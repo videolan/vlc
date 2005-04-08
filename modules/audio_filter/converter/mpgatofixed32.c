@@ -2,7 +2,7 @@
  * mpgatofixed32.c: MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder,
  * using MAD (MPEG Audio Decoder)
  *****************************************************************************
- * Copyright (C) 2001 by Jean-Paul Saman
+ * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -126,7 +126,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) * 
-                               aout_FormatNbChannels( &p_filter->input );
+                               aout_FormatNbChannels( &p_filter->output );
 
     /* Do the actual decoding now. */
     mad_stream_buffer( &p_sys->mad_stream, p_in_buf->p_buffer,
@@ -165,16 +165,36 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         switch ( p_pcm->channels )
         {
         case 2:
-            if ( p_filter->output.i_original_channels == AOUT_CHAN_CENTER )
-            while ( i_samples-- )
+            if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
             {
-                *p_samples++ = (*p_left++ >> 1) + (*p_right++ >> 1);
+                while ( i_samples-- )
+                {
+                    *p_samples++ = (*p_left++ >> 1) + (*p_right++ >> 1);
+                }
+            }
+            else if ( p_filter->output.i_original_channels == AOUT_CHAN_LEFT )
+            {
+                while ( i_samples-- )
+                {
+                    *p_samples++ = *p_left;
+                    *p_samples++ = *p_left++;
+                }
+            }
+            else if ( p_filter->output.i_original_channels == AOUT_CHAN_RIGHT )
+            {
+                while ( i_samples-- )
+                {
+                    *p_samples++ = *p_right;
+                    *p_samples++ = *p_right++;
+                }
             }
             else
-            while ( i_samples-- )
             {
-                *p_samples++ = *p_left++;
-                *p_samples++ = *p_right++;
+                while ( i_samples-- )
+                {
+                    *p_samples++ = *p_left++;
+                    *p_samples++ = *p_right++;
+                }
             }
             break;
 
@@ -201,17 +221,37 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         switch ( p_pcm->channels )
         {
         case 2:
-            if ( p_filter->output.i_original_channels == AOUT_CHAN_CENTER )
-            while ( i_samples-- )
+            if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
             {
-                *p_samples++ = (float)*p_left++ / f_temp / 2 +
-                               (float)*p_right++ / f_temp / 2;
+                while ( i_samples-- )
+                {
+                    *p_samples++ = (float)*p_left++ / f_temp / 2 +
+                                   (float)*p_right++ / f_temp / 2;
+                }
+            }
+            else if ( p_filter->output.i_original_channels == AOUT_CHAN_LEFT )
+            {
+                while ( i_samples-- )
+                {
+                    *p_samples++ = (float)*p_left / f_temp;
+                    *p_samples++ = (float)*p_left++ / f_temp;
+                }
+            }
+            else if ( p_filter->output.i_original_channels == AOUT_CHAN_RIGHT )
+            {
+                while ( i_samples-- )
+                {
+                    *p_samples++ = (float)*p_right / f_temp;
+                    *p_samples++ = (float)*p_right++ / f_temp;
+                }
             }
             else
-            while ( i_samples-- )
             {
-                *p_samples++ = (float)*p_left++ / f_temp;
-                *p_samples++ = (float)*p_right++ / f_temp;
+                while ( i_samples-- )
+                {
+                    *p_samples++ = (float)*p_left++ / f_temp;
+                    *p_samples++ = (float)*p_right++ / f_temp;
+                }
             }
             break;
 
@@ -279,13 +319,12 @@ static int OpenFilter( vlc_object_t *p_this )
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
-    p_filter->fmt_out.audio.i_bitspersample = sizeof(float);
     p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,
              (char *)&p_filter->fmt_out.i_codec,
-             p_filter->fmt_out.audio.i_bitspersample );
+             p_filter->fmt_in.audio.i_bitspersample );
 
     return 0;
 }
