@@ -397,7 +397,7 @@ mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 
 mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-#	patch -p 0 < Patches/mpeg2dec.patch
+	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && make && make install)
@@ -636,6 +636,7 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p 0 < Patches/libebml.patch
 	-rm -rf $@/CVS
 
 .ebml: libebml
