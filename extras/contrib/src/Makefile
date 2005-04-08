@@ -400,7 +400,7 @@ mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 #	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
-	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-dsl && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && make && make install)
 	touch $@
 
 CLEAN_FILE += .mpeg2
