@@ -350,6 +350,7 @@ static int AddStream( sout_mux_t *, sout_input_t * );
 static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
+static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
 static void TSSchedule  ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           mtime_t i_pcr_length, mtime_t i_pcr_dts );
 static void TSDate      ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
@@ -498,7 +499,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->csa      = NULL;
     var_Get( p_mux, SOUT_CFG_PREFIX "csa-ck", &val );
-    if( val.psz_string )
+    if( val.psz_string && *val.psz_string )
     {
         char *psz = val.psz_string;
 
@@ -985,11 +986,19 @@ static int Mux( sout_mux_t *p_mux )
 
             /* Accumulate enough data in the pcr stream (>i_shaping_delay) */
             /* Accumulate enough data in all other stream ( >= length of pcr)*/
-            for( i = 0; i < p_mux->i_nb_inputs; i++ )
+            for( i = -1; i < p_mux->i_nb_inputs; i++ )
             {
-                sout_input_t *p_input = p_mux->pp_inputs[i];
-                ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
+                sout_input_t *p_input;
+                ts_stream_t *p_stream;
                 int64_t i_spu_delay = 0;
+
+                if( i == -1 )
+                    p_input = p_sys->p_pcr_input;
+                else if( p_mux->pp_inputs[i]->p_sys == p_pcr_stream )
+                    continue;
+                else
+                    p_input = p_mux->pp_inputs[i];
+                p_stream = (ts_stream_t*)p_input->p_sys;
 
                 if( ( p_stream == p_pcr_stream &&
                       p_stream->i_pes_length < i_shaping_delay ) ||
@@ -1036,7 +1045,13 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     b_ok = VLC_FALSE;
 
-                    p_data = block_FifoGet( p_input->p_fifo );
+                    if( p_stream == p_pcr_stream
+                         || p_input->p_fmt->i_codec !=
+                             VLC_FOURCC('m', 'p', 'g', 'a') )
+                        p_data = block_FifoGet( p_input->p_fifo );
+                    else
+                        p_data = FixPES( p_mux, p_input->p_fifo );
+
                     if( p_input->p_fifo->i_depth > 0 &&
                         p_input->p_fmt->i_cat != SPU_ES )
                     {
@@ -1214,7 +1229,7 @@ static int Mux( sout_mux_t *p_mux )
         /* 3: mux PES into TS */
         BufferChainInit( &chain_ts );
         /* append PAT/PMT  -> FIXME with big pcr delay it won't have enough pat/pmt */
-        GetPAT( p_mux, &chain_ts);
+        GetPAT( p_mux, &chain_ts );
         GetPMT( p_mux, &chain_ts );
         i_packet_pos = 0;
         i_packet_count += chain_ts.i_depth;
@@ -1279,6 +1294,62 @@ static int Mux( sout_mux_t *p_mux )
 
         /* 4: date and send */
         TSSchedule( p_mux, &chain_ts, i_pcr_length, i_pcr_dts );
+    }
+}
+
+#define STD_PES_PAYLOAD 170
+static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
+{
+    block_t *p_data;
+    int i_size;
+
+    p_data = block_FifoShow( p_fifo );
+    i_size = p_data->i_buffer;
+
+    if( i_size == STD_PES_PAYLOAD )
+    {
+        return block_FifoGet( p_fifo );
+    }
+    else if( i_size > STD_PES_PAYLOAD )
+    {
+        block_t *p_new = block_New( p_mux, STD_PES_PAYLOAD );
+        p_mux->p_vlc->pf_memcpy( p_new->p_buffer, p_data->p_buffer, STD_PES_PAYLOAD );
+        p_new->i_pts = p_data->i_pts;
+        p_new->i_dts = p_data->i_dts;
+        p_new->i_length = p_data->i_length * STD_PES_PAYLOAD
+                            / p_data->i_buffer;
+        p_data->i_buffer -= STD_PES_PAYLOAD;
+        p_data->p_buffer += STD_PES_PAYLOAD;
+        p_data->i_pts += p_new->i_length;
+        p_data->i_dts += p_new->i_length;
+        p_data->i_length -= p_new->i_length;
+        p_data->i_flags |= BLOCK_FLAG_NO_KEYFRAME;
+        return p_new;
+    }
+    else
+    {
+        block_t *p_next;
+        p_data = block_FifoGet( p_fifo );
+        p_data = block_Realloc( p_data, 0, STD_PES_PAYLOAD );
+        p_next = block_FifoShow( p_fifo );
+        if ( p_data->i_flags & BLOCK_FLAG_NO_KEYFRAME )
+        {
+            p_data->i_flags &= ~BLOCK_FLAG_NO_KEYFRAME;
+            p_data->i_pts = p_next->i_pts;
+            p_data->i_dts = p_next->i_dts;
+        }
+        p_mux->p_vlc->pf_memcpy( &p_data->p_buffer[i_size], p_next->p_buffer,
+                                 STD_PES_PAYLOAD - i_size );
+        p_next->i_pts += p_next->i_length * (STD_PES_PAYLOAD - i_size)
+                           / p_next->i_buffer;
+        p_next->i_dts += p_next->i_length * (STD_PES_PAYLOAD - i_size)
+                           / p_next->i_buffer;
+        p_next->i_length -= p_next->i_length * (STD_PES_PAYLOAD - i_size)
+                           / p_next->i_buffer;
+        p_next->i_buffer -= STD_PES_PAYLOAD - i_size;
+        p_next->p_buffer += STD_PES_PAYLOAD - i_size;
+        p_next->i_flags |= BLOCK_FLAG_NO_KEYFRAME;
+        return p_data;
     }
 }
 
