@@ -1,0 +1,4 @@
+SOURCES_externrun = \
+	externrun.c \
+	$(NULL)
+

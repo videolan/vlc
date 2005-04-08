@@ -115,6 +115,9 @@ struct demux_sys_t
 
     /* Used for the pause command */
     mtime_t expiration;
+    
+    /* The command to run */
+    char* psz_command;
 };
 enum
 {
@@ -122,6 +125,7 @@ enum
     COMMAND_QUIT = 1,
     COMMAND_LOOP = 2,
     COMMAND_PAUSE= 3,
+    COMMAND_RUN  = 4,
 };
 
 static int Demux( demux_t * );
@@ -177,6 +181,16 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
         p_sys->expiration = mdate() + (mtime_t)i_arg * (mtime_t)1000000;
         return VLC_SUCCESS;
     }
+    
+    /* Check for a "vlc:run:***" command */
+    if ( i_len > 4 && !strncasecmp( psz_name, "run:", 4 ) )
+    {
+       p_sys->psz_command = malloc( i_len - 4 );
+       strcpy( p_sys->psz_command, psz_name + 4 );
+       msg_Info( p_demux, "command `run program %s'", p_sys->psz_command );
+       p_sys->i_command = COMMAND_RUN;
+       return VLC_SUCCESS;
+    } 
 
     msg_Err( p_demux, "unknown command `%s'", psz_name );
 
@@ -227,11 +241,17 @@ static int Demux( demux_t *p_demux )
             else
                 msleep( 10000 );
             break;
+        
+        case COMMAND_RUN:
+            var_SetString( p_playlist, "run-program-command", p_sys->psz_command );
+            free( p_sys->psz_command );
+            b_eof = VLC_TRUE;
+            break;
 
         case COMMAND_NOP:
         default:
             b_eof = VLC_TRUE;
-            break;
+            break;       
     }
 
     vlc_object_release( p_playlist );

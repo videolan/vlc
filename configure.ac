@@ -953,7 +953,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-VLC_ADD_PLUGINS([dummy logger memcpy])
+VLC_ADD_PLUGINS([dummy logger memcpy externrun])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump flac])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flacdec])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform distort motionblur])
@@ -4373,6 +4373,7 @@ AC_CONFIG_FILES([
   modules/gui/wince/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
+  modules/misc/externrun/Makefile
   modules/misc/memcpy/Makefile
   modules/misc/network/Makefile
   modules/misc/testsuite/Makefile
