@@ -95,7 +95,7 @@ int net_ConvertIPv4( uint32_t *p_addr, const char * psz_address )
         /* Try to convert address directly from in_addr - this will work if
          * psz_address is dotted decimal. */
 #ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_address, &p_addr ) )
+        if( !inet_aton( psz_address, (struct in_addr *)p_addr ) )
 #else
         *p_addr = inet_addr( psz_address );
         if( *p_addr == INADDR_NONE )
