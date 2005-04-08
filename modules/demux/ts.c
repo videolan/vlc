@@ -113,8 +113,6 @@ vlc_module_begin();
                  MTUOUT_LONGTEXT, VLC_TRUE );
     add_string( "ts-csa-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, VLC_TRUE );
     add_bool( "ts-silent", 0, NULL, SILENT_TEXT, SILENT_LONGTEXT, VLC_TRUE );
-    add_integer( "ts-capmt-sysid", 0, NULL, CAPMT_SYSID_TEXT,
-                 CAPMT_SYSID_LONGTEXT, VLC_TRUE );
 
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
@@ -298,7 +296,6 @@ struct demux_sys_t
     vlc_bool_t  b_es_id_pid;
     csa_t       *csa;
     vlc_bool_t  b_silent;
-    uint16_t    i_capmt_sysid;
 
     vlc_bool_t  b_udp_out;
     int         fd; /* udp socket */
@@ -626,10 +623,6 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_demux, "ts-silent", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-silent", &val );
     p_sys->b_silent = val.b_bool;
-
-    var_Create( p_demux, "ts-capmt-sysid", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "ts-capmt-sysid", &val );
-    p_sys->i_capmt_sysid = val.i_int;
 
     return VLC_SUCCESS;
 }
@@ -2608,24 +2601,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 else if( p_dr->i_tag == 0x45 )
                 {
                     msg_Dbg( p_demux, "   * VBI Data descriptor" );
-                    pid->es->fmt.i_cat = SPU_ES;
-                    pid->es->fmt.i_codec = VLC_FOURCC( 'v', 'b', 'i', 'd' );
-                    pid->es->fmt.psz_description = strdup( "VBI Data" );
-                    pid->es->fmt.i_extra = p_dr->i_length;
-                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
-                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
-                            p_dr->i_length );
+                    /* FIXME : store the information somewhere */
                 }
                 else if( p_dr->i_tag == 0x46 )
                 {
                     msg_Dbg( p_demux, "  * VBI Teletext descriptor" );
-                    pid->es->fmt.i_cat = SPU_ES;
-                    pid->es->fmt.i_codec = VLC_FOURCC( 'v', 'b', 'i', 't' );
-                    pid->es->fmt.psz_description = strdup( "VBI Teletext" );
-                    pid->es->fmt.i_extra = p_dr->i_length;
-                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
-                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
-                            p_dr->i_length );
+                    /* FIXME : store the information somewhere */
                 }
                 else if( p_dr->i_tag == 0x56 )
                 {
