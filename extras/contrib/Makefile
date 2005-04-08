@@ -1,10 +1,11 @@
 # ***************************************************************************
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
-# Copyright (C) 2003 VideoLAN
+# Copyright (C) 2003-2005 VideoLAN
 # $Id$
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
+#          Derk-Jan Hartman <hartman at videolan dot org>
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,17 +35,21 @@ src: FORCE
 contrib-macosx.tar.bz2: FORCE
 	$(WGET) $(CONTRIB_URL)
 
-bin: contrib-macosx.tar.bz2
-	@if test -d tmp; then \
-		echo "Move away ./tmp, it's in the way" ; \
-		exit 1 ; \
-	fi
-	mkdir tmp
-	bunzip2 -c $< | (cd tmp; tar xf -)
-	./change_prefix.sh tmp @@CONTRIB_PREFIX@@ $(PREFIX)
-	(cd tmp; tar cf - .) | tar xf -
-	rm -rf tmp
-	ranlib lib/*\.a
+bin: FORCE
+	@echo "make bin isn't in a functional state at this moment. Please use make src"
+
+#The disabled make bin
+#bin: contrib-macosx.tar.bz2
+#	@if test -d tmp; then \
+#		echo "Move away ./tmp, it's in the way" ; \
+#		exit 1 ; \
+#	fi
+#	mkdir tmp
+#	bunzip2 -c $< | (cd tmp; tar xf -)
+#	./change_prefix.sh tmp @@CONTRIB_PREFIX@@ $(PREFIX)
+#	(cd tmp; tar cf - .) | tar xf -
+#	rm -rf tmp
+#	ranlib lib/*\.a
 
 clean-src: FORCE
 	rm -rf $(BUILDDIRS)
