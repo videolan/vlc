@@ -543,6 +543,14 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 {
     block_FifoPut( p_input->p_fifo, p_buffer );
 
+    if( p_mux->p_sout->i_out_pace_nocontrol )
+    {
+        mtime_t current_date = mdate();
+        if ( current_date > p_buffer->i_dts )
+            msg_Warn( p_mux, "late buffer for mux input ("I64Fd")",
+                      current_date - p_buffer->i_dts );
+    }
+
     if( p_mux->b_waiting_stream )
     {
         if( p_mux->i_add_stream_start < 0 )
