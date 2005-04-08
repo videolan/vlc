@@ -220,13 +220,17 @@ static int block_ChainExtract( block_t *p_list, void *p_data, int i_max )
 static inline block_t *block_ChainGather( block_t *p_list )
 {
     int     i_total = 0;
+    mtime_t i_length = 0;
     block_t *b, *g;
 
     if( p_list->p_next == NULL )
         return p_list;  /* Already gathered */
 
     for( b = p_list; b != NULL; b = b->p_next )
+    {
         i_total += b->i_buffer;
+        i_length += b->i_length;
+    }
 
     g = block_New( p_list->p_manager, i_total );
     block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
@@ -234,6 +238,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
     g->i_flags = p_list->i_flags;
     g->i_pts   = p_list->i_pts;
     g->i_dts   = p_list->i_dts;
+    g->i_length = i_length;
 
     /* free p_list */
     block_ChainRelease( p_list );
