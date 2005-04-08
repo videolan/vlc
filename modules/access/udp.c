@@ -392,7 +392,12 @@ trash:
 
 static block_t *BlockRTP( access_t *p_access )
 {
-    return BlockParseRTP( p_access, BlockUDP( p_access ) );
+    block_t *p_block = BlockUDP( p_access );
+
+    if ( p_block != NULL )
+        return BlockParseRTP( p_access, p_block );
+    else
+        return NULL;
 }
 
 /*****************************************************************************
