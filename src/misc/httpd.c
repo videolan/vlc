@@ -879,15 +879,6 @@ void httpd_StreamDelete( httpd_stream_t *stream )
  *****************************************************************************/
 #define LISTEN_BACKLOG          100
 
-#if defined(HAVE_GETNAMEINFO) && !defined(HAVE_GETADDRINFO)
-/* 
- * For now, VLC's configure script does not check for getaddrinfo(),
- * but it should be present if getnameinfo() is (the opposite is untrue, with
- * Debian potato as an example)
- */
-# define HAVE_GETADDRINFO 1
-#endif
-
 static void httpd_HostThread( httpd_host_t * );
 static int GetAddrPort( const struct sockaddr_storage *p_ss );
 
