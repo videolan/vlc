@@ -112,12 +112,13 @@ typedef struct bridged_es_t
 
     /* bridge in part */
     sout_stream_id_t *id;
+    mtime_t i_last;
     vlc_bool_t b_changed;
 } bridged_es_t;
 
 typedef struct bridge_t
 {
-    bridged_es_t *p_es;
+    bridged_es_t **pp_es;
     int i_es_num;
 } bridge_t;
 
@@ -194,7 +195,6 @@ static void CloseOut( vlc_object_t * p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
 
-    /* update p_sout->i_out_pace_nocontrol */
     p_stream->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys );
@@ -228,25 +228,28 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
         var_Set( p_libvlc, "bridge-struct", val );
 
         p_bridge->i_es_num = 0;
-        p_bridge->p_es = NULL;
+        p_bridge->pp_es = NULL;
     }
 
     for ( i = 0; i < p_bridge->i_es_num; i++ )
     {
-        if ( p_bridge->p_es[i].b_empty && !p_bridge->p_es[i].b_changed )
+        if ( p_bridge->pp_es[i]->b_empty && !p_bridge->pp_es[i]->b_changed )
             break;
     }
 
     if ( i == p_bridge->i_es_num )
     {
-        p_bridge->p_es = realloc( p_bridge->p_es,
-                                  (p_bridge->i_es_num + 1)
-                                    * sizeof(bridged_es_t) );
+        p_bridge->pp_es = realloc( p_bridge->pp_es,
+                                   (p_bridge->i_es_num + 1)
+                                     * sizeof(bridged_es_t *) );
         p_sys->i_position = p_bridge->i_es_num;
         p_bridge->i_es_num++;
+        p_bridge->pp_es[i] = malloc( sizeof(bridged_es_t) );
     }
+    else
+        p_sys->i_position = i;
 
-    p_es = &p_bridge->p_es[ p_sys->i_position ];
+    p_es = p_bridge->pp_es[ p_sys->i_position ];
     p_es->fmt = *p_fmt;
     p_es->fmt.i_id = p_sys->i_id;
     p_es->p_block = NULL;
@@ -254,7 +257,11 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_es->b_empty = VLC_FALSE;
 
     p_es->id = NULL;
+    p_es->i_last = 0;
     p_es->b_changed = VLC_TRUE;
+
+    msg_Dbg( p_stream, "bridging out input codec=%4.4s id=%d pos=%d",
+             (char*)&p_es->fmt.i_codec, p_es->fmt.i_id, p_sys->i_position );
 
     vlc_mutex_unlock( p_sys->p_lock );
 
@@ -275,10 +282,11 @@ static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
     vlc_mutex_lock( p_sys->p_lock );
 
     p_bridge = GetBridge( p_stream );
-    p_es = &p_bridge->p_es[ p_sys->i_position ];
+    p_es = p_bridge->pp_es[ p_sys->i_position ];
 
     p_es->b_empty = VLC_TRUE;
     block_ChainRelease( p_es->p_block );
+    p_es->p_block = VLC_FALSE;
 
     p_es->b_changed = VLC_TRUE;
     vlc_mutex_unlock( p_sys->p_lock );
@@ -302,7 +310,7 @@ static int SendOut( sout_stream_t *p_stream, sout_stream_id_t *id,
     vlc_mutex_lock( p_sys->p_lock );
 
     p_bridge = GetBridge( p_stream );
-    p_es = &p_bridge->p_es[ p_sys->i_position ];
+    p_es = p_bridge->pp_es[ p_sys->i_position ];
     *p_es->pp_last = p_buffer;
     while ( p_buffer != NULL )
     {
@@ -380,10 +388,7 @@ static void CloseIn( vlc_object_t * p_this )
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
     sout_StreamDelete( p_sys->p_out );
-
-    /* update p_sout->i_out_pace_nocontrol */
     p_stream->p_sout->i_out_pace_nocontrol--;
-
 
     free( p_sys );
 }
@@ -425,57 +430,98 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     for ( i = 0; i < p_bridge->i_es_num; i++ )
     {
-        if ( p_bridge->p_es[i].b_changed )
+        if ( !p_bridge->pp_es[i]->b_empty )
+            b_no_es = VLC_FALSE;
+
+        while ( p_bridge->pp_es[i]->p_block != NULL
+                 && (p_bridge->pp_es[i]->p_block->i_dts < mdate()
+                      || p_bridge->pp_es[i]->p_block->i_dts + p_sys->i_delay
+                          < p_bridge->pp_es[i]->i_last) )
         {
-            if ( p_bridge->p_es[i].b_empty )
+            block_t *p_block = p_bridge->pp_es[i]->p_block;
+            p_bridge->pp_es[i]->p_block
+                = p_bridge->pp_es[i]->p_block->p_next;
+            block_Release( p_block );
+        }
+
+        if ( p_bridge->pp_es[i]->p_block == NULL )
+        {
+            p_bridge->pp_es[i]->pp_last = &p_bridge->pp_es[i]->p_block;
+        }
+
+        if ( p_bridge->pp_es[i]->b_changed )
+        {
+            if ( p_bridge->pp_es[i]->b_empty && p_bridge->pp_es[i]->id != NULL )
             {
-                p_sys->p_out->pf_del( p_sys->p_out, p_bridge->p_es[i].id );
+                p_sys->p_out->pf_del( p_sys->p_out, p_bridge->pp_es[i]->id );
             }
             else
             {
-                p_bridge->p_es[i].fmt.i_id += p_sys->i_id_offset;
-                p_bridge->p_es[i].id = p_sys->p_out->pf_add(
-                            p_sys->p_out, &p_bridge->p_es[i].fmt );
-                if ( p_bridge->p_es[i].id == NULL )
+                if ( p_bridge->pp_es[i]->p_block == NULL )
+                {
+                    continue;
+                }
+
+                p_bridge->pp_es[i]->fmt.i_id += p_sys->i_id_offset;
+                p_bridge->pp_es[i]->id = p_sys->p_out->pf_add(
+                            p_sys->p_out, &p_bridge->pp_es[i]->fmt );
+                if ( p_bridge->pp_es[i]->id == NULL )
                 {
                     msg_Warn( p_stream, "couldn't create chain for id %d",
-                              p_bridge->p_es[i].fmt.i_id );
+                              p_bridge->pp_es[i]->fmt.i_id );
                 }
+                msg_Dbg( p_stream, "bridging in input codec=%4.4s id=%d pos=%d",
+                         (char*)&p_bridge->pp_es[i]->fmt.i_codec,
+                         p_bridge->pp_es[i]->fmt.i_id, i );
             }
         }
-        p_bridge->p_es[i].b_changed = VLC_FALSE;
+        p_bridge->pp_es[i]->b_changed = VLC_FALSE;
 
-        if ( p_bridge->p_es[i].b_empty )
+        if ( p_bridge->pp_es[i]->b_empty )
             continue;
 
-        b_no_es = VLC_FALSE;
-
-        if ( p_bridge->p_es[i].p_block == NULL )
-            continue;
-
-        if ( p_bridge->p_es[i].id != NULL )
+        if ( p_bridge->pp_es[i]->p_block == NULL )
         {
-            block_t *p_block = p_bridge->p_es[i].p_block;
+            if ( p_bridge->pp_es[i]->id != NULL
+                  && p_bridge->pp_es[i]->i_last < mdate() )
+            {
+                p_sys->p_out->pf_del( p_sys->p_out, p_bridge->pp_es[i]->id );
+                p_bridge->pp_es[i]->fmt.i_id -= p_sys->i_id_offset;
+                p_bridge->pp_es[i]->b_changed = VLC_TRUE;
+                p_bridge->pp_es[i]->id = NULL;
+            }
+            continue;
+        }
+
+        if ( p_bridge->pp_es[i]->id != NULL )
+        {
+            block_t *p_block = p_bridge->pp_es[i]->p_block;
+            p_bridge->pp_es[i]->i_last = p_bridge->pp_es[i]->p_block->i_dts
+                                   + p_bridge->pp_es[i]->p_block->i_length;
             while ( p_block != NULL )
             {
                 p_block->i_pts += p_sys->i_delay;
                 p_block->i_dts += p_sys->i_delay;
                 p_block = p_block->p_next;
             }
-            p_sys->p_out->pf_send( p_sys->p_out, p_bridge->p_es[i].id,
-                                   p_bridge->p_es[i].p_block );
+            p_sys->p_out->pf_send( p_sys->p_out, p_bridge->pp_es[i]->id,
+                                   p_bridge->pp_es[i]->p_block );
         }
         else
-            block_ChainRelease( p_bridge->p_es[i].p_block );
+        {
+            block_ChainRelease( p_bridge->pp_es[i]->p_block );
+        }
 
-        p_bridge->p_es[i].p_block = NULL;
-        p_bridge->p_es[i].pp_last = &p_bridge->p_es[i].p_block;
+        p_bridge->pp_es[i]->p_block = NULL;
+        p_bridge->pp_es[i]->pp_last = &p_bridge->pp_es[i]->p_block;
     }
 
     if( b_no_es )
     {
         libvlc_t *p_libvlc = p_stream->p_libvlc;
-        free( p_bridge->p_es );
+        for ( i = 0; i < p_bridge->i_es_num; i++ )
+            free( p_bridge->pp_es[i] );
+        free( p_bridge->pp_es );
         free( p_bridge );
         var_Destroy( p_libvlc, "bridge-struct" );
     }
