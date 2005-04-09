@@ -7,7 +7,6 @@ SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c
 SOURCES_au = au.c
 SOURCES_wav = wav.c
-SOURCES_aac = aac.c
 SOURCES_mkv = mkv.cpp mp4/libmp4.c mp4/drms.c
 SOURCES_livedotcom = livedotcom.cpp ../access/mms/asf.c ../access/mms/buffer.c
 SOURCES_nsv = nsv.c
