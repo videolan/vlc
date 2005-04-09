@@ -354,7 +354,6 @@ gnutls_BeginHandshake( tls_session_t *p_session, int fd,
 
     gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
 
-    p_sys->psz_hostname = NULL;
     if( psz_hostname != NULL )
     {
         gnutls_server_name_set( p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
@@ -411,7 +410,6 @@ gnutls_ClientDelete( tls_session_t *p_session )
     gnutls_certificate_free_credentials( x509_cred );
 }
 
-
 inline int
 is_regular( const char *psz_filename )
 {
@@ -425,11 +423,11 @@ is_regular( const char *psz_filename )
 #endif
 }
 
-
 static int
-gnutls_AddCADirectory( vlc_object_t *p_this,
-                       gnutls_certificate_credentials cred,
-                       const char *psz_dirname )
+gnutls_Addx509Directory( vlc_object_t *p_this,
+                         gnutls_certificate_credentials cred,
+                         const char *psz_dirname,
+                         vlc_bool_t private )
 {
     DIR* dir;
     struct dirent *p_ent;
@@ -454,7 +452,10 @@ gnutls_AddCADirectory( vlc_object_t *p_this,
 
         psz_filename = (char *)malloc( i_len + strlen( p_ent->d_name ) );
         if( psz_filename == NULL )
+        {
+            closedir( dir );
             return VLC_ENOMEM;
+        }
 
         sprintf( psz_filename, "%s/%s", psz_dirname, p_ent->d_name );
         /* we neglect the race condition here - not security sensitive */
@@ -462,11 +463,16 @@ gnutls_AddCADirectory( vlc_object_t *p_this,
         {
             int i;
 
-            i = gnutls_certificate_set_x509_trust_file( cred, psz_filename,
-                                                        GNUTLS_X509_FMT_PEM );
+            i = (private)
+                ? gnutls_certificate_set_x509_key_file( cred, psz_filename,
+                                                        psz_filename,
+                                                        GNUTLS_X509_FMT_PEM )
+                : gnutls_certificate_set_x509_trust_file( cred, psz_filename,
+                                                          GNUTLS_X509_FMT_PEM
+                                                          );
             if( i < 0 )
             {
-                msg_Warn( p_this, "Cannot add trusted CA (%s) : %s",
+                msg_Warn( p_this, "Cannot add x509 certificate (%s) : %s",
                           psz_filename, gnutls_strerror( i ) );
             }
         }
@@ -513,6 +519,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     p_session->pf_close = gnutls_ClientDelete;
 
     p_sys->session.b_handshaked = VLC_FALSE;
+    p_sys->session.psz_hostname = NULL;
 
     vlc_object_attach( p_session, p_tls );
 
@@ -540,14 +547,35 @@ gnutls_ClientCreate( tls_t *p_tls )
         }
 
         sprintf( psz_path, "%s/"CONFIG_DIR"/ssl/certs", psz_homedir );
-        gnutls_AddCADirectory( (vlc_object_t *)p_session, p_sys->x509_cred,
-                               psz_path );
+        gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
+                                 psz_path, VLC_FALSE );
 
         free( psz_path );
         p_session->pf_handshake2 = gnutls_HandshakeAndValidate;
     }
     else
         p_session->pf_handshake2 = gnutls_ContinueHandshake;
+
+    {
+        /* FIXME: support for changing path/using multiple paths */
+        char *psz_path;
+        const char *psz_homedir;
+
+        psz_homedir = p_tls->p_vlc->psz_homedir;
+        psz_path = (char *)malloc( strlen( psz_homedir )
+                                   + sizeof( CONFIG_DIR ) + 14 );
+        if( psz_path == NULL )
+        {
+            gnutls_certificate_free_credentials( p_sys->x509_cred );
+            goto error;
+        }
+
+        sprintf( psz_path, "%s/"CONFIG_DIR"/ssl/private", psz_homedir );
+        gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
+                                 psz_path, VLC_TRUE );
+
+        free( psz_path );
+    }
 
     i_val = gnutls_init( &p_sys->session.session, GNUTLS_CLIENT );
     if( i_val != 0 )
@@ -735,6 +763,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session->pf_close = gnutls_SessionClose;
 
     ((tls_session_sys_t *)p_session->p_sys)->b_handshaked = VLC_FALSE;
+    ((tls_session_sys_t *)p_session->p_sys)->psz_hostname = NULL;
 
     i_val = gnutls_init( &session, GNUTLS_SERVER );
     if( i_val != 0 )
