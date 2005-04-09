@@ -37,6 +37,10 @@
  * Option help text
  *****************************************************************************/
 
+static char *psz_paranoia_list[] = { "none", "overlap", "full" };
+static char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
+					  N_("full") };
+
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
     "meta info          1\n" \
@@ -91,6 +95,13 @@
 "   %t : The track title or MRL if no title\n" \
 "   %% : a % \n")
 
+#define PARANOIA_TEXT N_("Enable CD paranoia?")
+#define PARANOIA_LONGTEXT N_( \
+        "Select whether to use CD Paranoia for jitter/error correction.\n" \
+        "none: no paranoia - fastest.\n" \
+        "overlap: do only overlap detection - not generally recommended.\n" \
+        "full: complete jitter and error correction detection - slowest.\n" )
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -99,7 +110,7 @@ vlc_module_begin();
     add_usage_hint( N_("cddax://[device-or-file][@[T]track]") );
     set_description( _("Compact Disc Digital Audio (CD-DA) input") );
     set_capability( "access2", 10 /* compare with priority of cdda */ );
-    set_shortname( N_("Audio CD"));
+    set_shortname( N_("Audio Compact Disc"));
     set_callbacks( CDDAOpen, CDDAClose );
     add_shortcut( "cddax" );
     add_shortcut( "cd" );
@@ -126,7 +137,32 @@ vlc_module_begin();
                 N_("Format to use in playlist \"title\" field when no CDDB"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
+    add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, CDTextEnabledCB,
+              N_("Do CD-Text lookups?"),
+              N_("If set, get CD-Text information"),
+              VLC_FALSE );
+
+    add_bool( MODULE_STRING "-navigation-mode", VLC_TRUE, 
+#if FIXED
+	      CDDANavModeCB,
+#else
+	      NULL,
+#endif
+              N_("Use Navigation-style playback?"),
+              N_("If set, tracks are navigated via Navagation rather than "
+		 "a playlist entries"),
+              VLC_FALSE );
+
+#if LIBCDIO_VERSION_NUM >= 72
+      add_string( MODULE_STRING "-paranoia", NULL, NULL,
+		PARANOIA_TEXT,
+		PARANOIA_LONGTEXT,
+		VLC_FALSE );
+      change_string_list( psz_paranoia_list, psz_paranoia_list_text, 0 );
+#endif /* LIBCDIO_VERSION_NUM >= 72 */
+
 #ifdef HAVE_LIBCDDB
+    set_section( N_("CDDB" ), 0 );
     add_string( MODULE_STRING "-cddb-title-format",
                 "Track %T. %t - %p %A", NULL,
                 N_("Format to use in playlist \"title\" field when using CDDB"),
@@ -180,33 +216,6 @@ vlc_module_begin();
               N_("If set, CD-Text information will be preferred "
 		 "to CDDB information when both are available"),
               VLC_FALSE );
-
-#endif
-
-    add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, CDTextEnabledCB,
-              N_("Do CD-Text lookups?"),
-              N_("If set, get CD-Text information"),
-              VLC_FALSE );
-
-    add_bool( MODULE_STRING "-navigation-mode", VLC_TRUE, 
-#if FIXED
-	      CDDANavModeCB,
-#else
-	      NULL,
-#endif
-              N_("Use Navigation-style playback?"),
-              N_("If set, tracks are navigated via Navagation rather than "
-		 "a playlist entries"),
-              VLC_FALSE );
-
-#if LIBCDIO_VERSION_NUM >= 72
-    add_bool( MODULE_STRING "-paranoia-enabled", 
-	      //	      VLC_FALSE, NULL,
-	      VLC_TRUE, NULL,
-              N_("Enable CD paranoia?"),
-              N_("If set, CD-DA reading will go through paranoia "
-                 "jitter/error correction"),
-              VLC_FALSE );
-#endif    
+#endif /*HAVE_LIBCDDB*/
 
 vlc_module_end();

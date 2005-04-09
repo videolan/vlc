@@ -80,9 +80,9 @@ CDTextEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
         msg_Dbg( p_cdda_input, "Old CDText Enabled %d, new %d",
-                 p_cdda->b_cdtext_enabled, val.b_bool);
+                 p_cdda->b_cdtext, val.b_bool);
     }
-    p_cdda->b_cdtext_enabled = val.b_bool;
+    p_cdda->b_cdtext = val.b_bool;
     return VLC_SUCCESS;
 }
 

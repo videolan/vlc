@@ -894,6 +894,9 @@ int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
     return VLC_SUCCESS;
 }
 
+/* 
+   Fixes up playlist. 
+*/
 int
 CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda, 
                    vlc_bool_t b_single_track )
@@ -937,8 +940,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     CDDAMetaInfo( p_access, p_cdda->i_track );
 
     if (p_playlist) {
-      p_item = playlist_LockItemGetByInput( p_playlist,
-                        ((input_thread_t *)p_access->p_parent)->input.p_item );
 
       if( p_item == p_playlist->status.p_item && !b_single_track )
 	{
@@ -950,22 +951,20 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 	}
     }
 
-    if( b_single_track )
+    if( b_single_track && !p_cdda->b_nav_mode )
     {
         /*May fill out more information when the playlist user interface becomes
            more mature.
          */
         track_t i_track = p_cdda->i_track;
 	unsigned int i_track_frames = 
-	  cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) - 
-	  cdio_get_track_lsn(p_cdda->p_cdio, i_track);
+	  cdio_get_track_sec_count(p_cdda->p_cdio, i_track);
 	
         input_title_t *t = p_cdda->p_title[0] = //i_track-i_first_track] =
         vlc_input_title_New();
 
         asprintf( &t->psz_name, _("Track %i"), i_track );
-        t->i_size = p_access->info.i_size = 
-	  i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
+        t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 
         t->i_length = I64C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
 
@@ -979,16 +978,14 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 	}
 	
         p_cdda->i_titles = 1;
-        p_access->info.i_size =
-	  i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
-	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
+	p_access->info.i_update = INPUT_UPDATE_TITLE;
     }
     else
     {
 	input_title_t *t;
 
 
-	if ( ! p_cdda->b_nav_mode )
+	if ( !p_cdda->b_nav_mode )
 	  playlist_ItemToNode( p_playlist, p_item );
 
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
@@ -996,8 +993,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
             playlist_item_t *p_child;
             const track_t i_track = i_first_track + i;
 	    unsigned int i_track_frames = 
-	      cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) - 
-	      cdio_get_track_lsn(p_cdda->p_cdio, i_track);
+	      cdio_get_track_sec_count(p_cdda->p_cdio, i_track);
 
             t = p_cdda->p_title[i] = vlc_input_title_New();
 
@@ -1017,9 +1013,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         }
 
         p_cdda->i_titles = p_cdda->i_tracks;
-        p_access->info.i_size = 
-	  cdio_get_track_lba(p_cdda->p_cdio, CDIO_CDROM_LEADOUT_TRACK)
-	  * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
 	if (p_item) {
 	    p_item->input.i_duration = 

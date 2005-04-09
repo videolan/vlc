@@ -64,6 +64,13 @@
 #define CdIo_t CdIo
 #endif    
 
+typedef enum {
+  paranoia_none    = 0, /* Note: We make use of 0 as being the same as false */
+  paranoia_overlap = 1, 
+  paranoia_full    = 2
+} paranoia_mode_t;
+
+  
 /*****************************************************************************
  * cdda_data_t: CD audio information
  *****************************************************************************/
@@ -90,7 +97,7 @@ typedef struct cdda_data_s
 
 #if LIBCDIO_VERSION_NUM >= 72
   /* Paranoia support */
-  vlc_bool_t     b_paranoia_enabled;       /* Use cd paranoia for reads? */
+  paranoia_mode_t e_paranoia;              /* Use cd paranoia for reads? */
   cdrom_drive_t *paranoia_cd;              /* Place to store drive
 					      handle given by paranoia. */
   cdrom_paranoia_t *paranoia;
@@ -108,7 +115,7 @@ typedef struct cdda_data_s
   } cddb;
 #endif
 
-  vlc_bool_t   b_cdtext_enabled;      /* Use CD-Text at all? If not,
+  vlc_bool_t   b_cdtext;              /* Use CD-Text at all? If not,
 					 cdtext_preferred is meaningless. */
   vlc_bool_t   b_cdtext_prefer;       /* Prefer CD-Text info over
 					 CDDB? If no CDDB, the issue

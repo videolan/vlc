@@ -175,8 +175,9 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
     int          i_blocks = p_cdda->i_blocks_per_read;
 
-    dbg_print((INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN), "called %d",
-              p_cdda->i_lsn);
+    dbg_print((INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN), 
+	      "called %d pos: %lld, size: %lld",
+              p_cdda->i_lsn, p_access->info.i_pos, p_access->info.i_size);
 
     /* Check end of file */
     if( p_access->info.b_eof ) return NULL;
@@ -191,8 +192,8 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     }
 
     /* Check end of track */
-    while( p_cdda->i_lsn >= cdio_get_track_lsn(p_cdda->p_cdio, 
-					       p_cdda->i_track+1) )
+    while( p_cdda->i_lsn > cdio_get_track_last_lsn(p_cdda->p_cdio, 
+						   p_cdda->i_track) )
     {
         if( p_cdda->i_track >= p_cdda->i_first_track + p_cdda->i_titles - 1 )
         {
@@ -237,7 +238,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
 #if LIBCDIO_VERSION_NUM >= 72
       driver_return_code_t rc = DRIVER_OP_SUCCESS;
 
-      if ( p_cdda->b_paranoia_enabled ) 
+      if ( p_cdda->e_paranoia && p_cdda->paranoia ) 
 	{
 	  int i;
 	  for( i = 0; i < i_blocks; i++ )
@@ -256,8 +257,8 @@ static block_t * CDDAReadBlocks( access_t * p_access )
 		msg_Err( p_access, "paranoia read error on frame %i\n", 
 			 p_cdda->i_lsn+i );
 	      } else 
-		memcpy(p_block + i * CDIO_CD_FRAMESIZE_RAW, p_readbuf, 
-		       CDIO_CD_FRAMESIZE_RAW);
+		memcpy(p_block->p_buffer + i * CDIO_CD_FRAMESIZE_RAW, 
+		       p_readbuf, CDIO_CD_FRAMESIZE_RAW);
 	    }
 	}
       else 
@@ -286,7 +287,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     }
 
     p_cdda->i_lsn        += i_blocks;
-    p_access->info.i_pos += p_block->i_buffer;
+    p_access->info.i_pos += i_blocks * CDIO_CD_FRAMESIZE_RAW;
 
     return p_block;
 }
@@ -302,7 +303,7 @@ static int CDDASeek( access_t * p_access, int64_t i_pos )
     p_cdda->i_lsn = (i_pos / CDIO_CD_FRAMESIZE_RAW);
 
 #if LIBCDIO_VERSION_NUM >= 72
-    if ( p_cdda->b_paranoia_enabled ) 
+    if ( p_cdda->e_paranoia && p_cdda->paranoia ) 
       cdio_paranoia_seek(p_cdda->paranoia, p_cdda->i_lsn, SEEK_SET);
 #endif
 
@@ -438,7 +439,7 @@ CDDAOpen( vlc_object_t *p_this )
       config_GetInt( p_access, MODULE_STRING "-cddb-enabled" );
 #endif
 
-    p_cdda->b_cdtext_enabled =
+    p_cdda->b_cdtext =
       config_GetInt( p_access, MODULE_STRING "-cdtext-enabled" );
 
     p_cdda->b_cdtext_prefer =
@@ -483,7 +484,19 @@ CDDAOpen( vlc_object_t *p_this )
     p_access->pf_control = CDDAControl;
     p_access->pf_seek    = CDDASeek;
 
-    p_access->info.i_size      = 0;
+    {
+      lsn_t i_last_lsn;
+      
+      if (p_cdda->b_nav_mode)
+	  i_last_lsn = cdio_get_track_lsn(p_cdio, CDIO_CDROM_LEADOUT_TRACK);
+      else 
+	  i_last_lsn = cdio_get_track_last_lsn(p_cdio, i_track);
+      
+      if (CDIO_INVALID_LSN != i_last_lsn)
+	p_access->info.i_size = i_last_lsn * (uint64_t) CDIO_CD_FRAMESIZE_RAW;
+      else 
+	p_access->info.i_size = 0;
+    }
 
     p_access->info.i_update    = 0;
     p_access->info.b_eof       = VLC_FALSE;
@@ -499,28 +512,43 @@ CDDAOpen( vlc_object_t *p_this )
     CDDAFixupPlaylist( p_access, p_cdda, b_single_track );
 
 #if LIBCDIO_VERSION_NUM >= 72
-    p_cdda->b_paranoia_enabled =
-      config_GetInt( p_access, MODULE_STRING "-paranoia-enabled" );
+    {
+   
+      char *psz_paranoia = config_GetPsz( p_access, 
+					  MODULE_STRING "-paranoia" );
+      p_cdda->e_paranoia = paranoia_none;
+      if( psz_paranoia && *psz_paranoia )
+      {
 
-    /* Use CD Paranoia? */
-    if ( p_cdda->b_paranoia_enabled ) {
-      p_cdda->paranoia_cd = cdio_cddap_identify_cdio(p_cdio, 1, NULL);
-      /* We'll set for verbose paranoia messages. */
-      cdio_cddap_verbose_set(p_cdda->paranoia_cd, CDDA_MESSAGE_PRINTIT, 
-			    CDDA_MESSAGE_PRINTIT);
-      if ( 0 != cdio_cddap_open(p_cdda->paranoia_cd) ) {
-	msg_Warn( p_cdda_input, "Unable to get paranoia support - "
-		  "continuing without it." );
-	p_cdda->b_paranoia_enabled = VLC_FALSE;
-      } else {
-	p_cdda->paranoia = cdio_paranoia_init(p_cdda->paranoia_cd);
-	cdio_paranoia_seek(p_cdda->paranoia, p_cdda->i_lsn, SEEK_SET);
-
-	/* Set reading mode for full paranoia, but allow skipping sectors. */
-	cdio_paranoia_modeset(p_cdda->paranoia, 
-			      PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
+	if( !strncmp( psz_paranoia, "full", strlen("full") )  )
+	  p_cdda->e_paranoia = paranoia_full;
+	else if( !strncmp( psz_paranoia, "overlap", strlen("overlap") )  )
+	  p_cdda->e_paranoia = paranoia_overlap;
+	
+	/* Use CD Paranoia? */
+	if ( p_cdda->e_paranoia ) {
+	  p_cdda->paranoia_cd = cdio_cddap_identify_cdio(p_cdio, 1, NULL);
+	  /* We'll set for verbose paranoia messages. */
+	  cdio_cddap_verbose_set(p_cdda->paranoia_cd, CDDA_MESSAGE_PRINTIT, 
+				 CDDA_MESSAGE_PRINTIT);
+	  if ( 0 != cdio_cddap_open(p_cdda->paranoia_cd) ) {
+	    msg_Warn( p_cdda_input, "Unable to get paranoia support - "
+		      "continuing without it." );
+	    p_cdda->e_paranoia = paranoia_none;
+	  } else {
+	    p_cdda->paranoia = cdio_paranoia_init(p_cdda->paranoia_cd);
+	    cdio_paranoia_seek(p_cdda->paranoia, p_cdda->i_lsn, SEEK_SET);
+	    
+	    /* Set reading mode for full or overlap paranoia, 
+	       but allow skipping sectors. */
+	    cdio_paranoia_modeset(p_cdda->paranoia,
+				  paranoia_full == p_cdda->e_paranoia ?
+				  PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP :
+				  PARANOIA_MODE_OVERLAP^PARANOIA_MODE_NEVERSKIP
+				  );
+	  }
+	}
       }
-      
     }
 #endif    
 
@@ -599,6 +627,10 @@ CDDAClose (vlc_object_t *p_this )
 
     if (p_cdda->psz_mcn)    free( p_cdda->psz_mcn );
     if (p_cdda->psz_source) free( p_cdda->psz_source );
+
+#if LIBCDDB_VERSION_NUM >= 1
+    libcddb_shutdown();
+#endif
     free( p_cdda );
     p_cdda = NULL;
     p_cdda_input = NULL;
@@ -638,14 +670,16 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 	    }
         }
 
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
+        case ACCESS_CAN_FASTSEEK:
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_PAUSE:
         {
             vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+	    dbg_print( INPUT_DBG_META, 
+		       "can seek/fastseek/pause/control pace");
             *pb_bool = VLC_TRUE;
-            return VLC_SUCCESS;;
+            return VLC_SUCCESS;
         }
 
         /* */
@@ -653,6 +687,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
         {
             pi_int = (int*)va_arg( args, int * );
             *pi_int = p_cdda-> i_blocks_per_read * CDIO_CD_FRAMESIZE_RAW;
+	    dbg_print( INPUT_DBG_META, "Get MTU %d", *pi_int);
             break;
         }
 
@@ -666,6 +701,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
+	    dbg_print( INPUT_DBG_META, "Set pause state");
             break;
 
         case ACCESS_GET_TITLE_INFO:
@@ -720,23 +756,30 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             if( i != p_access->info.i_title )
             {
                 /* Update info */
-                p_access->info.i_update |= INPUT_UPDATE_TITLE;
                 p_access->info.i_title = i;
-		if ( p_cdda->b_nav_mode) {
+		if ( p_cdda->b_nav_mode) 
+                {
+		    lsn_t i_last_lsn;
 		    char *psz_title = 
 		      CDDAFormatTitle( p_access, i+1 );
 		    input_Control( p_cdda->p_input, INPUT_SET_NAME, 
 				   psz_title );
 		    free(psz_title);
-		    p_cdda->i_track = i+1;
-		    p_access->info.i_pos = 
+		    p_cdda->i_track = p_cdda->i_first_track+i;
+		    i_last_lsn = cdio_get_track_lsn(p_cdda->p_cdio, 
+						    CDIO_CDROM_LEADOUT_TRACK);
+		    if (CDIO_INVALID_LSN != i_last_lsn)
+		      p_access->info.i_size = (int64_t) CDIO_CD_FRAMESIZE_RAW 
+			* i_last_lsn ;
+		    p_access->info.i_pos = (int64_t)
 		      cdio_get_track_lsn( p_cdda->p_cdio, p_cdda->i_track ) 
 		      * CDIO_CD_FRAMESIZE_RAW;
 		} else {
-		   p_access->info.i_update |= INPUT_UPDATE_SIZE;
 		   p_access->info.i_size = p_cdda->p_title[i]->i_size;
 		   p_access->info.i_pos = 0;
 		}
+                p_access->info.i_update = 
+		  INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE;
 
                 /* Next sector to read */
                 p_cdda->i_lsn = 
@@ -747,6 +790,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
+	    dbg_print( INPUT_DBG_META, "set seekpoint/set private id state");
             return VLC_EGENERIC;
 
         default:
