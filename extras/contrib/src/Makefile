@@ -30,6 +30,13 @@ include ./packages.mak
 # ***************************************************************************
 
 ifeq ($(HOST),ppc-darwin)
+HAVE_DARWIN_OS=1
+endif
+ifeq ($(HOST),powerpc-apple-darwin8)
+HAVE_DARWIN_OS=1
+endif
+
+ifdef HAV_DARWIN_OS
 export PATH = $(PREFIX)/bin:/bin:/usr/bin
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
 endif
@@ -74,7 +81,7 @@ endif
 # Standard rules
 # ***************************************************************************
 
-ifeq ($(HOST),ppc-darwin)
+ifdef HAVE_DARWIN_OS
 all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
@@ -130,7 +137,7 @@ endef
 #	$(INSTALL_NAME)
 #	touch $@
 
-ifeq ($(HOST),ppc-darwin)
+ifdef HAVE_DARWIN_OS
 define INSTALL_NAME_LIB
 	install_name_tool \
 		-change $(PREFIX)/lib/$(shell cd $(PREFIX)/lib; ls | grep "lib$(INSTALL_LIB).[0-9]*.dylib") \
@@ -208,7 +215,7 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 # libtool
 # ***************************************************************************
 
-ifeq ($(BUILD),ppc-darwin)
+ifdef HAVE_DARWIN_OS
 .libtool:
 	if test -x /usr/bin/glibtoolize; then \
 		ln -sf /usr/bin/glibtoolize $(PREFIX)/bin/libtoolize ; \
@@ -761,7 +768,7 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/dvdnav.patch
-ifeq ($(BUILD),ppc-darwin)
+ifdef HAVE_DARWIN_OS
 	(cd $@; autoconf)
 else
 	(cd $@; ./autogen.sh noconfig)
@@ -942,7 +949,7 @@ vcdimager-$(VCDIMAGER_VERSION).tar.gz:
 vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-ifeq ($(HOST),ppc-darwin)
+ifdef HAVE_DARWIN_OS
 .vcdimager: vcdimager
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make && make install)
 	touch $@

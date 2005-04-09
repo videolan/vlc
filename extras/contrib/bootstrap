@@ -46,7 +46,7 @@ echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
 
 case $HOST in
-    ppc-darwin)
+    powerpc-apple-darwin8 | ppc-darwin)
 	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
 	    echo "CONTRIB_URL = http://download.videolan.org/pub/videolan/devtools/contrib-macosx.tar.bz2" >> config.mak
         ;;
