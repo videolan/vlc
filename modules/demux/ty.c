@@ -151,13 +151,9 @@ static int TyOpen(vlc_object_t *p_this)
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
-    vlc_bool_t b_seekable;
     es_format_t fmt;
     uint8_t *p_peek;
 
-    /* see if this stream is seekable */
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_seekable );
-  
     /* peek at the first 12 bytes. */
     /* for TY streams, they're always the same */
     if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
@@ -169,11 +165,11 @@ static int TyOpen(vlc_object_t *p_this)
     {
         /* doesn't look like a TY file... */
         char *psz_ext = strrchr(p_demux->psz_path, '.');
-        /* if they specified tydemux, or if the file ends in .ty we try anyway */
-        if (psz_ext && strcmp(p_demux->psz_demux, "tydemux") &&
-            strcasecmp(psz_ext, ".ty"))
-            return VLC_EGENERIC;
-        msg_Warn(p_demux, "this does not look like a TY file, continuing anyway...");
+
+        if( !p_demux->b_force &&
+            (!psz_ext || strcasecmp(psz_ext, ".ty")) ) return VLC_EGENERIC;
+        msg_Warn( p_demux, "this does not look like a TY file, "
+                  "continuing anyway..." );
     }
 
     /* at this point, we assume we have a valid TY stream */  
@@ -192,8 +188,10 @@ static int TyOpen(vlc_object_t *p_this)
     p_sys->firstAudioPTS = -1;
     p_sys->i_stream_size = stream_Size(p_demux->s);
     p_sys->b_mpeg_audio = VLC_FALSE;
-    p_sys->b_seekable = b_seekable;
-  
+
+    /* see if this stream is seekable */
+    stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
+
     /* TODO: read first chunk & parse first audio PTS, then (if seekable)
      *       seek to last chunk & last record; read its PTS and compute
      *       overall program time.  Also determine Tivo type.   */
