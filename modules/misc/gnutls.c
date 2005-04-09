@@ -51,6 +51,7 @@
 
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 
 #define DH_BITS             1024
 #define CACHE_EXPIRATION    3600
@@ -96,10 +97,8 @@ vlc_module_begin();
 
     add_bool( "tls-check-cert", VLC_FALSE, NULL, CHECK_CERT_TEXT,
               CHECK_CERT_LONGTEXT, VLC_FALSE );
-#if 0
     add_bool( "tls-check-hostname", VLC_FALSE, NULL, CHECK_HOSTNAME_TEXT,
               CHECK_HOSTNAME_LONGTEXT, VLC_FALSE );
-#endif
 
     add_integer( "dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
                  DH_BITS_LONGTEXT, VLC_TRUE );
@@ -140,6 +139,7 @@ typedef struct tls_server_sys_t
 typedef struct tls_session_sys_t
 {
     gnutls_session  session;
+    char            *psz_hostname;
     vlc_bool_t      b_handshaked;
 } tls_session_sys_t;
 
@@ -263,10 +263,13 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
     if( val == 0 )
     {
         int status;
+        gnutls_x509_crt cert;
+        const gnutls_datum *p_data;
+        tls_session_sys_t *p_sys;
 
-        val = gnutls_certificate_verify_peers2( ((tls_session_sys_t *)
-                                                (p_session->p_sys))->session,
-                                                &status );
+        p_sys = (tls_session_sys_t *)(p_session->p_sys);
+        /* certificates chain verification */
+        val = gnutls_certificate_verify_peers2( p_sys->session, &status );
 
         if( val )
         {
@@ -292,6 +295,49 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
         }
 
         msg_Dbg( p_session, "TLS certificate verified" );
+        if( p_sys->psz_hostname == NULL )
+            return 0;
+
+        /* certificate (host)name verification */
+        p_data = gnutls_certificate_get_peers( p_sys->session, &val );
+        if( p_data == NULL )
+        {
+            msg_Err( p_session, "TLS peer certificate not available" );
+            p_session->pf_close( p_session );
+            return -1;
+        }
+
+        val = gnutls_x509_crt_init( &cert );
+        if( val )
+        {
+            msg_Err( p_session, "x509 fatal error : %s",
+                     gnutls_strerror( val ) );
+            p_session->pf_close( p_session );
+            return -1;
+        }
+
+        val = gnutls_x509_crt_import( cert, p_data, GNUTLS_X509_FMT_DER );
+        if( val )
+        {
+            msg_Err( p_session, "x509 certificate import error : %s",
+                     gnutls_strerror( val ) );
+            gnutls_x509_crt_deinit( cert );
+            p_session->pf_close( p_session );
+            return -1;
+        }
+
+        if( gnutls_x509_crt_check_hostname( cert, p_sys->psz_hostname ) == 0 )
+        {
+            msg_Err( p_session, "x509 certificate does not match \"%s\"",
+                     p_sys->psz_hostname );
+            gnutls_x509_crt_deinit( cert );
+            p_session->pf_close( p_session );
+            return -1;
+        }
+
+        gnutls_x509_crt_deinit( cert );
+        
+        msg_Dbg( p_session, "x509 hostname verified" );
         return 0;
     }
 
@@ -307,9 +353,22 @@ gnutls_BeginHandshake( tls_session_t *p_session, int fd,
     p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
     gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
+
+    p_sys->psz_hostname = NULL;
     if( psz_hostname != NULL )
+    {
         gnutls_server_name_set( p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
                                 strlen( psz_hostname ) );
+        if( get_Bool( p_session, "tls-check-hostname" ) )
+        {
+            p_sys->psz_hostname = strdup( psz_hostname );
+            if( p_sys->psz_hostname == NULL )
+            {
+                p_session->pf_close( p_session );
+                return -1;
+            }
+        }
+    }
 
     return p_session->pf_handshake2( p_session );
 }
@@ -329,6 +388,9 @@ gnutls_SessionClose( tls_session_t *p_session )
     if( p_sys->b_handshaked == VLC_TRUE )
         gnutls_bye( p_sys->session, GNUTLS_SHUT_WR );
     gnutls_deinit( p_sys->session );
+
+    if( p_sys->psz_hostname != NULL )
+        free( p_sys->psz_hostname );
 
     vlc_object_detach( p_session );
     vlc_object_destroy( p_session );
@@ -470,17 +532,18 @@ gnutls_ClientCreate( tls_t *p_tls )
 
         psz_homedir = p_tls->p_vlc->psz_homedir;
         psz_path = (char *)malloc( strlen( psz_homedir )
-                                   + sizeof( CONFIG_DIR ) + 5 );
+                                   + sizeof( CONFIG_DIR ) + 12 );
         if( psz_path == NULL )
         {
             gnutls_certificate_free_credentials( p_sys->x509_cred );
             goto error;
         }
 
-        sprintf( psz_path, "%s/"CONFIG_DIR"/ssl", psz_homedir );
+        sprintf( psz_path, "%s/"CONFIG_DIR"/ssl/certs", psz_homedir );
         gnutls_AddCADirectory( (vlc_object_t *)p_session, p_sys->x509_cred,
                                psz_path );
 
+        free( psz_path );
         p_session->pf_handshake2 = gnutls_HandshakeAndValidate;
     }
     else

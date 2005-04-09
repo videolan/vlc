@@ -27,12 +27,6 @@
 #include "vlc_tls.h"
 
 
-/*
- * TODO:
- * - server-side client cert validation,
- * - client-side server cert validation (?).
- */
-
 /*****************************************************************************
  * tls_ServerCreate:
  *****************************************************************************

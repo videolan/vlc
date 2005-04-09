@@ -881,7 +881,8 @@ static int Connect( access_t *p_access, int64_t i_tell )
             return VLC_EGENERIC;
         }
 
-        p_sys->p_tls = tls_ClientCreate( VLC_OBJECT(p_access), p_sys->fd, NULL );
+        p_sys->p_tls = tls_ClientCreate( VLC_OBJECT(p_access), p_sys->fd,
+                                         srv.psz_host );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/SSL session" );
