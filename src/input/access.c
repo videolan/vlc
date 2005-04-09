@@ -30,16 +30,15 @@
 /*****************************************************************************
  * access2_InternalNew:
  *****************************************************************************/
-static access_t *access2_InternalNew( vlc_object_t *p_obj,
-                                      char *psz_access, char *psz_demux, char *psz_path,
-                                      access_t *p_source,
-                                      vlc_bool_t b_quick )
+static access_t *access2_InternalNew( vlc_object_t *p_obj, char *psz_access,
+                                      char *psz_demux, char *psz_path,
+                                      access_t *p_source, vlc_bool_t b_quick )
 {
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
     if( p_access == NULL )
     {
-        msg_Err( p_obj, "vlc_object_create( p_obj, VLC_OBJECT_ACCESS ) failed" );
+        msg_Err( p_obj, "vlc_object_create() failed" );
         return NULL;
     }
 
@@ -50,15 +49,19 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj,
         msg_Dbg( p_obj, "creating access filter '%s'", psz_access );
         p_access->psz_access = strdup( p_source->psz_access );
         p_access->psz_path   = strdup( p_source->psz_path );
+        p_access->psz_demux   = strdup( p_source->psz_demux );
     }
-    else if( !b_quick )
+    else
     {
-        msg_Dbg( p_obj, "creating access '%s' path='%s'",
-                 psz_access, psz_path );
+        p_access->psz_path   = strdup( psz_path );
+        p_access->psz_access =
+            b_quick ? strdup( "file" ) : strdup( psz_access );
+        p_access->psz_demux  = strdup( psz_demux );
+
+        if( !b_quick )
+            msg_Dbg( p_obj, "creating access '%s' path='%s'",
+                     psz_access, psz_path );
     }
-    p_access->psz_access = b_quick ? strdup( "file" ) : strdup( psz_access );
-    p_access->psz_path   = strdup( psz_path );
-    p_access->psz_demux  = strdup( "" );
 
     p_access->pf_read    = NULL;
     p_access->pf_block   = NULL;
@@ -84,7 +87,7 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj,
     else
     {
         p_access->p_module =
-            module_Need( p_access, "access2",p_access->psz_access,
+            module_Need( p_access, "access2", p_access->psz_access,
                          b_quick ? VLC_TRUE : VLC_FALSE );
     }
 
@@ -104,11 +107,11 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj,
 /*****************************************************************************
  * access2_New:
  *****************************************************************************/
-access_t *__access2_New( vlc_object_t *p_obj,
-                         char *psz_access, char *psz_demux, char *psz_path,
-                         vlc_bool_t b_quick )
+access_t *__access2_New( vlc_object_t *p_obj, char *psz_access,
+                         char *psz_demux, char *psz_path, vlc_bool_t b_quick )
 {
-    return access2_InternalNew( p_obj, psz_access, psz_demux, psz_path, NULL, b_quick );
+    return access2_InternalNew( p_obj, psz_access, psz_demux,
+                                psz_path, NULL, b_quick );
 }
 
 /*****************************************************************************
@@ -116,9 +119,8 @@ access_t *__access2_New( vlc_object_t *p_obj,
  *****************************************************************************/
 access_t *access2_FilterNew( access_t *p_source, char *psz_access_filter )
 {
-    return access2_InternalNew( VLC_OBJECT(p_source),
-                                psz_access_filter, NULL, NULL,
-                                p_source, VLC_FALSE );
+    return access2_InternalNew( VLC_OBJECT(p_source), psz_access_filter,
+                                NULL, NULL, p_source, VLC_FALSE );
 }
 
 /*****************************************************************************
