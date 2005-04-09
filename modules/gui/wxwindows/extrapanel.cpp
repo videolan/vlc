@@ -996,7 +996,7 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
         if( !psz_parser )
         {
             psz_parser = psz_string;
-            asprintf( &psz_string, (*psz_string) ? "%s:%s" : "%s%s",
+            asprintf( &psz_string, (*psz_string) ? "%s,%s" : "%s%s",
                             psz_string, psz_name );
             free( psz_parser );
         }
@@ -1010,11 +1010,11 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
         if( psz_parser )
         {
             memmove( psz_parser, psz_parser + strlen(psz_name) +
-                            (*(psz_parser + strlen(psz_name)) == ':' ? 1 : 0 ),
+                            (*(psz_parser + strlen(psz_name)) == ',' ? 1 : 0 ),
                             strlen(psz_parser + strlen(psz_name)) + 1 );
 
             /* Remove trailing : : */
-            if( *(psz_string+strlen(psz_string ) -1 ) == ':' )
+            if( *(psz_string+strlen(psz_string ) -1 ) == ',' )
             {
                 *(psz_string+strlen(psz_string ) -1 ) = '\0';
             }
