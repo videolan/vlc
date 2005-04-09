@@ -23,8 +23,7 @@
 
 /*
  * TODO:
- * - fix FIXMEs,
- * - client-side server cert validation (?).
+ * - fix FIXMEs
  */
 
 
@@ -34,6 +33,19 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <vlc/vlc.h>
+
+#include <sys/types.h>
+#include <errno.h>
+#ifdef HAVE_DIRENT_H
+# include <dirent.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+# ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+# endif
+#endif
+
 
 #include "vlc_tls.h"
 
@@ -82,9 +94,9 @@ vlc_module_begin();
     set_category( CAT_ADVANCED );
     set_subcategory( SUBCAT_ADVANCED_MISC );
 
-#if 0
     add_bool( "tls-check-cert", VLC_FALSE, NULL, CHECK_CERT_TEXT,
               CHECK_CERT_LONGTEXT, VLC_FALSE );
+#if 0
     add_bool( "tls-check-hostname", VLC_FALSE, NULL, CHECK_HOSTNAME_TEXT,
               CHECK_HOSTNAME_LONGTEXT, VLC_FALSE );
 #endif
@@ -140,7 +152,7 @@ typedef struct tls_client_sys_t
 
 
 static int
-_get_Int (vlc_object_t *p_this, const char *var)
+_get_Int( vlc_object_t *p_this, const char *var )
 {
     vlc_value_t value;
 
@@ -153,7 +165,22 @@ _get_Int (vlc_object_t *p_this, const char *var)
     return value.i_int;
 }
 
+static int
+_get_Bool( vlc_object_t *p_this, const char *var )
+{
+    vlc_value_t value;
+
+    if( var_Get( p_this, var, &value ) != VLC_SUCCESS )
+    {
+        var_Create( p_this, var, VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Get( p_this, var, &value );
+    }
+
+    return value.b_bool;
+}
+
 #define get_Int( a, b ) _get_Int( (vlc_object_t *)(a), (b) )
+#define get_Bool( a, b ) _get_Bool( (vlc_object_t *)(a), (b) )
 
 
 /*****************************************************************************
@@ -323,6 +350,71 @@ gnutls_ClientDelete( tls_session_t *p_session )
 }
 
 
+inline int
+is_regular( const char *psz_filename )
+{
+#ifdef HAVE_SYS_STAT_H
+    struct stat st;
+
+    return ( stat( psz_filename, &st ) == 0 )
+        && S_ISREG( st.st_mode );
+#else
+    return 1;
+#endif
+}
+
+
+static int
+gnutls_AddCADirectory( vlc_object_t *p_this,
+                       gnutls_certificate_credentials cred,
+                       const char *psz_dirname )
+{
+    DIR* dir;
+    struct dirent *p_ent;
+    int i_len;
+
+    if( *psz_dirname == '\0' )
+        psz_dirname = ".";
+
+    dir = opendir( psz_dirname );
+    if( dir == NULL )
+    {
+        msg_Warn( p_this, "Cannot open directory (%s) : %s", psz_dirname,
+                  strerror( errno ) );
+        return VLC_EGENERIC;
+    }
+
+    i_len = strlen( psz_dirname ) + 2;
+
+    while( ( p_ent = readdir( dir ) ) != NULL )
+    {
+        char *psz_filename;
+
+        psz_filename = (char *)malloc( i_len + strlen( p_ent->d_name ) );
+        if( psz_filename == NULL )
+            return VLC_ENOMEM;
+
+        sprintf( psz_filename, "%s/%s", psz_dirname, p_ent->d_name );
+        /* we neglect the race condition here - not security sensitive */
+        if( is_regular( psz_filename ) )
+        {
+            int i;
+
+            i = gnutls_certificate_set_x509_trust_file( cred, psz_filename,
+                                                        GNUTLS_X509_FMT_PEM );
+            if( i < 0 )
+            {
+                msg_Warn( p_this, "Cannot add trusted CA (%s) : %s",
+                          psz_filename, gnutls_strerror( i ) );
+            }
+        }
+        free( psz_filename );
+    }
+
+    closedir( dir );
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * tls_ClientCreate:
  *****************************************************************************
@@ -356,7 +448,6 @@ gnutls_ClientCreate( tls_t *p_tls )
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_handshake = gnutls_BeginHandshake;
-    p_session->pf_handshake2 = gnutls_ContinueHandshake;
     p_session->pf_close = gnutls_ClientDelete;
 
     p_sys->session.b_handshaked = VLC_FALSE;
@@ -371,21 +462,30 @@ gnutls_ClientCreate( tls_t *p_tls )
         goto error;
     }
 
-#if 0
-    if( psz_ca_path != NULL )
+    if( get_Bool( p_tls, "tls-check-cert" ) )
     {
-        i_val = gnutls_certificate_set_x509_trust_file( p_sys->x509_cred,
-                                                        psz_ca_path,
-                                                        GNUTLS_X509_FMT_PEM );
-        if( i_val != 0 )
+        /* FIXME: support for changing path/using multiple paths */
+        char *psz_path;
+        const char *psz_homedir;
+
+        psz_homedir = p_tls->p_vlc->psz_homedir;
+        psz_path = (char *)malloc( strlen( psz_homedir )
+                                   + sizeof( CONFIG_DIR ) + 5 );
+        if( psz_path == NULL )
         {
-            msg_Err( p_tls, "Cannot add trusted CA (%s) : %s", psz_ca_path,
-                     gnutls_strerror( i_val ) );
             gnutls_certificate_free_credentials( p_sys->x509_cred );
             goto error;
         }
+
+        sprintf( psz_path, "%s/"CONFIG_DIR"/ssl", psz_homedir );
+        gnutls_AddCADirectory( (vlc_object_t *)p_session, p_sys->x509_cred,
+                               psz_path );
+
+        p_session->pf_handshake2 = gnutls_HandshakeAndValidate;
     }
-#endif
+    else
+        p_session->pf_handshake2 = gnutls_ContinueHandshake;
+
     i_val = gnutls_init( &p_sys->session.session, GNUTLS_CLIENT );
     if( i_val != 0 )
     {
