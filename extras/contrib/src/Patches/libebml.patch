@@ -1,7 +1,7 @@
-Index: src/EbmlFloat.cpp
+Index: libebml/src/EbmlFloat.cpp
 ===================================================================
---- src/EbmlFloat.cpp	(revision 1099)
-+++ src/EbmlFloat.cpp	(revision 1101)
+--- libebml/src/EbmlFloat.cpp	(revision 1099)
++++ libebml/src/EbmlFloat.cpp	(revision 1101)
 @@ -102,8 +102,8 @@
  		if (Size == 4) {
  			big_int32 TmpRead;
