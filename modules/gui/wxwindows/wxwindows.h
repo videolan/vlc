@@ -891,9 +891,9 @@ private:
     /* Popup  */
     wxMenu *item_popup;
     wxMenu *node_popup;
-    wxTreeItemId i_popup_item;
-    playlist_item_t *p_popup_item;
-    playlist_item_t *p_popup_parent;
+    wxTreeItemId i_wx_popup_item;
+    int i_popup_item;
+    int i_popup_parent;
     void OnPopup( wxContextMenuEvent& event );
     void OnPopupPlay( wxCommandEvent& event );
     void OnPopupPreparse( wxCommandEvent& event );
@@ -903,23 +903,24 @@ private:
     void OnPopupInfo( wxCommandEvent& event );
     void Rebuild( vlc_bool_t );
 
-    void Preparse( playlist_t *p_playlist );
+    void Preparse();
 
     /* Update */
-    void UpdateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
-    void UpdateNodeChildren( playlist_t *, playlist_item_t*, wxTreeItemId );
-    void CreateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
-    void UpdateTreeItem( playlist_t *, wxTreeItemId );
+    void UpdateNode( playlist_item_t*, wxTreeItemId );
+    void UpdateNodeChildren( playlist_item_t*, wxTreeItemId );
+    void CreateNode( playlist_item_t*, wxTreeItemId );
+    void UpdateTreeItem( wxTreeItemId );
 
     /* Search (internal) */
     int CountItems( wxTreeItemId);
-    wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );
     wxTreeItemId FindItem( wxTreeItemId, int );
     wxTreeItemId FindItemByName( wxTreeItemId, wxString,
                                  wxTreeItemId, vlc_bool_t *);
 
     wxTreeItemId saved_tree_item;
-    playlist_item_t *p_saved_item;
+    int i_saved_id;
+
+    playlist_t *p_playlist;
 
 
     /* Custom events */
