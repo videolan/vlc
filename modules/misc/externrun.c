@@ -1,7 +1,8 @@
 /*****************************************************************************
  * externrun.c: Run extern programs (vlc:run:"theprogram":delayinseconds)
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2005 VideoLAN
+ * $Id$
  *
  * Authors: Sylvain Cadilhac <sylv@via.ecp.fr>
  *
