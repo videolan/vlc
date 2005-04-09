@@ -869,7 +869,10 @@ AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
     [CFLAGS="${CFLAGS_save} -bundle -undefined error -lcc_dynamic"
      AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
 if test "${ac_cv_ld_darwin}" != "no"; then
-    VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error -lcc_dynamic])
+    VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error])
+    AC_CHECK_LIB(cc_dynamic, main,[
+      VLC_ADD_LDFLAGS([plugin],[-lcc_dynamic])
+    ])
 fi
 
 dnl Check for standard plugin linking flags
