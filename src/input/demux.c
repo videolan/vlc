@@ -27,6 +27,8 @@
 
 #include "input_internal.h"
 
+static void SkipID3Tag( demux_t * );
+
 /*****************************************************************************
  * demux2_New:
  *  if s is NULL then load a access_demux
@@ -38,10 +40,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
     char *psz_module;
 
-    if( p_demux == NULL )
-    {
-        return NULL;
-    }
+    if( p_demux == NULL ) return NULL;
 
     /* Parse URL */
     p_demux->psz_access = strdup( psz_access );
@@ -71,10 +70,8 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     p_demux->info.i_title  = 0;
     p_demux->info.i_seekpoint = 0;
 
-    if( s )
-        psz_module = p_demux->psz_demux;
-    else
-        psz_module = p_demux->psz_access;
+    if( s ) psz_module = p_demux->psz_demux;
+    else psz_module = p_demux->psz_access;
 
     if( s && *psz_module == '\0' && strrchr( p_demux->psz_path, '.' ) )
     {
@@ -143,6 +140,11 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
 
     if( s )
     {
+        /* ID3 tags will mess-up demuxer probing so we skip it here.
+         * ID3 parsers will called later on in the demuxer to access the
+         * skipped info. */
+        SkipID3Tag( p_demux );
+
         p_demux->p_module =
             module_Need( p_demux, "demux2", psz_module,
                          !strcmp( psz_module, p_demux->psz_demux ) ?
@@ -528,4 +530,38 @@ static int DStreamThread( stream_t *s )
 
     p_demux->b_die = VLC_TRUE;
     return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * Utility functions
+ ****************************************************************************/
+static void SkipID3Tag( demux_t *p_demux )
+{
+    uint8_t *p_peek;
+    uint8_t version, revision;
+    int i_size;
+    int b_footer;
+
+    if( !p_demux->s ) return;
+
+    /* Get 10 byte id3 header */
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) return;
+
+    if( p_peek[0] != 'I' || p_peek[1] != 'D' || p_peek[2] != '3' ) return;
+
+    version = p_peek[3];
+    revision = p_peek[4];
+    b_footer = p_peek[5] & 0x10;
+    i_size = (p_peek[6]<<21) + (p_peek[7]<<14) + (p_peek[8]<<7) + p_peek[9];
+
+    if( b_footer ) i_size += 10;
+    i_size += 10;
+
+    /* Skip the entire tag */
+    stream_Read( p_demux->s, NULL, i_size );
+
+    msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skiping %d bytes",
+             version, revision, i_size );
+
+    return;
 }

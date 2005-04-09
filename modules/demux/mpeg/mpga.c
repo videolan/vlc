@@ -120,7 +120,6 @@ static int Open( vlc_object_t * p_this )
     uint32_t     header;
     uint8_t     *p_peek;
     module_t    *p_id3;
-    vlc_meta_t  *p_meta = NULL;
     block_t     *p_block_in, *p_block_out;
 
     if( p_demux->psz_path )
@@ -132,30 +131,14 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    /* Skip/parse possible id3 header */
-    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
-    {
-        p_meta = (vlc_meta_t *)p_demux->p_private;
-        p_demux->p_private = NULL;
-        module_Unneed( p_demux, p_id3 );
-    }
-
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
-    {
-        if( p_meta ) vlc_meta_Delete( p_meta );
-        return VLC_EGENERIC;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( !HeaderCheck( header = GetDWBE( p_peek ) ) )
     {
         vlc_bool_t b_ok = VLC_FALSE;
         int i_peek;
 
-        if( !p_demux->b_force && !b_forced )
-        {
-            if( p_meta ) vlc_meta_Delete( p_meta );
-            return VLC_EGENERIC;
-        }
+        if( !p_demux->b_force && !b_forced ) return VLC_EGENERIC;
 
         i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
         while( i_peek > 4 )
@@ -168,11 +151,7 @@ static int Open( vlc_object_t * p_this )
             p_peek += 1;
             i_peek -= 1;
         }
-        if( !b_ok && !p_demux->b_force )
-        {
-            if( p_meta ) vlc_meta_Delete( p_meta );
-            return VLC_EGENERIC;
-        }
+        if( !b_ok && !p_demux->b_force ) return VLC_EGENERIC;
     }
 
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
@@ -180,7 +159,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es = 0;
     p_sys->p_packetizer = 0;
     p_sys->b_start = VLC_TRUE;
-    p_sys->meta = p_meta;
+    p_sys->meta = 0;
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
 
@@ -289,6 +268,14 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->p_block_in = p_block_in;
     p_sys->p_block_out = p_block_out;
+
+    /* Parse possible id3 header */
+    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
+    {
+        p_sys->meta = (vlc_meta_t *)p_demux->p_private;
+        p_demux->p_private = NULL;
+        module_Unneed( p_demux, p_id3 );
+    }
 
     return VLC_SUCCESS;
 }

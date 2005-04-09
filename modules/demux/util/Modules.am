@@ -1,7 +1,3 @@
-SOURCES_id3 = \
-	id3.c \
-	$(NULL)
-
 SOURCES_id3tag = \
 	id3tag.c \
 	id3genres.h \

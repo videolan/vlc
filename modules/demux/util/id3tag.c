@@ -128,96 +128,74 @@ static int ParseID3Tags( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
-    int i_size;
-    int i_size2;
     vlc_bool_t b_seekable;
+    int64_t i_init, i_pos;
+    int i_size;
 
     p_demux->p_private = NULL;
 
     msg_Dbg( p_demux, "checking for ID3 tag" );
 
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( b_seekable )
+    if( !b_seekable ) return VLC_SUCCESS;
+
+    i_init = stream_Tell( p_demux->s );
+
+    /*
+     * Look for a ID3v1 tag at the end of the file
+     */
+    i_init = stream_Tell( p_demux->s );
+    i_pos = stream_Size( p_demux->s );
+
+    while( i_pos > 128 ) /* while used so we can break; */
     {
-        int64_t i_init;
-        int64_t i_pos;
+        stream_Seek( p_demux->s, i_pos - 128 );
 
-        /*look for a ID3v1 tag at the end of the file*/
-        i_init = stream_Tell( p_demux->s );
-        i_pos = stream_Size( p_demux->s );
+        /* get 10 byte id3 header */
+        if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) break;
 
-        if ( i_pos >128 )
+        i_size = id3_tag_query( p_peek, 10 );
+        if( i_size == 128 )
         {
-            stream_Seek( p_demux->s, i_pos - 128 );
+            /* peek the entire tag */
+            if( stream_Peek( p_demux->s, &p_peek, i_size ) < i_size ) break;
 
-            /* get 10 byte id3 header */
-            if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-            {
-                msg_Err( p_demux, "cannot peek()" );
-                return VLC_EGENERIC;
-            }
-
-            i_size2 = id3_tag_query( p_peek, 10 );
-            if ( i_size2 == 128 )
-            {
-                /* peek the entire tag */
-                if ( stream_Peek( p_demux->s, &p_peek, i_size2 ) < i_size2 )
-                {
-                    msg_Err( p_demux, "cannot peek()" );
-                    return VLC_EGENERIC;
-                }
-                msg_Dbg( p_demux, "found ID3v1 tag" );
-                ParseID3Tag( p_demux, p_peek, i_size2 );
-            }
-
-            /* look for ID3v2.4 tag at end of file */
-            /* get 10 byte ID3 footer */
-            if( stream_Peek( p_demux->s, &p_peek, 128 ) < 128 )
-            {
-                msg_Err( p_demux, "cannot peek()" );
-                return VLC_EGENERIC;
-            }
-            i_size2 = id3_tag_query( p_peek + 118, 10 );
-            if ( i_size2 < 0  && i_pos > -i_size2 )
-            {                                        /* id3v2.4 footer found */
-                stream_Seek( p_demux->s , i_pos + i_size2 );
-                /* peek the entire tag */
-                if ( stream_Peek( p_demux->s, &p_peek, i_size2 ) < i_size2 )
-                {
-                    msg_Err( p_demux, "cannot peek()" );
-                    return VLC_EGENERIC;
-                }
-                msg_Dbg( p_demux, "found ID3v2 tag at end of file" );
-                ParseID3Tag( p_demux, p_peek, i_size2 );
-            }
+            msg_Dbg( p_demux, "found ID3v1 tag" );
+            ParseID3Tag( p_demux, p_peek, i_size );
         }
-        stream_Seek( p_demux->s, i_init );
-    }
-    /* get 10 byte id3 header */
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-    {
-        msg_Err( p_demux, "cannot peek()" );
-        return VLC_EGENERIC;
+
+        /* look for ID3v2.4 tag at end of file */
+        /* get 10 byte ID3 footer */
+        if( stream_Peek( p_demux->s, &p_peek, 128 ) < 128 ) break;
+
+        i_size = id3_tag_query( p_peek + 118, 10 );
+        if( i_size < 0  && i_pos > -i_size )
+        {
+            /* id3v2.4 footer found */
+            stream_Seek( p_demux->s , i_pos + i_size );
+            /* peek the entire tag */
+            if( stream_Peek( p_demux->s, &p_peek, i_size ) < i_size ) break;
+
+            msg_Dbg( p_demux, "found ID3v2 tag at end of file" );
+            ParseID3Tag( p_demux, p_peek, i_size );
+        }
+        break;
     }
 
-    i_size = id3_tag_query( p_peek, 10 );
-    if ( i_size <= 0 )
-    {
-        return VLC_SUCCESS;
-    }
+    /*
+     * Get 10 byte id3 header
+     */
+    stream_Seek( p_demux->s, 0 );
+    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) goto end;
 
-    /* Read the entire tag */
-    p_peek = malloc( i_size );
-    if( !p_peek || stream_Read( p_demux->s, p_peek, i_size ) < i_size )
-    {
-        msg_Err( p_demux, "cannot read ID3 tag" );
-        if( p_peek ) free( p_peek );
-        return VLC_EGENERIC;
-    }
+    if( (i_size = id3_tag_query( p_peek, 10 )) <= 0 ) goto end;
+
+    if( stream_Peek( p_demux->s, &p_peek, i_size ) < i_size ) goto end;
 
     msg_Dbg( p_demux, "found ID3v2 tag" );
     ParseID3Tag( p_demux, p_peek, i_size );
 
-    free( p_peek );
+ end:
+    stream_Seek( p_demux->s, i_init );
     return VLC_SUCCESS;
 }

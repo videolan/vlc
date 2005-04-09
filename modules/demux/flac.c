@@ -73,28 +73,14 @@ static int Open( vlc_object_t * p_this )
     int          i_peek;
     byte_t      *p_peek;
     es_format_t  fmt;
-    vlc_meta_t  *p_meta = NULL;
-
-    /* Skip/parse possible id3 header */
-    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
-    {
-        p_meta = (vlc_meta_t *)p_demux->p_private;
-        p_demux->p_private = NULL;
-        module_Unneed( p_demux, p_id3 );
-    }
 
     /* Have a peep at the show. */
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
-    {
-        goto error;
-    }
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
-        if( strncmp( p_demux->psz_demux, "flac", 4 ) )
-        {
-            goto error;
-        }
+        if( !p_demux->b_force ) return VLC_EGENERIC;
+
         /* User forced */
         msg_Err( p_demux, "this doesn't look like a flac stream, "
                  "continuing anyway" );
@@ -105,20 +91,20 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
     p_sys->b_start = VLC_TRUE;
-    p_sys->p_meta = p_meta;
+    p_sys->p_meta = 0;
 
     /* We need to read and store the STREAMINFO metadata */
     i_peek = stream_Peek( p_demux->s, &p_peek, 8 );
     if( p_peek[4] & 0x7F )
     {
         msg_Err( p_demux, "this isn't a STREAMINFO metadata block" );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     if( ((p_peek[5]<<16)+(p_peek[6]<<8)+p_peek[7]) != (STREAMINFO_SIZE - 4) )
     {
         msg_Err( p_demux, "invalid size for a STREAMINFO metadata block" );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /*
@@ -155,22 +141,20 @@ static int Open( vlc_object_t * p_this )
         vlc_object_destroy( p_sys->p_packetizer );
 
         msg_Err( p_demux, "cannot find flac packetizer" );
-        goto error;
+        return VLC_EGENERIC;
     }
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
-    return VLC_SUCCESS;
-
-error:
-    if( p_meta )
+    /* Parse possible id3 header */
+    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
     {
-        int b_seekable;
-        vlc_meta_Delete( p_meta );
-        stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
-        if( b_seekable ) stream_Seek( p_demux->s, 0 );
+        p_sys->p_meta = (vlc_meta_t *)p_demux->p_private;
+        p_demux->p_private = NULL;
+        module_Unneed( p_demux, p_id3 );
     }
-    return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -244,18 +228,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     /* demux_sys_t *p_sys  = p_demux->p_sys; */
     /* FIXME bitrate */
-    if( i_query == DEMUX_SET_TIME )
-        return VLC_EGENERIC;
+    if( i_query == DEMUX_SET_TIME ) return VLC_EGENERIC;
     else if( i_query == DEMUX_GET_META )
     {        
         vlc_meta_t **pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
-        if( p_demux->p_sys->p_meta ) *pp_meta = vlc_meta_Duplicate( p_demux->p_sys->p_meta );
+        if( p_demux->p_sys->p_meta )
+            *pp_meta = vlc_meta_Duplicate( p_demux->p_sys->p_meta );
         else *pp_meta = NULL;
         return VLC_SUCCESS;
     }
-    else
-        return demux2_vaControlHelper( p_demux->s,
-                                       0, -1,
-                                       8*0, 1, i_query, args );
+    else return demux2_vaControlHelper( p_demux->s, 0, -1,
+                                        8*0, 1, i_query, args );
 }
 
