@@ -1082,6 +1082,7 @@ libgcrypt-$(GCRYPT_VERSION).tar.gz:
 
 libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/gcrypt.patch
 
 .gcrypt: libgcrypt
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
