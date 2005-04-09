@@ -10,3 +10,4 @@ SOURCES_logger = logger.c
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_gnutls = gnutls.c
 SOURCES_svg = svg.c
+SOURCES_externrun = externrun.c
