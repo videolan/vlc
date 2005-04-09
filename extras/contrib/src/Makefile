@@ -36,7 +36,7 @@ ifeq ($(HOST),powerpc-apple-darwin8)
 HAVE_DARWIN_OS=1
 endif
 
-ifdef HAV_DARWIN_OS
+ifdef HAVE_DARWIN_OS
 export PATH = $(PREFIX)/bin:/bin:/usr/bin
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
 endif
