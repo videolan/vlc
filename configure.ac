@@ -395,6 +395,17 @@ dnl getaddrinfo, getnameinfo and gai_strerror check
 dnl  -lresolv is NOT needed on Solaris
 dnl  we purposedly make the test fail on Windows
 AC_CHECK_FUNCS([getaddrinfo getnameinfo gai_strerror])
+AH_TEMPLATE(HAVE_ADDRINFO, [Define to `1' if <netdb.h> defines struct addrinfo.])
+AC_CHECK_TYPES([struct addrinfo],[AC_DEFINE(HAVE_ADDRINFO)],,
+[#include <sys/types.h>
+#if defined( UNDER_CE )
+# include <winsock.h>
+#elif defined( WIN32 )
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#else
+# include <netdb.h>
+#endif])
 
 dnl Check for va_copy
 AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
@@ -4373,7 +4384,6 @@ AC_CONFIG_FILES([
   modules/gui/wince/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
-  modules/misc/externrun/Makefile
   modules/misc/memcpy/Makefile
   modules/misc/network/Makefile
   modules/misc/testsuite/Makefile
