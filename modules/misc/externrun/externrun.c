@@ -39,9 +39,9 @@
  *****************************************************************************/
 struct run_command_t
 {
-    int				i_delay;
-    char			*psz_torun;
-    struct run_command_t	*p_next;
+    int                  i_delay;
+    char                 *psz_torun;
+    struct run_command_t *p_next;
 };
 typedef struct run_command_t run_command_t;
 
@@ -50,10 +50,10 @@ typedef struct run_command_t run_command_t;
  *****************************************************************************/
 struct intf_sys_t
 {
-    vlc_mutex_t         	change_lock;
-    mtime_t			next_check;
-    run_command_t		*p_first_command;
-    run_command_t		*p_last_command;
+    vlc_mutex_t   change_lock;
+    mtime_t       next_check;
+    run_command_t *p_first_command;
+    run_command_t *p_last_command;
 };
 
 /*****************************************************************************
@@ -63,7 +63,7 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 static int  AddRunCommand( vlc_object_t *, char const *,
-                      vlc_value_t, vlc_value_t, void * );
+                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -181,29 +181,29 @@ static void Run( intf_thread_t *p_intf )
                     msg_Err( p_intf, "can't run \"%s\"", p_command->psz_torun );
                 }    
 #else
-		if ( fork() )
-		{
-		    execl( p_command->psz_torun, NULL, (char *)NULL );
-		}
+                if ( fork() )
+                {
+                    execl( p_command->psz_torun, NULL, (char *)NULL );
+                }
 #endif
-		if( p_previous )
-		{
-		    p_previous->p_next = p_command->p_next;
-		    free( p_command->psz_torun );
-		    free( p_command );
-		    p_command = p_previous->p_next;
-		}
-		else
-		{
-		    p_intf->p_sys->p_first_command = p_command->p_next;
-		    free( p_command->psz_torun );
-		    free( p_command );
-		    if ( p_intf->p_sys->p_last_command == p_command )
-		    {
-		    	p_intf->p_sys->p_last_command = p_command->p_next;
-		    }
-		    p_command = p_intf->p_sys->p_first_command;
-		}
+                if( p_previous )
+                {
+                    p_previous->p_next = p_command->p_next;
+                    free( p_command->psz_torun );
+                    free( p_command );
+                    p_command = p_previous->p_next;
+                }
+                else
+                {
+                    p_intf->p_sys->p_first_command = p_command->p_next;
+                    free( p_command->psz_torun );
+                    free( p_command );
+                    if ( p_intf->p_sys->p_last_command == p_command )
+                    {
+                        p_intf->p_sys->p_last_command = p_command->p_next;
+                    }
+                     p_command = p_intf->p_sys->p_first_command;
+                }
             }
         }
         vlc_mutex_unlock( &p_intf->p_sys->change_lock );
