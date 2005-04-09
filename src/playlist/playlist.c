@@ -295,7 +295,6 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
 
     if( p_playlist->i_size <= 0 )
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
         return VLC_EGENERIC;
     }
 
