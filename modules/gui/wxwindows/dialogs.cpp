@@ -150,6 +150,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_file_generic_dialog = NULL;
     p_wizard_dialog = NULL;
     p_bookmarks_dialog = NULL;
+    p_dir_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -424,7 +425,6 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
 
     if( p_dir_dialog && p_dir_dialog->ShowModal() == wxID_OK )
     {
-        playlist_item_t *p_item;
         wxString path = p_dir_dialog->GetPath();
 
         playlist_Add( p_playlist, (const char *)path.mb_str(),
