@@ -107,6 +107,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     var_CreateGetBool( p_playlist, "loop" );
 
     /* Initialise data structures */
+    p_playlist->i_last_id = 0;
     p_playlist->b_go_next = VLC_TRUE;
     p_playlist->p_input = NULL;
 
@@ -118,6 +119,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->i_index = -1;
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;
+    p_playlist->i_all_size = 0;
+    p_playlist->pp_all_items = malloc(sizeof(playlist_item_t*));
 
     playlist_ViewInsert( p_playlist, VIEW_CATEGORY, TITLE_CATEGORY );
     playlist_ViewInsert( p_playlist, VIEW_SIMPLE, TITLE_SIMPLE );
@@ -140,7 +143,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->status.i_status = PLAYLIST_STOPPED;
 
 
-    p_playlist->i_last_id = 0;
     p_playlist->i_sort = SORT_ID;
     p_playlist->i_order = ORDER_NORMAL;
 
@@ -246,6 +248,31 @@ int playlist_Destroy( playlist_t * p_playlist )
  * \param variable number of arguments
  * \return VLC_SUCCESS or an error
  */
+int playlist_LockControl( playlist_t * p_playlist, int i_query, ... )
+{
+    va_list args;
+    int i_result;
+    va_start( args, i_query );
+    vlc_mutex_lock( &p_playlist->object_lock );
+    i_result = playlist_vaControl( p_playlist, i_query, args );
+    va_end( args );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return i_result;
+    
+}
+
+/**
+ * Do a playlist action.
+ *
+ * If there is something in the playlist then you can do playlist actions.
+ *
+ * Playlist lock must be taken when calling this function
+ *
+ * \param p_playlist the playlist to do the command on
+ * \param i_query the command to do
+ * \param variable number of arguments
+ * \return VLC_SUCCESS or an error
+ */
 int playlist_Control( playlist_t * p_playlist, int i_query, ... )
 {
     va_list args;
@@ -261,8 +288,6 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
 {
     playlist_view_t *p_view;
     vlc_value_t val;
-
-    vlc_mutex_lock( &p_playlist->object_lock );
 
 #ifdef PLAYLIST_PROFILE
     p_playlist->request_date = mdate();
@@ -397,7 +422,6 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         break;
     }
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
     return VLC_SUCCESS;
 }
 

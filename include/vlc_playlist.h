@@ -154,6 +154,9 @@ struct playlist_t
     int                   i_size;   /**< total size of the list */
     playlist_item_t **    pp_items; /**< array of pointers to the
                                      * playlist items */
+    int                   i_all_size; /**< size of list of items and nodes */
+    playlist_item_t **    pp_all_items; /**< array of pointers to the
+                                         * playlist items and nodes */
 
     int                   i_views; /**< Number of views */
     playlist_view_t **    pp_views; /**< array of pointers to the
@@ -237,15 +240,16 @@ playlist_t * __playlist_Create   ( vlc_object_t * );
 int            playlist_Destroy  ( playlist_t * );
 
 /* Playlist control */
-#define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY )
-#define playlist_Pause(p) playlist_Control(p,PLAYLIST_PAUSE )
-#define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP )
-#define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP , 1)
-#define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP , -1)
-#define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP,i)
-#define playlist_Goto(p,i) playlist_Control(p,PLAYLIST_GOTO,i)
+#define playlist_Play(p) playlist_LockControl(p,PLAYLIST_PLAY )
+#define playlist_Pause(p) playlist_LockControl(p,PLAYLIST_PAUSE )
+#define playlist_Stop(p) playlist_LockControl(p,PLAYLIST_STOP )
+#define playlist_Next(p) playlist_LockControl(p,PLAYLIST_SKIP, 1)
+#define playlist_Prev(p) playlist_LockControl(p,PLAYLIST_SKIP, -1)
+#define playlist_Skip(p,i) playlist_LockControl(p,PLAYLIST_SKIP, i)
+#define playlist_Goto(p,i) playlist_LockControl(p,PLAYLIST_GOTO, i)
 
 VLC_EXPORT( int, playlist_Control, ( playlist_t *, int, ...  ) );
+VLC_EXPORT( int, playlist_LockControl, ( playlist_t *, int, ...  ) );
 
 VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 VLC_EXPORT( int,  playlist_LockClear, ( playlist_t * ) );

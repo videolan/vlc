@@ -188,6 +188,8 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         }
 
         INSERT_ELEM( p_playlist->pp_items, p_playlist->i_size, i_pos, p_item );
+        INSERT_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size,
+                     p_playlist->i_all_size, p_item );
         p_playlist->i_enabled ++;
 
         /* We update the ALL view directly */
@@ -345,6 +347,10 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
                  p_playlist->i_size,
                  i_position,
                  p_item );
+    INSERT_ELEM( p_playlist->pp_all_items,
+                 p_playlist->i_all_size,
+                 p_playlist->i_all_size,
+                 p_item );
     p_playlist->i_enabled ++;
 
     /* TODO: Handle modes */
@@ -401,9 +407,9 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 int playlist_GetPositionById( playlist_t * p_playlist , int i_id )
 {
     int i;
-    for( i =  0 ; i < p_playlist->i_size ; i++ )
+    for( i =  0 ; i < p_playlist->i_all_size ; i++ )
     {
-        if( p_playlist->pp_items[i]->input.i_id == i_id )
+        if( p_playlist->pp_all_items[i]->input.i_id == i_id )
         {
             return i;
         }
@@ -455,11 +461,11 @@ playlist_item_t *playlist_LockItemGetByPos( playlist_t *p_playlist, int i_pos )
 playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 {
     int i;
-    for( i =  0 ; i < p_playlist->i_size ; i++ )
+    for( i =  0 ; i < p_playlist->i_all_size ; i++ )
     {
-        if( p_playlist->pp_items[i]->input.i_id == i_id )
+        if( p_playlist->pp_all_items[i]->input.i_id == i_id )
         {
-            return p_playlist->pp_items[i];
+            return p_playlist->pp_all_items[i];
         }
     }
     return NULL;

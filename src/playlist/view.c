@@ -251,11 +251,11 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     vlc_value_t val;
     playlist_add_t *p_add = (playlist_add_t*)malloc( sizeof(playlist_add_t));
 
-    vlc_input_item_Init( VLC_OBJECT(p_playlist), &p_item->input );
     if( p_item == NULL )
     {
         return NULL;
     }
+    vlc_input_item_Init( VLC_OBJECT(p_playlist), &p_item->input );
 
     if( psz_name != NULL )
     {
@@ -291,6 +291,11 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     p_item->i_flags |= PLAYLIST_SKIP_FLAG; /* Default behaviour */
 
     vlc_mutex_init( p_playlist, &p_item->input.lock );
+
+    INSERT_ELEM( p_playlist->pp_all_items,
+                 p_playlist->i_all_size,
+                 p_playlist->i_all_size,
+                 p_item );
 
     if( p_parent != NULL )
     {
