@@ -28,9 +28,14 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <string.h>
+#include <errno.h>
 
 #if defined( WIN32 )
 #include <windows.h>
+#else
+# include <sys/types.h>
+# include <unistd.h>
+# include <sys/wait.h>
 #endif
 
 
@@ -166,12 +171,12 @@ static void Run( intf_thread_t *p_intf )
                 p_command = p_previous->p_next;
             }
             else
-            {    
-                msg_Info( p_intf, "running %s", p_command->psz_torun );
+            {
 #if defined( WIN32 )
-
                 STARTUPINFO si;
                 PROCESS_INFORMATION pi;
+
+                msg_Info( p_intf, "running %s", p_command->psz_torun );
                 ZeroMemory( &si, sizeof(si) );
                 si.cb = sizeof(si);
                 ZeroMemory( &pi, sizeof(pi) );
@@ -181,9 +186,46 @@ static void Run( intf_thread_t *p_intf )
                     msg_Err( p_intf, "can't run \"%s\"", p_command->psz_torun );
                 }    
 #else
-                if ( fork() )
+                pid_t pid;
+
+                msg_Info( p_intf, "running %s", p_command->psz_torun );
+                pid = fork();
+                switch( pid )
                 {
-                    execl( p_command->psz_torun, NULL, (char *)NULL );
+                    case -1:
+                        msg_Err( p_intf, "can't fork: %s", strerror( errno ) );
+                        break;
+
+                    case 0:
+                        execlp( p_command->psz_torun, p_command->psz_torun,
+                                NULL );
+                        msg_Err( p_intf, "can't run \"%s\": %s",
+                                 p_command->psz_torun, strerror( errno ) );
+                        exit (1);
+
+                    default:
+                    {
+                        int i_status;
+
+                        /* if we don't do that, we'll get zombies processes
+                         * FIXME: should still be possible to spawn other
+                         * proceses*/
+                        while( waitpid( pid, &i_status, 0 ) != pid );
+                        if( WIFEXITED( i_status ) )
+                        {
+                            i_status = WEXITSTATUS( i_status );
+                            if( i_status )
+                                msg_Warn( p_intf, "process %d returned %d",
+                                          pid, i_status );
+                        }
+                        else if( WIFSIGNALED( i_status ) )
+                        {
+                            i_status = WTERMSIG( i_status );
+                            msg_Warn( p_intf,
+                                      "process %d terminated by signal %d",
+                                      pid, i_status );
+                        }
+                    }
                 }
 #endif
                 if( p_previous )
@@ -210,7 +252,6 @@ static void Run( intf_thread_t *p_intf )
         mwait( p_intf->p_sys->next_check );
         p_intf->p_sys->next_check += 1000000;
     }
-    return VLC_SUCCESS;
 }
 
 
