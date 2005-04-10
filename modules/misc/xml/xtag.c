@@ -165,7 +165,6 @@ static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
 static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 {
     xml_reader_t *p_reader;
-    xml_reader_sys_t *p_sys;
     char *p_buffer;
     int i_size,i_buffer;
     XTag *p_root;
@@ -174,6 +173,9 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 
     i_size = stream_Size( s ) - stream_Tell( s );
     p_buffer = malloc( i_size + 1 );
+    if( p_buffer == NULL )
+        return NULL;
+
     i_buffer = 0;
     while( i_buffer < i_size )
     {
@@ -198,7 +200,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     }
 
     p_reader = malloc( sizeof(xml_reader_t) );
-    p_reader->p_sys = p_sys = malloc( sizeof(xml_reader_sys_t) );
+    p_reader->p_sys = malloc( sizeof(xml_reader_sys_t) );
     p_reader->p_sys->p_root = p_root;
     p_reader->p_sys->p_curtag = NULL;
     p_reader->p_sys->p_curattr = NULL;
