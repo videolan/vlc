@@ -957,15 +957,17 @@ typedef _off_t off_t;
 #       endif
 #   endif
 
-#   if defined( _MSC_VER )
+/*
+#   if (defined( _MSC_VER ) && (!defined(__WXMSW__)))
 #       if !defined( _OFF_T_DEFINED )
 typedef __int64 off_t;
 #           define _OFF_T_DEFINED
 #       else
 #           define off_t __int64
-            /* for wx compatibility typedef long off_t; */
+            // for wx compatibility typedef long off_t;
 #       endif
 #   endif
+*/
 
 #   if defined( __BORLANDC__ )
 #       undef off_t

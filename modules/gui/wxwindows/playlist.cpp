@@ -128,7 +128,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_MENU(AddFile_Event, Playlist::OnAddFile)
     EVT_MENU(AddDir_Event, Playlist::OnAddDir)
     EVT_MENU(AddMRL_Event, Playlist::OnAddMRL)
-    EVT_MENU(Close_Event, Playlist::OnClose)
+    EVT_MENU(Close_Event, Playlist::OnMenuClose)
     EVT_MENU(Open_Event, Playlist::OnOpen)
     EVT_MENU(Save_Event, Playlist::OnSave)
 
@@ -421,7 +421,7 @@ Playlist::~Playlist()
 /* Update a node */
 void Playlist::UpdateNode( playlist_item_t *p_node, wxTreeItemId node )
 {
-    long cookie;
+    wxTreeItemIdValue cookie;
     wxTreeItemId child;
     for( int i = 0; i< p_node->i_children ; i++ )
     {
@@ -622,7 +622,7 @@ void Playlist::RemoveItem( int i )
 /* Find a wxItem from a playlist id */
 wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
 {
-    long cookie;
+    wxTreeItemIdValue cookie;
     PlaylistItem *p_wxcurrent;
     wxTreeItemId search;
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
@@ -681,7 +681,7 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
 
 int Playlist::CountItems( wxTreeItemId root )
 {
-    long cookie;
+    wxTreeItemIdValue cookie;
     int count = 0;
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
     
@@ -708,7 +708,7 @@ int Playlist::CountItems( wxTreeItemId root )
 /* Find a wxItem from a name (from current) */
 wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string, wxTreeItemId current, vlc_bool_t *pb_current_found )
 {
-    long cookie;
+    wxTreeItemIdValue cookie;
     wxTreeItemId search;
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
     wxTreeItemId child;
@@ -848,6 +848,11 @@ void Playlist::DeleteNode( playlist_item_t *p_item )
     playlist_NodeDelete( p_playlist, p_item, VLC_TRUE , VLC_FALSE );
 }
 
+void Playlist::OnMenuClose( wxCommandEvent& event )
+{
+    wxCloseEvent cevent;
+    OnClose(cevent);
+}
 
 void Playlist::OnClose( wxCloseEvent& WXUNUSED(event) )
 {
@@ -1146,7 +1151,7 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
             wxMutexGuiLeave();
             playlist_ServicesDiscoveryRemove( p_playlist,
                             pp_sds[event.GetId() - FirstSD_Event] );
-            wxMutexGuiEnter();
+            //wxMutexGuiEnter();
         }
     }
 }

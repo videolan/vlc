@@ -91,6 +91,8 @@ private:
     "starts.")
 #define TASKBAR_TEXT N_("Show taskbar entry")
 #define TASKBAR_LONGTEXT N_("Show taskbar entry")
+#define MINIMAL_TEXT N_("Minimal interface")
+#define MINIMAL_LONGTEXT N_("Use minimal interface, no toolbar, few menus")
 #define SYSTRAY_TEXT N_("Show systray icon")
 #define SYSTRAY_LONGTEXT N_("Show systray icon")
 
@@ -117,6 +119,8 @@ vlc_module_begin();
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-taskbar", 1, NULL,
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
+    add_bool( "wxwin-minimal", 0, NULL,
+              MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wxwin-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
@@ -217,6 +221,8 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: wxWindows thread
  *****************************************************************************/
+
+//when is this called?
 #if !defined(__BUILTIN__) && defined( WIN32 )
 HINSTANCE hInstance = 0;
 extern "C" BOOL WINAPI
@@ -264,6 +270,11 @@ static void Init( intf_thread_t *p_intf )
 
 #if defined( WIN32 )
 #if !defined(__BUILTIN__)
+
+    //because no one knows when DllMain is called
+    if (hInstance == NULL)
+      hInstance = GetModuleHandle(NULL);
+
     wxEntry( hInstance/*GetModuleHandle(NULL)*/, NULL, NULL, SW_SHOW );
 #else
     wxEntry( GetModuleHandle(NULL), NULL, NULL, SW_SHOW );
@@ -319,6 +330,7 @@ bool Instance::OnInit()
         {
             style = wxDEFAULT_FRAME_STYLE|wxFRAME_NO_TASKBAR;
         }
+
         Interface *MainInterface = new Interface( p_intf, style );
         p_intf->p_sys->p_wxwindow = MainInterface;
 

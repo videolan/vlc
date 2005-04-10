@@ -148,6 +148,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 {
 #define MAX_POPUP_ITEMS 45
 
+    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+
     vlc_object_t *p_object, *p_input;
     char *ppsz_varnames[MAX_POPUP_ITEMS];
     int pi_objects[MAX_POPUP_ITEMS];
@@ -274,9 +276,12 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     {
         vlc_value_t val;
         popupmenu.InsertSeparator( 0 );
+        if (!minimal)
+        {
         popupmenu.Insert( 0, Stop_Event, wxU(_("Stop")) );
         popupmenu.Insert( 0, Previous_Event, wxU(_("Previous")) );
         popupmenu.Insert( 0, Next_Event, wxU(_("Next")) );
+        }
 
         var_Get( p_input, "state", &val );
         if( val.i_int == PAUSE_S )
@@ -301,8 +306,11 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 
     popupmenu.Append( MenuDummy_Event, wxU(_("Miscellaneous")),
                       MiscMenu( p_intf ), wxT("") );
+    if (!minimal)
+    {
     popupmenu.Append( MenuDummy_Event, wxU(_("Open")),
                       OpenStreamMenu( p_intf ), wxT("") );
+    }
 
     p_intf->p_sys->p_popup_menu = &popupmenu;
     p_parent->PopupMenu( &popupmenu, pos.x, pos.y );
@@ -1001,7 +1009,7 @@ void MenuEvtHandler::OnMenuEvent( wxCommandEvent& event )
 
         wxMutexGuiLeave(); // We don't want deadlocks
         var_Set( p_object, p_menuitemext->psz_var, p_menuitemext->val );
-        wxMutexGuiEnter();
+        //wxMutexGuiEnter();
 
         vlc_object_release( p_object );
     }

@@ -45,7 +45,7 @@ enum
 
 BEGIN_EVENT_TABLE(FileInfo, wxFrame)
     /* Button events */
-    EVT_BUTTON(wxID_OK, FileInfo::OnClose)
+    EVT_BUTTON(wxID_OK, FileInfo::OnButtonClose)
 
     /* Hide the window when the user closes the window */
     EVT_CLOSE(FileInfo::OnClose)
@@ -160,7 +160,13 @@ FileInfo::~FileInfo()
 {
 }
 
-void FileInfo::OnClose( wxCloseEvent& event )
+void FileInfo::OnButtonClose( wxCommandEvent& event )
+{
+    wxCloseEvent cevent;
+    OnClose(cevent);
+}
+
+void FileInfo::OnClose( wxCloseEvent& WXUNUSED(event) )
 {
     Hide();
 }

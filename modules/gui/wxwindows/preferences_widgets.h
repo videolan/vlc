@@ -48,7 +48,8 @@ protected:
     void (*pf_update_callback)( void * );
     void *p_update_data;
 
-    void OnUpdate( wxEvent& );
+    void OnUpdate( wxCommandEvent& event );
+    void OnUpdateScroll( wxScrollEvent& event );
 
 private:
     wxString name;
@@ -170,7 +171,8 @@ private:
     wxSpinCtrl *spin;
     int i_value;
 
-    void OnUpdate( wxScrollEvent& );
+    void OnUpdate( wxCommandEvent& event );
+    void OnUpdateScroll( wxScrollEvent& event );
 
     DECLARE_EVENT_TABLE()
 };

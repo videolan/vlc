@@ -68,7 +68,7 @@ private:
     void Update();
 
     /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event );
     void OnAdd( wxCommandEvent& event );
     void OnDel( wxCommandEvent& event );
     void OnClear( wxCommandEvent& event );
@@ -336,7 +336,7 @@ bool BookmarksDialog::Show( bool show )
     return wxFrame::Show( show );
 }
 
-void BookmarksDialog::OnClose( wxCommandEvent& event )
+void BookmarksDialog::OnClose( wxCloseEvent& event )
 {
     Hide();
 }

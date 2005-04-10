@@ -48,7 +48,7 @@ enum
 
 BEGIN_EVENT_TABLE(Messages, wxFrame)
     /* Button events */
-    EVT_BUTTON(wxID_OK, Messages::OnClose)
+    EVT_BUTTON(wxID_OK, Messages::OnButtonClose)
     EVT_BUTTON(wxID_CLEAR, Messages::OnClear)
     EVT_BUTTON(wxID_SAVEAS, Messages::OnSaveLog)
 
@@ -193,7 +193,13 @@ void Messages::UpdateLog()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-void Messages::OnClose( wxEvent& WXUNUSED(event) )
+void Messages::OnButtonClose( wxCommandEvent& WXUNUSED(event) )
+{
+    wxCloseEvent cevent;
+    OnClose(cevent);
+}
+
+void Messages::OnClose( wxCloseEvent& WXUNUSED(event) )
 {
     Hide();
 }

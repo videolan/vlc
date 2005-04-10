@@ -45,11 +45,11 @@
 #include <wx/taskbar.h>
 #include "vlc_keys.h"
 
-/* Hmmm, work-around for newest wxWin */
-#ifdef wxStaticCastEvent
-#   undef wxStaticCastEvent
-#   define wxStaticCastEvent(type, val) ((type)(val))
+//PITA
+#if (!wxCHECK_VERSION(2,5,0))
+typedef long wxTreeItemIdValue;
 #endif
+
 
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
@@ -294,12 +294,13 @@ private:
 class Systray: public wxTaskBarIcon
 {
 public:
-    Systray( Interface* p_main_interface );
+    Systray( Interface* p_main_interface, intf_thread_t *p_intf );
     virtual ~Systray() {};
     wxMenu* CreatePopupMenu();
     void UpdateTooltip( const wxChar* tooltip );
 
 private:
+    void OnMenuIconize( wxCommandEvent& event );
     void OnLeftClick( wxTaskBarIconEvent& event );
     void OnPlayStream ( wxCommandEvent& event );
     void OnStopStream ( wxCommandEvent& event );
@@ -307,6 +308,7 @@ private:
     void OnNextStream ( wxCommandEvent& event );
     void OnExit(  wxCommandEvent& event );
     Interface* p_main_interface;
+    intf_thread_t *p_intf;
     DECLARE_EVENT_TABLE()
 };
 #endif
@@ -443,6 +445,7 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event );
 
     void OnPageChange( wxNotebookEvent& event );
     void OnMRLChange( wxCommandEvent& event );
@@ -452,11 +455,13 @@ private:
     void OnFileBrowse( wxCommandEvent& event );
 
     /* Event handlers for the disc page */
+    void OnDiscPanelChangeSpin( wxSpinEvent& event );
     void OnDiscPanelChange( wxCommandEvent& event );
     void OnDiscTypeChange( wxCommandEvent& event );
     void OnDiscDeviceChange( wxCommandEvent& event );
 
     /* Event handlers for the net page */
+    void OnNetPanelChangeSpin( wxSpinEvent& event );
     void OnNetPanelChange( wxCommandEvent& event );
     void OnNetTypeChange( wxCommandEvent& event );
 
@@ -471,6 +476,7 @@ private:
     /* Event handlers for the caching option */
     void OnCachingEnable( wxCommandEvent& event );
     void OnCachingChange( wxCommandEvent& event );
+    void OnCachingChangeSpin( wxSpinEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -774,10 +780,11 @@ private:
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
-    void OnCancel( wxEvent& event );
+    void OnCancel( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnResetAll( wxCommandEvent& event );
     void OnAdvanced( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -798,7 +805,8 @@ public:
 
 private:
     /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxEvent& event );
+    void OnButtonClose( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& WXUNUSED(event) );
     void OnClear( wxCommandEvent& event );
     void OnSaveLog( wxCommandEvent& event );
 
@@ -842,7 +850,8 @@ private:
     void OnAddFile( wxCommandEvent& event );
     void OnAddDir( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
-    void OnClose( wxCloseEvent& event );
+    void OnMenuClose( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& WXUNUSED(event) );
 
     void OnEnableSelection( wxCommandEvent& event );
     void OnDisableSelection( wxCommandEvent& event );
@@ -999,7 +1008,8 @@ public:
     vlc_bool_t b_need_update;
 
 private:
-    void OnClose( wxCloseEvent& event );
+    void OnButtonClose( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& WXUNUSED(event) );
 
     DECLARE_EVENT_TABLE();
 

@@ -168,7 +168,7 @@ BEGIN_EVENT_TABLE(PrefsDialog, wxFrame)
     EVT_CHECKBOX(Advanced_Event, PrefsDialog::OnAdvanced)
 
     /* Don't destroy the window when the user closes it */
-    EVT_CLOSE(PrefsDialog::OnCancel)
+    EVT_CLOSE(PrefsDialog::OnClose)
 END_EVENT_TABLE()
 
 // menu and control ids
@@ -269,7 +269,13 @@ void PrefsDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     prefs_tree->CleanChanges();
 }
 
-void PrefsDialog::OnCancel( wxEvent& WXUNUSED(event) )
+void PrefsDialog::OnClose( wxCloseEvent& WXUNUSED(event) )
+{
+    wxCommandEvent cevent;
+    OnCancel(cevent);
+}
+
+void PrefsDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 {
     this->Hide();
     prefs_tree->CleanChanges();
@@ -330,6 +336,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     b_advanced = VLC_FALSE;
 
     root_item = AddRoot( wxT("") );
+    wxASSERT_MSG(root_item.IsOk(), "Could not add root item");
 
     wxImageList *p_images = new wxImageList( 16,16,TRUE );
     p_images->Add( wxIcon( audio_xpm ) );
@@ -505,8 +512,9 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         if( !i_options ) continue;
 
         /* Find the right category item */
-        long cookie;
+        wxTreeItemIdValue cookie;
         vlc_bool_t b_found = VLC_FALSE;
+
         wxTreeItemId category_item = GetFirstChild( root_item , cookie);
         while( category_item.IsOk() )
         {
@@ -524,7 +532,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
         /* Find subcategory item */
         b_found = VLC_FALSE;
-        cookie = -1;
+        //cookie = -1;
         wxTreeItemId subcategory_item = GetFirstChild( category_item, cookie );
         while( subcategory_item.IsOk() )
         {
@@ -558,14 +566,18 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     }
 
     /* Sort all this mess */
-    long cookie; size_t i_child_index;
+    wxTreeItemIdValue cookie; 
+    size_t i_child_index;
     wxTreeItemId capability_item = GetFirstChild( root_item, cookie);
     for( i_child_index = 0;
-         i_child_index < GetChildrenCount( plugins_item, FALSE );
+         (capability_item.IsOk() && 
+          //(i_child_index < GetChildrenCount( plugins_item, FALSE )));
+          (i_child_index < GetChildrenCount( root_item, FALSE )));
          i_child_index++ )
     {
         SortChildren( capability_item );
-        capability_item = GetNextChild( plugins_item, cookie );
+        //capability_item = GetNextChild( plugins_item, cookie );
+        capability_item = GetNextChild( root_item, cookie );
     }
 
     /* Clean-up everything */
@@ -579,16 +591,16 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     SelectItem( GetFirstChild( root_item, cookie ) );
 #endif
 
-    Expand( root_item );
+    //cannot expand hidden root item
+    //Expand( root_item );
 }
 
-PrefsTreeCtrl::~PrefsTreeCtrl()
-{
+PrefsTreeCtrl::~PrefsTreeCtrl(){
 }
 
 void PrefsTreeCtrl::ApplyChanges()
 {
-    long cookie, cookie2, cookie3;
+    wxTreeItemIdValue cookie, cookie2, cookie3;
     ConfigTreeData *config_data;
 
     wxTreeItemId category = GetFirstChild( root_item, cookie );
@@ -625,7 +637,7 @@ void PrefsTreeCtrl::ApplyChanges()
 
 void PrefsTreeCtrl::CleanChanges()
 {
-    long cookie, cookie2, cookie3;
+    wxTreeItemIdValue cookie, cookie2, cookie3;
     ConfigTreeData *config_data;
 
     config_data = !GetSelection() ? NULL :
@@ -633,7 +645,11 @@ void PrefsTreeCtrl::CleanChanges()
     if( config_data  )
     {
         config_data->panel->Hide();
+#if (wxMAJOR_VERSION >= 2) && (wxMINOR_VERSION < 5 )
         p_sizer->Remove( config_data->panel );
+#else
+        p_sizer->Detach( config_data->panel );
+#endif
     }
 
     wxTreeItemId category = GetFirstChild( root_item, cookie );
@@ -687,7 +703,7 @@ ConfigTreeData *PrefsTreeCtrl::FindModuleConfig( ConfigTreeData *config_data )
         return config_data;
     }
 
-    long cookie, cookie2, cookie3;
+    wxTreeItemIdValue cookie, cookie2, cookie3;
     ConfigTreeData *config_new;
     wxTreeItemId category = GetFirstChild( root_item, cookie );
     while( category.IsOk() )
@@ -725,7 +741,11 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
     if( config_data && config_data->panel )
     {
         config_data->panel->Hide();
+#if (wxMAJOR_VERSION >= 2) && (xwMINOR_VERSION < 5 )
         p_sizer->Remove( config_data->panel );
+#else
+        p_sizer->Detach( config_data->panel );
+#endif
     }
 
     /* Don't use event.GetItem() because we also send fake events */
@@ -761,7 +781,12 @@ void PrefsTreeCtrl::OnAdvanced( wxCommandEvent& event )
     if( config_data  )
     {
         config_data->panel->Hide();
+
+#if (wxMAJOR_VERSION >= 2) && (xwMINOR_VERSION < 5 )
         p_sizer->Remove( config_data->panel );
+#else
+        p_sizer->Detach( config_data->panel );
+#endif
     }
 
     if( GetSelection() )

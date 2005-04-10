@@ -159,13 +159,20 @@ void ConfigControl::SetUpdateCallback( void (*p_callback)( void * ),
     p_update_data = p_data;
 }
 
-void ConfigControl::OnUpdate( wxEvent& WXUNUSED(event) )
+void ConfigControl::OnUpdate( wxCommandEvent& WXUNUSED(event) )
 {
     if( pf_update_callback )
     {
         pf_update_callback( p_update_data );
     }
 }
+
+void ConfigControl::OnUpdateScroll( wxScrollEvent& WXUNUSED(event) )
+{
+    wxCommandEvent cevent;
+    OnUpdate(cevent);
+}
+
 
 /*****************************************************************************
  * KeyConfigControl implementation
@@ -708,7 +715,7 @@ wxString FileConfigControl::GetPszValue()
  *****************************************************************************/
 BEGIN_EVENT_TABLE(IntegerConfigControl, wxPanel)
     EVT_TEXT(-1, IntegerConfigControl::OnUpdate)
-    EVT_COMMAND_SCROLL(-1, IntegerConfigControl::OnUpdate)
+    EVT_COMMAND_SCROLL(-1, IntegerConfigControl::OnUpdateScroll)
 END_EVENT_TABLE()
 
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
@@ -743,10 +750,16 @@ int IntegerConfigControl::GetIntValue()
     return i_value; //spin->GetValue();
 }
 
-void IntegerConfigControl::OnUpdate( wxScrollEvent &event )
+void IntegerConfigControl::OnUpdate( wxCommandEvent &event )
 {
     i_value = event.GetInt();
     ConfigControl::OnUpdate( event );
+}
+void IntegerConfigControl::OnUpdateScroll( wxScrollEvent &event )
+{
+    wxCommandEvent cevent;
+    cevent.SetInt(event.GetPosition());
+    OnUpdate(cevent);
 }
 
 /*****************************************************************************
@@ -851,7 +864,7 @@ int IntegerListConfigControl::GetIntValue()
  * RangedIntConfigControl implementation
  *****************************************************************************/
 BEGIN_EVENT_TABLE(RangedIntConfigControl, wxPanel)
-    EVT_COMMAND_SCROLL(-1, RangedIntConfigControl::OnUpdate)
+    EVT_COMMAND_SCROLL(-1, RangedIntConfigControl::OnUpdateScroll)
 END_EVENT_TABLE()
 
 RangedIntConfigControl::RangedIntConfigControl( vlc_object_t *p_this,
@@ -879,6 +892,7 @@ int RangedIntConfigControl::GetIntValue()
 {
     return slider->GetValue();
 }
+
 
 /*****************************************************************************
  * FloatConfigControl implementation

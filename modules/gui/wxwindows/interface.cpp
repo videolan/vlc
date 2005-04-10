@@ -210,7 +210,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
     EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
-
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -225,6 +224,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     i_old_playing_status = PAUSE_S;
     b_extra = VLC_FALSE;
 //    b_undock = VLC_FALSE;
+
 
     extra_window = NULL;
 
@@ -246,7 +246,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     p_systray = NULL;
     if ( config_GetInt( p_intf, "wxwin-systray" ) )
     {
-        p_systray = new Systray(this);
+        p_systray = new Systray(this, p_intf);
         p_systray->SetIcon( wxIcon( vlc16x16_xpm ), wxT("VLC media player") );
         if ( (! p_systray->IsOk()) || (! p_systray->IsIconInstalled()) )
         {
@@ -374,8 +374,13 @@ void Interface::OnControlEvent( wxCommandEvent& event )
  *****************************************************************************/
 void Interface::CreateOurMenuBar()
 {
+    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
+
+    if (!minimal)
+    {
     file_menu->Append( OpenFileSimple_Event,
                        wxU(_("Quick &Open File...\tCtrl-O")) );
 
@@ -391,11 +396,15 @@ void Interface::CreateOurMenuBar()
     file_menu->AppendSeparator();
     file_menu->Append( Wizard_Event, wxU(_("&Wizard...\tCtrl-W")) );
     file_menu->AppendSeparator();
+    }
     file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")) );
 
     /* Create the "View" menu */
     wxMenu *view_menu = new wxMenu;
+    if (!minimal)
+    {
     view_menu->Append( Playlist_Event, wxU(_("&Playlist...\tCtrl-P")) );
+    }
     view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")) );
     view_menu->Append( FileInfo_Event,
                        wxU(_("Stream and Media &info...\tCtrl-I")) );
@@ -463,6 +472,8 @@ void Interface::CreateOurToolBar()
 #define HELP_SLOW N_("Play slower")
 #define HELP_FAST N_("Play faster")
 
+    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
 
@@ -471,17 +482,23 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
+    if (!minimal)
+    {
     toolbar->AddTool( OpenFile_Event, wxT(""),
                       wxBitmap( eject_xpm ), wxU(_(HELP_OPEN)) );
     toolbar->AddSeparator();
+    }
 
     wxToolBarToolBase *p_tool = toolbar->AddTool( PlayStream_Event, wxT(""),
                       wxBitmap( play_xpm ), wxU(_(HELP_PLAY)) );
     p_tool->SetClientData( p_tool );
 
+    if (!minimal)
+    {
     toolbar->AddTool( StopStream_Event, wxT(""), wxBitmap( stop_xpm ),
                       wxU(_(HELP_STOP)) );
     toolbar->AddSeparator();
+
     toolbar->AddTool( PrevStream_Event, wxT(""),
                       wxBitmap( prev_xpm ), wxU(_(HELP_PLP)) );
     toolbar->AddTool( SlowStream_Event, wxT(""),
@@ -493,6 +510,7 @@ void Interface::CreateOurToolBar()
     toolbar->AddSeparator();
     toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( playlist_xpm ),
                       wxU(_(HELP_PLO)) );
+    }
 
     wxControl *p_dummy_ctrl =
         new wxControl( toolbar, -1, wxDefaultPosition,
@@ -1334,7 +1352,7 @@ BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
     EVT_TASKBAR_LEFT_DOWN(Systray::OnLeftClick)
 #endif
     /* Menu events */
-    EVT_MENU(Iconize_Event, Systray::OnLeftClick)
+    EVT_MENU(Iconize_Event, Systray::OnMenuIconize)
     EVT_MENU(Exit_Event, Systray::OnExit)
     EVT_MENU(PlayStream_Event, Systray::OnPlayStream)
     EVT_MENU(NextStream_Event, Systray::OnNextStream)
@@ -1342,16 +1360,23 @@ BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
     EVT_MENU(StopStream_Event, Systray::OnStopStream)
 END_EVENT_TABLE()
 
-Systray::Systray( Interface *_p_main_interface )
+Systray::Systray( Interface *_p_main_interface, intf_thread_t *_p_intf )
 {
     p_main_interface = _p_main_interface;
+    p_intf = _p_intf;
 }
 
 /* Event handlers */
-void Systray::OnLeftClick( wxTaskBarIconEvent& event )
+void Systray::OnMenuIconize( wxCommandEvent& event )
 {
     p_main_interface->Show( ! p_main_interface->IsShown() );
     if ( p_main_interface->IsShown() ) p_main_interface->Raise();
+}
+
+void Systray::OnLeftClick( wxTaskBarIconEvent& event )
+{
+    wxCommandEvent cevent;
+    OnMenuIconize(cevent);
 }
 
 void Systray::OnExit( wxCommandEvent& event )
@@ -1382,13 +1407,19 @@ void Systray::OnStopStream( wxCommandEvent& event )
 /* Systray popup menu */
 wxMenu* Systray::CreatePopupMenu()
 {
+    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+
     wxMenu* systray_menu = new wxMenu;
     systray_menu->Append( Exit_Event, wxU(_("Quit VLC")) );
     systray_menu->AppendSeparator();
     systray_menu->Append( PlayStream_Event, wxU(_("Play/Pause")) );
+
+    if (!minimal)
+    {
     systray_menu->Append( PrevStream_Event, wxU(_("Previous")) );
     systray_menu->Append( NextStream_Event, wxU(_("Next")) );
     systray_menu->Append( StopStream_Event, wxU(_("Stop")) );
+    }
     systray_menu->AppendSeparator();
     systray_menu->Append( Iconize_Event, wxU(_("Show/Hide interface")) );
     return systray_menu;

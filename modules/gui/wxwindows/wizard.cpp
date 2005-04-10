@@ -183,7 +183,7 @@ class wizHelloPage : public wxWizardPageSimple
 {
     public:
         wizHelloPage( wxWizard *parent);
-        void OnActionChange(wxEvent& event);
+        void OnActionChange( wxCommandEvent& event );
         void OnWizardPageChanging(wxWizardEvent& event);
         void OnMoreInfo( wxCommandEvent& event );
     protected:
@@ -209,7 +209,7 @@ class wizInputPage : public wxWizardPage
         wizInputPage( wxWizard *, wxWizardPage *, intf_thread_t *);
         wizInputPage::~wizInputPage();
         void OnWizardPageChanging(wxWizardEvent& event);
-        void OnInputChange(wxEvent& event);
+        void OnInputChange( wxCommandEvent& event );
         void OnEnablePartial(wxCommandEvent& event);
         virtual wxWizardPage *GetPrev() const;
         virtual wxWizardPage *GetNext() const;
@@ -316,7 +316,7 @@ protected:
     wxStaticText *address_text;
     wxTextCtrl *address_txtctrl;
     WizardDialog * p_parent;
-    void OnMethodChange(wxEvent& event);
+    void OnMethodChange( wxCommandEvent& event );
     wxRadioButton *method_radios[4];
     wxWizardPage *p_prev;
     wxWizardPage *p_next;
@@ -349,7 +349,7 @@ protected:
     int i_encap;
     int i_mux;
     int i_action;
-    void OnEncapChange(wxEvent& event);
+    void OnEncapChange( wxCommandEvent& event );
     wxRadioButton *encap_radios[MUXERS_NUMBER];
     WizardDialog *p_parent;
     wxWizardPage *p_prev;
@@ -505,7 +505,7 @@ void wizHelloPage::OnMoreInfo(wxCommandEvent& event)
                   wxOK | wxICON_INFORMATION, this->p_parent );
 }
 
-void wizHelloPage::OnActionChange(wxEvent& event)
+void wizHelloPage::OnActionChange( wxCommandEvent& event )
 {
     i_action = event.GetId() - ActionRadio0_Event;
     ((wizInputPage *)GetNext())->SetAction( i_action );
@@ -644,7 +644,7 @@ wizInputPage::~wizInputPage()
 {
 }
 
-void wizInputPage::OnInputChange(wxEvent& event)
+void wizInputPage::OnInputChange( wxCommandEvent& event )
 {
     i_input = event.GetId() - InputRadio0_Event;
     if( i_input == 0 )
@@ -1098,7 +1098,7 @@ wxWizardPage *wizStreamingMethodPage::GetNext() const { return p_next; }
 void wizStreamingMethodPage::SetPrev( wxWizardPage *page) {p_prev = page; }
 
 
-void wizStreamingMethodPage::OnMethodChange(wxEvent& event)
+void wizStreamingMethodPage::OnMethodChange( wxCommandEvent& event )
 {
     i_method = event.GetId() - MethodRadio0_Event;
     address_text->SetLabel( wxU(
@@ -1174,7 +1174,7 @@ void wizEncapPage::OnWizardPageChanging(wxWizardEvent& event)
 }
 
 
-void wizEncapPage::OnEncapChange(wxEvent& event)
+void wizEncapPage::OnEncapChange( wxCommandEvent& event )
 {
     i_mux = event.GetId() - EncapRadio0_Event;
 }

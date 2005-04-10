@@ -245,6 +245,11 @@ int playlist_NodeGroup( playlist_t * p_playlist , int i_view,
             psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
                             _("Meta-information"), _( "Artist" ) );
         }
+        else if ( i_mode == SORT_GENRE )
+        {
+            psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
+                            _("Meta-information"), _( "Genre" ) );
+        }
 
         if( psz_search && !strcmp( psz_search, "" ) )
         {

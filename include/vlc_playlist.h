@@ -106,8 +106,9 @@ struct playlist_view_t
 #define VIEW_ALL      3
 #define VIEW_FIRST_SORTED  4
 #define VIEW_S_AUTHOR 4
+#define VIEW_S_GENRE 5
 
-#define VIEW_LAST_SORTED  4
+#define VIEW_LAST_SORTED  10
 
 #define VIEW_FIRST_CUSTOM 100
 
@@ -224,9 +225,10 @@ struct playlist_add_t
 #define SORT_TITLE 1
 #define SORT_TITLE_NODES_FIRST 2
 #define SORT_AUTHOR 3
-#define SORT_RANDOM 4
-#define SORT_DURATION 5
-#define SORT_TITLE_NUMERIC 6
+#define SORT_GENRE 4
+#define SORT_RANDOM 5
+#define SORT_DURATION 6
+#define SORT_TITLE_NUMERIC 7
 
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1

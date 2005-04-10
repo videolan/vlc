@@ -179,13 +179,20 @@ int playlist_ViewUpdate( playlist_t *p_playlist, int i_view)
     }
 
     /* Handle update of sorted views here */
-    if( i_view == VIEW_S_AUTHOR )
+    if( i_view >= VIEW_FIRST_SORTED )
     {
+        int i_sort_type;
         playlist_ViewEmpty( p_playlist, i_view, VLC_FALSE );
 
+        switch( i_view )
+        {
+            case VIEW_S_AUTHOR: i_sort_type = SORT_AUTHOR;break;
+            case VIEW_S_GENRE: i_sort_type = SORT_GENRE;break;
+            default: i_sort_type = SORT_AUTHOR;
+        }
         playlist_NodeGroup( p_playlist, i_view, p_view->p_root,
                             p_playlist->pp_items,p_playlist->i_size,
-                            SORT_AUTHOR, ORDER_NORMAL );
+                            i_sort_type, ORDER_NORMAL );
     }
 
 
