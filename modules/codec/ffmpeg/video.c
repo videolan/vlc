@@ -691,7 +691,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  * EndVideo: decoder destruction
  *****************************************************************************
- * This function is called when the thread ends after a sucessful
+ * This function is called when the thread ends after a successful
  * initialization.
  *****************************************************************************/
 void E_(EndVideoDec)( decoder_t *p_dec )

@@ -856,7 +856,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
 
     var_buffer_free( &buffer );
 
-    msg_Info( p_access, "connection sucessful" );
+    msg_Info( p_access, "connection successful" );
 
     return VLC_SUCCESS;
 }

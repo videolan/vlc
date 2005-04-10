@@ -1001,7 +1001,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
 
     if( !b_quick )
     {
-        msg_Dbg( p_input, "`%s' sucessfully opened",
+        msg_Dbg( p_input, "`%s' successfully opened",
                  p_input->input.p_item->psz_uri );
 
     }
