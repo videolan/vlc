@@ -1,10 +1,10 @@
 /*****************************************************************************
- * sap.c :  SAP interface module
+ * shout.c:  Shoutcast services discovery module
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
- * $Id: sap.c 9217 2004-11-07 11:02:59Z courmisch $
+ * Copyright (C) 2005 VideoLAN
+ * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@
     static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("HAL device detection") );
+    set_description( _("Shoutcast radio listings") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
