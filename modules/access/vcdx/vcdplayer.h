@@ -156,8 +156,8 @@ typedef struct vcdplayer_input_s
   int            i_audio_nb;
   int            i_still;
   bool           b_end_of_cell;
+  bool           b_track_length; /* Use track as max unit in seek */
   input_thread_t *p_input;
-  demux_t        *p_demux;
   access_t       *p_access;
   
 } vcdplayer_t;

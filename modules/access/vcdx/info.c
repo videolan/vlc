@@ -182,7 +182,7 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 
 #define add_format_str_info(val)			       \
   {							       \
-    const char *str = val;				       \
+    const char *str = strdup(val);			       \
     unsigned int len;					       \
     if (val != NULL) {					       \
       len=strlen(str);					       \

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vcd.c : VCD input module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2003, 2004 VideoLAN
+ * Copyright (C) 2000, 2003, 2004, 2005 VideoLAN
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
@@ -118,6 +118,13 @@ vlc_module_begin();
                  "Otherwise we play by tracks."),
               VLC_FALSE );
 
+    add_bool( MODULE_STRING "-track-length", VLC_TRUE, 
+	      NULL,
+              N_("Use track length as maximum unit in seek?"),
+              N_("If set, the length of the seek bar is the track rather than "
+		 "the length of an entry"),
+              VLC_FALSE );
+
     add_bool( MODULE_STRING "-extended-info", 0, NULL,
               N_("Show extended VCD info?"),
               N_("Show the maximum about of information under Stream and "
@@ -135,12 +142,6 @@ vlc_module_begin();
                 NULL,
                 N_("Format to use in playlist \"title\" field"),
                 VCD_TITLE_FMT_LONGTEXT, VLC_FALSE );
-
-#ifdef FIXED
-    add_submodule();
-        set_capability( "interface", 0 );
-        set_callbacks( VCDOpenIntf, VCDCloseIntf );
-#endif
 
 vlc_module_end();
 
