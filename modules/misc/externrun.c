@@ -123,6 +123,8 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    run_command_t *p_command;
+    run_command_t *p_next;
 
     playlist_t *p_playlist;    
     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -134,9 +136,7 @@ static void Close( vlc_object_t *p_this )
     var_Destroy( p_playlist, "run-program-command" );
     vlc_object_release( p_playlist );  
     
-    run_command_t *p_command = p_intf->p_sys->p_first_command;
-    run_command_t *p_next;
-    
+    p_command = p_intf->p_sys->p_first_command;
     while( p_command )
     {
         p_next = p_command->p_next;
@@ -154,9 +154,10 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    p_intf->p_sys->next_check = mdate() + 1000000;
     run_command_t *p_command;
     run_command_t *p_previous;
+
+    p_intf->p_sys->next_check = mdate() + 1000000;
 
     while( !p_intf->b_die )
     {
@@ -263,7 +264,7 @@ static int AddRunCommand( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    
+    run_command_t *p_command;
 
     char *psz_command = NULL;
     int i_delay = 0;
@@ -290,7 +291,7 @@ static int AddRunCommand( vlc_object_t *p_this, char const *psz_var,
         strcpy( psz_command, newval.psz_string );
     }
     
-    run_command_t *p_command = malloc( sizeof( run_command_t ) );
+    p_command = malloc( sizeof( run_command_t ) );
     if ( p_command == NULL )
     {
         msg_Err( p_intf, "out of memory: can't add run command" );
