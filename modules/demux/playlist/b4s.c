@@ -59,6 +59,7 @@ static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
 int Import_B4S( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
+    demux_sys_t *p_sys;
 
     char    *psz_ext;
 
@@ -78,15 +79,18 @@ int Import_B4S( vlc_object_t *p_this )
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
-    p_demux->p_sys = malloc( sizeof(demux_sys_t) );
-    if( p_demux->p_sys == NULL )
+    p_demux->p_sys = p_sys = malloc( sizeof(demux_sys_t) );
+    if( p_sys == NULL )
     {
         msg_Err( p_demux, "Out of memory" );
         return VLC_ENOMEM;
     }
-    p_demux->p_sys->b_shout = p_demux->psz_demux &&
+    p_sys->b_shout = p_demux->psz_demux &&
         !strcmp(p_demux->psz_demux, "shout-b4s");
-    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
+    p_sys->psz_prefix = FindPrefix( p_demux );
+    p_sys->p_playlist = NULL;
+    p_sys->p_xml = NULL;
+    p_sys->p_xml_reader = NULL;
 
     return VLC_SUCCESS;
 }
