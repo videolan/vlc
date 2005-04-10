@@ -4,7 +4,7 @@
  * Copyright (C) 1999, 2000, 2001 VideoLAN
  * $Id$
  *
- * Authors: Eric Petit <titer@videolan.org>
+ * Authors: Eric Petit <titer@m0k.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,101 +27,67 @@
 #include <InterfaceKit.h>
 
 #define PREFS_WINDOW_WIDTH   700
-#define PREFS_WINDOW_HEIGHT  400
+#define PREFS_WINDOW_HEIGHT  600
 #define PREFS_ITEM_SELECTED  'pris'
 #define PREFS_DEFAULTS       'prde'
 #define PREFS_APPLY          'prap'
 #define PREFS_SAVE           'prsa'
 
-class StringItemWithView : public BStringItem
+class VTextView : public BTextView
 {
-  public:
-                            StringItemWithView( const char * text )
-                                : BStringItem( text )
-                            {
-                                fConfigBox = NULL;
-                                fConfigScroll = NULL;
-                                fConfigView = NULL;
-                                fText = strdup( text );
-                            }
-
-    /* Here we store the config BBox associated to this module */
-    BBox *                  fConfigBox;
-    BScrollView *           fConfigScroll;
-    BView *                 fConfigView;
-    char *                  fText;
+    public:
+             VTextView( BRect frame, const char *name,
+                        uint32 resizingMode, uint32 flags );
+        void FrameResized( float width, float height );
 };
 
 class ConfigWidget : public BView
 {
     public:
-        ConfigWidget( BRect rect, int type, char * configName );
-        virtual void Apply( intf_thread_t * p_intf, bool doIt ) = 0;
-
-    protected:
-        int          fConfigType;
-        char       * fConfigName;
-};
-
-class ConfigTextControl : public ConfigWidget
-{
-    public:
-        ConfigTextControl( BRect rect, int type, char * label,
-                           char * configName );
-        void Apply( intf_thread_t * p_intf, bool doIt );
+                        ConfigWidget( intf_thread_t * p_intf, BRect rect,
+                                      module_config_t * p_item );
+        void            Apply( bool doIt );
 
     private:
-        BTextControl * fTextControl;
+        intf_thread_t * p_intf;
+
+        int             fType;
+
+        BTextControl  * fTextControl;
+        BCheckBox     * fCheckBox;
+        BPopUpMenu    * fPopUpMenu;
+        BMenuField    * fMenuField;
+        BSlider       * fSlider;
+        BStringView   * fStringView;
+        BCheckBox     * fAltCheck;
+        BCheckBox     * fCtrlCheck;
+        BCheckBox     * fShiftCheck;
 };
 
-class ConfigCheckBox : public ConfigWidget
+class ConfigItem : public BStringItem
 {
     public:
-        ConfigCheckBox( BRect rect, int type, char * label,
-                        char * configName );
-        void Apply( intf_thread_t * p_intf, bool doIt );
+                      ConfigItem( intf_thread_t * p_intf,
+                                  char * name, bool subModule,
+                                  int objectId, int type, char * help );
+                      ~ConfigItem();
+        int           ObjectId() { return fObjectId; }
+        BBox        * Box() { return fBox; }
+        void          Apply( bool doIt );
+        void          Pulse();
 
     private:
-        BCheckBox * fCheckBox;
-};
+        intf_thread_t * p_intf;
 
-class ConfigMenuField : public ConfigWidget
-{
-    public:
-        ConfigMenuField( BRect rect, int type, char * label,
-                         char * configName, char ** list );
-        void Apply( intf_thread_t * p_intf, bool doIt );
+        bool            fSubModule;
+        int             fObjectId;
+        int             fType;
+        char          * fHelp;
 
-    private:
-        BPopUpMenu * fPopUpMenu;
-        BMenuField * fMenuField;
-};
-
-class ConfigSlider : public ConfigWidget
-{
-    public:
-        ConfigSlider( BRect rect, int type, char * label,
-                      char * configName, int min, int max );
-        void Apply( intf_thread_t * p_intf, bool doIt );
-
-    private:
-        BSlider * fSlider;
-};
-
-class ConfigKey : public ConfigWidget
-{
-    public:
-        ConfigKey( BRect rect, int type, char * label,
-                   char * configName );
-        void Apply( intf_thread_t * p_intf, bool doIt );
-
-    private:
-        BStringView * fStringView;
-        BCheckBox   * fAltCheck;
-        BCheckBox   * fCtrlCheck;
-        BCheckBox   * fShiftCheck;
-        BPopUpMenu  * fPopUpMenu;
-        BMenuField  * fMenuField;
+        BBox *        fBox;
+        BScrollView * fScroll;
+        BView *       fView;
+        VTextView     * fTextView;
 };
 
 class PreferencesWindow : public BWindow
@@ -144,7 +110,7 @@ class PreferencesWindow : public BWindow
             void            ReallyQuit();
 
   private:
-    void                    BuildConfigView( StringItemWithView * stringItem,
+    void                    BuildConfigView( ConfigItem * stringItem,
                                              module_config_t ** pp_item,
                                              bool stop_after_category );
 
@@ -152,7 +118,7 @@ class PreferencesWindow : public BWindow
     BOutlineListView *      fOutline;
     BView *                 fDummyView;
     BScrollView *           fConfigScroll;
-    StringItemWithView *    fCurrent;
+    ConfigItem *    fCurrent;
 
     intf_thread_t *         p_intf;
 };
