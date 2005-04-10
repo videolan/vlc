@@ -587,6 +587,7 @@
         {
             bEnabled = FALSE;
         }
+		[o_main setupMenus]; /* Make sure input menu is up to date */
     }
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
@@ -637,6 +638,7 @@
     else if( [[o_mi title] isEqualToString: _NS("Mute")] ) 
     {
         [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+		[o_main setupMenus]; /* Make sure audio menu is up to date */
     }
     else if( [[o_mi title] isEqualToString: _NS("Half Size")] ||
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
@@ -683,6 +685,7 @@
         {
             bEnabled = FALSE;
         }
+		[o_main setupMenus]; /* Make sure video menu is up to date */
     }
 
 

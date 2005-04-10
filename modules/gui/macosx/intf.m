@@ -1591,12 +1591,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     NSString *o_title = [o_mi title];
     BOOL bEnabled = TRUE;
 
-    if( [o_title isEqualToString: _NS("License")] )
-    {
-        /* we need to do this only once */
-        [self setupMenus];
-    }
-
     /* Recent Items Menu */
     if( [o_title isEqualToString: _NS("Clear Menu")] )
     {
