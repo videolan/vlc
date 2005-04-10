@@ -93,6 +93,87 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
 }
 
 /**
+ * Copy a playlist item
+ *
+ * Creates a new item with name, mrl and meta infor like the
+ * source. Does not copy children for node type items.
+ * \param p_obj any vlc object, needed for mutex init
+ * \param p_item the item to copy
+ * \return pointer to the new item, or NULL on error
+ * \note function takes the lock on p_item
+ */
+playlist_item_t *__playlist_ItemCopy( vlc_object_t *p_obj,
+                                      playlist_item_t *p_item )
+{
+    playlist_item_t *p_res;
+    int i;
+    vlc_mutex_lock( &p_item->input.lock );
+
+    p_res = malloc( sizeof( playlist_item_t ) );
+    if( p_res == NULL )
+    {
+        vlc_mutex_unlock( &p_item->input.lock );
+        return NULL;
+    }
+
+    memcpy( p_res, p_item, sizeof(playlist_item_t) );
+    vlc_mutex_init( p_obj, &p_res->input.lock );
+    p_res->input.ppsz_options = malloc( p_item->input.i_options * sizeof(char*));
+    for( i = 0; i < p_item->input.i_options; i++ )
+    {
+        p_res->input.ppsz_options[i] = strdup( p_item->input.ppsz_options[i] );
+    }
+    if( p_item->i_children != -1 )
+    {
+        msg_Warn( p_obj, "not copying playlist items children" );
+        p_res->i_children = -1;
+        p_res->pp_children = NULL;
+    }
+    p_res->i_parents = 0;
+    p_res->pp_parents = NULL;
+    
+    if( p_item->input.psz_name )
+        p_res->input.psz_name = strdup( p_item->input.psz_name );
+    if( p_item->input.psz_uri )
+        p_res->input.psz_uri = strdup( p_item->input.psz_uri );
+    
+    if( p_item->input.i_es )
+    {
+        p_res->input.es = (es_format_t**)malloc( p_item->input.i_es * sizeof(es_format_t*));
+        for( i = 0; i < p_item->input.i_es; i++ )
+        {
+            p_res->input.es[ i ] = (es_format_t*)malloc(sizeof(es_format_t*));
+            es_format_Copy( p_res->input.es[ i ],
+                         p_item->input.es[ i ] );
+        }
+    }
+    if( p_item->input.i_categories )
+    {
+        p_res->input.pp_categories = NULL;
+        p_res->input.i_categories = 0;
+        for( i = 0; i < p_item->input.i_categories; i++ )
+        {
+            info_category_t *p_incat;
+            p_incat = p_item->input.pp_categories[i];
+            if( p_incat->i_infos )
+            {
+                int j;
+                for( j = 0; j < p_incat->i_infos; j++ )
+                {
+                    vlc_input_item_AddInfo( &p_res->input, p_incat->psz_name,
+                                            p_incat->pp_infos[j]->psz_name,
+                                            "%s", /* to be safe */
+                                            p_incat->pp_infos[j]->psz_value );
+                }
+            }
+        }
+    }
+
+    vlc_mutex_unlock( &p_item->input.lock );
+    return p_res;
+}
+
+/**
  * Deletes a playlist item
  *
  * \param p_item the item to delete

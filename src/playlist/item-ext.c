@@ -460,13 +460,25 @@ playlist_item_t *playlist_LockItemGetByPos( playlist_t *p_playlist, int i_pos )
  */
 playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 {
-    int i;
-    for( i =  0 ; i < p_playlist->i_all_size ; i++ )
+    int i, i_top, i_bottom;
+    i_bottom = 0; i_top = p_playlist->i_all_size;
+    i = i_top / 2;
+    while( p_playlist->pp_all_items[i]->input.i_id != i_id &&
+           i_top > i_bottom )
     {
-        if( p_playlist->pp_all_items[i]->input.i_id == i_id )
+        if( p_playlist->pp_all_items[i]->input.i_id < i_id )
         {
-            return p_playlist->pp_all_items[i];
+            i_bottom = i;
         }
+        else
+        {
+            i_top = i;
+        }
+        i = i_bottom + ( i_top - i_bottom ) / 2;
+    }
+    if( p_playlist->pp_all_items[i]->input.i_id == i_id )
+    {
+        return p_playlist->pp_all_items[i];
     }
     return NULL;
 }
