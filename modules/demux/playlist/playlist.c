@@ -63,6 +63,7 @@ vlc_module_begin();
     add_submodule();
         set_description( _("B4S playlist import") );
         add_shortcut( "b4s-open" );
+        add_shortcut( "shout-b4s" );
         set_capability( "demux2", 10 );
         set_callbacks( Import_B4S, Close_B4S );
 vlc_module_end();

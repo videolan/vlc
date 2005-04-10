@@ -1,8 +1,8 @@
 /*****************************************************************************
  * b4s.c : B4S playlist format import
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
- * $Id: m3u.c 10101 2005-03-02 16:47:31Z robux4 $
+ * Copyright (C) 2005 VideoLAN
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -40,6 +40,7 @@ struct demux_sys_t
     playlist_t *p_playlist;
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
+    int b_shout;
 };
 
 /*****************************************************************************
@@ -48,6 +49,9 @@ struct demux_sys_t
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 static int IsWhitespace( char *psz_string );
+static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
+                          playlist_item_t *p_bitrate, playlist_item_t *p_item,
+                          char *psz_genre, char *psz_bitrate );
 
 /*****************************************************************************
  * Import_B4S: main import function
@@ -61,7 +65,8 @@ int Import_B4S( vlc_object_t *p_this )
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
     if( ( psz_ext && !strcasecmp( psz_ext, ".b4s") ) ||
-        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "b4s-open") ) )
+        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "b4s-open") ) ||
+        ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "shout-b4s") ) )
     {
         ;
     }
@@ -79,6 +84,8 @@ int Import_B4S( vlc_object_t *p_this )
         msg_Err( p_demux, "Out of memory" );
         return VLC_ENOMEM;
     }
+    p_demux->p_sys->b_shout = p_demux->psz_demux &&
+        !strcmp(p_demux->psz_demux, "shout-b4s");
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
 
     return VLC_SUCCESS;
@@ -103,7 +110,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     playlist_t *p_playlist;
-    playlist_item_t *p_item, *p_current;
+    playlist_item_t *p_item, *p_current, *p_bitrate, *p_genre;
 
     vlc_bool_t b_play;
     int i_ret;
@@ -111,11 +118,13 @@ static int Demux( demux_t *p_demux )
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
     char *psz_elname = NULL;
-    int i_type;
+    int i_type, b_shoutcast;
     char *psz_mrl = NULL, *psz_name = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
         
 
+    b_shoutcast = p_sys->b_shout;
+    
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                  FIND_PARENT );
     if( !p_playlist )
@@ -129,7 +138,15 @@ static int Demux( demux_t *p_demux )
 
     playlist_ItemToNode( p_playlist, p_current );
     p_current->input.i_type = ITEM_TYPE_PLAYLIST;
+    if( b_shoutcast )
+    {
+        p_genre = playlist_NodeCreate( p_playlist, p_current->pp_parents[0]->i_view, "Genre", p_current );
+        playlist_CopyParents( p_current, p_genre );
 
+        p_bitrate = playlist_NodeCreate( p_playlist, p_current->pp_parents[0]->i_view, "Bitrate", p_current );
+        playlist_CopyParents( p_current, p_bitrate );
+    }
+    
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
 
@@ -334,6 +351,9 @@ static int Demux( demux_t *p_demux )
                     
                     vlc_input_item_CopyOptions( &p_current->input,
                                                 &p_item->input );
+                    if( b_shoutcast )
+                        ShoutcastAdd( p_playlist, p_genre, p_bitrate, p_item,
+                                      psz_genre, psz_bitrate );
 #define FREE(a) if( a ) free( a ); a = NULL;
                     FREE( psz_name );
                     FREE( psz_mrl );
@@ -354,6 +374,12 @@ static int Demux( demux_t *p_demux )
     if( i_ret != 0 )
     {
         msg_Warn( p_demux, "error while parsing data" );
+    }
+    if( b_shoutcast )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        playlist_NodeSort( p_playlist, p_bitrate, SORT_TITLE_NUMERIC, ORDER_NORMAL );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
 
     /* Go back and play the playlist */
@@ -386,4 +412,39 @@ static int IsWhitespace( char *psz_string )
         psz_string++;
     }
     return VLC_TRUE;
+}
+
+static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
+                          playlist_item_t *p_bitrate, playlist_item_t *p_item,
+                          char *psz_genre, char *psz_bitrate )
+{
+    playlist_item_t *p_parent;
+    if( psz_bitrate )
+    {
+        playlist_item_t *p_copy = playlist_ItemCopy(p_playlist,p_item);
+        p_parent = playlist_ChildSearchName( p_bitrate, psz_bitrate );
+        if( !p_parent )
+        {
+            p_parent = playlist_NodeCreate( p_playlist, p_genre->pp_parents[0]->i_view, psz_bitrate,
+                                            p_bitrate );
+            playlist_CopyParents( p_bitrate, p_parent );
+        }
+        playlist_NodeAddItem( p_playlist, p_copy, p_parent->pp_parents[0]->i_view, p_parent, PLAYLIST_APPEND, PLAYLIST_END  );
+        playlist_CopyParents( p_parent, p_copy );
+
+    }
+
+    if( psz_genre )
+    {
+        playlist_item_t *p_copy = playlist_ItemCopy(p_playlist,p_item);
+        p_parent = playlist_ChildSearchName( p_genre, psz_genre );
+        if( !p_parent )
+        {
+            p_parent = playlist_NodeCreate( p_playlist, p_genre->pp_parents[0]->i_view, psz_genre,
+                                            p_genre );
+            playlist_CopyParents( p_genre, p_parent );
+        }
+        playlist_NodeAddItem( p_playlist, p_copy, p_parent->pp_parents[0]->i_view, p_parent, PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_CopyParents( p_parent, p_copy );
+    }
 }
