@@ -635,6 +635,10 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
         wxTreeItemId dummy;
         return dummy;
     }
+    if( i_saved_id == i_id )
+    {
+        return saved_tree_item;
+    }
 
     if( !p_wxcurrent )
     {
@@ -644,6 +648,8 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
 
     if( p_wxcurrent->i_id == i_id )
     {
+        i_saved_id = i_id;
+        saved_tree_item = root;
         return root;
     }
 
@@ -652,6 +658,8 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
         p_wxcurrent = (PlaylistItem *)treectrl->GetItemData( item );
         if( p_wxcurrent->i_id == i_id )
         {
+            i_saved_id = i_id;
+            saved_tree_item = item;
             return item;
         }
         if( treectrl->ItemHasChildren( item ) )
@@ -659,6 +667,8 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
             wxTreeItemId search = FindItem( item, i_id );
             if( search.IsOk() )
             {
+                i_saved_id = i_id;
+                saved_tree_item = search;
                 return search;
             }
         }
