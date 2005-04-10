@@ -226,6 +226,7 @@ struct playlist_add_t
 #define SORT_AUTHOR 3
 #define SORT_RANDOM 4
 #define SORT_DURATION 5
+#define SORT_TITLE_NUMERIC 6
 
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1

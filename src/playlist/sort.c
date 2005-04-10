@@ -173,6 +173,11 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
                 i_test = strcasecmp( pp_items[i]->input.psz_name,
                                          pp_items[i_small]->input.psz_name );
             }
+            else if( i_mode == SORT_TITLE_NUMERIC )
+            {
+                i_test = atoi( pp_items[i]->input.psz_name ) -
+                         atoi( pp_items[i_small]->input.psz_name );
+            }
             else if( i_mode == SORT_DURATION )
             {
                 i_test = pp_items[i]->input.i_duration -
