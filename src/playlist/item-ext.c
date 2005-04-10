@@ -464,25 +464,21 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
     i_bottom = 0; i_top = p_playlist->i_all_size;
     i = i_top / 2;
     while( p_playlist->pp_all_items[i]->input.i_id != i_id &&
-           i_top > i_bottom + 1 )
+           i_top > i_bottom )
     {
         if( p_playlist->pp_all_items[i]->input.i_id < i_id )
         {
-            i_bottom = i;
+            i_bottom = i + 1;
         }
         else
         {
-            i_top = i;
+            i_top = i - 1;
         }
         i = i_bottom + ( i_top - i_bottom ) / 2;
     }
     if( p_playlist->pp_all_items[i]->input.i_id == i_id )
     {
         return p_playlist->pp_all_items[i];
-    }
-    else if( p_playlist->pp_all_items[i_top]->input.i_id == i_id )
-    {
-        return p_playlist->pp_all_items[i_top];
     }
         
     return NULL;
