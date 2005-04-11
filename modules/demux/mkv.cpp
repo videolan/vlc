@@ -80,6 +80,7 @@
 #include "matroska/KaxTrackVideo.h"
 #include "matroska/KaxTrackEntryData.h"
 #include "matroska/KaxContentEncoding.h"
+#include "matroska/KaxVersion.h"
 
 #include "ebml/StdIOCallback.h"
 
@@ -341,6 +342,14 @@ class matroska_script_codec_t : public chapter_codec_cmds_t
 {
 };
 
+class chapter_translation_t
+{
+public:
+    KaxChapterTranslateID  translated;
+    unsigned int           codec_id;
+    std::vector<uint64_t>  editions;
+};
+
 class chapter_item_t
 {
 public:
@@ -526,6 +535,7 @@ public:
     std::vector<chapter_edition_t> stored_editions;
     int                            i_default_edition;
 
+    std::vector<chapter_translation_t> translations;
     std::vector<KaxSegmentFamily>  families;
     
     demux_sys_t                    & sys;
@@ -2900,7 +2910,7 @@ void matroska_segment_t::ParseInfo( EbmlElement *info )
 {
     EbmlElement *el;
     EbmlMaster  *m;
-    unsigned int i;
+    size_t i, j;
     int i_upper_level = 0;
 
     msg_Dbg( &sys.demuxer, "|   + Information" );
@@ -3009,6 +3019,34 @@ void matroska_segment_t::ParseInfo( EbmlElement *info )
                 psz_date_utc = strdup( buffer );
                 msg_Dbg( &sys.demuxer, "|   |   + Date=%s", psz_date_utc );
             }
+        }
+#endif
+#if LIBMATROSKA_VERSION >= 0x000704
+        else if( MKV_IS_ID( l, KaxChapterTranslate ) )
+        {
+            KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
+            chapter_translation_t translated;
+
+            p_trans->Read( es, p_trans->Generic().Context, i_upper_level, el, true );
+            for( j = 0; j < p_trans->ListSize(); j++ )
+            {
+                EbmlElement *l = (*p_trans)[j];
+
+                if( MKV_IS_ID( l, KaxChapterTranslateEditionUID ) )
+                {
+                    translated.editions.push_back( uint64( *static_cast<KaxChapterTranslateEditionUID*>( l ) ) );
+                }
+                else if( MKV_IS_ID( l, KaxChapterTranslateCodec ) )
+                {
+                    translated.codec_id = uint32( *static_cast<KaxChapterTranslateCodec*>( l ) );
+                }
+                else if( MKV_IS_ID( l, KaxChapterTranslateID ) )
+                {
+                    translated.translated = *( new KaxChapterTranslateID( *static_cast<KaxChapterTranslateID*>( l ) ) );
+                }
+            }
+
+            translations.push_back( translated );
         }
 #endif
         else
