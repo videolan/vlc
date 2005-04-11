@@ -55,24 +55,25 @@ static void CloseIn ( vlc_object_t * );
 #define SOUT_CFG_PREFIX_IN "sout-bridge-in-"
 
 vlc_module_begin();
+    set_shortname( _("Bridge"));
+    set_description( _("Bridge stream output"));
     add_submodule();
-    set_shortname( _("Bridge out"));
-    set_description( _("Bridge out stream output") );
+    set_section( N_("Bridge out"),NULL);
     set_capability( "sout stream", 50 );
     add_shortcut( "bridge-out" );
+    /* Only usable with VLM. No category so not in gui preferences
     set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
+    set_subcategory( SUBCAT_SOUT_STREAM );*/
     add_integer( SOUT_CFG_PREFIX_OUT "id", 0, NULL, ID_TEXT, ID_LONGTEXT,
                  VLC_FALSE );
     set_callbacks( OpenOut, CloseOut );
 
     add_submodule();
-    set_shortname( _("Bridge in"));
-    set_description( _("Bridge in stream output") );
+    set_section( N_("Bridge in"),NULL);
     set_capability( "sout stream", 50 );
     add_shortcut( "bridge-in" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
+    /*set_category( CAT_SOUT );
+    set_subcategory( SUBCAT_SOUT_STREAM );*/
     add_integer( SOUT_CFG_PREFIX_IN "delay", 100, NULL, DELAY_TEXT,
                  DELAY_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, NULL, ID_OFFSET_TEXT,
