@@ -27,9 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#ifdef HAVE_SYS_TIME_H
-#    include <sys/time.h>
-#endif
+#include <time.h>
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
