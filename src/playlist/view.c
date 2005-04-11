@@ -367,7 +367,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
 int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
                          vlc_bool_t b_delete_items, vlc_bool_t b_force )
 {
-    int i;
+    int i, i_top, i_bottom;
     if( p_root->i_children == -1 )
     {
         return VLC_EGENERIC;
@@ -399,6 +399,27 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
                                      p_root->pp_parents[i]->p_parent );
         }
         var_SetInteger( p_playlist, "item-deleted", p_root->input.i_id );
+
+        i_bottom = 0; i_top = p_playlist->i_all_size;
+        i = i_top / 2;
+        while( p_playlist->pp_all_items[i]->input.i_id != p_root->input.i_id &&
+               i_top > i_bottom )
+        {
+            if( p_playlist->pp_all_items[i]->input.i_id < p_root->input.i_id )
+            {
+                i_bottom = i + 1;
+            }
+            else
+            {
+                i_top = i - 1;
+            }
+            i = i_bottom + ( i_top - i_bottom ) / 2;
+        }
+        if( p_playlist->pp_all_items[i]->input.i_id == p_root->input.i_id )
+        {
+            REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
+        }
+        
         playlist_ItemDelete( p_root );
     }
     return VLC_SUCCESS;

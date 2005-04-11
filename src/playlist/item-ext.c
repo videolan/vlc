@@ -642,7 +642,7 @@ int playlist_Replace( playlist_t *p_playlist, playlist_item_t *p_olditem,
  */
 int playlist_Delete( playlist_t * p_playlist, int i_id )
 {
-    int             i;
+    int i, i_top, i_bottom;
 
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
 
@@ -652,6 +652,27 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
     }
     var_SetInteger( p_playlist, "item-deleted", i_id );
 
+    i_bottom = 0; i_top = p_playlist->i_all_size;
+    i = i_top / 2;
+    while( p_playlist->pp_all_items[i]->input.i_id != i_id &&
+           i_top > i_bottom )
+    {
+        if( p_playlist->pp_all_items[i]->input.i_id < i_id )
+        {
+            i_bottom = i + 1;
+        }
+        else
+        {
+            i_top = i - 1;
+        }
+        i = i_bottom + ( i_top - i_bottom ) / 2;
+    }
+    if( p_playlist->pp_all_items[i]->input.i_id == i_id )
+    {
+        REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
+    }
+
+    
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )
     {
