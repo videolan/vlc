@@ -57,10 +57,16 @@
     static int  Open ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
+#define LIMIT_TEXT N_("Maximum number of shoutcast servers to be listed")
+#define LIMIT_LONGTEXT LIMIT_TEXT
+
 vlc_module_begin();
     set_description( _("Shoutcast radio listings") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
+
+    add_integer( "shoutcast-limit", 1000, NULL, LIMIT_TEXT,
+                    LIMIT_LONGTEXT, VLC_TRUE );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -101,6 +107,10 @@ static int Open( vlc_object_t *p_this )
     playlist_view_t     *p_view;
     playlist_item_t     *p_item;
 
+    int i_limit;
+    char *psz_shoutcast_url;
+    char *psz_shoutcast_title;
+
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
@@ -113,10 +123,21 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    i_limit = config_GetInt( p_this->p_libvlc, "shoutcast-limit" );
+    #define SHOUTCAST_BASE_URL "http/shout-b4s://shoutcast.com/sbin/xmllister.phtml?service=vlc&no_compress=1&limit="
+    psz_shoutcast_url = (char *)malloc( strlen( SHOUTCAST_BASE_URL ) + 20 );
+    psz_shoutcast_title = (char *)malloc( 6 + 20 );
+
+    sprintf( psz_shoutcast_url, SHOUTCAST_BASE_URL "%d", i_limit );
+    sprintf( psz_shoutcast_title, "Top %d", i_limit );
+
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("Shoutcast"), p_view->p_root );
-    p_item = playlist_ItemNew( p_playlist, "http/shout-b4s://shoutcast.com/sbin/xmllister.phtml?service=vlc&no_compress=1&limit=1000", "Top 1000" );
+    p_item = playlist_ItemNew( p_playlist, psz_shoutcast_url,
+                                     psz_shoutcast_title );
+    free( psz_shoutcast_url );
+    free( psz_shoutcast_title );
     playlist_NodeAddItem( p_playlist, p_item,
                           p_sys->p_node->pp_parents[0]->i_view,
                           p_sys->p_node, PLAYLIST_APPEND,
