@@ -138,6 +138,8 @@ Think playlist within playlist, directory structures, SAP section, TV channels l
 70% done.<br />
 Todo:<br />
 - Core support<br />
+   - *** Remove items from pp_all_items on deletion
+   - *** Consider changing calls to playlist_Control into playlist_LockControl
    - *   "Name finder"<br />
    - *   "Protocol rollover" node<br />
    - *** Item moving/copying facilities<br />
