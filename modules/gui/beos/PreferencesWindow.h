@@ -27,7 +27,7 @@
 #include <InterfaceKit.h>
 
 #define PREFS_WINDOW_WIDTH   700
-#define PREFS_WINDOW_HEIGHT  600
+#define PREFS_WINDOW_HEIGHT  400
 #define PREFS_ITEM_SELECTED  'pris'
 #define PREFS_DEFAULTS       'prde'
 #define PREFS_APPLY          'prap'
@@ -41,19 +41,28 @@ class VTextView : public BTextView
         void FrameResized( float width, float height );
 };
 
+class VTextControl : public BTextControl
+{
+    public:
+             VTextControl( BRect frame, const char *name,
+                           const char *label, const char *text,
+                           BMessage * message, uint32 resizingMode );
+        void FrameResized( float width, float height );
+};
+
 class ConfigWidget : public BView
 {
     public:
                         ConfigWidget( intf_thread_t * p_intf, BRect rect,
                                       module_config_t * p_item );
+        bool            InitCheck() { return fInitOK; }
         void            Apply( bool doIt );
 
     private:
         intf_thread_t * p_intf;
 
-        int             fType;
-
-        BTextControl  * fTextControl;
+        bool            fInitOK;
+        VTextControl  * fTextControl;
         BCheckBox     * fCheckBox;
         BPopUpMenu    * fPopUpMenu;
         BMenuField    * fMenuField;
@@ -73,8 +82,9 @@ class ConfigItem : public BStringItem
                       ~ConfigItem();
         int           ObjectId() { return fObjectId; }
         BBox        * Box() { return fBox; }
+        void          UpdateScrollBar();
+        void          ResetScroll();
         void          Apply( bool doIt );
-        void          Pulse();
 
     private:
         intf_thread_t * p_intf;
@@ -84,10 +94,10 @@ class ConfigItem : public BStringItem
         int             fType;
         char          * fHelp;
 
-        BBox *        fBox;
-        BScrollView * fScroll;
-        BView *       fView;
+        BBox          * fBox;
         VTextView     * fTextView;
+        BScrollView   * fScroll;
+        BView         * fView;
 };
 
 class PreferencesWindow : public BWindow
@@ -103,7 +113,6 @@ class PreferencesWindow : public BWindow
     virtual void            FrameResized( float, float );
 
             void            Update();
-            void            UpdateScrollBar();
             void            ApplyChanges( bool doIt );
             void            SaveChanges();
 
@@ -114,13 +123,12 @@ class PreferencesWindow : public BWindow
                                              module_config_t ** pp_item,
                                              bool stop_after_category );
 
-    BView *                 fPrefsView;
-    BOutlineListView *      fOutline;
-    BView *                 fDummyView;
-    BScrollView *           fConfigScroll;
-    ConfigItem *    fCurrent;
+    BView                 * fPrefsView;
+    BOutlineListView      * fOutline;
+    BView                 * fDummyView;
+    ConfigItem            * fCurrent;
 
-    intf_thread_t *         p_intf;
+    intf_thread_t         * p_intf;
 };
 
 #endif    // BEOS_PREFERENCES_WINDOW_H

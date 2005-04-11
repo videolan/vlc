@@ -39,14 +39,17 @@
 /*****************************************************************************
  * PreferencesWindow::PreferencesWindow
  *****************************************************************************/
-PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
+PreferencesWindow::PreferencesWindow( intf_thread_t * _p_intf,
                                       BRect frame, const char * name )
     : BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-               B_NOT_ZOOMABLE ),
-      fConfigScroll( NULL ),
-      p_intf( p_interface )
+               B_NOT_ZOOMABLE )
 {
+    p_intf   = _p_intf;
+    fCurrent = NULL;
+
     BRect rect;
+
+    SetSizeLimits( PREFS_WINDOW_WIDTH, 2000, PREFS_WINDOW_HEIGHT, 2000 );
 
     /* The "background" view */
     fPrefsView = new BView( Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW );
@@ -182,9 +185,11 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
         if( options < 1 || category < 0 || subcategory < 0 )
             continue;
 
+#if 0
         fprintf( stderr, "cat %d, sub %d, %s\n", category, subcategory,
                  p_module->psz_shortname ? p_module->psz_shortname :
                  p_module->psz_object_name );
+#endif
 
         catItem = NULL;
         for( int j = 0; j < fOutline->CountItemsUnder( NULL, true ); j++ )
@@ -322,8 +327,7 @@ void PreferencesWindow::MessageReceived( BMessage * message )
 void PreferencesWindow::FrameResized( float width, float height )
 {
     BWindow::FrameResized( width, height );
-
-    UpdateScrollBar();
+    fCurrent->UpdateScrollBar();
 }
 
 /*****************************************************************************
@@ -334,64 +338,24 @@ void PreferencesWindow::Update()
     /* Get the selected item, if any */
     if( fOutline->CurrentSelection() < 0 )
         return;
-    fCurrent = (ConfigItem*)
-        fOutline->ItemAt( fOutline->CurrentSelection() );
 
     /* Detach the old box if any */
-    if( fDummyView->CountChildren() > 0 )
-        fDummyView->RemoveChild( fDummyView->ChildAt( 0 ) );
+    if( fCurrent )
+    {
+        fCurrent->ResetScroll();
+        fDummyView->RemoveChild( fCurrent->Box() );
+    }
 
     /* Add the new one... */
+    fCurrent = (ConfigItem *)
+        fOutline->ItemAt( fOutline->CurrentSelection() );
     fDummyView->AddChild( fCurrent->Box() );
 
     /* ...then resize it (we must resize it after it's attached or the
        children don't get adjusted) */
     fCurrent->Box()->ResizeTo( fDummyView->Bounds().Width(),
                                fDummyView->Bounds().Height() );
-
-#if 0
-    /* Force redrawing of its children */
-    BRect rect = fCurrent->fConfigBox->Bounds();
-    rect.InsetBy( 10,10 );
-    rect.top += 10;
-    fCurrent->fConfigScroll->ResizeTo( rect.Width(), rect.Height() );
-    fCurrent->fConfigScroll->Draw( fCurrent->fConfigScroll->Bounds() );
-
-    UpdateScrollBar();
-#endif
-}
-
-
-/*****************************************************************************
- * PreferencesWindow::UpdateScrollBar
- *****************************************************************************/
-void PreferencesWindow::UpdateScrollBar()
-{
-    /* We have to fix the scrollbar manually because it doesn't handle
-       correctly simple BViews */
-
-#if 0
-    if( !fCurrent )
-    {
-        return;
-    }
-
-    /* Get the available BRect for display */
-    BRect display = fCurrent->fConfigScroll->Bounds();
-    display.right -= B_V_SCROLL_BAR_WIDTH;
-
-    /* Fix the scrollbar */
-    BScrollBar * scrollBar;
-    long max;
-	BRect visible = display & fCurrent->fConfigView->Bounds();
-	BRect total = display | fCurrent->fConfigView->Bounds();
-    scrollBar = fCurrent->fConfigScroll->ScrollBar( B_VERTICAL );
-    max = (long)( fCurrent->fConfigView->Bounds().Height() - visible.Height() );
-    if( max < 0 ) max = 0;
-    scrollBar->SetRange( 0, max );
-    scrollBar->SetProportion( visible.Height() / total.Height() );
-    scrollBar->SetSteps( 10, 100 );
-#endif
+    fCurrent->UpdateScrollBar();
 }
 
 /*****************************************************************************
@@ -444,15 +408,18 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
     fType      = type;
     fHelp      = strdup( help );
 
-    fTextView = NULL;
-
     BRect r;
     r = BRect( 0, 0, 100, 100 );
     fBox = new BBox( r, NULL, B_FOLLOW_ALL );
     fBox->SetLabel( name );
 
+    fTextView = NULL;
+    fScroll   = NULL;
+    fView     = NULL;
+
     if( fType == TYPE_CATEGORY )
     {
+        /* Category: we just show the help text */
         r = fBox->Bounds();
         r.InsetBy( 10, 10 );
         r.top += 5;
@@ -463,7 +430,105 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
         fTextView->MakeSelectable( false );
         fTextView->Insert( fHelp );
         fBox->AddChild( fTextView );
+
+        return;
     }
+
+    vlc_list_t * p_list = NULL;
+    module_t * p_module = NULL;
+    if( fType == TYPE_MODULE )
+    {
+        p_module = (module_t *) vlc_object_get( p_intf, fObjectId );
+    }
+    else
+    {
+        if( !( p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
+                                       FIND_ANYWHERE ) ) )
+        {
+            return;
+        }
+        for( int i = 0; i < p_list->i_count; i++ )
+        {
+            p_module = (module_t*) p_list->p_values[i].p_object;
+
+            if( !strcmp( p_module->psz_object_name, "main" ) )
+                break;
+            else
+                p_module = NULL;
+        }
+    }
+
+    if( !p_module || p_module->i_object_type != VLC_OBJECT_MODULE )
+    {
+        /* Shouldn't happen */
+        return;
+    }
+
+    module_config_t * p_item;
+    p_item = fSubModule ? ((module_t *)p_module->p_parent)->p_config :
+               p_module->p_config;
+
+    if( fType == TYPE_SUBCATEGORY )
+    {
+        for( ; p_item->i_type != CONFIG_HINT_END; p_item++ )
+        {
+            if( p_item->i_type == CONFIG_SUBCATEGORY &&
+                p_item->i_value == fObjectId )
+            {
+                break;
+            }
+        }
+    }
+
+    r = fBox->Bounds();
+    r = BRect( 10,20,fBox->Bounds().right-B_V_SCROLL_BAR_WIDTH-10,
+               fBox->Bounds().bottom-10 );
+    fView = new BView( r, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+                       B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE );
+    fView->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+
+    r = fView->Bounds();
+    r.InsetBy( 10,10 );
+
+    ConfigWidget * widget;
+    for( ; p_item->i_type != CONFIG_HINT_END; p_item++ )
+    {
+        if( ( p_item->i_type == CONFIG_CATEGORY ||
+              p_item->i_type == CONFIG_SUBCATEGORY ) &&
+            fType == TYPE_SUBCATEGORY &&
+            p_item->i_value != fObjectId )
+        {
+            break;
+        }
+
+        widget = new ConfigWidget( p_intf, r, p_item );
+        if( !widget->InitCheck() )
+        {
+            delete widget;
+            continue;
+        }
+        fView->AddChild( widget );
+        r.top += widget->Bounds().Height();
+    }
+
+    if( fType == TYPE_MODULE )
+    {
+        vlc_object_release( p_module );
+    }
+    else
+    {
+        vlc_list_release( p_list );
+    }
+
+    /* Create a scroll view around our fView */
+    fScroll = new BScrollView( NULL, fView, B_FOLLOW_ALL, 0, false,
+                               true, B_FANCY_BORDER );
+    fScroll->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    fBox->AddChild( fScroll );
+
+    /* Adjust fView's height to the size it actually needs (we do this
+       only now so the BScrollView fits the BBox) */
+    fView->ResizeTo( fView->Bounds().Width(), r.top + 10 );
 }
 
 /***********************************************************************
@@ -477,6 +542,53 @@ ConfigItem::~ConfigItem()
     {
         free( fHelp );
     }
+}
+
+/*****************************************************************************
+ * ConfigItem::UpdateScrollBar
+ *****************************************************************************/
+void ConfigItem::UpdateScrollBar()
+{
+    /* We have to fix the scrollbar manually because it doesn't handle
+       correctly simple BViews */
+
+    if( !fScroll )
+    {
+        return;
+    }
+
+    /* Get the available BRect for display */
+    BRect display = fScroll->Bounds();
+    display.right -= B_V_SCROLL_BAR_WIDTH;
+
+    /* Fix the scrollbar */
+    BScrollBar * scrollBar;
+    BRect visible = display & fView->Bounds();
+    BRect total   = display | fView->Bounds();
+    scrollBar = fScroll->ScrollBar( B_VERTICAL );
+    long max = (long)( fView->Bounds().Height() - visible.Height() );
+    if( max < 0 ) max = 0;
+    scrollBar->SetRange( 0, max );
+    scrollBar->SetProportion( visible.Height() / total.Height() );
+    scrollBar->SetSteps( 10, 100 );
+
+    /* We have to force redraw to avoid visual bugs when resizing
+       (BeOS bug?) */
+    fScroll->Invalidate();
+    fView->Invalidate();
+}
+
+/*****************************************************************************
+ * ConfigItem::ResetScroll
+ *****************************************************************************/
+void ConfigItem::ResetScroll()
+{
+    if( !fScroll )
+    {
+        return;
+    }
+
+    fView->ScrollTo( 0, 0 );
 }
 
 /***********************************************************************
@@ -514,64 +626,77 @@ void ConfigItem::Apply( bool doIt )
  **********************************************************************/
 ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
                             module_config_t * p_item )
-    : BView( rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW )
+    : BView( rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+             B_WILL_DRAW )
 {
-#if 0
-    fType = type;
+    p_intf = _p_intf;
 
-    switch( fType )
+    fInitOK = true;
+    SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+
+    BRect r;
+    BMenuItem * menuItem;
+
+    switch( p_item->i_type )
     {
+        case CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_MODULE_CAT:
+        case CONFIG_ITEM_MODULE_LIST_CAT:
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
-        case CONFIG_ITEM_MODULE:
         case CONFIG_ITEM_DIRECTORY:
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_FLOAT:
             ResizeTo( Bounds().Width(), 25 );
-            fTextControl = new BTextControl( Bounds(), NULL, label, NULL,
-                                     new BMessage() );
+            fTextControl = new VTextControl( Bounds(), NULL,
+                p_item->psz_text, NULL, new BMessage(),
+                B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
             AddChild( fTextControl );
             break;
-
-        case CONFIG_ITEM_BOOL:
-            ResizeTo( Bounds().Width(), 25 );
-            fCheckBox = new BCheckBox( Bounds(), NULL, label, new BMessage() );
-            AddChild( fCheckBox );
-            break;
-
         case CONFIG_ITEM_KEY:
             ResizeTo( Bounds().Width(), 25 );
-            r.left = r.right - 60;
+            r = Bounds();
+            r.left = r.right - 100;
             fPopUpMenu = new BPopUpMenu( "" );
-            fMenuField = new BMenuField( r, NULL, NULL, fPopUpMenu );
+            fMenuField = new BMenuField( r, NULL, NULL, fPopUpMenu,
+                B_FOLLOW_RIGHT | B_FOLLOW_TOP );
             for( unsigned i = 0;
-                 i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
+                 i < sizeof( vlc_keys ) / sizeof( key_descriptor_t );
+                 i++ )
             {
                 menuItem = new BMenuItem( vlc_keys[i].psz_key_string, NULL );
                 fPopUpMenu->AddItem( menuItem );
             }
-        
             r.right = r.left - 10; r.left = r.left - 60;
-            fShiftCheck = new BCheckBox( r, NULL, "Shift", new BMessage );
-        
+            fShiftCheck = new BCheckBox( r, NULL, "Shift",
+                new BMessage(), B_FOLLOW_RIGHT | B_FOLLOW_TOP );
             r.right = r.left - 10; r.left = r.left - 60;
-            fCtrlCheck = new BCheckBox( r, NULL, "Ctrl", new BMessage );
-        
+            fCtrlCheck = new BCheckBox( r, NULL, "Ctrl",
+                new BMessage(), B_FOLLOW_RIGHT | B_FOLLOW_TOP );
             r.right = r.left - 10; r.left = r.left - 60;
-            fAltCheck = new BCheckBox( r, NULL, "Alt", new BMessage );
-        
-            /* Can someone tell me how we're supposed to get GUI items aligned ? */
-            r.right = r.left - 10; r.left = 0;
-            r.bottom -= 10;
-            fStringView = new BStringView( r, NULL, label );
-        
+            fAltCheck = new BCheckBox( r, NULL, "Alt",
+                new BMessage(), B_FOLLOW_RIGHT | B_FOLLOW_TOP );
+            r.right = r.left - 10; r.left = 0; r.bottom -= 10;
+            fStringView = new BStringView( r, NULL, p_item->psz_text,
+                B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
             AddChild( fStringView );
             AddChild( fAltCheck );
             AddChild( fCtrlCheck );
             AddChild( fShiftCheck );
             AddChild( fMenuField );
             break;
-#endif
+        case CONFIG_ITEM_BOOL:
+            ResizeTo( Bounds().Width(), 25 );
+            fCheckBox = new BCheckBox( Bounds(), NULL, p_item->psz_text,
+                new BMessage(), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+            AddChild( fCheckBox );
+            break;
+        case CONFIG_SECTION:
+            fInitOK = false;
+            break;
+        default:
+            fInitOK = false;
+    }
 }
 
 /***********************************************************************
@@ -697,4 +822,18 @@ void VTextView::FrameResized( float width, float height )
 {
     BTextView::FrameResized( width, height );
     SetTextRect( BRect( 10,10, width-11, height-11 ) );
+}
+
+VTextControl::VTextControl( BRect frame, const char *name,
+                            const char *label, const char *text,
+                            BMessage * message, uint32 resizingMode )
+    : BTextControl( frame, name, label, text, message, resizingMode )
+{
+    FrameResized( Bounds().Width(), Bounds().Height() );
+}
+
+void VTextControl::FrameResized( float width, float height )
+{
+    BTextControl::FrameResized( width, height );
+    SetDivider( width / 2 );
 }
