@@ -82,9 +82,11 @@ static void    Close  ( vlc_object_t * );
 #define SPUPID_TEXT N_("SPU PID")
 #define SPUPID_LONGTEXT N_("Assigns a fixed PID to the SPU.")
 #define PMTPID_TEXT N_("PMT PID")
-#define PMTPID_LONGTEXT N_("Assings a fixed PID to the PMT")
+#define PMTPID_LONGTEXT N_("Assigns a fixed PID to the PMT")
 #define TSID_TEXT N_("TS ID")
 #define TSID_LONGTEXT N_("Assigns a fixed Transport Stream ID.")
+#define PMTPROG_TEXT N_("PMT Program number")
+#define PMTPROG_LONGTEXT N_("Assigns a program number to the PMT.")
 
 #define PID_TEXT N_("Set PID to id of ES")
 #define PID_LONGTEXT N_("set PID to id of es")
@@ -146,6 +148,8 @@ vlc_module_begin();
                  PMTPID_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
                  TSID_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "program-pmt", 1, NULL, PMTPROG_TEXT,
+                 PMTPROG_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
               VLC_TRUE );
 
@@ -176,7 +180,7 @@ vlc_module_end();
  * Local data structures
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "es-id-pid",
+    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "program-pmt", "es-id-pid",
     "shaping", "pcr", "bmin", "bmax", "use-key-frames", "dts-delay",
     "csa-ck", "crypt-audio",
     NULL
@@ -293,6 +297,7 @@ struct sout_mux_sys_t
 
     int             i_pmt_version_number;
     ts_stream_t     pmt;        // Up to now only one program
+    int             i_pmt_program_number;
 
     int             i_mpeg4_streams;
 
@@ -399,6 +404,16 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_tsid = rand() % 65536;
     p_sys->i_pmt_version_number = rand() % 32;
     p_sys->pmt.i_continuity_counter = 0;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "program-pmt", &val );
+    if (val.i_int )
+    {
+        p_sys->i_pmt_program_number = val.i_int;
+    }
+    else
+    {
+        p_sys->i_pmt_program_number = 1;
+    }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
     if (val.i_int )
@@ -1819,7 +1834,7 @@ static void GetPAT( sout_mux_t *p_mux,
                     1 );      // b_current_next
     /* add all program (only one) */
     dvbpsi_PATAddProgram( &pat,
-                          1,                    // i_number
+                          p_sys->i_pmt_program_number,                    // i_number
                           p_sys->pmt.i_pid );   // i_pid
 
     p_section = dvbpsi_GenPATSections( &pat,
@@ -1857,7 +1872,7 @@ static void GetPMT( sout_mux_t *p_mux,
     int                 i_stream;
 
     dvbpsi_InitPMT( &pmt,
-                    0x01,   // program number
+                    p_sys->i_pmt_program_number,   // program number
                     p_sys->i_pmt_version_number,
                     1,      // b_current_next
                     p_sys->i_pcr_pid );
