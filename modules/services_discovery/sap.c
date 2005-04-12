@@ -507,21 +507,13 @@ static void CloseDemux( vlc_object_t *p_this )
 static void Run( services_discovery_t *p_sd )
 {
     int		i;
-    uint8_t     *p_buffer;
     playlist_t  *p_playlist;
 
     /* read SAP packets */
     while( !p_sd->b_die )
     {
         int i_read;
-        p_buffer = (uint8_t *)malloc( MAX_SAP_BUFFER );
-
-        if( !p_buffer )
-        {
-            msg_Err( p_sd, "out of memory");
-            p_sd->b_die = VLC_TRUE;
-            continue;
-        }
+	uint8_t p_buffer[MAX_SAP_BUFFER];
 
         i_read = net_Select( p_sd, p_sd->p_sys->pi_fd, NULL,
                              p_sd->p_sys->i_fd, p_buffer,
@@ -565,7 +557,6 @@ static void Run( services_discovery_t *p_sd )
             {
                 msg_Warn( p_sd, "socket read error" );
             }
-            free( p_buffer );
             continue;
         }
 
@@ -573,8 +564,6 @@ static void Run( services_discovery_t *p_sd )
 
         /* Parse the packet */
         ParseSAP( p_sd, p_buffer, i_read );
-
-        free( p_buffer );
     }
 }
 
