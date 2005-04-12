@@ -904,7 +904,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
 
-            if( p_playlist == NULL )
+            if( p_playlist == NULL || p_playlist->status.p_item == NULL )
             {
                 return;
             }
@@ -926,7 +926,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 {
                     if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
                     {
-                        ;[o_vout_wnd updateTitle];
+                        [o_vout_wnd updateTitle];
                     }
                 }
                 vlc_object_release( (vlc_object_t *)p_vout );

@@ -253,8 +253,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         return;
 
     p_item = p_playlist->status.p_item;
+    if( p_item == NULL ) return;
+    
     p_temp_item = p_item;
-
     while( p_temp_item->i_parents > 0 )
     {
         [o_array insertObject: [NSValue valueWithPointer: p_temp_item] atIndex: 0];
