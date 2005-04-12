@@ -111,9 +111,9 @@ static void Close( vlc_object_t * );
 #define HUE_TEXT N_( "Hue" )
 #define HUE_LONGTEXT N_( \
     "Set the Hue of the video input" )
-#define COLOUR_TEXT N_( "Colour" )
+#define COLOUR_TEXT N_( "Color" )
 #define COLOUR_LONGTEXT N_( \
-    "Set the Colour of the video input" )
+    "Set the Color of the video input" )
 #define CONTRAST_TEXT N_( "Contrast" )
 #define CONTRAST_LONGTEXT N_( \
     "Set the Contrast of the video input" )
