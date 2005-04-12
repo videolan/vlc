@@ -144,7 +144,7 @@ Todo:<br />
    - *** Item moving/copying facilities<br />
    - *   Ability to save playlist on quit<br />
    - ?   Represent navigation structure as "fake items" ?  <br />
-   -     Custom playlist format<br />
+   -     Custom playlist format (http://xspf.xiph.org/ looks like a good idea)<br />
 - Helper modules<br />
    - **  ASX and B4S parsers (see below)<br />
    - *   Rewrite SLP announce discovery<br />

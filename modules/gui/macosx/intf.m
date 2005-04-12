@@ -772,6 +772,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
         var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
+        var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
+        var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
         var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
 
         vlc_object_release( p_playlist );
@@ -884,9 +886,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                    FIND_ANYWHERE );
-
-        [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool ) ];
-
+        var_Get( p_playlist, "fullscreen", &val );
+        [o_btn_fullscreen setState: val.b_bool];
         vlc_object_release( p_playlist );
 
         p_intf->p_sys->b_fullscreen_update = VLC_FALSE;

@@ -365,7 +365,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     vlc_value_t val;
 
-    if( var_Get( p_vout, "video-on-top", &val )>=0 && val.b_bool)
+    if( var_Get( p_real_vout, "video-on-top", &val )>=0 && val.b_bool)
     {
         val.b_bool = VLC_FALSE;
     }
@@ -373,24 +373,27 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     {
         val.b_bool = VLC_TRUE;
     }
-    var_Set( p_vout, "video-on-top", val );
+    var_Set( p_real_vout, "video-on-top", val );
 }
 
 - (void)toggleFullscreen
 {
     vlc_value_t val;
-    val.b_bool = !p_real_vout->b_fullscreen;
+    var_Get( p_real_vout, "fullscreen", &val );
+    val.b_bool = !val.b_bool;
     var_Set( p_real_vout, "fullscreen", val );
 }
 
 - (BOOL)isFullscreen
 {
-    return( p_vout->b_fullscreen );
+    vlc_value_t val;
+    var_Get( p_real_vout, "fullscreen", &val );
+    return( val.b_bool );
 }
 
 - (void)snapshot
 {
-    vout_Control( p_vout, VOUT_SNAPSHOT );
+    vout_Control( p_real_vout, VOUT_SNAPSHOT );
 }
 
 - (BOOL)canBecomeKeyWindow
