@@ -645,10 +645,10 @@ void PrefsTreeCtrl::CleanChanges()
     if( config_data  )
     {
         config_data->panel->Hide();
-#if (wxMAJOR_VERSION >= 2) && (wxMINOR_VERSION < 5 )
-        p_sizer->Remove( config_data->panel );
-#else
+#if (wxCHECK_VERSION(2,5,0))
         p_sizer->Detach( config_data->panel );
+#else
+        p_sizer->Remove( config_data->panel );
 #endif
     }
 
@@ -741,10 +741,10 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
     if( config_data && config_data->panel )
     {
         config_data->panel->Hide();
-#if (wxMAJOR_VERSION >= 2) && (xwMINOR_VERSION < 5 )
-        p_sizer->Remove( config_data->panel );
-#else
+#if (wxCHECK_VERSION(2,5,0))
         p_sizer->Detach( config_data->panel );
+#else
+        p_sizer->Remove( config_data->panel );
 #endif
     }
 
@@ -781,11 +781,10 @@ void PrefsTreeCtrl::OnAdvanced( wxCommandEvent& event )
     if( config_data  )
     {
         config_data->panel->Hide();
-
-#if (wxMAJOR_VERSION >= 2) && (xwMINOR_VERSION < 5 )
-        p_sizer->Remove( config_data->panel );
-#else
+#if (wxCHECK_VERSION(2,5,0))
         p_sizer->Detach( config_data->panel );
+#else
+        p_sizer->Remove( config_data->panel );
 #endif
     }
 

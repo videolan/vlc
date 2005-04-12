@@ -65,12 +65,20 @@ int Export_M3U( vlc_object_t *p_this )
         {
             char *psz_author =
                    vlc_input_item_GetInfo( &p_playlist->pp_items[i]->input,
-                                         _("General"), _("Author") );
-
-            fprintf( p_export->p_file, "#EXTINF:%i,%s,%s\n",
+                                         _("Meta-information"), _("Artist") );
+            if( psz_author && *psz_author )
+            {
+                fprintf( p_export->p_file, "#EXTINF:%i,%s - %s\n",
                      (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
-                     psz_author ? psz_author : "",
-                     p_playlist->pp_items[i]->input.psz_name );
+                     psz_author, p_playlist->pp_items[i]->input.psz_name );
+            }
+            else
+            {
+                fprintf( p_export->p_file, "#EXTINF:%i,%s\n",
+                         (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
+                         p_playlist->pp_items[i]->input.psz_name );
+            }
+            free(psz_author);
         }
 
         /* VLC specific options */

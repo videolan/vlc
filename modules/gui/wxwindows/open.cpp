@@ -464,9 +464,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     /* Create notebook */
     notebook = new wxNotebook( panel, Notebook_Event );
 
-//#if (!wxCHECK_VERSION(2,5,0))
+#if (!wxCHECK_VERSION(2,5,0))
     wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
-//#endif
+#endif
 
     notebook->AddPage( FilePanel( notebook ), wxU(_("File")),
                        i_access_method == FILE_ACCESS );
@@ -540,9 +540,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( mrl_sizer_sizer, 0, wxEXPAND, 5 );
     panel_sizer->Add( label, 0, wxEXPAND | wxALL, 5 );
-//#if (!wxCHECK_VERSION(2,5,0))
+#if (!wxCHECK_VERSION(2,5,0))
     panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
-//#endif
+#endif
     panel_sizer->Add( common_opt_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALL, 5 );

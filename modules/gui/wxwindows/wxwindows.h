@@ -45,11 +45,9 @@
 #include <wx/taskbar.h>
 #include "vlc_keys.h"
 
-//PITA
 #if (!wxCHECK_VERSION(2,5,0))
 typedef long wxTreeItemIdValue;
 #endif
-
 
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
@@ -88,6 +86,10 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 #define MODE_GROUP 1
 #define MODE_AUTHOR 2
 #define MODE_TITLE 3
+
+enum{
+  ID_CONTROLS_TIMER,
+};
 
 class DialogsProvider;
 class PrefsTreeCtrl;
@@ -187,7 +189,7 @@ private:
     vlc_bool_t b_init;
     int i_old_playing_status;
     int i_old_rate;
-    vlc_bool_t b_old_seekable;
+    vlc_bool_t b_slider_shown;
     vlc_bool_t b_disc_shown;
 };
 
@@ -353,6 +355,8 @@ public:
     Systray     *p_systray;
 #endif
 
+    wxTimer m_controls_timer;
+
 private:
     void SetupHotkeys();
     void CreateOurMenuBar();
@@ -362,6 +366,8 @@ private:
     void Open( int i_access_method );
 
     /* Event handlers (these functions should _not_ be virtual) */
+    void OnControlsTimer(wxTimerEvent& WXUNUSED(event));
+
     void OnExit( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
 

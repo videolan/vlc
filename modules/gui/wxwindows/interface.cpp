@@ -210,6 +210,8 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
     EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
+
+    EVT_TIMER(ID_CONTROLS_TIMER, Interface::OnControlsTimer)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -300,6 +302,8 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     SetupHotkeys();
 
+    m_controls_timer.SetOwner(this, ID_CONTROLS_TIMER);
+
     /* Start timer */
     timer = new Timer( p_intf, this );
 
@@ -356,8 +360,15 @@ void Interface::OnControlEvent( wxCommandEvent& event )
     switch( event.GetId() )
     {
     case 0:
+        {
+          int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+          if (size_to_video)
+          {
         frame_sizer->Layout();
         frame_sizer->Fit(this);
+          }
+        }
         break;
 
     case 1:
@@ -670,6 +681,28 @@ void Interface::SetupHotkeys()
  * Event Handlers.
  *****************************************************************************/
 
+void Interface::OnControlsTimer(wxTimerEvent& WXUNUSED(event))
+{
+  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+  
+  /* Hide slider and Disc Buttons */
+  disc_frame->Hide();
+  slider_sizer->Hide( disc_frame );
+  slider_sizer->Layout();
+  if (size_to_video)
+  {
+    slider_sizer->Fit( slider_frame );
+  }
+
+  slider_frame->Hide();
+  frame_sizer->Hide( slider_frame );
+  frame_sizer->Layout();
+  if (size_to_video)
+  {
+    frame_sizer->Fit( this );
+  }
+}
+
 void Interface::OnMenuOpen(wxMenuEvent& event)
 {
 #if defined( __WXMSW__ )
@@ -854,7 +887,11 @@ void Interface::OnExtended(wxCommandEvent& event)
                 fprintf(stderr,"Creating window\n");
             extra_frame->Hide();
             frame_sizer->Hide( extra_frame );
+#if (wxCHECK_VERSION(2,5,0))
             frame_sizer->Detach( extra_frame );
+#else
+            frame_sizer->Remove( extra_frame );
+#endif
             frame_sizer->Layout();
             frame_sizer->Fit(this);
             extra_window = new ExtraWindow( p_intf, this, extra_frame );
@@ -898,7 +935,11 @@ void Interface::OnUndock(wxCommandEvent& event)
                 fprintf(stderr,"Creating window\n");
             extra_frame->Hide();
             frame_sizer->Hide( extra_frame );
+#if (wxCHECK_VERSION(2,5,0))
             frame_sizer->Detach( extra_frame );
+#else
+            frame_sizer->Remove( extra_frame );
+#endif
             frame_sizer->Layout();
             frame_sizer->Fit(this);
             extra_window = new ExtraWindow( p_intf, this, extra_frame );

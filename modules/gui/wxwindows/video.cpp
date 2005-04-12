@@ -46,6 +46,7 @@ enum
     UpdateSize_Event = wxID_HIGHEST + 1,
     UpdateHide_Event,
     SetStayOnTop_Event,
+    ID_HIDE_TIMER
 };
 
 class VideoWindow: public wxWindow
@@ -69,9 +70,12 @@ private:
 
     wxWindow *p_child_window;
 
-    void UpdateSize( wxEvent & );
-    void UpdateHide( wxEvent & );
-    void OnControlEvent( wxCommandEvent & );
+    wxTimer m_hide_timer;
+
+    void UpdateSize( wxEvent& event );
+    void UpdateHide( wxEvent& event );
+    void OnControlEvent( wxCommandEvent& event );
+    void OnHideTimer( wxTimerEvent& WXUNUSED(event));
 
     DECLARE_EVENT_TABLE();
 };
@@ -83,6 +87,7 @@ BEGIN_EVENT_TABLE(VideoWindow, wxWindow)
     EVT_CUSTOM( wxEVT_SIZE, UpdateHide_Event, VideoWindow::UpdateHide )
     EVT_COMMAND( SetStayOnTop_Event, wxEVT_VLC_VIDEO,
                  VideoWindow::OnControlEvent )
+    EVT_TIMER( ID_HIDE_TIMER, VideoWindow::OnHideTimer )
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -105,17 +110,49 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     vlc_mutex_init( p_intf, &lock );
 
+    int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
     p_vout = NULL;
+
+    m_hide_timer.SetOwner(this, ID_HIDE_TIMER);
 
     p_intf->pf_request_window = ::GetWindow;
     p_intf->pf_release_window = ::ReleaseWindow;
     p_intf->pf_control_window = ::ControlWindow;
 
     p_intf->p_sys->p_video_window = this;
-    p_child_window = new wxWindow( this, -1, wxDefaultPosition, wxSize(0,0) );
+    
+    wxSize child_size = wxSize(0,0);
+    if (!size_to_video)
+    {
+      //maybe this size should be an option
+      child_size = wxSize( wxSystemSettings::GetMetric( wxSYS_SCREEN_X ) / 2,
+                           wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) / 2);
+
+      SetSize(child_size);
+    }
+
+    p_child_window = new wxWindow( this, -1, wxDefaultPosition, child_size );
+    
+    
+    if (!size_to_video)
+    {
+      //show the window so we can see the background where the video will be
     p_child_window->Show();
     Show();
     b_shown = VLC_TRUE;
+    }
+    else
+    {
+      //othewise the video window is shown when a video starts
+      //but hide it now, so we can set the background color without it showing
+      p_child_window->Hide();
+      Hide();
+      b_shown = VLC_FALSE;
+    }
+
+    p_child_window->SetBackgroundColour(*wxBLACK);
+    SetBackgroundColour(*wxBLACK);
 
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND );
@@ -227,16 +264,27 @@ void VideoWindow::ReleaseWindow( void *p_window )
 
     p_vout = NULL;
 
+    int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+    if (size_to_video)
+    {
 #if defined(__WXGTK__) || defined(WIN32)
     wxSizeEvent event( wxSize(0, 0), UpdateHide_Event );
     AddPendingEvent( event );
 #endif
+    }
 
     vlc_mutex_unlock( &lock );
 }
 
 void VideoWindow::UpdateSize( wxEvent &_event )
 {
+  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+  m_hide_timer.Stop();
+
+  if (size_to_video)
+  {
     wxSizeEvent * event = (wxSizeEvent*)(&_event);
     if( !b_shown )
     {
@@ -250,10 +298,43 @@ void VideoWindow::UpdateSize( wxEvent &_event )
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );
 }
+  else
+  {
+    //this is a very hackish way to show in case the user switched
+    //size-to-video off while no video was playing, which would leave
+    //the window hidden and of 0 size
+    if( !b_shown )
+    {
+        p_intf->p_sys->p_video_sizer->Show( this, TRUE );
+        SetFocus();
+        b_shown = VLC_TRUE;
+
+        wxSize child_size = wxSize( wxSystemSettings::GetMetric( wxSYS_SCREEN_X ) / 2,
+                                    wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) / 2);
+
+        SetSize(child_size);
+        p_child_window->SetSize(child_size);
+
+        Interface * intf = (Interface *)p_parent;
+        intf->frame_sizer->Layout();
+        intf->frame_sizer->Fit(intf);
+    }
+  }
+}
 
 void VideoWindow::UpdateHide( wxEvent &_event )
 {
-    wxSizeEvent * event = (wxSizeEvent*)(&_event);
+  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+  if (size_to_video)
+  {
+    m_hide_timer.Start(1000, wxTIMER_ONE_SHOT);
+  }
+}
+
+void VideoWindow::OnHideTimer( wxTimerEvent& WXUNUSED(event))
+{
+  //wxSizeEvent * event = (wxSizeEvent*)(&_event);
     if( b_shown )
     {
         p_intf->p_sys->p_video_sizer->Show( this, FALSE );
@@ -261,9 +342,10 @@ void VideoWindow::UpdateHide( wxEvent &_event )
         b_shown = VLC_FALSE;
 
         SetSize(0,0);
-        Show();
+      Hide();
     }
-    p_intf->p_sys->p_video_sizer->SetMinSize( event->GetSize() );
+  //ok I cheat here, but is it ever not 0,0?
+  p_intf->p_sys->p_video_sizer->SetMinSize( wxSize(0,0) );
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );
@@ -298,13 +380,20 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
     {
         case VOUT_SET_ZOOM:
         {
+            int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+            if (size_to_video)
+            {
             double f_arg = va_arg( args, double );
 
             /* Update dimensions */
             wxSizeEvent event( wxSize((int)(p_vout->i_window_width * f_arg),
                                       (int)(p_vout->i_window_height * f_arg)),
                                UpdateSize_Event );
+
+              
             AddPendingEvent( event );
+            }
 
             i_ret = VLC_SUCCESS;
         }

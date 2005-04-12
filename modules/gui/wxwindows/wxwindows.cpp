@@ -93,6 +93,8 @@ private:
 #define TASKBAR_LONGTEXT N_("Show taskbar entry")
 #define MINIMAL_TEXT N_("Minimal interface")
 #define MINIMAL_LONGTEXT N_("Use minimal interface, no toolbar, few menus")
+#define SIZE_TO_VIDEO_TEXT N_("Size to video")
+#define SIZE_TO_VIDEO_LONGTEXT N_("Resize VLC to match the video resolution")
 #define SYSTRAY_TEXT N_("Show systray icon")
 #define SYSTRAY_LONGTEXT N_("Show systray icon")
 
@@ -121,6 +123,8 @@ vlc_module_begin();
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-minimal", 0, NULL,
               MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
+    add_bool( "wxwin-size-to-video", 1, NULL,
+              SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wxwin-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );

@@ -25,6 +25,7 @@ Bruno Vella <allevb at tin.it> - Italian localization
 Carlo Calabrò <murray at via.ecp.fr> - Italian localization
 Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
 Christof Baumgaertner - dbox web intf
+Christophe Mutricy <xtophe at nxtelevision dot com>- many fixes (preferences, M3U, ...)
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
@@ -39,6 +40,7 @@ Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
 Felix Kühne <fkuehne at users.sf.net> - German translation
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
+Gregory Hazel <ghazel et gmail dot com> - wxWidgets fixes and improvements
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
