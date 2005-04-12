@@ -86,7 +86,7 @@ vlc_module_begin();
         add_bool( "macosx-fill", 0, NULL, FILL_TEXT, FILL_LONGTEXT,
                   VLC_TRUE );
     add_submodule();
-        set_description( _("Mac OS X OpenGL") );
+        set_description( "Mac OS X OpenGL" );
         set_capability( "opengl provider", 100 );
         set_callbacks( E_(OpenVideoGL), E_(CloseVideoGL) );
 vlc_module_end();

@@ -141,7 +141,7 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
   "Allows you to force a constant bitrate encoding (CBR)." )
 
 vlc_module_begin();
-    set_shortname( _("Vorbis"));
+    set_shortname( "Vorbis" );
     set_description( _("Vorbis audio decoder") );
 #ifdef MODULE_NAME_IS_tremor
     set_capability( "decoder", 90 );

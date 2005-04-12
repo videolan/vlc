@@ -76,7 +76,7 @@ static char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( _("Ffmpeg"));
+    set_shortname( "ffmpeg");
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );
     /* decoder main module */
@@ -86,7 +86,7 @@ vlc_module_begin();
     /*add_requirement( ALTIVEC );*/
     set_capability( "decoder", 71 );
 #else
-    set_description( _("Ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
+    set_description( _("ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
     set_capability( "decoder", 70 );
 #endif
     set_section( N_("Decoding") , NULL );

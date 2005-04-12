@@ -115,7 +115,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("Matroska") );
+    set_shortname( "Matroska" );
     set_description( _("Matroska stream demuxer" ) );
     set_capability( "demux2", 50 );
     set_callbacks( Open, Close );
