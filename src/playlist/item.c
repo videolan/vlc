@@ -116,13 +116,17 @@ playlist_item_t *__playlist_ItemCopy( vlc_object_t *p_obj,
         return NULL;
     }
 
-    memcpy( p_res, p_item, sizeof(playlist_item_t) );
+    *p_res = *p_item;
     vlc_mutex_init( p_obj, &p_res->input.lock );
-    p_res->input.ppsz_options = malloc( p_item->input.i_options * sizeof(char*));
+
+    if( p_item->input.i_options )
+        p_res->input.ppsz_options =
+            malloc( p_item->input.i_options * sizeof(char*) );
     for( i = 0; i < p_item->input.i_options; i++ )
     {
         p_res->input.ppsz_options[i] = strdup( p_item->input.ppsz_options[i] );
     }
+
     if( p_item->i_children != -1 )
     {
         msg_Warn( p_obj, "not copying playlist items children" );
@@ -139,7 +143,8 @@ playlist_item_t *__playlist_ItemCopy( vlc_object_t *p_obj,
     
     if( p_item->input.i_es )
     {
-        p_res->input.es = (es_format_t**)malloc( p_item->input.i_es * sizeof(es_format_t*));
+        p_res->input.es =
+            (es_format_t**)malloc( p_item->input.i_es * sizeof(es_format_t*));
         for( i = 0; i < p_item->input.i_es; i++ )
         {
             p_res->input.es[ i ] = (es_format_t*)malloc(sizeof(es_format_t*));
@@ -329,6 +334,7 @@ int playlist_ItemSetName( playlist_item_t *p_item, char *psz_name )
 {
     if( psz_name && p_item )
     {
+        if( p_item->input.psz_name ) free( p_item->input.psz_name );
         p_item->input.psz_name = strdup( psz_name );
         return VLC_SUCCESS;
     }

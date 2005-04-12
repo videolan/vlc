@@ -186,7 +186,7 @@ static int  ASeek( stream_t *s, int64_t i_pos );
 
 
 /****************************************************************************
- * stream_AccessNew: create a stream from a access
+ * stream_UrlNew: create a stream from a access
  ****************************************************************************/
 stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 {
@@ -194,32 +194,29 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     access_t *p_access;
     stream_t *p_res;
 
+    if( !psz_url ) return 0;
+
     psz_dup = strdup( psz_url );
     MRLSplit( p_parent, psz_dup, &psz_access, &psz_demux, &psz_path );
     
     /* Now try a real access */
-    p_access = access2_New( p_parent, psz_access, NULL,
-                            psz_path, VLC_FALSE );
+    p_access = access2_New( p_parent, psz_access, psz_demux, psz_path, 0 );
+    free( psz_dup );
 
     if( p_access == NULL )
     {
         msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
-        free( psz_dup );
         return NULL;
     }
-    p_res = stream_AccessNew( p_access, VLC_TRUE );
-    if( p_res )
-    {
-        p_res->pf_destroy = UStreamDestroy;
-        free( psz_dup );
-        return p_res;
-    }
-    else
+
+    if( !( p_res = stream_AccessNew( p_access, VLC_TRUE ) ) )
     {
         access2_Delete( p_access );
+        return NULL;
     }
-    free( psz_dup );
-    return NULL;
+
+    p_res->pf_destroy = UStreamDestroy;
+    return p_res;
 }
 
 stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )

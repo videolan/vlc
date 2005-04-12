@@ -166,31 +166,22 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 {
     xml_reader_t *p_reader;
     char *p_buffer;
-    int i_pos,i_size,i_buffer = 5000;
+    int i_size, i_pos = 0, i_buffer = 2048;
     XTag *p_root;
 
     /* Open and read file */
-    p_buffer = malloc( i_buffer + 1 );
-    if( p_buffer == NULL )
-        return NULL;
+    p_buffer = malloc( i_buffer );
+    if( p_buffer == NULL ) return NULL;
 
-    i_pos = 0;
-    i_size = 0;
-    while( i_pos < i_buffer )
+    while( ( i_size = stream_Read( s, &p_buffer[i_pos], 2048 ) ) == 2048 )
     {
-        i_size = stream_Read( s, &p_buffer[i_pos], 5000 );
         i_pos += i_size;
-        if( i_size < 5000 )
-            break; /* we're done */
-        else
-        {
-            i_buffer += 5000;
-            p_buffer = realloc( p_buffer, i_buffer * sizeof( char *) );
-        }
+        i_buffer += i_size;
+        p_buffer = realloc( p_buffer, i_buffer );
     }
-    p_buffer[ i_pos ] = 0;
+    p_buffer[ i_pos + i_size ] = 0; /* 0 terminated string */
 
-    if( !i_buffer )
+    if( i_pos + i_size == 0 )
     {
         msg_Dbg( p_xml, "empty xml" );
         free( p_buffer );

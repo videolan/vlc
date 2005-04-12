@@ -120,7 +120,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;
     p_playlist->i_all_size = 0;
-    p_playlist->pp_all_items = malloc(sizeof(playlist_item_t*));
+    p_playlist->pp_all_items = 0;
 
     playlist_ViewInsert( p_playlist, VIEW_CATEGORY, TITLE_CATEGORY );
     playlist_ViewInsert( p_playlist, VIEW_SIMPLE, TITLE_SIMPLE );
@@ -258,7 +258,6 @@ int playlist_LockControl( playlist_t * p_playlist, int i_query, ... )
     va_end( args );
     vlc_mutex_unlock( &p_playlist->object_lock );
     return i_result;
-    
 }
 
 /**

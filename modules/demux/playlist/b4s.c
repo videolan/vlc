@@ -154,7 +154,10 @@ static int Demux( demux_t *p_demux )
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
 
-    stream_ReadLine( p_demux->s );
+    psz_elname = stream_ReadLine( p_demux->s );
+    if( psz_elname ) free( psz_elname );
+    psz_elname = 0;
+
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
     if( !p_xml_reader ) return -1;
     p_sys->p_xml_reader = p_xml_reader;
