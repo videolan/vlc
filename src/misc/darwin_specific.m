@@ -63,6 +63,7 @@ static int FindLanguage( const char * psz_lang )
         "Swedish", "sv",
         "Tetum", "tet",
         "Tagalog", "tl",
+        "Chinese Traditional", "zh_TW",
         NULL
     };
 
