@@ -201,6 +201,7 @@ modules/access/vcdx/vcd.c
 modules/access/vcdx/vcd.h
 modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
+modules/access_filter/timeshift.c
 modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
@@ -320,7 +321,6 @@ modules/control/rc.c
 modules/control/showintf.c
 modules/control/telnet.c
 modules/demux/a52.c
-modules/demux/aac.c
 modules/demux/aiff.c
 modules/demux/asf/asf.c
 modules/demux/asf/libasf.c
@@ -349,7 +349,9 @@ modules/demux/mpeg/m4v.c
 modules/demux/mpeg/mpga.c
 modules/demux/mpeg/mpgv.c
 modules/demux/nsv.c
+modules/demux/nuv.c
 modules/demux/ogg.c
+modules/demux/playlist/b4s.c
 modules/demux/playlist/m3u.c
 modules/demux/playlist/old.c
 modules/demux/playlist/playlist.c
@@ -364,7 +366,6 @@ modules/demux/sgimb.c
 modules/demux/subtitle.c
 modules/demux/ts.c
 modules/demux/ty.c
-modules/demux/util/id3.c
 modules/demux/util/id3genres.h
 modules/demux/util/id3tag.c
 modules/demux/vobsub.c
@@ -689,6 +690,7 @@ modules/gui/skins2/x11/x11_tooltip.cpp
 modules/gui/skins2/x11/x11_tooltip.hpp
 modules/gui/skins2/x11/x11_window.cpp
 modules/gui/skins2/x11/x11_window.hpp
+modules/gui/wince/dialogs.cpp
 modules/gui/wince/fileinfo.cpp
 modules/gui/wince/interface.cpp
 modules/gui/wince/iteminfo.cpp
@@ -734,6 +736,7 @@ modules/misc/dummy/input.c
 modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
+modules/misc/externrun.c
 modules/misc/freetype.c
 modules/misc/gnutls.c
 modules/misc/gtk_main.c
@@ -755,6 +758,7 @@ modules/misc/testsuite/test1.c
 modules/misc/testsuite/test2.cpp
 modules/misc/testsuite/test3.m
 modules/misc/testsuite/test4.c
+modules/misc/win32text.c
 modules/misc/xml/libxml.c
 modules/misc/xml/xtag.c
 modules/mux/asf.c
@@ -779,8 +783,10 @@ modules/packetizer/mpegvideo.c
 modules/services_discovery/daap.c
 modules/services_discovery/hal.c
 modules/services_discovery/sap.c
+modules/services_discovery/shout.c
 modules/stream_out/announce.c
 modules/stream_out/announce.h
+modules/stream_out/bridge.c
 modules/stream_out/description.c
 modules/stream_out/display.c
 modules/stream_out/dummy.c
