@@ -128,9 +128,9 @@
     else
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Random Off" ) );
-    }    
+    }
 
-    p_intf->p_sys->b_playlist_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }
@@ -148,9 +148,9 @@
 
     var_Get( p_playlist, "repeat", &val );
     if (!val.b_bool)
-    {   
+    {
         var_Set( p_playlist, "loop", val );
-    } 
+    }
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "repeat", val );
     if( val.b_bool )
@@ -162,7 +162,7 @@
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
     }
 
-    p_intf->p_sys->b_playlist_update = VLC_TRUE;    
+    p_intf->p_sys->b_playmode_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }
@@ -192,9 +192,9 @@
     else
     {
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
-    }    
+    }
 
-    p_intf->p_sys->b_playlist_update = VLC_TRUE;
+    p_intf->p_sys->b_playmode_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
 }

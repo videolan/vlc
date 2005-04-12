@@ -239,6 +239,38 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_outline_view reloadData];
 }
 
+- (void)playModeUpdated
+{
+    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    vlc_value_t val, val2;
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    var_Get( p_playlist, "loop", &val2 );
+    var_Get( p_playlist, "repeat", &val );
+    if( val.b_bool == VLC_TRUE )
+    {
+        [o_loop_popup selectItemAtIndex: 1];
+   }
+    else if( val2.b_bool == VLC_TRUE )
+    {
+        [o_loop_popup selectItemAtIndex: 2];
+    }
+    else
+    {
+        [o_loop_popup selectItemAtIndex: 0];
+    }
+
+    var_Get( p_playlist, "random", &val );
+    [o_random_ckb setState: val.b_bool];
+
+    vlc_object_release( p_playlist );
+}
+
 - (void)updateRowSelection
 {
     int i,i_row;

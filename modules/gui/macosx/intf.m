@@ -179,6 +179,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t * p_intf = VLCIntf;
     p_intf->p_sys->b_playlist_update = TRUE;
     p_intf->p_sys->b_intf_update = TRUE;
+    p_intf->p_sys->b_playmode_update = TRUE;
     return VLC_SUCCESS;
 }
 
@@ -876,7 +877,12 @@ static VLCMain *_o_sharedMainInstance = nil;
         p_intf->p_sys->b_intf_update = VLC_FALSE;
     }
 
-    if ( p_intf->p_sys->b_playlist_update )
+    if( p_intf->p_sys->b_playmode_update )
+    {
+        [o_playlist playModeUpdated];
+        p_intf->p_sys->b_playmode_update = VLC_FALSE;
+    }
+    if( p_intf->p_sys->b_playlist_update )
     {
         [o_playlist playlistUpdated];
         p_intf->p_sys->b_playlist_update = VLC_FALSE;

@@ -57,11 +57,11 @@
     IBOutlet id o_mi_selectall;
     IBOutlet id o_mi_sort_name;
     IBOutlet id o_mi_sort_author;
-    
+
     /* "services discovery" menu in the playlist menu */
     IBOutlet id o_mi_services;
     IBOutlet id o_mu_services;
-    
+
     /* "services discovery" menu in the main menu */
     IBOutlet id o_mm_mi_services;
     IBOutlet id o_mm_mu_services;
@@ -85,6 +85,7 @@
 - (IBAction)searchItem:(id)sender;
 
 - (void)playlistUpdated;
+- (void)playModeUpdated;
 - (void)sortNode:(int)i_mode;
 - (void)updateRowSelection;
 

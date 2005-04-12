@@ -63,6 +63,7 @@ struct intf_sys_t
     /* interface update */
     vlc_bool_t b_intf_update;
     vlc_bool_t b_playlist_update;
+    vlc_bool_t b_playmode_update;
     vlc_bool_t b_current_title_update;
     vlc_bool_t b_fullscreen_update;
 
