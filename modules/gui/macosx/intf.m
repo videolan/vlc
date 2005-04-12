@@ -397,6 +397,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     [self updateTogglePlaylistState];
 
+    o_size_with_playlist = [o_window frame].size;
+
     p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( p_playlist )
@@ -1516,8 +1518,21 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         b_small_window = YES; /* we know we are small, make sure this is actually set (see case below) */
         /* make large */
-        o_rect.size.height = 500;
-        
+        if ( o_size_with_playlist.height > 200 )
+        {
+            o_rect.size.height = o_size_with_playlist.height;
+        }
+        else
+        {
+            o_rect.size.height = 500;
+            if ( o_rect.size.width == [o_window minSize].width )
+            {
+                o_rect.size.width = 500;
+            }
+
+        }
+        o_rect.size.height = (o_size_with_playlist.height > 200) ?
+            o_size_with_playlist.height : 500;
         o_rect.origin.x = [o_window frame].origin.x;
         o_rect.origin.y = [o_window frame].origin.y - o_rect.size.height +
                                                 [o_window minSize].height;
@@ -1531,7 +1546,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         /* Calculate the position of the lower right corner after resize */
         o_rect.origin.y = [o_window frame].origin.y +
             [o_window frame].size.height - [o_window minSize].height;
-        
+
         [o_playlist_view setAutoresizesSubviews: NO];
         [o_playlist_view removeFromSuperview];
         [o_btn_playlist setState: NO];
@@ -1556,6 +1571,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
 {
     /* Not triggered on a window resize or maxification of the window. only by window mouse dragging resize */
+
+   /*Stores the size the controller one resize, to be able to restore it when
+     toggling the playlist*/
+    o_size_with_playlist = proposedFrameSize;
+
     if( proposedFrameSize.height <= 200 )
     {
         if( b_small_window == NO )

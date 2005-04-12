@@ -25,12 +25,10 @@
  * VLCControllerWindow
  *****************************************************************************/
 
+
 @interface VLCControllerWindow : NSWindow
 {
-    NSSize o_size_with_playlist;
 }
-
-- (NSSize)getSizeWithPlaylist;
 
 @end
 

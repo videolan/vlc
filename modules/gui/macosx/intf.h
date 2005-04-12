@@ -234,10 +234,13 @@ struct intf_sys_t
     IBOutlet id o_dmi_next;
     IBOutlet id o_dmi_previous;
     IBOutlet id o_dmi_mute;
-    
+
     bool b_small_window;
-    
+
     mtime_t i_end_scroll;
+
+    NSSize o_size_with_playlist;
+
 }
 
 + (VLCMain *)sharedInstance;
