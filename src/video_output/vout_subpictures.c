@@ -473,9 +473,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             subpicture_t *p_subpic,
                             int i_scale_width_orig, int i_scale_height_orig )
 {
-
-    int i_subpic_x;
-  
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
@@ -484,6 +481,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     {
         subpicture_region_t *p_region = p_subpic->p_region;
         int i_scale_width, i_scale_height;
+        int i_subpic_x = p_subpic->i_x;
 
         /* Load the blending module */
         if( !p_spu->p_blend && p_region )
@@ -512,7 +510,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_text->fmt_out.video.i_height =
                 p_spu->p_text->fmt_out.video.i_visible_height =
                     p_fmt->i_height;
-                
+
             p_spu->p_text->pf_sub_buffer_new = spu_new_buffer;
             p_spu->p_text->pf_sub_buffer_del = spu_del_buffer;
             p_spu->p_text->p_module =
@@ -528,11 +526,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_fmt->i_height;
         }
 
-        if ( p_region && p_subpic->p_region->fmt.i_aspect == 0 )
-          /* Set subtitle to be the same aspect ratio as the background
-             source video. */
-            p_subpic->p_region->fmt.i_aspect = p_pic_src->format.i_aspect;
-
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
 
@@ -545,25 +538,31 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                              p_subpic->i_original_picture_height;
         }
 
-        /* Take care of the aspect ratio */
-        if( p_region && p_subpic->p_region->fmt.i_aspect !=
-                        p_pic_src->format.i_aspect)
+        /* Set default subpicture aspect ratio */
+        if( p_region && p_region->fmt.i_aspect &&
+            (!p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den) )
         {
-            i_scale_width = (p_subpic->p_region->fmt.i_aspect*1000) /
-            p_pic_src->format.i_aspect;
-            i_subpic_x = p_subpic->i_x * i_scale_width / 1000;
-        } else
-          i_subpic_x = p_subpic->i_x;
+            p_region->fmt.i_sar_den = p_region->fmt.i_aspect;
+            p_region->fmt.i_sar_num = VOUT_ASPECT_FACTOR;
+        }
+        if( p_region &&
+            (!p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den) )
+        {
+            p_region->fmt.i_sar_den = p_fmt->i_sar_den;
+            p_region->fmt.i_sar_num = p_fmt->i_sar_num;
+        }
 
-
+        /* Take care of the aspect ratio */
         if( p_region && p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
             p_region->fmt.i_sar_den * p_fmt->i_sar_num )
         {
             i_scale_width = i_scale_width *
                 (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
                 p_region->fmt.i_sar_den / p_fmt->i_sar_num;
+            i_subpic_x = p_subpic->i_x * i_scale_width / 1000;
         }
 
+        /* Load the scaling module */
         if( !p_spu->p_scale && (i_scale_width != 1000 ||
             i_scale_height != 1000) )
         {
@@ -583,18 +582,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 module_Need( p_spu->p_scale, "video filter2", 0, 0 );
         }
 
-        if( p_subpic->pf_render )
-        {
-            /* HACK to remove when the ogt subpic decoder is gone */
-            if( p_spu->p_parent &&
-                p_spu->p_parent->i_object_type == VLC_OBJECT_VOUT )
-            {
-                vout_thread_t *p_vout = (vout_thread_t *)p_spu->p_parent;
-                p_subpic->pf_render( p_vout, p_pic_dst, p_subpic );
-            }
-        }
-        else while( p_region && p_spu->p_blend &&
-                    p_spu->p_blend->pf_video_blend )
+        while( p_region && p_spu->p_blend && p_spu->p_blend->pf_video_blend )
         {
             int i_fade_alpha = 255;
             int i_x_offset = p_region->i_x + i_subpic_x;
