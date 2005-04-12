@@ -382,7 +382,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( [o_window frame].size.height <= 200 )
     {
         b_small_window = YES;
-        [o_window setFrame: NSMakeRect( [o_window frame].origin.x, [o_window frame].origin.y, [o_window frame].size.width, 95 ) display: YES animate:YES];
+        [o_window setFrame: NSMakeRect( [o_window frame].origin.x,
+            [o_window frame].origin.y, [o_window frame].size.width,
+            [o_window minSize].height ) display: YES animate:YES];
         [o_playlist_view setAutoresizesSubviews: NO];
     }
     else
@@ -1524,7 +1526,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
     {
         /* make small */
-        o_rect.size.height = 95;
+        o_rect.size.height = [o_window minSize].height;
         o_rect.origin.x = [o_window frame].origin.x;
         /* Calculate the position of the lower right corner after resize */
         o_rect.origin.y = [o_window frame].origin.y +
@@ -1563,7 +1565,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_playlist_view setAutoresizesSubviews: NO];
             [o_playlist_view removeFromSuperview];
         }
-        return NSMakeSize( proposedFrameSize.width, 95 );
+        return NSMakeSize( proposedFrameSize.width, [o_window minSize].height);
     }
     return proposedFrameSize;
 }
@@ -1574,7 +1576,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         /* If large and coming from small then show */
         [o_playlist_view setAutoresizesSubviews: YES];
-        [o_playlist_view setFrame: NSMakeRect( 10, 10, [o_window frame].size.width - 20, [o_window frame].size.height - 95 - 10 )];
+        [o_playlist_view setFrame: NSMakeRect( 10, 10, [o_window frame].size.width - 20, [o_window frame].size.height - [o_window minSize].height - 10 )];
         [o_playlist_view setNeedsDisplay:YES];
         [[o_window contentView] addSubview: o_playlist_view];
         b_small_window = NO;
