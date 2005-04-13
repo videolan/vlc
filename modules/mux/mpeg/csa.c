@@ -126,6 +126,9 @@ void csa_Decrypt( csa_t *c, uint8_t *pkt )
         i_hdr += pkt[4] + 1;
     }
 
+    if( 188 - i_hdr < 8 )
+        return;
+
     /* init csa state */
     csa_StreamCypher( c, 1, ck, &pkt[i_hdr], ib );
 
