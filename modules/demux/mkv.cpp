@@ -115,7 +115,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( "Matroska" );
+    set_shortname( _("Matroska") );
     set_description( _("Matroska stream demuxer" ) );
     set_capability( "demux2", 50 );
     set_callbacks( Open, Close );
@@ -544,12 +544,12 @@ public:
 
     bool Preload( );
     bool PreloadFamily( const matroska_segment_t & segment );
-    void ParseInfo( EbmlElement *info );
-    void ParseChapters( EbmlElement *chapters );
-    void ParseSeekHead( EbmlElement *seekhead );
-    void ParseTracks( EbmlElement *tracks );
-    void ParseChapterAtom( int i_level, EbmlMaster *ca, chapter_item_t & chapters );
-    void ParseTrackEntry( EbmlMaster *m );
+    void ParseInfo( KaxInfo *info );
+    void ParseChapters( KaxChapters *chapters );
+    void ParseSeekHead( KaxSeekHead *seekhead );
+    void ParseTracks( KaxTracks *tracks );
+    void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_t & chapters );
+    void ParseTrackEntry( KaxTrackEntry *m );
     void ParseCluster( );
     void IndexAppendCluster( KaxCluster *cluster );
     void LoadCues( );
@@ -2396,22 +2396,20 @@ void matroska_segment_t::LoadTags( )
 /*****************************************************************************
  * ParseSeekHead:
  *****************************************************************************/
-void matroska_segment_t::ParseSeekHead( EbmlElement *seekhead )
+void matroska_segment_t::ParseSeekHead( KaxSeekHead *seekhead )
 {
     EbmlElement *el;
-    EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
 
     msg_Dbg( &sys.demuxer, "|   + Seek head" );
 
     /* Master elements */
-    m = static_cast<EbmlMaster *>(seekhead);
-    m->Read( es, seekhead->Generic().Context, i_upper_level, el, true );
+    seekhead->Read( es, seekhead->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < m->ListSize(); i++ )
+    for( i = 0; i < seekhead->ListSize(); i++ )
     {
-        EbmlElement *l = (*m)[i];
+        EbmlElement *l = (*seekhead)[i];
 
         if( MKV_IS_ID( l, KaxSeek ) )
         {
@@ -2470,7 +2468,7 @@ void matroska_segment_t::ParseSeekHead( EbmlElement *seekhead )
 /*****************************************************************************
  * ParseTrackEntry:
  *****************************************************************************/
-void matroska_segment_t::ParseTrackEntry( EbmlMaster *m )
+void matroska_segment_t::ParseTrackEntry( KaxTrackEntry *m )
 {
     unsigned int i;
 
@@ -2875,26 +2873,24 @@ void matroska_segment_t::ParseTrackEntry( EbmlMaster *m )
 /*****************************************************************************
  * ParseTracks:
  *****************************************************************************/
-void matroska_segment_t::ParseTracks( EbmlElement *tracks )
+void matroska_segment_t::ParseTracks( KaxTracks *tracks )
 {
     EbmlElement *el;
-    EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
 
     msg_Dbg( &sys.demuxer, "|   + Tracks" );
 
     /* Master elements */
-    m = static_cast<EbmlMaster *>(tracks);
-    m->Read( es, tracks->Generic().Context, i_upper_level, el, true );
+    tracks->Read( es, tracks->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < m->ListSize(); i++ )
+    for( i = 0; i < tracks->ListSize(); i++ )
     {
-        EbmlElement *l = (*m)[i];
+        EbmlElement *l = (*tracks)[i];
 
         if( MKV_IS_ID( l, KaxTrackEntry ) )
         {
-            ParseTrackEntry( static_cast<EbmlMaster *>(l) );
+            ParseTrackEntry( static_cast<KaxTrackEntry *>(l) );
         }
         else
         {
@@ -2906,7 +2902,7 @@ void matroska_segment_t::ParseTracks( EbmlElement *tracks )
 /*****************************************************************************
  * ParseInfo:
  *****************************************************************************/
-void matroska_segment_t::ParseInfo( EbmlElement *info )
+void matroska_segment_t::ParseInfo( KaxInfo *info )
 {
     EbmlElement *el;
     EbmlMaster  *m;
@@ -3063,7 +3059,7 @@ void matroska_segment_t::ParseInfo( EbmlElement *info )
 /*****************************************************************************
  * ParseChapterAtom
  *****************************************************************************/
-void matroska_segment_t::ParseChapterAtom( int i_level, EbmlMaster *ca, chapter_item_t & chapters )
+void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_t & chapters )
 {
     unsigned int i;
 
@@ -3144,7 +3140,7 @@ void matroska_segment_t::ParseChapterAtom( int i_level, EbmlMaster *ca, chapter_
         else if( MKV_IS_ID( l, KaxChapterAtom ) )
         {
             chapter_item_t new_sub_chapter;
-            ParseChapterAtom( i_level+1, static_cast<EbmlMaster *>(l), new_sub_chapter );
+            ParseChapterAtom( i_level+1, static_cast<KaxChapterAtom *>(l), new_sub_chapter );
             new_sub_chapter.psz_parent = &chapters;
             chapters.sub_chapters.push_back( new_sub_chapter );
         }
@@ -3154,21 +3150,19 @@ void matroska_segment_t::ParseChapterAtom( int i_level, EbmlMaster *ca, chapter_
 /*****************************************************************************
  * ParseChapters:
  *****************************************************************************/
-void matroska_segment_t::ParseChapters( EbmlElement *chapters )
+void matroska_segment_t::ParseChapters( KaxChapters *chapters )
 {
     EbmlElement *el;
-    EbmlMaster  *m;
     unsigned int i;
     int i_upper_level = 0;
     mtime_t i_dur;
 
     /* Master elements */
-    m = static_cast<EbmlMaster *>(chapters);
-    m->Read( es, chapters->Generic().Context, i_upper_level, el, true );
+    chapters->Read( es, chapters->Generic().Context, i_upper_level, el, true );
 
-    for( i = 0; i < m->ListSize(); i++ )
+    for( i = 0; i < chapters->ListSize(); i++ )
     {
-        EbmlElement *l = (*m)[i];
+        EbmlElement *l = (*chapters)[i];
 
         if( MKV_IS_ID( l, KaxEditionEntry ) )
         {
@@ -3184,7 +3178,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
                 if( MKV_IS_ID( l, KaxChapterAtom ) )
                 {
                     chapter_item_t new_sub_chapter;
-                    ParseChapterAtom( 0, static_cast<EbmlMaster *>(l), new_sub_chapter );
+                    ParseChapterAtom( 0, static_cast<KaxChapterAtom *>(l), new_sub_chapter );
                     edition.sub_chapters.push_back( new_sub_chapter );
                 }
                 else if( MKV_IS_ID( l, KaxEditionUID ) )
@@ -3545,15 +3539,15 @@ bool matroska_segment_t::Preload( )
     {
         if( MKV_IS_ID( el, KaxInfo ) )
         {
-            ParseInfo( el );
+            ParseInfo( static_cast<KaxInfo*>( el ) );
         }
         else if( MKV_IS_ID( el, KaxTracks ) )
         {
-            ParseTracks( el );
+            ParseTracks( static_cast<KaxTracks*>( el ) );
         }
         else if( MKV_IS_ID( el, KaxSeekHead ) )
         {
-            ParseSeekHead( el );
+            ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
         }
         else if( MKV_IS_ID( el, KaxCues ) )
         {
@@ -3579,7 +3573,7 @@ bool matroska_segment_t::Preload( )
         else if( MKV_IS_ID( el, KaxChapters ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Chapters" );
-            ParseChapters( el );
+            ParseChapters( static_cast<KaxChapters*>( el ) );
         }
         else if( MKV_IS_ID( el, KaxTag ) )
         {
