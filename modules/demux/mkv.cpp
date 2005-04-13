@@ -244,7 +244,7 @@ class EbmlParser
 {
   public:
     EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux );
-    ~EbmlParser( void );
+    virtual ~EbmlParser( void );
 
     void Up( void );
     void Down( void );
@@ -332,6 +332,20 @@ typedef struct
 
 class chapter_codec_cmds_t
 {
+public:
+    void SetPrivate( const KaxChapterProcessPrivate & private_data )
+    {
+        m_private_data = *( new KaxChapterProcessPrivate( private_data ) );
+    }
+
+    void AddCommand( const KaxChapterProcessCommand & command );
+
+protected:
+    KaxChapterProcessPrivate m_private_data;
+
+    std::vector<KaxChapterProcessData> enter_cmds;
+    std::vector<KaxChapterProcessData> during_cmds;
+    std::vector<KaxChapterProcessData> leave_cmds;
 };
 
 class dvd_chapter_codec_t : public chapter_codec_cmds_t
@@ -363,17 +377,6 @@ public:
     ,psz_parent(NULL)
     {}
         
-    ~chapter_item_t()
-    {
-        size_t i;
-        for (i=0; i<enter_cmds.size(); i++)
-            delete enter_cmds[i];
-        for (i=0; i<during_cmds.size(); i++)
-            delete during_cmds[i];
-        for (i=0; i<leave_cmds.size(); i++)
-            delete leave_cmds[i];
-    }
-    
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     void PublishChapters( input_title_t & title, int i_level );
     const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
@@ -389,16 +392,14 @@ public:
     std::string                 psz_name;
     chapter_item_t              *psz_parent;
     
+    std::vector<chapter_codec_cmds_t> codecs;
+
     bool operator<( const chapter_item_t & item ) const
     {
         return ( i_user_start_time < item.i_user_start_time || (i_user_start_time == item.i_user_start_time && i_user_end_time < item.i_user_end_time) );
     }
 
 protected:
-    std::vector<chapter_codec_cmds_t*> enter_cmds;
-    std::vector<chapter_codec_cmds_t*> during_cmds;
-    std::vector<chapter_codec_cmds_t*> leave_cmds;
-
     bool Enter();
     bool Leave();
 };
@@ -449,7 +450,7 @@ public:
         index = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
     }
 
-    ~matroska_segment_t()
+    virtual ~matroska_segment_t()
     {
         for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
         {
@@ -643,7 +644,7 @@ public:
         ,sys(demuxer)
     {}
 
-    ~matroska_stream_t()
+    virtual ~matroska_stream_t()
     {
         delete p_in;
         delete p_es;
@@ -671,7 +672,7 @@ public:
         ,f_duration(-1.0)
     {}
 
-    ~demux_sys_t()
+    virtual ~demux_sys_t()
     {
         for (size_t i=0; i<streams.size(); i++)
             delete streams[i];
@@ -2399,7 +2400,7 @@ void matroska_segment_t::LoadTags( )
 void matroska_segment_t::ParseSeekHead( KaxSeekHead *seekhead )
 {
     EbmlElement *el;
-    unsigned int i;
+    size_t i, j;
     int i_upper_level = 0;
 
     msg_Dbg( &sys.demuxer, "|   + Seek head" );
@@ -2416,8 +2417,6 @@ void matroska_segment_t::ParseSeekHead( KaxSeekHead *seekhead )
             EbmlMaster *sk = static_cast<EbmlMaster *>(l);
             EbmlId id = EbmlVoid::ClassInfos.GlobalId;
             int64_t i_pos = -1;
-
-            unsigned int j;
 
             for( j = 0; j < sk->ListSize(); j++ )
             {
@@ -2470,7 +2469,7 @@ void matroska_segment_t::ParseSeekHead( KaxSeekHead *seekhead )
  *****************************************************************************/
 void matroska_segment_t::ParseTrackEntry( KaxTrackEntry *m )
 {
-    unsigned int i;
+    size_t i, j, k, n;
 
     mkv_track_t *tk;
 
@@ -2643,16 +2642,16 @@ void matroska_segment_t::ParseTrackEntry( KaxTrackEntry *m )
         {
             EbmlMaster *cencs = static_cast<EbmlMaster*>(l);
             MkvTree( sys.demuxer, 3, "Content Encodings" );
-            for( unsigned int i = 0; i < cencs->ListSize(); i++ )
+            for( j = 0; j < cencs->ListSize(); j++ )
             {
-                EbmlElement *l2 = (*cencs)[i];
+                EbmlElement *l2 = (*cencs)[j];
                 if( MKV_IS_ID( l2, KaxContentEncoding ) )
                 {
                     MkvTree( sys.demuxer, 4, "Content Encoding" );
                     EbmlMaster *cenc = static_cast<EbmlMaster*>(l2);
-                    for( unsigned int i = 0; i < cenc->ListSize(); i++ )
+                    for( k = 0; k < cenc->ListSize(); k++ )
                     {
-                        EbmlElement *l3 = (*cenc)[i];
+                        EbmlElement *l3 = (*cenc)[k];
                         if( MKV_IS_ID( l3, KaxContentEncodingOrder ) )
                         {
                             KaxContentEncodingOrder &encord = *(KaxContentEncodingOrder*)l3;
@@ -2672,9 +2671,9 @@ void matroska_segment_t::ParseTrackEntry( KaxTrackEntry *m )
                         {
                             EbmlMaster *compr = static_cast<EbmlMaster*>(l3);
                             MkvTree( sys.demuxer, 5, "Content Compression" );
-                            for( unsigned int i = 0; i < compr->ListSize(); i++ )
+                            for( n = 0; n < compr->ListSize(); n++ )
                             {
-                                EbmlElement *l4 = (*compr)[i];
+                                EbmlElement *l4 = (*compr)[n];
                                 if( MKV_IS_ID( l4, KaxContentCompAlgo ) )
                                 {
                                     KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
@@ -3061,7 +3060,7 @@ void matroska_segment_t::ParseInfo( KaxInfo *info )
  *****************************************************************************/
 void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_t & chapters )
 {
-    unsigned int i;
+    size_t i, j;
 
     if( sys.title == NULL )
     {
@@ -3102,7 +3101,6 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         else if( MKV_IS_ID( l, KaxChapterDisplay ) )
         {
             EbmlMaster *cd = static_cast<EbmlMaster *>(l);
-            unsigned int j;
 
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterDisplay" );
             for( j = 0; j < cd->ListSize(); j++ )
@@ -3137,6 +3135,45 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 }
             }
         }
+        else if( MKV_IS_ID( l, KaxChapterProcess ) )
+        {
+            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterProcess" );
+
+            KaxChapterProcess *cp = static_cast<KaxChapterProcess *>(l);
+            chapter_codec_cmds_t *p_ccodec = NULL;
+
+            for( j = 0; j < cp->ListSize(); j++ )
+            {
+                EbmlElement *k= (*cp)[j];
+
+                if( MKV_IS_ID( k, KaxChapterProcessCodecID ) )
+                {
+                    KaxChapterProcessCodecID *p_codec_id = static_cast<KaxChapterProcessCodecID*>( k );
+                    if ( uint32(*p_codec_id) == 0 )
+                        p_ccodec = new matroska_script_codec_t();
+                    else if ( uint32(*p_codec_id) == 1 )
+                        p_ccodec = new dvd_chapter_codec_t();
+                    break;
+                }
+            }
+
+            if ( p_ccodec != NULL )
+            for( j = 0; j < cp->ListSize(); j++ )
+            {
+                EbmlElement *k= (*cp)[j];
+
+                if( MKV_IS_ID( k, KaxChapterProcessPrivate ) )
+                {
+                    KaxChapterProcessPrivate * p_private = static_cast<KaxChapterProcessPrivate*>( k );
+                    p_ccodec->SetPrivate( *p_private );
+                }
+                else if( MKV_IS_ID( k, KaxChapterProcessCommand ) )
+                {
+                    p_ccodec->AddCommand( *static_cast<KaxChapterProcessCommand*>( k ) );
+                }
+            }
+            chapters.codecs.push_back( *p_ccodec );
+        }
         else if( MKV_IS_ID( l, KaxChapterAtom ) )
         {
             chapter_item_t new_sub_chapter;
@@ -3153,7 +3190,7 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 void matroska_segment_t::ParseChapters( KaxChapters *chapters )
 {
     EbmlElement *el;
-    unsigned int i;
+    size_t i;
     int i_upper_level = 0;
     mtime_t i_dur;
 
@@ -3169,7 +3206,7 @@ void matroska_segment_t::ParseChapters( KaxChapters *chapters )
             chapter_edition_t edition;
             
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
-            unsigned int j;
+            size_t j;
             msg_Dbg( &sys.demuxer, "|   |   + EditionEntry" );
             for( j = 0; j < E->ListSize(); j++ )
             {
@@ -3829,4 +3866,45 @@ void virtual_segment_t::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
     }
 
     linked_segments[i]->Seek( i_date, i_time_offset );
+}
+
+void chapter_codec_cmds_t::AddCommand( const KaxChapterProcessCommand & command )
+{
+    size_t i;
+
+    uint32 codec_time = uint32(-1);
+    for( i = 0; i < command.ListSize(); i++ )
+    {
+        const EbmlElement *k = command[i];
+
+        if( MKV_IS_ID( k, KaxChapterProcessTime ) )
+        {
+            codec_time = uint32( *static_cast<const KaxChapterProcessTime*>( k ) );
+            break;
+        }
+    }
+
+    for( i = 0; i < command.ListSize(); i++ )
+    {
+        const EbmlElement *k = command[i];
+
+        if( MKV_IS_ID( k, KaxChapterProcessData ) )
+        {
+            KaxChapterProcessData *p_data =  new KaxChapterProcessData( *static_cast<const KaxChapterProcessData*>( k ) );
+            switch ( codec_time )
+            {
+            case 0:
+                during_cmds.push_back( *p_data );
+                break;
+            case 1:
+                during_cmds.push_back( *p_data );
+                break;
+            case 2:
+                during_cmds.push_back( *p_data );
+                break;
+            default:
+                delete p_data;
+            }
+        }
+    }
 }
