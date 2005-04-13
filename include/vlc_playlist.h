@@ -84,6 +84,7 @@ struct playlist_item_t
 #define PLAYLIST_ENA_FLAG       0x04     /**< Is it enabled ? */
 #define PLAYLIST_DEL_FLAG       0x08     /**< Autodelete ? */
 #define PLAYLIST_RO_FLAG        0x10    /**< Write-enabled ? */
+#define PLAYLIST_REMOVE_FLAG    0x20    /**< Remove this item at the end */
 
 /**
  * playlist view
@@ -215,8 +216,8 @@ struct playlist_t
 /* Helper to add an item */
 struct playlist_add_t
 {
-    playlist_item_t *p_node;
-    playlist_item_t *p_item;
+    int i_node;
+    int i_item;
     int i_view;
     int i_position;
 };

@@ -191,7 +191,8 @@ struct sap_announce_t
     /* SAP annnounces must only contain one SDP */
     sdp_t       *p_sdp;
 
-    playlist_item_t *p_item;
+    int i_item_id;
+//    playlist_item_t *p_item;
 };
 
 struct services_discovery_sys_t
@@ -527,18 +528,23 @@ static void Run( services_discovery_t *p_sd )
             if( mdate() - p_sd->p_sys->pp_announces[i]->i_last > i_timeout )
             {
                 struct sap_announce_t *p_announce;
+                playlist_item_t * p_item;
                 p_announce = p_sd->p_sys->pp_announces[i];
-
-                msg_Dbg( p_sd, "Time out for %s, deleting (%i/%i)",
-                        p_announce->p_item->input.psz_name,
-                        i , p_sd->p_sys->i_announces );
 
                 /* Remove the playlist item */
                 p_playlist = vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
                               FIND_ANYWHERE );
                 if( p_playlist )
                 {
-                    playlist_Delete( p_playlist, p_announce->p_item->input.i_id );
+                    p_item = playlist_ItemGetById( p_playlist,
+                                                   p_announce->i_item_id );
+                    if( !p_item ) continue;
+
+                    msg_Dbg( p_sd, "Time out for %s, deleting (%i/%i)",
+                                   p_item->input.psz_name,
+                                   i , p_sd->p_sys->i_announces );
+
+                    playlist_Delete( p_playlist, p_announce->i_item_id );
                     vlc_object_release( p_playlist );
                 }
 
@@ -802,7 +808,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->i_last = mdate();
     p_sap->i_hash = i_hash;
     p_sap->p_sdp = p_sdp;
-    p_sap->p_item = NULL;
+    p_sap->i_item_id = -1;
 
     /* Create the playlist item here */
     p_item = playlist_ItemNew( p_sd, p_sap->p_sdp->psz_uri, psz_value );
@@ -877,7 +883,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
 
     vlc_object_release( p_playlist );
 
-    p_sap->p_item = p_item;
+    p_sap->i_item_id = p_item->input.i_id;
 
     TAB_APPEND( p_sd->p_sys->i_announces,
                 p_sd->p_sys->pp_announces, p_sap );
@@ -1432,9 +1438,9 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
         return VLC_EGENERIC;
     }
 
-    if( p_announce->p_item )
+    if( p_announce->i_item_id > -1 )
     {
-        playlist_LockDelete( p_playlist, p_announce->p_item->input.i_id );
+        playlist_LockDelete( p_playlist, p_announce->i_item_id );
     }
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)

@@ -110,7 +110,7 @@
                                         FIND_ANYWHERE );
 
     int i_index;
-    i_current_view = VIEW_SIMPLE;
+    i_current_view = VIEW_CATEGORY;
     playlist_ViewUpdate( p_playlist, i_current_view );
 
     [o_outline_view setTarget: self];

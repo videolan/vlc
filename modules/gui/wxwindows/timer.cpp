@@ -132,8 +132,6 @@ void Timer::Notify()
         if( p_intf->p_sys->p_input )
         {
             p_main_interface->slider->SetValue( 0 );
-            b_slider_shown = VLC_FALSE;
-            b_disc_shown = VLC_FALSE;
 
             char *psz_now_playing = vlc_input_item_GetInfo(
                 p_intf->p_sys->p_input->input.p_item,
@@ -221,9 +219,8 @@ void Timer::Notify()
             var_Get( p_input, "position", &pos );
 
             var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
-            if( val.i_int > 0 && !b_disc_shown )
+            if( val.i_int > 0 && !p_main_interface->disc_menu_button->IsShown() )
             {
-                b_disc_shown = VLC_TRUE;
                 vlc_value_t val;
 
                     #define HELP_MENU N_("Menu")
@@ -262,47 +259,21 @@ void Timer::Notify()
                         wxU(_( HELP_NTR ) ) );
                 }
 
-                p_main_interface->disc_frame->Show();
-                p_main_interface->slider_sizer->Show(
-                    p_main_interface->disc_frame );
+                p_main_interface->ShowDiscFrame();
             }
 
-                if( pos.f_float > 0.0 )
-                {
-                    /* Done like this, as it's the only way to know if the */
-                    /* slider has to be displayed */
 
-                if( !b_slider_shown )
-                {
-                  b_slider_shown = VLC_TRUE;
-                    p_main_interface->slider_frame->Show();
-                    p_main_interface->frame_sizer->Show(
-                        p_main_interface->slider_frame );
-
-                    p_main_interface->frame_sizer->Layout();
-                  if (size_to_video)
+            if( pos.f_float > 0.0 )
                   {
-                    p_main_interface->frame_sizer->Fit( p_main_interface );
-                }
-            }
+                /* Show the slider if it's position is significant */
+                p_main_interface->ShowSlider();
             }
             else
             {
-                if( b_slider_shown )
-                {
-                  p_main_interface->slider_frame->Hide();
-                  p_main_interface->frame_sizer->Hide(
-                      p_main_interface->slider_frame );
-
-                  p_main_interface->frame_sizer->Layout();
-                  if (size_to_video)
-                  {
-                    p_main_interface->frame_sizer->Fit( p_main_interface );
-                  }
-                }
+                p_main_interface->m_slider_timer.Start(1000, wxTIMER_ONE_SHOT);
             }
 
-            if( p_intf->p_sys->b_playing && b_slider_shown )
+            if( p_intf->p_sys->b_playing && p_main_interface->slider_frame->IsShown() )
             {
                 /* Update the slider if the user isn't dragging it. */
                 if( p_intf->p_sys->b_slider_free )
@@ -337,16 +308,12 @@ void Timer::Notify()
             }
 #if 0
         vlc_mutex_lock( &p_input->stream.stream_lock );
-            if( p_intf->p_sys->p_input->stream.b_seekable && !b_slider_shown )
+            if( p_intf->p_sys->p_input->stream.b_seekable &&
+                !p_main_interface->slider_frame->IsShown() )
             {
                 /* Done like this because b_seekable is set slightly after
                  * the new input object is available. */
-                b_slider_shown = VLC_TRUE;
-                p_main_interface->slider_frame->Show();
-                p_main_interface->frame_sizer->Show(
-                    p_main_interface->slider_frame );
-                p_main_interface->frame_sizer->Layout();
-                p_main_interface->frame_sizer->Fit( p_main_interface );
+                p_main_interface->ShowSlider();
             }
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {

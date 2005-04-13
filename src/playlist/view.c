@@ -309,8 +309,8 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
         playlist_NodeAppend( p_playlist, i_view, p_item, p_parent );
     }
 
-    p_add->p_node = p_parent;
-    p_add->p_item = p_item;
+    p_add->i_node = p_parent ? p_parent->input.i_id : -1;
+    p_add->i_item = p_item->input.i_id;
     p_add->i_view = i_view;
     val.p_address = p_add;
     var_Set( p_playlist, "item-append", val);
@@ -419,7 +419,6 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         {
             REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
         }
-        
         playlist_ItemDelete( p_root );
     }
     return VLC_SUCCESS;

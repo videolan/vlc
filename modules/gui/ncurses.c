@@ -224,7 +224,7 @@ static int Open( vlc_object_t *p_this )
     var_Set( p_intf->p_vlc, "verbose", val );
 
     /* Set defaul playlist view */
-    p_sys->i_current_view = VIEW_SIMPLE;
+    p_sys->i_current_view = VIEW_CATEGORY;
     p_sys->pp_plist = NULL;
     p_sys->i_plist_entries = 0;
     p_sys->b_need_update = VLC_FALSE;
@@ -439,14 +439,11 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             case 'v':
                 switch( p_sys->i_current_view )
                 {
-                    case VIEW_SIMPLE:
-                        p_sys->i_current_view = VIEW_CATEGORY;
-                        break;
                     case VIEW_CATEGORY:
                         p_sys->i_current_view = VIEW_ALL;
                         break;
                     default:
-                        p_sys->i_current_view = VIEW_SIMPLE;
+                        p_sys->i_current_view = VIEW_CATEGORY;
                 }
                 PlaylistRebuild( p_intf );
                 FindIndex( p_intf );

@@ -200,8 +200,8 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         {
             playlist_NodeAppend( p_playlist, VIEW_CATEGORY, p_item,
                                  p_playlist->p_general );
-            p_add->p_item = p_item;
-            p_add->p_node = p_playlist->p_general;
+            p_add->i_item = p_item->input.i_id;
+            p_add->i_node = p_playlist->p_general->input.i_id;
             p_add->i_view = VIEW_CATEGORY;
             val.p_address = p_add;
             var_Set( p_playlist, "item-append", val );
@@ -215,26 +215,6 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 
         p_view = playlist_ViewFind( p_playlist, VIEW_ALL );
         playlist_ItemAddParent( p_item, VIEW_ALL, p_view->p_root );
-
-        /* Also add the item to the "simple" view */
-        p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
-
-        if( b_end == VLC_TRUE )
-        {
-            playlist_NodeAppend( p_playlist, VIEW_SIMPLE,p_item,
-                                  p_view->p_root );
-            p_add->p_item = p_item;
-            p_add->p_node = p_view->p_root;
-            p_add->i_view = VIEW_SIMPLE;
-            val.p_address = p_add;
-            var_Set( p_playlist, "item-append", val );
-        }
-        else
-        {
-            playlist_NodeInsert( p_playlist, VIEW_SIMPLE,p_item,
-                                  p_view->p_root, i_pos );
-        }
-
 
         /* FIXME : Update sorted views */
 
@@ -252,7 +232,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     {
         p_playlist->request.b_request = VLC_TRUE;
         /* FIXME ... */
-        p_playlist->request.i_view = VIEW_SIMPLE;
+        p_playlist->request.i_view = VIEW_CATEGORY;
         p_playlist->request.p_node = p_view->p_root;
         p_playlist->request.p_item = p_item;
 
@@ -356,8 +336,8 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     /* TODO: Handle modes */
     playlist_NodeAppend( p_playlist, i_view, p_item, p_parent );
 
-    p_add->p_item = p_item;
-    p_add->p_node = p_parent;
+    p_add->i_item = p_item->input.i_id;
+    p_add->i_node = p_parent->input.i_id;
     p_add->i_view = i_view;
     val.p_address = p_add;
     var_Set( p_playlist, "item-append", val );
@@ -480,7 +460,6 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
     {
         return p_playlist->pp_all_items[i];
     }
-        
     return NULL;
 }
 
@@ -643,6 +622,7 @@ int playlist_Replace( playlist_t *p_playlist, playlist_item_t *p_olditem,
 int playlist_Delete( playlist_t * p_playlist, int i_id )
 {
     int i, i_top, i_bottom;
+    vlc_bool_t b_flag = VLC_FALSE;
 
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
 
@@ -672,14 +652,15 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
         REMOVE_ELEM( p_playlist->pp_all_items, p_playlist->i_all_size, i );
     }
 
-    
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )
     {
         /* Hack we don't call playlist_Control for lock reasons */
         p_playlist->status.i_status = PLAYLIST_STOPPED;
         p_playlist->request.b_request = VLC_TRUE;
-        p_playlist->status.p_item = NULL;
+//        p_playlist->status.p_item = NULL;
+        msg_Info( p_playlist, "stopping playback" );
+        b_flag = VLC_TRUE;
     }
 
     msg_Info( p_playlist, "deleting playlist item `%s'",
@@ -698,7 +679,10 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
 
     /* TODO : Update views */
 
-    playlist_ItemDelete( p_item );
+    if( b_flag == VLC_FALSE )
+        playlist_ItemDelete( p_item );
+    else
+        p_item->i_flags |= PLAYLIST_REMOVE_FLAG;
 
     return VLC_SUCCESS;
 }

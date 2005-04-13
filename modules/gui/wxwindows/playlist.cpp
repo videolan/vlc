@@ -216,7 +216,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     p_view_menu = NULL;
     p_sd_menu = SDMenu();
 
-    i_current_view = VIEW_SIMPLE;
+    i_current_view = VIEW_CATEGORY;
     b_changed_view = VLC_FALSE;
 
     i_title_sorted = 0;
@@ -540,26 +540,31 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
 void Playlist::AppendItem( wxCommandEvent& event )
 {
     playlist_add_t *p_add = (playlist_add_t *)event.GetClientData();
+    playlist_item_t *p_item = NULL;
 
     wxTreeItemId item,node;
 
-    if( p_add->i_view != i_current_view || !p_add->p_node )
+    if( p_add->i_view != i_current_view )
     {
         goto update;
     }
 
-    node = FindItem( treectrl->GetRootItem(), p_add->p_node->input.i_id );
+    node = FindItem( treectrl->GetRootItem(), p_add->i_node );
     if( !node.IsOk() )
     {
         goto update;
     }
 
-    item = treectrl->AppendItem( node,
-                                 wxL2U( p_add->p_item->input.psz_name ), -1,-1,
-                                 new PlaylistItem( p_add->p_item ) );
-    treectrl->SetItemImage( item, p_add->p_item->input.i_type );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
+    if( !p_item )
+        goto update;
 
-    if( item.IsOk() && p_add->p_item->i_children == -1 )
+    item = treectrl->AppendItem( node,
+                                 wxL2U( p_item->input.psz_name ), -1,-1,
+                                 new PlaylistItem( p_item ) );
+    treectrl->SetItemImage( item, p_item->input.i_type );
+
+    if( item.IsOk() && p_item->i_children == -1 )
     {
         UpdateTreeItem( item );
     }
@@ -1175,10 +1180,6 @@ wxMenu * Playlist::ViewMenu()
     /* FIXME : have a list of "should have" views */
     p_view_menu->Append( FirstView_Event + VIEW_CATEGORY,
                            wxU(_("Normal") ) );
-/*    p_view_menu->Append( FirstView_Event + VIEW_SIMPLE,
-                           wxU(_("Manually added") ) );
-    p_view_menu->Append( FirstView_Event + VIEW_ALL,
-                           wxU(_("All items, unsorted") ) ); */
     p_view_menu->Append( FirstView_Event + VIEW_S_AUTHOR,
                            wxU(_("Sorted by artist") ) );
 

@@ -123,7 +123,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->pp_all_items = 0;
 
     playlist_ViewInsert( p_playlist, VIEW_CATEGORY, TITLE_CATEGORY );
-    playlist_ViewInsert( p_playlist, VIEW_SIMPLE, TITLE_SIMPLE );
     playlist_ViewInsert( p_playlist, VIEW_ALL, TITLE_ALL );
 
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
@@ -135,8 +134,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     /* Set startup status
      * We set to simple view on startup for interfaces that don't do
      * anything */
-    p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
-    p_playlist->status.i_view = VIEW_SIMPLE;
+    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+    p_playlist->status.i_view = VIEW_CATEGORY;
     p_playlist->status.p_item = NULL;
     p_playlist->status.p_node = p_view->p_root;
     p_playlist->request.b_request = VLC_FALSE;
@@ -543,6 +542,13 @@ static void RunThread ( playlist_t *p_playlist )
 
                 i_vout_destroyed_date = 0;
                 i_sout_destroyed_date = 0;
+
+                if( p_playlist->status.p_item->i_flags
+                    & PLAYLIST_REMOVE_FLAG )
+                {
+                     playlist_ItemDelete( p_item );
+                     p_playlist->status.p_item = NULL;
+                }
 
                 continue;
             }

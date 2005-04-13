@@ -212,6 +212,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
 
     EVT_TIMER(ID_CONTROLS_TIMER, Interface::OnControlsTimer)
+    EVT_TIMER(ID_SLIDER_TIMER, Interface::OnSliderTimer)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -303,6 +304,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     SetupHotkeys();
 
     m_controls_timer.SetOwner(this, ID_CONTROLS_TIMER);
+    m_slider_timer.SetOwner(this, ID_SLIDER_TIMER);
 
     /* Start timer */
     timer = new Timer( p_intf, this );
@@ -677,6 +679,73 @@ void Interface::SetupHotkeys()
     delete [] p_entries;
 }
 
+void Interface::HideSlider(bool layout)
+{
+  ShowSlider(false, layout);
+}
+
+void Interface::ShowSlider(bool show, bool layout)
+{
+  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+  if (show)
+  {
+    //prevent the hide timers from hiding it now
+    m_slider_timer.Stop();
+    m_controls_timer.Stop();
+
+    slider_frame->Show();
+    frame_sizer->Show( slider_frame );
+  }
+  else
+  {
+    slider_frame->Hide();
+    frame_sizer->Hide( slider_frame );
+  }
+
+  if (layout)
+  {
+    frame_sizer->Layout();
+    if (size_to_video)
+    {
+      frame_sizer->Fit( this );
+    }
+  }
+}
+
+void Interface::HideDiscFrame(bool layout)
+{
+  ShowDiscFrame(false, layout);
+}
+
+void Interface::ShowDiscFrame(bool show, bool layout)
+{
+  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
+
+  if (show)
+  {
+    //prevent the hide timer from hiding it now
+    m_controls_timer.Stop();
+
+    disc_frame->Show();
+    slider_sizer->Show( disc_frame );
+  }
+  else
+  {
+    disc_frame->Hide();
+    slider_sizer->Hide( disc_frame );
+  }
+
+  if (layout)
+  {
+    slider_sizer->Layout();
+    if (size_to_video)
+    {
+      slider_sizer->Fit( slider_frame );
+    }
+  }
+}
+
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
@@ -686,21 +755,20 @@ void Interface::OnControlsTimer(wxTimerEvent& WXUNUSED(event))
   int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
   
   /* Hide slider and Disc Buttons */
-  disc_frame->Hide();
-  slider_sizer->Hide( disc_frame );
+  //postpone layout, we'll do it ourselves
+  HideDiscFrame(false);
+  HideSlider(false);
+
   slider_sizer->Layout();
   if (size_to_video)
   {
     slider_sizer->Fit( slider_frame );
   }
+}
 
-  slider_frame->Hide();
-  frame_sizer->Hide( slider_frame );
-  frame_sizer->Layout();
-  if (size_to_video)
+void Interface::OnSliderTimer(wxTimerEvent& WXUNUSED(event))
   {
-    frame_sizer->Fit( this );
-  }
+  HideSlider();
 }
 
 void Interface::OnMenuOpen(wxMenuEvent& event)

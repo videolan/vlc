@@ -542,6 +542,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     panel_sizer->Add( label, 0, wxEXPAND | wxALL, 5 );
 #if (!wxCHECK_VERSION(2,5,0))
     panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
+#else
+    panel_sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
 #endif
     panel_sizer->Add( common_opt_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );

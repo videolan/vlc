@@ -89,6 +89,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 enum{
   ID_CONTROLS_TIMER,
+  ID_SLIDER_TIMER,
 };
 
 class DialogsProvider;
@@ -184,13 +185,14 @@ public:
     virtual void Notify();
 
 private:
+    //use wxWindow::IsShown instead
+    //vlc_bool_t b_slider_shown;
+    //vlc_bool_t b_disc_shown;
     intf_thread_t *p_intf;
     Interface *p_main_interface;
     vlc_bool_t b_init;
     int i_old_playing_status;
     int i_old_rate;
-    vlc_bool_t b_slider_shown;
-    vlc_bool_t b_disc_shown;
 };
 
 
@@ -333,10 +335,16 @@ public:
     wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
 
+    void HideSlider(bool layout = true);
+    void ShowSlider(bool show = true, bool layout = true);
+
     wxSlider    *slider;
     wxWindow    *slider_frame;
     wxBoxSizer  *slider_sizer;
     wxPanel     *extra_frame;
+
+    void HideDiscFrame(bool layout = true);
+    void ShowDiscFrame(bool show = true, bool layout = true);
 
     wxPanel         *disc_frame;
     wxBoxSizer      *disc_sizer;
@@ -356,6 +364,7 @@ public:
 #endif
 
     wxTimer m_controls_timer;
+    wxTimer m_slider_timer;
 
 private:
     void SetupHotkeys();
@@ -367,6 +376,7 @@ private:
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnControlsTimer(wxTimerEvent& WXUNUSED(event));
+    void OnSliderTimer(wxTimerEvent& WXUNUSED(event));
 
     void OnExit( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
