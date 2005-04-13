@@ -346,6 +346,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("SAP"), p_view->p_root );
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
+    p_sys->p_node->i_flags =~ PLAYLIST_SKIP_FLAG;
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
 
@@ -858,8 +859,11 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
                                                 psz_grp );
 
             if( p_child == NULL )
+            {
                 p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                                psz_grp, p_sd->p_sys->p_node );
+                p_child->i_flags =~ PLAYLIST_SKIP_FLAG;
+            }
             free( psz_grp );
         }
         else

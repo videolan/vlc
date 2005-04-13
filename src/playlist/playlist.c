@@ -794,7 +794,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     }
 
     if( !p_playlist->request.b_request && p_playlist->status.p_item &&
-        !(p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG) )
+        !( p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG ) )
     {
         msg_Dbg( p_playlist, "no-skip mode, stopping") ;
         return NULL;
@@ -947,7 +947,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             {
                 p_playlist->i_index++;
                 p_new = p_playlist->pp_items[p_playlist->i_index];
-                if( !(p_new->i_flags & PLAYLIST_SKIP_FLAG) )
+                if( !( p_new->i_flags & PLAYLIST_SKIP_FLAG ) )
                 {
                     return NULL;
                 }
@@ -988,6 +988,8 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                                    p_playlist->status.p_node,
                                    NULL );
                 }
+                if( p_new != NULL && !(p_new->i_flags & PLAYLIST_SKIP_FLAG) )
+                    return NULL;
             }
         }
     }

@@ -362,7 +362,7 @@ bool Instance::OnInit()
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            playlist_Play( p_playlist );
+            playlist_LockControl( p_playlist, PLAYLIST_AUTOPLAY );
             vlc_object_release( p_playlist );
         }
     }
