@@ -399,9 +399,8 @@ public:
         return ( i_user_start_time < item.i_user_start_time || (i_user_start_time == item.i_user_start_time && i_user_end_time < item.i_user_end_time) );
     }
 
-protected:
-    bool Enter();
-    bool Leave();
+    bool Enter() const;
+    bool Leave() const;
 };
 
 class chapter_edition_t : public chapter_item_t
@@ -767,13 +766,13 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_segment = p_stream->segments[0];
-    if( p_segment->cluster == NULL )
+    if( p_segment->cluster != NULL )
     {
-        msg_Err( p_demux, "cannot find any cluster, damaged file ?" );
-        goto error;
+        msg_Warn( p_demux, "cannot find any cluster, damaged file ?" );
+
+        // reset the stream reading to the first cluster of the segment used
+        p_stream->p_in->setFilePointer( p_segment->cluster->GetElementPosition() );
     }
-    // reset the stream reading to the first cluster of the segment used
-    p_stream->p_in->setFilePointer( p_segment->cluster->GetElementPosition() );
 
     /* get the files from the same dir from the same family (based on p_demux->psz_path) */
     if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
@@ -1702,9 +1701,12 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
         psz_curr_chapter = editions[i_current_edition].FindTimecode( sys.i_pts );
 
         /* we have moved to a new chapter */
-        if (psz_curr_chapter != NULL && psz_current_chapter != NULL && psz_current_chapter != psz_curr_chapter)
+        if (psz_curr_chapter != NULL && psz_current_chapter != psz_curr_chapter)
         {
-            if (psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num && psz_curr_chapter->i_seekpoint_num > 0)
+            if ( psz_current_chapter != NULL )
+                psz_current_chapter->Leave();
+
+            if ( psz_curr_chapter->i_seekpoint_num > 0 )
             {
                 demux.info.i_update |= INPUT_UPDATE_SEEKPOINT;
                 demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
@@ -1712,15 +1714,12 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
 
             if ( editions[i_current_edition].b_ordered )
             {
-                /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
-                if (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time)
-                    Seek( demux, sys.i_pts, 0, psz_curr_chapter );
-                /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
-                /* only seek after each duration >= end timecode of the current chapter */
-            }
+                psz_curr_chapter->Enter();
 
-//            i_user_time = psz_curr_chapter->i_user_start_time - psz_curr_chapter->i_start_time;
-//            i_start_pts = psz_curr_chapter->i_user_start_time;
+                // only seek if necessary
+                if ( psz_current_chapter == NULL || (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time) )
+                    Seek( demux, sys.i_pts, 0, psz_curr_chapter );
+            }
         }
         psz_current_chapter = psz_curr_chapter;
     }
@@ -1890,10 +1889,17 @@ static int Demux( demux_t *p_demux)
         {
             if ( p_vsegment->EditionIsOrdered() )
             {
+                const chapter_item_t *p_chap = p_vsegment->CurrentChapter();
                 // check if there are more chapters to read
-                if ( p_vsegment->CurrentChapter() != NULL )
+                if ( p_chap != NULL )
                 {
-                    p_sys->i_pts = p_vsegment->CurrentChapter()->i_user_end_time;
+                    /* TODO handle successive chapters with the same user_start_time/user_end_time
+                    if ( p_chap->i_user_start_time == p_chap->i_user_start_time )
+                        p_vsegment->SelectNext();
+                    */
+                    p_sys->i_pts = p_chap->i_user_end_time;
+                    p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
+
                     return 1;
                 }
 
@@ -3429,6 +3435,14 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
 
     if ( b_ordered )
     {
+        // the ordered chapters always start at zero
+        if ( i_prev_user_time == -1 )
+        {
+            if ( i_user_time == -1 )
+                i_user_time = 0;
+            i_prev_user_time = 0;
+        }
+
         i_user_start_time = i_prev_user_time;
         if ( i_end_time != -1 && i_user_time == i_prev_user_time )
         {
@@ -3472,7 +3486,9 @@ const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) co
 {
     const chapter_item_t *psz_result = NULL;
 
-    if (i_user_timecode >= i_user_start_time && i_user_timecode < i_user_end_time)
+    if ( i_user_timecode >= i_user_start_time && 
+        ( i_user_timecode < i_user_end_time || 
+          ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
     {
         std::vector<chapter_item_t>::const_iterator index = sub_chapters.begin();
         while ( index != sub_chapters.end() && psz_result == NULL )
@@ -3907,4 +3923,14 @@ void chapter_codec_cmds_t::AddCommand( const KaxChapterProcessCommand & command 
             }
         }
     }
+}
+
+bool chapter_item_t::Enter() const
+{
+    return true;
+}
+
+bool chapter_item_t::Leave() const
+{
+    return true;
 }
