@@ -1700,7 +1700,7 @@ static void CacheLoad( vlc_object_t *p_this )
 #define LOAD_STRING(a) \
     { if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
           != sizeof(i_size) ) goto error; \
-      if( i_size && i_size > 16384 ) { \
+      if( i_size && i_size < 16384 ) { \
           a = malloc( i_size ); \
           if( fread( a, sizeof(char), i_size, file ) != (size_t)i_size ) \
               goto error; \
