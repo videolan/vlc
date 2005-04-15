@@ -260,8 +260,9 @@ void Timer::Notify()
             }
 
 
-            if( pos.f_float > 0.0 )
-                  {
+            if( pos.f_float > 0.0 &&
+                !p_main_interface->slider_frame->IsShown() )
+            {
                 /* Show the slider if it's position is significant */
                 p_main_interface->ShowSlider();
             }
@@ -304,52 +305,7 @@ void Timer::Notify()
                     }
                 }
             }
-#if 0
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-            if( p_intf->p_sys->p_input->stream.b_seekable &&
-                !p_main_interface->slider_frame->IsShown() )
-            {
-                /* Done like this because b_seekable is set slightly after
-                 * the new input object is available. */
-                p_main_interface->ShowSlider();
-            }
-            if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
-            {
-                /* Update the slider if the user isn't dragging it. */
-                if( p_intf->p_sys->b_slider_free )
-                {
-                    vlc_value_t pos;
-                    char psz_time[ MSTRTIME_MAX_SIZE ];
-                    char psz_total[ MSTRTIME_MAX_SIZE ];
-                    vlc_value_t time;
-                    mtime_t i_seconds;
 
-                    /* Update the value */
-                    var_Get( p_input, "position", &pos );
-                    if( pos.f_float >= 0.0 )
-                    {
-                        p_intf->p_sys->i_slider_pos =
-                            (int)(SLIDER_MAX_POS * pos.f_float);
-
-                        p_main_interface->slider->SetValue(
-                            p_intf->p_sys->i_slider_pos );
-
-                        var_Get( p_intf->p_sys->p_input, "time", &time );
-                        i_seconds = time.i_time / 1000000;
-                        secstotimestr ( psz_time, i_seconds );
-
-                        var_Get( p_intf->p_sys->p_input, "length",  &time );
-                        i_seconds = time.i_time / 1000000;
-                        secstotimestr ( psz_total, i_seconds );
-
-                        p_main_interface->statusbar->SetStatusText(
-                            wxU(psz_time) + wxString(wxT(" / ")) +
-                            wxU(psz_total), 0 );
-                    }
-                }
-            }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-#endif
             /* Take care of the volume, etc... */
             p_main_interface->Update();
 
