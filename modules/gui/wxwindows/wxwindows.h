@@ -143,6 +143,7 @@ struct intf_sys_t
     /* Embedded vout */
     VideoWindow         *p_video_window;
     wxBoxSizer          *p_video_sizer;
+    vlc_bool_t          b_video_autosize;
 
     /* Aout */
     aout_instance_t     *p_aout;

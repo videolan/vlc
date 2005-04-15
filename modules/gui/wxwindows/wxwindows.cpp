@@ -123,7 +123,7 @@ vlc_module_begin();
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
     add_bool( "wxwin-minimal", 0, NULL,
               MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
-    add_bool( "wxwin-size-to-video", 1, NULL,
+    add_bool( "wxwin-autosize", 1, NULL,
               SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wxwin-systray", 0, NULL,
@@ -178,8 +178,11 @@ static int Open( vlc_object_t *p_this )
     /* We support play on start */
     p_intf->b_play = VLC_TRUE;
 
-    /* */
+    /* Load saved window settings */
     p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );
+
+    p_intf->p_sys->b_video_autosize =
+        config_GetInt( p_intf, "wxwin-autosize" );
 
     return VLC_SUCCESS;
 }

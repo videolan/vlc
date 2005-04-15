@@ -111,7 +111,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     vlc_mutex_init( p_intf, &lock );
 
-    b_auto_size = config_GetInt( p_intf, "wxwin-size-to-video" );
+    b_auto_size = config_GetInt( p_intf, "wxwin-autosize" );
 
     p_vout = NULL;
 
@@ -248,18 +248,16 @@ static void ReleaseWindow( intf_thread_t *p_intf, void *p_window )
 
 void VideoWindow::ReleaseWindow( void *p_window )
 {
-    if( !b_auto_size ) return;
-
     vlc_mutex_lock( &lock );
-
     p_vout = NULL;
+    vlc_mutex_unlock( &lock );
+
+    if( !b_auto_size ) return;
 
 #if defined(__WXGTK__) || defined(WIN32)
     wxSizeEvent event( wxSize(0, 0), UpdateHide_Event );
     AddPendingEvent( event );
 #endif
-
-    vlc_mutex_unlock( &lock );
 }
 
 void VideoWindow::UpdateSize( wxEvent &_event )
@@ -297,7 +295,7 @@ void VideoWindow::OnHideTimer( wxTimerEvent& WXUNUSED(event))
         b_shown = VLC_FALSE;
 
         SetSize(0,0);
-        Hide();
+        Show();
     }
     //ok I cheat here, but is it ever not 0,0?
     p_intf->p_sys->p_video_sizer->SetMinSize( wxSize(0,0) );

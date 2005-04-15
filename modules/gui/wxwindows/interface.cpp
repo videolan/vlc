@@ -363,9 +363,7 @@ void Interface::OnControlEvent( wxCommandEvent& event )
     {
     case 0:
         {
-          int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
-
-          if (size_to_video)
+          if( p_intf->p_sys->b_video_autosize )
           {
         frame_sizer->Layout();
         frame_sizer->Fit(this);
@@ -686,8 +684,6 @@ void Interface::HideSlider(bool layout)
 
 void Interface::ShowSlider(bool show, bool layout)
 {
-  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
-
   if (show)
   {
     //prevent the hide timers from hiding it now
@@ -719,7 +715,7 @@ void Interface::ShowSlider(bool show, bool layout)
   if (layout)
   {
     frame_sizer->Layout();
-    if (size_to_video)
+    if ( p_intf->p_sys->b_video_autosize )
     {
       frame_sizer->Fit( this );
     }
@@ -733,8 +729,6 @@ void Interface::HideDiscFrame(bool layout)
 
 void Interface::ShowDiscFrame(bool show, bool layout)
 {
-  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
-
   if (show)
   {
     //prevent the hide timer from hiding it now
@@ -765,7 +759,7 @@ void Interface::ShowDiscFrame(bool show, bool layout)
   if (layout)
   {
     slider_sizer->Layout();
-    if (size_to_video)
+    if ( p_intf->p_sys->b_video_autosize )
     {
       slider_sizer->Fit( slider_frame );
     }
@@ -778,15 +772,13 @@ void Interface::ShowDiscFrame(bool show, bool layout)
 
 void Interface::OnControlsTimer(wxTimerEvent& WXUNUSED(event))
 {
-  int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
-  
   /* Hide slider and Disc Buttons */
   //postpone layout, we'll do it ourselves
   HideDiscFrame(false);
   HideSlider(false);
 
   slider_sizer->Layout();
-  if (size_to_video)
+  if ( p_intf->p_sys->b_video_autosize )
   {
     slider_sizer->Fit( slider_frame );
     frame_sizer->Fit( this );

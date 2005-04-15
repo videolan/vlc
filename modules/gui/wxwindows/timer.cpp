@@ -161,8 +161,6 @@ void Timer::Notify()
     }
     else if( p_intf->p_sys->p_input->b_dead )
     {
-        int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
-
         //controls auto-hide after a timer
         p_main_interface->m_controls_timer.Start(1000, wxTIMER_ONE_SHOT);
 
@@ -184,7 +182,6 @@ void Timer::Notify()
 
     if( p_intf->p_sys->p_input )
     {
-        int size_to_video = config_GetInt( p_intf, "wxwin-size-to-video" );
         input_thread_t *p_input = p_intf->p_sys->p_input;
         vlc_value_t val;
 
