@@ -131,6 +131,7 @@ vlc_module_begin();
 #endif
     add_string( "wxwin-config-last", NULL, NULL,
                 "last config", "last config", VLC_TRUE );
+        change_autosave();
 
     add_submodule();
     set_description( _("wxWindows dialogs provider") );
@@ -537,7 +538,6 @@ WindowSettings::~WindowSettings( )
     }
 
     config_PutPsz( p_intf, "wxwin-config-last", sCfg.mb_str() );
-    config_SaveConfigFile( p_intf, "wxwindows" );
 }
 void WindowSettings::SetScreen( int i_screen_w, int i_screen_h )
 {

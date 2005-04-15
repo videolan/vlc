@@ -344,8 +344,10 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_string( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
                 VLC_TRUE );
+        change_autosave();
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 VLC_TRUE );
+        change_autosave();
 #ifdef WIN32
     add_bool( "skins2-transparency", VLC_FALSE, NULL, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );

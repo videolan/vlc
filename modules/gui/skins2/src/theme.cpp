@@ -110,7 +110,6 @@ void Theme::saveConfig()
 
     // Save config to file
     config_PutPsz( getIntf(), "skins2-config", save );
-    config_SaveConfigFile( getIntf(), "skins2" );
 
     // Free memory
     delete[] save;

@@ -155,6 +155,12 @@ struct module_config_t
     char        *psz_value_orig;
     int          i_value_orig;
     float        f_value_orig;
+
+    /* Option values loaded from config file */
+    char        *psz_value_saved;
+    int          i_value_saved;
+    float        f_value_saved;
+    vlc_bool_t   b_autosave;       /* Config will be auto-saved at exit time */
 };
 
 /*****************************************************************************
@@ -199,6 +205,7 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 
 /* internal only */
 int config_CreateDir( vlc_object_t *, char * );
+int config_AutoSaveConfigFile( vlc_object_t * );
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
@@ -369,3 +376,6 @@ int config_CreateDir( vlc_object_t *, char * );
     p_config[i_config].ppsz_action_text[p_config[i_config].i_action] = \
       action_text; \
     p_config[i_config].i_action++;
+
+#define change_autosave() \
+    p_config[i_config].b_autosave = VLC_TRUE;

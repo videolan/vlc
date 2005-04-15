@@ -245,6 +245,8 @@ void __module_EndBank( vlc_object_t *p_this )
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_this->p_libvlc, "libvlc" );
 
+    config_AutoSaveConfigFile( p_this );
+
 #ifdef HAVE_DYNAMIC_PLUGINS
 #define p_bank p_this->p_libvlc->p_module_bank
     if( p_bank->b_cache ) CacheSave( p_this );
@@ -1698,10 +1700,13 @@ static void CacheLoad( vlc_object_t *p_this )
 #define LOAD_STRING(a) \
     { if( fread( &i_size, sizeof(char), sizeof(i_size), file ) \
           != sizeof(i_size) ) goto error; \
-      if( i_size ) { \
+      if( i_size && i_size > 16384 ) { \
           a = malloc( i_size ); \
           if( fread( a, sizeof(char), i_size, file ) != (size_t)i_size ) \
               goto error; \
+          if( a[i_size-1] ) { \
+              free( a ); a = 0; \
+              goto error; } \
       } else a = 0; \
     } while(0)
 
@@ -1820,6 +1825,10 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
                 strdup( p_module->p_config[i].psz_value_orig ) : 0;
         p_module->p_config[i].i_value = p_module->p_config[i].i_value_orig;
         p_module->p_config[i].f_value = p_module->p_config[i].f_value_orig;
+        p_module->p_config[i].i_value_saved = p_module->p_config[i].i_value;
+        p_module->p_config[i].f_value_saved = p_module->p_config[i].f_value;
+        p_module->p_config[i].psz_value_saved = 0;
+        p_module->p_config[i].b_dirty = VLC_FALSE;
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
 
