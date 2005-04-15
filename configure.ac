@@ -1159,15 +1159,17 @@ if test -n "${with_tuning}"; then
 else
     if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then
         CFLAGS_TUNING="-mcpu=pentiumpro"
-    else
-        if test "${target_cpu}" = "powerpc"; then CFLAGS_TUNING="-mtune=750"; fi
+    elif test "${target_cpu}" = "x86_64"; then
+        CFLAGS_TUNING="-mtune=opteron"
+    elif test "${target_cpu}" = "powerpc"; then
+        CFLAGS_TUNING="-mtune=750";
     fi
 fi
 
 dnl
 dnl  x86 accelerations
 dnl
-if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "x86" -o "${target_cpu}" = "i386"
+if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "x86" -o "${target_cpu}" = "i386" -o "${target_cpu}" = "x86_64"
 then
     ARCH="${ARCH} mmx"
     VLC_ADD_BUILTINS([${ACCEL_MODULES}])
