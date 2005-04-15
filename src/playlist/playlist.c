@@ -397,6 +397,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
     case PLAYLIST_SKIP:
         if( p_playlist->status.i_view > -1 )
         {
+            p_playlist->request.i_view = p_playlist->status.i_view;
             p_playlist->request.p_node = p_playlist->status.p_node;
             p_playlist->request.p_item = p_playlist->status.p_item;
         }
@@ -890,7 +891,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             p_playlist->status.i_view = p_playlist->request.i_view;
             if( !p_view )
             {
-                msg_Err( p_playlist, "p_view is NULL and should not! (FIXME)" );
+                msg_Err( p_playlist, "p_view is NULL and should not! (requested view is %i", p_playlist->request.i_view );
             }
             else if( i_skip > 0 )
             {
