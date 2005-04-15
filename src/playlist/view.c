@@ -400,7 +400,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         }
         var_SetInteger( p_playlist, "item-deleted", p_root->input.i_id );
 
-        i_bottom = 0; i_top = p_playlist->i_all_size;
+        i_bottom = 0; i_top = p_playlist->i_all_size - 1;
         i = i_top / 2;
         while( p_playlist->pp_all_items[i]->input.i_id != p_root->input.i_id &&
                i_top > i_bottom )
