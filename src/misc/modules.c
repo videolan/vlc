@@ -156,6 +156,11 @@ static char * GetWindowsError  ( void );
 #endif
 #endif
 
+
+/* Sub-version number
+ * (only used to avoid breakage in dev version when cache structure changes) */
+#define CACHE_SUBVERSION_NUM 1
+
 /*****************************************************************************
  * module_InitBank: create the module bank.
  *****************************************************************************
@@ -1668,6 +1673,16 @@ static void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
+    /* Check Sub-version number */
+    i_read = fread( &i_marker, sizeof(char), sizeof(i_marker), file );
+    if( i_read != sizeof(i_marker) || i_marker != CACHE_SUBVERSION_NUM )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
+                  "(corrupted header)" );
+        fclose( file );
+        return;
+    }
+
     /* Check the language hasn't changed */
     sprintf( p_lang, "%5.5s", _("C") ); i_size = 5;
     i_read = fread( p_cachelang, sizeof(char), i_size, file );
@@ -1964,6 +1979,11 @@ static void CacheSave( vlc_object_t *p_this )
 
     /* Contains version number */
     fprintf( file, "%s", PLUGINSCACHE_DIR COPYRIGHT_MESSAGE );
+
+    /* Sub-version number (to avoid breakage in the dev version when cache
+     * structure changes) */
+    i_file_size = CACHE_SUBVERSION_NUM;
+    fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
 
     /* Language */
     fprintf( file, "%5.5s", _("C") );
