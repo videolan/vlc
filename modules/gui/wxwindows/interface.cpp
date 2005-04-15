@@ -694,11 +694,24 @@ void Interface::ShowSlider(bool show, bool layout)
     m_slider_timer.Stop();
     m_controls_timer.Stop();
 
+    //prevent continuous layout
+    if (slider_frame->IsShown())
+    {
+      return;
+    }
+
     slider_frame->Show();
     frame_sizer->Show( slider_frame );
   }
   else
   {
+
+    //prevent continuous layout
+    if (!slider_frame->IsShown())
+    {
+      return;
+    }
+
     slider_frame->Hide();
     frame_sizer->Hide( slider_frame );
   }
@@ -727,11 +740,24 @@ void Interface::ShowDiscFrame(bool show, bool layout)
     //prevent the hide timer from hiding it now
     m_controls_timer.Stop();
 
+    //prevent continuous layout
+    if (disc_frame->IsShown())
+    {
+      return;
+    }
+
     disc_frame->Show();
     slider_sizer->Show( disc_frame );
   }
   else
   {
+
+    //prevent continuous layout
+    if (!disc_frame->IsShown())
+    {
+      return;
+    }
+
     disc_frame->Hide();
     slider_sizer->Hide( disc_frame );
   }
@@ -763,6 +789,7 @@ void Interface::OnControlsTimer(wxTimerEvent& WXUNUSED(event))
   if (size_to_video)
   {
     slider_sizer->Fit( slider_frame );
+    frame_sizer->Fit( this );
   }
 }
 
