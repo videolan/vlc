@@ -1200,6 +1200,7 @@ int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 i_value = p_item->i_value_saved;
                 f_value = p_item->f_value_saved;
                 psz_value = p_item->psz_value_saved;
+                if( !psz_value ) psz_value = p_item->psz_value_orig;
             }
 
             if( p_item->i_type & CONFIG_HINT )
@@ -1290,12 +1291,13 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     vlc_list_t *p_list;
     module_t *p_parser;
     module_config_t *p_item;
-    int i_index = 0;
+    int i_index, i_count;
 
     /* Check if there's anything to save */
     vlc_mutex_lock( &p_this->p_vlc->config_lock );
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    i_count = p_list->i_count;
+    for( i_index = 0; i_index < i_count; i_index++ )
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
@@ -1307,11 +1309,12 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         {
             if( p_item->b_autosave && p_item->b_dirty ) break;
         }
+        if( p_item->i_type != CONFIG_HINT_END ) break;
     }
     vlc_list_release( p_list );
     vlc_mutex_unlock( &p_this->p_vlc->config_lock );
 
-    if( i_index == p_list->i_count ) return VLC_SUCCESS;
+    if( i_index == i_count ) return VLC_SUCCESS;
     return SaveConfigFile( p_this, 0, VLC_TRUE );
 }
 
