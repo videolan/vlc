@@ -1068,6 +1068,7 @@ public:
         ID_MESSAGES,
         ID_FILE_INFO,
         ID_BOOKMARKS,
+        ID_VIDEO,
 
         ID_MAX,
     };

@@ -126,10 +126,14 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     wxSize child_size = wxSize(0,0);
     if( !b_auto_size )
     {
+        WindowSettings *ws = p_intf->p_sys->p_window_settings;
+        wxPoint p; bool b_shown;
+
         // Maybe this size should be an option
         child_size = wxSize( wxSystemSettings::GetMetric(wxSYS_SCREEN_X) / 2,
                              wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / 2 );
 
+        ws->GetSettings( WindowSettings::ID_VIDEO, b_shown, p, child_size );
         SetSize( child_size );
     }
 
@@ -166,6 +170,15 @@ VideoWindow::~VideoWindow()
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
+
+#ifdef WIN32
+    if( !b_auto_size )
+    {
+        WindowSettings *ws = p_intf->p_sys->p_window_settings;
+        ws->SetSettings( WindowSettings::ID_VIDEO, true,
+                         GetPosition(), GetSize() );
+    }
+#endif
 
     vlc_mutex_destroy( &lock );
 }
