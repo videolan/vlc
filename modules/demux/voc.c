@@ -57,13 +57,12 @@ struct demux_sys_t
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
-    int64_t         i_block_offset;
+    int64_t         i_block_start;
+    int64_t         i_block_end;
 
     int64_t         i_loop_offset;
     unsigned        i_loop_count;
     unsigned        i_silence_countdown;
-
-    int32_t         i_block_size;    
 
     date_t          pts;
 };
@@ -114,7 +113,7 @@ static int Open( vlc_object_t * p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->i_silence_countdown = p_sys->i_block_offset = p_sys->i_block_size =
+    p_sys->i_silence_countdown = p_sys->i_block_start = p_sys->i_block_end =
     p_sys->i_loop_count = 0;
     p_sys->p_es = NULL;
 
@@ -308,8 +307,8 @@ static int ReadBlockHeader( demux_t *p_demux )
             break;
     }
 
-    p_sys->i_block_size = i_block_size;
-    p_sys->i_block_offset = stream_Tell( p_demux->s );
+    p_sys->i_block_start = stream_Tell( p_demux->s );
+    p_sys->i_block_end = p_sys->i_block_start + i_block_size;
 
     if( i_block_size || p_sys->i_silence_countdown )
     {
@@ -352,19 +351,24 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
-    int64_t     i_offset;
+    int64_t     i_offset, i;
+
+    i_offset = stream_Tell( p_demux->s );
+
+    while( ( i_offset >= p_sys->i_block_end )
+         && ( p_sys->i_silence_countdown == 0 ) )
+        if( ReadBlockHeader( p_demux ) != VLC_SUCCESS )
+            return 0;
 
     if( p_sys->i_silence_countdown == 0 )
     {
-        i_offset = stream_Tell( p_demux->s );
-
-        while( ( i_offset >= p_sys->i_block_offset + p_sys->i_block_size )
-             && ( p_sys->i_silence_countdown == 0 ) )
-            if( ReadBlockHeader( p_demux ) != VLC_SUCCESS )
-                return 0;
+        i = ( p_sys->i_block_end - i_offset )
+            / p_sys->fmt.audio.i_bytes_per_frame;
+        if( i > 100)
+            i = 100;
 
         p_block = stream_Block( p_demux->s,
-                                p_sys->fmt.audio.i_bytes_per_frame );
+                                p_sys->fmt.audio.i_bytes_per_frame * i );
         if( p_block == NULL )
         {
             msg_Warn( p_demux, "cannot read data" );
@@ -373,16 +377,20 @@ static int Demux( demux_t *p_demux )
     }
     else
     {   /* emulates silence from the stream */
-        p_block = block_New( p_demux, 1 );
+        i = p_sys->i_silence_countdown;
+        if (i > 100 )
+            i = 100;
+
+        p_block = block_New( p_demux, i );
         if( p_block == NULL )
             return VLC_ENOMEM;
 
-        p_block->p_buffer[0] = 0;
-        p_sys->i_silence_countdown--;
+        memset( p_block->p_buffer, 0, i );
+        p_sys->i_silence_countdown -= i;
     }
 
     p_block->i_dts = p_block->i_pts =
-        date_Increment( &p_sys->pts, p_sys->fmt.audio.i_frame_length );
+        date_Increment( &p_sys->pts, p_sys->fmt.audio.i_frame_length * i );
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
 
@@ -408,8 +416,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
-    return demux2_vaControlHelper( p_demux->s, p_sys->i_block_offset,
-                                   p_sys->i_block_offset + p_sys->i_block_size,
+    return demux2_vaControlHelper( p_demux->s, p_sys->i_block_start,
+                                   p_sys->i_block_end,
                                    p_sys->fmt.i_bitrate,
                                    p_sys->fmt.audio.i_blockalign,
                                    i_query, args );
