@@ -110,6 +110,9 @@ struct picture_t
 
     /** This way the picture_Release can be overloaded */
     void (*pf_release)( picture_t * );
+
+    /** Next picture in a FIFO a pictures */
+    struct picture_t *p_next;
 };
 
 /**
