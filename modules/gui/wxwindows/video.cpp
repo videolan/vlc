@@ -139,9 +139,6 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     Show();
     b_shown = VLC_TRUE;
 
-    p_child_window->SetBackgroundColour( *wxBLACK );
-    SetBackgroundColour( *wxBLACK );
-
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND );
 
@@ -218,6 +215,10 @@ void *VideoWindow::GetWindow( vout_thread_t *_p_vout,
                        UpdateSize_Event );
     AddPendingEvent( event );
     vlc_mutex_unlock( &lock );
+
+    p_child_window->SetBackgroundColour( *wxBLACK );
+    SetBackgroundColour( *wxBLACK );
+    Refresh();
 
 #ifdef __WXGTK__
     GtkWidget *p_widget = p_child_window->GetHandle();
@@ -302,6 +303,10 @@ void VideoWindow::OnHideTimer( wxTimerEvent& WXUNUSED(event))
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );
+
+    p_child_window->SetBackgroundColour( wxNullColour );
+    SetBackgroundColour( wxNullColour );
+    Refresh();
 }
 
 void VideoWindow::OnControlEvent( wxCommandEvent &event )
