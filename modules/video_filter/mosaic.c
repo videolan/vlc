@@ -39,7 +39,9 @@
 #include "vlc_filter.h"
 #include "vlc_image.h"
 
-#include "../video_output/picture.h"
+#include "mosaic.h"
+
+#define BLANK_DELAY I64C(1000000)
 
 /*****************************************************************************
  * Local prototypes
@@ -58,11 +60,9 @@ static int MosaicCallback( vlc_object_t *, char const *, vlc_value_t,
 struct filter_sys_t
 {
     vlc_mutex_t lock;
+    vlc_mutex_t *p_lock;
 
     image_handler_t *p_image;
-#ifdef IMAGE_2PASSES
-    image_handler_t *p_image2;
-#endif
     picture_t *p_pic;
 
     int i_position; /* mosaic positioning method */
@@ -108,7 +108,7 @@ struct filter_sys_t
 
 #define DELAY_TEXT N_("Delay")
 #define DELAY_LONGTEXT N_("Pictures coming from the picture video outputs " \
-        "will be delayed accordingly (in milliseconds, >= 100 ms). For high " \
+        "will be delayed accordingly (in milliseconds). For high " \
         "values you will need to raise file-caching and others.")
 
 static int pi_pos_values[] = { 0, 1 };
@@ -145,8 +145,10 @@ vlc_module_begin();
     add_bool( "mosaic-keep-picture", 0, NULL, KEEP_TEXT, KEEP_TEXT, VLC_FALSE );
     add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_TEXT, VLC_FALSE );
 
-    add_integer( "mosaic-delay", 100, NULL, DELAY_TEXT, DELAY_LONGTEXT,
+    add_integer( "mosaic-delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
+
+    var_Create( p_module->p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
 
@@ -160,6 +162,7 @@ static int CreateFilter( vlc_object_t *p_this )
     libvlc_t *p_libvlc = p_filter->p_libvlc;
     char *psz_order;
     int i_index;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -174,6 +177,9 @@ static int CreateFilter( vlc_object_t *p_this )
 
     vlc_mutex_init( p_filter, &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
+
+    var_Get( p_libvlc, "mosaic-lock", &val );
+    p_sys->p_lock = val.p_address;
 
 #define GET_VAR( name, min, max )                                           \
     p_sys->i_##name = __MIN( max, __MAX( min,                               \
@@ -216,9 +222,6 @@ static int CreateFilter( vlc_object_t *p_this )
     if ( !p_sys->b_keep )
     {
         p_sys->p_image = image_HandlerCreate( p_filter );
-#ifdef IMAGE_2PASSES
-        p_sys->p_image2 = image_HandlerCreate( p_filter );
-#endif
     }
 
     p_sys->i_order_length = 0;
@@ -244,8 +247,6 @@ static int CreateFilter( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_sys->lock );
 
-    vlc_thread_set_priority( p_filter, VLC_THREAD_PRIORITY_OUTPUT );
-
     return VLC_SUCCESS;
 }
 
@@ -264,9 +265,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     if( !p_sys->b_keep )
     {
         image_HandlerDelete( p_sys->p_image );
-#ifdef IMAGE_2PASSES
-        image_HandlerDelete( p_sys->p_image2 );
-#endif
     }
 
     if( p_sys->i_order_length )
@@ -313,7 +311,7 @@ static void MosaicReleasePicture( picture_t *p_picture )
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    libvlc_t *p_libvlc = p_filter->p_libvlc;
+    bridge_t *p_bridge;
 
     subpicture_t *p_spu;
 
@@ -322,26 +320,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     subpicture_region_t *p_region;
     subpicture_region_t *p_region_prev = NULL;
-
-    picture_vout_t *p_picture_vout;
-    vlc_value_t val, lockval;
-
-    /* Wait for the specified date. This is to avoid running too fast and
-     * take twice the same pictures. */
-    mwait( date - p_sys->i_delay );
-
-    if ( var_Get( p_libvlc, "picture-lock", &lockval ) )
-        return NULL;
-
-    vlc_mutex_lock( lockval.p_address );
-
-    if( var_Get( p_libvlc, "p_picture_vout", &val ) )
-    {
-        vlc_mutex_unlock( lockval.p_address );
-        return NULL;
-    }
-
-    p_picture_vout = val.p_address;
 
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
@@ -360,28 +338,33 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_absolute = VLC_FALSE;
 
     vlc_mutex_lock( &p_sys->lock );
+    vlc_mutex_lock( p_sys->p_lock );
 
-    if( p_sys->i_position == 0 ) /* use automatic positioning */
+    p_bridge = GetBridge( p_filter );
+    if ( p_bridge == NULL )
+    {
+        vlc_mutex_unlock( p_sys->p_lock );
+        vlc_mutex_unlock( &p_sys->lock );
+        return p_spu;
+    }
+
+    if ( p_sys->i_position == 0 ) /* use automatic positioning */
     {
         int i_numpics = p_sys->i_order_length; /* keep slots and all */
-        for( i_index = 0;
-             i_index < p_picture_vout->i_picture_num;
-             i_index++ )
+        for ( i_index = 0; i_index < p_bridge->i_es_num; i_index++ )
         {
-            if( p_picture_vout->p_pic[i_index].i_status
-                           == PICTURE_VOUT_E_OCCUPIED )
+            bridged_es_t *p_es = p_bridge->pp_es[i_index];
+            if ( !p_es->b_empty )
             {
                 i_numpics ++;
-                if( p_sys->i_order_length
-                    && p_picture_vout->p_pic[i_index].psz_id != 0 )
+                if( p_sys->i_order_length && p_es->psz_id != 0 )
                 {
                     /* We also want to leave slots for images given in
                      * mosaic-order that are not available in p_vout_picture */
                     int i;
                     for( i = 0; i < p_sys->i_order_length ; i++ )
                     {
-                        if( !strcmp( p_sys->ppsz_order[i],
-                                     p_picture_vout->p_pic[i_index].psz_id ) )
+                        if( !strcmp( p_sys->ppsz_order[i], p_es->psz_id ) )
                         {
                             i_numpics--;
                             break;
@@ -399,50 +382,66 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     i_real_index = 0;
 
-    for( i_index = 0; i_index < p_picture_vout->i_picture_num; i_index++ )
+    for ( i_index = 0; i_index < p_bridge->i_es_num; i_index++ )
     {
-        picture_vout_e_t *p_pic = &p_picture_vout->p_pic[i_index];
+        bridged_es_t *p_es = p_bridge->pp_es[i_index];
         video_format_t fmt_in = {0}, fmt_out = {0};
         picture_t *p_converted;
-#ifdef IMAGE_2PASSES
-        video_format_t fmt_middle = {0};
-        picture_t *p_middle;
-#endif
 
-        if( p_pic->i_status == PICTURE_VOUT_E_AVAILABLE
-             || p_pic->p_picture == NULL )
-        {
+        if ( p_es->b_empty || p_es->p_picture == NULL )
             continue;
+
+        if ( p_es->p_picture->date + p_sys->i_delay < date )
+        {
+            if ( p_es->p_picture->p_next != NULL )
+            {
+                picture_t *p_next = p_es->p_picture->p_next;
+                p_es->p_picture->pf_release( p_es->p_picture );
+                p_es->p_picture = p_next;
+            }
+            else if ( p_es->p_picture->date + p_sys->i_delay + BLANK_DELAY <
+                        date )
+            {
+                /* Display blank */
+                p_es->p_picture->pf_release( p_es->p_picture );
+                p_es->p_picture = NULL;
+                p_es->pp_last = &p_es->p_picture;
+                continue;
+            }
+            else
+                msg_Dbg( p_filter, "too late picture %lld for %s",
+                         date - p_es->p_picture->date - p_sys->i_delay,
+                         p_es->psz_id );
         }
 
-        if( p_sys->i_order_length == 0 )
+        if ( p_sys->i_order_length == 0 )
         {
             i_real_index++;
         }
         else
         {
             int i;
-            for( i = 0; i <= p_sys->i_order_length; i++ )
+            for ( i = 0; i <= p_sys->i_order_length; i++ )
             {
-                if( i == p_sys->i_order_length ) break;
-                if( strcmp( p_pic->psz_id, p_sys->ppsz_order[i] ) == 0 )
+                if ( i == p_sys->i_order_length ) break;
+                if ( strcmp( p_es->psz_id, p_sys->ppsz_order[i] ) == 0 )
                 {
                     i_real_index = i;
                     break;
                 }
             }
-            if( i == p_sys->i_order_length )
+            if ( i == p_sys->i_order_length )
                 i_real_index = ++i_greatest_real_index_used;
         }
         i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows;
         i_col = i_real_index % p_sys->i_cols ;
 
-        if( !p_sys->b_keep )
+        if ( !p_sys->b_keep )
         {
             /* Convert the images */
-            fmt_in.i_chroma = p_pic->p_picture->format.i_chroma;
-            fmt_in.i_height = p_pic->p_picture->format.i_height;
-            fmt_in.i_width = p_pic->p_picture->format.i_width;
+            fmt_in.i_chroma = p_es->p_picture->format.i_chroma;
+            fmt_in.i_height = p_es->p_picture->format.i_height;
+            fmt_in.i_width = p_es->p_picture->format.i_width;
 
             fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
             fmt_out.i_width = fmt_in.i_width *
@@ -457,42 +456,19 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                       > (float)fmt_in.i_width / (float)fmt_in.i_height )
                 {
                     fmt_out.i_width = ( fmt_out.i_height * fmt_in.i_width )
-                                         / fmt_in.i_height ;
+                                         / fmt_in.i_height;
                 }
                 else
                 {
                     fmt_out.i_height = ( fmt_out.i_width * fmt_in.i_height )
-                                        / fmt_in.i_width ;
+                                        / fmt_in.i_width;
                 }
              }
 
             fmt_out.i_visible_width = fmt_out.i_width;
             fmt_out.i_visible_height = fmt_out.i_height;
 
-#ifdef IMAGE_2PASSES
-            fmt_middle.i_chroma = fmt_in.i_chroma;
-            fmt_middle.i_visible_width = fmt_middle.i_width = fmt_out.i_width;
-            fmt_middle.i_visible_height = fmt_middle.i_height = fmt_out.i_height;
-
-            p_middle = image_Convert( p_sys->p_image2, p_pic->p_picture,
-                                      &fmt_in, &fmt_middle );
-            if( !p_middle )
-            {
-                msg_Warn( p_filter, "image resizing failed" );
-                continue;
-            }
-
-            p_converted = image_Convert( p_sys->p_image, p_middle,
-                                         &fmt_middle, &fmt_out );
-            p_middle->pf_release( p_middle );
-
-            if( !p_converted )
-            {
-                msg_Warn( p_filter, "image chroma conversion failed" );
-                continue;
-            }
-#else
-            p_converted = image_Convert( p_sys->p_image, p_pic->p_picture,
+            p_converted = image_Convert( p_sys->p_image, p_es->p_picture,
                                          &fmt_in, &fmt_out );
             if( !p_converted )
             {
@@ -500,11 +476,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                            "image resizing and chroma conversion failed" );
                 continue;
             }
-#endif
         }
         else
         {
-            p_converted = p_pic->p_picture;
+            p_converted = p_es->p_picture;
             p_converted->i_refcount++;
             fmt_in.i_width = fmt_out.i_width = p_converted->format.i_width;
             fmt_in.i_height = fmt_out.i_height = p_converted->format.i_height;
@@ -520,8 +495,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             msg_Err( p_filter, "cannot allocate SPU region" );
             p_filter->pf_sub_buffer_del( p_filter, p_spu );
             vlc_mutex_unlock( &p_sys->lock );
-            vlc_mutex_unlock( lockval.p_address );
-            return NULL;
+            vlc_mutex_unlock( p_sys->p_lock );
+            return p_spu;
         }
 
         /* HACK ALERT : let's fix the pointers to avoid picture duplication.
@@ -578,8 +553,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_region_prev = p_region;
     }
 
+    vlc_mutex_unlock( p_sys->p_lock );
     vlc_mutex_unlock( &p_sys->lock );
-    vlc_mutex_unlock( lockval.p_address );
 
     return p_spu;
 }

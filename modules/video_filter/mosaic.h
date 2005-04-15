@@ -1,10 +1,11 @@
 /*****************************************************************************
- * picture.h:
+ * mosaic.h:
  *****************************************************************************
  * Copyright (C) 2004-2005 VideoLAN
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,24 +22,37 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _PICTURE_VOUT_H
-#define _PICTURE_VOUT_H 1
-
-#define PICTURE_VOUT_E_AVAILABLE 0
-#define PICTURE_VOUT_E_OCCUPIED 1
-typedef struct picture_vout_e_t
+typedef struct bridged_es_t
 {
+    es_format_t fmt;
     picture_t *p_picture;
-    int i_status;
+    picture_t **pp_last;
+    vlc_bool_t b_empty;
     char *psz_id;
-} picture_vout_e_t;
+} bridged_es_t;
 
-typedef struct picture_vout_t
+typedef struct bridge_t
 {
-    int i_picture_num;
-    picture_vout_e_t *p_pic;
-} picture_vout_t;
+    bridged_es_t **pp_es;
+    int i_es_num;
+} bridge_t;
 
-#undef IMAGE_2PASSES
+#define GetBridge(a) __GetBridge( VLC_OBJECT(a) )
+static bridge_t *__GetBridge( vlc_object_t *p_object )
+{
+    libvlc_t *p_libvlc = p_object->p_libvlc;
+    bridge_t *p_bridge;
+    vlc_value_t val;
 
-#endif
+    if( var_Get( p_libvlc, "mosaic-struct", &val ) != VLC_SUCCESS )
+    {
+        p_bridge = NULL;
+    }
+    else
+    {
+        p_bridge = val.p_address;
+    }    
+
+    return p_bridge;
+}
+

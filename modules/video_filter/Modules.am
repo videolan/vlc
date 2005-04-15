@@ -1,4 +1,4 @@
-SOURCES_mosaic = mosaic.c
+SOURCES_mosaic = mosaic.c mosaic.h
 SOURCES_transform = transform.c
 SOURCES_invert = invert.c
 SOURCES_adjust = adjust.c

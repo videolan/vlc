@@ -986,7 +986,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([externrun])
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap shout])
-  VLC_ADD_PLUGINS([picture mosaic wall motiondetect clone crop])
+  VLC_ADD_PLUGINS([mosaic wall motiondetect clone crop])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
   VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
@@ -1227,7 +1227,7 @@ then
   VLC_ADD_PLUGINS([packetizer_copy])
 
   VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp stream_out_description vod_rtsp])
-  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode stream_out_bridge])
+  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode stream_out_bridge stream_out_mosaic_bridge])
 #  VLC_ADD_PLUGINS([stream_out_transrate])
 
   AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
@@ -2533,7 +2533,7 @@ AC_ARG_ENABLE(speex,
 if test "${enable_speex}" != "no"
 then
   AC_CHECK_HEADERS(speex/speex.h, [
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_toolame}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_speex}"
     AC_CHECK_LIB(speex, speex_decode_int, [
       VLC_ADD_PLUGINS([speex])
       VLC_ADD_LDFLAGS([speex],[-lspeex]) ],

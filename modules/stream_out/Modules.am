@@ -11,3 +11,4 @@ SOURCES_stream_out_gather = gather.c
 SOURCES_stream_out_rtp = rtp.c
 SOURCES_stream_out_switcher = switcher.c
 SOURCES_stream_out_bridge = bridge.c
+SOURCES_stream_out_mosaic_bridge = mosaic_bridge.c

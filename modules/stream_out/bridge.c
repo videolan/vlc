@@ -58,7 +58,7 @@ vlc_module_begin();
     set_shortname( _("Bridge"));
     set_description( _("Bridge stream output"));
     add_submodule();
-    set_section( N_("Bridge out"),NULL);
+    set_section( N_("Bridge out"), NULL );
     set_capability( "sout stream", 50 );
     add_shortcut( "bridge-out" );
     /* Only usable with VLM. No category so not in gui preferences
@@ -69,12 +69,12 @@ vlc_module_begin();
     set_callbacks( OpenOut, CloseOut );
 
     add_submodule();
-    set_section( N_("Bridge in"),NULL);
+    set_section( N_("Bridge in"), NULL );
     set_capability( "sout stream", 50 );
     add_shortcut( "bridge-in" );
     /*set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );*/
-    add_integer( SOUT_CFG_PREFIX_IN "delay", 100, NULL, DELAY_TEXT,
+    add_integer( SOUT_CFG_PREFIX_IN "delay", 0, NULL, DELAY_TEXT,
                  DELAY_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, NULL, ID_OFFSET_TEXT,
                  ID_OFFSET_LONGTEXT, VLC_FALSE );
@@ -109,7 +109,6 @@ typedef struct bridged_es_t
     block_t *p_block;
     block_t **pp_last;
     vlc_bool_t b_empty;
-    int i_id;
 
     /* bridge in part */
     sout_stream_id_t *id;
@@ -150,9 +149,9 @@ static bridge_t *__GetBridge( vlc_object_t *p_object )
 typedef struct out_sout_stream_sys_t
 {
     vlc_mutex_t *p_lock;
+    bridged_es_t *p_es;
     int i_id;
     vlc_bool_t b_inited;
-    int i_position;
 } out_sout_stream_sys_t;
 
 /*****************************************************************************
@@ -160,7 +159,7 @@ typedef struct out_sout_stream_sys_t
  *****************************************************************************/
 static int OpenOut( vlc_object_t *p_this )
 {
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_t     *p_stream = (sout_stream_t *)p_this;
     out_sout_stream_sys_t *p_sys;
     vlc_value_t val;
 
@@ -182,7 +181,6 @@ static int OpenOut( vlc_object_t *p_this )
 
     p_stream->p_sys     = (sout_stream_sys_t *)p_sys;
 
-    /* update p_sout->i_out_pace_nocontrol */
     p_stream->p_sout->i_out_pace_nocontrol++;
 
     return VLC_SUCCESS;
@@ -243,14 +241,12 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_bridge->pp_es = realloc( p_bridge->pp_es,
                                    (p_bridge->i_es_num + 1)
                                      * sizeof(bridged_es_t *) );
-        p_sys->i_position = p_bridge->i_es_num;
         p_bridge->i_es_num++;
         p_bridge->pp_es[i] = malloc( sizeof(bridged_es_t) );
     }
-    else
-        p_sys->i_position = i;
 
-    p_es = p_bridge->pp_es[ p_sys->i_position ];
+    p_sys->p_es = p_es = p_bridge->pp_es[i];
+
     p_es->fmt = *p_fmt;
     p_es->fmt.i_id = p_sys->i_id;
     p_es->p_block = NULL;
@@ -262,7 +258,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_es->b_changed = VLC_TRUE;
 
     msg_Dbg( p_stream, "bridging out input codec=%4.4s id=%d pos=%d",
-             (char*)&p_es->fmt.i_codec, p_es->fmt.i_id, p_sys->i_position );
+             (char*)&p_es->fmt.i_codec, p_es->fmt.i_id, i );
 
     vlc_mutex_unlock( p_sys->p_lock );
 
@@ -272,7 +268,6 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
-    bridge_t *p_bridge;
     bridged_es_t *p_es;
 
     if ( !p_sys->b_inited )
@@ -282,8 +277,7 @@ static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     vlc_mutex_lock( p_sys->p_lock );
 
-    p_bridge = GetBridge( p_stream );
-    p_es = p_bridge->pp_es[ p_sys->i_position ];
+    p_es = p_sys->p_es;
 
     p_es->b_empty = VLC_TRUE;
     block_ChainRelease( p_es->p_block );
@@ -299,7 +293,6 @@ static int SendOut( sout_stream_t *p_stream, sout_stream_id_t *id,
                     block_t *p_buffer )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
-    bridge_t *p_bridge;
     bridged_es_t *p_es;
 
     if ( (out_sout_stream_sys_t *)id != p_sys )
@@ -310,8 +303,7 @@ static int SendOut( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     vlc_mutex_lock( p_sys->p_lock );
 
-    p_bridge = GetBridge( p_stream );
-    p_es = p_bridge->pp_es[ p_sys->i_position ];
+    p_es = p_sys->p_es;
     *p_es->pp_last = p_buffer;
     while ( p_buffer != NULL )
     {
