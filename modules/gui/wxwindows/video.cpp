@@ -171,7 +171,7 @@ VideoWindow::~VideoWindow()
     p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
 
-#ifdef WIN32
+#if 0
     if( !b_auto_size )
     {
         WindowSettings *ws = p_intf->p_sys->p_window_settings;
