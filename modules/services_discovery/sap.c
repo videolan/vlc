@@ -55,7 +55,14 @@
 
 /* SAP is always on that port */
 #define SAP_PORT 9875
-#define SAP_V4_ADDRESS "224.2.127.254"
+/* Global-scope SAP address */
+#define SAP_V4_GLOBAL_ADDRESS   "224.2.127.254"
+/* Organization-local SAP address */
+#define SAP_V4_ORG_ADDRESS      "239.195.255.255"
+/* Local (smallest non-link-local scope) SAP address */
+#define SAP_V4_LOCAL_ADDRESS    "239.255.255.255"
+/* Link-local SAP address */
+#define SAP_V4_LINK_ADDRESS     "224.0.0.255"
 #define ADD_SESSION 1
 
 #define IPV6_ADDR_1 "FF0"  /* Scope is inserted between them */
@@ -299,7 +306,10 @@ static int Open( vlc_object_t *p_this )
 
     if( var_CreateGetInteger( p_sd, "sap-ipv4" ) )
     {
-        InitSocket( p_sd, SAP_V4_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_GLOBAL_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_ORG_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_LOCAL_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
     }
     if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
     {
