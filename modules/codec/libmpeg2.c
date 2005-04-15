@@ -141,7 +141,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_skip     = 0;
     p_sys->b_preroll = VLC_FALSE;
 
-#if defined( __i386__ )
+#if defined( __i386__ ) || defined( __x86_64__ )
     if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
     {
         i_accel |= MPEG2_ACCEL_X86_MMX;

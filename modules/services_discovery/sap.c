@@ -258,8 +258,8 @@ struct demux_sys_t
     static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
     static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
-    static void FreeSDP( sdp_t *p_sdp );
 #endif
+    static void FreeSDP( sdp_t *p_sdp );
 
 /* Detect multicast addresses */
 static int  ismult( char * );

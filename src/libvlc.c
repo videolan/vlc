@@ -574,7 +574,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     if( !config_GetInt( p_vlc, "fpu" ) )
         libvlc.i_cpu &= ~CPU_CAPABILITY_FPU;
 
-#if defined( __i386__ )
+#if defined( __i386__ ) || defined( __x86_64__ )
     if( !config_GetInt( p_vlc, "mmx" ) )
         libvlc.i_cpu &= ~CPU_CAPABILITY_MMX;
     if( !config_GetInt( p_vlc, "3dn" ) )

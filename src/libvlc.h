@@ -1165,7 +1165,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_ADVANCED_CPU );
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, VLC_TRUE );
     add_bool( "fpu", 1, NULL, FPU_TEXT, FPU_LONGTEXT, VLC_TRUE );
-#if defined( __i386__ )
+#if defined( __i386__ ) || defined( __x86_64__ )
     add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_TRUE );
     add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );
     add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, VLC_TRUE );

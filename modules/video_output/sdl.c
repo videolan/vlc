@@ -107,7 +107,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     /* XXX: check for conflicts with the SDL audio output */
     var_Create( p_module->p_libvlc, "sdl", VLC_VAR_MUTEX );
-#if defined( __i386__ )
+#if defined( __i386__ ) || defined( __x86_64__ )
     /* On i386, SDL is linked against svgalib */
     linked_with_a_crap_library_which_uses_atexit();
 #endif
