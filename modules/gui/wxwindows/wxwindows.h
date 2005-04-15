@@ -154,6 +154,7 @@ struct intf_sys_t
  *****************************************************************************/
 wxArrayString SeparateEntries( wxString );
 wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
+void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window );
 wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
 wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
 
@@ -420,7 +421,8 @@ private:
     Timer *timer;
     intf_thread_t *p_intf;
 
-private:
+    wxWindow *video_window;
+
     int i_old_playing_status;
 
     /* For auto-generated menus */

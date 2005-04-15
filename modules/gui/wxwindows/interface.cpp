@@ -278,10 +278,11 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
     /* Video window */
+    video_window = 0;
     if( config_GetInt( p_intf, "wxwin-embed" ) )
     {
-        CreateVideoWindow( p_intf, this );
-        frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND , 0 );
+        video_window = CreateVideoWindow( p_intf, this );
+        frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND, 0 );
     }
 
     /* Creation of the slider sub-window */
@@ -329,17 +330,13 @@ Interface::~Interface()
     ws->SetSettings( WindowSettings::ID_MAIN, true,
                      GetPosition(), GetSize() );
 
+    if( video_window ) delete video_window;
+
 #ifdef wxHAS_TASK_BAR_ICON
-    if( p_systray )
-    {
-        delete p_systray;
-    }
+    if( p_systray ) delete p_systray;
 #endif
 
-    if( p_intf->p_sys->p_wxwindow )
-    {
-        delete p_intf->p_sys->p_wxwindow;
-    }
+    if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
 
     /* Clean up */
     delete timer;
@@ -677,120 +674,108 @@ void Interface::SetupHotkeys()
     delete [] p_entries;
 }
 
-void Interface::HideSlider(bool layout)
+void Interface::HideSlider( bool layout )
 {
-  ShowSlider(false, layout);
+    ShowSlider( false, layout );
 }
 
-void Interface::ShowSlider(bool show, bool layout)
+void Interface::ShowSlider( bool show, bool layout )
 {
-  if (show)
-  {
-    //prevent the hide timers from hiding it now
-    m_slider_timer.Stop();
-    m_controls_timer.Stop();
-
-    //prevent continuous layout
-    if (slider_frame->IsShown())
+    if( show )
     {
-      return;
+        //prevent the hide timers from hiding it now
+        m_slider_timer.Stop();
+        m_controls_timer.Stop();
+
+        //prevent continuous layout
+        if( slider_frame->IsShown() ) return;
+
+        slider_frame->Show();
+        frame_sizer->Show( slider_frame );
+    }
+    else
+    {
+        //prevent continuous layout
+        if( !slider_frame->IsShown() ) return;
+
+        slider_frame->Hide();
+        frame_sizer->Hide( slider_frame );
     }
 
-    slider_frame->Show();
-    frame_sizer->Show( slider_frame );
-  }
-  else
-  {
-
-    //prevent continuous layout
-    if (!slider_frame->IsShown())
+    if( layout )
     {
-      return;
+        frame_sizer->Layout();
+        if( p_intf->p_sys->b_video_autosize )
+        {
+            UpdateVideoWindow( p_intf, video_window );
+            frame_sizer->Fit( this );
+        }
     }
-
-    slider_frame->Hide();
-    frame_sizer->Hide( slider_frame );
-  }
-
-  if (layout)
-  {
-    frame_sizer->Layout();
-    if ( p_intf->p_sys->b_video_autosize )
-    {
-      frame_sizer->Fit( this );
-    }
-  }
 }
 
-void Interface::HideDiscFrame(bool layout)
+void Interface::HideDiscFrame( bool layout )
 {
-  ShowDiscFrame(false, layout);
+    ShowDiscFrame( false, layout );
 }
 
-void Interface::ShowDiscFrame(bool show, bool layout)
+void Interface::ShowDiscFrame( bool show, bool layout )
 {
-  if (show)
-  {
-    //prevent the hide timer from hiding it now
-    m_controls_timer.Stop();
-
-    //prevent continuous layout
-    if (disc_frame->IsShown())
+    if( show )
     {
-      return;
+        //prevent the hide timer from hiding it now
+        m_controls_timer.Stop();
+
+        //prevent continuous layout
+        if( disc_frame->IsShown() ) return;
+
+        disc_frame->Show();
+        slider_sizer->Show( disc_frame );
+    }
+    else
+    {
+        //prevent continuous layout
+        if( !disc_frame->IsShown() ) return;
+
+        disc_frame->Hide();
+        slider_sizer->Hide( disc_frame );
     }
 
-    disc_frame->Show();
-    slider_sizer->Show( disc_frame );
-  }
-  else
-  {
-
-    //prevent continuous layout
-    if (!disc_frame->IsShown())
+    if( layout )
     {
-      return;
+        slider_sizer->Layout();
+        if( p_intf->p_sys->b_video_autosize )
+        {
+            UpdateVideoWindow( p_intf, video_window );
+            slider_sizer->Fit( slider_frame );
+        }
     }
-
-    disc_frame->Hide();
-    slider_sizer->Hide( disc_frame );
-  }
-
-  if (layout)
-  {
-    slider_sizer->Layout();
-    if ( p_intf->p_sys->b_video_autosize )
-    {
-      slider_sizer->Fit( slider_frame );
-    }
-  }
 }
 
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
-
-void Interface::OnControlsTimer(wxTimerEvent& WXUNUSED(event))
+void Interface::OnControlsTimer( wxTimerEvent& WXUNUSED(event) )
 {
-  /* Hide slider and Disc Buttons */
-  //postpone layout, we'll do it ourselves
-  HideDiscFrame(false);
-  HideSlider(false);
+    /* Hide slider and Disc Buttons */
+    //postpone layout, we'll do it ourselves
+    HideDiscFrame( false );
+    HideSlider( false );
 
-  slider_sizer->Layout();
-  if ( p_intf->p_sys->b_video_autosize )
-  {
-    slider_sizer->Fit( slider_frame );
-    frame_sizer->Fit( this );
-  }
+    slider_sizer->Layout();
+    if( p_intf->p_sys->b_video_autosize )
+    {
+        slider_sizer->Fit( slider_frame );
+        UpdateVideoWindow( p_intf, video_window );
+        frame_sizer->Fit( this );
+    }
 }
 
-void Interface::OnSliderTimer(wxTimerEvent& WXUNUSED(event))
-  {
-  HideSlider();
+void Interface::OnSliderTimer( wxTimerEvent& WXUNUSED(event) )
+{
+    HideSlider();
 }
 
-void Interface::OnMenuOpen(wxMenuEvent& event)
+void Interface::OnMenuOpen( wxMenuEvent& event )
 {
 #if defined( __WXMSW__ )
 #   define GetEventObject GetMenu

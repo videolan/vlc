@@ -99,6 +99,14 @@ wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
     return new VideoWindow( p_intf, p_parent );
 }
 
+void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window )
+{
+#if (wxCHECK_VERSION(2,5,0))
+    if( p_window && p_intf->p_sys->p_video_sizer && p_window->IsShown() )
+        p_intf->p_sys->p_video_sizer->SetMinSize( p_window->GetSize() );
+#endif
+}
+
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
@@ -144,7 +152,11 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     b_shown = VLC_TRUE;
 
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
+#if (wxCHECK_VERSION(2,5,0))
+    p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND|wxFIXED_MINSIZE );
+#else
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND );
+#endif
 
     ReleaseWindow( NULL );
 }
@@ -171,14 +183,12 @@ VideoWindow::~VideoWindow()
     p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
 
-#if 0
     if( !b_auto_size )
     {
         WindowSettings *ws = p_intf->p_sys->p_window_settings;
         ws->SetSettings( WindowSettings::ID_VIDEO, true,
                          GetPosition(), GetSize() );
     }
-#endif
 
     vlc_mutex_destroy( &lock );
 }
@@ -296,22 +306,18 @@ void VideoWindow::UpdateSize( wxEvent &_event )
 
 void VideoWindow::UpdateHide( wxEvent &_event )
 {
-    if( b_auto_size) m_hide_timer.Start( 200, wxTIMER_ONE_SHOT );
+    if( b_auto_size ) m_hide_timer.Start( 200, wxTIMER_ONE_SHOT );
 }
 
 void VideoWindow::OnHideTimer( wxTimerEvent& WXUNUSED(event))
 {
-    //wxSizeEvent * event = (wxSizeEvent*)(&_event);
     if( b_shown )
     {
         p_intf->p_sys->p_video_sizer->Show( this, FALSE );
+        Hide();
         p_intf->p_sys->p_video_sizer->Layout();
         b_shown = VLC_FALSE;
-
-        SetSize(0,0);
-        Show();
     }
-    //ok I cheat here, but is it ever not 0,0?
     p_intf->p_sys->p_video_sizer->SetMinSize( wxSize(0,0) );
 
     wxCommandEvent intf_event( wxEVT_INTF, 0 );

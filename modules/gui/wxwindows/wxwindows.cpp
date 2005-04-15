@@ -410,6 +410,9 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
     }
 }
 
+/*****************************************************************************
+ * WindowSettings utility class
+ *****************************************************************************/
 WindowSettings::WindowSettings( intf_thread_t *_p_intf )
 {
     char *psz_org = NULL;
@@ -539,6 +542,7 @@ WindowSettings::~WindowSettings( )
 
     config_PutPsz( p_intf, "wxwin-config-last", sCfg.mb_str() );
 }
+
 void WindowSettings::SetScreen( int i_screen_w, int i_screen_h )
 {
     int i;
