@@ -162,7 +162,7 @@ void Timer::Notify()
     else if( p_intf->p_sys->p_input->b_dead )
     {
         //controls auto-hide after a timer
-        p_main_interface->m_controls_timer.Start(1000, wxTIMER_ONE_SHOT);
+        p_main_interface->m_controls_timer.Start(200, wxTIMER_ONE_SHOT);
 
         p_main_interface->TogglePlayButton( PAUSE_S );
         i_old_playing_status = PAUSE_S;
@@ -267,10 +267,11 @@ void Timer::Notify()
             }
             else
             {
-                p_main_interface->m_slider_timer.Start(1000, wxTIMER_ONE_SHOT);
+                p_main_interface->m_slider_timer.Start(200, wxTIMER_ONE_SHOT);
             }
 
-            if( p_intf->p_sys->b_playing && p_main_interface->slider_frame->IsShown() )
+            if( p_intf->p_sys->b_playing &&
+                p_main_interface->slider_frame->IsShown() )
             {
                 /* Update the slider if the user isn't dragging it. */
                 if( p_intf->p_sys->b_slider_free )
