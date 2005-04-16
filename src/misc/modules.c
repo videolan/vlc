@@ -1707,8 +1707,9 @@ static void CacheLoad( vlc_object_t *p_this )
 
     p_this->p_libvlc->p_module_bank->i_loaded_cache = 0;
     fread( &i_cache, sizeof(char), sizeof(i_cache), file );
-    pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache =
-        malloc( i_cache * sizeof(void *) );
+    if( i_cache )
+        pp_cache = p_this->p_libvlc->p_module_bank->pp_loaded_cache =
+                   malloc( i_cache * sizeof(void *) );
 
 #define LOAD_IMMEDIATE(a) \
     if( fread( &a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
