@@ -911,8 +911,9 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                         if( p_item->psz_value_saved )
                             free( p_item->psz_value_saved );
                         p_item->psz_value_saved = 0;
-                        if( p_item->psz_value && p_item->psz_value_orig &&
-                            strcmp(p_item->psz_value, p_item->psz_value_orig) )
+                        if( !p_item->psz_value || !p_item->psz_value_orig ||
+                            (p_item->psz_value && p_item->psz_value_orig &&
+                             strcmp(p_item->psz_value,p_item->psz_value_orig)))
                             p_item->psz_value_saved = p_item->psz_value ?
                                 strdup( p_item->psz_value ) : 0;
 
@@ -1195,6 +1196,10 @@ int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             float f_value = p_item->f_value;
             char  *psz_value = p_item->psz_value;
 
+            if( p_item->i_type & CONFIG_HINT )
+                /* ignore hints */
+                continue;
+
             if( b_autosave && !p_item->b_autosave )
             {
                 i_value = p_item->i_value_saved;
@@ -1202,10 +1207,10 @@ int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 psz_value = p_item->psz_value_saved;
                 if( !psz_value ) psz_value = p_item->psz_value_orig;
             }
-
-            if( p_item->i_type & CONFIG_HINT )
-                /* ignore hints */
-                continue;
+            else
+            {
+                p_item->b_dirty = VLC_FALSE;
+            }
 
             switch( p_item->i_type )
             {
@@ -1258,14 +1263,15 @@ int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 fprintf( file, "%s=%s\n", p_item->psz_name,
                          psz_value ? psz_value : "" );
 
-                if( p_item->psz_value_saved )
-                    free( p_item->psz_value_saved );
+                if( b_autosave && !p_item->b_autosave ) break;
+
+                if( p_item->psz_value_saved ) free( p_item->psz_value_saved );
                 p_item->psz_value_saved = 0;
-                if( psz_value && p_item->psz_value_orig &&
-                    strcmp( psz_value, p_item->psz_value_orig ) )
+                if( (psz_value && p_item->psz_value_orig &&
+                     strcmp( psz_value, p_item->psz_value_orig )) ||
+                    !psz_value || !p_item->psz_value_orig)
                     p_item->psz_value_saved = psz_value ? strdup(psz_value):0;
             }
-            p_item->b_dirty = VLC_FALSE;
         }
 
         fprintf( file, "\n" );
