@@ -76,13 +76,11 @@ $(LIBRARIES_mozilla): $(libplugin_a_OBJECTS) \
 vlcintf_xpt_DATA = vlcintf.xpt
 vlcintf_xptdir = $(libdir)/mozilla/components
 vlcintf.xpt: vlcintf.idl
-	$(XPIDL) $(XPIDL_INCL) -I/usr/share/idl/mozilla \
-	  -I/usr/lib/mozilla/include/idl \
+	$(XPIDL) $(XPIDL_INCL) \
 	  -m typelib -o vlcintf $(srcdir)/vlcintf.idl
 
 vlcintf.h: vlcintf.idl
-	$(XPIDL) $(XPIDL_INCL) -I/usr/share/idl/mozilla \
-	  -I/usr/lib/mozilla/include/idl \
+	$(XPIDL) $(XPIDL_INCL) \
 	  -m header -o vlcintf $(srcdir)/vlcintf.idl
 
 if HAVE_WIN32

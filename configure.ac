@@ -4155,6 +4155,10 @@ dnl Not necessarily in ${PATH}
 if test -z "${XPIDL}" -o ! -x "${XPIDL}"; then
   XPIDL="/usr/lib/mozilla/xpidl"
 fi
+if test -z "${XPIDL_INCL}"; then
+  XPIDL_INCL="`${MOZILLA_CONFIG} --cflags plugin xpcom java` \
+ `${MOZILLA_CONFIG} --idlflags plugin xpcom java` "
+fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
