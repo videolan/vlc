@@ -35,7 +35,9 @@
 /*****************************************************************************
  * Global mutex for lazy initialization of the threads system
  *****************************************************************************/
-static volatile int i_initializations = 0;
+static volatile unsigned i_initializations = 0;
+static volatile int i_status = VLC_THREADS_UNINITIALIZED;
+static vlc_object_t *p_root;
 
 #if defined( PTH_INIT_IN_PTH_H )
 #elif defined( ST_INIT_IN_ST_H )
@@ -69,8 +71,6 @@ struct vlc_namedmutex_t
  *****************************************************************************/
 int __vlc_threads_init( vlc_object_t *p_this )
 {
-    static volatile int i_status = VLC_THREADS_UNINITIALIZED;
-
     libvlc_t *p_libvlc = (libvlc_t *)p_this;
     int i_ret = VLC_SUCCESS;
 
@@ -80,7 +80,6 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( ST_INIT_IN_ST_H )
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
-    HINSTANCE hInstLib;
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_lock( &once_mutex );
@@ -107,6 +106,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
         /* Dynamically get the address of SignalObjectAndWait */
         if( GetVersion() < 0x80000000 )
         {
+            HINSTANCE hInstLib;
+
             /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
             hInstLib = LoadLibrary( "kernel32" );
             if( hInstLib )
@@ -129,7 +130,9 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( HAVE_CTHREADS_H )
 #endif
 
-        vlc_object_create( p_libvlc, VLC_OBJECT_ROOT );
+        p_root = vlc_object_create( p_libvlc, VLC_OBJECT_ROOT );
+        if( p_root == NULL )
+            i_ret = VLC_ENOMEM;
 
         if( i_ret )
         {
@@ -176,38 +179,43 @@ int __vlc_threads_init( vlc_object_t *p_this )
 /*****************************************************************************
  * vlc_threads_end: stop threads system
  *****************************************************************************
- * FIXME: This function is far from being threadsafe. We should undo exactly
- * what we did above in vlc_threads_init.
+ * FIXME: This function is far from being threadsafe.
  *****************************************************************************/
 int __vlc_threads_end( vlc_object_t *p_this )
 {
 #if defined( PTH_INIT_IN_PTH_H )
+#elif defined( ST_INIT_IN_ST_H )
+#elif defined( UNDER_CE )
+#elif defined( WIN32 )
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    pthread_mutex_lock( &once_mutex );
+#elif defined( HAVE_CTHREADS_H )
+#endif
+
+    if( i_initializations == 0 )
+        return VLC_EGENERIC;
+
     i_initializations--;
+    if( i_initializations == 0 )
+    {
+        i_status = VLC_THREADS_UNINITIALIZED;
+        vlc_object_destroy( p_root );
+    }
+
+#if defined( PTH_INIT_IN_PTH_H )
     if( i_initializations == 0 )
     {
         return ( pth_kill() == FALSE );
     }
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_initializations--;
-
 #elif defined( UNDER_CE )
-    i_initializations--;
-
 #elif defined( WIN32 )
-    i_initializations--;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    i_initializations--;
-
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    pthread_mutex_lock( &once_mutex );
-    i_initializations--;
     pthread_mutex_unlock( &once_mutex );
-
 #elif defined( HAVE_CTHREADS_H )
-    i_initializations--;
-
 #endif
     return VLC_SUCCESS;
 }
