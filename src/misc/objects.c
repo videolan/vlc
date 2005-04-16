@@ -244,7 +244,8 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     if( !p_new->p_vars )
     {
-        free( p_new );
+        if( i_type != VLC_OBJECT_ROOT )
+            free( p_new );
         return NULL;
     }
 
@@ -396,7 +397,9 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
 
-    free( p_this );
+    /* root is not dynamically allocated by vlc_object_create */
+    if( p_this->i_object_type != VLC_OBJECT_ROOT )
+        free( p_this );
 }
 
 /**
