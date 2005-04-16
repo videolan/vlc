@@ -34,7 +34,8 @@
 #include "network.h"
 #include "charset.h"
 
-#include <errno.h>                                                 /* ENOMEM */
+#include <ctype.h>
+#include <errno.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -262,7 +263,7 @@ struct demux_sys_t
     static void FreeSDP( sdp_t *p_sdp );
 
 /* Detect multicast addresses */
-static int  ismult( char * );
+static vlc_bool_t ismult( char * );
 
 #define FREE( p ) \
     if( p ) { free( p ); (p) = NULL; }
@@ -1283,6 +1284,7 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
 {
     char *psz_local, *psz_in, *psz_out;
     size_t ret, i_in, i_out;
+    vlc_bool_t b_warn = VLC_FALSE;
 
     if( psz_unicode == NULL )
         return NULL;
@@ -1306,10 +1308,8 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
                          &psz_in, &i_in, &psz_out, &i_out);
         if( i_in )
         {
-            *psz_in = '\0';
-            msg_Warn( p_sd, "after \"%s\" : %s", strerror( errno ),
-                     psz_unicode );
             *psz_in = '?';
+            b_warn = VLC_TRUE;
         }
         else
         if( ret == (size_t)(-1) )
@@ -1321,6 +1321,11 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
         }
     }
     while( i_in );
+
+    if( b_warn )
+        msg_Warn( p_sd, "in \"%s\" : %s", psz_unicode, 
+                  strerror( errno ) );
+
     *psz_out = '\0';
     return psz_local;
 }
@@ -1329,26 +1334,26 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
 /***********************************************************************
  * ismult: returns true if we have a multicast address
  ***********************************************************************/
-static int ismult( char *psz_uri )
+static vlc_bool_t ismult( char *psz_uri )
 {
     char *psz_end;
     int  i_value;
-
-    i_value = strtol( psz_uri, &psz_end, 0 );
 
     /* IPv6 */
     if( psz_uri[0] == '[')
     {
       if( strncasecmp( &psz_uri[1], "FF0" , 3) ||
-          strncasecmp( &psz_uri[2], "FF0" , 3))
+          ( !isalnum( psz_uri[1]) && strncasecmp( &psz_uri[2], "FF0" , 3) ) )
             return( VLC_TRUE );
         else
             return( VLC_FALSE );
     }
+    
+    i_value = strtol( psz_uri, &psz_end, 0 );
 
     if( *psz_end != '.' ) { return( VLC_FALSE ); }
 
-    return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
+    return ( ( i_value < 224 ) || ( i_value >= 240 ) ) ? VLC_FALSE : VLC_TRUE;
 }
 
 static int InitSocket( services_discovery_t *p_sd, char *psz_address,
