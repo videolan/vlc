@@ -287,7 +287,8 @@ static int Open( vlc_object_t *p_this )
     free( psz_charset );
     if( p_sys->iconvHandle == (vlc_iconv_t)(-1) )
     {
-        msg_Warn( p_sd, "Unable to do requested conversion" );
+        msg_Err( p_sd, "unable to perform characters conversion" );
+	return VLC_EGENERIC;
     }
 
     p_sd->pf_run = Run;
@@ -495,8 +496,7 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_playlist );
     }
 
-    if( p_sys->iconvHandle != (vlc_iconv_t)(-1) )
-        vlc_iconv_close( p_sys->iconvHandle );
+    vlc_iconv_close( p_sys->iconvHandle );
 
     free( p_sys );
 }
@@ -810,10 +810,8 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     psz_value = convert_from_utf8( p_sd, p_sdp->psz_sessionname );
     if( p_sap == NULL || psz_value == NULL )
     {
-        msg_Err( p_sd, "out of memory");
         FREE( p_sap );
         FREE( psz_value );
-        p_sd->b_die = VLC_TRUE;
         return NULL;
     }
     p_sap->i_last = mdate();
@@ -1288,26 +1286,41 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
 
     if( psz_unicode == NULL )
         return NULL;
-    if ( p_sd->p_sys->iconvHandle == (vlc_iconv_t)(-1) )
-        return strdup( psz_unicode );
 
     psz_in = psz_unicode;
     i_in = strlen( psz_unicode );
 
-    i_out = 2 * i_in;
+#ifndef MB_CUR_MAX
+    i_out = 6 * i_in;
+#else
+    i_out = MB_CUR_MAX * i_in;
+#endif
     psz_local = malloc( i_out + 1 );
     if( psz_local == NULL )
-        return strdup( psz_unicode );
+        return NULL;
     psz_out = psz_local;
 
-    ret = vlc_iconv( p_sd->p_sys->iconvHandle,
-                     &psz_in, &i_in, &psz_out, &i_out);
-    if( ret == (size_t)(-1) || i_in )
+    do
     {
-        msg_Warn( p_sd, "Failed to convert \"%s\" from UTF-8", psz_unicode );
-        free( psz_local );
-        return strdup( psz_unicode );
+        ret = vlc_iconv( p_sd->p_sys->iconvHandle,
+                         &psz_in, &i_in, &psz_out, &i_out);
+        if( i_in )
+        {
+            *psz_in = '\0';
+            msg_Warn( p_sd, "after \"%s\" : %s", strerror( errno ),
+                     psz_unicode );
+            *psz_in = '?';
+        }
+        else
+        if( ret == (size_t)(-1) )
+        {
+            msg_Err( p_sd, "character conversion failure : %s",
+                     strerror( errno ) );
+            free( psz_local );
+            return NULL;
+        }
     }
+    while( i_in );
     *psz_out = '\0';
     return psz_local;
 }
