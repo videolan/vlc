@@ -374,7 +374,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
 #endif
 
-    i_saved_id = 0;
+    i_saved_id = -1;
 
 
     /* We want to be noticed of playlist changes */
@@ -610,6 +610,7 @@ void Playlist::UpdateItem( int i )
 void Playlist::RemoveItem( int i )
 {
     if( i <= 0 ) return; /* Sanity check */
+    if( i == i_saved_id ) i_saved_id = -1;
 
     wxTreeItemId item = FindItem( treectrl->GetRootItem(), i );
 
@@ -768,6 +769,7 @@ void Playlist::Rebuild( vlc_bool_t b_root )
         /* ...and rebuild it */
         LockPlaylist( p_intf->p_sys, p_playlist );
     }
+    i_saved_id = -1;
 
     p_view = playlist_ViewFind( p_playlist, i_current_view ); /* FIXME */
 
@@ -1383,6 +1385,7 @@ void Playlist::OnPopupSort( wxCommandEvent& event )
                                     SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
         
         treectrl->DeleteChildren( i_wx_popup_item );
+        i_saved_id = -1;
         UpdateNodeChildren( p_item, i_wx_popup_item );
 
     }
