@@ -122,7 +122,7 @@ vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
                      playlist_item_t **pp_item )
 {
      vlc_bool_t b_play;
-     if( &p_playlist->status.p_item->input ==
+     if( p_playlist->status.p_item && &p_playlist->status.p_item->input ==
          ((input_thread_t *)p_demux->p_parent)->input.p_item )
      {
          msg_Dbg( p_playlist, "starting playlist playback" );
