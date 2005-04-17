@@ -482,7 +482,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
 static void RunThread ( playlist_t *p_playlist )
 {
     vlc_object_t *p_obj;
-    playlist_item_t *p_item;
+    playlist_item_t *p_item = NULL;
 
     mtime_t    i_vout_destroyed_date = 0;
     mtime_t    i_sout_destroyed_date = 0;

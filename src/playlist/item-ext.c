@@ -387,9 +387,9 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 int playlist_GetPositionById( playlist_t * p_playlist , int i_id )
 {
     int i;
-    for( i =  0 ; i < p_playlist->i_all_size ; i++ )
+    for( i =  0 ; i < p_playlist->i_size ; i++ )
     {
-        if( p_playlist->pp_all_items[i]->input.i_id == i_id )
+        if( p_playlist->pp_items[i]->input.i_id == i_id )
         {
             return i;
         }
