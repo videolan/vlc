@@ -143,11 +143,13 @@ static int Open( vlc_object_t *p_this )
                           p_sys->p_node, PLAYLIST_APPEND,
                           PLAYLIST_END );
 
-    p_sys->p_input = input_CreateThread( p_playlist, &p_item->input );
     /* We need to declare the parents of the node as the same of the
      * parent's ones */
     playlist_CopyParents( p_sys->p_node, p_item );
     
+
+    p_sys->p_input = input_CreateThread( p_playlist, &p_item->input );
+
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
@@ -166,11 +168,6 @@ static void Close( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     playlist_t *p_playlist =  (playlist_t *) vlc_object_find( p_sd,
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist )
-    {
-        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
-        vlc_object_release( p_playlist );
-    }
     if( p_sd->p_sys->p_input )
     {
         input_StopThread( p_sd->p_sys->p_input );
@@ -178,6 +175,11 @@ static void Close( vlc_object_t *p_this )
         vlc_object_detach( p_sd->p_sys->p_input );
         vlc_object_destroy( p_sd->p_sys->p_input );
         p_sd->p_sys->p_input = NULL;        
+    }
+    if( p_playlist )
+    {
+        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
+        vlc_object_release( p_playlist );
     }
     free( p_sys );
 }
