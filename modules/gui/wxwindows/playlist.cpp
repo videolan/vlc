@@ -1154,7 +1154,7 @@ void Playlist::OnMenuEvent( wxCommandEvent& event )
         }
         else
         {
-            wxMutexGuiLeave();
+            //wxMutexGuiLeave();
             playlist_ServicesDiscoveryRemove( p_playlist,
                             pp_sds[event.GetId() - FirstSD_Event] );
             //wxMutexGuiEnter();
