@@ -209,6 +209,8 @@ void __msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
     /* Remove this subscription */
     REMOVE_ELEM( p_bank->pp_sub, p_bank->i_sub, i_index );
 
+    free( p_sub );
+
     vlc_mutex_unlock( &p_bank->lock );
 }
 

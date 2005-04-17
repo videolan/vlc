@@ -2362,6 +2362,7 @@ static void InitDeviceValues( vlc_t *p_vlc )
 
                 hal_free_string( block_dev );
             }
+            hal_free_string_array( devices );
         }
 
         hal_shutdown( ctx );
