@@ -179,9 +179,6 @@ static int Open( vlc_object_t *p_this )
     /* We support play on start */
     p_intf->b_play = VLC_TRUE;
 
-    /* Load saved window settings */
-    p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );
-
     p_intf->p_sys->b_video_autosize =
         config_GetInt( p_intf, "wxwin-autosize" );
 
@@ -326,6 +323,9 @@ bool Instance::OnInit()
      * keep the default '.' for floating point numbers. */
     setlocale( LC_NUMERIC, "C" );
 
+    /* Load saved window settings */
+    p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );
+
     /* Make an instance of your derived frame. Passing NULL (the default value
      * of Frame's constructor is NULL) as the frame doesn't have a parent
      * since it is the first window */
@@ -432,10 +432,11 @@ WindowSettings::WindowSettings( intf_thread_t *_p_intf )
     }
     b_shown[ID_MAIN] = true;
 
+    if( p_intf->pf_show_dialog ) return;
+
     /* Parse the configuration */
     psz_org = psz = config_GetPsz( p_intf, "wxwin-config-last" );
-    if( !psz || *psz == '\0' )
-        return;
+    if( !psz || *psz == '\0' ) return;
 
     msg_Dbg( p_intf, "Using last windows config '%s'", psz );
 
@@ -525,12 +526,13 @@ invalid:
 WindowSettings::~WindowSettings( )
 {
     wxString sCfg;
-    int i;
+
+    if( p_intf->pf_show_dialog ) return;
 
     sCfg = wxString::Format( wxT("(%d,0,0,%d,%d)"), ID_SCREEN,
                              wxSystemSettings::GetMetric( wxSYS_SCREEN_X ),
                              wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
-    for( i = 0; i < ID_MAX; i++ )
+    for( int i = 0; i < ID_MAX; i++ )
     {
         if( !b_valid[i] || !b_shown[i] )
             continue;
@@ -592,4 +594,3 @@ bool WindowSettings::GetSettings( int id, bool& _b_shown, wxPoint& p, wxSize& s)
 
     return true;
 }
-
