@@ -109,10 +109,10 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Associate the window to the main "parent" window
     XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
 
-    // XXX Set this window as the vout
+    // Set this window as a vout
     if( m_pParent )
     {
-        VlcProc::instance( getIntf() )->setVoutWindow( (void*)m_wnd );
+        VlcProc::instance( getIntf() )->registerVoutWindow( (void*)m_wnd );
     }
 
 }
@@ -120,10 +120,9 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
 X11Window::~X11Window()
 {
-    // XXX This window is no more the vout
     if( m_pParent )
     {
-        VlcProc::instance( getIntf() )->setVoutWindow( NULL );
+        VlcProc::instance( getIntf() )->unregisterVoutWindow( (void*)m_wnd );
     }
 
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );

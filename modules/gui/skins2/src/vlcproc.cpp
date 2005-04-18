@@ -60,8 +60,7 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 }
 
 
-VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
-                  m_pVoutWindow( NULL ), m_pVout( NULL )
+VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -160,15 +159,21 @@ VlcProc::~VlcProc()
 }
 
 
-void VlcProc::setVoutWindow( void *pVoutWindow )
+void VlcProc::registerVoutWindow( void *pVoutWindow )
 {
-    m_pVoutWindow = pVoutWindow;
+    m_handleSet.insert( pVoutWindow );
     // Reparent the vout window
     if( m_pVout )
     {
         if( vout_Control( m_pVout, VOUT_REPARENT ) != VLC_SUCCESS )
             vout_Control( m_pVout, VOUT_CLOSE );
     }
+}
+
+
+void VlcProc::unregisterVoutWindow( void *pVoutWindow )
+{
+    m_handleSet.erase( pVoutWindow );
 }
 
 
@@ -423,7 +428,14 @@ void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
 {
     VlcProc *pThis = pIntf->p_sys->p_vlcProc;
     pThis->m_pVout = pVout;
-    return pThis->m_pVoutWindow;
+    if( pThis->m_handleSet.empty() )
+    {
+        return NULL;
+    }
+    else
+    {
+        return *pThis->m_handleSet.begin();
+    }
 }
 
 

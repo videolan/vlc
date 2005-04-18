@@ -42,7 +42,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
                           bool dragDrop, bool playOnDrop,
                           Win32Window *pParentWindow ):
-    OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false )
+    OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false ),
+    m_pParent( pParentWindow )
 {
     // Create the window
     if( pParentWindow )
@@ -81,16 +82,21 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         RegisterDragDrop( m_hWnd, m_pDropTarget );
     }
 
-    // XXX Set this window as the vout
-    if( pParentWindow )
+    // Set this window as a vout
+    if( m_pParent )
     {
-        VlcProc::instance( getIntf() )->setVoutWindow( (void*)m_hWnd );
+        VlcProc::instance( getIntf() )->registerVoutWindow( (void*)m_hWnd );
     }
 }
 
 
 Win32Window::~Win32Window()
 {
+    if( m_pParent )
+    {
+        VlcProc::instance( getIntf() )->unregisterVoutWindow( (void*)m_hWnd );
+    }
+
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
     pFactory->m_windowMap[m_hWnd] = NULL;
 

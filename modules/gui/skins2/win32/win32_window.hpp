@@ -71,6 +71,8 @@ class Win32Window: public OSWindow
         LPDROPTARGET m_pDropTarget;
         /// Indicates whether the window is layered
         mutable bool m_isLayered;
+        /// Parent window
+        Win32Window *m_pParent;
 };
 
 

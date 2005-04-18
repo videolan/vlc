@@ -25,6 +25,8 @@
 #ifndef VLCPROC_HPP
 #define VLCPROC_HPP
 
+#include <set>
+
 #include "../vars/playlist.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
@@ -63,7 +65,10 @@ class VlcProc: public SkinObject
             { return *((VarText*)(m_cVarStreamURI.get())); }
 
         /// Set the vout window handle
-        void setVoutWindow( void *pVoutWindow );
+        void registerVoutWindow( void *pVoutWindow );
+
+        /// Unset the vout window handle
+        void unregisterVoutWindow( void *pVoutWindow );
 
         /// Indicate whether the embedded video output is currently used
         bool isVoutUsed() const { return m_pVout; }
@@ -99,16 +104,23 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarStopped;
         VariablePtr m_cVarPaused;
         VariablePtr m_cVarSeekable;
-        /// Vout window handle
-        void *m_pVoutWindow;
+
+        /// Set of handles of vout windows
+        /**
+         * When changing the skin, the handles of the 2 skins coexist in the
+         * set (but this is temporary, until the old theme is destroyed).
+         */
+        set<void *> m_handleSet;
         /// Vout thread
         vout_thread_t *m_pVout;
 
-        /// Poll VLC internals to update the status (volume, current time in
-        /// the stream, current filename, play/pause/stop status, ...)
-        /// This function should be called regurlarly, since there is no
-        /// callback mechanism (yet?) to automatically update a variable when
-        /// the internal status changes
+        /**
+         * Poll VLC internals to update the status (volume, current time in
+         * the stream, current filename, play/pause/stop status, ...)
+         * This function should be called regurlarly, since there is no
+         * callback mechanism (yet?) to automatically update a variable when
+         * the internal status changes
+         */
         void manage();
 
         /// Update the stream name variable
