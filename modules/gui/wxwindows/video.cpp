@@ -158,7 +158,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     b_shown = VLC_TRUE;
 
     p_intf->p_sys->p_video_sizer = new wxBoxSizer( wxHORIZONTAL );
-#if (wxCHECK_VERSION(2,5,0))
+#if (wxCHECK_VERSION(2,5,3))
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND|wxFIXED_MINSIZE );
 #else
     p_intf->p_sys->p_video_sizer->Add( this, 1, wxEXPAND );

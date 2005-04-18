@@ -63,6 +63,10 @@ static void Init         ( intf_thread_t * );
 
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
+#if (wxCHECK_VERSION(2,5,0))
+void *wxClassInfo_sm_classTable_BUGGY = 0;
+#endif
+
 /*****************************************************************************
  * Local classes declarations.
  *****************************************************************************/
@@ -218,6 +222,10 @@ static void Close( vlc_object_t *p_this )
 
     /* */
     delete p_intf->p_sys->p_window_settings;
+
+#if (wxCHECK_VERSION(2,5,0))
+    wxClassInfo::sm_classTable = wxClassInfo_sm_classTable_BUGGY;
+#endif
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -385,6 +393,12 @@ int Instance::OnExit()
          /* We need to manually clean up the dialogs class */
          if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
     }
+
+#if (wxCHECK_VERSION(2,5,0))
+    wxClassInfo_sm_classTable_BUGGY = wxClassInfo::sm_classTable;
+    wxClassInfo::sm_classTable = 0;
+#endif
+
     return 0;
 }
 
