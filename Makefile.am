@@ -779,6 +779,10 @@ if BUILD_ACTIVEX
 	cp $(top_builddir)/activex/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
 	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
 endif
+# Rebase all those DLLs to speed up loading (need cygwin rebase)
+	if [ -x rebase ]; then \
+		find $(top_builddir)/vlc-${VERSION} -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
+	fi
 
 package-win32-base-exe:
 # Create package
