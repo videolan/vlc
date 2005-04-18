@@ -1,7 +1,7 @@
 /*****************************************************************************
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2005 VideoLAN
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -253,6 +253,14 @@ static void Run( intf_thread_t *p_intf )
 
         if( i_action == ACTIONID_QUIT )
         {
+            p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                    FIND_ANYWHERE );
+            if( p_playlist )
+            {
+                playlist_Stop( p_playlist );
+                vlc_object_release( p_playlist );
+            }
+            /* Playlist is stopped now kill vlc. */
             p_intf->p_vlc->b_die = VLC_TRUE;
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
