@@ -44,8 +44,6 @@
 #include "pes.h"
 #include "bits.h"
 
-#define PES_PAYLOAD_SIZE_MAX 65500
-
 static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                              int i_es_size, es_format_t *p_fmt,
                              int i_stream_id, int i_private_id,
@@ -233,7 +231,8 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 
 int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
                    es_format_t *p_fmt, int i_stream_id,
-                   int b_mpeg2, int b_data_alignment, int i_header_size )
+                   int b_mpeg2, int b_data_alignment, int i_header_size,
+                   int i_max_pes_size )
 {
     block_t *p_pes;
     mtime_t i_pts, i_dts, i_length;
@@ -266,7 +265,8 @@ int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
 
     do
     {
-        i_pes_payload = __MIN( i_size, PES_PAYLOAD_SIZE_MAX );
+        i_pes_payload = __MIN( i_size, (i_max_pes_size ?
+                               i_max_pes_size : PES_PAYLOAD_SIZE_MAX) );
         i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload,
                                    p_fmt, i_stream_id, i_private_id, b_mpeg2,
                                    b_data_alignment, i_header_size );

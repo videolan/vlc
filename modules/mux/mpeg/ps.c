@@ -48,6 +48,10 @@
   "stream, compared to the SCRs. This allows for some buffering inside " \
   "the client decoder.")
 
+#define PES_SIZE_TEXT N_("PES maximum size")
+#define PES_SIZE_LONGTEXT N_("This option will set the maximum allowed PES "\
+  "size when producing the MPEG PS stream.")
+
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
@@ -66,6 +70,8 @@ vlc_module_begin();
 
     add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
                  DTS_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pes-max-size", PES_PAYLOAD_SIZE_MAX, NULL,
+                 PES_SIZE_TEXT, PES_SIZE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -123,12 +129,14 @@ struct sout_mux_sys_t
 
     vlc_bool_t b_mpeg2;
 
+    int i_pes_max_size;
+
     int i_psm_version;
     uint32_t crc32_table[256];
 };
 
 static const char *ppsz_sout_options[] = {
-    "dts-delay", NULL
+    "dts-delay", "pes-max-size", NULL
 };
 
 /*****************************************************************************
@@ -172,6 +180,9 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
     p_sys->i_dts_delay = (int64_t)val.i_int * 1000;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "pes-max-size", &val );
+    p_sys->i_pes_max_size = (int64_t)val.i_int;
 
     /* Initialise CRC32 table */
     if( p_sys->b_mpeg2 )
@@ -507,7 +518,7 @@ static int Mux( sout_mux_t *p_mux )
         p_data = block_FifoGet( p_input->p_fifo );
         E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
                        p_input->p_fmt, p_stream->i_stream_id,
-                       p_sys->b_mpeg2, 0, 0 );
+                       p_sys->b_mpeg2, 0, 0, p_sys->i_pes_max_size );
 
         block_ChainAppend( &p_ps, p_data );
 

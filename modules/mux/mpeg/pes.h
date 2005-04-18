@@ -32,6 +32,9 @@
 #define PES_DSMCC_STREAM                0xf2
 #define PES_ITU_T_H222_1_TYPE_E_STREAM  0xf8
 
+#define PES_PAYLOAD_SIZE_MAX 65500
+
 int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
                    es_format_t *p_fmt, int i_stream_id,
-                   int b_mpeg2, int b_data_alignment, int i_header_size );
+                   int b_mpeg2, int b_data_alignment, int i_header_size,
+                   int i_max_pes_size );
