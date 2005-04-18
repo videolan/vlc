@@ -653,7 +653,8 @@ void Interface::SetupHotkeys()
         int i_key = ConvertHotkey( p_hotkeys[i].i_key );
 
 #ifdef WIN32
-        if( i_mod ) i_key = toupper(i_key);
+        if( !(p_hotkeys[i].i_key & KEY_SPECIAL) && i_mod )
+            i_key = toupper(i_key);
 #endif
 
         p_entries[i].Set( i_mod, i_key,
