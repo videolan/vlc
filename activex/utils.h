@@ -34,6 +34,9 @@ extern BSTR BSTRFromCStr(int codePage, const char *s);
 // properties
 extern HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v);
 
+// properties
+extern HDC CreateDevDC(DVTARGETDEVICE *ptd);
+
 // enumeration
 template<class T> class VLCEnum : IUnknown
 {

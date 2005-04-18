@@ -67,7 +67,7 @@ make sure that the plugin path is set in the registry as per following example:
 [HKEY_LOCAL_MACHINE\Software\VideoLAN\VLC]
 InstallDir="C:\Program Files\VideoLAN\VLC"
 
-The InstallDir must contain the 'plugins' directory.
+The InstallDir must be the parent directory of the 'plugins' directory.
 
 WARNING: Both control and plugins must come from the same build source tree.
 Otherwise, at best, the control will not play any content, at worse

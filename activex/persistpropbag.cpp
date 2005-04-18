@@ -116,7 +116,7 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
     return _p_instance->onLoad();
 };
 
-STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDiry, BOOL fSaveAllProperties)
+STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirty, BOOL fSaveAllProperties)
 {
     if( NULL == pPropBag )
         return E_POINTER;

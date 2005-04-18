@@ -25,7 +25,7 @@
 
 #include <oleidl.h>
 
-class VLCViewObject : public IViewObject
+class VLCViewObject : public IViewObject2
 {
 
 public:
@@ -39,7 +39,8 @@ public:
         if( (NULL != ppv)
          && (IID_IUnknown == riid) 
          && (IID_IPersist == riid) 
-         && (IID_IViewObject == riid) ) {
+         && (IID_IViewObject == riid) 
+         && (IID_IViewObject2 == riid) ) {
             AddRef();
             *ppv = reinterpret_cast<LPVOID>(this);
             return NOERROR;
@@ -57,6 +58,9 @@ public:
     STDMETHODIMP GetColorSet(DWORD,LONG,PVOID,DVTARGETDEVICE *,HDC,LPLOGPALETTE *);
     STDMETHODIMP SetAdvise(DWORD,DWORD,LPADVISESINK);
     STDMETHODIMP Unfreeze(DWORD);
+
+    // IViewObject2 methods
+    STDMETHODIMP GetExtent(DWORD,LONG,DVTARGETDEVICE *,LPSIZEL);
 
 private:
 

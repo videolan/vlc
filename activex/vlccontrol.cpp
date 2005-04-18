@@ -54,6 +54,9 @@ HRESULT VLCControl::getTypeInfo(void)
 
 STDMETHODIMP VLCControl::GetTypeInfoCount(UINT* pctInfo)
 {
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
     if( SUCCEEDED(getTypeInfo()) )
         *pctInfo = 1;
     else
@@ -102,7 +105,7 @@ STDMETHODIMP VLCControl::Invoke(DISPID dispIdMember, REFIID riid,
 STDMETHODIMP VLCControl::get_Value(VARIANT *pvarValue)
 {
     if( NULL == pvarValue )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     V_VT(pvarValue) = VT_BOOL;
     return get_Playing(&V_BOOL(pvarValue));
@@ -127,7 +130,7 @@ STDMETHODIMP VLCControl::put_Value(VARIANT pvarValue)
 STDMETHODIMP VLCControl::get_Visible(VARIANT_BOOL *isVisible)
 {
     if( NULL == isVisible )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     *isVisible = _p_instance->getVisible();
 
@@ -180,7 +183,7 @@ STDMETHODIMP VLCControl::stop(void)
 STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
 {
     if( NULL == isPlaying )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
@@ -215,7 +218,7 @@ STDMETHODIMP VLCControl::put_Playing(VARIANT_BOOL isPlaying)
 STDMETHODIMP VLCControl::get_Position(float *position)
 {
     if( NULL == position )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
@@ -241,7 +244,7 @@ STDMETHODIMP VLCControl::put_Position(float position)
 STDMETHODIMP VLCControl::get_Time(int *seconds)
 {
     if( NULL == seconds )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
@@ -289,7 +292,7 @@ STDMETHODIMP VLCControl::fullscreen(void)
 STDMETHODIMP VLCControl::get_Length(int *seconds)
 {
     if( NULL == seconds )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
@@ -326,7 +329,7 @@ STDMETHODIMP VLCControl::playSlower(void)
 STDMETHODIMP VLCControl::get_Volume(int *volume)
 {
     if( NULL == volume )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
@@ -557,7 +560,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
 
 STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistMode mode, int position)
 {
-    if( NULL == uri )
+    if( 0 == SysStringLen(uri) )
         return E_INVALIDARG;
 
     HRESULT hr = E_UNEXPECTED;
@@ -588,7 +591,7 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
 STDMETHODIMP VLCControl::get_PlaylistIndex(int *index)
 {
     if( NULL == index )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
@@ -647,7 +650,7 @@ STDMETHODIMP VLCControl::playlistClear(void)
 STDMETHODIMP VLCControl::get_VersionInfo(BSTR *version)
 {
     if( NULL == version )
-        return E_INVALIDARG;
+        return E_POINTER;
 
     const char *versionStr = VLC_Version();
     if( NULL != versionStr )

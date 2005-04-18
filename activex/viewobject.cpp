@@ -23,7 +23,7 @@
 #include "plugin.h"
 #include "viewobject.h"
 
-#include <iostream>
+#include "utils.h"
 
 using namespace std;
 
@@ -31,25 +31,18 @@ STDMETHODIMP VLCViewObject::Draw(DWORD dwAspect, LONG lindex, PVOID pvAspect,
         DVTARGETDEVICE *ptd, HDC hicTargetDev, HDC hdcDraw, LPCRECTL lprcBounds,
         LPCRECTL lprcWBounds, BOOL(CALLBACK *pfnContinue)(DWORD), DWORD dwContinue)
 {
-    switch( dwAspect )
+    if( dwAspect & DVASPECT_CONTENT )
     {
-        case DVASPECT_CONTENT:
-            if( _p_instance->getVisible() )
-            {
-                RECT bounds;
-                bounds.left   = lprcBounds->left;
-                bounds.top    = lprcBounds->top;
-                bounds.right  = lprcBounds->right;
-                bounds.bottom = lprcBounds->bottom;
-                _p_instance->onPaint(hdcDraw, bounds, bounds);
-            }
-            return S_OK;
-        case DVASPECT_THUMBNAIL:
-            break;
-        case DVASPECT_ICON:
-            break;
-        case DVASPECT_DOCPRINT:
-            break;
+        if( _p_instance->getVisible() )
+        {
+            RECT bounds;
+            bounds.left   = lprcBounds->left;
+            bounds.top    = lprcBounds->top;
+            bounds.right  = lprcBounds->right;
+            bounds.bottom = lprcBounds->bottom;
+            _p_instance->onPaint(hdcDraw, bounds, bounds);
+        }
+        return S_OK;
     }
     return E_NOTIMPL;
 };
@@ -60,19 +53,28 @@ STDMETHODIMP VLCViewObject::Freeze(DWORD dwAspect, LONG lindex,
     if( NULL != pvAspect )
         return E_INVALIDARG;
 
-    return OLE_E_BLANK;
+    return E_NOTIMPL;
 };
 
 STDMETHODIMP VLCViewObject::GetAdvise(LPDWORD pdwAspect, LPDWORD padvf,
         LPADVISESINK *ppAdviseSink)
 {
-    return E_NOTIMPL;
+    if( NULL != pdwAspect )
+        *pdwAspect = 0;
+
+    if( NULL != padvf )
+        *padvf = 0;
+
+    if( NULL != ppAdviseSink )
+        *ppAdviseSink = NULL;
+
+    return S_OK;
 };
 
 STDMETHODIMP VLCViewObject::GetColorSet(DWORD dwAspect, LONG lindex, 
         PVOID pvAspect, DVTARGETDEVICE *ptd, HDC hicTargetDev, LPLOGPALETTE *ppColorSet)
 {
-    return E_NOTIMPL;
+    return S_FALSE;
 };
 
 STDMETHODIMP VLCViewObject::SetAdvise(DWORD dwAspect, DWORD advf,
@@ -83,6 +85,19 @@ STDMETHODIMP VLCViewObject::SetAdvise(DWORD dwAspect, DWORD advf,
 
 STDMETHODIMP VLCViewObject::Unfreeze(DWORD dwFreeze)
 {
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCViewObject::GetExtent(DWORD dwAspect, LONG lindex,
+        DVTARGETDEVICE *ptd, LPSIZEL lpSizel)
+{
+    if( dwAspect & DVASPECT_CONTENT )
+    {
+        *lpSizel = _p_instance->getExtent();
+        return S_OK;
+    }
+    lpSizel->cx= 0L;
+    lpSizel->cy= 0L;
     return E_NOTIMPL;
 };
 

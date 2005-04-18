@@ -250,6 +250,12 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class) :
     vlcObjectSafety = new VLCObjectSafety(this);
     vlcControl = new VLCControl(this);
     vlcViewObject = new VLCViewObject(this);
+
+    // set default/preferred size (320x240) pixels in HIMETRIC
+    HDC hDC = CreateDevDC(NULL);
+    _extent.cx = (320*2540L)/GetDeviceCaps(hDC, LOGPIXELSX);
+    _extent.cy = (240*2540L)/GetDeviceCaps(hDC, LOGPIXELSY);
+    DeleteDC(hDC);
 };
 
 VLCPlugin::~VLCPlugin()
@@ -383,6 +389,12 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
         *ppv = reinterpret_cast<LPVOID>(vlcViewObject);
         return NOERROR;
     }
+    else if( IID_IViewObject2 == riid )
+    {
+        AddRef();
+        *ppv = reinterpret_cast<LPVOID>(vlcViewObject);
+        return NOERROR;
+    }
 
     *ppv = NULL;
 
@@ -407,29 +419,30 @@ STDMETHODIMP_(ULONG) VLCPlugin::Release(void)
 //////////////////////////////////////
 
 /*
-** we use an in-place child window to represent plugin viewport,
-** whose size is limited by the clipping rectangle
-** all drawing within this window must follow 
-** cartesian coordinate system represented by _bounds.
+** we use a window to represent plugin viewport,
+** whose geometry is limited by the clipping rectangle
+** all drawing within this window must follow must
+** follow coordinates system described in lprPosRect
 */
 
-void VLCPlugin::calcPositionChange(LPRECT lprPosRect, LPCRECT lprcClipRect)
+static void getViewportCoords(LPRECT lprPosRect, LPRECT lprClipRect)
 {
-    _bounds.right  = lprPosRect->right-lprPosRect->left;
+    RECT bounds;
+    bounds.right  = lprPosRect->right-lprPosRect->left;
 
-    if( lprcClipRect->left <= lprPosRect->left )
+    if( lprClipRect->left <= lprPosRect->left )
     {
         // left side is not clipped out
-        _bounds.left = 0;
+        bounds.left = 0;
 
-        if( lprcClipRect->right >= lprPosRect->right )
+        if( lprClipRect->right >= lprPosRect->right )
         {
             // right side is not clipped out, no change
         }
-        else if( lprcClipRect->right >= lprPosRect->left )
+        else if( lprClipRect->right >= lprPosRect->left )
         {
             // right side is clipped out
-            lprPosRect->right = lprcClipRect->right;
+            lprPosRect->right = lprClipRect->right;
         }
         else
         {
@@ -440,36 +453,36 @@ void VLCPlugin::calcPositionChange(LPRECT lprPosRect, LPCRECT lprcClipRect)
     else
     {
         // left side is clipped out
-        _bounds.left = lprPosRect->left-lprcClipRect->left;
-        _bounds.right += _bounds.left;
+        bounds.left = lprPosRect->left-lprClipRect->left;
+        bounds.right += bounds.left;
 
-        lprPosRect->left = lprcClipRect->left;
-        if( lprcClipRect->right >= lprPosRect->right )
+        lprPosRect->left = lprClipRect->left;
+        if( lprClipRect->right >= lprPosRect->right )
         {
             // right side is not clipped out
         }
         else
         {
             // right side is clipped out
-            lprPosRect->right = lprcClipRect->right;
+            lprPosRect->right = lprClipRect->right;
         }
     }
 
-    _bounds.bottom = lprPosRect->bottom-lprPosRect->top;
+    bounds.bottom = lprPosRect->bottom-lprPosRect->top;
 
-    if( lprcClipRect->top <= lprPosRect->top )
+    if( lprClipRect->top <= lprPosRect->top )
     {
         // top side is not clipped out
-        _bounds.top = 0;
+        bounds.top = 0;
 
-        if( lprcClipRect->bottom >= lprPosRect->bottom )
+        if( lprClipRect->bottom >= lprPosRect->bottom )
         {
             // bottom side is not clipped out, no change
         }
-        else if( lprcClipRect->bottom >= lprPosRect->top )
+        else if( lprClipRect->bottom >= lprPosRect->top )
         {
             // bottom side is clipped out
-            lprPosRect->bottom = lprcClipRect->bottom;
+            lprPosRect->bottom = lprClipRect->bottom;
         }
         else
         {
@@ -479,20 +492,22 @@ void VLCPlugin::calcPositionChange(LPRECT lprPosRect, LPCRECT lprcClipRect)
     }
     else
     {
-        _bounds.top = lprPosRect->top-lprcClipRect->top;
-        _bounds.bottom += _bounds.top;
+        bounds.top = lprPosRect->top-lprClipRect->top;
+        bounds.bottom += bounds.top;
 
-        lprPosRect->top = lprcClipRect->top;
-        if( lprcClipRect->bottom >= lprPosRect->bottom )
+        lprPosRect->top = lprClipRect->top;
+        if( lprClipRect->bottom >= lprPosRect->bottom )
         {
             // bottom side is not clipped out
         }
         else
         {
             // bottom side is clipped out
-            lprPosRect->bottom = lprcClipRect->bottom;
+            lprPosRect->bottom = lprClipRect->bottom;
         }
     }
+    *lprClipRect = *lprPosRect;
+    *lprPosRect  = bounds;
 };
 
 HRESULT VLCPlugin::onInit(BOOL isNew)
@@ -522,7 +537,7 @@ HRESULT VLCPlugin::onInit(BOOL isNew)
              RegCloseKey( h_key );
         }
 
-#if 0
+#if 1
         ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
 #endif
 
@@ -610,16 +625,30 @@ BOOL VLCPlugin::isInPlaceActive(void)
 HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect)
 {
     RECT posRect = *lprcPosRect;
+    RECT clipRect = *lprcClipRect;
 
-    calcPositionChange(&posRect, lprcClipRect);
+    /*
+    ** record keeping of control geometry within container
+    */ 
+    _posRect = posRect;
 
+    /*
+    ** convert posRect & clipRect to match control viewport coordinates
+    */
+    getViewportCoords(&posRect, &clipRect);
+
+    /*
+    ** Create a window for in place activated control.
+    ** the window geometry represents the control viewport
+    ** so that embedded video is always properly clipped.
+    */
     _inplacewnd = CreateWindow(_p_class->getInPlaceWndClassName(),
             "VLC Plugin In-Place Window",
             WS_CHILD|WS_CLIPCHILDREN|WS_TABSTOP,
-            posRect.left,
-            posRect.top,
-            posRect.right-posRect.left,
-            posRect.bottom-posRect.top,
+            clipRect.left,
+            clipRect.top,
+            clipRect.right-clipRect.left,
+            clipRect.bottom-clipRect.top,
             hwndParent,
             0,
             _p_class->getHInstance(),
@@ -631,13 +660,18 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     SetWindowLongPtr(_inplacewnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
+    /*
+    ** VLC embedded video geometry automatically matches parent window.
+    ** hence create a child window so that video position and size
+    ** is always correct relative to the viewport bounds
+    */
     _videownd = CreateWindow(_p_class->getVideoWndClassName(),
             "VLC Plugin Video Window",
             WS_CHILD|WS_CLIPCHILDREN|WS_VISIBLE,
-            _bounds.left,
-            _bounds.top,
-            _bounds.right-_bounds.left,
-            _bounds.bottom-_bounds.top,
+            posRect.left,
+            posRect.top,
+            posRect.right-posRect.left,
+            posRect.bottom-posRect.top,
             _inplacewnd,
             0,
             _p_class->getHInstance(),
@@ -763,36 +797,48 @@ void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &pr)
 
 void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
 {
-    RECT posRect = *lprcPosRect;
+    RECT clipRect = *lprcClipRect;
+    RECT posRect  = *lprcPosRect;
 
-    calcPositionChange(&posRect, lprcClipRect);
+    /*
+    ** record keeping of control geometry within container
+    */ 
+    _posRect = posRect;
+
+    /*
+    ** convert posRect & clipRect to match control viewport coordinates
+    */
+    getViewportCoords(&posRect, &clipRect);
 
     /*
     ** change in-place window geometry to match clipping region
     */
     MoveWindow(_inplacewnd,
-            posRect.left,
-            posRect.top,
-            posRect.right-posRect.left,
-            posRect.bottom-posRect.top,
+            clipRect.left,
+            clipRect.top,
+            clipRect.right-clipRect.left,
+            clipRect.bottom-clipRect.top,
             FALSE);
 
     /*
     ** change video window geometry to match object bounds within clipping region
     */
     MoveWindow(_videownd,
-            _bounds.left,
-            _bounds.top,
-            _bounds.right-_bounds.left,
-            _bounds.bottom-_bounds.top,
+            posRect.left,
+            posRect.top,
+            posRect.right-posRect.left,
+            posRect.bottom-posRect.top,
             FALSE);
 
-    RECT updateRect;
 
-    updateRect.left = -_bounds.left;
-    updateRect.top = -_bounds.top;
-    updateRect.right = _bounds.right-_bounds.left;
-    updateRect.bottom = _bounds.bottom-_bounds.top;
+    /*
+    ** force a full refresh of control content
+    */
+    RECT updateRect;
+    updateRect.left = -posRect.left;
+    updateRect.top = -posRect.top;
+    updateRect.right = posRect.right-posRect.left;
+    updateRect.bottom = posRect.bottom-posRect.top;
 
     ValidateRect(_videownd, NULL);
     InvalidateRect(_videownd, &updateRect, FALSE);

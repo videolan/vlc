@@ -225,6 +225,16 @@ STDMETHODIMP VLCOleObject::GetClipboardData(DWORD dwReserved, LPDATAOBJECT *ppDa
 
 STDMETHODIMP VLCOleObject::GetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
 {
+    if( NULL == pSizel )
+        return E_POINTER;
+
+    if( dwDrawAspect & DVASPECT_CONTENT )
+    {
+        *pSizel = _p_instance->getExtent();
+        return S_OK;
+    }
+    pSizel->cx= 0L;
+    pSizel->cy= 0L;
     return E_NOTIMPL;
 };
 
@@ -314,6 +324,48 @@ STDMETHODIMP VLCOleObject::SetColorScheme(LOGPALETTE *pLogpal)
 
 STDMETHODIMP VLCOleObject::SetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
 {
+    if( NULL == pSizel )
+        return E_POINTER;
+
+    if( dwDrawAspect & DVASPECT_CONTENT )
+    {
+        _p_instance->setExtent(*pSizel);
+
+        if( _p_instance->isInPlaceActive() )
+        {
+            LPOLEINPLACESITE p_inPlaceSite;
+
+            if( SUCCEEDED(_p_clientsite->QueryInterface(IID_IOleInPlaceSite, (void**)&p_inPlaceSite)) )
+            {
+                LPOLECONTROLSITE p_controlSite;
+                RECT posRect = _p_instance->getPosRect();
+
+                if( SUCCEEDED(_p_clientsite->QueryInterface(IID_IOleControlSite, (void**)&p_controlSite)) )
+                {
+                    // use HIMETRIC to container transform
+                    POINTL extent = { pSizel->cx, pSizel->cy };
+                    POINTF container;
+                    if( SUCCEEDED(p_controlSite->TransformCoords(&extent,
+                                    &container, XFORMCOORDS_SIZE|XFORMCOORDS_HIMETRICTOCONTAINER)) )
+                    {
+                        posRect.right  = ((LONG)container.x)+posRect.left;
+                        posRect.bottom = ((LONG)container.y)+posRect.top;
+                    }
+                    p_controlSite->Release();
+                }
+                else {
+                    // use HIMETRIC to display transform 
+                    HDC hDC = CreateDevDC(NULL);
+                    posRect.right = (pSizel->cx*GetDeviceCaps(hDC, LOGPIXELSX)/2540L)+posRect.left;
+                    posRect.bottom = (pSizel->cy*GetDeviceCaps(hDC, LOGPIXELSY)/2540L)+posRect.top;
+                    DeleteDC(hDC);
+                }
+                p_inPlaceSite->OnPosRectChange(&posRect);
+                p_inPlaceSite->Release();
+            }
+        }
+        return S_OK;
+    }
     return E_NOTIMPL;
 };
 

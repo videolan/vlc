@@ -98,4 +98,36 @@ HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v)
     return hr;
 };
 
+HDC CreateDevDC(DVTARGETDEVICE *ptd)
+{
+	HDC hdc=NULL;
+	LPDEVNAMES lpDevNames;
+	LPDEVMODE lpDevMode;
+	LPTSTR lpszDriverName;
+	LPTSTR lpszDeviceName;
+	LPTSTR lpszPortName;
+
+	if (ptd == NULL) {
+		hdc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
+		goto errReturn;
+	}
+
+	lpDevNames = (LPDEVNAMES) ptd; // offset for size field
+
+	if (ptd->tdExtDevmodeOffset == 0) {
+		lpDevMode = NULL;
+	}else{
+		lpDevMode  = (LPDEVMODE) ((LPTSTR)ptd + ptd->tdExtDevmodeOffset);
+	}
+
+	lpszDriverName = (LPTSTR) lpDevNames + ptd->tdDriverNameOffset;
+	lpszDeviceName = (LPTSTR) lpDevNames + ptd->tdDeviceNameOffset;
+	lpszPortName   = (LPTSTR) lpDevNames + ptd->tdPortNameOffset;
+
+	hdc = CreateDC(lpszDriverName, lpszDeviceName, lpszPortName, lpDevMode);
+
+errReturn:
+	return hdc;
+};
+
 

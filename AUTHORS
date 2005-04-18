@@ -344,3 +344,9 @@ D: SSL/TLS support (core, HTTP server, HTTP input)
 D: VOC files demultiplexer
 S: France
 
+N: Damien Fouilleul
+E: Damien.Fouilleul@laposte.net
+C: Quovodis
+D: ActiveX control
+S: Germany
+

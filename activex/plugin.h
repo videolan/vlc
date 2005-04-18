@@ -116,6 +116,7 @@ public:
     void setVisible(BOOL fVisible);
     BOOL getVisible(void) { return _b_visible; };
 
+    
     // container events
     void onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
     void onPaint(HDC hdc, const RECT &bounds, const RECT &pr);
@@ -126,13 +127,18 @@ public:
     void fireOnPauseEvent(void);
     void fireOnStopEvent(void);
 
+    // control size in HIMETRIC
+    const SIZEL& getExtent(void) { return _extent; };
+    void  setExtent(const SIZEL& extent) { _extent = extent; };
+
+    // control geometry within container
+    RECT getPosRect(void) { return _posRect; }; 
+
 protected:
 
     virtual ~VLCPlugin();
 
 private:
-
-    void calcPositionChange(LPRECT lprPosRect, LPCRECT lprcClipRect);
 
     //implemented interfaces
     class VLCOleObject *vlcOleObject;
@@ -152,7 +158,6 @@ private:
     HWND _inplacewnd;
     // video window (Drawing window)
     HWND _videownd;
-    RECT _bounds;
 
     VLCPluginClass *_p_class;
     ULONG _i_ref;
@@ -163,7 +168,10 @@ private:
     BOOL _b_loopmode;
     BOOL _b_visible;
     BOOL _b_sendevents;
-    int _i_vlc;
+    int  _i_vlc;
+
+    SIZEL _extent;
+    RECT _posRect;
 };
 
 #endif
