@@ -1267,7 +1267,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
      VLC_ADD_LDFLAGS([gnutls],[-lws2_32])]
   )
 
-  gnutls_LIBS="-lgcrypt ${gcrypt_LIBS}"
+  gnutls_LIBS="-lgcrypt -lz ${gcrypt_LIBS}"
 
   AC_CHECK_HEADER(gcrypt.h,
     [AC_CHECK_LIB(gcrypt, gcry_control,
@@ -1278,7 +1278,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
 
   AS_IF([test "${have_gnutls}" = "yes"], [
     VLC_ADD_PLUGINS([gnutls])
-    VLC_ADD_LDFLAGS([gnutls], [-lgnutls -lgcrypt -lgpg-error])
+    VLC_ADD_LDFLAGS([gnutls], [-lgnutls ${gnutls_LIBS}])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
       AC_MSG_ERROR([gnutls not present or too old (version 1.0.17 required)])]
