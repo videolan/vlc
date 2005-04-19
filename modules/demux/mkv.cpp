@@ -339,7 +339,7 @@ public:
     }
 
     void AddCommand( const KaxChapterProcessCommand & command );
-	
+    
     virtual bool Enter() { return true; }
     virtual bool Leave() { return true; }
 
@@ -356,8 +356,8 @@ class dvd_command_interpretor_c
 public:
     dvd_command_interpretor_c()
     {
-        memset( p_GPRM, 0, sizeof(p_GPRM) * 2 );
-        memset( p_SPRM, 0, sizeof(p_SPRM) * 2 );
+        memset( p_GPRM, 0, sizeof(p_GPRM) );
+        memset( p_SPRM, 0, sizeof(p_SPRM) );
         p_SPRM[ 1 ] = 15;
         p_SPRM[ 2 ] = 62;
         p_SPRM[ 3 ] = 1;
@@ -368,8 +368,8 @@ public:
         p_SPRM[ 18 ] = 0xFFFFu;
     }
     
-	bool Interpret( const binary * p_command, size_t i_size = 8 );
-	
+    bool Interpret( const binary * p_command, size_t i_size = 8 );
+    
 protected:
     uint16 GetGPRM( size_t index ) const
     {
@@ -444,7 +444,23 @@ public:
     ,b_display_seekpoint(true)
     ,psz_parent(NULL)
     {}
-        
+
+    ~chapter_item_c()
+    {
+        std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
+        while ( index != codecs.end() )
+        {
+            delete (*index);
+            index++;
+        }
+        std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
+        while ( index_ != sub_chapters.end() )
+        {
+            delete (*index_);
+            index_++;
+        }
+    }
+
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     void PublishChapters( input_title_t & title, int i_level );
     chapter_item_c * FindTimecode( mtime_t i_timecode );
@@ -453,14 +469,14 @@ public:
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
-    std::vector<chapter_item_c> sub_chapters;
+    std::vector<chapter_item_c*> sub_chapters;
     int                         i_seekpoint_num;
     int64_t                     i_uid;
     bool                        b_display_seekpoint;
     std::string                 psz_name;
     chapter_item_c              *psz_parent;
     
-    std::vector<chapter_codec_cmds_c> codecs;
+    std::vector<chapter_codec_cmds_c*> codecs;
 
     bool operator<( const chapter_item_c & item ) const
     {
@@ -562,6 +578,13 @@ public:
             free( index );
 
         delete ep;
+
+        std::vector<chapter_edition_c*>::iterator index = stored_editions.begin();
+        while ( index != stored_editions.end() )
+        {
+            delete (*index);
+            index++;
+        }
     }
 
     KaxSegment              *segment;
@@ -600,8 +623,8 @@ public:
     char                    *psz_title;
     char                    *psz_date_utc;
 
-    std::vector<chapter_edition_c> stored_editions;
-    int                            i_default_edition;
+    std::vector<chapter_edition_c*> stored_editions;
+    int                             i_default_edition;
 
     std::vector<chapter_translation_c> translations;
     std::vector<KaxSegmentFamily>  families;
@@ -636,6 +659,7 @@ class virtual_segment_c
 public:
     virtual_segment_c( matroska_segment_c *p_segment )
         :i_current_segment(0)
+        ,p_editions(NULL)
         ,i_current_edition(-1)
         ,psz_current_chapter(NULL)
     {
@@ -655,14 +679,14 @@ public:
 
     inline chapter_edition_c *Edition()
     {
-        if ( i_current_edition >= 0 && size_t(i_current_edition) < editions.size() )
-            return &editions[i_current_edition];
+        if ( i_current_edition >= 0 && size_t(i_current_edition) < p_editions->size() )
+            return (*p_editions)[i_current_edition];
         return NULL;
     }
     
     inline bool EditionIsOrdered() const
     {
-        return (editions.size() != 0 && i_current_edition >= 0 && editions[i_current_edition].b_ordered);
+        return (p_editions->size() != 0 && i_current_edition >= 0 && (*p_editions)[i_current_edition]->b_ordered);
     }
 
     matroska_segment_c * Segment() const
@@ -695,7 +719,7 @@ protected:
     std::vector<KaxSegmentUID>       linked_uids;
     size_t                           i_current_segment;
 
-    std::vector<chapter_edition_c>   editions;
+    std::vector<chapter_edition_c*>  *p_editions;
     int                              i_current_edition;
     chapter_item_c                   *psz_current_chapter;
 
@@ -1709,14 +1733,14 @@ bool virtual_segment_c::Select( input_title_t & title )
 
     // copy editions from the first segment
     p_segment = linked_segments[0];
-    editions = p_segment->stored_editions;
+    p_editions = &p_segment->stored_editions;
 
     for ( i=1 ; i<linked_segments.size(); i++ )
     {
         p_segment = linked_segments[i];
         // FIXME assume we have the same editions in all segments
         for (j=0; j<p_segment->stored_editions.size(); j++)
-            editions[j].Append( p_segment->stored_editions[j] );
+            (*p_editions)[j]->Append( *p_segment->stored_editions[j] );
     }
 
     if ( Edition() != NULL )
@@ -1753,7 +1777,7 @@ void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
 
     for ( size_t i=0; i<sub_chapters.size() ; i++)
     {
-        sub_chapters[i].PublishChapters( title, i_level+1 );
+        sub_chapters[i]->PublishChapters( title, i_level+1 );
     }
 }
 
@@ -1763,10 +1787,10 @@ void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     chapter_item_c *psz_curr_chapter;
 
     /* update current chapter/seekpoint */
-    if ( editions.size() )
+    if ( p_editions->size() )
     {
         /* 1st, we need to know in which chapter we are */
-        psz_curr_chapter = editions[i_current_edition].FindTimecode( sys.i_pts );
+        psz_curr_chapter = (*p_editions)[i_current_edition]->FindTimecode( sys.i_pts );
 
         /* we have moved to a new chapter */
         if (psz_curr_chapter != NULL && psz_current_chapter != psz_curr_chapter)
@@ -1780,7 +1804,7 @@ void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                 demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
             }
 
-            if ( editions[i_current_edition].b_ordered )
+            if ( (*p_editions)[i_current_edition]->b_ordered )
             {
                 psz_curr_chapter->Enter();
 
@@ -1801,10 +1825,10 @@ void chapter_item_c::Append( const chapter_item_c & chapter )
 
     for ( i=0; i<chapter.sub_chapters.size(); i++ )
     {
-        p_chapter = FindChapter( chapter.sub_chapters[i] );
+        p_chapter = FindChapter( *chapter.sub_chapters[i] );
         if ( p_chapter != NULL )
         {
-            p_chapter->Append( chapter.sub_chapters[i] );
+            p_chapter->Append( *chapter.sub_chapters[i] );
         }
         else
         {
@@ -1821,8 +1845,8 @@ chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
     size_t i;
     for ( i=0; i<sub_chapters.size(); i++)
     {
-        if ( sub_chapters[i].i_uid == chapter.i_uid )
-            return &sub_chapters[i];
+        if ( sub_chapters[i]->i_uid == chapter.i_uid )
+            return sub_chapters[i];
     }
     return NULL;
 }
@@ -3232,27 +3256,29 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             }
 
             if ( p_ccodec != NULL )
-            for( j = 0; j < cp->ListSize(); j++ )
             {
-                EbmlElement *k= (*cp)[j];
+                for( j = 0; j < cp->ListSize(); j++ )
+                {
+                    EbmlElement *k= (*cp)[j];
 
-                if( MKV_IS_ID( k, KaxChapterProcessPrivate ) )
-                {
-                    KaxChapterProcessPrivate * p_private = static_cast<KaxChapterProcessPrivate*>( k );
-                    p_ccodec->SetPrivate( *p_private );
+                    if( MKV_IS_ID( k, KaxChapterProcessPrivate ) )
+                    {
+                        KaxChapterProcessPrivate * p_private = static_cast<KaxChapterProcessPrivate*>( k );
+                        p_ccodec->SetPrivate( *p_private );
+                    }
+                    else if( MKV_IS_ID( k, KaxChapterProcessCommand ) )
+                    {
+                        p_ccodec->AddCommand( *static_cast<KaxChapterProcessCommand*>( k ) );
+                    }
                 }
-                else if( MKV_IS_ID( k, KaxChapterProcessCommand ) )
-                {
-                    p_ccodec->AddCommand( *static_cast<KaxChapterProcessCommand*>( k ) );
-                }
+                chapters.codecs.push_back( p_ccodec );
             }
-            chapters.codecs.push_back( *p_ccodec );
         }
         else if( MKV_IS_ID( l, KaxChapterAtom ) )
         {
-            chapter_item_c new_sub_chapter;
-            ParseChapterAtom( i_level+1, static_cast<KaxChapterAtom *>(l), new_sub_chapter );
-            new_sub_chapter.psz_parent = &chapters;
+            chapter_item_c *new_sub_chapter = new chapter_item_c();
+            ParseChapterAtom( i_level+1, static_cast<KaxChapterAtom *>(l), *new_sub_chapter );
+            new_sub_chapter->psz_parent = &chapters;
             chapters.sub_chapters.push_back( new_sub_chapter );
         }
     }
@@ -3277,7 +3303,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 
         if( MKV_IS_ID( l, KaxEditionEntry ) )
         {
-            chapter_edition_c edition;
+            chapter_edition_c *p_edition = new chapter_edition_c();
             
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
             size_t j;
@@ -3288,17 +3314,17 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 
                 if( MKV_IS_ID( l, KaxChapterAtom ) )
                 {
-                    chapter_item_c new_sub_chapter;
-                    ParseChapterAtom( 0, static_cast<KaxChapterAtom *>(l), new_sub_chapter );
-                    edition.sub_chapters.push_back( new_sub_chapter );
+                    chapter_item_c *new_sub_chapter = new chapter_item_c();
+                    ParseChapterAtom( 0, static_cast<KaxChapterAtom *>(l), *new_sub_chapter );
+                    p_edition->sub_chapters.push_back( new_sub_chapter );
                 }
                 else if( MKV_IS_ID( l, KaxEditionUID ) )
                 {
-                    edition.i_uid = uint64(*static_cast<KaxEditionUID *>( l ));
+                    p_edition->i_uid = uint64(*static_cast<KaxEditionUID *>( l ));
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
                 {
-                    edition.b_ordered = config_GetInt( &sys.demuxer, "mkv-use-ordered-chapters" ) ? (uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0) : 0;
+                    p_edition->b_ordered = config_GetInt( &sys.demuxer, "mkv-use-ordered-chapters" ) ? (uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0) : 0;
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
                 {
@@ -3310,7 +3336,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
                     msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
-            stored_editions.push_back( edition );
+            stored_editions.push_back( p_edition );
         }
         else
         {
@@ -3320,13 +3346,13 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 
     for( i = 0; i < stored_editions.size(); i++ )
     {
-        stored_editions[i].RefreshChapters( );
+        stored_editions[i]->RefreshChapters( );
     }
     
-    if ( stored_editions[i_default_edition].b_ordered )
+    if ( stored_editions[i_default_edition]->b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
-        i_dur = stored_editions[i_default_edition].Duration() / I64C(1000);
+        i_dur = stored_editions[i_default_edition]->Duration() / I64C(1000);
         if (i_dur > 0)
             i_duration = i_dur;
     }
@@ -3494,10 +3520,10 @@ int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     int64_t i_user_time = i_prev_user_time;
     
     // first the sub-chapters, and then ourself
-    std::vector<chapter_item_c>::iterator index = sub_chapters.begin();
+    std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
     while ( index != sub_chapters.end() )
     {
-        i_user_time = (*index).RefreshChapters( b_ordered, i_user_time );
+        i_user_time = (*index)->RefreshChapters( b_ordered, i_user_time );
         index++;
     }
 
@@ -3542,9 +3568,9 @@ mtime_t chapter_edition_c::Duration() const
     
     if ( sub_chapters.size() )
     {
-        std::vector<chapter_item_c>::const_iterator index = sub_chapters.end();
+        std::vector<chapter_item_c*>::const_iterator index = sub_chapters.end();
         index--;
-        i_result = (*index).i_user_end_time;
+        i_result = (*index)->i_user_end_time;
     }
     
     return i_result;
@@ -3558,10 +3584,10 @@ chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode )
         ( i_user_timecode < i_user_end_time || 
           ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
     {
-        std::vector<chapter_item_c>::iterator index = sub_chapters.begin();
+        std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
         while ( index != sub_chapters.end() && psz_result == NULL )
         {
-            psz_result = (*index).FindTimecode( i_user_timecode );
+            psz_result = (*index)->FindTimecode( i_user_timecode );
             index++;
         }
         
@@ -3920,7 +3946,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
         if ( EditionIsOrdered() )
         {
             /* 1st, we need to know in which chapter we are */
-            psz_chapter = editions[i_current_edition].FindTimecode( i_date );
+            psz_chapter = (*p_editions)[i_current_edition]->FindTimecode( i_date );
         }
     }
 
@@ -3995,72 +4021,72 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
 
 bool chapter_item_c::Enter()
 {
-	std::vector<chapter_codec_cmds_c>::iterator index = codecs.begin();
-	while ( index != codecs.end() )
-	{
-		(*index).Enter();
-		index++;
-	}
+    std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
+    while ( index != codecs.end() )
+    {
+        (*index)->Enter();
+        index++;
+    }
     return true;
 }
 
 bool chapter_item_c::Leave()
 {
-	std::vector<chapter_codec_cmds_c>::iterator index = codecs.begin();
-	while ( index != codecs.end() )
-	{
-		(*index).Leave();
-		index++;
-	}
+    std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
+    while ( index != codecs.end() )
+    {
+        (*index)->Leave();
+        index++;
+    }
     return true;
 }
 
 bool dvd_chapter_codec_c::Enter()
 {
-	std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
-	while ( index != enter_cmds.end() )
-	{
-		if ( (*index).GetSize() )
-		{
-			binary *p_data = (*index).GetBuffer();
-			size_t i_size = *p_data++;
-			// avoid reading too much from the buffer
-			i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
-			for ( ; i_size > 0; i_size--, p_data += 8 )
-			{
-				interpretor.Interpret( p_data );
-			}
-		}
-		index++;
-	}
+    std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
+    while ( index != enter_cmds.end() )
+    {
+        if ( (*index).GetSize() )
+        {
+            binary *p_data = (*index).GetBuffer();
+            size_t i_size = *p_data++;
+            // avoid reading too much from the buffer
+            i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
+            for ( ; i_size > 0; i_size--, p_data += 8 )
+            {
+                interpretor.Interpret( p_data );
+            }
+        }
+        index++;
+    }
     return true;
 }
 
 bool dvd_chapter_codec_c::Leave()
 {
-	std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
-	while ( index != leave_cmds.end() )
-	{
-		if ( (*index).GetSize() )
-		{
-			binary *p_data = (*index).GetBuffer();
-			size_t i_size = *p_data++;
-			// avoid reading too much from the buffer
-			i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
-			for ( ; i_size > 0; i_size--, p_data += 8 )
-			{
-				interpretor.Interpret( p_data );
-			}
-		}
-		index++;
-	}
+    std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
+    while ( index != leave_cmds.end() )
+    {
+        if ( (*index).GetSize() )
+        {
+            binary *p_data = (*index).GetBuffer();
+            size_t i_size = *p_data++;
+            // avoid reading too much from the buffer
+            i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
+            for ( ; i_size > 0; i_size--, p_data += 8 )
+            {
+                interpretor.Interpret( p_data );
+            }
+        }
+        index++;
+    }
     return true;
 }
 
 bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_size )
 {
-	if ( i_size != 8 )
-		return false;
+    if ( i_size != 8 )
+        return false;
 
-	return true;
+    return true;
 }
