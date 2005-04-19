@@ -423,12 +423,12 @@ public:
     bool                        b_ordered;
 };
 
-class demux_sys_c;
+class demux_sys_t;
 
 class matroska_segment_c
 {
 public:
-    matroska_segment_c( demux_sys_c & demuxer, EbmlStream & estream )
+    matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream )
         :segment(NULL)
         ,es(estream)
         ,i_timescale(MKVD_TIMECODESCALE)
@@ -544,7 +544,7 @@ public:
     std::vector<chapter_translation_c> translations;
     std::vector<KaxSegmentFamily>  families;
     
-    demux_sys_c                    & sys;
+    demux_sys_t                    & sys;
     EbmlParser                     *ep;
     bool                           b_preloaded;
 
@@ -643,7 +643,7 @@ protected:
 class matroska_stream_c
 {
 public:
-    matroska_stream_c( demux_sys_c & demuxer )
+    matroska_stream_c( demux_sys_t & demuxer )
         :p_in(NULL)
         ,p_es(NULL)
         ,sys(demuxer)
@@ -660,13 +660,13 @@ public:
 
     std::vector<matroska_segment_c*> segments;
 
-    demux_sys_c                      & sys;
+    demux_sys_t                      & sys;
 };
 
-class demux_sys_c
+class demux_sys_t
 {
 public:
-    demux_sys_c( demux_t & demux )
+    demux_sys_t( demux_t & demux )
         :demuxer(demux)
         ,i_pts(0)
         ,i_start_pts(0)
@@ -677,7 +677,7 @@ public:
         ,f_duration(-1.0)
     {}
 
-    virtual ~demux_sys_c()
+    virtual ~demux_sys_t()
     {
         for (size_t i=0; i<streams.size(); i++)
             delete streams[i];
@@ -724,7 +724,7 @@ static char *UTF8ToStr          ( const UTFstring &u );
 static int Open( vlc_object_t * p_this )
 {
     demux_t            *p_demux = (demux_t*)p_this;
-    demux_sys_c        *p_sys;
+    demux_sys_t        *p_sys;
     matroska_stream_c  *p_stream;
     matroska_segment_c *p_segment;
     uint8_t            *p_peek;
@@ -742,7 +742,7 @@ static int Open( vlc_object_t * p_this )
     /* Set the demux function */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = new demux_sys_c( *p_demux );
+    p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
 
     p_io_callback = new vlc_stream_io_callback( p_demux->s );
     p_io_stream = new EbmlStream( *p_io_callback );
@@ -865,7 +865,7 @@ error:
 static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_c *p_sys   = p_demux->p_sys;
+    demux_sys_t *p_sys   = p_demux->p_sys;
 
     delete p_sys;
 }
@@ -875,7 +875,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_c        *p_sys = p_demux->p_sys;
+    demux_sys_t        *p_sys = p_demux->p_sys;
     int64_t     *pi64;
     double      *pf, f;
     int         i_skp;
@@ -1112,7 +1112,7 @@ static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem)
 static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                          mtime_t i_duration )
 {
-    demux_sys_c        *p_sys = p_demux->p_sys;
+    demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
 
     size_t          i_track;
@@ -1206,7 +1206,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-matroska_stream_c *demux_sys_c::AnalyseAllSegmentsFound( EbmlStream *p_estream )
+matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
 {
     int i_upper_lvl = 0;
     size_t i;
@@ -1697,7 +1697,7 @@ void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
 
 void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
-    demux_sys_c & sys = *demux.p_sys;
+    demux_sys_t & sys = *demux.p_sys;
     const chapter_item_c *psz_curr_chapter;
 
     /* update current chapter/seekpoint */
@@ -1767,7 +1767,7 @@ chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
 
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_c *psz_chapter )
 {
-    demux_sys_c        *p_sys = p_demux->p_sys;
+    demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segment = p_vsegment->Segment();
     mtime_t            i_time_offset = 0;
@@ -1852,7 +1852,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
  *****************************************************************************/
 static int Demux( demux_t *p_demux)
 {
-    demux_sys_c        *p_sys = p_demux->p_sys;
+    demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segmet = p_vsegment->Segment();
     if ( p_segmet == NULL ) return 0;
@@ -3510,7 +3510,7 @@ const chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode ) co
     return psz_result;
 }
 
-void demux_sys_c::PreloadFamily( const matroska_segment_c & of_segment )
+void demux_sys_t::PreloadFamily( const matroska_segment_c & of_segment )
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
@@ -3535,7 +3535,7 @@ bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
 }
 
 // preload all the linked segments for all preloaded segments
-void demux_sys_c::PreloadLinked( matroska_segment_c *p_segment )
+void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
 {
     size_t i_preloaded, i;
 
@@ -3556,7 +3556,7 @@ void demux_sys_c::PreloadLinked( matroska_segment_c *p_segment )
     p_current_segment->PreloadLinked( );
 }
 
-bool demux_sys_c::PreparePlayback( )
+bool demux_sys_t::PreparePlayback( )
 {
     p_current_segment->LoadCues();
     f_duration = p_current_segment->Duration();
@@ -3649,7 +3649,7 @@ bool matroska_segment_c::Preload( )
     return true;
 }
 
-matroska_segment_c *demux_sys_c::FindSegment( const EbmlBinary & uid ) const
+matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
@@ -3849,7 +3849,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
 void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_c *psz_chapter )
 {
-    demux_sys_c *p_sys = demuxer.p_sys;
+    demux_sys_t *p_sys = demuxer.p_sys;
     size_t i;
 
     // find the actual time for an ordered edition
