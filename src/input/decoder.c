@@ -1037,5 +1037,20 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 
 static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 {
-    spu_DestroySubpicture( p_dec->p_owner->p_vout->p_spu, p_subpic );
+    decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
+    vout_thread_t *p_vout = NULL;
+
+    p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    if( !p_vout || p_sys->p_spu_vout != p_vout )
+    {
+        if( p_vout )
+            vlc_object_release( p_vout );
+        msg_Warn( p_dec, "no vout found, leaking subpicture" );
+        return;
+    }
+
+    spu_DestroySubpicture( p_vout->p_spu, p_subpic );
+
+    vlc_object_release( p_vout );
 }
+
