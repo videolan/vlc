@@ -35,6 +35,10 @@
 #   include <altivec.h>
 #endif
 
+#ifdef CAN_COMPILE_MMXEXT
+#   include "mmx.h"
+#endif
+
 #include "filter_common.h"
 
 #define DEINTERLACE_DISCARD 1
@@ -42,6 +46,7 @@
 #define DEINTERLACE_BLEND   3
 #define DEINTERLACE_BOB     4
 #define DEINTERLACE_LINEAR  5
+#define DEINTERLACE_X       6
 
 /*****************************************************************************
  * Local protypes
@@ -58,6 +63,7 @@ static void RenderBob    ( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderBlend  ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
+static void RenderX      ( vout_thread_t *, picture_t *, picture_t * );
 
 static void MergeGeneric ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_C_ALTIVEC)
@@ -91,9 +97,9 @@ static int FilterCallback ( vlc_object_t *, char const *,
 #define MODE_TEXT N_("Deinterlace mode")
 #define MODE_LONGTEXT N_("You can choose the default deinterlace mode")
 
-static char *mode_list[] = { "discard", "blend", "mean", "bob", "linear" };
+static char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", "x" };
 static char *mode_list_text[] = { N_("Discard"), N_("Blend"), N_("Mean"),
-                                  N_("Bob"), N_("Linear") };
+                                  N_("Bob"), N_("Linear"), N_("X") };
 
 vlc_module_begin();
     set_description( _("Deinterlacing video filter") );
@@ -256,6 +262,11 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
         p_vout->p_sys->i_mode = DEINTERLACE_LINEAR;
         p_vout->p_sys->b_double_rate = 1;
     }
+    else if( !strcmp( psz_method, "x" ) )
+    {
+        p_vout->p_sys->i_mode = DEINTERLACE_X;
+        p_vout->p_sys->b_double_rate = 0;
+    }
     else
     {
         msg_Err( p_vout, "no valid deinterlace mode provided, "
@@ -348,6 +359,7 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
         case DEINTERLACE_BOB:
         case DEINTERLACE_BLEND:
         case DEINTERLACE_LINEAR:
+        case DEINTERLACE_X:
             p_real_vout = vout_Create( p_vout, &fmt );
             break;
         }
@@ -489,8 +501,12 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
             RenderBlend( p_vout, pp_outpic[0], p_pic );
             vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
             break;
-    }
 
+        case DEINTERLACE_X:
+            RenderX( p_vout, pp_outpic[0], p_pic );
+            vout_DisplayPicture( p_vout->p_sys->p_vout, pp_outpic[0] );
+            break;
+    }
     vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
 }
 
@@ -1015,6 +1031,883 @@ static void MergeAltivec( void *_p_dest, const void *_p_s1,
     }
 }
 #endif
+
+/*****************************************************************************
+ * RenderX: This algo works on a 8x8 block basic, it copies the top field
+ * and apply a process to recreate the bottom field :
+ *  If a 8x8 block is classified as :
+ *   - progressive: it applies a small blend (1,6,1)
+ *   - interlaced:
+ *    * in the MMX version: we do a ME between the 2 fields, if there is a
+ *    good match we use MC to recreate the bottom field (with a small
+ *    blend (1,6,1) )
+ *    * otherwise: it recreates the bottom field by an edge oriented
+ *    interpolation.
+  *****************************************************************************/
+
+/* XDeint8x8Detect: detect if a 8x8 block is interlaced.
+ * XXX: It need to access to 8x10
+ * We use more than 8 lines to help with scrolling (text)
+ * (and because XDeint8x8Frame use line 9)
+ * XXX: smooth/uniform area with noise detection doesn't works well
+ * but it's not really a problem because they don't have much details anyway
+ */
+static inline int ssd( int a ) { return a*a; }
+static inline int XDeint8x8DetectC( uint8_t *src, int i_src )
+{
+    int y, x;
+    int ff, fr;
+    int fc;
+
+    /* Detect interlacing */
+    fc = 0;
+    for( y = 0; y < 7; y += 2 )
+    {
+        ff = fr = 0;
+        for( x = 0; x < 8; x++ )
+        {
+            fr += ssd(src[      x] - src[1*i_src+x]) +
+                  ssd(src[i_src+x] - src[2*i_src+x]);
+            ff += ssd(src[      x] - src[2*i_src+x]) +
+                  ssd(src[i_src+x] - src[3*i_src+x]);
+        }
+        if( ff < 6*fr/8 && fr > 32 )
+            fc++;
+
+        src += 2*i_src;
+    }
+
+    return fc < 1 ? VLC_FALSE : VLC_TRUE;
+}
+#ifdef CAN_COMPILE_MMXEXT
+static inline int XDeint8x8DetectMMXEXT( uint8_t *src, int i_src )
+{
+
+    int y, x;
+    int32_t ff, fr;
+    int fc;
+
+    /* Detect interlacing */
+    fc = 0;
+    pxor_r2r( mm7, mm7 );
+    for( y = 0; y < 9; y += 2 )
+    {
+        ff = fr = 0;
+        pxor_r2r( mm5, mm5 );
+        pxor_r2r( mm6, mm6 );
+        for( x = 0; x < 8; x+=4 )
+        {
+            movd_m2r( src[        x], mm0 );
+            movd_m2r( src[1*i_src+x], mm1 );
+            movd_m2r( src[2*i_src+x], mm2 );
+            movd_m2r( src[3*i_src+x], mm3 );
+
+            punpcklbw_r2r( mm7, mm0 );
+            punpcklbw_r2r( mm7, mm1 );
+            punpcklbw_r2r( mm7, mm2 );
+            punpcklbw_r2r( mm7, mm3 );
+
+            movq_r2r( mm0, mm4 );
+
+            psubw_r2r( mm1, mm0 );
+            psubw_r2r( mm2, mm4 );
+
+            psubw_r2r( mm1, mm2 );
+            psubw_r2r( mm1, mm3 );
+
+            pmaddwd_r2r( mm0, mm0 );
+            pmaddwd_r2r( mm4, mm4 );
+            pmaddwd_r2r( mm2, mm2 );
+            pmaddwd_r2r( mm3, mm3 );
+            paddd_r2r( mm0, mm2 );
+            paddd_r2r( mm4, mm3 );
+            paddd_r2r( mm2, mm5 );
+            paddd_r2r( mm3, mm6 );
+        }
+
+        movq_r2r( mm5, mm0 );
+        psrlq_i2r( 32, mm0 );
+        paddd_r2r( mm0, mm5 );
+        movd_r2m( mm5, fr );
+
+        movq_r2r( mm6, mm0 );
+        psrlq_i2r( 32, mm0 );
+        paddd_r2r( mm0, mm6 );
+        movd_r2m( mm6, ff );
+
+        if( ff < 6*fr/8 && fr > 32 )
+            fc++;
+
+        src += 2*i_src;
+    }
+    return fc;
+}
+#endif
+
+/* XDeint8x8Frame: apply a small blend between field (1,6,1).
+ * This won't destroy details, and help if there is a bit of interlacing.
+ * (It helps with paning to avoid flickers)
+ * (Use 8x9 pixels)
+ */
+#if 0
+static inline void XDeint8x8FrameC( uint8_t *dst, int i_dst,
+                                    uint8_t *src, int i_src )
+{
+    int y, x;
+
+    /* Progressive */
+    for( y = 0; y < 8; y += 2 )
+    {
+        memcpy( dst, src, 8 );
+        dst += i_dst;
+
+        for( x = 0; x < 8; x++ )
+            dst[x] = (src[x] + 6*src[1*i_src+x] + src[2*i_src+x] + 4 ) >> 3;
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+#endif
+static inline void XDeint8x8MergeC( uint8_t *dst, int i_dst,
+                                    uint8_t *src1, int i_src1,
+                                    uint8_t *src2, int i_src2 )
+{
+    int y, x;
+
+    /* Progressive */
+    for( y = 0; y < 8; y += 2 )
+    {
+        memcpy( dst, src1, 8 );
+        dst  += i_dst;
+
+        for( x = 0; x < 8; x++ )
+            dst[x] = (src1[x] + 6*src2[x] + src1[i_src1+x] + 4 ) >> 3;
+        dst += i_dst;
+
+        src1 += i_src1;
+        src2 += i_src2;
+    }
+}
+
+#ifdef CAN_COMPILE_MMXEXT
+static inline void XDeint8x8MergeMMXEXT( uint8_t *dst, int i_dst,
+                                         uint8_t *src1, int i_src1,
+                                         uint8_t *src2, int i_src2 )
+{
+    static const uint64_t m_4 = I64C(0x0004000400040004);
+    int y, x;
+
+    /* Progressive */
+    pxor_r2r( mm7, mm7 );
+    for( y = 0; y < 8; y += 2 )
+    {
+        for( x = 0; x < 8; x +=4 )
+        {
+            movd_m2r( src1[x], mm0 );
+            movd_r2m( mm0, dst[x] );
+
+            movd_m2r( src2[x], mm1 );
+            movd_m2r( src1[i_src1+x], mm2 );
+
+            punpcklbw_r2r( mm7, mm0 );
+            punpcklbw_r2r( mm7, mm1 );
+            punpcklbw_r2r( mm7, mm2 );
+            paddw_r2r( mm1, mm1 );
+            movq_r2r( mm1, mm3 );
+            paddw_r2r( mm3, mm3 );
+            paddw_r2r( mm2, mm0 );
+            paddw_r2r( mm3, mm1 );
+            paddw_m2r( m_4, mm1 );
+            paddw_r2r( mm1, mm0 );
+            psraw_i2r( 3, mm0 );
+            packuswb_r2r( mm7, mm0 );
+            movd_r2m( mm0, dst[i_dst+x] );
+        }
+        dst += 2*i_dst;
+        src1 += i_src1;
+        src2 += i_src2;
+    }
+}
+
+#endif
+
+/* For debug */
+static inline void XDeint8x8Set( uint8_t *dst, int i_dst, uint8_t v )
+{
+    int y;
+    for( y = 0; y < 8; y++ )
+        memset( &dst[y*i_dst], v, 8 );
+}
+
+/* XDeint8x8FieldE: Stupid deinterlacing (1,0,1) for block that miss a
+ * neighbour
+ * (Use 8x9 pixels)
+ * TODO: a better one for the inner part.
+ */
+static inline void XDeint8x8FieldEC( uint8_t *dst, int i_dst,
+                                     uint8_t *src, int i_src )
+{
+    int y, x;
+
+    /* Interlaced */
+    for( y = 0; y < 8; y += 2 )
+    {
+        memcpy( dst, src, 8 );
+        dst += i_dst;
+
+        for( x = 0; x < 8; x++ )
+            dst[x] = (src[x] + src[2*i_src+x] ) >> 1;
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+#ifdef CAN_COMPILE_MMXEXT
+static inline void XDeint8x8FieldEMMXEXT( uint8_t *dst, int i_dst,
+                                          uint8_t *src, int i_src )
+{
+    int y;
+
+    /* Interlaced */
+    for( y = 0; y < 8; y += 2 )
+    {
+        movq_m2r( src[0], mm0 );
+        movq_r2m( mm0, dst[0] );
+        dst += i_dst;
+
+        movq_m2r( src[2*i_src], mm1 );
+        pavgb_r2r( mm1, mm0 );
+
+        movq_r2m( mm0, dst[0] );
+
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+#endif
+
+/* XDeint8x8Field: Edge oriented interpolation
+ * (Need -4 and +5 pixels H, +1 line)
+ */
+static inline void XDeint8x8FieldC( uint8_t *dst, int i_dst,
+                                    uint8_t *src, int i_src )
+{
+    int y, x;
+
+    /* Interlaced */
+    for( y = 0; y < 8; y += 2 )
+    {
+        memcpy( dst, src, 8 );
+        dst += i_dst;
+
+        for( x = 0; x < 8; x++ )
+        {
+            uint8_t *src2 = &src[2*i_src];
+            /* I use 8 pixels just to match the MMX version, but it's overkill
+             * 5 would be enough (less isn't good) */
+            const int c0 = abs(src[x-4]-src2[x-2]) + abs(src[x-3]-src2[x-1]) +
+                           abs(src[x-2]-src2[x+0]) + abs(src[x-1]-src2[x+1]) +
+                           abs(src[x+0]-src2[x+2]) + abs(src[x+1]-src2[x+3]) +
+                           abs(src[x+2]-src2[x+4]) + abs(src[x+3]-src2[x+5]);
+
+            const int c1 = abs(src[x-3]-src2[x-3]) + abs(src[x-2]-src2[x-2]) +
+                           abs(src[x-1]-src2[x-1]) + abs(src[x+0]-src2[x+0]) +
+                           abs(src[x+1]-src2[x+1]) + abs(src[x+2]-src2[x+2]) +
+                           abs(src[x+3]-src2[x+3]) + abs(src[x+4]-src2[x+4]);
+
+            const int c2 = abs(src[x-2]-src2[x-4]) + abs(src[x-1]-src2[x-3]) +
+                           abs(src[x+0]-src2[x-2]) + abs(src[x+1]-src2[x-1]) +
+                           abs(src[x+2]-src2[x+0]) + abs(src[x+3]-src2[x+1]) +
+                           abs(src[x+4]-src2[x+2]) + abs(src[x+5]-src2[x+3]);
+
+            if( c0 < c1 && c1 <= c2 )
+                dst[x] = (src[x-1] + src2[x+1]) >> 1;
+            else if( c2 < c1 && c1 <= c0 )
+                dst[x] = (src[x+1] + src2[x-1]) >> 1;
+            else
+                dst[x] = (src[x+0] + src2[x+0]) >> 1;
+        }
+
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+#ifdef CAN_COMPILE_MMXEXT
+static inline void XDeint8x8FieldMMXEXT( uint8_t *dst, int i_dst,
+                                         uint8_t *src, int i_src )
+{
+    int y, x;
+
+    /* Interlaced */
+    for( y = 0; y < 8; y += 2 )
+    {
+        memcpy( dst, src, 8 );
+        dst += i_dst;
+
+        for( x = 0; x < 8; x++ )
+        {
+            uint8_t *src2 = &src[2*i_src];
+            int32_t c0, c1, c2;
+
+            movq_m2r( src[x-2], mm0 );
+            movq_m2r( src[x-3], mm1 );
+            movq_m2r( src[x-4], mm2 );
+
+            psadbw_m2r( src2[x-4], mm0 );
+            psadbw_m2r( src2[x-3], mm1 );
+            psadbw_m2r( src2[x-2], mm2 );
+
+            movd_r2m( mm0, c2 );
+            movd_r2m( mm1, c1 );
+            movd_r2m( mm2, c0 );
+
+            if( c0 < c1 && c1 <= c2 )
+                dst[x] = (src[x-1] + src2[x+1]) >> 1;
+            else if( c2 < c1 && c1 <= c0 )
+                dst[x] = (src[x+1] + src2[x-1]) >> 1;
+            else
+                dst[x] = (src[x+0] + src2[x+0]) >> 1;
+        }
+
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+#endif
+
+#if 0
+static inline int XDeint8x8SsdC( uint8_t *pix1, int i_pix1,
+                                 uint8_t *pix2, int i_pix2 )
+{
+    int y, x;
+    int s = 0;
+
+    for( y = 0; y < 8; y++ )
+        for( x = 0; x < 8; x++ )
+            s += ssd( pix1[y*i_pix1+x] - pix2[y*i_pix2+x] );
+    return s;
+}
+
+#ifdef CAN_COMPILE_MMXEXT
+static inline int XDeint8x8SsdMMXEXT( uint8_t *pix1, int i_pix1,
+                                      uint8_t *pix2, int i_pix2 )
+{
+    int y;
+    int32_t s;
+
+    pxor_r2r( mm7, mm7 );
+    pxor_r2r( mm6, mm6 );
+
+    for( y = 0; y < 8; y++ )
+    {
+        movq_m2r( pix1[0], mm0 );
+        movq_m2r( pix2[0], mm1 );
+
+        movq_r2r( mm0, mm2 );
+        movq_r2r( mm1, mm3 );
+
+        punpcklbw_r2r( mm7, mm0 );
+        punpckhbw_r2r( mm7, mm2 );
+        punpcklbw_r2r( mm7, mm1 );
+        punpckhbw_r2r( mm7, mm3 );
+
+        psubw_r2r( mm1, mm0 );
+        psubw_r2r( mm3, mm2 );
+
+        pmaddwd_r2r( mm0, mm0 );
+        pmaddwd_r2r( mm2, mm2 );
+
+        paddd_r2r( mm2, mm0 );
+        paddd_r2r( mm0, mm6 );
+
+        pix1 += i_pix1;
+        pix2 += i_pix2;
+    }
+
+    movq_r2r( mm6, mm7 );
+    psrlq_i2r( 32, mm7 );
+    paddd_r2r( mm6, mm7 );
+    movd_r2m( mm7, s );
+
+    return s;
+}
+#endif
+#endif
+
+#if 0
+/* A little try with motion, but doesn't work better that pure intra (and slow) */
+#ifdef CAN_COMPILE_MMXEXT
+/* XDeintMC:
+ *  Bilinear MC QPel
+ *  TODO: mmx version (easier in sse2)
+ */
+static inline void XDeintMC( uint8_t *dst, int i_dst,
+                             uint8_t *src, int i_src,
+                             int mvx, int mvy,
+                             int i_width, int i_height )
+{
+    const int d4x = mvx&0x03;
+    const int d4y = mvy&0x03;
+
+    const int cA = (4-d4x)*(4-d4y);
+    const int cB = d4x    *(4-d4y);
+    const int cC = (4-d4x)*d4y;
+    const int cD = d4x    *d4y;
+
+    int y, x;
+    uint8_t *srcp;
+
+
+    src  += (mvy >> 2) * i_src + (mvx >> 2);
+    srcp = &src[i_src];
+
+    for( y = 0; y < i_height; y++ )
+    {
+        for( x = 0; x < i_width; x++ )
+        {
+            dst[x] = ( cA*src[x]  + cB*src[x+1] +
+                       cC*srcp[x] + cD*srcp[x+1] + 8 ) >> 4;
+        }
+        dst  += i_dst;
+
+        src   = srcp;
+        srcp += i_src;
+    }
+}
+static int XDeint8x4SadMMXEXT( uint8_t *pix1, int i_pix1,
+                               uint8_t *pix2, int i_pix2 )
+{
+    int32_t s;
+
+    movq_m2r( pix1[0*i_pix1], mm0 );
+    movq_m2r( pix1[1*i_pix1], mm1 );
+
+    psadbw_m2r( pix2[0*i_pix2], mm0 );
+    psadbw_m2r( pix2[1*i_pix2], mm1 );
+
+    movq_m2r( pix1[2*i_pix1], mm2 );
+    movq_m2r( pix1[3*i_pix1], mm3 );
+    psadbw_m2r( pix2[2*i_pix2], mm2 );
+    psadbw_m2r( pix2[3*i_pix2], mm3 );
+
+    paddd_r2r( mm1, mm0 );
+    paddd_r2r( mm3, mm2 );
+    paddd_r2r( mm2, mm0 );
+    movd_r2m( mm0, s );
+
+    return s;
+}
+
+static inline int XDeint8x4TestQpel( uint8_t *src, int i_src,
+                                     uint8_t *ref, int i_stride,
+                                     int mx, int my,
+                                     int xmax, int ymax )
+{
+    uint8_t buffer[8*4];
+
+    if( abs(mx) >= 4*xmax || abs(my) >= 4*ymax )
+        return 255*255*255;
+
+    XDeintMC( buffer, 8, ref, i_stride, mx, my, 8, 4 );
+    return XDeint8x4SadMMXEXT( src, i_src, buffer, 8 );
+}
+static inline int XDeint8x4TestInt( uint8_t *src, int i_src,
+                                    uint8_t *ref, int i_stride,
+                                    int mx, int my,
+                                    int xmax, int ymax )
+{
+    if( abs(mx) >= xmax || abs(my) >= ymax )
+        return 255*255*255;
+
+    return XDeint8x4SadMMXEXT( src, i_src, &ref[my*i_stride+mx], i_stride );
+}
+
+static inline void XDeint8x8FieldMotion( uint8_t *dst, int i_dst,
+                                         uint8_t *src, int i_src,
+                                         int *mpx, int *mpy,
+                                         int xmax, int ymax )
+{
+    static const int dx[8] = { 0,  0, -1, 1, -1, -1,  1, 1 };
+    static const int dy[8] = {-1,  1,  0, 0, -1,  1, -1, 1 };
+    uint8_t *next = &src[i_src];
+    const int i_src2 = 2*i_src;
+    int mvx, mvy;
+    int mvs, s;
+    int i_step;
+
+    uint8_t *rec = &dst[i_dst];
+
+    /* We construct with intra method the missing field */
+    XDeint8x8FieldMMXEXT( dst, i_dst, src, i_src );
+
+    /* Now we will try to find a match with ME with the other field */
+
+    /* ME: A small/partial EPZS
+     * We search only for small MV (with high motion intra will be perfect */
+    if( xmax > 4 ) xmax = 4;
+    if( ymax > 4 ) ymax = 4;
+
+    /* Init with NULL Mv */
+    mvx = mvy = 0;
+    mvs = XDeint8x4SadMMXEXT( rec, i_src2, next, i_src2 );
+
+    /* Try predicted Mv */
+    if( (s=XDeint8x4TestInt( rec, i_src2, next, i_src2, *mpx, *mpy, xmax, ymax)) < mvs )
+    {
+        mvs = s;
+        mvx = *mpx;
+        mvy = *mpy;
+    }
+    /* Search interger pel (small mv) */
+    for( i_step = 0; i_step < 4; i_step++ )
+    {
+        int c = 4;
+        int s;
+        int i;
+
+        for( i = 0; i < 4; i++ )
+        {
+            s = XDeint8x4TestInt( rec, i_src2,
+                                  next, i_src2, mvx+dx[i], mvy+dy[i],
+                                  xmax, ymax );
+            if( s < mvs )
+            {
+                mvs = s;
+                c = i;
+            }
+        }
+        if( c == 4 )
+            break;
+
+        mvx += dx[c];
+        mvy += dy[c];
+    }
+    *mpx = mvx;
+    *mpy = mvy;
+
+    mvx <<= 2;
+    mvy <<= 2;
+
+    if( mvs > 4 && mvs < 256 )
+    {
+        /* Search Qpel */
+        /* XXX: for now only HPEL (too slow) */
+        for( i_step = 0; i_step < 4; i_step++ )
+        {
+            int c = 8;
+            int s;
+            int i;
+
+            for( i = 0; i < 8; i++ )
+            {
+                s = XDeint8x4TestQpel( rec, i_src2, next, i_src2,
+                                       mvx+dx[i], mvy+dy[i],
+                                       xmax, ymax );
+                if( s < mvs )
+                {
+                    mvs = s;
+                    c = i;
+                }
+            }
+            if( c == 8 )
+                break;
+
+            mvx += dx[c];
+            mvy += dy[c];
+        }
+    }
+
+    if( mvs < 128 )
+    {
+        uint8_t buffer[8*4];
+        XDeintMC( buffer, 8, next, i_src2, mvx, mvy, 8, 4 );
+        XDeint8x8MergeMMXEXT( dst, i_dst, src, 2*i_src, buffer, 8 );
+
+        //XDeint8x8Set( dst, i_dst, 0 );
+    }
+}
+#endif
+#endif
+
+#if 0
+/* Kernel interpolation (1,-5,20,20,-5,1)
+ * Loose a bit more details+add aliasing than edge interpol but avoid
+ * more artifacts
+ */
+static inline uint8_t clip1( int a )
+{
+    if( a <= 0 )
+        return 0;
+    else if( a >= 255 )
+        return 255;
+    else
+        return a;
+}
+static inline void XDeint8x8Field( uint8_t *dst, int i_dst,
+                                   uint8_t *src, int i_src )
+{
+    int y, x;
+
+    /* Interlaced */
+    for( y = 0; y < 8; y += 2 )
+    {
+        const int i_src2 = i_src*2;
+
+        memcpy( dst, src, 8 );
+        dst += i_dst;
+
+        for( x = 0; x < 8; x++ )
+        {
+            int pix;
+
+            pix =   1*(src[-2*i_src2+x]+src[3*i_src2+x]) +
+                   -5*(src[-1*i_src2+x]+src[2*i_src2+x])
+                  +20*(src[ 0*i_src2+x]+src[1*i_src2+x]);
+
+            dst[x] = clip1( ( pix + 16 ) >> 5 );
+        }
+
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+
+#endif
+
+/* NxN arbitray size (and then only use pixel in the NxN block)
+ */
+static inline int XDeintNxNDetect( uint8_t *src, int i_src,
+                                   int i_height, int i_width )
+{
+    int y, x;
+    int ff, fr;
+    int fc;
+
+
+    /* Detect interlacing */
+    /* FIXME way too simple, need to be more like XDeint8x8Detect */
+    ff = fr = 0;
+    fc = 0;
+    for( y = 0; y < i_height - 2; y += 2 )
+    {
+        const uint8_t *s = &src[y*i_src];
+        for( x = 0; x < i_width; x++ )
+        {
+            fr += ssd(s[      x] - s[1*i_src+x]);
+            ff += ssd(s[      x] - s[2*i_src+x]);
+        }
+        if( ff < fr && fr > i_width / 2 )
+            fc++;
+    }
+
+    return fc < 2 ? VLC_FALSE : VLC_TRUE;
+}
+
+static inline void XDeintNxNFrame( uint8_t *dst, int i_dst,
+                                   uint8_t *src, int i_src,
+                                   int i_width, int i_height )
+{
+    int y, x;
+
+    /* Progressive */
+    for( y = 0; y < i_height; y += 2 )
+    {
+        memcpy( dst, src, i_width );
+        dst += i_dst;
+
+        if( y < i_height - 2 )
+        {
+            for( x = 0; x < i_width; x++ )
+                dst[x] = (src[x] + 2*src[1*i_src+x] + src[2*i_src+x] + 2 ) >> 2;
+        }
+        else
+        {
+            /* Blend last line */
+            for( x = 0; x < i_width; x++ )
+                dst[x] = (src[x] + src[1*i_src+x] ) >> 1;
+        }
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+
+static inline void XDeintNxNField( uint8_t *dst, int i_dst,
+                                   uint8_t *src, int i_src,
+                                   int i_width, int i_height )
+{
+    int y, x;
+
+    /* Interlaced */
+    for( y = 0; y < i_height; y += 2 )
+    {
+        memcpy( dst, src, i_width );
+        dst += i_dst;
+
+        if( y < i_height - 2 )
+        {
+            for( x = 0; x < i_width; x++ )
+                dst[x] = (src[x] + src[2*i_src+x] ) >> 1;
+        }
+        else
+        {
+            /* Blend last line */
+            for( x = 0; x < i_width; x++ )
+                dst[x] = (src[x] + src[i_src+x]) >> 1;
+        }
+        dst += 1*i_dst;
+        src += 2*i_src;
+    }
+}
+
+static inline void XDeintNxN( uint8_t *dst, int i_dst, uint8_t *src, int i_src,
+                              int i_width, int i_height )
+{
+    if( XDeintNxNDetect( src, i_src, i_width, i_height ) )
+        XDeintNxNField( dst, i_dst, src, i_src, i_width, i_height );
+    else
+        XDeintNxNFrame( dst, i_dst, src, i_src, i_width, i_height );
+}
+
+
+static inline int median( int a, int b, int c )
+{
+    int min = a, max =a;
+    if( b < min )
+        min = b;
+    else
+        max = b;
+
+    if( c < min )
+        min = c;
+    else if( c > max )
+        max = c;
+
+    return a + b + c - min - max;
+}
+
+
+/* XDeintBand8x8:
+ */
+static inline void XDeintBand8x8C( uint8_t *dst, int i_dst,
+                                   uint8_t *src, int i_src,
+                                   const int i_mbx, int i_modx )
+{
+    int x;
+
+    for( x = 0; x < i_mbx; x++ )
+    {
+        int s;
+        if( ( s = XDeint8x8DetectC( src, i_src ) ) )
+        {
+            if( x == 0 || x == i_mbx - 1 )
+                XDeint8x8FieldEC( dst, i_dst, src, i_src );
+            else
+                XDeint8x8FieldC( dst, i_dst, src, i_src );
+        }
+        else
+        {
+            XDeint8x8MergeC( dst, i_dst,
+                             &src[0*i_src], 2*i_src,
+                             &src[1*i_src], 2*i_src );
+        }
+
+        dst += 8;
+        src += 8;
+    }
+
+    if( i_modx )
+        XDeintNxN( dst, i_dst, src, i_src, i_modx, 8 );
+}
+#ifdef CAN_COMPILE_MMXEXT
+static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
+                                        uint8_t *src, int i_src,
+                                        const int i_mbx, int i_modx )
+{
+    int x;
+
+    /* Reset current line */
+    for( x = 0; x < i_mbx; x++ )
+    {
+        int s;
+        if( ( s = XDeint8x8DetectMMXEXT( src, i_src ) ) )
+        {
+            if( x == 0 || x == i_mbx - 1 )
+                XDeint8x8FieldEMMXEXT( dst, i_dst, src, i_src );
+            else
+                XDeint8x8FieldMMXEXT( dst, i_dst, src, i_src );
+        }
+        else
+        {
+            XDeint8x8MergeMMXEXT( dst, i_dst,
+                                  &src[0*i_src], 2*i_src,
+                                  &src[1*i_src], 2*i_src );
+        }
+
+        dst += 8;
+        src += 8;
+    }
+
+    if( i_modx )
+        XDeintNxN( dst, i_dst, src, i_src, i_modx, 8 );
+}
+#endif
+
+static void RenderX( vout_thread_t *p_vout,
+                     picture_t *p_outpic, picture_t *p_pic )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+    int i_plane;
+
+    /* Copy image and skip lines */
+    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    {
+        const int i_mby = ( p_outpic->p[i_plane].i_visible_lines + 7 )/8 - 1;
+        const int i_mbx = p_outpic->p[i_plane].i_visible_pitch/8;
+
+        const int i_mody = p_outpic->p[i_plane].i_visible_lines - 8*i_mby;
+        const int i_modx = p_outpic->p[i_plane].i_visible_pitch - 8*i_mbx;
+
+        const int i_dst = p_outpic->p[i_plane].i_pitch;
+        const int i_src = p_pic->p[i_plane].i_pitch;
+
+        int y, x;
+
+        for( y = 0; y < i_mby; y++ )
+        {
+            uint8_t *dst = &p_outpic->p[i_plane].p_pixels[8*y*i_dst];
+            uint8_t *src = &p_pic->p[i_plane].p_pixels[8*y*i_src];
+
+#ifdef CAN_COMPILE_MMXEXT
+            if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+                XDeintBand8x8MMXEXT( dst, i_dst, src, i_src, i_mbx, i_modx );
+            else
+#endif
+                XDeintBand8x8C( dst, i_dst, src, i_src, i_mbx, i_modx );
+        }
+
+        /* Last line (C only)*/
+        if( i_mody )
+        {
+            uint8_t *dst = &p_outpic->p[i_plane].p_pixels[8*y*i_dst];
+            uint8_t *src = &p_pic->p[i_plane].p_pixels[8*y*i_src];
+
+            for( x = 0; x < i_mbx; x++ )
+            {
+                XDeintNxN( dst, i_dst, src, i_src, 8, i_mody );
+
+                dst += 8;
+                src += 8;
+            }
+
+            if( i_modx )
+                XDeintNxN( dst, i_dst, src, i_src, i_modx, i_mody );
+        }
+    }
+
+#ifdef CAN_COMPILE_MMXEXT
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMXEXT )
+        emms();
+#endif
+}
 
 /*****************************************************************************
  * SendEvents: forward mouse and keyboard events to the parent p_vout
