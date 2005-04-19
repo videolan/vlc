@@ -211,7 +211,8 @@ vlc_module_end();
 static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
-#define DVB_READ_ONCE 3
+#define DVB_READ_ONCE 20
+#define DVB_READ_ONCE_START 2
 #define TS_PACKET_SIZE 188
 
 static void FilterUnset( access_t *, int i_max );
@@ -296,6 +297,11 @@ static int Open( vlc_object_t *p_this )
     }
 
     E_(CAMOpen)( p_access );
+
+    if( p_sys->b_budget_mode )
+        p_sys->i_read_once = DVB_READ_ONCE;
+    else
+        p_sys->i_read_once = DVB_READ_ONCE_START;
 
     return VLC_SUCCESS;
 }
@@ -382,14 +388,17 @@ static block_t *Block( access_t *p_access )
         }
     }
 
-    p_block = block_New( p_access, DVB_READ_ONCE * TS_PACKET_SIZE );
+    p_block = block_New( p_access, p_sys->i_read_once * TS_PACKET_SIZE );
     if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer,
-                                    DVB_READ_ONCE * TS_PACKET_SIZE ) ) <= 0 )
+                                    p_sys->i_read_once*TS_PACKET_SIZE ) ) <= 0 )
     {
         msg_Err( p_access, "read failed (%s)", strerror(errno) );
         block_Release( p_block );
         return NULL;
     }
+
+    if( p_sys->i_read_once < DVB_READ_ONCE )
+        p_sys->i_read_once++;
 
     return p_block;
 }
@@ -495,6 +504,9 @@ static void FilterSet( access_t *p_access, int i_pid, int i_type )
     }
     p_sys->p_demux_handles[i].i_type = i_type;
     p_sys->p_demux_handles[i].i_pid = i_pid;
+
+    if( p_sys->i_read_once < DVB_READ_ONCE )
+        p_sys->i_read_once++;
 }
 
 static void FilterUnset( access_t *p_access, int i_max )
