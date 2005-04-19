@@ -408,6 +408,8 @@ protected:
 
     uint16 p_GPRM[16];
     uint16 p_SPRM[24];
+
+    static const uint16 CMD_JUMP_TT = 0x3002;
 };
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
@@ -4087,6 +4089,18 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 {
     if ( i_size != 8 )
         return false;
+
+    uint16 i_command = ( p_command[0] << 8 ) + p_command[1];
+
+    switch ( i_command )
+    {
+    case CMD_JUMP_TT:
+        {
+            uint8 i_title = p_command[5];
+            // TODO find in the ChapProcessPrivate matching this Title level
+            break;
+        }
+    }
 
     return true;
 }
