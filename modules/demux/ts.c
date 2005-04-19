@@ -218,14 +218,6 @@ typedef struct
 
 typedef struct
 {
-    demux_t *p_demux;   /* Hack */
-    int i_table_id;
-    int i_version;
-    int i_service_id;
-} ts_eit_psi_t;
-
-typedef struct
-{
     /* for special PAT/SDT case */
     dvbpsi_handle   handle; /* PAT/SDT/EIT */
     int             i_pat_version;
@@ -234,10 +226,6 @@ typedef struct
     /* For PMT */
     int             i_prg;
     ts_prg_psi_t    **prg;
-
-    /* For EIT */
-    int             i_eit;
-    ts_eit_psi_t    **eit;
 
 } ts_psi_t;
 
@@ -442,11 +430,13 @@ static int Open( vlc_object_t *p_this )
         ts_pid_t *eit = &p_sys->pid[0x12];
 
         PIDInit( sdt, VLC_TRUE, NULL );
-        sdt->psi->handle = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
-                                               p_demux );
+        sdt->psi->handle =
+            dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
+                                p_demux );
         PIDInit( eit, VLC_TRUE, NULL );
-        eit->psi->handle = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
-                                               p_demux );
+        eit->psi->handle =
+            dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
+                                p_demux );
         if( p_sys->b_dvb_control )
         {
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -644,7 +634,6 @@ static void Close( vlc_object_t *p_this )
 
         if( pid->b_valid && pid->psi )
         {
-            int j;
             switch( pid->i_pid )
             {
                 case 0: /* PAT */
@@ -655,17 +644,8 @@ static void Close( vlc_object_t *p_this )
                     free( pid->psi );
                     break;
                 case 0x11: /* SDT */
-                    dvbpsi_DetachDemux( pid->psi->handle );
-                    free( pid->psi );
-                    break;
                 case 0x12: /* EIT */
                     dvbpsi_DetachDemux( pid->psi->handle );
-                    for( j = 0; j < pid->psi->i_eit; j++ )
-                    {
-                        free( pid->psi->eit[j] );
-                    }
-                    if( pid->psi->i_eit )
-                        free( pid->psi->eit );
                     free( pid->psi );
                     break;
                 default:
@@ -1058,8 +1038,6 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
             pid->psi->handle= NULL;
             pid->psi->i_prg = 0;
             pid->psi->prg   = NULL;
-            pid->psi->i_eit = 0;
-            pid->psi->eit   = NULL;
         }
         pid->psi->i_pat_version  = -1;
         pid->psi->i_sdt_version  = -1;
@@ -2034,18 +2012,21 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         return;
     }
 
-    msg_Dbg( p_demux, "new SDT ts_id=%d version=%d current_next=%d network_id=%d",
-             p_sdt->i_ts_id, p_sdt->i_version, p_sdt->b_current_next, p_sdt->i_network_id );
+    msg_Dbg( p_demux, "new SDT ts_id=%d version=%d current_next=%d "
+             "network_id=%d",
+             p_sdt->i_ts_id, p_sdt->i_version, p_sdt->b_current_next,
+             p_sdt->i_network_id );
 
     for( p_srv = p_sdt->p_first_service; p_srv; p_srv = p_srv->p_next )
     {
         vlc_meta_t          *p_meta = vlc_meta_New();
         dvbpsi_descriptor_t *p_dr;
 
-        msg_Dbg( p_demux, "  * service id=%d eit schedule=%d present=%d runing=%d free_ca=%d",
-                p_srv->i_service_id,
-                p_srv->b_eit_schedule, p_srv->b_eit_present, p_srv->i_running_status,
-                p_srv->b_free_ca );
+        msg_Dbg( p_demux, "  * service id=%d eit schedule=%d present=%d "
+                 "runing=%d free_ca=%d",
+                 p_srv->i_service_id, p_srv->b_eit_schedule,
+                 p_srv->b_eit_present, p_srv->i_running_status,
+                 p_srv->b_free_ca );
 
         for( p_dr = p_srv->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
         {
@@ -2074,7 +2055,8 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                 char str1[257];
                 char str2[257];
 
-                memcpy( str1, pD->i_service_provider_name, pD->i_service_provider_name_length );
+                memcpy( str1, pD->i_service_provider_name,
+                        pD->i_service_provider_name_length );
                 str1[pD->i_service_provider_name_length] = '\0';
                 memcpy( str2, pD->i_service_name, pD->i_service_name_length );
                 str2[pD->i_service_name_length] = '\0';
@@ -2130,24 +2112,23 @@ static void DecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
 }
 #endif
 
-static void EITCallBack( ts_eit_psi_t *psi, dvbpsi_eit_t *p_eit )
+static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 {
-    demux_t              *p_demux = psi->p_demux;
-
     dvbpsi_eit_event_t *p_evt;
 
     msg_Dbg( p_demux, "EITCallBack called" );
-    if( psi->i_version != -1 &&
-        ( !p_eit->b_current_next || psi->i_version == p_eit->i_version ) )
+    if( !p_eit->b_current_next )
     {
         dvbpsi_DeleteEIT( p_eit );
         return;
     }
 
-    msg_Dbg( p_demux, "new EIT service_id=%d version=%d current_next=%d ts_id=%d network_id=%d"
-                      "segment_last_section_number=%d last_table_id=%d",
-             p_eit->i_service_id, p_eit->i_version, p_eit->b_current_next, p_eit->i_ts_id,
-             p_eit->i_network_id, p_eit->i_segment_last_section_number, p_eit->i_last_table_id );
+    msg_Dbg( p_demux, "new EIT service_id=%d version=%d current_next=%d "
+             "ts_id=%d network_id=%d segment_last_section_number=%d "
+             "last_table_id=%d",
+             p_eit->i_service_id, p_eit->i_version, p_eit->b_current_next,
+             p_eit->i_ts_id, p_eit->i_network_id,
+             p_eit->i_segment_last_section_number, p_eit->i_last_table_id );
 
     for( p_evt = p_eit->p_first_event; p_evt; p_evt = p_evt->p_next )
     {
@@ -2260,7 +2241,6 @@ static void EITCallBack( ts_eit_psi_t *psi, dvbpsi_eit_t *p_eit )
         free( psz_cat );
         free( psz_extra );
     }
-    psi->i_version = p_eit->i_version;
     dvbpsi_DeleteEIT( p_eit );
 }
 
@@ -2271,27 +2251,23 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
     msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
              i_table_id, i_table_id, i_extension, i_extension );
 #endif
+
     if( i_table_id == 0x42 )
     {
         msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
 
-        dvbpsi_AttachSDT( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux );
+        dvbpsi_AttachSDT( h, i_table_id, i_extension,
+                          (dvbpsi_sdt_callback)SDTCallBack, p_demux );
     }
-    else if( i_table_id == 0x4e ||                          /* Current/Following */
+    else if( i_table_id == 0x4e || /* Current/Following */
              ( i_table_id >= 0x50 && i_table_id <= 0x5f ) ) /* Schedule */
     {
-        ts_eit_psi_t *psi = malloc( sizeof(ts_eit_psi_t) );
-
         msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
 
-        psi->p_demux = p_demux;
-        psi->i_table_id = i_table_id;
-        psi->i_version = -1;
-        psi->i_service_id = i_extension;
-
-        dvbpsi_AttachEIT( h, i_table_id, i_extension, (dvbpsi_eit_callback)EITCallBack, psi );
+        dvbpsi_AttachEIT( h, i_table_id, i_extension,
+                          (dvbpsi_eit_callback)EITCallBack, p_demux );
     }
 }
 #endif
