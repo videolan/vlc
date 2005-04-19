@@ -340,8 +340,8 @@ public:
 
     void AddCommand( const KaxChapterProcessCommand & command );
 	
-    virtual bool Enter() const {}
-    virtual bool Leave() const {}
+    virtual bool Enter() { return true; }
+    virtual bool Leave() { return true; }
 
 protected:
     KaxChapterProcessPrivate m_private_data;
@@ -353,6 +353,7 @@ protected:
 
 class dvd_command_interpretor_c
 {
+public:
     dvd_command_interpretor_c()
     {
         memset( p_GPRM, 0, sizeof(p_GPRM) * 2 );
@@ -369,53 +370,54 @@ class dvd_command_interpretor_c
     
 	bool Interpret( const binary * p_command, size_t i_size = 8 );
 	
-    protected:
-        uint16 GetGPRM( size_t index ) const
-        {
-            if ( index >= 0 && index < 16 )
-                return p_GPRM[ index ];
-            else return 0;
-        }
+protected:
+    uint16 GetGPRM( size_t index ) const
+    {
+        if ( index >= 0 && index < 16 )
+            return p_GPRM[ index ];
+        else return 0;
+    }
 
-        uint16 GetSPRM( size_t index ) const
-        {
-            // 21,22,23 reserved for future use
-            if ( index >= 0 && index < 21 )
-                return p_SPRM[ index ];
-            else return 0;
-        }
+    uint16 GetSPRM( size_t index ) const
+    {
+        // 21,22,23 reserved for future use
+        if ( index >= 0 && index < 21 )
+            return p_SPRM[ index ];
+        else return 0;
+    }
 
-        bool SetGPRM( size_t index, uint16 value )
+    bool SetGPRM( size_t index, uint16 value )
+    {
+        if ( index >= 0 && index < 16 )
         {
-            if ( index >= 0 && index < 16 )
-            {
-                p_GPRM[ index ] = value;
-                return true;
-            }
-            return false;
+            p_GPRM[ index ] = value;
+            return true;
         }
+        return false;
+    }
 
-        bool SetSPRM( size_t index, uint16 value )
+    bool SetSPRM( size_t index, uint16 value )
+    {
+        if ( index > 0 && index <= 13 && index != 12 )
         {
-            if ( index > 0 && index <= 13 && index != 12 )
-            {
-                p_SPRM[ index ] = value;
-                return true;
-            }
-            return false;
+            p_SPRM[ index ] = value;
+            return true;
         }
+        return false;
+    }
 
-        uint16 p_GPRM[16];
-        uint16 p_SPRM[24];
+    uint16 p_GPRM[16];
+    uint16 p_SPRM[24];
 };
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
-    bool Enter() const;
-    bool Leave() const;
+public:
+    bool Enter();
+    bool Leave();
 
-    protected:
-        static dvd_command_interpretor_c interpretor; 
+protected:
+    dvd_command_interpretor_c interpretor; 
 };
 
 class matroska_script_codec_c : public chapter_codec_cmds_c
@@ -445,7 +447,7 @@ public:
         
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     void PublishChapters( input_title_t & title, int i_level );
-    const chapter_item_c * FindTimecode( mtime_t i_timecode ) const;
+    chapter_item_c * FindTimecode( mtime_t i_timecode );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( const chapter_item_c & chapter );
     
@@ -465,8 +467,8 @@ public:
         return ( i_user_start_time < item.i_user_start_time || (i_user_start_time == item.i_user_start_time && i_user_end_time < item.i_user_end_time) );
     }
 
-    bool Enter() const;
-    bool Leave() const;
+    bool Enter();
+    bool Leave();
 };
 
 class chapter_edition_c : public chapter_item_c
@@ -649,7 +651,7 @@ public:
     void PreloadLinked( );
     mtime_t Duration( ) const;
     void LoadCues( );
-    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_c *psz_chapter );
+    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter );
 
     inline chapter_edition_c *Edition()
     {
@@ -695,7 +697,7 @@ protected:
 
     std::vector<chapter_edition_c>   editions;
     int                              i_current_edition;
-    const chapter_item_c             *psz_current_chapter;
+    chapter_item_c                   *psz_current_chapter;
 
     void                             AppendUID( const EbmlBinary & UID );
 };
@@ -772,7 +774,7 @@ public:
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_date, double f_percent, const chapter_item_c *psz_chapter );
+static void Seek   ( demux_t *, mtime_t i_date, double f_percent, chapter_item_c *psz_chapter );
 
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
@@ -1758,7 +1760,7 @@ void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
 void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
-    const chapter_item_c *psz_curr_chapter;
+    chapter_item_c *psz_curr_chapter;
 
     /* update current chapter/seekpoint */
     if ( editions.size() )
@@ -1825,7 +1827,7 @@ chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
     return NULL;
 }
 
-static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_c *psz_chapter )
+static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_item_c *psz_chapter )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
@@ -3548,15 +3550,15 @@ mtime_t chapter_edition_c::Duration() const
     return i_result;
 }
 
-const chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode ) const
+chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode )
 {
-    const chapter_item_c *psz_result = NULL;
+    chapter_item_c *psz_result = NULL;
 
     if ( i_user_timecode >= i_user_start_time && 
         ( i_user_timecode < i_user_end_time || 
           ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
     {
-        std::vector<chapter_item_c>::const_iterator index = sub_chapters.begin();
+        std::vector<chapter_item_c>::iterator index = sub_chapters.begin();
         while ( index != sub_chapters.end() && psz_result == NULL )
         {
             psz_result = (*index).FindTimecode( i_user_timecode );
@@ -3907,7 +3909,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 #undef tk
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_c *psz_chapter )
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
     size_t i;
@@ -3991,9 +3993,9 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
     }
 }
 
-bool chapter_item_c::Enter() const
+bool chapter_item_c::Enter()
 {
-	std::vector<chapter_codec_cmds_c>::const_iterator index = codecs.begin();
+	std::vector<chapter_codec_cmds_c>::iterator index = codecs.begin();
 	while ( index != codecs.end() )
 	{
 		(*index).Enter();
@@ -4002,9 +4004,9 @@ bool chapter_item_c::Enter() const
     return true;
 }
 
-bool chapter_item_c::Leave() const
+bool chapter_item_c::Leave()
 {
-	std::vector<chapter_codec_cmds_c>::const_iterator index = codecs.begin();
+	std::vector<chapter_codec_cmds_c>::iterator index = codecs.begin();
 	while ( index != codecs.end() )
 	{
 		(*index).Leave();
@@ -4013,17 +4015,17 @@ bool chapter_item_c::Leave() const
     return true;
 }
 
-bool dvd_chapter_codec_c::Enter() const
+bool dvd_chapter_codec_c::Enter()
 {
-	std::vector<KaxChapterProcessData>::const_iterator index = enter_cmds.begin();
+	std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
 	while ( index != enter_cmds.end() )
 	{
-		if ( *index.GetSize() )
+		if ( (*index).GetSize() )
 		{
-			binary *p_data = *index.GetBuffer();
+			binary *p_data = (*index).GetBuffer();
 			size_t i_size = *p_data++;
 			// avoid reading too much from the buffer
-			i_size = min( i_size, (*index.GetSize() - 1) >> 3 );
+			i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
 			for ( ; i_size > 0; i_size--, p_data += 8 )
 			{
 				interpretor.Interpret( p_data );
@@ -4034,17 +4036,17 @@ bool dvd_chapter_codec_c::Enter() const
     return true;
 }
 
-bool dvd_chapter_codec_c::Leave() const
+bool dvd_chapter_codec_c::Leave()
 {
-	std::vector<KaxChapterProcessData>::const_iterator index = leave_cmds.begin();
+	std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
 	while ( index != leave_cmds.end() )
 	{
-		if ( *index.GetSize() )
+		if ( (*index).GetSize() )
 		{
-			binary *p_data = *index.GetBuffer();
+			binary *p_data = (*index).GetBuffer();
 			size_t i_size = *p_data++;
 			// avoid reading too much from the buffer
-			i_size = min( i_size, (*index.GetSize() - 1) >> 3 );
+			i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
 			for ( ; i_size > 0; i_size--, p_data += 8 )
 			{
 				interpretor.Interpret( p_data );
@@ -4059,4 +4061,6 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 {
 	if ( i_size != 8 )
 		return false;
+
+	return true;
 }
