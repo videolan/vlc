@@ -339,6 +339,9 @@ public:
     }
 
     void AddCommand( const KaxChapterProcessCommand & command );
+	
+    virtual bool Enter() const {}
+    virtual bool Leave() const {}
 
 protected:
     KaxChapterProcessPrivate m_private_data;
@@ -364,6 +367,8 @@ class dvd_command_interpretor_c
         p_SPRM[ 18 ] = 0xFFFFu;
     }
     
+	bool Interpret( const binary * p_command, size_t i_size = 8 );
+	
     protected:
         uint16 GetGPRM( size_t index ) const
         {
@@ -390,7 +395,7 @@ class dvd_command_interpretor_c
             return false;
         }
 
-        bool SetSPRM( size_t index, uint16 value );
+        bool SetSPRM( size_t index, uint16 value )
         {
             if ( index > 0 && index <= 13 && index != 12 )
             {
@@ -406,6 +411,9 @@ class dvd_command_interpretor_c
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
+    bool Enter() const;
+    bool Leave() const;
+
     protected:
         static dvd_command_interpretor_c interpretor; 
 };
@@ -3985,10 +3993,70 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
 
 bool chapter_item_c::Enter() const
 {
+	std::vector<chapter_codec_cmds_c>::const_iterator index = codecs.begin();
+	while ( index != codecs.end() )
+	{
+		(*index).Enter();
+		index++;
+	}
     return true;
 }
 
 bool chapter_item_c::Leave() const
 {
+	std::vector<chapter_codec_cmds_c>::const_iterator index = codecs.begin();
+	while ( index != codecs.end() )
+	{
+		(*index).Leave();
+		index++;
+	}
     return true;
+}
+
+bool dvd_chapter_codec_c::Enter() const
+{
+	std::vector<KaxChapterProcessData>::const_iterator index = enter_cmds.begin();
+	while ( index != enter_cmds.end() )
+	{
+		if ( *index.GetSize() )
+		{
+			binary *p_data = *index.GetBuffer();
+			size_t i_size = *p_data++;
+			// avoid reading too much from the buffer
+			i_size = min( i_size, (*index.GetSize() - 1) >> 3 );
+			for ( ; i_size > 0; i_size--, p_data += 8 )
+			{
+				interpretor.Interpret( p_data );
+			}
+		}
+		index++;
+	}
+    return true;
+}
+
+bool dvd_chapter_codec_c::Leave() const
+{
+	std::vector<KaxChapterProcessData>::const_iterator index = leave_cmds.begin();
+	while ( index != leave_cmds.end() )
+	{
+		if ( *index.GetSize() )
+		{
+			binary *p_data = *index.GetBuffer();
+			size_t i_size = *p_data++;
+			// avoid reading too much from the buffer
+			i_size = min( i_size, (*index.GetSize() - 1) >> 3 );
+			for ( ; i_size > 0; i_size--, p_data += 8 )
+			{
+				interpretor.Interpret( p_data );
+			}
+		}
+		index++;
+	}
+    return true;
+}
+
+bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_size )
+{
+	if ( i_size != 8 )
+		return false;
 }
