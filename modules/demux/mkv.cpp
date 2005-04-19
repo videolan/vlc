@@ -333,6 +333,8 @@ typedef struct
 class chapter_codec_cmds_c
 {
 public:
+    virtual ~chapter_codec_cmds_c() {}
+
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
     {
         m_private_data = *( new KaxChapterProcessPrivate( private_data ) );
