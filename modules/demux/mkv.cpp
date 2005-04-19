@@ -330,7 +330,7 @@ typedef struct
     vlc_bool_t b_key;
 } mkv_index_t;
 
-class chapter_codec_cmds_t
+class chapter_codec_cmds_c
 {
 public:
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
@@ -348,15 +348,21 @@ protected:
     std::vector<KaxChapterProcessData> leave_cmds;
 };
 
-class dvd_chapter_codec_t : public chapter_codec_cmds_t
+class dvd_command_interpretor_c
 {
 };
 
-class matroska_script_codec_t : public chapter_codec_cmds_t
+class dvd_chapter_codec_c : public chapter_codec_cmds_c
+{
+    protected:
+        static dvd_command_interpretor_c interpreter; 
+};
+
+class matroska_script_codec_c : public chapter_codec_cmds_c
 {
 };
 
-class chapter_translation_t
+class chapter_translation_c
 {
 public:
     KaxChapterTranslateID  translated;
@@ -364,10 +370,10 @@ public:
     std::vector<uint64_t>  editions;
 };
 
-class chapter_item_t
+class chapter_item_c
 {
 public:
-    chapter_item_t()
+    chapter_item_c()
     :i_start_time(0)
     ,i_end_time(-1)
     ,i_user_start_time(-1)
@@ -379,22 +385,22 @@ public:
         
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     void PublishChapters( input_title_t & title, int i_level );
-    const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
-    void Append( const chapter_item_t & edition );
-    chapter_item_t * FindChapter( const chapter_item_t & chapter );
+    const chapter_item_c * FindTimecode( mtime_t i_timecode ) const;
+    void Append( const chapter_item_c & edition );
+    chapter_item_c * FindChapter( const chapter_item_c & chapter );
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
-    std::vector<chapter_item_t> sub_chapters;
+    std::vector<chapter_item_c> sub_chapters;
     int                         i_seekpoint_num;
     int64_t                     i_uid;
     bool                        b_display_seekpoint;
     std::string                 psz_name;
-    chapter_item_t              *psz_parent;
+    chapter_item_c              *psz_parent;
     
-    std::vector<chapter_codec_cmds_t> codecs;
+    std::vector<chapter_codec_cmds_c> codecs;
 
-    bool operator<( const chapter_item_t & item ) const
+    bool operator<( const chapter_item_c & item ) const
     {
         return ( i_user_start_time < item.i_user_start_time || (i_user_start_time == item.i_user_start_time && i_user_end_time < item.i_user_end_time) );
     }
@@ -403,10 +409,10 @@ public:
     bool Leave() const;
 };
 
-class chapter_edition_t : public chapter_item_t
+class chapter_edition_c : public chapter_item_c
 {
 public:
-    chapter_edition_t()
+    chapter_edition_c()
     :b_ordered(false)
     {}
     
@@ -417,12 +423,12 @@ public:
     bool                        b_ordered;
 };
 
-class demux_sys_t;
+class demux_sys_c;
 
-class matroska_segment_t
+class matroska_segment_c
 {
 public:
-    matroska_segment_t( demux_sys_t & demuxer, EbmlStream & estream )
+    matroska_segment_c( demux_sys_c & demuxer, EbmlStream & estream )
         :segment(NULL)
         ,es(estream)
         ,i_timescale(MKVD_TIMECODESCALE)
@@ -449,7 +455,7 @@ public:
         index = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
     }
 
-    virtual ~matroska_segment_t()
+    virtual ~matroska_segment_c()
     {
         for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
         {
@@ -532,23 +538,23 @@ public:
     char                    *psz_title;
     char                    *psz_date_utc;
 
-    std::vector<chapter_edition_t> stored_editions;
+    std::vector<chapter_edition_c> stored_editions;
     int                            i_default_edition;
 
-    std::vector<chapter_translation_t> translations;
+    std::vector<chapter_translation_c> translations;
     std::vector<KaxSegmentFamily>  families;
     
-    demux_sys_t                    & sys;
+    demux_sys_c                    & sys;
     EbmlParser                     *ep;
     bool                           b_preloaded;
 
     bool Preload( );
-    bool PreloadFamily( const matroska_segment_t & segment );
+    bool PreloadFamily( const matroska_segment_c & segment );
     void ParseInfo( KaxInfo *info );
     void ParseChapters( KaxChapters *chapters );
     void ParseSeekHead( KaxSeekHead *seekhead );
     void ParseTracks( KaxTracks *tracks );
-    void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_t & chapters );
+    void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters );
     void ParseTrackEntry( KaxTrackEntry *m );
     void ParseCluster( );
     void IndexAppendCluster( KaxCluster *cluster );
@@ -559,14 +565,14 @@ public:
     int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
-    static bool CompareSegmentUIDs( const matroska_segment_t * item_a, const matroska_segment_t * item_b );
+    static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 };
 
 // class holding hard-linked segment together in the playback order
-class virtual_segment_t
+class virtual_segment_c
 {
 public:
-    virtual_segment_t( matroska_segment_t *p_segment )
+    virtual_segment_c( matroska_segment_c *p_segment )
         :i_current_segment(0)
         ,i_current_edition(-1)
         ,psz_current_chapter(NULL)
@@ -579,13 +585,13 @@ public:
     }
 
     void Sort();
-    size_t AddSegment( matroska_segment_t *p_segment );
+    size_t AddSegment( matroska_segment_c *p_segment );
     void PreloadLinked( );
     mtime_t Duration( ) const;
     void LoadCues( );
-    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_t *psz_chapter );
+    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_c *psz_chapter );
 
-    inline chapter_edition_t *Edition()
+    inline chapter_edition_c *Edition()
     {
         if ( i_current_edition >= 0 && size_t(i_current_edition) < editions.size() )
             return &editions[i_current_edition];
@@ -597,14 +603,14 @@ public:
         return (editions.size() != 0 && i_current_edition >= 0 && editions[i_current_edition].b_ordered);
     }
 
-    matroska_segment_t * Segment() const
+    matroska_segment_c * Segment() const
     {
         if ( linked_segments.size() == 0 || i_current_segment >= linked_segments.size() )
             return NULL;
         return linked_segments[i_current_segment];
     }
 
-    inline const chapter_item_t *CurrentChapter() const {
+    inline const chapter_item_c *CurrentChapter() const {
         return psz_current_chapter;
     }
 
@@ -623,27 +629,27 @@ public:
     bool Select( input_title_t & title );
 
 protected:
-    std::vector<matroska_segment_t*> linked_segments;
+    std::vector<matroska_segment_c*> linked_segments;
     std::vector<KaxSegmentUID>       linked_uids;
     size_t                           i_current_segment;
 
-    std::vector<chapter_edition_t>   editions;
+    std::vector<chapter_edition_c>   editions;
     int                              i_current_edition;
-    const chapter_item_t             *psz_current_chapter;
+    const chapter_item_c             *psz_current_chapter;
 
     void                             AppendUID( const EbmlBinary & UID );
 };
 
-class matroska_stream_t
+class matroska_stream_c
 {
 public:
-    matroska_stream_t( demux_sys_t & demuxer )
+    matroska_stream_c( demux_sys_c & demuxer )
         :p_in(NULL)
         ,p_es(NULL)
         ,sys(demuxer)
     {}
 
-    virtual ~matroska_stream_t()
+    virtual ~matroska_stream_c()
     {
         delete p_in;
         delete p_es;
@@ -652,15 +658,15 @@ public:
     IOCallback         *p_in;
     EbmlStream         *p_es;
 
-    std::vector<matroska_segment_t*> segments;
+    std::vector<matroska_segment_c*> segments;
 
-    demux_sys_t                      & sys;
+    demux_sys_c                      & sys;
 };
 
-class demux_sys_t
+class demux_sys_c
 {
 public:
-    demux_sys_t( demux_t & demux )
+    demux_sys_c( demux_t & demux )
         :demuxer(demux)
         ,i_pts(0)
         ,i_start_pts(0)
@@ -671,7 +677,7 @@ public:
         ,f_duration(-1.0)
     {}
 
-    virtual ~demux_sys_t()
+    virtual ~demux_sys_c()
     {
         for (size_t i=0; i<streams.size(); i++)
             delete streams[i];
@@ -690,23 +696,23 @@ public:
 
     input_title_t           *title;
 
-    std::vector<matroska_stream_t*>  streams;
-    std::vector<matroska_segment_t*> opened_segments;
-    virtual_segment_t                *p_current_segment;
+    std::vector<matroska_stream_c*>  streams;
+    std::vector<matroska_segment_c*> opened_segments;
+    virtual_segment_c                *p_current_segment;
 
     /* duration of the stream */
     float                   f_duration;
 
-    matroska_segment_t *FindSegment( const EbmlBinary & uid ) const;
-    void PreloadFamily( const matroska_segment_t & of_segment );
-    void PreloadLinked( matroska_segment_t *p_segment );
+    matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
+    void PreloadFamily( const matroska_segment_c & of_segment );
+    void PreloadLinked( matroska_segment_c *p_segment );
     bool PreparePlayback( );
-    matroska_stream_t *AnalyseAllSegmentsFound( EbmlStream *p_estream );
+    matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream );
 };
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter );
+static void Seek   ( demux_t *, mtime_t i_date, double f_percent, const chapter_item_c *psz_chapter );
 
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
@@ -718,9 +724,9 @@ static char *UTF8ToStr          ( const UTFstring &u );
 static int Open( vlc_object_t * p_this )
 {
     demux_t            *p_demux = (demux_t*)p_this;
-    demux_sys_t        *p_sys;
-    matroska_stream_t  *p_stream;
-    matroska_segment_t *p_segment;
+    demux_sys_c        *p_sys;
+    matroska_stream_c  *p_stream;
+    matroska_segment_c *p_segment;
     uint8_t            *p_peek;
     std::string        s_path, s_filename;
     vlc_stream_io_callback *p_io_callback;
@@ -736,7 +742,7 @@ static int Open( vlc_object_t * p_this )
     /* Set the demux function */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
+    p_demux->p_sys      = p_sys = new demux_sys_c( *p_demux );
 
     p_io_callback = new vlc_stream_io_callback( p_demux->s );
     p_io_stream = new EbmlStream( *p_io_callback );
@@ -859,7 +865,7 @@ error:
 static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys   = p_demux->p_sys;
+    demux_sys_c *p_sys   = p_demux->p_sys;
 
     delete p_sys;
 }
@@ -869,7 +875,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
+    demux_sys_c        *p_sys = p_demux->p_sys;
     int64_t     *pi64;
     double      *pf, f;
     int         i_skp;
@@ -951,7 +957,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 }
 
-int matroska_segment_t::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
 {
     *pp_block = NULL;
     *pi_ref1  = -1;
@@ -1106,8 +1112,8 @@ static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem)
 static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                          mtime_t i_duration )
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
+    demux_sys_c        *p_sys = p_demux->p_sys;
+    matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
 
     size_t          i_track;
     unsigned int    i;
@@ -1200,7 +1206,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
+matroska_stream_c *demux_sys_c::AnalyseAllSegmentsFound( EbmlStream *p_estream )
 {
     int i_upper_lvl = 0;
     size_t i;
@@ -1223,14 +1229,14 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
         return NULL;
     }
 
-    matroska_stream_t *p_stream1 = new matroska_stream_t( *this );
+    matroska_stream_c *p_stream1 = new matroska_stream_c( *this );
 
     while (p_l0 != 0)
     {
         if (EbmlId(*p_l0) == KaxSegment::ClassInfos.GlobalId)
         {
             EbmlParser  *ep;
-            matroska_segment_t *p_segment1 = new matroska_segment_t( *this, *p_estream );
+            matroska_segment_c *p_segment1 = new matroska_segment_c( *this, *p_estream );
             b_keep_segment = false;
 
             ep = new EbmlParser(p_estream, p_l0, &demuxer );
@@ -1297,7 +1303,7 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
     return p_stream1;
 }
 
-bool matroska_segment_t::Select( mtime_t i_start_time )
+bool matroska_segment_c::Select( mtime_t i_start_time )
 {
     size_t i_track;
 
@@ -1612,7 +1618,7 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
     return true;
 }
 
-void matroska_segment_t::UnSelect( )
+void matroska_segment_c::UnSelect( )
 {
     size_t i_track;
 
@@ -1630,13 +1636,13 @@ void matroska_segment_t::UnSelect( )
     ep = NULL;
 }
 
-bool virtual_segment_t::Select( input_title_t & title )
+bool virtual_segment_c::Select( input_title_t & title )
 {
     if ( linked_segments.size() == 0 )
         return false;
 
     // !!! should be called only once !!!
-    matroska_segment_t *p_segment;
+    matroska_segment_c *p_segment;
     size_t i, j;
 
     // copy editions from the first segment
@@ -1657,15 +1663,15 @@ bool virtual_segment_t::Select( input_title_t & title )
     return true;
 }
 
-void chapter_edition_t::PublishChapters( input_title_t & title )
+void chapter_edition_c::PublishChapters( input_title_t & title )
 {
     title.i_seekpoint = 0;
     if ( title.seekpoint != NULL )
         free( title.seekpoint );
-    chapter_item_t::PublishChapters( title, 0 );
+    chapter_item_c::PublishChapters( title, 0 );
 }
 
-void chapter_item_t::PublishChapters( input_title_t & title, int i_level )
+void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
 {
     if (b_display_seekpoint)
     {
@@ -1689,10 +1695,10 @@ void chapter_item_t::PublishChapters( input_title_t & title, int i_level )
     }
 }
 
-void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
+void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
-    demux_sys_t & sys = *demux.p_sys;
-    const chapter_item_t *psz_curr_chapter;
+    demux_sys_c & sys = *demux.p_sys;
+    const chapter_item_c *psz_curr_chapter;
 
     /* update current chapter/seekpoint */
     if ( editions.size() )
@@ -1725,11 +1731,11 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
     }
 }
 
-void chapter_item_t::Append( const chapter_item_t & chapter )
+void chapter_item_c::Append( const chapter_item_c & chapter )
 {
     // we are appending content for the same chapter UID
     size_t i;
-    chapter_item_t *p_chapter;
+    chapter_item_c *p_chapter;
 
     for ( i=0; i<chapter.sub_chapters.size(); i++ )
     {
@@ -1748,7 +1754,7 @@ void chapter_item_t::Append( const chapter_item_t & chapter )
     i_user_end_time = max( i_user_end_time, chapter.i_user_end_time );
 }
 
-chapter_item_t * chapter_item_t::FindChapter( const chapter_item_t & chapter )
+chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
 {
     size_t i;
     for ( i=0; i<sub_chapters.size(); i++)
@@ -1759,11 +1765,11 @@ chapter_item_t * chapter_item_t::FindChapter( const chapter_item_t & chapter )
     return NULL;
 }
 
-static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter )
+static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_c *psz_chapter )
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
-    virtual_segment_t  *p_vsegment = p_sys->p_current_segment;
-    matroska_segment_t *p_segment = p_vsegment->Segment();
+    demux_sys_c        *p_sys = p_demux->p_sys;
+    virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
+    matroska_segment_c *p_segment = p_vsegment->Segment();
     mtime_t            i_time_offset = 0;
 
     int         i_index;
@@ -1846,9 +1852,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chap
  *****************************************************************************/
 static int Demux( demux_t *p_demux)
 {
-    demux_sys_t        *p_sys = p_demux->p_sys;
-    virtual_segment_t  *p_vsegment = p_sys->p_current_segment;
-    matroska_segment_t *p_segmet = p_vsegment->Segment();
+    demux_sys_c        *p_sys = p_demux->p_sys;
+    virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
+    matroska_segment_c *p_segmet = p_vsegment->Segment();
     if ( p_segmet == NULL ) return 0;
     int                i_block_count = 0;
 
@@ -1889,7 +1895,7 @@ static int Demux( demux_t *p_demux)
         {
             if ( p_vsegment->EditionIsOrdered() )
             {
-                const chapter_item_t *p_chap = p_vsegment->CurrentChapter();
+                const chapter_item_c *p_chap = p_vsegment->CurrentChapter();
                 // check if there are more chapters to read
                 if ( p_chap != NULL )
                 {
@@ -2153,7 +2159,7 @@ EbmlElement *EbmlParser::Get( void )
  *  * InformationCreate : create all information, load tags if present
  *
  *****************************************************************************/
-void matroska_segment_t::LoadCues( )
+void matroska_segment_c::LoadCues( )
 {
     int64_t     i_sav_position = es.I_O().getFilePointer();
     EbmlParser  *ep;
@@ -2276,7 +2282,7 @@ void matroska_segment_t::LoadCues( )
     es.I_O().setFilePointer( i_sav_position, seek_beginning );
 }
 
-void matroska_segment_t::LoadTags( )
+void matroska_segment_c::LoadTags( )
 {
     int64_t     i_sav_position = es.I_O().getFilePointer();
     EbmlParser  *ep;
@@ -2403,7 +2409,7 @@ void matroska_segment_t::LoadTags( )
 /*****************************************************************************
  * ParseSeekHead:
  *****************************************************************************/
-void matroska_segment_t::ParseSeekHead( KaxSeekHead *seekhead )
+void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 {
     EbmlElement *el;
     size_t i, j;
@@ -2473,7 +2479,7 @@ void matroska_segment_t::ParseSeekHead( KaxSeekHead *seekhead )
 /*****************************************************************************
  * ParseTrackEntry:
  *****************************************************************************/
-void matroska_segment_t::ParseTrackEntry( KaxTrackEntry *m )
+void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 {
     size_t i, j, k, n;
 
@@ -2878,7 +2884,7 @@ void matroska_segment_t::ParseTrackEntry( KaxTrackEntry *m )
 /*****************************************************************************
  * ParseTracks:
  *****************************************************************************/
-void matroska_segment_t::ParseTracks( KaxTracks *tracks )
+void matroska_segment_c::ParseTracks( KaxTracks *tracks )
 {
     EbmlElement *el;
     unsigned int i;
@@ -2907,7 +2913,7 @@ void matroska_segment_t::ParseTracks( KaxTracks *tracks )
 /*****************************************************************************
  * ParseInfo:
  *****************************************************************************/
-void matroska_segment_t::ParseInfo( KaxInfo *info )
+void matroska_segment_c::ParseInfo( KaxInfo *info )
 {
     EbmlElement *el;
     EbmlMaster  *m;
@@ -3026,7 +3032,7 @@ void matroska_segment_t::ParseInfo( KaxInfo *info )
         else if( MKV_IS_ID( l, KaxChapterTranslate ) )
         {
             KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
-            chapter_translation_t translated;
+            chapter_translation_c translated;
 
             p_trans->Read( es, p_trans->Generic().Context, i_upper_level, el, true );
             for( j = 0; j < p_trans->ListSize(); j++ )
@@ -3064,7 +3070,7 @@ void matroska_segment_t::ParseInfo( KaxInfo *info )
 /*****************************************************************************
  * ParseChapterAtom
  *****************************************************************************/
-void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_t & chapters )
+void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters )
 {
     size_t i, j;
 
@@ -3146,7 +3152,7 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterProcess" );
 
             KaxChapterProcess *cp = static_cast<KaxChapterProcess *>(l);
-            chapter_codec_cmds_t *p_ccodec = NULL;
+            chapter_codec_cmds_c *p_ccodec = NULL;
 
             for( j = 0; j < cp->ListSize(); j++ )
             {
@@ -3156,9 +3162,9 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 {
                     KaxChapterProcessCodecID *p_codec_id = static_cast<KaxChapterProcessCodecID*>( k );
                     if ( uint32(*p_codec_id) == 0 )
-                        p_ccodec = new matroska_script_codec_t();
+                        p_ccodec = new matroska_script_codec_c();
                     else if ( uint32(*p_codec_id) == 1 )
-                        p_ccodec = new dvd_chapter_codec_t();
+                        p_ccodec = new dvd_chapter_codec_c();
                     break;
                 }
             }
@@ -3182,7 +3188,7 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         }
         else if( MKV_IS_ID( l, KaxChapterAtom ) )
         {
-            chapter_item_t new_sub_chapter;
+            chapter_item_c new_sub_chapter;
             ParseChapterAtom( i_level+1, static_cast<KaxChapterAtom *>(l), new_sub_chapter );
             new_sub_chapter.psz_parent = &chapters;
             chapters.sub_chapters.push_back( new_sub_chapter );
@@ -3193,7 +3199,7 @@ void matroska_segment_t::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 /*****************************************************************************
  * ParseChapters:
  *****************************************************************************/
-void matroska_segment_t::ParseChapters( KaxChapters *chapters )
+void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 {
     EbmlElement *el;
     size_t i;
@@ -3209,7 +3215,7 @@ void matroska_segment_t::ParseChapters( KaxChapters *chapters )
 
         if( MKV_IS_ID( l, KaxEditionEntry ) )
         {
-            chapter_edition_t edition;
+            chapter_edition_c edition;
             
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
             size_t j;
@@ -3220,7 +3226,7 @@ void matroska_segment_t::ParseChapters( KaxChapters *chapters )
 
                 if( MKV_IS_ID( l, KaxChapterAtom ) )
                 {
-                    chapter_item_t new_sub_chapter;
+                    chapter_item_c new_sub_chapter;
                     ParseChapterAtom( 0, static_cast<KaxChapterAtom *>(l), new_sub_chapter );
                     edition.sub_chapters.push_back( new_sub_chapter );
                 }
@@ -3264,7 +3270,7 @@ void matroska_segment_t::ParseChapters( KaxChapters *chapters )
     }
 }
 
-void matroska_segment_t::ParseCluster( )
+void matroska_segment_c::ParseCluster( )
 {
     EbmlElement *el;
     EbmlMaster  *m;
@@ -3294,7 +3300,7 @@ void matroska_segment_t::ParseCluster( )
 /*****************************************************************************
  * InformationCreate:
  *****************************************************************************/
-void matroska_segment_t::InformationCreate( )
+void matroska_segment_c::InformationCreate( )
 {
     size_t      i_track;
 
@@ -3369,7 +3375,7 @@ void matroska_segment_t::InformationCreate( )
  * Divers
  *****************************************************************************/
 
-void matroska_segment_t::IndexAppendCluster( KaxCluster *cluster )
+void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
 {
 #define idx index[i_index]
     idx.i_track       = -1;
@@ -3415,18 +3421,18 @@ static char * UTF8ToStr( const UTFstring &u )
     return dst;
 }
 
-void chapter_edition_t::RefreshChapters( )
+void chapter_edition_c::RefreshChapters( )
 {
-    chapter_item_t::RefreshChapters( b_ordered, -1 );
+    chapter_item_c::RefreshChapters( b_ordered, -1 );
     b_display_seekpoint = false;
 }
 
-int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
+int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
 {
     int64_t i_user_time = i_prev_user_time;
     
     // first the sub-chapters, and then ourself
-    std::vector<chapter_item_t>::iterator index = sub_chapters.begin();
+    std::vector<chapter_item_c>::iterator index = sub_chapters.begin();
     while ( index != sub_chapters.end() )
     {
         i_user_time = (*index).RefreshChapters( b_ordered, i_user_time );
@@ -3468,13 +3474,13 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     return i_user_end_time;
 }
 
-mtime_t chapter_edition_t::Duration() const
+mtime_t chapter_edition_c::Duration() const
 {
     mtime_t i_result = 0;
     
     if ( sub_chapters.size() )
     {
-        std::vector<chapter_item_t>::const_iterator index = sub_chapters.end();
+        std::vector<chapter_item_c>::const_iterator index = sub_chapters.end();
         index--;
         i_result = (*index).i_user_end_time;
     }
@@ -3482,15 +3488,15 @@ mtime_t chapter_edition_t::Duration() const
     return i_result;
 }
 
-const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) const
+const chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode ) const
 {
-    const chapter_item_t *psz_result = NULL;
+    const chapter_item_c *psz_result = NULL;
 
     if ( i_user_timecode >= i_user_start_time && 
         ( i_user_timecode < i_user_end_time || 
           ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
     {
-        std::vector<chapter_item_t>::const_iterator index = sub_chapters.begin();
+        std::vector<chapter_item_c>::const_iterator index = sub_chapters.begin();
         while ( index != sub_chapters.end() && psz_result == NULL )
         {
             psz_result = (*index).FindTimecode( i_user_timecode );
@@ -3504,14 +3510,14 @@ const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) co
     return psz_result;
 }
 
-void demux_sys_t::PreloadFamily( const matroska_segment_t & of_segment )
+void demux_sys_c::PreloadFamily( const matroska_segment_c & of_segment )
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
         opened_segments[i]->PreloadFamily( of_segment );
     }
 }
-bool matroska_segment_t::PreloadFamily( const matroska_segment_t & of_segment )
+bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
 {
     if ( b_preloaded )
         return false;
@@ -3529,12 +3535,12 @@ bool matroska_segment_t::PreloadFamily( const matroska_segment_t & of_segment )
 }
 
 // preload all the linked segments for all preloaded segments
-void demux_sys_t::PreloadLinked( matroska_segment_t *p_segment )
+void demux_sys_c::PreloadLinked( matroska_segment_c *p_segment )
 {
     size_t i_preloaded, i;
 
     delete p_current_segment;
-    p_current_segment = new virtual_segment_t( p_segment );
+    p_current_segment = new virtual_segment_c( p_segment );
 
     // fill our current virtual segment with all hard linked segments
     do {
@@ -3550,7 +3556,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_t *p_segment )
     p_current_segment->PreloadLinked( );
 }
 
-bool demux_sys_t::PreparePlayback( )
+bool demux_sys_c::PreparePlayback( )
 {
     p_current_segment->LoadCues();
     f_duration = p_current_segment->Duration();
@@ -3563,7 +3569,7 @@ bool demux_sys_t::PreparePlayback( )
     return p_current_segment->Select( *title );
 }
 
-bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a, const matroska_segment_t * p_item_b )
+bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a, const matroska_segment_c * p_item_b )
 {
     EbmlBinary * p_itema = (EbmlBinary *)(&p_item_a->segment_uid);
     if ( *p_itema == p_item_b->prev_segment_uid )
@@ -3579,7 +3585,7 @@ bool matroska_segment_t::CompareSegmentUIDs( const matroska_segment_t * p_item_a
     return false;
 }
 
-bool matroska_segment_t::Preload( )
+bool matroska_segment_c::Preload( )
 {
     if ( b_preloaded )
         return false;
@@ -3643,7 +3649,7 @@ bool matroska_segment_t::Preload( )
     return true;
 }
 
-matroska_segment_t *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
+matroska_segment_c *demux_sys_c::FindSegment( const EbmlBinary & uid ) const
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
@@ -3653,19 +3659,19 @@ matroska_segment_t *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
     return NULL;
 }
 
-void virtual_segment_t::Sort()
+void virtual_segment_c::Sort()
 {
     // keep the current segment index
-    matroska_segment_t *p_segment = linked_segments[i_current_segment];
+    matroska_segment_c *p_segment = linked_segments[i_current_segment];
 
-    std::sort( linked_segments.begin(), linked_segments.end(), matroska_segment_t::CompareSegmentUIDs );
+    std::sort( linked_segments.begin(), linked_segments.end(), matroska_segment_c::CompareSegmentUIDs );
 
     for ( i_current_segment=0; i_current_segment<linked_segments.size(); i_current_segment++)
         if ( linked_segments[i_current_segment] == p_segment )
             break;
 }
 
-size_t virtual_segment_t::AddSegment( matroska_segment_t *p_segment )
+size_t virtual_segment_c::AddSegment( matroska_segment_c *p_segment )
 {
     size_t i;
     // check if it's not already in here
@@ -3693,7 +3699,7 @@ size_t virtual_segment_t::AddSegment( matroska_segment_t *p_segment )
     return 0;
 }
 
-void virtual_segment_t::PreloadLinked( )
+void virtual_segment_c::PreloadLinked( )
 {
     for ( size_t i=0; i<linked_segments.size(); i++ )
     {
@@ -3702,13 +3708,13 @@ void virtual_segment_t::PreloadLinked( )
     i_current_edition = linked_segments[0]->i_default_edition;
 }
 
-mtime_t virtual_segment_t::Duration() const
+mtime_t virtual_segment_c::Duration() const
 {
     mtime_t i_duration;
     if ( linked_segments.size() == 0 )
         i_duration = 0;
     else {
-        matroska_segment_t *p_last_segment = linked_segments[linked_segments.size()-1];
+        matroska_segment_c *p_last_segment = linked_segments[linked_segments.size()-1];
 //        p_last_segment->ParseCluster( );
 
         i_duration = p_last_segment->i_start_time / 1000 + p_last_segment->i_duration;
@@ -3716,7 +3722,7 @@ mtime_t virtual_segment_t::Duration() const
     return i_duration;
 }
 
-void virtual_segment_t::LoadCues( )
+void virtual_segment_c::LoadCues( )
 {
     for ( size_t i=0; i<linked_segments.size(); i++ )
     {
@@ -3724,7 +3730,7 @@ void virtual_segment_t::LoadCues( )
     }
 }
 
-void virtual_segment_t::AppendUID( const EbmlBinary & UID )
+void virtual_segment_c::AppendUID( const EbmlBinary & UID )
 {
     if ( UID.GetBuffer() == NULL )
         return;
@@ -3737,7 +3743,7 @@ void virtual_segment_t::AppendUID( const EbmlBinary & UID )
     linked_uids.push_back( *(KaxSegmentUID*)(&UID) );
 }
 
-void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
+void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 {
     KaxBlock    *block;
     int         i_track_skipping;
@@ -3841,9 +3847,9 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
 #undef tk
 }
 
-void virtual_segment_t::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_t *psz_chapter )
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, const chapter_item_c *psz_chapter )
 {
-    demux_sys_t *p_sys = demuxer.p_sys;
+    demux_sys_c *p_sys = demuxer.p_sys;
     size_t i;
 
     // find the actual time for an ordered edition
@@ -3884,7 +3890,7 @@ void virtual_segment_t::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
     linked_segments[i]->Seek( i_date, i_time_offset );
 }
 
-void chapter_codec_cmds_t::AddCommand( const KaxChapterProcessCommand & command )
+void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
     size_t i;
 
@@ -3913,10 +3919,10 @@ void chapter_codec_cmds_t::AddCommand( const KaxChapterProcessCommand & command 
                 during_cmds.push_back( *p_data );
                 break;
             case 1:
-                during_cmds.push_back( *p_data );
+                enter_cmds.push_back( *p_data );
                 break;
             case 2:
-                during_cmds.push_back( *p_data );
+                leave_cmds.push_back( *p_data );
                 break;
             default:
                 delete p_data;
@@ -3925,12 +3931,12 @@ void chapter_codec_cmds_t::AddCommand( const KaxChapterProcessCommand & command 
     }
 }
 
-bool chapter_item_t::Enter() const
+bool chapter_item_c::Enter() const
 {
     return true;
 }
 
-bool chapter_item_t::Leave() const
+bool chapter_item_c::Leave() const
 {
     return true;
 }
