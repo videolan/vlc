@@ -983,7 +983,7 @@ VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 
 if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGINS([externrun])
+dnl  VLC_ADD_PLUGINS([externrun])
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap shout])
   VLC_ADD_PLUGINS([mosaic wall motiondetect clone crop])
