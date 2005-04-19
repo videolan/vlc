@@ -350,12 +350,64 @@ protected:
 
 class dvd_command_interpretor_c
 {
+    dvd_command_interpretor_c()
+    {
+        memset( p_GPRM, 0, sizeof(p_GPRM) * 2 );
+        memset( p_SPRM, 0, sizeof(p_SPRM) * 2 );
+        p_SPRM[ 1 ] = 15;
+        p_SPRM[ 2 ] = 62;
+        p_SPRM[ 3 ] = 1;
+        p_SPRM[ 4 ] = 1;
+        p_SPRM[ 7 ] = 1;
+        p_SPRM[ 8 ] = 1;
+        p_SPRM[ 16 ] = 0xFFFFu;
+        p_SPRM[ 18 ] = 0xFFFFu;
+    }
+    
+    protected:
+        uint16 GetGPRM( size_t index ) const
+        {
+            if ( index >= 0 && index < 16 )
+                return p_GPRM[ index ];
+            else return 0;
+        }
+
+        uint16 GetSPRM( size_t index ) const
+        {
+            // 21,22,23 reserved for future use
+            if ( index >= 0 && index < 21 )
+                return p_SPRM[ index ];
+            else return 0;
+        }
+
+        bool SetGPRM( size_t index, uint16 value )
+        {
+            if ( index >= 0 && index < 16 )
+            {
+                p_GPRM[ index ] = value;
+                return true;
+            }
+            return false;
+        }
+
+        bool SetSPRM( size_t index, uint16 value );
+        {
+            if ( index > 0 && index <= 13 && index != 12 )
+            {
+                p_SPRM[ index ] = value;
+                return true;
+            }
+            return false;
+        }
+
+        uint16 p_GPRM[16];
+        uint16 p_SPRM[24];
 };
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
     protected:
-        static dvd_command_interpretor_c interpreter; 
+        static dvd_command_interpretor_c interpretor; 
 };
 
 class matroska_script_codec_c : public chapter_codec_cmds_c
