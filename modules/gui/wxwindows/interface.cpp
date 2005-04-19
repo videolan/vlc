@@ -621,7 +621,9 @@ static int ConvertHotkey( int i_hotkey )
         case KEY_F11: return WXK_F11;
         case KEY_F12: return WXK_F12;
         case KEY_HOME: return WXK_HOME;
-        case KEY_END: return WXK_HOME;
+        case KEY_END: return WXK_END;
+        case KEY_INSERT: return WXK_INSERT;
+        case KEY_DELETE: return WXK_DELETE;
         case KEY_MENU: return WXK_MENU;
         case KEY_ESC: return WXK_ESCAPE;
         case KEY_PAGEUP: return WXK_PRIOR;

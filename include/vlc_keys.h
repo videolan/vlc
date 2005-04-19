@@ -49,14 +49,16 @@
 #define KEY_F12              0x00120000
 #define KEY_HOME             0x00130000
 #define KEY_END              0x00140000
-#define KEY_MENU             0x00150000
-#define KEY_ESC              0x00160000
-#define KEY_PAGEUP           0x00170000
-#define KEY_PAGEDOWN         0x00180000
-#define KEY_TAB              0x00190000
-#define KEY_BACKSPACE        0x001A0000
-#define KEY_MOUSEWHEELUP     0x001B0000
-#define KEY_MOUSEWHEELDOWN   0x001C0000
+#define KEY_INSERT           0x00150000
+#define KEY_DELETE           0x00160000
+#define KEY_MENU             0x00170000
+#define KEY_ESC              0x00180000
+#define KEY_PAGEUP           0x00190000
+#define KEY_PAGEDOWN         0x001A0000
+#define KEY_TAB              0x001B0000
+#define KEY_BACKSPACE        0x001C0000
+#define KEY_MOUSEWHEELUP     0x001D0000
+#define KEY_MOUSEWHEELDOWN   0x001E0000
 
 #define KEY_ASCII            0x0000007F
 #define KEY_UNSET            0
@@ -101,6 +103,8 @@ static const struct key_descriptor_s vlc_keys[] =
     { "F12", KEY_F12 },
     { "Home", KEY_HOME },
     { "End", KEY_END },
+    { "Insert", KEY_INSERT },
+    { "Delete", KEY_DELETE },
     { "Menu", KEY_MENU },
     { "Esc", KEY_ESC },
     { "Page Up", KEY_PAGEUP },
