@@ -754,6 +754,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         {
         case PIX_FMT_YUV410P:
         case PIX_FMT_YUV411P:
+        case PIX_FMT_BGR24:
         case PIX_FMT_PAL8:
             for( i = 0; i < p_pic->i_planes; i++ )
             {

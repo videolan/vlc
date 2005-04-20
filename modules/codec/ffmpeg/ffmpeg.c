@@ -624,6 +624,12 @@ static struct
       VIDEO_ES, "Windows Media Video 1" },
     { VLC_FOURCC('W','M','V','2'), CODEC_ID_WMV2,
       VIDEO_ES, "Windows Media Video 2" },
+#if 0
+    { VLC_FOURCC('W','M','V','3'), CODEC_ID_WMV3,
+      VIDEO_ES, "Windows Media Video 3" },
+    { VLC_FOURCC('V','C','9',' '), CODEC_ID_VC9,
+      VIDEO_ES, "Windows Media Video VC9" },
+#endif
 
 #if LIBAVCODEC_BUILD >= 4683
     /* Microsoft Video 1 */
@@ -757,6 +763,33 @@ static struct
     /* FFMPEG's SNOW wavelet codec */
     { VLC_FOURCC('S','N','O','W'), CODEC_ID_SNOW,
       VIDEO_ES, "FFMpeg SNOW wavelet Video" },
+#endif
+
+#if LIBAVCODEC_BUILD >= 4752
+    { VLC_FOURCC('q','d','r','w'), CODEC_ID_QDRAW,
+      VIDEO_ES, "Apple QuickDraw Video" },
+
+    { VLC_FOURCC('Q','P','E','G'), CODEC_ID_QPEG,
+      VIDEO_ES, "QPEG Video" },
+    { VLC_FOURCC('Q','1','.','0'), CODEC_ID_QPEG,
+      VIDEO_ES, "QPEG Video" },
+    { VLC_FOURCC('Q','1','.','1'), CODEC_ID_QPEG,
+      VIDEO_ES, "QPEG Video" },
+
+    { VLC_FOURCC('U','L','T','I'), CODEC_ID_ULTI,
+      VIDEO_ES, "IBM Ultimotion Video" },
+
+    { VLC_FOURCC('L','O','C','O'), CODEC_ID_LOCO,
+      VIDEO_ES, "LOCO Video" },
+
+    { VLC_FOURCC('W','N','V','1'), CODEC_ID_WNV1,
+      VIDEO_ES, "Winnov WNV1 Video" },
+
+    { VLC_FOURCC('A','A','S','C'), CODEC_ID_AASC,
+      VIDEO_ES, "Autodesc RLE Video" },
+
+    { VLC_FOURCC('I','V','2','0'), CODEC_ID_INDEO2,
+      VIDEO_ES, "Indeo Video v2" },
 #endif
 
     /*
