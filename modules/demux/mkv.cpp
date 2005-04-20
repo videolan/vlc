@@ -675,10 +675,6 @@ public:
     int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
-    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
-                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
-                                        const void *p_cookie, 
-                                        size_t i_cookie_size );
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 };
@@ -740,9 +736,24 @@ public:
         return false;
     }
 
+    bool FindUID( KaxSegmentUID & uid ) const
+    {
+        for ( size_t i=0; i<linked_uids.size(); i++ )
+        {
+            if ( linked_uids[i] == uid )
+                return true;
+        }
+        return false;
+    }
+
     void UpdateCurrentToChapter( demux_t & demux );
+    void PrepareChapters( );
     bool Select( input_title_t & title );
 
+    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                        const void *p_cookie, 
+                                        size_t i_cookie_size );
 protected:
     std::vector<matroska_segment_c*> linked_segments;
     std::vector<KaxSegmentUID>       linked_uids;
@@ -794,10 +805,13 @@ public:
 
     virtual ~demux_sys_t()
     {
-        for (size_t i=0; i<streams.size(); i++)
+        size_t i;
+        for ( i=0; i<streams.size(); i++ )
             delete streams[i];
-        for ( size_t i=0; i<opened_segments.size(); i++ )
+        for ( i=0; i<opened_segments.size(); i++ )
             delete opened_segments[i];
+        for ( i=0; i<used_segments.size(); i++ )
+            delete used_segments[i];
     }
 
     /* current data */
@@ -813,6 +827,7 @@ public:
 
     std::vector<matroska_stream_c*>  streams;
     std::vector<matroska_segment_c*> opened_segments;
+    std::vector<virtual_segment_c*>  used_segments;
     virtual_segment_c                *p_current_segment;
 
     /* duration of the stream */
@@ -823,12 +838,16 @@ public:
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                         const void *p_cookie, 
                                         size_t i_cookie_size, 
-                                        matroska_segment_c * & p_segment_found );
+                                        virtual_segment_c * & p_segment_found );
 
     void PreloadFamily( const matroska_segment_c & of_segment );
     void PreloadLinked( matroska_segment_c *p_segment );
     bool PreparePlayback( );
     matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream );
+
+protected:
+    virtual_segment_c *VirtualFromSegments( matroska_segment_c *p_segment ) const;
+    bool IsUsedSegment( matroska_segment_c &p_segment ) const;
 };
 
 static int  Demux  ( demux_t * );
@@ -1756,10 +1775,10 @@ void matroska_segment_c::UnSelect( )
     ep = NULL;
 }
 
-bool virtual_segment_c::Select( input_title_t & title )
+void virtual_segment_c::PrepareChapters( )
 {
     if ( linked_segments.size() == 0 )
-        return false;
+        return;
 
     // !!! should be called only once !!!
     matroska_segment_c *p_segment;
@@ -1776,7 +1795,10 @@ bool virtual_segment_c::Select( input_title_t & title )
         for (j=0; j<p_segment->stored_editions.size(); j++)
             (*p_editions)[j]->Append( *p_segment->stored_editions[j] );
     }
+}
 
+bool virtual_segment_c::Select( input_title_t & title )
+{
     if ( Edition() != NULL )
         Edition()->PublishChapters( title );
 
@@ -1785,9 +1807,12 @@ bool virtual_segment_c::Select( input_title_t & title )
 
 void chapter_edition_c::PublishChapters( input_title_t & title )
 {
-    title.i_seekpoint = 0;
     if ( title.seekpoint != NULL )
         free( title.seekpoint );
+
+    title.i_seekpoint = 0;
+    title.seekpoint = NULL;
+
     chapter_item_c::PublishChapters( title, 0 );
 }
 
@@ -1851,14 +1876,14 @@ void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     }
 }
 
-chapter_item_c *matroska_segment_c::BrowseCodecPrivate( unsigned int codec_id, 
+chapter_item_c *virtual_segment_c::BrowseCodecPrivate( unsigned int codec_id, 
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                     const void *p_cookie, 
                                     size_t i_cookie_size )
 {
     // FIXME don't assume it is the first edition
-    std::vector<chapter_edition_c*>::iterator index = stored_editions.begin();
-    if ( index != stored_editions.end() )
+    std::vector<chapter_edition_c*>::iterator index = p_editions->begin();
+    if ( index != p_editions->end() )
     {
         chapter_item_c *p_result = (*index)->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
         if ( p_result != NULL )
@@ -3704,22 +3729,59 @@ bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
 void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
 {
     size_t i_preloaded, i;
+    virtual_segment_c *p_seg;
 
-    delete p_current_segment;
-    p_current_segment = new virtual_segment_c( p_segment );
+    p_current_segment = VirtualFromSegments( p_segment );
+    
+    used_segments.push_back( p_current_segment );
+
+    // create all the other virtual segments of the family
+    do {
+        i_preloaded = 0;
+        for ( i=0; i< opened_segments.size(); i++ )
+        {
+            if ( opened_segments[i]->b_preloaded && !IsUsedSegment( *opened_segments[i] ) )
+            {
+                p_seg = VirtualFromSegments( opened_segments[i] );
+                used_segments.push_back( p_seg );
+                i_preloaded++;
+            }
+        }
+    } while ( i_preloaded ); // worst case: will stop when all segments are found as family related
+}
+
+bool demux_sys_t::IsUsedSegment( matroska_segment_c &segment ) const
+{
+    for ( size_t i=0; i< used_segments.size(); i++ )
+    {
+        if ( used_segments[i]->FindUID( segment.segment_uid ) )
+            return true;
+    }
+    return false;
+}
+
+virtual_segment_c *demux_sys_t::VirtualFromSegments( matroska_segment_c *p_segment ) const
+{
+    size_t i_preloaded, i;
+
+    virtual_segment_c *p_result = new virtual_segment_c( p_segment );
 
     // fill our current virtual segment with all hard linked segments
     do {
         i_preloaded = 0;
         for ( i=0; i< opened_segments.size(); i++ )
         {
-            i_preloaded += p_current_segment->AddSegment( opened_segments[i] );
+            i_preloaded += p_result->AddSegment( opened_segments[i] );
         }
     } while ( i_preloaded ); // worst case: will stop when all segments are found as linked
 
-    p_current_segment->Sort( );
+    p_result->Sort( );
 
-    p_current_segment->PreloadLinked( );
+    p_result->PreloadLinked( );
+
+    p_result->PrepareChapters( );
+
+    return p_result;
 }
 
 bool demux_sys_t::PreparePlayback( )
@@ -3829,15 +3891,15 @@ chapter_item_c *demux_sys_t::BrowseCodecPrivate( unsigned int codec_id,
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                         const void *p_cookie, 
                                         size_t i_cookie_size, 
-                                        matroska_segment_c * &p_segment_found )
+                                        virtual_segment_c * &p_segment_found )
 {
     chapter_item_c *p_result = NULL;
     for (size_t i=0; i<opened_segments.size(); i++)
     {
-        p_result = opened_segments[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        p_result = used_segments[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
         if ( p_result != NULL )
         {
-            p_segment_found = opened_segments[i];
+            p_segment_found = used_segments[i];
             break;
         }
     }
@@ -4193,11 +4255,19 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         {
             uint8 i_title = p_command[5];
             // find in the ChapProcessPrivate matching this Title level
-            matroska_segment_c *p_segment;
+            virtual_segment_c *p_segment;
             chapter_item_c *p_chapter;
             p_chapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_segment );
             // TODO if the segment is not part of the current segment, select the new one
+            if ( p_segment != sys.p_current_segment )
+            {
+                sys.p_current_segment = p_segment;
+                sys.PreparePlayback();
+            }
+
             // TODO jump to the location in the found segment
+            p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, NULL );
+
             break;
         }
     }
