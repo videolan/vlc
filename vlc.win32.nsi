@@ -83,7 +83,7 @@ NoBackup:
   ReadRegStr $0 HKCR "VLC$R0" ""
   WriteRegStr HKCR "VLC$R0" "" "VLC media file"
   WriteRegStr HKCR "VLC$R0\shell" "" "Play"
-  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '$INSTDIR\vlc.exe "%1"'
+  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 FunctionEnd
 
