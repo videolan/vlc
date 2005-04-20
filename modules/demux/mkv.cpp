@@ -330,9 +330,15 @@ typedef struct
     vlc_bool_t b_key;
 } mkv_index_t;
 
+class demux_sys_t;
+
 class chapter_codec_cmds_c
 {
 public:
+    chapter_codec_cmds_c( int codec_id = -1)
+    :i_codec_id( codec_id )
+    {}
+        
     virtual ~chapter_codec_cmds_c() {}
 
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
@@ -345,18 +351,21 @@ public:
     virtual bool Enter() { return true; }
     virtual bool Leave() { return true; }
 
-protected:
     KaxChapterProcessPrivate m_private_data;
 
+protected:
     std::vector<KaxChapterProcessData> enter_cmds;
     std::vector<KaxChapterProcessData> during_cmds;
     std::vector<KaxChapterProcessData> leave_cmds;
+
+    int i_codec_id;
 };
 
 class dvd_command_interpretor_c
 {
 public:
-    dvd_command_interpretor_c()
+    dvd_command_interpretor_c( demux_sys_t & demuxer )
+    :sys( demuxer )
     {
         memset( p_GPRM, 0, sizeof(p_GPRM) );
         memset( p_SPRM, 0, sizeof(p_SPRM) );
@@ -408,15 +417,25 @@ protected:
         return false;
     }
 
-    uint16 p_GPRM[16];
-    uint16 p_SPRM[24];
-
+    uint16       p_GPRM[16];
+    uint16       p_SPRM[24];
+    demux_sys_t  & sys;
+    
+    // DVD command IDs
     static const uint16 CMD_JUMP_TT = 0x3002;
+    
+    // callbacks when browsing inside CodecPrivate
+    static bool MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
 };
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
 public:
+    dvd_chapter_codec_c( demux_sys_t & sys )
+    :chapter_codec_cmds_c( 1 )
+    ,interpretor( sys )
+    {}
+
     bool Enter();
     bool Leave();
 
@@ -470,6 +489,10 @@ public:
     chapter_item_c * FindTimecode( mtime_t i_timecode );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( const chapter_item_c & chapter );
+    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
+                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                    const void *p_cookie, 
+                                    size_t i_cookie_size );
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
@@ -504,8 +527,6 @@ public:
     
     bool                        b_ordered;
 };
-
-class demux_sys_t;
 
 class matroska_segment_c
 {
@@ -654,6 +675,11 @@ public:
     int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
+    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                        const void *p_cookie, 
+                                        size_t i_cookie_size );
+
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 };
 
@@ -714,7 +740,6 @@ public:
         return false;
     }
 
-/* TODO handle/merge chapters here */
     void UpdateCurrentToChapter( demux_t & demux );
     bool Select( input_title_t & title );
 
@@ -794,6 +819,12 @@ public:
     float                   f_duration;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
+    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                        const void *p_cookie, 
+                                        size_t i_cookie_size, 
+                                        matroska_segment_c * & p_segment_found );
+
     void PreloadFamily( const matroska_segment_c & of_segment );
     void PreloadLinked( matroska_segment_c *p_segment );
     bool PreparePlayback( );
@@ -1028,7 +1059,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_SEEKPOINT:
-            /* FIXME do a better implementation */
             i_skp = (int)va_arg( args, int );
 
             if( p_sys->title && i_skp < p_sys->title->i_seekpoint)
@@ -1819,6 +1849,50 @@ void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
         }
         psz_current_chapter = psz_curr_chapter;
     }
+}
+
+chapter_item_c *matroska_segment_c::BrowseCodecPrivate( unsigned int codec_id, 
+                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                    const void *p_cookie, 
+                                    size_t i_cookie_size )
+{
+    // FIXME don't assume it is the first edition
+    std::vector<chapter_edition_c*>::iterator index = stored_editions.begin();
+    if ( index != stored_editions.end() )
+    {
+        chapter_item_c *p_result = (*index)->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        if ( p_result != NULL )
+            return p_result;
+    }
+    return NULL;
+}
+
+chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id, 
+                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                    const void *p_cookie, 
+                                    size_t i_cookie_size )
+{
+    // this chapter
+    std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
+    while ( index != codecs.end() )
+    {
+        if ( match( **index ,p_cookie, i_cookie_size ) )
+            return this;
+        index++;
+    }
+    
+    // sub-chapters
+    chapter_item_c *p_result = NULL;
+    std::vector<chapter_item_c*>::const_iterator index2 = sub_chapters.begin();
+    while ( index2 != sub_chapters.end() )
+    {
+        p_result = (*index2)->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        if ( p_result != NULL )
+            return p_result;
+        index2++;
+    }
+    
+    return p_result;
 }
 
 void chapter_item_c::Append( const chapter_item_c & chapter )
@@ -3254,7 +3328,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                     if ( uint32(*p_codec_id) == 0 )
                         p_ccodec = new matroska_script_codec_c();
                     else if ( uint32(*p_codec_id) == 1 )
-                        p_ccodec = new dvd_chapter_codec_c();
+                        p_ccodec = new dvd_chapter_codec_c( sys );
                     break;
                 }
             }
@@ -3719,7 +3793,7 @@ bool matroska_segment_c::Preload( )
         }
         else if( MKV_IS_ID( el, KaxAttachments ) )
         {
-            msg_Dbg( &sys.demuxer, "|   + Attachments FIXME TODO (but probably never supported)" );
+            msg_Dbg( &sys.demuxer, "|   + Attachments FIXME (but probably never supported)" );
         }
         else if( MKV_IS_ID( el, KaxChapters ) )
         {
@@ -3749,6 +3823,25 @@ matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
             return opened_segments[i];
     }
     return NULL;
+}
+
+chapter_item_c *demux_sys_t::BrowseCodecPrivate( unsigned int codec_id, 
+                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
+                                        const void *p_cookie, 
+                                        size_t i_cookie_size, 
+                                        matroska_segment_c * &p_segment_found )
+{
+    chapter_item_c *p_result = NULL;
+    for (size_t i=0; i<opened_segments.size(); i++)
+    {
+        p_result = opened_segments[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        if ( p_result != NULL )
+        {
+            p_segment_found = opened_segments[i];
+            break;
+        }
+    }
+    return p_result;
 }
 
 void virtual_segment_c::Sort()
@@ -4099,10 +4192,29 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_JUMP_TT:
         {
             uint8 i_title = p_command[5];
-            // TODO find in the ChapProcessPrivate matching this Title level
+            // find in the ChapProcessPrivate matching this Title level
+            matroska_segment_c *p_segment;
+            chapter_item_c *p_chapter;
+            p_chapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_segment );
+            // TODO if the segment is not part of the current segment, select the new one
+            // TODO jump to the location in the found segment
             break;
         }
     }
 
     return true;
+}
+
+bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+{
+    if ( i_cookie_size != 1 || data.m_private_data.GetSize() < 4 )
+        return false;
+    
+    if ( data.m_private_data.GetBuffer()[0] != 0x28 )
+        return false;
+
+    uint16 i_gtitle = (data.m_private_data.GetBuffer()[1] << 8 ) + data.m_private_data.GetBuffer()[2];
+    uint8 i_title = *(uint8*)p_cookie;
+
+    return (i_gtitle == i_title);
 }
