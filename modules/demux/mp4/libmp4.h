@@ -138,6 +138,7 @@
 #define FOURCC_VP31 VLC_FOURCC( 'V', 'P', '3', '1' )
 #define FOURCC_vp31 VLC_FOURCC( 'v', 'p', '3', '1' )
 #define FOURCC_h264 VLC_FOURCC( 'h', '2', '6', '4' )
+#define FOURCC_qdrw VLC_FOURCC( 'q', 'd', 'r', 'w' )
 
 #define FOURCC_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
 #define FOURCC_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
