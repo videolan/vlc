@@ -779,6 +779,9 @@ static struct
     { VLC_FOURCC('U','L','T','I'), CODEC_ID_ULTI,
       VIDEO_ES, "IBM Ultimotion Video" },
 
+    { VLC_FOURCC('V','I','X','L'), CODEC_ID_VIXL,
+      VIDEO_ES, "Miro/Pinnacle VideoXL Video" },
+
     { VLC_FOURCC('L','O','C','O'), CODEC_ID_LOCO,
       VIDEO_ES, "LOCO Video" },
 
@@ -789,6 +792,8 @@ static struct
       VIDEO_ES, "Autodesc RLE Video" },
 
     { VLC_FOURCC('I','V','2','0'), CODEC_ID_INDEO2,
+      VIDEO_ES, "Indeo Video v2" },
+    { VLC_FOURCC('R','T','2','1'), CODEC_ID_INDEO2,
       VIDEO_ES, "Indeo Video v2" },
 #endif
 
