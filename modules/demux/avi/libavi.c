@@ -385,8 +385,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biYPelsPerMeter );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biClrUsed );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biClrImportant );
-            if( p_chk->strf.vids.p_bih->biSize >
-                        p_chk->common.i_chunk_size )
+            if( p_chk->strf.vids.p_bih->biSize > p_chk->common.i_chunk_size )
             {
                 p_chk->strf.vids.p_bih->biSize = p_chk->common.i_chunk_size;
             }
@@ -394,8 +393,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             {
                 memcpy( &p_chk->strf.vids.p_bih[1],
                         p_buff + 8 + sizeof(BITMAPINFOHEADER), /* 8=fourrc+size */
-                        p_chk->strf.vids.p_bih->biSize -
-                                                    sizeof(BITMAPINFOHEADER) );
+                        p_chk->common.i_chunk_size -sizeof(BITMAPINFOHEADER) );
             }
 #ifdef AVI_DEBUG
             msg_Dbg( (vlc_object_t*)s,
