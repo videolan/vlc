@@ -256,10 +256,16 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
     playlist_item_t *p_item = (playlist_item_t *)malloc(
                                         sizeof( playlist_item_t ) );
     vlc_value_t val;
-    playlist_add_t *p_add = (playlist_add_t*)malloc( sizeof(playlist_add_t));
+    playlist_add_t *p_add;
 
     if( p_item == NULL )
     {
+        return NULL;
+    }
+    p_add = (playlist_add_t*)malloc( sizeof(playlist_add_t) );
+    if( p_add == NULL )
+    {
+        free( p_item );
         return NULL;
     }
     vlc_input_item_Init( VLC_OBJECT(p_playlist), &p_item->input );
