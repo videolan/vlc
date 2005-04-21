@@ -4258,15 +4258,20 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             virtual_segment_c *p_segment;
             chapter_item_c *p_chapter;
             p_chapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_segment );
-            // TODO if the segment is not part of the current segment, select the new one
-            if ( p_segment != sys.p_current_segment )
+            if ( p_chapter != NULL )
             {
-                sys.p_current_segment = p_segment;
-                sys.PreparePlayback();
+                // if the segment is not part of the current segment, select the new one
+                if ( p_segment != sys.p_current_segment )
+                {
+                    sys.p_current_segment = p_segment;
+                    sys.PreparePlayback();
+                }
+    
+                p_chapter->Enter();
+                
+                // jump to the location in the found segment
+                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
             }
-
-            // TODO jump to the location in the found segment
-            p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, NULL );
 
             break;
         }
