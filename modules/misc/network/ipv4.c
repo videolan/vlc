@@ -97,6 +97,11 @@ static int NetOpen( vlc_object_t * );
     "Allows you to modify the default TCP connection timeout. This " \
     "value should be set in millisecond units." )
 
+#define MIFACE_TEXT N_("Multicast output interface")
+#define MIFACE_LONGTEXT N_( \
+    "Indicate here the multicast output interface. " \
+    "This overrides the routing table.")
+
 vlc_module_begin();
     set_description( _("IPv4 network abstraction layer") );
     set_capability( "network", 50 );
@@ -104,6 +109,7 @@ vlc_module_begin();
 
     add_integer( "ipv4-timeout", 5 * 1000, NULL, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, VLC_TRUE );
+    add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -431,6 +437,23 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             /* set the time-to-live */
             int i_ttl = p_socket->i_ttl;
             unsigned char ttl;
+            
+            /* set the multicast interface */
+            char * psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
+            if( psz_mif_addr )
+            {
+                struct in_addr intf;
+                intf.s_addr = inet_addr(psz_mif_addr);
+                free( psz_mif_addr  );
+
+                if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_IF,
+                                &intf, sizeof( intf ) ) < 0 )
+                {
+                    msg_Dbg( p_this, "failed to set multicast interface (%s).", strerror(errno) );
+                    close( i_handle );
+                    return ( -1 );
+                }
+            }
 
             if( i_ttl < 1 )
             {
