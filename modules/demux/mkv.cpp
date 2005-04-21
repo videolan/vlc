@@ -468,7 +468,7 @@ public:
     ,psz_parent(NULL)
     {}
 
-    ~chapter_item_c()
+    virtual ~chapter_item_c()
     {
         std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
         while ( index != codecs.end() )
@@ -489,7 +489,7 @@ public:
     chapter_item_c * FindTimecode( mtime_t i_timecode );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( const chapter_item_c & chapter );
-    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
+    virtual chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                     const void *p_cookie, 
                                     size_t i_cookie_size );
@@ -648,6 +648,9 @@ public:
     char                    *psz_title;
     char                    *psz_date_utc;
 
+    /* !!!!! GCC 3.3 bug on Darwin !!!!! */
+    /* when you remove this variable the compiler issues an atomicity error */
+    /* this variable only works when using std::vector<chapter_edition_c> */
     std::vector<chapter_edition_c*> stored_editions;
     int                             i_default_edition;
 
