@@ -643,7 +643,6 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/libebml.patch
 	-rm -rf $@/CVS
 
 .ebml: libebml
