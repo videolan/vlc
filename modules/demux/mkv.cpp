@@ -422,7 +422,8 @@ protected:
     demux_sys_t  & sys;
     
     // DVD command IDs
-    static const uint16 CMD_JUMP_TT = 0x3002;
+    static const uint16 CMD_JUMP_TT     = 0x3002;
+    static const uint16 CMD_CALLSS_VTSM = 0x3008;
     
     // callbacks when browsing inside CodecPrivate
     static bool MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
@@ -4189,6 +4190,12 @@ bool chapter_item_c::Enter()
         (*index)->Enter();
         index++;
     }
+    std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
+    while ( index_ != sub_chapters.end() )
+    {
+        (*index_)->Enter();
+        index_++;
+    }
     return true;
 }
 
@@ -4199,6 +4206,12 @@ bool chapter_item_c::Leave()
     {
         (*index)->Leave();
         index++;
+    }
+    std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
+    while ( index_ != sub_chapters.end() )
+    {
+        (*index_)->Leave();
+        index_++;
     }
     return true;
 }
@@ -4257,6 +4270,8 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_JUMP_TT:
         {
             uint8 i_title = p_command[5];
+            msg_Dbg( &sys.demuxer, "DVD command: JumpTT %d", i_title );
+
             // find in the ChapProcessPrivate matching this Title level
             virtual_segment_c *p_segment;
             chapter_item_c *p_chapter;
@@ -4276,6 +4291,24 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
             }
 
+            break;
+        }
+    case CMD_CALLSS_VTSM:
+        {
+            msg_Dbg( &sys.demuxer, "DVD command: CallSS VTSM" );
+            break;
+        }
+    default:
+        {
+            msg_Dbg( &sys.demuxer, "DVD command: unsupported %02X %02X %02X %02X %02X %02X %02X %02X"
+                     ,p_command[0]
+                     ,p_command[1]
+                     ,p_command[2]
+                     ,p_command[3]
+                     ,p_command[4]
+                     ,p_command[5]
+                     ,p_command[6]
+                     ,p_command[7]);
             break;
         }
     }
