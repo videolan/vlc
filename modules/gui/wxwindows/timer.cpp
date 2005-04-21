@@ -266,7 +266,7 @@ void Timer::Notify()
                 /* Show the slider if it's position is significant */
                 p_main_interface->ShowSlider();
             }
-            else
+            else if( pos.f_float <= 0.0 )
             {
                 p_main_interface->m_slider_timer.Start(200, wxTIMER_ONE_SHOT);
             }
