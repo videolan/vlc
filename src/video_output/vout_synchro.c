@@ -367,10 +367,12 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
         if( p_synchro->i_eta_p
              && p_synchro->i_eta_p != p_synchro->i_n_p )
         {
+#if 0
             if( !p_synchro->b_quiet )
                 msg_Dbg( p_synchro,
                          "stream periodicity changed from P[%d] to P[%d]",
                          p_synchro->i_n_p, p_synchro->i_eta_p );
+#endif
             p_synchro->i_n_p = p_synchro->i_eta_p;
         }
         p_synchro->i_eta_p = p_synchro->i_eta_b = 0;
@@ -399,7 +401,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
 #else
         if( p_synchro->i_pic >= 100 )
         {
-            if( !p_synchro->b_quiet )
+            if( !p_synchro->b_quiet && p_synchro->i_trashed_pic != 0 )
                 msg_Dbg( p_synchro, "decoded %d/%d pictures",
                          p_synchro->i_pic
                            - p_synchro->i_trashed_pic,
@@ -415,10 +417,12 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
         if( p_synchro->i_eta_b
              && p_synchro->i_eta_b != p_synchro->i_n_b )
         {
+#if 0
             if( !p_synchro->b_quiet )
                 msg_Dbg( p_synchro,
                          "stream periodicity changed from B[%d] to B[%d]",
                          p_synchro->i_n_b, p_synchro->i_eta_b );
+#endif
             p_synchro->i_n_b = p_synchro->i_eta_b;
         }
         p_synchro->i_eta_b = 0;
