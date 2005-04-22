@@ -774,6 +774,8 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
 </itemizedlist>
 
+<para>It is possible to run several actions at once, by separating them with ';'. Example: action="playlist_id.hide(); main_window_id.setLayout(main_layout)"</para>
+
 </sect1>
 
 <sect1 id="textvars">
