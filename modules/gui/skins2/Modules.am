@@ -14,6 +14,8 @@ SOURCES_skins2 = \
 	commands/cmd_input.hpp \
 	commands/cmd_layout.cpp \
 	commands/cmd_layout.hpp \
+	commands/cmd_muxer.cpp \
+	commands/cmd_muxer.hpp \
 	commands/cmd_on_top.cpp \
 	commands/cmd_on_top.hpp \
 	commands/cmd_playlist.cpp \

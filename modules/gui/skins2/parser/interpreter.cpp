@@ -24,6 +24,7 @@
 
 #include "interpreter.hpp"
 #include "expr_evaluator.hpp"
+#include "../commands/cmd_muxer.hpp"
 #include "../commands/cmd_playlist.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_dummy.hpp"
@@ -133,7 +134,35 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
 
     CmdGeneric *pCommand = NULL;
 
-    if( rAction.find( ".setLayout(" ) != string::npos )
+    if( rAction.find( ";" ) != string::npos )
+    {
+        // Several actions are defined...
+        list<CmdGeneric *> actionList;
+        string rightPart = rAction;
+        string::size_type pos = rightPart.find( ";" );
+        while( pos != string::npos )
+        {
+            string leftPart = rightPart.substr( 0, rightPart.find( ";" ) );
+            // Remove any whitespace at the end of the left part, and parse it
+            leftPart =
+                leftPart.substr( 0, leftPart.find_last_not_of( " \t" ) + 1 );
+            actionList.push_back( parseAction( leftPart, pTheme ) );
+            // Now remove any whitespace at the beginning of the right part,
+            // and go on checking for further actions in it...
+            rightPart = rightPart.substr( pos, rightPart.size() );
+            rightPart =
+                rightPart.substr( rightPart.find_first_not_of( " \t;" ),
+                                  rightPart.size() );
+            pos = rightPart.find( ";" );
+        }
+        actionList.push_back( parseAction( rightPart, pTheme ) );
+
+        // The list is filled, we remove NULL pointers from it, just in case...
+        actionList.remove( NULL );
+
+        pCommand = new CmdMuxer( getIntf(), actionList );
+    }
+    else if( rAction.find( ".setLayout(" ) != string::npos )
     {
         int leftPos = rAction.find( ".setLayout(" );
         string windowId = rAction.substr( 0, leftPos );
@@ -178,6 +207,10 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     {
         // Add the command in the pool
         pTheme->m_commands.push_back( CmdGenericPtr( pCommand ) );
+    }
+    else
+    {
+        msg_Warn( getIntf(), "Unknown action: %s", rAction.c_str() );
     }
 
     return pCommand;
