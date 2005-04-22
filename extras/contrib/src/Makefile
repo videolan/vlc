@@ -82,29 +82,36 @@ endif
 # ***************************************************************************
 
 ifdef HAVE_DARWIN_OS
-all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
+ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
 # mozilla support? add before .aclocal:  .glib .libidl .mozilla
-endif
+else
 
-ifeq ($(HOST),i586-pc-beos)
-ifeq ($(HOST),$(BUILD))
+ ifeq ($(HOST),i586-pc-beos)
+  ifeq ($(HOST),$(BUILD))
 # Native build: we need perl, autoconf, etc first
-all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
+   all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi .aclocal
-else
+  else
 # Cross compiling: we already have the Linux tools, only build the
 # libraries now
-all: .iconv .intl .freetype .fribidi \
+   all: .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi .aclocal
-endif
+  endif
+ else
+# Standard Linux or other UNIX-like systems
+   all: .iconv .intl .freetype .fribidi \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
+	.dvdread .dvdnav .dvbpsi .aclocal
+ endif
 endif
 
 FORCE:
