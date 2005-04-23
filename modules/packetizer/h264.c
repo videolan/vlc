@@ -630,9 +630,12 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
                     w = bs_read( &s, 16 );
                     h = bs_read( &s, 16 );
                 }
-                p_dec->fmt_out.video.i_aspect =
-                    VOUT_ASPECT_FACTOR * w / h * p_dec->fmt_out.video.i_width /
-                    p_dec->fmt_out.video.i_height;
+                if( h != 0 )
+                    p_dec->fmt_out.video.i_aspect =
+                        VOUT_ASPECT_FACTOR * w / h * p_dec->fmt_out.video.i_width /
+                        p_dec->fmt_out.video.i_height;
+                else
+                    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
             }
         }
 
