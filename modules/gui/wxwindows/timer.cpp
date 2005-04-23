@@ -216,7 +216,7 @@ void Timer::Notify()
             var_Get( p_input, "position", &pos );
 
             var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
-            if( val.i_int > 0 && !p_main_interface->disc_menu_button->IsShown() )
+            if( val.i_int > 0 && !p_main_interface->disc_frame->IsShown() )
             {
                 vlc_value_t val;
 
@@ -257,6 +257,10 @@ void Timer::Notify()
                 }
 
                 p_main_interface->ShowDiscFrame();
+            }
+            else if( val.i_int == 0 && p_main_interface->disc_frame->IsShown() )
+            {
+                p_main_interface->HideDiscFrame();
             }
 
 
