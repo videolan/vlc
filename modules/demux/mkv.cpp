@@ -350,6 +350,7 @@ public:
     
     virtual bool Enter() { return true; }
     virtual bool Leave() { return true; }
+    virtual std::string GetCodecName() const { return ""; }
 
     KaxChapterProcessPrivate m_private_data;
 
@@ -439,6 +440,7 @@ public:
 
     bool Enter();
     bool Leave();
+    std::string GetCodecName() const;
 
 protected:
     dvd_command_interpretor_c interpretor; 
@@ -494,6 +496,7 @@ public:
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                     const void *p_cookie, 
                                     size_t i_cookie_size );
+    std::string                 GetCodecName() const;
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
@@ -1822,6 +1825,14 @@ void chapter_edition_c::PublishChapters( input_title_t & title )
 
 void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
 {
+    // add support for meta-elements from codec like DVD Titles
+    if ( psz_name == "" || !b_display_seekpoint )
+    {
+        psz_name = GetCodecName();
+        if ( psz_name != "" )
+            b_display_seekpoint = true;
+    }
+
     if (b_display_seekpoint)
     {
         seekpoint_t *sk = vlc_seekpoint_New();
@@ -1956,6 +1967,41 @@ chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
             return sub_chapters[i];
     }
     return NULL;
+}
+
+std::string chapter_item_c::GetCodecName() const
+{
+    std::string result;
+
+    std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
+    while ( index != codecs.end() )
+    {
+        result = (*index)->GetCodecName();
+        if ( result != "" )
+            break;
+        index++;
+    }
+
+    return result;
+}
+
+std::string dvd_chapter_codec_c::GetCodecName() const
+{
+    std::string result;
+    if ( m_private_data.GetSize() >= 3)
+    {
+        const binary* p_data = m_private_data.GetBuffer();
+        if ( p_data[0] == 0x28 )
+        {
+            uint16_t i_title = (p_data[1] << 8) + p_data[2];
+            char psz_str[6];
+            sprintf( psz_str, " %d", i_title );
+            result = N_("DVD Title");
+            result += psz_str;
+        }
+    }
+
+    return result;
 }
 
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_item_c *psz_chapter )
@@ -3752,6 +3798,8 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             }
         }
     } while ( i_preloaded ); // worst case: will stop when all segments are found as family related
+
+    // TODO publish all editions of all usable segment
 }
 
 bool demux_sys_t::IsUsedSegment( matroska_segment_c &segment ) const
