@@ -348,8 +348,9 @@ public:
 
     void AddCommand( const KaxChapterProcessCommand & command );
     
-    virtual bool Enter() { return true; }
-    virtual bool Leave() { return true; }
+    /// \return wether the codec has seeked in the files or not
+    virtual bool Enter() { return false; }
+    virtual bool Leave() { return false; }
     virtual std::string GetCodecName( bool f_for_title = false ) const { return ""; }
 
     KaxChapterProcessPrivate m_private_data;
@@ -467,6 +468,7 @@ public:
     ,i_user_start_time(-1)
     ,i_user_end_time(-1)
     ,i_seekpoint_num(-1)
+    ,i_user_chapters(0)
     ,b_display_seekpoint(true)
     ,psz_parent(NULL)
     {}
@@ -488,7 +490,7 @@ public:
     }
 
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
-    void PublishChapters( input_title_t & title, int i_level );
+    int PublishChapters( input_title_t & title, int i_level = 0 );
     chapter_item_c * FindTimecode( mtime_t i_timecode );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( const chapter_item_c & chapter );
@@ -502,6 +504,7 @@ public:
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
     std::vector<chapter_item_c*> sub_chapters;
     int                         i_seekpoint_num;
+    int                         i_user_chapters;
     int64_t                     i_uid;
     bool                        b_display_seekpoint;
     std::string                 psz_name;
@@ -527,7 +530,6 @@ public:
     
     void RefreshChapters( );
     mtime_t Duration() const;
-    void PublishChapters( input_title_t & title );
     std::string GetMainName() const;
     
     bool                        b_ordered;
@@ -849,7 +851,7 @@ public:
 
     void PreloadFamily( const matroska_segment_c & of_segment );
     void PreloadLinked( matroska_segment_c *p_segment );
-    bool PreparePlayback( );
+    bool PreparePlayback( virtual_segment_c *p_new_segment );
     matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream );
 
 protected:
@@ -993,7 +995,7 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->PreloadFamily( *p_segment );
     p_sys->PreloadLinked( p_segment );
-    if ( !p_sys->PreparePlayback( ) )
+    if ( !p_sys->PreparePlayback( NULL ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
@@ -1026,6 +1028,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t     *pi64;
     double      *pf, f;
     int         i_skp;
+    size_t      i_idx;
 
     vlc_meta_t **pp_meta;
 
@@ -1081,8 +1084,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TITLE:
             /* TODO handle editions as titles */
-            if( p_sys->titles.size() && p_sys->titles[p_sys->i_current_title].i_seekpoint > 0 )
+            i_idx = (int)va_arg( args, int );
+            if( i_idx < p_sys->used_segments.size() )
             {
+                p_sys->PreparePlayback( p_sys->used_segments[i_idx] );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1116,6 +1121,9 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
     {
         EbmlElement *el;
         int         i_level;
+
+        if ( ep == NULL )
+            break;
 
         el = ep->Get();
         i_level = ep->GetLevel();
@@ -1816,13 +1824,9 @@ std::string chapter_edition_c::GetMainName() const
     return "";
 }
 
-void chapter_edition_c::PublishChapters( input_title_t & title )
+int chapter_item_c::PublishChapters( input_title_t & title, int i_level )
 {
-    chapter_item_c::PublishChapters( title, 0 );
-}
-
-void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
-{
+    bool f_user_display = ( psz_name != "" );
     // add support for meta-elements from codec like DVD Titles
     if ( !b_display_seekpoint || psz_name == "" )
     {
@@ -1843,14 +1847,19 @@ void chapter_item_c::PublishChapters( input_title_t & title, int i_level )
         title.i_seekpoint++;
         title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
         title.seekpoint[title.i_seekpoint-1] = sk;
-    
-        i_seekpoint_num = title.i_seekpoint;
+
+        if ( f_user_display )
+            i_user_chapters++;
     }
 
     for ( size_t i=0; i<sub_chapters.size() ; i++)
     {
-        sub_chapters[i]->PublishChapters( title, i_level+1 );
+        i_user_chapters += sub_chapters[i]->PublishChapters( title, i_level+1 );
     }
+
+    i_seekpoint_num = i_user_chapters;
+
+    return i_user_chapters;
 }
 
 void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
@@ -1870,22 +1879,24 @@ void virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             if ( psz_current_chapter != NULL )
                 psz_current_chapter->Leave();
 
-            if ( psz_curr_chapter->i_seekpoint_num > 0 )
+            if ( (*p_editions)[i_current_edition]->b_ordered )
             {
-                demux.info.i_update |= INPUT_UPDATE_SEEKPOINT;
+                if ( !psz_curr_chapter->Enter() )
+                {
+                    // only seek if necessary
+                    if ( psz_current_chapter == NULL || (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time) )
+                        Seek( demux, sys.i_pts, 0, psz_curr_chapter );
+                }
+            }
+            else if ( psz_curr_chapter->i_seekpoint_num > 0 )
+            {
+                demux.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+                demux.info.i_title = sys.i_current_title = i_sys_title;
                 demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
             }
 
-            if ( (*p_editions)[i_current_edition]->b_ordered )
-            {
-                psz_curr_chapter->Enter();
-
-                // only seek if necessary
-                if ( psz_current_chapter == NULL || (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time) )
-                    Seek( demux, sys.i_pts, 0, psz_curr_chapter );
-            }
+            psz_current_chapter = psz_curr_chapter;
         }
-        psz_current_chapter = psz_curr_chapter;
     }
 }
 
@@ -3888,8 +3899,17 @@ virtual_segment_c *demux_sys_t::VirtualFromSegments( matroska_segment_c *p_segme
     return p_result;
 }
 
-bool demux_sys_t::PreparePlayback( )
+bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
 {
+    if ( p_new_segment != NULL && p_new_segment != p_current_segment )
+    {
+        if ( p_current_segment != NULL && p_current_segment->Segment() != NULL )
+            p_current_segment->Segment()->UnSelect();
+
+        p_current_segment = p_new_segment;
+        i_current_title = p_new_segment->i_sys_title;
+    }
+
     p_current_segment->LoadCues();
     f_duration = p_current_segment->Duration();
 
@@ -4217,8 +4237,12 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
     {
         psz_current_chapter = psz_chapter;
         p_sys->i_chapter_time = i_time_offset = psz_chapter->i_user_start_time - psz_chapter->i_start_time;
-        demuxer.info.i_update |= INPUT_UPDATE_SEEKPOINT;
-        demuxer.info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
+        if ( psz_chapter->i_seekpoint_num > 0 )
+        {
+            demuxer.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+            demuxer.info.i_title = p_sys->i_current_title = i_sys_title;
+            demuxer.info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
+        }
     }
 
     // find the best matching segment
@@ -4284,40 +4308,43 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
 
 bool chapter_item_c::Enter()
 {
+    bool f_result = false;
     std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
     while ( index != codecs.end() )
     {
-        (*index)->Enter();
+        f_result |= (*index)->Enter();
         index++;
     }
     std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
     while ( index_ != sub_chapters.end() )
     {
-        (*index_)->Enter();
+        f_result |= (*index_)->Enter();
         index_++;
     }
-    return true;
+    return f_result;
 }
 
 bool chapter_item_c::Leave()
 {
+    bool f_result = false;
     std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
     while ( index != codecs.end() )
     {
-        (*index)->Leave();
+        f_result |= (*index)->Leave();
         index++;
     }
     std::vector<chapter_item_c*>::iterator index_ = sub_chapters.begin();
     while ( index_ != sub_chapters.end() )
     {
-        (*index_)->Leave();
+        f_result |= (*index_)->Leave();
         index_++;
     }
-    return true;
+    return f_result;
 }
 
 bool dvd_chapter_codec_c::Enter()
 {
+    bool f_result = false;
     std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
     while ( index != enter_cmds.end() )
     {
@@ -4329,16 +4356,17 @@ bool dvd_chapter_codec_c::Enter()
             i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
-                interpretor.Interpret( p_data );
+                f_result |= interpretor.Interpret( p_data );
             }
         }
         index++;
     }
-    return true;
+    return f_result;
 }
 
 bool dvd_chapter_codec_c::Leave()
 {
+    bool f_result = false;
     std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
     while ( index != leave_cmds.end() )
     {
@@ -4350,12 +4378,12 @@ bool dvd_chapter_codec_c::Leave()
             i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
-                interpretor.Interpret( p_data );
+                f_result |= interpretor.Interpret( p_data );
             }
         }
         index++;
     }
-    return true;
+    return f_result;
 }
 
 bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_size )
@@ -4363,6 +4391,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     if ( i_size != 8 )
         return false;
 
+    bool f_result = false;
     uint16 i_command = ( p_command[0] << 8 ) + p_command[1];
 
     switch ( i_command )
@@ -4381,15 +4410,14 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 // if the segment is not part of the current segment, select the new one
                 if ( p_segment != sys.p_current_segment )
                 {
-                    sys.p_current_segment = p_segment;
-                    sys.i_current_title = p_segment->i_sys_title;
-                    sys.PreparePlayback();
+                    sys.PreparePlayback( p_segment );
                 }
     
                 p_chapter->Enter();
                 
                 // jump to the location in the found segment
                 p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                f_result = true;
             }
 
             break;
@@ -4414,7 +4442,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     }
 
-    return true;
+    return f_result;
 }
 
 bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
