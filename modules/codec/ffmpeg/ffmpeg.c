@@ -790,7 +790,8 @@ static struct
 
     { VLC_FOURCC('A','A','S','C'), CODEC_ID_AASC,
       VIDEO_ES, "Autodesc RLE Video" },
-
+#endif
+#if LIBAVCODEC_BUILD >= 4753
     { VLC_FOURCC('I','V','2','0'), CODEC_ID_INDEO2,
       VIDEO_ES, "Indeo Video v2" },
     { VLC_FOURCC('R','T','2','1'), CODEC_ID_INDEO2,
