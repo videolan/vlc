@@ -918,6 +918,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
                 VLC_TRUE );
+        change_short('A');
     set_subcategory( SUBCAT_AUDIO_AFILTER );
     add_module_list_cat( "audio-filter", SUBCAT_AUDIO_AFILTER, 0,
                          NULL, AUDIO_FILTER_TEXT,
@@ -1184,7 +1185,6 @@ vlc_module_begin();
                 MEMCPY_LONGTEXT, VLC_TRUE );
     add_module( "audio-channel-mixer", "audio mixer", NULL, NULL,
                 AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_TRUE );
-        change_short('A');
 
     set_section( N_("Plugins" ), NULL );
     add_bool( "plugins-cache", VLC_TRUE, NULL, PLUGINS_CACHE_TEXT,
