@@ -350,7 +350,7 @@ public:
     
     virtual bool Enter() { return true; }
     virtual bool Leave() { return true; }
-    virtual std::string GetCodecName() const { return ""; }
+    virtual std::string GetCodecName( bool f_for_title = false ) const { return ""; }
 
     KaxChapterProcessPrivate m_private_data;
 
@@ -440,7 +440,7 @@ public:
 
     bool Enter();
     bool Leave();
-    std::string GetCodecName() const;
+    std::string GetCodecName( bool f_for_title = false ) const;
 
 protected:
     dvd_command_interpretor_c interpretor; 
@@ -496,7 +496,7 @@ public:
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                     const void *p_cookie, 
                                     size_t i_cookie_size );
-    std::string                 GetCodecName() const;
+    std::string                 GetCodecName( bool f_for_title = false ) const;
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
@@ -1809,6 +1809,10 @@ void virtual_segment_c::PrepareChapters( )
 
 std::string chapter_edition_c::GetMainName() const
 {
+    if ( sub_chapters.size() )
+    {
+        return sub_chapters[0]->GetCodecName( true );
+    }
     return "";
 }
 
@@ -1963,14 +1967,14 @@ chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
     return NULL;
 }
 
-std::string chapter_item_c::GetCodecName() const
+std::string chapter_item_c::GetCodecName( bool f_for_title ) const
 {
     std::string result;
 
     std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
     while ( index != codecs.end() )
     {
-        result = (*index)->GetCodecName();
+        result = (*index)->GetCodecName( f_for_title );
         if ( result != "" )
             break;
         index++;
@@ -1979,7 +1983,7 @@ std::string chapter_item_c::GetCodecName() const
     return result;
 }
 
-std::string dvd_chapter_codec_c::GetCodecName() const
+std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
 {
     std::string result;
     if ( m_private_data.GetSize() >= 3)
@@ -2000,7 +2004,7 @@ std::string dvd_chapter_codec_c::GetCodecName() const
             result = N_("---  DVD Menu");
             result += psz_str;
         }
-        else if ( p_data[0] == 0x30 )
+        else if ( p_data[0] == 0x30 && f_for_title )
         {
             if ( p_data[1] == 0x00 )
                 result = N_("First Played");
@@ -3820,6 +3824,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             input_title_t *p_title = vlc_input_title_New();
             p_seg->i_sys_title = i;
 
+            // TODO use a name for each edition, let the TITLE deal with a codec name
             for ( j=0; j<p_seg->p_editions->size(); j++ )
             {
                 if ( p_title->psz_name == NULL )
@@ -4377,7 +4382,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 if ( p_segment != sys.p_current_segment )
                 {
                     sys.p_current_segment = p_segment;
-                    sys.i_current_title = p_segment->i_sys_title + 1;
+                    sys.i_current_title = p_segment->i_sys_title;
                     sys.PreparePlayback();
                 }
     
