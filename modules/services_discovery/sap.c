@@ -120,7 +120,7 @@ vlc_module_begin();
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv4", 1 , NULL,
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
-    add_bool( "sap-ipv6", 0 , NULL,
+    add_bool( "sap-ipv6", 1 , NULL,
               SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE );
     add_string( "sap-ipv6-scope", "8" , NULL,
                 SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
