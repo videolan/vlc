@@ -158,6 +158,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     /* Tree control events */
     EVT_TREE_ITEM_ACTIVATED( TreeCtrl_Event, Playlist::OnActivateItem )
+    EVT_TREE_KEY_DOWN( -1, Playlist::OnKeyDown )
 
     EVT_CONTEXT_MENU( Playlist::OnPopup )
 
@@ -845,6 +846,36 @@ void Playlist::UpdatePlaylist()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
+void Playlist::DeleteTreeItem( wxTreeItemId item )
+{
+   PlaylistItem *p_wxitem;
+   playlist_item_t *p_item;
+   p_wxitem = (PlaylistItem *)treectrl->GetItemData( item );
+
+   LockPlaylist( p_intf->p_sys, p_playlist );
+   p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id );
+
+   if( !p_item )
+   {
+       UnlockPlaylist( p_intf->p_sys, p_playlist );
+       return;
+   }
+
+   if( p_item->i_children == -1 )
+   {
+       UnlockPlaylist( p_intf->p_sys, p_playlist );
+       DeleteItem( p_item->input.i_id );
+   }
+   else
+   {
+       UnlockPlaylist( p_intf->p_sys, p_playlist );
+       DeleteNode( p_item );
+   }
+   RemoveItem( item );
+}
+
+
+
 void Playlist::DeleteItem( int item_id )
 {
     playlist_LockDelete( p_playlist, item_id );
@@ -999,11 +1030,26 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
  **********************************************************************/
 void Playlist::OnInvertSelection( wxCommandEvent& WXUNUSED(event) )
 {
+//    InvertSelection( treectrl, treectrl->GetRootItem() );
+}
+
+void Playlist::RecursiveDeleteSelection(  wxTreeItemId root )
+{
+    wxTreeItemIdValue cookie;
+    wxTreeItemId child = treectrl->GetFirstChild( root, cookie );
+    while( child.IsOk() )
+    {
+        if( treectrl->ItemHasChildren( child ) )
+            RecursiveDeleteSelection(  child );
+        else if( treectrl->IsSelected( child ) )
+            DeleteTreeItem( child );
+        child = treectrl->GetNextChild( root, cookie );
+    }
 }
 
 void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
 {
-    Rebuild( VLC_TRUE );
+    RecursiveDeleteSelection( treectrl->GetRootItem() );
 }
 
 void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
@@ -1048,7 +1094,7 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
     PlaylistItem *p_wxparent = (PlaylistItem *)treectrl->GetItemData( parent );
 
     LockPlaylist( p_intf->p_sys, p_playlist );
-    
+
     p_item2 = playlist_ItemGetById(p_playlist, p_wxitem->i_id);
     p_node2 = playlist_ItemGetById(p_playlist, p_wxparent->i_id);
     if( p_item2 && p_item2->i_children == -1 )
@@ -1319,7 +1365,7 @@ void Playlist::Preparse()
     playlist_item_t *p_popup_item;
     LockPlaylist( p_intf->p_sys, p_playlist );
     p_popup_item = playlist_ItemGetById( p_playlist, i_popup_item );
-    
+
     if( p_popup_item != NULL )
     {
         if( p_popup_item->i_children == -1 )
@@ -1345,29 +1391,7 @@ void Playlist::Preparse()
 
 void Playlist::OnPopupDel( wxCommandEvent& event )
 {
-    PlaylistItem *p_wxitem;
-    playlist_item_t *p_item;
-
-    p_wxitem = (PlaylistItem *)treectrl->GetItemData( i_wx_popup_item );
-    
-    LockPlaylist( p_intf->p_sys, p_playlist );
-    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id );
-    if( !p_item )
-    {
-        UnlockPlaylist( p_intf->p_sys, p_playlist );
-        return;
-    }
-    
-    if( p_item->i_children == -1 )
-    {
-        UnlockPlaylist( p_intf->p_sys, p_playlist );
-        DeleteItem( p_item->input.i_id );
-    }
-    else
-    {
-        UnlockPlaylist( p_intf->p_sys, p_playlist );
-        DeleteNode( p_item );
-    }
+    DeleteTreeItem( i_wx_popup_item );
 }
 
 void Playlist::OnPopupSort( wxCommandEvent& event )

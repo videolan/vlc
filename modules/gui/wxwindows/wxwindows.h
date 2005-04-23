@@ -860,8 +860,11 @@ public:
 
 private:
     void RemoveItem( int );
+    void DeleteTreeItem( wxTreeItemId );
     void DeleteItem( int item );
     void DeleteNode( playlist_item_t *node );
+
+    void RecursiveDeleteSelection( wxTreeItemId );
 
     /* Event handlers (these functions should _not_ be virtual) */
 
