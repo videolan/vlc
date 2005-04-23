@@ -875,11 +875,7 @@ private:
     void OnMenuClose( wxCommandEvent& event );
     void OnClose( wxCloseEvent& WXUNUSED(event) );
 
-    void OnEnableSelection( wxCommandEvent& event );
-    void OnDisableSelection( wxCommandEvent& event );
-    void OnInvertSelection( wxCommandEvent& event );
     void OnDeleteSelection( wxCommandEvent& event );
-    void OnSelectAll( wxCommandEvent& event );
 
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );

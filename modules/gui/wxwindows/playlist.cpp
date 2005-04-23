@@ -83,12 +83,10 @@ enum
     RSortTitle_Event,
     Randomize_Event,
 
-    InvertSelection_Event,
     DeleteSelection_Event,
     Random_Event,
     Loop_Event,
     Repeat_Event,
-    SelectAll_Event,
 
     PopupPlay_Event,
     PopupPlayThis_Event,
@@ -137,9 +135,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     EVT_MENU(Randomize_Event, Playlist::OnSort)
 
-    EVT_MENU(InvertSelection_Event, Playlist::OnInvertSelection)
     EVT_MENU(DeleteSelection_Event, Playlist::OnDeleteSelection)
-    EVT_MENU(SelectAll_Event, Playlist::OnSelectAll)
 
     EVT_MENU_OPEN( Playlist::OnMenuOpen )
     EVT_MENU( -1, Playlist::OnMenuEvent )
@@ -251,9 +247,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;
-    selection_menu->Append( InvertSelection_Event, wxU(_("&Invert")) );
     selection_menu->Append( DeleteSelection_Event, wxU(_("D&elete")) );
-    selection_menu->Append( SelectAll_Event, wxU(_("&Select All")) );
 
     /* Create our "View" menu */
     ViewMenu();
@@ -1028,11 +1022,6 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
 /**********************************************************************
  * Selection functions
  **********************************************************************/
-void Playlist::OnInvertSelection( wxCommandEvent& WXUNUSED(event) )
-{
-//    InvertSelection( treectrl, treectrl->GetRootItem() );
-}
-
 void Playlist::RecursiveDeleteSelection(  wxTreeItemId root )
 {
     wxTreeItemIdValue cookie;
@@ -1040,7 +1029,7 @@ void Playlist::RecursiveDeleteSelection(  wxTreeItemId root )
     while( child.IsOk() )
     {
         if( treectrl->ItemHasChildren( child ) )
-            RecursiveDeleteSelection(  child );
+            RecursiveDeleteSelection( child );
         else if( treectrl->IsSelected( child ) )
             DeleteTreeItem( child );
         child = treectrl->GetNextChild( root, cookie );
@@ -1050,10 +1039,6 @@ void Playlist::RecursiveDeleteSelection(  wxTreeItemId root )
 void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
 {
     RecursiveDeleteSelection( treectrl->GetRootItem() );
-}
-
-void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
-{
 }
 
 /**********************************************************************
