@@ -669,6 +669,27 @@ Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
 Subtitle Files( .idx, .sub, .utf, .srt)<br />
 Status: Todo
 
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: OpenGL improvements
+OpenGL extensions can be querried at runtime using the glGetString(
+GL_EXTENSIONS ) call. Both rectangular textures and yuv textures may be
+available at non-apple platform (or even not available on some macs).<br />
+More fancy stuff can be done with GL, like subpicture rendering.<br />
+With recent hardware (and opengl shading language) stuff like dct, motion
+compensation or postprocessing should be possible.
+
+Task
+Difficulty: Medium
+Platform: any
+Urgancy: Wishlist
+Description: Gnutella servlet
+A simple gnutella servlet, combined with vlc's stream output/input features
+would make it fairly easy to implement peercast streaming, and peercast
+playback with restreaming. Also I guess gnutella could be used for other
+things as well, like discovering services.
 
 # Do not remove me
 Task
