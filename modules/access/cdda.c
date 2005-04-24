@@ -249,7 +249,8 @@ static block_t *Block( access_t *p_access )
             return NULL;
         }
 
-        p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE;
+        p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE |
+                                   INPUT_UPDATE_META;
         p_access->info.i_title++;
         p_access->info.i_size = p_sys->title[p_access->info.i_title]->i_size;
         p_access->info.i_pos = 0;
