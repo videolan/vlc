@@ -195,10 +195,10 @@ int playlist_Destroy( playlist_t * p_playlist )
     int i;
     p_playlist->b_die = 1;
 
-    for( i = 0 ; i< p_playlist->i_sds ; i++ )
+    while( p_playlist->i_sds )
     {
         playlist_ServicesDiscoveryRemove( p_playlist,
-                                          p_playlist->pp_sds[i]->psz_module );
+                                          p_playlist->pp_sds[0]->psz_module );
     }
 
     vlc_thread_join( p_playlist->p_preparse );
