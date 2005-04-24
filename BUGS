@@ -1,0 +1,20 @@
+##################
+# Known VLC bugs #
+##################
+
+Feel free to work on these :)
+
+Regressions from previous versions
+----------------------------------
+*** OS X preferences
+*** OS X playlist
+*** OS X resampler 
+*   CDDAX 
+
+Other bugs
+----------
+
+** DVDNav duration
+*  Insert/Backspace hotkeys
+*  SDL Vout
+
