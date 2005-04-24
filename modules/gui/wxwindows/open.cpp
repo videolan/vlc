@@ -1328,15 +1328,22 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
         subsfile_mrl.Add( wxString(wxT("sub-file=")) +
                           subsfile_dialog->file_combo->GetValue() );
         if( subsfile_dialog->encoding_combo )
+        {
             subsfile_mrl.Add( wxString(wxT("subsdec-encoding=")) +
                               subsfile_dialog->encoding_combo->GetValue() );
-        subsfile_mrl.Add( wxString::Format(wxT("subsdec-align=%i"),
-                           (int)subsfile_dialog->align_combo->GetClientData(
-                           subsfile_dialog->align_combo->GetSelection()) ) );
-
-        subsfile_mrl.Add( wxString::Format( wxT("freetype-rel-fontsize=%i"),
-                          (int)subsfile_dialog->size_combo->GetClientData(
-                          subsfile_dialog->size_combo->GetSelection()) ) );
+        }
+        if( subsfile_dialog->align_combo )
+        {
+            subsfile_mrl.Add( wxString::Format(wxT("subsdec-align=%i"),
+                              (int)subsfile_dialog->align_combo->GetClientData(
+                              subsfile_dialog->align_combo->GetSelection()) ) );
+        }
+        if( subsfile_dialog->size_combo )
+        {
+            subsfile_mrl.Add( wxString::Format( wxT("freetype-rel-fontsize=%i"),
+                              (int)subsfile_dialog->size_combo->GetClientData(
+                              subsfile_dialog->size_combo->GetSelection()) ) );
+        }
         subsfile_mrl.Add( wxString::Format( wxT("sub-fps=%i"),
                           subsfile_dialog->fps_spinctrl->GetValue() ) );
         subsfile_mrl.Add( wxString::Format( wxT("sub-delay=%i"),
