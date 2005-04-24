@@ -456,8 +456,38 @@ protected:
     dvd_command_interpretor_c interpretor; 
 };
 
+class matroska_script_interpretor_c
+{
+public:
+    matroska_script_interpretor_c( demux_sys_t & demuxer )
+    :sys( demuxer )
+    {}
+
+    bool Interpret( const binary * p_command, size_t i_size );
+    
+    // DVD command IDs
+    static const std::string CMD_MS_GOTO_AND_PLAY;
+    
+protected:
+    demux_sys_t  & sys;
+};
+
+const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAndPlay";
+
+
 class matroska_script_codec_c : public chapter_codec_cmds_c
 {
+public:
+    matroska_script_codec_c( demux_sys_t & sys )
+    :chapter_codec_cmds_c( 0 )
+    ,interpretor( sys )
+    {}
+
+    bool Enter();
+    bool Leave();
+
+protected:
+    matroska_script_interpretor_c interpretor; 
 };
 
 class chapter_translation_c
@@ -502,7 +532,7 @@ public:
     int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level = 0 );
     chapter_item_c * FindTimecode( mtime_t i_timecode );
     void Append( const chapter_item_c & edition );
-    chapter_item_c * FindChapter( const chapter_item_c & chapter );
+    chapter_item_c * FindChapter( int64_t i_find_uid );
     virtual chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                     const void *p_cookie, 
@@ -770,6 +800,7 @@ public:
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                         const void *p_cookie, 
                                         size_t i_cookie_size );
+    chapter_item_c *FindChapter( int64_t i_find_uid );
 
     std::vector<chapter_edition_c*>  *p_editions;
     int                              i_sys_title;
@@ -859,6 +890,7 @@ public:
                                         const void *p_cookie, 
                                         size_t i_cookie_size, 
                                         virtual_segment_c * & p_segment_found );
+    chapter_item_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found );
 
     void PreloadFamily( const matroska_segment_c & of_segment );
     void PreloadLinked( matroska_segment_c *p_segment );
@@ -1926,6 +1958,19 @@ chapter_item_c *virtual_segment_c::BrowseCodecPrivate( unsigned int codec_id,
     return NULL;
 }
 
+chapter_item_c *virtual_segment_c::FindChapter( int64_t i_find_uid )
+{
+    // FIXME don't assume it is the first edition
+    std::vector<chapter_edition_c*>::iterator index = p_editions->begin();
+    if ( index != p_editions->end() )
+    {
+        chapter_item_c *p_result = (*index)->FindChapter( i_find_uid );
+        if ( p_result != NULL )
+            return p_result;
+    }
+    return NULL;
+}
+
 chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id, 
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ), 
                                     const void *p_cookie, 
@@ -1962,7 +2007,7 @@ void chapter_item_c::Append( const chapter_item_c & chapter )
 
     for ( i=0; i<chapter.sub_chapters.size(); i++ )
     {
-        p_chapter = FindChapter( *chapter.sub_chapters[i] );
+        p_chapter = FindChapter( chapter.sub_chapters[i]->i_uid );
         if ( p_chapter != NULL )
         {
             p_chapter->Append( *chapter.sub_chapters[i] );
@@ -1977,15 +2022,21 @@ void chapter_item_c::Append( const chapter_item_c & chapter )
     i_user_end_time = max( i_user_end_time, chapter.i_user_end_time );
 }
 
-chapter_item_c * chapter_item_c::FindChapter( const chapter_item_c & chapter )
+chapter_item_c * chapter_item_c::FindChapter( int64_t i_find_uid )
 {
     size_t i;
+    chapter_item_c *p_result = NULL;
+
+    if ( i_uid == i_find_uid )
+        return this;
+
     for ( i=0; i<sub_chapters.size(); i++)
     {
-        if ( sub_chapters[i]->i_uid == chapter.i_uid )
-            return sub_chapters[i];
+        p_result = sub_chapters[i]->FindChapter( i_find_uid );
+        if ( p_result != NULL )
+            break;
     }
-    return NULL;
+    return p_result;
 }
 
 std::string chapter_item_c::GetCodecName( bool f_for_title ) const
@@ -3439,7 +3490,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 {
                     KaxChapterProcessCodecID *p_codec_id = static_cast<KaxChapterProcessCodecID*>( k );
                     if ( uint32(*p_codec_id) == 0 )
-                        p_ccodec = new matroska_script_codec_c();
+                        p_ccodec = new matroska_script_codec_c( sys );
                     else if ( uint32(*p_codec_id) == 1 )
                         p_ccodec = new dvd_chapter_codec_c( sys );
                     break;
@@ -4048,9 +4099,24 @@ chapter_item_c *demux_sys_t::BrowseCodecPrivate( unsigned int codec_id,
                                         virtual_segment_c * &p_segment_found )
 {
     chapter_item_c *p_result = NULL;
-    for (size_t i=0; i<opened_segments.size(); i++)
+    for (size_t i=0; i<used_segments.size(); i++)
     {
         p_result = used_segments[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        if ( p_result != NULL )
+        {
+            p_segment_found = used_segments[i];
+            break;
+        }
+    }
+    return p_result;
+}
+
+chapter_item_c *demux_sys_t::FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found )
+{
+    chapter_item_c *p_result = NULL;
+    for (size_t i=0; i<used_segments.size(); i++)
+    {
+        p_result = used_segments[i]->FindChapter( i_find_uid );
         if ( p_result != NULL )
         {
             p_segment_found = used_segments[i];
@@ -4604,4 +4670,89 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
     uint8 i_pgc = *(uint8*)p_cookie;
 
     return (i_pgc_type == i_pgc);
+}
+
+bool matroska_script_codec_c::Enter()
+{
+    bool f_result = false;
+    std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
+    while ( index != enter_cmds.end() )
+    {
+        if ( (*index).GetSize() )
+        {
+            f_result |= interpretor.Interpret( (*index).GetBuffer(), (*index).GetSize() );
+        }
+        index++;
+    }
+    return f_result;
+}
+
+bool matroska_script_codec_c::Leave()
+{
+    bool f_result = false;
+    std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
+    while ( index != leave_cmds.end() )
+    {
+        if ( (*index).GetSize() )
+        {
+            f_result |= interpretor.Interpret( (*index).GetBuffer(), (*index).GetSize() );
+        }
+        index++;
+    }
+    return f_result;
+}
+
+// see http://www.matroska.org/technical/specs/chapters/index.html#mscript 
+//  for a description of existing commands
+bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t i_size )
+{
+    bool b_result = false;
+
+    char *psz_str = (char*) malloc( i_size + 1 );
+    memcpy( psz_str, p_command, i_size );
+    psz_str[ i_size ] = '\0';
+
+    std::string sz_command = psz_str;
+
+    msg_Dbg( &sys.demuxer, "Matroska Script command : %s", sz_command.c_str() );
+
+    if ( sz_command.compare( 0, CMD_MS_GOTO_AND_PLAY.size(), CMD_MS_GOTO_AND_PLAY ) == 0 )
+    {
+        size_t i,j;
+
+        // find the (
+        for ( i=CMD_MS_GOTO_AND_PLAY.size(); i<sz_command.size(); i++)
+        {
+            if ( sz_command[i] == '(' )
+            {
+                i++;
+                break;
+            }
+        }
+        // find the )
+        for ( j=i; j<sz_command.size(); j++)
+        {
+            if ( sz_command[j] == ')' )
+            {
+                i--;
+                break;
+            }
+        }
+
+        std::string st = sz_command.substr( i+1, j-i-1 );
+        int64_t i_chapter_uid = atoi( st.c_str() );
+
+        virtual_segment_c *p_segment;
+        chapter_item_c *p_chapter = sys.FindChapter( i_chapter_uid, p_segment );
+
+        if ( p_chapter == NULL )
+            msg_Dbg( &sys.demuxer, "Chapter %d not found", i_chapter_uid);
+        else
+        {
+            p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+            b_result = true;
+        }
+    }
+
+    return b_result;
 }
