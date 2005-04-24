@@ -468,8 +468,8 @@ public:
     ,i_user_start_time(-1)
     ,i_user_end_time(-1)
     ,i_seekpoint_num(-1)
-    ,i_user_chapters(0)
     ,b_display_seekpoint(true)
+    ,b_user_display(false)
     ,psz_parent(NULL)
     {}
 
@@ -490,7 +490,7 @@ public:
     }
 
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
-    int PublishChapters( input_title_t & title, int i_level = 0 );
+    int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level = 0 );
     chapter_item_c * FindTimecode( mtime_t i_timecode );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( const chapter_item_c & chapter );
@@ -504,9 +504,9 @@ public:
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
     std::vector<chapter_item_c*> sub_chapters;
     int                         i_seekpoint_num;
-    int                         i_user_chapters;
     int64_t                     i_uid;
     bool                        b_display_seekpoint;
+    bool                        b_user_display;
     std::string                 psz_name;
     chapter_item_c              *psz_parent;
     
@@ -1123,7 +1123,7 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
         int         i_level;
 
         if ( ep == NULL )
-            break;
+            return VLC_EGENERIC;
 
         el = ep->Get();
         i_level = ep->GetLevel();
@@ -1824,9 +1824,8 @@ std::string chapter_edition_c::GetMainName() const
     return "";
 }
 
-int chapter_item_c::PublishChapters( input_title_t & title, int i_level )
+int chapter_item_c::PublishChapters( input_title_t & title, int & i_user_chapters, int i_level )
 {
-    bool f_user_display = ( psz_name != "" );
     // add support for meta-elements from codec like DVD Titles
     if ( !b_display_seekpoint || psz_name == "" )
     {
@@ -1848,13 +1847,13 @@ int chapter_item_c::PublishChapters( input_title_t & title, int i_level )
         title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
         title.seekpoint[title.i_seekpoint-1] = sk;
 
-        if ( f_user_display )
+        if ( b_user_display )
             i_user_chapters++;
     }
 
     for ( size_t i=0; i<sub_chapters.size() ; i++)
     {
-        i_user_chapters += sub_chapters[i]->PublishChapters( title, i_level+1 );
+        sub_chapters[i]->PublishChapters( title, i_user_chapters, i_level+1 );
     }
 
     i_seekpoint_num = i_user_chapters;
@@ -2000,7 +1999,7 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
     if ( m_private_data.GetSize() >= 3)
     {
         const binary* p_data = m_private_data.GetBuffer();
-        if ( p_data[0] == 0x28 )
+/*        if ( p_data[0] == 0x28 )
         {
             uint16_t i_title = (p_data[1] << 8) + p_data[2];
             char psz_str[11];
@@ -2008,7 +2007,7 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
             result = N_("---  DVD Title");
             result += psz_str;
         }
-        else if ( p_data[0] == 0x2A )
+        else */ if ( p_data[0] == 0x2A )
         {
             char psz_str[11];
             sprintf( psz_str, " (%c%c)  ---", p_data[1], p_data[2] );
@@ -3393,6 +3392,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                         chapters.psz_name += '+';
                     chapters.psz_name += ' ';
                     chapters.psz_name += UTF8ToStr( UTFstring( name ) );
+                    chapters.b_user_display = true;
 
                     msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterString '%s'", UTF8ToStr(UTFstring(name)) );
                 }
@@ -3834,6 +3834,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             std::string sz_name;
             input_title_t *p_title = vlc_input_title_New();
             p_seg->i_sys_title = i;
+            int i_chapters;
 
             // TODO use a name for each edition, let the TITLE deal with a codec name
             for ( j=0; j<p_seg->p_editions->size(); j++ )
@@ -3847,7 +3848,8 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
 
                 chapter_edition_c *p_edition = (*p_seg->p_editions)[j];
 
-                p_edition->PublishChapters( *p_title );
+                i_chapters = 0;
+                p_edition->PublishChapters( *p_title, i_chapters, 0 );
             }
 
             // create a name if there is none
@@ -4386,6 +4388,7 @@ bool dvd_chapter_codec_c::Leave()
     return f_result;
 }
 
+// see http://www.dvd-replica.com/DVD/vmcmdset.php for a description of DVD commands
 bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_size )
 {
     if ( i_size != 8 )
