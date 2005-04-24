@@ -1029,7 +1029,10 @@ void Playlist::RecursiveDeleteSelection(  wxTreeItemId root )
     while( child.IsOk() )
     {
         if( treectrl->ItemHasChildren( child ) )
+        {
             RecursiveDeleteSelection( child );
+            if( treectrl->IsSelected(child ) ) DeleteTreeItem( child );
+        }
         else if( treectrl->IsSelected( child ) )
             DeleteTreeItem( child );
         child = treectrl->GetNextChild( root, cookie );
