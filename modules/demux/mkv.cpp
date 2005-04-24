@@ -1926,6 +1926,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                     // only seek if necessary
                     if ( psz_current_chapter == NULL || (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time) )
                         Seek( demux, sys.i_pts, 0, psz_curr_chapter );
+                    psz_current_chapter = psz_curr_chapter;
                 }
             }
             else if ( psz_curr_chapter->i_seekpoint_num > 0 )
@@ -1933,9 +1934,13 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                 demux.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
                 demux.info.i_title = sys.i_current_title = i_sys_title;
                 demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
+                psz_current_chapter = psz_curr_chapter;
+            }
+            else
+            {
+                psz_current_chapter = psz_curr_chapter;
             }
 
-            psz_current_chapter = psz_curr_chapter;
             return true;
         }
     }
