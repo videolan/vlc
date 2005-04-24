@@ -211,6 +211,7 @@ struct services_discovery_sys_t
 
     /* playlist node */
     playlist_item_t *p_node;
+    playlist_t *p_playlist;
 
     /* charset conversion */
     vlc_iconv_t iconvHandle;
@@ -276,7 +277,6 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)
                                 malloc( sizeof( services_discovery_sys_t ) );
 
-    playlist_t          *p_playlist;
     playlist_view_t     *p_view;
     char                *psz_addr, *psz_charset;
     vlc_value_t         val;
@@ -346,23 +346,22 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Create our playlist node */
-    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist )
+    p_sys->p_playlist = (playlist_t *)vlc_object_find( p_sd,
+                                                       VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( !p_sys->p_playlist )
     {
         msg_Warn( p_sd, "unable to find playlist, cancelling SAP listening");
         return VLC_EGENERIC;
     }
 
-    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
-    p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
+    p_view = playlist_ViewFind( p_sys->p_playlist, VIEW_CATEGORY );
+    p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
                                          _("SAP"), p_view->p_root );
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     p_sys->p_node->i_flags =~ PLAYLIST_SKIP_FLAG;
     val.b_bool = VLC_TRUE;
-    var_Set( p_playlist, "intf-change", val );
-
-    vlc_object_release( p_playlist );
+    var_Set( p_sys->p_playlist, "intf-change", val );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
@@ -468,7 +467,6 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
-    playlist_t *p_playlist;
     int i;
 
     for( i = p_sys->i_fd-1 ; i >= 0 ; i-- )
@@ -488,13 +486,11 @@ static void Close( vlc_object_t *p_this )
     }
     FREE( p_sys->pp_announces );
 
-    p_playlist = (playlist_t *) vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                 FIND_ANYWHERE );
-
-    if( p_playlist )
+    if( p_sys->p_playlist )
     {
-        playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE , VLC_TRUE );
-        vlc_object_release( p_playlist );
+        playlist_NodeDelete( p_sys->p_playlist, p_sys->p_node, VLC_TRUE,
+                             VLC_TRUE );
+        vlc_object_release( p_sys->p_playlist );
     }
 
     vlc_iconv_close( p_sys->iconvHandle );
@@ -520,7 +516,6 @@ static void CloseDemux( vlc_object_t *p_this )
 static void Run( services_discovery_t *p_sd )
 {
     int		i;
-    playlist_t  *p_playlist;
 
     /* read SAP packets */
     while( !p_sd->b_die )
@@ -540,25 +535,11 @@ static void Run( services_discovery_t *p_sd )
             if( mdate() - p_sd->p_sys->pp_announces[i]->i_last > i_timeout )
             {
                 struct sap_announce_t *p_announce;
-                playlist_item_t * p_item;
                 p_announce = p_sd->p_sys->pp_announces[i];
 
                 /* Remove the playlist item */
-                p_playlist = vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                              FIND_ANYWHERE );
-                if( p_playlist )
-                {
-                    p_item = playlist_ItemGetById( p_playlist,
-                                                   p_announce->i_item_id );
-                    if( !p_item ) continue;
-
-                    msg_Dbg( p_sd, "Time out for %s, deleting (%i/%i)",
-                                   p_item->input.psz_name,
-                                   i , p_sd->p_sys->i_announces );
-
-                    playlist_Delete( p_playlist, p_announce->i_item_id );
-                    vlc_object_release( p_playlist );
-                }
+                playlist_LockDelete( p_sd->p_sys->p_playlist,
+                                     p_announce->i_item_id );
 
                 /* Remove the sap_announce from the array */
                 REMOVE_ELEM( p_sd->p_sys->pp_announces,
@@ -802,7 +783,6 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
                                 sdp_t *p_sdp )
 {
-    playlist_t          *p_playlist;
     playlist_item_t     *p_item, *p_child;
     char                *psz_value;
     sap_announce_t *p_sap = (sap_announce_t *)malloc(
@@ -849,15 +829,6 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         psz_value = GetAttribute( p_sap->p_sdp, "plgroup" );
     }
 
-    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Err( p_sd, "playlist not found" );
-        free( p_sap );
-        return NULL;
-    }
-
     if( psz_value != NULL )
     {
         char *psz_grp = convert_from_utf8( p_sd, psz_value );
@@ -869,15 +840,15 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
 
             if( p_child == NULL )
             {
-                p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
-                                               psz_grp, p_sd->p_sys->p_node );
+                p_child = playlist_NodeCreate( p_sd->p_sys->p_playlist,
+                                               VIEW_CATEGORY, psz_grp,
+                                               p_sd->p_sys->p_node );
                 p_child->i_flags =~ PLAYLIST_SKIP_FLAG;
             }
             free( psz_grp );
         }
         else
         {
-            vlc_object_release( p_playlist );
             msg_Err( p_sd, "out of memory");
             free( p_sap );
             return NULL;
@@ -891,10 +862,8 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
 
-    playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY, p_child,
-                          PLAYLIST_APPEND, PLAYLIST_END );
-
-    vlc_object_release( p_playlist );
+    playlist_NodeAddItem( p_sd->p_sys->p_playlist, p_item, VIEW_CATEGORY,
+                              p_child, PLAYLIST_APPEND, PLAYLIST_END );
 
     p_sap->i_item_id = p_item->input.i_id;
 
@@ -1459,20 +1428,12 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
                            sap_announce_t *p_announce )
 {
     int i;
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
-                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( p_announce->p_sdp ) FreeSDP( p_announce->p_sdp );
 
-    if( !p_playlist )
-    {
-        free( p_announce );
-        return VLC_EGENERIC;
-    }
-
     if( p_announce->i_item_id > -1 )
     {
-        playlist_LockDelete( p_playlist, p_announce->i_item_id );
+        playlist_LockDelete( p_sd->p_sys->p_playlist, p_announce->i_item_id );
     }
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)
@@ -1484,8 +1445,6 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
             break;
         }
     }
-
-    vlc_object_release( p_playlist );
 
     free( p_announce );
 
