@@ -343,8 +343,9 @@ const binary MATROSKA_DVD_LEVEL_CN   = 0x08;
 class chapter_codec_cmds_c
 {
 public:
-    chapter_codec_cmds_c( int codec_id = -1)
+    chapter_codec_cmds_c( demux_sys_t & demuxer, int codec_id = -1)
     :i_codec_id( codec_id )
+    ,sys( demuxer )
     {}
         
     virtual ~chapter_codec_cmds_c() {}
@@ -369,6 +370,7 @@ protected:
     std::vector<KaxChapterProcessData> leave_cmds;
 
     int i_codec_id;
+    demux_sys_t & sys;
 };
 
 class dvd_command_interpretor_c
@@ -377,41 +379,57 @@ public:
     dvd_command_interpretor_c( demux_sys_t & demuxer )
     :sys( demuxer )
     {
-        memset( p_GPRM, 0, sizeof(p_GPRM) );
-        memset( p_SPRM, 0, sizeof(p_SPRM) );
-        p_SPRM[ 1 ] = 15;
-        p_SPRM[ 2 ] = 62;
-        p_SPRM[ 3 ] = 1;
-        p_SPRM[ 4 ] = 1;
-        p_SPRM[ 7 ] = 1;
-        p_SPRM[ 8 ] = 1;
-        p_SPRM[ 16 ] = 0xFFFFu;
-        p_SPRM[ 18 ] = 0xFFFFu;
+        memset( p_PRMs, 0, sizeof(p_PRMs) );
+        p_PRMs[ 0x80 + 1 ] = 15;
+        p_PRMs[ 0x80 + 2 ] = 62;
+        p_PRMs[ 0x80 + 3 ] = 1;
+        p_PRMs[ 0x80 + 4 ] = 1;
+        p_PRMs[ 0x80 + 7 ] = 1;
+        p_PRMs[ 0x80 + 8 ] = 1;
+        p_PRMs[ 0x80 + 16 ] = 0xFFFFu;
+        p_PRMs[ 0x80 + 18 ] = 0xFFFFu;
     }
     
     bool Interpret( const binary * p_command, size_t i_size = 8 );
     
 protected:
+    uint16 GetPRM( size_t index ) const
+    {
+        if ( index < 256 )
+            return p_PRMs[ index ];
+        else return 0;
+    }
+
     uint16 GetGPRM( size_t index ) const
     {
         if ( index >= 0 && index < 16 )
-            return p_GPRM[ index ];
+            return p_PRMs[ index ];
         else return 0;
     }
 
     uint16 GetSPRM( size_t index ) const
     {
         // 21,22,23 reserved for future use
-        if ( index >= 0 && index < 21 )
-            return p_SPRM[ index ];
+        if ( index >= 0x80 && index < 0x95 )
+            return p_PRMs[ index ];
         else return 0;
     }
 
+    bool SetPRM( size_t index, uint16 value )
+    {
+        if ( index >= 0 && index < 16 )
+        {
+            p_PRMs[ index ] = value;
+            return true;
+        }
+        return false;
+    }
+    
     bool SetGPRM( size_t index, uint16 value )
     {
         if ( index >= 0 && index < 16 )
         {
-            p_GPRM[ index ] = value;
+            p_PRMs[ index ] = value;
             return true;
         }
         return false;
@@ -419,21 +437,89 @@ protected:
 
     bool SetSPRM( size_t index, uint16 value )
     {
-        if ( index > 0 && index <= 13 && index != 12 )
+        if ( index > 0x80 && index <= 0x8D && index != 0x8C )
         {
-            p_SPRM[ index ] = value;
+            p_PRMs[ index ] = value;
             return true;
         }
         return false;
     }
 
-    uint16       p_GPRM[16];
-    uint16       p_SPRM[24];
+    std::string GetRegTypeName( bool b_value, uint16 value ) const
+    {
+        std::string result;
+        char s_value[6], s_reg_value[6];
+        itoa( value, s_value, 10 );
+
+        if ( b_value )
+        {
+            result = "value (";
+            result += s_value;
+            result += ")";
+        }
+        else if ( value < 0x80 )
+        {
+            itoa( GetPRM( value ) , s_reg_value, 10 );
+            result = "GPreg[";
+            result += s_value;
+            result += "] (";
+            result += s_reg_value;
+            result += ")";
+        }
+        else
+        {
+            itoa( GetPRM( value ) , s_reg_value, 10 );
+            result = "SPreg[";
+            result += s_value;
+            result += "] (";
+            result += s_reg_value;
+            result += ")";
+        }
+        return result;
+    }
+
+    uint16       p_PRMs[256];
     demux_sys_t  & sys;
     
     // DVD command IDs
-    static const uint16 CMD_JUMP_TT     = 0x3002;
-    static const uint16 CMD_CALLSS_VTSM = 0x3008;
+
+    // Tests
+    // wether the test has to be positive or not
+    static const uint16 CMD_DVD_IF_NOT              = 0x10;
+    // wether it's a comparison on the value or register
+    static const uint16 CMD_DVD_TEST_VALUE          = 0x80;
+    static const uint16 CMD_DVD_IF_GPREG_AND        = (0 << 5);
+    static const uint16 CMD_DVD_IF_GPREG_EQUAL      = (1 << 5);
+    static const uint16 CMD_DVD_IF_GPREG_SUP_EQUAL  = (2 << 5);
+    static const uint16 CMD_DVD_IF_GPREG_INF        = (3 << 5);
+    
+    static const uint16 CMD_DVD_NOP                    = 0x0000;
+    static const uint16 CMD_DVD_GOTO_LINE              = 0x0001;
+    static const uint16 CMD_DVD_BREAK                  = 0x0002;
+    // Links
+    static const uint16 CMD_DVD_NOP2                   = 0x2001;
+    static const uint16 CMD_DVD_LINKPGCN               = 0x2004;
+    static const uint16 CMD_DVD_LINKPGN                = 0x2006;
+    static const uint16 CMD_DVD_LINKCN                 = 0x2007;
+    static const uint16 CMD_DVD_JUMP_TT                = 0x3002;
+    static const uint16 CMD_DVD_JUMPVTS_TT             = 0x3003;
+    static const uint16 CMD_DVD_JUMP_SS                = 0x3006;
+    static const uint16 CMD_DVD_CALLSS_VTSM1           = 0x3008;
+    //
+    static const uint16 CMD_DVD_SET_HL_BTNN2           = 0x4600;
+    static const uint16 CMD_DVD_SET_HL_BTNN_LINKPGCN1  = 0x4604;
+    static const uint16 CMD_DVD_SET_AUDIO              = 0x5100;
+    static const uint16 CMD_DVD_SET_GPRMMD             = 0x5300;
+    static const uint16 CMD_DVD_SET_HL_BTNN1           = 0x5600;
+    static const uint16 CMD_DVD_SET_HL_BTNN_LINKPGCN2  = 0x5604;
+    static const uint16 CMD_DVD_SET_HL_BTNN_LINKCN     = 0x5607;
+    // Operations
+    static const uint16 CMD_DVD_MOV_SPREG_PREG         = 0x6100;
+    static const uint16 CMD_DVD_GPREG_MOV_VALUE        = 0x7100;
+    static const uint16 CMD_DVD_SUB_GPREG              = 0x7400;
+    static const uint16 CMD_DVD_MULT_GPREG             = 0x7500;
+    static const uint16 CMD_DVD_GPREG_DIV_VALUE        = 0x7600;
+    static const uint16 CMD_DVD_GPREG_AND_VALUE        = 0x7900;
     
     // callbacks when browsing inside CodecPrivate
     static bool MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
@@ -444,7 +530,7 @@ class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
 public:
     dvd_chapter_codec_c( demux_sys_t & sys )
-    :chapter_codec_cmds_c( 1 )
+    :chapter_codec_cmds_c( sys, 1 )
     ,interpretor( sys )
     {}
 
@@ -479,7 +565,7 @@ class matroska_script_codec_c : public chapter_codec_cmds_c
 {
 public:
     matroska_script_codec_c( demux_sys_t & sys )
-    :chapter_codec_cmds_c( 0 )
+    :chapter_codec_cmds_c( sys, 0 )
     ,interpretor( sys )
     {}
 
@@ -4504,6 +4590,7 @@ bool dvd_chapter_codec_c::Enter()
             i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
+                msg_Dbg( &sys.demuxer, "Matroska DVD enter command" );
                 f_result |= interpretor.Interpret( p_data );
             }
         }
@@ -4526,6 +4613,7 @@ bool dvd_chapter_codec_c::Leave()
             i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
+                msg_Dbg( &sys.demuxer, "Matroska DVD leave command" );
                 f_result |= interpretor.Interpret( p_data );
             }
         }
@@ -4545,12 +4633,80 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     bool f_result = false;
     uint16 i_command = ( p_command[0] << 8 ) + p_command[1];
 
+    // handle register tests if there are some
+    if ( (i_command & 0xF0) != 0 )
+    {
+        bool b_test_positive = (i_command & CMD_DVD_IF_NOT) == 0;
+        bool b_test_value    = (i_command & CMD_DVD_TEST_VALUE) != 0;
+        uint8 i_test = i_command & 0x70;
+        uint16 i_value;
+
+        if ( b_test_value )
+            i_value = ( p_command[4] << 8 ) + p_command[5];
+        else
+            i_value = GetPRM( p_command[7] );
+
+        switch ( i_test )
+        {
+        case CMD_DVD_IF_GPREG_EQUAL:
+            // if equals
+            msg_Dbg( &sys.demuxer, "IF %s EQUALS %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( p_command[3] ) == i_value ))
+            {
+                b_test_positive = !b_test_positive;
+            }
+            break;
+        case CMD_DVD_IF_GPREG_INF:
+            // if inferior
+            msg_Dbg( &sys.demuxer, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( p_command[3] ) < i_value ))
+            {
+                b_test_positive = !b_test_positive;
+            }
+            break;
+        case CMD_DVD_IF_GPREG_AND:
+            // if logical and
+            msg_Dbg( &sys.demuxer, "IF %s & %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( p_command[3] ) & i_value ))
+            {
+                b_test_positive = !b_test_positive;
+            }
+            break;
+        case CMD_DVD_IF_GPREG_SUP_EQUAL:
+            // if superior or equal
+            msg_Dbg( &sys.demuxer, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( p_command[3] ) >= i_value ))
+            {
+                b_test_positive = !b_test_positive;
+            }
+            break;
+        }
+
+        if ( !b_test_positive )
+            return false;
+    }
+    
+    // strip the test command
+    i_command &= 0xFF0F;
+    
     switch ( i_command )
     {
-    case CMD_JUMP_TT:
+    case CMD_DVD_NOP:
+    case CMD_DVD_NOP2:
+        {
+            msg_Dbg( &sys.demuxer, "NOP" );
+            break;
+        }
+    case CMD_DVD_BREAK:
+        {
+            msg_Dbg( &sys.demuxer, "Break" );
+            // TODO
+            break;
+        }
+    case CMD_DVD_JUMP_TT:
         {
             uint8 i_title = p_command[5];
-            msg_Dbg( &sys.demuxer, "DVD command: JumpTT %d", i_title );
+            msg_Dbg( &sys.demuxer, "JumpTT %d", i_title );
 
             // find in the ChapProcessPrivate matching this Title level
             p_chapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_segment );
@@ -4571,9 +4727,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
             break;
         }
-    case CMD_CALLSS_VTSM:
+    case CMD_DVD_CALLSS_VTSM1:
         {
-            msg_Dbg( &sys.demuxer, "DVD command: CallSS VTSM" );
+            msg_Dbg( &sys.demuxer, "CallSS VTSM" );
             switch( (p_command[6] & 0xC0) >> 6 ) {
                 case 0:
                     switch ( p_command[5] )
@@ -4631,9 +4787,38 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             }
             break;
         }
+    case CMD_DVD_SET_GPRMMD:
+        {
+            msg_Dbg( &sys.demuxer, "Set GPRMMD [%d]=%d", (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3]);
+            
+            if ( !SetGPRM( (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3] ) )
+                msg_Dbg( &sys.demuxer, "Set GPRMMD failed" );
+            break;
+        }
+    case CMD_DVD_LINKPGCN:
+        {
+            uint16 i_pgcn = (p_command[6] << 8) + p_command[7];
+            
+            msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
+            // TODO
+            break;
+        }
+    case CMD_DVD_LINKCN:
+        {
+            msg_Dbg( &sys.demuxer, "LinkCN (cell %d)", (p_command[6] << 8) + p_command[7] );
+            // TODO
+            f_result = true;
+            break;
+        }
+    case CMD_DVD_GOTO_LINE:
+        {
+            msg_Dbg( &sys.demuxer, "GotoLine (%d)", (p_command[6] << 8) + p_command[7] );
+            // TODO
+            break;
+        }
     default:
         {
-            msg_Dbg( &sys.demuxer, "DVD command: unsupported %02X %02X %02X %02X %02X %02X %02X %02X"
+            msg_Dbg( &sys.demuxer, "unsupported command : %02X %02X %02X %02X %02X %02X %02X %02X"
                      ,p_command[0]
                      ,p_command[1]
                      ,p_command[2]
@@ -4685,6 +4870,7 @@ bool matroska_script_codec_c::Enter()
     {
         if ( (*index).GetSize() )
         {
+            msg_Dbg( &sys.demuxer, "Matroska Script enter command" );
             f_result |= interpretor.Interpret( (*index).GetBuffer(), (*index).GetSize() );
         }
         index++;
@@ -4700,6 +4886,7 @@ bool matroska_script_codec_c::Leave()
     {
         if ( (*index).GetSize() )
         {
+            msg_Dbg( &sys.demuxer, "Matroska Script leave command" );
             f_result |= interpretor.Interpret( (*index).GetBuffer(), (*index).GetSize() );
         }
         index++;
@@ -4718,8 +4905,9 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
     psz_str[ i_size ] = '\0';
 
     std::string sz_command = psz_str;
+    free( psz_str );
 
-    msg_Dbg( &sys.demuxer, "Matroska Script command : %s", sz_command.c_str() );
+    msg_Dbg( &sys.demuxer, "command : %s", sz_command.c_str() );
 
     if ( sz_command.compare( 0, CMD_MS_GOTO_AND_PLAY.size(), CMD_MS_GOTO_AND_PLAY ) == 0 )
     {
