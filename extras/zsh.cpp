@@ -158,13 +158,13 @@ mmap PrintModuleList( vlc_t *p_vlc )
 
         /* Exclude empty plugins (submodules don't have config options, they
          * are stored in the parent module) */
-        if( p_module->b_submodule )
-              continue;
 
         if( strcmp( p_module->psz_object_name, "main" ) )
         {
             modules_cap.insert( mpair( p_module->psz_capability,
                                        p_module->psz_object_name ) );
+	   if( p_module->b_submodule )
+	     continue;
             printf( "%s ", p_module->psz_object_name );
         }
 
