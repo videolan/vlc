@@ -28,13 +28,16 @@
 #include <iostream>
 #include <algorithm>
 typedef std::multimap<std::string, std::string> mmap;
+typedef std::multimap<int, std::string> mcmap;
+
 typedef std::pair<std::string, std::string> mpair;
+typedef std::pair<int, std::string> mcpair;
 
 #include <vlc/vlc.h>
 
-void ParseModules( vlc_t *p_vlc, mmap &mods );
-mmap PrintModuleList( vlc_t *p_vlc );
-void ParseOption( module_config_t *p_item, mmap &mods );
+void ParseModules( vlc_t *p_vlc, mmap &mods, mcmap &mods2 );
+void PrintModuleList( vlc_t *p_vlc, mmap &mods, mcmap &mods2 );
+void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 );
 void PrintOption( char *psz_option, char i_short, char *psz_exlusive,
                    char *psz_text, char *psz_longtext, char *psz_args );
 extern "C"{ vlc_t * vlc_current_object( int i_object );}
@@ -42,6 +45,7 @@ extern "C"{ vlc_t * vlc_current_object( int i_object );}
 int main( int i_argc, char **ppsz_argv )
 {
     mmap mods;
+    mcmap mods2;
     /* Create a libvlc structure */
     int i_ret = VLC_Create();
     vlc_t *p_vlc;
@@ -66,10 +70,10 @@ int main( int i_argc, char **ppsz_argv )
            "local context state line ret=1\n"
            "local modules\n\n" );
 
-    mods = PrintModuleList( p_vlc );
+    PrintModuleList( p_vlc, mods, mods2 );
 
     printf( "_arguments -S -s \\\n" );
-    ParseModules( p_vlc, mods );
+    ParseModules( p_vlc, mods, mods2 );
     printf( "  \"(--module)-p[print help on module]:print help on module:($modules)\"\\\n" );
     printf( "  \"(-p)--module[print help on module]:print help on module:($modules)\"\\\n" );
     printf( "  \"(--help)-h[print help]\"\\\n" );
@@ -104,7 +108,7 @@ int main( int i_argc, char **ppsz_argv )
     
 }
 
-void ParseModules( vlc_t *p_vlc, mmap &mods )
+void ParseModules( vlc_t *p_vlc, mmap &mods, mcmap &mods2 )
 {
     vlc_list_t      *p_list = NULL;;
     module_t        *p_module;
@@ -139,23 +143,22 @@ void ParseModules( vlc_t *p_vlc, mmap &mods )
 //                printf( "  #Subcategory %d\n", p_item->i_value );
             }
             if( p_item->i_type & CONFIG_ITEM )
-                ParseOption( p_item, mods );
+                ParseOption( p_item, mods, mods2 );
         }
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
     }    
 }
 
-mmap PrintModuleList( vlc_t *p_vlc )
+void PrintModuleList( vlc_t *p_vlc, mmap &mods, mcmap &mods2 )
 {
     vlc_list_t      *p_list = NULL;;
     module_t        *p_module;
     int              i_index;
-    mmap             modules_cap;
 
     /* List the plugins */
     p_list = vlc_list_find( p_vlc, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    if( !p_list ) return mmap();
+    if( !p_list ) return;
 
     printf( "modules=\"" );
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
@@ -167,8 +170,18 @@ mmap PrintModuleList( vlc_t *p_vlc )
 
         if( strcmp( p_module->psz_object_name, "main" ) )
         {
-            modules_cap.insert( mpair( p_module->psz_capability,
-                                       p_module->psz_object_name ) );
+            mods.insert( mpair( p_module->psz_capability,
+                                p_module->psz_object_name ) );
+            module_config_t *p_config = p_module->p_config;
+            if( p_config ) do
+            {
+                /* Hack: required subcategory is stored in i_min */
+                if( p_config->i_type == CONFIG_SUBCATEGORY )
+                {
+                    mods2.insert( mcpair( p_config->i_value,
+                                          p_module->psz_object_name ) );
+                }
+            } while( p_config->i_type != CONFIG_HINT_END && p_config++ );
             if( p_module->b_submodule )
                 continue;
             printf( "%s ", p_module->psz_object_name );
@@ -176,10 +189,10 @@ mmap PrintModuleList( vlc_t *p_vlc )
 
     }
     printf( "\"\n\n" );
-    return modules_cap;
+    return;
 }
 
-void ParseOption( module_config_t *p_item, mmap &mods )
+void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
 {
     char *psz_arguments = "";
     char *psz_exclusive;
@@ -201,11 +214,36 @@ void ParseOption( module_config_t *p_item, mmap &mods )
     }
     break;
     case CONFIG_ITEM_MODULE_CAT:
-//      p_control = new ModuleCatConfigControl( p_this, p_item, parent );
-        break;
+    {
+        std::pair<mcmap::iterator, mcmap::iterator> range =
+            mods2.equal_range( p_item->i_min );
+        std::string list = (*range.first).second;
+        ++range.first;
+        while( range.first != range.second )
+        {
+            list = list.append( " " );
+            list = list.append( range.first->second );
+            ++range.first;
+        }
+        asprintf( &psz_arguments, "(%s)", list.c_str() );
+    }
+    break;
     case CONFIG_ITEM_MODULE_LIST_CAT:
-//        p_control = new ModuleListCatConfigControl( p_this, p_item, parent );
-        break;
+    {
+        std::pair<mcmap::iterator, mcmap::iterator> range =
+            mods2.equal_range( p_item->i_min );
+        std::string list = "_values -s , ";
+        list = list.append( p_item->psz_name );
+        while( range.first != range.second )
+        {
+            list = list.append( " '*" );
+            list = list.append( range.first->second );
+            list = list.append( "'" );
+            ++range.first;
+        }
+        asprintf( &psz_arguments, "%s", list.c_str() );
+    }
+    break;
 
     case CONFIG_ITEM_STRING:
         if( p_item->i_list )
