@@ -344,8 +344,8 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
     {
         if( !psz_exclusive ) psz_exclusive = "";
         else asprintf( &psz_exclusive, " %s", psz_exclusive );
-        printf( "  \"(-%c%s)--%s[%s]", i_short, psz_exclusive,
-                psz_option, psz_text );
+        printf( "  \"(-%c%s)--%s%s[%s]", i_short, psz_exclusive,
+                psz_option, psz_args?"=":"", psz_text );
         if( psz_args )
             printf( ":%s:%s\"\\\n", psz_longtext, psz_args );
         else
@@ -361,8 +361,8 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
     else
     {
         if( psz_exclusive )
-            printf( "  \"(%s)--%s[%s]", psz_exclusive, psz_option,
-                    psz_text );
+            printf( "  \"(%s)--%s%s[%s]", psz_exclusive, psz_option,
+                    psz_args?"=":"", psz_text );
         else
             printf( "  \"--%s[%s]", psz_option, psz_text );
             
