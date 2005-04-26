@@ -449,7 +449,7 @@ protected:
     {
         std::string result;
         char s_value[6], s_reg_value[6];
-        itoa( value, s_value, 10 );
+        sprintf( s_value, "%.5d", value );
 
         if ( b_value )
         {
@@ -459,7 +459,7 @@ protected:
         }
         else if ( value < 0x80 )
         {
-            itoa( GetPRM( value ) , s_reg_value, 10 );
+            sprintf( s_reg_value, "%.5d", GetPRM( value ) );
             result = "GPreg[";
             result += s_value;
             result += "] (";
@@ -468,7 +468,7 @@ protected:
         }
         else
         {
-            itoa( GetPRM( value ) , s_reg_value, 10 );
+            sprintf( s_reg_value, "%.5d", GetPRM( value ) );
             result = "SPreg[";
             result += s_value;
             result += "] (";
@@ -821,11 +821,11 @@ class virtual_segment_c
 {
 public:
     virtual_segment_c( matroska_segment_c *p_segment )
-        :i_current_segment(0)
-        ,p_editions(NULL)
+        :p_editions(NULL)
+        ,i_sys_title(0)
+        ,i_current_segment(0)
         ,i_current_edition(-1)
         ,psz_current_chapter(NULL)
-        ,i_sys_title(0)
     {
         linked_segments.push_back( p_segment );
 
@@ -4939,7 +4939,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         chapter_item_c *p_chapter = sys.FindChapter( i_chapter_uid, p_segment );
 
         if ( p_chapter == NULL )
-            msg_Dbg( &sys.demuxer, "Chapter %d not found", i_chapter_uid);
+            msg_Dbg( &sys.demuxer, "Chapter "I64Fd" not found", i_chapter_uid);
         else
         {
             p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
