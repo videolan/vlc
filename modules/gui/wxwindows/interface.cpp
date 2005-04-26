@@ -394,7 +394,7 @@ void Interface::CreateOurMenuBar()
 
     file_menu->AppendSeparator();
     file_menu->Append( OpenFile_Event, wxU(_("Open &File...\tCtrl-F")) );
-    file_menu->Append( OpenDir_Event, wxU(_("Open D&irectory...\tCtrl-I")) );
+    file_menu->Append( OpenDir_Event, wxU(_("Open Di&rectory...\tCtrl-R")) );
     file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...\tCtrl-D")) );
     file_menu->Append( OpenNet_Event,
                        wxU(_("Open &Network Stream...\tCtrl-N")) );
