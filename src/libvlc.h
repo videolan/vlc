@@ -1367,7 +1367,7 @@ vlc_module_begin();
 #   define KEY_PLAY_BOOKMARK10    KEY_UNSET
 #   define KEY_HISTORY_BACK       KEY_MODIFIER_COMMAND|'['
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_COMMAND|']'
-#   define KEY_RECORD             KEY_UNSET
+#   define KEY_RECORD             KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'r'
 
 #else
 #   define KEY_FULLSCREEN         'f'
@@ -1425,8 +1425,8 @@ vlc_module_begin();
 #   define KEY_PLAY_BOOKMARK8     KEY_F8
 #   define KEY_PLAY_BOOKMARK9     KEY_F9
 #   define KEY_PLAY_BOOKMARK10    KEY_F10
-#   define KEY_HISTORY_BACK       KEY_MODIFIER_CTRL|'['
-#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_CTRL|']'
+#   define KEY_HISTORY_BACK       KEY_MODIFIER_CTRL|'v'
+#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_CTRL|'b'
 #   define KEY_RECORD             KEY_MODIFIER_CTRL|'r'
 #endif
 
