@@ -201,10 +201,19 @@ static int  Open ( vlc_object_t *p_this )
     if( p_enc->fmt_in.video.i_width % 16 != 0 ||
         p_enc->fmt_in.video.i_height % 16!= 0 )
     {
-        msg_Warn( p_enc, "invalid size %ix%i",
-                  p_enc->fmt_in.video.i_width,
-                  p_enc->fmt_in.video.i_height );
-        return VLC_EGENERIC;
+        msg_Warn( p_enc, "size is not a multiple of 16 (%ix%i)",
+                  p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height );
+
+        if( p_enc->fmt_in.video.i_width < 16 ||
+            p_enc->fmt_in.video.i_height < 16 )
+        {
+            msg_Err( p_enc, "video is too small to be cropped" );
+            return VLC_EGENERIC;
+        }
+
+        msg_Warn( p_enc, "cropping video to %ix%i",
+                  p_enc->fmt_in.video.i_width >> 4 << 4,
+                  p_enc->fmt_in.video.i_height >> 4 << 4 );
     }
 
     sout_CfgParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
@@ -217,8 +226,8 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
 
     x264_param_default( &p_sys->param );
-    p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
-    p_sys->param.i_height = p_enc->fmt_in.video.i_height;
+    p_sys->param.i_width  = p_enc->fmt_in.video.i_width >> 4 << 4;
+    p_sys->param.i_height = p_enc->fmt_in.video.i_height >> 4 << 4;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "qp-min", &val );
     if( val.i_int >= 1 && val.i_int <= 51 ) i_qmin = val.i_int;
