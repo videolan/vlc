@@ -36,6 +36,9 @@
 
 #include <sys/socket.h>
 
+#include <sys/time.h>
+#include <time.h>
+
 #include <esd.h>
 
 /*****************************************************************************
@@ -66,6 +69,7 @@ vlc_module_begin();
     set_description( _("EsounD audio output") );
     set_shortname( "EsounD" );
     set_capability( "audio output", 50 );
+    add_string( "esdserver", "", NULL, N_("Esound server"), NULL, VLC_FALSE );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     set_callbacks( Open, Close );
@@ -79,9 +83,9 @@ static int Open( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
+    char * psz_server;
     int i_nb_channels;
-    int i_newfd = -1;
-    int fl;
+    int i_newfd;
 
     /* Allocate structure */
     p_sys = malloc( sizeof( aout_sys_t ) );
@@ -122,11 +126,24 @@ static int Open( vlc_object_t *p_this )
 
     /* Force the rate, otherwise the sound is very noisy */
     p_aout->output.output.i_rate = ESD_DEFAULT_RATE;
+    p_aout->output.i_nb_samples = ESD_BUF_SIZE * 2;
 
-    /* open a socket for playing a stream
+    /* Open a socket for playing a stream
      * and try to open /dev/dsp if there's no EsounD */
-    p_sys->i_fd = esd_play_stream_fallback( p_sys->esd_format,
-                              p_aout->output.output.i_rate, NULL, "vlc" );
+    psz_server = config_GetPsz( p_aout, "esdserver" );
+    if( psz_server && *psz_server )
+    {
+        p_sys->i_fd = esd_play_stream_fallback( p_sys->esd_format,
+                                                p_aout->output.output.i_rate,
+                                                psz_server, "vlc" );
+    }
+    else
+    {
+        p_sys->i_fd = esd_play_stream_fallback( p_sys->esd_format,
+                                                p_aout->output.output.i_rate,
+                                                NULL, "vlc" );
+    }
+
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %d Hz)",
@@ -135,16 +152,32 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_aout->output.i_nb_samples = ESD_BUF_SIZE * 2;
+    if( psz_server && *psz_server )
+    {
+        struct timeval start, stop;
+        esd_server_info_t * p_info;
 
+        gettimeofday( &start, NULL );
+        p_info = esd_get_server_info( p_sys->i_fd );
+        gettimeofday( &stop, NULL );
+
+        p_sys->latency = (mtime_t)( stop.tv_sec - start.tv_sec )
+                           * (mtime_t)1000000;
+        p_sys->latency += stop.tv_usec - start.tv_usec;
+    }
+    else
+    {
+        p_sys->latency = 0;
+    }
+        
     /* ESD latency is calculated for 44100 Hz. We don't have any way to get the
      * number of buffered samples, so I assume ESD_BUF_SIZE/2 */
-    p_sys->latency =
-        (mtime_t)( esd_get_latency( i_newfd = esd_open_sound(NULL) ) +
-                      ESD_BUF_SIZE/2
-                    * p_aout->output.output.i_bytes_per_frame
-                    * p_aout->output.output.i_rate
-                    / ESD_DEFAULT_RATE )
+    p_sys->latency +=
+        (mtime_t)( esd_get_latency( i_newfd = esd_open_sound(NULL) )
+                    + ESD_BUF_SIZE / 2
+                      * p_aout->output.output.i_bytes_per_frame
+                      * p_aout->output.output.i_rate
+                      / ESD_DEFAULT_RATE )
       * (mtime_t)1000000
       / p_aout->output.output.i_bytes_per_frame
       / p_aout->output.output.i_rate;
