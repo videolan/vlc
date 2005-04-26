@@ -984,7 +984,7 @@ VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 
 if test "${SYS}" != "mingwce"; then
 dnl  VLC_ADD_PLUGINS([externrun])
-  VLC_ADD_PLUGINS([access_fake access_filter_timeshift])
+  VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap shout])
   VLC_ADD_PLUGINS([mosaic wall motiondetect clone crop])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
