@@ -482,21 +482,10 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( !strcmp( psz_cmd, "rate-slower" ) )
     {
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE_SLOWER, NULL );
-
-        /* Fix "rate" value */
-        i_rate = var_GetInteger( p_input, "rate" ) * 2;
-        if( i_rate < INPUT_RATE_MIN ) i_rate = INPUT_RATE_MIN;
-        val.i_int = i_rate;
-        var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
     }
     else if( !strcmp( psz_cmd, "rate-faster" ) )
     {
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE_FASTER, NULL );
-        i_rate = var_GetInteger( p_input, "rate" ) / 2;
-
-        if( i_rate > INPUT_RATE_MAX ) i_rate = INPUT_RATE_MAX;
-        val.i_int = i_rate;
-        var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
     }
     else
     {
