@@ -125,6 +125,10 @@
     "This option will drop/duplicate video frames to synchronise the video " \
     "track on the audio track." )
 
+#define HURRYUP_TEXT N_( "Hurry up" )
+#define HURRYUP_LONGTEXT N_( "Allows you to specify if the transcoder " \
+  "should drop frames if your CPU can't keep up with the encoding rate." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -149,6 +153,8 @@ vlc_module_begin();
                SCALE_LONGTEXT, VLC_FALSE );
     add_float( SOUT_CFG_PREFIX "fps", 0, NULL, FPS_TEXT,
                FPS_LONGTEXT, VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "hurry-up", VLC_TRUE, NULL, HURRYUP_TEXT,
+               HURRYUP_LONGTEXT, VLC_FALSE );
     add_bool( SOUT_CFG_PREFIX "deinterlace", 0, NULL, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
@@ -198,7 +204,7 @@ vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
-    "scale", "fps", "width", "height", "deinterlace", "threads",
+    "scale", "fps", "width", "height", "deinterlace", "threads", "hurry-up",
     "aenc", "acodec", "ab", "samplerate", "channels",
     "senc", "scodec", "soverlay", "sfilter",
     "audio-sync", NULL
@@ -285,6 +291,7 @@ struct sout_stream_sys_t
     int             i_height;
     vlc_bool_t      b_deinterlace;
     int             i_threads;
+    vlc_bool_t      b_hurry_up;
 
     int             i_crop_top;
     int             i_crop_bottom;
@@ -408,6 +415,9 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "fps", &val );
     p_sys->f_fps = val.f_float;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "hurry-up", &val );
+    p_sys->b_hurry_up = val.b_bool;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
     p_sys->i_width = val.i_int;
@@ -1483,6 +1493,18 @@ static int transcode_video_process( sout_stream_t *p_stream,
     {
         subpicture_t *p_subpic = 0;
 
+        if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
+        {
+            mtime_t current_date = mdate();
+            if( current_date + 100000 > p_pic->date )
+            {
+                msg_Dbg( p_stream, "late picture skipped ("I64Fd")",
+                         current_date + 100000 - p_pic->date );
+                p_pic->pf_release( p_pic );
+                continue;
+            }
+        }
+
         if( p_sys->b_master_sync )
         {
             mtime_t i_video_drift;
@@ -1509,7 +1531,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                          (int)(i_video_drift - i_master_drift) );
 #endif
                 p_pic->pf_release( p_pic );
-                return VLC_EGENERIC;
+                continue;
             }
             else if( i_video_drift > i_master_drift + 50000 )
             {
