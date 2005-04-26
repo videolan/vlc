@@ -653,7 +653,7 @@ libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	-rm -rf $@/CVS
 
 .ebml: libebml
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) && make -C make/linux install prefix=$(PREFIX))
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libebml.a
 	touch $@
 
@@ -673,7 +673,7 @@ libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	-rm -rf $@/CVS
 
 .matroska: libmatroska
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) && make -C make/linux install prefix=$(PREFIX))
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libmatroska.a
 	touch $@
 
