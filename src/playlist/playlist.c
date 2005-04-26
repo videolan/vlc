@@ -107,6 +107,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     var_CreateGetBool( p_playlist, "loop" );
 
     /* Initialise data structures */
+    vlc_mutex_init( p_playlist, &p_playlist->gc_lock );
     p_playlist->i_last_id = 0;
     p_playlist->b_go_next = VLC_TRUE;
     p_playlist->p_input = NULL;
@@ -127,8 +128,9 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
 
-    p_playlist->p_general = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
-                                        _( "General" ), p_view->p_root );
+    p_playlist->p_general =
+        playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
+                             _( "General" ), p_view->p_root );
     p_playlist->p_general->i_flags |= PLAYLIST_RO_FLAG;
 
     /* Set startup status
@@ -228,6 +230,7 @@ int playlist_Destroy( playlist_t * p_playlist )
         free( p_view );
     }
 
+    vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_destroy( p_playlist->p_preparse );
     vlc_object_destroy( p_playlist );
 
@@ -451,6 +454,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
     }
     else
     {
+        vlc_mutex_lock( &p_playlist->gc_lock );
         while( ( p_obj = vlc_object_find( p_playlist, i_type, FIND_CHILD ) ) )
         {
             if( p_obj->p_parent != (vlc_object_t*)p_playlist )
@@ -472,6 +476,7 @@ static mtime_t ObjectGarbageCollector( playlist_t *p_playlist, int i_type,
                 sout_DeleteInstance( (sout_instance_t*)p_obj );
             }
         }
+        vlc_mutex_unlock( &p_playlist->gc_lock );
         return 0;
     }
 }

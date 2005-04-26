@@ -210,6 +210,8 @@ struct playlist_t
 
     playlist_preparse_t     *p_preparse;
 
+    vlc_mutex_t gc_lock;         /**< Lock to protect the garbage collection */
+
     /*@}*/
 };
 

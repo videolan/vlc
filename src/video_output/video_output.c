@@ -41,6 +41,7 @@
 #include "video_output.h"
 #include "vlc_spu.h"
 #include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
+#include "vlc_playlist.h"
 
 #if defined( SYS_DARWIN )
 #include "darwin_specific.h"
@@ -117,12 +118,13 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( !p_vout )
         {
-            vlc_object_t *p_playlist;
+            playlist_t *p_playlist;
 
             p_playlist = vlc_object_find( p_this,
                                           VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
             if( p_playlist )
             {
+                vlc_mutex_lock( &p_playlist->gc_lock );
                 p_vout = vlc_object_find( p_playlist,
                                           VLC_OBJECT_VOUT, FIND_CHILD );
                 /* only first children of p_input for unused vout */
@@ -131,6 +133,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                     vlc_object_release( p_vout );
                     p_vout = NULL;
                 }
+                vlc_mutex_unlock( &p_playlist->gc_lock );
                 vlc_object_release( p_playlist );
             }
         }
