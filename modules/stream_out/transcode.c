@@ -1496,10 +1496,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {
             mtime_t current_date = mdate();
-            if( current_date + 100000 > p_pic->date )
+            if( current_date + 50000 > p_pic->date )
             {
                 msg_Dbg( p_stream, "late picture skipped ("I64Fd")",
-                         current_date + 100000 - p_pic->date );
+                         current_date + 50000 - p_pic->date );
                 p_pic->pf_release( p_pic );
                 continue;
             }
