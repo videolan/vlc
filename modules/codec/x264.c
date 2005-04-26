@@ -283,7 +283,7 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "bframes", &val );
     if( val.i_int >= 0 && val.i_int <= 16 ) p_sys->param.i_bframe = val.i_int;
 
-#if X264_BUILD >= 23
+#if X264_BUILD >= 22
     var_Get( p_enc, SOUT_CFG_PREFIX "bpyramid", &val );
     p_sys->param.b_bframe_pyramid = val.b_bool;
 #endif
@@ -298,7 +298,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_scenecut_threshold = val.i_int;
 #endif
 
-#if X264_BUILD >= 23
+#if X264_BUILD >= 22
     var_Get( p_enc, SOUT_CFG_PREFIX "subpel", &val );
     if( val.i_int >= 1 && val.i_int <= 5 )
         p_sys->param.analyse.i_subpel_refine = val.i_int;
