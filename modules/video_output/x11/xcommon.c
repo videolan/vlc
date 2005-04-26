@@ -2331,6 +2331,10 @@ static struct
     { XK_End, KEY_END },
     { XK_Page_Up, KEY_PAGEUP },
     { XK_Page_Down, KEY_PAGEDOWN },
+
+    { XK_Insert, KEY_INSERT },
+    { XK_Delete, KEY_DELETE },
+
     { 0, 0 }
 };
 

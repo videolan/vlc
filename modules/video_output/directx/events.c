@@ -853,6 +853,9 @@ static struct
     { VK_PRIOR, KEY_PAGEUP },
     { VK_NEXT, KEY_PAGEDOWN },
 
+    { VK_INSERT, KEY_INSERT },
+    { VK_DELETE, KEY_DELETE },
+
     { VK_CONTROL, 0 },
     { VK_SHIFT, 0 },
     { VK_MENU, 0 },
