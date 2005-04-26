@@ -135,7 +135,7 @@ void Timer::Notify()
 
             char *psz_now_playing = vlc_input_item_GetInfo(
                 p_intf->p_sys->p_input->input.p_item,
-                _("Meta-information"), _( "Now Playing" ) );
+                _("Meta-information"), _(VLC_META_NOW_PLAYING) );
             if( psz_now_playing && *psz_now_playing )
             {
                 p_main_interface->statusbar->SetStatusText(
@@ -198,7 +198,7 @@ void Timer::Notify()
             /* Update the item name */
             char *psz_now_playing = vlc_input_item_GetInfo(
                 p_intf->p_sys->p_input->input.p_item,
-                _("Meta-information"), _( "Now Playing" ) );
+                _("Meta-information"), _(VLC_META_NOW_PLAYING) );
             if( psz_now_playing && *psz_now_playing )
             {
                 p_main_interface->statusbar->SetStatusText(
