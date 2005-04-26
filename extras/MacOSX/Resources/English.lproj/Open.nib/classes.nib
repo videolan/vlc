@@ -307,6 +307,7 @@
                 "o_net_http_url" = id; 
                 "o_net_http_url_lbl" = id; 
                 "o_net_mode" = id; 
+                "o_net_timeshift_ckbox" = id; 
                 "o_net_udp_port" = id; 
                 "o_net_udp_port_lbl" = id; 
                 "o_net_udp_port_stp" = id; 
@@ -389,13 +390,7 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {
-            ACTIONS = {}; 
-            CLASS = VLCPlaylist; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {}; 
-            SUPERCLASS = NSObject; 
-        }, 
+        {CLASS = VLCPlaylist; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {
             ACTIONS = {advancedToggle = id; closePrefs = id; resetAll = id; savePrefs = id; }; 
