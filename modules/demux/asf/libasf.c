@@ -904,7 +904,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         else
         {
             /* This p_sp will be inserted by ReadRoot later */
-            p_esp->p_sp = p_sp;
+            p_esp->p_sp = (asf_object_stream_properties_t*)p_sp;
         }
     }
 

@@ -114,7 +114,8 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     playlist_t *p_playlist;
-    playlist_item_t *p_item, *p_current, *p_bitrate, *p_genre;
+    playlist_item_t *p_item, *p_current;
+    playlist_item_t *p_bitrate = NULL, *p_genre = NULL;
 
     vlc_bool_t b_play;
     int i_ret;
@@ -125,10 +126,10 @@ static int Demux( demux_t *p_demux )
     int i_type, b_shoutcast;
     char *psz_mrl = NULL, *psz_name = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
-        
+
 
     b_shoutcast = p_sys->b_shout;
-    
+
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                  FIND_PARENT );
     if( !p_playlist )

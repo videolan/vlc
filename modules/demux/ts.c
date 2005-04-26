@@ -25,6 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <ctype.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -1402,6 +1403,8 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     {
         msg_Dbg( p_demux, "transport_error_indicator set (pid=%d)",
                  pid->i_pid );
+        if( pid->es->p_pes ) //&& pid->es->fmt.i_cat == VIDEO_ES )
+            pid->es->p_pes->i_flags |= BLOCK_FLAG_CORRUPTED;
     }
 
     if( p_demux->p_sys->csa )
@@ -2111,10 +2114,21 @@ static void DecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
     }
 }
 #endif
-
+static void EITEventFixString( char *psz )
+{
+    int i_len;
+    /* Sometimes the first char isn't a normal char but designed
+     * caracters encoding, for now lets skip it */
+    if( isalnum(psz[0]) )
+            return;
+    if( ( i_len = strlen( psz ) ) > 0 )
+        memmove( &psz[0], &psz[1], i_len ); /* Copy the \0 too */
+}
 static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 {
     dvbpsi_eit_event_t *p_evt;
+    vlc_meta_t         *p_meta;
+    vlc_bool_t b_event_active = VLC_FALSE;
 
     msg_Dbg( p_demux, "EITCallBack called" );
     if( !p_eit->b_current_next )
@@ -2130,9 +2144,9 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
              p_eit->i_ts_id, p_eit->i_network_id,
              p_eit->i_segment_last_section_number, p_eit->i_last_table_id );
 
+    p_meta = vlc_meta_New();
     for( p_evt = p_eit->p_first_event; p_evt; p_evt = p_evt->p_next )
     {
-        vlc_meta_t          *p_meta = vlc_meta_New();
         dvbpsi_descriptor_t *p_dr;
         char                *psz_cat = malloc( strlen("Event")+10 );
         char                psz_start[15];
@@ -2176,6 +2190,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                     memcpy( psz_text, pE->i_text, pE->i_text_length );
                     psz_text[pE->i_text_length] = '\0';
 
+                    EITEventFixString(psz_name);
+                    EITEventFixString(psz_text);
                     msg_Dbg( p_demux, "    - short event lang=%3.3s '%s' : '%s'",
                              pE->i_iso_639_code, psz_name, psz_text );
                 }
@@ -2196,10 +2212,12 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                         memcpy( str1, pE->i_item_description[i],
                                 pE->i_item_description_length[i] );
                         str1[pE->i_item_description_length[i]] = '\0';
+                        EITEventFixString(str1);
 
-                        memcpy( str1, pE->i_item[i],
+                        memcpy( str2, pE->i_item[i],
                                 pE->i_item_length[i] );
                         str2[pE->i_item_length[i]] = '\0';
+                        EITEventFixString(str2);
 
                         msg_Dbg( p_demux, "       - desc='%s' item='%s'", str1, str2 );
                         psz_extra = realloc( psz_extra,
@@ -2213,6 +2231,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
                     memcpy( str1, pE->i_text, pE->i_text_length );
                     str1[pE->i_text_length] = '\0';
+                    EITEventFixString(str1);
+
                     msg_Dbg( p_demux, "       - text='%s'", str1 );
                     psz_extra = realloc( psz_extra,
                                          strlen(psz_extra) + strlen(str1) + 2 );
@@ -2234,13 +2254,22 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
         vlc_meta_Add( p_meta, psz_cat, psz_value );
         free( psz_value );
 
-        es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META,
-                        p_eit->i_service_id, p_meta );
-        vlc_meta_Delete( p_meta );
+        if( p_evt->i_running_status == 0x04 )
+        {
+            vlc_meta_Add( p_meta, VLC_META_NOW_PLAYING, psz_name );
+            b_event_active = VLC_TRUE;
+        }
 
         free( psz_cat );
         free( psz_extra );
     }
+
+    if( !b_event_active )
+        vlc_meta_Add( p_meta, VLC_META_NOW_PLAYING, "" );
+    es_out_Control( p_demux->out, ES_OUT_SET_GROUP_META,
+                    p_eit->i_service_id, p_meta );
+    vlc_meta_Delete( p_meta );
+
     dvbpsi_DeleteEIT( p_eit );
 }
 
