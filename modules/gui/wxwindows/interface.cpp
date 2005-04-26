@@ -394,12 +394,12 @@ void Interface::CreateOurMenuBar()
 
     file_menu->AppendSeparator();
     file_menu->Append( OpenFile_Event, wxU(_("Open &File...\tCtrl-F")) );
-    file_menu->Append( OpenDir_Event, wxU(_("Open Di&rectory...\tCtrl-R")) );
+    file_menu->Append( OpenDir_Event, wxU(_("Open Dir&ectory...\tCtrl-E")) );
     file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...\tCtrl-D")) );
     file_menu->Append( OpenNet_Event,
                        wxU(_("Open &Network Stream...\tCtrl-N")) );
     file_menu->Append( OpenCapture_Event,
-                       wxU(_("Open &Capture Device...\tCtrl-C")) );
+                       wxU(_("Open C&apture Device...\tCtrl-A")) );
 
     file_menu->AppendSeparator();
     file_menu->Append( Wizard_Event, wxU(_("&Wizard...\tCtrl-W")) );
@@ -790,15 +790,17 @@ void Interface::OnMenuOpen( wxMenuEvent& event )
 
         /* Add static items */
         p_settings_menu->AppendCheckItem( Extended_Event,
-            wxU(_("&Extended GUI") ) );
+            wxU(_("Extended &GUI\tCtrl-G") ) );
         if( b_extra ) p_settings_menu->Check( Extended_Event, TRUE );
 #if 0
         p_settings_menu->AppendCheckItem( Undock_Event,
             wxU(_("&Undock Ext. GUI") ) );
         if( b_undock ) p_settings_menu->Check( Undock_Event, TRUE );
 #endif
-        p_settings_menu->Append( Bookmarks_Event, wxU(_("&Bookmarks...") ) );
-        p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")) );
+        p_settings_menu->Append( Bookmarks_Event,
+                                 wxU(_("&Bookmarks...\tCtrl-B") ) );
+        p_settings_menu->Append( Prefs_Event,
+                                 wxU(_("Preference&s...\tCtrl-S")) );
     }
 
     else if( event.GetEventObject() == p_audio_menu )
