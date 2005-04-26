@@ -137,7 +137,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-    float *p_in_orig, *p_in, *p_out = (float *)p_out_buf->p_buffer;
+    float *p_in, *p_out = (float *)p_out_buf->p_buffer;
     float *p_prev_sample = (float *)p_sys->p_prev_sample;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );

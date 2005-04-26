@@ -553,8 +553,8 @@ static int ReadDir( playlist_t *p_playlist,
                 }
 #endif /* HAVE_STRSEP */
 
-                p_item = playlist_ItemNewWithType( p_playlist, psz_uri,
-                             p_dir_content->d_name, ITEM_TYPE_VFILE );
+                p_item = playlist_ItemNewWithType( VLC_OBJECT(p_playlist),
+                        psz_uri, p_dir_content->d_name, ITEM_TYPE_VFILE );
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,

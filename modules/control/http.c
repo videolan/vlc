@@ -40,6 +40,7 @@
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
 #include "vlc_tls.h"
+#include "charset.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
