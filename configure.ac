@@ -1866,6 +1866,9 @@ if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
             [AC_MSG_RESULT([yes])
               AC_CHECK_HEADERS(matroska/KaxAttachments.h)
               VLC_ADD_CXXFLAGS([mkv],[])
+              if test "${SYS}" = "darwin"; then
+                VLC_ADD_CXXFLAGS([mkv],[-O1])
+              fi
               AC_CHECK_LIB(ebml_pic, main, [
                 # We have ebml_pic, that's good, we can build an mkv.so plugin !
                 VLC_ADD_PLUGINS([mkv])
