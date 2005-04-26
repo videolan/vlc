@@ -80,6 +80,10 @@ static void Close( vlc_object_t * );
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-Frames between I and " \
     "P-frames." )
 
+#define BPYRAMID_TEXT N_("B pyramid")
+#define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
+    "predicting other frames." )
+
 #define FRAMEREF_TEXT N_("Number of previous frames used as predictors.")
 #define FRAMEREF_LONGTEXT N_( "This is effective in Anime, but seems to " \
     "make little difference in live-action source material. Some decoders " \
@@ -93,6 +97,11 @@ static void Close( vlc_object_t * );
     "Large values use more I-frames than necessary, thus wasting bits. " \
     "-1 disables scene-cut detection, so I-frames are be inserted only every "\
     "other keyint frames, which probably leads to ugly encoding artifacts." )
+
+#define SUBPEL_TEXT N_("Sub-pixel refinement quality.")
+#define SUBPEL_LONGTEXT N_( "This parameter controls quality versus speed " \
+    "tradeoffs involved in the motion estimation decision process " \
+    "(lower = quicker and higher = better quality)." )
 
 static char *enc_analyse_list[] =
   { "", "all", "normal", "fast", "none" };
@@ -136,6 +145,9 @@ vlc_module_begin();
                  BFRAMES_LONGTEXT, VLC_FALSE );
         change_integer_range( 0, 16 );
 
+    add_bool( SOUT_CFG_PREFIX "bpyramid", 0, NULL, BPYRAMID_TEXT,
+              BPYRAMID_LONGTEXT, VLC_FALSE );
+
     add_integer( SOUT_CFG_PREFIX "frameref", 1, NULL, FRAMEREF_TEXT,
                  FRAMEREF_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, 15 );
@@ -144,6 +156,10 @@ vlc_module_begin();
                  SCENE_LONGTEXT, VLC_FALSE );
         change_integer_range( -1, 100 );
 
+    add_integer( SOUT_CFG_PREFIX "subpel", 40, NULL, SUBPEL_TEXT,
+                 SUBPEL_LONGTEXT, VLC_FALSE );
+        change_integer_range( 1, 5 );
+
 vlc_module_end();
 
 /*****************************************************************************
@@ -151,7 +167,8 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "qp", "qp-min", "qp-max", "cabac", "loopfilter", "analyse",
-    "keyint", "keyint-min", "bframes", "frameref", "scenecut", NULL
+    "keyint", "keyint-min", "bframes", "bpyramid", "frameref", "scenecut",
+    "subpel", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -257,6 +274,11 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "bframes", &val );
     if( val.i_int >= 0 && val.i_int <= 16 ) p_sys->param.i_bframe = val.i_int;
 
+#if X264_BUILD >= 23
+    var_Get( p_enc, SOUT_CFG_PREFIX "bpyramid", &val );
+    p_sys->param.b_bframe_pyramid = val.b_bool;
+#endif
+
     var_Get( p_enc, SOUT_CFG_PREFIX "frameref", &val );
     if( val.i_int > 0 && val.i_int <= 15 )
         p_sys->param.i_frame_reference = val.i_int;
@@ -265,6 +287,12 @@ static int  Open ( vlc_object_t *p_this )
 #if X264_BUILD >= 0x000b
     if( val.i_int >= -1 && val.i_int <= 100 )
         p_sys->param.i_scenecut_threshold = val.i_int;
+#endif
+
+#if X264_BUILD >= 23
+    var_Get( p_enc, SOUT_CFG_PREFIX "subpel", &val );
+    if( val.i_int >= 1 && val.i_int <= 5 )
+        p_sys->param.analyse.i_subpel_refine = val.i_int;
 #endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "analyse", &val );
@@ -283,8 +311,12 @@ static int  Open ( vlc_object_t *p_this )
     }
     else if( !strcmp( val.psz_string, "all" ) )
     {
+#ifndef X264_ANALYSE_BSUB16x16
+#   define X264_ANALYSE_BSUB16x16 0
+#endif
         p_sys->param.analyse.inter =
-            X264_ANALYSE_I4x4 | X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8;
+            X264_ANALYSE_I4x4 | X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8 |
+            X264_ANALYSE_BSUB16x16;
     }
     if( val.psz_string ) free( val.psz_string );
 
