@@ -218,6 +218,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
         free( val.psz_string );
     }
 
+    /* Remove 'Now playing' info as it is probably outdated */
+    input_Control( p_input, INPUT_DEL_INFO, _("Meta-information"),
+                   VLC_META_NOW_PLAYING );
+
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
 
@@ -1911,13 +1915,15 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz_access;
     char *psz_demux;
     char *psz_path;
+    char *psz_tmp;
     char *psz;
     vlc_value_t val;
 
     /* Split uri */
     if( !b_quick )
     {
-        MRLSplit( p_input, psz_dup, &psz_access, &psz_demux, &psz_path );
+        MRLSplit( VLC_OBJECT(p_input), psz_dup,
+                  &psz_access, &psz_demux, &psz_path );
 
         msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
                  psz_mrl, psz_access, psz_demux, psz_path );
@@ -2022,12 +2028,15 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* */
-        psz = var_GetString( p_input, "access-filter" );
-        if( *psz )
+        psz_tmp = psz = var_GetString( p_input, "access-filter" );
+        while( psz && *psz )
         {
             access_t *p_access = in->p_access;
+            char *end = strchr( psz, ':' );
 
-            /* TODO support chained access-filter */
+            if( end )
+                *end++ = '\0';
+
             in->p_access = access2_FilterNew( in->p_access, psz );
             if( in->p_access == NULL )
             {
@@ -2035,8 +2044,10 @@ static int InputSourceInit( input_thread_t *p_input,
                 msg_Warn( p_input, "failed to insert access filter %s",
                           psz );
             }
+
+            psz = end;
         }
-        free( psz );
+        free( psz_tmp );
 
         /* Get infos from access */
         if( !b_quick )
