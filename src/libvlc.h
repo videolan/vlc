@@ -846,6 +846,10 @@ static char *ppsz_clock_descriptions[] =
 #define SNAP_KEY_TEXT N_("Take video snapshot")
 #define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
 
+#define RECORD_KEY_TEXT N_("Record")
+#define RECORD_KEY_LONGTEXT N_("Record access filter start/stop.")
+
+
 #define VLC_USAGE N_( \
     "Usage: %s [options] [playlistitems] ..." \
     "\nYou can specify multiple playlistitems on the commandline. They will be enqueued in the playlist." \
@@ -1363,6 +1367,7 @@ vlc_module_begin();
 #   define KEY_PLAY_BOOKMARK10    KEY_UNSET
 #   define KEY_HISTORY_BACK       KEY_MODIFIER_COMMAND|'['
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_COMMAND|']'
+#   define KEY_RECORD             KEY_UNSET
 
 #else
 #   define KEY_FULLSCREEN         'f'
@@ -1422,6 +1427,7 @@ vlc_module_begin();
 #   define KEY_PLAY_BOOKMARK10    KEY_F10
 #   define KEY_HISTORY_BACK       KEY_MODIFIER_CTRL|'['
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_CTRL|']'
+#   define KEY_RECORD             KEY_MODIFIER_CTRL|'r'
 #endif
 
     add_key( "key-fullscreen", KEY_FULLSCREEN, NULL, FULLSCREEN_KEY_TEXT,
@@ -1537,6 +1543,8 @@ vlc_module_begin();
              HISTORY_BACK_LONGTEXT, VLC_TRUE );
     add_key( "key-history-forward", KEY_HISTORY_FORWARD, NULL,
              HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
+    add_key( "key-record", KEY_RECORD, NULL,
+             RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, VLC_TRUE );
 
     /* Usage (mainly useful for cmd line stuff) */
     /* add_usage_hint( PLAYLIST_USAGE ); */
@@ -1636,6 +1644,7 @@ static struct hotkey p_hotkeys[] =
     { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, 0},
     { "key-history-back", ACTIONID_HISTORY_BACK, 0},
     { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0},
+    { "key-record", ACTIONID_RECORD, 0 },
     { NULL, 0, 0 }
 };
 
