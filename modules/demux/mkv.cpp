@@ -596,6 +596,7 @@ public:
     ,b_display_seekpoint(true)
     ,b_user_display(false)
     ,psz_parent(NULL)
+    ,b_is_leaving(false)
     {}
 
     virtual ~chapter_item_c()
@@ -635,6 +636,7 @@ public:
     bool                        b_user_display;
     std::string                 psz_name;
     chapter_item_c              *psz_parent;
+    bool                        b_is_leaving;
     
     std::vector<chapter_codec_cmds_c*> codecs;
 
@@ -4519,6 +4521,7 @@ bool chapter_item_c::Enter( bool b_do_subs )
 bool chapter_item_c::Leave( bool b_do_subs )
 {
     bool f_result = false;
+    b_is_leaving = true;
     std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
     while ( index != codecs.end() )
     {
@@ -4536,6 +4539,7 @@ bool chapter_item_c::Leave( bool b_do_subs )
             index_++;
         }
     }
+    b_is_leaving = false;
     return f_result;
 }
 
@@ -4546,7 +4550,7 @@ bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item )
     // leave, up to a common parent
     while ( p_common_parent != NULL && !p_common_parent->ParentOf( *this ) )
     {
-        if ( p_common_parent->Leave( false ) )
+        if ( !p_common_parent->b_is_leaving && p_common_parent->Leave( false ) )
             return true;
         p_common_parent = p_common_parent->psz_parent;
     }
