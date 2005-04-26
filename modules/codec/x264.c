@@ -156,7 +156,7 @@ vlc_module_begin();
                  SCENE_LONGTEXT, VLC_FALSE );
         change_integer_range( -1, 100 );
 
-    add_integer( SOUT_CFG_PREFIX "subpel", 40, NULL, SUBPEL_TEXT,
+    add_integer( SOUT_CFG_PREFIX "subpel", 5, NULL, SUBPEL_TEXT,
                  SUBPEL_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, 5 );
 
