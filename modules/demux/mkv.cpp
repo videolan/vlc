@@ -857,7 +857,7 @@ public:
         return linked_segments[i_current_segment];
     }
 
-    inline const chapter_item_c *CurrentChapter() const {
+    inline chapter_item_c *CurrentChapter() {
         return psz_current_chapter;
     }
 
@@ -1226,6 +1226,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_SEEKPOINT:
             i_skp = (int)va_arg( args, int );
 
+            // TODO change the way it works with the << & >> buttons on the UI (+1/-1 instead of a number)
             if( p_sys->titles.size() && i_skp < p_sys->titles[p_sys->i_current_title].i_seekpoint)
             {
                 Seek( p_demux, (int64_t)p_sys->titles[p_sys->i_current_title].seekpoint[i_skp]->i_time_offset, -1, NULL);
@@ -4560,20 +4561,21 @@ bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item )
     {
         do
         {
+            if ( p_common_parent == this )
+                return Enter( true );
+
             for ( size_t i = 0; i<p_common_parent->sub_chapters.size(); i++ )
             {
                 if ( p_common_parent->sub_chapters[i]->ParentOf( *this ) )
                 {
                     p_common_parent = p_common_parent->sub_chapters[i];
+                    if ( p_common_parent != this )
+                        if ( p_common_parent->Enter( false ) )
+                            return true;
+
                     break;
                 }
             }
-
-            if ( p_common_parent == this )
-                break;
-
-            if ( p_common_parent->Enter( false ) )
-                return true;
         } while ( 1 );
     }
 
@@ -4946,7 +4948,8 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
             msg_Dbg( &sys.demuxer, "Chapter "I64Fd" not found", i_chapter_uid);
         else
         {
-            p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+            if ( !p_chapter->EnterAndLeave( sys.p_current_segment->CurrentChapter() ) )
+                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
             b_result = true;
         }
     }
