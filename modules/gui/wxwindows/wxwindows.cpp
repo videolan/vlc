@@ -224,7 +224,7 @@ static void Close( vlc_object_t *p_this )
     delete p_intf->p_sys->p_window_settings;
 
 #if (wxCHECK_VERSION(2,5,0))
-    wxClassInfo::sm_classTable = wxClassInfo_sm_classTable_BUGGY;
+    wxClassInfo::sm_classTable = (wxHashTable*)wxClassInfo_sm_classTable_BUGGY;
 #endif
 
     /* Destroy structure */
