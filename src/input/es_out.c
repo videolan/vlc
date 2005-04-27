@@ -496,6 +496,50 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     return p_pgrm;
 }
 
+/* EsOutDelProgram:
+ *  Delete a program
+ */
+static void EsOutProgramDel( es_out_t *out, int i_group )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+    es_out_pgrm_t     *p_pgrm = NULL;
+    vlc_value_t       val;
+    int               i;
+
+    for( i = 0; i < p_sys->i_pgrm; i++ )
+    {
+        if( p_sys->pgrm[i]->i_id == i_group )
+        {
+            p_pgrm = p_sys->pgrm[i];
+            break;
+        }
+    }
+
+    if( p_pgrm == NULL ) return;
+
+    if( p_pgrm->i_es )
+    {
+        msg_Dbg( p_input, "can't delete program %d which still has %i ES",
+                 i_group, p_pgrm->i_es );
+        return;
+    }
+
+    TAB_REMOVE( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
+
+    /* If program is selected we need to unselect it */
+    if( p_sys->p_pgrm == p_pgrm ) p_sys->p_pgrm = 0;
+
+    if( p_pgrm->psz_now_playing ) free( p_pgrm->psz_now_playing );
+    free( p_pgrm );
+
+    /* Update "program" variable */
+    val.i_int = i_group;
+    var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
+
+    var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+}
+
 /* EsOutProgramMeta:
  */
 static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
@@ -1011,11 +1055,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
     es->p_pgrm->i_es--;
-    if( es->p_pgrm->i_es == 0 )
-    {
-        msg_Warn( p_sys->p_input, "Program doesn't contain anymore ES, "
-                  "TODO cleaning ?" );
-    }
+    if( es->p_pgrm->i_es == 0 ) EsOutProgramDel( out, es->p_pgrm->i_id );
 
     if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
     if( p_sys->p_es_video == es ) p_sys->p_es_video = NULL;
@@ -1503,11 +1543,11 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
                            fmt->video.i_visible_width,
                            fmt->video.i_visible_height);
        if( fmt->video.i_frame_rate > 0 &&
-	   fmt->video.i_frame_rate_base > 0 )
-	   input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-			  _("Frame rate"), "%f",
-			  (float)fmt->video.i_frame_rate / 
-			  fmt->video.i_frame_rate_base );
+           fmt->video.i_frame_rate_base > 0 )
+           input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                          _("Frame rate"), "%f",
+                          (float)fmt->video.i_frame_rate / 
+                          fmt->video.i_frame_rate_base );
         break;
 
     case SPU_ES:
