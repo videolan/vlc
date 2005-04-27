@@ -32,6 +32,7 @@
 
 #include "vlc_keys.h"
 #include <osd.h>
+#include <errno.h>
 
 /*****************************************************************************
  * Module descriptor
