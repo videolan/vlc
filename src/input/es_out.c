@@ -1055,7 +1055,11 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
     es->p_pgrm->i_es--;
-    if( es->p_pgrm->i_es == 0 ) EsOutProgramDel( out, es->p_pgrm->i_id );
+    if( es->p_pgrm->i_es == 0 )
+    {
+        msg_Warn( p_sys->p_input, "Program doesn't contain anymore ES, "
+                  "TODO cleaning ?" );
+    }
 
     if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
     if( p_sys->p_es_video == es ) p_sys->p_es_video = NULL;
