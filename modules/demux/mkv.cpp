@@ -84,6 +84,8 @@
 
 #include "ebml/StdIOCallback.h"
 
+#include "vlc_keys.h"
+
 extern "C" {
    #include "mp4/libmp4.h"
 }
@@ -95,6 +97,271 @@ extern "C" {
 #define MATROSKA_COMPRESSION_ZLIB 1
 
 #define MKVD_TIMECODESCALE 1000000
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#undef ATTRIBUTE_PACKED
+#undef PRAGMA_PACK_BEGIN 
+#undef PRAGMA_PACK_END
+
+#if defined(__GNUC__)
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
+#define ATTRIBUTE_PACKED __attribute__ ((packed))
+#define PRAGMA_PACK 0
+#endif
+#endif
+
+#if !defined(ATTRIBUTE_PACKED)
+#define ATTRIBUTE_PACKED
+#define PRAGMA_PACK 1
+#endif
+
+#if PRAGMA_PACK
+#pragma pack(1)
+#endif
+
+/*************************************
+*  taken from libdvdnav / libdvdread
+**************************************/
+
+/**
+ * DVD Time Information.
+ */
+typedef struct {
+  uint8_t hour;
+  uint8_t minute;
+  uint8_t second;
+  uint8_t frame_u; /* The two high bits are the frame rate. */
+} ATTRIBUTE_PACKED dvd_time_t;
+
+/**
+ * User Operations.
+ */
+typedef struct {
+#ifdef WORDS_BIGENDIAN
+  unsigned int zero                           : 7; /* 25-31 */
+  unsigned int video_pres_mode_change         : 1; /* 24 */
+  
+  unsigned int karaoke_audio_pres_mode_change : 1; /* 23 */
+  unsigned int angle_change                   : 1;
+  unsigned int subpic_stream_change           : 1;
+  unsigned int audio_stream_change            : 1;
+  unsigned int pause_on                       : 1;
+  unsigned int still_off                      : 1;
+  unsigned int button_select_or_activate      : 1;
+  unsigned int resume                         : 1; /* 16 */
+  
+  unsigned int chapter_menu_call              : 1; /* 15 */
+  unsigned int angle_menu_call                : 1;
+  unsigned int audio_menu_call                : 1;
+  unsigned int subpic_menu_call               : 1;
+  unsigned int root_menu_call                 : 1;
+  unsigned int title_menu_call                : 1;
+  unsigned int backward_scan                  : 1;
+  unsigned int forward_scan                   : 1; /* 8 */
+  
+  unsigned int next_pg_search                 : 1; /* 7 */
+  unsigned int prev_or_top_pg_search          : 1;
+  unsigned int time_or_chapter_search         : 1;
+  unsigned int go_up                          : 1;
+  unsigned int stop                           : 1;
+  unsigned int title_play                     : 1;
+  unsigned int chapter_search_or_play         : 1;
+  unsigned int title_or_time_play             : 1; /* 0 */
+#else
+  unsigned int video_pres_mode_change         : 1; /* 24 */
+  unsigned int zero                           : 7; /* 25-31 */
+  
+  unsigned int resume                         : 1; /* 16 */
+  unsigned int button_select_or_activate      : 1;
+  unsigned int still_off                      : 1;
+  unsigned int pause_on                       : 1;
+  unsigned int audio_stream_change            : 1;
+  unsigned int subpic_stream_change           : 1;
+  unsigned int angle_change                   : 1;
+  unsigned int karaoke_audio_pres_mode_change : 1; /* 23 */
+  
+  unsigned int forward_scan                   : 1; /* 8 */
+  unsigned int backward_scan                  : 1;
+  unsigned int title_menu_call                : 1;
+  unsigned int root_menu_call                 : 1;
+  unsigned int subpic_menu_call               : 1;
+  unsigned int audio_menu_call                : 1;
+  unsigned int angle_menu_call                : 1;
+  unsigned int chapter_menu_call              : 1; /* 15 */
+  
+  unsigned int title_or_time_play             : 1; /* 0 */
+  unsigned int chapter_search_or_play         : 1;
+  unsigned int title_play                     : 1;
+  unsigned int stop                           : 1;
+  unsigned int go_up                          : 1;
+  unsigned int time_or_chapter_search         : 1;
+  unsigned int prev_or_top_pg_search          : 1;
+  unsigned int next_pg_search                 : 1; /* 7 */
+#endif
+} ATTRIBUTE_PACKED user_ops_t;
+
+/**
+ * Type to store per-command data.
+ */
+typedef struct {
+  uint8_t bytes[8];
+} ATTRIBUTE_PACKED vm_cmd_t;
+#define COMMAND_DATA_SIZE 8
+
+/**
+ * PCI General Information 
+ */
+typedef struct {
+  uint32_t nv_pck_lbn;      /**< sector address of this nav pack */
+  uint16_t vobu_cat;        /**< 'category' of vobu */
+  uint16_t zero1;           /**< reserved */
+  user_ops_t vobu_uop_ctl;  /**< UOP of vobu */
+  uint32_t vobu_s_ptm;      /**< start presentation time of vobu */
+  uint32_t vobu_e_ptm;      /**< end presentation time of vobu */
+  uint32_t vobu_se_e_ptm;   /**< end ptm of sequence end in vobu */
+  dvd_time_t e_eltm;        /**< Cell elapsed time */
+  char vobu_isrc[32];
+} ATTRIBUTE_PACKED pci_gi_t;
+
+/**
+ * Non Seamless Angle Information
+ */
+typedef struct {
+  uint32_t nsml_agl_dsta[9];  /**< address of destination vobu in AGL_C#n */
+} ATTRIBUTE_PACKED nsml_agli_t;
+
+/** 
+ * Highlight General Information 
+ *
+ * For btngrX_dsp_ty the bits have the following meaning:
+ * 000b: normal 4/3 only buttons
+ * XX1b: wide (16/9) buttons
+ * X1Xb: letterbox buttons
+ * 1XXb: pan&scan buttons
+ */
+typedef struct {
+  uint16_t hli_ss; /**< status, only low 2 bits 0: no buttons, 1: different 2: equal 3: eual except for button cmds */
+  uint32_t hli_s_ptm;              /**< start ptm of hli */
+  uint32_t hli_e_ptm;              /**< end ptm of hli */
+  uint32_t btn_se_e_ptm;           /**< end ptm of button select */
+#ifdef WORDS_BIGENDIAN
+  unsigned char zero1 : 2;          /**< reserved */
+  unsigned char btngr_ns : 2;       /**< number of button groups 1, 2 or 3 with 36/18/12 buttons */
+  unsigned char zero2 : 1;          /**< reserved */
+  unsigned char btngr1_dsp_ty : 3;  /**< display type of subpic stream for button group 1 */
+  unsigned char zero3 : 1;          /**< reserved */
+  unsigned char btngr2_dsp_ty : 3;  /**< display type of subpic stream for button group 2 */
+  unsigned char zero4 : 1;          /**< reserved */
+  unsigned char btngr3_dsp_ty : 3;  /**< display type of subpic stream for button group 3 */
+#else
+  unsigned char btngr1_dsp_ty : 3;
+  unsigned char zero2 : 1;
+  unsigned char btngr_ns : 2;
+  unsigned char zero1 : 2;
+  unsigned char btngr3_dsp_ty : 3;
+  unsigned char zero4 : 1;
+  unsigned char btngr2_dsp_ty : 3;
+  unsigned char zero3 : 1;
+#endif
+  uint8_t btn_ofn;     /**< button offset number range 0-255 */
+  uint8_t btn_ns;      /**< number of valid buttons  <= 36/18/12 (low 6 bits) */  
+  uint8_t nsl_btn_ns;  /**< number of buttons selectable by U_BTNNi (low 6 bits)   nsl_btn_ns <= btn_ns */
+  uint8_t zero5;       /**< reserved */
+  uint8_t fosl_btnn;   /**< forcedly selected button  (low 6 bits) */
+  uint8_t foac_btnn;   /**< forcedly activated button (low 6 bits) */
+} ATTRIBUTE_PACKED hl_gi_t;
+
+
+/** 
+ * Button Color Information Table 
+ * Each entry beeing a 32bit word that contains the color indexs and alpha
+ * values to use.  They are all represented by 4 bit number and stored
+ * like this [Ci3, Ci2, Ci1, Ci0, A3, A2, A1, A0].   The actual palette
+ * that the indexes reference is in the PGC.
+ * @TODO split the uint32_t into a struct
+ */
+typedef struct {
+  uint32_t btn_coli[3][2];  /**< [button color number-1][select:0/action:1] */
+} ATTRIBUTE_PACKED btn_colit_t;
+
+/** 
+ * Button Information
+ *
+ * NOTE: I've had to change the structure from the disk layout to get
+ * the packing to work with Sun's Forte C compiler.
+ * The 4 and 7 bytes are 'rotated' was: ABC DEF GHIJ  is: ABCG DEFH IJ
+ */
+typedef struct {
+#ifdef WORDS_BIGENDIAN
+  unsigned int btn_coln         : 2;  /**< button color number */
+  unsigned int x_start          : 10; /**< x start offset within the overlay */
+  unsigned int zero1            : 2;  /**< reserved */
+  unsigned int x_end            : 10; /**< x end offset within the overlay */
+
+  unsigned int zero3            : 2;  /**< reserved */
+  unsigned int up               : 6;  /**< button index when pressing up */
+
+  unsigned int auto_action_mode : 2;  /**< 0: no, 1: activated if selected */
+  unsigned int y_start          : 10; /**< y start offset within the overlay */
+  unsigned int zero2            : 2;  /**< reserved */
+  unsigned int y_end            : 10; /**< y end offset within the overlay */
+
+  unsigned int zero4            : 2;  /**< reserved */
+  unsigned int down             : 6;  /**< button index when pressing down */
+  unsigned char zero5            : 2;  /**< reserved */
+  unsigned char left             : 6;  /**< button index when pressing left */
+  unsigned char zero6            : 2;  /**< reserved */
+  unsigned char right            : 6;  /**< button index when pressing right */
+#else
+  unsigned int x_end            : 10;
+  unsigned int zero1            : 2;
+  unsigned int x_start          : 10;
+  unsigned int btn_coln         : 2;
+
+  unsigned int up               : 6;
+  unsigned int zero3            : 2;
+
+  unsigned int y_end            : 10;
+  unsigned int zero2            : 2;
+  unsigned int y_start          : 10;
+  unsigned int auto_action_mode : 2;
+
+  unsigned int down             : 6;
+  unsigned int zero4            : 2;
+  unsigned char left             : 6;
+  unsigned char zero5            : 2;
+  unsigned char right            : 6;
+  unsigned char zero6            : 2;
+#endif
+  vm_cmd_t cmd;
+} ATTRIBUTE_PACKED btni_t;
+
+/**
+ * Highlight Information 
+ */
+typedef struct {
+  hl_gi_t     hl_gi;
+  btn_colit_t btn_colit;
+  btni_t      btnit[36];
+} ATTRIBUTE_PACKED hli_t;
+
+/**
+ * PCI packet
+ */
+typedef struct {
+  pci_gi_t    pci_gi;
+  nsml_agli_t nsml_agli;
+  hli_t       hli;
+  uint8_t     zero1[189];
+} ATTRIBUTE_PACKED pci_t;
+
+
+#if PRAGMA_PACK
+#pragma pack()
+#endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * What's between a directory and a filename?
@@ -952,6 +1219,7 @@ public:
         ,f_duration(-1.0)
         ,b_ui_hooked(false)
         ,p_input(NULL)
+        ,p_pci_packet(NULL)
         ,p_ev(NULL)
     {}
 
@@ -1006,6 +1274,7 @@ public:
 
     /* for spu variables */
     input_thread_t *p_input;
+    block_t        *p_pci_packet;
 
     /* event */
     event_thread_t *p_ev;
@@ -1014,6 +1283,7 @@ public:
                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
     static int EventKey( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
 
 
 protected:
@@ -1463,12 +1733,17 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         return; /* discard audio packets that shouldn't be rendered */
     }
 
-    es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
-    if( !b )
+    if ( tk->fmt.i_cat != SPU_ES || strcmp( tk->psz_codec, "B_VOBBTN" ) )
     {
-        tk->b_inited = VLC_FALSE;
-        return;
+        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+
+        if( !b )
+        {
+            tk->b_inited = VLC_FALSE;
+            return;
+        }
     }
+
 
     /* First send init data */
     if( !tk->b_inited && tk->i_data_init > 0 )
@@ -1512,9 +1787,26 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
             p_block->i_pts = 0;
         }
 
-        if( tk->fmt.i_cat == SPU_ES && strcmp( tk->psz_codec, "S_VOBSUB" ) )
+        if ( tk->fmt.i_cat == SPU_ES )
         {
-            p_block->i_length = i_duration * 1000;
+            if ( !strcmp( tk->psz_codec, "B_VOBBTN" ) )
+            {
+                // TODO handle the start/stop times of this packet
+                if ( p_sys->b_ui_hooked )
+                {
+                    vlc_mutex_lock( &p_sys->p_ev->lock );
+                    if ( p_sys->p_pci_packet != NULL )
+                        block_Release( p_sys->p_pci_packet );
+                    p_sys->p_pci_packet = p_block;
+                    vlc_mutex_unlock( &p_sys->p_ev->lock );
+                }
+                return;
+            }
+
+            else if ( strcmp( tk->psz_codec, "S_VOBSUB" ) )
+            {
+                p_block->i_length = i_duration * 1000;
+            }
         }
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
@@ -1908,8 +2200,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "B_VOBBTN" ) )
         {
-            /* FIXME: support this codec */
-            msg_Err( &sys.demuxer, "Vob Buttons not supported yet[%d, n=%d]", i_track, tracks[i_track]->i_number );
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
             sys.StartUiThread();
         }
@@ -1942,6 +2232,7 @@ void demux_sys_t::StartUiThread()
 {
     if ( !b_ui_hooked )
     {
+        msg_Dbg( &demuxer, "Starting the UI Hook" );
         b_ui_hooked = true;
         /* FIXME hack hack hack hack FIXME */
         /* Get p_input and create variable */
@@ -1958,6 +2249,7 @@ void demux_sys_t::StartUiThread()
         /* Now create our event thread catcher */
         p_ev = (event_thread_t *) vlc_object_create( &demuxer, sizeof( event_thread_t ) );
         p_ev->p_demux = &demuxer;
+        vlc_mutex_init( p_ev, &p_ev->lock );
         vlc_thread_create( p_ev, "mkv event thread handler", EventThread,
                         VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
     }
@@ -1968,8 +2260,6 @@ void demux_sys_t::StopUiThread()
     if ( b_ui_hooked )
     {
         p_ev->b_die = VLC_TRUE;
-        vlc_thread_join( p_ev );
-        vlc_object_destroy( p_ev );
 
         var_Destroy( p_input, "highlight-mutex" );
         var_Destroy( p_input, "highlight" );
@@ -1979,6 +2269,11 @@ void demux_sys_t::StopUiThread()
         var_Destroy( p_input, "y-end" );
         var_Destroy( p_input, "color" );
         var_Destroy( p_input, "menu-contrast" );
+
+        vlc_thread_join( p_ev );
+        vlc_object_destroy( p_ev );
+
+        msg_Dbg( &demuxer, "Stopping the UI Hook" );
     }
     b_ui_hooked = false;
 }
@@ -2014,7 +2309,6 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
     vlc_object_t   *p_vout = NULL;
 
-    vlc_mutex_init( p_ev, &p_ev->lock );
     p_ev->b_moved   = VLC_FALSE;
     p_ev->b_clicked = VLC_FALSE;
     p_ev->b_key     = VLC_FALSE;
@@ -2025,6 +2319,95 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
     /* main loop */
     while( !p_ev->b_die )
     {
+        vlc_bool_t b_activated = VLC_FALSE;
+
+        /* KEY part */
+        if( p_ev->b_key )
+        {
+            vlc_value_t valk;
+            struct vlc_t::hotkey *p_hotkeys = p_ev->p_vlc->p_hotkeys;
+            int i, i_action = -1;
+
+            vlc_mutex_lock( &p_ev->lock );
+
+            pci_t *pci = (pci_t *) &p_sys->p_pci_packet->p_buffer[1];
+
+            var_Get( p_ev->p_vlc, "key-pressed", &valk );
+            for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+            {
+                if( p_hotkeys[i].i_key == valk.i_int )
+                {
+                    i_action = p_hotkeys[i].i_action;
+                }
+            }
+
+            switch( i_action )
+            {
+            case ACTIONID_NAV_LEFT:
+//                dvdnav_left_button_select( NULL, pci );
+                break;
+            case ACTIONID_NAV_RIGHT:
+//                dvdnav_right_button_select( NULL, pci );
+                break;
+            case ACTIONID_NAV_UP:
+//                dvdnav_upper_button_select( NULL, pci );
+                break;
+            case ACTIONID_NAV_DOWN:
+//                dvdnav_lower_button_select( NULL, pci );
+                break;
+            case ACTIONID_NAV_ACTIVATE:
+                b_activated = VLC_TRUE;
+//                dvdnav_button_activate( NULL, pci );
+                break;
+            default:
+                break;
+            }
+            p_ev->b_key = VLC_FALSE;
+            vlc_mutex_unlock( &p_ev->lock );
+        }
+
+        /* VOUT part */
+        if( p_vout && ( p_ev->b_moved || p_ev->b_clicked ) )
+        {
+            vlc_value_t valx, valy;
+
+            vlc_mutex_lock( &p_ev->lock );
+            pci_t *pci = (pci_t *) &p_sys->p_pci_packet->p_buffer[1];
+            var_Get( p_vout, "mouse-x", &valx );
+            var_Get( p_vout, "mouse-y", &valy );
+
+            if( p_ev->b_moved )
+            {
+//                dvdnav_mouse_select( NULL, pci, valx.i_int, valy.i_int );
+                p_ev->b_moved = 0;
+            }
+            if( p_ev->b_clicked )
+            {
+                b_activated = VLC_TRUE;
+//                dvdnav_mouse_activate( NULL, pci, valx.i_int, valy.i_int );
+            }
+
+            p_ev->b_moved = VLC_FALSE;
+            p_ev->b_clicked = VLC_FALSE;
+            vlc_mutex_unlock( &p_ev->lock );
+        }
+        if( p_vout && p_vout->b_die )
+        {
+            var_DelCallback( p_vout, "mouse-moved", EventMouse, p_ev );
+            var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
+            vlc_object_release( p_vout );
+            p_vout = NULL;
+        }
+        if( p_vout == NULL )
+        {
+            p_vout = (vlc_object_t*) vlc_object_find( p_sys->p_input, VLC_OBJECT_VOUT,
+                                      FIND_CHILD );
+            if( p_vout)
+            {
+                var_AddCallback( p_vout, "mouse-moved", EventMouse, p_ev );
+                var_AddCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
+            }
+        }
 
         /* Wait a bit */
         msleep( 10000 );
