@@ -326,16 +326,13 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         struct tm l;
 
 #ifdef HAVE_LOCALTIME_R
-        if( !localtime_r( &t, &l ) )
-            memset( &l, 0, sizeof(l) );
+        if( !localtime_r( &t, &l ) ) memset( &l, 0, sizeof(l) );
 #else
         /* Grrr */
         {
             struct tm *p_l = localtime( &t );
-            if( p_l )
-                l = *p√_l;
-            else
-                memset( &l, 0, sizeof(l) );
+            if( p_l ) l = *p_l;
+            else memset( &l, 0, sizeof(l) );
         }
 #endif
 
