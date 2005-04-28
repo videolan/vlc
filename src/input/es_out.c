@@ -1363,6 +1363,12 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             EsOutProgramMeta( out, i_group, p_meta );
             return VLC_SUCCESS;
         }
+        case ES_OUT_DEL_GROUP:
+        {
+            int i_group = (int)va_arg( args, int );
+
+            return EsOutProgramDel( out, i_group );
+        }
 
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );

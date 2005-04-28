@@ -2941,12 +2941,20 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         /* Delete PMT pid */
         for( i = 0; i < i_pmt_rm; i++ )
         {
+            int i_prg;
             if( p_sys->b_dvb_control )
             {
                 if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE,
                                     pmt_rm[i]->i_pid, VLC_FALSE ) )
                     p_sys->b_dvb_control = VLC_FALSE;
+            }
+
+            for( i_prg = 0; i_prg < pmt_rm[i]->psi->i_prg; i_prg++ )
+            {
+                const int i_number = pmt_rm[i]->psi->prg[i_prg]->i_number;
+                if( i_number != 0 )
+                    es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, i_number );
             }
 
             PIDClean( p_demux->out, &p_sys->pid[pmt_rm[i]->i_pid] );

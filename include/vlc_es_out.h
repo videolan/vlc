@@ -80,6 +80,8 @@ enum es_out_query_e
     ES_OUT_SET_NEXT_DISPLAY_TIME,   /* arg1=es_out_id_t* arg2=int64_t i_pts(microsecond) */
     /* Set meta data for group (dynamic) */
     ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=vlc_meta_t */
+    /* */
+    ES_OUT_DEL_GROUP,       /* arg1=int i_group */
 };
 
 struct es_out_t
