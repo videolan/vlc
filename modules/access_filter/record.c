@@ -325,8 +325,19 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         time_t t = time(NULL);
         struct tm l;
 
+#ifdef HAVE_LOCALTIME_R
         if( !localtime_r( &t, &l ) )
             memset( &l, 0, sizeof(l) );
+#else
+        /* Grrr */
+        {
+            struct tm *p_l = localtime( &t );
+            if( p_l )
+                l = *p√_l;
+            else
+                memset( &l, 0, sizeof(l) );
+        }
+#endif
 
         p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
         if( p_input )
