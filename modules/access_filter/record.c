@@ -33,6 +33,7 @@
 #include "vlc_keys.h"
 #include <osd.h>
 #include <errno.h>
+#include <time.h>
 
 /*****************************************************************************
  * Module descriptor
