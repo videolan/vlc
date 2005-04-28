@@ -499,7 +499,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
 /* EsOutDelProgram:
  *  Delete a program
  */
-static void EsOutProgramDel( es_out_t *out, int i_group )
+static int EsOutProgramDel( es_out_t *out, int i_group )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
@@ -516,13 +516,14 @@ static void EsOutProgramDel( es_out_t *out, int i_group )
         }
     }
 
-    if( p_pgrm == NULL ) return;
+    if( p_pgrm == NULL )
+        return VLC_EGENERIC;
 
     if( p_pgrm->i_es )
     {
         msg_Dbg( p_input, "can't delete program %d which still has %i ES",
                  i_group, p_pgrm->i_es );
-        return;
+        return VLC_EGENERIC;
     }
 
     TAB_REMOVE( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -538,6 +539,8 @@ static void EsOutProgramDel( es_out_t *out, int i_group )
     var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
 
     var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+
+    return VLC_SUCCESS;
 }
 
 /* EsOutProgramMeta:
@@ -1057,8 +1060,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     es->p_pgrm->i_es--;
     if( es->p_pgrm->i_es == 0 )
     {
-        msg_Warn( p_sys->p_input, "Program doesn't contain anymore ES, "
-                  "TODO cleaning ?" );
+        msg_Dbg( p_sys->p_input, "Program doesn't contain anymore ES" );
     }
 
     if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
