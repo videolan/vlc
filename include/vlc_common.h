@@ -906,7 +906,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #endif
 
 /* Format type specifiers for 64 bits numbers */
-#if defined(__MINGW32__) || defined(__CYGWIN32__) || (!defined(WIN32) && !defined(UNDER_CE))
+#if defined(__CYGWIN32__) || (!defined(WIN32) && !defined(UNDER_CE))
 #   define I64Fd "%lld"
 #   define I64Fi "%lli"
 #   define I64Fo "%llo"
