@@ -54,8 +54,8 @@ vlc_module_begin();
     set_capability( "access_filter", 0 );
     add_shortcut( "record" );
 
-    add_string( "record-path", NULL, NULL,
-                RECORD_PATH_TXT, RECORD_PATH_LONGTXT, VLC_TRUE );
+    add_directory( "record-path", NULL, NULL,
+                   RECORD_PATH_TXT, RECORD_PATH_LONGTXT, VLC_TRUE );
 
     set_callbacks( Open, Close );
 
@@ -341,13 +341,22 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         if( p_input )
         {
             vlc_mutex_lock( &p_input->input.p_item->lock );
-            if( p_input->input.p_item->psz_name &&
-                strlen( p_input->input.p_item->psz_name ) < 64 )
-                psz_name = strdup( p_input->input.p_item->psz_name );
+            if( p_input->input.p_item->psz_name )
+            {
+                char *p = strrchr( p_input->input.p_item->psz_name, '/' );
+                if( p == NULL )
+                    p = strrchr( p_input->input.p_item->psz_name, '\\' );
+
+                if( p == NULL )
+                    psz_name = strdup( p_input->input.p_item->psz_name );
+                else if( p[1] != '\0' )
+                    psz_name = strdup( &p[1] );
+            }
             vlc_mutex_unlock( &p_input->input.p_item->lock );
 
             vlc_object_release( p_input );
         }
+
         if( psz_name == NULL )
             psz_name = strdup( "Unknown" );
 
