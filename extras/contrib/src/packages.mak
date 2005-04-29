@@ -107,8 +107,6 @@ VCDIMAGER_VERSION=0.7.21
 VCDIMAGER_URL=$(GNU)/vcdimager/vcdimager-$(VCDIMAGER_VERSION).tar.gz
 CDIO_VERSION=0.72
 CDIO_URL=$(GNU)/libcdio/libcdio-$(CDIO_VERSION).tar.gz
-TOOLAME_VERSION=02m-beta8
-TOOLAME_URL=$(VIDEOLAN)/testing/contrib/toolame-$(TOOLAME_VERSION).tar.bz2
 PNG_VERSION=1.2.5
 PNG_URL=$(VIDEOLAN)/testing/contrib/libpng-$(PNG_VERSION).tar.bz2
 GPGERROR_VERSION=1.0
@@ -125,4 +123,5 @@ LIBIDL_VERSION=0.6.8
 LIBIDL_URL=http://andrewtv.org/libIDL/libIDL-$(LIBIDL_VERSION).tar.gz
 MOZILLA_VERSION=1.7.5
 MOZILLA_URL=http://ftp.mozilla.org/pub/mozilla.org/mozilla/releases/mozilla$(MOZILLA_VERSION)/source/mozilla-source-$(MOZILLA_VERSION).tar.bz2
-
+TWOLAME_VERSION=0.3.2
+TWOLAME_URL=$(SF)/twolame/twolame-$(TWOLAME_VERSION).tar.gz

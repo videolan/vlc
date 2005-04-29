@@ -453,7 +453,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264 goom],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad toolame equalizer vlc freetype],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer vlc freetype],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
@@ -2211,46 +2211,48 @@ then
 fi
 
 dnl
-dnl toolame encoder plugin
+dnl twolame encoder plugin
 dnl
-AC_ARG_ENABLE(toolame,
-[  --enable-toolame        toolame codec (default disabled)])
-if test "${enable_toolame}" = "yes"
+AC_ARG_ENABLE(twolame,
+[  --enable-twolame        twolame codec (default disabled)])
+if test "${enable_twolame}" = "yes"
 then
-  AC_ARG_WITH(toolame-tree,
-  [    --with-toolame-tree=PATH toolame tree for static linking])
-  if test -n "${with_toolame_tree}"
+  AC_ARG_WITH(twolame-tree,
+  [    --with-twolame-tree=PATH twolame tree for static linking])
+  if test -n "${with_twolame_tree}"
   then
-    AC_MSG_CHECKING(for libtoolame.a in ${with_toolame_tree})
-    real_toolame_tree="`cd ${with_toolame_tree} 2>/dev/null && pwd`"
-    if test -z "${real_toolame_tree}"
+    AC_MSG_CHECKING(for libtwolame.a in ${with_twolame_tree})
+    real_twolame_tree="`cd ${with_twolame_tree} 2>/dev/null && pwd`"
+    if test -z "${real_twolame_tree}"
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_toolame_tree}])
+      AC_MSG_ERROR([cannot cd to ${with_twolame_tree}])
     fi
-    if test -f "${real_toolame_tree}/libtoolame/libtoolame.a"
+    if test -f "${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a"
     then
-      dnl  Use a custom toolame
-      AC_MSG_RESULT(${real_toolame_tree}/libtoolame/libtoolame.a)
-      VLC_ADD_BUILTINS([toolame])
-      VLC_ADD_LDFLAGS([toolame],[${real_toolame_tree}/libtoolame/libtoolame.a])
-      VLC_ADD_CPPFLAGS([toolame],[-I${real_toolame_tree}/libtoolame])
+      dnl  Use a custom twolame
+      AC_MSG_RESULT(${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a)
+      VLC_ADD_BUILTINS([twolame])
+      VLC_ADD_LDFLAGS([twolame],[${real_twolame_tree}/src/libtwolame/.libs/libtw
+olame.a])
+      VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/src/libtwolame])
     else
-      dnl  The given libtoolame wasn't built
+      dnl  The given libtwolame wasn't built
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_toolame_tree}/libtoolame/libtoolame.a, make sure you compiled libtoolame in ${with_toolame_tree}])
+      AC_MSG_ERROR([cannot find ${real_twolame_tree}/src/libtwolame/.libs/libtwo
+lame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
     fi
   else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_toolame}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_toolame}"
-    AC_CHECK_HEADERS(toolame.h, ,
-      [ AC_MSG_ERROR([Cannot find development header for libtoolame...]) ])
-    AC_CHECK_LIB(toolame, toolame_init, [
-      VLC_ADD_PLUGINS([toolame])
-      VLC_ADD_LDFLAGS([toolame],[-ltoolame]) ],
-        [ AC_MSG_ERROR([Cannot find libtoolame library...]) ])
-    LDFLAGS="${LDFLAGS_save}"
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_twolame}"
+    AC_CHECK_HEADERS(twolame.h, ,
+      [ AC_MSG_ERROR([Cannot find development header for libtwolame...]) ])
+    AC_CHECK_LIB(twolame, twolame_init, [
+      VLC_ADD_PLUGINS([twolame])
+      VLC_ADD_LDFLAGS([twolame],[-ltwolame]) ],
+        [ AC_MSG_ERROR([Cannot find libtwolame library...]) ])
+    LDFLAGS="${LDFLAGS_save}"  
     CPPFLAGS="${CPPFLAGS_save}"
   fi
 fi

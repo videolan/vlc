@@ -1006,23 +1006,23 @@ CLEAN_PKG += mash-code
 DISTCLEAN_PKG += mash-src-$(MASH_VERSION).tar.gz
 
 # ***************************************************************************
-# toolame
+# twolame
 # ***************************************************************************
 
-toolame-$(TOOLAME_VERSION).tar.bz2:
-	$(WGET) $(TOOLAME_URL)
+twolame-$(TWOLAME_VERSION).tar.gz:
+	$(WGET) $(TWOLAME_URL)
 
-toolame: toolame-$(TOOLAME_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+twolame: twolame-$(TWOLAME_VERSION).tar.gz
+	$(EXTRACT_GZ)
 
-.toolame: toolame
-	(cd toolame; ./configure --prefix=$(PREFIX) && make && make install)
+.twolame: twolame
+	(cd twolame; ./configure --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
-CLEAN_FILE += .toolame
-CLEAN_PKG += toolame
-DISTCLEAN_PKG += toolame-$(TOOLAME_VERSION).tar.bz2
+CLEAN_FILE += .twolame
+CLEAN_PKG += twolame
+DISTCLEAN_PKG += twolame-$(TWOLAME_VERSION).tar.bz2
 
 # ***************************************************************************
 # libpng
