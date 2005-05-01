@@ -771,6 +771,11 @@ CDDAClose (vlc_object_t *p_this )
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
     track_t      i;
 
+#if LIBCDIO_VERSION_NUM >= 73
+    if (p_cdda->b_audio_ctl)
+      cdio_audio_stop(p_cdda->p_cdio);
+#endif
+
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "" );
 
     /* Remove playlist titles */
