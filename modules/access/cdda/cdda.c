@@ -137,6 +137,13 @@ vlc_module_begin();
                 N_("Format to use in playlist \"title\" field when no CDDB"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
+#if LIBCDIO_VERSION_NUM >= 73
+    add_bool( MODULE_STRING "-analog-output", VLC_FALSE, NULL,
+              N_("Use CD audio controls and output?"),
+              N_("If set, audio controls and audio jack output are used"),
+              VLC_FALSE );
+#endif
+
     add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, CDTextEnabledCB,
               N_("Do CD-Text lookups?"),
               N_("If set, get CD-Text information"),

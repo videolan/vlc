@@ -1,7 +1,7 @@
 /*****************************************************************************
  * info.c : CD digital audio input information routines
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004, 2005 VideoLAN
  * $Id: info.c 8845 2004-09-29 09:00:41Z rocky $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
@@ -941,6 +941,9 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
     if (p_playlist) {
 
+      p_item = playlist_LockItemGetByInput( p_playlist,
+                        ((input_thread_t *)p_access->p_parent)->input.p_item );
+
       if( p_item == p_playlist->status.p_item && !b_single_track )
 	{
 	  b_play = VLC_TRUE;
@@ -983,7 +986,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     else
     {
 	input_title_t *t;
-
 
 	if ( !p_cdda->b_nav_mode )
 	  playlist_ItemToNode( p_playlist, p_item );
@@ -1028,9 +1030,9 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           p_playlist->status.i_view,
                           p_playlist->status.p_item, NULL );
-	vlc_object_release( p_playlist );
     }
 
+    if (p_playlist) vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 }
 

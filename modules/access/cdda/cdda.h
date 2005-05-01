@@ -24,12 +24,18 @@
 #include <vlc/input.h>
 #include <cdio/cdio.h>
 #include <cdio/cdtext.h>
+#if LIBCDIO_VERSION_NUM >= 73
+#include <cdio/audio.h>
+#include <cdio/mmc.h>
+#endif
+
 #include "vlc_meta.h"
 #include "codecs.h"
 
 #ifdef HAVE_LIBCDDB
 #include <cddb/cddb.h>
 #endif
+
 
 #define CDDA_MRL_PREFIX "cddax://"
 
@@ -115,6 +121,9 @@ typedef struct cdda_data_s
   } cddb;
 #endif
 
+  vlc_bool_t   b_audio_ctl;           /* Use CD-Text audio controls and
+					 audio output? */
+
   vlc_bool_t   b_cdtext;              /* Use CD-Text at all? If not,
 					 cdtext_preferred is meaningless. */
   vlc_bool_t   b_cdtext_prefer;       /* Prefer CD-Text info over
@@ -128,7 +137,12 @@ typedef struct cdda_data_s
 
   WAVEHEADER   waveheader;            /* Wave header for the output data  */
   vlc_bool_t   b_header;
-  vlc_bool_t   b_nav_mode;
+  vlc_bool_t   b_nav_mode;           /* If false we view the entire CD as
+					as a unit rather than each track
+					as a unit. If b_nav_mode then the
+					slider area represents the Disc rather
+					than a track
+				      */
   
   input_thread_t *p_input;
   
