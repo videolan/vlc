@@ -29,6 +29,7 @@
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include <string>
+#include <map>
 
 #include "generic_font.hpp"
 
@@ -54,6 +55,15 @@ class FT2Font: public GenericFont
         virtual int getSize() const { return m_height; }
 
     private:
+        typedef struct
+        {
+            FT_Glyph m_glyph;
+            FT_BBox m_size;
+            int m_index;
+            int m_advance;
+        } Glyph_t;
+        typedef map<uint32_t,Glyph_t> GlyphMap_t;
+
         /// File name
         const string m_name;
         /// Buffer to store the font
@@ -66,11 +76,11 @@ class FT2Font: public GenericFont
         FT_Face m_face;
         /// Font metrics
         int m_height, m_ascender, m_descender;
-        /// Index, glyph, width and advance of the dot symbol
-        int m_dotIndex;
-        FT_Glyph m_dotGlyph;
-        int m_dotWidth;
-        int m_dotAdvance;
+        /// Glyph cache
+        mutable GlyphMap_t m_glyphCache;
+
+        /// Get the glyph corresponding to the given code
+        Glyph_t &getGlyph( uint32_t code ) const;
 };
 
 

@@ -33,16 +33,18 @@
 
 FT2Font::FT2Font( intf_thread_t *pIntf, const string &rName, int size ):
     GenericFont( pIntf ), m_name( rName ), m_buffer( NULL ), m_size( size ),
-    m_lib( NULL ), m_face( NULL ), m_dotGlyph( NULL )
+    m_lib( NULL ), m_face( NULL )
 {
 }
 
 
 FT2Font::~FT2Font()
 {
-    if( m_dotGlyph )
+    // Clear the glyph cache
+    GlyphMap_t::iterator iter;
+    for( iter = m_glyphCache.begin(); iter != m_glyphCache.end(); ++iter )
     {
-        FT_Done_Glyph( m_dotGlyph );
+        FT_Done_Glyph( (*iter).second.m_glyph );
     }
     if( m_face )
     {
@@ -130,16 +132,6 @@ bool FT2Font::init()
     m_ascender = m_face->size->metrics.ascender >> 6;
     m_descender = m_face->size->metrics.descender >> 6;
 
-    // Render the '.' symbol and compute its size
-    m_dotIndex = FT_Get_Char_Index( m_face, '.' );
-    FT_Load_Glyph( m_face, m_dotIndex, FT_LOAD_DEFAULT );
-    FT_Get_Glyph( m_face->glyph, &m_dotGlyph );
-    FT_BBox dotSize;
-    FT_Glyph_Get_CBox( m_dotGlyph, ft_glyph_bbox_pixels, &dotSize );
-    m_dotWidth = dotSize.xMax - dotSize.xMin;
-    m_dotAdvance = m_face->glyph->advance.x >> 6;
-    FT_Glyph_To_Bitmap( &m_dotGlyph, ft_render_mode_normal, NULL, 1 );
-
     return true;
 }
 
@@ -147,7 +139,6 @@ bool FT2Font::init()
 GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
                                     int maxWidth ) const
 {
-    int err;
     uint32_t code;
     int n;
     int penX = 0;
@@ -178,7 +169,7 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
 #endif
 
     // Array of glyph bitmaps and position
-    FT_Glyph *glyphs = new FT_Glyph[len];
+    FT_BitmapGlyphRec **glyphs = new (FT_BitmapGlyphRec*)[len];
     int *pos = new int[len];
 
     // Does the font support kerning ?
@@ -189,42 +180,36 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     int maxIndex = 0;
     // Position of the first trailing dot
     int firstDotX = 0;
+    /// Get the dot glyph
+    Glyph_t &dotGlyph = getGlyph( '.' );
 
     // First, render all the glyphs
     for( n = 0; n < len; n++ )
     {
         code = *(pString++);
-        // Load the glyph
-        int glyphIndex = FT_Get_Char_Index( m_face, code );
-        err = FT_Load_Glyph( m_face, glyphIndex, FT_LOAD_DEFAULT );
-        err = FT_Get_Glyph( m_face->glyph, &glyphs[n] );
+        // Get the glyph for this character
+        Glyph_t &glyph = getGlyph( code );
+        glyphs[n] = (FT_BitmapGlyphRec*)(glyph.m_glyph);
 
         // Retrieve kerning distance and move pen position
-        if( useKerning && previous && glyphIndex )
+        if( useKerning && previous && glyph.m_index )
         {
             FT_Vector delta;
-            FT_Get_Kerning( m_face, previous, glyphIndex,
+            FT_Get_Kerning( m_face, previous, glyph.m_index,
                             ft_kerning_default, &delta );
             penX += delta.x >> 6;
         }
 
-        // Get the glyph size
-        FT_BBox glyphSize;
-        FT_Glyph_Get_CBox( glyphs[n], ft_glyph_bbox_pixels, &glyphSize );
-
-        // Render the glyph
-        err = FT_Glyph_To_Bitmap( &glyphs[n], ft_render_mode_normal, NULL, 1 );
-
         pos[n] = penX;
-        width1 = penX + glyphSize.xMax - glyphSize.xMin;
-        yMin = __MIN( yMin, glyphSize.yMin );
-        yMax = __MAX( yMax, glyphSize.yMax );
+        width1 = penX + glyph.m_size.xMax - glyph.m_size.xMin;
+        yMin = __MIN( yMin, glyph.m_size.yMin );
+        yMax = __MAX( yMax, glyph.m_size.yMax );
 
         // Next position
-        penX += m_face->glyph->advance.x >> 6;
+        penX += glyph.m_advance;
 
         // Save glyph index
-        previous = glyphIndex;
+        previous = glyph.m_index;
 
         if( maxWidth != -1 )
         {
@@ -233,13 +218,15 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
             if( useKerning )
             {
                 FT_Vector delta;
-                FT_Get_Kerning( m_face, glyphIndex, m_dotIndex,
+                FT_Get_Kerning( m_face, glyph.m_index, dotGlyph.m_index,
                                 ft_kerning_default, &delta );
                 curX += delta.x >> 6;
             }
-            if( curX + 2 * m_dotAdvance + m_dotWidth < maxWidth )
+            int dotWidth = 2 * dotGlyph.m_advance +
+                dotGlyph.m_size.xMax - dotGlyph.m_size.xMin;
+            if( curX + dotWidth < maxWidth )
             {
-                width2 = curX + 2 * m_dotAdvance + m_dotWidth;
+                width2 = curX + dotWidth;
                 maxIndex++;
                 firstDotX = curX;
             }
@@ -279,21 +266,18 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
         FT_BitmapGlyphRec *pBmpGlyph = (FT_BitmapGlyphRec*)glyphs[n];
         // Draw the glyph on the bitmap
         pBmp->draw( pBmpGlyph->bitmap, pos[n], yMax - pBmpGlyph->top, color );
-
-        // Free the glyph
-        FT_Done_Glyph( glyphs[n] );
     }
     // Draw the trailing dots if the text is truncated
     if( maxIndex < len )
     {
         int penX = firstDotX;
-        FT_BitmapGlyphRec *pBmpGlyph = (FT_BitmapGlyphRec*)m_dotGlyph;
+        FT_BitmapGlyphRec *pBmpGlyph = (FT_BitmapGlyphRec*)dotGlyph.m_glyph;
         for( n = 0; n < 3; n++ )
         {
             // Draw the glyph on the bitmap
             pBmp->draw( pBmpGlyph->bitmap, penX, yMax - pBmpGlyph->top,
                         color );
-            penX += m_dotAdvance;
+            penX += dotGlyph.m_advance;
         }
     }
 
@@ -302,3 +286,30 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
 
     return pBmp;
 }
+
+
+FT2Font::Glyph_t &FT2Font::getGlyph( uint32_t code ) const
+{
+    // Try to find the glyph in the cache
+    GlyphMap_t::iterator iter = m_glyphCache.find( code );
+    if( iter != m_glyphCache.end() )
+    {
+        return (*iter).second;
+    }
+    else
+    {
+        // Add a new glyph in the cache
+        Glyph_t &glyph = m_glyphCache[code];
+
+        // Load and render the glyph
+        glyph.m_index = FT_Get_Char_Index( m_face, code );
+        FT_Load_Glyph( m_face, glyph.m_index, FT_LOAD_DEFAULT );
+        FT_Get_Glyph( m_face->glyph, &glyph.m_glyph );
+        FT_Glyph_Get_CBox( glyph.m_glyph, ft_glyph_bbox_pixels,
+                           &glyph.m_size );
+        glyph.m_advance = m_face->glyph->advance.x >> 6;
+        FT_Glyph_To_Bitmap( &glyph.m_glyph, ft_render_mode_normal, NULL, 1 );
+        return glyph;
+    }
+}
+

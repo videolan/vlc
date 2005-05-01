@@ -416,9 +416,9 @@ unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b )
     const
 {
     unsigned long value;
-    value = ( ((uint32_t)r >> m_redRightShift) << m_redLeftShift ) |
-            ( ((uint32_t)g >> m_greenRightShift) << m_greenLeftShift ) |
-            ( ((uint32_t)b >> m_blueRightShift) << m_blueLeftShift );
+
+    PUT_PIXEL(value, r, g, b, uint32_t)
+
     if( m_pixelSize == 1 )
     {
         return 255 - value;
