@@ -24,6 +24,10 @@
 #ifndef _VLC_STREAM_H
 #define _VLC_STREAM_H 1
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /**
  * \defgroup stream Stream
  *
@@ -204,5 +208,9 @@ VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_u
 /**
  * @}
  */
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif
