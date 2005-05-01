@@ -44,7 +44,8 @@ class Win32Graphics: public OSGraphics
         /// Render a bitmap on this graphics
         virtual void drawBitmap( const GenericBitmap &rBitmap, int xSrc = 0,
                                  int ySrc = 0, int xDest = 0, int yDest = 0,
-                                 int width = -1, int height = -1 );
+                                 int width = -1, int height = -1,
+                                 bool blend = false );
 
         /// Draw another graphics on this one
         virtual void drawGraphics( const OSGraphics &rGraphics, int xSrc = 0,

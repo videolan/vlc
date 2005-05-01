@@ -471,7 +471,7 @@ void CtrlList::makeImage()
         }
         int lineHeight = __MIN( pText->getHeight() - ySrc, height - yPos );
         m_pImage->drawBitmap( *pText, 0, ySrc, 0, yPos, pText->getWidth(),
-                              lineHeight );
+                              lineHeight, true );
         yPos += (pText->getHeight() - ySrc );
         delete pText;
 

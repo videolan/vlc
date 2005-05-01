@@ -23,19 +23,18 @@
 
 #ifdef MACOSX_SKINS
 
+#include <Carbon/Carbon.h>
 #include "macosx_loop.hpp"
 
 
 MacOSXLoop::MacOSXLoop( intf_thread_t *pIntf ):
-    OSLoop( pIntf )
+    OSLoop( pIntf ), m_exit( false )
 {
-    // TODO
 }
 
 
 MacOSXLoop::~MacOSXLoop()
 {
-    // TODO
 }
 
 
@@ -62,13 +61,58 @@ void MacOSXLoop::destroy( intf_thread_t *pIntf )
 
 void MacOSXLoop::run()
 {
-    // TODO
+    // Main event loop
+    while( !m_exit )
+    {
+        EventRef pEvent;
+        OSStatus err = ReceiveNextEvent( 0, NULL, kEventDurationForever, true,
+                                         &pEvent );
+        if( err != noErr )
+        {
+            // Get the event type
+            UInt32 evClass = GetEventClass( pEvent );
+
+            switch( evClass )
+            {
+                case kEventClassMouse:
+                {
+                    break;
+                }
+
+                case kEventClassKeyboard:
+                {
+                    break;
+                }
+
+                case kEventClassWindow:
+                {
+                    handleWindowEvent( pEvent );
+                    break;
+                }
+
+                default:
+                {
+                    EventTargetRef pTarget;
+                    pTarget = GetEventDispatcherTarget();
+                    SendEventToEventTarget( pEvent, pTarget );
+                    ReleaseEvent( pEvent );
+                }
+            }
+        }
+    }
 }
 
 
 void MacOSXLoop::exit()
 {
-    // TODO
+    m_exit = true;
+}
+
+
+void MacOSXLoop::handleWindowEvent( EventRef pEvent )
+{
+    UInt32 evKind = GetEventKind( pEvent );
+
 }
 
 

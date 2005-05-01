@@ -49,6 +49,11 @@ class MacOSXLoop: public OSLoop
         // Private because it's a singleton
         MacOSXLoop( intf_thread_t *pIntf );
         virtual ~MacOSXLoop();
+        // Flag set to exit the loop
+        bool m_exit;
+
+        // Handle a window event
+        void handleWindowEvent( EventRef pEvent );
 };
 
 #endif

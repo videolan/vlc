@@ -58,12 +58,15 @@ class X11Display: public SkinObject
         /// Get the colormap
         Colormap getColormap() const { return m_colormap; }
 
-        /// Type of function to convert RGB values into a pixel
+        /// Type of function to put RGBA values into a pixel
         typedef void (X11Display::*MakePixelFunc_t)( uint8_t *pPixel,
             uint8_t r, uint8_t g, uint8_t b, uint8_t a ) const;
 
-        /// Get a pointer on the right makePixel implementation
-        MakePixelFunc_t getMakePixel() const { return makePixelImpl; }
+        /// Get a pointer on the right blendPixel implementation
+        MakePixelFunc_t getBlendPixel() const { return blendPixelImpl; }
+
+        /// Get a pointer on the right putPixel implementation
+        MakePixelFunc_t getPutPixel() const { return putPixelImpl; }
 
         /// Get the pixel value corresponding to the given colors
         unsigned long getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const;
@@ -86,33 +89,54 @@ class X11Display: public SkinObject
         int m_redLeftShift, m_redRightShift;
         int m_greenLeftShift, m_greenRightShift;
         int m_blueLeftShift, m_blueRightShift;
-
-        /// Pointer on the right implementation of getPixel
-        MakePixelFunc_t makePixelImpl;
+        /// Pointer on the right implementation of blendPixel
+        MakePixelFunc_t blendPixelImpl;
+        /// Pointer on the right implementation of putPixel
+        MakePixelFunc_t putPixelImpl;
 
         /// Calculate shifts from a color mask
         void getShifts( uint32_t mask, int &rLeftShift,
                         int &rRightShift ) const;
 
-        /// 8 bpp version of makePixel
-        void makePixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
-                         uint8_t a ) const;
+        /// 8 bpp version of blendPixel
+        void blendPixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                          uint8_t a ) const;
 
-        /// 16 bpp MSB first version of makePixel
-        void makePixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
-                             uint8_t a ) const;
+        /// 16 bpp MSB first version of blendPixel
+        void blendPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                              uint8_t a ) const;
 
-        /// 16 bpp LSB first version of makePixel
-        void makePixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
-                             uint8_t a ) const;
+        /// 16 bpp LSB first version of blendPixel
+        void blendPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                              uint8_t a ) const;
 
-        /// 24/32 bpp MSB first version of makePixel
-        void makePixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
-                             uint8_t a ) const;
+        /// 24/32 bpp MSB first version of blendPixel
+        void blendPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                              uint8_t a ) const;
 
-        /// 24/32 bpp LSB first version of makePixel
-        void makePixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
-                             uint8_t a ) const;
+        /// 24/32 bpp LSB first version of blendPixel
+        void blendPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                              uint8_t a ) const;
+
+        /// 8 bpp version of putPixel
+        void putPixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                        uint8_t a ) const;
+
+        /// 16 bpp MSB first version of putPixel
+        void putPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                            uint8_t a ) const;
+
+        /// 16 bpp LSB first version of putPixel
+        void putPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                            uint8_t a ) const;
+
+        /// 24/32 bpp MSB first version of putPixel
+        void putPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                            uint8_t a ) const;
+
+        /// 24/32 bpp LSB first version of putPixel
+        void putPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                            uint8_t a ) const;
 };
 
 #endif

@@ -68,7 +68,7 @@ void Win32Graphics::clear()
 
 void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
                                 int xSrc, int ySrc, int xDest, int yDest,
-                                int width, int height )
+                                int width, int height, bool blend )
 {
     // Get the bitmap size if necessary
     if( width == -1 )

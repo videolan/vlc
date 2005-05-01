@@ -160,7 +160,7 @@ void CtrlText::draw( OSGraphics &rImage, int xDest, int yDest )
         if( width > 0 && height > 0 )
         {
             rImage.drawBitmap( *m_pCurrImg, -m_xPos, 0, xDest, yDest,
-                            width, height );
+                            width, height, true );
         }
     }
 }

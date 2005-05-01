@@ -113,7 +113,7 @@ void Tooltip::makeImage( const UString &rText )
     m_pImage = OSFactory::instance( getIntf() )->createOSGraphics( w, h );
     m_pImage->fillRect( 0, 0, w, h, 0xffffd0 );
     m_pImage->drawRect( 0, 0, w, h, 0x000000 );
-    m_pImage->drawBitmap( *pBmpTip, 0, 0, 5, 5 );
+    m_pImage->drawBitmap( *pBmpTip, 0, 0, 5, 5, -1, -1, true );
 
     delete pBmpTip;
 }

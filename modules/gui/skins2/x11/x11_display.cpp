@@ -31,6 +31,24 @@
 #include "x11_display.hpp"
 #include "../src/logger.hpp"
 
+// Macro to compute a pixel value
+#define PUT_PIXEL(value, r, g, b, type) \
+    value = \
+        ( ((type)r >> m_redRightShift) << m_redLeftShift ) | \
+        ( ((type)g >> m_greenRightShift) << m_greenLeftShift ) | \
+        ( ((type)b >> m_blueRightShift) << m_blueLeftShift );
+
+// Macro to blend a pixel with another color
+#define BLEND_PIXEL(value, r, g, b, a, type) \
+    uint16_t temp; \
+    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift)); \
+    uint8_t red = r + ( temp * (255 - a) ) / 255; \
+    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift)); \
+    uint8_t green = g + ( temp * (255 - a) ) / 255; \
+    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift)); \
+    uint8_t blue = b + ( temp * (255 - a) ) / 255; \
+    PUT_PIXEL(value, red, green, blue, type)
+
 
 X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_mainWindow( 0 ), m_gc( NULL ), m_colormap( 0 )
@@ -52,6 +70,7 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     int screen = DefaultScreen( m_pDisplay );
     int depth = DefaultDepth( m_pDisplay, screen );
     int order = ImageByteOrder( m_pDisplay );
+    Window root = DefaultRootWindow( m_pDisplay );
 
     // Template for looking up the XVisualInfo
     XVisualInfo xVInfoTemplate;
@@ -84,8 +103,7 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
             getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
 
             // Create a color map
-            m_colormap = XCreateColormap( m_pDisplay,
-                    DefaultRootWindow( m_pDisplay ),
+            m_colormap = XCreateColormap( m_pDisplay, root,
                     DefaultVisual( m_pDisplay, screen ), AllocAll );
 
             // Create the palette
@@ -97,12 +115,16 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
                 pColors[i].pixel = 254-i;
                 pColors[i].pad   = 0;
                 pColors[i].flags = DoRed | DoGreen | DoBlue;
-                pColors[i].red   = (i >> m_redLeftShift) << (m_redRightShift + 8);
-                pColors[i].green = (i >> m_greenLeftShift) << (m_greenRightShift + 8);
-                pColors[i].blue  = (i >> m_blueLeftShift) << (m_blueRightShift + 8);
+                pColors[i].red   =
+                    (i >> m_redLeftShift) << (m_redRightShift + 8);
+                pColors[i].green =
+                    (i >> m_greenLeftShift) << (m_greenRightShift + 8);
+                pColors[i].blue  =
+                    (i >> m_blueLeftShift) << (m_blueRightShift + 8);
             }
             XStoreColors( m_pDisplay, m_colormap, pColors, 255 );
-            makePixelImpl = &X11Display::makePixel8;
+            blendPixelImpl = &X11Display::blendPixel8;
+            putPixelImpl = &X11Display::putPixel8;
             m_pixelSize = 1;
             break;
 
@@ -130,21 +152,17 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
                        m_greenRightShift );
             getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
 
-            if( depth == 8 )
-            {
-                makePixelImpl = &X11Display::makePixel8;
-                m_pixelSize = 1;
-            }
-
             if( depth == 15 || depth == 16 )
             {
                 if( order == MSBFirst )
                 {
-                    makePixelImpl = &X11Display::makePixel16MSB;
+                    blendPixelImpl = &X11Display::blendPixel16MSB;
+                    putPixelImpl = &X11Display::putPixel16MSB;
                 }
                 else
                 {
-                    makePixelImpl = &X11Display::makePixel16LSB;
+                    blendPixelImpl = &X11Display::blendPixel16LSB;
+                    putPixelImpl = &X11Display::putPixel16LSB;
                 }
                 m_pixelSize = 2;
             }
@@ -152,11 +170,13 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
             {
                 if( order == MSBFirst )
                 {
-                    makePixelImpl = &X11Display::makePixel32MSB;
+                    blendPixelImpl = &X11Display::blendPixel32MSB;
+                    putPixelImpl = &X11Display::putPixel32MSB;
                 }
                 else
                 {
-                    makePixelImpl = &X11Display::makePixel32LSB;
+                    blendPixelImpl = &X11Display::blendPixel32LSB;
+                    putPixelImpl = &X11Display::putPixel32LSB;
                 }
                 m_pixelSize = 4;
             }
@@ -179,14 +199,12 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     {
         XGCValues xgcvalues;
         xgcvalues.graphics_exposures = False;
-        m_gc = XCreateGC( m_pDisplay, DefaultRootWindow( m_pDisplay ),
-                          GCGraphicsExposures, &xgcvalues );
+        m_gc = XCreateGC( m_pDisplay, root, GCGraphicsExposures, &xgcvalues );
 
         // Create a parent window to have a single task in the task bar
         XSetWindowAttributes attr;
-        m_mainWindow = XCreateWindow( m_pDisplay, DefaultRootWindow( m_pDisplay),
-                                      0, 0, 1, 1, 0, 0, InputOutput,
-                                      CopyFromParent, 0, &attr );
+        m_mainWindow = XCreateWindow( m_pDisplay, root, 0, 0, 1, 1, 0, 0,
+                                      InputOutput, CopyFromParent, 0, &attr );
 
         // Changing decorations
         struct {
@@ -264,150 +282,138 @@ void X11Display::getShifts( uint32_t mask, int &rLeftShift,
 }
 
 
-void X11Display::makePixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
-                             uint8_t a ) const
+void X11Display::blendPixel8( uint8_t *pPixel, uint8_t r, uint8_t g,
+                              uint8_t b, uint8_t a ) const
 {
-    // Get the current pixel value
     uint8_t value = 255 - *pPixel;
 
-    // Compute the new color values
-    uint16_t temp;
-    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift));
-    uint8_t red = ( temp * (255 - a) + r * a ) / 255;
-    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift));
-    uint8_t green = ( temp * (255 - a) + g * a ) / 255;
-    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift));
-    uint8_t blue = ( temp * (255 - a) + b * a ) / 255;
-
-    // Set the new pixel value
-    value =
-        ( ((uint8_t)red >> m_redRightShift) << m_redLeftShift ) |
-        ( ((uint8_t)green >> m_greenRightShift) << m_greenLeftShift ) |
-        ( ((uint8_t)blue >> m_blueRightShift) << m_blueLeftShift );
+    BLEND_PIXEL(value, r, g, b, a, uint8_t)
 
     *pPixel = 255 - value;
 }
 
 
-void X11Display::makePixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
-                                 uint8_t b, uint8_t a ) const
+void X11Display::blendPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                  uint8_t b, uint8_t a ) const
 {
-    // Get the current pixel value
     uint16_t value = pPixel[1] | pPixel[0] << 8;
 
-    // Compute the new color values
-    uint16_t temp;
-    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift));
-    uint8_t red = ( temp * (255 - a) + r * a ) / 255;
-    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift));
-    uint8_t green = ( temp * (255 - a) + g * a ) / 255;
-    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift));
-    uint8_t blue = ( temp * (255 - a) + b * a ) / 255;
+    BLEND_PIXEL(value, r, g, b, a, uint16_t)
 
-    // Set the new pixel value
-    value =
-        ( ((uint16_t)red >> m_redRightShift) << m_redLeftShift ) |
-        ( ((uint16_t)green >> m_greenRightShift) << m_greenLeftShift ) |
-        ( ((uint16_t)blue >> m_blueRightShift) << m_blueLeftShift );
-
-    pPixel[1] = value;
-    value >>= 8;
+    pPixel[1] = value; value >>= 8;
     pPixel[0] = value;
 }
 
 
-void X11Display::makePixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
-                                 uint8_t b, uint8_t a ) const
+void X11Display::blendPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                  uint8_t b, uint8_t a ) const
 {
-    // Get the current pixel value
     uint16_t value = pPixel[0] | pPixel[1] << 8;
 
-    // Compute the new color values
-    uint16_t temp;
-    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift));
-    uint8_t red = ( temp * (255 - a) + r * a ) / 255;
-    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift));
-    uint8_t green = ( temp * (255 - a) + g * a ) / 255;
-    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift));
-    uint8_t blue = ( temp * (255 - a) + b * a ) / 255;
+    BLEND_PIXEL(value, r, g, b, a, uint16_t)
 
-    // Set the new pixel value
-    value =
-        ( ((uint16_t)red >> m_redRightShift) << m_redLeftShift ) |
-        ( ((uint16_t)green >> m_greenRightShift) << m_greenLeftShift ) |
-        ( ((uint16_t)blue >> m_blueRightShift) << m_blueLeftShift );
-
-    pPixel[0] = value;
-    value >>= 8;
+    pPixel[0] = value; value >>= 8;
     pPixel[1] = value;
 }
 
 
-void X11Display::makePixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
-                                 uint8_t b, uint8_t a ) const
+void X11Display::blendPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                  uint8_t b, uint8_t a ) const
 {
-    // Get the current pixel value
     uint32_t value = pPixel[3] | pPixel[2] << 8 | pPixel[1] << 16 |
                           pPixel[0] << 24;
 
-    // Compute the new color values
-    uint16_t temp;
-    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift));
-    uint8_t red = ( temp * (255 - a) + r * a ) / 255;
-    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift));
-    uint8_t green = ( temp * (255 - a) + g * a ) / 255;
-    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift));
-    uint8_t blue = ( temp * (255 - a) + b * a ) / 255;
+    BLEND_PIXEL(value, r, g, b, a, uint32_t)
 
-    // Set the new pixel value
-    value =
-        ( ((uint32_t)red >> m_redRightShift) << m_redLeftShift ) |
-        ( ((uint32_t)green >> m_greenRightShift) << m_greenLeftShift ) |
-        ( ((uint32_t)blue >> m_blueRightShift) << m_blueLeftShift );
-
-    pPixel[3] = value;
-    value >>= 8;
-    pPixel[2] = value;
-    value >>= 8;
-    pPixel[1] = value;
-    value >>= 8;
+    pPixel[3] = value; value >>= 8;
+    pPixel[2] = value; value >>= 8;
+    pPixel[1] = value; value >>= 8;
     pPixel[0] = value;
 }
 
 
-void X11Display::makePixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
-                                 uint8_t b, uint8_t a ) const
+void X11Display::blendPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                  uint8_t b, uint8_t a ) const
 {
-    // Get the current pixel value
     uint32_t value = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16 |
                           pPixel[3] << 24;
 
-    // Compute the new color values
-    uint16_t temp;
-    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift));
-    uint8_t red = ( temp * (255 - a) + r * a ) / 255;
-    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift));
-    uint8_t green = ( temp * (255 - a) + g * a ) / 255;
-    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift));
-    uint8_t blue = ( temp * (255 - a) + b * a ) / 255;
+    BLEND_PIXEL(value, r, g, b, a, uint32_t)
 
-    // Set the new pixel value
-    value =
-        ( ((uint32_t)red >> m_redRightShift) << m_redLeftShift ) |
-        ( ((uint32_t)green >> m_greenRightShift) << m_greenLeftShift ) |
-        ( ((uint32_t)blue >> m_blueRightShift) << m_blueLeftShift );
-
-    pPixel[0] = value;
-    value >>= 8;
-    pPixel[1] = value;
-    value >>= 8;
-    pPixel[2] = value;
-    value >>= 8;
+    pPixel[0] = value; value >>= 8;
+    pPixel[1] = value; value >>= 8;
+    pPixel[2] = value; value >>= 8;
     pPixel[3] = value;
 }
 
 
-unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const
+void X11Display::putPixel8( uint8_t *pPixel, uint8_t r, uint8_t g,
+                            uint8_t b, uint8_t a ) const
+{
+    uint8_t value = 255 - *pPixel;
+
+    PUT_PIXEL(value, r, g, b, uint8_t)
+
+    *pPixel = 255 - value;
+}
+
+
+void X11Display::putPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                uint8_t b, uint8_t a ) const
+{
+    uint16_t value = pPixel[1] | pPixel[0] << 8;
+
+    PUT_PIXEL(value, r, g, b, uint16_t)
+
+    pPixel[1] = value; value >>= 8;
+    pPixel[0] = value;
+}
+
+
+void X11Display::putPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                uint8_t b, uint8_t a ) const
+{
+    uint16_t value = pPixel[0] | pPixel[1] << 8;
+
+    PUT_PIXEL(value, r, g, b, uint16_t)
+
+    pPixel[0] = value; value >>= 8;
+    pPixel[1] = value;
+}
+
+
+void X11Display::putPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                uint8_t b, uint8_t a ) const
+{
+    uint32_t value = pPixel[3] | pPixel[2] << 8 | pPixel[1] << 16 |
+                          pPixel[0] << 24;
+
+    PUT_PIXEL(value, r, g, b, uint32_t)
+
+    pPixel[3] = value; value >>= 8;
+    pPixel[2] = value; value >>= 8;
+    pPixel[1] = value; value >>= 8;
+    pPixel[0] = value;
+}
+
+
+void X11Display::putPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
+                                uint8_t b, uint8_t a ) const
+{
+    uint32_t value = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16 |
+                          pPixel[3] << 24;
+
+    PUT_PIXEL(value, r, g, b, uint32_t)
+
+    pPixel[0] = value; value >>= 8;
+    pPixel[1] = value; value >>= 8;
+    pPixel[2] = value; value >>= 8;
+    pPixel[3] = value;
+}
+
+
+unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b )
+    const
 {
     unsigned long value;
     value = ( ((uint32_t)r >> m_redRightShift) << m_redLeftShift ) |
