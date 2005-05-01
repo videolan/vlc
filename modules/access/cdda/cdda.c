@@ -37,9 +37,11 @@
  * Option help text
  *****************************************************************************/
 
+#if LIBCDIO_VERSION_NUM >= 72
 static char *psz_paranoia_list[] = { "none", "overlap", "full" };
 static char *psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
 					  N_("full") };
+#endif
 
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \

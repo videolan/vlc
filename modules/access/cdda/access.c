@@ -399,12 +399,12 @@ CDDARead( access_t * p_access, uint8_t *p_buffer, int i_len )
     return i_len;
 }
 
-#if LIBCDIO_VERSION_NUM >= 73
 /*! Pause CD playing via audio control */
 static bool
 cdda_audio_pause(CdIo_t *p_cdio)
 {
   bool b_ok = true;
+#if LIBCDIO_VERSION_NUM >= 73
   cdio_subchannel_t sub;
   if (DRIVER_OP_SUCCESS == cdio_audio_read_subchannel(p_cdio, &sub)) {
     if (sub.audio_status == CDIO_MMC_READ_SUB_ST_PLAY) {
@@ -412,9 +412,11 @@ cdda_audio_pause(CdIo_t *p_cdio)
     }
   } else
     b_ok = false;
+#endif
   return b_ok;
 }
 
+#if LIBCDIO_VERSION_NUM >= 73
 /*! play CD using audio controls */
 static driver_return_code_t
 cdda_audio_play(CdIo_t *p_cdio, lsn_t start_lsn, lsn_t end_lsn)
