@@ -166,6 +166,8 @@ uninit_log_handler (cdio_log_level_t level, const char message[])
     /* gl_default_cdio_log_handler (level, message); */
 }
 
+/* Only used in audio control mode. Gets the current LSN from the 
+   CD-ROM drive. */
 static int64_t
 get_current_pos ( access_t *p_access ) 
 {
@@ -476,7 +478,7 @@ CDDASeek( access_t * p_access, int64_t i_pos )
 	   i_track--, p_access->info.i_title-- ) ;
 
       p_cdda->i_track = i_track;
-      p_access->info.i_update |= INPUT_UPDATE_TITLE;
+      p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_META ;
       psz_title  = CDDAFormatTitle( p_access, p_cdda->i_track );
       input_Control( p_cdda->p_input, INPUT_SET_NAME, 
 		     psz_title );
@@ -876,11 +878,6 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             break;
         }
 
-        /* */
-        case ACCESS_SET_PAUSE_STATE:
-	    dbg_print( INPUT_DBG_META, "Set pause state");
-            break;
-
         case ACCESS_GET_TITLE_INFO:
         {
 	    input_title_t ***ppp_title = 
@@ -963,6 +960,12 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             }
             break;
         }
+
+        case ACCESS_SET_PAUSE_STATE:
+	  dbg_print( INPUT_DBG_META, "Pause");
+	  if (p_cdda->b_audio_ctl)
+	    cdda_audio_pause(p_cdda->p_cdio);
+	  break;
 
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
