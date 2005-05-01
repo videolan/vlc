@@ -501,6 +501,8 @@ CDDASeek( access_t * p_access, int64_t i_pos )
 
 /*
   Set up internal state so that we play a given track.
+  If we are using audio-ctl mode we also activate CD-ROM
+  to play.
  */
 static bool
 cdda_play_track( access_t *p_access, track_t i_track ) 
@@ -726,6 +728,8 @@ CDDAOpen( vlc_object_t *p_this )
     i_rc = CDDAInit( p_access, p_cdda );
     if ( VLC_SUCCESS != i_rc ) goto error;
 
+    cdda_play_track( p_access, i_track );
+
     CDDAFixupPlaylist( p_access, p_cdda, b_single_track );
 
 #if LIBCDIO_VERSION_NUM >= 72
@@ -788,8 +792,6 @@ CDDAOpen( vlc_object_t *p_this )
              2*16/8 /*BytesPerSample*/ * CDDA_FREQUENCY_SAMPLE );
     p_cdda->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
     p_cdda->waveheader.DataLength  = 0;    /* we just don't know */
-
-    cdda_play_track( p_access, i_track );
 
     /* PTS delay */
     var_Create( p_access, MODULE_STRING "-caching",
@@ -985,7 +987,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 	    dbg_print( INPUT_DBG_EVENT, "set title %d", i );
             if( i != p_access->info.i_title )
             {
-	        const track_t i_track = p_cdda->i_track + i;
+	        const track_t i_track = p_cdda->i_first_track + i;
                 /* Update info */
                 p_access->info.i_title = i;
 		if ( p_cdda->b_nav_mode) 

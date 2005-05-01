@@ -200,6 +200,8 @@ VCDReadBlock( access_t * p_access )
            */
 #if 1
           msleep( MILLISECONDS_PER_SEC * *p_buf );
+	  VCDSetOrigin(p_access, p_vcdplayer->origin_lsn, p_vcdplayer->i_track,
+		       &(p_vcdplayer->play_item));
           // p_vcd->in_still = VLC_FALSE;
           dbg_print(INPUT_DBG_STILL, "still wait time done");
 #else

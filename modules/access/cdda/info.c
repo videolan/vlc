@@ -230,6 +230,9 @@ CDDAMetaInfoInit( access_t *p_access )
     
     if ( ! p_cdda ) return;
 
+    dbg_print( (INPUT_DBG_CALL), "p_cdda->i_tracks %d", 
+	       p_cdda->i_tracks );
+
     p_cdda->psz_mcn = cdio_get_mcn(p_cdda->p_cdio);
     p_cdda->p_meta = vlc_meta_New();
 
@@ -268,6 +271,8 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
     char *psz_meta_artist = NULL;
     
     if ( ! p_cdda ) return;
+
+    dbg_print( (INPUT_DBG_CALL), "i_track %d", i_track );
 
 #ifdef HAVE_LIBCDDB
 
