@@ -332,9 +332,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
             }
             else
             {
-                i_new_aspect = i_width * VOUT_ASPECT_FACTOR
-                                       * atof( val.psz_string )
-                                       / i_height;
+                i_new_aspect = VOUT_ASPECT_FACTOR
+                                       * atof( val.psz_string );
             }
 
             free( val.psz_string );
