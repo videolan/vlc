@@ -169,7 +169,7 @@ uninit_log_handler (cdio_log_level_t level, const char message[])
 /* Only used in audio control mode. Gets the current LSN from the 
    CD-ROM drive. */
 static int64_t
-get_current_pos ( access_t *p_access ) 
+get_audio_position ( access_t *p_access ) 
 {
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
     lsn_t i_offset;
@@ -180,21 +180,21 @@ get_current_pos ( access_t *p_access )
 	cdio_subchannel_t sub;
 	CdIo_t *p_cdio = p_cdda->p_cdio;
 	if (DRIVER_OP_SUCCESS == cdio_audio_read_subchannel(p_cdio, &sub)) {
-	  if (sub.audio_status == CDIO_MMC_READ_SUB_ST_PAUSED ||
-	      sub.audio_status == CDIO_MMC_READ_SUB_ST_PLAY) 
+	  if (sub.audio_status != CDIO_MMC_READ_SUB_ST_PAUSED &&
+	      sub.audio_status != CDIO_MMC_READ_SUB_ST_PLAY) 
 	    return CDIO_INVALID_LSN;
 	  
 	  if ( ! p_cdda->b_nav_mode ) {
-	    char *psz = cdio_msf_to_str(&sub.abs_addr);
+	    // char *psz = cdio_msf_to_str(&sub.abs_addr);
 	    // fprintf(stderr, "+++disk mode abs msf %s", psz);
-	    free(psz);
-	    i_offset = cdio_msf_to_lsn((&sub.abs_addr));
+	    // free(psz);
+	    i_offset = cdio_msf_to_lba((&sub.abs_addr));
 	    // fprintf(stderr, " frame offset %d\n", i_offset);
 	  } else {
-	    char *psz = cdio_msf_to_str(&sub.rel_addr);
+	    // char *psz = cdio_msf_to_str(&sub.rel_addr);
 	    // fprintf(stderr, "+++track abs msf %s", psz);
-	    free(psz);
-	    i_offset = cdio_msf_to_lsn((&sub.rel_addr));
+	    // free(psz);
+	    i_offset = cdio_msf_to_lba((&sub.rel_addr));
 	    // fprintf(stderr, " frame offset %d\n", i_offset);
 	  }
 	} else {
@@ -242,7 +242,14 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     while( p_cdda->i_lsn > cdio_get_track_last_lsn(p_cdda->p_cdio, 
 						   p_cdda->i_track) )
     {
-        if( p_cdda->i_track >= p_cdda->i_first_track + p_cdda->i_titles - 1 )
+        bool go_on;
+      
+	if( p_cdda->b_nav_mode )
+	  go_on = p_cdda->i_lsn > p_cdda->last_disc_frame;
+	else
+	  go_on = p_cdda->i_track >= p_cdda->i_first_track+p_cdda->i_titles-1 ;
+
+        if( go_on )
         {
 	    dbg_print( (INPUT_DBG_LSN), "EOF");
             p_access->info.b_eof = VLC_TRUE;
@@ -356,8 +363,9 @@ CDDARead( access_t * p_access, uint8_t *p_buffer, int i_len )
     if( p_access->info.b_eof ) return 0;
     
     {
-      lsn_t i_lsn = get_current_pos(p_access);
+      lsn_t i_lsn = get_audio_position(p_access);
       if (CDIO_INVALID_LSN == i_lsn) {
+	dbg_print((INPUT_DBG_LSN), "invalid lsn");
 	memset( p_buffer, 0, i_len );
 	return i_len;
       }
@@ -453,16 +461,14 @@ CDDASeek( access_t * p_access, int64_t i_pos )
 #if LIBCDIO_VERSION_NUM >= 73
     if ( p_cdda->b_audio_ctl ) {
       track_t i_track = cdio_get_track(p_cdda->p_cdio, p_cdda->i_lsn);
-      lsn_t last_lsn;
+      lsn_t i_last_lsn;
 
       if ( p_cdda->b_nav_mode )
-	last_lsn = p_cdda->i_lsn + cdio_get_track_sec_count(p_cdda->p_cdio, 
-							     i_track);
+	i_last_lsn = p_cdda->last_disc_frame;
       else 
-	last_lsn = p_cdda->i_lsn + 
-	  cdio_get_track_lsn(p_cdda->p_cdio, CDIO_CDROM_LEADOUT_TRACK);
+	i_last_lsn = cdio_get_track_last_lsn(p_cdda->p_cdio, i_track);
 
-      cdda_audio_play(p_cdda->p_cdio, p_cdda->i_lsn, last_lsn);
+      cdda_audio_play(p_cdda->p_cdio, p_cdda->i_lsn, i_last_lsn);
     }
 #endif 
 
@@ -491,6 +497,46 @@ CDDASeek( access_t * p_access, int64_t i_pos )
     p_access->info.i_pos = i_pos;
 
     return VLC_SUCCESS;
+}
+
+/*
+  Set up internal state so that we play a given track.
+ */
+static bool
+cdda_play_track( access_t *p_access, track_t i_track ) 
+{
+    cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
+
+    dbg_print((INPUT_DBG_CALL), "called track: %d\n", i_track);
+
+    if (i_track > p_cdda->i_tracks) 
+      {
+	msg_Err( p_access, "CD has %d tracks, and you requested track %d", 
+		 p_cdda->i_tracks, i_track );
+	return false;
+      }
+
+    p_cdda->i_track = i_track;
+
+    /* set up the frame boundaries for this particular track */
+    p_cdda->first_frame = p_cdda->i_lsn = 
+    cdio_get_track_lsn(p_cdda->p_cdio, i_track);
+
+    p_cdda->last_frame  = cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) - 1;
+
+#if LIBCDIO_VERSION_NUM >= 73
+    if (p_cdda->b_audio_ctl) 
+      {
+	lsn_t i_last_lsn;
+	if ( p_cdda->b_nav_mode )
+	  i_last_lsn = p_cdda->last_disc_frame;
+	else 
+	  i_last_lsn = cdio_get_track_last_lsn(p_cdda->p_cdio, i_track);
+	cdda_audio_play(p_cdda->p_cdio, p_cdda->i_lsn, i_last_lsn);
+      }
+#endif
+  
+  return true;
 }
 
 /****************************************************************************
@@ -610,15 +656,16 @@ CDDAOpen( vlc_object_t *p_this )
     p_cdda->b_header   = VLC_FALSE;
     p_cdda->p_cdio     = p_cdio;
     p_cdda->i_tracks   = 0;
-    p_cdda->i_lsn      = 0;
     p_cdda->i_titles   = 0;
-    p_cdda->i_track    = i_track;
     p_cdda->i_debug    = config_GetInt(p_this, MODULE_STRING 
 				       "-debug");
     p_cdda->b_nav_mode = config_GetInt(p_this, MODULE_STRING 
 				       "-navigation-mode" );
     p_cdda->i_blocks_per_read
       = config_GetInt(p_this, MODULE_STRING "-blocks-per-read");
+
+    p_cdda->last_disc_frame = 
+      cdio_get_track_lsn(p_cdio, CDIO_CDROM_LEADOUT_TRACK);
 
     p_cdda->p_input  = vlc_object_find( p_access, VLC_OBJECT_INPUT,
                                         FIND_PARENT );
@@ -658,7 +705,7 @@ CDDAOpen( vlc_object_t *p_this )
       lsn_t i_last_lsn;
       
       if (p_cdda->b_nav_mode)
-	  i_last_lsn = cdio_get_track_lsn(p_cdio, CDIO_CDROM_LEADOUT_TRACK);
+	  i_last_lsn = p_cdda->last_disc_frame;
       else 
 	  i_last_lsn = cdio_get_track_last_lsn(p_cdio, i_track);
       
@@ -741,6 +788,8 @@ CDDAOpen( vlc_object_t *p_this )
              2*16/8 /*BytesPerSample*/ * CDDA_FREQUENCY_SAMPLE );
     p_cdda->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
     p_cdda->waveheader.DataLength  = 0;    /* we just don't know */
+
+    cdda_play_track( p_access, i_track );
 
     /* PTS delay */
     var_Create( p_access, MODULE_STRING "-caching",
@@ -848,19 +897,19 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_CONTROL_PACE:
 	  {
             vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-	    dbg_print( INPUT_DBG_META, "can control pace");
             *pb_bool = p_cdda->b_audio_ctl ? VLC_FALSE : VLC_TRUE;
+	    dbg_print( INPUT_DBG_META, "can control pace? %d", *pb_bool);
             return VLC_SUCCESS;
 	  }
 	    
         case ACCESS_CAN_FASTSEEK:
-	    dbg_print( INPUT_DBG_META, "can fast seek");
+	    dbg_print( INPUT_DBG_META, "can fast seek?");
 	    goto common;
         case ACCESS_CAN_SEEK:
-	    dbg_print( INPUT_DBG_META, "can seek");
+	    dbg_print( INPUT_DBG_META, "can seek?");
 	    goto common;
         case ACCESS_CAN_PAUSE:
-	    dbg_print( INPUT_DBG_META, "can pause");
+	    dbg_print( INPUT_DBG_META, "can pause?");
     common:
         {
             vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
@@ -975,8 +1024,11 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 	  break;
 
         case ACCESS_SET_SEEKPOINT:
+	    dbg_print( INPUT_DBG_META, "set seekpoint");
+            return VLC_EGENERIC;
+
         case ACCESS_SET_PRIVATE_ID_STATE:
-	    dbg_print( INPUT_DBG_META, "set seekpoint/set private id state");
+	    dbg_print( INPUT_DBG_META, "set private id state");
             return VLC_EGENERIC;
 
         default:

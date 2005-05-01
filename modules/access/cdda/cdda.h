@@ -82,30 +82,33 @@ typedef enum {
  *****************************************************************************/
 typedef struct cdda_data_s
 {
-  CdIo_t         *p_cdio;                   /* libcdio CD device */
-  track_t        i_tracks;                 /* # of tracks */
-  track_t        i_first_track;            /* # of first track */
-  track_t        i_titles;                 /* # of titles in playlist */
+  CdIo_t         *p_cdio;             /* libcdio CD device */
+  track_t        i_tracks;            /* # of tracks */
+  track_t        i_first_track;       /* # of first track */
+  track_t        i_titles;            /* # of titles in playlist */
   
   /* Current position */
-  track_t        i_track;                  /* Current track */
-  lsn_t          i_lsn;                    /* Current Logical Sector Number */
+  track_t        i_track;             /* Current track */
+  lsn_t          i_lsn;               /* Current Logical Sector Number */
   
-  int            i_blocks_per_read;        /* # blocks to get in a read */
-  int            i_debug;                  /* Debugging mask */
+  lsn_t          first_frame;         /* LSN of first frame of this track   */
+  lsn_t          last_frame;          /* LSN of last frame of this track    */
+  lsn_t          last_disc_frame;     /* LSN of last frame on CD            */
+  int            i_blocks_per_read;   /* # blocks to get in a read */
+  int            i_debug;             /* Debugging mask */
 
   /* Information about CD */
   vlc_meta_t    *p_meta;
-  char *         psz_mcn;                  /* Media Catalog Number */
-  char *         psz_source;               /* CD drive or CD image filename */
+  char *         psz_mcn;             /* Media Catalog Number */
+  char *         psz_source;          /* CD drive or CD image filename */
   input_title_t *p_title[CDIO_CD_MAX_TRACKS]; /* This *is* 0 origin, not
 					         track number origin */
 
 #if LIBCDIO_VERSION_NUM >= 72
   /* Paranoia support */
-  paranoia_mode_t e_paranoia;              /* Use cd paranoia for reads? */
-  cdrom_drive_t *paranoia_cd;              /* Place to store drive
-					      handle given by paranoia. */
+  paranoia_mode_t e_paranoia;         /* Use cd paranoia for reads? */
+  cdrom_drive_t *paranoia_cd;         /* Place to store drive
+					 handle given by paranoia. */
   cdrom_paranoia_t *paranoia;
 
 #endif    
