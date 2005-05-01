@@ -740,6 +740,9 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>playlist.previous()</emphasis>: Go to the previous playlist item.
   </para></listitem>
   <listitem><para>
+    <emphasis>playlist.sort()</emphasis>: Sort the playlist alphabetically.
+  </para></listitem>
+  <listitem><para>
     <emphasis>playlist.setRandom(true)</emphasis>: Play the playlist items in random order.
   </para></listitem>
   <listitem><para>
