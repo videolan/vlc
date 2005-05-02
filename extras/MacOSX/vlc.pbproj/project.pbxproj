@@ -166,6 +166,8 @@
 				<string>aiff</string>
 				<string>aif</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>AIFF file</string>
 			<key>CFBundleTypeRole</key>
@@ -313,6 +315,8 @@
 				<string>iso</string>
 				<string>bin</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>bin.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>ISO file</string>
 			<key>CFBundleTypeRole</key>
