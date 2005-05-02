@@ -169,7 +169,7 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
 #endif
 
     // Array of glyph bitmaps and position
-    FT_BitmapGlyphRec **glyphs = new (FT_BitmapGlyphRec*)[len];
+    FT_BitmapGlyphRec **glyphs = new FT_BitmapGlyphRec*[len];
     int *pos = new int[len];
 
     // Does the font support kerning ?
