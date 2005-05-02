@@ -1118,6 +1118,10 @@ void Playlist::OnKeyDown( wxTreeEvent& event )
         /* We send a dummy event */
         OnDeleteSelection( event );
     }
+    else
+    {
+        event.Skip();
+    }
 }
 
 void Playlist::OnEnDis( wxCommandEvent& event )
