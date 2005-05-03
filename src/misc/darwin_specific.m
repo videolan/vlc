@@ -41,6 +41,7 @@ static int FindLanguage( const char * psz_lang )
     const char * ppsz_all[] =
     {
         "Bengali", "bn",
+        "Catalan", "ca",
         "Danish", "da",
         "German", "de",
         "Modern Greek", "el",
