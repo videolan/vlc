@@ -60,6 +60,7 @@ John Paul Lorenti <jpl31 at columbia.edu> - ALSA device selection patch
 Jonas Larsen <jonas at vrt.dk> - Danish translation
 Julien Blache <jb at technologeek.org> - disc ejection code
 kty0ne - WinAmp 5 skin for VLC
+Lorena Gomes - Catalan translation
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
@@ -101,5 +102,6 @@ Wade Majors <guru at startrek.com> - BeOS icon integration, debugging and fixes
 Watanabe Go <go at dsl.gr.jp> - fix for non-ASCII filenames
 Xavier Maillard <zedek at fxgsproject.org> - audio converters
 Xavier Marchesini <xav at alarue.net> - Win32 fixes
+Xènia Albà Cantero <xenia_alba at hotmail.com> - Catalan translation
 Yves Duret <yves at zarb.org> - RPM packages
 
