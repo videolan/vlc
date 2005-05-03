@@ -56,7 +56,7 @@ static const iso639_lang_t p_languages[] =
     { N_( "Breton" ),           "",            "br", "bre", "bre" },
     { N_( "Bulgarian" ),        "",            "bg", "bul", "bul" },
     { N_( "Burmese" ),          "",            "my", "mya", "bur" },
-    { N_( "Catalan" ),          "",            "ca", "cat", "cat" },
+    { N_( "Catalan" ),          "Catala",      "ca", "cat", "cat" },
     { N_( "Chamorro" ),         "",            "ch", "cha", "cha" },
     { N_( "Chechen" ),          "",            "ce", "che", "che" },
     { N_( "Chinese" ),          "",            "zh", "zho", "chi" },
