@@ -302,7 +302,7 @@ modules/codec/subsdec.c
 modules/codec/svcdsub.c
 modules/codec/tarkin.c
 modules/codec/theora.c
-modules/codec/toolame.c
+modules/codec/twolame.c
 modules/codec/vorbis.c
 modules/codec/x264.c
 modules/control/corba/corba.c
@@ -793,6 +793,7 @@ modules/stream_out/dummy.c
 modules/stream_out/duplicate.c
 modules/stream_out/es.c
 modules/stream_out/gather.c
+modules/stream_out/mosaic_bridge.c
 modules/stream_out/rtp.c
 modules/stream_out/standard.c
 modules/stream_out/switcher.c
@@ -858,8 +859,6 @@ modules/video_output/hd1000v.cpp
 modules/video_output/image.c
 modules/video_output/mga.c
 modules/video_output/opengl.c
-modules/video_output/picture.c
-modules/video_output/picture.h
 modules/video_output/qte/qte.cpp
 modules/video_output/qte/qte.h
 modules/video_output/sdl.c
