@@ -4257,6 +4257,7 @@ fi
 dnl Export automake variables
 if ${plugin_support}
 then
+  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
   for plugin in `echo ${PLUGINS}`
   do
     eval "${plugin}_p=yes"
