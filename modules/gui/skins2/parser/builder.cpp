@@ -389,7 +389,9 @@ void Builder::addImage( const BuilderData::Image &rData )
     Interpreter *pInterpreter = Interpreter::instance( getIntf() );
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
-    CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp,
+    CtrlImage::resize_t resizeMethod =
+        (rData.m_resize == "scale" ? CtrlImage::kScale : CtrlImage::kMosaic);
+    CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp, resizeMethod,
         UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control

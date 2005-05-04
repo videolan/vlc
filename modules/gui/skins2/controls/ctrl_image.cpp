@@ -32,8 +32,10 @@
 
 
 CtrlImage::CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
-                      const UString &rHelp, VarBool *pVisible ):
-    CtrlFlat( pIntf, rHelp, pVisible ), m_rBitmap( rBitmap )
+                      resize_t resizeMethod, const UString &rHelp,
+                      VarBool *pVisible ):
+    CtrlFlat( pIntf, rHelp, pVisible ), m_rBitmap( rBitmap ),
+    m_resizeMethod( resizeMethod )
 {
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
     // Create an initial unscaled image in the buffer
@@ -79,16 +81,42 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
     {
         int width = pPos->getWidth();
         int height = pPos->getHeight();
-        if( width != m_pImage->getWidth() || height != m_pImage->getHeight() )
+
+        if( m_resizeMethod == kScale )
         {
-            OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-            // Rescale the image with the actual size of the control
-            ScaledBitmap bmp( getIntf(), m_rBitmap, width, height );
-            SKINS_DELETE( m_pImage );
-            m_pImage = pOsFactory->createOSGraphics( width, height );
-            m_pImage->drawBitmap( bmp, 0, 0 );
+            // Use scaling method
+            if(  width != m_pImage->getWidth() ||
+                 height != m_pImage->getHeight() )
+            {
+                OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+                // Rescale the image with the actual size of the control
+                ScaledBitmap bmp( getIntf(), m_rBitmap, width, height );
+                SKINS_DELETE( m_pImage );
+                m_pImage = pOsFactory->createOSGraphics( width, height );
+                m_pImage->drawBitmap( bmp, 0, 0 );
+            }
+            rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
         }
-        rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
+        else
+        {
+            // Use mosaic method
+            while( width > 0 )
+            {
+                int curWidth = __MIN( width, m_pImage->getWidth() );
+                height = pPos->getHeight();
+                int curYDest = yDest;
+                while( height > 0 )
+                {
+                    int curHeight = __MIN( height, m_pImage->getHeight() );
+                    rImage.drawGraphics( *m_pImage, 0, 0, xDest, curYDest,
+                                         curWidth, curHeight );
+                    curYDest += curHeight;
+                    height -= m_pImage->getHeight();
+                }
+                xDest += curWidth;
+                width -= m_pImage->getWidth();
+            }
+        }
     }
 }
 
