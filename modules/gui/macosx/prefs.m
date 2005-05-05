@@ -496,7 +496,7 @@ fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
             {
                 if( !p_item )
                 {
-                    msg_Err( "null item found" );
+                    msg_Err( p_intf, "null item found" );
                     break;
                 }
                 switch(p_item->i_type)
@@ -637,7 +637,7 @@ fprintf( stderr, "\n" );
                 p_item++;
                 if( !p_item )
                 {
-                    msg_Err( "null item found" );
+                    msg_Err( p_intf, "null item found" );
                     break;
                 }
                 switch(p_item->i_type)
