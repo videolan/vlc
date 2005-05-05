@@ -25,6 +25,9 @@
 #define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 1)
 #define CONFIG_ITEM_KEY_BEFORE_10_3 (CONFIG_ITEM_KEY + 1)
 #define CONFIG_ITEM_KEY_AFTER_10_3 (CONFIG_ITEM_KEY + 2)
+#define MACOS_VERSION [[[NSDictionary dictionaryWithContentsOfFile: \
+            @"/System/Library/CoreServices/SystemVersion.plist"] \
+            objectForKey: @"ProductVersion"] floatValue]
 
 @interface VLCConfigControl : NSView
 {
