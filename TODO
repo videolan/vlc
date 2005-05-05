@@ -12,14 +12,6 @@ Description: World domination
 Status: Todo
 
 Task
-Difficulty: Guru
-Platform: any
-Urgency: Critical
-Description: Clock Synchro redesign
-We need to adapt the clock synchro to work better with BOTH files and streams.
-Status: Todo
-
-Task
 Difficulty: Easy
 Platform: any
 Urgency: Normal

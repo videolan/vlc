@@ -6,7 +6,6 @@ Feel free to work on these :)
 
 Regressions from previous versions
 ----------------------------------
-*** OS X preferences
 *** OS X resampler 
 *   CDDAX 
 
@@ -15,17 +14,10 @@ at the other edge of the playlist, when at the beginning of a node
 
 * Sort by Author unimplemented
 
-*** wxWindows : Play button state
-
 Other bugs
 ----------
-
-** DVDNav duration
 *  Insert/Backspace hotkeys
 *  SDL Vout
 ** ALSA 5.1, at least with some configuration
 ** hotkeys in wxWindows in embedded mode sometimes don't respond
-* HTTP interface : some weirds URLs (?control=stop&control=seek&control=seek&seek_value=&control=seek), state sometimes doesn't reflext the current one
 ** OSX LPCM
-** HAL service discovery sees data DVDs as Video DVDs and adds them to the playlist
-
