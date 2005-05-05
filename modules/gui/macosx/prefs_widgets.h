@@ -21,20 +21,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 1)
+#define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 1)
+#define CONFIG_ITEM_KEY_BEFORE_10_3 (CONFIG_ITEM_KEY + 1)
+#define CONFIG_ITEM_KEY_AFTER_10_3 (CONFIG_ITEM_KEY + 2)
 
 @interface VLCConfigControl : NSView
 {
-    vlc_object_t    *p_this;
     module_config_t *p_item;
     char            *psz_name;
     NSTextField     *o_label;
     int             i_type;
     vlc_bool_t      b_advanced;
-    NSView          *contentView;
 }
 
-+ (VLCConfigControl *)newControl: (module_config_t *)p_item withView: (NSView *)o_parent_view withObject: (vlc_object_t *)p_this offset:(NSPoint) offset;
-- (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item withObject: (vlc_object_t *)_p_this;
++ (VLCConfigControl *)newControl: (module_config_t *)_p_item withView: (NSView *)o_parent_view yOffset:(int) i_yPos lastItem: (int) i_lastItem;
+- (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item;
 - (NSString *)getName;
 - (int)getType;
 - (BOOL)isAdvanced;
@@ -42,29 +44,22 @@
 - (int)intValue;
 - (float)floatValue;
 - (char *)stringValue;
+- (void)applyChanges;
+static NSMenu   *o_keys_menu = nil;
+
++ (int)calcVerticalMargin: (int)i_curItem lastItem:(int)i_lastItem;
 
 @end
 
-@interface KeyConfigControl : VLCConfigControl
-{
-    NSMatrix        *o_matrix;
-    NSComboBox      *o_combo;
-}
-
-@end
-#if 0
-
-@interface ModuleConfigControl : VLCConfigControl
-{
-    NSPopUpButton   *o_popup;
-}
-
-@end
-#endif
 @interface StringConfigControl : VLCConfigControl
 {
     NSTextField     *o_textfield;
 }
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
 
 @end
 
@@ -73,7 +68,13 @@
     NSComboBox      *o_combo;
 }
 
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+
 @end
+
 @interface FileConfigControl : VLCConfigControl
 {
     NSTextField     *o_textfield;
@@ -81,8 +82,25 @@
     BOOL            b_directory;
 }
 
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+
 - (IBAction)openFileDialog: (id)sender;
 - (void)pathChosenInPanel:(NSOpenPanel *)o_sheet withReturn:(int)i_return_code contextInfo:(void  *)o_context_info;
+
+@end
+
+@interface ModuleConfigControl : VLCConfigControl
+{
+    NSPopUpButton   *o_popup;
+}
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
 
 @end
 
@@ -92,6 +110,11 @@
     NSStepper       *o_stepper;
 }
 
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
 - (IBAction)stepperChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -101,6 +124,11 @@
 {
     NSComboBox      *o_combo;
 }
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
 
 @end
 
@@ -112,16 +140,41 @@
     NSTextField     *o_textfield_max;
 }
 
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
 - (IBAction)sliderChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
 @end
-#if 0
+
+@interface BoolConfigControl : VLCConfigControl
+{
+    NSButton        *o_checkbox;
+}
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+
+@end
 
 @interface FloatConfigControl : VLCConfigControl
 {
     NSTextField     *o_textfield;
+    NSStepper       *o_stepper;
 }
+
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+- (IBAction)stepperChanged:(id)sender;
+- (void)textfieldChanged:(NSNotification *)o_notification;
 
 @end
 
@@ -133,16 +186,60 @@
     NSTextField     *o_textfield_max;
 }
 
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
 - (IBAction)sliderChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
 @end
 
-
-@interface BoolConfigControl : VLCConfigControl
+@interface KeyConfigControlBefore103 : VLCConfigControl
 {
-    NSButton        *o_checkbox;
+    NSButton        *o_cmd_checkbox;
+    NSButton        *o_ctrl_checkbox;
+    NSButton        *o_alt_checkbox;
+    NSButton        *o_shift_checkbox;
+    NSPopUpButton   *o_popup;
 }
 
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+
 @end
-#endif
+
+@interface KeyConfigControlAfter103 : VLCConfigControl
+{
+    NSPopUpButton   *o_popup;
+}
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+
+@end
+
+@interface ModuleListConfigControl : VLCConfigControl
+{
+    NSTextField     *o_textfield;
+    NSScrollView    *o_scrollview;
+    NSMutableArray  *o_modulearray;
+}
+
+- (id) initWithItem: (module_config_t *)_p_item
+           withView: (NSView *)o_parent_view
+           withVerticalOffset: (int)i_yPos
+           withLastItem: (int)i_lastItem;
+
+@end
+
+//#undef CONFIG_ITEM_LIST_STRING
+//#undef CONFIG_ITEM_RANGED_INTEGER
+//#undef CONFIG_ITEM_KEY_BEFORE_10_3
+//#undef CONFIG_ITEM_KEY_AFTER_10_3
+
