@@ -685,9 +685,12 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ffmpeg
 # ***************************************************************************
 
+# Note: at present, we check out the tree from 2005-04-30 because of 
+# compilation issues. We will use the latest version again, when our
+# ffmpeg-module is fixed properly -- FK
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
-	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
+	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co -D 2005-04-30 ffmpeg
 	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
