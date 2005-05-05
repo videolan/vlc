@@ -1902,6 +1902,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "inputdel (input_name)|all" );
         MessageAddChild( "inputdeln input_number" );
         MessageAddChild( "output (output_name)" );
+        MessageAddChild( "option (option_name)[=value]" );
         MessageAddChild( "enabled|disabled" );
         MessageAddChild( "loop|unloop (broadcast only)" );
         MessageAddChild( "mux (mux_name)" );
