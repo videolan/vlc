@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2005 VideoLAN
+* Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -543,13 +543,103 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [self playlistUpdated];
 }
 
-- (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
+- (playlist_item_t *)createItem:(NSDictionary *)o_one_item
 {
-    int i_item;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
 
+    if( p_playlist == NULL )
+    {
+        return NULL;
+    }
+    playlist_item_t *p_item;
+    int i;
+    BOOL b_rem = FALSE, b_dir = FALSE;
+    NSString *o_uri, *o_name;
+    NSArray *o_options;
+    NSURL *o_true_file;
+
+    /* Get the item */
+    o_uri = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
+    o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
+    o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
+
+    /* Find the name for a disc entry ( i know, can you believe the trouble?) */
+    if( ( !o_name || [o_name isEqualToString:@""] ) && [o_uri rangeOfString: @"/dev/"].location != NSNotFound )
+    {
+        int i_count, i_index;
+        struct statfs *mounts = NULL;
+
+        i_count = getmntinfo (&mounts, MNT_NOWAIT);
+        /* getmntinfo returns a pointer to static data. Do not free. */
+        for( i_index = 0 ; i_index < i_count; i_index++ )
+        {
+            NSMutableString *o_temp, *o_temp2;
+            o_temp = [NSMutableString stringWithString: o_uri];
+            o_temp2 = [NSMutableString stringWithCString: mounts[i_index].f_mntfromname];
+            [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+            [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
+            [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
+
+            if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
+            {
+                o_name = [[NSFileManager defaultManager] displayNameAtPath: [NSString stringWithCString:mounts[i_index].f_mntonname]];
+            }
+        }
+    }
+    /* If no name, then make a guess */
+    if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_uri];
+
+    if( [[NSFileManager defaultManager] fileExistsAtPath:o_uri isDirectory:&b_dir] && b_dir &&
+        [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_uri isRemovable: &b_rem
+                isWritable:NULL isUnmountable:NULL description:NULL type:NULL] && b_rem   )
+    {
+        /* All of this is to make sure CD's play when you D&D them on VLC */
+        /* Converts mountpoint to a /dev file */
+        struct statfs *buf;
+        char *psz_dev;
+        NSMutableString *o_temp;
+
+        buf = (struct statfs *) malloc (sizeof(struct statfs));
+        statfs( [o_uri fileSystemRepresentation], buf );
+        psz_dev = strdup(buf->f_mntfromname);
+        o_temp = [NSMutableString stringWithCString: psz_dev ];
+        [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+        o_uri = o_temp;
+    }
+
+    p_item = playlist_ItemNew( p_intf, [o_uri fileSystemRepresentation], [o_name UTF8String] );
+    if( !p_item )
+       return NULL;
+
+    if( o_options )
+    {
+        for( i = 0; i < (int)[o_options count]; i++ )
+        {
+            playlist_ItemAddOption( p_item, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
+        }
+    }
+
+    /* Recent documents menu */
+    o_true_file = [NSURL fileURLWithPath: o_uri];
+    if( o_true_file != nil )
+    {
+        [[NSDocumentController sharedDocumentController]
+            noteNewRecentDocumentURL: o_true_file];
+    }
+
+    vlc_object_release( p_playlist );
+    return p_item;
+}
+
+- (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
+{
+    int i_item;
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                            FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return;
@@ -557,97 +647,61 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     for( i_item = 0; i_item < (int)[o_array count]; i_item++ )
     {
-        /* One item */
-        NSDictionary *o_one_item;
         playlist_item_t *p_item;
-        int i;
-        BOOL b_rem = FALSE, b_dir = FALSE;
-        NSString *o_uri, *o_name;
-        NSArray *o_options;
-        NSURL *o_true_file;
+        NSDictionary *o_one_item;
 
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
-        o_uri = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
-        o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
-        o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
-
-        /* Find the name for a disc entry ( i know, can you believe the trouble?) */
-        if( ( !o_name || [o_name isEqualToString:@""] ) && [o_uri rangeOfString: @"/dev/"].location != NSNotFound )
-        {
-            int i_count, i_index;
-            struct statfs *mounts = NULL;
-            
-            i_count = getmntinfo (&mounts, MNT_NOWAIT);
-            /* getmntinfo returns a pointer to static data. Do not free. */
-            for( i_index = 0 ; i_index < i_count; i_index++ )
-            {
-                NSMutableString *o_temp, *o_temp2;
-                o_temp = [NSMutableString stringWithString: o_uri];
-                o_temp2 = [NSMutableString stringWithCString: mounts[i_index].f_mntfromname];
-                [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-                [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
-                [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
-
-                if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
-                {
-                    o_name = [[NSFileManager defaultManager] displayNameAtPath: [NSString stringWithCString:mounts[i_index].f_mntonname]];
-                }
-            }
-        }
-        /* If no name, then make a guess */
-        if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_uri];
-
-        if( [[NSFileManager defaultManager] fileExistsAtPath:o_uri isDirectory:&b_dir] && b_dir &&
-            [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_uri isRemovable: &b_rem
-                    isWritable:NULL isUnmountable:NULL description:NULL type:NULL] && b_rem   )
-        {
-            /* All of this is to make sure CD's play when you D&D them on VLC */
-            /* Converts mountpoint to a /dev file */
-            struct statfs *buf;
-            char *psz_dev;
-            NSMutableString *o_temp;
-
-            buf = (struct statfs *) malloc (sizeof(struct statfs));
-            statfs( [o_uri fileSystemRepresentation], buf );
-            psz_dev = strdup(buf->f_mntfromname);
-            o_temp = [NSMutableString stringWithCString: psz_dev ];
-            [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-            [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-            [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-            o_uri = o_temp;
-        }
-        
-        p_item = playlist_ItemNew( p_intf, [o_uri fileSystemRepresentation], [o_name UTF8String] );
+        p_item = [self createItem: o_one_item];
         if( !p_item )
-            continue;
-
-        if( o_options )
         {
-            for( i = 0; i < (int)[o_options count]; i++ )
-            {
-                playlist_ItemAddOption( p_item, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
-            }
+            continue;
         }
 
         /* Add the item */
         playlist_AddItem( p_playlist, p_item, PLAYLIST_APPEND, i_position == -1 ? PLAYLIST_END : i_position + i_item );
-
-        /* Recent documents menu */
-        o_true_file = [NSURL fileURLWithPath: o_uri];
-        if( o_true_file != nil )
-        {
-            [[NSDocumentController sharedDocumentController]
-                noteNewRecentDocumentURL: o_true_file];
-        }
 
         if( i_item == 0 && !b_enqueue )
         {
             playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
         }
     }
-
     vlc_object_release( p_playlist );
+}
+
+- (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position inView:(int)i_view enqueue:(BOOL)b_enqueue
+{
+    int i_item;
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                            FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    for( i_item = 0; i_item < (int)[o_array count]; i_item++ )
+    {
+        playlist_item_t *p_item;
+        NSDictionary *o_one_item;
+
+        /* Get the item */
+        o_one_item = [o_array objectAtIndex: i_item];
+        p_item = [self createItem: o_one_item];
+        if( !p_item )
+        {
+            continue;
+        }
+
+        /* Add the item */
+        playlist_NodeAddItem( p_playlist, p_item, i_view, p_node, PLAYLIST_APPEND, i_position + i_item );
+
+        if( i_item == 0 && !b_enqueue )
+        {
+            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+        }
+    }
+    vlc_object_release( p_playlist );
+
 }
 
 - (IBAction)handlePopUp:(id)sender
@@ -1076,7 +1130,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         return( @"error" );
     }
-    
+
     p_item = (playlist_item_t *)[item pointerValue];
 
     if( p_item == NULL )
@@ -1132,12 +1186,90 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 /* Required for drag & drop and reordering */
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
+/*    unsigned int i;
+
+    for( i = 0 ; i < [items count] ; i++ )
+    {
+        if( [outlineView levelForItem: [items objectAtIndex: i]] == 0 )
+        {
+            return NO;
+        }
+    }*/
     return NO;
 }
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
 {
+    NSPasteboard *o_pasteboard = [info draggingPasteboard];
+
+    if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
+    {
+        return NSDragOperationGeneric;
+    }
     return NSDragOperationNone;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(int)index
+{
+    playlist_t * p_playlist =  vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    NSPasteboard *o_pasteboard = [info draggingPasteboard];
+
+    if( !p_playlist ) return NO;
+
+    if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
+    {
+        int i;
+        playlist_item_t *p_node = [item pointerValue];
+
+        NSArray *o_array = [NSArray array];
+        NSArray *o_values = [[o_pasteboard propertyListForType:
+                                        NSFilenamesPboardType]
+                                sortedArrayUsingSelector:
+                                        @selector(caseInsensitiveCompare:)];
+
+        for( i = 0; i < (int)[o_values count]; i++)
+        {
+            NSDictionary *o_dic;
+            o_dic = [NSDictionary dictionaryWithObject:[o_values
+                        objectAtIndex:i] forKey:@"ITEM_URL"];
+            o_array = [o_array arrayByAddingObject: o_dic];
+        }
+
+        if ( item == nil )
+        {
+            [self appendArray: o_array atPos: index enqueue: YES];
+        }
+        else if( p_node->i_children == -1 )
+        {
+            int i_counter;
+            playlist_item_t *p_real_node = NULL;
+
+            for( i_counter = 0 ; i_counter < p_node->i_parents ; i_counter++ )
+            {
+                if( p_node->pp_parents[i_counter]->i_view == i_current_view )
+                {
+                    p_real_node = p_node->pp_parents[i_counter]->p_parent;
+                    break;
+                }
+                if( i_counter == p_node->i_parents )
+                {
+                    return NO;
+                }
+            }
+            [self appendNodeArray: o_array inNode: p_real_node
+                atPos: index inView: i_current_view enqueue: YES];
+        }
+        else
+        {
+            [self appendNodeArray: o_array inNode: p_node
+                atPos: index inView: i_current_view enqueue: YES];
+        }
+        vlc_object_release( p_playlist );
+        return YES;
+    }
+    vlc_object_release( p_playlist );
+    return NO;
 }
 
 /* Delegate method of NSWindow */

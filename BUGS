@@ -7,12 +7,12 @@ Feel free to work on these :)
 Regressions from previous versions
 ----------------------------------
 *** OS X preferences
-*** OS X playlist
 *** OS X resampler 
 *   CDDAX 
 
-** Playlist : previous item sometimes doesn't get any item, or an item
+** Playlist : the "previous item" action sometimes doesn't get any item, or an item
 at the other edge of the playlist, when at the beginning of a node
+
 * Sort by Author unimplemented
 
 *** wxWindows : Play button state
