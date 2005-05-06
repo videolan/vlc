@@ -99,6 +99,11 @@ extern "C" {
 #define MKVD_TIMECODESCALE 1000000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifdef VSLHC1
+#define DVDNAV_COMPILE
+#include <dvdnav.h>
+#else /* VSLHC */
+
 #undef ATTRIBUTE_PACKED
 #undef PRAGMA_PACK_BEGIN 
 #undef PRAGMA_PACK_END
@@ -138,65 +143,65 @@ typedef struct {
  */
 typedef struct {
 #ifdef WORDS_BIGENDIAN
-  unsigned int zero                           : 7; /* 25-31 */
-  unsigned int video_pres_mode_change         : 1; /* 24 */
+  unsigned char zero                           : 7; /* 25-31 */
+  unsigned char video_pres_mode_change         : 1; /* 24 */
   
-  unsigned int karaoke_audio_pres_mode_change : 1; /* 23 */
-  unsigned int angle_change                   : 1;
-  unsigned int subpic_stream_change           : 1;
-  unsigned int audio_stream_change            : 1;
-  unsigned int pause_on                       : 1;
-  unsigned int still_off                      : 1;
-  unsigned int button_select_or_activate      : 1;
-  unsigned int resume                         : 1; /* 16 */
+  unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
+  unsigned char angle_change                   : 1;
+  unsigned char subpic_stream_change           : 1;
+  unsigned char audio_stream_change            : 1;
+  unsigned char pause_on                       : 1;
+  unsigned char still_off                      : 1;
+  unsigned char button_select_or_activate      : 1;
+  unsigned char resume                         : 1; /* 16 */
   
-  unsigned int chapter_menu_call              : 1; /* 15 */
-  unsigned int angle_menu_call                : 1;
-  unsigned int audio_menu_call                : 1;
-  unsigned int subpic_menu_call               : 1;
-  unsigned int root_menu_call                 : 1;
-  unsigned int title_menu_call                : 1;
-  unsigned int backward_scan                  : 1;
-  unsigned int forward_scan                   : 1; /* 8 */
+  unsigned char chapter_menu_call              : 1; /* 15 */
+  unsigned char angle_menu_call                : 1;
+  unsigned char audio_menu_call                : 1;
+  unsigned char subpic_menu_call               : 1;
+  unsigned char root_menu_call                 : 1;
+  unsigned char title_menu_call                : 1;
+  unsigned char backward_scan                  : 1;
+  unsigned char forward_scan                   : 1; /* 8 */
   
-  unsigned int next_pg_search                 : 1; /* 7 */
-  unsigned int prev_or_top_pg_search          : 1;
-  unsigned int time_or_chapter_search         : 1;
-  unsigned int go_up                          : 1;
-  unsigned int stop                           : 1;
-  unsigned int title_play                     : 1;
-  unsigned int chapter_search_or_play         : 1;
-  unsigned int title_or_time_play             : 1; /* 0 */
+  unsigned char next_pg_search                 : 1; /* 7 */
+  unsigned char prev_or_top_pg_search          : 1;
+  unsigned char time_or_chapter_search         : 1;
+  unsigned char go_up                          : 1;
+  unsigned char stop                           : 1;
+  unsigned char title_play                     : 1;
+  unsigned char chapter_search_or_play         : 1;
+  unsigned char title_or_time_play             : 1; /* 0 */
 #else
-  unsigned int video_pres_mode_change         : 1; /* 24 */
-  unsigned int zero                           : 7; /* 25-31 */
+  unsigned char video_pres_mode_change         : 1; /* 24 */
+  unsigned char zero                           : 7; /* 25-31 */
   
-  unsigned int resume                         : 1; /* 16 */
-  unsigned int button_select_or_activate      : 1;
-  unsigned int still_off                      : 1;
-  unsigned int pause_on                       : 1;
-  unsigned int audio_stream_change            : 1;
-  unsigned int subpic_stream_change           : 1;
-  unsigned int angle_change                   : 1;
-  unsigned int karaoke_audio_pres_mode_change : 1; /* 23 */
+  unsigned char resume                         : 1; /* 16 */
+  unsigned char button_select_or_activate      : 1;
+  unsigned char still_off                      : 1;
+  unsigned char pause_on                       : 1;
+  unsigned char audio_stream_change            : 1;
+  unsigned char subpic_stream_change           : 1;
+  unsigned char angle_change                   : 1;
+  unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
   
-  unsigned int forward_scan                   : 1; /* 8 */
-  unsigned int backward_scan                  : 1;
-  unsigned int title_menu_call                : 1;
-  unsigned int root_menu_call                 : 1;
-  unsigned int subpic_menu_call               : 1;
-  unsigned int audio_menu_call                : 1;
-  unsigned int angle_menu_call                : 1;
-  unsigned int chapter_menu_call              : 1; /* 15 */
+  unsigned char forward_scan                   : 1; /* 8 */
+  unsigned char backward_scan                  : 1;
+  unsigned char title_menu_call                : 1;
+  unsigned char root_menu_call                 : 1;
+  unsigned char subpic_menu_call               : 1;
+  unsigned char audio_menu_call                : 1;
+  unsigned char angle_menu_call                : 1;
+  unsigned char chapter_menu_call              : 1; /* 15 */
   
-  unsigned int title_or_time_play             : 1; /* 0 */
-  unsigned int chapter_search_or_play         : 1;
-  unsigned int title_play                     : 1;
-  unsigned int stop                           : 1;
-  unsigned int go_up                          : 1;
-  unsigned int time_or_chapter_search         : 1;
-  unsigned int prev_or_top_pg_search          : 1;
-  unsigned int next_pg_search                 : 1; /* 7 */
+  unsigned char title_or_time_play             : 1; /* 0 */
+  unsigned char chapter_search_or_play         : 1;
+  unsigned char title_play                     : 1;
+  unsigned char stop                           : 1;
+  unsigned char go_up                          : 1;
+  unsigned char time_or_chapter_search         : 1;
+  unsigned char prev_or_top_pg_search          : 1;
+  unsigned char next_pg_search                 : 1; /* 7 */
 #endif
 } ATTRIBUTE_PACKED user_ops_t;
 
@@ -293,41 +298,41 @@ typedef struct {
  */
 typedef struct {
 #ifdef WORDS_BIGENDIAN
-  unsigned int btn_coln         : 2;  /**< button color number */
-  unsigned int x_start          : 10; /**< x start offset within the overlay */
-  unsigned int zero1            : 2;  /**< reserved */
-  unsigned int x_end            : 10; /**< x end offset within the overlay */
+  uint32        btn_coln         : 2;  /**< button color number */
+  uint32        x_start          : 10; /**< x start offset within the overlay */
+  uint32        zero1            : 2;  /**< reserved */
+  uint32        x_end            : 10; /**< x end offset within the overlay */
 
-  unsigned int zero3            : 2;  /**< reserved */
-  unsigned int up               : 6;  /**< button index when pressing up */
+  uint32        zero3            : 2;  /**< reserved */
+  uint32        up               : 6;  /**< button index when pressing up */
 
-  unsigned int auto_action_mode : 2;  /**< 0: no, 1: activated if selected */
-  unsigned int y_start          : 10; /**< y start offset within the overlay */
-  unsigned int zero2            : 2;  /**< reserved */
-  unsigned int y_end            : 10; /**< y end offset within the overlay */
+  uint32        auto_action_mode : 2;  /**< 0: no, 1: activated if selected */
+  uint32        y_start          : 10; /**< y start offset within the overlay */
+  uint32        zero2            : 2;  /**< reserved */
+  uint32        y_end            : 10; /**< y end offset within the overlay */
 
-  unsigned int zero4            : 2;  /**< reserved */
-  unsigned int down             : 6;  /**< button index when pressing down */
+  uint32        zero4            : 2;  /**< reserved */
+  uint32        down             : 6;  /**< button index when pressing down */
   unsigned char zero5            : 2;  /**< reserved */
   unsigned char left             : 6;  /**< button index when pressing left */
   unsigned char zero6            : 2;  /**< reserved */
   unsigned char right            : 6;  /**< button index when pressing right */
 #else
-  unsigned int x_end            : 10;
-  unsigned int zero1            : 2;
-  unsigned int x_start          : 10;
-  unsigned int btn_coln         : 2;
+  uint32        x_end            : 10;
+  uint32        zero1            : 2;
+  uint32        x_start          : 10;
+  uint32        btn_coln         : 2;
 
-  unsigned int up               : 6;
-  unsigned int zero3            : 2;
+  uint32        up               : 6;
+  uint32        zero3            : 2;
 
-  unsigned int y_end            : 10;
-  unsigned int zero2            : 2;
-  unsigned int y_start          : 10;
-  unsigned int auto_action_mode : 2;
+  uint32        y_end            : 10;
+  uint32        zero2            : 2;
+  uint32        y_start          : 10;
+  uint32        auto_action_mode : 2;
 
-  unsigned int down             : 6;
-  unsigned int zero4            : 2;
+  uint32        down             : 6;
+  uint32        zero4            : 2;
   unsigned char left             : 6;
   unsigned char zero5            : 2;
   unsigned char right            : 6;
@@ -360,6 +365,7 @@ typedef struct {
 #pragma pack()
 #endif
 
+#endif /* VSLHC */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1220,6 +1226,7 @@ public:
         ,b_ui_hooked(false)
         ,p_input(NULL)
         ,p_pci_packet(NULL)
+        ,i_curr_button(0)
         ,p_ev(NULL)
     {}
 
@@ -1271,10 +1278,13 @@ public:
     void StartUiThread();
     void StopUiThread();
     bool b_ui_hooked;
+    inline void SwapButtons();
 
     /* for spu variables */
     input_thread_t *p_input;
     block_t        *p_pci_packet;
+    int16          i_curr_button;
+    uint8_t        alpha[4];
 
     /* event */
     event_thread_t *p_ev;
@@ -1798,6 +1808,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                     if ( p_sys->p_pci_packet != NULL )
                         block_Release( p_sys->p_pci_packet );
                     p_sys->p_pci_packet = p_block;
+                    p_sys->SwapButtons();
                     vlc_mutex_unlock( &p_sys->p_ev->lock );
                 }
                 return;
@@ -2383,14 +2394,75 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             }
             if( p_ev->b_clicked )
             {
+                int32_t button;
+                int32_t best,dist,d;
+                int32_t mx,my,dx,dy;
+
                 b_activated = VLC_TRUE;
-//                dvdnav_mouse_activate( NULL, pci, valx.i_int, valy.i_int );
+                // get current button
+                dist = 0x08000000; /* >> than  (720*720)+(567*567); */
+                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++) {
+                    btni_t *button_ptr = &(pci->hli.btnit[button-1]);
+
+                    if((valx.i_int >= button_ptr->x_start) && (valx.i_int <= button_ptr->x_end) &&
+                       (valy.i_int >= button_ptr->y_start) && (valy.i_int <= button_ptr->y_end)) {
+                        mx = (button_ptr->x_start + button_ptr->x_end)/2;
+                        my = (button_ptr->y_start + button_ptr->y_end)/2;
+                        dx = mx - valx.i_int;
+                        dy = my - valy.i_int;
+                        d = (dx*dx) + (dy*dy);
+                        /* If the mouse is within the button and the mouse is closer
+                        * to the center of this button then it is the best choice. */
+                        if(d < dist) {
+                            dist = d;
+                            best = button;
+                        }
+                    }
+                }
+                // select new button
+                if ( best != 0 && best != p_sys->i_curr_button )
+                {
+                    vlc_value_t val;
+
+                    if( var_Get( p_sys->p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
+                    {
+                        vlc_mutex_t *p_mutex = (vlc_mutex_t *) val.p_address;
+                        btni_t *button_ptr = &(pci->hli.btnit[best-1]);
+                        uint32_t i_palette;
+
+                        if(button_ptr->btn_coln != 0) {
+                            i_palette = pci->hli.btn_colit.btn_coli[button_ptr->btn_coln-1][1];
+                        } else {
+                            i_palette = 0;
+                        }
+                        p_sys->alpha[0] = i_palette      & 0x0f;
+                        p_sys->alpha[1] = (i_palette>>4) & 0x0f;
+                        p_sys->alpha[2] = (i_palette>>8) & 0x0f;
+                        p_sys->alpha[3] = (i_palette>>12)& 0x0f;
+
+                        vlc_mutex_lock( p_mutex );
+                        val.i_int = button_ptr->x_start; var_Set( p_sys->p_input, "x-start", val );
+                        val.i_int = button_ptr->x_end;   var_Set( p_sys->p_input, "x-end",   val );
+                        val.i_int = button_ptr->y_start; var_Set( p_sys->p_input, "y-start", val );
+                        val.i_int = button_ptr->y_end;   var_Set( p_sys->p_input, "y-end",   val );
+
+                        val.p_address = (void *)p_sys->alpha;
+                        var_Set( p_sys->p_input, "menu-contrast", val );
+
+                        val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
+                        vlc_mutex_unlock( p_mutex );
+
+                        p_sys->i_curr_button = best;
+                        msg_Dbg( &p_sys->demuxer, "Selected button %d", best );
+                    }
+                }
             }
 
             p_ev->b_moved = VLC_FALSE;
             p_ev->b_clicked = VLC_FALSE;
             vlc_mutex_unlock( &p_ev->lock );
         }
+
         if( p_vout && p_vout->b_die )
         {
             var_DelCallback( p_vout, "mouse-moved", EventMouse, p_ev );
@@ -2398,6 +2470,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             vlc_object_release( p_vout );
             p_vout = NULL;
         }
+
         if( p_vout == NULL )
         {
             p_vout = (vlc_object_t*) vlc_object_find( p_sys->p_input, VLC_OBJECT_VOUT,
@@ -4562,6 +4635,8 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             titles.push_back( *p_title );
         }
     }
+
+    // TODO decide which segment should be first used (VMG for DVD)
 }
 
 bool demux_sys_t::IsUsedSegment( matroska_segment_c &segment ) const
@@ -5477,4 +5552,26 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
     }
 
     return b_result;
+}
+
+void demux_sys_t::SwapButtons()
+{
+#ifndef WORDS_BIGENDIAN
+    pci_t *pci = (pci_t *) &p_pci_packet->p_buffer[1];
+    uint8_t button;
+
+    for( button = 1; button <= pci->hli.hl_gi.btn_ns; button++) {
+        binary *p_data = (binary*) &(pci->hli.btnit[button-1]);
+        btni_t *button_ptr = &(pci->hli.btnit[button-1]);
+
+        uint16 i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
+        uint16 i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
+        uint16 i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
+        uint16 i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
+        button_ptr->x_start = i_x_start;
+        button_ptr->x_end   = i_x_end;
+        button_ptr->y_start = i_y_start;
+        button_ptr->y_end   = i_y_end;
+    }
+#endif
 }
