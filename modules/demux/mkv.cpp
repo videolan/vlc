@@ -1225,7 +1225,6 @@ public:
         ,f_duration(-1.0)
         ,b_ui_hooked(false)
         ,p_input(NULL)
-        ,p_pci_packet(NULL)
         ,i_curr_button(0)
         ,p_ev(NULL)
     {}
@@ -1282,7 +1281,7 @@ public:
 
     /* for spu variables */
     input_thread_t *p_input;
-    block_t        *p_pci_packet;
+    pci_t          pci_packet;
     int16          i_curr_button;
     uint8_t        alpha[4];
 
@@ -1805,9 +1804,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                 if ( p_sys->b_ui_hooked )
                 {
                     vlc_mutex_lock( &p_sys->p_ev->lock );
-                    if ( p_sys->p_pci_packet != NULL )
-                        block_Release( p_sys->p_pci_packet );
-                    p_sys->p_pci_packet = p_block;
+                    memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
                     p_sys->SwapButtons();
                     vlc_mutex_unlock( &p_sys->p_ev->lock );
                 }
@@ -2341,7 +2338,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 
             vlc_mutex_lock( &p_ev->lock );
 
-            pci_t *pci = (pci_t *) &p_sys->p_pci_packet->p_buffer[1];
+            pci_t *pci = (pci_t *) &p_sys->pci_packet;
 
             var_Get( p_ev->p_vlc, "key-pressed", &valk );
             for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
@@ -2383,7 +2380,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             vlc_value_t valx, valy;
 
             vlc_mutex_lock( &p_ev->lock );
-            pci_t *pci = (pci_t *) &p_sys->p_pci_packet->p_buffer[1];
+            pci_t *pci = (pci_t *) &p_sys->pci_packet;
             var_Get( p_vout, "mouse-x", &valx );
             var_Get( p_vout, "mouse-y", &valy );
 
@@ -2400,12 +2397,14 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 
                 b_activated = VLC_TRUE;
                 // get current button
+                best = 0;
                 dist = 0x08000000; /* >> than  (720*720)+(567*567); */
                 for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++) {
                     btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
                     if((valx.i_int >= button_ptr->x_start) && (valx.i_int <= button_ptr->x_end) &&
-                       (valy.i_int >= button_ptr->y_start) && (valy.i_int <= button_ptr->y_end)) {
+                       (valy.i_int >= button_ptr->y_start) && (valy.i_int <= button_ptr->y_end)) 
+                    {
                         mx = (button_ptr->x_start + button_ptr->x_end)/2;
                         my = (button_ptr->y_start + button_ptr->y_end)/2;
                         dx = mx - valx.i_int;
@@ -5557,12 +5556,11 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
 void demux_sys_t::SwapButtons()
 {
 #ifndef WORDS_BIGENDIAN
-    pci_t *pci = (pci_t *) &p_pci_packet->p_buffer[1];
-    uint8_t button;
+    uint8_t button, i, j;
 
-    for( button = 1; button <= pci->hli.hl_gi.btn_ns; button++) {
-        binary *p_data = (binary*) &(pci->hli.btnit[button-1]);
-        btni_t *button_ptr = &(pci->hli.btnit[button-1]);
+    for( button = 1; button <= pci_packet.hli.hl_gi.btn_ns; button++) {
+        btni_t *button_ptr = &(pci_packet.hli.btnit[button-1]);
+        binary *p_data = (binary*) button_ptr;
 
         uint16 i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
         uint16 i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
@@ -5572,6 +5570,14 @@ void demux_sys_t::SwapButtons()
         button_ptr->x_end   = i_x_end;
         button_ptr->y_start = i_y_start;
         button_ptr->y_end   = i_y_end;
+
+    }
+    for ( i = 0; i<3; i++ )
+    {
+        for ( j = 0; j<2; j++ )
+        {
+            pci_packet.hli.btn_colit.btn_coli[i][j] = U32_AT( &pci_packet.hli.btn_colit.btn_coli[i][j] );
+        }
     }
 #endif
 }
