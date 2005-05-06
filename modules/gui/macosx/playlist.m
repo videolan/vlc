@@ -155,7 +155,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             /* create the menu entries used in the playlist menu */
             o_lmi = [[o_mi_services submenu] addItemWithTitle:
-                     [NSString stringWithCString:
+                     [NSString stringWithUTF8String:
                      p_parser->psz_longname ? p_parser->psz_longname :
                      ( p_parser->psz_shortname ? p_parser->psz_shortname:
                      p_parser->psz_object_name)]
@@ -170,7 +170,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 
             /* create the menu entries for the main menu */
             o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
-                     [NSString stringWithCString:
+                     [NSString stringWithUTF8String:
                      p_parser->psz_longname ? p_parser->psz_longname :
                      ( p_parser->psz_shortname ? p_parser->psz_shortname:
                      p_parser->psz_object_name)]
