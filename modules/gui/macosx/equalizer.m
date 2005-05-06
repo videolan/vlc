@@ -149,7 +149,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     [o_popup_presets removeAllItems];
     for( i = 0; i < 18 ; i++ )
     {
-        [o_popup_presets insertItemWithTitle: _NS(preset_list[i]) atIndex: i];
+        [o_popup_presets insertItemWithTitle: _NS(preset_list_text[i]) atIndex: i];
     }
     [o_window setTitle: _NS("Equalizer")];
 
