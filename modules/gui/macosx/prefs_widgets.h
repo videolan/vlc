@@ -40,7 +40,7 @@
 }
 
 + (VLCConfigControl *)newControl: (module_config_t *)_p_item
-        withView: (NSView *)o_parent_view yOffset:(int) i_yPos;
+        withView: (NSView *)o_parent_view;
 - (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item;
 - (NSString *)getName;
 - (int)getType;
@@ -63,8 +63,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -74,8 +73,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -87,8 +85,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 - (IBAction)openFileDialog: (id)sender;
 - (void)pathChosenInPanel:(NSOpenPanel *)o_sheet withReturn:(int)i_return_code contextInfo:(void  *)o_context_info;
@@ -101,8 +98,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -114,8 +110,7 @@ static NSMenu   *o_keys_menu = nil;
 
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 - (IBAction)stepperChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -127,8 +122,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -142,8 +136,7 @@ static NSMenu   *o_keys_menu = nil;
 
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 - (IBAction)sliderChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -155,8 +148,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -168,8 +160,7 @@ static NSMenu   *o_keys_menu = nil;
 
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 - (IBAction)stepperChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -185,8 +176,7 @@ static NSMenu   *o_keys_menu = nil;
 
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 - (IBAction)sliderChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -202,8 +192,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -213,8 +202,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 
@@ -226,8 +214,7 @@ static NSMenu   *o_keys_menu = nil;
 }
 
 - (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos;
+           withView: (NSView *)o_parent_view;
 
 @end
 

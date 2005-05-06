@@ -491,8 +491,6 @@ fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
             }
             p_item = p_parser->p_config;
             int i = 0;
-            int i_yPos = -2;
-            int i_lastItem = 0;
 
             p_item = p_parser->p_config + 1;
 
@@ -521,83 +519,20 @@ fprintf( stderr, "end of (sub)category\n" );
 fprintf( stderr, "skipping hint usage\n" );
                     break;
                 default:
-fprintf( stderr, "%s (%d) is ", p_item->psz_name, p_item->i_type );
+fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
                 {
                     VLCConfigControl *o_control = nil;
-                    int i_widget = 0;
-                    switch( p_item->i_type )
+                    o_control = [VLCConfigControl newControl:p_item
+                                                  withView:o_view];
+                    if( o_control != nil )
                     {
-                    case CONFIG_ITEM_STRING:
-fprintf( stderr, "CONFIG_ITEM_STRING" );
-                        if( !p_item->i_list )
-                            i_widget = CONFIG_ITEM_STRING;
-                        else
-                            i_widget = CONFIG_ITEM_STRING_LIST;
-                        break;
-                    case CONFIG_ITEM_FILE:
-                    case CONFIG_ITEM_DIRECTORY:
-fprintf( stderr, "CONFIG_ITEM_FILE" );
-                        i_widget = CONFIG_ITEM_FILE;
-                        break;
-                    case CONFIG_ITEM_MODULE:
-                    case CONFIG_ITEM_MODULE_CAT:
-fprintf( stderr, "CONFIG_ITEM_MODULE" );
-                        i_widget = CONFIG_ITEM_MODULE;
-                        break;
-                    case CONFIG_ITEM_INTEGER:
-fprintf( stderr, "CONFIG_ITEM_INTEGER" );
-                        if( p_item->i_list )
-                            i_widget = CONFIG_ITEM_STRING_LIST;
-                        else if( p_item->i_min != 0 || p_item->i_max != 0 )
-                            i_widget = CONFIG_ITEM_RANGED_INTEGER;
-                        else
-                            i_widget = CONFIG_ITEM_INTEGER;
-                        break;
-                    case CONFIG_ITEM_FLOAT:
-fprintf( stderr, "CONFIG_ITEM_FLOAT" );
-                        if( p_item->f_min != 0 || p_item->f_max != 0 )
-                            i_widget = CONFIG_ITEM_RANGED_INTEGER;
-                        else
-                            i_widget = CONFIG_ITEM_INTEGER;
-                        break;
-                    case CONFIG_ITEM_BOOL:
-fprintf( stderr, "CONFIG_ITEM_BOOL" );
-                        i_widget = CONFIG_ITEM_BOOL;
-                        break;
-                    case CONFIG_ITEM_KEY:
-fprintf( stderr, "CONFIG_ITEM_KEY" );
-                        if( MACOS_VERSION < 10.3 )
-                            i_widget = CONFIG_ITEM_KEY_BEFORE_10_3;
-                        else
-                            i_widget = CONFIG_ITEM_KEY_AFTER_10_3;
-                        break;
-                    case CONFIG_ITEM_MODULE_LIST:
-                    case CONFIG_ITEM_MODULE_LIST_CAT:
-fprintf( stderr, "CONFIG_ITEM_MODULE_LIST" );
-                        i_widget = CONFIG_ITEM_MODULE_LIST;
-                        break;
-                    default:
-fprintf( stderr, "***UNKNOWN***" );
-                    }
-                    if( i_widget != 0 )
-                    {
-                        i_yPos += [VLCConfigControl
-                            calcVerticalMargin:i_widget lastItem:i_lastItem];
-                        o_control = [VLCConfigControl newControl:p_item
-                                                      withView:o_view
-                                                      yOffset: i_yPos];
-                        if( o_control != nil )
-                        {
-                            i_yPos += [o_control frame].size.height;
-                            i_lastItem = i_widget;
-                            [o_control setAutoresizingMask: NSViewMaxYMargin |
-                                NSViewWidthSizable];
-                            [o_subviews addObject: o_control];
-                        }
+                        [o_control setAutoresizingMask: NSViewMaxYMargin |
+                            NSViewWidthSizable];
+                        [o_subviews addObject: o_control];
                     }
 fprintf( stderr, "\n" );
-                    break;
                 }
+                    break;
                 }
             } while( p_item++->i_type != CONFIG_HINT_END );
 
@@ -606,8 +541,6 @@ fprintf( stderr, "\n" );
         else
         {
             int i = 0;
-            int i_yPos = -2;
-            int i_lastItem = 0;
             int i_index;
             p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
             if( !p_list ) return o_view;
@@ -659,81 +592,17 @@ fprintf( stderr, "end of (sub)category\n" );
 fprintf( stderr, "skipping hint usage\n" );
                     break;
                 default:
-fprintf( stderr, "%s (%d) is ", p_item->psz_name, p_item->i_type );
+fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
                 {
                     VLCConfigControl *o_control = nil;
-                    int i_widget = 0;
-                    switch( p_item->i_type )
+                    o_control = [VLCConfigControl newControl:p_item
+                                                  withView:o_view];
+                    if( o_control != nil )
                     {
-                    case CONFIG_ITEM_STRING:
-fprintf( stderr, "CONFIG_ITEM_STRING" );
-                        if( !p_item->i_list )
-                            i_widget = CONFIG_ITEM_STRING;
-                        else
-                            i_widget = CONFIG_ITEM_STRING_LIST;
-                        break;
-                    case CONFIG_ITEM_FILE:
-                    case CONFIG_ITEM_DIRECTORY:
-fprintf( stderr, "CONFIG_ITEM_FILE" );
-                        i_widget = CONFIG_ITEM_FILE;
-                        break;
-                    case CONFIG_ITEM_MODULE:
-                    case CONFIG_ITEM_MODULE_CAT:
-fprintf( stderr, "CONFIG_ITEM_MODULE" );
-                        i_widget = CONFIG_ITEM_MODULE;
-                        break;
-                    case CONFIG_ITEM_INTEGER:
-fprintf( stderr, "CONFIG_ITEM_INTEGER" );
-                        if( p_item->i_list )
-                            i_widget = CONFIG_ITEM_STRING_LIST;
-                        else if( p_item->i_min != 0 || p_item->i_max != 0 )
-                            i_widget = CONFIG_ITEM_RANGED_INTEGER;
-                        else
-                            i_widget = CONFIG_ITEM_INTEGER;
-                        break;
-                    case CONFIG_ITEM_FLOAT:
-fprintf( stderr, "CONFIG_ITEM_FLOAT" );
-                        if( p_item->f_min != 0 || p_item->f_max != 0 )
-                            i_widget = CONFIG_ITEM_RANGED_INTEGER;
-                        else
-                            i_widget = CONFIG_ITEM_INTEGER;
-                        break;
-                    case CONFIG_ITEM_BOOL:
-fprintf( stderr, "CONFIG_ITEM_BOOL" );
-                        i_widget = CONFIG_ITEM_BOOL;
-                        break;
-                    case CONFIG_ITEM_KEY:
-fprintf( stderr, "CONFIG_ITEM_KEY" );
-                        if( MACOS_VERSION < 10.3 )
-                            i_widget = CONFIG_ITEM_KEY_BEFORE_10_3;
-                        else
-                            i_widget = CONFIG_ITEM_KEY_AFTER_10_3;
-                        break;
-                    case CONFIG_ITEM_MODULE_LIST:
-                    case CONFIG_ITEM_MODULE_LIST_CAT:
-fprintf( stderr, "CONFIG_ITEM_MODULE_LIST" );
-                        i_widget = CONFIG_ITEM_MODULE_LIST;
-                        break;
-                    default:
-fprintf( stderr, "***UNKNOWN***" );
+                        [o_control setAutoresizingMask: NSViewMaxYMargin |
+                                                        NSViewWidthSizable];
+                        [o_subviews addObject: o_control];
                     }
-                    if( i_widget != 0 )
-                    {
-                        i_yPos += [VLCConfigControl
-                            calcVerticalMargin:i_widget lastItem:i_lastItem];
-                        o_control = [VLCConfigControl newControl:p_item
-                                                      withView:o_view
-                                                      yOffset: i_yPos];
-                        if( o_control != nil )
-                        {
-                            i_yPos += [o_control frame].size.height;
-                            i_lastItem = i_widget;
-                            [o_control setAutoresizingMask: NSViewMaxYMargin |
-                                NSViewWidthSizable];
-                            [o_subviews addObject: o_control];
-                        }
-                    }
-fprintf( stderr, "\n" );
                     break;
                 }
                 }
@@ -748,7 +617,7 @@ fprintf( stderr, "\n" );
     if( o_view != nil )
     {
         int i_lastItem = 0;
-        int i_yPos = 0;
+        int i_yPos = -2;
         unsigned int i;
         for( i = 0 ; i < [o_subviews count] ; i++ )
         {
@@ -763,8 +632,6 @@ fprintf( stderr, "\n" );
             [o_widget setYPos:i_yPos];
             i_yPos += [o_widget frame].size.height;
             i_lastItem = i_widget;
-            [o_widget setAutoresizingMask: NSViewMaxYMargin |
-                                            NSViewWidthSizable];
             [o_view addSubview:o_widget];
          }
 
@@ -777,12 +644,10 @@ fprintf( stderr, "\n" );
 {
     unsigned int i;
     if( o_subviews != nil )
-    {
-    //Item has been shown
-fprintf( stderr, "[%s] applying changes\n", [o_name cString]);
+        //Item has been shown
         for( i = 0 ; i < [o_subviews count] ; i++ )
             [[o_subviews objectAtIndex:i] applyChanges];
-    }
+
     if( o_children != IsALeafNode )
         for( i = 0 ; i < [o_children count] ; i++ )
             [[o_children objectAtIndex:i] applyChanges];

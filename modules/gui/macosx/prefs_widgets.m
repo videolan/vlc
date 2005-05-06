@@ -833,7 +833,6 @@ if( MACOS_VERSION >= 10.3 )                                                 \
 
 + (VLCConfigControl *)newControl: (module_config_t *)_p_item
                       withView: (NSView *)o_parent_view
-                      yOffset:(int) i_yPos
 {
     VLCConfigControl *p_control = NULL;
     switch( _p_item->i_type )
@@ -843,74 +842,64 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         {
             p_control = [[StringConfigControl alloc]
                     initWithItem: _p_item
-                    withView: o_parent_view
-                    withVerticalOffset: i_yPos];
+                    withView: o_parent_view];
         }
         else
         {
             p_control = [[StringListConfigControl alloc]
                     initWithItem: _p_item
-                    withView: o_parent_view
-                    withVerticalOffset: i_yPos];
+                    withView: o_parent_view];
         }
         break;
     case CONFIG_ITEM_FILE:
     case CONFIG_ITEM_DIRECTORY:
         p_control = [[FileConfigControl alloc]
                     initWithItem: _p_item
-                    withView: o_parent_view
-                    withVerticalOffset: i_yPos];
+                    withView: o_parent_view];
         break;
     case CONFIG_ITEM_MODULE:
     case CONFIG_ITEM_MODULE_CAT:
         p_control = [[ModuleConfigControl alloc]
                     initWithItem: _p_item
-                    withView: o_parent_view
-                    withVerticalOffset: i_yPos];
+                    withView: o_parent_view];
         break;
     case CONFIG_ITEM_INTEGER:
         if( _p_item->i_list )
         {
             p_control = [[IntegerListConfigControl alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         else if( _p_item->i_min != 0 || _p_item->i_max != 0 )
         {
             p_control = [[RangedIntegerConfigControl alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         else
         {
             p_control = [[IntegerConfigControl alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         break;
     case CONFIG_ITEM_BOOL:
         p_control = [[BoolConfigControl alloc]
                     initWithItem: _p_item
-                    withView: o_parent_view
-                    withVerticalOffset: i_yPos];
+                    withView: o_parent_view];
         break;
     case CONFIG_ITEM_FLOAT:
         if( _p_item->f_min != 0 || _p_item->f_max != 0 )
         {
             p_control = [[RangedFloatConfigControl alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         else
         {
             p_control = [[FloatConfigControl alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         break;
     case CONFIG_ITEM_KEY:
@@ -918,23 +907,20 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         {
             p_control = [[KeyConfigControlBefore103 alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         else
         {
             p_control = [[KeyConfigControlAfter103 alloc]
                         initWithItem: _p_item
-                        withView: o_parent_view
-                        withVerticalOffset: i_yPos];
+                        withView: o_parent_view];
         }
         break;
     case CONFIG_ITEM_MODULE_LIST:
     case CONFIG_ITEM_MODULE_LIST_CAT:
         p_control = [[ModuleListConfigControl alloc]
                     initWithItem: _p_item
-                    withView: o_parent_view
-                    withVerticalOffset: i_yPos];
+                    withView: o_parent_view];
         break;
     default:
         break;
@@ -1012,14 +998,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation StringConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldString, *o_textfieldTooltip;
     mainFrame.size.height = 22;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1069,14 +1054,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation StringListConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldTooltip;
     mainFrame.size.height = 22;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1144,7 +1128,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation FileConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_buttonTooltip, *o_textfieldString;
@@ -1152,7 +1135,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     mainFrame.size.height = 46;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1248,14 +1231,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation ModuleConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_popupTooltip;
     mainFrame.size.height = 22;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1398,14 +1380,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation IntegerConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip, *o_textfieldString;
     mainFrame.size.height = 23;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1480,14 +1461,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldTooltip;
     mainFrame.size.height = 22;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1557,14 +1537,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation RangedIntegerConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 50;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1655,14 +1634,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation FloatConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip, *o_textfieldString;
     mainFrame.size.height = 23;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1735,14 +1713,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation RangedFloatConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 50;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1835,14 +1812,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 17;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1882,14 +1858,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 37;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -1997,14 +1972,13 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation KeyConfigControlAfter103
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 22;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
@@ -2062,7 +2036,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 @implementation ModuleListConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
 {
 if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 //TODO....
@@ -2116,7 +2089,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     mainFrame.size.height = 30 + 18 * [o_modulearray count];
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = i_yPos;
+    mainFrame.origin.y = 0;
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
         i_view_type = CONFIG_ITEM_MODULE_LIST;
