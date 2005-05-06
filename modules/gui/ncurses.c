@@ -96,7 +96,7 @@ static void ReadDir        ( intf_thread_t * );
     "will show you initially.")
 
 vlc_module_begin();
-    set_shortname( _("Ncurses"));
+    set_shortname( "Ncurses" );
     set_description( _("Ncurses interface") );
     set_capability( "interface", 10 );
     set_category( CAT_INTERFACE );
