@@ -35,15 +35,18 @@
     char            *psz_name;
     NSTextField     *o_label;
     int             i_type;
+    int             i_view_type;
     vlc_bool_t      b_advanced;
 }
 
-+ (VLCConfigControl *)newControl: (module_config_t *)_p_item withView: (NSView *)o_parent_view yOffset:(int) i_yPos lastItem: (int) i_lastItem;
++ (VLCConfigControl *)newControl: (module_config_t *)_p_item
+        withView: (NSView *)o_parent_view yOffset:(int) i_yPos;
 - (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item;
 - (NSString *)getName;
 - (int)getType;
+- (int)getViewType;
 - (BOOL)isAdvanced;
-
+- (void)setYPos:(int)i_yPos;
 - (int)intValue;
 - (float)floatValue;
 - (char *)stringValue;
@@ -61,8 +64,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -73,8 +75,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -87,8 +88,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 - (IBAction)openFileDialog: (id)sender;
 - (void)pathChosenInPanel:(NSOpenPanel *)o_sheet withReturn:(int)i_return_code contextInfo:(void  *)o_context_info;
@@ -102,8 +102,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -116,8 +115,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 - (IBAction)stepperChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -130,8 +128,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -146,8 +143,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 - (IBAction)sliderChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -160,8 +156,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -174,8 +169,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 - (IBAction)stepperChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -192,8 +186,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 - (IBAction)sliderChanged:(id)sender;
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
@@ -210,8 +203,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -222,8 +214,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 
@@ -236,8 +227,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
-           withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem;
+           withVerticalOffset: (int)i_yPos;
 
 @end
 

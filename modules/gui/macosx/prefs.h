@@ -28,7 +28,7 @@
     VLCTreeItem *o_parent;
     NSMutableArray *o_children;
     int i_object_category;
-    NSView *o_view;
+    NSMutableArray *o_subviews;
 }
 
 + (VLCTreeItem *)rootItem;

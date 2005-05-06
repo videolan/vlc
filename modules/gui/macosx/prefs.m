@@ -227,7 +227,7 @@ static VLCTreeItem *o_root_item = nil;
         o_parent = o_parent_item;
         o_children = o_children_array;
         i_object_category = i_category;
-        o_view = nil;
+        o_subviews = nil;
     }
     return( self );
 }
@@ -464,18 +464,22 @@ static VLCTreeItem *o_root_item = nil;
     advancedView:(vlc_bool_t) b_advanced
 {
 fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
-    if( o_view == nil )
+    NSRect          s_vrc;
+    NSView          *o_view;
+
+    s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
+    o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
+    [o_view setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
+
+/* Create all subviews if it isn't already done because we cannot use setHiden for MacOS < 10.3*/
+    if( o_subviews == nil )
     {
         intf_thread_t   *p_intf = VLCIntf;
         vlc_list_t      *p_list;
         module_t        *p_parser = NULL;
         module_config_t *p_item;
-        NSRect          s_vrc;
 
-        s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
-        o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
-        [o_view setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
-
+        o_subviews = [[NSMutableArray alloc] initWithCapacity:10];
         /* Get a pointer to the module */
         if( i_object_category == -1 )
         {
@@ -521,8 +525,6 @@ fprintf( stderr, "%s (%d) is ", p_item->psz_name, p_item->i_type );
                 {
                     VLCConfigControl *o_control = nil;
                     int i_widget = 0;
-                    if( p_item->b_advanced && (! b_advanced) )
-                        break;
                     switch( p_item->i_type )
                     {
                     case CONFIG_ITEM_STRING:
@@ -583,15 +585,14 @@ fprintf( stderr, "***UNKNOWN***" );
                             calcVerticalMargin:i_widget lastItem:i_lastItem];
                         o_control = [VLCConfigControl newControl:p_item
                                                       withView:o_view
-                                                      yOffset: i_yPos
-                                                      lastItem: i_lastItem];
+                                                      yOffset: i_yPos];
                         if( o_control != nil )
                         {
                             i_yPos += [o_control frame].size.height;
                             i_lastItem = i_widget;
                             [o_control setAutoresizingMask: NSViewMaxYMargin |
                                 NSViewWidthSizable];
-                            [o_view addSubview: o_control];
+                            [o_subviews addObject: o_control];
                         }
                     }
 fprintf( stderr, "\n" );
@@ -722,15 +723,14 @@ fprintf( stderr, "***UNKNOWN***" );
                             calcVerticalMargin:i_widget lastItem:i_lastItem];
                         o_control = [VLCConfigControl newControl:p_item
                                                       withView:o_view
-                                                      yOffset: i_yPos
-                                                      lastItem: i_lastItem];
+                                                      yOffset: i_yPos];
                         if( o_control != nil )
                         {
                             i_yPos += [o_control frame].size.height;
                             i_lastItem = i_widget;
                             [o_control setAutoresizingMask: NSViewMaxYMargin |
                                 NSViewWidthSizable];
-                            [o_view addSubview: o_control];
+                            [o_subviews addObject: o_control];
                         }
                     }
 fprintf( stderr, "\n" );
@@ -744,25 +744,42 @@ fprintf( stderr, "\n" );
             vlc_list_release( p_list );
         }
     }
-    else
-    {
-        NSRect s_vrc;
-        s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
-        [o_view setFrame: s_vrc];
-    }
+
     if( o_view != nil )
+    {
+        int i_lastItem = 0;
+        int i_yPos = 0;
+        unsigned int i;
+        for( i = 0 ; i < [o_subviews count] ; i++ )
+        {
+            int i_widget;
+            VLCConfigControl *o_widget = [o_subviews objectAtIndex:i];
+            if( ( [o_widget isAdvanced] ) && (! b_advanced) )
+                continue;
+
+            i_widget = [o_widget getViewType];
+            i_yPos += [VLCConfigControl calcVerticalMargin:i_widget
+                lastItem:i_lastItem];
+            [o_widget setYPos:i_yPos];
+            i_yPos += [o_widget frame].size.height;
+            i_lastItem = i_widget;
+            [o_widget setAutoresizingMask: NSViewMaxYMargin |
+                                            NSViewWidthSizable];
+            [o_view addSubview:o_widget];
+         }
+
         [o_prefs_view setDocumentView:o_view];
+    }
     return o_view;
 }
 
 - (void)applyChanges
 {
     unsigned int i;
-    if( o_view != nil )
+    if( o_subviews != nil )
     {
     //Item has been shown
 fprintf( stderr, "[%s] applying changes\n", [o_name cString]);
-        NSArray *o_subviews = [o_view subviews];
         for( i = 0 ; i < [o_subviews count] ; i++ )
             [[o_subviews objectAtIndex:i] applyChanges];
     }

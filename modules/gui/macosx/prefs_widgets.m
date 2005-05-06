@@ -418,10 +418,18 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         psz_name = strdup( p_item->psz_name );
         o_label = NULL;
         i_type = p_item->i_type;
+        i_view_type = 0;
         b_advanced = p_item->b_advanced;
         [self setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin ];
     }
     return (self);
+}
+
+- (void)setYPos:(int)i_yPos
+{
+    NSRect frame = [self frame];
+    frame.origin.y = i_yPos;
+    [self setFrame:frame];
 }
 
 - (void)dealloc
@@ -826,7 +834,6 @@ if( MACOS_VERSION >= 10.3 )                                                 \
 + (VLCConfigControl *)newControl: (module_config_t *)_p_item
                       withView: (NSView *)o_parent_view
                       yOffset:(int) i_yPos
-                      lastItem: (int) i_lastItem
 {
     VLCConfigControl *p_control = NULL;
     switch( _p_item->i_type )
@@ -837,16 +844,14 @@ if( MACOS_VERSION >= 10.3 )                                                 \
             p_control = [[StringConfigControl alloc]
                     initWithItem: _p_item
                     withView: o_parent_view
-                    withVerticalOffset: i_yPos
-                    withLastItem: i_lastItem];
+                    withVerticalOffset: i_yPos];
         }
         else
         {
             p_control = [[StringListConfigControl alloc]
                     initWithItem: _p_item
                     withView: o_parent_view
-                    withVerticalOffset: i_yPos
-                    withLastItem: i_lastItem];
+                    withVerticalOffset: i_yPos];
         }
         break;
     case CONFIG_ITEM_FILE:
@@ -854,16 +859,14 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         p_control = [[FileConfigControl alloc]
                     initWithItem: _p_item
                     withView: o_parent_view
-                    withVerticalOffset: i_yPos
-                    withLastItem: i_lastItem];
+                    withVerticalOffset: i_yPos];
         break;
     case CONFIG_ITEM_MODULE:
     case CONFIG_ITEM_MODULE_CAT:
         p_control = [[ModuleConfigControl alloc]
                     initWithItem: _p_item
                     withView: o_parent_view
-                    withVerticalOffset: i_yPos
-                    withLastItem: i_lastItem];
+                    withVerticalOffset: i_yPos];
         break;
     case CONFIG_ITEM_INTEGER:
         if( _p_item->i_list )
@@ -871,32 +874,28 @@ if( MACOS_VERSION >= 10.3 )                                                 \
             p_control = [[IntegerListConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         else if( _p_item->i_min != 0 || _p_item->i_max != 0 )
         {
             p_control = [[RangedIntegerConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         else
         {
             p_control = [[IntegerConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         break;
     case CONFIG_ITEM_BOOL:
         p_control = [[BoolConfigControl alloc]
                     initWithItem: _p_item
                     withView: o_parent_view
-                    withVerticalOffset: i_yPos
-                    withLastItem: i_lastItem];
+                    withVerticalOffset: i_yPos];
         break;
     case CONFIG_ITEM_FLOAT:
         if( _p_item->f_min != 0 || _p_item->f_max != 0 )
@@ -904,16 +903,14 @@ if( MACOS_VERSION >= 10.3 )                                                 \
             p_control = [[RangedFloatConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         else
         {
             p_control = [[FloatConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         break;
     case CONFIG_ITEM_KEY:
@@ -922,16 +919,14 @@ if( MACOS_VERSION >= 10.3 )                                                 \
             p_control = [[KeyConfigControlBefore103 alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         else
         {
             p_control = [[KeyConfigControlAfter103 alloc]
                         initWithItem: _p_item
                         withView: o_parent_view
-                        withVerticalOffset: i_yPos
-                        withLastItem: i_lastItem];
+                        withVerticalOffset: i_yPos];
         }
         break;
     case CONFIG_ITEM_MODULE_LIST:
@@ -939,8 +934,7 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         p_control = [[ModuleListConfigControl alloc]
                     initWithItem: _p_item
                     withView: o_parent_view
-                    withVerticalOffset: i_yPos
-                    withLastItem: i_lastItem];
+                    withVerticalOffset: i_yPos];
         break;
     default:
         break;
@@ -956,6 +950,11 @@ if( MACOS_VERSION >= 10.3 )                                                 \
 - (int)getType
 {
     return i_type;
+}
+
+- (int)getViewType
+{
+    return i_view_type;
 }
 
 - (BOOL)isAdvanced
@@ -1014,7 +1013,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldString, *o_textfieldTooltip;
@@ -1025,6 +1023,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_STRING;
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1071,7 +1070,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldTooltip;
@@ -1083,6 +1081,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
         int i_index;
+        i_view_type = CONFIG_ITEM_STRING_LIST;
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1146,7 +1145,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_buttonTooltip, *o_textfieldString;
@@ -1158,6 +1156,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_FILE;
+
         /* is it a directory */
         b_directory = ( [self getType] == CONFIG_ITEM_DIRECTORY ) ? YES : NO;
 
@@ -1249,7 +1249,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_popupTooltip;
@@ -1263,6 +1262,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         int i_index;
         vlc_list_t *p_list;
         module_t *p_parser;
+        i_view_type = CONFIG_ITEM_MODULE;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1398,7 +1399,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip, *o_textfieldString;
@@ -1409,6 +1409,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_INTEGER;
+
         o_tooltip = [[VLCMain sharedInstance] wrapString:
             [[VLCMain sharedInstance]
                 localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP];
@@ -1479,7 +1481,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldTooltip;
@@ -1491,6 +1492,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
         int i_index;
+        i_view_type = CONFIG_ITEM_STRING_LIST;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1555,7 +1558,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1566,6 +1568,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_RANGED_INTEGER;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1652,7 +1656,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip, *o_textfieldString;
@@ -1663,6 +1666,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_INTEGER;
+
         o_tooltip = [[VLCMain sharedInstance] wrapString:
             [[VLCMain sharedInstance]
                 localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP];
@@ -1731,7 +1736,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1742,6 +1746,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_RANGED_INTEGER;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1830,7 +1836,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1841,6 +1846,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_BOOL;
+
         /* add the checkbox */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1876,7 +1883,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1887,6 +1893,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_KEY_BEFORE_10_3;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -1990,7 +1998,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -2001,6 +2008,8 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_KEY_AFTER_10_3;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
@@ -2054,7 +2063,6 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
            withVerticalOffset: (int)i_yPos
-           withLastItem: (int)i_lastItem
 {
 if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 //TODO....
@@ -2111,6 +2119,8 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     mainFrame.origin.y = i_yPos;
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
+        i_view_type = CONFIG_ITEM_MODULE_LIST;
+
         /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
