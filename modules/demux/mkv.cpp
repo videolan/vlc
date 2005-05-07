@@ -2281,6 +2281,8 @@ void demux_sys_t::StopUiThread()
         vlc_thread_join( p_ev );
         vlc_object_destroy( p_ev );
 
+        p_ev = NULL;
+
         msg_Dbg( &demuxer, "Stopping the UI Hook" );
     }
     b_ui_hooked = false;
@@ -2892,9 +2894,10 @@ static int Demux( demux_t *p_demux)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
-    matroska_segment_c *p_segmet = p_vsegment->Segment();
-    if ( p_segmet == NULL ) return 0;
+    matroska_segment_c *p_segment = p_vsegment->Segment();
+    if ( p_segment == NULL ) return 0;
     int                i_block_count = 0;
+    int                i_return = 0;
 
     KaxBlock *block;
     int64_t i_block_duration;
@@ -2904,33 +2907,36 @@ static int Demux( demux_t *p_demux)
     for( ;; )
     {
         if ( p_sys->demuxer.b_die )
-            return 0;
+            break;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
-                return 1;
+            {
+                i_return = 1;
+                break;
+            }
         
         if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
             /* nothing left to read in this ordered edition */
             if ( !p_vsegment->SelectNext() )
-                return 0;
-            p_segmet->UnSelect( );
+                break;
+            p_segment->UnSelect( );
             
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
-            p_segmet = p_vsegment->Segment();
-            if ( !p_segmet->Select( 0 ) )
+            p_segment = p_vsegment->Segment();
+            if ( !p_segment->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );
-                return 0;
+                break;
             }
             continue;
         }
 
 
-        if( p_segmet->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( p_segment->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered )
             {
@@ -2945,25 +2951,25 @@ static int Demux( demux_t *p_demux)
                     p_sys->i_pts = p_chap->i_user_end_time;
                     p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
 
-                    return 1;
+                    i_return = 1;
                 }
 
-                return 0;
+                break;
             }
             msg_Warn( p_demux, "cannot get block EOF?" );
-            p_segmet->UnSelect( );
+            p_segment->UnSelect( );
             
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
             if ( !p_vsegment->SelectNext() )
                 // no more segments in this stream
-                return 0;
-            p_segmet = p_vsegment->Segment();
-            if ( !p_segmet->Select( 0 ) )
+                break;
+            p_segment = p_vsegment->Segment();
+            if ( !p_segment->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );
-                return 0;
+                break;
             }
 
             continue;
@@ -2984,9 +2990,12 @@ static int Demux( demux_t *p_demux)
         // TODO optimize when there is need to leave or when seeking has been called
         if( i_block_count > 5 )
         {
-            return 1;
+            i_return = 1;
+            break;
         }
     }
+
+    return i_return;
 }
 
 
