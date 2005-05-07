@@ -46,6 +46,8 @@ Decoders / Encoders:
 Services discovery
  * New type of modules, that add items to the playlist
  * Brand new SAP module
+     * To enable SAP, you now need to use "-S sap" or add SAP in 
+       the "Manage->Services Discovery" menu
  * HAL (Hardware Abstraction Layer) discovery
  * DAAP (iTunes shares) support
 
