@@ -1596,8 +1596,9 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
         }
 
         /* do parsing */
-        if( i_level == 1 )
+        switch ( i_level )
         {
+        case 1:
             if( MKV_IS_ID( el, KaxCluster ) )
             {
                 cluster = (KaxCluster*)el;
@@ -1626,9 +1627,8 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
             {
                 msg_Dbg( &sys.demuxer, "unknown (%s)", typeid( el ).name() );
             }
-        }
-        else if( i_level == 2 )
-        {
+            break;
+        case 2:
             if( MKV_IS_ID( el, KaxClusterTimecode ) )
             {
                 KaxClusterTimecode &ctc = *(KaxClusterTimecode*)el;
@@ -1644,9 +1644,8 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
             {
                 ep->Down();
             }
-        }
-        else if( i_level == 3 )
-        {
+            break;
+        case 3:
             if( MKV_IS_ID( el, KaxBlock ) )
             {
                 *pp_block = (KaxBlock*)el;
@@ -1691,9 +1690,8 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
                     }
                 }
             }
-        }
-        else
-        {
+            break;
+        default:
             msg_Err( &sys.demuxer, "invalid level = %d", i_level );
             return VLC_EGENERIC;
         }
@@ -2401,7 +2399,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 // get current button
                 best = 0;
                 dist = 0x08000000; /* >> than  (720*720)+(567*567); */
-                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++) {
+                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++) 
+                {
                     btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
                     if((valx.i_int >= button_ptr->x_start) && (valx.i_int <= button_ptr->x_end) &&
@@ -2420,17 +2419,22 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                         }
                     }
                 }
-                // select new button
-                if ( best != 0 && best != p_sys->i_curr_button )
+
+                if ( best != 0)
                 {
-                    vlc_value_t val;
                     btni_t *button_ptr = &(pci->hli.btnit[best-1]);
 
-                    p_sys->dvd_interpretor.SetSPRM( 0x88, best );
+                    msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
 
                     // process the button action
-                    if ( !p_sys->dvd_interpretor.Interpret( button_ptr->cmd.bytes, 8 ) )
+                    p_sys->dvd_interpretor.SetSPRM( 0x88, best );
+                    p_sys->dvd_interpretor.Interpret( button_ptr->cmd.bytes, 8 );
+
+                    // select new button
+                    if ( best != p_sys->i_curr_button )
                     {
+                        vlc_value_t val;
+
                         if( var_Get( p_sys->p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
                         {
                             vlc_mutex_t *p_mutex = (vlc_mutex_t *) val.p_address;
@@ -2460,7 +2464,6 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                             vlc_mutex_unlock( p_mutex );
 
                             p_sys->i_curr_button = best;
-                            msg_Dbg( &p_sys->demuxer, "Selected button %d", best );
                         }
                     }
                 }
@@ -5420,19 +5423,13 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             uint16 i_pgcn = (p_command[6] << 8) + p_command[7];
             
             msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
-            p_chapter = sys.BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 2, p_segment );
+            p_chapter = sys.p_current_segment->BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 2 );
             if ( p_chapter != NULL )
             {
-                // if the segment is not part of the current segment, select the new one
-                if ( p_segment != sys.p_current_segment )
-                {
-                    sys.PreparePlayback( p_segment );
-                }
-
                 p_chapter->Enter( true );
                 
                 // jump to the location in the found segment
-                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
                 f_result = true;
             }
             break;
