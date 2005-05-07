@@ -97,7 +97,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_prefs_view setBorderType: NSGrooveBorder];
     [o_prefs_view setHasVerticalScroller: YES];
     [o_prefs_view setDrawsBackground: NO];
-    [o_prefs_view setRulersVisible: NO];
     [o_prefs_view setDocumentView: o_empty_view];
     [o_tree selectRow:0 byExtendingSelection:NO];
 }
@@ -469,9 +468,11 @@ fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
 
     s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
-    [o_view setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
+    [o_view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin |
+                                    NSViewMaxYMargin];
 
-/* Create all subviews if it isn't already done because we cannot use setHiden for MacOS < 10.3*/
+/* Create all subviews if it isn't already done because we cannot use */
+/* setHiden for MacOS < 10.3*/
     if( o_subviews == nil )
     {
         intf_thread_t   *p_intf = VLCIntf;
@@ -618,11 +619,21 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
     {
         int i_lastItem = 0;
         int i_yPos = -2;
-        unsigned int i;
-        for( i = 0 ; i < [o_subviews count] ; i++ )
+        int i_max_label = 0;
+        NSEnumerator *enumerator = [o_subviews objectEnumerator];
+        VLCConfigControl *o_widget;
+        NSRect o_frame;
+        
+        while( ( o_widget = [enumerator nextObject] ) )
+            if( ( [o_widget isAdvanced] ) && (! b_advanced) )
+                continue;
+            else if( i_max_label < [o_widget getLabelSize] )
+                i_max_label = [o_widget getLabelSize];
+
+        enumerator = [o_subviews objectEnumerator];
+        while( ( o_widget = [enumerator nextObject] ) )
         {
             int i_widget;
-            VLCConfigControl *o_widget = [o_subviews objectAtIndex:i];
             if( ( [o_widget isAdvanced] ) && (! b_advanced) )
                 continue;
 
@@ -630,12 +641,20 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
             i_yPos += [VLCConfigControl calcVerticalMargin:i_widget
                 lastItem:i_lastItem];
             [o_widget setYPos:i_yPos];
+            o_frame = [o_widget frame];
+            o_frame.size.width = [o_view frame].size.width -
+                                    LEFTMARGIN - RIGHTMARGIN;
+            [o_widget setFrame:o_frame];
+            [o_widget alignWithXPosition: i_max_label];
             i_yPos += [o_widget frame].size.height;
             i_lastItem = i_widget;
             [o_view addSubview:o_widget];
          }
-
+        o_frame = [o_view frame];
+        o_frame.size.height = i_yPos;
+        [o_view setFrame:o_frame];
         [o_prefs_view setDocumentView:o_view];
+
     }
     return o_view;
 }

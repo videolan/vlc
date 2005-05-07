@@ -38,8 +38,9 @@
 #define OFFSET_RIGHT 20
 #define OFFSET_BETWEEN 2
 
-#define LEFTMARGIN  18
-#define RIGHTMARGIN 18
+#define MACOS_VERSION [[[NSDictionary dictionaryWithContentsOfFile: \
+            @"/System/Library/CoreServices/SystemVersion.plist"] \
+            objectForKey: @"ProductVersion"] floatValue]
 
 #define UPWARDS_WHITE_ARROW                 "\xE2\x87\xA7" 
 #define OPTION_KEY                          "\xE2\x8C\xA5"
@@ -383,23 +384,6 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     [o_checkbox sizeToFit];                                                 \
 }
 
-#define ADD_CHECKBOX( o_checkbox, superFrame, x_offset, my_y_offset, label, \
-    tooltip, init_value, position )                                         \
-{                                                                           \
-    NSRect s_rc = superFrame;                                               \
-    s_rc.size.height = 18;                                                  \
-    s_rc.origin.x = x_offset - 2;                                           \
-    s_rc.origin.y = superFrame.size.height - 18 + my_y_offset;              \
-    o_checkbox = [[[NSButton alloc] initWithFrame: s_rc] retain];           \
-    [o_checkbox setFont:[NSFont systemFontOfSize:0]];                       \
-    [o_checkbox setButtonType: NSSwitchButton];                             \
-    [o_checkbox setImagePosition: position];                                \
-    [o_checkbox setIntValue: init_value];                                   \
-    [o_checkbox setTitle: label];                                           \
-    [o_checkbox setToolTip: tooltip];                                       \
-    [o_checkbox sizeToFit];                                                 \
-}
-
 @implementation VLCConfigControl
 - (id)initWithFrame: (NSRect)frame
 {
@@ -676,37 +660,37 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         switch( i_lastItem )
         {
         case CONFIG_ITEM_STRING:
-            i_margin = 6;
+            i_margin = 10;
             break;
         case CONFIG_ITEM_STRING_LIST:
-            i_margin = 5;
+            i_margin = 9;
             break;
         case CONFIG_ITEM_FILE:
-            i_margin = 4;
+            i_margin = 8;
             break;
         case CONFIG_ITEM_MODULE:
-            i_margin = 2;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 3;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 3;
-            break;
-        case CONFIG_ITEM_KEY_BEFORE_10_3:
-            i_margin = 3;
-            break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
-            i_margin = 2;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
             i_margin = 6;
             break;
+        case CONFIG_ITEM_INTEGER:
+            i_margin = 9;
+            break;
+        case CONFIG_ITEM_RANGED_INTEGER:
+            i_margin = 7;
+            break;
+        case CONFIG_ITEM_BOOL:
+            i_margin = 7;
+            break;
+        case CONFIG_ITEM_KEY_BEFORE_10_3:
+            i_margin = 7;
+            break;
+        case CONFIG_ITEM_KEY_AFTER_10_3:
+            i_margin = 5;
+            break;
+        case CONFIG_ITEM_MODULE_LIST:
+            i_margin = 10;
+            break;
         default:
-            i_margin = 18;
+            i_margin = 20;
             break;
         }
         break;
@@ -993,6 +977,11 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         break;
     }
 }
+
+- (int)getLabelSize
+{
+    return [o_label frame].size.width;
+}
 @end
 
 @implementation StringConfigControl
@@ -1037,9 +1026,22 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     return self;
 }
 
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    NSRect superFrame = [self frame];
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_textfield frame];
+    frame.origin.x = i_xPos + 2;
+    frame.size.width = superFrame.size.width - frame.origin.x - 1;
+    [o_textfield setFrame:frame];
+}
+
 - (void)dealloc
 {
-    [o_label release];
     [o_textfield release];
     [super dealloc];
 }
@@ -1090,6 +1092,20 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         [self addSubview: o_combo];
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    NSRect superFrame = [self frame];
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_combo frame];
+    frame.origin.x = i_xPos + 2;
+    frame.size.width = superFrame.size.width - frame.origin.x + 2;
+    [o_combo setFrame:frame];
 }
 
 - (void)dealloc
@@ -1179,6 +1195,11 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         [self addSubview: o_textfield];
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    ;
 }
 
 - (void)dealloc
@@ -1316,6 +1337,20 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     return self;
 }
 
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    NSRect superFrame = [self frame];
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_popup frame];
+    frame.origin.x = i_xPos - 1;
+    frame.size.width = superFrame.size.width - frame.origin.x + 2;
+    [o_popup setFrame:frame];
+}
+
 - (void)dealloc
 {
     [o_popup release];
@@ -1402,7 +1437,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
                                 localizedString: p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -2, o_labelString )
+        ADD_LABEL( o_label, mainFrame, 0, -3, o_labelString )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
 
@@ -1410,7 +1445,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         ADD_STEPPER( o_stepper, mainFrame, mainFrame.size.width - 19,
             0, o_tooltip, -1600, 1600)
         [o_stepper setIntValue: p_item->i_value];
-        [o_stepper setAutoresizingMask:NSViewMinXMargin ];
+        [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
 
         /* build the textfield */
@@ -1427,10 +1462,26 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
             selector: @selector(textfieldChanged:)
             name: NSControlTextDidChangeNotification
             object: o_textfield];
-        [o_textfield setAutoresizingMask:NSViewMinXMargin ];
+        [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_textfield];
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_textfield frame];
+    frame.origin.x = i_xPos + 2;
+    [o_textfield setFrame:frame];
+
+    frame = [o_stepper frame];
+    frame.origin.x = i_xPos + [o_textfield frame].size.width + 5;
+    [o_stepper setFrame:frame];
 }
 
 - (void)dealloc
@@ -1501,6 +1552,20 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         [self addSubview: o_combo];
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    NSRect superFrame = [self frame];
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_combo frame];
+    frame.origin.x = i_xPos + 2;
+    frame.size.width = superFrame.size.width - frame.origin.x + 2;
+    [o_combo setFrame:frame];
 }
 
 - (void)dealloc
@@ -1578,6 +1643,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         ADD_LABEL( o_textfield_min, mainFrame, 12, -30, @"-8888" )
         [o_textfield_min setIntValue: p_item->i_min];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
+        [o_textfield_min setAlignment:NSRightTextAlignment];
         [self addSubview: o_textfield_min];
 
         /* build the maxtextfield */
@@ -1604,6 +1670,18 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_textfield frame];
+    frame.origin.x = i_xPos + 2;
+    [o_textfield setFrame:frame];
 }
 
 - (void)dealloc
@@ -1664,7 +1742,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         ADD_STEPPER( o_stepper, mainFrame, mainFrame.size.width - 19,
             0, o_tooltip, -1600, 1600)
         [o_stepper setFloatValue: p_item->f_value];
-        [o_stepper setAutoresizingMask:NSViewMinXMargin ];
+        [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
 
         /* build the textfield */
@@ -1681,10 +1759,26 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
             selector: @selector(textfieldChanged:)
             name: NSControlTextDidChangeNotification
             object: o_textfield];
-        [o_textfield setAutoresizingMask:NSViewMinXMargin ];
+        [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_textfield];
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_textfield frame];
+    frame.origin.x = i_xPos + 2;
+    [o_textfield setFrame:frame];
+
+    frame = [o_stepper frame];
+    frame.origin.x = i_xPos + [o_textfield frame].size.width + 5;
+    [o_stepper setFrame:frame];
 }
 
 - (void)dealloc
@@ -1754,6 +1848,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         ADD_LABEL( o_textfield_min, mainFrame, 12, -30, @"-8888" )
         [o_textfield_min setFloatValue: p_item->f_min];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
+        [o_textfield_min setAlignment:NSRightTextAlignment];
         [self addSubview: o_textfield_min];
 
         /* build the maxtextfield */
@@ -1780,6 +1875,18 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_textfield frame];
+    frame.origin.x = i_xPos + 2;
+    [o_textfield setFrame:frame];
 }
 
 - (void)dealloc
@@ -1824,21 +1931,37 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     {
         i_view_type = CONFIG_ITEM_BOOL;
 
-        /* add the checkbox */
+        /* add the label */
         if( p_item->psz_text )
             o_labelString = [[VLCMain sharedInstance]
                                 localizedString: p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
+        ADD_LABEL( o_label, mainFrame, 0, 0, o_labelString )
+        [o_label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: o_label];
+        /* add the checkbox */
         o_tooltip = [[VLCMain sharedInstance]
             wrapString: [[VLCMain sharedInstance]
             localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP];
-        ADD_CHECKBOX( o_checkbox, mainFrame, 0, 0, o_labelString,
-            o_tooltip, p_item->i_value, NSImageRight)
+        ADD_CHECKBOX( o_checkbox, mainFrame, [o_label frame].size.width,
+                        0, @"", o_tooltip, p_item->i_value, NSImageLeft)
         [o_checkbox setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_checkbox];
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_checkbox frame];
+    frame.origin.x = i_xPos;
+    [o_checkbox setFrame:frame];
 }
 
 - (void)dealloc
@@ -1941,6 +2064,39 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
     return self;
 }
 
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    NSRect superFrame = [self frame];
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_cmd_checkbox frame];
+    frame.origin.x = i_xPos;
+    [o_cmd_checkbox setFrame:frame];
+
+    frame = [o_ctrl_checkbox frame];
+    frame.origin.x = [o_cmd_checkbox frame].size.width +
+                        [o_cmd_checkbox frame].origin.x + 4;
+    [o_ctrl_checkbox setFrame:frame];
+
+    frame = [o_alt_checkbox frame];
+    frame.origin.x = i_xPos;
+    [o_alt_checkbox setFrame:frame];
+
+    frame = [o_shift_checkbox frame];
+    frame.origin.x = [o_cmd_checkbox frame].size.width +
+                        [o_cmd_checkbox frame].origin.x + 4;
+    [o_shift_checkbox setFrame:frame];
+
+    frame = [o_popup frame];
+    frame.origin.x = [o_shift_checkbox frame].origin.x +
+                        [o_shift_checkbox frame].size.width + 3;
+    frame.size.width = superFrame.size.width - frame.origin.x + 2;
+    [o_popup setFrame:frame];
+}
+
 - (void)dealloc
 {
     [o_cmd_checkbox release];
@@ -2019,6 +2175,20 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
 
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    NSRect frame;
+    NSRect superFrame = [self frame];
+    frame = [o_label frame];
+    frame.origin.x = i_xPos - frame.size.width - 3;
+    [o_label setFrame:frame];
+
+    frame = [o_popup frame];
+    frame.origin.x = i_xPos - 1;
+    frame.size.width = superFrame.size.width - frame.origin.x + 2;
+    [o_popup setFrame:frame];
 }
 
 - (void)dealloc
@@ -2176,6 +2346,11 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 
     }
     return self;
+}
+
+- (void) alignWithXPosition:(int)i_xPos
+{
+    ;
 }
 
 - (IBAction)tableChanged:(id)sender

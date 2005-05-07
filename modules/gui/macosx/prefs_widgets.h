@@ -25,9 +25,8 @@
 #define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 1)
 #define CONFIG_ITEM_KEY_BEFORE_10_3 (CONFIG_ITEM_KEY + 1)
 #define CONFIG_ITEM_KEY_AFTER_10_3 (CONFIG_ITEM_KEY + 2)
-#define MACOS_VERSION [[[NSDictionary dictionaryWithContentsOfFile: \
-            @"/System/Library/CoreServices/SystemVersion.plist"] \
-            objectForKey: @"ProductVersion"] floatValue]
+#define LEFTMARGIN  18
+#define RIGHTMARGIN 18
 
 @interface VLCConfigControl : NSView
 {
@@ -51,6 +50,8 @@
 - (float)floatValue;
 - (char *)stringValue;
 - (void)applyChanges;
+- (int)getLabelSize;
+- (void) alignWithXPosition:(int)i_xPos;
 static NSMenu   *o_keys_menu = nil;
 
 + (int)calcVerticalMargin: (int)i_curItem lastItem:(int)i_lastItem;
