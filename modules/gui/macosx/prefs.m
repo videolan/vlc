@@ -610,7 +610,6 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
             } while ( ( p_item->i_type != CONFIG_HINT_END ) &&
                       ( p_item->i_type != CONFIG_SUBCATEGORY ) );
 
-            vlc_object_release( p_parser );
             vlc_list_release( p_list );
         }
     }
