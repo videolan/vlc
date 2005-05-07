@@ -619,6 +619,8 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
         int i_lastItem = 0;
         int i_yPos = -2;
         int i_max_label = 0;
+        int i_show_advanced = 0;
+
         NSEnumerator *enumerator = [o_subviews objectEnumerator];
         VLCConfigControl *o_widget;
         NSRect o_frame;
@@ -634,7 +636,10 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
         {
             int i_widget;
             if( ( [o_widget isAdvanced] ) && (! b_advanced) )
+            {
+                i_show_advanced++;
                 continue;
+            }
 
             i_widget = [o_widget getViewType];
             i_yPos += [VLCConfigControl calcVerticalMargin:i_widget
@@ -649,6 +654,28 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
             i_lastItem = i_widget;
             [o_view addSubview:o_widget];
          }
+        if( i_show_advanced != 0 )
+        {
+            /* We add the advanced notice... */
+            NSRect s_rc = [o_view frame];
+            NSTextField *o_label;
+            s_rc.size.height = 17;
+            s_rc.origin.x = LEFTMARGIN;
+            s_rc.origin.y = i_yPos += [VLCConfigControl
+                                        calcVerticalMargin:CONFIG_ITEM_STRING
+                                        lastItem:i_lastItem];
+            o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
+            [o_label setDrawsBackground: NO];
+            [o_label setBordered: NO];
+            [o_label setEditable: NO];
+            [o_label setSelectable: NO];
+            [o_label setStringValue: _NS("Some options are available but" \
+                                "hidden. Check \"Advanced\" to see them.")];
+            [o_label setFont:[NSFont systemFontOfSize:10]];
+            [o_label sizeToFit];
+            [o_view addSubview:o_label];
+            i_yPos += [o_label frame].size.height;
+        }
         o_frame = [o_view frame];
         o_frame.size.height = i_yPos;
         [o_view setFrame:o_frame];
