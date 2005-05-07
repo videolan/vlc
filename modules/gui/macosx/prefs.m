@@ -669,7 +669,7 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
             [o_label setBordered: NO];
             [o_label setEditable: NO];
             [o_label setSelectable: NO];
-            [o_label setStringValue: _NS("Some options are available but" \
+            [o_label setStringValue: _NS("Some options are available but " \
                                 "hidden. Check \"Advanced\" to see them.")];
             [o_label setFont:[NSFont systemFontOfSize:10]];
             [o_label sizeToFit];
