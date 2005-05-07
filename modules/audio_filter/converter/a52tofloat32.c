@@ -100,7 +100,7 @@ struct filter_sys_t
     "listening room.")
 
 vlc_module_begin();
-    set_shortname( _("A/52") );
+    set_shortname( "A/52" );
     set_description( _("ATSC A/52 (AC-3) audio decoder") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );

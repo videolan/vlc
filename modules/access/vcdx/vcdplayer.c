@@ -83,7 +83,7 @@ vcdplayer_get_item_size(access_t * p_access, vcdinfo_itemid_t itemid)
   case VCDINFO_ITEM_TYPE_NOTFOUND:
   case VCDINFO_ITEM_TYPE_SPAREID2:
   default:
-    LOG_ERR("%s %d", _("bad item type"), itemid.type);
+    LOG_ERR("%s %d", "bad item type", itemid.type);
     return 0;
   }
 }
@@ -195,7 +195,7 @@ _vcdplayer_set_entry(access_t * p_access, unsigned int num)
   const unsigned int   i_entries = vcdinfo_get_num_entries(p_vcdinfo);
 
   if (num >= i_entries) {
-    LOG_ERR("%s %d", _("bad entry number"), num);
+    LOG_ERR("%s %d", "bad entry number", num);
     return;
   } else {
     vcdinfo_itemid_t itemid;
@@ -223,14 +223,14 @@ _vcdplayer_set_segment(access_t * p_access, unsigned int num)
   segnum_t       i_segs    = vcdinfo_get_num_segments(p_vcdinfo);
 
   if (num >= i_segs) {
-    LOG_ERR("%s %d", _("bad segment number"), num);
+    LOG_ERR("%s %d", "bad segment number", num);
     return;
   } else {
     vcdinfo_itemid_t itemid;
 
     if (VCDINFO_NULL_LSN==p_vcdplayer->i_lsn) {
       LOG_ERR("%s %d", 
-              _("Error in getting current segment number"), num);
+              "Error in getting current segment number", num);
       return;
     }
     
@@ -301,7 +301,7 @@ vcdplayer_play_single_item( access_t * p_access, vcdinfo_itemid_t itemid)
     }
     
   case VCDINFO_ITEM_TYPE_LID:
-    LOG_ERR("%s", _("Should have converted p_vcdplayer above"));
+    LOG_ERR("%s", "Should have converted p_vcdplayer above");
     return false;
     break;
 

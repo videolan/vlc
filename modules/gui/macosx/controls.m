@@ -259,7 +259,7 @@
 
     aout_VolumeGet( p_intf, &i_volume );
 
-    o_text = [NSString stringWithFormat: @"Volume: %d", i_volume * 200 / AOUT_VOLUME_MAX];
+    o_text = [NSString stringWithFormat: _NS("Volume: %d"), i_volume * 200 / AOUT_VOLUME_MAX];
     [o_main setScrollField:o_text stopAfter:1000000];
     
     [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];

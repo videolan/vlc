@@ -53,7 +53,7 @@ int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
  * Option help text
  *****************************************************************************/
 
-#define DEBUG_LONGTEXT N_( \
+#define DEBUG_LONGTEXT \
     "This integer when viewed in binary is a debugging mask\n" \
     "meta info         1\n" \
     "event info        2\n" \
@@ -68,7 +68,7 @@ int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
     "still    (400) 1024\n" \
     "vcdinfo  (800) 2048\n" )
 
-#define VCD_TITLE_FMT_LONGTEXT N_( \
+#define VCD_TITLE_FMT_LONGTEXT \
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
 "Format specifiers that start with a percent sign. Specifiers are: \n" \
 "   %A : The album information\n" \
