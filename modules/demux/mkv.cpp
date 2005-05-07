@@ -804,15 +804,11 @@ class dvd_chapter_codec_c : public chapter_codec_cmds_c
 public:
     dvd_chapter_codec_c( demux_sys_t & sys )
     :chapter_codec_cmds_c( sys, 1 )
-    ,interpretor( sys )
     {}
 
     bool Enter();
     bool Leave();
     std::string GetCodecName( bool f_for_title = false ) const;
-
-protected:
-    dvd_command_interpretor_c interpretor; 
 };
 
 class matroska_script_interpretor_c
@@ -1222,6 +1218,7 @@ public:
         ,meta(NULL)
         ,i_current_title(0)
         ,p_current_segment(NULL)
+        ,dvd_interpretor( *this )
         ,f_duration(-1.0)
         ,b_ui_hooked(false)
         ,p_input(NULL)
@@ -1257,6 +1254,8 @@ public:
     std::vector<matroska_segment_c*> opened_segments;
     std::vector<virtual_segment_c*>  used_segments;
     virtual_segment_c                *p_current_segment;
+
+    dvd_command_interpretor_c        dvd_interpretor;
 
     /* duration of the stream */
     float                   f_duration;
@@ -1807,6 +1806,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                     memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
                     p_sys->SwapButtons();
                     vlc_mutex_unlock( &p_sys->p_ev->lock );
+                    block_Release( p_block );
                 }
                 return;
             }
@@ -2422,6 +2422,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 if ( best != 0 && best != p_sys->i_curr_button )
                 {
                     vlc_value_t val;
+                    btni_t *button_ptr = &(pci->hli.btnit[best-1]);
 
                     if( var_Get( p_sys->p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
                     {
@@ -2454,6 +2455,9 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                         p_sys->i_curr_button = best;
                         msg_Dbg( &p_sys->demuxer, "Selected button %d", best );
                     }
+
+                    // process the button action
+                    p_sys->dvd_interpretor.Interpret( button_ptr->cmd.bytes, 8 );
                 }
             }
 
@@ -5193,7 +5197,7 @@ bool dvd_chapter_codec_c::Enter()
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "Matroska DVD enter command" );
-                f_result |= interpretor.Interpret( p_data );
+                f_result |= sys.dvd_interpretor.Interpret( p_data );
             }
         }
         index++;
@@ -5216,7 +5220,7 @@ bool dvd_chapter_codec_c::Leave()
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "Matroska DVD leave command" );
-                f_result |= interpretor.Interpret( p_data );
+                f_result |= sys.dvd_interpretor.Interpret( p_data );
             }
         }
         index++;
