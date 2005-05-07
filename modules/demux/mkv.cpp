@@ -665,7 +665,6 @@ public:
     
     bool Interpret( const binary * p_command, size_t i_size = 8 );
     
-protected:
     uint16 GetPRM( size_t index ) const
     {
         if ( index < 256 )
@@ -718,6 +717,7 @@ protected:
         return false;
     }
 
+protected:
     std::string GetRegTypeName( bool b_value, uint16 value ) const
     {
         std::string result;
@@ -797,6 +797,7 @@ protected:
     // callbacks when browsing inside CodecPrivate
     static bool MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
     static bool MatchPgcType    ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
+    static bool MatchPgcNumber  ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
 };
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
@@ -2424,40 +2425,43 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                     vlc_value_t val;
                     btni_t *button_ptr = &(pci->hli.btnit[best-1]);
 
-                    if( var_Get( p_sys->p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
-                    {
-                        vlc_mutex_t *p_mutex = (vlc_mutex_t *) val.p_address;
-                        btni_t *button_ptr = &(pci->hli.btnit[best-1]);
-                        uint32_t i_palette;
-
-                        if(button_ptr->btn_coln != 0) {
-                            i_palette = pci->hli.btn_colit.btn_coli[button_ptr->btn_coln-1][1];
-                        } else {
-                            i_palette = 0;
-                        }
-                        p_sys->alpha[0] = i_palette      & 0x0f;
-                        p_sys->alpha[1] = (i_palette>>4) & 0x0f;
-                        p_sys->alpha[2] = (i_palette>>8) & 0x0f;
-                        p_sys->alpha[3] = (i_palette>>12)& 0x0f;
-
-                        vlc_mutex_lock( p_mutex );
-                        val.i_int = button_ptr->x_start; var_Set( p_sys->p_input, "x-start", val );
-                        val.i_int = button_ptr->x_end;   var_Set( p_sys->p_input, "x-end",   val );
-                        val.i_int = button_ptr->y_start; var_Set( p_sys->p_input, "y-start", val );
-                        val.i_int = button_ptr->y_end;   var_Set( p_sys->p_input, "y-end",   val );
-
-                        val.p_address = (void *)p_sys->alpha;
-                        var_Set( p_sys->p_input, "menu-contrast", val );
-
-                        val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
-                        vlc_mutex_unlock( p_mutex );
-
-                        p_sys->i_curr_button = best;
-                        msg_Dbg( &p_sys->demuxer, "Selected button %d", best );
-                    }
+                    p_sys->dvd_interpretor.SetSPRM( 0x88, best );
 
                     // process the button action
-                    p_sys->dvd_interpretor.Interpret( button_ptr->cmd.bytes, 8 );
+                    if ( !p_sys->dvd_interpretor.Interpret( button_ptr->cmd.bytes, 8 ) )
+                    {
+                        if( var_Get( p_sys->p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
+                        {
+                            vlc_mutex_t *p_mutex = (vlc_mutex_t *) val.p_address;
+                            btni_t *button_ptr = &(pci->hli.btnit[best-1]);
+                            uint32_t i_palette;
+
+                            if(button_ptr->btn_coln != 0) {
+                                i_palette = pci->hli.btn_colit.btn_coli[button_ptr->btn_coln-1][1];
+                            } else {
+                                i_palette = 0;
+                            }
+                            p_sys->alpha[0] = i_palette      & 0x0f;
+                            p_sys->alpha[1] = (i_palette>>4) & 0x0f;
+                            p_sys->alpha[2] = (i_palette>>8) & 0x0f;
+                            p_sys->alpha[3] = (i_palette>>12)& 0x0f;
+
+                            vlc_mutex_lock( p_mutex );
+                            val.i_int = button_ptr->x_start; var_Set( p_sys->p_input, "x-start", val );
+                            val.i_int = button_ptr->x_end;   var_Set( p_sys->p_input, "x-end",   val );
+                            val.i_int = button_ptr->y_start; var_Set( p_sys->p_input, "y-start", val );
+                            val.i_int = button_ptr->y_end;   var_Set( p_sys->p_input, "y-end",   val );
+
+                            val.p_address = (void *)p_sys->alpha;
+                            var_Set( p_sys->p_input, "menu-contrast", val );
+
+                            val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
+                            vlc_mutex_unlock( p_mutex );
+
+                            p_sys->i_curr_button = best;
+                            msg_Dbg( &p_sys->demuxer, "Selected button %d", best );
+                        }
+                    }
                 }
             }
 
@@ -5406,7 +5410,21 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             uint16 i_pgcn = (p_command[6] << 8) + p_command[7];
             
             msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
-            // TODO
+            p_chapter = sys.BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 1, p_segment );
+            if ( p_chapter != NULL )
+            {
+                // if the segment is not part of the current segment, select the new one
+                if ( p_segment != sys.p_current_segment )
+                {
+                    sys.PreparePlayback( p_segment );
+                }
+
+                p_chapter->Enter( true );
+                
+                // jump to the location in the found segment
+                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                f_result = true;
+            }
             break;
         }
     case CMD_DVD_LINKCN:
@@ -5466,6 +5484,20 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
     uint8 i_pgc = *(uint8*)p_cookie;
 
     return (i_pgc_type == i_pgc);
+}
+
+bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+{
+    if ( i_cookie_size != 1 || data.m_private_data.GetSize() < 7 )
+        return false;
+    
+    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
+        return false;
+
+    uint16 *i_pgc_n = (uint16 *)p_cookie;
+    uint16 i_pgc_num = (data.m_private_data.GetBuffer()[1] << 8) + data.m_private_data.GetBuffer()[2];
+
+    return (i_pgc_num == *i_pgc_n);
 }
 
 bool matroska_script_codec_c::Enter()
