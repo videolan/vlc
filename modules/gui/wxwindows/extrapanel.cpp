@@ -479,12 +479,12 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 
     top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
-    top_sizer->Add( new wxButton( panel, EqRestore_Event,
-                                  wxU( _("Restore Defaults") ) ),
-                                  0, wxALL, 2 );
+    eq_restoredefaults_button = new wxButton( panel, EqRestore_Event,
+                                  wxU( _("Restore Defaults") ) );
+    top_sizer->Add( eq_restoredefaults_button, 0, wxALL, 2 );
     top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
-    wxStaticText *smooth_text = new wxStaticText( panel, -1, wxU( "Smooth :" ));
+    smooth_text = new wxStaticText( panel, -1, wxU( "Smooth :" ));
     smooth_text->SetToolTip( wxU( SMOOTH_TIP ) );
     top_sizer->Add( smooth_text, 0, wxALL, 2 );
 
@@ -543,6 +543,19 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     panel_sizer->SetSizeHints( panel );
 
     CheckAout();
+
+    eq_2p_chkbox->Disable();
+    eq_restoredefaults_button->Disable();
+    smooth_slider->Disable();
+    smooth_text->Disable();
+    preamp_slider->Disable();
+    preamp_text->Disable();
+    for( int i_index=0; i_index < 10; i_index++ )
+    {
+        band_sliders[i_index]->Disable();
+        band_texts[i_index]->Disable();
+    }
+
     return panel;
 }
 
@@ -599,10 +612,38 @@ void ExtraPanel::OnIdle( wxIdleEvent &event )
  *************************/
 void ExtraPanel::OnEnableEqualizer( wxCommandEvent &event )
 {
+    int i_index;
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
     ChangeFiltersString( p_intf,p_aout, "equalizer",
                          event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+
+    if( event.IsChecked() )
+    {
+        eq_2p_chkbox->Enable();
+        eq_restoredefaults_button->Enable();
+        smooth_slider->Enable();
+        smooth_text->Enable();
+        preamp_slider->Enable();
+        preamp_text->Enable();
+        for( i_index=0; i_index < 10; i_index++ )
+        {
+            band_sliders[i_index]->Enable();
+            band_texts[i_index]->Enable();
+        }
+    } else {
+        eq_2p_chkbox->Disable();
+        eq_restoredefaults_button->Disable();
+        smooth_slider->Disable();
+        smooth_text->Disable();
+        preamp_slider->Disable();
+        preamp_text->Disable();
+        for( i_index=0; i_index < 10; i_index++ )
+        {
+            band_sliders[i_index]->Disable();
+            band_texts[i_index]->Disable();
+        }
+    }
 
     if( p_aout != NULL )
         vlc_object_release( p_aout );

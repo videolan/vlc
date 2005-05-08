@@ -233,7 +233,10 @@ private:
 
     wxCheckBox *eq_2p_chkbox;
 
+    wxButton *eq_restoredefaults_button;
+
     wxSlider *smooth_slider;
+    wxStaticText *smooth_text;
 
     wxSlider *preamp_slider;
     wxStaticText * preamp_text;
