@@ -2,22 +2,6 @@
 # Known VLC bugs #
 ##################
 
-Feel free to work on these :)
-
-Regressions from previous versions
-----------------------------------
-*** OS X resampler 
-*   CDDAX 
-
-** Playlist : the "previous item" action sometimes doesn't get any item, or an item
-at the other edge of the playlist, when at the beginning of a node
-
-* Sort by Author unimplemented
-
-Other bugs
-----------
-*  Insert/Backspace hotkeys
-*  SDL Vout
-** ALSA 5.1, at least with some configuration
-** hotkeys in wxWindows in embedded mode sometimes don't respond
-** OSX LPCM
+# This file is deprecated
+# Please use https://developers.videolan.org/cgi-bin/trac.cgi/
+# Every developer with an SVN account can access Trac with the same credentials
