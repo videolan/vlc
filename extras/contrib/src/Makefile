@@ -84,7 +84,7 @@ endif
 ifdef HAVE_DARWIN_OS
  all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
+	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
 # mozilla support? add before .aclocal:  .glib .libidl .mozilla
@@ -102,7 +102,7 @@ else
 # libraries now
    all: .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
+	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi .aclocal
   endif
  else
