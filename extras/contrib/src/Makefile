@@ -294,7 +294,7 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/gettext.patch
 
-.intl: gettext
+.intl: gettext .iconv
 	( cd $< && ./configure $(HOSTCONF) --prefix=$(PREFIX) )
 ifeq ($(BUILD),i586-pc-beos)
 # The ugliest kludge ever - so libtool correctly links shared libraries
@@ -1084,6 +1084,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 
 .gpgerror: libgpg-error
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+#	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .gpgerror
@@ -1101,7 +1102,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/gcrypt.patch
 
-.gcrypt: libgcrypt
+.gcrypt: libgcrypt .gpgerror .intl .iconv
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
 	$(INSTALL_NAME)
 	touch $@
@@ -1120,7 +1121,7 @@ gnutls-$(GNUTLS_VERSION).tar.bz2:
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
-.gnutls: gnutls
+.gnutls: gnutls .intl .iconv .gcrypt .gpgerror
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
 	$(INSTALL_NAME)
 	touch $@
