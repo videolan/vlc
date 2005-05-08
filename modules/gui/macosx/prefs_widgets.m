@@ -2170,7 +2170,7 @@ fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
                         , vlc_keys[i].i_key_code)
         }
         [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
-        [o_popup selectItemWithTag: p_item->i_value];
+        [o_popup selectItem:[[o_popup menu] itemWithTag:p_item->i_value]];
         [self addSubview: o_popup];
 
     }
@@ -2237,9 +2237,9 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
             if( p_config->i_type == CONFIG_SUBCATEGORY &&
                 p_config->i_value == _p_item->i_min )
             {
-                o_modulelongname = [NSString stringWithCString:
+                o_modulelongname = [NSString stringWithUTF8String:
                                         p_parser->psz_longname];
-                o_modulename = [NSString stringWithCString:
+                o_modulename = [NSString stringWithUTF8String:
                                         p_parser->psz_object_name];
 
                 if( _p_item->psz_value &&
