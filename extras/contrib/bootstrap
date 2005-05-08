@@ -66,4 +66,12 @@ else
 	exit 1
 fi
 
+if which svn >/dev/null; then
+	echo "SVN = svn" >> config.mak
+elif which /sw/bin/svn >/dev/null; then
+	echo "SVN = /sw/bin/svn" >> config.mak
+else
+	echo "You don't have a subversion client installed." >&2
+fi
+
 echo "PREFIX = `pwd`" >> config.mak
