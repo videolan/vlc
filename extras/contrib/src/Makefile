@@ -645,15 +645,16 @@ DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 # libebml
 # ***************************************************************************
 
+ifdef SVN
+libebml:
+	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
+else
 libebml-$(LIBEBML_VERSION).tar.bz2:
 	$(WGET) $(LIBEBML_URL)
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
-	ifdef $(SVN)
-		$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
-	else
-		$(EXTRACT_BZ2)
-	endif
+	$(EXTRACT_BZ2)
+endif
 
 .ebml: libebml
 	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
@@ -668,15 +669,16 @@ DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
 # libmatroska
 # ***************************************************************************
 
+ifdef SVN
+libmatroska:
+	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
+else
 libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 	$(WGET) $(LIBMATROSKA_URL)
 
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
-	ifdef $(SVN)
-		$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
-	else
-		$(EXTRACT_BZ2)
-	endif
+	$(EXTRACT_BZ2)
+endif
 
 .matroska: libmatroska
 	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
