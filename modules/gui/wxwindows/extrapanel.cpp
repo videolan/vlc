@@ -544,17 +544,38 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 
     CheckAout();
 
-    eq_2p_chkbox->Disable();
-    eq_restoredefaults_button->Disable();
-    smooth_slider->Disable();
-    smooth_text->Disable();
-    preamp_slider->Disable();
-    preamp_text->Disable();
-    for( int i_index=0; i_index < 10; i_index++ )
+    aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
+                                 VLC_OBJECT_AOUT, FIND_ANYWHERE);
+    char *psz_af;
+    if( p_aout )
     {
-        band_sliders[i_index]->Disable();
-        band_texts[i_index]->Disable();
+        psz_af = var_GetString( p_aout, "audio-filter" );
+        if( var_GetBool( p_aout, "equalizer-2pass" ) )
+            eq_2p_chkbox->SetValue( true );
     }
+    else
+    {
+        psz_af = config_GetPsz( p_intf, "audio-filter" );
+        if( config_GetInt( p_intf, "equalizer-2pass" ) )
+            eq_2p_chkbox->SetValue( true );
+    }
+    if( strstr( psz_af, "equalizer" ) != NULL )
+    {
+        eq_chkbox->SetValue( true );
+    } else {
+        eq_2p_chkbox->Disable();
+        eq_restoredefaults_button->Disable();
+        smooth_slider->Disable();
+        smooth_text->Disable();
+        preamp_slider->Disable();
+        preamp_text->Disable();
+        for( int i_index=0; i_index < 10; i_index++ )
+        {
+            band_sliders[i_index]->Disable();
+            band_texts[i_index]->Disable();
+        }
+    }
+    free( psz_af );
 
     return panel;
 }
