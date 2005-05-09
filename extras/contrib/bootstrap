@@ -68,6 +68,8 @@ fi
 
 if test -f /sw/bin/svn; then
         echo "SVN = /sw/bin/svn" >> config.mak
+elif test -f /usr/local/bin/svn; then
+        echo "SVN = /usr/local/bin/svn" >> config.mak
 elif svn help >/dev/null 2>&1; then
         echo "SVN = svn" >> config.mak
 else
