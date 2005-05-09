@@ -86,7 +86,7 @@ ifdef HAVE_DARWIN_OS
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
+	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
 # mozilla support? add before .aclocal:  .glib .libidl .mozilla
 else
 
@@ -1082,12 +1082,12 @@ libgpg-error-$(GPGERROR_VERSION).tar.gz:
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.gpgerror: libgpg-error
+.gpg-error: libgpg-error .intl .iconv
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
-#	$(INSTALL_NAME)
+	$(INSTALL_NAME)
 	touch $@
 
-CLEAN_FILE += .gpgerror
+CLEAN_FILE += .gpg-error
 CLEAN_PKG += libgpg-error
 DISCLEAN_PKG += libgpg-error-$(GPGERROR_VERSION).tar.gz
 
@@ -1102,7 +1102,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/gcrypt.patch
 
-.gcrypt: libgcrypt .gpgerror .intl .iconv
+.gcrypt: libgcrypt .gpg-error .intl .iconv
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
 	$(INSTALL_NAME)
 	touch $@
@@ -1121,7 +1121,7 @@ gnutls-$(GNUTLS_VERSION).tar.bz2:
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
-.gnutls: gnutls .intl .iconv .gcrypt .gpgerror
+.gnutls: gnutls .intl .iconv .gcrypt .gpg-error
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
 	$(INSTALL_NAME)
 	touch $@
