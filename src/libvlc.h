@@ -1403,7 +1403,7 @@ vlc_module_begin();
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
 #   define KEY_INTF_SHOW          'i'
-#   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|'s'
+#   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_CTRL|KEY_F2
