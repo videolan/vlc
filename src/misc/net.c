@@ -441,6 +441,11 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
               : recv( fd, p_data, i_data, 0 ) ) < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
+            if( WSAGetLastError() == WSAEWOULDBLOCK )
+            {
+                /* only happens with p_vs (SSL) - not really an error */
+            }
+            else
             /* For udp only */
             /* On win32 recv() will fail if the datagram doesn't fit inside
              * the passed buffer, even though the buffer will be filled with
@@ -454,7 +459,9 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
             else
                 msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
 #else
-            msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+            /* EAGAIN only happens with p_vs (SSL) and it's not an error */
+            if( errno != EAGAIN )
+                msg_Err( p_this, "recv failed (%s)", strerror(errno) );
 #endif
             return i_total > 0 ? i_total : -1;
         }
