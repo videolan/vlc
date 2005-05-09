@@ -546,7 +546,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
-    char *psz_af;
+    char *psz_af = NULL;
     if( p_aout )
     {
         psz_af = var_GetString( p_aout, "audio-filter" );
@@ -559,7 +559,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
         if( config_GetInt( p_intf, "equalizer-2pass" ) )
             eq_2p_chkbox->SetValue( true );
     }
-    if( strstr( psz_af, "equalizer" ) != NULL )
+    if( psz_af != NULL ? strstr( psz_af, "equalizer" ) != NULL : VLC_FALSE )
     {
         eq_chkbox->SetValue( true );
     } else {
