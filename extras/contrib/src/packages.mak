@@ -1,11 +1,12 @@
 # ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
-# Copyright (C) 2003, 2004 VideoLAN
+# Copyright (C) 2003 - 2005 VideoLAN
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
+#          Felix Kühne <fkuehne@users.sourceforge.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -59,7 +60,7 @@ OGG_CVSROOT=:pserver:anoncvs@xiph.org:/usr/local/cvsroot
 VORBIS_VERSION=1.0
 VORBIS_URL=http://us.xiph.org/ogg/vorbis/download/libvorbis-$(VORBIS_VERSION).tar.gz
 THEORA_VERSION=1.0alpha4
-THEORA_URL=http://downloads.xiph.org/releases/theora/libtheora-$(THEORA_VERSION).tar.bz2
+THEORA_URL=$(VIDEOLAN)/testing/contrib/libtheora-$(THEORA_VERSION).tar.bz2
 FLAC_VERSION=1.1.0
 FLAC_URL=$(SF)/flac/flac-$(FLAC_VERSION).tar.gz
 SPEEX_VERSION=1.1.5
