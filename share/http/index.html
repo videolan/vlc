@@ -36,21 +36,39 @@ function changeMe(item)
     <div class="left">
       <div class="sectitle">Playback control</div>
       <div class="section-controls">
-        <form method="get" action="">
-          <p>
+        <p>
+          <form method="get" action="" style="display: inline">
             <input type="submit" name="control" value="stop" />
-            <input type="submit" name="control" value="pause" />
-            <br />
-            <input type="submit" name="control" value="previous" />
-            <input type="submit" name="control" value="next" />
-          </p>
-            <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
-            <input type="submit" name="seek_value" value="+1min"/><input type="hidden" name="control" value="seek"/>
-            <br />
-            <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
           </form>
-        <br />
+          <form method="get" action="" style="display: inline">
+            <input type="submit" name="control" value="pause" />
+          </form>
+        </p>
+        <p>
+          <form method="get" action="" style="display: inline">
+            <input type="submit" name="control" value="previous" />
+          </form>
+          <form method="get" action="" style="display: inline">
+            <input type="submit" name="control" value="next" />
+          </form>
+        </p>
+        <p>
+          <form method="get" action="" style="display: inline">
+            <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
+          </form>
+          <form method="get" action="" style="display: inline">
+            <input type="submit" name="seek_value" value="+1min"/><input type="hidden" name="control" value="seek"/>
+          </form>
+        </p>
+        <p>
+          <form method="get" action="">
+            <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
+            <input type="submit" value="Seek" />
+          </form>
+        </p>
+        <p>
           <span class="small">( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )</span>
+        </p>
       </div> <!-- End section -->
 
       <div class="sectitle">Misc controls</div>
@@ -93,11 +111,11 @@ function changeMe(item)
           <table class="add">
             <tr>
               <td>Add a MRL (Media Resource Locator) to the playlist</td>
-              <td><input type="text" name="mrl" size="40" /><input type="submit" name="control" value="add" /></td>
+              <td><input type="text" name="mrl" size="40" /> <input type="submit" name="control" value="add" /></td>
             </tr>
             <tr>
               <td>Stream Output:</td>
-              <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /><input type="submit" name="control" value="sout" /></td>
+              <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /> <input type="submit" name="control" value="sout" /></td>
             </tr>
           </table>
         </form>

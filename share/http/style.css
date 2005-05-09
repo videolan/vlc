@@ -89,6 +89,10 @@ form {
     padding: 0pt;
 }
 
+input {
+    border: 1px solid black;
+}
+
 ul#playlist, ul#playlist ul{
     list-style-type: none;
 }
