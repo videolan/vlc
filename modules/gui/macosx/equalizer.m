@@ -172,21 +172,28 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
 {
     intf_thread_t *p_intf = VLCIntf;
     float f_preamp, f_band[10];
-    char *psz_bands, *p_next;
+    char *psz_bands, *psz_bands_init, *p_next;
     vlc_bool_t b_2p;
     int i;
     vlc_bool_t b_enabled = GetFiltersStatus( p_intf, "equalizer" );
     vlc_object_t *p_object = vlc_object_find( p_intf,
                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
+
     if( p_object == NULL )
         p_object = vlc_object_find( p_intf,
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_object == NULL )
         return;
 
+    var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
+                                                    VLC_VAR_DOINHERIT );
+    var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
+                                                    VLC_VAR_DOINHERIT );
+
     f_preamp = var_GetFloat( p_object, "equalizer-preamp" );
     psz_bands = var_GetString( p_object, "equalizer-bands" );
-    if( !psz_bands )
+
+    if( !strcmp( psz_bands, "" ) )
         psz_bands = strdup( "0 0 0 0 0 0 0 0 0 0" );
 
     b_2p = var_GetBool( p_object, "equalizer-2pass" );
@@ -197,6 +204,8 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     [o_slider_preamp setFloatValue: f_preamp];
 
 /* Set the bands slider */
+    psz_bands_init = psz_bands;
+
     for( i = 0; i < 10; i++ )
     {
         /* Read dB -20/20 */
@@ -210,7 +219,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
         if( !*psz_bands ) break; /* end of line */
         psz_bands = p_next+1;
     }
-    free( psz_bands );
+    free( psz_bands_init );
 
     [o_slider_band1 setFloatValue: f_band[0]];
     [o_slider_band2 setFloatValue: f_band[1]];
