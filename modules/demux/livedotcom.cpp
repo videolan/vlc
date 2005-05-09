@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include "network.h"
 
 #include <iostream>
 
@@ -132,6 +133,7 @@ typedef struct
 struct demux_sys_t
 {
     char         *p_sdp;    /* XXX mallocated */
+    char         *psz_path; /* URL-encoded path */
 
     MediaSession     *ms;
     TaskScheduler    *scheduler;
@@ -226,6 +228,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_no_data = VLC_TRUE;
     p_sys->i_no_data_ti = 0;
     p_sys->b_multicast = VLC_FALSE;
+    p_sys->psz_path = p_demux->psz_path;
 
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
@@ -237,6 +240,13 @@ static int  Open ( vlc_object_t *p_this )
     {
         msg_Err( p_demux, "BasicUsageEnvironment::createNew failed" );
         goto error;
+    }
+
+    if( vlc_UrlIsNotEncoded( p_sys->psz_path ) )
+    {
+        p_sys->psz_path = vlc_UrlEncode( p_sys->psz_path );
+        if( p_sys->psz_path == NULL )
+            goto error;
     }
 
     if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "rtsp" ) )
@@ -251,8 +261,8 @@ static int  Open ( vlc_object_t *p_this )
                      p_sys->env->getResultMsg() );
             goto error;
         }
-        psz_url = (char*)malloc( strlen( p_demux->psz_path ) + 8 );
-        sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
+        psz_url = (char*)malloc( strlen( p_sys->psz_path ) + 8 );
+        sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
 
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         if( psz_options )
@@ -276,7 +286,7 @@ static int  Open ( vlc_object_t *p_this )
     }
     else if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "sdp" ) )
     {
-        p_sys->p_sdp = strdup( p_demux->psz_path );
+        p_sys->p_sdp = strdup( p_sys->psz_path );
     }
     else
     {
@@ -626,6 +636,10 @@ error:
     {
         free( p_sys->p_sdp );
     }
+    if( ( p_sys->psz_path != NULL )
+     && ( p_sys->psz_path != p_demux->psz_path ) )
+        free( p_sys->psz_path );
+
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -663,6 +677,8 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->env ) RECLAIM_ENV(p_sys->env);
     if( p_sys->scheduler ) delete p_sys->scheduler;
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
+    if( p_sys->psz_path != p_demux->psz_path )
+        free( p_sys->psz_path );
     free( p_sys );
 }
 
@@ -955,7 +971,7 @@ static int RollOverTcp( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    asprintf( &psz_url, "rtsp://%s", p_demux->psz_path );
+    asprintf( &psz_url, "rtsp://%s", p_sys->psz_path );
 
     if( ( psz_options = p_sys->rtsp->sendOptionsCmd( psz_url ) ) )
         delete [] psz_options;
