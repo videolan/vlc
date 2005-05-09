@@ -238,11 +238,11 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
  *****************************************************************************
  *
  *****************************************************************************/
-static inline char *vlc_b64_encode( unsigned char *src )
+static inline char *vlc_b64_encode( char *src )
 {
     static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
                                                                                 
-    char *dst = malloc( strlen( src ) * 4 / 3 + 12 );
+    char *dst = (char *)malloc( strlen( src ) * 4 / 3 + 12 );
     char *ret = dst;
     unsigned i_bits = 0;
     unsigned i_shift = 0;
