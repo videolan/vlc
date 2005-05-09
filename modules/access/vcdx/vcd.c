@@ -66,7 +66,7 @@ int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
     "seek-set (100)  256\n" \
     "seek-cur (200)  512\n" \
     "still    (400) 1024\n" \
-    "vcdinfo  (800) 2048\n" )
+    "vcdinfo  (800) 2048\n"
 
 #define VCD_TITLE_FMT_LONGTEXT \
 "Format used in the GUI Playlist Title. Similar to the Unix date \n" \
@@ -85,7 +85,7 @@ int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
 "   %V : The volume set ID\n" \
 "   %v : The volume ID\n" \
 "       A number between 1 and the volume count.\n" \
-"   %% : a % \n")
+"   %% : a % \n"
 
 /*****************************************************************************
  * Module descriptor
