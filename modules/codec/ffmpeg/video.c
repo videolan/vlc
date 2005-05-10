@@ -186,11 +186,19 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         }
     }
 
+#if LIBAVCODEC_BUILD >= 4754
+    if( p_context->time_base.num > 0 && p_context->time_base.den > 0 )
+    {
+        p_dec->fmt_out.video.i_frame_rate = p_context->time_base.den;
+        p_dec->fmt_out.video.i_frame_rate_base = p_context->time_base.num;
+    }
+#else
     if( p_context->frame_rate > 0 && p_context->frame_rate_base > 0 )
     {
         p_dec->fmt_out.video.i_frame_rate = p_context->frame_rate;
         p_dec->fmt_out.video.i_frame_rate_base = p_context->frame_rate_base;
     }
+#endif
 
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
@@ -654,6 +662,16 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             p_pic->date = p_sys->i_pts;
 
             /* interpolate the next PTS */
+#if LIBAVCODEC_BUILD >= 4754
+            if( p_sys->p_context->time_base.den > 0 )
+            {
+                p_sys->i_pts += I64C(1000000) *
+                    (2 + p_sys->p_ff_pic->repeat_pict) *
+                    p_sys->p_context->time_base.num *
+                    p_block->i_rate / INPUT_RATE_DEFAULT /
+                    (2 * p_sys->p_context->time_base.den);
+            }
+#else
             if( p_sys->p_context->frame_rate > 0 )
             {
                 p_sys->i_pts += I64C(1000000) *
@@ -662,6 +680,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
                     p_block->i_rate / INPUT_RATE_DEFAULT /
                     (2 * p_sys->p_context->frame_rate);
             }
+#endif
 
             if( p_sys->b_first_frame )
             {

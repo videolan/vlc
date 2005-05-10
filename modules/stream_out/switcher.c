@@ -740,8 +740,13 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
                    i_aspect_num * (int64_t)id->ff_enc_c->height,
                    i_aspect_den * (int64_t)id->ff_enc_c->width, 1 << 30 );
 
+#if LIBAVCODEC_BUILD >= 4754
+        id->ff_enc_c->time_base.num = 1;
+        id->ff_enc_c->time_base.den = 25; /* FIXME */
+#else
         id->ff_enc_c->frame_rate    = 25; /* FIXME */
         id->ff_enc_c->frame_rate_base = 1;
+#endif
 
         id->ff_enc_c->gop_size = 200;
         id->ff_enc_c->max_b_frames = 0;
