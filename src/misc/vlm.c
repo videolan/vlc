@@ -1743,9 +1743,22 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
         int i, j;
         vlm_message_t *msg;
         vlm_message_t *msg_child;
+        int i_vod = 0, i_broadcast = 0;
+        char *psz_count;
+
+        for( i = 0; i < vlm->i_media; i++ )
+        {
+            if( vlm->media[i]->i_type == VOD_TYPE )
+                i_vod ++;
+            else
+                i_broadcast ++;
+        }
+
+        asprintf( &psz_count, "( %d broadcast - %d vod )", i_broadcast, i_vod);
 
         msg = vlm_MessageNew( "show", NULL );
-        msg_child = vlm_MessageAdd( msg, vlm_MessageNew( "media", NULL ) );
+        msg_child = vlm_MessageAdd( msg, vlm_MessageNew( "media", psz_count ) );
+        free( psz_count );
 
         for( i = 0; i < vlm->i_media; i++ )
         {
