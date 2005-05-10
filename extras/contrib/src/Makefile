@@ -698,7 +698,7 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ffmpeg-module is fixed properly -- FK
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
-	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co -D 2005-04-30 ffmpeg
+	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
 	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
@@ -1082,8 +1082,8 @@ libgpg-error-$(GPGERROR_VERSION).tar.gz:
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.gpg-error: libgpg-error .intl .iconv
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+.gpg-error: libgpg-error
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-nls && make && make install )
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1102,7 +1102,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/gcrypt.patch
 
-.gcrypt: libgcrypt .gpg-error .intl .iconv
+.gcrypt: libgcrypt .gpg-error
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
 	$(INSTALL_NAME)
 	touch $@
@@ -1121,7 +1121,7 @@ gnutls-$(GNUTLS_VERSION).tar.bz2:
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
-.gnutls: gnutls .intl .iconv .gcrypt .gpg-error
+.gnutls: gnutls .gcrypt .gpg-error
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
 	$(INSTALL_NAME)
 	touch $@
