@@ -630,6 +630,11 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
     {
         return VLC_EGENERIC;
     }
+    if( p_item->i_children > -1 )
+    {
+        return playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
+    }
+
     var_SetInteger( p_playlist, "item-deleted", i_id );
 
     i_bottom = 0; i_top = p_playlist->i_all_size - 1;
@@ -658,7 +663,6 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
         /* Hack we don't call playlist_Control for lock reasons */
         p_playlist->status.i_status = PLAYLIST_STOPPED;
         p_playlist->request.b_request = VLC_TRUE;
-//        p_playlist->status.p_item = NULL;
         msg_Info( p_playlist, "stopping playback" );
         b_flag = VLC_TRUE;
     }
