@@ -51,6 +51,9 @@
 #ifndef STDOUT_FILENO
 #   define STDOUT_FILENO 1
 #endif
+#ifndef O_LARGEFILE
+#   define O_LARGEFILE 0
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -115,7 +118,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "no file name specified" );
         return VLC_EGENERIC;
     }
-    i_flags = O_RDWR|O_CREAT;
+    i_flags = O_RDWR|O_CREAT|O_LARGEFILE;
 
     var_Get( p_access, SOUT_CFG_PREFIX "append", &val );
     if( val.b_bool )
