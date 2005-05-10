@@ -1083,6 +1083,8 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
 
     LockPlaylist( p_intf->p_sys, p_playlist );
 
+    if( !( p_wxitem && p_wxparent ) ) return;
+
     p_item2 = playlist_ItemGetById(p_playlist, p_wxitem->i_id);
     p_node2 = playlist_ItemGetById(p_playlist, p_wxparent->i_id);
     if( p_item2 && p_item2->i_children == -1 )
