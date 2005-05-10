@@ -303,9 +303,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     for (j = 0 ; j < [o_array count] - 1 ; j++)
     {
-        [o_outline_view expandItem: [o_outline_dict objectForKey:
+        id o_item;
+        if( ( o_item = [o_outline_dict objectForKey:
                             [NSString stringWithFormat: @"%p",
-                            [[o_array objectAtIndex:j] pointerValue]]]];
+                            [[o_array objectAtIndex:j] pointerValue]]] ) != nil )
+            [o_outline_view expandItem: o_item];
 
     }
 

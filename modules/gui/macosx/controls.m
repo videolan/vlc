@@ -222,7 +222,8 @@
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-vol-up" );
     var_Set( p_intf->p_vlc, "key-pressed", val );
-    [self updateVolumeSlider];
+    /* Manage volume status */
+    [o_main manageVolumeSlider];
 }
 
 - (IBAction)volumeDown:(id)sender
@@ -231,7 +232,8 @@
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-vol-down" );
     var_Set( p_intf->p_vlc, "key-pressed", val );
-    [self updateVolumeSlider];
+    /* Manage volume status */
+    [o_main manageVolumeSlider];
 }
 
 - (IBAction)mute:(id)sender
@@ -240,7 +242,8 @@
     intf_thread_t * p_intf = VLCIntf;
     val.i_int = config_GetInt( p_intf, "key-vol-mute" );
     var_Set( p_intf->p_vlc, "key-pressed", val );
-    [self updateVolumeSlider];
+    /* Manage volume status */
+    [o_main manageVolumeSlider];
 }
 
 - (IBAction)volumeSliderUpdated:(id)sender
@@ -248,21 +251,8 @@
     intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
     aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_STEP );
-    [self updateVolumeSlider];
-}
-
-- (void)updateVolumeSlider
-{
-    NSString * o_text;
-    intf_thread_t * p_intf = VLCIntf;
-    audio_volume_t i_volume;
-
-    aout_VolumeGet( p_intf, &i_volume );
-
-    o_text = [NSString stringWithFormat: _NS("Volume: %d"), i_volume * 200 / AOUT_VOLUME_MAX];
-    [o_main setScrollField:o_text stopAfter:1000000];
-    
-    [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];
+    /* Manage volume status */
+    [o_main manageVolumeSlider];
 }
 
 - (IBAction)windowAction:(id)sender

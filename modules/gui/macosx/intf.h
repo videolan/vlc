@@ -242,6 +242,7 @@ struct intf_sys_t
 
     NSSize o_size_with_playlist;
 
+    int     i_lastShownVolume;
 }
 
 + (VLCMain *)sharedInstance;

@@ -52,7 +52,6 @@
 - (IBAction)volumeDown:(id)sender;
 - (IBAction)mute:(id)sender;
 - (IBAction)volumeSliderUpdated:(id)sender;
-- (void)updateVolumeSlider;
 
 - (IBAction)windowAction:(id)sender;
 

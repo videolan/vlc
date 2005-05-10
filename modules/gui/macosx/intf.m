@@ -296,7 +296,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_about = [[VLAboutBox alloc] init];
     o_prefs = [[VLCPrefs alloc] init];
     o_open = [[VLCOpen alloc] init];
-    
+
+    i_lastShownVolume = -1;
     return _o_sharedMainInstance;
 }
 
@@ -965,9 +966,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             [o_timefield setStringValue: o_time];
         }
 
-        /* Manage volume status */
-        [self manageVolumeSlider];
-
         /* Manage Playing status */
         var_Get( p_input, "state", &val );
         if( p_intf->p_sys->i_play_status != val.i_int )
@@ -990,6 +988,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( (i_end_scroll != -1) && (mdate() > i_end_scroll) )
         [self resetScrollField];
+
+    /* Manage volume status */
+    [self manageVolumeSlider];
 
     [NSTimer scheduledTimerWithTimeInterval: 0.3
         target: self selector: @selector(manageIntf:)
@@ -1221,11 +1222,19 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)manageVolumeSlider
 {
     audio_volume_t i_volume;
-
     aout_VolumeGet( p_intf, &i_volume );
 
-    [o_volumeslider setFloatValue: (float)i_volume / AOUT_VOLUME_STEP];
-    [o_volumeslider setEnabled: TRUE];
+    if( i_volume != i_lastShownVolume )
+    {
+        NSString *o_text;
+        o_text = [NSString stringWithFormat: _NS("Volume: %d"), i_volume * 200 / AOUT_VOLUME_MAX];
+        if( i_lastShownVolume != -1 )
+            [self setScrollField:o_text stopAfter:1000000];
+    
+        [o_volumeslider setFloatValue: (float)i_volume / AOUT_VOLUME_STEP];
+        [o_volumeslider setEnabled: TRUE];
+        i_lastShownVolume = i_volume;
+    }
 
     p_intf->p_sys->b_mute = ( i_volume == 0 );
 }
