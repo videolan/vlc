@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
+<!-- $Id: -->
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -7,21 +9,28 @@
     <title>VLC media player</title>
     <link href="/style.css" title="Default" rel="stylesheet" type="text/css" />
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <!-- Work around. should be done in the code -->
+    <vlc id="if" param1="url_param"/>
+        <meta http-equiv="refresh" content="0;url=/" />
+    <vlc id="else" />
+        <meta http-equiv="Refresh" content="60;url=/">
+    <vlc id="end" />
+    
     <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort,move" />
     <vlc id="set" param1="sout" param2="string" />
 <script type="text/javascript">
 
 function changeMe(item)
 {
-  if (item.parentNode.parentNode.lastChild.style.display=="none")
+  if (item.parentNode.lastChild.style.display=="none")
   {
-    item.parentNode.parentNode.lastChild.style.display="block";
+    item.parentNode.lastChild.style.display="block";
     item.alt="[-]";
     item.src="cone_minus.png";
   }
   else
   {
-    item.parentNode.parentNode.lastChild.style.display="none";
+    item.parentNode.lastChild.style.display="none";
     item.alt="[+]";
     item.src="cone_plus.png";
   }
@@ -107,20 +116,31 @@ function changeMe(item)
 
       <div class="sectitle">Add</div>
       <div class="section">
-        <form method="get" action="" enctype="text/plain" >
-          <table class="add">
-            <tr>
+        <table class="add">
+          <tr>
+	    <form method="get" action="" enctype="text/plain" >
               <td>Add a MRL (Media Resource Locator) to the playlist</td>
-              <td><input type="text" name="mrl" size="40" /> <input type="submit" name="control" value="add" /></td>
-            </tr>
-            <tr>
+              <td>
+               <input type="hidden" name="control" value="add" />
+	       <input type="text" name="mrl" size="40" />
+	       <input type="submit" value="Add" />
+	      </td>
+             </form> 
+          </tr>
+          <!--control=sout is not yet implemented
+	  <tr>
+            <form method="get" action="" enctype="text/plain" >
               <td>Stream Output:</td>
-              <td><input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" /> <input type="submit" name="control" value="sout" /></td>
-            </tr>
+              <td>
+               <input type="hidden" name="control" value="sout" />
+	       <input type="text" name="sout" size="40" value="<vlc id="get" param1="sout" param2="string" />" />
+	       <input type="submit"  value="Sout" />
+	      </td>
+             </form>
+           </tr>-->
           </table>
-        </form>
       </div>
-
+<!-- Playlist -->
       <div class="section">
        <form method="get" action="">
          <ul id="playlist">
@@ -149,26 +169,23 @@ function changeMe(item)
                  </li>
                <vlc id="else" />
                  <li>
-                   <form method="get" action="">
                    <vlc id="if" param1="first_item value 0 ="/>
                    <img alt="Cone" src="cone_plus.png" />
                      Playlist
                      <vlc id="rpn" param1="first_item 1 store" />
                    <vlc id="else"/>
                    <img alt="[-]" src="cone_minus.png" onclick='changeMe(this)'/>
-                     <vlc id="value" param1="pl.name" /> (<vlc id="value" param1="pl.i_children" /> item<vlc id="if" param1="pl.i_children 1 >" />s<vlc id="end" />)
+                   <vlc id="if" param1="pl.depth value 0 >"/>
+                     <input type="checkbox" name="item" value="<vlc id="value" param1="pl.index" />"/>
+		     <a href="?control=play&amp;item=<vlc id="value" param1="pl.index" />">
                    <vlc id="end"/>
-                     <input type="hidden" name="item" value="<vlc id="value" param1="pl.index" />" />
-                     <input type="submit" name="control" value="sort" /> by
-                     <select name="type">
-                       <option value="title">title</option>
-                       <option value="shuffle">shuffle</option>
-                     </select> with
-                     <select name="order">
-                       <option value="0">normal order</option>
-                       <option value="1">reverse order</option>
-                     </select>
-                   </form>
+		   <vlc id="value" param1="pl.name" />
+                   <vlc id="if" param1="pl.depth value 0 >"/>
+		      </a>
+                   <vlc id="end"/>
+		   (<vlc id="value" param1="pl.i_children" />
+		    item<vlc id="if" param1="pl.i_children 1 >" />s<vlc id="end" />)
+                   <vlc id="end"/>
 
                    <vlc id="if" param1="pl.i_children 0 !=" />
                        <ul>
@@ -190,6 +207,16 @@ function changeMe(item)
          <input type="submit" name="control" value="delete" />
          <input type="submit" name="control" value="empty" />
          <input type="submit" name="control" value="keep" />
+	              <input type="submit" name="control" value="sort" /> by
+                     <select name="type">
+                       <option value="title">title</option>
+                       <option value="shuffle">shuffle</option>
+                     </select> with
+                     <select name="order">
+                       <option value="0">normal order</option>
+                       <option value="1">reverse order</option>
+                     </select>
+        
        </form>
       </div>
     </div>
