@@ -260,7 +260,10 @@ static VLCInfoTreeItem *o_root_item = nil;
         o_value = [o_item_value copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
-        p_item = [[[VLCMain sharedInstance] getInfo] getItem];
+        if( [[VLCMain sharedInstance] getInfo] != nil )
+            p_item = [[[VLCMain sharedInstance] getInfo] getItem];
+        else
+            p_item = NULL;
     }
     return( self );
 }
