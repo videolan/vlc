@@ -3661,12 +3661,12 @@ if test "${SYS}" = "mingwce"; then
   VLC_ADD_CXXFLAGS([wince],[])
   VLC_ADD_LDFLAGS([wince],[-lcommctrl -lcommdlg -laygshell])
   dnl Gross hack
-  VLC_ADD_LDFLAGS([wince],[modules/gui/wince/wince_rc.o])
+  VLC_ADD_LDFLAGS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
 elif test "${SYS}" = "mingw32"; then
   VLC_ADD_CXXFLAGS([wince],[])
   VLC_ADD_LDFLAGS([wince],[-lcomctl32 -lcomdlg32 -lgdi32 -lole32])
   dnl Gross hack
-  VLC_ADD_LDFLAGS([wince],[modules/gui/wince/wince_rc.o])
+  VLC_ADD_LDFLAGS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
 fi
 
 dnl

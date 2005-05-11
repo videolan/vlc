@@ -421,6 +421,11 @@ vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin`
 vlc_LDADD = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
+# Work around a bug in the arm-wince-pe linker
+if HAVE_WINCE
+vlc_LDFLAGS += lib/libvlc.a
+endif
+
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
 DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
