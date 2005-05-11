@@ -67,7 +67,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id)initWithVout:(vout_thread_t *)_p_vout frame:(NSRect *)s_frame
 {
-    NSAutoreleasePool *o_pool;
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     NSArray *o_screens = [NSScreen screens];
     NSScreen *o_screen;
     vlc_bool_t b_menubar_screen = VLC_FALSE;
@@ -199,8 +199,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         b_menubar_screen = ( i_device == 0 );
     }
 
-    o_pool = [[NSAutoreleasePool alloc] init];
-
     if( p_vout->b_fullscreen )
     {
         NSRect screen_rect = [o_screen frame];
@@ -268,11 +266,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)close
 {
+    [super close];
     if( p_fullscreen_state )
     {
         EndFullScreen( p_fullscreen_state, 0 );
     }
-    [super close];
 }
 
 - (void)setOnTop:(BOOL)b_on_top
@@ -690,7 +688,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( b_inside )
     {
         vlc_value_t val;
-        int i_width, i_height, i_x, i_y;
+        unsigned int i_width, i_height, i_x, i_y;
 
         vout_PlacePicture( p_vout, (unsigned int)s_rect.size.width,
                                    (unsigned int)s_rect.size.height,
