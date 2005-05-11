@@ -25,6 +25,8 @@
 
 #include "utils.h"
 
+using namespace std;
+
 VLCControl::~VLCControl()
 {
     if( _p_typeinfo )
@@ -102,37 +104,12 @@ STDMETHODIMP VLCControl::Invoke(DISPID dispIdMember, REFIID riid,
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCControl::get_Value(VARIANT *pvarValue)
-{
-    if( NULL == pvarValue )
-        return E_POINTER;
-
-    V_VT(pvarValue) = VT_BOOL;
-    return get_Playing(&V_BOOL(pvarValue));
-};
-        
-STDMETHODIMP VLCControl::put_Value(VARIANT pvarValue)
-{
-    if( VT_BOOL != V_VT(&pvarValue) )
-    {
-        VARIANT boolValue;
-        HRESULT hr = VariantChangeType(&boolValue, &pvarValue, 0, VT_BOOL);
-        if( SUCCEEDED(hr) )
-        {
-            hr = get_Playing(&V_BOOL(&pvarValue));
-            //VariantClear(&boolValue);
-        }
-        return hr;
-    }
-    return get_Playing(&V_BOOL(&pvarValue));
-};
-        
 STDMETHODIMP VLCControl::get_Visible(VARIANT_BOOL *isVisible)
 {
     if( NULL == isVisible )
         return E_POINTER;
 
-    *isVisible = _p_instance->getVisible();
+    *isVisible = _p_instance->getVisible() ? VARIANT_TRUE : VARIANT_FALSE;
 
     return NOERROR;
 };
@@ -363,6 +340,130 @@ STDMETHODIMP VLCControl::toggleMute(void)
     return E_UNEXPECTED;
 };
 
+STDMETHODIMP VLCControl::setVariable( BSTR name, VARIANT value)
+{
+    if( 0 == SysStringLen(name) )
+        return E_INVALIDARG;
+
+    int i_vlc = _p_instance->getVLCObject();
+    if( i_vlc )
+    {
+        int codePage = _p_instance->getCodePage();
+        char *psz_varname = CStrFromBSTR(codePage, name);
+        if( NULL == psz_varname )
+            return E_OUTOFMEMORY;
+
+        HRESULT hr = E_INVALIDARG;
+        int i_type;
+        if( VLC_SUCCESS == VLC_VariableType(i_vlc, psz_varname, &i_type) )
+        {
+            VARIANT arg;
+            VariantInit(&arg);
+
+            vlc_value_t val;
+
+            hr = DISP_E_TYPEMISMATCH;
+
+            switch( i_type )
+            {
+                case VLC_VAR_BOOL:
+                    hr = VariantChangeType(&value, &arg, 0, VT_BOOL);
+                    if( SUCCEEDED(hr) )
+                        val.b_bool = (VARIANT_TRUE == V_BOOL(&arg)) ? VLC_TRUE : VLC_FALSE;
+                    break;
+
+                case VLC_VAR_INTEGER:
+                    hr = VariantChangeType(&value, &arg, 0, VT_I4);
+                    if( SUCCEEDED(hr) )
+                        val.i_int = V_I4(&arg);
+                    break;
+
+                case VLC_VAR_FLOAT:
+                    hr = VariantChangeType(&value, &arg, 0, VT_R4);
+                    if( SUCCEEDED(hr) )
+                        val.f_float = V_R4(&arg);
+                    break;
+
+                case VLC_VAR_STRING:
+                    hr = VariantChangeType(&value, &arg, 0, VT_BSTR);
+                    if( SUCCEEDED(hr) )
+                        val.psz_string = CStrFromBSTR(codePage, V_BSTR(&arg));
+                    break;
+            }
+            if( SUCCEEDED(hr) )
+            {
+                VariantClear(&arg);
+
+                hr = (VLC_SUCCESS == VLC_VariableSet(i_vlc, psz_varname, val)) ? NOERROR : E_FAIL;
+
+                if( (VLC_VAR_STRING == i_type) && (NULL != val.psz_string) )
+                    free(val.psz_string);
+            }
+        }
+        free(psz_varname);
+
+        return hr;
+    }
+    return E_UNEXPECTED;
+};
+
+STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
+{
+    if( 0 == SysStringLen(name) )
+        return E_INVALIDARG;
+
+    if( NULL == value )
+        return E_POINTER;
+
+    int i_vlc = _p_instance->getVLCObject();
+    if( i_vlc )
+    {
+        int codePage = _p_instance->getCodePage();
+        char *psz_varname = CStrFromBSTR(codePage, name);
+        if( NULL == psz_varname )
+            return E_OUTOFMEMORY;
+
+        HRESULT hr = E_INVALIDARG;
+
+        vlc_value_t val;
+        int i_type;
+
+        if( (VLC_SUCCESS == VLC_VariableGet(i_vlc, psz_varname, &val))
+         && (VLC_SUCCESS == VLC_VariableType(i_vlc, psz_varname, &i_type)) )
+        {
+            hr = NOERROR;
+            switch( i_type )
+            {
+                case VLC_VAR_BOOL:
+                    V_VT(value) = VT_BOOL;
+                    V_BOOL(value) = val.b_bool ? VARIANT_TRUE : VARIANT_FALSE;
+                    break;
+
+                case VLC_VAR_INTEGER:
+                    V_VT(value) = VT_I4;
+                    V_I4(value) = val.i_int;
+                    break;
+
+                case VLC_VAR_FLOAT:
+                    V_VT(value) = VT_R4;
+                    V_R4(value) = val.f_float;
+                    break;
+
+                case VLC_VAR_STRING:
+                    V_VT(value) = VT_BSTR;
+                    V_BSTR(value) = BSTRFromCStr(codePage, val.psz_string);
+                    free(val.psz_string);
+                    break;
+                default:
+                    hr = DISP_E_TYPEMISMATCH;
+            }
+        }
+        free(psz_varname);
+        return hr;
+    }
+    return E_UNEXPECTED;
+};
+
 static void freeTargetOptions(char **cOptions, int cOptionCount)
 {
     // clean up 
@@ -579,8 +680,18 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
         if( FAILED(createTargetOptions(codePage, &options, &cOptions, &cOptionsCount)) )
             return E_INVALIDARG;
 
-        VLC_AddTarget(i_vlc, cUri, (const char **)cOptions, cOptionsCount, mode, position);
-        hr = NOERROR;
+        if( VLC_SUCCESS <= VLC_AddTarget(i_vlc, cUri, (const char **)cOptions, cOptionsCount, mode, position) )
+        {
+            hr = NOERROR;
+            if( mode & VLCPlayListGo )
+                _p_instance->fireOnPlayEvent();
+        }
+        else
+        {
+            hr = E_FAIL;
+            if( mode & VLCPlayListGo )
+                _p_instance->fireOnStopEvent();
+        }
 
         freeTargetOptions(cOptions, cOptionsCount);
         free(cUri);

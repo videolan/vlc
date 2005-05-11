@@ -30,7 +30,8 @@ class VLCViewObject : public IViewObject2
 
 public:
 
-    VLCViewObject(VLCPlugin *p_instance) : _p_instance(p_instance) {};
+    VLCViewObject(VLCPlugin *p_instance) : _p_instance(p_instance),
+        _dwAspect(0), _advf(0), _pAdvSink(NULL) {};
     virtual ~VLCViewObject() {};
 
     // IUnknown methods
@@ -65,6 +66,11 @@ public:
 private:
 
     VLCPlugin *_p_instance;
+
+    // Advise Sink support
+    DWORD _dwAspect;
+    DWORD _advf;
+    LPADVISESINK _pAdvSink;
 };
 
 #endif

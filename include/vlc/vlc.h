@@ -47,6 +47,27 @@ typedef struct vlc_list_t vlc_list_t;
 typedef struct vlc_object_t vlc_object_t;
 
 /**
+ * \defgroup var_type Variable types
+ * These are the different types a vlc variable can have.
+ * @{
+ */
+#define VLC_VAR_VOID      0x0010
+#define VLC_VAR_BOOL      0x0020
+#define VLC_VAR_INTEGER   0x0030
+#define VLC_VAR_HOTKEY    0x0031
+#define VLC_VAR_STRING    0x0040
+#define VLC_VAR_MODULE    0x0041
+#define VLC_VAR_FILE      0x0042
+#define VLC_VAR_DIRECTORY 0x0043
+#define VLC_VAR_VARIABLE  0x0044
+#define VLC_VAR_FLOAT     0x0050
+#define VLC_VAR_TIME      0x0060
+#define VLC_VAR_ADDRESS   0x0070
+#define VLC_VAR_MUTEX     0x0080
+#define VLC_VAR_LIST      0x0090
+/**@}*/
+
+/**
  * VLC value structure
  */
 typedef union
@@ -253,6 +274,19 @@ int     VLC_VariableSet( int, char const *, vlc_value_t );
  * \return VLC_SUCCESS on success
  */
 int     VLC_VariableGet( int, char const *, vlc_value_t * );
+
+/**
+ * Get a VLC variable type
+ *
+ * This function gets the type of a variable of VLC
+ * It stores it in the p_type argument
+ *
+ * \param i_object a vlc object id
+ * \param psz_var a vlc variable name
+ * \param pi_type a pointer to an integer
+ * \return VLC_SUCCESS on success
+ */
+int     VLC_VariableType( int, char const *, int * );
 
 /**
  * Add a target to the current playlist

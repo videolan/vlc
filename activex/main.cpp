@@ -307,6 +307,12 @@ STDAPI DllRegisterServer(VOID)
 
     // register type lib into the registry
     ITypeLib *typeLib;
+
+#ifdef BUILD_LOCALSERVER
+    // replace .exe by .tlb
+    strcpy(DllPath+DllPathLen-4, ".tlb");
+#endif
+    
 #ifndef OLE2ANSI
     size_t typeLibPathLen = MultiByteToWideChar(CP_ACP, 0, DllPath, -1, NULL, 0);
     if( typeLibPathLen > 0 )
@@ -314,8 +320,10 @@ STDAPI DllRegisterServer(VOID)
         LPOLESTR typeLibPath = (LPOLESTR)CoTaskMemAlloc(typeLibPathLen*sizeof(wchar_t));
         MultiByteToWideChar(CP_ACP, 0, DllPath, DllPathLen, typeLibPath, typeLibPathLen);
         if( FAILED(LoadTypeLibEx(typeLibPath, REGKIND_REGISTER, &typeLib)) )
+#ifndef BUILD_LOCALSERVER
             return SELFREG_E_TYPELIB;
         typeLib->Release();
+#endif
         CoTaskMemFree((void *)typeLibPath);
     }
 #else

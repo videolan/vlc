@@ -5,7 +5,7 @@
 
 
 /* File created by MIDL compiler version 5.01.0164 */
-/* at Thu Feb 17 09:25:54 2005
+/* at Tue May 10 21:24:51 2005
  */
 /* Compiler settings for axvlc.idl:
     Oicf (OptLev=i2), W1, Zp8, env=Win32, ms_ext, c_ext

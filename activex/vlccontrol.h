@@ -58,8 +58,6 @@ public:
     STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
 
     // IVLCControl methods
-    STDMETHODIMP get_Value(VARIANT *pvarValue);
-    STDMETHODIMP put_Value(VARIANT pvarValue);
     STDMETHODIMP play(void);
     STDMETHODIMP get_Visible(VARIANT_BOOL *visible);
     STDMETHODIMP put_Visible(VARIANT_BOOL visible);
@@ -79,6 +77,8 @@ public:
     STDMETHODIMP get_Volume(int *volume);
     STDMETHODIMP put_Volume(int volume);
     STDMETHODIMP toggleMute(void);
+    STDMETHODIMP setVariable( BSTR name, VARIANT value);
+    STDMETHODIMP getVariable( BSTR name, VARIANT *value);
     STDMETHODIMP addTarget( BSTR uri, VARIANT options, enum VLCPlaylistMode mode, int position);
     STDMETHODIMP get_PlaylistIndex(int *index);
     STDMETHODIMP get_PlaylistCount(int *count);

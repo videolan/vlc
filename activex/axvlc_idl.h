@@ -2,7 +2,7 @@
 
 
 /* File created by MIDL compiler version 5.01.0164 */
-/* at Thu Feb 17 09:25:54 2005
+/* at Tue May 10 21:24:51 2005
  */
 /* Compiler settings for axvlc.idl:
     Oicf (OptLev=i2), W1, Zp8, env=Win32, ms_ext, c_ext
@@ -110,12 +110,6 @@ EXTERN_C const IID IID_IVLCControl;
     IVLCControl : public IDispatch
     {
     public:
-        virtual /* [helpstring][propget][defaultbind][bindable][id] */ HRESULT STDMETHODCALLTYPE get_Value( 
-            /* [retval][out] */ VARIANT __RPC_FAR *pvarValue) = 0;
-        
-        virtual /* [helpstring][propput][defaultbind][bindable][id] */ HRESULT STDMETHODCALLTYPE put_Value( 
-            /* [in] */ VARIANT pvarValue) = 0;
-        
         virtual /* [helpstring][bindable][propget][id] */ HRESULT STDMETHODCALLTYPE get_Visible( 
             /* [retval][out] */ VARIANT_BOOL __RPC_FAR *visible) = 0;
         
@@ -140,10 +134,10 @@ EXTERN_C const IID IID_IVLCControl;
         virtual /* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE put_Position( 
             /* [in] */ float position) = 0;
         
-        virtual /* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE get_Time( 
+        virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_Time( 
             /* [retval][out] */ int __RPC_FAR *seconds) = 0;
         
-        virtual /* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE put_Time( 
+        virtual /* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE put_Time( 
             /* [in] */ int seconds) = 0;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE shuttle( 
@@ -165,6 +159,14 @@ EXTERN_C const IID IID_IVLCControl;
             /* [in] */ int volume) = 0;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE toggleMute( void) = 0;
+        
+        virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE setVariable( 
+            /* [in] */ BSTR name,
+            /* [in] */ VARIANT value) = 0;
+        
+        virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE getVariable( 
+            /* [in] */ BSTR name,
+            /* [retval][out] */ VARIANT __RPC_FAR *value) = 0;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE addTarget( 
             /* [in] */ BSTR uri,
@@ -235,14 +237,6 @@ EXTERN_C const IID IID_IVLCControl;
             /* [out] */ EXCEPINFO __RPC_FAR *pExcepInfo,
             /* [out] */ UINT __RPC_FAR *puArgErr);
         
-        /* [helpstring][propget][defaultbind][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Value )( 
-            IVLCControl __RPC_FAR * This,
-            /* [retval][out] */ VARIANT __RPC_FAR *pvarValue);
-        
-        /* [helpstring][propput][defaultbind][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Value )( 
-            IVLCControl __RPC_FAR * This,
-            /* [in] */ VARIANT pvarValue);
-        
         /* [helpstring][bindable][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Visible )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ VARIANT_BOOL __RPC_FAR *visible);
@@ -276,11 +270,11 @@ EXTERN_C const IID IID_IVLCControl;
             IVLCControl __RPC_FAR * This,
             /* [in] */ float position);
         
-        /* [helpstring][propget][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Time )( 
+        /* [helpstring][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Time )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ int __RPC_FAR *seconds);
         
-        /* [helpstring][propput][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Time )( 
+        /* [helpstring][propput][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Time )( 
             IVLCControl __RPC_FAR * This,
             /* [in] */ int seconds);
         
@@ -311,6 +305,16 @@ EXTERN_C const IID IID_IVLCControl;
         
         /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *toggleMute )( 
             IVLCControl __RPC_FAR * This);
+        
+        /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *setVariable )( 
+            IVLCControl __RPC_FAR * This,
+            /* [in] */ BSTR name,
+            /* [in] */ VARIANT value);
+        
+        /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *getVariable )( 
+            IVLCControl __RPC_FAR * This,
+            /* [in] */ BSTR name,
+            /* [retval][out] */ VARIANT __RPC_FAR *value);
         
         /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *addTarget )( 
             IVLCControl __RPC_FAR * This,
@@ -376,12 +380,6 @@ EXTERN_C const IID IID_IVLCControl;
     (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
 
 
-#define IVLCControl_get_Value(This,pvarValue)	\
-    (This)->lpVtbl -> get_Value(This,pvarValue)
-
-#define IVLCControl_put_Value(This,pvarValue)	\
-    (This)->lpVtbl -> put_Value(This,pvarValue)
-
 #define IVLCControl_get_Visible(This,visible)	\
     (This)->lpVtbl -> get_Visible(This,visible)
 
@@ -439,6 +437,12 @@ EXTERN_C const IID IID_IVLCControl;
 #define IVLCControl_toggleMute(This)	\
     (This)->lpVtbl -> toggleMute(This)
 
+#define IVLCControl_setVariable(This,name,value)	\
+    (This)->lpVtbl -> setVariable(This,name,value)
+
+#define IVLCControl_getVariable(This,name,value)	\
+    (This)->lpVtbl -> getVariable(This,name,value)
+
 #define IVLCControl_addTarget(This,uri,options,mode,position)	\
     (This)->lpVtbl -> addTarget(This,uri,options,mode,position)
 
@@ -465,30 +469,6 @@ EXTERN_C const IID IID_IVLCControl;
 
 #endif 	/* C style interface */
 
-
-
-/* [helpstring][propget][defaultbind][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Value_Proxy( 
-    IVLCControl __RPC_FAR * This,
-    /* [retval][out] */ VARIANT __RPC_FAR *pvarValue);
-
-
-void __RPC_STUB IVLCControl_get_Value_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-/* [helpstring][propput][defaultbind][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Value_Proxy( 
-    IVLCControl __RPC_FAR * This,
-    /* [in] */ VARIANT pvarValue);
-
-
-void __RPC_STUB IVLCControl_put_Value_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
 
 
 /* [helpstring][bindable][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Visible_Proxy( 
@@ -596,7 +576,7 @@ void __RPC_STUB IVLCControl_put_Position_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Time_Proxy( 
+/* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Time_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [retval][out] */ int __RPC_FAR *seconds);
 
@@ -608,7 +588,7 @@ void __RPC_STUB IVLCControl_get_Time_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Time_Proxy( 
+/* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Time_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [in] */ int seconds);
 
@@ -706,6 +686,32 @@ void __RPC_STUB IVLCControl_put_Volume_Stub(
 
 
 void __RPC_STUB IVLCControl_toggleMute_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring] */ HRESULT STDMETHODCALLTYPE IVLCControl_setVariable_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [in] */ BSTR name,
+    /* [in] */ VARIANT value);
+
+
+void __RPC_STUB IVLCControl_setVariable_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring] */ HRESULT STDMETHODCALLTYPE IVLCControl_getVariable_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [in] */ BSTR name,
+    /* [retval][out] */ VARIANT __RPC_FAR *value);
+
+
+void __RPC_STUB IVLCControl_getVariable_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,

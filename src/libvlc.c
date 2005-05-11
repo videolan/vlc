@@ -1031,6 +1031,31 @@ int VLC_VariableGet( int i_object, char const *psz_var, vlc_value_t *p_value )
 }
 
 /*****************************************************************************
+ * VLC_VariableType: get a vlc variable type
+ *****************************************************************************/
+int VLC_VariableType( int i_object, char const *psz_var, int *pi_type )
+{
+    int i_type;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    i_type = VLC_VAR_TYPE & var_Type( p_vlc , psz_var );
+
+    if( i_object ) vlc_object_release( p_vlc );
+
+    if( i_type > 0 )
+    {
+        *pi_type = i_type;
+        return VLC_SUCCESS;
+    }
+    return VLC_ENOVAR;
+}
+
+/*****************************************************************************
  * VLC_AddTarget: adds a target for playing.
  *****************************************************************************
  * This function adds psz_target to the current playlist. If a playlist does

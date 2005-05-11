@@ -66,10 +66,6 @@ library AXVLC
     ]
     interface IVLCControl : IDispatch {
 
-        [id(0), bindable, defaultbind, propget, helpstring("Specifies current target in playlist")]
-        HRESULT Value([out, retval] VARIANT* pvarValue);
-        [id(0), bindable, defaultbind, propput, helpstring("Specifies current target in playlist")]
-        HRESULT Value([in] VARIANT pvarValue);
         [id(DISPID_Visible), propget, bindable, helpstring("Shows or hides plugin.")]
         HRESULT Visible([out, retval] VARIANT_BOOL* visible);
         [id(DISPID_Visible), propput, bindable, helpstring("Shows or hides plugin.")]
@@ -88,9 +84,9 @@ library AXVLC
         HRESULT Position([out, retval] float* position);
         [id(DISPID_Position), bindable, propput, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([in] float position);
-        [id(DISPID_Time), bindable, propget, helpstring("Specifies playback time relative to the start of current target in playlist.")]
+        [id(DISPID_Time), propget, helpstring("Specifies playback time relative to the start of current target in playlist.")]
         HRESULT Time([out, retval] int* seconds);
-        [id(DISPID_Time), bindable, propput, helpstring("Specifies playback time relative to the start of current target in playlist.")]
+        [id(DISPID_Time), propput, helpstring("Specifies playback time relative to the start of current target in playlist.")]
         HRESULT Time([in] int seconds);
         [helpstring("Advance or backtrack playback time, relative to current time.")]
         HRESULT shuttle([in] int seconds);
@@ -108,6 +104,10 @@ library AXVLC
         HRESULT Volume([in] int volume);
         [helpstring("Mute/unmute playback sound volume.")]
         HRESULT toggleMute();
+        [helpstring("Set a value to a VLC variable.")]
+        HRESULT setVariable([in] BSTR name, [in] VARIANT value);
+        [helpstring("Retrieve the value of a VLC variable.")]
+        HRESULT getVariable([in] BSTR name, [out, retval] VARIANT *value);
         [helpstring("Add a target to the current playlist.")]
 
 /*

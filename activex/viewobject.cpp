@@ -60,13 +60,17 @@ STDMETHODIMP VLCViewObject::GetAdvise(LPDWORD pdwAspect, LPDWORD padvf,
         LPADVISESINK *ppAdviseSink)
 {
     if( NULL != pdwAspect )
-        *pdwAspect = 0;
+        *pdwAspect = _dwAspect;
 
     if( NULL != padvf )
-        *padvf = 0;
+        *padvf = _advf;
 
     if( NULL != ppAdviseSink )
-        *ppAdviseSink = NULL;
+    {
+        *ppAdviseSink = _pAdvSink;
+        if( NULL != _pAdvSink )
+            _pAdvSink->AddRef();
+    }
 
     return S_OK;
 };
@@ -80,7 +84,22 @@ STDMETHODIMP VLCViewObject::GetColorSet(DWORD dwAspect, LONG lindex,
 STDMETHODIMP VLCViewObject::SetAdvise(DWORD dwAspect, DWORD advf,
         LPADVISESINK pAdvSink)
 {
-    return OLE_E_ADVISENOTSUPPORTED;
+    _dwAspect = dwAspect;
+    _advf = advf;
+    if( NULL != _pAdvSink )
+        _pAdvSink->Release();
+
+    _pAdvSink = pAdvSink;
+    if( NULL != pAdvSink )
+    {
+        pAdvSink->AddRef();
+
+        if( dwAspect & DVASPECT_CONTENT )
+        {
+            pAdvSink->OnViewChange(DVASPECT_CONTENT, -1);
+        }
+    }
+    return S_OK;
 };
 
 STDMETHODIMP VLCViewObject::Unfreeze(DWORD dwFreeze)
