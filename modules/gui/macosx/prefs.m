@@ -462,7 +462,6 @@ static VLCTreeItem *o_root_item = nil;
 - (NSView *)showView:(NSScrollView *)o_prefs_view
     advancedView:(vlc_bool_t) b_advanced
 {
-fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
     NSRect          s_vrc;
     NSView          *o_view;
 
@@ -505,22 +504,16 @@ fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
                 switch(p_item->i_type)
                 {
                 case CONFIG_SUBCATEGORY:
-fprintf( stderr, "drawing subcategory %s\n", [o_name UTF8String] );
                     break;
                 case CONFIG_SECTION:
-fprintf( stderr, "drawing section %s\n", p_item->psz_text );
                     break;
                 case CONFIG_CATEGORY:
-fprintf( stderr, "drawing category %s\n", [o_name UTF8String] );
                     break;
                 case CONFIG_HINT_END:
-fprintf( stderr, "end of (sub)category\n" );
                     break;
                 case CONFIG_HINT_USAGE:
-fprintf( stderr, "skipping hint usage\n" );
                     break;
                 default:
-fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
                 {
                     VLCConfigControl *o_control = nil;
                     o_control = [VLCConfigControl newControl:p_item
@@ -531,7 +524,6 @@ fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
                             NSViewWidthSizable];
                         [o_subviews addObject: o_control];
                     }
-fprintf( stderr, "\n" );
                 }
                     break;
                 }
@@ -578,22 +570,16 @@ fprintf( stderr, "\n" );
                 switch(p_item->i_type)
                 {
                 case CONFIG_SUBCATEGORY:
-fprintf( stderr, "drawing subcategory %s\n", [o_name UTF8String] );
                     break;
                 case CONFIG_SECTION:
-fprintf( stderr, "drawing section %s\n", p_item->psz_text );
                     break;
                 case CONFIG_CATEGORY:
-fprintf( stderr, "drawing category %s\n", [o_name UTF8String] );
                     break;
                 case CONFIG_HINT_END:
-fprintf( stderr, "end of (sub)category\n" );
                     break;
                 case CONFIG_HINT_USAGE:
-fprintf( stderr, "skipping hint usage\n" );
                     break;
                 default:
-fprintf( stderr, "%s (%d)", p_item->psz_name, p_item->i_type );
                 {
                     VLCConfigControl *o_control = nil;
                     o_control = [VLCConfigControl newControl:p_item

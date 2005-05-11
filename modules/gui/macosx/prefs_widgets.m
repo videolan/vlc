@@ -959,21 +959,17 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     case CONFIG_ITEM_MODULE:
     case CONFIG_ITEM_MODULE_LIST:
     case CONFIG_ITEM_MODULE_LIST_CAT:
-fprintf( stderr, "Applying %s to %s\n" , [self stringValue], psz_name );
         config_PutPsz( VLCIntf, psz_name, [self stringValue] );
         break;
     case CONFIG_ITEM_KEY:
         /* So you don't need to restart to have the changes take effect */
-fprintf( stderr, "Applying %d to %s\n" , [self intValue], psz_name );
         val.i_int = [self intValue];
         var_Set( VLCIntf->p_vlc, psz_name, val );
     case CONFIG_ITEM_INTEGER:
     case CONFIG_ITEM_BOOL:
-fprintf( stderr, "Applying %d to %s\n" , [self intValue], psz_name );
         config_PutInt( VLCIntf, psz_name, [self intValue] );
         break;
     case CONFIG_ITEM_FLOAT:
-fprintf( stderr, "Applying %f to %s\n" , [self floatValue], psz_name );
         config_PutFloat( VLCIntf, psz_name, [self floatValue] );
         break;
     }
