@@ -38,10 +38,6 @@
 #define OFFSET_RIGHT 20
 #define OFFSET_BETWEEN 2
 
-#define MACOS_VERSION [[[NSDictionary dictionaryWithContentsOfFile: \
-            @"/System/Library/CoreServices/SystemVersion.plist"] \
-            objectForKey: @"ProductVersion"] floatValue]
-
 #define UPWARDS_WHITE_ARROW                 "\xE2\x87\xA7" 
 #define OPTION_KEY                          "\xE2\x8C\xA5"
 #define UP_ARROWHEAD                        "\xE2\x8C\x83"

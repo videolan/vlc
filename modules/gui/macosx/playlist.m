@@ -187,8 +187,33 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_list_release( p_list );
     vlc_object_release( p_playlist );
 
+    /* Change the simple textfield into a searchField if we can... */
+    if( MACOS_VERSION >= 10.3 )
+    {
+        NSView *o_parentview = [o_status_field superview];
+        NSSearchField *o_better_search_field = [[NSSearchField alloc]initWithFrame:[o_search_field frame]];
+        [o_better_search_field setRecentsAutosaveName:@"VLC media player search"];
+        [o_better_search_field setDelegate:self];
+        [[NSNotificationCenter defaultCenter] addObserver: self
+            selector: @selector(searchfieldChanged:)
+            name: NSControlTextDidChangeNotification
+            object: o_better_search_field];
+
+        [o_better_search_field setTarget:self];
+        [o_better_search_field setAction:@selector(searchItem:)];
+
+        [o_better_search_field setAutoresizingMask:NSViewMinXMargin];
+        [o_parentview addSubview:o_better_search_field];
+        [o_search_field setHidden:YES];
+    }
+    
     [self initStrings];
     //[self playlistUpdated];
+}
+
+- (void)searchfieldChanged:(NSNotification *)o_notification
+{
+    [o_search_field setStringValue:[[o_notification object] stringValue]];
 }
 
 - (void)initStrings
@@ -838,7 +863,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if( p_playlist == NULL )
         return;
-
     p_view = playlist_ViewFind( p_playlist, i_current_view );
 
     if( p_view )

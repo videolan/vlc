@@ -78,6 +78,7 @@
 }
 
 - (void)initStrings;
+- (void)searchfieldChanged:(NSNotification *)o_notification;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 - (NSOutlineView *)outlineView;
 
