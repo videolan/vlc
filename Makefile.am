@@ -417,14 +417,14 @@ bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
 
-vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin`
-vlc_LDADD = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
-vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-
 # Work around a bug in the arm-wince-pe linker
 if HAVE_WINCE
-vlc_LDFLAGS += lib/libvlc.a
+vlc_WORKAROUNDLDFLAGS = lib/libvlc.a
 endif
+
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin` $(vlc_WORKAROUNDLDFLAGS)
+vlc_LDADD = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
+vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
