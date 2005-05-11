@@ -111,8 +111,7 @@ int spu_Init( spu_t *p_spu )
     psz_filter = psz_filter_orig = val.psz_string;
     while( psz_filter && *psz_filter )
     {
-        char *psz_parser = strchr( psz_filter, ',' );
-        if( !psz_parser ) psz_parser = strchr( psz_filter, ':' );
+        char *psz_parser = strchr( psz_filter, ':' );
 
         if( psz_parser ) *psz_parser++ = 0;
 

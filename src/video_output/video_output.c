@@ -363,7 +363,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         /* continue the parent's filter chain */
         char *psz_end;
 
-        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ',' );
+        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
         if( psz_end && *(psz_end+1) )
             p_vout->psz_filter_chain = strdup( psz_end+1 );
         else p_vout->psz_filter_chain = NULL;
@@ -382,7 +382,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
          * colons */
         char *psz_end;
 
-        psz_end = strchr( p_vout->psz_filter_chain, ',' );
+        psz_end = strchr( p_vout->psz_filter_chain, ':' );
         if( psz_end )
             psz_plugin = strndup( p_vout->psz_filter_chain,
                                   psz_end - p_vout->psz_filter_chain );
@@ -1383,15 +1383,15 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
         if( psz_deinterlace )
         {
             char *psz_src = psz_deinterlace + sizeof("deinterlace") - 1;
-            if( psz_src[0] == ',' ) psz_src++;
+            if( psz_src[0] == ':' ) psz_src++;
             memmove( psz_deinterlace, psz_src, strlen(psz_src) + 1 );
         }
     }
     else if( !psz_deinterlace )
     {
         psz_filter = realloc( psz_filter, strlen( psz_filter ) +
-                              sizeof(",deinterlace") );
-        if( psz_filter && *psz_filter ) strcat( psz_filter, "," );
+                              sizeof(":deinterlace") );
+        if( psz_filter && *psz_filter ) strcat( psz_filter, ":" );
         strcat( psz_filter, "deinterlace" );
     }
 
