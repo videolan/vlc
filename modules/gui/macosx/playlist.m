@@ -78,6 +78,12 @@
             [[self delegate] deleteItem:self];
             break;
 
+        case NSEnterCharacter:
+        case NSCarriageReturnCharacter:
+            [(VLCPlaylist *)[[VLCMain sharedInstance] getPlaylist]
+                                                            playItem:self];
+            break;
+
         default:
             [super keyDown: o_event];
             break;

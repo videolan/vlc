@@ -714,6 +714,13 @@ static VLCMain *_o_sharedMainInstance = nil;
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
             return YES;
+        case NSUpArrowFunctionKey:
+        case NSDownArrowFunctionKey:
+        case NSRightArrowFunctionKey:
+        case NSLeftArrowFunctionKey:
+        case NSEnterCharacter:
+        case NSCarriageReturnCharacter:
+            return NO;
     }
 
     val.i_int |= CocoaKeyToVLC( key );
