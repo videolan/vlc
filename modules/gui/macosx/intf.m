@@ -294,7 +294,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     
     o_about = [[VLAboutBox alloc] init];
-    o_prefs = [[VLCPrefs alloc] init];
+    o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
 
     i_lastShownVolume = -1;
@@ -1415,6 +1415,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)viewPreferences:(id)sender
 {
+/* GRUIIIIIIIK */
+    if( o_prefs == nil )
+        o_prefs = [[VLCPrefs alloc] init];
     [o_prefs showPrefs];
 }
 

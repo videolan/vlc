@@ -55,6 +55,7 @@
         action:nil keyEquivalent:@""];                                      \
     [o_mi setKeyEquivalentModifierMask:                                     \
         0];                                                                 \
+if( MACOS_VERSION >= 10.3 )                                                 \
     [o_mi setAlternate: NO];                                                \
     [o_mi setTag:                                                           \
         ( value )];                                                         \
