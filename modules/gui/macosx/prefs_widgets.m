@@ -1795,7 +1795,7 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     [o_stepper setFloatValue: [o_textfield floatValue]];
 }
 
-- (int)floatValue
+- (float)floatValue
 {
     return [o_stepper floatValue];
 }
@@ -1905,7 +1905,7 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     [o_slider setFloatValue: [o_textfield floatValue]];
 }
 
-- (int)floatValue
+- (float)floatValue
 {
     return [o_slider floatValue];
 }
@@ -2296,11 +2296,13 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     o_scrollview = [[[NSScrollView alloc] initWithFrame: s_rc] retain];
     [o_scrollview setDrawsBackground: NO];
     [o_scrollview setBorderType: NSBezelBorder];
-    [o_scrollview setAutohidesScrollers:YES];
+    if( MACOS_VERSION >= 10.3 )
+        [o_scrollview setAutohidesScrollers:YES];
 
     NSTableView *o_tableview;
     o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
-    [o_tableview setUsesAlternatingRowBackgroundColors:YES];
+    if( MACOS_VERSION >= 10.3 )
+        [o_tableview setUsesAlternatingRowBackgroundColors:YES];
     [o_tableview setHeaderView:nil];
 /* TODO: find a good way to fix the row height and text size*/
 /* FIXME: support for multiple selection... */
