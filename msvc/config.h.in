@@ -9,6 +9,9 @@
 /* Maximum supported data alignment */
 #define ATTRIBUTE_ALIGNED_MAX 16
 
+/* Define if we have support for dynamic plugins */
+#define HAVE_DYNAMIC_PLUGINS 1
+
 /* Define if you have Windows' LoadLibrary */
 #define HAVE_DL_WINDOWS 1
 
