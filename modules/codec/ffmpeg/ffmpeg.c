@@ -76,7 +76,7 @@ static char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( "ffmpeg");
+    set_shortname( "FFmpeg");
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );
     /* decoder main module */
