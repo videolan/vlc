@@ -1600,7 +1600,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
         if( cl->i_buffer >= 4 )
         {
-            fprintf( stderr, "peek=%4.4s\n", cl->p_buffer );
+            /*fprintf( stderr, "peek=%4.4s\n", cl->p_buffer );*/
             /* detect type */
             if( cl->p_buffer[0] == '$' )
             {
@@ -1714,7 +1714,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                     p = NULL;
                     cl->query.i_type = HTTPD_MSG_NONE;
 
-                    fprintf( stderr, "received new request=%s\n", cl->p_buffer);
+                    /*fprintf( stderr, "received new request=%s\n", cl->p_buffer);*/
 
                     for( i = 0; msg_type[i].name != NULL; i++ )
                     {
@@ -1886,7 +1886,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
         cl->i_activity_timeout = 0;
 
     /* Debugging only */
-    if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
+    /*if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
     {
         int i;
 
@@ -1909,7 +1909,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             fprintf( stderr, "  - option name='%s' value='%s'\n",
                      cl->query.name[i], cl->query.value[i] );
         }
-    }
+    }*/
 }
 
 
@@ -1954,8 +1954,8 @@ static void httpd_ClientSend( httpd_client_t *cl )
         cl->i_buffer = 0;
         cl->i_buffer_size = (uint8_t*)p - cl->p_buffer;
 
-        fprintf( stderr, "sending answer\n" );
-        fprintf( stderr, "%s",  cl->p_buffer );
+        /*fprintf( stderr, "sending answer\n" );
+        fprintf( stderr, "%s",  cl->p_buffer );*/
     }
 
     i_len = httpd_NetSend( cl, &cl->p_buffer[cl->i_buffer],
