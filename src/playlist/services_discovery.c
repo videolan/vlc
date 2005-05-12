@@ -153,12 +153,12 @@ int playlist_AddSDModules( playlist_t *p_playlist, char *psz_modules )
 
         while( psz_parser && *psz_parser )
         {
-            while( *psz_parser == ' ' || *psz_parser == ',' )
+            while( *psz_parser == ' ' || *psz_parser == ':' )
             {
                 psz_parser++;
             }
 
-            if( (psz_next = strchr( psz_parser, ',' ) ) )
+            if( (psz_next = strchr( psz_parser, ':' ) ) )
             {
                 *psz_next++ = '\0';
             }

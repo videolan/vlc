@@ -669,7 +669,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         psz_modules = (char *)realloc( psz_modules, strlen( psz_modules ) +
                                                     strlen( psz_control ) + 1 );
-        sprintf( psz_modules, "%s,%s", psz_modules, psz_control );
+        sprintf( psz_modules, "%s:%s", psz_modules, psz_control );
     }
     else if( psz_control && *psz_control )
     {
@@ -682,7 +682,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         char *psz_module, *psz_temp;
         psz_module = psz_parser;
-        psz_parser = strchr( psz_module, ',' );
+        psz_parser = strchr( psz_module, ':' );
         if ( psz_parser )
         {
             *psz_parser = '\0';
