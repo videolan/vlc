@@ -2257,6 +2257,7 @@ void demux_sys_t::StartUiThread()
         /* Now create our event thread catcher */
         p_ev = (event_thread_t *) vlc_object_create( &demuxer, sizeof( event_thread_t ) );
         p_ev->p_demux = &demuxer;
+		p_ev->b_die = VLC_FALSE;
         vlc_mutex_init( p_ev, &p_ev->lock );
         vlc_thread_create( p_ev, "mkv event thread handler", EventThread,
                         VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
@@ -2269,6 +2270,11 @@ void demux_sys_t::StopUiThread()
     {
         p_ev->b_die = VLC_TRUE;
 
+        vlc_thread_join( p_ev );
+        vlc_object_destroy( p_ev );
+
+        p_ev = NULL;
+
         var_Destroy( p_input, "highlight-mutex" );
         var_Destroy( p_input, "highlight" );
         var_Destroy( p_input, "x-start" );
@@ -2277,11 +2283,6 @@ void demux_sys_t::StopUiThread()
         var_Destroy( p_input, "y-end" );
         var_Destroy( p_input, "color" );
         var_Destroy( p_input, "menu-contrast" );
-
-        vlc_thread_join( p_ev );
-        vlc_object_destroy( p_ev );
-
-        p_ev = NULL;
 
         msg_Dbg( &demuxer, "Stopping the UI Hook" );
     }
@@ -2484,7 +2485,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             p_vout = NULL;
         }
 
-        if( p_vout == NULL )
+        else if( p_vout == NULL )
         {
             p_vout = (vlc_object_t*) vlc_object_find( p_sys->p_input, VLC_OBJECT_VOUT,
                                       FIND_CHILD );
@@ -2495,7 +2496,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             }
         }
 
-        /* Wait a bit */
+        /* Wait a bit, 10ms */
         msleep( 10000 );
     }
 
