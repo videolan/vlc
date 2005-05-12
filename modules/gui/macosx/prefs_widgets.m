@@ -2358,7 +2358,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
         {
             o_newstring = [o_newstring stringByAppendingString:
                 [[o_modulearray objectAtIndex:i] objectAtIndex:0]];
-            o_newstring = [o_newstring stringByAppendingString:@","];
+            o_newstring = [o_newstring stringByAppendingString:@":"];
         }
 
     [o_textfield setStringValue: [o_newstring
