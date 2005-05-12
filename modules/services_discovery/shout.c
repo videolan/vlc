@@ -61,7 +61,7 @@
 #define LIMIT_LONGTEXT LIMIT_TEXT
 
 vlc_module_begin();
-    set_shorname( "Shoutcast");
+    set_shortname( "Shoutcast");
     set_description( _("Shoutcast radio listings") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );

@@ -95,7 +95,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_shorname( "Theora" );
+    set_shortname( "Theora" );
     set_description( _("Theora video decoder") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, CloseDecoder );
