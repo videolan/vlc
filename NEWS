@@ -1,6 +1,6 @@
 $Id$
 
-Changes between 0.8.1 and 0.8.2-svn2:
+Changes between 0.8.1 and 0.8.2-test1:
 -----------------------------------------------------
 
 Core support:
@@ -19,8 +19,11 @@ Core support:
  * Renamed --spumargin to --sub-margin
  * Renamed --audio-channel to --audio-track
  * Renamed --filter to --vout-filter
-   Multiple video filters are now seperated by ',' instead of ':'
+ * filters, extra interfaces, visualizations and service discovery modules are
+   now seperated by ':' instead of ','
+ * Access filter architecture
  * Track selection based on preferred language (--sub-language and --audio-language)
+ * Zsh autocompletion for vlc's arguments
  * Many bugfixes...
 
 Input/Demuxers:
@@ -32,6 +35,7 @@ Input/Demuxers:
  * RTSP UDP->TCP rollover support
  * Massive Matroska improvements
  * Support for XA and VOC audio files
+ * TiVo demuxer
  * Samba (Windows shares) access module
  * Improved CDDAX module (uses several playlist items)
  * Fixes to Linux DVB support
@@ -43,13 +47,18 @@ Decoders / Encoders:
  * Improvements to DVB subtitles encoder
  * Support for Apple Lossless Audio Codec
 
-Services discovery
+Access filters:
+ * New Record and Timeshift filters
+
+Services discovery:
  * New type of modules, that add items to the playlist
  * Brand new SAP module
      * To enable SAP, you now need to use "-S sap" or add SAP in 
        the "Manage->Services Discovery" menu
+     ( IPv6 SAP is now enabled by default )
  * HAL (Hardware Abstraction Layer) discovery
  * DAAP (iTunes shares) support
+ * Shoutcast
 
 Audio output:
  * Support for 20/24 bits LPCM
@@ -59,7 +68,6 @@ Video output:
  * Image file video output (png)
  * Motion detection filter (can trigger playlist actions)
  * Improvements to wall video filter
- * Mosaic (picture-in-picture system)
  * Support for font color and opacity
  * Fixed Mac OS X OpenGL output
 
@@ -69,16 +77,19 @@ Stream output:
  * VLM / VoD
     - Ability to load a configuration file on startup
     - Seeking support in VoD streams
-    
+ * Mosaic (picture-in-picture system)
+
 Interfaces:
- * wxWidgets 
+ * wxWidgets
     - Redesigned playlist : add playlist, add directory, ...
     - Improved preferences
     - Improvements to the wizard
     - DVD, VCD and Audio CD navigation buttons
  * MacOS X
     - Redesigned playlist
+    - Improved preferences
  * Skins
+    - Support for multiple actions
     - Fixes
  * HTTP
     - Support for the new playlist system
@@ -90,13 +101,16 @@ Windows port:
  * DirectShow tuner configuration
  * Support for no-decoration windows
 
+MacOS X port:
+ * Many Tiger related fixes
+
 BeOS port:
  * Support for single-buffered overlay
 
 Pocket PC port:
  * Many fixes
  * New interface
- * New video output 
+ * New video output
 
 Mozilla Plugin:
  * Javascript fixes
@@ -107,9 +121,10 @@ IE Plugin:
 
 Translations:
  The following languages were added
+ * Catalan
  * Danish
  * Greek
- * Hindi 
+ * Hindi
  * Pashto
  * Burmese
  * Tetum
