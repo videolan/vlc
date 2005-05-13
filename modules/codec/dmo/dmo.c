@@ -604,31 +604,33 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     }
 
     /* Pickup the first available codec */
-    if( p_enum_dmo->vt->Next( p_enum_dmo, 1, &clsid_dmo,
-            &psz_dmo_name, &i_dummy /* NULL doesn't work */ ) )
-    {
-        FreeLibrary( *p_hmsdmo_dll );
-        return VLC_EGENERIC;
-    }
-    p_enum_dmo->vt->Release( (IUnknown *)p_enum_dmo );
-
-#if 1
+    *pp_dmo = 0;
+    while( ( S_OK == p_enum_dmo->vt->Next( p_enum_dmo, 1, &clsid_dmo,
+                     &psz_dmo_name, &i_dummy /* NULL doesn't work */ ) ) )
     {
         char psz_temp[MAX_PATH];
         wcstombs( psz_temp, psz_dmo_name, MAX_PATH );
         msg_Dbg( p_this, "found DMO: %s", psz_temp );
+        CoTaskMemFree( psz_dmo_name );
+
+        /* Create DMO */
+        if( CoCreateInstance( &clsid_dmo, NULL, CLSCTX_INPROC,
+                              &IID_IMediaObject, (void **)pp_dmo ) )
+        {
+            msg_Warn( p_this, "can't create DMO: %s", psz_temp );
+            *pp_dmo = 0;
+        }
+        else break;
     }
-#endif
 
-    CoTaskMemFree( psz_dmo_name );
+    p_enum_dmo->vt->Release( (IUnknown *)p_enum_dmo );
 
-    /* Create DMO */
-    if( CoCreateInstance( &clsid_dmo, NULL, CLSCTX_INPROC,
-                          &IID_IMediaObject, (void **)pp_dmo ) )
+    if( !*pp_dmo )
     {
-        msg_Err( p_this, "can't create DMO" );
         FreeLibrary( *p_hmsdmo_dll );
-        return VLC_EGENERIC;
+        /* return VLC_EGENERIC; */
+        /* Try loading the dll directly */
+        goto loader;
     }
 
     return VLC_SUCCESS;
