@@ -1,5 +1,5 @@
 # German translation for VLC.
-# Copyright (C) 1999-2005 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2002-2005 VideoLAN <videolan@videolan.org>
 #
 # Thanks to Thomas Graf <tgr@reeler.org> for starting a translation in 2002.
 # Thanks to Philipp Weissenbacher <philippweissenbacher@aon.at> for various fixes in 2004.
@@ -146,11 +146,11 @@ msgid ""
 "subpictures"
 msgstr ""
 "Verschiedene Einstellungen zu On-Screen-Display (Anzeige von Informationen "
-"im aktuellen Video), Untertiteln und überlagerten Unterbildern."
+"im aktuellen Video), Untertiteln und eingeblendeten Unterbildern."
 
 #: include/vlc_config_cat.h:89
 msgid "Text rendering"
-msgstr "Textrendering"
+msgstr "Darstellung von Text"
 
 #: include/vlc_config_cat.h:91
 msgid ""
@@ -158,7 +158,7 @@ msgid ""
 "to use for text rendering (to display subtitles for example)."
 msgstr ""
 "Benutzen Sie die Einstellungen des \"freetype\"-Modules zur Auswahl der "
-"Schrift, die VLC für Textrenderings benutzen soll (zur Anzeige von "
+"Schrift, die VLC für die Darstellung von Text benutzen soll (zur Anzeige von "
 "Untertiteln beispielsweise)."
 
 #: include/vlc_config_cat.h:95
@@ -233,7 +233,7 @@ msgstr "Erweitert"
 
 #: include/vlc_config_cat.h:121
 msgid "Advanced input settings. Use with care."
-msgstr "Fortgeschrittene Input-Einstellungen. Mit Vorsicht verwenden."
+msgstr "Erweiterte Input-Einstellungen. Mit Vorsicht verwenden."
 
 #: include/vlc_config_cat.h:124 src/libvlc.h:1130
 #: modules/gui/gtk/gtk_interface.c:2370 modules/gui/gtk/gtk_interface.c:3046
@@ -253,9 +253,9 @@ msgid ""
 msgstr ""
 "Der Stream-Output macht es VLC möglich als Streamingserver zu agieren oder "
 "eingehende Streams zu speichern.\n"
-"Streams laufen zuerst durch einen Muxer und werden danach durch ein \"Access-"
-"Output\"-Modul geschickt, dass den Stream entweder in einer Datei speichern "
-"oder ihn streamen kann (via UDP, HTTP, RTP/RTSP).\n"
+"Streams laufen zuerst durch einen Multiplexer und werden danach durch ein \"Access-"
+"Output\"-Modul geschickt, dass den Stream entweder in einer Datei speichert "
+"oder streamt (via UDP, HTTP, RTP/RTSP).\n"
 "Sout-Stream-Module erlauben erweiterte Streamverarbeitungen "
 "(Transkodierungen, Duplizieren, ...)"
 
@@ -274,9 +274,9 @@ msgid ""
 "force a muxer.You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"Muxer sind die Verkapsulierungsformate, die zur Zusammenfügung von allen "
+"Muxer sind die Kapselungsformate, die zur Zusammenfügung von allen "
 "Elementarstreams (Video, Audio...) benutzt werden. Diese Einstellung erlaubt "
-"Ihnen immer einen Muxer zuerzwingen. Sie sollten dies höchstwahrscheinlich "
+"Ihnen immer einen Muxer zu erzwingen. Sie sollten dies höchstwahrscheinlich "
 "nicht tun.\n"
 "Sie können auch Standardparameter für jeden Muxer festlegen."
 
@@ -290,15 +290,15 @@ msgid ""
 "you to always force an access output.You should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"Mit Access-Output werden die Art und Weisen bezeichnet, wie durch einen "
-"Muxer bearbeitete Streams gesendet werden. Diese Einstellung erlaubt Ihnen, "
+"Nach dem Multiplexen eines Streams bestimmt Access-Output wie der"
+"Stream verschickt wird. Diese Einstellung erlaubt Ihnen, "
 "immer einen Access-Output zu erzwingen. Sie sollten dies "
 "höchstwahrscheinlich nicht tun.\n"
 "Sie können auch Standardparameter für jeden Access-Output festlegen."
 
 #: include/vlc_config_cat.h:148
 msgid "Packetizers"
-msgstr "Packetizer"
+msgstr "Paketierer"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -307,11 +307,11 @@ msgid ""
 "do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"Packetizer werden zur \"Vorbearbeitung\" von Elementarstreams verwendet, "
+"Paketierer werden zur \"Vorbearbeitung\" von Elementarstreams verwendet, "
 "bevor Sie einen Muxer durchlaufen. Diese Einstellung erlaubt Ihnen immer "
-"einen Packetizer zu verwenden. Sie sollten dies höchstwahrscheinlich nicht "
+"einen Paketierer zu verwenden. Sie sollten dies höchstwahrscheinlich nicht "
 "tun.\n"
-"Sie können auch Standardparameter für jeden Packetizer festlegen."
+"Sie können auch Standardparameter für jeden Paketierer festlegen."
 
 #: include/vlc_config_cat.h:155
 msgid "Sout stream"
@@ -325,7 +325,7 @@ msgid ""
 msgstr ""
 "Sout-Stream-Module erlauben die Erstellung einer Sout-Verarbeitungskette. "
 "Bitte schauen Sie in das Streaming-Howto für weitere Informationen. Sie "
-"können Standardoptionen für jedes Sout-Stream-Modul hier festlegen."
+"können hier Standardoptionen für jedes Sout-Stream-Modul festlegen."
 
 #: include/vlc_config_cat.h:161 modules/services_discovery/sap.c:106
 #: modules/services_discovery/sap.c:346
@@ -346,7 +346,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:166
 msgid "VLC's implementation of Video On Demand"
-msgstr "VLCs Implementation von Video-On-Demand"
+msgstr "VLCs Implementierung von Video-On-Demand"
 
 #: include/vlc_config_cat.h:170 src/libvlc.h:1232
 #: modules/gui/beos/InterfaceWindow.cpp:213
@@ -367,13 +367,13 @@ msgid ""
 "modules that automatically add items to the playlist ('service discovery "
 "modules'"
 msgstr ""
-"Einstellungen zum Wiedergabelistenverhalten (Wiedergabemodus zum Beispiel) "
-"und zu Modulen, die automatisch Objekte der WIedergabeliste hinzufügen "
+"Einstellungen zum Verhalten der Wiedergabelisten (zum Beispiel Wiedergabemodus) "
+"und zu Modulen, die automatisch Objekte zur Wiedergabeliste hinzufügen "
 "('Service-Discovery'-Module)"
 
 #: include/vlc_config_cat.h:173
 msgid "General playlist behaviour"
-msgstr "Allgemeines Wiedergabelistenverhalten"
+msgstr "Allgemeines Verhalten der Wiedergabeliste"
 
 #: include/vlc_config_cat.h:174 modules/gui/macosx/playlist.m:203
 #: modules/gui/wxwindows/playlist.cpp:236
@@ -402,7 +402,7 @@ msgid ""
 "probably not touch that."
 msgstr ""
 "Hier können Sie einige CPU-Beschleunigungen deaktivieren. Sie sollten dies "
-"höchstwahrscheinlich nicht berühren."
+"höchstwahrscheinlich nicht tun."
 
 #: include/vlc_config_cat.h:184 modules/demux/util/id3genres.h:40
 msgid "Other"
@@ -436,7 +436,7 @@ msgstr "Diese Einstellungen betreffen die Chroma-Umkodierungsmodule."
 
 #: include/vlc_config_cat.h:196
 msgid "Packetizer modules settings"
-msgstr "Einstellungen der Packetizermodule"
+msgstr "Einstellungen der Paketierermodule"
 
 #: include/vlc_config_cat.h:197 include/vlc_config_cat.h:215
 msgid " "
@@ -1054,7 +1054,7 @@ msgstr "Deutsch"
 
 #: src/libvlc.h:34
 msgid "Greek"
-msgstr ""
+msgstr "Griechisch"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:168
 msgid "Spanish"
@@ -5477,7 +5477,7 @@ msgstr "Titel "
 
 #: modules/access/vcdx/access.c:531
 msgid "LID "
-msgstr ""
+msgstr "LID "
 
 #: modules/access/vcdx/access.c:706 modules/access/vcdx/info.c:292
 #: modules/access/vcdx/info.c:293
@@ -5539,7 +5539,7 @@ msgstr "Letzter Eingangspunkt"
 
 #: modules/access/vcdx/info.c:125
 msgid "Track size (in sectors)"
-msgstr ""
+msgstr "Trackgröße (in Sektoren)"
 
 #: modules/access/vcdx/info.c:137 modules/access/vcdx/info.c:140
 #: modules/access/vcdx/info.c:149 modules/access/vcdx/info.c:164
@@ -6096,7 +6096,7 @@ msgstr "Volle Bässe"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Full bass and treble"
-msgstr "Volle Bässe und Höhen"
+msgstr "Volle Bässe & Höhen"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Full treble"
@@ -13028,9 +13028,8 @@ msgid "SAP announces"
 msgstr "SAP-Ankündigungen"
 
 #: modules/services_discovery/sap.c:132
-#, fuzzy
 msgid "SDP file parser for UDP"
-msgstr "SDP-Dateiparser (nur für UDP)"
+msgstr "SDP-Dateiparser für UDP"
 
 #: modules/services_discovery/sap.c:820 modules/services_discovery/sap.c:825
 msgid "Session"
@@ -13774,7 +13773,7 @@ msgstr "Wählen Sie das Videoausgabemodule aus, welche Sie aktivieren möchten."
 
 #: modules/video_filter/clone.c:63
 msgid "Clone video filter"
-msgstr "Bild-Klon-Filder"
+msgstr "Bild-Klon-Filter"
 
 #: modules/video_filter/clone.c:65
 #, fuzzy
