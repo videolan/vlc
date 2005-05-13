@@ -5589,7 +5589,11 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
 
     msg_Dbg( &sys.demuxer, "command : %s", sz_command.c_str() );
 
+#if defined(__GNUC__) && (__GNUC__ < 3)
+    if ( sz_command.compare( CMD_MS_GOTO_AND_PLAY, 0, CMD_MS_GOTO_AND_PLAY.size() ) == 0 )
+#else
     if ( sz_command.compare( 0, CMD_MS_GOTO_AND_PLAY.size(), CMD_MS_GOTO_AND_PLAY ) == 0 )
+#endif
     {
         size_t i,j;
 
