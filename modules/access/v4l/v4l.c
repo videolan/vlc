@@ -360,7 +360,7 @@ static int Open( vlc_object_t *p_this )
 
     var_Create( p_demux, "v4l-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l-height", &val );
-    p_sys->i_width          = val.i_int;
+    p_sys->i_height         = val.i_int;
 
     p_sys->i_video_pts      = -1;
 
