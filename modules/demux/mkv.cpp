@@ -1235,6 +1235,7 @@ public:
         ,p_ev(NULL)
     {
         vlc_mutex_init( &demuxer, &lock_demuxer );
+        StartUiThread();
     }
 
     virtual ~demux_sys_t()
@@ -1940,7 +1941,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", tracks.size() );
-    sys.StopUiThread();
+
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
@@ -2220,7 +2221,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( tracks[i_track]->psz_codec, "B_VOBBTN" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
-            sys.StartUiThread();
         }
         else
         {
@@ -2441,6 +2441,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                     p_sys->dvd_interpretor.SetSPRM( 0x88, best );
                     p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
 
+                    msg_Dbg( &p_sys->demuxer, "Processed button %d", best );
+
                     // select new button
                     if ( best != p_sys->i_curr_button )
                     {
@@ -2531,8 +2533,6 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 void matroska_segment_c::UnSelect( )
 {
     size_t i_track;
-
-    sys.StopUiThread();
 
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
@@ -2937,6 +2937,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
 static int Demux( demux_t *p_demux)
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
+
+    vlc_mutex_lock( &p_sys->lock_demuxer );
+
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segment = p_vsegment->Segment();
     if ( p_segment == NULL ) return 0;
@@ -2947,8 +2950,6 @@ static int Demux( demux_t *p_demux)
     int64_t i_block_duration;
     int64_t i_block_ref1;
     int64_t i_block_ref2;
-
-    vlc_mutex_lock( &p_sys->lock_demuxer );
 
     for( ;; )
     {
