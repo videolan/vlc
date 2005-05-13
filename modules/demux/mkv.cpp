@@ -1231,7 +1231,7 @@ public:
         ,f_duration(-1.0)
         ,b_ui_hooked(false)
         ,p_input(NULL)
-		,b_pci_packet_set(false)
+        ,b_pci_packet_set(false)
         ,i_curr_button(0)
         ,p_ev(NULL)
     {
@@ -1295,7 +1295,7 @@ public:
     /* for spu variables */
     input_thread_t *p_input;
     pci_t          pci_packet;
-	bool           b_pci_packet_set;
+    bool           b_pci_packet_set;
     int16          i_curr_button;
     uint8_t        alpha[4];
     vlc_mutex_t    lock_demuxer;
@@ -1819,7 +1819,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                     vlc_mutex_lock( &p_sys->p_ev->lock );
                     memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
                     p_sys->SwapButtons();
-					p_sys->b_pci_packet_set = true;
+                    p_sys->b_pci_packet_set = true;
                     vlc_mutex_unlock( &p_sys->p_ev->lock );
                     block_Release( p_block );
                 }
@@ -1944,7 +1944,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", tracks.size() );
-	sys.b_pci_packet_set = false;
+    sys.b_pci_packet_set = false;
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
@@ -2355,13 +2355,13 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 
             vlc_mutex_lock( &p_ev->lock );
 
-			if ( !p_sys->b_pci_packet_set )
-			{
-				vlc_mutex_unlock( &p_ev->lock );
-				/* Wait 100ms */
-				msleep( 100000 );
-				continue;
-			}
+            if ( !p_sys->b_pci_packet_set )
+            {
+                vlc_mutex_unlock( &p_ev->lock );
+                /* Wait 100ms */
+                msleep( 100000 );
+                continue;
+            }
 
             pci_t *pci = (pci_t *) &p_sys->pci_packet;
 
@@ -5481,8 +5481,8 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_JUMPVTS_PTT:
         {
-            uint16 i_title = (p_command[4] << 8) + p_command[5];
-            uint8 i_ptt    = p_command[3];
+            uint8 i_title = p_command[5];
+            uint8 i_ptt = p_command[3];
 
             msg_Dbg( &sys.demuxer, "JumpVTS Title (%d) PTT (%d)", i_title, i_ptt);
 
@@ -5497,21 +5497,29 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
                     if ( p_chapter != NULL )
                     {
-                        p_chapter = p_segment->BrowseCodecPrivate( 1, MatchChapterNumber, &i_ptt, sizeof(i_ptt) );
+                        // find the title in the VTS
+                        p_chapter = p_chapter->BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title) );
                         if ( p_chapter != NULL )
                         {
-                            // if the segment is not part of the current segment, select the new one
-                            if ( p_segment != sys.p_current_segment )
+                            // find the chapter in the title
+                            p_chapter = p_chapter->BrowseCodecPrivate( 1, MatchChapterNumber, &i_ptt, sizeof(i_ptt) );
+                            if ( p_chapter != NULL )
                             {
-                                sys.PreparePlayback( p_segment );
+                                // if the segment is not part of the current segment, select the new one
+                                if ( p_segment != sys.p_current_segment )
+                                {
+                                    sys.PreparePlayback( p_segment );
+                                }
+                    
+                                p_chapter->Enter( true );
+                                
+                                // jump to the location in the found segment
+                                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                                f_result = true;
                             }
-                
-                            p_chapter->Enter( true );
-                            
-                            // jump to the location in the found segment
-                            p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
-                            f_result = true;
                         }
+                    else
+                        msg_Dbg( &sys.demuxer, "Title (%d) does not exist in this VTS", i_title );
                     }
                     else
                         msg_Dbg( &sys.demuxer, "DVD Domain VTS (%d) not found", i_curr_title );
