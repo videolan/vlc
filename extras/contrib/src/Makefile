@@ -1027,7 +1027,7 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .twolame: twolame
-	(cd twolame; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd twolame; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
