@@ -2671,6 +2671,8 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             {
                 if ( !(*p_editions)[i_current_edition]->EnterAndLeave( psz_current_chapter ) )
                     psz_current_chapter = NULL;
+                else
+                    return true;
             }
         }
     }
