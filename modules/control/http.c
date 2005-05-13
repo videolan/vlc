@@ -881,7 +881,6 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
     char *str = dup;
     mvar_t *s = mvar_New( name, "set" );
 
-    fprintf( stderr," mvar_IntegerSetNew: name=`%s' arg=`%s'\n", name, str );
 
     while( str )
     {
@@ -897,7 +896,6 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
 
         i_step = 0;
         i_match = sscanf( str, "%d:%d:%d", &i_start, &i_stop, &i_step );
-        fprintf( stderr," mvar_IntegerSetNew: m=%d start=%d stop=%d step=%d\n", i_match, i_start, i_stop, i_step );
 
         if( i_match == 1 )
         {
@@ -926,7 +924,6 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
                         break;
                     }
 
-                    fprintf( stderr," mvar_IntegerSetNew: adding %d\n", i );
                     sprintf( value, "%d", i );
 
                     mvar_PushNewVar( s, name, value );
@@ -1003,7 +1000,6 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
     playlist_view_t *p_view;
     mvar_t *s = mvar_New( name, "set" );
 
-    fprintf( stderr," mvar_PlaylistSetNew: name=`%s'\n", name );
 
     vlc_mutex_lock( &p_pl->object_lock );
 
@@ -1022,7 +1018,6 @@ static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
     mvar_t *s = mvar_New( name, "set" );
     int i, j;
 
-    fprintf( stderr," mvar_InfoSetNew: name=`%s'\n", name );
     if( p_input == NULL )
     {
         return s;
@@ -1062,7 +1057,6 @@ static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
     httpd_info_t info;
     int          i;
 
-    fprintf( stderr," mvar_HttpdInfoSetNew: name=`%s'\n", name );
     if( !p_httpd->pf_control( p_httpd, i_type, &info, NULL ) )
     {
         for( i= 0; i < info.i_count; )
@@ -1184,7 +1178,6 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     }
     *p = '\0';
 
-    fprintf( stderr," mvar_FileSetNew: name=`%s' dir=`%s'\n", name, psz_dir );
 
 #ifdef HAVE_SYS_STAT_H
     if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
@@ -1273,7 +1266,6 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
     vlm_message_t *msg;
     int    i;
 
-    /* fprintf( stderr," mvar_VlmSetNew: name=`%s'\n", name ); */
     if( vlm == NULL ) return s;
 
     if( vlm_ExecuteCommand( vlm, "show", &msg ) )
@@ -1305,8 +1297,6 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
             set = mvar_New( name, "set" );
             mvar_AppendNewVar( set, "name", el->psz_name );
 
-            /* fprintf( stderr, "#### name=%s\n", el->psz_name ); */
-
             for( k = 0; k < desc->i_child; k++ )
             {
                 vlm_message_t *ch = desc->child[k];
@@ -1315,26 +1305,22 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
                     int c;
                     mvar_t *n = mvar_New( ch->psz_name, "set" );
 
-                    /* fprintf( stderr, "        child=%s [%d]\n", ch->psz_name, ch->i_child ); */
                     for( c = 0; c < ch->i_child; c++ )
                     {
                         if( ch->child[c]->psz_value )
                         {
                             mvar_AppendNewVar( n, ch->child[c]->psz_name, ch->child[c]->psz_value );
-                            /* fprintf( stderr, "            sub=%s->%s\n", ch->child[c]->psz_name, ch->child[c]->psz_value ); */
                         }
                         else
                         {
                             mvar_t *in = mvar_New( ch->psz_name, ch->child[c]->psz_name );
                             mvar_AppendVar( n, in );
-                            /* fprintf( stderr, "            sub=%s\n", ch->child[c]->psz_name ); */
                         }
                     }
                     mvar_AppendVar( set, n );
                 }
                 else
                 {
-                    /* fprintf( stderr, "        child=%s->%s\n", ch->psz_name, ch->psz_value ); */
                     mvar_AppendNewVar( set, ch->psz_name, ch->psz_value );
                 }
             }
@@ -2166,7 +2152,6 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             p += sprintf( p, " %s", vlm_properties[i] );
                         }
                     }
-                    fprintf( stderr, "vlm_ExecuteCommand: %s\n", psz );
                     vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
                     if( vlm_answer->psz_value == NULL ) /* there is no error */
                     {
