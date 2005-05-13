@@ -62,6 +62,21 @@ static void Close( vlc_object_t * );
 #define ANALYSE_TEXT N_("Analyse mode")
 #define ANALYSE_LONGTEXT N_( "This selects the analysing mode.")
 
+#define TOLERANCE_TEXT N_("Bitrate tolerance")
+#define TOLERANCE_LONGTEXT N_( "Sets the allowed variance in average " \
+    "bitrate.")
+
+#define VBV_MAXRATE_TEXT N_("Maximum local bitrate")
+#define VBV_MAXRATE_LONGTEXT N_( "Sets a maximum local bitrate in kbits/s.")
+
+#define VBV_BUFSIZE_TEXT N_("Averaging period for the maximum local bitrate")
+#define VBV_BUFSIZE_LONGTEXT N_( "Sets an averaging preiod for the maximum " \
+    "local bitrate, in kbits/s.")
+
+#define VBV_INIT_TEXT N_("Initial buffer occupancy")
+#define VBV_INIT_LONGTEXT N_( "Sets the initial buffer occupancy as a " \
+    "fraction of the buffer size.")
+
 #define KEYINT_TEXT N_("Sets maximum interval between IDR-frames")
 #define KEYINT_LONGTEXT N_( "Larger values save bits, thus improve quality "\
     "for a given bitrate, at the cost of seeking precision." )
@@ -135,6 +150,20 @@ vlc_module_begin();
                 ANALYSE_LONGTEXT, VLC_FALSE );
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
 
+    add_float( SOUT_CFG_PREFIX "tolerance", 1.0, NULL, TOLERANCE_TEXT,
+               TOLERANCE_LONGTEXT, VLC_FALSE );
+        change_float_range( 0, 100 );
+
+    add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
+                 VBV_MAXRATE_LONGTEXT, VLC_FALSE );
+
+    add_integer( SOUT_CFG_PREFIX "vbv-bufsize", 0, NULL, VBV_BUFSIZE_TEXT,
+                 VBV_BUFSIZE_LONGTEXT, VLC_FALSE );
+
+    add_float( SOUT_CFG_PREFIX "vbv-init", 0.9, NULL, VBV_INIT_TEXT,
+               VBV_INIT_LONGTEXT, VLC_FALSE );
+        change_float_range( 0, 1 );
+
     add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
                  KEYINT_LONGTEXT, VLC_FALSE );
 
@@ -168,7 +197,7 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "qp", "qp-min", "qp-max", "cabac", "loopfilter", "analyse",
     "keyint", "keyint-min", "bframes", "bpyramid", "frameref", "scenecut",
-    "subpel", NULL
+    "subpel", "tolerance", "vbv-maxrate", "vbv-bufsize", "vbv-init", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -254,8 +283,25 @@ static int  Open ( vlc_object_t *p_this )
 #if X264_BUILD >= 0x000a
         p_sys->param.rc.b_cbr = 1;
         p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
+
+#if X264_BUILD >= 24
+        var_Get( p_enc, SOUT_CFG_PREFIX "tolerance", &val );
+        p_sys->param.rc.f_rate_tolerance = val.f_float;
+
+        var_Get( p_enc, SOUT_CFG_PREFIX "vbv-maxrate", &val );
+        p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
+
+        var_Get( p_enc, SOUT_CFG_PREFIX "vbv-bufsize", &val );
+        p_sys->param.rc.i_vbv_buffer_size = val.i_int;
+        if( !val.i_int )
+            p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate;
+
+        var_Get( p_enc, SOUT_CFG_PREFIX "vbv-init", &val );
+        p_sys->param.rc.f_vbv_buffer_init = val.f_float;
+#else
         p_sys->param.rc.i_rc_buffer_size = p_sys->param.rc.i_bitrate;
         p_sys->param.rc.i_rc_init_buffer = p_sys->param.rc.i_bitrate / 4;
+#endif
 #endif
     }
 
