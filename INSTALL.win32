@@ -136,7 +136,7 @@ along those lines:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
-      --enable-toolame --enable-dvdread \
+      --enable-twolame --enable-dvdread \
       --enable-debug
 
 If you are cross-compiling with our gcc-3.3.1 package, you can use something
@@ -160,7 +160,7 @@ along those lines:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
-      --enable-toolame --enable-dvdread \
+      --enable-twolame --enable-dvdread \
       --enable-debug
 
 If you are using cygwin, you can build VLC with or without the POSIX
@@ -185,7 +185,7 @@ emulation layer, use something like this:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
-      --enable-toolame --enable-dvdread \
+      --enable-twolame --enable-dvdread \
       --enable-debug
 
 If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
@@ -208,7 +208,7 @@ lines:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
-      --enable-toolame --enable-dvdread \
+      --enable-twolame --enable-dvdread \
       --disable-mkv \
       --enable-debug
 
