@@ -194,6 +194,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
 
     /* Change the simple textfield into a searchField if we can... */
+#if 0
     if( MACOS_VERSION >= 10.3 )
     {
         NSView *o_parentview = [o_status_field superview];
@@ -212,7 +213,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         [o_parentview addSubview:o_better_search_field];
         [o_search_field setHidden:YES];
     }
-    
+#endif
     [self initStrings];
     //[self playlistUpdated];
 }
