@@ -1231,6 +1231,7 @@ public:
         ,f_duration(-1.0)
         ,b_ui_hooked(false)
         ,p_input(NULL)
+		,b_pci_packet_set(false)
         ,i_curr_button(0)
         ,p_ev(NULL)
     {
@@ -1294,6 +1295,7 @@ public:
     /* for spu variables */
     input_thread_t *p_input;
     pci_t          pci_packet;
+	bool           b_pci_packet_set;
     int16          i_curr_button;
     uint8_t        alpha[4];
     vlc_mutex_t    lock_demuxer;
@@ -1817,6 +1819,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
                     vlc_mutex_lock( &p_sys->p_ev->lock );
                     memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
                     p_sys->SwapButtons();
+					p_sys->b_pci_packet_set = true;
                     vlc_mutex_unlock( &p_sys->p_ev->lock );
                     block_Release( p_block );
                 }
@@ -1941,7 +1944,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", tracks.size() );
-
+	sys.b_pci_packet_set = false;
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
@@ -2351,6 +2354,14 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             int i, i_action = -1;
 
             vlc_mutex_lock( &p_ev->lock );
+
+			if ( !p_sys->b_pci_packet_set )
+			{
+				vlc_mutex_unlock( &p_ev->lock );
+				/* Wait 100ms */
+				msleep( 100000 );
+				continue;
+			}
 
             pci_t *pci = (pci_t *) &p_sys->pci_packet;
 
