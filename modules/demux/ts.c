@@ -2420,9 +2420,22 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         if( !old_pid && p_sys->pid[p_es->i_pid].b_valid )
         {
-            msg_Warn( p_demux, "pmt error: pid=%d already defined",
-                      p_es->i_pid );
-            continue;
+            ts_pid_t *pid = &p_sys->pid[p_es->i_pid];
+            if( ( pid->i_pid == 0x11 /* SDT */ ||
+                  pid->i_pid == 0x12 /* EDT */ ) && pid->psi )
+            {
+                /* This doesn't look like a DVB stream so don't try
+                 * parsing the SDT/EDT */
+                dvbpsi_DetachDemux( pid->psi->handle );
+                free( pid->psi );
+                pid->psi = 0;
+            }
+            else
+            {
+                msg_Warn( p_demux, "pmt error: pid=%d already defined",
+                          p_es->i_pid );
+                continue;
+            }
         }
 
         PIDInit( pid, VLC_FALSE, pmt->psi );
