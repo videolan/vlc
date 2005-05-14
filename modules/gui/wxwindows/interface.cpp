@@ -1445,8 +1445,9 @@ void VLCVolCtrl::OnChange( wxMouseEvent& event )
     {
         int i_volume;
         aout_VolumeMute( p_intf, (audio_volume_t *)&i_volume );
-
-        b_mute = !b_mute;
+        i_volume = (audio_volume_t)config_GetInt( p_intf, "volume" );
+        if( i_volume == 0 ) b_mute = 1;
+        else b_mute=0;
         Refresh();
     }
 }
