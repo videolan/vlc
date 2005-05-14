@@ -580,6 +580,10 @@ void Builder::addSlider( const BuilderData::Slider &rData )
 
 void Builder::addList( const BuilderData::List &rData )
 {
+    // Get the background bitmap, if any
+    GenericBitmap *pBgBmp = NULL;
+    GET_BMP( pBgBmp, rData.m_bgImageId );
+
     GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
@@ -608,7 +612,7 @@ void Builder::addList( const BuilderData::List &rData )
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
     // Create the list control
-    CtrlList *pList = new CtrlList( getIntf(), *pVar, *pFont,
+    CtrlList *pList = new CtrlList( getIntf(), *pVar, *pFont, pBgBmp,
        rData.m_fgColor, rData.m_playColor, rData.m_bgColor1,
        rData.m_bgColor2, rData.m_selColor,
        UString( getIntf(), rData.m_help.c_str() ), pVisible );

@@ -631,6 +631,11 @@ difficulty to understand how VLC skins work.</para>
       <para>Type of playlist. Currently, only "playlist" is recognized, so don't bother with this attribute :)</para>
       <para>Default value: playlist</para>
     </sect4>
+    <sect4 id="bgimage">
+      <title>bgimage</title>
+      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used as the background image. When no bitmap is specified, the background will be filled using the <link linkend="bgcolor1">bgcolor1</link> and <link linkend="bgcolor2">bgcolor2</link> attributes.</para>
+      <para>Default value: none</para>
+    </sect4>
     <sect4 id="fgcolor">
       <title>fgcolor</title>
       <para>Foreground color of the playlist items.</para>
@@ -648,12 +653,12 @@ difficulty to understand how VLC skins work.</para>
     </sect4>
     <sect4 id="bgcolor1">
       <title>bgcolor1</title>
-      <para>Background color for odd playlist items.</para>
+      <para>Background color for odd playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
       <para>Default value: #FFFFFF</para>
     </sect4>
     <sect4 id="bgcolor2">
       <title>bgcolor2</title>
-      <para>Background color for even playlist items.</para>
+      <para>Background color for even playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
       <para>Default value: #FFFFFF</para>
     </sect4>
 </sect3>

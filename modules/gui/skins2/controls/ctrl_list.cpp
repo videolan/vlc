@@ -28,6 +28,7 @@
 #include "../src/os_graphics.hpp"
 #include "../src/generic_bitmap.hpp"
 #include "../src/generic_font.hpp"
+#include "../src/scaled_bitmap.hpp"
 #include "../utils/position.hpp"
 #include "../utils/ustring.hpp"
 #include "../events/evt_key.hpp"
@@ -42,14 +43,15 @@
 #define LINE_INTERVAL 1  // Number of pixels inserted between 2 lines
 
 
-CtrlList::CtrlList( intf_thread_t *pIntf, VarList &rList, GenericFont &rFont,
+CtrlList::CtrlList( intf_thread_t *pIntf, VarList &rList,
+                    const GenericFont &rFont, const GenericBitmap *pBitmap,
                     uint32_t fgColor, uint32_t playColor, uint32_t bgColor1,
                     uint32_t bgColor2, uint32_t selColor,
                     const UString &rHelp, VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_rList( rList ), m_rFont( rFont ),
-    m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ),
-    m_bgColor2( bgColor2 ), m_selColor( selColor ), m_pLastSelected( NULL ),
-    m_pImage( NULL ), m_lastPos( 0 )
+    m_pBitmap( pBitmap ), m_fgColor( fgColor ), m_playColor( playColor ),
+    m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ),
+    m_pLastSelected( NULL ), m_pImage( NULL ), m_lastPos( 0 )
 {
     // Observe the list and position variables
     m_rList.addObserver( this );
@@ -427,26 +429,52 @@ void CtrlList::makeImage()
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
     m_pImage = pOsFactory->createOSGraphics( width, height );
 
-    // Current background color
-    uint32_t bgColor = m_bgColor1;
+    VarList::ConstIterator it = m_rList[m_lastPos];
 
     // Draw the background
-    VarList::ConstIterator it = m_rList[m_lastPos];
-    for( int yPos = 0; yPos < height; yPos += itemHeight )
+    if( m_pBitmap )
     {
-        int rectHeight = __MIN( itemHeight, height - yPos );
-        if( it != m_rList.end() )
+        // A background bitmap is given, so we scale it, ignoring the
+        // background colors
+        ScaledBitmap bmp( getIntf(), *m_pBitmap, width, height );
+        m_pImage->drawBitmap( bmp, 0, 0 );
+
+        // Take care of the selection color
+        for( int yPos = 0; yPos < height; yPos += itemHeight )
         {
-            uint32_t color = ( (*it).m_selected ? m_selColor : bgColor );
-            m_pImage->fillRect( 0, yPos, width, rectHeight, color );
-            it++;
+            int rectHeight = __MIN( itemHeight, height - yPos );
+            if( it != m_rList.end() )
+            {
+                if( (*it).m_selected )
+                {
+                    m_pImage->fillRect( 0, yPos, width, rectHeight,
+                                        m_selColor );
+                }
+                it++;
+            }
         }
-        else
+    }
+    else
+    {
+        // No background bitmap, so use the 2 background colors
+        // Current background color
+        uint32_t bgColor = m_bgColor1;
+        for( int yPos = 0; yPos < height; yPos += itemHeight )
         {
-            m_pImage->fillRect( 0, yPos, width, rectHeight, bgColor );
+            int rectHeight = __MIN( itemHeight, height - yPos );
+            if( it != m_rList.end() )
+            {
+                uint32_t color = ( (*it).m_selected ? m_selColor : bgColor );
+                m_pImage->fillRect( 0, yPos, width, rectHeight, color );
+                it++;
+            }
+            else
+            {
+                m_pImage->fillRect( 0, yPos, width, rectHeight, bgColor );
+            }
+            // Flip the background color
+            bgColor = ( bgColor == m_bgColor1 ? m_bgColor2 : m_bgColor1 );
         }
-        // Flip the background color
-        bgColor = ( bgColor == m_bgColor1 ? m_bgColor2 : m_bgColor1 );
     }
 
     // Draw the items

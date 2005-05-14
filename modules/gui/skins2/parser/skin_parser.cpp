@@ -215,6 +215,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "height", "0" );
         CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "rightbottom", "lefttop" );
+        CheckDefault( "bgimage", "none" );
         CheckDefault( "fgcolor", "#000000" );
         CheckDefault( "playcolor", "#FF0000" );
         CheckDefault( "bgcolor1", "#FFFFFF" );
@@ -227,7 +228,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
                 atoi( attr["width"]), atoi( attr["height"] ),
                 attr["lefttop"], attr["rightbottom"],
-                attr["font"], "playlist", convertColor( attr["fgcolor"] ),
+                attr["font"], "playlist", attr["bgimage"],
+                convertColor( attr["fgcolor"] ),
                 convertColor( attr["playcolor"] ),
                 convertColor( attr["bgcolor1"] ),
                 convertColor( attr["bgcolor2"] ),
