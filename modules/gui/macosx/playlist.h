@@ -92,6 +92,7 @@
 
 - (IBAction)servicesChange:(id)sender;
 - (IBAction)playItem:(id)sender;
+- (IBAction)savePlaylist:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
 - (IBAction)sortNodeByName:(id)sender;

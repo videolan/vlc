@@ -392,6 +392,24 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     return NO;
 }
 
+- (IBAction)savePlaylist:(id)sender
+{
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    NSSavePanel *o_save_panel = [NSSavePanel savePanel];
+    NSString * o_name = [NSString stringWithFormat: @"%@.m3u", _NS("Untitled")];
+    [o_save_panel setTitle: _NS("Save Playlist")];
+    [o_save_panel setPrompt: _NS("Save")];
+
+    if( [o_save_panel runModalForDirectory: nil
+            file: o_name] == NSOKButton )
+    {
+        playlist_Export( p_playlist, [[o_save_panel filename] fileSystemRepresentation], "export-m3u" );
+    }
+}
+
 
 /* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)playItem:(id)sender

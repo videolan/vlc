@@ -248,6 +248,7 @@
                 deleteItem = id; 
                 handlePopUp = id; 
                 playItem = id; 
+                savePlaylist = id; 
                 searchItem = id; 
                 selectAll = id; 
                 sortNodeByAuthor = id; 
