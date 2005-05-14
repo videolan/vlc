@@ -1235,7 +1235,6 @@ public:
         ,p_ev(NULL)
     {
         vlc_mutex_init( &demuxer, &lock_demuxer );
-        StartUiThread();
     }
 
     virtual ~demux_sys_t()
@@ -1454,6 +1453,8 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
     }
+
+    p_sys->StartUiThread();
     
     return VLC_SUCCESS;
 
@@ -1943,6 +1944,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", tracks.size() );
     sys.b_pci_packet_set = false;
+
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
