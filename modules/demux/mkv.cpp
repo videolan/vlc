@@ -99,11 +99,6 @@ extern "C" {
 #define MKVD_TIMECODESCALE 1000000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifdef VSLHC1
-#define DVDNAV_COMPILE
-#include <dvdnav.h>
-#else /* VSLHC */
-
 #undef ATTRIBUTE_PACKED
 #undef PRAGMA_PACK_BEGIN 
 #undef PRAGMA_PACK_END
@@ -364,8 +359,6 @@ typedef struct {
 #if PRAGMA_PACK
 #pragma pack()
 #endif
-
-#endif /* VSLHC */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -2642,7 +2635,7 @@ void matroska_segment_c::UnSelect( )
     {
         if ( tracks[i_track]->p_es != NULL )
         {
-            es_format_Clean( &tracks[i_track]->fmt );
+//            es_format_Clean( &tracks[i_track]->fmt );
             es_out_Del( sys.demuxer.out, tracks[i_track]->p_es );
             tracks[i_track]->p_es = NULL;
         }
