@@ -2642,6 +2642,7 @@ void matroska_segment_c::UnSelect( )
     {
         if ( tracks[i_track]->p_es != NULL )
         {
+            es_format_Clean( &tracks[i_track]->fmt );
             es_out_Del( sys.demuxer.out, tracks[i_track]->p_es );
             tracks[i_track]->p_es = NULL;
         }
