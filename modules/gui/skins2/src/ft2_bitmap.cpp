@@ -60,9 +60,9 @@ void FT2Bitmap::draw( const FT_Bitmap &rBitmap, int left, int top,
         {
             // The buffer in FT_Bitmap contains alpha values
             uint8_t val = *(pBuf++);
-            *(pData++) = (blue * val) >> 8;
-            *(pData++) = (green * val) >> 8;
-            *(pData++) = (red * val) >> 8;
+            *(pData++) = blue;
+            *(pData++) = green;
+            *(pData++) = red;
             *(pData++) = val;
         }
     }
