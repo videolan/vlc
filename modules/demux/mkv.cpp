@@ -1232,7 +1232,6 @@ public:
         ,b_ui_hooked(false)
         ,p_input(NULL)
         ,b_pci_packet_set(false)
-        ,i_curr_button(0)
         ,p_ev(NULL)
     {
         vlc_mutex_init( &demuxer, &lock_demuxer );
@@ -1296,7 +1295,6 @@ public:
     input_thread_t *p_input;
     pci_t          pci_packet;
     bool           b_pci_packet_set;
-    int16          i_curr_button;
     uint8_t        alpha[4];
     vlc_mutex_t    lock_demuxer;
 
@@ -2374,23 +2372,118 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 }
             }
 
+            uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
+
             switch( i_action )
             {
             case ACTIONID_NAV_LEFT:
-//                dvdnav_left_button_select( NULL, pci );
+                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                {
+                    btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
+                    if ( p_button_ptr->left > 0 && p_button_ptr->left <= pci->hli.hl_gi.btn_ns )
+                    {
+                        i_curr_button = p_button_ptr->left;
+                        p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
+                        btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+                        if ( button_ptr.auto_action_mode )
+                        {
+                            vlc_mutex_unlock( &p_ev->lock );
+                            vlc_mutex_lock( &p_sys->lock_demuxer );
+
+                            // process the button action
+                            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+                            vlc_mutex_unlock( &p_sys->lock_demuxer );
+                            vlc_mutex_lock( &p_ev->lock );
+                        }
+                    }
+                }
                 break;
             case ACTIONID_NAV_RIGHT:
-//                dvdnav_right_button_select( NULL, pci );
+                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                {
+                    btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
+                    if ( p_button_ptr->right > 0 && p_button_ptr->right <= pci->hli.hl_gi.btn_ns )
+                    {
+                        i_curr_button = p_button_ptr->right;
+                        p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
+                        btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+                        if ( button_ptr.auto_action_mode )
+                        {
+                            vlc_mutex_unlock( &p_ev->lock );
+                            vlc_mutex_lock( &p_sys->lock_demuxer );
+
+                            // process the button action
+                            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+                            vlc_mutex_unlock( &p_sys->lock_demuxer );
+                            vlc_mutex_lock( &p_ev->lock );
+                        }
+                    }
+                }
                 break;
             case ACTIONID_NAV_UP:
-//                dvdnav_upper_button_select( NULL, pci );
+                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                {
+                    btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
+                    if ( p_button_ptr->up > 0 && p_button_ptr->up <= pci->hli.hl_gi.btn_ns )
+                    {
+                        i_curr_button = p_button_ptr->up;
+                        p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
+                        btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+                        if ( button_ptr.auto_action_mode )
+                        {
+                            vlc_mutex_unlock( &p_ev->lock );
+                            vlc_mutex_lock( &p_sys->lock_demuxer );
+
+                            // process the button action
+                            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+                            vlc_mutex_unlock( &p_sys->lock_demuxer );
+                            vlc_mutex_lock( &p_ev->lock );
+                        }
+                    }
+                }
                 break;
             case ACTIONID_NAV_DOWN:
-//                dvdnav_lower_button_select( NULL, pci );
+                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                {
+                    btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
+                    if ( p_button_ptr->down > 0 && p_button_ptr->down <= pci->hli.hl_gi.btn_ns )
+                    {
+                        i_curr_button = p_button_ptr->down;
+                        p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
+                        btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+                        if ( button_ptr.auto_action_mode )
+                        {
+                            vlc_mutex_unlock( &p_ev->lock );
+                            vlc_mutex_lock( &p_sys->lock_demuxer );
+
+                            // process the button action
+                            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+                            vlc_mutex_unlock( &p_sys->lock_demuxer );
+                            vlc_mutex_lock( &p_ev->lock );
+                        }
+                    }
+                }
                 break;
             case ACTIONID_NAV_ACTIVATE:
                 b_activated = VLC_TRUE;
-//                dvdnav_button_activate( NULL, pci );
+        
+                if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
+                {
+                    btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+
+                    vlc_mutex_unlock( &p_ev->lock );
+                    vlc_mutex_lock( &p_sys->lock_demuxer );
+
+                    // process the button action
+                    p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+                    vlc_mutex_unlock( &p_sys->lock_demuxer );
+                    vlc_mutex_lock( &p_ev->lock );
+                }
                 break;
             default:
                 break;
@@ -2443,6 +2536,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 if ( best != 0)
                 {
                     btni_t button_ptr = pci->hli.btnit[best-1];
+                    uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
 
                     msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
                     vlc_mutex_unlock( &p_ev->lock );
@@ -2455,7 +2549,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                     msg_Dbg( &p_sys->demuxer, "Processed button %d", best );
 
                     // select new button
-                    if ( best != p_sys->i_curr_button )
+                    if ( best != i_curr_button )
                     {
                         vlc_value_t val;
 
@@ -2485,8 +2579,6 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
 
                             val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
                             vlc_mutex_unlock( p_mutex );
-
-                            p_sys->i_curr_button = best;
                         }
                     }
                     vlc_mutex_unlock( &p_sys->lock_demuxer );
