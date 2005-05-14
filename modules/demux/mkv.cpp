@@ -2342,6 +2342,13 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
     /* main loop */
     while( !p_ev->b_die )
     {
+        if ( !p_sys->b_pci_packet_set )
+        {
+            /* Wait 100ms */
+            msleep( 100000 );
+            continue;
+        }
+
         vlc_bool_t b_activated = VLC_FALSE;
 
         /* KEY part */
@@ -2352,14 +2359,6 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             int i, i_action = -1;
 
             vlc_mutex_lock( &p_ev->lock );
-
-            if ( !p_sys->b_pci_packet_set )
-            {
-                vlc_mutex_unlock( &p_ev->lock );
-                /* Wait 100ms */
-                msleep( 100000 );
-                continue;
-            }
 
             pci_t *pci = (pci_t *) &p_sys->pci_packet;
 
