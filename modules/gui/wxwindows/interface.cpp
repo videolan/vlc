@@ -352,6 +352,7 @@ void Interface::Update()
 {
     /* Misc updates */
     ((VLCVolCtrl *)volctrl)->UpdateVolume();
+    
 }
 
 void Interface::OnControlEvent( wxCommandEvent& event )
@@ -1454,7 +1455,12 @@ void VLCVolCtrl::OnChange( wxMouseEvent& event )
 
 void VLCVolCtrl::UpdateVolume()
 {
+    int i_volume;
     gauge->UpdateVolume();
+    i_volume = (audio_volume_t)config_GetInt( p_intf, "volume" );
+    if( i_volume == 0 ) b_mute = 1;
+    else b_mute=0;
+    Refresh();
 }
 
 /*****************************************************************************
