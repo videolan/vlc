@@ -389,6 +389,11 @@ difficulty to understand how VLC skins work.</para>
       <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>.</para>
       <para><emphasis>Required.</emphasis></para>
     </sect4>
+    <sect4 id="resize">
+      <title>resize</title>
+      <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'resize' (the image is actually resized). Beware that the 'resize' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
+      <para><emphasis>Default value: mosaic.</emphasis></para>
+    </sect4>
     <sect4 id="imageaction">
       <title>action</title>
       <para>Action triggered by a click on the control. Possible values are "move", to move the window, or "resizeSE" (SE as in South-East ; other directions will be added in the future) to resize the window in the corresponding direction.</para>
