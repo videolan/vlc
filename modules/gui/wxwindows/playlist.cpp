@@ -52,6 +52,7 @@
 #define HELP_LOOP N_( "Repeat All" )
 #define HELP_REPEAT N_( "Repeat One" )
 
+namespace wxvlc {
 /* Callback prototype */
 static int PlaylistChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
@@ -1516,4 +1517,5 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     p_playlist_dialog->AddPendingEvent( event );
 
     return VLC_SUCCESS;
+}
 }
