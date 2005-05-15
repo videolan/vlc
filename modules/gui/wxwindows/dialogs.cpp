@@ -232,17 +232,17 @@ DialogsProvider::~DialogsProvider()
 
 void DialogsProvider::OnIdle( wxIdleEvent& WXUNUSED(event) )
 {
-  /* Update the log window */
-  if( p_messages_dialog )
-    p_messages_dialog->UpdateLog();
+    /* Update the log window */
+    if( p_messages_dialog )
+        p_messages_dialog->UpdateLog();
 
-  /* Update the playlist */
-  if( p_playlist_dialog )
-    p_playlist_dialog->UpdatePlaylist();
+    /* Update the playlist */
+    if( p_playlist_dialog )
+        p_playlist_dialog->UpdatePlaylist();
 
-  /* Update the fileinfo windows */
-  if( p_fileinfo_dialog )
-    p_fileinfo_dialog->UpdateFileInfo();
+    /* Update the fileinfo windows */
+    if( p_fileinfo_dialog )
+        p_fileinfo_dialog->UpdateFileInfo();
 }
 
 void DialogsProvider::OnPlaylist( wxCommandEvent& WXUNUSED(event) )
