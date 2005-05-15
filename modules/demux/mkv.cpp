@@ -610,15 +610,37 @@ class chapter_codec_cmds_c
 {
 public:
     chapter_codec_cmds_c( demux_sys_t & demuxer, int codec_id = -1)
-    :i_codec_id( codec_id )
+    :p_private_data(NULL)
+    ,i_codec_id( codec_id )
     ,sys( demuxer )
     {}
         
-    virtual ~chapter_codec_cmds_c() {}
+    virtual ~chapter_codec_cmds_c() 
+    {
+        delete p_private_data;
+        std::vector<KaxChapterProcessData*>::iterator indexe = enter_cmds.begin();
+        while ( indexe != enter_cmds.end() )
+        {
+            delete (*indexe);
+            indexe++;
+        }
+        std::vector<KaxChapterProcessData*>::iterator indexl = leave_cmds.begin();
+        while ( indexl != leave_cmds.end() )
+        {
+            delete (*indexl);
+            indexl++;
+        }
+        std::vector<KaxChapterProcessData*>::iterator indexd = during_cmds.begin();
+        while ( indexd != during_cmds.end() )
+        {
+            delete (*indexd);
+            indexd++;
+        }
+    }
 
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
     {
-        m_private_data = *( new KaxChapterProcessPrivate( private_data ) );
+        p_private_data = new KaxChapterProcessPrivate( private_data );
     }
 
     void AddCommand( const KaxChapterProcessCommand & command );
@@ -629,12 +651,12 @@ public:
     virtual std::string GetCodecName( bool f_for_title = false ) const { return ""; }
     virtual int16 GetTitleNumber() { return -1; }
 
-    KaxChapterProcessPrivate m_private_data;
+    KaxChapterProcessPrivate *p_private_data;
 
 protected:
-    std::vector<KaxChapterProcessData> enter_cmds;
-    std::vector<KaxChapterProcessData> during_cmds;
-    std::vector<KaxChapterProcessData> leave_cmds;
+    std::vector<KaxChapterProcessData*> enter_cmds;
+    std::vector<KaxChapterProcessData*> during_cmds;
+    std::vector<KaxChapterProcessData*> leave_cmds;
 
     int i_codec_id;
     demux_sys_t & sys;
@@ -849,7 +871,16 @@ protected:
 class chapter_translation_c
 {
 public:
-    KaxChapterTranslateID  translated;
+    chapter_translation_c()
+        :p_translated(NULL)
+    {}
+
+    ~chapter_translation_c()
+    {
+        delete p_translated;
+    }
+
+    KaxChapterTranslateID  *p_translated;
     unsigned int           codec_id;
     std::vector<uint64_t>  editions;
 };
@@ -949,6 +980,9 @@ public:
         ,i_tags_position(-1)
         ,cluster(NULL)
         ,i_start_pos(0)
+        ,p_segment_uid(NULL)
+        ,p_prev_segment_uid(NULL)
+        ,p_next_segment_uid(NULL)
         ,b_cues(VLC_FALSE)
         ,i_index(0)
         ,i_index_max(1024)
@@ -962,7 +996,7 @@ public:
         ,ep(NULL)
         ,b_preloaded(false)
     {
-        index = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
+        p_indexes = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
     }
 
     virtual ~matroska_segment_c()
@@ -973,14 +1007,14 @@ public:
             {
                 free( tracks[i_track]->fmt.psz_description );
             }
-            if( tracks[i_track]->psz_codec )
+/*            if( tracks[i_track]->psz_codec )
             {
                 free( tracks[i_track]->psz_codec );
             }
             if( tracks[i_track]->fmt.psz_language )
             {
                 free( tracks[i_track]->fmt.psz_language );
-            }
+            }*/
             delete tracks[i_track];
         }
         
@@ -1004,16 +1038,25 @@ public:
         {
             free( psz_date_utc );
         }
-        if ( index )
-            free( index );
+        if ( p_indexes )
+            free( p_indexes );
 
         delete ep;
+        delete p_segment_uid;
+        delete p_prev_segment_uid;
+        delete p_next_segment_uid;
 
         std::vector<chapter_edition_c*>::iterator index = stored_editions.begin();
         while ( index != stored_editions.end() )
         {
             delete (*index);
             index++;
+        }
+        std::vector<chapter_translation_c*>::iterator indext = translations.begin();
+        while ( indext != translations.end() )
+        {
+            delete (*indext);
+            indext++;
         }
     }
 
@@ -1037,14 +1080,14 @@ public:
 
     KaxCluster              *cluster;
     int64_t                 i_start_pos;
-    KaxSegmentUID           segment_uid;
-    KaxPrevUID              prev_segment_uid;
-    KaxNextUID              next_segment_uid;
+    KaxSegmentUID           *p_segment_uid;
+    KaxPrevUID              *p_prev_segment_uid;
+    KaxNextUID              *p_next_segment_uid;
 
     vlc_bool_t              b_cues;
     int                     i_index;
     int                     i_index_max;
-    mkv_index_t             *index;
+    mkv_index_t             *p_indexes;
 
     /* info */
     char                    *psz_muxing_application;
@@ -1059,7 +1102,7 @@ public:
     std::vector<chapter_edition_c*> stored_editions;
     int                             i_default_edition;
 
-    std::vector<chapter_translation_c> translations;
+    std::vector<chapter_translation_c*> translations;
     std::vector<KaxSegmentFamily>  families;
     
     demux_sys_t                    & sys;
@@ -1100,9 +1143,9 @@ public:
     {
         linked_segments.push_back( p_segment );
 
-        AppendUID( p_segment->segment_uid );
-        AppendUID( p_segment->prev_segment_uid );
-        AppendUID( p_segment->next_segment_uid );
+        AppendUID( p_segment->p_segment_uid );
+        AppendUID( p_segment->p_prev_segment_uid );
+        AppendUID( p_segment->p_next_segment_uid );
     }
 
     void Sort();
@@ -1170,7 +1213,7 @@ protected:
     int                              i_current_edition;
     chapter_item_c                   *psz_current_chapter;
 
-    void                             AppendUID( const EbmlBinary & UID );
+    void                             AppendUID( const EbmlBinary * UID );
 };
 
 class matroska_stream_c
@@ -1252,7 +1295,7 @@ public:
 
     vlc_meta_t              *meta;
 
-    std::vector<input_title_t>       titles; // matroska editions
+    std::vector<input_title_t*>      titles; // matroska editions
     size_t                           i_current_title;
 
     std::vector<matroska_stream_c*>  streams;
@@ -1523,7 +1566,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
                 for( size_t i = 0; i < p_sys->titles.size(); i++ )
                 {
-                    (*ppp_title)[i] = vlc_input_title_Duplicate( &p_sys->titles[i] );
+                    (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->titles[i] );
                 }
 
                 return VLC_SUCCESS;
@@ -1544,9 +1587,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_skp = (int)va_arg( args, int );
 
             // TODO change the way it works with the << & >> buttons on the UI (+1/-1 instead of a number)
-            if( p_sys->titles.size() && i_skp < p_sys->titles[p_sys->i_current_title].i_seekpoint)
+            if( p_sys->titles.size() && i_skp < p_sys->titles[p_sys->i_current_title]->i_seekpoint)
             {
-                Seek( p_demux, (int64_t)p_sys->titles[p_sys->i_current_title].seekpoint[i_skp]->i_time_offset, -1, NULL);
+                Seek( p_demux, (int64_t)p_sys->titles[p_sys->i_current_title]->seekpoint[i_skp]->i_time_offset, -1, NULL);
                 p_demux->info.i_seekpoint |= INPUT_UPDATE_SEEKPOINT;
                 p_demux->info.i_seekpoint = i_skp;
                 return VLC_SUCCESS;
@@ -1580,7 +1623,7 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
         if( el == NULL && *pp_block != NULL )
         {
             /* update the index */
-#define idx index[i_index - 1]
+#define idx p_indexes[i_index - 1]
             if( i_index > 0 && idx.i_time == -1 )
             {
                 idx.i_time        = (*pp_block)->GlobalTimecode() / (mtime_t)1000;
@@ -1611,7 +1654,7 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
 
                 /* add it to the index */
                 if( i_index == 0 ||
-                    ( i_index > 0 && index[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                    ( i_index > 0 && p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
                 {
                     IndexAppendCluster( cluster );
                 }
@@ -1889,15 +1932,16 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
                             if ( !b_keep_segment )
                                 break; // this segment is already known
                             opened_segments.push_back( p_segment1 );
-                            p_segment1->segment_uid = *( new KaxSegmentUID(*p_uid) );
+                            delete p_segment1->p_segment_uid;
+                            p_segment1->p_segment_uid = new KaxSegmentUID(*p_uid);
                         }
                         else if( MKV_IS_ID( l, KaxPrevUID ) )
                         {
-                            p_segment1->prev_segment_uid = *( new KaxPrevUID( *static_cast<KaxPrevUID*>(l) ) );
+                            p_segment1->p_prev_segment_uid = new KaxPrevUID( *static_cast<KaxPrevUID*>(l) );
                         }
                         else if( MKV_IS_ID( l, KaxNextUID ) )
                         {
-                            p_segment1->next_segment_uid = *( new KaxNextUID( *static_cast<KaxNextUID*>(l) ) );
+                            p_segment1->p_next_segment_uid = new KaxNextUID( *static_cast<KaxNextUID*>(l) );
                         }
                         else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                         {
@@ -1997,16 +2041,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( tracks[i_track]->psz_codec, "V_QUICKTIME" ) )
         {
             MP4_Box_t *p_box = (MP4_Box_t*)malloc( sizeof( MP4_Box_t ) );
-#ifdef VSLHC
-            stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
-                                                       tracks[i_track]->p_extra_data,
-                                                       tracks[i_track]->i_extra_data );
-#else
             stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
                                                        tracks[i_track]->p_extra_data,
                                                        tracks[i_track]->i_extra_data,
                                                        VLC_FALSE );
-#endif
             MP4_ReadBoxCommon( p_mp4_stream, p_box );
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
             tracks[i_track]->fmt.i_codec = p_box->i_type;
@@ -2016,11 +2054,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
             memcpy( tracks[i_track]->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tracks[i_track]->fmt.i_extra );
             MP4_FreeBox_sample_vide( p_box );
-#ifdef VSLHC
-            stream_MemoryDelete( p_mp4_stream, VLC_TRUE );
-#else
             stream_Delete( p_mp4_stream );
-#endif        
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_MS/ACM" ) )
         {
@@ -2882,9 +2916,9 @@ std::string chapter_item_c::GetCodecName( bool f_for_title ) const
 std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
 {
     std::string result;
-    if ( m_private_data.GetSize() >= 3)
+    if ( p_private_data->GetSize() >= 3)
     {
-        const binary* p_data = m_private_data.GetBuffer();
+        const binary* p_data = p_private_data->GetBuffer();
 /*        if ( p_data[0] == MATROSKA_DVD_LEVEL_TT )
         {
             uint16_t i_title = (p_data[1] << 8) + p_data[2];
@@ -2938,9 +2972,9 @@ int16 chapter_item_c::GetTitleNumber( ) const
 
 int16 dvd_chapter_codec_c::GetTitleNumber()
 {
-    if ( m_private_data.GetSize() >= 3)
+    if ( p_private_data->GetSize() >= 3)
     {
-        const binary* p_data = m_private_data.GetBuffer();
+        const binary* p_data = p_private_data->GetBuffer();
         if ( p_data[0] == MATROSKA_DVD_LEVEL_SS )
         {
             return int16( (p_data[2] << 8) + p_data[3] );
@@ -2984,7 +3018,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
             msg_Dbg( p_demux, "inacurate way of seeking" );
             for( i_index = 0; i_index < p_segment->i_index; i_index++ )
             {
-                if( p_segment->index[i_index].i_position >= i_pos)
+                if( p_segment->p_indexes[i_index].i_position >= i_pos)
                 {
                     break;
                 }
@@ -2994,10 +3028,10 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
                 i_index--;
             }
 
-            i_date = p_segment->index[i_index].i_time;
+            i_date = p_segment->p_indexes[i_index].i_time;
 
 #if 0
-            if( p_segment->index[i_index].i_position < i_pos )
+            if( p_segment->p_indexes[i_index].i_position < i_pos )
             {
                 EbmlElement *el;
 
@@ -3046,11 +3080,6 @@ static int Demux( demux_t *p_demux)
     int                i_block_count = 0;
     int                i_return = 0;
 
-    KaxBlock *block;
-    int64_t i_block_duration;
-    int64_t i_block_ref1;
-    int64_t i_block_ref2;
-
     for( ;; )
     {
         if ( p_sys->demuxer.b_die )
@@ -3082,6 +3111,10 @@ static int Demux( demux_t *p_demux)
             continue;
         }
 
+        KaxBlock *block;
+        int64_t i_block_duration = 0;
+        int64_t i_block_ref1;
+        int64_t i_block_ref2;
 
         if( p_segment->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
@@ -3317,7 +3350,7 @@ EbmlElement *EbmlParser::Get( void )
         mb_keep = VLC_FALSE;
     }
 
-    m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy, 1 );
+    m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy != 0, 1 );
 //    mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
     if( i_ulev > 0 )
     {
@@ -3392,7 +3425,7 @@ void matroska_segment_c::LoadCues( )
     {
         if( MKV_IS_ID( el, KaxCuePoint ) )
         {
-#define idx index[i_index]
+#define idx p_indexes[i_index]
 
             idx.i_track       = -1;
             idx.i_block_number= -1;
@@ -3461,7 +3494,7 @@ void matroska_segment_c::LoadCues( )
             if( i_index >= i_index_max )
             {
                 i_index_max += 1024;
-                index = (mkv_index_t*)realloc( index, sizeof( mkv_index_t ) * i_index_max );
+                p_indexes = (mkv_index_t*)realloc( p_indexes, sizeof( mkv_index_t ) * i_index_max );
             }
 #undef idx
         }
@@ -4133,21 +4166,21 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
         if( MKV_IS_ID( l, KaxSegmentUID ) )
         {
-            segment_uid = *(new KaxSegmentUID(*static_cast<KaxSegmentUID*>(l)));
+            p_segment_uid = new KaxSegmentUID(*static_cast<KaxSegmentUID*>(l));
 
-            msg_Dbg( &sys.demuxer, "|   |   + UID=%d", *(uint32*)segment_uid.GetBuffer() );
+            msg_Dbg( &sys.demuxer, "|   |   + UID=%d", *(uint32*)p_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxPrevUID ) )
         {
-            prev_segment_uid = *(new KaxPrevUID(*static_cast<KaxPrevUID*>(l)));
+            p_prev_segment_uid = new KaxPrevUID(*static_cast<KaxPrevUID*>(l));
 
-            msg_Dbg( &sys.demuxer, "|   |   + PrevUID=%d", *(uint32*)prev_segment_uid.GetBuffer() );
+            msg_Dbg( &sys.demuxer, "|   |   + PrevUID=%d", *(uint32*)p_prev_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxNextUID ) )
         {
-            next_segment_uid = *(new KaxNextUID(*static_cast<KaxNextUID*>(l)));
+            p_next_segment_uid = new KaxNextUID(*static_cast<KaxNextUID*>(l));
 
-            msg_Dbg( &sys.demuxer, "|   |   + NextUID=%d", *(uint32*)next_segment_uid.GetBuffer() );
+            msg_Dbg( &sys.demuxer, "|   |   + NextUID=%d", *(uint32*)p_next_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxTimecodeScale ) )
         {
@@ -4233,7 +4266,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         else if( MKV_IS_ID( l, KaxChapterTranslate ) )
         {
             KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
-            chapter_translation_c translated;
+            chapter_translation_c *p_translate = new chapter_translation_c();
 
             p_trans->Read( es, p_trans->Generic().Context, i_upper_level, el, true );
             for( j = 0; j < p_trans->ListSize(); j++ )
@@ -4242,19 +4275,19 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
                 if( MKV_IS_ID( l, KaxChapterTranslateEditionUID ) )
                 {
-                    translated.editions.push_back( uint64( *static_cast<KaxChapterTranslateEditionUID*>( l ) ) );
+                    p_translate->editions.push_back( uint64( *static_cast<KaxChapterTranslateEditionUID*>( l ) ) );
                 }
                 else if( MKV_IS_ID( l, KaxChapterTranslateCodec ) )
                 {
-                    translated.codec_id = uint32( *static_cast<KaxChapterTranslateCodec*>( l ) );
+                    p_translate->codec_id = uint32( *static_cast<KaxChapterTranslateCodec*>( l ) );
                 }
                 else if( MKV_IS_ID( l, KaxChapterTranslateID ) )
                 {
-                    translated.translated = *( new KaxChapterTranslateID( *static_cast<KaxChapterTranslateID*>( l ) ) );
+                    p_translate->p_translated = new KaxChapterTranslateID( *static_cast<KaxChapterTranslateID*>( l ) );
                 }
             }
 
-            translations.push_back( translated );
+            translations.push_back( p_translate );
         }
 #endif
         else
@@ -4503,7 +4536,8 @@ void matroska_segment_c::InformationCreate( )
 {
     size_t      i_track;
 
-    sys.meta = vlc_meta_New();
+    if ( sys.meta == NULL )
+        sys.meta = vlc_meta_New();
 
     if( psz_title )
     {
@@ -4576,7 +4610,7 @@ void matroska_segment_c::InformationCreate( )
 
 void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
 {
-#define idx index[i_index]
+#define idx p_indexes[i_index]
     idx.i_track       = -1;
     idx.i_block_number= -1;
     idx.i_position    = cluster->GetElementPosition();
@@ -4587,7 +4621,7 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     if( i_index >= i_index_max )
     {
         i_index_max += 1024;
-        index = (mkv_index_t*)realloc( index, sizeof( mkv_index_t ) * i_index_max );
+        p_indexes = (mkv_index_t*)realloc( p_indexes, sizeof( mkv_index_t ) * i_index_max );
     }
 #undef idx
 }
@@ -4810,7 +4844,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
                 p_title->psz_name = strdup( sz_name.c_str() );
             }
 
-            titles.push_back( *p_title );
+            titles.push_back( p_title );
         }
     }
 
@@ -4821,7 +4855,7 @@ bool demux_sys_t::IsUsedSegment( matroska_segment_c &segment ) const
 {
     for ( size_t i=0; i< used_segments.size(); i++ )
     {
-        if ( used_segments[i]->FindUID( segment.segment_uid ) )
+        if ( used_segments[i]->FindUID( *segment.p_segment_uid ) )
             return true;
     }
     return false;
@@ -4875,15 +4909,15 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
 
 bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a, const matroska_segment_c * p_item_b )
 {
-    EbmlBinary * p_itema = (EbmlBinary *)(&p_item_a->segment_uid);
-    if ( *p_itema == p_item_b->prev_segment_uid )
+    EbmlBinary * p_itema = (EbmlBinary *)(p_item_a->p_segment_uid);
+    if ( *p_itema == *p_item_b->p_prev_segment_uid )
         return true;
 
-    p_itema = (EbmlBinary *)(&p_item_a->next_segment_uid);
-    if ( *p_itema == p_item_b->segment_uid )
+    p_itema = (EbmlBinary *)(&p_item_a->p_next_segment_uid);
+    if ( *p_itema == *p_item_b->p_segment_uid )
         return true;
 
-    if ( *p_itema == p_item_b->prev_segment_uid )
+    if ( *p_itema == *p_item_b->p_prev_segment_uid )
         return true;
 
     return false;
@@ -4957,7 +4991,7 @@ matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
-        if ( opened_segments[i]->segment_uid == uid )
+        if ( *opened_segments[i]->p_segment_uid == uid )
             return opened_segments[i];
     }
     return NULL;
@@ -5015,21 +5049,21 @@ size_t virtual_segment_c::AddSegment( matroska_segment_c *p_segment )
     // check if it's not already in here
     for ( i=0; i<linked_segments.size(); i++ )
     {
-        if ( p_segment->segment_uid == linked_segments[i]->segment_uid )
+        if ( *p_segment->p_segment_uid == *linked_segments[i]->p_segment_uid )
             return 0;
     }
 
     // find possible mates
     for ( i=0; i<linked_uids.size(); i++ )
     {
-        if (   p_segment->segment_uid == linked_uids[i] 
-            || p_segment->prev_segment_uid == linked_uids[i] 
-            || p_segment->next_segment_uid == linked_uids[i] )
+        if (   (p_segment->p_segment_uid != NULL && *p_segment->p_segment_uid == linked_uids[i])
+            || (p_segment->p_prev_segment_uid != NULL && *p_segment->p_prev_segment_uid == linked_uids[i])
+            || (p_segment->p_next_segment_uid !=NULL && *p_segment->p_next_segment_uid == linked_uids[i]) )
         {
             linked_segments.push_back( p_segment );
 
-            AppendUID( p_segment->prev_segment_uid );
-            AppendUID( p_segment->next_segment_uid );
+            AppendUID( p_segment->p_prev_segment_uid );
+            AppendUID( p_segment->p_next_segment_uid );
 
             return 1;
         }
@@ -5068,17 +5102,19 @@ void virtual_segment_c::LoadCues( )
     }
 }
 
-void virtual_segment_c::AppendUID( const EbmlBinary & UID )
+void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
 {
-    if ( UID.GetBuffer() == NULL )
+    if ( p_UID == NULL )
+        return;
+    if ( p_UID->GetBuffer() == NULL )
         return;
 
     for (size_t i=0; i<linked_uids.size(); i++)
     {
-        if ( UID == linked_uids[i] )
+        if ( *p_UID == linked_uids[i] )
             return;
     }
-    linked_uids.push_back( *(KaxSegmentUID*)(&UID) );
+    linked_uids.push_back( *(KaxSegmentUID*)(p_UID) );
 }
 
 void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
@@ -5098,7 +5134,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
         for( ; i_idx < i_index; i_idx++ )
         {
-            if( index[i_idx].i_time + i_time_offset > i_date )
+            if( p_indexes[i_idx].i_time + i_time_offset > i_date )
             {
                 break;
             }
@@ -5109,8 +5145,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
             i_idx--;
         }
 
-        i_seek_position = index[i_idx].i_position;
-        i_seek_time = index[i_idx].i_time;
+        i_seek_position = p_indexes[i_idx].i_position;
+        i_seek_time = p_indexes[i_idx].i_time;
     }
 
     msg_Dbg( &sys.demuxer, "seek got "I64Fd" (%d%%)",
@@ -5256,13 +5292,13 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
             switch ( codec_time )
             {
             case 0:
-                during_cmds.push_back( *p_data );
+                during_cmds.push_back( p_data );
                 break;
             case 1:
-                enter_cmds.push_back( *p_data );
+                enter_cmds.push_back( p_data );
                 break;
             case 2:
-                leave_cmds.push_back( *p_data );
+                leave_cmds.push_back( p_data );
                 break;
             default:
                 delete p_data;
@@ -5360,15 +5396,15 @@ bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item )
 bool dvd_chapter_codec_c::Enter()
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
+    std::vector<KaxChapterProcessData*>::iterator index = enter_cmds.begin();
     while ( index != enter_cmds.end() )
     {
-        if ( (*index).GetSize() )
+        if ( (*index)->GetSize() )
         {
-            binary *p_data = (*index).GetBuffer();
+            binary *p_data = (*index)->GetBuffer();
             size_t i_size = *p_data++;
             // avoid reading too much from the buffer
-            i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
+            i_size = min( i_size, ((*index)->GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "Matroska DVD enter command" );
@@ -5383,15 +5419,15 @@ bool dvd_chapter_codec_c::Enter()
 bool dvd_chapter_codec_c::Leave()
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
+    std::vector<KaxChapterProcessData*>::iterator index = leave_cmds.begin();
     while ( index != leave_cmds.end() )
     {
-        if ( (*index).GetSize() )
+        if ( (*index)->GetSize() )
         {
-            binary *p_data = (*index).GetBuffer();
+            binary *p_data = (*index)->GetBuffer();
             size_t i_size = *p_data++;
             // avoid reading too much from the buffer
-            i_size = min( i_size, ((*index).GetSize() - 1) >> 3 );
+            i_size = min( i_size, ((*index)->GetSize() - 1) >> 3 );
             for ( ; i_size > 0; i_size--, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "Matroska DVD leave command" );
@@ -5688,18 +5724,18 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
 bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    return ( data.m_private_data.GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS );
+    return ( data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS );
 }
 
 bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    if ( i_cookie_size != 2 || data.m_private_data.GetSize() < 4 )
+    if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
     
-    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.m_private_data.GetBuffer()[1] != 0x80 )
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x80 )
         return false;
 
-    uint16 i_gtitle = (data.m_private_data.GetBuffer()[2] << 8 ) + data.m_private_data.GetBuffer()[3];
+    uint16 i_gtitle = (data.p_private_data->GetBuffer()[2] << 8 ) + data.p_private_data->GetBuffer()[3];
     uint16 i_title = *(uint16*)p_cookie;
 
     return (i_gtitle == i_title);
@@ -5707,13 +5743,13 @@ bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data
 
 bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    if ( i_cookie_size != 1 || data.m_private_data.GetSize() < 4 )
+    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
     
-    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_TT )
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_TT )
         return false;
 
-    uint16 i_gtitle = (data.m_private_data.GetBuffer()[1] << 8 ) + data.m_private_data.GetBuffer()[2];
+    uint16 i_gtitle = (data.p_private_data->GetBuffer()[1] << 8 ) + data.p_private_data->GetBuffer()[2];
     uint8 i_title = *(uint8*)p_cookie;
 
     return (i_gtitle == i_title);
@@ -5721,13 +5757,13 @@ bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &da
 
 bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    if ( i_cookie_size != 1 || data.m_private_data.GetSize() < 8 )
+    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
     
-    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
-    uint8 i_pgc_type = data.m_private_data.GetBuffer()[3];
+    uint8 i_pgc_type = data.p_private_data->GetBuffer()[3];
     uint8 i_pgc = *(uint8*)p_cookie;
 
     return (i_pgc_type == i_pgc);
@@ -5735,27 +5771,27 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
 
 bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    if ( i_cookie_size != 2 || data.m_private_data.GetSize() < 8 )
+    if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
     
-    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
     uint16 *i_pgc_n = (uint16 *)p_cookie;
-    uint16 i_pgc_num = (data.m_private_data.GetBuffer()[1] << 8) + data.m_private_data.GetBuffer()[2];
+    uint16 i_pgc_num = (data.p_private_data->GetBuffer()[1] << 8) + data.p_private_data->GetBuffer()[2];
 
     return (i_pgc_num == *i_pgc_n);
 }
 
 bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    if ( i_cookie_size != 1 || data.m_private_data.GetSize() < 2 )
+    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
         return false;
     
-    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_PTT )
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PTT )
         return false;
 
-    uint8 i_chapter = data.m_private_data.GetBuffer()[1];
+    uint8 i_chapter = data.p_private_data->GetBuffer()[1];
     uint8 i_ptt = *(uint8*)p_cookie;
 
     return (i_chapter == i_ptt);
@@ -5763,14 +5799,14 @@ bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &
 
 bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    if ( i_cookie_size != 1 || data.m_private_data.GetSize() < 5 )
+    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 5 )
         return false;
     
-    if ( data.m_private_data.GetBuffer()[0] != MATROSKA_DVD_LEVEL_CN )
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_CN )
         return false;
 
     uint8 *i_cell_n = (uint8 *)p_cookie;
-    uint8 i_cell_num = data.m_private_data.GetBuffer()[3];
+    uint8 i_cell_num = data.p_private_data->GetBuffer()[3];
 
     return (i_cell_num == *i_cell_n);
 }
@@ -5778,13 +5814,13 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
 bool matroska_script_codec_c::Enter()
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData>::iterator index = enter_cmds.begin();
+    std::vector<KaxChapterProcessData*>::iterator index = enter_cmds.begin();
     while ( index != enter_cmds.end() )
     {
-        if ( (*index).GetSize() )
+        if ( (*index)->GetSize() )
         {
             msg_Dbg( &sys.demuxer, "Matroska Script enter command" );
-            f_result |= interpretor.Interpret( (*index).GetBuffer(), (*index).GetSize() );
+            f_result |= interpretor.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
         index++;
     }
@@ -5794,13 +5830,13 @@ bool matroska_script_codec_c::Enter()
 bool matroska_script_codec_c::Leave()
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData>::iterator index = leave_cmds.begin();
+    std::vector<KaxChapterProcessData*>::iterator index = leave_cmds.begin();
     while ( index != leave_cmds.end() )
     {
-        if ( (*index).GetSize() )
+        if ( (*index)->GetSize() )
         {
             msg_Dbg( &sys.demuxer, "Matroska Script leave command" );
-            f_result |= interpretor.Interpret( (*index).GetBuffer(), (*index).GetSize() );
+            f_result |= interpretor.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
         index++;
     }
