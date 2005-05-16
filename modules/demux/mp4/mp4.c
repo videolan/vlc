@@ -77,7 +77,7 @@ typedef struct
     uint32_t     *p_sample_delta_dts;   /* dts delta */
 
     uint32_t     *p_sample_count_pts;
-    uint32_t     *p_sample_offset_pts;  /* pts-dts */
+    int32_t      *p_sample_offset_pts;  /* pts-dts */
 
     /* TODO if needed add pts
         but quickly *add* support for edts and seeking */
@@ -228,7 +228,8 @@ static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_tra
     for( i_index = 0;; i_index++ )
     {
         if( i_sample < ck->p_sample_count_pts[i_index] )
-            return ck->p_sample_offset_pts[i_index] * I64C(1000000) / p_track->i_timescale;
+            return ck->p_sample_offset_pts[i_index] * I64C(1000000) /
+                   (int64_t)p_track->i_timescale;
 
         i_sample -= ck->p_sample_count_pts[i_index];
     }
@@ -1145,7 +1146,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
 
             /* allocate them */
             ck->p_sample_count_pts = calloc( i_entry, sizeof( uint32_t ) );
-            ck->p_sample_offset_pts = calloc( i_entry, sizeof( uint32_t ) );
+            ck->p_sample_offset_pts = calloc( i_entry, sizeof( int32_t ) );
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
