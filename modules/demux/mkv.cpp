@@ -3167,6 +3167,32 @@ static int Demux( demux_t *p_demux)
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
 
+        if( p_sys->i_pts >= p_sys->i_start_pts  )
+            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+            {
+                i_return = 1;
+                break;
+            }
+        
+        if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
+        {
+            /* nothing left to read in this ordered edition */
+            if ( !p_vsegment->SelectNext() )
+                break;
+            p_segment->UnSelect( );
+            
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
+            /* switch to the next segment */
+            p_segment = p_vsegment->Segment();
+            if ( !p_segment->Select( 0 ) )
+            {
+                msg_Err( p_demux, "Failed to select new segment" );
+                break;
+            }
+            continue;
+        }
+
         BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration );
 
         delete block;
