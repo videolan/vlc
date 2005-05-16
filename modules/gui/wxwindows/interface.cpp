@@ -241,6 +241,11 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Create a dummy widget that can get the keyboard focus */
     wxWindow *p_dummy = new wxWindow( this, 0, wxDefaultPosition,
                                       wxSize(0,0) );
+#if defined(__WXGTK20__) && wxCHECK_VERSION(2,5,6)
+    /* As ugly as your butt! Please remove when wxWidgets 2.6 fixed their
+     * Accelerators bug. */
+    p_dummy->m_imData = 0;
+#endif
     p_dummy->SetFocus();
     frame_sizer->Add( p_dummy, 0, 0 );
 
