@@ -109,7 +109,7 @@ vlc_module_begin();
 
     add_submodule();
     set_description( _("Theora video encoder") );
-    set_capability( "encoder", 100 );
+    set_capability( "encoder", 150 );
     set_callbacks( OpenEncoder, CloseEncoder );
     add_shortcut( "theora" );
 
