@@ -1320,6 +1320,7 @@ public:
     void PreloadLinked( matroska_segment_c *p_segment );
     bool PreparePlayback( virtual_segment_c *p_new_segment );
     matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream );
+    void JumpTo( virtual_segment_c & p_segment, chapter_item_c * p_chapter );
 
     void StartUiThread();
     void StopUiThread();
@@ -1578,7 +1579,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_idx = (int)va_arg( args, int );
             if( i_idx < p_sys->used_segments.size() )
             {
-                p_sys->PreparePlayback( p_sys->used_segments[i_idx] );
+                p_sys->JumpTo( *p_sys->used_segments[i_idx], NULL );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -4536,8 +4537,14 @@ void matroska_segment_c::InformationCreate( )
 {
     size_t      i_track;
 
-    if ( sys.meta == NULL )
-        sys.meta = vlc_meta_New();
+/*************
+    impossible as is it now, vlc_meta_Delete is not clean
+
+    if ( sys.meta != NULL )
+        vlc_meta_Delete( sys.meta );
+*/
+
+    sys.meta = vlc_meta_New();
 
     if( psz_title )
     {
@@ -4905,6 +4912,25 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
     p_current_segment->Segment()->Select( 0 );
 
     return true;
+}
+
+void demux_sys_t::JumpTo( virtual_segment_c & vsegment, chapter_item_c * p_chapter )
+{
+    // if the segment is not part of the current segment, select the new one
+    if ( &vsegment != p_current_segment )
+    {
+        PreparePlayback( &vsegment );
+    }
+
+    if ( p_chapter != NULL )
+    {
+        if ( !p_chapter->Enter( true ) )
+        {
+            // jump to the location in the found segment
+            vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, NULL );
+        }
+    }
+    
 }
 
 bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a, const matroska_segment_c * p_item_b )
@@ -5527,18 +5553,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
             // find in the ChapProcessPrivate matching this Title level
             p_chapter = sys.BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title), p_segment );
-            if ( p_chapter != NULL )
+            if ( p_segment != NULL )
             {
-                // if the segment is not part of the current segment, select the new one
-                if ( p_segment != sys.p_current_segment )
-                {
-                    sys.PreparePlayback( p_segment );
-                }
-    
-                // jump to the location in the found segment
-                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, NULL );
-                p_chapter->Enter( true );
-                
+                sys.JumpTo( *p_segment, p_chapter );
                 f_result = true;
             }
 
@@ -5577,18 +5594,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         break;
                     }
                     p_chapter = sys.BrowseCodecPrivate( 1, MatchPgcType, &p_command[5], 1, p_segment );
-                    if ( p_chapter != NULL )
+                    if ( p_segment != NULL )
                     {
-                        // if the segment is not part of the current segment, select the new one
-                        if ( p_segment != sys.p_current_segment )
-                        {
-                            sys.PreparePlayback( p_segment );
-                        }
-            
-                        p_chapter->Enter( true );
-                        
-                        // jump to the location in the found segment
-                        p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                        sys.JumpTo( *p_segment, p_chapter );
                         f_result = true;
                     }
                 break;
@@ -5620,7 +5628,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 {
                     p_chapter = sys.BrowseCodecPrivate( 1, MatchVTSNumber, &i_curr_title, sizeof(i_curr_title), p_segment );
 
-                    if ( p_chapter != NULL )
+                    if ( p_segment != NULL && p_chapter != NULL )
                     {
                         // find the title in the VTS
                         p_chapter = p_chapter->BrowseCodecPrivate( 1, MatchTitleNumber, &i_title, sizeof(i_title) );
@@ -5630,16 +5638,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             p_chapter = p_chapter->BrowseCodecPrivate( 1, MatchChapterNumber, &i_ptt, sizeof(i_ptt) );
                             if ( p_chapter != NULL )
                             {
-                                // if the segment is not part of the current segment, select the new one
-                                if ( p_segment != sys.p_current_segment )
-                                {
-                                    sys.PreparePlayback( p_segment );
-                                }
-                    
-                                p_chapter->Enter( true );
-                                
-                                // jump to the location in the found segment
-                                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                                sys.JumpTo( *p_segment, p_chapter );
                                 f_result = true;
                             }
                         }
@@ -5672,10 +5671,10 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             p_chapter = sys.p_current_segment->BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 2 );
             if ( p_chapter != NULL )
             {
-                p_chapter->Enter( true );
-                
-                // jump to the location in the found segment
-                sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                if ( !p_chapter->Enter( true ) )
+                    // jump to the location in the found segment
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+
                 f_result = true;
             }
             break;
@@ -5690,10 +5689,10 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             p_chapter = p_chapter->BrowseCodecPrivate( 1, MatchCellNumber, &i_cn, 1 );
             if ( p_chapter != NULL )
             {
-                p_chapter->Enter( true );
-                
-                // jump to the location in the found segment
-                sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+                if ( !p_chapter->Enter( true ) )
+                    // jump to the location in the found segment
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter );
+
                 f_result = true;
             }
             break;
