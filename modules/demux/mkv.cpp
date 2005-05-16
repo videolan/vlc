@@ -1859,7 +1859,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
             p_block->i_pts = 0;
         }
 
-        if ( strcmp( tk->psz_codec, "S_VOBSUB" ) )
+        if( tk->fmt.i_cat == SPU_ES && strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
             p_block->i_length = i_duration * 1000;
         }
