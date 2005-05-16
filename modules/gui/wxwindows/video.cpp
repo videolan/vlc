@@ -61,6 +61,8 @@ public:
     void ReleaseWindow( void * );
     int  ControlWindow( void *, int, va_list );
 
+    mtime_t i_creation_date;
+
 private:
     intf_thread_t *p_intf;
     vout_thread_t *p_vout;
@@ -102,6 +104,10 @@ wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
 void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window )
 {
 #if (wxCHECK_VERSION(2,5,0))
+    if( mdate() - ((VideoWindow *)p_window)->i_creation_date < 2000000 )
+        return; /* Hack to prevent saving coordinates if window is not yet
+                 * properly created. Yuck :( */
+
     if( p_window && p_intf->p_sys->p_video_sizer && p_window->IsShown() )
         p_intf->p_sys->p_video_sizer->SetMinSize( p_window->GetSize() );
 #endif
@@ -122,7 +128,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     b_auto_size = config_GetInt( p_intf, "wxwin-autosize" );
 
     p_vout = NULL;
-
+    i_creation_date = 0;
     m_hide_timer.SetOwner( this, ID_HIDE_TIMER );
 
     p_intf->pf_request_window = ::GetWindow;
@@ -302,6 +308,7 @@ void VideoWindow::UpdateSize( wxEvent &_event )
     }
     p_intf->p_sys->p_video_sizer->SetMinSize( event->GetSize() );
 
+    i_creation_date = mdate();
     wxCommandEvent intf_event( wxEVT_INTF, 0 );
     p_parent->AddPendingEvent( intf_event );
 }
