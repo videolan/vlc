@@ -1048,7 +1048,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         }
     }
 
-    /* Use stts table to crate a sample number -> dts table.
+    /* Use stts table to create a sample number -> dts table.
      * XXX: if we don't want to waste too much memory, we can't expand
      *  the box! so each chunk will contain an "extract" of this table
      *  for fast research (problem with raw stream where a sample is sometime
@@ -1190,6 +1190,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 {
     MP4_Box_t   *p_sample;
     MP4_Box_t   *p_esds;
+    MP4_Box_t   *p_box;
 
     *pp_es = NULL;
 
@@ -1438,6 +1439,18 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_sample->data.p_sample_vide->i_width != p_track->i_width )
             p_track->fmt.video.i_aspect =
                 VOUT_ASPECT_FACTOR * p_track->i_width / p_track->i_height;
+
+        /* Frame rate */
+        p_track->fmt.video.i_frame_rate = p_track->i_timescale;
+        p_track->fmt.video.i_frame_rate_base = 1;
+
+        if( p_track->fmt.video.i_frame_rate &&
+            (p_box = MP4_BoxGet( p_track->p_stbl, "stts" )) &&
+            p_box->data.p_stts->i_entry_count >= 1 )
+        {
+            p_track->fmt.video.i_frame_rate_base =
+                p_box->data.p_stts->i_sample_delta[0];
+        }
 
         break;
 
