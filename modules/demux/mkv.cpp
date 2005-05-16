@@ -517,6 +517,7 @@ class EbmlParser
     void Reset( demux_t *p_demux );
     EbmlElement *Get( void );
     void        Keep( void );
+    void        UnGet( uint64 i_restart_pos );
 
     int GetLevel( void );
 
@@ -1123,7 +1124,7 @@ public:
     void LoadTags( );
     void InformationCreate( );
     void Seek( mtime_t i_date, mtime_t i_time_offset );
-    int BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
+    int BlockGet( KaxBlock * & pp_block, uint64 & i_cuepos, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
 
@@ -1604,9 +1605,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 }
 
-int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+int matroska_segment_c::BlockGet( KaxBlock * & pp_block, uint64 & i_cuepos, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
 {
-    *pp_block = NULL;
+    pp_block = NULL;
+    i_cuepos = 0;
     *pi_ref1  = -1;
     *pi_ref2  = -1;
 
@@ -1621,13 +1623,13 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
         el = ep->Get();
         i_level = ep->GetLevel();
 
-        if( el == NULL && *pp_block != NULL )
+        if( el == NULL && pp_block != NULL )
         {
             /* update the index */
 #define idx p_indexes[i_index - 1]
             if( i_index > 0 && idx.i_time == -1 )
             {
-                idx.i_time        = (*pp_block)->GlobalTimecode() / (mtime_t)1000;
+                idx.i_time        = (*pp_block).GlobalTimecode() / (mtime_t)1000;
                 idx.b_key         = *pi_ref1 == -1 ? VLC_TRUE : VLC_FALSE;
             }
 #undef idx
@@ -1692,16 +1694,17 @@ int matroska_segment_c::BlockGet( KaxBlock **pp_block, int64_t *pi_ref1, int64_t
             }
             else if( MKV_IS_ID( el, KaxBlockGroup ) )
             {
+                i_cuepos = el->GetElementPosition();
                 ep->Down();
             }
             break;
         case 3:
             if( MKV_IS_ID( el, KaxBlock ) )
             {
-                *pp_block = (KaxBlock*)el;
+                pp_block = (KaxBlock*)el;
 
-                (*pp_block)->ReadData( es.I_O() );
-                (*pp_block)->SetParent( *cluster );
+                pp_block->ReadData( es.I_O() );
+                pp_block->SetParent( *cluster );
 
                 ep->Keep();
             }
@@ -1859,7 +1862,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
             p_block->i_pts = 0;
         }
 
-        if( tk->fmt.i_cat == SPU_ES && strcmp( tk->psz_codec, "S_VOBSUB" ) )
+        if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
             p_block->i_length = i_duration * 1000;
         }
@@ -3110,11 +3113,12 @@ static int Demux( demux_t *p_demux)
         }
 
         KaxBlock *block;
+        uint64 i_cuepos;
         int64_t i_block_duration = 0;
         int64_t i_block_ref1;
         int64_t i_block_ref2;
 
-        if( p_segment->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( p_segment->BlockGet( block, i_cuepos, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered )
             {
@@ -3134,23 +3138,26 @@ static int Demux( demux_t *p_demux)
 
                 break;
             }
-            msg_Warn( p_demux, "cannot get block EOF?" );
-            p_segment->UnSelect( );
-            
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-
-            /* switch to the next segment */
-            if ( !p_vsegment->SelectNext() )
-                // no more segments in this stream
-                break;
-            p_segment = p_vsegment->Segment();
-            if ( !p_segment->Select( 0 ) )
+            else
             {
-                msg_Err( p_demux, "Failed to select new segment" );
-                break;
-            }
+                msg_Warn( p_demux, "cannot get block EOF?" );
+                p_segment->UnSelect( );
+                
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-            continue;
+                /* switch to the next segment */
+                if ( !p_vsegment->SelectNext() )
+                    // no more segments in this stream
+                    break;
+                p_segment = p_vsegment->Segment();
+                if ( !p_segment->Select( 0 ) )
+                {
+                    msg_Err( p_demux, "Failed to select new segment" );
+                    break;
+                }
+
+                continue;
+            }
         }
 
         p_sys->i_pts = p_sys->i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
@@ -3276,6 +3283,15 @@ EbmlParser::~EbmlParser( void )
         }
         mb_keep = VLC_FALSE;
     }
+}
+
+void EbmlParser::UnGet( uint64 i_restart_pos )
+{
+    mi_user_level--;
+    m_el[mi_level] = NULL;
+    m_got = NULL;
+    mb_keep = VLC_FALSE;
+    m_es->I_O().setFilePointer( i_restart_pos, seek_beginning );
 }
 
 void EbmlParser::Up( void )
@@ -5136,6 +5152,7 @@ void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
 void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 {
     KaxBlock    *block;
+    uint64      i_cuepos;
     int         i_track_skipping;
     int64_t     i_block_duration;
     int64_t     i_block_ref1;
@@ -5193,7 +5210,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
     while( i_track_skipping > 0 )
     {
-        if( BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( BlockGet( block, i_cuepos, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             msg_Warn( &sys.demuxer, "cannot get block EOF?" );
 
@@ -5212,9 +5229,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
         if( i_track < tracks.size() )
         {
-            if( sys.i_pts >= sys.i_start_pts )
+           if( sys.i_pts >= sys.i_start_pts )
             {
-                BlockDecode( &sys.demuxer, block, sys.i_pts, 0 );
+                ep->UnGet( i_cuepos );
                 i_track_skipping = 0;
             }
             else if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
