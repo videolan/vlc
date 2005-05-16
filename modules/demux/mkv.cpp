@@ -1781,7 +1781,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         msg_Err( p_demux, "invalid track number=%d", block->TrackNum() );
         return;
     }
-    if( tk->p_es == NULL )
+    if( tk->fmt.i_cat != NAV_ES && tk->p_es == NULL )
     {
         msg_Err( p_demux, "unknown track number=%d", block->TrackNum() );
         return;
@@ -1791,7 +1791,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         return; /* discard audio packets that shouldn't be rendered */
     }
 
-    if ( tk->fmt.i_cat != SPU_ES || strcmp( tk->psz_codec, "B_VOBBTN" ) )
+    if ( tk->fmt.i_cat != NAV_ES )
     {
         es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
 
@@ -1834,6 +1834,20 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
+        if ( tk->fmt.i_cat == NAV_ES )
+        {
+            // TODO handle the start/stop times of this packet
+            if ( p_sys->b_ui_hooked )
+            {
+                vlc_mutex_lock( &p_sys->p_ev->lock );
+                memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
+                p_sys->SwapButtons();
+                p_sys->b_pci_packet_set = true;
+                vlc_mutex_unlock( &p_sys->p_ev->lock );
+                block_Release( p_block );
+            }
+            return;
+        }
         // TODO implement correct timestamping when B frames are used
         if( tk->fmt.i_cat != VIDEO_ES )
         {
@@ -1845,27 +1859,9 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
             p_block->i_pts = 0;
         }
 
-        if ( tk->fmt.i_cat == SPU_ES )
+        if ( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
-            if ( !strcmp( tk->psz_codec, "B_VOBBTN" ) )
-            {
-                // TODO handle the start/stop times of this packet
-                if ( p_sys->b_ui_hooked )
-                {
-                    vlc_mutex_lock( &p_sys->p_ev->lock );
-                    memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
-                    p_sys->SwapButtons();
-                    p_sys->b_pci_packet_set = true;
-                    vlc_mutex_unlock( &p_sys->p_ev->lock );
-                    block_Release( p_block );
-                }
-                return;
-            }
-
-            else if ( strcmp( tk->psz_codec, "S_VOBSUB" ) )
-            {
-                p_block->i_length = i_duration * 1000;
-            }
+            p_block->i_length = i_duration * 1000;
         }
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
@@ -2251,7 +2247,8 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "B_VOBBTN" ) )
         {
-            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
+            tracks[i_track]->fmt.i_cat = NAV_ES;
+            continue;
         }
         else
         {
@@ -4536,13 +4533,6 @@ void matroska_segment_c::ParseCluster( )
 void matroska_segment_c::InformationCreate( )
 {
     size_t      i_track;
-
-/*************
-    impossible as is it now, vlc_meta_Delete is not clean
-
-    if ( sys.meta != NULL )
-        vlc_meta_Delete( sys.meta );
-*/
 
     sys.meta = vlc_meta_New();
 
