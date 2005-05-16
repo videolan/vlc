@@ -245,6 +245,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* As ugly as your butt! Please remove when wxWidgets 2.6 fixed their
      * Accelerators bug. */
     p_dummy->m_imData = 0;
+    m_imData = 0;
 #endif
     p_dummy->SetFocus();
     frame_sizer->Add( p_dummy, 0, 0 );
