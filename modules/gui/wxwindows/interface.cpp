@@ -692,27 +692,23 @@ void Interface::ShowSlider( bool show, bool layout )
 
         //prevent continuous layout
         if( slider_frame->IsShown() ) return;
-
-        slider_frame->Show();
-        frame_sizer->Show( slider_frame );
     }
     else
     {
         //prevent continuous layout
         if( !slider_frame->IsShown() ) return;
-
-        slider_frame->Hide();
-        frame_sizer->Hide( slider_frame );
     }
+
+    if( layout && p_intf->p_sys->b_video_autosize )
+        UpdateVideoWindow( p_intf, video_window );
+
+    slider_frame->Show( show );
+    frame_sizer->Show( slider_frame, show );
 
     if( layout )
     {
         frame_sizer->Layout();
-        if( p_intf->p_sys->b_video_autosize )
-        {
-            UpdateVideoWindow( p_intf, video_window );
-            frame_sizer->Fit( this );
-        }
+        if( p_intf->p_sys->b_video_autosize ) frame_sizer->Fit( this );
     }
 }
 
@@ -730,27 +726,24 @@ void Interface::ShowDiscFrame( bool show, bool layout )
 
         //prevent continuous layout
         if( disc_frame->IsShown() ) return;
-
-        disc_frame->Show();
-        slider_sizer->Show( disc_frame );
     }
     else
     {
         //prevent continuous layout
         if( !disc_frame->IsShown() ) return;
-
-        disc_frame->Hide();
-        slider_sizer->Hide( disc_frame );
     }
+
+    if( layout && p_intf->p_sys->b_video_autosize )
+        UpdateVideoWindow( p_intf, video_window );
+
+    disc_frame->Show( show );
+    slider_sizer->Show( disc_frame, show );
 
     if( layout )
     {
         slider_sizer->Layout();
         if( p_intf->p_sys->b_video_autosize )
-        {
-            UpdateVideoWindow( p_intf, video_window );
             slider_sizer->Fit( slider_frame );
-        }
     }
 }
 
@@ -759,6 +752,9 @@ void Interface::ShowDiscFrame( bool show, bool layout )
  *****************************************************************************/
 void Interface::OnControlsTimer( wxTimerEvent& WXUNUSED(event) )
 {
+    if( p_intf->p_sys->b_video_autosize )
+        UpdateVideoWindow( p_intf, video_window );
+
     /* Hide slider and Disc Buttons */
     //postpone layout, we'll do it ourselves
     HideDiscFrame( false );
@@ -768,7 +764,6 @@ void Interface::OnControlsTimer( wxTimerEvent& WXUNUSED(event) )
     if( p_intf->p_sys->b_video_autosize )
     {
         slider_sizer->Fit( slider_frame );
-        UpdateVideoWindow( p_intf, video_window );
         frame_sizer->Fit( this );
     }
 }
