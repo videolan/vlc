@@ -870,6 +870,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found video header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
 
+                        p_stream->fmt.video.i_frame_rate = 10000000;
+                        p_stream->fmt.video.i_frame_rate_base =
+                            GetQWLE((oggpacket.packet+164));
                         p_stream->f_rate = 10000000.0 /
                             GetQWLE((oggpacket.packet+164));
                         p_stream->fmt.video.i_bits_per_pixel =
@@ -969,6 +972,9 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found video header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
 
+                        p_stream->fmt.video.i_frame_rate = 10000000;
+                        p_stream->fmt.video.i_frame_rate_base =
+                            GetQWLE(&st->time_unit);
                         p_stream->f_rate = 10000000.0 /
                             GetQWLE(&st->time_unit);
                         p_stream->fmt.video.i_bits_per_pixel =
