@@ -94,6 +94,7 @@ public:
 
     wxVolCtrl *gauge;
     int i_y_offset;
+    vlc_bool_t b_mute;
     intf_thread_t *p_intf;
 };
 
@@ -351,7 +352,6 @@ void Interface::Update()
 {
     /* Misc updates */
     ((VLCVolCtrl *)volctrl)->UpdateVolume();
-    
 }
 
 void Interface::OnControlEvent( wxCommandEvent& event )
@@ -1374,6 +1374,7 @@ public:
     virtual ~wxVolCtrl() {};
 
     void UpdateVolume();
+    int GetVolume();
 
     void OnChange( wxMouseEvent& event );
 
@@ -1428,7 +1429,7 @@ VLCVolCtrl::VLCVolCtrl( intf_thread_t *_p_intf, wxWindow *p_parent )
   :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, VLCVOL_HEIGHT ),
               wxBORDER_NONE ),
    i_y_offset((VLCVOL_HEIGHT - TOOLBAR_BMP_HEIGHT) / 2),
-   p_intf(_p_intf)
+   b_mute(0), p_intf(_p_intf)
 {
     gauge = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, i_y_offset ),
                            wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
@@ -1436,11 +1437,8 @@ VLCVolCtrl::VLCVolCtrl( intf_thread_t *_p_intf, wxWindow *p_parent )
 
 void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
 {
-    int i_volume;
-    i_volume = (audio_volume_t)config_GetInt( p_intf, "volume" );
-
     wxPaintDC dc( this );
-    wxBitmap mPlayBitmap( i_volume ? speaker_xpm : speaker_mute_xpm );
+    wxBitmap mPlayBitmap( b_mute ? speaker_mute_xpm : speaker_xpm );
     dc.DrawBitmap( mPlayBitmap, 0, i_y_offset, TRUE );
 }
 
@@ -1450,12 +1448,19 @@ void VLCVolCtrl::OnChange( wxMouseEvent& event )
     {
         int i_volume;
         aout_VolumeMute( p_intf, (audio_volume_t *)&i_volume );
+
+        b_mute = !b_mute;
+        Refresh();
     }
 }
 
 void VLCVolCtrl::UpdateVolume()
 {
     gauge->UpdateVolume();
+
+    int i_volume = gauge->GetValue();
+    if( !!i_volume == !b_mute ) return;
+    b_mute = !b_mute;
     Refresh();
 }
 
