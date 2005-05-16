@@ -663,7 +663,16 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
             /* interpolate the next PTS */
 #if LIBAVCODEC_BUILD >= 4754
-            if( p_sys->p_context->time_base.den > 0 )
+            if( p_dec->fmt_in.video.i_frame_rate > 0 &&
+                p_dec->fmt_in.video.i_frame_rate_base > 0 )
+            {
+                p_sys->i_pts += I64C(1000000) *
+                    (2 + p_sys->p_ff_pic->repeat_pict) *
+                    p_dec->fmt_in.video.i_frame_rate_base *
+                    p_block->i_rate / INPUT_RATE_DEFAULT /
+                    (2 * p_dec->fmt_in.video.i_frame_rate);
+            }
+            else if( p_sys->p_context->time_base.den > 0 )
             {
                 p_sys->i_pts += I64C(1000000) *
                     (2 + p_sys->p_ff_pic->repeat_pict) *
