@@ -1073,8 +1073,10 @@ static int Mux( sout_mux_t *p_mux )
                         block_t *p_next = block_FifoShow( p_input->p_fifo );
                         p_data->i_length = p_next->i_dts - p_data->i_dts;
                     }
+#if 0
                     else
                         p_data->i_length = 1000;
+#endif
 
                     if( ( p_pcr_stream->i_pes_dts > 0 &&
                           p_data->i_dts - 10000000 > p_pcr_stream->i_pes_dts +
