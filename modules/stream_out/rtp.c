@@ -74,7 +74,7 @@
 #define PORT_VIDEO_LONGTEXT N_( \
     "Allows you to specify the default video port used for the RTP streaming." )
 
-#define TTL_TEXT N_("Time to live")
+#define TTL_TEXT N_("Time To Live")
 #define TTL_LONGTEXT N_( \
     "Allows you to specify the time to live for the output stream." )
 

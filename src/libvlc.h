@@ -315,7 +315,7 @@ static char *ppsz_clock_descriptions[] =
     "multicast solution, you will probably have to indicate the IP address " \
     "of your multicasting interface here.")
 
-#define TTL_TEXT N_("Time to live")
+#define TTL_TEXT N_("Time To Live")
 #define TTL_LONGTEXT N_( \
     "Indicate here the Time To Live of the multicast packets sent by " \
     "the stream output.")

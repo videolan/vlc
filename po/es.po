@@ -1753,7 +1753,7 @@ msgstr ""
 
 #: src/libvlc.h:318 modules/stream_out/rtp.c:77
 msgid "Time to live"
-msgstr "Hora para emisión en directo"
+msgstr "Tiempo de vida (TTL)"
 
 #: src/libvlc.h:320
 msgid ""
@@ -5778,7 +5778,7 @@ msgstr "Valor de caché (ms)"
 
 #: modules/access_output/udp.c:68
 msgid "Time To Live"
-msgstr "Hora para Emisión En Directo"
+msgstr "Tiempo de vida (TTL)"
 
 #: modules/access_output/udp.c:69
 msgid "Allows you to define the time to live of the outgoing stream."
