@@ -1,7 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
+# Hungarian translation of VLC.
 # Copyright (C) 2003 VideoLAN
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the VLC package.
 #
 msgid ""
 msgstr ""

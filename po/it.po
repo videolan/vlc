@@ -1,5 +1,5 @@
 # Italian translation for vlc.
-# Copyright (C) 2002 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2002-2004 VideoLAN <videolan@videolan.org>
 #
 # Carlo Calabrò 2003-2004
 #

@@ -1,6 +1,6 @@
 # Brazilian Portuguese Translation for VLC.
 #
-# Copyright (C) 2003 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2003-2004 VideoLAN <videolan@videolan.org>
 # André de Barros Martins Ribeiro  <andrerib@ajato.com.br>, 2003.
 #
 msgid ""

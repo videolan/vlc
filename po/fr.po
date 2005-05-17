@@ -1,17 +1,11 @@
-# translation of fr.po to 
-# translation of fr.po to
 # French translation for VLC.
-# Copyright (C) 2001-2003 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2001-2004 VideoLAN <videolan@videolan.org>
 #
 # Previous Translators
 #  Samuel Hocevar <sam@zoy.org>
 #  Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be>
 #  Probably other french VLC developers, look at the AUTHORS files
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
-# , 2004.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"

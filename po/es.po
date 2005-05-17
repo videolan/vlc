@@ -1,6 +1,7 @@
 # Traducción española para VLC
-# Copyright (C) 2002-2003 VideoLAN <videolan@videolan.org
-# Antonio Javier Varela Calvo <tonxabar@hotmail.com>, 2003
+# Copyright (C) 2002-2005 VideoLAN <videolan@videolan.org
+#
+# Antonio Javier Varela Calvo <tonxabar@hotmail.com>, 2003-2005
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
