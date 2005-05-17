@@ -2234,14 +2234,12 @@ then
       dnl  Use a custom twolame
       AC_MSG_RESULT(${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a)
       VLC_ADD_BUILTINS([twolame])
-      VLC_ADD_LDFLAGS([twolame],[${real_twolame_tree}/src/libtwolame/.libs/libtw
-olame.a])
+      VLC_ADD_LDFLAGS([twolame],[${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a])
       VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/src/libtwolame])
     else
       dnl  The given libtwolame wasn't built
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_twolame_tree}/src/libtwolame/.libs/libtwo
-lame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
+      AC_MSG_ERROR([cannot find ${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
     fi
   else
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame}"
