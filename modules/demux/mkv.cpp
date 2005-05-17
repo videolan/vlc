@@ -774,14 +774,15 @@ protected:
     // DVD command IDs
 
     // Tests
-    // wether the test has to be positive or not
-    static const uint16 CMD_DVD_IF_NOT              = 0x10;
     // wether it's a comparison on the value or register
     static const uint16 CMD_DVD_TEST_VALUE          = 0x80;
-    static const uint16 CMD_DVD_IF_GPREG_AND        = (0 << 5);
-    static const uint16 CMD_DVD_IF_GPREG_EQUAL      = (1 << 5);
-    static const uint16 CMD_DVD_IF_GPREG_SUP_EQUAL  = (2 << 5);
-    static const uint16 CMD_DVD_IF_GPREG_INF        = (3 << 5);
+    static const uint16 CMD_DVD_IF_GPREG_AND        = (1 << 4);
+    static const uint16 CMD_DVD_IF_GPREG_EQUAL      = (2 << 4);
+    static const uint16 CMD_DVD_IF_GPREG_NOT_EQUAL  = (3 << 4);
+    static const uint16 CMD_DVD_IF_GPREG_SUP_EQUAL  = (4 << 4);
+    static const uint16 CMD_DVD_IF_GPREG_SUP        = (5 << 4);
+    static const uint16 CMD_DVD_IF_GPREG_INF_EQUAL  = (6 << 4);
+    static const uint16 CMD_DVD_IF_GPREG_INF        = (7 << 4);
     
     static const uint16 CMD_DVD_NOP                    = 0x0000;
     static const uint16 CMD_DVD_GOTO_LINE              = 0x0001;
@@ -5517,48 +5518,81 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     // handle register tests if there are some
     if ( (i_command & 0xF0) != 0 )
     {
-        bool b_test_positive = (i_command & CMD_DVD_IF_NOT) == 0;
+        bool b_test_positive = true;//(i_command & CMD_DVD_IF_NOT) == 0;
         bool b_test_value    = (i_command & CMD_DVD_TEST_VALUE) != 0;
         uint8 i_test = i_command & 0x70;
         uint16 i_value;
 
+        // see http://dvd.sourceforge.net/dvdinfo/vmi.html
+        uint8  i_cr1;
+        uint16 i_cr2;
+        switch ( i_command >> 12 )
+        {
+        case 0:
+        case 1:
+        case 2:
+            i_cr1 = p_command[3];
+            i_cr2 = (p_command[4] << 8) + p_command[5];
+            break;
+        case 3:
+        case 4:
+        case 5:
+            i_cr1 = p_command[6];
+            i_cr2 = p_command[7];
+            b_test_value = false;
+            break;
+        case 6:
+        case 7:
+            if ( ((p_command[1] >> 4) & 0x7) == 0)
+            {
+                i_cr1 = p_command[2];
+                i_cr2 = (p_command[6] << 8) + p_command[7];
+            }
+            else
+            {
+                i_cr1 = p_command[2];
+                i_cr2 = (p_command[6] << 8) + p_command[7];
+            }
+            break;
+        }
+
         if ( b_test_value )
-            i_value = ( p_command[4] << 8 ) + p_command[5];
+            i_value = i_cr2;
         else
-            i_value = GetPRM( p_command[7] );
+            i_value = GetPRM( i_cr2 );
 
         switch ( i_test )
         {
         case CMD_DVD_IF_GPREG_EQUAL:
             // if equals
-            msg_Dbg( &sys.demuxer, "IF %s EQUALS %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
-            if (!( GetPRM( p_command[3] ) == i_value ))
+            msg_Dbg( &sys.demuxer, "IF %s EQUALS %s", GetRegTypeName( false, i_cr1 ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( i_cr1 ) == i_value ))
             {
-                b_test_positive = !b_test_positive;
+                b_test_positive = false;
             }
             break;
         case CMD_DVD_IF_GPREG_INF:
             // if inferior
             msg_Dbg( &sys.demuxer, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
-            if (!( GetPRM( p_command[3] ) < i_value ))
+            if (!( GetPRM( i_cr1 ) < i_value ))
             {
-                b_test_positive = !b_test_positive;
+                b_test_positive = false;
             }
             break;
         case CMD_DVD_IF_GPREG_AND:
             // if logical and
             msg_Dbg( &sys.demuxer, "IF %s & %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
-            if (!( GetPRM( p_command[3] ) & i_value ))
+            if (!( GetPRM( i_cr1 ) & i_value ))
             {
-                b_test_positive = !b_test_positive;
+                b_test_positive = false;
             }
             break;
         case CMD_DVD_IF_GPREG_SUP_EQUAL:
             // if superior or equal
             msg_Dbg( &sys.demuxer, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
-            if (!( GetPRM( p_command[3] ) >= i_value ))
+            if (!( GetPRM( i_cr1 ) >= i_value ))
             {
-                b_test_positive = !b_test_positive;
+                b_test_positive = false;
             }
             break;
         }
@@ -5842,6 +5876,12 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         {
             msg_Dbg( &sys.demuxer, "GotoLine (%d)", (p_command[6] << 8) + p_command[7] );
             // TODO
+            break;
+        }
+    case CMD_DVD_SET_HL_BTNN1:
+        {
+            msg_Dbg( &sys.demuxer, "SetHL_BTN (%d)", p_command[4] );
+            SetSPRM( 0x88, p_command[4] );
             break;
         }
     default:
