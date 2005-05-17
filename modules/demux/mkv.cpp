@@ -814,7 +814,9 @@ protected:
     
     // callbacks when browsing inside CodecPrivate
     static bool MatchIsDomain     ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
+    static bool MatchIsVMG        ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
     static bool MatchVTSNumber    ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
+    static bool MatchVTSMNumber   ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
     static bool MatchTitleNumber  ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
     static bool MatchPgcType      ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
     static bool MatchPgcNumber    ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
@@ -950,7 +952,7 @@ public:
 
     bool Enter( bool b_do_subchapters );
     bool Leave( bool b_do_subchapters );
-    bool EnterAndLeave( chapter_item_c *p_item );
+    bool EnterAndLeave( chapter_item_c *p_item, bool b_enter = true );
 };
 
 class chapter_edition_c : public chapter_item_c
@@ -2791,7 +2793,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             // out of the scope of the data described by chapters, leave the edition
             if ( (*p_editions)[i_current_edition]->b_ordered && psz_current_chapter != NULL )
             {
-                if ( !(*p_editions)[i_current_edition]->EnterAndLeave( psz_current_chapter ) )
+                if ( !(*p_editions)[i_current_edition]->EnterAndLeave( psz_current_chapter, false ) )
                     psz_current_chapter = NULL;
                 else
                     return true;
@@ -5414,7 +5416,7 @@ bool chapter_item_c::Leave( bool b_do_subs )
     return f_result;
 }
 
-bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item )
+bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item, bool b_final_enter )
 {
     chapter_item_c *p_common_parent = p_item;
 
@@ -5449,7 +5451,10 @@ bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item )
         } while ( 1 );
     }
 
-    return Enter( true );
+    if ( b_final_enter )
+        return Enter( true );
+    else
+        return false;
 }
 
 bool dvd_chapter_codec_c::Enter()
@@ -5596,37 +5601,39 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_CALLSS_VTSM1:
         {
-            msg_Dbg( &sys.demuxer, "CallSS VTSM" );
+            msg_Dbg( &sys.demuxer, "CallSS" );
+            binary p_type;
             switch( (p_command[6] & 0xC0) >> 6 ) {
                 case 0:
-                    switch ( p_command[5] )
+                    p_type = p_command[5] & 0x0F;
+                    switch ( p_type )
                     {
                     case 0x00:
-                        msg_Dbg( &sys.demuxer, "CallSS PGC (rsm_cell %x)", p_command[5]);
+                        msg_Dbg( &sys.demuxer, "CallSS PGC (rsm_cell %x)", p_command[4]);
                         break;
-                    case 0x82:
-                        msg_Dbg( &sys.demuxer, "CallSS Title Entry (rsm_cell %x)", p_command[5]);
+                    case 0x02:
+                        msg_Dbg( &sys.demuxer, "CallSS Title Entry (rsm_cell %x)", p_command[4]);
                         break;
-                    case 0x83:
-                        msg_Dbg( &sys.demuxer, "CallSS Root Menu (rsm_cell %x)", p_command[5]);
+                    case 0x03:
+                        msg_Dbg( &sys.demuxer, "CallSS Root Menu (rsm_cell %x)", p_command[4]);
                         break;
-                    case 0x84:
-                        msg_Dbg( &sys.demuxer, "CallSS Subpicture Menu (rsm_cell %x)", p_command[5]);
+                    case 0x04:
+                        msg_Dbg( &sys.demuxer, "CallSS Subpicture Menu (rsm_cell %x)", p_command[4]);
                         break;
-                    case 0x85:
-                        msg_Dbg( &sys.demuxer, "CallSS Audio Menu (rsm_cell %x)", p_command[5]);
+                    case 0x05:
+                        msg_Dbg( &sys.demuxer, "CallSS Audio Menu (rsm_cell %x)", p_command[4]);
                         break;
-                    case 0x86:
-                        msg_Dbg( &sys.demuxer, "CallSS Angle Menu (rsm_cell %x)", p_command[5]);
+                    case 0x06:
+                        msg_Dbg( &sys.demuxer, "CallSS Angle Menu (rsm_cell %x)", p_command[4]);
                         break;
-                    case 0x87:
-                        msg_Dbg( &sys.demuxer, "CallSS Chapter Menu (rsm_cell %x)", p_command[5]);
+                    case 0x07:
+                        msg_Dbg( &sys.demuxer, "CallSS Chapter Menu (rsm_cell %x)", p_command[4]);
                         break;
                     default:
-                        msg_Dbg( &sys.demuxer, "CallSS <unknown> (rsm_cell %x)", p_command[5]);
+                        msg_Dbg( &sys.demuxer, "CallSS <unknown> (rsm_cell %x)", p_command[4]);
                         break;
                     }
-                    p_chapter = sys.BrowseCodecPrivate( 1, MatchPgcType, &p_command[5], 1, p_segment );
+                    p_chapter = sys.BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1, p_segment );
                     if ( p_segment != NULL )
                     {
                         sys.JumpTo( *p_segment, p_chapter );
@@ -5634,13 +5641,114 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                     }
                 break;
                 case 1:
-                    msg_Dbg( &sys.demuxer, "CallSS VMGM (menu %d, rsm_cell %x)", p_command[6] & 0x0F, p_command[5]);
+                    msg_Dbg( &sys.demuxer, "CallSS VMGM (menu %d, rsm_cell %x)", p_command[5] & 0x0F, p_command[4]);
                 break;
                 case 2:
-                    msg_Dbg( &sys.demuxer, "CallSS VTSM (menu %d, rsm_cell %x)", p_command[6] & 0x0F, p_command[5]);
+                    msg_Dbg( &sys.demuxer, "CallSS VTSM (menu %d, rsm_cell %x)", p_command[5] & 0x0F, p_command[4]);
                 break;
                 case 3:
-                    msg_Dbg( &sys.demuxer, "CallSS VMGM (pgc %d, rsm_cell %x)", (p_command[3] << 8) + p_command[4], p_command[5]);
+                    msg_Dbg( &sys.demuxer, "CallSS VMGM (pgc %d, rsm_cell %x)", (p_command[2] << 8) + p_command[3], p_command[4]);
+                break;
+            }
+            break;
+        }
+    case CMD_DVD_JUMP_SS:
+        {
+            msg_Dbg( &sys.demuxer, "JumpSS");
+            binary p_type;
+            switch( (p_command[5] & 0xC0) >> 6 ) {
+                case 0:
+                    msg_Dbg( &sys.demuxer, "JumpSS FP");
+                break;
+                case 1:
+                    p_type = p_command[5] & 0x0F;
+                    switch ( p_type )
+                    {
+                    case 0x02:
+                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Title Entry");
+                        break;
+                    case 0x03:
+                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Root Menu");
+                        break;
+                    case 0x04:
+                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Subpicture Menu");
+                        break;
+                    case 0x05:
+                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Audio Menu");
+                        break;
+                    case 0x06:
+                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Angle Menu");
+                        break;
+                    case 0x07:
+                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Chapter Menu");
+                        break;
+                    default:
+                        msg_Dbg( &sys.demuxer, "JumpSS <unknown>");
+                        break;
+                    }
+                    // find the VMG
+                    p_chapter = sys.BrowseCodecPrivate( 1, MatchIsVMG, NULL, 0, p_segment );
+                    if ( p_segment != NULL )
+                    {
+                        p_chapter = p_segment->BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1 );
+                        if ( p_chapter != NULL )
+                        {
+                            sys.JumpTo( *p_segment, p_chapter );
+                            f_result = true;
+                        }
+                    }
+                break;
+                case 2:
+                    p_type = p_command[5] & 0x0F;
+                    switch ( p_type )
+                    {
+                    case 0x02:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Title Entry", p_command[4], p_command[3]);
+                        break;
+                    case 0x03:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Root Menu", p_command[4], p_command[3]);
+                        break;
+                    case 0x04:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Subpicture Menu", p_command[4], p_command[3]);
+                        break;
+                    case 0x05:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Audio Menu", p_command[4], p_command[3]);
+                        break;
+                    case 0x06:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Angle Menu", p_command[4], p_command[3]);
+                        break;
+                    case 0x07:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Chapter Menu", p_command[4], p_command[3]);
+                        break;
+                    default:
+                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) <unknown>", p_command[4], p_command[3]);
+                        break;
+                    }
+
+                    p_chapter = sys.BrowseCodecPrivate( 1, MatchVTSMNumber, &p_command[4], 1, p_segment );
+
+                    if ( p_segment != NULL && p_chapter != NULL )
+                    {
+                        // find the title in the VTS
+                        p_chapter = p_chapter->BrowseCodecPrivate( 1, MatchTitleNumber, &p_command[3], 1 );
+                        if ( p_chapter != NULL )
+                        {
+                            // find the specified menu in the VTSM
+                            p_chapter = p_segment->BrowseCodecPrivate( 1, MatchPgcType, &p_type, 1 );
+                            if ( p_chapter != NULL )
+                            {
+                                sys.JumpTo( *p_segment, p_chapter );
+                                f_result = true;
+                            }
+                        }
+                        else
+                            msg_Dbg( &sys.demuxer, "Title (%d) does not exist in this VTS", p_command[3] );
+                    }
+                    else
+                        msg_Dbg( &sys.demuxer, "DVD Domain VTS (%d) not found", p_command[4] );
+                break;
+                case 3:
+                    msg_Dbg( &sys.demuxer, "JumpSS VMGM (pgc %d)", (p_command[2] << 8) + p_command[3]);
                 break;
             }
             break;
@@ -5756,7 +5864,15 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
 bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
 {
-    return ( data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS );
+    return ( data.p_private_data != NULL && data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS );
+}
+
+bool dvd_command_interpretor_c::MatchIsVMG( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+{
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
+        return false;
+
+    return ( data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS && data.p_private_data->GetBuffer()[1] == 0xC0);
 }
 
 bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
@@ -5769,6 +5885,20 @@ bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data
 
     uint16 i_gtitle = (data.p_private_data->GetBuffer()[2] << 8 ) + data.p_private_data->GetBuffer()[3];
     uint16 i_title = *(uint16*)p_cookie;
+
+    return (i_gtitle == i_title);
+}
+
+bool dvd_command_interpretor_c::MatchVTSMNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+{
+    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
+        return false;
+    
+    if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x40 )
+        return false;
+
+    uint8 i_gtitle = data.p_private_data->GetBuffer()[3];
+    uint8 i_title = *(uint8*)p_cookie;
 
     return (i_gtitle == i_title);
 }
@@ -5795,7 +5925,7 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
-    uint8 i_pgc_type = data.p_private_data->GetBuffer()[3];
+    uint8 i_pgc_type = data.p_private_data->GetBuffer()[3] & 0x0F;
     uint8 i_pgc = *(uint8*)p_cookie;
 
     return (i_pgc_type == i_pgc);
