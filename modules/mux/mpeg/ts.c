@@ -180,9 +180,9 @@ vlc_module_end();
  * Local data structures
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "program-pmt", "es-id-pid",
-    "shaping", "pcr", "bmin", "bmax", "use-key-frames", "dts-delay",
-    "csa-ck", "crypt-audio",
+    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "program-pmt",
+    "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
+    "dts-delay", "csa-ck", "crypt-audio",
     NULL
 };
 
@@ -1344,6 +1344,8 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
     else
     {
         block_t *p_next;
+        int i_copy;
+
         p_data = block_FifoGet( p_fifo );
         p_data = block_Realloc( p_data, 0, STD_PES_PAYLOAD );
         p_next = block_FifoShow( p_fifo );
@@ -1353,17 +1355,22 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
             p_data->i_pts = p_next->i_pts;
             p_data->i_dts = p_next->i_dts;
         }
+        i_copy = __MIN( STD_PES_PAYLOAD - i_size, p_next->i_buffer );
+
         p_mux->p_vlc->pf_memcpy( &p_data->p_buffer[i_size], p_next->p_buffer,
-                                 STD_PES_PAYLOAD - i_size );
-        p_next->i_pts += p_next->i_length * (STD_PES_PAYLOAD - i_size)
-                           / p_next->i_buffer;
-        p_next->i_dts += p_next->i_length * (STD_PES_PAYLOAD - i_size)
-                           / p_next->i_buffer;
-        p_next->i_length -= p_next->i_length * (STD_PES_PAYLOAD - i_size)
-                           / p_next->i_buffer;
-        p_next->i_buffer -= STD_PES_PAYLOAD - i_size;
-        p_next->p_buffer += STD_PES_PAYLOAD - i_size;
+                                 i_copy );
+        p_next->i_pts += p_next->i_length * i_copy / p_next->i_buffer;
+        p_next->i_dts += p_next->i_length * i_copy / p_next->i_buffer;
+        p_next->i_length -= p_next->i_length * i_copy / p_next->i_buffer;
+        p_next->i_buffer -= i_copy;
+        p_next->p_buffer += i_copy;
         p_next->i_flags |= BLOCK_FLAG_NO_KEYFRAME;
+
+        if( !p_next->i_buffer )
+        {
+            p_next = block_FifoGet( p_fifo );
+            block_Release( p_next );
+        }
         return p_data;
     }
 }
