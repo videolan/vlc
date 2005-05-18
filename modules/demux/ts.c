@@ -2114,12 +2114,12 @@ static void DecodeMjd( int i_mjd, int *p_y, int *p_m, int *p_d )
     }
 }
 #endif
-static void EITEventFixString( char *psz )
+static void EITEventFixString( unsigned char *psz )
 {
     int i_len;
     /* Sometimes the first char isn't a normal char but designed
      * caracters encoding, for now lets skip it */
-    if( isalnum(psz[0]) )
+    if( psz[0] >= 0x20 )
             return;
     if( ( i_len = strlen( psz ) ) > 0 )
         memmove( &psz[0], &psz[1], i_len ); /* Copy the \0 too */
