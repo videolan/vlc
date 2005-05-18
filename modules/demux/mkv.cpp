@@ -5528,9 +5528,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         uint16 i_cr2;
         switch ( i_command >> 12 )
         {
-        case 0:
-        case 1:
-        case 2:
+        default:
             i_cr1 = p_command[3];
             i_cr2 = (p_command[4] << 8) + p_command[5];
             break;
@@ -5571,6 +5569,14 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 b_test_positive = false;
             }
             break;
+        case CMD_DVD_IF_GPREG_NOT_EQUAL:
+            // if not equals
+            msg_Dbg( &sys.demuxer, "IF %s NOT EQUALS %s", GetRegTypeName( false, i_cr1 ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( i_cr1 ) != i_value ))
+            {
+                b_test_positive = false;
+            }
+            break;
         case CMD_DVD_IF_GPREG_INF:
             // if inferior
             msg_Dbg( &sys.demuxer, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
@@ -5579,10 +5585,26 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 b_test_positive = false;
             }
             break;
+        case CMD_DVD_IF_GPREG_INF_EQUAL:
+            // if inferior or equal
+            msg_Dbg( &sys.demuxer, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( i_cr1 ) <= i_value ))
+            {
+                b_test_positive = false;
+            }
+            break;
         case CMD_DVD_IF_GPREG_AND:
             // if logical and
             msg_Dbg( &sys.demuxer, "IF %s & %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) & i_value ))
+            {
+                b_test_positive = false;
+            }
+            break;
+        case CMD_DVD_IF_GPREG_SUP:
+            // if superior
+            msg_Dbg( &sys.demuxer, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            if (!( GetPRM( i_cr1 ) > i_value ))
             {
                 b_test_positive = false;
             }
