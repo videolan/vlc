@@ -2470,7 +2470,7 @@ then
     then
       dnl  Use a custom libmpeg2
       AC_MSG_RESULT(${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a)
-      VLC_ADD_PLUGINS([libmpeg2])
+      VLC_ADD_BUILTINS([libmpeg2])
       VLC_ADD_LDFLAGS([libmpeg2],[-L${real_libmpeg2_tree}/libmpeg2/.libs -lmpeg2])
       VLC_ADD_CFLAGS([libmpeg2],[-I${real_libmpeg2_tree}/include])
       eval "`cd ${real_libmpeg2_tree}/include && ln -sf . mpeg2dec 2>/dev/null`"
