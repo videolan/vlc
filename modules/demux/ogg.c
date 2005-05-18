@@ -1205,6 +1205,9 @@ static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     bs_read( &bitstream, 24 ); /* aspect_numerator */
     bs_read( &bitstream, 24 ); /* aspect_denominator */
 
+    p_stream->fmt.video.i_frame_rate = i_fps_numerator;
+    p_stream->fmt.video.i_frame_rate_base = i_fps_denominator;
+
     bs_read( &bitstream, 8 ); /* colorspace */
     p_stream->fmt.i_bitrate = bs_read( &bitstream, 24 );
     bs_read( &bitstream, 6 ); /* quality */
