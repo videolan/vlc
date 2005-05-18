@@ -1758,7 +1758,12 @@ then
   fi
   CPPFLAGS="${CPPFLAGS_save} -I${with_dvb}/include"
   AC_CHECK_HEADERS(linux/dvb/version.h linux/dvb/frontend.h, [
-    VLC_ADD_PLUGINS([dvb])
+    if test -z "${with_dvbpsi_tree}"
+    then
+      VLC_ADD_PLUGINS([dvb])
+    else
+      VLC_ADD_BUILTINS([dvb])
+    fi
   ],[])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
