@@ -104,7 +104,7 @@ wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
 void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window )
 {
 #if (wxCHECK_VERSION(2,5,0))
-    if( mdate() - ((VideoWindow *)p_window)->i_creation_date < 2000000 )
+    if( p_window && mdate() - ((VideoWindow *)p_window)->i_creation_date < 2000000 )
         return; /* Hack to prevent saving coordinates if window is not yet
                  * properly created. Yuck :( */
 
