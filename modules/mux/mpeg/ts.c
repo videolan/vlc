@@ -107,7 +107,7 @@ static void    Close  ( vlc_object_t * );
 #define PCR_TEXT N_("PCR delay (ms)")
 #define PCR_LONGTEXT N_("This option allows you to set at which interval " \
   "PCRs (Program Clock Reference) will be sent. " \
-  "This value should be below 100ms. (default is 30)")
+  "This value should be below 100ms. (default is 70)")
 
 #define BMIN_TEXT N_( "Minimum B (deprecated)")
 #define BMIN_LONGTEXT N_( "This setting is deprecated and not used anymore" )
@@ -158,13 +158,13 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "use-key-frames", VLC_FALSE, NULL, KEYF_TEXT,
               KEYF_LONGTEXT, VLC_TRUE );
 
-    add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, PCR_TEXT, PCR_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "pcr", 70, NULL, PCR_TEXT, PCR_LONGTEXT,
                  VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
                  VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
                  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 400, NULL, DTS_TEXT,
                  DTS_LONGTEXT, VLC_TRUE );
 
     add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, ACRYPT_TEXT,
