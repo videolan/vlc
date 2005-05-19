@@ -34,10 +34,12 @@
 
     Ptr             p_fullscreen_state;
     mtime_t         i_time_mouse_last_moved;
+    NSRect        * s_frame;
+    vlc_bool_t      b_init_ok;
 }
 
-- (id)initWithVout:(vout_thread_t *)_p_vout
-    frame:(NSRect *)s_frame;
+- (id) initWithVout: (vout_thread_t *) p_vout frame: (NSRect *) s_frame;
+- (id) initReal: (id) sender;
 - (void)close;
 - (void)setOnTop:(BOOL)b_on_top;
 

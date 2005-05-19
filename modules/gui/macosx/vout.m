@@ -65,7 +65,30 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
  *****************************************************************************/
 @implementation VLCWindow
 
-- (id)initWithVout:(vout_thread_t *)_p_vout frame:(NSRect *)s_frame
+- (id) initWithVout: (vout_thread_t *) vout frame: (NSRect *) frame
+{
+    p_vout  = vout;
+    s_frame = frame;
+
+    if( MACOS_VERSION >= 10.2 )
+    {
+        [self performSelectorOnMainThread: @selector(initReal:)
+            withObject: NULL waitUntilDone: YES];
+    }
+    else
+    {
+        [self initReal: NULL];
+    }
+
+    if( !b_init_ok )
+    {
+        return NULL;
+    }
+    
+    return self;
+}
+
+- (id) initReal: (id) sender
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     NSArray *o_screens = [NSScreen screens];
@@ -74,7 +97,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     int i_timeout, i_device;
     vlc_value_t value_drawable;
 
-    p_vout = _p_vout;
+    b_init_ok = VLC_FALSE;
 
     var_Get( p_vout->p_vlc, "drawable", &value_drawable );
 
@@ -261,6 +284,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [self makeFirstResponder: self];
     
     [o_pool release];
+
+    b_init_ok = VLC_TRUE;
     return self;
 }
 
@@ -455,7 +480,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)updateTitle
 {
-    NSMutableString * o_title,* o_mrl;
+    NSMutableString * o_title = NULL, * o_mrl = NULL;
     input_thread_t * p_input;
     
     if( p_vout == NULL )
