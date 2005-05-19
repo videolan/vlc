@@ -4536,7 +4536,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         stored_editions[i]->RefreshChapters( );
     }
     
-    if ( stored_editions[i_default_edition]->b_ordered )
+    if ( stored_editions.size() != 0 && stored_editions[i_default_edition]->b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
         i_dur = stored_editions[i_default_edition]->Duration() / I64C(1000);
