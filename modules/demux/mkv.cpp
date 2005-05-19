@@ -922,7 +922,7 @@ public:
 
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level = 0 );
-    chapter_item_c * FindTimecode( mtime_t i_timecode );
+    virtual chapter_item_c * FindTimecode( mtime_t i_timecode, const chapter_item_c * p_current, bool & b_found );
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( int64_t i_find_uid );
     virtual chapter_item_c *BrowseCodecPrivate( unsigned int codec_id, 
@@ -966,6 +966,7 @@ public:
     void RefreshChapters( );
     mtime_t Duration() const;
     std::string GetMainName() const;
+    chapter_item_c * FindTimecode( mtime_t i_timecode, const chapter_item_c * p_current );
     
     bool                        b_ordered;
 };
@@ -2760,7 +2761,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     if ( p_editions->size() )
     {
         /* 1st, we need to know in which chapter we are */
-        psz_curr_chapter = (*p_editions)[i_current_edition]->FindTimecode( sys.i_pts );
+        psz_curr_chapter = (*p_editions)[i_current_edition]->FindTimecode( sys.i_pts, psz_current_chapter );
 
         /* we have moved to a new chapter */
         if (psz_curr_chapter != NULL && psz_current_chapter != psz_curr_chapter)
@@ -4764,18 +4765,29 @@ mtime_t chapter_edition_c::Duration() const
     return i_result;
 }
 
-chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode )
+chapter_item_c * chapter_edition_c::FindTimecode( mtime_t i_timecode, const chapter_item_c * p_current )
+{
+    if ( !b_ordered )
+        p_current = NULL;
+    bool b_found_current = false;
+    return chapter_item_c::FindTimecode( i_timecode, p_current, b_found_current );
+}
+
+chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode, const chapter_item_c * p_current, bool & b_found )
 {
     chapter_item_c *psz_result = NULL;
+
+    if ( p_current == this )
+        b_found = true;
 
     if ( i_user_timecode >= i_user_start_time && 
         ( i_user_timecode < i_user_end_time || 
           ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
     {
         std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
-        while ( index != sub_chapters.end() && psz_result == NULL )
+        while ( index != sub_chapters.end() && ((p_current == NULL && psz_result == NULL) || (p_current != NULL && (!b_found || psz_result == NULL))))
         {
-            psz_result = (*index)->FindTimecode( i_user_timecode );
+            psz_result = (*index)->FindTimecode( i_user_timecode, p_current, b_found );
             index++;
         }
         
@@ -5293,7 +5305,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
         if ( Edition() && Edition()->b_ordered )
         {
             /* 1st, we need to know in which chapter we are */
-            psz_chapter = (*p_editions)[i_current_edition]->FindTimecode( i_date );
+            psz_chapter = (*p_editions)[i_current_edition]->FindTimecode( i_date, psz_current_chapter );
         }
     }
 
