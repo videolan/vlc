@@ -3318,8 +3318,15 @@ EbmlParser::~EbmlParser( void )
 
 void EbmlParser::UnGet( uint64 i_restart_pos )
 {
-    mi_user_level--;
-    m_el[mi_level] = NULL;
+    if ( mi_user_level > mi_level )
+    {
+        while ( mi_user_level != mi_level )
+        {
+            delete m_el[mi_user_level];
+            m_el[mi_user_level] = NULL;
+            mi_user_level--;
+        }
+    }
     m_got = NULL;
     mb_keep = VLC_FALSE;
     m_es->I_O().setFilePointer( i_restart_pos, seek_beginning );
@@ -5258,6 +5265,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
             return;
         }
+        ep->Down();
 
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
