@@ -242,7 +242,8 @@ static int  Open ( vlc_object_t *p_this )
         goto error;
     }
 
-    if( vlc_UrlIsNotEncoded( p_sys->psz_path ) )
+    if( strcasecmp( p_demux->psz_access, "sdp" ) && 
+	vlc_UrlIsNotEncoded( p_sys->psz_path ) )
     {
         p_sys->psz_path = vlc_UrlEncode( p_sys->psz_path );
         if( p_sys->psz_path == NULL )
