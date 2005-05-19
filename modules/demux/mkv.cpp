@@ -1896,7 +1896,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
     delete p_l0;
 
     // find all segments in this file
-    p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+    p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFFLL);
     if (p_l0 == NULL)
     {
         return NULL;
