@@ -2754,6 +2754,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
     chapter_item_c *psz_curr_chapter;
+    bool b_has_seeked = false;
 
     /* update current chapter/seekpoint */
     if ( p_editions->size() )
@@ -2767,24 +2768,24 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             if ( (*p_editions)[i_current_edition]->b_ordered )
             {
                 // Leave/Enter up to the link point
-                if ( !psz_curr_chapter->EnterAndLeave( psz_current_chapter ) )
+                b_has_seeked = psz_curr_chapter->EnterAndLeave( psz_current_chapter );
+                if ( !b_has_seeked )
                 {
-                    // only seek if necessary
+                    // only physically seek if necessary
                     if ( psz_current_chapter == NULL || (psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time) )
                         Seek( demux, sys.i_pts, 0, psz_curr_chapter );
-                    psz_current_chapter = psz_curr_chapter;
                 }
             }
-            else if ( psz_curr_chapter->i_seekpoint_num > 0 )
-            {
-                demux.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-                demux.info.i_title = sys.i_current_title = i_sys_title;
-                demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
-                psz_current_chapter = psz_curr_chapter;
-            }
-            else
+            
+            if ( !b_has_seeked )
             {
                 psz_current_chapter = psz_curr_chapter;
+                if ( psz_curr_chapter->i_seekpoint_num > 0 )
+                {
+                    demux.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+                    demux.info.i_title = sys.i_current_title = i_sys_title;
+                    demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
+                }
             }
 
             return true;
@@ -4962,7 +4963,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, chapter_item_c * p_chapt
         if ( !p_chapter->Enter( true ) )
         {
             // jump to the location in the found segment
-            vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, NULL );
+            vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, p_chapter );
         }
     }
     
