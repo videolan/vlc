@@ -419,6 +419,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         if ( p_sys->b_trellis )
             p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
 
+        if ( p_sys->i_qmin == p_sys->i_qmax )
+            p_context->flags |= CODEC_FLAG_QSCALE;
+
 #if LIBAVCODEC_BUILD >= 4702
         if ( p_enc->i_threads >= 1 )
             p_context->thread_count = p_enc->i_threads;
