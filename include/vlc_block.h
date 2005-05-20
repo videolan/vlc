@@ -62,8 +62,6 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_END_OF_FRAME  0x0040
 /** This is not a key frame for bitrate shaping */
 #define BLOCK_FLAG_NO_KEYFRAME   0x0080
-/** This is the last block of the GOP */
-#define BLOCK_FLAG_END_OF_GOP    0x0100
 /** This block contains a clock reference */
 #define BLOCK_FLAG_CLOCK         0x0200
 /** This block is scrambled */

@@ -88,10 +88,10 @@ struct vout_synchro_t
 VLC_EXPORT( vout_synchro_t *, __vout_SynchroInit, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, vout_SynchroRelease,        ( vout_synchro_t * ) );
 VLC_EXPORT( void, vout_SynchroReset,          ( vout_synchro_t * ) );
-VLC_EXPORT( vlc_bool_t, vout_SynchroChoose,   ( vout_synchro_t *, int, int ) );
+VLC_EXPORT( vlc_bool_t, vout_SynchroChoose,   ( vout_synchro_t *, int, int, vlc_bool_t ) );
 VLC_EXPORT( void, vout_SynchroTrash,          ( vout_synchro_t * ) );
 VLC_EXPORT( void, vout_SynchroDecode,         ( vout_synchro_t * ) );
 VLC_EXPORT( void, vout_SynchroEnd,            ( vout_synchro_t *, int, vlc_bool_t ) );
 VLC_EXPORT( mtime_t, vout_SynchroDate,        ( vout_synchro_t * ) );
-VLC_EXPORT( void, vout_SynchroNewPicture,     ( vout_synchro_t *, int, int, mtime_t, mtime_t, int ) );
+VLC_EXPORT( void, vout_SynchroNewPicture,     ( vout_synchro_t *, int, int, mtime_t, mtime_t, int, vlc_bool_t ) );
 

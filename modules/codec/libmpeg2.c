@@ -216,7 +216,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
-            if( (p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) &&
+            if( (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY
+                                      | BLOCK_FLAG_CORRUPTED)) &&
                 p_sys->p_synchro &&
                 p_sys->p_info->sequence &&
                 p_sys->p_info->sequence->width != (unsigned)-1 )
@@ -241,7 +242,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if ( p_sys->b_slice_i )
                 {
                     vout_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate );
+                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                        p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                     vout_SynchroDecode( p_sys->p_synchro );
                     vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
                 }
@@ -377,7 +379,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             vout_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                 p_sys->p_info->current_picture->nb_fields,
-                0, 0, p_sys->i_current_rate );
+                0, 0, p_sys->i_current_rate,
+                p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
 
             if( p_sys->b_skip )
             {
@@ -402,7 +405,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Intra-slice refresh. Simulate a blank I picture. */
                 msg_Dbg( p_dec, "intra-slice refresh stream" );
                 vout_SynchroNewPicture( p_sys->p_synchro,
-                    I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate );
+                    I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                    p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                 vout_SynchroDecode( p_sys->p_synchro );
                 vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
                 p_sys->b_slice_i = 1;
@@ -444,7 +448,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             vout_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                 p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
-                p_sys->i_current_rate );
+                p_sys->i_current_rate,
+                p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
 
             if( !p_dec->b_pace_control && !p_sys->b_preroll &&
                 !(p_sys->b_slice_i
@@ -453,7 +458,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                    && !vout_SynchroChoose( p_sys->p_synchro,
                               p_sys->p_info->current_picture->flags
                                 & PIC_MASK_CODING_TYPE,
-                              /*p_sys->p_vout->render_time*/ 0 /*FIXME*/ ) )
+                              /*p_sys->p_vout->render_time*/ 0 /*FIXME*/,
+                              p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ) )
             {
                 mpeg2_skip( p_sys->p_mpeg2dec, 1 );
                 p_sys->b_skip = 1;
@@ -570,7 +576,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->b_slice_i )
             {
                 vout_SynchroNewPicture( p_sys->p_synchro,
-                            I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate );
+                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                        p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                 vout_SynchroDecode( p_sys->p_synchro );
                 vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
             }

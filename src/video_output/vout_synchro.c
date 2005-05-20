@@ -172,7 +172,7 @@ void vout_SynchroReset( vout_synchro_t * p_synchro )
  * vout_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
 vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
-                               int i_render_time )
+                               int i_render_time, vlc_bool_t b_low_delay )
 {
 #define TAU_PRIME( coding_type )    (p_synchro->p_tau[(coding_type)] \
                                     + (p_synchro->p_tau[(coding_type)] >> 1) \
@@ -194,7 +194,11 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
     switch( i_coding_type )
     {
     case I_CODING_TYPE:
-        if( S.backward_pts )
+        if( b_low_delay )
+        {
+            pts = S.current_pts;
+        }
+        else if( S.backward_pts )
         {
             pts = S.backward_pts;
         }
@@ -225,7 +229,11 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
         break;
 
     case P_CODING_TYPE:
-        if( S.backward_pts )
+        if( b_low_delay )
+        {
+            pts = S.current_pts;
+        }
+        else if( S.backward_pts )
         {
             pts = S.backward_pts;
         }
@@ -352,7 +360,8 @@ mtime_t vout_SynchroDate( vout_synchro_t * p_synchro )
  *****************************************************************************/
 void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
                              int i_repeat_field, mtime_t next_pts,
-                             mtime_t next_dts, int i_current_rate )
+                             mtime_t next_dts, int i_current_rate,
+                             vlc_bool_t b_low_delay )
 {
     mtime_t         period = 1000000 * 1001 / p_synchro->i_frame_rate
                               * i_current_rate / INPUT_RATE_DEFAULT;
@@ -441,7 +450,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
                                         * (period >> 1);
 
 #define PTS_THRESHOLD   (period >> 2)
-    if( i_coding_type == B_CODING_TYPE )
+    if( i_coding_type == B_CODING_TYPE || b_low_delay )
     {
         /* A video frame can be displayed 1, 2 or 3 times, according to
          * repeat_first_field, top_field_first, progressive_sequence and
