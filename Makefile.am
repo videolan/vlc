@@ -125,13 +125,13 @@ HEADERS_include_built = \
 	include/vlc_symbols.h \
 	$(NULL)
 
-include/vlc_symbols.h: Makefile $(HEADERS_include) vlc-config
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+# Common dependencies for these 3 files : Makefile vlc-config
+# Specific dependencies :
+#  include/vlc_symbols.h: $(HEADERS_include)
+#  src/misc/modules_plugin.h: src/misc/modules_plugin.h.in $(HEADERS_include)
+#  src/misc/modules_builtin.h: src/misc/modules_builtin.h.in
 
-src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_include) vlc-config
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
-
-src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
+include/vlc_symbols.h src/misc/modules_plugin.h src/misc/modules_builtin.h: Makefile $(HEADERS_include) vlc-config src/misc/modules_plugin.h.in src/misc/modules_builtin.h.in
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 
 # These dependencies are mandatory
