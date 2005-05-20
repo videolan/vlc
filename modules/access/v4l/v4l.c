@@ -1111,6 +1111,19 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         p_sys->i_width  = vid_win.width;
         p_sys->i_height = vid_win.height;
 
+        if( !p_sys->i_width || !p_sys->i_height )
+        {
+            p_sys->i_width = p_sys->vid_cap.maxwidth;
+            p_sys->i_height = p_sys->vid_cap.maxheight;
+        }
+
+        if( !p_sys->i_width || !p_sys->i_height )
+        {
+            msg_Err( p_demux, "invalid video size (%ix%i)",
+                     p_sys->i_width, p_sys->i_height );
+            goto vdev_failed;
+        }
+
         msg_Dbg( p_demux, "will use %dx%d", p_sys->i_width, p_sys->i_height );
     }
 
