@@ -61,6 +61,10 @@
 #define DEINTERLACE_TEXT N_("Deinterlace video")
 #define DEINTERLACE_LONGTEXT N_( \
     "Allows you to deinterlace the video before encoding." )
+#define DEINTERLACE_MODULE_TEXT N_("Deinterlace module")
+#define DEINTERLACE_MODULE_LONGTEXT N_( \
+    "Specifies the deinterlace module to use (ffmpeg-deinterlace or " \
+    "deinterlace)." )
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
     "Allows you to specify the output video width." )
@@ -157,6 +161,9 @@ vlc_module_begin();
                HURRYUP_LONGTEXT, VLC_FALSE );
     add_bool( SOUT_CFG_PREFIX "deinterlace", 0, NULL, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace", NULL,
+                DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
+                VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
@@ -204,8 +211,8 @@ vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
-    "scale", "fps", "width", "height", "deinterlace", "threads", "hurry-up",
-    "aenc", "acodec", "ab", "samplerate", "channels",
+    "scale", "fps", "width", "height", "deinterlace", "deinterlace-module",
+    "threads", "hurry-up", "aenc", "acodec", "ab", "samplerate", "channels",
     "senc", "scodec", "soverlay", "sfilter",
     "audio-sync", NULL
 };
@@ -290,6 +297,8 @@ struct sout_stream_sys_t
     int             i_width;
     int             i_height;
     vlc_bool_t      b_deinterlace;
+    char            *psz_deinterlace;
+    sout_cfg_t      *p_deinterlace_cfg;
     int             i_threads;
     vlc_bool_t      b_hurry_up;
 
@@ -428,6 +437,19 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace", &val );
     p_sys->b_deinterlace = val.b_bool;
 
+    var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace-module", &val );
+    p_sys->psz_deinterlace = NULL;
+    p_sys->p_deinterlace_cfg = NULL;
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz_next;
+        psz_next = sout_CfgCreate( &p_sys->psz_deinterlace,
+                                   &p_sys->p_deinterlace_cfg,
+                                   val.psz_string );
+        if( psz_next ) free( psz_next );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
     var_Get( p_stream, SOUT_CFG_PREFIX "croptop", &val );
     p_sys->i_crop_top = val.i_int;
     var_Get( p_stream, SOUT_CFG_PREFIX "cropbottom", &val );
@@ -539,6 +561,20 @@ static void Close( vlc_object_t * p_this )
         p_sys->p_video_cfg = p_next;
     }
     if( p_sys->psz_venc ) free( p_sys->psz_venc );
+
+    while( p_sys->p_deinterlace_cfg != NULL )
+    {
+        sout_cfg_t *p_next = p_sys->p_deinterlace_cfg->p_next;
+
+        if( p_sys->p_deinterlace_cfg->psz_name )
+            free( p_sys->p_deinterlace_cfg->psz_name );
+        if( p_sys->p_deinterlace_cfg->psz_value )
+            free( p_sys->p_deinterlace_cfg->psz_value );
+        free( p_sys->p_deinterlace_cfg );
+
+        p_sys->p_deinterlace_cfg = p_next;
+    }
+    if( p_sys->psz_deinterlace ) free( p_sys->psz_deinterlace );
 
     while( p_sys->p_spu_cfg != NULL )
     {
@@ -1567,9 +1603,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
                 id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
                 id->pp_filter[id->i_filter]->fmt_out = id->p_decoder->fmt_out;
+                id->pp_filter[id->i_filter]->p_cfg = p_sys->p_deinterlace_cfg;
                 id->pp_filter[id->i_filter]->p_module =
                     module_Need( id->pp_filter[id->i_filter],
-                                 "video filter2", "deinterlace", 0 );
+                                 "video filter2", p_sys->psz_deinterlace, 0 );
                 if( id->pp_filter[id->i_filter]->p_module )
                 {
                     id->pp_filter[id->i_filter]->p_owner =
@@ -1608,6 +1645,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
                 id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
                 id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
+                id->pp_filter[id->i_filter]->p_cfg = NULL;
                 id->pp_filter[id->i_filter]->p_module =
                     module_Need( id->pp_filter[id->i_filter],
                                  "video filter2", 0, 0 );

@@ -51,6 +51,9 @@ struct filter_t
     /* Output format of filter */
     es_format_t         fmt_out;
 
+    /* Filter configuration */
+    sout_cfg_t *        p_cfg;
+
     picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
     block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );
     void                ( * pf_video_blend )  ( filter_t *, picture_t *,
