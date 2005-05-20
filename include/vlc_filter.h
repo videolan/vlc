@@ -37,6 +37,12 @@ typedef struct filter_owner_sys_t filter_owner_sys_t;
  *
  * @{
  */
+
+/*
+ * BIG FAT WARNING : the code relies in the first 4 members of filter_t
+ * and decoder_t to be the same, so if you have anything to add, do it
+ * at the end of the structure.
+ */
 struct filter_t
 {
     VLC_COMMON_MEMBERS
