@@ -517,7 +517,7 @@ class EbmlParser
     void Reset( demux_t *p_demux );
     EbmlElement *Get( void );
     void        Keep( void );
-    void        UnGet( uint64 i_restart_pos );
+    EbmlElement *UnGet( uint64 i_block_pos, uint64 i_cluster_pos );
 
     int GetLevel( void );
 
@@ -984,6 +984,8 @@ public:
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
         ,cluster(NULL)
+        ,i_block_pos(0)
+        ,i_cluster_pos(0)
         ,i_start_pos(0)
         ,p_segment_uid(NULL)
         ,p_prev_segment_uid(NULL)
@@ -1084,6 +1086,8 @@ public:
     int64_t                 i_tags_position;
 
     KaxCluster              *cluster;
+    uint64                  i_block_pos;
+    uint64                  i_cluster_pos;
     int64_t                 i_start_pos;
     KaxSegmentUID           *p_segment_uid;
     KaxPrevUID              *p_prev_segment_uid;
@@ -1128,7 +1132,7 @@ public:
     void LoadTags( );
     void InformationCreate( );
     void Seek( mtime_t i_date, mtime_t i_time_offset );
-    int BlockGet( KaxBlock * & pp_block, uint64 & i_cuepos, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
+    int BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
     bool Select( mtime_t i_start_time );
     void UnSelect( );
 
@@ -1609,10 +1613,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 }
 
-int matroska_segment_c::BlockGet( KaxBlock * & pp_block, uint64 & i_cuepos, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
 {
     pp_block = NULL;
-    i_cuepos = 0;
     *pi_ref1  = -1;
     *pi_ref2  = -1;
 
@@ -1658,6 +1661,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, uint64 & i_cuepos, int6
             if( MKV_IS_ID( el, KaxCluster ) )
             {
                 cluster = (KaxCluster*)el;
+                i_cluster_pos = cluster->GetElementPosition();
 
                 /* add it to the index */
                 if( i_index == 0 ||
@@ -1698,7 +1702,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, uint64 & i_cuepos, int6
             }
             else if( MKV_IS_ID( el, KaxBlockGroup ) )
             {
-                i_cuepos = el->GetElementPosition();
+                i_block_pos = el->GetElementPosition();
                 ep->Down();
             }
             break;
@@ -3118,12 +3122,11 @@ static int Demux( demux_t *p_demux)
         }
 
         KaxBlock *block;
-        uint64 i_cuepos;
         int64_t i_block_duration = 0;
         int64_t i_block_ref1;
         int64_t i_block_ref2;
 
-        if( p_segment->BlockGet( block, i_cuepos, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( p_segment->BlockGet( block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered )
             {
@@ -3316,7 +3319,7 @@ EbmlParser::~EbmlParser( void )
     }
 }
 
-void EbmlParser::UnGet( uint64 i_restart_pos )
+EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
 {
     if ( mi_user_level > mi_level )
     {
@@ -3329,7 +3332,21 @@ void EbmlParser::UnGet( uint64 i_restart_pos )
     }
     m_got = NULL;
     mb_keep = VLC_FALSE;
-    m_es->I_O().setFilePointer( i_restart_pos, seek_beginning );
+    if ( m_el[1]->GetElementPosition() == i_cluster_pos )
+    {
+        m_es->I_O().setFilePointer( i_block_pos, seek_beginning );
+        return (EbmlMaster*) m_el[mi_level-1];
+    }
+    else
+    {
+        // seek to the previous Cluster
+        m_es->I_O().setFilePointer( i_cluster_pos, seek_beginning );
+        mi_level--;
+        mi_user_level--;
+        delete m_el[mi_level];
+        m_el[mi_level] = NULL;
+        return NULL;
+    }
 }
 
 void EbmlParser::Up( void )
@@ -5037,7 +5054,7 @@ bool matroska_segment_c::Preload( )
 
             cluster = (KaxCluster*)el;
 
-            i_start_pos = cluster->GetElementPosition();
+            i_cluster_pos = i_start_pos = cluster->GetElementPosition();
             ParseCluster( );
 
             ep->Down();
@@ -5201,7 +5218,6 @@ void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
 void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 {
     KaxBlock    *block;
-    uint64      i_cuepos;
     int         i_track_skipping;
     int64_t     i_block_duration;
     int64_t     i_block_ref1;
@@ -5259,7 +5275,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
     while( i_track_skipping > 0 )
     {
-        if( BlockGet( block, i_cuepos, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+        if( BlockGet( block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             msg_Warn( &sys.demuxer, "cannot get block EOF?" );
 
@@ -5281,7 +5297,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
         {
            if( sys.i_pts >= sys.i_start_pts )
             {
-                ep->UnGet( i_cuepos );
+                cluster = static_cast<KaxCluster*>(ep->UnGet( i_block_pos, i_cluster_pos ));
                 i_track_skipping = 0;
             }
             else if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
