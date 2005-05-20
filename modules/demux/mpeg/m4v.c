@@ -95,7 +95,7 @@ static int Open( vlc_object_t * p_this )
             return VLC_EGENERIC;
         }
 
-        msg_Err( p_demux, "this doesn't look like an MPEG-4 ES stream, continuing" );
+        msg_Warn( p_demux, "this doesn't look like an MPEG-4 ES stream, continuing anyway" );
     }
 
     p_demux->pf_demux  = Demux;

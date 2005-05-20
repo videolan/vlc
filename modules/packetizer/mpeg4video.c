@@ -213,7 +213,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     if( p_sys->i_buffer > 10*1000000 )
     {
-        msg_Err( p_dec, "mmh reseting context" );
+        msg_Warn( p_dec, "reseting context" );
         p_sys->i_buffer = 0;
     }
 
