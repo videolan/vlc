@@ -432,6 +432,8 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                           < p_bridge->pp_es[i]->i_last) )
         {
             block_t *p_block = p_bridge->pp_es[i]->p_block;
+            msg_Dbg( p_stream, "dropping a packet (" I64Fd ")",
+                     p_bridge->pp_es[i]->i_last - p_block->i_dts );
             p_bridge->pp_es[i]->p_block
                 = p_bridge->pp_es[i]->p_block->p_next;
             block_Release( p_block );
@@ -489,10 +491,9 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
         if ( p_bridge->pp_es[i]->id != NULL )
         {
             block_t *p_block = p_bridge->pp_es[i]->p_block;
-            p_bridge->pp_es[i]->i_last = p_bridge->pp_es[i]->p_block->i_dts
-                                   + p_bridge->pp_es[i]->p_block->i_length;
             while ( p_block != NULL )
             {
+                p_bridge->pp_es[i]->i_last = p_block->i_dts;
                 p_block->i_pts += p_sys->i_delay;
                 p_block->i_dts += p_sys->i_delay;
                 p_block = p_block->p_next;

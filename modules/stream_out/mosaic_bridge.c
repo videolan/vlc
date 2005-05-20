@@ -408,7 +408,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             vout_CopyPicture( p_stream, p_new_pic, p_pic );
         }
-        p_pic->pf_release( p_pic );
 
         p_new_pic->i_refcount = 1;
         p_new_pic->i_status = DESTROYED_PICTURE;
@@ -417,6 +416,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         p_new_pic->pf_release = ReleasePicture;
         p_new_pic->date = p_pic->date;
 
+        p_pic->pf_release( p_pic );
         PushPicture( p_stream, p_new_pic );
     }
 
