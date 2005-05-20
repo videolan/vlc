@@ -585,7 +585,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
             psz[i] = p[i]; \
         } \
         psz[size] = '\0'; \
-        p += 2 * ( size ); \
+        p += ( size ); \
     }
     GETUTF16( p_sys->psz_server_version, i_server_version );
     GETUTF16( p_sys->psz_tool_version, i_tool_version );
