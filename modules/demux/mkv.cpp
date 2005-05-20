@@ -4137,6 +4137,11 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             }
             if ( tk->fmt.video.i_visible_height && tk->fmt.video.i_visible_width )
                 tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * tk->fmt.video.i_visible_width / tk->fmt.video.i_visible_height;
+            if( tk->f_fps )
+            {
+                tk->fmt.video.i_frame_rate = (unsigned int)(tk->f_fps * 1001);
+                tk->fmt.video.i_frame_rate_base = 1001;
+            }
         }
         else  if( MKV_IS_ID( l, KaxTrackAudio ) )
         {
