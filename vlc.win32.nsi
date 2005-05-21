@@ -183,6 +183,8 @@ Section "Start Menu + Desktop Shortcut" SEC02
     "$INSTDIR\vlc.exe" "--intf wxwin --no-wxwin-embed"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (skins).lnk" \
     "$INSTDIR\vlc.exe" "--intf skins"
+  CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC defaults and quit.lnk" \
+    "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit "
   CreateShortCut "$DESKTOP\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" "--intf wxwin"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
