@@ -40,6 +40,7 @@ Input/Demuxers:
  * Improved CDDAX module (uses several playlist items)
  * Fixes to Linux DVB support
  * Fix the "negative subtitles delay" bug
+ * Support for FTP over IPv6
 
 Decoders / Encoders:
  * Dirac decoder and encoder
