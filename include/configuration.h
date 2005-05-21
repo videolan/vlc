@@ -146,6 +146,9 @@ struct module_config_t
     char           **ppsz_action_text;         /* Friendly names for actions */
     int            i_action;                            /* actions list size */
 
+    /* Deprecated */
+    char           *psz_current;   /* Good option name */
+    vlc_bool_t     b_strict;      /* Transitionnal or strict */
     /* Misc */
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
@@ -339,6 +342,17 @@ int config_AutoSaveConfigFile( vlc_object_t * );
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
         (i_config+11) * sizeof(module_config_t)); \
     { static module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, '\0', text, longtext, NULL, b_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; }
+
+#define add_deprecated( name, strict ) \
+        i_config++; \
+    if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
+        (i_config+11) * sizeof(module_config_t)); \
+    {   static module_config_t tmp={}; \
+        p_config[ i_config ] = tmp; \
+        p_config[ i_config ].i_type = p_config[ i_config -1 ].i_type; \
+        p_config[ i_config ].psz_name = name; \
+        p_config[i_config].b_strict = strict; \
+        p_config[ i_config ].psz_current = p_config[ i_config-1].psz_current?p_config[ i_config-1 ].psz_current:p_config[ i_config-1 ].psz_name; }
 
 /* Modifier macros for the config options (used for fine tuning) */
 #define change_short( ch ) \

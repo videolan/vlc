@@ -983,7 +983,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
-
+       add_deprecated( "filter", VLC_FALSE ); /*deprecated since 0.8.2 */
 #if 0
     add_string( "pixel-ratio", "1", NULL, PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT );
 #endif
@@ -1010,7 +1010,7 @@ vlc_module_begin();
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
     add_integer( "sub-margin", -1, NULL, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, VLC_TRUE );
-
+        add_deprecated( "spu-margin", VLC_FALSE ); /*Deprecated since 0.8.2 */
     set_section( N_( "Overlays" ) , NULL );
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
@@ -1042,12 +1042,16 @@ vlc_module_begin();
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_FALSE );
     add_integer( "audio-track", -1, NULL,
                  INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, VLC_FALSE );
+       add_deprecated( "audio-channel", VLC_FALSE ); /*deprecated since 0.8.2 */
     add_integer( "sub-track", -1, NULL,
                  INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, VLC_FALSE );
+       add_deprecated("spu-channel",VLC_FALSE); /*deprecated since 0.8.2*/
     add_string( "audio-language", "", NULL,
-                 INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT, VLC_FALSE );
+                 INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT,
+                  VLC_FALSE );
     add_string( "sub-language", "", NULL,
-                 INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT, VLC_FALSE );
+                 INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
+                  VLC_FALSE );
 
 
     set_section( N_( "Playback control" ) , NULL);
