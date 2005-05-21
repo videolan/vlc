@@ -413,8 +413,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             }
             else
                 msg_Dbg( p_filter, "too late picture for %s (" I64Fd ")",
-                         date - p_es->p_picture->date - p_sys->i_delay,
-                         p_es->psz_id );
+                         p_es->psz_id,
+                         date - p_es->p_picture->date - p_sys->i_delay );
         }
 
         if ( p_sys->i_order_length == 0 )
