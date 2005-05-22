@@ -871,28 +871,76 @@ static int Connect( access_t *p_access, int64_t i_tell )
     }
 
     /* Initialize TLS/SSL session */
-    /* FIXME: support proxy CONNECT for HTTP/SSL */
     if( p_sys->b_ssl == VLC_TRUE )
     {
+        /* CONNECT to establish TLS tunnel through HTTP proxy */
         if( p_sys->b_proxy )
         {
-            msg_Err( p_access, "HTTP/SSL through HTTP proxy not supported yet" );
-            Disconnect( p_access );
-            return VLC_EGENERIC;
+            char *psz;
+            unsigned i_status = 0;
+
+            if( p_sys->i_version == 0 )
+            {
+                /* CONNECT is not in HTTP/1.0 */
+                Disconnect( p_access );
+                return VLC_EGENERIC;
+            }
+
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                        "CONNECT %s:%d HTTP/1.%d\r\nHost: %s:%d\r\n\r\n",
+                        p_sys->url.psz_host, p_sys->url.i_port,
+                        p_sys->i_version,
+                        p_sys->url.psz_host, p_sys->url.i_port);
+
+            psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+            if( psz == NULL )
+            {
+                msg_Err( p_access, "cannot establish HTTP/TLS tunnel" );
+                Disconnect( p_access );
+                return VLC_EGENERIC;
+            }
+
+            sscanf( psz, "HTTP/%*u.%*u %3u", &i_status );
+            free( psz );
+
+            if( ( i_status / 100 ) != 2 )
+            {
+                msg_Err( p_access, "HTTP/TLS tunnel through proxy denied" );
+                Disconnect( p_access );
+                return VLC_EGENERIC;
+            }
+
+            do
+            {
+                psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+                if( psz == NULL )
+                {
+                    msg_Err( p_access, "HTTP proxy connection failed" );
+                    Disconnect( p_access );
+                    return VLC_EGENERIC;
+                }
+
+                if( *psz == '\0' )
+                    i_status = 0;
+
+                free( psz );
+            }
+            while( i_status );
         }
 
+        /* TLS/SSL handshake */
         p_sys->p_tls = tls_ClientCreate( VLC_OBJECT(p_access), p_sys->fd,
                                          srv.psz_host );
         if( p_sys->p_tls == NULL )
         {
-            msg_Err( p_access, "cannot establish HTTP/SSL session" );
+            msg_Err( p_access, "cannot establish HTTP/TLS session" );
             Disconnect( p_access );
             return VLC_EGENERIC;
         }
         p_sys->p_vs = &p_sys->p_tls->sock;
     }
 
-    return Request( p_access,i_tell );
+    return Request( p_access, i_tell );
 }
 
 
@@ -904,6 +952,7 @@ static int Request( access_t *p_access, int64_t i_tell )
 
     if( p_sys->b_proxy )
     {
+        /* FIXME: support SSL proxies */
         if( p_sys->url.psz_path )
         {
             net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
