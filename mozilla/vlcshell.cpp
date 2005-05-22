@@ -330,6 +330,20 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 
 #endif /* XP_MACOSX */
 
+        /* HACK: special case for loop, to have it set before playlist startup
+         */
+        for( i = 0; i < argc ; i++ )
+        {
+            if( !strcmp( argn[i], "loop" ) )
+            {
+                if( !strcmp( argv[i], "yes" ) )
+                {
+                    value.b_bool = VLC_TRUE;
+                    VLC_VariableSet( p_plugin->i_vlc, "conf::loop", value );
+                }
+            }
+        }
+
         i_ret = VLC_Init( p_plugin->i_vlc, sizeof(ppsz_argv)/sizeof(char*),
                           ppsz_argv );
 
@@ -395,14 +409,6 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         }
 
 #if USE_LIBVLC
-        else if( !strcmp( argn[i], "loop" ) )
-        {
-            if( !strcmp( argv[i], "yes" ) )
-            {
-                value.b_bool = VLC_TRUE;
-                VLC_VariableSet( p_plugin->i_vlc, "conf::loop", value );
-            }
-        }
         else if( !strcmp( argn[i], "fullscreen" ) )
         {
             if( !strcmp( argv[i], "yes" ) )
@@ -448,7 +454,6 @@ static void HackStopVout( VlcPlugin* p_plugin )
 
     do
     {
-        fprintf( stderr, "FindWindow: %p\n", hwnd );
         while( PeekMessage( &msg, (HWND)value.i_int, 0, 0, PM_REMOVE ) )
         {
             TranslateMessage(&msg);
@@ -676,7 +681,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         {
 #if USE_LIBVLC
             VLC_AddTarget( p_plugin->i_vlc, p_plugin->psz_target,
-                           0, 0, i_mode, PLAYLIST_END );
+                           0, 0, PLAYLIST_INSERT, 0 );
 #endif
             p_plugin->b_stream = VLC_TRUE;
         }
