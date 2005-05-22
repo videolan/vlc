@@ -761,7 +761,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     int i_skip,i_goto,i, i_new, i_count ;
     playlist_view_t *p_view;
 
-    vlc_bool_t b_loop = var_GetBool( p_playlist, "loop");
+    vlc_bool_t b_loop = var_GetBool( p_playlist, "loop" );
     vlc_bool_t b_random = var_GetBool( p_playlist, "random" );
     vlc_bool_t b_repeat = var_GetBool( p_playlist, "repeat" );
     vlc_bool_t b_playstop = var_GetBool( p_playlist, "play-and-stop" );
@@ -770,7 +770,6 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     /* Calculate time needed */
     int64_t start = mdate();
 #endif
-
 
     /* Handle quickly a few special cases */
 
@@ -830,7 +829,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             {
                 p_playlist->pp_items[--i_count]->i_nb_played = 0;
             }
-           if( !b_loop )
+            if( !b_loop )
             {
                 return NULL;
             }
@@ -838,7 +837,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         p_playlist->request.i_skip = 0;
         p_playlist->request.b_request = VLC_FALSE;
         return p_playlist->pp_items[i_new];
-   }
+    }
 
     /* Start the real work */
     if( p_playlist->request.b_request )
@@ -911,6 +910,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                     {
                         if( b_loop )
                         {
+#ifdef PLAYLIST_DEBUG
+                            msg_Dbg( p_playlist, "looping" );
+#endif
                             p_new = playlist_FindNextFromParent( p_playlist,
                                       p_playlist->request.i_view,
                                       p_view->p_root,
@@ -949,6 +951,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
 
         if( p_playlist->status.i_view == -1 )
         {
+#ifdef PLAYLIST_DEBUG
+        msg_Dbg( p_playlist,"no request - old mode" );
+#endif
             if( p_playlist->i_index + 1 < p_playlist->i_size )
             {
                 p_playlist->i_index++;
@@ -972,6 +977,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         /* We are playing with a view */
         else
         {
+#ifdef PLAYLIST_DEBUG
+            msg_Dbg( p_playlist,"no request - from a view" );
+#endif
             playlist_view_t *p_view =
                     playlist_ViewFind( p_playlist,
                                    p_playlist->status.i_view );
@@ -988,6 +996,9 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                             p_playlist->status.p_item );
                 if( p_new == NULL && b_loop )
                 {
+#ifdef PLAYLIST_DEBUG
+                    msg_Dbg( p_playlist, "looping" );
+#endif
                     p_new = playlist_FindNextFromParent( p_playlist,
                                    p_playlist->status.i_view,
                                    p_view->p_root,
