@@ -6,7 +6,7 @@
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
- *          Rémi Denis-Courmont <courmisch # via.ecp.fr>
+ *          Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@
  *****************************************************************************/
 struct network_socket_t
 {
-    unsigned int i_type;
-
     char * psz_bind_addr;
     int i_bind_port;
 
@@ -45,12 +43,6 @@ struct network_socket_t
     int i_handle;
     size_t i_mtu;
 };
-
-/* Socket types */
-#define NETWORK_UDP 1
-#define NETWORK_TCP 2
-#define NETWORK_TCP_PASSIVE 3
-
 
 typedef struct
 {
@@ -277,22 +269,21 @@ static inline char *vlc_b64_encode( char *src )
     return ret;
 }
 
-VLC_EXPORT( int, net_ConvertIPv4, ( uint32_t *p_addr, const char * psz_address ) );
-
 /* Portable networking layer communication */
 #define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __net_ListenTCP, ( vlc_object_t *p_this, char *psz_localaddr, int i_port ) );
+VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
 
 #define net_Accept(a, b, c) __net_Accept(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __net_Accept, ( vlc_object_t *p_this, int fd_listen, mtime_t i_wait ) );
+VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server ) );
 
 VLC_EXPORT( void, net_Close, ( int fd ) );
+VLC_EXPORT( void, net_ListenClose, ( int *fd ) );
 
 
 /* Functions to read from or write to the networking layer */
@@ -322,5 +313,84 @@ VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, v_socket_t *, const
 
 #define net_vaPrintf(a,b,c,d,e) __net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args ) );
+
+/* Portable network names/addresses resolution layer */
+
+/* GAI error codes */
+# ifndef EAI_BADFLAGS
+#  define EAI_BADFLAGS -1
+# endif
+# ifndef EAI_NONAME
+#  define EAI_NONAME -2
+# endif
+# ifndef EAI_AGAIN
+#  define EAI_AGAIN -3
+# endif
+# ifndef EAI_FAIL
+#  define EAI_FAIL -4
+# endif
+# ifndef EAI_NODATA
+#  define EAI_NODATA -5
+# endif
+# ifndef EAI_FAMILY
+#  define EAI_FAMILY -6
+# endif
+# ifndef EAI_SOCKTYPE
+#  define EAI_SOCKTYPE -7
+# endif
+# ifndef EAI_SERVICE
+#  define EAI_SERVICE -8
+# endif
+# ifndef EAI_ADDRFAMILY
+#  define EAI_ADDRFAMILY -9
+# endif
+# ifndef EAI_MEMORY
+#  define EAI_MEMORY -10
+# endif
+# ifndef EAI_SYSTEM
+#  define EAI_SYSTEM -11
+# endif
+
+
+# ifndef NI_MAXHOST
+#  define NI_MAXHOST 1025
+#  define NI_MAXSERV 32
+# endif
+
+# ifndef NI_NUMERICHOST
+#  define NI_NUMERICHOST 0x01
+#  define NI_NUMERICSERV 0x02
+#  define NI_NOFQDN      0x04
+#  define NI_NAMEREQD    0x08
+#  define NI_DGRAM       0x10
+# endif
+
+# ifndef HAVE_STRUCT_ADDRINFO
+struct addrinfo
+{
+    int ai_flags;
+    int ai_family;
+    int ai_socktype;
+    int ai_protocol;
+    size_t ai_addrlen;
+    struct sockaddr *ai_addr;
+    char *ai_canonname;
+    struct addrinfo *ai_next;
+};
+#  define AI_PASSIVE     1
+#  define AI_CANONNAME   2
+#  define AI_NUMERICHOST 4
+# endif /* if !HAVE_STRUCT_ADDRINFO */
+
+/*** libidn support ***/
+# ifndef AI_IDN
+#  define AI_IDN      0
+#  define AI_CANONIDN 0
+# endif
+
+VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );
+VLC_EXPORT( int, vlc_getnameinfo, ( vlc_object_t *, const struct sockaddr *, int, char *, int, char *, int, int ) );
+VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, const char *, const struct addrinfo *, struct addrinfo ** ) );
+VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 
 #endif

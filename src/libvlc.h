@@ -463,6 +463,11 @@ static char *ppsz_clock_descriptions[] =
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
 
+#define TIMEOUT_TEXT N_("TCP connection timeout in ms")
+#define TIMEOUT_LONGTEXT N_( \
+    "Allows you to modify the default TCP connection timeout. This " \
+    "value should be set in millisecond units." )
+
 #define SOCKS_SERVER_TEXT N_("SOCKS server")
 #define SOCKS_SERVER_LONGTEXT N_( \
     "Allow you to specify a SOCKS server to use. It must be of the form " \
@@ -1089,6 +1094,8 @@ vlc_module_begin();
         change_short('6');
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
         change_short('4');
+    add_integer( "ipv4-timeout", 5 * 1000, NULL, TIMEOUT_TEXT,
+                 TIMEOUT_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Socks proxy") , NULL )
     add_string( "socks", NULL, NULL,

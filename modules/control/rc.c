@@ -92,7 +92,7 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
 
 struct intf_sys_t
 {
-    int i_socket_listen;
+    int *pi_socket_listen;
     int i_socket;
     char *psz_unix_path;
 
@@ -173,7 +173,7 @@ static int Activate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist;
     char *psz_host, *psz_unix_path;
-    int i_socket = -1;
+    int *pi_socket = NULL;
 
 #if defined(HAVE_ISATTY) && !defined(WIN32)
     /* Check that stdin is a TTY */
@@ -187,6 +187,8 @@ static int Activate( vlc_object_t *p_this )
     psz_unix_path = config_GetPsz( p_intf, "rc-unix" );
     if( psz_unix_path )
     {
+        int i_socket;
+
 #ifndef PF_LOCAL
         msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
         free( psz_unix_path );
@@ -227,10 +229,21 @@ static int Activate( vlc_object_t *p_this )
             net_Close( i_socket );
             return VLC_EGENERIC;
         }
+
+        /* FIXME: we need a core function to merge listening sockets sets */
+        pi_socket = calloc( 2, sizeof( int ) );
+        if( pi_socket == NULL )
+        {
+            free( psz_unix_path );
+            net_Close( i_socket );
+            return VLC_ENOMEM;
+        }
+        pi_socket[0] = i_socket;
+        pi_socket[1] = -1;
 #endif
     }
 
-    if( ( i_socket == -1) &&
+    if( ( pi_socket == NULL ) &&
         ( psz_host = config_GetPsz( p_intf, "rc-host" ) ) != NULL )
     {
         vlc_url_t url;
@@ -239,7 +252,8 @@ static int Activate( vlc_object_t *p_this )
 
         msg_Dbg( p_intf, "base %s port %d", url.psz_host, url.i_port );
 
-        if( (i_socket = net_ListenTCP(p_this, url.psz_host, url.i_port)) == -1)
+        pi_socket = net_ListenTCP(p_this, url.psz_host, url.i_port);
+        if( pi_socket == NULL )
         {
             msg_Warn( p_intf, "can't listen to %s port %i",
                       url.psz_host, url.i_port );
@@ -259,7 +273,7 @@ static int Activate( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    p_intf->p_sys->i_socket_listen = i_socket;
+    p_intf->p_sys->pi_socket_listen = pi_socket;
     p_intf->p_sys->i_socket = -1;
     p_intf->p_sys->psz_unix_path = psz_unix_path;
 
@@ -297,8 +311,7 @@ static void Deactivate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
 
-    if( p_intf->p_sys->i_socket_listen != -1 )
-        net_Close( p_intf->p_sys->i_socket_listen );
+    net_ListenClose( p_intf->p_sys->pi_socket_listen );
     if( p_intf->p_sys->i_socket != -1 )
         net_Close( p_intf->p_sys->i_socket );
     if( p_intf->p_sys->psz_unix_path != NULL )
@@ -477,11 +490,11 @@ static void Run( intf_thread_t *p_intf )
         char *psz_cmd, *psz_arg;
         vlc_bool_t b_complete;
 
-        if( p_intf->p_sys->i_socket_listen != - 1 &&
+        if( p_intf->p_sys->pi_socket_listen != NULL &&
             p_intf->p_sys->i_socket == -1 )
         {
             p_intf->p_sys->i_socket =
-                net_Accept( p_intf, p_intf->p_sys->i_socket_listen, 0 );
+                net_Accept( p_intf, p_intf->p_sys->pi_socket_listen, 0 );
         }
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );

@@ -1,10 +1,11 @@
 /*****************************************************************************
  * net.c:
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004-2005 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
+ *          Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,193 +123,427 @@ int net_ConvertIPv4( uint32_t *p_addr, const char * psz_address )
  *****************************************************************************/
 int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 {
-    vlc_value_t      val;
-    void            *private;
+    struct addrinfo hints, *res, *ptr;
+    const char      *psz_realhost;
+    char            *psz_realport, *psz_socks;
+    int             i_val, i_handle = -1;
 
-    char            *psz_network = "";
-    network_socket_t sock;
-    module_t         *p_network;
+    if( ( i_port < 0 ) || ( i_port > 65535 ) )
+        return -1; /* I don't expect the next TCP version shortly */
+    if( i_port == 0 )
+        i_port = 80; /* historical VLC thing */
 
-    /* Check if we have force ipv4 or ipv6 */
-    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv4", &val );
-    if( val.b_bool )
+    memset( &hints, 0, sizeof( hints ) );
+    hints.ai_socktype = SOCK_STREAM;
+
+    psz_socks = var_CreateGetString( p_this, "socks" );
+    if( *psz_socks && *psz_socks != ':' )
     {
-        psz_network = "ipv4";
-    }
-
-    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv6", &val );
-    if( val.b_bool )
-    {
-        psz_network = "ipv6";
-    }
-
-    /* Prepare the network_socket_t structure */
-    sock.i_type = NETWORK_TCP;
-    sock.psz_bind_addr   = "";
-    sock.i_bind_port     = 0;
-    sock.i_ttl           = 0;
-
-    var_Create( p_this, "socks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "socks", &val );
-    if( *val.psz_string && *val.psz_string != ':' )
-    {
-        char *psz = strchr( val.psz_string, ':' );
+        char *psz = strchr( psz_socks, ':' );
 
         if( psz )
             *psz++ = '\0';
 
-        sock.psz_server_addr = (char*)val.psz_string;
-        sock.i_server_port   = psz ? atoi( psz ) : 1080;
+        psz_realhost = psz_socks;
+        psz_realport = strdup( ( psz != NULL ) ? psz : "1080" );
 
-        msg_Dbg( p_this, "net: connecting to '%s:%d' for '%s:%d'",
-                 sock.psz_server_addr, sock.i_server_port,
-                 psz_host, i_port );
+        msg_Dbg( p_this, "net: connecting to '%s:%s' for '%s:%d'",
+                 psz_realhost, psz_realport, psz_host, i_port );
     }
     else
     {
-        sock.psz_server_addr = (char*)psz_host;
-        sock.i_server_port   = i_port;
-        msg_Dbg( p_this, "net: connecting to '%s:%d'", psz_host, i_port );
+        psz_realhost = psz_host;
+        psz_realport = malloc( 6 );
+        if( psz_realport == NULL )
+        {
+            free( psz_socks );
+            return -1;
+        }
+
+        sprintf( psz_realport, "%d", i_port );
+        msg_Dbg( p_this, "net: connecting to '%s:%s'", psz_realhost,
+                 psz_realport );
     }
 
-
-    private = p_this->p_private;
-    p_this->p_private = (void*)&sock;
-    if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
+    i_val = vlc_getaddrinfo( p_this, psz_realhost, psz_realport, &hints,
+                             &res );
+    free( psz_realport );
+    if( i_val )
     {
-        msg_Dbg( p_this, "net: connection to '%s:%d' failed",
-                 psz_host, i_port );
+        msg_Err( p_this, "cannot resolve '%s' : %s", psz_realhost,
+                 vlc_gai_strerror( i_val ) );
+        free( psz_socks );
         return -1;
     }
-    module_Unneed( p_this, p_network );
-    p_this->p_private = private;
 
-    if( *val.psz_string && *val.psz_string != ':' )
+    for( ptr = res; (ptr != NULL) && (i_handle == -1); ptr = ptr->ai_next )
+    {
+        int fd;
+
+        fd = socket( ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol );
+        if( fd == -1 )
+        {
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Warn( p_this, "cannot create socket (%i)",
+                      WSAGetLastError() );
+#else
+            msg_Warn( p_this, "cannot create socket (%s)",
+                      strerror( errno ) );
+#endif
+            continue;
+        }
+
+
+        /* Set to non-blocking */
+#if defined( WIN32 ) || defined( UNDER_CE )
+        {
+            unsigned long i_dummy = 1;
+            if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+                msg_Err( p_this, "cannot set socket to non-blocking mode" );
+        }
+
+# ifdef IPV6_PROTECTION_LEVEL
+        if( ptr->ai_family == PF_INET6 )
+        {
+            i_val = PROTECTION_LEVEL_UNRESTRICTED;
+            setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
+                        sizeof( i_val ) );
+        }
+# else
+#  warning You are using outdated headers for Winsock !
+# endif
+#else
+        if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
+            ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
+            msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
+                     strerror( errno ) );
+#endif
+
+        i_val = 1;
+        setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
+                    sizeof( i_val ) );
+
+        if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
+        {
+            int i_val_size = sizeof( i_val ), i_max_count;
+            struct timeval tv;
+            vlc_value_t timeout;
+            fd_set fds;
+
+#if defined( WIN32 ) || defined( UNDER_CE )
+            if( WSAGetLastError() != WSAEWOULDBLOCK )
+            {
+                msg_Warn( p_this, "connection to %s:%d failed (%d)", psz_host,
+                          i_port, WSAGetLastError( ) );
+                net_Close( fd );
+                continue;
+            }
+#else
+            if( errno != EINPROGRESS )
+            {
+                msg_Warn( p_this, "connection to %s:%d : %s", psz_host,
+                          i_port, strerror( errno ) );
+                net_Close( fd );
+                continue;
+            }
+#endif
+
+            var_Create( p_this, "ipv4-timeout",
+                        VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            var_Get( p_this, "ipv4-timeout", &timeout );
+            i_max_count = timeout.i_int / 100;
+
+            msg_Dbg( p_this, "connection in progress" );
+            do
+            {
+                if( p_this->b_die )
+                {
+                    msg_Dbg( p_this, "connection aborted" );
+                    net_Close( fd );
+                    vlc_freeaddrinfo( res );
+                    free( psz_socks );
+                    return -1;
+                }
+                if( i_max_count <= 0 )
+                {
+                    msg_Dbg( p_this, "connection timed out" );
+                    net_Close( fd );
+                    continue;
+                }
+
+                i_max_count--;
+
+                /* Initialize file descriptor set */
+                FD_ZERO( &fds );
+                FD_SET( fd, &fds );
+
+                /* We'll wait 0.1 second if nothing happens */
+                tv.tv_sec = 0;
+                tv.tv_usec = 100000;
+
+                i_val = select( fd + 1, NULL, &fds, NULL, &tv );
+            }
+            while( ( i_val == 0 ) || ( ( i_val < 0 ) &&
+#if defined( WIN32 ) || defined( UNDER_CE )
+                            ( WSAGetLastError() == WSAEWOULDBLOCK )
+#else
+                            ( errno == EINTR )
+#endif
+                     ) );
+
+            if( i_val < 0 )
+            {
+                msg_Warn( p_this, "connection aborted (select failed)" );
+                net_Close( fd );
+                continue;
+            }
+
+#if !defined( SYS_BEOS ) && !defined( UNDER_CE )
+            if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
+                            &i_val_size ) == -1 || i_val != 0 )
+            {
+#ifdef WIN32
+                msg_Warn( p_this, "connection to %s:%d failed (%d)", psz_host,
+                          i_port, WSAGetLastError( ) );
+#else
+                msg_Warn( p_this, "connection to %s:%d : %s", psz_host,
+                          i_port, strerror( i_val ) );
+#endif
+                net_Close( fd );
+                continue;
+            }
+#endif
+        }
+        i_handle = fd; /* success! */
+    }
+    
+    vlc_freeaddrinfo( res );
+
+    if( *psz_socks && *psz_socks != ':' )
     {
         char *psz_user = var_CreateGetString( p_this, "socks-user" );
         char *psz_pwd  = var_CreateGetString( p_this, "socks-pwd" );
 
-        if( SocksHandshakeTCP( p_this, sock.i_handle, 5,
-                               psz_user, psz_pwd,
+        if( SocksHandshakeTCP( p_this, i_handle, 5, psz_user, psz_pwd,
                                psz_host, i_port ) )
         {
             msg_Err( p_this, "failed to use the SOCKS server" );
-            net_Close( sock.i_handle );
-            return -1;
+            net_Close( i_handle );
+            i_handle = -1;
         }
 
         free( psz_user );
         free( psz_pwd );
     }
-    free( val.psz_string );
+    free( psz_socks );
 
-    return sock.i_handle;
+    return i_handle;
 }
+
 
 /*****************************************************************************
  * __net_ListenTCP:
  *****************************************************************************
- * Open a TCP listening socket and return it
+ * Open TCP passive "listening" socket(s)
+ * This function returns NULL in case of error.
  *****************************************************************************/
-int __net_ListenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
+int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 {
-    vlc_value_t      val;
-    void            *private;
+    struct addrinfo hints, *res, *ptr;
+    int             i_val, *pi_handles, i_size;
+    char            *psz_port;
 
-    char            *psz_network = "";
-    network_socket_t sock;
-    module_t         *p_network;
+    if( ( i_port < 0 ) || ( i_port > 65535 ) )
+        return NULL; /* I don't expect the next TCP version shortly */
+    if( i_port == 0 )
+        i_port = 80; /* historical VLC thing */
 
-    /* Check if we have force ipv4 or ipv6 */
-    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv4", &val );
-    if( val.b_bool )
+    memset( &hints, 0, sizeof( hints ) );
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    psz_port = malloc( 6 );
+    if( psz_port == NULL )
+        return NULL;
+
+    sprintf( psz_port, "%d", i_port );
+    msg_Dbg( p_this, "net: listening to '%s:%s'", psz_host, psz_port );
+
+    i_val = vlc_getaddrinfo( p_this, psz_host, psz_port, &hints, &res );
+    free( psz_port );
+    if( i_val )
     {
-        psz_network = "ipv4";
+        msg_Err( p_this, "cannot resolve '%s' : %s", psz_host,
+                 vlc_gai_strerror( i_val ) );
+        return NULL;
     }
 
-    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv6", &val );
-    if( val.b_bool )
+    pi_handles = NULL;
+    i_size = 1;
+
+    for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
-        psz_network = "ipv6";
+        int fd, *newpi;
+
+        fd = socket( ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol );
+        if( fd == -1 )
+        {
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Warn( p_this, "cannot create socket (%i)",
+                      WSAGetLastError() );
+#else
+            msg_Warn( p_this, "cannot create socket (%s)",
+                      strerror( errno ) );
+#endif
+            continue;
+        }
+
+        /* Set to non-blocking */
+#if defined( WIN32 ) || defined( UNDER_CE )
+        {
+            unsigned long i_dummy = 1;
+            if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+                msg_Err( p_this, "cannot set socket to non-blocking mode" );
+        }
+#else
+        if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
+            ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
+            msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
+                     strerror( errno ) );
+#endif
+
+        i_val = 1;
+        setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
+                    sizeof( i_val ) );
+
+        /* Bind the socket */
+        if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
+        {
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Warn( p_this, "cannot bind socket (%i)", WSAGetLastError( ) );
+#else
+            msg_Warn( p_this, "cannot bind socket (%s)", strerror( errno ) );
+#endif
+            net_Close( fd );
+            continue;
+        }
+ 
+        /* Listen */
+        if( listen( fd, 100 ) == -1 )
+        {
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Err( p_this, "cannot bring socket in listening mode (%i)",
+                     WSAGetLastError());
+#else
+            msg_Err( p_this, "cannot bring the socket in listening mode (%s)",
+                     strerror( errno ) );
+#endif
+            net_Close( fd );
+            continue;
+        }
+
+        newpi = (int *)realloc( pi_handles, (++i_size) * sizeof( int ) );
+        if( newpi == NULL )
+        {
+            net_Close( fd );
+            break;
+        }
+        else
+        {
+            newpi[i_size - 2] = fd;
+            if( pi_handles == NULL )
+                newpi[i_size - 1] = -1;
+            pi_handles = newpi;
+        }
     }
+    
+    freeaddrinfo( res );
 
-    /* Prepare the network_socket_t structure */
-    sock.i_type = NETWORK_TCP_PASSIVE;
-    sock.psz_bind_addr   = "";
-    sock.i_bind_port     = 0;
-    sock.psz_server_addr = psz_host;
-    sock.i_server_port   = i_port;
-    sock.i_ttl           = 0;
-
-    msg_Dbg( p_this, "net: listening to '%s:%d'", psz_host, i_port );
-    private = p_this->p_private;
-    p_this->p_private = (void*)&sock;
-    if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
-    {
-        msg_Dbg( p_this, "net: listening to '%s:%d' failed",
-                 psz_host, i_port );
-        return -1;
-    }
-    module_Unneed( p_this, p_network );
-    p_this->p_private = private;
-
-    return sock.i_handle;
+    return pi_handles;
 }
 
 /*****************************************************************************
  * __net_Accept:
  *****************************************************************************
- * Accept a connection on a listening socket and return it
+ * Accept a connection on a set of listening sockets and return it
  *****************************************************************************/
-int __net_Accept( vlc_object_t *p_this, int fd, mtime_t i_wait )
+int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 {
     vlc_bool_t b_die = p_this->b_die, b_block = (i_wait < 0);
-    struct timeval timeout;
-    fd_set fds_r, fds_e;
-    int i_ret;
 
     while( p_this->b_die == b_die )
     {
+        int i_val = -1, *pi, *pi_end;
+        struct timeval timeout;
+        fd_set fds_r, fds_e;
+
+        pi = pi_fd;
+
         /* Initialize file descriptor set */
         FD_ZERO( &fds_r );
-        FD_SET( fd, &fds_r );
         FD_ZERO( &fds_e );
-        FD_SET( fd, &fds_e );
+
+        for( pi = pi_fd; *pi != -1; pi++ )
+        {
+            int i_fd = *pi;
+
+            if( i_fd > i_val )
+                i_val = i_fd;
+
+            FD_SET( i_fd, &fds_r );
+            FD_SET( i_fd, &fds_e );
+        }
+        pi_end = pi;
 
         timeout.tv_sec = 0;
         timeout.tv_usec = b_block ? 500000 : i_wait;
 
-        i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
-        if( (i_ret < 0 && errno == EINTR) || i_ret == 0 )
+        i_val = select( i_val + 1, &fds_r, NULL, &fds_e, &timeout );
+        if( ( ( i_val < 0 ) && ( errno == EINTR ) ) || i_val == 0 )
         {
-            if( b_block ) continue;
-            else return -1;
+            if( b_block )
+                continue;
+            else
+                return -1;
         }
-        else if( i_ret < 0 )
+        else if( i_val < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             msg_Err( p_this, "network select error (%i)", WSAGetLastError() );
 #else
-            msg_Err( p_this, "network select error (%s)", strerror(errno) );
+            msg_Err( p_this, "network select error (%s)", strerror( errno ) );
 #endif
             return -1;
         }
 
-        if( ( i_ret = accept( fd, 0, 0 ) ) <= 0 )
+        for( pi = pi_fd; *pi != -1; pi++ )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "accept failed (%i)", WSAGetLastError() );
-#else
-            msg_Err( p_this, "accept failed (%s)", strerror(errno) );
-#endif
-            return -1;
-        }
+            int i_fd = *pi;
 
-        return i_ret;
+            if( !FD_ISSET( i_fd, &fds_r ) && !FD_ISSET( i_fd, &fds_e ) )
+                continue;
+
+            i_val = accept( i_fd, NULL, 0 );
+            if( i_val < 0 )
+            {
+#if defined(WIN32) || defined(UNDER_CE)
+                msg_Err( p_this, "accept failed (%i)", WSAGetLastError() );
+#else
+                msg_Err( p_this, "accept failed (%s)", strerror( errno ) );
+#endif
+            }
+            else
+            {
+                /*
+                 * This round-robin trick ensures that the first sockets in
+                 * pi_fd won't prevent the last ones from getting accept'ed.
+                 */
+                --pi_end;
+                memmove( pi, pi + 1, pi_end - pi );
+                *pi_end = i_fd;
+                return i_val;
+            }
+        }
     }
 
     return -1;
@@ -348,7 +583,6 @@ int __net_OpenUDP( vlc_object_t *p_this, char *psz_bind, int i_bind,
     if( psz_bind   == NULL ) psz_bind   = "";
 
     /* Prepare the network_socket_t structure */
-    sock.i_type = NETWORK_UDP;
     sock.psz_bind_addr   = psz_bind;
     sock.i_bind_port     = i_bind;
     sock.psz_server_addr = psz_server;
@@ -385,6 +619,18 @@ void net_Close( int fd )
 #else
     close( fd );
 #endif
+}
+
+void net_ListenClose( int *pi_fd )
+{
+    if( pi_fd != NULL )
+    {
+        int *pi;
+
+        for( pi = pi_fd; *pi != -1; pi++ )
+            net_Close( *pi );
+        free( pi_fd );
+    }
 }
 
 /*****************************************************************************

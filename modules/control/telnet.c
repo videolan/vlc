@@ -1,7 +1,7 @@
 /*****************************************************************************
  * telnet.c: VLM interface plugin
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Simon Latapie <garf@videolan.org>
@@ -120,7 +120,7 @@ struct intf_sys_t
 {
    telnet_client_t **clients;
    int             i_clients;
-   int             fd;
+   int             *pi_fd;
    vlm_t           *mediatheque;
 };
 
@@ -144,7 +144,8 @@ static int Open( vlc_object_t *p_this )
     i_telnetport = config_GetInt( p_intf, "telnet-port" );
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( ( p_intf->p_sys->fd = net_ListenTCP( p_intf , "", i_telnetport ) ) < 0 )
+    if( ( p_intf->p_sys->pi_fd = net_ListenTCP( p_intf , "", i_telnetport ) )
+                == NULL )
     {
         msg_Err( p_intf, "cannot listen for telnet" );
         free( p_intf->p_sys );
@@ -178,7 +179,7 @@ static void Close( vlc_object_t *p_this )
     }
     if( p_sys->clients != NULL ) free( p_sys->clients );
 
-    net_Close( p_sys->fd );
+    net_ListenClose( p_sys->pi_fd );
 
     vlm_Delete( p_sys->mediatheque );
 
@@ -203,7 +204,7 @@ static void Run( intf_thread_t *p_intf )
         int    i_ret, i_len, fd, i;
 
         /* if a new client wants to communicate */
-        fd = net_Accept( p_intf, p_sys->fd, p_sys->i_clients > 0 ? 0 : -1 );
+        fd = net_Accept( p_intf, p_sys->pi_fd, p_sys->i_clients > 0 ? 0 : -1 );
         if( fd > 0 )
         {
             telnet_client_t *cl;

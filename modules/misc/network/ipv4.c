@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -92,11 +92,6 @@ static int NetOpen( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define TIMEOUT_TEXT N_("TCP connection timeout in ms")
-#define TIMEOUT_LONGTEXT N_( \
-    "Allows you to modify the default TCP connection timeout. This " \
-    "value should be set in millisecond units." )
-
 #define MIFACE_TEXT N_("Multicast output interface")
 #define MIFACE_LONGTEXT N_( \
     "Indicate here the multicast output interface. " \
@@ -106,9 +101,6 @@ vlc_module_begin();
     set_description( _("IPv4 network abstraction layer") );
     set_capability( "network", 50 );
     set_callbacks( NetOpen, NULL );
-
-    add_integer( "ipv4-timeout", 5 * 1000, NULL, TIMEOUT_TEXT,
-                 TIMEOUT_LONGTEXT, VLC_TRUE );
     add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
@@ -502,246 +494,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 }
 
 /*****************************************************************************
- * SocketTCP: create a TCP socket
- *****************************************************************************
- * This function returns -1 in case of error.
- *****************************************************************************/
-static int SocketTCP( vlc_object_t * p_this )
-{
-    int i_handle;
-    
-    /* Open a SOCK_STREAM (TCP) socket, in the PF_INET domain, automatic (0)
-     * protocol */
-    if( (i_handle = socket( PF_INET, SOCK_STREAM, 0 )) == -1 )
-    {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Warn( p_this, "cannot create socket (%i)", WSAGetLastError() );
-#else
-        msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
-#endif
-        return -1;
-    }
-
-    /* Set to non-blocking */
-#if defined( WIN32 ) || defined( UNDER_CE )
-    {
-        unsigned long i_dummy = 1;
-        if( ioctlsocket( i_handle, FIONBIO, &i_dummy ) != 0 )
-        {
-            msg_Err( p_this, "cannot set socket to non-blocking mode" );
-        }
-    }
-#else
-    {
-        int i_flags;
-        if( ( i_flags = fcntl( i_handle, F_GETFL, 0 ) ) < 0 ||
-            fcntl( i_handle, F_SETFL, i_flags | O_NONBLOCK ) < 0 )
-        {
-            msg_Err( p_this, "cannot set socket to non-blocking mode" );
-        }
-    }
-#endif
-
-    return i_handle;
-}
-
-/*****************************************************************************
- * OpenTCP: open a TCP socket
- *****************************************************************************
- * psz_server_addr, i_server_port : address and port used for the connect()
- *   system call. If i_server_port == 0, 80 is used.
- * Other parameters are ignored.
- * This function returns -1 in case of error.
- *****************************************************************************/
-static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
-{
-    char * psz_server_addr = p_socket->psz_server_addr;
-    int i_server_port = p_socket->i_server_port;
-
-    int i_handle;
-    struct sockaddr_in sock;
-
-    if( i_server_port == 0 )
-    {
-        i_server_port = 80;
-    }
-
-    if( (i_handle = SocketTCP( p_this )) == -1 )
-        return VLC_EGENERIC;
-
-    /* Build remote address */
-    if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
-    {
-        msg_Dbg( p_this, "could not build local address" );
-        goto error;
-    }
-
-    /* Connect the socket */
-    if( connect( i_handle, (struct sockaddr *) &sock, sizeof( sock ) ) == -1 )
-    {
-#if defined( WIN32 ) || defined( UNDER_CE )
-        if( WSAGetLastError() == WSAEWOULDBLOCK )
-#else
-        if( errno == EINPROGRESS )
-#endif
-        {
-            int i_ret, i_opt, i_opt_size = sizeof( i_opt ), i_max_count;
-            struct timeval timeout;
-            vlc_value_t val;
-            fd_set fds;
-
-            if( var_Get( p_this, "ipv4-timeout", &val ) != VLC_SUCCESS )
-            {
-                var_Create( p_this, "ipv4-timeout",
-                            VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-                var_Get( p_this, "ipv4-timeout", &val );
-            }
-            i_max_count = val.i_int * 1000 / 100000 /* timeout.tv_usec */;
-
-            msg_Dbg( p_this, "connection in progress" );
-            do
-            {
-                if( p_this->b_die || i_max_count <= 0 )
-                {
-                    msg_Dbg( p_this, "connection aborted" );
-                    goto error;
-                }
-
-                i_max_count--;
-
-                /* Initialize file descriptor set */
-                FD_ZERO( &fds );
-                FD_SET( i_handle, &fds );
-
-                /* We'll wait 0.1 second if nothing happens */
-                timeout.tv_sec = 0;
-                timeout.tv_usec = 100000;
-
-            } while( ( i_ret = select( i_handle + 1, NULL, &fds, NULL,
-                                       &timeout ) ) == 0 ||
-#if defined( WIN32 ) || defined( UNDER_CE )
-                     ( i_ret < 0 && WSAGetLastError() == WSAEWOULDBLOCK ) );
-#else
-                     ( i_ret < 0 && errno == EINTR ) );
-#endif
-
-            if( i_ret < 0 )
-            {
-                msg_Warn( p_this, "cannot connect socket (select failed)" );
-                goto error;
-            }
-
-#if !defined( SYS_BEOS ) && !defined( UNDER_CE )
-            if( getsockopt( i_handle, SOL_SOCKET, SO_ERROR, (void*)&i_opt,
-                            &i_opt_size ) == -1 || i_opt != 0 )
-            {
-                msg_Warn( p_this, "cannot connect socket (SO_ERROR)" );
-                goto error;
-            }
-#endif
-        }
-        else
-        {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Warn( p_this, "cannot connect socket (%i)", WSAGetLastError());
-#else
-            msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
-#endif
-            goto error;
-        }
-    }
-
-    p_socket->i_handle = i_handle;
-    p_socket->i_mtu = 0; /* There is no MTU notion in TCP */
-    return VLC_SUCCESS;
-
-error:
-    close( i_handle );
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * ListenTCP: open a TCP passive socket (server-side)
- *****************************************************************************
- * psz_server_addr, i_server_port : address and port used for the bind()
- *   system call. If i_server_port == 0, 80 is used.
- * Other parameters are ignored.
- * This function returns -1 in case of error.
- *****************************************************************************/
-static int ListenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
-{
-    char * psz_server_addr = p_socket->psz_server_addr;
-    int i_server_port = p_socket->i_server_port;
-
-    int i_handle, i_dummy = 1;
-    struct sockaddr_in sock;
-
-    if( (i_handle = SocketTCP( p_this )) == -1 )
-        return VLC_EGENERIC;
-
-    if ( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
-                (void *)&i_dummy, sizeof( i_dummy ) ) == -1 )
-    {
-        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR)" );
-    }
-
-    /* Build remote address */
-    if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
-    {
-        msg_Dbg( p_this, "could not build local address" );
-        return VLC_EGENERIC;
-    }
-    
-    /* Bind the socket */
-    if( bind( i_handle, (struct sockaddr *) &sock, sizeof( sock )) == -1 )
-    {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Err( p_this, "cannot bind socket (%i)", WSAGetLastError());
-#else
-        msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
-#endif
-        goto error;
-    }
- 
-    /* Listen */
-    if( listen( i_handle, 100 ) == -1 )
-    {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Err( p_this, "cannot bring socket in listening mode (%i)",
-                 WSAGetLastError());
-#else
-        msg_Err( p_this, "cannot bring the socket in listening mode (%s)",
-                 strerror(errno) );
-#endif
-        goto error;
-    }
-
-    p_socket->i_handle = i_handle;
-    p_socket->i_mtu = 0; /* There is no MTU notion in TCP */
-    return VLC_SUCCESS;
-
-error:
-    close( i_handle );
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
  * NetOpen: wrapper around OpenUDP, ListenTCP and OpenTCP
  *****************************************************************************/
 static int NetOpen( vlc_object_t * p_this )
 {
     network_socket_t * p_socket = p_this->p_private;
 
-    if( p_socket->i_type == NETWORK_UDP )
-    {
-        return OpenUDP( p_this, p_socket );
-    }
-    else if( p_socket->i_type == NETWORK_TCP_PASSIVE )
-    {
-        return ListenTCP( p_this, p_socket );
-    }
-    else
-    {
-        return OpenTCP( p_this, p_socket );
-    }
+    return OpenUDP( p_this, p_socket );
 }
