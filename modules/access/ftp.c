@@ -4,7 +4,8 @@
  * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
- * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code
+ *          Rémi Denis-Courmont <rem # videolan.org> - EPSV support
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +84,7 @@ struct access_sys_t
     int        fd_cmd;
     int        fd_data;
     
-    vlc_bool_t b_epsv;
+    char       *psz_epsv_ip;
 };
 
 static int  ftp_SendCommand( access_t *, char *, ... );
@@ -118,6 +119,7 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( access_sys_t ) );
     p_sys->fd_cmd = -1;
     p_sys->fd_data = -1;
+    p_sys->psz_epsv_ip = NULL;
 
     /* *** Parse URL and get server addr/port and path *** */
     psz = p_access->psz_path;
@@ -228,13 +230,32 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "cannot request extended passive mode" );
         goto exit_error;
     }
-    if( ftp_ReadCommand( p_access, &i_answer, NULL ) != 2 )
+
+    if( ftp_ReadCommand( p_access, &i_answer, NULL ) == 2 )
     {
-        p_sys->b_epsv = VLC_FALSE;
-        msg_Warn( p_access, "Extended passive mode not supported" );
+        char hostaddr[NI_MAXHOST];
+        struct sockaddr_storage addr;
+        socklen_t len = sizeof (addr);
+
+        if( getpeername( p_sys->fd_cmd, (struct sockaddr *)&addr, &len ) )
+        {
+            msg_Err( p_access, "getpeername failed" );
+            goto exit_error;
+        }
+
+        i_answer = vlc_getnameinfo( p_this, (struct sockaddr *)&addr, len,
+                                    hostaddr, sizeof( hostaddr ), NULL, 0,
+                                    NI_NUMERICHOST );
+        if( i_answer )
+        {
+            msg_Err( p_access, "getnameinfo failed: %s",
+                     vlc_gai_strerror( i_answer ) );
+            goto exit_error;
+        }
+        p_sys->psz_epsv_ip = strdup( hostaddr );
     }
-    else
-        p_sys->b_epsv = VLC_TRUE;
+    if( p_sys->psz_epsv_ip == NULL )
+        msg_Info( p_access, "FTP Extended passive mode disabled" );
 
     /* binary mode */
     if( ftp_SendCommand( p_access, "TYPE I" ) < 0 ||
@@ -297,6 +318,8 @@ static void Close( vlc_object_t *p_this )
         ftp_ReadCommand( p_access, NULL, NULL );
     }
     net_Close( p_sys->fd_cmd );
+    if( p_sys->psz_epsv_ip != NULL )
+        free( p_sys->psz_epsv_ip );
 
     /* free memory */
     vlc_UrlClean( &p_sys->url );
@@ -512,7 +535,8 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     unsigned  a1, a2, a3, a4, p1, p2;
     int  i_port;
 
-    if( ( ftp_SendCommand( p_access, p_sys->b_epsv ? "EPSV" : "PASV" ) < 0 )
+    if( ( ftp_SendCommand( p_access, p_sys->psz_epsv_ip != NULL
+                                     ? "EPSV" : "PASV" ) < 0 )
      || ( ftp_ReadCommand( p_access, &i_answer, &psz_arg ) != 2 ) )
     {
         msg_Err( p_access, "cannot set passive mode" );
@@ -527,7 +551,8 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
         return VLC_EGENERIC;
     }
 
-    if( p_sys->b_epsv )
+    psz_ip = p_sys->psz_epsv_ip;
+    if( psz_ip != NULL )
     {
         char psz_fmt[7] = "(|||%u";
         psz_fmt[1] = psz_fmt[2] = psz_fmt[3] = psz_parser[1];
@@ -538,11 +563,6 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
             msg_Err( p_access, "cannot parse passive mode response" );
             return VLC_EGENERIC;
         }
-        /* FIXME: if psz_ip is a hostname/DNS to a cluster of FTP servers,
-         * this may fail because we'll end up on another server :(
-         * getpeername() + getnameinfo() should be used instead.
-         */
-        psz_ip = p_sys->url.psz_host;
     }
     else
     {
