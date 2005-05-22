@@ -2,7 +2,7 @@
  * common.h: common definitions
  * Collection of useful common types and macros definitions
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN
+ * Copyright (C) 1998-2005 VideoLAN
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
@@ -360,6 +360,8 @@ typedef struct pes_packet_t pes_packet_t;
 typedef struct network_socket_t network_socket_t;
 typedef struct virtual_socket_t v_socket_t;
 typedef struct iso639_lang_t iso639_lang_t;
+typedef struct sockaddr sockaddr;
+typedef struct addrinfo addrinfo;
 
 /* block */
 typedef struct block_t      block_t;
