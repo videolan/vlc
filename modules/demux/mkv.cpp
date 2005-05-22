@@ -1616,8 +1616,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
 {
     pp_block = NULL;
-    *pi_ref1  = -1;
-    *pi_ref2  = -1;
+    *pi_ref1  = 0;
+    *pi_ref2  = 0;
 
     for( ;; )
     {
@@ -1637,7 +1637,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
             if( i_index > 0 && idx.i_time == -1 )
             {
                 idx.i_time        = (*pp_block).GlobalTimecode() / (mtime_t)1000;
-                idx.b_key         = *pi_ref1 == -1 ? VLC_TRUE : VLC_FALSE;
+                idx.b_key         = *pi_ref1 == 0 ? VLC_TRUE : VLC_FALSE;
             }
 #undef idx
             return VLC_SUCCESS;
@@ -1728,13 +1728,13 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
                 KaxReferenceBlock &ref = *(KaxReferenceBlock*)el;
 
                 ref.ReadData( es.I_O() );
-                if( *pi_ref1 == -1 )
+                if( *pi_ref1 == 0 )
                 {
-                    *pi_ref1 = int64( ref );
+                    *pi_ref1 = int64( ref ) * cluster->GlobalTimecodeScale();
                 }
                 else
                 {
-                    *pi_ref2 = int64( ref );
+                    *pi_ref2 = int64( ref ) * cluster->GlobalTimecodeScale();
                 }
             }
             else if( MKV_IS_ID( el, KaxClusterSilentTrackNumber ) )
@@ -1866,8 +1866,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
         else
         {
-            p_block->i_dts = i_pts;
-            p_block->i_pts = 0;
+            p_block->i_pts = i_pts;
+            p_block->i_dts = p_sys->i_pts;
         }
 
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
@@ -3168,14 +3168,20 @@ static int Demux( demux_t *p_demux)
             }
         }
 
-        p_sys->i_pts = p_sys->i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
+        mtime_t i_time = block->GlobalTimecode();
+        if ( i_block_ref1 != 0 )
+            i_time += min( 0, i_block_ref1 );
+        if ( i_block_ref2 != 0 )
+            i_time += min( 0, i_block_ref2 );
+
+        p_sys->i_pts = (p_sys->i_chapter_time + i_time) / (mtime_t) 1000;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
 
-        if( p_sys->i_pts >= p_sys->i_start_pts  )
+        if( ( (p_sys->i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000 ) >= p_sys->i_start_pts  )
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
                 i_return = 1;
@@ -3201,7 +3207,7 @@ static int Demux( demux_t *p_demux)
             continue;
         }
 
-        BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration );
+        BlockDecode( p_demux, block, (p_sys->i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000, i_block_duration );
 
         delete block;
         i_block_count++;
@@ -4060,6 +4066,9 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Video" );
             tk->f_fps = 0.0;
 
+            tk->fmt.video.i_frame_rate_base = (unsigned int)(tk->i_default_duration / 1000);
+            tk->fmt.video.i_frame_rate = 1000000;     
+            
             for( j = 0; j < tkv->ListSize(); j++ )
             {
                 EbmlElement *l = (*tkv)[j];
@@ -4137,11 +4146,6 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             }
             if ( tk->fmt.video.i_visible_height && tk->fmt.video.i_visible_width )
                 tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * tk->fmt.video.i_visible_width / tk->fmt.video.i_visible_height;
-            if( tk->f_fps )
-            {
-                tk->fmt.video.i_frame_rate = (unsigned int)(tk->f_fps * 1001);
-                tk->fmt.video.i_frame_rate_base = 1001;
-            }
         }
         else  if( MKV_IS_ID( l, KaxTrackAudio ) )
         {
@@ -5296,7 +5300,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
             }
         }
 
-        sys.i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
+        sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
 
         if( i_track < tracks.size() )
         {
@@ -5307,7 +5311,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
             }
             else if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
             {
-                if( i_block_ref1 == -1 && tracks[i_track]->b_search_keyframe )
+                if( i_block_ref1 == 0 && tracks[i_track]->b_search_keyframe )
                 {
                     tracks[i_track]->b_search_keyframe = VLC_FALSE;
                     i_track_skipping--;
