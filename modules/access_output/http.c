@@ -30,7 +30,6 @@
 #include <vlc/sout.h>
 
 #include "vlc_httpd.h"
-#include "vlc_tls.h"
 
 #define FREE( p ) if( p ) { free( p); (p) = NULL; }
 
@@ -130,7 +129,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys;
-    tls_server_t            *p_tls;
 
     char                *psz_parser, *psz_name;
 
@@ -140,6 +138,8 @@ static int Open( vlc_object_t *p_this )
     char                *psz_user = NULL;
     char                *psz_pwd = NULL;
     char                *psz_mime = NULL;
+    const char          *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
+                        *psz_crl = NULL;
     vlc_value_t         val;
 
     if( !( p_sys = p_access->p_sys =
@@ -200,62 +200,28 @@ static int Open( vlc_object_t *p_this )
     /* SSL support */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "https" ) )
     {
-        const char *psz_cert, *psz_key;
         psz_cert = config_GetPsz( p_this, SOUT_CFG_PREFIX"cert" );
         psz_key = config_GetPsz( p_this, SOUT_CFG_PREFIX"key" );
-
-        p_tls = tls_ServerCreate( p_this, psz_cert, psz_key );
-        if ( p_tls == NULL )
-        {
-            msg_Err( p_this, "TLS initialization error" );
-            free( psz_file_name );
-            free( psz_name );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-
-        psz_cert = config_GetPsz( p_this, SOUT_CFG_PREFIX"ca" );
-        if ( ( psz_cert != NULL) && tls_ServerAddCA( p_tls, psz_cert ) )
-        {
-            msg_Err( p_this, "TLS CA error" );
-            tls_ServerDelete( p_tls );
-            free( psz_file_name );
-            free( psz_name );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-
-        psz_cert = config_GetPsz( p_this, SOUT_CFG_PREFIX"crl" );
-        if ( ( psz_cert != NULL) && tls_ServerAddCRL( p_tls, psz_cert ) )
-        {
-            msg_Err( p_this, "TLS CRL error" );
-            tls_ServerDelete( p_tls );
-            free( psz_file_name );
-            free( psz_name );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
+        psz_ca = config_GetPsz( p_this, SOUT_CFG_PREFIX"ca" );
+        psz_crl = config_GetPsz( p_this, SOUT_CFG_PREFIX"crl" );
 
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_SSL_PORT;
     }
     else
     {
-        p_tls = NULL;
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_PORT;
     }
 
     p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_access),
                                             psz_bind_addr, i_bind_port,
-                                            p_tls );
+                                            psz_cert, psz_key, psz_ca,
+                                            psz_crl );
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_access, "cannot listen on %s:%d",
                  psz_bind_addr, i_bind_port );
-
-        if( p_tls != NULL )
-            tls_ServerDelete( p_tls );
         free( psz_name );
         free( psz_file_name );
         free( p_sys );

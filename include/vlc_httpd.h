@@ -112,8 +112,8 @@ typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t
 */
 
 /* create a new host */
-VLC_EXPORT( httpd_host_t *, httpd_HostNew, ( vlc_object_t *, char *psz_host, int i_port ) );
-VLC_EXPORT( httpd_host_t *, httpd_TLSHostNew, ( vlc_object_t *, char *, int, tls_server_t * ) );
+VLC_EXPORT( httpd_host_t *, httpd_HostNew, ( vlc_object_t *, const char *psz_host, int i_port ) );
+VLC_EXPORT( httpd_host_t *, httpd_TLSHostNew, ( vlc_object_t *, const char *, int, const char *, const char *, const char *, const char * ) );
 
 /* delete a host */
 VLC_EXPORT( void,           httpd_HostDelete, ( httpd_host_t * ) );

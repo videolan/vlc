@@ -871,21 +871,26 @@ void httpd_StreamDelete( httpd_stream_t *stream )
 static void httpd_HostThread( httpd_host_t * );
 
 /* create a new host */
-httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host,
+httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
                              int i_port )
 {
-    return httpd_TLSHostNew( p_this, psz_host, i_port, NULL );
+    return httpd_TLSHostNew( p_this, psz_host, i_port, NULL, NULL, NULL, NULL
+                           );
 }
 
-httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
-                                int i_port, tls_server_t *p_tls )
+httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
+                                int i_port,
+                                const char *psz_cert, const char *psz_key,
+                                const char *psz_ca, const char *psz_crl )
 {
     httpd_t      *httpd;
     httpd_host_t *host;
+    tls_server_t *p_tls;
+    char *psz_host;
     vlc_value_t  lockval;
     int i;
 
-    psz_host = strdup( psz_host );
+    psz_host = strdup( psz_hostname );
     if( psz_host == NULL )
     {
         msg_Err( p_this, "memory error" );
@@ -903,6 +908,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
         if( ( httpd = vlc_object_create( p_this, VLC_OBJECT_HTTPD ) ) == NULL )
         {
             vlc_mutex_unlock( lockval.p_address );
+            free( psz_host );
             return NULL;
         }
 
@@ -918,12 +924,10 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
     {
         host = httpd->host[i];
 
-        /* FIXME : Cannot re-use host if it uses TLS/SSL */
-        if( httpd->host[i]->p_tls != NULL )
-            continue;
-
-        if( ( host->i_port != i_port )
-         || strcmp( host->psz_hostname, psz_host ) )
+        /* cannot mix TLS and non-TLS hosts */
+        if( ( ( httpd->host[i]->p_tls != NULL ) != ( psz_cert != NULL ) )
+         || ( host->i_port != i_port )
+         || strcmp( host->psz_hostname, psz_hostname ) )
             continue;
 
         /* yep found */
@@ -932,6 +936,33 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
         vlc_mutex_unlock( lockval.p_address );
         return host;
     }
+
+    host = NULL;
+
+    /* determine TLS configuration */
+    if ( psz_cert != NULL )
+    {
+        p_tls = tls_ServerCreate( p_this, psz_cert, psz_key );
+        if ( p_tls == NULL )
+        {
+            msg_Err( p_this, "TLS initialization error" );
+            goto error;
+        }
+
+        if ( ( psz_ca != NULL) && tls_ServerAddCA( p_tls, psz_ca ) )
+        {
+            msg_Err( p_this, "TLS CA error" );
+            goto error;
+        }
+
+        if ( ( psz_crl != NULL) && tls_ServerAddCRL( p_tls, psz_crl ) )
+        {
+            msg_Err( p_this, "TLS CRL error" );
+            goto error;
+        }
+    }
+    else
+        p_tls = NULL;
 
     /* create the new host */
     host = vlc_object_create( p_this, sizeof( httpd_host_t ) );
@@ -971,6 +1002,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, char *psz_host,
     return host;
 
 error:
+    free( psz_host );
     if( httpd->i_host <= 0 )
     {
         vlc_object_release( httpd );
@@ -985,6 +1017,9 @@ error:
         vlc_mutex_destroy( &host->lock );
         vlc_object_destroy( host );
     }
+
+    if( p_tls != NULL )
+        tls_ServerDelete( p_tls );
 
     return NULL;
 }
