@@ -1,7 +1,7 @@
 /*****************************************************************************
  * udp.c
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -239,7 +239,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->b_error= 0;
     p_sys->p_thread->p_fifo = block_FifoNew( p_access );
 
-    socket_desc.i_type = NETWORK_UDP;
     socket_desc.psz_server_addr = psz_dst_addr;
     socket_desc.i_server_port   = i_dst_port;
     socket_desc.psz_bind_addr   = "";
