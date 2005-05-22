@@ -150,15 +150,27 @@ int playlist_AddSDModules( playlist_t *p_playlist, char *psz_modules )
     {
         char *psz_parser = psz_modules;
         char *psz_next;
-
+        if( psz_parser && *psz_parser &&
+            strstr( psz_parser, ",") && !strstr(psz_parser, ":" ) )
+        {
+            msg_Info( p_playlist, "Warning: you are using a deprecated syntax "
+                                  "for services-discovery." );
+            msg_Info( p_playlist, "You must now use ':' as separator instead "
+                                  "of ','." );
+        }
         while( psz_parser && *psz_parser )
         {
-            while( *psz_parser == ' ' || *psz_parser == ':' )
+            while( *psz_parser == ' ' || *psz_parser == ':' ||
+                   *psz_parser == ',' )
             {
                 psz_parser++;
             }
 
             if( (psz_next = strchr( psz_parser, ':' ) ) )
+            {
+                *psz_next++ = '\0';
+            }
+            else if( ( psz_next = strchr( psz_parser, ',' ) ) )
             {
                 *psz_next++ = '\0';
             }

@@ -678,11 +678,19 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     psz_parser = psz_modules;
+    if( psz_parser && *psz_parser &&
+       strstr( psz_parser, ",") && !strstr(psz_parser, ":" ) )
+    {
+        msg_Info( p_vlc, "Warning: you are using a deprecated syntax for "
+                         "extraintf / control." );
+        msg_Info( p_vlc, "You must now use ':' as separator instead of ','." );
+    }
     while ( psz_parser && *psz_parser )
     {
         char *psz_module, *psz_temp;
         psz_module = psz_parser;
         psz_parser = strchr( psz_module, ':' );
+        if( !psz_parser ) psz_parser = strchr( psz_module, ',' );
         if ( psz_parser )
         {
             *psz_parser = '\0';

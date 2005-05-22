@@ -202,6 +202,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     {
         char *psz_parser = psz_filters;
         char *psz_next;
+
+        if( strchr( psz_filters, ',' ) && !strchr( psz_filters, ':' ) )
+        {
+            msg_Info( p_aout, "Warning: you are using a deprecated syntax for "
+                              "audio-filter / audio-visual." );
+            msg_Info( p_aout, "You must now use ':' as separator instead of "
+                              "','." );
+        }
         while( psz_parser && *psz_parser )
         {
             aout_filter_t * p_filter;
@@ -212,11 +220,16 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 break;
             }
 
-            while( *psz_parser == ' ' && *psz_parser == ':' )
+            while( *psz_parser == ' ' || *psz_parser == ':' ||
+                   *psz_parser == ',')
             {
                 psz_parser++;
             }
             if( ( psz_next = strchr( psz_parser , ':'  ) ) )
+            {
+                *psz_next++ = '\0';
+            }
+            else if( ( psz_next = strchr( psz_parser , ','  ) ) )
             {
                 *psz_next++ = '\0';
             }

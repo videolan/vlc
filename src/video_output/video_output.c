@@ -357,6 +357,16 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_vout, "vout-filter", &val );
         p_vout->psz_filter_chain = val.psz_string;
+
+        if( p_vout->psz_filter_chain && *p_vout->psz_filter_chain &&
+            strchr( p_vout->psz_filter_chain, ',' ) &&
+            !strchr( p_vout->psz_filter_chain, ':') )
+        {
+            msg_Info( p_vout, "Warning: you are using a deprecated syntax for "
+                             "vout-filter." );
+            msg_Info( p_vout, "You must now use ':' as separator instead of "
+                             "','." );
+        }
     }
     else
     {
@@ -364,6 +374,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         char *psz_end;
 
         psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
+        if( !psz_end ) psz_end = strchr(
+                        ((vout_thread_t *)p_parent)->psz_filter_chain, ',' );
         if( psz_end && *(psz_end+1) )
             p_vout->psz_filter_chain = strdup( psz_end+1 );
         else p_vout->psz_filter_chain = NULL;
@@ -383,6 +395,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         char *psz_end;
 
         psz_end = strchr( p_vout->psz_filter_chain, ':' );
+        if( !psz_end ) psz_end = strchr( p_vout->psz_filter_chain, ',' );
         if( psz_end )
             psz_plugin = strndup( p_vout->psz_filter_chain,
                                   psz_end - p_vout->psz_filter_chain );
