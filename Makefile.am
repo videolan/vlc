@@ -395,6 +395,7 @@ SOURCES_libvlc_common = \
 	src/misc/variables.c \
 	src/misc/error.c \
 	src/misc/net.c \
+	src/misc/getaddrinfo.c \
 	src/misc/vlm.c \
 	src/misc/xml.c \
 	src/extras/libc.c \
