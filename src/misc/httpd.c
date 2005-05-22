@@ -1173,6 +1173,12 @@ socket_error:
     return host;
 
 error:
+    if( httpd->i_host <= 0 )
+    {
+        vlc_object_release( httpd );
+        vlc_object_detach( httpd );
+        vlc_object_destroy( httpd );
+    }
     vlc_mutex_unlock( lockval.p_address );
 
     if( fd != -1 )
@@ -1184,8 +1190,6 @@ error:
         vlc_object_destroy( host );
     }
 
-    /* TODO destroy no more used httpd TODO */
-    vlc_object_release( httpd );
     return NULL;
 }
 
@@ -1200,8 +1204,6 @@ void httpd_HostDelete( httpd_host_t *host )
 
     var_Get( httpd->p_libvlc, "httpd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-
-    vlc_object_release( httpd );
 
     host->i_ref--;
     if( host->i_ref > 0 )
@@ -1244,6 +1246,7 @@ void httpd_HostDelete( httpd_host_t *host )
     if( httpd->i_host <= 0 )
     {
         msg_Info( httpd, "httpd doesn't reference any host, deleting" );
+        vlc_object_release( httpd );
         vlc_object_detach( httpd );
         vlc_object_destroy( httpd );
     }
