@@ -156,3 +156,6 @@
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+#define HAVE_STRUCT_ADDRINFO 1
+#define HAVE_DYNAMIC_PLUGINS 1

@@ -347,7 +347,7 @@ int config_AutoSaveConfigFile( vlc_object_t * );
         i_config++; \
     if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
         (i_config+11) * sizeof(module_config_t)); \
-    {   static module_config_t tmp={}; \
+    {   static module_config_t tmp; \
         p_config[ i_config ] = tmp; \
         p_config[ i_config ].i_type = p_config[ i_config -1 ].i_type; \
         p_config[ i_config ].psz_name = name; \
