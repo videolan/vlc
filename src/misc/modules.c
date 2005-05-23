@@ -121,7 +121,7 @@
 
 #if defined( WIN32 ) || defined( UNDER_CE )
     /* Avoid name collisions */
-#   define LoadModule(a,b,c) _LoadModule(a,b,c)
+#   define LoadModule(a,b,c) LoadVlcModule(a,b,c)
 #endif
 
 /*****************************************************************************

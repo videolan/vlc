@@ -273,6 +273,8 @@ static inline char *vlc_b64_encode( char *src )
 #define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
+VLC_EXPORT( int, net_ConvertIPv4, ( uint32_t *p_addr, const char * psz_address ) );
+
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
 
