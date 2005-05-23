@@ -911,7 +911,10 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Check for subpictures to display
          */
-        p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date );
+        if( display_date > 0 )
+        {
+            p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date );
+        }
 
         /*
          * Perform rendering
