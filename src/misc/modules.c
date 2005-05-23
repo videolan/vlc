@@ -1833,6 +1833,7 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
         LOAD_STRING( p_module->p_config[i].psz_name );
         LOAD_STRING( p_module->p_config[i].psz_text );
         LOAD_STRING( p_module->p_config[i].psz_longtext );
+        LOAD_STRING( p_module->p_config[i].psz_current );
         LOAD_STRING( p_module->p_config[i].psz_value_orig );
 
         p_module->p_config[i].psz_value =
@@ -2095,6 +2096,7 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
         SAVE_STRING( p_module->p_config[i].psz_name );
         SAVE_STRING( p_module->p_config[i].psz_text );
         SAVE_STRING( p_module->p_config[i].psz_longtext );
+        SAVE_STRING( p_module->p_config[i].psz_current );
         SAVE_STRING( p_module->p_config[i].psz_value_orig );
 
         if( p_module->p_config[i].i_list )
