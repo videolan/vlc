@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
 dnl $Id$
  
-AC_INIT(vlc,0.8.3)
+AC_INIT(vlc,0.8.3-svn)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Janus"
