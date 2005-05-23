@@ -457,7 +457,7 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         }
     }
     
-    freeaddrinfo( res );
+    vlc_freeaddrinfo( res );
 
     return pi_handles;
 }

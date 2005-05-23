@@ -187,7 +187,7 @@ case "${target_os}" in
     VLC_ADD_CXXFLAGS([beos],[])
     VLC_ADD_LDFLAGS([vlc beos],[-lbe])
     VLC_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
-    VLC_ADD_LDFLAGS([access_file access_mms access_output_udp telnet netsync sap ipv4 vlc],[-lnet])
+    VLC_ADD_LDFLAGS([access_file access_ftp access_mms access_output_udp telnet netsync sap ipv4 vlc],[-lnet])
 
     dnl Ugly check for Zeta
     if test -f /boot/beos/system/lib/libzeta.so; then

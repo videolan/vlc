@@ -46,6 +46,12 @@
 # include <netdb.h>
 #endif
 
+#ifdef SYS_BEOS
+#define NO_ADDRESS  NO_DATA
+#define PF_INET     AF_INET
+#define INADDR_NONE 0xFFFFFFFF
+#define AF_UNSPEC   0
+#endif
 
 #define _NI_MASK  (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
                    NI_DGRAM)
@@ -202,6 +208,8 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
         if (serv != NULL)
         {
             struct servent *sent = NULL;
+
+#ifndef SYS_BEOS /* No getservbyport() */
             int solved = 0;
 
             /* service name resolution */
@@ -218,6 +226,9 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
                     solved = 1;
                 }
             }
+#else
+            sent = NULL;
+#endif
             if (sent == NULL)
             {
                 snprintf (serv, servlen, "%u",
@@ -289,7 +300,7 @@ makeaddrinfo (int af, int type, int proto,
         }
     }
     /* failsafe */
-    freeaddrinfo (res);
+    vlc_freeaddrinfo (res);
     return NULL;
 }
 
@@ -352,7 +363,9 @@ __getaddrinfo (const char *node, const char *service,
                 protocol = IPPROTO_UDP;
                 break;
 
+#ifndef SYS_BEOS
             case SOCK_RAW:
+#endif
             case 0:
                 break;
 
@@ -544,10 +557,12 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         if( val.b_bool )
             hints.ai_family = AF_INET;
 
+#ifdef HAVE_INET_PTON
         var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv6", &val );
         if( val.b_bool )
             hints.ai_family = AF_INET6;
+#endif
     }
 
     /* 
