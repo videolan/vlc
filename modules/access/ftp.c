@@ -31,6 +31,13 @@
 #include <vlc/input.h>
 
 #include "network.h"
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif defined( WIN32 )
+#   include <winsock2.h>
+#else
+#   include <sys/socket.h>
+#endif
 
 /*****************************************************************************
  * Module descriptor
