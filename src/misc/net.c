@@ -81,8 +81,9 @@ static int SocksHandshakeTCP( vlc_object_t *,
  * net_ConvertIPv4:
  *****************************************************************************
  * Open a TCP connection and return a handle
+ * FIXME: not thread-safe, should use vlc_getaddrinfo instead
  *****************************************************************************/
-int net_ConvertIPv4( uint32_t *p_addr, const char * psz_address )
+static int net_ConvertIPv4( uint32_t *p_addr, const char * psz_address )
 {
     /* Reset struct */
     if( !*psz_address )
