@@ -2005,7 +2005,7 @@ then
         VLC_ADD_PLUGINS([stream_out_switcher])
     fi
     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
+    VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
   else
     AC_ARG_WITH(ffmpeg-mp3lame,
       [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
@@ -2040,10 +2040,10 @@ then
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
+        VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[-lavcodec])
         if test "${enable_sout}" != "no"; then
             VLC_ADD_BUILTINS([stream_out_switcher])
-        fi
-        VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])],
+        fi],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         AC_DEFINE(HAVE_LIBAVFORMAT, 1,
@@ -2111,7 +2111,7 @@ then
       if test "${enable_sout}" != "no"; then
           VLC_ADD_BUILTINS([stream_out_switcher])
       fi
-      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
+      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
       VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
 
       if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
