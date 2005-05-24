@@ -62,6 +62,9 @@
 #ifndef INADDR_NONE
 #   define INADDR_NONE 0xFFFFFFFF
 #endif
+#ifndef PF_INET
+#   define PF_INET AF_INET
+#endif
 
 static int SocksNegociate( vlc_object_t *, int fd, int i_socks_version,
                            char *psz_socks_user, char *psz_socks_passwd );
@@ -69,46 +72,6 @@ static int SocksHandshakeTCP( vlc_object_t *,
                               int fd, int i_socks_version,
                               char *psz_socks_user, char *psz_socks_passwd,
                               const char *psz_host, int i_port );
-
-/*****************************************************************************
- * net_ConvertIPv4:
- *****************************************************************************
- * Open a TCP connection and return a handle
- * FIXME: not thread-safe, should use vlc_getaddrinfo instead
- *****************************************************************************/
-static int net_ConvertIPv4( uint32_t *p_addr, const char * psz_address )
-{
-    /* Reset struct */
-    if( !*psz_address )
-    {
-        *p_addr = INADDR_ANY;
-    }
-    else
-    {
-        struct hostent *p_hostent;
-
-        /* Try to convert address directly from in_addr - this will work if
-         * psz_address is dotted decimal. */
-#ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_address, (struct in_addr *)p_addr ) )
-#else
-        *p_addr = inet_addr( psz_address );
-        if( *p_addr == INADDR_NONE )
-#endif
-        {
-            /* We have a fqdn, try to find its address */
-            if ( (p_hostent = gethostbyname( psz_address )) == NULL )
-            {
-                return VLC_EGENERIC;
-            }
-
-            /* Copy the first address of the host in the socket address */
-            memcpy( p_addr, p_hostent->h_addr_list[0],
-                    p_hostent->h_length );
-        }
-    }
-    return VLC_SUCCESS;
-}
 
 /*****************************************************************************
  * __net_OpenTCP:
@@ -1131,16 +1094,20 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
     if( i_socks_version == 4 )
     {
-        uint32_t addr;
+        struct addrinfo hints = { 0 }, *p_res;
 
         /* v4 only support ipv4 */
-        if( net_ConvertIPv4( &addr, psz_host ) )
+        hints.ai_family = PF_INET;
+        if( vlc_getaddrinfo( p_obj, psz_host, NULL, &hints, &p_res ) )
             return VLC_EGENERIC;
 
         buffer[0] = i_socks_version;
         buffer[1] = 0x01;               /* CONNECT */
         SetWBE( &buffer[2], i_port );   /* Port */
-        memcpy( &buffer[4], &addr, 4 ); /* Addresse */
+        memcpy( &buffer[4],             /* Address */
+                &((struct sockaddr_in *)(p_res->ai_addr))->sin_addr, 4 );
+        vlc_freeaddrinfo( p_res );
+
         buffer[8] = 0;                  /* Empty user id */
 
         if( net_Write( p_obj, fd, NULL, buffer, 9 ) != 9 )
