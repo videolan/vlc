@@ -398,9 +398,7 @@ AC_CHECK_FUNCS([getaddrinfo getnameinfo gai_strerror])
 AH_TEMPLATE(HAVE_ADDRINFO, [Define to `1' if <netdb.h> defines struct addrinfo.])
 AC_CHECK_TYPES([struct addrinfo],[AC_DEFINE(HAVE_ADDRINFO)],,
 [#include <sys/types.h>
-#if defined( UNDER_CE )
-# include <winsock.h>
-#elif defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
 # include <winsock2.h>
 # include <ws2tcpip.h>
 #else
