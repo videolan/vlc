@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include "network.h"
 
 #include <stddef.h> /* size_t */
 #include <string.h> /* strncpy(), strlen(), memcpy(), memset(), strchr() */
@@ -37,14 +36,23 @@
 #endif
 #include <errno.h>
 
-#if defined (UNDER_CE)
-# include <winsock.h>
-#elif defined WIN32
-# include <winsock2.h>
-# include <ws2tcpip.h>
+#if defined( WIN32 ) || defined( UNDER_CE )
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
 #else
-# include <netdb.h>
+#   include <sys/socket.h>
+#   include <netinet/in.h>
+#   ifdef HAVE_ARPA_INET_H
+#       include <arpa/inet.h>
+#   endif
+#   include <netdb.h>
 #endif
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
+#include "network.h"
 
 #ifdef SYS_BEOS
 #define NO_ADDRESS  NO_DATA
@@ -597,28 +605,30 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         service = "0";
 
 #ifdef WIN32
-    typedef int (CALLBACK * GETADDRINFO) ( const char *, const char *,
-                                           const struct addrinfo *,
-                                           struct addrinfo ** );
-    HINSTANCE wship6_module;
-    GETADDRINFO ws2_getaddrinfo;
-     
-    wship6_module = LoadLibrary( "wship6.dll" );
-    if( wship6_module != NULL )
     {
-        ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( wship6_module,
-                                                       "getaddrinfo" );
-
-        if( ws2_getaddrinfo != NULL )
+        typedef int (CALLBACK * GETADDRINFO) ( const char *, const char *,
+                                            const struct addrinfo *,
+                                            struct addrinfo ** );
+        HINSTANCE wship6_module;
+        GETADDRINFO ws2_getaddrinfo;
+         
+        wship6_module = LoadLibrary( "wship6.dll" );
+        if( wship6_module != NULL )
         {
-            int i_ret;
+            ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( wship6_module,
+                                                        "getaddrinfo" );
 
-            i_ret = ws2_getaddrinfo( psz_node, service, &hints, res );
-            FreeLibrary( wship6_module ); /* is this wise ? */
-            return i_ret;
+            if( ws2_getaddrinfo != NULL )
+            {
+                int i_ret;
+
+                i_ret = ws2_getaddrinfo( psz_node, service, &hints, res );
+                FreeLibrary( wship6_module ); /* is this wise ? */
+                return i_ret;
+            }
+
+            FreeLibrary( wship6_module );
         }
-
-        FreeLibrary( wship6_module );
     }
 #endif
 #if HAVE_GETADDRINFO
