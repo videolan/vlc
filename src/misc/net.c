@@ -38,14 +38,9 @@
 #    include <sys/time.h>
 #endif
 
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#elif defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
 #else
 #   include <sys/socket.h>
 #   include <netinet/in.h>
@@ -57,8 +52,6 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
 #endif
 
 #include "network.h"
