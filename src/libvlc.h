@@ -557,7 +557,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define SOUT_AUDIO_TEXT N_("Enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
-    "This allows you to choose if the video stream should be redirected to " \
+    "This allows you to choose if the audio stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
 #define SOUT_KEEP_TEXT N_("Keep stream output open" )
