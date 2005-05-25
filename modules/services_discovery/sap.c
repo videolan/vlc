@@ -4,7 +4,7 @@
  * Copyright (C) 2004-2005 VideoLAN
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,8 +66,11 @@
 #define SAP_V4_LINK_ADDRESS     "224.0.0.255"
 #define ADD_SESSION 1
 
-#define IPV6_ADDR_1 "FF0"  /* Scope is inserted between them */
-#define IPV6_ADDR_2 "::2:7FFE"
+#define SAP_V6_1 "FF0"
+/* Scope is inserted between them */
+#define SAP_V6_2 "::2:7FFE"
+/* See RFC3513 for list of valid scopes */
+static const char ipv6_scopes[] = "12456789ABCDE";
 
 
 /*****************************************************************************
@@ -122,8 +125,6 @@ vlc_module_begin();
                SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, VLC_TRUE );
     add_bool( "sap-ipv6", 1 , NULL,
               SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, VLC_TRUE );
-    add_string( "sap-ipv6-scope", "8" , NULL,
-                SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
     add_integer( "sap-timeout", 1800, NULL,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-parse", 1 , NULL,
@@ -315,22 +316,14 @@ static int Open( vlc_object_t *p_this )
     }
     if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
     {
-        /* [ + 8x4+7*':' + ] */
-        char psz_address[42];
-        char c_scope;
-        char *psz_scope = var_CreateGetString( p_sd, "sap-ipv6-scope" );
+        char psz_address[] = SAP_V6_1"0"SAP_V6_2;
+        const char *c_scope;
 
-        if( psz_scope == NULL || *psz_scope == '\0')
+        for( c_scope = ipv6_scopes; *c_scope; c_scope++ )
         {
-            c_scope = '8';
+            psz_address[sizeof(SAP_V6_1) - 1] = *c_scope;
+            InitSocket( p_sd, psz_address, SAP_PORT );
         }
-        else
-        {
-            c_scope = psz_scope[0];
-        }
-        snprintf( psz_address, 42, "[%s%c%s]", IPV6_ADDR_1, c_scope,
-                                               IPV6_ADDR_2 );
-        InitSocket( p_sd, psz_address, SAP_PORT );
     }
 
     psz_addr = var_CreateGetString( p_sd, "sap-addr" );
