@@ -596,14 +596,13 @@ msg_Dbg( p_aout, "inNumberFrames: %d", inNumberFrames);
     p_sys->clock_diff += mdate();
 
 
-    current_date = (mtime_t) p_sys->clock_diff + mdate() + 
-                     (mtime_t) ( 1000000 * 1 );
+    current_date = (mtime_t) p_sys->clock_diff + mdate();
 
     p_aout->output.i_nb_samples = inNumberFrames;
 
 msg_Dbg( p_aout, "start audio packet BADABOEM");
 #define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i'))
-        p_buffer = aout_OutputNextBuffer( p_aout,  mdate() + (mtime_t) ( 1000000 * 1 ), VLC_FALSE );
+    p_buffer = aout_OutputNextBuffer( p_aout, mdate(), VLC_FALSE );
 #undef B_SPDI
 
 
