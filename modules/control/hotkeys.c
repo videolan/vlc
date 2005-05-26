@@ -721,10 +721,11 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
                     VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         if( p_playlist->status.p_item )
         {
-            val.psz_string = strdup( p_playlist->status.p_item->input.psz_uri );
-            var_Set( p_intf, psz_bookmark_name, val );
+            config_PutPsz( p_intf, psz_bookmark_name, 
+                           p_playlist->status.p_item->input.psz_uri);
             msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
-                      val.psz_string );
+                           p_playlist->status.p_item->input.psz_uri);
+            config_SaveConfigFile( p_intf, "hotkeys" );
         }
         vlc_object_release( p_playlist );
     }
