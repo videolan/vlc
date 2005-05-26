@@ -391,10 +391,11 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         video_format_t fmt_in = {0}, fmt_out = {0};
         picture_t *p_converted;
 
-        if ( p_es->b_empty || p_es->p_picture == NULL )
+        if ( p_es->b_empty )
             continue;
 
-        if ( p_es->p_picture->date + p_sys->i_delay < date )
+        while ( p_es->p_picture != NULL
+                 && p_es->p_picture->date + p_sys->i_delay < date )
         {
             if ( p_es->p_picture->p_next != NULL )
             {
@@ -409,13 +410,19 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                 p_es->p_picture->pf_release( p_es->p_picture );
                 p_es->p_picture = NULL;
                 p_es->pp_last = &p_es->p_picture;
-                continue;
+                break;
             }
             else
+            {
                 msg_Dbg( p_filter, "too late picture for %s (" I64Fd ")",
                          p_es->psz_id,
                          date - p_es->p_picture->date - p_sys->i_delay );
+                break;
+            }
         }
+
+        if ( p_es->p_picture == NULL )
+            continue;
 
         if ( p_sys->i_order_length == 0 )
         {
