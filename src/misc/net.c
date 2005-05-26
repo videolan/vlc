@@ -39,6 +39,9 @@
 #endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
+#   if defined(UNDER_CE) && defined(sockaddr_storage)
+#       undef sockaddr_storage
+#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #else
@@ -659,8 +662,8 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
                          "Increase the mtu size (--mtu option)" );
                 i_total += i_data;
             }
-            else
-                msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
+            else if( WSAGetLastError() == WSAEINTR ) continue;
+            else msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
 #else
             /* EAGAIN only happens with p_vs (SSL) and it's not an error */
             if( errno != EAGAIN )
@@ -745,8 +748,7 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
                 msg_Err( p_this, "recv() failed. "
                          "Increase the mtu size (--mtu option)" );
             }
-            else
-                msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
+            else msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
 #else
             msg_Err( p_this, "recv failed (%s)", strerror(errno) );
 #endif
@@ -826,9 +828,8 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
                         msg_Err( p_this, "recv() failed. "
                              "Increase the mtu size (--mtu option)" );
                     }
-                    else
-                        msg_Err( p_this, "recv failed (%i)",
-                                        WSAGetLastError() );
+                    else msg_Err( p_this, "recv failed (%i)",
+                                  WSAGetLastError() );
 #else
                      msg_Err( p_this, "recv failed (%s)", strerror(errno) );
 #endif
@@ -1170,5 +1171,3 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
     return VLC_SUCCESS;
 }
-
-

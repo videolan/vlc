@@ -37,6 +37,9 @@
 #include <errno.h>
 
 #if defined( WIN32 ) || defined( UNDER_CE )
+#   if defined(UNDER_CE) && defined(sockaddr_storage)
+#       undef sockaddr_storage
+#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #else
