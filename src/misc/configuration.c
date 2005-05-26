@@ -1661,8 +1661,9 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
         /* Internal error: unknown option */
         if( !b_ignore_errors )
         {
-            fprintf( stderr, "%s: unknown option ",
-                             p_this->p_vlc->psz_object_name );
+            fprintf( stderr, "%s: unknown option"
+                     " or missing mandatory argument ",
+                     p_this->p_vlc->psz_object_name );
             if( optopt )
             {
                 fprintf( stderr, "`-%c'\n", optopt );
