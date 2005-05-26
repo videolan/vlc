@@ -22,7 +22,7 @@ Getting the right compiler tools
 ================================
 
 You will need to download our wince gcc cross-compiler package:
-http://www.videolan.org/pub/testing/wince/wince-arm-gcc4.0.0-cvs-linux-crosscompiler.tar.bz2.
+http://www.videolan.org/pub/testing/wince/wince-arm-gcc4.0.0-cvs-linux-crosscompiler-20050517.tar.bz2.
 Extract this package in your root directory (everything will be extracted in
 /usr/local/wince/cross-tools).
 
@@ -78,7 +78,7 @@ CC="arm-wince-pe-gcc -mcpu=xscale" \
     --disable-sdl --disable-gtk --disable-dvdnav --disable-dvdread \
     --disable-nls --disable-sout --disable-vlm --disable-wxwindows \
     --disable-a52 --disable-libmpeg2 --disable-freetype --disable-fribidi \
-    --disable-mad --disable-plugins \
+    --disable-mad --disable-plugins --enable-optimize-memory \
     --with-freetype-config-path=/usr/local/wince-xscale/bin \
     --with-fribidi-config-path=/usr/local/wince-xscale/bin \
     --enable-tremor --enable-faad
