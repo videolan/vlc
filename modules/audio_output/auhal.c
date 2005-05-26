@@ -254,7 +254,7 @@ static int Open( vlc_object_t * p_this )
                                 &i_param_size,
                                 layout ));
     }
-    
+
     msg_Dbg( p_aout, "Layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions );
     
     p_aout->output.output.i_physical_channels = 0;
@@ -314,9 +314,9 @@ static int Open( vlc_object_t * p_this )
     
     /* Calculate framesizes and stuff */
     aout_FormatPrepare( &p_aout->output.output );
-    DeviceFormat.mBytesPerFrame = p_aout->output.output.i_bytes_per_frame;
-    DeviceFormat.mFramesPerPacket = p_aout->output.output.i_frame_length;
-    DeviceFormat.mBytesPerPacket = p_aout->output.output.i_bytes_per_frame * p_aout->output.output.i_frame_length;
+    DeviceFormat.mFramesPerPacket = 1;
+    DeviceFormat.mBytesPerFrame = DeviceFormat.mBitsPerChannel * DeviceFormat.mChannelsPerFrame / 8;
+    DeviceFormat.mBytesPerPacket = DeviceFormat.mBytesPerFrame * DeviceFormat.mFramesPerPacket;
  
     i_param_size = sizeof(AudioStreamBasicDescription);
     /* Set desired format (Use CAStreamBasicDescription )*/
@@ -339,7 +339,7 @@ static int Open( vlc_object_t * p_this )
                                    
     msg_Dbg( p_aout, STREAM_FORMAT_MSG( "the actual set AU format is " , DeviceFormat ) );
     
-    p_aout->output.i_nb_samples = 69 * p_aout->output.output.i_frame_length;
+    
     aout_VolumeSoftInit( p_aout );
 
     /* Let's pray for the following operation to be atomic... */
@@ -356,12 +356,14 @@ static int Open( vlc_object_t * p_this )
                             kAudioUnitProperty_SetRenderCallback,
                             kAudioUnitScope_Input,
                             0, &input, sizeof( input ) ) );
+
+    input.inputProc = (AURenderCallback) RenderCallbackAnalog;
+    input.inputProcRefCon = p_aout;
     
     /* AU initiliaze */
     verify_noerr( AudioUnitInitialize(p_sys->au_unit) );
 
     verify_noerr( AudioOutputUnitStart(p_sys->au_unit) );
-
     return( VLC_SUCCESS );
 }
 
@@ -577,6 +579,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     aout_buffer_t * p_buffer;
     AudioTimeStamp  host_time;
     mtime_t         current_date;
+    unsigned int    i_samples;
 
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
@@ -596,19 +599,24 @@ msg_Dbg( p_aout, "inNumberFrames: %d", inNumberFrames);
     current_date = (mtime_t) p_sys->clock_diff + mdate() + 
                      (mtime_t) ( 1000000 * 1 );
 
-#define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i'))
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date, VLC_FALSE );
-#undef B_SPDI
+    p_aout->output.i_nb_samples = inNumberFrames;
 
 msg_Dbg( p_aout, "start audio packet BADABOEM");
+#define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i'))
+        p_buffer = aout_OutputNextBuffer( p_aout,  mdate() + (mtime_t) ( 1000000 * 1 ), VLC_FALSE );
+#undef B_SPDI
+
 
     if( p_buffer != NULL )
     {
+        msg_Dbg( p_aout, "expected mDataByteSize:%d", ioData->mBuffers[0].mDataByteSize );
+        msg_Dbg( p_aout, "retrieved nb bytes:%d", p_buffer->i_nb_bytes );
+        
         if( ioData != NULL && ioData->mNumberBuffers > 0 )
         {
-            if( p_buffer->i_nb_bytes*8 != ioData->mBuffers[0].mDataByteSize )
+            if( p_buffer->i_nb_bytes != ioData->mBuffers[0].mDataByteSize )
             {
-                msg_Dbg( p_aout, "byte sizes don't match %d:%d", p_buffer->i_nb_bytes*8, ioData->mBuffers[0].mDataByteSize);
+                msg_Dbg( p_aout, "byte sizes don't match %d:%d", p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize);
             }
             else
             {
@@ -621,11 +629,14 @@ msg_Dbg( p_aout, "start audio packet BADABOEM");
                                       p_buffer->p_buffer, ioData->mBuffers[i].mDataByteSize );
                 }
                 msg_Dbg( p_aout, "yeah first:" );
-                aout_BufferFree( p_buffer );
-                msg_Dbg( p_aout, "yeah" );
             }
         }
-        else msg_Dbg( p_aout, "no iodata or buffers");
+        else
+        {
+            msg_Dbg( p_aout, "no iodata or buffers");
+        }
+        aout_BufferFree( p_buffer );
+        msg_Dbg( p_aout, "yeah the buffer free thing :D" );
     }
     else
     {
