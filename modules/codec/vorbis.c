@@ -909,8 +909,8 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     {
         for( j = 0 ; j < p_aout_buf->i_nb_samples ; j++ )
         {
-            buffer[p_sys->pi_chan_table[i]][j]= ((float *)p_aout_buf->p_buffer)
-                                    [j * p_sys->i_channels + i ];
+            buffer[i][j]= ((float *)p_aout_buf->p_buffer)
+                                    [j * p_sys->i_channels + p_sys->pi_chan_table[i]];
         }
     }
 
