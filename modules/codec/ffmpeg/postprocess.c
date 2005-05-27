@@ -111,6 +111,8 @@ void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
     /* ***** Load post processing if enabled ***** */
     var_Get( p_dec, "ffmpeg-pp-q", &val );
     var_Set( p_dec, "ffmpeg-pp-q", val_orig );
+    if( val_orig.i_int )
+        *pb_pp = VLC_TRUE;
 
     return p_sys;
 }
