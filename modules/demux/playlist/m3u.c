@@ -243,11 +243,13 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Go back and play the playlist */
-    if( b_play )
+    if( b_play && p_playlist->status.p_item &&
+        p_playlist->status.p_item->i_children > 0 )
     {
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           p_playlist->status.i_view,
-                          p_playlist->status.p_item, NULL );
+                          p_playlist->status.p_item,
+                          p_playlist->status.p_item->pp_children[0] );
     }
 
     vlc_object_release( p_playlist );

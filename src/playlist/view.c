@@ -611,13 +611,14 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
 #ifdef PLAYLIST_DEBUG
     if( p_item != NULL )
     {
-        msg_Dbg( p_playlist, "finding next of %s within %s",
-                        p_item->input.psz_name, p_node->input.psz_name );
+        msg_Dbg( p_playlist, "finding next of %s within %s - root %s",
+                        p_item->input.psz_name, p_node->input.psz_name,
+                        p_root->input.psz_name );
     }
     else
     {
-        msg_Dbg( p_playlist, "finding something to play within %s",
-                                 p_node->input.psz_name );
+        msg_Dbg( p_playlist, "finding something to play within %s -root %s",
+                            p_node->input.psz_name, p_root->input.psz_name );
 
     }
 #endif
@@ -652,6 +653,10 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
     {
         if( p_playlist->b_go_next )
         {
+#ifdef PLAYLIST_DEBUG
+            msg_Dbg( p_playlist, "Moving on to next node: search from %s",
+                            p_root->input.psz_name );
+#endif
             p_next = playlist_RecursiveFindNext( p_playlist, i_view,
                                 p_root, p_item, p_search );
             if( p_next == NULL )
@@ -663,6 +668,9 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
         }
         else
         {
+#ifdef PLAYLIST_DEBUG
+            msg_Dbg( p_playlist, "Not moving on to next node: you loose" );
+#endif
             return NULL;
         }
     }
@@ -782,6 +790,10 @@ playlist_item_t *playlist_RecursiveFindNext( playlist_t *p_playlist,
 #endif
                 if( p_parent == p_root )
                 {
+#ifdef PLAYLIST_DEBUG
+                    msg_Dbg( p_playlist, "At root item (%s)",
+                                         p_root->input.psz_name );
+#endif
                     /* Hmm, seems it's the end for you, guy ! */
                     return NULL;
                 }
@@ -874,6 +886,10 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
 #endif
                 if( p_parent == p_root )
                 {
+#ifdef PLAYLIST_DEBUG
+                    msg_Dbg( p_playlist, "At root item (%s)",
+                                         p_root->input.psz_name );
+#endif
                     /* Hmm, seems it's the end for you, guy ! */
                     return NULL;
                 }
