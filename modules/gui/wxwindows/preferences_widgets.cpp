@@ -453,7 +453,7 @@ ModuleListCatConfigControl::~ModuleListCatConfigControl()
 
 wxString ModuleListCatConfigControl::GetPszValue()
 {
-    return wxU( text->GetValue().c_str() ) ;
+    return text->GetValue() ;
 }
 
 void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
