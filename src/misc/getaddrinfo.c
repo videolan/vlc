@@ -583,7 +583,11 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
      * - ignore square brackets
      */
     if( ( node == NULL ) || (node[0] == '\0' ) )
+    {
         psz_node = NULL;
+        if( service == NULL )
+            service = "";
+    }
     else
     {
         strncpy( psz_buf, node, NI_MAXHOST );
