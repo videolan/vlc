@@ -53,7 +53,7 @@ struct sout_stream_sys_t
     vlc_bool_t b_inited;
 };
 
-#define PICTURE_RING_SIZE 64
+#define PICTURE_RING_SIZE 4
 struct decoder_owner_sys_t
 {
     picture_t *pp_pics[PICTURE_RING_SIZE];
