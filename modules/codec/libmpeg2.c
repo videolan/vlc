@@ -287,9 +287,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_block->i_buffer = 0;
             break;
 
+#ifdef STATE_SEQUENCE_MODIFIED
         case STATE_SEQUENCE_MODIFIED:
             GetAR( p_dec );
             break;
+#endif
 
         case STATE_SEQUENCE:
         {
