@@ -1001,22 +1001,19 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
      FindItemByName( treectrl->GetRootItem(), search_string,
                      search_current, &pb_found );
 
-    if( found.IsOk() )
-    {
-        search_current = found;
-        treectrl->SelectItem( found, true );
-    }
-    else
+    if( !found.IsOk() )
     {
         wxTreeItemId dummy;
         search_current = dummy;
         found =  FindItemByName( treectrl->GetRootItem(), search_string,
                                  search_current, &pb_found );
-        if( found.IsOk() )
-        {
-            search_current = found;
-            treectrl->SelectItem( found, true );
-        }
+    }
+
+    if( found.IsOk() )
+    {
+        search_current = found;
+        treectrl->EnsureVisible( found );
+        treectrl->SelectItem( found, true );
     }
 }
 
