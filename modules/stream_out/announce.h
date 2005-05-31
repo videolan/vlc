@@ -25,21 +25,6 @@
  * Preamble
  *****************************************************************************/
 
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#elif defined( WIN32 )
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   define close closesocket
-#else
-#   include <netdb.h>                                         /* hostent ... */
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
-#   endif
-#endif
-
 #ifdef HAVE_SLP_H
 #   include <slp.h>
 #endif

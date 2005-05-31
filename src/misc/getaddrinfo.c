@@ -58,15 +58,16 @@
 #include "network.h"
 
 #ifdef SYS_BEOS
-#define NO_ADDRESS  NO_DATA
-#define PF_INET     AF_INET
-#define INADDR_NONE 0xFFFFFFFF
-#define AF_UNSPEC   0
+#   define NO_ADDRESS  NO_DATA
+#   define PF_INET     AF_INET
+#   define INADDR_NONE 0xFFFFFFFF
+#   define AF_UNSPEC   0
+#   define PF_UNSPEC   AF_UNSPEC
 #endif
 
-#define _NI_MASK  (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
-                   NI_DGRAM)
-# define _AI_MASK (AI_PASSIVE|AI_CANONNAME|AI_NUMERICHOST)
+#define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
+                  NI_DGRAM)
+#define _AI_MASK (AI_PASSIVE|AI_CANONNAME|AI_NUMERICHOST)
 
 
 #ifndef HAVE_GAI_STRERROR
@@ -559,20 +560,20 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     else
         memcpy( &hints, p_hints, sizeof( hints ) );
 
-    if( hints.ai_family == AF_UNSPEC )
+    if( hints.ai_family == PF_UNSPEC )
     {
         vlc_value_t val;
 
         var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv4", &val );
         if( val.b_bool )
-            hints.ai_family = AF_INET;
+            hints.ai_family = PF_INET;
 
-#ifdef HAVE_INET_PTON
+#ifdef PF_INET6
         var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv6", &val );
         if( val.b_bool )
-            hints.ai_family = AF_INET6;
+            hints.ai_family = PF_INET6;
 #endif
     }
 
