@@ -1548,7 +1548,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             p_conf = config_FindConfig( p_this, psz_name );
             if( p_conf )
             {
-                /* Check if the option is derecated */
+                /* Check if the option is deprecated */
                 if( p_conf->psz_current )
                 {
                     if( !b_ignore_errors )
