@@ -277,7 +277,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        char *psz_proxy = getenv( "http_proxy" );
+        char *psz_proxy = strdup(getenv( "http_proxy" ));
         if( psz_proxy && *psz_proxy )
         {
             p_sys->b_proxy = VLC_TRUE;
