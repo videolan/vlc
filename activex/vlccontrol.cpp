@@ -355,14 +355,12 @@ STDMETHODIMP VLCControl::setVariable( BSTR name, VARIANT value)
 
         HRESULT hr = E_INVALIDARG;
         int i_type;
+        vlc_value_t val;
+        
         if( VLC_SUCCESS == VLC_VariableType(i_vlc, psz_varname, &i_type) )
         {
             VARIANT arg;
             VariantInit(&arg);
-
-            vlc_value_t val;
-
-            hr = DISP_E_TYPEMISMATCH;
 
             switch( i_type )
             {
@@ -373,6 +371,7 @@ STDMETHODIMP VLCControl::setVariable( BSTR name, VARIANT value)
                     break;
 
                 case VLC_VAR_INTEGER:
+                case VLC_VAR_HOTKEY:
                     hr = VariantChangeType(&value, &arg, 0, VT_I4);
                     if( SUCCEEDED(hr) )
                         val.i_int = V_I4(&arg);
@@ -385,20 +384,65 @@ STDMETHODIMP VLCControl::setVariable( BSTR name, VARIANT value)
                     break;
 
                 case VLC_VAR_STRING:
+                case VLC_VAR_MODULE:
+                case VLC_VAR_FILE:
+                case VLC_VAR_DIRECTORY:
+                case VLC_VAR_VARIABLE:
                     hr = VariantChangeType(&value, &arg, 0, VT_BSTR);
                     if( SUCCEEDED(hr) )
+                    {
                         val.psz_string = CStrFromBSTR(codePage, V_BSTR(&arg));
+                        VariantClear(&arg);
+                    }
                     break;
+
+                case VLC_VAR_TIME:
+                    // use a double value to represent time (base is expressed in seconds)
+                    hr = VariantChangeType(&value, &arg, 0, VT_R8);
+                    if( SUCCEEDED(hr) )
+                        val.i_time = (signed __int64)(V_R8(&arg)*1000000.0);
+                    break;
+
+                default:
+                    hr = DISP_E_TYPEMISMATCH;
             }
-            if( SUCCEEDED(hr) )
+        }
+        else {
+            // no defined type, defaults to VARIANT type
+            hr = NO_ERROR;
+            switch( V_VT(&value) )
             {
-                VariantClear(&arg);
-
-                hr = (VLC_SUCCESS == VLC_VariableSet(i_vlc, psz_varname, val)) ? NOERROR : E_FAIL;
-
-                if( (VLC_VAR_STRING == i_type) && (NULL != val.psz_string) )
-                    free(val.psz_string);
+                case VT_BOOL:
+                    val.b_bool = (VARIANT_TRUE == V_BOOL(&value)) ? VLC_TRUE : VLC_FALSE;
+                    i_type = VLC_VAR_BOOL;
+                    break;
+                case VT_I4:
+                    val.i_int = V_I4(&value);
+                    i_type = VLC_VAR_INTEGER;
+                    break;
+                case VT_R4:
+                    val.f_float = V_R4(&value);
+                    i_type = VLC_VAR_FLOAT;
+                    break;
+                case VT_BSTR:
+                    val.psz_string = CStrFromBSTR(codePage, V_BSTR(&value));
+                    i_type = VLC_VAR_STRING;
+                    break;
+                case VT_R8:
+                    // use a double value to represent time (base is expressed in seconds)
+                    val.i_time = (signed __int64)(V_R8(&value)*1000000.0);
+                    i_type = VLC_VAR_TIME;
+                    break;
+                default:
+                    hr = DISP_E_TYPEMISMATCH;
             }
+        }
+        if( SUCCEEDED(hr) )
+        {
+            hr = (VLC_SUCCESS == VLC_VariableSet(i_vlc, psz_varname, val)) ? NOERROR : E_FAIL;
+
+            if( (VLC_VAR_STRING == i_type) && (NULL != val.psz_string) )
+                free(val.psz_string);
         }
         free(psz_varname);
 
@@ -440,6 +484,7 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
                     break;
 
                 case VLC_VAR_INTEGER:
+                case VLC_VAR_HOTKEY:
                     V_VT(value) = VT_I4;
                     V_I4(value) = val.i_int;
                     break;
@@ -450,10 +495,21 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
                     break;
 
                 case VLC_VAR_STRING:
+                case VLC_VAR_MODULE:
+                case VLC_VAR_FILE:
+                case VLC_VAR_DIRECTORY:
+                case VLC_VAR_VARIABLE:
                     V_VT(value) = VT_BSTR;
                     V_BSTR(value) = BSTRFromCStr(codePage, val.psz_string);
                     free(val.psz_string);
                     break;
+
+                case VLC_VAR_TIME:
+                    // use a double value to represent time (base is expressed in seconds)
+                    V_VT(value) = VT_R8;
+                    V_R8(value) = ((double)val.i_time)/1000000.0;
+                    break;
+
                 default:
                     hr = DISP_E_TYPEMISMATCH;
             }
