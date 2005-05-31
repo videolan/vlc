@@ -1234,6 +1234,7 @@ static int SapSetup( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;
+    /* FIXME: use sout_AnnounceMethodCreate */
     announce_method_t *p_method = (announce_method_t *)
                                   malloc(sizeof(announce_method_t));
 
@@ -1246,7 +1247,6 @@ static int SapSetup( sout_stream_t *p_stream )
     }
     p_method->i_type = METHOD_TYPE_SAP;
     p_method->psz_address = NULL; /* FIXME */
-    p_method->i_ip_version = 4; /* FIXME ! */
 
     if( p_sys->i_es > 0 && p_sys->psz_sdp && *p_sys->psz_sdp )
     {

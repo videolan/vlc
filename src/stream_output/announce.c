@@ -204,12 +204,8 @@ announce_method_t * sout_AnnounceMethodCreate( int i_type )
     {
         p_method->i_type = i_type;
         if( i_type == METHOD_TYPE_SAP )
-        {
-            /* Default values */
+            /* Default value */
             p_method->psz_address = NULL;
-            p_method->i_ip_version = 4 ;
-            p_method->sz_ipv6_scope = '\0';
-        }
     }
     return p_method;
 }

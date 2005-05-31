@@ -259,38 +259,9 @@ struct announce_method_t
     int i_type;
 
     /* For SAP */
-    int i_ip_version;
     char *psz_address; /* If we use a custom address */
-    char sz_ipv6_scope;
 };
 
-
-/* SAP Specific structures */
-
-/* 100ms */
-#define SAP_IDLE ((mtime_t)(0.100*CLOCK_FREQ))
-#define SAP_MAX_BUFFER 65534
-#define MIN_INTERVAL 2
-#define MAX_INTERVAL 300
-
-/* A SAP announce address. For each of these, we run the
- * control flow algorithm */
-struct sap_address_t
-{
-    char *psz_address;
-    int i_ip_version;
-    int i_port;
-    int i_rfd; /* Read socket */
-    int i_wfd; /* Write socket */
-
-    /* Used for flow control */
-    mtime_t t1;
-    vlc_bool_t b_enabled;
-    vlc_bool_t b_ready;
-    int i_interval;
-    int i_buff;
-    int i_limit;
-};
 
 /* A SAP session descriptor, enqueued in the SAP handler queue */
 struct sap_session_t
