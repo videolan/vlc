@@ -76,6 +76,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
+static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 static int  NewPictureVec  ( vout_thread_t *, picture_t *, int );
 static void FreePictureVec ( vout_thread_t *, picture_t *, int );
@@ -1497,8 +1498,9 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 switch( ddpfPixelFormat.dwRGBBitCount )
                 {
-                case 8: /* FIXME: set the palette */
+                case 8:
                     p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+                    p_vout->output.pf_setpalette = SetPalette;
                     break;
                 case 15:
                     p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
@@ -2113,4 +2115,13 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * SetPalette: sets an 8 bpp palette
+ *****************************************************************************/
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
+{
+    msg_Err( p_vout, "FIXME: SetPalette unimplemented" );
 }
