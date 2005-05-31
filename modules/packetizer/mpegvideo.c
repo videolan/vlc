@@ -545,10 +545,18 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                     p_frag->p_buffer[9]&0x80 ? VLC_TRUE : VLC_FALSE;
             }
 
+            /* Do not set aspect ratio : in case we're transcoding,
+             * transcode will take our fmt_out as a fmt_in to libmpeg2.
+             * libmpeg2.c will then believe that the user has requested
+             * a specific aspect ratio, which she hasn't. Thus in case
+             * of aspect ratio change, we're screwed. --Meuuh
+             */
+#if 0
             p_dec->fmt_out.video.i_aspect =
                 mpeg2_aspect[p_sys->i_aspect_ratio_info][0] *
                 VOUT_ASPECT_FACTOR /
                 mpeg2_aspect[p_sys->i_aspect_ratio_info][1];
+#endif
 
         }
         else if( i_type == 0x08 )
