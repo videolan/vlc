@@ -665,8 +665,8 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         p_input->b_can_pause        = p_input->input.b_can_pause;
 
         /* Fix pts delay */
-        if( p_input->i_pts_delay <= 0 )
-            p_input->i_pts_delay = DEFAULT_PTS_DELAY;
+        if( p_input->i_pts_delay < 0 )
+            p_input->i_pts_delay = 0;
 
         /* If the desynchronisation requested by the user is < 0, we need to
          * cache more data. */
@@ -676,7 +676,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         /* Update cr_average depending on the caching */
         p_input->input.i_cr_average *= (10 * p_input->i_pts_delay / 200000);
         p_input->input.i_cr_average /= 10;
-        if( p_input->input.i_cr_average <= 0 ) p_input->input.i_cr_average = 1;
+        if( p_input->input.i_cr_average < 10 ) p_input->input.i_cr_average = 10;
     }
 
     /* Load master infos */
