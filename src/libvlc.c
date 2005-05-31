@@ -1043,7 +1043,38 @@ int VLC_VariableType( int i_object, char const *psz_var, int *pi_type )
         return VLC_ENOOBJ;
     }
 
-    i_type = VLC_VAR_TYPE & var_Type( p_vlc , psz_var );
+    /* FIXME: Temporary hack for Mozilla, if variable starts with conf:: then
+     * we handle it as a configuration variable. Don't tell Gildas :) -- sam */
+    if( !strncmp( psz_var, "conf::", 6 ) )
+    {
+        module_config_t *p_item;
+        char const *psz_newvar = psz_var + 6;
+
+        p_item = config_FindConfig( VLC_OBJECT(p_vlc), psz_newvar );
+
+        if( p_item )
+        {
+            switch( p_item->i_type )
+            {
+                case CONFIG_ITEM_BOOL:
+                    i_type = VLC_VAR_BOOL;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_type = VLC_VAR_INTEGER;
+                    break;
+                case CONFIG_ITEM_FLOAT:
+                    i_type = VLC_VAR_FLOAT;
+                    break;
+                default:
+                    i_type = VLC_VAR_STRING;
+                    break;
+            }
+        }
+        else
+            i_type = 0;
+    }
+    else
+        i_type = VLC_VAR_TYPE & var_Type( p_vlc , psz_var );
 
     if( i_object ) vlc_object_release( p_vlc );
 
