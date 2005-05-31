@@ -174,7 +174,7 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        p_sys->i_last_pts += I64C(1000000) / p_sys->f_fps;
+        p_sys->i_last_pts += (mtime_t)(1000000.0 / p_sys->f_fps);
         mwait( p_sys->i_last_pts );
     }
 
