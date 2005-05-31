@@ -330,6 +330,5 @@ static int OpenUDP( vlc_object_t * p_this )
     var_Get( p_this, "mtu", &val );
     p_socket->i_mtu = val.i_int;
 
-    msg_Info( p_this, "ipv6 suceeded" );
     return( 0 );
 }
