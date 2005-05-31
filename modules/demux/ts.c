@@ -3028,11 +3028,6 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                         if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, p_program->i_pid, VLC_TRUE ) )
                             p_sys->b_dvb_control = VLC_FALSE;
                     }
-                    else
-                    {
-                        if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, p_program->i_pid, VLC_FALSE ) )
-                            p_sys->b_dvb_control = VLC_FALSE;
-                    }
                 }
             }
         }
