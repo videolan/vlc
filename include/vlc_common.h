@@ -386,6 +386,9 @@ typedef struct tls_t tls_t;
 typedef struct tls_server_t tls_server_t;
 typedef struct tls_session_t tls_session_t;
 
+/* Hashing */
+typedef struct md5_s md5_t;
+
 /* XML */
 typedef struct xml_t xml_t;
 typedef struct xml_sys_t xml_sys_t;
