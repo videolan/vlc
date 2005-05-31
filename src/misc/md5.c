@@ -2,7 +2,7 @@
  * md5.c: not so strong MD5 hashing
  *****************************************************************************
  * Copyright (C) 2004-2005 VideoLAN
- * $Id: drms.c 10101 2005-03-02 16:47:31Z robux4 $
+ * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
