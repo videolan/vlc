@@ -277,7 +277,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     if( p_method->psz_address == NULL )
     {
         /* Determine SAP multicast address automatically */
-        char psz_buf[NI_MAXHOST];
+        char psz_buf[NI_MAXHOST], *ptr;
         const char *psz_addr;
         struct addrinfo hints, *res;
 
@@ -307,6 +307,11 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             vlc_mutex_unlock( &p_sap->object_lock );
             return VLC_EGENERIC;
         }
+
+        /* Remove interface specification if present */
+        ptr = strchr( psz_buf, '%' );
+        if( ptr != NULL )
+            *ptr = '\0';
 
         if( strchr( psz_buf, ':' ) != NULL )
         {
@@ -580,13 +585,28 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
 {
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
-    char *psz_group, *psz_name;
+    char *psz_group, *psz_name, psz_uri[NI_MAXHOST];
     char ipv;
 
     psz_group = convert_to_utf8( p_sap, p_session->psz_group );
     psz_name = convert_to_utf8( p_sap, p_session->psz_name );
 
+    /* FIXME: really check that psz_uri is a real IP address
+     * FIXME: make a common function to obtain a canonical IP address */
     ipv = ( strchr( p_session->psz_uri, ':' )  != NULL) ? '6' : '4';
+    if( *p_session->psz_uri == '[' )
+    {
+        char *ptr;
+
+        strncpy( psz_uri, p_session->psz_uri + 1, sizeof( psz_uri ) );
+        psz_uri[sizeof( psz_uri ) - 1] = '\0';
+        ptr = strchr( psz_uri, '%' );
+        if( ptr != NULL)
+            *ptr = '\0';
+        ptr = strchr( psz_uri, ']' );
+        if( ptr != NULL)
+            *ptr = '\0';
+    }
 
     /* see the lists in modules/stream_out/rtp.c for compliance stuff */
     p_session->psz_sdp = (char *)malloc(
@@ -599,7 +619,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                                    "a=tool:"PACKAGE_STRING"\r\n"
                                    "a=type:broadcast\r\n")
                            + strlen( psz_name )
-                           + strlen( p_session->psz_uri ) + 300
+                           + strlen( psz_uri ) + 300
                            + ( psz_group ? strlen( psz_group ) : 0 ) );
 
     if( p_session->psz_sdp == NULL || psz_name == NULL )
@@ -609,6 +629,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
         FREE( psz_group );
         return VLC_ENOMEM;
     }
+
     sprintf( p_session->psz_sdp,
                             "v=0\r\n"
                             "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
@@ -620,7 +641,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                             "a=type:broadcast\r\n",
                             i_sdp_id, i_sdp_version,
                             psz_name, ipv,
-                            p_session->psz_uri, p_session->i_ttl,
+                            psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload );
     free( psz_name );
 
