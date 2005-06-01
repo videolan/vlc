@@ -1,7 +1,7 @@
 /*****************************************************************************
  * zsh.cpp: create zsh completion rule for vlc
  *****************************************************************************
- * Copyright (C) 1998-2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -197,6 +197,10 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
     char *psz_arguments = "";
     char *psz_exclusive;
     char *psz_option;
+    //Skip deprecated options
+    if( p_item->psz_current )
+        return;
+    
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
@@ -207,6 +211,7 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
         while( range.first != range.second )
         {
             list = list.append( " " );
+            printf("%s",range.first->second.c_str());
             list = list.append( range.first->second );
             ++range.first;
         }
@@ -377,7 +382,8 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
     if( !psz_longtext ||
         strchr( psz_longtext, '\n' ) ||
         strchr( psz_longtext, '(' ) ) psz_longtext = psz_text;
-    while( (foo = strchr( psz_text, '"' ))) *foo='\'';
+    if( psz_text )
+        while( (foo = strchr( psz_text, '"' ))) *foo='\'';
     if( i_short )
     {
         if( !psz_exclusive ) psz_exclusive = "";
