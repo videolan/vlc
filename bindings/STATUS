@@ -1,0 +1,34 @@
+###########################
+# STATUS for VLC bindings #
+###########################
+
+* General
+---------
+  * TODO
+     - Integrate bindings creation with build system
+
+* API
+-----
+  * TODO
+     - Clean up / Use VLC coding styles
+     - VLM control
+
+* Python: (Olivier Aubert) 
+---------
+  * Implements the mediacontrol API
+  * TODO
+     - Fix win32 build
+     - Clean up glue file
+
+* Java:   (Filippo Carone)
+-------
+  * Implements libvlc base API
+  * Only works with gcj
+  * TODO
+     - Fix crash with command line arguments
+     - Implement mediacontrol
+     - provide "make install" 
+
+* .NET:   (jlj)
+-------  
+  * Not commited yet :)

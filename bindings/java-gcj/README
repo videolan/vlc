@@ -1,0 +1,10 @@
+Implementation Notes
+--------------------
+
+ The union vlc_value_t has been implemented as a hierarchy of classes
+which has JVLCVariable.class as the root. All the children of this
+class are named JVLC<type>Variable.class and are mapped 1:1 to the
+union members with some exceptions: p_address is not implemented since
+there's no notion of address in Java, vlc_object_t is not implemented
+since I don't know how to represent it in Java and is not defined in
+vlc/vlc.h 
