@@ -275,17 +275,17 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_proxy = VLC_TRUE;
         vlc_UrlParse( &p_sys->proxy, psz, 0 );
     }
+#ifdef HAVE_GETENV
     else
     {
-        char *psz_proxy = strdup(getenv( "http_proxy" ));
+        char *psz_proxy = getenv( "http_proxy" );
         if( psz_proxy && *psz_proxy )
         {
             p_sys->b_proxy = VLC_TRUE;
             vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
         }
-        if( psz_proxy )
-            free( psz_proxy );
     }
+#endif
     free( psz );
 
     if( p_sys->b_proxy )
