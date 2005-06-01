@@ -2043,7 +2043,7 @@ then
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
-        VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[-lavcodec])
+        VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
         if test "${enable_sout}" != "no"; then
             VLC_ADD_BUILTINS([stream_out_switcher])
         fi],
@@ -2114,8 +2114,8 @@ then
       if test "${enable_sout}" != "no"; then
           VLC_ADD_BUILTINS([stream_out_switcher])
       fi
-      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
-      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
+      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
+      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
 
       if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
         AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
