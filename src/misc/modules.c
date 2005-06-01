@@ -1627,6 +1627,7 @@ static void CacheLoad( vlc_object_t *p_this )
         DeleteFile( psz_wf );
 #endif
         msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
+        free( psz_filename );
         return;
     }
 
