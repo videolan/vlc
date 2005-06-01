@@ -668,6 +668,15 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             while( (p_packetized_block =
                     p_packetizer->pf_packetize( p_packetizer, &p_block )) )
             {
+                if( p_packetizer->fmt_out.i_extra && !p_dec->fmt_in.i_extra )
+                {
+                    p_dec->fmt_in.i_extra = p_packetizer->fmt_out.i_extra;
+                    p_dec->fmt_in.p_extra = malloc( p_dec->fmt_in.i_extra );
+                    memcpy( p_dec->fmt_in.p_extra,
+                            p_packetizer->fmt_out.p_extra,
+                            p_dec->fmt_in.i_extra );
+                }
+
                 while( p_packetized_block )
                 {
                     block_t *p_next = p_packetized_block->p_next;
