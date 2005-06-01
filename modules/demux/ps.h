@@ -474,7 +474,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
                 /* Look for the ISO639 language descriptor */
                 if( es.p_descriptor[i] != 0x0a )
                 {
-                    i += es.p_descriptor[i+1];
+                    i += es.p_descriptor[i+1] + 2;
                     continue;
                 }
 
