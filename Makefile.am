@@ -137,8 +137,11 @@ HEADERS_include_built = \
 include/vlc_symbols.h:
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 
+# for some strange reasons (??) modules_plugin.h depends on vlc_symbols.h
+# so we have to touch it :(
 src/misc/modules_plugin.h: src/misc/modules_plugin.h.in
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+	touch src/misc/modules_plugin.h
 
 src/misc/modules_builtin.h: src/misc/modules_builtin.h.in
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
