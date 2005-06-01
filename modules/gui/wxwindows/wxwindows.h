@@ -885,7 +885,7 @@ private:
 
     /* Search (user) */
     void OnSearch( wxCommandEvent& event );
-    void OnSearchTextChange( wxCommandEvent& event );
+    /*void OnSearchTextChange( wxCommandEvent& event );*/
     wxTextCtrl *search_text;
     wxButton *search_button;
     wxTreeItemId search_current;
