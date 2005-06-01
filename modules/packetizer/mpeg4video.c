@@ -235,13 +235,23 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
         if( p_vol )
         {
-            /* Copy the complete VOL */
-            p_dec->fmt_out.i_extra = p_start - p_vol;
-            p_dec->fmt_out.p_extra =
-                realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
-            memcpy( p_dec->fmt_out.p_extra, p_vol, p_dec->fmt_out.i_extra );
-            m4v_VOLParse( p_dec, &p_dec->fmt_out,
-                          p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+            if( !p_dec->fmt_out.i_extra )
+            {
+                /* Copy the complete VOL */
+                p_dec->fmt_out.i_extra = p_start - p_vol;
+                p_dec->fmt_out.p_extra =
+                    realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+                memcpy( p_dec->fmt_out.p_extra, p_vol,
+                        p_dec->fmt_out.i_extra );
+                m4v_VOLParse( p_dec, &p_dec->fmt_out,
+                              p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+            }
+
+            /* Remove VOL from the original stream */
+            memmove( p_vol, p_start,
+                     p_sys->i_buffer - (p_start - p_sys->p_buffer) );
+            p_sys->i_buffer -= p_dec->fmt_out.i_extra;
+            p_start = p_vol;
 
             p_vol = NULL;
         }
