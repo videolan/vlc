@@ -636,8 +636,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     break;
                 case VLC_FOURCC( 'm', 'p','4', 'v' ):
                     p_stream->i_stream_type = 0x10;
-                    p_stream->i_stream_id = 0xfa;
-                    p_sys->i_mpeg4_streams++;
+                    p_stream->i_stream_id = 0xe0;
                     p_stream->i_es_id = p_stream->i_pid;
                     break;
                 case VLC_FOURCC( 'h', '2','6', '4' ):
@@ -689,7 +688,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_stream_type = 0x06;
                     p_stream->i_stream_id = 0xbd;
                     break;
-
                 case VLC_FOURCC( 'm', 'p','4', 'a' ):
                     p_stream->i_stream_type = 0x11;
                     p_stream->i_stream_id = 0xfa;
@@ -1182,6 +1180,20 @@ static int Mux( sout_mux_t *p_mux )
                              * so don't remove it ... */
                             p_data->i_pts = p_data->i_dts;
                         }
+
+                        if( p_input->p_fmt->i_codec ==
+                            VLC_FOURCC( 'm', 'p','4', 'v' ) &&
+                            p_data->i_flags & BLOCK_FLAG_TYPE_I )
+                        {
+                            /* For MPEG4 video, add VOL before I-frames */
+                            p_data = block_Realloc( p_data,
+                                                    p_input->p_fmt->i_extra,
+                                                    p_data->i_buffer );
+
+                            memcpy( p_data->p_buffer, p_input->p_fmt->p_extra,
+                                    p_input->p_fmt->i_extra );
+                        }
+
                         E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
                                        p_input->p_fmt, p_stream->i_stream_id,
                                        1, b_data_alignment, i_header_size, 0 );
