@@ -163,7 +163,8 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_BUTTON( Search_Event, Playlist::OnSearch)
     EVT_BUTTON( Save_Event, Playlist::OnSave)
 
-    EVT_TEXT(SearchText_Event, Playlist::OnSearchTextChange)
+    /*EVT_TEXT( SearchText_Event, Playlist::OnSearchTextChange )*/
+    EVT_TEXT_ENTER( SearchText_Event, Playlist::OnSearch )
 
     /* Custom events */
     EVT_COMMAND(-1, wxEVT_PLAYLIST, Playlist::OnPlaylistEvent)
@@ -986,10 +987,10 @@ void Playlist::OnSort( wxCommandEvent& event )
 /**********************************************************************
  * Search functions (user)
  **********************************************************************/
-void Playlist::OnSearchTextChange( wxCommandEvent& WXUNUSED(event) )
+/*void Playlist::OnSearchTextChange( wxCommandEvent& WXUNUSED(event) )
 {
    search_button->SetDefault();
-}
+}*/
 
 void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
 {
