@@ -82,6 +82,8 @@ if test "@includedir@" != "/usr/include"; then
 fi
 if test "${top_builddir}" != ""; then
   top_builddir="${top_builddir}/"
+elif test "${TOP_BUILDDIR}" != ""; then
+  top_builddir="${TOP_BUILDDIR}/"
 fi
 includes="${includes} -I${top_builddir}include"
 cppflags="${includes}"

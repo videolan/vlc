@@ -322,9 +322,9 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_PROGRAM_TEXT N_("Choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
-    "Choose the program to select by giving its Service ID\n." \
+    "Choose the program to select by giving its Service ID.\n" \
     "Only use this option if you want to read a multi-program stream " \
-    "(like DVB streams for example )" )
+    "(ike DVB streams for example)" )
 
 #define INPUT_PROGRAMS_TEXT N_("Choose programs")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
@@ -927,7 +927,6 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
                 VLC_TRUE );
-        change_short('A');
     set_subcategory( SUBCAT_AUDIO_AFILTER );
     add_module_list_cat( "audio-filter", SUBCAT_AUDIO_AFILTER, 0,
                          NULL, AUDIO_FILTER_TEXT,
@@ -1200,6 +1199,7 @@ vlc_module_begin();
                 MEMCPY_LONGTEXT, VLC_TRUE );
     add_module( "audio-channel-mixer", "audio mixer", NULL, NULL,
                 AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_TRUE );
+        change_short('A');
 
     set_section( N_("Plugins" ), NULL );
     add_bool( "plugins-cache", VLC_TRUE, NULL, PLUGINS_CACHE_TEXT,

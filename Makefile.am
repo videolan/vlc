@@ -60,6 +60,7 @@ dist_pkginclude_HEADERS = \
 	include/vlc/decoder.h \
 	include/vlc/input.h \
 	include/vlc/intf.h \
+	include/vlc/control.h \
 	$(NULL)
 
 noinst_HEADERS = $(HEADERS_include) $(HEADERS_include_built)
@@ -412,6 +413,9 @@ SOURCES_libvlc_common = \
 	src/misc/vlm.c \
 	src/misc/xml.c \
 	src/extras/libc.c \
+	src/control/core.c \
+	src/control/util.c \
+	src/control/audio_video.c \
 	$(NULL)
 
 SOURCES_libvlc = \
