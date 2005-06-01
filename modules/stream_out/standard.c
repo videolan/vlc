@@ -92,7 +92,7 @@ vlc_module_begin();
                                         VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "group", "", NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                         VLC_TRUE );
-    add_deprecated( SOUT_CFG_PREFIX "sap-ipv6", VLC_FALSE );
+    add_suppressed_bool( SOUT_CFG_PREFIX "sap-ipv6" );
 
     add_bool( SOUT_CFG_PREFIX "slp", 0, NULL, SLP_TEXT, SLP_LONGTEXT, VLC_TRUE );
 

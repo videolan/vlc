@@ -1551,6 +1551,16 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 /* Check if the option is deprecated */
                 if( p_conf->psz_current )
                 {
+                    if( !strcmp(p_conf->psz_current,"SUPPRESSED") )
+                    {
+                       if( !b_ignore_errors ) 
+                        {
+                            fprintf(stderr,
+                                    "Warning: option --%s is no longer used.\n",
+                                    p_conf->psz_name);
+                        }
+                       continue;
+                    }
                     if( !b_ignore_errors )
                     {
                         if( p_conf->b_strict )
