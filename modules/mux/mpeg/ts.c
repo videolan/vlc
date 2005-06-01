@@ -1181,19 +1181,6 @@ static int Mux( sout_mux_t *p_mux )
                             p_data->i_pts = p_data->i_dts;
                         }
 
-                        if( p_input->p_fmt->i_codec ==
-                            VLC_FOURCC( 'm', 'p','4', 'v' ) &&
-                            p_data->i_flags & BLOCK_FLAG_TYPE_I )
-                        {
-                            /* For MPEG4 video, add VOL before I-frames */
-                            p_data = block_Realloc( p_data,
-                                                    p_input->p_fmt->i_extra,
-                                                    p_data->i_buffer );
-
-                            memcpy( p_data->p_buffer, p_input->p_fmt->p_extra,
-                                    p_input->p_fmt->i_extra );
-                        }
-
                         E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
                                        p_input->p_fmt, p_stream->i_stream_id,
                                        1, b_data_alignment, i_header_size, 0 );

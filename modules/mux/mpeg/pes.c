@@ -255,6 +255,15 @@ int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
         i_stream_id  = PES_PRIVATE_STREAM_1;
     }
 
+    if( p_fmt->i_codec == VLC_FOURCC( 'm', 'p','4', 'v' ) &&
+        p_es->i_flags & BLOCK_FLAG_TYPE_I )
+    {
+        /* For MPEG4 video, add VOL before I-frames */
+        p_es = block_Realloc( p_es, p_fmt->i_extra, p_es->i_buffer );
+
+        memcpy( p_es->p_buffer, p_fmt->p_extra, p_fmt->i_extra );
+    }
+
     i_pts = p_es->i_pts <= 0 ? 0 : p_es->i_pts * 9 / 100; // 90000 units clock
     i_dts = p_es->i_dts <= 0 ? 0 : p_es->i_dts * 9 / 100; // 90000 units clock
 
