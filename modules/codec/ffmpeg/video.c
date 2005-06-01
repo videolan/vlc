@@ -728,12 +728,6 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
                       p_sys->p_context->sub_id );
         }
     }
-    /* FIXME: remove when ffmpeg deals properly with avc1 */
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC('a','v','c','1') )
-    {
-        ;
-    }
-    /* End FIXME */
     else
     {
         p_sys->p_context->extradata_size = i_size;
