@@ -91,6 +91,7 @@ static AVPaletteControl palette_control;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static void ffmpeg_InitCodec      ( decoder_t * );
 static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
@@ -322,82 +323,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->opaque = p_dec;
 
     /* ***** init this codec with special data ***** */
-    if( p_dec->fmt_in.i_extra )
-    {
-        int i_size = p_dec->fmt_in.i_extra;
-
-        if( p_sys->i_codec_id == CODEC_ID_SVQ3 )
-        {
-            uint8_t *p;
-
-            p_sys->p_context->extradata_size = i_size + 12;
-            p = p_sys->p_context->extradata  =
-                malloc( p_sys->p_context->extradata_size );
-
-            memcpy( &p[0],  "SVQ3", 4 );
-            memset( &p[4], 0, 8 );
-            memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
-
-            /* Now remove all atoms before the SMI one */
-            if( p_sys->p_context->extradata_size > 0x5a &&
-                strncmp( &p[0x56], "SMI ", 4 ) )
-            {
-                uint8_t *psz = &p[0x52];
-
-                while( psz < &p[p_sys->p_context->extradata_size - 8] )
-                {
-                    int i_size = GetDWBE( psz );
-                    if( i_size <= 1 )
-                    {
-                        /* FIXME handle 1 as long size */
-                        break;
-                    }
-                    if( !strncmp( &psz[4], "SMI ", 4 ) )
-                    {
-                        memmove( &p[0x52], psz,
-                                 &p[p_sys->p_context->extradata_size] - psz );
-                        break;
-                    }
-
-                    psz += i_size;
-                }
-            }
-        }
-        else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '0' ) ||
-                 p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '3' ) ||
-                 p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '2', '0' ) )
-        {
-            if( p_dec->fmt_in.i_extra == 8 )
-            {
-                p_sys->p_context->extradata_size = 8;
-                p_sys->p_context->extradata = malloc( 8 );
-
-                memcpy( p_sys->p_context->extradata,
-                        p_dec->fmt_in.p_extra,
-                        p_dec->fmt_in.i_extra );
-                p_sys->p_context->sub_id= ((uint32_t*)p_dec->fmt_in.p_extra)[1];
-
-                msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x",
-                          p_sys->p_context->sub_id );
-            }
-        }
-        /* FIXME: remove when ffmpeg deals properly with avc1 */
-        else if( p_dec->fmt_in.i_codec == VLC_FOURCC('a','v','c','1') )
-        {
-            ;
-        }
-        /* End FIXME */
-        else
-        {
-            p_sys->p_context->extradata_size = i_size;
-            p_sys->p_context->extradata =
-                malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
-            memcpy( p_sys->p_context->extradata,
-                    p_dec->fmt_in.p_extra, i_size );
-            memset( &((uint8_t*)p_sys->p_context->extradata)[i_size],
-                    0, FF_INPUT_BUFFER_PADDING_SIZE );
-        }
-    }
+    ffmpeg_InitCodec( p_dec );
 
     /* ***** misc init ***** */
     p_sys->input_pts = p_sys->input_dts = 0;
@@ -449,6 +375,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block;
 
     if( !pp_block || !*pp_block ) return NULL;
+
+    if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra )
+        ffmpeg_InitCodec( p_dec );
 
     p_block = *pp_block;
 
@@ -733,6 +662,88 @@ void E_(EndVideoDec)( decoder_t *p_dec )
 #endif
 
     free( p_sys->p_buffer_orig );
+}
+
+/*****************************************************************************
+ * ffmpeg_InitCodec: setup codec extra initialization data for ffmpeg
+ *****************************************************************************/
+static void ffmpeg_InitCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int i_size = p_dec->fmt_in.i_extra;
+
+    if( !i_size ) return;
+
+    if( p_sys->i_codec_id == CODEC_ID_SVQ3 )
+    {
+        uint8_t *p;
+
+        p_sys->p_context->extradata_size = i_size + 12;
+        p = p_sys->p_context->extradata  =
+            malloc( p_sys->p_context->extradata_size );
+
+        memcpy( &p[0],  "SVQ3", 4 );
+        memset( &p[4], 0, 8 );
+        memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
+
+        /* Now remove all atoms before the SMI one */
+        if( p_sys->p_context->extradata_size > 0x5a &&
+            strncmp( &p[0x56], "SMI ", 4 ) )
+        {
+            uint8_t *psz = &p[0x52];
+
+            while( psz < &p[p_sys->p_context->extradata_size - 8] )
+            {
+                int i_size = GetDWBE( psz );
+                if( i_size <= 1 )
+                {
+                    /* FIXME handle 1 as long size */
+                    break;
+                }
+                if( !strncmp( &psz[4], "SMI ", 4 ) )
+                {
+                    memmove( &p[0x52], psz,
+                             &p[p_sys->p_context->extradata_size] - psz );
+                    break;
+                }
+
+                psz += i_size;
+            }
+        }
+    }
+    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '0' ) ||
+             p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '3' ) ||
+             p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '2', '0' ) )
+    {
+        if( p_dec->fmt_in.i_extra == 8 )
+        {
+            p_sys->p_context->extradata_size = 8;
+            p_sys->p_context->extradata = malloc( 8 );
+
+            memcpy( p_sys->p_context->extradata,
+                    p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
+            p_sys->p_context->sub_id= ((uint32_t*)p_dec->fmt_in.p_extra)[1];
+
+            msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x",
+                      p_sys->p_context->sub_id );
+        }
+    }
+    /* FIXME: remove when ffmpeg deals properly with avc1 */
+    else if( p_dec->fmt_in.i_codec == VLC_FOURCC('a','v','c','1') )
+    {
+        ;
+    }
+    /* End FIXME */
+    else
+    {
+        p_sys->p_context->extradata_size = i_size;
+        p_sys->p_context->extradata =
+            malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+        memcpy( p_sys->p_context->extradata,
+                p_dec->fmt_in.p_extra, i_size );
+        memset( &((uint8_t*)p_sys->p_context->extradata)[i_size],
+                0, FF_INPUT_BUFFER_PADDING_SIZE );
+    }
 }
 
 /*****************************************************************************
