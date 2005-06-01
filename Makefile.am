@@ -44,6 +44,7 @@ AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 ###############################################################################
 
 BUILT_SOURCES += \
+	stamp-api \
 	include/vlc_symbols.h \
 	src/misc/modules_builtin.h \
 	src/misc/modules_plugin.h \
@@ -127,12 +128,19 @@ HEADERS_include_built = \
 	$(NULL)
 
 # Common dependencies for these 3 files : Makefile vlc-config
-# Specific dependencies :
-#  include/vlc_symbols.h: $(HEADERS_include)
-#  src/misc/modules_plugin.h: src/misc/modules_plugin.h.in $(HEADERS_include)
-#  src/misc/modules_builtin.h: src/misc/modules_builtin.h.in
+# Real specific dependencies :
 
-include/vlc_symbols.h src/misc/modules_plugin.h src/misc/modules_builtin.h: Makefile $(HEADERS_include) vlc-config src/misc/modules_plugin.h.in src/misc/modules_builtin.h.in
+#include/vlc_symbols.h: $(HEADERS_include)
+#src/misc/modules_plugin.h: src/misc/modules_plugin.h.in $(HEADERS_include)
+#src/misc/modules_builtin.h: src/misc/modules_builtin.h.in vlc-config
+
+include/vlc_symbols.h:
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+
+src/misc/modules_plugin.h: src/misc/modules_plugin.h.in
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+
+src/misc/modules_builtin.h: src/misc/modules_builtin.h.in
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 
 # These dependencies are mandatory
@@ -913,7 +921,7 @@ package-translations:
 ###############################################################################
 clean: clean-stamp clean-recursive
 clean-stamp:
-	rm -f stamp-builtin
+	rm -f stamp-builtin stamp-api
 
 stamp-builtin: FORCE
 	@for dep in "" `$(VLC_CONFIG) --target builtin`; do \
@@ -923,6 +931,10 @@ stamp-builtin: FORCE
 	  fi; \
 	done
 	@if test ! -f $@; then printf "" > $@; fi
+
+stamp-api: Makefile $(HEADERS_include) vlc-config src/misc/modules_plugin.h.in src/misc/modules_builtin.h.in
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+	touch stamp-api
 
 ###############################################################################
 # Force rule
