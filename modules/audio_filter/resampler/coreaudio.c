@@ -56,13 +56,6 @@ struct aout_filter_sys_t
     AudioConverterRef   s_converter;
     unsigned int i_remainder;
     unsigned int i_first_rate;
-
-    uint32_t p_bufferized[32768];
-    int i_bufferized;
-    int32_t p_output[32768];
-    int i_output;
-
-    audio_date_t end_date;
 };
 
 /*****************************************************************************
@@ -196,8 +189,6 @@ static int Create( vlc_object_t *p_this )
     /* We don't want a new buffer to be created because we're not sure we'll
      * actually need to resample anything. */
     p_filter->b_in_place = VLC_FALSE;
-    p_sys->i_bufferized = 0;
-    p_sys->i_output = 0;
 
     return VLC_SUCCESS;
 }
@@ -231,14 +222,15 @@ static void Close( vlc_object_t * p_this )
  * DoWork: convert a buffer
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_real_out_buf )
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     struct aout_filter_sys_t * p_sys = p_filter->p_sys;
-    int32_t *p_in = p_sys->p_bufferized;
+    int32_t *p_in = (int32_t *)p_in_buf->p_buffer;
     int32_t *p_out;
-    int i_input_samples;
+    UInt32 i_output_size;
+    unsigned int i_out_nb, i_wanted_nb, i_new_rate;
     OSErr err;
-    unsigned int i_out_nb;
+    aout_buffer_t * p_middle_buf;
 
     unsigned int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
 
@@ -253,109 +245,54 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         p_filter->b_continuity = VLC_TRUE;
         p_sys->i_remainder = 0;
-        aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate ); 
     }
 #endif
 
-    memcpy( p_sys->p_bufferized + p_sys->i_bufferized * i_nb_channels,
-            p_in_buf->p_buffer,
-            __MIN(p_in_buf->i_nb_samples * 4 * i_nb_channels,
-                  sizeof(p_sys->p_bufferized)
-                     - p_sys->i_bufferized * 4 * i_nb_channels) );
-    p_sys->i_bufferized += p_in_buf->i_nb_samples;
-    i_input_samples = p_sys->i_bufferized;
-
-    if ( i_input_samples >= 512 )
-    {
-        aout_buffer_t * p_middle_buf, * p_out_buf;
-        UInt32 i_output_size;
-        unsigned int i_wanted_nb, i_new_rate;
-
-        i_out_nb = (i_input_samples * p_filter->output.i_rate
-                     + p_sys->i_remainder) / p_sys->i_first_rate;
-        p_sys->i_remainder = (i_input_samples * p_filter->output.i_rate
-                     + p_sys->i_remainder) % p_sys->i_first_rate;
-    
-        aout_BufferAlloc( &p_filter->output_alloc,
-            i_out_nb * 1000000 / p_filter->output.i_rate,
-            NULL, p_out_buf );
-
-        i_output_size = i_out_nb * 4 * i_nb_channels;
-        if ( i_output_size > p_out_buf->i_size )
-        {
-            aout_BufferAlloc( &p_sys->alloc,
-                i_out_nb * 1000000 / p_filter->output.i_rate,
-                NULL, p_middle_buf );
-        }
-        else
-        {
-            p_middle_buf = p_out_buf;
-        }
-        p_out = (int32_t*)p_middle_buf->p_buffer;
-        err = AudioConverterConvertBuffer( p_sys->s_converter,
-            i_input_samples * 4 * i_nb_channels, p_in,
-            &i_output_size, p_out );
-        if( err != noErr )
-        {
-            msg_Warn( p_filter, "AudioConverterConvertBuffer failed: [%4.4s] (%u:%u)",
-                     (char *)&err, i_out_nb * 4 * i_nb_channels, i_output_size );
-            i_output_size = i_out_nb * 4 * i_nb_channels;
-            memset( p_out, 0, i_output_size );
-        }
-        memmove( p_sys->p_bufferized,
-                 p_sys->p_bufferized + i_input_samples * 4 * i_nb_channels,
-                 (p_sys->i_bufferized - i_input_samples) * 4 * i_nb_channels );
-        p_sys->i_bufferized -= i_input_samples;
-
-        p_middle_buf->i_nb_samples = i_output_size / 4 / i_nb_channels;
-        p_middle_buf->i_nb_bytes = i_output_size;
-        p_middle_buf->start_date = p_in_buf->start_date;
-        p_middle_buf->end_date = p_middle_buf->start_date
-            + p_middle_buf->i_nb_samples * 1000000 / p_filter->output.i_rate;
-    
-        i_wanted_nb = i_input_samples * p_filter->output.i_rate
-                                            / p_filter->input.i_rate;
-        i_new_rate = p_middle_buf->i_nb_samples * p_filter->output.i_rate
-                                            / i_wanted_nb;
-    
-        p_sys->p_secondary_resampler->input.i_rate = i_new_rate;
-        p_sys->p_secondary_resampler->pf_do_work( p_aout,
-            p_sys->p_secondary_resampler, p_middle_buf, p_out_buf );
-    
-        if ( p_middle_buf != p_out_buf )
-        {
-            aout_BufferFree( p_middle_buf );
-        }
-
-        memcpy( p_sys->p_output + p_sys->i_output * i_nb_channels,
-                p_out_buf->p_buffer,
-                __MIN(p_out_buf->i_nb_samples * 4 * i_nb_channels,
-                      sizeof(p_sys->p_output)
-                         - p_sys->i_output * 4 * i_nb_channels) );
-        p_sys->i_output += p_out_buf->i_nb_samples;
-
-        aout_BufferFree( p_out_buf );
-    }
-
     i_out_nb = (p_in_buf->i_nb_samples * p_filter->output.i_rate
-                 + p_sys->i_first_rate - 1) / p_sys->i_first_rate;
-    if ( i_out_nb > p_sys->i_output )
-        i_out_nb = p_sys->i_output;
+                 + p_sys->i_remainder) / p_sys->i_first_rate;
+    p_sys->i_remainder = (p_in_buf->i_nb_samples * p_filter->output.i_rate
+                 + p_sys->i_remainder) % p_sys->i_first_rate;
 
-    p_real_out_buf->i_nb_samples = i_out_nb;
-    p_real_out_buf->i_nb_bytes = i_out_nb * 4 * i_nb_channels;
-
-    if( p_in_buf->start_date !=
-        aout_DateGet( &p_filter->p_sys->end_date ) )
+    i_output_size = i_out_nb * 4 * i_nb_channels;
+    if ( i_output_size > p_out_buf->i_size )
     {
-        aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );
+        aout_BufferAlloc( &p_sys->alloc,
+            i_out_nb * 1000000 / p_filter->output.i_rate,
+            NULL, p_middle_buf );
+    }
+    else
+    {
+        p_middle_buf = p_out_buf;
+    }
+    p_out = (int32_t*)p_middle_buf->p_buffer;
+    err = AudioConverterConvertBuffer( p_sys->s_converter,
+        p_in_buf->i_nb_samples * 4 * i_nb_channels, p_in,
+        &i_output_size, p_out );
+    if( err != noErr )
+    {
+        msg_Warn( p_filter, "AudioConverterConvertBuffer failed: [%4.4s] (%u:%u)",
+                 (char *)&err, i_out_nb * 4 * i_nb_channels, i_output_size );
+        i_output_size = i_out_nb * 4 * i_nb_channels;
+        memset( p_out, 0, i_output_size );
     }
 
-    p_real_out_buf->end_date = aout_DateIncrement( &p_filter->p_sys->end_date,
-                                                   i_out_nb );
-    memcpy( p_real_out_buf->p_buffer, p_sys->p_output,
-            i_out_nb * 4 * i_nb_channels );
-    memmove( p_sys->p_output, p_sys->p_output + i_out_nb * i_nb_channels,
-             (p_sys->i_output - i_out_nb) * 4 * i_nb_channels );
-    p_sys->i_output -= i_out_nb;
+    p_middle_buf->i_nb_samples = i_output_size / 4 / i_nb_channels;
+    p_middle_buf->i_nb_bytes = i_output_size;
+    p_middle_buf->start_date = p_in_buf->start_date;
+    p_middle_buf->end_date = p_middle_buf->start_date + p_middle_buf->i_nb_samples *
+        1000000 / p_filter->output.i_rate;
+
+    i_wanted_nb = p_in_buf->i_nb_samples * p_filter->output.i_rate
+                                        / p_filter->input.i_rate;
+    i_new_rate = p_middle_buf->i_nb_samples * p_filter->output.i_rate
+                                        / i_wanted_nb;
+
+    p_sys->p_secondary_resampler->input.i_rate = i_new_rate;
+    p_sys->p_secondary_resampler->pf_do_work( p_aout,
+        p_sys->p_secondary_resampler, p_middle_buf, p_out_buf );
+
+    if ( p_middle_buf != p_out_buf )
+    {
+        aout_BufferFree( p_middle_buf );
+    }
 }
