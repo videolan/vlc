@@ -498,9 +498,12 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
     char *psz_group, *psz_name;
+    char ipv;
 
     psz_group = convert_to_utf8( p_sap, p_session->psz_group );
     psz_name = convert_to_utf8( p_sap, p_session->psz_name );
+
+    ipv = ( strchr( p_session->psz_uri, ':' )  != NULL) ? '6' : '4';
 
     /* see the lists in modules/stream_out/rtp.c for compliance stuff */
     p_session->psz_sdp = (char *)malloc(
@@ -528,12 +531,12 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                             "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
                             "s=%s\r\n"
                             "t=0 0\r\n"
-                            "c=IN IP4 %s/%d\r\n"
+                            "c=IN IP%c %s/%d\r\n"
                             "m=video %d udp %d\r\n"
                             "a=tool:"PACKAGE_STRING"\r\n"
                             "a=type:broadcast\r\n",
                             i_sdp_id, i_sdp_version,
-                            psz_name,
+                            psz_name, ipv,
                             p_session->psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload );
     free( psz_name );
