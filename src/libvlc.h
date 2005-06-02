@@ -324,7 +324,7 @@ static char *ppsz_clock_descriptions[] =
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID.\n" \
     "Only use this option if you want to read a multi-program stream " \
-    "(ike DVB streams for example)" )
+    "(like DVB streams for example)" )
 
 #define INPUT_PROGRAMS_TEXT N_("Choose programs")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
