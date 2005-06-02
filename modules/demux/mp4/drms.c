@@ -89,7 +89,9 @@ struct aes_s
     uint32_t pp_dec_keys[ AES_KEY_COUNT + 1 ][ 4 ];
 };
 
-#ifndef __VLC__
+#ifdef __VLC__
+# define Digest DigestMD5
+#else
 /*****************************************************************************
  * md5_s: MD5 message structure
  *****************************************************************************

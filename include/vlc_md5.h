@@ -41,6 +41,6 @@ struct md5_s
 VLC_EXPORT(void, InitMD5, ( struct md5_s * ) );
 VLC_EXPORT(void, AddMD5, ( struct md5_s *, const uint8_t *, uint32_t ) );
 VLC_EXPORT(void, EndMD5, ( struct md5_s * ) );
-VLC_EXPORT(void, Digest, ( struct md5_s *, uint32_t * ) );
+VLC_EXPORT(void, DigestMD5, ( struct md5_s *, uint32_t * ) );
 
 #endif
