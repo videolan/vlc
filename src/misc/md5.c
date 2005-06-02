@@ -174,7 +174,7 @@ void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
     {
         memcpy( ((uint8_t *)p_md5->p_data) + i_current, p_src,
                 (64 - i_current) );
-        Digest( p_md5, p_md5->p_data );
+        DigestMD5( p_md5, p_md5->p_data );
 
         i_offset += (64 - i_current);
         i_len -= (64 - i_current);
@@ -186,7 +186,7 @@ void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
     {
         uint32_t p_tmp[ 16 ];
         memcpy( p_tmp, p_src + i_offset, 64 );
-        Digest( p_md5, p_tmp );
+        DigestMD5( p_md5, p_tmp );
         i_offset += 64;
         i_len -= 64;
     }
@@ -217,7 +217,7 @@ void EndMD5( struct md5_s *p_md5 )
     if( i_current > 56 )
     {
         memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (64 - i_current) );
-        Digest( p_md5, p_md5->p_data );
+        DigestMD5( p_md5, p_md5->p_data );
         i_current = 0;
     }
 
@@ -228,7 +228,7 @@ void EndMD5( struct md5_s *p_md5 )
     p_md5->p_data[ 15 ] = (p_md5->i_bits >> 32);
     REVERSE( &p_md5->p_data[ 14 ], 2 );
 
-    Digest( p_md5, p_md5->p_data );
+    DigestMD5( p_md5, p_md5->p_data );
 }
 
 
