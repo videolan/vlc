@@ -369,7 +369,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_SLAVE_TEXT N_("Input slave (experimental)")
 #define INPUT_SLAVE_LONGTEXT N_("Allows you to play from several files at " \
-    "the same time. This feature is experimental, not all formats " \  
+    "the same time. This feature is experimental, not all formats " \
  	"are supported.")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
