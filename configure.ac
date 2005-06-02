@@ -2115,7 +2115,7 @@ then
           VLC_ADD_BUILTINS([stream_out_switcher])
       fi
       VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
-      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
+      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
 
       if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
         AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
