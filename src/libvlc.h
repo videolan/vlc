@@ -322,16 +322,16 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_PROGRAM_TEXT N_("Choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
-    "Choose the program to select by giving its Service ID\n." \
+    "Choose the program to select by giving its Service ID.\n" \
     "Only use this option if you want to read a multi-program stream " \
-    "(like DVB streams for example )" )
+    "(like DVB streams for example)" )
 
 #define INPUT_PROGRAMS_TEXT N_("Choose programs")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
     "Choose the programs to select by giving a comma-separated list of " \
-    "SIDs\n." \
+    "SIDs.\n" \
     "Only use this option if you want to read a multi-program stream " \
-    "(like DVB streams for example )" )
+    "(like DVB streams for example)" )
 
 #define INPUT_AUDIOTRACK_TEXT N_("Choose audio track")
 #define INPUT_AUDIOTRACK_LONGTEXT N_( \
@@ -369,7 +369,8 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_SLAVE_TEXT N_("Input slave (experimental)")
 #define INPUT_SLAVE_LONGTEXT N_("Allows you to play from several files at " \
-    "the same time. Experimental, not all formats are supported.")
+    "the same time. This feature is experimental, not all formats " \
+    "are supported.")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
@@ -534,7 +535,7 @@ static char *ppsz_clock_descriptions[] =
 #define SOUT_TEXT N_("Default stream output chain")
 #define SOUT_LONGTEXT N_( \
     "You can enter here a default stream output chain. Refer to "\
-    "the documentation to learn how to build such chains." \
+    "the documentation to learn how to build such chains. " \
     "Warning: this chain will be enabled for all streams." )
 
 #define SOUT_ALL_TEXT N_("Enable streaming of all ES")
@@ -628,8 +629,8 @@ static char *ppsz_clock_descriptions[] =
 
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
-     "Specifies the services discovery modules to load, separated by commas." \
-     "Typical values are sap, hal, ..." )
+     "Specifies the services discovery modules to load, separated by " \
+     "semi-colons. Typical values are sap, hal, ..." )
 
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \

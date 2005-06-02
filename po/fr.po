@@ -25,7 +25,7 @@ msgstr "Préférences de VLC"
 
 #: include/vlc_config_cat.h:34
 msgid "Click on \"Advanced Options\" to see all options."
-msgstr ""
+msgstr "Cliquez sur \"Optione avancées\" pour voir toutes les options"
 
 #: include/vlc_config_cat.h:36 src/input/input.c:1822 src/input/input.c:1882
 #: src/playlist/item.c:366 src/playlist/playlist.c:133
@@ -39,7 +39,7 @@ msgstr "Interface"
 
 #: include/vlc_config_cat.h:40
 msgid "Settings for VLC interfaces"
-msgstr ""
+msgstr "Paramètres des interfaces"
 
 #: include/vlc_config_cat.h:42
 #, fuzzy
@@ -148,7 +148,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:84
 msgid "Video filters are used to postprocess the video stream"
-msgstr ""
+msgstr "Les filtres vidéo permettrent de traiter le flux vidéo sortant"
 
 #: include/vlc_config_cat.h:86
 #, fuzzy
@@ -160,6 +160,8 @@ msgid ""
 "Miscellaneous settings related to On Screen Display, subtitles and overlay "
 "subpictures"
 msgstr ""
+"Paramètres divers pour l'affichage à l'écran (OSD), les sous-titres et les "
+"incrustations"
 
 #: include/vlc_config_cat.h:89
 #, fuzzy
@@ -177,13 +179,15 @@ msgstr ""
 
 #: include/vlc_config_cat.h:95
 msgid "Input / Codecs"
-msgstr ""
+msgstr "Lecture / Décodeurs"
 
 #: include/vlc_config_cat.h:96
 msgid ""
 "These are the settings for the input, demultiplexing and decoding parts of "
 "VLC. Encoder settings can also be found here"
 msgstr ""
+"Ces paramètres permettent de régler la lecture, le démultiplexage et le "
+"décodage dans VLC. Les paramètres d'encodage sont également ici."
 
 #: include/vlc_config_cat.h:98
 #, fuzzy
@@ -207,33 +211,32 @@ msgstr "Module d’accès"
 #: include/vlc_config_cat.h:106
 msgid "Settings related to the various access filter used by VLC.\n"
 msgstr ""
+"Réglages pour les filtres d'entrée utilisés par VLC.\n"
 
 #: include/vlc_config_cat.h:108
-#, fuzzy
 msgid "Demuxers"
-msgstr "Numéro du module de démultiplexage"
+msgstr "Démultiplexeurs"
 
 #: include/vlc_config_cat.h:109
 msgid "Demuxers are used to separate audio and video streams"
 msgstr ""
+"Les démultiplexeurs permettent de séparer les flux audio et video"
 
 #: include/vlc_config_cat.h:111
-#, fuzzy
 msgid "Video codecs"
-msgstr "Codec vidéo"
+msgstr "Codecs vidéo"
 
 #: include/vlc_config_cat.h:112
 msgid "Settings for the video-only decoders and encoders"
-msgstr ""
+msgstr "Réglages pour les décodeurs et encodeurs vidéo"
 
 #: include/vlc_config_cat.h:114
-#, fuzzy
 msgid "Audio codecs"
-msgstr "Codec audio"
+msgstr "Codecs audio"
 
 #: include/vlc_config_cat.h:115
 msgid "Settings for the audio-only decoders and encoders"
-msgstr ""
+msgstr "Réglages pour les décodeurs et encodeurs audio"
 
 #: include/vlc_config_cat.h:117
 #, fuzzy
@@ -242,7 +245,7 @@ msgstr "Mode Stéréo"
 
 #: include/vlc_config_cat.h:118
 msgid "Settings for audio+video and miscellaneous decoders and encoders"
-msgstr ""
+msgstr "Réglages pour les décodeurs/encodeurs audio+vidéo et divers"
 
 #: include/vlc_config_cat.h:120 include/vlc_config_cat.h:178 src/libvlc.h:1116
 #: modules/gui/macosx/prefs.m:119
@@ -251,7 +254,7 @@ msgstr "Avancé"
 
 #: include/vlc_config_cat.h:121
 msgid "Advanced input settings. Use with care."
-msgstr ""
+msgstr "Réglages de lecture avancés. A utiliser avec précaution."
 
 #: include/vlc_config_cat.h:124 src/libvlc.h:1135
 #: modules/gui/gtk/gtk_interface.c:2370 modules/gui/gtk/gtk_interface.c:3046
@@ -287,11 +290,17 @@ msgid ""
 "force a muxer.You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
+"Les multiplexeurs gèrent les différents formats d'encapsulation utilisés "
+"pour assembler tous les flux élémentaires (audio, vidéo). Ce réglage vous "
+"permet de toujours forcer un multiplexeur. Ce n'est probablement pas "
+"souhaitable.\n"
+" Vous pouvez également régler les paramètres par défaut de "
+"chaque multiplexeur."
 
 #: include/vlc_config_cat.h:142
 #, fuzzy
 msgid "Access output"
-msgstr "Module de sortie"
+msgstr "Modules de sortie"
 
 #: include/vlc_config_cat.h:143
 msgid ""
@@ -299,6 +308,11 @@ msgid ""
 "you to always force an access output.You should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
+"Les modules de sorties sont les moyens d'envoyer les flux multiplexés. Ce "
+"réglage vous permet de toujours forcer un module de sortie. Ce n'est "
+"probablement pas souhaitable.\n"
+"Vous pouvez également régler les paramètres par défaut de chaque module de "
+"sortie."
 
 #: include/vlc_config_cat.h:148
 #, fuzzy
@@ -312,11 +326,16 @@ msgid ""
 "do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
+"Les empaqueteurs permettent de \"pré-traiter\" un flux élémentaire "
+"avant son multiplexage. Ce réglage vous permet de toujours forcer un "
+"empaqueteur. Ce n'est probablement pas souhaitable.\n"
+"Vous pouvez également régler les paramètres par défaut de chaque "
+"empaqueteur."
 
 #: include/vlc_config_cat.h:155
 #, fuzzy
 msgid "Sout stream"
-msgstr "Arrêter le flux"
+msgstr "Flux de sortie"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -324,27 +343,31 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
+"Les modules de flux de sortie vous permettent de bâtir une chaîne de "
+"traiment pour le flux de sortie. Merci de bien vouloir lire le \"Streaming"
+" Howto\" pour plus de détails. Vous pouvez configurer les options par "
+"défaut pour chaque module de flux de sortie ici."
 
 #: include/vlc_config_cat.h:161 modules/services_discovery/sap.c:114
 #: modules/services_discovery/sap.c:360
-#, fuzzy
 msgid "SAP"
-msgstr "SDP"
+msgstr "SAP"
 
 #: include/vlc_config_cat.h:162
 msgid ""
 "SAP is a way to publically announce streams that are being sent using "
 "multicast UDP or RTP."
 msgstr ""
+"SAP est une méthode permettant d'annoncer publiquement des flux envoyés "
+"par UDP ou RTP multicast."
 
 #: include/vlc_config_cat.h:165
-#, fuzzy
 msgid "VOD"
-msgstr "DVD"
+msgstr "VOD"
 
 #: include/vlc_config_cat.h:166
 msgid "VLC's implementation of Video On Demand"
-msgstr ""
+msgstr "Vidéo à la demande par VLC"
 
 #: include/vlc_config_cat.h:170 src/libvlc.h:1236
 #: modules/gui/beos/InterfaceWindow.cpp:213
@@ -365,36 +388,42 @@ msgid ""
 "modules that automatically add items to the playlist ('service discovery "
 "modules'"
 msgstr ""
+"Réglages liés au comportement de la liste de lecture (mode de lecture, par"
+" exemple) et aux modules de découverte de services (modules qui ajoutent "
+"automatiquement des éléments à la liste de lecture)"
 
 #: include/vlc_config_cat.h:173
 msgid "General playlist behaviour"
-msgstr ""
+msgstr "Comportement général de la liste de lecture"
 
 #: include/vlc_config_cat.h:174 modules/gui/macosx/playlist.m:235
 #: modules/gui/wxwindows/playlist.cpp:233
-#, fuzzy
 msgid "Services discovery"
-msgstr "Répertoire source"
+msgstr "Découverte de services"
 
 #: include/vlc_config_cat.h:175
 msgid ""
 "Services discovery modules are modules that automatically add items to "
 "playlist"
 msgstr ""
+"Les modules de découverte de services ajoutent automatiquement des "
+"éléments à la liste de lecture."
 
 #: include/vlc_config_cat.h:179
 msgid "Advanced settings. Use with care."
-msgstr ""
+msgstr "Réglages avancés. A utiliser avec précaution."
 
 #: include/vlc_config_cat.h:181
 msgid "CPU features"
-msgstr ""
+msgstr "Capacités CPU"
 
 #: include/vlc_config_cat.h:182
 msgid ""
 "From here you can choose to disable some CPU accelerations. You should "
 "probably not touch that."
 msgstr ""
+"Vous pouvez choisir de désactiver des accélérations CPU. Vous ne devriez"
+" probablement pas modifier ceci."
 
 #: include/vlc_config_cat.h:184 modules/demux/util/id3genres.h:40
 msgid "Other"
@@ -415,7 +444,8 @@ msgstr "Réseau"
 
 #: include/vlc_config_cat.h:188
 msgid "These modules provide network functions to all other parts of VLC"
-msgstr ""
+msgstr "Ces modules fournissent les fonctions d'accès au réseau à tous "
+"les autres modules de VLC"
 
 #: include/vlc_config_cat.h:193
 msgid "Chroma modules settings"
@@ -1049,7 +1079,7 @@ msgstr "Allemand"
 
 #: src/libvlc.h:34
 msgid "Greek"
-msgstr ""
+msgstr "Grec"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:168
 msgid "Spanish"
@@ -1123,7 +1153,7 @@ msgstr "Tagalog"
 
 #: src/libvlc.h:36
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Chinois Traditionnel"
 
 #: src/libvlc.h:49
 msgid ""
@@ -1596,7 +1626,7 @@ msgstr "Toujours placer la fenêtre DirectX au-dessus des autres fenêtres"
 
 #: src/libvlc.h:246
 msgid "Window decorations"
-msgstr ""
+msgstr "Décorations de fenêtres"
 
 #: src/libvlc.h:248
 msgid ""
@@ -1619,7 +1649,7 @@ msgstr ""
 
 #: src/libvlc.h:257
 msgid "Video snapshot directory"
-msgstr ""
+msgstr "Répertoire des captures"
 
 #: src/libvlc.h:259
 #, fuzzy
@@ -1664,11 +1694,12 @@ msgstr "Images B"
 
 #: src/libvlc.h:278
 msgid "Disable this option to disable frame drops on MPEG-2 streams."
-msgstr ""
+msgstr "Désactivez cette option pour désactiver la suppression "
+"d'images sur les flux MPEG-2"
 
 #: src/libvlc.h:280
 msgid "Quiet synchro"
-msgstr ""
+msgstr "Synchronisation silencieuse"
 
 #: src/libvlc.h:282
 msgid ""
@@ -1708,6 +1739,8 @@ msgid ""
 "Allows you to enable/disable the input clock synchronisation for real-time "
 "sources."
 msgstr ""
+"Cette option vous permet d'activer ou de désactiver le méchanisme de "
+"synchronisation d'horloge pour les sources temps-réel."
 
 #: src/libvlc.h:301 modules/access/dshow/dshow.cpp:72
 #: modules/access/dshow/dshow.cpp:74 modules/access/dshow/dshow.cpp:77
@@ -1785,6 +1818,9 @@ msgid ""
 ".Only use this option if you want to read a multi-program stream (like DVB "
 "streams for example )"
 msgstr ""
+"Veuillez choisir le programme à sélectionner en donnant son Service ID.\n"
+"N'utilisez cette option que pour lire un flux multi-programme (tel qu'un "
+"flux DVB, par exemple)"
 
 #: src/libvlc.h:329
 msgid "Choose programs"
@@ -1888,6 +1924,8 @@ msgid ""
 "Allows you to play from several files at the same time. Experimental, not "
 "all formats are supported."
 msgstr ""
+"Ceci vous permet de lire depuis plusieurs fichiers en même temps. Cette "
+"fonction est expérimentale, tous les formats ne sont pas supportés."
 
 #: src/libvlc.h:374
 msgid "Bookmarks list for a stream"
@@ -2240,6 +2278,9 @@ msgid ""
 "to learn how to build such chains.Warning: this chain will be enabled for "
 "all streams."
 msgstr ""
+"Vous pouvez entrer ici une chaîne de flux de sortie par défaut. Veuillez "
+"vous référer à la documentation pour savoir comment construire ces chaînes. "
+"Attention: cette chaîne sera activée pour tous les flux."
 
 #: src/libvlc.h:540
 msgid "Enable streaming of all ES"
@@ -2456,6 +2497,8 @@ msgid ""
 "Specifies the services discovery modules to load, separated by commas."
 "Typical values are sap, hal, ..."
 msgstr ""
+"Vous permet de spécifier les modules de découverte de services à lancer, "
+"séparés par des ':'. Les valeurs courantes sont sap, hal, ..."
 
 #: src/libvlc.h:634
 msgid "Play files randomly forever"
@@ -3176,21 +3219,20 @@ msgstr "Montrer l'interface devant les autres fenêtres"
 
 #: src/libvlc.h:846
 msgid "Take video snapshot"
-msgstr ""
+msgstr "Prendre une capture d'écran"
 
 #: src/libvlc.h:847
 msgid "Takes a video snapshot and writes it to disk."
-msgstr ""
+msgstr "Prend une capture d'écran et l'écrit sur le disque"
 
 #: src/libvlc.h:849 modules/access_filter/record.c:50
 #: modules/access_filter/record.c:51
-#, fuzzy
 msgid "Record"
-msgstr "Fondu"
+msgstr "Enregistrer"
 
 #: src/libvlc.h:850
 msgid "Record access filter start/stop."
-msgstr ""
+msgstr "Démarrer/arrêter le filtre d'enregistrement"
 
 #: src/libvlc.h:854
 #, fuzzy, c-format
@@ -3293,18 +3335,16 @@ msgid "Default devices"
 msgstr "Options prédéfinies"
 
 #: src/libvlc.h:1077
-#, fuzzy
 msgid "Network settings"
-msgstr "Paramètres des modules de réseau"
+msgstr "Paramètres réseau"
 
 #: src/libvlc.h:1089
 msgid "Socks proxy"
-msgstr ""
+msgstr "Proxy SOCKS"
 
 #: src/libvlc.h:1098
-#, fuzzy
 msgid "Metadata"
-msgstr "URL"
+msgstr "Métadonnées"
 
 #: src/libvlc.h:1125
 msgid "Decoders"
