@@ -301,6 +301,63 @@ static int Open( vlc_object_t * p_this )
 
     msg_Dbg( p_aout, "defined %d physical channels for vlc core", aout_FormatNbChannels( &p_aout->output.output ) );
     msg_Dbg( p_aout, "%s", aout_FormatPrintChannels( &p_aout->output.output ));
+    
+    AudioChannelLayout new_layout;
+    memset (&new_layout, 0, sizeof(new_layout));
+    switch( aout_FormatNbChannels( &p_aout->output.output ) )
+    {
+        case 1:
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+            break;
+        case 2:
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+            break;
+        case 3:
+            if( p_aout->output.output.i_physical_channels & AOUT_CHAN_CENTER )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
+            }
+            else if( p_aout->output.output.i_physical_channels & AOUT_CHAN_LFE )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
+            }
+            break;
+        case 4:
+            if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_CENTER | AOUT_CHAN_LFE ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
+            }
+            else if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
+            }
+            else if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
+            }
+            break;
+        case 5:
+            if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_CENTER ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
+            }
+            else if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_LFE ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
+            }
+            break;
+        case 6:
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
+            break;
+        case 7:
+            /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
+            break;
+        case 8:
+            /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+            break;
+    }
 
     /* Set up the format to be used */
     DeviceFormat.mSampleRate = p_aout->output.output.i_rate;
@@ -358,6 +415,12 @@ static int Open( vlc_object_t * p_this )
 
     input.inputProc = (AURenderCallback) RenderCallbackAnalog;
     input.inputProcRefCon = p_aout;
+    
+    /* Set the new_layout as the layout VLC feeds to the AU unit */
+    verify_noerr( AudioUnitSetProperty( p_sys->au_unit,
+                            kAudioUnitProperty_AudioChannelLayout,
+                            kAudioUnitScope_Input,
+                            0, &new_layout, sizeof(new_layout) ) );
     
     /* AU initiliaze */
     verify_noerr( AudioUnitInitialize(p_sys->au_unit) );
