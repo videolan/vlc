@@ -23,6 +23,7 @@ EXTRA_DIST = \
 	bootstrap \
 	src/extras/COPYING \
 	toolbox \
+	vlc-api.pl \
 	vlc-config.in.in \
 	vlc.spec \
 	vlc.spec.mdk \
@@ -45,9 +46,7 @@ AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 
 BUILT_SOURCES += \
 	stamp-api \
-	include/vlc_symbols.h \
 	src/misc/modules_builtin.h \
-	src/misc/modules_plugin.h \
 	$(NULL)
 
 pkgincludedir = $(includedir)/vlc
@@ -63,7 +62,7 @@ dist_pkginclude_HEADERS = \
 	include/vlc/control.h \
 	$(NULL)
 
-noinst_HEADERS = $(HEADERS_include) $(HEADERS_include_built)
+noinst_HEADERS = $(HEADERS_include)
 
 HEADERS_include = \
 	include/aout_internal.h \
@@ -114,6 +113,7 @@ HEADERS_include = \
 	include/vlc_playlist.h \
 	include/vlc_spu.h \
 	include/vlc_stream.h \
+	include/vlc_symbols.h \
 	include/vlc_threads_funcs.h \
 	include/vlc_threads.h \
 	include/vlc_video.h \
@@ -124,32 +124,12 @@ HEADERS_include = \
 	include/win32_specific.h \
 	$(NULL)
 
-HEADERS_include_built = \
-	include/vlc_symbols.h \
-	$(NULL)
-
-# Common dependencies for these 3 files : Makefile vlc-config
-# Real specific dependencies :
-
-#include/vlc_symbols.h: $(HEADERS_include)
-#src/misc/modules_plugin.h: src/misc/modules_plugin.h.in $(HEADERS_include)
-#src/misc/modules_builtin.h: src/misc/modules_builtin.h.in vlc-config
-
-include/vlc_symbols.h:
+src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
-
-# for some strange reasons (??) modules_plugin.h depends on vlc_symbols.h
-# so we have to touch it :(
-src/misc/modules_plugin.h: src/misc/modules_plugin.h.in
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
-	touch src/misc/modules_plugin.h
-
-src/misc/modules_builtin.h: src/misc/modules_builtin.h.in
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+	touch $@
 
 # These dependencies are mandatory
-$(SOURCES): include/vlc_symbols.h
-$(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h $(LIB_intl)
+$(SOURCES_libvlc): src/misc/modules_builtin.h $(LIB_intl)
 
 ###############################################################################
 # Optional libintl - FIXME, bad dependencies
@@ -285,7 +265,6 @@ CLEANFILES = $(BUILT_SOURCES)
 lib_LIBRARIES = lib/libvlc.a $(LIBRARIES_libvlc_pic)
 
 lib_libvlc_a_SOURCES = $(SOURCES_libvlc)
-dist_lib_libvlc_a_SOURCES = src/misc/modules_plugin.h
 lib_libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 lib_libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 lib_libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
@@ -939,8 +918,8 @@ stamp-builtin: FORCE
 	done
 	@if test ! -f $@; then printf "" > $@; fi
 
-stamp-api: Makefile $(HEADERS_include) vlc-config src/misc/modules_plugin.h.in src/misc/modules_builtin.h.in
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
+stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl src/misc/modules_builtin.h.in
+	cd $(srcdir) && cat $(HEADERS_include) | perl ./vlc-api.pl
 	touch stamp-api
 
 ###############################################################################

@@ -85,7 +85,7 @@ if test "${top_builddir}" != ""; then
 elif test "${TOP_BUILDDIR}" != ""; then
   top_builddir="${TOP_BUILDDIR}/"
 fi
-includes="${includes} -I${top_builddir}include"
+includes="${includes}"
 cppflags="${includes}"
 libs="-L@libdir@"
 module=""

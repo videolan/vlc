@@ -107,10 +107,6 @@
 
 #include "vlc_image.h"
 
-#ifdef HAVE_DYNAMIC_PLUGINS
-#   include "modules_plugin.h"
-#endif
-
 #if defined( _MSC_VER ) && defined( UNDER_CE )
 #    include "modules_builtin_evc.h"
 #elif defined( _MSC_VER )
