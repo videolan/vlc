@@ -75,7 +75,7 @@ static void     Close   ( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-es-"
 
 vlc_module_begin();
-    set_shortname( _("ES"));
+    set_shortname( "ES" );
     set_description( _("Elementary stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "es" );

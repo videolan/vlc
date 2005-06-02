@@ -57,7 +57,7 @@ static void Display   ( vout_thread_t *, picture_t * );
                             "will have the form prefixNUMBER.format" )
 
 static char *psz_format_list[] = { "png" };
-static char *psz_format_list_text[] = { N_("PNG") };
+static char *psz_format_list_text[] = { "PNG" };
 
 vlc_module_begin( );
     set_shortname( _( "Image file" ) );

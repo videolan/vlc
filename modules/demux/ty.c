@@ -66,7 +66,7 @@ static int Control(demux_t *, int, va_list);
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_shortname( _("TY") );
+    set_shortname( "TY" );
     set_description(_("TY Stream audio/video demux"));
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

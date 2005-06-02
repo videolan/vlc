@@ -78,14 +78,14 @@
 #define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
 #define SAP_IPV4_LONGTEXT N_( \
       "Set this if you want the SAP module to listen to IPv4 announces " \
-      "on the standard address" )
+      "on the standard address." )
 #define SAP_IPV6_TEXT N_( "IPv6-SAP listening" )
 #define SAP_IPV6_LONGTEXT N_( \
       "Set this if you want the SAP module to listen to IPv6 announces " \
-      "on the standard address" )
+      "on the standard address." )
 #define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
-       "Sets the scope for IPv6 announces (default is 8)" )
+       "Sets the scope for IPv6 announces (default is 8)." )
 #define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
 #define SAP_TIMEOUT_LONGTEXT N_( \
        "Sets the time before SAP items get deleted if no new announce " \
@@ -93,14 +93,14 @@
 #define SAP_PARSE_TEXT N_( "Try to parse the SAP" )
 #define SAP_PARSE_LONGTEXT N_( \
        "When SAP can it will try to parse the SAP. If you don't select " \
-       "this, all announces will be parsed by the livedotcom module" )
+       "this, all announces will be parsed by the livedotcom module." )
 #define SAP_STRICT_TEXT N_( "SAP Strict mode" )
 #define SAP_STRICT_LONGTEXT N_( \
        "When this is set, the SAP parser will discard some non-compliant " \
-       "announces" )
+       "announces." )
 #define SAP_CACHE_TEXT N_("Use SAP cache")
 #define SAP_CACHE_LONGTEXT N_( \
-       "If this option is selected, a SAP caching mechanism will be used." \
+       "If this option is selected, a SAP caching mechanism will be used. " \
        "This will result in lower SAP startup time, but you could end up " \
         "with items corresponding to legacy streams." )
 

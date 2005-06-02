@@ -141,7 +141,7 @@ static char *ppsz_dev[] = { "" };
 static char *ppsz_dev_text[] = { N_("Default") };
 
 vlc_module_begin();
-    set_shortname( _("DirectX") );
+    set_shortname( "DirectX" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
