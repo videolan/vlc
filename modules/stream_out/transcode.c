@@ -71,6 +71,10 @@
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
     "Allows you to specify the output video height." )
+#define VFILTER_TEXT N_("Video filter")
+#define VFILTER_LONGTEXT N_( \
+    "Allows you to specify video filters used after the video " \
+    "transcoding and subpictures overlaying." )
 
 #define CROPTOP_TEXT N_("Video crop top")
 #define CROPTOP_LONGTEXT N_( \
@@ -123,6 +127,10 @@
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
     "Allows you to specify the number of threads used for the transcoding." )
+#define HP_TEXT N_("High priority")
+#define HP_LONGTEXT N_( \
+    "Runs the optional encoder thread at the OUTPUT priority instead of " \
+    "VIDEO." )
 
 #define ASYNC_TEXT N_("Synchronise on audio track")
 #define ASYNC_LONGTEXT N_( \
@@ -168,6 +176,9 @@ vlc_module_begin();
                  WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, VLC_TRUE );
+    add_module_list_cat( SOUT_CFG_PREFIX "vfilter", SUBCAT_VIDEO_VFILTER,
+                     NULL, NULL,
+                     VFILTER_TEXT, VFILTER_LONGTEXT, VLC_FALSE );
 
     add_integer( SOUT_CFG_PREFIX "croptop", 0, NULL, CROPTOP_TEXT,
                  CROPTOP_LONGTEXT, VLC_TRUE );
@@ -206,15 +217,17 @@ vlc_module_begin();
     set_section( N_("Miscellaneous"), NULL );
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "high-priority", 0, NULL, HP_TEXT, HP_LONGTEXT,
+              VLC_TRUE );
 
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
-    "scale", "fps", "width", "height", "deinterlace", "deinterlace-module",
-    "threads", "hurry-up", "aenc", "acodec", "ab", "samplerate", "channels",
-    "senc", "scodec", "soverlay", "sfilter",
-    "audio-sync", NULL
+    "scale", "fps", "width", "height", "vfilter", "deinterlace",
+    "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
+    "samplerate", "channels", "senc", "scodec", "soverlay", "sfilter",
+    "audio-sync", "high-priority", NULL
 };
 
 /*****************************************************************************
@@ -300,7 +313,11 @@ struct sout_stream_sys_t
     char            *psz_deinterlace;
     sout_cfg_t      *p_deinterlace_cfg;
     int             i_threads;
+    vlc_bool_t      b_high_priority;
     vlc_bool_t      b_hurry_up;
+    char            *psz_vfilters[10];
+    sout_cfg_t      *p_vfilters_cfg[10];
+    int             i_vfilters;
 
     int             i_crop_top;
     int             i_crop_bottom;
@@ -434,6 +451,26 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "height", &val );
     p_sys->i_height = val.i_int;
 
+    var_Get( p_stream, SOUT_CFG_PREFIX "vfilter", &val );
+    p_sys->i_vfilters = 0;
+    if( val.psz_string && *val.psz_string )
+    {
+        char *psz_parser = val.psz_string;
+
+        while( psz_parser != NULL && *psz_parser != '\0' )
+        {
+            psz_parser = sout_CfgCreate(
+                                   &p_sys->psz_vfilters[p_sys->i_vfilters],
+                                   &p_sys->p_vfilters_cfg[p_sys->i_vfilters],
+                                   psz_parser );
+            p_sys->i_vfilters++;
+            if( psz_parser != NULL && *psz_parser != '\0' ) psz_parser++;
+        }
+    }
+    if( val.psz_string ) free( val.psz_string );
+    p_sys->psz_vfilters[p_sys->i_vfilters] = NULL;
+    p_sys->p_vfilters_cfg[p_sys->i_vfilters] = NULL;
+
     var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace", &val );
     p_sys->b_deinterlace = val.b_bool;
 
@@ -461,6 +498,8 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "threads", &val );
     p_sys->i_threads = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "high-priority", &val );
+    p_sys->b_high_priority = val.b_bool;
 
     if( p_sys->i_vcodec )
     {
@@ -608,6 +647,8 @@ struct sout_stream_id_t
     /* Filters */
     filter_t        *pp_filter[10];
     int             i_filter;
+    filter_t        *pp_vfilter[10];
+    int             i_vfilter;
 
     /* Encoder */
     encoder_t       *p_encoder;
@@ -1328,6 +1369,8 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( p_sys->i_threads >= 1 )
     {
+        int i_priority = p_sys->b_high_priority ? VLC_THREAD_PRIORITY_OUTPUT :
+                           VLC_THREAD_PRIORITY_VIDEO;
         p_sys->id_video = id;
         vlc_mutex_init( p_stream, &p_sys->lock_out );
         vlc_cond_init( p_stream, &p_sys->cond );
@@ -1336,8 +1379,8 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         p_sys->i_last_pic = 0;
         p_sys->p_buffers = NULL;
         p_sys->b_die = p_sys->b_error = 0;
-        if( vlc_thread_create( p_sys, "encoder", EncoderThread,
-                               VLC_THREAD_PRIORITY_VIDEO, VLC_FALSE ) )
+        if( vlc_thread_create( p_sys, "encoder", EncoderThread, i_priority,
+                               VLC_FALSE ) )
         {
             msg_Err( p_stream, "cannot spawn encoder thread" );
             module_Unneed( id->p_decoder, id->p_decoder->p_module );
@@ -1514,6 +1557,23 @@ static void transcode_video_close( sout_stream_t *p_stream,
 
         vlc_object_destroy( id->pp_filter[i] );
     }
+    for( i = 0; i < id->i_vfilter; i++ )
+    {
+        vlc_object_detach( id->pp_vfilter[i] );
+        if( id->pp_vfilter[i]->p_module )
+            module_Unneed( id->pp_vfilter[i], id->pp_vfilter[i]->p_module );
+
+        /* Clean-up pictures ring buffer */
+        for( j = 0; j < PICTURE_RING_SIZE; j++ )
+        {
+            if( id->pp_vfilter[i]->p_owner->pp_pics[j] )
+                video_del_buffer( VLC_OBJECT(id->pp_vfilter[i]),
+                                  id->pp_vfilter[i]->p_owner->pp_pics[j] );
+        }
+        free( id->pp_vfilter[i]->p_owner );
+
+        vlc_object_destroy( id->pp_vfilter[i] );
+    }
 }
 
 static int transcode_video_process( sout_stream_t *p_stream,
@@ -1670,6 +1730,40 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     return VLC_EGENERIC;
                 }
             }
+
+            for( i = 0; i < p_sys->i_vfilters; i++ )
+            {
+                id->pp_vfilter[id->i_vfilter] =
+                    vlc_object_create( p_stream, VLC_OBJECT_FILTER );
+                vlc_object_attach( id->pp_vfilter[id->i_vfilter], p_stream );
+
+                id->pp_vfilter[id->i_vfilter]->pf_vout_buffer_new =
+                    video_new_buffer_filter;
+                id->pp_vfilter[id->i_vfilter]->pf_vout_buffer_del =
+                    video_del_buffer_filter;
+
+                id->pp_vfilter[id->i_vfilter]->fmt_in = id->p_encoder->fmt_in;
+                id->pp_vfilter[id->i_vfilter]->fmt_out = id->p_encoder->fmt_in;
+                id->pp_vfilter[id->i_vfilter]->p_cfg = p_sys->p_vfilters_cfg[i];
+                id->pp_vfilter[id->i_vfilter]->p_module =
+                    module_Need( id->pp_vfilter[id->i_vfilter],
+                          "video filter2", p_sys->psz_vfilters[i], 0 );
+                if( id->pp_vfilter[id->i_vfilter]->p_module )
+                {
+                    id->pp_vfilter[id->i_vfilter]->p_owner =
+                        malloc( sizeof(filter_owner_sys_t) );
+                    for( i = 0; i < PICTURE_RING_SIZE; i++ )
+                        id->pp_vfilter[id->i_vfilter]->p_owner->pp_pics[i] = 0;
+
+                    id->i_vfilter++;
+                }
+                else
+                {
+                    msg_Dbg( p_stream, "no video filter found" );
+                    vlc_object_detach( id->pp_vfilter[id->i_vfilter] );
+                    vlc_object_destroy( id->pp_vfilter[id->i_vfilter] );
+                }
+            }
         }
 
         /* Run filter chain */
@@ -1724,6 +1818,12 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
             spu_RenderSubpictures( p_sys->p_spu, p_fmt, p_pic, p_pic, p_subpic,
                                    i_scale_width, i_scale_height );
+        }
+
+        /* Run vfilter chain */
+        for( i = 0; i < id->i_vfilter; i++ )
+        {
+            p_pic = id->pp_vfilter[i]->pf_video_filter(id->pp_vfilter[i], p_pic);
         }
 
         if( p_sys->i_threads >= 1 )
