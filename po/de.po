@@ -6243,7 +6243,7 @@ msgstr "A/52 über S/PDIF"
 
 #: modules/audio_output/alsa.c:878
 msgid "Unknown soundcard"
-msgstr ""
+msgstr "Unbekannte Soundkarte"
 
 #: modules/audio_output/arts.c:67
 msgid "aRts audio output"
@@ -14526,14 +14526,12 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/image.c:63
-#, fuzzy
 msgid "Image file"
-msgstr "Datei sichern"
+msgstr "Bilddatei"
 
 #: modules/video_output/image.c:64
-#, fuzzy
 msgid "Image video output"
-msgstr "X11 Videoausgabe"
+msgstr "Bild-Videoausgabe"
 
 #: modules/video_output/mga.c:59
 msgid "Matrox Graphic Array video output"
@@ -14541,11 +14539,11 @@ msgstr "Matrox Graphic Array Videoausgabe"
 
 #: modules/video_output/opengl.c:98
 msgid "OpenGL cube rotation speed"
-msgstr ""
+msgstr "Rotationsgeschwindigkeit des OpenGL-Würfels"
 
 #: modules/video_output/opengl.c:99
 msgid "If the OpenGL cube effect is enabled, this controls its rotation speed."
-msgstr ""
+msgstr "Wenn der OpenGL-Würfeleffect aktiviert ist, kontrolliert dies dessen Geschwindigkeit."
 
 #: modules/video_output/opengl.c:102
 #, fuzzy
