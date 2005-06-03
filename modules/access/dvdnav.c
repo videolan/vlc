@@ -138,6 +138,9 @@ struct demux_sys_t
 
     int           i_title;
     input_title_t **title;
+
+    /* lenght of program group chain */
+    mtime_t     i_pgc_length;
 };
 
 static int Control( demux_t *, int, va_list );
@@ -211,6 +214,7 @@ static int Open( vlc_object_t *p_this )
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
     p_sys->i_mux_rate = 0;
+    p_sys->i_pgc_length = 0;
 
     if( 1 )
     {
@@ -294,7 +298,10 @@ static int Open( vlc_object_t *p_this )
         if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title ) !=
             DVDNAV_STATUS_OK )
         {
-            msg_Warn( p_demux, "cannot go to dvd menu" );
+            /* Try going to menu root */
+            if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root ) !=
+                DVDNAV_STATUS_OK )
+                    msg_Warn( p_demux, "cannot go to dvd menu" );
         }
     }
 
@@ -411,20 +418,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else if( i_query == DEMUX_GET_TIME )
             {
                 pi64 = (int64_t*)va_arg( args, int64_t * );
-                if( p_sys->i_mux_rate > 0 )
+                if( p_sys->i_pgc_length > 0 )
                 {
-                    *pi64 = (int64_t)1000000 * 2048 * pos / 50 /
-                        p_sys->i_mux_rate;
+                    *pi64 = (int64_t) ( (double)p_sys->i_pgc_length / (double)len ) * (double) pos;
                     return VLC_SUCCESS;
                 }
             }
             else if( i_query == DEMUX_GET_LENGTH )
             {
                 pi64 = (int64_t*)va_arg( args, int64_t * );
-                if( p_sys->i_mux_rate > 0 )
+                if( p_sys->i_pgc_length > 0 )
                 {
-                    *pi64 = (int64_t)1000000 * len * 2048 / 50 /
-                        p_sys->i_mux_rate;
+                    *pi64 = (int64_t)p_sys->i_pgc_length;
                     return VLC_SUCCESS;
                 }
             }
@@ -702,6 +707,9 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - pgc_length=%lld", event->pgc_length );
         msg_Dbg( p_demux, "     - cell_start=%lld", event->cell_start );
         msg_Dbg( p_demux, "     - pg_start=%lld", event->pg_start );
+
+        /* Store the lenght in time of the current PGC */
+        p_sys->i_pgc_length = event->pgc_length / 90 * 1000;
 
         /* FIXME is it correct or there is better way to know chapter change */
         if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
