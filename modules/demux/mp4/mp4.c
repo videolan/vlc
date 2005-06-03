@@ -690,7 +690,7 @@ static int Demux( demux_t *p_demux )
                 p_block->i_dts = MP4_TrackGetDTS( p_demux, tk ) + 1;
                 /* pts */
                 i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-                if( i_delta >= 0 )
+                if( i_delta != -1 )
                     p_block->i_pts = p_block->i_dts + i_delta;
                 else if( tk->fmt.i_cat != VIDEO_ES )
                     p_block->i_pts = p_block->i_dts;
