@@ -106,7 +106,7 @@ static int FilterCallback ( vlc_object_t *, char const *,
 
 static char *mode_list[] = { "discard", "blend", "mean", "bob", "linear", "x" };
 static char *mode_list_text[] = { N_("Discard"), N_("Blend"), N_("Mean"),
-                                  N_("Bob"), N_("Linear"), N_("X") };
+                                  N_("Bob"), N_("Linear"), "X" };
 
 vlc_module_begin();
     set_description( _("Deinterlacing video filter") );

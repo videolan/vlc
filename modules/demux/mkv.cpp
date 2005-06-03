@@ -381,7 +381,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("Matroska") );
+    set_shortname( "Matroska" );
     set_description( _("Matroska stream demuxer" ) );
     set_capability( "demux2", 50 );
     set_callbacks( Open, Close );
@@ -390,19 +390,19 @@ vlc_module_begin();
 
     add_bool( "mkv-use-ordered-chapters", 1, NULL,
             N_("Ordered chapters"),
-            N_("Play ordered chapters as specified in the segment"), VLC_TRUE );
+            N_("Play ordered chapters as specified in the segment."), VLC_TRUE );
 
     add_bool( "mkv-use-chapter-codec", 1, NULL,
             N_("Chapter codecs"),
-            N_("Use chapter codecs found in the segment"), VLC_TRUE );
+            N_("Use chapter codecs found in the segment."), VLC_TRUE );
 
     add_bool( "mkv-seek-percent", 0, NULL,
-            N_("Seek based on percent not time"),
-            N_("Seek based on percent not time"), VLC_TRUE );
+            N_("Seek based on percent not time."),
+            N_("Seek based on percent not time."), VLC_TRUE );
 
     add_bool( "mkv-use-dummy", 0, NULL,
             N_("Dummy Elements"),
-            N_("Read and discard unknown EBML elements (not good for broken files)"), VLC_TRUE );
+            N_("Read and discard unknown EBML elements (not good for broken files)."), VLC_TRUE );
 
     add_shortcut( "mka" );
     add_shortcut( "mkv" );

@@ -70,7 +70,7 @@ static void Close( vlc_object_t * );
 #define VBV_MAXRATE_LONGTEXT N_( "Sets a maximum local bitrate in kbits/s.")
 
 #define VBV_BUFSIZE_TEXT N_("Averaging period for the maximum local bitrate")
-#define VBV_BUFSIZE_LONGTEXT N_( "Sets an averaging preiod for the maximum " \
+#define VBV_BUFSIZE_LONGTEXT N_( "Sets an averaging period for the maximum " \
     "local bitrate, in kbits/s.")
 
 #define VBV_INIT_TEXT N_("Initial buffer occupancy")

@@ -75,7 +75,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "set it to 0 for first screen, 1 for the second.")
 
 vlc_module_begin();
-    set_shortname( N_("XVideo") );
+    set_shortname( "XVideo" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
