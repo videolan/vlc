@@ -831,7 +831,7 @@ live: live.$(LIVEDOTCOM_VERSION).tar.gz
 	patch -p 0 < Patches/live.patch
 
 .live: live
-	(cd $<; ./genmakefiles macosx && make )
+	(cd $<; ./genMakefiles macosx && make )
 	touch $@
 
 CLEAN_FILE += .live
