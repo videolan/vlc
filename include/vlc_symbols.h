@@ -128,6 +128,7 @@ struct module_symbols_t
     int (*sout_AnnounceRegister_inner) (sout_instance_t *,session_descriptor_t*, announce_method_t*);
     session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *,char *, announce_method_t*);
     int (*sout_AnnounceUnRegister_inner) (sout_instance_t *,session_descriptor_t*);
+    session_descriptor_t* (*sout_AnnounceSessionCreate_inner) (void);
     void (*sout_AnnounceSessionDestroy_inner) (session_descriptor_t *);
     announce_method_t* (*sout_AnnounceMethodCreate_inner) (int);
     int (*__var_Create_inner) (vlc_object_t *, const char *, int);
@@ -487,6 +488,7 @@ struct module_symbols_t
 #  define sout_AnnounceRegister (p_symbols)->sout_AnnounceRegister_inner
 #  define sout_AnnounceRegisterSDP (p_symbols)->sout_AnnounceRegisterSDP_inner
 #  define sout_AnnounceUnRegister (p_symbols)->sout_AnnounceUnRegister_inner
+#  define sout_AnnounceSessionCreate (p_symbols)->sout_AnnounceSessionCreate_inner
 #  define sout_AnnounceSessionDestroy (p_symbols)->sout_AnnounceSessionDestroy_inner
 #  define sout_AnnounceMethodCreate (p_symbols)->sout_AnnounceMethodCreate_inner
 #  define __var_Create (p_symbols)->__var_Create_inner
@@ -849,6 +851,7 @@ struct module_symbols_t
     ((p_symbols)->sout_AnnounceRegister_inner) = sout_AnnounceRegister; \
     ((p_symbols)->sout_AnnounceRegisterSDP_inner) = sout_AnnounceRegisterSDP; \
     ((p_symbols)->sout_AnnounceUnRegister_inner) = sout_AnnounceUnRegister; \
+    ((p_symbols)->sout_AnnounceSessionCreate_inner) = sout_AnnounceSessionCreate; \
     ((p_symbols)->sout_AnnounceSessionDestroy_inner) = sout_AnnounceSessionDestroy; \
     ((p_symbols)->sout_AnnounceMethodCreate_inner) = sout_AnnounceMethodCreate; \
     ((p_symbols)->__var_Create_inner) = __var_Create; \

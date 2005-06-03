@@ -339,7 +339,7 @@ VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,sessio
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *,char *, announce_method_t* ) );
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
 
-VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, () );
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (void) );
 VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
 VLC_EXPORT(announce_method_t*,   sout_AnnounceMethodCreate, (int) );
 
