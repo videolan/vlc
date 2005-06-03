@@ -24,7 +24,9 @@
 #include "xmlparser.hpp"
 #include "../src/os_factory.hpp"
 
-#include <sys/stat.h>
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
 
 // Static variable to avoid initializing catalogs twice
 static bool m_initialized = false;
@@ -84,6 +86,8 @@ void XMLParser::LoadCatalog()
     const list<string> &resPath = pOSFactory->getResourcePath();
     const string &sep = pOSFactory->getDirSeparator();
     list<string>::const_iterator it;
+
+#ifdef HAVE_SYS_STAT_H
     struct stat statBuf;
 
     // Try to load the catalog first (needed at least on win32 where
@@ -123,6 +127,7 @@ void XMLParser::LoadCatalog()
     {
         msg_Err( getIntf(), "Cannot find the skins DTD !");
     }
+#endif
 }
 
 bool XMLParser::parse()

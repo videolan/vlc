@@ -27,7 +27,7 @@
 #include "../commands/cmd_dialogs.hpp"
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( WIN32 )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <direct.h>
 #endif
 #ifdef HAVE_DIRENT_H
