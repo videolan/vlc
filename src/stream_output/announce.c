@@ -151,7 +151,7 @@ int sout_AnnounceUnRegister( sout_instance_t *p_sout,
  *
  * \return a new session descriptor
  */
-session_descriptor_t * sout_AnnounceSessionCreate()
+session_descriptor_t * sout_AnnounceSessionCreate(void)
 {
     session_descriptor_t *p_session;
 
