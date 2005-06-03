@@ -983,7 +983,26 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             XSetCommand( p_vout->p_sys->p_display, p_win->base_window,
                          p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
 
-            XStoreName( p_vout->p_sys->p_display, p_win->base_window,
+            if( !var_GetBool( p_vout, "video-deco") )
+            {
+                Atom prop;
+                mwmhints_t mwmhints;
+
+                mwmhints.flags = MWM_HINTS_DECORATIONS;
+                mwmhints.decorations = False;
+
+                prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
+                                    False );
+
+                XChangeProperty( p_vout->p_sys->p_display,
+                                 p_win->base_window,
+                                 prop, prop, 32, PropModeReplace,
+                                 (unsigned char *)&mwmhints,
+                                 PROP_MWM_HINTS_ELEMENTS );
+            }
+            else
+            {
+                XStoreName( p_vout->p_sys->p_display, p_win->base_window,
 #ifdef MODULE_NAME_IS_x11
                         VOUT_TITLE " (X11 output)"
 #elif defined(MODULE_NAME_IS_glx)
@@ -992,6 +1011,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                         VOUT_TITLE " (XVideo output)"
 #endif
                       );
+            }
         }
     }
     else
