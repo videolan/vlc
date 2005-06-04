@@ -474,7 +474,6 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
     r = fView->Bounds();
     r.InsetBy( 10,10 );
 
-    fprintf( stderr, "start\n" );
     ConfigWidget * widget;
     for( ; p_item->i_type != CONFIG_HINT_END; p_item++ )
     {
@@ -493,10 +492,8 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
             continue;
         }
         fView->AddChild( widget );
-        fprintf( stderr, "+ %f\n", widget->Bounds().Height() );
         r.top += widget->Bounds().Height();
     }
-    fprintf( stderr, "stop\n" );
 
     if( fType == TYPE_MODULE )
     {
@@ -645,8 +642,6 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
                 p_item->psz_text, NULL, new BMessage(),
                 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
             AddChild( fTextControl );
-            fprintf( stderr, "adding text %s at %f\n", p_item->psz_text,
-                     rect.top );
             break;
         case CONFIG_ITEM_KEY:
             ResizeTo( Bounds().Width(), 25 );
@@ -679,16 +674,12 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
             AddChild( fCtrlCheck );
             AddChild( fShiftCheck );
             AddChild( fMenuField );
-            fprintf( stderr, "adding key %s at %f\n", p_item->psz_text,
-                     rect.top );
             break;
         case CONFIG_ITEM_BOOL:
             ResizeTo( Bounds().Width(), 25 );
             fCheckBox = new BCheckBox( Bounds(), NULL, p_item->psz_text,
                 new BMessage(), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
             AddChild( fCheckBox );
-            fprintf( stderr, "adding bool %s at %f\n", p_item->psz_text,
-                     rect.top );
             break;
         case CONFIG_SECTION:
             fInitOK = false;
