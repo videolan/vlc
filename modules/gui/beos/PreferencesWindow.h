@@ -55,6 +55,7 @@ class ConfigWidget : public BView
     public:
                         ConfigWidget( intf_thread_t * p_intf, BRect rect,
                                       module_config_t * p_item );
+                        ~ConfigWidget();
         bool            InitCheck() { return fInitOK; }
         void            Apply( bool doIt );
 
@@ -62,6 +63,9 @@ class ConfigWidget : public BView
         intf_thread_t * p_intf;
 
         bool            fInitOK;
+        int             fType;
+        char          * fName;
+
         VTextControl  * fTextControl;
         BCheckBox     * fCheckBox;
         BPopUpMenu    * fPopUpMenu;
@@ -113,8 +117,7 @@ class PreferencesWindow : public BWindow
     virtual void            FrameResized( float, float );
 
             void            Update();
-            void            ApplyChanges( bool doIt );
-            void            SaveChanges();
+            void            Apply( bool doIt );
 
             void            ReallyQuit();
 

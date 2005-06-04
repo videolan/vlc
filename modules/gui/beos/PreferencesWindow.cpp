@@ -185,12 +185,6 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * _p_intf,
         if( options < 1 || category < 0 || subcategory < 0 )
             continue;
 
-#if 0
-        fprintf( stderr, "cat %d, sub %d, %s\n", category, subcategory,
-                 p_module->psz_shortname ? p_module->psz_shortname :
-                 p_module->psz_object_name );
-#endif
-
         catItem = NULL;
         for( int j = 0; j < fOutline->CountItemsUnder( NULL, true ); j++ )
         {
@@ -233,18 +227,15 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * _p_intf,
 
     vlc_list_release( p_list );
 
+    /* Collapse the whole tree */
     for( int i = 0; i < fOutline->FullListCountItems(); i++ )
     {
-        otherItem = (ConfigItem *)
-            fOutline->FullListItemAt( i );
-        if( fOutline->Superitem( otherItem ) )
-        {
-            fOutline->Collapse( otherItem );
-        }
+        otherItem = (ConfigItem *) fOutline->FullListItemAt( i );
+        fOutline->Collapse( otherItem );
     }
 
     /* Set the correct values */
-    ApplyChanges( false );
+    Apply( false );
 
     /* Select the first item */
     fOutline->Select( 0 );
@@ -305,15 +296,17 @@ void PreferencesWindow::MessageReceived( BMessage * message )
 
         case PREFS_DEFAULTS:
             config_ResetAll( p_intf );
-            ApplyChanges( false );
+            config_SaveConfigFile( p_intf, NULL );
+            Apply( false );
             break;
 
         case PREFS_APPLY:
-            ApplyChanges( true );
+            Apply( true );
             break;
 
         case PREFS_SAVE:
-            SaveChanges();
+            Apply( true );
+            config_SaveConfigFile( p_intf, NULL );
             break;
 
         default:
@@ -359,27 +352,18 @@ void PreferencesWindow::Update()
 }
 
 /*****************************************************************************
- * PreferencesWindow::ApplyChanges
+ * PreferencesWindow::Apply
  * Apply changes if doIt is true, revert them otherwise
  *****************************************************************************/
-void PreferencesWindow::ApplyChanges( bool doIt )
+void PreferencesWindow::Apply( bool doIt )
 {
     ConfigItem * item;
 
-    for( int i = 0; i < fOutline->CountItems(); i++ )
+    for( int i = 0; i < fOutline->FullListCountItems(); i++ )
     {
-        item = (ConfigItem*) fOutline->ItemAt( i );
+        item = (ConfigItem*) fOutline->FullListItemAt( i );
         item->Apply( doIt );
     }
-}
-
-/*****************************************************************************
- * PreferencesWindow::SaveChanges
- *****************************************************************************/
-void PreferencesWindow::SaveChanges()
-{
-    ApplyChanges( true );
-    config_SaveConfigFile( p_intf, NULL );
 }
 
 /*****************************************************************************
@@ -490,6 +474,7 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
     r = fView->Bounds();
     r.InsetBy( 10,10 );
 
+    fprintf( stderr, "start\n" );
     ConfigWidget * widget;
     for( ; p_item->i_type != CONFIG_HINT_END; p_item++ )
     {
@@ -508,8 +493,10 @@ ConfigItem::ConfigItem( intf_thread_t * _p_intf, char * name,
             continue;
         }
         fView->AddChild( widget );
+        fprintf( stderr, "+ %f\n", widget->Bounds().Height() );
         r.top += widget->Bounds().Height();
     }
+    fprintf( stderr, "stop\n" );
 
     if( fType == TYPE_MODULE )
     {
@@ -598,17 +585,13 @@ void ConfigItem::ResetScroll()
  **********************************************************************/
 void ConfigItem::Apply( bool doIt )
 {
-    ConfigWidget * widget;
-
-    return;
-
-    if( !fView )
+    if( !fScroll )
     {
-        /* This is a category */
         return;
     }
 
     /* Call ConfigWidget::Apply for every child of your fView */
+    ConfigWidget * widget;
     for( int i = 0; i < fView->CountChildren(); i++ )
     {
         widget = (ConfigWidget*) fView->ChildAt( i );
@@ -631,7 +614,6 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
 {
     p_intf = _p_intf;
 
-    fInitOK = true;
     SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
 
     BRect r;
@@ -639,10 +621,16 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
     /* Skip deprecated options */
     if( p_item->psz_current )
     {
+        fInitOK = false;
         return;
     }
 
-    switch( p_item->i_type )
+    fInitOK = true;
+
+    fType = p_item->i_type;
+    fName = strdup( p_item->psz_name );
+
+    switch( fType )
     {
         case CONFIG_ITEM_MODULE:
         case CONFIG_ITEM_MODULE_CAT:
@@ -657,6 +645,8 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
                 p_item->psz_text, NULL, new BMessage(),
                 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
             AddChild( fTextControl );
+            fprintf( stderr, "adding text %s at %f\n", p_item->psz_text,
+                     rect.top );
             break;
         case CONFIG_ITEM_KEY:
             ResizeTo( Bounds().Width(), 25 );
@@ -689,12 +679,16 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
             AddChild( fCtrlCheck );
             AddChild( fShiftCheck );
             AddChild( fMenuField );
+            fprintf( stderr, "adding key %s at %f\n", p_item->psz_text,
+                     rect.top );
             break;
         case CONFIG_ITEM_BOOL:
             ResizeTo( Bounds().Width(), 25 );
             fCheckBox = new BCheckBox( Bounds(), NULL, p_item->psz_text,
                 new BMessage(), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
             AddChild( fCheckBox );
+            fprintf( stderr, "adding bool %s at %f\n", p_item->psz_text,
+                     rect.top );
             break;
         case CONFIG_SECTION:
             fInitOK = false;
@@ -704,6 +698,11 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
     }
 }
 
+ConfigWidget::~ConfigWidget()
+{
+    free( fName );
+}
+
 /***********************************************************************
  * ConfigWidget::Apply
  ***********************************************************************
@@ -711,34 +710,36 @@ ConfigWidget::ConfigWidget( intf_thread_t * _p_intf, BRect rect,
  **********************************************************************/
 void ConfigWidget::Apply( bool doIt )
 {
-#if 0
+    BMenuItem * menuItem;
+    char string[256];
+    vlc_value_t val;
+
     switch( fType )
     {
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_MODULE_CAT:
+        case CONFIG_ITEM_MODULE_LIST_CAT:
         case CONFIG_ITEM_DIRECTORY:
             if( doIt )
             {
-                config_PutPsz( p_intf, fConfigName, fTextControl->Text() );
+                config_PutPsz( p_intf, fName, fTextControl->Text() );
             }
             else
             {
-                fTextControl->SetText( config_GetPsz( p_intf, fConfigName ) );
+                fTextControl->SetText( config_GetPsz( p_intf, fName ) );
             }
             break;
 
         case CONFIG_ITEM_INTEGER:
             if( doIt )
             {
-                config_PutInt( p_intf, fConfigName,
-                               atoi( fTextControl->Text() ) );
+                config_PutInt( p_intf, fName, atoi( fTextControl->Text() ) );
             }
             else
             {
-                memset( string, 0, 1024 );
-                snprintf( string, 1023, "%d",
-                          config_GetInt( p_intf, fConfigName ) );
+                snprintf( string, 256, "%d", config_GetInt( p_intf, fName ) );
                 fTextControl->SetText( string );
             }
             break;
@@ -746,26 +747,12 @@ void ConfigWidget::Apply( bool doIt )
         case CONFIG_ITEM_FLOAT:
             if( doIt )
             {
-                config_PutFloat( p_intf, fConfigName,
-                                 strtod( fTextControl->Text(), NULL ) );
+                config_PutFloat( p_intf, fName, atof( fTextControl->Text() ) );
             }
             else
             {
-                memset( string, 0, 1024 );
-                snprintf( string, 1023, "%f",
-                          config_GetFloat( p_intf, fConfigName ) );
+                snprintf( string, 256, "%f", config_GetFloat( p_intf, fName ) );
                 fTextControl->SetText( string );
-            }
-            break;
-
-        case CONFIG_ITEM_BOOL:
-            if( doIt )
-            {
-                config_PutInt( p_intf, fConfigName, fCheckBox->Value() );
-            }
-            else
-            {
-                fCheckBox->SetValue( config_GetInt( p_intf, fConfigName ) );
             }
             break;
 
@@ -775,34 +762,34 @@ void ConfigWidget::Apply( bool doIt )
                 menuItem = fPopUpMenu->FindMarked();
                 if( menuItem )
                 {
-                    int value = vlc_keys[fPopUpMenu->IndexOf( menuItem )].i_key_code;
+                    val.i_int = vlc_keys[fPopUpMenu->IndexOf( menuItem )].i_key_code;
                     if( fAltCheck->Value() )
                     {
-                        value |= KEY_MODIFIER_ALT;
+                        val.i_int |= KEY_MODIFIER_ALT;
                     }
                     if( fCtrlCheck->Value() )
                     {
-                        value |= KEY_MODIFIER_CTRL;
+                        val.i_int |= KEY_MODIFIER_CTRL;
                     }
                     if( fShiftCheck->Value() )
                     {
-                        value |= KEY_MODIFIER_SHIFT;
+                        val.i_int |= KEY_MODIFIER_SHIFT;
                     }
-                    config_PutInt( p_intf, fConfigName, value );
+                    var_Set( p_intf->p_vlc, fName, val );
                 }
             }
             else
             {
-                int value = config_GetInt( p_intf, fConfigName );
-                fAltCheck->SetValue( value & KEY_MODIFIER_ALT );
-                fCtrlCheck->SetValue( value & KEY_MODIFIER_CTRL );
-                fShiftCheck->SetValue( value & KEY_MODIFIER_SHIFT );
+                val.i_int = config_GetInt( p_intf, fName );
+                fAltCheck->SetValue( val.i_int & KEY_MODIFIER_ALT );
+                fCtrlCheck->SetValue( val.i_int & KEY_MODIFIER_CTRL );
+                fShiftCheck->SetValue( val.i_int & KEY_MODIFIER_SHIFT );
         
                 for( unsigned i = 0;
                      i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
                 {
                     if( (unsigned) vlc_keys[i].i_key_code ==
-                            ( value & ~KEY_MODIFIER ) )
+                            ( val.i_int & ~KEY_MODIFIER ) )
                     {
                         menuItem = fPopUpMenu->ItemAt( i );
                         menuItem->SetMarked( true );
@@ -810,10 +797,22 @@ void ConfigWidget::Apply( bool doIt )
                     }
                 }
             }
+            break;
 
+        case CONFIG_ITEM_BOOL:
+            if( doIt )
+            {
+                config_PutInt( p_intf, fName, fCheckBox->Value() );
+            }
+            else
+            {
+                fCheckBox->SetValue( config_GetInt( p_intf, fName ) );
+            }
+            break;
+
+        default:
             break;
     }
-#endif
 }
 
 VTextView::VTextView( BRect frame, const char *name,
