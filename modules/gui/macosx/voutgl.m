@@ -48,10 +48,8 @@
     vout_thread_t * p_vout;
 }
 
-- (id)initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
-
+- (id) initWithVout: (vout_thread_t *) p_vout;
 @end
-
 
 struct vout_sys_t
 {
@@ -99,22 +97,18 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
     vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
-    /* Spawn window */
+    /* Create the GL view */
+    p_vout->p_sys->o_glview = [[VLCGLView alloc] initWithVout: p_vout];
+    [p_vout->p_sys->o_glview autorelease];
+
+    /* Spawn the window */
     p_vout->p_sys->b_got_frame = VLC_FALSE;
     p_vout->p_sys->o_window = [[VLCWindow alloc] initWithVout: p_vout
-                                                 frame: nil];
+        view: p_vout->p_sys->o_glview frame: nil];
     if( !p_vout->p_sys->o_window )
     {
         return VLC_EGENERIC;
     }
-
-    /* Add OpenGL view */
-#define o_glview p_vout->p_sys->o_glview
-    o_glview = [[VLCGLView alloc] initWithFrame:
-                [p_vout->p_sys->o_window frame] vout: p_vout];
-    [p_vout->p_sys->o_window setContentView: o_glview];
-    [o_glview autorelease];
-#undef o_glview
 
     p_vout->pf_init   = Init;
     p_vout->pf_end    = End;
@@ -131,12 +125,6 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-
-    /* Remove the GLView from the window, because we are not sure OS X
-       will actually close the window right away. When it doesn't,
-       VLCGLView's reshape is called while p_vout and p_vout->p_sys
-       aren't valid anymore and crashes. */
-    [p_vout->p_sys->o_window setContentView: NULL];
 
     /* Close the window */
     [p_vout->p_sys->o_window close];
@@ -177,23 +165,25 @@ static int Manage( vout_thread_t * p_vout )
 
         p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
+#define o_glview p_vout->p_sys->o_glview
+        o_glview = [[VLCGLView alloc] initWithVout: p_vout];
+        [o_glview autorelease];
+
         if( p_vout->p_sys->b_saved_frame )
         {
             p_vout->p_sys->o_window = [[VLCWindow alloc]
-                initWithVout: p_vout frame: &p_vout->p_sys->s_frame];
+                initWithVout: p_vout view: o_glview
+                frame: &p_vout->p_sys->s_frame];
         }
         else
         {
             p_vout->p_sys->o_window = [[VLCWindow alloc]
-                initWithVout: p_vout frame: nil];
+                initWithVout: p_vout view: o_glview frame: nil];
         }
 
-#define o_glview p_vout->p_sys->o_glview
-        o_glview = [[VLCGLView alloc] initWithFrame: [p_vout->p_sys->o_window frame] vout: p_vout];
-        [p_vout->p_sys->o_window setContentView: o_glview];
-        [o_glview autorelease];
         [[o_glview openGLContext] makeCurrentContext];
 #undef o_glview
+
         [o_pool release];
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
@@ -246,9 +236,9 @@ static void Unlock( vout_thread_t * p_vout )
  *****************************************************************************/
 @implementation VLCGLView
 
-- (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) _p_vout
+- (id) initWithVout: (vout_thread_t *) vout
 {
-    p_vout = _p_vout;
+    p_vout = vout;
 
     NSOpenGLPixelFormatAttribute attribs[] =
     {
@@ -270,7 +260,7 @@ static void Unlock( vout_thread_t * p_vout )
         return nil;
     }
 
-    self = [super initWithFrame:frame pixelFormat: fmt];
+    self = [super initWithFrame: NSMakeRect(0,0,10,10) pixelFormat: fmt];
     [fmt release];
 
     [[self openGLContext] makeCurrentContext];

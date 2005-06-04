@@ -140,25 +140,6 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     else
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
-    if( p_vout->p_sys->b_embedded )
-    {
-        /* Zero the clipping rectangle */
-        p_vout->p_sys->clipping_rect.left = 0;
-        p_vout->p_sys->clipping_rect.right = 0;
-        p_vout->p_sys->clipping_rect.top = 0;
-        p_vout->p_sys->clipping_rect.bottom = 0;
-    }
-    else
-    {
-        /* Spawn window */
-        p_vout->p_sys->o_window =
-            [[VLCWindow alloc] initWithVout: p_vout frame: nil];
-        if( !p_vout->p_sys->o_window )
-        {
-            return VLC_EGENERIC;
-        }
-    }
-
     p_vout->p_sys->b_altivec = p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC;
     msg_Dbg( p_vout, "We do%s have Altivec", p_vout->p_sys->b_altivec ? "" : "n't" );
     
@@ -221,8 +202,26 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
 
 #define o_qtview p_vout->p_sys->o_qtview
     o_qtview = [[VLCQTView alloc] initWithVout: p_vout];
-    [p_vout->p_sys->o_window setContentView: o_qtview];
     [o_qtview autorelease];
+
+    if( p_vout->p_sys->b_embedded )
+    {
+        /* Zero the clipping rectangle */
+        p_vout->p_sys->clipping_rect.left = 0;
+        p_vout->p_sys->clipping_rect.right = 0;
+        p_vout->p_sys->clipping_rect.top = 0;
+        p_vout->p_sys->clipping_rect.bottom = 0;
+    }
+    else
+    {
+        /* Spawn window */
+        p_vout->p_sys->o_window = [[VLCWindow alloc]
+            initWithVout: p_vout view: o_qtview frame: nil];
+        if( !p_vout->p_sys->o_window )
+        {
+            return VLC_EGENERIC;
+        }
+    }
 
     /* Retrieve the QuickDraw port */
     if( p_vout->p_sys->b_embedded )
@@ -498,21 +497,21 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
+#define o_qtview p_vout->p_sys->o_qtview
+    o_qtview = [[VLCQTView alloc] initWithVout: p_vout];
+    [o_qtview autorelease];
+    
     if( p_vout->p_sys->b_saved_frame )
     {
         p_vout->p_sys->o_window = [[VLCWindow alloc]
-            initWithVout: p_vout frame: &p_vout->p_sys->s_frame];
+            initWithVout: p_vout view: o_qtview
+            frame: &p_vout->p_sys->s_frame];
     }
     else
     {
         p_vout->p_sys->o_window = [[VLCWindow alloc]
-            initWithVout: p_vout frame: nil];
+            initWithVout: p_vout view: o_qtview frame: nil];
     }
-
-#define o_qtview p_vout->p_sys->o_qtview
-    o_qtview = [[VLCQTView alloc] initWithVout: p_vout];
-    [p_vout->p_sys->o_window setContentView: o_qtview];
-    [o_qtview autorelease];
 
     /* Retrieve the QuickDraw port */
     [o_qtview lockFocus];
