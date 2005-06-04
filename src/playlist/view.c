@@ -896,6 +896,13 @@ playlist_item_t *playlist_RecursiveFindPrev( playlist_t *p_playlist,
                 /* Go up one level */
                 p_parent_parent = playlist_FindDirectParent( p_playlist,
                                             p_parent, i_view );
+                if( p_parent_parent == NULL )
+                {
+#ifdef PLAYLIST_DEBUG
+                    msg_Dbg( p_playlist, "Mmmh, couldn't find parent" );
+#endif
+                    return NULL;
+                }
                 return playlist_RecursiveFindPrev( p_playlist, i_view,p_root,
                                             p_parent, p_parent_parent );
             }
