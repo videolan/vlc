@@ -189,7 +189,7 @@
 
 /* Pictures which are VOUT_BOGUS_DELAY or more in advance probably have
  * a bogus PTS and won't be displayed */
-#define VOUT_BOGUS_DELAY                ((mtime_t)(DEFAULT_PTS_DELAY * 3))
+#define VOUT_BOGUS_DELAY                ((mtime_t)(DEFAULT_PTS_DELAY * 30))
 
 /* Delay (in microseconds) before an idle screen is displayed */
 #define VOUT_IDLE_DELAY                 (5*CLOCK_FREQ)
