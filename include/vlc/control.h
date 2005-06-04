@@ -36,7 +36,7 @@ extern "C" {
 #define WINDOWHANDLE int
 #endif
 
-#ifndef __bool_true_false_are_defined
+#ifndef true
 typedef int bool;
 #endif
 

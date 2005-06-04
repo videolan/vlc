@@ -296,7 +296,7 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
 {
     mediacontrol_PlaylistSeq *retval;
     int i_index;
-    playlist_t * p_playlist = self->p_playlist;;
+    playlist_t * p_playlist = self->p_playlist;
     int i_playlist_size;
 
     exception=mediacontrol_exception_init( exception );
