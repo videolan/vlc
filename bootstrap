@@ -396,8 +396,7 @@ ${automake} --add-missing --copy
 ##  files which need to be regenerated
 ##
 rm -f vlc-config.in vlc-config
-rm -f src/misc/modules_builtin.h src/misc/modules_plugin.h
-rm -f include/vlc_symbols.h
+rm -f src/misc/modules_builtin.h
 rm -f mozilla/vlcintf.h
 
 # Shut up
