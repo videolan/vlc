@@ -856,7 +856,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     msg.Printf( wxString(wxT("VLC media player " PACKAGE_VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
         wxU(_("(c) 1996-2005 - the VideoLAN Team\n\n")) +
-        wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +
+        wxU( INTF_ABOUT_MSG ) + wxT("\n\n") +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );
 
