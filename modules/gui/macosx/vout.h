@@ -30,17 +30,20 @@
 @interface VLCWindow : NSWindow
 {
     vout_thread_t * p_vout;
-    vout_thread_t * p_real_vout;
+    NSView        * o_view;
+    NSRect        * s_frame;
 
+    vout_thread_t * p_real_vout;
     Ptr             p_fullscreen_state;
     mtime_t         i_time_mouse_last_moved;
-    NSRect        * s_frame;
     vlc_bool_t      b_init_ok;
 }
 
-- (id) initWithVout: (vout_thread_t *) p_vout frame: (NSRect *) s_frame;
+- (id) initWithVout: (vout_thread_t *) p_vout view: (NSView *) view
+                     frame: (NSRect *) s_frame;
 - (id) initReal: (id) sender;
-- (void)close;
+- (void) close;
+- (id)   closeReal: (id) sender;
 - (void)setOnTop:(BOOL)b_on_top;
 
 - (void)hideMouse:(BOOL)b_hide;

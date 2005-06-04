@@ -65,20 +65,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
  *****************************************************************************/
 @implementation VLCWindow
 
-- (id) initWithVout: (vout_thread_t *) vout frame: (NSRect *) frame
+- (id) initWithVout: (vout_thread_t *) vout view: (NSView *) view
+                     frame: (NSRect *) frame
 {
     p_vout  = vout;
+    o_view  = view;
     s_frame = frame;
 
-    if( MACOS_VERSION >= 10.2 )
-    {
-        [self performSelectorOnMainThread: @selector(initReal:)
-            withObject: NULL waitUntilDone: YES];
-    }
-    else
-    {
-        [self initReal: NULL];
-    }
+    [self performSelectorOnMainThread: @selector(initReal:)
+        withObject: NULL waitUntilDone: YES];
 
     if( !b_init_ok )
     {
@@ -282,6 +277,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* We'll catch mouse events */
     [self setAcceptsMouseMovedEvents: YES];
     [self makeFirstResponder: self];
+
+    /* Add the view. It's automatically resized to fit the window */
+    [self setContentView: o_view];
     
     [o_pool release];
 
@@ -289,13 +287,22 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return self;
 }
 
-- (void)close
+- (void) close
+{
+    /* XXX waitUntilDone = NO to avoid a possible deadlock when hitting
+       Command-Q */
+    [self performSelectorOnMainThread: @selector(closeReal:)
+        withObject: NULL waitUntilDone: NO];
+}
+
+- (id) closeReal: (id) sender
 {
     [super close];
     if( p_fullscreen_state )
     {
         EndFullScreen( p_fullscreen_state, 0 );
     }
+    return NULL;
 }
 
 - (void)setOnTop:(BOOL)b_on_top
@@ -701,11 +708,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     NSPoint ml;
     NSRect s_rect;
     BOOL b_inside;
-    NSView * o_view;
 
     i_time_mouse_last_moved = mdate();
 
-    o_view = [self contentView];
     s_rect = [o_view bounds];
     ml = [o_view convertPoint: [o_event locationInWindow] fromView: nil];
     b_inside = [o_view mouse: ml inRect: s_rect];

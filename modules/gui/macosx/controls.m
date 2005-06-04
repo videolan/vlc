@@ -690,6 +690,7 @@
 - (void)dealloc
 {
     free( psz_name );
+    [super dealloc];
 }
 
 - (char *)name
