@@ -411,14 +411,14 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         else
         {
             newpi[i_size - 2] = fd;
-            if( pi_handles == NULL )
-                newpi[i_size - 1] = -1;
             pi_handles = newpi;
         }
     }
     
     vlc_freeaddrinfo( res );
 
+    if( pi_handles != NULL )
+        pi_handles[i_size - 1] = -1;
     return pi_handles;
 }
 
