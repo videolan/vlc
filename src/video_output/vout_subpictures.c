@@ -599,13 +599,11 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
 
             /* Force palette if requested */
-            if( p_spu->b_force_alpha && VLC_FOURCC('Y','U','V','P') ==
+            if( p_spu->b_force_palette && VLC_FOURCC('Y','U','V','P') ==
                 p_region->fmt.i_chroma )
             {
-                p_region->fmt.p_palette->palette[0][3] = p_spu->pi_alpha[0];
-                p_region->fmt.p_palette->palette[1][3] = p_spu->pi_alpha[1];
-                p_region->fmt.p_palette->palette[2][3] = p_spu->pi_alpha[2];
-                p_region->fmt.p_palette->palette[3][3] = p_spu->pi_alpha[3];
+                memcpy( p_region->fmt.p_palette->palette,
+                        p_spu->palette, 16 );
             }
 
             /* Scale SPU if necessary */
@@ -964,7 +962,7 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
 {
     vlc_value_t val;
 
-    p_spu->b_force_alpha = VLC_FALSE;
+    p_spu->b_force_palette = VLC_FALSE;
     p_spu->b_force_crop = VLC_FALSE;
 
     if( var_Get( p_object, "highlight", &val ) || !val.b_bool ) return;
@@ -979,32 +977,16 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
     var_Get( p_object, "y-end", &val );
     p_spu->i_crop_height = val.i_int - p_spu->i_crop_y;
 
-#if 0
-    if( var_Get( p_object, "color", &val ) == VLC_SUCCESS )
+    if( var_Get( p_object, "menu-palette", &val ) == VLC_SUCCESS )
     {
-        int i;
-        for( i = 0; i < 4; i++ )
-        {
-            p_spu->pi_color[i] = ((uint8_t *)val.p_address)[i];
-        }
-    }
-#endif
-
-    if( var_Get( p_object, "menu-contrast", &val ) == VLC_SUCCESS )
-    {
-        int i;
-        for( i = 0; i < 4; i++ )
-        {
-            p_spu->pi_alpha[i] = ((uint8_t *)val.p_address)[i];
-            p_spu->pi_alpha[i] = p_spu->pi_alpha[i] == 0xf ?
-                0xff : p_spu->pi_alpha[i] << 4;
-        }
-        p_spu->b_force_alpha = VLC_TRUE;
+        memcpy( p_spu->palette, val.p_address, 16 );
+        p_spu->b_force_palette = VLC_TRUE;
     }
 
-    msg_Dbg( p_object, "crop: %i,%i,%i,%i, alpha: %i",
+    msg_Dbg( p_object, "crop: %i,%i,%i,%i, palette forced: %i",
              p_spu->i_crop_x, p_spu->i_crop_y,
-             p_spu->i_crop_width, p_spu->i_crop_height, p_spu->b_force_alpha );
+             p_spu->i_crop_width, p_spu->i_crop_height,
+             p_spu->b_force_palette );
 }
 
 /*****************************************************************************
