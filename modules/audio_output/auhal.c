@@ -46,6 +46,7 @@
     sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
     sfm.mChannelsPerFrame, sfm.mBitsPerChannel
 
+#define BUFSIZE 0xffffff
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -63,6 +64,12 @@ struct aout_sys_t
     Component                   au_component;   /* The Audiocomponent we use */
     AudioUnit                   au_unit;        /* The AudioUnit we use */
     mtime_t                     clock_diff;
+    uint8_t                      p_remainder_buffer[BUFSIZE];
+    uint32_t                    i_read_bytes;
+    uint32_t                    i_total_bytes;
+    audio_date_t                end_date_t;
+    
+    
 };
 
 /*****************************************************************************
@@ -426,12 +433,16 @@ static int Open( vlc_object_t * p_this )
                                    
     msg_Dbg( p_aout, STREAM_FORMAT_MSG( "the actual set AU format is " , DeviceFormat ) );
 
+    p_aout->output.i_nb_samples = 2048;
     aout_VolumeSoftInit( p_aout );
 
     /* Let's pray for the following operation to be atomic... */
     p_sys->clock_diff = - (mtime_t)
         AudioConvertHostTimeToNanos( AudioGetCurrentHostTime() ) / 1000; 
     p_sys->clock_diff += mdate();
+    
+    p_sys->i_read_bytes = 0;
+    p_sys->i_total_bytes = 0;
 
     /* set the IOproc callback */
     AURenderCallbackStruct input;
@@ -586,7 +597,7 @@ static int Probe( aout_instance_t * p_aout )
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     
     /* attach a Listener so that we are notified of a change in the Device setup */
-    /*err = AudioHardwareAddPropertyListener( kAudioHardwarePropertyDevices,
+    /* err = AudioHardwareAddPropertyListener( kAudioHardwarePropertyDevices,
                                             HardwareListener, 
                                             (void *)p_aout );
     if( err )
@@ -670,9 +681,9 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                                       unsigned int inNumberFrames,
                                       AudioBufferList *ioData )
 {
-    aout_buffer_t * p_buffer;
     AudioTimeStamp  host_time;
     mtime_t         current_date = 0;
+    uint32_t        i_mData_bytes = 0;    
 
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
@@ -687,8 +698,6 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     current_date = p_sys->clock_diff +
                    AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
 
-    p_aout->output.i_nb_samples = inNumberFrames;
-
     if( ioData == NULL && ioData->mNumberBuffers < 1 )
     {
         msg_Err( p_aout, "no iodata or buffers");
@@ -697,22 +706,50 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     if( ioData->mNumberBuffers > 1 )
         msg_Err( p_aout, "well this is weird. seems like there is more than one buffer..." );
 
-    
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date , VLC_FALSE );
-    if( p_buffer != NULL )
-    {
-        p_aout->p_vlc->pf_memcpy(ioData->mBuffers[0].mData, p_buffer->p_buffer, __MIN( p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize ) );
 
-        if( p_buffer->i_nb_bytes != ioData->mBuffers[0].mDataByteSize )
-        {
-            /* FIXME */
-            //msg_Err( p_aout, "byte sizes don't match %d:%d\nframes: %d, nb_samples: %d", p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize, inNumberFrames, p_aout->output.i_nb_samples);
-        }
-        aout_BufferFree( p_buffer );
-    }
-    else
+    if( p_sys->i_total_bytes > 0 )
     {
-         p_aout->p_vlc->pf_memset(ioData->mBuffers[0].mData, 0, ioData->mBuffers[0].mDataByteSize);
+        i_mData_bytes = __MIN( p_sys->i_total_bytes - p_sys->i_read_bytes, ioData->mBuffers[0].mDataByteSize );
+        p_aout->p_vlc->pf_memcpy( ioData->mBuffers[0].mData, &p_sys->p_remainder_buffer[p_sys->i_read_bytes], i_mData_bytes );
+        p_sys->i_read_bytes += i_mData_bytes;
+        current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->output.output.i_rate ) *
+                        ( i_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->output.output )  ); // 4 is fl32 specific
+        
+        if( p_sys->i_read_bytes >= p_sys->i_total_bytes )
+            p_sys->i_read_bytes = p_sys->i_total_bytes = 0;
+    }
+    
+    while( i_mData_bytes < ioData->mBuffers[0].mDataByteSize )
+    {
+        /* We don't have enough data yet */
+        aout_buffer_t * p_buffer;
+        p_buffer = aout_OutputNextBuffer( p_aout, current_date , VLC_FALSE );
+        
+        if( p_buffer != NULL )
+        {
+            uint32_t i_second_mData_bytes = __MIN( p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+            
+            p_aout->p_vlc->pf_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes, p_buffer->p_buffer, i_second_mData_bytes );
+            i_mData_bytes += i_second_mData_bytes;
+
+            if( i_mData_bytes >= ioData->mBuffers[0].mDataByteSize )
+            {
+                p_sys->i_total_bytes = p_buffer->i_nb_bytes - i_second_mData_bytes;
+                p_aout->p_vlc->pf_memcpy( p_sys->p_remainder_buffer, &p_buffer->p_buffer[i_second_mData_bytes], p_sys->i_total_bytes );
+            }
+            else
+            {
+                // update current_date
+                current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->output.output.i_rate ) *
+                                ( i_second_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->output.output )  ); // 4 is fl32 specific
+            }
+            aout_BufferFree( p_buffer );
+        }
+        else
+        {
+             p_aout->p_vlc->pf_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes, 0, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+             i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
+        }
     }
     return( noErr );     
 }

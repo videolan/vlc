@@ -2,7 +2,7 @@
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;\f1\fswiss\fcharset77 Helvetica-Bold;\f2\fmodern\fcharset77 Courier;
 }
 {\colortbl;\red255\green255\blue255;}
-\vieww17160\viewh15400\viewkind0
+\vieww9000\viewh9000\viewkind0
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qc
 
 \f0\fs48 \cf0 VLC media player, version 0.8\
@@ -15,7 +15,7 @@ Mac OS X-specific information
 \cf0 Welcome to the VLC media player! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file.\
 For a full list of features visit: \ul http://www.videolan.org/vlc/features.html\ulnone \
 \
-VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. Though there probably are bugs, we are always working hard to improve VLC media player and if you think you can help us in any way, please drop us a line: \ul http://www.videolan.org/support/lists.html\
+VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. Though there probably are bugs, we are always working hard to improve VLC media player and if you think you can help us in any way, please drop us a line: \ul http://www.videolan.org/support/lists.html \ulnone  or\ul \
 http://forum.videolan.org/\ulnone \
 \
 The following frequently asked questions are answered below :\
@@ -33,7 +33,12 @@ The following frequently asked questions are answered below :\
 11. How do i get fullscreen video on my other monitor ?\
 12. Multiple sound-devices and multi-channel sound?
 \f0\b0 \ulnone \
-\
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
+
+\f1\b \cf0 \ul \ulc0 13. I have a problem or a feature request \
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
+
+\f0\b0 \cf0 \ulnone \
 \
 
 \f1\b \ul 1. How do I install ?
@@ -98,13 +103,12 @@ Simply drag VLC from the place where you had installed it, to the Trash.\
 
 \f1\b \ul 9. Support for files with subtitles.\
 
-\f0\b0 \ulnone - VLC will autodected subtitle files when they are in the same directory as your movie and contain the movie name.\
-- DVD and autodectected subtitles  can be enabled trough the Controls->Subtitles menu-item.\
+\f0\b0 \ulnone - VLC will autodetect subtitle files when they are in the same directory as your movie and contain the movie's filename.\
+- DVD and autodetected subtitles  can be enabled trough the Video -> Subtitles Track menu-item.\
 - Only Vobsub, MicroDVD, SubRIP, SSA1-4. SAMI and vplayer subtitle files are supported at the moment.\
 - You cannot change anything about DVD and Vobsub subtitles.\
 - You can add any subtitle files to a video file via the Open.. dialog.\
-- A text-encoding and fontsize is automatically chosen, but for some people this can be incorrect. You can change these by using the Open File menu entry and setting the subtitle options when you open a movie.\
-- Text subtitles are by default centered. If you want them to be aligned left or right you can change this in Preferences -> Modules ->  decoder -> subsdec\
+- A text-encoding and fontsize is automatically chosen, but for some people this can be incorrect. You can change these by using the Open File menu entry and setting the subtitle settngs when you open a movie.\
 - For Arabic, Hebrew and Japanese etc, you need to select a font compatible with these languages. You can change the default font in Preferences -> Modules ->  text-renderer -> freetype\
 - You cannot change the font color or the thickness of the outlines.\
 \
@@ -118,21 +122,25 @@ Hold your mouse still on top of an option for just over a second and a ToolTip w
 
 \f1\b \ul 11. How do I get fullscreen video on my other monitor ? 
 \f0\b0 \ulnone \
-If you want to use your second screen for fullscreen playback, then look at the Video->Screen menuitem. You can set this option permanently by going into the Preferences and choosing Modules -> video output -> macosx -> video device (You will need to choose "Show Advanced options" first).\
+If you want to use your second screen for fullscreen playback, then look at the Video->Video Device menuitem. You can set this option permanently by going into the Preferences and choosing Interface -> General -> macosx -> video device (You will need to choose "Show Advanced options" first).\
 \
 \
 
 \f1\b \ul 12. Multiple sound-devices and multi-channel sound? \
 
 \f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Modules -> audio output -> coreaudio -> audio device (You will need to choose "Show Advanced options" first).\
-- AC3 over SPDIF with M-Audio Sonica Theater does not work. This is most likely a driver bug which has been reported to M-Audio.\
-- VLC is known to have lots of problems on G5's. Try going into the preferences -> Modules -> audio output -> coreaudio. Now change the device value from 0 to 1. Choose Save and Quit and restart VLC.\
-- Many problems might still exist. Multiple channel audio support is pretty new on Mac OS X and there are many bugs in the system software, the device drivers and probably in VLC media player as well.\
-- Someone with CoreAudio knowledge is very much invited to assist is in fixing all the bugs that linger in this area.\
+- You should change your speakerlayout in the Audio Midi Setup utility. The program is located in /Applications/Utilities.\
+Select your audio device in "Properties For:", then click the "Configure Speakers" button. Choose "Multichannel". Even if these settings are correct, you should change them and click "Apply", then change them back and again click "Apply". This is important, otherwise VLC cannot reliably detect which speakers are connected.\
+- We are in a transitional phase for our Mac OS X audio system. Therefore it is currently not possible to use Digital audio without changing a Preferences setting. The setting is in Audio->Output modules. Change this from default to "CoreAudio output". This is the module that was also used in previous versions of VLC. It has several issues with Analog audio, but it also supports Digital audio, which the new module does not yet support. You should ONLY use this module for Digital output.\
 \
 \
-Thanks for reading this file. For additional information and support, please see: \ul http://www.videolan.org/support\ulnone \
+\pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
+
+\f1\b \cf0 \ul \ulc0 13. I have a problem or a feature request \
+
+\f0\b0 \ulnone Your first stop is \ul http://www.videolan.org/doc\ulnone . The documentation on this page can usually help you with your problems. If you cannot find an aswer there then please visit \ul http://forum.videolan.org.\ulnone  Use the Search function there and see if someone else might have already answered your question or run into your problem. Feature requests can also be made in the Request forum.\
+\
+For additional information and support, please see: \ul http://www.videolan.org/support\ulnone \
 -- \
-Christophe Massiot  and\
 Derk-Jan Hartman for the VideoLAN team.\
 $Id$}

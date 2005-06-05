@@ -1,6 +1,6 @@
 $Id$
 
-Changes between 0.8.1 and 0.8.2-test1:
+Changes between 0.8.1 and 0.8.2-test2:
 -----------------------------------------------------
 
 Core support:
@@ -105,6 +105,11 @@ Windows port:
 
 MacOS X port:
  * Many Tiger related fixes
+ * A new audio module that should work more reliable for analog audio output in various configurations.
+   - Supports multichannel discrete analog output
+   - Digital audio output requires you to change a preference setting because it
+     is not yet available in the new module
+   - Please read the README.MacOSX.rtf file for more information.
 
 BeOS port:
  * Support for single-buffered overlay
@@ -116,7 +121,7 @@ Pocket PC port:
 
 Mozilla Plugin:
  * Javascript fixes
- * Mozilla plugin for MacOS X is back
+ * Mozilla plugin for MacOS X is back (not yet distributed)
 
 IE Plugin:
  * Brand new Internet Explorer ActiveX plugin
@@ -132,6 +137,7 @@ Translations:
  * Tetum
  * Tagalog
  * Bengali
+
 
 Changes between 0.8.0 and 0.8.1:
 -----------------------------------------------------
