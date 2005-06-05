@@ -293,7 +293,37 @@ static int Open( vlc_object_t * p_this )
                 continue;
             default:
                 msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
-                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                switch( layout->mNumberChannelDescriptions )
+                {
+                    /* We make assumptions based on number of channels here.
+                     * Unfortunatly Apple has provided no 100% method to retrieve the speaker configuration */
+                    case 1:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+                        break;
+                    case 4:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                        break;
+                    case 6:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                        break;
+                    case 7:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER;
+                        break;
+                    case 8:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                        break;
+                    case 2:
+                    default:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                }
                 break;
         }
     }
