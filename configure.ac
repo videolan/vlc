@@ -3381,13 +3381,7 @@ if test "${enable_coreaudio}" != "no" &&
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
     [ VLC_ADD_BUILTINS([coreaudio auhal])
-      VLC_ADD_LDFLAGS([coreaudio auhal],[-framework CoreAudio -framework AudioUnit])
-      AC_MSG_CHECKING(for kAudioConverterPrimeMethod in AudioToolbox/AudioConverter.h)
-      AC_EGREP_HEADER(kAudioConverterPrimeMethod,AudioToolbox/AudioConverter.h,[
-        AC_MSG_RESULT(yes)
-        VLC_ADD_PLUGINS([coreaudio_resampler])
-        VLC_ADD_LDFLAGS([coreaudio_resampler auhal],[-framework AudioToolbox])
-      ],[ AC_MSG_RESULT(no) ])
+      VLC_ADD_LDFLAGS([coreaudio auhal],[-framework CoreAudio -framework AudioUnit -framework AudioToolbox])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 

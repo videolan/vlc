@@ -46,6 +46,7 @@
     sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
     sfm.mChannelsPerFrame, sfm.mBitsPerChannel
 
+#define BUFSIZE 0xffffff
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -63,6 +64,12 @@ struct aout_sys_t
     Component                   au_component;   /* The Audiocomponent we use */
     AudioUnit                   au_unit;        /* The AudioUnit we use */
     mtime_t                     clock_diff;
+    uint8_t                      p_remainder_buffer[BUFSIZE];
+    uint32_t                    i_read_bytes;
+    uint32_t                    i_total_bytes;
+    audio_date_t                end_date_t;
+    
+    
 };
 
 /*****************************************************************************
@@ -73,7 +80,7 @@ static void     Close                   ( vlc_object_t * );
 
 static void     Play                    ( aout_instance_t *);
 
-static int      DevicesList             ( aout_instance_t * );
+static int      Probe                   ( aout_instance_t * );
 static int      DeviceDigitalMode       ( aout_instance_t *, AudioDeviceID );
 static int      DigitalInit             ( aout_instance_t * );
 
@@ -92,7 +99,7 @@ static OSStatus HardwareListener        ( AudioHardwarePropertyID, void *);
 vlc_module_begin();
     set_shortname( "auhal" );
     set_description( _("HAL AudioUnit output") );
-    set_capability( "audio output", 50 );
+    set_capability( "audio output", 101 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     set_callbacks( Open, Close );
@@ -131,10 +138,10 @@ static int Open( vlc_object_t * p_this )
     /* Build a list of devices */
     if( var_Type( p_aout, "audio-device" ) == 0 )
     {
-        DevicesList( p_aout );
-        /*if( DevicesList( p_aout ) != VLC_SUCCESS );
+        Probe( p_aout );
+        /*if( Probe( p_aout ) != VLC_SUCCESS );
         {
-            msg_Err( p_aout, "DevicesList failed" );
+            msg_Err( p_aout, "Probe failed" );
             free( p_sys );
             return VLC_EGENERIC;
         }*/
@@ -254,7 +261,7 @@ static int Open( vlc_object_t * p_this )
                                 &i_param_size,
                                 layout ));
     }
-    
+
     msg_Dbg( p_aout, "Layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions );
     
     p_aout->output.output.i_physical_channels = 0;
@@ -293,7 +300,37 @@ static int Open( vlc_object_t * p_this )
                 continue;
             default:
                 msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
-                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                switch( layout->mNumberChannelDescriptions )
+                {
+                    /* We make assumptions based on number of channels here.
+                     * Unfortunatly Apple has provided no 100% method to retrieve the speaker configuration */
+                    case 1:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+                        break;
+                    case 4:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                        break;
+                    case 6:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                        break;
+                    case 7:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER;
+                        break;
+                    case 8:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                    AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
+                                                                    AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                        break;
+                    case 2:
+                    default:
+                        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                }
                 break;
         }
     }
@@ -301,6 +338,63 @@ static int Open( vlc_object_t * p_this )
 
     msg_Dbg( p_aout, "defined %d physical channels for vlc core", aout_FormatNbChannels( &p_aout->output.output ) );
     msg_Dbg( p_aout, "%s", aout_FormatPrintChannels( &p_aout->output.output ));
+    
+    AudioChannelLayout new_layout;
+    memset (&new_layout, 0, sizeof(new_layout));
+    switch( aout_FormatNbChannels( &p_aout->output.output ) )
+    {
+        case 1:
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+            break;
+        case 2:
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+            break;
+        case 3:
+            if( p_aout->output.output.i_physical_channels & AOUT_CHAN_CENTER )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_7; // L R C
+            }
+            else if( p_aout->output.output.i_physical_channels & AOUT_CHAN_LFE )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_4; // L R LFE
+            }
+            break;
+        case 4:
+            if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_CENTER | AOUT_CHAN_LFE ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_10; // L R C LFE
+            }
+            else if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R Ls Rs
+            }
+            else if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_3; // L R C Cs
+            }
+            break;
+        case 5:
+            if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_CENTER ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_19; // L R Ls Rs C
+            }
+            else if( p_aout->output.output.i_physical_channels & ( AOUT_CHAN_LFE ) )
+            {
+                new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_18; // L R Ls Rs LFE
+            }
+            break;
+        case 6:
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_DVD_20; // L R Ls Rs C LFE
+            break;
+        case 7:
+            /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_6_1_A; // L R C LFE Ls Rs Cs
+            break;
+        case 8:
+            /* FIXME: This is incorrect. VLC uses the internal ordering: L R Lm Rm Lr Rr C LFE but this is wrong */
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+            break;
+    }
 
     /* Set up the format to be used */
     DeviceFormat.mSampleRate = p_aout->output.output.i_rate;
@@ -314,9 +408,9 @@ static int Open( vlc_object_t * p_this )
     
     /* Calculate framesizes and stuff */
     aout_FormatPrepare( &p_aout->output.output );
-    DeviceFormat.mBytesPerFrame = p_aout->output.output.i_bytes_per_frame;
-    DeviceFormat.mFramesPerPacket = p_aout->output.output.i_frame_length;
-    DeviceFormat.mBytesPerPacket = p_aout->output.output.i_bytes_per_frame * p_aout->output.output.i_frame_length;
+    DeviceFormat.mFramesPerPacket = 1;
+    DeviceFormat.mBytesPerFrame = DeviceFormat.mBitsPerChannel * DeviceFormat.mChannelsPerFrame / 8;
+    DeviceFormat.mBytesPerPacket = DeviceFormat.mBytesPerFrame * DeviceFormat.mFramesPerPacket;
  
     i_param_size = sizeof(AudioStreamBasicDescription);
     /* Set desired format (Use CAStreamBasicDescription )*/
@@ -338,14 +432,17 @@ static int Open( vlc_object_t * p_this )
                                    &i_param_size ));
                                    
     msg_Dbg( p_aout, STREAM_FORMAT_MSG( "the actual set AU format is " , DeviceFormat ) );
-    
-    p_aout->output.i_nb_samples = 69 * p_aout->output.output.i_frame_length;
+
+    p_aout->output.i_nb_samples = 2048;
     aout_VolumeSoftInit( p_aout );
 
     /* Let's pray for the following operation to be atomic... */
     p_sys->clock_diff = - (mtime_t)
         AudioConvertHostTimeToNanos( AudioGetCurrentHostTime() ) / 1000; 
     p_sys->clock_diff += mdate();
+    
+    p_sys->i_read_bytes = 0;
+    p_sys->i_total_bytes = 0;
 
     /* set the IOproc callback */
     AURenderCallbackStruct input;
@@ -356,12 +453,20 @@ static int Open( vlc_object_t * p_this )
                             kAudioUnitProperty_SetRenderCallback,
                             kAudioUnitScope_Input,
                             0, &input, sizeof( input ) ) );
+
+    input.inputProc = (AURenderCallback) RenderCallbackAnalog;
+    input.inputProcRefCon = p_aout;
+    
+    /* Set the new_layout as the layout VLC feeds to the AU unit */
+    verify_noerr( AudioUnitSetProperty( p_sys->au_unit,
+                            kAudioUnitProperty_AudioChannelLayout,
+                            kAudioUnitScope_Input,
+                            0, &new_layout, sizeof(new_layout) ) );
     
     /* AU initiliaze */
     verify_noerr( AudioUnitInitialize(p_sys->au_unit) );
 
     verify_noerr( AudioOutputUnitStart(p_sys->au_unit) );
-
     return( VLC_SUCCESS );
 }
 
@@ -391,9 +496,9 @@ static void Play( aout_instance_t * p_aout )
 
 
 /*****************************************************************************
- * DevicesList
+ * Probe
  *****************************************************************************/
-static int DevicesList( aout_instance_t * p_aout )
+static int Probe( aout_instance_t * p_aout )
 {
     OSStatus            err = noErr;
     UInt32              i, i_param_size;
@@ -492,7 +597,7 @@ static int DevicesList( aout_instance_t * p_aout )
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     
     /* attach a Listener so that we are notified of a change in the Device setup */
-    /*err = AudioHardwareAddPropertyListener( kAudioHardwarePropertyDevices,
+    /* err = AudioHardwareAddPropertyListener( kAudioHardwarePropertyDevices,
                                             HardwareListener, 
                                             (void *)p_aout );
     if( err )
@@ -566,6 +671,8 @@ static int DeviceDigitalMode( aout_instance_t *p_aout, AudioDeviceID i_dev_id )
 /*****************************************************************************
  * RenderCallbackAnalog: This function is called everytime the AudioUnit wants
  * us to provide some more audio data.
+ * Don't print anything during normal playback, calling blocking function from
+ * this callback is not allowed.
  *****************************************************************************/
 static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                                       AudioUnitRenderActionFlags *ioActionFlags,
@@ -574,78 +681,76 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                                       unsigned int inNumberFrames,
                                       AudioBufferList *ioData )
 {
-    aout_buffer_t * p_buffer;
     AudioTimeStamp  host_time;
-    mtime_t         current_date;
+    mtime_t         current_date = 0;
+    uint32_t        i_mData_bytes = 0;    
 
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-msg_Dbg( p_aout, "start audio packet");
-msg_Dbg( p_aout, "inbusnummer: %d",inBusNummer );
-msg_Dbg( p_aout, "inNumberFrames: %d", inNumberFrames);
 
     host_time.mFlags = kAudioTimeStampHostTimeValid;
     AudioDeviceTranslateTime( p_sys->i_selected_dev, inTimeStamp, &host_time );
-
 
     p_sys->clock_diff = - (mtime_t)
         AudioConvertHostTimeToNanos( AudioGetCurrentHostTime() ) / 1000; 
     p_sys->clock_diff += mdate();
 
+    current_date = p_sys->clock_diff +
+                   AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
 
-    current_date = (mtime_t) p_sys->clock_diff + mdate() + 
-                     (mtime_t) ( 1000000 * 1 );
-
-#define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i'))
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date, VLC_FALSE );
-#undef B_SPDI
-
-msg_Dbg( p_aout, "start audio packet BADABOEM");
-
-    if( p_buffer != NULL )
+    if( ioData == NULL && ioData->mNumberBuffers < 1 )
     {
-        if( ioData != NULL && ioData->mNumberBuffers > 0 )
+        msg_Err( p_aout, "no iodata or buffers");
+        return 0;
+    }
+    if( ioData->mNumberBuffers > 1 )
+        msg_Err( p_aout, "well this is weird. seems like there is more than one buffer..." );
+
+
+    if( p_sys->i_total_bytes > 0 )
+    {
+        i_mData_bytes = __MIN( p_sys->i_total_bytes - p_sys->i_read_bytes, ioData->mBuffers[0].mDataByteSize );
+        p_aout->p_vlc->pf_memcpy( ioData->mBuffers[0].mData, &p_sys->p_remainder_buffer[p_sys->i_read_bytes], i_mData_bytes );
+        p_sys->i_read_bytes += i_mData_bytes;
+        current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->output.output.i_rate ) *
+                        ( i_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->output.output )  ); // 4 is fl32 specific
+        
+        if( p_sys->i_read_bytes >= p_sys->i_total_bytes )
+            p_sys->i_read_bytes = p_sys->i_total_bytes = 0;
+    }
+    
+    while( i_mData_bytes < ioData->mBuffers[0].mDataByteSize )
+    {
+        /* We don't have enough data yet */
+        aout_buffer_t * p_buffer;
+        p_buffer = aout_OutputNextBuffer( p_aout, current_date , VLC_FALSE );
+        
+        if( p_buffer != NULL )
         {
-            if( p_buffer->i_nb_bytes*8 != ioData->mBuffers[0].mDataByteSize )
+            uint32_t i_second_mData_bytes = __MIN( p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+            
+            p_aout->p_vlc->pf_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes, p_buffer->p_buffer, i_second_mData_bytes );
+            i_mData_bytes += i_second_mData_bytes;
+
+            if( i_mData_bytes >= ioData->mBuffers[0].mDataByteSize )
             {
-                msg_Dbg( p_aout, "byte sizes don't match %d:%d", p_buffer->i_nb_bytes*8, ioData->mBuffers[0].mDataByteSize);
+                p_sys->i_total_bytes = p_buffer->i_nb_bytes - i_second_mData_bytes;
+                p_aout->p_vlc->pf_memcpy( p_sys->p_remainder_buffer, &p_buffer->p_buffer[i_second_mData_bytes], p_sys->i_total_bytes );
             }
             else
             {
-                unsigned int i;
-                /* move data into output data buffer */
-                msg_Dbg( p_aout, "#buffers: %d", (int)ioData->mNumberBuffers );
-                for( i = 0; i < ioData->mNumberBuffers; i++ )
-                {
-                    p_aout->p_vlc->pf_memcpy( ioData->mBuffers[i].mData,
-                                      p_buffer->p_buffer, ioData->mBuffers[i].mDataByteSize );
-                }
-                msg_Dbg( p_aout, "yeah first:" );
-                aout_BufferFree( p_buffer );
-                msg_Dbg( p_aout, "yeah" );
+                // update current_date
+                current_date += (mtime_t) ( (mtime_t) 1000000 / p_aout->output.output.i_rate ) *
+                                ( i_second_mData_bytes / 4 / aout_FormatNbChannels( &p_aout->output.output )  ); // 4 is fl32 specific
             }
-        }
-        else msg_Dbg( p_aout, "no iodata or buffers");
-    }
-    else
-    {
-        msg_Dbg( p_aout, "aout_OutputNextBuffer failed" ); 
-        if( p_aout->output.output.i_format == VLC_FOURCC('f','l','3','2') )
-        {
-            UInt32 i;
-            float * p = (float *)ioData->mBuffers[0].mData;
-
-            for( i = 0; i < ioData->mBuffers[0].mDataByteSize; i++ )
-            {
-                *p++ = 0.0;
-            }
+            aout_BufferFree( p_buffer );
         }
         else
         {
-            p_aout->p_vlc->pf_memset( ioData->mBuffers[0].mData, 0, ioData->mBuffers[0].mDataByteSize );
+             p_aout->p_vlc->pf_memset( (uint8_t *)ioData->mBuffers[0].mData +i_mData_bytes, 0, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+             i_mData_bytes += ioData->mBuffers[0].mDataByteSize - i_mData_bytes;
         }
     }
-msg_Dbg( p_aout, "eof audio packet");
     return( noErr );     
 }
 
