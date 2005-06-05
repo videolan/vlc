@@ -291,6 +291,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     /* XXX waitUntilDone = NO to avoid a possible deadlock when hitting
        Command-Q */
+    [self setAcceptsMouseMovedEvents: NO];
     [self setContentView: NULL];
     [self performSelectorOnMainThread: @selector(closeReal:)
         withObject: NULL waitUntilDone: NO];
