@@ -766,6 +766,8 @@ static int Demux( demux_t *p_demux )
     case DVDNAV_WAIT:
         msg_Dbg( p_demux, "DVDNAV_WAIT" );
 
+        /* reset PCR */
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
         dvdnav_wait_skip( p_sys->dvdnav );
         break;
 
