@@ -491,7 +491,7 @@ static int Demux( demux_t *p_demux )
         DvdReadHandleDSI( p_demux, p_buffer );
 
         /* End of title */
-        if( p_sys->i_next_vobu > p_sys->i_title_end_block )
+        if( p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells )
         {
             if( p_sys->i_title + 1 >= p_sys->i_titles )
             {
@@ -516,7 +516,7 @@ static int Demux( demux_t *p_demux )
         DemuxBlock( p_demux, p_buffer, DVD_VIDEO_LB_LEN );
     }
 
-    if( p_sys->i_cur_block > p_sys->i_title_end_block )
+    if( p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells )
     {
         if( p_sys->i_title + 1 >= p_sys->i_titles )
         {
@@ -1178,6 +1178,10 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     else if( p_sys->dsi_pack.vobu_sri.next_vobu == SRI_END_OF_CELL )
     {
         p_sys->i_cur_cell = p_sys->i_next_cell;
+
+        /* End of title */
+        if( p_sys->i_cur_cell >= p_sys->p_cur_pgc->nr_of_cells ) return;
+
         DvdReadFindCell( p_demux );
 
         p_sys->i_next_vobu =
