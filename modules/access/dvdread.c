@@ -263,7 +263,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_angle = val.i_int > 0 ? val.i_int : 1;
 
     DemuxTitles( p_demux, &p_sys->i_angle );
-    DvdReadSetArea( p_demux, 0, 0, p_sys->i_angle );
+    if( DvdReadSetArea( p_demux, 0, 0, p_sys->i_angle ) != VLC_SUCCESS )
+    {
+        Close( p_this );
+        msg_Err( p_demux, "DvdReadSetArea(0,0,%i) failed (can't decrypt DVD?)",
+                 p_sys->i_angle );
+        return VLC_EGENERIC;
+    }
 
     /* Update default_pts to a suitable value for dvdread access */
     var_Create( p_demux, "dvdread-caching",

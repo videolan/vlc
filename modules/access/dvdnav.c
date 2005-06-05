@@ -292,7 +292,10 @@ static int Open( vlc_object_t *p_this )
 
         if( dvdnav_title_play( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
         {
-            msg_Warn( p_demux, "cannot set title" );
+            msg_Err( p_demux, "cannot set title (can't decrypt DVD?)" );
+            dvdnav_close( p_sys->dvdnav );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
 
         if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title ) !=
