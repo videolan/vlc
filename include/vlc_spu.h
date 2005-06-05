@@ -48,8 +48,8 @@ struct spu_t
     int i_crop_x, i_crop_y, i_crop_width, i_crop_height;       /**< cropping */
 
     int i_margin;                        /**< force position of a subpicture */
-    vlc_bool_t b_force_alpha;         /**< force alpha palette of subpicture */
-    uint8_t pi_alpha[4];                           /**< forced alpha palette */
+    vlc_bool_t b_force_palette;             /**< force palette of subpicture */
+    uint8_t palette[4][4];                               /**< forced palette */
 
     int ( *pf_control ) ( spu_t *, int, va_list );
 
