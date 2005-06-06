@@ -197,9 +197,38 @@ Section /o "Mozilla plugin" SEC03
   SectionIn 2 3
   File /r mozilla
 
-  WriteRegStr HKLM \
-    SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION} \
-    "Path" '"$INSTDIR\mozilla\npvlc.dll"'
+  ; doesn't work. bug in mozilla/mozilla firefox or moz documentation (xpt file isn't loaded)
+  ; see mozilla bugs 184506 and 159445
+  ;!define Moz "SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}"
+  ;WriteRegStr HKLM ${Moz} "Description" "VideoLAN VLC plugin for Mozilla"
+  ;WriteRegStr HKLM ${Moz} "Path" "$INSTDIR\mozilla\npvlc.dll"
+  ;WriteRegStr HKLM ${Moz} "Product" "VLC media player"
+  ;WriteRegStr HKLM ${Moz} "Vendor" "VideoLAN"
+  ;WriteRegStr HKLM ${Moz} "Version" "${VERSION}"
+  ;WriteRegStr HKLM ${Moz} "XPTPath" "$INSTDIR\mozilla\vlcintf.xpt"
+
+  Push $R0
+  Push $R1
+  Push $R2
+
+  !define Index 'Line${__LINE__}'
+  StrCpy $R1 "0"
+
+  "${Index}-Loop:"
+
+    ; Check for Key
+    EnumRegKey $R0 HKLM "SOFTWARE\Mozilla" "$R1"
+    StrCmp $R0 "" "${Index}-End"
+    IntOp $R1 $R1 + 1
+    ReadRegStr $R2 HKLM "SOFTWARE\Mozilla\$R0\Extensions" "Plugins"
+    StrCmp $R2 "" "${Index}-Loop" ""
+
+    CopyFiles "$INSTDIR\mozilla\*" "$R2"
+    Goto "${Index}-Loop"
+
+  "${Index}-End:"
+  !undef Index
+
 SectionEnd
 
 Section /o "ActiveX plugin" SEC04
@@ -276,7 +305,7 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} \
     "Adds icons to your start menu and your desktop for easy access"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} \
-    "The VLC mozilla plugin"
+    "The VLC Mozilla and Mozilla Firefox plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
     "The VLC ActiveX plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} \
@@ -339,6 +368,30 @@ Section Uninstall
 
   UnRegDLL "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
+
+  ;remove mozilla plugin
+  Push $R0
+  Push $R1
+  Push $R2
+
+  !define Index 'Line${__LINE__}'
+  StrCpy $R1 "0"
+
+  "${Index}-Loop:"
+
+    ; Check for Key
+    EnumRegKey $R0 HKLM "SOFTWARE\Mozilla" "$R1"
+    StrCmp $R0 "" "${Index}-End"
+    IntOp $R1 $R1 + 1
+    ReadRegStr $R2 HKLM "SOFTWARE\Mozilla\$R0\Extensions" "Plugins"
+    StrCmp $R2 "" "${Index}-Loop" ""
+
+    Delete "$R2\vlcintf.xpt"
+    Delete "$R2\npvlc.dll"
+    Goto "${Index}-Loop"
+
+  "${Index}-End:"
+  !undef Index
 
   RMDir "$SMPROGRAMS\VideoLAN"
   RMDir /r $SMPROGRAMS\VideoLAN
