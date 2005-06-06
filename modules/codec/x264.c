@@ -410,6 +410,11 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.cpu &= ~X264_CPU_SSE2;
     }
 
+#if X264_BUILD >= 29
+    if( p_enc->i_threads >= 1 )
+        p_sys->param.i_threads = p_enc->i_threads;
+#endif
+
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
