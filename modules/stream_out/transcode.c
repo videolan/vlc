@@ -1082,7 +1082,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* Final checks to see if conversions were successful */
     if( fmt_last.i_codec != id->p_encoder->fmt_in.i_codec )
     {
-        msg_Dbg( p_stream, "no audio filter found (%4.4s->%4.4s)",
+        msg_Err( p_stream, "no audio filter found (%4.4s->%4.4s)",
                  (char *)&fmt_last.i_codec,
                  (char *)&id->p_encoder->fmt_in.i_codec );
         transcode_audio_close( p_stream, id );
@@ -1091,10 +1091,11 @@ static int transcode_audio_new( sout_stream_t *p_stream,
 
     if( fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels )
     {
-        msg_Dbg( p_stream, "no audio filter found for mixing from"
+        msg_Err( p_stream, "no audio filter found for mixing from"
                  " %i to %i channels", fmt_last.audio.i_channels,
                  id->p_encoder->fmt_in.audio.i_channels );
-
+#if 0
+        /* FIXME : this might work, but only if the encoder is restarted */
         id->p_encoder->fmt_in.audio.i_channels = fmt_last.audio.i_channels;
         id->p_encoder->fmt_out.audio.i_channels = fmt_last.audio.i_channels;
 
@@ -1104,15 +1105,25 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_encoder->fmt_out.audio.i_physical_channels =
             id->p_encoder->fmt_out.audio.i_original_channels =
                 fmt_last.audio.i_physical_channels;
+#else
+        transcode_audio_close( p_stream, id );
+        return VLC_EGENERIC;
+#endif
     }
 
     if( fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate )
     {
-        msg_Dbg( p_stream, "no audio filter found for resampling from"
+        msg_Err( p_stream, "no audio filter found for resampling from"
                  " %iHz to %iHz", fmt_last.audio.i_rate,
                  id->p_encoder->fmt_in.audio.i_rate );
+#if 0
+        /* FIXME : this might work, but only if the encoder is restarted */
         id->p_encoder->fmt_in.audio.i_rate = fmt_last.audio.i_rate;
         id->p_encoder->fmt_out.audio.i_rate = fmt_last.audio.i_rate;
+#else
+        transcode_audio_close( p_stream, id );
+        return VLC_EGENERIC;
+#endif
     }
 
     /* FIXME: Hack for mp3 transcoding support */
