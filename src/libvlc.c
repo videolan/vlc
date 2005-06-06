@@ -2024,6 +2024,11 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             char *psz_suf = "", *psz_prefix = NULL;
             int i;
 
+            /* Skip deprecated options */
+            if( p_item->psz_current )
+            {
+                continue;
+            }
             /* Skip advanced options if requested */
             if( p_item->b_advanced && !b_advanced )
             {
@@ -2113,12 +2118,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
 
             if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
             {
-                /* If option is of type --foo-bar, we print its counterpart
-                 * as --no-foo-bar, but if it is of type --foobar (without
-                 * dashes in the name) we print it as --nofoobar. Both
-                 * values are of course valid, only the display changes. */
-                psz_prefix = strchr( p_item->psz_name, '-' ) ? ", --no-"
-                                                             : ", --no";
+                psz_prefix =  ", --no-";
                 i -= strlen( p_item->psz_name ) + strlen( psz_prefix );
             }
 
