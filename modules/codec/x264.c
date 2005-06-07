@@ -209,6 +209,8 @@ struct encoder_sys_t
 
     int             i_buffer;
     uint8_t         *p_buffer;
+
+    mtime_t         i_last_ref_pts;
 };
 
 /*****************************************************************************
@@ -253,6 +255,7 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
+    p_sys->i_last_ref_pts = 0;
 
     x264_param_default( &p_sys->param );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width >> 4 << 4;
@@ -460,6 +463,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
     /* init pic */
     memset( &pic, 0, sizeof( x264_picture_t ) );
+    pic.i_pts = p_pict->date;
     pic.img.i_csp = X264_CSP_I420;
     pic.img.i_plane = p_pict->i_planes;
     for( i = 0; i < p_pict->i_planes; i++ )
@@ -473,6 +477,9 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 #else
     x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic );
 #endif
+
+    if( !i_nal ) return NULL;
+
     for( i = 0, i_out = 0; i < i_nal; i++ )
     {
         int i_size = p_sys->i_buffer - i_out;
@@ -482,8 +489,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     }
 
     p_block = block_New( p_enc, i_out );
-    p_block->i_dts = p_pict->date;
-    p_block->i_pts = p_pict->date;
     memcpy( p_block->p_buffer, p_sys->p_buffer, i_out );
 
     if( pic.i_type == X264_TYPE_IDR || pic.i_type == X264_TYPE_I )
@@ -492,6 +497,35 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
     else if( pic.i_type == X264_TYPE_B )
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+
+    /* This isn't really valid for streams with B-frames */
+    p_block->i_length = I64C(1000000) *
+        p_enc->fmt_in.video.i_frame_rate_base /
+            p_enc->fmt_in.video.i_frame_rate;
+
+    p_block->i_dts = p_block->i_pts = pic.i_pts;
+
+    if( p_sys->param.i_bframe > 0 )
+    {
+        if( p_block->i_flags & BLOCK_FLAG_TYPE_B )
+        {
+            p_block->i_dts = p_block->i_pts;
+        }
+        else
+        {
+            if( p_sys->i_last_ref_pts )
+            {
+                p_block->i_dts = p_sys->i_last_ref_pts;
+            }
+            else
+            {
+                /* Let's put something sensible */
+                p_block->i_dts = p_block->i_pts;
+            }
+
+            p_sys->i_last_ref_pts = p_block->i_pts;
+        }
+    }
 
     return p_block;
 }
