@@ -143,9 +143,9 @@ vlc_module_begin();
               ENC_PRE_ME_LONGTEXT, VLC_TRUE );
     add_bool( ENC_CFG_PREFIX "strict-rc", 0, NULL, ENC_RC_STRICT_TEXT,
               ENC_RC_STRICT_LONGTEXT, VLC_TRUE );
-    add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8 * 3/2, NULL,
+    add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8, NULL,
                  ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, VLC_TRUE );
-    add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 0.1, NULL,
+    add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 1.0, NULL,
                ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, VLC_TRUE );
     add_float( ENC_CFG_PREFIX "i-quant-factor", 0, NULL,
                ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, VLC_TRUE );

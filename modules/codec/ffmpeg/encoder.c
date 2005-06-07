@@ -386,6 +386,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         {
             p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
             p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
+            /* This is from ffmpeg's ffmpeg.c : */
+            p_context->rc_initial_buffer_occupancy
+                = p_sys->i_rc_buffer_size * 3/4;
             p_context->rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
         }
 
