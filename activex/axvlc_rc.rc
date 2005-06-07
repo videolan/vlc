@@ -21,7 +21,7 @@ BEGIN
       VALUE "CompanyName", "VideoLAN Team"
       VALUE "FileVersion", STRINGIFY( VERSION )
       VALUE "FileDescription", "VLC media player"
-      VALUE "LegalCopyright", "(c) 1996-2003 VideoLAN"
+      VALUE "LegalCopyright", "(c) 1996-2005 VideoLAN"
     END
   END
   BLOCK "VarFileInfo"
