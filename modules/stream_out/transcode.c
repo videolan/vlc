@@ -322,10 +322,12 @@ struct sout_stream_sys_t
 struct decoder_owner_sys_t
 {
     picture_t *pp_pics[PICTURE_RING_SIZE];
+    sout_stream_sys_t *p_sys;
 };
 struct filter_owner_sys_t
 {
     picture_t *pp_pics[PICTURE_RING_SIZE];
+    sout_stream_sys_t *p_sys;
 };
 
 /*****************************************************************************
@@ -1281,6 +1283,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     id->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
         id->p_decoder->p_owner->pp_pics[i] = 0;
+    id->p_decoder->p_owner->p_sys = p_sys;
     //id->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     id->p_decoder->p_module =
@@ -1624,6 +1627,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                         malloc( sizeof(filter_owner_sys_t) );
                     for( i = 0; i < PICTURE_RING_SIZE; i++ )
                         id->pp_filter[id->i_filter]->p_owner->pp_pics[i] = 0;
+                    id->pp_filter[id->i_filter]->p_owner->p_sys = p_sys;
 
                     id->i_filter++;
                 }
@@ -1666,6 +1670,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                         malloc( sizeof(filter_owner_sys_t) );
                     for( i = 0; i < PICTURE_RING_SIZE; i++ )
                         id->pp_filter[id->i_filter]->p_owner->pp_pics[i] = 0;
+                    id->pp_filter[id->i_filter]->p_owner->p_sys = p_sys;
 
                     id->i_filter++;
                 }
@@ -1864,6 +1869,33 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring )
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
     {
         if( pp_ring[i] == 0 ) break;
+    }
+
+    if( i == PICTURE_RING_SIZE && p_dec->p_owner->p_sys->i_threads >= 1 )
+    {
+        int i_first_pic = p_dec->p_owner->p_sys->i_first_pic;
+
+        if( p_dec->p_owner->p_sys->i_first_pic !=
+            p_dec->p_owner->p_sys->i_last_pic )
+        {
+            /* Encoder still has stuff to encode, wait to clear-up the list */
+            while( p_dec->p_owner->p_sys->i_first_pic == i_first_pic )
+                msleep( 100000 );
+        }
+
+        /* Find an empty space in the picture ring buffer */
+        for( i = 0; i < PICTURE_RING_SIZE; i++ )
+        {
+            if( pp_ring[i] != 0 && pp_ring[i]->i_status == DESTROYED_PICTURE )
+            {
+                pp_ring[i]->i_status = RESERVED_PICTURE;
+                return pp_ring[i];
+            }
+        }
+        for( i = 0; i < PICTURE_RING_SIZE; i++ )
+        {
+            if( pp_ring[i] == 0 ) break;
+        }
     }
 
     if( i == PICTURE_RING_SIZE )
