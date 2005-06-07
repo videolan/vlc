@@ -192,11 +192,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_sar_num = p_sys->i_sar_den = 1;
     }
 
-    if ( p_sys->i_height || p_sys->i_width )
-    {
-        p_sys->p_image = image_HandlerCreate( p_stream );
-    }
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -307,6 +302,11 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_es->b_empty = VLC_FALSE;
 
     vlc_mutex_unlock( p_sys->p_lock );
+
+    if ( p_sys->i_height || p_sys->i_width )
+    {
+        p_sys->p_image = image_HandlerCreate( p_stream );
+    }
 
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
 
