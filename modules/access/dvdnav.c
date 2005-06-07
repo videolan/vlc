@@ -740,6 +740,7 @@ static int Demux( demux_t *p_demux )
          *  - ...
          */
         DemuxBlock( p_demux, packet, i_len );
+	ButtonUpdate( p_demux, VLC_FALSE );
         break;
     }
 
