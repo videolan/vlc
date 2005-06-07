@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
