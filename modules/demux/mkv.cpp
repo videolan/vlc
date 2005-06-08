@@ -1342,7 +1342,7 @@ public:
     input_thread_t *p_input;
     pci_t          pci_packet;
     bool           b_pci_packet_set;
-    uint8_t        alpha[4];
+    uint8_t        palette[4][4];
     vlc_mutex_t    lock_demuxer;
 
     /* event */
@@ -1876,7 +1876,10 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         p_block->i_pts = i_pts;
         p_block->i_dts = p_sys->i_last_dts;
 #endif
+
+#if 0
 msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block->i_pts);
+#endif
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
             p_block->i_length = i_duration * 1000;
@@ -2307,7 +2310,7 @@ void demux_sys_t::StartUiThread()
         var_Create( p_input, "x-end", VLC_VAR_INTEGER );
         var_Create( p_input, "y-end", VLC_VAR_INTEGER );
         var_Create( p_input, "color", VLC_VAR_ADDRESS );
-        var_Create( p_input, "menu-contrast", VLC_VAR_ADDRESS );
+        var_Create( p_input, "menu-palette", VLC_VAR_ADDRESS );
         var_Create( p_input, "highlight", VLC_VAR_BOOL );
         var_Create( p_input, "highlight-mutex", VLC_VAR_MUTEX );
 
@@ -2339,7 +2342,9 @@ void demux_sys_t::StopUiThread()
         var_Destroy( p_input, "y-start" );
         var_Destroy( p_input, "y-end" );
         var_Destroy( p_input, "color" );
-        var_Destroy( p_input, "menu-contrast" );
+        var_Destroy( p_input, "menu-palette" );
+
+        vlc_object_release( p_input );
 
         msg_Dbg( &demuxer, "Stopping the UI Hook" );
     }
@@ -2607,10 +2612,18 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                             } else {
                                 i_palette = 0;
                             }
-                            p_sys->alpha[0] = i_palette      & 0x0f;
-                            p_sys->alpha[1] = (i_palette>>4) & 0x0f;
-                            p_sys->alpha[2] = (i_palette>>8) & 0x0f;
-                            p_sys->alpha[3] = (i_palette>>12)& 0x0f;
+
+                            for( int i = 0; i < 4; i++ )
+                            {
+                                uint32_t i_yuv = 0xFF;//p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
+                                uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
+                                i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
+
+                                p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
+                                p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
+                                p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
+                                p_sys->palette[i][3] = i_alpha;
+                            }
 
                             vlc_mutex_lock( p_mutex );
                             val.i_int = button_ptr.x_start; var_Set( p_sys->p_input, "x-start", val );
@@ -2618,8 +2631,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                             val.i_int = button_ptr.y_start; var_Set( p_sys->p_input, "y-start", val );
                             val.i_int = button_ptr.y_end;   var_Set( p_sys->p_input, "y-end",   val );
 
-                            val.p_address = (void *)p_sys->alpha;
-                            var_Set( p_sys->p_input, "menu-contrast", val );
+                            val.p_address = (void *)p_sys->palette;
+                            var_Set( p_sys->p_input, "menu-palette", val );
 
                             val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
                             vlc_mutex_unlock( p_mutex );
