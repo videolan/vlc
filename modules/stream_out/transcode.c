@@ -1770,7 +1770,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                         malloc( sizeof(filter_owner_sys_t) );
                     for( i = 0; i < PICTURE_RING_SIZE; i++ )
                         id->pp_vfilter[id->i_vfilter]->p_owner->pp_pics[i] = 0;
-                    id->pp_vfilter[id->i_filter]->p_owner->p_sys = p_sys;
+                    id->pp_vfilter[id->i_vfilter]->p_owner->p_sys = p_sys;
 
                     id->i_vfilter++;
                 }
