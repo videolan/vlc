@@ -2,7 +2,7 @@
  * auhal.c: AUHAL output plugin
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: coreaudio.c 10101 2005-03-02 16:47:31Z robux4 $
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *
@@ -289,10 +289,10 @@ static int Open( vlc_object_t * p_this )
             case kAudioChannelLabel_RightSurround:
                 p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARRIGHT;
                 continue;
-            case kAudioChannelLabel_LeftCenter:
+            case kAudioChannelLabel_RearSurroundLeft:
                 p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
                 continue;
-            case kAudioChannelLabel_RightCenter:
+            case kAudioChannelLabel_RearSurroundRight:
                 p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
                 continue;
             case kAudioChannelLabel_CenterSurround:
