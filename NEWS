@@ -71,7 +71,6 @@ Video output:
  * Motion detection filter (can trigger playlist actions)
  * Improvements to wall video filter
  * Support for font color and opacity
- * Fixed Mac OS X OpenGL output
 
 Stream output:
  * Muxers
@@ -104,7 +103,8 @@ Windows port:
  * Support for no-decoration windows
 
 MacOS X port:
- * Many Tiger related fixes
+ * Many Mac OS X 10.4 Tiger related fixes
+ * The OpenGL video output is back
  * A new audio module that should work more reliable for analog audio output in various configurations.
    - Supports multichannel discrete analog output
    - Digital audio output requires you to change a preference setting because it
