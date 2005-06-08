@@ -216,7 +216,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_aspect = -1;
     p_sys->i_mux_rate = 0;
     p_sys->i_pgc_length = 0;
-    p_sys->b_spu_change = 0;
+    p_sys->b_spu_change = VLC_FALSE;
 
     if( 1 )
     {
@@ -634,7 +634,7 @@ static int Demux( demux_t *p_demux )
                  event->physical_pan_scan );
 
         ESSubtitleUpdate( p_demux );
-        p_sys->b_spu_change = 1;
+        p_sys->b_spu_change = VLC_TRUE;
 
         /* HACK to get the SPU tracks registered in the right order */
         for( i = 0; i < 0x1f; i++ )
@@ -743,8 +743,11 @@ static int Demux( demux_t *p_demux )
          *  - ...
          */
         DemuxBlock( p_demux, packet, i_len );
-        if( p_sys->b_spu_change ) ButtonUpdate( p_demux, 0 );
-        p_sys->b_spu_change = 0;
+        if( p_sys->b_spu_change ) 
+	{
+		ButtonUpdate( p_demux, VLC_FALSE );
+	        p_sys->b_spu_change = VLC_FALSE;
+        }
         break;
     }
 
@@ -762,7 +765,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_HIGHLIGHT" );
         msg_Dbg( p_demux, "     - display=%d", event->display );
         msg_Dbg( p_demux, "     - buttonN=%d", event->buttonN );
-        ButtonUpdate( p_demux, 0 );
+        ButtonUpdate( p_demux, VLC_FALSE );
         break;
     }
 
@@ -963,7 +966,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     int         i_spu = dvdnav_get_active_spu_stream( p_sys->dvdnav );
     int32_t i_title, i_part;
 
-    ButtonUpdate( p_demux, 0 );
+    ButtonUpdate( p_demux, VLC_FALSE );
 
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
     if( i_title > 0 ) return;
@@ -1177,7 +1180,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     }
     tk->b_seen = VLC_TRUE;
 
-    if( tk->fmt.i_cat == VIDEO_ES ) ButtonUpdate( p_demux, 0 );
+    if( tk->fmt.i_cat == VIDEO_ES ) ButtonUpdate( p_demux, VLC_FALSE );
 }
 
 /*****************************************************************************
