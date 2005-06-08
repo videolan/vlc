@@ -791,7 +791,7 @@ endif
 
 package-win32-base-exe:
 # Create package
-	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
+	wine C:/Program\ Files/NSIS/makensis.exe \
              /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
 
 package-win32-base-exe-cygwin:
