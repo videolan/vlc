@@ -514,7 +514,7 @@ static void Run( services_discovery_t *p_sd )
     while( !p_sd->b_die )
     {
         int i_read;
-        uint8_t p_buffer[MAX_SAP_BUFFER];
+        uint8_t p_buffer[MAX_SAP_BUFFER+1];
 
         i_read = net_Select( p_sd, p_sd->p_sys->pi_fd, NULL,
                              p_sd->p_sys->i_fd, p_buffer,
