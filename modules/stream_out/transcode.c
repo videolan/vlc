@@ -1851,7 +1851,8 @@ static void video_release_buffer( picture_t *p_pic )
     else if( p_pic && p_pic->i_refcount > 0 ) p_pic->i_refcount--;
 }
 
-static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring )
+static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
+                                    sout_stream_sys_t *p_sys )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     picture_t *p_pic;
@@ -1871,15 +1872,14 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring )
         if( pp_ring[i] == 0 ) break;
     }
 
-    if( i == PICTURE_RING_SIZE && p_dec->p_owner->p_sys->i_threads >= 1 )
+    if( i == PICTURE_RING_SIZE && p_sys->i_threads >= 1 )
     {
-        int i_first_pic = p_dec->p_owner->p_sys->i_first_pic;
+        int i_first_pic = p_sys->i_first_pic;
 
-        if( p_dec->p_owner->p_sys->i_first_pic !=
-            p_dec->p_owner->p_sys->i_last_pic )
+        if( p_sys->i_first_pic != p_sys->i_last_pic )
         {
             /* Encoder still has stuff to encode, wait to clear-up the list */
-            while( p_dec->p_owner->p_sys->i_first_pic == i_first_pic )
+            while( p_sys->i_first_pic == i_first_pic )
                 msleep( 100000 );
         }
 
@@ -1938,13 +1938,14 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring )
 static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
 {
     return video_new_buffer( VLC_OBJECT(p_dec),
-                             p_dec->p_owner->pp_pics );
+                             p_dec->p_owner->pp_pics, p_dec->p_owner->p_sys );
 }
 
 static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
     return video_new_buffer( VLC_OBJECT(p_filter),
-                             p_filter->p_owner->pp_pics );
+                             p_filter->p_owner->pp_pics,
+                             p_filter->p_owner->p_sys );
 }
 
 static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
