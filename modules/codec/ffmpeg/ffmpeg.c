@@ -447,6 +447,8 @@ static struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('m','p','4','v'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('M','P','4','V'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC( 4,  0,  0,  0 ), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('m','4','c','c'), CODEC_ID_MPEG4,

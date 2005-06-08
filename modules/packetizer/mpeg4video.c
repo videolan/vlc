@@ -121,6 +121,7 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'm', 'p', '4', 's'):
         case VLC_FOURCC( 'M', 'P', '4', 'S'):
         case VLC_FOURCC( 'm', 'p', '4', 'v'):
+        case VLC_FOURCC( 'M', 'P', '4', 'V'):
         case VLC_FOURCC( 'D', 'I', 'V', 'X'):
         case VLC_FOURCC( 'd', 'i', 'v', 'x'):
         case VLC_FOURCC( 'X', 'V', 'I', 'D'):
