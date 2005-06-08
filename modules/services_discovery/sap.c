@@ -1078,8 +1078,15 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     }
 
     p_sdp = (sdp_t *)malloc( sizeof( sdp_t ) );
+    if( p_sdp == NULL )
+        return NULL;
 
     p_sdp->psz_sdp = strdup( psz_sdp );
+    if( p_sdp->psz_sdp == NULL )
+    {
+        free( p_sdp );
+        return NULL;
+    }
 
     p_sdp->psz_sessionname = NULL;
     p_sdp->psz_media       = NULL;
@@ -1125,7 +1132,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
         if( psz_sdp[1] != '=' )
         {
             msg_Warn( p_obj, "invalid packet" ) ;
-            /* MEMLEAK ! */
+            FreeSDP( p_sdp );
             return NULL;
         }
 
