@@ -132,6 +132,7 @@ struct demux_sys_t
     /* palette for menus */
     uint32_t clut[16];
     uint8_t  palette[4][4];
+    vlc_bool_t b_spu_change;
 
     /* */
     int i_aspect;
@@ -215,6 +216,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_aspect = -1;
     p_sys->i_mux_rate = 0;
     p_sys->i_pgc_length = 0;
+    p_sys->b_spu_change = 0;
 
     if( 1 )
     {
@@ -632,6 +634,7 @@ static int Demux( demux_t *p_demux )
                  event->physical_pan_scan );
 
         ESSubtitleUpdate( p_demux );
+        p_sys->b_spu_change = 1;
 
         /* HACK to get the SPU tracks registered in the right order */
         for( i = 0; i < 0x1f; i++ )
@@ -740,7 +743,8 @@ static int Demux( demux_t *p_demux )
          *  - ...
          */
         DemuxBlock( p_demux, packet, i_len );
-	ButtonUpdate( p_demux, VLC_FALSE );
+        if( p_sys->b_spu_change ) ButtonUpdate( p_demux, 0 );
+        p_sys->b_spu_change = 0;
         break;
     }
 
