@@ -928,7 +928,8 @@ x264-$(X264_VERSION).tar.gz:
 
 x264: x264-$(X264_VERSION).tar.gz
 	$(EXTRACT_GZ)
-
+	patch -p 0 < Patches/x264.patch
+	rm x264/x264.c
 
 .x264: x264
 	(cd $<; ./configure --enable-pthread --prefix=$(PREFIX) && make && make install)
