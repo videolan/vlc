@@ -83,7 +83,7 @@ endif
 
 ifdef HAVE_DARWIN_OS
  all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
-	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
@@ -918,6 +918,25 @@ endif
 CLEAN_FILE += .dts
 CLEAN_PKG += libdts
 DISTCLEAN_PKG += libdts-$(LIBDTS_VERSION).tar.gz
+
+# ***************************************************************************
+# libdts
+# ***************************************************************************
+
+x264-$(X264_VERSION).tar.gz:
+	$(WGET) $(X264_URL)
+
+x264: x264-$(X264_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+
+.x264: x264
+	(cd $<; ./configure --enable-pthread --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .x264
+CLEAN_PKG += x264
+DISTCLEAN_PKG += x264-$(X264_VERSION).tar.gz
 
 # ***************************************************************************
 # libmodplug
