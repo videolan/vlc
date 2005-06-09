@@ -126,3 +126,5 @@ MOZILLA_VERSION=1.7.5
 MOZILLA_URL=http://ftp.mozilla.org/pub/mozilla.org/mozilla/releases/mozilla$(MOZILLA_VERSION)/source/mozilla-source-$(MOZILLA_VERSION).tar.bz2
 TWOLAME_VERSION=0.3.2
 TWOLAME_URL=$(SF)/twolame/twolame-$(TWOLAME_VERSION).tar.gz
+X264_VERSION=20050609
+X264_URL=$(VIDEOLAN)/testing/contrib/x264-$(X264_VERSION).tar.gz
