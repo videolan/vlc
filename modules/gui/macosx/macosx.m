@@ -76,6 +76,8 @@ vlc_module_begin();
     add_submodule();
         set_description( _("Quartz video") );
         set_capability( "video output", 100 );
+        set_category( CAT_VIDEO);
+        set_subcategory( SUBCAT_VIDEO_VOUT );
         set_callbacks( E_(OpenVideoQT), E_(CloseVideoQT) );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
                      VLC_FALSE );
@@ -88,6 +90,8 @@ vlc_module_begin();
     add_submodule();
         set_description( "Mac OS X OpenGL" );
         set_capability( "opengl provider", 100 );
+        set_category( CAT_VIDEO);
+        set_subcategory( SUBCAT_VIDEO_VOUT );
         set_callbacks( E_(OpenVideoGL), E_(CloseVideoGL) );
 vlc_module_end();
 

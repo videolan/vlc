@@ -57,6 +57,8 @@ static int  SendEvents( vlc_object_t *, char const *,
 vlc_module_begin();
     set_description( _("Motion blur filter") );
     set_capability( "video filter", 0 );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer_with_range( "blur-factor", 80, 1, 127, NULL,
         MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );

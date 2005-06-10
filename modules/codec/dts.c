@@ -90,8 +90,6 @@ static block_t       *GetSoutBuffer( decoder_t * );
 vlc_module_begin();
     set_description( _("DTS parser") );
     set_capability( "decoder", 100 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();

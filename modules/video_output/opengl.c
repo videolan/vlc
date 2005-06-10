@@ -109,6 +109,9 @@ static char *ppsz_effects_text[] = {
         N_("None"), N_("Cube"), N_("Transparent Cube") };
 
 vlc_module_begin();
+    set_shortname( "OpenGL" );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("OpenGL video output") );
 #ifdef SYS_DARWIN
     set_capability( "video output", 200 );
@@ -117,10 +120,10 @@ vlc_module_begin();
 #endif
     add_shortcut( "opengl" );
     add_float( "opengl-cube-speed", 2.0, NULL, SPEED_TEXT,
-                    SPEED_LONGTEXT, VLC_FALSE );
+                    SPEED_LONGTEXT, VLC_TRUE );
     set_callbacks( CreateVout, DestroyVout );
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
-                 EFFECT_LONGTEXT, VLC_TRUE );
+                 EFFECT_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_effects, ppsz_effects_text, 0 );
 vlc_module_end();
 
