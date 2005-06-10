@@ -185,7 +185,46 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             }
             else if( i_mode == SORT_AUTHOR )
             {
-                msg_Err( p_playlist,"META SORT not implemented" );
+                char *psz_a = vlc_input_item_GetInfo(
+                                 &pp_items[i]->input,
+                                 _( "Meta-information"), _("Artist") );
+                char *psz_b = vlc_input_item_GetInfo(
+                                 &pp_items[i_small]->input,
+                                 _( "Meta-information"), _("Artist") );
+                if( pp_items[i]->i_children == -1 &&
+                    pp_items[i_small]->i_children >= 0 )
+                {
+                    i_test = 1;
+                }
+                else if( pp_items[i]->i_children >= 0 &&
+                         pp_items[i_small]->i_children == -1 )
+                {
+                    i_test = -1;
+                }
+                // both are nodes
+                else if( pp_items[i]->i_children >= 0 &&
+                         pp_items[i_small]->i_children >= 0 )
+                {
+                    i_test = strcasecmp( pp_items[i]->input.psz_name,
+                                         pp_items[i_small]->input.psz_name );
+                }
+                else if( psz_a == NULL && psz_b != NULL )
+                {
+                    i_test = 1;
+                }
+                else if( psz_a != NULL && psz_b == NULL )
+                {
+                    i_test = -1;
+                }
+                else if( psz_a == NULL && psz_b == NULL )
+                {
+                    i_test = strcasecmp( pp_items[i]->input.psz_name,
+                                         pp_items[i_small]->input.psz_name );
+                }
+                else
+                {
+                    i_test = strcmp( psz_b, psz_a );
+                }
             }
             else if( i_mode == SORT_TITLE_NODES_FIRST )
             {

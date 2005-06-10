@@ -972,12 +972,14 @@ void Playlist::OnSort( wxCommandEvent& event )
     switch( event.GetId() )
     {
         case SortTitle_Event:
-            playlist_RecursiveNodeSort( p_playlist, playlist_ItemGetById( p_playlist, p_wxitem->i_id ),
-                                        SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
+            playlist_RecursiveNodeSort( p_playlist,
+                            playlist_ItemGetById( p_playlist, p_wxitem->i_id ),
+                            SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
             break;
         case RSortTitle_Event:
-            playlist_RecursiveNodeSort( p_playlist, playlist_ItemGetById( p_playlist, p_wxitem->i_id ),
-                                        SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
+            playlist_RecursiveNodeSort( p_playlist,
+                            playlist_ItemGetById( p_playlist, p_wxitem->i_id ),
+                            SORT_TITLE_NODES_FIRST, ORDER_REVERSE );
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 
