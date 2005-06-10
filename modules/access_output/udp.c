@@ -266,13 +266,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_mtu = socket_desc.i_mtu;
 
-#ifdef WIN32
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
                            VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
-#else
-    if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-#endif
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
         vlc_object_destroy( p_sys->p_thread );
