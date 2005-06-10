@@ -155,7 +155,7 @@
     var_Set( p_playlist, "repeat", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
+        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
     }
     else
     {
@@ -187,7 +187,7 @@
     var_Set( p_playlist, "loop", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
+        vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
     }
     else
     {

@@ -1347,7 +1347,7 @@ vlc_module_begin();
 #   define KEY_QUIT               KEY_MODIFIER_COMMAND|'q'
 #   define KEY_VOL_UP             KEY_MODIFIER_COMMAND|KEY_UP
 #   define KEY_VOL_DOWN           KEY_MODIFIER_COMMAND|KEY_DOWN
-#   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'
+#   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_DOWN
 #   define KEY_SUBDELAY_UP        'j'
 #   define KEY_SUBDELAY_DOWN      'h'
 #   define KEY_AUDIODELAY_UP      'g'
