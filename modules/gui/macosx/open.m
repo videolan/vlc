@@ -601,7 +601,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
                             o_device]; 
         else
-            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i",
+            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i-",
                             o_device, i_title, i_chapter]; 
     }
     else /* VIDEO_TS folder */
