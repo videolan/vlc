@@ -135,7 +135,7 @@ static void Close( vlc_object_t * );
 #define QUALITY_LONGTEXT N_( "Set the quality of the stream" )
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(-1 for auto)" )
+    "(-1 for autodetect)" )
 
 static int i_norm_list[] =
     { VIDEO_MODE_AUTO, VIDEO_MODE_SECAM, VIDEO_MODE_PAL, VIDEO_MODE_NTSC };

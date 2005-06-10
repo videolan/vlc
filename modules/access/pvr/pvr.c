@@ -68,10 +68,10 @@ static void Close( vlc_object_t * );
 
 #define FRAMERATE_TEXT N_( "Framerate" )
 #define FRAMERATE_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(-1 for auto)" )
+    "(-1 for autodetect)" )
 
 #define KEYINT_TEXT N_( "Key interval" )
-#define KEYINT_LONGTEXT N_( "Interval between keyframes (-1 for auto)" )
+#define KEYINT_LONGTEXT N_( "Interval between keyframes (-1 for autodetect)" )
 
 #define BFRAMES_TEXT N_( "B Frames" )
 #define BFRAMES_LONGTEXT N_("If this option is set, B-Frames will be used. " \
