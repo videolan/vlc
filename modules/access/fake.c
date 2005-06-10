@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
     "value should be set in millisecond units." )
 #define FPS_TEXT N_("Framerate")
 #define FPS_LONGTEXT N_( \
-    "Specify the number of frames per second (eg. 24, 25, 29.997, 30).")
+    "Specify the number of frames per second (eg. 24, 25, 29.97, 30).")
 
 vlc_module_begin();
     set_shortname( _("Fake") );
