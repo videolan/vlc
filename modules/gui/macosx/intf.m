@@ -1509,7 +1509,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     else
     {
-        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Either you are running Mac OS X pre 10.2 or you haven't experienced any heavy crashes yet.") );
+        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("You haven't experienced any heavy crashes yet.") );
 
     }
 }

@@ -96,8 +96,8 @@ struct filter_sys_t
 #define ALIGN_TEXT N_("Mosaic alignment")
 
 #define POS_TEXT N_("Positioning method")
-#define POS_LONGTEXT N_("Positioning method. auto : automatically choose " \
-        "the best number of rows and columns. fixed : use the user-defined " \
+#define POS_LONGTEXT N_("Positioning method. auto: automatically choose " \
+        "the best number of rows and columns. fixed: use the user-defined " \
         "number of rows and columns.")
 #define ROWS_TEXT N_("Number of rows")
 #define COLS_TEXT N_("Number of columns")
