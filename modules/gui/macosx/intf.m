@@ -817,6 +817,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         }
 #undef p_input
 
+        /* Manage volume status */
+        [self manageVolumeSlider];
+
         vlc_mutex_unlock( &p_intf->change_lock );
 
         o_sleep_date = [NSDate dateWithTimeIntervalSinceNow: .1];
@@ -972,6 +975,19 @@ static VLCMain *_o_sharedMainInstance = nil;
                             (int) (i_seconds % 60)];
             [o_timefield setStringValue: o_time];
         }
+        
+        if( p_intf->p_sys->b_volume_update )
+        {
+            NSString *o_text;
+            o_text = [NSString stringWithFormat: _NS("Volume: %d"), i_lastShownVolume * 200 / AOUT_VOLUME_MAX];
+            if( i_lastShownVolume != -1 )
+            [self setScrollField:o_text stopAfter:1000000];
+
+            [o_volumeslider setFloatValue: (float)i_lastShownVolume / AOUT_VOLUME_STEP];
+            [o_volumeslider setEnabled: TRUE];
+            p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
+            p_intf->p_sys->b_volume_update = FALSE;
+        }
 
         /* Manage Playing status */
         var_Get( p_input, "state", &val );
@@ -996,8 +1012,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( (i_end_scroll != -1) && (mdate() > i_end_scroll) )
         [self resetScrollField];
 
-    /* Manage volume status */
-    [self manageVolumeSlider];
 
     [NSTimer scheduledTimerWithTimeInterval: 0.3
         target: self selector: @selector(manageIntf:)
@@ -1233,17 +1247,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( i_volume != i_lastShownVolume )
     {
-        NSString *o_text;
-        o_text = [NSString stringWithFormat: _NS("Volume: %d"), i_volume * 200 / AOUT_VOLUME_MAX];
-        if( i_lastShownVolume != -1 )
-            [self setScrollField:o_text stopAfter:1000000];
-    
-        [o_volumeslider setFloatValue: (float)i_volume / AOUT_VOLUME_STEP];
-        [o_volumeslider setEnabled: TRUE];
         i_lastShownVolume = i_volume;
+        p_intf->p_sys->b_volume_update = TRUE;
     }
-
-    p_intf->p_sys->b_mute = ( i_volume == 0 );
 }
 
 - (IBAction)timesliderUpdate:(id)sender

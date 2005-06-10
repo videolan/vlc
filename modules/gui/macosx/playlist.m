@@ -243,6 +243,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 #if 0
     [o_search_button setTitle: _NS("Search")];
 #endif
+    [o_search_field setToolTip: _NS("Search in Playlist")];
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];

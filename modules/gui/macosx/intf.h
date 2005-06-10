@@ -70,6 +70,7 @@ struct intf_sys_t
     vlc_bool_t b_playmode_update;
     vlc_bool_t b_current_title_update;
     vlc_bool_t b_fullscreen_update;
+    vlc_bool_t b_volume_update;
 
     /* menus handlers */
     vlc_bool_t b_input_update;
