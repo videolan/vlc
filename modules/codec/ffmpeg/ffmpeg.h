@@ -249,3 +249,29 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define ENC_STRICT_TEXT N_( "Strict standard compliance" )
 #define ENC_STRICT_LONGTEXT N_( "Allows you to force a strict standard " \
   "compliance when encoding (accepted values: -1, 0, 1)." )
+
+#define ENC_LUMI_MASKING_TEXT N_( "Luminance masking" )
+#define ENC_LUMI_MASKING_LONGTEXT N_( "Allows you to raise the quantizer for " \
+  "very bright macroblocks (default: 0.0)." )
+
+#define ENC_DARK_MASKING_TEXT N_( "Darkness masking" )
+#define ENC_DARK_MASKING_LONGTEXT N_( "Allows you to raise the quantizer for " \
+  "very dark macroblocks (default: 0.0)." )
+
+#define ENC_P_MASKING_TEXT N_( "Motion masking" )
+#define ENC_P_MASKING_LONGTEXT N_( "Allows you to raise the quantizer for " \
+  "macroblocks with a high temporal complexity (default: 0.0)." )
+
+#define ENC_BORDER_MASKING_TEXT N_( "Border masking" )
+#define ENC_BORDER_MASKING_LONGTEXT N_( "Allows you to raise the quantizer " \
+  "for macroblocks at the border of the frame (default: 0.0)." )
+
+#define ENC_LUMA_ELIM_TEXT N_( "Luminance elimination" )
+#define ENC_LUMA_ELIM_LONGTEXT N_( "Eliminates luminance blocks when " \
+  "the PSNR isn't much changed (default: 0.0). The H264 specification " \
+  "recommends -4." )
+
+#define ENC_CHROMA_ELIM_TEXT N_( "Chrominance elimination" )
+#define ENC_CHROMA_ELIM_LONGTEXT N_( "Eliminates chrominance blocks when " \
+  "the PSNR isn't much changed (default: 0.0). The H264 specification " \
+  "recommends 7." )

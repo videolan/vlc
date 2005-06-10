@@ -579,10 +579,33 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         /* Set the PTS */
         if( p_sys->p_ff_pic->pts ) p_sys->i_pts = p_sys->p_ff_pic->pts;
 
-        /* Sanity check (seems to be needed for some streams ) */
+        /* Sanity check (seems to be needed for some streams) */
         if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
         {
             p_sys->b_has_b_frames = VLC_TRUE;
+        }
+
+        if( !p_dec->fmt_in.video.i_aspect )
+        {
+            /* Fetch again the aspect ratio in case it changed */
+#if LIBAVCODEC_BUILD >= 4687
+            p_dec->fmt_out.video.i_aspect =
+                VOUT_ASPECT_FACTOR
+                    * ( av_q2d(p_sys->p_context->sample_aspect_ratio)
+                    * p_sys->p_context->width / p_sys->p_context->height );
+            p_dec->fmt_out.video.i_sar_num
+                = p_sys->p_context->sample_aspect_ratio.num;
+            p_dec->fmt_out.video.i_sar_den
+                = p_sys->p_context->sample_aspect_ratio.den;
+#else
+            p_dec->fmt_out.video.i_aspect =
+                VOUT_ASPECT_FACTOR * p_sys->p_context->aspect_ratio;
+#endif
+            if( p_dec->fmt_out.video.i_aspect == 0 )
+            {
+                p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR
+                    * p_sys->p_context->width / p_sys->p_context->height;
+            }
         }
 
         /* Send decoded frame to vout */

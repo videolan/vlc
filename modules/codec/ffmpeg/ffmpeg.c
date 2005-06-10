@@ -163,6 +163,18 @@ vlc_module_begin();
                ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, VLC_TRUE );
     add_integer( ENC_CFG_PREFIX "strict", 0, NULL,
                  ENC_STRICT_TEXT, ENC_STRICT_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "lumi-masking", 0.0, NULL,
+               ENC_LUMI_MASKING_TEXT, ENC_LUMI_MASKING_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "dark-masking", 0.0, NULL,
+               ENC_DARK_MASKING_TEXT, ENC_DARK_MASKING_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "p-masking", 0.0, NULL,
+               ENC_P_MASKING_TEXT, ENC_P_MASKING_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "border-masking", 0.0, NULL,
+               ENC_BORDER_MASKING_TEXT, ENC_BORDER_MASKING_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "luma-elim-threshold", 0, NULL,
+                 ENC_LUMA_ELIM_TEXT, ENC_LUMA_ELIM_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "chroma-elim-threshold", 0, NULL,
+                 ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, VLC_TRUE );
 
     /* demux submodule */
     add_submodule();

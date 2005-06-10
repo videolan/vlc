@@ -140,6 +140,8 @@ struct encoder_sys_t
     vlc_bool_t b_mpeg4_matrix;
     vlc_bool_t b_trellis;
     int        i_quality; /* for VBR */
+    float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
+    int        i_luma_elim, i_chroma_elim;
 
     /* Used to work around stupid timestamping behaviour in libavcodec */
     uint64_t i_framenum;
@@ -150,7 +152,9 @@ static const char *ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict-rc",
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
-    "trellis", "qscale", "strict", NULL
+    "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
+    "p-masking", "border-masking", "luma-elim-threshold",
+    "chroma-elim-threshold", NULL
 };
 
 /*****************************************************************************
@@ -313,6 +317,19 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( val.i_int < - 1 || val.i_int > 1 ) val.i_int = 0;
     p_context->strict_std_compliance = val.i_int;
 
+    var_Get( p_enc, ENC_CFG_PREFIX "lumi-masking", &val );
+    p_sys->f_lumi_masking = val.f_float;
+    var_Get( p_enc, ENC_CFG_PREFIX "dark-masking", &val );
+    p_sys->f_dark_masking = val.f_float;
+    var_Get( p_enc, ENC_CFG_PREFIX "p-masking", &val );
+    p_sys->f_p_masking = val.f_float;
+    var_Get( p_enc, ENC_CFG_PREFIX "border-masking", &val );
+    p_sys->f_border_masking = val.f_float;
+    var_Get( p_enc, ENC_CFG_PREFIX "luma-elim-threshold", &val );
+    p_sys->i_luma_elim = val.i_int;
+    var_Get( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold", &val );
+    p_sys->i_chroma_elim = val.i_int;
+
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
         int i_aspect_num, i_aspect_den;
@@ -343,6 +360,13 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->b_quant_factor = 1.25;
         p_context->i_quant_offset = 0.0;
         p_context->i_quant_factor = -0.8;
+
+        p_context->lumi_masking = p_sys->f_lumi_masking;
+        p_context->dark_masking = p_sys->f_dark_masking;
+        p_context->p_masking = p_sys->f_p_masking;
+        p_context->border_masking = p_sys->f_border_masking;
+        p_context->luma_elim_threshold = p_sys->i_luma_elim;
+        p_context->chroma_elim_threshold = p_sys->i_chroma_elim;
 
         if( p_sys->i_key_int > 0 )
             p_context->gop_size = p_sys->i_key_int;
