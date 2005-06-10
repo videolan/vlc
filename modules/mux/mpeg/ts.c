@@ -123,6 +123,8 @@ static void    Close  ( vlc_object_t * );
 
 #define ACRYPT_TEXT N_("Crypt audio")
 #define ACRYPT_LONGTEXT N_("Crypt audio using CSA")
+#define VCRYPT_TEXT N_("Crypt video")
+#define VCRYPT_LONGTEXT N_("Crypt video using CSA")
 
 #define CK_TEXT N_("CSA Key")
 #define CK_LONGTEXT N_("Defines the CSA encryption key. This must be a " \
@@ -169,6 +171,8 @@ vlc_module_begin();
 
     add_bool( SOUT_CFG_PREFIX "crypt-audio", VLC_TRUE, NULL, ACRYPT_TEXT,
               ACRYPT_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "crypt-video", VLC_TRUE, NULL, VCRYPT_TEXT,
+              VCRYPT_LONGTEXT, VLC_TRUE );
 
     add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
                 VLC_TRUE );
@@ -182,7 +186,7 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "program-pmt",
     "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
-    "dts-delay", "csa-ck", "crypt-audio",
+    "dts-delay", "csa-ck", "crypt-audio", "crypt-video",
     NULL
 };
 
@@ -318,6 +322,7 @@ struct sout_mux_sys_t
 
     csa_t               *csa;
     vlc_bool_t          b_crypt_audio;
+    vlc_bool_t          b_crypt_video;
 };
 
 
@@ -549,6 +554,9 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_mux, SOUT_CFG_PREFIX "crypt-audio", &val );
     p_sys->b_crypt_audio = val.b_bool;
+
+    var_Get( p_mux, SOUT_CFG_PREFIX "crypt-video", &val );
+    p_sys->b_crypt_video = val.b_bool;
 
     return VLC_SUCCESS;
 }
@@ -1297,7 +1305,8 @@ static int Mux( sout_mux_t *p_mux )
             /* Build the TS packet */
             p_ts = TSNew( p_mux, p_stream, b_pcr );
             if( p_sys->csa != NULL &&
-                 (p_input->p_fmt->i_cat != AUDIO_ES || p_sys->b_crypt_audio) )
+                 (p_input->p_fmt->i_cat != AUDIO_ES || p_sys->b_crypt_audio) &&
+                 (p_input->p_fmt->i_cat != VIDEO_ES || p_sys->b_crypt_video) )
             {
                 p_ts->i_flags |= BLOCK_FLAG_SCRAMBLED;
             }
