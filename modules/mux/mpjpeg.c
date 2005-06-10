@@ -31,7 +31,7 @@
 
 #define SEPARATOR_TEXT N_( "Multipart separator string" )
 #define SEPARATOR_LONGTEXT N_( "Multipart strings like MPJPEG use a " \
-                               "separator string betwen content pieces. "\
+                               "separator string between content pieces. "\
                                "You can select this string. Default is "\
                                "--myboundary" )
 
