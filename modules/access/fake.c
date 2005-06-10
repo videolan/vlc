@@ -43,7 +43,12 @@ static void Close( vlc_object_t * );
     "value should be set in millisecond units." )
 #define FPS_TEXT N_("Framerate")
 #define FPS_LONGTEXT N_( \
-    "Specify the number of frames per second (eg. 24, 25, 29.97, 30).")
+    "Specifies the number of frames per second (eg. 24, 25, 29.97, 30).")
+#define ID_TEXT N_("ID")
+#define ID_LONGTEXT N_( \
+    "Allows you to set the ID of the fake elementary stream for use in " \
+    "#duplicate{} constructs (default 0).")
+
 
 vlc_module_begin();
     set_shortname( _("Fake") );
@@ -54,6 +59,7 @@ vlc_module_begin();
     add_integer( "fake-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+    add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "fake" );
     set_capability( "access_demux", 0 );
@@ -103,7 +109,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_last_pts = 0;
 
     /* Declare elementary stream */
+    var_Create( p_demux, "fake-id", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "fake-id", &val );
     es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC('f', 'a', 'k', 'e') );
+    fmt.i_id = val.i_int;
     p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
 
     /* Update default_pts to a suitable value for access */
