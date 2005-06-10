@@ -25,7 +25,7 @@
 #define MUXERS_NUMBER 9
 
 // Do not count dummy here !
-#define VCODECS_NUMBER 13
+#define VCODECS_NUMBER 12
 #define ACODECS_NUMBER 9
 
 #define MUX_PS          0
@@ -70,8 +70,6 @@ static struct codec vcodecs_array[] =
     { "H 263" , "H263" , N_("H263 is a video codec optimized for videoconference (low rates)") ,
        { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
     { "H 264" , "H264" , N_("H264 is a new video codec") ,
-       { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
-    { "I 263", "I263", N_("I263 is an Intel conferencing codec") ,
        { MUX_TS, MUX_AVI, -1,-1,-1,-1,-1,-1,-1 } },
     { "WMV 1" , "WMV1", N_("WMV (Windows Media Video) 1") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },

@@ -131,7 +131,7 @@
     NSArray *o_v_scales = [NSArray arrayWithObjects: @"0.25",@"0.5",@"0.75",@"1",@"1.25",@"1.5",@"1.75",@"2",nil];
     NSArray *o_a_codecs = [NSArray arrayWithObjects: @"mpga", @"mp3 ", @"mp4a", @"a52 ", @"vorb", @"flac", @"spx ", nil];
     NSArray *o_v_codecs = [NSArray arrayWithObjects: @"mp1v", @"mp2v", @"mp4v", @"DIV1",
-        @"DIV2", @"DIV3", @"h263", @"h264", @"I263", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
+        @"DIV2", @"DIV3", @"h263", @"h264", @"WMV1", @"WMV2", @"MJPG", @"theo", nil];
 
     [o_output_ckbox setTitle: _NS("Advanced output:")];
     [o_output_settings setTitle: _NS("Settings...")];

@@ -920,7 +920,6 @@ create_pda (void)
   comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("mp2v"));
   comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("mp4v"));
   comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("H263"));
-  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("I263"));
   comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("WMV1"));
   comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("WMV2"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboVideoCodec), comboVideoCodec_items);

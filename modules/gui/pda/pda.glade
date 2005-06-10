@@ -1953,14 +1953,6 @@
 				  </child>
 
 				  <child>
-				    <widget class="GtkListItem" id="listitem3164">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label">I263</property>
-				    </widget>
-				  </child>
-
-				  <child>
 				    <widget class="GtkListItem" id="listitem3165">
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>

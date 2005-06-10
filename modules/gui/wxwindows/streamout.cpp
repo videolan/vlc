@@ -694,7 +694,6 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("DIV3"),
         wxT("H263"),
         wxT("h264"),
-        wxT("I263"),
         wxT("WMV1"),
         wxT("WMV2"),
         wxT("MJPG"),
