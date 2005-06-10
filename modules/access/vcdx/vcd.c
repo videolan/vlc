@@ -127,7 +127,7 @@ vlc_module_begin();
 
     add_bool( MODULE_STRING "-extended-info", 0, NULL,
               N_("Show extended VCD info?"),
-              N_("Show the maximum about of information under Stream and "
+              N_("Show the maximum amount of information under Stream and "
                  "Media Info. Shows for example playback control navigation."),
               VLC_FALSE );
 

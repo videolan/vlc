@@ -81,7 +81,7 @@ static void Close( vlc_object_t * );
 #define CHECK_CERT_TEXT N_("Check TLS/SSL server certificate validity")
 #define CHECK_CERT_LONGTEXT N_( \
     "Ensures that server certificate is valid " \
-    "(ie. signed by an approved Certificate Authority)." )
+    "(i.e. signed by an approved Certificate Authority)." )
 
 #define CHECK_HOSTNAME_TEXT N_("Check TLS/SSL server hostname in certificate")
 #define CHECK_HOSTNAME_LONGTEXT N_( \
