@@ -58,6 +58,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #define TEMPLATE_LONGTEXT N_( "Location of a file holding a SVG template for automatic string conversion" )
 
 vlc_module_begin();
+ set_category( CAT_INPUT);
+ set_category( SUBCAT_INPUT_SCODEC );
  set_capability( "text renderer", 101 );
  add_shortcut( "svg" );
  add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, VLC_TRUE );

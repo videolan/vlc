@@ -123,11 +123,11 @@ vlc_module_begin();
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_TRUE );
 
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "freetype-color", 0x00FFFFFF, NULL, COLOR_TEXT,
-                 COLOR_LONGTEXT, VLC_TRUE );
+                 COLOR_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
 
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,

@@ -73,6 +73,8 @@ static char *ppsz_mode_descriptions[] =
 vlc_module_begin();
     set_description( _("Video scaling filter") );
     set_capability( "video filter2", 1000 );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_callbacks( OpenFilter, CloseFilter );
 
     add_integer( "swscale-mode", 0, NULL, MODE_TEXT, MODE_LONGTEXT, VLC_TRUE );

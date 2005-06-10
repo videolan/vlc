@@ -100,6 +100,8 @@ static int NetOpen( vlc_object_t * );
 vlc_module_begin();
     set_description( _("IPv4 network abstraction layer") );
     set_capability( "network", 50 );
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_ADVANCED );
     set_callbacks( NetOpen, NULL );
     add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
 vlc_module_end();

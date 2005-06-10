@@ -101,6 +101,9 @@ static void SetPalette      ( vout_thread_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_shortname( "SDL" );
+    set_category( CAT_VIDEO );
+    set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("Simple DirectMedia Layer video output") );
     set_capability( "video output", 60 );
     add_shortcut( "sdl" );

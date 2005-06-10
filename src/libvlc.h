@@ -948,7 +948,7 @@ vlc_module_begin();
               FULLSCREEN_LONGTEXT, VLC_FALSE );
         change_short('f');
     add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
-              SKIP_FRAMES_LONGTEXT, VLC_TRUE );
+              SKIP_FRAMES_LONGTEXT, VLC_FALSE );
     add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, VLC_TRUE );
 #ifndef SYS_DARWIN
@@ -961,7 +961,7 @@ vlc_module_begin();
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, VLC_FALSE );
     add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
-                   SNAP_FORMAT_LONGTEXT, VLC_TRUE );
+                   SNAP_FORMAT_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_snap_formats, NULL, 0 );
 
     set_section( N_("Window properties" ), NULL );
@@ -970,7 +970,7 @@ vlc_module_begin();
     add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, VLC_TRUE );
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
     add_string( "aspect-ratio", "", NULL,
-               ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
+               ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_FALSE );
     add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
