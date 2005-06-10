@@ -1,5 +1,5 @@
 # Danish translation for VLC.
-# Copyright (C) 2004-2005 VideoLAN
+# Copyright (C) 2004 VideoLAN
 # Translated by:
 # Jonas Larsen <jonas@vrt.dk>
 # Morten Brix Pedersen <morten@wtf.dk>
@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: da\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-06-03 16:57+0200\n"
-"PO-Revision-Date: 2005-05-05 20:14+0100\n"
+"PO-Revision-Date: 2005-06-08 01:02+0100\n"
 "Last-Translator: Jonas A. Larsen <jonas@vrt.dk>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -190,13 +190,12 @@ msgstr ""
 "værdier."
 
 #: include/vlc_config_cat.h:104
-#, fuzzy
 msgid "Access filter modules"
-msgstr "Adgangsmoduler"
+msgstr "Adgangfilter moduler"
 
 #: include/vlc_config_cat.h:106
 msgid "Settings related to the various access filter used by VLC.\n"
-msgstr ""
+msgstr "Indstilliger for adgangsfiltre der bruges af VLC.\n"
 
 #: include/vlc_config_cat.h:108
 msgid "Demuxers"
@@ -204,7 +203,7 @@ msgstr "Demuxere"
 
 #: include/vlc_config_cat.h:109
 msgid "Demuxers are used to separate audio and video streams"
-msgstr ""
+msgstr "Demuxere bruges til at skille lyd og video streams fra hinanden"
 
 #: include/vlc_config_cat.h:111
 msgid "Video codecs"
@@ -212,7 +211,7 @@ msgstr "Video Codec's"
 
 #: include/vlc_config_cat.h:112
 msgid "Settings for the video-only decoders and encoders"
-msgstr ""
+msgstr "Indstillinger for video dekodere og indkodere"
 
 #: include/vlc_config_cat.h:114
 msgid "Audio codecs"
@@ -220,7 +219,7 @@ msgstr "Audio codec's"
 
 #: include/vlc_config_cat.h:115
 msgid "Settings for the audio-only decoders and encoders"
-msgstr ""
+msgstr "Indstillinger for lyd dekodere og indkodere"
 
 #: include/vlc_config_cat.h:117
 msgid "Other codecs"
@@ -228,7 +227,7 @@ msgstr "Andre codec"
 
 #: include/vlc_config_cat.h:118
 msgid "Settings for audio+video and miscellaneous decoders and encoders"
-msgstr ""
+msgstr "Indstillinger for lyd+video dekodere og indkodere"
 
 #: include/vlc_config_cat.h:120 include/vlc_config_cat.h:178 src/libvlc.h:1121
 #: modules/gui/macosx/prefs.m:119
@@ -1019,7 +1018,7 @@ msgstr "Britisk"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:52
 msgid "Bengali"
-msgstr ""
+msgstr "Bengalsk"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:59
 msgid "Catalan"
@@ -1082,9 +1081,8 @@ msgid "Polish"
 msgstr "Polsk"
 
 #: src/libvlc.h:36
-#, fuzzy
 msgid "Pashto"
-msgstr "Sæt ind"
+msgstr ""
 
 #: src/libvlc.h:36
 msgid "Brazilian"
@@ -1099,9 +1097,8 @@ msgid "Swedish"
 msgstr "Svensk"
 
 #: src/libvlc.h:36
-#, fuzzy
 msgid "Tetum"
-msgstr "Tekst"
+msgstr ""
 
 #: src/libvlc.h:36 src/misc/iso-639_def.h:179
 msgid "Tagalog"
@@ -1602,11 +1599,13 @@ msgstr ""
 
 #: src/libvlc.h:276
 msgid "Skip frames"
-msgstr ""
+msgstr "Spring frames over"
 
 #: src/libvlc.h:278
 msgid "Disable this option to disable frame drops on MPEG-2 streams."
 msgstr ""
+"Deaktiver denne indstillinger for at deaktivere overspring af frames i MPEG-"
+"2 streams."
 
 #: src/libvlc.h:280
 msgid "Quiet synchro"
@@ -1634,11 +1633,12 @@ msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
 msgstr ""
+"Hvis der bruges inddata for PVR (eller anden iregulær kilde) bør denne "
+"indstilling sættes til 10000."
 
 #: src/libvlc.h:295
-#, fuzzy
 msgid "Clock synchronisation"
-msgstr "Netværkssynkronisering"
+msgstr "Clock synkronisering"
 
 #: src/libvlc.h:297
 msgid ""
@@ -1736,7 +1736,6 @@ msgid "Give the stream number of the audio track you want to use(from 0 to n)."
 msgstr "Sæt nummeret på den stream i lydsporet du vil bruge (fra 0 til n)"
 
 #: src/libvlc.h:341
-#, fuzzy
 msgid "Choose subtitles track"
 msgstr "Vælg undertekstspor"
 
@@ -1787,9 +1786,8 @@ msgid "Input stop time (seconds)"
 msgstr "Inddata stop-tidspunkt (sekunder)"
 
 #: src/libvlc.h:366
-#, fuzzy
 msgid "Input list"
-msgstr "spilleliste"
+msgstr "Inddata liste"
 
 #: src/libvlc.h:367
 #, fuzzy
@@ -1829,9 +1827,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:387
-#, fuzzy
 msgid "Force subtitle position"
-msgstr "Gennemtving SPU position"
+msgstr "Gennemtving undertekstposition"
 
 #: src/libvlc.h:389
 msgid ""
@@ -2173,7 +2170,7 @@ msgstr ""
 
 #: src/libvlc.h:559
 msgid "Keep stream output open"
-msgstr ""
+msgstr "Hold stream udgang åben"
 
 #: src/libvlc.h:561
 msgid ""
@@ -2238,11 +2235,10 @@ msgid "Enable FPU support"
 msgstr "Aktiver FPU understøttelse i CPU'n"
 
 #: src/libvlc.h:593
-#, fuzzy
 msgid ""
 "If your processor has a floating point calculation unit, VLC can take "
 "advantage of it."
-msgstr "Hvis din CPU understøtter AltiVec instruktioner kan VLC udnytte disse"
+msgstr "Hvis din CPU har en kommatal beregningsenhed kan VLC udnytte denne."
 
 #: src/libvlc.h:596
 msgid "Enable CPU MMX support"
@@ -2346,7 +2342,6 @@ msgid ""
 msgstr "Aktivér indstillingen hvis du vil have VLC til at spille uafbrudt."
 
 #: src/libvlc.h:645
-#, fuzzy
 msgid "Repeat current item"
 msgstr "Gentag det aktuelle emne"
 
@@ -2391,9 +2386,8 @@ msgid "This is a legacy entry to let you configure access modules."
 msgstr ""
 
 #: src/libvlc.h:667
-#, fuzzy
 msgid "Access filter module"
-msgstr "Adgangsmodul"
+msgstr "Adgangfiltermodul"
 
 #: src/libvlc.h:669
 msgid "This is a legacy entry to let you configure access filter modules."
@@ -3082,41 +3076,38 @@ msgid "main program"
 msgstr "hoved program"
 
 #: src/libvlc.h:1564
-#, fuzzy
 msgid "print help for VLC (can be combined with --advanced)"
 msgstr "udskriv hjælp (kan kombineres med --advanced)"
 
 #: src/libvlc.h:1566
-#, fuzzy
 msgid ""
 "print help for VLC and all it's modules (can be combined with --advanced)"
-msgstr "udskriv hjælp på et modul (kan kombineres med --advanced)"
+msgstr ""
+"udskriv hjælp for VLC og alle dets moduler (kan kombineres med --advanced)"
 
 #: src/libvlc.h:1568
-#, fuzzy
 msgid "print help for the advanced options"
-msgstr "Vis advanceret indstillinger"
+msgstr "udskriv hjælp for de advancerede indstillinger"
 
 #: src/libvlc.h:1570
 msgid "ask for extra verbosity when displaying help"
-msgstr ""
+msgstr "brug udvidet detaljegrad ved visning af hjælp"
 
 #: src/libvlc.h:1572
 msgid "print a list of available modules"
 msgstr "udskriv en liste af tilgængelige moduler"
 
 #: src/libvlc.h:1574
-#, fuzzy
 msgid "print help on a specific module (can be combined with --advanced)"
-msgstr "udskriv hjælp på et modul (kan kombineres med --advanced)"
+msgstr "udskriv hjælp for et specifikt modul (kan kombineres med --advanced)"
 
 #: src/libvlc.h:1576
 msgid "save the current command line options in the config"
-msgstr ""
+msgstr "Gem de nuværende kommandolinie indstillinger i konfigurationen"
 
 #: src/libvlc.h:1578
 msgid "reset the current config to the default values"
-msgstr ""
+msgstr "nulstil den nuværende konfiguration til standard værdierne"
 
 #: src/libvlc.h:1580
 msgid "use alternate config file"
@@ -3124,7 +3115,7 @@ msgstr "brug alternativ konfigurationsfil"
 
 #: src/libvlc.h:1582
 msgid "resets the current plugins cache"
-msgstr ""
+msgstr "nulstil det det midlertidige lager for plugins"
 
 #: src/libvlc.h:1584
 msgid "print version information"
@@ -3396,7 +3387,7 @@ msgstr ""
 
 #: src/misc/iso-639_def.h:113
 msgid "Kurdish"
-msgstr ""
+msgstr "Kurdisk"
 
 #: src/misc/iso-639_def.h:114
 msgid "Lao"
@@ -3408,7 +3399,7 @@ msgstr "Latinsk"
 
 #: src/misc/iso-639_def.h:116
 msgid "Latvian"
-msgstr ""
+msgstr "Lettisk"
 
 #: src/misc/iso-639_def.h:117
 msgid "Lingala"
@@ -4064,7 +4055,7 @@ msgstr "Disk"
 
 #: modules/access/cdda/info.c:329
 msgid "Media Catalog Number (MCN)"
-msgstr ""
+msgstr "Media Catalog Number (MCN)"
 
 #: modules/access/cdda/info.c:333 modules/access/vcdx/info.c:103
 msgid "Tracks"
@@ -4108,7 +4099,7 @@ msgstr "udvid"
 
 #: modules/access/directory.c:78
 msgid "Ignore files with these extensions"
-msgstr ""
+msgstr "Ignorer filer med disse endelser"
 
 #: modules/access/directory.c:80
 msgid ""
@@ -4123,7 +4114,7 @@ msgstr "Mappe"
 
 #: modules/access/directory.c:88
 msgid "Standard filesystem directory input"
-msgstr ""
+msgstr "Standard filsystem mappe inddata"
 
 #: modules/access/dshow/dshow.cpp:72 modules/access/dshow/dshow.cpp:74
 #: modules/gui/gtk/menu.c:700 modules/video_output/opengl.c:109
@@ -4144,6 +4135,8 @@ msgid ""
 "Allows you to modify the default caching value for DirectShow streams. This "
 "value should be set in milliseconds units."
 msgstr ""
+"Lader dig ændre standard værdien for DirectShow streams cache. Værdien "
+"angives i milisekunder."
 
 #: modules/access/dshow/dshow.cpp:83 modules/access/v4l/v4l.c:77
 msgid "Video device name"
@@ -4327,7 +4320,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:100
 msgid "Satellite number in the Diseqc system"
-msgstr ""
+msgstr "Satelit nummer i Diseqc systemet"
 
 #: modules/access/dvb/access.c:101
 msgid "[0=no diseqc, 1-4=satellite number]"
@@ -4421,7 +4414,7 @@ msgstr "DVD vinkel"
 
 #: modules/access/dvdnav.c:61 modules/access/dvdread.c:59
 msgid "Allows you to select the default DVD angle."
-msgstr ""
+msgstr "Lader dig indstille standard dvd-vinkel."
 
 #: modules/access/dvdnav.c:65
 msgid ""
@@ -4431,7 +4424,7 @@ msgstr ""
 
 #: modules/access/dvdnav.c:67
 msgid "Start directly in menu"
-msgstr ""
+msgstr "Start direkte i menu"
 
 #: modules/access/dvdnav.c:69
 msgid ""
@@ -4445,7 +4438,7 @@ msgstr "DVD uden menuer"
 
 #: modules/access/dvdnav.c:79
 msgid "DVDnav Input"
-msgstr ""
+msgstr "DVDnav inddata"
 
 #: modules/access/dvdread.c:63
 msgid ""
@@ -4487,7 +4480,7 @@ msgstr "DVD med menuer"
 
 #: modules/access/dvdread.c:91
 msgid "DVDRead Input (DVD without menu support)"
-msgstr ""
+msgstr "DVDRead inddata (DVD uden menu understøttelse)"
 
 #: modules/access/fake.c:42
 msgid ""
@@ -4500,12 +4493,11 @@ msgstr ""
 #: modules/access/fake.c:44 modules/access/pvr/pvr.c:69
 #: modules/access/v4l/v4l.c:136
 msgid "Framerate"
-msgstr ""
+msgstr "Framerate"
 
 #: modules/access/fake.c:46
-#, fuzzy
 msgid "Specify the number of frames per second (eg. 24, 25, 29.997, 30)."
-msgstr "Sæt antallet af billeder pr. sekund"
+msgstr "Sæt antallet af billeder pr. sekund (f.eks. 24, 25, 29.97,30)"
 
 #: modules/access/fake.c:49
 msgid "Fake"
@@ -4601,6 +4593,9 @@ msgid ""
 "mydomain:myport/. If none is specified, the HTTP_PROXY environment variable "
 "will be tried."
 msgstr ""
+"Du kan angive en HTTP proxy server. Det skal være efter syntaksen: http://"
+"proxyserver.dk:minport/. Hvis feltet ikke specificeres bruges HTTP_PROXY "
+"enviroment variablen."
 
 #: modules/access/http.c:52
 msgid ""
@@ -4619,6 +4614,8 @@ msgid ""
 "Allows you to modify the user name that will be used for the connection "
 "(Basic authentication only)."
 msgstr ""
+"Lader dig ændre det brugernavn der vil blive brugt for forbindelsen (Basal "
+"autorisation)"
 
 #: modules/access/http.c:59
 msgid "HTTP password"
@@ -4631,7 +4628,7 @@ msgstr "HTTP bruger agent"
 #: modules/access/http.c:64
 msgid ""
 "Allows you to modify the user agent that will be used for the connection."
-msgstr ""
+msgstr "Lader dig ændre den user agent der vil blive opgivet for forbindelsen"
 
 #: modules/access/http.c:67
 msgid "Auto re-connect"
@@ -4641,6 +4638,8 @@ msgstr "Automatisk gen-oprettelse af forbindelse"
 msgid ""
 "Will automatically attempt a re-connection in case it was untimely closed."
 msgstr ""
+"Vil automatisk forsøge at genetablere forbindelsen hvis den blev lukket i "
+"utide."
 
 #: modules/access/http.c:71
 msgid "Continuous stream"
@@ -4674,7 +4673,7 @@ msgstr ""
 
 #: modules/access/mms/mms.c:53
 msgid "Select maximum bitrate stream"
-msgstr ""
+msgstr "Vælg stream med højest bitrate"
 
 #: modules/access/mms/mms.c:55
 msgid "Always select the stream with the maximum bitrate."
@@ -4708,27 +4707,27 @@ msgstr "PVR video enhed"
 
 #: modules/access/pvr/pvr.c:54 modules/access/v4l/v4l.c:96
 msgid "Norm"
-msgstr ""
+msgstr "Type"
 
 #: modules/access/pvr/pvr.c:55 modules/access/v4l/v4l.c:98
 msgid "Defines the norm of the stream (Automatic, SECAM, PAL, or NTSC)"
-msgstr ""
+msgstr "Angiver streamens signaltype (Automatisk, SECAM, PAL eller NTSC)"
 
 #: modules/access/pvr/pvr.c:58 modules/access/v4l/v4l.c:102
 msgid "Width"
-msgstr ""
+msgstr "Bredde"
 
 #: modules/access/pvr/pvr.c:59 modules/access/v4l/v4l.c:103
 msgid "Width of the stream to capture (-1 for autodetect)"
-msgstr ""
+msgstr "Bredden på den stream der modtages (-1 for auto)"
 
 #: modules/access/pvr/pvr.c:62 modules/access/v4l/v4l.c:105
 msgid "Height"
-msgstr ""
+msgstr "Højde"
 
 #: modules/access/pvr/pvr.c:63 modules/access/v4l/v4l.c:106
 msgid "Height of the stream to capture (-1 for autodetect)"
-msgstr ""
+msgstr "Højden på den stream der modtages (-1 for auto)"
 
 #: modules/access/pvr/pvr.c:66 modules/access/v4l/v4l.c:89
 #: modules/gui/gtk/gnome_interface.c:1866 modules/gui/gtk/gtk_interface.c:2181
@@ -4737,11 +4736,11 @@ msgstr "Frekvens"
 
 #: modules/access/pvr/pvr.c:67 modules/access/v4l/v4l.c:91
 msgid "Frequency to capture (in kHz), if applicable"
-msgstr ""
+msgstr "Frekvens i Khz. Kun hvis relevant."
 
 #: modules/access/pvr/pvr.c:70 modules/access/v4l/v4l.c:137
 msgid "Framerate to capture, if applicable (-1 for auto)"
-msgstr ""
+msgstr "Framerate for stream. Kun hvis relevant. (-1 for auto)"
 
 #: modules/access/pvr/pvr.c:73
 msgid "Key interval"
@@ -4749,37 +4748,39 @@ msgstr ""
 
 #: modules/access/pvr/pvr.c:74
 msgid "Interval between keyframes (-1 for auto)"
-msgstr ""
+msgstr "Interval mellem keyframes (-1 for auto)"
 
 #: modules/access/pvr/pvr.c:76
 msgid "B Frames"
-msgstr ""
+msgstr "B-frames"
 
 #: modules/access/pvr/pvr.c:77
 msgid ""
 "If this option is set, B-Frames will be used. Use this option to set the "
 "number of B-Frames."
 msgstr ""
+"Hvis denne indstilling aktiveres vil der blive brugt B-frames i enkodningen. "
+"Indstil antallet her."
 
 #: modules/access/pvr/pvr.c:81
 msgid "Bitrate to use (-1 for default)"
-msgstr ""
+msgstr "Brug denne bitrate (-1 for standard)"
 
 #: modules/access/pvr/pvr.c:83
 msgid "Bitrate peak"
-msgstr ""
+msgstr "Bitrate max."
 
 #: modules/access/pvr/pvr.c:84
 msgid "Peak bitrate in VBR mode"
-msgstr ""
+msgstr "Max. bitrate for VBR indstilling"
 
 #: modules/access/pvr/pvr.c:86
 msgid "Bitrate mode (vbr or cbr)"
-msgstr ""
+msgstr "Bitrate indstilling (VBR eller CBR)"
 
 #: modules/access/pvr/pvr.c:87
 msgid "Bitrate mode to use"
-msgstr ""
+msgstr "Den brugte bitrate indstillinger"
 
 #: modules/access/pvr/pvr.c:89
 msgid "Audio bitmask"
@@ -4836,7 +4837,7 @@ msgstr ""
 
 #: modules/access/satellite/satellite.c:41
 msgid "Demux number"
-msgstr ""
+msgstr "Demux nummer"
 
 #: modules/access/satellite/satellite.c:44
 msgid "Tuner number"
@@ -4860,11 +4861,11 @@ msgstr ""
 
 #: modules/access/satellite/satellite.c:59
 msgid "Use diseqc with antenna"
-msgstr ""
+msgstr "Brug diseqc med antenne"
 
 #: modules/access/satellite/satellite.c:72
 msgid "Satellite input"
-msgstr ""
+msgstr "Satelit inddata"
 
 #: modules/access/screen/screen.c:39
 msgid ""
@@ -4890,7 +4891,7 @@ msgstr ""
 
 #: modules/access/screen/screen.c:62
 msgid "Screen Input"
-msgstr ""
+msgstr "Skærm inddata"
 
 #: modules/access/screen/screen.c:63 modules/gui/gtk/gnome_interface.c:190
 #: modules/gui/gtk/gnome_interface.c:973 modules/gui/gtk/gtk_interface.c:560
@@ -4950,7 +4951,7 @@ msgstr ""
 
 #: modules/access/slp.c:86
 msgid "SLP input"
-msgstr ""
+msgstr "SLP inddata"
 
 #: modules/access/smb.c:61
 msgid ""
@@ -4970,7 +4971,7 @@ msgstr "SMB adgangskode"
 
 #: modules/access/smb.c:69
 msgid "SMB domain"
-msgstr ""
+msgstr "SMB domæne"
 
 #: modules/access/smb.c:70
 #, fuzzy
@@ -4997,7 +4998,7 @@ msgstr "TCP"
 
 #: modules/access/tcp.c:47
 msgid "TCP input"
-msgstr ""
+msgstr "TCP inddata"
 
 #: modules/access/udp.c:43 modules/access_output/udp.c:65
 msgid ""
@@ -5009,11 +5010,11 @@ msgstr ""
 
 #: modules/access/udp.c:46
 msgid "Autodetection of MTU"
-msgstr ""
+msgstr "Automatisk opdagelse af MTU"
 
 #: modules/access/udp.c:48
 msgid "Allows growing the MTU if truncated packets are found"
-msgstr ""
+msgstr "Tillader at MTU forhøjes hvis trunkerede pakker opdages"
 
 #: modules/access/udp.c:54 modules/gui/gtk/gtk_interface.c:2031
 #: modules/gui/macosx/open.m:183 modules/gui/macosx/open.m:654
@@ -5023,7 +5024,7 @@ msgstr "UDP/RTP"
 
 #: modules/access/udp.c:55
 msgid "UDP/RTP input"
-msgstr ""
+msgstr "UDP/RTP inddata"
 
 #: modules/access/v4l/v4l.c:75
 msgid ""
@@ -5038,12 +5039,16 @@ msgid ""
 "Specify the name of the video device that will be used. If you don't specify "
 "anything, no video device will be used."
 msgstr ""
+"Angiver navnet på den video enhed der vil blive brugt. Hvis intet angives, "
+"vil der ikke blive brugt nogen video enhed."
 
 #: modules/access/v4l/v4l.c:83
 msgid ""
 "Specify the name of the audio device that will be used. If you don't specify "
 "anything, no audio device will be used."
 msgstr ""
+"Angiver navnet på den lyd enhed der vil blive brugt. Hvis intet angives, vil "
+"der ikke blive brugt nogen lyd enhed."
 
 #: modules/access/v4l/v4l.c:87
 msgid ""
@@ -5065,7 +5070,7 @@ msgstr "Klarhed"
 
 #: modules/access/v4l/v4l.c:110
 msgid "Set the Brightness of the video input"
-msgstr ""
+msgstr "Indstil lysstyrke for video inddata"
 
 #: modules/access/v4l/v4l.c:111 modules/gui/wxwindows/extrapanel.cpp:226
 msgid "Hue"
@@ -5081,8 +5086,9 @@ msgid "Color"
 msgstr "Farve"
 
 #: modules/access/v4l/v4l.c:116
+#, fuzzy
 msgid "Set the Color of the video input"
-msgstr ""
+msgstr "Indstil farve for video inddata"
 
 #: modules/access/v4l/v4l.c:117 modules/gui/wxwindows/extrapanel.cpp:231
 msgid "Contrast"
@@ -5090,7 +5096,7 @@ msgstr "Kontrast"
 
 #: modules/access/v4l/v4l.c:119
 msgid "Set the Contrast of the video input"
-msgstr ""
+msgstr "Indstil kontrast for video inddata"
 
 #: modules/access/v4l/v4l.c:120
 msgid "Tuner"
@@ -5135,7 +5141,7 @@ msgstr "Kvalitet"
 
 #: modules/access/v4l/v4l.c:135
 msgid "Set the quality of the stream"
-msgstr ""
+msgstr "Indstil kvaliteten af streamen"
 
 #: modules/access/v4l/v4l.c:146
 msgid "Video4Linux"
@@ -5158,15 +5164,15 @@ msgstr "VCD inddata"
 
 #: modules/access/vcd/vcd.c:53
 msgid "[vcd:][device][@[title][,[chapter]]]"
-msgstr ""
+msgstr "[vcd:][enhed][@titel[,kapittel"
 
 #: modules/access/vcdx/access.c:106
 msgid "The above message had unknown log level"
-msgstr ""
+msgstr "Den ovenstående besked havde et ukendt logge niveau"
 
 #: modules/access/vcdx/access.c:132
 msgid "The above message had unknown vcdimager log level"
-msgstr ""
+msgstr "Den ovenstående besked havde et ukendt vcdimager logge niveau"
 
 #: modules/access/vcdx/access.c:282 modules/access/vcdx/access.c:690
 #: modules/access/vcdx/info.c:288 modules/access/vcdx/info.c:289
@@ -5192,12 +5198,12 @@ msgstr "Indlæg"
 
 #: modules/access/vcdx/access.c:533
 msgid "LID "
-msgstr ""
+msgstr "LID "
 
 #: modules/access/vcdx/access.c:708 modules/access/vcdx/info.c:292
 #: modules/access/vcdx/info.c:293
 msgid "Segment"
-msgstr ""
+msgstr "Segment"
 
 #: modules/access/vcdx/info.c:90
 msgid "VCD Format"
@@ -5288,7 +5294,7 @@ msgstr "Liste ID"
 
 #: modules/access/vcdx/vcd.c:95
 msgid "vcdx://[device-or-file][@{P,S,T}num]"
-msgstr ""
+msgstr "vcdx://[enhed-eller-fil][@{P,S,T}num]"
 
 #: modules/access/vcdx/vcd.c:96
 msgid "Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input"
@@ -5300,7 +5306,7 @@ msgstr "(Super) Video CD"
 
 #: modules/access/vcdx/vcd.c:111 modules/access/vcdx/vcd.c:112
 msgid "Number of CD blocks to get in a single read."
-msgstr ""
+msgstr "Antal blokke på CD'n der læses af gangen."
 
 #: modules/access/vcdx/vcd.c:116
 msgid "Use playback control?"
@@ -5356,11 +5362,11 @@ msgstr "Tidsforskydelse"
 
 #: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
 msgid "Dummy stream output"
-msgstr ""
+msgstr "Attrap-stream uddata"
 
 #: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
 msgid "Dummy"
-msgstr ""
+msgstr "Attrap"
 
 #: modules/access_output/file.c:65
 msgid "Append to file"
@@ -5373,7 +5379,7 @@ msgstr ""
 
 #: modules/access_output/file.c:70
 msgid "File stream output"
-msgstr ""
+msgstr "Fil-stream uddata"
 
 #: modules/access_output/http.c:48
 msgid "Username"
@@ -5497,7 +5503,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:89
 msgid "UDP stream output"
-msgstr ""
+msgstr "UDP stream uddata"
 
 #: modules/access_output/udp.c:90 modules/gui/gtk/gnome_interface.c:2869
 #: modules/gui/wxwindows/streamout.cpp:459
@@ -5574,60 +5580,62 @@ msgstr ""
 
 #: modules/audio_filter/converter/dtstospdif.c:70
 msgid "audio filter for DTS->S/PDIF encapsulation"
-msgstr ""
+msgstr "lydfilter for DTS->S/PDIF indkapsling"
 
 #: modules/audio_filter/converter/fixed32tofloat32.c:50
 msgid "audio filter for fixed32<->float32 conversion"
-msgstr ""
+msgstr "lydfilter for fixed32<->float32 konvertering"
 
 #: modules/audio_filter/converter/fixed32tos16.c:48
 msgid "audio filter for fixed32->s16 conversion"
-msgstr ""
+msgstr "lydfilter for fixed32->s16 konvertering"
 
 #: modules/audio_filter/converter/float32tos16.c:48
 msgid "audio filter for float32->s16 conversion"
-msgstr ""
+msgstr "lydfilter for float32->s16 konvertering"
 
 #: modules/audio_filter/converter/float32tos8.c:48
 msgid "audio filter for float32->s8 conversion"
-msgstr ""
+msgstr "lydfilter for float32->s8 konvertering"
 
 #: modules/audio_filter/converter/float32tou16.c:48
 msgid "audio filter for float32->u16 conversion"
-msgstr ""
+msgstr "lydfilter for float32->u16 konvertering"
 
 #: modules/audio_filter/converter/float32tou8.c:48
 msgid "audio filter for float32->u8 conversion"
-msgstr ""
+msgstr "lydfilter for float32->u8 konvertering"
 
 #: modules/audio_filter/converter/mpgatofixed32.c:67
 #: modules/audio_filter/converter/mpgatofixed32.c:72
 msgid "MPEG audio decoder"
-msgstr ""
+msgstr "MPEG lyd-dekoder"
 
 #: modules/audio_filter/converter/s16tofixed32.c:48
 msgid "audio filter for s16->fixed32 conversion"
-msgstr ""
+msgstr "lydfilter for s16->fixed32 konvertering"
 
 #: modules/audio_filter/converter/s16tofloat32.c:50
 msgid "audio filter for s16->float32 conversion"
-msgstr ""
+msgstr "lydfilter for s16->float32 konvertering"
 
 #: modules/audio_filter/converter/s16tofloat32swab.c:62
 msgid "audio filter for s16->float32 with endianness conversion"
 msgstr ""
+"lydfilter for s16->float32 konvertering med endiansk konvertering (Big "
+"endian / little endian)"
 
 #: modules/audio_filter/converter/s8tofloat32.c:48
 msgid "audio filter for s8->float32 conversion"
-msgstr ""
+msgstr "lydfilter for s8->float32 konvertering"
 
 #: modules/audio_filter/converter/u8tofixed32.c:48
 msgid "audio filter for u8->fixed32 conversion"
-msgstr ""
+msgstr "lydfilter for u8->fixed32 konvertering"
 
 #: modules/audio_filter/converter/u8tofloat32.c:48
 msgid "audio filter for u8->float32 conversion"
-msgstr ""
+msgstr "lydfilter for u8->float32 konvertering"
 
 #: modules/audio_filter/equalizer.c:52
 msgid "Equalizer preset"
@@ -5643,7 +5651,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Two pass"
-msgstr ""
+msgstr "To gennemløb"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Filter twice the audio"
@@ -5793,15 +5801,15 @@ msgstr ""
 
 #: modules/audio_mixer/float32.c:47
 msgid "Float32 audio mixer"
-msgstr ""
+msgstr "Float32 lydmixer"
 
 #: modules/audio_mixer/spdif.c:47
 msgid "Dummy S/PDIF audio mixer"
-msgstr ""
+msgstr "Attrap S/PDIF lyd mixer"
 
 #: modules/audio_mixer/trivial.c:47
 msgid "Trivial audio mixer"
-msgstr ""
+msgstr "Trivial lydmixer"
 
 #: modules/audio_output/alsa.c:84 modules/codec/x264.c:124
 msgid "default"
@@ -5835,7 +5843,7 @@ msgstr "Mono"
 #: modules/audio_output/oss.c:181 modules/audio_output/portaudio.c:419
 #: modules/audio_output/waveout.c:388
 msgid "2 Front 2 Rear"
-msgstr ""
+msgstr "2 front 2 bag"
 
 #: modules/audio_output/alsa.c:203 modules/audio_output/directx.c:400
 #: modules/audio_output/oss.c:170 modules/audio_output/portaudio.c:435
@@ -5850,7 +5858,7 @@ msgstr ""
 
 #: modules/audio_output/alsa.c:878
 msgid "Unknown soundcard"
-msgstr ""
+msgstr "Ukendt lydkort"
 
 #: modules/audio_output/arts.c:67
 msgid "aRts audio output"
@@ -5878,7 +5886,7 @@ msgstr ""
 
 #: modules/audio_output/directx.c:418 modules/audio_output/portaudio.c:427
 msgid "3 Front 2 Rear"
-msgstr ""
+msgstr "3 front 2 bag"
 
 #: modules/audio_output/esd.c:69
 msgid "EsounD audio output"
@@ -5891,7 +5899,7 @@ msgstr "Ingen server"
 
 #: modules/audio_output/file.c:80
 msgid "Output format"
-msgstr ""
+msgstr "uddata format"
 
 #: modules/audio_output/file.c:81
 msgid ""
@@ -5970,7 +5978,7 @@ msgstr ""
 
 #: modules/audio_output/waveout.c:133
 msgid "Use float32 output"
-msgstr ""
+msgstr "Brug float32 uddata"
 
 #: modules/audio_output/waveout.c:135
 msgid ""
@@ -6021,7 +6029,7 @@ msgstr ""
 #: modules/codec/dirac.c:66 modules/codec/theora.c:90
 #: modules/codec/twolame.c:50 modules/codec/vorbis.c:127
 msgid "Encoding quality"
-msgstr ""
+msgstr "Indkodningskvalitet"
 
 #: modules/codec/dirac.c:68
 msgid "Allows you to specify a quality between 1.0 (low) and 10.0 (high)."
@@ -6053,11 +6061,11 @@ msgstr ""
 
 #: modules/codec/dvbsub.c:56
 msgid "DVB subtitles decoder"
-msgstr ""
+msgstr "DVB undertekst dekoder"
 
 #: modules/codec/dvbsub.c:64
 msgid "DVB subtitles encoder"
-msgstr ""
+msgstr "DVB undertekst indkoder"
 
 #: modules/codec/faad.c:38
 msgid "AAC audio decoder (using libfaad2)"
@@ -6118,7 +6126,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:88
 msgid "Error resilience"
-msgstr ""
+msgstr "Fejltolerance"
 
 #: modules/codec/ffmpeg/ffmpeg.h:90
 msgid ""
@@ -6189,7 +6197,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:127
 msgid "Low resolution decoding"
-msgstr ""
+msgstr "Lav opløsning dekodning"
 
 #: modules/codec/ffmpeg/ffmpeg.h:128
 msgid "Will only decode a low resolution version of the video."
@@ -6377,11 +6385,11 @@ msgstr "6 (Kraftigst)"
 
 #: modules/codec/flac.c:170
 msgid "Flac audio decoder"
-msgstr ""
+msgstr "Flac lyd-dekoder"
 
 #: modules/codec/flac.c:175
 msgid "Flac audio encoder"
-msgstr ""
+msgstr "Flac lyd-indkoder"
 
 #: modules/codec/flac.c:181
 msgid "Flac audio packetizer"
@@ -6393,11 +6401,11 @@ msgstr ""
 
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
-msgstr ""
+msgstr "Linear PCM lyd-dekoder"
 
 #: modules/codec/lpcm.c:87
 msgid "Linear PCM audio packetizer"
-msgstr ""
+msgstr "Linear PCM lyd-indkoder"
 
 #: modules/codec/mash.cpp:65
 msgid "Video decoder using openmash"
@@ -6445,7 +6453,7 @@ msgstr ""
 
 #: modules/codec/speex.c:551
 msgid "Mode"
-msgstr ""
+msgstr "Tilstand"
 
 #: modules/codec/spudec/spudec.c:41
 msgid "DVD subtitles decoder"
@@ -6521,7 +6529,7 @@ msgstr ""
 
 #: modules/codec/twolame.c:55
 msgid "Stereo mode"
-msgstr ""
+msgstr "Stereo tilstand"
 
 #: modules/codec/twolame.c:57
 msgid "[0=stereo, 1=dual-mono, 2=joint-stereo]"
@@ -6529,7 +6537,7 @@ msgstr ""
 
 #: modules/codec/twolame.c:58
 msgid "VBR mode"
-msgstr ""
+msgstr "VBR tilstand"
 
 #: modules/codec/twolame.c:60
 msgid "By default the encoding is CBR."
@@ -6550,7 +6558,7 @@ msgstr "Raw lyd encoder"
 
 #: modules/codec/vorbis.c:131
 msgid "Maximum encoding bitrate"
-msgstr ""
+msgstr "Maksimal indkodnings bitrate"
 
 #: modules/codec/vorbis.c:133
 msgid ""
@@ -6620,7 +6628,7 @@ msgstr ""
 
 #: modules/codec/x264.c:54
 msgid "Enable CABAC"
-msgstr ""
+msgstr "Aktiver CABAC"
 
 #: modules/codec/x264.c:55
 msgid ""
@@ -6654,12 +6662,14 @@ msgid "Sets the allowed variance in average bitrate."
 msgstr ""
 
 #: modules/codec/x264.c:69
+#, fuzzy
 msgid "Maximum local bitrate"
-msgstr ""
+msgstr "Maksimal indkodnings bitrate"
 
 #: modules/codec/x264.c:70
+#, fuzzy
 msgid "Sets a maximum local bitrate in kbits/s."
-msgstr ""
+msgstr "Vælg stream med højest bitrate"
 
 #: modules/codec/x264.c:72
 msgid "Averaging period for the maximum local bitrate"
@@ -7529,7 +7539,7 @@ msgstr ""
 
 #: modules/demux/mkv.cpp:404
 msgid "Dummy Elements"
-msgstr ""
+msgstr "Attrap elementer"
 
 #: modules/demux/mkv.cpp:405
 msgid "Read and discard unknown EBML elements (not good for broken files)."
@@ -9881,7 +9891,7 @@ msgstr "Gruppe"
 
 #: modules/gui/pda/pda.c:281 modules/gui/wxwindows/bookmarks.cpp:161
 msgid "Time"
-msgstr ""
+msgstr "Tid"
 
 #: modules/gui/pda/pda.c:288
 msgid "Index"
@@ -10513,11 +10523,11 @@ msgstr "Beskærer billedet"
 
 #: modules/gui/wxwindows/extrapanel.cpp:154
 msgid "Blurring"
-msgstr ""
+msgstr "Slørring"
 
 #: modules/gui/wxwindows/extrapanel.cpp:154
 msgid "Creates a motion blurring on the image"
-msgstr ""
+msgstr "Giver bevægelses sløring på billedet"
 
 #: modules/gui/wxwindows/extrapanel.cpp:155
 #: modules/video_filter/transform.c:67
@@ -11029,7 +11039,7 @@ msgstr ""
 #: modules/gui/wxwindows/streamdata.h:84
 #: modules/gui/wxwindows/streamdata.h:112
 msgid "Dummy codec (do not transcode)"
-msgstr ""
+msgstr "Attrap codec (ingen konvertering)"
 
 #: modules/gui/wxwindows/streamdata.h:91
 msgid "The standard MPEG audio (1/2) format"
@@ -11521,13 +11531,16 @@ msgstr "wxWindows vinduesudbyder"
 
 #: modules/misc/dummy/dummy.c:37
 msgid "Dummy image chroma format"
-msgstr ""
+msgstr "Attrap billede kroma format"
 
 #: modules/misc/dummy/dummy.c:39
 msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
+"Tvinger attrap-video uddata til at generere billeder via et specifikt kroma "
+"format i stedet for at forsøge at forbedre hastigheden ved at bruge det mest "
+"effektive"
 
 #: modules/misc/dummy/dummy.c:43
 msgid "Save raw codec data"
@@ -11538,6 +11551,8 @@ msgid ""
 "This option allows you to save the raw codec data if you have selected/"
 "forced the dummy decoder in the main options."
 msgstr ""
+"Denne mulighed lader dig gemme den rå codec data hvis du har valgt Attrap-"
+"dekoderen i Generelle indstillinger."
 
 #: modules/misc/dummy/dummy.c:51
 msgid ""
@@ -11545,50 +11560,52 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
+"Som standard starter Attrap-interfacet en DOS kommando prompt. Ved at "
+"aktivere stille-tilstand vises denne prompt ikke."
 
 #: modules/misc/dummy/dummy.c:59
 msgid "Dummy interface function"
-msgstr "Dummy grænseflade funktion"
+msgstr "Attrap-interface funktion"
 
 #: modules/misc/dummy/dummy.c:66
 msgid "Dummy Interface"
-msgstr "Dummy Grænseflade"
+msgstr "Attrap-interface"
 
 #: modules/misc/dummy/dummy.c:71
 msgid "Dummy access function"
-msgstr "Dummy adgangs funktion"
+msgstr "Attrap-adgangs funktion"
 
 #: modules/misc/dummy/dummy.c:75
 msgid "Dummy demux function"
-msgstr "Dummy demux funktion"
+msgstr "Attrap-demux funktion"
 
 #: modules/misc/dummy/dummy.c:79
 msgid "Dummy decoder"
-msgstr "Dummy decoder"
+msgstr "Attrap-dekoder"
 
 #: modules/misc/dummy/dummy.c:80
 msgid "Dummy decoder function"
-msgstr "Dummy decoder funktion"
+msgstr "Attrap-dekoder funktion"
 
 #: modules/misc/dummy/dummy.c:85
 msgid "Dummy encoder function"
-msgstr "Dummy encoder funktion"
+msgstr "Attrap indkoder funktion"
 
 #: modules/misc/dummy/dummy.c:89
 msgid "Dummy audio output function"
-msgstr "Dummy lyd-uddata funktion"
+msgstr "Attrap lyd-uddata funktion"
 
 #: modules/misc/dummy/dummy.c:93
 msgid "Dummy video output function"
-msgstr "Dummy video-uddata funktion"
+msgstr "Attrap video-uddata funktion"
 
 #: modules/misc/dummy/dummy.c:94
 msgid "Dummy Video output"
-msgstr "Dummy Video-uddata"
+msgstr "Attrap video-uddata"
 
 #: modules/misc/dummy/dummy.c:100
 msgid "Dummy font renderer function"
-msgstr "Dummy skrifttype optegner funktion"
+msgstr "Attrap-skrifttype optegner funktion"
 
 #: modules/misc/externrun.c:79
 msgid "Execution of extern programs interface function"
@@ -11776,17 +11793,18 @@ msgstr ""
 
 #: modules/misc/gnutls.c:81
 msgid "Check TLS/SSL server certificate validity"
-msgstr ""
+msgstr "Kontroller TLS/SSL servercertifikat validitet"
 
 #: modules/misc/gnutls.c:83
 msgid ""
 "Ensures that server certificate is valid (ie. signed by an approved "
 "Certificate Authority)."
 msgstr ""
+"Kontrol at servercertifikatet er validt (Dvs. signeret af en godkendt CA)"
 
 #: modules/misc/gnutls.c:86
 msgid "Check TLS/SSL server hostname in certificate"
-msgstr ""
+msgstr "Kontroler TLS/SSL server hostname i certifikatet"
 
 #: modules/misc/gnutls.c:88
 msgid "Ensures that server hostname in certificate match requested host name."
@@ -12007,7 +12025,7 @@ msgstr "AVI muxer"
 
 #: modules/mux/dummy.c:41
 msgid "Dummy/Raw muxer"
-msgstr "Dummy/Raw muxer"
+msgstr "Attrap/Raw muxer"
 
 #: modules/mux/mp4.c:45
 msgid "Create \"Fast start\" files"
@@ -12244,7 +12262,7 @@ msgstr "Enheder"
 
 #: modules/services_discovery/sap.c:76
 msgid "SAP multicast address"
-msgstr ""
+msgstr "SAP multicast addresse"
 
 #: modules/services_discovery/sap.c:77
 msgid "Listen for SAP announces on another address"
@@ -12343,7 +12361,7 @@ msgstr ""
 
 #: modules/services_discovery/shout.c:65
 msgid "Shoutcast radio listings"
-msgstr ""
+msgstr "Shoutcast radiostationsliste"
 
 #: modules/services_discovery/shout.c:137
 msgid "Shoutcast"
@@ -12351,7 +12369,7 @@ msgstr "Shoutcast"
 
 #: modules/stream_out/bridge.c:36 modules/stream_out/mosaic_bridge.c:99
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: modules/stream_out/bridge.c:38
 msgid "Specify an identifier integer for this elementary stream"
@@ -12659,9 +12677,8 @@ msgid "Files"
 msgstr "Filer"
 
 #: modules/stream_out/switcher.c:83
-#, fuzzy
 msgid "Full paths of the files separated by colons."
-msgstr "Den fulde sti til den PNg fil der skal bruges."
+msgstr "Fulde stier til filerne, separeret med kolon"
 
 #: modules/stream_out/switcher.c:84
 msgid "Sizes"
@@ -12672,7 +12689,6 @@ msgid "List of sizes separated by colons (720x576:480x576)."
 msgstr ""
 
 #: modules/stream_out/switcher.c:87
-#, fuzzy
 msgid "Aspect ratio"
 msgstr "Udseendeforhold"
 
@@ -12698,7 +12714,7 @@ msgstr ""
 
 #: modules/stream_out/switcher.c:96
 msgid "GOP size"
-msgstr ""
+msgstr "GOP størrelse"
 
 #: modules/stream_out/switcher.c:98
 msgid "Number of P frames between two I frames."
@@ -12713,9 +12729,8 @@ msgid "Fixed quantizer scale to use."
 msgstr ""
 
 #: modules/stream_out/switcher.c:104
-#, fuzzy
 msgid "MPEG2 video switcher stream output"
-msgstr "Aktiver videostream-uddata"
+msgstr ""
 
 #: modules/stream_out/transcode.c:43
 msgid "Video encoder"
@@ -12920,9 +12935,8 @@ msgid "Transcode stream output"
 msgstr "Konverter stream uddata"
 
 #: modules/stream_out/transcode.c:195
-#, fuzzy
 msgid "Overlays/Subtitles"
-msgstr "Åbn undertekster"
+msgstr "Overlægning/undertekster"
 
 #: modules/stream_out/transrate/transrate.c:58
 msgid "MPEG2 video transrating stream output"
@@ -13149,11 +13163,11 @@ msgstr ""
 
 #: modules/video_filter/marq.c:76
 msgid "Marquee text"
-msgstr ""
+msgstr "Markise tekst"
 
 #: modules/video_filter/marq.c:77
 msgid "Marquee text to display"
-msgstr ""
+msgstr "Markise tekst der skal vises"
 
 #: modules/video_filter/marq.c:78 modules/video_filter/time.c:73
 msgid "X offset, from left"
@@ -13173,13 +13187,15 @@ msgstr ""
 
 #: modules/video_filter/marq.c:82
 msgid "Marquee timeout"
-msgstr ""
+msgstr "Markise timeout"
 
 #: modules/video_filter/marq.c:83
 msgid ""
 "Defines the time the marquee must remain displayed, in milliseconds. Default "
 "value is 0 (remain forever)."
 msgstr ""
+"Angiver hvor lang tid markisen skal vises i milisekunder. Standard værdien "
+"er 0 (vis altid)."
 
 #: modules/video_filter/marq.c:86
 msgid "Opacity"
@@ -13194,24 +13210,22 @@ msgid "Specify the font size, in pixels, with -1 = use freetype-fontsize"
 msgstr ""
 
 #: modules/video_filter/marq.c:98
-#, fuzzy
 msgid "Marquee position"
-msgstr "Startende position"
+msgstr "Markise position"
 
 #: modules/video_filter/marq.c:100
-#, fuzzy
 msgid ""
 "You can enforce the marquee position on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values by "
 "adding them)."
 msgstr ""
-"Du kan tvinge videoplaceringen i vinduet. Som standard (0) vil det blive "
-"centreret (0=center, 1=venstre, 2=højre, 4=top, 8=bottom). Du kan også bruge "
-"kombinationer af værdierne."
+"Du kan indstille markisepositionen i videon. (0=centrer, 1=venstre, 2=højre, "
+"4=top,8=bund) vil det blive centreret (0=center, 1=venstre, 2=højre, 4=top, "
+"8=bottom). Du kan også bruge kombinationer af værdierne."
 
 #: modules/video_filter/marq.c:114
 msgid "Marquee"
-msgstr ""
+msgstr "Markise"
 
 #: modules/video_filter/marq.c:134
 msgid "Misc"
@@ -13219,7 +13233,7 @@ msgstr "forskelligt"
 
 #: modules/video_filter/marq.c:138
 msgid "Marquee display sub filter"
-msgstr ""
+msgstr "Markise visningsfilter"
 
 #: modules/video_filter/mosaic.c:87
 msgid "Alpha blending"
@@ -13296,7 +13310,7 @@ msgstr ""
 
 #: modules/video_filter/mosaic.c:116
 msgid "fixed"
-msgstr ""
+msgstr "fast"
 
 #: modules/video_filter/mosaic.c:125
 msgid "Mosaic video sub filter"
@@ -13308,15 +13322,15 @@ msgstr "Mosaik"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor (1-127)"
-msgstr ""
+msgstr "Slørringsfaktor (1-127)"
 
 #: modules/video_filter/motionblur.c:55
 msgid "The degree of blurring from 1 to 127."
-msgstr ""
+msgstr "Graden af slørring fra 1 til 127."
 
 #: modules/video_filter/motionblur.c:58
 msgid "Motion blur filter"
-msgstr ""
+msgstr "Bevægelsesslørrings filter"
 
 #: modules/video_filter/motiondetect.c:54
 msgid "Description file"
@@ -13413,15 +13427,15 @@ msgid "Time position"
 msgstr "Tids position"
 
 #: modules/video_filter/time.c:90
-#, fuzzy
 msgid ""
 "You can enforce the time position on the video (0=center, 1=left, 2=right, "
 "4=top, 8=bottom, you can also use combinations of these values by adding "
 "them)."
 msgstr ""
-"Du kan tvinge videoplaceringen i vinduet. Som standard (0) vil det blive "
-"centreret (0=center, 1=venstre, 2=højre, 4=top, 8=bottom). Du kan også bruge "
-"kombinationer af værdierne."
+"Du kan indstille positionen for tidsangivelse i videon. (0=centrer, "
+"1=venstre, 2=højre, 4=top,8=bund) vil det blive centreret (0=center, "
+"1=venstre, 2=højre, 4=top, 8=bottom). Du kan også bruge kombinationer af "
+"værdierne."
 
 #: modules/video_filter/time.c:104
 msgid "Time overlay"
@@ -13482,9 +13496,8 @@ msgid "Comma separated list of active windows, defaults to all"
 msgstr "Komma adskilt liste af aktive vinduer, standardværdi er alle"
 
 #: modules/video_filter/wall.c:65
-#, fuzzy
 msgid "Element aspect ratio"
-msgstr "Korrekt udseende forhold"
+msgstr "Element udseendesforhold"
 
 #: modules/video_filter/wall.c:66
 msgid "The aspect ratio of the individual displays building the display wall"
@@ -13913,9 +13926,8 @@ msgid "Defines the number of stars to draw with random effect."
 msgstr "Angiver antallet at stjerner der skal tegnes tilfældigt."
 
 #: modules/visualization/visual/visual.c:75
-#, fuzzy
 msgid "Visualizer"
-msgstr "Visualiseringsfilter"
+msgstr "Visualiserings plugin"
 
 #: modules/visualization/visual/visual.c:78
 msgid "Visualizer filter"
@@ -13961,152 +13973,153 @@ msgstr "Skrifttype brugt til at vise tekst i xosd"
 msgid "XOSD interface"
 msgstr "XOSD grænseflade"
 
-#~ msgid "Matroska"
-#~ msgstr "Matroska"
+msgid "Matroska"
+msgstr "Matroska"
 
-#~ msgid "TY"
-#~ msgstr "TY"
+msgid "TY"
+msgstr "TY"
 
-#~ msgid "MPJPEG"
-#~ msgstr "MPJPEG"
+msgid "MPJPEG"
+msgstr "MPJPEG"
 
-#~ msgid "DirectX"
-#~ msgstr "DirectX"
+msgid "DirectX"
+msgstr "DirectX"
 
-#~ msgid "OpenGL"
-#~ msgstr "OpenGL"
+msgid "OpenGL"
+msgstr "OpenGL"
 
-#~ msgid "PNG"
-#~ msgstr "PNG"
+msgid "PNG"
+msgstr "PNG"
 
-#~ msgid "X11"
-#~ msgstr "X11"
+msgid "X11"
+msgstr "X11"
 
-#~ msgid "XVideo"
-#~ msgstr "XVideo"
+msgid "XVideo"
+msgstr "XVideo"
 
-#~ msgid "A/52"
-#~ msgstr "A/52"
+msgid "A/52"
+msgstr "A/52"
 
-#~ msgid "Toolame"
-#~ msgstr "Toolame"
+msgid "Toolame"
+msgstr "Toolame"
 
-#~ msgid "Showintf"
-#~ msgstr "Showintf"
+msgid "Showintf"
+msgstr "Showintf"
 
-#~ msgid "Telnet"
-#~ msgstr "Telnet"
+msgid "Telnet"
+msgstr "Telnet"
 
-#~ msgid "MPEG-TS"
-#~ msgstr "MPEG-TS"
+msgid "MPEG-TS"
+msgstr "MPEG-TS"
 
-#~ msgid "Mac OS X OpenGL"
-#~ msgstr "Mac OS X OpenGL"
+msgid "Mac OS X OpenGL"
+msgstr "Mac OS X OpenGL"
 
-#~ msgid "Control"
-#~ msgstr "Control"
+msgid "Control"
+msgstr "Control"
 
-#~ msgid "Ncurses"
-#~ msgstr "Ncurses"
+msgid "Ncurses"
+msgstr "Ncurses"
 
-#~ msgid "&Invert"
-#~ msgstr "&Invertér"
+msgid "&Invert"
+msgstr "&Invertér"
 
-#~ msgid "&Select All"
-#~ msgstr "&Vælg alle"
+msgid "&Select All"
+msgstr "&Vælg alle"
 
-#~ msgid "PLS file"
-#~ msgstr "PLS fil"
+msgid "PLS file"
+msgstr "PLS fil"
 
-#~ msgid "wxWindows"
-#~ msgstr "wxWindows"
+msgid "wxWindows"
+msgstr "wxWindows"
 
-#~ msgid "Picture"
-#~ msgstr "Billede"
+msgid "Picture"
+msgstr "Billede"
 
-#, fuzzy
-#~ msgid "VLC internal picture video output"
-#~ msgstr "DirectX video-udgang"
+msgid "VLC internal picture video output"
+msgstr "VLC internbillede video uddata"
 
-#~ msgid "AAC demuxer"
-#~ msgstr "AAC demuxer"
+msgid "AAC demuxer"
+msgstr "AAC demuxer"
 
-#~ msgid "Simple id3 tag skipper"
-#~ msgstr "Simpel id3-mærke overspringer"
+msgid "Simple id3 tag skipper"
+msgstr "Simpel id3-mærke overspringer"
 
-#~ msgid "Screenshot Path"
-#~ msgstr "Skærmbillede sti"
+msgid "Screenshot Path"
+msgstr "Skærmbillede sti"
 
-#~ msgid "Screenshot Format"
-#~ msgstr "Skærmbillede format"
+msgid "Screenshot Format"
+msgstr "Skærmbillede format"
 
-#~ msgid "Usage: %s [options] [items]...\n"
-#~ msgstr "Brug: %s [tilvalg] [elementer]...\n"
+msgid "Usage: %s [options] [items]...\n"
+msgstr "Brug: %s [tilvalg] [elementer]...\n"
 
-#~ msgid ""
-#~ "Usage: %s [options] [items]...\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Brug: %s [tilvalg] [elementer]...\n"
-#~ "\n"
+msgid ""
+"Usage: %s [options] [items]...\n"
+"\n"
+msgstr ""
+"Brug: %s [tilvalg] [elementer]...\n"
+"\n"
 
-#~ msgid "[module]              [description]\n"
-#~ msgstr "[modul]               [beskrivelse]\n"
+msgid "[module]              [description]\n"
+msgstr "[modul]               [beskrivelse]\n"
 
-#~ msgid "Server port"
-#~ msgstr "Server port"
+msgid "Server port"
+msgstr "Server port"
 
-#~ msgid "Choose the program to select by giving its Service ID."
-#~ msgstr "Vælg program ved at vælg dets Service ID."
+msgid "Choose the program to select by giving its Service ID."
+msgstr "Vælg program ved at vælg dets Service ID."
 
-#~ msgid ""
-#~ "Choose the programs to select by giving a comma-separated list of SIDs."
-#~ msgstr "Vælg programmer der skal vælges med en komma-adskilt liste af SIDs."
+msgid "Choose the programs to select by giving a comma-separated list of SIDs."
+msgstr "Vælg programmer der skal vælges med en komma-adskilt liste af SIDs."
 
-#~ msgid "Choose a stream output"
-#~ msgstr "Vælg streamuddata"
+msgid "Choose a stream output"
+msgstr "Vælg streamuddata"
 
-#~ msgid "Empty if no stream output."
-#~ msgstr "Tom hvis ingen stream-uddata."
+msgid "Empty if no stream output."
+msgstr "Tom hvis ingen stream-uddata."
 
-#~ msgid "Loop playlist on end"
-#~ msgstr "Start spilleliste forfra når enden nås"
+msgid "Loop playlist on end"
+msgstr "Start spilleliste forfra når enden nås"
 
-#~ msgid "print detailed help (can be combined with --advanced)"
-#~ msgstr "udskriv detaljeret hjælp (kan kombineres med --advanced)"
+msgid "print detailed help (can be combined with --advanced)"
+msgstr "udskriv detaljeret hjælp (kan kombineres med --advanced)"
 
-#~ msgid "Vol %%%d"
-#~ msgstr "Lydstyrke %%%d"
+msgid "Vol %%%d"
+msgstr "Lydstyrke %%%d"
 
-#~ msgid "Vol %d%%"
-#~ msgstr "Lydstyrke %d%%"
+msgid "Vol %d%%"
+msgstr "Lydstyrke %d%%"
 
-#~ msgid "Extended help"
-#~ msgstr "Udvidet hjælp"
+msgid "Extended help"
+msgstr "Udvidet hjælp"
 
-#~ msgid "List additional commands."
-#~ msgstr "Vis yderligere kommandoer."
+msgid "List additional commands."
+msgstr "Vis yderligere kommandoer."
 
-#~ msgid "vlc preferences"
-#~ msgstr "vlc indstillinger"
+msgid "vlc preferences"
+msgstr "vlc indstillinger"
 
-#~ msgid "Mac OS X interface, sound and video"
-#~ msgstr "Mac OS X grænseflade, lyd og video"
+msgid "Mac OS X interface, sound and video"
+msgstr "Mac OS X grænseflade, lyd og video"
 
-#~ msgid "Select file or directory"
-#~ msgstr "Vælg fil eller mappe"
+msgid "Select file or directory"
+msgstr "Vælg fil eller mappe"
 
-#~ msgid "Loop"
-#~ msgstr "Løkke"
+msgid "Loop"
+msgstr "Løkke"
 
-#~ msgid "Repeat"
-#~ msgstr "Gentag"
+msgid "Repeat"
+msgstr "Gentag"
 
-#~ msgid "Win32 OpenGL provider"
-#~ msgstr "Win32 OpenGL provider"
+msgid "Win32 OpenGL provider"
+msgstr "Win32 OpenGL provider"
 
-#~ msgid "Image"
-#~ msgstr "Billede"
+msgid "Image"
+msgstr "Billede"
 
-#~ msgid "X11 OpenGL provider"
-#~ msgstr "X11 OpenGL provider"
+msgid "X11 OpenGL provider"
+msgstr "X11 OpenGL provider"
+
+#~ msgid "Vorbis"
+#~ msgstr "Vorbis"
