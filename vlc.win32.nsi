@@ -190,8 +190,12 @@ Section "Start Menu + Desktop Shortcut" SEC02
     "$INSTDIR\vlc.exe" "--intf wxwin"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
     "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\Website.lnk" \
+  CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_NAME} Website.lnk" \
     "$INSTDIR\${PRODUCT_NAME}.url"
+  WriteIniStr "$INSTDIR\Documentation.url" "InternetShortcut" "URL" \
+    "${PRODUCT_WEB_SITE}/doc/"
+  CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
+    "$INSTDIR\Documentation.url"
 SectionEnd
 
 Section /o "Mozilla plugin" SEC03
