@@ -82,6 +82,7 @@ static void     Play                    ( aout_instance_t *);
 
 static int      Probe                   ( aout_instance_t * );
 static int      DeviceDigitalMode       ( aout_instance_t *, AudioDeviceID );
+int             AudioDeviceHasOutput    ( AudioDeviceID );
 static int      DigitalInit             ( aout_instance_t * );
 
 static OSStatus RenderCallbackAnalog    ( vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *,
@@ -165,6 +166,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
     */
+    
     if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) && p_sys->b_supports_digital )
     {
         p_sys->b_digital = VLC_TRUE;
@@ -568,7 +570,7 @@ static int Probe( aout_instance_t * p_aout )
         char psz_devuid[1024];
         char psz_name[1024];
         CFStringRef devUID;
-            
+
         i_param_size = sizeof psz_name;
         err = AudioDeviceGetProperty(
                     p_devices[i], 0, VLC_FALSE,
@@ -588,6 +590,12 @@ static int Probe( aout_instance_t * p_aout )
         CFStringGetCString( devUID, psz_devuid, sizeof psz_devuid, CFStringGetSystemEncoding() );
         msg_Dbg( p_aout, "DevID: %lu  DevName: %s  DevUID: %s", p_devices[i], psz_name, psz_devuid );
         CFRelease( devUID );
+
+        if( !AudioDeviceHasOutput(p_aout, p_devices[i]) )
+        {
+            msg_Dbg( p_aout, "this device is INPUT only. skipping..." );
+            continue;
+        }
 
         val.i_int = (int) p_devices[i];
         text.psz_string = psz_name;
@@ -778,6 +786,17 @@ static int DigitalInit( aout_instance_t * p_aout )
 
 error:
     return VLC_EGENERIC;
+}
+
+int AudioDeviceHasOutput( AudioDeviceID i_dev_id )
+{
+    UInt32			dataSize;
+    Boolean			isWritable;
+	
+    verify_noerr( AudioDeviceGetPropertyInfo( i_dev_id, 0, FALSE, kAudioDevicePropertyStreams, &dataSize, &isWritable) );
+    if (dataSize == 0) return FALSE;
+    
+    return TRUE;
 }
 
 
