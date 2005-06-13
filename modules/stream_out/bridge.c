@@ -286,6 +286,8 @@ static int DelOut( sout_stream_t *p_stream, sout_stream_id_t *id )
     p_es->b_changed = VLC_TRUE;
     vlc_mutex_unlock( p_sys->p_lock );
 
+    p_sys->b_inited = VLC_FALSE;
+
     return VLC_SUCCESS;
 }
 
