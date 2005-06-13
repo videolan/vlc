@@ -1470,8 +1470,8 @@ static int Open( vlc_object_t * p_this )
                         !s_filename.compare(s_filename.length() - 3, 3, "mka"))
 #endif
                     {
-                        // test wether this file belongs to the our family
-                        StdIOCallback *p_file_io = new StdIOCallback(s_filename.c_str(), MODE_READ);
+                        // test wether this file belongs to our family
+                        vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( stream_UrlNew( p_demux, s_filename.c_str()));
                         EbmlStream *p_estream = new EbmlStream(*p_file_io);
 
                         p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
