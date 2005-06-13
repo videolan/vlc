@@ -591,7 +591,7 @@ static int Probe( aout_instance_t * p_aout )
         msg_Dbg( p_aout, "DevID: %lu  DevName: %s  DevUID: %s", p_devices[i], psz_name, psz_devuid );
         CFRelease( devUID );
 
-        if( !AudioDeviceHasOutput(p_aout, p_devices[i]) )
+        if( !AudioDeviceHasOutput( p_devices[i]) )
         {
             msg_Dbg( p_aout, "this device is INPUT only. skipping..." );
             continue;
