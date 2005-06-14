@@ -326,12 +326,20 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                     i_options++;
                 }
-
-                playlist_AddExt( p_playlist, ppsz_argv[i_opt],ppsz_argv[i_opt],
-                    PLAYLIST_APPEND | (i_opt? 0 : PLAYLIST_GO),
+                if( i_opt || config_GetInt( p_this, "playlist-enqueue" ) )
+                {
+                  playlist_AddExt( p_playlist, ppsz_argv[i_opt],
+                    ppsz_argv[i_opt], PLAYLIST_APPEND ,
                     PLAYLIST_END, -1,
                     (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
                     i_options );
+                } else {
+                  playlist_AddExt( p_playlist, ppsz_argv[i_opt],
+                    ppsz_argv[i_opt], PLAYLIST_APPEND | PLAYLIST_GO,
+                    PLAYLIST_END, -1,
+                    (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
+                    i_options );
+                }
 
                 i_opt += i_options;
             }

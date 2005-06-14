@@ -722,6 +722,12 @@ static char *ppsz_clock_descriptions[] =
     "double-click on a file in the explorer. This option will allow you " \
     "to play the file with the already running instance or enqueue it.")
 
+#define PLAYLISTENQUEUE_TEXT N_( \
+    "Enqueue items to playlist when in one instance mode")
+#define PLAYLISTENQUEUE_LONGTEXT N_( \
+    "When using the one instance only option, enqueue items to playlist " \
+    "and keep playing current item.")
+
 #define HPRIORITY_TEXT N_("Increase the priority of the process")
 #define HPRIORITY_LONGTEXT N_( \
     "Increasing the priority of the process will very likely improve your " \
@@ -1224,6 +1230,8 @@ vlc_module_begin();
 
 #if defined(WIN32)
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
+              ONEINSTANCE_LONGTEXT, VLC_TRUE );
+    add_bool( "playlist-enqueue", 0, NULL, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, VLC_FALSE );
