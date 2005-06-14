@@ -11,6 +11,7 @@
 !define PRODUCT_DIR_REGKEY "Software\VideoLAN\VLC"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+!define PRODUCT_ID "{ea92ef52-afe4-4212-bacb-dfe9fca94cd6}"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
@@ -68,6 +69,63 @@ InstType "Full"
 
 ; MUI end ------
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Push extensions on stack ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+!macro MacroAudioExtensions _action
+  !insertmacro ${_action} ".a52"
+  !insertmacro ${_action} ".aac"
+  !insertmacro ${_action} ".ac3"
+  !insertmacro ${_action} ".dts"
+  !insertmacro ${_action} ".flac"
+  !insertmacro ${_action} ".mka"
+  !insertmacro ${_action} ".mp1"
+  !insertmacro ${_action} ".mp2"
+  !insertmacro ${_action} ".mp3"
+  !insertmacro ${_action} ".ogg"
+  !insertmacro ${_action} ".spx"
+  !insertmacro ${_action} ".wav"
+  !insertmacro ${_action} ".wma"
+!macroend
+
+!macro MacroVideoExtensions _action
+  !insertmacro ${_action} ".asf"
+  !insertmacro ${_action} ".avi"
+  !insertmacro ${_action} ".divx"
+  !insertmacro ${_action} ".dv"
+  !insertmacro ${_action} ".m1v"
+  !insertmacro ${_action} ".m2v"
+  !insertmacro ${_action} ".mkv"
+  !insertmacro ${_action} ".mov"
+  !insertmacro ${_action} ".mp4"
+  !insertmacro ${_action} ".mpeg"
+  !insertmacro ${_action} ".mpeg1"
+  !insertmacro ${_action} ".mpeg2"
+  !insertmacro ${_action} ".mpeg4"
+  !insertmacro ${_action} ".mpg"
+  !insertmacro ${_action} ".ps"
+  !insertmacro ${_action} ".ts"
+  !insertmacro ${_action} ".ogm"
+  !insertmacro ${_action} ".vob"
+  !insertmacro ${_action} ".wmv"
+!macroend
+
+!macro MacroOtherExtensions _action
+  !insertmacro ${_action} ".asx"
+  !insertmacro ${_action} ".bin"
+  !insertmacro ${_action} ".cue"
+  !insertmacro ${_action} ".m3u"
+  !insertmacro ${_action} ".pls"
+  !insertmacro ${_action} ".vlc"
+!macroend
+
+!macro MacroAllExtensions _action
+  !insertmacro MacroAudioExtensions ${_action}
+  !insertmacro MacroVideoExtensions ${_action}
+  !insertmacro MacroOtherExtensions ${_action}
+!macroend
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; File type associations ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -118,6 +176,27 @@ FunctionEnd
   Pop $R0
 !macroend
 
+!macro WriteRegStrSupportedTypes EXT
+  WriteRegStr HKCR Applications\vlc.exe\SupportedTypes ${EXT} ""
+!macroend
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; Context menu entries ;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+!macro AddContextMenu EXT
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" "Play with VLC media player"
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe "%1"'
+
+  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
+  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --one-instance --playlist-enqueue "%1"'
+!macroend
+
+!macro DeleteContextMenu EXT
+  DeleteRegKey HKCR ${EXT}\shell\PlayWithVLC
+  DeleteRegKey HKCR ${EXT}\shell\AddToPlaylistVLC
+!macroend
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ; Installer sections ;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -136,10 +215,13 @@ Section "Media player (required)" SEC01
   File  /r skins
   File  /r http
 
+  ; Add VLC to "recomended programs" for the following extensions
   WriteRegStr HKCR Applications\vlc.exe "" ""
-  WriteRegStr HKCR Applications\vlc.exe\shell "" "Play"
+  WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
+  WriteRegStr HKCR Applications\vlc.exe\shell\Play "" "Play with VLC"
   WriteRegStr HKCR Applications\vlc.exe\shell\Play\command "" \
     '$INSTDIR\vlc.exe "%1"'
+  !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
 
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" "Play with VLC media player"
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
@@ -242,53 +324,22 @@ Section /o "ActiveX plugin" SEC04
   RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd
 
-SubSection "File type associations" SEC05
-  SubSection "Audio Files"
-    ; Make sure we have the same list in uninstall
-    !insertmacro RegisterExtensionSection ".a52"
-    !insertmacro RegisterExtensionSection ".aac"
-    !insertmacro RegisterExtensionSection ".ac3"
-    !insertmacro RegisterExtensionSection ".dts"
-    !insertmacro RegisterExtensionSection ".flac"
-    !insertmacro RegisterExtensionSection ".mka"
-    !insertmacro RegisterExtensionSection ".mp1"
-    !insertmacro RegisterExtensionSection ".mp2"
-    !insertmacro RegisterExtensionSection ".mp3"
-    !insertmacro RegisterExtensionSection ".ogg"
-    !insertmacro RegisterExtensionSection ".spx"
-    !insertmacro RegisterExtensionSection ".wav"
-    !insertmacro RegisterExtensionSection ".wma"
-  SubSectionEnd
-  SubSection "Video Files"
-    ; Make sure we have the same list in uninstall
-    !insertmacro RegisterExtensionSection ".asf"
-    !insertmacro RegisterExtensionSection ".avi"
-    !insertmacro RegisterExtensionSection ".divx"
-    !insertmacro RegisterExtensionSection ".dv"
-    !insertmacro RegisterExtensionSection ".m1v"
-    !insertmacro RegisterExtensionSection ".m2v"
-    !insertmacro RegisterExtensionSection ".mkv"
-    !insertmacro RegisterExtensionSection ".mov"
-    !insertmacro RegisterExtensionSection ".mp4"
-    !insertmacro RegisterExtensionSection ".mpeg"
-    !insertmacro RegisterExtensionSection ".mpeg1"
-    !insertmacro RegisterExtensionSection ".mpeg2"
-    !insertmacro RegisterExtensionSection ".mpeg4"
-    !insertmacro RegisterExtensionSection ".mpg"
-    !insertmacro RegisterExtensionSection ".ogm"
-    !insertmacro RegisterExtensionSection ".vob"
-    !insertmacro RegisterExtensionSection ".wmv"
-  SubSectionEnd
-  SubSection "Other"
-    ; Make sure we have the same list in uninstall
-    !insertmacro RegisterExtensionSection ".asx"
-    !insertmacro RegisterExtensionSection ".bin"
-    !insertmacro RegisterExtensionSection ".cue"
-    !insertmacro RegisterExtensionSection ".m3u"
-    !insertmacro RegisterExtensionSection ".pls"
-    !insertmacro RegisterExtensionSection ".vlc"
-  SubSectionEnd
-SubSectionEnd
+Section "Context Menus" SEC05
+  SectionIn 1 2 3
+  !insertmacro MacroAllExtensions AddContextMenu
+SectionEnd
+
+SectionGroup "File type associations" SEC06
+  SectionGroup "Audio Files"
+    !insertmacro MacroAudioExtensions RegisterExtensionSection
+  SectionGroupEnd
+  SectionGroup "Video Files"
+    !insertmacro MacroVideoExtensions RegisterExtensionSection
+  SectionGroupEnd
+  SectionGroup "Other"
+    !insertmacro MacroOtherExtensions RegisterExtensionSection
+  SectionGroupEnd
+SectionGroupEnd
 
 Section -Post
   WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -321,6 +372,8 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
     "The VLC ActiveX plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} \
+    "Add context menu items (Play With VLC and Add To VLC's Playlist)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} \
     "Sets VLC media player as the default application for the specified file type"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -340,43 +393,8 @@ FunctionEnd
 Section Uninstall
   SetShellVarContext all
 
-  ; Make sure we have the same list in install
-  !insertmacro UnRegisterExtensionSection ".a52"
-  !insertmacro UnRegisterExtensionSection ".aac"
-  !insertmacro UnRegisterExtensionSection ".ac3"
-  !insertmacro UnRegisterExtensionSection ".asf"
-  !insertmacro UnRegisterExtensionSection ".asx"
-  !insertmacro UnRegisterExtensionSection ".avi"
-  !insertmacro UnRegisterExtensionSection ".bin"
-  !insertmacro UnRegisterExtensionSection ".cue"
-  !insertmacro UnRegisterExtensionSection ".divx"
-  !insertmacro UnRegisterExtensionSection ".dts"
-  !insertmacro UnRegisterExtensionSection ".dv"
-  !insertmacro UnRegisterExtensionSection ".flac"
-  !insertmacro UnRegisterExtensionSection ".m1v"
-  !insertmacro UnRegisterExtensionSection ".m2v"
-  !insertmacro UnRegisterExtensionSection ".m3u"
-  !insertmacro UnRegisterExtensionSection ".mka"
-  !insertmacro UnRegisterExtensionSection ".mkv"
-  !insertmacro UnRegisterExtensionSection ".mov"
-  !insertmacro UnRegisterExtensionSection ".mp1"
-  !insertmacro UnRegisterExtensionSection ".mp2"
-  !insertmacro UnRegisterExtensionSection ".mp3"
-  !insertmacro UnRegisterExtensionSection ".mp4"
-  !insertmacro UnRegisterExtensionSection ".mpeg"
-  !insertmacro UnRegisterExtensionSection ".mpeg1"
-  !insertmacro UnRegisterExtensionSection ".mpeg2"
-  !insertmacro UnRegisterExtensionSection ".mpeg4"
-  !insertmacro UnRegisterExtensionSection ".mpg"
-  !insertmacro UnRegisterExtensionSection ".ogg"
-  !insertmacro UnRegisterExtensionSection ".ogm"
-  !insertmacro UnRegisterExtensionSection ".pls"
-  !insertmacro UnRegisterExtensionSection ".spx"
-  !insertmacro UnRegisterExtensionSection ".vob"
-  !insertmacro UnRegisterExtensionSection ".vlc"
-  !insertmacro UnRegisterExtensionSection ".wav"
-  !insertmacro UnRegisterExtensionSection ".wma"
-  !insertmacro UnRegisterExtensionSection ".wmv"
+  !insertmacro MacroAllExtensions DeleteContextMenu
+  !insertmacro MacroAllExtensions UnRegisterExtensionSection
 
   UnRegDLL "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
