@@ -39,6 +39,7 @@
 - (BOOL)hasPrefs:(NSString *)o_module_name;
 - (NSView *)showView:(NSScrollView *)o_prefs_view advancedView:(vlc_bool_t) b_advanced;
 - (void)applyChanges;
+- (void)resetView;
 
 @end
 

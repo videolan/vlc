@@ -146,7 +146,9 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     if( i_return == NSAlertAlternateReturn )
     {
+        [o_prefs_view setDocumentView: o_empty_view];
         config_ResetAll( p_intf );
+        [[VLCTreeItem rootItem] resetView];
         [[o_tree itemAtRow:[o_tree selectedRow]]
             showView:o_prefs_view advancedView:
             ( [o_advanced_ckb state] == NSOnState ) ? VLC_TRUE : VLC_FALSE];
@@ -310,7 +312,8 @@ static VLCTreeItem *o_root_item = nil;
                     case CONFIG_SUBCATEGORY:
                         o_child_name = [[VLCMain sharedInstance]
     localizedString: config_CategoryNameGet(p_item->i_value ) ];
-                        if( p_item->i_value != SUBCAT_VIDEO_GENERAL &&
+                        if( p_item->i_value != SUBCAT_PLAYLIST_GENERAL &&
+                            p_item->i_value != SUBCAT_VIDEO_GENERAL &&
                             p_item->i_value != SUBCAT_AUDIO_GENERAL )
                             [p_last_category->o_children
                                 addObject:[[VLCTreeItem alloc]
@@ -555,7 +558,8 @@ static VLCTreeItem *o_root_item = nil;
             }
             p_item = (p_parser->p_config + i_object_category);
             if( ( p_item->i_type == CONFIG_CATEGORY ) &&
-              ( ( p_item->i_value == CAT_AUDIO )  ||
+              ( ( p_item->i_value == CAT_PLAYLIST )  ||
+                ( p_item->i_value == CAT_AUDIO )  ||
                 ( p_item->i_value == CAT_VIDEO ) ) )
                 p_item++;
 
@@ -682,6 +686,21 @@ static VLCTreeItem *o_root_item = nil;
     if( o_children != IsALeafNode )
         for( i = 0 ; i < [o_children count] ; i++ )
             [[o_children objectAtIndex:i] applyChanges];
+}
+
+- (void)resetView
+{
+    unsigned int i;
+    if( o_subviews != nil )
+    {
+        //Item has been shown
+        [o_subviews release];
+        o_subviews = nil;
+    }
+
+    if( o_children != IsALeafNode )
+        for( i = 0 ; i < [o_children count] ; i++ )
+            [[o_children objectAtIndex:i] resetView];
 }
 
 @end
