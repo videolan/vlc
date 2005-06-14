@@ -1,4 +1,4 @@
-/*****************************************************************************
+*****************************************************************************
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
@@ -150,7 +150,6 @@ struct demux_sys_t
 
     /* Track */
     ps_track_t    tk[PS_TK_COUNT];
-    int           i_mux_rate;
 
     int           i_titles;
     input_title_t **titles;
@@ -252,7 +251,6 @@ static int Open( vlc_object_t *p_this )
 
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
-    p_sys->i_mux_rate = 0;
     p_sys->i_title_cur_time = (mtime_t) 0;
     p_sys->i_cell_cur_time = (mtime_t) 0;
     p_sys->i_cell_duration = (mtime_t) 0;
@@ -619,7 +617,6 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr );
-/*                if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;*/
             }
             block_Release( p_pkt );
             break;
