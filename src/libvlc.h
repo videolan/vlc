@@ -1231,8 +1231,8 @@ vlc_module_begin();
 #if defined(WIN32)
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, VLC_TRUE );
-    add_bool( "playlist-enqueue", 0, NULL, ONEINSTANCE_TEXT,
-              ONEINSTANCE_LONGTEXT, VLC_TRUE );
+    add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
+              PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, VLC_FALSE );
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT,
