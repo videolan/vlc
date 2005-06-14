@@ -279,6 +279,8 @@ static void Unlock( vout_thread_t * p_vout )
 {
     int x, y;
     vlc_value_t val;
+
+    Lock( p_vout );
     NSRect bounds = [self bounds];
 
     [[self openGLContext] makeCurrentContext];
@@ -301,16 +303,15 @@ static void Unlock( vout_thread_t * p_vout )
         y = bounds.size.width * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
 
-    Lock( p_vout );
     glViewport( ( bounds.size.width - x ) / 2,
                 ( bounds.size.height - y ) / 2, x, y );
-    Unlock( p_vout );
 
     if( p_vout->p_sys->b_got_frame )
     {
         /* Ask the opengl module to redraw */
         vout_thread_t * p_parent;
         p_parent = (vout_thread_t *) p_vout->p_parent;
+        Unlock( p_vout );
         if( p_parent && p_parent->pf_display )
         {
             p_parent->pf_display( p_parent, NULL );
@@ -318,17 +319,25 @@ static void Unlock( vout_thread_t * p_vout )
     }
     else
     {
-        Lock( p_vout );
         glClear( GL_COLOR_BUFFER_BIT );
         Unlock( p_vout );
     }
+    [super reshape];
+}
+
+- (void) update
+{
+    Lock( p_vout );
+    [super update];
+    Unlock( p_vout );
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    [[self openGLContext] makeCurrentContext];
     Lock( p_vout );
+    [[self openGLContext] makeCurrentContext];
     glFlush();
+    [super drawRect:rect];
     Unlock( p_vout );
 }
 

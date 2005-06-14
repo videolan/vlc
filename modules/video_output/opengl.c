@@ -562,6 +562,13 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     vout_sys_t *p_sys = p_vout->p_sys;
     float f_width, f_height;
 
+    if( p_sys->p_vout->pf_lock &&
+        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    {
+        msg_Warn( p_vout, "could not lock OpenGL provider" );
+        return;
+    }
+
     /* glTexCoord works differently with GL_TEXTURE_2D and
        GL_TEXTURE_RECTANGLE_EXT */
 #ifdef SYS_DARWIN
@@ -575,13 +582,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call pf_display to force redraw. Currently,
        the OS X provider uses it to get a smooth window resizing */
-
-    if( p_sys->p_vout->pf_lock &&
-        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
-    {
-        msg_Warn( p_vout, "could not lock OpenGL provider" );
-        return;
-    }
 
     glClear( GL_COLOR_BUFFER_BIT );
 
