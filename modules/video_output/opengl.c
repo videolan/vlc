@@ -69,6 +69,10 @@
 #define VLCGL_TYPE   VLCGL_RGB_TYPE
 #endif
 
+#ifndef GL_CLAMP_TO_EDGE
+#   define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
 /* OpenGL effects */
 #define OPENGL_EFFECT_NONE             1
 #define OPENGL_EFFECT_CUBE             2
