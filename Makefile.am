@@ -759,6 +759,8 @@ package-win32-base:
 	cp $(srcdir)/share/http/admin/*.html \
            $(top_builddir)/vlc-${VERSION}/http/admin/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/*.html ;
+	cp $(srcdir)/share/http/admin/dboxfiles.html \
+           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
 	cp $(srcdir)/share/http/admin/.access \
            $(top_builddir)/vlc-${VERSION}/http/admin/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/.access ;
