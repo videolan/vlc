@@ -103,6 +103,7 @@ static IMAGE_TYPE *CreateImage    ( vout_thread_t *,
 #ifdef HAVE_SYS_SHM_H
 static IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
                                     Display *, EXTRA_ARGS_SHM, int, int );
+static vlc_bool_t b_shm = VLC_TRUE;
 #endif
 
 static void ToggleFullScreen      ( vout_thread_t * );
@@ -1222,7 +1223,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                             &p_pic->p_sys->shminfo,
                             p_vout->output.i_width, p_vout->output.i_height );
     }
-    else
+
+    if( !p_vout->p_sys->b_shm || !p_pic->p_sys->p_image )
 #endif /* HAVE_SYS_SHM_H */
     {
         /* Create image without XShm extension */
@@ -1238,6 +1240,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                          p_vout->p_sys->i_bytes_per_pixel,
 #endif
                          p_vout->output.i_width, p_vout->output.i_height );
+
+#ifdef HAVE_SYS_SHM_H
+        if( p_pic->p_sys->p_image && p_vout->p_sys->b_shm )
+        {
+            msg_Warn( p_vout, "couldn't create SHM image, disabling SHM." );
+            p_vout->p_sys->b_shm = VLC_FALSE;
+        }
+#endif /* HAVE_SYS_SHM_H */
     }
 
     if( p_pic->p_sys->p_image == NULL )
@@ -2006,6 +2016,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
                                     int i_width, int i_height )
 {
     IMAGE_TYPE *p_image;
+    Status result;
 
     /* Create XImage / XvImage */
 #ifdef MODULE_NAME_IS_xvideo
@@ -2047,7 +2058,10 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     p_shm->readOnly = True;
 
     /* Attach shared memory segment to X server */
-    if( XShmAttach( p_display, p_shm ) == False )
+    XSynchronize( p_display, True );
+    b_shm = VLC_TRUE;
+    result = XShmAttach( p_display, p_shm );
+    if( result == False || !b_shm )
     {
         msg_Err( p_vout, "cannot attach shared memory to X server" );
         IMAGE_FREE( p_image );
@@ -2055,6 +2069,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
         shmdt( p_shm->shmaddr );
         return NULL;
     }
+    XSynchronize( p_display, False );
 
     /* Send image to X server. This instruction is required, since having
      * built a Shm XImage and not using it causes an error on XCloseDisplay,
@@ -2145,6 +2160,14 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
     if( event->request_code == X_SetInputFocus )
     {
         fprintf(stderr, "XSetInputFocus failed\n");
+        return 0;
+    }
+
+    if( event->request_code == 150 /* MIT-SHM */ &&
+        event->minor_code == X_ShmAttach )
+    {
+        fprintf(stderr, "XShmAttach failed\n");
+        b_shm = VLC_FALSE;
         return 0;
     }
 
