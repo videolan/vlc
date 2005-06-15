@@ -3,6 +3,8 @@
 #
 # Thanks to Thomas Graf <tgr@reeler.org> for starting a translation in 2002.
 # Thanks to Philipp Weissenbacher <philippweissenbacher@aon.at> for various fixes in 2004.
+# Thanks to Jens Seidel <jensseidel@users.sf.net> for some minor fixes in 2005.
+#
 # Felix Kühne <fkuehne@users.sf.net>, 2003-2005.
 #
 msgid ""
@@ -38,7 +40,7 @@ msgstr "Interface"
 
 #: include/vlc_config_cat.h:40
 msgid "Settings for VLC interfaces"
-msgstr "Einstellungen für die VLCs Interfaces"
+msgstr "Einstellungen für die VLC-Interfaces"
 
 #: include/vlc_config_cat.h:42
 msgid "General interface setttings"
@@ -584,31 +586,31 @@ msgstr "Gerade läuft"
 
 #: include/vlc_meta.h:41
 msgid "CDDB Artist"
-msgstr "CDDB Künstler"
+msgstr "CDDB-Künstler"
 
 #: include/vlc_meta.h:42
 msgid "CDDB Category"
-msgstr "CDDB Kategorie"
+msgstr "CDDB-Kategorie"
 
 #: include/vlc_meta.h:43
 msgid "CDDB Disc ID"
-msgstr "CDDB Disk-ID"
+msgstr "CDDB-Disk-ID"
 
 #: include/vlc_meta.h:44
 msgid "CDDB Extended Data"
-msgstr "CDDB Erweiterte Daten"
+msgstr "CDDB-Erweiterte Daten"
 
 #: include/vlc_meta.h:45
 msgid "CDDB Genre"
-msgstr "CDDB Genre"
+msgstr "CDDB-Genre"
 
 #: include/vlc_meta.h:46
 msgid "CDDB Year"
-msgstr "CDDB Jahr"
+msgstr "CDDB-Jahr"
 
 #: include/vlc_meta.h:47
 msgid "CDDB Title"
-msgstr "CDDB Titel"
+msgstr "CDDB-Titel"
 
 #: include/vlc_meta.h:49
 msgid "CD-Text Arranger"
@@ -636,7 +638,7 @@ msgstr "CD-Text Liedermacher"
 
 #: include/vlc_meta.h:55
 msgid "CD-Text Performer"
-msgstr "CD-Text Ausübender Künstler"
+msgstr "CD-Text ausübender Künstler"
 
 #: include/vlc_meta.h:56
 msgid "CD-Text Title"
@@ -740,7 +742,7 @@ msgstr "Stereo-Kanäle umkehren"
 #: src/extras/getopt.c:638
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: Option `%s' ist doppeldeutig\n"
+msgstr "%s: Option `%s' ist mehrdeutig\n"
 
 #: src/extras/getopt.c:663
 #, c-format
@@ -3387,7 +3389,7 @@ msgstr "Baskisch"
 
 #: src/misc/iso-639_def.h:51
 msgid "Belarusian"
-msgstr "Belarussisch"
+msgstr "Weißrussisch"
 
 #: src/misc/iso-639_def.h:53
 msgid "Bihari"
@@ -3479,7 +3481,7 @@ msgstr "Georgisch"
 
 #: src/misc/iso-639_def.h:81
 msgid "Gaelic (Scots)"
-msgstr "Gällisch (Schottisch)"
+msgstr "Gälisch (Schottisch)"
 
 #: src/misc/iso-639_def.h:82
 msgid "Irish"
@@ -3683,7 +3685,7 @@ msgstr "Norwegisches Nynorsk"
 
 #: src/misc/iso-639_def.h:138
 msgid "Norwegian Bokmaal"
-msgstr "Norwegisches Bokmaal"
+msgstr "Norwegisches Bokmal"
 
 #: src/misc/iso-639_def.h:139
 msgid "Chichewa; Nyanja"
@@ -3719,7 +3721,7 @@ msgstr "Pali"
 
 #: src/misc/iso-639_def.h:148
 msgid "Portuguese"
-msgstr "Portugisisch"
+msgstr "Portugiesisch"
 
 #: src/misc/iso-639_def.h:149
 msgid "Pushto"
@@ -8543,7 +8545,7 @@ msgstr "Eingeborene amerikanische Musik"
 
 #: modules/demux/util/id3genres.h:93
 msgid "Cabaret"
-msgstr "Kabaret"
+msgstr "Kabarett"
 
 #: modules/demux/util/id3genres.h:94
 msgid "New wave"
@@ -11387,7 +11389,7 @@ msgstr "Untertiteloptionen"
 
 #: modules/gui/wxwindows/open.cpp:608
 msgid "Force options for separate subtitle files."
-msgstr "Optionen für seperate Untertiteldateien erzwingen."
+msgstr "Optionen für separate Untertiteldateien erzwingen."
 
 #: modules/gui/wxwindows/open.cpp:643
 msgid "DVD (menus)"
@@ -11572,7 +11574,7 @@ msgstr "H264 ist ein neuer Videocodec"
 
 #: modules/gui/wxwindows/streamdata.h:74
 msgid "I263 is an Intel conferencing codec"
-msgstr "I263 ist ein Intel-Konferrenz-Codec"
+msgstr "I263 ist ein Intel-Konferenz-Codec"
 
 #: modules/gui/wxwindows/streamdata.h:76
 msgid "WMV (Windows Media Video) 1"
@@ -11687,11 +11689,11 @@ msgstr ""
 
 #: modules/gui/wxwindows/streamdata.h:160
 msgid "MPEG Program Stream"
-msgstr "MPEG Program-Stream"
+msgstr "MPEG-Programm-Stream"
 
 #: modules/gui/wxwindows/streamdata.h:161
 msgid "MPEG Transport Stream"
-msgstr "MPEG Transport-Stream"
+msgstr "MPEG-Transport-Stream"
 
 #: modules/gui/wxwindows/streamdata.h:162
 msgid "MPEG 1 Format"
@@ -11850,7 +11852,7 @@ msgstr "Benutzen Sie dies, um über ein Netzwerk zu streamen."
 
 #: modules/gui/wxwindows/wizard.cpp:95
 msgid "Transcode/Save to file"
-msgstr "Transcodieren/Sichern in eine Datei"
+msgstr "Transcodieren/Als Datei speichern"
 
 #: modules/gui/wxwindows/wizard.cpp:96
 msgid "Use this to re-encode a stream and save it to a file"
@@ -11864,9 +11866,9 @@ msgid ""
 "transcoding capabilities. Use the Open and Stream Output dialogs to get all "
 "of them"
 msgstr ""
-"Dieser Assitent gewährt Ihnen nur Zugriff auf einen kleinen Teil von VLCs "
-"Streaming- und Transcodierungsmöglichkeiten. Benutzen Sie die Öffnen- und "
-"Streamausgabe-Dialoge, um alle benutzen zu können."
+"Dieser Assistent gewährt Ihnen nur auf einen kleinen Teil von VLCs "
+"Streaming- und Transcodierungsmöglichkeiten Zugriff. Benutzen Sie die "
+"Öffnen- und Streamausgabe-Dialoge, um alle erreichen zu können."
 
 #: modules/gui/wxwindows/wizard.cpp:101
 msgid ""
@@ -12051,7 +12053,7 @@ msgstr "Wählen..."
 
 #: modules/gui/wxwindows/wizard.cpp:608
 msgid "Partial Extract"
-msgstr "Teilweises Extrahieren"
+msgstr "Teilweises extrahieren"
 
 #: modules/gui/wxwindows/wizard.cpp:619
 msgid "From"
@@ -12059,7 +12061,7 @@ msgstr "Von"
 
 #: modules/gui/wxwindows/wizard.cpp:624
 msgid "To"
-msgstr "An"
+msgstr "bis"
 
 #: modules/gui/wxwindows/wizard.cpp:799
 msgid "Transcode video"
