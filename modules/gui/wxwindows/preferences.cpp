@@ -326,7 +326,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     vlc_list_t      *p_list = NULL;;
     module_t        *p_module;
     module_config_t *p_item;
-    int i_index;
+    int i_index, i_image=0;
 
     /* Initializations */
     p_intf = _p_intf;
@@ -392,27 +392,27 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 config_data->i_object_id = p_item->i_value;
 
                 /* Add the category to the tree */
-                current_item = AppendItem( root_item,
-                                           wxU( config_data->psz_name ),
-                                           -1, -1, config_data );
-
                 switch( p_item->i_value )
                 {
                     case CAT_AUDIO:
-                        SetItemImage( current_item, 0 );break;
+                        i_image = 0; break;
                     case CAT_VIDEO:
-                        SetItemImage( current_item, 1 );break;
+                        i_image = 1; break;
                     case CAT_INPUT:
-                        SetItemImage( current_item, 2 );break;
+                        i_image = 2; break;
                     case CAT_SOUT:
-                        SetItemImage( current_item, 3 );break;
+                        i_image = 3; break;
                     case CAT_ADVANCED:
-                        SetItemImage( current_item, 4 );break;
+                        i_image = 4; break;
                     case CAT_PLAYLIST:
-                        SetItemImage( current_item, 5 );break;
+                        i_image = 5; break;
                     case CAT_INTERFACE:
-                        SetItemImage( current_item, 6 );break;
+                        i_image = 6; break;
                 }
+                current_item = AppendItem( root_item,
+                                           wxU( config_data->psz_name ),
+                                           i_image, -1, config_data );
+
                 break;
             case CONFIG_SUBCATEGORY:
                 if( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
@@ -455,8 +455,30 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 }
                 config_data->i_type = TYPE_SUBCATEGORY;
                 config_data->i_object_id = p_item->i_value;
+                /* WXMSW doesn't know image -1 ... FIXME */
+                #ifdef __WXMSW__
+                switch( p_item->i_value / 100 )
+                {
+                    case CAT_AUDIO:
+                        i_image = 0; break;
+                    case CAT_VIDEO:
+                        i_image = 1; break;
+                    case CAT_INPUT:
+                        i_image = 2; break;
+                    case CAT_SOUT:
+                        i_image = 3; break;
+                    case CAT_ADVANCED:
+                        i_image = 4; break;
+                    case CAT_PLAYLIST:
+                        i_image = 5; break;
+                    case CAT_INTERFACE:
+                        i_image = 6; break;
+                }
+                #else
+                i_image = -1;
+                #endif
                 AppendItem( current_item, wxU( config_data->psz_name ),
-                            -1, -1, config_data );
+                            i_image, -1, config_data );
                 break;
             }
         }
@@ -559,9 +581,31 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             p_module->i_object_id;
         config_data->psz_help = NULL;
 
+        /* WXMSW doesn't know image -1 ... FIXME */
+        #ifdef __WXMSW__
+        switch( i_subcategory / 100 )
+        {
+            case CAT_AUDIO:
+                i_image = 0; break;
+            case CAT_VIDEO:
+                i_image = 1; break;
+            case CAT_INPUT:
+                i_image = 2; break;
+            case CAT_SOUT:
+                i_image = 3; break;
+            case CAT_ADVANCED:
+                i_image = 4; break;
+            case CAT_PLAYLIST:
+                i_image = 5; break;
+            case CAT_INTERFACE:
+                i_image = 6; break;
+        }
+        #else
+        i_image = -1;
+        #endif
         AppendItem( subcategory_item, wxU( p_module->psz_shortname ?
                        p_module->psz_shortname : p_module->psz_object_name )
-                                    , -1, -1,
+                                    , i_image, -1,
                     config_data );
     }
 
