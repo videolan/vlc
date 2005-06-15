@@ -288,6 +288,8 @@ int playlist_Control( playlist_t * p_playlist, int i_query, ... )
 int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
 {
     playlist_view_t *p_view;
+    playlist_item_t *p_item, *p_node;
+    int i_view;
     vlc_value_t val;
 
 #ifdef PLAYLIST_PROFILE
@@ -307,11 +309,13 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         break;
 
     case PLAYLIST_ITEMPLAY:
+        p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
+        if ( p_item == NULL || p_item->input.psz_uri == NULL )
+            return VLC_EGENERIC;
         p_playlist->status.i_status = PLAYLIST_RUNNING;
         p_playlist->request.i_skip = 0;
         p_playlist->request.b_request = VLC_TRUE;
-        p_playlist->request.p_item = (playlist_item_t *)va_arg( args,
-                                                   playlist_item_t *);
+        p_playlist->request.p_item = p_item;
         p_playlist->request.i_view = p_playlist->status.i_view;
         p_view = playlist_ViewFind( p_playlist, p_playlist->status.i_view );
         if( p_view )
@@ -325,14 +329,21 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         break;
 
     case PLAYLIST_VIEWPLAY:
+        i_view = (int)va_arg( args,int );
+        p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
+        p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
+        if ( p_node == NULL || p_item == NULL || p_item->input.psz_uri == NULL )
+        {
+            p_playlist->status.i_status = PLAYLIST_STOPPED;
+            p_playlist->request.b_request = VLC_TRUE;
+            return VLC_SUCCESS;
+        }
         p_playlist->status.i_status = PLAYLIST_RUNNING;
         p_playlist->request.i_skip = 0;
         p_playlist->request.b_request = VLC_TRUE;
-        p_playlist->request.i_view = (int)va_arg( args,int );
-        p_playlist->request.p_node = (playlist_item_t *)va_arg( args,
-                                                        playlist_item_t *);
-        p_playlist->request.p_item = (playlist_item_t *)va_arg( args,
-                                                        playlist_item_t *);
+        p_playlist->request.i_view = i_view;
+        p_playlist->request.p_node = p_node;
+        p_playlist->request.p_item = p_item;
 
         /* If we select a node, play only it.
          * If we select an item, continue */
