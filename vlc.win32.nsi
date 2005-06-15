@@ -186,7 +186,7 @@ FunctionEnd
 
 !macro AddContextMenu EXT
   WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" "Play with VLC media player"
-  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe "%1"'
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --no-playlist-enqueue "%1"'
 
   WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
   WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --one-instance --playlist-enqueue "%1"'
