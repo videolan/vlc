@@ -80,7 +80,7 @@ DIST_icons48 = \
 	gvlc48x48.png \
 	kvlc48x48.png \
 	qvlc48x48.png \
-	vlc48x48.ico \
+	vlc48x48new.ico \
 	vlc48x48.png \
 	$(NULL)
 
