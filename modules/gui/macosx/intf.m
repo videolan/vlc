@@ -1557,12 +1557,13 @@ static VLCMain *_o_sharedMainInstance = nil;
         else
         {
             o_rect.size.height = 500;
-            if ( o_rect.size.width == [o_window minSize].width )
-            {
-                o_rect.size.width = 500;
-            }
-
         }
+        
+        if ( o_rect.size.width == [o_window minSize].width )
+        {
+            o_rect.size.width = 500;
+        }
+        
         o_rect.size.height = (o_size_with_playlist.height > 200) ?
             o_size_with_playlist.height : 500;
         o_rect.origin.x = [o_window frame].origin.x;
@@ -1574,11 +1575,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         /* make small */
         o_rect.size.height = [o_window minSize].height;
+        o_rect.size.width = [o_window minSize].width;
         o_rect.origin.x = [o_window frame].origin.x;
         /* Calculate the position of the lower right corner after resize */
         o_rect.origin.y = [o_window frame].origin.y +
             [o_window frame].size.height - [o_window minSize].height;
 
+        
         [o_playlist_view setAutoresizesSubviews: NO];
         [o_playlist_view removeFromSuperview];
         [o_btn_playlist setState: NO];
