@@ -37,14 +37,13 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-int Import_Old ( vlc_object_t * );
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
  * Import_Old : main import function
  *****************************************************************************/
-int Import_Old( vlc_object_t *p_this )
+int E_(Import_Old)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
