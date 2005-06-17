@@ -336,7 +336,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         {
             if( !strcmp( argn[i], "loop" ) )
             {
-                if( !strcmp( argv[i], "yes" ) )
+                if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
                 {
                     value.b_bool = VLC_TRUE;
                     VLC_VariableSet( p_plugin->i_vlc, "conf::loop", value );
@@ -387,7 +387,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         }
         else if( !strcmp( argn[i], "autoplay" ) )
         {
-            if( !strcmp( argv[i], "yes" ) )
+            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
             {
                 p_plugin->b_autoplay = 1;
             }
@@ -411,7 +411,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 #if USE_LIBVLC
         else if( !strcmp( argn[i], "fullscreen" ) )
         {
-            if( !strcmp( argv[i], "yes" ) )
+            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
             {
                 value.b_bool = VLC_TRUE;
                 VLC_VariableSet( p_plugin->i_vlc, "conf::fullscreen", value );
@@ -419,7 +419,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         }
         else if( !strcmp( argn[i], "mute" ) )
         {
-            if( !strcmp( argv[i], "yes" ) )
+            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "yes" ) )
             {
                 VLC_VolumeMute( p_plugin->i_vlc );
             }
