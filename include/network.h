@@ -314,6 +314,9 @@ VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, v_socket_t *, const
 #define net_vaPrintf(a,b,c,d,e) __net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args ) );
 
+#define net_CheckIP(a,b,c,d) __net_CheckIP(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( int, __net_CheckIP, ( vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts, int i_hosts ) );
+
 /* Portable network names/addresses resolution layer */
 
 /* GAI error codes */

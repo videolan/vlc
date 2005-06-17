@@ -522,6 +522,10 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
     char          *user = NULL;
     char          *password = NULL;
+    char          **ppsz_hosts = NULL;
+    int           i_hosts = 0;
+
+    int           i;
 
 #ifdef HAVE_SYS_STAT_H
     if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
@@ -572,6 +576,43 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         fclose( file );
     }
 
+    sprintf( dir, "%s/.hosts", psz_dir );
+    if( ( file = fopen( dir, "r" ) ) != NULL )
+    {
+        char line[1024];
+        int  i_size;
+
+        msg_Dbg( p_intf, "find .hosts in dir=%s", psz_dir );
+
+        while( !feof( file ) )
+        {
+            fgets( line, 1023, file );
+            i_size = strlen(line);
+            if( i_size > 0 && line[0] != '#' )
+            {
+                while( i_size > 0 && ( line[i_size-1] == '\n' ||
+                       line[i_size-1] == '\r' ) )
+                {
+                    i_size--;
+                }
+                if( !i_size ) continue;
+
+                line[i_size] = '\0';
+
+                msg_Dbg( p_intf, "restricted to %s (read=%d)",
+                         line, i_size );
+                TAB_APPEND( i_hosts, ppsz_hosts, strdup( line ) );
+            }
+        }
+
+        fclose( file );
+
+        if( net_CheckIP( p_intf, "0.0.0.0", ppsz_hosts, i_hosts ) < 0 )
+        {
+            msg_Err( p_intf, ".hosts file is invalid in dir=%s", psz_dir );
+        }
+    }
+
     for( ;; )
     {
         /* parse psz_src dir */
@@ -611,7 +652,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             f->p_file = httpd_FileNew( p_sys->p_httpd_host,
                                        f->name,
                                        f->b_html ? p_sys->psz_html_type : NULL,
-                                       user, password,
+                                       user, password, ppsz_hosts, i_hosts,
                                        HttpCallback, f );
 
             if( f->p_file )
@@ -652,6 +693,10 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     if( password )
     {
         free( password );
+    }
+    for( i = 0; i < i_hosts; i++ )
+    {
+        TAB_REMOVE( i_hosts, ppsz_hosts, ppsz_hosts[0] );
     }
 
     closedir( p_dir );

@@ -237,6 +237,8 @@ struct httpd_url_t
     char    *psz_url;
     char    *psz_user;
     char    *psz_password;
+    char    **ppsz_hosts;
+    int     i_hosts;
 
     struct
     {
@@ -489,13 +491,15 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
 httpd_file_t *httpd_FileNew( httpd_host_t *host,
                              char *psz_url, char *psz_mime,
                              char *psz_user, char *psz_password,
+                             char **ppsz_hosts, int i_hosts,
                              httpd_file_callback_t pf_fill,
                              httpd_file_sys_t *p_sys )
 {
     httpd_file_t *file = malloc( sizeof( httpd_file_t ) );
 
     if( ( file->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                          psz_password ) ) == NULL )
+                                          psz_password, ppsz_hosts, i_hosts )
+        ) == NULL )
     {
         free( file );
         return NULL;
@@ -586,7 +590,8 @@ httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, char *psz_url_dst,
 {
     httpd_redirect_t *rdir = malloc( sizeof( httpd_redirect_t ) );
 
-    if( !( rdir->url = httpd_UrlNewUnique( host, psz_url_src, NULL, NULL ) ) )
+    if( !( rdir->url = httpd_UrlNewUnique( host, psz_url_src, NULL, NULL,
+                                           NULL, 0 ) ) )
     {
         free( rdir );
         return NULL;
@@ -761,12 +766,14 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 
 httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
                                  char *psz_url, char *psz_mime,
-                                 char *psz_user, char *psz_password )
+                                 char *psz_user, char *psz_password,
+                                 char **ppsz_hosts, int i_hosts )
 {
     httpd_stream_t *stream = malloc( sizeof( httpd_stream_t ) );
 
     if( ( stream->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                            psz_password ) ) == NULL )
+                                            psz_password, ppsz_hosts, i_hosts )
+        ) == NULL )
     {
         free( stream );
         return NULL;
@@ -1090,6 +1097,7 @@ void httpd_HostDelete( httpd_host_t *host )
 /* register a new url */
 static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
                                          char *psz_user, char *psz_password,
+                                         char **ppsz_hosts, int i_hosts,
                                          vlc_bool_t b_check )
 {
     httpd_url_t *url;
@@ -1117,6 +1125,12 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
     url->psz_url = strdup( psz_url );
     url->psz_user = strdup( psz_user ? psz_user : "" );
     url->psz_password = strdup( psz_password ? psz_password : "" );
+    url->i_hosts = 0;
+    url->ppsz_hosts = NULL;
+    for( i = 0; i < i_hosts; i++ )
+    {
+        TAB_APPEND( url->i_hosts, url->ppsz_hosts, strdup(ppsz_hosts[i]) );
+    }
     for( i = 0; i < HTTPD_MSG_MAX; i++ )
     {
         url->catch[i].cb = NULL;
@@ -1130,17 +1144,19 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
 }
 
 httpd_url_t *httpd_UrlNew( httpd_host_t *host, char *psz_url,
-                           char *psz_user, char *psz_password )
+                           char *psz_user, char *psz_password,
+                           char **ppsz_hosts, int i_hosts )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, VLC_FALSE );
+                                psz_password, ppsz_hosts, i_hosts, VLC_FALSE );
 }
 
 httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, char *psz_url,
-                                 char *psz_user, char *psz_password )
+                                 char *psz_user, char *psz_password,
+                                 char **ppsz_hosts, int i_hosts )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, VLC_TRUE );
+                                psz_password, ppsz_hosts, i_hosts, VLC_TRUE );
 }
 
 /* register callback on a url */
@@ -1169,6 +1185,10 @@ void httpd_UrlDelete( httpd_url_t *url )
     free( url->psz_url );
     free( url->psz_user );
     free( url->psz_password );
+    for( i = 0; i < url->i_hosts; i++ )
+    {
+        TAB_REMOVE( url->i_hosts, url->ppsz_hosts, url->ppsz_hosts[0] );
+    }
 
     for( i = 0; i < host->i_client; i++ )
     {
@@ -2073,6 +2093,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 else
                 {
                     vlc_bool_t b_auth_failed = VLC_FALSE;
+                    vlc_bool_t b_hosts_failed = VLC_FALSE;
                     int i;
 
                     /* Search the url and trigger callbacks */
@@ -2084,6 +2105,23 @@ static void httpd_HostThread( httpd_host_t *host )
                         {
                             if( url->catch[i_msg].cb )
                             {
+                                if( answer && url->i_hosts )
+                                {
+                                    char *ip = httpd_ClientIP( cl );
+                                    if( ip != NULL )
+                                    {
+                                        if( net_CheckIP( host, ip,
+                                                         url->ppsz_hosts,
+                                                         url->i_hosts ) <= 0 )
+                                        {
+                                            b_hosts_failed = VLC_TRUE;
+                                            free( ip );
+                                            break;
+                                        }
+                                        free( ip );
+                                    }
+                                }
+
                                 if( answer && ( *url->psz_user || *url->psz_password ) )
                                 {
                                     /* create the headers */
@@ -2142,7 +2180,23 @@ static void httpd_HostThread( httpd_host_t *host )
                         answer->i_version= 0;
                         p = answer->p_body = malloc( 1000 + strlen(query->psz_url) );
 
-                        if( b_auth_failed )
+                        if( b_hosts_failed )
+                        {
+                            answer->i_status = 403;
+                            answer->psz_status = strdup( "Forbidden" );
+
+                            p += sprintf( p, "<html>\n" );
+                            p += sprintf( p, "<head>\n" );
+                            p += sprintf( p, "<title>Error 403</title>\n" );
+                            p += sprintf( p, "</head>\n" );
+                            p += sprintf( p, "<body>\n" );
+                            p += sprintf( p, "<h1><center> 403 Forbidden (%s)</center></h1>\n", query->psz_url );
+                            p += sprintf( p, "<hr />\n" );
+                            p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+                            p += sprintf( p, "</body>\n" );
+                            p += sprintf( p, "</html>\n" );
+                        }
+                        else if( b_auth_failed )
                         {
                             answer->i_status = 401;
                             answer->psz_status = strdup( "Authorization Required" );
@@ -2354,7 +2408,7 @@ static void httpd_HostThread( httpd_host_t *host )
                         ip = httpd_ClientIP( cl );
                         msg_Dbg( host, "new connection (%s)",
                                 ip != NULL ? ip : "unknown" );
-                        if( ip != NULL)
+                        if( ip != NULL )
                             free( ip );
                     }
                 }
