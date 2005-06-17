@@ -40,30 +40,17 @@ static int FindLanguage( const char * psz_lang )
     const char ** ppsz_parser;
     const char * ppsz_all[] =
     {
-        "Bengali", "bn",
         "Catalan", "ca",
         "Danish", "da",
         "German", "de",
-        "Modern Greek", "el",
         "British", "en_GB",
         "English", "en",
         "Spanish", "es",
         "French", "fr",
-        "Hindi", "hi",
-        "Hungarian", "hu",
         "Italian", "it",
         "Japanese", "ja",
-        "Burmese", "my",
-        "Nepali", "ne",
         "Dutch", "nl",
-        "Norwegian", "no",
-        "Polish", "pl",
-        "Pashto", "ps",
         "Brazillian Portuguese", "pt_BR",
-        "Russian", "ru",
-        "Swedish", "sv",
-        "Tetum", "tet",
-        "Tagalog", "tl",
         "Chinese Traditional", "zh_TW",
         NULL
     };
