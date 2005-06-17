@@ -48,7 +48,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 /*****************************************************************************
  * Import_M3U: main import function
  *****************************************************************************/
-int Import_M3U( vlc_object_t *p_this )
+int E_(Import_M3U)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
@@ -87,7 +87,7 @@ int Import_M3U( vlc_object_t *p_this )
         msg_Err( p_demux, "Out of memory" );
         return VLC_ENOMEM;
     }
-    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
+    p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
 
     return VLC_SUCCESS;
 }
@@ -95,7 +95,7 @@ int Import_M3U( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void Close_M3U( vlc_object_t *p_this )
+void E_(Close_M3U)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
@@ -127,7 +127,7 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
-    b_play = FindItem( p_demux, p_playlist, &p_current );
+    b_play = E_(FindItem)( p_demux, p_playlist, &p_current );
 
     playlist_ItemToNode( p_playlist, p_current );
     p_current->input.i_type = ITEM_TYPE_PLAYLIST;
@@ -194,7 +194,7 @@ static int Demux( demux_t *p_demux )
                 psz_name = strdup( psz_parse );
             }
 
-            psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
+            psz_mrl = E_(ProcessMRL)( psz_parse, p_demux->p_sys->psz_prefix );
 
             b_cleanup = VLC_TRUE;
             if( !psz_mrl ) goto error;

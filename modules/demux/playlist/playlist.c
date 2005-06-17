@@ -41,31 +41,31 @@ vlc_module_begin();
     set_description( _("Old playlist open") );
     add_shortcut( "old-open" );
     set_capability( "demux2", 10 );
-    set_callbacks( Import_Old, NULL );
+    set_callbacks( E_(Import_Old), NULL );
 #if 0
     add_submodule();
         set_description( _("Native playlist import") );
         add_shortcut( "playlist" );
         add_shortcut( "native-open" );
         set_capability( "demux2", 10 );
-        set_callbacks( Import_Native, Close_Native );
+        set_callbacks( E_(Import_Native), E_(Close_Native) );
 #endif
     add_submodule();
         set_description( _("M3U playlist import") );
         add_shortcut( "m3u-open" );
         set_capability( "demux2", 10 );
-        set_callbacks( Import_M3U, Close_M3U );
+        set_callbacks( E_(Import_M3U), E_(Close_M3U) );
     add_submodule();
         set_description( _("PLS playlist import") );
         add_shortcut( "pls-open" );
         set_capability( "demux2", 10 );
-        set_callbacks( Import_PLS, Close_PLS );
+        set_callbacks( E_(Import_PLS), E_(Close_PLS) );
     add_submodule();
         set_description( _("B4S playlist import") );
         add_shortcut( "b4s-open" );
         add_shortcut( "shout-b4s" );
         set_capability( "demux2", 10 );
-        set_callbacks( Import_B4S, Close_B4S );
+        set_callbacks( E_(Import_B4S), E_(Close_B4S) );
 vlc_module_end();
 
 
@@ -73,7 +73,7 @@ vlc_module_end();
  * Find directory part of the path to the playlist file, in case of
  * relative paths inside
  */
-char *FindPrefix( demux_t *p_demux )
+char *E_(FindPrefix)( demux_t *p_demux )
 {
     char *psz_name;
     char *psz_path = strdup( p_demux->psz_path );
@@ -94,7 +94,7 @@ char *FindPrefix( demux_t *p_demux )
  * Add the directory part of the playlist file to the start of the
  * mrl, if the mrl is a relative file path
  */
-char *ProcessMRL( char *psz_mrl, char *psz_prefix )
+char *E_(ProcessMRL)( char *psz_mrl, char *psz_prefix )
 {
     /* Check for a protocol name.
      * for URL, we should look for "://"
@@ -118,7 +118,7 @@ char *ProcessMRL( char *psz_mrl, char *psz_prefix )
     return psz_mrl;
 }
 
-vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
+vlc_bool_t E_(FindItem)( demux_t *p_demux, playlist_t *p_playlist,
                      playlist_item_t **pp_item )
 {
      vlc_bool_t b_play;

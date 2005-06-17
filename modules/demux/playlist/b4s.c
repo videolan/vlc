@@ -56,7 +56,7 @@ static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
 /*****************************************************************************
  * Import_B4S: main import function
  *****************************************************************************/
-int Import_B4S( vlc_object_t *p_this )
+int E_(Import_B4S)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
@@ -87,7 +87,7 @@ int Import_B4S( vlc_object_t *p_this )
     }
     p_sys->b_shout = p_demux->psz_demux &&
         !strcmp(p_demux->psz_demux, "shout-b4s");
-    p_sys->psz_prefix = FindPrefix( p_demux );
+    p_sys->psz_prefix = E_(FindPrefix)( p_demux );
     p_sys->p_playlist = NULL;
     p_sys->p_xml = NULL;
     p_sys->p_xml_reader = NULL;
@@ -98,7 +98,7 @@ int Import_B4S( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void Close_B4S( vlc_object_t *p_this )
+void E_(Close_B4S)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -139,7 +139,7 @@ static int Demux( demux_t *p_demux )
     }
     p_sys->p_playlist = p_playlist;
 
-    b_play = FindItem( p_demux, p_playlist, &p_current );
+    b_play = E_(FindItem)( p_demux, p_playlist, &p_current );
 
     playlist_ItemToNode( p_playlist, p_current );
     p_current->input.i_type = ITEM_TYPE_PLAYLIST;
