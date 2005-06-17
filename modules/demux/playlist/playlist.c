@@ -33,10 +33,17 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define AUTOSTART_TEXT N_( "Auto start" )
+#define AUTOSTART_LONGTEXT N_( "Automatically start the playlist when " \
+    "it's loaded.\n" )
+
 vlc_module_begin();
     add_shortcut( "playlist" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
+
+    add_bool( "playlist-autostart", 1, NULL, AUTOSTART_TEXT, AUTOSTART_LONGTEXT,
+              VLC_FALSE );
 
     set_description( _("Old playlist open") );
     add_shortcut( "old-open" );
@@ -121,9 +128,11 @@ char *E_(ProcessMRL)( char *psz_mrl, char *psz_prefix )
 vlc_bool_t E_(FindItem)( demux_t *p_demux, playlist_t *p_playlist,
                      playlist_item_t **pp_item )
 {
-     vlc_bool_t b_play;
-     if( p_playlist->status.p_item && &p_playlist->status.p_item->input ==
-         ((input_thread_t *)p_demux->p_parent)->input.p_item )
+     vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
+
+     if( b_play && p_playlist->status.p_item &&
+             &p_playlist->status.p_item->input ==
+                ((input_thread_t *)p_demux->p_parent)->input.p_item )
      {
          msg_Dbg( p_playlist, "starting playlist playback" );
          *pp_item = p_playlist->status.p_item;
