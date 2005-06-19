@@ -1,5 +1,7 @@
 # Danish translation for VLC.
 # Copyright (C) 2004 VideoLAN
+# $Id$
+#
 # Translated by:
 # Jonas Larsen <jonas@vrt.dk>
 # Morten Brix Pedersen <morten@wtf.dk>
@@ -13973,153 +13975,154 @@ msgstr "Skrifttype brugt til at vise tekst i xosd"
 msgid "XOSD interface"
 msgstr "XOSD grænseflade"
 
-msgid "Matroska"
-msgstr "Matroska"
+#~ msgid "Matroska"
+#~ msgstr "Matroska"
 
-msgid "TY"
-msgstr "TY"
+#~ msgid "TY"
+#~ msgstr "TY"
 
-msgid "MPJPEG"
-msgstr "MPJPEG"
+#~ msgid "MPJPEG"
+#~ msgstr "MPJPEG"
 
-msgid "DirectX"
-msgstr "DirectX"
+#~ msgid "DirectX"
+#~ msgstr "DirectX"
 
-msgid "OpenGL"
-msgstr "OpenGL"
+#~ msgid "OpenGL"
+#~ msgstr "OpenGL"
 
-msgid "PNG"
-msgstr "PNG"
+#~ msgid "PNG"
+#~ msgstr "PNG"
 
-msgid "X11"
-msgstr "X11"
+#~ msgid "X11"
+#~ msgstr "X11"
 
-msgid "XVideo"
-msgstr "XVideo"
+#~ msgid "XVideo"
+#~ msgstr "XVideo"
 
-msgid "A/52"
-msgstr "A/52"
+#~ msgid "A/52"
+#~ msgstr "A/52"
 
-msgid "Toolame"
-msgstr "Toolame"
+#~ msgid "Toolame"
+#~ msgstr "Toolame"
 
-msgid "Showintf"
-msgstr "Showintf"
+#~ msgid "Showintf"
+#~ msgstr "Showintf"
 
-msgid "Telnet"
-msgstr "Telnet"
+#~ msgid "Telnet"
+#~ msgstr "Telnet"
 
-msgid "MPEG-TS"
-msgstr "MPEG-TS"
+#~ msgid "MPEG-TS"
+#~ msgstr "MPEG-TS"
 
-msgid "Mac OS X OpenGL"
-msgstr "Mac OS X OpenGL"
+#~ msgid "Mac OS X OpenGL"
+#~ msgstr "Mac OS X OpenGL"
 
-msgid "Control"
-msgstr "Control"
+#~ msgid "Control"
+#~ msgstr "Control"
 
-msgid "Ncurses"
-msgstr "Ncurses"
+#~ msgid "Ncurses"
+#~ msgstr "Ncurses"
 
-msgid "&Invert"
-msgstr "&Invertér"
+#~ msgid "&Invert"
+#~ msgstr "&Invertér"
 
-msgid "&Select All"
-msgstr "&Vælg alle"
+#~ msgid "&Select All"
+#~ msgstr "&Vælg alle"
 
-msgid "PLS file"
-msgstr "PLS fil"
+#~ msgid "PLS file"
+#~ msgstr "PLS fil"
 
-msgid "wxWindows"
-msgstr "wxWindows"
+#~ msgid "wxWindows"
+#~ msgstr "wxWindows"
 
-msgid "Picture"
-msgstr "Billede"
+#~ msgid "Picture"
+#~ msgstr "Billede"
 
-msgid "VLC internal picture video output"
-msgstr "VLC internbillede video uddata"
+#~ msgid "VLC internal picture video output"
+#~ msgstr "VLC internbillede video uddata"
 
-msgid "AAC demuxer"
-msgstr "AAC demuxer"
+#~ msgid "AAC demuxer"
+#~ msgstr "AAC demuxer"
 
-msgid "Simple id3 tag skipper"
-msgstr "Simpel id3-mærke overspringer"
+#~ msgid "Simple id3 tag skipper"
+#~ msgstr "Simpel id3-mærke overspringer"
 
-msgid "Screenshot Path"
-msgstr "Skærmbillede sti"
+#~ msgid "Screenshot Path"
+#~ msgstr "Skærmbillede sti"
 
-msgid "Screenshot Format"
-msgstr "Skærmbillede format"
+#~ msgid "Screenshot Format"
+#~ msgstr "Skærmbillede format"
 
-msgid "Usage: %s [options] [items]...\n"
-msgstr "Brug: %s [tilvalg] [elementer]...\n"
+#~ msgid "Usage: %s [options] [items]...\n"
+#~ msgstr "Brug: %s [tilvalg] [elementer]...\n"
 
-msgid ""
-"Usage: %s [options] [items]...\n"
-"\n"
-msgstr ""
-"Brug: %s [tilvalg] [elementer]...\n"
-"\n"
+#~ msgid ""
+#~ "Usage: %s [options] [items]...\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Brug: %s [tilvalg] [elementer]...\n"
+#~ "\n"
 
-msgid "[module]              [description]\n"
-msgstr "[modul]               [beskrivelse]\n"
+#~ msgid "[module]              [description]\n"
+#~ msgstr "[modul]               [beskrivelse]\n"
 
-msgid "Server port"
-msgstr "Server port"
+#~ msgid "Server port"
+#~ msgstr "Server port"
 
-msgid "Choose the program to select by giving its Service ID."
-msgstr "Vælg program ved at vælg dets Service ID."
+#~ msgid "Choose the program to select by giving its Service ID."
+#~ msgstr "Vælg program ved at vælg dets Service ID."
 
-msgid "Choose the programs to select by giving a comma-separated list of SIDs."
-msgstr "Vælg programmer der skal vælges med en komma-adskilt liste af SIDs."
+#~ msgid ""
+#~ "Choose the programs to select by giving a comma-separated list of SIDs."
+#~ msgstr "Vælg programmer der skal vælges med en komma-adskilt liste af SIDs."
 
-msgid "Choose a stream output"
-msgstr "Vælg streamuddata"
+#~ msgid "Choose a stream output"
+#~ msgstr "Vælg streamuddata"
 
-msgid "Empty if no stream output."
-msgstr "Tom hvis ingen stream-uddata."
+#~ msgid "Empty if no stream output."
+#~ msgstr "Tom hvis ingen stream-uddata."
 
-msgid "Loop playlist on end"
-msgstr "Start spilleliste forfra når enden nås"
+#~ msgid "Loop playlist on end"
+#~ msgstr "Start spilleliste forfra når enden nås"
 
-msgid "print detailed help (can be combined with --advanced)"
-msgstr "udskriv detaljeret hjælp (kan kombineres med --advanced)"
+#~ msgid "print detailed help (can be combined with --advanced)"
+#~ msgstr "udskriv detaljeret hjælp (kan kombineres med --advanced)"
 
-msgid "Vol %%%d"
-msgstr "Lydstyrke %%%d"
+#~ msgid "Vol %%%d"
+#~ msgstr "Lydstyrke %%%d"
 
-msgid "Vol %d%%"
-msgstr "Lydstyrke %d%%"
+#~ msgid "Vol %d%%"
+#~ msgstr "Lydstyrke %d%%"
 
-msgid "Extended help"
-msgstr "Udvidet hjælp"
+#~ msgid "Extended help"
+#~ msgstr "Udvidet hjælp"
 
-msgid "List additional commands."
-msgstr "Vis yderligere kommandoer."
+#~ msgid "List additional commands."
+#~ msgstr "Vis yderligere kommandoer."
 
-msgid "vlc preferences"
-msgstr "vlc indstillinger"
+#~ msgid "vlc preferences"
+#~ msgstr "vlc indstillinger"
 
-msgid "Mac OS X interface, sound and video"
-msgstr "Mac OS X grænseflade, lyd og video"
+#~ msgid "Mac OS X interface, sound and video"
+#~ msgstr "Mac OS X grænseflade, lyd og video"
 
-msgid "Select file or directory"
-msgstr "Vælg fil eller mappe"
+#~ msgid "Select file or directory"
+#~ msgstr "Vælg fil eller mappe"
 
-msgid "Loop"
-msgstr "Løkke"
+#~ msgid "Loop"
+#~ msgstr "Løkke"
 
-msgid "Repeat"
-msgstr "Gentag"
+#~ msgid "Repeat"
+#~ msgstr "Gentag"
 
-msgid "Win32 OpenGL provider"
-msgstr "Win32 OpenGL provider"
+#~ msgid "Win32 OpenGL provider"
+#~ msgstr "Win32 OpenGL provider"
 
-msgid "Image"
-msgstr "Billede"
+#~ msgid "Image"
+#~ msgstr "Billede"
 
-msgid "X11 OpenGL provider"
-msgstr "X11 OpenGL provider"
+#~ msgid "X11 OpenGL provider"
+#~ msgstr "X11 OpenGL provider"
 
 #~ msgid "Vorbis"
 #~ msgstr "Vorbis"

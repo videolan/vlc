@@ -1,6 +1,8 @@
 # Burmese translations for vlc package.
 # Copyright (C) 2005 VideoLAN
 # This file is distributed under the same license as the vlc package.
+# $Id$
+#
 # Khin Mi Mi Aung <kmma@myanmarlug.org>, 2005.
 # Simos Xenitellis <simos74@gmx.net>, 2005.
 #

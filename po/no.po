@@ -1,5 +1,7 @@
 # Norwegian locale definition for VLC
 # Copyright (C) 2002 Sigmund Augdal <sigmunau@idi.ntnu.no>.
+# $Id$
+#
 #
 msgid ""
 msgstr ""

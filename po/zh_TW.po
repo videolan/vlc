@@ -1,6 +1,8 @@
 # Translation to traditional Chinese.
 # Copyright (C) 2005 VideoLAN
 # This file is distributed under the same license as the VLC package.
+# $Id$
+#
 # Frank Chao <frank0624@gmail.com>, 2005.
 #
 msgid ""

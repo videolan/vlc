@@ -1,6 +1,8 @@
 # Greek translation of VLC
 # Copyright (C) 2005 VideoLAN.
 # Simos Xenitellis <simos74@gmx.net>, 2005.
+# $Id$
+#
 #
 msgid ""
 msgstr ""

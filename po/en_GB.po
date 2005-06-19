@@ -1,5 +1,7 @@
 # British translation for VLC.
 # Copyright (C) 2002-2004 VideoLAN <videolan@videolan.org>
+# $Id$
+#
 #
 # Sam Hocevar <sam@zoy.org>, 2002, 2003, 2004.
 #
@@ -102,14 +104,12 @@ msgid "Visualizations"
 msgstr "Visualisations"
 
 #: include/vlc_config_cat.h:63 src/audio_output/input.c:180
-#, fuzzy
 msgid "Audio visualizations"
-msgstr "Visualisations"
+msgstr "Audio visualisations"
 
 #: include/vlc_config_cat.h:65 include/vlc_config_cat.h:78
-#, fuzzy
 msgid "Output modules"
-msgstr "Audio output access method"
+msgstr "Output modules"
 
 #: include/vlc_config_cat.h:66
 msgid "These are general settings for audio output modules."
@@ -122,9 +122,8 @@ msgid "Miscellaneous"
 msgstr ""
 
 #: include/vlc_config_cat.h:69
-#, fuzzy
 msgid "Miscellaneous audio settings and modules"
-msgstr "Help options"
+msgstr ""
 
 #: include/vlc_config_cat.h:72 src/input/es_out.c:1549 src/libvlc.h:938
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
@@ -136,30 +135,25 @@ msgid "Video"
 msgstr "Video"
 
 #: include/vlc_config_cat.h:73
-#, fuzzy
 msgid "Video settings"
-msgstr "Video filters settings"
+msgstr "Video settings"
 
 #: include/vlc_config_cat.h:75 include/vlc_config_cat.h:76
-#, fuzzy
 msgid "General video settings"
-msgstr "General settings"
+msgstr "General video settings"
 
 #: include/vlc_config_cat.h:80
-#, fuzzy
 msgid "Choose your preferred video output and configure it here."
 msgstr ""
-"Choose your preferred video output in the Video section, and configure it "
-"here."
+"Choose your preferred video output and configure it here."
 
 #: include/vlc_config_cat.h:84
 msgid "Video filters are used to postprocess the video stream"
 msgstr ""
 
 #: include/vlc_config_cat.h:86
-#, fuzzy
 msgid "Subtitles/OSD"
-msgstr "Subtitles Track"
+msgstr "Subtitles/OSD"
 
 #: include/vlc_config_cat.h:87
 msgid ""
@@ -168,9 +162,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:89
-#, fuzzy
 msgid "Text rendering"
-msgstr "Force a video rendering mode."
+msgstr "Text rendering"
 
 #: include/vlc_config_cat.h:91
 #, fuzzy
@@ -192,9 +185,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:98
-#, fuzzy
 msgid "Access modules"
-msgstr "Access modules settings"
+msgstr "Access modules"
 
 #: include/vlc_config_cat.h:100
 msgid ""
@@ -205,27 +197,24 @@ msgstr ""
 "Common settings you may want to alter are HTTP proxy or caching settings."
 
 #: include/vlc_config_cat.h:104
-#, fuzzy
 msgid "Access filter modules"
-msgstr "Access modules settings"
+msgstr "Access filter modules"
 
 #: include/vlc_config_cat.h:106
 msgid "Settings related to the various access filter used by VLC.\n"
 msgstr ""
 
 #: include/vlc_config_cat.h:108
-#, fuzzy
 msgid "Demuxers"
-msgstr "PS demuxer"
+msgstr "Demuxers"
 
 #: include/vlc_config_cat.h:109
 msgid "Demuxers are used to separate audio and video streams"
 msgstr ""
 
 #: include/vlc_config_cat.h:111
-#, fuzzy
 msgid "Video codecs"
-msgstr "Video encoder"
+msgstr "Video codecs"
 
 #: include/vlc_config_cat.h:112
 msgid "Settings for the video-only decoders and encoders"
@@ -305,9 +294,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:148
-#, fuzzy
 msgid "Packetizers"
-msgstr "Copy packetiser"
+msgstr "Packetisers"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -318,9 +306,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:155
-#, fuzzy
 msgid "Sout stream"
-msgstr "Codec setting"
+msgstr "Sout stream"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -694,9 +681,8 @@ msgstr "Spectrum"
 #: src/audio_output/input.c:151 modules/audio_filter/equalizer.c:66
 #: modules/gui/macosx/equalizer.m:140 modules/gui/macosx/equalizer.m:154
 #: modules/gui/macosx/intf.m:526 modules/gui/wxwindows/extrapanel.cpp:179
-#, fuzzy
 msgid "Equalizer"
-msgstr "visualiser"
+msgstr "Equaliser"
 
 #: src/audio_output/input.c:173 src/libvlc.h:155
 #: modules/gui/wxwindows/extrapanel.cpp:392
@@ -869,9 +855,9 @@ msgid "Bitrate"
 msgstr "Bitrate"
 
 #: src/input/es_out.c:1544
-#, fuzzy, c-format
+#, c-format
 msgid "%d kb/s"
-msgstr "%d bps"
+msgstr "%d kb/s"
 
 #: src/input/es_out.c:1553
 msgid "Resolution"
@@ -882,9 +868,8 @@ msgid "Display resolution"
 msgstr "Display resolution"
 
 #: src/input/es_out.c:1565 modules/access/screen/screen.c:41
-#, fuzzy
 msgid "Frame rate"
-msgstr "Sample rate"
+msgstr "Frame rate"
 
 #: src/input/es_out.c:1572 modules/gui/gtk/gnome_interface.c:1972
 #: modules/gui/gtk/gtk_interface.c:2287
@@ -909,9 +894,8 @@ msgid "Bookmark"
 msgstr ""
 
 #: src/input/var.c:135
-#, fuzzy
 msgid "Programs"
-msgstr "Programme"
+msgstr "Programmes"
 
 #: src/input/var.c:146 modules/gui/beos/MediaControlView.cpp:1234
 #: modules/gui/gtk/gnome_interface.c:1649 modules/gui/gtk/gtk_interface.c:1955
@@ -1107,9 +1091,8 @@ msgid "Polish"
 msgstr ""
 
 #: src/libvlc.h:36
-#, fuzzy
 msgid "Pashto"
-msgstr "Date"
+msgstr ""
 
 #: src/libvlc.h:36
 msgid "Brazilian"
@@ -1124,9 +1107,8 @@ msgid "Swedish"
 msgstr ""
 
 #: src/libvlc.h:36
-#, fuzzy
 msgid "Tetum"
-msgstr "Spectrum"
+msgstr ""
 
 #: src/libvlc.h:36 src/misc/iso-639_def.h:179
 msgid "Tagalog"
@@ -1366,24 +1348,19 @@ msgstr ""
 "hardware supports it as well as the audio stream being played."
 
 #: src/libvlc.h:157
-#, fuzzy
 msgid ""
 "This allows you to add audio post processing filters, to modify the sound"
 msgstr ""
-"This allows you to add audio post processing filters, to modify the sound, "
-"or audio visualisation modules (spectrum analyser, …)."
+"This allows you to add audio post processing filters, to modify the sound"
 
 #: src/libvlc.h:160
-#, fuzzy
 msgid "Audio visualizations "
-msgstr "Visualisations"
+msgstr "Audio visualisations "
 
 #: src/libvlc.h:162
-#, fuzzy
 msgid "This allows you to add visualization modules (spectrum analyzer, etc.)."
 msgstr ""
-"This allows you to add audio post processing filters, to modify the sound, "
-"or audio visualisation modules (spectrum analyser, …)."
+"This allows you to add visualisation modules (spectrum analyser, etc.)."
 
 #: src/libvlc.h:165
 msgid "Channel mixer"
@@ -1510,7 +1487,7 @@ msgstr ""
 #: modules/video_filter/marq.c:106 modules/video_filter/mosaic.c:120
 #: modules/video_filter/time.c:96
 msgid "Center"
-msgstr ""
+msgstr "Centre"
 
 #: src/libvlc.h:220 modules/video_filter/logo.c:85
 #: modules/video_filter/marq.c:106 modules/video_filter/mosaic.c:120
@@ -1625,24 +1602,19 @@ msgid "Video snapshot directory"
 msgstr ""
 
 #: src/libvlc.h:259
-#, fuzzy
 msgid ""
 "Allows you to specify the directory where the video snapshots will be stored."
 msgstr ""
-"Allows you to modify the user name that will be used for the connection."
 
 #: src/libvlc.h:262
-#, fuzzy
 msgid "Video snapshot format"
-msgstr "Video crop left"
+msgstr ""
 
 #: src/libvlc.h:264
-#, fuzzy
 msgid ""
 "Allows you to specify the image format in which the video snapshots will be "
 "stored."
 msgstr ""
-"Allows you to modify the user name that will be used for the connection."
 
 #: src/libvlc.h:267
 msgid "Source aspect ratio"
@@ -1703,9 +1675,8 @@ msgstr ""
 "to 10000."
 
 #: src/libvlc.h:295
-#, fuzzy
 msgid "Clock synchronisation"
-msgstr "Codec Description"
+msgstr "Clock synchronisation"
 
 #: src/libvlc.h:297
 msgid ""
@@ -1728,9 +1699,8 @@ msgstr ""
 #: modules/gui/wxwindows/extrapanel.cpp:218
 #: modules/gui/wxwindows/extrapanel.cpp:467
 #: modules/gui/wxwindows/wizard.cpp:614
-#, fuzzy
 msgid "Enable"
-msgstr "Disable"
+msgstr "Enable"
 
 #: src/libvlc.h:303
 msgid "UDP port"
@@ -1788,11 +1758,13 @@ msgid ""
 "Only use this option if you want to read a multi-program stream (like DVB "
 "streams for example)."
 msgstr ""
+"Choose the programme to select by giving its Service ID.\n"
+"Only use this option if you want to read multi-programme stream (like DVB "
+"stream for example)."
 
 #: src/libvlc.h:329
-#, fuzzy
 msgid "Choose programs"
-msgstr "Choose the programme"
+msgstr "Choose programmes"
 
 #: src/libvlc.h:331
 msgid ""
@@ -1800,62 +1772,50 @@ msgid ""
 "Only use this option if you want to read a multi-program stream (like DVB "
 "streams for example)."
 msgstr ""
+"Choose the programmes to select by giving a comma-separated list of SIDs.\n"
+"Only use this option if you want to read a multi-programme stream (like DVB "
+"streams for example)."
 
 #: src/libvlc.h:336
-#, fuzzy
 msgid "Choose audio track"
-msgstr "Choose subtitle track"
+msgstr "Choose audio track"
 
 #: src/libvlc.h:338
-#, fuzzy
 msgid "Give the stream number of the audio track you want to use(from 0 to n)."
 msgstr ""
-"Give the stream number of the audio channel you want to use in a DVD (from 1 "
-"to n)."
 
 #: src/libvlc.h:341
-#, fuzzy
 msgid "Choose subtitles track"
-msgstr "Choose subtitle track"
+msgstr "Choose subtitles track"
 
 #: src/libvlc.h:343
-#, fuzzy
 msgid ""
 "Give the stream number of the subtitle track you want to use (from 0 to n)."
 msgstr ""
-"Give the stream number of the subtitle channel you want to use (from 1 to n)."
 
 #: src/libvlc.h:346
-#, fuzzy
 msgid "Choose audio language"
-msgstr "Choose file"
+msgstr ""
 
 #: src/libvlc.h:348
-#, fuzzy
 msgid ""
 "Give the language of the audio track you want to use (comma separted, two or "
 "tree letter country code)."
 msgstr ""
-"Give the stream number of the audio channel you want to use in a DVD (from 1 "
-"to n)."
 
 #: src/libvlc.h:351
-#, fuzzy
 msgid "Choose subtitle language"
-msgstr "Choose file"
+msgstr ""
 
 #: src/libvlc.h:353
-#, fuzzy
 msgid ""
 "Give the language of the subtitle track you want to use (comma separted, two "
 "or tree letter country code)."
 msgstr ""
-"Give the stream number of the subtitle channel you want to use (from 1 to n)."
 
 #: src/libvlc.h:356
-#, fuzzy
 msgid "Input repetitions"
-msgstr "Options"
+msgstr ""
 
 #: src/libvlc.h:357
 msgid "Number of time the same input will be repeated"
@@ -1870,17 +1830,14 @@ msgid "Input stop time (seconds)"
 msgstr ""
 
 #: src/libvlc.h:366
-#, fuzzy
 msgid "Input list"
-msgstr "&Shuffle Playlist"
+msgstr ""
 
 #: src/libvlc.h:367
-#, fuzzy
 msgid ""
 "Allows you to specify a comma-separated list of inputs that will be "
 "concatenated."
 msgstr ""
-"Allows you to modify the user name that will be used for the connection."
 
 #: src/libvlc.h:370
 msgid "Input slave (experimental)"
@@ -1919,9 +1876,8 @@ msgstr ""
 "section. You can also set many miscellaneous subpictures options."
 
 #: src/libvlc.h:387
-#, fuzzy
 msgid "Force subtitle position"
-msgstr "Subtitle options"
+msgstr ""
 
 #: src/libvlc.h:389
 msgid ""
@@ -1965,7 +1921,7 @@ msgstr ""
 
 #: src/libvlc.h:407
 msgid "Subtitle autodetection fuzziness"
-msgstr "Subtitle autodetection fuzziness"
+msgstr "Subtitle auto-detection fuzziness"
 
 #: src/libvlc.h:409
 msgid ""
@@ -1979,7 +1935,7 @@ msgid ""
 msgstr ""
 "This determines how fuzzy subtitle and movie filename matching will be. "
 "Options are:\n"
-"0 = no subtitles autodetected\n"
+"0 = no subtitles auto-detected\n"
 "1 = any subtitle file\n"
 "2 = any subtitle file containing the movie name\n"
 "3 = subtitle file matching the movie name with additional chars\n"
@@ -1987,7 +1943,7 @@ msgstr ""
 
 #: src/libvlc.h:417
 msgid "Subtitle autodetection paths"
-msgstr "Subtitle autodetection paths"
+msgstr "Subtitle auto-detection paths"
 
 #: src/libvlc.h:419
 msgid ""
@@ -2082,41 +2038,35 @@ msgstr ""
 "connections."
 
 #: src/libvlc.h:467
-#, fuzzy
 msgid "SOCKS server"
-msgstr "Genre"
+msgstr ""
 
 #: src/libvlc.h:469
-#, fuzzy
 msgid ""
 "Allow you to specify a SOCKS server to use. It must be of the form address:"
 "port . It will be used for all TCP connections"
 msgstr ""
-"Allows you to modify the user name that will be used for the connection."
 
 #: src/libvlc.h:472
 msgid "SOCKS user name"
 msgstr ""
 
 #: src/libvlc.h:473
-#, fuzzy
 msgid ""
 "Allows you to modify the user name that will be used for the connection to "
 "the SOCKS server."
 msgstr ""
-"Allows you to modify the user name that will be used for the connection."
+
 
 #: src/libvlc.h:476
 msgid "SOCKS password"
 msgstr ""
 
 #: src/libvlc.h:477
-#, fuzzy
 msgid ""
 "Allows you to modify the password that will be used for the connection to "
 "the SOCKS server."
 msgstr ""
-"Allows you to modify the user name that will be used for the connection."
 
 #: src/libvlc.h:483
 msgid "Title metadata"
@@ -2225,9 +2175,8 @@ msgstr ""
 "subsystem."
 
 #: src/libvlc.h:535
-#, fuzzy
 msgid "Default stream output chain"
-msgstr "File stream output"
+msgstr ""
 
 #: src/libvlc.h:537
 msgid ""
@@ -2354,13 +2303,10 @@ msgid "Enable FPU support"
 msgstr ""
 
 #: src/libvlc.h:593
-#, fuzzy
 msgid ""
 "If your processor has a floating point calculation unit, VLC can take "
 "advantage of it."
 msgstr ""
-"If your processor supports the AltiVec instructions set, VLC can take "
-"advantage of them."
 
 #: src/libvlc.h:596
 msgid "Enable CPU MMX support"
@@ -2451,6 +2397,8 @@ msgid ""
 "Specifies the services discovery modules to load, separated by semi-colons. "
 "Typical values are sap, hal, ..."
 msgstr ""
+"Specifies the services discovery modules to load, separated by semicolons. "
+"Typical values are sap, hal, ..."
 
 #: src/libvlc.h:635
 msgid "Play files randomly forever"
@@ -2465,9 +2413,8 @@ msgstr ""
 "interrupted."
 
 #: src/libvlc.h:640
-#, fuzzy
 msgid "Repeat all"
-msgstr "Random Off"
+msgstr ""
 
 #: src/libvlc.h:642
 msgid ""
@@ -2526,9 +2473,8 @@ msgid "This is a legacy entry to let you configure access modules."
 msgstr ""
 
 #: src/libvlc.h:667
-#, fuzzy
 msgid "Access filter module"
-msgstr "Access modules settings"
+msgstr ""
 
 #: src/libvlc.h:669
 msgid "This is a legacy entry to let you configure access filter modules."

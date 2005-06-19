@@ -1,5 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian localisation for VLC
 # Copyright (C) 2001 Free Software Foundation, Inc.
+# $Id$
+#
 # Valek Filippov <frob@df.ru>, 2001.
 #
 msgid ""

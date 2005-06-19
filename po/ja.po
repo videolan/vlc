@@ -1,6 +1,8 @@
 # translation of ja.po to Japanese
 # Japanese translation for VLC
 # Copyright (C) 2002,2004 VideoLAN
+# $Id$
+#
 #
 # Fumio Nakayama <endymion@ca2.so-net.ne.jp>, 2002.
 # Tadashi Jokagi <fedora@elf.no-ip.org>, 2004.

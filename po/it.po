@@ -1,6 +1,8 @@
 # Italian translation for vlc.
 # Copyright (C) 2002-2004 VideoLAN <videolan@videolan.org>
+# $Id$
 #
+# Bruno Vella 2002-2003
 # Carlo Calabrò 2003-2004
 #
 msgid ""

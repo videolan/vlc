@@ -1,5 +1,6 @@
 # French translation for VLC.
 # Copyright (C) 2001-2004 VideoLAN <videolan@videolan.org>
+# $Id$
 #
 # Previous Translators
 #  Samuel Hocevar <sam@zoy.org>

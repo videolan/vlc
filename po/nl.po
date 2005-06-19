@@ -1,6 +1,7 @@
 # Dutch translation for VLC.
-#
 # Copyright (C) 2004 Free Software Foundation, Inc.
+# $Id$
+#
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004.
 #
 msgid ""

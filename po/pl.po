@@ -1,5 +1,7 @@
 # polish translation of VLC.
 # Copyright (C) 2002 Free Software Foundation, Inc.
+# $Id$
+#
 # Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>, 2002.
 #
 msgid ""

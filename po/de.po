@@ -1,5 +1,6 @@
 # German translation for VLC.
 # Copyright (C) 2002-2005 VideoLAN <videolan@videolan.org>
+# $Id$
 #
 # Thanks to Thomas Graf <tgr@reeler.org> for starting a translation in 2002.
 # Thanks to Philipp Weissenbacher <philippweissenbacher@aon.at> for various fixes in 2004.
