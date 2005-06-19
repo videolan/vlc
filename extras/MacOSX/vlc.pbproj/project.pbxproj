@@ -2162,18 +2162,18 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.objc;
 			name = wizard.m;
-			path = "/Users/felix/Desktop/Programming/VideoLAN/vlc-trunk/modules/gui/macosx/wizard.m";
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../modules/gui/macosx/wizard.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		DC769AB8085DF0DB001A838D = {
 			fileEncoding = 5;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = wizard.h;
-			path = "/Users/felix/Desktop/Programming/VideoLAN/vlc-trunk/modules/gui/macosx/wizard.h";
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../modules/gui/macosx/wizard.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		DCA00AA7075F948800E6BF46 = {
 			children = (
