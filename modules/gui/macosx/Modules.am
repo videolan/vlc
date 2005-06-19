@@ -28,5 +28,7 @@ SOURCES_macosx = \
 	voutqt.m \
 	voutgl.m \
 	vout.h \
+	wizard.h \
+	wizard.m \
 	$(NULL)
 

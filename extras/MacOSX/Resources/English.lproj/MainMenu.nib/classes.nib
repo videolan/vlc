@@ -113,6 +113,7 @@
                 openRecentItem = id; 
                 openWebsite = id; 
                 reportABug = id; 
+                showWizard = id; 
                 timesliderUpdate = id; 
                 togglePlaylist = id; 
                 viewAbout = id; 

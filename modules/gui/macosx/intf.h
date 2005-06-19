@@ -90,7 +90,9 @@ struct intf_sys_t
     id o_prefs;                 /* VLCPrefs       */
     id o_about;                 /* VLAboutBox     */
     id o_open;                  /* VLCOpen        */
+    id o_wizard;                /* VLCWizard      */
     BOOL nib_open_loaded;       /* reference to the open-nib */
+    BOOL nib_wizard_loaded;     /* reference to the wizard-nib */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_playlist_view;/* playlist view  */
@@ -154,6 +156,7 @@ struct intf_sys_t
     IBOutlet id o_mi_open_net;
     IBOutlet id o_mi_open_recent;
     IBOutlet id o_mi_open_recent_cm;
+    IBOutlet id o_mi_open_wizard;
 
     IBOutlet id o_mu_edit;
     IBOutlet id o_mi_cut;
@@ -285,6 +288,8 @@ struct intf_sys_t
 - (IBAction)intfOpenFileGeneric:(id)sender;
 - (IBAction)intfOpenDisc:(id)sender;
 - (IBAction)intfOpenNet:(id)sender;
+
+- (IBAction)showWizard:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;

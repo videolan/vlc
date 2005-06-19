@@ -38,6 +38,7 @@
 #include "controls.h"
 #include "about.h"
 #include "open.h"
+#include "wizard.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -296,6 +297,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_about = [[VLAboutBox alloc] init];
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
+    o_wizard = [[VLCWizard alloc] init];
 
     i_lastShownVolume = -1;
     return _o_sharedMainInstance;
@@ -459,6 +461,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_recent_cm setTitle: _NS("Clear Menu")];
+    [o_mi_open_wizard setTitle: _NS("Wizard...")];
 
     [o_mu_edit setTitle: _NS("Edit")];
     [o_mi_cut setTitle: _NS("Cut")];
@@ -1421,6 +1424,18 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 }
 
+- (IBAction)showWizard:(id)sender
+{
+    if (!nib_wizard_loaded)
+    {
+        nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
+        [o_wizard initStrings];
+        [o_wizard showWizard];
+    } else {
+        [o_wizard showWizard];
+    }
+}
+
 - (IBAction)viewAbout:(id)sender
 {
     [o_about showPanel];
@@ -1557,12 +1572,13 @@ static VLCMain *_o_sharedMainInstance = nil;
         else
         {
             o_rect.size.height = 500;
-            if ( o_rect.size.width == [o_window minSize].width )
-            {
-                o_rect.size.width = 500;
-            }
-
         }
+        
+        if ( o_rect.size.width == [o_window minSize].width )
+        {
+            o_rect.size.width = 500;
+        }
+        
         o_rect.size.height = (o_size_with_playlist.height > 200) ?
             o_size_with_playlist.height : 500;
         o_rect.origin.x = [o_window frame].origin.x;
@@ -1574,6 +1590,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         /* make small */
         o_rect.size.height = [o_window minSize].height;
+        o_rect.size.width = [o_window minSize].width;
         o_rect.origin.x = [o_window frame].origin.x;
         /* Calculate the position of the lower right corner after resize */
         o_rect.origin.y = [o_window frame].origin.y +

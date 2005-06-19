@@ -812,6 +812,7 @@
 				DCA00AA9075F948800E6BF46,
 				DCF358BB077F10BA007DB450,
 				DCA693C30789DF8700139EC6,
+				DCFCCDB9085CE18F001E36AF,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -892,6 +893,8 @@
 				8ED6C28803E2EB1C0059A3A7,
 				8E9CA1A506D7DEE800B7186C,
 				8E9CA1A606D7DEE800B7186C,
+				DC769AB8085DF0DB001A838D,
+				DC769AB7085DF0DB001A838D,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -2154,6 +2157,24 @@
 //DC2
 //DC3
 //DC4
+		DC769AB7085DF0DB001A838D = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = wizard.m;
+			path = "/Users/felix/Desktop/Programming/VideoLAN/vlc-trunk/modules/gui/macosx/wizard.m";
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		DC769AB8085DF0DB001A838D = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = wizard.h;
+			path = "/Users/felix/Desktop/Programming/VideoLAN/vlc-trunk/modules/gui/macosx/wizard.h";
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
 		DCA00AA7075F948800E6BF46 = {
 			children = (
 				DCA00AA8075F948800E6BF46,
@@ -2238,11 +2259,36 @@
 				F74F13EA02C2A79C01EE194C,
 				DCF358B9077F10BA007DB450,
 				DCA693C10789DF8700139EC6,
+				DCFCCDB7085CE18F001E36AF,
 			);
 			isa = PBXGroup;
 			name = nibs;
 			refType = 4;
 			sourceTree = "<group>";
+		};
+		DCFCCDB7085CE18F001E36AF = {
+			children = (
+				DCFCCDB8085CE18F001E36AF,
+			);
+			isa = PBXVariantGroup;
+			name = Wizard.nib;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCFCCDB8085CE18F001E36AF = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
+			name = English;
+			path = Resources/English.lproj/Wizard.nib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCFCCDB9085CE18F001E36AF = {
+			fileRef = DCFCCDB7085CE18F001E36AF;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 //DC0
 //DC1
