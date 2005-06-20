@@ -47,7 +47,7 @@
 #include <npapi.h>
 
 /* This is from mozilla java, do we really need it? */
-#if 0 
+#if 0
 #include <jri.h>
 #endif
 
@@ -91,6 +91,9 @@
 #ifdef XP_UNIX
 #   define VOUT_PLUGINS "xvideo,x11,dummy"
 #   define AOUT_PLUGINS "oss,dummy"
+
+static int i_previous_height = -1;
+static int i_previous_width = -1;
 
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
 static void Resize( Widget w, XtPointer closure, XEvent *event );
@@ -661,6 +664,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     XResizeWindow( p_plugin->p_display, p_plugin->window,
                    p_plugin->i_width, p_plugin->i_height );
     Widget w = XtWindowToWidget( p_plugin->p_display, p_plugin->window );
+
     XtAddEventHandler( w, ExposureMask, FALSE,
                        (XtEventHandler)Redraw, p_plugin );
     XtAddEventHandler( w, StructureNotifyMask, FALSE,
@@ -943,6 +947,14 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
                  event->xconfigure.height,
                  event->xconfigure.send_event ? "TRUE" : "FALSE" );
     }
+    if( p_plugin->i_height == i_previous_height &&
+        p_plugin->i_width == i_previous_width )
+    {
+        return;
+    }
+    i_previous_height = p_plugin->i_height;
+    i_previous_width  = p_plugin->i_width;
+
 #endif /* X11_RESIZE_DEBUG */
 
     i_ret = XResizeWindow( p_plugin->p_display, p_plugin->window,
