@@ -194,7 +194,7 @@ vlc_module_begin();
 	set_callbacks( OpenEncoder, CloseEncoder );
 #endif
 
-    add_integer( ENC_CFG_PREFIX "quality", 3, NULL, ENC_QUALITY_TEXT,
+    add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBR_TEXT,
                  ENC_MAXBR_LONGTEXT, VLC_FALSE );
