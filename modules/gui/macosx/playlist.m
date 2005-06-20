@@ -1069,7 +1069,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         playlist_view_t *p_view;
         p_view = playlist_ViewFind( p_playlist, i_current_view );
         if( p_view && p_view->p_root )
+        {
             i_return = p_view->p_root->i_children;
+            if( i_current_view == VIEW_CATEGORY )
+            {
+                i_return--; /* remove the GENERAL item from the list */
+                i_return += p_playlist->p_general->i_children; /* add the items of the general node */
+            }
+        }
     }
     else
     {
@@ -1101,8 +1108,20 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         /* root object */
         playlist_view_t *p_view;
         p_view = playlist_ViewFind( p_playlist, i_current_view );
-        if( p_view && index < p_view->p_root->i_children && index >= 0 )
-            p_return = p_view->p_root->pp_children[index];
+        if( p_view && p_view->p_root ) p_return = p_view->p_root->pp_children[index];
+        
+        if( i_current_view == VIEW_CATEGORY )
+        {
+            if( p_playlist->p_general->i_children && index >= 0 && index < p_playlist->p_general->i_children )
+            {
+                p_return = p_playlist->p_general->pp_children[index];
+            }
+            else if( p_view && p_view->p_root && index >= 0 && index - p_playlist->p_general->i_children < p_view->p_root->i_children )
+            {
+                p_return = p_view->p_root->pp_children[index - p_playlist->p_general->i_children + 1];
+                
+            }
+        }
     }
     else
     {
@@ -1152,8 +1171,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         /* root object */
         playlist_view_t *p_view;
         p_view = playlist_ViewFind( p_playlist, i_current_view );
-        if( p_view && p_view->p_root )
-            i_return = p_view->p_root->i_children;
+        if( p_view && p_view->p_root ) i_return = p_view->p_root->i_children;
+        
+        if( i_current_view == VIEW_CATEGORY )
+        {
+            i_return--;
+            i_return += p_playlist->p_general->i_children;
+        }
     }
     else
     {
