@@ -1553,14 +1553,14 @@ static VLCMain *_o_sharedMainInstance = nil;
         if ( o_size_with_playlist.height > 200 )
         {
             o_rect.size.height = o_size_with_playlist.height;
-        }
-        else
-        {
+        } else {
             o_rect.size.height = 500;
         }
         
-        if ( o_rect.size.width == [o_window minSize].width )
+        if ( o_size_with_playlist.width > [o_window minSize].width )
         {
+            o_rect.size.width = o_size_with_playlist.width;
+        } else {
             o_rect.size.width = 500;
         }
         
