@@ -663,6 +663,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
         /* Hack we don't call playlist_Control for lock reasons */
         p_playlist->status.i_status = PLAYLIST_STOPPED;
         p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.p_item = NULL;
         msg_Info( p_playlist, "stopping playback" );
         b_flag = VLC_TRUE;
     }

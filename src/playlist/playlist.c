@@ -866,7 +866,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             i_skip = p_playlist->request.i_skip;
             i_goto = p_playlist->request.i_goto;
 
-            if( p_playlist->i_index == -1 ) p_playlist->i_index = 0;
+            if( p_playlist->i_index < 0 ) p_playlist->i_index = 0;
             p_new = p_playlist->pp_items[p_playlist->i_index];
 
             if( i_goto >= 0  && i_goto < p_playlist->i_size )
