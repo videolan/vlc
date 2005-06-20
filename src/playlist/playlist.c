@@ -332,7 +332,8 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         i_view = (int)va_arg( args,int );
         p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
-        if ( p_node == NULL || p_item == NULL || p_item->input.psz_uri == NULL )
+        if ( p_node == NULL || (p_item != NULL && p_item->input.psz_uri
+                                                         == NULL ))
         {
             p_playlist->status.i_status = PLAYLIST_STOPPED;
             p_playlist->request.b_request = VLC_TRUE;
