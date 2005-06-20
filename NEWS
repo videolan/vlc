@@ -20,10 +20,10 @@ Core support:
  * Renamed --audio-channel to --audio-track
  * Renamed --filter to --vout-filter
  * filters, extra interfaces, visualizations and service discovery modules are
-   now seperated by ':' instead of ','
+   now separated by ':' instead of ','
  * Access filter architecture
  * Track selection based on preferred language (--sub-language and --audio-language)
- * Zsh autocompletion for vlc's arguments
+ * Zsh autocompletion for VLC's arguments
  * Many bugfixes...
 
 Input/Demuxers:
@@ -127,16 +127,10 @@ IE Plugin:
  * Brand new Internet Explorer ActiveX plugin
 
 Translations:
- The following languages were added
+ The following languages were added:
  * Catalan
  * Danish
- * Greek
- * Hindi
- * Pashto
- * Burmese
- * Tetum
- * Tagalog
- * Bengali
+ * Turkish
 
 
 Changes between 0.8.0 and 0.8.1:
