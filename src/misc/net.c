@@ -1180,6 +1180,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 int __net_CheckIP( vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts,
                    int i_hosts )
 {
+#ifdef HAVE_ARPA_INET_H
     struct in_addr ip;
     int i;
 
@@ -1225,5 +1226,10 @@ int __net_CheckIP( vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts,
     }
 
     return VLC_FALSE;
+#else
+    msg_Err( p_this, "hosts checking is not supported on this OS" );
+
+    return VLC_FALSE;
+#endif
 }
 
