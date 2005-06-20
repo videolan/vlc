@@ -1180,11 +1180,10 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 int __net_CheckIP( vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts,
                    int i_hosts )
 {
-#ifdef HAVE_ARPA_INET_H
     struct in_addr ip;
     int i;
 
-    if( !inet_aton( psz_ip, &ip ) )
+    if( (ip.s_addr = inet_addr( psz_ip )) == INADDR_NONE )
     {
         return VLC_EGENERIC;
     }
@@ -1208,12 +1207,12 @@ int __net_CheckIP( vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts,
             else if( i_mask == 0 )
                 mask.s_addr = INADDR_ANY;
             else
-                mask.s_addr = htons( ntohs(INADDR_NONE) << (32 - i_mask) );
+                mask.s_addr = htonl( ntohl(INADDR_NONE) << (32 - i_mask) );
         }
         else
             mask.s_addr = INADDR_NONE;
 
-        if( !inet_aton( psz_host, &base ) )
+        if( (base.s_addr = inet_addr( psz_host )) == INADDR_NONE )
         {
             msg_Err( p_this, "invalid base address %s", psz_host );
             free( psz_host );
@@ -1226,10 +1225,5 @@ int __net_CheckIP( vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts,
     }
 
     return VLC_FALSE;
-#else
-    msg_Err( p_this, "hosts checking is not supported on this OS" );
-
-    return VLC_FALSE;
-#endif
 }
 
