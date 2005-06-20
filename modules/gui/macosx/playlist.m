@@ -367,6 +367,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if ( p_temp_item )
     {
+        vlc_mutex_lock( &p_playlist->object_lock );
         while( p_temp_item->i_parents > 0 )
         {
             int i;
@@ -377,6 +378,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                     if( p_temp_item->pp_parents[i]->p_parent == p_node )
                     {
                         vlc_object_release( p_playlist );
+                        vlc_mutex_unlock( &p_playlist->object_lock );
                         return YES;
                     }
                     else
@@ -387,6 +389,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 }
             }
         }
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
 
     vlc_object_release( p_playlist );

@@ -332,7 +332,8 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         i_view = (int)va_arg( args,int );
         p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
-        if ( p_node == NULL || p_item == NULL || p_item->input.psz_uri == NULL )
+        if ( p_node == NULL || (p_item != NULL && p_item->input.psz_uri
+                                                         == NULL ))
         {
             p_playlist->status.i_status = PLAYLIST_STOPPED;
             p_playlist->request.b_request = VLC_TRUE;
@@ -866,7 +867,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
             i_skip = p_playlist->request.i_skip;
             i_goto = p_playlist->request.i_goto;
 
-            if( p_playlist->i_index == -1 ) p_playlist->i_index = 0;
+            if( p_playlist->i_index < 0 ) p_playlist->i_index = 0;
             p_new = p_playlist->pp_items[p_playlist->i_index];
 
             if( i_goto >= 0  && i_goto < p_playlist->i_size )

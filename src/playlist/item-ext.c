@@ -622,6 +622,7 @@ int playlist_Replace( playlist_t *p_playlist, playlist_item_t *p_olditem,
 int playlist_Delete( playlist_t * p_playlist, int i_id )
 {
     int i, i_top, i_bottom;
+    int i_pos;
     vlc_bool_t b_flag = VLC_FALSE;
 
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
@@ -663,8 +664,17 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
         /* Hack we don't call playlist_Control for lock reasons */
         p_playlist->status.i_status = PLAYLIST_STOPPED;
         p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.p_item = NULL;
         msg_Info( p_playlist, "stopping playback" );
         b_flag = VLC_TRUE;
+    }
+
+    /* Get position and update index if needed */
+    i_pos = playlist_GetPositionById( p_playlist, i_id );
+
+    if( i_pos >= 0 && i_pos <= p_playlist->i_index )
+    {
+        p_playlist->i_index--;
     }
 
     msg_Dbg( p_playlist, "deleting playlist item `%s'",

@@ -619,6 +619,8 @@ playlist_item_t *playlist_FindNextFromParent( playlist_t *p_playlist,
     {
         msg_Dbg( p_playlist, "finding something to play within %s -root %s",
                             p_node->input.psz_name, p_root->input.psz_name );
+        msg_Dbg( p_playlist, "%s has %i children",
+                            p_node->input.psz_name, p_node->i_children );
 
     }
 #endif
