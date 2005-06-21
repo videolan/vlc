@@ -367,18 +367,34 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if ( p_temp_item )
     {
+        int i;
         vlc_mutex_lock( &p_playlist->object_lock );
+
+        /* Since outlineView: willDisplayCell:... may call this function with
+           p_items that don't exist anymore, first check if the item is still
+           in the playlist. Any cleaner solution welcomed. */
+
+        for ( i = 0 ; i < p_playlist->i_all_size ; i++ )
+        {
+            if( p_playlist->pp_all_items[i] == p_item ) break;
+            else if ( i == p_playlist->i_all_size - 1 )
+            {
+                vlc_object_release( p_playlist );
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                return NO;
+            }
+        }
+
         while( p_temp_item->i_parents > 0 )
         {
-            int i;
             for( i = 0; i < p_temp_item->i_parents ; i++ )
             {
                 if( p_temp_item->pp_parents[i]->i_view == i_current_view )
                 {
                     if( p_temp_item->pp_parents[i]->p_parent == p_node )
                     {
-                        vlc_object_release( p_playlist );
                         vlc_mutex_unlock( &p_playlist->object_lock );
+                        vlc_object_release( p_playlist );
                         return YES;
                     }
                     else
@@ -388,8 +404,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                     }
                 }
             }
+            vlc_mutex_unlock( &p_playlist->object_lock );
         }
-        vlc_mutex_unlock( &p_playlist->object_lock );
     }
 
     vlc_object_release( p_playlist );
@@ -510,7 +526,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         playlist_item_t * p_item;
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
-
         [o_to_delete removeObject: o_number];
         [o_outline_view deselectRow: i_row];
 
@@ -524,7 +539,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
             }
+            vlc_mutex_lock( &p_playlist->object_lock );
             playlist_NodeDelete( p_playlist, p_item, VLC_TRUE, VLC_FALSE );
+            vlc_mutex_unlock( &p_playlist->object_lock );
         }
         else
         {
@@ -533,7 +550,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             {
                 playlist_Stop( p_playlist );
             }
-            playlist_LockDelete( p_playlist, p_item->input.i_id );
+            vlc_mutex_lock( &p_playlist->object_lock );
+            playlist_Delete( p_playlist, p_item->input.i_id );
+            vlc_mutex_unlock( &p_playlist->object_lock );
         }
     }
     [self playlistUpdated];
@@ -965,7 +984,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         return;
     }
-    
+
     /* Check whether the selected table column header corresponds to a
        sortable table column*/
     if( !( o_tc == o_tc_name || o_tc == o_tc_author ) )
@@ -1033,10 +1052,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 {
     playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
-    playlist_item_t *p_item = (playlist_item_t *)[item pointerValue];
+    playlist_item_t *p_item;
 
     if( !p_playlist ) return;
 
+    p_item = (playlist_item_t *)[item pointerValue];
     if( ( p_item == p_playlist->status.p_item ) ||
             ( p_item->i_children != 0 &&
             [self isItem: p_playlist->status.p_item inNode: p_item] ) )
