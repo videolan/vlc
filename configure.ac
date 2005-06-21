@@ -459,6 +459,9 @@ AC_CHECK_LIB(m,pow,[
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
 ])
+AC_CHECK_LIB(mx,sqrtf,[
+  VLC_ADD_LDFLAGS([x264],[-lmx])
+])
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Check for dynamic plugins
