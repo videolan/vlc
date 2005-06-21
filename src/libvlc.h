@@ -66,12 +66,16 @@ static char *ppsz_snap_formats[] =
 
 #define VERBOSE_TEXT N_("Verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
-    "This options sets the verbosity level (0=only errors and " \
+    "This option sets the verbosity level (0=only errors and " \
     "standard messages, 1=warnings, 2=debug).")
 
 #define QUIET_TEXT N_("Be quiet")
 #define QUIET_LONGTEXT N_( \
-    "This options turns off all warning and information messages.")
+    "This option turns off all warning and information messages.")
+
+#define OPEN_TEXT N_("Open MRL")
+#define OPEN_LONGTEXT N_( \
+    "This option allows you to open a default MRL on start-up.")
 
 #define LANGUAGE_TEXT N_("Language")
 #define LANGUAGE_LONGTEXT N_( "This option allows you to set the language " \
@@ -1290,6 +1294,7 @@ vlc_module_begin();
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
+    add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, VLC_FALSE );
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,

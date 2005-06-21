@@ -252,6 +252,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     vlc_t *      p_vlc = vlc_current_object( i_object );
     module_t    *p_help_module;
     playlist_t  *p_playlist;
+    vlc_value_t  val;
 
     if( !p_vlc )
     {
@@ -555,7 +556,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     var_Create( p_vlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     if( config_GetInt( p_vlc, "quiet" ) )
     {
-        vlc_value_t val;
         val.i_int = -1;
         var_Set( p_vlc, "verbose", val );
     }
@@ -726,6 +726,18 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * Get input filenames given as commandline arguments
      */
     GetFilenames( p_vlc, i_argc, ppsz_argv );
+
+    /*
+     * Get --open argument
+     */
+    var_Create( p_vlc, "open", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_vlc, "open", &val );
+    if ( val.psz_string != NULL && *val.psz_string )
+    {
+        VLC_AddTarget( p_vlc->i_object_id, val.psz_string, NULL, 0,
+                       PLAYLIST_INSERT, 0 );
+    }
+    if ( val.psz_string != NULL ) free( val.psz_string );
 
     if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
