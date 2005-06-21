@@ -134,6 +134,30 @@ static int fmtcmp( es_format_t *ofmt, es_format_t *nfmt )
 }
 
 
+/*
+ * Converts old-style VOC sample rates to commonly used ones
+ * so as not to confuse sound card drivers.
+ * (I assume 16k, 24k and 32k are never found in .VOC files)
+ */
+static unsigned int fix_voc_sr( unsigned int sr )
+{
+    switch( sr )
+    {
+        /*case 8000:
+            return 8000;*/
+        case 11111:
+            return 11025;
+
+        case 22222:
+            return 22050;
+
+        case 44444:
+            return 44100;
+    }
+    return sr;
+}
+        
+
 static int ReadBlockHeader( demux_t *p_demux )
 {
     es_format_t     new_fmt;
@@ -163,7 +187,6 @@ static int ReadBlockHeader( demux_t *p_demux )
             if( stream_Read( p_demux->s, buf, 2 ) < 2 )
                 goto corrupt;
 
-            new_fmt.audio.i_rate = 1000000L / (256L - buf[0]);
             if( buf[1] )
             {
                 msg_Err( p_demux, "Unsupported compression" );
@@ -171,12 +194,13 @@ static int ReadBlockHeader( demux_t *p_demux )
             }
 
             new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.audio.i_rate = fix_voc_sr( 1000000L / (256L - buf[0]) );
             new_fmt.audio.i_bytes_per_frame = 1;
             new_fmt.audio.i_frame_length = 1;
             new_fmt.audio.i_channels = 1;
             new_fmt.audio.i_blockalign = 1;
             new_fmt.audio.i_bitspersample = 8;
-            new_fmt.i_bitrate = p_sys->fmt.audio.i_rate * 8;
+            new_fmt.i_bitrate = new_fmt.audio.i_rate * 8;
             break;
 
         case 2: /* data block with same format as the previous one */
@@ -194,14 +218,14 @@ static int ReadBlockHeader( demux_t *p_demux )
             i_block_size = 0;
             p_sys->i_silence_countdown = GetWLE( buf );
 
-            new_fmt.audio.i_rate = 1000000L / (256L - buf[2]);
             new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.audio.i_rate = fix_voc_sr( 1000000L / (256L - buf[0]) );
             new_fmt.audio.i_bytes_per_frame = 1;
             new_fmt.audio.i_frame_length = 1;
             new_fmt.audio.i_channels = 1;
             new_fmt.audio.i_blockalign = 1;
             new_fmt.audio.i_bitspersample = 8;
-            new_fmt.i_bitrate = p_sys->fmt.audio.i_rate * 8;
+            new_fmt.i_bitrate = new_fmt.audio.i_rate * 8;
             break;
 
         case 6: /* repeat block */
@@ -291,7 +315,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             new_fmt.audio.i_bytes_per_frame = new_fmt.audio.i_channels
                 * (new_fmt.audio.i_bitspersample / 8);
             new_fmt.audio.i_frame_length = 1;
-            new_fmt.audio.i_blockalign = p_sys->fmt.audio.i_bytes_per_frame;
+            new_fmt.audio.i_blockalign = new_fmt.audio.i_bytes_per_frame;
             new_fmt.i_bitrate = 8 * new_fmt.audio.i_rate
                                      * new_fmt.audio.i_bytes_per_frame;
             break;
