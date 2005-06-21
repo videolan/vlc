@@ -852,7 +852,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         o_current_name = [NSString stringWithUTF8String:
             p_item->pp_children[i_current]->input.psz_name];
         psz_temp = vlc_input_item_GetInfo( &p_item->input ,
-				   _("Meta-information"),_("Artist") );
+                   _("Meta-information"),_("Artist") );
         o_current_author = [NSString stringWithUTF8String: psz_temp];
         free( psz_temp);
         vlc_mutex_unlock( &p_playlist->object_lock );
@@ -925,7 +925,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
         if( o_result != NULL )
         {
-            for( i = 0 ; i < [o_result count] - 1 ; i++ )
+            for( i = 1 ; i < [o_result count] - 1 ; i++ )
             {
                 [o_outline_view expandItem: [o_outline_dict objectForKey:
                             [NSString stringWithFormat: @"%p",
