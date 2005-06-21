@@ -659,7 +659,7 @@
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VLC media player 0.8.2-test2, Copyright (c) 1996-2005 VideoLAN.</string>
+	<string>VLC media player 0.8.2-test3, Copyright (c) 1996-2005 VideoLAN.</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -671,7 +671,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.8.2-test2</string>
+	<string>0.8.2-test3</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleURLTypes</key>
@@ -728,7 +728,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>0.8.2-test2</string>
+	<string>0.8.2-test3</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>
