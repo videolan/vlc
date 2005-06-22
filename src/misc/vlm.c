@@ -1348,7 +1348,7 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         time.tm_year = 0;        /* year */
         time.tm_wday = 0;        /* day of the week */
         time.tm_yday = 0;        /* day in the year */
-        time.tm_isdst = 0;       /* daylight saving time */
+        time.tm_isdst = -1;       /* daylight saving time */
 
         /* date should be year/month/day-hour:minutes:seconds */
         p = strchr( psz_value, '-' );
@@ -1426,7 +1426,7 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         time.tm_year = 0;        /* year */
         time.tm_wday = 0;        /* day of the week */
         time.tm_yday = 0;        /* day in the year */
-        time.tm_isdst = 0;       /* daylight saving time */
+        time.tm_isdst = -1;       /* daylight saving time */
 
         /* date should be year/month/day-hour:minutes:seconds */
         p = strchr( psz_value, '-' );
