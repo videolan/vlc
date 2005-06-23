@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
-<!-- $Id: -->
+<!-- $Id$-->
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
 
@@ -41,6 +41,9 @@ function changeMe(item)
 
 
  <body>
+
+program="<vlc id="get" param1="program" param2="int" />
+test2="<vlc id="get" param1="test2" param2="int" />
     <!-- left menu -->
     <div class="left">
       <div class="sectitle">Playback control</div>
@@ -118,7 +121,7 @@ function changeMe(item)
       <div class="section">
         <table class="add">
           <tr>
-	    <form method="get" action="" enctype="text/plain" >
+	    <form method="get" action="?" enctype="text/plain" >
               <td>Add a MRL (Media Resource Locator) to the playlist</td>
               <td>
                <input type="hidden" name="control" value="add" />
