@@ -925,7 +925,14 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
         if( o_result != NULL )
         {
-            for( i = 1 ; i < [o_result count] - 1 ; i++ )
+            int i_start;
+            if( [[o_result objectAtIndex: 0] pointerValue] ==
+                                                    p_playlist->p_general )
+            i_start = 1;
+            else
+            i_start = 0;
+
+            for( i = i_start ; i < [o_result count] - 1 ; i++ )
             {
                 [o_outline_view expandItem: [o_outline_dict objectForKey:
                             [NSString stringWithFormat: @"%p",

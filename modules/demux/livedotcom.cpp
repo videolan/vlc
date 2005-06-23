@@ -769,8 +769,10 @@ static int Demux( demux_t *p_demux )
 
     if( p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 120 )
     {
+        /* FIXME Make this configurable
         msg_Err( p_demux, "no multicast data received in 36s, aborting" );
         return 0;
+        */
     }
     else if( !p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 3 )
     {
@@ -792,7 +794,7 @@ static int Demux( demux_t *p_demux )
             return 0;
         }
     }
-    else if( p_sys->i_no_data_ti > 10 )
+    else if( !p_sys->b_multicast && p_sys->b_no_data&& p_sys->i_no_data_ti > 10 )
     {
         /* EOF ? */
         msg_Warn( p_demux, "no data received in 3s, eof ?" );
