@@ -492,9 +492,16 @@ class vlc_stream_io_callback: public IOCallback
   private:
     stream_t       *s;
     vlc_bool_t     mb_eof;
+    vlc_bool_t     b_owner;
 
   public:
-    vlc_stream_io_callback( stream_t * );
+    vlc_stream_io_callback( stream_t *, vlc_bool_t );
+
+    virtual ~vlc_stream_io_callback()
+    {
+        if( b_owner )
+            stream_Delete( s );
+    }
 
     virtual uint32   read            ( void *p_buffer, size_t i_size);
     virtual void     setFilePointer  ( int64_t i_offset, seek_mode mode = seek_beginning );
@@ -1394,7 +1401,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
 
-    p_io_callback = new vlc_stream_io_callback( p_demux->s );
+    p_io_callback = new vlc_stream_io_callback( p_demux->s, VLC_FALSE );
     p_io_stream = new EbmlStream( *p_io_callback );
 
     if( p_io_stream == NULL )
@@ -1471,7 +1478,7 @@ static int Open( vlc_object_t * p_this )
 #endif
                     {
                         // test wether this file belongs to our family
-                        vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( stream_UrlNew( p_demux, s_filename.c_str()));
+                        vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( stream_UrlNew( p_demux, s_filename.c_str()), VLC_TRUE );
                         EbmlStream *p_estream = new EbmlStream(*p_file_io);
 
                         p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
@@ -3260,9 +3267,10 @@ static int Demux( demux_t *p_demux)
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
-vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_ )
+vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, vlc_bool_t b_owner_ )
 {
     s = s_;
+    b_owner = b_owner_;
     mb_eof = VLC_FALSE;
 }
 
