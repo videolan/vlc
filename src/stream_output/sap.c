@@ -585,7 +585,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
 {
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
-    char *psz_group, *psz_name, psz_uri[NI_MAXHOST];
+    char *psz_group, *psz_name, psz_uribuf[NI_MAXHOST], *psz_uri;
     char ipv;
 
     psz_group = convert_to_utf8( p_sap, p_session->psz_group );
@@ -598,15 +598,18 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
     {
         char *ptr;
 
-        strncpy( psz_uri, p_session->psz_uri + 1, sizeof( psz_uri ) );
-        psz_uri[sizeof( psz_uri ) - 1] = '\0';
-        ptr = strchr( psz_uri, '%' );
+        strncpy( psz_uribuf, p_session->psz_uri + 1, sizeof( psz_uribuf ) );
+        psz_uribuf[sizeof( psz_uribuf ) - 1] = '\0';
+        ptr = strchr( psz_uribuf, '%' );
         if( ptr != NULL)
             *ptr = '\0';
-        ptr = strchr( psz_uri, ']' );
+        ptr = strchr( psz_uribuf, ']' );
         if( ptr != NULL)
             *ptr = '\0';
+        psz_uri = psz_uribuf;
     }
+    else
+        psz_uri = p_session->psz_uri;
 
     /* see the lists in modules/stream_out/rtp.c for compliance stuff */
     p_session->psz_sdp = (char *)malloc(
