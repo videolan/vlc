@@ -1055,6 +1055,7 @@ void PrefsPanel::ApplyChanges()
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_DIRECTORY:
         case CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_MODULE_CAT:
         case CONFIG_ITEM_MODULE_LIST:
         case CONFIG_ITEM_MODULE_LIST_CAT:
             config_PutPsz( p_intf, control->GetName().mb_str(),
