@@ -185,11 +185,10 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
-            int i_val_size = sizeof( i_val ), i_max_count;
+            int i_val_size = sizeof( i_val );
+            div_t d;
             struct timeval tv;
             vlc_value_t timeout;
-            fd_set fds;
-
 #if defined( WIN32 ) || defined( UNDER_CE )
             if( WSAGetLastError() != WSAEWOULDBLOCK )
             {
@@ -211,11 +210,18 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             var_Create( p_this, "ipv4-timeout",
                         VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
             var_Get( p_this, "ipv4-timeout", &timeout );
-            i_max_count = timeout.i_int / 100;
+            if( timeout.i_int < 0 )
+            {
+                msg_Err( p_this, "invalid negative value for ipv4-timeout" );
+                timeout.i_int = 0;
+            }
+            d = div( timeout.i_int, 100 );
 
             msg_Dbg( p_this, "connection in progress" );
             do
             {
+                fd_set fds;
+
                 if( p_this->b_die )
                 {
                     msg_Dbg( p_this, "connection aborted" );
@@ -224,14 +230,6 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
                     free( psz_socks );
                     return -1;
                 }
-                if( i_max_count <= 0 )
-                {
-                    msg_Dbg( p_this, "connection timed out" );
-                    net_Close( fd );
-                    continue;
-                }
-
-                i_max_count--;
 
                 /* Initialize file descriptor set */
                 FD_ZERO( &fds );
@@ -239,9 +237,19 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 
                 /* We'll wait 0.1 second if nothing happens */
                 tv.tv_sec = 0;
-                tv.tv_usec = 100000;
+                tv.tv_usec = (d.quot > 0) ? 100000 : (1000 * d.rem);
 
                 i_val = select( fd + 1, NULL, &fds, NULL, &tv );
+
+                if( d.quot <= 0 )
+                {
+                    msg_Dbg( p_this, "connection timed out" );
+                    net_Close( fd );
+                    fd = -1;
+                    break;
+                }
+
+                d.quot--;
             }
             while( ( i_val == 0 ) || ( ( i_val < 0 ) &&
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -250,6 +258,9 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
                             ( errno == EINTR )
 #endif
                      ) );
+
+            if( fd == -1 )
+                continue; /* timeout */
 
             if( i_val < 0 )
             {
