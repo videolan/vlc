@@ -51,6 +51,7 @@ static int FindLanguage( const char * psz_lang )
         "Japanese", "ja",
         "Dutch", "nl",
         "Brazillian Portuguese", "pt_BR",
+        "Russian", "ru",
         "Chinese Traditional", "zh_TW",
         NULL
     };
