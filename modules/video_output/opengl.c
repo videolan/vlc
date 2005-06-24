@@ -69,10 +69,6 @@
 #define VLCGL_TYPE   VLCGL_RGB_TYPE
 #endif
 
-#ifndef GL_CLAMP_TO_EDGE
-#   define GL_CLAMP_TO_EDGE 0x812F
-#endif
-
 /* OpenGL effects */
 #define OPENGL_EFFECT_NONE             1
 #define OPENGL_EFFECT_CUBE             2
@@ -96,6 +92,10 @@ static int InitTextures( vout_thread_t * );
 static int SendEvents( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
 
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define SPEED_TEXT N_( "OpenGL cube rotation speed" )
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -589,10 +589,10 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     {
         glEnable( VLCGL_TARGET );
         glBegin( GL_POLYGON );
-        glTexCoord2f( 0.0, 0.0 ); glVertex2f( -1.0, 1.0 );
-        glTexCoord2f( f_width, 0.0 ); glVertex2f( 1.0, 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
-        glTexCoord2f( 0.0, f_height ); glVertex2f( -1.0, -1.0 );
+        glTexCoord2f( 0.5, 0.5 ); glVertex2f( -1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex2f( 1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex2f( 1.0, -1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex2f( -1.0, -1.0 );
         glEnd();
     }
     else
@@ -603,40 +603,36 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         glBegin( GL_QUADS );
 
         /* Front */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( 1.0, 1.0, 1.0 );
 
         /* Left */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, 1.0 );
 
         /* Back */
-        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0.5, 0.5 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, - 1.0 );
 
         /* Right */
-        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0.5, 0.5 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Top */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
-
-        /* Bottom */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( 1.0, - 1.0, 1.0 );
         glEnd();
     }
 
@@ -696,12 +692,12 @@ static int InitTextures( vout_thread_t *p_vout )
         /* Set the texture parameters */
         glTexParameterf( VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0 );
     
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    
         glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
         glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    
+        
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
         glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 #ifdef SYS_DARWIN
