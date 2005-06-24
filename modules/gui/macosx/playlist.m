@@ -353,62 +353,26 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release(p_playlist);
 }
 
-
-- (BOOL)isItem: (playlist_item_t *)p_item inNode: (playlist_item_t *)p_node
+- (BOOL)isValueItem: (id)o_item inNode: (id)o_node
 {
-    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-    playlist_item_t *p_temp_item = p_item;
-
-    if( p_playlist == NULL )
+    int i;
+    int i_total = [[o_outline_view dataSource] outlineView:o_outline_view
+                                        numberOfChildrenOfItem: o_node];
+    for( i = 0 ; i < i_total ; i++ )
     {
-        return NO;
-    }
-
-    if ( p_temp_item )
-    {
-        int i;
-        vlc_mutex_lock( &p_playlist->object_lock );
-
-        /* Since outlineView: willDisplayCell:... may call this function with
-           p_items that don't exist anymore, first check if the item is still
-           in the playlist. Any cleaner solution welcomed. */
-
-        for ( i = 0 ; i < p_playlist->i_all_size ; i++ )
+        id o_temp_item = [[o_outline_view dataSource] outlineView:
+                                    o_outline_view child:i ofItem: o_node];
+        if( [[o_outline_view dataSource] outlineView:o_outline_view
+                                    numberOfChildrenOfItem: o_temp_item] > 0 )
         {
-            if( p_playlist->pp_all_items[i] == p_item ) break;
-            else if ( i == p_playlist->i_all_size - 1 )
-            {
-                vlc_object_release( p_playlist );
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                return NO;
-            }
+            if( [self isValueItem: o_item inNode: o_temp_item] == YES )
+            return YES;
         }
-
-        while( p_temp_item->i_parents > 0 )
+        else if( [o_temp_item isEqual: o_item] )
         {
-            for( i = 0; i < p_temp_item->i_parents ; i++ )
-            {
-                if( p_temp_item->pp_parents[i]->i_view == i_current_view )
-                {
-                    if( p_temp_item->pp_parents[i]->p_parent == p_node )
-                    {
-                        vlc_mutex_unlock( &p_playlist->object_lock );
-                        vlc_object_release( p_playlist );
-                        return YES;
-                    }
-                    else
-                    {
-                        p_temp_item = p_temp_item->pp_parents[i]->p_parent;
-                        break;
-                    }
-                }
-            }
-            vlc_mutex_unlock( &p_playlist->object_lock );
+            return YES;
         }
     }
-
-    vlc_object_release( p_playlist );
     return NO;
 }
 
@@ -523,18 +487,21 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     for( i = 0; i < i_count; i++ )
     {
-        playlist_item_t * p_item;
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
+        id o_item = [o_outline_view itemAtRow: i_row];
+        playlist_item_t *p_item = [o_item pointerValue];
         [o_to_delete removeObject: o_number];
         [o_outline_view deselectRow: i_row];
 
-        p_item = (playlist_item_t *)[[o_outline_view itemAtRow: i_row] pointerValue];
-
-        if( p_item->i_children > -1 ) //is a node and not an item
+        if( [[o_outline_view dataSource] outlineView:o_outline_view
+                                        numberOfChildrenOfItem: o_item]  > 0 )
+        //is a node and not an item
         {
+            id o_playing_item = [o_outline_dict objectForKey:
+                [NSString stringWithFormat: @"%p", p_playlist->status.p_item]];
             if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
-                [self isItem: p_playlist->status.p_item inNode: p_item] == YES )
+                [self isValueItem: o_playing_item inNode: o_item] == YES )
             {
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
@@ -1059,14 +1026,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 {
     playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
-    playlist_item_t *p_item;
+
+    id o_playing_item;
 
     if( !p_playlist ) return;
 
-    p_item = (playlist_item_t *)[item pointerValue];
-    if( ( p_item == p_playlist->status.p_item ) ||
-            ( p_item->i_children != 0 &&
-            [self isItem: p_playlist->status.p_item inNode: p_item] ) )
+    o_playing_item = [o_outline_dict objectForKey:
+                [NSString stringWithFormat:@"%p",  p_playlist->status.p_item]];
+
+    if( [self isValueItem: o_playing_item inNode: item] ||
+                                                [o_playing_item isEqual: item] )
     {
         [cell setFont: [NSFont boldSystemFontOfSize: 0]];
     }
