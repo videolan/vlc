@@ -4,7 +4,8 @@
  * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
- * Authors: Cl�ment Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -585,7 +586,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
 {
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
-    char *psz_group, *psz_name, psz_uribuf[NI_MAXHOST], *psz_uri;
+    char *psz_group, *psz_name, psz_uribuf[48], *psz_uri;
     char ipv;
 
     psz_group = convert_to_utf8( p_sap, p_session->psz_group );
