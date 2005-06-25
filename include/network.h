@@ -125,7 +125,7 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
         char *p2;
 
         /* We have a host[:port] */
-        url->psz_host = psz_parse;
+        url->psz_host = strdup( psz_parse );
         if( p )
         {
             url->psz_host[p - psz_parse] = '\0';
@@ -176,6 +176,7 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
 static inline void vlc_UrlClean( vlc_url_t *url )
 {
     if( url->psz_buffer ) free( url->psz_buffer );
+    if( url->psz_host )   free( url->psz_host );
 
     url->psz_protocol = NULL;
     url->psz_username = NULL;
