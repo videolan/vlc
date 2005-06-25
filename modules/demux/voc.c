@@ -371,6 +371,7 @@ corrupt:
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
+#define SAMPLES_BUFFER 1000
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -388,8 +389,8 @@ static int Demux( demux_t *p_demux )
     {
         i = ( p_sys->i_block_end - i_offset )
             / p_sys->fmt.audio.i_bytes_per_frame;
-        if( i > 100)
-            i = 100;
+        if( i > SAMPLES_BUFFER )
+            i = SAMPLES_BUFFER;
 
         p_block = stream_Block( p_demux->s,
                                 p_sys->fmt.audio.i_bytes_per_frame * i );
@@ -402,8 +403,8 @@ static int Demux( demux_t *p_demux )
     else
     {   /* emulates silence from the stream */
         i = p_sys->i_silence_countdown;
-        if (i > 100 )
-            i = 100;
+        if( i > SAMPLES_BUFFER )
+            i = SAMPLES_BUFFER;
 
         p_block = block_New( p_demux, i );
         if( p_block == NULL )
