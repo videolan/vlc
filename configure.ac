@@ -4434,6 +4434,12 @@ AC_OUTPUT
 ${SHELL} ./config.status --file=vlc-config
 chmod 0755 vlc-config
 
+dnl echo "Enabled builtin modules :"
+dnl for a in `./vlc-config --target builtin` ; do echo $a; done | sed -e 's,modules\/\(.*\)\/lib\(.*\)\.a,\2 (\1),'
+
+dnl echo "Enabled plugin modules :"
+dnl for a in `./vlc-config --target plugin` ; do echo $a; done | sed -e 's,modules\/\(.*\)\/lib\(.*\)_plugin,\2 (\1),'
+
 printf "
 vlc configuration
 --------------------
