@@ -45,8 +45,8 @@ static void Close( vlc_object_t * );
 #define PROXY_TEXT N_("HTTP proxy")
 #define PROXY_LONGTEXT N_( \
     "You can specify an HTTP proxy to use. It must be of the form " \
-    "http://myproxy.mydomain:myport/. If none is specified, the HTTP_PROXY " \
-    "environment variable will be tried." )
+    "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
+    "if empty, the HTTP_PROXY environment variable will be tried." )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -237,7 +237,7 @@ static int Open( vlc_object_t *p_this )
     }
     if( !strncmp( p_access->psz_access, "https", 5 ) )
     {
-        /* SSL over HTTP */
+        /* HTTP over SSL */
         p_sys->b_ssl = VLC_TRUE;
         if( p_sys->url.i_port <= 0 )
             p_sys->url.i_port = 443;
@@ -261,7 +261,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef HAVE_GETENV
     else
     {
-        char *psz_proxy = getenv( "http_proxy" );
+        char *psz_proxy = getenv( "HTTP_PROXY" );
         if( psz_proxy && *psz_proxy )
         {
             p_sys->b_proxy = VLC_TRUE;
@@ -927,7 +927,7 @@ static int Request( access_t *p_access, int64_t i_tell )
                     "Range: bytes="I64Fd"-\r\n", i_tell );
     }
 
-    /* Authentification */
+    /* Authentication */
     if( p_sys->url.psz_username && *p_sys->url.psz_username )
     {
         char *buf;
@@ -941,6 +941,23 @@ static int Request( access_t *p_access, int64_t i_tell )
 
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Authorization: Basic %s\r\n", b64 );
+        free( b64 );
+    }
+
+    /* Proxy Authentication */
+    if( p_sys->proxy.psz_username && *p_sys->proxy.psz_username )
+    {
+        char *buf;
+        char *b64;
+
+        asprintf( &buf, "%s:%s", p_sys->proxy.psz_username,
+                   p_sys->proxy.psz_password ? p_sys->proxy.psz_password : "" );
+
+        b64 = vlc_b64_encode( buf );
+        free( buf );
+
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+                    "Proxy-Authorization: Basic %s\r\n", b64 );
         free( b64 );
     }
 
