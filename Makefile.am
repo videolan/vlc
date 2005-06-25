@@ -485,6 +485,12 @@ endif
 	  ln -s vlc "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
 
+# the opposite of install-{data,exec}-local
+uninstall-local:
+	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
+	  rm -f "$(DESTDIR)$(bindir)/$$i" ; \
+	fi ; done
+
 if HAVE_DARWIN
 # Create the MacOS X app
 vlc_app_DATA = VLC.app
