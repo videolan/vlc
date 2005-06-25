@@ -259,7 +259,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     char *psz_type = "application/sdp";
     int i_header_size;
     char *psz_head;
-    vlc_bool_t b_found = VLC_FALSE, b_ipv6;
+    vlc_bool_t b_found = VLC_FALSE, b_ipv6 = VLC_FALSE;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
 
@@ -335,8 +335,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         }
         else
         {
-            b_ipv6 = VLC_FALSE;
-
             /* See RFC2365 for IPv4 scopes */
             if( memcmp( psz_buf, "224.0.0.", 8 ) == 0 )
                 psz_addr = "224.0.0.255";
