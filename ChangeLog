@@ -1,4 +1,163 @@
 ------------------------------------------------------------------------
+r11539 | dionoea | 2005-06-25 15:31:08 +0200 (Sat, 25 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/modules/demux/playlist/b4s.c
+
+shoutcast genres fix by Jonas A. Larsen
+
+------------------------------------------------------------------------
+r11538 | fkuehne | 2005-06-25 15:15:01 +0200 (Sat, 25 Jun 2005) | 1 line
+Changed paths:
+   M /branches/0.8.2/po/da.po
+
+fix svn:keywords
+------------------------------------------------------------------------
+r11537 | fkuehne | 2005-06-25 15:12:16 +0200 (Sat, 25 Jun 2005) | 1 line
+Changed paths:
+   M /branches/0.8.2/po/da.po
+
+* Update to the Danish translation by Jonas Larsen
+------------------------------------------------------------------------
+r11534 | courmisch | 2005-06-25 15:00:59 +0200 (Sat, 25 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/modules/access/http.c
+
+back to http_proxy in lowercase
+
+------------------------------------------------------------------------
+r11532 | fkuehne | 2005-06-25 14:46:44 +0200 (Sat, 25 Jun 2005) | 1 line
+Changed paths:
+   M /branches/0.8.2/po/tr.po
+
+* update to the Turkish translation by Adem Gunes (1460 translated messages, 3 fuzzy translations, 1570 untranslated messages now)
+------------------------------------------------------------------------
+r11531 | hartman | 2005-06-25 14:14:42 +0200 (Sat, 25 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/po/nl.po
+
+* Dutch translation for as far as it is gonna get done. (non advanced options and GUI strings translated)
+
+------------------------------------------------------------------------
+r11530 | courmisch | 2005-06-25 13:20:53 +0200 (Sat, 25 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/modules/access/http.c
+
+Backport getenv bugfix from [11529]
+
+------------------------------------------------------------------------
+r11524 | dionoea | 2005-06-25 12:23:06 +0200 (Sat, 25 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/NEWS
+   M /branches/0.8.2/configure.ac
+   M /branches/0.8.2/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /branches/0.8.2/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+prepare release. We still need to update the Changelog
+
+------------------------------------------------------------------------
+r11522 | hartman | 2005-06-25 11:46:50 +0200 (Sat, 25 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/modules/demux/livedotcom.cpp
+
+* Change timeout on all RTSP transport protocols to 10secs. Apparently on VoD streams, this is not uncommon.
+
+------------------------------------------------------------------------
+r11517 | adn | 2005-06-25 01:48:56 +0200 (Sat, 25 Jun 2005) | 3 lines
+Changed paths:
+   M /branches/0.8.2/po/fr.po
+
+all translated: please check the diff and correct the strings (rc and
+                mosaic, especially) for next release.
+
+------------------------------------------------------------------------
+r11516 | dionoea | 2005-06-24 23:58:22 +0200 (Fri, 24 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/po/fr.po
+
+French translation (37 fuzzy and 65 untranslated). rels #143
+
+------------------------------------------------------------------------
+r11515 | gbazin | 2005-06-24 22:39:26 +0200 (Fri, 24 Jun 2005) | 1 line
+Changed paths:
+   M /branches/0.8.2/modules/codec/ffmpeg/video.c
+   M /branches/0.8.2/modules/demux/mp4/mp4.c
+
+* modules/codec/ffmpeg/video.c, modules/demux/mp4/mp4.c: backport 11229 to fix playback of some h264 streams.
+------------------------------------------------------------------------
+r11514 | hartman | 2005-06-24 22:14:28 +0200 (Fri, 24 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/extras/contrib/src/packages.mak
+   M /branches/0.8.2/modules/gui/macosx/playlist.m
+   M /branches/0.8.2/modules/video_output/opengl.c
+
+* backport of [11511] [11512] and [11513]
+
+------------------------------------------------------------------------
+r11510 | titer | 2005-06-24 01:15:44 +0200 (Fri, 24 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/src/libvlc.h
+
+ libvlc.h: compile fix (s/_N/N_/)
+
+------------------------------------------------------------------------
+r11508 | zorglub | 2005-06-23 20:58:12 +0200 (Thu, 23 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/modules/gui/wxwindows/preferences.cpp
+
+Backport [11507] to 0.8.2
+
+------------------------------------------------------------------------
+r11506 | fkuehne | 2005-06-23 20:03:26 +0200 (Thu, 23 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/configure.ac
+   M /branches/0.8.2/po/ru.po
+   M /branches/0.8.2/src/libvlc.h
+   M /branches/0.8.2/src/misc/darwin_specific.m
+
+* update to the Russian translation by Andrey Brilevskiy <andrey-brilevskiy@yandex.ru>
+* include ru in the builds again although it's far from being complete (685 translated messages, 716 fuzzy translations, 1632 untranslated messages)
+------------------------------------------------------------------------
+r11503 | hartman | 2005-06-23 17:14:36 +0200 (Thu, 23 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/modules/demux/livedotcom.cpp
+   M /branches/0.8.2/modules/demux/mkv.cpp
+   M /branches/0.8.2/modules/gui/macosx/playlist.m
+
+* backport of [11500] [11501] and [11502]
+
+------------------------------------------------------------------------
+r11499 | xtophe | 2005-06-23 10:36:46 +0200 (Thu, 23 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/share/http/index.html
+
+ckport of [11498]
+
+------------------------------------------------------------------------
+r11497 | dionoea | 2005-06-22 18:43:05 +0200 (Wed, 22 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/src/misc/vlm.c
+
+backport 11496
+
+------------------------------------------------------------------------
+r11495 | hartman | 2005-06-21 23:32:34 +0200 (Tue, 21 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/configure.ac
+
+* backport of [11494]
+
+------------------------------------------------------------------------
+r11493 | hartman | 2005-06-21 20:24:16 +0200 (Tue, 21 Jun 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.2/ChangeLog
+   M /branches/0.8.2/NEWS
+   M /branches/0.8.2/configure.ac
+   M /branches/0.8.2/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /branches/0.8.2/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* prepare 0.8.2-test3
+
+------------------------------------------------------------------------
 r11492 | hartman | 2005-06-21 20:19:16 +0200 (Tue, 21 Jun 2005) | 2 lines
 Changed paths:
    M /branches/0.8.2/modules/gui/macosx/playlist.m
