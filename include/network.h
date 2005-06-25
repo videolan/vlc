@@ -47,12 +47,16 @@ struct network_socket_t
 typedef struct
 {
     char *psz_protocol;
+    char *psz_username;
+    char *psz_password;
     char *psz_host;
     int  i_port;
 
     char *psz_path;
 
     char *psz_option;
+    
+    char *psz_buffer; /* to be freed */
 } vlc_url_t;
 
 /*****************************************************************************
@@ -60,35 +64,59 @@ typedef struct
  *****************************************************************************
  * option : if != 0 then path is split at this char
  *
- * format [protocol://][host[:port]]/path[OPTIONoption]
+ * format [protocol://[login[:password]@]][host[:port]]/path[OPTIONoption]
  *****************************************************************************/
-static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
+static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
+                                 char option )
 {
-    char *psz_dup = psz_url ? strdup( psz_url ) : 0;
-    char *psz_parse = psz_dup;
+    char *psz_dup;
+    char *psz_parse;
     char *p;
 
     url->psz_protocol = NULL;
+    url->psz_username = NULL;
+    url->psz_password = NULL;
     url->psz_host     = NULL;
     url->i_port       = 0;
     url->psz_path     = NULL;
     url->psz_option   = NULL;
+    
+    if( psz_url == NULL )
+    {
+        url->psz_buffer = NULL;
+        return;
+    }
+    url->psz_buffer = psz_parse = psz_dup = strdup( psz_url );
 
-    if( !psz_url ) return;
-
-    if( ( p  = strstr( psz_parse, ":/" ) ) )
+    p  = strstr( psz_parse, ":/" );
+    if( p != NULL )
     {
         /* we have a protocol */
 
         /* skip :// */
         *p++ = '\0';
-        if( p[0] == '/' && p[1] == '/' )
-        {
+        if( p[1] == '/' )
             p += 2;
-        }
-        url->psz_protocol = strdup( psz_dup );
+        url->psz_protocol = psz_parse;
 
         psz_parse = p;
+        p = strchr( psz_parse, '@' );
+        if( p != NULL )
+        {
+            /* We have a login */
+            url->psz_username = psz_parse;
+            *p++ = '\0';
+
+            psz_parse = strchr( psz_parse, ':' );
+            if( psz_parse != NULL )
+            {
+                /* We have a password */
+                *psz_parse++ = '\0';
+                url->psz_password = psz_parse;
+            }
+
+            psz_parse = p;
+        }
     }
 
     p = strchr( psz_parse, '/' );
@@ -97,7 +125,7 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
         char *p2;
 
         /* We have a host[:port] */
-        url->psz_host = strdup( psz_parse );
+        url->psz_host = psz_parse;
         if( p )
         {
             url->psz_host[p - psz_parse] = '\0';
@@ -127,18 +155,17 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
     /* Now parse psz_path and psz_option */
     if( psz_parse )
     {
-        url->psz_path = strdup( psz_parse );
+        url->psz_path = psz_parse;
         if( option != '\0' )
         {
             p = strchr( url->psz_path, option );
             if( p )
             {
                 *p++ = '\0';
-                url->psz_option = strdup( p );
+                url->psz_option = p;
             }
         }
     }
-    free( psz_dup );
 }
 
 /*****************************************************************************
@@ -148,16 +175,17 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
  *****************************************************************************/
 static inline void vlc_UrlClean( vlc_url_t *url )
 {
-    if( url->psz_protocol ) free( url->psz_protocol );
-    if( url->psz_host )     free( url->psz_host );
-    if( url->psz_path )     free( url->psz_path );
-    if( url->psz_option )   free( url->psz_option );
+    if( url->psz_buffer ) free( url->psz_buffer );
 
     url->psz_protocol = NULL;
+    url->psz_username = NULL;
+    url->psz_password = NULL;
     url->psz_host     = NULL;
     url->i_port       = 0;
     url->psz_path     = NULL;
     url->psz_option   = NULL;
+
+    url->psz_buffer   = NULL;
 }
 
 /*****************************************************************************
