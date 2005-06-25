@@ -6,6 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,14 +53,6 @@ static void Close( vlc_object_t * );
     "Allows you to modify the default caching value for http streams. This " \
     "value should be set in millisecond units." )
 
-#define USER_TEXT N_("HTTP user name")
-#define USER_LONGTEXT N_("Allows you to modify the user name that will " \
-    "be used for the connection (Basic authentication only).")
-
-#define PASS_TEXT N_("HTTP password")
-#define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
-    "used for the connection.")
-
 #define AGENT_TEXT N_("HTTP user agent")
 #define AGENT_LONGTEXT N_("Allows you to modify the user agent that will be " \
     "used for the connection.")
@@ -83,8 +76,6 @@ vlc_module_begin();
                 VLC_FALSE );
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_string( "http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT, VLC_FALSE );
-    add_string( "http-pwd", NULL , NULL, PASS_TEXT, PASS_LONGTEXT, VLC_FALSE );
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
                 AGENT_LONGTEXT, VLC_FALSE );
     add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,
@@ -111,8 +102,6 @@ struct access_sys_t
 
     /* From uri */
     vlc_url_t url;
-    char    *psz_user;
-    char    *psz_passwd;
     char    *psz_user_agent;
 
     /* Proxy */
@@ -153,8 +142,7 @@ static int Seek( access_t *, int64_t );
 static int Control( access_t *, int, va_list );
 
 /* */
-static void ParseURL( access_sys_t *, char *psz_url );
-static int  Connect( access_t *, int64_t );
+static int Connect( access_t *, int64_t );
 static int Request( access_t *p_access, int64_t i_tell );
 static void Disconnect( access_t * );
 
@@ -236,11 +224,11 @@ static int Open( vlc_object_t *p_this )
             return VLC_ENOMEM;
         }
 
-        ParseURL( p_sys, psz );
+        vlc_UrlParse( &p_sys->url, psz, 0 );
         free( psz );
     }
     else
-        ParseURL( p_sys, p_access->psz_path );
+        vlc_UrlParse( &p_sys->url, p_access->psz_path, 0 );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
@@ -258,11 +246,6 @@ static int Open( vlc_object_t *p_this )
     {
         if( p_sys->url.i_port <= 0 )
             p_sys->url.i_port = 80;
-    }
-    if( !p_sys->psz_user || *p_sys->psz_user == '\0' )
-    {
-        p_sys->psz_user = var_CreateGetString( p_access, "http-user" );
-        p_sys->psz_passwd = var_CreateGetString( p_access, "http-pwd" );
     }
 
     /* Do user agent */
@@ -308,10 +291,10 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_access, "      proxy %s:%d", p_sys->proxy.psz_host,
                  p_sys->proxy.i_port );
     }
-    if( p_sys->psz_user && *p_sys->psz_user )
+    if( p_sys->url.psz_username && *p_sys->url.psz_username )
     {
         msg_Dbg( p_access, "      user='%s', pwd='%s'",
-                 p_sys->psz_user, p_sys->psz_passwd );
+                 p_sys->url.psz_username, p_sys->url.psz_password );
     }
 
     p_sys->b_reconnect = var_CreateGetBool( p_access, "http-reconnect" );
@@ -366,8 +349,6 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
         if( p_sys->psz_location ) free( p_sys->psz_location );
         if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
-        if( p_sys->psz_user ) free( p_sys->psz_user );
-        if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
         Disconnect( p_access );
         free( p_sys );
@@ -433,8 +414,6 @@ error:
     if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
     if( p_sys->psz_location ) free( p_sys->psz_location );
     if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
-    if( p_sys->psz_user ) free( p_sys->psz_user );
-    if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
     Disconnect( p_access );
     free( p_sys );
@@ -451,9 +430,6 @@ static void Close( vlc_object_t *p_this )
 
     vlc_UrlClean( &p_sys->url );
     vlc_UrlClean( &p_sys->proxy );
-
-    if( p_sys->psz_user ) free( p_sys->psz_user );
-    if( p_sys->psz_passwd ) free( p_sys->psz_passwd );
 
     if( p_sys->psz_mime ) free( p_sys->psz_mime );
     if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
@@ -781,54 +757,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 }
 
 /*****************************************************************************
- * ParseURL: extract user:password
- *****************************************************************************/
-static void ParseURL( access_sys_t *p_sys, char *psz_url )
-{
-    char *psz_dup = strdup( psz_url );
-    char *p = psz_dup;
-    char *psz;
-
-    /* Syntax //[user:password]@<hostname>[:<port>][/<path>] */
-    while( *p == '/' )
-    {
-        p++;
-    }
-    psz = p;
-
-    /* Parse auth */
-    if( ( p = strchr( psz, '@' ) ) )
-    {
-        char *comma;
-
-        *p++ = '\0';
-        comma = strchr( psz, ':' );
-
-        /* Retreive user:password */
-        if( comma )
-        {
-            *comma++ = '\0';
-
-            p_sys->psz_user = strdup( psz );
-            p_sys->psz_passwd = strdup( comma );
-        }
-        else
-        {
-            p_sys->psz_user = strdup( psz );
-        }
-    }
-    else
-    {
-        p = psz;
-    }
-
-    /* Parse uri */
-    vlc_UrlParse( &p_sys->url, p, 0 );
-
-    free( psz_dup );
-}
-
-/*****************************************************************************
  * Connect:
  *****************************************************************************/
 static int Connect( access_t *p_access, int64_t i_tell )
@@ -1000,13 +928,13 @@ static int Request( access_t *p_access, int64_t i_tell )
     }
 
     /* Authentification */
-    if( p_sys->psz_user && *p_sys->psz_user )
+    if( p_sys->url.psz_username && *p_sys->url.psz_username )
     {
         char *buf;
         char *b64;
 
-        asprintf( &buf, "%s:%s", p_sys->psz_user,
-                   p_sys->psz_passwd ? p_sys->psz_passwd : "" );
+        asprintf( &buf, "%s:%s", p_sys->url.psz_username,
+                   p_sys->url.psz_password ? p_sys->url.psz_password : "" );
 
         b64 = vlc_b64_encode( buf );
         free( buf );
