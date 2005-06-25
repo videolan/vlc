@@ -103,6 +103,12 @@ C: tcastley
 D: BeOS interface, BeOS Video
 S: Australia
 
+N: Antoine Cellerier
+E: dionoea@videolan.org
+C: dionoea
+D: mosaic
+S: France
+
 N: Renaud Dartus
 E: reno@via.ecp.fr
 C: reno
@@ -115,6 +121,13 @@ C: asmax
 D: Audio output
 D: skins module (X11 port)
 D: skins2 module (core and X11 port)
+S: France
+
+N: Rémi Denis-Courmont
+E: rem#videolan.org
+C: courmisch
+D: SSL/TLS support (core, HTTP server, HTTP input)
+D: VOC files demultiplexer
 S: France
 
 N: Colin Delacroix
@@ -150,6 +163,12 @@ N: Andrew Flintham
 E: amf@cus.org.uk
 D: text subtitler and font scripts
 S: United Kingdom
+
+N: Damien Fouilleul
+E: Damien.Fouilleul@laposte.net
+C: Quovodis
+D: ActiveX control
+S: Germany
 
 N: Alexis Guillard
 E: alexis.guillard@bt.com
@@ -335,23 +354,4 @@ C: ipkiss
 D: Win32 interface
 D: skins module (core and win32 port)
 D: skins2 module (core and win32 port)
-S: France
-
-N: Rémi Denis-Courmont
-E: rem#videolan.org
-C: courmisch
-D: SSL/TLS support (core, HTTP server, HTTP input)
-D: VOC files demultiplexer
-S: France
-
-N: Damien Fouilleul
-E: Damien.Fouilleul@laposte.net
-C: Quovodis
-D: ActiveX control
-S: Germany
-
-N: Antoine Cellerier
-E: dionoea@videolan.org
-C: dionoea
-D: mosaic
 S: France
