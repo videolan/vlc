@@ -46,7 +46,7 @@ static void Close( vlc_object_t * );
 #define PROXY_LONGTEXT N_( \
     "You can specify an HTTP proxy to use. It must be of the form " \
     "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
-    "if empty, the HTTP_PROXY environment variable will be tried." )
+    "if empty, the http_proxy environment variable will be tried." )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
