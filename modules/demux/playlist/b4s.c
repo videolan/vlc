@@ -48,6 +48,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
+static char *get_next_token(char *cur_string);
 static int IsWhitespace( char *psz_string );
 static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
                           playlist_item_t *p_bitrate, playlist_item_t *p_item,
@@ -360,8 +361,22 @@ static int Demux( demux_t *p_demux )
                     vlc_input_item_CopyOptions( &p_current->input,
                                                 &p_item->input );
                     if( b_shoutcast )
-                        ShoutcastAdd( p_playlist, p_genre, p_bitrate, p_item,
-                                      psz_genre, psz_bitrate );
+					{
+						char *psz_genreToken;
+						char *psz_otherToken;
+
+
+						psz_genreToken = psz_genre;
+
+						while ( psz_genreToken && ( psz_otherToken = get_next_token(psz_genreToken )))
+						{
+							ShoutcastAdd( p_playlist, p_genre, p_bitrate, p_item,
+                                      psz_genreToken, psz_bitrate );
+
+							psz_genreToken = psz_otherToken;
+						}
+					}
+
 #define FREE(a) if( a ) free( a ); a = NULL;
                     FREE( psz_name );
                     FREE( psz_mrl );
@@ -408,6 +423,14 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     return VLC_EGENERIC;
+}
+
+static char *get_next_token(char *cur_string) {
+        while (*cur_string && !isspace(*cur_string)) cur_string++;
+        if (!*cur_string) return NULL;
+        *cur_string++ = '\0';
+        while (*cur_string && isspace(*cur_string)) cur_string++;
+        return cur_string;
 }
 
 static int IsWhitespace( char *psz_string )
