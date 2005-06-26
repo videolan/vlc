@@ -660,7 +660,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
             {
                 int i_ret;
 
-                i_ret = ws2_getaddrinfo( psz_node, service, &hints, res );
+                i_ret = ws2_getaddrinfo( psz_node, psz_service, &hints, res );
                 FreeLibrary( wship6_module ); /* is this wise ? */
                 return i_ret;
             }
@@ -681,7 +681,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     var_Get( p_this->p_libvlc, "getaddrinfo_mutex", &lock );
     vlc_mutex_lock( lock.p_address );
 
-    i_ret = __getaddrinfo( psz_node, service, &hints, res );
+    i_ret = __getaddrinfo( psz_node, psz_service, &hints, res );
     vlc_mutex_unlock( lock.p_address );
     return i_ret;
 }
