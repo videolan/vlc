@@ -85,11 +85,9 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 {
     struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
-    char            *psz_realport, *psz_socks;
-    int             i_val, i_handle = -1;
+    char            *psz_socks;
+    int             i_realport, i_val, i_handle = -1;
 
-    if( ( i_port < 0 ) || ( i_port > 65535 ) )
-        return -1; /* I don't expect the next TCP version shortly */
     if( i_port == 0 )
         i_port = 80; /* historical VLC thing */
 
@@ -105,33 +103,25 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             *psz++ = '\0';
 
         psz_realhost = psz_socks;
-        psz_realport = strdup( ( psz != NULL ) ? psz : "1080" );
+        i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
 
-        msg_Dbg( p_this, "net: connecting to '%s:%s' for '%s:%d'",
-                 psz_realhost, psz_realport, psz_host, i_port );
+        msg_Dbg( p_this, "net: connecting to '%s:%d' for '%s:%d'",
+                 psz_realhost, i_realport, psz_host, i_port );
     }
     else
     {
         psz_realhost = psz_host;
-        psz_realport = malloc( 6 );
-        if( psz_realport == NULL )
-        {
-            free( psz_socks );
-            return -1;
-        }
+        i_realport = i_port;
 
-        sprintf( psz_realport, "%d", i_port );
-        msg_Dbg( p_this, "net: connecting to '%s:%s'", psz_realhost,
-                 psz_realport );
+        msg_Dbg( p_this, "net: connecting to '%s:%d'", psz_realhost,
+                 i_realport );
     }
 
-    i_val = vlc_getaddrinfo( p_this, psz_realhost, psz_realport, &hints,
-                             &res );
-    free( psz_realport );
+    i_val = vlc_getaddrinfo( p_this, psz_realhost, i_realport, &hints, &res );
     if( i_val )
     {
-        msg_Err( p_this, "cannot resolve '%s' : %s", psz_realhost,
-                 vlc_gai_strerror( i_val ) );
+        msg_Err( p_this, "cannot resolve '%s:%d' : %s", psz_realhost,
+                 i_realport, vlc_gai_strerror( i_val ) );
         free( psz_socks );
         return -1;
     }
@@ -322,29 +312,17 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 {
     struct addrinfo hints, *res, *ptr;
     int             i_val, *pi_handles, i_size;
-    char            *psz_port;
-
-    if( ( i_port < 0 ) || ( i_port > 65535 ) )
-        return NULL; /* I don't expect the next TCP version shortly */
-    if( i_port == 0 )
-        i_port = 80; /* historical VLC thing */
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    psz_port = malloc( 6 );
-    if( psz_port == NULL )
-        return NULL;
+    msg_Dbg( p_this, "net: listening to '%s:%d'", psz_host, i_port );
 
-    sprintf( psz_port, "%d", i_port );
-    msg_Dbg( p_this, "net: listening to '%s:%s'", psz_host, psz_port );
-
-    i_val = vlc_getaddrinfo( p_this, psz_host, psz_port, &hints, &res );
-    free( psz_port );
+    i_val = vlc_getaddrinfo( p_this, psz_host, i_port, &hints, &res );
     if( i_val )
     {
-        msg_Err( p_this, "cannot resolve '%s' : %s", psz_host,
+        msg_Err( p_this, "cannot resolve '%s:%d' : %s", psz_host, i_port,
                  vlc_gai_strerror( i_val ) );
         return NULL;
     }
@@ -1110,7 +1088,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
         /* v4 only support ipv4 */
         hints.ai_family = PF_INET;
-        if( vlc_getaddrinfo( p_obj, psz_host, NULL, &hints, &p_res ) )
+        if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
             return VLC_EGENERIC;
 
         buffer[0] = i_socks_version;

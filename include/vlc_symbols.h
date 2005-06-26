@@ -366,8 +366,8 @@ struct module_symbols_t
     void (*vout_SynchroEnd_inner) (vout_synchro_t *, int, vlc_bool_t);
     mtime_t (*vout_SynchroDate_inner) (vout_synchro_t *);
     void (*vout_SynchroNewPicture_inner) (vout_synchro_t *, int, int, mtime_t, mtime_t, int, vlc_bool_t);
-    int (*vlc_getaddrinfo_inner) (vlc_object_t *, const char *, const char *, const struct addrinfo *, struct addrinfo **);
-    int (*vlc_getnameinfo_inner) (vlc_object_t *, const struct sockaddr *, int, char *, int, char *, int, int);
+    int (*vlc_getaddrinfo_inner) (vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo **);
+    int (*vlc_getnameinfo_inner) (vlc_object_t *, const struct sockaddr *, int, char *, int, int *, int);
     void (*InitMD5_inner) (struct md5_s *);
     void (*EndMD5_inner) (struct md5_s *);
     void (*vlc_freeaddrinfo_inner) (struct addrinfo *);

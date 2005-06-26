@@ -494,8 +494,22 @@ __getaddrinfo (const char *node, const char *service,
 
 
 int vlc_getnameinfo( vlc_object_t *p_this, const struct sockaddr *sa, int salen,
-                     char *host, int hostlen, char *serv, int servlen, int flags )
+                     char *host, int hostlen, int *portnum, int flags )
 {
+    char psz_servbuf[6], *psz_serv;
+    int i_servlen, i_val;
+
+    flags |= NI_NUMERICSERV;
+    if( portnum != NULL )
+    {
+        psz_serv = psz_servbuf;
+        i_servlen = sizeof( psz_servbuf );
+    }
+    else
+    {
+        psz_serv = NULL;
+        i_servlen = 0;
+    }
 #ifdef WIN32
     /*
      * Here is the kind of kludge you need to keep binary compatibility among
@@ -514,11 +528,12 @@ int vlc_getnameinfo( vlc_object_t *p_this, const struct sockaddr *sa, int salen,
 
         if( ws2_getnameinfo != NULL )
         {
-            int i_val;
-
-            i_val = ws2_getnameinfo( sa, salen, host, hostlen, serv, servlen,
-                                     flags );
+            i_val = ws2_getnameinfo( sa, salen, host, hostlen, psz_serv,
+                                     i_servlen, flags );
             FreeLibrary( wship6_module );
+
+            if( portnum != NULL )
+                *portnum = atoi( psz_serv );
             return i_val;
         }
             
@@ -526,33 +541,51 @@ int vlc_getnameinfo( vlc_object_t *p_this, const struct sockaddr *sa, int salen,
     }
 #endif
 #if HAVE_GETNAMEINFO
-    return getnameinfo( sa, salen, host, hostlen, serv, servlen, flags );
+    i_val = getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
+                         flags );
 #else
-{
-    vlc_value_t lock;
-    int i_val;
-
-    /* my getnameinfo implementation is not thread-safe as it uses
-     * gethostbyaddr and the likes */
-    var_Create( p_this->p_libvlc, "getnameinfo_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "getnameinfo_mutex", &lock );
-    vlc_mutex_lock( lock.p_address );
-
-    i_val = __getnameinfo( sa, salen, host, hostlen, serv, servlen, flags );
-    vlc_mutex_unlock( lock.p_address );
-    return i_val;
-}
+    {
+        vlc_value_t lock;
+    
+        /* my getnameinfo implementation is not thread-safe as it uses
+        * gethostbyaddr and the likes */
+        var_Create( p_this->p_libvlc, "getnameinfo_mutex", VLC_VAR_MUTEX );
+        var_Get( p_this->p_libvlc, "getnameinfo_mutex", &lock );
+        vlc_mutex_lock( lock.p_address );
+    
+        i_val = __getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
+                               flags );
+        vlc_mutex_unlock( lock.p_address );
+    }
 #endif
+
+    if( portnum != NULL )
+        *portnum = atoi( psz_serv );
+
+    return i_val;
 }
 
 
 /* TODO: support for setting sin6_scope_id */
 int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
-                     const char *service, const struct addrinfo *p_hints,
+                     int i_port, const struct addrinfo *p_hints,
                      struct addrinfo **res )
 {
     struct addrinfo hints;
-    char psz_buf[NI_MAXHOST], *psz_node;
+    char psz_buf[NI_MAXHOST], *psz_node, psz_service[6];
+
+    /*
+     * In VLC, we always use port number as integer rather than strings
+     * for historical reasons (and portability).
+     */
+    if( ( i_port > 65535 ) || ( i_port < 0 ) )
+    {
+        msg_Err( p_this, "invalid port number %d specified", i_port );
+        return EAI_SERVICE;
+    }
+
+    /* cannot overflow */
+    snprintf( psz_service, 6, "%d", i_port );
 
     /* Check if we have to force ipv4 or ipv6 */
     if( p_hints == NULL )
@@ -585,8 +618,6 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     if( ( node == NULL ) || (node[0] == '\0' ) )
     {
         psz_node = NULL;
-        if( service == NULL )
-            service = "";
     }
     else
     {
@@ -607,10 +638,6 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
             }
         }
     }
-
-    if( ( service != NULL ) && ( *service == '\0' ) )
-        /* We could put NULL, but you can't have both node and service NULL */
-        service = "0";
 
 #ifdef WIN32
     {
@@ -640,7 +667,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
 #endif
 #if HAVE_GETADDRINFO
-    return getaddrinfo( psz_node, service, &hints, res );
+    return getaddrinfo( psz_node, psz_service, &hints, res );
 #else
 {
     int i_ret;

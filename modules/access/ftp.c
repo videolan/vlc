@@ -240,7 +240,7 @@ static int Open( vlc_object_t *p_this )
 
     if( ftp_ReadCommand( p_access, &i_answer, NULL ) == 2 )
     {
-        char hostaddr[NI_MAXHOST];
+        char hostaddr[NI_MAXNUMERICHOST];
         struct sockaddr_storage addr;
         socklen_t len = sizeof (addr);
 
@@ -251,7 +251,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         i_answer = vlc_getnameinfo( p_this, (struct sockaddr *)&addr, len,
-                                    hostaddr, sizeof( hostaddr ), NULL, 0,
+                                    hostaddr, sizeof( hostaddr ), NULL,
                                     NI_NUMERICHOST );
         if( i_answer )
         {

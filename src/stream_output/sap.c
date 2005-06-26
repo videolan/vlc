@@ -295,12 +295,12 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_flags = AI_NUMERICHOST;
 
-        i = vlc_getaddrinfo( (vlc_object_t *)p_sap, p_session->psz_uri, NULL,
+        i = vlc_getaddrinfo( (vlc_object_t *)p_sap, p_session->psz_uri, 0,
                              &hints, &res );
         if( i == 0 )
             i = vlc_getnameinfo( (vlc_object_t *)p_sap, res->ai_addr,
                                  res->ai_addrlen, psz_buf, sizeof( psz_buf ),
-                                 NULL, 0, NI_NUMERICHOST );
+                                 NULL, NI_NUMERICHOST );
         if( i )
         {
             msg_Err( p_sap, "Invalid URI for SAP announce : %s : %s",
@@ -584,7 +584,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
 {
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
-    char *psz_group, *psz_name, psz_uribuf[48], *psz_uri;
+    char *psz_group, *psz_name, psz_uribuf[NI_MAXNUMERICHOST], *psz_uri;
     char ipv;
 
     psz_group = convert_to_utf8( p_sap, p_session->psz_group );

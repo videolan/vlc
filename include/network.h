@@ -388,6 +388,7 @@ VLC_EXPORT( int, __net_CheckIP, ( vlc_object_t *p_this, char *psz_ip, char **pps
 #  define NI_MAXHOST 1025
 #  define NI_MAXSERV 32
 # endif
+# define NI_MAXNUMERICHOST 48
 
 # ifndef NI_NUMERICHOST
 #  define NI_NUMERICHOST 0x01
@@ -421,8 +422,8 @@ struct addrinfo
 # endif
 
 VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );
-VLC_EXPORT( int, vlc_getnameinfo, ( vlc_object_t *, const struct sockaddr *, int, char *, int, char *, int, int ) );
-VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, const char *, const struct addrinfo *, struct addrinfo ** ) );
+VLC_EXPORT( int, vlc_getnameinfo, ( vlc_object_t *, const struct sockaddr *, int, char *, int, int *, int ) );
+VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );
 VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 
 #endif
