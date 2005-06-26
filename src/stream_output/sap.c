@@ -278,7 +278,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     if( p_method->psz_address == NULL )
     {
         /* Determine SAP multicast address automatically */
-        char psz_buf[NI_MAXHOST], *ptr;
+        char psz_buf[NI_MAXNUMERICHOST], *ptr;
         const char *psz_addr;
         struct addrinfo hints, *res;
 
