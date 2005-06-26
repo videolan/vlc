@@ -31,6 +31,10 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
+#if !defined (SYS_DARWIN) && !defined(WIN32)
+# define LOADER 1
+#endif
+
 #ifdef SYS_DARWIN
 #include <QuickTime/QuickTimeComponents.h>
 #include <QuickTime/Movies.h>
@@ -39,9 +43,9 @@
 
 /* for windows do we require Quicktime compents header? */
 #ifdef LOADER
-#include "w32dll/loader/qtx/qtxsdk/components.h"
-#include "w32dll/loader/wine/windef.h"
-#include "w32dll/loader/ldt_keeper.h"
+#include "qtx/qtxsdk/components.h"
+#include "wine/windef.h"
+#include "ldt_keeper.h"
 
 HMODULE   WINAPI LoadLibraryA(LPCSTR);
 FARPROC   WINAPI GetProcAddress(HMODULE,LPCSTR);
