@@ -1337,28 +1337,8 @@ char* httpd_ClientIP( httpd_client_t *cl )
     char *psz_ip;
 
     psz_ip = (char *)malloc( NI_MAXNUMERICHOST + 2 );
-#ifdef HAVE_GETNAMEINFO /* FIXME not very good check */
-    if( (cl->sock.ss_family == AF_INET6) &&
-        IN6_IS_ADDR_V4MAPPED( &((const struct sockaddr_in6 *)
-                              &cl->sock)->sin6_addr) )
-    {
-        /* If client is using IPv4 but server is using IPv6 */
-        struct sockaddr_in a;
-        
-        memset( &a, 0, sizeof( a ) );
-        a.sin_family = AF_INET;
-        a.sin_port = ((const struct sockaddr_in6 *)&cl->sock)->sin6_port;
-        a.sin_addr.s_addr = ((const uint32_t *)&((const struct sockaddr_in6 *)
-                            &cl->sock)->sin6_addr)[3];
-        i = vlc_getnameinfo( (const struct sockaddr *)&a, sizeof( a ),
-                             psz_ip + 1, NI_MAXNUMERICHOST, NULL,
-                             NI_NUMERICHOST );
-    }
-    else
-#endif
-        i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock,
-                             cl->i_sock_size, psz_ip + 1, NI_MAXNUMERICHOST,
-                             NULL, NI_NUMERICHOST );
+    i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
+                         psz_ip+1, NI_MAXNUMERICHOST, NULL, NI_NUMERICHOST );
 
     if( i != 0 )
         return NULL;
