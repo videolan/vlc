@@ -1,6 +1,6 @@
 diff -ruN x264.orig/Makefile x264/Makefile
 --- x264.orig/Makefile	Mon May 30 21:47:02 2005
-+++ x264/Makefile	Fri Jun 10 00:43:31 2005
++++ x264/Makefile	Sun Jun 26 03:09:05 2005
 @@ -40,7 +40,7 @@
  OBJS = $(SRCS:%.c=%.o)
  DEP  = depend
@@ -32,3 +32,17 @@ diff -ruN x264.orig/Makefile x264/Makefile
  
  etags: TAGS
  
+diff -ruN x264.orig/encoder/ratecontrol.c x264/encoder/ratecontrol.c
+--- x264.orig/encoder/ratecontrol.c	Sun Jun  5 13:07:28 2005
++++ x264/encoder/ratecontrol.c	Sun Jun 26 03:09:52 2005
+@@ -37,8 +37,9 @@
+ #include "common/macroblock.h"
+ #include "ratecontrol.h"
+ 
+-#if defined(SYS_FREEBSD) || defined(SYS_BEOS)
++#if defined(SYS_FREEBSD) || defined(SYS_BEOS) || defined(SYS_MACOSX)
+ #define exp2f(x) powf( 2, (x) )
++#define sqrtf sqrt
+ #endif
+ #ifdef _MSC_VER
+ #define exp2f(x) pow( 2, (x) )
