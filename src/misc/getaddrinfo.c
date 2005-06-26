@@ -552,7 +552,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
          * gethostbyaddr and the likes */
         vlc_mutex_lock( lock.p_address );
 #else
-# warning FIXME : This is not thread-safe! Your platform is outdated.
+# warning FIXME : This is not thread-safe!
 #endif
         i_val = __getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
                                flags );
