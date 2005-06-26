@@ -354,6 +354,20 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
                     sizeof( i_val ) );
 
+#ifdef IPV6_V6ONLY
+        /*
+         * Accepts only IPv6 connections on IPv6 sockets
+         * (and open an IPv4 socket later as well if needed).
+         * Only Linux and FreeBSD can map IPv4 connections on IPv6 sockets,
+         * so this allows for more uniform handling across platforms. Besides,
+         * it makes sure that IPv4 addresses will be printed as w.x.y.z rather
+         * than ::ffff:w.x.y.z
+         */
+        if( ptr->ai_family == PF_INET6 )
+            setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&i_val,
+                        sizeof( i_val ) );
+#endif
+
 #if defined( WIN32 ) || defined( UNDER_CE )
 # ifdef IPV6_PROTECTION_LEVEL
         if( ptr->ai_family == PF_INET6 )
