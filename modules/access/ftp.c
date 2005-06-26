@@ -250,9 +250,8 @@ static int Open( vlc_object_t *p_this )
             goto exit_error;
         }
 
-        i_answer = vlc_getnameinfo( p_this, (struct sockaddr *)&addr, len,
-                                    hostaddr, sizeof( hostaddr ), NULL,
-                                    NI_NUMERICHOST );
+        i_answer = vlc_getnameinfo( (struct sockaddr *)&addr, len, hostaddr,
+                                    sizeof( hostaddr ), NULL, NI_NUMERICHOST );
         if( i_answer )
         {
             msg_Err( p_access, "getnameinfo failed: %s",

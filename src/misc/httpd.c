@@ -1331,15 +1331,13 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
     cl->i_mode   = HTTPD_CLIENT_BIDIR;
 }
 
-/*
- * FIXME: use vlc_getnameinfo
- */
 char* httpd_ClientIP( httpd_client_t *cl )
 {
-#ifdef HAVE_GETNAMEINFO
-    char sz_ip[INET6_ADDRSTRLEN + 2];
     int i;
+    char *psz_ip;
 
+    psz_ip = (char *)malloc( NI_MAXNUMERICHOST + 2 );
+#ifdef HAVE_GETNAMEINFO /* FIXME not very good check */
     if( (cl->sock.ss_family == AF_INET6) &&
         IN6_IS_ADDR_V4MAPPED( &((const struct sockaddr_in6 *)
                               &cl->sock)->sin6_addr) )
@@ -1352,34 +1350,31 @@ char* httpd_ClientIP( httpd_client_t *cl )
         a.sin_port = ((const struct sockaddr_in6 *)&cl->sock)->sin6_port;
         a.sin_addr.s_addr = ((const uint32_t *)&((const struct sockaddr_in6 *)
                             &cl->sock)->sin6_addr)[3];
-        i = getnameinfo( (const struct sockaddr *)&a, sizeof( a ),
-                         &sz_ip[1], INET6_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST );
+        i = vlc_getnameinfo( (const struct sockaddr *)&a, sizeof( a ),
+                             psz_ip + 1, NI_MAXNUMERICHOST, NULL,
+                             NI_NUMERICHOST );
     }
     else
-        i = getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
-                         &sz_ip[1], INET6_ADDRSTRLEN, NULL, 0,
-                         NI_NUMERICHOST );
+#endif
+        i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock,
+                             cl->i_sock_size, psz_ip + 1, NI_MAXNUMERICHOST,
+                             NULL, NI_NUMERICHOST );
 
     if( i != 0 )
-        /* FIXME: msg_Err */
         return NULL;
-        
-    if( strchr( &sz_ip[1], ':' ) != NULL )
+
+    /* semi-colon in address => must add bracket for HTTP */        
+    if( strchr( psz_ip + 1, ':' ) != NULL )
     {
-        *sz_ip = '[';
-        i = strlen( sz_ip );
-        sz_ip[i++] = ']';
-        sz_ip[i] = '\0';
-       
-        return strdup( sz_ip );
+        psz_ip[0] = '[';
+        i = strlen( psz_ip );
+        psz_ip[i++] = ']';
+        psz_ip[i] = '\0';
+
+        return psz_ip;
     }
     
-    return strdup( &sz_ip[1] );
-
-#else
-    /* FIXME not thread safe */
-    return strdup( inet_ntoa( ((const struct sockaddr_in *)&cl->sock)->sin_addr ) );
-#endif
+    return psz_ip + 1;
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
@@ -1961,14 +1956,6 @@ static void httpd_HostThread( httpd_host_t *host )
                   ( cl->i_activity_timeout > 0 &&
                     cl->i_activity_date+cl->i_activity_timeout < mdate()) ) ) )
             {
-                char *ip;
-
-                // FIXME: it sucks to allocate memory on the stack for debug
-                ip = httpd_ClientIP( cl );
-                msg_Dbg( host, "connection closed(%s)",
-                         (ip != NULL) ? ip : "unknown" );
-                free( ip );
-
                 httpd_ClientClean( cl );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
@@ -2392,7 +2379,6 @@ static void httpd_HostThread( httpd_host_t *host )
                     
                     if( fd >= 0 )
                     {
-                        char *ip;
                         httpd_client_t *cl;
     
                         cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
@@ -2403,13 +2389,6 @@ static void httpd_HostThread( httpd_host_t *host )
     
                         if( i_state != 0 )
                             cl->i_state = i_state; // override state for TLS
-    
-                        // FIXME: it sucks to allocate memory for debug
-                        ip = httpd_ClientIP( cl );
-                        msg_Dbg( host, "new connection (%s)",
-                                ip != NULL ? ip : "unknown" );
-                        if( ip != NULL )
-                            free( ip );
                     }
                 }
             }

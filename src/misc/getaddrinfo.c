@@ -493,7 +493,7 @@ __getaddrinfo (const char *node, const char *service,
 #endif /* if !HAVE_GETADDRINFO */
 
 
-int vlc_getnameinfo( vlc_object_t *p_this, const struct sockaddr *sa, int salen,
+int vlc_getnameinfo( const struct sockaddr *sa, int salen,
                      char *host, int hostlen, int *portnum, int flags )
 {
     char psz_servbuf[6], *psz_serv;
@@ -545,17 +545,20 @@ int vlc_getnameinfo( vlc_object_t *p_this, const struct sockaddr *sa, int salen,
                          flags );
 #else
     {
-        vlc_value_t lock;
+# ifdef HAVE_USABLE_MUTEX_THAT_DONT_NEED_LIBVLC_POINTER
+        static vlc_value_t lock;
     
         /* my getnameinfo implementation is not thread-safe as it uses
-        * gethostbyaddr and the likes */
-        var_Create( p_this->p_libvlc, "getnameinfo_mutex", VLC_VAR_MUTEX );
-        var_Get( p_this->p_libvlc, "getnameinfo_mutex", &lock );
+         * gethostbyaddr and the likes */
         vlc_mutex_lock( lock.p_address );
-    
+#else
+# warning FIXME : This is not thread-safe! Your platform is outdated.
+#endif
         i_val = __getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
                                flags );
+# ifdef HAVE_USABLE_MUTEX_THAT_DONT_NEED_LIBVLC_POINTER
         vlc_mutex_unlock( lock.p_address );
+# endif
     }
 #endif
 

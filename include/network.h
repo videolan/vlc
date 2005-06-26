@@ -422,7 +422,7 @@ struct addrinfo
 # endif
 
 VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );
-VLC_EXPORT( int, vlc_getnameinfo, ( vlc_object_t *, const struct sockaddr *, int, char *, int, int *, int ) );
+VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, int *, int ) );
 VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );
 VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 
