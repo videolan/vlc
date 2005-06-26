@@ -93,6 +93,10 @@
     IBOutlet id o_t7_txt_saveFileTo;
     IBOutlet id o_tab_pageHolder;
     IBOutlet id o_wizard_window;
+	IBOutlet id o_wizardhelp_window;
+	IBOutlet id o_wh_txt_title;
+	IBOutlet id o_wh_txt_text;
+	IBOutlet id o_wh_btn_okay;
 }
 - (IBAction)cancelRun:(id)sender;
 - (IBAction)nextTab:(id)sender;
@@ -111,6 +115,7 @@
 - (IBAction)t6_mrInfo_ttl:(id)sender;
 - (IBAction)t6_mrInfo_sap:(id)sender;
 - (IBAction)t7_selectTrnscdDestFile:(id)sender;
+- (IBAction)wh_closeSheet:(id)sender;
 
 + (VLCWizard *)sharedInstance;
 - (void)showWizard;

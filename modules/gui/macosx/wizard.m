@@ -26,7 +26,13 @@
  * Note: this code is based upon ../wxwindows/wizard.cpp,
  *       written by Clément Stenac.
  *****************************************************************************/ 
- 
+
+/* TODO:
+    - implementation of the logic, i.e. handling of the collected values, respective manipulation of the GUI, start of the stream
+    - move some arrays to an external header file
+    - some GUI things (e.g. radio buttons on page 2, etc. - see FIXMEs)
+    - l10n string fixes (both in OSX and WX) */
+
  
 /*****************************************************************************
  * Preamble
@@ -63,6 +69,8 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* some minor cleanup */
     [o_t2_tbl_plst setEnabled:NO];
+	[o_wizardhelp_window setExcludedFromWindowsMenu:YES];
+	
 
     /* FIXME: make the both arrays global */
 
@@ -170,6 +178,9 @@ static VLCWizard *_o_sharedInstance = nil;
                               "additionnal parameters for your transcoding.")];
     [o_t7_txt_saveFileTo setStringValue: _NS("Select the file to save to")];
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
+	
+	/* wizard help window */
+	[o_wh_btn_okay setTitle: _NS("OK")];
 }
 
 - (IBAction)cancelRun:(id)sender
@@ -191,12 +202,31 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (IBAction)t1_mrInfo_streaming:(id)sender
 {
-    /* show a simple notify sheet for the help */
+    /* show a sheet for the help */
+	/* since NSAlert does not exist on OSX < 10.3, we use our own implementation */
+	[o_wh_txt_title setStringValue: _NS("Stream to network")];
+	[o_wh_txt_text setStringValue: _NS("Use this to stream on a network.")];
+	[NSApp beginSheet: o_wizardhelp_window
+            modalForWindow: o_wizard_window
+            modalDelegate: o_wizardhelp_window
+            didEndSelector: nil
+            contextInfo: nil];
 }
 
 - (IBAction)t1_mrInfo_transcode:(id)sender
 {
-    /* show a simple notify sheet for the help */
+    /* show a sheet for the help */
+	[o_wh_txt_title setStringValue: _NS("Transcode/Save to file")];
+	[o_wh_txt_text setStringValue: _NS("Use this to save a stream to a file. You "\
+			"have the possibility to reencode the stream. You can save whatever "\
+			"VLC can read.\nPlease notice that VLC is not very suited " \
+			"for file to file transcoding. You should use its transcoding " \
+            "features to save network streams, for example.")];
+	[NSApp beginSheet: o_wizardhelp_window
+            modalForWindow: o_wizard_window
+            modalDelegate: o_wizardhelp_window
+            didEndSelector: nil
+            contextInfo: nil];
 }
 
 - (IBAction)t2_addNewStream:(id)sender
@@ -290,12 +320,34 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (IBAction)t6_mrInfo_ttl:(id)sender
 {
-    /* show a simple notify sheet for the help */
+    /* show a sheet for the help */
+	[o_wh_txt_title setStringValue: _NS("Time-To-Live (TTL)")];
+	[o_wh_txt_text setStringValue: _NS("Define the TTL (Time-To-Live) of the stream. "\
+			"This parameter is the maximum number of routers your stream can go "
+			"through. If you don't know what it means, or if you want to stream on " \
+			"your local network only, leave this setting to 1.")];
+	[NSApp beginSheet: o_wizardhelp_window
+            modalForWindow: o_wizard_window
+            modalDelegate: o_wizardhelp_window
+            didEndSelector: nil
+            contextInfo: nil];
 }
 
 - (IBAction)t6_mrInfo_sap:(id)sender
 {
-    /* show a simple notify sheet for the help */
+    /* show a sheet for the help */
+	[o_wh_txt_title setStringValue: _NS("SAP Announce")];
+	[o_wh_txt_text setStringValue: _NS("When streaming using UDP, you can " \
+		"announce your streams using the SAP/SDP announcing protocol. This " \
+		"way, the clients won't have to type in the multicast address, it " \
+		"will appear in their playlist if they enable the SAP extra interface.\n" \
+		"If you want to give a name to your stream, enter it here, " \
+		"else, a default name will be used.")];
+	[NSApp beginSheet: o_wizardhelp_window
+            modalForWindow: o_wizard_window
+            modalDelegate: o_wizardhelp_window
+            didEndSelector: nil
+            contextInfo: nil];
 }
 
 - (IBAction)t7_selectTrnscdDestFile:(id)sender
@@ -314,6 +366,13 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t7_fld_filePath setStringValue:[sheet filename]];
         /* FIXME: store path in a global variable and add a suffix depending on the chosen encap-format, if needed */
     }
+}
+
+- (IBAction)wh_closeSheet:(id)sender
+{
+	/* close the help sheet */
+	[NSApp endSheet:o_wizardhelp_window];
+	[o_wizardhelp_window close];
 }
 
 @end
