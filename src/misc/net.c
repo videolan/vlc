@@ -151,17 +151,6 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
                 msg_Err( p_this, "cannot set socket to non-blocking mode" );
         }
-
-# ifdef IPV6_PROTECTION_LEVEL
-        if( ptr->ai_family == PF_INET6 )
-        {
-            i_val = PROTECTION_LEVEL_UNRESTRICTED;
-            setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
-                        sizeof( i_val ) );
-        }
-# else
-#  warning You are using outdated headers for Winsock !
-# endif
 #else
         if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
             ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
@@ -364,6 +353,19 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         i_val = 1;
         setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
                     sizeof( i_val ) );
+
+#if defined( WIN32 ) || defined( UNDER_CE )
+# ifdef IPV6_PROTECTION_LEVEL
+        if( ptr->ai_family == PF_INET6 )
+        {
+            i_val = PROTECTION_LEVEL_UNRESTRICTED;
+            setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
+                        sizeof( i_val ) );
+        }
+# else
+# warning You are using outdated headers for Winsock !
+# endif
+#endif
 
         /* Bind the socket */
         if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
