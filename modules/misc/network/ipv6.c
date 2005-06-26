@@ -98,7 +98,7 @@ static int BuildAddr( vlc_object_t *p_this, struct sockaddr_in6 *p_socket,
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE;
 
-    i = vlc_getaddrinfo( p_this, psz_address, NULL, &hints, &res );
+    i = vlc_getaddrinfo( p_this, psz_address, 0, &hints, &res );
     if( i )
     {
         msg_Dbg( p_this, "%s: %s", psz_address, vlc_gai_strerror( i ) );
