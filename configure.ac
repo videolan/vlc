@@ -206,7 +206,7 @@ AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
 dnl
 dnl Gettext stuff
 dnl
-ALL_LINGUAS="ca da de en_GB es fr it ja nl pt_BR zh_TW"
+ALL_LINGUAS="ca da de en_GB es fr it ja nl pt_BR ru tr zh_TW"
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
