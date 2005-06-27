@@ -40,7 +40,7 @@ STDMETHODIMP VLCPersistPropertyBag::GetClassID(LPCLSID pClsID)
 
 STDMETHODIMP VLCPersistPropertyBag::InitNew(void)
 {
-    return _p_instance->onInit(TRUE);
+    return _p_instance->onInit();
 };
 
 STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErrorLog)
@@ -48,7 +48,7 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
     if( NULL == pPropBag )
         return E_POINTER;
 
-    HRESULT hr = _p_instance->onInit(FALSE);
+    HRESULT hr = _p_instance->onInit();
     if( FAILED(hr) )
         return hr;
 

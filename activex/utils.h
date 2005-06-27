@@ -60,7 +60,6 @@ public:
     STDMETHODIMP Reset(void);
     // cloning is implemented by subclasses and must use copy constructor
     //STDMETHODIMP Clone(VLCEnum<T> **);
-    // cloning is implemented by subclasses and must use copy constructor
 
     typedef void (*retainer)(T);
 

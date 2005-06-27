@@ -34,6 +34,7 @@
 #include "objectsafety.h"
 #include "vlccontrol.h"
 #include "viewobject.h"
+#include "dataobject.h"
 
 #include "utils.h"
 
@@ -510,7 +511,7 @@ static void getViewportCoords(LPRECT lprPosRect, LPRECT lprClipRect)
     *lprPosRect  = bounds;
 };
 
-HRESULT VLCPlugin::onInit(BOOL isNew)
+HRESULT VLCPlugin::onInit(void)
 {
     if( 0 == _i_vlc )
     {
@@ -549,21 +550,6 @@ HRESULT VLCPlugin::onInit(BOOL isNew)
             _i_vlc = 0;
             return E_FAIL;
         }
-
-        if( isNew )
-        {
-            /*
-            ** object has fully initialized,
-            ** try to activate in place if container is ready
-            */
-            LPOLECLIENTSITE pActiveSite;
-
-            if( SUCCEEDED(vlcOleObject->GetClientSite(&pActiveSite)) && (NULL != pActiveSite) )
-            {
-                vlcOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pActiveSite, 0, NULL, NULL);
-                pActiveSite->Release();
-            }
-        }
         return S_OK;
     }
     return E_UNEXPECTED;
@@ -571,16 +557,20 @@ HRESULT VLCPlugin::onInit(BOOL isNew)
 
 HRESULT VLCPlugin::onLoad(void)
 {
-    /*
-    ** object has fully initialized,
-    ** try to activate in place if container is ready
-    */
-    LPOLECLIENTSITE pActiveSite;
+    if( _b_mute )
+        VLC_VolumeMute(_i_vlc);
 
-    if( SUCCEEDED(vlcOleObject->GetClientSite(&pActiveSite)) && (NULL != pActiveSite) )
+    if( NULL != _psz_src )
     {
-        vlcOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pActiveSite, 0, NULL, NULL);
-        pActiveSite->Release();
+        // add default target to playlist
+        char *cOptions[1];
+        int  cOptionsCount = 0;
+
+        if( _b_loopmode )
+        {
+            cOptions[cOptionsCount++] = "loop";
+        }
+        VLC_AddTarget(_i_vlc, _psz_src, (const char **)&cOptions, cOptionsCount, PLAYLIST_APPEND, PLAYLIST_END);
     }
     return S_OK;
 };
@@ -694,23 +684,10 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     val.i_int = reinterpret_cast<int>(_videownd);
     VLC_VariableSet(_i_vlc, "drawable", val);
 
-    if( NULL != _psz_src )
+    if( _b_autostart & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
     {
-        // add target to playlist
-        char *cOptions[1];
-        int  cOptionsCount = 0;
-
-        if( _b_loopmode )
-        {
-            cOptions[cOptionsCount++] = "loop";
-        }
-        VLC_AddTarget(_i_vlc, _psz_src, (const char **)&cOptions, cOptionsCount, PLAYLIST_APPEND, PLAYLIST_END);
-
-        if( _b_autostart )
-        {
-            VLC_Play(_i_vlc);
-            fireOnPlayEvent();
-        }
+        VLC_Play(_i_vlc);
+        fireOnPlayEvent();
     }
     return S_OK;
 };
@@ -749,50 +726,53 @@ BOOL VLCPlugin::hasFocus(void)
 
 void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &pr)
 {
-    /*
-    ** if VLC is playing, it may not display any VIDEO content 
-    ** hence, draw control logo
-    */ 
-    int width = bounds.right-bounds.left;
-    int height = bounds.bottom-bounds.top;
-
-    HBITMAP pict = _p_class->getInPlacePict();
-    if( NULL != pict )
+    if( getVisible() )
     {
-        HDC hdcPict = CreateCompatibleDC(hdc);
-        if( NULL != hdcPict )
+        /*
+        ** if VLC is playing, it may not display any VIDEO content 
+        ** hence, draw control logo
+        */ 
+        int width = bounds.right-bounds.left;
+        int height = bounds.bottom-bounds.top;
+
+        HBITMAP pict = _p_class->getInPlacePict();
+        if( NULL != pict )
         {
-            BITMAP bm;
-            if( GetObject(pict, sizeof(BITMAPINFO), &bm) )
+            HDC hdcPict = CreateCompatibleDC(hdc);
+            if( NULL != hdcPict )
             {
-                int dstWidth = bm.bmWidth;
-                if( dstWidth > width-4 )
-                    dstWidth = width-4;
+                BITMAP bm;
+                if( GetObject(pict, sizeof(BITMAPINFO), &bm) )
+                {
+                    int dstWidth = bm.bmWidth;
+                    if( dstWidth > width-4 )
+                        dstWidth = width-4;
 
-                int dstHeight = bm.bmHeight;
-                if( dstHeight > height-4 )
-                    dstHeight = height-4;
+                    int dstHeight = bm.bmHeight;
+                    if( dstHeight > height-4 )
+                        dstHeight = height-4;
 
-                int dstX = bounds.left+(width-dstWidth)/2;
-                int dstY = bounds.top+(height-dstHeight)/2;
+                    int dstX = bounds.left+(width-dstWidth)/2;
+                    int dstY = bounds.top+(height-dstHeight)/2;
 
-                SelectObject(hdcPict, pict);
-                StretchBlt(hdc, dstX, dstY, dstWidth, dstHeight,
-                        hdcPict, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
-                DeleteDC(hdcPict);
-                ExcludeClipRect(hdc, dstX, dstY, dstWidth+dstX, dstHeight+dstY);
+                    SelectObject(hdcPict, pict);
+                    StretchBlt(hdc, dstX, dstY, dstWidth, dstHeight,
+                            hdcPict, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+                    DeleteDC(hdcPict);
+                    ExcludeClipRect(hdc, dstX, dstY, dstWidth+dstX, dstHeight+dstY);
+                }
             }
         }
+
+        FillRect(hdc, &pr, (HBRUSH)GetStockObject(WHITE_BRUSH));
+        SelectObject(hdc, GetStockObject(BLACK_BRUSH));
+
+        MoveToEx(hdc, bounds.left, bounds.top, NULL);
+        LineTo(hdc, bounds.left+width-1, bounds.top);
+        LineTo(hdc, bounds.left+width-1, bounds.top+height-1);
+        LineTo(hdc, bounds.left, bounds.top+height-1);
+        LineTo(hdc, bounds.left, bounds.top);
     }
-
-    FillRect(hdc, &pr, (HBRUSH)GetStockObject(WHITE_BRUSH));
-    SelectObject(hdc, GetStockObject(BLACK_BRUSH));
-
-    MoveToEx(hdc, bounds.left, bounds.top, NULL);
-    LineTo(hdc, bounds.left+width-1, bounds.top);
-    LineTo(hdc, bounds.left+width-1, bounds.top+height-1);
-    LineTo(hdc, bounds.left, bounds.top+height-1);
-    LineTo(hdc, bounds.left, bounds.top);
 };
 
 void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
@@ -801,8 +781,15 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     RECT posRect  = *lprcPosRect;
 
     /*
+    ** tell container that previous area needs redrawing
+    */
+
+    InvalidateRect(GetParent(_inplacewnd), &_posRect, TRUE);
+
+    /*
     ** record keeping of control geometry within container
-    */ 
+    */
+
     _posRect = posRect;
 
     /*
@@ -829,7 +816,6 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
             posRect.right-posRect.left,
             posRect.bottom-posRect.top,
             FALSE);
-
 
     /*
     ** force a full refresh of control content

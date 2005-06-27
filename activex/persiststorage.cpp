@@ -45,7 +45,7 @@ STDMETHODIMP VLCPersistStorage::InitNew(IStorage *pStg)
     if( NULL == pStg )
         return E_POINTER;
 
-    return _p_instance->onInit(TRUE);
+    return _p_instance->onInit();
 };
 
 STDMETHODIMP VLCPersistStorage::Load(IStorage *pStg)
@@ -53,7 +53,7 @@ STDMETHODIMP VLCPersistStorage::Load(IStorage *pStg)
     if( NULL == pStg )
         return E_POINTER;
 
-    return _p_instance->onInit(TRUE);
+    return _p_instance->onInit();
 };
 
 STDMETHODIMP VLCPersistStorage::Save(IStorage *pStg, BOOL fSameAsLoad)

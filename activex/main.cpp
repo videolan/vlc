@@ -186,6 +186,14 @@ STDAPI DllRegisterServer(VOID)
         hSubKey = keyCreate(hClassKey, TEXT("Control"));
         RegCloseKey(hSubKey);
 
+        // ToolboxBitmap32 key value
+        hSubKey = keyCreate(hClassKey, TEXT("ToolboxBitmap32"));
+        strcpy(DllPath+DllPathLen, ",1");
+        RegSetValueEx(hSubKey, NULL, 0, REG_SZ,
+                (const BYTE*)DllPath, DllPathLen+2);
+        DllPath[DllPathLen] = '\0';
+        RegCloseKey(hSubKey);
+
 #ifdef BUILD_LOCALSERVER
         // LocalServer32 key value
         hSubKey = keyCreate(hClassKey, TEXT("LocalServer32"));

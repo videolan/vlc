@@ -52,6 +52,7 @@ DIST_misc = \
     axvlc.idl \
     axvlc.tlb \
     inplace.bmp \
+    vlc16x16.bmp \
     test.html \
     $(NULL)
 

@@ -8,6 +8,7 @@
 #define STRINGIFY( z ) UGLY_KLUDGE( z )
 #define UGLY_KLUDGE( z ) #z
 
+1 BITMAP "vlc16x16.bmp"
 1 VERSIONINFO
 FILETYPE 1
 FILEOS 4

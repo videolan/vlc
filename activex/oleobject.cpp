@@ -56,9 +56,6 @@ STDMETHODIMP VLCOleObject::Close(DWORD dwSaveOption)
 STDMETHODIMP VLCOleObject::DoVerb(LONG iVerb, LPMSG lpMsg, LPOLECLIENTSITE pActiveSite,
                                     LONG lIndex, HWND hwndParent, LPCRECT lprcPosRect)
 {
-    if( 0 != lIndex )
-        return DV_E_LINDEX;
-
     switch( iVerb )
     {
         case OLEIVERB_PRIMARY:
@@ -104,7 +101,9 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         if( SUCCEEDED(pActiveSite->QueryInterface(IID_IOleInPlaceSite, (void**)&p_inPlaceSite)) )
         {
             if( S_OK != p_inPlaceSite->CanInPlaceActivate() )
+            {
                 return OLEOBJ_S_CANNOT_DOVERB_NOW;
+            }
 
             LPOLEINPLACEFRAME p_inPlaceFrame;
             LPOLEINPLACEUIWINDOW p_inPlaceUIWindow;
@@ -128,7 +127,9 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
             }
         }
         else if( NULL == hwndParent )
+        {
             return OLEOBJ_S_INVALIDHWND;
+        }
 
         if( FAILED(_p_instance->onActivateInPlace(lpMsg, hwndParent, lprcPosRect, lprcClipRect)) )
         {
@@ -293,8 +294,6 @@ STDMETHODIMP VLCOleObject::IsUpToDate(void)
 
 STDMETHODIMP VLCOleObject::SetClientSite(LPOLECLIENTSITE pClientSite)
 {
-    if( NULL != _p_clientsite )
-        _p_clientsite->Release(); 
  
     if( NULL != pClientSite )
     {
@@ -312,8 +311,13 @@ STDMETHODIMP VLCOleObject::SetClientSite(LPOLECLIENTSITE pClientSite)
             VariantClear(&v);
         }
     }
+
+    if( NULL != _p_clientsite )
+        _p_clientsite->Release();
+
     _p_clientsite = pClientSite;
     _p_instance->onClientSiteChanged(pClientSite);
+
     return S_OK;
 };
 
@@ -337,30 +341,18 @@ STDMETHODIMP VLCOleObject::SetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
 
             if( SUCCEEDED(_p_clientsite->QueryInterface(IID_IOleInPlaceSite, (void**)&p_inPlaceSite)) )
             {
-                LPOLECONTROLSITE p_controlSite;
-                RECT posRect = _p_instance->getPosRect();
+                HWND hwnd;
 
-                if( SUCCEEDED(_p_clientsite->QueryInterface(IID_IOleControlSite, (void**)&p_controlSite)) )
+                if( SUCCEEDED(p_inPlaceSite->GetWindow(&hwnd)) )
                 {
-                    // use HIMETRIC to container transform
-                    POINTL extent = { pSizel->cx, pSizel->cy };
-                    POINTF container;
-                    if( SUCCEEDED(p_controlSite->TransformCoords(&extent,
-                                    &container, XFORMCOORDS_SIZE|XFORMCOORDS_HIMETRICTOCONTAINER)) )
-                    {
-                        posRect.right  = ((LONG)container.x)+posRect.left;
-                        posRect.bottom = ((LONG)container.y)+posRect.top;
-                    }
-                    p_controlSite->Release();
-                }
-                else {
-                    // use HIMETRIC to display transform 
-                    HDC hDC = CreateDevDC(NULL);
+                    // use HIMETRIC to pixel transform 
+                    RECT posRect = _p_instance->getPosRect();
+                    HDC hDC = GetDC(hwnd);
                     posRect.right = (pSizel->cx*GetDeviceCaps(hDC, LOGPIXELSX)/2540L)+posRect.left;
                     posRect.bottom = (pSizel->cy*GetDeviceCaps(hDC, LOGPIXELSY)/2540L)+posRect.top;
                     DeleteDC(hDC);
+                    p_inPlaceSite->OnPosRectChange(&posRect);
                 }
-                p_inPlaceSite->OnPosRectChange(&posRect);
                 p_inPlaceSite->Release();
             }
         }

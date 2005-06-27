@@ -84,7 +84,7 @@ public:
     REFCLSID getClassID(void) { return (REFCLSID)CLSID_VLCPlugin; };
     REFIID getDispEventID(void) { return (REFIID)DIID_DVLCEvents; };
 
-    HRESULT onInit(BOOL isNew);
+    HRESULT onInit(void);
     HRESULT onLoad(void);
     HRESULT onClientSiteChanged(LPOLECLIENTSITE pActiveSite);
     HRESULT onClose(DWORD dwSaveOption);
@@ -102,20 +102,14 @@ public:
 
     int  getVLCObject(void) { return _i_vlc; };
 
-    // control properties
+    // persistent control properties, may be overriden by HTML & javascript
     void setSourceURL(const char *url) { _psz_src = strdup(url); };
     void setAutoStart(BOOL autostart) { _b_autostart = autostart; };
     void setLoopMode(BOOL loopmode) { _b_loopmode = loopmode; };
-    void setMute(BOOL mute) {
-        if( mute && _i_vlc )
-        {
-            VLC_VolumeMute(_i_vlc);
-        }
-    };
+    void setMute(BOOL mute) { _b_mute = mute; };
     void setSendEvents(BOOL sendevents) { _b_sendevents = sendevents; };
     void setVisible(BOOL fVisible);
     BOOL getVisible(void) { return _b_visible; };
-
     
     // container events
     void onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
@@ -167,6 +161,7 @@ private:
     BOOL _b_autostart;
     BOOL _b_loopmode;
     BOOL _b_visible;
+    BOOL _b_mute;
     BOOL _b_sendevents;
     int  _i_vlc;
 
