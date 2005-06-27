@@ -234,6 +234,7 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class) :
     _b_autostart(TRUE),
     _b_loopmode(FALSE),
     _b_visible(TRUE),
+    _b_mute(FALSE),
     _b_sendevents(TRUE),
     _i_vlc(0)
 {
