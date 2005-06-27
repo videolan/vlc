@@ -17,6 +17,7 @@ D: cinepak, adpcm, araw decoders
 D: Subtile file parser.
 D: mms, ftp access
 D: Stream output
+D: VLM
 S: France
 
 N: Marc Ariberti
@@ -66,6 +67,7 @@ D: mpeg1/2 video decoder (libmpeg2), bandlimited resampling
 D: Ogg and Raw DV demultiplexers
 D: Configuration file infrastructure
 D: wxWindows and http interfaces
+D: Pocket PC port
 S: France
 
 N: Rocky Bernstein
@@ -241,11 +243,19 @@ D: AC3 decoder
 D: MPEG audio decoder
 S: France
 
+N: Felix Kühne
+E: fk@aenneburghardt.de
+C: fkuehne
+D: MacOS X Interface (Wizard, structure)
+D: German translation
+S: Germany
+
 N: Simon Latapie
 E: garf@via.ecp.fr
 C: garf
 D: contrast/HSB, and logo  video filters
 D: HTTP interface
+D: VLM
 S: France
 
 N: Pascal Levesque
@@ -260,6 +270,9 @@ D: decoder and input core functions
 D: audio output
 D: MPEG video decoder
 D: Many ports (Mac OS X, iPAQ, *BSD, Solaris...)
+D: DVB input
+D: mosaic
+D: TS muxer/demuxer improvements
 D: documentation
 S: France
 
@@ -289,6 +302,12 @@ D: BeOS module fixes and enhancements
 D: Stream output
 D: Mac OS X OpenGL video output
 S: France
+
+N: Benjamin Pracht
+E: bigben@videolan.org
+C: bigben
+D: MacOS X Interface (playlist)
+D: documentation
 
 N: Emmanuel Puig
 E: karibu@videolan.org
