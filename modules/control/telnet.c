@@ -366,7 +366,7 @@ static void Run( intf_thread_t *p_intf )
                 else
                 {
                     /* wrong password */
-                    Write_message( cl, NULL, "\r\nTry again, you polio:",
+                    Write_message( cl, NULL, "\r\nWrong password. ",
                                    WRITE_MODE_PWD );
                 }
             }
