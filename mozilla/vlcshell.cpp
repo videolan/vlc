@@ -947,6 +947,8 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
                  event->xconfigure.height,
                  event->xconfigure.send_event ? "TRUE" : "FALSE" );
     }
+#endif /* X11_RESIZE_DEBUG */
+
     if( p_plugin->i_height == i_previous_height &&
         p_plugin->i_width == i_previous_width )
     {
@@ -955,7 +957,6 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     i_previous_height = p_plugin->i_height;
     i_previous_width  = p_plugin->i_width;
 
-#endif /* X11_RESIZE_DEBUG */
 
     i_ret = XResizeWindow( p_plugin->p_display, p_plugin->window,
             p_plugin->i_width, p_plugin->i_height );
