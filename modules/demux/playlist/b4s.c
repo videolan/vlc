@@ -25,6 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <ctype.h>                                              /* isspace() */
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
