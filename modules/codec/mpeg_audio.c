@@ -7,7 +7,7 @@
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,6 +128,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','a') )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* HACK: Don't use this codec if we don't have an mpga audio filter */
+    if( p_dec->i_object_type == VLC_OBJECT_DECODER &&
+        !config_FindModule( p_this, "mpgatofixed32" ) )
     {
         return VLC_EGENERIC;
     }
