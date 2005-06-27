@@ -92,8 +92,8 @@
 #   define VOUT_PLUGINS "xvideo,x11,dummy"
 #   define AOUT_PLUGINS "oss,dummy"
 
-static int i_previous_height = -1;
-static int i_previous_width = -1;
+static unsigned int i_previous_height = 100000;
+static unsigned int i_previous_width = 100000;
 
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
 static void Resize( Widget w, XtPointer closure, XEvent *event );
