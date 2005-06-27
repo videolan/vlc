@@ -1334,27 +1334,26 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
 char* httpd_ClientIP( httpd_client_t *cl )
 {
     int i;
-    char *psz_ip;
+    char sz_ip[NI_MAXNUMERICHOST + 2];
 
-    psz_ip = (char *)malloc( NI_MAXNUMERICHOST + 2 );
     i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
-                         psz_ip+1, NI_MAXNUMERICHOST, NULL, NI_NUMERICHOST );
+                         sz_ip+1, NI_MAXNUMERICHOST, NULL, NI_NUMERICHOST );
 
     if( i != 0 )
         return NULL;
 
     /* semi-colon in address => must add bracket for HTTP */        
-    if( strchr( psz_ip + 1, ':' ) != NULL )
+    if( strchr( sz_ip + 1, ':' ) != NULL )
     {
-        psz_ip[0] = '[';
-        i = strlen( psz_ip );
-        psz_ip[i++] = ']';
-        psz_ip[i] = '\0';
+        sz_ip[0] = '[';
+        i = strlen( sz_ip );
+        sz_ip[i++] = ']';
+        sz_ip[i] = '\0';
 
-        return psz_ip;
+        return strdup(sz_ip);
     }
     
-    return psz_ip + 1;
+    return strdup(sz_ip + 1);
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
