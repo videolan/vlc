@@ -136,19 +136,19 @@
 #define SOUT_MUX_TITLE N_( "Muxers" )
 #define SOUT_MUX_HELP N_( "Muxers are the encapsulation formats that are used to " \
                           "put all the elementary streams (video, audio, ...) " \
-                          "together. This setting allows you to always force a muxer." \
+                          "together. This setting allows you to always force a muxer. " \
                           "You should probably not do that.\n" \
                           "You can also set default parameters for each muxer." )
 #define SOUT_ACO_TITLE N_( "Access output" )
-#define SOUT_ACO_HELP N_( "Access output are the ways the muxed streams are sent." \
-                          "This setting allows you to always force an access output." \
+#define SOUT_ACO_HELP N_( "Access output are the ways the muxed streams are sent. " \
+                          "This setting allows you to always force an access output. " \
                           "You should probably not do that.\n" \
                           "You can also set default parameters for each access output.")
 
 #define SOUT_PACKET_TITLE N_( "Packetizers" )
 #define SOUT_PACKET_HELP N_( "Packetizers are used to \"preprocess\" the elementary "\
-                              "streams before muxing." \
-                          "This setting allows you to always force a packetizer." \
+                              "streams before muxing. " \
+                          "This setting allows you to always force a packetizer. " \
                           "You should probably not do that.\n" \
                           "You can also set default parameters for each packetizer." )
 

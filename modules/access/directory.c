@@ -93,7 +93,7 @@ vlc_module_begin();
                 RECURSIVE_LONGTEXT, VLC_FALSE );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
 #ifdef HAVE_STRSEP
-    add_string( "ignore-filetypes", "m3u,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
+    add_string( "ignore-filetypes", "m3u,db,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
                 NULL, IGNORE_TEXT, IGNORE_LONGTEXT, VLC_FALSE );
 #endif
     set_callbacks( Open, Close );

@@ -63,10 +63,10 @@ vlc_module_begin();
     set_callbacks( OpenDecoder, CloseDecoder );
     add_shortcut( "fake" );
 
-    add_string( "fake-file", "", NULL, FILE_TEXT,
-                FILE_LONGTEXT, VLC_TRUE );
+    add_file( "fake-file", "", NULL, FILE_TEXT,
+                FILE_LONGTEXT, VLC_FALSE );
     add_string( "fake-aspect-ratio", "4:3", NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_FALSE );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************

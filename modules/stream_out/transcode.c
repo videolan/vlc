@@ -63,8 +63,7 @@
     "Allows you to deinterlace the video before encoding." )
 #define DEINTERLACE_MODULE_TEXT N_("Deinterlace module")
 #define DEINTERLACE_MODULE_LONGTEXT N_( \
-    "Specifies the deinterlace module to use (ffmpeg-deinterlace or " \
-    "deinterlace)." )
+    "Specifies the deinterlace module to use." )
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
     "Allows you to specify the output video width." )
@@ -141,6 +140,11 @@
 #define HURRYUP_LONGTEXT N_( "Allows you to specify if the transcoder " \
   "should drop frames if your CPU can't keep up with the encoding rate." )
 
+static char *ppsz_deinterlace_type[] =
+{
+    "deinterlace", "ffmpeg-deinterlace"
+};
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -172,6 +176,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
                 VLC_FALSE );
+        change_string_list( ppsz_deinterlace_type, 0, 0 );
     add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
