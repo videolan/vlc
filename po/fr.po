@@ -161,7 +161,7 @@ msgstr "Paramètres des interfaces"
 
 #: include/vlc_config_cat.h:42
 msgid "General interface setttings"
-msgstr "Paramètres généraux de l'interface"
+msgstr "Paramètres généraux de l’interface"
 
 #: include/vlc_config_cat.h:44 src/libvlc.h:63
 msgid "Control interfaces"
@@ -305,11 +305,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:104
 msgid "Access filter modules"
-msgstr "Modules de filtres d'accès"
+msgstr "Modules de filtres d’accès"
 
 #: include/vlc_config_cat.h:106
 msgid "Settings related to the various access filter used by VLC.\n"
-msgstr "Réglages pour les filtres d'entrée utilisés par VLC.\n"
+msgstr "Réglages pour les filtres d’entrée utilisés par VLC.\n"
 
 #: include/vlc_config_cat.h:108
 msgid "Demuxers"
@@ -372,9 +372,9 @@ msgstr ""
 "diffusion ou de sauvegarder des flux entrants.\n"
 "Les flux sont multiplexés et envoyés dans un \"module de sortie\", "
 "permettant soit de sauvegarder le flux dans un fichier, soit de le diffuser "
-"(par UDP, HTTP, RTP/RTSP ...)\n"
+"(par UDP, HTTP, RTP/RTSP…)\n"
 "Les modules du flux de sortie permettent de réaliser du traitement sur le "
-"flux (transcodage, duplication, ...)."
+"flux (transcodage, duplication…)."
 
 #: include/vlc_config_cat.h:134
 msgid "General stream output settings"
@@ -392,10 +392,10 @@ msgid ""
 "You can also set default parameters for each muxer."
 msgstr ""
 "Les multiplexeurs gèrent les différents formats d'encapsulation utilisés "
-"pour assembler tous les flux élémentaires (audio, vidéo). Ce réglage vous "
+"pour assembler tous les flux élémentaires (audio, vidéo…). Ce réglage vous "
 "permet de toujours forcer un multiplexeur. Ce n'est probablement pas "
 "souhaitable.\n"
-" Vous pouvez également régler les paramètres par défaut de chaque "
+"Vous pouvez également régler les paramètres par défaut de chaque "
 "multiplexeur."
 
 #: include/vlc_config_cat.h:142
@@ -1720,7 +1720,7 @@ msgstr ""
 
 #: src/libvlc.h:263
 msgid "Video snapshot format"
-msgstr "Format des captures d'écran"
+msgstr "Format des captures d’écran"
 
 #: src/libvlc.h:265
 msgid ""
@@ -1793,7 +1793,7 @@ msgstr ""
 
 #: src/libvlc.h:296
 msgid "Clock synchronisation"
-msgstr "Synchronisation de l'horloge"
+msgstr "Synchronisation de l’horloge"
 
 #: src/libvlc.h:298
 msgid ""
@@ -1919,7 +1919,7 @@ msgstr ""
 
 #: src/libvlc.h:347
 msgid "Choose audio language"
-msgstr "Choisir la langue de l'audio"
+msgstr "Choisir la langue de l’audio"
 
 #: src/libvlc.h:349
 msgid ""
@@ -1943,7 +1943,7 @@ msgstr ""
 
 #: src/libvlc.h:357
 msgid "Input repetitions"
-msgstr "Répétitions de l'entrée"
+msgstr "Répétitions de l’entrée"
 
 #: src/libvlc.h:358
 msgid "Number of time the same input will be repeated"
@@ -2562,7 +2562,7 @@ msgid ""
 "Typical values are sap, hal, ..."
 msgstr ""
 "Vous permet de spécifier les modules de découverte de services à lancer, "
-"séparés par des ':'. Les valeurs courantes sont sap, hal, ..."
+"séparés par des « : ». Les valeurs courantes sont sap, hal…"
 
 #: src/libvlc.h:641
 msgid "Play files randomly forever"
@@ -3122,7 +3122,7 @@ msgstr ""
 
 #: src/libvlc.h:821
 msgid "Audio delay up"
-msgstr "Retarder l'audio"
+msgstr "Retarder l’audio"
 
 #: src/libvlc.h:822
 msgid "Select the key to increase the audio delay."
@@ -3132,7 +3132,7 @@ msgstr ""
 
 #: src/libvlc.h:823
 msgid "Audio delay down"
-msgstr "Avancer l'audio"
+msgstr "Avancer l’audio"
 
 #: src/libvlc.h:824
 msgid "Select the key to decrease the audio delay."
@@ -3276,15 +3276,15 @@ msgstr "Afficher l’interface"
 
 #: src/libvlc.h:858
 msgid "Raise the interface above all other windows"
-msgstr "Montrer l'interface devant les autres fenêtres"
+msgstr "Montrer l’interface devant les autres fenêtres"
 
 #: src/libvlc.h:859
 msgid "Take video snapshot"
-msgstr "Prendre une capture d'écran"
+msgstr "Prendre une capture d’écran"
 
 #: src/libvlc.h:860
 msgid "Takes a video snapshot and writes it to disk."
-msgstr "Prend une capture d'écran et l'écrit sur le disque"
+msgstr "Prend une capture d’écran et l’écrit sur le disque"
 
 #: src/libvlc.h:862 modules/access_filter/record.c:50
 #: modules/access_filter/record.c:51
@@ -3293,7 +3293,7 @@ msgstr "Enregistrer"
 
 #: src/libvlc.h:863
 msgid "Record access filter start/stop."
-msgstr "Démarrer/arrêter le filtre d'enregistrement"
+msgstr "Démarrer/arrêter le filtre d’enregistrement"
 
 #: src/libvlc.h:867
 #, c-format
@@ -3367,7 +3367,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:286 modules/gui/macosx/controls.m:620
 #: modules/gui/macosx/intf.m:513 modules/video_output/snapshot.c:75
 msgid "Snapshot"
-msgstr "Capture d'écran"
+msgstr "Capture d’écran"
 
 #: src/libvlc.h:974
 msgid "Window properties"
@@ -3454,11 +3454,11 @@ msgstr ""
 
 #: src/libvlc.h:1585
 msgid "print help for the advanced options"
-msgstr "Afficher l'aide pour les options avancées"
+msgstr "Afficher l’aide pour les options avancées"
 
 #: src/libvlc.h:1587
 msgid "ask for extra verbosity when displaying help"
-msgstr "Afficher plus de détails dans l'aide"
+msgstr "Afficher plus de détails dans l’aide"
 
 #: src/libvlc.h:1589
 msgid "print a list of available modules"
@@ -4668,7 +4668,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:102
 msgid "Video input frame rate"
-msgstr "Nombre d'images par seconde de l'entrée vidéo"
+msgstr "Nombre d’images par seconde de l’entrée vidéo"
 
 #: modules/access/dshow/dshow.cpp:104
 msgid ""
@@ -4724,11 +4724,11 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:121
 msgid "Tuner input type"
-msgstr "Type d'entrée du tuner"
+msgstr "Type d’entrée du tuner"
 
 #: modules/access/dshow/dshow.cpp:123
 msgid "Allows you to select the tuner input type (Cable/Antenna)."
-msgstr "Ceci vous permet de choisir le type d'entrée du tuner (Câble/Antenne)."
+msgstr "Ceci vous permet de choisir le type d’entrée du tuner (Câble/Antenne)."
 
 #: modules/access/dshow/dshow.cpp:135
 msgid "DirectShow"
@@ -5621,7 +5621,7 @@ msgstr "Canal audio"
 
 #: modules/access/v4l/v4l.c:101
 msgid "Audio Channel to use, if there are several audio input"
-msgstr "Canal audio à utiliser, s'il existe plusieurs entrées audio"
+msgstr "Canal audio à utiliser, s’il existe plusieurs entrées audio"
 
 #: modules/access/v4l/v4l.c:108 modules/gui/wxwindows/extrapanel.cpp:236
 msgid "Brightness"
@@ -5645,7 +5645,7 @@ msgstr "Couleur"
 
 #: modules/access/v4l/v4l.c:116
 msgid "Set the Color of the video input"
-msgstr "Régler la couleur de l'image"
+msgstr "Régler la couleur de l’image"
 
 #: modules/access/v4l/v4l.c:117 modules/gui/wxwindows/extrapanel.cpp:231
 msgid "Contrast"
@@ -5661,7 +5661,7 @@ msgstr "Tuner"
 
 #: modules/access/v4l/v4l.c:121
 msgid "Tuner to use, if there are several ones"
-msgstr "Tuner à utiliser, s'il en existe plusieurs"
+msgstr "Tuner à utiliser, s’il en existe plusieurs"
 
 #: modules/access/v4l/v4l.c:122
 msgid "Samplerate"
@@ -5669,7 +5669,7 @@ msgstr "Débit d’échantillons"
 
 #: modules/access/v4l/v4l.c:124
 msgid "Samplerate of the captures audio stream, in Hz"
-msgstr "Débit d'échantillons audio, en Hz"
+msgstr "Débit d’échantillons audio, en Hz"
 
 #: modules/access/v4l/v4l.c:127
 msgid "If this option is set, the audio stream will be captured in stereo"
@@ -5913,7 +5913,7 @@ msgstr "Format à utiliser dans le champ « titre » de la liste de lecture"
 
 #: modules/access_filter/record.c:42
 msgid "Record directory"
-msgstr "Répertoire d'enregistrement"
+msgstr "Répertoire d’enregistrement"
 
 #: modules/access_filter/record.c:44
 msgid "Allows you to specify the directory where the record will be stored"
@@ -6676,26 +6676,23 @@ msgstr "Décodeur audio AAC (utilisant libfaad2)"
 
 #: modules/codec/fake.c:51 modules/video_output/image.c:63
 msgid "Image file"
-msgstr "Fichier d'image"
+msgstr "Fichier d’image"
 
 #: modules/codec/fake.c:53
 msgid "Path of the image file when using the fake input."
 msgstr ""
 
 #: modules/codec/fake.c:54
-#, fuzzy
 msgid "Background aspect ratio"
-msgstr "Format d’écran de la source"
+msgstr "Étirement du fond d’écran"
 
 #: modules/codec/fake.c:56
-#, fuzzy
 msgid "Aspect ratio of the image file (4:3, 16:9)."
-msgstr "Format d'écran (4:3, 16:9)."
+msgstr "Étirement du fichier image (4:3, 16:9)."
 
 #: modules/codec/fake.c:61
-#, fuzzy
 msgid "fake video decoder"
-msgstr "Décodeur vidéo Cinepak"
+msgstr "décodeur vidéo factice"
 
 #: modules/codec/ffmpeg/ffmpeg.c:74
 msgid "rd"
@@ -7413,7 +7410,7 @@ msgstr "Mode analyse"
 
 #: modules/codec/x264.c:63
 msgid "This selects the analysing mode."
-msgstr "Ceci s�ectionne le mode d'analyse"
+msgstr "Ceci sélectionne le mode d’analyse"
 
 #: modules/codec/x264.c:65
 msgid "Bitrate tolerance"
@@ -7451,7 +7448,7 @@ msgstr ""
 
 #: modules/codec/x264.c:80
 msgid "Sets maximum interval between IDR-frames"
-msgstr "Sélectionner l'interval maximal entre deux images IDR."
+msgstr "Sélectionner l’intervale maximal entre deux images IDR"
 
 #: modules/codec/x264.c:81
 msgid ""
@@ -7493,7 +7490,7 @@ msgstr "Images B"
 
 #: modules/codec/x264.c:95
 msgid "Number of consecutive B-Frames between I and P-frames."
-msgstr "Nombre d'images B consécutives entre images I et P."
+msgstr "Nombre d’images B consécutives entre images I et P."
 
 #: modules/codec/x264.c:98
 msgid "B pyramid"
@@ -7507,7 +7504,7 @@ msgstr ""
 
 #: modules/codec/x264.c:102
 msgid "Number of previous frames used as predictors."
-msgstr "Nombre d'images précédentes utilisées pour la prédiction"
+msgstr "Nombre d’images précédentes utilisées pour la prédiction"
 
 #: modules/codec/x264.c:103
 msgid ""
@@ -7686,19 +7683,19 @@ msgstr "Répertoire source"
 
 #: modules/control/http.c:82
 msgid "HTTP interface x509 PEM certificate file (enables SSL)"
-msgstr "Fichier de certificat x509 pour l'interface HTTP (active SSL)"
+msgstr "Fichier de certificat x509 pour l’interface HTTP (active SSL)"
 
 #: modules/control/http.c:85
 msgid "HTTP interface x509 PEM private key file"
-msgstr "Fichier de cl�priv� x509 pour l'interface HTTP."
+msgstr "Fichier de clé privée x509 pour l’interface HTTP"
 
 #: modules/control/http.c:87
 msgid "HTTP interface x509 PEM trusted root CA certificates file"
-msgstr "Fichier d'autorit� de certification x509 pour l'interface HTTP."
+msgstr "Fichier d’autorité de certification x509 pour l’interface HTTP"
 
 #: modules/control/http.c:90
 msgid "HTTP interace Certificates Revocation List file"
-msgstr "Fichier de r�ocations de certificats x509 pour l'interface HTTP."
+msgstr "Fichier de révocations de certificats x509 pour l’interface HTTP"
 
 #: modules/control/http.c:94
 msgid "HTTP remote control interface"
@@ -7873,7 +7870,7 @@ msgstr ""
 
 #: modules/control/rc.c:128
 msgid "Fake TTY"
-msgstr "TTY simulée"
+msgstr "TTY factice"
 
 #: modules/control/rc.c:129
 msgid "Force the rc module to use stdin as if it was a TTY."
@@ -7956,7 +7953,7 @@ msgstr "| prev . . . . . . . item de la playlist précédent\n"
 
 #: modules/control/rc.c:692
 msgid "| goto . . . . . . . . . . . .  goto item at index\n"
-msgstr "| goto . . . . . . . . aller à l'élément\n"
+msgstr "| goto . . . . . . . . aller à l’élément\n"
 
 #: modules/control/rc.c:693
 msgid "| title [X]  . . . . set/get title in current item\n"
@@ -8187,11 +8184,11 @@ msgstr "Seuil"
 
 #: modules/control/showintf.c:63
 msgid "Height of the zone triggering the interface"
-msgstr "Hauteur de la zone d�lenchant l'apparition de l'interface"
+msgstr "Hauteur de la zone déclenchant l’apparition de l’interface"
 
 #: modules/control/showintf.c:70
 msgid "Interface showing control interface"
-msgstr "Interface permettant d'afficher la GUI"
+msgstr "Interface permettant d’afficher la GUI"
 
 #: modules/control/telnet.c:79
 msgid "Telnet Interface port"
@@ -8467,7 +8464,7 @@ msgstr "Démultiplexeur de flux MP4"
 
 #: modules/demux/mpeg/h264.c:40
 msgid "Allows you to set the desired frame rate."
-msgstr "Ceci vous permet de spécifier le nombre d'images par seconde."
+msgstr "Ceci vous permet de spécifier le nombre d’images par seconde."
 
 #: modules/demux/mpeg/h264.c:47
 msgid "H264 video demuxer"
@@ -9160,7 +9157,7 @@ msgstr "Synchronisation verticale"
 
 #: modules/gui/beos/VideoOutput.cpp:1068
 msgid "Correct Aspect Ratio"
-msgstr "Format d'écran correct"
+msgstr "Format d’écran correct"
 
 #: modules/gui/beos/VideoOutput.cpp:1097
 msgid "Stay On Top"
@@ -10614,11 +10611,11 @@ msgstr "Propriétés"
 
 #: modules/gui/macosx/playlist.m:233
 msgid "Sort Node by Name"
-msgstr "Trier le noeud par Nom"
+msgstr "Trier le nœud par Nom"
 
 #: modules/gui/macosx/playlist.m:234
 msgid "Sort Node by Author"
-msgstr "Trier le noeud par Auteur"
+msgstr "Trier le nœud par Auteur"
 
 #: modules/gui/macosx/playlist.m:240 modules/gui/macosx/playlist.m:1139
 msgid "no items in playlist"
@@ -11541,7 +11538,7 @@ msgstr "Clone"
 
 #: modules/gui/wxwindows/extrapanel.cpp:150
 msgid "Creates several clones of the image"
-msgstr "Crée des clones de l'image"
+msgstr "Crée des clones de l’image"
 
 #: modules/gui/wxwindows/extrapanel.cpp:151 modules/video_filter/distort.c:67
 msgid "Distortion"
@@ -11557,15 +11554,15 @@ msgstr "Inversion vidéo"
 
 #: modules/gui/wxwindows/extrapanel.cpp:152
 msgid "Inverts the image colors"
-msgstr "Inverse les couleurs d'images"
+msgstr "Inverse les couleurs de l’image"
 
 #: modules/gui/wxwindows/extrapanel.cpp:153
 msgid "Image cropping"
-msgstr "Rognage d'image"
+msgstr "Rognage d’image"
 
 #: modules/gui/wxwindows/extrapanel.cpp:153
 msgid "Crops the image"
-msgstr "Permet de rogner l'image"
+msgstr "Permet de rogner l’image"
 
 #: modules/gui/wxwindows/extrapanel.cpp:154
 msgid "Blurring"
@@ -11573,7 +11570,7 @@ msgstr "Flou"
 
 #: modules/gui/wxwindows/extrapanel.cpp:154
 msgid "Creates a motion blurring on the image"
-msgstr "Ajoute un effet de flou à l'image"
+msgstr "Ajoute un effet de flou à l’image"
 
 #: modules/gui/wxwindows/extrapanel.cpp:155
 #: modules/video_filter/transform.c:67
@@ -11582,7 +11579,7 @@ msgstr "Transformation"
 
 #: modules/gui/wxwindows/extrapanel.cpp:155
 msgid "Rotates or flips the image"
-msgstr "Tourne ou inverse l'image"
+msgstr "Tourne ou inverse l’image"
 
 #: modules/gui/wxwindows/extrapanel.cpp:206
 msgid "Adjust Image"
@@ -11607,7 +11604,7 @@ msgstr "Paramètres vidéo"
 
 #: modules/gui/wxwindows/extrapanel.cpp:286
 msgid "Aspect Ratio"
-msgstr "Format d'écran"
+msgstr "Format d’écran"
 
 #: modules/gui/wxwindows/extrapanel.cpp:302
 msgid "Video Filters"
@@ -11919,7 +11916,7 @@ msgstr "Ajout simple de fichier…"
 
 #: modules/gui/wxwindows/playlist.cpp:232
 msgid "Add &Directory..."
-msgstr "Ajouter &Répertoire..."
+msgstr "Ajouter &Répertoire…"
 
 #: modules/gui/wxwindows/playlist.cpp:233
 msgid "&Add MRL..."
@@ -12478,15 +12475,15 @@ msgstr "Interface minimale"
 
 #: modules/gui/wxwindows/wxwindows.cpp:99
 msgid "Use minimal interface, no toolbar, few menus"
-msgstr "Utiliser l'interface minimale, sans barre et peu de menus"
+msgstr "Utiliser l’interface minimale, sans barre et peu de menus"
 
 #: modules/gui/wxwindows/wxwindows.cpp:100
 msgid "Size to video"
-msgstr "S'adapter à la vidéo"
+msgstr "S’adapter à la vidéo"
 
 #: modules/gui/wxwindows/wxwindows.cpp:101
 msgid "Resize VLC to match the video resolution"
-msgstr "Redimensionner VLC pour s'adapter à la taille de la vidéo"
+msgstr "Redimensionner VLC pour s’adapter à la taille de la vidéo"
 
 #: modules/gui/wxwindows/wxwindows.cpp:102
 #: modules/gui/wxwindows/wxwindows.cpp:103
@@ -12582,7 +12579,7 @@ msgstr "Fonctions de rendu de polices factices"
 
 #: modules/misc/externrun.c:79
 msgid "Execution of extern programs interface function"
-msgstr "Exécution de fonctions d'interface de programmes externes"
+msgstr "Exécution de fonctions d’interface de programmes externes"
 
 #: modules/misc/freetype.c:83 modules/misc/win32text.c:54
 #: modules/video_filter/marq.c:125 modules/visualization/xosd.c:73
@@ -12754,12 +12751,12 @@ msgstr ""
 
 #: modules/misc/gnutls.c:71
 msgid "Expiration time for resumed TLS sessions"
-msgstr "Délai d'expiration pour les sessions TLS reprises"
+msgstr "Délai d’expiration pour les sessions TLS reprises"
 
 #: modules/misc/gnutls.c:73
 msgid ""
 "Defines the delay before resumed TLS sessions will be expired (in seconds)."
-msgstr "Définit le délai d'expiration des sessions TLS reprises (en secondes)."
+msgstr "Définit le délai d’expiration des sessions TLS reprises (en secondes)."
 
 #: modules/misc/gnutls.c:76
 msgid "Number of resumed TLS sessions"
@@ -12788,7 +12785,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:86
 msgid "Check TLS/SSL server hostname in certificate"
-msgstr "Vérifier le nom d'hôte du serveur TLS/SSL ?"
+msgstr "Vérifier le nom d’hôte du serveur TLS/SSL ?"
 
 #: modules/misc/gnutls.c:88
 msgid "Ensures that server hostname in certificate match requested host name."
@@ -13122,11 +13119,11 @@ msgstr "Affecte un numéro de programme à la PMT."
 
 #: modules/mux/mpeg/ts.c:91
 msgid "Set PID to id of ES"
-msgstr "Regler l'id du PID comme celui de l'ES"
+msgstr "Régler l’id du PID comme celui de l’ES"
 
 #: modules/mux/mpeg/ts.c:92
 msgid "set PID to id of es"
-msgstr "Regler l'id du PID comme celui de l'ES"
+msgstr "Régler l’id du PID comme celui de l’ES"
 
 #: modules/mux/mpeg/ts.c:94
 msgid "Shaping delay (ms)"
@@ -13180,7 +13177,7 @@ msgstr "B minimal (inutilisé)"
 
 #: modules/mux/mpeg/ts.c:113 modules/mux/mpeg/ts.c:116
 msgid "This setting is deprecated and not used anymore"
-msgstr "Ce réglage n'est plus utilisé"
+msgstr "Ce réglage n’est plus utilisé"
 
 #: modules/mux/mpeg/ts.c:115
 msgid "Maximum B (deprecated)"
@@ -13429,7 +13426,7 @@ msgstr ""
 
 #: modules/stream_out/bridge.c:45
 msgid "ID Offset"
-msgstr "Décalage d'ID"
+msgstr "Décalage d’ID"
 
 #: modules/stream_out/bridge.c:46
 msgid ""
@@ -13745,7 +13742,7 @@ msgstr "Fichiers"
 
 #: modules/stream_out/switcher.c:83
 msgid "Full paths of the files separated by colons."
-msgstr "Chemin complets des fichiers séparés par des ':'"
+msgstr "Chemin complets des fichiers séparés par des « : »"
 
 #: modules/stream_out/switcher.c:84
 msgid "Sizes"
@@ -13753,15 +13750,15 @@ msgstr "Tailles"
 
 #: modules/stream_out/switcher.c:86
 msgid "List of sizes separated by colons (720x576:480x576)."
-msgstr "Liste des tailles séparées par des ':' (720x576:480x576)."
+msgstr "Liste des tailles séparées par des « : » (720x576:480x576)."
 
 #: modules/stream_out/switcher.c:87
 msgid "Aspect ratio"
-msgstr "Format d'écran"
+msgstr "Format d’écran"
 
 #: modules/stream_out/switcher.c:89
 msgid "Aspect ratio (4:3, 16:9)."
-msgstr "Format d'écran (4:3, 16:9)."
+msgstr "Format d’écran (4:3, 16:9)."
 
 #: modules/stream_out/switcher.c:90
 msgid "Command UDP port"
@@ -13785,7 +13782,7 @@ msgstr "Taille du GOP"
 
 #: modules/stream_out/switcher.c:98
 msgid "Number of P frames between two I frames."
-msgstr "Nombre d'images P entre deux images I."
+msgstr "Nombre d’images P entre deux images I."
 
 #: modules/stream_out/switcher.c:99
 msgid "Quantizer scale"
@@ -14138,7 +14135,7 @@ msgstr "Filtre vidéo d’ajustement d’image"
 
 #: modules/video_filter/adjust.c:74
 msgid "Image adjust"
-msgstr "Ajustement d'image"
+msgstr "Ajustement d’image"
 
 #: modules/video_filter/blend.c:67
 msgid "Video pictures blending"
@@ -14283,7 +14280,7 @@ msgstr "Filtre vidéo d’insertion de logo"
 
 #: modules/video_filter/logo.c:91
 msgid "Logo overlay"
-msgstr "Superposition d'un logo"
+msgstr "Superposition d’un logo"
 
 #: modules/video_filter/logo.c:109
 msgid "Logo sub filter"
@@ -14424,7 +14421,7 @@ msgstr "Nombre de colonnes"
 
 #: modules/video_filter/mosaic.c:104
 msgid "Keep aspect ratio when resizing"
-msgstr "Conserver le format d'écran pendant le redimensionnement"
+msgstr "Conserver le format d’écran lors d’un redimensionnement"
 
 #: modules/video_filter/mosaic.c:105
 msgid "Keep original size"
@@ -14479,11 +14476,11 @@ msgstr "Fichier de description, fichier contenant la liste de lecture simple"
 
 #: modules/video_filter/motiondetect.c:56
 msgid "History parameter"
-msgstr "Paramètre d'historique"
+msgstr "Paramètre d’historique"
 
 #: modules/video_filter/motiondetect.c:57
 msgid "History parameter, number of frames used for detection"
-msgstr "Paramètre d'historique, nombre d'images utilisées pour la détection"
+msgstr "Paramètre d’historique, nombre d’images utilisées pour la détection"
 
 #: modules/video_filter/motiondetect.c:60
 msgid "Motion detect video filter"
@@ -14639,7 +14636,7 @@ msgstr "liste de fenêtres actives, séparées par des virgules. Défault = tout
 
 #: modules/video_filter/wall.c:65
 msgid "Element aspect ratio"
-msgstr "Format d’écran de l'élément"
+msgstr "Format d’écran de l’élément"
 
 #: modules/video_filter/wall.c:66
 msgid "The aspect ratio of the individual displays building the display wall"
@@ -14651,7 +14648,7 @@ msgstr "Filtre vidéo effet mur"
 
 #: modules/video_filter/wall.c:70
 msgid "Image wall"
-msgstr "Mur d'image"
+msgstr "Mur d’image"
 
 #: modules/video_output/aa.c:55
 msgid "Ascii Art"
@@ -14786,27 +14783,27 @@ msgstr "Sortie audio HD1000"
 
 #: modules/video_output/image.c:48
 msgid "Image format"
-msgstr "Format de l'image"
+msgstr "Format de l’image"
 
 #: modules/video_output/image.c:49
 msgid "Set the format of the output image."
-msgstr "Réglez le format de l'image en sortie."
+msgstr "Réglez le format de l’image en sortie."
 
 #: modules/video_output/image.c:51
 msgid "Recording ratio"
-msgstr "Ratio d'enregistrement"
+msgstr "Ratio d’enregistrement"
 
 #: modules/video_output/image.c:52
 msgid ""
 "Set the ratio of images that are recorded. 3 means that one image out of "
 "three is recorded."
 msgstr ""
-"Configurer les dimensions des images enregistrées. 3 signifie qu'un tiers "
-"des images est enregistré."
+"Configurer le quota d’images enregistrées. 3 signifie qu’un tiers "
+"des images sont enregistrées."
 
 #: modules/video_output/image.c:55
 msgid "Filename prefix"
-msgstr "Prefix du nom de fichier"
+msgstr "Préfixe du nom de fichier"
 
 #: modules/video_output/image.c:56
 msgid ""
@@ -14920,9 +14917,8 @@ msgid "Windows GAPI video output"
 msgstr "Sortie vidéo Windows GAPI"
 
 #: modules/video_output/wingdi.c:220
-#, fuzzy
 msgid "Windows GDI"
-msgstr "Fenêtre"
+msgstr "Windows GDI"
 
 #: modules/video_output/wingdi.c:221
 msgid "Windows GDI video output"
@@ -15178,7 +15174,7 @@ msgstr "Interface XOSD"
 #~ msgstr "Tetum"
 
 #~ msgid "Faux"
-#~ msgstr "TTY simulée"
+#~ msgstr "TTY factice"
 
 #~ msgid "HTTP user name"
 #~ msgstr "Nom d’utilisateur HTTP"
