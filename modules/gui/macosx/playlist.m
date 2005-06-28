@@ -353,6 +353,64 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release(p_playlist);
 }
 
+- (BOOL)isItem: (playlist_item_t *)p_item inNode: (playlist_item_t *)p_node
+{
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    playlist_item_t *p_temp_item = p_item;
+
+    if( p_playlist == NULL )
+    {
+        return NO;
+    }
+
+    if ( p_temp_item )
+    {
+        int i;
+        vlc_mutex_lock( &p_playlist->object_lock );
+
+        /* Since outlineView: willDisplayCell:... may call this function with
+           p_items that don't exist anymore, first check if the item is still
+           in the playlist. Any cleaner solution welcomed. */
+
+        for ( i = 0 ; i < p_playlist->i_all_size ; i++ )
+        {
+            if( p_playlist->pp_all_items[i] == p_item ) break;
+            else if ( i == p_playlist->i_all_size - 1 )
+            {
+                vlc_object_release( p_playlist );
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                return NO;
+            }
+        }
+
+        while( p_temp_item->i_parents > 0 )
+        {
+            for( i = 0; i < p_temp_item->i_parents ; i++ )
+            {
+                if( p_temp_item->pp_parents[i]->i_view == i_current_view )
+                {
+                    if( p_temp_item->pp_parents[i]->p_parent == p_node )
+                    {
+                        vlc_mutex_unlock( &p_playlist->object_lock );
+                        vlc_object_release( p_playlist );
+                        return YES;
+                    }
+                    else
+                    {
+                        p_temp_item = p_temp_item->pp_parents[i]->p_parent;
+                        break;
+                    }
+                }
+            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
+        }
+    }
+
+    vlc_object_release( p_playlist );
+    return NO;
+}
+
 - (BOOL)isValueItem: (id)o_item inNode: (id)o_node
 {
     int i;
@@ -1261,16 +1319,39 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 /* Required for drag & drop and reordering */
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
-/*    unsigned int i;
+    unsigned int i;
+    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+    NSArray *o_array;
+
+    if( !p_playlist ) return NO;
+
+    [pboard declareTypes: [NSArray arrayWithObject:
+                                    @"VLCPlaylistItemPboardType"] owner: nil];
 
     for( i = 0 ; i < [items count] ; i++ )
     {
-        if( [outlineView levelForItem: [items objectAtIndex: i]] == 0 )
+        id o_item = [items objectAtIndex: i];
+
+        if( ![self isItem: [o_item pointerValue] inNode:
+                                        p_playlist->p_general] )
         {
+            vlc_object_release(p_playlist);
             return NO;
         }
-    }*/
-    return NO;
+    }
+
+    o_array = [NSArray arrayWithArray: items];
+
+    if( ![pboard setPropertyList:(id)o_array
+                                        forType:@"VLCPlaylistItemPboardType"] )
+    {
+        vlc_object_release(p_playlist);
+        return NO;
+    }
+
+    vlc_object_release(p_playlist);
+    return YES;
 }
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
