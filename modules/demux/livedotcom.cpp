@@ -774,13 +774,13 @@ static int Demux( demux_t *p_demux )
         return 0;
         */
     }
-    else if( !p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 3 )
+    else if( !p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 34 )
     {
         vlc_bool_t b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" );
 
         if( !b_rtsp_tcp && p_sys->rtsp && p_sys->ms )
         {
-            msg_Warn( p_demux, "no data received in 900ms. Switching to TCP" );
+            msg_Warn( p_demux, "no data received in 10s. Switching to TCP" );
             if( RollOverTcp( p_demux ) )
             {
                 msg_Err( p_demux, "TCP rollover failed, aborting" );
@@ -788,16 +788,16 @@ static int Demux( demux_t *p_demux )
             }
             var_SetBool( p_demux, "rtsp-tcp", VLC_TRUE );
         }
-        else if( p_sys->i_no_data_ti > 10 )
+        else if( p_sys->i_no_data_ti > 34 )
         {
-            msg_Err( p_demux, "no data received in 3s, aborting" );
+            msg_Err( p_demux, "no data received in 10s, aborting" );
             return 0;
         }
     }
-    else if( !p_sys->b_multicast && p_sys->b_no_data&& p_sys->i_no_data_ti > 10 )
+    else if( !p_sys->b_multicast && p_sys->b_no_data&& p_sys->i_no_data_ti > 34 )
     {
         /* EOF ? */
-        msg_Warn( p_demux, "no data received in 3s, eof ?" );
+        msg_Warn( p_demux, "no data received in 10s, eof ?" );
 	return 0;
     }
 
