@@ -34,6 +34,7 @@ if test "${CXX}" != ""; then
 fi
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AM_PROG_AS
 
 dnl AC_PROG_EGREP only exists in autoconf 2.54+, so we use AC_EGREP_CPP right
 dnl now otherwise it might be set in an obscure if statement.
@@ -4078,6 +4079,21 @@ then
 fi
 
 dnl
+dnl  DLL loader copied from MPlayer copied from somewhere else (WINE ?)
+dnl
+loader=false
+AC_ARG_ENABLE(loader,
+  [  --enable-loader         build DLL loader for ELF i386 platforms (default disabled)])
+AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
+AS_IF([test "${enable_loader}" = "yes"],
+  [ VLC_ADD_PLUGINS([dmo quicktime])
+    VLC_ADD_CPPFLAGS([dmo],[-I../../../@top_srcdir@/loader])
+    VLC_ADD_LDFLAGS([dmo],[../../../loader/libloader.a])
+    VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/loader])
+    VLC_ADD_LDFLAGS([quicktime],[../../loader/libloader.a])
+  ])
+
+dnl
 dnl  Microsoft ActiveX support
 dnl
 activex=false
@@ -4347,6 +4363,7 @@ AC_CONFIG_FILES([
   intl/Makefile
   ipkg/Makefile
   lib/Makefile
+  loader/Makefile
   modules/Makefile
   mozilla/Makefile
   m4/Makefile
