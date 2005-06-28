@@ -369,11 +369,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         int i;
         vlc_mutex_lock( &p_playlist->object_lock );
 
+// Let's check if we can do without that
+#if 0
+
         /* Since outlineView: willDisplayCell:... may call this function with
            p_items that don't exist anymore, first check if the item is still
            in the playlist. Any cleaner solution welcomed. */
 
-        for ( i = 0 ; i < p_playlist->i_all_size ; i++ )
         {
             if( p_playlist->pp_all_items[i] == p_item ) break;
             else if ( i == p_playlist->i_all_size - 1 )
@@ -383,7 +385,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 return NO;
             }
         }
-
+#endif
         while( p_temp_item->i_parents > 0 )
         {
             for( i = 0; i < p_temp_item->i_parents ; i++ )
@@ -1319,10 +1321,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 /* Required for drag & drop and reordering */
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
-    unsigned int i;
+    unsigned int i,j;
     playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
-    NSArray *o_array;
+    NSMutableArray *o_nodes_array = [NSMutableArray array];
+    NSMutableArray *o_items_array = [NSMutableArray array];
+    NSMutableArray *o_objects_array = [NSMutableArray array];
 
     if( !p_playlist ) return NO;
 
@@ -1339,11 +1343,50 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             vlc_object_release(p_playlist);
             return NO;
         }
+        if( ((playlist_item_t *)[o_item pointerValue])->i_children > 0 )
+            [o_nodes_array addObject: o_item];
+        else
+            [o_items_array addObject: o_item];
     }
 
-    o_array = [NSArray arrayWithArray: items];
+    /* Now we need to check if there are selected items that are in already
+       selected nodes. In that case, we only want to move the nodes */
+    for( i = 0 ; i < [o_nodes_array count] ; i++ )
+    {
+        for ( j = 0 ; j < [o_nodes_array count] ; j++ )
+        {
+            if( j == i ) continue;
+            if( [self isItem: [[o_nodes_array objectAtIndex:i] pointerValue]
+                    inNode: [[o_nodes_array objectAtIndex:j] pointerValue]] )
+            {
+                [o_nodes_array removeObjectAtIndex:i];
+                /* We need to execute the next iteration with the same index
+                   since the current item has been deleted */
+                i--;
+                break;
+            }
+        }
+    }
 
-    if( ![pboard setPropertyList:(id)o_array
+    for( i = 0 ; i < [o_items_array count] ; i++ )
+    {
+        for ( j = 0 ; j < [o_nodes_array count] ; j++ )
+        {
+            if( [self isItem: [[o_items_array objectAtIndex:i] pointerValue]
+                    inNode: [[o_nodes_array objectAtIndex:j] pointerValue]] )
+            {
+                [o_items_array removeObjectAtIndex:i];
+                i--;
+                break;
+            }
+            if( j == [o_nodes_array count] ) i++;
+        }
+    }
+
+    [o_objects_array addObjectsFromArray: o_nodes_array];
+    [o_objects_array addObjectsFromArray: o_items_array];
+
+    if( ![pboard setPropertyList:(id)o_objects_array
                                         forType:@"VLCPlaylistItemPboardType"] )
     {
         vlc_object_release(p_playlist);
