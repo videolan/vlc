@@ -34,7 +34,6 @@
 #include "objectsafety.h"
 #include "vlccontrol.h"
 #include "viewobject.h"
-#include "dataobject.h"
 
 #include "utils.h"
 
