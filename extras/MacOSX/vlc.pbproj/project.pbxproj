@@ -713,7 +713,7 @@
 			<string>RTSP</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>rtsp,rts</string>
+				<string>rtsp</string>
 			</array>
 		</dict>
 		<dict>
