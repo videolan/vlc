@@ -444,6 +444,18 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
         p_es->i_payload_type = p_media->i_payload_type++;
         p_es->psz_rtpmap = strdup( "MP2P/90000" );
         break;
+    case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
+                                   "AMR/8000/2" : "AMR/8000" );
+        p_es->psz_fmtp = strdup( "octet-align=1" );
+        break; 
+    case VLC_FOURCC( 's', 'a', 'w', 'b' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
+                                   "AMR-WB/16000/2" : "AMR-WB/16000" );
+        p_es->psz_fmtp = strdup( "octet-align=1" );
+        break; 
 
     default:
         msg_Err( p_vod, "cannot add this stream (unsupported "

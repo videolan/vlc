@@ -804,6 +804,7 @@ static int rtp_packetize_ac3  ( sout_stream_t *, sout_stream_id_t *, block_t * )
 static int rtp_packetize_split( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_h263 ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_amr  ( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -998,6 +999,22 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                      "IndexDeltaLength=3; Profile=1;", hexa );
             break;
         }
+        case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+            id->i_payload_type = p_sys->i_payload_type++;
+            id->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
+                                     "AMR/8000/2" : "AMR/8000" );
+            id->psz_fmtp = strdup( "octet-align=1" );
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            id->pf_packetize = rtp_packetize_amr;
+            break; 
+        case VLC_FOURCC( 's', 'a', 'w', 'b' ):
+            id->i_payload_type = p_sys->i_payload_type++;
+            id->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
+                                     "AMR-WB/16000/2" : "AMR-WB/16000" );
+            id->psz_fmtp = strdup( "octet-align=1" );
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            id->pf_packetize = rtp_packetize_amr;
+            break; 
 
         default:
             msg_Err( p_stream, "cannot add this stream (unsupported "
@@ -2113,3 +2130,41 @@ static int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
     return VLC_SUCCESS;
 }
 
+static int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
+                              block_t *in )
+{
+    int     i_max   = id->i_mtu - 14; /* payload max in one packet */
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+
+    uint8_t *p_data = in->p_buffer;
+    int     i_data  = in->i_buffer;
+    int     i;
+
+    /* Only supports octet-aligned mode */
+    for( i = 0; i < i_count; i++ )
+    {
+        int           i_payload = __MIN( i_max, i_data );
+        block_t *out = block_New( p_stream, 14 + i_payload );
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
+                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+        /* Payload header */
+        out->p_buffer[12] = 0xF0; /* CMR */
+        out->p_buffer[13] = 0x00; /* ToC */ /* FIXME: frame type */
+
+        /* FIXME: are we fed multiple frames ? */
+        memcpy( &out->p_buffer[14], p_data, i_payload );
+
+        out->i_buffer   = 14 + i_payload;
+        out->i_dts    = in->i_dts + i * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        rtp_packetize_send( id, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+    }
+
+    return VLC_SUCCESS;
+}
