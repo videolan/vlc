@@ -1359,8 +1359,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if( !p_playlist ) return NO;
 
-    [pboard declareTypes: [NSArray arrayWithObject:
-                                    @"VLCPlaylistItemPboardType"] owner: nil];
+    [pboard declareTypes: [NSArray arrayWithObjects:
+        @"VLCPlaylistItemPboardType", NSFilenamesPboardType, nil] owner: self];
 
     for( i = 0 ; i < [items count] ; i++ )
     {
@@ -1415,8 +1415,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_objects_array addObjectsFromArray: o_nodes_array];
     [o_objects_array addObjectsFromArray: o_items_array];
 
-    if( ![pboard setPropertyList:(id)o_objects_array
-                                        forType:@"VLCPlaylistItemPboardType"] )
+    if( ![pboard setPropertyList: o_objects_array
+            forType:@"VLCPlaylistItemPboardType"] ||
+            ![pboard setPropertyList: [NSArray array]
+            forType:@"VLCPlaylistItemPboardType"])
     {
         vlc_object_release(p_playlist);
         return NO;
@@ -1428,12 +1430,28 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
 {
+    playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
-    if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
+    if( !p_playlist ) return NSDragOperationNone;
+
+    /* Drop from the Playlist */
+    if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] &&
+        [self isItem: [item pointerValue] inNode: p_playlist->p_general])
     {
+        vlc_object_release(p_playlist);
+        return NSDragOperationMove;
+    }
+
+    /* Drop from the Finder */
+    else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] &&
+        ![[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"])
+    {
+        vlc_object_release(p_playlist);
         return NSDragOperationGeneric;
     }
+    vlc_object_release(p_playlist);
     return NSDragOperationNone;
 }
 
