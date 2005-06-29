@@ -106,7 +106,7 @@ private:
     "video/x-ms-asf-plugin:asf,asx:Windows Media Video;" \
     "video/x-ms-asf:asf,asx:Windows Media Video;" \
     "application/x-mplayer2::Windows Media;" \
-    "video/x-ms-wmv:wmv:Windows Media" \
+    "video/x-ms-wmv:wmv:Windows Media;" \
     /* Google VLC mime */ \
-    "application/x-google-vlc-plugin::Google VLC plugin;" \
+    "application/x-google-vlc-plugin::Google VLC plugin" \
 
