@@ -249,6 +249,7 @@
                 deleteItem = id; 
                 handlePopUp = id; 
                 playItem = id; 
+                recursiveExpandNode = id; 
                 savePlaylist = id; 
                 searchItem = id; 
                 selectAll = id; 
@@ -264,6 +265,7 @@
                 "o_mi_delete" = id; 
                 "o_mi_info" = id; 
                 "o_mi_play" = id; 
+                "o_mi_recursive_expand" = id; 
                 "o_mi_save_playlist" = id; 
                 "o_mi_selectall" = id; 
                 "o_mi_services" = id; 

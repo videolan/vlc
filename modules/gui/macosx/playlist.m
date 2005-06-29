@@ -228,6 +228,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
+    [o_mi_recursive_expand setTitle: _NS("Expand Node")];
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_info setTitle: _NS("Properties")];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
@@ -558,10 +559,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                                         numberOfChildrenOfItem: o_item]  > 0 )
         //is a node and not an item
         {
-            id o_playing_item = [o_outline_dict objectForKey:
-                [NSString stringWithFormat: @"%p", p_playlist->status.p_item]];
             if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
-                [self isValueItem: o_playing_item inNode: o_item] == YES )
+                [self isItem: p_playlist->status.p_item inNode:
+                        ((playlist_item_t *)[o_item pointerValue])] == YES )
             {
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
@@ -979,6 +979,32 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
 }
 
+- (IBAction)recursiveExpandNode:(id)sender
+{
+    int i;
+    id o_item = [o_outline_view itemAtRow: [o_outline_view selectedRow]];
+    playlist_item_t *p_item = (playlist_item_t *)[o_item pointerValue];
+
+    if( ![[o_outline_view dataSource] outlineView: o_outline_view
+                                                    isItemExpandable: o_item] )
+    {
+        for( i = 0 ; i < p_item->i_parents ; i++ )
+        {
+            if( p_item->pp_parents[i]->i_view == i_current_view )
+            {
+                o_item = [o_outline_dict objectForKey: [NSString
+                    stringWithFormat: @"%p", p_item->pp_parents[i]->p_parent]];
+                break;
+            }
+        }
+    }
+
+    /* We need to collapse the node first, since OSX refuses to recursively
+       expand an already expanded node, even if children nodes are collapsed. */
+    [o_outline_view collapseItem: o_item collapseChildren: YES];
+    [o_outline_view expandItem: o_item expandChildren: YES];
+}
+
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
     NSPoint pt;
@@ -995,6 +1021,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_delete setEnabled: b_item_sel];
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
+    [o_mi_recursive_expand setEnabled: b_item_sel];
+    [o_mi_sort_name setEnabled: b_item_sel];
+    [o_mi_sort_author setEnabled: b_item_sel];
 
     return( o_ctx_menu );
 }
