@@ -255,14 +255,17 @@ void __module_EndBank( vlc_object_t *p_this )
     {
         free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
         free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
-        if( !p_bank->i_loaded_cache ) free( p_bank->pp_loaded_cache );
     }
+    if( p_bank->pp_loaded_cache )
+        free( p_bank->pp_loaded_cache );
+
     while( p_bank->i_cache-- )
     {
         free( p_bank->pp_cache[p_bank->i_cache]->psz_file );
         free( p_bank->pp_cache[p_bank->i_cache] );
-        if( !p_bank->i_cache ) free( p_bank->pp_cache );
     }
+    if( p_bank->pp_cache )
+        free( p_bank->pp_cache );
 #undef p_bank
 #endif
 
