@@ -34,7 +34,6 @@
 	- implementation of correct encap-selection for transcoding
 	- fill the playlist-table on t2
 	- implement l10n on t8?
-	- implement prevTab
 	- see FIXME's
 */
 
@@ -76,6 +75,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t2_tbl_plst setEnabled:NO];
 	[o_wizardhelp_window setExcludedFromWindowsMenu:YES];
 	o_userSelections = [[NSMutableDictionary alloc] init];
+	[o_btn_backward setEnabled:NO];
 
     /* add audio-bitrates for transcoding */
     NSArray * audioBitratesArray;
@@ -164,12 +164,54 @@ static VLCWizard *_o_sharedInstance = nil;
 - (void)showWizard
 {
     /* just present the window to the user */
-    /* FIXME: we need a method to reset the window first */
     [o_tab_pageHolder selectFirstTabViewItem:self];
     
+	[self resetWizard];
+	
     [o_wizard_window center];
     [o_wizard_window displayIfNeeded];
     [o_wizard_window makeKeyAndOrderFront:nil];
+}
+
+- (void)resetWizard
+{
+	/* reset the wizard-window to its default values */
+	
+	[o_userSelections removeAllObjects];
+	[o_t1_matrix_strmgOrTrnscd selectCellAtRow:0 column:0];
+	[[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setState: NSOffState];
+	[o_btn_forward setTitle: [_NS("Next") stringByAppendingString:@" >"]];
+	
+	/* "Input" */
+	[o_t2_fld_pathToNewStrm setStringValue: @""];
+	[o_t2_ckb_enblPartExtrct setState: NSOffState];
+	[self t2_enableExtract:nil];
+	[o_t2_matrix_inputSourceType selectCellAtRow:0 column:0];
+	[[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setState: NSOffState];
+	/* FIXME: we need to refresh the playlist-table as well */
+	[o_t2_tbl_plst setEnabled:NO];
+	[o_t2_fld_pathToNewStrm setEnabled:YES];
+	[o_t2_btn_chooseFile setEnabled:YES];
+	
+	/* "Streaming 1" */
+	[o_t3_fld_address setStringValue: @""];
+	[o_t3_matrix_stmgMhd selectCellAtRow:0 column:0];
+	[[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setState: NSOffState];
+	[[o_t3_matrix_stmgMhd cellAtRow:1 column:2] setState: NSOffState];
+	
+	/* "Transcode 1" */
+	[o_t4_ckb_audio setState: NSOffState];
+	[o_t4_ckb_video setState: NSOffState];
+	[self t4_enblVidTrnscd:nil];
+	[self t4_enblAudTrnscd:nil];
+	
+	/* "Streaming 2" */
+	[o_t6_fld_ttl setStringValue: @"1"];
+	[o_t6_ckb_sap setState: NSOffState];
+	[self t6_enblSapAnnce:nil];
+	
+	/* "Transcode 2" */
+	[o_t7_fld_filePath setStringValue: @""];
 }
 
 - (void)initStrings
@@ -277,6 +319,7 @@ static VLCWizard *_o_sharedInstance = nil;
 		}else{
 			[o_userSelections setObject:@"trnscd" forKey:@"trnscdOrStrmg"];
 		}
+		[o_btn_backward setEnabled:YES];
 		[o_tab_pageHolder selectTabViewItemAtIndex:1];
 	}
 	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Input"])
@@ -502,8 +545,59 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (IBAction)prevTab:(id)sender
 {
-    /* only a stub atm; needs to be implemented correctly later on */
-    [o_tab_pageHolder selectPreviousTabViewItem:self];
+    if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Summary"])
+	{	
+		/* check whether we are streaming or transcoding and go back */
+		if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
+		{
+			/* show "Streaming 2" */
+			[o_tab_pageHolder selectTabViewItemAtIndex:5];
+		}else{
+			/* show "Transcode 2" */
+			[o_tab_pageHolder selectTabViewItemAtIndex:6];
+		}
+		/* rename the forward-button */
+		[o_btn_forward setTitle: [_NS("Next") stringByAppendingString:@" >"]];
+	}
+	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Transcode 2"])
+	{
+		/* show "Encap" */
+		[o_tab_pageHolder selectTabViewItemAtIndex:4];
+	}
+	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Streaming 2"])
+	{
+		/* show "Encap" */
+		[o_tab_pageHolder selectTabViewItemAtIndex:4];
+	}
+	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Encap"])
+	{
+		/* check whether we are streaming or transcoding and go back */
+		if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
+		{
+			/* show "Streaming 1" */
+			[o_tab_pageHolder selectTabViewItemAtIndex:2];
+		}else{
+			/* show "Transcode 2" */
+			[o_tab_pageHolder selectTabViewItemAtIndex:3];
+		}
+	}
+	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Streaming 1"])
+	{
+		/* show "Input" */
+		[o_tab_pageHolder selectTabViewItemAtIndex:1];
+	}
+	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Transcode 1"])
+	{
+		/* show "Input" */
+		[o_tab_pageHolder selectTabViewItemAtIndex:1];
+	}
+	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Input"])
+	{
+		/* show "Hello" */
+		[o_tab_pageHolder selectTabViewItemAtIndex:0];
+		/* disable backwards-btn */
+		[o_btn_backward setEnabled:NO];
+	}
 }
 
 - (IBAction)t1_mrInfo_streaming:(id)sender
@@ -579,6 +673,8 @@ static VLCWizard *_o_sharedInstance = nil;
     } else {
         [o_t2_fld_prtExtrctFrom setEnabled:NO];
         [o_t2_fld_prtExtrctTo setEnabled:NO];
+		[o_t2_fld_prtExtrctFrom setStringValue:@""];
+		[o_t2_fld_prtExtrctTo setStringValue:@""];
     }
 }
 
@@ -590,6 +686,7 @@ static VLCWizard *_o_sharedInstance = nil;
 - (IBAction)t4_AudCdcChanged:(id)sender
 {
     /* update codec info */
+	[o_t4_txt_hintAudio setStringValue:[[o_audioCodecs objectAtIndex:[o_t4_pop_audioCodec indexOfSelectedItem]] objectAtIndex:2]];
 }
 
 - (IBAction)t4_enblAudTrnscd:(id)sender

@@ -161,4 +161,5 @@
 + (VLCWizard *)sharedInstance;
 - (void)showWizard;
 - (void)showSummary;
+- (void)resetWizard;
 @end
