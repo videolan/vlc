@@ -1332,6 +1332,7 @@ static int InitSocket( services_discovery_t *p_sd, char *psz_address,
 
     if( i_fd != -1 )
     {
+        net_StopSend( i_fd );
         INSERT_ELEM(  p_sd->p_sys->pi_fd, p_sd->p_sys->i_fd,
                       p_sd->p_sys->i_fd, i_fd );
         return VLC_SUCCESS;
