@@ -243,6 +243,8 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_name );
 
+    net_StopSend( p_sys->fd );
+
     /* FIXME */
     p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );
     if( p_sys->i_mtu <= 1 )
