@@ -103,6 +103,10 @@
     if ( self != nil )
     {
         o_outline_dict = [[NSMutableDictionary alloc] init];
+        o_nodes_array = [[NSMutableArray alloc] init];
+        o_items_array = [[NSMutableArray alloc] init];
+
+
         //i_moveRow = -1;
     }
     return self;
@@ -364,6 +368,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         return NO;
     }
+
+    if( p_node == p_item ) return YES;
 
     if ( p_temp_item )
     {
@@ -1353,14 +1359,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     unsigned int i,j;
     playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
-    NSMutableArray *o_nodes_array = [NSMutableArray array];
-    NSMutableArray *o_items_array = [NSMutableArray array];
-    NSMutableArray *o_objects_array = [NSMutableArray array];
+
+    [o_items_array removeAllObjects];
+    [o_nodes_array removeAllObjects];
 
     if( !p_playlist ) return NO;
-
-    [pboard declareTypes: [NSArray arrayWithObjects:
-        @"VLCPlaylistItemPboardType", NSFilenamesPboardType, nil] owner: self];
 
     for( i = 0 ; i < [items count] ; i++ )
     {
@@ -1408,21 +1411,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 i--;
                 break;
             }
-            if( j == [o_nodes_array count] ) i++;
         }
     }
 
-    [o_objects_array addObjectsFromArray: o_nodes_array];
-    [o_objects_array addObjectsFromArray: o_items_array];
-
-    if( ![pboard setPropertyList: o_objects_array
-            forType:@"VLCPlaylistItemPboardType"] ||
-            ![pboard setPropertyList: [NSArray array]
-            forType:@"VLCPlaylistItemPboardType"])
-    {
-        vlc_object_release(p_playlist);
-        return NO;
-    }
+    [pboard declareTypes: [NSArray arrayWithObjects:
+        @"VLCPlaylistItemPboardType",NSFilenamesPboardType, nil] owner: self];
+    [pboard setPropertyList:[NSArray array]
+                                        forType:NSFilenamesPboardType];
 
     vlc_object_release(p_playlist);
     return YES;
@@ -1436,17 +1431,28 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if( !p_playlist ) return NSDragOperationNone;
 
+    if( ![self isItem: [item pointerValue] inNode: p_playlist->p_general] )
+    return NSDragOperationNone;
+
     /* Drop from the Playlist */
-    if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] &&
-        [self isItem: [item pointerValue] inNode: p_playlist->p_general])
+    if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] )
     {
+        unsigned int i;
+        for( i = 0 ; i < [o_nodes_array count] ; i++ )
+        {
+            if( [self isItem: [item pointerValue] inNode:
+                            [[o_nodes_array objectAtIndex: i] pointerValue]]  )
+            {
+                vlc_object_release(p_playlist);
+                return NSDragOperationNone;
+            }
+        }
         vlc_object_release(p_playlist);
         return NSDragOperationMove;
     }
 
     /* Drop from the Finder */
-    else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] &&
-        ![[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"])
+    else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
         vlc_object_release(p_playlist);
         return NSDragOperationGeneric;

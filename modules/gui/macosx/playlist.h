@@ -70,6 +70,8 @@
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
+    NSMutableArray *o_nodes_array;
+    NSMutableArray *o_items_array;
     NSMutableDictionary *o_outline_dict;
 
     BOOL b_selected_item_met;
