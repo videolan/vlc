@@ -240,6 +240,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->i_empty_depth = 0;
     vlc_mutex_init( p_access, &p_sys->p_thread->blocks_lock );
 
+    /* FIXME: use net_OpenUDP API */
     socket_desc.psz_server_addr = psz_dst_addr;
     socket_desc.i_server_port   = i_dst_port;
     socket_desc.psz_bind_addr   = "";
@@ -257,6 +258,7 @@ static int Open( vlc_object_t *p_this )
     module_Unneed( p_sys->p_thread, p_network );
 
     p_sys->p_thread->i_handle = socket_desc.i_handle;
+    net_StopRecv( socket_desc.i_handle );
 
     var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
     p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;
