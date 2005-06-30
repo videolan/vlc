@@ -29,29 +29,40 @@
 
 @interface VLCWizard : NSObject
 {
-    IBOutlet id o_btn_backward;
+    /* general items */
+	IBOutlet id o_btn_backward;
     IBOutlet id o_btn_cancel;
     IBOutlet id o_btn_forward;
+	IBOutlet id o_tab_pageHolder;
+    IBOutlet id o_wizard_window;
+	IBOutlet id o_wizardhelp_window;
+	IBOutlet id o_wh_txt_title;
+	IBOutlet id o_wh_txt_text;
+	IBOutlet id o_wh_btn_okay;
+	
+	/* page one ("Hello") */
     IBOutlet id o_t1_btn_mrInfo_strmg;
     IBOutlet id o_t1_btn_mrInfo_trnscd;
-    IBOutlet id o_t1_rdo_streaming;
-    IBOutlet id o_t1_rdo_transcode;
+    IBOutlet id o_t1_matrix_strmgOrTrnscd;
     IBOutlet id o_t1_txt_notice;
     IBOutlet id o_t1_txt_text;
     IBOutlet id o_t1_txt_title;
+	
+	/* page two ("Input") */
     IBOutlet id o_t2_box_prtExtrct;
     IBOutlet id o_t2_ckb_enblPartExtrct;
     IBOutlet id o_t2_btn_chooseFile;
     IBOutlet id o_t2_fld_pathToNewStrm;
     IBOutlet id o_t2_fld_prtExtrctFrom;
     IBOutlet id o_t2_fld_prtExtrctTo;
-    IBOutlet id o_t2_rdo_exstPlstItm;
-    IBOutlet id o_t2_rdo_newStrm;
+    IBOutlet id o_t2_matrix_inputSourceType;
     IBOutlet id o_t2_tbl_plst;
     IBOutlet id o_t2_text;
     IBOutlet id o_t2_title;
     IBOutlet id o_t2_txt_prtExtrctFrom;
     IBOutlet id o_t2_txt_prtExtrctTo;
+	
+	/* page one ("Streaming 1") */
     IBOutlet id o_t3_box_dest;
     IBOutlet id o_t3_box_strmgMthd;
     IBOutlet id o_t3_fld_address;
@@ -59,6 +70,8 @@
     IBOutlet id o_t3_txt_destInfo;
     IBOutlet id o_t3_txt_text;
     IBOutlet id o_t3_txt_title;
+	
+	/* page four ("Transcode 1") */
     IBOutlet id o_t4_box_audio;
     IBOutlet id o_t4_box_video;
     IBOutlet id o_t4_ckb_audio;
@@ -75,9 +88,13 @@
     IBOutlet id o_t4_txt_videoCodec;
     IBOutlet id o_t4_txt_hintAudio;
     IBOutlet id o_t4_txt_hintVideo;
+	
+	/* page five ("Encap") */
     IBOutlet id o_t5_matrix_encap;
     IBOutlet id o_t5_text;
     IBOutlet id o_t5_title;
+	
+	/* page six ("Streaming 2") */
     IBOutlet id o_t6_ckb_sap;
     IBOutlet id o_t6_fld_sap;
     IBOutlet id o_t6_fld_ttl;
@@ -86,17 +103,41 @@
     IBOutlet id o_t6_txt_ttl;
     IBOutlet id o_t6_btn_mrInfo_ttl;
     IBOutlet id o_t6_btn_mrInfo_sap;
+	
+	/* page seven ("Transcode 2") */
     IBOutlet id o_t7_btn_chooseFile;
     IBOutlet id o_t7_fld_filePath;
     IBOutlet id o_t7_text;
     IBOutlet id o_t7_title;
     IBOutlet id o_t7_txt_saveFileTo;
-    IBOutlet id o_tab_pageHolder;
-    IBOutlet id o_wizard_window;
-	IBOutlet id o_wizardhelp_window;
-	IBOutlet id o_wh_txt_title;
-	IBOutlet id o_wh_txt_text;
-	IBOutlet id o_wh_btn_okay;
+	
+	/* page eight ("Summary") */
+	IBOutlet id o_t8_fld_destination;
+    IBOutlet id o_t8_fld_encapFormat;
+    IBOutlet id o_t8_fld_inptStream;
+    IBOutlet id o_t8_fld_partExtract;
+    IBOutlet id o_t8_fld_sap;
+    IBOutlet id o_t8_fld_saveFileTo;
+    IBOutlet id o_t8_fld_strmgMthd;
+    IBOutlet id o_t8_fld_trnscdAudio;
+    IBOutlet id o_t8_fld_trnscdVideo;
+    IBOutlet id o_t8_fld_ttl;
+    IBOutlet id o_t8_txt_destination;
+    IBOutlet id o_t8_txt_encapFormat;
+    IBOutlet id o_t8_txt_inputStream;
+    IBOutlet id o_t8_txt_partExtract;
+    IBOutlet id o_t8_txt_sap;
+    IBOutlet id o_t8_txt_saveFileTo;
+    IBOutlet id o_t8_txt_strmgMthd;
+    IBOutlet id o_t8_txt_text;
+    IBOutlet id o_t8_txt_title;
+    IBOutlet id o_t8_txt_trnscdAudio;
+    IBOutlet id o_t8_txt_trnscdVideo;
+    IBOutlet id o_t8_txt_ttl;
+	
+	NSMutableDictionary * o_userSelections;
+	NSArray * o_videoCodecs;
+	NSArray * o_audioCodecs;
 }
 - (IBAction)cancelRun:(id)sender;
 - (IBAction)nextTab:(id)sender;
@@ -119,4 +160,5 @@
 
 + (VLCWizard *)sharedInstance;
 - (void)showWizard;
+- (void)showSummary;
 @end
