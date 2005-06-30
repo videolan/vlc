@@ -1376,7 +1376,6 @@ static int LoadModule( vlc_object_t *p_this, char *psz_file,
 
 #elif defined(HAVE_DL_DLOPEN) && defined(RTLD_NOW)
     /* static is OK, we are called atomically */
-    static vlc_bool_t b_kde = VLC_FALSE;
 
 #   if defined(SYS_LINUX)
     /* XXX HACK #1 - we should NOT open modules with RTLD_GLOBAL, or we
@@ -1393,18 +1392,6 @@ static int LoadModule( vlc_object_t *p_this, char *psz_file,
         }
     }
 #   endif
-    /* XXX HACK #2 - the ugly KDE workaround. It seems that libkdewhatever
-     * causes dlopen() to segfault if libstdc++ is not loaded in the caller,
-     * so we just load libstdc++. Bwahahaha! ph34r! -- Sam. */
-    /* Update: FYI, this is Debian bug #180505, and seems to be fixed. */
-    if( !b_kde && !strstr( psz_file, "kde" ) )
-    {
-        dlopen( "libstdc++.so.6", RTLD_NOW )
-         || dlopen( "libstdc++.so.5", RTLD_NOW )
-         || dlopen( "libstdc++.so.4", RTLD_NOW )
-         || dlopen( "libstdc++.so.3", RTLD_NOW );
-        b_kde = VLC_TRUE;
-    }
 
     handle = dlopen( psz_file, RTLD_NOW );
     if( handle == NULL )
