@@ -40,8 +40,9 @@ diff -ruN x264.orig/encoder/ratecontrol.c x264/encoder/ratecontrol.c
  #include "ratecontrol.h"
  
 -#if defined(SYS_FREEBSD) || defined(SYS_BEOS)
+-#define exp2f(x) powf( 2, (x) )
 +#if defined(SYS_FREEBSD) || defined(SYS_BEOS) || defined(SYS_MACOSX)
- #define exp2f(x) powf( 2, (x) )
++#define exp2f(x) (float)pow( 2, (x) )
 +#define sqrtf sqrt
  #endif
  #ifdef _MSC_VER
