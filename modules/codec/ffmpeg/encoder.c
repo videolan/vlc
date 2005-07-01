@@ -364,7 +364,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->lumi_masking = p_sys->f_lumi_masking;
         p_context->dark_masking = p_sys->f_dark_masking;
         p_context->p_masking = p_sys->f_p_masking;
+#if LIBAVCODEC_BUILD >= 4741
         p_context->border_masking = p_sys->f_border_masking;
+#endif
         p_context->luma_elim_threshold = p_sys->i_luma_elim;
         p_context->chroma_elim_threshold = p_sys->i_chroma_elim;
 
