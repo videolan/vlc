@@ -496,6 +496,39 @@ int playlist_NodeInsert( playlist_t *p_playlist,
 }
 
 /**
+ * Deletes a parent from the parent list of a node
+ *
+ * \param p_playlist the playlist
+ * \param p_item the item to remove
+ * \param p_parent the parent node
+ * \return VLC_SUCCESS or an error
+ */
+int playlist_NodeRemoveParent( playlist_t *p_playlist,
+                        playlist_item_t *p_item,
+                        playlist_item_t *p_parent )
+{
+   int i;
+   if( !p_parent || p_parent->i_children == -1 )
+   {
+        msg_Err( p_playlist, "invalid node" );
+   }
+
+   for( i = 0; i < p_item->i_parents; i++ )
+   {
+       if( p_item->pp_parents[i]->p_parent == p_parent )
+       {
+           if( p_item->pp_parents[i] )
+           {
+               free( p_item->pp_parents[i] );
+           }
+           REMOVE_ELEM( p_item->pp_parents, p_item->i_parents, i );
+       }
+   }
+   p_item->i_serial++;
+   return VLC_SUCCESS;
+}
+
+/**
  * Deletes an item from the children of a node
  *
  * \param p_playlist the playlist
@@ -508,11 +541,6 @@ int playlist_NodeRemoveItem( playlist_t *p_playlist,
                         playlist_item_t *p_parent )
 {
    int i;
-   if( !p_parent || p_parent->i_children == -1 )
-   {
-        msg_Err( p_playlist, "invalid node" );
-   }
-
    for( i= 0; i< p_parent->i_children ; i++ )
    {
        if( p_parent->pp_children[i] == p_item )
