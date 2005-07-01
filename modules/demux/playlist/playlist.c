@@ -45,6 +45,7 @@ vlc_module_begin();
     add_bool( "playlist-autostart", 1, NULL, AUTOSTART_TEXT, AUTOSTART_LONGTEXT,
               VLC_FALSE );
 
+    set_shortname( _("Playlist") );
     set_description( _("Old playlist open") );
     add_shortcut( "old-open" );
     set_capability( "demux2", 10 );

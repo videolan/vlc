@@ -98,6 +98,7 @@ static int NetOpen( vlc_object_t * );
     "This overrides the routing table.")
 
 vlc_module_begin();
+    set_shortname( "IPv4" );
     set_description( _("IPv4 network abstraction layer") );
     set_capability( "network", 50 );
     set_category( CAT_INPUT );

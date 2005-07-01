@@ -63,7 +63,7 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
   "Integer from -1 (no model) to 4." )
 
 vlc_module_begin();
-    set_shortname( "twolame");
+    set_shortname( "Twolame");
     set_description( _("Libtwolame audio encoder") );
     set_capability( "encoder", 50 );
     set_callbacks( OpenEncoder, CloseEncoder );
