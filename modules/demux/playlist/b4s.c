@@ -153,7 +153,7 @@ static int Demux( demux_t *p_demux )
         p_bitrate = playlist_NodeCreate( p_playlist, p_current->pp_parents[0]->i_view, "Bitrate", p_current );
         playlist_CopyParents( p_current, p_bitrate );
     }
-    
+
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
 
@@ -245,7 +245,7 @@ static int Demux( demux_t *p_demux )
                 if( psz_elname ) free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
                 if( !psz_elname ) return -1;
-                
+
 
                 // Read the attributes
                 while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
@@ -358,25 +358,41 @@ static int Demux( demux_t *p_demux )
                     /* We need to declare the parents of the node as the
                      *                  * same of the parent's ones */
                     playlist_CopyParents( p_current, p_item );
-                    
+
                     vlc_input_item_CopyOptions( &p_current->input,
                                                 &p_item->input );
                     if( b_shoutcast )
-					{
-						char *psz_genreToken;
-						char *psz_otherToken;
+                    {
+                        char *psz_genreToken;
+                        char *psz_otherToken;
+                        int i = 0;
 
+                        psz_genreToken = psz_genre;
 
-						psz_genreToken = psz_genre;
+                        /* split up the combined genre string form
+                        shoutcast and add the individual genres */
+                        while ( psz_genreToken &&
+                          ( psz_otherToken = get_next_token(psz_genreToken )))
+                        {
+                            if( strlen(psz_genreToken)>2 )
+                            /* We dont want genres below 2 letters,
+                            this gets rid of alot of junk*/
+                            {
+                                /* lowercase everything */
+                                for( i=0; psz_genreToken[i]!=0; i++ )
+                                    psz_genreToken[i] =
+                                        tolower(psz_genreToken[i]);
+                /* Make first letter uppercase, purely cosmetical */
+                                psz_genreToken[0] =
+                                    toupper( psz_genreToken[0] );
+                                ShoutcastAdd( p_playlist, p_genre,
+                                              p_bitrate, p_item,
+                                              psz_genreToken, psz_bitrate );
 
-						while ( psz_genreToken && ( psz_otherToken = get_next_token(psz_genreToken )))
-						{
-							ShoutcastAdd( p_playlist, p_genre, p_bitrate, p_item,
-                                      psz_genreToken, psz_bitrate );
-
-							psz_genreToken = psz_otherToken;
-						}
-					}
+                                psz_genreToken = psz_otherToken;
+                            }
+                        }
+                    }
 
 #define FREE(a) if( a ) free( a ); a = NULL;
                     FREE( psz_name );
