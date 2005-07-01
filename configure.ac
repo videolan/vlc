@@ -4307,9 +4307,15 @@ AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version st
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2005 VideoLAN", [Copyright string])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 
-VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
-AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module functions])
-AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
+dnl Old definitions for version-dependant plugins
+dnl VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
+dnl AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module functions])
+dnl AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
+
+dnl New definitions with value matching 0.8.2 release
+AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__0_8_2", [String suffix for module functions])
+AC_DEFINE_UNQUOTED(MODULE_SYMBOL, 0_8_2, [Symbol suffix for module functions])
+
 
 DATA_PATH="${ac_tool_prefix}/share/vlc"
 AC_SUBST(DATA_PATH)
