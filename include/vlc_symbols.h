@@ -376,8 +376,6 @@ struct module_symbols_t
     void (*net_ListenClose_inner) (int *fd);
     void (*DigestMD5_inner) (struct md5_s *, uint32_t *);
     int (*__net_CheckIP_inner) (vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts, int i_hosts);
-    int (*net_StopSend_inner) (int fd);
-    int (*net_StopRecv_inner) (int fd);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -739,8 +737,6 @@ struct module_symbols_t
 #  define net_ListenClose (p_symbols)->net_ListenClose_inner
 #  define DigestMD5 (p_symbols)->DigestMD5_inner
 #  define __net_CheckIP (p_symbols)->__net_CheckIP_inner
-#  define net_StopSend (p_symbols)->net_StopSend_inner
-#  define net_StopRecv (p_symbols)->net_StopRecv_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1105,8 +1101,6 @@ struct module_symbols_t
     ((p_symbols)->net_ListenClose_inner) = net_ListenClose; \
     ((p_symbols)->DigestMD5_inner) = DigestMD5; \
     ((p_symbols)->__net_CheckIP_inner) = __net_CheckIP; \
-    ((p_symbols)->net_StopSend_inner) = net_StopSend; \
-    ((p_symbols)->net_StopRecv_inner) = net_StopRecv; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */

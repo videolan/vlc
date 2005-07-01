@@ -1178,39 +1178,6 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 }
 
 /*****************************************************************************
- * net_StopRecv/Send
- *****************************************************************************
- * Wrappers for shutdown()
- *****************************************************************************/
-int net_StopRecv( int fd )
-{
-#if defined (SHUT_RD)
-    /* the standard way */
-    return shutdown( fd, SHUT_RD );
-#elif defined (SD_RECEIVE)
-    /* the Microsoft seemingly-purposedly-different-for-the-sake-of-it way */
-    return shutdown( fd, SD_RECEIVE );
-#else
-# warning FIXME: implement shutdown on your platform!
-    return -1;
-#endif
-}
-
-int net_StopSend( int fd )
-{
-#if defined (SHUT_WR)
-    /* the standard way */
-    return shutdown( fd, SHUT_WR );
-#elif defined (SD_SEND)
-    /* the Microsoft seemingly-purposedly-different-for-the-sake-of-it way */
-    return shutdown( fd, SD_SEND );
-#else
-# warning FIXME: implement shutdown on your platform!
-    return -1;
-#endif
-}
-
-/*****************************************************************************
  * __net_CheckIP
  *****************************************************************************
  * Check that a given IP is within a set of IP/netmask.
