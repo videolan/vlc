@@ -59,10 +59,8 @@
 
 #ifdef SYS_BEOS
 #   define NO_ADDRESS  NO_DATA
-#   define PF_INET     AF_INET
 #   define INADDR_NONE 0xFFFFFFFF
 #   define AF_UNSPEC   0
-#   define PF_UNSPEC   AF_UNSPEC
 #endif
 
 #define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
@@ -330,7 +328,7 @@ makeipv4info (int type, int proto, u_long ip, u_short port, const char *name)
     addr.sin_port = port;
     addr.sin_addr.s_addr = ip;
 
-    return makeaddrinfo (PF_INET, type, proto,
+    return makeaddrinfo (AF_INET, type, proto,
                          (struct sockaddr*)&addr, sizeof (addr), name);
 }
 
@@ -596,20 +594,20 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     else
         memcpy( &hints, p_hints, sizeof( hints ) );
 
-    if( hints.ai_family == PF_UNSPEC )
+    if( hints.ai_family == AF_UNSPEC )
     {
         vlc_value_t val;
 
         var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv4", &val );
         if( val.b_bool )
-            hints.ai_family = PF_INET;
+            hints.ai_family = AF_INET;
 
-#ifdef PF_INET6
+#ifdef AF_INET6
         var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv6", &val );
         if( val.b_bool )
-            hints.ai_family = PF_INET6;
+            hints.ai_family = AF_INET6;
 #endif
     }
 

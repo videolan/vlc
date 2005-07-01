@@ -65,9 +65,6 @@
 #ifndef INADDR_NONE
 #   define INADDR_NONE 0xFFFFFFFF
 #endif
-#ifndef PF_INET
-#   define PF_INET AF_INET
-#endif
 
 static int SocksNegociate( vlc_object_t *, int fd, int i_socks_version,
                            char *psz_socks_user, char *psz_socks_passwd );
@@ -363,14 +360,14 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
          * it makes sure that IPv4 addresses will be printed as w.x.y.z rather
          * than ::ffff:w.x.y.z
          */
-        if( ptr->ai_family == PF_INET6 )
+        if( ptr->ai_family == AF_INET6 )
             setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&i_val,
                         sizeof( i_val ) );
 #endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
 # ifdef IPV6_PROTECTION_LEVEL
-        if( ptr->ai_family == PF_INET6 )
+        if( ptr->ai_family == AF_INET6 )
         {
             i_val = PROTECTION_LEVEL_UNRESTRICTED;
             setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
@@ -1103,7 +1100,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         struct addrinfo hints = { 0 }, *p_res;
 
         /* v4 only support ipv4 */
-        hints.ai_family = PF_INET;
+        hints.ai_family = AF_INET;
         if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
             return VLC_EGENERIC;
 

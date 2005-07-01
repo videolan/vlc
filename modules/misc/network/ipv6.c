@@ -94,7 +94,7 @@ static int BuildAddr( vlc_object_t *p_this, struct sockaddr_in6 *p_socket,
     int i;
 
     memset( &hints, 0, sizeof( hints ) );
-    hints.ai_family = PF_INET6;
+    hints.ai_family = AF_INET6;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE;
 
@@ -151,7 +151,7 @@ static int OpenUDP( vlc_object_t * p_this )
 
 #ifdef WIN32
 # ifdef IPV6_PROTECTION_LEVEL
-        if( ptr->ai_family == PF_INET6 )
+        if( ptr->ai_family == AF_INET6 )
         {
             i_val = PROTECTION_LEVEL_UNRESTRICTED;
             setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,

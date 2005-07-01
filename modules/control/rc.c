@@ -49,14 +49,11 @@
 #include "vlc_error.h"
 #include "network.h"
 
-#if defined(PF_UNIX) && !defined(PF_LOCAL)
-#    define PF_LOCAL PF_UNIX
-#endif
 #if defined(AF_UNIX) && !defined(AF_LOCAL)
 #    define AF_LOCAL AF_UNIX
 #endif
 
-#ifdef PF_LOCAL
+#ifdef AF_LOCAL
 #    include <sys/un.h>
 #endif
 
@@ -189,7 +186,7 @@ static int Activate( vlc_object_t *p_this )
     {
         int i_socket;
 
-#ifndef PF_LOCAL
+#ifndef AF_LOCAL
         msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
         free( psz_unix_path );
         return VLC_EGENERIC;
@@ -201,7 +198,7 @@ static int Activate( vlc_object_t *p_this )
 
         msg_Dbg( p_intf, "trying UNIX socket" );
 
-        if( (i_socket = socket( PF_LOCAL, SOCK_STREAM, 0 ) ) < 0 )
+        if( (i_socket = socket( AF_LOCAL, SOCK_STREAM, 0 ) ) < 0 )
         {
             msg_Warn( p_intf, "can't open socket: %s", strerror(errno) );
             free( psz_unix_path );
@@ -316,7 +313,7 @@ static void Deactivate( vlc_object_t *p_this )
         net_Close( p_intf->p_sys->i_socket );
     if( p_intf->p_sys->psz_unix_path != NULL )
     {
-#ifdef PF_LOCAL
+#ifdef AF_LOCAL
         unlink( p_intf->p_sys->psz_unix_path );
 #endif
         free( p_intf->p_sys->psz_unix_path );
