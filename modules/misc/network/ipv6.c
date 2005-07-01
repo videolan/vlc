@@ -138,7 +138,6 @@ static int OpenUDP( vlc_object_t * p_this )
     const char *psz_server_addr = p_socket->psz_server_addr;
     int i_server_port = p_socket->i_server_port;
     int i_handle, i_opt;
-    socklen_t i_opt_size;
     struct sockaddr_in6 sock;
     vlc_value_t val;
 
@@ -182,23 +181,6 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         msg_Warn( p_this, "cannot configure socket (SO_RCVBUF: %s)",
                           strerror(errno) );
-    }
-
-    /* Check if we really got what we have asked for, because Linux, etc.
-     * will silently limit the max buffer size to net.core.rmem_max which
-     * is typically only 65535 bytes */
-    i_opt = 0;
-    i_opt_size = sizeof( i_opt );
-    if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
-                    (void*) &i_opt, &i_opt_size ) == -1 )
-    {
-        msg_Warn( p_this, "cannot query socket (SO_RCVBUF: %s)",
-                          strerror(errno) );
-    }
-    else if( i_opt < 0x80000 )
-    {
-        msg_Warn( p_this, "Socket buffer size is 0x%x instead of 0x%x",
-                          i_opt, 0x80000 );
     }
 
     /* Build the local socket */
