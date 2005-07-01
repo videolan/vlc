@@ -804,8 +804,8 @@ endif
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/activex"
 if BUILD_ACTIVEX
-	cp $(top_builddir)/activex/README.TXT  $(top_builddir)/vlc-${VERSION}/activex/ ;
-	cp $(top_builddir)/activex/test.html  $(top_builddir)/vlc-${VERSION}/activex/ ;
+	cp $(srcdir)/activex/README.TXT  $(top_builddir)/vlc-${VERSION}/activex/ ;
+	cp $(srcdir)/activex/test.html  $(top_builddir)/vlc-${VERSION}/activex/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/activex/* ;
 
 	cp $(top_builddir)/activex/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
