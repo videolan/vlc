@@ -158,7 +158,7 @@ static int Open( vlc_object_t *p_this )
             }
 
             p_sys->i_ssnd_pos = stream_Tell( p_demux->s );
-            p_sys->i_ssnd_size= i_size;
+            p_sys->i_ssnd_size = i_size;
             p_sys->i_ssnd_offset = GetDWBE( &p_peek[8] );
             p_sys->i_ssnd_blocksize = GetDWBE( &p_peek[12] );
 
@@ -172,7 +172,8 @@ static int Open( vlc_object_t *p_this )
         }
 
         /* Skip this chunk */
-        if( stream_Read( p_demux->s, NULL, i_size + 8 ) != i_size + 8 )
+        i_size += 8;
+        if( stream_Read( p_demux->s, NULL, i_size ) != (int)i_size )
         {
             msg_Warn( p_demux, "incomplete file" );
             goto error;

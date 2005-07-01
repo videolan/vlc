@@ -2572,8 +2572,10 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 {
                     btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
-                    if((valx.i_int >= button_ptr->x_start) && (valx.i_int <= button_ptr->x_end) &&
-                       (valy.i_int >= button_ptr->y_start) && (valy.i_int <= button_ptr->y_end)) 
+                    if(((unsigned)valx.i_int >= button_ptr->x_start)
+                     && ((unsigned)valx.i_int <= button_ptr->x_end)
+                     && ((unsigned)valy.i_int >= button_ptr->y_start)
+                     && ((unsigned)valy.i_int <= button_ptr->y_end)) 
                     {
                         mx = (button_ptr->x_start + button_ptr->x_end)/2;
                         my = (button_ptr->y_start + button_ptr->y_end)/2;
