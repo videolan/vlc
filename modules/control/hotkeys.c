@@ -710,7 +710,6 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 
 static void SetBookmark( intf_thread_t *p_intf, int i_num )
 {
-    vlc_value_t val;
     playlist_t *p_playlist =
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist )
