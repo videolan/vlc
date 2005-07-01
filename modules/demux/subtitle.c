@@ -159,7 +159,7 @@ static struct
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
-static void Fix( demux_t * );
+/*static void Fix( demux_t * );*/
 
 /*****************************************************************************
  * Module initializer
@@ -570,6 +570,7 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Fix: fix time stamp and order of subtitle
  *****************************************************************************/
+#ifdef USE_THIS_UNUSED_PIECE_OF_CODE
 static void Fix( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -603,6 +604,7 @@ static void Fix( demux_t *p_demux )
         }
     } while( !b_done );
 }
+#endif
 
 static int TextLoad( text_t *txt, stream_t *s )
 {
