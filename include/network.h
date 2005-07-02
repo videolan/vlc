@@ -25,6 +25,11 @@
 
 #ifndef __VLC_NETWORK_H
 # define __VLC_NETWORK_H
+
+#ifdef HAVE_SYS_SOCKET_H
+    #include <sys/socket.h>
+#endif
+
 /*****************************************************************************
  * network_socket_t: structure passed to a network plug-in to define the
  *                   kind of socket we want
