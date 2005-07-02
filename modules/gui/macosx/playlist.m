@@ -1649,7 +1649,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
         [self playlistUpdated];
         i_row = [o_outline_view rowForItem:[o_outline_dict
-            objectForKey:[NSString stringWithFormat: @"%p", p_item]]];
+            objectForKey:[NSString stringWithFormat: @"%p",
+            [[o_all_items objectAtIndex: 0] pointerValue]]]];
 
         if( i_row == -1 )
         {
