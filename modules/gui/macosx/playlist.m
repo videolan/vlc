@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Derk-Jan Hartman <hartman at videola/n dot org>
  *          Benjamin Pracht <bigben at videolab dot org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -378,7 +378,13 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release(p_playlist);
 }
 
-- (BOOL)isItem: (playlist_item_t *)p_item inNode: (playlist_item_t *)p_node
+/* Check if p_item is a child of p_node recursively. We need to check the item     existence first since OSX sometimes tries to redraw items that have been
+   deleted. We don't do it when not required  since this verification takes
+   quite a long time on big playlists (yes, pretty hacky). */
+- (BOOL)isItem: (playlist_item_t *)p_item
+                    inNode: (playlist_item_t *)p_node
+                    checkItemExistence:(BOOL)b_check
+
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
@@ -403,26 +409,26 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if ( p_temp_item )
     {
-//        int i;
+        int i;
         vlc_mutex_lock( &p_playlist->object_lock );
 
-// Let's check if we can do without that
-#if 0
-
+        if( b_check )
+        {
         /* Since outlineView: willDisplayCell:... may call this function with
            p_items that don't exist anymore, first check if the item is still
            in the playlist. Any cleaner solution welcomed. */
-
-        {
-            if( p_playlist->pp_all_items[i] == p_item ) break;
-            else if ( i == p_playlist->i_all_size - 1 )
+            for( i = 0; i < p_playlist->i_all_size; i++ )
             {
-                vlc_object_release( p_playlist );
-                vlc_mutex_unlock( &p_playlist->object_lock );
-                return NO;
+                if( p_playlist->pp_all_items[i] == p_item ) break;
+                else if ( i == p_playlist->i_all_size - 1 )
+                {
+                    vlc_object_release( p_playlist );
+                    vlc_mutex_unlock( &p_playlist->object_lock );
+                    return NO;
+                }
             }
         }
-#endif
+
         while( p_temp_item->i_parents > 0 )
         {
             p_temp_item = [self parentOfItem: p_temp_item];
@@ -472,9 +478,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 if( j == i ) continue;
             }
             if( [self isItem: [[o_items objectAtIndex:i] pointerValue]
-                    inNode: [[o_nodes objectAtIndex:j] pointerValue]] )
+                    inNode: [[o_nodes objectAtIndex:j] pointerValue]
+                    checkItemExistence: NO] )
             {
-                [o_nodes removeObjectAtIndex:i];
+                [o_items removeObjectAtIndex:i];
                 /* We need to execute the next iteration with the same index
                    since the current item has been deleted */
                 i--;
@@ -483,29 +490,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
     }
 
-}
-
-- (BOOL)isValueItem: (id)o_item inNode: (id)o_node
-{
-    int i;
-    int i_total = [[o_outline_view dataSource] outlineView:o_outline_view
-                                        numberOfChildrenOfItem: o_node];
-    for( i = 0 ; i < i_total ; i++ )
-    {
-        id o_temp_item = [[o_outline_view dataSource] outlineView:
-                                    o_outline_view child:i ofItem: o_node];
-        if( [[o_outline_view dataSource] outlineView:o_outline_view
-                                    numberOfChildrenOfItem: o_temp_item] > 0 )
-        {
-            if( [self isValueItem: o_item inNode: o_temp_item] == YES )
-            return YES;
-        }
-        else if( [o_temp_item isEqual: o_item] )
-        {
-            return YES;
-        }
-    }
-    return NO;
 }
 
 - (IBAction)savePlaylist:(id)sender
@@ -634,7 +618,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
                 [self isItem: p_playlist->status.p_item inNode:
-                        ((playlist_item_t *)[o_item pointerValue])] == YES )
+                        ((playlist_item_t *)[o_item pointerValue])
+                        checkItemExistence: NO] == YES )
             {
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Stop( p_playlist );
@@ -1196,8 +1181,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     o_playing_item = [o_outline_dict objectForKey:
                 [NSString stringWithFormat:@"%p",  p_playlist->status.p_item]];
 
-    if( [self isValueItem: o_playing_item inNode: item] ||
-                                                [o_playing_item isEqual: item] )
+    if( [self isItem: [o_playing_item pointerValue] inNode:
+                        [item pointerValue] checkItemExistence: YES]
+                        || [o_playing_item isEqual: item] )
     {
         [cell setFont: [NSFont boldSystemFontOfSize: 0]];
     }
@@ -1441,7 +1427,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         /* Refuse to move items that are not in the General Node
            (Service Discovery) */
         if( ![self isItem: [o_item pointerValue] inNode:
-                                        p_playlist->p_general] )
+                        p_playlist->p_general checkItemExistence: NO])
         {
             vlc_object_release(p_playlist);
             return NO;
@@ -1515,8 +1501,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     /* We refuse to drop an item in anything else than a child of the General
        Node. We still accept items that would be root nodes of the outlineview
        however, to allow drop in an empty playlist.*/
-    if( !([self isItem: [item pointerValue] inNode: p_playlist->p_general] ||
-          item == nil) )
+    if( !([self isItem: [item pointerValue] inNode: p_playlist->p_general
+                                    checkItemExistence: NO] || item == nil) )
     {
         vlc_object_release(p_playlist);
         return NSDragOperationNone;
@@ -1530,7 +1516,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             /* We refuse to Drop in a child of an item we are moving */
             if( [self isItem: [item pointerValue] inNode:
-                            [[o_nodes_array objectAtIndex: i] pointerValue]]  )
+                    [[o_nodes_array objectAtIndex: i] pointerValue]
+                    checkItemExistence: NO] )
             {
                 vlc_object_release(p_playlist);
                 return NSDragOperationNone;
