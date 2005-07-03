@@ -76,18 +76,25 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define TELNETHOST_TEXT N_( "Telnet Interface host" )
+#define TELNETHOST_LONGTEXT N_( "Default to listen on all network interfaces" )
+#define TELNETHOST_DEFAULT "0.0.0.0"
 #define TELNETPORT_TEXT N_( "Telnet Interface port" )
 #define TELNETPORT_LONGTEXT N_( "Default to 4212" )
+#define TELNETPORT_DEFAULT 4212
 #define TELNETPWD_TEXT N_( "Telnet Interface password" )
 #define TELNETPWD_LONGTEXT N_( "Default to admin" )
+#define TELNETPWD_DEFAULT "admin"
 
 vlc_module_begin();
     set_shortname( "Telnet" );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
-    add_integer( "telnet-port", 4212, NULL, TELNETPORT_TEXT,
+    add_string( "telnet-host", TELNETHOST_DEFAULT, NULL, TELNETHOST_TEXT,
+                 TELNETHOST_LONGTEXT, VLC_TRUE );
+    add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
                  TELNETPORT_LONGTEXT, VLC_TRUE );
-    add_string( "telnet-password", "admin", NULL, TELNETPWD_TEXT,
+    add_string( "telnet-password", TELNETPWD_DEFAULT, NULL, TELNETPWD_TEXT,
                 TELNETPWD_LONGTEXT, VLC_TRUE );
     set_description( _("VLM remote control interface") );
     add_category_hint( "VLM", NULL, VLC_FALSE );
@@ -124,6 +131,36 @@ struct intf_sys_t
    vlm_t           *mediatheque;
 };
 
+/* 
+ * getPort: Decide which port to use. There are two possibilities to
+ * specify a port: integrated in the --telnet-host option with :PORT
+ * or using the --telnet-port option. The --telnet-port option has
+ * precedence. 
+ * This code relies upon the fact the url.i_port is 0 if the :PORT 
+ * option is missing from --telnet-host.
+ */
+static int getPort(intf_thread_t *p_intf, vlc_url_t url, int i_port)
+    {
+    // Print error if two different ports have been specified
+    if (url.i_port != 0  &&
+        i_port != TELNETPORT_DEFAULT && 
+        url.i_port != i_port )
+    {
+	    msg_Err( p_intf, "ignoring port %d and using %d", url.i_port,
+                 i_port);
+    }
+    if (i_port != TELNETPORT_DEFAULT)
+    {
+	    return i_port;
+    }
+    if (url.i_port != 0)
+    {
+ 	    return url.i_port;
+    }
+    // return default
+    return i_port;
+}
+
 /*****************************************************************************
  * Open: initialize dummy interface
  *****************************************************************************/
@@ -131,6 +168,8 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
     vlm_t *mediatheque;
+    char *psz_address;
+    vlc_url_t url;
     int i_telnetport;
 
     if( !(mediatheque = vlm_New( p_intf )) )
@@ -142,16 +181,25 @@ static int Open( vlc_object_t *p_this )
     msg_Info( p_intf, "Using the VLM interface plugin..." );
 
     i_telnetport = config_GetInt( p_intf, "telnet-port" );
+    psz_address  = config_GetPsz( p_intf, "telnet-host" );
+
+    vlc_UrlParse(&url, psz_address, 0);
+
+    // There might be two ports given, resolve any potentially
+    // conflict
+    url.i_port = getPort(p_intf, url, i_telnetport);
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( ( p_intf->p_sys->pi_fd = net_ListenTCP( p_intf , "", i_telnetport ) )
+    if( ( p_intf->p_sys->pi_fd = net_ListenTCP( p_intf, url.psz_host, url.i_port ) )
                 == NULL )
     {
         msg_Err( p_intf, "cannot listen for telnet" );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
-    msg_Info( p_intf, "Telnet interface started on port: %d", i_telnetport );
+    msg_Info( p_intf, 
+              "Telnet interface started on interface %s %d",
+	      url.psz_host, url.i_port );
 
     p_intf->p_sys->i_clients   = 0;
     p_intf->p_sys->clients     = NULL;
