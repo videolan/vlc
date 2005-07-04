@@ -70,6 +70,16 @@ static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #   define close closesocket
 #endif
 
+#ifndef MCAST_JOIN_SOURCE_GROUP
+#   define MCAST_JOIN_SOURCE_GROUP         46
+struct group_source_req
+{
+       uint32_t           gsr_interface;  /* interface index */
+       struct sockaddr_storage gsr_group;      /* group address */
+       struct sockaddr_storage gsr_source;     /* source address */
+};
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -232,22 +242,58 @@ static int OpenUDP( vlc_object_t * p_this )
 #if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
     if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
     {
-        struct ipv6_mreq     imr;
-        int                  res;
+        if(*psz_server_addr)
+        {
+            struct group_source_req imr;
+            struct sockaddr_in6 *p_sin6;
 
-        imr.ipv6mr_interface = sock.sin6_scope_id;
-        imr.ipv6mr_multiaddr = sock.sin6_addr;
-        res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, (void*) &imr,
+            imr.gsr_interface = 0;
+            imr.gsr_group.ss_family = AF_INET6;
+            imr.gsr_source.ss_family = AF_INET6;
+            p_sin6 = (struct sockaddr_in6 *)&imr.gsr_group;
+            p_sin6->sin6_addr = sock.sin6_addr;
+
+            /* Build socket for remote connection */
+            msg_Dbg( p_this, "psz_server_addr : %s", psz_server_addr);
+
+            if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) )
+            {
+                msg_Warn( p_this, "cannot build remote address" );
+                close( i_handle );
+                return( -1 );
+            }
+            p_sin6 = (struct sockaddr_in6 *)&imr.gsr_source;
+            p_sin6->sin6_addr = sock.sin6_addr;
+
+            msg_Dbg( p_this, "IPV6_ADD_SOURCE_MEMBERSHIP multicast request" );
+            if( setsockopt( i_handle, IPPROTO_IPV6, MCAST_JOIN_SOURCE_GROUP,
+                          (char *)&imr, sizeof(struct group_source_req) ) == -1 )
+            {
+
+                msg_Err( p_this, "failed to join IP multicast group (%s)",
+                                                          strerror(errno) );
+            }    
+        }
+        else
+        {
+        
+            struct ipv6_mreq     imr;
+            int                  res;
+
+            imr.ipv6mr_interface = sock.sin6_scope_id;
+            imr.ipv6mr_multiaddr = sock.sin6_addr;
+            res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, (void*) &imr,
 #if defined(WIN32)
                          sizeof(imr) + 4); /* Doesn't work without this */
 #else
                          sizeof(imr));
 #endif
 
-        if( res == -1 )
-        {
-            msg_Err( p_this, "cannot join multicast group" );
-        } 
+            if( res == -1 )
+            {
+                msg_Err( p_this, "cannot join multicast group" );
+            } 
+        }
     }
 #else
     msg_Warn( p_this, "Multicast IPv6 is not supported on your OS" );
