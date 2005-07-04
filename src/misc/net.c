@@ -73,6 +73,71 @@ static int SocksHandshakeTCP( vlc_object_t *,
                               char *psz_socks_user, char *psz_socks_passwd,
                               const char *psz_host, int i_port );
 
+static int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
+                       int i_protocol )
+{
+    int fd, i_val;
+
+    fd = socket( i_family, i_socktype, i_protocol );
+    if( fd == -1 )
+    {
+#if defined(WIN32) || defined(UNDER_CE)
+        msg_Warn( p_this, "cannot create socket (%i)",
+                  WSAGetLastError() );
+#else
+        msg_Warn( p_this, "cannot create socket (%s)",
+                  strerror( errno ) );
+#endif
+        return -1;
+    }
+
+        /* Set to non-blocking */
+#if defined( WIN32 ) || defined( UNDER_CE )
+    {
+        unsigned long i_dummy = 1;
+        if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+            msg_Err( p_this, "cannot set socket to non-blocking mode" );
+    }
+#else
+    if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
+        ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
+        msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
+                 strerror( errno ) );
+#endif
+
+    i_val = 1;
+    setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
+                sizeof( i_val ) );
+
+#ifdef IPV6_V6ONLY
+    /*
+     * Accepts only IPv6 connections on IPv6 sockets
+     * (and open an IPv4 socket later as well if needed).
+     * Only Linux and FreeBSD can map IPv4 connections on IPv6 sockets,
+     * so this allows for more uniform handling across platforms. Besides,
+     * it makes sure that IPv4 addresses will be printed as w.x.y.z rather
+     * than ::ffff:w.x.y.z
+     */
+    if( i_family == AF_INET6 )
+        setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&i_val,
+                    sizeof( i_val ) );
+#endif
+
+#if defined( WIN32 ) || defined( UNDER_CE )
+# ifdef IPV6_PROTECTION_LEVEL
+    if( i_family == AF_INET6 )
+    {
+        i_val = PROTECTION_LEVEL_UNRESTRICTED;
+        setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
+                    sizeof( i_val ) );
+    }
+# else
+# warning You are using outdated headers for Winsock !
+# endif
+#endif
+    return fd;
+}
+
 /*****************************************************************************
  * __net_OpenTCP:
  *****************************************************************************
@@ -127,37 +192,10 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     {
         int fd;
 
-        fd = socket( ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol );
+        fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
+                         ptr->ai_protocol );
         if( fd == -1 )
-        {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Warn( p_this, "cannot create socket (%i)",
-                      WSAGetLastError() );
-#else
-            msg_Warn( p_this, "cannot create socket (%s)",
-                      strerror( errno ) );
-#endif
             continue;
-        }
-
-
-        /* Set to non-blocking */
-#if defined( WIN32 ) || defined( UNDER_CE )
-        {
-            unsigned long i_dummy = 1;
-            if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
-                msg_Err( p_this, "cannot set socket to non-blocking mode" );
-        }
-#else
-        if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
-            ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
-            msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
-                     strerror( errno ) );
-#endif
-
-        i_val = 1;
-        setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
-                    sizeof( i_val ) );
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
@@ -320,63 +358,10 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     {
         int fd, *newpi;
 
-        fd = socket( ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol );
+        fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
+                         ptr->ai_protocol );
         if( fd == -1 )
-        {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Warn( p_this, "cannot create socket (%i)",
-                      WSAGetLastError() );
-#else
-            msg_Warn( p_this, "cannot create socket (%s)",
-                      strerror( errno ) );
-#endif
             continue;
-        }
-
-        /* Set to non-blocking */
-#if defined( WIN32 ) || defined( UNDER_CE )
-        {
-            unsigned long i_dummy = 1;
-            if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
-                msg_Err( p_this, "cannot set socket to non-blocking mode" );
-        }
-#else
-        if( ( ( i_val = fcntl( fd, F_GETFL, 0 ) ) < 0 ) ||
-            ( fcntl( fd, F_SETFL, i_val | O_NONBLOCK ) < 0 ) )
-            msg_Err( p_this, "cannot set socket to non-blocking mode (%s)",
-                     strerror( errno ) );
-#endif
-
-        i_val = 1;
-        setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (void *)&i_val,
-                    sizeof( i_val ) );
-
-#ifdef IPV6_V6ONLY
-        /*
-         * Accepts only IPv6 connections on IPv6 sockets
-         * (and open an IPv4 socket later as well if needed).
-         * Only Linux and FreeBSD can map IPv4 connections on IPv6 sockets,
-         * so this allows for more uniform handling across platforms. Besides,
-         * it makes sure that IPv4 addresses will be printed as w.x.y.z rather
-         * than ::ffff:w.x.y.z
-         */
-        if( ptr->ai_family == AF_INET6 )
-            setsockopt( fd, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&i_val,
-                        sizeof( i_val ) );
-#endif
-
-#if defined( WIN32 ) || defined( UNDER_CE )
-# ifdef IPV6_PROTECTION_LEVEL
-        if( ptr->ai_family == AF_INET6 )
-        {
-            i_val = PROTECTION_LEVEL_UNRESTRICTED;
-            setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
-                        sizeof( i_val ) );
-        }
-# else
-# warning You are using outdated headers for Winsock !
-# endif
-#endif
 
         /* Bind the socket */
         if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
