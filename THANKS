@@ -71,6 +71,7 @@ Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solari
 Matthieu Lochegnies <lochegm1 at cti.ecp.fr> - MPEG audio emphasis fix
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Michael Mondragon <mammon at lokmail.net> - ncurses compilation fix
+Mickael Hoerdt <hoerdt at clarinet.u-strasbg.fr> - IPv6 SSM multicast patch
 Mike Schrag <mschrag at pobox dot com> - directx device selection
 Michel Lanners <mlan at cpu.lu> - fixed typos and AltiVec detection
 Moritz Bunkus <moritz at bunkus dot org> - Matroska patches
