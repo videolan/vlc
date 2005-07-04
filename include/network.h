@@ -363,8 +363,8 @@ VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, c
 # define net_StopRecv( fd ) shutdown( fd, SD_RECEIVE )
 #else
 # warning FIXME: implement shutdown on your platform!
-# define net_StopSend( fd ) void(0)
-# define net_StopRecv( fd ) void(0)
+# define net_StopSend( fd ) return(-1) 
+# define net_StopRecv( fd ) return(-1)
 #endif
 
 #define net_CheckIP(a,b,c,d) __net_CheckIP(VLC_OBJECT(a),b,c,d)
