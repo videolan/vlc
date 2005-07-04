@@ -53,7 +53,7 @@
 #    define AF_LOCAL AF_UNIX
 #endif
 
-#ifdef AF_LOCAL
+#if defined(AF_LOCAL) && ! defined(WIN32)
 #    include <sys/un.h>
 #endif
 
@@ -186,7 +186,7 @@ static int Activate( vlc_object_t *p_this )
     {
         int i_socket;
 
-#ifndef AF_LOCAL
+#if !defined(AF_LOCAL) || defined(WIN32)
         msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
         free( psz_unix_path );
         return VLC_EGENERIC;
@@ -313,7 +313,7 @@ static void Deactivate( vlc_object_t *p_this )
         net_Close( p_intf->p_sys->i_socket );
     if( p_intf->p_sys->psz_unix_path != NULL )
     {
-#ifdef AF_LOCAL
+#if defined(AF_LOCAL) && !defined(WIN32)
         unlink( p_intf->p_sys->psz_unix_path );
 #endif
         free( p_intf->p_sys->psz_unix_path );
