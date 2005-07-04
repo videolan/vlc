@@ -618,6 +618,25 @@ static PyObject* MediaControl_sound_get_volume(PyObject *self, PyObject *args)
   return py_retval;
 }
 
+static PyObject* MediaControl_set_visual(PyObject *self, PyObject *args)
+{
+  mediacontrol_Exception* exception = NULL;
+  WINDOWHANDLE visual;
+  
+  if (!PyArg_ParseTuple(args, "i", &visual))
+     return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  MC_TRY;
+  mediacontrol_set_visual(SELF->mc, visual, exception);
+  Py_END_ALLOW_THREADS
+  MC_EXCEPT;
+   
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+
 /* Method table */
 static PyMethodDef MediaControl_methods[] = {
   {"get_media_position", MediaControl_get_media_position, METH_VARARGS, "get_media_position(origin, key) -> Position    Get current media position."},
@@ -635,6 +654,7 @@ static PyMethodDef MediaControl_methods[] = {
   {"get_stream_information", MediaControl_get_stream_information, METH_VARARGS, "get_stream_information() -> dict      Get information about the stream"},
   {"sound_get_volume", MediaControl_sound_get_volume, METH_VARARGS, "sound_get_volume() -> int       Get the volume"},
   {"sound_set_volume", MediaControl_sound_set_volume, METH_VARARGS, "sound_set_volume(int)           Set the volume"},
+  {"set_visual", MediaControl_set_visual, METH_VARARGS, "set_visual(int)           Set the embedding window visual ID"},  
   {NULL, NULL, 0, NULL},
 };
 
