@@ -26,8 +26,12 @@
 #ifndef __VLC_NETWORK_H
 # define __VLC_NETWORK_H
 
-#ifdef HAVE_SYS_SOCKET_H
-    #include <sys/socket.h>
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif defined( WIN32 )
+#   include <winsock2.h>
+#elif HAVE_SYS_SOCKET_H
+#   include <sys/socket.h>
 #endif
 
 /*****************************************************************************
