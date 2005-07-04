@@ -359,16 +359,16 @@ VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, c
  *****************************************************************************/
 #if defined (SHUT_WR)
 /* the standard way */
-# define net_StopSend( fd ) shutdown( fd, SHUT_WR )
-# define net_StopRecv( fd ) shutdown( fd, SHUT_RD )
+# define net_StopSend( fd ) (void)shutdown( fd, SHUT_WR )
+# define net_StopRecv( fd ) (void)shutdown( fd, SHUT_RD )
 #elif defined (SD_SEND)
 /* the Microsoft seemingly-purposedly-different-for-the-sake-of-it way */
-# define net_StopSend( fd ) shutdown( fd, SD_SEND )
-# define net_StopRecv( fd ) shutdown( fd, SD_RECEIVE )
+# define net_StopSend( fd ) (void)shutdown( fd, SD_SEND )
+# define net_StopRecv( fd ) (void)shutdown( fd, SD_RECEIVE )
 #else
 # warning FIXME: implement shutdown on your platform!
-# define net_StopSend( fd ) return(-1) 
-# define net_StopRecv( fd ) return(-1)
+# define net_StopSend( fd ) (void)0
+# define net_StopRecv( fd ) (void)0
 #endif
 
 #define net_CheckIP(a,b,c,d) __net_CheckIP(VLC_OBJECT(a),b,c,d)
