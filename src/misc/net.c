@@ -896,45 +896,41 @@ int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
 
 char *__net_Gets( vlc_object_t *p_this, int fd, v_socket_t *p_vs )
 {
-    char *psz_line = malloc( 1024 );
-    int  i_line = 0;
-    int  i_max = 1024;
+    char *psz_line = NULL, *ptr = NULL;
+    size_t  i_line = 0, i_max = 0;
 
 
     for( ;; )
     {
-        if( net_Read( p_this, fd, p_vs, &psz_line[i_line], 1, VLC_TRUE ) != 1 )
-        {
-            psz_line[i_line] = '\0';
-            break;
-        }
-        i_line++;
-
-        if( psz_line[i_line-1] == '\n' )
-        {
-            psz_line[i_line] = '\0';
-            break;
-        }
-
-        if( i_line >= i_max - 1 )
+        if( i_line == i_max )
         {
             i_max += 1024;
             psz_line = realloc( psz_line, i_max );
+            ptr = psz_line + i_line;
         }
+
+        if( net_Read( p_this, fd, p_vs, ptr, 1, VLC_TRUE ) != 1 )
+        {
+            if( i_line == 0 )
+            {
+                free( psz_line );
+                return NULL;
+            }
+            break;
+        }
+
+        if ( *ptr == '\n' )
+            break;
+
+        i_line++;
+        ptr++;
     }
 
-    if( i_line <= 0 )
-    {
-        free( psz_line );
-        return NULL;
-    }
+    *ptr-- = '\0';
 
-    while( i_line >= 1 &&
-           ( psz_line[i_line-1] == '\n' || psz_line[i_line-1] == '\r' ) )
-    {
-        i_line--;
-        psz_line[i_line] = '\0';
-    }
+    if( ( ptr > psz_line ) && ( *ptr == '\r' ) )
+        *ptr = '\0';
+
     return psz_line;
 }
 
