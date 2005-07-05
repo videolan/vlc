@@ -928,7 +928,7 @@ char *__net_Gets( vlc_object_t *p_this, int fd, v_socket_t *p_vs )
 
     *ptr-- = '\0';
 
-    if( ( ptr > psz_line ) && ( *ptr == '\r' ) )
+    if( ( ptr >= psz_line ) && ( *ptr == '\r' ) )
         *ptr = '\0';
 
     return psz_line;
