@@ -2303,7 +2303,11 @@ static void httpd_HostThread( httpd_host_t *host )
 
         if( i_ret == -1 && errno != EINTR )
         {
-            msg_Warn( host, "cannot select sockets" );
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Warn( host, "cannot select sockets (%d)", WSAGetLastError( ) );
+#else
+            msg_Warn( host, "cannot select sockets : %s", strerror( errno ) );
+#endif
             msleep( 1000 );
             continue;
         }
