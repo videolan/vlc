@@ -1263,6 +1263,8 @@ vlc_module_begin();
         change_short('R');
     add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_FALSE );
 
+    add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, VLC_FALSE );
+
     set_subcategory( SUBCAT_PLAYLIST_SD );
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
                           NULL, SD_TEXT, SD_LONGTEXT, VLC_FALSE );
@@ -1294,7 +1296,6 @@ vlc_module_begin();
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
-    add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, VLC_FALSE );
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
