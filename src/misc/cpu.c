@@ -84,17 +84,31 @@ uint32_t CPUCapabilities( void )
     volatile vlc_bool_t    b_amd;
 
     /* Needed for x86 CPU capabilities detection */
-#   define cpuid( reg )                    \
-        asm volatile ( "push %%ebx\n\t"   \
-                       "cpuid\n\t"         \
-                       "movl %%ebx,%1\n\t" \
-                       "pop %%ebx\n\t"    \
-                     : "=a" ( i_eax ),     \
-                       "=r" ( i_ebx ),     \
-                       "=c" ( i_ecx ),     \
-                       "=d" ( i_edx )      \
-                     : "a"  ( reg )        \
-                     : "cc" );
+#   if defined( __x86_64__ )
+#       define cpuid( reg )                    \
+            asm volatile ( "push %%rbx\n\t"    \
+                           "cpuid\n\t"         \
+                           "movl %%ebx,%1\n\t" \
+                           "pop %%rbx\n\t"     \
+                         : "=a" ( i_eax ),     \
+                           "=r" ( i_ebx ),     \
+                           "=c" ( i_ecx ),     \
+                           "=d" ( i_edx )      \
+                         : "a"  ( reg )        \
+                         : "cc" );
+#   else
+#       define cpuid( reg )                    \
+            asm volatile ( "push %%ebx\n\t"    \
+                           "cpuid\n\t"         \
+                           "movl %%ebx,%1\n\t" \
+                           "pop %%ebx\n\t"     \
+                         : "=a" ( i_eax ),     \
+                           "=r" ( i_ebx ),     \
+                           "=c" ( i_ecx ),     \
+                           "=d" ( i_edx )      \
+                         : "a"  ( reg )        \
+                         : "cc" );
+#   endif
 
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
      && defined( HAVE_SIGNAL_H )
@@ -103,6 +117,8 @@ uint32_t CPUCapabilities( void )
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
+#   if defined( __i386__ )
+    /* check if cpuid instruction is supported */
     asm volatile ( "push %%ebx\n\t"
                    "pushf\n\t"
                    "pop %%eax\n\t"
@@ -121,12 +137,15 @@ uint32_t CPUCapabilities( void )
 
     if( i_eax == i_ebx )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-     && defined( HAVE_SIGNAL_H )
+#       if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
+            && defined( HAVE_SIGNAL_H )
         signal( SIGILL, pf_sigill );
-#   endif
+#       endif
         return i_capabilities;
     }
+#   else
+    /* x86_64 supports cpuid instruction, so we dont need to check it */
+#   endif
 
     i_capabilities |= CPU_CAPABILITY_486;
 
