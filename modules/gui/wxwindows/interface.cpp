@@ -55,8 +55,6 @@
 #include "../../../share/vlc16x16.xpm"
 #endif
 
-static int  Interact     ( intf_thread_t *, user_interaction_t *, vlc_bool_t );
-
 /*****************************************************************************
  * Local class declarations.
  *****************************************************************************/
@@ -230,9 +228,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     b_extra = VLC_FALSE;
 //    b_undock = VLC_FALSE;
 
-    /* Allow user interaction */
-    p_intf->p_sys->p_main_interface = this;
-    p_intf->pf_interact = ::Interact;
 
     extra_window = NULL;
 
@@ -1334,22 +1329,6 @@ void Interface::OnDiscNext( wxCommandEvent& WXUNUSED(event) )
 }
 
 #if wxUSE_DRAG_AND_DROP
-
-/*****************************************************************************
- * Interaction
- *****************************************************************************/
-int Interface::Interact( user_interaction_t *p_interact, vlc_bool_t b_block )
-{
-    if( p_interact->i_type == INTERACT_FATAL )
-    {
-        fprintf( stderr, "Showing message -%s-\n", p_interact->psz_description);
-        wxFrame *p_message = new wxFrame( this, -1,
-                                            wxU( p_interact->psz_description ));
-        p_message->Show();
-    }
-    return VLC_SUCCESS;
-}
-
 /*****************************************************************************
  * Definition of DragAndDrop class.
  *****************************************************************************/
@@ -1578,15 +1557,3 @@ void Systray::UpdateTooltip( const wxChar* tooltip )
     SetIcon( wxIcon( vlc16x16_xpm ), tooltip );
 }
 #endif
-
-
-/**
- * Interaction entry point
- */
-int Interact( intf_thread_t *p_intf, user_interaction_t *p_interact,
-              vlc_bool_t b_block )
-{
-    fprintf( stderr,"Asking for interaction\n" );
-    return p_intf->p_sys->p_main_interface->Interact( p_interact, b_block );
-}
-

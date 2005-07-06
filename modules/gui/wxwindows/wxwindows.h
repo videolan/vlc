@@ -44,7 +44,6 @@
 #include <wx/wizard.h>
 #include <wx/taskbar.h>
 #include "vlc_keys.h"
-#include "vlc_interaction.h"
 
 #if (!wxCHECK_VERSION(2,5,0))
 typedef long wxTreeItemIdValue;
@@ -99,8 +98,6 @@ class AutoBuiltPanel;
 class VideoWindow;
 class WindowSettings;
 
-namespace wxvlc { class Interface;};
-
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
  *****************************************************************************/
@@ -142,9 +139,6 @@ struct intf_sys_t
     /* Hotkeys */
     int                 i_first_hotkey_event;
     int                 i_hotkeys;
-
-    /* Main interface */
-    wxvlc::Interface   *p_main_interface;
 
     /* Embedded vout */
     VideoWindow         *p_video_window;
@@ -376,9 +370,6 @@ public:
 
     wxTimer m_controls_timer;
     wxTimer m_slider_timer;
-
-    /* Interaction */
-    int Interact( user_interaction_t *, vlc_bool_t );
 
 private:
     void SetupHotkeys();

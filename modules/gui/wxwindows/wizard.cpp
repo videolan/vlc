@@ -1030,8 +1030,8 @@ wizStreamingMethodPage::wizStreamingMethodPage( wxWizard *parent,
                                  TEXTWIDTH, false ) ),
                wxDefaultPosition, wxDefaultSize );
 
-    address_txtctrl = new wxTextCtrl( this, -1, wxT("") , wxDefaultPosition,
-                                      wxSize(200,25)) ;
+    address_txtctrl = new wxTextCtrl( this, -1, wxU(""), wxDefaultPosition,
+                                      wxSize(200,25));
     address_sizer->Add( address_text, 0, wxALL, 5 );
     address_sizer->Add( address_txtctrl, 0, wxALL, 5 );
     address_sizer->Layout();
