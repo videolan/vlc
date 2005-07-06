@@ -622,7 +622,7 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
         if( i_ret < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "network select error" );
+            msg_Err( p_this, "network select error (%d)", WSAGetLastError() );
 #else
             msg_Err( p_this, "network select error (%s)", strerror(errno) );
 #endif
@@ -706,7 +706,7 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
     else if( i_ret < 0 )
     {
 #if defined(WIN32) || defined(UNDER_CE)
-        msg_Err( p_this, "network select error" );
+        msg_Err( p_this, "network select error (%d)", WSAGetLastError() );
 #else
         msg_Err( p_this, "network select error (%s)", strerror(errno) );
 #endif
@@ -870,7 +870,7 @@ int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
         if( i_ret < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "network select error" );
+            msg_Err( p_this, "network select error (%d)", WSAGetLastError() );
 #else
             msg_Err( p_this, "network select error (%s)", strerror(errno) );
 #endif
