@@ -63,6 +63,7 @@ static void Init         ( intf_thread_t * );
 
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
+
 #if (wxCHECK_VERSION(2,5,0))
 void *wxClassInfo_sm_classTable_BUGGY = 0;
 #endif
@@ -362,6 +363,7 @@ bool Instance::OnInit()
                                NULL : p_intf->p_sys->p_wxwindow );
 
     p_intf->p_sys->pf_show_dialog = ShowDialog;
+
 
     /* OK, initialization is over */
     vlc_thread_ready( p_intf );
