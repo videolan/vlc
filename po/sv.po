@@ -14,7 +14,7 @@ msgstr ""
 "Last-Translator: Joel Arvidsson <dogai@privat.utfors.se>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: include/vlc_config_cat.h:32 modules/gui/kde/preferences.cpp:56
@@ -47,7 +47,7 @@ msgstr "Markera allt"
 #: include/vlc_config_cat.h:44 src/libvlc.h:66
 #, fuzzy
 msgid "Control interfaces"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:45
 #, fuzzy
@@ -57,7 +57,7 @@ msgstr "Markera allt"
 #: include/vlc_config_cat.h:47 include/vlc_config_cat.h:48
 #, fuzzy
 msgid "Hotkeys settings"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:51 src/input/es_out.c:1527 src/libvlc.h:908
 #: modules/gui/beos/InterfaceWindow.cpp:263
@@ -71,7 +71,7 @@ msgstr ""
 #: include/vlc_config_cat.h:52
 #, fuzzy
 msgid "Audio settings"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:54 include/vlc_config_cat.h:55
 #, fuzzy
@@ -101,7 +101,7 @@ msgstr "Paus"
 #: include/vlc_config_cat.h:65 include/vlc_config_cat.h:78
 #, fuzzy
 msgid "Output modules"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: include/vlc_config_cat.h:66
 msgid "These are general settings for audio output modules."
@@ -130,7 +130,7 @@ msgstr ""
 #: include/vlc_config_cat.h:73
 #, fuzzy
 msgid "Video settings"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:75 include/vlc_config_cat.h:76
 #, fuzzy
@@ -159,7 +159,7 @@ msgstr ""
 #: include/vlc_config_cat.h:89
 #, fuzzy
 msgid "Text rendering"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:91
 msgid ""
@@ -180,7 +180,7 @@ msgstr ""
 #: include/vlc_config_cat.h:98
 #, fuzzy
 msgid "Access modules"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:100
 msgid ""
@@ -191,7 +191,7 @@ msgstr ""
 #: include/vlc_config_cat.h:104
 #, fuzzy
 msgid "Access filter modules"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:106
 msgid "Settings related to the various access filter used by VLC.\n"
@@ -200,7 +200,7 @@ msgstr ""
 #: include/vlc_config_cat.h:108
 #, fuzzy
 msgid "Demuxers"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:109
 msgid "Demuxers are used to separate audio and video streams"
@@ -209,7 +209,7 @@ msgstr ""
 #: include/vlc_config_cat.h:111
 #, fuzzy
 msgid "Video codecs"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:112
 msgid "Settings for the video-only decoders and encoders"
@@ -218,7 +218,7 @@ msgstr ""
 #: include/vlc_config_cat.h:114
 #, fuzzy
 msgid "Audio codecs"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:115
 msgid "Settings for the audio-only decoders and encoders"
@@ -269,7 +269,7 @@ msgstr "Paus"
 #: include/vlc_config_cat.h:136
 #, fuzzy
 msgid "Muxers"
-msgstr "Stäng av ljudet"
+msgstr "StÃ¤ng av ljudet"
 
 #: include/vlc_config_cat.h:137
 msgid ""
@@ -282,7 +282,7 @@ msgstr ""
 #: include/vlc_config_cat.h:142
 #, fuzzy
 msgid "Access output"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:143
 msgid ""
@@ -294,7 +294,7 @@ msgstr ""
 #: include/vlc_config_cat.h:148
 #, fuzzy
 msgid "Packetizers"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -389,7 +389,7 @@ msgstr ""
 #: include/vlc_config_cat.h:184 modules/demux/util/id3genres.h:40
 #, fuzzy
 msgid "Other"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:185
 #, fuzzy
@@ -402,7 +402,7 @@ msgstr "Paus"
 #: modules/gui/macosx/open.m:379 modules/gui/pda/pda_interface.c:548
 #: modules/gui/wxwindows/open.cpp:475
 msgid "Network"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: include/vlc_config_cat.h:188
 msgid "These modules provide network functions to all other parts of VLC"
@@ -429,7 +429,7 @@ msgstr ""
 #: include/vlc_config_cat.h:199
 #, fuzzy
 msgid "Encoders settings"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:201
 msgid "These are general settings for video/audio/subtitles encoding modules."
@@ -438,7 +438,7 @@ msgstr ""
 #: include/vlc_config_cat.h:205
 #, fuzzy
 msgid "Dialog providers settings"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: include/vlc_config_cat.h:207
 msgid "Dialog providers can be configured here."
@@ -458,7 +458,7 @@ msgstr ""
 #: include/vlc_config_cat.h:214
 #, fuzzy
 msgid "Video filters settings"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: include/vlc_config_cat.h:221
 msgid "No help available"
@@ -553,7 +553,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:259
 #, fuzzy
 msgid "Language"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: include/vlc_meta.h:39
 #, fuzzy
@@ -579,12 +579,12 @@ msgstr ""
 #: include/vlc_meta.h:45
 #, fuzzy
 msgid "CDDB Genre"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: include/vlc_meta.h:46
 #, fuzzy
 msgid "CDDB Year"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: include/vlc_meta.h:47
 #, fuzzy
@@ -622,7 +622,7 @@ msgstr ""
 #: include/vlc_meta.h:56
 #, fuzzy
 msgid "CD-Text Title"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: include/vlc_meta.h:58
 #, fuzzy
@@ -686,7 +686,7 @@ msgstr ""
 #: modules/gui/wxwindows/extrapanel.cpp:392
 #, fuzzy
 msgid "Audio filters"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/audio_output/output.c:102 src/audio_output/output.c:129
 #: modules/access/vcdx/info.c:116 modules/gui/macosx/intf.m:496
@@ -856,7 +856,7 @@ msgstr ""
 #: modules/demux/playlist/b4s.c:347
 #, fuzzy
 msgid "Bitrate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/input/es_out.c:1544
 #, c-format
@@ -924,13 +924,13 @@ msgstr ""
 #: modules/gui/macosx/intf.m:512
 #, fuzzy
 msgid "Video Track"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/input/var.c:174 modules/gui/macosx/intf.m:494
 #: modules/gui/macosx/intf.m:495
 #, fuzzy
 msgid "Audio Track"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/input/var.c:180 modules/gui/macosx/intf.m:515
 #: modules/gui/macosx/intf.m:516
@@ -941,12 +941,12 @@ msgstr "Undertext"
 #: src/input/var.c:263
 #, fuzzy
 msgid "Next title"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: src/input/var.c:268
 #, fuzzy
 msgid "Previous title"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: src/input/var.c:291
 #, fuzzy, c-format
@@ -973,13 +973,13 @@ msgstr "Kapitel"
 #: src/interface/interface.c:326
 #, fuzzy
 msgid "Switch interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/interface/interface.c:353 modules/gui/macosx/intf.m:447
 #: modules/gui/macosx/intf.m:448
 #, fuzzy
 msgid "Add Interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.c:287 src/libvlc.c:418 src/misc/modules.c:1686
 #: src/misc/modules.c:1990
@@ -1125,7 +1125,7 @@ msgstr ""
 #: src/libvlc.h:36
 #, fuzzy
 msgid "Tetum"
-msgstr "Nästa objekt"
+msgstr "NÃ¤sta objekt"
 
 #: src/libvlc.h:36 src/misc/iso-639_def.h:179
 msgid "Tagalog"
@@ -1145,7 +1145,7 @@ msgstr ""
 #: src/libvlc.h:53 src/libvlc.h:1259
 #, fuzzy
 msgid "Interface module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:55
 msgid ""
@@ -1156,7 +1156,7 @@ msgstr ""
 #: src/libvlc.h:59 src/libvlc.h:1264 modules/control/ntservice.c:53
 #, fuzzy
 msgid "Extra interface modules"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:61
 msgid ""
@@ -1404,7 +1404,7 @@ msgstr ""
 #: src/libvlc.h:199
 #, fuzzy
 msgid "Video x coordinate"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:201
 msgid ""
@@ -1415,7 +1415,7 @@ msgstr ""
 #: src/libvlc.h:204
 #, fuzzy
 msgid "Video y coordinate"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:206
 msgid ""
@@ -1426,7 +1426,7 @@ msgstr ""
 #: src/libvlc.h:209
 #, fuzzy
 msgid "Video title"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:211
 msgid "You can specify a custom video window title here."
@@ -1509,7 +1509,7 @@ msgstr ""
 #: src/libvlc.h:232
 #, fuzzy
 msgid "Fullscreen video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: src/libvlc.h:234
 msgid ""
@@ -1547,7 +1547,7 @@ msgstr ""
 #: src/libvlc.h:251
 #, fuzzy
 msgid "Video filter module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:253
 msgid ""
@@ -1563,19 +1563,19 @@ msgstr ""
 #, fuzzy
 msgid ""
 "Allows you to specify the directory where the video snapshots will be stored."
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:262
 #, fuzzy
 msgid "Video snapshot format"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:264
 #, fuzzy
 msgid ""
 "Allows you to specify the image format in which the video snapshots will be "
 "stored."
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:267
 msgid "Source aspect ratio"
@@ -1678,7 +1678,7 @@ msgstr ""
 #: src/libvlc.h:312
 #, fuzzy
 msgid "Network interface address"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:314
 msgid ""
@@ -1723,7 +1723,7 @@ msgstr ""
 #: src/libvlc.h:336
 #, fuzzy
 msgid "Choose audio track"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/libvlc.h:338
 msgid "Give the stream number of the audio track you want to use(from 0 to n)."
@@ -1764,7 +1764,7 @@ msgstr ""
 #: src/libvlc.h:356
 #, fuzzy
 msgid "Input repetitions"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: src/libvlc.h:357
 msgid "Number of time the same input will be repeated"
@@ -1781,14 +1781,14 @@ msgstr ""
 #: src/libvlc.h:366
 #, fuzzy
 msgid "Input list"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:367
 #, fuzzy
 msgid ""
 "Allows you to specify a comma-separated list of inputs that will be "
 "concatenated."
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:370
 msgid "Input slave (experimental)"
@@ -1843,7 +1843,7 @@ msgstr ""
 #: src/libvlc.h:397
 #, fuzzy
 msgid "Subpictures filter module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:399
 msgid ""
@@ -1930,7 +1930,7 @@ msgstr ""
 #: src/libvlc.h:447
 #, fuzzy
 msgid "Audio CD device"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/libvlc.h:450
 msgid ""
@@ -1965,7 +1965,7 @@ msgstr ""
 #: src/libvlc.h:467
 #, fuzzy
 msgid "SOCKS server"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: src/libvlc.h:469
 msgid ""
@@ -2286,7 +2286,7 @@ msgstr ""
 #: src/libvlc.h:630
 #, fuzzy
 msgid "Services discovery modules"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:632
 msgid ""
@@ -2329,7 +2329,7 @@ msgstr ""
 #: src/libvlc.h:650
 #, fuzzy
 msgid "Play and stop"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: src/libvlc.h:652
 msgid "Stop the playlist after each played playlist item. "
@@ -2354,7 +2354,7 @@ msgstr ""
 #: src/libvlc.h:663
 #, fuzzy
 msgid "Access module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:665
 msgid "This is a legacy entry to let you configure access modules."
@@ -2363,7 +2363,7 @@ msgstr ""
 #: src/libvlc.h:667
 #, fuzzy
 msgid "Access filter module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:669
 msgid "This is a legacy entry to let you configure access filter modules."
@@ -2509,7 +2509,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:649 modules/gui/macosx/intf.m:435
 #: modules/gui/macosx/intf.m:508
 msgid "Fullscreen"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: src/libvlc.h:751
 msgid "Select the hotkey to use to swap fullscreen state."
@@ -2518,7 +2518,7 @@ msgstr ""
 #: src/libvlc.h:752 modules/gui/wxwindows/interface.cpp:1542
 #, fuzzy
 msgid "Play/Pause"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: src/libvlc.h:753
 msgid "Select the hotkey to use to swap paused state."
@@ -2546,7 +2546,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:556 modules/gui/macosx/intf.m:473
 #, fuzzy
 msgid "Faster"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: src/libvlc.h:759
 msgid "Select the hotkey to use for fast forward playback."
@@ -2571,7 +2571,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:543 modules/gui/wxwindows/interface.cpp:1547
 #: modules/gui/wxwindows/menus.cpp:283
 msgid "Next"
-msgstr "Nästa objekt"
+msgstr "NÃ¤sta objekt"
 
 #: src/libvlc.h:763
 msgid "Select the hotkey to use to skip to the next item in the playlist."
@@ -2584,7 +2584,7 @@ msgstr ""
 #: modules/gui/wxwindows/menus.cpp:282
 #, fuzzy
 msgid "Previous"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: src/libvlc.h:765
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
@@ -2673,7 +2673,7 @@ msgstr "Avsluta VLC"
 #: src/libvlc.h:788
 #, fuzzy
 msgid "Select the hotkey to quit the application."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:789
 msgid "Navigate up"
@@ -2706,7 +2706,7 @@ msgstr ""
 #: src/libvlc.h:796
 #, fuzzy
 msgid "Select the key to move the selector right in DVD menus."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:797
 msgid "Activate"
@@ -2737,7 +2737,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1267 modules/gui/macosx/controls.m:611
 #: modules/gui/macosx/intf.m:493 modules/gui/macosx/intf.m:545
 msgid "Mute"
-msgstr "Stäng av ljudet"
+msgstr "StÃ¤ng av ljudet"
 
 #: src/libvlc.h:804
 msgid "Select the key to turn off audio volume."
@@ -2751,7 +2751,7 @@ msgstr "Undertext"
 #: src/libvlc.h:806
 #, fuzzy
 msgid "Select the key to increase the subtitle delay."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:807
 #, fuzzy
@@ -2761,7 +2761,7 @@ msgstr "Undertext"
 #: src/libvlc.h:808
 #, fuzzy
 msgid "Select the key to decrease the subtitle delay."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:809
 #, fuzzy
@@ -2771,7 +2771,7 @@ msgstr "Undertext"
 #: src/libvlc.h:810
 #, fuzzy
 msgid "Select the key to increase the audio delay."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:811
 #, fuzzy
@@ -2781,7 +2781,7 @@ msgstr "Undertext"
 #: src/libvlc.h:812
 #, fuzzy
 msgid "Select the key to decrease the audio delay."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:813
 msgid "Play playlist bookmark 1"
@@ -2826,52 +2826,52 @@ msgstr ""
 #: src/libvlc.h:823
 #, fuzzy
 msgid "Select the key to play this bookmark."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:824
 #, fuzzy
 msgid "Set playlist bookmark 1"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:825
 #, fuzzy
 msgid "Set playlist bookmark 2"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:826
 #, fuzzy
 msgid "Set playlist bookmark 3"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:827
 #, fuzzy
 msgid "Set playlist bookmark 4"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:828
 #, fuzzy
 msgid "Set playlist bookmark 5"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:829
 #, fuzzy
 msgid "Set playlist bookmark 6"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:830
 #, fuzzy
 msgid "Set playlist bookmark 7"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:831
 #, fuzzy
 msgid "Set playlist bookmark 8"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:832
 #, fuzzy
 msgid "Set playlist bookmark 9"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:833
 msgid "Set playlist bookmark 10"
@@ -2880,7 +2880,7 @@ msgstr ""
 #: src/libvlc.h:834
 #, fuzzy
 msgid "Select the key to set this playlist bookmark."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:836
 msgid "Go back in browsing history"
@@ -2905,7 +2905,7 @@ msgstr ""
 #: src/libvlc.h:841
 #, fuzzy
 msgid "Cycle audio track"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/libvlc.h:842
 msgid "Cycle through the available audio tracks(languages)"
@@ -2923,7 +2923,7 @@ msgstr ""
 #: src/libvlc.h:845
 #, fuzzy
 msgid "Show interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:846
 msgid "Raise the interface above all other windows"
@@ -2941,7 +2941,7 @@ msgstr ""
 #: modules/access_filter/record.c:51
 #, fuzzy
 msgid "Record"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: src/libvlc.h:851
 msgid "Record access filter start/stop."
@@ -2988,7 +2988,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:510 modules/video_output/snapshot.c:75
 #, fuzzy
 msgid "Snapshot"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/libvlc.h:963
 #, fuzzy
@@ -3013,12 +3013,12 @@ msgstr "Spela upp"
 #: src/libvlc.h:1022
 #, fuzzy
 msgid "Input"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: src/libvlc.h:1039
 #, fuzzy
 msgid "Track settings"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: src/libvlc.h:1058
 #, fuzzy
@@ -3028,7 +3028,7 @@ msgstr "Paus"
 #: src/libvlc.h:1073
 #, fuzzy
 msgid "Default devices"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: src/libvlc.h:1082
 #, fuzzy
@@ -3260,7 +3260,7 @@ msgstr ""
 #: src/misc/iso-639_def.h:74
 #, fuzzy
 msgid "Faroese"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: src/misc/iso-639_def.h:75
 msgid "Fijian"
@@ -3367,7 +3367,7 @@ msgstr ""
 #: src/misc/iso-639_def.h:106
 #, fuzzy
 msgid "Khmer"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: src/misc/iso-639_def.h:107
 msgid "Kikuyu"
@@ -3449,7 +3449,7 @@ msgstr "Spela upp"
 #: src/misc/iso-639_def.h:126
 #, fuzzy
 msgid "Malagasy"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: src/misc/iso-639_def.h:127
 msgid "Maltese"
@@ -3570,7 +3570,7 @@ msgstr "Radera"
 #: src/misc/iso-639_def.h:159
 #, fuzzy
 msgid "Sinhalese"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: src/misc/iso-639_def.h:160
 #, fuzzy
@@ -3825,12 +3825,12 @@ msgstr ""
 #: modules/gui/wxwindows/open.cpp:646
 #, fuzzy
 msgid "Audio CD"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/cdda.c:49
 #, fuzzy
 msgid "Audio CD input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/cdda.c:55
 msgid "[cdda:][device][@[track]]"
@@ -3839,12 +3839,12 @@ msgstr ""
 #: modules/access/cdda.c:380
 #, fuzzy
 msgid "Audio CD - Track "
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/cdda.c:381
 #, fuzzy, c-format
 msgid "Audio CD - Track %i"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:75
 #: modules/codec/x264.c:124
@@ -3948,7 +3948,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:115
 #, fuzzy
 msgid "Audio Compact Disc"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/cdda/cdda.c:124 modules/access/vcdx/vcd.c:106
 msgid "If nonzero, this gives additional debug information."
@@ -3996,7 +3996,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:174
 #, fuzzy
 msgid "CDDB"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/access/cdda/cdda.c:177
 msgid "Format to use in playlist \"title\" field when using CDDB"
@@ -4013,7 +4013,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:187
 #, fuzzy
 msgid "CDDB server"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/access/cdda/cdda.c:188
 msgid "Contact this CDDB server look up CD-DA information"
@@ -4022,7 +4022,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:192
 #, fuzzy
 msgid "CDDB server port"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/access/cdda/cdda.c:193
 msgid "CDDB server uses this port number to communicate on"
@@ -4051,7 +4051,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:213
 #, fuzzy
 msgid "CDDB server timeout"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/access/cdda/cdda.c:214
 msgid "Time (in seconds) to wait for a response from the CDDB server"
@@ -4145,7 +4145,7 @@ msgstr ""
 #: modules/access/directory.c:86
 #, fuzzy
 msgid "Directory"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/directory.c:88
 #, fuzzy
@@ -4176,7 +4176,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:83 modules/access/v4l/v4l.c:77
 #, fuzzy
 msgid "Video device name"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/access/dshow/dshow.cpp:85
 msgid ""
@@ -4188,7 +4188,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:88 modules/access/v4l/v4l.c:81
 #, fuzzy
 msgid "Audio device name"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/dshow/dshow.cpp:90
 msgid ""
@@ -4200,7 +4200,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:93
 #, fuzzy
 msgid "Video size"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/access/dshow/dshow.cpp:95
 msgid ""
@@ -4212,7 +4212,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:98 modules/access/v4l/v4l.c:85
 #, fuzzy
 msgid "Video input chroma format"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/access/dshow/dshow.cpp:100
 msgid ""
@@ -4223,7 +4223,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:102
 #, fuzzy
 msgid "Video input frame rate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/dshow/dshow.cpp:104
 msgid ""
@@ -4282,12 +4282,12 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:135
 #, fuzzy
 msgid "DirectShow"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/dshow/dshow.cpp:136 modules/access/dshow/dshow.cpp:181
 #, fuzzy
 msgid "DirectShow input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/dshow/dshow.cpp:144 modules/access/dshow/dshow.cpp:149
 #: modules/audio_output/alsa.c:110 modules/video_output/directx/directx.c:157
@@ -4332,7 +4332,7 @@ msgstr ""
 #: modules/access/dvb/access.c:81
 #, fuzzy
 msgid "Inversion mode"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/access/dvb/access.c:82
 msgid "Inversion mode [0=off, 1=on, 2=auto]"
@@ -4361,7 +4361,7 @@ msgstr ""
 #: modules/access/dvb/access.c:97
 #, fuzzy
 msgid "Budget mode"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/access/dvb/access.c:98
 msgid "This allows you to stream an entire transponder with a budget card."
@@ -4558,7 +4558,7 @@ msgstr ""
 #: modules/access/fake.c:50
 #, fuzzy
 msgid "Fake input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/file.c:80
 msgid ""
@@ -4633,7 +4633,7 @@ msgstr ""
 #: modules/access/ftp.c:56
 #, fuzzy
 msgid "FTP input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/http.c:44
 msgid "HTTP proxy"
@@ -4680,7 +4680,7 @@ msgstr ""
 #: modules/access/http.c:67
 #, fuzzy
 msgid "Auto re-connect"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/http.c:68
 msgid ""
@@ -4701,7 +4701,7 @@ msgstr ""
 #: modules/access/http.c:76
 #, fuzzy
 msgid "HTTP input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/http.c:78
 msgid "HTTP/HTTPS"
@@ -4716,12 +4716,12 @@ msgstr ""
 #: modules/access/mms/mms.c:51
 #, fuzzy
 msgid "Force selection of all streams"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/access/mms/mms.c:53
 #, fuzzy
 msgid "Select maximum bitrate stream"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/access/mms/mms.c:55
 msgid "Always select the stream with the maximum bitrate."
@@ -4746,12 +4746,12 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1289
 #, fuzzy
 msgid "Device"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/pvr/pvr.c:52
 #, fuzzy
 msgid "PVR video device"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/access/pvr/pvr.c:54 modules/access/v4l/v4l.c:96
 #, fuzzy
@@ -4794,7 +4794,7 @@ msgstr ""
 #: modules/access/pvr/pvr.c:73
 #, fuzzy
 msgid "Key interval"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/access/pvr/pvr.c:74
 msgid "Interval between keyframes (-1 for auto)"
@@ -4817,7 +4817,7 @@ msgstr ""
 #: modules/access/pvr/pvr.c:83
 #, fuzzy
 msgid "Bitrate peak"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/pvr/pvr.c:84
 msgid "Peak bitrate in VBR mode"
@@ -4834,7 +4834,7 @@ msgstr ""
 #: modules/access/pvr/pvr.c:89
 #, fuzzy
 msgid "Audio bitmask"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/pvr/pvr.c:90
 msgid ""
@@ -4941,13 +4941,13 @@ msgstr ""
 #: modules/access/screen/screen.c:62
 #, fuzzy
 msgid "Screen Input"
-msgstr "Helskärm %d"
+msgstr "HelskÃ¤rm %d"
 
 #: modules/access/screen/screen.c:63 modules/gui/gtk/gnome_interface.c:190
 #: modules/gui/gtk/gnome_interface.c:973 modules/gui/gtk/gtk_interface.c:560
 #: modules/gui/gtk/gtk_interface.c:1356 modules/gui/macosx/vout.m:189
 msgid "Screen"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/access/slp.c:60
 msgid "SLP attribute identifiers"
@@ -4982,7 +4982,7 @@ msgstr ""
 #: modules/access/slp.c:75
 #, fuzzy
 msgid "SLP LDAP filter"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/access/slp.c:77
 msgid ""
@@ -5003,7 +5003,7 @@ msgstr ""
 #: modules/access/slp.c:86
 #, fuzzy
 msgid "SLP input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/smb.c:61
 msgid ""
@@ -5034,7 +5034,7 @@ msgstr ""
 #: modules/access/smb.c:75
 #, fuzzy
 msgid "SMB input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/tcp.c:39
 msgid ""
@@ -5049,7 +5049,7 @@ msgstr ""
 #: modules/access/tcp.c:47
 #, fuzzy
 msgid "TCP input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/udp.c:43 modules/access_output/udp.c:65
 msgid ""
@@ -5074,7 +5074,7 @@ msgstr ""
 #: modules/access/udp.c:55
 #, fuzzy
 msgid "UDP/RTP input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/v4l/v4l.c:75
 msgid ""
@@ -5116,7 +5116,7 @@ msgstr ""
 #: modules/access/v4l/v4l.c:110
 #, fuzzy
 msgid "Set the Brightness of the video input"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/access/v4l/v4l.c:111 modules/gui/wxwindows/extrapanel.cpp:226
 #, fuzzy
@@ -5126,7 +5126,7 @@ msgstr "Radera"
 #: modules/access/v4l/v4l.c:113
 #, fuzzy
 msgid "Set the Hue of the video input"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/access/v4l/v4l.c:114
 #, fuzzy
@@ -5136,7 +5136,7 @@ msgstr "Kontroller"
 #: modules/access/v4l/v4l.c:116
 #, fuzzy
 msgid "Set the Color of the video input"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/access/v4l/v4l.c:117 modules/gui/wxwindows/extrapanel.cpp:231
 #, fuzzy
@@ -5146,12 +5146,12 @@ msgstr "Kontroller"
 #: modules/access/v4l/v4l.c:119
 #, fuzzy
 msgid "Set the Contrast of the video input"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/access/v4l/v4l.c:120
 #, fuzzy
 msgid "Tuner"
-msgstr "Stäng av ljudet"
+msgstr "StÃ¤ng av ljudet"
 
 #: modules/access/v4l/v4l.c:121
 msgid "Tuner to use, if there are several ones"
@@ -5181,7 +5181,7 @@ msgstr ""
 #: modules/access/v4l/v4l.c:131
 #, fuzzy
 msgid "Decimation"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/access/v4l/v4l.c:133
 msgid "Set the Decimation level for MJPEG streams"
@@ -5195,7 +5195,7 @@ msgstr "Avsluta VLC"
 #: modules/access/v4l/v4l.c:135
 #, fuzzy
 msgid "Set the quality of the stream"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/access/v4l/v4l.c:146
 msgid "Video4Linux"
@@ -5215,7 +5215,7 @@ msgstr ""
 #: modules/access/vcd/vcd.c:47
 #, fuzzy
 msgid "VCD input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/access/vcd/vcd.c:53
 msgid "[vcd:][device][@[title][,[chapter]]]"
@@ -5244,12 +5244,12 @@ msgstr "Kontroller"
 #: modules/access/vcdx/access.c:409 modules/access/vcdx/info.c:102
 #, fuzzy
 msgid "Segments"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/access/vcdx/access.c:428 modules/demux/mkv.cpp:4924
 #, fuzzy
 msgid "Segment "
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/access/vcdx/access.c:472
 #, fuzzy
@@ -5264,7 +5264,7 @@ msgstr ""
 #: modules/access/vcdx/info.c:293
 #, fuzzy
 msgid "Segment"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/access/vcdx/info.c:90
 msgid "VCD Format"
@@ -5337,12 +5337,12 @@ msgstr "Skiva typ"
 #: modules/access/vcdx/info.c:137
 #, fuzzy
 msgid "end"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/access/vcdx/info.c:140
 #, fuzzy
 msgid "play list"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/access/vcdx/info.c:151
 #, fuzzy
@@ -5427,7 +5427,7 @@ msgstr "Arkiv"
 #: modules/access_filter/record.c:44
 #, fuzzy
 msgid "Allows you to specify the directory where the record will be stored"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/access_filter/timeshift.c:42 modules/access_filter/timeshift.c:43
 #, fuzzy
@@ -5446,7 +5446,7 @@ msgstr ""
 #: modules/access_output/file.c:65
 #, fuzzy
 msgid "Append to file"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/access_output/file.c:66
 msgid "Append to file if it exists instead of replacing it."
@@ -5521,7 +5521,7 @@ msgstr ""
 #: modules/access_output/http.c:69 modules/control/http.c:89
 #, fuzzy
 msgid "CRL file"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/access_output/http.c:70
 msgid ""
@@ -5641,7 +5641,7 @@ msgstr ""
 #: modules/audio_filter/converter/a52tofloat32.c:112
 #, fuzzy
 msgid "ATSC A/52 (AC-3) audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_filter/converter/a52tospdif.c:53
 msgid "audio filter for A/52->S/PDIF encapsulation"
@@ -5659,7 +5659,7 @@ msgstr ""
 #: modules/audio_filter/converter/dtstofloat32.c:99
 #, fuzzy
 msgid "DTS Coherent Acoustics audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_filter/converter/dtstospdif.c:70
 msgid "audio filter for DTS->S/PDIF encapsulation"
@@ -5693,7 +5693,7 @@ msgstr ""
 #: modules/audio_filter/converter/mpgatofixed32.c:72
 #, fuzzy
 msgid "MPEG audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_filter/converter/s16tofixed32.c:48
 msgid "audio filter for s16->fixed32 conversion"
@@ -5756,7 +5756,7 @@ msgstr "Paus"
 #: modules/audio_filter/equalizer_presets.h:39
 #, fuzzy
 msgid "Flat"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/audio_filter/equalizer_presets.h:39
 #: modules/demux/util/id3genres.h:60
@@ -5776,17 +5776,17 @@ msgstr "Avbryt"
 #: modules/audio_filter/equalizer_presets.h:39
 #, fuzzy
 msgid "Full bass"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/audio_filter/equalizer_presets.h:40
 #, fuzzy
 msgid "Full bass and treble"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/audio_filter/equalizer_presets.h:40
 #, fuzzy
 msgid "Full treble"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Headphones"
@@ -5795,7 +5795,7 @@ msgstr ""
 #: modules/audio_filter/equalizer_presets.h:41
 #, fuzzy
 msgid "Large Hall"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Live"
@@ -5815,7 +5815,7 @@ msgstr ""
 #: modules/demux/util/id3genres.h:44
 #, fuzzy
 msgid "Reggae"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/audio_filter/equalizer_presets.h:42
 #: modules/demux/util/id3genres.h:45
@@ -5898,17 +5898,17 @@ msgstr ""
 #: modules/audio_mixer/float32.c:47
 #, fuzzy
 msgid "Float32 audio mixer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_mixer/spdif.c:47
 #, fuzzy
 msgid "Dummy S/PDIF audio mixer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_mixer/trivial.c:47
 #, fuzzy
 msgid "Trivial audio mixer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_output/alsa.c:84 modules/codec/x264.c:124
 msgid "default"
@@ -5922,7 +5922,7 @@ msgstr "Paus"
 #: modules/audio_output/alsa.c:108
 #, fuzzy
 msgid "ALSA Device Name"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_output/alsa.c:130 modules/audio_output/auhal.c:87
 #: modules/audio_output/auhal.c:454 modules/audio_output/coreaudio.c:217
@@ -5932,7 +5932,7 @@ msgstr "_Nästa objekt"
 #: modules/gui/macosx/intf.m:498 modules/gui/macosx/intf.m:499
 #, fuzzy
 msgid "Audio Device"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_output/alsa.c:184 modules/audio_output/directx.c:463
 #: modules/audio_output/oss.c:225 modules/audio_output/portaudio.c:400
@@ -6002,12 +6002,12 @@ msgstr "Paus"
 #: modules/audio_output/esd.c:72
 #, fuzzy
 msgid "Esound server"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/audio_output/file.c:80
 #, fuzzy
 msgid "Output format"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/audio_output/file.c:81
 msgid ""
@@ -6018,7 +6018,7 @@ msgstr ""
 #: modules/audio_output/file.c:84
 #, fuzzy
 msgid "Output channels number"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/audio_output/file.c:85
 msgid ""
@@ -6037,7 +6037,7 @@ msgstr ""
 #: modules/audio_output/file.c:106
 #, fuzzy
 msgid "Output file"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/audio_output/file.c:107
 msgid "File to which the audio samples will be written to"
@@ -6072,12 +6072,12 @@ msgstr "Paus"
 #: modules/audio_output/oss.c:114
 #, fuzzy
 msgid "OSS DSP device"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/audio_output/portaudio.c:107
 #, fuzzy
 msgid "Output device"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/audio_output/portaudio.c:108
 msgid "Portaudio identifier for the output device"
@@ -6119,27 +6119,27 @@ msgstr "Undertext"
 #: modules/codec/adpcm.c:42
 #, fuzzy
 msgid "ADPCM audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/araw.c:43
 #, fuzzy
 msgid "Raw/Log Audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/araw.c:52
 #, fuzzy
 msgid "Raw audio encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/cinepak.c:38
 #, fuzzy
 msgid "Cinepak video decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/cmml/cmml.c:70
 #, fuzzy
 msgid "CMML annotations decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/cvdsub.c:46
 #, fuzzy
@@ -6163,12 +6163,12 @@ msgstr ""
 #: modules/codec/dirac.c:73
 #, fuzzy
 msgid "Dirac video decoder"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/dirac.c:79
 #, fuzzy
 msgid "Dirac video encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/dmo/dmo.c:99
 msgid "DirectMedia Object decoder"
@@ -6200,7 +6200,7 @@ msgstr "Undertext"
 #: modules/codec/faad.c:38
 #, fuzzy
 msgid "AAC audio decoder (using libfaad2)"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/ffmpeg/ffmpeg.c:74
 msgid "rd"
@@ -6220,12 +6220,12 @@ msgstr "Arkiv"
 #, fuzzy
 msgid ""
 "AltiVec ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/ffmpeg/ffmpeg.c:89
 #, fuzzy
 msgid "ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/ffmpeg/ffmpeg.c:92
 #, fuzzy
@@ -6244,27 +6244,27 @@ msgstr "Undertext"
 #: modules/codec/ffmpeg/ffmpeg.c:125
 #, fuzzy
 msgid "ffmpeg audio/video encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/ffmpeg/ffmpeg.c:169
 #, fuzzy
 msgid "ffmpeg demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/ffmpeg/ffmpeg.c:177
 #, fuzzy
 msgid "ffmpeg video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/codec/ffmpeg/ffmpeg.c:183
 #, fuzzy
 msgid "ffmpeg deinterlace video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/codec/ffmpeg/ffmpeg.h:86
 #, fuzzy
 msgid "Direct rendering"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/ffmpeg/ffmpeg.h:88
 msgid "Error resilience"
@@ -6372,7 +6372,7 @@ msgstr ""
 #: modules/codec/ffmpeg/ffmpeg.h:181
 #, fuzzy
 msgid "Video bitrate tolerance"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/ffmpeg/ffmpeg.h:182
 msgid "Allows you to specify the video bitrate tolerance in kbit/s."
@@ -6407,22 +6407,22 @@ msgstr ""
 #: modules/codec/ffmpeg/ffmpeg.h:197
 #, fuzzy
 msgid "Rate control buffer size"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/ffmpeg/ffmpeg.h:198
 #, fuzzy
 msgid "Allows you to specify the rate control buffer size."
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/ffmpeg/ffmpeg.h:201
 #, fuzzy
 msgid "Rate control buffer aggressiveness"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/ffmpeg/ffmpeg.h:202
 #, fuzzy
 msgid "Allows you to specify the rate control buffer aggressiveness."
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/ffmpeg/ffmpeg.h:205
 msgid "I quantization factor"
@@ -6537,12 +6537,12 @@ msgstr ""
 #: modules/codec/flac.c:170
 #, fuzzy
 msgid "Flac audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/flac.c:175
 #, fuzzy
 msgid "Flac audio encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/flac.c:181
 #, fuzzy
@@ -6552,22 +6552,22 @@ msgstr "Undertext"
 #: modules/codec/libmpeg2.c:93
 #, fuzzy
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/lpcm.c:82
 #, fuzzy
 msgid "Linear PCM audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/lpcm.c:87
 #, fuzzy
 msgid "Linear PCM audio packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/mash.cpp:65
 #, fuzzy
 msgid "Video decoder using openmash"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/mpeg_audio.c:106
 msgid "MPEG audio layer I/II/III parser"
@@ -6581,7 +6581,7 @@ msgstr "Undertext"
 #: modules/codec/png.c:54
 #, fuzzy
 msgid "PNG video decoder"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/quicktime.c:59
 msgid "QuickTime library decoder"
@@ -6590,17 +6590,17 @@ msgstr ""
 #: modules/codec/rawvideo.c:68
 #, fuzzy
 msgid "Pseudo raw video decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/rawvideo.c:75
 #, fuzzy
 msgid "Pseudo raw video packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/speex.c:105
 #, fuzzy
 msgid "Speex audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/speex.c:110
 #, fuzzy
@@ -6610,12 +6610,12 @@ msgstr "Undertext"
 #: modules/codec/speex.c:115
 #, fuzzy
 msgid "Speex audio encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/speex.c:551 modules/codec/speex.c:568
 #, fuzzy
 msgid "Speex comment"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/codec/speex.c:551
 #, fuzzy
@@ -6675,7 +6675,7 @@ msgstr "Undertext"
 #: modules/codec/tarkin.c:75
 #, fuzzy
 msgid "Tarkin decoder module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:129
 msgid ""
@@ -6686,22 +6686,22 @@ msgstr ""
 #: modules/codec/theora.c:99
 #, fuzzy
 msgid "Theora video decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/theora.c:105
 #, fuzzy
 msgid "Theora video packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/theora.c:111
 #, fuzzy
 msgid "Theora video encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/theora.c:512
 #, fuzzy
 msgid "Theora comment"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/codec/twolame.c:52
 msgid ""
@@ -6721,7 +6721,7 @@ msgstr ""
 #: modules/codec/twolame.c:58
 #, fuzzy
 msgid "VBR mode"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/codec/twolame.c:60
 msgid "By default the encoding is CBR."
@@ -6738,12 +6738,12 @@ msgstr ""
 #: modules/codec/twolame.c:67
 #, fuzzy
 msgid "Libtwolame audio encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/vorbis.c:131
 #, fuzzy
 msgid "Maximum encoding bitrate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/vorbis.c:133
 msgid ""
@@ -6754,7 +6754,7 @@ msgstr ""
 #: modules/codec/vorbis.c:135
 #, fuzzy
 msgid "Minimum encoding bitrate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/vorbis.c:137
 msgid ""
@@ -6774,7 +6774,7 @@ msgstr ""
 #: modules/codec/vorbis.c:145
 #, fuzzy
 msgid "Vorbis audio decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/vorbis.c:156
 #, fuzzy
@@ -6784,7 +6784,7 @@ msgstr "Undertext"
 #: modules/codec/vorbis.c:163
 #, fuzzy
 msgid "Vorbis audio encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/vorbis.c:586
 msgid "Vorbis comment"
@@ -6831,7 +6831,7 @@ msgstr ""
 #: modules/codec/x264.c:59
 #, fuzzy
 msgid "Enable loop filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/codec/x264.c:60
 msgid "Use deblocking loop filter (increases quality)."
@@ -6849,7 +6849,7 @@ msgstr ""
 #: modules/codec/x264.c:65
 #, fuzzy
 msgid "Bitrate tolerance"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/x264.c:66
 msgid "Sets the allowed variance in average bitrate."
@@ -6858,12 +6858,12 @@ msgstr ""
 #: modules/codec/x264.c:69
 #, fuzzy
 msgid "Maximum local bitrate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/codec/x264.c:70
 #, fuzzy
 msgid "Sets a maximum local bitrate in kbits/s."
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/codec/x264.c:72
 msgid "Averaging period for the maximum local bitrate"
@@ -6872,7 +6872,7 @@ msgstr ""
 #: modules/codec/x264.c:73
 #, fuzzy
 msgid "Sets an averaging period for the maximum local bitrate, in kbits/s."
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/codec/x264.c:76
 msgid "Initial buffer occupancy"
@@ -6885,7 +6885,7 @@ msgstr ""
 #: modules/codec/x264.c:80
 #, fuzzy
 msgid "Sets maximum interval between IDR-frames"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/codec/x264.c:81
 msgid ""
@@ -6896,7 +6896,7 @@ msgstr ""
 #: modules/codec/x264.c:84
 #, fuzzy
 msgid "Sets minimum interval between IDR-frames"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/codec/x264.c:85
 msgid ""
@@ -6977,7 +6977,7 @@ msgstr "Slow Motion"
 #: modules/codec/x264.c:124
 #, fuzzy
 msgid "fast"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/codec/x264.c:127
 msgid "h264 video encoder using x264 library"
@@ -6991,7 +6991,7 @@ msgstr "Kontroller"
 #: modules/control/corba/corba.c:689
 #, fuzzy
 msgid "corba control module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/gestures.c:77
 msgid "Motion threshold (10-100)"
@@ -7021,57 +7021,57 @@ msgstr ""
 #: modules/control/gestures.c:97
 #, fuzzy
 msgid "Mouse gestures control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/hotkeys.c:83
 #, fuzzy
 msgid "Playlist bookmark 1"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:84
 #, fuzzy
 msgid "Playlist bookmark 2"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:85
 #, fuzzy
 msgid "Playlist bookmark 3"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:86
 #, fuzzy
 msgid "Playlist bookmark 4"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:87
 #, fuzzy
 msgid "Playlist bookmark 5"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:88
 #, fuzzy
 msgid "Playlist bookmark 6"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:89
 #, fuzzy
 msgid "Playlist bookmark 7"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:90
 #, fuzzy
 msgid "Playlist bookmark 8"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:91
 #, fuzzy
 msgid "Playlist bookmark 9"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:92
 #, fuzzy
 msgid "Playlist bookmark 10"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/control/hotkeys.c:94
 msgid "This option allows you to define playlist bookmarks."
@@ -7080,12 +7080,12 @@ msgstr ""
 #: modules/control/hotkeys.c:97
 #, fuzzy
 msgid "Hotkeys management interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/hotkeys.c:512
 #, fuzzy, c-format
 msgid "Audio track: %s"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/control/hotkeys.c:526 modules/control/hotkeys.c:554
 #, fuzzy, c-format
@@ -7129,7 +7129,7 @@ msgstr ""
 #: modules/control/http.c:94
 #, fuzzy
 msgid "HTTP remote control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/http.c:99
 msgid "HTTP SSL"
@@ -7192,12 +7192,12 @@ msgstr ""
 #: modules/control/joystick.c:175
 #, fuzzy
 msgid "Joystick control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/lirc.c:58
 #, fuzzy
 msgid "Infrared remote control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/netsync.c:81
 msgid "Act as master for network synchronisation"
@@ -7230,7 +7230,7 @@ msgstr ""
 #: modules/control/ntservice.c:39
 #, fuzzy
 msgid "Install Windows Service"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/ntservice.c:41
 msgid "If enabled the interface will install the Service and exit."
@@ -7239,7 +7239,7 @@ msgstr ""
 #: modules/control/ntservice.c:42
 #, fuzzy
 msgid "Uninstall Windows Service"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/ntservice.c:44
 msgid "If enabled the interface will uninstall the Service and exit."
@@ -7276,12 +7276,12 @@ msgstr ""
 #: modules/control/ntservice.c:61
 #, fuzzy
 msgid "NT Service"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/control/ntservice.c:62
 #, fuzzy
 msgid "Windows Service interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/rc.c:124
 #, fuzzy
@@ -7304,7 +7304,7 @@ msgstr ""
 #: modules/control/rc.c:131
 #, fuzzy
 msgid "UNIX socket command input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/control/rc.c:132
 msgid "Accept commands over a Unix socket rather than stdin."
@@ -7313,7 +7313,7 @@ msgstr ""
 #: modules/control/rc.c:135
 #, fuzzy
 msgid "TCP command input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/control/rc.c:136
 msgid ""
@@ -7340,12 +7340,12 @@ msgstr "sv"
 #: modules/control/rc.c:152
 #, fuzzy
 msgid "Remote control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/rc.c:289
 #, fuzzy
 msgid "Remote control interface initialized, `h' for help\n"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/rc.c:671
 msgid "+----[ Remote control commands ]\n"
@@ -7611,12 +7611,12 @@ msgstr ""
 #: modules/control/showintf.c:70
 #, fuzzy
 msgid "Interface showing control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/telnet.c:79
 #, fuzzy
 msgid "Telnet Interface port"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/telnet.c:80
 msgid "Default to 4212"
@@ -7625,7 +7625,7 @@ msgstr ""
 #: modules/control/telnet.c:81
 #, fuzzy
 msgid "Telnet Interface password"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/control/telnet.c:82
 msgid "Default to admin"
@@ -7634,32 +7634,32 @@ msgstr ""
 #: modules/control/telnet.c:92
 #, fuzzy
 msgid "VLM remote control interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/demux/a52.c:44
 #, fuzzy
 msgid "Raw A/52 demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/aiff.c:45
 #, fuzzy
 msgid "AIFF demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/asf/asf.c:51
 #, fuzzy
 msgid "ASF v1.0 demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/au.c:46
 #, fuzzy
 msgid "AU demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/avi/avi.c:40 modules/demux/avi/avi.c:41
 #, fuzzy
 msgid "Force interleaved method"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/demux/avi/avi.c:43
 #, fuzzy
@@ -7674,7 +7674,7 @@ msgstr ""
 #: modules/demux/avi/avi.c:52
 #, fuzzy
 msgid "AVI demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/demuxdump.c:37
 #, fuzzy
@@ -7688,7 +7688,7 @@ msgstr ""
 #: modules/demux/demuxdump.c:40
 #, fuzzy
 msgid "Append"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/demux/demuxdump.c:42
 msgid ""
@@ -7699,17 +7699,17 @@ msgstr ""
 #: modules/demux/demuxdump.c:52
 #, fuzzy
 msgid "Filedump demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/dts.c:40
 #, fuzzy
 msgid "Raw DTS demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/flac.c:38
 #, fuzzy
 msgid "FLAC demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/livedotcom.cpp:63
 msgid ""
@@ -7743,7 +7743,7 @@ msgstr ""
 #: modules/demux/m3u.c:68
 #, fuzzy
 msgid "Playlist metademux"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/demux/mjpeg.c:43 modules/demux/mpeg/h264.c:39
 msgid "Frames per Second"
@@ -7758,12 +7758,12 @@ msgstr ""
 #: modules/demux/mjpeg.c:49
 #, fuzzy
 msgid "JPEG camera demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mkv.cpp:385
 #, fuzzy
 msgid "Matroska stream demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mkv.cpp:392
 #, fuzzy
@@ -7808,7 +7808,7 @@ msgstr ""
 #: modules/demux/mkv.cpp:2952
 #, fuzzy
 msgid "Video Manager"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/demux/mkv.cpp:2958
 #, fuzzy
@@ -7899,52 +7899,52 @@ msgstr ""
 #: modules/demux/mp4/mp4.c:50
 #, fuzzy
 msgid "MP4 stream demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mpeg/h264.c:40
 #, fuzzy
 msgid "Allows you to set the desired frame rate."
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/demux/mpeg/h264.c:47
 #, fuzzy
 msgid "H264 video demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mpeg/m4a.c:42
 #, fuzzy
 msgid "MPEG-4 audio demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mpeg/m4v.c:42
 #, fuzzy
 msgid "MPEG-4 video demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mpeg/mpga.c:46
 #, fuzzy
 msgid "MPEG-I/II audio demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/mpeg/mpgv.c:42
 #, fuzzy
 msgid "MPEG-I/II video demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/nsv.c:45
 #, fuzzy
 msgid "NullSoft demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/nuv.c:46
 #, fuzzy
 msgid "Nuv demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/ogg.c:43
 #, fuzzy
 msgid "Ogg stream demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/playlist/b4s.c:339
 #, fuzzy
@@ -7954,47 +7954,47 @@ msgstr "Arkiv"
 #: modules/demux/playlist/playlist.c:41
 #, fuzzy
 msgid "Old playlist open"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/demux/playlist/playlist.c:47
 #, fuzzy
 msgid "Native playlist import"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/demux/playlist/playlist.c:54
 #, fuzzy
 msgid "M3U playlist import"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/demux/playlist/playlist.c:59
 #, fuzzy
 msgid "PLS playlist import"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/demux/playlist/playlist.c:64
 #, fuzzy
 msgid "B4S playlist import"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/demux/ps.c:47 modules/demux/ps.c:55
 #, fuzzy
 msgid "PS demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/pva.c:43
 #, fuzzy
 msgid "PVA demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/rawdv.c:39
 #, fuzzy
 msgid "raw DV demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/real.c:39
 #, fuzzy
 msgid "Real demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/sgimb.c:113
 msgid "Kasenna MediaBase metademux"
@@ -8073,7 +8073,7 @@ msgstr "Spela upp"
 #: modules/demux/ty.c:70
 #, fuzzy
 msgid "TY Stream audio/video demux"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/util/id3genres.h:28
 msgid "Blues"
@@ -8338,7 +8338,7 @@ msgstr ""
 #: modules/demux/util/id3genres.h:96
 #, fuzzy
 msgid "Rave"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/demux/util/id3genres.h:97
 msgid "Showtunes"
@@ -8399,17 +8399,17 @@ msgstr "Markera allt"
 #: modules/demux/voc.c:42
 #, fuzzy
 msgid "VOC demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/wav.c:42
 #, fuzzy
 msgid "WAV demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/demux/xa.c:42
 #, fuzzy
 msgid "XA demuxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/beos/BeOS.cpp:52
 #, fuzzy
@@ -8419,7 +8419,7 @@ msgstr "Radera"
 #: modules/gui/beos/BeOS.cpp:54
 #, fuzzy
 msgid "BeOS standard API interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/beos/InterfaceWindow.cpp:158
 msgid "Open files from all sub-folders as well?"
@@ -8445,7 +8445,7 @@ msgstr "Avbryt"
 #: modules/gui/wxwindows/menus.cpp:311
 #, fuzzy
 msgid "Open"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/beos/InterfaceWindow.cpp:208
 #: modules/gui/beos/InterfaceWindow.cpp:309 modules/gui/macosx/prefs.m:115
@@ -8461,7 +8461,7 @@ msgstr ""
 #: modules/gui/wxwindows/messages.cpp:64
 #, fuzzy
 msgid "Messages"
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/beos/InterfaceWindow.cpp:246
 #: modules/gui/beos/PlayListWindow.cpp:87
@@ -8470,13 +8470,13 @@ msgstr "_Öppna skiva..."
 #: modules/gui/wxwindows/dialogs.cpp:389 modules/gui/wxwindows/open.cpp:1126
 #: modules/gui/wxwindows/wizard.cpp:1258
 msgid "Open File"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/beos/InterfaceWindow.cpp:248
 #: modules/gui/beos/PlayListWindow.cpp:92 modules/gui/gtk/gtk_interface.c:630
 #, fuzzy
 msgid "Open Disc"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/beos/InterfaceWindow.cpp:249
 #, fuzzy
@@ -8492,12 +8492,12 @@ msgstr "Om VLC"
 #: modules/gui/beos/InterfaceWindow.cpp:268
 #, fuzzy
 msgid "Prev Title"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/beos/InterfaceWindow.cpp:269
 #, fuzzy
 msgid "Next Title"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/beos/InterfaceWindow.cpp:278
 #, fuzzy
@@ -8516,7 +8516,7 @@ msgstr "Stopp"
 
 #: modules/gui/beos/InterfaceWindow.cpp:304 modules/gui/macosx/intf.m:522
 msgid "Window"
-msgstr "Fönster"
+msgstr "FÃ¶nster"
 
 #: modules/gui/beos/InterfaceWindow.cpp:381
 #: modules/gui/gtk/gtk_interface.c:1661 modules/gui/gtk/gtk_interface.c:2405
@@ -8551,7 +8551,7 @@ msgstr ""
 #: modules/gui/beos/PlayListWindow.cpp:76
 #, fuzzy
 msgid "playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/beos/PlayListWindow.cpp:96
 #: modules/gui/wxwindows/messages.cpp:89
@@ -8591,7 +8591,7 @@ msgstr "Undertext"
 #: modules/gui/beos/PlayListWindow.cpp:122
 #, fuzzy
 msgid "Randomize"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/beos/PlayListWindow.cpp:127
 #: modules/gui/wxwindows/bookmarks.cpp:223
@@ -8632,7 +8632,7 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:116 modules/gui/wxwindows/preferences.cpp:213
 #, fuzzy
 msgid "Save"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/beos/PreferencesWindow.cpp:267
 msgid "Defaults"
@@ -8641,7 +8641,7 @@ msgstr ""
 #: modules/gui/beos/VideoOutput.cpp:1044
 #, fuzzy
 msgid "Show Interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/beos/VideoOutput.cpp:1048
 msgid "50%"
@@ -8701,7 +8701,7 @@ msgstr ""
 #: modules/gui/gtk/gnome.c:66 modules/gui/gtk/gtk.c:65
 #, fuzzy
 msgid "Interface default search path"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gnome.c:68 modules/gui/gtk/gtk.c:67
 msgid ""
@@ -8712,42 +8712,42 @@ msgstr ""
 #: modules/gui/gtk/gnome.c:77
 #, fuzzy
 msgid "GNOME interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gnome_interface.c:19 modules/gui/gtk/gnome_interface.c:985
 #: modules/gui/gtk/gtk_interface.c:165 modules/gui/gtk/gtk_interface.c:1391
 msgid "_Open File..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:504
 #: modules/gui/gtk/gnome_interface.c:986 modules/gui/gtk/gtk_interface.c:173
 #: modules/gui/gtk/gtk_interface.c:619 modules/gui/gtk/gtk_interface.c:1399
 #, fuzzy
 msgid "Open a file"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/gtk/gnome_interface.c:26 modules/gui/gtk/gnome_interface.c:992
 #: modules/gui/gtk/gtk_interface.c:180 modules/gui/gtk/gtk_interface.c:1403
 msgid "Open _Disc..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/gtk/gnome_interface.c:27 modules/gui/gtk/gnome_interface.c:993
 #: modules/gui/gtk/gtk_interface.c:188 modules/gui/gtk/gtk_interface.c:1411
 #, fuzzy
 msgid "Open Disc Media"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:33
 #, fuzzy
 msgid "_Network stream..."
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/gtk/gnome_interface.c:34 modules/gui/gtk/gnome_interface.c:528
 #: modules/gui/gtk/gnome_interface.c:1000 modules/gui/gtk/gtk_interface.c:203
 #: modules/gui/gtk/gtk_interface.c:641 modules/gui/gtk/gtk_interface.c:1423
 #, fuzzy
 msgid "Select a network stream"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/gtk/gnome_interface.c:41 modules/gui/gtk/gtk_interface.c:218
 msgid "_Eject Disc"
@@ -8761,7 +8761,7 @@ msgstr "Mata ut skiva"
 #: modules/gui/gtk/gnome_interface.c:56 modules/gui/gtk/gtk_interface.c:286
 #, fuzzy
 msgid "_Hide interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gnome_interface.c:64 modules/gui/gtk/gtk_interface.c:306
 msgid "Progr_am"
@@ -8793,12 +8793,12 @@ msgstr "Arkiv"
 #: modules/gui/gtk/gnome_interface.c:86 modules/gui/gtk/gtk_interface.c:352
 #, fuzzy
 msgid "_Playlist..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:87 modules/gui/gtk/gtk_interface.c:360
 #, fuzzy
 msgid "Open the playlist window"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:93 modules/gui/gtk/gtk_interface.c:364
 #, fuzzy
@@ -8813,7 +8813,7 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:133
 #, fuzzy
 msgid "Messages..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/gtk/gnome_interface.c:101 modules/gui/gtk/gtk_interface.c:381
 msgid "Open the messages window"
@@ -8823,7 +8823,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:433 modules/gui/gtk/gtk_interface.c:1235
 #, fuzzy
 msgid "_Language"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/gui/gtk/gnome_interface.c:119 modules/gui/gtk/gnome_interface.c:902
 #: modules/gui/gtk/gtk_interface.c:442
@@ -8855,16 +8855,16 @@ msgstr "Markera allt"
 #: modules/gui/gtk/gnome_interface.c:175 modules/gui/gtk/gnome_interface.c:958
 #: modules/gui/gtk/gtk_interface.c:536 modules/gui/gtk/gtk_interface.c:1332
 msgid "_Fullscreen"
-msgstr "_Helskärm"
+msgstr "_HelskÃ¤rm"
 
 #: modules/gui/gtk/gnome_interface.c:211 modules/gui/gtk/gtk_interface.c:415
 msgid "_Audio"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/gtk/gnome_interface.c:218 modules/gui/gtk/gtk_interface.c:497
 #, fuzzy
 msgid "_Video"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gnome_interface.c:274 modules/gui/gtk/gtk_interface.c:121
 #: modules/gui/gtk/gtk_interface.c:1595 modules/gui/macosx/intf.m:426
@@ -8877,11 +8877,11 @@ msgstr "Markera allt"
 #: modules/gui/gtk/gnome_interface.c:516
 #, fuzzy
 msgid "Open disc"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:527 modules/gui/gtk/gtk_interface.c:640
 msgid "Net"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/gui/gtk/gnome_interface.c:539 modules/gui/gtk/gtk_interface.c:651
 msgid "Sat"
@@ -8890,18 +8890,18 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:540
 #, fuzzy
 msgid "Open a satellite card"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/gtk/gnome_interface.c:553
 #: modules/gui/gtk/gnome_interface.c:1034 modules/gui/gtk/gtk_interface.c:664
 #: modules/gui/gtk/gtk_interface.c:1134
 msgid "Back"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/gtk/gnome_interface.c:554
 #, fuzzy
 msgid "Go backward"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/gtk/gnome_interface.c:567
 #, fuzzy
@@ -8965,20 +8965,20 @@ msgstr "Slow Motion"
 #: modules/gui/gtk/gnome_interface.c:1048 modules/gui/gtk/gtk_interface.c:735
 #: modules/gui/gtk/gtk_interface.c:1150 modules/gui/kde/interface.cpp:161
 msgid "Fast"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/gui/gtk/gnome_interface.c:631
 #: modules/gui/wxwindows/interface.cpp:487
 #, fuzzy
 msgid "Play faster"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/gui/gtk/gnome_interface.c:644
 #: modules/gui/skins2/src/dialogs.cpp:233
 #: modules/gui/wxwindows/playlist.cpp:936
 #, fuzzy
 msgid "Open playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:655
 #: modules/gui/gtk/gnome_interface.c:1063 modules/gui/gtk/gtk_interface.c:758
@@ -8986,17 +8986,17 @@ msgstr "Öppna skiva"
 #: modules/gui/gtk/gtk_interface.c:1173 modules/gui/kde/interface.cpp:129
 #: modules/gui/kde/interface.cpp:162
 msgid "Prev"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/gtk/gnome_interface.c:656
 #, fuzzy
 msgid "Previous file"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/gtk/gnome_interface.c:668
 #, fuzzy
 msgid "Next file"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/gtk/gnome_interface.c:732 modules/gui/gtk/gtk_interface.c:830
 msgid "Title:"
@@ -9005,7 +9005,7 @@ msgstr "Titel:"
 #: modules/gui/gtk/gnome_interface.c:752
 #, fuzzy
 msgid "Select previous title"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/gtk/gnome_interface.c:775 modules/gui/gtk/gtk_interface.c:874
 msgid "Chapter:"
@@ -9024,17 +9024,17 @@ msgstr "Markera allt"
 #: modules/gui/gtk/gnome_interface.c:811 modules/gui/gtk/gtk_interface.c:911
 #, fuzzy
 msgid "No server"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/gui/gtk/gnome_interface.c:959
 #, fuzzy
 msgid "Toggle fullscreen mode"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/gui/gtk/gnome_interface.c:999 modules/gui/gtk/gtk_interface.c:195
 #: modules/gui/gtk/gtk_interface.c:1415
 msgid "_Network Stream..."
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/gtk/gnome_interface.c:1070 modules/gui/gtk/gtk_interface.c:1182
 msgid "_Jump..."
@@ -9060,12 +9060,12 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1108 modules/gui/gtk/gtk_interface.c:1446
 #, fuzzy
 msgid "Toggle _Interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gnome_interface.c:1115 modules/gui/gtk/gtk_interface.c:1455
 #, fuzzy
 msgid "Playlist..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:1361 modules/gui/gtk/gtk_interface.c:1603
 #: modules/gui/kde/kde.cpp:112 modules/gui/pda/pda_interface.c:1350
@@ -9082,12 +9082,12 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1460
 #, fuzzy
 msgid "Open Stream"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/gtk/gnome_interface.c:1499 modules/gui/gtk/gtk_interface.c:1814
 #, fuzzy
 msgid "Open Target:"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/gtk/gnome_interface.c:1519 modules/gui/gtk/gtk_interface.c:1834
 #: modules/gui/wince/open.cpp:146 modules/gui/wxwindows/open.cpp:408
@@ -9124,7 +9124,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:167 modules/gui/wxwindows/open.cpp:656
 #, fuzzy
 msgid "Device name"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gnome_interface.c:1669 modules/gui/gtk/gtk_interface.c:2005
 #: modules/gui/macosx/open.m:171
@@ -9180,7 +9180,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1965 modules/gui/gtk/gtk_interface.c:2280
 #, fuzzy
 msgid "Satellite"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gnome_interface.c:2014 modules/gui/gtk/gtk_interface.c:2331
 #: modules/gui/macosx/open.m:244
@@ -9272,7 +9272,7 @@ msgstr "Paus"
 #: modules/gui/gtk/gnome_interface.c:2823 modules/gui/gtk/gtk_interface.c:3078
 #, fuzzy
 msgid "Destination Target: "
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/gtk/gnome_interface.c:2879 modules/stream_out/rtp.c:87
 msgid "RTP"
@@ -9319,7 +9319,7 @@ msgstr ""
 #: modules/gui/gtk/gtk.c:76
 #, fuzzy
 msgid "Gtk+ interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/gtk/gtk_interface.c:147 modules/gui/gtk/gtk_interface.c:1373
 msgid "_File"
@@ -9333,7 +9333,7 @@ msgstr "Radera"
 #: modules/gui/gtk/gtk_interface.c:246
 #, fuzzy
 msgid "Close the window"
-msgstr "Fönster"
+msgstr "FÃ¶nster"
 
 #: modules/gui/gtk/gtk_interface.c:253 modules/gui/gtk/gtk_interface.c:1483
 msgid "E_xit"
@@ -9385,11 +9385,11 @@ msgstr "Om VLC"
 #: modules/gui/gtk/gtk_interface.c:652
 #, fuzzy
 msgid "Open a Satellite Card"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/gtk/gtk_interface.c:665
 msgid "Go Backward"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/gtk/gtk_interface.c:677
 msgid "Stop Stream"
@@ -9409,21 +9409,21 @@ msgstr "Slow Motion"
 
 #: modules/gui/gtk/gtk_interface.c:736
 msgid "Play Faster"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/gui/gtk/gtk_interface.c:748
 #, fuzzy
 msgid "Open Playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/gtk/gtk_interface.c:759
 #, fuzzy
 msgid "Previous File"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/gtk/gtk_interface.c:770
 msgid "Next File"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/gtk/gtk_interface.c:1110
 msgid "_Play"
@@ -9441,7 +9441,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1778
 #, fuzzy
 msgid "Open Target"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/gtk/gtk_interface.c:2051
 msgid "HTTP/FTP/MMS"
@@ -9571,32 +9571,32 @@ msgstr "Kapitel"
 #: modules/gui/kde/disc.cpp:47
 #, fuzzy
 msgid "Device name "
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/kde/interface.cpp:88
 #, fuzzy
 msgid "Languages"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/gui/kde/interface.cpp:89
 #, fuzzy
 msgid "language"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/gui/kde/interface.cpp:110
 #, fuzzy
 msgid "Open &Disk"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/kde/interface.cpp:113
 #, fuzzy
 msgid "Open &Stream"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/kde/interface.cpp:116
 #, fuzzy
 msgid "&Backward"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/kde/interface.cpp:119
 #, fuzzy
@@ -9621,7 +9621,7 @@ msgstr "Slow Motion"
 #: modules/gui/kde/interface.cpp:127
 #, fuzzy
 msgid "Fas&t"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/gui/kde/interface.cpp:137
 #, fuzzy
@@ -9635,7 +9635,7 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:149
 #, fuzzy
 msgid "Opens a recently used file"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/kde/interface.cpp:150
 #, fuzzy
@@ -9654,17 +9654,17 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:154
 #, fuzzy
 msgid "Opens a disk"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/kde/interface.cpp:155
 #, fuzzy
 msgid "Opens a network stream"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/kde/interface.cpp:156
 #, fuzzy
 msgid "Backward"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/kde/interface.cpp:157
 #, fuzzy
@@ -9690,12 +9690,12 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:200 modules/gui/kde/interface.cpp:222
 #, fuzzy
 msgid "Opening file..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/kde/interface.cpp:202 modules/gui/macosx/intf.m:456
 #, fuzzy
 msgid "Open File..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/kde/interface.cpp:228
 msgid "Exiting..."
@@ -9716,7 +9716,7 @@ msgstr ""
 #: modules/gui/kde/kde.cpp:56
 #, fuzzy
 msgid "KDE interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/kde/kde.cpp:57
 msgid "path to ui.rc file"
@@ -9725,7 +9725,7 @@ msgstr ""
 #: modules/gui/kde/messages.cpp:52
 #, fuzzy
 msgid "Messages:"
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/kde/net.cpp:31
 msgid "Protocol"
@@ -9744,7 +9744,7 @@ msgstr "Klistra in"
 #: modules/gui/kde/preferences.cpp:56
 #, fuzzy
 msgid "&Save"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/macosx/about.m:76 modules/gui/macosx/intf.m:445
 #: modules/gui/wxwindows/interface.cpp:434
@@ -9806,17 +9806,17 @@ msgstr ""
 #: modules/gui/macosx/intf.m:507
 #, fuzzy
 msgid "Fit to Screen"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/gui/macosx/controls.m:602 modules/gui/macosx/intf.m:480
 #, fuzzy
 msgid "Step Forward"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/macosx/controls.m:603 modules/gui/macosx/intf.m:481
 #, fuzzy
 msgid "Step Backward"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/gui/macosx/equalizer.m:141 modules/gui/wxwindows/extrapanel.cpp:473
 msgid "2 Pass"
@@ -9848,7 +9848,7 @@ msgstr "Kontroller"
 #: modules/gui/pda/pda_interface.c:239
 #, fuzzy
 msgid "Rewind"
-msgstr "Fönster"
+msgstr "FÃ¶nster"
 
 #: modules/gui/macosx/intf.m:433
 msgid "Fast Forward"
@@ -9865,15 +9865,15 @@ msgstr ""
 #: modules/gui/macosx/intf.m:449
 #, fuzzy
 msgid "Services"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/macosx/intf.m:450
 msgid "Hide VLC"
-msgstr "Göm VLC"
+msgstr "GÃ¶m VLC"
 
 #: modules/gui/macosx/intf.m:451
 msgid "Hide Others"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/macosx/intf.m:452
 msgid "Show All"
@@ -9892,22 +9892,22 @@ msgstr "1:Arkiv"
 #: modules/gui/macosx/intf.m:457
 #, fuzzy
 msgid "Quick Open File..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/macosx/intf.m:458
 #, fuzzy
 msgid "Open Disc..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/macosx/intf.m:459
 #, fuzzy
 msgid "Open Network..."
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/macosx/intf.m:460
 #, fuzzy
 msgid "Open Recent"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/macosx/intf.m:461 modules/gui/macosx/intf.m:1643
 #, fuzzy
@@ -9939,7 +9939,7 @@ msgstr "Kontroller"
 #: modules/gui/macosx/vout.m:172
 #, fuzzy
 msgid "Video Device"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/macosx/intf.m:523
 #, fuzzy
@@ -9949,7 +9949,7 @@ msgstr "Minimera"
 #: modules/gui/macosx/intf.m:524
 #, fuzzy
 msgid "Close Window"
-msgstr "Fönster"
+msgstr "FÃ¶nster"
 
 #: modules/gui/macosx/intf.m:525
 #, fuzzy
@@ -9962,11 +9962,11 @@ msgstr "Kontroller"
 #: modules/gui/wxwindows/playlist.cpp:280
 #, fuzzy
 msgid "Info"
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/macosx/intf.m:531
 msgid "Bring All to Front"
-msgstr "Lägg alla överst"
+msgstr "LÃ¤gg alla Ã¶verst"
 
 #: modules/gui/macosx/intf.m:533
 msgid "Help"
@@ -9987,7 +9987,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:537
 #, fuzzy
 msgid "VideoLAN Website"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/macosx/intf.m:538
 msgid "License"
@@ -10036,7 +10036,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:50
 #, fuzzy
 msgid "Video device"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/macosx/macosx.m:51
 msgid ""
@@ -10067,7 +10067,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:65
 #, fuzzy
 msgid "Fill fullscreen"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/gui/macosx/macosx.m:66
 msgid ""
@@ -10078,7 +10078,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:71
 #, fuzzy
 msgid "Mac OS X interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/macosx/macosx.m:77
 msgid "Quartz video"
@@ -10087,7 +10087,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:154
 #, fuzzy
 msgid "Open Source"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/macosx/open.m:155 modules/gui/wince/open.cpp:130
 #: modules/gui/wxwindows/open.cpp:390
@@ -10145,7 +10145,7 @@ msgstr "Undertext"
 #: modules/gui/macosx/open.m:590 modules/gui/macosx/open.m:598
 #, fuzzy, objc-format
 msgid "No %@s found"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/macosx/open.m:633
 msgid "Open VIDEO_TS Directory"
@@ -10159,7 +10159,7 @@ msgstr "Paus"
 #: modules/gui/macosx/output.m:140
 #, fuzzy
 msgid "Output Options"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/macosx/output.m:141 modules/gui/wxwindows/streamout.cpp:455
 #, fuzzy
@@ -10186,7 +10186,7 @@ msgstr "Paus"
 #: modules/gui/wxwindows/wizard.cpp:816 modules/gui/wxwindows/wizard.cpp:855
 #, fuzzy
 msgid "Bitrate (kb/s)"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/macosx/output.m:166 modules/gui/wxwindows/streamout.cpp:754
 #, fuzzy
@@ -10230,12 +10230,12 @@ msgstr ""
 #: modules/gui/macosx/output.m:511
 #, fuzzy
 msgid "Save File"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/macosx/playlist.m:228
 #, fuzzy
 msgid "Save Playlist..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/macosx/playlist.m:232 modules/gui/macosx/playlistinfo.m:53
 #, fuzzy
@@ -10255,7 +10255,7 @@ msgstr "Undertext"
 #: modules/gui/macosx/playlist.m:240 modules/gui/macosx/playlist.m:1120
 #, fuzzy
 msgid "no items in playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/macosx/playlist.m:244 modules/gui/wxwindows/playlist.cpp:317
 #, fuzzy
@@ -10274,18 +10274,18 @@ msgstr "Undertext"
 #: modules/gui/macosx/playlist.m:403
 #, fuzzy
 msgid "Save Playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/macosx/playlist.m:1113 modules/gui/wxwindows/playlist.cpp:587
 #: modules/gui/wxwindows/playlist.cpp:799
 #, fuzzy, c-format
 msgid "%i items in playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/macosx/playlist.m:1125
 #, fuzzy
 msgid "1 item in playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/macosx/playlistinfo.m:54 modules/gui/wxwindows/iteminfo.cpp:137
 #: modules/gui/wxwindows/wizard.cpp:576
@@ -10319,7 +10319,7 @@ msgstr ""
 #: modules/gui/macosx/prefs_widgets.m:1216
 #, fuzzy
 msgid "Select a directory"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/macosx/prefs_widgets.m:1216
 #, fuzzy
@@ -10339,7 +10339,7 @@ msgstr ""
 #: modules/gui/ncurses.c:100
 #, fuzzy
 msgid "Ncurses interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda.c:58
 #, fuzzy
@@ -10353,7 +10353,7 @@ msgstr ""
 #: modules/gui/pda/pda.c:66
 #, fuzzy
 msgid "PDA Linux Gtk2+ interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
 #: modules/gui/wxwindows/streamout.cpp:480
@@ -10373,7 +10373,7 @@ msgstr ""
 #: modules/gui/pda/pda.c:238
 #, fuzzy
 msgid "Owner"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda.c:244
 #, fuzzy
@@ -10401,7 +10401,7 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:869 modules/gui/pda/pda_interface.c:1217
 #, fuzzy
 msgid "Add to Playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/pda/pda_interface.c:384
 msgid "MRL:"
@@ -10423,7 +10423,7 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:481
 #, fuzzy
 msgid "Network: "
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/gui/pda/pda_interface.c:498
 msgid "udp"
@@ -10480,12 +10480,12 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:575
 #, fuzzy
 msgid "Video:"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda_interface.c:584
 #, fuzzy
 msgid "Audio:"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/pda/pda_interface.c:593
 msgid "Channel:"
@@ -10517,7 +10517,7 @@ msgstr "Avsluta VLC"
 #: modules/gui/pda/pda_interface.c:647
 #, fuzzy
 msgid "Tuner:"
-msgstr "Stäng av ljudet"
+msgstr "StÃ¤ng av ljudet"
 
 #: modules/gui/pda/pda_interface.c:656
 msgid "Sound:"
@@ -10604,7 +10604,7 @@ msgstr "Kapitel"
 #: modules/gui/pda/pda_interface.c:901
 #, fuzzy
 msgid "Video Codec:"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda_interface.c:918
 msgid "huffyuv"
@@ -10641,27 +10641,27 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:934
 #, fuzzy
 msgid "Video Bitrate:"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/pda/pda_interface.c:943
 #, fuzzy
 msgid "Bitrate Tolerance:"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/pda/pda_interface.c:952
 #, fuzzy
 msgid "Keyframe Interval:"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda_interface.c:961
 #, fuzzy
 msgid "Audio Codec:"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/pda/pda_interface.c:970
 #, fuzzy
 msgid "Deinterlace:"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/pda/pda_interface.c:979
 #, fuzzy
@@ -10671,7 +10671,7 @@ msgstr "Adress"
 #: modules/gui/pda/pda_interface.c:988
 #, fuzzy
 msgid "Muxer:"
-msgstr "Stäng av ljudet"
+msgstr "StÃ¤ng av ljudet"
 
 #: modules/gui/pda/pda_interface.c:997
 msgid "URL:"
@@ -10756,7 +10756,7 @@ msgstr "Undertext"
 #: modules/gui/pda/pda_interface.c:1135
 #, fuzzy
 msgid "Audio Bitrate :"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/pda/pda_interface.c:1158
 #, fuzzy
@@ -10792,7 +10792,7 @@ msgstr "Radera"
 #: modules/gui/pda/pda_interface.c:1291
 #, fuzzy
 msgid " Save "
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/pda/pda_interface.c:1296
 msgid " Apply "
@@ -10826,12 +10826,12 @@ msgstr "Paus"
 #: modules/gui/qt/qt.cpp:47
 #, fuzzy
 msgid "Qt interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/skins2/src/dialogs.cpp:225
 #, fuzzy
 msgid "Open a skin file"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/skins2/src/dialogs.cpp:226
 msgid "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
@@ -10845,7 +10845,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:920
 #, fuzzy
 msgid "Save playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/skins2/src/dialogs.cpp:241
 #, fuzzy
@@ -10859,7 +10859,7 @@ msgstr ""
 #: modules/gui/skins2/src/skin_main.cpp:334
 #, fuzzy
 msgid "Select the path to the last skin used."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/skins2/src/skin_main.cpp:335
 msgid "Config of last used skin"
@@ -10886,7 +10886,7 @@ msgstr ""
 #: modules/gui/skins2/src/skin_main.cpp:356
 #, fuzzy
 msgid "Skinnable Interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/skins2/src/skin_main.cpp:363
 msgid "Skins loader demux"
@@ -10900,7 +10900,7 @@ msgstr "Markera allt"
 #: modules/gui/skins2/src/theme_repository.cpp:83
 #, fuzzy
 msgid "Open skin..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wince/interface.cpp:496
 #, fuzzy
@@ -10908,7 +10908,7 @@ msgid ""
 "\n"
 "(WinCE interface)\n"
 "\n"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wince/interface.cpp:497 modules/gui/wxwindows/interface.cpp:858
 msgid ""
@@ -10926,7 +10926,7 @@ msgstr ""
 #: modules/gui/wince/open.cpp:134 modules/gui/wxwindows/open.cpp:394
 #, fuzzy
 msgid "Open:"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/wince/preferences_widgets.cpp:523
 #: modules/gui/wxwindows/preferences_widgets.cpp:685
@@ -10943,7 +10943,7 @@ msgstr "Arkiv"
 #: modules/gui/wince/wince.cpp:55 modules/gui/wxwindows/wxwindows.cpp:90
 #, fuzzy
 msgid "Embed video in interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wince/wince.cpp:56 modules/gui/wxwindows/wxwindows.cpp:91
 msgid ""
@@ -10954,7 +10954,7 @@ msgstr ""
 #: modules/gui/wince/wince.cpp:60
 #, fuzzy
 msgid "WinCE interface module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wince/wince.cpp:70
 msgid "WinCE dialogs provider"
@@ -10963,7 +10963,7 @@ msgstr ""
 #: modules/gui/wxwindows/bookmarks.cpp:137
 #, fuzzy
 msgid "Edit bookmark"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/bookmarks.cpp:163
 msgid "Bytes"
@@ -10972,7 +10972,7 @@ msgstr ""
 #: modules/gui/wxwindows/bookmarks.cpp:201
 #, fuzzy
 msgid "Bookmarks"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/bookmarks.cpp:229
 msgid "Extract"
@@ -11001,7 +11001,7 @@ msgstr ""
 #: modules/gui/wxwindows/bookmarks.cpp:420
 #, fuzzy
 msgid "No input found"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/bookmarks.cpp:503
 msgid ""
@@ -11011,7 +11011,7 @@ msgstr ""
 #: modules/gui/wxwindows/bookmarks.cpp:505
 #, fuzzy
 msgid "No input"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/bookmarks.cpp:511
 msgid ""
@@ -11040,7 +11040,7 @@ msgstr ""
 #: modules/gui/wxwindows/extrapanel.cpp:151 modules/video_filter/distort.c:67
 #, fuzzy
 msgid "Distortion"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/gui/wxwindows/extrapanel.cpp:151
 msgid "Adds distorsion effects"
@@ -11049,7 +11049,7 @@ msgstr ""
 #: modules/gui/wxwindows/extrapanel.cpp:152
 #, fuzzy
 msgid "Image inversion"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/gui/wxwindows/extrapanel.cpp:152
 msgid "Inverts the image colors"
@@ -11113,7 +11113,7 @@ msgstr "Om VLC"
 #: modules/gui/wxwindows/extrapanel.cpp:302
 #, fuzzy
 msgid "Video Filters"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/extrapanel.cpp:319
 #, fuzzy
@@ -11178,37 +11178,37 @@ msgstr ""
 #: modules/gui/wxwindows/interface.cpp:399
 #, fuzzy
 msgid "Quick &Open File...\tCtrl-O"
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/wxwindows/interface.cpp:402
 #, fuzzy
 msgid "Open &File...\tCtrl-F"
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/wxwindows/interface.cpp:403
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/wxwindows/interface.cpp:404
 #, fuzzy
 msgid "Open &Disc...\tCtrl-D"
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/interface.cpp:406
 #, fuzzy
 msgid "Open &Network Stream...\tCtrl-N"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/wxwindows/interface.cpp:408
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/interface.cpp:411
 #, fuzzy
 msgid "&Wizard...\tCtrl-W"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/interface.cpp:414
 msgid "E&xit\tCtrl-X"
@@ -11217,12 +11217,12 @@ msgstr ""
 #: modules/gui/wxwindows/interface.cpp:420
 #, fuzzy
 msgid "&Playlist...\tCtrl-P"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/interface.cpp:422
 #, fuzzy
 msgid "&Messages...\tCtrl-M"
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/interface.cpp:424
 msgid "Stream and Media &info...\tCtrl-I"
@@ -11246,12 +11246,12 @@ msgstr "Markera allt"
 #: modules/gui/wxwindows/interface.cpp:441
 #, fuzzy
 msgid "&Audio"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/interface.cpp:442
 #, fuzzy
 msgid "&Video"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/interface.cpp:443
 msgid "&Navigation"
@@ -11264,12 +11264,12 @@ msgstr ""
 #: modules/gui/wxwindows/interface.cpp:484
 #, fuzzy
 msgid "Previous playlist item"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/interface.cpp:485
 #, fuzzy
 msgid "Next playlist item"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/interface.cpp:794
 msgid "Extended &GUI\tCtrl-G"
@@ -11282,19 +11282,19 @@ msgstr ""
 #: modules/gui/wxwindows/interface.cpp:802
 #, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/interface.cpp:804
 #, fuzzy
 msgid "Preference&s...\tCtrl-S"
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/interface.cpp:857
 #, fuzzy
 msgid ""
 " (wxWindows interface)\n"
 "\n"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/interface.cpp:863
 #, fuzzy, c-format
@@ -11304,12 +11304,12 @@ msgstr "Om VLC"
 #: modules/gui/wxwindows/interface.cpp:1551
 #, fuzzy
 msgid "Show/Hide interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/iteminfo.cpp:70
 #, fuzzy
 msgid "Playlist item info"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/iteminfo.cpp:129
 #, fuzzy
@@ -11319,27 +11319,27 @@ msgstr "Radera"
 #: modules/gui/wxwindows/menus.cpp:129
 #, fuzzy
 msgid "Quick &Open File..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/wxwindows/menus.cpp:130
 #, fuzzy
 msgid "Open &File..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/wxwindows/menus.cpp:131
 #, fuzzy
 msgid "Open &Disc..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/menus.cpp:132
 #, fuzzy
 msgid "Open &Network Stream..."
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/wxwindows/menus.cpp:133
 #, fuzzy
 msgid "Open &Capture Device..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/menus.cpp:140
 #, fuzzy
@@ -11349,7 +11349,7 @@ msgstr "Radera"
 #: modules/gui/wxwindows/menus.cpp:141
 #, fuzzy
 msgid "&Messages..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/menus.cpp:142
 msgid "&Preferences..."
@@ -11363,12 +11363,12 @@ msgstr "Kontroller"
 #: modules/gui/wxwindows/messages.cpp:99
 #, fuzzy
 msgid "Save As..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/messages.cpp:216
 #, fuzzy
 msgid "Save Messages As..."
-msgstr "_Öppna skiva..."
+msgstr "_Ã–ppna skiva..."
 
 #: modules/gui/wxwindows/open.cpp:229
 #, fuzzy
@@ -11389,7 +11389,7 @@ msgstr "Paus"
 #: modules/gui/wxwindows/open.cpp:358 modules/gui/wxwindows/open.cpp:366
 #, fuzzy
 msgid "Open..."
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/wxwindows/open.cpp:397
 msgid ""
@@ -11444,12 +11444,12 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:231
 #, fuzzy
 msgid "&Simple Add File..."
-msgstr "_Öppna fil..."
+msgstr "_Ã–ppna fil..."
 
 #: modules/gui/wxwindows/playlist.cpp:232
 #, fuzzy
 msgid "Add &Directory..."
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/playlist.cpp:233
 msgid "&Add MRL..."
@@ -11458,12 +11458,12 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:238
 #, fuzzy
 msgid "&Open Playlist..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/playlist.cpp:239
 #, fuzzy
 msgid "&Save Playlist..."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/playlist.cpp:241
 #, fuzzy
@@ -11483,7 +11483,7 @@ msgstr "Undertext"
 #: modules/gui/wxwindows/playlist.cpp:248
 #, fuzzy
 msgid "&Shuffle Playlist"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/playlist.cpp:252
 #, fuzzy
@@ -11493,7 +11493,7 @@ msgstr "Markera allt"
 #: modules/gui/wxwindows/playlist.cpp:259
 #, fuzzy
 msgid "&Manage"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/gui/wxwindows/playlist.cpp:260
 #, fuzzy
@@ -11508,7 +11508,7 @@ msgstr "Markera allt"
 #: modules/gui/wxwindows/playlist.cpp:262
 #, fuzzy
 msgid "&View items"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/playlist.cpp:270
 msgid "Play this branch"
@@ -11533,7 +11533,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:792
 #, fuzzy, c-format
 msgid "%i items in playlist (%i not shown)"
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/gui/wxwindows/playlist.cpp:902
 #, fuzzy
@@ -11543,7 +11543,7 @@ msgstr "Arkiv"
 #: modules/gui/wxwindows/playlist.cpp:908
 #, fuzzy
 msgid "Playlist is empty"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/playlist.cpp:908
 msgid "Can't save"
@@ -11588,17 +11588,17 @@ msgstr ""
 #: modules/gui/wxwindows/streamdata.h:54
 #, fuzzy
 msgid "MPEG-1 Video codec"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/streamdata.h:57
 #, fuzzy
 msgid "MPEG-2 Video codec"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/streamdata.h:60
 #, fuzzy
 msgid "MPEG-4 Video codec"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/streamdata.h:63
 msgid "DivX first version"
@@ -11619,7 +11619,7 @@ msgstr ""
 #: modules/gui/wxwindows/streamdata.h:72
 #, fuzzy
 msgid "H264 is a new video codec"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/streamdata.h:74
 msgid "I263 is an Intel conferencing codec"
@@ -11653,7 +11653,7 @@ msgstr ""
 #: modules/gui/wxwindows/streamdata.h:94
 #, fuzzy
 msgid "MPEG Audio Layer 3"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/streamdata.h:97
 msgid "Audio format for MPEG4"
@@ -11667,7 +11667,7 @@ msgstr "Radera"
 #: modules/gui/wxwindows/streamdata.h:102
 #, fuzzy
 msgid "Vorbis is a free audio codec"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/streamdata.h:104
 msgid "FLAC is a lossless audio codec"
@@ -11760,7 +11760,7 @@ msgstr "Paus"
 #: modules/gui/wxwindows/streamout.cpp:178
 #, fuzzy
 msgid "Destination Target:"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/streamout.cpp:181
 msgid ""
@@ -11772,7 +11772,7 @@ msgstr ""
 #: modules/gui/wxwindows/streamout.cpp:448
 #, fuzzy
 msgid "Output methods"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/wxwindows/streamout.cpp:458
 msgid "MMSH"
@@ -11796,7 +11796,7 @@ msgstr "Kanalserver"
 #: modules/gui/wxwindows/streamout.cpp:611
 #, fuzzy
 msgid "Select all elementary streams"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/wxwindows/streamout.cpp:682
 #, fuzzy
@@ -11806,12 +11806,12 @@ msgstr "Paus"
 #: modules/gui/wxwindows/streamout.cpp:740
 #, fuzzy
 msgid "Video codec"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/streamout.cpp:810
 #, fuzzy
 msgid "Audio codec"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/gui/wxwindows/streamout.cpp:860
 #, fuzzy
@@ -11826,7 +11826,7 @@ msgstr "Undertext"
 #: modules/gui/wxwindows/streamout.cpp:993
 #, fuzzy
 msgid "Save file"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/gui/wxwindows/subtitles.cpp:82
 #, fuzzy
@@ -11858,7 +11858,7 @@ msgstr "Markera allt"
 #: modules/gui/wxwindows/subtitles.cpp:294
 #, fuzzy
 msgid "Open file"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/gui/wxwindows/timer.cpp:156 modules/gui/wxwindows/timer.cpp:337
 #, fuzzy
@@ -11901,7 +11901,7 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:93
 #, fuzzy
 msgid "Stream to network"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/gui/wxwindows/wizard.cpp:94 modules/gui/wxwindows/wizard.cpp:99
 msgid "Use this to stream on a network"
@@ -11944,12 +11944,12 @@ msgstr "Paus"
 #: modules/gui/wxwindows/wizard.cpp:109
 #, fuzzy
 msgid "Select a stream"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/wxwindows/wizard.cpp:110
 #, fuzzy
 msgid "Existing playlist item"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/wizard.cpp:112
 #, fuzzy
@@ -12012,7 +12012,7 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:144
 #, fuzzy
 msgid "You need to enter an address"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/wizard.cpp:147
 msgid "Encapsulation format"
@@ -12108,12 +12108,12 @@ msgstr "Stopp"
 #: modules/gui/wxwindows/wizard.cpp:1022 modules/stream_out/rtp.c:41
 #, fuzzy
 msgid "Destination"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/gui/wxwindows/wizard.cpp:1239
 #, fuzzy
 msgid "Select the file to save to"
-msgstr "_Öppna nätverk..."
+msgstr "_Ã–ppna nÃ¤tverk..."
 
 #: modules/gui/wxwindows/wizard.cpp:1307
 msgid "Time-To-Live (TTL)"
@@ -12139,7 +12139,7 @@ msgstr ""
 #: modules/gui/wxwindows/wxwindows.cpp:98
 #, fuzzy
 msgid "Minimal interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/wxwindows.cpp:99
 msgid "Use minimal interface, no toolbar, few menus"
@@ -12162,7 +12162,7 @@ msgstr "Om VLC"
 #: modules/gui/wxwindows/wxwindows.cpp:112
 #, fuzzy
 msgid "wxWindows interface module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/gui/wxwindows/wxwindows.cpp:141
 msgid "wxWindows dialogs provider"
@@ -12202,7 +12202,7 @@ msgstr ""
 #: modules/misc/dummy/dummy.c:66
 #, fuzzy
 msgid "Dummy Interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/misc/dummy/dummy.c:71
 msgid "Dummy access function"
@@ -12215,7 +12215,7 @@ msgstr ""
 #: modules/misc/dummy/dummy.c:79
 #, fuzzy
 msgid "Dummy decoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/misc/dummy/dummy.c:80
 msgid "Dummy decoder function"
@@ -12310,18 +12310,18 @@ msgstr "Slow Motion"
 #: modules/misc/freetype.c:101 modules/misc/win32text.c:72
 #, fuzzy
 msgid "Large"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/misc/freetype.c:101 modules/misc/win32text.c:72
 #, fuzzy
 msgid "Larger"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:52 modules/video_filter/time.c:52
 #, fuzzy
 msgid "Black"
-msgstr "Föregående objekt"
+msgstr "FÃ¶regÃ¥ende objekt"
 
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:53 modules/video_filter/time.c:53
@@ -12348,7 +12348,7 @@ msgstr ""
 #: modules/video_filter/marq.c:53 modules/video_filter/time.c:53
 #, fuzzy
 msgid "Red"
-msgstr "Öppna fil"
+msgstr "Ã–ppna fil"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:54 modules/video_filter/time.c:54
@@ -12369,7 +12369,7 @@ msgstr ""
 #: modules/video_filter/marq.c:54 modules/video_filter/time.c:54
 #, fuzzy
 msgid "Green"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:55 modules/video_filter/time.c:55
@@ -12406,7 +12406,7 @@ msgstr ""
 #: modules/misc/freetype.c:113 modules/misc/win32text.c:84
 #, fuzzy
 msgid "Text renderer"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/misc/freetype.c:114
 msgid "Freetype2 font renderer"
@@ -12470,7 +12470,7 @@ msgstr ""
 #: modules/misc/logger.c:95
 #, fuzzy
 msgid "Text"
-msgstr "Nästa objekt"
+msgstr "NÃ¤sta objekt"
 
 #: modules/misc/logger.c:97
 #, fuzzy
@@ -12490,7 +12490,7 @@ msgstr ""
 #: modules/misc/logger.c:104
 #, fuzzy
 msgid "File logging"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/misc/logger.c:106
 #, fuzzy
@@ -12534,7 +12534,7 @@ msgstr ""
 #: modules/misc/network/ipv4.c:100
 #, fuzzy
 msgid "Multicast output interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/misc/network/ipv4.c:102
 msgid ""
@@ -12553,12 +12553,12 @@ msgstr ""
 #: modules/misc/playlist/export.c:44
 #, fuzzy
 msgid "M3U playlist exporter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/misc/playlist/export.c:50
 #, fuzzy
 msgid "Old playlist exporter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/misc/qte_main.cpp:66
 msgid "Run as standalone Qt/Embedded GUI Server"
@@ -12588,12 +12588,12 @@ msgstr ""
 #: modules/misc/rtsp.c:52
 #, fuzzy
 msgid "RTSP VoD"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/misc/rtsp.c:53
 #, fuzzy
 msgid "RTSP VoD server"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/misc/screensaver.c:46
 msgid "X Screensaver disabler"
@@ -12602,7 +12602,7 @@ msgstr ""
 #: modules/misc/svg.c:57
 #, fuzzy
 msgid "SVG template file"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/misc/svg.c:58
 msgid ""
@@ -12612,7 +12612,7 @@ msgstr ""
 #: modules/misc/testsuite/playlist.c:94
 #, fuzzy
 msgid "Playlist stress tests"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
@@ -12626,7 +12626,7 @@ msgstr "Undertext"
 #: modules/misc/win32text.c:85
 #, fuzzy
 msgid "Win32 font renderer"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/misc/xml/libxml.c:43
 msgid "XML Parser (using libxml2)"
@@ -12665,7 +12665,7 @@ msgstr ""
 #: modules/mux/asf.c:63
 #, fuzzy
 msgid "Packet Size"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/asf.c:64
 msgid "The ASF packet size -- default is 4096 bytes"
@@ -12674,7 +12674,7 @@ msgstr ""
 #: modules/mux/asf.c:67
 #, fuzzy
 msgid "ASF muxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/asf.c:535
 msgid "Unknown Video"
@@ -12683,12 +12683,12 @@ msgstr ""
 #: modules/mux/avi.c:44
 #, fuzzy
 msgid "AVI muxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/dummy.c:41
 #, fuzzy
 msgid "Dummy/Raw muxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/mp4.c:45
 msgid "Create \"Fast start\" files"
@@ -12704,7 +12704,7 @@ msgstr ""
 #: modules/mux/mp4.c:56
 #, fuzzy
 msgid "MP4/MOV muxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/mpeg/ps.c:45 modules/mux/mpeg/ts.c:118
 msgid "DTS delay (ms)"
@@ -12730,12 +12730,12 @@ msgstr ""
 #: modules/mux/mpeg/ps.c:61
 #, fuzzy
 msgid "PS muxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/mpeg/ts.c:77
 #, fuzzy
 msgid "Video PID"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/mux/mpeg/ts.c:78
 msgid ""
@@ -12746,7 +12746,7 @@ msgstr ""
 #: modules/mux/mpeg/ts.c:80
 #, fuzzy
 msgid "Audio PID"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/mpeg/ts.c:81
 msgid "Assigns a fixed PID to the audio stream."
@@ -12849,12 +12849,12 @@ msgstr ""
 #: modules/mux/mpeg/ts.c:124
 #, fuzzy
 msgid "Crypt audio"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/mpeg/ts.c:125
 #, fuzzy
 msgid "Crypt audio using CSA"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/mux/mpeg/ts.c:127
 msgid "CSA Key"
@@ -12883,7 +12883,7 @@ msgstr ""
 #: modules/mux/mpjpeg.c:50
 #, fuzzy
 msgid "Multipart jpeg muxer"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/mux/ogg.c:50
 msgid "Ogg/ogm muxer"
@@ -12892,17 +12892,17 @@ msgstr ""
 #: modules/mux/wav.c:42
 #, fuzzy
 msgid "WAV muxer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/packetizer/copy.c:43
 #, fuzzy
 msgid "Copy packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/packetizer/h264.c:47
 #, fuzzy
 msgid "H264 video packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/packetizer/mpeg4audio.c:118
 #, fuzzy
@@ -12912,12 +12912,12 @@ msgstr "Undertext"
 #: modules/packetizer/mpeg4video.c:47
 #, fuzzy
 msgid "MPEG4 video packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/packetizer/mpegvideo.c:60
 #, fuzzy
 msgid "MPEG-I/II video packetizer"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/services_discovery/daap.c:53 modules/services_discovery/daap.c:187
 msgid "DAAP shares"
@@ -12936,7 +12936,7 @@ msgstr "Markera allt"
 #: modules/services_discovery/hal.c:127
 #, fuzzy
 msgid "Devices"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/services_discovery/sap.c:76
 #, fuzzy
@@ -12997,7 +12997,7 @@ msgstr ""
 #: modules/services_discovery/sap.c:97
 #, fuzzy
 msgid "SAP Strict mode"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/services_discovery/sap.c:99
 msgid ""
@@ -13027,7 +13027,7 @@ msgstr ""
 #: modules/services_discovery/sap.c:816 modules/services_discovery/sap.c:821
 #, fuzzy
 msgid "Session"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/services_discovery/sap.c:817
 msgid "Tool"
@@ -13100,7 +13100,7 @@ msgstr "Paus"
 #: modules/stream_out/display.c:38
 #, fuzzy
 msgid "Enable/disable audio rendering."
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/display.c:40
 msgid "Enable/disable video rendering."
@@ -13128,7 +13128,7 @@ msgstr "Spela upp"
 #: modules/stream_out/es.c:37 modules/stream_out/standard.c:43
 #, fuzzy
 msgid "Output access method"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/stream_out/es.c:39 modules/stream_out/standard.c:45
 msgid ""
@@ -13160,7 +13160,7 @@ msgstr ""
 #: modules/stream_out/es.c:50 modules/stream_out/standard.c:47
 #, fuzzy
 msgid "Output muxer"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/stream_out/es.c:52 modules/stream_out/rtp.c:52
 msgid "Allows you to specify the muxer used for the streaming output."
@@ -13259,12 +13259,12 @@ msgstr ""
 #: modules/stream_out/rtp.c:50
 #, fuzzy
 msgid "Muxer"
-msgstr "Stäng av ljudet"
+msgstr "StÃ¤ng av ljudet"
 
 #: modules/stream_out/rtp.c:54 modules/stream_out/standard.c:55
 #, fuzzy
 msgid "Session name"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/stream_out/rtp.c:56
 msgid "Allows you to specify the session name used for the streaming output."
@@ -13313,7 +13313,7 @@ msgstr ""
 #: modules/stream_out/rtp.c:73
 #, fuzzy
 msgid "Video port"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/rtp.c:75
 msgid ""
@@ -13341,7 +13341,7 @@ msgstr ""
 #: modules/stream_out/standard.c:59
 #, fuzzy
 msgid "Session groupname"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/stream_out/standard.c:61
 msgid "Name of the group that will be announced for the session"
@@ -13392,7 +13392,7 @@ msgstr ""
 #: modules/stream_out/switcher.c:84
 #, fuzzy
 msgid "Sizes"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/switcher.c:86
 msgid "List of sizes separated by colons (720x576:480x576)."
@@ -13452,7 +13452,7 @@ msgstr "Paus"
 #: modules/stream_out/transcode.c:43
 #, fuzzy
 msgid "Video encoder"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/stream_out/transcode.c:45
 msgid ""
@@ -13462,7 +13462,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:47
 #, fuzzy
 msgid "Destination video codec"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/stream_out/transcode.c:49
 msgid ""
@@ -13473,7 +13473,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:51
 #, fuzzy
 msgid "Video bitrate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:53
 msgid "Allows you to specify the video bitrate used for the streaming output."
@@ -13482,7 +13482,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:55
 #, fuzzy
 msgid "Video scaling"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/stream_out/transcode.c:57
 msgid "Allows you to scale the video before encoding."
@@ -13491,7 +13491,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:58
 #, fuzzy
 msgid "Video frame-rate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:60
 msgid "Allows you to specify an output frame rate for the video."
@@ -13500,7 +13500,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:61
 #, fuzzy
 msgid "Deinterlace video"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/stream_out/transcode.c:63
 msgid "Allows you to deinterlace the video before encoding."
@@ -13509,7 +13509,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:64
 #, fuzzy
 msgid "Deinterlace module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/stream_out/transcode.c:66
 msgid ""
@@ -13528,7 +13528,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:78
 #, fuzzy
 msgid "Video crop left"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/stream_out/transcode.c:80
 msgid "Allows you to specify the left coordinate for the video cropping."
@@ -13546,7 +13546,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:84
 #, fuzzy
 msgid "Video crop right"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/stream_out/transcode.c:86
 msgid "Allows you to specify the right coordinate for the video cropping."
@@ -13555,7 +13555,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:88
 #, fuzzy
 msgid "Audio encoder"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:90
 msgid ""
@@ -13565,7 +13565,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:92
 #, fuzzy
 msgid "Destination audio codec"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:94
 msgid ""
@@ -13576,7 +13576,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:96
 #, fuzzy
 msgid "Audio bitrate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:98
 msgid "Allows you to specify the audio bitrate used for the streaming output."
@@ -13585,7 +13585,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:100
 #, fuzzy
 msgid "Audio sample rate"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:102
 msgid ""
@@ -13617,7 +13617,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:113
 #, fuzzy
 msgid "Destination subtitles codec"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/stream_out/transcode.c:115
 msgid ""
@@ -13649,7 +13649,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:127
 #, fuzzy
 msgid "Synchronise on audio track"
-msgstr "_Nästa objekt"
+msgstr "_NÃ¤sta objekt"
 
 #: modules/stream_out/transcode.c:129
 msgid ""
@@ -13690,7 +13690,7 @@ msgstr ""
 #: modules/video_chroma/i422_yuy2.c:63
 #, fuzzy
 msgid "Conversions from "
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/video_chroma/i420_ymga.c:48 modules/video_chroma/i420_ymga.c:51
 #: modules/video_chroma/i420_yuy2.c:75 modules/video_chroma/i420_yuy2.c:78
@@ -13751,7 +13751,7 @@ msgstr ""
 #: modules/video_filter/adjust.c:73
 #, fuzzy
 msgid "Image properties filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/adjust.c:74
 msgid "Image adjust"
@@ -13760,7 +13760,7 @@ msgstr ""
 #: modules/video_filter/blend.c:67
 #, fuzzy
 msgid "Video pictures blending"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_filter/clone.c:55
 #, fuzzy
@@ -13783,7 +13783,7 @@ msgstr ""
 #: modules/video_filter/clone.c:63
 #, fuzzy
 msgid "Clone video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/clone.c:65
 #, fuzzy
@@ -13812,12 +13812,12 @@ msgstr ""
 #: modules/video_filter/crop.c:61
 #, fuzzy
 msgid "Crop video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/deinterlace.c:102
 #, fuzzy
 msgid "Deinterlace mode"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_filter/deinterlace.c:103
 msgid "You can choose the default deinterlace mode"
@@ -13826,12 +13826,12 @@ msgstr ""
 #: modules/video_filter/deinterlace.c:112
 #, fuzzy
 msgid "Deinterlacing video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/distort.c:59
 #, fuzzy
 msgid "Distort mode"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/video_filter/distort.c:60
 msgid "Distort mode, one of \"wave\" and \"ripple\""
@@ -13840,7 +13840,7 @@ msgstr ""
 #: modules/video_filter/distort.c:63
 #, fuzzy
 msgid "Wave"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/video_filter/distort.c:63
 #, fuzzy
@@ -13850,17 +13850,17 @@ msgstr "Arkiv"
 #: modules/video_filter/distort.c:66
 #, fuzzy
 msgid "Distort video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/invert.c:52
 #, fuzzy
 msgid "Invert video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/invert.c:53
 #, fuzzy
 msgid "Color inversion"
-msgstr "Nätverk"
+msgstr "NÃ¤tverk"
 
 #: modules/video_filter/logo.c:68
 #, fuzzy
@@ -13907,7 +13907,7 @@ msgstr ""
 #: modules/video_filter/logo.c:89
 #, fuzzy
 msgid "Logo video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/logo.c:91
 #, fuzzy
@@ -13917,7 +13917,7 @@ msgstr "Radera"
 #: modules/video_filter/logo.c:109
 #, fuzzy
 msgid "Logo sub filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/marq.c:76
 msgid "Marquee text"
@@ -14010,12 +14010,12 @@ msgstr ""
 #: modules/video_filter/mosaic.c:92
 #, fuzzy
 msgid "Top left corner x coordinate"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_filter/mosaic.c:93
 #, fuzzy
 msgid "Top left corner y coordinate"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_filter/mosaic.c:94
 msgid "Vertical border width in pixels"
@@ -14077,7 +14077,7 @@ msgstr "Arkiv"
 #: modules/video_filter/mosaic.c:125
 #, fuzzy
 msgid "Mosaic video sub filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/mosaic.c:126
 msgid "Mosaic"
@@ -14094,7 +14094,7 @@ msgstr ""
 #: modules/video_filter/motionblur.c:58
 #, fuzzy
 msgid "Motion blur filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/motiondetect.c:54
 #, fuzzy
@@ -14117,7 +14117,7 @@ msgstr ""
 #: modules/video_filter/motiondetect.c:60
 #, fuzzy
 msgid "Motion detect video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/motiondetect.c:61
 msgid "Motion detect"
@@ -14126,7 +14126,7 @@ msgstr ""
 #: modules/video_filter/scale.c:53 modules/video_filter/swscale/filter.c:74
 #, fuzzy
 msgid "Video scaling filter"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_filter/swscale/filter.c:63
 #, fuzzy
@@ -14140,7 +14140,7 @@ msgstr ""
 #: modules/video_filter/swscale/filter.c:68
 #, fuzzy
 msgid "Fast bilinear"
-msgstr "Spola framåt"
+msgstr "Spola framÃ¥t"
 
 #: modules/video_filter/swscale/filter.c:68
 #, fuzzy
@@ -14247,7 +14247,7 @@ msgstr ""
 #: modules/video_filter/transform.c:66
 #, fuzzy
 msgid "Video transformation filter"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_filter/wall.c:54
 msgid ""
@@ -14262,7 +14262,7 @@ msgstr ""
 #: modules/video_filter/wall.c:61
 #, fuzzy
 msgid "Active windows"
-msgstr "Fönster"
+msgstr "FÃ¶nster"
 
 #: modules/video_filter/wall.c:62
 msgid "Comma separated list of active windows, defaults to all"
@@ -14280,12 +14280,12 @@ msgstr ""
 #: modules/video_filter/wall.c:69
 #, fuzzy
 msgid "Wall video filter"
-msgstr "Föregående fil"
+msgstr "FÃ¶regÃ¥ende fil"
 
 #: modules/video_filter/wall.c:70
 #, fuzzy
 msgid "Image wall"
-msgstr "Språk"
+msgstr "SprÃ¥k"
 
 #: modules/video_output/aa.c:55
 msgid "Ascii Art"
@@ -14369,7 +14369,7 @@ msgstr "Slow Motion"
 #: modules/video_output/x11/glx.c:115
 #, fuzzy
 msgid "OpenGL video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/video_output/fb.c:67
 msgid "Framebuffer device"
@@ -14415,7 +14415,7 @@ msgstr "Radera"
 #: modules/video_output/image.c:49
 #, fuzzy
 msgid "Set the format of the output image."
-msgstr "Öppna skiva"
+msgstr "Ã–ppna skiva"
 
 #: modules/video_output/image.c:51
 msgid "Recording ratio"
@@ -14441,7 +14441,7 @@ msgstr ""
 #: modules/video_output/image.c:63
 #, fuzzy
 msgid "Image file"
-msgstr "Nästa file"
+msgstr "NÃ¤sta file"
 
 #: modules/video_output/image.c:64
 #, fuzzy
@@ -14491,7 +14491,7 @@ msgstr ""
 #: modules/video_output/qte/qte.cpp:117
 #, fuzzy
 msgid "QT Embedded video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/video_output/sdl.c:104
 msgid "Simple DirectMedia Layer video output"
@@ -14500,7 +14500,7 @@ msgstr ""
 #: modules/video_output/snapshot.c:60
 #, fuzzy
 msgid "snapshot width"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_output/snapshot.c:61
 msgid "Set the width of the snapshot image."
@@ -14509,7 +14509,7 @@ msgstr ""
 #: modules/video_output/snapshot.c:63
 #, fuzzy
 msgid "snapshot height"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_output/snapshot.c:64
 msgid "Set the height of the snapshot image."
@@ -14534,22 +14534,22 @@ msgstr ""
 #: modules/video_output/snapshot.c:74
 #, fuzzy
 msgid "snapshot module"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/video_output/svgalib.c:53
 #, fuzzy
 msgid "SVGAlib video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/video_output/wingdi.c:214
 #, fuzzy
 msgid "Windows GAPI video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/video_output/wingdi.c:217
 #, fuzzy
 msgid "Windows GDI video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/video_output/x11/glx.c:87 modules/video_output/x11/xvideo.c:44
 #, fuzzy
@@ -14626,7 +14626,7 @@ msgstr ""
 #: modules/video_output/x11/xvideo.c:92
 #, fuzzy
 msgid "XVideo extension video output"
-msgstr "Helskärm"
+msgstr "HelskÃ¤rm"
 
 #: modules/visualization/galaktos/plugin.c:48
 msgid "GaLaktos visualization plugin"
@@ -14661,7 +14661,7 @@ msgstr ""
 #: modules/visualization/goom.c:71
 #, fuzzy
 msgid "Goom effect"
-msgstr "Öppna nätverk"
+msgstr "Ã–ppna nÃ¤tverk"
 
 #: modules/visualization/visual/visual.c:38
 #, fuzzy
@@ -14729,12 +14729,12 @@ msgstr ""
 #: modules/visualization/visual/visual.c:75
 #, fuzzy
 msgid "Visualizer"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/visualization/visual/visual.c:78
 #, fuzzy
 msgid "Visualizer filter"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #: modules/visualization/visual/visual.c:86
 msgid "Spectrum analyser"
@@ -14777,19 +14777,19 @@ msgstr ""
 #: modules/visualization/xosd.c:82
 #, fuzzy
 msgid "XOSD interface"
-msgstr "Göm andra"
+msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "DirectX"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "OpenGL"
-#~ msgstr "Öppna fil"
+#~ msgstr "Ã–ppna fil"
 
 #, fuzzy
 #~ msgid "XVideo"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "bad entry number"
@@ -14801,7 +14801,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Showintf"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Telnet"
@@ -14821,11 +14821,11 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "PLS file"
-#~ msgstr "Nästa file"
+#~ msgstr "NÃ¤sta file"
 
 #, fuzzy
 #~ msgid "wxWindows"
-#~ msgstr "Fönster"
+#~ msgstr "FÃ¶nster"
 
 #, fuzzy
 #~ msgid "Picture"
@@ -14837,7 +14837,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "AAC demuxer"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "Choose audio channel"
@@ -14853,23 +14853,23 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Loop playlist on end"
-#~ msgstr "Öppna skiva"
+#~ msgstr "Ã–ppna skiva"
 
 #, fuzzy
 #~ msgid "Real time control interface"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Real time control interface initialized, `h' for help\n"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Telnet remote control interface"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Select file or directory"
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #~ msgid "Loop"
 #~ msgstr "Repetera"
@@ -14880,7 +14880,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "SAP interface"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "IDR frames"
@@ -14924,7 +14924,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Factor to increase subtitle display interval"
-#~ msgstr "Öppna skiva"
+#~ msgstr "Ã–ppna skiva"
 
 #, fuzzy
 #~ msgid "Add this to starting vertical position of subtitle."
@@ -14932,11 +14932,11 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Error: %s\n"
-#~ msgstr "Spola framåt"
+#~ msgstr "Spola framÃ¥t"
 
 #, fuzzy
 #~ msgid "Xvid video decoder"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "Delete Group"
@@ -14980,7 +14980,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "no input\n"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "| no entries\n"
@@ -14992,19 +14992,19 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Track Artist"
-#~ msgstr "Föregående fil"
+#~ msgstr "FÃ¶regÃ¥ende fil"
 
 #, fuzzy
 #~ msgid "Track Title"
-#~ msgstr "Föregående fil"
+#~ msgstr "FÃ¶regÃ¥ende fil"
 
 #, fuzzy
 #~ msgid "Program to decode"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "Telnet interface started on port: %d"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Demuxers settings (new generation)"
@@ -15012,11 +15012,11 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Audio menu"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "Interface menu"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Stream "
@@ -15032,7 +15032,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "OpenGL effect"
-#~ msgstr "Öppna nätverk"
+#~ msgstr "Ã–ppna nÃ¤tverk"
 
 #, fuzzy
 #~ msgid "Item info"
@@ -15040,15 +15040,15 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Step 1: Select what to stream."
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "Step 2: Define streaming method."
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "Step 3: Start streaming."
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "slowest"
@@ -15092,11 +15092,11 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Open a skin file."
-#~ msgstr "Öppna fil"
+#~ msgstr "Ã–ppna fil"
 
 #, fuzzy
 #~ msgid "Open a network stream"
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "Exit this program"
@@ -15108,7 +15108,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Open &Satellite Stream..."
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "E&xit"
@@ -15116,7 +15116,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Video device type"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "Advanced video device options"
@@ -15124,7 +15124,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Video device MRL"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "subtitles"
@@ -15140,7 +15140,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Play List"
-#~ msgstr "Spola framåt"
+#~ msgstr "Spola framÃ¥t"
 
 #, fuzzy
 #~ msgid "Loop On"
@@ -15152,7 +15152,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Repeat Playlist"
-#~ msgstr "Öppna skiva"
+#~ msgstr "Ã–ppna skiva"
 
 #, fuzzy
 #~ msgid "Quicktime"
@@ -15160,7 +15160,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Quick &Open ..."
-#~ msgstr "_Öppna fil..."
+#~ msgstr "_Ã–ppna fil..."
 
 #, fuzzy
 #~ msgid "&About..."
@@ -15172,7 +15172,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Simple &Open ..."
-#~ msgstr "_Öppna fil..."
+#~ msgstr "_Ã–ppna fil..."
 
 #, fuzzy
 #~ msgid "Open subtitles file"
@@ -15192,15 +15192,15 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "CD Audio demux"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "CD Audio device"
-#~ msgstr "_Nästa objekt"
+#~ msgstr "_NÃ¤sta objekt"
 
 #, fuzzy
 #~ msgid "Gtk2 interface"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "_Edit"
@@ -15212,18 +15212,18 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "CD-ROM device name"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #~ msgid "Open a DVD or VCD"
-#~ msgstr "Öppna skiva"
+#~ msgstr "Ã–ppna skiva"
 
 #, fuzzy
 #~ msgid "Open a DVD or (S)VCD"
-#~ msgstr "Öppna skiva"
+#~ msgstr "Ã–ppna skiva"
 
 #, fuzzy
 #~ msgid "&File info..."
-#~ msgstr "_Öppna fil..."
+#~ msgstr "_Ã–ppna fil..."
 
 #, fuzzy
 #~ msgid "file://"
@@ -15243,11 +15243,11 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "HTTP interface bind address"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "osd text filter"
-#~ msgstr "Nästa file"
+#~ msgstr "NÃ¤sta file"
 
 #, fuzzy
 #~ msgid "&Title:"
@@ -15259,19 +15259,19 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Open &file..."
-#~ msgstr "_Öppna fil..."
+#~ msgstr "_Ã–ppna fil..."
 
 #, fuzzy
 #~ msgid "Open &disc..."
-#~ msgstr "_Öppna skiva..."
+#~ msgstr "_Ã–ppna skiva..."
 
 #, fuzzy
 #~ msgid "&Network stream..."
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "Spawn a new interface"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #, fuzzy
 #~ msgid "&Controls"
@@ -15283,7 +15283,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Sc&reen"
-#~ msgstr "Helskärm"
+#~ msgstr "HelskÃ¤rm"
 
 #, fuzzy
 #~ msgid "&Title"
@@ -15295,7 +15295,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "&Language"
-#~ msgstr "Språk"
+#~ msgstr "SprÃ¥k"
 
 #, fuzzy
 #~ msgid "New stream"
@@ -15303,7 +15303,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Network Stream..."
-#~ msgstr "_Öppna nätverk..."
+#~ msgstr "_Ã–ppna nÃ¤tverk..."
 
 #, fuzzy
 #~ msgid "&Add subtitles..."
@@ -15315,7 +15315,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "&Fullscreen"
-#~ msgstr "Helskärm"
+#~ msgstr "HelskÃ¤rm"
 
 #, fuzzy
 #~ msgid "About..."
@@ -15323,7 +15323,7 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "&Mute"
-#~ msgstr "Stäng av ljudet"
+#~ msgstr "StÃ¤ng av ljudet"
 
 #, fuzzy
 #~ msgid "Channel server"
@@ -15331,11 +15331,11 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "&Disc..."
-#~ msgstr "_Öppna skiva..."
+#~ msgstr "_Ã–ppna skiva..."
 
 #, fuzzy
 #~ msgid "&Network..."
-#~ msgstr "Nätverk"
+#~ msgstr "NÃ¤tverk"
 
 #, fuzzy
 #~ msgid "Play the selected stream"
@@ -15347,10 +15347,10 @@ msgstr "Göm andra"
 
 #, fuzzy
 #~ msgid "Native Windows interface"
-#~ msgstr "Göm andra"
+#~ msgstr "GÃ¶m andra"
 
 #~ msgid "Language 0x%x"
-#~ msgstr "Språk 0x%x"
+#~ msgstr "SprÃ¥k 0x%x"
 
 #, fuzzy
 #~ msgid "All files"
@@ -15365,8 +15365,8 @@ msgstr "Göm andra"
 #~ msgstr "Paus"
 
 #~ msgid "A_udio"
-#~ msgstr "_Språk"
+#~ msgstr "_SprÃ¥k"
 
 #, fuzzy
 #~ msgid "Open disc..."
-#~ msgstr "_Öppna skiva..."
+#~ msgstr "_Ã–ppna skiva..."
