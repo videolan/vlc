@@ -1164,7 +1164,7 @@ int E_(CAMOpen)( access_t *p_access )
     }
 
     if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0
-          || caps.slot_num == 0 || caps.slot_type != CA_CI_LINK )
+          || caps.slot_num == 0 || !(caps.slot_type & CA_CI_LINK) )
     {
         msg_Err( p_access, "CAMInit: no compatible CAM module" );
         close( p_sys->i_ca_handle );
