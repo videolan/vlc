@@ -12,7 +12,7 @@ msgstr ""
 "Last-Translator: Haakon Meland Eriksen <haakon.eriksen@far.no>\n"
 "Language-Team: vlc <>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: include/vlc_config_cat.h:32 modules/gui/kde/preferences.cpp:56
@@ -311,7 +311,7 @@ msgstr ""
 #: include/vlc_config_cat.h:155
 #, fuzzy
 msgid "Sout stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -482,8 +482,8 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I wxwin\"\n"
 msgstr ""
 "\n"
-"Advarsel: om du ikke lenger får tilgang til brukergrensesnittet kan du åpne "
-"et dos vindu, gå til katalogen du har installer VLC i og kjøre \"vlc -I win32"
+"Advarsel: om du ikke lenger fÃ¥r tilgang til brukergrensesnittet kan du Ã¥pne "
+"et dos vindu, gÃ¥ til katalogen du har installer VLC i og kjÃ¸re \"vlc -I win32"
 "\"\n"
 
 #: include/vlc_interface.h:164
@@ -659,12 +659,12 @@ msgstr ""
 #: include/vlc_meta.h:62
 #, fuzzy
 msgid "ISO-9660 Volume Set"
-msgstr "Øk volum"
+msgstr "Ã˜k volum"
 
 #: include/vlc_meta.h:64
 #, fuzzy
 msgid "Codec Name"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: include/vlc_meta.h:65
 #, fuzzy
@@ -732,7 +732,7 @@ msgstr "Venstre"
 #: modules/video_filter/logo.c:85 modules/video_filter/marq.c:106
 #: modules/video_filter/mosaic.c:120 modules/video_filter/time.c:96
 msgid "Right"
-msgstr "Høyre"
+msgstr "HÃ¸yre"
 
 #: src/audio_output/output.c:135
 msgid "Dolby Surround"
@@ -835,7 +835,7 @@ msgstr "skriv ut versjonsinformasjon"
 #: src/input/es_out.c:1514
 #, fuzzy, c-format
 msgid "Stream %d"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: src/input/es_out.c:1516 modules/gui/wxwindows/wizard.cpp:802
 #: modules/gui/wxwindows/wizard.cpp:842
@@ -881,12 +881,12 @@ msgstr ""
 
 #: src/input/es_out.c:1553
 msgid "Resolution"
-msgstr "Oppløsning"
+msgstr "OpplÃ¸sning"
 
 #: src/input/es_out.c:1559
 #, fuzzy
 msgid "Display resolution"
-msgstr "Oppløsning"
+msgstr "OpplÃ¸sning"
 
 #: src/input/es_out.c:1565 modules/access/screen/screen.c:41
 #, fuzzy
@@ -904,7 +904,7 @@ msgstr "_Teksting"
 #: modules/gui/macosx/output.m:395
 #, fuzzy
 msgid "Stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: src/input/input.c:1882 src/playlist/item.c:366
 #: modules/access/cdda/info.c:324 modules/access/cdda/info.c:392
@@ -1006,7 +1006,7 @@ msgstr "no"
 #: src/libvlc.c:304
 #, fuzzy
 msgid "Help options"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: src/libvlc.c:2056 src/misc/configuration.c:1265
 msgid "string"
@@ -1022,7 +1022,7 @@ msgstr "desimaltall"
 
 #: src/libvlc.c:2097
 msgid " (default enabled)"
-msgstr " (grunninnstilling påskrudd)"
+msgstr " (grunninnstilling pÃ¥skrudd)"
 
 #: src/libvlc.c:2098
 msgid " (default disabled)"
@@ -1036,7 +1036,7 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"Dette programmet er UTEN GARANTI, så langt dette er tillatt i loven.\n"
+"Dette programmet er UTEN GARANTI, sÃ¥ langt dette er tillatt i loven.\n"
 "Du kan redistribuere det etter betingelsene i The GNU General Public "
 "License;\n"
 "- se filen KOPIERING for detaljer om dette.\n"
@@ -1049,7 +1049,7 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"Trykk Retur-knappen for å fortsette...\n"
+"Trykk Retur-knappen for Ã¥ fortsette...\n"
 
 #: src/libvlc.h:34
 #, fuzzy
@@ -1067,7 +1067,7 @@ msgstr ""
 #: src/libvlc.h:34 src/misc/iso-639_def.h:52
 #, fuzzy
 msgid "Bengali"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:59
 #, fuzzy
@@ -1216,20 +1216,20 @@ msgstr ""
 #: src/libvlc.h:70
 #, fuzzy
 msgid "Verbosity (0,1,2)"
-msgstr "detaljnivå (0,1,2)"
+msgstr "detaljnivÃ¥ (0,1,2)"
 
 #: src/libvlc.h:72
 msgid ""
 "This options sets the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
-"Sett detaljnivået på beskjeder med dette alternativet (0=bare feil og "
+"Sett detaljnivÃ¥et pÃ¥ beskjeder med dette alternativet (0=bare feil og "
 "standard meldinger, 1=advarsler, 2=feilretting)."
 
 #: src/libvlc.h:75
 #, fuzzy
 msgid "Be quiet"
-msgstr "vær stille"
+msgstr "vÃ¦r stille"
 
 #: src/libvlc.h:77
 msgid "This options turns off all warning and information messages."
@@ -1242,7 +1242,7 @@ msgid ""
 "This option allows you to set the language of the interface. The system "
 "language is auto-detected if \"auto\" is specified here."
 msgstr ""
-"Standard sti som grensesnittet benytter for å finne filer velger du med "
+"Standard sti som grensesnittet benytter for Ã¥ finne filer velger du med "
 "dette alternativet."
 
 #: src/libvlc.h:84
@@ -1255,8 +1255,8 @@ msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
 msgstr ""
-"Når dette alternativet er påskrudd fargelegges meldinger til konsolen. "
-"Terminalklienten trenger Linux-fargestøtte for at dette skal virke."
+"NÃ¥r dette alternativet er pÃ¥skrudd fargelegges meldinger til konsolen. "
+"Terminalklienten trenger Linux-fargestÃ¸tte for at dette skal virke."
 
 #: src/libvlc.h:89
 #, fuzzy
@@ -1270,9 +1270,9 @@ msgid ""
 "all the available options, including those that most users should never "
 "touch."
 msgstr ""
-"Alle tilgjengelige alternativer vises for grensesnittene når dette "
-"alternativet er påskrudd, inkludert de som de fleste brukere aldri burde "
-"røre."
+"Alle tilgjengelige alternativer vises for grensesnittene nÃ¥r dette "
+"alternativet er pÃ¥skrudd, inkludert de som de fleste brukere aldri burde "
+"rÃ¸re."
 
 #: src/libvlc.h:96
 msgid ""
@@ -1300,7 +1300,7 @@ msgstr ""
 #: src/libvlc.h:108 modules/stream_out/display.c:37
 #, fuzzy
 msgid "Enable audio"
-msgstr "skru på lyd"
+msgstr "skru pÃ¥ lyd"
 
 #: src/libvlc.h:110
 #, fuzzy
@@ -1330,7 +1330,7 @@ msgstr "Lydeksport volum"
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
 msgstr ""
-"Du velger standardvolum for lydekport i et område fra 0 til 1024 med dette "
+"Du velger standardvolum for lydekport i et omrÃ¥de fra 0 til 1024 med dette "
 "alternativet."
 
 #: src/libvlc.h:121
@@ -1340,7 +1340,7 @@ msgstr "Standard grensesnitt: "
 
 #: src/libvlc.h:123
 msgid "This saves the audio output volume when you select mute."
-msgstr "Dette lagrer lydeksportvolumet når du skrur av lyden."
+msgstr "Dette lagrer lydeksportvolumet nÃ¥r du skrur av lyden."
 
 #: src/libvlc.h:125
 #, fuzzy
@@ -1380,12 +1380,12 @@ msgid ""
 "the audio."
 msgstr ""
 "Du kan forsinke lydeksporten med dette alternativet. Hvis du oppdager "
-"tidsforsinkelse mellom lyd og bilde kan dette være svært kjekt."
+"tidsforsinkelse mellom lyd og bilde kan dette vÃ¦re svÃ¦rt kjekt."
 
 #: src/libvlc.h:144
 #, fuzzy
 msgid "Preferred audio output channels mode"
-msgstr "velg foretrukket rekkefølge for lydinnkoding"
+msgstr "velg foretrukket rekkefÃ¸lge for lydinnkoding"
 
 #: src/libvlc.h:146
 #, fuzzy
@@ -1394,21 +1394,21 @@ msgid ""
 "used by default when possible (ie. if your hardware supports it as well as "
 "the audio stream being played)."
 msgstr ""
-"Du kan bruke S/PDIF lydeksport som standard når maskinvaren din støtter "
-"dette i tillegg til lydstrømmen som avspilles."
+"Du kan bruke S/PDIF lydeksport som standard nÃ¥r maskinvaren din stÃ¸tter "
+"dette i tillegg til lydstrÃ¸mmen som avspilles."
 
 #: src/libvlc.h:150
 #, fuzzy
 msgid "Use the S/PDIF audio output when available"
-msgstr "bruk S/PDIF lydeksport når dette er tilgjengelig"
+msgstr "bruk S/PDIF lydeksport nÃ¥r dette er tilgjengelig"
 
 #: src/libvlc.h:152
 msgid ""
 "This option allows you to use the S/PDIF audio output by default when your "
 "hardware supports it as well as the audio stream being played."
 msgstr ""
-"Du kan bruke S/PDIF lydeksport som standard når maskinvaren din støtter "
-"dette i tillegg til lydstrømmen som avspilles."
+"Du kan bruke S/PDIF lydeksport som standard nÃ¥r maskinvaren din stÃ¸tter "
+"dette i tillegg til lydstrÃ¸mmen som avspilles."
 
 #: src/libvlc.h:157
 msgid ""
@@ -1461,7 +1461,7 @@ msgstr ""
 #: src/libvlc.h:184 modules/stream_out/display.c:39
 #, fuzzy
 msgid "Enable video"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: src/libvlc.h:186
 #, fuzzy
@@ -1491,7 +1491,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:71 modules/visualization/visual/visual.c:47
 #, fuzzy
 msgid "Video height"
-msgstr "videohøyde"
+msgstr "videohÃ¸yde"
 
 #: src/libvlc.h:196
 #, fuzzy
@@ -1499,7 +1499,7 @@ msgid ""
 "You can enforce the video height here. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Her kan du sette videohøyden. Standardinnstillingen er at VLC tilpasser seg "
+"Her kan du sette videohÃ¸yden. Standardinnstillingen er at VLC tilpasser seg "
 "til videoviseren."
 
 #: src/libvlc.h:199
@@ -1563,7 +1563,7 @@ msgstr ""
 #: modules/video_filter/time.c:96
 #, fuzzy
 msgid "Bottom"
-msgstr "Gå til:"
+msgstr "GÃ¥ til:"
 
 #: src/libvlc.h:221 modules/video_filter/logo.c:86
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:121
@@ -1577,7 +1577,7 @@ msgstr "Venstre"
 #: modules/video_filter/time.c:97
 #, fuzzy
 msgid "Top-Right"
-msgstr "Høyre"
+msgstr "HÃ¸yre"
 
 #: src/libvlc.h:221 modules/video_filter/logo.c:86
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:121
@@ -1603,14 +1603,14 @@ msgstr "Zoom videoen med den spesifiserte faktoren."
 #: src/libvlc.h:227
 #, fuzzy
 msgid "Grayscale video output"
-msgstr "videoeksport i gråtoner"
+msgstr "videoeksport i grÃ¥toner"
 
 #: src/libvlc.h:229
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
 msgstr ""
-"Fargeinformasjon fra videoen blir ikke dekodet når dette alternativet er "
+"Fargeinformasjon fra videoen blir ikke dekodet nÃ¥r dette alternativet er "
 "valgt. (Du sparer litt prosessorkraft)."
 
 #: src/libvlc.h:232
@@ -1622,7 +1622,7 @@ msgstr "Fullskjermdybde:"
 msgid ""
 "If this option is enabled, VLC will always start a video in fullscreen mode."
 msgstr ""
-"VLC starter alltid video på hele skjermen når dette alternativet er påskrudd."
+"VLC starter alltid video pÃ¥ hele skjermen nÃ¥r dette alternativet er pÃ¥skrudd."
 
 #: src/libvlc.h:237
 #, fuzzy
@@ -1635,8 +1635,8 @@ msgid ""
 "If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphics card (hardware acceleration)."
 msgstr ""
-"VLC vil prøve å bruke \"overlay\" egenskapene i grafikkortet ditt hvis dette "
-"alternativet er påskrudd."
+"VLC vil prÃ¸ve Ã¥ bruke \"overlay\" egenskapene i grafikkortet ditt hvis dette "
+"alternativet er pÃ¥skrudd."
 
 #: src/libvlc.h:242 src/video_output/vout_intf.c:216
 msgid "Always on top"
@@ -1666,8 +1666,8 @@ msgid ""
 "This will allow you to add a post-processing filter to enhance the picture "
 "quality, for instance deinterlacing, or to clone or distort the video window."
 msgstr ""
-"Du kan legge til filtre for etterbehandling for å forbedre bildekvaliteten, "
-"for eksempel for å fjerne striper, eller for å klone eller forvrenge "
+"Du kan legge til filtre for etterbehandling for Ã¥ forbedre bildekvaliteten, "
+"for eksempel for Ã¥ fjerne striper, eller for Ã¥ klone eller forvrenge "
 "videovinduet. "
 
 #: src/libvlc.h:257
@@ -1705,10 +1705,10 @@ msgid ""
 "y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
-"Her fastsettes kildens bildeformat. Noen DVDer vil for eksempel påstå at de "
-"har 16:9 som format mens de egentlig har 4:3. VLC kan også bruke "
+"Her fastsettes kildens bildeformat. Noen DVDer vil for eksempel pÃ¥stÃ¥ at de "
+"har 16:9 som format mens de egentlig har 4:3. VLC kan ogsÃ¥ bruke "
 "innstillingen som et hint for filmer som mangler informasjon om bildeformat. "
-"Formater aksepteres på formen x:y (4:3, 16:9, etc.) som uttrykk for det "
+"Formater aksepteres pÃ¥ formen x:y (4:3, 16:9, etc.) som uttrykk for det "
 "globale bildeformatet, eller som et desimaltall (1.25, 1.3333, etc.) som "
 "uttrykk for firkantetheten til pixlene."
 
@@ -1777,7 +1777,7 @@ msgstr "Slett"
 #: modules/gui/wxwindows/wizard.cpp:614
 #, fuzzy
 msgid "Enable"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: src/libvlc.h:303
 #, fuzzy
@@ -1786,7 +1786,7 @@ msgstr "Port"
 
 #: src/libvlc.h:305
 msgid "This is the port used for UDP streams. By default, we chose 1234."
-msgstr "Her er porten som brukes til UDP-strømmer. Som standard brukes 1234."
+msgstr "Her er porten som brukes til UDP-strÃ¸mmer. Som standard brukes 1234."
 
 #: src/libvlc.h:307
 #, fuzzy
@@ -1798,7 +1798,7 @@ msgid ""
 "This is the typical size of UDP packets that we expect. On Ethernet it is "
 "usually 1500."
 msgstr ""
-"Her er pakkestørrelsen for UDP slik vi antar den vil være. I Ethernet er "
+"Her er pakkestÃ¸rrelsen for UDP slik vi antar den vil vÃ¦re. I Ethernet er "
 "dette vanligvis 1500."
 
 #: src/libvlc.h:312
@@ -1813,7 +1813,7 @@ msgid ""
 "multicasting interface here."
 msgstr ""
 "Hvis du har flere nettverksgrensesnitt i maskinen din og bruker multicast-"
-"løsningen, må du antakelig skrive IP-adressen til multicast-grensesnittet "
+"lÃ¸sningen, mÃ¥ du antakelig skrive IP-adressen til multicast-grensesnittet "
 "her."
 
 #: src/libvlc.h:318 modules/access_output/udp.c:68 modules/stream_out/rtp.c:77
@@ -1860,7 +1860,7 @@ msgstr "Lyd"
 #, fuzzy
 msgid "Give the stream number of the audio track you want to use(from 0 to n)."
 msgstr ""
-"Skriv inn nummeret på lydkanalen du ønsker å bruke for lydstrømmen fra en "
+"Skriv inn nummeret pÃ¥ lydkanalen du Ã¸nsker Ã¥ bruke for lydstrÃ¸mmen fra en "
 "DVD (fra 1 til n)."
 
 #: src/libvlc.h:341
@@ -1873,7 +1873,7 @@ msgstr "Velg tittel"
 msgid ""
 "Give the stream number of the subtitle track you want to use (from 0 to n)."
 msgstr ""
-"Skriv inn nummeret på undertekstkanalen du ønsker å bruke for tekststrømmen "
+"Skriv inn nummeret pÃ¥ undertekstkanalen du Ã¸nsker Ã¥ bruke for tekststrÃ¸mmen "
 "fra en DVD (fra 1 to n)."
 
 #: src/libvlc.h:346
@@ -1887,7 +1887,7 @@ msgid ""
 "Give the language of the audio track you want to use (comma separted, two or "
 "tree letter country code)."
 msgstr ""
-"Skriv inn nummeret på lydkanalen du ønsker å bruke for lydstrømmen fra en "
+"Skriv inn nummeret pÃ¥ lydkanalen du Ã¸nsker Ã¥ bruke for lydstrÃ¸mmen fra en "
 "DVD (fra 1 til n)."
 
 #: src/libvlc.h:351
@@ -1901,7 +1901,7 @@ msgid ""
 "Give the language of the subtitle track you want to use (comma separted, two "
 "or tree letter country code)."
 msgstr ""
-"Skriv inn nummeret på undertekstkanalen du ønsker å bruke for tekststrømmen "
+"Skriv inn nummeret pÃ¥ undertekstkanalen du Ã¸nsker Ã¥ bruke for tekststrÃ¸mmen "
 "fra en DVD (fra 1 to n)."
 
 #: src/libvlc.h:356
@@ -1973,7 +1973,7 @@ msgid ""
 "over the movie. Try several positions."
 msgstr ""
 "Du kan plassere undertekstene under filmen med dette alternativet, i stedet "
-"for over filmen. Du kan også prøve andre posisjoner."
+"for over filmen. Du kan ogsÃ¥ prÃ¸ve andre posisjoner."
 
 #: src/libvlc.h:392 src/libvlc.h:994
 msgid "On Screen Display"
@@ -2101,7 +2101,7 @@ msgid ""
 "If you check this box, IPv6 will be used by default for all UDP and HTTP "
 "connections."
 msgstr ""
-"Ved å sette hake i denne ruten brukes IPv6 som standard for alle "
+"Ved Ã¥ sette hake i denne ruten brukes IPv6 som standard for alle "
 "forbindelser over UDP og HTTP."
 
 #: src/libvlc.h:462
@@ -2114,7 +2114,7 @@ msgid ""
 "If you check this box, IPv4 will be used by default for all UDP and HTTP "
 "connections."
 msgstr ""
-"Ved å sette hake i denne ruten brukes IPv4 som standard for alle "
+"Ved Ã¥ sette hake i denne ruten brukes IPv4 som standard for alle "
 "forbindelser over UDP og HTTP."
 
 #: src/libvlc.h:467
@@ -2132,7 +2132,7 @@ msgstr "Du kan fastsette lydinnkoding her"
 #: src/libvlc.h:472
 #, fuzzy
 msgid "SOCKS user name"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: src/libvlc.h:473
 #, fuzzy
@@ -2235,7 +2235,7 @@ msgstr ""
 #: src/libvlc.h:520
 #, fuzzy
 msgid "Preferred codecs list"
-msgstr "velg foretrukket rekkefølge på kodek"
+msgstr "velg foretrukket rekkefÃ¸lge pÃ¥ kodek"
 
 #: src/libvlc.h:522
 msgid ""
@@ -2247,14 +2247,14 @@ msgstr ""
 #: src/libvlc.h:526
 #, fuzzy
 msgid "Preferred encoders list"
-msgstr "velg foretrukket rekkefølge på kodek"
+msgstr "velg foretrukket rekkefÃ¸lge pÃ¥ kodek"
 
 #: src/libvlc.h:528
 #, fuzzy
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority"
 msgstr ""
-"Her kan du velge rekkefølgen som VLC bruker når den skal velge pakkemetode."
+"Her kan du velge rekkefÃ¸lgen som VLC bruker nÃ¥r den skal velge pakkemetode."
 
 #: src/libvlc.h:532
 msgid ""
@@ -2265,7 +2265,7 @@ msgstr ""
 #: src/libvlc.h:535
 #, fuzzy
 msgid "Default stream output chain"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: src/libvlc.h:537
 msgid ""
@@ -2302,8 +2302,8 @@ msgid ""
 "This allows you to choose if the video stream should be redirected to the "
 "stream output facility when this last one is enabled."
 msgstr ""
-"Du kan velge om videostrømmen skal omdirigeres til strømmens ut-enhet når "
-"denne er påskrudd."
+"Du kan velge om videostrÃ¸mmen skal omdirigeres til strÃ¸mmens ut-enhet nÃ¥r "
+"denne er pÃ¥skrudd."
 
 #: src/libvlc.h:554
 #, fuzzy
@@ -2316,8 +2316,8 @@ msgid ""
 "This allows you to choose if the audio stream should be redirected to the "
 "stream output facility when this last one is enabled."
 msgstr ""
-"Du kan velge om videostrømmen skal omdirigeres til strømmens ut-enhet når "
-"denne er påskrudd."
+"Du kan velge om videostrÃ¸mmen skal omdirigeres til strÃ¸mmens ut-enhet nÃ¥r "
+"denne er pÃ¥skrudd."
 
 #: src/libvlc.h:559
 #, fuzzy
@@ -2334,13 +2334,13 @@ msgstr ""
 #: src/libvlc.h:565
 #, fuzzy
 msgid "Preferred packetizer list"
-msgstr "velg foretrukket rekkefølge for pakking"
+msgstr "velg foretrukket rekkefÃ¸lge for pakking"
 
 #: src/libvlc.h:567
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
 msgstr ""
-"Her kan du velge rekkefølgen som VLC bruker når den skal velge pakkemetode."
+"Her kan du velge rekkefÃ¸lgen som VLC bruker nÃ¥r den skal velge pakkemetode."
 
 #: src/libvlc.h:570
 #, fuzzy
@@ -2350,7 +2350,7 @@ msgstr "Standard grensesnitt: "
 #: src/libvlc.h:572
 msgid "This is a legacy entry to let you configure mux modules"
 msgstr ""
-"Dette er en gammel innføring som lar deg sette innstillinger for mux moduler."
+"Dette er en gammel innfÃ¸ring som lar deg sette innstillinger for mux moduler."
 
 #: src/libvlc.h:574
 #, fuzzy
@@ -2360,7 +2360,7 @@ msgstr "Standard grensesnitt: "
 #: src/libvlc.h:576
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr ""
-"Dette er en gammel innføring som lar deg sette innstillinger i moduler for "
+"Dette er en gammel innfÃ¸ring som lar deg sette innstillinger i moduler for "
 "tilgangseksport"
 
 #: src/libvlc.h:578
@@ -2393,7 +2393,7 @@ msgstr ""
 #: src/libvlc.h:591
 #, fuzzy
 msgid "Enable FPU support"
-msgstr "skru på støtte for MMX i prosessoren"
+msgstr "skru pÃ¥ stÃ¸tte for MMX i prosessoren"
 
 #: src/libvlc.h:593
 #, fuzzy
@@ -2401,65 +2401,65 @@ msgid ""
 "If your processor has a floating point calculation unit, VLC can take "
 "advantage of it."
 msgstr ""
-"VLC kan dra nytte av AltiVec instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av AltiVec instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette dette."
 
 #: src/libvlc.h:596
 #, fuzzy
 msgid "Enable CPU MMX support"
-msgstr "skru på støtte for MMX i prosessoren"
+msgstr "skru pÃ¥ stÃ¸tte for MMX i prosessoren"
 
 #: src/libvlc.h:598
 msgid ""
 "If your processor supports the MMX instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"VLC kan dra nytte av MMX instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av MMX instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette."
 
 #: src/libvlc.h:601
 #, fuzzy
 msgid "Enable CPU 3D Now! support"
-msgstr "skru på støtte for 3D Now! i prosessoren"
+msgstr "skru pÃ¥ stÃ¸tte for 3D Now! i prosessoren"
 
 #: src/libvlc.h:603
 msgid ""
 "If your processor supports the 3D Now! instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"VLC kan dra nytte av 3D Now! instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av 3D Now! instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette."
 
 #: src/libvlc.h:606
 #, fuzzy
 msgid "Enable CPU MMX EXT support"
-msgstr "skru på støtte for MMX EXT i prosessoren "
+msgstr "skru pÃ¥ stÃ¸tte for MMX EXT i prosessoren "
 
 #: src/libvlc.h:608
 msgid ""
 "If your processor supports the MMX EXT instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"VLC kan dra nytte av MMX EXT instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av MMX EXT instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette dette."
 
 #: src/libvlc.h:611
 #, fuzzy
 msgid "Enable CPU SSE support"
-msgstr "skru på støtte for SSE i prosessoren"
+msgstr "skru pÃ¥ stÃ¸tte for SSE i prosessoren"
 
 #: src/libvlc.h:613
 msgid ""
 "If your processor supports the SSE instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"VLC kan dra nytte av SSE instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av SSE instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette dette."
 
 #: src/libvlc.h:616
 #, fuzzy
 msgid "Enable CPU SSE2 support"
-msgstr "skru på støtte for SSE i prosessoren"
+msgstr "skru pÃ¥ stÃ¸tte for SSE i prosessoren"
 
 #: src/libvlc.h:618
 #, fuzzy
@@ -2467,20 +2467,20 @@ msgid ""
 "If your processor supports the SSE2 instructions set, VLC can take advantage "
 "of them."
 msgstr ""
-"VLC kan dra nytte av SSE instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av SSE instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette dette."
 
 #: src/libvlc.h:621
 #, fuzzy
 msgid "Enable CPU AltiVec support"
-msgstr "skru på støtte for AltiVec i prosessoren"
+msgstr "skru pÃ¥ stÃ¸tte for AltiVec i prosessoren"
 
 #: src/libvlc.h:623
 msgid ""
 "If your processor supports the AltiVec instructions set, VLC can take "
 "advantage of them."
 msgstr ""
-"VLC kan dra nytte av AltiVec instruksjonssettet hvis prosessoren din støtter "
+"VLC kan dra nytte av AltiVec instruksjonssettet hvis prosessoren din stÃ¸tter "
 "dette dette."
 
 #: src/libvlc.h:627
@@ -2503,15 +2503,15 @@ msgstr ""
 #: src/libvlc.h:635
 #, fuzzy
 msgid "Play files randomly forever"
-msgstr "uendelig avspilling av filer i tilfeldig rekkefølge"
+msgstr "uendelig avspilling av filer i tilfeldig rekkefÃ¸lge"
 
 #: src/libvlc.h:637
 msgid ""
 "When selected, VLC will randomly play files in the playlist until "
 "interrupted."
 msgstr ""
-"Når dette alternativet er valgt, vil VLC spille filene i spillelisten i "
-"tilfeldig rekkefølge inntil den blir avbrutt."
+"NÃ¥r dette alternativet er valgt, vil VLC spille filene i spillelisten i "
+"tilfeldig rekkefÃ¸lge inntil den blir avbrutt."
 
 #: src/libvlc.h:640
 #, fuzzy
@@ -2523,13 +2523,13 @@ msgid ""
 "If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
 msgstr ""
-"VLC kan avspille spillelisten i det uendelige ved å skru på dette "
+"VLC kan avspille spillelisten i det uendelige ved Ã¥ skru pÃ¥ dette "
 "alternativet."
 
 #: src/libvlc.h:645
 #, fuzzy
 msgid "Repeat current item"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:647
 msgid ""
@@ -2562,8 +2562,8 @@ msgid ""
 "You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
 msgstr ""
-"Du kan velge hvilken modul for minnekopiering du ønsker å bruke. "
-"Standardvalget til VLC er å velge den raskeste som støttes av din maskinvare."
+"Du kan velge hvilken modul for minnekopiering du Ã¸nsker Ã¥ bruke. "
+"Standardvalget til VLC er Ã¥ velge den raskeste som stÃ¸ttes av din maskinvare."
 
 #: src/libvlc.h:663
 #, fuzzy
@@ -2574,7 +2574,7 @@ msgstr "Standard grensesnitt: "
 #, fuzzy
 msgid "This is a legacy entry to let you configure access modules."
 msgstr ""
-"Dette er en gammel innføring så du kan sette innstillinger for "
+"Dette er en gammel innfÃ¸ring sÃ¥ du kan sette innstillinger for "
 "tilgangsmoduler"
 
 #: src/libvlc.h:667
@@ -2586,7 +2586,7 @@ msgstr "Standard grensesnitt: "
 #, fuzzy
 msgid "This is a legacy entry to let you configure access filter modules."
 msgstr ""
-"Dette er en gammel innføring så du kan sette innstillinger for "
+"Dette er en gammel innfÃ¸ring sÃ¥ du kan sette innstillinger for "
 "tilgangsmoduler"
 
 #: src/libvlc.h:671
@@ -2598,7 +2598,7 @@ msgstr "Standard grensesnitt: "
 #, fuzzy
 msgid "This is a legacy entry to let you configure demux modules."
 msgstr ""
-"Dette er en gammel innføring så du kan sette innstillinger for demux-moduler"
+"Dette er en gammel innfÃ¸ring sÃ¥ du kan sette innstillinger for demux-moduler"
 
 #: src/libvlc.h:675
 #, fuzzy
@@ -2627,7 +2627,7 @@ msgstr ""
 #: src/libvlc.h:689
 #, fuzzy
 msgid "Minimize number of threads"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: src/libvlc.h:691
 msgid "This option minimizes the number of threads needed to run VLC"
@@ -2636,7 +2636,7 @@ msgstr ""
 #: src/libvlc.h:693
 #, fuzzy
 msgid "Modules search path"
-msgstr "søkesti for tilleggskomponenter"
+msgstr "sÃ¸kesti for tilleggskomponenter"
 
 #: src/libvlc.h:695
 #, fuzzy
@@ -2709,7 +2709,7 @@ msgstr ""
 #: src/libvlc.h:729
 #, fuzzy
 msgid "Fast mutex on NT/2K/XP (developers only)"
-msgstr "rask mutex på NT/2K/XP (kun for utviklere)"
+msgstr "rask mutex pÃ¥ NT/2K/XP (kun for utviklere)"
 
 #: src/libvlc.h:731
 #, fuzzy
@@ -2718,13 +2718,13 @@ msgid ""
 "to correctly implement condition variables. You can also use the faster "
 "Win9x implementation but you might experience problems with it."
 msgstr ""
-"Vi bruker en treg framgangsmåte for mutex på Windows NT/2K/XP, men den gir "
-"oss muligheten for en korrekt framgangsmåte for tilstandsvariabler. Win9x-"
-"framgangsmåten er raskere, men du kan oppleve problemer hvis du bruker den."
+"Vi bruker en treg framgangsmÃ¥te for mutex pÃ¥ Windows NT/2K/XP, men den gir "
+"oss muligheten for en korrekt framgangsmÃ¥te for tilstandsvariabler. Win9x-"
+"framgangsmÃ¥ten er raskere, men du kan oppleve problemer hvis du bruker den."
 
 #: src/libvlc.h:736
 msgid "Condition variables implementation for Win9x (developers only)"
-msgstr "Framgangsmåte for tilstandvariabler under Win9x (kun for utviklere)"
+msgstr "FramgangsmÃ¥te for tilstandvariabler under Win9x (kun for utviklere)"
 
 #: src/libvlc.h:739
 #, fuzzy
@@ -2735,11 +2735,11 @@ msgid ""
 "robust. Currently you can choose between implementation 0 (which is the "
 "fastest but slightly incorrect), 1 (default) and 2."
 msgstr ""
-"Under Windows 9x/Me bruker vi en rask, men ikke korrekt framgangsmåte for "
-"tilstandsvariabler (som åpner for usikkerhet om hvilken kodebit som får "
-"oppdatere en fellesvariabel først). Det er mulig å velge tregere "
-"alternativer som skal være mer robuste. I øyeblikket kan du velge mellom "
-"framgangsmåte 0 (som er standard og raskest), 1 og 2"
+"Under Windows 9x/Me bruker vi en rask, men ikke korrekt framgangsmÃ¥te for "
+"tilstandsvariabler (som Ã¥pner for usikkerhet om hvilken kodebit som fÃ¥r "
+"oppdatere en fellesvariabel fÃ¸rst). Det er mulig Ã¥ velge tregere "
+"alternativer som skal vÃ¦re mer robuste. I Ã¸yeblikket kan du velge mellom "
+"framgangsmÃ¥te 0 (som er standard og raskest), 1 og 2"
 
 #: src/libvlc.h:747
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
@@ -2918,7 +2918,7 @@ msgstr "Om"
 #: src/libvlc.h:788
 #, fuzzy
 msgid "Select the hotkey to quit the application."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:789
 #, fuzzy
@@ -2955,7 +2955,7 @@ msgstr "_Navigasjon"
 #: src/libvlc.h:796
 #, fuzzy
 msgid "Select the key to move the selector right in DVD menus."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:797
 msgid "Activate"
@@ -2968,7 +2968,7 @@ msgstr ""
 #: src/libvlc.h:799 modules/gui/gtk/gnome_interface.c:909
 #, fuzzy
 msgid "Volume up"
-msgstr "Øk volum"
+msgstr "Ã˜k volum"
 
 #: src/libvlc.h:800
 msgid "Select the key to increase audio volume."
@@ -3002,7 +3002,7 @@ msgstr "_Teksting"
 #: src/libvlc.h:806
 #, fuzzy
 msgid "Select the key to increase the subtitle delay."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:807
 #, fuzzy
@@ -3012,7 +3012,7 @@ msgstr "Standard grensesnitt: "
 #: src/libvlc.h:808
 #, fuzzy
 msgid "Select the key to decrease the subtitle delay."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:809
 #, fuzzy
@@ -3022,7 +3022,7 @@ msgstr "_Teksting"
 #: src/libvlc.h:810
 #, fuzzy
 msgid "Select the key to increase the audio delay."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:811
 #, fuzzy
@@ -3032,7 +3032,7 @@ msgstr "Standard grensesnitt: "
 #: src/libvlc.h:812
 #, fuzzy
 msgid "Select the key to decrease the audio delay."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:813
 msgid "Play playlist bookmark 1"
@@ -3077,62 +3077,62 @@ msgstr ""
 #: src/libvlc.h:823
 #, fuzzy
 msgid "Select the key to play this bookmark."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:824
 #, fuzzy
 msgid "Set playlist bookmark 1"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:825
 #, fuzzy
 msgid "Set playlist bookmark 2"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:826
 #, fuzzy
 msgid "Set playlist bookmark 3"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:827
 #, fuzzy
 msgid "Set playlist bookmark 4"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:828
 #, fuzzy
 msgid "Set playlist bookmark 5"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:829
 #, fuzzy
 msgid "Set playlist bookmark 6"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:830
 #, fuzzy
 msgid "Set playlist bookmark 7"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:831
 #, fuzzy
 msgid "Set playlist bookmark 8"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:832
 #, fuzzy
 msgid "Set playlist bookmark 9"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:833
 #, fuzzy
 msgid "Set playlist bookmark 10"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:834
 #, fuzzy
 msgid "Select the key to set this playlist bookmark."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:836
 msgid "Go back in browsing history"
@@ -3194,7 +3194,7 @@ msgstr ""
 #: modules/access_filter/record.c:51
 #, fuzzy
 msgid "Record"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: src/libvlc.h:851
 msgid "Record access filter start/stop."
@@ -3320,7 +3320,7 @@ msgstr "Spill"
 #: src/libvlc.h:1204
 #, fuzzy
 msgid "Performance options"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: src/libvlc.h:1288
 #, fuzzy
@@ -3372,7 +3372,7 @@ msgstr ""
 #: src/libvlc.h:1582
 #, fuzzy
 msgid "resets the current plugins cache"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/libvlc.h:1584
 msgid "print version information"
@@ -3837,7 +3837,7 @@ msgstr "Varighet"
 #: src/misc/iso-639_def.h:159
 #, fuzzy
 msgid "Sinhalese"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: src/misc/iso-639_def.h:160
 #, fuzzy
@@ -3868,7 +3868,7 @@ msgstr ""
 #: src/misc/iso-639_def.h:166
 #, fuzzy
 msgid "Somali"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: src/misc/iso-639_def.h:167
 msgid "Sotho, Southern"
@@ -4233,7 +4233,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:134
 #, fuzzy
 msgid "Number of blocks per CD read"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/access/cdda/cdda.c:139
 msgid "Format to use in playlist \"title\" field when no CDDB"
@@ -4422,7 +4422,7 @@ msgstr "Standard grensesnitt: "
 #: modules/access/directory.c:88
 #, fuzzy
 msgid "Standard filesystem directory input"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/access/dshow/dshow.cpp:72 modules/access/dshow/dshow.cpp:74
 #: modules/gui/gtk/menu.c:700 modules/video_output/opengl.c:109
@@ -4433,7 +4433,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:77
 #, fuzzy
 msgid "Cable"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: modules/access/dshow/dshow.cpp:77
 msgid "Antenna"
@@ -4460,7 +4460,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:88 modules/access/v4l/v4l.c:81
 #, fuzzy
 msgid "Audio device name"
-msgstr "Navn på ALSA-enhet"
+msgstr "Navn pÃ¥ ALSA-enhet"
 
 #: modules/access/dshow/dshow.cpp:90
 msgid ""
@@ -4567,7 +4567,7 @@ msgstr "Standard grensesnitt: "
 #: modules/audio_output/alsa.c:110 modules/video_output/directx/directx.c:157
 #, fuzzy
 msgid "Refresh list"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/access/dshow/dshow.cpp:145 modules/access/dshow/dshow.cpp:150
 #: modules/gui/gtk/preferences.c:373
@@ -4855,7 +4855,7 @@ msgstr ""
 #: modules/access/file.c:88
 #, fuzzy
 msgid "Standard filesystem file input"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/access/file.c:89 modules/access_output/file.c:71
 #: modules/audio_output/file.c:111 modules/gui/beos/InterfaceWindow.cpp:244
@@ -4883,7 +4883,7 @@ msgstr ""
 #: modules/access/ftp.c:44
 #, fuzzy
 msgid "FTP user name"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/access/ftp.c:45 modules/access/smb.c:64
 #, fuzzy
@@ -4936,7 +4936,7 @@ msgstr ""
 #: modules/access/http.c:55
 #, fuzzy
 msgid "HTTP user name"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/access/http.c:56
 #, fuzzy
@@ -4953,7 +4953,7 @@ msgstr "Standard grensesnitt: "
 #: modules/access/http.c:63
 #, fuzzy
 msgid "HTTP user agent"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/access/http.c:64
 #, fuzzy
@@ -4974,7 +4974,7 @@ msgstr ""
 #: modules/access/http.c:71
 #, fuzzy
 msgid "Continuous stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/access/http.c:72
 msgid ""
@@ -5000,12 +5000,12 @@ msgstr ""
 #: modules/access/mms/mms.c:51
 #, fuzzy
 msgid "Force selection of all streams"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/access/mms/mms.c:53
 #, fuzzy
 msgid "Select maximum bitrate stream"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/access/mms/mms.c:55
 msgid "Always select the stream with the maximum bitrate."
@@ -5030,7 +5030,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1289
 #, fuzzy
 msgid "Device"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/access/pvr/pvr.c:52
 #, fuzzy
@@ -5057,7 +5057,7 @@ msgstr ""
 #: modules/access/pvr/pvr.c:62 modules/access/v4l/v4l.c:105
 #, fuzzy
 msgid "Height"
-msgstr "Høyre"
+msgstr "HÃ¸yre"
 
 #: modules/access/pvr/pvr.c:63 modules/access/v4l/v4l.c:106
 msgid "Height of the stream to capture (-1 for autodetect)"
@@ -5205,7 +5205,7 @@ msgstr ""
 #: modules/access/satellite/satellite.c:72
 #, fuzzy
 msgid "Satellite input"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/access/screen/screen.c:39
 msgid ""
@@ -5252,7 +5252,7 @@ msgstr ""
 #: modules/access/slp.c:65
 #, fuzzy
 msgid "SLP scopes list"
-msgstr "velg foretrukket rekkefølge på kodek"
+msgstr "velg foretrukket rekkefÃ¸lge pÃ¥ kodek"
 
 #: modules/access/slp.c:67
 msgid ""
@@ -5305,7 +5305,7 @@ msgstr ""
 #: modules/access/smb.c:63
 #, fuzzy
 msgid "SMB user name"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/access/smb.c:66
 #, fuzzy
@@ -5315,7 +5315,7 @@ msgstr "Standard grensesnitt: "
 #: modules/access/smb.c:69
 #, fuzzy
 msgid "SMB domain"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/access/smb.c:70
 #, fuzzy
@@ -5411,7 +5411,7 @@ msgstr ""
 #: modules/access/v4l/v4l.c:110
 #, fuzzy
 msgid "Set the Brightness of the video input"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/access/v4l/v4l.c:111 modules/gui/wxwindows/extrapanel.cpp:226
 #, fuzzy
@@ -5421,7 +5421,7 @@ msgstr "Pause"
 #: modules/access/v4l/v4l.c:113
 #, fuzzy
 msgid "Set the Hue of the video input"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/access/v4l/v4l.c:114
 #, fuzzy
@@ -5431,7 +5431,7 @@ msgstr "skrifttype"
 #: modules/access/v4l/v4l.c:116
 #, fuzzy
 msgid "Set the Color of the video input"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/access/v4l/v4l.c:117 modules/gui/wxwindows/extrapanel.cpp:231
 #, fuzzy
@@ -5441,7 +5441,7 @@ msgstr "skrifttype"
 #: modules/access/v4l/v4l.c:119
 #, fuzzy
 msgid "Set the Contrast of the video input"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/access/v4l/v4l.c:120
 msgid "Tuner"
@@ -5489,7 +5489,7 @@ msgstr "Om"
 #: modules/access/v4l/v4l.c:135
 #, fuzzy
 msgid "Set the quality of the stream"
-msgstr "Naviger gjennom strømmen"
+msgstr "Naviger gjennom strÃ¸mmen"
 
 #: modules/access/v4l/v4l.c:146
 #, fuzzy
@@ -5591,13 +5591,13 @@ msgstr ""
 #: modules/access/vcdx/info.c:96
 #, fuzzy
 msgid "Volume Set"
-msgstr "Øk volum"
+msgstr "Ã˜k volum"
 
 #: modules/access/vcdx/info.c:97 modules/gui/macosx/intf.m:436
 #: modules/gui/wxwindows/interface.cpp:1420
 #, fuzzy
 msgid "Volume"
-msgstr "Øk volum"
+msgstr "Ã˜k volum"
 
 #: modules/access/vcdx/info.c:98
 msgid "Publisher"
@@ -5606,7 +5606,7 @@ msgstr ""
 #: modules/access/vcdx/info.c:99
 #, fuzzy
 msgid "System Id"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/access/vcdx/info.c:101
 msgid "Entries"
@@ -5633,7 +5633,7 @@ msgstr "Disktype"
 #: modules/access/vcdx/info.c:137
 #, fuzzy
 msgid "end"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/access/vcdx/info.c:140
 #, fuzzy
@@ -5675,7 +5675,7 @@ msgstr ""
 #: modules/access/vcdx/vcd.c:111 modules/access/vcdx/vcd.c:112
 #, fuzzy
 msgid "Number of CD blocks to get in a single read."
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/access/vcdx/vcd.c:116
 #, fuzzy
@@ -5743,7 +5743,7 @@ msgstr ""
 #: modules/access_output/file.c:65
 #, fuzzy
 msgid "Append to file"
-msgstr "Åpne en fil"
+msgstr "Ã…pne en fil"
 
 #: modules/access_output/file.c:66
 msgid "Append to file if it exists instead of replacing it."
@@ -5902,10 +5902,10 @@ msgid ""
 "tiring when listening to music for long periods of time.\n"
 "It works with any source format from mono to 5.1."
 msgstr ""
-"Du får følelsen av å stå i et rom med et komplett 5.1 høytaleranlegg selv om "
-"du bare benytter en høretelefon når denne effekten er valgt, noe som gir en "
-"mer realistisk lydopplevelse. Når du hører på musikk over lengre tidsrom bør "
-"denne effekten gi en mer komfortabel og mindre trøttende opplevelse. "
+"Du fÃ¥r fÃ¸lelsen av Ã¥ stÃ¥ i et rom med et komplett 5.1 hÃ¸ytaleranlegg selv om "
+"du bare benytter en hÃ¸retelefon nÃ¥r denne effekten er valgt, noe som gir en "
+"mer realistisk lydopplevelse. NÃ¥r du hÃ¸rer pÃ¥ musikk over lengre tidsrom bÃ¸r "
+"denne effekten gi en mer komfortabel og mindre trÃ¸ttende opplevelse. "
 "Effekten virker uansett kildeformat, fra mono to 5.1."
 
 #: modules/audio_filter/channel_mixer/headphone.c:56
@@ -5917,18 +5917,18 @@ msgstr "karakteristiske forhold"
 #, fuzzy
 msgid "Distance between front left speaker and listener in meters."
 msgstr ""
-"Parametre for romklangeffekt i høretelefoner: avstanden mellom fremre "
-"venstre høytaler og lytter i meter."
+"Parametre for romklangeffekt i hÃ¸retelefoner: avstanden mellom fremre "
+"venstre hÃ¸ytaler og lytter i meter."
 
 #: modules/audio_filter/channel_mixer/headphone.c:61
 #, fuzzy
 msgid "Headphone channel mixer with virtual spatialization effect"
-msgstr "romklangeffekt i høretelefoner"
+msgstr "romklangeffekt i hÃ¸retelefoner"
 
 #: modules/audio_filter/channel_mixer/headphone.c:62
 #, fuzzy
 msgid "Headphone effect"
-msgstr "høretelefoner"
+msgstr "hÃ¸retelefoner"
 
 #: modules/audio_filter/channel_mixer/simple.c:46
 #, fuzzy
@@ -6119,7 +6119,7 @@ msgstr "_Fullskjerm"
 #: modules/audio_filter/equalizer_presets.h:40
 #, fuzzy
 msgid "Headphones"
-msgstr "høretelefoner"
+msgstr "hÃ¸retelefoner"
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Large Hall"
@@ -6179,7 +6179,7 @@ msgstr "Lydfilter for triviell miksing av lydkanaler"
 #: modules/audio_filter/normvol.c:69
 #, fuzzy
 msgid "Number of audio buffers"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/audio_filter/normvol.c:70
 msgid ""
@@ -6259,7 +6259,7 @@ msgstr "Lydeksport volum"
 #: modules/audio_output/alsa.c:108
 #, fuzzy
 msgid "ALSA Device Name"
-msgstr "Navn på ALSA-enhet"
+msgstr "Navn pÃ¥ ALSA-enhet"
 
 #: modules/audio_output/alsa.c:130 modules/audio_output/auhal.c:87
 #: modules/audio_output/auhal.c:454 modules/audio_output/coreaudio.c:217
@@ -6371,7 +6371,7 @@ msgstr "lag wavfil"
 #: modules/audio_output/file.c:89
 #, fuzzy
 msgid "Instead of writing a raw file, you can add a WAV header to the file"
-msgstr "Du kan lage en wavfil i stede for en rå lydfil"
+msgstr "Du kan lage en wavfil i stede for en rÃ¥ lydfil"
 
 #: modules/audio_output/file.c:106
 #, fuzzy
@@ -6600,7 +6600,7 @@ msgstr "Standard grensesnitt: "
 #: modules/codec/ffmpeg/ffmpeg.c:183
 #, fuzzy
 msgid "ffmpeg deinterlace video filter"
-msgstr "modul for å snu om videosignalet"
+msgstr "modul for Ã¥ snu om videosignalet"
 
 #: modules/codec/ffmpeg/ffmpeg.h:86
 #, fuzzy
@@ -7180,7 +7180,7 @@ msgstr "Du kan fastsette videoinnkoding her"
 #: modules/codec/x264.c:54
 #, fuzzy
 msgid "Enable CABAC"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: modules/codec/x264.c:55
 msgid ""
@@ -7223,7 +7223,7 @@ msgstr "Lyd"
 #: modules/codec/x264.c:70
 #, fuzzy
 msgid "Sets a maximum local bitrate in kbits/s."
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/codec/x264.c:72
 msgid "Averaging period for the maximum local bitrate"
@@ -7232,7 +7232,7 @@ msgstr ""
 #: modules/codec/x264.c:73
 #, fuzzy
 msgid "Sets an averaging period for the maximum local bitrate, in kbits/s."
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/codec/x264.c:76
 msgid "Initial buffer occupancy"
@@ -7245,7 +7245,7 @@ msgstr ""
 #: modules/codec/x264.c:80
 #, fuzzy
 msgid "Sets maximum interval between IDR-frames"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/codec/x264.c:81
 msgid ""
@@ -7256,7 +7256,7 @@ msgstr ""
 #: modules/codec/x264.c:84
 #, fuzzy
 msgid "Sets minimum interval between IDR-frames"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/codec/x264.c:85
 msgid ""
@@ -7277,7 +7277,7 @@ msgstr "Fort"
 #: modules/codec/x264.c:95
 #, fuzzy
 msgid "Number of consecutive B-Frames between I and P-frames."
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/codec/x264.c:98
 msgid "B pyramid"
@@ -7332,7 +7332,7 @@ msgstr "Alle"
 #: modules/codec/x264.c:124
 #, fuzzy
 msgid "normal"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/codec/x264.c:124
 #, fuzzy
@@ -7612,12 +7612,12 @@ msgstr ""
 #: modules/control/ntservice.c:45
 #, fuzzy
 msgid "Display name of the Service"
-msgstr "Dette valget lar deg skru på oversettelse av grensesnittet"
+msgstr "Dette valget lar deg skru pÃ¥ oversettelse av grensesnittet"
 
 #: modules/control/ntservice.c:47
 #, fuzzy
 msgid "This allows you to change the display name of the Service."
-msgstr "Dette valget lar deg skru på oversettelse av grensesnittet"
+msgstr "Dette valget lar deg skru pÃ¥ oversettelse av grensesnittet"
 
 #: modules/control/ntservice.c:48
 #, fuzzy
@@ -8065,7 +8065,7 @@ msgstr ""
 #: modules/demux/demuxdump.c:40
 #, fuzzy
 msgid "Append"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/demux/demuxdump.c:42
 msgid ""
@@ -8120,7 +8120,7 @@ msgstr ""
 #: modules/demux/m3u.c:68
 #, fuzzy
 msgid "Playlist metademux"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/demux/mjpeg.c:43 modules/demux/mpeg/h264.c:39
 msgid "Frames per Second"
@@ -8333,17 +8333,17 @@ msgstr "heltall"
 #: modules/demux/playlist/playlist.c:41
 #, fuzzy
 msgid "Old playlist open"
-msgstr "Gå tilbake til start ved slutten av Spillelisten"
+msgstr "GÃ¥ tilbake til start ved slutten av Spillelisten"
 
 #: modules/demux/playlist/playlist.c:47
 #, fuzzy
 msgid "Native playlist import"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/demux/playlist/playlist.c:54
 #, fuzzy
 msgid "M3U playlist import"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/demux/playlist/playlist.c:59
 #, fuzzy
@@ -8412,7 +8412,7 @@ msgstr ""
 #: modules/demux/ts.c:88
 #, fuzzy
 msgid "Fast udp streaming"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/demux/ts.c:90
 msgid "Sends TS to specific ip:port by udp (you must know what you are doing)"
@@ -8438,7 +8438,7 @@ msgstr ""
 #: modules/demux/ts.c:101
 #, fuzzy
 msgid "CAPMT System ID"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/demux/ts.c:102
 msgid "only forward descriptors from this SysID to the CAM"
@@ -8447,7 +8447,7 @@ msgstr ""
 #: modules/demux/ts.c:105
 #, fuzzy
 msgid "MPEG Transport Stream demuxer"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/demux/ty.c:70
 #, fuzzy
@@ -8549,7 +8549,7 @@ msgstr ""
 #: modules/demux/util/id3genres.h:56
 #, fuzzy
 msgid "Vocal"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/demux/util/id3genres.h:57
 msgid "Jazz+Funk"
@@ -8669,7 +8669,7 @@ msgstr "Avbryt"
 #: modules/demux/util/id3genres.h:83
 #, fuzzy
 msgid "Dream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/demux/util/id3genres.h:84
 #, fuzzy
@@ -8833,7 +8833,7 @@ msgstr "Avbryt"
 #: modules/gui/wxwindows/menus.cpp:311
 #, fuzzy
 msgid "Open"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/gui/beos/InterfaceWindow.cpp:208
 #: modules/gui/beos/InterfaceWindow.cpp:309 modules/gui/macosx/prefs.m:115
@@ -8857,13 +8857,13 @@ msgstr "Beskjeder"
 #: modules/gui/wxwindows/dialogs.cpp:389 modules/gui/wxwindows/open.cpp:1126
 #: modules/gui/wxwindows/wizard.cpp:1258
 msgid "Open File"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/gui/beos/InterfaceWindow.cpp:248
 #: modules/gui/beos/PlayListWindow.cpp:92 modules/gui/gtk/gtk_interface.c:630
 #, fuzzy
 msgid "Open Disc"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/beos/InterfaceWindow.cpp:249
 #, fuzzy
@@ -8904,7 +8904,7 @@ msgstr "Valgte"
 #: modules/gui/beos/InterfaceWindow.cpp:304 modules/gui/macosx/intf.m:522
 #, fuzzy
 msgid "Window"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/beos/InterfaceWindow.cpp:381
 #: modules/gui/gtk/gtk_interface.c:1661 modules/gui/gtk/gtk_interface.c:2405
@@ -8981,7 +8981,7 @@ msgstr "Ingen tjener !"
 #: modules/gui/beos/PlayListWindow.cpp:122
 #, fuzzy
 msgid "Randomize"
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/beos/PlayListWindow.cpp:127
 #: modules/gui/wxwindows/bookmarks.cpp:223
@@ -9093,14 +9093,14 @@ msgstr ""
 #: modules/gui/gtk/gnome.c:66 modules/gui/gtk/gtk.c:65
 #, fuzzy
 msgid "Interface default search path"
-msgstr "standard søkesti for grensesnittet"
+msgstr "standard sÃ¸kesti for grensesnittet"
 
 #: modules/gui/gtk/gnome.c:68 modules/gui/gtk/gtk.c:67
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
 msgstr ""
-"Standard sti som grensesnittet benytter for å finne filer velger du med "
+"Standard sti som grensesnittet benytter for Ã¥ finne filer velger du med "
 "dette alternativet."
 
 #: modules/gui/gtk/gnome.c:77
@@ -9111,47 +9111,47 @@ msgstr "Standard grensesnitt: "
 #: modules/gui/gtk/gnome_interface.c:19 modules/gui/gtk/gnome_interface.c:985
 #: modules/gui/gtk/gtk_interface.c:165 modules/gui/gtk/gtk_interface.c:1391
 msgid "_Open File..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/gtk/gnome_interface.c:20 modules/gui/gtk/gnome_interface.c:504
 #: modules/gui/gtk/gnome_interface.c:986 modules/gui/gtk/gtk_interface.c:173
 #: modules/gui/gtk/gtk_interface.c:619 modules/gui/gtk/gtk_interface.c:1399
 #, fuzzy
 msgid "Open a file"
-msgstr "Åpne en fil"
+msgstr "Ã…pne en fil"
 
 #: modules/gui/gtk/gnome_interface.c:26 modules/gui/gtk/gnome_interface.c:992
 #: modules/gui/gtk/gtk_interface.c:180 modules/gui/gtk/gtk_interface.c:1403
 msgid "Open _Disc..."
-msgstr "Åpne en _disk"
+msgstr "Ã…pne en _disk"
 
 #: modules/gui/gtk/gnome_interface.c:27 modules/gui/gtk/gnome_interface.c:993
 #: modules/gui/gtk/gtk_interface.c:188 modules/gui/gtk/gtk_interface.c:1411
 #, fuzzy
 msgid "Open Disc Media"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/gtk/gnome_interface.c:33
 #, fuzzy
 msgid "_Network stream..."
-msgstr "_Nettverksstrøm"
+msgstr "_NettverksstrÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:34 modules/gui/gtk/gnome_interface.c:528
 #: modules/gui/gtk/gnome_interface.c:1000 modules/gui/gtk/gtk_interface.c:203
 #: modules/gui/gtk/gtk_interface.c:641 modules/gui/gtk/gtk_interface.c:1423
 msgid "Select a network stream"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:41 modules/gui/gtk/gtk_interface.c:218
 #, fuzzy
 msgid "_Eject Disc"
-msgstr "Løs ut disk"
+msgstr "LÃ¸s ut disk"
 
 #: modules/gui/gtk/gnome_interface.c:42 modules/gui/gtk/gnome_interface.c:579
 #: modules/gui/gtk/gtk_interface.c:226
 #, fuzzy
 msgid "Eject disc"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/gtk/gnome_interface.c:56 modules/gui/gtk/gtk_interface.c:286
 msgid "_Hide interface"
@@ -9189,7 +9189,7 @@ msgstr "_Spilleliste"
 
 #: modules/gui/gtk/gnome_interface.c:87 modules/gui/gtk/gtk_interface.c:360
 msgid "Open the playlist window"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/gtk/gnome_interface.c:93 modules/gui/gtk/gtk_interface.c:364
 msgid "_Modules..."
@@ -9197,7 +9197,7 @@ msgstr "_Moduler..."
 
 #: modules/gui/gtk/gnome_interface.c:94 modules/gui/gtk/gtk_interface.c:373
 msgid "Open the module manager"
-msgstr "Åpne plugin håndterer"
+msgstr "Ã…pne plugin hÃ¥ndterer"
 
 #: modules/gui/gtk/gnome_interface.c:100 modules/gui/gtk/gtk_interface.c:375
 #: modules/gui/kde/interface.cpp:133
@@ -9206,7 +9206,7 @@ msgstr "Beskjeder..."
 
 #: modules/gui/gtk/gnome_interface.c:101 modules/gui/gtk/gtk_interface.c:381
 msgid "Open the messages window"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/gtk/gnome_interface.c:118 modules/gui/gtk/gnome_interface.c:901
 #: modules/gui/gtk/gtk_interface.c:433 modules/gui/gtk/gtk_interface.c:1235
@@ -9222,7 +9222,7 @@ msgstr "Velg lydkanal"
 #: modules/gui/gtk/gnome_interface.c:126 modules/gui/gtk/gtk_interface.c:452
 #: modules/gui/gtk/gtk_interface.c:1253 modules/gui/macosx/intf.m:491
 msgid "Volume Up"
-msgstr "Øk volum"
+msgstr "Ã˜k volum"
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gtk_interface.c:459
 #: modules/gui/gtk/gtk_interface.c:1260 modules/gui/macosx/intf.m:492
@@ -9263,7 +9263,7 @@ msgstr "Velg teksting kanal"
 #: modules/gui/gtk/gnome_interface.c:516
 #, fuzzy
 msgid "Open disc"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/gtk/gnome_interface.c:527 modules/gui/gtk/gtk_interface.c:640
 msgid "Net"
@@ -9277,7 +9277,7 @@ msgstr "tegn"
 #: modules/gui/gtk/gnome_interface.c:540
 #, fuzzy
 msgid "Open a satellite card"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/gtk/gnome_interface.c:553
 #: modules/gui/gtk/gnome_interface.c:1034 modules/gui/gtk/gtk_interface.c:664
@@ -9288,17 +9288,17 @@ msgstr "Tilbake"
 #: modules/gui/gtk/gnome_interface.c:554
 #, fuzzy
 msgid "Go backward"
-msgstr "Gå tilbake"
+msgstr "GÃ¥ tilbake"
 
 #: modules/gui/gtk/gnome_interface.c:567
 #, fuzzy
 msgid "Stop stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:578 modules/gui/gtk/gtk_interface.c:687
 #, fuzzy
 msgid "Eject"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/gtk/gnome_interface.c:590
 #: modules/gui/gtk/gnome_interface.c:1013 modules/gui/gtk/gtk_interface.c:698
@@ -9317,7 +9317,7 @@ msgstr "Spill"
 #: modules/gui/gtk/gnome_interface.c:591
 #, fuzzy
 msgid "Play stream"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:602
 #: modules/gui/gtk/gnome_interface.c:1020 modules/gui/gtk/gtk_interface.c:709
@@ -9335,7 +9335,7 @@ msgstr "Pause"
 #: modules/gui/gtk/gnome_interface.c:603
 #, fuzzy
 msgid "Pause stream"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:617
 #: modules/gui/gtk/gnome_interface.c:1041 modules/gui/gtk/gtk_interface.c:723
@@ -9366,7 +9366,7 @@ msgstr "Spill fortere"
 #: modules/gui/wxwindows/playlist.cpp:936
 #, fuzzy
 msgid "Open playlist"
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/gtk/gnome_interface.c:655
 #: modules/gui/gtk/gnome_interface.c:1063 modules/gui/gtk/gtk_interface.c:758
@@ -9418,7 +9418,7 @@ msgstr "Fullskjerm"
 #: modules/gui/gtk/gnome_interface.c:999 modules/gui/gtk/gtk_interface.c:195
 #: modules/gui/gtk/gtk_interface.c:1415
 msgid "_Network Stream..."
-msgstr "_Nettverksstrøm"
+msgstr "_NettverksstrÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:1070 modules/gui/gtk/gtk_interface.c:1182
 msgid "_Jump..."
@@ -9426,7 +9426,7 @@ msgstr "_Hopp..."
 
 #: modules/gui/gtk/gnome_interface.c:1071
 msgid "Got directly so specified point"
-msgstr "Fikk direkte så spesifisert punkt"
+msgstr "Fikk direkte sÃ¥ spesifisert punkt"
 
 #: modules/gui/gtk/gnome_interface.c:1079
 #, fuzzy
@@ -9468,12 +9468,12 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1460
 #, fuzzy
 msgid "Open Stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:1499 modules/gui/gtk/gtk_interface.c:1814
 #, fuzzy
 msgid "Open Target:"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:1519 modules/gui/gtk/gtk_interface.c:1834
 #: modules/gui/wince/open.cpp:146 modules/gui/wxwindows/open.cpp:408
@@ -9510,7 +9510,7 @@ msgstr "DVD"
 #: modules/gui/gtk/gnome_interface.c:1630 modules/gui/gtk/gtk_interface.c:1945
 #: modules/gui/macosx/open.m:167 modules/gui/wxwindows/open.cpp:656
 msgid "Device name"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/gtk/gnome_interface.c:1669 modules/gui/gtk/gtk_interface.c:2005
 #: modules/gui/macosx/open.m:171
@@ -9567,7 +9567,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1965 modules/gui/gtk/gtk_interface.c:2280
 #, fuzzy
 msgid "Satellite"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/gtk/gnome_interface.c:2014 modules/gui/gtk/gtk_interface.c:2331
 #: modules/gui/macosx/open.m:244
@@ -9602,7 +9602,7 @@ msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
 msgstr ""
-"Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en "
+"Beklager, modul hÃ¥ndtereren virker ikke ennÃ¥. Vennligst prÃ¸v pÃ¥ nytt i en "
 "senere versjon."
 
 #: modules/gui/gtk/gnome_interface.c:2312 modules/gui/gtk/gtk_interface.c:2780
@@ -9655,7 +9655,7 @@ msgstr "Standard output:"
 #: modules/gui/gtk/gnome_interface.c:2823 modules/gui/gtk/gtk_interface.c:3078
 #, fuzzy
 msgid "Destination Target: "
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/gtk/gnome_interface.c:2879 modules/stream_out/rtp.c:87
 msgid "RTP"
@@ -9716,7 +9716,7 @@ msgstr "Utforsk"
 #: modules/gui/gtk/gtk_interface.c:246
 #, fuzzy
 msgid "Close the window"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/gtk/gtk_interface.c:253 modules/gui/gtk/gtk_interface.c:1483
 msgid "E_xit"
@@ -9736,7 +9736,7 @@ msgstr "Skjul grensesnittvinduet"
 
 #: modules/gui/gtk/gtk_interface.c:328
 msgid "Navigate through the stream"
-msgstr "Naviger gjennom strømmen"
+msgstr "Naviger gjennom strÃ¸mmen"
 
 #: modules/gui/gtk/gtk_interface.c:385
 msgid "_Settings"
@@ -9765,23 +9765,23 @@ msgstr "Om dette programmet"
 #: modules/gui/gtk/gtk_interface.c:652
 #, fuzzy
 msgid "Open a Satellite Card"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/gtk/gtk_interface.c:665
 msgid "Go Backward"
-msgstr "Gå tilbake"
+msgstr "GÃ¥ tilbake"
 
 #: modules/gui/gtk/gtk_interface.c:677
 msgid "Stop Stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/gtk/gtk_interface.c:699
 msgid "Play Stream"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/gui/gtk/gtk_interface.c:710
 msgid "Pause Stream"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/gtk/gtk_interface.c:724
 msgid "Play Slower"
@@ -9793,7 +9793,7 @@ msgstr "Spill fortere"
 
 #: modules/gui/gtk/gtk_interface.c:748
 msgid "Open Playlist"
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/gtk/gtk_interface.c:759
 #, fuzzy
@@ -9819,7 +9819,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1778
 #, fuzzy
 msgid "Open Target"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/gtk/gtk_interface.c:2051
 msgid "HTTP/FTP/MMS"
@@ -9864,7 +9864,7 @@ msgstr "Hopp"
 #: modules/gui/gtk/gtk_interface.c:2584
 #, fuzzy
 msgid "Go To:"
-msgstr "Gå til:"
+msgstr "GÃ¥ til:"
 
 #: modules/gui/gtk/gtk_interface.c:2600
 msgid "s."
@@ -9946,7 +9946,7 @@ msgstr "Kapittel"
 #: modules/gui/kde/disc.cpp:47
 #, fuzzy
 msgid "Device name "
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/kde/interface.cpp:88
 #, fuzzy
@@ -9961,17 +9961,17 @@ msgstr "_Vinkel"
 #: modules/gui/kde/interface.cpp:110
 #, fuzzy
 msgid "Open &Disk"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/kde/interface.cpp:113
 #, fuzzy
 msgid "Open &Stream"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/kde/interface.cpp:116
 #, fuzzy
 msgid "&Backward"
-msgstr "Gå tilbake"
+msgstr "GÃ¥ tilbake"
 
 #: modules/gui/kde/interface.cpp:119
 #, fuzzy
@@ -10010,7 +10010,7 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:149
 #, fuzzy
 msgid "Opens a recently used file"
-msgstr "Åpne en fil"
+msgstr "Ã…pne en fil"
 
 #: modules/gui/kde/interface.cpp:150
 #, fuzzy
@@ -10029,17 +10029,17 @@ msgstr ""
 #: modules/gui/kde/interface.cpp:154
 #, fuzzy
 msgid "Opens a disk"
-msgstr "Åpne en fil"
+msgstr "Ã…pne en fil"
 
 #: modules/gui/kde/interface.cpp:155
 #, fuzzy
 msgid "Opens a network stream"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/gui/kde/interface.cpp:156
 #, fuzzy
 msgid "Backward"
-msgstr "Gå tilbake"
+msgstr "GÃ¥ tilbake"
 
 #: modules/gui/kde/interface.cpp:157
 #, fuzzy
@@ -10066,12 +10066,12 @@ msgstr "Beskjeder"
 #: modules/gui/kde/interface.cpp:200 modules/gui/kde/interface.cpp:222
 #, fuzzy
 msgid "Opening file..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/kde/interface.cpp:202 modules/gui/macosx/intf.m:456
 #, fuzzy
 msgid "Open File..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/kde/interface.cpp:228
 #, fuzzy
@@ -10188,12 +10188,12 @@ msgstr "Fullskjerm"
 #: modules/gui/macosx/controls.m:602 modules/gui/macosx/intf.m:480
 #, fuzzy
 msgid "Step Forward"
-msgstr "Gå tilbake"
+msgstr "GÃ¥ tilbake"
 
 #: modules/gui/macosx/controls.m:603 modules/gui/macosx/intf.m:481
 #, fuzzy
 msgid "Step Backward"
-msgstr "Gå tilbake"
+msgstr "GÃ¥ tilbake"
 
 #: modules/gui/macosx/equalizer.m:141 modules/gui/wxwindows/extrapanel.cpp:473
 msgid "2 Pass"
@@ -10214,7 +10214,7 @@ msgstr ""
 #: modules/gui/macosx/equalizer.m:147
 #, fuzzy
 msgid "Preamp"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/macosx/intf.m:425
 #, fuzzy
@@ -10225,7 +10225,7 @@ msgstr "skrifttype"
 #: modules/gui/pda/pda_interface.c:239
 #, fuzzy
 msgid "Rewind"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/macosx/intf.m:433
 msgid "Fast Forward"
@@ -10243,7 +10243,7 @@ msgstr "_Preferanser..."
 #: modules/gui/macosx/intf.m:449
 #, fuzzy
 msgid "Services"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/macosx/intf.m:450
 #, fuzzy
@@ -10272,27 +10272,27 @@ msgstr "Fil"
 #: modules/gui/macosx/intf.m:457
 #, fuzzy
 msgid "Quick Open File..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/macosx/intf.m:458
 #, fuzzy
 msgid "Open Disc..."
-msgstr "Åpne en _disk"
+msgstr "Ã…pne en _disk"
 
 #: modules/gui/macosx/intf.m:459
 #, fuzzy
 msgid "Open Network..."
-msgstr "Åpne nettverk"
+msgstr "Ã…pne nettverk"
 
 #: modules/gui/macosx/intf.m:460
 #, fuzzy
 msgid "Open Recent"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/macosx/intf.m:461 modules/gui/macosx/intf.m:1643
 #, fuzzy
 msgid "Clear Menu"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/macosx/intf.m:464
 msgid "Cut"
@@ -10332,7 +10332,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:524
 #, fuzzy
 msgid "Close Window"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/macosx/intf.m:525
 #, fuzzy
@@ -10345,7 +10345,7 @@ msgstr "skrifttype"
 #: modules/gui/wxwindows/playlist.cpp:280
 #, fuzzy
 msgid "Info"
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/macosx/intf.m:531
 msgid "Bring All to Front"
@@ -10395,7 +10395,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:551
 #, fuzzy
 msgid "Open Messages Window"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/macosx/intf.m:552
 msgid "Dismiss"
@@ -10475,7 +10475,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:154
 #, fuzzy
 msgid "Open Source"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/macosx/open.m:155 modules/gui/wince/open.cpp:130
 #: modules/gui/wxwindows/open.cpp:390
@@ -10567,7 +10567,7 @@ msgstr ""
 #: modules/gui/macosx/output.m:159
 #, fuzzy
 msgid "Transcode options"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
 #: modules/gui/wxwindows/streamout.cpp:748
@@ -10580,7 +10580,7 @@ msgstr "Lyd"
 #: modules/gui/macosx/output.m:166 modules/gui/wxwindows/streamout.cpp:754
 #, fuzzy
 msgid "Scale"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 # , fuzzy
 #: modules/gui/macosx/output.m:180
@@ -10653,7 +10653,7 @@ msgstr "Ingen tjener !"
 #: modules/gui/macosx/playlist.m:240 modules/gui/macosx/playlist.m:1120
 #, fuzzy
 msgid "no items in playlist"
-msgstr "Legg til i kø som standard"
+msgstr "Legg til i kÃ¸ som standard"
 
 #: modules/gui/macosx/playlist.m:244 modules/gui/wxwindows/playlist.cpp:317
 #, fuzzy
@@ -10672,18 +10672,18 @@ msgstr "_Teksting"
 #: modules/gui/macosx/playlist.m:403
 #, fuzzy
 msgid "Save Playlist"
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/macosx/playlist.m:1113 modules/gui/wxwindows/playlist.cpp:587
 #: modules/gui/wxwindows/playlist.cpp:799
 #, fuzzy, c-format
 msgid "%i items in playlist"
-msgstr "Legg til i kø som standard"
+msgstr "Legg til i kÃ¸ som standard"
 
 #: modules/gui/macosx/playlist.m:1125
 #, fuzzy
 msgid "1 item in playlist"
-msgstr "Legg til i kø som standard"
+msgstr "Legg til i kÃ¸ som standard"
 
 #: modules/gui/macosx/playlistinfo.m:54 modules/gui/wxwindows/iteminfo.cpp:137
 #: modules/gui/wxwindows/wizard.cpp:576
@@ -10746,7 +10746,7 @@ msgstr "Standard grensesnitt: "
 #: modules/gui/pda/pda.c:58
 #, fuzzy
 msgid "Autoplay selected file"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/gui/pda/pda.c:59
 msgid "Automatically play a file when selected in the file selection list"
@@ -10878,7 +10878,7 @@ msgstr "Avbryt"
 #: modules/gui/pda/pda_interface.c:1167 modules/gui/pda/pda_interface.c:1174
 #, fuzzy
 msgid "enable"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: modules/gui/pda/pda_interface.c:575
 #, fuzzy
@@ -11244,7 +11244,7 @@ msgstr "Standard grensesnitt: "
 #: modules/gui/skins2/src/dialogs.cpp:225
 #, fuzzy
 msgid "Open a skin file"
-msgstr "Åpne en fil"
+msgstr "Ã…pne en fil"
 
 #: modules/gui/skins2/src/dialogs.cpp:226
 msgid "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
@@ -11258,7 +11258,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:920
 #, fuzzy
 msgid "Save playlist"
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/skins2/src/dialogs.cpp:241
 #, fuzzy
@@ -11272,7 +11272,7 @@ msgstr ""
 #: modules/gui/skins2/src/skin_main.cpp:334
 #, fuzzy
 msgid "Select the path to the last skin used."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/skins2/src/skin_main.cpp:335
 msgid "Config of last used skin"
@@ -11313,7 +11313,7 @@ msgstr "Valg"
 #: modules/gui/skins2/src/theme_repository.cpp:83
 #, fuzzy
 msgid "Open skin..."
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/gui/wince/interface.cpp:496
 #, fuzzy
@@ -11328,7 +11328,7 @@ msgstr "Standard grensesnitt: "
 msgid ""
 "(c) 1996-2005 - the VideoLAN Team\n"
 "\n"
-msgstr "© 1996-2003 the VideoLAN team"
+msgstr "Â© 1996-2003 the VideoLAN team"
 
 #: modules/gui/wince/interface.cpp:498 modules/gui/wxwindows/interface.cpp:860
 msgid ""
@@ -11340,7 +11340,7 @@ msgstr ""
 #: modules/gui/wince/open.cpp:134 modules/gui/wxwindows/open.cpp:394
 #, fuzzy
 msgid "Open:"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/gui/wince/preferences_widgets.cpp:523
 #: modules/gui/wxwindows/preferences_widgets.cpp:685
@@ -11538,12 +11538,12 @@ msgstr "lydenhet"
 #: modules/gui/wxwindows/extrapanel.cpp:319
 #, fuzzy
 msgid "More info"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/wxwindows/extrapanel.cpp:398
 #, fuzzy
 msgid "Headphone virtualization"
-msgstr "romklangeffekt i høretelefoner"
+msgstr "romklangeffekt i hÃ¸retelefoner"
 
 #: modules/gui/wxwindows/extrapanel.cpp:399
 msgid ""
@@ -11599,32 +11599,32 @@ msgstr ""
 #: modules/gui/wxwindows/interface.cpp:399
 #, fuzzy
 msgid "Quick &Open File...\tCtrl-O"
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/wxwindows/interface.cpp:402
 #, fuzzy
 msgid "Open &File...\tCtrl-F"
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/wxwindows/interface.cpp:403
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/wxwindows/interface.cpp:404
 #, fuzzy
 msgid "Open &Disc...\tCtrl-D"
-msgstr "Åpne en _disk"
+msgstr "Ã…pne en _disk"
 
 #: modules/gui/wxwindows/interface.cpp:406
 #, fuzzy
 msgid "Open &Network Stream...\tCtrl-N"
-msgstr "_Nettverksstrøm"
+msgstr "_NettverksstrÃ¸m"
 
 #: modules/gui/wxwindows/interface.cpp:408
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
-msgstr "Åpne en _disk"
+msgstr "Ã…pne en _disk"
 
 #: modules/gui/wxwindows/interface.cpp:411
 #, fuzzy
@@ -11692,7 +11692,7 @@ msgstr "Forrige fil"
 #: modules/gui/wxwindows/interface.cpp:485
 #, fuzzy
 msgid "Next playlist item"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/wxwindows/interface.cpp:794
 msgid "Extended &GUI\tCtrl-G"
@@ -11737,37 +11737,37 @@ msgstr "Spilleliste"
 #: modules/gui/wxwindows/iteminfo.cpp:129
 #, fuzzy
 msgid "Item Info"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/wxwindows/menus.cpp:129
 #, fuzzy
 msgid "Quick &Open File..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/wxwindows/menus.cpp:130
 #, fuzzy
 msgid "Open &File..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/wxwindows/menus.cpp:131
 #, fuzzy
 msgid "Open &Disc..."
-msgstr "Åpne en _disk"
+msgstr "Ã…pne en _disk"
 
 #: modules/gui/wxwindows/menus.cpp:132
 #, fuzzy
 msgid "Open &Network Stream..."
-msgstr "_Nettverksstrøm"
+msgstr "_NettverksstrÃ¸m"
 
 #: modules/gui/wxwindows/menus.cpp:133
 #, fuzzy
 msgid "Open &Capture Device..."
-msgstr "Åpne en _disk"
+msgstr "Ã…pne en _disk"
 
 #: modules/gui/wxwindows/menus.cpp:140
 #, fuzzy
 msgid "Media &Info..."
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/wxwindows/menus.cpp:141
 #, fuzzy
@@ -11812,7 +11812,7 @@ msgstr "_Innstillinger"
 #: modules/gui/wxwindows/open.cpp:358 modules/gui/wxwindows/open.cpp:366
 #, fuzzy
 msgid "Open..."
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/gui/wxwindows/open.cpp:397
 msgid ""
@@ -11869,7 +11869,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:231
 #, fuzzy
 msgid "&Simple Add File..."
-msgstr "_Åpne fil..."
+msgstr "_Ã…pne fil..."
 
 #: modules/gui/wxwindows/playlist.cpp:232
 #, fuzzy
@@ -11883,7 +11883,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:238
 #, fuzzy
 msgid "&Open Playlist..."
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/wxwindows/playlist.cpp:239
 #, fuzzy
@@ -11908,7 +11908,7 @@ msgstr "Ingen tjener !"
 #: modules/gui/wxwindows/playlist.cpp:248
 #, fuzzy
 msgid "&Shuffle Playlist"
-msgstr "Åpne Spilleliste"
+msgstr "Ã…pne Spilleliste"
 
 #: modules/gui/wxwindows/playlist.cpp:252
 #, fuzzy
@@ -11958,7 +11958,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:792
 #, fuzzy, c-format
 msgid "%i items in playlist (%i not shown)"
-msgstr "Legg til i kø som standard"
+msgstr "Legg til i kÃ¸ som standard"
 
 #: modules/gui/wxwindows/playlist.cpp:902
 #, fuzzy
@@ -12045,7 +12045,7 @@ msgstr ""
 #: modules/gui/wxwindows/streamdata.h:72
 #, fuzzy
 msgid "H264 is a new video codec"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/wxwindows/streamdata.h:74
 msgid "I263 is an Intel conferencing codec"
@@ -12155,12 +12155,12 @@ msgstr ""
 #: modules/gui/wxwindows/streamdata.h:160
 #, fuzzy
 msgid "MPEG Program Stream"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/gui/wxwindows/streamdata.h:161
 #, fuzzy
 msgid "MPEG Transport Stream"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/gui/wxwindows/streamdata.h:162
 msgid "MPEG 1 Format"
@@ -12186,7 +12186,7 @@ msgstr "Standard output:"
 #: modules/gui/wxwindows/streamout.cpp:178
 #, fuzzy
 msgid "Destination Target:"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/wxwindows/streamout.cpp:181
 msgid ""
@@ -12222,7 +12222,7 @@ msgstr "Kanaltjener:"
 #: modules/gui/wxwindows/streamout.cpp:611
 #, fuzzy
 msgid "Select all elementary streams"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/gui/wxwindows/streamout.cpp:682
 #, fuzzy
@@ -12284,7 +12284,7 @@ msgstr "Velg teksting kanal"
 #: modules/gui/wxwindows/subtitles.cpp:294
 #, fuzzy
 msgid "Open file"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/gui/wxwindows/timer.cpp:156 modules/gui/wxwindows/timer.cpp:337
 #, fuzzy
@@ -12328,7 +12328,7 @@ msgstr "Du kan fastsette videoinnkoding her"
 #: modules/gui/wxwindows/wizard.cpp:93
 #, fuzzy
 msgid "Stream to network"
-msgstr "Åpne nettverk"
+msgstr "Ã…pne nettverk"
 
 #: modules/gui/wxwindows/wizard.cpp:94 modules/gui/wxwindows/wizard.cpp:99
 msgid "Use this to stream on a network"
@@ -12366,22 +12366,22 @@ msgstr "Velg tittel"
 #: modules/gui/wxwindows/wizard.cpp:107
 #, fuzzy
 msgid "Choose here your input stream"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:109
 #, fuzzy
 msgid "Select a stream"
-msgstr "Velg en nettverksstrøm"
+msgstr "Velg en nettverksstrÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:110
 #, fuzzy
 msgid "Existing playlist item"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/gui/wxwindows/wizard.cpp:112
 #, fuzzy
 msgid "You must choose a stream"
-msgstr "velg en utstrøm"
+msgstr "velg en utstrÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:113
 msgid "Uh Oh! Unable to find playlist !"
@@ -12426,7 +12426,7 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:138
 #, fuzzy
 msgid "Streaming"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:139
 msgid "In this page, you will select how your input stream will be sent."
@@ -12454,7 +12454,7 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:154
 #, fuzzy
 msgid "Additional transcode options"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:155
 msgid ""
@@ -12465,12 +12465,12 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:158
 #, fuzzy
 msgid "You must choose a file to save to"
-msgstr "velg en utstrøm"
+msgstr "velg en utstrÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:161
 #, fuzzy
 msgid "Additional streaming options"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:162
 msgid ""
@@ -12498,7 +12498,7 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:475 modules/gui/wxwindows/wizard.cpp:482
 #, fuzzy
 msgid "More Info"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/gui/wxwindows/wizard.cpp:557
 #, fuzzy
@@ -12520,22 +12520,22 @@ msgstr ""
 #: modules/gui/wxwindows/wizard.cpp:799
 #, fuzzy
 msgid "Transcode video"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:838
 #, fuzzy
 msgid "Transcode audio"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:1008
 #, fuzzy
 msgid "Streaming method"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:1022 modules/stream_out/rtp.c:41
 #, fuzzy
 msgid "Destination"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/gui/wxwindows/wizard.cpp:1239
 #, fuzzy
@@ -12612,7 +12612,7 @@ msgid ""
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
 "Krev at XVideo-gjengiveren skal bruke et bestemt chroma format, i stedet for "
-"å forsøke å forbedre yttelsen ved å benytte det mest effektive."
+"Ã¥ forsÃ¸ke Ã¥ forbedre yttelsen ved Ã¥ benytte det mest effektive."
 
 #: modules/misc/dummy/dummy.c:43
 msgid "Save raw codec data"
@@ -12625,7 +12625,7 @@ msgid ""
 "forced the dummy decoder in the main options."
 msgstr ""
 "Du kan forsinke lydeksporten med dette alternativet. Hvis du oppdager "
-"tidsforsinkelse mellom lyd og bilde kan dette være svært kjekt."
+"tidsforsinkelse mellom lyd og bilde kan dette vÃ¦re svÃ¦rt kjekt."
 
 #: modules/misc/dummy/dummy.c:51
 msgid ""
@@ -12745,12 +12745,12 @@ msgstr ""
 #: modules/misc/freetype.c:100 modules/misc/win32text.c:71
 #, fuzzy
 msgid "Smaller"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/misc/freetype.c:100 modules/misc/win32text.c:71
 #, fuzzy
 msgid "Small"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/misc/freetype.c:101 modules/misc/win32text.c:72
 msgid "Large"
@@ -12791,7 +12791,7 @@ msgstr ""
 #: modules/video_filter/marq.c:53 modules/video_filter/time.c:53
 #, fuzzy
 msgid "Red"
-msgstr "Åpne fil"
+msgstr "Ã…pne fil"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:54 modules/video_filter/time.c:54
@@ -13000,12 +13000,12 @@ msgstr ""
 #: modules/misc/playlist/export.c:44
 #, fuzzy
 msgid "M3U playlist exporter"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/misc/playlist/export.c:50
 #, fuzzy
 msgid "Old playlist exporter"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/misc/qte_main.cpp:66
 msgid "Run as standalone Qt/Embedded GUI Server"
@@ -13391,7 +13391,7 @@ msgstr "Valg"
 #: modules/services_discovery/hal.c:127
 #, fuzzy
 msgid "Devices"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/services_discovery/sap.c:76
 #, fuzzy
@@ -13483,7 +13483,7 @@ msgstr ""
 #: modules/services_discovery/sap.c:816 modules/services_discovery/sap.c:821
 #, fuzzy
 msgid "Session"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/services_discovery/sap.c:817
 msgid "Tool"
@@ -13575,12 +13575,12 @@ msgstr "Spill"
 #: modules/stream_out/display.c:51
 #, fuzzy
 msgid "Display stream output"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/stream_out/duplicate.c:40
 #, fuzzy
 msgid "Duplicate stream output"
-msgstr "Spill strøm"
+msgstr "Spill strÃ¸m"
 
 #: modules/stream_out/es.c:37 modules/stream_out/standard.c:43
 #, fuzzy
@@ -13732,7 +13732,7 @@ msgstr ""
 #: modules/stream_out/rtp.c:54 modules/stream_out/standard.c:55
 #, fuzzy
 msgid "Session name"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/stream_out/rtp.c:56
 #, fuzzy
@@ -13752,7 +13752,7 @@ msgstr "Du kan fastsette videoinnkoding her"
 #: modules/stream_out/rtp.c:60
 #, fuzzy
 msgid "Session URL"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/stream_out/rtp.c:62
 #, fuzzy
@@ -13762,7 +13762,7 @@ msgstr "Du kan fastsette videoinnkoding her"
 #: modules/stream_out/rtp.c:63
 #, fuzzy
 msgid "Session email"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/stream_out/rtp.c:65
 #, fuzzy
@@ -13819,7 +13819,7 @@ msgstr ""
 #: modules/stream_out/standard.c:59
 #, fuzzy
 msgid "Session groupname"
-msgstr "Navn på enhet"
+msgstr "Navn pÃ¥ enhet"
 
 #: modules/stream_out/standard.c:61
 #, fuzzy
@@ -13863,7 +13863,7 @@ msgstr ""
 #: modules/stream_out/standard.c:79
 #, fuzzy
 msgid "Standard stream output"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/stream_out/switcher.c:81
 #, fuzzy
@@ -13917,7 +13917,7 @@ msgstr ""
 #: modules/stream_out/switcher.c:98
 #, fuzzy
 msgid "Number of P frames between two I frames."
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/stream_out/switcher.c:99
 #, fuzzy
@@ -13948,7 +13948,7 @@ msgstr "Du kan fastsette lydinnkoding her"
 #: modules/stream_out/transcode.c:47
 #, fuzzy
 msgid "Destination video codec"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/stream_out/transcode.c:49
 #, fuzzy
@@ -14040,7 +14040,7 @@ msgstr "Du kan fastsette videoinnkoding her"
 #: modules/stream_out/transcode.c:84
 #, fuzzy
 msgid "Video crop right"
-msgstr "videohøyde"
+msgstr "videohÃ¸yde"
 
 #: modules/stream_out/transcode.c:86
 #, fuzzy
@@ -14061,7 +14061,7 @@ msgstr "Du kan fastsette lydinnkoding her"
 #: modules/stream_out/transcode.c:92
 #, fuzzy
 msgid "Destination audio codec"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/stream_out/transcode.c:94
 #, fuzzy
@@ -14118,7 +14118,7 @@ msgstr "Du kan fastsette lydinnkoding her"
 #: modules/stream_out/transcode.c:113
 #, fuzzy
 msgid "Destination subtitles codec"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/stream_out/transcode.c:115
 #, fuzzy
@@ -14142,7 +14142,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:123
 #, fuzzy
 msgid "Number of threads"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/stream_out/transcode.c:125
 #, fuzzy
@@ -14169,7 +14169,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:143
 #, fuzzy
 msgid "Transcode stream output"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/stream_out/transcode.c:195
 #, fuzzy
@@ -14269,7 +14269,7 @@ msgstr "Standard grensesnitt: "
 #: modules/video_filter/clone.c:55
 #, fuzzy
 msgid "Number of clones"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/video_filter/clone.c:56
 msgid "Select the number of video windows in which to clone the video."
@@ -14330,7 +14330,7 @@ msgstr ""
 #: modules/video_filter/deinterlace.c:112
 #, fuzzy
 msgid "Deinterlacing video filter"
-msgstr "modul for å snu om videosignalet"
+msgstr "modul for Ã¥ snu om videosignalet"
 
 #: modules/video_filter/distort.c:59
 #, fuzzy
@@ -14354,12 +14354,12 @@ msgstr "Fil"
 #: modules/video_filter/distort.c:66
 #, fuzzy
 msgid "Distort video filter"
-msgstr "modul for å snu om videosignalet"
+msgstr "modul for Ã¥ snu om videosignalet"
 
 #: modules/video_filter/invert.c:52
 #, fuzzy
 msgid "Invert video filter"
-msgstr "modul for å snu om videosignalet"
+msgstr "modul for Ã¥ snu om videosignalet"
 
 #: modules/video_filter/invert.c:53
 #, fuzzy
@@ -14537,7 +14537,7 @@ msgstr "_Innstillinger"
 #: modules/video_filter/mosaic.c:98
 #, fuzzy
 msgid "Positioning method"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/video_filter/mosaic.c:99
 msgid ""
@@ -14548,12 +14548,12 @@ msgstr ""
 #: modules/video_filter/mosaic.c:102 modules/video_filter/wall.c:57
 #, fuzzy
 msgid "Number of rows"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/video_filter/mosaic.c:103 modules/video_filter/wall.c:53
 #, fuzzy
 msgid "Number of columns"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/video_filter/mosaic.c:104
 msgid "Keep aspect ratio when resizing"
@@ -14668,7 +14668,7 @@ msgstr ""
 #: modules/video_filter/swscale/filter.c:70
 #, fuzzy
 msgid "Area"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/video_filter/swscale/filter.c:70
 msgid "Luma bicubic / chroma bilinear"
@@ -14725,7 +14725,7 @@ msgstr ""
 #: modules/video_filter/transform.c:57
 #, fuzzy
 msgid "Transform type"
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/video_filter/transform.c:58
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
@@ -14746,12 +14746,12 @@ msgstr ""
 #: modules/video_filter/transform.c:63
 #, fuzzy
 msgid "Flip horizontally"
-msgstr "rotér vertikal posisjon"
+msgstr "rotÃ©r vertikal posisjon"
 
 #: modules/video_filter/transform.c:63
 #, fuzzy
 msgid "Flip vertically"
-msgstr "rotér vertikal posisjon"
+msgstr "rotÃ©r vertikal posisjon"
 
 #: modules/video_filter/transform.c:66
 #, fuzzy
@@ -14771,7 +14771,7 @@ msgstr ""
 #: modules/video_filter/wall.c:61
 #, fuzzy
 msgid "Active windows"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/video_filter/wall.c:62
 msgid "Comma separated list of active windows, defaults to all"
@@ -14780,7 +14780,7 @@ msgstr ""
 #: modules/video_filter/wall.c:65
 #, fuzzy
 msgid "Element aspect ratio"
-msgstr "målets bildeformat"
+msgstr "mÃ¥lets bildeformat"
 
 #: modules/video_filter/wall.c:66
 msgid "The aspect ratio of the individual displays building the display wall"
@@ -14871,7 +14871,7 @@ msgstr "DirectX videomodul"
 #: modules/video_output/directx/directx.c:301
 #, fuzzy
 msgid "Wallpaper"
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/video_output/directx/glwin32.c:65 modules/video_output/opengl.c:112
 #: modules/video_output/x11/glx.c:115
@@ -14906,8 +14906,8 @@ msgid ""
 "Specify the X11 hardware display you want to use.\n"
 "By default, VLC will use the value of the DISPLAY environment variable."
 msgstr ""
-"Oppgi hvilket Qt Embedded hardware skjerm du ønsker å bruke. Standardvalget "
-"til VLC er å bruke verdien fra miljøvariabelen DISPLAY."
+"Oppgi hvilket Qt Embedded hardware skjerm du Ã¸nsker Ã¥ bruke. Standardvalget "
+"til VLC er Ã¥ bruke verdien fra miljÃ¸variabelen DISPLAY."
 
 #: modules/video_output/glide.c:64
 #, fuzzy
@@ -14927,7 +14927,7 @@ msgstr "skriv ut versjonsinformasjon"
 #: modules/video_output/image.c:49
 #, fuzzy
 msgid "Set the format of the output image."
-msgstr "Åpne spilleliste-vinduet"
+msgstr "Ã…pne spilleliste-vinduet"
 
 #: modules/video_output/image.c:51
 msgid "Recording ratio"
@@ -15000,8 +15000,8 @@ msgid ""
 "Specify the Qt Embedded hardware display you want to use. By default VLC "
 "will use the value of the DISPLAY environment variable."
 msgstr ""
-"Oppgi hvilket Qt Embedded hardware skjerm du ønsker å bruke. Standardvalget "
-"til VLC er å bruke verdien fra miljøvariabelen DISPLAY."
+"Oppgi hvilket Qt Embedded hardware skjerm du Ã¸nsker Ã¥ bruke. Standardvalget "
+"til VLC er Ã¥ bruke verdien fra miljÃ¸variabelen DISPLAY."
 
 #: modules/video_output/qte/qte.cpp:117
 #, fuzzy
@@ -15076,14 +15076,14 @@ msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
 msgstr ""
-"Hvis grafikkortet støtter flere tilkoblinger, kan du velge hvilken som skal "
-"brukes med dette alternativet (det skal ikke være nødvendig å bytte dette)."
+"Hvis grafikkortet stÃ¸tter flere tilkoblinger, kan du velge hvilken som skal "
+"brukes med dette alternativet (det skal ikke vÃ¦re nÃ¸dvendig Ã¥ bytte dette)."
 
 #: modules/video_output/x11/glx.c:92 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
 #, fuzzy
 msgid "Alternate fullscreen method"
-msgstr "metode for å veksle til og fra fullskjerm"
+msgstr "metode for Ã¥ veksle til og fra fullskjerm"
 
 #: modules/video_output/x11/glx.c:94 modules/video_output/x11/x11.c:45
 #: modules/video_output/x11/xvideo.c:51
@@ -15103,8 +15103,8 @@ msgid ""
 "Specify the X11 hardware display you want to use. By default VLC will use "
 "the value of the DISPLAY environment variable."
 msgstr ""
-"Oppgi hvilket Qt Embedded hardware skjerm du ønsker å bruke. Standardvalget "
-"til VLC er å bruke verdien fra miljøvariabelen DISPLAY."
+"Oppgi hvilket Qt Embedded hardware skjerm du Ã¸nsker Ã¥ bruke. Standardvalget "
+"til VLC er Ã¥ bruke verdien fra miljÃ¸variabelen DISPLAY."
 
 #: modules/video_output/x11/glx.c:106 modules/video_output/x11/xvideo.c:72
 #, fuzzy
@@ -15125,7 +15125,7 @@ msgstr "bruk delt minne"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between VLC and the X server."
-msgstr "Bruk delt minne for å kommunisere mellom VLC og X-tjenesten."
+msgstr "Bruk delt minne for Ã¥ kommunisere mellom VLC og X-tjenesten."
 
 #: modules/video_output/x11/x11.c:61
 #, fuzzy
@@ -15147,7 +15147,7 @@ msgid ""
 "to improve performances by using the most efficient one."
 msgstr ""
 "Krev at XVideo-gjengiveren skal bruke et bestemt chroma format, i stedet for "
-"å forsøke å forbedre yttelsen ved å benytte det mest effektive."
+"Ã¥ forsÃ¸ke Ã¥ forbedre yttelsen ved Ã¥ benytte det mest effektive."
 
 #: modules/video_output/x11/xvideo.c:92
 #, fuzzy
@@ -15184,7 +15184,7 @@ msgstr "Du kan fastsette videoinnkoding her"
 #: modules/visualization/goom.c:70
 #, fuzzy
 msgid "Goom"
-msgstr "Gå til:"
+msgstr "GÃ¥ til:"
 
 #: modules/visualization/goom.c:71
 #, fuzzy
@@ -15194,7 +15194,7 @@ msgstr "kikkerteffekt ?"
 #: modules/visualization/visual/visual.c:38
 #, fuzzy
 msgid "Effects list"
-msgstr "Åpne Disk"
+msgstr "Ã…pne Disk"
 
 #: modules/visualization/visual/visual.c:40
 msgid ""
@@ -15213,7 +15213,7 @@ msgstr ""
 #: modules/visualization/visual/visual.c:51
 #, fuzzy
 msgid "Number of bands"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/visualization/visual/visual.c:53
 msgid "Number of bands used by spectrum analyzer, should be 20 or 80."
@@ -15226,7 +15226,7 @@ msgstr ""
 #: modules/visualization/visual/visual.c:57
 #, fuzzy
 msgid "Number of blank pixels between bands."
-msgstr "Pause strøm"
+msgstr "Pause strÃ¸m"
 
 #: modules/visualization/visual/visual.c:59
 #, fuzzy
@@ -15240,7 +15240,7 @@ msgstr ""
 #: modules/visualization/visual/visual.c:63
 #, fuzzy
 msgid "Enable peaks"
-msgstr "skru på video"
+msgstr "skru pÃ¥ video"
 
 #: modules/visualization/visual/visual.c:65
 msgid "Defines whether to draw peaks."
@@ -15249,7 +15249,7 @@ msgstr ""
 #: modules/visualization/visual/visual.c:67
 #, fuzzy
 msgid "Number of stars"
-msgstr "Stopp strøm"
+msgstr "Stopp strÃ¸m"
 
 #: modules/visualization/visual/visual.c:69
 msgid "Defines the number of stars to draw with random effect."
@@ -15278,11 +15278,11 @@ msgstr "Valg"
 #: modules/visualization/xosd.c:63
 #, fuzzy
 msgid "Flip vertical position"
-msgstr "rotér vertikal posisjon"
+msgstr "rotÃ©r vertikal posisjon"
 
 #: modules/visualization/xosd.c:64
 msgid "Display xosd output on the bottom of the screen instead of the top"
-msgstr "Vis xosd-eksporten på bunnen av skjermen i stedet for på toppen"
+msgstr "Vis xosd-eksporten pÃ¥ bunnen av skjermen i stedet for pÃ¥ toppen"
 
 #: modules/visualization/xosd.c:67
 #, fuzzy
@@ -15321,7 +15321,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "OpenGL"
-#~ msgstr "Åpne fil"
+#~ msgstr "Ã…pne fil"
 
 #~ msgid "X11"
 #~ msgstr "X11"
@@ -15339,7 +15339,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Toolame"
-#~ msgstr "Øk volum"
+#~ msgstr "Ã˜k volum"
 
 #, fuzzy
 #~ msgid "Vorbis"
@@ -15375,7 +15375,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "wxWindows"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "Picture"
@@ -15415,14 +15415,14 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Choose a stream output"
-#~ msgstr "velg en utstrøm"
+#~ msgstr "velg en utstrÃ¸m"
 
 #~ msgid "Empty if no stream output."
-#~ msgstr "Tøm hvis det ikke kommer noen strøm."
+#~ msgstr "TÃ¸m hvis det ikke kommer noen strÃ¸m."
 
 #, fuzzy
 #~ msgid "Loop playlist on end"
-#~ msgstr "Gå tilbake til start ved slutten av Spillelisten"
+#~ msgstr "GÃ¥ tilbake til start ved slutten av Spillelisten"
 
 #, fuzzy
 #~ msgid "Real time control interface"
@@ -15448,7 +15448,7 @@ msgstr "_Gjem grensesnitt"
 #~ msgid ""
 #~ "(c) 1996-2004 - the VideoLAN Team\n"
 #~ "\n"
-#~ msgstr "© 1996-2003 the VideoLAN team"
+#~ msgstr "Â© 1996-2003 the VideoLAN team"
 
 #, fuzzy
 #~ msgid "Repeat"
@@ -15464,13 +15464,13 @@ msgstr "_Gjem grensesnitt"
 
 #~ msgid "Choose the program to select by giving its Service ID."
 #~ msgstr ""
-#~ "Angi hvilket program som skal velges ved å angi programmets Service ID."
+#~ "Angi hvilket program som skal velges ved Ã¥ angi programmets Service ID."
 
 #, fuzzy
 #~ msgid ""
 #~ "Choose the programs to select by giving a comma-separated list of SIDs."
 #~ msgstr ""
-#~ "Angi hvilket program som skal velges ved å angi programmets Service ID."
+#~ "Angi hvilket program som skal velges ved Ã¥ angi programmets Service ID."
 
 #, fuzzy
 #~ msgid "IDR frames"
@@ -15523,7 +15523,7 @@ msgstr "_Gjem grensesnitt"
 #, fuzzy
 #~ msgid ""
 #~ "Give the default type of audio you want to use in a DVD. (Developers only)"
-#~ msgstr "Her angir du hva slags lyd du ønsker å bruke med en DVD."
+#~ msgstr "Her angir du hva slags lyd du Ã¸nsker Ã¥ bruke med en DVD."
 
 #, fuzzy
 #~ msgid "Subtitle aspect-ratio correction"
@@ -15531,7 +15531,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Factor to increase subtitle display interval"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "Add this to starting vertical position of subtitle."
@@ -15547,7 +15547,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Item Enabled"
-#~ msgstr " (grunninnstilling påskrudd)"
+#~ msgstr " (grunninnstilling pÃ¥skrudd)"
 
 #, fuzzy
 #~ msgid "Delete Group"
@@ -15567,7 +15567,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "&Enable"
-#~ msgstr "skru på video"
+#~ msgstr "skru pÃ¥ video"
 
 #, fuzzy
 #~ msgid "&Disable"
@@ -15595,7 +15595,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Effect"
-#~ msgstr "Åpne Disk"
+#~ msgstr "Ã…pne Disk"
 
 #, fuzzy
 #~ msgid "no input\n"
@@ -15647,7 +15647,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Stream "
-#~ msgstr "Stopp strøm"
+#~ msgstr "Stopp strÃ¸m"
 
 #, fuzzy
 #~ msgid "Angle"
@@ -15671,19 +15671,19 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Item info"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "Step 1: Select what to stream."
-#~ msgstr "Velg en nettverksstrøm"
+#~ msgstr "Velg en nettverksstrÃ¸m"
 
 #, fuzzy
 #~ msgid "Step 2: Define streaming method."
-#~ msgstr "Velg en nettverksstrøm"
+#~ msgstr "Velg en nettverksstrÃ¸m"
 
 #, fuzzy
 #~ msgid "Step 3: Start streaming."
-#~ msgstr "Velg en nettverksstrøm"
+#~ msgstr "Velg en nettverksstrÃ¸m"
 
 #, fuzzy
 #~ msgid "slowest"
@@ -15717,7 +15717,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "This allows you to change the caching done inside the muxer itself."
-#~ msgstr "Dette valget lar deg skru på oversettelse av grensesnittet"
+#~ msgstr "Dette valget lar deg skru pÃ¥ oversettelse av grensesnittet"
 
 #, fuzzy
 #~ msgid ""
@@ -15731,7 +15731,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Toggle enabled"
-#~ msgstr " (grunninnstilling påskrudd)"
+#~ msgstr " (grunninnstilling pÃ¥skrudd)"
 
 #, fuzzy
 #~ msgid "Welcome, streaming wizard"
@@ -15744,15 +15744,15 @@ msgstr "_Gjem grensesnitt"
 #~ "TV set. Accepted format is a float value (1, 1.25, 1.3333, etc.) "
 #~ "expressing pixel squareness."
 #~ msgstr ""
-#~ "Her fastsettes målets pixelstørrelse. Standarden i VLC er å anta at "
+#~ "Her fastsettes mÃ¥lets pixelstÃ¸rrelse. Standarden i VLC er Ã¥ anta at "
 #~ "pixlene danner et kvadrat, med mindre maskinvaren din kan fortelle VLC "
 #~ "noe annet. Du kan bruke dette hvis du sender VLCs signal til et annet "
-#~ "apparat, slik som en TV. Formatet må uttrykkes som et desimaltall (1, "
+#~ "apparat, slik som en TV. Formatet mÃ¥ uttrykkes som et desimaltall (1, "
 #~ "1.25, 1.3333, etc.) som uttrykk for firkantetheten til pixlene."
 
 #, fuzzy
 #~ msgid "Truncated stream"
-#~ msgstr "Spill strøm"
+#~ msgstr "Spill strÃ¸m"
 
 #, fuzzy
 #~ msgid "UTC date"
@@ -15760,11 +15760,11 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Number of streams"
-#~ msgstr "Stopp strøm"
+#~ msgstr "Stopp strÃ¸m"
 
 #, fuzzy
 #~ msgid "Codec name"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "Codec setting"
@@ -15772,11 +15772,11 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Codec info"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "Codec download"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "rtp6://"
@@ -15784,15 +15784,15 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Open a skin file."
-#~ msgstr "Åpne en fil"
+#~ msgstr "Ã…pne en fil"
 
 #, fuzzy
 #~ msgid "Open a network stream"
-#~ msgstr "Velg en nettverksstrøm"
+#~ msgstr "Velg en nettverksstrÃ¸m"
 
 #, fuzzy
 #~ msgid "Open a satellite stream"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "Exit this program"
@@ -15804,7 +15804,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Open the playlist"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "Show the program logs"
@@ -15816,7 +15816,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Open &Satellite Stream..."
-#~ msgstr "_Nettverksstrøm"
+#~ msgstr "_NettverksstrÃ¸m"
 
 #, fuzzy
 #~ msgid "E&xit"
@@ -15844,7 +15844,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "The maximum bitrate of the stream"
-#~ msgstr "Naviger gjennom strømmen"
+#~ msgstr "Naviger gjennom strÃ¸mmen"
 
 #~ msgid "scope effect"
 #~ msgstr "kikkerteffekt ?"
@@ -15900,7 +15900,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Repeat Playlist"
-#~ msgstr "Åpne Spilleliste"
+#~ msgstr "Ã…pne Spilleliste"
 
 #, fuzzy
 #~ msgid "Quicktime"
@@ -15908,7 +15908,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Quick &Open ..."
-#~ msgstr "_Åpne fil..."
+#~ msgstr "_Ã…pne fil..."
 
 #, fuzzy
 #~ msgid "&About..."
@@ -15916,7 +15916,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Stop current playlist item"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "Quick"
@@ -15924,7 +15924,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Simple &Open ..."
-#~ msgstr "_Åpne fil..."
+#~ msgstr "_Ã…pne fil..."
 
 #, fuzzy
 #~ msgid "&Delete"
@@ -15936,11 +15936,11 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "ES stream"
-#~ msgstr "Stopp strøm"
+#~ msgstr "Stopp strÃ¸m"
 
 #, fuzzy
 #~ msgid "Gather stream"
-#~ msgstr "Pause strøm"
+#~ msgstr "Pause strÃ¸m"
 
 #, fuzzy
 #~ msgid "discard"
@@ -15987,22 +15987,22 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "CD-ROM device name"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "VCD device name"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #~ msgid "Open a DVD or VCD"
-#~ msgstr "Åpne en DVD eller VCD"
+#~ msgstr "Ã…pne en DVD eller VCD"
 
 #, fuzzy
 #~ msgid "Open a DVD or (S)VCD"
-#~ msgstr "Åpne en DVD eller VCD"
+#~ msgstr "Ã…pne en DVD eller VCD"
 
 #, fuzzy
 #~ msgid "&File info..."
-#~ msgstr "_Åpne fil..."
+#~ msgstr "_Ã…pne fil..."
 
 #, fuzzy
 #~ msgid "&Miscellaneous"
@@ -16027,19 +16027,19 @@ msgstr "_Gjem grensesnitt"
 #~ "or video codecs, so you should always specify 'any' at the end of the "
 #~ "list to make sure there is a fallback for the types you didn't specify."
 #~ msgstr ""
-#~ "Du kan velge rekkefølgen VLC skal bruke når kodek skal velges med dette "
-#~ "alternativet. 'a52old,a52,any' vil for eksempel prøve den gamle a52-"
-#~ "kodeken før den nye. Legg merke til at VLC ikke skiller lyd eller video "
-#~ "kodeker, så du bør alltid legge til 'any' på slutten av listen for å være "
-#~ "sikker på at å ha en nødløsning for typer som du ikke har spesifisert."
+#~ "Du kan velge rekkefÃ¸lgen VLC skal bruke nÃ¥r kodek skal velges med dette "
+#~ "alternativet. 'a52old,a52,any' vil for eksempel prÃ¸ve den gamle a52-"
+#~ "kodeken fÃ¸r den nye. Legg merke til at VLC ikke skiller lyd eller video "
+#~ "kodeker, sÃ¥ du bÃ¸r alltid legge til 'any' pÃ¥ slutten av listen for Ã¥ vÃ¦re "
+#~ "sikker pÃ¥ at Ã¥ ha en nÃ¸dlÃ¸sning for typer som du ikke har spesifisert."
 
 #~ msgid ""
 #~ "This allows you to select the order in which VLC will choose its codecs. "
-#~ msgstr "Her velger du rekkefølgen VLC skal velge kodek etter."
+#~ msgstr "Her velger du rekkefÃ¸lgen VLC skal velge kodek etter."
 
 #, fuzzy
 #~ msgid "Choose preferred audio encoder list"
-#~ msgstr "velg foretrukket rekkefølge for lydinnkoding"
+#~ msgstr "velg foretrukket rekkefÃ¸lge for lydinnkoding"
 
 #, fuzzy
 #~ msgid "ffmpeg video encoder"
@@ -16047,7 +16047,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Only enqueue in playlist, do not play"
-#~ msgstr "Legg til i kø som standard"
+#~ msgstr "Legg til i kÃ¸ som standard"
 
 #, fuzzy
 #~ msgid "file://"
@@ -16055,19 +16055,19 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Stream:"
-#~ msgstr "Stopp strøm"
+#~ msgstr "Stopp strÃ¸m"
 
 #, fuzzy
 #~ msgid "Device :"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "Codec :"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "&Eject Disc"
-#~ msgstr "Løs ut disk"
+#~ msgstr "LÃ¸s ut disk"
 
 #~ msgid "print help"
 #~ msgstr "skriv ut hjelp"
@@ -16090,8 +16090,8 @@ msgstr "_Gjem grensesnitt"
 #~ "If you want VLC to add items to the playlist as you open them, then "
 #~ "enable this option."
 #~ msgstr ""
-#~ "VLC kan legge til ønsker på spillelisten ettervært som du åpner dem hvis "
-#~ "du skrur på dette alternativet."
+#~ "VLC kan legge til Ã¸nsker pÃ¥ spillelisten ettervÃ¦rt som du Ã¥pner dem hvis "
+#~ "du skrur pÃ¥ dette alternativet."
 
 #, fuzzy
 #~ msgid "Audio encoding codec"
@@ -16127,11 +16127,11 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "&Logs..."
-#~ msgstr "Åpne en _disk"
+#~ msgstr "Ã…pne en _disk"
 
 #, fuzzy
 #~ msgid "Display identifier"
-#~ msgstr "Identifikator for visningsområde"
+#~ msgstr "Identifikator for visningsomrÃ¥de"
 
 #~ msgid ""
 #~ "This is the local display port that will be used for X11 drawing. For "
@@ -16141,12 +16141,12 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Launch playlist on startup"
-#~ msgstr "Kjør ved oppstart"
+#~ msgstr "KjÃ¸r ved oppstart"
 
 #~ msgid ""
 #~ "If you want VLC to start playing on startup, then enable this option."
 #~ msgstr ""
-#~ "VLC kan begynne å spille ved oppstart hvis du skrur på dette alternativet."
+#~ "VLC kan begynne Ã¥ spille ved oppstart hvis du skrur pÃ¥ dette alternativet."
 
 #, fuzzy
 #~ msgid "Device &name:"
@@ -16161,11 +16161,11 @@ msgstr "_Gjem grensesnitt"
 #~ msgstr "Kapittel:"
 
 #~ msgid "Go!"
-#~ msgstr "Gå!"
+#~ msgstr "GÃ¥!"
 
 #, fuzzy
 #~ msgid "Open &disc..."
-#~ msgstr "Åpne en _disk"
+#~ msgstr "Ã…pne en _disk"
 
 #, fuzzy
 #~ msgid "&Hide interface"
@@ -16197,7 +16197,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Close this popup"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "&Jump..."
@@ -16205,11 +16205,11 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "New stream"
-#~ msgstr "Stopp strøm"
+#~ msgstr "Stopp strÃ¸m"
 
 #, fuzzy
 #~ msgid "Network Stream..."
-#~ msgstr "_Nettverksstrøm"
+#~ msgstr "_NettverksstrÃ¸m"
 
 #, fuzzy
 #~ msgid "&Add subtitles..."
@@ -16237,7 +16237,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Set the window on top"
-#~ msgstr "Åpne spilleliste-vinduet"
+#~ msgstr "Ã…pne spilleliste-vinduet"
 
 #, fuzzy
 #~ msgid "&Add"
@@ -16245,7 +16245,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "&Disc..."
-#~ msgstr "Åpne en _disk"
+#~ msgstr "Ã…pne en _disk"
 
 #, fuzzy
 #~ msgid "&Network..."
@@ -16269,7 +16269,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Play the selected stream"
-#~ msgstr "Spill strøm"
+#~ msgstr "Spill strÃ¸m"
 
 #, fuzzy
 #~ msgid "Add subtitles"
@@ -16279,7 +16279,7 @@ msgstr "_Gjem grensesnitt"
 #~ msgid ""
 #~ "Check this option if you want to display the caption of the buttons in "
 #~ msgstr ""
-#~ "Hvis du vil bruke VideoLAN Channel Server skrur du på dette alternativet."
+#~ "Hvis du vil bruke VideoLAN Channel Server skrur du pÃ¥ dette alternativet."
 
 #, fuzzy
 #~ msgid "Native Windows interface"
@@ -16294,7 +16294,7 @@ msgstr "_Gjem grensesnitt"
 
 #~ msgid "Activate this option if you want to use the VideoLAN Channel Server."
 #~ msgstr ""
-#~ "Hvis du vil bruke VideoLAN Channel Server skrur du på dette alternativet."
+#~ "Hvis du vil bruke VideoLAN Channel Server skrur du pÃ¥ dette alternativet."
 
 #, fuzzy
 #~ msgid "channel server address"
@@ -16308,14 +16308,14 @@ msgstr "_Gjem grensesnitt"
 #~ msgstr "Kanaltjener:"
 
 #~ msgid "Indicate here the port on which the VideoLAN Channel Server runs."
-#~ msgstr "Her skriver du porten der VideoLAN Channel Server kjører."
+#~ msgstr "Her skriver du porten der VideoLAN Channel Server kjÃ¸rer."
 
 #~ msgid ""
 #~ "If you have several interfaces on your Linux machine and use the VLAN "
 #~ "solution, you may indicate here which interface to use."
 #~ msgstr ""
 #~ "Hvis du har flere nettverksgrensesnitt i Linux-maskinen din og bruker "
-#~ "VLAN-løsningen, kan du skrive hvilket som skal brukes her."
+#~ "VLAN-lÃ¸sningen, kan du skrive hvilket som skal brukes her."
 
 #, fuzzy
 #~ msgid "Network Channel:"
@@ -16339,7 +16339,7 @@ msgstr "_Gjem grensesnitt"
 
 #, fuzzy
 #~ msgid "Device Name"
-#~ msgstr "Navn på enhet"
+#~ msgstr "Navn pÃ¥ enhet"
 
 #, fuzzy
 #~ msgid "dvdplay input module"
