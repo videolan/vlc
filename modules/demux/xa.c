@@ -65,7 +65,7 @@ struct demux_sys_t
 
 typedef struct xa_header_t
 {
-    uint8_t  xa_id[4];
+    char     xa_id[4];
     uint32_t iSize;
 
     uint16_t wFormatTag;
