@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mash.c: Video decoder using openmash codec implementations
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

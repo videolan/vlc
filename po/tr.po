@@ -1,5 +1,5 @@
 # Turkish localisation file for VLC
-# Copyright (C) 2005 VideoLAN
+# Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
 # This file is distributed under the same license as the VLC package.
 # Adem Gunes <xleopar@yahoo.com>, 2005.
 #

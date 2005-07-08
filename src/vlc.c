@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc.c: the vlc player
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN
+ * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

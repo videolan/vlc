@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cvd.c : CVD Subtitle decoder
  *****************************************************************************
- * Copyright (C) 2003, 2004 VideoLAN
+ * Copyright (C) 2003, 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Rocky Bernstein

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * variables.c: routines for object variables handling
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

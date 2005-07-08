@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mosaic_bridge.c:
  *****************************************************************************
- * Copyright (C) 2004-2005 VideoLAN
+ * Copyright (C) 2004-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>

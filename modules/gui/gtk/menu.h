@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk_menu.h: prototypes for menu functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

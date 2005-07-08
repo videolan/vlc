@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.h:  Playlist import module common functions
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

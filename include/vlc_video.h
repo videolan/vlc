@@ -3,7 +3,7 @@
  * This header is required by all modules which have to handle pictures. It
  * includes all common video types and constants.
  *****************************************************************************
- * Copyright (C) 1999 - 2005 VideoLAN
+ * Copyright (C) 1999 - 2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input.c: input thread
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN
+ * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

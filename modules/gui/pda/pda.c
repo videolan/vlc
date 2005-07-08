@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>

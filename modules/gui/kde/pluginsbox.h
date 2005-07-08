@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pluginbox.h: includes for the pluginbox class
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
+ * Copyright (C) 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002

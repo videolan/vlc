@@ -3,7 +3,7 @@
  *            DVB subtitles encoder (developed for Anevia, www.anevia.com)
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * Copyright (C) 2003-2005 VideoLAN
+ * Copyright (C) 2003-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

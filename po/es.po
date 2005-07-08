@@ -1,5 +1,5 @@
 # Traducción española para VLC
-# Copyright (C) 2002-2005 VideoLAN <videolan@videolan.org
+# Copyright (C) 2002-2005 VideoLAN (Centrale Réseaux) and its contributors
 # $Id$
 #
 # Antonio Javier Varela Calvo <tonxabar@hotmail.com>, 2003-2005

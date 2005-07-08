@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

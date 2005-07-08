@@ -2,7 +2,7 @@
  * vlc_threads.h : threads implementation for the VideoLAN client
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
- * Copyright (C) 1999, 2002 VideoLAN
+ * Copyright (C) 1999, 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>

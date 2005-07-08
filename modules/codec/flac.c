@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
+ * Copyright (C) 1999-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

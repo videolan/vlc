@@ -1,7 +1,7 @@
 /*****************************************************************************
  * control.h: global header for mediacontrol
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id: vlc.h 10101 2005-03-02 16:47:31Z robux4 $
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>

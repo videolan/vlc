@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2005 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>

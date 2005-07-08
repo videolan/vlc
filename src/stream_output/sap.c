@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sap.c : SAP announce handler
  *****************************************************************************
- * Copyright (C) 2002-2005 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

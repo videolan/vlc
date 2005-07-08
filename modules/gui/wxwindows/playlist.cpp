@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2005 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>

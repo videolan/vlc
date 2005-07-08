@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk_modules.c : functions to build modules configuration boxes.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

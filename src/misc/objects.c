@@ -1,7 +1,7 @@
 /*****************************************************************************
  * objects.c: vlc_object_t handling
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

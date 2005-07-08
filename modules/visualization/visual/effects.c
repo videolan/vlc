@@ -1,7 +1,7 @@
 /*****************************************************************************
  * effects.c : Effects for the visualization system
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>

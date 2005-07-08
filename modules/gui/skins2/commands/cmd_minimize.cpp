@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cmd_minimize.cpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id: cmd_fullscreen.cpp 6961 2004-03-05 17:34:23Z sam $
  *
  * Authors: Mohammed Adnène Trojette     <adn@via.ecp.fr>

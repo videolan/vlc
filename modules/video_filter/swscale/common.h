@@ -1,7 +1,7 @@
 /*****************************************************************************
  * common.h: a few defines and wrappers for swscale
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN
+ * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

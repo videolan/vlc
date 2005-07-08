@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extrapanel.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004, 2003 VideoLAN
+ * Copyright (C) 2000-2004, 2003 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

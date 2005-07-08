@@ -1,7 +1,7 @@
 /*****************************************************************************
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN
+ * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Olie Lho <ollie@sis.com.tw>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
- * Copyright (C) 2002-2005 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>

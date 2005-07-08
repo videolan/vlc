@@ -1,5 +1,5 @@
 # British translation for VLC.
-# Copyright (C) 2002-2004 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2002-2004 VideoLAN (Centrale Réseaux) and its contributors
 # $Id$
 #
 #

@@ -1,5 +1,5 @@
 # Hungarian translation of VLC.
-# Copyright (C) 2003 VideoLAN
+# Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
 # This file is distributed under the same license as the VLC package.
 # $Id$
 #

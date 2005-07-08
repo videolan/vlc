@@ -1,7 +1,7 @@
 /*****************************************************************************
  * xml.c: XML parser wrapper for XML modules
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * b4s.c : B4S playlist format import
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

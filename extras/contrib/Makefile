@@ -1,7 +1,7 @@
 # ***************************************************************************
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
-# Copyright (C) 2003-2005 VideoLAN
+# Copyright (C) 2003-2005 VideoLAN (Centrale Réseaux) and its contributors
 # $Id$
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>

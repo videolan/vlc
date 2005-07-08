@@ -1,6 +1,5 @@
-# translation of fr.po to 
 # French translation for VLC.
-# Copyright (C) 2001-2004 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2001-2004 VideoLAN (Centrale Réseaux) and its contributors
 # $Id$
 #
 # Previous Translators

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * u8tofixed32.c : converter from unsigned 8 bits integer to fixed32.
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

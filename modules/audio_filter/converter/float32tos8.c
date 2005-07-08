@@ -1,7 +1,7 @@
 /*****************************************************************************
  * float32tos8.c : converter from float32 to signed 8 bits integer
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Xavier Maillard <zedek@fxgsproject.org>

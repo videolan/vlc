@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cinepak.c: cinepak video decoder
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
+ * Copyright (C) 1999-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

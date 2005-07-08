@@ -1,7 +1,7 @@
 /*****************************************************************************
  * glwin32.c: Windows OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2004 VideoLAN
+ * Copyright (C) 2001-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

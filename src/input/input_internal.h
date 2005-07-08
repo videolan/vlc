@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input_internal.h:
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN
+ * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id: input.c 7955 2004-06-07 22:21:33Z fenrir $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

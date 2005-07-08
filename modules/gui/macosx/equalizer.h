@@ -1,7 +1,7 @@
 /*****************************************************************************
  * equalizer.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: JŽr™me Decoodt <djc@videolan.org>

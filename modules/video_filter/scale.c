@@ -2,7 +2,7 @@
  * resize.c: video scaling module for YUVP/A pictures
  *  Uses the low quality "nearest neighbour" algorithm.
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * s16tofixed32.c : converter from signed 16 bits integer to fixed 32
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Marc Ariberti <marcari@videolan.ord>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * iso_lang.h: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
+ * Copyright (C) 1998-2001 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>

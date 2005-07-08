@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bits.h :
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

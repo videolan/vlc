@@ -1,7 +1,7 @@
 /*****************************************************************************
  * arts.c : aRts module
  *****************************************************************************
- * Copyright (C) 2001-2002 VideoLAN
+ * Copyright (C) 2001-2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>

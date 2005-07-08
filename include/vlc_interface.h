@@ -3,7 +3,7 @@
  * This library provides basic functions for threads to interact with user
  * interface, such as message output.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

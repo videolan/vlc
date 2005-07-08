@@ -1,7 +1,7 @@
 /*****************************************************************************
  * announce.c : announce handler
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2004 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

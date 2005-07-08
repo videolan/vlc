@@ -1,7 +1,7 @@
 /*****************************************************************************
  * var.c: object variables for input thread
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id: input.c 7955 2004-06-07 22:21:33Z fenrir $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

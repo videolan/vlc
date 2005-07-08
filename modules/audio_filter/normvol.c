@@ -1,7 +1,7 @@
 /*****************************************************************************
  * normvol.c :  volume normalizer
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
+ * Copyright (C) 2001 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

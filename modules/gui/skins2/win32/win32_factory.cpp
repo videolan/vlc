@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32_factory.cpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>

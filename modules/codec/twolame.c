@@ -2,7 +2,7 @@
  * twolame.c: libtwolame encoder (MPEG-1/2 layer II) module
  *            (using libtwolame from http://users.tpg.com.au/adslblvi/)
  *****************************************************************************
- * Copyright (C) 2004-2005 VideoLAN
+ * Copyright (C) 2004-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * time.c : time display video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2003-2005 VideoLAN
+ * Copyright (C) 2003-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

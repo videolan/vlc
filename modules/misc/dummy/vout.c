@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

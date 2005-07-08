@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvb.c : functions to control a DVB card under Linux
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
+ * Copyright (C) 1998-2001 VideoLAN (Centrale Réseaux) and its contributors
  *
  * Authors: Damien Lucas <nitrox@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>

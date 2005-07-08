@@ -1,7 +1,7 @@
 /*****************************************************************************
  * xml.h
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>

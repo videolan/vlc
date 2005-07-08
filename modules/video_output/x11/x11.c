@@ -1,7 +1,7 @@
 /*****************************************************************************
  * x11.c : X11 plugin for vlc
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
+ * Copyright (C) 1998-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

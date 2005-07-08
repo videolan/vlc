@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ftp.c: FTP input module
  *****************************************************************************
- * Copyright (C) 2001-2005 VideoLAN
+ * Copyright (C) 2001-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code

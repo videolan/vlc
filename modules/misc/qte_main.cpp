@@ -1,7 +1,7 @@
 /*****************************************************************************
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>

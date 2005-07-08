@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
- * Copyright (C) 2001, 2003 VideoLAN
+ * Copyright (C) 2001, 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

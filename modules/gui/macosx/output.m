@@ -1,7 +1,7 @@
 /*****************************************************************************
  * output.m: MacOS X Output Dialog
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
+ * Copyright (C) 2002-2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>

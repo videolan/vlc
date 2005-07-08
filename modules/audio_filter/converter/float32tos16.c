@@ -1,7 +1,7 @@
 /*****************************************************************************
  * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

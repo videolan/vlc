@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ListViews.h: BeOS interface list view class prototype
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>

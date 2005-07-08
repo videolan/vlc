@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout.c: QNX RTOS video output display method
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Pascal Levesque <Pascal.Levesque@mindready.com>

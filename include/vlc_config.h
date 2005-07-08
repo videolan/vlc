@@ -2,7 +2,7 @@
  * vlc_config.h: limits and configuration
  * Defines all compilation-time configuration constants and size limits
  *****************************************************************************
- * Copyright (C) 1999-2003 VideoLAN
+ * Copyright (C) 1999-2003 VideoLAN (Centrale Réseaux) and its contributors
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>

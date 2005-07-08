@@ -1,7 +1,7 @@
 /*****************************************************************************
  * image.c : image video output
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id: snapshot.c 8644 2004-09-05 16:53:04Z fkuehne $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * format.c : PCM format converter
  *****************************************************************************
- * Copyright (C) 2002-2005 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

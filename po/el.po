@@ -1,5 +1,5 @@
 # Greek translation of VLC
-# Copyright (C) 2005 VideoLAN.
+# Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
 # Simos Xenitellis <simos74@gmx.net>, 2005.
 # $Id$
 #

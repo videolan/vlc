@@ -1,7 +1,7 @@
 /*****************************************************************************
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
- * Copyright (C) 2001-2004 VideoLAN
+ * Copyright (C) 2001-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>

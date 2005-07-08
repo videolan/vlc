@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>

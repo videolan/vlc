@@ -2,7 +2,7 @@
  * dirac.c: Dirac decoder/encoder module making use of libdirac.
  *          (http://www.bbc.co.uk/rd/projects/dirac/index.shtml)
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
+ * Copyright (C) 1999-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

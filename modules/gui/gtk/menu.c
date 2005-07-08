@@ -1,7 +1,7 @@
 /*****************************************************************************
  * menu.c : functions to handle menu items.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvb.h : functions to control a DVB card under Linux with v4l2
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN
+ * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@saman>

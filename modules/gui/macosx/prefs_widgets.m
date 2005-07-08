@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs_widgets.m: Preferences controls
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
+ * Copyright (C) 2002-2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>

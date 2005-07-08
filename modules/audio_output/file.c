@@ -1,7 +1,7 @@
 /*****************************************************************************
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

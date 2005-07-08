@@ -1,8 +1,8 @@
 /*****************************************************************************
  * test3.m : Empty Objective C module for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: test3.m,v 1.2 2003/12/04 16:49:43 sam Exp $
+ * Copyright (C) 2000-2001 VideoLAN (Centrale Réseaux) and its contributors
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

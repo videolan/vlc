@@ -1,7 +1,7 @@
 /*****************************************************************************
  * u8tofloat32.c : converter from unsigned 8 bits integer to float32.
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>

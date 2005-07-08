@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sdl.c: SDL video output display method
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
+ * Copyright (C) 1998-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN
+ * Copyright (C) 2001-2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

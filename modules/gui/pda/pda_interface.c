@@ -1346,7 +1346,7 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelAuthors), GTK_JUSTIFY_LEFT);
   gtk_label_set_line_wrap (GTK_LABEL (labelAuthors), TRUE);
 
-  labelCopyright = gtk_label_new (_("(c) 1996-2004 the VideoLAN team"));
+  labelCopyright = gtk_label_new (_("(c) 1996-2004 the VideoLAN (Centrale Réseaux) and its contributors team"));
   gtk_widget_set_name (labelCopyright, "labelCopyright");
   gtk_widget_show (labelCopyright);
   gtk_fixed_put (GTK_FIXED (fixed2), labelCopyright, 16, 48);

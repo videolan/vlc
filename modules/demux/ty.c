@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ty.c - TiVo ty stream video demuxer for VLC
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
  * Copyright (C) 2005 by Neal Symms (tivo@freakinzoo.com) - February 2005
  * based on code by Christopher Wingert for tivo-mplayer
  * tivo(at)wingert.org, February 2003

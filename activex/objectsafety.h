@@ -1,7 +1,7 @@
 /*****************************************************************************
  * objectsafety.h: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *

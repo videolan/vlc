@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wizard.h: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net> 

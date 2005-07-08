@@ -1,5 +1,5 @@
 # Swedish translation for VLC.
-# Copyright (C) 2002 VideoLAN <videolan@videolan.org>
+# Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors <videolan@videolan.org>
 # This file is distributed under the same license as the VLC package.
 # $Id$
 #

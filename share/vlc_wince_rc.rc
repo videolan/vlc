@@ -104,7 +104,7 @@ FONT 8, "System"
 BEGIN
     ICON            IDI_NIOUP,IDC_STATIC,7,7,21,20
     LTEXT           "VLC Version Tarass",IDC_STATIC,38,10,70,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) VideoLAN",IDC_STATIC,30,27,80,8
+    LTEXT           "Copyright (C) VideoLAN (Centrale Reseaux) and its contributors",IDC_STATIC,30,27,80,8
 END
 
 

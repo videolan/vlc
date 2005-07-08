@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN
+ * Copyright (C) 2001-2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

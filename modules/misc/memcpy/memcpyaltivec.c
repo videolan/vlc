@@ -1,7 +1,7 @@
 /*****************************************************************************
  * memcpyaltivec.c : AltiVec memcpy module
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
+ * Copyright (C) 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>

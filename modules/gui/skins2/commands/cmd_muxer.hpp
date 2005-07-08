@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cmd_muxer.hpp
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>

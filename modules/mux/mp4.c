@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mp4.c: mp4/mov muxer
  *****************************************************************************
- * Copyright (C) 2001, 2002, 2003 VideoLAN
+ * Copyright (C) 2001, 2002, 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

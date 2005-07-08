@@ -1,7 +1,7 @@
 /*****************************************************************************
  * svg.c : Put SVG on the video
  *****************************************************************************
- * Copyright (C) 2002, 2003 VideoLAN
+ * Copyright (C) 2002, 2003 VideoLAN (Centrale Réseaux) and its contributors
  * $Id: svg.c,v 1.2 2003/07/23 17:26:56 oaubert Exp $
  *
  * Authors: Olivier Aubert <oaubert@lisi.univ-lyon1.fr>

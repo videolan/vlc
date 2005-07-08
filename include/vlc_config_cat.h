@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_help.h: Help strings
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
+ * Copyright (C) 2003 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id: vlc_help.h 9171 2004-11-06 11:15:50Z zorglub $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

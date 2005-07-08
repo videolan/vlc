@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc.h: main libvlc header
  *****************************************************************************
- * Copyright (C) 1998-2005 VideoLAN
+ * Copyright (C) 1998-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

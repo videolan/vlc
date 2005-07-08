@@ -1,7 +1,7 @@
 /*****************************************************************************
  * common.h : DirectShow access module for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * logo.c : logo video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2003-2004 VideoLAN
+ * Copyright (C) 2003-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

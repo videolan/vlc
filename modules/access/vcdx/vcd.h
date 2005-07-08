@@ -2,7 +2,7 @@
  * vcd.h : VCD input module header for vlc
  *         using libcdio, libvcd and libvcdinfo
  *****************************************************************************
- * Copyright (C) 2003, 2004 VideoLAN
+ * Copyright (C) 2003, 2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 

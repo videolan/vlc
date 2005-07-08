@@ -1,7 +1,7 @@
 /*****************************************************************************
  * access.c
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN
+ * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id: demux.c 7546 2004-04-29 13:53:29Z gbazin $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>

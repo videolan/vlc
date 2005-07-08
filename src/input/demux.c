@@ -1,7 +1,7 @@
 /*****************************************************************************
  * demux.c
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN
+ * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>

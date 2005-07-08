@@ -1,7 +1,7 @@
 /*****************************************************************************
  * joystick.c: control vlc with a joystick
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>

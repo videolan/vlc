@@ -2,7 +2,7 @@
  * main.h: access to all program variables
  * Declaration and extern access to global program object.
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
+ * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

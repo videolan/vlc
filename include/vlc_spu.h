@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_spu.h : subpicture unit
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

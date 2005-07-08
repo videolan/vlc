@@ -1,7 +1,7 @@
 /*****************************************************************************
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
+ * Copyright (C) 1999-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

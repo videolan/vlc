@@ -3,7 +3,7 @@
  *   This plugin makes use of liba52 to decode A/52 audio
  *   (http://liba52.sf.net/).
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

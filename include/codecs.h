@@ -1,7 +1,7 @@
 /*****************************************************************************
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
+ * Copyright (C) 1999-2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * streamdata.h: streaming/transcoding data
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN
+ * Copyright (C) 2000-2004 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id: wizard.cpp 7826 2004-05-30 14:43:12Z zorglub $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Eric Petit <titer@m0k.org>

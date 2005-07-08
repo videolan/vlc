@@ -1,7 +1,7 @@
 /*****************************************************************************
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
+ * Copyright (C) 1998-2001 VideoLAN (Centrale RÃ©seaux) and its contributors
  * $Id$
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

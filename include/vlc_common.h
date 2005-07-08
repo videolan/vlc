@@ -2,7 +2,7 @@
  * common.h: common definitions
  * Collection of useful common types and macros definitions
  *****************************************************************************
- * Copyright (C) 1998-2005 VideoLAN
+ * Copyright (C) 1998-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>

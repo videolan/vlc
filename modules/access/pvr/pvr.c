@@ -1,7 +1,7 @@
 /*****************************************************************************
  * pvr.c
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
+ * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Eric Petit <titer@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * getaddrinfo.c: getaddrinfo/getnameinfo replacement functions
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN
+ * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
  * Copyright (C) 2002-2004 Rémi Denis-Courmont
  * $Id$
  *

@@ -1,5 +1,5 @@
 # Burmese translations for vlc package.
-# Copyright (C) 2005 VideoLAN
+# Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
 # This file is distributed under the same license as the vlc package.
 # $Id$
 #
