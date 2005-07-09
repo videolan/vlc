@@ -1,7 +1,7 @@
 /*****************************************************************************
  * video_widgets.c : OSD widgets manipulation functions
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
  * Author: Yoann Peronneau <yoann@videolan.org>

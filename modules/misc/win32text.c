@@ -1,7 +1,7 @@
 /*****************************************************************************
  * win32text.c : Text drawing routines using the TextOut win32 API
  *****************************************************************************
- * Copyright (C) 2002 - 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 - 2005 the VideoLAN team
  * $Id: freetype.c 10258 2005-03-10 13:37:29Z gbazin $
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

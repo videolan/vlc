@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.h: interface header for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * This program is free software; you can redistribute it and/or modify

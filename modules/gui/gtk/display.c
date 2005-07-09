@@ -1,7 +1,7 @@
 /*****************************************************************************
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999, 2000, 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

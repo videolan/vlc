@@ -1,7 +1,7 @@
 /*****************************************************************************
  * lirc.c : lirc module for vlc
  *****************************************************************************
- * Copyright (C) 2003-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003-2005 the VideoLAN team
  * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>

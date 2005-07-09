@@ -1,7 +1,7 @@
 /*****************************************************************************
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999, 2000 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

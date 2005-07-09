@@ -1,7 +1,7 @@
 /*****************************************************************************
  * oleinplaceactiveobject.h: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2005 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *

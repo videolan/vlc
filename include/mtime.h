@@ -8,7 +8,7 @@
  * 'm' stands for 'micro', since maximum resolution is the microsecond.
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

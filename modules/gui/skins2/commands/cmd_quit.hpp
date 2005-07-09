@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cmd_quit.hpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>

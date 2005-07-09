@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2001, 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>

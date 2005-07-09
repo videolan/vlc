@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mosaic.h:
  *****************************************************************************
- * Copyright (C) 2004-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2004-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>

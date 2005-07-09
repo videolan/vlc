@@ -1,7 +1,7 @@
 /*****************************************************************************
  * s8tofloat32.c : converter from signed 8 bits integer to float32.
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>

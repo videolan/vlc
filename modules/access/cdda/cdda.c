@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cdda.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
- * Copyright (C) 2000, 2003, 2004, 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2003, 2004, 2005 the VideoLAN team
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>

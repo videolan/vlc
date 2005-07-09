@@ -1,7 +1,7 @@
 /*****************************************************************************
  * net.c:
  *****************************************************************************
- * Copyright (C) 2004-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2004-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>

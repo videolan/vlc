@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.c : Playlist testsuite
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN (Centrale RÃ©seaux) and its contributors
+ * Copyright (C) 2004 the VideoLAN team
  * $Id: test4.c 6961 2004-03-05 17:34:23Z sam $
  *
  * Authors : Clément Stenac <zorglub@videolan.org>

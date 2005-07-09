@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001, 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

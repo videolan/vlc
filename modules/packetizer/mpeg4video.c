@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001, 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

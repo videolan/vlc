@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001-2003 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>

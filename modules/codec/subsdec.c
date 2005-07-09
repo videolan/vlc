@@ -1,7 +1,7 @@
 /*****************************************************************************
  * subsdec.c : text subtitles decoder
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000-2001 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

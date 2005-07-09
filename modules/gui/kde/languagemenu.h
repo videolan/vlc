@@ -1,7 +1,7 @@
 /*****************************************************************************
  * languagemenu.h: the KLanguageMenuAction class
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001-2003 the VideoLAN team
  * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>

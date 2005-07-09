@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
- * Copyright (C) 2001-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

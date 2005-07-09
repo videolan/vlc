@@ -1,7 +1,7 @@
 /*****************************************************************************
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
- * Copyright (C) 2001-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

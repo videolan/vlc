@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2001 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

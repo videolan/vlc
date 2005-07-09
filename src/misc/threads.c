@@ -1,7 +1,7 @@
 /*****************************************************************************
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>

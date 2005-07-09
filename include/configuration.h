@@ -3,7 +3,7 @@
  * This file describes the programming interface for the configuration module.
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999, 2000 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
- * Copyright (C) 2001, 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001, 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

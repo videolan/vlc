@@ -1,7 +1,7 @@
 /*****************************************************************************
  * memcpy.c : classic memcpy module
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

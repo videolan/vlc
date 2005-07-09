@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

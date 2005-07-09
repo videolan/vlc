@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libavi.c : LibAVI
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001 the VideoLAN team
  * $Id$
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

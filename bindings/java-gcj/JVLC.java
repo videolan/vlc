@@ -1,7 +1,7 @@
 /*****************************************************************************
  * JVLC.java: global class for vlc Java Bindings
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2004 the VideoLAN team
  *
  * Authors: Filippo Carone <filippo@carone.org>
  *

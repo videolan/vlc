@@ -1,7 +1,7 @@
 /*****************************************************************************
  * m3u.c :  M3U playlist export module
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN (Centrale RÃ©seaux) and its contributors
+ * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

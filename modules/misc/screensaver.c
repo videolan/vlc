@@ -1,7 +1,7 @@
 /*****************************************************************************
  * screensaver.c : disable screen savers when VLC is playing
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>

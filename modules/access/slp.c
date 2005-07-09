@@ -1,7 +1,7 @@
 /*****************************************************************************
  * slp.c: SLP access plugin
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN (Centrale RÃ©seaux) and its contributors
+ * Copyright (C) 2002-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Loïc Minier <lool@videolan.org>

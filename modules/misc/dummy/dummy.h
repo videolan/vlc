@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dummy.h : dummy plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2001, 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

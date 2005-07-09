@@ -1,7 +1,7 @@
 /*****************************************************************************
  * aout.c : QNX audio output
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2001 the VideoLAN team
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>

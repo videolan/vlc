@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_block.h: Data blocks management functions
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

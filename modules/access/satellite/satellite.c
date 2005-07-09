@@ -1,7 +1,7 @@
 /*****************************************************************************
  * satellite.c : Satellite input module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000 the VideoLAN team
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

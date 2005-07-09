@@ -1,7 +1,7 @@
 /*****************************************************************************
  * daap.c :  Apple DAAP discovery module
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN (Centrale RÃ©seaux) and its contributors
+ * Copyright (C) 2004 the VideoLAN team
  * $Id: sap.c 9569 2004-12-15 22:17:52Z zorglub $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

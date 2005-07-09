@@ -1,7 +1,7 @@
 /*****************************************************************************
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

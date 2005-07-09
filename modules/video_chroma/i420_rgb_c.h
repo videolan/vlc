@@ -4,7 +4,7 @@
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999, 2000 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

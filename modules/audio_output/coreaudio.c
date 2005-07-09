@@ -1,7 +1,7 @@
 /*****************************************************************************
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>

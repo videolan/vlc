@@ -1,7 +1,7 @@
 /*****************************************************************************
  * access.c: Satellite card input
  *****************************************************************************
- * Copyright (C) 1998-2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2003 the VideoLAN team
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>

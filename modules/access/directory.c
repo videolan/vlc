@@ -1,7 +1,7 @@
 /*****************************************************************************
  * directory.c: expands a directory (directory: access plug-in)
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>>

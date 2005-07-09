@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audio_video.c: Audio/Video management : volume, snapshot, OSD
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2005 the VideoLAN team
  * $Id: vlc.c 10786 2005-04-23 23:19:17Z zorglub $
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>

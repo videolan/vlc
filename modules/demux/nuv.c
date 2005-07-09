@@ -1,7 +1,7 @@
 /*****************************************************************************
  * nuv.c:
  *****************************************************************************
- * Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2005 the VideoLAN team
  * $Id: $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

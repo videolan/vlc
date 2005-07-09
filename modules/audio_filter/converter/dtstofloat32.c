@@ -3,7 +3,7 @@
  *   This plugin makes use of libdts to do the actual decoding
  *   (http://www.videolan.org/dtsdec/).
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001, 2002 the VideoLAN team
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>

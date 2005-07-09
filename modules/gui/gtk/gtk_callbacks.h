@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2001 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

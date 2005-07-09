@@ -1,7 +1,7 @@
 /*****************************************************************************
  * iso_lang.h: languages codes and abbreviations
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2004 the VideoLAN team
  * $Id$
  *
  * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5

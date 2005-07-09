@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2003, 2004 Rocky Bernstein (for VideoLAN (Centrale Réseaux) and its contributors)
+ * Copyright (C) 2003, 2004 Rocky Bernstein (for the VideoLAN team)
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 

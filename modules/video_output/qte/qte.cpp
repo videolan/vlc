@@ -1,7 +1,7 @@
 /*****************************************************************************
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
- * Copyright (C) 1998-2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2003 the VideoLAN team
  * $Id$
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>

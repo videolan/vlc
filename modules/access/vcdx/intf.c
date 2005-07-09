@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
- * Copyright (C) 2002,2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002,2003 the VideoLAN team
  * $Id$
  *
  * Author: Rocky Bernstein <rocky@panix.com>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_filter.h: filter related structures
  *****************************************************************************
- * Copyright (C) 1999-2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2003 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
- * Copyright (C) 2000-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

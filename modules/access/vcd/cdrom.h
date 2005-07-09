@@ -1,7 +1,7 @@
 /****************************************************************************
  * cdrom.h: cdrom tools header
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2001 the VideoLAN team
  * $Id$
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>

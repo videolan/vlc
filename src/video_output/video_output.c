@@ -5,7 +5,7 @@
  * It includes functions allowing to open a new thread, send pictures to a
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

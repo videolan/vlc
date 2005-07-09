@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.c : Playlist management functions
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

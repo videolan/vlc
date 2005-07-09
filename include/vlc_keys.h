@@ -1,7 +1,7 @@
 /*****************************************************************************
  * hotkeys.h: keycode defines
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>

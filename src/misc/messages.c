@@ -3,7 +3,7 @@
  * This library provides an interface to the message queue to be used by other
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>

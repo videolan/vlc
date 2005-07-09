@@ -1,7 +1,7 @@
 /*****************************************************************************
  * video.cpp : WinCE gui plugin for VLC
  *****************************************************************************
- * Copyright (C) 2000-2004, 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000-2004, 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Marodon Cedric <cedric_marodon@yahoo.fr>

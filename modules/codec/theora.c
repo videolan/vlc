@@ -1,7 +1,7 @@
 /*****************************************************************************
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2001 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

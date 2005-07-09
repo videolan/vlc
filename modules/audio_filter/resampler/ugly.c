@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

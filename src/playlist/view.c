@@ -1,7 +1,7 @@
 /*****************************************************************************
  * view.c : Playlist views functions
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN (Centrale RÃ©seaux) and its contributors
+ * Copyright (C) 1999-2004 the VideoLAN team
  * $Id: item.c 7997 2004-06-18 11:35:45Z sigmunau $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_intf.c : video output interface
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

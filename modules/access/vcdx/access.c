@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc using libcdio, libvcd and libvcdinfo.
  *         vlc-specific things tend to go here.
  *****************************************************************************
- * Copyright (C) 2000, 2003, 2004, 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2003, 2004, 2005 the VideoLAN team
  * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>

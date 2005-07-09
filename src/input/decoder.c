@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decoder.c: Functions for the management of decoders
  *****************************************************************************
- * Copyright (C) 1999-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>

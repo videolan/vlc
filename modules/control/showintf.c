@@ -1,7 +1,7 @@
 /*****************************************************************************
  * showintf.c: control the display of the interface in fullscreen mode
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2004 the VideoLAN team
  * $Id:$
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>

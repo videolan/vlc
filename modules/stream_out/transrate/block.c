@@ -1,7 +1,7 @@
 /*****************************************************************************
  * block.c: MPEG2 video transrating module
  *****************************************************************************
- * Copyright (C) 2003-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003-2004 the VideoLAN team
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>

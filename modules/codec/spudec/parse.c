@@ -1,7 +1,7 @@
 /*****************************************************************************
  * parse.c: SPU parser
  *****************************************************************************
- * Copyright (C) 2000-2001, 2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000-2001, 2005 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

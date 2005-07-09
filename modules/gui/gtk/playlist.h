@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk_playlist.h : Playlist functions for the Gtk plugin.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2000, 2001 the VideoLAN team
  * $Id$
  *
  * Authors: Pierre Baillet <oct@zoy.org>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * visual.c : Visualisation system
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale RÃ©seaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>

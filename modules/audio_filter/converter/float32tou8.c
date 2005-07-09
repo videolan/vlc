@@ -1,7 +1,7 @@
 /*****************************************************************************
  * float32tou8.c : converter from float32 to unsigned 8 bits integer
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Xavier Maillard <zedek@fxgsproject.org>

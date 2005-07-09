@@ -1,7 +1,7 @@
 /*****************************************************************************
  * id3genres.h: list of genres for id3 genre tags
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002-2003 the VideoLAN team
  * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>

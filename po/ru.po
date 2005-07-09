@@ -1,6 +1,6 @@
 # Russian localisation for VLC
 # Copyright (C) 2001 Free Software Foundation, Inc.
-# Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
+# Copyright (C) 2005 the VideoLAN team
 # $Id$
 #
 # Valek Filippov <frob@df.ru>, 2001.

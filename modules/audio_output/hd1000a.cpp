@@ -1,7 +1,7 @@
 /*****************************************************************************
  * hd1000a.cpp : Roku HD1000 audio output
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>

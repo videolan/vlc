@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fixed32float32.c : converter from fixed32 to float32 bits integer
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>

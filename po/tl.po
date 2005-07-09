@@ -1,5 +1,5 @@
 # Tagalog translation for vlc package.
-# Copyright (C) 2005 VideoLAN (Centrale Réseaux) and its contributors
+# Copyright (C) 2005 the VideoLAN team
 # This file is distributed under the same license as the vlc package.
 # $Id$
 #

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gtk2.c : Gtk2 plugin for vlc
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>

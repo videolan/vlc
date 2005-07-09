@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
- * Copyright (C) 1999-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>

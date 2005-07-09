@@ -1,7 +1,7 @@
 /*****************************************************************************
  * QConfigItem.h : includes for the QConfigItem class
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 2001 the VideoLAN team
  * $Id$
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001

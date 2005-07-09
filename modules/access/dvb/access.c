@@ -1,7 +1,7 @@
 /*****************************************************************************
  * access.c: DVB card input v4l2 only
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2004 the VideoLAN team
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
