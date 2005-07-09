@@ -251,12 +251,57 @@ static int ReadBlockHeader( demux_t *p_demux )
             }
             break;
 
-        /* FIXME: support block type 8 properly */
-        case 8:
-            msg_Err( p_demux, "Unimplemented block type 8" );
-            return VLC_EGENERIC;
+        case 8: 
+            /* 
+             * Block 8 is a big kludge to add stereo support to block 1 :
+             * A block of type 8 is always followed by a block of type 1
+             * and specifies the number of channels in that 1-block
+             * (normally block 1 are always mono). In practice, block type 9
+             * is used for stereo rather than 8
+             */
+            if( ( i_block_size != 4 )
+             || ( stream_Read( p_demux->s, buf, 4 ) < 4 ) )
+                goto corrupt;
 
-        case 9:
+            if( buf[2] )
+            {
+                msg_Err( p_demux, "Unsupported compression" );
+                return VLC_EGENERIC;
+            }
+
+            new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.audio.i_channels = buf[3] + 1; /* can't be nul */
+            new_fmt.audio.i_rate = 256000000L /
+                          ((65536L - GetWLE(buf)) * new_fmt.audio.i_channels);
+            new_fmt.audio.i_bytes_per_frame = new_fmt.audio.i_channels;
+            new_fmt.audio.i_frame_length = 1;
+            new_fmt.audio.i_blockalign = new_fmt.audio.i_bytes_per_frame;
+            new_fmt.audio.i_bitspersample = 8 * new_fmt.audio.i_bytes_per_frame;
+            new_fmt.i_bitrate = new_fmt.audio.i_rate * 8;
+
+            /* read subsequent block 1 */
+            if( stream_Read( p_demux->s, buf, 4 ) < 4 )
+                return VLC_EGENERIC; /* EOF */
+        
+            i_block_size = GetDWLE( buf ) >> 8;
+            msg_Dbg( p_demux, "new block: type: %u, size: %u",
+                    (unsigned)*buf, i_block_size );
+            if( i_block_size < 2 )
+                goto corrupt;
+            i_block_size -= 2;
+
+            if( stream_Read( p_demux->s, buf, 2 ) < 2 )
+                goto corrupt;
+
+            if( buf[1] )
+            {
+                msg_Err( p_demux, "Unsupported compression" );
+                return VLC_EGENERIC;
+            }
+
+            break;
+
+        case 9: /* newer data block with channel number and bits resolution */
             if( i_block_size < 12 )
                 goto corrupt;
             i_block_size -= 12;
