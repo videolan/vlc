@@ -523,12 +523,14 @@ private:
     wxSpinCtrl *disc_title; int i_disc_title;
     wxSpinCtrl *disc_chapter; int i_disc_chapter;
     wxSpinCtrl *disc_sub; int i_disc_sub;
+    wxSpinCtrl *disc_audio; int i_disc_audio;
 
     /* The media equivalent name for a DVD names. For example,
      * "Title", is "Track" for a CD-DA */
     wxStaticText *disc_title_label;
     wxStaticText *disc_chapter_label;
     wxStaticText *disc_sub_label;
+    wxStaticText *disc_audio_label;
 
     /* Indicates if the disc device control was modified */
     bool b_disc_device_changed;
