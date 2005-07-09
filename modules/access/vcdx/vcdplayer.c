@@ -695,6 +695,7 @@ vcdplayer_play_default( access_t * p_access )
       dbg_print(INPUT_DBG_PBC, "DEFAULT to %d", itemid.num);
     } else {
       dbg_print(INPUT_DBG_PBC, "no DEFAULT for LID %d", p_vcdplayer->i_lid);
+      return VLC_EGENERIC;
     }
 
 #else 
@@ -724,7 +725,7 @@ vcdplayer_play_default( access_t * p_access )
     /* PBC is not on. "default" selection beginning of current 
        selection . */
   
-    p_vcdplayer->play_item.num = p_vcdplayer->play_item.num;
+    itemid.num = p_vcdplayer->play_item.num;
     
   }
 
