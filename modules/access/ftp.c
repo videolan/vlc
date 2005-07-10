@@ -189,13 +189,6 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
             return -1;
     }
 
-    /* Extended passive mode */
-    if( ftp_SendCommand( p_access, "EPSV ALL" ) < 0 )
-    {
-        msg_Err( p_access, "cannot request extended passive mode" );
-        return -1;
-    }
-
     return 0;
 }
 
@@ -248,6 +241,13 @@ static int Open( vlc_object_t *p_this )
 
     if( Connect( p_access, p_sys ) < 0 )
         goto exit_error;
+
+    /* Extended passive mode */
+    if( ftp_SendCommand( p_access, "EPSV ALL" ) < 0 )
+    {
+        msg_Err( p_access, "cannot request extended passive mode" );
+        return -1;
+    }
 
     if( ftp_ReadCommand( p_access, &i_answer, NULL ) == 2 )
     {
