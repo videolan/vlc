@@ -85,14 +85,14 @@ static int Open( vlc_object_t * p_this )
 
     /* Check if we are dealing with a WAV file */
     if( stream_Peek( p_demux->s, &p_peek, 12 ) == 12 &&
-        !strncmp( p_peek, "RIFF", 4 ) && !strncmp( &p_peek[8], "WAVE", 4 ) )
+        !memcmp( p_peek, "RIFF", 4 ) && !memcmp( p_peek + 8, "WAVE", 4 ) )
     {
         int i_size;
 
         /* Skip the wave header */
         i_peek = 12 + 8;
         while( stream_Peek( p_demux->s, &p_peek, i_peek ) == i_peek &&
-               strncmp( p_peek + i_peek - 8, "data", 4 ) )
+               memcmp( p_peek + i_peek - 8, "data", 4 ) )
         {
             i_peek += GetDWLE( p_peek + i_peek - 4 ) + 8;
         }
