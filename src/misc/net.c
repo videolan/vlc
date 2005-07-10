@@ -199,7 +199,7 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
-            int i_val_size = sizeof( i_val );
+            socklen_t i_val_size = sizeof( i_val );
             div_t d;
             struct timeval tv;
             vlc_value_t timeout;
@@ -909,7 +909,7 @@ char *__net_Gets( vlc_object_t *p_this, int fd, v_socket_t *p_vs )
             ptr = psz_line + i_line;
         }
 
-        if( net_Read( p_this, fd, p_vs, ptr, 1, VLC_TRUE ) != 1 )
+        if( net_Read( p_this, fd, p_vs, (uint8_t *)ptr, 1, VLC_TRUE ) != 1 )
         {
             if( i_line == 0 )
             {
@@ -954,7 +954,8 @@ int __net_vaPrintf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
 
     vasprintf( &psz, psz_fmt, args );
     i_size = strlen( psz );
-    i_ret = __net_Write( p_this, fd, p_vs, psz, i_size ) < i_size ? -1 : i_size;
+    i_ret = __net_Write( p_this, fd, p_vs, (uint8_t *)psz, i_size ) < i_size
+        ? -1 : i_size;
     free( psz );
 
     return i_ret;
