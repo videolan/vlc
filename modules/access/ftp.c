@@ -562,10 +562,10 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     char psz_ipv4[16], *psz_ip;
     int  i_answer;
     char *psz_arg, *psz_parser;
-    unsigned  a1, a2, a3, a4, p1, p2;
     int  i_port;
 
-    if( ( ftp_SendCommand( p_access, p_sys->psz_epsv_ip != NULL
+    psz_ip = p_sys->psz_epsv_ip;
+    if( ( ftp_SendCommand( p_access, ( psz_ip != NULL )
                                      ? "EPSV" : "PASV" ) < 0 )
      || ( ftp_ReadCommand( p_access, &i_answer, &psz_arg ) != 2 ) )
     {
@@ -581,7 +581,6 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
         return VLC_EGENERIC;
     }
 
-    psz_ip = p_sys->psz_epsv_ip;
     if( psz_ip != NULL )
     {
         char psz_fmt[7] = "(|||%u";
@@ -596,6 +595,8 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     }
     else
     {
+        unsigned  a1, a2, a3, a4, p1, p2;
+
         if( ( sscanf( psz_parser, "(%u,%u,%u,%u,%u,%u", &a1, &a2, &a3, &a4,
                       &p1, &p2 ) < 6 ) || ( a1 > 255 ) || ( a2 > 255 )
          || ( a3 > 255 ) || ( a4 > 255 ) || ( p1 > 255 ) || ( p2 > 255 ) )
@@ -658,7 +659,7 @@ static int ftp_StopStream ( access_t *p_access )
 
     if( ftp_SendCommand( p_access, "ABOR" ) < 0 )
     {
-        msg_Warn( p_access, "cannot abord file" );
+        msg_Warn( p_access, "cannot abort file" );
         if(  p_sys->fd_data > 0 )
             net_Close( p_sys->fd_data );
         p_sys->fd_data = -1;
