@@ -568,7 +568,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     p += sprintf( (char *)p,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
-        "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd\">\n"
+        "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
         "<html>\n"
         "<head>\n"
         "<title>Redirection</title>\n"
@@ -1400,7 +1400,7 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
 }
 
 
-static int httpd_NetRecv( httpd_client_t *cl, char *p, int i_len )
+static int httpd_NetRecv( httpd_client_t *cl, uint8_t *p, int i_len )
 {
     tls_session_t *p_tls;
     
@@ -1412,7 +1412,7 @@ static int httpd_NetRecv( httpd_client_t *cl, char *p, int i_len )
 }
 
 
-static int httpd_NetSend( httpd_client_t *cl, const char *p, int i_len )
+static int httpd_NetSend( httpd_client_t *cl, const uint8_t *p, int i_len )
 {
     tls_session_t *p_tls;
 
@@ -1453,19 +1453,19 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
                 cl->i_buffer      = 0;
             }
-            else if( !strncmp( cl->p_buffer, "HTTP", 4 ) )
+            else if( !memcmp( cl->p_buffer, "HTTP", 4 ) )
             {
                 cl->query.i_proto = HTTPD_PROTO_HTTP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
             }
-            else if( !strncmp( cl->p_buffer, "RTSP", 4 ) )
+            else if( !memcmp( cl->p_buffer, "RTSP", 4 ) )
             {
                 cl->query.i_proto = HTTPD_PROTO_RTSP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
             }
-            else if( !strncmp( cl->p_buffer, "GET", 3 ) ||
-                     !strncmp( cl->p_buffer, "HEAD", 4 ) ||
-                     !strncmp( cl->p_buffer, "POST", 4 ) )
+            else if( !memcmp( cl->p_buffer, "GET", 3 ) ||
+                     !memcmp( cl->p_buffer, "HEAD", 4 ) ||
+                     !memcmp( cl->p_buffer, "POST", 4 ) )
             {
                 cl->query.i_proto = HTTPD_PROTO_HTTP;
                 cl->query.i_type  = HTTPD_MSG_NONE;
@@ -1508,8 +1508,8 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 cl->i_buffer_size += 1024;
                 cl->p_buffer = realloc( cl->p_buffer, cl->i_buffer_size );
             }
-            if( ( cl->i_buffer >= 2 && !strncmp( &cl->p_buffer[cl->i_buffer-2], "\n\n", 2 ) )||
-                ( cl->i_buffer >= 4 && !strncmp( &cl->p_buffer[cl->i_buffer-4], "\r\n\r\n", 4 ) ) )
+            if( ( cl->i_buffer >= 2 && !memcmp( &cl->p_buffer[cl->i_buffer-2], "\n\n", 2 ) )||
+                ( cl->i_buffer >= 4 && !memcmp( &cl->p_buffer[cl->i_buffer-4], "\r\n\r\n", 4 ) ) )
             {
                 char *p;
 
@@ -1518,8 +1518,12 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
                 if( cl->query.i_type == HTTPD_MSG_ANSWER )
                 {
+                    /* FIXME:
+                     * assume strlen( "HTTP/1.x" ) = 8
+                     */
                     cl->query.i_status =
-                        strtol( &cl->p_buffer[strlen( "HTTP/1.x" )], &p, 0 );
+                        strtol( (char *)&cl->p_buffer[8],
+                                &p, 0 );
                     while( *p == ' ' )
                     {
                         p++;
@@ -1558,10 +1562,10 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
                     for( i = 0; msg_type[i].name != NULL; i++ )
                     {
-                        if( !strncmp( cl->p_buffer, msg_type[i].name,
+                        if( !strncmp( (char *)cl->p_buffer, msg_type[i].name,
                                       strlen( msg_type[i].name ) ) )
                         {
-                            p = &cl->p_buffer[strlen(msg_type[i].name) + 1 ];
+                            p = (char *)&cl->p_buffer[strlen((char *)msg_type[i].name) + 1 ];
                             cl->query.i_type = msg_type[i].i_type;
                             if( cl->query.i_proto != msg_type[i].i_proto )
                             {
@@ -1574,11 +1578,11 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                     }
                     if( p == NULL )
                     {
-                        if( strstr( cl->p_buffer, "HTTP/1." ) )
+                        if( strstr( (char *)cl->p_buffer, "HTTP/1." ) )
                         {
                             cl->query.i_proto = HTTPD_PROTO_HTTP;
                         }
-                        else if( strstr( cl->p_buffer, "RTSP/1." ) )
+                        else if( strstr( (char *)cl->p_buffer, "RTSP/1." ) )
                         {
                             cl->query.i_proto = HTTPD_PROTO_RTSP;
                         }
@@ -1608,7 +1612,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                         if( ( p3 = strchr( cl->query.psz_url, '?' ) )  )
                         {
                             *p3++ = '\0';
-                            cl->query.psz_args = strdup( p3 );
+                            cl->query.psz_args = (uint8_t *)strdup( p3 );
                         }
                         if( p2 )
                         {
@@ -1778,7 +1782,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
             free( cl->p_buffer );
             cl->p_buffer = malloc( i_size );
         }
-        p = cl->p_buffer;
+        p = (char *)cl->p_buffer;
 
         p += sprintf( p, "%s/1.%d %d %s\r\n",
                       cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP" : "RTSP",
@@ -2044,16 +2048,20 @@ static void httpd_HostThread( httpd_host_t *host )
 
                         p = answer->p_body = malloc( 1000 );
 
-                        p += sprintf( p, "<html>\n" );
-                        p += sprintf( p, "<head>\n" );
-                        p += sprintf( p, "<title>Error 501</title>\n" );
-                        p += sprintf( p, "</head>\n" );
-                        p += sprintf( p, "<body>\n" );
-                        p += sprintf( p, "<h1><center> 501 Unimplemented</center></h1>\n" );
-                        p += sprintf( p, "<hr />\n" );
-                        p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-                        p += sprintf( p, "</body>\n" );
-                        p += sprintf( p, "</html>\n" );
+                        p += sprintf( (char *)p,
+                            "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                            "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
+                            "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
+                            "<html>\n"
+                            "<head>\n"
+                            "<title>Error 501</title>\n"
+                            "</head>\n"
+                            "<body>\n"
+                            "<h1>501 Unimplemented</h1>\n"
+                            "<hr />\n"
+                            "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                            "</body>\n"
+                            "</html>\n" );
 
                         answer->i_body = p - answer->p_body;
                         httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
@@ -2157,32 +2165,41 @@ static void httpd_HostThread( httpd_host_t *host )
                             answer->i_status = 403;
                             answer->psz_status = strdup( "Forbidden" );
 
-                            p += sprintf( p, "<html>\n" );
-                            p += sprintf( p, "<head>\n" );
-                            p += sprintf( p, "<title>Error 403</title>\n" );
-                            p += sprintf( p, "</head>\n" );
-                            p += sprintf( p, "<body>\n" );
-                            p += sprintf( p, "<h1><center> 403 Forbidden (%s)</center></h1>\n", query->psz_url );
-                            p += sprintf( p, "<hr />\n" );
-                            p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-                            p += sprintf( p, "</body>\n" );
-                            p += sprintf( p, "</html>\n" );
+                            /* FIXME: lots of code duplication */
+                            p += sprintf( (char *)p,
+                                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                                "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
+                                "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
+                                "<html>\n"
+                                "<head>\n"
+                                "<title>Error 403</title>\n"
+                                "</head>\n"
+                                "<body>\n"
+                                "<h1>403 Forbidden (%s)</h1>\n"
+                                "<hr />\n"
+                                "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                                "</body>\n"
+                                "</html>\n", query->psz_url );
                         }
                         else if( b_auth_failed )
                         {
                             answer->i_status = 401;
                             answer->psz_status = strdup( "Authorization Required" );
 
-                            p += sprintf( p, "<html>\n" );
-                            p += sprintf( p, "<head>\n" );
-                            p += sprintf( p, "<title>Error 401</title>\n" );
-                            p += sprintf( p, "</head>\n" );
-                            p += sprintf( p, "<body>\n" );
-                            p += sprintf( p, "<h1><center> 401 Authorization Required (%s)</center></h1>\n", query->psz_url );
-                            p += sprintf( p, "<hr />\n" );
-                            p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-                            p += sprintf( p, "</body>\n" );
-                            p += sprintf( p, "</html>\n" );
+                            p += sprintf( (char *)p,
+                                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                                "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
+                                "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
+                                "<html>\n"
+                                "<head>\n"
+                                "<title>Error 401</title>\n"
+                                "</head>\n"
+                                "<body>\n"
+                                "<h1>401 Authorization Required (%s)</h1>\n"
+                                "<hr />\n"
+                                "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                                "</body>\n"
+                                "</html>\n", query->psz_url );
                         }
                         else
                         {
@@ -2190,16 +2207,20 @@ static void httpd_HostThread( httpd_host_t *host )
                             answer->i_status = 404;
                             answer->psz_status = strdup( "Not found" );
 
-                            p += sprintf( p, "<html>\n" );
-                            p += sprintf( p, "<head>\n" );
-                            p += sprintf( p, "<title>Error 404</title>\n" );
-                            p += sprintf( p, "</head>\n" );
-                            p += sprintf( p, "<body>\n" );
-                            p += sprintf( p, "<h1><center> 404 Resource not found(%s)</center></h1>\n", query->psz_url );
-                            p += sprintf( p, "<hr />\n" );
-                            p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-                            p += sprintf( p, "</body>\n" );
-                            p += sprintf( p, "</html>\n" );
+                            p += sprintf( (char *)p,
+                                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                                "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
+                                "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
+                                "<html>\n"
+                                "<head>\n"
+                                "<title>Error 404</title>\n"
+                                "</head>\n"
+                                "<body>\n"
+                                "<h1><center> 404 Resource not found(%s)</center></h1>\n"
+                                "<hr />\n"
+                                "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
+                                "</body>\n"
+                                "</html>\n", query->psz_url );
                         }
 
                         answer->i_body = p - answer->p_body;
@@ -2327,7 +2348,7 @@ static void httpd_HostThread( httpd_host_t *host )
         {
             if( FD_ISSET( fd, &fds_read ) )
             {
-                int     i_sock_size = sizeof( struct sockaddr_storage );
+                socklen_t i_sock_size = sizeof( struct sockaddr_storage );
                 struct  sockaddr_storage sock;
     
                 fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
