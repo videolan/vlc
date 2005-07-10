@@ -830,6 +830,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
         {
         case 0: /* DVD with menus */
         case 1: /* DVD without menus */
+	    disc_device->SetToolTip( wxU(_("Name of DVD device "
+	    "to read from.")) );
             if( i_disc_type_selection == 0 )
             {
                 mrltemp = wxT("dvd://") + disc_device->GetValue();
@@ -859,12 +861,17 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
         case 2:  /* VCD of some sort */
 #ifdef HAVE_VCDX
+	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+	    "to read Video CD from. If this field is left empty, we will scan "
+	    "for a CD-ROM with a VCD in it.")) );
             mrltemp = wxT("vcdx://") + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%c%d"),
                                   config_GetInt( p_intf, "vcdx-PBC"  )
                                   ? 'P' : 'E', i_disc_title );
 #else
+	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+	    "to read Video CD from.")) );
             mrltemp = wxT("vcd://") + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%d"), i_disc_title );
@@ -881,11 +888,15 @@ void OpenDialog::UpdateMRL( int i_access_method )
             break;
 
         case 3: /* CD-DA */
-            mrltemp = 
 #ifdef HAVE_CDDAX
-              wxT("cddax://") 
+	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+	    "to read audio CD from. If this field is left empty, we will scan "
+	    "for a CD-ROM with an audio CD in it." )) );
+            mrltemp = wxT("cddax://") 
 #else
-              wxT("cdda://") 
+	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+	    "to read audio CD from." )) );
+            mrltemp = wxT("cdda://") 
 #endif
               + disc_device->GetValue();
             if( i_disc_title > 0 )
@@ -1237,6 +1248,14 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_sub->SetRange( -1, 31 );  // up to 32 subtitles -1: no subtitle
         disc_audio->SetRange( 0, 7 );  // up to 8 audio channels
         disc_chapter->SetRange( 0, 255 );
+	disc_title->SetToolTip( wxU(_("Title number.")) );
+	disc_sub->SetToolTip( wxU(_(
+	  "DVD's can have up to 32 subtitles numbered 0..31. "
+	  "Note this is not the same thing as a subtitle name e.g. 'en'. "
+	  "If a value -1 is used, no subtitle will be shown." )) );
+	disc_audio->SetToolTip( wxU(_("Audio track number. "
+	  "DVD's can have up to 8 audio tracks numbered 0..7."
+        )) );
         break;
 
     case 2:  /* VCD of some sort */
@@ -1251,14 +1270,32 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         }
 
 #ifdef HAVE_VCDX
-        disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
-                                     ? wxT("Playback LID") : wxT("Entry") );
+	if (config_GetInt( p_intf, "vcdx-PBC"  )) 
+	{
+	  disc_title_label->SetLabel ( wxT("Playback LID") );
+	  disc_title->SetToolTip( wxU(_(
+	  "Playback control (PBC) usually starts with number 1." )) );
+	} 
+	else 
+	{
+	  disc_title_label->SetLabel ( wxT("Entry") );
+	  disc_title->SetToolTip( wxU(_(
+	  "The first entry (the beginning of the first MPEG track) is 0." )) );
+	}
+	
 #else
         disc_title_label->SetLabel ( wxU(_("Track")) );
+	disc_title->SetToolTip( wxU(_("Track number.")) );
 #endif
         disc_title->SetRange( 0, 99 );  // only 100 tracks allowed on VCDs
         disc_sub->SetRange( -1, 3 );    // up to 4 subtitles -1 = no subtitle
         disc_audio->SetRange( 0, 1 );   // up to 2 audio tracks
+	disc_sub->SetToolTip( wxU(_(
+	  "SVCD's can have up to 4 subtitles numbered 0..3. "
+          "If a value -1 is used, no subtitle will be shown." )) );
+	disc_audio->SetToolTip( wxU(_("Audio track number. "
+	  "VCD's can have up to 2 audio tracks numbered 0 or 1. "
+        )) );
         break;
 
     case 3: /* CD-DA */
@@ -1266,6 +1303,15 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_chapter->Disable(); disc_chapter_label->Disable();
         disc_audio->Disable(); disc_audio_label->Disable();
         disc_title_label->SetLabel ( wxU(_("Track")) );
+#ifdef HAVE_CDDAX
+	disc_title->SetToolTip( wxU(_(
+	"Audio CDs can have up to 100 tracks, the first track is usually 1. "
+        "If 0 is given, then all tracks are played.")) );
+#else
+	disc_title->SetToolTip( wxU(_(
+	"Audio CDs can have up to 100 tracks, the first track is usually 1."
+        )) );
+#endif
         psz_device = config_GetPsz( p_intf, "cd-audio" );
         if( !b_disc_device_changed )
         {
@@ -1273,8 +1319,8 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
             else disc_device->SetValue( wxT("") );
         }
 
-        /* There are at most 99 tracks in a CD-DA */
-        disc_title->SetRange( 0, 99 );
+        /* There are at most 100 tracks in a CD-DA */
+        disc_title->SetRange( 0, 100 );
         break;
 
     default:
