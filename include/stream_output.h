@@ -267,8 +267,8 @@ struct announce_method_t
 struct sap_session_t
 {
     char          *psz_sdp;
-    char          *psz_data;
-    int            i_length;
+    uint8_t       *psz_data;
+    unsigned      i_length;
     sap_address_t *p_address;
 
     /* Last and next send */

@@ -466,7 +466,7 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
 
     if( query->i_type != HTTPD_MSG_HEAD )
     {
-        char *psz_args = query->psz_args;
+        uint8_t *psz_args = query->psz_args;
         if( query->i_type == HTTPD_MSG_POST )
         {
             /* Check that */

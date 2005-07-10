@@ -82,7 +82,9 @@ struct httpd_message_t
 
     /* for a query */
     char    *psz_url;
-    char    *psz_args;  /* FIXME find a clean way to handle GET(psz_args) and POST(body) through the same code */
+    /* FIXME find a clean way to handle GET(psz_args)
+       and POST(body) through the same code */
+    uint8_t *psz_args;
 
     /* for rtp over rtsp */
     int     i_channel;

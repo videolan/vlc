@@ -483,8 +483,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     psz_head[ i_header_size-1 ] = '\0';
     p_sap_session->i_length = i_header_size + strlen( p_sap_session->psz_sdp);
 
-    p_sap_session->psz_data = (char *)malloc( sizeof(char)*
-                                              p_sap_session->i_length );
+    p_sap_session->psz_data = (uint8_t *)malloc( sizeof(char)*
+                                                 p_sap_session->i_length );
 
     /* Build the final message */
     memcpy( p_sap_session->psz_data, psz_head, i_header_size );
@@ -665,7 +665,7 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
 static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
 {
     int i_read;
-    char buffer[SAP_MAX_BUFFER];
+    uint8_t buffer[SAP_MAX_BUFFER];
     int i_tot = 0;
     mtime_t i_temp;
     int i_rate;

@@ -59,7 +59,7 @@ static void     DestroyThread     ( vout_thread_t * );
 static void     AspectRatio       ( int, int *, int * );
 static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
-static void     InitWindowSize    ( vout_thread_t *, int *, int * );
+static void     InitWindowSize    ( vout_thread_t *, unsigned *, unsigned * );
 
 /* Object variables callbacks */
 static int DeinterlaceCallback( vlc_object_t *, char const *,
@@ -128,7 +128,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                 p_vout = vlc_object_find( p_playlist,
                                           VLC_OBJECT_VOUT, FIND_CHILD );
                 /* only first children of p_input for unused vout */
-                if( p_vout && p_vout->p_parent != p_playlist )
+                if( p_vout && p_vout->p_parent != (vlc_object_t *)p_playlist )
                 {
                     vlc_object_release( p_vout );
                     p_vout = NULL;
@@ -1256,8 +1256,8 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
  * This function will check the "width", "height" and "zoom" config options and
  * will calculate the size that the video window should have.
  *****************************************************************************/
-static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
-                            int *pi_height )
+static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
+                            unsigned *pi_height )
 {
     vlc_value_t val;
     int i_width, i_height;
