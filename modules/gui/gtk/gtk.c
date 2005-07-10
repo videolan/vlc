@@ -440,7 +440,7 @@ static int Manage( intf_thread_t *p_intf )
         vout_thread_t   *p_vout  = NULL;
         vlc_bool_t      b_need_menus = VLC_FALSE;
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
+        //vlc_mutex_lock( &p_input->stream.stream_lock );
 
         if( !p_input->b_die )
         {
@@ -481,9 +481,9 @@ static int Manage( intf_thread_t *p_intf )
                         double f_fpos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        //vlc_mutex_unlock( &p_input->stream.stream_lock );
                         var_SetFloat( p_input, "position", f_fpos );
-                        vlc_mutex_lock( &p_input->stream.stream_lock );
+                        //vlc_mutex_lock( &p_input->stream.stream_lock );
                     }
 
                     /* Update the old value */
@@ -536,7 +536,7 @@ static int Manage( intf_thread_t *p_intf )
             }
         }
 
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        //vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {

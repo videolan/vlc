@@ -30,5 +30,5 @@ GtkWidget*  create_pixmap              (GtkWidget       *widget,
                                         const gchar     *filename,
                                         gboolean         gnome_pixmap);
 
-GdkImlibImage* create_image            (const gchar     *filename);
+//GdkImlibImage* create_image            (const gchar     *filename);
 

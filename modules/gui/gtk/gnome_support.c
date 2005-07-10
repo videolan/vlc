@@ -126,6 +126,7 @@ create_pixmap                          (GtkWidget       *widget,
 }
 
 /* This is an internally used function to create imlib images. */
+#if 0
 GdkImlibImage*
 create_image                           (const gchar     *filename)
 {
@@ -143,4 +144,5 @@ create_image                           (const gchar     *filename)
   g_free (pathname);
   return image;
 }
+#endif
 

@@ -344,7 +344,7 @@ static void Manage( intf_thread_t *p_intf )
         }
 
         gnome_popup_menu_do_popup( p_intf->p_sys->p_popup,
-                                   NULL, NULL, NULL, NULL );
+                                   NULL, NULL, NULL, NULL, NULL );
         p_intf->b_menu_change = 0;
     }
 
