@@ -467,7 +467,7 @@ vlc_bool_t vlc_reduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
                        uint64_t i_nom, uint64_t i_den, uint64_t i_max )
 {
     vlc_bool_t b_exact = 1;
-    uint64_t u_gcd;
+    int64_t i_gcd;
 
     if( i_den == 0 )
     {
