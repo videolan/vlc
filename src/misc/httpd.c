@@ -565,16 +565,22 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     answer->psz_status = strdup( "Moved Permanently" );
 
     p = answer->p_body = malloc( 1000 + strlen( rdir->psz_dst ) );
-    p += sprintf( p, "<html>\n" );
-    p += sprintf( p, "<head>\n" );
-    p += sprintf( p, "<title>Redirection</title>\n" );
-    p += sprintf( p, "</head>\n" );
-    p += sprintf( p, "<body>\n" );
-    p += sprintf( p, "<h1><center>You should be <a href=\"%s\">redirected</a></center></h1>\n", rdir->psz_dst );
-    p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
-    p += sprintf( p, "</body>\n" );
-    p += sprintf( p, "</html>\n" );
+    p += sprintf( (char *)p,
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+        "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
+        "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd\">\n"
+        "<html>\n"
+        "<head>\n"
+        "<title>Redirection</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>You should be "
+        "<a href=\"%s\">redirected</a></h1>\n"
+        "<hr />\n"
+        "<p><a href=\"http://www.videolan.org\">VideoLAN</a>\n</p>"
+        "<hr />\n"
+        "</body>\n"
+        "</html>\n", rdir->psz_dst );
     answer->i_body = p - answer->p_body;
 
     /* XXX check if it's ok or we need to set an absolute url */
