@@ -122,7 +122,7 @@ typedef enum { PLAYLIST_STOPPED,PLAYLIST_RUNNING,PLAYLIST_PAUSED } playlist_stat
 struct services_discovery_t
 {
     VLC_COMMON_MEMBERS
-    const char *psz_module;
+    char *psz_module;
 
     module_t *p_module;
 
