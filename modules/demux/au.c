@@ -107,7 +107,7 @@ static int Open( vlc_object_t *p_this )
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
-    if( strncmp( p_peek, ".snd", 4 ) )
+    if( memcmp( p_peek, ".snd", 4 ) )
     {
         return VLC_EGENERIC;
     }

@@ -112,7 +112,7 @@ static int Open( vlc_object_t * p_this )
     /* Is it a wav file ? */
     if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 ) return VLC_EGENERIC;
 
-    if( strncmp( p_peek, "RIFF", 4 ) || strncmp( &p_peek[8], "WAVE", 4 ) )
+    if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "WAVE", 4 ) )
     {
         return VLC_EGENERIC;
     }
@@ -381,7 +381,7 @@ static int ChunkFind( demux_t *p_demux, char *fcc, unsigned int *pi_size )
 
         msg_Dbg( p_demux, "Chunk: fcc=`%4.4s` size=%d", p_peek, i_size );
 
-        if( !strncmp( p_peek, fcc, 4 ) )
+        if( !memcmp( p_peek, fcc, 4 ) )
         {
             if( pi_size )
             {
