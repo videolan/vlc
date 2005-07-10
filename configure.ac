@@ -1154,16 +1154,12 @@ dnl  Special arch tuning
 dnl
 AC_ARG_WITH(tuning,
 [  --with-tuning=ARCH      enable special tuning for an architecture
-                          (default i686 on IA-32 and 750 on PPC)])
+                          (default Pentium 2 on IA-32 and 750 on PPC)])
 if test -n "${with_tuning}"; then
-    if test "${target_cpu}" = "powerpc"; then
-        CFLAGS_TUNING="-mtune=${with_tuning}"
-    else
-        CFLAGS_TUNING="-mcpu=${with_tuning}"
-    fi
+    CFLAGS_TUNING="-mtune=${with_tuning}"
 else
     if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then
-        CFLAGS_TUNING="-mcpu=pentiumpro"
+        CFLAGS_TUNING="-mtune=pentium2"
     elif test "${target_cpu}" = "x86_64"; then
         CFLAGS_TUNING="-mtune=opteron"
     elif test "${target_cpu}" = "powerpc"; then
