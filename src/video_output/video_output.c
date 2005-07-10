@@ -423,6 +423,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "linear"; text.psz_string = _("Linear");
     var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "x"; text.psz_string = "X";
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+
     if( var_Get( p_vout, "deinterlace-mode", &val ) == VLC_SUCCESS )
     {
         var_Set( p_vout, "deinterlace", val );
