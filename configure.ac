@@ -1165,6 +1165,19 @@ else
     elif test "${target_cpu}" = "powerpc"; then
         CFLAGS_TUNING="-mtune=750";
     fi
+
+    dnl NOTE: this can't be cached cleanly
+    AS_IF([test "${CFLAGS_TUNING}"],
+       [CFLAGS_save="${CFLAGS}"
+        CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
+
+        AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
+        AC_COMPILE_IFELSE([ ], [tuning="yes"],
+                               [CFLAGS_TUNING=""; tuning="no"])
+
+        AC_MSG_RESULT([$tuning])
+        CFLAGS="${CFLAGS_save}"
+    ])
 fi
 
 dnl
