@@ -181,7 +181,7 @@ struct module_symbols_t
     void * (*vlc_opendir_inner) (const char *);
     void * (*vlc_readdir_inner) (void *);
     int (*vlc_closedir_inner) (void *);
-    vlc_bool_t (*vlc_reduce_inner) (int *, int *, int64_t, int64_t, int64_t);
+    vlc_bool_t (*vlc_reduce_inner) (unsigned *, unsigned *, uint64_t, uint64_t, uint64_t);
     char ** (*vlc_parse_cmdline_inner) (const char *, int *);
     char * (*vlc_wraptext_inner) (const char *, int, vlc_bool_t);
     vlc_iconv_t (*vlc_iconv_open_inner) (const char *, const char *);
