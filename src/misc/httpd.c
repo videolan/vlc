@@ -2216,7 +2216,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                 "<title>Error 404</title>\n"
                                 "</head>\n"
                                 "<body>\n"
-                                "<h1><center> 404 Resource not found(%s)</center></h1>\n"
+                                "<h1>404 Resource not found(%s)</h1>\n"
                                 "<hr />\n"
                                 "<a href=\"http://www.videolan.org\">VideoLAN</a>\n"
                                 "</body>\n"
