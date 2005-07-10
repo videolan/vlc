@@ -598,37 +598,31 @@ static int ReadICYMeta( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    uint8_t buffer[1];
-    char *psz_meta;
+    uint8_t buffer;
+    char *p, *psz_meta;
     int i_read;
-    char *p;
 
     /* Read meta data length */
-    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, buffer, 1,
+    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, &buffer, 1,
                        VLC_TRUE );
-    if( i_read <= 0 )
+    if( ( i_read <= 0 ) || ( buffer == 0 ) )
         return VLC_EGENERIC;
 
+    i_read = buffer << 4;
+    msg_Dbg( p_access, "ICY meta size=%u", i_read);
 
-    if( buffer[0] <= 0 )
-        return VLC_SUCCESS;
-
-    msg_Dbg( p_access, "ICY meta size=%d", buffer[0] * 16);
-
-    psz_meta = malloc( buffer[0] * 16 + 1 );
-    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs,
-                       psz_meta, buffer[0] * 16, VLC_TRUE );
-
-    if( i_read != buffer[0] * 16 )
+    psz_meta = malloc( i_read + 1 );
+    if( net_Read( p_access, p_sys->fd, p_sys->p_vs,
+                  (uint8_t *)psz_meta, i_read, VLC_TRUE ) != i_read )
         return VLC_EGENERIC;
 
-    psz_meta[buffer[0]*16] = '\0'; /* Just in case */
+    psz_meta[i_read] = '\0'; /* Just in case */
 
     msg_Dbg( p_access, "icy-meta=%s", psz_meta );
 
     /* Now parse the meta */
     /* Look for StreamTitle= */
-    p = strcasestr( psz_meta, "StreamTitle=" );
+    p = strcasestr( (char *)psz_meta, "StreamTitle=" );
     if( p )
     {
         p += strlen( "StreamTitle=" );
