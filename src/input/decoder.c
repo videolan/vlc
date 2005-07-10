@@ -906,17 +906,17 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         vlc_reduce( &p_dec->fmt_out.video.i_sar_num,
                     &p_dec->fmt_out.video.i_sar_den,
-		    p_dec->fmt_out.video.i_sar_num,
-		    p_dec->fmt_out.video.i_sar_den, 0 );
+                    p_dec->fmt_out.video.i_sar_num,
+                    p_dec->fmt_out.video.i_sar_den, 0 );
 
-	if( !p_dec->fmt_out.video.i_visible_width ||
-	    !p_dec->fmt_out.video.i_visible_height )
-	{
-	    p_dec->fmt_out.video.i_visible_width =
-	        p_dec->fmt_out.video.i_width;
-	    p_dec->fmt_out.video.i_visible_height =
-	        p_dec->fmt_out.video.i_height;
-	}
+        if( !p_dec->fmt_out.video.i_visible_width ||
+            !p_dec->fmt_out.video.i_visible_height )
+        {
+            p_dec->fmt_out.video.i_visible_width =
+                p_dec->fmt_out.video.i_width;
+            p_dec->fmt_out.video.i_visible_height =
+                p_dec->fmt_out.video.i_height;
+        }
 
         p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
         p_sys->video = p_dec->fmt_out.video;
