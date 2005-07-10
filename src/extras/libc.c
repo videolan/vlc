@@ -467,7 +467,7 @@ vlc_bool_t vlc_reduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
                        uint64_t i_nom, uint64_t i_den, uint64_t i_max )
 {
     vlc_bool_t b_exact = 1;
-    int64_t i_gcd;
+    uint64_t i_gcd;
 
     if( i_den == 0 )
     {
@@ -484,14 +484,14 @@ vlc_bool_t vlc_reduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
 
     if( i_nom > i_max || i_den > i_max )
     {
-        int i_a0_num = 0, i_a0_den = 1, i_a1_num = 1, i_a1_den = 0;
+        uint i_a0_num = 0, i_a0_den = 1, i_a1_num = 1, i_a1_den = 0;
         b_exact = 0;
 
         for( ; ; )
         {
-            int64_t i_x = i_nom / i_den;
-            int64_t i_a2n = i_x * i_a1_num + i_a0_num;
-            int64_t i_a2d = i_x * i_a1_den + i_a0_den;
+            uint64_t i_x = i_nom / i_den;
+            uint64_t i_a2n = i_x * i_a1_num + i_a0_num;
+            uint64_t i_a2d = i_x * i_a1_den + i_a0_den;
 
             if( i_a2n > i_max || i_a2d > i_max ) break;
 
