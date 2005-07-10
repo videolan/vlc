@@ -545,7 +545,7 @@ then
   (cd debian && find . -type d '(' -name '[a-z]*' ! -name 'patches' ')' -maxdepth 1 -exec rm -Rf '{}' ';')
   find msvc -type f -name '*.dsp' -exec rm -f '{}' ';'
   find evc -type f -name '*.vcp' -exec rm -f '{}' ';'
-  #find . -type d -name '.deps' -exec rm -Rf '{}' ';'
+  find . -type d -name '.deps' -exec rm -Rf '{}' ';'
   # there's some more cruft all around
   rm -f config.h config.log config.status
   rm -f vlc vlc-config Makefile Modules.am
