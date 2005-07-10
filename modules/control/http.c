@@ -462,6 +462,7 @@ static char *FileToUrl( char *name, vlc_bool_t *pb_index )
 
     url = p = malloc( strlen( name ) + 1 );
 
+    *pb_index = VLC_FALSE;
     if( !url || !p )
     {
         return NULL;
@@ -492,7 +493,6 @@ static char *FileToUrl( char *name, vlc_bool_t *pb_index )
     }
 #endif
 
-    *pb_index = VLC_FALSE;
     /* index.* -> / */
     if( ( p = strrchr( url, '/' ) ) != NULL )
     {
@@ -2322,7 +2322,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
             {
                 case MVLC_INT:
                     i = config_GetInt( p_intf, m->param1 );
-                    sprintf( value, "%i", i );
+                    sprintf( value, "%d", i );
                     break;
                 case MVLC_FLOAT:
                     f = config_GetFloat( p_intf, m->param1 );
@@ -2330,13 +2330,15 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     break;
                 case MVLC_STRING:
                     psz = config_GetPsz( p_intf, m->param1 );
-                    sprintf( value, "%s", psz ? psz : "" );
+                    snprintf( value, sizeof( value ), "%s", psz ? psz : "" );
                     if( psz ) free( psz );
                     break;
                 default:
-                    sprintf( value, "invalid type(%s) in set", m->param2 );
+                    snprintf( value, sizeof( value ),
+                              "invalid type(%s) in set", m->param2 );
                     break;
             }
+            value[sizeof( value ) - 1] = '\0';
             msg_Dbg( p_intf, "get name=%s value=%s type=%s", m->param1, value, m->param2 );
             PRINTS( "%s", value );
             break;
