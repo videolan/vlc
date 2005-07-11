@@ -1469,7 +1469,8 @@ void WizardDialog::SetPartial( int i_from, int i_to )
     this->i_to = i_to;
 }
 
-void WizardDialog::SetTranscode( char *vcodec, int vb, char *acodec,int ab)
+void WizardDialog::SetTranscode( char const *vcodec, int vb,
+                                 char const *acodec, int ab)
 {
     if( strcmp( vcodec, "dummy") )
     {
@@ -1483,18 +1484,18 @@ void WizardDialog::SetTranscode( char *vcodec, int vb, char *acodec,int ab)
     this->ab = ab;
 }
 
-void WizardDialog::SetStream( char *method, char *address )
+void WizardDialog::SetStream( char const *method, char const *address )
 {
     this->method = strdup( method );
     this->address = strdup( address );
 }
 
-void WizardDialog::SetTranscodeOut( const char *address )
+void WizardDialog::SetTranscodeOut( char const *address )
 {
     this->address = strdup( address );
 }
 
-void WizardDialog::SetMux( char *mux )
+void WizardDialog::SetMux( char const *mux )
 {
     this->mux = strdup( mux );
 }

@@ -81,7 +81,7 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     byte_t      *p_peek;
     int         i_peek = 0;
-    vlc_bool_t  b_big_endian;
+    vlc_bool_t  b_big_endian = 0; /* Arbitrary initialisation */
 
     /* Check if we are dealing with a WAV file */
     if( stream_Peek( p_demux->s, &p_peek, 12 ) == 12 &&

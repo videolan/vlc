@@ -190,7 +190,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_control = Control;
 
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
-    p_vout->p_sys->b_double_rate = 0;
+    p_vout->p_sys->b_double_rate = VLC_FALSE;
     p_vout->p_sys->last_date = 0;
     p_vout->p_sys->p_vout = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
@@ -253,35 +253,35 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
     if( !strcmp( psz_method, "discard" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
-        p_vout->p_sys->b_double_rate = 0;
+        p_vout->p_sys->b_double_rate = VLC_FALSE;
     }
     else if( !strcmp( psz_method, "mean" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_MEAN;
-        p_vout->p_sys->b_double_rate = 0;
+        p_vout->p_sys->b_double_rate = VLC_FALSE;
     }
     else if( !strcmp( psz_method, "blend" )
              || !strcmp( psz_method, "average" )
              || !strcmp( psz_method, "combine-fields" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_BLEND;
-        p_vout->p_sys->b_double_rate = 0;
+        p_vout->p_sys->b_double_rate = VLC_FALSE;
     }
     else if( !strcmp( psz_method, "bob" )
              || !strcmp( psz_method, "progressive-scan" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_BOB;
-        p_vout->p_sys->b_double_rate = 1;
+        p_vout->p_sys->b_double_rate = VLC_TRUE;
     }
     else if( !strcmp( psz_method, "linear" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_LINEAR;
-        p_vout->p_sys->b_double_rate = 1;
+        p_vout->p_sys->b_double_rate = VLC_TRUE;
     }
     else if( !strcmp( psz_method, "x" ) )
     {
         p_vout->p_sys->i_mode = DEINTERLACE_X;
-        p_vout->p_sys->b_double_rate = 0;
+        p_vout->p_sys->b_double_rate = VLC_FALSE;
     }
     else
     {
@@ -442,11 +442,13 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *pp_outpic[2];
 
+    pp_outpic[0] = pp_outpic[1] = NULL;
+
     vlc_mutex_lock( &p_vout->p_sys->filter_lock );
 
     /* Get a new picture */
     while( ( pp_outpic[0] = vout_CreatePicture( p_vout->p_sys->p_vout,
-                                             0, 0, 0 ) )
+                                                0, 0, 0 ) )
               == NULL )
     {
         if( p_vout->b_die || p_vout->b_error )
@@ -455,7 +457,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
         msleep( VOUT_OUTMEM_SLEEP );
-     }
+    }
 
     vout_DatePicture( p_vout->p_sys->p_vout, pp_outpic[0], p_pic->date );
 
@@ -1872,7 +1874,6 @@ static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
 static void RenderX( vout_thread_t *p_vout,
                      picture_t *p_outpic, picture_t *p_pic )
 {
-    vout_sys_t *p_sys = p_vout->p_sys;
     int i_plane;
 
     /* Copy image and skip lines */

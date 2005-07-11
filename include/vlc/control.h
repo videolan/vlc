@@ -123,6 +123,7 @@ mediacontrol_position2microsecond (input_thread_t* p_input, const mediacontrol_P
 
 mediacontrol_RGBPicture* mediacontrol_RGBPicture__alloc (int datasize);
 void mediacontrol_RGBPicture__free (mediacontrol_RGBPicture* pic);
+mediacontrol_RGBPicture* _mediacontrol_createRGBPicture (int, int, long, long long l_date, char*, int);
 mediacontrol_PlaylistSeq* mediacontrol_PlaylistSeq__alloc (int size);
 void mediacontrol_PlaylistSeq__free (mediacontrol_PlaylistSeq* ps);
 

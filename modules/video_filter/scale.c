@@ -105,7 +105,6 @@ static void CloseFilter( vlc_object_t *p_this )
  ****************************************************************************/
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_pic_dst;
     int i_plane, i, j, k, l;
 

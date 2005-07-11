@@ -27,7 +27,7 @@
 
 typedef struct ps_psm_t ps_psm_t;
 static inline int ps_id_to_type( ps_psm_t *, int );
-static inline char *ps_id_to_lang( ps_psm_t *, int );
+static inline uint8_t *ps_id_to_lang( ps_psm_t *, int );
 
 typedef struct
 {
@@ -390,7 +390,7 @@ static inline int ps_id_to_type( ps_psm_t *p_psm, int i_id )
     return 0;
 }
 
-static inline char *ps_id_to_lang( ps_psm_t *p_psm, int i_id )
+static inline uint8_t *ps_id_to_lang( ps_psm_t *p_psm, int i_id )
 {
     int i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )

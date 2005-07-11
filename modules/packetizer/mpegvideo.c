@@ -526,12 +526,14 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         /* Extention start code */
         if( i_type == 0x01 )
         {
+#if 0
             static const int mpeg2_aspect[16][2] =
             {
                 {0,1}, {1,1}, {4,3}, {16,9}, {221,100},
                 {0,1}, {0,1}, {0,1}, {0,1}, {0,1}, {0,1}, {0,1}, {0,1}, {0,1},
                 {0,1}, {0,1}
             };
+#endif
 
             /* sequence extention */
             if( p_sys->p_ext) block_Release( p_sys->p_ext );

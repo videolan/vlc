@@ -730,7 +730,7 @@ static void RunThread( vout_thread_t *p_vout)
     picture_t *     p_last_picture = NULL;                   /* last picture */
     picture_t *     p_directbuffer;              /* direct buffer to display */
 
-    subpicture_t *  p_subpic;                          /* subpicture pointer */
+    subpicture_t *  p_subpic = NULL;                   /* subpicture pointer */
 
     /*
      * Initialize thread

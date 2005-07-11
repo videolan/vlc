@@ -30,6 +30,8 @@
 class Box
 {
     public:
+        virtual ~Box() {}
+
         /// Get the size of the box
         virtual int getWidth() const = 0;
         virtual int getHeight() const = 0;

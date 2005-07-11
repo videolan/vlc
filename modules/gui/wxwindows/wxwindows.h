@@ -763,18 +763,18 @@ class WizardDialog : public wxWizard
 {
 public:
     /* Constructor */
-    WizardDialog( intf_thread_t *p_intf, wxWindow *p_parent,char *, int, int );
+    WizardDialog( intf_thread_t *, wxWindow *p_parent, char *, int, int );
     virtual ~WizardDialog();
-    void SetTranscode( char *vcodec, int vb, char *acodec,int ab);
+    void SetTranscode( char const *vcodec, int vb, char const *acodec, int ab);
     void SetMrl( const char *mrl );
     void SetTTL( int i_ttl );
     void SetPartial( int, int );
-    void SetStream( char *method, char *address );
-    void SetTranscodeOut( const char *address );
+    void SetStream( char const *method, char const *address );
+    void SetTranscodeOut( char const *address );
     void SetAction( int i_action );
     int  GetAction();
     void SetSAP( bool b_enabled, const char *psz_name );
-    void SetMux( char *mux );
+    void SetMux( char const *mux );
     void Run();
     int i_action;
     char *method;

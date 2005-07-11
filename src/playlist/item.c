@@ -395,11 +395,13 @@ static void GuessType( input_item_t *p_item)
         { NULL, 0 }
     };
 
+#if 0 /* Unused */
     static struct { char *psz_search; int i_type; } exts_array[] =
     {
         { "mp3", ITEM_TYPE_AFILE },
         { NULL, 0 }
     };
+#endif
 
     for( i = 0; types_array[i].psz_search != NULL; i++ )
     {
