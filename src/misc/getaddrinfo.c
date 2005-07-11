@@ -57,9 +57,13 @@
 
 #include "network.h"
 
-#ifdef SYS_BEOS
+#ifndef NO_ADDRESS
 #   define NO_ADDRESS  NO_DATA
+#endif
+#ifndef INADDR_NONE
 #   define INADDR_NONE 0xFFFFFFFF
+#endif
+#ifndef AF_UNSPEC
 #   define AF_UNSPEC   0
 #endif
 

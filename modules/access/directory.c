@@ -362,7 +362,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     return demux2_vaControlHelper( p_demux->s, 0, 0, 0, 1, i_query, args );
 }
 
-#if defined(SYS_BEOS) || defined(WIN32)
+#if defined(SYS_BEOS) || defined(WIN32) || defined(SYS_SOLARIS)
 /* BeOS doesn't have scandir/alphasort/versionsort */
 static int alphasort( const struct dirent **a, const struct dirent **b )
 {
