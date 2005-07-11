@@ -1,5 +1,5 @@
 /*****************************************************************************
- * wizard.h: MacOS X Streaming Wizard
+ * wizard.m: MacOS X Streaming Wizard
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
@@ -23,15 +23,13 @@
 
  
 /*****************************************************************************
- * Note: this code is based upon ../wxwindows/wizard.cpp and 
+ * Note: this code is partially based upon ../wxwindows/wizard.cpp and 
  *		 ../wxwindows/streamdata.h; both written by Clément Stenac.
  *****************************************************************************/ 
 
 /* TODO:
     - start of the streaming/transcoding
-    - some GUI things
-    - l10n string fixes (both in OSX and WX) 
-	- implementation of correct encap-selection for transcoding
+    - l10n string fixes (both in OSX and WX)
 	- fill the playlist-table on t2
 	- implement l10n on t8?
 	- see FIXME's
@@ -382,6 +380,7 @@ static VLCWizard *_o_sharedInstance = nil;
 			[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:NO];
 			[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
 			[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
+			[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
 			[o_t5_matrix_encap selectCellAtRow:0 column:0];
 		} else {
 			if( [o_mode isEqualToString: _NS("UDP Unicast")] )
@@ -399,6 +398,7 @@ static VLCWizard *_o_sharedInstance = nil;
 			[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:NO];
 			[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
 			[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
+			[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
 			[[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
 			[o_t5_matrix_encap selectCellAtRow:1 column:0];
 		}
@@ -439,8 +439,269 @@ static VLCWizard *_o_sharedInstance = nil;
 			[o_userSelections setObject:@"NO" forKey:@"trnscdAudio"];
 		}
 		
-		/* FIXME: re-enable the "Encap"-tab depending on the chosen codecs */
+		/* disable all encap-formats */
+		[[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
+		[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
+		
+		/* re-enable the encap-formats supported by the chosen codecs */
+		/* FIXME: the following is a really bad coding-style. feel free to write 
+			me ideas how to make this nicer, if you want to -- FK, 7/11/05 */
+		
+		if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualTo: @"YES"])
+		{
+			if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualTo: @"YES"])
+			{
+				/* we are transcoding both audio and video, so we need to check both deps */
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_PS"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_PS"])
+					{
+						[[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:0 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_TS"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_TS"])
+					{
+						[[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:1 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_MPEG"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_MPEG"])
+					{
+						[[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:2 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_OGG"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_OGG"])
+					{
+						[[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:3 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_RAW"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_RAW"])
+					{
+						[[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:4 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_ASF"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_ASF"])
+					{
+						[[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:5 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_AVI"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_AVI"])
+					{
+						[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:6 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_MP4"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_MP4"])
+					{
+						[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:7 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_MOV"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_MOV"])
+					{
+						[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:8 column:0];
+					}
+				}
+				if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_WAV"])
+				{
+					if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_WAV"])
+					{
+						[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:YES];
+						[o_t5_matrix_encap selectCellAtRow:9 column:0];
+					}
+				}
+				
+			} else {
+				
+				/* we just transcoding the audio */
+				
+				/* select formats supported by the audio codec */
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_PS"])
+				{
+					[[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:0 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_TS"])
+				{
+					[[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:1 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_MPEG"])
+				{
+					[[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:2 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_OGG"])
+				{
+					[[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:3 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_RAW"])
+				{
+					[[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:4 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_ASF"])
+				{
+					[[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:5 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_AVI"])
+				{
+					[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:6 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_MP4"])
+				{
+					[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:7 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_MOV"])
+				{
+					[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:8 column:0];
+				}
+				if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_WAV"])
+				{
+					[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:YES];
+					[o_t5_matrix_encap selectCellAtRow:9 column:0];
+				}
+			}
+		}
+		else if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualTo: @"YES"])
+		{
+			/* we are just transcoding the video */
+			
+			/* select formats supported by the video-codec */ 
+		
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_PS"])
+			{
+				[[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:0 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_TS"])
+			{
+				[[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:1 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_MPEG"])
+			{
+				[[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:2 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_OGG"])
+			{
+				[[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:3 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_RAW"])
+			{
+				[[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:4 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_ASF"])
+			{
+				[[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:5 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_AVI"])
+			{
+				[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:6 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_MP4"])
+			{
+				[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:7 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_MOV"])
+			{
+				[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:8 column:0];
+			}
+			if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_WAV"])
+			{
+				[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:YES];
+				[o_t5_matrix_encap selectCellAtRow:9 column:0];
+			}
+		} else {
+			/* we don't do any transcoding 
+			 * -> enabled the encap-formats allowed when streaming content via http
+			 * since this should work fine in most cases */
+			/* FIXME: choose a selection of encap-formats based upon the actually used codecs */
+						
+			/* enable MPEG PS, MPEG TS, MPEG 1, OGG, RAW and ASF; select MPEG PS */
+			[[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
+			[[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
+			[[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:YES];
+			[[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:YES];
+			[[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:YES];
+			[[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:YES];
+			[[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:NO];
+			[[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
+			[[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
+			[[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
+			[o_t5_matrix_encap selectCellAtRow:0 column:0];
+		}
+		int x;
+		BOOL anythingEnabled;
+		x = 0;
+		anythingEnabled = NO;
+		while (x != [o_t5_matrix_encap numberOfRows])
+		{
+			if ([[o_t5_matrix_encap cellAtRow:x column:0] isEnabled])
+			{	
+				anythingEnabled = YES;
+			}	
+			x = (x + 1);
+		}
+		if (anythingEnabled == YES)
+		{
 		[o_tab_pageHolder selectTabViewItemAtIndex:4];
+		} else {
+		    /* show a sheet that the selected codecs are not compatible */
+			[o_wh_txt_title setStringValue: _NS("Invalid selection")];
+			[o_wh_txt_text setStringValue: _NS("Your chosen codecs are " \
+				"not compatible with each other. For example: you cannot " \
+				"mix uncompressed audio with any video codec.\n\n" \
+				"Correct your selection and try again.")];
+			[NSApp beginSheet: o_wizardhelp_window
+				modalForWindow: o_wizard_window
+				modalDelegate: o_wizardhelp_window
+				didEndSelector: nil
+				contextInfo: nil];
+		}
+		
 	}
 	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Encap"])
 	{
