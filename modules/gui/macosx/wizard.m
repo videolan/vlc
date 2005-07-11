@@ -336,31 +336,55 @@ static VLCWizard *_o_sharedInstance = nil;
 		 * store the path or the index and set a flag.
 		 * complain to the user if s/he didn't provide a path */
 		NSString *o_mode;
+		BOOL stop;
+		stop = NO;
 		o_mode = [[o_t2_matrix_inputSourceType selectedCell] title];
 		if( [o_mode isEqualToString: _NS("Select a stream")] )
 		{
 			[o_userSelections setObject:@"YES" forKey:@"newStrm"];
 			if ([[o_t2_fld_pathToNewStrm stringValue] isEqualToString: @""])
 			{
-				/* FIXME: we should complain to the user that s/he didn't provide a path */
+                /* set a flag that no file is selected */
+				stop = YES;
 			}else{
 				[o_userSelections setObject:[o_t2_fld_pathToNewStrm stringValue] forKey:@"pathToNewStrm"];
 			}
 		}else{
-			[o_userSelections setObject:@"NO" forKey:@"newStrm"];
-			NSNumber * myNumber = [[NSNumber alloc] initWithInt:[o_t2_tbl_plst selectedRow]];
-			[o_userSelections setObject:myNumber forKey:@"plItemIndex"];
+			if ([o_t2_tbl_plst selectedRow] != -1)
+			{
+				[o_userSelections setObject:@"NO" forKey:@"newStrm"];
+				NSNumber * myNumber = [[NSNumber alloc] initWithInt:[o_t2_tbl_plst selectedRow]];
+				[o_userSelections setObject:myNumber forKey:@"plItemIndex"];
+            } else {
+                /* set a flag that no item is selected */
+                stop = YES;
+			}
 		}
 		
 		/* show either "Streaming 1" or "Transcode 1" to the user */
-		if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
+		if (stop == NO)
 		{
-			/* we are streaming */
-			[o_tab_pageHolder selectTabViewItemAtIndex:2];
-		}else{
-			/* we are just transcoding */
-			[o_tab_pageHolder selectTabViewItemAtIndex:3];
-		}
+            if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
+            {
+                /* we are streaming */
+                [o_tab_pageHolder selectTabViewItemAtIndex:2];
+            }else{
+                /* we are just transcoding */
+                [o_tab_pageHolder selectTabViewItemAtIndex:3];
+            }
+        } else {
+            /* show a sheet that the user didn't select a file */
+			[o_wh_txt_title setStringValue: _NS("No input selected")];
+			[o_wh_txt_text setStringValue: _NS("You selected neither " \
+				"a new stream nor an existing playlist item. VLC is unable to " \
+				"guess, which input you want use. \n\n Choose one " \
+				"before going to the next page.")];
+			[NSApp beginSheet: o_wizardhelp_window
+				modalForWindow: o_wizard_window
+				modalDelegate: o_wizardhelp_window
+				didEndSelector: nil
+				contextInfo: nil];
+        }
 	}
 	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Streaming 1"])
 	{
@@ -405,13 +429,22 @@ static VLCWizard *_o_sharedInstance = nil;
 		
 		/* store the destination and check whether is it empty */
 		if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
-		{	/* FIXME: complain to the user that "" is no valid dest. */
+		{	/* complain to the user that "" is no valid dest. */
+			[o_wh_txt_title setStringValue: _NS("No valid destination")];
+			[o_wh_txt_text setStringValue: _NS("You need to enter " \
+			"a valid destination you want to stream to. Enter either a " \
+			"fixed Unicast-IP or a Multicast-IP.\n\n If you don't know "
+			"what this means, have a look at the VLC Streaming HOWTO." )];
+			[NSApp beginSheet: o_wizardhelp_window
+				modalForWindow: o_wizard_window
+				modalDelegate: o_wizardhelp_window
+				didEndSelector: nil
+				contextInfo: nil];
 		} else {
 			[o_userSelections setObject:[o_t3_fld_address stringValue] forKey:@"stmgDest"];
+			/* let's go to the encap-tab */
+			[o_tab_pageHolder selectTabViewItemAtIndex:4];
 		}
-		
-		/* let's go to the encap-tab */
-		[o_tab_pageHolder selectTabViewItemAtIndex:4];
 	}
 	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Transcode 1"])
 	{
@@ -739,13 +772,22 @@ static VLCWizard *_o_sharedInstance = nil;
 	{
 		/* check whether the path != "" and store it */
 		if( [[o_t7_fld_filePath stringValue] isEqualToString: @""] )
-		{	/* FIXME: complain to the user that "" is no valid path */
+		{	/* complain to the user that "" is no valid path */
+			[o_wh_txt_title setStringValue: _NS("No file selected")];
+			[o_wh_txt_text setStringValue: _NS("You you need to select " \
+			"a file, you want to save to. \n\n Enter either a valid path or " \
+			"choose a location through the button's dialog-box.")];
+			[NSApp beginSheet: o_wizardhelp_window
+				modalForWindow: o_wizard_window
+				modalDelegate: o_wizardhelp_window
+				didEndSelector: nil
+				contextInfo: nil];
 		} else {
 			[o_userSelections setObject:[o_t7_fld_filePath stringValue] forKey:@"trnscdFilePath"];
+			
+			/* go to "Summary" */
+			[self showSummary];
 		}
-		
-		/* go to "Summary" */
-		[self showSummary];
 	}
 }
 
@@ -902,7 +944,6 @@ static VLCWizard *_o_sharedInstance = nil;
     if (returnCode == NSOKButton)
     {
         [o_t2_fld_pathToNewStrm setStringValue:[sheet filename]];
-        /* FIXME: store path in a global variable */
     }
 }
 
