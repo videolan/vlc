@@ -912,12 +912,21 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 
 /* Format type specifiers for 64 bits numbers */
 #if defined(__CYGWIN32__) || (!defined(WIN32) && !defined(UNDER_CE))
-#   define I64Fd "%lld"
-#   define I64Fi "%lli"
-#   define I64Fo "%llo"
-#   define I64Fu "%llu"
-#   define I64Fx "%llx"
-#   define I64FX "%llX"
+#   if defined(__WORDSIZE) && __WORDSIZE == 64
+#       define I64Fd "%ld"
+#       define I64Fi "%li"
+#       define I64Fo "%lo"
+#       define I64Fu "%lu"
+#       define I64Fx "%lx"
+#       define I64FX "%lX"
+#   else
+#       define I64Fd "%lld"
+#       define I64Fi "%lli"
+#       define I64Fo "%llo"
+#       define I64Fu "%llu"
+#       define I64Fx "%llx"
+#       define I64FX "%llX"
+#   endif
 #else
 #   define I64Fd "%I64d"
 #   define I64Fi "%I64i"
@@ -929,8 +938,13 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 
 /* 64 bits integer constant suffix */
 #if defined( __MINGW32__ ) || (!defined(WIN32) && !defined(UNDER_CE))
-#   define I64C(x)         x##LL
-#   define UI64C(x)        x##ULL
+#   if defined(__WORDSIZE) && __WORDSIZE == 64
+#       define I64C(x)         x##L
+#       define UI64C(x)        x##UL
+#   else
+#       define I64C(x)         x##LL
+#       define UI64C(x)        x##ULL
+#   endif
 #else
 #   define I64C(x)         x##i64
 #   define UI64C(x)        x##ui64
