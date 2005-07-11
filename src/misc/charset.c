@@ -213,7 +213,8 @@ static char *vlc_encoding_from_locale( char *psz_locale )
 
         if( psz_modifier == NULL )
             return psz_dot;
-        if( 0 < ( psz_modifier - psz_dot ) < sizeof( buf ))
+        if( 0 < ( psz_modifier - psz_dot )
+             && ( psz_modifier - psz_dot ) < sizeof( buf ))
         {
             memcpy( buf, psz_dot, psz_modifier - psz_dot );
             buf[ psz_modifier - psz_dot ] = '\0';
