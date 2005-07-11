@@ -246,7 +246,7 @@ void * fast_memcpy(void * to, const void * from, size_t len)
 	}
 #else
 	/* Align destination at BLOCK_SIZE boundary */
-	for(; ((int)to & (BLOCK_SIZE-1)) && i>0; i--)
+	for(; ((ptrdiff_t)to & (BLOCK_SIZE-1)) && i>0; i--)
 	{
 		__asm__ __volatile__ (
 #ifndef HAVE_MMX1
@@ -273,7 +273,7 @@ void * fast_memcpy(void * to, const void * from, size_t len)
 		to = (void *) (((unsigned char *)to)+64);
 	}
 
-/*	printf(" %d %d\n", (int)from&1023, (int)to&1023); */
+/*	printf(" %p %p\n", (ptrdiff_t)from&1023, (ptrdiff_t)to&1023); */
 	/* Pure Assembly cuz gcc is a bit unpredictable ;) */
 # if 0
 	if(i>=BLOCK_SIZE/64)

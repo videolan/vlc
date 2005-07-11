@@ -78,7 +78,7 @@ static void *DecodeBlock  ( decoder_t *, block_t ** );
 
 static inline int SyncCode( const uint8_t * );
 static int  SyncInfo      ( const uint8_t *, unsigned int *, unsigned int *,
-                            unsigned int *, unsigned int *, unsigned int * );
+                            unsigned int *, int *, unsigned int * );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
@@ -425,7 +425,7 @@ static const unsigned int ppi_dts_bitrate[] =
 static int SyncInfo16be( const uint8_t *p_buf,
                          unsigned int *pi_audio_mode,
                          unsigned int *pi_sample_rate,
-                         unsigned int *pi_bit_rate,
+                         int *pi_bit_rate,
                          unsigned int *pi_frame_length )
 {
     unsigned int i_frame_size;
@@ -537,7 +537,7 @@ static int SyncInfo( const uint8_t *p_buf,
                      unsigned int *pi_channels,
                      unsigned int *pi_channels_conf,
                      unsigned int *pi_sample_rate,
-                     unsigned int *pi_bit_rate,
+                     int *pi_bit_rate,
                      unsigned int *pi_frame_length )
 {
     unsigned int i_audio_mode;

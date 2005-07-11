@@ -126,8 +126,8 @@ static int Activate( vlc_object_t * p_this )
     /* We double check for file != m3u as some asx are just m3u file */
     if( i_type != TYPE_M3U )
     {
-        uint8_t *p_peek;
-        int i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
+        char *p_peek;
+        int i_size = stream_Peek( p_demux->s, (uint8_t *)&p_peek, MAX_LINE );
         i_size -= sizeof("[Reference]") - 1;
 
         if( i_size > 0 )

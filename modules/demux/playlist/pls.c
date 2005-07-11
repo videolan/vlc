@@ -58,7 +58,7 @@ int E_(Import_PLS)( vlc_object_t *p_this )
     if( stream_Peek( p_demux->s , &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
-    if( !strncasecmp( p_peek, "[playlist]", 10 ) )
+    if( !strncasecmp( (char *)p_peek, "[playlist]", 10 ) )
     {
         ;
     }

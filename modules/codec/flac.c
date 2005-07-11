@@ -126,7 +126,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
 #endif
 static block_t *PacketizeBlock( decoder_t *, block_t ** );
 
-static int SyncInfo( decoder_t *, uint8_t *, int *, int *, int *,int * );
+static int SyncInfo( decoder_t *, uint8_t *, unsigned int *, unsigned int *,
+                     unsigned int *,int * );
 
 
 #ifdef USE_LIBFLAC
@@ -753,8 +754,10 @@ static void decoder_state_error( decoder_t *p_dec,
  * SyncInfo: parse FLAC sync info
  *****************************************************************************/
 static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
-                     int * pi_channels, int * pi_channels_conf,
-                     int * pi_sample_rate, int * pi_bits_per_sample )
+                     unsigned int * pi_channels,
+                     unsigned int * pi_channels_conf,
+                     unsigned int * pi_sample_rate,
+                     int * pi_bits_per_sample )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_header, i_temp, i_read;

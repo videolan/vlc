@@ -104,7 +104,7 @@ static int Open( vlc_object_t *p_this )
     uint8_t     *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 12 ) < 12 ) return VLC_EGENERIC;
-    if( strncmp( &p_peek[0], "FORM", 4 ) || strncmp( &p_peek[8], "AIFF", 4 ) )
+    if( strncmp( (char *)&p_peek[0], "FORM", 4 ) || strncmp( (char *)&p_peek[8], "AIFF", 4 ) )
     {
         return VLC_EGENERIC;
     }
@@ -134,7 +134,7 @@ static int Open( vlc_object_t *p_this )
 
         msg_Dbg( p_demux, "chunk fcc=%4.4s size=%d", p_peek, i_size );
 
-        if( !strncmp( &p_peek[0], "COMM", 4 ) )
+        if( !strncmp( (char *)&p_peek[0], "COMM", 4 ) )
         {
             if( stream_Peek( p_demux->s, &p_peek, 18 + 8 ) < 18 + 8 )
             {
@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
             msg_Dbg( p_demux, "COMM: channels=%d samples_frames=%d bits=%d rate=%d",
                      GetWBE( &p_peek[8] ), GetDWBE( &p_peek[10] ), GetWBE( &p_peek[14] ), GetF80BE( &p_peek[16] ) );
         }
-        else if( !strncmp( &p_peek[0], "SSND", 4 ) )
+        else if( !strncmp( (char *)&p_peek[0], "SSND", 4 ) )
         {
             if( stream_Peek( p_demux->s, &p_peek, 8 + 8 ) < 8 + 8 )
             {

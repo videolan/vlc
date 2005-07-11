@@ -949,7 +949,7 @@ static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
     const uint8_t *p_s2 = (const uint8_t *)_p_s2;
     uint8_t* p_end;
-    while( (int)p_s1 % 16 )
+    while( (ptrdiff_t)p_s1 % 16 )
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }        

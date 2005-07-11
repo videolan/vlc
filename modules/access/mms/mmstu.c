@@ -292,7 +292,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PRIVATE_ID_STATE:
             i_int = (int)va_arg( args, int );
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t );
+            pb_bool = (vlc_bool_t *)va_arg( args, vlc_bool_t * );
 
             if( i_int < 0 || i_int > 127 )
                 return VLC_EGENERIC;

@@ -94,7 +94,7 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
-    if( !strncmp( p_peek, "ADIF", 4 ) )
+    if( !strncmp( (char *)p_peek, "ADIF", 4 ) )
     {
         msg_Err( p_demux, "ADIF file. Not yet supported. (Please report)" );
         return VLC_EGENERIC;

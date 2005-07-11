@@ -50,7 +50,7 @@ int E_(Import_Old)( vlc_object_t *p_this )
 
     if( stream_Peek( p_demux->s, &p_peek, 31 ) < 31 ) return VLC_EGENERIC;
 
-    if( strncmp( p_peek, PLAYLIST_FILE_HEADER , 31 ) ) return VLC_EGENERIC;
+    if( strncmp( (char *)p_peek, PLAYLIST_FILE_HEADER , 31 ) ) return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "found valid old playlist file");
 

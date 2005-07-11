@@ -71,7 +71,7 @@ typedef struct msf_s
  *****************************************************************************/
 typedef struct entries_sect_s
 {
-    uint8_t psz_id[8];                              /* "ENTRYVCD" */
+    char psz_id[8];                                 /* "ENTRYVCD" */
     uint8_t i_version;                              /* 0x02 VCD2.0
                                                        0x01 SVCD  */
     uint8_t i_sys_prof_tag;                         /* 0x01 if VCD1.1

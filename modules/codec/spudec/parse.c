@@ -43,7 +43,7 @@ static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *);
  * AddNibble: read a nibble from a source packet and add it to our integer.
  *****************************************************************************/
 static inline unsigned int AddNibble( unsigned int i_code,
-                                      uint8_t *p_src, int *pi_index )
+                                      uint8_t *p_src, unsigned int *pi_index )
 {
     if( *pi_index & 0x1 )
     {

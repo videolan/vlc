@@ -212,8 +212,8 @@ static int Open( vlc_object_t * p_this )
 
     for( i_peeker = 0; i_peeker < 188; i_peeker++ )
     {
-        if( !strncmp( &p_peek[0], "RIFF", 4 ) &&
-            !strncmp( &p_peek[8], "AVI ", 4 ) ) break;
+        if( !strncmp( (char *)&p_peek[0], "RIFF", 4 ) &&
+            !strncmp( (char *)&p_peek[8], "AVI ", 4 ) ) break;
         p_peek++;
     }
     if( i_peeker == 188 )

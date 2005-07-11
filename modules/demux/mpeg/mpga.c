@@ -202,7 +202,7 @@ static int Open( vlc_object_t * p_this )
             i_skip = MPGA_MODE( header ) != 3 ? 21 : 13;
         }
 
-        if( i_skip + 8 < i_xing && !strncmp( &p_xing[i_skip], "Xing", 4 ) )
+        if( i_skip + 8 < i_xing && !strncmp( (char *)&p_xing[i_skip], "Xing", 4 ) )
         {
             unsigned int i_flags = GetDWBE( &p_xing[i_skip+4] );
 

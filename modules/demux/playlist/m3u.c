@@ -61,7 +61,7 @@ int E_(Import_M3U)( vlc_object_t *p_this )
     }
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
-    if( !strncmp( p_peek, "#EXTM3U", 7 ) )
+    if( !strncmp( (char *)p_peek, "#EXTM3U", 7 ) )
     {
         ;
     }

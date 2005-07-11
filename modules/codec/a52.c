@@ -77,7 +77,8 @@ static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 static void *DecodeBlock  ( decoder_t *, block_t ** );
 
-static int  SyncInfo      ( const byte_t *, int *, int *, int *,int * );
+static int  SyncInfo      ( const byte_t *, unsigned int *, unsigned int *,
+                            unsigned int *, int * );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
@@ -409,8 +410,9 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
  * their SyncInfo...
  *****************************************************************************/
 static int SyncInfo( const byte_t * p_buf,
-                     int * pi_channels, int * pi_channels_conf,
-                     int * pi_sample_rate, int * pi_bit_rate )
+                     unsigned int * pi_channels,
+                     unsigned int * pi_channels_conf,
+                     unsigned int * pi_sample_rate, int * pi_bit_rate )
 {
     static const uint8_t halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
     static const int rate[] = { 32,  40,  48,  56,  64,  80,  96, 112,

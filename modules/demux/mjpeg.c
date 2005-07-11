@@ -188,7 +188,7 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         *p_header_size = -2;
         return VLC_FALSE;
     }
-    if( strncmp( p_sys->p_peek, "--", 2 ) )
+    if( strncmp( (char *)p_sys->p_peek, "--", 2 ) )
     {
         *p_header_size = 0;
         return VLC_FALSE;
@@ -476,7 +476,7 @@ static int MimeDemux( demux_t *p_demux )
                 }
             }
         }
-        if( !strncmp( p_sys->psz_separator, p_sys->p_peek + i + 2,
+        if( !strncmp( p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2),
                       strlen( p_sys->psz_separator ) ) )
         {
             b_done = VLC_TRUE;

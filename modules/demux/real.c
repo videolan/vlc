@@ -93,7 +93,7 @@ static int Open( vlc_object_t *p_this )
     uint8_t     *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) return VLC_EGENERIC;
-    if( strncmp( p_peek, ".RMF", 4 ) ) return VLC_EGENERIC;
+    if( strncmp( (char *)p_peek, ".RMF", 4 ) ) return VLC_EGENERIC;
 
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
@@ -181,7 +181,7 @@ static int Demux( demux_t *p_demux )
         {
             return 0;
         }
-        if( strncmp( header, "DATA", 4 ) )
+        if( strncmp( (char *)header, "DATA", 4 ) )
         {
             return 0;
         }
@@ -746,7 +746,7 @@ static int HeaderRead( demux_t *p_demux )
                 msg_Dbg( p_demux, "    - specific data len=%d", i_len );
                 if( stream_Peek( p_demux->s, &p_peek, 34 ) >= 34 )
                 {
-                    if( !strncmp( &p_peek[4], "VIDO", 4 ) )
+                    if( !strncmp( (char *)&p_peek[4], "VIDO", 4 ) )
                     {
                         es_format_Init( &fmt, VIDEO_ES,
                                         VLC_FOURCC( p_peek[8], p_peek[9], p_peek[10], p_peek[11] ) );
@@ -781,7 +781,7 @@ static int HeaderRead( demux_t *p_demux )
 
                         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
                     }
-                    else if( !strncmp( p_peek, ".ra\xfd", 4 ) )
+                    else if( !strncmp( (char *)p_peek, ".ra\xfd", 4 ) )
                     {
                         int     i_version = GetWBE( &p_peek[4] );
                         uint8_t *p_extra = NULL;

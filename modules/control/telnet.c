@@ -111,10 +111,10 @@ typedef struct
 {
     int        i_mode; /* read or write */
     int        fd;
-    uint8_t    buffer_read[1000]; // 1000 byte per command should be sufficient
+    char       buffer_read[1000]; // 1000 byte per command should be sufficient
     char      *buffer_write;
-    uint8_t   *p_buffer_read;
-    uint8_t   *p_buffer_write; // the position in the buffer
+    char      *p_buffer_read;
+    char      *p_buffer_write; // the position in the buffer
     int        i_buffer_write; // the number of byte we still have to send
     int        i_tel_cmd; // for specific telnet commands
 
@@ -336,7 +336,7 @@ static void Run( intf_thread_t *p_intf )
                     switch( cl->i_tel_cmd )
                     {
                     case 0:
-                        switch( *cl->p_buffer_read )
+                        switch( *(uint8_t *)cl->p_buffer_read )
                         {
                         case '\r':
                             break;
@@ -354,7 +354,7 @@ static void Run( intf_thread_t *p_intf )
                         }
                         break;
                     case 1:
-                        switch( *cl->p_buffer_read )
+                        switch( *(uint8_t *)cl->p_buffer_read )
                         {
                         case TEL_WILL: case TEL_WONT:
                         case TEL_DO: case TEL_DONT:

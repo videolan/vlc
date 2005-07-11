@@ -206,7 +206,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PRIVATE_ID_STATE:
             i_int = (int)va_arg( args, int );
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t );
+            pb_bool = (vlc_bool_t *)va_arg( args, vlc_bool_t * );
 
             if( i_int < 0 || i_int > 127 )
                 return VLC_EGENERIC;
@@ -541,7 +541,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
      *        and bitrate mutual exclusion(optional) */
     E_( asf_HeaderParse )( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
-    msg_Dbg( p_access, "packet count=%lld packet size=%d",
+    msg_Dbg( p_access, "packet count="I64Fd" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
 

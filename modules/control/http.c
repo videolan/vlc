@@ -1369,7 +1369,7 @@ typedef struct
     char *param2;
 } macro_t;
 
-static int FileLoad( FILE *f, uint8_t **pp_data, int *pi_data )
+static int FileLoad( FILE *f, char **pp_data, int *pi_data )
 {
     int i_read;
 
@@ -1390,11 +1390,11 @@ static int FileLoad( FILE *f, uint8_t **pp_data, int *pi_data )
     return VLC_SUCCESS;
 }
 
-static int MacroParse( macro_t *m, uint8_t *psz_src )
+static int MacroParse( macro_t *m, char *psz_src )
 {
-    uint8_t *dup = strdup( psz_src );
-    uint8_t *src = dup;
-    uint8_t *p;
+    char *dup = strdup( (char *)psz_src );
+    char *src = dup;
+    char *p;
     int     i_skip;
 
 #define EXTRACT( name, l ) \
@@ -1604,9 +1604,9 @@ static int StrToMacroType( char *name )
 
 static void MacroDo( httpd_file_sys_t *p_args,
                      macro_t *m,
-                     uint8_t *p_request, int i_request,
-                     uint8_t **pp_data,  int *pi_data,
-                     uint8_t **pp_dst )
+                     char *p_request, int i_request,
+                     char **pp_data,  int *pi_data,
+                     char **pp_dst )
 {
     intf_thread_t  *p_intf = p_args->p_intf;
     intf_sys_t     *p_sys = p_args->p_intf->p_sys;
@@ -2387,14 +2387,14 @@ static void MacroDo( httpd_file_sys_t *p_args,
 #undef ALLOC
 }
 
-static uint8_t *MacroSearch( uint8_t *src, uint8_t *end, int i_mvlc, vlc_bool_t b_after )
+static char *MacroSearch( char *src, char *end, int i_mvlc, vlc_bool_t b_after )
 {
     int     i_id;
     int     i_level = 0;
 
     while( src < end )
     {
-        if( src + 4 < end  && !strncmp( src, "<vlc", 4 ) )
+        if( src + 4 < end  && !strncmp( (char *)src, "<vlc", 4 ) )
         {
             int i_skip;
             macro_t m;
@@ -2440,15 +2440,15 @@ static uint8_t *MacroSearch( uint8_t *src, uint8_t *end, int i_mvlc, vlc_bool_t 
 }
 
 static void Execute( httpd_file_sys_t *p_args,
-                     uint8_t *p_request, int i_request,
-                     uint8_t **pp_data, int *pi_data,
-                     uint8_t **pp_dst,
-                     uint8_t *_src, uint8_t *_end )
+                     char *p_request, int i_request,
+                     char **pp_data, int *pi_data,
+                     char **pp_dst,
+                     char *_src, char *_end )
 {
     intf_thread_t  *p_intf = p_args->p_intf;
 
-    uint8_t *src, *dup, *end;
-    uint8_t *dst = *pp_dst;
+    char *src, *dup, *end;
+    char *dst = *pp_dst;
 
     src = dup = malloc( _end - _src + 1 );
     end = src +( _end - _src );
@@ -2459,10 +2459,10 @@ static void Execute( httpd_file_sys_t *p_args,
     /* we parse searching <vlc */
     while( src < end )
     {
-        uint8_t *p;
+        char *p;
         int i_copy;
 
-        p = strstr( src, "<vlc" );
+        p = (char *)strstr( (char *)src, "<vlc" );
         if( p < end && p == src )
         {
             macro_t m;
@@ -2476,7 +2476,7 @@ static void Execute( httpd_file_sys_t *p_args,
                 case MVLC_IF:
                 {
                     vlc_bool_t i_test;
-                    uint8_t    *endif;
+                    char    *endif;
 
                     EvaluateRPN( p_args->vars, &p_args->stack, m.param1 );
                     if( SSPopN( &p_args->stack, p_args->vars ) )
@@ -2491,11 +2491,11 @@ static void Execute( httpd_file_sys_t *p_args,
 
                     if( i_test == 0 )
                     {
-                        uint8_t *start = MacroSearch( src, endif, MVLC_ELSE, VLC_TRUE );
+                        char *start = MacroSearch( src, endif, MVLC_ELSE, VLC_TRUE );
 
                         if( start )
                         {
-                            uint8_t *stop  = MacroSearch( start, endif, MVLC_END, VLC_FALSE );
+                            char *stop  = MacroSearch( start, endif, MVLC_END, VLC_FALSE );
                             if( stop )
                             {
                                 Execute( p_args, p_request, i_request, pp_data, pi_data, &dst, start, stop );
@@ -2504,7 +2504,7 @@ static void Execute( httpd_file_sys_t *p_args,
                     }
                     else if( i_test == 1 )
                     {
-                        uint8_t *stop;
+                        char *stop;
                         if( ( stop = MacroSearch( src, endif, MVLC_ELSE, VLC_FALSE ) ) == NULL )
                         {
                             stop = MacroSearch( src, endif, MVLC_END, VLC_FALSE );
@@ -2520,9 +2520,9 @@ static void Execute( httpd_file_sys_t *p_args,
                 }
                 case MVLC_FOREACH:
                 {
-                    uint8_t *endfor = MacroSearch( src, end, MVLC_END, VLC_TRUE );
-                    uint8_t *start = src;
-                    uint8_t *stop = MacroSearch( src, end, MVLC_END, VLC_FALSE );
+                    char *endfor = MacroSearch( src, end, MVLC_END, VLC_TRUE );
+                    char *start = src;
+                    char *stop = MacroSearch( src, end, MVLC_END, VLC_FALSE );
 
                     if( stop )
                     {
@@ -2640,9 +2640,11 @@ static void Execute( httpd_file_sys_t *p_args,
  ****************************************************************************/
 static int  HttpCallback( httpd_file_sys_t *p_args,
                           httpd_file_t *p_file,
-                          uint8_t *p_request,
-                          uint8_t **pp_data, int *pi_data )
+                          uint8_t *_p_request,
+                          uint8_t **_pp_data, int *pi_data )
 {
+    char *p_request = (char *)_p_request;
+    char **pp_data = (char **)_pp_data;
     int i_request = p_request ? strlen( p_request ) : 0;
     char *p;
     FILE *f;
@@ -2677,8 +2679,8 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
     else
     {
         int  i_buffer;
-        uint8_t *p_buffer;
-        uint8_t *dst;
+        char *p_buffer;
+        char *dst;
         vlc_value_t val;
         char position[4]; /* percentage */
         char time[12]; /* in seconds */
