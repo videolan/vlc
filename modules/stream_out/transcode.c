@@ -950,6 +950,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         break;
 
     default:
+        p_out = NULL;
         block_Release( p_buffer );
         break;
     }
@@ -1004,7 +1005,7 @@ static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
     filter_t *p_filter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
 
     vlc_object_attach( p_filter, p_stream );
-    p_filter->pf_audio_buffer_new = __block_New;
+    p_filter->pf_audio_buffer_new = (block_t* (*) (filter_t*, int))__block_New;
 
     p_filter->fmt_in = *p_fmt_in;
     p_filter->fmt_out = *p_fmt_out;
