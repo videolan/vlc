@@ -936,7 +936,7 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
             {
                 for( i = i_start; ; i += i_step )
                 {
-                    char   value[512];
+                    char   value[79];
 
                     if( ( i_step > 0 && i > i_stop ) ||
                         ( i_step < 0 && i < i_stop ) )
