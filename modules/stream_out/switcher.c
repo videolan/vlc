@@ -48,8 +48,8 @@
 #endif
 
 #define SOUT_CFG_PREFIX "sout-switcher-"
-#define MAX_PICTURES 12
-#define MAX_AUDIO 12
+#define MAX_PICTURES 10
+#define MAX_AUDIO 30
 #define AVCODEC_MAX_VIDEO_FRAME_SIZE (3*1024*1024)
 #define MAX_THRESHOLD 99999999
 
@@ -99,6 +99,9 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 #define QSCALE_TEXT N_("Quantizer scale")
 #define QSCALE_LONGTEXT N_( \
     "Fixed quantizer scale to use." )
+#define AUDIO_TEXT N_("Mute audio")
+#define AUDIO_LONGTEXT N_( \
+    "Mute audio when command is not 0." )
 
 vlc_module_begin();
     set_description( _("MPEG2 video switcher stream output") );
@@ -120,10 +123,13 @@ vlc_module_begin();
                  GOP_TEXT, GOP_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "qscale", 5, NULL,
                  QSCALE_TEXT, QSCALE_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "mute-audio", 1, NULL,
+              AUDIO_TEXT, AUDIO_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
-    "files", "sizes", "aspect-ratio", "port", "command", "gop", "qscale", NULL
+    "files", "sizes", "aspect-ratio", "port", "command", "gop", "qscale",
+    "mute-audio", NULL
 };
 
 struct sout_stream_sys_t
@@ -133,6 +139,7 @@ struct sout_stream_sys_t
     int             i_qscale;
     int             i_aspect;
     sout_stream_id_t *pp_audio_ids[MAX_AUDIO];
+    vlc_bool_t      b_audio;
 
     /* Pictures */
     picture_t       p_pictures[MAX_PICTURES];
@@ -267,6 +274,9 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "qscale", &val );
     p_sys->i_qscale = val.i_int;
 
+    var_Get( p_stream, SOUT_CFG_PREFIX "mute-audio", &val );
+    p_sys->b_audio = val.b_bool;
+
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -314,7 +324,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                  (char*)&p_fmt->i_codec );
     }
     else if ( p_fmt->i_cat == AUDIO_ES
-               && p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'a') )
+               && p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'a')
+               && p_sys->b_audio )
     {
         int i_ff_codec = CODEC_ID_MP2;
         int i;
