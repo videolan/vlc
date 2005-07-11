@@ -525,7 +525,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     char          **ppsz_hosts = NULL;
     int           i_hosts = 0;
 
-    int           i;
+    int           i, i_dirlen;
 
 #ifdef HAVE_SYS_STAT_H
     if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
@@ -538,6 +538,13 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     {
         msg_Err( p_intf, "cannot open dir (%s)", psz_dir );
         return VLC_EGENERIC;
+    }
+
+    i_dirlen = strlen( psz_dir );
+    if( i_dirlen + 10 > MAX_DIR_SIZE )
+    {
+        msg_Warn( p_intf, "skipping too deep dir (%s)", psz_dir );
+        return 0;
     }
 
     msg_Dbg( p_intf, "dir=%s", psz_dir );
@@ -621,10 +628,10 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             break;
         }
 
-        if( p_dir_content->d_name[0] == '.' )
-        {
+        if( ( p_dir_content->d_name[0] == '.' )
+         || ( i_dirlen + strlen( p_dir_content->d_name ) > MAX_DIR_SIZE ) )
             continue;
-        }
+        
         sprintf( dir, "%s/%s", psz_dir, p_dir_content->d_name );
         if( ParseDirectory( p_intf, psz_root, dir ) )
         {
