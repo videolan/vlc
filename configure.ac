@@ -1827,7 +1827,7 @@ then
   ])
   AC_MSG_CHECKING(for sockaddr_in6 in netinet/in.h)
   AC_EGREP_HEADER(sockaddr_in6,netinet/in.h,
-    [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no) have_ipv6=false])
+    [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); have_ipv6=false])
   if ${have_ipv6}; then
     VLC_ADD_PLUGINS([ipv6])
   fi
