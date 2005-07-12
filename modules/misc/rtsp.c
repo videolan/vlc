@@ -276,8 +276,8 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
 
     asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
     p_media->p_rtsp_url =
-        httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, 0, 0,
-                            NULL, 0 );
+        httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, NULL,
+                            NULL, NULL );
 
     if( !p_media->p_rtsp_url )
     {
@@ -465,8 +465,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     }
 
     p_es->p_rtsp_url =
-        httpd_UrlNewUnique( p_vod->p_sys->p_rtsp_host, psz_urlc, 0, 0, NULL,
-                            0 );
+        httpd_UrlNewUnique( p_vod->p_sys->p_rtsp_host, psz_urlc, NULL, NULL,
+                            NULL );
 
     if( !p_es->p_rtsp_url )
     {
@@ -637,7 +637,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             answer->psz_status = strdup( "OK" );
             httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
 
-            answer->p_body = psz_sdp;
+            answer->p_body = (uint8_t *)psz_sdp;
             answer->i_body = strlen( psz_sdp );
             break;
         }

@@ -88,6 +88,7 @@ HEADERS_include = \
 	include/variables.h \
 	include/video_output.h \
 	include/vlc_access.h \
+	include/vlc_acl.h \
 	include/vlc_bits.h \
 	include/vlc_block.h \
 	include/vlc_block_helper.h \
@@ -374,6 +375,7 @@ SOURCES_libvlc_common = \
 	src/stream_output/stream_output.c \
 	src/stream_output/announce.c \
 	src/stream_output/sap.c \
+	src/stream_output/acl.c \
 	src/misc/charset.c \
 	src/misc/httpd.c \
 	src/misc/tls.c \

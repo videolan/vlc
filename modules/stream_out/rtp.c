@@ -1049,7 +1049,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         sprintf( psz_urlc, "%s/trackid=%d", p_sys->psz_rtsp_path, p_sys->i_es );
         fprintf( stderr, "rtsp: adding %s\n", psz_urlc );
-        id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL, 0 );
+        id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
 
         if( id->p_rtsp_url )
         {
@@ -1313,7 +1313,7 @@ static int HttpSetup( sout_stream_t *p_stream, vlc_url_t *url)
         p_sys->p_httpd_file = httpd_FileNew( p_sys->p_httpd_host,
                                              url->psz_path ? url->psz_path : "/",
                                              "application/sdp",
-                                             NULL, NULL, NULL, 0,
+                                             NULL, NULL, NULL,
                                              HttpCallback, (void*)p_sys );
     }
     if( p_sys->p_httpd_file == NULL )
@@ -1411,7 +1411,7 @@ static int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
     sprintf( p_sys->psz_rtsp_control, "rtsp://%s:%d%s",
              url->psz_host,  url->i_port > 0 ? url->i_port : 554, p_sys->psz_rtsp_path );
 
-    p_sys->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, p_sys->psz_rtsp_path, NULL, NULL, NULL, 0 );
+    p_sys->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, p_sys->psz_rtsp_path, NULL, NULL, NULL );
     if( p_sys->p_rtsp_url == 0 )
     {
         return VLC_EGENERIC;

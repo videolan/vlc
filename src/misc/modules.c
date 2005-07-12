@@ -94,6 +94,7 @@
 #include "stream_output.h"
 #include "osd.h"
 #include "vlc_httpd.h"
+#include "vlc_acl.h"
 #include "vlc_tls.h"
 #include "vlc_md5.h"
 #include "vlc_xml.h"

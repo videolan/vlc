@@ -195,18 +195,18 @@ struct module_symbols_t
     httpd_host_t * (*httpd_HostNew_inner) (vlc_object_t *, const char *psz_host, int i_port);
     httpd_host_t * (*httpd_TLSHostNew_inner) (vlc_object_t *, const char *, int, const char *, const char *, const char *, const char *);
     void (*httpd_HostDelete_inner) (httpd_host_t *);
-    httpd_url_t * (*httpd_UrlNew_inner) (httpd_host_t *, char *psz_url, char *psz_user, char *psz_password, char **ppsz_hosts, int i_hosts);
-    httpd_url_t * (*httpd_UrlNewUnique_inner) (httpd_host_t *, char *psz_url, char *psz_user, char *psz_password, char **ppsz_hosts, int i_hosts);
+    httpd_url_t * (*httpd_UrlNew_inner) (httpd_host_t *, char *psz_url, char *psz_user, char *psz_password, const vlc_acl_t *p_acl);
+    httpd_url_t * (*httpd_UrlNewUnique_inner) (httpd_host_t *, char *psz_url, char *psz_user, char *psz_password, const vlc_acl_t *p_acl);
     int (*httpd_UrlCatch_inner) (httpd_url_t *, int i_msg, httpd_callback_t, httpd_callback_sys_t *);
     void (*httpd_UrlDelete_inner) (httpd_url_t *);
     void (*httpd_ClientModeStream_inner) (httpd_client_t *cl);
     void (*httpd_ClientModeBidir_inner) (httpd_client_t *cl);
     char* (*httpd_ClientIP_inner) (httpd_client_t *cl);
-    httpd_file_t * (*httpd_FileNew_inner) (httpd_host_t *, char *psz_url, char *psz_mime, char *psz_user, char *psz_password, char **ppsz_hosts, int i_hosts, httpd_file_callback_t pf_fill, httpd_file_sys_t *);
+    httpd_file_t * (*httpd_FileNew_inner) (httpd_host_t *, char *psz_url, char *psz_mime, char *psz_user, char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t *);
     void (*httpd_FileDelete_inner) (httpd_file_t *);
     httpd_redirect_t * (*httpd_RedirectNew_inner) (httpd_host_t *, char *psz_url_dst, char *psz_url_src);
     void (*httpd_RedirectDelete_inner) (httpd_redirect_t *);
-    httpd_stream_t * (*httpd_StreamNew_inner) (httpd_host_t *, char *psz_url, char *psz_mime, char *psz_user, char *psz_password, char **ppsz_hosts, int i_hosts);
+    httpd_stream_t * (*httpd_StreamNew_inner) (httpd_host_t *, char *psz_url, char *psz_mime, char *psz_user, char *psz_password, const vlc_acl_t *p_acl);
     void (*httpd_StreamDelete_inner) (httpd_stream_t *);
     int (*httpd_StreamHeader_inner) (httpd_stream_t *, uint8_t *p_data, int i_data);
     int (*httpd_StreamSend_inner) (httpd_stream_t *, uint8_t *p_data, int i_data);
@@ -375,8 +375,13 @@ struct module_symbols_t
     const char * (*vlc_gai_strerror_inner) (int);
     void (*net_ListenClose_inner) (int *fd);
     void (*DigestMD5_inner) (struct md5_s *, uint32_t *);
-    int (*__net_CheckIP_inner) (vlc_object_t *p_this, char *psz_ip, char **ppsz_hosts, int i_hosts);
+    int (*ACL_Check_inner) (vlc_acl_t *p_acl, const char *psz_ip);
     int (*playlist_NodeRemoveParent_inner) (playlist_t *,playlist_item_t*,playlist_item_t *);
+    vlc_acl_t * (*__ACL_Duplicate_inner) (vlc_object_t *p_this, const vlc_acl_t *p_acl);
+    vlc_acl_t * (*__ACL_Create_inner) (vlc_object_t *p_this, vlc_bool_t b_allow);
+    int (*ACL_LoadFile_inner) (vlc_acl_t *p_acl, const char *path);
+    int (*ACL_AddNet_inner) (vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow);
+    void (*ACL_Destroy_inner) (vlc_acl_t *p_acl);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -737,8 +742,13 @@ struct module_symbols_t
 #  define vlc_gai_strerror (p_symbols)->vlc_gai_strerror_inner
 #  define net_ListenClose (p_symbols)->net_ListenClose_inner
 #  define DigestMD5 (p_symbols)->DigestMD5_inner
-#  define __net_CheckIP (p_symbols)->__net_CheckIP_inner
+#  define ACL_Check (p_symbols)->ACL_Check_inner
 #  define playlist_NodeRemoveParent (p_symbols)->playlist_NodeRemoveParent_inner
+#  define __ACL_Duplicate (p_symbols)->__ACL_Duplicate_inner
+#  define __ACL_Create (p_symbols)->__ACL_Create_inner
+#  define ACL_LoadFile (p_symbols)->ACL_LoadFile_inner
+#  define ACL_AddNet (p_symbols)->ACL_AddNet_inner
+#  define ACL_Destroy (p_symbols)->ACL_Destroy_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1102,8 +1112,13 @@ struct module_symbols_t
     ((p_symbols)->vlc_gai_strerror_inner) = vlc_gai_strerror; \
     ((p_symbols)->net_ListenClose_inner) = net_ListenClose; \
     ((p_symbols)->DigestMD5_inner) = DigestMD5; \
-    ((p_symbols)->__net_CheckIP_inner) = __net_CheckIP; \
+    ((p_symbols)->ACL_Check_inner) = ACL_Check; \
     ((p_symbols)->playlist_NodeRemoveParent_inner) = playlist_NodeRemoveParent; \
+    ((p_symbols)->__ACL_Duplicate_inner) = __ACL_Duplicate; \
+    ((p_symbols)->__ACL_Create_inner) = __ACL_Create; \
+    ((p_symbols)->ACL_LoadFile_inner) = ACL_LoadFile; \
+    ((p_symbols)->ACL_AddNet_inner) = ACL_AddNet; \
+    ((p_symbols)->ACL_Destroy_inner) = ACL_Destroy; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */

@@ -30,6 +30,7 @@
 #include "vlc_httpd.h"
 #include "network.h"
 #include "vlc_tls.h"
+#include "vlc_acl.h"
 
 #include <string.h>
 #include <errno.h>
@@ -234,11 +235,10 @@ struct httpd_url_t
 
     vlc_mutex_t lock;
 
-    char    *psz_url;
-    char    *psz_user;
-    char    *psz_password;
-    char    **ppsz_hosts;
-    int     i_hosts;
+    char      *psz_url;
+    char      *psz_user;
+    char      *psz_password;
+    vlc_acl_t *p_acl;
 
     struct
     {
@@ -491,14 +491,13 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
 httpd_file_t *httpd_FileNew( httpd_host_t *host,
                              char *psz_url, char *psz_mime,
                              char *psz_user, char *psz_password,
-                             char **ppsz_hosts, int i_hosts,
-                             httpd_file_callback_t pf_fill,
+                             const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill,
                              httpd_file_sys_t *p_sys )
 {
     httpd_file_t *file = malloc( sizeof( httpd_file_t ) );
 
     if( ( file->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                          psz_password, ppsz_hosts, i_hosts )
+                                          psz_password, p_acl )
         ) == NULL )
     {
         free( file );
@@ -596,8 +595,7 @@ httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, char *psz_url_dst,
 {
     httpd_redirect_t *rdir = malloc( sizeof( httpd_redirect_t ) );
 
-    if( !( rdir->url = httpd_UrlNewUnique( host, psz_url_src, NULL, NULL,
-                                           NULL, 0 ) ) )
+    if( !( rdir->url = httpd_UrlNewUnique( host, psz_url_src, NULL, NULL, NULL ) ) )
     {
         free( rdir );
         return NULL;
@@ -773,12 +771,12 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
                                  char *psz_url, char *psz_mime,
                                  char *psz_user, char *psz_password,
-                                 char **ppsz_hosts, int i_hosts )
+                                 const vlc_acl_t *p_acl )
 {
     httpd_stream_t *stream = malloc( sizeof( httpd_stream_t ) );
 
     if( ( stream->url = httpd_UrlNewUnique( host, psz_url, psz_user,
-                                            psz_password, ppsz_hosts, i_hosts )
+                                            psz_password, p_acl )
         ) == NULL )
     {
         free( stream );
@@ -1103,8 +1101,7 @@ void httpd_HostDelete( httpd_host_t *host )
 /* register a new url */
 static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
                                          char *psz_user, char *psz_password,
-                                         char **ppsz_hosts, int i_hosts,
-                                         vlc_bool_t b_check )
+                                         const vlc_acl_t *p_acl, vlc_bool_t b_check )
 {
     httpd_url_t *url;
     int         i;
@@ -1131,12 +1128,7 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
     url->psz_url = strdup( psz_url );
     url->psz_user = strdup( psz_user ? psz_user : "" );
     url->psz_password = strdup( psz_password ? psz_password : "" );
-    url->i_hosts = 0;
-    url->ppsz_hosts = NULL;
-    for( i = 0; i < i_hosts; i++ )
-    {
-        TAB_APPEND( url->i_hosts, url->ppsz_hosts, strdup(ppsz_hosts[i]) );
-    }
+    url->p_acl = ACL_Duplicate( host, p_acl );
     for( i = 0; i < HTTPD_MSG_MAX; i++ )
     {
         url->catch[i].cb = NULL;
@@ -1151,18 +1143,18 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
 
 httpd_url_t *httpd_UrlNew( httpd_host_t *host, char *psz_url,
                            char *psz_user, char *psz_password,
-                           char **ppsz_hosts, int i_hosts )
+                           const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, ppsz_hosts, i_hosts, VLC_FALSE );
+                                psz_password, p_acl, VLC_FALSE );
 }
 
 httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, char *psz_url,
                                  char *psz_user, char *psz_password,
-                                 char **ppsz_hosts, int i_hosts )
+                                 const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
-                                psz_password, ppsz_hosts, i_hosts, VLC_TRUE );
+                                psz_password, p_acl, VLC_TRUE );
 }
 
 /* register callback on a url */
@@ -1191,10 +1183,7 @@ void httpd_UrlDelete( httpd_url_t *url )
     free( url->psz_url );
     free( url->psz_user );
     free( url->psz_password );
-    for( i = 0; i < url->i_hosts; i++ )
-    {
-        TAB_REMOVE( url->i_hosts, url->ppsz_hosts, url->ppsz_hosts[0] );
-    }
+    ACL_Destroy( url->p_acl );
 
     for( i = 0; i < host->i_client; i++ )
     {
@@ -2085,14 +2074,12 @@ static void httpd_HostThread( httpd_host_t *host )
                         {
                             if( url->catch[i_msg].cb )
                             {
-                                if( answer && url->i_hosts )
+                                if( answer && ( url->p_acl != NULL ) )
                                 {
                                     char *ip = httpd_ClientIP( cl );
                                     if( ip != NULL )
                                     {
-                                        if( net_CheckIP( host, ip,
-                                                         url->ppsz_hosts,
-                                                         url->i_hosts ) <= 0 )
+                                        if( ACL_Check( url->p_acl, ip ) )
                                         {
                                             b_hosts_failed = VLC_TRUE;
                                             free( ip );
@@ -2454,10 +2441,21 @@ httpd_host_t *httpd_HostNew( vlc_object_t *a, char *b, int c )
     msg_Err( a, "HTTP daemon support is disabled" );
     return 0;
 }
-void httpd_HostDelete( httpd_host_t *a ){}
-httpd_url_t *httpd_UrlNew( httpd_host_t *a, char *b ){ return 0; }
-httpd_url_t *httpd_UrlNewUnique( httpd_host_t *a, char *b, char *c,
-                                 char *d ){ return 0; }
+void httpd_HostDelete( httpd_host_t *a )
+{
+}
+httpd_url_t *httpd_UrlNew( httpd_host_t *host, char *psz_url,
+                           char *psz_user, char *psz_password,
+                           const vlc_acl_t *p_acl )
+{
+    return NULL;
+}
+httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, char *psz_url,
+                                 char *psz_user, char *psz_password,
+                                 const vlc_acl_t *p_acl )
+{
+    return NULL;
+}
 int httpd_UrlCatch( httpd_url_t *a, int b, httpd_callback_t c,
                     httpd_callback_sys_t *d ){ return 0; }
 void httpd_UrlDelete( httpd_url_t *a ){}
