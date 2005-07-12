@@ -54,7 +54,7 @@ const char * DecodeLanguage( uint16_t i_code )
 
     for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
     {
-        if( !strncmp( p_lang->psz_iso639_1, psz_code, 2 ) )
+        if( !memcmp( p_lang->psz_iso639_1, psz_code, 2 ) )
         {
 # if 0
             if( *p_lang->psz_native_name )
