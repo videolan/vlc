@@ -71,7 +71,7 @@ static void           SetAttachment ( vlc_object_t *, vlc_bool_t );
 
 static vlc_list_t   * NewList       ( int );
 static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
-static void           ListAppend    ( vlc_list_t *, vlc_object_t * );
+/*static void           ListAppend    ( vlc_list_t *, vlc_object_t * );*/
 static int            CountChildren ( vlc_object_t *, int );
 static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
@@ -1029,7 +1029,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
     return;
 }
 
-static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
+/*static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
 {
     if( p_list == NULL )
     {
@@ -1050,7 +1050,7 @@ static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
     p_list->i_count++;
 
     return;
-}
+}*/
 
 static int CountChildren( vlc_object_t *p_this, int i_type )
 {
