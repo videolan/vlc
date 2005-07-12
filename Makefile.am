@@ -151,7 +151,7 @@ endif
 EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib \
+	extras/MacOSX/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/About.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/About.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/About.nib/keyedobjects.nib \
