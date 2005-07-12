@@ -70,6 +70,7 @@
     IBOutlet id o_t3_txt_destInfo;
     IBOutlet id o_t3_txt_text;
     IBOutlet id o_t3_txt_title;
+	IBOutlet id o_t3_txt_strgMthdInfo;
 	
 	/* page four ("Transcode 1") */
     IBOutlet id o_t4_box_audio;
@@ -122,6 +123,7 @@
     IBOutlet id o_t8_fld_trnscdAudio;
     IBOutlet id o_t8_fld_trnscdVideo;
     IBOutlet id o_t8_fld_ttl;
+	IBOutlet id o_t8_fld_mrl;
     IBOutlet id o_t8_txt_destination;
     IBOutlet id o_t8_txt_encapFormat;
     IBOutlet id o_t8_txt_inputStream;
@@ -134,10 +136,13 @@
     IBOutlet id o_t8_txt_trnscdAudio;
     IBOutlet id o_t8_txt_trnscdVideo;
     IBOutlet id o_t8_txt_ttl;
+	IBOutlet id o_t8_txt_mrl;
 	
 	NSMutableDictionary * o_userSelections;
 	NSArray * o_videoCodecs;
 	NSArray * o_audioCodecs;
+	NSArray * o_encapFormats;
+	NSString * o_mrl;
 }
 - (IBAction)cancelRun:(id)sender;
 - (IBAction)nextTab:(id)sender;
@@ -148,6 +153,7 @@
 - (IBAction)t2_chooseStreamOrPlst:(id)sender;
 - (IBAction)t2_enableExtract:(id)sender;
 - (IBAction)t3_addressEntered:(id)sender;
+- (IBAction)t3_strmMthdChanged:(id)sender;
 - (IBAction)t4_AudCdcChanged:(id)sender;
 - (IBAction)t4_enblAudTrnscd:(id)sender;
 - (IBAction)t4_enblVidTrnscd:(id)sender;
@@ -159,7 +165,9 @@
 - (IBAction)wh_closeSheet:(id)sender;
 
 + (VLCWizard *)sharedInstance;
+
 - (void)showWizard;
 - (void)showSummary;
 - (void)resetWizard;
+- (void)createMrl;
 @end

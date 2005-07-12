@@ -28,8 +28,9 @@
  *****************************************************************************/ 
 
 /* TODO:
-    - start of the streaming/transcoding
-    - l10n string fixes (both in OSX and WX)
+	- MRL composition when streaming
+    - putting the MRL and the next item to the playlist
+	- l10n string fixes (both in OSX and WX)
 	- fill the playlist-table on t2
 	- implement l10n on t8?
 	- see FIXME's
@@ -157,6 +158,32 @@ static VLCWizard *_o_sharedInstance = nil;
 		[o_t4_pop_audioCodec addItemWithTitle:[[o_audioCodecs objectAtIndex:x] objectAtIndex:0]];
 		x = (x + 1);
 	}
+	
+	
+	/* fill another global array with all information about the encap-formats 
+	 * note that the order of the formats inside the g. array is the same as on
+	 * the encap-tab */
+	NSArray * o_ps;
+	NSArray * o_ts;
+	NSArray * o_mpeg;
+	NSArray * o_ogg;
+	NSArray * o_raw;
+	NSArray * o_asf;
+	NSArray * o_avi;
+	NSArray * o_mp4;
+	NSArray * o_mov;
+	NSArray * o_wav;
+	o_ps = [NSArray arrayWithObjects: @"ps", @"MPEG PS", _NS("MPEG Program Stream"), nil];
+	o_ts = [NSArray arrayWithObjects: @"ts", @"MPEG TS", _NS("MPEG Transport Stream"), nil];
+	o_mpeg = [NSArray arrayWithObjects: @"ps", @"MPEG 1", _NS("MPEG 1 Format"), nil];
+	o_ogg = [NSArray arrayWithObjects: @"ogg", @"OGG", @"OGG", nil];
+	o_raw = [NSArray arrayWithObjects: @"raw", @"RAW", @"RAW", nil];
+	o_asf = [NSArray arrayWithObjects: @"asf", @"ASF", @"ASF", nil];
+	o_avi = [NSArray arrayWithObjects: @"avi", @"AVI", @"AVI", nil];
+	o_mp4 = [NSArray arrayWithObjects: @"mp4", @"MP4", @"MPEG4", nil];
+	o_mov = [NSArray arrayWithObjects: @"mov", @"MOV", @"MOV", nil];
+	o_wav = [NSArray arrayWithObjects: @"wav", @"WAV", @"WAV", nil];
+	o_encapFormats = [[NSArray alloc] initWithObjects: o_ps, o_ts, o_mpeg, o_ogg, o_raw, o_asf, o_avi, o_mp4, o_mov, o_wav, nil];
 }
 
 - (void)showWizard
@@ -253,6 +280,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t3_txt_destInfo setStringValue: _NS("Enter the address of the computer to stream to")];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:0] setTitle: _NS("UDP Unicast")];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setTitle: _NS("UDP Multicast")];
+	[o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to a single computer")];
     
     /* page four ("Transcode 1") */
     [o_t4_title setStringValue: _NS("Transcode")];
@@ -428,18 +456,31 @@ static VLCWizard *_o_sharedInstance = nil;
 		}
 		
 		/* store the destination and check whether is it empty */
-		if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
-		{	/* complain to the user that "" is no valid dest. */
-			[o_wh_txt_title setStringValue: _NS("No valid destination")];
-			[o_wh_txt_text setStringValue: _NS("You need to enter " \
-			"a valid destination you want to stream to. Enter either a " \
-			"fixed Unicast-IP or a Multicast-IP.\n\n If you don't know "
-			"what this means, have a look at the VLC Streaming HOWTO." )];
-			[NSApp beginSheet: o_wizardhelp_window
-				modalForWindow: o_wizard_window
-				modalDelegate: o_wizardhelp_window
-				didEndSelector: nil
-				contextInfo: nil];
+		if(! [o_mode isEqualToString: _NS("HTTP")] )
+		{	
+			/* empty field is valid for HTTP */
+			
+			if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
+			{	
+			
+				/* complain to the user that "" is no valid dest. */
+				[o_wh_txt_title setStringValue: _NS("No valid destination")];
+				[o_wh_txt_text setStringValue: _NS("You need to enter " \
+				"a valid destination you want to stream to. Enter either a " \
+				"Unicast-IP or a Multicast-IP.\n\n If you don't know "
+				"what this means, have a look at the VLC Streaming HOWTO and " \
+				"the help texts in this window." )];
+				[NSApp beginSheet: o_wizardhelp_window
+					modalForWindow: o_wizard_window
+					modalDelegate: o_wizardhelp_window
+					didEndSelector: nil
+					contextInfo: nil];
+			} else {
+				/* FIXME: stupid code duplication, should be solved by a GoTo-like-thing -- FK */
+				[o_userSelections setObject:[o_t3_fld_address stringValue] forKey:@"stmgDest"];
+				/* let's go to the encap-tab */
+				[o_tab_pageHolder selectTabViewItemAtIndex:4];
+			}
 		} else {
 			[o_userSelections setObject:[o_t3_fld_address stringValue] forKey:@"stmgDest"];
 			/* let's go to the encap-tab */
@@ -739,7 +780,9 @@ static VLCWizard *_o_sharedInstance = nil;
 	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Encap"])
 	{
 		/* get the chosen encap format and store it */
-		[o_userSelections setObject:[[o_t5_matrix_encap selectedCell] title] forKey:@"encapFormat"];
+		NSNumber * theNum;
+		theNum = [NSNumber numberWithInt:[[o_t5_matrix_encap selectedCell] tag]];
+		[o_userSelections setObject:[theNum stringValue] forKey:@"encapFormat"];
 		
 		/* show either "Streaming 2" or "Transcode 2" to the user */
 		if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
@@ -842,8 +885,51 @@ static VLCWizard *_o_sharedInstance = nil;
 		}
 		[o_t8_fld_saveFileTo setStringValue: [o_userSelections objectForKey:@"trnscdFilePath"]];
 	}
-	[o_t8_fld_encapFormat setStringValue: [o_userSelections objectForKey:@"encapFormat"]];
+	[o_t8_fld_encapFormat setStringValue: [[o_encapFormats objectAtIndex:[[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:1]];
+	
+	[self createMrl];
+	[o_t8_fld_mrl setStringValue: o_mrl];
+	
 	[o_tab_pageHolder selectTabViewItemAtIndex:7];
+}
+
+- (void) createMrl
+{
+	NSMutableString * o_mrl_string = [NSMutableString stringWithString:@""];
+	if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
+		{
+			/* we are streaming, no transcoding allowed atm */
+			/* FIXME: implementation missing */
+		} else {
+			/* we are just transcoding and dumping the stuff to a file */
+			NSMutableString *o_trnscdCmd = [NSMutableString stringWithString:@""];
+			if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"YES"])
+			{
+				[o_trnscdCmd appendString: @"transcode{"];
+				[o_trnscdCmd appendFormat: @"vcodec=%s,vb=%i", [[[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections objectForKey:@"trnscdVideoBitrate"] intValue]];
+				if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
+				{
+					[o_trnscdCmd appendString: @","];
+				} else
+				{
+					[o_trnscdCmd appendString: @"}:"];
+				}
+			}
+			if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
+			{
+				if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"NO"])
+				{
+					/* in case we transcode the audio only, add this */
+					[o_trnscdCmd appendString: @"transcode{"];
+				}
+				[o_trnscdCmd appendFormat: @"acodec=%s,ab=%i}:", [[[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections objectForKey:@"trnscdAudioBitrate"] intValue]];
+			}
+			[o_mrl_string appendFormat:
+                        @":sout=#%sstandard{mux=%s,url=%s,access=file}", [o_trnscdCmd UTF8String],
+                        [[[o_encapFormats objectAtIndex:[[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:0] UTF8String], [[o_userSelections objectForKey:@"trnscdFilePath"] UTF8String]];
+		}
+		
+	o_mrl = [[NSString alloc] initWithString: o_mrl_string];
 }
 
 - (IBAction)prevTab:(id)sender
@@ -985,6 +1071,44 @@ static VLCWizard *_o_sharedInstance = nil;
     /* check whether the entered address is valid */
 }
 
+- (IBAction)t3_strmMthdChanged:(id)sender
+{
+	/* change the captions of o_t3_txt_destInfo according to the chosen
+	 * streaming method */
+	NSNumber * o_mode;
+	o_mode = [[NSNumber alloc] initWithInt:[[o_t3_matrix_stmgMhd selectedCell] tag]];
+	if( [o_mode intValue] == 2 )
+	{
+		[o_t3_txt_destInfo setStringValue: _NS("Enter the local addresses you " \
+			"want to listen to. Do not enter anything if you want to listen " \
+			"to all adresses or if you don't understand. This is generally " \
+			"the best thing to do. Other computers can then access the stream " \
+			"at http://yourip:8080 by default") ];
+		[o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to " \
+			"several computers. This method is less efficient, as the server " \
+			"needs to send several times the stream.")];
+	}
+	else if( [o_mode intValue] == 1 )
+	{
+		[o_t3_txt_destInfo setStringValue: _NS("Enter the multicast address " \
+			"to stream to in this field.  This must be an IP address between " \
+			"224.0.0.0 an 239.255.255.255  For a private use, enter an " \
+			"address beginning with 239.255")];
+		[o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to a " \
+			"dynamic group of computers on a multicast-enabled network. This " \
+			"is the most efficient method to stream to several computers, but " \
+			"it does not work over Internet.")];
+	}
+	else if( [o_mode intValue] == 0 ) 
+	{
+		[o_t3_txt_destInfo setStringValue: _NS("Enter the address of the " \
+			"computer to stream to")];
+		[o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to a " \
+			"single computer")];
+	}
+	[o_mode release];
+}
+
 - (IBAction)t4_AudCdcChanged:(id)sender
 {
     /* update codec info */
@@ -1080,16 +1204,17 @@ static VLCWizard *_o_sharedInstance = nil;
     /* provide a save-to-dialogue, so the user can choose a location for his/her new file */
     NSSavePanel * savePanel = [NSSavePanel savePanel];
     SEL sel = @selector(t7_getTrnscdDestFile:returnCode:contextInfo:);
+	[savePanel setRequiredFileType:[[o_encapFormats objectAtIndex:[[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:0]];
+	[savePanel setCanSelectHiddenExtension:YES];
     [savePanel beginSheetForDirectory:nil file:nil modalForWindow:o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
-    /* FIXME: insert a suffix in file depending on the chosen encap-format instead of providing file:nil */
 }
 
 - (void)t7_getTrnscdDestFile: (NSSavePanel *)sheet returnCode: (int)returnCode contextInfo: (void *)contextInfo
 {
     if (returnCode == NSOKButton)
     {
+		/* add a suffix depending on the chosen encap-format and output path to text-field*/
         [o_t7_fld_filePath setStringValue:[sheet filename]];
-        /* FIXME: add a suffix depending on the chosen encap-format, if needed */
     }
 }
 
@@ -1105,6 +1230,7 @@ static VLCWizard *_o_sharedInstance = nil;
 	[o_userSelections release];
 	[o_videoCodecs release];
 	[o_audioCodecs release];
+	[o_encapFormats release];
 	[super dealloc];
 }
 

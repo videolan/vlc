@@ -444,7 +444,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
 
     /* main menu */
-    [o_mi_about setTitle: _NS("About VLC media player")];
+    [o_mi_about setTitle: _NS("About VLC media player...")];
     [o_mi_prefs setTitle: _NS("Preferences...")];
     [o_mi_add_intf setTitle: _NS("Add Interface")];
     [o_mu_add_intf setTitle: _NS("Add Interface")];

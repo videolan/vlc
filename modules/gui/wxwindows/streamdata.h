@@ -132,7 +132,7 @@ static struct method methods_array[] =
      "to stream to several computers, but it does not work over Internet."),
      N_("Enter the multicast address to stream to in this field. "
      "This must be an IP address between 224.0.0.0 an 239.255.255.255 "
-     "For a private use, enter an address beginning with 239.255."),
+     "For a private use, enter an address beginning with 239.255"),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
     {"http://",N_("HTTP"),
      N_("Use this to stream to several computers. This method is "
@@ -158,13 +158,13 @@ static struct encap encaps_array[] =
     { MUX_PS, "ps","MPEG PS", N_("MPEG Program Stream") },
     { MUX_TS, "ts","MPEG TS", N_("MPEG Transport Stream") },
     { MUX_MPEG, "ps", "MPEG 1", N_("MPEG 1 Format") },
-    { MUX_OGG, "ogg", "OGG", N_("OGG") },
-    { MUX_RAW, "raw", "RAW", N_("RAW") },
-    { MUX_ASF, "asf","ASF", N_("ASF") },
-//    { MUX_AVI, "avi","AVI", N_("AVI") },
-    { MUX_MP4, "mp4","MP4", N_("MPEG4") },
-    { MUX_MOV, "mov","MOV", N_("MOV") },
-    { MUX_WAV, "wav","WAV", N_("WAV") },
+    { MUX_OGG, "ogg", "OGG", "OGG" },
+    { MUX_RAW, "raw", "RAW", "RAW" },
+    { MUX_ASF, "asf","ASF", "ASF" },
+//    { MUX_AVI, "avi","AVI", "AVI" },
+    { MUX_MP4, "mp4","MP4", "MPEG4" },
+    { MUX_MOV, "mov","MOV", "MOV" },
+    { MUX_WAV, "wav","WAV", "WAV" },
     { -1 , NULL,NULL , NULL } /* Do not remove me */
 };
 

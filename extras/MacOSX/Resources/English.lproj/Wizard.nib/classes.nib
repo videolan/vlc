@@ -12,6 +12,7 @@
                 "t2_chooseStreamOrPlst" = id; 
                 "t2_enableExtract" = id; 
                 "t3_addressEntered" = id; 
+                "t3_strmMthdChanged" = id; 
                 "t4_AudCdcChanged" = id; 
                 "t4_VidCdcChanged" = id; 
                 "t4_enblAudTrnscd" = id; 
@@ -51,6 +52,7 @@
                 "o_t3_fld_address" = id; 
                 "o_t3_matrix_stmgMhd" = id; 
                 "o_t3_txt_destInfo" = id; 
+                "o_t3_txt_strgMthdInfo" = id; 
                 "o_t3_txt_text" = id; 
                 "o_t3_txt_title" = id; 
                 "o_t4_box_audio" = id; 
@@ -88,6 +90,7 @@
                 "o_t8_fld_destination" = id; 
                 "o_t8_fld_encapFormat" = id; 
                 "o_t8_fld_inptStream" = id; 
+                "o_t8_fld_mrl" = id; 
                 "o_t8_fld_partExtract" = id; 
                 "o_t8_fld_sap" = id; 
                 "o_t8_fld_saveFileTo" = id; 
@@ -98,6 +101,7 @@
                 "o_t8_txt_destination" = id; 
                 "o_t8_txt_encapFormat" = id; 
                 "o_t8_txt_inputStream" = id; 
+                "o_t8_txt_mrl" = id; 
                 "o_t8_txt_partExtract" = id; 
                 "o_t8_txt_sap" = id; 
                 "o_t8_txt_saveFileTo" = id; 
