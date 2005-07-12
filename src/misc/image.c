@@ -57,7 +57,7 @@ static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
 static void DeleteFilter( filter_t * );
 
 static vlc_fourcc_t Ext2Fourcc( const char * );
-static const char *Fourcc2Ext( vlc_fourcc_t );
+/*static const char *Fourcc2Ext( vlc_fourcc_t );*/
 
 /**
  * Create an image_handler_t instance
@@ -471,6 +471,7 @@ static vlc_fourcc_t Ext2Fourcc( const char *psz_name )
     return 0;
 }
 
+/*
 static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 {
     int i;
@@ -482,6 +483,7 @@ static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
 
     return NULL;
 }
+*/
 
 static void video_release_buffer( picture_t *p_pic )
 {

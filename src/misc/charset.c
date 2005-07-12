@@ -59,7 +59,7 @@ typedef struct VLCCharsetAlias
  * a lot of basic aliases (check it first by iconv -l).
  *
  */
-
+#if defined WIN32 || defined OS2 || !HAVE_LANGINFO_CODESET
 static const char* vlc_encoding_from_language( const char *l )
 {
     /* check for language (and perhaps country) codes */
@@ -91,7 +91,7 @@ static const char* vlc_encoding_from_language( const char *l )
     /* We don't know. This ain't working go to default. */
     return "ISO-8859-1";
 }
-
+#endif
 
 static const char* vlc_charset_aliases( const char *psz_name )
 {
@@ -197,6 +197,7 @@ static const char* vlc_charset_aliases( const char *psz_name )
 }
 
 /* Returns charset from "language_COUNTRY.charset@modifier" string */
+#if defined WIN32 || defined OS2 || !HAVE_LANGINFO_CODESET
 static char *vlc_encoding_from_locale( char *psz_locale )
 {
     char *psz_dot = strchr( psz_locale, '.' );
@@ -224,6 +225,7 @@ static char *vlc_encoding_from_locale( char *psz_locale )
     /* try language mapping */
     return (char *)vlc_encoding_from_language( psz_locale );
 }
+#endif
 
 vlc_bool_t vlc_current_charset( char **psz_charset )
 {
