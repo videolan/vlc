@@ -1,10 +1,10 @@
 /*****************************************************************************
  * tls.c
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2005 Rémi Denis-Courmont
  * $Id$
  *
- * Authors: Remi Denis-Courmont <rem # videolan.org>
+ * Authors: Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -262,7 +262,7 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
     val = gnutls_ContinueHandshake( p_session );
     if( val == 0 )
     {
-        int status;
+        unsigned status;
         gnutls_x509_crt cert;
         const gnutls_datum *p_data;
         tls_session_sys_t *p_sys;
@@ -299,7 +299,7 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
             return 0;
 
         /* certificate (host)name verification */
-        p_data = gnutls_certificate_get_peers( p_sys->session, &val );
+        p_data = gnutls_certificate_get_peers( p_sys->session, &status );
         if( p_data == NULL )
         {
             msg_Err( p_session, "TLS peer certificate not available" );
