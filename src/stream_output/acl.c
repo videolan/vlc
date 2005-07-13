@@ -291,8 +291,12 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         psz_ip = line;
 
         /* skips blanks */
-        while( isblank( *psz_ip ) )
+        while( isspace( *psz_ip ) )
+        {
+            if( *psz_ip == '\n' )
+                continue;
             psz_ip++;
+        }
 
         ptr = strchr( psz_ip, '\n' );
         if( ptr == NULL )
