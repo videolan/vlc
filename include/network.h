@@ -352,6 +352,10 @@ VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, v_socket_t *, const
 #define net_vaPrintf(a,b,c,d,e) __net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args ) );
 
+#define net_GetSockAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_FALSE,b,c,d)
+#define net_GetPeerAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_TRUE,b,c,d)
+VLC_EXPORT( int, __net_GetAddress, ( vlc_object_t *p_this, vlc_bool_t peer, int fd, char *address, int *port ) );
+
 /*****************************************************************************
  * net_StopRecv/Send
  *****************************************************************************

@@ -382,6 +382,7 @@ struct module_symbols_t
     int (*ACL_LoadFile_inner) (vlc_acl_t *p_acl, const char *path);
     int (*ACL_AddNet_inner) (vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow);
     void (*ACL_Destroy_inner) (vlc_acl_t *p_acl);
+    int (*__net_GetAddress_inner) (vlc_object_t *p_this, vlc_bool_t peer, int fd, char *address, int *port);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -749,6 +750,7 @@ struct module_symbols_t
 #  define ACL_LoadFile (p_symbols)->ACL_LoadFile_inner
 #  define ACL_AddNet (p_symbols)->ACL_AddNet_inner
 #  define ACL_Destroy (p_symbols)->ACL_Destroy_inner
+#  define __net_GetAddress (p_symbols)->__net_GetAddress_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1119,6 +1121,7 @@ struct module_symbols_t
     ((p_symbols)->ACL_LoadFile_inner) = ACL_LoadFile; \
     ((p_symbols)->ACL_AddNet_inner) = ACL_AddNet; \
     ((p_symbols)->ACL_Destroy_inner) = ACL_Destroy; \
+    ((p_symbols)->__net_GetAddress_inner) = __net_GetAddress; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
