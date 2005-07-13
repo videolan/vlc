@@ -256,6 +256,9 @@ void ACL_Destroy( vlc_acl_t *p_acl )
     }
 }
 
+#ifndef isblank 
+#   define isblank(c) ((c) == ' ' || (c) == '\t')
+#endif
 
 int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
 {
