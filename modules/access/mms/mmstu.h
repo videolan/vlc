@@ -37,7 +37,7 @@ struct access_sys_t
     int                 i_handle_tcp;   /* TCP socket for communication with server */
     int                 i_handle_udp;   /* Optional UDP socket for data(media/header packet) */
                                         /* send by server */
-    char                *psz_bind_addr; /* used by udp */
+    char                sz_bind_addr[NI_MAXNUMERICHOST]; /* used by udp */
 
     vlc_url_t           url;
 

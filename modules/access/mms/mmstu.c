@@ -415,7 +415,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     i_data = 0;
 
     /* *** now send data if needed *** */
-    while( i_data < i_len )
+    while( i_data < (size_t)i_len )
     {
         if( p_access->info.i_pos < p_sys->i_header )
         {
@@ -490,24 +490,15 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     /* *** Bind port if UDP protocol is selected *** */
     if( b_udp )
     {
-        struct sockaddr_storage name;
-        socklen_t i_namelen = sizeof( name );
-
-        if( getsockname( p_sys->i_handle_tcp,
-                         (struct sockaddr*)&name, &i_namelen ) < 0 )
+        if( net_GetSockAddress( p_access, p_sys->i_handle_tcp,
+                                p_sys->sz_bind_addr, NULL ) )
         {
             net_Close( p_sys->i_handle_tcp );
             return VLC_EGENERIC;
         }
 
-        /* FIXME: not thread-safe for IPv4 */
-        /* FIXME: not sure if it works fine for IPv6 */
-        if( name.ss_family == AF_INET )
-            p_sys->psz_bind_addr = inet_ntoa( ((struct sockaddr_in *)&name)->sin_addr );
-        else
-            p_sys->psz_bind_addr = p_url->psz_host;
-
-        p_sys->i_handle_udp = net_OpenUDP( p_access, p_sys->psz_bind_addr, 7000, "", 0 );
+        p_sys->i_handle_udp = net_OpenUDP( p_access, p_sys->sz_bind_addr,
+                                           7000, "", 0 );
         if( p_sys->i_handle_udp < 0 )
         {
             msg_Err( p_access, "failed to open a connection (udp)" );
@@ -516,11 +507,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
         }
         msg_Dbg( p_access,
                  "connection(udp) at \"%s:%d\" successful",
-                 p_sys->psz_bind_addr, 7000 );
-    }
-    else
-    {
-        p_sys->psz_bind_addr = NULL;
+                 p_sys->sz_bind_addr, 7000 );
     }
 
     /* *** Init context for mms prototcol *** */
@@ -610,7 +597,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     {
         sprintf( tmp,
                  "\\\\%s\\UDP\\%d",
-                 p_sys->psz_bind_addr,
+                 p_sys->sz_bind_addr,
                  7000 ); // FIXME
     }
     else
