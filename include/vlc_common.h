@@ -1013,7 +1013,7 @@ typedef __int64 off_t;
 #   include <tchar.h>
 #endif
 
-VLC_EXPORT( vlc_bool_t, vlc_reduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t ) );
+VLC_EXPORT( vlc_bool_t, vlc_ureduce, ( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t ) );
 VLC_EXPORT( char **, vlc_parse_cmdline, ( const char *, int * ) );
 
 /* vlc_wraptext (defined in src/extras/libc.c) */

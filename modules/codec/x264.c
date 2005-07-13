@@ -386,7 +386,7 @@ static int  Open ( vlc_object_t *p_this )
         i_num = p_enc->fmt_in.video.i_aspect *
             (int64_t)p_enc->fmt_in.video.i_height;
         i_den = VOUT_ASPECT_FACTOR * p_enc->fmt_in.video.i_width;
-        vlc_reduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
+        vlc_ureduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
 
         p_sys->param.vui.i_sar_width = i_dst_num;
         p_sys->param.vui.i_sar_height = i_dst_den;

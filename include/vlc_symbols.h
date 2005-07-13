@@ -181,7 +181,7 @@ struct module_symbols_t
     void * (*vlc_opendir_inner) (const char *);
     void * (*vlc_readdir_inner) (void *);
     int (*vlc_closedir_inner) (void *);
-    vlc_bool_t (*vlc_reduce_inner) (unsigned *, unsigned *, uint64_t, uint64_t, uint64_t);
+    vlc_bool_t (*vlc_ureduce_inner) (unsigned *, unsigned *, uint64_t, uint64_t, uint64_t);
     char ** (*vlc_parse_cmdline_inner) (const char *, int *);
     char * (*vlc_wraptext_inner) (const char *, int, vlc_bool_t);
     vlc_iconv_t (*vlc_iconv_open_inner) (const char *, const char *);
@@ -548,7 +548,7 @@ struct module_symbols_t
 #  define vlc_opendir (p_symbols)->vlc_opendir_inner
 #  define vlc_readdir (p_symbols)->vlc_readdir_inner
 #  define vlc_closedir (p_symbols)->vlc_closedir_inner
-#  define vlc_reduce (p_symbols)->vlc_reduce_inner
+#  define vlc_ureduce (p_symbols)->vlc_ureduce_inner
 #  define vlc_parse_cmdline (p_symbols)->vlc_parse_cmdline_inner
 #  define vlc_wraptext (p_symbols)->vlc_wraptext_inner
 #  define vlc_iconv_open (p_symbols)->vlc_iconv_open_inner
@@ -918,7 +918,7 @@ struct module_symbols_t
     ((p_symbols)->vlc_opendir_inner) = vlc_opendir; \
     ((p_symbols)->vlc_readdir_inner) = vlc_readdir; \
     ((p_symbols)->vlc_closedir_inner) = vlc_closedir; \
-    ((p_symbols)->vlc_reduce_inner) = vlc_reduce; \
+    ((p_symbols)->vlc_ureduce_inner) = vlc_ureduce; \
     ((p_symbols)->vlc_parse_cmdline_inner) = vlc_parse_cmdline; \
     ((p_symbols)->vlc_wraptext_inner) = vlc_wraptext; \
     ((p_symbols)->vlc_iconv_open_inner) = vlc_iconv_open; \
