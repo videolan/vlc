@@ -91,7 +91,7 @@ struct access_sys_t
     int        fd_cmd;
     int        fd_data;
     
-    char       *psz_epsv_ip;
+    char       sz_epsv_ip[NI_MAXNUMERICHOST];
 };
 
 static int  ftp_SendCommand( access_t *, char *, ... );
@@ -219,7 +219,6 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( access_sys_t ) );
     p_sys->fd_cmd = -1;
     p_sys->fd_data = -1;
-    p_sys->psz_epsv_ip = NULL;
 
     /* *** Parse URL and get server addr/port and path *** */
     psz = p_access->psz_path;
@@ -251,26 +250,8 @@ static int Open( vlc_object_t *p_this )
 
     if( ftp_ReadCommand( p_access, &i_answer, NULL ) == 2 )
     {
-        char hostaddr[NI_MAXNUMERICHOST];
-        struct sockaddr_storage addr;
-        socklen_t len = sizeof (addr);
-
-        if( getpeername( p_sys->fd_cmd, (struct sockaddr *)&addr, &len ) )
-        {
-            msg_Err( p_access, "getpeername failed" );
-            goto exit_error;
-        }
-
-        i_answer = vlc_getnameinfo( (struct sockaddr *)&addr, len, hostaddr,
-                                    sizeof( hostaddr ), NULL, NI_NUMERICHOST );
-        if( i_answer )
-        {
-            msg_Err( p_access, "getnameinfo failed: %s",
-                     vlc_gai_strerror( i_answer ) );
-            goto exit_error;
-        }
-        p_sys->psz_epsv_ip = strdup( hostaddr );
-        if( p_sys->psz_epsv_ip == NULL )
+        if( net_GetPeerAddress( p_access, p_sys->fd_cmd, p_sys->sz_epsv_ip,
+                                NULL ) )
             goto exit_error;
     }
     else
@@ -282,6 +263,7 @@ static int Open( vlc_object_t *p_this )
          */
         net_Close( p_sys->fd_cmd );
         p_sys->fd_cmd = -1;
+        *p_sys->sz_epsv_ip = '\0';
 
         if( ( p_sys->fd_cmd = Connect( p_access, p_sys ) ) < 0 )
            goto exit_error;
@@ -348,8 +330,6 @@ static void Close( vlc_object_t *p_this )
         ftp_ReadCommand( p_access, NULL, NULL );
     }
     net_Close( p_sys->fd_cmd );
-    if( p_sys->psz_epsv_ip != NULL )
-        free( p_sys->psz_epsv_ip );
 
     /* free memory */
     vlc_UrlClean( &p_sys->url );
@@ -564,9 +544,9 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     char *psz_arg, *psz_parser;
     int  i_port;
 
-    psz_ip = p_sys->psz_epsv_ip;
-    if( ( ftp_SendCommand( p_access, ( psz_ip != NULL )
-                                     ? "EPSV" : "PASV" ) < 0 )
+    psz_ip = p_sys->sz_epsv_ip;
+
+    if( ( ftp_SendCommand( p_access, *psz_ip ? "EPSV" : "PASV" ) < 0 )
      || ( ftp_ReadCommand( p_access, &i_answer, &psz_arg ) != 2 ) )
     {
         msg_Err( p_access, "cannot set passive mode" );
