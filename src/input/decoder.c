@@ -904,10 +904,10 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
               p_dec->fmt_out.video.i_width;
         }
 
-        vlc_reduce( &p_dec->fmt_out.video.i_sar_num,
-                    &p_dec->fmt_out.video.i_sar_den,
-                    p_dec->fmt_out.video.i_sar_num,
-                    p_dec->fmt_out.video.i_sar_den, 0 );
+        vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,
+                     &p_dec->fmt_out.video.i_sar_den,
+                     p_dec->fmt_out.video.i_sar_num,
+                     p_dec->fmt_out.video.i_sar_den, 0 );
 
         if( !p_dec->fmt_out.video.i_visible_width ||
             !p_dec->fmt_out.video.i_visible_height )

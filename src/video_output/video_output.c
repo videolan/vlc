@@ -611,8 +611,8 @@ static int InitThread( vout_thread_t *p_vout )
             p_vout->fmt_out.i_width;
     }
 
-    vlc_reduce( &p_vout->fmt_out.i_sar_num, &p_vout->fmt_out.i_sar_den,
-                p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den, 0 );
+    vlc_ureduce( &p_vout->fmt_out.i_sar_num, &p_vout->fmt_out.i_sar_den,
+                 p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den, 0 );
 
     AspectRatio( p_vout->fmt_out.i_aspect, &i_aspect_x, &i_aspect_y );
 

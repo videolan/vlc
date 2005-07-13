@@ -679,10 +679,10 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     case VIDEO_ES:
         es->i_channel = p_sys->i_video;
         if( fmt->video.i_frame_rate && fmt->video.i_frame_rate_base )
-            vlc_reduce( &es->fmt.video.i_frame_rate,
-                        &es->fmt.video.i_frame_rate_base,
-                        fmt->video.i_frame_rate,
-                        fmt->video.i_frame_rate_base, 0 );
+            vlc_ureduce( &es->fmt.video.i_frame_rate,
+                         &es->fmt.video.i_frame_rate_base,
+                         fmt->video.i_frame_rate,
+                         fmt->video.i_frame_rate_base, 0 );
         break;
 
     case SPU_ES:
