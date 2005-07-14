@@ -4313,7 +4313,7 @@ dnl
 dnl  Stuff used by the program
 dnl
 AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version string])
-AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2005 VideoLAN", [Copyright string])
+AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2005 the VideoLAN team", [Copyright string])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
 
 dnl Old definitions for version-dependant plugins
@@ -4325,6 +4325,9 @@ dnl New definitions with value matching 0.8.2 release
 AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__0_8_2", [String suffix for module functions])
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, 0_8_2, [Symbol suffix for module functions])
 
+dnl Version number for ActiveX INF
+VERSION32="`echo -n ${VERSION} | sed -e 's/@<:@a-z\-@:>@//g' | sed -e 'y/./,/'; echo ',0'`"
+AC_SUBST(VERSION32)
 
 DATA_PATH="${ac_tool_prefix}/share/vlc"
 AC_SUBST(DATA_PATH)
@@ -4373,6 +4376,7 @@ VLC_OUTPUT_VLC_CONFIG_IN
 AC_CONFIG_FILES([
   Makefile
   activex/Makefile
+  activex/axvlc.inf
   debian/Makefile
   doc/Makefile
   intl/Makefile

@@ -48,6 +48,7 @@ DIST_rsrc = \
 
 DIST_misc = \
     README.TXT \
+    axvlc.inf.in \
     axvlc.def \
     axvlc.idl \
     axvlc.tlb \

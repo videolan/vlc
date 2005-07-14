@@ -5,19 +5,19 @@
   AdvancedINF=2.0
 
 [Add.Code]
-  vlc-0.8.2-win32.exe
+  vlc-@VERSION@-win32.exe
   axvlc.dll=axvlc.dll
 
 [axvlc.dll]
-  FileVersion=0,8,2,0
+  FileVersion=@VERSION32@
   clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
   RegisterServer=no
   hook=nsiinstaller
 
-[vlc-0.8.2-win32.exe]
-  FileVersion=0,8,2,0
+[vlc-@VERSION@-win32.exe]
+  FileVersion=@VERSION32@
   file-win32-x86=thiscab
 
 [nsiinstaller]
-  run=%EXTRACT_DIR%\vlc-0.8.2-win32.exe
+  run=%EXTRACT_DIR%\vlc-@VERSION@-win32.exe
 
