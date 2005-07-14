@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <vlc/vlc.h>
 
 #include "vlc_acl.h"
