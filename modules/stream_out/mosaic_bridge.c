@@ -176,8 +176,8 @@ static int Open( vlc_object_t *p_this )
             *psz_parser++ = '\0';
             p_sys->i_sar_num = atoi( val.psz_string );
             p_sys->i_sar_den = atoi( psz_parser );
-            vlc_reduce( &p_sys->i_sar_num, &p_sys->i_sar_den,
-                        p_sys->i_sar_num, p_sys->i_sar_den, 0 );
+            vlc_ureduce( &p_sys->i_sar_num, &p_sys->i_sar_den,
+                         p_sys->i_sar_num, p_sys->i_sar_den, 0 );
         }
         else
         {
