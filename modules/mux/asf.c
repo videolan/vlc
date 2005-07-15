@@ -915,7 +915,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         i_num = p_sys->track[i].fmt.video.i_aspect *
             (int64_t)p_sys->track[i].fmt.video.i_height;
         i_den = VOUT_ASPECT_FACTOR * p_sys->track[i].fmt.video.i_width;
-        vlc_reduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
+        vlc_ureduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
 
         msg_Dbg( p_mux, "pixel aspect-ratio: %i/%i", i_dst_num, i_dst_den );
 
