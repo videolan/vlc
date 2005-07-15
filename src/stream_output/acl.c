@@ -278,7 +278,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
     {
         char line[1024], *psz_ip, *ptr;
 
-        if( fgets( line, sizeof( line ) - 1, file ) == NULL )
+        if( fgets( line, sizeof( line ), file ) == NULL )
         {
             if( ferror( file ) )
             {
@@ -289,15 +289,12 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
             continue;
         }
 
+        /* fgets() is cool : never overflow, always nul-terminate */
         psz_ip = line;
 
-        /* skips blanks */
+        /* skips blanks - cannot overflow given '\0' is not space */
         while( isspace( *psz_ip ) )
-        {
-            if( *psz_ip == '\n' )
-                continue;
             psz_ip++;
-        }
 
         ptr = strchr( psz_ip, '\n' );
         if( ptr == NULL )
@@ -306,7 +303,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
                       psz_path);
             do
             {
-                fgets( line, sizeof( line ) - 1, file );
+                fgets( line, sizeof( line ), file );
                 if( ferror( file ) || feof( file ) )
                 {
                     msg_Err( p_acl->p_owner, "Error reading %s : %s\n",
