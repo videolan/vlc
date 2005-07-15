@@ -221,10 +221,6 @@ install: build
 	#mv debian/vlc/$(VIDDIR)/gnome-vlc32x32.xpm debian/gnome-vlc/$(VIDDIR)/gnome-vlc.xpm
 	#mv debian/vlc/$(VIDDIR)/gnome-vlc48x48.png debian/gnome-vlc/$(PIXDIR)/gnome-vlc.png
 
-	# Package: vlc-gnome
-	mkdir -p debian/vlc-gnome/usr/share/doc/
-	ln -s vlc debian/vlc-gnome/usr/share/doc/vlc-gnome
-
 	# Package: gvlc
 	#mv debian/vlc/usr/bin/gvlc debian/gvlc/usr/bin/
 	ln -s vlc debian/gvlc/usr/share/doc/gvlc
@@ -238,27 +234,15 @@ install: build
 	#mv debian/vlc/$(VIDDIR)/gvlc32x32.xpm debian/gvlc/$(VIDDIR)/gvlc.xpm
 	#mv debian/vlc/$(VIDDIR)/gvlc48x48.png debian/gvlc/$(PIXDIR)/gvlc.png
 
-	# Package: vlc-gtk
-	mkdir -p debian/vlc-gtk/usr/share/doc/
-	ln -s vlc debian/vlc-gtk/usr/share/doc/vlc-gtk
-
 	# Package: vlc-plugin-esd
 	ln -s vlc debian/vlc-plugin-esd/usr/share/doc/vlc-plugin-esd
 	mv debian/vlc/usr/lib/vlc/audio_output/libesd_plugin.so \
 	  debian/vlc-plugin-esd/usr/lib/vlc/audio_output/
 
-	# Package: vlc-esd
-	mkdir -p debian/vlc-esd/usr/share/doc/
-	ln -s vlc debian/vlc-esd/usr/share/doc/vlc-esd
-
 	# Package: vlc-plugin-alsa
 	ln -s vlc debian/vlc-plugin-alsa/usr/share/doc/vlc-plugin-alsa
 	mv debian/vlc/usr/lib/vlc/audio_output/libalsa_plugin.so \
 	  debian/vlc-plugin-alsa/usr/lib/vlc/audio_output/
-
-	# Package: vlc-alsa
-	mkdir -p debian/vlc-alsa/usr/share/doc/
-	ln -s vlc debian/vlc-alsa/usr/share/doc/vlc-alsa
 
 	# Package: vlc-plugin-sdl
 	ln -s vlc debian/vlc-plugin-sdl/usr/share/doc/vlc-plugin-sdl
@@ -267,28 +251,16 @@ install: build
 	mv debian/vlc/usr/lib/vlc/video_output/libvout_sdl_plugin.so \
 	  debian/vlc-plugin-sdl/usr/lib/vlc/video_output/
 
-	# Package: vlc-sdl
-	mkdir -p debian/vlc-sdl/usr/share/doc/
-	ln -s vlc debian/vlc-sdl/usr/share/doc/vlc-sdl
-
 	# Package: vlc-plugin-ggi
 	ln -s vlc debian/vlc-plugin-ggi/usr/share/doc/vlc-plugin-ggi
 	mv debian/vlc/usr/lib/vlc/video_output/libggi_plugin.so \
 	  debian/vlc-plugin-ggi/usr/lib/vlc/video_output/
-
-	# Package: vlc-ggi
-	mkdir -p debian/vlc-ggi/usr/share/doc/
-	ln -s vlc debian/vlc-ggi/usr/share/doc/vlc-ggi
 
 	# Package: vlc-plugin-glide
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	ln -s vlc debian/vlc-plugin-glide/usr/share/doc/vlc-plugin-glide
 	mv debian/vlc/usr/lib/vlc/video_output/libglide_plugin.so \
 	  debian/vlc-plugin-glide/usr/lib/vlc/video_output/
-
-	# Package: vlc-glide
-	mkdir -p debian/vlc-glide/usr/share/doc/
-	ln -s vlc debian/vlc-glide/usr/share/doc/vlc-glide
 endif
 
 	# Package: qvlc
@@ -299,10 +271,6 @@ endif
 	#ln -s vlc.1.gz debian/qvlc/usr/share/man/man1/qvlc.1.gz
 	#mv debian/vlc/$(VIDDIR)/qvlc32x32.xpm debian/qvlc/$(VIDDIR)/qvlc.xpm
 	#mv debian/vlc/$(VIDDIR)/qvlc48x48.png debian/qvlc/$(PIXDIR)/qvlc.png
-
-	# Package: vlc-qt
-	mkdir -p debian/vlc-qt/usr/share/doc/
-	ln -s vlc debian/vlc-qt/usr/share/doc/vlc-qt
 
 	# Package: vlc-plugin-arts
 	ln -s vlc debian/vlc-plugin-arts/usr/share/doc/vlc-plugin-arts

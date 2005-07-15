@@ -1,3 +1,37 @@
+vlc (UNRELEASED) experimental; urgency=low
+
+  * Experimental build.
+  * debian/control:
+    + Build-depend on libwxgtk2.6-dev instead of libwxgtk2.4-dev.
+    + Build-depend on libdvbpsi4-dev instead of libdvbpsi3-dev.
+    + Build-depend on a newer version of libmatroska-dev because of the C++
+      transition.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 15 Jul 2005 03:22:46 +0300
+
+vlc (0.8.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * This version fixes the random playlist parsing (Closes: #308375), encodes
+    non-ASCII characters in RTSP requests (Closes: #279735) and fixes an issue
+    with large files (Closes: #306110).
+  * debian/control:
+    + Set policy to 3.6.2.1.
+    + Build-depend on libpng12-dev, xlibmesa-gl-dev.
+    + Build-depend on a more recent ffmpeg library set, to fix nasty visual
+      artifacts with post-processing (Closes: #300220).
+    + mozilla-plugin-vlc recommends mozilla-firefox in addition to
+      mozilla-browser (Closes: #308723).
+    + Now that sarge is out, removed legacy packages that disappeared in woody.
+  * debian/rules:
+    + Activated PNG output support.
+    + Activated GLX output support.
+  * The NEWS file documents the changed behaviour for SAP (Closes: #303262).
+  * Minor typo fixed in the manpage (Closes: #300339).
+  * po/de.po: merged corrections from Jens Seidel (Closes: #313890).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun, 26 Jun 2005 16:28:19 +0200
+
 vlc (0.8.1.svn20050314-1) unstable; urgency=low
 
   * More recent SVN snapshot.
