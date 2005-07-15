@@ -584,7 +584,7 @@ void net_ListenClose( int *pi_fd )
  * __net_Read:
  *****************************************************************************
  * Read from a network socket
- * If b_rety is true, then we repeat until we have read the right amount of
+ * If b_retry is true, then we repeat until we have read the right amount of
  * data
  *****************************************************************************/
 int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
@@ -952,8 +952,7 @@ int __net_vaPrintf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
     char    *psz;
     int     i_size, i_ret;
 
-    vasprintf( &psz, psz_fmt, args );
-    i_size = strlen( psz );
+    i_size = vasprintf( &psz, psz_fmt, args );
     i_ret = __net_Write( p_this, fd, p_vs, (uint8_t *)psz, i_size ) < i_size
         ? -1 : i_size;
     free( psz );
