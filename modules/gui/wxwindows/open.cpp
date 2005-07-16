@@ -665,7 +665,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
 #ifdef HAVE_LIBCDIO
     disc_probe = new wxCheckBox( panel, DiscProbe_Event, 
-				 wxU(_("Probe Disc")) );
+                                 wxU(_("Probe Disc")) );
 #endif
 
     sizer_row->Add( disc_type, i_disc_type_selection, wxEXPAND | wxALL, 5 );
@@ -846,8 +846,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
         {
         case 0: /* DVD with menus */
         case 1: /* DVD without menus */
-	    disc_device->SetToolTip( wxU(_("Name of DVD device "
-	    "to read from.")) );
+            disc_device->SetToolTip( wxU(_("Name of DVD device "
+            "to read from.")) );
             if( i_disc_type_selection == 0 )
             {
                 mrltemp = wxT("dvd://") + disc_device->GetValue();
@@ -877,17 +877,17 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
         case 2:  /* VCD of some sort */
 #ifdef HAVE_VCDX
-	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
-	    "to read Video CD from. If this field is left empty, we will scan "
-	    "for a CD-ROM with a VCD in it.")) );
+            disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+            "to read Video CD from. If this field is left empty, we will scan "
+            "for a CD-ROM with a VCD in it.")) );
             mrltemp = wxT("vcdx://") + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%c%d"),
                                   config_GetInt( p_intf, "vcdx-PBC"  )
                                   ? 'P' : 'E', i_disc_title );
 #else
-	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
-	    "to read Video CD from.")) );
+            disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+            "to read Video CD from.")) );
             mrltemp = wxT("vcd://") + disc_device->GetValue();
             if( i_disc_title > 0 )
                 mrltemp += wxString::Format( wxT("@%d"), i_disc_title );
@@ -905,13 +905,13 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
         case 3: /* CD-DA */
 #ifdef HAVE_CDDAX
-	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
-	    "to read audio CD from. If this field is left empty, we will scan "
-	    "for a CD-ROM with an audio CD in it." )) );
+            disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+            "to read audio CD from. If this field is left empty, we will scan "
+            "for a CD-ROM with an audio CD in it." )) );
             mrltemp = wxT("cddax://") 
 #else
-	    disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
-	    "to read audio CD from." )) );
+            disc_device->SetToolTip( wxU(_("Name of CD-ROM device "
+            "to read audio CD from." )) );
             mrltemp = wxT("cdda://") 
 #endif
               + disc_device->GetValue();
@@ -1254,19 +1254,19 @@ static char * ProbeDVD()
       char **c;
       for( c = ppsz_cd_drives; *c != NULL; c++ ) 
       {
-	  CdIo_t *p_cdio = cdio_open (*c, DRIVER_UNKNOWN);
-	  if (p_cdio) 
-	  {
-	      discmode_t discmode = cdio_get_discmode(p_cdio);
-	      cdio_destroy(p_cdio);
-	      if( cdio_is_discmode_dvd(discmode) )
-	      {
-		  char *psz_drive = strdup(*c);
-		  cdio_free_device_list(ppsz_cd_drives);
-		  return strdup(psz_drive);
-	      }
-	  }
-	
+          CdIo_t *p_cdio = cdio_open (*c, DRIVER_UNKNOWN);
+          if (p_cdio) 
+          {
+              discmode_t discmode = cdio_get_discmode(p_cdio);
+              cdio_destroy(p_cdio);
+              if( cdio_is_discmode_dvd(discmode) )
+              {
+                  char *psz_drive = strdup(*c);
+                  cdio_free_device_list(ppsz_cd_drives);
+                  return strdup(psz_drive);
+              }
+          }
+        
       }
       cdio_free_device_list(ppsz_cd_drives);
   }
@@ -1275,7 +1275,7 @@ static char * ProbeDVD()
 
 
 static char * ProbeDevice(char **search_devices, cdio_fs_anal_t mask, 
-			  bool b_any)
+                          bool b_any)
 {
     char **ppsz_devices;
 
@@ -1285,8 +1285,8 @@ static char * ProbeDevice(char **search_devices, cdio_fs_anal_t mask,
     if (ppsz_devices && *ppsz_devices) 
     {
         char *psz_device = strdup(*ppsz_devices);
-	cdio_free_device_list(ppsz_devices);
-	return psz_device;
+        cdio_free_device_list(ppsz_devices);
+        return psz_device;
     }
 
     /* If there was no device specified on the first try then give up
@@ -1299,8 +1299,8 @@ static char * ProbeDevice(char **search_devices, cdio_fs_anal_t mask,
     if (ppsz_devices && *ppsz_devices) 
     {
         char *psz_device = strdup(*ppsz_devices);
-	cdio_free_device_list(ppsz_devices);
-	return psz_device;
+        cdio_free_device_list(ppsz_devices);
+        return psz_device;
     }
 
     return NULL;
@@ -1331,8 +1331,8 @@ static char * ProbeVCD(const wxChar *device)
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device, 
-		      (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD|CDIO_FS_ANAL_VIDEOCD
-		       |CDIO_FS_UNKNOWN), true);
+                      (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD|CDIO_FS_ANAL_VIDEOCD
+                       |CDIO_FS_UNKNOWN), true);
 }
 
 
@@ -1357,14 +1357,14 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
     case 0: /* DVD with menus */
     case 1: /* DVD without menus */
       /* If not a DVD then try for a VCD. If VCD fails it will
-	 try for a CD-DA. */
+         try for a CD-DA. */
       if (!psz_device) psz_device = ProbeDVD();
       if (!psz_device)
       {
-	  b_probed_DVD = true;
-	  disc_type->SetSelection(2);
-	  OnDiscTypeChange( dummy_event );
-	  goto retry;
+          b_probed_DVD = true;
+          disc_type->SetSelection(2);
+          OnDiscTypeChange( dummy_event );
+          goto retry;
       }
       disc_device->SetValue( wxL2U(psz_device) );
       free(psz_device);
@@ -1375,33 +1375,33 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       if( psz_device  ) 
       {
           CdIo_t *p_cdio = cdio_open (psz_device, DRIVER_UNKNOWN);
-	  disc_device->SetValue( wxL2U(psz_device) );
+          disc_device->SetValue( wxL2U(psz_device) );
 
 #ifdef HAVE_VCDX
-	  /* FIXME: get information from libvcdinfo. */
-	  if (config_GetInt( p_intf, "vcdx-PBC"  )) 
-	  {
-	      /* Set largest LID. */;
-	      ;
-	  } 
-	  else 
-	  {
-	      /* Set largest Entry */
-	      ;
-	  }
-	  
+          /* FIXME: get information from libvcdinfo. */
+          if (config_GetInt( p_intf, "vcdx-PBC"  )) 
+          {
+              /* Set largest LID. */;
+              ;
+          } 
+          else 
+          {
+              /* Set largest Entry */
+              ;
+          }
+          
 #else
 
-	  /* Set track range accurately if possible. */
-	  if (p_cdio) 
-	  {
-	      track_t i_last_track = cdio_get_last_track_num(p_cdio);
-	      disc_title->SetRange( 0, i_last_track-1 );  
-	  }
+          /* Set track range accurately if possible. */
+          if (p_cdio) 
+          {
+              track_t i_last_track = cdio_get_last_track_num(p_cdio);
+              disc_title->SetRange( 0, i_last_track-1 );  
+          }
 #endif
-	  free(psz_device);
-	  cdio_destroy(p_cdio);
-	  break;
+          free(psz_device);
+          cdio_destroy(p_cdio);
+          break;
       }
 
       b_probed_VCD = true;
@@ -1409,9 +1409,9 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       /* Not a VCD. Try for a DVD unless we've been there before. */
       if( !b_probed_DVD && (psz_device = ProbeDVD()) ) 
       {
-	  disc_type->SetSelection(0);
-	  OnDiscTypeChange( dummy_event );
-	  goto retry;
+          disc_type->SetSelection(0);
+          OnDiscTypeChange( dummy_event );
+          goto retry;
       }
       b_probed_DVD = true;
       
@@ -1419,9 +1419,9 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       psz_device = ProbeCDDA(disc_device->GetValue());
       if( psz_device  ) 
       {
-	  disc_type->SetSelection(3);
-	  OnDiscTypeChange( dummy_event );
-	  goto retry;
+          disc_type->SetSelection(3);
+          OnDiscTypeChange( dummy_event );
+          goto retry;
       }
       break;
 
@@ -1430,33 +1430,33 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       if( psz_device  ) 
       {
           CdIo_t *p_cdio = cdio_open (psz_device, DRIVER_UNKNOWN);
-	  disc_device->SetValue( wxL2U(psz_device) );
-	  if (p_cdio) 
-	  {
-	      track_t i_last_track = cdio_get_last_track_num(p_cdio);
-	      disc_title->SetRange( 0, i_last_track );  
-	  }
-	  free(psz_device);
-	  cdio_destroy(p_cdio);
-	  break;
+          disc_device->SetValue( wxL2U(psz_device) );
+          if (p_cdio) 
+          {
+              track_t i_last_track = cdio_get_last_track_num(p_cdio);
+              disc_title->SetRange( 0, i_last_track );  
+          }
+          free(psz_device);
+          cdio_destroy(p_cdio);
+          break;
       }
 
       /* Not a CD-DA. Try for a DVD unless we've been there before. */
       if( !b_probed_DVD && (psz_device = ProbeDVD()) ) 
       {
-	  disc_type->SetSelection(0);
-	  OnDiscTypeChange( dummy_event );
-	  goto retry;
+          disc_type->SetSelection(0);
+          OnDiscTypeChange( dummy_event );
+          goto retry;
       }
       
       /* Couldn't find a CD-DA or DVD. See if we can find a VCD, unless
-	 we've tried that before. */
+         we've tried that before. */
       if (!b_probed_VCD) psz_device = ProbeVCD(disc_device->GetValue());
       if( psz_device  ) 
       {
-	  disc_type->SetSelection(2);
-	  OnDiscTypeChange( dummy_event );
-	  goto retry;
+          disc_type->SetSelection(2);
+          OnDiscTypeChange( dummy_event );
+          goto retry;
       }
       break;
 
@@ -1495,13 +1495,13 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_sub->SetRange( -1, 31 );  // up to 32 subtitles -1: no subtitle
         disc_audio->SetRange( 0, 7 );  // up to 8 audio channels
         disc_chapter->SetRange( 0, 255 );
-	disc_title->SetToolTip( wxU(_("Title number.")) );
-	disc_sub->SetToolTip( wxU(_(
-	  "DVD's can have up to 32 subtitles numbered 0..31. "
-	  "Note this is not the same thing as a subtitle name e.g. 'en'. "
-	  "If a value -1 is used, no subtitle will be shown." )) );
-	disc_audio->SetToolTip( wxU(_("Audio track number. "
-	  "DVD's can have up to 8 audio tracks numbered 0..7."
+        disc_title->SetToolTip( wxU(_("Title number.")) );
+        disc_sub->SetToolTip( wxU(_(
+          "DVD's can have up to 32 subtitles numbered 0..31. "
+          "Note this is not the same thing as a subtitle name e.g. 'en'. "
+          "If a value -1 is used, no subtitle will be shown." )) );
+        disc_audio->SetToolTip( wxU(_("Audio track number. "
+          "DVD's can have up to 8 audio tracks numbered 0..7."
         )) );
         break;
 
@@ -1517,31 +1517,31 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         }
 
 #ifdef HAVE_VCDX
-	if (config_GetInt( p_intf, "vcdx-PBC"  )) 
-	{
-	  disc_title_label->SetLabel ( wxT("Playback LID") );
-	  disc_title->SetToolTip( wxU(_(
-	  "Playback control (PBC) usually starts with number 1." )) );
-	} 
-	else 
-	{
-	  disc_title_label->SetLabel ( wxT("Entry") );
-	  disc_title->SetToolTip( wxU(_(
-	  "The first entry (the beginning of the first MPEG track) is 0." )) );
-	}
-	
+        if (config_GetInt( p_intf, "vcdx-PBC"  )) 
+        {
+          disc_title_label->SetLabel ( wxT("Playback LID") );
+          disc_title->SetToolTip( wxU(_(
+          "Playback control (PBC) usually starts with number 1." )) );
+        } 
+        else 
+        {
+          disc_title_label->SetLabel ( wxT("Entry") );
+          disc_title->SetToolTip( wxU(_(
+          "The first entry (the beginning of the first MPEG track) is 0." )) );
+        }
+        
 #else
         disc_title_label->SetLabel ( wxU(_("Track")) );
-	disc_title->SetToolTip( wxU(_("Track number.")) );
+        disc_title->SetToolTip( wxU(_("Track number.")) );
 #endif
         disc_title->SetRange( 0, 99 );  // only 100 tracks allowed on VCDs
         disc_sub->SetRange( -1, 3 );    // up to 4 subtitles -1 = no subtitle
         disc_audio->SetRange( 0, 1 );   // up to 2 audio tracks
-	disc_sub->SetToolTip( wxU(_(
-	  "SVCD's can have up to 4 subtitles numbered 0..3. "
+        disc_sub->SetToolTip( wxU(_(
+          "SVCD's can have up to 4 subtitles numbered 0..3. "
           "If a value -1 is used, no subtitle will be shown." )) );
-	disc_audio->SetToolTip( wxU(_("Audio track number. "
-	  "VCD's can have up to 2 audio tracks numbered 0 or 1. "
+        disc_audio->SetToolTip( wxU(_("Audio track number. "
+          "VCD's can have up to 2 audio tracks numbered 0 or 1. "
         )) );
         break;
 
@@ -1551,12 +1551,12 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_audio->Disable(); disc_audio_label->Disable();
         disc_title_label->SetLabel ( wxU(_("Track")) );
 #ifdef HAVE_CDDAX
-	disc_title->SetToolTip( wxU(_(
-	"Audio CDs can have up to 100 tracks, the first track is usually 1. "
+        disc_title->SetToolTip( wxU(_(
+        "Audio CDs can have up to 100 tracks, the first track is usually 1. "
         "If 0 is given, then all tracks are played.")) );
 #else
-	disc_title->SetToolTip( wxU(_(
-	"Audio CDs can have up to 100 tracks, the first track is usually 1."
+        disc_title->SetToolTip( wxU(_(
+        "Audio CDs can have up to 100 tracks, the first track is usually 1."
         )) );
 #endif
         psz_device = config_GetPsz( p_intf, "cd-audio" );
