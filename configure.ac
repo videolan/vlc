@@ -1627,38 +1627,46 @@ then
   VLC_ADD_PLUGINS([pvr])
 fi
 
+dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
+AC_ARG_ENABLE(libcdio,
+  [  --enable-libcdio        CD input and control library support (default enabled)])
+ 
+have_libcdio=no
+have_libvcdinfo=no
+if test "${enable_libcdio}" != "no"
+then
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.72,
+     have_libcdio=yes
+     AC_DEFINE(HAVE_LIBCDIO, [], 
+     [Define if you have libcdio 0.72 or greater installed]))
+
+  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
+     have_libvcdinfo=yes
+     AC_DEFINE(HAVE_VCDINFO, [], 
+     [Define if you have libvcdinfo 0.7.21 or greater installed]))
+fi
+
 dnl
 dnl  VCDX and CDDAX modules
 dnl
-AC_ARG_ENABLE(libcdio,
-  [  --enable-libcdio        CDDA support via libcdio (default enabled)])
+AC_ARG_ENABLE(cddax,
+  [  --enable-cddax          audio CD plugin with CD Text and CD paranoia via libcdio (default disabled)])
  
 AC_ARG_ENABLE(libcddb,
-  [  --enable-libcddb        CDDB support for CDDAX (default enabled)])
- 
-AC_ARG_ENABLE(vcdx,
-  [  --enable-vcdx           VCD support with Navigation (default disabled)])
- 
-AC_ARG_ENABLE(cdda,           
-  [  --enable-cdda           CDDA plugin support (default enabled)])
- 
-AC_ARG_ENABLE(cddax,
-  [  --enable-cddax          CDDA plugin with CD Text and possibly CDDB and paranoia support (default disabled)])
+  [  --enable-libcddb        CDDB support for libcdio audio CD (default enabled)])
  
 if test "${enable_cddax}" = "yes"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
-   [
-    AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
-    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
+  if test "$have_libcdio" = "yes"
+  then
+    AC_DEFINE(HAVE_CDDAX, [], [Define for the audio CD plugin using libcdio])
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS $LIBCDIO_PARANOIA_LIBS])
     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-    VLC_ADD_PLUGINS([cddax])], 
-    [AC_MSG_WARN(libcdio library not found)
-    HAVE_CDDAX=no])
-
-  PKG_CHECK_MODULES(LIBCDIO_PARANOIA, libcdio_paranoia >= 0.72, [
-  VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])], 
-  HAVE_CDDAX=no)
+    VLC_ADD_PLUGINS([cddax])
+  else 
+    AC_MSG_WARN([cddax plugin disabled because ok libcdio library not found or disabled])
+    HAVE_CDDAX=no
+  fi
 
   if test "$enable_libcddb" != "no"; then
     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
@@ -1673,35 +1681,47 @@ then
  
 fi
 
+AC_ARG_ENABLE(vcdx,
+  [  --enable-vcdx           VCD with Navigation via libvcdinfo (default disabled)])
+ 
 if test "${enable_vcdx}" = "yes"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.72,
-   [VLC_ADD_LDFLAGS([vcdx],[$LIBCDIO_LIBS])
-    VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
-    [AC_MSG_WARN(libcdio library not found)
-    HAVE_VCDX=no])
+  if test "${have_libvcdinfo}" = "yes"
+  then
+    VLC_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
+    VLC_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
+  else 
+    AC_MSG_WARN([vcdx plugin disabled because ok libvcdinfo library not found or disabled])
+    HAVE_VCDX=no
+  fi
 
   PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.72,
    [VLC_ADD_LDFLAGS([vcdx],[$LIBISO9660_LIBS])
     VLC_ADD_CFLAGS([vcdx],[$LIBISO9660_CFLAGS])],
-    [AC_MSG_WARN(libiso9660 library not found)
+    [AC_MSG_WARN([vcdx plugin disabled because ok libiso9660 library not found])
     HAVE_VCDX=no])
 
-  PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
-   [AC_DEFINE(HAVE_VCDX, [], 
+  if test "$have_libvcdinfo" = "yes"
+  then
+    AC_DEFINE(HAVE_VCDX, [], 
     [Define for the VCD plugin using libcdio/libvcdinfo])
     VLC_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
     VLC_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
-    VLC_ADD_PLUGINS([vcdx])], 
-   [AC_MSG_WARN(vcdinfo library not found)
-   HAVE_VCDX=no])
+    VLC_ADD_PLUGINS([vcdx])
+  else 
+    AC_MSG_WARN([vcdx plugin disabled because ok libvcdinfo library not found])
+    HAVE_VCDX=no
+  fi
 fi
 
 dnl
-dnl  VCD module
+dnl  Built-in CDDA and VCD module
 dnl
+AC_ARG_ENABLE(cdda,           
+  [  --enable-cdda           audio CD via builtin VCD (default enabled)])
+ 
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            VCD support for Linux, FreeBSD, MacOS X and Win32 (default enabled)])
+  [  --enable-vcd            VCD (not via libcdio) for GNU/Linux, FreeBSD, MacOS X and Win32 (default enabled)])
 
 if test "${enable_vcd}" != "no"
 then
@@ -1752,7 +1772,7 @@ AC_ARG_ENABLE(satellite,
   [ if test "${enable_satellite}" = "yes"
     then
       AC_DEFINE(HAVE_SATELLITE, [], 
-      [Define for the VCD plugin using libcdio/libvcdinfo])
+      [Define for the satellite plugin])
       VLC_ADD_PLUGINS([satellite])
     fi])
 
@@ -3645,15 +3665,23 @@ then
     if test "${ac_cv_cxx_fpermissive}" = "yes"; then
       VLC_ADD_CXXFLAGS([wxwindows],-fpermissive)
     fi
-    PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
-     [
-      AC_DEFINE(HAVE_LIBCDIO, [], [Define for the CD-DA plugin using libcdio])
-      VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags` $LIBCDIO_CFLAGS])
-      VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`] $LIBCDIO_LIBS)], 
-     [AC_MSG_WARN(libcdio library not found - Probe disc disabled)
-      VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
-      VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
-      HAVE_LIBCDIO=no])
+    VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
+    VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
+    if test "$have_libcdio" = "yes"
+    then 
+      VLC_ADD_LDFLAGS([wxwindows],[$LIBCDIO_LIBS])
+      VLC_ADD_CXXFLAGS([wxwindows],[$LIBCDIO_CFLAGS])
+    else 
+      AC_MSG_WARN([Probe disc disabled because ok libcdio library not found])
+    fi
+
+    if test "$have_libvcdinfo" = "yes"
+    then 
+      VLC_ADD_LDFLAGS([wxwindows],[$VCDINFO_LIBS])
+      VLC_ADD_CXXFLAGS([wxwindows],[$VCDINFO_CFLAGS])
+    else 
+      AC_MSG_WARN([VCD information on Probe disc disabled because ok libvcdinfo not found])
+    fi
 
     # now look for the wxprec.h header
     CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_wxwindows}"
