@@ -34,8 +34,9 @@
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
 #endif /* HAVE_LIBCDIO */
-#if defined(HAVE_VCDINFO) && LIBVCD_VERSION_NUM > 23
+#ifdef HAVE_VCDINFO
 #include <libvcd/info.h>
+#include <libvcd/version.h>
 #endif /* HAVE_VCDINFO */
 
 #include <wx/combobox.h>
@@ -1398,7 +1399,8 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
 	      else 
 	      {
 		  /* Set largest Entry */
-		  disc_title->SetRange( 0, vcdinfo_get_num_entries(p_vcdinfo) );
+		  disc_title->SetRange( 0, 
+					vcdinfo_get_num_entries(p_vcdinfo)-1 );
 	      }
 	      vcdinfo_close(p_vcdinfo);
 	  }
