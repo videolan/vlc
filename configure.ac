@@ -4364,7 +4364,8 @@ AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__0_8_2", [String suffix for module functions
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, 0_8_2, [Symbol suffix for module functions])
 
 dnl Version number for ActiveX INF
-VERSION32="`echo -n ${VERSION} | sed -e 's/@<:@a-z\-@:>@//g' | sed -e 'y/./,/'; echo ',0'`"
+VERSION32="`echo -n ${VERSION} | sed -e 's/@<:@a-z\-@:>@//g' | sed -e 'y/./,/'`"
+VERSION32="`echo -n ${VERSION32}',0'`"
 AC_SUBST(VERSION32)
 
 DATA_PATH="${ac_tool_prefix}/share/vlc"
