@@ -242,6 +242,8 @@ vlc_acl_t *__ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
     vlc_object_yield( p_this );
     p_dupacl->p_owner = p_this;
     p_dupacl->i_size = p_acl->i_size;
+    p_dupacl->b_allow_default = p_acl->b_allow_default;
+
     memcpy( p_dupacl->p_entries, p_acl->p_entries,
             p_dupacl->i_size * sizeof( vlc_acl_entry_t ) );
     
