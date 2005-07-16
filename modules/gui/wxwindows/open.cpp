@@ -1377,12 +1377,28 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
           CdIo_t *p_cdio = cdio_open (psz_device, DRIVER_UNKNOWN);
 	  disc_device->SetValue( wxL2U(psz_device) );
 
+#ifdef HAVE_VCDX
+	  /* FIXME: get information from libvcdinfo. */
+	  if (config_GetInt( p_intf, "vcdx-PBC"  )) 
+	  {
+	      /* Set largest LID. */;
+	      ;
+	  } 
+	  else 
+	  {
+	      /* Set largest Entry */
+	      ;
+	  }
+	  
+#else
+
 	  /* Set track range accurately if possible. */
 	  if (p_cdio) 
 	  {
 	      track_t i_last_track = cdio_get_last_track_num(p_cdio);
 	      disc_title->SetRange( 0, i_last_track-1 );  
 	  }
+#endif
 	  free(psz_device);
 	  cdio_destroy(p_cdio);
 	  break;
