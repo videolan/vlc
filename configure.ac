@@ -1496,7 +1496,7 @@ dnl
 dnl  libsmbclient plugin
 dnl
 AC_ARG_ENABLE(smb,
-  [  --enable-smb         smb input module (default enabled)])
+  [  --enable-smb            smb input module (default enabled)])
 if test "${enable_smb}" != "no"; then
   AC_CHECK_HEADERS(libsmbclient.h,
     [ VLC_ADD_PLUGINS([access_smb])
@@ -1635,7 +1635,7 @@ have_libcdio=no
 have_libvcdinfo=no
 if test "${enable_libcdio}" != "no"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.72,
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
      have_libcdio=yes
      AC_DEFINE(HAVE_LIBCDIO, [], 
      [Define if you have libcdio 0.72 or greater installed]))
@@ -1663,6 +1663,8 @@ then
     VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS $LIBCDIO_PARANOIA_LIBS])
     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     VLC_ADD_PLUGINS([cddax])
+    PKG_CHECK_MODULES(LIBCDIO_PARANOIA, libcdio_paranoia >= 0.72, [
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])])
   else 
     AC_MSG_WARN([cddax plugin disabled because ok libcdio library not found or disabled])
     HAVE_CDDAX=no
@@ -1682,7 +1684,7 @@ then
 fi
 
 AC_ARG_ENABLE(vcdx,
-  [  --enable-vcdx           VCD with Navigation via libvcdinfo (default disabled)])
+  [  --enable-vcdx           VCD with navigation via libvcdinfo (default disabled)])
  
 if test "${enable_vcdx}" = "yes"
 then
@@ -1695,7 +1697,7 @@ then
     HAVE_VCDX=no
   fi
 
-  PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.72,
+  PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.71,
    [VLC_ADD_LDFLAGS([vcdx],[$LIBISO9660_LIBS])
     VLC_ADD_CFLAGS([vcdx],[$LIBISO9660_CFLAGS])],
     [AC_MSG_WARN([vcdx plugin disabled because ok libiso9660 library not found])
@@ -1715,13 +1717,13 @@ then
 fi
 
 dnl
-dnl  Built-in CDDA and VCD module
+dnl  Built-in CD-DA and VCD module
 dnl
 AC_ARG_ENABLE(cdda,           
-  [  --enable-cdda           audio CD via builtin VCD (default enabled)])
+  [  --enable-cdda           audio CD via built-in VCD (default enabled)])
  
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            VCD (not via libcdio) for GNU/Linux, FreeBSD, MacOS X and Win32 (default enabled)])
+  [  --enable-vcd            built-in VCD (not via libcdio)])
 
 if test "${enable_vcd}" != "no"
 then

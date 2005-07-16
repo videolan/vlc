@@ -34,6 +34,9 @@
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
 #endif /* HAVE_LIBCDIO */
+#if defined(HAVE_VCDINFO) && LIBVCD_VERSION_NUM > 23
+#include <libvcd/info.h>
+#endif /* HAVE_VCDINFO */
 
 #include <wx/combobox.h>
 #include <wx/statline.h>
@@ -666,6 +669,12 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 #ifdef HAVE_LIBCDIO
     disc_probe = new wxCheckBox( panel, DiscProbe_Event, 
                                  wxU(_("Probe Disc")) );
+    disc_probe->SetToolTip( wxU(_("Probe for a DVD, VCD or audio CD. " 
+"First try the device name entered for the selected disc type "
+"(DVD, DVD Menu, VCD, CDDA). If that doesn't find media, try any device for "
+"the disc type.  If that doesn't work, then try looking for CD-ROMs or DVD "
+"drives. The disc type, device name, and some parameter ranges are set "
+"based on media we find.")) );
 #endif
 
     sizer_row->Add( disc_type, i_disc_type_selection, wxEXPAND | wxALL, 5 );
@@ -1274,13 +1283,12 @@ static char * ProbeDVD()
 }
 
 
-static char * ProbeDevice(char **search_devices, cdio_fs_anal_t mask, 
-                          bool b_any)
+static char * ProbeDevice(char **ppsz_search_devices, cdio_fs_anal_t mask)
 {
     char **ppsz_devices;
 
     /* Start out trying the device that has been entered so far. */
-    ppsz_devices = cdio_get_devices_with_cap(search_devices, mask, b_any);
+    ppsz_devices = cdio_get_devices_with_cap(ppsz_search_devices, mask, true);
      
     if (ppsz_devices && *ppsz_devices) 
     {
@@ -1292,9 +1300,9 @@ static char * ProbeDevice(char **search_devices, cdio_fs_anal_t mask,
     /* If there was no device specified on the first try then give up
        now. Otherwise accept any CD-ROM in the class (e.g. VCD or DVD).
     */
-    if (!search_devices[0]) return NULL;
+    if (!ppsz_search_devices[0]) return NULL;
 
-    ppsz_devices = cdio_get_devices_with_cap(NULL, mask, b_any);
+    ppsz_devices = cdio_get_devices_with_cap(NULL, mask, true);
      
     if (ppsz_devices && *ppsz_devices) 
     {
@@ -1317,7 +1325,7 @@ static char * ProbeCDDA(const wxChar *device)
    char *psz_device = (char *) tmp_buf;
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
-   return ProbeDevice(ppsz_device, CDIO_FS_AUDIO, false);
+   return ProbeDevice(ppsz_device, CDIO_FS_AUDIO);
 }
 
 /* Return a device that has a VCD in it. The caller needs to free
@@ -1332,16 +1340,15 @@ static char * ProbeVCD(const wxChar *device)
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device, 
                       (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD|CDIO_FS_ANAL_VIDEOCD
-                       |CDIO_FS_UNKNOWN), true);
+                       |CDIO_FS_UNKNOWN));
 }
-
 
 /* 
    Probe (find anywhere) a CD-DA, VCD, or a DVD.
-   First we try the device name that may have been entered for the media class
-   selected. If that doesn't work we try any device for the media class.
-   If that doesn't work the try looking for CD-ROMs or DVD drives and set the
-   media selection to whatever we find.
+   First try the device name that may have been entered for the "disc type"
+   selected. If that doesn't work we try any device for the disc type.
+   If that doesn't work, try looking for CD-ROMs or DVD drives. the
+   disc type, device name and paramter ranges are set to whatever we find.
 */
 void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
 {
@@ -1374,23 +1381,32 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       if(!psz_device) psz_device = ProbeVCD(disc_device->GetValue());
       if( psz_device  ) 
       {
+#ifdef HAVE_VCDX
+#if LIBVCD_VERSION_NUM > 23
+	  vcdinfo_obj_t *p_vcdinfo;
+
+          /* Set LID or entry range accurately if possible. */
+	  if( vcdinfo_open(&p_vcdinfo, &psz_device, DRIVER_DEVICE,
+			    NULL) == VCDINFO_OPEN_VCD) 
+	  {
+	      if (config_GetInt( p_intf, "vcdx-PBC"  )) 
+	      {
+		  /* Set largest LID. */;
+		  disc_title->SetRange( 0, vcdinfo_get_num_LIDs(p_vcdinfo) );
+
+	      } 
+	      else 
+	      {
+		  /* Set largest Entry */
+		  disc_title->SetRange( 0, vcdinfo_get_num_entries(p_vcdinfo) );
+	      }
+	      vcdinfo_close(p_vcdinfo);
+	  }
+#endif /* LIBVCD_VERSION_NUM > 23 */
+          disc_device->SetValue( wxL2U(psz_device) );
+#else
           CdIo_t *p_cdio = cdio_open (psz_device, DRIVER_UNKNOWN);
           disc_device->SetValue( wxL2U(psz_device) );
-
-#ifdef HAVE_VCDX
-          /* FIXME: get information from libvcdinfo. */
-          if (config_GetInt( p_intf, "vcdx-PBC"  )) 
-          {
-              /* Set largest LID. */;
-              ;
-          } 
-          else 
-          {
-              /* Set largest Entry */
-              ;
-          }
-          
-#else
 
           /* Set track range accurately if possible. */
           if (p_cdio) 
@@ -1398,9 +1414,9 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
               track_t i_last_track = cdio_get_last_track_num(p_cdio);
               disc_title->SetRange( 0, i_last_track-1 );  
           }
-#endif
           free(psz_device);
           cdio_destroy(p_cdio);
+#endif
           break;
       }
 
