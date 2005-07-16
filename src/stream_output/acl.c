@@ -47,7 +47,6 @@
 #include "network.h"
 
 /* FIXME: rwlock on acl, but libvlc doesn't implement rwlock */
-/* FIXME: move to src/stream_output/whatever */
 typedef struct vlc_acl_entry_t
 {
     uint8_t    host[17];
@@ -165,6 +164,9 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
     if( p_ent == NULL )
         return -1;
 
+    p_acl->p_entries = p_ent;
+    p_ent += i_size;
+
     i_family = ACL_Resolve( p_acl->p_owner, p_ent->host, psz_ip );
     if( i_family < 0 )
     {
@@ -180,9 +182,6 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
     {
         if( i_family == AF_INET )
             i_len += 96;
-
-        p_acl->p_entries = p_ent;
-        p_ent += i_size;
 
         if( i_len > 128 )
             i_len = 128;
@@ -231,22 +230,28 @@ vlc_acl_t *__ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
     if( p_dupacl == NULL )
         return NULL;
 
-    p_dupacl->p_entries = (vlc_acl_entry_t *)
-        malloc( p_acl->i_size * sizeof( vlc_acl_entry_t ) );
-    if( p_dupacl->p_entries == NULL )
+    if( p_acl->i_size )
     {
-        free( p_dupacl );
-        return NULL;
-    }   
+        p_dupacl->p_entries = (vlc_acl_entry_t *)
+            malloc( p_acl->i_size * sizeof( vlc_acl_entry_t ) );
+
+        if( p_dupacl->p_entries == NULL )
+        {
+            free( p_dupacl );
+            return NULL;
+        }
+
+        memcpy( p_dupacl->p_entries, p_acl->p_entries,
+                p_acl->i_size * sizeof( vlc_acl_entry_t ) );
+    }
+    else
+        p_dupacl->p_entries = NULL;
 
     vlc_object_yield( p_this );
     p_dupacl->p_owner = p_this;
     p_dupacl->i_size = p_acl->i_size;
     p_dupacl->b_allow_default = p_acl->b_allow_default;
 
-    memcpy( p_dupacl->p_entries, p_acl->p_entries,
-            p_dupacl->i_size * sizeof( vlc_acl_entry_t ) );
-    
     return p_dupacl;
 }
 
