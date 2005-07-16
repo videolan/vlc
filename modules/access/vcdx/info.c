@@ -108,10 +108,12 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 
 #define TITLE_MAX 30
   for( i_track = 1 ; i_track < p_vcdplayer->i_tracks ; i_track++ ) {
+    char psz_cat[20];
     unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcdplayer->vcd, 
 							   i_track);
     uint32_t i_secsize = vcdinfo_get_track_sect_count(p_vcdplayer->vcd, i_track);
 
+    snprintf(psz_cat, sizeof(psz_cat), "Track %d", i_track);
     if (p_vcdplayer->b_svd) {
       addnum(_("Audio Channels"),  
 	     vcdinfo_audio_type_num_channels(p_vcdplayer->vcd, audio_type) );
