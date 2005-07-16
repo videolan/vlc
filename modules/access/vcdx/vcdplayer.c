@@ -755,7 +755,7 @@ vcdplayer_play_next( access_t * p_access )
 
   p_vcdinfo = p_vcdplayer->vcd;
 
-  itemid.type = p_vcdplayer->play_item.type;
+  itemid = p_vcdplayer->play_item;
 
   if  (vcdplayer_pbc_is_on(p_vcdplayer)) {
 
@@ -849,7 +849,7 @@ vcdplayer_play_prev( access_t * p_access )
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
 	     "current: %d" , p_vcdplayer->play_item.num);
 
-  itemid.type = p_vcdplayer->play_item.type;
+  itemid = p_vcdplayer->play_item;
 
   if  (vcdplayer_pbc_is_on(p_vcdplayer)) {
 
@@ -915,7 +915,7 @@ vcdplayer_play_return( access_t * p_access )
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC), 
 	     "current: %d" , p_vcdplayer->play_item.num);
 
-  itemid.type = p_vcdplayer->play_item.type;
+  itemid = p_vcdplayer->play_item;
 
   if  (vcdplayer_pbc_is_on(p_vcdplayer)) {
 
