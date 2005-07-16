@@ -480,6 +480,9 @@ private:
     void OnDiscPanelChangeSpin( wxSpinEvent& event );
     void OnDiscPanelChange( wxCommandEvent& event );
     void OnDiscTypeChange( wxCommandEvent& event );
+#ifdef HAVE_LIBCDIO
+    void OnDiscProbe( wxCommandEvent& event );
+#endif
     void OnDiscDeviceChange( wxCommandEvent& event );
 
     /* Event handlers for the net page */
@@ -519,6 +522,7 @@ private:
 
     /* Controls for the disc panel */
     wxRadioBox *disc_type;
+    wxCheckBox *disc_probe;
     wxTextCtrl *disc_device;
     wxSpinCtrl *disc_title; int i_disc_title;
     wxSpinCtrl *disc_chapter; int i_disc_chapter;

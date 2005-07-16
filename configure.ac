@@ -3645,8 +3645,16 @@ then
     if test "${ac_cv_cxx_fpermissive}" = "yes"; then
       VLC_ADD_CXXFLAGS([wxwindows],-fpermissive)
     fi
-    VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
-    VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
+    PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
+     [
+      AC_DEFINE(HAVE_LIBCDIO, [], [Define for the CD-DA plugin using libcdio])
+      VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags` $LIBCDIO_CFLAGS])
+      VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`] $LIBCDIO_LIBS)], 
+     [AC_MSG_WARN(libcdio library not found - Probe disc disabled)
+      VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
+      VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
+      HAVE_LIBCDIO=no])
+
     # now look for the wxprec.h header
     CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_wxwindows}"
     ac_cv_wx_headers=yes
