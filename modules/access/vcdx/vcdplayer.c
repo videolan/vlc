@@ -43,10 +43,6 @@
 #include <cdio/util.h>
 #include <libvcd/info.h>
 
-#ifdef WIN32
-#define sleep(A) Sleep((A)*1000)
-#endif
-
 extern void VCDSetOrigin ( access_t *p_access, lsn_t i_lsn, track_t i_track,
 			   const vcdinfo_itemid_t * p_itemid );
 
@@ -550,7 +546,7 @@ vcdplayer_pbc_nav ( access_t * p_access, uint8_t *wait_time )
           return READ_BLOCK;
         } else if (p_vcdplayer->i_still) {
           /* Hack: Just go back and do still again */
-          sleep(1);
+          msleep(1000);
           return READ_STILL_FRAME;
         }
       }
