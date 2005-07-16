@@ -290,7 +290,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->iconvHandle == (vlc_iconv_t)(-1) )
     {
         msg_Err( p_sd, "unable to perform characters conversion" );
-	return VLC_EGENERIC;
+        return VLC_EGENERIC;
     }
 
     p_sd->pf_run = Run;
