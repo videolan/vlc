@@ -34,9 +34,13 @@
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
 #endif /* HAVE_LIBCDIO */
+
 #ifdef HAVE_VCDINFO
-#include <libvcd/info.h>
 #include <libvcd/version.h>
+/* There was a bug in libvcdinfo <= 23 which prevented C++ compilation */
+#if LIBVCD_VERSION_NUM > 23
+#include <libvcd/info.h>
+#endif /* LIBVCD_VERSION_NUM > 23 */
 #endif /* HAVE_VCDINFO */
 
 #include <wx/combobox.h>
@@ -671,10 +675,10 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     disc_probe = new wxCheckBox( panel, DiscProbe_Event, 
                                  wxU(_("Probe Disc")) );
     disc_probe->SetToolTip( wxU(_("Probe for a DVD, VCD or audio CD. " 
-"First try the device name entered for the selected disc type "
-"(DVD, DVD Menu, VCD, CDDA). If that doesn't find media, try any device for "
-"the disc type.  If that doesn't work, then try looking for CD-ROMs or DVD "
-"drives. The disc type, device name, and some parameter ranges are set "
+"First try the Device name entered for the selected Disc type "
+"(DVD, DVD Menu, VCD, audio CD). If that doesn't find media, try any device "
+"for the Disc type.  If that doesn't work, then try looking for CD-ROMs or "
+"DVD drives. The Disc type, Device name, and some parameter ranges are set "
 "based on media we find.")) );
 #endif
 
