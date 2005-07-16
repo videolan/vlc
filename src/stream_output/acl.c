@@ -31,6 +31,10 @@
 
 #include "vlc_acl.h"
 
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
