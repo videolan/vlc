@@ -1638,12 +1638,14 @@ then
   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
      have_libcdio=yes
      AC_DEFINE(HAVE_LIBCDIO, [], 
-     [Define if you have libcdio 0.72 or greater installed]))
+     [Define if you have libcdio 0.71 or greater installed]),
+     [AC_MSG_WARN(CD Reading and information library not found)])
 
   PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
-     have_libvcdinfo=yes
+     [have_libvcdinfo=yes
      AC_DEFINE(HAVE_VCDINFO, [], 
-     [Define if you have libvcdinfo 0.7.21 or greater installed]))
+     [Define if you have libvcdinfo 0.7.21 or greater installed])],
+     [AC_MSG_WARN(VCD information library not found)])
 fi
 
 dnl
@@ -1664,7 +1666,8 @@ then
     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     VLC_ADD_PLUGINS([cddax])
     PKG_CHECK_MODULES(LIBCDIO_PARANOIA, libcdio_paranoia >= 0.72, [
-    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])])
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])],
+    AC_MSG_WARN([CD Paranoia support disabled because no libcdio >= 0.72 found]))
   else 
     AC_MSG_WARN([cddax plugin disabled because ok libcdio library not found or disabled])
     HAVE_CDDAX=no
