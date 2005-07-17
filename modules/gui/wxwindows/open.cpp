@@ -30,9 +30,11 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
+
 #ifdef HAVE_LIBCDIO
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
+#include <cdio/logging.h>
 #endif /* HAVE_LIBCDIO */
 
 #ifdef HAVE_VCDINFO
@@ -161,6 +163,14 @@ BEGIN_EVENT_TABLE(OpenDialog, wxDialog)
     EVT_CLOSE(OpenDialog::OnClose)
 
 END_EVENT_TABLE()
+
+#if 0
+/* Perhaps someday we'll figure out how to add media information to
+   "Stream-and-Media info" when no input thread hasn't been initialized.
+*/
+extern void MediaInsertCDDA( intf_thread_t *_p_intf,  CdIo_t *p_cdio,
+			     track_t i_last_track );
+#endif
 
 /*****************************************************************************
  * AutoBuiltPanel.
@@ -673,7 +683,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
 #ifdef HAVE_LIBCDIO
     disc_probe = new wxCheckBox( panel, DiscProbe_Event, 
-                                 wxU(_("Probe Disc")) );
+                                 wxU(_("Probe Disc(s)")) );
     disc_probe->SetToolTip( wxU(_("Probe for a DVD, VCD or audio CD. " 
 "First try the Device name entered for the selected Disc type "
 "(DVD, DVD Menu, VCD, audio CD). If that doesn't find media, try any device "
@@ -1257,30 +1267,49 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
 
 #ifdef HAVE_LIBCDIO
 
+/* Return true if *psz_drive is a drive with a DVD in it. A more complete
+   check would see if the media looks like a *playable* DVD. This should
+   go into libcdio.
+ */
+static bool IsDVD(const char *psz_drive)
+{
+  CdIo_t *p_cdio = cdio_open (psz_drive, DRIVER_UNKNOWN);
+  if (p_cdio) 
+  {
+      discmode_t discmode = cdio_get_discmode(p_cdio);
+      cdio_destroy(p_cdio);
+      return cdio_is_discmode_dvd(discmode);
+  }
+  return false;
+}
+
+
 /* Return a device that has a DVD in it. The caller needs to free
    the returned string.
 */
-static char * ProbeDVD()
+static char * ProbeDVD(const wxChar *device)
 {
-  char **ppsz_cd_drives = cdio_get_devices(DRIVER_DEVICE);
-  if (ppsz_cd_drives) 
+  char **ppsz_cd_drives;
+  const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
+  char *psz_device = (char *) tmp_buf;
+
+  if( IsDVD(psz_device) )
+  {
+      return strdup(psz_device);
+  }
+  
+  ppsz_cd_drives = cdio_get_devices(DRIVER_DEVICE);
+  if( ppsz_cd_drives )
   {
       char **c;
       for( c = ppsz_cd_drives; *c != NULL; c++ ) 
       {
-          CdIo_t *p_cdio = cdio_open (*c, DRIVER_UNKNOWN);
-          if (p_cdio) 
-          {
-              discmode_t discmode = cdio_get_discmode(p_cdio);
-              cdio_destroy(p_cdio);
-              if( cdio_is_discmode_dvd(discmode) )
-              {
-                  char *psz_drive = strdup(*c);
-                  cdio_free_device_list(ppsz_cd_drives);
-                  return strdup(psz_drive);
-              }
+	  if( IsDVD(*c) ) 
+	  {
+	      char *psz_drive = strdup(*c);
+	      cdio_free_device_list(ppsz_cd_drives);
+	      return strdup(psz_drive);
           }
-        
       }
       cdio_free_device_list(ppsz_cd_drives);
   }
@@ -1288,12 +1317,17 @@ static char * ProbeDVD()
 }
 
 
-static char * ProbeDevice(char **ppsz_search_devices, cdio_fs_anal_t mask)
+static char * ProbeDevice(char **ppsz_search_devices, cdio_fs_anal_t mask,
+			  bool b_any)
 {
     char **ppsz_devices;
 
+    if( ppsz_search_devices && !ppsz_search_devices[0] ) 
+        ppsz_search_devices = NULL;
+
     /* Start out trying the device that has been entered so far. */
-    ppsz_devices = cdio_get_devices_with_cap(ppsz_search_devices, mask, true);
+    ppsz_devices = cdio_get_devices_with_cap(ppsz_search_devices, mask, 
+					     b_any);
      
     if (ppsz_devices && *ppsz_devices) 
     {
@@ -1302,10 +1336,10 @@ static char * ProbeDevice(char **ppsz_search_devices, cdio_fs_anal_t mask)
         return psz_device;
     }
 
-    /* If there was no device specified on the first try then give up
+    /* If there was no device specified on the first try, then give up
        now. Otherwise accept any CD-ROM in the class (e.g. VCD or DVD).
     */
-    if (!ppsz_search_devices[0]) return NULL;
+    if( !ppsz_search_devices ) return NULL;
 
     ppsz_devices = cdio_get_devices_with_cap(NULL, mask, true);
      
@@ -1330,7 +1364,7 @@ static char * ProbeCDDA(const wxChar *device)
    char *psz_device = (char *) tmp_buf;
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
-   return ProbeDevice(ppsz_device, CDIO_FS_AUDIO);
+   return ProbeDevice(ppsz_device, CDIO_FS_AUDIO, false);
 }
 
 /* Return a device that has a VCD in it. The caller needs to free
@@ -1345,9 +1379,14 @@ static char * ProbeVCD(const wxChar *device)
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device, 
                       (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD|CDIO_FS_ANAL_VIDEOCD
-                       |CDIO_FS_UNKNOWN));
+                       |CDIO_FS_UNKNOWN), true);
 }
 
+#define SELECTION_DISC_TYPE_DVD_MENUS 0
+#define SELECTION_DISC_TYPE_DVD       1
+#define SELECTION_DISC_TYPE_VCD       2
+#define SELECTION_DISC_TYPE_CDDA      3
+ 
 /* 
    Probe (find anywhere) a CD-DA, VCD, or a DVD.
    First try the device name that may have been entered for the "disc type"
@@ -1361,28 +1400,31 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
     char *psz_device = NULL;
     bool b_probed_DVD = false;
     bool b_probed_VCD = false;
+    const int i_selection = disc_type->GetSelection();
+
+    /* Reduce verbosity of cdio errors. */
+    cdio_loglevel_default = CDIO_LOG_ERROR;
 
  retry:
     switch( disc_type->GetSelection() )
     {
 
-    case 0: /* DVD with menus */
-    case 1: /* DVD without menus */
+    case SELECTION_DISC_TYPE_DVD_MENUS:
+    case SELECTION_DISC_TYPE_DVD: 
       /* If not a DVD then try for a VCD. If VCD fails it will
          try for a CD-DA. */
-      if (!psz_device) psz_device = ProbeDVD();
+      if (!psz_device) psz_device = ProbeDVD(disc_device->GetValue());
       if (!psz_device)
       {
           b_probed_DVD = true;
-          disc_type->SetSelection(2);
+          disc_type->SetSelection(SELECTION_DISC_TYPE_VCD);
           OnDiscTypeChange( dummy_event );
           goto retry;
       }
       disc_device->SetValue( wxL2U(psz_device) );
-      free(psz_device);
       break;
 
-    case 2:  /* VCD probe of some sort */
+    case SELECTION_DISC_TYPE_VCD:  /* VCD probe of some sort */
       if(!psz_device) psz_device = ProbeVCD(disc_device->GetValue());
       if( psz_device  ) 
       {
@@ -1420,7 +1462,6 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
               track_t i_last_track = cdio_get_last_track_num(p_cdio);
               disc_title->SetRange( 0, i_last_track-1 );  
           }
-          free(psz_device);
           cdio_destroy(p_cdio);
 #endif
           break;
@@ -1429,9 +1470,9 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       b_probed_VCD = true;
 
       /* Not a VCD. Try for a DVD unless we've been there before. */
-      if( !b_probed_DVD && (psz_device = ProbeDVD()) ) 
+      if( !b_probed_DVD && (psz_device = ProbeDVD(disc_device->GetValue())) ) 
       {
-          disc_type->SetSelection(0);
+          disc_type->SetSelection(SELECTION_DISC_TYPE_DVD_MENUS);
           OnDiscTypeChange( dummy_event );
           goto retry;
       }
@@ -1441,13 +1482,20 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       psz_device = ProbeCDDA(disc_device->GetValue());
       if( psz_device  ) 
       {
-          disc_type->SetSelection(3);
+          disc_type->SetSelection(SELECTION_DISC_TYPE_CDDA);
           OnDiscTypeChange( dummy_event );
           goto retry;
       }
+
+      /* Couldn't find a VCD, DVD or CD-DA. Null out the Device name and
+	 set to original selection.
+       */
+      disc_device->SetValue( wxL2U("") );
+      disc_type->SetSelection(i_selection);
+      OnDiscTypeChange( dummy_event );
       break;
 
-    case 3: /* CD-DA Probe */
+    case SELECTION_DISC_TYPE_CDDA:
       if(!psz_device) psz_device = ProbeCDDA(disc_device->GetValue());
       if( psz_device  ) 
       {
@@ -1457,16 +1505,18 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
           {
               track_t i_last_track = cdio_get_last_track_num(p_cdio);
               disc_title->SetRange( 0, i_last_track );  
+#if 0
+	      MediaInsertCDDA( p_intf,  p_cdio, i_last_track );
+#endif
           }
-          free(psz_device);
           cdio_destroy(p_cdio);
           break;
       }
 
       /* Not a CD-DA. Try for a DVD unless we've been there before. */
-      if( !b_probed_DVD && (psz_device = ProbeDVD()) ) 
+      if( !b_probed_DVD && (psz_device = ProbeDVD(disc_device->GetValue())) ) 
       {
-          disc_type->SetSelection(0);
+          disc_type->SetSelection(SELECTION_DISC_TYPE_DVD_MENUS);
           OnDiscTypeChange( dummy_event );
           goto retry;
       }
@@ -1476,10 +1526,11 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
       if (!b_probed_VCD) psz_device = ProbeVCD(disc_device->GetValue());
       if( psz_device  ) 
       {
-          disc_type->SetSelection(2);
+          disc_type->SetSelection(SELECTION_DISC_TYPE_VCD);
           OnDiscTypeChange( dummy_event );
           goto retry;
       }
+      disc_device->SetValue( wxL2U("") );
       break;
 
     default:
@@ -1488,6 +1539,7 @@ void OpenDialog::OnDiscProbe( wxCommandEvent& WXUNUSED(event) )
         break;
     }
 
+    free(psz_device);
     disc_probe->SetValue(FALSE);
    
     UpdateMRL( DISC_ACCESS );
@@ -1501,8 +1553,8 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     switch( disc_type->GetSelection() )
     {
 
-    case 0: /* DVD with menus */
-    case 1: /* DVD without menus */
+    case SELECTION_DISC_TYPE_DVD_MENUS:
+    case SELECTION_DISC_TYPE_DVD: 
         disc_sub->Enable(); disc_sub_label->Enable();
         disc_audio->Enable(); disc_audio_label->Enable();
         disc_chapter->Enable(); disc_chapter_label->Enable();
@@ -1527,7 +1579,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         )) );
         break;
 
-    case 2:  /* VCD of some sort */
+    case SELECTION_DISC_TYPE_VCD:
         disc_sub->Enable(); disc_sub_label->Enable();
         disc_audio->Enable(); disc_audio_label->Enable();
         disc_chapter->Disable(); disc_chapter_label->Disable();
@@ -1567,7 +1619,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         )) );
         break;
 
-    case 3: /* CD-DA */
+    case SELECTION_DISC_TYPE_CDDA:
         disc_sub->Disable(); disc_sub_label->Disable();
         disc_chapter->Disable(); disc_chapter_label->Disable();
         disc_audio->Disable(); disc_audio_label->Disable();
