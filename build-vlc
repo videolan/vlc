@@ -28,6 +28,7 @@ DVB dvb
 OGG ogg
 MKV mkv
 MOD mod
+CDIO libcdio
 X11 x11
 XVIDEO xvideo
 GLX glx

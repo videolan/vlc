@@ -85,6 +85,7 @@ fi
 bool 'Ogg demux support' CONFIG_OGG
 bool 'Matroska demux support' CONFIG_MKV
 bool 'Mod demux support' CONFIG_MOD
+bool 'CD input and control library (libcdio) support' CONFIG_CDIO
 endmenu
 
 mainmenu_option next_comment
