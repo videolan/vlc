@@ -3438,6 +3438,50 @@ then
 fi
 
 dnl
+dnl  CyberLink for C++ UPnP stack
+dnl
+AC_ARG_ENABLE(cyberlink,
+  [  --enable-cyberlink      CyberLink for C++ UPnP stack (default disabled)])
+if test "${CXX}" != "" -a "${enable_cyberlink}" = "yes" || (test "${enable_cyberlink}" != "no"); then
+  AC_ARG_WITH(cyberlink-tree,
+    [    --with-cyberlink-tree=PATH CyberLink for C++ tree for static linking])
+
+  dnl
+  dnl test for --with-cyberlink-tree
+  dnl
+  if test ! -z "${with_cyberlink_tree}" -a "${CXX}" != ""; then
+    AC_LANG_PUSH(C++)
+    real_cyberlink_tree="`cd ${with_cyberlink_tree} 2>/dev/null && pwd`"
+    if test -z "${real_cyberlink_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_cyberlink_tree}])
+    fi
+    CXXFLAGS_save="${CXXFLAGS}"
+    CXXFLAGS_cyberlink="-I${real_cyberlink_tree}/include"
+    CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_cyberlink}"
+    AC_CHECK_HEADERS([cybergarage/upnp/MediaServer.h],
+      [ VLC_ADD_CXXFLAGS([upnp], [${CXXFLAGS_cyberlink}])
+        VLC_ADD_PLUGINS([upnp]) 
+      ],[
+        AC_MSG_ERROR([cannot find CyberLink for C++ headers])
+      ])
+    AC_MSG_CHECKING(for libclink.a in ${with_cyberlink_tree})
+    if test -f "${real_cyberlink_tree}/lib/unix/libclink.a"
+    then
+      AC_MSG_RESULT(${real_cyberlink_tree}/lib/unix/libclink.a)
+      VLC_ADD_LDFLAGS([upnp], [${real_cyberlink_tree}/lib/unix/libclink.a -lexpat])
+    else
+      AC_MSG_RESULT(no)
+       AC_MSG_ERROR([cannot find ${real_cyberlink_tree}/lib/unix/libclink.a, make sure you compiled CyberLink for C++ in ${with_cyberlink_tree}])
+    fi
+    CXXFLAGS="${CXXFLAGS_save}"
+    AC_LANG_POP([C++])
+  fi
+fi
+
+dnl
 dnl  Interface plugins
 dnl
 
