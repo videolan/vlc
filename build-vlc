@@ -2,7 +2,7 @@
 
 FEATURES="
 SKINS skins2
-FAMILIAR familiar
+PDA pda
 WXWINDOWS wxwindows
 OPIE opie
 MACOSX macosx
@@ -29,6 +29,9 @@ OGG ogg
 MKV mkv
 MOD mod
 CDIO libcdio
+VCDX vcdx
+CDDAX cddax
+CDDB libcddb
 X11 x11
 XVIDEO xvideo
 GLX glx

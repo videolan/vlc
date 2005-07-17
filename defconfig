@@ -6,86 +6,125 @@ CONFIG_LINUX=y
 # CONFIG_WIN32 is not set
 
 #
-# Graphical User Interfaces
+# User Interfaces
 #
-CONFIG_GTK=y
-CONFIG_GNOME=y
-# CONFIG_GTK2 is not set
-# CONFIG_GNOME2 is not set
 CONFIG_SKINS=y
-# CONFIG_FAMILIAR is not set
-# CONFIG_WXWINDOWS is not set
-# CONFIG_QT is not set
-# CONFIG_KDE is not set
+CONFIG_WITHXML2CONFIGPATH=""
+# CONFIG_PDA is not set
+CONFIG_WXWINDOWS=y
+CONFIG_WITHWXCONFIGPATH=""
 # CONFIG_OPIE is not set
 # CONFIG_QNX is not set
 # CONFIG_NCURSES is not set
 # CONFIG_XOSD is not set
+CONFIG_VISUAL=y
+# CONFIG_GOOM is not set
+# CONFIG_GALAKTOS is not set
+# CONFIG_SLP is not set
+# CONFIG_LIRC is not set
+CONFIG_JOYSTICK=y
+# CONFIG_CORBA is not set
 
 #
-# Inputs
+# Input plugins
 #
+# CONFIG_LIVEDOTCOM is not set
 CONFIG_DVD=y
-CONFIG_DVDOLD=y
 # CONFIG_DVDREAD is not set
-# CONFIG_DVDPLAY is not set
+CONFIG_DVDNAV=y
+CONFIG_WITHDVDNAVCONFIGPATH=""
+# CONFIG_DSHOW is not set
 CONFIG_DVBPSI=y
-# CONFIG_VCD is not set
+CONFIG_WITHDVBPSI=""
+CONFIG_WITHDVBPSITREE=""
 # CONFIG_V4L is not set
-# CONFIG_SAT is not set
+# CONFIG_PVR is not set
+CONFIG_VCD=y
+# CONFIG_SATELLITE is not set
+# CONFIG_DVB is not set
+CONFIG_OGG=y
+CONFIG_MKV=y
+CONFIG_MOD=y
+CONFIG_CDIO=y
+# CONFIG_CDAX is not set
+CONFIG_CDDB=y
+# CONFIG_VCDX is not set
 
 #
-# Video outputs
+# Video plugins
 #
-# CONFIG_X11 is not set
+CONFIG_X11=y
 CONFIG_XVIDEO=y
+CONFIG_GLX=y
 # CONFIG_FB is not set
-# CONFIG_SDL is not set
-# CONFIG_FREETYPE is not set
-# CONFIG_QTE is not set
 # CONFIG_MGA is not set
+CONFIG_SDL=y
+CONFIG_WITHSDLCONFIGPATH=""
+CONFIG_WITHSDLPREFIX=""
+CONFIG_FREETYPE=y
+CONFIG_WITHFREETYPECONFIGPATH=""
+CONFIG_FRIBIDI=y
+CONFIG_WITHFRIBIDICONFIGPATH=""
+# CONFIG_SVG is not set
+# CONFIG_QTE is not set
+# CONFIG_HD1000V is not set
 # CONFIG_SVGALIB is not set
 # CONFIG_GGI is not set
 # CONFIG_GLIDE is not set
 # CONFIG_AA is not set
+# CONFIG_CACA is not set
 
 #
-# Audio outputs
+# Audio plugins
 #
 CONFIG_OSS=y
-CONFIG_ESD=y
+# CONFIG_ESD is not set
 # CONFIG_ARTS is not set
-# CONFIG_ALSA is not set
+CONFIG_ALSA=y
+# CONFIG_HD1000A is not set
 
 #
-# Codecs
+# Codec plugins
 #
-CONFIG_OGG=y
-CONFIG_A52=y
 CONFIG_MAD=y
+CONFIG_WITHMAD=""
+CONFIG_WITHMADTREE=""
 CONFIG_FFMPEG=y
-CONFIG_FFMPEG_TREE="/home/cyril/ffmpeg"
+# CONFIG_WITHFFMPEGMP3LAME is not set
+# CONFIG_WITHFFMPEGFAAC is not set
+CONFIG_WITHFFMPEGTREE=""
 # CONFIG_FAAD is not set
-# CONFIG_XVID is not set
-# CONFIG_DV is not set
+# CONFIG_QUICKTIME is not set
+CONFIG_A52=y
+CONFIG_WITHA52=""
+CONFIG_WITHA52TREE=""
+CONFIG_DTS=y
+CONFIG_WITHDTSTREE=""
 # CONFIG_FLAC is not set
 CONFIG_LIBMPEG2=y
+CONFIG_WITHLIBMPEG2TREE=""
 CONFIG_VORBIS=y
 # CONFIG_TREMOR is not set
+CONFIG_SPEEX=y
 # CONFIG_TARKIN is not set
 # CONFIG_THEORA is not set
-
-#
-# Streaming
-#
-CONFIG_SOUT=y
+CONFIG_CMML=y
 
 #
 # Miscellaneous options
 #
-CONFIG_SLP=y
+# CONFIG_UTF8 is not set
+# CONFIG_PTH is not set
+# CONFIG_ST is not set
+# CONFIG_GPROF is not set
+# CONFIG_CPROF is not set
+# CONFIG_MOZILLA is not set
+# COFIG_TESTSUITE is not set
 
 #
-# Compilation options
+# Optimization options
 #
+# CONFIG_OPTIMIZATIONS is not set
 # CONFIG_DEBUG is not set
+# CONFIG_RELEASE is not set
+# CONFIG_SOUT is not set

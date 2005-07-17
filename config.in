@@ -10,19 +10,17 @@ choice 'Operating System' \
     Win32		CONFIG_WIN32" Linux
 
 mainmenu_option next_comment
-comment 'Interfaces'
+comment 'User Interfaces'
 bool 'Skins module' CONFIG_SKINS
-bool 'Skins2 module' CONFIG_SKINS2
-if [ "$CONFIG_SKINS2" = "y" ]; then
+if [ "$CONFIG_SKINS" = "y" ]; then
   string 'xml2-config path' CONFIG_WITHXML2CONFIGPATH ""
 fi
-bool 'Familiar GTK+ support' CONFIG_FAMILIAR
-# TODO: --enable-pda
+bool 'PDA interface (via Gtk2) support' CONFIG_PDA
 bool 'wxWindows support' CONFIG_WXWINDOWS
 if [ "$CONFIG_WXWINDOWS" = "y" ]; then
   string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
 fi
-bool 'Qt embedded interface support' CONFIG_OPIE
+bool 'Qt embedded interface support (opie)' CONFIG_OPIE
 if [ "$CONFIG_OPIE" = "y" ]; then
   string 'Qt Embedded headers and libraries' CONFIG_WITHQTE ""
 fi
@@ -65,7 +63,7 @@ if [ "$CONFIG_DVD" = "y" ]; then
       string '        dvdnav-config path' CONFIG_WITHDVDNAVCONFIGPATH ""
    fi
 fi
-boof 'Win32 DirectShow support' CONFIG_DSHOW
+bool 'Win32 DirectShow support' CONFIG_DSHOW
 bool 'Dvbpsi ts mux and demux module' CONFIG_DVBPSI
 if [ "$CONFIG_DVBPSI" = "y" ]; then
    string '    libdvbpsi headers and libraries' CONFIG_WITHDVBPSI ""
@@ -76,7 +74,7 @@ if [ "$CONFIG_V4L" = "y" ]; then
    string '    path to a v4l-enabled kernel tree' CONFIG_WITHV4L
 fi
 bool 'PVR cards support' CONFIG_PVR
-bool 'VCD support for Linux, FreeBSD, MacOS X and Win32' CONFIG_VCD
+bool 'built-in VCD and audio CD support' CONFIG_VCD
 bool 'Satellite card support' CONFIG_SATELLITE
 bool 'DVB-S/T/C cards support' CONFIG_DVB
 if [ "$CONFIG_DVB" = "y" ]; then
@@ -86,6 +84,11 @@ bool 'Ogg demux support' CONFIG_OGG
 bool 'Matroska demux support' CONFIG_MKV
 bool 'Mod demux support' CONFIG_MOD
 bool 'CD input and control library (libcdio) support' CONFIG_CDIO
+if [ "$CONFIG_CDIO" = "y" ]; then
+   bool '    audio CD module with CD-Text & CD-Paranoia (via libcdio)' CONFIG_CDAX
+   bool '    enable audio CDDB lookups (via libcddb)' CONFIG_CDDB
+   bool '    VCD module with navigation (via libcdio and libvcdinfo)' CONFIG_VCDX
+fi
 endmenu
 
 mainmenu_option next_comment
@@ -202,8 +205,8 @@ endmenu
 mainmenu_option next_comment
 comment 'Miscellaneous options'
 bool 'UTF8 support' CONFIG_UTF8
-bool 'GNU Portable Threads support' CONFIG_PTH
-bool 'State threads support' CONFIG_ST
+bool 'GNU Portable Threads (Pth) support' CONFIG_PTH
+bool 'State threads (st) support' CONFIG_ST
 bool 'Gprof profiling' CONFIG_GPROF
 bool 'Cprof profiling' CONFIG_CPROF
 # TODO: change to a tristate choice

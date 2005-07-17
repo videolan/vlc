@@ -1726,7 +1726,7 @@ AC_ARG_ENABLE(cdda,
   [  --enable-cdda           audio CD via built-in VCD (default enabled)])
  
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            built-in VCD (not via libcdio)])
+  [  --enable-vcd            built-in VCD (default enabled)])
 
 if test "${enable_vcd}" != "no"
 then
