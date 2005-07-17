@@ -352,7 +352,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         p_method->psz_address = strdup( psz_addr );
     }
     else
-        b_ipv6 == (strchr( p_method->psz_address, ':' ) != NULL);
+        b_ipv6 = (strchr( p_method->psz_address, ':' ) != NULL);
 
     msg_Dbg( p_sap, "using SAP address: %s", p_method->psz_address);
 

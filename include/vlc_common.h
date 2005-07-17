@@ -536,7 +536,7 @@ static int64_t GCD( int64_t a, int64_t b )
 }
 
 /* Dynamic array handling: realloc array, move data, increment position */
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) && _MSC_VER < 1300
 #   define VLCCVP (void**) /* Work-around for broken compiler */
 #else
 #   define VLCCVP

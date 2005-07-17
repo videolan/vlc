@@ -500,6 +500,16 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 {
     char psz_servbuf[6], *psz_serv;
     int i_servlen, i_val;
+#ifdef WIN32
+    /*
+     * Here is the kind of kludge you need to keep binary compatibility among
+     * varying OS versions...
+     */
+    typedef int (CALLBACK * GETNAMEINFO) ( const struct sockaddr*, socklen_t,
+                                           char*, DWORD, char*, DWORD, int );
+    HINSTANCE wship6_module;
+    GETNAMEINFO ws2_getnameinfo;
+#endif
 
     flags |= NI_NUMERICSERV;
     if( portnum != NULL )
@@ -512,16 +522,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         psz_serv = NULL;
         i_servlen = 0;
     }
-#ifdef WIN32
-    /*
-     * Here is the kind of kludge you need to keep binary compatibility among
-     * varying OS versions...
-     */
-    typedef int (CALLBACK * GETNAMEINFO) ( const struct sockaddr*, socklen_t,
-                                           char*, DWORD, char*, DWORD, int );
-    HINSTANCE wship6_module;
-    GETNAMEINFO ws2_getnameinfo;
-     
+#ifdef WIN32    
     wship6_module = LoadLibrary( "wship6.dll" );
     if( wship6_module != NULL )
     {
@@ -554,7 +555,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
          * gethostbyaddr and the likes */
         vlc_mutex_lock( lock.p_address );
 #else
-# warning FIXME : This is not thread-safe!
+//# warning FIXME : This is not thread-safe!
 #endif
         i_val = __getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
                                flags );

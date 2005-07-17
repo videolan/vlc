@@ -30,6 +30,7 @@
 #   include <winsock.h>
 #elif defined( WIN32 )
 #   include <winsock2.h>
+#   include <ws2tcpip.h>
 #elif HAVE_SYS_SOCKET_H
 #   include <sys/socket.h>
 #endif

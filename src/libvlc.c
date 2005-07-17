@@ -247,12 +247,14 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       psz_modules;
     char *       psz_parser;
     char *       psz_control;
-    char *       psz_language;
     vlc_bool_t   b_exit = VLC_FALSE;
     vlc_t *      p_vlc = vlc_current_object( i_object );
     module_t    *p_help_module;
     playlist_t  *p_playlist;
     vlc_value_t  val;
+#ifndef WIN32
+    char *       psz_language;
+#endif
 
     if( !p_vlc )
     {
@@ -2034,7 +2036,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             char *psz_text, *psz_spaces = psz_spaces_text;
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             char *psz_suf = "", *psz_prefix = NULL;
-            int i;
+            size_t i;
 
             /* Skip deprecated options */
             if( p_item->psz_current )
@@ -2167,10 +2169,10 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             while( *psz_text )
             {
                 char *psz_parser, *psz_word;
-                int i_end = strlen( psz_text );
+                size_t i_end = strlen( psz_text );
 
                 /* If the remaining text fits in a line, print it. */
-                if( i_end <= i_width )
+                if( i_end <= (size_t)i_width )
                 {
                     fprintf( stdout, "%s\n", psz_text );
                     break;

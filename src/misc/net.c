@@ -42,6 +42,7 @@
 #   if defined(UNDER_CE) && defined(sockaddr_storage)
 #       undef sockaddr_storage
 #   endif
+#   include <io.h>
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #else
@@ -128,8 +129,8 @@ static int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
     if( i_family == AF_INET6 )
     {
         i_val = PROTECTION_LEVEL_UNRESTRICTED;
-        setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
-                    sizeof( i_val ) );
+        setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
+                   (const char*)&i_val, sizeof( i_val ) );
     }
 # else
 # warning You are using outdated headers for Winsock !
