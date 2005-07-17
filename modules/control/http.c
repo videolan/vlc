@@ -585,8 +585,11 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
     sprintf( dir, "%s/.hosts", psz_dir );
     p_acl = ACL_Create( p_intf, VLC_FALSE );
-    ACL_LoadFile( p_acl, dir );
-    
+    if( ACL_LoadFile( p_acl, dir ) )
+    {
+        ACL_Destroy( p_acl );
+        p_acl = NULL;
+    }
 
     for( ;; )
     {
