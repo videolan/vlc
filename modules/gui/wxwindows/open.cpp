@@ -60,6 +60,11 @@
 #   define wxRB_SINGLE 0
 #endif
 
+#define SELECTION_DISC_TYPE_DVD_MENUS 0
+#define SELECTION_DISC_TYPE_DVD       1
+#define SELECTION_DISC_TYPE_VCD       2
+#define SELECTION_DISC_TYPE_CDDA      3
+
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -1382,10 +1387,6 @@ static char * ProbeVCD(const wxChar *device)
                        |CDIO_FS_UNKNOWN), true);
 }
 
-#define SELECTION_DISC_TYPE_DVD_MENUS 0
-#define SELECTION_DISC_TYPE_DVD       1
-#define SELECTION_DISC_TYPE_VCD       2
-#define SELECTION_DISC_TYPE_CDDA      3
  
 /* 
    Probe (find anywhere) a CD-DA, VCD, or a DVD.
