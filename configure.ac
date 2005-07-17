@@ -1635,10 +1635,10 @@ have_libcdio=no
 have_libvcdinfo=no
 if test "${enable_libcdio}" != "no"
 then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.71,
+  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.72,
      have_libcdio=yes
      AC_DEFINE(HAVE_LIBCDIO, [], 
-     [Define if you have libcdio 0.71 or greater installed]),
+     [Define if you have libcdio 0.72 or greater installed]),
      [AC_MSG_WARN(CD Reading and information library not found)])
 
   PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.21,
@@ -1662,12 +1662,9 @@ then
   if test "$have_libcdio" = "yes"
   then
     AC_DEFINE(HAVE_CDDAX, [], [Define for the audio CD plugin using libcdio])
-    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS $LIBCDIO_PARANOIA_LIBS])
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS $LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])
     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     VLC_ADD_PLUGINS([cddax])
-    PKG_CHECK_MODULES(LIBCDIO_PARANOIA, libcdio_paranoia >= 0.72, [
-    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])],
-    AC_MSG_WARN([CD Paranoia support disabled because no libcdio >= 0.72 found]))
   else 
     AC_MSG_WARN([cddax plugin disabled because ok libcdio library not found or disabled])
     HAVE_CDDAX=no
@@ -1700,7 +1697,7 @@ then
     HAVE_VCDX=no
   fi
 
-  PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.71,
+  PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.72,
    [VLC_ADD_LDFLAGS([vcdx],[$LIBISO9660_LIBS])
     VLC_ADD_CFLAGS([vcdx],[$LIBISO9660_CFLAGS])],
     [AC_MSG_WARN([vcdx plugin disabled because ok libiso9660 library not found])
