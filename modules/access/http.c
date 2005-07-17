@@ -322,6 +322,15 @@ static int Open( vlc_object_t *p_this )
 
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
+        /* Do not accept redirection outside of HTTP works */
+        if( strncmp( p_sys->psz_location, "http", 4 )
+         || ( ( p_sys->psz_location[4] != ':' ) /* HTTP */
+           && strncmp( p_sys->psz_location + 4, "s:", 2 ) /* HTTP/SSL */ ) )
+        {
+            msg_Err( p_access, "insecure redirection ignored" );
+            goto error;
+        }
+
         p_playlist = vlc_object_find( p_access, VLC_OBJECT_PLAYLIST,
                                       FIND_ANYWHERE );
         if( !p_playlist )
@@ -874,7 +883,6 @@ static int Request( access_t *p_access, int64_t i_tell )
 
     if( p_sys->b_proxy )
     {
-        /* FIXME: support SSL proxies */
         if( p_sys->url.psz_path )
         {
             net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
