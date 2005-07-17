@@ -2305,16 +2305,22 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     break;
                 case MVLC_STRING:
                     psz = config_GetPsz( p_intf, m->param1 );
-                    snprintf( value, sizeof( value ), "%s", psz ? psz : "" );
-                    if( psz ) free( psz );
+                    if( psz != NULL )
+                    {
+                        strncpy( value, psz,sizeof( value ) );
+                        free( psz );
+                        value[sizeof( value ) - 1] = '\0';
+                    }
+                    else
+                        *value = '\0';
+                    msg_Dbg( p_intf, "%d: value = \"%s\"", __LINE__, value );
                     break;
                 default:
                     snprintf( value, sizeof( value ),
                               "invalid type(%s) in set", m->param2 );
+                    value[sizeof( value ) - 1] = '\0';
                     break;
             }
-            value[sizeof( value ) - 1] = '\0';
-            msg_Dbg( p_intf, "get name=%s value=%s type=%s", m->param1, value, m->param2 );
             PRINTS( "%s", value );
             break;
         }
