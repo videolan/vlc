@@ -84,8 +84,6 @@ vlc_module_begin();
               CONTINUOUS_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "http" );
-    add_shortcut( "http4" );
-    add_shortcut( "http6" );
     add_shortcut( "https" );
     add_shortcut( "unsv" );
     set_callbacks( Open, Close );
@@ -154,32 +152,6 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz;
-
-    /* First set ipv4/ipv6 */
-    var_Create( p_access, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
-    if( *p_access->psz_access )
-    {
-        vlc_value_t val;
-        /* Find out which shortcut was used */
-        if( !strncmp( p_access->psz_access, "http4", 6 ) )
-        {
-            val.b_bool = VLC_TRUE;
-            var_Set( p_access, "ipv4", val );
-
-            val.b_bool = VLC_FALSE;
-            var_Set( p_access, "ipv6", val );
-        }
-        else if( !strncmp( p_access->psz_access, "http6", 6 ) )
-        {
-            val.b_bool = VLC_TRUE;
-            var_Set( p_access, "ipv6", val );
-
-            val.b_bool = VLC_FALSE;
-            var_Set( p_access, "ipv4", val );
-        }
-    }
 
     /* Set up p_access */
     p_access->pf_read = Read;
