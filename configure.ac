@@ -1662,9 +1662,12 @@ then
   if test "$have_libcdio" = "yes"
   then
     AC_DEFINE(HAVE_CDDAX, [], [Define for the audio CD plugin using libcdio])
-    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS $LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
     VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
     VLC_ADD_PLUGINS([cddax])
+    PKG_CHECK_MODULES(LIBCDIO_PARANOIA, libcdio_paranoia >= 0.72, [
+    VLC_ADD_LDFLAGS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])],
+    AC_MSG_WARN([CD Paranoia support disabled because no libcdio >= 0.72 found]))
   else 
     AC_MSG_WARN([cddax plugin disabled because ok libcdio library not found or disabled])
     HAVE_CDDAX=no
