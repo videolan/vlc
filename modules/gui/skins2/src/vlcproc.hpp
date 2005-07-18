@@ -71,7 +71,7 @@ class VlcProc: public SkinObject
         void unregisterVoutWindow( void *pVoutWindow );
 
         /// Indicate whether the embedded video output is currently used
-        bool isVoutUsed() const { return m_pVout; }
+        bool isVoutUsed() const { return m_pVout != NULL; }
 
         /// If an embedded video output is used, drop it (i.e. tell it to stop
         /// using our window handle)

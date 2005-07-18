@@ -331,7 +331,7 @@ void Win32Graphics::copyToWindow( OSWindow &rWindow, int xSrc, int ySrc,
 
 bool Win32Graphics::hit( int x, int y ) const
 {
-    return PtInRegion( m_mask, x, y );
+    return PtInRegion( m_mask, x, y ) != 0;
 }
 
 

@@ -224,7 +224,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
     }
 
     // Get the first directory entry
-    pDirContent = readdir( pCurrDir );
+    pDirContent = (dirent*)readdir( pCurrDir );
 
     // While we still have entries in the directory
     while( pDirContent != NULL )
@@ -265,7 +265,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
             }
         }
 
-        pDirContent = readdir( pCurrDir );
+        pDirContent = (dirent*)readdir( pCurrDir );
     }
 
     closedir( pCurrDir );
@@ -535,7 +535,7 @@ int gzopen_frontend( char *pathname, int oflags, int mode )
     char *gzflags;
     gzFile gzf;
 
-    switch( oflags & O_ACCMODE )
+    switch( oflags )
     {
         case O_WRONLY:
             gzflags = "wb";

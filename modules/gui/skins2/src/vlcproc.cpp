@@ -260,15 +260,15 @@ void VlcProc::manage()
     // Refresh the random variable
     vlc_value_t val;
     var_Get( getIntf()->p_sys->p_playlist, "random", &val );
-    pVarRandom->set( val.b_bool );
+    pVarRandom->set( val.b_bool != 0 );
 
     // Refresh the loop variable
     var_Get( getIntf()->p_sys->p_playlist, "loop", &val );
-    pVarLoop->set( val.b_bool );
+    pVarLoop->set( val.b_bool != 0 );
 
     // Refresh the repeat variable
     var_Get( getIntf()->p_sys->p_playlist, "repeat", &val );
-    pVarRepeat->set( val.b_bool );
+    pVarRepeat->set( val.b_bool != 0 );
 }
 
 

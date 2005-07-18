@@ -38,6 +38,11 @@
 #endif
 
 
+// XXX layered windows are supposed to work only with at least win2k
+#ifndef WS_EX_LAYERED
+#   define WS_EX_LAYERED 0x00080000
+#endif
+
 Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
                           bool dragDrop, bool playOnDrop,

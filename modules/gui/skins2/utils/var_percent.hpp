@@ -28,12 +28,14 @@
 #include "variable.hpp"
 #include "observer.hpp"
 
+class VarPercent;
+
 
 /// Percentage variable
 class VarPercent: public Variable, public Subject<VarPercent>
 {
     public:
-        VarPercent( intf_thread_t *pIntf );
+        VarPercent( intf_thread_t *pIntf ): Variable( pIntf ), m_value( 0 ) {}
         virtual ~VarPercent() {}
 
         /// Get the variable type

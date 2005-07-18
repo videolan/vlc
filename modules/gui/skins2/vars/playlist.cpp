@@ -38,7 +38,10 @@ Playlist::Playlist( intf_thread_t *pIntf ): VarList( pIntf )
     vlc_current_charset( &pCharset );
     iconvHandle = vlc_iconv_open( "UTF-8", pCharset );
     msg_Dbg( pIntf, "Using character encoding: %s", pCharset );
+#ifndef WIN32
+    // vlc_current_charset returns a pointer on a satic char[] on win32
     free( pCharset );
+#endif
 
     if( iconvHandle == (vlc_iconv_t)-1 )
     {

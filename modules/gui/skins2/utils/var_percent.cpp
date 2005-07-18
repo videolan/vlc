@@ -28,11 +28,6 @@
 const string VarPercent::m_type = "percent";
 
 
-VarPercent::VarPercent( intf_thread_t *pIntf ): Variable( pIntf ), m_value( 0 )
-{
-}
-
-
 void VarPercent::set( float percentage )
 {
     if( percentage < 0 )

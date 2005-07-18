@@ -114,7 +114,7 @@ void ThemeRepository::parseDirectory( const string &rDir )
     }
 
     // Get the first directory entry
-    pDirContent = readdir( pDir );
+    pDirContent = (dirent*)readdir( pDir );
 
     // While we still have entries in the directory
     while( pDirContent != NULL )
@@ -132,7 +132,7 @@ void ThemeRepository::parseDirectory( const string &rDir )
                         &text );
         }
 
-        pDirContent = readdir( pDir );
+        pDirContent = (dirent*)readdir( pDir );
     }
 
     closedir( pDir );

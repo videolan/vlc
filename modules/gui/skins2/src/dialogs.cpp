@@ -99,7 +99,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Dialogs *p_dialogs = (Dialogs *)param;
-    p_dialogs->showPopupMenu( new_val.b_bool );
+    p_dialogs->showPopupMenu( new_val.b_bool != 0 );
 
     return VLC_SUCCESS;
 }
