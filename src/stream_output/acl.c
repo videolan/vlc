@@ -66,7 +66,7 @@ struct vlc_acl_t
 static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
                         const char *psz_ip )
 {
-    struct addrinfo hints, *res;
+    struct addrinfo hints = { 0 }, *res;
     int i_family;
 
     hints.ai_socktype = SOCK_STREAM; /* doesn't matter */
