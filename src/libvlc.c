@@ -252,9 +252,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     module_t    *p_help_module;
     playlist_t  *p_playlist;
     vlc_value_t  val;
-#ifndef WIN32
     char *       psz_language;
-#endif
 
     if( !p_vlc )
     {
