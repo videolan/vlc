@@ -1161,7 +1161,7 @@ else
     if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then
         CFLAGS_TUNING="-mtune=pentium2"
     elif test "${target_cpu}" = "x86_64"; then
-        CFLAGS_TUNING="-mtune=opteron"
+        CFLAGS_TUNING="-mtune=athlon64"
     elif test "${target_cpu}" = "powerpc"; then
         CFLAGS_TUNING="-mtune=750";
     fi
