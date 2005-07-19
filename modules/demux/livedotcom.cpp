@@ -201,8 +201,8 @@ static int  Open ( vlc_object_t *p_this )
            v, o, s fields are mandatory and in this order */
         if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
 
-        if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) &&
-            strncmp( (char*)p_peek, "v=0\n", 4 ) &&
+        if( memcmp( (char*)p_peek, "v=0\r\n", 5 ) &&
+            memcmp( (char*)p_peek, "v=0\n", 4 ) &&
             ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
         {
             return VLC_EGENERIC;
@@ -246,7 +246,7 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     if( strcasecmp( p_demux->psz_access, "sdp" ) && 
-	vlc_UrlIsNotEncoded( p_sys->psz_path ) )
+        vlc_UrlIsNotEncoded( p_sys->psz_path ) )
     {
         p_sys->psz_path = vlc_UrlEncode( p_sys->psz_path );
         if( p_sys->psz_path == NULL )
@@ -1264,8 +1264,6 @@ static void StreamClose( void *p_private )
 static void TaskInterrupt( void *p_private )
 {
     demux_t *p_demux = (demux_t*)p_private;
-
-    fprintf( stderr, "TaskInterrupt\n" );
 
     p_demux->p_sys->i_no_data_ti++;
 
