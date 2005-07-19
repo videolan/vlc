@@ -174,6 +174,9 @@ static void StreamRead( void *, unsigned int, unsigned int,
 static void StreamClose( void * );
 static void TaskInterrupt( void * );
 
+static unsigned char* parseH264ConfigStr( char const* configStr,
+                                          unsigned& configSize );
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -283,7 +286,7 @@ static int  Open ( vlc_object_t *p_this )
         /* malloc-ated copy */
         p_sys->p_sdp = strdup( (char*)p_sdp );
         delete[] p_sdp;
-        fprintf( stderr, "sdp=%s\n", p_sys->p_sdp );
+        msg_Dbg( p_demux, "sdp=%s\n", p_sys->p_sdp );
     }
     else if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "sdp" ) )
     {
@@ -509,6 +512,27 @@ static int  Open ( vlc_object_t *p_this )
             else if( !strcmp( sub->codecName(), "H261" ) )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '1' );
+            }
+            else if( !strcmp( sub->codecName(), "H264" ) )
+            {
+                unsigned int i_extra;
+                uint8_t      *p_extra;
+
+                tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '4' );
+                tk->fmt.b_packetized = VLC_FALSE;
+
+                /* XXX not the right minimal version I fear */
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1117756800
+                if((p_extra=parseH264ConfigStr( sub->fmtp_spropparametersets(),
+                                                i_extra ) ) )
+                {
+                    tk->fmt.i_extra = i_extra;
+                    tk->fmt.p_extra = malloc( i_extra );
+                    memcpy( tk->fmt.p_extra, p_extra, i_extra );
+
+                    delete[] p_extra;
+                }
+#endif
             }
             else if( !strcmp( sub->codecName(), "JPEG" ) )
             {
@@ -1140,7 +1164,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         msg_Warn( p_demux, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
-    if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
+    if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','1') )
     {
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1081468800
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->rtpSource;
@@ -1152,6 +1176,22 @@ static void StreamRead( void *p_private, unsigned int i_size,
         p_block = block_New( p_demux, i_size + 4 );
         memcpy( p_block->p_buffer, &header, 4 );
         memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
+
+        if( tk->rtpSource->curPacketMarkerBit() )
+            p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
+    }
+    else if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','4') )
+    {
+        if( (tk->p_buffer[0] & 0x1f) >= 24 )
+            msg_Warn( p_demux, "unsupported NAL type for H264" );
+
+        /* Normal NAL type */
+        p_block = block_New( p_demux, i_size + 4 );
+        p_block->p_buffer[0] = 0x00;
+        p_block->p_buffer[1] = 0x00;
+        p_block->p_buffer[2] = 0x00;
+        p_block->p_buffer[3] = 0x01;
+        memcpy( &p_block->p_buffer[4], tk->p_buffer, i_size );
     }
     else if( tk->b_asf )
     {
@@ -1165,11 +1205,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         p_block = block_New( p_demux, i_size );
         memcpy( p_block->p_buffer, tk->p_buffer, i_size );
     }
-    if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') &&
-        tk->rtpSource->curPacketMarkerBit() )
-    {
-        p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
-    }
+
     //p_block->i_rate = p_input->stream.control.i_rate;
 
     if( i_pts != tk->i_pts && !tk->b_muxed )
@@ -1287,6 +1323,42 @@ static int ParseASF( demux_t *p_demux )
     free( psz_asf );
     return VLC_SUCCESS;
 }
+
+static unsigned char* parseH264ConfigStr( char const* configStr,
+                                          unsigned& configSize )
+{
+    char *dup, *psz;
+
+    configSize = 0;
+
+    if( configStr == NULL || *configStr == '\0' )
+        return NULL;
+
+    psz = dup = strdup( configStr );
+
+    unsigned char *cfg = new unsigned char[5 * strlen(psz)];
+    for( ;; )
+    {
+        char *p = strchr( psz, ',' );
+        if( p )
+            *p++ = '\0';
+
+        cfg[configSize++] = 0x00;
+        cfg[configSize++] = 0x00;
+        cfg[configSize++] = 0x00;
+        cfg[configSize++] = 0x01;
+        configSize += b64_decode( (char*)&cfg[configSize], psz );
+
+        if( p == NULL )
+            break;
+        psz = p;
+    }
+
+    free( dup );
+
+    return cfg;
+}
+
 /*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
 static int b64_decode( char *dest, char *src )
 {
