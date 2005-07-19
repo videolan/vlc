@@ -85,8 +85,8 @@ bool 'Matroska demux support' CONFIG_MKV
 bool 'Mod demux support' CONFIG_MOD
 bool 'CD input and control library (libcdio) support' CONFIG_CDIO
 if [ "$CONFIG_CDIO" = "y" ]; then
-   bool '    audio CD module with CD-Text & CD-Paranoia (via libcdio)' CONFIG_CDAX
-   bool '    enable audio CDDB lookups (via libcddb)' CONFIG_CDDB
+   bool '    audio CD module with CD-Text & CD-Paranoia (via libcdio)' CONFIG_CDDAX
+   bool '    CDDB lookups (via libcddb) for audio CD' CONFIG_CDDB
    bool '    VCD module with navigation (via libcdio and libvcdinfo)' CONFIG_VCDX
 fi
 endmenu

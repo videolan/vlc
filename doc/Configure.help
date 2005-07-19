@@ -1,9 +1,70 @@
-Gnome Interface
-CONFIG_GNOME
-  to be written
-
-Skins Interface
+Skins module
 CONFIG_SKINS
   Enables the skins interface.
   BE CAREFUL: under linux, you must have the wxWindows library compiled 
-  with GTK2 support ! (see http://www.wxwindows.org)
+  with GTK2 support See http://www.wxwindows.org.
+
+CD input and control library (libcdio) support
+CONFIG_CDIO
+
+  This library is used in an enhanced audio CD plugin called "cddax"
+  and a Video CD plugin called "vcdx". 
+
+  It is also used in the "Probe" button of the "Open Disc" menu to find
+  an appropriate media for the disc type that has been selected. 
+
+  See http://www.gnu.org/software/libcdio.
+
+audio CD module with CD-Text & CD-Paranoia (via libcdio)
+CONFIG_CDDAX
+
+  This audio CD plugin can get CD-Text information from an
+  audio CD. If the library libcddb is available, the plugin can show
+  CDDB information too. This plugin needs libraries from libcdio.
+
+  The information from CD-Text or CDDB can be used in a number of ways.
+  It is shown in the "Stream and Media Window" and it is shown when 
+  playing a CD information in a playlist. Exactly what information to be
+  shown can be customized. 
+
+  This plugin can also make use of CD-paranoia to correct for jittering
+  of a a CD-ROM drive. Jitter correction which is more CPU intensive but 
+  is often desirable for making ripping more acurate. 
+
+VCD module with navigation (via libcdio and libvcdinfo)
+CONFIG_VCDX
+
+  This Video CD plugin uses understands VCD information to a great level
+  of detail. Much more so than the built-in VCD plugin. As as result, it 
+  can perform playback control and show still menus and motion MPEGs in 
+  the first ISO-9660 track. 
+
+  Alas, the full potential of this plugin hasn't been realized, even
+  though a great bit of the code is shared between this and the xine
+  VCD plugin. In particular, menu selection and keyboard input is not
+  available, and switching between different formats of MPEGs causes
+  new windows to pop up. If you want more complete VCD playback, at
+  present the xine VCD plugin is more complete. Volunteers in
+  finishing this plugin are always welcome.
+
+  This plugin needs libraries from libcdio, and a library from the
+  vcdimager package called libvcdinfo.
+
+  Information on vcdimager is at http://www.vcdimager.org
+
+CDDB lookups (via libcddb) for audio CD
+CONFIG_CDDB
+  This library is used in an enhanced audio CD plugin called "cddax" to 
+  allow it to look up audio CD information. CD database information
+  resides on the Internet but since the same information appears 
+  frequently, the information is often saved (or "cached") locally.
+
+  See http://libcddb.sourceforge.net  
+
+built-in VCD and audio CD support
+CONFIG_VCD
+  Built-in in support for Video CD (VCD) and audio CD (CD-DA) exists. 
+  Support is pretty basic, but it doesn't require the use of external
+  libraries libcdio and libvcdinfo. If you need more advanced support
+  see the cddax and vcdx plugins.
+
