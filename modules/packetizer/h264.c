@@ -205,6 +205,22 @@ static int Open( vlc_object_t *p_this )
     {
         /* Set callback */
         p_dec->pf_packetize = Packetize;
+
+        /* */
+        if( p_dec->fmt_in.i_extra > 0 )
+        {
+            block_t *p_init = block_New( p_dec, p_dec->fmt_in.i_extra );
+            block_t *p_pic;
+
+            memcpy( p_init->p_buffer, p_dec->fmt_in.p_extra,
+                    p_dec->fmt_in.i_extra );
+
+            while( ( p_pic = Packetize( p_dec, &p_init ) ) )
+            {
+                /* Should not occur because we should only receive SPS/PPS */
+                block_Release( p_pic );
+            }
+        }
     }
 
     return VLC_SUCCESS;
