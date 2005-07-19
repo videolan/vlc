@@ -37,7 +37,7 @@ char *CStrFromBSTR(int codePage, BSTR bstr)
                 0, bstr, len, NULL, 0, NULL, NULL);
         if( mblen > 0 )
         {
-            char *buffer = (char *)malloc(mblen+1);
+            char *buffer = (char *)CoTaskMemAlloc(mblen+1);
             ZeroMemory(buffer, mblen+1);
             if( WideCharToMultiByte(codePage, 0, bstr, len, buffer, mblen, NULL, NULL) )
                 return buffer;
@@ -51,7 +51,7 @@ BSTR BSTRFromCStr(int codePage, const char *s)
     int wideLen = MultiByteToWideChar(codePage, 0, s, -1, NULL, 0);
     if( wideLen )
     {
-        WCHAR* wideStr = (WCHAR*)malloc(wideLen*sizeof(WCHAR));
+        WCHAR* wideStr = (WCHAR*)CoTaskMemAlloc(wideLen*sizeof(WCHAR));
         if( NULL != wideStr )
         {
             BSTR bstr;

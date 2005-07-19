@@ -25,8 +25,7 @@
 
 #include <ocidl.h>
 #include <vector>
-
-using namespace std;
+#include <queue>
 
 class VLCConnectionPoint : public IConnectionPoint
 {
@@ -68,10 +67,22 @@ private:
 
     REFIID _iid;
     IConnectionPointContainer *_p_cpc;
-    vector<CONNECTDATA> _connections;
+    std::vector<CONNECTDATA> _connections;
 };
 
 //////////////////////////////////////////////////////////////////////////
+
+class VLCDispatchEvent {
+
+public:
+    VLCDispatchEvent(DISPID dispId, DISPPARAMS dispParams) :
+        _dispId(dispId), _dispParams(dispParams) {};
+    VLCDispatchEvent(const VLCDispatchEvent&);
+    ~VLCDispatchEvent();
+
+    DISPID      _dispId;
+    DISPPARAMS  _dispParams;
+};
 
 class VLCConnectionPointContainer : public IConnectionPointContainer
 {
@@ -91,25 +102,28 @@ public:
             *ppv = reinterpret_cast<LPVOID>(this);
             return NOERROR;
         }
-        return _p_instance->QueryInterface(riid, ppv);
+        return _p_instance->pUnkOuter->QueryInterface(riid, ppv);
     };
 
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->Release(); };
+    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
+    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
 
     // IConnectionPointContainer methods
     STDMETHODIMP EnumConnectionPoints(LPENUMCONNECTIONPOINTS *);
     STDMETHODIMP FindConnectionPoint(REFIID, LPCONNECTIONPOINT *);
 
+    void freezeEvents(BOOL);
     void fireEvent(DISPID, DISPPARAMS*);
     void firePropChangedEvent(DISPID dispId);
 
 private:
 
     VLCPlugin *_p_instance;
+    BOOL _b_freeze;
     VLCConnectionPoint *_p_events;
     VLCConnectionPoint *_p_props;
-    vector<LPCONNECTIONPOINT> _v_cps;
+    std::vector<LPCONNECTIONPOINT> _v_cps;
+    std::queue<class VLCDispatchEvent *> _q_events;
 };
 
 #endif

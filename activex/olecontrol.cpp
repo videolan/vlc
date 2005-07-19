@@ -127,7 +127,7 @@ STDMETHODIMP VLCOleControl::OnAmbientPropertyChange(DISPID dispID)
 
 STDMETHODIMP VLCOleControl::FreezeEvents(BOOL bFreeze)
 {
-    _p_instance->setSendEvents(! bFreeze);
+    _p_instance->freezeEvents(bFreeze);
     return S_OK;
 };
 

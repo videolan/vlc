@@ -126,6 +126,26 @@ STDMETHODIMP VLCControl::play(void)
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
     {
+        if( ! _p_instance->isInPlaceActive() )
+        {
+            /*
+            ** object has not yet been activated. try doing it by ourself
+            ** if parent container is known
+            */
+            LPOLEOBJECT p_oleobject;
+            if( SUCCEEDED(QueryInterface(IID_IOleObject, (LPVOID *)&p_oleobject)) )
+            {
+                LPOLECLIENTSITE p_clientsite;
+                if( SUCCEEDED(p_oleobject->GetClientSite(&p_clientsite)
+                    && (NULL != p_clientsite)) )
+                {
+                    p_oleobject->DoVerb(OLEIVERB_INPLACEACTIVATE,
+                            NULL, p_clientsite, 0, NULL, NULL);
+                    p_clientsite->Release();
+                }
+                p_oleobject->Release();
+            }
+        }
         VLC_Play(i_vlc);
         _p_instance->fireOnPlayEvent();
         return NOERROR;
@@ -442,9 +462,9 @@ STDMETHODIMP VLCControl::setVariable( BSTR name, VARIANT value)
             hr = (VLC_SUCCESS == VLC_VariableSet(i_vlc, psz_varname, val)) ? NOERROR : E_FAIL;
 
             if( (VLC_VAR_STRING == i_type) && (NULL != val.psz_string) )
-                free(val.psz_string);
+                CoTaskMemFree(val.psz_string);
         }
-        free(psz_varname);
+        CoTaskMemFree(psz_varname);
 
         return hr;
     }
@@ -501,7 +521,7 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
                 case VLC_VAR_VARIABLE:
                     V_VT(value) = VT_BSTR;
                     V_BSTR(value) = BSTRFromCStr(codePage, val.psz_string);
-                    free(val.psz_string);
+                    CoTaskMemFree(val.psz_string);
                     break;
 
                 case VLC_VAR_TIME:
@@ -514,7 +534,7 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
                     hr = DISP_E_TYPEMISMATCH;
             }
         }
-        free(psz_varname);
+        CoTaskMemFree(psz_varname);
         return hr;
     }
     return E_UNEXPECTED;
@@ -523,16 +543,18 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
 static void freeTargetOptions(char **cOptions, int cOptionCount)
 {
     // clean up 
-    for( long pos=0; pos<cOptionCount; ++pos )
-    {
-        char *cOption = cOptions[pos];
-        if( NULL != cOption )
-            free(cOption);
-        else
-            break;
-    }
     if( NULL != cOptions )
-        free(cOptions);
+    {
+        for( int pos=0; pos<cOptionCount; ++pos )
+        {
+            char *cOption = cOptions[pos];
+            if( NULL != cOption )
+                CoTaskMemFree(cOption);
+            else
+                break;
+        }
+        CoTaskMemFree(cOptions);
+    }
 };
 
 static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOptions, int *cOptionCount)
@@ -571,7 +593,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                 long capacity = 16;
                 VARIANT option;
 
-                *cOptions = (char **)malloc(capacity*sizeof(char *));
+                *cOptions = (char **)CoTaskMemAlloc(capacity*sizeof(char *));
                 if( NULL != *cOptions )
                 {
                     ZeroMemory(*cOptions, sizeof(char *)*capacity);
@@ -586,7 +608,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                                 ++pos;
                                 if( pos == capacity )
                                 {
-                                    char **moreOptions = (char **)realloc(*cOptions, (capacity+16)*sizeof(char *));
+                                    char **moreOptions = (char **)CoTaskMemRealloc(*cOptions, (capacity+16)*sizeof(char *));
                                     if( NULL != moreOptions )
                                     {
                                         ZeroMemory(moreOptions+capacity, sizeof(char *)*16);
@@ -598,7 +620,8 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                                 }
                             }
                             else
-                                hr = E_OUTOFMEMORY;
+                                hr = ( SysStringLen(V_BSTR(&option)) > 0 ) ?
+                                    E_OUTOFMEMORY : E_INVALIDARG;
                         }
                         else
                             hr = E_INVALIDARG;
@@ -614,6 +637,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                 }
                 else
                     hr = E_OUTOFMEMORY;
+
                 enumVar->Release();
             }
         }
@@ -635,7 +659,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
         if( uBound > lBound )
         {
             VARTYPE vType;
-            HRESULT hr = SafeArrayGetVartype(array, &vType);
+            hr = SafeArrayGetVartype(array, &vType);
             if( FAILED(hr) )
                 return hr;
 
@@ -644,10 +668,11 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
             // marshall options into an array of C strings
             if( VT_VARIANT == vType )
             {
-                *cOptions = (char **)malloc(sizeof(char *)*(uBound-lBound));
-                if( NULL != options )
+                *cOptions = (char **)CoTaskMemAlloc(sizeof(char *)*(uBound-lBound));
+                if( NULL == *cOptions )
                     return E_OUTOFMEMORY;
 
+                ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound));
                 for(pos=lBound; SUCCEEDED(hr) && (pos<uBound); ++pos )
                 {
                     VARIANT option;
@@ -659,7 +684,8 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                             char *cOption = CStrFromBSTR(codePage, V_BSTR(&option));
                             (*cOptions)[pos-lBound] = cOption;
                             if( NULL == cOption )
-                                hr = E_OUTOFMEMORY;
+                                hr = ( SysStringLen(V_BSTR(&option)) > 0 ) ?
+                                    E_OUTOFMEMORY : E_INVALIDARG;
                         }
                         else
                             hr = E_INVALIDARG;
@@ -669,28 +695,32 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
             }
             else if( VT_BSTR == vType )
             {
-                *cOptions = (char **)malloc(sizeof(char *)*(uBound-lBound));
-                if( NULL != options )
+                *cOptions = (char **)CoTaskMemAlloc(sizeof(char *)*(uBound-lBound));
+                if( NULL == *cOptions )
                     return E_OUTOFMEMORY;
 
-                ZeroMemory(cOptions, sizeof(char *)*(uBound-lBound));
-                for(pos=lBound; SUCCEEDED(hr) && (pos<uBound); ++pos )
+                ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound));
+                for(pos=lBound; (pos<uBound) && SUCCEEDED(hr); ++pos )
                 {
                     BSTR option;
                     hr = SafeArrayGetElement(array, &pos, &option);
                     if( SUCCEEDED(hr) )
                     {
                         char *cOption = CStrFromBSTR(codePage, option);
+
                         (*cOptions)[pos-lBound] = cOption;
                         if( NULL == cOption )
-                            hr = E_OUTOFMEMORY;
+                            hr = ( SysStringLen(option) > 0 ) ?
+                                E_OUTOFMEMORY : E_INVALIDARG;
                         SysFreeString(option);
                     }
                 }
             }
-            else
+            else 
+            {
                 // unsupported type
                 return E_INVALIDARG;
+            }
 
             *cOptionCount = pos-lBound;
             if( FAILED(hr) )
@@ -750,7 +780,7 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
         }
 
         freeTargetOptions(cOptions, cOptionsCount);
-        free(cUri);
+        CoTaskMemFree(cUri);
     }
     return hr;
 };
@@ -778,6 +808,7 @@ STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
         *count = VLC_PlaylistNumberOfItems(i_vlc);
         return NOERROR;
     }
+    *count = 0;
     return E_UNEXPECTED;
 };
         

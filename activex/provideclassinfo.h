@@ -44,11 +44,11 @@ public:
             *ppv = reinterpret_cast<LPVOID>(this);
             return NOERROR;
         }
-        return _p_instance->QueryInterface(riid, ppv);
+        return _p_instance->pUnkOuter->QueryInterface(riid, ppv);
     };
 
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->Release(); };
+    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
+    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
 
     // IProvideClassInfo methods
     STDMETHODIMP GetClassInfo(ITypeInfo **);

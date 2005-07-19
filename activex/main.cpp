@@ -186,6 +186,10 @@ STDAPI DllRegisterServer(VOID)
         hSubKey = keyCreate(hClassKey, TEXT("Control"));
         RegCloseKey(hSubKey);
 
+        // Insertable key value
+        //hSubKey = keyCreate(hClassKey, TEXT("Insertable"));
+        //RegCloseKey(hSubKey);
+
         // ToolboxBitmap32 key value
         hSubKey = keyCreate(hClassKey, TEXT("ToolboxBitmap32"));
         strcpy(DllPath+DllPathLen, ",1");
@@ -294,6 +298,9 @@ STDAPI DllRegisterServer(VOID)
 
             RegCloseKey(hSubKey);
         }
+        //hSubKey = keyCreate(hBaseKey, TEXT("Insertable"));
+        //RegCloseKey(hSubKey);
+ 
         RegCloseKey(hBaseKey);
     }
 

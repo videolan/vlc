@@ -66,9 +66,6 @@ STDMETHODIMP VLCPersistStorage::Save(IStorage *pStg, BOOL fSameAsLoad)
 
 STDMETHODIMP VLCPersistStorage::SaveCompleted(IStorage *pStg)
 {
-    if( NULL == pStg )
-        return E_POINTER;
-
     return S_OK;
 };
 

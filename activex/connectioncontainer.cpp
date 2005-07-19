@@ -221,8 +221,23 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
+VLCDispatchEvent::~VLCDispatchEvent()
+{
+    //clear event arguments
+    if( NULL != _dispParams.rgvarg )
+    {
+        for(unsigned int c=0; c<_dispParams.cArgs; ++c)
+            VariantClear(_dispParams.rgvarg+c);
+        CoTaskMemFree(_dispParams.rgvarg);
+    }
+    if( NULL != _dispParams.rgdispidNamedArgs )
+        CoTaskMemFree(_dispParams.rgdispidNamedArgs);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
 VLCConnectionPointContainer::VLCConnectionPointContainer(VLCPlugin *p_instance) :
-    _p_instance(p_instance)
+    _p_instance(p_instance), _b_freeze(FALSE)
 {
     _p_events = new VLCConnectionPoint(dynamic_cast<LPCONNECTIONPOINTCONTAINER>(this),
             _p_instance->getDispEventID());
@@ -237,7 +252,6 @@ VLCConnectionPointContainer::VLCConnectionPointContainer(VLCPlugin *p_instance) 
 
 VLCConnectionPointContainer::~VLCConnectionPointContainer()
 {
-    _v_cps.clear();
     delete _p_props;
     delete _p_events;
 };
@@ -275,13 +289,46 @@ STDMETHODIMP VLCConnectionPointContainer::FindConnectionPoint(REFIID riid, IConn
     return NOERROR;
 };
 
+void VLCConnectionPointContainer::freezeEvents(BOOL freeze)
+{
+    if( ! freeze )
+    {
+        // release queued events
+        while( ! _q_events.empty() )
+        {
+            VLCDispatchEvent *ev = _q_events.front();
+            _p_events->fireEvent(ev->_dispId, &ev->_dispParams);
+            delete ev;
+            _q_events.pop();
+        }
+    }
+    _b_freeze = freeze;
+};
+
 void VLCConnectionPointContainer::fireEvent(DISPID dispId, DISPPARAMS* pDispParams)
 {
-    _p_events->fireEvent(dispId, pDispParams);
+    VLCDispatchEvent *evt = new VLCDispatchEvent(dispId, *pDispParams);
+    if( _b_freeze )
+    {
+        // queue event for later use when container is ready
+        _q_events.push(evt);
+        if( _q_events.size() > 10 )
+        {
+            // too many events in queue, get rid of older one
+            delete _q_events.front();
+            _q_events.pop();
+        }
+    }
+    else
+    {
+        _p_events->fireEvent(dispId, pDispParams);
+        delete evt;
+    }
 };
 
 void VLCConnectionPointContainer::firePropChangedEvent(DISPID dispId)
 {
-    _p_props->firePropChangedEvent(dispId);
+    if( ! _b_freeze )
+        _p_props->firePropChangedEvent(dispId);
 };
 

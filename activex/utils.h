@@ -99,6 +99,7 @@ VLCEnum<T>& VLCEnum<T>::operator=(const VLCEnum<T> &e)
     this->_riid = e._riid;
     this->_v    = e._v;
     this->_i    = e._i;
+    return this;
 };
 
 template<class T>

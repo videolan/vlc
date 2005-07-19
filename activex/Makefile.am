@@ -32,6 +32,8 @@ SOURCES_activex = \
     connectioncontainer.h \
     objectsafety.cpp \
     objectsafety.h \
+    dataobject.cpp \
+    dataobject.h \
     viewobject.cpp \
     viewobject.h \
     vlccontrol.cpp \

@@ -33,12 +33,7 @@ STDMETHODIMP VLCViewObject::Draw(DWORD dwAspect, LONG lindex, PVOID pvAspect,
 {
     if( dwAspect & DVASPECT_CONTENT )
     {
-        RECT bounds;
-        bounds.left   = lprcBounds->left;
-        bounds.top    = lprcBounds->top;
-        bounds.right  = lprcBounds->right;
-        bounds.bottom = lprcBounds->bottom;
-        _p_instance->onPaint(hdcDraw, bounds, bounds);
+        _p_instance->onDraw(ptd, hicTargetDev, hdcDraw, lprcBounds, lprcWBounds);
         return S_OK;
     }
     return E_NOTIMPL;
@@ -47,9 +42,6 @@ STDMETHODIMP VLCViewObject::Draw(DWORD dwAspect, LONG lindex, PVOID pvAspect,
 STDMETHODIMP VLCViewObject::Freeze(DWORD dwAspect, LONG lindex,
         PVOID pvAspect, LPDWORD pdwFreeze)
 {
-    if( NULL != pvAspect )
-        return E_INVALIDARG;
-
     return E_NOTIMPL;
 };
 
@@ -81,7 +73,6 @@ STDMETHODIMP VLCViewObject::GetColorSet(DWORD dwAspect, LONG lindex,
 STDMETHODIMP VLCViewObject::SetAdvise(DWORD dwAspect, DWORD advf,
         LPADVISESINK pAdvSink)
 {
-
     if( NULL != pAdvSink )
         pAdvSink->AddRef();
 

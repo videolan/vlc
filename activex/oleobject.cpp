@@ -49,7 +49,6 @@ STDMETHODIMP VLCOleObject::Advise(IAdviseSink *pAdvSink, DWORD *dwConnection)
 STDMETHODIMP VLCOleObject::Close(DWORD dwSaveOption)
 {
     _p_advise_holder->SendOnClose();
-    OleFlushClipboard();
     return _p_instance->onClose(dwSaveOption);
 };
 
@@ -61,6 +60,8 @@ STDMETHODIMP VLCOleObject::DoVerb(LONG iVerb, LPMSG lpMsg, LPOLECLIENTSITE pActi
         case OLEIVERB_PRIMARY:
         case OLEIVERB_SHOW:
         case OLEIVERB_OPEN:
+            // force control to be visible when activating in place
+            _p_instance->setVisible(TRUE);
         case OLEIVERB_INPLACEACTIVATE:
             return doInPlaceActivate(lpMsg, pActiveSite, hwndParent, lprcPosRect);
 
@@ -75,7 +76,12 @@ STDMETHODIMP VLCOleObject::DoVerb(LONG iVerb, LPMSG lpMsg, LPOLECLIENTSITE pActi
             return S_OK;
 
         default:
-            return OLEOBJ_S_INVALIDVERB;
+            if( iVerb > 0 ) {
+                _p_instance->setVisible(TRUE);
+                doInPlaceActivate(lpMsg, pActiveSite, hwndParent, lprcPosRect);
+                return OLEOBJ_S_INVALIDVERB;
+            }
+            return E_NOTIMPL;
     }
 };
 
@@ -91,8 +97,8 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         if( _p_instance->isInPlaceActive() )
         {
             // just attempt to show object then
-            pActiveSite->ShowObject();
-            _p_instance->setVisible(TRUE);
+            if( _p_instance->getVisible() )
+                pActiveSite->ShowObject();
             return S_OK;
         }
 
@@ -204,7 +210,8 @@ STDMETHODIMP VLCOleObject::EnumAdvise(IEnumSTATDATA **ppEnumAdvise)
 
 STDMETHODIMP VLCOleObject::EnumVerbs(IEnumOleVerb **ppEnumOleVerb)
 {
-    return OLE_S_USEREG;
+    return OleRegEnumVerbs(_p_instance->getClassID(),
+        ppEnumOleVerb);
 };
 
 STDMETHODIMP VLCOleObject::GetClientSite(LPOLECLIENTSITE *ppClientSite)
@@ -221,7 +228,7 @@ STDMETHODIMP VLCOleObject::GetClientSite(LPOLECLIENTSITE *ppClientSite)
 
 STDMETHODIMP VLCOleObject::GetClipboardData(DWORD dwReserved, LPDATAOBJECT *ppDataObject)
 {
-    return E_NOTIMPL;
+    return _p_instance->pUnkOuter->QueryInterface(IID_IDataObject, (void **)ppDataObject);
 };
 
 STDMETHODIMP VLCOleObject::GetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
@@ -241,7 +248,7 @@ STDMETHODIMP VLCOleObject::GetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
 
 STDMETHODIMP VLCOleObject::GetMiscStatus(DWORD dwAspect, DWORD *pdwStatus)
 {
-    if( NULL != pdwStatus )
+    if( NULL == pdwStatus )
         return E_POINTER;
 
     switch( dwAspect )
@@ -273,13 +280,14 @@ STDMETHODIMP VLCOleObject::GetUserClassID(LPCLSID pClsid)
     if( NULL == pClsid )
         return E_POINTER;
  
-    pClsid = const_cast<LPCLSID>(&_p_instance->getClassID()); 
+    *pClsid = _p_instance->getClassID(); 
     return S_OK;
 };
 
 STDMETHODIMP VLCOleObject::GetUserType(DWORD dwFormOfType, LPOLESTR *pszUserType)
 {
-    return OLE_S_USEREG;
+    return OleRegGetUserType(_p_instance->getClassID(),
+        dwFormOfType, pszUserType);
 };
 
 STDMETHODIMP VLCOleObject::InitFromData(LPDATAOBJECT pDataObject, BOOL fCreation, DWORD dwReserved)
@@ -294,7 +302,6 @@ STDMETHODIMP VLCOleObject::IsUpToDate(void)
 
 STDMETHODIMP VLCOleObject::SetClientSite(LPOLECLIENTSITE pClientSite)
 {
- 
     if( NULL != pClientSite )
     {
         pClientSite->AddRef();

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * persiststorage.h: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005 VideoLAN
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -20,26 +20,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef __PERSISTSTORAGE_H__
-#define __PERSISTSTORAGE_H__
+#ifndef __DATAOBJECT_H__
+#define __DATAOBJECT_H__
 
-#include <ocidl.h>
+#include <objidl.h>
+#include <vector>
 
-class VLCPersistStorage : public IPersistStorage
+class VLCDataObject : public IDataObject
 {
 
 public:
 
-    VLCPersistStorage(VLCPlugin *p_instance) : _p_instance(p_instance) {};
-    virtual ~VLCPersistStorage() {};
+    VLCDataObject(VLCPlugin *p_instance);
+    virtual ~VLCDataObject();
 
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
     {
         if( (NULL != ppv)
          && (IID_IUnknown == riid) 
-         && (IID_IPersist == riid) 
-         && (IID_IPersistStorage == riid) ) {
+         && (IID_IDataObject == riid) ) {
             AddRef();
             *ppv = reinterpret_cast<LPVOID>(this);
             return NOERROR;
@@ -50,20 +50,26 @@ public:
     STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
     STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
 
-    // IPersist methods
-    STDMETHODIMP GetClassID(LPCLSID);
+    // IDataObject methods
+    STDMETHODIMP DAdvise(LPFORMATETC,DWORD,LPADVISESINK,LPDWORD);
+    STDMETHODIMP DUnadvise(DWORD);
+    STDMETHODIMP EnumDAdvise(IEnumSTATDATA**);
+    STDMETHODIMP EnumFormatEtc(DWORD, IEnumFORMATETC**);
+    STDMETHODIMP GetCanonicalFormatEtc(LPFORMATETC,LPFORMATETC);
+    STDMETHODIMP GetData(LPFORMATETC,LPSTGMEDIUM);
+    STDMETHODIMP GetDataHere(LPFORMATETC,LPSTGMEDIUM);
+    STDMETHODIMP QueryGetData(LPFORMATETC);
+    STDMETHODIMP SetData(LPFORMATETC,LPSTGMEDIUM,BOOL);
 
-    // IPersistStorage methods
-    STDMETHODIMP IsDirty(void);
-    STDMETHODIMP InitNew(IStorage *);
-    STDMETHODIMP Load(IStorage *);
-    STDMETHODIMP Save(IStorage *, BOOL);
-    STDMETHODIMP SaveCompleted(IStorage *);
-    STDMETHODIMP HandsOffStorage(void);
-
+    void onClose(void);
 private:
 
+    HRESULT getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium);
+    HRESULT getEnhMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium);
+
     VLCPlugin *_p_instance;
+    std::vector<FORMATETC> _v_formatEtc;
+    IDataAdviseHolder *_p_adviseHolder;
 };
 
 #endif
