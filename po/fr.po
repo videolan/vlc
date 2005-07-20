@@ -6,122 +6,6 @@
 #  Samuel Hocevar <sam@zoy.org>
 #  Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be>
 #  Probably other french VLC developers, look at the AUTHORS files
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
-# , 2005.
 #
 msgid ""
 msgstr ""
@@ -142,7 +26,7 @@ msgstr "Préférences de VLC"
 
 #: include/vlc_config_cat.h:34
 msgid "Click on \"Advanced Options\" to see all options."
-msgstr "Cliquez sur \"Optione avancées\" pour voir toutes les options"
+msgstr "Cliquez sur « Options avancées » pour voir toutes les options."
 
 #: include/vlc_config_cat.h:36 src/input/input.c:1822 src/input/input.c:1882
 #: src/playlist/item.c:366 src/playlist/playlist.c:133
@@ -273,7 +157,7 @@ msgid ""
 "Use the settings of the \"freetype\" module to choose the font you  want VLC "
 "to use for text rendering (to display subtitles for example)."
 msgstr ""
-"Utilisez les parmaètres du module \"freetype\" pour choisir la police de "
+"Utilisez les paramètres du module « freetype » pour choisir la police de "
 "caractères que vous souhaitez utiliser dans VLC lors du rendu du texte (lors "
 "de l'affichage de sous-titres par exemple)."
 
@@ -369,7 +253,7 @@ msgid ""
 msgstr ""
 "Le mécanisme de flux de sortie permet à VLC d'agir comme serveur de "
 "diffusion ou de sauvegarder des flux entrants.\n"
-"Les flux sont multiplexés et envoyés dans un \"module de sortie\", "
+"Les flux sont multiplexés et envoyés dans un « module de sortie », "
 "permettant soit de sauvegarder le flux dans un fichier, soit de le diffuser "
 "(par UDP, HTTP, RTP/RTSP…)\n"
 "Les modules du flux de sortie permettent de réaliser du traitement sur le "
@@ -424,7 +308,7 @@ msgid ""
 "do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"Les empaqueteurs permettent de \"pré-traiter\" un flux élémentaire avant son "
+"Les empaqueteurs permettent de « pré-traiter » un flux élémentaire avant son "
 "multiplexage. Ce réglage vous permet de toujours forcer un empaqueteur. Ce "
 "n'est probablement pas souhaitable.\n"
 "Vous pouvez également régler les paramètres par défaut de chaque empaqueteur."
@@ -440,8 +324,8 @@ msgid ""
 "for each sout stream module here."
 msgstr ""
 "Les modules de flux de sortie vous permettent de bâtir une chaîne de "
-"traiment pour le flux de sortie. Merci de bien vouloir lire le \"Streaming "
-"Howto\" pour plus de détails. Vous pouvez configurer les options par défaut "
+"traiment pour le flux de sortie. Merci de bien vouloir lire le « Streaming "
+"Howto » pour plus de détails. Vous pouvez configurer les options par défaut "
 "pour chaque module de flux de sortie ici."
 
 #: include/vlc_config_cat.h:161 modules/services_discovery/sap.c:117
@@ -859,32 +743,32 @@ msgstr "Stéréo inversé"
 #: src/extras/getopt.c:638
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: l’option « %s » est ambiguë\n"
+msgstr "%s: l’option « %s » est ambiguë\n"
 
 #: src/extras/getopt.c:663
 #, c-format
 msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: l’option « --%s » n’accepte pas d’arguments\n"
+msgstr "%s: l’option « --%s » n’accepte pas d’arguments\n"
 
 #: src/extras/getopt.c:668
 #, c-format
 msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: l’option « %c%s » n’accepte pas d’arguments\n"
+msgstr "%s: l’option « %c%s » n’accepte pas d’arguments\n"
 
 #: src/extras/getopt.c:686 src/extras/getopt.c:859
 #, c-format
 msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: l’option « %s » requiert un argument\n"
+msgstr "%s: l’option « %s » requiert un argument\n"
 
 #: src/extras/getopt.c:715
 #, c-format
 msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: option non reconnue « --%s »\n"
+msgstr "%s: option non reconnue « --%s »\n"
 
 #: src/extras/getopt.c:719
 #, c-format
 msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: option non reconnue « %c%s »\n"
+msgstr "%s: option non reconnue « %c%s »\n"
 
 #: src/extras/getopt.c:745
 #, c-format
@@ -904,12 +788,12 @@ msgstr "%s: l’option nécessite un argument -- %c\n"
 #: src/extras/getopt.c:825
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: l’option « -W %s » est ambiguë\n"
+msgstr "%s: l’option « -W %s » est ambiguë\n"
 
 #: src/extras/getopt.c:843
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: l’option « -W %s » n’accepte pas d’argument\n"
+msgstr "%s: l’option « -W %s » n’accepte pas d’argument\n"
 
 #: src/input/control.c:278
 #, c-format
@@ -2393,8 +2277,8 @@ msgid ""
 "specified)"
 msgstr ""
 "Ceci permet de garder une instance unique du flux de sortie tout au long de "
-"la liste de lecture (insère automatiquement le module de flux de sortie « "
-"regroupement » si non spécifié)."
+"la liste de lecture (insère automatiquement le module de flux de sortie « "
+"regroupement » si non spécifié)."
 
 #: src/libvlc.h:571
 msgid "Preferred packetizer list"
@@ -2561,7 +2445,7 @@ msgid ""
 "Typical values are sap, hal, ..."
 msgstr ""
 "Vous permet de spécifier les modules de découverte de services à lancer, "
-"séparés par des « : ». Les valeurs courantes sont sap, hal…"
+"séparés par des « : ». Les valeurs courantes sont sap, hal…"
 
 #: src/libvlc.h:641
 msgid "Play files randomly forever"
@@ -6454,7 +6338,7 @@ msgid ""
 "playback."
 msgstr ""
 "Choisissez un numéro correspondant au numéro d’un périphérique audio, tel "
-"qu’il apparaît dans le menu « périphériques audio ». Ce périphérique sera "
+"qu’il apparaît dans le menu « périphériques audio ». Ce périphérique sera "
 "alors utilisé par défaut pour la lecture audio."
 
 #: modules/audio_output/auhal.c:102
@@ -6513,8 +6397,8 @@ msgid ""
 "One of \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be\", "
 "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\""
 msgstr ""
-"Un parmi \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be"
-"\", \"s16_be\", \"fixed32\", \"float32\" ou \"spdif\""
+"Un parmi « u8 », « s8 », « u16 », « s16 », « u16_le », « s16_le », « u16_be"
+"», « s16_be », « fixed32 », « float32 » ou « spdif »"
 
 #: modules/audio_output/file.c:84
 msgid "Output channels number"
@@ -7920,7 +7804,7 @@ msgstr "Interface de commande à distance"
 #: modules/control/rc.c:303
 msgid "Remote control interface initialized, `h' for help\n"
 msgstr ""
-"Interface de commande à distance initialisée, « h » pour obtenir de l’aide.\n"
+"Interface de commande à distance initialisée, « h » pour obtenir de l’aide.\n"
 
 #: modules/control/rc.c:684
 msgid "+----[ Remote control commands ]\n"
@@ -7980,7 +7864,7 @@ msgstr "| chapter_p  . . .  chapitre précédant dans l’item\n"
 
 #: modules/control/rc.c:700
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
-msgstr "| seek X .  déplacement en secondes, ex. « seek 12 »\n"
+msgstr "| seek X .  déplacement en secondes, ex. « seek 12 »\n"
 
 #: modules/control/rc.c:701
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause\n"
@@ -8175,7 +8059,7 @@ msgstr "+----[ fin de l’aide ]\n"
 #: modules/control/rc.c:788
 #, c-format
 msgid "unknown command `%s', type `help' for help\n"
-msgstr "commande inconnue « %s », tapez « help » pour obtenir de l’aide\n"
+msgstr "commande inconnue « %s », tapez « help » pour obtenir de l’aide\n"
 
 #: modules/control/showintf.c:62
 msgid "Threshold"
@@ -10422,7 +10306,7 @@ msgid ""
 "and this screen will be used by default as the screen for 'fullscreen'."
 msgstr ""
 "Indiquez un numéro correspondant à un écran dans le menu de sélection Vidéo "
-"et cet écran sera utilisé a priori comme écran pour le « plein écran »."
+"et cet écran sera utilisé a priori comme écran pour le « plein écran »."
 
 #: modules/gui/macosx/macosx.m:55
 msgid "Opaqueness"
@@ -10679,7 +10563,7 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:662
 msgid "Some options are available but hidden. Check \"Advanced\" to see them."
 msgstr ""
-"Certaines options sont cachées. Cochez \"Options avancées\" pour les voir"
+"Certaines options sont cachées. Cochez « Options avancées » pour les voir."
 
 #: modules/gui/macosx/prefs_widgets.m:1216
 msgid "Select a directory"
@@ -12015,7 +11899,7 @@ msgid ""
 "Some options are available but hidden. Check \"Advanced options\" to see "
 "them."
 msgstr ""
-"Des options sont cachés. Cliquez sur \"Options avancées\" pour les voir."
+"Des options sont cachés. Cliquez sur « Options avancées » pour les voir."
 
 #: modules/gui/wxwindows/preferences_widgets.cpp:206
 msgid "Alt"
@@ -13741,7 +13625,7 @@ msgstr "Fichiers"
 
 #: modules/stream_out/switcher.c:83
 msgid "Full paths of the files separated by colons."
-msgstr "Chemin complets des fichiers séparés par des « : »"
+msgstr "Chemin complets des fichiers séparés par des « : »"
 
 #: modules/stream_out/switcher.c:84
 msgid "Sizes"
@@ -13749,7 +13633,7 @@ msgstr "Tailles"
 
 #: modules/stream_out/switcher.c:86
 msgid "List of sizes separated by colons (720x576:480x576)."
-msgstr "Liste des tailles séparées par des « : » (720x576:480x576)."
+msgstr "Liste des tailles séparées par des « : » (720x576:480x576)."
 
 #: modules/stream_out/switcher.c:87
 msgid "Aspect ratio"
@@ -14585,7 +14469,7 @@ msgstr "Type de transformation"
 
 #: modules/video_filter/transform.c:58
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
-msgstr "Choisir parmi « 90 », « 180 », « 270 », « hflip » et « vflip »"
+msgstr "Choisir parmi « 90 », « 180 », « 270 », « hflip » et « vflip »"
 
 #: modules/video_filter/transform.c:61
 msgid "Rotate by 90 degrees"
@@ -14714,7 +14598,7 @@ msgid ""
 msgstr ""
 "Dans une configuration à plusieurs moniteurs, vous pouvez spécifier le nom "
 "du périphérique Windows correspondant au moniteur sur lequel vous désirez "
-"avoir la vidéo. Par exemple, \"\\\\.\\DISPLAY 1\" ou \"\\\\.\\DISPLAY 2\"."
+"avoir la vidéo. Par exemple, « \\\\.\\DISPLAY 1 » ou « \\\\.\\DISPLAY 2 »."
 
 #: modules/video_output/directx/directx.c:134
 msgid "Enable wallpaper mode "
