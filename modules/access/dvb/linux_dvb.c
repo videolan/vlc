@@ -1163,8 +1163,46 @@ int E_(CAMOpen)( access_t *p_access )
         return VLC_EGENERIC;
     }
 
-    if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0
-          || caps.slot_num == 0 || !(caps.slot_type & CA_CI_LINK) )
+    if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0 )
+    {
+        msg_Err( p_access, "CAMInit: ioctl() error getting CAM capabilities" );
+        close( p_sys->i_ca_handle );
+        p_sys->i_ca_handle = 0;
+        return VLC_EGENERIC;
+    }
+
+    /* Output CA capabilities */
+    msg_Dbg( p_access, "CAMInit: CA interface with %d %s", caps.slot_num, 
+        caps.slot_num == 1 ? "slot" : "slots" );
+    if ( caps.slot_type & CA_CI )
+        msg_Dbg( p_access, "CAMInit: CI high level interface type (not supported)" );
+    if ( caps.slot_type & CA_CI_LINK )
+        msg_Dbg( p_access, "CAMInit: CI link layer level interface type" );
+    if ( caps.slot_type & CA_CI_PHYS )
+        msg_Dbg( p_access, "CAMInit: CI physical layer level interface type (not supported) " );
+    if ( caps.slot_type & CA_DESCR )
+        msg_Dbg( p_access, "CAMInit: built-in descrambler detected" );
+    if ( caps.slot_type & CA_SC )
+        msg_Dbg( p_access, "CAMInit: simple smart card interface" );
+
+    msg_Dbg( p_access, "CAMInit: %d available %s", caps.descr_num,
+        caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
+    if ( caps.descr_type & CA_ECD )
+        msg_Dbg( p_access, "CAMInit: ECD scrambling system supported" );
+    if ( caps.descr_type & CA_NDS )
+        msg_Dbg( p_access, "CAMInit: NDS scrambling system supported" );
+    if ( caps.descr_type & CA_DSS )
+        msg_Dbg( p_access, "CAMInit: DSS scrambling system supported" );
+ 
+    if ( caps.slot_num == 0 )
+    {
+        msg_Err( p_access, "CAMInit: CAM module with no slots" );
+        close( p_sys->i_ca_handle );
+        p_sys->i_ca_handle = 0;
+        return VLC_EGENERIC;
+    }
+
+    if ( !(caps.slot_type & CA_CI_LINK) )
     {
         msg_Err( p_access, "CAMInit: no compatible CAM module" );
         close( p_sys->i_ca_handle );
@@ -1182,9 +1220,6 @@ int E_(CAMOpen)( access_t *p_access )
             msg_Err( p_access, "CAMInit: couldn't reset slot %d", i_slot );
         }
     }
-
-    msg_Dbg( p_access, "CAMInit: found a CI handler with %d slots",
-             p_sys->i_nb_slots );
 
     p_sys->i_ca_timeout = 100000;
     /* Wait a bit otherwise it doesn't initialize properly... */
