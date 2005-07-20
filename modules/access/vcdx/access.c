@@ -692,7 +692,8 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
       if (p_vcdplayer->b_track_length) 
       {
 	p_access->info.i_size = p_vcdplayer->p_title[i_track-1]->i_size;
-	p_access->info.i_pos  = (int64_t) i_lsn * M2F2_SECTOR_SIZE;
+	p_access->info.i_pos  = (int64_t) M2F2_SECTOR_SIZE *
+	  (vcdinfo_get_track_lsn(p_vcdplayer->vcd, i_track) - i_lsn) ;
       } else {
 	p_access->info.i_size = M2F2_SECTOR_SIZE * (int64_t)
 	  vcdinfo_get_entry_sect_count(p_vcdplayer->vcd, p_itemid->num);
