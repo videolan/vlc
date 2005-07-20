@@ -342,6 +342,8 @@ vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
   p_vcdplayer->i_track        = i_track;
   p_vcdplayer->track_lsn      = vcdinfo_get_track_lsn(p_vcdplayer->vcd, 
 						      i_track);
+  p_vcdplayer->track_end_lsn  = p_vcdplayer->track_lsn + 
+    vcdinfo_get_track_sect_count(p_vcdplayer->vcd, i_track);
 
   dbg_print((INPUT_DBG_CALL|INPUT_DBG_LSN), 
 	    "lsn %u, end LSN: %u item.num %d, item.type %d", 
