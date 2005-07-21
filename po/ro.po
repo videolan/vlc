@@ -1,5 +1,6 @@
 # Romanian translations for vlc package.
-# Copyright (C) 2005 VideoLAN
+# Copyright (C) 2005 the VideoLAN team
+# $Id$
 # This file is distributed under the same license as the vlc package.
 # Circo Radu <circo.radusorin@gmail.com>, 2005.
 #
