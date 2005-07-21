@@ -28,8 +28,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface VLCWizard : NSObject
-{
-    /* general items */
+{	
+	/* general items */
 	IBOutlet id o_btn_backward;
     IBOutlet id o_btn_cancel;
     IBOutlet id o_btn_forward;
@@ -142,7 +142,8 @@
 	NSArray * o_videoCodecs;
 	NSArray * o_audioCodecs;
 	NSArray * o_encapFormats;
-	NSString * o_mrl;
+	NSArray * o_strmgMthds;
+	NSString * o_opts;
 }
 - (IBAction)cancelRun:(id)sender;
 - (IBAction)nextTab:(id)sender;
@@ -169,5 +170,5 @@
 - (void)showWizard;
 - (void)showSummary;
 - (void)resetWizard;
-- (void)createMrl;
+- (void)createOpts;
 @end
