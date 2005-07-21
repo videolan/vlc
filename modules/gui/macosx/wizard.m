@@ -237,14 +237,14 @@ static VLCWizard *_o_sharedInstance = nil;
 	[o_btn_forward setTitle: [_NS("Next") stringByAppendingString:@" >"]];
 	
 	/* "Input" */
-	[o_t2_fld_pathToStrm setStringValue: @""];
+	[o_t2_fld_pathToNewStrm setStringValue: @""];
 	[o_t2_ckb_enblPartExtrct setState: NSOffState];
 	[self t2_enableExtract:nil];
 	[o_t2_matrix_inputSourceType selectCellAtRow:0 column:0];
 	[[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setState: NSOffState];
 	/* FIXME: we need to refresh the playlist-table as well */
 	[o_t2_tbl_plst setEnabled:NO];
-	[o_t2_fld_pathToStrm setEnabled:YES];
+	[o_t2_fld_pathToNewStrm setEnabled:YES];
 	[o_t2_btn_chooseFile setEnabled:YES];
 	
 	/* "Streaming 1" */
@@ -399,12 +399,12 @@ static VLCWizard *_o_sharedInstance = nil;
 		if( [o_mode isEqualToString: _NS("Select a stream")] )
 		{
 			[o_userSelections setObject:@"YES" forKey:@"newStrm"];
-			if ([[o_t2_fld_pathToStrm stringValue] isEqualToString: @""])
+			if ([[o_t2_fld_pathToNewStrm stringValue] isEqualToString: @""])
 			{
                 /* set a flag that no file is selected */
 				stop = YES;
 			}else{
-				[o_userSelections setObject:[o_t2_fld_pathToStrm stringValue] forKey:@"pathToStrm"];
+				[o_userSelections setObject:[o_t2_fld_pathToNewStrm stringValue] forKey:@"pathToStrm"];
 			}
 		}else{
 			if ([o_t2_tbl_plst selectedRow] != -1)
@@ -1104,7 +1104,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     if (returnCode == NSOKButton)
     {
-        [o_t2_fld_pathToStrm setStringValue:[sheet filename]];
+        [o_t2_fld_pathToNewStrm setStringValue:[sheet filename]];
     }
 }
 
@@ -1117,11 +1117,11 @@ static VLCWizard *_o_sharedInstance = nil;
 	if( [o_mode isEqualToString: _NS("Select a stream")] )
     {
 		[o_t2_btn_chooseFile setEnabled:YES];
-		[o_t2_fld_pathToStrm setEnabled:YES];
+		[o_t2_fld_pathToNewStrm setEnabled:YES];
 		[o_t2_tbl_plst setEnabled:NO];
 	} else {
 		[o_t2_btn_chooseFile setEnabled:NO];
-		[o_t2_fld_pathToStrm setEnabled:NO];
+		[o_t2_fld_pathToNewStrm setEnabled:NO];
 		[o_t2_tbl_plst setEnabled:YES];
 	}
 }
