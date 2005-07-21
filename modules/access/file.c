@@ -422,6 +422,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         else if ( p_sys->file[i_file]->i_size != stat_info.st_size )
         {
             p_access->info.i_size += (stat_info.st_size - p_sys->file[i_file]->i_size );
+            p_sys->file[i_file]->i_size = stat_info.st_size;
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
     }
