@@ -31,9 +31,13 @@
 #elif defined( WIN32 )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#elif HAVE_SYS_SOCKET_H
+#else
+#   include <netdb.h>
+#if HAVE_SYS_SOCKET_H
 #   include <sys/socket.h>
 #endif
+#endif
+
 
 /*****************************************************************************
  * network_socket_t: structure passed to a network plug-in to define the
@@ -455,5 +459,58 @@ VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );
 VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, int *, int ) );
 VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );
 VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
+
+/*****************************************************************************
+ * net_AddressIsMulticast: This function returns VLC_FALSE if the psz_addr does
+ * not specify a multicast address or if the address is not a valid address.
+ * FIXME: Only the first returned address is checked. This might be problematic.
+ *****************************************************************************/
+static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, char *psz_addr )
+{
+    struct addrinfo hints, *res;
+    vlc_bool_t b_multicast = VLC_FALSE;
+    int i;
+
+    if( psz_addr == NULL )
+    {
+        msg_Err( p_object, "*FIXME* Unexpected NULL URI for net_AddressIsMulticast" );
+        msg_Err( p_object, "This should not happen. VLC needs fixing." );
+        return VLC_FALSE;
+    }
+    
+    memset( &hints, 0, sizeof( hints ) );
+    hints.ai_socktype = SOCK_DGRAM; /* UDP */
+    hints.ai_flags = AI_NUMERICHOST;
+
+    i = vlc_getaddrinfo( p_object, psz_addr, 0,
+                         &hints, &res );
+    /*if( i == 0 )
+        i = vlc_getnameinfo( res->ai_addr, res->ai_addrlen, psz_buf,
+                             sizeof( psz_buf ), NULL, NI_NUMERICHOST );*/
+    if( i )
+    {
+        msg_Err( p_object, "Invalid node for net_AddressIsMulticast: %s : %s",
+                 psz_addr, vlc_gai_strerror( i ) );
+        return b_multicast;
+    }
+    
+    if( res->ai_family == AF_INET )
+    {
+#if !defined( SYS_BEOS )
+        struct sockaddr_in *v4 = (struct sockaddr_in *) res->ai_addr;
+        b_multicast = ( ntohl( v4->sin_addr.s_addr ) > 0xe1000000 && ntohl( v4->sin_addr.s_addr ) <= 0xEFFFFFFF );
+#endif
+    }
+    else if( res->ai_family == AF_INET6 )
+    {
+#if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
+        struct sockaddr_in6 *v6 = (struct sockaddr_in6 *) res->ai_addr;
+        b_multicast = IN6_IS_ADDR_MULTICAST( &v6->sin6_addr);
+#endif
+    }
+    
+    vlc_freeaddrinfo( res );
+    return b_multicast;
+}
 
 #endif

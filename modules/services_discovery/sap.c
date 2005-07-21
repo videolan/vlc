@@ -264,8 +264,6 @@ struct demux_sys_t
 #endif
     static void FreeSDP( sdp_t *p_sdp );
 
-/* Detect multicast addresses */
-static vlc_bool_t ismult( char * );
 
 #define FREE( p ) \
     if( p ) { free( p ); (p) = NULL; }
@@ -1036,7 +1034,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         i_port = 1234;
     }
 
-    if( ismult( psz_uri ) )
+    if( net_AddressIsMulticast( p_obj, psz_uri ) )
     {
         asprintf( &p_sdp->psz_uri, "%s://@%s:%i", psz_proto, psz_uri, i_port );
     }
@@ -1297,32 +1295,6 @@ static char *convert_from_utf8( struct services_discovery_t *p_sd,
 
     *psz_out = '\0';
     return psz_local;
-}
-
-
-/***********************************************************************
- * ismult: returns true if we have a multicast address
- ***********************************************************************/
-static vlc_bool_t ismult( char *psz_uri )
-{
-    char *psz_end;
-    int  i_value;
-
-    /* IPv6 */
-    if( psz_uri[0] == '[')
-    {
-      if( strncasecmp( &psz_uri[1], "FF0" , 3) ||
-          ( !isalnum( psz_uri[1]) && strncasecmp( &psz_uri[2], "FF0" , 3) ) )
-            return( VLC_TRUE );
-        else
-            return( VLC_FALSE );
-    }
-    
-    i_value = strtol( psz_uri, &psz_end, 0 );
-
-    if( *psz_end != '.' ) { return( VLC_FALSE ); }
-
-    return ( ( i_value < 224 ) || ( i_value >= 240 ) ) ? VLC_FALSE : VLC_TRUE;
 }
 
 static int InitSocket( services_discovery_t *p_sd, char *psz_address,

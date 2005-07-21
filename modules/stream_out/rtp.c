@@ -392,6 +392,7 @@ static int Open( vlc_object_t *p_this )
 
         char *psz_rtpmap;
         char access[100];
+        char psz_ttl[100];
         char url[p_sys->psz_destination ? strlen( p_sys->psz_destination ) + 1 + 12+1 : 14];
 
         /* Check muxer type */
@@ -465,7 +466,6 @@ static int Open( vlc_object_t *p_this )
            o= don't use the localhost address. use fully qualified domain name or IP4 address
            p= international phone number (pass via vars?)
            c= IP6 support
-           c= /ttl should only be added in case of multicast
            a= recvonly (missing)
            a= type:broadcast (missing)
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
@@ -477,6 +477,16 @@ static int Open( vlc_object_t *p_this )
                     10 + strlen( p_sys->psz_session_email ) + 10 + strlen( p_sys->psz_destination ) +
                     10 + 10 + strlen( PACKAGE_STRING ) +
                     20 + 10 + 20 + 10 + strlen( psz_rtpmap ) );
+
+        if( net_AddressIsMulticast( (vlc_object_t *)p_stream, p_sys->psz_destination ) )
+        {
+            sprintf( psz_ttl, "/%d", p_sys->i_ttl );
+        }
+        else
+        {
+            psz_ttl[0] = '\0'; 
+        }
+
         sprintf( p_sys->psz_sdp,
                  "v=0\r\n"
                  "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
@@ -486,7 +496,7 @@ static int Open( vlc_object_t *p_this )
                  "e=%s\r\n"
                  "t=0 0\r\n" /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
                  "a=tool:"PACKAGE_STRING"\r\n"
-                 "c=IN IP4 %s/%d\r\n"
+                 "c=IN IP4 %s%s\r\n"
                  "m=video %d RTP/AVP %d\r\n"
                  "a=rtpmap:%d %s\r\n",
                  p_sys->i_sdp_id, p_sys->i_sdp_version,
@@ -494,7 +504,7 @@ static int Open( vlc_object_t *p_this )
                  p_sys->psz_session_description,
                  p_sys->psz_session_url,
                  p_sys->psz_session_email,
-                 p_sys->psz_destination, p_sys->i_ttl,
+                 p_sys->psz_destination, psz_ttl,
                  p_sys->i_port, p_sys->i_payload_type,
                  p_sys->i_payload_type, psz_rtpmap );
         fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
@@ -695,7 +705,6 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
            o= don't use the localhost address. use fully qualified domain name or IP4 address
            p= international phone number (pass via vars?)
            c= IP6 support
-           c= /ttl should only be added in case of multicast
            a= recvonly (missing)
            a= type:broadcast (missing)
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
@@ -753,8 +762,17 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
-    p += sprintf( p, "c=IN IP4 %s/%d\r\n", psz_destination ? psz_destination : "0.0.0.0",
-                  p_sys->i_ttl );
+    p += sprintf( p, "c=IN IP4 %s", psz_destination ? psz_destination : "0.0.0.0" );
+
+    if( net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ? psz_destination : "0.0.0.0" ) )
+    {
+        /* Add the ttl if it is a multicast address */
+        p += sprintf( p, "/%d\r\n", p_sys->i_ttl );
+    }
+    else
+    {
+        p += sprintf( p, "\r\n" );
+    }
 
     for( i = 0; i < p_sys->i_es; i++ )
     {

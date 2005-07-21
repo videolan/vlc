@@ -1016,8 +1016,17 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
     p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
-    p += sprintf( p, "c=IN IP4 %s/%d\r\n", psz_destination ?
-                  psz_destination : "0.0.0.0", p_media->i_ttl );
+    p += sprintf( p, "c=IN IP4 %s", psz_destination ?  psz_destination : "0.0.0.0" );
+
+    if( net_AddressIsMulticast( p_media, psz_destination ?  psz_destination : "0.0.0.0" ) )
+    {
+        /* Add the ttl if it is a multicast address */
+	p += sprintf( p, "/%d\r\n", p_media->i_ttl );
+    }
+    else
+    {
+        p += sprintf( p, "\r\n" );
+    }
 
     if( p_media->i_length > 0 )
     p += sprintf( p, "a=range:npt=0-%.3f\r\n",
