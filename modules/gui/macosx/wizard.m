@@ -134,7 +134,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t4_pop_videoCodec addItemWithTitle:[[o_videoCodecs objectAtIndex:x] objectAtIndex:0]];
         x = (x + 1);
     }
-    
+
     NSArray * o_mpga;
     NSArray * o_mp3;
     NSArray * o_mp4a;
@@ -163,8 +163,8 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t4_pop_audioCodec addItemWithTitle:[[o_audioCodecs objectAtIndex:x] objectAtIndex:0]];
         x = (x + 1);
     }
-    
-    
+
+
     /* fill another global array with all information about the encap-formats
      * note that the order of the formats inside the g. array is the same as on
      * the encap-tab */
@@ -189,7 +189,7 @@ static VLCWizard *_o_sharedInstance = nil;
     o_mov = [NSArray arrayWithObjects: @"mov", @"MOV", @"MOV", nil];
     o_wav = [NSArray arrayWithObjects: @"wav", @"WAV", @"WAV", nil];
     o_encapFormats = [[NSArray alloc] initWithObjects: o_ps, o_ts, o_mpeg, o_ogg, o_raw, o_asf, o_avi, o_mp4, o_mov, o_wav, nil];
-    
+
     /* yet another array on streaming methods including help texts */
     NSArray * o_http;
     NSArray * o_udp_uni;
@@ -220,7 +220,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_tab_pageHolder selectFirstTabViewItem:self];
 
     [self resetWizard];
-    
+
     [o_wizard_window center];
     [o_wizard_window displayIfNeeded];
     [o_wizard_window makeKeyAndOrderFront:nil];
@@ -229,12 +229,12 @@ static VLCWizard *_o_sharedInstance = nil;
 - (void)resetWizard
 {
     /* reset the wizard-window to its default values */
-    
+
     [o_userSelections removeAllObjects];
     [o_t1_matrix_strmgOrTrnscd selectCellAtRow:0 column:0];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setState: NSOffState];
     [o_btn_forward setTitle: _NS("Next")];
-    
+
     /* "Input" */
     [o_t2_fld_pathToNewStrm setStringValue: @""];
     [o_t2_ckb_enblPartExtrct setState: NSOffState];
@@ -245,24 +245,24 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t2_tbl_plst setEnabled:NO];
     [o_t2_fld_pathToNewStrm setEnabled:YES];
     [o_t2_btn_chooseFile setEnabled:YES];
-    
+
     /* "Streaming 1" */
     [o_t3_fld_address setStringValue: @""];
     [o_t3_matrix_stmgMhd selectCellAtRow:0 column:0];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setState: NSOffState];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:2] setState: NSOffState];
-    
+
     /* "Transcode 1" */
     [o_t4_ckb_audio setState: NSOffState];
     [o_t4_ckb_video setState: NSOffState];
     [self t4_enblVidTrnscd:nil];
     [self t4_enblAudTrnscd:nil];
-    
+
     /* "Streaming 2" */
     [o_t6_fld_ttl setStringValue: @"1"];
     [o_t6_ckb_sap setState: NSOffState];
     [self t6_enblSapAnnce:nil];
-    
+
     /* "Transcode 2" */
     [o_t7_fld_filePath setStringValue: @""];
 }
@@ -349,7 +349,7 @@ static VLCWizard *_o_sharedInstance = nil;
                               "additionnal parameters for your transcoding.")];
     [o_t7_txt_saveFileTo setStringValue: _NS("Select the file to save to")];
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
-    
+
     /* page eight ("Summary") */
     [o_t8_txt_text setStringValue: _NS("This page lists all your selections. " \
         "Click \"Finish\" to start your streaming or transcoding.")];
@@ -363,7 +363,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t8_txt_strmgMthd setStringValue: [_NS("Streaming method") stringByAppendingString: @":"]];
     [o_t8_txt_trnscdAudio setStringValue: [_NS("Transcode audio") stringByAppendingString: @":"]];
     [o_t8_txt_trnscdVideo setStringValue: [_NS("Transcode video") stringByAppendingString: @":"]];
-    
+
     /* wizard help window */
     [o_wh_btn_okay setTitle: _NS("OK")];
 }
@@ -401,7 +401,7 @@ static VLCWizard *_o_sharedInstance = nil;
         }else{
             [o_userSelections setObject:@"NO" forKey:@"partExtract"];
         }
-        
+
         /* check whether we use an existing pl-item or add an new one;
          * store the path or the index and set a flag.
          * complain to the user if s/he didn't provide a path */
@@ -428,7 +428,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 stop = YES;
             }
         }
-        
+
         /* show either "Streaming 1" or "Transcode 1" to the user */
         if (stop == NO)
         {
@@ -488,13 +488,13 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
             [o_t5_matrix_encap selectCellAtRow:1 column:0];
         }
-        
+
         /* store the destination and check whether is it empty */
         if(! [o_mode isEqualToString: @"HTTP"] )
-        {    
+        {
             /* empty field is valid for HTTP */
             if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
-            {    
+            {
                 /* complain to the user that "" is no valid dest. */
                 NSBeginInformationalAlertSheet(_NS("No valid destination"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You need to enter " \
                 "a valid destination you want to stream to. Enter either a " \
@@ -526,7 +526,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             [o_userSelections setObject:@"NO" forKey:@"trnscdVideo"];
         }
-        
+
         /* check whether the user wants to transcode the audio-track and store the related options */
         if ([o_t4_ckb_audio state] == NSOnState)
         {
@@ -538,7 +538,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             [o_userSelections setObject:@"NO" forKey:@"trnscdAudio"];
         }
-        
+
         /* disable all encap-formats */
         [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
         [[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:NO];
@@ -550,11 +550,11 @@ static VLCWizard *_o_sharedInstance = nil;
         [[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
         [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
         [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
-        
+
         /* re-enable the encap-formats supported by the chosen codecs */
         /* FIXME: the following is a really bad coding-style. feel free to mail
             me ideas how to make this nicer, if you want to -- FK, 7/11/05 */
-        
+
         if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualTo: @"YES"])
         {
             if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualTo: @"YES"])
@@ -640,11 +640,11 @@ static VLCWizard *_o_sharedInstance = nil;
                         [o_t5_matrix_encap selectCellAtRow:9 column:0];
                     }
                 }
-                
+
             } else {
-                
+
                 /* we just transcoding the audio */
-                
+
                 /* select formats supported by the audio codec */
                 if ([[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] containsObject: @"MUX_PS"])
                 {
@@ -701,9 +701,9 @@ static VLCWizard *_o_sharedInstance = nil;
         else if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualTo: @"YES"])
         {
             /* we are just transcoding the video */
-            
+
             /* select formats supported by the video-codec */
-        
+
             if ([[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] intValue]] containsObject: @"MUX_PS"])
             {
                 [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
@@ -759,7 +759,7 @@ static VLCWizard *_o_sharedInstance = nil;
              * -> enabled the encap-formats allowed when streaming content via http
              * since this should work fine in most cases */
             /* FIXME: choose a selection of encap-formats based upon the actually used codecs */
-                        
+
             /* enable MPEG PS, MPEG TS, MPEG 1, OGG, RAW and ASF; select MPEG PS */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
             [[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
@@ -780,9 +780,9 @@ static VLCWizard *_o_sharedInstance = nil;
         while (x != [o_t5_matrix_encap numberOfRows])
         {
             if ([[o_t5_matrix_encap cellAtRow:x column:0] isEnabled])
-            {    
+            {
                 anythingEnabled = YES;
-            }    
+            }
             x = (x + 1);
         }
         if (anythingEnabled == YES)
@@ -795,7 +795,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 "mix uncompressed audio with any video codec.\n\n" \
                 "Correct your selection and try again."));
         }
-        
+
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Encap"])
     {
@@ -803,7 +803,7 @@ static VLCWizard *_o_sharedInstance = nil;
         NSNumber * theNum;
         theNum = [NSNumber numberWithInt:[[o_t5_matrix_encap selectedCell] tag]];
         [o_userSelections setObject:[theNum stringValue] forKey:@"encapFormat"];
-        
+
         /* show either "Streaming 2" or "Transcode 2" to the user */
         if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
         {
@@ -818,7 +818,7 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         /* store the chosen TTL */
         [o_userSelections setObject:[o_t6_fld_ttl stringValue] forKey:@"ttl"];
-        
+
         /* check whether SAP is enabled and store the announce, if needed */
         if ([o_t6_ckb_sap state] == NSOnState)
         {
@@ -827,7 +827,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             [o_userSelections setObject:@"NO" forKey:@"sap"];
         }
-        
+
         /* go to "Summary" */
         [self showSummary];
     }
@@ -835,14 +835,14 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         /* check whether the path != "" and store it */
         if( [[o_t7_fld_filePath stringValue] isEqualToString: @""] )
-        {    
+        {
             /* complain to the user that "" is no valid path */
             NSBeginInformationalAlertSheet(_NS("No file selected"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You you need to select a file, you want to save to. " \
                 "\n\n Enter either a valid path or choose a location through " \
                 "the button's dialog-box."));
         } else {
             [o_userSelections setObject:[o_t7_fld_filePath stringValue] forKey:@"trnscdFilePath"];
-            
+
             /* go to "Summary" */
             [self showSummary];
         }
@@ -857,7 +857,7 @@ static VLCWizard *_o_sharedInstance = nil;
         {
             playlist_item_t *p_item = playlist_ItemNew( p_playlist, [[o_userSelections objectForKey:@"pathToStrm"] UTF8String], _("Streaming/Transcoding Wizard") );
             playlist_ItemAddOption( p_item, [[o_userSelections objectForKey:@"opts"] UTF8String]);
-            
+
             if(! [[o_userSelections objectForKey:@"partExtractFrom"] isEqualToString:@""] )
             {
                 playlist_ItemAddOption( p_item, [[@"start-time=" stringByAppendingString: [o_userSelections objectForKey:@"partExtractFrom"]] UTF8String] );
@@ -867,20 +867,20 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 playlist_ItemAddOption( p_item, [[@"stop-time=" stringByAppendingString: [o_userSelections objectForKey:@"partExtractTo"]] UTF8String] );
             }
-            
+
             playlist_ItemAddOption( p_item, [[@"ttl=" stringByAppendingString: [o_userSelections objectForKey:@"ttl"]] UTF8String] );
-                        
+
             playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
-            
+
             msg_Warn(p_intf, "updating the playlist-table is not implemented!");
-            
+
             playlist_ViewUpdate( p_playlist, VIEW_CATEGORY );
-            
+
             vlc_object_release(p_playlist);
         } else {
             msg_Err( p_intf, "Uh Oh! Unable to find playlist!" );
         }
-        
+
         /* close the window, since we are done */
         [o_wizard_window close];
     }
@@ -890,14 +890,14 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     [o_btn_forward setTitle: _NS("Finish")];
     [o_t8_fld_inptStream setStringValue:[o_userSelections objectForKey:@"pathToStrm"]];
-    
+
     if ([[o_userSelections objectForKey:@"partExtract"] isEqualToString: @"YES"])
     {
         [o_t8_fld_partExtract setStringValue: [[[[[_NS("yes") stringByAppendingString:@" - "] stringByAppendingString: _NS("from ")] stringByAppendingString: [o_userSelections objectForKey:@"partExtractFrom"]] stringByAppendingString: _NS(" to ")] stringByAppendingString: [o_userSelections objectForKey:@"partExtractTo"]]];
     } else {
         [o_t8_fld_partExtract setStringValue: _NS("no")];
     }
-    
+
     if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
     {
         /* we are streaming; no transcoding allowed atm */
@@ -934,17 +934,17 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_saveFileTo setStringValue: [o_userSelections objectForKey:@"trnscdFilePath"]];
     }
     [o_t8_fld_encapFormat setStringValue: [[o_encapFormats objectAtIndex:[[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:1]];
-    
+
     [self createOpts];
     [o_t8_fld_mrl setStringValue: [o_userSelections objectForKey:@"opts"]];
-    
+
     [o_tab_pageHolder selectTabViewItemAtIndex:7];
 }
 
 - (void) createOpts
 {
     NSMutableString * o_opts_string = [NSMutableString stringWithString:@""];
-    
+
     if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"trnscd"])
     {
         /* we are just transcoding and dumping the stuff to a file */
@@ -971,9 +971,9 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_trnscdCmd appendFormat: @"acodec=%s,ab=%i}:", [[[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections objectForKey:@"trnscdAudioBitrate"] intValue]];
         }
         [o_opts_string appendFormat: @":sout=#%sstandard{mux=%s,url=%s,access=file}", [o_trnscdCmd UTF8String], [[[o_encapFormats objectAtIndex:[[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:0] UTF8String], [[o_userSelections objectForKey:@"trnscdFilePath"] UTF8String]];
-    
+
     } else {
-        
+
         /* we are streaming - no transcoding allowed atm, since we mirror the wx-wizard */
         if ([[o_userSelections objectForKey:@"sap"] isEqualToString:@"YES"])
         {
@@ -990,15 +990,15 @@ static VLCWizard *_o_sharedInstance = nil;
             /* no SAP, just streaming */
             [o_opts_string appendFormat: @":sout=#standard{mux=%s,url=%s,access=%s}", [[[o_encapFormats objectAtIndex:[[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:0] UTF8String], [[o_userSelections objectForKey:@"stmgDest"] UTF8String], [[[o_strmgMthds objectAtIndex:[[o_userSelections objectForKey:@"stmgMhd"] intValue]] objectAtIndex:0] UTF8String]];
         }
-    }    
-    
+    }
+
     [o_userSelections setObject:o_opts_string forKey:@"opts"];
 }
 
 - (IBAction)prevTab:(id)sender
 {
     if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Summary"])
-    {    
+    {
         /* check whether we are streaming or transcoding and go back */
         if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
         {
@@ -1101,7 +1101,7 @@ static VLCWizard *_o_sharedInstance = nil;
     /* enable and disable the respective items depending on user's choice */
     NSString *o_mode;
     o_mode = [[o_t2_matrix_inputSourceType selectedCell] title];
-    
+
     if( [o_mode isEqualToString: _NS("Select a stream")] )
     {
         [o_t2_btn_chooseFile setEnabled:YES];
