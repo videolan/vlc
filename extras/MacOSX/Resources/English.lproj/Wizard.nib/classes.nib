@@ -1,6 +1,18 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = VLCPlaylistCommon; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = VLCPlaylistWizard; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_outline_view" = id; 
+                "o_tc_author" = id; 
+                "o_tc_duration" = id; 
+                "o_tc_name" = id; 
+            }; 
+            SUPERCLASS = VLCPlaylistCommon; 
+        }, 
         {
             ACTIONS = {
                 cancelRun = id; 
@@ -29,6 +41,7 @@
                 "o_btn_backward" = id; 
                 "o_btn_cancel" = id; 
                 "o_btn_forward" = id; 
+                "o_playlist_wizard" = id; 
                 "o_t1_btn_mrInfo_strmg" = id; 
                 "o_t1_btn_mrInfo_trnscd" = id; 
                 "o_t1_matrix_strmgOrTrnscd" = id; 

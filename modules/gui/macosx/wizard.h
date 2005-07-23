@@ -39,6 +39,7 @@
     IBOutlet id o_wh_txt_title;
     IBOutlet id o_wh_txt_text;
     IBOutlet id o_wh_btn_okay;
+    IBOutlet id o_playlist_wizard;
     
     /* page one ("Hello") */
     IBOutlet id o_t1_btn_mrInfo_strmg;

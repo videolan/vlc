@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * VLCPlaylistView interface 
+ * VLCPlaylistView interface
  *****************************************************************************/
 @interface VLCPlaylistView : NSOutlineView
 {
@@ -32,18 +32,44 @@
 @end
 
 /*****************************************************************************
- * VLCPlaylist interface 
+ * VLCPlaylistCommon interface
  *****************************************************************************/
-@interface VLCPlaylist : NSObject
+@interface VLCPlaylistCommon : NSObject
+{
+    IBOutlet id o_tc_name;
+    IBOutlet id o_tc_author;
+    IBOutlet id o_tc_duration;
+    IBOutlet id o_outline_view;
+
+    int i_current_view;
+}
+
+- (void)initStrings;
+- (playlist_item_t *)selectedPlaylistItem;
+- (NSOutlineView *)outlineView;
+
+@end
+
+/*****************************************************************************
+ * VLCPlaylistWizard interface
+ *****************************************************************************/
+@interface VLCPlaylistWizard : VLCPlaylistCommon
+{
+}
+
+- (IBAction)reloadOutlineView;
+
+@end
+
+/*****************************************************************************
+ * VLCPlaylist interface
+ *****************************************************************************/
+@interface VLCPlaylist : VLCPlaylistCommon
 {
     IBOutlet id o_controller;
 
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;
-    IBOutlet id o_outline_view;
-    IBOutlet id o_tc_name;
-    IBOutlet id o_tc_author;
-    IBOutlet id o_tc_duration;
     IBOutlet id o_status_field;
     IBOutlet id o_search_field;
     IBOutlet id o_random_ckb;
@@ -70,20 +96,17 @@
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
+    NSMutableDictionary *o_outline_dict;
     NSMutableArray *o_nodes_array;
     NSMutableArray *o_items_array;
-    NSMutableDictionary *o_outline_dict;
 
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
-    int i_current_view;
     id o_tc_sortColumn;
 }
 
-- (void)initStrings;
 - (void)searchfieldChanged:(NSNotification *)o_notification;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
-- (NSOutlineView *)outlineView;
 
 - (IBAction)handlePopUp:(id)sender;
 - (IBAction)searchItem:(id)sender;
@@ -105,7 +128,6 @@
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position inView:(int)i_view enqueue:(BOOL)b_enqueue;
 
-- (playlist_item_t *)selectedPlaylistItem;
 
 @end
 

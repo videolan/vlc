@@ -39,6 +39,7 @@
 #import "wizard.h"
 #import "intf.h"
 #import "network.h"
+#import "playlist.h"
 
 /*****************************************************************************
  * VLCWizard implementation
@@ -242,9 +243,9 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t2_matrix_inputSourceType selectCellAtRow:0 column:0];
     [[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setState: NSOffState];
     /* FIXME: we need to refresh the playlist-table as well */
-    [o_t2_tbl_plst setEnabled:NO];
     [o_t2_fld_pathToNewStrm setEnabled:YES];
     [o_t2_btn_chooseFile setEnabled:YES];
+    [o_t2_tbl_plst setEnabled:NO];
 
     /* "Streaming 1" */
     [o_t3_fld_address setStringValue: @""];
@@ -293,8 +294,8 @@ static VLCWizard *_o_sharedInstance = nil;
     [[o_t2_matrix_inputSourceType cellAtRow:0 column:0] setTitle: _NS("Select a stream")];
     [[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setTitle: _NS("Existing playlist item")];
     [o_t2_btn_chooseFile setTitle: _NS("Choose...")];
-    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"name"] headerCell] setStringValue: _NS("Name")];
-    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"uri"] headerCell] setStringValue: _NS("URI")];
+//    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"name"] headerCell] setStringValue: _NS("Name")];
+//    [[[o_t2_tbl_plst tableColumnWithIdentifier:@"uri"] headerCell] setStringValue: _NS("URI")];
     [o_t2_box_prtExtrct setTitle: _NS("Partial Extract")];
     [o_t2_ckb_enblPartExtrct setTitle: _NS("Enable")];
     [o_t2_ckb_enblPartExtrct setToolTip: _NS("Use this to read only a part of " \
@@ -389,6 +390,10 @@ static VLCWizard *_o_sharedInstance = nil;
         }
         [o_btn_backward setEnabled:YES];
         [o_tab_pageHolder selectTabViewItemAtIndex:1];
+
+        /* Fill the playlist with current playlist items */
+        [o_playlist_wizard reloadOutlineView];
+
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Input"])
     {
@@ -416,12 +421,25 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 /* set a flag that no file is selected */
                 stop = YES;
-            }else{
+            }
+            else
+            {
                 [o_userSelections setObject:[@"file://" stringByAppendingString:[o_t2_fld_pathToNewStrm stringValue]] forKey:@"pathToStrm"];
             }
-        }else{
+        }
+        else
+        {
             if ([o_t2_tbl_plst selectedRow] != -1)
             {
+                playlist_item_t *p_item =
+                                    [o_playlist_wizard selectedPlaylistItem];
+                if( p_item->i_children <= 0 )
+                {
+                    [o_userSelections setObject: [NSString stringWithFormat:
+                        @"%s", p_item->input.psz_uri] forKey:@"pathToStrm"];
+                }
+                else
+                stop = YES;
                 /* FIXME: put the path of the selected pl-item to pathToStrm */
             } else {
                 /* set a flag that no item is selected */
@@ -443,7 +461,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             /* show a sheet that the user didn't select a file */
             NSBeginInformationalAlertSheet(_NS("No input selected"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You selected neither " \
-                "a new stream nor an existing playlist item. VLC is unable to " \
+                "a new stream nor a valid playlist item. VLC is unable to " \
                 "guess, which input you want use. \n\n Choose one " \
                 "before going to the next page."));
         }
