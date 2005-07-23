@@ -38,7 +38,6 @@ DirektX <direktx at freemail.hu> - Hungarian translation
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Espen Skoglund <esk at ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
-Felix Kühne <fkuehne at users.sf.net> - German translation
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Gregory Hazel <ghazel et gmail dot com> - wxWidgets fixes and improvements
@@ -49,6 +48,7 @@ Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
 Javier Varela <tonxabar at hotmail.com> - Spanish translation
 Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
+Jean-Baptiste le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX)
 Jean-Philippe Grimaldi <jeanphi at via.ecp.fr> - bug fixes
 Jean-Pierre Kuypers <Kuypers at sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker at acm.org> - port of the ALSA plugin to the ALSA 1.0 API

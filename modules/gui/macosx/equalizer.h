@@ -54,4 +54,11 @@
 - (IBAction)twopass:(id)sender;
 - (void)windowWillClose:(NSNotification *)aNotification;
 - (void)awakeFromNib;
+
+- (void)setValue:(float)value forSlider:(int)index;
+- (id)getSliderByIndex:(int)index;
+- (void)setBandSlidersValues:(float *)values;
+- (void)initBandSliders;
+
+
 @end
