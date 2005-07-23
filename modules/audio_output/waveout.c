@@ -5,12 +5,12 @@
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
+#include <math.h>                                                /* roundf() */
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
@@ -698,7 +699,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 }
 
 /*****************************************************************************
- * WaveOutThread: this thread will capture play notification events. 
+ * WaveOutThread: this thread will capture play notification events.
  *****************************************************************************
  * We use this thread to feed new audio samples to the sound card because
  * we are not authorized to use waveOutWrite() directly in the waveout
@@ -800,8 +801,11 @@ static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 #endif
 
     i_waveout_vol &= 0xFFFF;
+    /* Force float computation, otherwise VolumeGet does not return the value
+     * which was set with VolumeSet, because of rounding issues */
     *pi_volume = p_aout->output.i_volume =
-        i_waveout_vol * AOUT_VOLUME_MAX / 2 / 0xFFFF;
+        (audio_volume_t)roundf((float)i_waveout_vol * AOUT_VOLUME_MAX
+                               / 2.0 / 0xFFFF);
     return 0;
 }
 
