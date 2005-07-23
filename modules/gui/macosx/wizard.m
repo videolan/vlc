@@ -442,16 +442,10 @@ static VLCWizard *_o_sharedInstance = nil;
             }
         } else {
             /* show a sheet that the user didn't select a file */
-			[o_wh_txt_title setStringValue: _NS("No input selected")];
-			[o_wh_txt_text setStringValue: _NS("You selected neither " \
+            NSBeginInformationalAlertSheet(_NS("No input selected"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You selected neither " \
 				"a new stream nor an existing playlist item. VLC is unable to " \
 				"guess, which input you want use. \n\n Choose one " \
-				"before going to the next page.")];
-			[NSApp beginSheet: o_wizardhelp_window
-				modalForWindow: o_wizard_window
-				modalDelegate: o_wizardhelp_window
-				didEndSelector: nil
-				contextInfo: nil];
+				"before going to the next page."));
         }
 	}
 	else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Streaming 1"])
@@ -502,17 +496,11 @@ static VLCWizard *_o_sharedInstance = nil;
 			if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
 			{	
             	/* complain to the user that "" is no valid dest. */
-				[o_wh_txt_title setStringValue: _NS("No valid destination")];
-				[o_wh_txt_text setStringValue: _NS("You need to enter " \
+				NSBeginInformationalAlertSheet(_NS("No valid destination"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You need to enter " \
 				"a valid destination you want to stream to. Enter either a " \
 				"Unicast-IP or a Multicast-IP.\n\n If you don't know "
 				"what this means, have a look at the VLC Streaming HOWTO and " \
-				"the help texts in this window." )];
-				[NSApp beginSheet: o_wizardhelp_window
-					modalForWindow: o_wizard_window
-					modalDelegate: o_wizardhelp_window
-					didEndSelector: nil
-					contextInfo: nil];
+				"the help texts in this window."));
 			} else {
                 /* FIXME: check whether the entered IP is really valid */
                 [o_userSelections setObject:[o_t3_fld_address stringValue] forKey:@"stmgDest"];
@@ -802,16 +790,10 @@ static VLCWizard *_o_sharedInstance = nil;
 		[o_tab_pageHolder selectTabViewItemAtIndex:4];
 		} else {
 		    /* show a sheet that the selected codecs are not compatible */
-			[o_wh_txt_title setStringValue: _NS("Invalid selection")];
-			[o_wh_txt_text setStringValue: _NS("Your chosen codecs are " \
+			NSBeginInformationalAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("Your chosen codecs are " \
 				"not compatible with each other. For example: you cannot " \
 				"mix uncompressed audio with any video codec.\n\n" \
-				"Correct your selection and try again.")];
-			[NSApp beginSheet: o_wizardhelp_window
-				modalForWindow: o_wizard_window
-				modalDelegate: o_wizardhelp_window
-				didEndSelector: nil
-				contextInfo: nil];
+				"Correct your selection and try again."));
 		}
 		
 	}
@@ -853,16 +835,11 @@ static VLCWizard *_o_sharedInstance = nil;
 	{
 		/* check whether the path != "" and store it */
 		if( [[o_t7_fld_filePath stringValue] isEqualToString: @""] )
-		{	/* complain to the user that "" is no valid path */
-			[o_wh_txt_title setStringValue: _NS("No file selected")];
-			[o_wh_txt_text setStringValue: _NS("You you need to select " \
-			"a file, you want to save to. \n\n Enter either a valid path or " \
-			"choose a location through the button's dialog-box.")];
-			[NSApp beginSheet: o_wizardhelp_window
-				modalForWindow: o_wizard_window
-				modalDelegate: o_wizardhelp_window
-				didEndSelector: nil
-				contextInfo: nil];
+		{	
+            /* complain to the user that "" is no valid path */
+			NSBeginInformationalAlertSheet(_NS("No file selected"), _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You you need to select a file, you want to save to. " \
+                "\n\n Enter either a valid path or choose a location through " \
+                "the button's dialog-box."));
 		} else {
 			[o_userSelections setObject:[o_t7_fld_filePath stringValue] forKey:@"trnscdFilePath"];
 			
