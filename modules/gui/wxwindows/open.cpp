@@ -698,7 +698,9 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 #endif
 
     sizer_row->Add( disc_type, i_disc_type_selection, wxEXPAND | wxALL, 5 );
+#ifdef HAVE_LIBCDIO
     sizer_row->Add( disc_probe, 0, wxEXPAND | wxALL );
+#endif
 
     wxStaticText *label = new wxStaticText( panel, -1, wxU(_("Device name")) );
     disc_device = new wxTextCtrl( panel, DiscDevice_Event, wxT(""),
