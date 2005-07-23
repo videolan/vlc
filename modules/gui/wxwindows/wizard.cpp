@@ -89,22 +89,22 @@ END_EVENT_TABLE()
 /* Hello page */
 #define HELLO_TITLE _("Streaming/Transcoding Wizard")
 #define HELLO_TEXT _("This wizard helps you to stream, transcode or" \
-                     " save a stream")
+                     " save a stream.")
 #define HELLO_STREAMING _("Stream to network")
-#define HELLO_STREAMING_DESC _("Use this to stream on a network")
+#define HELLO_STREAMING_DESC _("Use this to stream on a network.")
 #define HELLO_TRANSCODE _("Transcode/Save to file")
-#define HELLO_TRANSCODE_DESC _("Use this to re-encode a stream and save it to a file")
-#define HELLO_NOTICE _("This wizard only gives access to a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to get all of them")
+#define HELLO_TRANSCODE_DESC _("Use this to re-encode a stream and save it to a file.")
+#define HELLO_NOTICE _("This wizard only gives access to a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to get all of them.")
 
 #define MOREINFO_STREAM _("Use this to stream on a network")
 
 #define MOREINFO_TRANSCODE _("Use this to save a stream to a file. You have the possibility to reencode the stream. You can save whatever VLC can read.\nPlease notice that VLC is not very suited " \
              "for file to file transcoding. You should use its transcoding " \
-             "features to save network streams, for example" )
+             "features to save network streams, for example." )
 
 /* Input page */
 #define INPUT_TITLE _("Choose input")
-#define INPUT_TEXT _("Choose here your input stream")
+#define INPUT_TEXT _("Choose here your input stream.")
 
 #define INPUT_OPEN _("Select a stream" )
 #define INPUT_PL _( "Existing playlist item" )
@@ -116,23 +116,23 @@ END_EVENT_TABLE()
                   "You must be able to control the incoming stream " \
                   "(for example, a file or a disc, but not an UDP " \
                   "network stream.)\n" \
-                  "Enter the starting and ending times (in seconds)")
+                  "Enter the starting and ending times (in seconds).")
 
 #define INPUT_BUTTON _("Choose")
 
 /* Transcode 1 */
 #define TRANSCODE1_TITLE _("Transcode")
-#define TRANSCODE1_TEXT _("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page).")
+#define TRANSCODE1_TEXT _("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page.)")
 
 #define TR_VIDEO_TEXT0 _("If your stream has video and you want to " \
-                         "transcode it, enable this")
+                         "transcode it, enable this.")
 #define TR_VIDEO_TEXT _("Select your video codec. Click one to get more " \
-                        "information")
+                        "information.")
 
 #define TR_AUDIO_TEXT0 _("If your stream has audio and you want to "\
-                         "transcode it, enable this")
+                         "transcode it, enable this.")
 #define TR_AUDIO_TEXT _("Select your audio codec. Click one to get more " \
-                        "information")
+                        "information.")
 
 /* Streaming 1 */
 #define STREAMING1_TITLE _("Streaming")

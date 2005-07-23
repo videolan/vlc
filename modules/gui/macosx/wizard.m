@@ -28,9 +28,7 @@
  *****************************************************************************/ 
 
 /* TODO:
-	- l10n string fixes (both in OSX and WX)
 	- fill the playlist-table on t2
-	- implement l10n on t8
 	- see FIXME's
 */
 
@@ -40,6 +38,7 @@
  *****************************************************************************/
 #import "wizard.h"
 #import "intf.h"
+#import "network.h"
 
 /*****************************************************************************
  * VLCWizard implementation
@@ -199,9 +198,9 @@ static VLCWizard *_o_sharedInstance = nil;
 		"addresses you want to listen to. Do not enter anything if you want to " \
 		"listen to all adresses or if you don't understand. This is generally " \
 		"the best thing to do. Other computers can then access the stream at " \
-		"http://yourip:8080 by default") , _NS("Use this to stream to several " \
+		"http://yourip:8080 by default.") , _NS("Use this to stream to several " \
 		"computers. This method is less efficient, as the server needs to send " \
-		"several times the stream."), nil];
+		"the stream several times."), nil];
 	o_udp_multi = [NSArray arrayWithObjects: @"udp", @"UDP-Multicast", _NS("Enter " \
 		"the multicast address to stream to in this field. This must be an IP " \
 		"address between 224.0.0.0 and 239.255.255.255. For a private use, " \
@@ -210,8 +209,8 @@ static VLCWizard *_o_sharedInstance = nil;
 		"is the most efficient method to stream to several computers, but it " \
 		"does not work over Internet."), nil];
 	o_udp_uni = [NSArray arrayWithObjects: @"udp", @"UDP-Unicast", _NS("Enter " \
-		"the address of the computer to stream to"), _NS("Use this to stream " \
-		"to a single computer"), nil];
+		"the address of the computer to stream to."), _NS("Use this to stream " \
+		"to a single computer."), nil];
 	o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_udp_multi, o_udp_uni, nil];
 }
 
@@ -234,7 +233,7 @@ static VLCWizard *_o_sharedInstance = nil;
 	[o_userSelections removeAllObjects];
 	[o_t1_matrix_strmgOrTrnscd selectCellAtRow:0 column:0];
 	[[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setState: NSOffState];
-	[o_btn_forward setTitle: [_NS("Next") stringByAppendingString:@" >"]];
+	[o_btn_forward setTitle: _NS("Next")];
 	
 	/* "Input" */
 	[o_t2_fld_pathToNewStrm setStringValue: @""];
@@ -281,16 +280,16 @@ static VLCWizard *_o_sharedInstance = nil;
     
     /* page one ("Hello") */
     [o_t1_txt_title setStringValue: _NS("Streaming/Transcoding Wizard")];
-    [o_t1_txt_text setStringValue: _NS("This wizard helps you to stream, transcode or save a stream")];
+    [o_t1_txt_text setStringValue: _NS("This wizard helps you to stream, transcode or save a stream.")];
     [o_t1_btn_mrInfo_strmg setTitle: _NS("More Info")];
     [o_t1_btn_mrInfo_trnscd setTitle: _NS("More Info")];
-    [o_t1_txt_notice setStringValue: _NS("This wizard only gives access to a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to get all of them")];
+    [o_t1_txt_notice setStringValue: _NS("This wizard only gives access to a small subset of VLC's streaming and transcoding capabilities. Use the Open and Stream Output dialogs to get all of them.")];
 	[[o_t1_matrix_strmgOrTrnscd cellAtRow:0 column:0] setTitle: _NS("Stream to network")];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setTitle: _NS("Transcode/Save to file")];
     
     /* page two ("Input") */
     [o_t2_title setStringValue: _NS("Choose input")];
-    [o_t2_text setStringValue: _NS("Choose here your input stream")];
+    [o_t2_text setStringValue: _NS("Choose here your input stream.")];
     [[o_t2_matrix_inputSourceType cellAtRow:0 column:0] setTitle: _NS("Select a stream")];
     [[o_t2_matrix_inputSourceType cellAtRow:1 column:0] setTitle: _NS("Existing playlist item")];
     [o_t2_btn_chooseFile setTitle: _NS("Choose...")];
@@ -298,6 +297,10 @@ static VLCWizard *_o_sharedInstance = nil;
     [[[o_t2_tbl_plst tableColumnWithIdentifier:@"uri"] headerCell] setStringValue: _NS("URI")];
     [o_t2_box_prtExtrct setTitle: _NS("Partial Extract")];
     [o_t2_ckb_enblPartExtrct setTitle: _NS("Enable")];
+    [o_t2_ckb_enblPartExtrct setToolTip: _NS("Use this to read only a part of " \
+        "the stream. You must be able to control the incoming stream " \
+        "(for example, a file or a disc, but not an UDP network stream.)\n" \
+        "Enter the starting and ending times (in seconds).")];
     [o_t2_txt_prtExtrctFrom setStringValue: _NS("From")];
     [o_t2_txt_prtExtrctTo setStringValue: _NS("To")];
     
@@ -306,14 +309,14 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t3_txt_text setStringValue: _NS("In this page, you will select how your input stream will be sent.")];
     [o_t3_box_dest setTitle: _NS("Destination")];
     [o_t3_box_strmgMthd setTitle: _NS("Streaming method")];
-    [o_t3_txt_destInfo setStringValue: _NS("Enter the address of the computer to stream to")];
+    [o_t3_txt_destInfo setStringValue: _NS("Enter the address of the computer to stream to.")];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:0] setTitle: _NS("UDP Unicast")];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setTitle: _NS("UDP Multicast")];
-	[o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to a single computer")];
+	[o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to a single computer.")];
     
     /* page four ("Transcode 1") */
     [o_t4_title setStringValue: _NS("Transcode")];
-    [o_t4_text setStringValue: _NS("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page).")];
+    [o_t4_text setStringValue: _NS("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page.)")];
     [o_t4_box_audio setTitle: _NS("Audio")];
     [o_t4_box_video setTitle: _NS("Video")];
     [o_t4_ckb_audio setTitle: _NS("Transcode audio")];
@@ -321,9 +324,9 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t4_txt_videoBitrate setStringValue: _NS("Bitrate (kb/s)")];
     [o_t4_txt_videoCodec setStringValue: _NS("Codec")];
     [o_t4_txt_hintAudio setStringValue: _NS("If your stream has audio and you want to " \
-                         "transcode it, enable this")];
+                         "transcode it, enable this.")];
     [o_t4_txt_hintVideo setStringValue: _NS("If your stream has video and you want to " \
-                         "transcode it, enable this")];
+                         "transcode it, enable this.")];
     
     /* page five ("Encap") */
     [o_t5_title setStringValue: _NS("Encapsulation format")];
@@ -348,8 +351,18 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
 	
 	/* page eight ("Summary") */
-	/* FIXME: currently not implemented as it unsure whether we show this tab
-	 * to the public or use it for debugging only */
+	[o_t8_txt_text setStringValue: _NS("This page lists all your selections. " \
+		"Click \"Finish\" to start your streaming or transcoding.")];
+    [o_t8_txt_title setStringValue: _NS("Summary")];
+	[o_t8_txt_destination setStringValue: [_NS("Destination") stringByAppendingString: @":"]];
+    [o_t8_txt_encapFormat setStringValue: [_NS("Encap. format") stringByAppendingString: @":"]];
+	[o_t8_txt_inputStream setStringValue: [_NS("Input stream") stringByAppendingString: @":"]];
+    [o_t8_txt_partExtract setStringValue: [_NS("Partial Extract") stringByAppendingString: @":"]];
+    [o_t8_txt_sap setStringValue: [_NS("SAP Announce") stringByAppendingString: @":"]];
+    [o_t8_txt_saveFileTo setStringValue: [_NS("Save file to") stringByAppendingString: @":"]];
+    [o_t8_txt_strmgMthd setStringValue: [_NS("Streaming method") stringByAppendingString: @":"]];
+    [o_t8_txt_trnscdAudio setStringValue: [_NS("Transcode audio") stringByAppendingString: @":"]];
+    [o_t8_txt_trnscdVideo setStringValue: [_NS("Transcode video") stringByAppendingString: @":"]];
 	
 	/* wizard help window */
 	[o_wh_btn_okay setTitle: _NS("OK")];
@@ -404,7 +417,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 /* set a flag that no file is selected */
 				stop = YES;
 			}else{
-				[o_userSelections setObject:[o_t2_fld_pathToNewStrm stringValue] forKey:@"pathToStrm"];
+				[o_userSelections setObject:[@"file://" stringByAppendingString:[o_t2_fld_pathToNewStrm stringValue]] forKey:@"pathToStrm"];
 			}
 		}else{
 			if ([o_t2_tbl_plst selectedRow] != -1)
@@ -486,11 +499,9 @@ static VLCWizard *_o_sharedInstance = nil;
 		if(! [o_mode isEqualToString: @"HTTP"] )
 		{	
 			/* empty field is valid for HTTP */
-			
 			if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
 			{	
-			
-				/* complain to the user that "" is no valid dest. */
+            	/* complain to the user that "" is no valid dest. */
 				[o_wh_txt_title setStringValue: _NS("No valid destination")];
 				[o_wh_txt_text setStringValue: _NS("You need to enter " \
 				"a valid destination you want to stream to. Enter either a " \
@@ -503,8 +514,8 @@ static VLCWizard *_o_sharedInstance = nil;
 					didEndSelector: nil
 					contextInfo: nil];
 			} else {
-				/* FIXME: stupid code duplication, should be solved by a GoTo-like-thing -- FK */
-				[o_userSelections setObject:[o_t3_fld_address stringValue] forKey:@"stmgDest"];
+                /* FIXME: check whether the entered IP is really valid */
+                [o_userSelections setObject:[o_t3_fld_address stringValue] forKey:@"stmgDest"];
 				/* let's go to the encap-tab */
 				[o_tab_pageHolder selectTabViewItemAtIndex:4];
 			}
@@ -867,7 +878,7 @@ static VLCWizard *_o_sharedInstance = nil;
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
         if( p_playlist )
         {
-			playlist_item_t *p_item = playlist_ItemNew( p_playlist, [[@"file://" stringByAppendingString: [o_userSelections objectForKey:@"pathToStrm"]] UTF8String], _("Streaming/Transcoding Wizard") );
+			playlist_item_t *p_item = playlist_ItemNew( p_playlist, [[o_userSelections objectForKey:@"pathToStrm"] UTF8String], _("Streaming/Transcoding Wizard") );
 			playlist_ItemAddOption( p_item, [[o_userSelections objectForKey:@"opts"] UTF8String]);
 			
 			if(! [[o_userSelections objectForKey:@"partExtractFrom"] isEqualToString:@""] )
@@ -1139,11 +1150,6 @@ static VLCWizard *_o_sharedInstance = nil;
 		[o_t2_fld_prtExtrctFrom setStringValue:@""];
 		[o_t2_fld_prtExtrctTo setStringValue:@""];
     }
-}
-
-- (IBAction)t3_addressEntered:(id)sender
-{
-    /* check whether the entered address is valid */
 }
 
 - (IBAction)t3_strmMthdChanged:(id)sender

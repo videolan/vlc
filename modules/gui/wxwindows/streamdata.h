@@ -123,25 +123,25 @@ struct method {
 
 static struct method methods_array[] =
 {
-    {"udp:",N_("UDP Unicast"), N_("Use this to stream to a single computer"),
-     N_("Enter the address of the computer to stream to"),
+    {"udp:",N_("UDP Unicast"), N_("Use this to stream to a single computer."),
+     N_("Enter the address of the computer to stream to."),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
     {"udp:",N_("UDP Multicast"),
      N_("Use this to stream to a dynamic group of computers on a "
      "multicast-enabled network. This is the most efficient method "
      "to stream to several computers, but it does not work over Internet."),
      N_("Enter the multicast address to stream to in this field. "
-     "This must be an IP address between 224.0.0.0 an 239.255.255.255 "
-     "For a private use, enter an address beginning with 239.255"),
+     "This must be an IP address between 224.0.0.0 an 239.255.255.255. "
+     "For a private use, enter an address beginning with 239.255."),
      { MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1 } },
-    {"http://",N_("HTTP"),
+    {"http://","HTTP",
      N_("Use this to stream to several computers. This method is "
-     "less efficient, as the server needs to send several times the "
-     "stream."),
+     "less efficient, as the server needs to send the "
+     "stream several times."),
      N_("Enter the local addresses you want to listen to. Do not enter "
      "anything if you want to listen to all adresses or if you don't "
      "understand. This is generally the best thing to do. Other computers "
-     "can then access the stream at http://yourip:8080 by default"),
+     "can then access the stream at http://yourip:8080 by default."),
      { MUX_TS, MUX_PS, MUX_MPEG, MUX_OGG, MUX_RAW, MUX_ASF, -1,-1,-1} },
     { NULL, NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
 };

@@ -153,7 +153,6 @@
 - (IBAction)t2_addNewStream:(id)sender;
 - (IBAction)t2_chooseStreamOrPlst:(id)sender;
 - (IBAction)t2_enableExtract:(id)sender;
-- (IBAction)t3_addressEntered:(id)sender;
 - (IBAction)t3_strmMthdChanged:(id)sender;
 - (IBAction)t4_AudCdcChanged:(id)sender;
 - (IBAction)t4_enblAudTrnscd:(id)sender;
