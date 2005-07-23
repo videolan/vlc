@@ -213,7 +213,7 @@ void VlcProc::manage()
     // Refresh sound volume
     audio_volume_t volume;
     aout_VolumeGet( getIntf(), &volume );
-    pVolume->set( (double)volume / AOUT_VOLUME_MAX );
+    pVolume->set( (double)volume * 2.0 / AOUT_VOLUME_MAX );
     // Set the mute variable
     pVarMute->set( volume == 0 );
 

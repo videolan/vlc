@@ -33,7 +33,7 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
     // Initial value
     audio_volume_t val;
     aout_VolumeGet( getIntf(), &val );
-    VarPercent::set( val / AOUT_VOLUME_MAX );
+    VarPercent::set( val * 2.0 / AOUT_VOLUME_MAX );
 }
 
 
@@ -45,7 +45,7 @@ void Volume::set( float percentage )
     {
         VarPercent::set( percentage );
 
-        aout_VolumeSet( getIntf(), (int)(get() * AOUT_VOLUME_MAX) );
+        aout_VolumeSet( getIntf(), (int)(get() * AOUT_VOLUME_MAX / 2.0) );
     }
 }
 
