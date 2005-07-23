@@ -1140,11 +1140,26 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
                 unsigned int     i_entry =
                   vcdinfo_track_get_entry( p_vcdplayer->vcd, i_track);
 
-                /* FIXME! For now we are assuming titles are only
-                 tracks and that track == title+1 */
-                itemid.num = i_track;
-                itemid.type = VCDINFO_ITEM_TYPE_TRACK;
-
+		if( i < p_vcdplayer->i_tracks ) 
+		{
+		    /* FIXME! For now we are assuming titles are only
+		       tracks and that track == title+1 */
+		    itemid.num = i_track;
+		    itemid.type = VCDINFO_ITEM_TYPE_TRACK;
+		} 
+		else 
+		{
+		    /* FIXME! i_tracks+2 are Segments, but we need to 
+		       be able to figure out which segment of that.
+                       i_tracks+1 is either Segments (if no LIDs) or 
+		       LIDs otherwise. Again need a way to get the LID 
+		       number. */
+		    msg_Warn( p_access,
+                    "Trying to set track (%u) beyond end of last track (%u).",
+			      i+1, p_vcdplayer->i_tracks );
+		    return VLC_EGENERIC;
+		}
+		
                 VCDSetOrigin(p_access,
                      vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i_entry),
                              i_track, &itemid );

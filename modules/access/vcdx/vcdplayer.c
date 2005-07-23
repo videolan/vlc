@@ -326,13 +326,18 @@ vcdplayer_play_single_item( access_t * p_access, vcdinfo_itemid_t itemid)
    changed: p_vcdplayer->origin_lsn, p_vcdplayer->end_lsn
 */
 
-/* FIXME: add parameters lsn, i_track, p_itemid and set accordingly. */
 void 
 vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
 		     const vcdinfo_itemid_t *p_itemid)
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *)p_access->p_sys;
   const size_t i_size= vcdplayer_get_item_size(p_access, *p_itemid);
+
+  if( VCDINFO_NULL_LSN == i_lsn ) 
+  {
+      LOG_ERR("%s %d", "Invalid LSN for track", i_track);
+      return;
+  }
 
   p_vcdplayer->play_item.num  = p_itemid->num;
   p_vcdplayer->play_item.type = p_itemid->type;
