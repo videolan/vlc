@@ -13,6 +13,10 @@
 		<integer>10</integer>
 		<integer>270</integer>
 	</array>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>6</integer>
+	</array>
 	<key>IBSystem Version</key>
 	<string>8C46</string>
 </dict>
