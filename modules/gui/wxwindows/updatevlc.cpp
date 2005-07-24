@@ -46,8 +46,8 @@
 #   define UPDATE_VLC_OS "macosx"
 #   define UPDATE_VLC_ARCH "ppc"
 #else
-#   define UPDATE_VLC_OS "windows"
-#   define UPDATE_VLC_ARCH "i386"
+#   define UPDATE_VLC_OS "*"
+#   define UPDATE_VLC_ARCH "*"
 #endif
 #endif
 
