@@ -23,7 +23,6 @@
                 "t2_addNewStream" = id; 
                 "t2_chooseStreamOrPlst" = id; 
                 "t2_enableExtract" = id; 
-                "t3_addressEntered" = id; 
                 "t3_strmMthdChanged" = id; 
                 "t4_AudCdcChanged" = id; 
                 "t4_VidCdcChanged" = id; 
