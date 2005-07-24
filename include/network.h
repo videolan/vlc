@@ -112,25 +112,24 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
         if( p[1] == '/' )
             p += 2;
         url->psz_protocol = psz_parse;
+        psz_parse = p;
+    }
+    p = strchr( psz_parse, '@' );
+    if( p != NULL )
+    {
+        /* We have a login */
+        url->psz_username = psz_parse;
+        *p++ = '\0';
+
+        psz_parse = strchr( psz_parse, ':' );
+        if( psz_parse != NULL )
+        {
+            /* We have a password */
+            *psz_parse++ = '\0';
+            url->psz_password = psz_parse;
+        }
 
         psz_parse = p;
-        p = strchr( psz_parse, '@' );
-        if( p != NULL )
-        {
-            /* We have a login */
-            url->psz_username = psz_parse;
-            *p++ = '\0';
-
-            psz_parse = strchr( psz_parse, ':' );
-            if( psz_parse != NULL )
-            {
-                /* We have a password */
-                *psz_parse++ = '\0';
-                url->psz_password = psz_parse;
-            }
-
-            psz_parse = p;
-        }
     }
 
     p = strchr( psz_parse, '/' );
