@@ -981,6 +981,12 @@ if( MACOS_VERSION >= 10.3 )                                                 \
 {
     return [o_label frame].size.width;
 }
+
+- (void) alignWithXPosition:(int)i_xPos;
+{
+    /* FIXME: not implemented atm, but created to shut up the warning
+     * about "method definition not found" -- FK @ 7/24/05 */
+}
 @end
 
 @implementation StringConfigControl
@@ -2119,7 +2125,7 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     i_new_key |= ([o_shift_checkbox state] == NSOnState) ?
         KEY_MODIFIER_SHIFT : 0;
 
-    i_new_key |= StringToKey([[[o_popup selectedItem] title] cString]);
+    i_new_key |= StringToKey((char *)[[[o_popup selectedItem] title] cString]);
     return i_new_key;
 }
 @end
