@@ -261,6 +261,7 @@ struct intf_sys_t
 - (id)getControls;
 - (id)getPlaylist;
 - (id)getInfo;
+- (id)getWizard;
 - (void)terminate;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;

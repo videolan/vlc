@@ -470,6 +470,11 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_wizard_window close];
 }
 
+- (id)getPlaylistWizard
+{
+    return o_playlist_wizard;
+}
+
 - (IBAction)nextTab:(id)sender
 {
     if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: @"Hello"])

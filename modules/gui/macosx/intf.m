@@ -764,7 +764,16 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         return o_info;
     }
-    return  nil;
+    return nil;
+}
+
+- (id)getWizard
+{
+    if ( o_wizard )
+    {
+        return o_wizard;
+    }
+    return nil;
 }
 
 - (void)manage

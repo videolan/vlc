@@ -335,7 +335,12 @@
 
 - (IBAction)reloadOutlineView
 {
-    [o_outline_view reloadData];
+    /* Only reload the outlineview if the wizard window is open since this can
+       be quite long on big playlists */
+    if( [[o_outline_view window] isVisible] )
+    {
+        [o_outline_view reloadData];
+    }
 }
 
 @end
@@ -512,6 +517,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     // TODO Find a way to keep the dict size to a minimum
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
+    [[[[VLCMain sharedInstance] getWizard] getPlaylistWizard] reloadOutlineView];
 }
 
 - (void)playModeUpdated

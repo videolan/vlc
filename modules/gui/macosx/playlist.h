@@ -67,6 +67,7 @@
 @interface VLCPlaylist : VLCPlaylistCommon
 {
     IBOutlet id o_controller;
+    IBOutlet id o_playlist_wizard;
 
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;
