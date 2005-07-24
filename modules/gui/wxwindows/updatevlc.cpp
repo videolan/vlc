@@ -257,8 +257,6 @@ void UpdateVLC::GetData()
                                 tmp_file.size = wxU( psz_value );
                             if( !strcmp( psz_name, "url" ) )
                                 tmp_file.url = wxU( psz_value );
-                            if( !strcmp( psz_name, "desciption" ) )
-                                tmp_file.description = wxU( psz_value );
                         }
                     }
                     if( !strcmp( psz_name, "name" )
