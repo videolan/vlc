@@ -45,6 +45,7 @@
 #include <vlc_keys.h>
 
 #include "intf.h"
+#include "wizard.h"
 #include "playlist.h"
 #include "controls.h"
 #include "osd.h"
