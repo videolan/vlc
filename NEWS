@@ -1,5 +1,19 @@
 $Id$
 
+Changes between 0.8.2 and 0.8.4-svn (not yet released):
+-----------------------------------------------------
+
+Core support:
+* IPv6 and Extended passive mode support for FTP
+
+Services discovery:
+* Bleeding edge UPnP service discovery
+
+Interfaces:
+ * Mac OS X
+    - new streaming and transcoding wizard with the same functionality as the WxWidgets one
+
+
 Changes between 0.8.1 and 0.8.2:
 -----------------------------------------------------
 

@@ -244,7 +244,7 @@ D: MPEG audio decoder
 S: France
 
 N: Felix Kühne
-E: fk@aenneburghardt.de
+E: fkuehne@users.sourceforge.net
 C: fkuehne
 D: MacOS X Interface (Wizard, structure)
 D: German translation
@@ -253,7 +253,7 @@ S: Germany
 N: Simon Latapie
 E: garf@via.ecp.fr
 C: garf
-D: contrast/HSB, and logo  video filters
+D: contrast/HSB, and logo video filters
 D: HTTP interface
 D: VLM
 S: France
