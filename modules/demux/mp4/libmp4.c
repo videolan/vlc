@@ -1087,10 +1087,9 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratehi );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratelo );
 
-    if( p_box->data.p_sample_soun->i_qt_version == 1 &&
-        i_read >= 16 )
+    if( p_box->data.p_sample_soun->i_qt_version == 1 && i_read >= 16 )
     {
-        /* qt3+ */
+        /* SoundDescriptionV1 */
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_packet );
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_frame );
@@ -1107,6 +1106,28 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 #endif
         stream_Seek( p_stream, p_box->i_pos +
                         MP4_BOX_HEADERSIZE( p_box ) + 44 );
+    }
+    else if( p_box->data.p_sample_soun->i_qt_version == 2 && i_read >= 36 )
+    {
+        /* SoundDescriptionV2 */
+        double f_sample_rate;
+        uint32_t i_channel;
+
+        MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
+        MP4_GET8BYTES( (*(int64_t *)&f_sample_rate) );
+
+        msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
+        p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % 65536;
+        p_box->data.p_sample_soun->i_sampleratelo = f_sample_rate / 65536;
+
+        MP4_GET4BYTES( i_channel );
+        p_box->data.p_sample_soun->i_channelcount = i_channel;
+
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream, "read box: \"soun\" V2" );
+#endif
+        stream_Seek( p_stream, p_box->i_pos +
+                        MP4_BOX_HEADERSIZE( p_box ) + 28 + 36 );
     }
     else
     {
@@ -2172,6 +2193,8 @@ static struct
     { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_qdrw,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_m2v,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_hdv2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
     { FOURCC_mjqt,  MP4_ReadBox_default,        NULL }, /* found in mjpa/b */
     { FOURCC_mjht,  MP4_ReadBox_default,        NULL },
