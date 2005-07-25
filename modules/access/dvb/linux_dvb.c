@@ -690,7 +690,7 @@ static int FrontendSetQPSK( access_t *p_access )
     struct dvb_frontend_parameters fep;
     int i_ret;
     vlc_value_t val;
-    int i_frequency, i_lnb_slof, i_lnb_lof1, i_lnb_lof2 = 0;
+    int i_frequency, i_lnb_slof = 0, i_lnb_lof1, i_lnb_lof2 = 0;
 
     /* Prepare the fep structure */
     var_Get( p_access, "dvb-frequency", &val );
@@ -700,25 +700,27 @@ static int FrontendSetQPSK( access_t *p_access )
     if ( val.i_int == 0 )
     {
         /* Automatic mode. */
-        if ( i_frequency >= 2500000 && i_frequency <= 2700000 )
+        if ( i_frequency >= 950000 && i_frequency <= 2150000 )
+        {
+            msg_Dbg( p_access, "frequency %d is in IF-band", i_frequency );
+            i_lnb_lof1 = 0;
+        }
+        else if ( i_frequency >= 2500000 && i_frequency <= 2700000 )
         {
             msg_Dbg( p_access, "frequency %d is in S-band", i_frequency );
             i_lnb_lof1 = 3650000;
-            i_lnb_slof = 0;
         }
         else if ( i_frequency >= 3400000 && i_frequency <= 4200000 )
         {
             msg_Dbg( p_access, "frequency %d is in C-band (lower)",
                      i_frequency );
             i_lnb_lof1 = 5150000;
-            i_lnb_slof = 0;
         }
         else if ( i_frequency >= 4500000 && i_frequency <= 4800000 )
         {
             msg_Dbg( p_access, "frequency %d is in C-band (higher)",
                      i_frequency );
             i_lnb_lof1 = 5950000;
-            i_lnb_slof = 0;
         }
         else if ( i_frequency >= 10700000 && i_frequency <= 13250000 )
         {
