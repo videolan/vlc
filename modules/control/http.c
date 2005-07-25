@@ -2853,18 +2853,6 @@ static void uri_decode_url_encoded( char *psz )
     free( dup );
 }
 
-static int char_in_str( char c, const char *str )
-{
-    while( *str )
-    {
-        if( c == *str )
-            return 1;
-        str++;
-    }
-
-    return 0;
-}
-
 static void uri_encode( const char *from, char *to, size_t to_len )
 {
     static const char hex[] = "0123456789abcdef";
@@ -2875,7 +2863,7 @@ static void uri_encode( const char *from, char *to, size_t to_len )
         {
             *to++ = '+';
         }
-        else if( isalnum( *from ) || char_in_str( *from, "$-_.+!*'(),/" ) )
+        else if( isalnum( *from ) || strchr( "$-_.+!*'(),/", *from ) )
         {
             *to++ = *from;
         }
