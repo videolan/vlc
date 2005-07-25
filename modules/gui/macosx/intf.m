@@ -991,7 +991,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         if( p_intf->p_sys->b_volume_update )
         {
             NSString *o_text;
-            o_text = [NSString stringWithFormat: _NS("Volume: %d"), i_lastShownVolume * 200 / AOUT_VOLUME_MAX];
+            o_text = [NSString stringWithFormat: _NS("Volume: %d%%"), i_lastShownVolume * 400 / AOUT_VOLUME_MAX];
             if( i_lastShownVolume != -1 )
             [self setScrollField:o_text stopAfter:1000000];
 

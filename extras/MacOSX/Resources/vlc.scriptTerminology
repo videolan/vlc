@@ -69,14 +69,14 @@
             <key>Name</key>
             <string>volumeUp</string>
             <key>Description</key>
-            <string>Bring the volume up by one step. There are 32 steps from 0 to 100% volume.</string>
+            <string>Bring the volume up by one step. There are 32 steps from 0 to 400% volume.</string>
         </dict>
         <key>volumeDown</key>
         <dict>
             <key>Name</key>
             <string>volumeDown</string>
             <key>Description</key>
-            <string>Bring the volume down by one step. There are 32 steps from 0 to 100% volume.</string>
+            <string>Bring the volume down by one step. There are 32 steps from 0 to 400% volume.</string>
         </dict>
     </dict>
 </dict>

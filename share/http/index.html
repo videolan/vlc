@@ -241,7 +241,7 @@ function changeMe(item)
       if ( seconds < 10 ) seconds = "0" + seconds;
       document.getElementById('length').innerHTML = hours+":"+minutes+":"+seconds;
       got_volume = <vlc id="value" param1="volume" />;
-      document.getElementById( 'volume').innerHTML = Math.ceil(got_volume * 100/1024) + " %";
+      document.getElementById( 'volume').innerHTML = Math.ceil(got_volume * 400/1024) + " %";
     </script>
 </body>
 </html>
