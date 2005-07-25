@@ -784,8 +784,8 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
     }
     else
     {
-        vout_OSDMessage( p_vout, VOLUME_TEXT_CHAN, "Vol %d%%",
-                         2*i_vol*100/AOUT_VOLUME_MAX );
+        vout_OSDMessage( p_vout, VOLUME_TEXT_CHAN, "Volume %d%%",
+                         i_vol*400/AOUT_VOLUME_MAX );
     }
 }
 
