@@ -1447,7 +1447,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)viewAbout:(id)sender
 {
-    [o_about showPanel];
+    if (!nib_about_loaded)
+    {
+        nib_about_loaded = [NSBundle loadNibNamed:@"About" owner:self];
+        [o_about showPanel];
+    } else {
+        [o_about showPanel];
+    }
 }
 
 - (IBAction)viewPreferences:(id)sender

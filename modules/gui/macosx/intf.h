@@ -92,6 +92,7 @@ struct intf_sys_t
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
     BOOL nib_open_loaded;       /* reference to the open-nib */
+    BOOL nib_about_loaded;      /* reference to the about-nib */
     BOOL nib_wizard_loaded;     /* reference to the wizard-nib */
 
     IBOutlet id o_window;       /* main window    */

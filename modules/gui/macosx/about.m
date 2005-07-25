@@ -57,9 +57,6 @@ static VLAboutBox *_o_sharedInstance = nil;
         NSString *o_name;
         NSString *o_version;
         NSString *o_thanks_path;
-        
-		/* Load the needed nib-file */
-		[NSBundle loadNibNamed:@"About" owner:self];
 		
         /* Get the info dictionary (Info.plist) */
         o_info_dict = [[NSBundle mainBundle] infoDictionary];
