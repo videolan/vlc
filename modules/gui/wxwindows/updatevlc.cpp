@@ -493,13 +493,32 @@ void UpdateVLC::UpdateUpdatesTree()
     /* build tree */
     parent = updates_tree->AppendItem( updates_root, wxT( "" ) );
     updates_tree->AppendItem( parent,
-                             wxT( "Current version : "PACKAGE_VERSION_MAJOR"."PACKAGE_VERSION_MINOR"."PACKAGE_VERSION_REVISION"-"PACKAGE_VERSION_EXTRA ),
+                             wxT( "Current version : VLC media player "PACKAGE_VERSION_MAJOR"."PACKAGE_VERSION_MINOR"."PACKAGE_VERSION_REVISION"-"PACKAGE_VERSION_EXTRA ),
                              -1, -1, new UpdatesTreeItem( wxT( "" ) ));
     it = m_versions.begin();
     while( it != m_versions.end() )
     {
+        if( atoi((const char *)it->major.mb_str()) <
+            atoi(PACKAGE_VERSION_MAJOR)
+         || ( atoi((const char *)it->major.mb_str()) ==
+              atoi(PACKAGE_VERSION_MAJOR)
+         && ( atoi((const char *)it->minor.mb_str()) <
+               atoi(PACKAGE_VERSION_MINOR)
+         || ( atoi((const char *)it->minor.mb_str()) ==
+              atoi(PACKAGE_VERSION_MINOR)
+         && ( atoi((const char *)it->revision.mb_str()) <
+               atoi(PACKAGE_VERSION_REVISION)
+         || ( atoi((const char *)it->revision.mb_str()) ==
+              atoi(PACKAGE_VERSION_REVISION) ) ) ) ) ) )
+        {
+            /* version is older or equal tu current version.
+            FIXME : how do we handle the extra version number ? */
+            it++;
+            continue;
+        }
         wxTreeItemId cat = updates_tree->AppendItem( parent,
-                         wxT("VLC media player ")+ it->major + wxT(".")
+                         wxT("New Version : VLC media player ")
+                         + it->major + wxT(".")
                          + it->minor + wxT(".") + it->revision + wxT("-")
                          + it->extra + wxT(" (") + it->type + wxT(")"),
                          -1, -1, new UpdatesTreeItem( wxT( "" ) ));
