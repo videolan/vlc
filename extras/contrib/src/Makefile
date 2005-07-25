@@ -823,10 +823,10 @@ DISTCLEAN_PKG += libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 # live
 # ***************************************************************************
 
-live.$(LIVEDOTCOM_VERSION).tar.gz:
+live-$(LIVEDOTCOM_VERSION).tar.gz:
 	$(WGET) $(LIVEDOTCOM_URL)
 
-live: live.$(LIVEDOTCOM_VERSION).tar.gz
+live: live-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
 
@@ -836,7 +836,7 @@ live: live.$(LIVEDOTCOM_VERSION).tar.gz
 
 CLEAN_FILE += .live
 CLEAN_PKG += live
-DISTCLEAN_PKG += live.$(LIVEDOTCOM_VERSION).tar.gz
+DISTCLEAN_PKG += live-$(LIVEDOTCOM_VERSION).tar.gz
 
 # ***************************************************************************
 # goom
