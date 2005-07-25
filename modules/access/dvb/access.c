@@ -84,19 +84,10 @@ static void Close( vlc_object_t *p_this );
 #define PROBE_TEXT N_("Probe DVB card for capabilities")
 #define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their capabilities.")
 
-#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
-#define LNB_LOF1_LONGTEXT ""
-
-#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
-#define LNB_LOF2_LONGTEXT ""
-
-#define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
-#define LNB_SLOF_LONGTEXT ""
-
-/* Satellite */
 #define BUDGET_TEXT N_("Budget mode")
 #define BUDGET_LONGTEXT N_("This allows you to stream an entire transponder with a budget card.")
 
+/* Satellite */
 #define SATNO_TEXT N_("Satellite number in the Diseqc system")
 #define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number]")
 
@@ -115,6 +106,15 @@ static void Close( vlc_object_t *p_this );
 
 #define SRATE_TEXT N_("Transponder symbol rate in kHz")
 #define SRATE_LONGTEXT ""
+
+#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
+#define LNB_LOF1_LONGTEXT ""
+
+#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
+#define LNB_LOF2_LONGTEXT ""
+
+#define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
+#define LNB_SLOF_LONGTEXT ""
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")
@@ -156,15 +156,9 @@ vlc_module_begin();
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
                  VLC_TRUE );
     add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-lnb-lof1", 9750000, NULL, LNB_LOF1_TEXT,
-                 LNB_LOF1_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-lnb-lof2", 10600000, NULL, LNB_LOF2_TEXT,
-                 LNB_LOF2_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-lnb-slof", 11700000, NULL, LNB_SLOF_TEXT,
-                 LNB_SLOF_LONGTEXT, VLC_TRUE );
-    /* DVB-S (satellite) */
     add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
               VLC_TRUE );
+    /* DVB-S (satellite) */
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
                  VLC_TRUE );
     add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
@@ -176,7 +170,13 @@ vlc_module_begin();
     add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_TRUE );
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
                  VLC_FALSE );
-    /* DVB-T (terrestrial) */
+    add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
+                 LNB_LOF1_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
+                 LNB_LOF2_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
+                 LNB_SLOF_LONGTEXT, VLC_TRUE );
+    /* DVB-C (cable) */
     add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT,
                  MODULATION_LONGTEXT, VLC_TRUE );
     /* DVB-T (terrestrial) */
@@ -554,18 +554,18 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-inversion", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-probe", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-lnb-lof1", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-lnb-lof2", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "dvb-lnb-slof", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* */
-    var_Create( p_access, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-satno", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-high-voltage", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-tone", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-fec", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-srate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-lof1", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-lof2", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-lnb-slof", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* */
     var_Create( p_access, "dvb-modulation", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -620,17 +620,17 @@ static int ParseMRL( access_t *p_access )
         else GET_OPTION_INT("frequency")
         else GET_OPTION_INT("inversion")
         else GET_OPTION_BOOL("probe")
-        else GET_OPTION_INT("lnb-lof1")
-        else GET_OPTION_INT("lnb-lof2")
-        else GET_OPTION_INT("lnb-slof")
-
         else GET_OPTION_BOOL("budget-mode")
+
         else GET_OPTION_INT("voltage")
         else GET_OPTION_BOOL("high-voltage")
         else GET_OPTION_INT("tone")
         else GET_OPTION_INT("satno")
         else GET_OPTION_INT("fec")
         else GET_OPTION_INT("srate")
+        else GET_OPTION_INT("lnb-lof1")
+        else GET_OPTION_INT("lnb-lof2")
+        else GET_OPTION_INT("lnb-slof")
 
         else GET_OPTION_INT("modulation")
 

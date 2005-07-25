@@ -690,19 +690,77 @@ static int FrontendSetQPSK( access_t *p_access )
     struct dvb_frontend_parameters fep;
     int i_ret;
     vlc_value_t val;
-    int i_frequency, i_lnb_slof;
+    int i_frequency, i_lnb_slof, i_lnb_lof1, i_lnb_lof2 = 0;
 
     /* Prepare the fep structure */
     var_Get( p_access, "dvb-frequency", &val );
     i_frequency = val.i_int;
-    var_Get( p_access, "dvb-lnb-slof", &val );
-    i_lnb_slof = val.i_int;
 
-    if( i_frequency >= i_lnb_slof )
-        var_Get( p_access, "dvb-lnb-lof2", &val );
+    var_Get( p_access, "dvb-lnb-lof1", &val );
+    if ( val.i_int == 0 )
+    {
+        /* Automatic mode. */
+        if ( i_frequency >= 2500000 && i_frequency <= 2700000 )
+        {
+            msg_Dbg( p_access, "frequency %d is in S-band", i_frequency );
+            i_lnb_lof1 = 3650000;
+            i_lnb_slof = 0;
+        }
+        else if ( i_frequency >= 3400000 && i_frequency <= 4200000 )
+        {
+            msg_Dbg( p_access, "frequency %d is in C-band (lower)",
+                     i_frequency );
+            i_lnb_lof1 = 5150000;
+            i_lnb_slof = 0;
+        }
+        else if ( i_frequency >= 4500000 && i_frequency <= 4800000 )
+        {
+            msg_Dbg( p_access, "frequency %d is in C-band (higher)",
+                     i_frequency );
+            i_lnb_lof1 = 5950000;
+            i_lnb_slof = 0;
+        }
+        else if ( i_frequency >= 10700000 && i_frequency <= 13250000 )
+        {
+            msg_Dbg( p_access, "frequency %d is in Ku-band",
+                     i_frequency );
+            i_lnb_lof1 = 9750000;
+            i_lnb_lof2 = 10600000;
+            i_lnb_slof = 11700000;
+        }
+        else
+        {
+            msg_Err( p_access, "frequency %d is out of any known band",
+                     i_frequency );
+            msg_Err( p_access, "specify dvb-lnb-lof1 manually for the local "
+                     "oscillator frequency" );
+            return VLC_EGENERIC;
+        }
+        val.i_int = i_lnb_lof1;
+        var_Set( p_access, "dvb-lnb-lof1", val );
+        val.i_int = i_lnb_lof2;
+        var_Set( p_access, "dvb-lnb-lof2", val );
+        val.i_int = i_lnb_slof;
+        var_Set( p_access, "dvb-lnb-slof", val );
+    }
     else
-        var_Get( p_access, "dvb-lnb-lof1", &val );
-    fep.frequency = i_frequency - val.i_int;
+    {
+        i_lnb_lof1 = val.i_int;
+        var_Get( p_access, "dvb-lnb-lof2", &val );
+        i_lnb_lof2 = val.i_int;
+        var_Get( p_access, "dvb-lnb-slof", &val );
+        i_lnb_slof = val.i_int;
+    }
+
+    if( i_lnb_slof && i_frequency >= i_lnb_slof )
+    {
+        i_frequency -= i_lnb_lof2;
+    }
+    else
+    {
+        i_frequency -= i_lnb_lof1;
+    }
+    fep.frequency = i_frequency >= 0 ? i_frequency : -i_frequency;
 
     fep.inversion = DecodeInversion( p_access );
 
@@ -1157,8 +1215,8 @@ int E_(CAMOpen)( access_t *p_access )
     msg_Dbg( p_access, "Opening device %s", ca );
     if( (p_sys->i_ca_handle = open(ca, O_RDWR | O_NONBLOCK)) < 0 )
     {
-        msg_Err( p_access, "CAMInit: opening device failed (%s)",
-                 strerror(errno) );
+        msg_Warn( p_access, "CAMInit: opening CAM device failed (%s)",
+                  strerror(errno) );
         p_sys->i_ca_handle = 0;
         return VLC_EGENERIC;
     }
