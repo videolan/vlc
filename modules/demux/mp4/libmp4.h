@@ -77,12 +77,14 @@
 #define FOURCC_iods VLC_FOURCC( 'i', 'o', 'd', 's' )
 
 #define FOURCC_nmhd VLC_FOURCC( 'n', 'm', 'h', 'd' )
+#define FOURCC_mp2v VLC_FOURCC( 'm', 'p', '2', 'v' )
 #define FOURCC_mp4v VLC_FOURCC( 'm', 'p', '4', 'v' )
 #define FOURCC_mp4a VLC_FOURCC( 'm', 'p', '4', 'a' )
 #define FOURCC_mp4s VLC_FOURCC( 'm', 'p', '4', 's' )
 #define FOURCC_vide VLC_FOURCC( 'v', 'i', 'd', 'e' )
 #define FOURCC_soun VLC_FOURCC( 's', 'o', 'u', 'n' )
 #define FOURCC_hint VLC_FOURCC( 'h', 'i', 'n', 't' )
+#define FOURCC_hdv2 VLC_FOURCC( 'h', 'd', 'v', '2' )
 
 #define FOURCC_dpnd VLC_FOURCC( 'd', 'p', 'n', 'd' )
 #define FOURCC_ipir VLC_FOURCC( 'i', 'p', 'i', 'r' )

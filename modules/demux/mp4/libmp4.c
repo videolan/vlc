@@ -2193,7 +2193,7 @@ static struct
     { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_qdrw,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
-    { FOURCC_m2v,   MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_mp2v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_hdv2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
     { FOURCC_mjqt,  MP4_ReadBox_default,        NULL }, /* found in mjpa/b */
