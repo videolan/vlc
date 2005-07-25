@@ -372,6 +372,12 @@ static int OpenDemux( vlc_object_t *p_this )
     char *psz_sdp = NULL;
     sdp_t *p_sdp = NULL;
 
+    if( !var_CreateGetInteger( p_demux, "sap-parse" ) )
+    {
+        /* We want livedotcom module to parse this SDP file */
+        return VLC_EGENERIC;
+    }
+
     /* Probe for SDP */
     if( p_demux->s )
     {
