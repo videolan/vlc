@@ -348,7 +348,9 @@ void UpdateVLC::GetData()
                 psz_eltvalue = xml_ReaderValue( p_xml_reader );
                 msg_Dbg( p_intf, "  text : %s", psz_eltvalue );
                 /* This doesn't look safe ... but it works */
-                it->m_files.back().description = wxU( psz_eltvalue );
+                if( !m_versions.empty() )
+                    if( !it->m_files.empty() )
+                        it->m_files.back().description = wxU( psz_eltvalue );
                 free( psz_eltvalue );
                 break;
         }
@@ -491,7 +493,7 @@ void UpdateVLC::UpdateUpdatesTree()
     /* build tree */
     parent = updates_tree->AppendItem( updates_root, wxT( "" ) );
     updates_tree->AppendItem( parent,
-                             wxT( "Current version : "PACKAGE_VERSION ),
+                             wxT( "Current version : "PACKAGE_VERSION_MAJOR"."PACKAGE_VERSION_MINOR"."PACKAGE_VERSION_REVISION"-"PACKAGE_VERSION_EXTRA ),
                              -1, -1, new UpdatesTreeItem( wxT( "" ) ));
     it = m_versions.begin();
     while( it != m_versions.end() )
