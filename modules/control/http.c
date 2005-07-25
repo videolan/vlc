@@ -31,6 +31,7 @@
  */
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
@@ -1211,6 +1212,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
 #endif
         f = mvar_New( name, "set" );
         mvar_AppendNewVar( f, "name", tmp );
+        mvar_AppendNewVar( f, "basename", p_dir_content->d_name );
 
 #ifdef HAVE_SYS_STAT_H
         if( S_ISDIR( stat_info.st_mode ) )
@@ -2847,8 +2849,55 @@ static void uri_decode_url_encoded( char *psz )
             *psz++ = *p++;
         }
     }
-    *psz++  ='\0';
+    *psz++ = '\0';
     free( dup );
+}
+
+static int char_in_str( char c, const char *str )
+{
+    while( *str )
+    {
+        if( c == *str )
+            return 1;
+        str++;
+    }
+
+    return 0;
+}
+
+static void uri_encode( const char *from, char *to, size_t to_len )
+{
+    static const char hex[] = "0123456789abcdef";
+
+    while( *from && to_len > 1 )
+    {
+        if( *from == ' ' )
+        {
+            *to++ = '+';
+        }
+        else if( isalnum( *from ) || char_in_str( *from, "$-_.+!*'(),/" ) )
+        {
+            *to++ = *from;
+        }
+        else
+        {
+            *to++ = '%';
+            if ( --to_len <= 1 )
+                break;
+
+            *to++ = hex[( *from >> 4 ) & 0x0f];
+            if ( --to_len <= 1 )
+                break;
+
+            *to++ = hex[*from & 0x0f];
+        }
+
+        to_len--;
+        from++;
+    }
+
+    if ( to_len > 0 )
+        *to = '\0';
 }
 
 /****************************************************************************
@@ -3171,6 +3220,14 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
 
             uri_extract_value( url, name, value, 512 );
             uri_decode_url_encoded( value );
+            SSPush( st, value );
+        }
+        else if( !strcmp( s, "url_encode" ) )
+        {
+            char *url = SSPop( st );
+            char value[512];
+
+            uri_encode( url, value, 512 );
             SSPush( st, value );
         }
         else
