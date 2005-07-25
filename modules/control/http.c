@@ -2853,41 +2853,6 @@ static void uri_decode_url_encoded( char *psz )
     free( dup );
 }
 
-static void uri_encode( const char *from, char *to, size_t to_len )
-{
-    static const char hex[] = "0123456789abcdef";
-
-    while( *from && to_len > 1 )
-    {
-        if( *from == ' ' )
-        {
-            *to++ = '+';
-        }
-        else if( isalnum( *from ) || strchr( "$-_.+!*'(),/", *from ) )
-        {
-            *to++ = *from;
-        }
-        else
-        {
-            *to++ = '%';
-            if ( --to_len <= 1 )
-                break;
-
-            *to++ = hex[( *from >> 4 ) & 0x0f];
-            if ( --to_len <= 1 )
-                break;
-
-            *to++ = hex[*from & 0x0f];
-        }
-
-        to_len--;
-        from++;
-    }
-
-    if ( to_len > 0 )
-        *to = '\0';
-}
-
 /****************************************************************************
  * Light RPN evaluator
  ****************************************************************************/
@@ -3213,10 +3178,11 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         else if( !strcmp( s, "url_encode" ) )
         {
             char *url = SSPop( st );
-            char value[512];
+            char *value;
 
-            uri_encode( url, value, 512 );
+            value = vlc_UrlEncode( url );
             SSPush( st, value );
+            free( value );
         }
         else
         {
