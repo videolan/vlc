@@ -1,7 +1,11 @@
 dnl Autoconf settings for vlc
 dnl $Id$
- 
+
 AC_INIT(vlc,0.8.4-svn)
+VERSION_MAJOR="0"
+VERSION_MINOR="8"
+VERSION_REVISION="4"
+VERSION_EXTRA="svn"
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Janus"
@@ -4400,6 +4404,10 @@ dnl
 AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION} ${CODENAME}", [Simple version string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "VLC media player - version ${VERSION} ${CODENAME} - (c) 1996-2005 the VideoLAN team", [Copyright string])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MAJOR,"${VERSION_MAJOR}", [version major number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MINOR,"${VERSION_MINOR}", [version minor number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_REVISION,"${VERSION_REVISION}", [version minor number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_EXTRA,"${VERSION_EXTRA}", [version minor number])
 
 dnl Old definitions for version-dependant plugins
 dnl VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
