@@ -593,10 +593,10 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     {
         glEnable( VLCGL_TARGET );
         glBegin( GL_POLYGON );
-        glTexCoord2f( 0.5, 0.5 ); glVertex2f( -1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex2f( 1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex2f( 1.0, -1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex2f( -1.0, -1.0 );
+        glTexCoord2f( 0.0, 0.0 ); glVertex2f( -1.0, 1.0 );
+        glTexCoord2f( f_width, 0.0 ); glVertex2f( 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
+        glTexCoord2f( 0.0, f_height ); glVertex2f( -1.0, -1.0 );
         glEnd();
     }
     else
@@ -607,36 +607,40 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         glBegin( GL_QUADS );
 
         /* Front */
-        glTexCoord2f( 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
 
         /* Left */
-        glTexCoord2f( 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
 
         /* Back */
-        glTexCoord2f( 0.5, 0.5 ); glVertex3f( 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
 
         /* Right */
-        glTexCoord2f( 0.5, 0.5 ); glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Top */
-        glTexCoord2f( 0.5, 0.5 ); glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0.5, f_height - 0.5 ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width - 0.5, f_height - 0.5 ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width - 0.5, 0.5 ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
+
+        /* Bottom */
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, - 1.0, 1.0 );
         glEnd();
     }
 
