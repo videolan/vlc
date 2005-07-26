@@ -126,7 +126,7 @@ struct module_symbols_t
     sout_stream_t * (*sout_StreamNew_inner) (sout_instance_t *, char *psz_chain);
     void (*sout_StreamDelete_inner) (sout_stream_t *);
     int (*sout_AnnounceRegister_inner) (sout_instance_t *,session_descriptor_t*, announce_method_t*);
-    session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *,char *, announce_method_t*);
+    session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *,const char *, announce_method_t*);
     int (*sout_AnnounceUnRegister_inner) (sout_instance_t *,session_descriptor_t*);
     session_descriptor_t* (*sout_AnnounceSessionCreate_inner) (void);
     void (*sout_AnnounceSessionDestroy_inner) (session_descriptor_t *);

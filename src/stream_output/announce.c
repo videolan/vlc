@@ -87,7 +87,7 @@ int sout_AnnounceRegister( sout_instance_t *p_sout,
  * \return the new session descriptor structure
  */
 session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
-                          char *psz_sdp, announce_method_t *p_method )
+                          const char *psz_sdp, announce_method_t *p_method )
 {
     session_descriptor_t *p_session;
     announce_handler_t *p_announce = (announce_handler_t*)
