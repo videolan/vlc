@@ -1269,9 +1269,7 @@ static int SapSetup( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;
-    /* FIXME: use sout_AnnounceMethodCreate */
-    announce_method_t *p_method = (announce_method_t *)
-                                  malloc(sizeof(announce_method_t));
+    announce_method_t *p_method = sout_AnnounceMethodCreate( METHOD_TYPE_SAP );
 
     /* Remove the previous session */
     if( p_sys->p_session != NULL)
@@ -1280,8 +1278,6 @@ static int SapSetup( sout_stream_t *p_stream )
         sout_AnnounceSessionDestroy( p_sys->p_session );
         p_sys->p_session = NULL;
     }
-    p_method->i_type = METHOD_TYPE_SAP;
-    p_method->psz_address = NULL; /* FIXME */
 
     if( ( p_sys->i_es > 0 || p_sys->p_mux ) && p_sys->psz_sdp && *p_sys->psz_sdp )
     {
