@@ -327,21 +327,18 @@ static int Open( vlc_object_t *p_this )
 
         var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
         if( *val.psz_string )
-        {
-            p_session->psz_name = strdup( val.psz_string );
-        }
+            p_session->psz_name = val.psz_string;
         else
         {
             p_session->psz_name = strdup( psz_url );
+            free( val.psz_string );
         }
-        free( val.psz_string );
 
         var_Get( p_stream, SOUT_CFG_PREFIX "group", &val );
         if( *val.psz_string )
-        {
-            p_session->psz_group = strdup( val.psz_string );
-        }
-        free( val.psz_string );
+            p_session->psz_group = val.psz_string;
+        else
+            free( val.psz_string );
 
         /* Now, parse the URL to extract host and port */
         vlc_UrlParse( &url, psz_url , 0);
