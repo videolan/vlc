@@ -1,7 +1,0 @@
-SOURCES_satellite = \
-	satellite.c \
-	access.c \
-	dvb.c \
-	dvb.h \
-	$(NULL)
-

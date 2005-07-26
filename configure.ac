@@ -1774,18 +1774,6 @@ then
 fi
 
 dnl
-dnl  Satellite input module
-dnl
-AC_ARG_ENABLE(satellite,
-  [  --enable-satellite      satellite card support (default disabled)],
-  [ if test "${enable_satellite}" = "yes"
-    then
-      AC_DEFINE(HAVE_SATELLITE, [], 
-      [Define for the satellite plugin])
-      VLC_ADD_PLUGINS([satellite])
-    fi])
-
-dnl
 dnl  DVB-S/DVB-T/DVB-C satellite/teresterial/cable input using v4l2
 dnl
 AC_ARG_ENABLE(dvb,
@@ -4491,7 +4479,6 @@ AC_CONFIG_FILES([
   modules/access/dvb/Makefile
   modules/access/mms/Makefile
   modules/access/pvr/Makefile
-  modules/access/satellite/Makefile
   modules/access/v4l/Makefile
   modules/access/cdda/Makefile
   modules/access/vcd/Makefile
