@@ -128,11 +128,19 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
         new wxButton( panel, CheckForUpdate_Event,
                       wxU(_("Check for updates now !")) );
     subpanel_sizer->Add( update_button, 0, wxALL, 5 );
+//wxChoice constructor prototype changes with 2.5
+#if wxCHECK_VERSION(2,5,0)
     wxArrayString *choices_array = new wxArrayString();
     choices_array->Add( wxT("") );
     mirrors_choice =
         new wxChoice( panel, MirrorChoice_Event, wxDefaultPosition,
                       wxSize( 200, -1 ), *choices_array );
+#else
+    wxString choices_array = wxT("");
+    mirrors_choice =
+        new wxChoice( panel, -1, wxDefaultPosition,
+                      wxSize( 200, -1 ),1, *choices_array );
+#endif
     subpanel_sizer->Add( mirrors_choice, 0, wxALL, 5 );
     subpanel_sizer->Layout();
     panel_sizer->Add( subpanel_sizer, 0, wxALL , 0 );
