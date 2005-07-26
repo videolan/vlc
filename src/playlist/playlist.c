@@ -570,12 +570,12 @@ static void RunThread ( playlist_t *p_playlist )
 
                 continue;
             }
-            /* This input is dying, let him do */
+            /* This input is dying, let it do */
             else if( p_playlist->p_input->b_die )
             {
                 ;
             }
-            /* This input has finished, ask him to die ! */
+            /* This input has finished, ask it to die ! */
             else if( p_playlist->p_input->b_error
                       || p_playlist->p_input->b_eof )
             {
@@ -691,7 +691,7 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->p_input->b_die )
         {
-            /* This input is dying, leave him alone */
+            /* This input is dying, leave it alone */
             ;
         }
         else if( p_playlist->p_input->b_error || p_playlist->p_input->b_eof )
@@ -858,17 +858,19 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         msg_Dbg( p_playlist,"processing request" );
 #endif
         /* We are not playing from a view */
-        if(  p_playlist->request.i_view == -1  )
+        if( p_playlist->request.i_view == -1  )
         {
 #ifdef PLAYLIST_DEBUG
             msg_Dbg( p_playlist, "non-view mode request");
 #endif
             /* Directly select the item, just like now */
+            p_new = p_playlist->request.p_item;
             i_skip = p_playlist->request.i_skip;
             i_goto = p_playlist->request.i_goto;
 
             if( p_playlist->i_index < 0 ) p_playlist->i_index = 0;
-            p_new = p_playlist->pp_items[p_playlist->i_index];
+            if ( p_new == NULL )
+                p_new = p_playlist->pp_items[p_playlist->i_index];
 
             if( i_goto >= 0  && i_goto < p_playlist->i_size )
             {
@@ -964,7 +966,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         if( p_playlist->status.i_view == -1 )
         {
 #ifdef PLAYLIST_DEBUG
-        msg_Dbg( p_playlist,"no request - old mode" );
+        msg_Dbg( p_playlist, "no request - old mode" );
 #endif
             if( p_playlist->i_index + 1 < p_playlist->i_size )
             {
