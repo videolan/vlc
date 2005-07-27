@@ -118,6 +118,7 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
         new wxTreeCtrl( panel, UpdatesTreeActivate_Event, wxDefaultPosition,
                         wxSize( 400, 200 ),
                         wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxSUNKEN_BORDER );
+    updates_tree->AddRoot( wxU(_("root" )), -1, -1, NULL );
 
     /* Place everything in sizers */
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
@@ -499,7 +500,7 @@ void UpdateVLC::UpdateUpdatesTree()
     updates_tree->DeleteAllItems();
 
     /* build tree */
-    parent = updates_tree->AppendItem( updates_root, wxT( "" ) );
+    parent=updates_tree->AddRoot( wxU(_("root" )), -1, -1, NULL );
     updates_tree->AppendItem( parent,
                              wxT( "Current version : VLC media player "PACKAGE_VERSION_MAJOR"."PACKAGE_VERSION_MINOR"."PACKAGE_VERSION_REVISION"-"PACKAGE_VERSION_EXTRA ),
                              -1, -1, new UpdatesTreeItem( wxT( "" ) ));
@@ -555,6 +556,7 @@ void UpdateVLC::UpdateUpdatesTree()
         }
         it ++;
         updates_tree->Expand( cat );
+        updates_tree->Expand( parent );
     }
 }
 
