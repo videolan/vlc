@@ -1018,10 +1018,11 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
 
     p += sprintf( p, "c=IN IP4 %s", psz_destination ?  psz_destination : "0.0.0.0" );
 
-    if( net_AddressIsMulticast( p_media, psz_destination ?  psz_destination : "0.0.0.0" ) )
+    if( ( psz_destination != NULL )
+     && net_AddressIsMulticast( p_media->p_vod, psz_destination ) )
     {
         /* Add the ttl if it is a multicast address */
-	p += sprintf( p, "/%d\r\n", p_media->i_ttl );
+        p += sprintf( p, "/%d\r\n", p_media->i_ttl );
     }
     else
     {
