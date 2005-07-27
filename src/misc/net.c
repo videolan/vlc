@@ -502,8 +502,8 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
  *****************************************************************************
  * Open a UDP connection and return a handle
  *****************************************************************************/
-int __net_OpenUDP( vlc_object_t *p_this, char *psz_bind, int i_bind,
-                   char *psz_server, int i_server )
+int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
+                   const char *psz_server, int i_server )
 {
     vlc_value_t      val;
     void            *private;

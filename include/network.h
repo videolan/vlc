@@ -45,10 +45,10 @@
  *****************************************************************************/
 struct network_socket_t
 {
-    char * psz_bind_addr;
+    const char *psz_bind_addr;
     int i_bind_port;
 
-    char * psz_server_addr;
+    const char *psz_server_addr;
     int i_server_port;
 
     int i_ttl;
@@ -322,7 +322,7 @@ VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
 VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
-VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server ) );
+VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server ) );
 
 VLC_EXPORT( void, net_Close, ( int fd ) );
 VLC_EXPORT( void, net_ListenClose, ( int *fd ) );

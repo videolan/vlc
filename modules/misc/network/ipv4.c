@@ -160,9 +160,9 @@ static int BuildAddr( struct sockaddr_in * p_socket,
  *****************************************************************************/
 static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 {
-    char * psz_bind_addr = p_socket->psz_bind_addr;
+    const char * psz_bind_addr = p_socket->psz_bind_addr;
     int i_bind_port = p_socket->i_bind_port;
-    char * psz_server_addr = p_socket->psz_server_addr;
+    const char * psz_server_addr = p_socket->psz_server_addr;
     int i_server_port = p_socket->i_server_port;
 
     int i_handle, i_opt;
