@@ -254,90 +254,112 @@ static void RunThread( vlc_object_t *p_this)
 static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                              session_descriptor_t *p_session )
 {
-    int i;
-    const char *psz_type = "application/sdp";
-    int i_header_size;
-    char *psz_head;
+    int i_header_size, i;
+    char *psz_head, psz_addr[NI_MAXNUMERICHOST];
     vlc_bool_t b_ipv6 = VLC_FALSE;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
-    char psz_buf[NI_MAXNUMERICHOST], *ptr;
-    const char *psz_addr;
     struct addrinfo hints, *res;
-        
+    struct sockaddr_storage addr;
 
     vlc_mutex_lock( &p_sap->object_lock );
 
     if( p_session->psz_uri == NULL )
     {
+        vlc_mutex_unlock( &p_sap->object_lock );
         msg_Err( p_sap, "*FIXME* Unexpected NULL URI for SAP announce" );
         msg_Err( p_sap, "This should not happen. VLC needs fixing." );
-        vlc_mutex_unlock( &p_sap->object_lock );
         return VLC_EGENERIC;
     }
 
-    /* Determine SAP multicast address automatically (FIXME: gruik) */
-    /* Canonicalize IP address (e.g. 224.00.010.1 => 224.0.10.1) */
+    /* Determine SAP multicast address automatically */
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_NUMERICHOST;
 
     i = vlc_getaddrinfo( (vlc_object_t *)p_sap, p_session->psz_uri, 0,
                          &hints, &res );
-    if( i == 0 )
-    {
-        i = vlc_getnameinfo( res->ai_addr, res->ai_addrlen, psz_buf,
-                             sizeof( psz_buf ), NULL, NI_NUMERICHOST );
-        vlc_freeaddrinfo( res );
-    }
-
     if( i )
     {
-        msg_Err( p_sap, "Invalid URI for SAP announce : %s : %s",
-                 p_session->psz_uri, vlc_gai_strerror( i ) );
         vlc_mutex_unlock( &p_sap->object_lock );
+        msg_Err( p_sap, "Invalid URI for SAP announce: %s: %s",
+                 p_session->psz_uri, vlc_gai_strerror( i ) );
         return VLC_EGENERIC;
     }
 
-    /* Remove interface specification if present */
-    ptr = strchr( psz_buf, '%' );
-    if( ptr != NULL )
-        *ptr = '\0';
-
-    if( strchr( psz_buf, ':' ) != NULL )
+    if( (unsigned)res->ai_addrlen > sizeof( addr ) )
     {
-        b_ipv6 = VLC_TRUE;
-
-        /* See RFC3513 for list of valid IPv6 scopes */
-        if( ( tolower( psz_buf[0] ) == 'f' )
-         && ( tolower( psz_buf[1] ) == 'f' )
-         && isxdigit( psz_buf[2] ) && isxdigit( psz_buf[3] ) )
-        {
-            /* Multicast IPv6 */
-            psz_buf[2] = '0'; /* force flags to zero */
-            /* keep scope in psz_addr[3] */
-            memcpy( &psz_buf[4], "::2:7ffe", sizeof( "::2:7ffe" ) );
-            psz_addr = psz_buf;
-        }
-        else
-            /* Unicast IPv6 - assume global scope */
-            psz_addr = "ff0e::2:7ffe";
+        vlc_mutex_unlock( &p_sap->object_lock );
+        vlc_freeaddrinfo( res );
+        msg_Err( p_sap, "Unsupported address family of size %d > %u",
+                 res->ai_addrlen, sizeof( addr ) );
+        return VLC_EGENERIC;
     }
-    else
+
+    memcpy( &addr, res->ai_addr, res->ai_addrlen );
+
+    switch( addr.ss_family )
     {
-        /* See RFC2365 for IPv4 scopes */
-        if( memcmp( psz_buf, "224.0.0.", 8 ) == 0 )
-            psz_addr = "224.0.0.255";
-        else
-        if( memcmp( psz_buf, "239.255.", 8 ) == 0 )
-            psz_addr = "239.255.255.255";
-        else
-        if( ( memcmp( psz_buf, "239.19", 6 ) == 0 )
-         && ( ( psz_buf[6] >= '2' ) && ( psz_buf[6] <= '5' ) ) )
-            psz_addr = "239.195.255.255";
-        else
-            /* assume global scope */
-            psz_addr = "224.2.127.254";
+#if defined (HAVE_GETADDRINFO) || defined (WIN32)
+        case AF_INET6:
+        {
+            /* See RFC3513 for list of valid IPv6 scopes */
+            struct in6_addr *a6 = &((struct sockaddr_in6 *)&addr)->sin6_addr;
+
+            memcpy( a6->s6_addr + 2, "\x00\x00\x00\x00\x00\x00"
+                   "\x00\x00\x00\x00\x00\x02\x7f\xfe", 14 );
+            if( IN6_IS_ADDR_MULTICAST( a6 ) )
+                 /* force flags to zero, preserve scope */
+                a6->s6_addr[1] &= 0xf;
+            else
+                /* Unicast IPv6 - assume global scope */
+                memcpy( a6->s6_addr, "\xff\x0e", 2 );
+
+            b_ipv6 = VLC_TRUE;
+            break;
+        }
+#endif
+
+        case AF_INET:
+        {
+            /* See RFC2365 for IPv4 scopes */
+            uint32_t ipv4;
+
+            ipv4 = ntohl( ((struct sockaddr_in *)&addr)->sin_addr.s_addr );
+            /* 224.0.0.0/24 => 224.0.0.255 */
+            if ((ipv4 & 0xffffff00) == 0xe0000000)
+                ipv4 =  0xe00000ff;
+            else
+            /* 239.255.0.0/16 => 239.255.255.255 */
+            if ((ipv4 & 0xffff0000) == 0xefff0000)
+                ipv4 =  0xefffffff;
+            else
+            /* 239.192.0.0/14 => 239.195.255.255 */
+            if ((ipv4 & 0xfffc0000) == 0xefc00000)
+                ipv4 =  0xefc3ffff;
+            else
+            /* other addresses => 224.2.127.254 */
+                ipv4 = 0xe0027ffe;
+            break;
+        }
+        
+        default:
+            vlc_mutex_unlock( &p_sap->object_lock );
+            vlc_freeaddrinfo( res );
+            msg_Err( p_sap, "Address family %d not supported by SAP",
+                     addr.ss_family );
+            return VLC_EGENERIC;
+    }
+
+    i = vlc_getnameinfo( (struct sockaddr *)&addr, res->ai_addrlen,
+                         psz_addr, sizeof( psz_addr ), NULL, NI_NUMERICHOST );
+    vlc_freeaddrinfo( res );
+
+    if( i )
+    {
+        vlc_mutex_unlock( &p_sap->object_lock );
+        msg_Err( p_sap, "%s", vlc_gai_strerror( i ) );
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_sap, "using SAP address: %s", psz_addr);
@@ -371,9 +393,16 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                                         p_address->i_port );
         if( p_address->i_wfd != -1 )
         {
+            char *ptr;
+
             net_StopRecv( p_address->i_wfd );
             net_GetSockAddress( p_sap, p_address->i_wfd,
                                 p_address->psz_machine, NULL );
+
+            /* removes scope if present */
+            ptr = strchr( p_address->psz_machine, '%' );
+            if( ptr != NULL )
+                *ptr = '\0';
         }
 
         if( p_sap->b_control == VLC_TRUE )
@@ -412,7 +441,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
 
     /* Build the SAP Headers */
-    i_header_size = ( b_ipv6 ? 20 : 8 ) + strlen( psz_type ) + 1;
+    i_header_size = ( b_ipv6 ? 16 : 4 ) + 20;
     psz_head = (char *) malloc( i_header_size * sizeof( char ) );
     if( psz_head == NULL )
     {
@@ -420,51 +449,18 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         return VLC_ENOMEM;
     }
 
-    psz_head[0] = 0x20; /* Means SAPv1, IPv4, not encrypted, not compressed */
+    /* SAPv1, not encrypted, not compressed */
+    psz_head[0] = b_ipv6 ? 0x30 : 0x20;
     psz_head[1] = 0x00; /* No authentification length */
 
     i_hash = mdate();
     psz_head[2] = (i_hash & 0xFF00) >> 8; /* Msg id hash */
     psz_head[3] = (i_hash & 0xFF);        /* Msg id hash 2 */
 
-    if( b_ipv6 )
-    {
-        /* in_addr_t ip_server = inet_addr( ip ); */
-        psz_head[0] |= 0x10; /* Set IPv6 */
+    inet_pton( b_ipv6 ? AF_INET6 : AF_INET, /* can't fail */
+               p_sap_session->p_address->psz_machine, psz_head + 4 );
 
-        psz_head[4] = 0x01; /* Source IP  FIXME: we should get the real address */
-        psz_head[5] = 0x02; /* idem */
-        psz_head[6] = 0x03; /* idem */
-        psz_head[7] = 0x04; /* idem */
-
-        psz_head[8] = 0x01; /* Source IP  FIXME: we should get the real address */
-        psz_head[9] = 0x02; /* idem */
-        psz_head[10] = 0x03; /* idem */
-        psz_head[11] = 0x04; /* idem */
-
-        psz_head[12] = 0x01; /* Source IP  FIXME: we should get the real address */
-        psz_head[13] = 0x02; /* idem */
-        psz_head[14] = 0x03; /* idem */
-        psz_head[15] = 0x04; /* idem */
-
-        psz_head[16] = 0x01; /* Source IP  FIXME: we should get the real address */
-        psz_head[17] = 0x02; /* idem */
-        psz_head[18] = 0x03; /* idem */
-        psz_head[19] = 0x04; /* idem */
-
-        strncpy( psz_head + 20, psz_type, 15 );
-    }
-    else
-    {
-        /* in_addr_t ip_server = inet_addr( ip) */
-        /* Source IP  FIXME: we should get the real address */
-        psz_head[4] = 0x01; /* ip_server */
-        psz_head[5] = 0x02; /* ip_server>>8 */
-        psz_head[6] = 0x03; /* ip_server>>16 */
-        psz_head[7] = 0x04; /* ip_server>>24 */
-
-        strncpy( psz_head + 8, psz_type, 15 );
-    }
+    memcpy( psz_head + (b_ipv6 ? 20 : 8), "application/sdp", 15 );
 
     /* If needed, build the SDP */
     if( p_session->psz_sdp == NULL )
