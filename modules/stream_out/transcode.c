@@ -897,28 +897,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( !id->b_transcode && id->id )
     {
-        if( p_sys->b_master_sync && p_sys->i_master_drift )
-        {
-            if( p_buffer->i_dts > 0 )
-            {
-                p_buffer->i_dts -= p_sys->i_master_drift;
-                if( p_buffer->i_dts < 0 )
-                {
-                    block_Release( p_buffer );
-                    return VLC_EGENERIC;
-                }
-            }
-            if( p_buffer->i_pts > 0 )
-            {
-                p_buffer->i_pts -= p_sys->i_master_drift;
-                if( p_buffer->i_pts < 0 )
-                {
-                    block_Release( p_buffer );
-                    return VLC_EGENERIC;
-                }
-            }
-        }
-
         return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
     }
     else if( !id->b_transcode )
@@ -1223,6 +1201,11 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
+            if ( i_dts == 1 )
+            {
+                date_Set( &id->interpolated_pts, p_audio_buf->start_date );
+                i_dts = p_audio_buf->start_date + 1;
+            }
             p_sys->i_master_drift = p_audio_buf->start_date - i_dts;
             date_Increment( &id->interpolated_pts, p_audio_buf->i_nb_samples );
             p_audio_buf->start_date -= p_sys->i_master_drift;
@@ -1408,8 +1391,6 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
             return VLC_EGENERIC;
         }
     }
-
-    date_Set( &id->interpolated_pts, 0 );
 
     return VLC_SUCCESS;
 }
@@ -1627,13 +1608,12 @@ static int transcode_video_process( sout_stream_t *p_stream,
             mtime_t i_master_drift = p_sys->i_master_drift;
             mtime_t i_pts;
 
-            if( !i_master_drift )
-            {
-                /* No audio track ? */
-                p_sys->i_master_drift = i_master_drift = p_pic->date;
-            }
-
             i_pts = date_Get( &id->interpolated_pts ) + 1;
+            if ( i_pts == 1 )
+            {
+                date_Set( &id->interpolated_pts, p_pic->date );
+                i_pts = p_pic->date + 1;
+            }
             i_video_drift = p_pic->date - i_pts;
             i_duplicate = 1;
 
@@ -1864,21 +1844,56 @@ static int transcode_video_process( sout_stream_t *p_stream,
             block_t *p_block;
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
             block_ChainAppend( out, p_block );
+        }
 
-            if( p_sys->b_master_sync )
-                date_Increment( &id->interpolated_pts, 1 );
-
-            if( p_sys->b_master_sync && i_duplicate > 1 )
+        if( p_sys->b_master_sync )
+        {
+            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
+            if ( i_pts == 1 )
             {
-                mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-                date_Increment( &id->interpolated_pts, 1 );
+                date_Set( &id->interpolated_pts, p_pic->date );
+                i_pts = p_pic->date + 1;
+            }
+            date_Increment( &id->interpolated_pts, 1 );
+        }
+
+        if( p_sys->b_master_sync && i_duplicate > 1 )
+        {
+            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
+            if ( i_pts == 1 )
+            {
+                date_Set( &id->interpolated_pts, p_pic->date );
+                i_pts = p_pic->date + 1;
+            }
+            date_Increment( &id->interpolated_pts, 1 );
+
+            if( p_sys->i_threads >= 1 )
+            {
+                /* We can't modify the picture, we need to duplicate it */
+                picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
+                if( p_tmp != NULL )
+                {
+                    vout_CopyPicture( p_stream, p_tmp, p_pic );
+                    p_pic = p_tmp;
+
+                    vlc_mutex_lock( &p_sys->lock_out );
+                    p_sys->pp_pics[p_sys->i_last_pic++] = p_pic;
+                    p_sys->i_last_pic %= PICTURE_RING_SIZE;
+                    vlc_cond_signal( &p_sys->cond );
+                    vlc_mutex_unlock( &p_sys->lock_out );
+                }
+            }
+            else
+            {
+                block_t *p_block;
                 p_pic->date = i_pts;
                 p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
                 block_ChainAppend( out, p_block );
             }
-
-            p_pic->pf_release( p_pic );
         }
+
+        if( p_sys->i_threads == 0 )
+            p_pic->pf_release( p_pic );
     }
 
     return VLC_SUCCESS;
@@ -1913,19 +1928,6 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
         vlc_mutex_lock( &p_sys->lock_out );
         block_ChainAppend( &p_sys->p_buffers, p_block );
 
-        if( p_sys->b_master_sync )
-            date_Increment( &id->interpolated_pts, 1 );
-
-#if 0
-        if( p_sys->b_master_sync && i_duplicate > 1 )
-        {
-            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            date_Increment( &id->interpolated_pts, 1 );
-            p_pic->date = i_pts;
-            p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
-            block_ChainAppend( &p_sys->p_buffers, p_block );
-        }
-#endif
         vlc_mutex_unlock( &p_sys->lock_out );
 
         p_pic->pf_release( p_pic );
