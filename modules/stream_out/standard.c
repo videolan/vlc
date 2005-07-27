@@ -361,8 +361,6 @@ static int Open( vlc_object_t *p_this )
         }
         vlc_UrlClean( &url );
 
-        /* FIXME: Free p_method */
-        if( p_method->psz_address) free( p_method->psz_address );
         free( p_method );
     }
 

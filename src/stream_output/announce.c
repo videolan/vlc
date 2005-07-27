@@ -199,14 +199,10 @@ announce_method_t * sout_AnnounceMethodCreate( int i_type )
     announce_method_t *p_method;
 
     p_method = (announce_method_t *)malloc( sizeof(announce_method_t) );
+    if( p_method == NULL )
+        return NULL;
 
-    if( p_method )
-    {
-        p_method->i_type = i_type;
-        if( i_type == METHOD_TYPE_SAP )
-            /* Default value */
-            p_method->psz_address = NULL;
-    }
+    p_method->i_type = i_type;
     return p_method;
 }
 
@@ -286,7 +282,7 @@ int announce_Register( announce_handler_t *p_announce,
         }
         /* this will set p_session->p_sap for later deletion */
         msg_Dbg( p_announce, "adding SAP session");
-        p_announce->p_sap->pf_add( p_announce->p_sap, p_session, p_method );
+        p_announce->p_sap->pf_add( p_announce->p_sap, p_session );
     }
     else if( p_method->i_type == METHOD_TYPE_SLP )
     {

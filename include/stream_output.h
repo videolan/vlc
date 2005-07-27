@@ -257,9 +257,6 @@ struct session_descriptor_t
 struct announce_method_t
 {
     int i_type;
-
-    /* For SAP */
-    char *psz_address; /* If we use a custom address */
 };
 
 
@@ -291,7 +288,7 @@ struct sap_handler_t
 
     int i_current_session;
 
-    int (*pf_add)  ( sap_handler_t*, session_descriptor_t *,announce_method_t*);
+    int (*pf_add)  ( sap_handler_t*, session_descriptor_t *);
     int (*pf_del)  ( sap_handler_t*, session_descriptor_t *);
 
     /* private data, not in p_sys as there is one kind of sap_handler_t */

@@ -92,7 +92,7 @@ struct module_symbols_t
     int (*__net_OpenTCP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port);
     int * (*__net_ListenTCP_inner) (vlc_object_t *, const char *, int);
     int (*__net_Accept_inner) (vlc_object_t *, int *, mtime_t);
-    int (*__net_OpenUDP_inner) (vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server);
+    int (*__net_OpenUDP_inner) (vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server);
     void (*net_Close_inner) (int fd);
     int (*__net_Read_inner) (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data, vlc_bool_t b_retry);
     int (*__net_ReadNonBlock_inner) (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data, mtime_t i_wait);

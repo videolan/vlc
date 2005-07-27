@@ -65,6 +65,7 @@
 struct sap_address_t
 {
     char *psz_address;
+    char psz_machine[NI_MAXNUMERICHOST];
     int i_port;
     int i_rfd; /* Read socket */
     int i_wfd; /* Write socket */
@@ -83,15 +84,16 @@ struct sap_address_t
  *****************************************************************************/
 static void RunThread( vlc_object_t *p_this);
 static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address );
-static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session );
+static char *SDPGenerate( sap_handler_t *p_sap,
+                          const session_descriptor_t *p_session,
+                          const sap_address_t *p_addr );
 
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                                      sap_session_t *p_session );
 
 
 static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
-                             session_descriptor_t *p_session,
-                             announce_method_t *p_method );
+                             session_descriptor_t *p_session );
 
 static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
                              session_descriptor_t *p_session );
@@ -125,9 +127,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     p_sap->iconvHandle = vlc_iconv_open( "UTF-8", psz_charset );
     free( psz_charset );
     if( p_sap->iconvHandle == (vlc_iconv_t)(-1) )
-    {
         msg_Warn( p_sap, "Unable to do requested conversion" );
-    }
 
     p_sap->pf_add = announce_SAPAnnounceAdd;
     p_sap->pf_del = announce_SAPAnnounceDel;
@@ -252,132 +252,111 @@ static void RunThread( vlc_object_t *p_this)
 
 /* Add a SAP announce */
 static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
-                             session_descriptor_t *p_session,
-                             announce_method_t *p_method )
+                             session_descriptor_t *p_session )
 {
     int i;
-    char *psz_type = "application/sdp";
+    const char *psz_type = "application/sdp";
     int i_header_size;
     char *psz_head;
-    vlc_bool_t b_found = VLC_FALSE, b_ipv6 = VLC_FALSE;
+    vlc_bool_t b_ipv6 = VLC_FALSE;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
+    char psz_buf[NI_MAXNUMERICHOST], *ptr;
+    const char *psz_addr;
+    struct addrinfo hints, *res;
+        
 
     vlc_mutex_lock( &p_sap->object_lock );
 
-    /* If needed, build the SDP */
-    if( !p_session->psz_sdp )
+    if( p_session->psz_uri == NULL )
     {
-        if ( SDPGenerate( p_sap, p_session ) != VLC_SUCCESS )
-        {
-            vlc_mutex_unlock( &p_sap->object_lock );
-            return VLC_EGENERIC;
-        }
+        msg_Err( p_sap, "*FIXME* Unexpected NULL URI for SAP announce" );
+        msg_Err( p_sap, "This should not happen. VLC needs fixing." );
+        vlc_mutex_unlock( &p_sap->object_lock );
+        return VLC_EGENERIC;
     }
 
-    if( p_method->psz_address == NULL )
+    /* Determine SAP multicast address automatically (FIXME: gruik) */
+    /* Canonicalize IP address (e.g. 224.00.010.1 => 224.0.10.1) */
+    memset( &hints, 0, sizeof( hints ) );
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_NUMERICHOST;
+
+    i = vlc_getaddrinfo( (vlc_object_t *)p_sap, p_session->psz_uri, 0,
+                         &hints, &res );
+    if( i == 0 )
     {
-        /* Determine SAP multicast address automatically */
-        char psz_buf[NI_MAXNUMERICHOST], *ptr;
-        const char *psz_addr;
-        struct addrinfo hints, *res;
+        i = vlc_getnameinfo( res->ai_addr, res->ai_addrlen, psz_buf,
+                             sizeof( psz_buf ), NULL, NI_NUMERICHOST );
+        vlc_freeaddrinfo( res );
+    }
 
-        if( p_session->psz_uri == NULL )
+    if( i )
+    {
+        msg_Err( p_sap, "Invalid URI for SAP announce : %s : %s",
+                 p_session->psz_uri, vlc_gai_strerror( i ) );
+        vlc_mutex_unlock( &p_sap->object_lock );
+        return VLC_EGENERIC;
+    }
+
+    /* Remove interface specification if present */
+    ptr = strchr( psz_buf, '%' );
+    if( ptr != NULL )
+        *ptr = '\0';
+
+    if( strchr( psz_buf, ':' ) != NULL )
+    {
+        b_ipv6 = VLC_TRUE;
+
+        /* See RFC3513 for list of valid IPv6 scopes */
+        if( ( tolower( psz_buf[0] ) == 'f' )
+         && ( tolower( psz_buf[1] ) == 'f' )
+         && isxdigit( psz_buf[2] ) && isxdigit( psz_buf[3] ) )
         {
-            msg_Err( p_sap, "*FIXME* Unexpected NULL URI for SAP announce" );
-            msg_Err( p_sap, "This should not happen. VLC needs fixing." );
-            vlc_mutex_unlock( &p_sap->object_lock );
-            return VLC_EGENERIC;
-        }
-
-        /* Canonicalize IP address (e.g. 224.00.010.1 => 224.0.10.1) */
-        memset( &hints, 0, sizeof( hints ) );
-        hints.ai_socktype = SOCK_DGRAM;
-        hints.ai_flags = AI_NUMERICHOST;
-
-        i = vlc_getaddrinfo( (vlc_object_t *)p_sap, p_session->psz_uri, 0,
-                             &hints, &res );
-        if( i == 0 )
-        {
-            i = vlc_getnameinfo( res->ai_addr, res->ai_addrlen, psz_buf,
-                                 sizeof( psz_buf ), NULL, NI_NUMERICHOST );
-            vlc_freeaddrinfo( res );
-        }
-
-        if( i )
-        {
-            msg_Err( p_sap, "Invalid URI for SAP announce : %s : %s",
-                     p_session->psz_uri, vlc_gai_strerror( i ) );
-            vlc_mutex_unlock( &p_sap->object_lock );
-            return VLC_EGENERIC;
-        }
-
-        /* Remove interface specification if present */
-        ptr = strchr( psz_buf, '%' );
-        if( ptr != NULL )
-            *ptr = '\0';
-
-        if( strchr( psz_buf, ':' ) != NULL )
-        {
-            b_ipv6 = VLC_TRUE;
-
-            /* See RFC3513 for list of valid IPv6 scopes */
-            if( ( tolower( psz_buf[0] ) == 'f' )
-             && ( tolower( psz_buf[1] ) == 'f' )
-             && isxdigit( psz_buf[2] ) && isxdigit( psz_buf[3] ) )
-            {
-                /* Multicast IPv6 */
-                psz_buf[2] = '0'; /* force flags to zero */
-                /* keep scope in psz_addr[3] */
-                memcpy( &psz_buf[4], "::2:7ffe", sizeof( "::2:7ffe" ) );
-                psz_addr = psz_buf;
-            }
-            else
-                /* Unicast IPv6 - assume global scope */
-                psz_addr = "ff0e::2:7ffe";
+            /* Multicast IPv6 */
+            psz_buf[2] = '0'; /* force flags to zero */
+            /* keep scope in psz_addr[3] */
+            memcpy( &psz_buf[4], "::2:7ffe", sizeof( "::2:7ffe" ) );
+            psz_addr = psz_buf;
         }
         else
-        {
-            /* See RFC2365 for IPv4 scopes */
-            if( memcmp( psz_buf, "224.0.0.", 8 ) == 0 )
-                psz_addr = "224.0.0.255";
-            else
-            if( memcmp( psz_buf, "239.255.", 8 ) == 0 )
-                psz_addr = "239.255.255.255";
-            else
-            if( ( memcmp( psz_buf, "239.19", 6 ) == 0 )
-             && ( ( psz_buf[6] >= '2' ) && ( psz_buf[6] <= '5' ) ) )
-                psz_addr = "239.195.255.255";
-            else
-                /* assume global scope */
-                psz_addr = "224.2.127.254";
-        }
-
-        p_method->psz_address = strdup( psz_addr );
+            /* Unicast IPv6 - assume global scope */
+            psz_addr = "ff0e::2:7ffe";
     }
     else
-        b_ipv6 = (strchr( p_method->psz_address, ':' ) != NULL);
+    {
+        /* See RFC2365 for IPv4 scopes */
+        if( memcmp( psz_buf, "224.0.0.", 8 ) == 0 )
+            psz_addr = "224.0.0.255";
+        else
+        if( memcmp( psz_buf, "239.255.", 8 ) == 0 )
+            psz_addr = "239.255.255.255";
+        else
+        if( ( memcmp( psz_buf, "239.19", 6 ) == 0 )
+         && ( ( psz_buf[6] >= '2' ) && ( psz_buf[6] <= '5' ) ) )
+            psz_addr = "239.195.255.255";
+        else
+            /* assume global scope */
+            psz_addr = "224.2.127.254";
+    }
 
-    msg_Dbg( p_sap, "using SAP address: %s", p_method->psz_address);
+    msg_Dbg( p_sap, "using SAP address: %s", psz_addr);
 
     /* XXX: Check for dupes */
     p_sap_session = (sap_session_t*)malloc(sizeof(sap_session_t));
-
-    p_sap_session->psz_sdp = strdup( p_session->psz_sdp );
-    p_sap_session->i_last = 0;
+    p_sap_session->p_address = NULL;
 
     /* Add the address to the buffer */
-    for( i = 0; i< p_sap->i_addresses; i++)
+    for( i = 0; i < p_sap->i_addresses; i++)
     {
-        if( !strcmp( p_method->psz_address,
-             p_sap->pp_addresses[i]->psz_address ) )
+        if( !strcmp( psz_addr, p_sap->pp_addresses[i]->psz_address ) )
         {
             p_sap_session->p_address = p_sap->pp_addresses[i];
-            b_found = VLC_TRUE;
             break;
         }
     }
-    if( b_found == VLC_FALSE )
+
+    if( p_sap_session->p_address == NULL )
     {
         sap_address_t *p_address = (sap_address_t *)
                                     malloc( sizeof(sap_address_t) );
@@ -386,19 +365,21 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             msg_Err( p_sap, "out of memory" );
             return VLC_ENOMEM;
         }
-        p_address->psz_address = strdup( p_method->psz_address );
+        p_address->psz_address = strdup( psz_addr );
         p_address->i_port  =  9875;
-        p_address->i_wfd = net_OpenUDP( p_sap, "", 0,
-                                        p_address->psz_address,
+        p_address->i_wfd = net_OpenUDP( p_sap, "", 0, psz_addr,
                                         p_address->i_port );
         if( p_address->i_wfd != -1 )
+        {
             net_StopRecv( p_address->i_wfd );
+            net_GetSockAddress( p_sap, p_address->i_wfd,
+                                p_address->psz_machine, NULL );
+        }
 
         if( p_sap->b_control == VLC_TRUE )
         {
-            p_address->i_rfd = net_OpenUDP( p_sap, p_method->psz_address,
-                                            p_address->i_port,
-                                            "", 0 );
+            p_address->i_rfd = net_OpenUDP( p_sap, psz_addr,
+                                            p_address->i_port, "", 0 );
             if( p_address->i_rfd != -1 )
                 net_StopSend( p_address->i_rfd );
             p_address->i_buff = 0;
@@ -429,10 +410,11 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         p_sap_session->p_address = p_address;
     }
 
+
     /* Build the SAP Headers */
     i_header_size = ( b_ipv6 ? 20 : 8 ) + strlen( psz_type ) + 1;
     psz_head = (char *) malloc( i_header_size * sizeof( char ) );
-    if( ! psz_head )
+    if( psz_head == NULL )
     {
         msg_Err( p_sap, "out of memory" );
         return VLC_ENOMEM;
@@ -483,6 +465,21 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
         strncpy( psz_head + 8, psz_type, 15 );
     }
+
+    /* If needed, build the SDP */
+    if( p_session->psz_sdp == NULL )
+    {
+        p_session->psz_sdp = SDPGenerate( p_sap, p_session,
+                                          p_sap_session->p_address );
+        if( p_session->psz_sdp == NULL )
+        {
+            vlc_mutex_unlock( &p_sap->object_lock );
+            return VLC_ENOMEM;
+        }
+    }
+
+    p_sap_session->psz_sdp = strdup( p_session->psz_sdp );
+    p_sap_session->i_last = 0;
 
     psz_head[ i_header_size-1 ] = '\0';
     p_sap_session->i_length = i_header_size + strlen( p_sap_session->psz_sdp);
@@ -570,7 +567,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
         i_ret = net_Write( p_sap, p_session->p_address->i_wfd, NULL,
                            p_session->psz_data,
                            p_session->i_length );
-        if( i_ret != p_session->i_length )
+        if( i_ret != (int)p_session->i_length )
         {
             msg_Warn( p_sap, "SAP send failed on address %s (%i %i)",
                    p_session->p_address->psz_address,
@@ -587,15 +584,23 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
     return VLC_SUCCESS;
 }
 
-static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
+static char *SDPGenerate( sap_handler_t *p_sap,
+                          const session_descriptor_t *p_session,
+                          const sap_address_t *p_addr )
 {
     int64_t i_sdp_id = mdate();
     int     i_sdp_version = 1 + p_sap->i_sessions + (rand()&0xfff);
-    char *psz_group, *psz_name, psz_uribuf[NI_MAXNUMERICHOST], *psz_uri;
+    char *psz_group, *psz_name, psz_uribuf[NI_MAXNUMERICHOST], *psz_uri,
+         *psz_sdp;
     char ipv;
 
     psz_group = convert_to_utf8( p_sap, p_session->psz_group );
     psz_name = convert_to_utf8( p_sap, p_session->psz_name );
+    if( psz_name == NULL )
+    {
+        FREE( psz_group );
+        return NULL;
+    }
 
     /* FIXME: really check that psz_uri is a real IP address
      * FIXME: make a common function to obtain a canonical IP address */
@@ -618,30 +623,9 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
         psz_uri = p_session->psz_uri;
 
     /* see the lists in modules/stream_out/rtp.c for compliance stuff */
-    p_session->psz_sdp = (char *)malloc(
-                            sizeof("v=0\r\n"
-                                   "o=- 45383436098 45398  IN IP4 127.0.0.1\r\n" /* FIXME */
-                                   "s=\r\n"
-                                   "t=0 0\r\n"
-                                   "c=IN IP4 /\r\n"
-                                   "m=video  udp\r\n"
-                                   "a=tool:"PACKAGE_STRING"\r\n"
-                                   "a=type:broadcast\r\n")
-                           + strlen( psz_name )
-                           + strlen( psz_uri ) + 300
-                           + ( psz_group ? strlen( psz_group ) : 0 ) );
-
-    if( p_session->psz_sdp == NULL || psz_name == NULL )
-    {
-        msg_Err( p_sap, "out of memory" );
-        FREE( psz_name );
-        FREE( psz_group );
-        return VLC_ENOMEM;
-    }
-
-    sprintf( p_session->psz_sdp,
+    if( asprintf( &psz_sdp,
                             "v=0\r\n"
-                            "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
+                            "o=- "I64Fd" %d IN IP%c %s\r\n"
                             "s=%s\r\n"
                             "t=0 0\r\n"
                             "c=IN IP%c %s/%d\r\n"
@@ -649,21 +633,28 @@ static int SDPGenerate( sap_handler_t *p_sap, session_descriptor_t *p_session )
                             "a=tool:"PACKAGE_STRING"\r\n"
                             "a=type:broadcast\r\n",
                             i_sdp_id, i_sdp_version,
+                            ipv, p_addr->psz_machine,
                             psz_name, ipv,
                             psz_uri, p_session->i_ttl,
-                            p_session->i_port, p_session->i_payload );
+                            p_session->i_port, p_session->i_payload ) == -1 )
+    {
+        free( psz_name );
+        FREE( psz_group );
+        return NULL;
+    }
+    
     free( psz_name );
 
     if( psz_group )
     {
-        sprintf( p_session->psz_sdp, "%sa=x-plgroup:%s\r\n",
-                                     p_session->psz_sdp, psz_group );
+        /* FIXME: this is illegal use of sprintf */
+        sprintf( psz_sdp, "%sa=x-plgroup:%s\r\n", psz_sdp, psz_group );
         free( psz_group );
     }
 
-    msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(p_session->psz_sdp),
-                    p_session->psz_sdp );
-    return VLC_SUCCESS;
+    msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),
+             psz_sdp );
+    return psz_sdp;
 }
 
 static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
