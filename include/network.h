@@ -462,7 +462,6 @@ VLC_EXPORT( void, vlc_freeaddrinfo, ( struct addrinfo * ) );
 /*****************************************************************************
  * net_AddressIsMulticast: This function returns VLC_FALSE if the psz_addr does
  * not specify a multicast address or if the address is not a valid address.
- * FIXME: Only the first returned address is checked. This might be problematic.
  *****************************************************************************/
 static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, char *psz_addr )
 {
