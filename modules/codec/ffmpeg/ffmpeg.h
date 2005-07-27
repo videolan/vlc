@@ -186,6 +186,10 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define ENC_INTERLACE_LONGTEXT N_( "Allows you to enable dedicated " \
   "algorithms for interlaced frames." )
 
+#define ENC_INTERLACE_ME_TEXT N_( "Enable interlaced motion estimation" )
+#define ENC_INTERLACE_ME_LONGTEXT N_( "Allows you to enable interlaced " \
+  "motion estimation algorithms. It requires more CPU." )
+
 #define ENC_PRE_ME_TEXT N_( "Enable pre motion estimation" )
 #define ENC_PRE_ME_LONGTEXT N_( "Allows you to enable the pre motion " \
   "estimation." )

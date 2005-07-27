@@ -134,7 +134,7 @@ struct encoder_sys_t
     float      f_rc_buffer_aggressivity;
     vlc_bool_t b_pre_me;
     vlc_bool_t b_hurry_up;
-    vlc_bool_t b_interlace;
+    vlc_bool_t b_interlace, b_interlace_me;
     float      f_i_quant_factor;
     int        i_noise_reduction;
     vlc_bool_t b_mpeg4_matrix;
@@ -260,6 +260,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     var_Get( p_enc, ENC_CFG_PREFIX "interlace", &val );
     p_sys->b_interlace = val.b_bool;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "interlace-me", &val );
+    p_sys->b_interlace_me = val.b_bool;
 
     var_Get( p_enc, ENC_CFG_PREFIX "pre-me", &val );
     p_sys->b_pre_me = val.b_bool;
@@ -439,9 +442,19 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         if ( p_sys->b_interlace )
         {
-            p_context->flags |= CODEC_FLAG_INTERLACED_DCT;
+            if ( p_context->height <= 280 )
+            {
+                msg_Warn( p_enc,
+                    "disabling interlaced video because height=%d <= 280",
+                    p_context->height );
+            }
+            else
+            {
+                p_context->flags |= CODEC_FLAG_INTERLACED_DCT;
 #if LIBAVCODEC_BUILD >= 4698
-            p_context->flags |= CODEC_FLAG_INTERLACED_ME;
+                if ( p_sys->b_interlace_me )
+                    p_context->flags |= CODEC_FLAG_INTERLACED_ME;
+            }
 #endif
         }
 
@@ -664,7 +677,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     /* Let ffmpeg select the frame type */
     frame.pict_type = 0;
 
-    frame.repeat_pict = 2 - p_pict->i_nb_fields;
+    frame.repeat_pict = p_pict->i_nb_fields - 2;
 
 #if LIBAVCODEC_BUILD >= 4685
     frame.interlaced_frame = !p_pict->b_progressive;

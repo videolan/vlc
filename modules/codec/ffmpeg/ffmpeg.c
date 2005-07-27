@@ -137,6 +137,8 @@ vlc_module_begin();
               ENC_HURRYUP_LONGTEXT, VLC_FALSE );
     add_bool( ENC_CFG_PREFIX "interlace", 0, NULL, ENC_INTERLACE_TEXT,
               ENC_INTERLACE_LONGTEXT, VLC_TRUE );
+    add_bool( ENC_CFG_PREFIX "interlace-me", 1, NULL, ENC_INTERLACE_ME_TEXT,
+              ENC_INTERLACE_ME_LONGTEXT, VLC_TRUE );
     add_integer( ENC_CFG_PREFIX "vt", 0, NULL, ENC_VT_TEXT,
                  ENC_VT_LONGTEXT, VLC_TRUE );
     add_bool( ENC_CFG_PREFIX "pre-me", 0, NULL, ENC_PRE_ME_TEXT,
