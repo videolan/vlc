@@ -497,7 +497,7 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, char *p
     {
 #if !defined( SYS_BEOS )
         struct sockaddr_in *v4 = (struct sockaddr_in *) res->ai_addr;
-        b_multicast = ( ntohl( v4->sin_addr.s_addr ) >= 0xe1000000 && ntohl( v4->sin_addr.s_addr ) <= 0xEFFFFFFF );
+        b_multicast = ( ntohl( v4->sin_addr.s_addr ) >= 0xe0000000 && ntohl( v4->sin_addr.s_addr ) <= 0xefffffff );
 #endif
     }
     else if( res->ai_family == AF_INET6 )
