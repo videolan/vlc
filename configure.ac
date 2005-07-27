@@ -1833,25 +1833,24 @@ fi
 dnl
 dnl  ipv6 plugin - not for QNX yet
 dnl
-AC_CHECK_FUNCS(inet_pton,[have_ipv6=:],[
+have_ipv6=no
+AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
   AC_CHECK_LIB(resolv,inet_pton,
-    [have_ipv6=:
+    [have_ipv6=yes
      VLC_ADD_LDFLAGS([ipv6],[-lresolv])])
 ])
 
-AS_IF([${have_ipv6}], [
+AS_IF([test "${have_ipv6}" == "yes"], [
   AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
 
 if test "${SYS}" != "nto" &&
    test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 then
-  have_ipv6=false
   AC_MSG_CHECKING(for sockaddr_in6 in netinet/in.h)
   AC_EGREP_HEADER(sockaddr_in6,netinet/in.h,
-    [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); have_ipv6=false])
-  if ${have_ipv6}; then
-    VLC_ADD_PLUGINS([ipv6])
-  fi
+    [AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no); have_ipv6=no])
+  AS_IF([test "${have_ipv6}" != "no"], [
+    VLC_ADD_PLUGINS([ipv6])])
 fi
 if test "${SYS}" = "mingw32"
 then
