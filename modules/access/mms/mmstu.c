@@ -947,16 +947,18 @@ static void MMSClose( access_t  *p_access )
 static int mms_CommandSend( access_t *p_access,
                              int i_command,
                              uint32_t i_prefix1, uint32_t i_prefix2,
-                             uint8_t *p_data, int i_data )
+                             uint8_t *p_data, int i_data_old )
 {
     var_buffer_t buffer;
 
     access_sys_t        *p_sys = p_access->p_sys;
     int i_data_by8;
+    int i_data = i_data_old;
 
-    i_data_by8 = ( i_data + 7 ) / 8;
+    while( i_data & 0x7 ) i_data++;
+    i_data_by8 = i_data >> 3;
 
-    /* first init uffer */
+    /* first init buffer */
     var_buffer_initwrite( &buffer, 0 );
 
     var_buffer_add32( &buffer, 0x00000001 );    /* start sequence */
@@ -975,13 +977,16 @@ static int mms_CommandSend( access_t *p_access,
     /* specific command data */
     if( p_data && i_data > 0 )
     {
-        var_buffer_addmemory( &buffer, p_data, i_data );
+        var_buffer_addmemory( &buffer, p_data, i_data_old );
     }
+
+    /* Append padding to the command data */
+    var_buffer_add64( &buffer, 0 );
 
     /* send it */
     if( send( p_sys->i_handle_tcp,
               buffer.p_data,
-              buffer.i_data,
+              buffer.i_data - ( 8 - ( i_data - i_data_old ) ),
               0 ) == -1 )
     {
         msg_Err( p_access, "failed to send command" );
