@@ -421,7 +421,7 @@ VLC_EXPORT( int, __net_GetAddress, ( vlc_object_t *p_this, vlc_bool_t peer, int 
 #  define NI_MAXHOST 1025
 #  define NI_MAXSERV 32
 # endif
-# define NI_MAXNUMERICHOST 48
+# define NI_MAXNUMERICHOST 64
 
 # ifndef NI_NUMERICHOST
 #  define NI_NUMERICHOST 0x01
@@ -497,7 +497,7 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, char *p
     {
 #if !defined( SYS_BEOS )
         struct sockaddr_in *v4 = (struct sockaddr_in *) res->ai_addr;
-        b_multicast = ( ntohl( v4->sin_addr.s_addr ) > 0xe1000000 && ntohl( v4->sin_addr.s_addr ) <= 0xEFFFFFFF );
+        b_multicast = ( ntohl( v4->sin_addr.s_addr ) >= 0xe1000000 && ntohl( v4->sin_addr.s_addr ) <= 0xEFFFFFFF );
 #endif
     }
     else if( res->ai_family == AF_INET6 )
