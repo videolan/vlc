@@ -537,13 +537,13 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     sock.i_server_port   = i_server;
     sock.i_ttl           = 0;
 
-    msg_Dbg( p_this, "net: connecting to '%s:%d@%s:%d'",
+    msg_Dbg( p_this, "net: connecting to '[%s]:%d@[%s]:%d'",
              psz_server, i_server, psz_bind, i_bind );
     private = p_this->p_private;
     p_this->p_private = (void*)&sock;
     if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
     {
-        msg_Dbg( p_this, "net: connection to '%s:%d@%s:%d' failed",
+        msg_Dbg( p_this, "net: connection to '[%s]:%d@[%s]:%d' failed",
                  psz_server, i_server, psz_bind, i_bind );
         return -1;
     }
