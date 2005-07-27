@@ -1177,6 +1177,12 @@ int E_(DVROpen)( access_t * p_access )
         return VLC_EGENERIC;
     }
 
+    if( fcntl( p_sys->i_handle, F_SETFL, O_NONBLOCK ) == -1 )
+    {
+        msg_Warn( p_access, "DVROpen: couldn't set non-blocking mode (%s)",
+                  strerror(errno) );
+    }
+
     return VLC_SUCCESS;
 }
 

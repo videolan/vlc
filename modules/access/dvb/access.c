@@ -384,17 +384,17 @@ static block_t *Block( access_t *p_access )
 
         if ( FD_ISSET( p_sys->i_handle, &fds ) )
         {
+            p_block = block_New( p_access,
+                                 p_sys->i_read_once * TS_PACKET_SIZE );
+            if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer,
+                                p_sys->i_read_once * TS_PACKET_SIZE ) ) <= 0 )
+            {
+                msg_Warn( p_access, "read failed (%s)", strerror(errno) );
+                block_Release( p_block );
+                continue;
+            }
             break;
         }
-    }
-
-    p_block = block_New( p_access, p_sys->i_read_once * TS_PACKET_SIZE );
-    if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer,
-                                    p_sys->i_read_once*TS_PACKET_SIZE ) ) <= 0 )
-    {
-        msg_Err( p_access, "read failed (%s)", strerror(errno) );
-        block_Release( p_block );
-        return NULL;
     }
 
     if( p_sys->i_read_once < DVB_READ_ONCE )
