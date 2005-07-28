@@ -1626,7 +1626,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
 
                 if( ip == NULL )
                 {
-                    answer->i_status = 400;
+                    answer->i_status = 500;
                     answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
@@ -1649,8 +1649,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                     rtsp = RtspClientGet( p_stream, psz_session );
                     if( rtsp == NULL )
                     {
-                        /* FIXME right error code */
-                        answer->i_status = 400;
+                        answer->i_status = 454;
                         answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
@@ -1671,8 +1670,8 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                 {
                     msg_Err( p_stream, "cannot create the access out for %s://%s",
                              psz_access, psz_url );
-                    answer->i_status = 400;
-                    answer->psz_status = strdup( "Server internal error" );
+                    answer->i_status = 500;
+                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
                     break;
@@ -1691,8 +1690,8 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
             }
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
-                answer->i_status = 400;
-                answer->psz_status = strdup( "Bad Request" );
+                answer->i_status = 461;
+                answer->psz_status = strdup( "Unsupported Transport" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
