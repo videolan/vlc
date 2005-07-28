@@ -360,6 +360,12 @@ VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, c
 #define net_GetPeerAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_TRUE,b,c,d)
 VLC_EXPORT( int, __net_GetAddress, ( vlc_object_t *p_this, vlc_bool_t peer, int fd, char *address, int *port ) );
 
+#if !HAVE_INET_PTON
+/* only in core, so no need for C++ extern "C" */
+int inet_pton(int af, const char *src, void *dst);
+#endif
+
+
 /*****************************************************************************
  * net_StopRecv/Send
  *****************************************************************************

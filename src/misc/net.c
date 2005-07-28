@@ -1185,3 +1185,62 @@ int __net_GetAddress( vlc_object_t *p_this, vlc_bool_t peer, int fd,
     }
     return 0;
 }
+
+/*****************************************************************************
+ * inet_pton replacement for obsolete and/or crap operating systems
+ *****************************************************************************/
+#ifndef HAVE_INET_PTON
+int inet_pton(int af, const char *src, void *dst)
+{
+# ifdef WIN32
+    /* As we already know, Microsoft always go its own way, so even if they do
+     * provide IPv6, they don't provide the API. */
+    struct sockaddr_storage addr;
+    int len = sizeof( addr );
+
+    /* Damn it, they didn't even put LPCSTR for the firs parameter!!! */
+    char *workaround_for_ill_designed_api = strdup( src );
+    
+    if( !WSAStringToAddress( workaround_for_ill_designed_api, af, NULL,
+                             (LPSOCKADDR)&addr, &len ) )
+    {
+        free( workaround_for_ill_designed_api );
+        return -1;
+    }
+    free( workaround_for_ill_designed_api );
+
+    switch( af )
+    {
+        case AF_INET6:
+            memcpy( dst, &((struct sockaddr_in6 *)&addr)->sin6_addr, 16 );
+            break;
+            
+        case AF_INET:
+            memcpy( dst, &((struct sockaddr_in *)&addr)->sin_addr, 4 );
+            break;
+
+        default:
+            WSASetLastError( WSAEAFNOSUPPORT );
+            return -1;
+    }
+# else
+    /* Assume IPv6 is not supported. */
+    /* Would be safer and more simpler to use inet_aton() but it is most
+     * likely not provided either. */
+    uint32_t ipv4;
+
+    if( af != AF_INET )
+    {
+        errno = EAFNOSUPPORT;
+        return -1;
+    }
+
+    ipv4 = inet_addr( src );
+    if( ipv4 == INADDR_NONE )
+        return -1;
+
+    memcpy( dst; &ipv4, 4 );
+# endif /* WIN32 */
+    return 0;
+}
+#endif /* HAVE_INET_PTON */
