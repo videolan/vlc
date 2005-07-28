@@ -436,9 +436,9 @@ DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	@rm -f $(top_builddir)/vlc$(EXEEXT)
 	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
-	  c++) echo $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ; $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
-	  objc) echo $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ; $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
-	  c|*) echo $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ; $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) ;; \
+	  c++) echo $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDFLAGS) $(LIBS) ; $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) $(vlc_LDADD) ;; \
+	  objc) echo $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDFLAGS) $(LIBS) ; $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) $(vlc_LDADD) ;; \
+	  c|*) echo $(LINK) $(vlc_OBJECTS) $(vlc_LDFLAGS) $(LIBS) ; $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) $(vlc_LDADD) ;; \
 	esac
 
 if HAVE_BEOS
