@@ -301,7 +301,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
     switch( addr.ss_family )
     {
-#if defined (INET_PTON) || defined (WIN32)
+#if defined (HAVE_INET_PTON) || defined (WIN32)
         case AF_INET6:
         {
             /* See RFC3513 for list of valid IPv6 scopes */
