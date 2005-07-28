@@ -457,8 +457,29 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     psz_head[2] = (i_hash & 0xFF00) >> 8; /* Msg id hash */
     psz_head[3] = (i_hash & 0xFF);        /* Msg id hash 2 */
 
+#if defined(WIN32)
+    if( b_ipv6 )
+    {
+        struct sockaddr_in6 saddr;
+        int len = sizeof(saddr);
+        if( ! WSAStringToAddress(p_sap_session->p_address->psz_machine,
+                    AF_INET6, NULL, (LPSOCKADDR)&saddr, &len) )
+            return VLC_ENOMEM;
+        memcpy(psz_head+4, &saddr.sin6_addr, sizeof(struct in6_addr));
+    }
+    else
+    {
+        struct sockaddr_in saddr;
+        int len = sizeof(saddr);
+        if( ! WSAStringToAddress(p_sap_session->p_address->psz_machine,
+                    AF_INET, NULL, (LPSOCKADDR)&saddr, &len) )
+            return VLC_ENOMEM;
+        memcpy(psz_head+4, &saddr.sin_addr, sizeof(struct in_addr));
+    }
+#else
     inet_pton( b_ipv6 ? AF_INET6 : AF_INET, /* can't fail */
                p_sap_session->p_address->psz_machine, psz_head + 4 );
+#endif
 
     memcpy( psz_head + (b_ipv6 ? 20 : 8), "application/sdp", 15 );
 
