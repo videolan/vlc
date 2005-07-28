@@ -42,6 +42,7 @@
 #   include <ws2tcpip.h>
 #else
 #   include <netdb.h>
+#   include <arpa/inet.h>
 #endif
 #include "charset.h"
 
