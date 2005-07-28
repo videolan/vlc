@@ -78,7 +78,6 @@ static void Close( vlc_object_t * );
 
 #define TELNETHOST_TEXT N_( "Telnet Interface host" )
 #define TELNETHOST_LONGTEXT N_( "Default to listen on all network interfaces" )
-#define TELNETHOST_DEFAULT "0.0.0.0"
 #define TELNETPORT_TEXT N_( "Telnet Interface port" )
 #define TELNETPORT_LONGTEXT N_( "Default to 4212" )
 #define TELNETPORT_DEFAULT 4212
@@ -90,7 +89,7 @@ vlc_module_begin();
     set_shortname( "Telnet" );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
-    add_string( "telnet-host", TELNETHOST_DEFAULT, NULL, TELNETHOST_TEXT,
+    add_string( "telnet-host", "", NULL, TELNETHOST_TEXT,
                  TELNETHOST_LONGTEXT, VLC_TRUE );
     add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
                  TELNETPORT_LONGTEXT, VLC_TRUE );
