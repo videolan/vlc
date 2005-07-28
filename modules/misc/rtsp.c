@@ -114,7 +114,6 @@ struct vod_media_t
     char         *psz_rtsp_control;
     char         *psz_rtsp_path;
 
-    char *psz_destination;
     int  i_port;
     int  i_port_audio;
     int  i_port_video;
@@ -172,7 +171,7 @@ static int RtspCallback( httpd_callback_sys_t *, httpd_client_t *,
 static int RtspCallbackES( httpd_callback_sys_t *, httpd_client_t *,
                            httpd_message_t *, httpd_message_t * );
 
-static char *SDPGenerate( vod_media_t *, char * );
+static char *SDPGenerate( const vod_media_t * );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -613,7 +612,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 {
     vod_media_t *p_media = (vod_media_t*)p_args;
     vod_t *p_vod = p_media->p_vod;
-    char *psz_destination = p_media->psz_destination;
     char *psz_session = NULL;
     rtsp_client_t *p_rtsp;
 
@@ -630,8 +628,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         case HTTPD_MSG_DESCRIBE:
         {
             char *psz_sdp =
-                SDPGenerate( p_media, psz_destination ?
-                             psz_destination : "0.0.0.0" );
+                SDPGenerate( p_media );
 
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
@@ -776,27 +773,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         psz_transport = httpd_MsgGet( query, "Transport" );
         fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
 
-        if( strstr( psz_transport, "multicast" ) && p_media->psz_destination )
-        {
-            fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
-            answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
-            answer->i_body = 0;
-            answer->p_body = NULL;
-
-            psz_session = httpd_MsgGet( query, "Session" );
-            if( !psz_session || !*psz_session )
-            {
-                asprintf( &psz_session, "%d", rand() );
-            }
-
-            httpd_MsgAdd( answer, "Transport",
-                          "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
-                          p_media->psz_destination, p_media->i_port,
-                          p_media->i_port+1, p_media->i_ttl );
-        }
-        else if( strstr( psz_transport, "unicast" ) &&
-                 strstr( psz_transport, "client_port=" ) )
+        if( strstr( psz_transport, "unicast" ) &&
+            strstr( psz_transport, "client_port=" ) )
         {
             rtsp_client_t *p_rtsp;
             rtsp_client_es_t *p_rtsp_es;
@@ -806,7 +784,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
             if( !ip )
             {
-                answer->i_status = 400;
+                answer->i_status = 500;
                 answer->psz_status = strdup( "Internal server error" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
@@ -828,7 +806,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( !p_rtsp )
                 {
                     /* FIXME right error code */
-                    answer->i_status = 400;
+                    answer->i_status = 454;
                     answer->psz_status = strdup( "Unknown session id" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
@@ -853,8 +831,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         }
         else /* TODO  strstr( psz_transport, "interleaved" ) ) */
         {
-            answer->i_status = 400;
-            answer->psz_status = strdup( "Bad Request" );
+            answer->i_status = 461;
+            answer->psz_status = strdup( "Unsupported Transport" );
             answer->i_body = 0;
             answer->p_body = NULL;
         }
@@ -962,7 +940,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
  * SDPGenerate: TODO
  * FIXME: need to be moved to a common place ?
  *****************************************************************************/
-static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
+static char *SDPGenerate( const vod_media_t *p_media )
 {
     int i, i_size;
     char *p, *psz_sdp;
@@ -976,8 +954,7 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
         strlen( "e=*\r\n" ) + strlen( p_media->psz_session_email ) +
         strlen( "t=0 0\r\n" ) + /* FIXME */
         strlen( "a=tool:"PACKAGE_STRING"\r\n" ) +
-        strlen( "c=IN IP4 */*\r\n" ) + 20 + 10 +
-        strlen( psz_destination ? psz_destination : "0.0.0.0" ) +
+        strlen( "c=IN IPn */*\r\n" ) + 20 + 10 + NI_MAXNUMERICHOST +
         strlen( "a=range:npt=0-1000000000.000\r\n" );
 
     for( i = 0; i < p_media->i_es; i++ )
@@ -1016,18 +993,7 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
     p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
-    p += sprintf( p, "c=IN IP4 %s", psz_destination ?  psz_destination : "0.0.0.0" );
-
-    if( ( psz_destination != NULL )
-     && net_AddressIsMulticast( p_media->p_vod, psz_destination ) )
-    {
-        /* Add the ttl if it is a multicast address */
-        p += sprintf( p, "/%d\r\n", p_media->i_ttl );
-    }
-    else
-    {
-        p += sprintf( p, "\r\n" );
-    }
+    p += sprintf( p, "c=IN IP4 0.0.0.0\r\n" );
 
     if( p_media->i_length > 0 )
     p += sprintf( p, "a=range:npt=0-%.3f\r\n",
