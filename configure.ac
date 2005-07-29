@@ -2900,16 +2900,19 @@ then
   AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no, ${SDL_PATH})
   SDL_CONFIG="${SDL12_CONFIG}"
   SDL_HEADER="SDL12/SDL.h"
+  SDL_IMAGE="SDL12/SDL_image.h"
   if test "${SDL_CONFIG}" = "no"
   then
     AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no, ${SDL_PATH})
     SDL_CONFIG=${SDL11_CONFIG}
     SDL_HEADER="SDL11/SDL.h"
+    SDL_IMAGE="SDL11/SDL_image.h"
   fi
   if test "${SDL_CONFIG}" = "no"
   then
     AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
     SDL_HEADER="SDL/SDL.h"
+    SDL_IMAGE="SDL/SDL_image.h"
   fi
   # check for cross-compiling
   SDL_PREFIX=
@@ -2924,8 +2927,8 @@ then
   if test "${SDL_CONFIG}" != "no"
   then
     VLC_ADD_PLUGINS([vout_sdl aout_sdl])
-    VLC_ADD_CFLAGS([vout_sdl aout_sdl],[`${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`])
-    VLC_ADD_LDFLAGS([vout_sdl aout_sdl],[`${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`])
+    VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`])
+    VLC_ADD_LDFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`])
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_vout_sdl}"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
@@ -2934,6 +2937,15 @@ then
       [ AC_MSG_ERROR([The development package for SDL is not installed.
 Please install it and try again. Alternatively you can also configure with
 --disable-sdl.])
+      ])])
+    AC_CHECK_HEADERS(${SDL_IMAGE}, [AC_DEFINE_UNQUOTED(SDL_IMAGE_INCLUDE_FILE,
+      <${SDL_IMAGE}>, Indicate the path of SDL_image.h)
+      VLC_ADD_PLUGINS([sdl_image])
+      VLC_ADD_LDFLAGS([sdl_image], [-lSDL_image])],
+      [ AC_CHECK_HEADERS(SDL_image.h, AC_DEFINE(SDL_IMAGE_INCLUDE_FILE, <SDL_image.h>,
+          As a last resort we also test for SDL_image.h presence),
+      [ AC_MSG_WARN([The development package for SDL_image is not installed.
+You should install it alongside your SDL package.])
       ])])
     CPPFLAGS="${CPPFLAGS_save}"
     if expr 1.1.5 \> `${SDL_CONFIG} --version` >/dev/null

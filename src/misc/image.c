@@ -103,7 +103,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
                              video_format_t *p_fmt_in,
                              video_format_t *p_fmt_out )
 {
-    picture_t *p_pic;
+    picture_t *p_pic = NULL, *p_tmp;
 
     /* Check if we can reuse the current decoder */
     if( p_image->p_dec &&
@@ -122,11 +122,17 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
 
     p_block->i_pts = p_block->i_dts = mdate();
     p_pic = p_image->p_dec->pf_decode_video( p_image->p_dec, &p_block );
-    p_image->p_dec->pf_decode_video( p_image->p_dec, &p_block );
-
-    if( !p_pic )
+    while( (p_tmp = p_image->p_dec->pf_decode_video( p_image->p_dec, &p_block ))
+             != NULL )
     {
-        msg_Dbg( p_image->p_parent, "no image decoded" );
+        if ( p_pic != NULL )
+            p_pic->pf_release( p_pic );
+        p_pic = p_tmp;
+    }
+
+    if( p_pic == NULL )
+    {
+        msg_Warn( p_image->p_parent, "no image decoded" );
         return 0;
     }
 
@@ -446,6 +452,16 @@ static struct
     { VLC_FOURCC('p','g','m','y'), "pgmyuv" },
     { VLC_FOURCC('p','b','m',' '), "pbm" },
     { VLC_FOURCC('p','a','m',' '), "pam" },
+    { VLC_FOURCC('t','g','a',' '), "tga" },
+    { VLC_FOURCC('b','m','p',' '), "bmp" },
+    { VLC_FOURCC('p','n','m',' '), "pnm" },
+    { VLC_FOURCC('x','p','m',' '), "xpm" },
+    { VLC_FOURCC('x','c','f',' '), "xcf" },
+    { VLC_FOURCC('p','c','x',' '), "pcx" },
+    { VLC_FOURCC('g','i','f',' '), "gif" },
+    { VLC_FOURCC('t','i','f','f'), "tif" },
+    { VLC_FOURCC('t','i','f','f'), "tiff" },
+    { VLC_FOURCC('l','b','m',' '), "lbm" },
     { 0, NULL }
 };
 
