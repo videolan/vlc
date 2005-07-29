@@ -911,19 +911,24 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if( p_sys->psz_destination )
     {
-        char access[100];
-        char url[strlen( p_sys->psz_destination ) + 1 + 12 + 1];
+        char access[17];
+        char url[NI_MAXHOST + 7];
 
         /* first try to create the access out */
         if( p_sys->i_ttl > 0 )
         {
-            sprintf( access, "udp{raw,ttl=%d}", p_sys->i_ttl );
+            snprintf( access, sizeof( access ), "udp{raw,ttl=%d}",
+                      p_sys->i_ttl );
+            access[sizeof( access ) - 1] = '\0';
         }
         else
-        {
-            sprintf( access, "udp{raw}" );
-        }
-        sprintf( url, "%s:%d", p_sys->psz_destination, i_port );
+            strcpy( access, "udp{raw}" );
+
+        snprintf( url, sizeof( url ),
+                 strchr( p_sys->psz_destination, ':' ) ? "[%s]:%d" : "%s:%d",
+                 p_sys->psz_destination, i_port );
+        url[sizeof( url ) - 1] = '\0';
+
         if( ( p_access = sout_AccessOutNew( p_sout, access, url ) ) == NULL )
         {
             msg_Err( p_stream, "cannot create the access out for %s://%s",
