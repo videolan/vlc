@@ -490,8 +490,8 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     /* *** Bind port if UDP protocol is selected *** */
     if( b_udp )
     {
-        if( net_GetSockAddress( p_access, p_sys->i_handle_tcp,
-                                p_sys->sz_bind_addr, NULL ) )
+        if( net_GetSockAddress( p_sys->i_handle_tcp, p_sys->sz_bind_addr,
+                                NULL ) )
         {
             net_Close( p_sys->i_handle_tcp );
             return VLC_EGENERIC;

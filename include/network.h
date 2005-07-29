@@ -32,7 +32,6 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #else
-#   include <errno.h>
 #   include <netdb.h>
 #if HAVE_SYS_SOCKET_H
 #   include <sys/socket.h>
@@ -506,37 +505,26 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, char *p
     return b_multicast;
 }
 
-#define net_GetSockAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_FALSE,b,c,d)
-#define net_GetPeerAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_TRUE,b,c,d)
-
-static inline int __net_GetAddress( vlc_object_t *p_this, vlc_bool_t peer, int fd,
-                      char *address, int *port )
+static inline int net_GetSockAddress( int fd, char *address, int *port )
 {
     struct sockaddr_storage addr;
     socklen_t addrlen = sizeof( addr );
-    int val;
 
-    val = peer ? getpeername( fd, (struct sockaddr *)&addr, &addrlen )
-               : getsockname( fd, (struct sockaddr *)&addr, &addrlen );
+    return getpeername( fd, (struct sockaddr *)&addr, &addrlen )
+        || vlc_getnameinfo( (struct sockaddr *)&addr, addrlen, address,
+                            NI_MAXNUMERICHOST, port, NI_NUMERICHOST )
+        ? VLC_EGENERIC : 0;
+}
 
-    if (val)
-    {
-#if defined(WIN32) || defined (UNDER_CE)
-        msg_Err( p_this, "socket address error : %d", WSAGetLastError( ) );
-#else
-        msg_Err( p_this, "socket address error : %s", strerror( errno ) );
-#endif
-        return val;
-    }
+static inline int net_GetPeerAddress( int fd, char *address, int *port )
+{
+    struct sockaddr_storage addr;
+    socklen_t addrlen = sizeof( addr );
 
-    val = vlc_getnameinfo( (struct sockaddr *)&addr, addrlen,
-                           address, NI_MAXNUMERICHOST, port, NI_NUMERICHOST );
-    if( val )
-    {
-        msg_Err( p_this, "socket address error : %s",
-                 vlc_gai_strerror( val ) );
-    }
-    return 0;
+    return getpeername( fd, (struct sockaddr *)&addr, &addrlen )
+        || vlc_getnameinfo( (struct sockaddr *)&addr, addrlen, address,
+                            NI_MAXNUMERICHOST, port, NI_NUMERICHOST )
+        ? VLC_EGENERIC : 0;
 }
 
 #endif

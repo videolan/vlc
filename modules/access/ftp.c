@@ -250,8 +250,7 @@ static int Open( vlc_object_t *p_this )
 
     if( ftp_ReadCommand( p_access, &i_answer, NULL ) == 2 )
     {
-        if( net_GetPeerAddress( p_access, p_sys->fd_cmd, p_sys->sz_epsv_ip,
-                                NULL ) )
+        if( net_GetPeerAddress( p_sys->fd_cmd, p_sys->sz_epsv_ip, NULL ) )
             goto exit_error;
     }
     else
