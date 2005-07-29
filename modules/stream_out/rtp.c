@@ -396,10 +396,14 @@ static int Open( vlc_object_t *p_this )
     {
         sout_access_out_t *p_grab;
 
-        char *psz_rtpmap;
-        char access[100];
-        char psz_ttl[5];
-        char url[p_sys->psz_destination ? strlen( p_sys->psz_destination ) + 1 + 12+1 : 14];
+        char *psz_rtpmap, url[NI_MAXHOST + 8], access[17], psz_ttl[5];
+
+        if( p_sys->psz_destination )
+        {
+            msg_Err( p_stream, "rtp needs a destination when muxing" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
 
         /* Check muxer type */
         if( !strncasecmp( val.psz_string, "ps", 2 ) || !strncasecmp( val.psz_string, "mpeg1", 5 ) )
@@ -414,6 +418,7 @@ static int Open( vlc_object_t *p_this )
         else
         {
             msg_Err( p_stream, "unsupported muxer type with rtp (only ts/ps)" );
+            free( p_sys );
             return VLC_EGENERIC;
         }
 
@@ -426,10 +431,14 @@ static int Open( vlc_object_t *p_this )
         {
             sprintf( access, "udp{raw}" );
         }
-        if( p_sys->psz_destination != NULL )
-            sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
-        else
-            sprintf( url, ":%d", p_sys->i_port );
+
+        /* IPv6 needs brackets if not already present */
+        snprintf( url, sizeof( url ),
+                  ( ( p_sys->psz_destination[0] != '[' ) 
+                 && ( strchr( p_sys->psz_destination, ':' ) != NULL ) )
+                  ? "[%s]:%d" : "%s:%d", p_sys->psz_destination,
+                  p_sys->i_port );
+        url[sizeof( url ) - 1] = '\0';
 
         if( !( p_sys->p_access = sout_AccessOutNew( p_sout, access, url ) ) )
         {
@@ -1200,7 +1209,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     unsigned int    i_data  = p_buffer->i_buffer;
     unsigned int    i_max   = p_sys->i_mtu - 12;
 
-    int i_packet = ( p_buffer->i_buffer + i_max - 1 ) / i_max;
+    unsigned i_packet = ( p_buffer->i_buffer + i_max - 1 ) / i_max;
 
     while( i_data > 0 )
     {
@@ -1239,7 +1248,8 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
             p_sys->i_sequence++;
         }
 
-        i_size = __MIN( i_data, p_sys->i_mtu - p_sys->packet->i_buffer );
+        i_size = __MIN( i_data,
+                        (unsigned)(p_sys->i_mtu - p_sys->packet->i_buffer) );
 
         memcpy( &p_sys->packet->p_buffer[p_sys->packet->i_buffer],
                 p_data, i_size );
@@ -1478,7 +1488,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             answer->psz_status = strdup( "OK" );
             httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
 
-            answer->p_body = psz_sdp;
+            answer->p_body = (uint8_t *)psz_sdp;
             answer->i_body = strlen( psz_sdp );
             break;
         }
