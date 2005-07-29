@@ -2064,17 +2064,18 @@ static void httpd_HostThread( httpd_host_t *host )
                             {
                                 if( answer && ( url->p_acl != NULL ) )
                                 {
-                                    char *ip = httpd_ClientIP( cl );
-                                    if( ip != NULL )
+                                    char ip[NI_MAXNUMERICHOST];
+
+                                    if( httpd_ClientIP( cl, ip ) != NULL )
                                     {
                                         if( ACL_Check( url->p_acl, ip ) )
                                         {
                                             b_hosts_failed = VLC_TRUE;
-                                            free( ip );
                                             break;
                                         }
-                                        free( ip );
                                     }
+                                    else
+                                        b_hosts_failed = VLC_TRUE;
                                 }
 
                                 if( answer && ( *url->psz_user || *url->psz_password ) )
