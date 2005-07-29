@@ -250,6 +250,8 @@ static void Close( vlc_object_t * p_this )
 
     /* TODO delete medias */
 
+    free( p_sys->psz_host );
+    free( p_sys->psz_path );
     free( p_sys );
 }
 
@@ -341,6 +343,10 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     while( p_media->i_es ) MediaDelES( p_vod, p_media, &p_media->es[0]->fmt );
 
     vlc_mutex_destroy( &p_media->lock );
+    free( p_media->psz_session_name );
+    free( p_media->psz_session_description );
+    free( p_media->psz_session_url );
+    free( p_media->psz_session_email );
     free( p_media );
 }
 
