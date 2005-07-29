@@ -356,9 +356,6 @@ VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, v_socket_t *, const
 #define net_vaPrintf(a,b,c,d,e) __net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args ) );
 
-#define net_GetSockAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_FALSE,b,c,d)
-#define net_GetPeerAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_TRUE,b,c,d)
-VLC_EXPORT( int, __net_GetAddress, ( vlc_object_t *p_this, vlc_bool_t peer, int fd, char *address, int *port ) );
 
 #if !HAVE_INET_PTON
 /* only in core, so no need for C++ extern "C" */
@@ -506,6 +503,39 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, char *p
     
     vlc_freeaddrinfo( res );
     return b_multicast;
+}
+
+#define net_GetSockAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_FALSE,b,c,d)
+#define net_GetPeerAddress(a,b,c,d) __net_GetAddress(VLC_OBJECT(a),VLC_TRUE,b,c,d)
+
+static inline int __net_GetAddress( vlc_object_t *p_this, vlc_bool_t peer, int fd,
+                      char *address, int *port )
+{
+    struct sockaddr_storage addr;
+    socklen_t addrlen = sizeof( addr );
+    int val;
+
+    val = peer ? getpeername( fd, (struct sockaddr *)&addr, &addrlen )
+               : getsockname( fd, (struct sockaddr *)&addr, &addrlen );
+
+    if (val)
+    {
+#if defined(WIN32) || defined (UNDER_CE)
+        msg_Err( p_this, "socket address error : %d", WSAGetLastError( ) );
+#else
+        msg_Err( p_this, "socket address error : %s", strerror( errno ) );
+#endif
+        return val;
+    }
+
+    val = vlc_getnameinfo( (struct sockaddr *)&addr, addrlen,
+                           address, NI_MAXNUMERICHOST, port, NI_NUMERICHOST );
+    if( val )
+    {
+        msg_Err( p_this, "socket address error : %s",
+                 vlc_gai_strerror( val ) );
+    }
+    return 0;
 }
 
 #endif

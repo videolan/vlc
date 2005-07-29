@@ -1156,36 +1156,6 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
     return VLC_SUCCESS;
 }
 
-int __net_GetAddress( vlc_object_t *p_this, vlc_bool_t peer, int fd,
-                      char *address, int *port )
-{
-    struct sockaddr_storage addr;
-    socklen_t addrlen = sizeof( addr );
-    int val;
-
-    val = peer ? getpeername( fd, (struct sockaddr *)&addr, &addrlen )
-               : getsockname( fd, (struct sockaddr *)&addr, &addrlen );
-
-    if (val)
-    {
-#if defined(WIN32) || defined (UNDER_CE)
-        msg_Err( p_this, "socket address error : %d", WSAGetLastError( ) );
-#else
-        msg_Err( p_this, "socket address error : %s", strerror( errno ) );
-#endif
-        return val;
-    }
-
-    val = vlc_getnameinfo( (struct sockaddr *)&addr, addrlen,
-                           address, NI_MAXNUMERICHOST, port, NI_NUMERICHOST );
-    if( val )
-    {
-        msg_Err( p_this, "socket address error : %s",
-                 vlc_gai_strerror( val ) );
-    }
-    return 0;
-}
-
 /*****************************************************************************
  * inet_pton replacement for obsolete and/or crap operating systems
  *****************************************************************************/
