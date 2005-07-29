@@ -32,6 +32,7 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #else
+#   include <errno.h>
 #   include <netdb.h>
 #if HAVE_SYS_SOCKET_H
 #   include <sys/socket.h>
