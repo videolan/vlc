@@ -46,8 +46,8 @@ static void Close( vlc_object_t * );
 #define HOST_TEXT N_( "Host address" )
 #define HOST_LONGTEXT N_( \
     "You can set the address, port and path the rtsp interface will bind to." \
-    "\n Syntax is address:port/path. Default is to bind to localhost address "\
-    "on port 554, with no path. Use 0.0.0.0 to bind to all addresses." )
+    "\n Syntax is address:port/path. Default is to bind to any address "\
+    "on port 554, with no path." )
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
     set_description( _("RTSP VoD server") );
@@ -200,11 +200,6 @@ static int Open( vlc_object_t *p_this )
     vlc_UrlParse( &url, psz_url, 0 );
     if( psz_url ) free( psz_url );
 
-    if( !url.psz_host || !*url.psz_host )
-    {
-        if( url.psz_host ) free( url.psz_host );
-        url.psz_host = strdup( "localhost" );
-    }
     if( url.i_port <= 0 ) url.i_port = 554;
 
     p_vod->p_sys = p_sys = malloc( sizeof( vod_sys_t ) );
