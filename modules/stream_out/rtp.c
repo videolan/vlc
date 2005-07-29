@@ -912,7 +912,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( p_sys->psz_destination )
     {
         char access[17];
-        char url[NI_MAXHOST + 7];
+        char url[NI_MAXHOST + 8];
 
         /* first try to create the access out */
         if( p_sys->i_ttl > 0 )
@@ -924,8 +924,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         else
             strcpy( access, "udp{raw}" );
 
-        snprintf( url, sizeof( url ),
-                 strchr( p_sys->psz_destination, ':' ) ? "[%s]:%d" : "%s:%d",
+        snprintf( url, sizeof( url ), (( p_sys->psz_destination[0] != '[' ) &&
+                 strchr( p_sys->psz_destination, ':' )) ? "[%s]:%d" : "%s:%d",
                  p_sys->psz_destination, i_port );
         url[sizeof( url ) - 1] = '\0';
 
@@ -1641,10 +1641,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
             else if( strstr( psz_transport, "unicast" ) && strstr( psz_transport, "client_port=" ) )
             {
                 int  i_port = atoi( strstr( psz_transport, "client_port=" ) + strlen("client_port=") );
-                char ip[NI_MAXNUMERICHOST];
-
-                char psz_access[100];
-                char psz_url[100];
+                char ip[NI_MAXNUMERICHOST], psz_access[17], psz_url[NI_MAXNUMERICHOST + 8];
 
                 sout_access_out_t *p_access;
 
@@ -1685,10 +1682,15 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
 
                 /* first try to create the access out */
                 if( p_sys->i_ttl > 0 )
-                    sprintf( psz_access, "udp{raw,ttl=%d}", p_sys->i_ttl );
+                    snprintf( psz_access, sizeof( psz_access ),
+                              "udp{raw,ttl=%d}", p_sys->i_ttl );
                 else
-                    sprintf( psz_access, "udp{raw}" );
-                sprintf( psz_url, "%s:%d", ip, i_port );
+                    strncpy( psz_access, "udp{raw}", sizeof( psz_access ) );
+                psz_access[sizeof( psz_access ) - 1] = '\0';
+
+                snprintf( psz_url, sizeof( psz_url ),
+                         ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
+                         ip, i_port );
 
                 if( ( p_access = sout_AccessOutNew( p_stream->p_sout, psz_access, psz_url ) ) == NULL )
                 {
