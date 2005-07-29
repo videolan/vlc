@@ -171,7 +171,7 @@ static int RtspCallback( httpd_callback_sys_t *, httpd_client_t *,
 static int RtspCallbackES( httpd_callback_sys_t *, httpd_client_t *,
                            httpd_message_t *, httpd_message_t * );
 
-static char *SDPGenerate( const vod_media_t * );
+static char *SDPGenerate( const vod_media_t *, httpd_client_t *cl );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -623,7 +623,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         case HTTPD_MSG_DESCRIBE:
         {
             char *psz_sdp =
-                SDPGenerate( p_media );
+                SDPGenerate( p_media, cl );
 
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
@@ -636,7 +636,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         case HTTPD_MSG_PLAY:
         {
-            char *psz_output, *ip;
+            char *psz_output, ip[NI_MAXNUMERICHOST];
             int i, i_port_audio = 0, i_port_video = 0;
 
             /* for now only multicast so easy */
@@ -660,7 +660,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             }
             else if( p_rtsp->b_playing ) break;
 
-            if( !(ip = httpd_ClientIP( cl )) ) break;
+            if( httpd_ClientIP( cl, ip ) == NULL ) break;
 
             p_rtsp->b_playing = VLC_TRUE;
 
@@ -687,7 +687,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PLAY,
                               psz_output );
             free( psz_output );
-            free( ip );
             break;
         }
 
@@ -773,11 +772,11 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         {
             rtsp_client_t *p_rtsp;
             rtsp_client_es_t *p_rtsp_es;
-            char *ip = httpd_ClientIP( cl );
+            char ip[NI_MAXNUMERICHOST];
             int i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                strlen("client_port=") );
 
-            if( !ip )
+            if( httpd_ClientIP( cl, ip ) == NULL )
             {
                 answer->i_status = 500;
                 answer->psz_status = strdup( "Internal server error" );
@@ -935,10 +934,10 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
  * SDPGenerate: TODO
  * FIXME: need to be moved to a common place ?
  *****************************************************************************/
-static char *SDPGenerate( const vod_media_t *p_media )
+static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 {
     int i, i_size;
-    char *p, *psz_sdp;
+    char *p, *psz_sdp, *ip;
 
     /* Calculate size */
     i_size = strlen( "v=0\r\n" ) +

@@ -131,7 +131,8 @@ VLC_EXPORT( void,           httpd_UrlDelete, ( httpd_url_t * ) );
 /* Default client mode is FILE, use these to change it */
 VLC_EXPORT( void,           httpd_ClientModeStream, ( httpd_client_t *cl ) );
 VLC_EXPORT( void,           httpd_ClientModeBidir, ( httpd_client_t *cl ) );
-VLC_EXPORT( char*,          httpd_ClientIP, ( httpd_client_t *cl ) );
+VLC_EXPORT( char*,          httpd_ClientIP, ( httpd_client_t *cl, char *psz_ip ) );
+VLC_EXPORT( char*,          httpd_ServerIP, ( httpd_client_t *cl, char *psz_ip ) );
 
 /* High level */
 

@@ -1329,20 +1329,14 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
     cl->i_mode   = HTTPD_CLIENT_BIDIR;
 }
 
-char* httpd_ClientIP( httpd_client_t *cl )
+char* httpd_ClientIP( httpd_client_t *cl, char *psz_ip )
 {
-    int i;
-    char *psz_ip = malloc( NI_MAXNUMERICHOST );
+    return net_GetPeerAddress( cl->fd, psz_ip, NULL ) ? NULL : psz_ip;
+}
 
-    if( psz_ip == NULL )
-        return NULL;
-
-    i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
-                         psz_ip, NI_MAXNUMERICHOST, NULL, NI_NUMERICHOST );
-    if( i )
-        return NULL;
-
-    return psz_ip;
+char* httpd_ServerIP( httpd_client_t *cl, char *psz_ip )
+{
+    return net_GetSockAddress( cl->fd, psz_ip, NULL ) ? NULL : psz_ip;
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
