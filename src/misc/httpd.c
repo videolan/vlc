@@ -1329,26 +1329,17 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
 char* httpd_ClientIP( httpd_client_t *cl )
 {
     int i;
-    char sz_ip[NI_MAXNUMERICHOST + 2];
+    char *psz_ip = malloc( NI_MAXNUMERICHOST );
 
-    i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
-                         sz_ip+1, NI_MAXNUMERICHOST, NULL, NI_NUMERICHOST );
-
-    if( i != 0 )
+    if( psz_ip == NULL )
         return NULL;
 
-    /* semi-colon in address => must add bracket for HTTP */        
-    if( strchr( sz_ip + 1, ':' ) != NULL )
-    {
-        sz_ip[0] = '[';
-        i = strlen( sz_ip );
-        sz_ip[i++] = ']';
-        sz_ip[i] = '\0';
+    i = vlc_getnameinfo( (const struct sockaddr *)&cl->sock, cl->i_sock_size,
+                         psz_ip, NI_MAXNUMERICHOST, NULL, NI_NUMERICHOST );
+    if( i )
+        return NULL;
 
-        return strdup(sz_ip);
-    }
-    
-    return strdup(sz_ip + 1);
+    return psz_ip;
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
