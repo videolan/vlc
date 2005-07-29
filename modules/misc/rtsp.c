@@ -625,12 +625,22 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             char *psz_sdp =
                 SDPGenerate( p_media, cl );
 
-            answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
-            httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
-
-            answer->p_body = (uint8_t *)psz_sdp;
-            answer->i_body = strlen( psz_sdp );
+            if( psz_sdp != NULL )
+            {
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
+    
+                answer->p_body = (uint8_t *)psz_sdp;
+                answer->i_body = strlen( psz_sdp );
+            }
+            else
+            {
+                answer->i_status = 500;
+                answer->psz_status = strdup( "Internal server error" );
+                answer->p_body = NULL;
+                answer->i_body = 0;
+            }
             break;
         }
 
@@ -937,44 +947,53 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 {
     int i, i_size;
-    char *p, *psz_sdp, *ip;
+    char *p, *psz_sdp, ip[NI_MAXNUMERICHOST], ipv;
+
+    if( httpd_ServerIP( cl, ip ) == NULL )
+        return NULL;
+
+    p = strchr( ip, '%' );
+    if( p != NULL )
+        *p = '\0'; /* remove scope if present */
+
+    ipv = ( strchr( ip, ':' ) != NULL ) ? '6' : '4';
 
     /* Calculate size */
-    i_size = strlen( "v=0\r\n" ) +
-        strlen( "o=- * * IN IP4 127.0.0.1\r\n" ) + 10 + 10 +
-        strlen( "s=*\r\n" ) + strlen( p_media->psz_session_name ) +
-        strlen( "i=*\r\n" ) + strlen( p_media->psz_session_description ) +
-        strlen( "u=*\r\n" ) + strlen( p_media->psz_session_url ) +
-        strlen( "e=*\r\n" ) + strlen( p_media->psz_session_email ) +
-        strlen( "t=0 0\r\n" ) + /* FIXME */
-        strlen( "a=tool:"PACKAGE_STRING"\r\n" ) +
-        strlen( "c=IN IPn */*\r\n" ) + 20 + 10 + NI_MAXNUMERICHOST +
-        strlen( "a=range:npt=0-1000000000.000\r\n" );
+    i_size = sizeof( "v=0\r\n" ) +
+        sizeof( "o=- * * IN IP4 \r\n" ) + 10 + NI_MAXNUMERICHOST +
+        sizeof( "s=*\r\n" ) + strlen( p_media->psz_session_name ) +
+        sizeof( "i=*\r\n" ) + strlen( p_media->psz_session_description ) +
+        sizeof( "u=*\r\n" ) + strlen( p_media->psz_session_url ) +
+        sizeof( "e=*\r\n" ) + strlen( p_media->psz_session_email ) +
+        sizeof( "t=0 0\r\n" ) + /* FIXME */
+        sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
+        sizeof( "c=IN IP4 0.0.0.0\r\n" ) + 20 + 10 +
+        sizeof( "a=range:npt=0-1000000000.000\r\n" );
 
     for( i = 0; i < p_media->i_es; i++ )
     {
         media_es_t *p_es = p_media->es[i];
 
-        i_size += strlen( "m=**d*o * RTP/AVP *\r\n" ) + 10 + 10;
+        i_size += sizeof( "m=**d*o * RTP/AVP *\r\n" ) + 19;
         if( p_es->psz_rtpmap )
         {
-            i_size += strlen( "a=rtpmap:* *\r\n" ) +
-                strlen( p_es->psz_rtpmap ) + 10;
+            i_size += sizeof( "a=rtpmap:* *\r\n" ) +
+                strlen( p_es->psz_rtpmap ) + 9;
         }
         if( p_es->psz_fmtp )
         {
-            i_size += strlen( "a=fmtp:* *\r\n" ) +
-                strlen( p_es->psz_fmtp ) + 10;
+            i_size += sizeof( "a=fmtp:* *\r\n" ) +
+                strlen( p_es->psz_fmtp ) + 9;
         }
 
-        i_size += strlen( "a=control:*/trackid=*\r\n" ) +
-            strlen( p_media->psz_rtsp_control ) + 10;
+        i_size += sizeof( "a=control:*/trackid=*\r\n" ) +
+            strlen( p_media->psz_rtsp_control ) + 9;
     }
 
     p = psz_sdp = malloc( i_size );
     p += sprintf( p, "v=0\r\n" );
-    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n",
-                  p_media->i_sdp_id, p_media->i_sdp_version );
+    p += sprintf( p, "o=- "I64Fd" %d IN IP%c %s\r\n",
+                  p_media->i_sdp_id, p_media->i_sdp_version, ipv, ip );
     if( *p_media->psz_session_name )
         p += sprintf( p, "s=%s\r\n", p_media->psz_session_name );
     if( *p_media->psz_session_description )
@@ -987,7 +1006,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
-    p += sprintf( p, "c=IN IP4 0.0.0.0\r\n" );
+    p += sprintf( p, "c=IN IP%c %s\r\n", ipv, ipv == '6' ? "::" : "0.0.0.0" );
 
     if( p_media->i_length > 0 )
     p += sprintf( p, "a=range:npt=0-%.3f\r\n",
@@ -1027,6 +1046,5 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
                       p_media->psz_rtsp_control, i );
     }
 
-    fprintf( stderr, psz_sdp );
     return psz_sdp;
 }
