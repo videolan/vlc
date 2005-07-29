@@ -420,7 +420,11 @@ static int Open( vlc_object_t *p_this )
         {
             sprintf( access, "udp{raw}" );
         }
-        sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
+        if( p_sys->psz_destination != NULL )
+            sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
+        else
+            sprintf( url, ":%d", p_sys->i_port );
+
         if( !( p_sys->p_access = sout_AccessOutNew( p_sout, access, url ) ) )
         {
             msg_Err( p_stream, "cannot create the access out for %s://%s",
