@@ -397,8 +397,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             char *ptr;
 
             net_StopRecv( p_address->i_wfd );
-            net_GetSockAddress( p_sap, p_address->i_wfd,
-                                p_address->psz_machine, NULL );
+            net_GetSockAddress( p_address->i_wfd, p_address->psz_machine,
+                                NULL );
 
             /* removes scope if present */
             ptr = strchr( p_address->psz_machine, '%' );
