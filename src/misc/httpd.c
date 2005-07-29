@@ -901,6 +901,9 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     vlc_value_t  lockval;
     int i;
 
+    if( psz_hostname == NULL )
+        psz_hostname = "";
+
     psz_host = strdup( psz_hostname );
     if( psz_host == NULL )
     {
