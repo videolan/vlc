@@ -352,6 +352,12 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "ttl", &val );
+    if( ( val.i_int > 255 ) || ( val.i_int < 0 ) )
+    {
+        msg_Err( p_stream, "illegal TTL %d", val.i_int );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     p_sys->i_ttl = val.i_int;
 
     p_sys->i_payload_type = 96;
@@ -392,7 +398,7 @@ static int Open( vlc_object_t *p_this )
 
         char *psz_rtpmap;
         char access[100];
-        char psz_ttl[100];
+        char psz_ttl[5];
         char url[p_sys->psz_destination ? strlen( p_sys->psz_destination ) + 1 + 12+1 : 14];
 
         /* Check muxer type */
@@ -484,7 +490,8 @@ static int Open( vlc_object_t *p_this )
 
         if( net_AddressIsMulticast( (vlc_object_t *)p_stream, p_sys->psz_destination ) )
         {
-            sprintf( psz_ttl, "/%d", p_sys->i_ttl );
+            snprintf( psz_ttl, sizeof( psz_ttl ), "/%d", p_sys->i_ttl );
+            psz_ttl[sizeof( psz_ttl ) - 1] = '\0';
         }
         else
         {
