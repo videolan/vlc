@@ -35,15 +35,6 @@
 #include <errno.h>
 #endif
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   include <netdb.h>
-#endif
-
 #include "network.h"
 
 /* FIXME: rwlock on acl, but libvlc doesn't implement rwlock */

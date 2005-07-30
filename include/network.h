@@ -26,16 +26,25 @@
 #ifndef __VLC_NETWORK_H
 # define __VLC_NETWORK_H
 
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#elif defined( WIN32 )
+#if defined( WIN32 )
+#   if defined(UNDER_CE) && defined(sockaddr_storage)
+#       undef sockaddr_storage
+#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #else
+#   if HAVE_SYS_SOCKET_H
+#      include <sys/socket.h>
+#   endif
+#   if HAVE_NETINET_IN_H
+#      include <netinet/in.h>
+#   endif
+#   if HAVE_ARPA_INET_H
+#      include <arpa/inet.h>
+#   elif defined( SYS_BEOS )
+#      include <net/netdb.h>
+#   endif
 #   include <netdb.h>
-#if HAVE_SYS_SOCKET_H
-#   include <sys/socket.h>
-#endif
 #endif
 
 

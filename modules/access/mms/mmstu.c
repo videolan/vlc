@@ -47,24 +47,6 @@
 #   include <sys/stat.h>
 #endif
 
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#elif WIN32
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
-#else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   if HAVE_ARPA_INET_H
-#      include <arpa/inet.h>
-#   elif defined( SYS_BEOS )
-#      include <net/netdb.h>
-#   endif
-#endif
-
 #include "network.h"
 #include "asf.h"
 #include "buffer.h"
