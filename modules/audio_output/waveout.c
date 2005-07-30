@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
-#include <math.h>                                                /* roundf() */
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
@@ -801,11 +800,8 @@ static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 #endif
 
     i_waveout_vol &= 0xFFFF;
-    /* Force float computation, otherwise VolumeGet does not return the value
-     * which was set with VolumeSet, because of rounding issues */
     *pi_volume = p_aout->output.i_volume =
-        (audio_volume_t)roundf((float)i_waveout_vol * AOUT_VOLUME_MAX
-                               / 2.0 / 0xFFFF);
+        (i_waveout_vol * AOUT_VOLUME_MAX + 0xFFFF /*rounding*/) / 2 / 0xFFFF;
     return 0;
 }
 
