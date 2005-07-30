@@ -52,9 +52,9 @@ export PATH = $(PREFIX)/bin:/opt/cross-tools/bin:/usr/bin:/bin
 endif
 endif
 
-export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
-export CFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
-export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
+export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
+export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
+export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export LDFLAGS = -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
 
 # ***************************************************************************

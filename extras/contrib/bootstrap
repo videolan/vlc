@@ -46,9 +46,20 @@ echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
 
 case $HOST in
-    powerpc-apple-darwin8 | ppc-darwin)
+    ppc-darwin)
+# Mac OS X < 10.4
 	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
-	    echo "CONTRIB_URL = http://download.videolan.org/pub/videolan/devtools/contrib-macosx.tar.bz2" >> config.mak
+	;;
+    powerpc-apple-darwin8)
+# Mac OS X 10.4
+# Makefile cross compiling is only supported with gcc-4.0
+# ENVP defines the oldest environment on which the program will be able to run
+# SDK 10.2.8 requires gcc-3.3 (so we cannot use that SDK)
+            echo "ENVP = MACOSX_DEPLOYMENT_TARGET=10.3" >> config.mak
+	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
+#	    echo "EXTRA_CFLAGS = -D\${ENVP} -isysroot \${MACOSX_SDK}" >> config.mak
+	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
+	    echo "EXTRA_LDFLAGS = -isysroot \${MACOSX_SDK} -syslibroot,\${MACOSX_SDK}" >> config.mak
         ;;
     i586-pc-beos)
 	    echo "EXTRA_LDFLAGS = -lnet" >> config.mak
