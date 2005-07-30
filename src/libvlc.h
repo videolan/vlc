@@ -1025,7 +1025,7 @@ vlc_module_begin();
         add_deprecated( "spu-margin", VLC_FALSE ); /*Deprecated since 0.8.2 */
     set_section( N_( "Overlays" ) , NULL );
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
-                SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_TRUE );
+                SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_FALSE );
 
 /* Input options */
     set_category( CAT_INPUT );
