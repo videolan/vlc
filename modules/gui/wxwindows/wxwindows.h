@@ -157,7 +157,7 @@ struct intf_sys_t
 wxArrayString SeparateEntries( wxString );
 wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
 void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window );
-wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+wxFrame *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
 wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
 
 namespace wxvlc

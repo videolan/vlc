@@ -335,8 +335,11 @@ Interface::~Interface()
 {
     WindowSettings *ws = p_intf->p_sys->p_window_settings;
 
-    ws->SetSettings( WindowSettings::ID_MAIN, true,
-                     GetPosition(), GetSize() );
+    if( !IsIconized() )
+    {
+        ws->SetSettings( WindowSettings::ID_MAIN, true,
+                         GetPosition(), GetSize() );
+    }
 
     if( video_window ) delete video_window;
 

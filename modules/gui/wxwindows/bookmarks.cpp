@@ -294,7 +294,7 @@ BookmarksDialog::~BookmarksDialog()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent )
+wxFrame *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent )
 {
     return new class BookmarksDialog( p_intf, p_parent );
 }

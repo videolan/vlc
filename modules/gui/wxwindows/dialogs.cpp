@@ -88,7 +88,7 @@ public:
     FileInfo            *p_fileinfo_dialog;
     WizardDialog        *p_wizard_dialog;
     wxFrame             *p_prefs_dialog;
-    wxWindow            *p_bookmarks_dialog;
+    wxFrame             *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
     UpdateVLC           *p_updatevlc_dialog;
 };
@@ -200,7 +200,7 @@ DialogsProvider::~DialogsProvider()
 
 #define UPDATE(id,w)                                        \
   {                                                         \
-    if( w && w->IsShown() )                                 \
+    if( w && w->IsShown() && !w->IsIconized() )             \
         ws->SetSettings(  WindowSettings::id, true,         \
                           w->GetPosition(), w->GetSize() ); \
     else                                                    \
