@@ -46,6 +46,7 @@ static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
 
 static int FetchRSS( filter_t * );
+static void FreeRSS( filter_t * );
 
 static int pi_color_values[] = { 0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0,
                0x00FFFFFF, 0x00800000, 0x00FF0000, 0x00FF00FF, 0x00FFFF00,
@@ -80,6 +81,9 @@ struct rss_feed_t
 
 struct filter_sys_t
 {
+    vlc_mutex_t lock;
+    vlc_mutex_t *p_lock;
+
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
     int i_speed;
@@ -102,14 +106,12 @@ struct filter_sys_t
     int i_cur_char;
 };
 
-// <TODO>
 #define MSG_TEXT N_("RSS feed URLs")
-#define MSG_LONGTEXT N_("RSS feed comma(TODO ?) seperated URLs")
+#define MSG_LONGTEXT N_("RSS feed comma seperated URLs")
 #define SPEED_TEXT N_("RSS feed speed")
 #define SPEED_LONGTEXT N_("RSS feed speed (bigger is slower)")
 #define LENGTH_TEXT N_("RSS feed max number of chars displayed")
 #define LENGTH_LONGTEXT N_("RSS feed max number of chars displayed")
-// </TODO>
 
 #define POSX_TEXT N_("X offset, from left")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
@@ -190,10 +192,15 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+    vlc_mutex_init( p_filter, &p_sys->lock );
+    vlc_mutex_lock( &p_sys->lock );
+
     p_sys->psz_urls = var_CreateGetString( p_filter, "rss-urls" );
     p_sys->i_cur_feed = 0;
     p_sys->i_cur_item = 0;
     p_sys->i_cur_char = 0;
+    p_sys->i_feeds = 0;
+    p_sys->p_feeds = NULL;
     p_sys->i_speed = var_CreateGetInteger( p_filter, "rss-speed" );
     p_sys->i_length = var_CreateGetInteger( p_filter, "rss-length" );
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length );
@@ -209,18 +216,27 @@ static int CreateFilter( vlc_object_t *p_this )
     if( FetchRSS( p_filter ) )
     {
         msg_Err( p_filter, "failed while fetching RSS ... too bad" );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_EGENERIC;
     }
 
-    if( p_sys->i_feeds == 0 ) return VLC_EGENERIC;
+    if( p_sys->i_feeds == 0 )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return VLC_EGENERIC;
+    }
     for( i_feed=0; i_feed < p_sys->i_feeds; i_feed ++ )
         if( p_sys->p_feeds[i_feed].i_items == 0 )
+        {
+            vlc_mutex_unlock( &p_sys->lock );
             return VLC_EGENERIC;
+        }
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
     p_sys->last_date = (mtime_t)0;
-    //p_sys->b_need_update = VLC_TRUE;
+
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -232,9 +248,13 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    vlc_mutex_lock( &p_sys->lock );
+
     if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
     free( p_sys->psz_urls );
-    /* TODO : free RSS feeds stuff */
+    FreeRSS( p_filter );
+    vlc_mutex_unlock( &p_sys->lock );
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 
     /* Delete the RSS variables */
@@ -262,8 +282,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     int i_feed, i_item;
 
+    vlc_mutex_lock( &p_sys->lock );
+
     /* wait more for the 1st char */
-    if( p_sys->last_date + ( p_sys->i_cur_char == 0 && p_sys->i_cur_item == 0 ? 5 : 1 ) * p_sys->i_speed > date ) return NULL;
+    if( p_sys->last_date + ( p_sys->i_cur_char == 0 && p_sys->i_cur_item == 0 ? 5 : 1 ) * p_sys->i_speed > date )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return NULL;
+    }
 
     p_sys->last_date = date;
     p_sys->i_cur_char++;
@@ -278,15 +304,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
     }
 
-
-/* We always need an update
-    if( p_sys->b_need_update == VLC_FALSE )
-    {
-        return NULL;
-    }*/
-
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
-    if( !p_spu ) return NULL;
+    if( !p_spu )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return NULL;
+    }
 
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
@@ -299,6 +322,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     if( !p_spu->p_region )
     {
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
+        vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
 
@@ -337,11 +361,20 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region->i_text_alpha = 255 - p_sys->i_font_opacity;
     p_spu->p_region->i_text_size = p_sys->i_font_size;
 
-
-    //p_sys->b_need_update = VLC_FALSE;
+    vlc_mutex_unlock( &p_sys->lock );
     return p_spu;
 }
 
+/****************************************************************************
+ * RSS related functions
+ ****************************************************************************
+ * You should always lock the p_filter mutex before using any of these
+ * functions
+ ***************************************************************************/
+
+/****************************************************************************
+ * FetchRSS
+ ***************************************************************************/
 static int FetchRSS( filter_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -354,12 +387,14 @@ static int FetchRSS( filter_t *p_filter)
     char *psz_eltvalue = NULL;
     char *psz_feed = NULL;
     char *psz_buffer = NULL;
+    char *psz_buffer_2 = NULL;
 
     int i_feed;
     int i_item;
     int i_is_item;
     int i_int;
 
+    FreeRSS( p_filter );
     p_sys->i_feeds = 1;
     i_int = 0;
     while( p_sys->psz_urls[i_int] != 0 )
@@ -376,6 +411,7 @@ static int FetchRSS( filter_t *p_filter)
     }
 
     psz_buffer = strdup( p_sys->psz_urls );
+    psz_buffer_2 = psz_buffer; /* keep track so we can free it */
     for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
         struct rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
@@ -505,7 +541,40 @@ static int FetchRSS( filter_t *p_filter)
         if( p_xml_reader && p_xml ) xml_ReaderDelete( p_xml, p_xml_reader );
         if( p_stream ) stream_Delete( p_stream );
     }
+    free( psz_buffer_2 );
     if( p_xml ) xml_Delete( p_xml );
 
     return 0;
+}
+
+/****************************************************************************
+ * FreeRSS
+ ***************************************************************************/
+static void FreeRSS( filter_t *p_filter)
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    struct rss_item_t *p_item;
+    struct rss_feed_t *p_feed;
+
+    int i_feed;
+    int i_item;
+
+    for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
+    {
+        p_feed = p_sys->p_feeds+i_feed;
+        for( i_item = 0; i_item < p_feed->i_items; i_item++ )
+        {
+            p_item = p_feed->p_items+i_item;
+            free( p_item->psz_title );
+            free( p_item->psz_link );
+            free( p_item->psz_description );
+        }
+        free( p_feed->p_items );
+        free( p_feed->psz_title);
+        free( p_feed->psz_link );
+        free( p_feed->psz_description );
+    }
+    free( p_sys->p_feeds );
+    p_sys->i_feeds = 0;
 }
