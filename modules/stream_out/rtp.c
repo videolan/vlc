@@ -395,8 +395,7 @@ static int Open( vlc_object_t *p_this )
     if( *val.psz_string )
     {
         sout_access_out_t *p_grab;
-
-        char *psz_rtpmap, url[NI_MAXHOST + 8], access[17], psz_ttl[5];
+        char *psz_rtpmap, url[NI_MAXHOST + 8], access[17], psz_ttl[5], ipv;
 
         if( p_sys->psz_destination )
         {
@@ -439,6 +438,10 @@ static int Open( vlc_object_t *p_this )
                   ? "[%s]:%d" : "%s:%d", p_sys->psz_destination,
                   p_sys->i_port );
         url[sizeof( url ) - 1] = '\0';
+        /* FIXME: we should check that url is a numerical address, otherwise
+         * the SDP will be quite broken (regardless of the IP protocol version)
+         */
+        ipv = ( strchr( p_sys->psz_destination, ':' ) != NULL ) ? '6' : '4';
 
         if( !( p_sys->p_access = sout_AccessOutNew( p_sout, access, url ) ) )
         {
@@ -490,13 +493,6 @@ static int Open( vlc_object_t *p_this )
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
-        p_sys->psz_sdp =
-            malloc( 10 + 30 + 10 + strlen( p_sys->psz_session_name ) +
-                    10 + strlen( p_sys->psz_session_description ) + 10 + strlen( p_sys->psz_session_url ) +
-                    10 + strlen( p_sys->psz_session_email ) + 10 + strlen( p_sys->psz_destination ) +
-                    10 + 10 + strlen( PACKAGE_STRING ) +
-                    20 + 10 + 20 + 10 + strlen( psz_rtpmap ) );
-
         if( net_AddressIsMulticast( (vlc_object_t *)p_stream, p_sys->psz_destination ) )
         {
             snprintf( psz_ttl, sizeof( psz_ttl ), "/%d", p_sys->i_ttl );
@@ -507,26 +503,28 @@ static int Open( vlc_object_t *p_this )
             psz_ttl[0] = '\0'; 
         }
 
-        sprintf( p_sys->psz_sdp,
-                 "v=0\r\n"
-                 "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n"
-                 "s=%s\r\n"
-                 "i=%s\r\n"
-                 "u=%s\r\n"
-                 "e=%s\r\n"
-                 "t=0 0\r\n" /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
-                 "a=tool:"PACKAGE_STRING"\r\n"
-                 "c=IN IP4 %s%s\r\n"
-                 "m=video %d RTP/AVP %d\r\n"
-                 "a=rtpmap:%d %s\r\n",
-                 p_sys->i_sdp_id, p_sys->i_sdp_version,
-                 p_sys->psz_session_name,
-                 p_sys->psz_session_description,
-                 p_sys->psz_session_url,
-                 p_sys->psz_session_email,
-                 p_sys->psz_destination, psz_ttl,
-                 p_sys->i_port, p_sys->i_payload_type,
-                 p_sys->i_payload_type, psz_rtpmap );
+        asprintf( &p_sys->psz_sdp,
+                  "v=0\r\n"
+                  /* FIXME: source address not known :( */
+                  "o=- "I64Fd" %d IN IP%c %s\r\n"
+                  "s=%s\r\n"
+                  "i=%s\r\n"
+                  "u=%s\r\n"
+                  "e=%s\r\n"
+                  "t=0 0\r\n" /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+                  "a=tool:"PACKAGE_STRING"\r\n"
+                  "c=IN IP%c %s%s\r\n"
+                  "m=video %d RTP/AVP %d\r\n"
+                  "a=rtpmap:%d %s\r\n",
+                  p_sys->i_sdp_id, p_sys->i_sdp_version,
+                  ipv, ipv == '6' ? "::1" : "127.0.0.1" /* FIXME */,
+                  p_sys->psz_session_name,
+                  p_sys->psz_session_description,
+                  p_sys->psz_session_url,
+                  p_sys->psz_session_email,
+                  ipv, p_sys->psz_destination, psz_ttl,
+                  p_sys->i_port, p_sys->i_payload_type,
+                  p_sys->i_payload_type, psz_rtpmap );
         fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
 
         /* create the rtp context */
@@ -730,23 +728,28 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
-static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bool_t b_rtsp )
+static char *SDPGenerate( const sout_stream_t *p_stream,
+                          const char *psz_destination, vlc_bool_t b_rtsp )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_size;
-    char *psz_sdp, *p;
+    char *psz_sdp, *p, ipv;
     int i;
 
-    i_size = strlen( "v=0\r\n" ) +
-             strlen( "o=- * * IN IP4 127.0.0.1\r\n" ) + 10 + 10 +
-             strlen( "s=*\r\n" ) + strlen( p_sys->psz_session_name ) +
-             strlen( "i=*\r\n" ) + strlen( p_sys->psz_session_description ) +
-             strlen( "u=*\r\n" ) + strlen( p_sys->psz_session_url ) +
-             strlen( "e=*\r\n" ) + strlen( p_sys->psz_session_email ) +
-             strlen( "t=0 0\r\n" ) + /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
-             strlen( "a=tool:"PACKAGE_STRING"\r\n" ) +
-             strlen( "c=IN IP4 */*\r\n" ) + 20 + 10 +
-             strlen( psz_destination ? psz_destination : "0.0.0.0") ;
+    /* FIXME: breaks IP version check on unknown destination */
+    if( psz_destination == NULL )
+        psz_destination = "0.0.0.0";
+
+    i_size = sizeof( "v=0\r\n" ) +
+             sizeof( "o=- * * IN IP4 127.0.0.1\r\n" ) + 10 + 10 +
+             sizeof( "s=*\r\n" ) + strlen( p_sys->psz_session_name ) +
+             sizeof( "i=*\r\n" ) + strlen( p_sys->psz_session_description ) +
+             sizeof( "u=*\r\n" ) + strlen( p_sys->psz_session_url ) +
+             sizeof( "e=*\r\n" ) + strlen( p_sys->psz_session_email ) +
+             sizeof( "t=0 0\r\n" ) + /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+             sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
+             sizeof( "c=IN IP4 */*\r\n" ) + 20 + 10 +
+             strlen( psz_destination ) ;
     for( i = 0; i < p_sys->i_es; i++ )
     {
         sout_stream_id_t *id = p_sys->es[i];
@@ -766,10 +769,13 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
         }
     }
 
+    ipv = ( strchr( psz_destination, ':' ) != NULL ) ? '6' : '4';
+
     p = psz_sdp = malloc( i_size );
     p += sprintf( p, "v=0\r\n" );
-    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n",
-                  p_sys->i_sdp_id, p_sys->i_sdp_version );
+    p += sprintf( p, "o=- "I64Fd" %d IN IP%c %s\r\n",
+                  p_sys->i_sdp_id, p_sys->i_sdp_version,
+                  ipv, ipv == '6' ? "::" : "127.0.0.1" );
     if( *p_sys->psz_session_name )
         p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
     if( *p_sys->psz_session_description )
@@ -782,9 +788,9 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
-    p += sprintf( p, "c=IN IP4 %s", psz_destination ? psz_destination : "0.0.0.0" );
+    p += sprintf( p, "c=IN IP%c %s", ipv, psz_destination );
 
-    if( net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ? psz_destination : "0.0.0.0" ) )
+    if( net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ) )
     {
         /* Add the ttl if it is a multicast address */
         p += sprintf( p, "/%d\r\n", p_sys->i_ttl );
