@@ -150,18 +150,18 @@ vlc_module_begin();
     add_string( "rss-urls", "rss", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Position"), NULL );
-    add_integer( "marq-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+    add_integer( "rss-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "rss-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( "rss-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
 
     set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_integer_with_range( "marq-opacity", 255, 0, 255, NULL,
+    add_integer_with_range( "rss-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_integer( "rss-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
-    add_integer( "marq-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
+    add_integer( "rss-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Misc"), NULL );
     add_integer( "rss-speed", 100000, NULL, SPEED_TEXT, SPEED_LONGTEXT,
@@ -198,13 +198,13 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_length = var_CreateGetInteger( p_filter, "rss-length" );
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length );
 
-    p_sys->i_xoff = var_CreateGetInteger( p_filter, "marq-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_filter, "marq-y" );
-    p_sys->i_pos = var_CreateGetInteger( p_filter, "marq-position" );
-    var_Create( p_filter, "marq-opacity", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    p_sys->i_font_opacity = var_CreateGetInteger( p_filter, "marq-opacity" );
-    p_sys->i_font_color = var_CreateGetInteger( p_filter, "marq-color" );
-    p_sys->i_font_size = var_CreateGetInteger( p_filter, "marq-size" );
+    p_sys->i_xoff = var_CreateGetInteger( p_filter, "rss-x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_filter, "rss-y" );
+    p_sys->i_pos = var_CreateGetInteger( p_filter, "rss-position" );
+    var_Create( p_filter, "rss-opacity", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    p_sys->i_font_opacity = var_CreateGetInteger( p_filter, "rss-opacity" );
+    p_sys->i_font_color = var_CreateGetInteger( p_filter, "rss-color" );
+    p_sys->i_font_size = var_CreateGetInteger( p_filter, "rss-size" );
 
     if( FetchRSS( p_filter ) )
     {
@@ -241,12 +241,12 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_filter, "rss-urls" );
     var_Destroy( p_filter, "rss-speed" );
     var_Destroy( p_filter, "rss-length" );
-    var_Destroy( p_filter, "marq-x" );
-    var_Destroy( p_filter, "marq-y" );
-    var_Destroy( p_filter, "marq-position" );
-    var_Destroy( p_filter, "marq-color");
-    var_Destroy( p_filter, "marq-opacity");
-    var_Destroy( p_filter, "marq-size");
+    var_Destroy( p_filter, "rss-x" );
+    var_Destroy( p_filter, "rss-y" );
+    var_Destroy( p_filter, "rss-position" );
+    var_Destroy( p_filter, "rss-color");
+    var_Destroy( p_filter, "rss-opacity");
+    var_Destroy( p_filter, "rss-size");
 }
 
 /****************************************************************************
