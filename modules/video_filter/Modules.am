@@ -13,5 +13,6 @@ SOURCES_blend = blend.c
 SOURCES_scale = scale.c
 SOURCES_time = time.c
 SOURCES_marq = marq.c
+SOURCES_rss = rss.c
 SOURCES_motiondetect = motiondetect.c
 noinst_HEADERS += filter_common.h
