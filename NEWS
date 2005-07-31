@@ -9,10 +9,14 @@ Core support:
 Services discovery:
 * Bleeding edge UPnP service discovery
 
+Video Filters:
+* RSS feed
+
 Interfaces:
  * Mac OS X
     - new streaming and transcoding wizard with the same functionality as the WxWidgets one
-
+ * wxWidgets
+    - VLC update checker
 
 Changes between 0.8.1 and 0.8.2:
 -----------------------------------------------------
