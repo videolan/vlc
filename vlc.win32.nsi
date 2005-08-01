@@ -438,10 +438,10 @@ Section Uninstall
   DeleteRegKey HKCR "VLC.MediaFile"
 
   DeleteRegKey HKLM \
-    SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}
+    "SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}"
 
   DeleteRegKey HKLM \
-    Software\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN
+    "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
   Delete "$DESKTOP\VLC media player.lnk"
 
