@@ -78,13 +78,18 @@ static struct codec vcodecs_array[] =
        { MUX_TS, -1, -1,-1,-1,-1,-1,-1,-1 } },
     { "H 264" , "H264" , N_("H264 is a new video codec (useable with MPEG TS " \
         "and MPEG4)") ,
-       { MUX_TS, MUX_MP4, -1,-1,-1,-1,-1,-1,-1 } },
-    { "WMV 1" , "WMV1", N_("WMV (Windows Media Video) 1 (useable with MPEG TS, " \
+       { MUX_TS, MUX_MP4, MUX_ASF,-1,-1,-1,-1,-1,-1 } },
+    { "WMV 1" , "WMV1", N_("WMV (Windows Media Video) 7 (useable with MPEG TS, " \
         "MPEG1, ASF and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
-    { "WMV 2" , "WMV2", N_("WMV (Windows Media Video) 2 (useable with MPEG TS, " \
+    { "WMV 2" , "WMV2", N_("WMV (Windows Media Video) 8 (useable with MPEG TS, " \
         "MPEG1, ASF and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
+#ifdef WIN32
+    { "WMV 3" , "WMV3", N_("WMV (Windows Media Video) 9 (useable with MPEG TS, " \
+        "MPEG1, ASF and OGG)") ,
+       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
+#endif
     { "MJPEG" , "MJPG", N_("MJPEG consists of a series of JPEG pictures " \
         "(useable with MPEG TS, MPEG1, ASF and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
