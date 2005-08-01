@@ -1191,6 +1191,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     for( ;; )
     {
         mvar_t *f;
+        const char *psz_ext;
 
         /* parse psz_src dir */
         if( ( p_dir_content = readdir( p_dir ) ) == NULL )
@@ -1213,6 +1214,10 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
         f = mvar_New( name, "set" );
         mvar_AppendNewVar( f, "name", tmp );
         mvar_AppendNewVar( f, "basename", p_dir_content->d_name );
+
+        /* put file extension in 'ext' */
+        psz_ext = strrchr( p_dir_content->d_name, '.' );
+        mvar_AppendNewVar( f, "ext", psz_ext != NULL ? psz_ext + 1 : "" );
 
 #ifdef HAVE_SYS_STAT_H
         if( S_ISDIR( stat_info.st_mode ) )
