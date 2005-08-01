@@ -125,7 +125,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     i_limit = config_GetInt( p_this->p_libvlc, "shoutcast-limit" );
-    #define SHOUTCAST_BASE_URL "http/shout-b4s://shoutcast.com/sbin/xmllister.phtml?service=vlc&no_compress=1&limit="
+    #define SHOUTCAST_BASE_URL "http/shout-b4s://www.shoutcast.com/sbin/xmllister.phtml?service=vlc&no_compress=1&limit="
     psz_shoutcast_url = (char *)malloc( strlen( SHOUTCAST_BASE_URL ) + 20 );
     psz_shoutcast_title = (char *)malloc( 6 + 20 );
 
