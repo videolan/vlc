@@ -7,6 +7,7 @@
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Remco Poortinga <poortinga@telin.nl>
+ *          Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +90,7 @@ static int OpenUDP( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("IPv6 network abstraction layer") );
+    set_description( _("UDP/IPv6 network abstraction layer") );
     set_capability( "network", 40 );
     set_callbacks( OpenUDP, NULL );
 vlc_module_end();
@@ -127,14 +128,25 @@ static int BuildAddr( vlc_object_t *p_this, struct sockaddr_in6 *p_socket,
     return 0;
 }
 
+#if defined(WIN32) || defined(UNDER_CE)
+# define WINSOCK_STRERROR_SIZE 20
+static const char *winsock_strerror( char *buf )
+{
+    snprintf( buf, WINSOCK_STRERROR_SIZE, "Winsock error %d",
+              WSAGetLastError( ) );
+    buf[WINSOCK_STRERROR_SIZE - 1] = '\0';
+    return buf;
+}
+#endif
+
+
 /*****************************************************************************
  * OpenUDP: open a UDP socket
  *****************************************************************************
  * psz_bind_addr, i_bind_port : address and port used for the bind()
  *   system call. If psz_bind_addr == NULL, the socket is bound to
- *   in6addr_any and broadcast reception is enabled. If i_bind_port == 0,
- *   1234 is used. If psz_bind_addr is a multicast (class D) address,
- *   join the multicast group.
+ *   in6addr_any and broadcast reception is enabled. If psz_bind_addr is a
+ *   multicast (FF00::/8) address, join the multicast group.
  * psz_server_addr, i_server_port : address and port used for the connect()
  *   system call. It can avoid receiving packets from unauthorized IPs.
  *   Its use leads to great confusion and is currently discouraged.
@@ -150,6 +162,10 @@ static int OpenUDP( vlc_object_t * p_this )
     int i_handle, i_opt;
     struct sockaddr_in6 sock;
     vlc_value_t val;
+#if defined(WIN32) || defined(UNDER_CE)
+    char strerror_buf[WINSOCK_STRERROR_SIZE];
+# define strerror( x ) winsock_strerror( strerror_buf )
+#endif
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)
      * protocol */

@@ -7,6 +7,7 @@
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
  *          Alexis de Lattre <alexis@via.ecp.fr>
+ *          Rémi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,7 +85,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int NetOpen( vlc_object_t * );
+static int OpenUDP( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -96,11 +97,11 @@ static int NetOpen( vlc_object_t * );
 
 vlc_module_begin();
     set_shortname( "IPv4" );
-    set_description( _("IPv4 network abstraction layer") );
+    set_description( _("UDP/IPv4 network abstraction layer") );
     set_capability( "network", 50 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ADVANCED );
-    set_callbacks( NetOpen, NULL );
+    set_callbacks( OpenUDP, NULL );
     add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
@@ -145,21 +146,33 @@ static int BuildAddr( struct sockaddr_in * p_socket,
     return( 0 );
 }
 
+#if defined(WIN32) || defined(UNDER_CE)
+# define WINSOCK_STRERROR_SIZE 20
+static const char *winsock_strerror( char *buf )
+{
+    snprintf( buf, WINSOCK_STRERROR_SIZE, "Winsock error %d",
+              WSAGetLastError( ) );
+    buf[WINSOCK_STRERROR_SIZE - 1] = '\0';
+    return buf;
+}
+#endif
+
+
 /*****************************************************************************
  * OpenUDP: open a UDP socket
  *****************************************************************************
  * psz_bind_addr, i_bind_port : address and port used for the bind()
  *   system call. If psz_bind_addr == "", the socket is bound to
- *   INADDR_ANY and broadcast reception is enabled. If i_bind_port == 0,
- *   1234 is used. If psz_bind_addr is a multicast (class D) address,
- *   join the multicast group.
+ *   INADDR_ANY and broadcast reception is enabled. If psz_bind_addr is a
+ *   multicast (class D) address, join the multicast group.
  * psz_server_addr, i_server_port : address and port used for the connect()
  *   system call. It can avoid receiving packets from unauthorized IPs.
  *   Its use leads to great confusion and is currently discouraged.
  * This function returns -1 in case of error.
  *****************************************************************************/
-static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
+static int OpenUDP( vlc_object_t * p_this )
 {
+    network_socket_t * p_socket = p_this->p_private;
     const char * psz_bind_addr = p_socket->psz_bind_addr;
     int i_bind_port = p_socket->i_bind_port;
     const char * psz_server_addr = p_socket->psz_server_addr;
@@ -168,6 +181,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     int i_handle, i_opt;
     struct sockaddr_in sock;
     vlc_value_t val;
+#if defined(WIN32) || defined(UNDER_CE)
+    char strerror_buf[WINSOCK_STRERROR_SIZE];
+# define strerror( x ) winsock_strerror( strerror_buf )
+#endif
 
     /* If IP_ADD_SOURCE_MEMBERSHIP is not defined in the headers
        (because it's not in glibc for example), we have to define the
@@ -185,11 +202,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
      * protocol */
     if( (i_handle = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 )
     {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Warn( p_this, "cannot create socket (%i)", WSAGetLastError() );
-#else
         msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
-#endif
         return( -1 );
     }
 
@@ -198,13 +211,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %i)",
-                  WSAGetLastError() );
-#else
         msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
                           strerror(errno));
-#endif
         close( i_handle );
         return( -1 );
     }
@@ -222,16 +230,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
      * packet loss caused by scheduling problems */
     i_opt = 0x80000;
 #if !defined( SYS_BEOS )
-    if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *) &i_opt, sizeof( i_opt ) ) == -1 )
-    {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Dbg( p_this, "cannot configure socket (SO_RCVBUF: %i)",
-                 WSAGetLastError() );
-#else
+    if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *) &i_opt,
+                    sizeof( i_opt ) ) == -1 )
         msg_Dbg( p_this, "cannot configure socket (SO_RCVBUF: %s)",
                           strerror(errno));
-#endif
-    }
 #endif
 
     /* Build the local socket */
@@ -253,11 +255,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
-#if defined(WIN32) || defined(UNDER_CE)
-        msg_Warn( p_this, "cannot bind socket (%i)", WSAGetLastError() );
-#else
         msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
-#endif
         close( i_handle );
         return( -1 );
     }
@@ -280,16 +278,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( !*psz_bind_addr )
     {
         i_opt = 1;
-        if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST, (void*) &i_opt, sizeof( i_opt ) ) == -1 )
-        {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Warn( p_this, "cannot configure socket (SO_BROADCAST: %i)",
-                      WSAGetLastError() );
-#else
+        if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST, (void*) &i_opt,
+                        sizeof( i_opt ) ) == -1 )
             msg_Warn( p_this, "cannot configure socket (SO_BROADCAST: %s)",
                        strerror(errno) );
-#endif
-        }
     }
 #endif
 
@@ -327,13 +319,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                          (char*)&imr,
                          sizeof(struct ip_mreq_source) ) == -1 )
             {
-#if defined(WIN32) || defined(UNDER_CE)
-                msg_Err( p_this, "failed to join IP multicast group (%i)",
-                         WSAGetLastError() );
-#else
                 msg_Err( p_this, "failed to join IP multicast group (%s)",
                                   strerror(errno) );
-#endif
                 msg_Err( p_this, "are you sure your OS supports IGMPv3?" );
                 close( i_handle );
                 return( -1 );
@@ -361,13 +348,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                             (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
             {
-#if defined(WIN32) || defined(UNDER_CE)
-                msg_Err( p_this, "failed to join IP multicast group (%i)",
-                         WSAGetLastError() );
-#else
                 msg_Err( p_this, "failed to join IP multicast group (%s)",
                                   strerror(errno) );
-#endif
                 close( i_handle );
                 return( -1 );
             }
@@ -389,11 +371,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Warn( p_this, "cannot connect socket (%i)", WSAGetLastError());
-#else
             msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
-#endif
             close( i_handle );
             return( -1 );
         }
@@ -465,15 +443,6 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         var_Get( p_this, "mtu", &val );
     }
     p_socket->i_mtu = val.i_int;
-    return( 0 );
-}
 
-/*****************************************************************************
- * NetOpen: wrapper around OpenUDP, ListenTCP and OpenTCP
- *****************************************************************************/
-static int NetOpen( vlc_object_t * p_this )
-{
-    network_socket_t * p_socket = p_this->p_private;
-
-    return OpenUDP( p_this, p_socket );
+    return 0;
 }
