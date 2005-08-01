@@ -2384,6 +2384,36 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
         val.psz_string = psz_value;
         break;
 
+    case VLC_VAR_LIST:
+    {
+        char *psz_orig, *psz_var;
+        vlc_list_t *p_list = malloc(sizeof(vlc_list_t));
+        val.p_list = p_list;
+        p_list->i_count = 0;
+
+        psz_var = psz_orig = strdup(psz_value);
+        while( psz_var && *psz_var )
+        {
+            char *psz_item = psz_var;
+            vlc_value_t val;
+            while( *psz_var && *psz_var != ',' ) psz_var++;
+            if( *psz_var == ',' )
+            {
+                *psz_var = '\0';
+                psz_var++;
+            }
+            val.i_int = strtol( psz_item, NULL, 0 );
+            INSERT_ELEM( p_list->p_values, p_list->i_count,
+                         p_list->i_count, val );
+            /* p_list->i_count is incremented twice by INSERT_ELEM */
+            p_list->i_count--;
+            INSERT_ELEM( p_list->pi_types, p_list->i_count,
+                         p_list->i_count, VLC_VAR_INTEGER );
+        }
+        if( psz_orig ) free( psz_orig );
+        break;
+    }
+
     default:
         goto cleanup;
         break;
