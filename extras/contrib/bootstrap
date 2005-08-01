@@ -59,7 +59,7 @@ case $HOST in
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
 #	    echo "EXTRA_CFLAGS = -D\${ENVP} -isysroot \${MACOSX_SDK}" >> config.mak
 	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
-	    echo "EXTRA_LDFLAGS = -isysroot \${MACOSX_SDK} -syslibroot \${MACOSX_SDK}" >> config.mak
+	    echo "EXTRA_LDFLAGS = -isysroot \${MACOSX_SDK} -Wl,syslibroot,\${MACOSX_SDK}" >> config.mak
         ;;
     i586-pc-beos)
 	    echo "EXTRA_LDFLAGS = -lnet" >> config.mak
