@@ -52,47 +52,47 @@ struct codec {
 static struct codec vcodecs_array[] =
 {
     { "MPEG-1 Video" , "mp1v" , N_("MPEG-1 Video codec (useable with MPEG PS, " \
-		"MPEG TS, MPEG1, OGG and RAW)"),
+        "MPEG TS, MPEG1, OGG and RAW)"),
 //       {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_AVI, MUX_RAW, -1,-1,-1 } },
        {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_RAW, -1,-1,-1,-1 } },
     { "MPEG-2 Video" , "mp2v" , N_("MPEG-2 Video codec (useable with MPEG PS, " \
-		"MPEG TS, MPEG1, OGG and RAW)"),
+        "MPEG TS, MPEG1, OGG and RAW)"),
 //       {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_AVI, MUX_RAW, -1,-1,-1 } },
        {MUX_PS, MUX_TS, MUX_MPEG, MUX_OGG, MUX_RAW, -1,-1,-1,-1 } },
     { "MPEG-4 Video" , "mp4v" , N_("MPEG-4 Video codec (useable with MPEG PS, " \
-		"MPEG TS, MPEG1, ASF, MPEG4, OGG and RAW)"),
+        "MPEG TS, MPEG1, ASF, MPEG4, OGG and RAW)"),
 //       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW, -1} },
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_RAW, -1,-1} },
     { "DIVX 1" ,"DIV1",N_("DivX first version (useable with MPEG TS, MPEG1, ASF" \
-		" and OGG)") ,
+        " and OGG)") ,
 //       {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , MUX_AVI , -1,-1,-1,-1 } },
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
     { "DIVX 2" ,"DIV2",N_("DivX second version (useable with MPEG TS, MPEG1, ASF" \
-		" and OGG)") ,
+        " and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
     { "DIVX 3" ,"DIV3",N_("DivX third version (useable with MPEG TS, MPEG1, ASF" \
-		" and OGG)") ,
+        " and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
-    { "H 263" , "H263" , N_("H263 is a video codec optimized for videoconference " \ 
-		"(low rates, useable with MPEG TS)") ,
+    { "H 263" , "H263" , N_("H263 is a video codec optimized for videoconference " \
+        "(low rates, useable with MPEG TS)") ,
        { MUX_TS, -1, -1,-1,-1,-1,-1,-1,-1 } },
     { "H 264" , "H264" , N_("H264 is a new video codec (useable with MPEG TS " \
-		"and MPEG4)") ,
+        "and MPEG4)") ,
        { MUX_TS, MUX_MP4, -1,-1,-1,-1,-1,-1,-1 } },
     { "WMV 1" , "WMV1", N_("WMV (Windows Media Video) 1 (useable with MPEG TS, " \
-		"MPEG1, ASF and OGG)") ,
+        "MPEG1, ASF and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
     { "WMV 2" , "WMV2", N_("WMV (Windows Media Video) 2 (useable with MPEG TS, " \
-		"MPEG1, ASF and OGG)") ,
+        "MPEG1, ASF and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
     { "MJPEG" , "MJPG", N_("MJPEG consists of a series of JPEG pictures " \
-		"(useable with MPEG TS, MPEG1, ASF and OGG)") ,
+        "(useable with MPEG TS, MPEG1, ASF and OGG)") ,
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
     { "Theora" , "theo", N_("Theora is a free general-purpose codec (useable " \
-		"with MPEG TS)"),
+        "with MPEG TS)"),
        {MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1} },
     { "Dummy", "dummy", N_("Dummy codec (do not transcode, useable with all " \
-		"encapsulation formats)") ,
+        "encapsulation formats)") ,
       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_WAV,MUX_RAW,MUX_MOV}},
     { NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
 };
@@ -100,36 +100,36 @@ static struct codec vcodecs_array[] =
 static struct codec acodecs_array[] =
 {
     { "MPEG Audio" , "mpga" , N_("The standard MPEG audio (1/2) format " \
-		"(useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)") ,
+        "(useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)") ,
 //       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_RAW, -1,-1,-1} },
     { "MP3" , "mp3" , N_("MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, " \
-		"MPEG1, ASF, OGG and RAW)") ,
+        "MPEG1, ASF, OGG and RAW)") ,
 //       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_RAW, -1,-1, -1} },
     { "MPEG 4 Audio" , "mp4a" , N_("Audio format for MPEG4 (useable with " \
-		"MPEG TS and MPEG4)") ,
+        "MPEG TS and MPEG4)") ,
        {MUX_TS, MUX_MP4, -1,-1,-1,-1,-1,-1,-1 } },
     { "A/52" , "a52" , N_("DVD audio format (useable with MPEG PS, MPEG TS, " \
-		"MPEG1, ASF, OGG and RAW)") ,
+        "MPEG1, ASF, OGG and RAW)") ,
 //       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_AVI,MUX_RAW, -1,-1} },
        {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_OGG,MUX_RAW, -1,-1,-1} },
     { "Vorbis" , "vorb" , N_("Vorbis is a free audio codec (useable with OGG)") ,
        {MUX_OGG, -1,-1,-1,-1,-1,-1,-1,-1} },
     { "FLAC" , "flac" , N_("FLAC is a lossless audio codec (useable with OGG " \
-		"and RAW)") ,
+        "and RAW)") ,
        {MUX_OGG , MUX_RAW, -1,-1,-1,-1,-1,-1,-1} },
     { "Speex" , "spx" , N_("A free audio codec dedicated to compression of " \
-		"voice (useable with OGG)") ,
+        "voice (useable with OGG)") ,
        {MUX_OGG, -1,-1,-1,-1,-1,-1,-1,-1} },
     { "Uncompressed, integer" , "s16l" , N_("Uncompressed audio samples " \
-		"(useable with WAV)"),
+        "(useable with WAV)"),
        {MUX_WAV, -1,-1,-1,-1,-1,-1,-1,-1} },
     { "Uncompressed, floating" , "fl32" , N_("Uncompressed audio samples " \
-		"(useable with WAV)"),
+        "(useable with WAV)"),
        {MUX_WAV, -1,-1,-1,-1,-1,-1,-1,-1} },
     { "Dummy", "dummy", N_("Dummy codec (do not transcode, useable with all " \
-		"encapsulation formats)") ,
+        "encapsulation formats)") ,
 //     {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_AVI,MUX_RAW,MUX_MOV}},
      {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_RAW,MUX_MOV,MUX_WAV}},
     { NULL,NULL,NULL , {-1,-1,-1,-1,-1,-1,-1,-1,-1}} /* Do not remove me */
