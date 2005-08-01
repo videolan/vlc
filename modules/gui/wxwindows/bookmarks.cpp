@@ -468,8 +468,8 @@ void BookmarksDialog::OnEdit( wxCommandEvent& event )
 {
     input_thread_t *p_old_input;
     input_thread_t *p_input =
-            (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                   FIND_ANYWHERE );
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
     if( !p_input ) return;
 
 
@@ -492,7 +492,7 @@ void BookmarksDialog::OnEdit( wxCommandEvent& event )
     {
         BookmarkEditDialog *p_bmk_edit;
         p_bmk_edit = new BookmarkEditDialog( p_intf, this,
-                               pp_bookmarks[i_first]);
+                                             pp_bookmarks[i_first]);
 
         if( p_bmk_edit->ShowModal() == wxID_OK )
         {
@@ -502,8 +502,8 @@ void BookmarksDialog::OnEdit( wxCommandEvent& event )
            {
                 wxMessageBox( wxU( _("No input found. The stream must be "
                                   "playing or paused for bookmarks to work.") ),
-                               wxU( _("No input") ), wxICON_WARNING | wxOK,
-                               this );
+                              wxU( _("No input") ), wxICON_WARNING | wxOK,
+                              this );
                 return;
            }
            if( p_old_input != p_input )
@@ -511,15 +511,14 @@ void BookmarksDialog::OnEdit( wxCommandEvent& event )
                 wxMessageBox( wxU( _("Input has changed, unable to save "
                                   "bookmark. Use \"pause\" while editing "
                                   "bookmarks to keep the same input.") ),
-                               wxU( _("Input has changed ") ),
-                               wxICON_WARNING | wxOK, this );
+                              wxU( _("Input has changed ") ),
+                              wxICON_WARNING | wxOK, this );
                 vlc_object_release( p_input );
                 return;
 
            }
-           fprintf(stderr,"Changing %li\n",i_first );
-           if( input_Control(  p_input, INPUT_CHANGE_BOOKMARK,
-                                p_bmk_edit->p_seekpoint, i_first ) !=
+           if( input_Control( p_input, INPUT_CHANGE_BOOKMARK,
+                              p_bmk_edit->p_seekpoint, i_first ) !=
                VLC_SUCCESS )
            {
                vlc_object_release( p_input );
