@@ -610,6 +610,7 @@ enum
 enum
 {
     ANN_MISC_SOUT = 0,
+    TTL_MISC_SOUT,
     MISC_SOUT_NUM
 };
 
@@ -678,13 +679,14 @@ private:
     wxSpinCtrl *net_ports[ACCESS_OUT_NUM];
     wxTextCtrl *net_addrs[ACCESS_OUT_NUM];
 
-    /* Controls for the SAP announces */
+    /* Controls for the SAP announces and TTL setting */
     wxPanel *misc_panel;
     wxPanel *misc_subpanels[MISC_SOUT_NUM];
     wxCheckBox *sap_checkbox;
     wxCheckBox *slp_checkbox;
     wxTextCtrl *announce_group;
     wxTextCtrl *announce_addr;
+    wxSpinCtrl *ttl_spin;
 
     /* Controls for the encapsulation */
     wxPanel *encapsulation_panel;

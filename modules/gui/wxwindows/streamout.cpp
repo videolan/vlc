@@ -564,8 +564,10 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
 
     /* Announce Row */
     misc_subpanels[ANN_MISC_SOUT] = new wxPanel( panel, -1 );
+    misc_subpanels[TTL_MISC_SOUT] = new wxPanel( panel, -1 );
     wxFlexGridSizer *subpanel_sizer = new wxFlexGridSizer( 3, 4, 20 );
     wxFlexGridSizer *subpanel_sub_sizer = new wxFlexGridSizer( 2, 4, 20 );
+    wxFlexGridSizer *subpanel2_sizer = new wxFlexGridSizer( 3, 4, 20 );
 
     sap_checkbox = new wxCheckBox( misc_subpanels[ANN_MISC_SOUT],SAPMisc_Event,
                                    wxU(_("SAP announce")) );
@@ -586,6 +588,11 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
                                     wxT(""), wxDefaultPosition,
                                     wxSize( 200, -1 ), wxTE_PROCESS_ENTER);
 
+    wxStaticText *ttl_label = new wxStaticText( misc_subpanels[TTL_MISC_SOUT], -1,
+                        wxU(_("Time-To-Live (TTL)")) );
+    ttl_spin = new wxSpinCtrl( misc_subpanels[TTL_MISC_SOUT], -1, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+                   0, 1, 255, config_GetInt( p_intf, "ttl" ) );
+
     subpanel_sizer->Add( sap_checkbox, 0,
                          wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( slp_checkbox, 0,
@@ -601,16 +608,23 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
     subpanel_sizer->Add( subpanel_sub_sizer, 1, wxEXPAND |
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
+    sout_all_checkbox = new wxCheckBox( misc_subpanels[TTL_MISC_SOUT],
+                    SoutAll_Event, wxU(_("Select all elementary streams")) );
+    subpanel2_sizer->Add( sout_all_checkbox, 1,
+                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxLEFT, 5 );
+    subpanel2_sizer->Add( ttl_label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+    subpanel2_sizer->Add( ttl_spin, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+
     misc_subpanels[ANN_MISC_SOUT]->SetSizerAndFit( subpanel_sizer );
+    misc_subpanels[TTL_MISC_SOUT]->SetSizerAndFit( subpanel2_sizer );
 
     /* Stuff everything into the main panel */
     panel_sizer->Add( misc_subpanels[ANN_MISC_SOUT], 1,
                       wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxLEFT, 5 );
 
-    sout_all_checkbox = new wxCheckBox( panel, SoutAll_Event,
-                            wxU(_("Select all elementary streams")) );
-    panel_sizer->Add( sout_all_checkbox, 1,
-                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxLEFT, 5 );
+    panel_sizer->Add( misc_subpanels[TTL_MISC_SOUT], 1,
+                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+
 
     panel->SetSizerAndFit( panel_sizer );
 
@@ -902,6 +916,7 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
 void SoutDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
     mrl_combo->Append( mrl_combo->GetValue() );
+    config_PutInt( p_intf, "ttl", ttl_spin->GetValue());
     EndModal( wxID_OK );
 }
 
