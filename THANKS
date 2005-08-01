@@ -38,6 +38,7 @@ DirektX <direktx at freemail.hu> - Hungarian translation
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Espen Skoglund <esk at ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
+François Seingier <francois.seingier at club-internet.fr> - TTL setting in the wx stream output dialog
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
 Gregory Hazel <ghazel et gmail dot com> - wxWidgets fixes and improvements
