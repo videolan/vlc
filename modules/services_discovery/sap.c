@@ -70,7 +70,8 @@
 /* Scope is inserted between them */
 #define SAP_V6_2 "::2:7FFE"
 /* See RFC3513 for list of valid scopes */
-static const char ipv6_scopes[] = "12456789ABCDE";
+/* FIXME: find a way to listen to link-local scope */
+static const char ipv6_scopes[] = "1456789ABCDE";
 
 
 /*****************************************************************************
