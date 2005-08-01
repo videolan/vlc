@@ -157,6 +157,15 @@ static const char *ppsz_enc_options[] = {
     "chroma-elim-threshold", NULL
 };
 
+static const uint16_t mpa_bitrate_tab[2][15] =
+{
+    {0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384},
+    {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160}
+};
+
+static const uint16_t mpa_freq_tab[6] =
+{ 44100, 48000, 32000, 22050, 24000, 16000 };
+
 /*****************************************************************************
  * OpenEncoder: probe the encoder
  *****************************************************************************/
@@ -516,17 +525,61 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
     if( avcodec_open( p_context, p_codec ) )
     {
-        if( p_enc->fmt_in.i_cat == AUDIO_ES && p_context->channels > 2 )
+        if( p_enc->fmt_in.i_cat == AUDIO_ES &&
+             (p_context->channels > 2 || i_codec_id == CODEC_ID_MP2
+               || i_codec_id == CODEC_ID_MP3) )
         {
-            p_context->channels = 2;
-            p_enc->fmt_in.audio.i_channels = 2; // FIXME
+            if( p_context->channels > 2 )
+            {
+                p_context->channels = 2;
+                p_enc->fmt_in.audio.i_channels = 2; // FIXME
+                msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
+            }
+
+            if( i_codec_id == CODEC_ID_MP2 || i_codec_id == CODEC_ID_MP3 )
+            {
+                int i_frequency, i;
+
+                for ( i_frequency = 0; i_frequency < 6; i_frequency++ )
+                {
+                    if ( p_enc->fmt_out.audio.i_rate
+                            == mpa_freq_tab[i_frequency] )
+                        break;
+                }
+                if ( i_frequency == 6 )
+                {
+                    msg_Err( p_enc, "MPEG audio doesn't support frequency=%d",
+                             p_enc->fmt_out.audio.i_rate );
+                    free( p_sys );
+                    return VLC_EGENERIC;
+                }
+
+                for ( i = 1; i < 14; i++ )
+                {
+                    if ( p_enc->fmt_out.i_bitrate / 1000
+                          <= mpa_bitrate_tab[i_frequency / 3][i] )
+                        break;
+                }
+                if ( p_enc->fmt_out.i_bitrate / 1000
+                      != mpa_bitrate_tab[i_frequency / 3][i] )
+                {
+                    msg_Warn( p_enc,
+                              "MPEG audio doesn't support bitrate=%d, using %d",
+                              p_enc->fmt_out.i_bitrate,
+                              mpa_bitrate_tab[i_frequency / 3][i] * 1000 );
+                    p_enc->fmt_out.i_bitrate =
+                        mpa_bitrate_tab[i_frequency / 3][i] * 1000;
+                    p_context->bit_rate = p_enc->fmt_out.i_bitrate;
+                }
+            }
+
+            p_context->codec = NULL;
             if( avcodec_open( p_context, p_codec ) )
             {
                 msg_Err( p_enc, "cannot open encoder" );
                 free( p_sys );
                 return VLC_EGENERIC;
             }
-            msg_Warn( p_enc, "stereo mode selected (codec limitation)" );
         }
         else
         {

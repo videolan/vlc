@@ -106,11 +106,21 @@ struct encoder_sys_t
 /*****************************************************************************
  * OpenEncoder: probe the encoder and return score
  *****************************************************************************/
+static const uint16_t mpa_bitrate_tab[2][15] =
+{
+    {0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384},
+    {0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160}
+};
+
+static const uint16_t mpa_freq_tab[6] =
+{ 44100, 48000, 32000, 22050, 24000, 16000 };
+
 static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     vlc_value_t val;
+    int i_frequency;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','g','a') &&
         p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','2','a') &&
@@ -123,6 +133,18 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_in.audio.i_channels > 2 )
     {
         msg_Err( p_enc, "doesn't support > 2 channels" );
+        return VLC_EGENERIC;
+    }
+
+    for ( i_frequency = 0; i_frequency < 6; i_frequency++ )
+    {
+        if ( p_enc->fmt_out.audio.i_rate == mpa_freq_tab[i_frequency] )
+            break;
+    }
+    if ( i_frequency == 6 )
+    {
+        msg_Err( p_enc, "MPEG audio doesn't support frequency=%d",
+                 p_enc->fmt_out.audio.i_rate );
         return VLC_EGENERIC;
     }
 
@@ -159,7 +181,25 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
     else
     {
-        twolame_set_bitrate( p_sys->p_twolame, p_enc->fmt_out.i_bitrate / 1000 );
+        int i;
+        for ( i = 1; i < 14; i++ )
+        {
+            if ( p_enc->fmt_out.i_bitrate / 1000
+                  <= mpa_bitrate_tab[i_frequency / 3][i] )
+                break;
+        }
+        if ( p_enc->fmt_out.i_bitrate / 1000
+              != mpa_bitrate_tab[i_frequency / 3][i] )
+        {
+            msg_Warn( p_enc, "MPEG audio doesn't support bitrate=%d, using %d",
+                      p_enc->fmt_out.i_bitrate,
+                      mpa_bitrate_tab[i_frequency / 3][i] * 1000 );
+            p_enc->fmt_out.i_bitrate = mpa_bitrate_tab[i_frequency / 3][i]
+                                        * 1000;
+        }
+
+        twolame_set_bitrate( p_sys->p_twolame,
+                             p_enc->fmt_out.i_bitrate / 1000 );
     }
 
     if ( p_enc->fmt_in.audio.i_channels == 1 )
