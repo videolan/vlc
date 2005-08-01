@@ -46,6 +46,8 @@ static int ImageWriteUrl( image_handler_t *, picture_t *,
 
 static picture_t *ImageConvert( image_handler_t *, picture_t *,
                                 video_format_t *, video_format_t * );
+static picture_t *ImageFilter( image_handler_t *, picture_t *,
+                               video_format_t *, const char *psz_module );
 
 static decoder_t *CreateDecoder( vlc_object_t *, video_format_t * );
 static void DeleteDecoder( decoder_t * );
@@ -53,7 +55,7 @@ static encoder_t *CreateEncoder( vlc_object_t *, video_format_t *,
                                  video_format_t * );
 static void DeleteEncoder( encoder_t * );
 static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
-                               video_format_t * );
+                               video_format_t *, const char * );
 static void DeleteFilter( filter_t * );
 
 static vlc_fourcc_t Ext2Fourcc( const char * );
@@ -75,6 +77,7 @@ image_handler_t *__image_HandlerCreate( vlc_object_t *p_this )
     p_image->pf_write = ImageWrite;
     p_image->pf_write_url = ImageWriteUrl;
     p_image->pf_convert = ImageConvert;
+    p_image->pf_filter = ImageFilter;
 
     return p_image;
 }
@@ -138,6 +141,13 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
 
     if( !p_fmt_out->i_chroma )
         p_fmt_out->i_chroma = p_image->p_dec->fmt_out.video.i_chroma;
+    if( !p_fmt_out->i_width && p_fmt_out->i_height )
+        p_fmt_out->i_width = p_fmt_out->i_height
+                              * p_image->p_dec->fmt_out.video.i_aspect
+                              / VOUT_ASPECT_FACTOR;
+    if( !p_fmt_out->i_height && p_fmt_out->i_width )
+        p_fmt_out->i_height = p_fmt_out->i_width * VOUT_ASPECT_FACTOR
+                               / p_image->p_dec->fmt_out.video.i_aspect;
     if( !p_fmt_out->i_width )
         p_fmt_out->i_width = p_image->p_dec->fmt_out.video.i_width;
     if( !p_fmt_out->i_height )
@@ -163,7 +173,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         {
             p_image->p_filter =
                 CreateFilter( p_image->p_parent, &p_image->p_dec->fmt_out,
-                              p_fmt_out );
+                              p_fmt_out, NULL );
 
             if( !p_image->p_filter )
             {
@@ -282,7 +292,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
             p_image->p_filter =
                 CreateFilter( p_image->p_parent, &fmt_in,
-                              &p_image->p_enc->fmt_in.video );
+                              &p_image->p_enc->fmt_in.video, NULL );
 
             if( !p_image->p_filter )
             {
@@ -402,7 +412,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         fmt_in.video = *p_fmt_in;
 
         p_image->p_filter =
-            CreateFilter( p_image->p_parent, &fmt_in, p_fmt_out );
+            CreateFilter( p_image->p_parent, &fmt_in, p_fmt_out, NULL );
 
         if( !p_image->p_filter )
         {
@@ -429,6 +439,47 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_pif = p_image->p_filter->pf_vout_buffer_new( p_image->p_filter );
         if( p_pif ) vout_CopyPicture( p_image->p_parent, p_pif, p_pic );
     }
+
+    return p_pif;
+}
+
+/**
+ * Filter an image with a psz_module filter
+ *
+ */
+
+static picture_t *ImageFilter( image_handler_t *p_image, picture_t *p_pic,
+                               video_format_t *p_fmt, const char *psz_module )
+{
+    void (*pf_release)( picture_t * );
+    picture_t *p_pif;
+
+    /* Start a filter */
+    if( !p_image->p_filter )
+    {
+        es_format_t fmt;
+        es_format_Init( &fmt, VIDEO_ES, p_fmt->i_chroma );
+        fmt.video = *p_fmt;
+
+        p_image->p_filter =
+            CreateFilter( p_image->p_parent, &fmt, &fmt.video, psz_module );
+
+        if( !p_image->p_filter )
+        {
+            return NULL;
+        }
+    }
+    else
+    {
+        /* Filters should handle on-the-fly size changes */
+        p_image->p_filter->fmt_in.video = *p_fmt;
+        p_image->p_filter->fmt_out.video = *p_fmt;
+    }
+
+    pf_release = p_pic->pf_release;
+    p_pic->pf_release = PicRelease; /* Small hack */
+    p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+    p_pic->pf_release = pf_release;
 
     return p_pif;
 }
@@ -681,7 +732,8 @@ static void DeleteEncoder( encoder_t * p_enc )
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
-                               video_format_t *p_fmt_out )
+                               video_format_t *p_fmt_out,
+                               const char *psz_module )
 {
     filter_t *p_filter;
 
@@ -697,7 +749,8 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
     p_filter->fmt_out = *p_fmt_in;
     p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
     p_filter->fmt_out.video = *p_fmt_out;
-    p_filter->p_module = module_Need( p_filter, "video filter2", 0, 0 );
+    p_filter->p_module = module_Need( p_filter, "video filter2", psz_module,
+                                      0 );
 
     if( !p_filter->p_module )
     {
