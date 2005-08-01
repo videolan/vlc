@@ -99,13 +99,8 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
 
     char *psz_name = strdup( p_access->psz_path );
-    char *psz_parser = psz_name;
-    char *psz_server_addr = "";
-    char *psz_server_port = "";
-    char *psz_bind_addr = "";
-    char *psz_bind_port = "";
-    int  i_bind_port = 0;
-    int  i_server_port = 0;
+    char *psz_parser, *psz_server_addr, *psz_bind_addr = "";
+    int  i_bind_port, i_server_port = 0;
 
 
     /* First set ipv4/ipv6 */
@@ -136,75 +131,46 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
+    i_bind_port = var_CreateGetInteger( p_access, "server-port" );
+
     /* Parse psz_name syntax :
      * [serveraddr[:serverport]][@[bindaddr]:[bindport]] */
-    if( *psz_parser && *psz_parser != '@' )
+    psz_parser = strchr( psz_name, '@' );
+    if( psz_parser != NULL )
     {
-        /* Found server */
-        psz_server_addr = psz_parser;
+        /* Found bind address and/or bind port */
+        *psz_parser++ = '\0';
+        psz_bind_addr = psz_parser;
 
-        while( *psz_parser && *psz_parser != ':' && *psz_parser != '@' )
+        if( *psz_parser == '[' )
+            /* skips bracket'd IPv6 address */
+            psz_parser = strchr( psz_parser, ']' );
+
+        if( psz_parser != NULL )
         {
-            if( *psz_parser == '[' )
+            psz_parser = strchr( psz_parser, ':' );
+            if( psz_parser != NULL )
             {
-                /* IPv6 address */
-                while( *psz_parser && *psz_parser != ']' )
-                {
-                    psz_parser++;
-                }
-            }
-            psz_parser++;
-        }
-
-        if( *psz_parser == ':' )
-        {
-            /* Found server port */
-            *psz_parser++ = '\0'; /* Terminate server name */
-            psz_server_port = psz_parser;
-
-            while( *psz_parser && *psz_parser != '@' )
-            {
-                psz_parser++;
+                *psz_parser++ = '\0';
+                i_bind_port = atoi( psz_parser );
             }
         }
+  
     }
 
-    if( *psz_parser == '@' )
+    psz_server_addr = psz_name;
+    if( *psz_server_addr == '[' )
+        /* skips bracket'd IPv6 address */
+        psz_parser = strchr( psz_name, ']' );
+
+    if( psz_parser != NULL )
     {
-        /* Found bind address or bind port */
-        *psz_parser++ = '\0'; /* Terminate server port or name if necessary */
-
-        if( *psz_parser && *psz_parser != ':' )
+        psz_parser = strchr( psz_name, ':' );
+        if( psz_parser != NULL )
         {
-            /* Found bind address */
-            psz_bind_addr = psz_parser;
-
-            while( *psz_parser && *psz_parser != ':' )
-            {
-                if( *psz_parser == '[' )
-                {
-                    /* IPv6 address */
-                    while( *psz_parser && *psz_parser != ']' )
-                    {
-                        psz_parser++;
-                    }
-                }
-                psz_parser++;
-            }
+            *psz_parser++ = '\0';
+            i_server_port = atoi( psz_parser );
         }
-
-        if( *psz_parser == ':' )
-        {
-            /* Found bind port */
-            *psz_parser++ = '\0'; /* Terminate bind address if necessary */
-            psz_bind_port = psz_parser;
-        }
-    }
-
-    i_server_port = strtol( psz_server_port, NULL, 10 );
-    if( ( i_bind_port   = strtol( psz_bind_port,   NULL, 10 ) ) == 0 )
-    {
-        i_bind_port = var_CreateGetInteger( p_access, "server-port" );
     }
 
     msg_Dbg( p_access, "opening server=%s:%d local=%s:%d",
