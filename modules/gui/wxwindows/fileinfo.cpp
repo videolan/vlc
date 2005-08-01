@@ -151,8 +151,12 @@ void FileInfo::UpdateFileInfo()
         {
             info_t *p_info = p_cat->pp_infos[j];
 
-            fileinfo_tree->AppendItem( cat, (wxString)wxU(p_info->psz_name) +
-                                       wxT(": ") + wxU(p_info->psz_value) );
+            if( p_info->psz_value[0] != 0 )
+            /* We only wanna show fields that have an actual value */
+            {
+                fileinfo_tree->AppendItem( cat, (wxString)wxU(p_info->psz_name)
+                                        + wxT(": ") + wxU(p_info->psz_value) );
+            }
         }
         fileinfo_tree->Expand( cat );
     }
@@ -179,7 +183,7 @@ void FileInfo::OnClose( wxCloseEvent& WXUNUSED(event) )
     Hide();
 }
 
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var, 
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     FileInfo *p_fileinfo = (FileInfo *)param;

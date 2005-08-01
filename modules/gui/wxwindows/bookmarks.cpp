@@ -517,7 +517,7 @@ void BookmarksDialog::OnEdit( wxCommandEvent& event )
                 return;
 
            }
-           fprintf(stderr,"Changing %i\n",i_first );
+           fprintf(stderr,"Changing %li\n",i_first );
            if( input_Control(  p_input, INPUT_CHANGE_BOOKMARK,
                                 p_bmk_edit->p_seekpoint, i_first ) !=
                VLC_SUCCESS )
