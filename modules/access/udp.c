@@ -165,7 +165,7 @@ static int Open( vlc_object_t *p_this )
 
     if( psz_parser != NULL )
     {
-        psz_parser = strchr( psz_name, ':' );
+        psz_parser = strchr( psz_parser, ':' );
         if( psz_parser != NULL )
         {
             *psz_parser++ = '\0';
