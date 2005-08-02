@@ -181,6 +181,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     int i_codec_id, i_cat;
     char *psz_namecodec;
     vlc_value_t val;
+    vlc_value_t lockval;
+
+    var_Get( p_enc->p_libvlc, "avcodec", &lockval );
 
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
@@ -523,8 +526,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_context->extradata = NULL;
     p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
+    vlc_mutex_lock( lockval.p_address );
     if( avcodec_open( p_context, p_codec ) )
     {
+        vlc_mutex_unlock( lockval.p_address );
         if( p_enc->fmt_in.i_cat == AUDIO_ES &&
              (p_context->channels > 2 || i_codec_id == CODEC_ID_MP2
                || i_codec_id == CODEC_ID_MP3) )
@@ -574,8 +579,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             }
 
             p_context->codec = NULL;
+            vlc_mutex_lock( lockval.p_address );
             if( avcodec_open( p_context, p_codec ) )
             {
+                vlc_mutex_unlock( lockval.p_address );
                 msg_Err( p_enc, "cannot open encoder" );
                 free( p_sys );
                 return VLC_EGENERIC;
@@ -588,6 +595,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
+    vlc_mutex_unlock( lockval.p_address );
 
     p_enc->fmt_out.i_extra = p_context->extradata_size;
     p_enc->fmt_out.p_extra = p_context->extradata;
@@ -999,6 +1007,9 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
+    vlc_value_t lockval;
+
+    var_Get( p_enc->p_libvlc, "avcodec", &lockval );
 
 #if LIBAVCODEC_BUILD >= 4702
     if ( p_sys->b_inited && p_enc->i_threads >= 1 )
@@ -1020,7 +1031,9 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
     }
 #endif
 
+    vlc_mutex_lock( lockval.p_address );
     avcodec_close( p_sys->p_context );
+    vlc_mutex_unlock( lockval.p_address );
     av_free( p_sys->p_context );
 
     if( p_sys->p_buffer ) free( p_sys->p_buffer );

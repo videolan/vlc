@@ -293,6 +293,9 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+    vlc_value_t lockval;
+
+    var_Get( p_dec->p_libvlc, "avcodec", &lockval );
 
     switch( p_sys->i_cat )
     {
@@ -309,7 +312,9 @@ static void CloseDecoder( vlc_object_t *p_this )
         if( p_sys->p_context->extradata )
             free( p_sys->p_context->extradata );
 
+        vlc_mutex_lock( lockval.p_address );
         avcodec_close( p_sys->p_context );
+        vlc_mutex_unlock( lockval.p_address );
         msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
         av_free( p_sys->p_context );
     }
