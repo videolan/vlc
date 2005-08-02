@@ -737,6 +737,7 @@ static char *convert_to_utf8( struct sap_handler_t *p_this, char *psz_local )
     if( ret == (size_t)(-1) || i_in )
     {
         msg_Warn( p_this, "Failed to convert \"%s\" to UTF-8", psz_local );
+        free(psz_unicode);
         return strdup( psz_local );
     }
     *psz_out = '\0';
