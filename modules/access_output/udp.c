@@ -245,17 +245,29 @@ static int Open( vlc_object_t *p_this )
     socket_desc.i_server_port   = i_dst_port;
     socket_desc.psz_bind_addr   = "";
     socket_desc.i_bind_port     = 0;
+    socket_desc.i_handle        = -1;
+    socket_desc.v6only          = 0;
 
     var_Get( p_access, SOUT_CFG_PREFIX "ttl", &val );
     socket_desc.i_ttl = val.i_int;
 
     p_sys->p_thread->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_sys->p_thread, "network", NULL, 0 ) ) )
+    p_network = module_Need( p_sys->p_thread, "network", "ipv4", VLC_TRUE );
+    if( p_network != NULL )
+        module_Unneed( p_sys->p_thread, p_network );
+
+    if( socket_desc.i_handle == -1 )
     {
-        msg_Err( p_access, "failed to open a connection (udp)" );
-        return VLC_EGENERIC;
+        p_network = module_Need( p_sys->p_thread, "network", "ipv6", VLC_TRUE );
+        if( p_network != NULL )
+            module_Unneed( p_sys->p_thread, p_network );
+
+        if( socket_desc.i_handle == -1 )
+        {
+            msg_Err( p_access, "failed to open a connection (udp)" );
+            return VLC_EGENERIC;
+        }
     }
-    module_Unneed( p_sys->p_thread, p_network );
 
     p_sys->p_thread->i_handle = socket_desc.i_handle;
     net_StopRecv( socket_desc.i_handle );
