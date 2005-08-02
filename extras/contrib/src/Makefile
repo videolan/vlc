@@ -407,7 +407,7 @@ DISTCLEAN_PKG += a52dec-$(A52DEC_VERSION).tar.gz
 # It is easier to use bootstrapped versions...
 mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 	$(WGET) $(MPEG2DEC_SNAPSHOT)
-	mv mpeg2dec-snapshot.tar.gz $@
+	mv mpeg2dec-$(MPEG2DEC_DATE).tar.gz $@
 
 mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
