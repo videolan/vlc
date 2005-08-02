@@ -167,22 +167,37 @@ static int OpenUDP( vlc_object_t * p_this )
 # define strerror( x ) winsock_strerror( strerror_buf )
 #endif
 
+    p_socket->i_handle = -1;
+
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET6, SOCK_DGRAM, 0 )) == -1 )
     {
         msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
-        return( -1 );
+        return 0;
     }
+
+#ifdef IPV6_V6ONLY
+    val.i_int = p_socket->v6only;
+
+    if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&val.i_int,
+                    sizeof( val.i_int ) ) )
+    {
+        msg_Warn( p_this, "IPV6_V6ONLY: %s", strerror( errno ) );
+        p_socket->v6only = 1;
+    }
+#else
+    p_socket->v6only = 1;
+#endif
 
 #ifdef WIN32
 # ifdef IPV6_PROTECTION_LEVEL
-        if( ptr->ai_family == AF_INET6 )
-        {
-            i_val = PROTECTION_LEVEL_UNRESTRICTED;
-            setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
-                        sizeof( i_val ) );
-        }
+    if( ptr->ai_family == AF_INET6 )
+    {
+        int i_val = PROTECTION_LEVEL_UNRESTRICTED;
+        setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
+                    sizeof( i_val ) );
+    }
 # else
 #  warning You are using outdated headers for Winsock !
 # endif
@@ -196,7 +211,7 @@ static int OpenUDP( vlc_object_t * p_this )
         msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
                          strerror(errno) );
         close( i_handle );
-        return( -1 );
+        return 0;
     }
 
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
@@ -213,7 +228,7 @@ static int OpenUDP( vlc_object_t * p_this )
     if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )        
     {
         close( i_handle );
-        return( -1 );
+        return 0;
     }
 
 #if defined(WIN32)
@@ -229,7 +244,7 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
             close( i_handle );
-            return( -1 );
+            return 0;
         }
     }
     else
@@ -239,7 +254,7 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
         close( i_handle );
-        return( -1 );
+        return 0;
     }
 
     /* Allow broadcast reception if we bound on in6addr_any */
@@ -276,7 +291,7 @@ static int OpenUDP( vlc_object_t * p_this )
             {
                 msg_Warn( p_this, "cannot build remote address" );
                 close( i_handle );
-                return( -1 );
+                return 0;
             }
             p_sin6 = (struct sockaddr_in6 *)&imr.gsr_source;
             p_sin6->sin6_addr = sock.sin6_addr;
@@ -330,7 +345,7 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             msg_Warn( p_this, "cannot build remote address" );
             close( i_handle );
-            return( -1 );
+            return 0;
         }
 
         /* Connect the socket */
@@ -339,7 +354,7 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
             close( i_handle );
-            return( -1 );
+            return 0;
         }
 
         /* Set the time-to-live */
@@ -374,5 +389,5 @@ static int OpenUDP( vlc_object_t * p_this )
     var_Get( p_this, "mtu", &val );
     p_socket->i_mtu = val.i_int;
 
-    return( 0 );
+    return 0;
 }

@@ -62,6 +62,8 @@ struct network_socket_t
 
     int i_ttl;
 
+    int v6only;
+
     /* Return values */
     int i_handle;
     size_t i_mtu;

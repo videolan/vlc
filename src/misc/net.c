@@ -505,30 +505,10 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
                    const char *psz_server, int i_server )
 {
-    vlc_value_t      val;
+    vlc_value_t      v4, v6;
     void            *private;
-
-    char            *psz_network = "";
     network_socket_t sock;
-    module_t         *p_network;
-
-
-    /* Check if we have force ipv4 or ipv6 */
-    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv4", &val );
-    if( val.b_bool )
-    {
-        psz_network = "ipv4";
-    }
-
-    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "ipv6", &val );
-    if( val.b_bool )
-    {
-        psz_network = "ipv6";
-    }
-    if( psz_server == NULL ) psz_server = "";
-    if( psz_bind   == NULL ) psz_bind   = "";
+    module_t         *p_network = NULL;
 
     /* Prepare the network_socket_t structure */
     sock.psz_bind_addr   = psz_bind;
@@ -536,19 +516,78 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     sock.psz_server_addr = psz_server;
     sock.i_server_port   = i_server;
     sock.i_ttl           = 0;
+    sock.v6only          = 0;
+    sock.i_handle        = -1;
+
+    if( psz_server == NULL )
+        psz_server = "";
+    if( psz_bind == NULL )
+        psz_bind = "";
 
     msg_Dbg( p_this, "net: connecting to '[%s]:%d@[%s]:%d'",
              psz_server, i_server, psz_bind, i_bind );
-    private = p_this->p_private;
-    p_this->p_private = (void*)&sock;
-    if( !( p_network = module_Need( p_this, "network", psz_network, 0 ) ) )
+
+    /* Check if we have force ipv4 or ipv6 */
+    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "ipv4", &v4 );
+    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "ipv6", &v6 );
+
+    if( !v4.b_bool )
     {
-        msg_Dbg( p_this, "net: connection to '[%s]:%d@[%s]:%d' failed",
-                 psz_server, i_server, psz_bind, i_bind );
-        return -1;
+        if( v6.b_bool )
+            sock.v6only = 1;
+
+        /* try IPv6 first (unless IPv4 forced) */
+        private = p_this->p_private;
+        p_this->p_private = (void*)&sock;
+        p_network = module_Need( p_this, "network", "ipv6", VLC_TRUE );
+
+        if( p_network != NULL )
+            module_Unneed( p_this, p_network );
+
+        p_this->p_private = private;
+
+        /*
+         * Check if the IP stack can receive IPv4 packets on IPv6 sockets.
+         * If yes, then it is better to use the IPv6 socket.
+         * Otherwise, if we also get an IPv4, we have to choose, so we use
+         * IPv4 only.
+         */
+        if( ( sock.i_handle != -1 ) && ( ( sock.v6only == 0 ) || v6.b_bool ) )
+            return sock.i_handle;
     }
-    module_Unneed( p_this, p_network );
-    p_this->p_private = private;
+
+    if( !v6.b_bool )
+    {
+        int fd6 = sock.i_handle;
+
+        /* also try IPv4 (unless IPv6 forced) */
+        private = p_this->p_private;
+        p_this->p_private = (void*)&sock;
+        p_network = module_Need( p_this, "network", "ipv4", VLC_TRUE );
+
+        if( p_network != NULL )
+            module_Unneed( p_this, p_network );
+
+        p_this->p_private = private;
+
+        if( fd6 != -1 )
+        {
+            if( sock.i_handle != -1 )
+            {
+                msg_Warn( p_this, "net: lame IPv6/IPv4 dual-stack present. "
+                                  "Using only IPv4." );
+                net_Close( fd6 );
+            }
+            else
+                sock.i_handle = fd6;
+        }
+    }
+
+    if( sock.i_handle == -1 )
+        msg_Dbg( p_this, "net: connection to '[%s]:%d@[%s]:%d' failed",
+                psz_server, i_server, psz_bind, i_bind );
 
     return sock.i_handle;
 }

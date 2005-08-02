@@ -198,12 +198,14 @@ static int OpenUDP( vlc_object_t * p_this )
      };
 #endif
 
+    p_socket->i_handle = -1;
+
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 )
     {
         msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
-        return( -1 );
+        return 0;
     }
 
     /* We may want to reuse an already used socket */
@@ -214,7 +216,7 @@ static int OpenUDP( vlc_object_t * p_this )
         msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
                           strerror(errno));
         close( i_handle );
-        return( -1 );
+        return 0;
     }
 
 #ifdef SO_REUSEPORT
@@ -249,7 +251,7 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         msg_Dbg( p_this, "could not build local address" );
         close( i_handle );
-        return( -1 );
+        return 0;
     }
 
     /* Bind it */
@@ -257,7 +259,7 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
         close( i_handle );
-        return( -1 );
+        return 0;
     }
 
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -268,7 +270,7 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             msg_Dbg( p_this, "could not build local address" );
             close( i_handle );
-            return( -1 );
+            return 0;
         }
     }
 #endif
@@ -323,7 +325,7 @@ static int OpenUDP( vlc_object_t * p_this )
                                   strerror(errno) );
                 msg_Err( p_this, "are you sure your OS supports IGMPv3?" );
                 close( i_handle );
-                return( -1 );
+                return 0;
             }
          }
          /* If there is no source address, we use IP_ADD_MEMBERSHIP */
@@ -351,7 +353,7 @@ static int OpenUDP( vlc_object_t * p_this )
                 msg_Err( p_this, "failed to join IP multicast group (%s)",
                                   strerror(errno) );
                 close( i_handle );
-                return( -1 );
+                return 0;
             }
          }
     }
@@ -364,7 +366,7 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             msg_Warn( p_this, "cannot build remote address" );
             close( i_handle );
-            return( -1 );
+            return 0;
         }
 
         /* Connect the socket */
@@ -373,7 +375,7 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
             close( i_handle );
-            return( -1 );
+            return 0;
         }
 
 #if !defined( SYS_BEOS )
@@ -396,7 +398,7 @@ static int OpenUDP( vlc_object_t * p_this )
                 {
                     msg_Dbg( p_this, "failed to set multicast interface (%s).", strerror(errno) );
                     close( i_handle );
-                    return ( -1 );
+                    return 0;
                 }
             }
 
@@ -428,7 +430,7 @@ static int OpenUDP( vlc_object_t * p_this )
                     msg_Err( p_this, "failed to set ttl (%s)",
                              strerror(errno) );
                     close( i_handle );
-                    return( -1 );
+                    return 0;
                 }
             }
         }
