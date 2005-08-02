@@ -1,5 +1,5 @@
 /*****************************************************************************
- * wxwindows.cpp : wxWindows plugin for vlc
+ * wxwindows.cpp : wxWidgets plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$
@@ -108,8 +108,8 @@ vlc_module_begin();
 #else
     int i_score = getenv( "DISPLAY" ) == NULL ? 15 : 150;
 #endif
-    set_shortname( (char*) "wxWindows" );
-    set_description( (char *) _("wxWindows interface module") );
+    set_shortname( (char*) "wxWidgets" );
+    set_description( (char *) _("wxWidgets interface module") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     set_capability( "interface", i_score );
@@ -117,6 +117,7 @@ vlc_module_begin();
     add_shortcut( "wxwindows" );
     add_shortcut( "wxwin" );
     add_shortcut( "wx" );
+    add_shortcut( "wxwidgets" );
     set_program( "wxvlc" );
 
     add_bool( "wxwin-embed", 1, NULL,
@@ -138,7 +139,7 @@ vlc_module_begin();
         change_autosave();
 
     add_submodule();
-    set_description( _("wxWindows dialogs provider") );
+    set_description( _("wxWidgets dialogs provider") );
     set_capability( "dialogs provider", 50 );
     set_callbacks( OpenDialogs, Close );
 
