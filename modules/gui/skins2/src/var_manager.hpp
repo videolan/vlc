@@ -52,16 +52,16 @@ class VarManager: public SkinObject
         Variable *getVar( const string &rName, const string &rType );
 
         /// Get the tooltip text variable
-        VarText &getTooltipText() { return m_tooltipText; }
+        VarText &getTooltipText() { return *m_pTooltipText; }
 
         /// Get the help text variable
-        VarText &getHelpText() { return m_helpText; }
+        VarText &getHelpText() { return *m_pHelpText; }
 
     private:
         /// Tooltip text
-        VarText m_tooltipText;
+        VarText *m_pTooltipText;
         /// Help text
-        VarText m_helpText;
+        VarText *m_pHelpText;
         /// Map of named registered variables
         map<string, VariablePtr> m_varMap;
         /// List of named registed variables

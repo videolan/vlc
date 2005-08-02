@@ -26,8 +26,10 @@
 
 
 VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
-    m_tooltipText( pIntf ), m_helpText( pIntf, false )
+    m_pTooltipText( NULL ), m_pHelpText( NULL )
 {
+    m_pTooltipText = new VarText( pIntf );
+    m_pHelpText = new VarText( pIntf, false );
 }
 
 
@@ -45,6 +47,12 @@ VarManager::~VarManager()
     {
         m_anonVarList.pop_back();
     }
+
+    delete m_pTooltipText;
+
+    // Warning! the help text must be the last variable to be deleted,
+    // because VarText destructor references it (FIXME: find a cleaner way?)
+    delete m_pHelpText;
 }
 
 
