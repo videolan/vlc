@@ -115,6 +115,7 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
+    set_section( N_("Display"),NULL);
     add_string( "deinterlace-mode", "discard", NULL, MODE_TEXT,
                 MODE_LONGTEXT, VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
@@ -124,6 +125,7 @@ vlc_module_begin();
 
     add_submodule();
     set_capability( "video filter2", 0 );
+    set_section( N_("Streamming"),NULL);
     add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, MODE_TEXT,
                 MODE_LONGTEXT, VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
