@@ -1072,7 +1072,7 @@ libpng: libpng-$(PNG_VERSION).tar.bz2
 
 CLEAN_FILE += .png
 CLEAN_PKG += libpng
-DISCLEAN_PKG += libpng-$(PNG_VERSION).tar.bz2
+DISTCLEAN_PKG += libpng-$(PNG_VERSION).tar.bz2
 
 # ***************************************************************************
 # libzvbi
@@ -1090,7 +1090,7 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 
 CLEAN_FILE += .zvbi
 CLEAN_PKG += zvbi
-DISCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
+DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 
 # ***************************************************************************
 # gpg-error 
@@ -1109,7 +1109,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 
 CLEAN_FILE += .gpg-error
 CLEAN_PKG += libgpg-error
-DISCLEAN_PKG += libgpg-error-$(GPGERROR_VERSION).tar.gz
+DISTCLEAN_PKG += libgpg-error-$(GPGERROR_VERSION).tar.gz
 
 # ***************************************************************************
 # libgcrypt
@@ -1129,7 +1129,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 
 CLEAN_FILE += .gcrypt
 CLEAN_PKG += libgcrypt
-DISCLEAN_PKG += libgcrypt-$(GCRYPT_VERSION).tar.gz
+DISTCLEAN_PKG += libgcrypt-$(GCRYPT_VERSION).tar.gz
 
 # ***************************************************************************
 # gnutls
@@ -1148,7 +1148,7 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 
 CLEAN_FILE += .gnutls
 CLEAN_PKG += gnutls
-DISCLEAN_PKG += gnutls-$(GNUTLS_VERSION).tar.bz2
+DISTCLEAN_PKG += gnutls-$(GNUTLS_VERSION).tar.bz2
 
 # ***************************************************************************
 # libopendaap
@@ -1159,7 +1159,6 @@ libopendaap-$(DAAP_VERSION).tar.bz2:
 
 libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/daap.patch
 
 .daap: libopendaap
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install )
@@ -1167,7 +1166,7 @@ libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 
 CLEAN_FILE += .daap
 CLEAN_PKG += libopendaap
-DISCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
+DISTCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
 
 # ***************************************************************************
 # glib
@@ -1185,7 +1184,7 @@ glib: glib-$(GLIB_VERSION).tar.gz
 
 CLEAN_FILE += .glibl
 CLEAN_PKG += glib
-DISCLEAN_PKG += glib-$(GLIB_VERSION).tar.gz
+DISTCLEAN_PKG += glib-$(GLIB_VERSION).tar.gz
 
 # ***************************************************************************
 # libIDL
@@ -1203,7 +1202,7 @@ libIDL: libIDL-$(LIBIDL_VERSION).tar.gz
 
 CLEAN_FILE += .libidl
 CLEAN_PKG += libIDL
-DISCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
+DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
 
 # ***************************************************************************
 # mozilla
@@ -1221,7 +1220,7 @@ mozilla: mozilla-source-$(MOZILLA_VERSION).tar.bz2
 
 CLEAN_FILE += .mozilla
 CLEAN_PKG += mozilla
-DISCLEAN_PKG += mozilla-source-$(MOZILLA_VERSION).tar.bz2
+DISTCLEAN_PKG += mozilla-source-$(MOZILLA_VERSION).tar.bz2
 
 # ***************************************************************************
 # Copy aclocal files
