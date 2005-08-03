@@ -3684,33 +3684,42 @@ dnl   fi
 dnl fi
 
 dnl
-dnl  wxWindows module
+dnl  wxWidgets module
 dnl
-AC_ARG_ENABLE(wxwindows,
-  [  --enable-wxwindows      wxWindows support (default enabled)])
-if test "${enable_wxwindows}" != "no"
+AC_ARG_ENABLE(wxwidgets,
+  [  --enable-wxwidgets      wxWidgets support (default enabled)])
+if test "${enable_wxwindows}" 
 then
-  WXWINDOWS_PATH="${PATH}"
+  AC_MSG_WARN(--{en|dis}able-wxwindows is deprecated. Use --{en|dis}able-wxwidgets instead.)
+fi
+
+if test "${enable_wxwindows}" = "no"
+then
+  enable_wxwidgets="no"
+fi
+if test "${enable_wxwidgets}" != "no"
+then
+  WXWIDGETS_PATH="${PATH}"
   AC_ARG_WITH(wx-config-path,
     [    --with-wx-config-path=PATH wx-config path (default search in \$PATH)],
     [ if test "${with_wx_config_path}" != "no"
       then
-        WXWINDOWS_PATH="${with_wx_config_path}:${PATH}"
+        WXWIDGETS_PATH="${with_wx_config_path}:${PATH}"
       fi ])
-  WXWINDOWS_NAME="wx-config"
+  WXWIDGETS_NAME="wx-config"
   AC_ARG_WITH(wx-config,
     [    --with-wx-config=NAME      wx-config name (default is wx-config)],
     [ if test "${with_wx_config}" != "no"
       then
-        WXWINDOWS_NAME="${with_wx_config}"
+        WXWIDGETS_NAME="${with_wx_config}"
       fi ])
   # look for wx-config
-  AC_PATH_PROG(WX_CONFIG, ${WXWINDOWS_NAME}, no, ${WXWINDOWS_PATH})
+  AC_PATH_PROG(WX_CONFIG, ${WXWIDGETS_NAME}, no, ${WXWIDGETS_PATH})
   if test "${WX_CONFIG}" != "no" -a "${CXX}" != ""
   then
     if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
     then
-      AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwindows.])
+      AC_MSG_ERROR([Your development package for wxWidgets is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwidgets.])
     fi
     AC_LANG_PUSH(C++)
     # Turn this error:
@@ -3722,36 +3731,36 @@ then
          AC_TRY_COMPILE([],,ac_cv_cxx_fpermissive=yes,
                         ac_cv_cxx_fpermissive=no)])
     if test "${ac_cv_cxx_fpermissive}" = "yes"; then
-      VLC_ADD_CXXFLAGS([wxwindows],-fpermissive)
+      VLC_ADD_CXXFLAGS([wxwidgets],-fpermissive)
     fi
-    VLC_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
-    VLC_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
+    VLC_ADD_LDFLAGS([wxwidgets],[`${WX_CONFIG} --libs`])
+    VLC_ADD_CXXFLAGS([wxwidgets],[`${WX_CONFIG} --cxxflags`])
     if test "$have_libcdio" = "yes"
     then 
-      VLC_ADD_LDFLAGS([wxwindows],[$LIBCDIO_LIBS])
-      VLC_ADD_CXXFLAGS([wxwindows],[$LIBCDIO_CFLAGS])
+      VLC_ADD_LDFLAGS([wxwidgets],[$LIBCDIO_LIBS])
+      VLC_ADD_CXXFLAGS([wxwidgets],[$LIBCDIO_CFLAGS])
     else 
       AC_MSG_WARN([Probe disc disabled because ok libcdio library not found])
     fi
 
     if test "$have_libvcdinfo" = "yes"
     then 
-      VLC_ADD_LDFLAGS([wxwindows],[$VCDINFO_LIBS])
-      VLC_ADD_CXXFLAGS([wxwindows],[$VCDINFO_CFLAGS])
+      VLC_ADD_LDFLAGS([wxwidgets],[$VCDINFO_LIBS])
+      VLC_ADD_CXXFLAGS([wxwidgets],[$VCDINFO_CFLAGS])
     else 
       AC_MSG_WARN([VCD information on Probe disc disabled because ok libvcdinfo not found])
     fi
 
     # now look for the wxprec.h header
-    CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_wxwindows}"
+    CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_wxwidgets}"
     ac_cv_wx_headers=yes
     AC_CHECK_HEADERS(wx/wxprec.h, , [
       ac_cv_wx_headers=no
-      echo "Cannot find wxWindows development headers."
+      echo "Cannot find wxWidgets development headers."
     ])
     if test "${ac_cv_wx_headers}" = "yes"
     then
-      VLC_ADD_PLUGINS([wxwindows])
+      VLC_ADD_PLUGINS([wxwidgets])
       ALIASES="${ALIASES} wxvlc"
     fi
     CPPFLAGS="${CPPFLAGS_save}"
@@ -3782,7 +3791,7 @@ if test "${enable_skins2}" != "no"
 then
   if test "${WX_CONFIG}" = "no"
   then
-    AC_MSG_ERROR([The skins2 module depends on the wxWindows development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the wxWindows development package or alternatively you can also configure with: --disable-wxwindows --disable-skins2.])
+    AC_MSG_ERROR([The skins2 module depends on the wxWidgets development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the wxWidgets development package or alternatively you can also configure with: --disable-wxwidgets --disable-skins2.])
   fi
 fi
 
@@ -4534,7 +4543,7 @@ AC_CONFIG_FILES([
   modules/gui/qnx/Makefile
   modules/gui/qt/Makefile
   modules/gui/skins2/Makefile
-  modules/gui/wxwindows/Makefile
+  modules/gui/wxwidgets/Makefile
   modules/gui/wince/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
