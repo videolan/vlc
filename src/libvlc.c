@@ -1891,6 +1891,9 @@ char *FromLocale( const char *locale )
 {
     char *psz_charset;
 
+    if( locale == NULL )
+        return NULL;
+
     if( !vlc_current_charset( &psz_charset ) )
     {
         char *iptr = (ICONV_CONST char *)locale, *output, *optr;
@@ -1928,6 +1931,9 @@ char *ToLocale( const char *utf8 )
 {
     char *psz_charset;
 
+    if( utf8 == NULL )
+        return NULL;
+
     if( !vlc_current_charset( &psz_charset ) )
     {
         char *iptr = (ICONV_CONST char *)utf8, *output, *optr;
@@ -1959,13 +1965,16 @@ char *ToLocale( const char *utf8 )
 
 void LocaleFree( const char *str )
 {
-    /* FIXME: this deserve a price for the most inefficient peice of code */
-    char *psz_charset;
-
-    if( !vlc_current_charset( &psz_charset ) )
-        free( (char *)str );
-
-    free( psz_charset );
+    if( str != NULL )
+    {
+        /* FIXME: this deserve a price for the most inefficient peice of code */
+        char *psz_charset;
+    
+        if( !vlc_current_charset( &psz_charset ) )
+            free( (char *)str );
+    
+        free( psz_charset );
+    }
 }
 
 /* FIXME: don't use iconv at all */
@@ -1974,7 +1983,10 @@ char *EnsureUTF8( char *str )
     vlc_iconv_t hd;
     size_t inb, outb;
     char *ostr, *istr;
-     
+
+    if( str == NULL )
+        return NULL;
+
     ostr = istr = str;
 
     inb = outb = strlen( str );
