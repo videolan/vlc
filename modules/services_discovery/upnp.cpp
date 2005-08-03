@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
                                          _("UPnP"), p_view->p_root );
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node->i_flags =~ PLAYLIST_SKIP_FLAG;
+    p_sys->p_node->i_flags &= ~PLAYLIST_SKIP_FLAG;
     val.b_bool = VLC_TRUE;
     var_Set( p_sys->p_playlist, "intf-change", val );
 
@@ -230,7 +230,7 @@ playlist_item_t *UPnPHandler::AddDevice( Device *dev )
 
     p_item = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
                                   str, p_sys->p_node );
-    p_item->i_flags =~ PLAYLIST_SKIP_FLAG;
+    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     msg_Dbg( p_sd, "device %s added", str );
     free( str );
 
