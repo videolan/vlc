@@ -254,7 +254,6 @@ void __module_EndBank( vlc_object_t *p_this )
     if( p_bank->b_cache ) CacheSave( p_this );
     while( p_bank->i_loaded_cache-- )
     {
-        DeleteModule( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
         free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
         free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
     }
