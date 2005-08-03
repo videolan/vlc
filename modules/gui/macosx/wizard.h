@@ -171,6 +171,7 @@
 - (void)showSummary;
 - (void)resetWizard;
 - (void)createOpts;
+- (void)rebuildCodecMenus;
 - (id)getPlaylistWizard;
 
 @end
