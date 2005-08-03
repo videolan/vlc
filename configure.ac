@@ -2926,7 +2926,10 @@ then
   fi
   if test "${SDL_CONFIG}" != "no"
   then
-    VLC_ADD_PLUGINS([vout_sdl aout_sdl])
+    # SDL on Darwin is heavily patched and can only run SDL_image
+    if test "${SYS}" != "darwin"; then
+      VLC_ADD_PLUGINS([vout_sdl aout_sdl])
+    fi
     VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`])
     VLC_ADD_LDFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`])
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_vout_sdl}"

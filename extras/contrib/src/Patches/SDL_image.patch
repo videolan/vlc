@@ -1,0 +1,22 @@
+diff -ru SDL_image.old/Makefile.am SDL_image/Makefile.am
+--- SDL_image.old/Makefile.am	2004-12-16 05:41:01.000000000 +0100
++++ SDL_image/Makefile.am	2005-08-02 19:29:18.000000000 +0200
+@@ -32,7 +32,6 @@
+ 
+ libSDL_image_la_LDFLAGS = 	\
+ 	-no-undefined		\
+-	-release $(LT_RELEASE)	\
+ 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+ libSDL_image_la_LIBADD = @IMG_LIBS@
+ 
+diff -ru SDL_image.old/Makefile.in SDL_image/Makefile.in
+--- SDL_image.old/Makefile.in	2004-12-16 07:32:18.000000000 +0100
++++ SDL_image/Makefile.in	2005-08-02 19:29:27.000000000 +0200
+@@ -255,7 +255,6 @@
+ 
+ libSDL_image_la_LDFLAGS = \
+ 	-no-undefined		\
+-	-release $(LT_RELEASE)	\
+ 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+ 
+ libSDL_image_la_LIBADD = @IMG_LIBS@

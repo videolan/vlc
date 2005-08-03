@@ -86,7 +86,8 @@ ifdef HAVE_DARWIN_OS
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
+	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .SDL_image \
+	.aclocal
 # mozilla support? add before .aclocal:  .glib .libidl .mozilla
 else
 
@@ -693,12 +694,12 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ffmpeg
 # ***************************************************************************
 
-# Note: at present, we check out the tree from 2005-04-30 because of 
+# Note: at present, we check out the tree from 2005-08-01 because of 
 # compilation issues. We will use the latest version again, when our
-# ffmpeg-module is fixed properly -- FK
+# ffmpeg-module is fixed properly --Meuuh
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
-	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
+	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co -D "2005-08-01 20:02:00 +0000" ffmpeg
 	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
@@ -714,7 +715,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	touch $@
 
 CLEAN_FILE += .ffmpeg
-CLEAN_PKG += ffmpeg
+CLEAN_PKG += ffmpeg ffmpeg.cvs
 DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
 
 # ***************************************************************************
@@ -817,7 +818,7 @@ libdvbpsi: libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 
 CLEAN_FILE += .dvbpsi
 CLEAN_PKG += libdvbpsi
-DISTCLEAN_PKG += libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
+DISTCLEAN_PKG += libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 
 # ***************************************************************************
 # live
@@ -874,7 +875,7 @@ goom: goom$(GOOM2k4_VERSION).tar.gz
 
 CLEAN_FILE += .goom2k4
 CLEAN_PKG += goom
-DISTCLEAN_PKG += goom$(GOOM2k_VESION).tar.gz
+DISTCLEAN_PKG += goom$(GOOM2k4_VERSION).tar.gz
 
 # ***************************************************************************
 # libcaca
@@ -1029,7 +1030,7 @@ mash-code: mash-src-$(MASH_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .mash: mash-code
-	(cd $<; ./configure && make )
+	(cd $<; ./configure && make)
 	touch $@
 
 CLEAN_FILE += .mash
@@ -1053,7 +1054,7 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz
 
 CLEAN_FILE += .twolame
 CLEAN_PKG += twolame
-DISTCLEAN_PKG += twolame-$(TWOLAME_VERSION).tar.bz2
+DISTCLEAN_PKG += twolame-$(TWOLAME_VERSION).tar.gz
 
 # ***************************************************************************
 # libpng
@@ -1085,7 +1086,7 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .zvbi: zvbi
-	(cd $<; ./configure --prefix=$(PREFIX) && make )
+	(cd $<; ./configure --prefix=$(PREFIX) && make)
 	touch $@
 
 CLEAN_FILE += .zvbi
@@ -1103,7 +1104,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .gpg-error: libgpg-error
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-nls && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1123,7 +1124,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 	patch -p 0 < Patches/gcrypt.patch
 
 .gcrypt: libgcrypt .gpg-error
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1142,7 +1143,7 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .gnutls: gnutls .gcrypt .gpg-error
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1161,7 +1162,7 @@ libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .daap: libopendaap
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install)
 	touch $@
 
 CLEAN_FILE += .daap
@@ -1179,7 +1180,7 @@ glib: glib-$(GLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .glib: glib
-	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install)
 	touch $@
 
 CLEAN_FILE += .glibl
@@ -1215,12 +1216,91 @@ mozilla: mozilla-source-$(MOZILLA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .mozilla: mozilla
-	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=mac --enable-standalone-modules=xpcom,plugin && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=mac --enable-standalone-modules=xpcom,plugin && make && make install)
 	touch $@
 
 CLEAN_FILE += .mozilla
 CLEAN_PKG += mozilla
 DISTCLEAN_PKG += mozilla-source-$(MOZILLA_VERSION).tar.bz2
+
+# ***************************************************************************
+# libjpeg
+# ***************************************************************************
+
+jpeg-$(JPEG_VERSION).tar.gz:
+	$(WGET) $(JPEG_URL)
+
+jpeg: jpeg-$(JPEG_VERSION).tar.gz 
+	$(EXTRACT_GZ)
+
+.jpeg: jpeg
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install-lib)
+	$(RANLIB) $(PREFIX)/lib/libjpeg.a
+	touch $@
+
+CLEAN_FILE += .jpeg
+CLEAN_PKG += jpeg
+DISTCLEAN_PKG += jpeg-$(JPEG_VERSION).tar.gz
+
+# ***************************************************************************
+# tiff
+# ***************************************************************************
+
+tiff-$(TIFF_VERSION).tar.gz:
+	$(WGET) $(TIFF_URL)
+	mv tiff-$(TIFF_VERSION)-tar.gz $@
+
+tiff: tiff-$(TIFF_VERSION).tar.gz 
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/tiff.patch
+
+.tiff: tiff
+	(cd $<; ./configure --noninteractive --with-DIR_BIN=$(PREFIX)/bin --with-DIR_LIB=$(PREFIX)/lib --with-DIR_INC=$(PREFIX)/include --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no && make -C libtiff && make -C libtiff install)
+	touch $@
+
+CLEAN_FILE += .tiff
+CLEAN_PKG += tiff
+DISTCLEAN_PKG += tiff-$(TIFF_VERSION).tar.gz
+
+# ***************************************************************************
+# SDL
+# ***************************************************************************
+
+SDL-$(SDL_VERSION).tar.gz:
+	$(WGET) $(SDL_URL)
+
+SDL: SDL-$(SDL_VERSION).tar.gz 
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/SDL.patch
+
+.SDL: SDL
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-audio --disable-video-x11 --disable-video-aalib --disable-video-dga --disable-video-fbcon --disable-video-directfb --disable-video-ggi --disable-video-svga --disable-directx --disable-joystick --disable-cdrom --disable-threads --disable-sdl-dlopen CFLAGS="$(CFLAGS)" && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .SDL
+CLEAN_PKG += SDL
+DISTCLEAN_PKG += SDL-$(SDL_VERSION).tar.gz
+
+# ***************************************************************************
+# SDL_image
+# ***************************************************************************
+
+SDL_image-$(SDL_IMAGE_VERSION).tar.gz:
+	$(WGET) $(SDL_IMAGE_URL)
+
+SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz 
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/SDL_image.patch
+
+.SDL_image: SDL_image .SDL .png .jpeg .tiff
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .SDL_image
+CLEAN_PKG += SDL_image
+DISTCLEAN_PKG += SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 
 # ***************************************************************************
 # Copy aclocal files
