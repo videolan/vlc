@@ -34,7 +34,7 @@
 
 #include <vlc_config_cat.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 #include "preferences_widgets.h"
 
 #include <wx/combobox.h>

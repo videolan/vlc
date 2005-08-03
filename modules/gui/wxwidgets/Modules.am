@@ -1,6 +1,6 @@
-SOURCES_wxwindows = \
-	wxwindows.cpp \
-	wxwindows.h \
+SOURCES_wxwidgets = \
+	wxwidgets.cpp \
+	wxwidgets.h \
 	interface.cpp \
 	extrapanel.cpp \
 	dialogs.cpp \

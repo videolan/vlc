@@ -30,7 +30,7 @@
 #include <vlc/input.h>
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 /* include the toolbar graphics */
 #include "bitmaps/play.xpm"

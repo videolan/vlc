@@ -29,7 +29,7 @@
 
 #include <wx/progdlg.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 #include "vlc_block.h"
 #include "vlc_stream.h"

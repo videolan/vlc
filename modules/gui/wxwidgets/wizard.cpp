@@ -32,7 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 #include "streamdata.h"
 

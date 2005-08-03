@@ -28,7 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 #include "bitmaps/shuffle.xpm"
 #include "bitmaps/repeat.xpm"

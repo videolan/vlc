@@ -36,7 +36,7 @@
 
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0

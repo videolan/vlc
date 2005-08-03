@@ -35,7 +35,7 @@
 
 #include "vlc_meta.h"
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 #include <wx/timer.h>
 
 //void DisplayStreamDate( wxControl *, intf_thread_t *, int );

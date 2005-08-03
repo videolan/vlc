@@ -28,7 +28,7 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 static void *GetWindow( intf_thread_t *p_intf, vout_thread_t *,
                         int *pi_x_hint, int *pi_y_hint,

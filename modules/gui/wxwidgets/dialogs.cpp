@@ -33,7 +33,7 @@
 #include <vlc/aout.h>
 #include <vlc/intf.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"

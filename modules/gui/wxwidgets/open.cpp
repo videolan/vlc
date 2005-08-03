@@ -53,7 +53,7 @@
 
 #include <vector>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 #include "preferences_widgets.h"
 
 #ifndef wxRB_SINGLE

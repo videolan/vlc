@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-#include "wxwindows.h"
+#include "wxwidgets.h"
 
 /*****************************************************************************
  * Local class declarations.
