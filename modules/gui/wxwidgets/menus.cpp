@@ -1,5 +1,5 @@
 /*****************************************************************************
- * menus.cpp : wxWindows plugin for vlc
+ * menus.cpp : wxWidgets plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 the VideoLAN team
  * $Id$
@@ -148,7 +148,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 {
 #define MAX_POPUP_ITEMS 45
 
-    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+    int minimal = config_GetInt( p_intf, "wx-minimal" );
 
     vlc_object_t *p_object, *p_input;
     char *ppsz_varnames[MAX_POPUP_ITEMS];

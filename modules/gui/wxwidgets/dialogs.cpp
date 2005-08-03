@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dialogs.cpp : wxWindows plugin for vlc
+ * dialogs.cpp : wxWidgets plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 the VideoLAN team
  * $Id$
@@ -165,7 +165,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
 
     /* Check if user wants to show the bookmarks dialog by default */
     wxCommandEvent dummy_event;
-    if( config_GetInt( p_intf, "wxwin-bookmarks" ) )
+    if( config_GetInt( p_intf, "wx-bookmarks" ) )
         OnBookmarks( dummy_event );
 
     /* Intercept all menu events in our custom event handler */

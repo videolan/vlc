@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video.cpp : wxWindows plugin for vlc
+ * video.cpp : wxWidgets plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2003 the VideoLAN team
  * $Id$
@@ -125,7 +125,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     vlc_mutex_init( p_intf, &lock );
 
-    b_auto_size = config_GetInt( p_intf, "wxwin-autosize" );
+    b_auto_size = config_GetInt( p_intf, "wx-autosize" );
 
     p_vout = NULL;
     i_creation_date = 0;

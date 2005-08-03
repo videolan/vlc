@@ -255,7 +255,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 #ifdef wxHAS_TASK_BAR_ICON
     /* Systray integration */
     p_systray = NULL;
-    if ( config_GetInt( p_intf, "wxwin-systray" ) )
+    if ( config_GetInt( p_intf, "wx-systray" ) )
     {
         p_systray = new Systray(this, p_intf);
         p_systray->SetIcon( wxIcon( vlc16x16_xpm ), wxT("VLC media player") );
@@ -287,7 +287,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     /* Video window */
     video_window = 0;
-    if( config_GetInt( p_intf, "wxwin-embed" ) )
+    if( config_GetInt( p_intf, "wx-embed" ) )
     {
         video_window = CreateVideoWindow( p_intf, this );
         frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND, 0 );
@@ -393,7 +393,7 @@ void Interface::OnControlEvent( wxCommandEvent& event )
  *****************************************************************************/
 void Interface::CreateOurMenuBar()
 {
-    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+    int minimal = config_GetInt( p_intf, "wx-minimal" );
 
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
@@ -493,7 +493,7 @@ void Interface::CreateOurToolBar()
 #define HELP_SLOW N_("Play slower")
 #define HELP_FAST N_("Play faster")
 
-    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+    int minimal = config_GetInt( p_intf, "wx-minimal" );
 
     wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
                          * version because we don't include wx.rc */
@@ -1544,7 +1544,7 @@ void Systray::OnStopStream( wxCommandEvent& event )
 /* Systray popup menu */
 wxMenu* Systray::CreatePopupMenu()
 {
-    int minimal = config_GetInt( p_intf, "wxwin-minimal" );
+    int minimal = config_GetInt( p_intf, "wx-minimal" );
 
     wxMenu* systray_menu = new wxMenu;
     systray_menu->Append( Exit_Event, wxU(_("Quit VLC")) );
