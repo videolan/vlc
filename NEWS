@@ -16,6 +16,8 @@ Interfaces:
  * Mac OS X
     - new streaming and transcoding wizard with the same functionality as the WxWidgets one
  * wxWidgets
+    - Rename wxWindows interface in wxWidgets.
+    - All the --wxwin-* options are now --wx-*	
     - VLC update checker
 
 Changes between 0.8.1 and 0.8.2:

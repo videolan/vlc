@@ -1,5 +1,5 @@
 /*****************************************************************************
- * wxwindows.cpp : wxWidgets plugin for vlc
+ * wxwidgets.cpp : wxWidgets plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$
@@ -41,7 +41,7 @@
 /* Temporary hack */
 #if defined(WIN32) && defined(_WX_INIT_H_)
 #if (wxMAJOR_VERSION <= 2) && (wxMINOR_VERSION <= 5) && (wxRELEASE_NUMBER < 3)
-/* Hack to detect wxWindows 2.5 which has a different wxEntry() prototype */
+/* Hack to detect wxWidgets 2.5 which has a different wxEntry() prototype */
 extern int wxEntry( HINSTANCE hInstance, HINSTANCE hPrevInstance = NULL,
                     char *pCmdLine = NULL, int nCmdShow = SW_NORMAL );
 #endif
@@ -120,23 +120,30 @@ vlc_module_begin();
     add_shortcut( "wxwidgets" );
     set_program( "wxvlc" );
 
-    add_bool( "wxwin-embed", 1, NULL,
+    add_bool( "wx-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
-    add_bool( "wxwin-bookmarks", 0, NULL,
+    add_deprecated( "wxwin-enbed", VLC_FALSE); /*Deprecated since 0.8.4*/
+    add_bool( "wx-bookmarks", 0, NULL,
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
-    add_bool( "wxwin-taskbar", 1, NULL,
+    add_deprecated( "wxwin-bookmarks", VLC_FALSE); /*Deprecated since 0.8.4*/
+    add_bool( "wx-taskbar", 1, NULL,
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
-    add_bool( "wxwin-minimal", 0, NULL,
+    add_deprecated( "wxwin-taskbar", VLC_FALSE); /*Deprecated since 0.8.4*/
+    add_bool( "wx-minimal", 0, NULL,
               MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
-    add_bool( "wxwin-autosize", 1, NULL,
+    add_deprecated( "wxwin-minimal", VLC_FALSE); /*Deprecated since 0.8.4*/
+    add_bool( "wx-autosize", 1, NULL,
               SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
+    add_deprecated( "wxwin-autosize", VLC_FALSE); /*Deprecated since 0.8.4*/
 #ifdef wxHAS_TASK_BAR_ICON
-    add_bool( "wxwin-systray", 0, NULL,
+    add_bool( "wx-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
+    add_deprecated( "wxwin-systray", VLC_FALSE); /*Deprecated since 0.8.4*/
 #endif
-    add_string( "wxwin-config-last", NULL, NULL,
+    add_string( "wx-config-last", NULL, NULL,
                 "last config", "last config", VLC_TRUE );
         change_autosave();
+    add_deprecated( "wxwin-config-last", VLC_FALSE); /*Deprecated since 0.8.4*/
 
     add_submodule();
     set_description( _("wxWidgets dialogs provider") );
@@ -168,7 +175,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
-    /* Initialize wxWindows thread */
+    /* Initialize wxWidgets thread */
     p_intf->p_sys->b_playing = 0;
 
     p_intf->p_sys->p_input = NULL;
@@ -185,7 +192,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->b_play = VLC_TRUE;
 
     p_intf->p_sys->b_video_autosize =
-        config_GetInt( p_intf, "wxwin-autosize" );
+        config_GetInt( p_intf, "wx-autosize" );
 
     return VLC_SUCCESS;
 }
@@ -233,7 +240,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Run: wxWindows thread
+ * Run: wxWidgets thread
  *****************************************************************************/
 
 //when is this called?
@@ -253,7 +260,7 @@ static void Run( intf_thread_t *p_intf )
     {
         /* The module is used in dialog provider mode */
 
-        /* Create a new thread for wxWindows */
+        /* Create a new thread for wxWidgets */
         if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
                                Init, 0, VLC_TRUE ) )
         {
@@ -275,7 +282,7 @@ static void Init( intf_thread_t *p_intf )
     int i_args = 1;
 #endif
 
-    /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
+    /* Hack to pass the p_intf pointer to the new wxWidgets Instance object */
 #ifdef wxTheApp
     wxApp::SetInstance( new Instance( p_intf ) );
 #else
@@ -324,7 +331,7 @@ IMPLEMENT_APP_NO_MAIN(Instance)
 bool Instance::OnInit()
 {
     /* Initialization of i18n stuff.
-     * Usefull for things we don't have any control over, like wxWindows
+     * Usefull for things we don't have any control over, like wxWidgets
      * provided facilities (eg. open file dialog) */
     locale.Init( wxLANGUAGE_DEFAULT );
 
@@ -343,7 +350,7 @@ bool Instance::OnInit()
     {
         /* The module is used in interface mode */
         long style = wxDEFAULT_FRAME_STYLE;
-        if ( ! config_GetInt( p_intf, "wxwin-taskbar" ) )
+        if ( ! config_GetInt( p_intf, "wx-taskbar" ) )
         {
             style = wxDEFAULT_FRAME_STYLE|wxFRAME_NO_TASKBAR;
         }
@@ -450,7 +457,7 @@ WindowSettings::WindowSettings( intf_thread_t *_p_intf )
     if( p_intf->pf_show_dialog ) return;
 
     /* Parse the configuration */
-    psz_org = psz = config_GetPsz( p_intf, "wxwin-config-last" );
+    psz_org = psz = config_GetPsz( p_intf, "wx-config-last" );
     if( !psz || *psz == '\0' ) return;
 
     msg_Dbg( p_intf, "Using last windows config '%s'", psz );
@@ -557,7 +564,7 @@ WindowSettings::~WindowSettings( )
                                      size[i].x, size[i].y );
     }
 
-    config_PutPsz( p_intf, "wxwin-config-last", sCfg.mb_str() );
+    config_PutPsz( p_intf, "wx-config-last", sCfg.mb_str() );
 }
 
 void WindowSettings::SetScreen( int i_screen_w, int i_screen_h )

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * wxwindows.h: private wxWindows interface description
+ * wxwidgets.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
  * $Id$
