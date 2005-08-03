@@ -3,7 +3,7 @@
 FEATURES="
 SKINS skins2
 PDA pda
-WXWINDOWS wxwindows
+WXWIDGETS wxwidgets
 OPIE opie
 MACOSX macosx
 QNX qnx
@@ -86,6 +86,7 @@ SOUT sout
 WITHFFMPEGMP3LAME ffmpeg-mp3lame
 WITHFFMPEGFAAC ffmpeg-faac
 GALAKTOS galaktos
+HTTPD httpd
 "
 PATHS="
 WITHXML2CONFIGPATH xml2-config-path

@@ -16,8 +16,8 @@ if [ "$CONFIG_SKINS" = "y" ]; then
   string 'xml2-config path' CONFIG_WITHXML2CONFIGPATH ""
 fi
 bool 'PDA interface (via Gtk2) support' CONFIG_PDA
-bool 'wxWindows support' CONFIG_WXWINDOWS
-if [ "$CONFIG_WXWINDOWS" = "y" ]; then
+bool 'wxWidgets support' CONFIG_WXWIDGETS
+if [ "$CONFIG_WXWIDGETS" = "y" ]; then
   string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
 fi
 bool 'Qt embedded interface support (opie)' CONFIG_OPIE
@@ -216,6 +216,7 @@ if [ "$CONFIG_MOZILLA" = "y" ]; then
    string '    Path to win32 mozilla sdk' CONFIG_WITHMOZILLASDKPATH ""
 fi
 bool 'Build test modules' COFIG_TESTSUITE
+bool 'Enable http daemon' COFIG_HTTPD
 # TODO: --disable-plugins
 endmenu
 
