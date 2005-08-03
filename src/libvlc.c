@@ -957,6 +957,13 @@ int VLC_Destroy( int i_object )
      */
     system_End( p_vlc );
 
+    /*
+     * Free message queue.
+     * Nobody shall use msg_* afterward.
+     */
+    msg_Flush( p_vlc );
+    msg_Destroy( p_libvlc );
+
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->config_lock );
 
