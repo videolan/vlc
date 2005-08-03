@@ -96,18 +96,13 @@ void Playlist::buildList()
     for( int i = 0; i < m_pPlaylist->i_size; i++ )
     {
         // Get the name of the playlist item
-        UString *pName = m_pPlaylist->pp_items[i]->input.psz_name;
+        UString *pName =
+            new UString( getIntf(), m_pPlaylist->pp_items[i]->input.psz_name );
         // Is it the played stream ?
         bool playing = (i == m_pPlaylist->i_index );
         // Add the item in the list
         m_list.push_back( Elem_t( UStringPtr( pName ), false, playing ) );
     }
     vlc_mutex_unlock( &m_pPlaylist->object_lock );
-}
-
-
-UString *Playlist::convertName( const char *pName )
-{
-    return new UString( getIntf(), pName );
 }
 
