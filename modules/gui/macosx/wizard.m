@@ -249,6 +249,7 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mp4;
     NSArray * o_mov;
     NSArray * o_wav;
+    NSArray * o_asfh;
     o_ps = [NSArray arrayWithObjects: @"ps", @"MPEG PS", \
         _NS("MPEG Program Stream"), nil];
     o_ts = [NSArray arrayWithObjects: @"ts", @"MPEG TS", \
@@ -262,11 +263,13 @@ static VLCWizard *_o_sharedInstance = nil;
     o_mp4 = [NSArray arrayWithObjects: @"mp4", @"MP4", @"MPEG4", nil];
     o_mov = [NSArray arrayWithObjects: @"mov", @"MOV", @"MOV", nil];
     o_wav = [NSArray arrayWithObjects: @"wav", @"WAV", @"WAV", nil];
+    o_asfh = [NSArray arrayWithObjects: @"asfh", @"ASFH", @"ASFH", nil];
     o_encapFormats = [[NSArray alloc] initWithObjects: o_ps, o_ts, o_mpeg, \
-        o_ogg, o_raw, o_asf, o_avi, o_mp4, o_mov, o_wav, nil];
+        o_ogg, o_raw, o_asf, o_avi, o_mp4, o_mov, o_wav, o_asfh, nil];
 
     /* yet another array on streaming methods including help texts */
     NSArray * o_http;
+    NSArray * o_mms;
     NSArray * o_udp_uni;
     NSArray * o_udp_multi;
     o_http = [NSArray arrayWithObjects: @"http", @"HTTP", _NS("Enter the local " \
@@ -276,6 +279,18 @@ static VLCWizard *_o_sharedInstance = nil;
         "http://yourip:8080 by default.") , _NS("Use this to stream to several " \
         "computers. This method is less efficient, as the server needs to send " \
         "the stream several times."), nil];
+    o_mms = [NSArray arrayWithObjects: @"mmsh", @"MMS", _NS("Enter the local " \
+        "addresses you want to listen to. Do not enter anything if you want to " \
+        "listen to all adresses or if you don't understand. This is generally " \
+        "the best thing to do. Other computers can then access the stream at " \
+        "mms://yourip:8080 by default."), _NS("Use this to stream to several " \
+        "computers using the Microsoft MMS protocol. This protocol is used as " \
+        "transport method by many Microsoft's softwares. Note that only a " \
+        "small part of the MMS protocol is supported (MMS encapsulated in " \
+        "HTTP)." ), nil];
+    o_udp_uni = [NSArray arrayWithObjects: @"udp", @"UDP-Unicast", _NS("Enter " \
+        "the address of the computer to stream to."), _NS("Use this to stream " \
+        "to a single computer."), nil];
     o_udp_multi = [NSArray arrayWithObjects: @"udp", @"UDP-Multicast", _NS("Enter " \
         "the multicast address to stream to in this field. This must be an IP " \
         "address between 224.0.0.0 and 239.255.255.255. For a private use, " \
@@ -283,10 +298,8 @@ static VLCWizard *_o_sharedInstance = nil;
         "to a dynamic group of computers on a multicast-enabled network. This " \
         "is the most efficient method to stream to several computers, but it " \
         "does not work over Internet."), nil];
-    o_udp_uni = [NSArray arrayWithObjects: @"udp", @"UDP-Unicast", _NS("Enter " \
-        "the address of the computer to stream to."), _NS("Use this to stream " \
-        "to a single computer."), nil];
-    o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_udp_multi, o_udp_uni, nil];
+    o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_mms, \
+        o_udp_uni, o_udp_multi, nil];
 }
 
 - (void)showWizard
@@ -323,6 +336,7 @@ static VLCWizard *_o_sharedInstance = nil;
     /* "Streaming 1" */
     [o_t3_fld_address setStringValue: @""];
     [o_t3_matrix_stmgMhd selectCellAtRow:0 column:0];
+    [[o_t3_matrix_stmgMhd cellAtRow:0 column:1] setState: NSOffState];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setState: NSOffState];
     [[o_t3_matrix_stmgMhd cellAtRow:1 column:2] setState: NSOffState];
 
@@ -395,8 +409,8 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t3_box_strmgMthd setTitle: _NS("Streaming method")];
     [o_t3_txt_destInfo setStringValue: _NS("Enter the address of the computer " \
         "to stream to.")];
-    [[o_t3_matrix_stmgMhd cellAtRow:1 column:0] setTitle: _NS("UDP Unicast")];
-    [[o_t3_matrix_stmgMhd cellAtRow:1 column:1] setTitle: _NS("UDP Multicast")];
+    [[o_t3_matrix_stmgMhd cellAtRow:0 column:0] setTitle: _NS("UDP Unicast")];
+    [[o_t3_matrix_stmgMhd cellAtRow:0 column:1] setTitle: _NS("UDP Multicast")];
     [o_t3_txt_strgMthdInfo setStringValue: _NS("Use this to stream to a single " \
         "computer.")];
 
@@ -591,13 +605,29 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
             [o_t5_matrix_encap selectCellAtRow:0 column:0];
+        } else if ([o_mode isEqualToString: @"MMS"])
+        {
+            [o_userSelections setObject:@"1" forKey:@"stmgMhd"];
+            [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:YES];
+            [o_t5_matrix_encap selectCellAtRow:10 column:0];
         } else {
             if( [o_mode isEqualToString: _NS("UDP Unicast")] )
             {
                 [o_userSelections setObject:@"2" forKey:@"stmgMhd"];
             } else {
-                [o_userSelections setObject:@"1" forKey:@"stmgMhd"];
+                [o_userSelections setObject:@"3" forKey:@"stmgMhd"];
             }
             /* disable all encap-formats but MPEG-TS and select it */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
@@ -609,14 +639,15 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
             [o_t5_matrix_encap selectCellAtRow:1 column:0];
         }
 
         /* store the destination and check whether is it empty */
-        if(! [o_mode isEqualToString: @"HTTP"] )
+        if([[o_userSelections objectForKey:@"stmgMhd"] intValue] >=2 )
         {
-            /* empty field is valid for HTTP */
+           /* empty field is valid for HTTP and MMS */
             if( [[o_t3_fld_address stringValue] isEqualToString: @""] )
             {
                 /* complain to the user that "" is no valid dest. */
@@ -624,8 +655,9 @@ static VLCWizard *_o_sharedInstance = nil;
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
                     _NS("You need to enter a valid destination you want to "\
                     "stream to. Enter either a Unicast-IP or a Multicast-IP." \
-                    "\n\n If you don't know what this means, have a look at the " \
-                    "VLC Streaming HOWTO and the help texts in this window."));
+                    "\n\n If you don't know what this means, have a look at " \
+                    "the VLC Streaming HOWTO and the help texts in this " \
+                    "window."));
             } else {
                 /* FIXME: check whether the entered IP is really valid */
                 [o_userSelections setObject:[o_t3_fld_address stringValue] \
@@ -1058,9 +1090,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 [o_userSelections objectForKey:@"ttl"]] UTF8String] );
 
             playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
-
-            msg_Warn(p_intf, "updating the playlist-table is not implemented!");
-
+            
             playlist_ViewUpdate( p_playlist, VIEW_CATEGORY );
 
             vlc_object_release(p_playlist);
@@ -1377,7 +1407,23 @@ static VLCWizard *_o_sharedInstance = nil;
      * streaming method */
     NSNumber * o_mode;
     o_mode = [[NSNumber alloc] initWithInt:[[o_t3_matrix_stmgMhd selectedCell] tag]];
-    if( [o_mode intValue] == 2 )
+    if( [o_mode intValue] == 0 )
+    {
+        /* UDP-Unicast */
+        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
+            objectAtIndex:2]];
+        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
+        objectAtIndex:3]];
+    }
+    else if ( [o_mode intValue] == 1 )
+    {
+        /* UDP-Multicast */
+        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:3] \
+            objectAtIndex:2]];
+        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:3] \
+        objectAtIndex:3]];
+    }
+    else if( [o_mode intValue] == 2 )
     {
         /* HTTP */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:0] \
@@ -1385,21 +1431,13 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:0] \
             objectAtIndex:3]];
     }
-    else if( [o_mode intValue] == 1 )
+    else if( [o_mode intValue] == 3 )
     {
-        /* UDP-Multicast */
+        /* MMS */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:1] \
             objectAtIndex:2]];
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:1] \
             objectAtIndex:3]];
-    }
-    else if( [o_mode intValue] == 0 )
-    {
-        /* UDP-Unicast */
-        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
-            objectAtIndex:2]];
-        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
-        objectAtIndex:3]];
     }
     [o_mode release];
 }
