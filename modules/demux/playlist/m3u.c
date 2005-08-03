@@ -199,9 +199,13 @@ static int Demux( demux_t *p_demux )
             b_cleanup = VLC_TRUE;
             if( !psz_mrl ) goto error;
 
+            EnsureUTF8( psz_name );
+            EnsureUTF8( psz_mrl );
+
             p_item = playlist_ItemNew( p_playlist, psz_mrl, psz_name );
             for( i = 0; i< i_options; i++ )
             {
+                EnsureUTF8( ppsz_options[i] );
                 playlist_ItemAddOption( p_item, ppsz_options[i] );
             }
             p_item->input.i_duration = i_duration;
