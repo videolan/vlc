@@ -78,6 +78,7 @@
 #include "video_output.h"
 
 #include "stream_output.h"
+#include "charset.h"
 
 #include "libvlc.h"
 
@@ -1878,11 +1879,111 @@ static void SetLanguage ( char const *psz_lang )
     /* Set the default domain */
     textdomain( PACKAGE_NAME );
 
-#if defined( ENABLE_UTF8 )
     bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
 #endif
+}
 
-#endif
+/*****************************************************************************
+ * FromLocale: converts a locale string to UTF-8
+ *****************************************************************************/
+/* FIXME FIXME: it really has to be made quicker */
+char *FromLocale( const char *locale )
+{
+    char *psz_charset;
+
+    if( !vlc_current_charset( &psz_charset ) )
+    {
+        char *iptr = (ICONV_CONST char *)locale, *output, *optr;
+        size_t inb, outb;
+
+        /* cannot fail (unless vlc_current_charset sucks) */
+        vlc_iconv_t hd = vlc_iconv_open( "UTF-8", psz_charset );
+        free( psz_charset );
+
+        /*
+         * We are not allowed to modify the locale pointer, even if we cast it to
+         * non-const.
+         */
+        inb = strlen( locale );
+        outb = inb * 6 + 1;
+
+        /* FIXME: I'm not sure about the value for the multiplication
+         * (for western people, multiplication by 3 (Latin9) is sufficient) */
+        optr = output = calloc( outb , 1);
+        while( vlc_iconv( hd, &iptr, &inb, &optr, &outb ) == (size_t)-1 )
+            *iptr = '?'; /* should not happen, and yes, it sucks */
+
+        vlc_iconv_close( hd );
+        return realloc( output, strlen( output ) + 1 );
+    }
+    free( psz_charset );
+    return (char *)locale;
+}
+
+/*****************************************************************************
+ * ToLocale: converts an UTF-8 string to locale
+ *****************************************************************************/
+/* FIXME FIXME: it really has to be made quicker */
+char *ToLocale( const char *utf8 )
+{
+    char *psz_charset;
+
+    if( !vlc_current_charset( &psz_charset ) )
+    {
+        char *iptr = (ICONV_CONST char *)utf8, *output, *optr;
+        size_t inb, outb;
+
+        /* cannot fail (unless vlc_current_charset sucks) */
+        vlc_iconv_t hd = vlc_iconv_open( psz_charset, "UTF-8" );
+        free( psz_charset );
+
+        /*
+         * We are not allowed to modify the locale pointer, even if we cast it to
+         * non-const.
+         */
+        inb = strlen( utf8 );
+        /* FIXME: I'm not sure about the value for the multiplication
+         * (for western people, multiplication is not needed) */
+        outb = inb * 2 + 1;
+
+        optr = output = calloc( outb, 1 );
+        while( vlc_iconv( hd, &iptr, &inb, &optr, &outb ) == (size_t)-1 )
+            *iptr = '?'; /* should not happen, and yes, it sucks */
+
+        vlc_iconv_close( hd );
+        return realloc( output, strlen( output ) + 1 );
+    }
+    free( psz_charset );
+    return (char *)utf8;
+}
+
+void LocaleFree( const char *str )
+{
+    /* FIXME: this deserve a price for the most inefficient peice of code */
+    char *psz_charset;
+
+    if( !vlc_current_charset( &psz_charset ) )
+        free( (char *)str );
+
+    free( psz_charset );
+}
+
+/* FIXME: don't use iconv at all */
+char *EnsureUTF8( char *str )
+{
+    vlc_iconv_t hd;
+    size_t inb, outb;
+    char *ostr, *istr;
+     
+    ostr = istr = str;
+
+    inb = outb = strlen( str );
+    hd = vlc_iconv_open( "UTF-8", "UTF-8" );
+    while( vlc_iconv( hd, &istr, &inb, &ostr, &outb ) == (size_t)-1 )
+        *istr = '?';
+
+    vlc_iconv_close( hd );
+    return str;
 }
 
 /*****************************************************************************
@@ -1899,6 +2000,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * and their input options */
     for( i_opt = i_argc - 1; i_opt >= optind; i_opt-- )
     {
+        const char *psz_target;
         i_options = 0;
 
         /* Count the input options */
@@ -1910,10 +2012,13 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
-        VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ i_opt ],
+        /* FIXME: should we convert options to UTF-8 as well ?? */
+        psz_target = FromLocale( ppsz_argv[ i_opt ] );
+        VLC_AddTarget( p_vlc->i_object_id, psz_target,
                        (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
                                         NULL ), i_options,
                        PLAYLIST_INSERT, 0 );
+        LocaleFree( psz_target );
     }
 
     return VLC_SUCCESS;

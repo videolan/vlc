@@ -98,7 +98,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
 static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
                              session_descriptor_t *p_session );
-static char *convert_to_utf8( struct sap_handler_t *p_this, char *psz_local );
 
 #define FREE( p ) if( p ) { free( p ); (p) = NULL; }
 
@@ -112,7 +111,6 @@ static char *convert_to_utf8( struct sap_handler_t *p_this, char *psz_local );
 sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
 {
     sap_handler_t *p_sap;
-    char *psz_charset;
 
     p_sap = vlc_object_create( p_announce, sizeof( sap_handler_t ) );
 
@@ -123,12 +121,6 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce )
     }
 
     vlc_mutex_init( p_sap, &p_sap->object_lock );
-
-    vlc_current_charset( &psz_charset );
-    p_sap->iconvHandle = vlc_iconv_open( "UTF-8", psz_charset );
-    free( psz_charset );
-    if( p_sap->iconvHandle == (vlc_iconv_t)(-1) )
-        msg_Warn( p_sap, "Unable to do requested conversion" );
 
     p_sap->pf_add = announce_SAPAnnounceAdd;
     p_sap->pf_del = announce_SAPAnnounceDel;
@@ -187,9 +179,6 @@ void announce_SAPHandlerDestroy( sap_handler_t *p_sap )
         REMOVE_ELEM( p_sap->pp_addresses, p_sap->i_addresses, i );
         FREE( p_address );
     }
-
-    if( p_sap->iconvHandle != (vlc_iconv_t)(-1) )
-        vlc_iconv_close( p_sap->iconvHandle );
 
     /* Free the structure */
     vlc_object_destroy( p_sap );
@@ -591,13 +580,8 @@ static char *SDPGenerate( sap_handler_t *p_sap,
          *psz_sdp;
     char ipv;
 
-    psz_group = convert_to_utf8( p_sap, p_session->psz_group );
-    psz_name = convert_to_utf8( p_sap, p_session->psz_name );
-    if( psz_name == NULL )
-    {
-        FREE( psz_group );
-        return NULL;
-    }
+    psz_group = p_session->psz_group;
+    psz_name = p_session->psz_name;
 
     /* FIXME: really check that psz_uri is a real IP address
      * FIXME: make a common function to obtain a canonical IP address */
@@ -634,20 +618,11 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             psz_name, ipv,
                             psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload ) == -1 )
-    {
-        free( psz_name );
-        FREE( psz_group );
         return NULL;
-    }
     
-    free( psz_name );
-
     if( psz_group )
-    {
         /* FIXME: this is illegal use of sprintf */
         sprintf( psz_sdp, "%sa=x-plgroup:%s\r\n", psz_sdp, psz_group );
-        free( psz_group );
-    }
 
     msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),
              psz_sdp );
@@ -710,36 +685,4 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
     p_address->i_buff = 0;
 
     return VLC_SUCCESS;
-}
-
-
-static char *convert_to_utf8( struct sap_handler_t *p_this, char *psz_local )
-{
-    char *psz_unicode, *psz_in, *psz_out;
-    size_t ret, i_in, i_out;
-
-    if( psz_local == NULL )
-        return NULL;
-    if ( p_this->iconvHandle == (vlc_iconv_t)(-1) )
-        return strdup( psz_local );
-
-    psz_in = psz_local;
-    i_in = strlen( psz_local );
-
-    i_out = 6 * i_in;
-    psz_unicode = malloc( i_out + 1 );
-    if( psz_unicode == NULL )
-        return strdup( psz_local );
-    psz_out = psz_unicode;
-
-    ret = vlc_iconv( p_this->iconvHandle,
-                     &psz_in, &i_in, &psz_out, &i_out);
-    if( ret == (size_t)(-1) || i_in )
-    {
-        msg_Warn( p_this, "Failed to convert \"%s\" to UTF-8", psz_local );
-        free(psz_unicode);
-        return strdup( psz_local );
-    }
-    *psz_out = '\0';
-    return psz_unicode;
 }

@@ -46,14 +46,9 @@ class Playlist: public VarList
     private:
         /// VLC playlist object
         playlist_t *m_pPlaylist;
-        /// Iconv handle
-        vlc_iconv_t iconvHandle;
 
         /// Build the list from the VLC playlist
         void buildList();
-
-        /// Convert a string to UTF8 from the current encoding
-        UString *convertName( const char *pName );
 };
 
 

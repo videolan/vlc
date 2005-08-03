@@ -26,6 +26,10 @@ extern "C" {
 # endif
 
 VLC_EXPORT( vlc_bool_t, vlc_current_charset, ( char ** ) );
+VLC_EXPORT( void, LocaleFree, ( const char * ) );
+VLC_EXPORT( char *, FromLocale, ( const char * ) );
+VLC_EXPORT( char *, ToLocale, ( const char * ) );
+VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 
 # ifdef __cplusplus
 }

@@ -228,14 +228,6 @@ fi
 AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
 XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
 
-AC_ARG_ENABLE(utf8,
-  [  --enable-utf8           unicode utf8 support (default enabled on darwin/beos/win32)])
-if test "${enable_utf8}" = "yes" || (test "${enable_utf8}" != "no" && (test "${SYS}" = "mingw32" || test "${SYS}" = "beos" || test "${SYS}" = "darwin" ) )
-then
-  AC_DEFINE(ENABLE_UTF8, 1,
-            Define if you want utf8 support)
-fi
-
 dnl
 dnl Iconv stuff
 dnl

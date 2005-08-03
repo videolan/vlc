@@ -69,6 +69,8 @@
 #   define lseek fseek
 #endif
 
+#include "charset.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -106,7 +108,7 @@ static int  Seek( access_t *, int64_t );
 static int  Read( access_t *, uint8_t *, int );
 static int  Control( access_t *, int, va_list );
 
-static int  _OpenFile( access_t *, char * );
+static int  _OpenFile( access_t *, const char * );
 
 typedef struct
 {
@@ -573,12 +575,16 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * OpenFile: Opens a specific file
  *****************************************************************************/
-static int _OpenFile( access_t * p_access, char * psz_name )
+static int _OpenFile( access_t * p_access, const char * psz_name )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    const char *psz_localname;
+
+    psz_localname = ToLocale( psz_name );
 
 #ifdef UNDER_CE
-    p_sys->fd = fopen( psz_name, "rb" );
+    p_sys->fd = fopen( psz_localname, "rb" );
+    LocaleFree( psz_localname );
     if ( !p_sys->fd )
     {
         msg_Err( p_access, "cannot open file %s", psz_name );
@@ -591,7 +597,8 @@ static int _OpenFile( access_t * p_access, char * psz_name )
     fseek( p_sys->fd, 0, SEEK_SET );
 #else
 
-    p_sys->fd = open( psz_name, O_NONBLOCK /*| O_LARGEFILE*/ );
+    p_sys->fd = open( psz_localname, O_NONBLOCK /*| O_LARGEFILE*/ );
+    LocaleFree( psz_localname );
     if ( p_sys->fd == -1 )
     {
         msg_Err( p_access, "cannot open file %s (%s)", psz_name,

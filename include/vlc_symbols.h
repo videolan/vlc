@@ -383,6 +383,10 @@ struct module_symbols_t
     int (*ACL_AddNet_inner) (vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow);
     void (*ACL_Destroy_inner) (vlc_acl_t *p_acl);
     char* (*httpd_ServerIP_inner) (httpd_client_t *cl, char *psz_ip);
+    char * (*FromLocale_inner) (const char *);
+    void (*LocaleFree_inner) (const char *);
+    char * (*ToLocale_inner) (const char *);
+    char * (*EnsureUTF8_inner) (char *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -751,6 +755,10 @@ struct module_symbols_t
 #  define ACL_AddNet (p_symbols)->ACL_AddNet_inner
 #  define ACL_Destroy (p_symbols)->ACL_Destroy_inner
 #  define httpd_ServerIP (p_symbols)->httpd_ServerIP_inner
+#  define FromLocale (p_symbols)->FromLocale_inner
+#  define LocaleFree (p_symbols)->LocaleFree_inner
+#  define ToLocale (p_symbols)->ToLocale_inner
+#  define EnsureUTF8 (p_symbols)->EnsureUTF8_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1122,6 +1130,10 @@ struct module_symbols_t
     ((p_symbols)->ACL_AddNet_inner) = ACL_AddNet; \
     ((p_symbols)->ACL_Destroy_inner) = ACL_Destroy; \
     ((p_symbols)->httpd_ServerIP_inner) = httpd_ServerIP; \
+    ((p_symbols)->FromLocale_inner) = FromLocale; \
+    ((p_symbols)->LocaleFree_inner) = LocaleFree; \
+    ((p_symbols)->ToLocale_inner) = ToLocale; \
+    ((p_symbols)->EnsureUTF8_inner) = EnsureUTF8; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */

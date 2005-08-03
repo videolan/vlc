@@ -382,7 +382,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 if( psz_help )
                 {
                     config_data->psz_help = wraptext( strdup( psz_help ),
-                                                      72 , ISUTF8 );
+                                                      72 , 1 );
                 }
                 else
                 {
@@ -430,7 +430,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     if( psz_help )
                     {
                         cd->psz_help = wraptext( strdup( psz_help ),72 ,
-                                                 ISUTF8 );
+                                                 1 );
                     }
                     else
                     {
@@ -447,7 +447,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 if( psz_help )
                 {
                     config_data->psz_help = wraptext( strdup( psz_help ) ,
-                                                      72 , ISUTF8 );
+                                                      72 , 1 );
                 }
                 else
                 {

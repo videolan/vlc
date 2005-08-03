@@ -535,12 +535,6 @@ protected:
 #   define _TOMB(a) a
 #endif
 
-#if defined( ENABLE_NLS ) && defined( ENABLE_UTF8 )
-#   define ISUTF8 1
-#else // ENABLE_NLS && ENABLE_UTF8
-#   define ISUTF8 0
-#endif
-
 /*****************************************************************************
  * Misc definitions (mainly from aygshell.h)
  *****************************************************************************/

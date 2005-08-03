@@ -54,8 +54,11 @@ int Export_Old( vlc_object_t *p_this )
 
     for ( i = 0 ; i < p_playlist->i_size ; i++ )
     {
-        fprintf( p_export->p_file , "%s\n" ,
-        p_playlist->pp_items[i]->input.psz_uri );
+        char *psz_uri;
+
+        psz_uri = ToLocale( p_playlist->pp_items[i]->input.psz_uri );
+        fprintf( p_export->p_file , "%s\n" , psz_uri );
+        LocaleFree( psz_uri );
     }
     return VLC_SUCCESS;
 }
