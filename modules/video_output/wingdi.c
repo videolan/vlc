@@ -36,7 +36,7 @@
 #define SHFS_SHOWSIPBUTTON 0x0004
 #define SHFS_HIDESIPBUTTON 0x0008
 
-#ifdef UNDER_CE
+#if defined(UNDER_CE) && !defined(__PLUGIN__) /*FIXME*/
 #   define MENU_HEIGHT 26
     BOOL SHFullScreen(HWND hwndRequester, DWORD dwState);
 #else
