@@ -456,9 +456,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         {
             if ( p_context->height <= 280 )
             {
-                msg_Warn( p_enc,
-                    "disabling interlaced video because height=%d <= 280",
-                    p_context->height );
+                if ( p_context->height != 16 || p_context->width != 16 )
+                    msg_Warn( p_enc,
+                        "disabling interlaced video because height=%d <= 280",
+                        p_context->height );
             }
             else
             {
