@@ -1896,7 +1896,7 @@ char *FromLocale( const char *locale )
 
     if( !vlc_current_charset( &psz_charset ) )
     {
-        char *iptr = (ICONV_CONST char *)locale, *output, *optr;
+        char *iptr = (char *)locale, *output, *optr;
         size_t inb, outb;
 
         /* cannot fail (unless vlc_current_charset sucks) */
@@ -1936,7 +1936,7 @@ char *ToLocale( const char *utf8 )
 
     if( !vlc_current_charset( &psz_charset ) )
     {
-        char *iptr = (ICONV_CONST char *)utf8, *output, *optr;
+        char *iptr = (char *)utf8, *output, *optr;
         size_t inb, outb;
 
         /* cannot fail (unless vlc_current_charset sucks) */
