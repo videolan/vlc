@@ -47,10 +47,6 @@ extern int wxEntry( HINSTANCE hInstance, HINSTANCE hPrevInstance = NULL,
 #endif
 #endif
 
-#ifdef SYS_DARWIN
-int wxEntry( int argc, char *argv[] , bool enterLoop = TRUE );
-#endif
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
