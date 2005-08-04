@@ -42,6 +42,7 @@
 #include "vlc_vlm.h"
 #include "vlc_tls.h"
 #include "vlc_acl.h"
+#include "charset.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -79,6 +80,9 @@ static void Close( vlc_object_t * );
     "You can set the address and port the http interface will bind to." )
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
+#define CHARSET_TEXT N_( "Charset" )
+#define CHARSET_LONGTEXT N_( \
+        "Charset declared in Content-Type header (default UTF-8)." )
 #define CERT_TEXT N_( "Certificate file" )
 #define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
                           "(enables SSL)" )
@@ -97,6 +101,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
+        add_string ( "http-charset", "UTF-8", NULL, CHARSET_TEXT, CHARSET_LONGTEXT, VLC_TRUE );
         set_section( N_("HTTP SSL" ), 0 );
         add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
         add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
@@ -115,6 +120,7 @@ static void Run          ( intf_thread_t *p_intf );
 static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                            char *psz_dir );
 
+#if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && !defined(WIN32)
 static int DirectoryCheck( char *psz_dir )
 {
     DIR           *p_dir;
@@ -136,6 +142,7 @@ static int DirectoryCheck( char *psz_dir )
 
     return VLC_SUCCESS;
 }
+#endif
 
 static int  HttpCallback( httpd_file_sys_t *p_args,
                           httpd_file_t *,
@@ -149,7 +156,7 @@ static int uri_test_param( char *psz_uri, const char *psz_name );
 static void uri_decode_url_encoded( char *psz );
 
 static char *Find_end_MRL( char *psz );
-static playlist_item_t *parse_MRL( intf_thread_t * , char *psz );
+static playlist_item_t *parse_MRL( intf_thread_t *, char *psz, char *psz_name );
 
 /*****************************************************************************
  *
@@ -197,6 +204,8 @@ struct intf_sys_t
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
+    char                *psz_html_type;
+    vlc_iconv_t         iconv_from_utf8, iconv_to_utf8;
 };
 
 
@@ -238,11 +247,51 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
 
+    /* determine Content-Type value for HTML pages */
+    psz_src = config_GetPsz( p_intf, "http-charset" );
+    if( psz_src == NULL || !*psz_src )
+    {
+        if( psz_src != NULL ) free( psz_src );
+        psz_src = strdup("UTF-8");
+    }
+
+    p_sys->psz_html_type = malloc( 20 + strlen( psz_src ) );
+    if( p_sys->psz_html_type == NULL )
+    {
+        free( p_sys );
+        free( psz_src );
+        return VLC_ENOMEM ;
+    }
+    sprintf( p_sys->psz_html_type, "text/html; charset=%s", psz_src );
+    msg_Dbg( p_intf, "using charset=%s", psz_src );
+
+    if( strcmp( psz_src, "UTF-8" ) )
+    {
+        p_sys->iconv_from_utf8 = vlc_iconv_open( psz_src, "UTF-8" );
+        if( p_sys->iconv_from_utf8 == (vlc_iconv_t)-1 )
+            msg_Warn( p_intf, "unable to perform charset conversion to %s",
+                      psz_src );
+        else
+        {
+            p_sys->iconv_to_utf8 = vlc_iconv_open( "UTF-8", psz_src );
+            if( p_sys->iconv_to_utf8 == (vlc_iconv_t)-1 )
+                msg_Warn( p_intf,
+                          "unable to perform charset conversion from %s",
+                          psz_src );
+        }
+    }
+    else
+    {
+        p_sys->iconv_from_utf8 = p_sys->iconv_to_utf8 = (vlc_iconv_t)-1;
+    }
+
+    free( psz_src );
+
     /* determine SSL configuration */
     psz_cert = config_GetPsz( p_intf, "http-intf-cert" );
     if ( psz_cert != NULL )
     {
-        msg_Dbg( p_intf, "enablind TLS for HTTP interface (cert file: %s)",
+        msg_Dbg( p_intf, "enabling TLS for HTTP interface (cert file: %s)",
                  psz_cert );
         psz_key = config_GetPsz( p_intf, "http-intf-key" );
         psz_ca = config_GetPsz( p_intf, "http-intf-ca" );
@@ -265,6 +314,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
+        free( p_sys->psz_html_type );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -338,12 +388,17 @@ failed:
         free( p_sys->pp_files );
     }
     httpd_HostDelete( p_sys->p_httpd_host );
+    free( p_sys->psz_html_type ); 
+    if( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
+        vlc_iconv_close( p_sys->iconv_from_utf8 );
+    if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
+        vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
     return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * CloseIntf: destroy interface
+ * Close: destroy interface
  *****************************************************************************/
 void Close ( vlc_object_t *p_this )
 {
@@ -373,7 +428,12 @@ void Close ( vlc_object_t *p_this )
         free( p_sys->pp_files );
     }
     httpd_HostDelete( p_sys->p_httpd_host );
+    free( p_sys->psz_html_type );
 
+    if( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
+        vlc_iconv_close( p_sys->iconv_from_utf8 );
+    if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
+        vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
 }
 
@@ -485,13 +545,72 @@ static char *FileToUrl( char *name, vlc_bool_t *pb_index )
     return url;
 }
 
+static char *FromUTF8( intf_thread_t *p_intf, char *psz_utf8 )
+{
+    intf_sys_t    *p_sys = p_intf->p_sys;
+
+    if ( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
+    {
+        char *psz_in = psz_utf8;
+        size_t i_in = strlen(psz_in);
+        size_t i_out = i_in * 2;
+        char *psz_local = malloc(i_out + 1);
+        char *psz_out = psz_local;
+
+        size_t i_ret = vlc_iconv( p_sys->iconv_from_utf8, &psz_in, &i_in,
+                                  &psz_out, &i_out );
+        if( i_ret == (size_t)-1 || i_in )
+        {
+            msg_Warn( p_intf,
+                      "failed to convert \"%s\" to desired charset (%s)",
+                      psz_utf8, strerror(errno) );
+            free( psz_local );
+            return strdup( psz_utf8 );
+        }
+
+        *psz_out = '\0';
+        return psz_local;
+    }
+    else
+        return strdup( psz_utf8 );
+}
+
+static char *ToUTF8( intf_thread_t *p_intf, char *psz_local )
+{
+    intf_sys_t    *p_sys = p_intf->p_sys;
+
+    if ( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
+    {
+        char *psz_in = psz_local;
+        size_t i_in = strlen(psz_in);
+        size_t i_out = i_in * 6;
+        char *psz_utf8 = malloc(i_out + 1);
+        char *psz_out = psz_utf8;
+
+        size_t i_ret = vlc_iconv( p_sys->iconv_to_utf8, &psz_in, &i_in,
+                                  &psz_out, &i_out );
+        if( i_ret == (size_t)-1 || i_in )
+        {
+            msg_Warn( p_intf,
+                      "failed to convert \"%s\" to desired charset (%s)",
+                      psz_local, strerror(errno) );
+            free( psz_utf8 );
+            return strdup( psz_local );
+        }
+
+        *psz_out = '\0';
+        return psz_utf8;
+    }
+    else
+        return strdup( psz_local );
+}
+
 /****************************************************************************
  * ParseDirectory: parse recursively a directory, adding each file
  ****************************************************************************/
 static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                            char *psz_dir )
 {
-    static const char mimetype[] = "text/html; charset=UTF-8";
     intf_sys_t     *p_sys = p_intf->p_sys;
     char           dir[MAX_DIR_SIZE];
 #ifdef HAVE_SYS_STAT_H
@@ -588,13 +707,20 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         {
             httpd_file_sys_t *f = malloc( sizeof( httpd_file_sys_t ) );
             vlc_bool_t b_index;
+            char *psz_tmp;
 
             f->p_intf  = p_intf;
             f->p_file = NULL;
             f->p_redir = NULL;
             f->p_redir2 = NULL;
-            f->file = strdup( dir );
-            f->name = FileToUrl( &dir[strlen( psz_root )], &b_index );
+            psz_tmp = vlc_fix_readdir_charset( VLC_OBJECT(p_intf),
+                                               dir );
+            f->file = FromUTF8( p_intf, psz_tmp );
+            free( psz_tmp );
+            psz_tmp = vlc_fix_readdir_charset( VLC_OBJECT(p_intf),
+                                               &dir[strlen( psz_root )] );
+            f->name = FileToUrl( psz_tmp, &b_index );
+            free( psz_tmp );
             f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) ? VLC_TRUE : VLC_FALSE;
 
             if( !f->name )
@@ -609,7 +735,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
             f->p_file = httpd_FileNew( p_sys->p_httpd_host,
                                        f->name,
-                                       f->b_html ? mimetype : NULL,
+                                       f->b_html ? p_sys->psz_html_type : NULL,
                                        user, password, p_acl,
                                        HttpCallback, f );
 
@@ -905,14 +1031,16 @@ static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
     return s;
 }
 
-void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
-                       char *name, mvar_t *s, int i_depth )
+static void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
+                              playlist_item_t *p_node, char *name, mvar_t *s,
+                              int i_depth )
 {
     if( p_node != NULL )
     {
-        if (p_node->i_children == -1)
+        if( p_node->i_children == -1 )
         {
             char value[512];
+            char *psz;
             mvar_t *itm = mvar_New( name, "set" );
 
             sprintf( value, "%d", ( p_pl->status.p_item == p_node )? 1 : 0 );
@@ -921,9 +1049,13 @@ void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
             sprintf( value, "%d", p_node->input.i_id );
             mvar_AppendNewVar( itm, "index", value );
 
-            mvar_AppendNewVar( itm, "name", p_node->input.psz_name );
+            psz = FromUTF8( p_intf, p_node->input.psz_name );
+            mvar_AppendNewVar( itm, "name", psz );
+            free( psz );
 
-            mvar_AppendNewVar( itm, "uri", p_node->input.psz_uri );
+            psz = FromUTF8( p_intf, p_node->input.psz_uri );
+            mvar_AppendNewVar( itm, "uri", psz );
+            free( psz );
 
             sprintf( value, "Item");
             mvar_AppendNewVar( itm, "type", value );
@@ -936,11 +1068,14 @@ void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
         else
         {
             char value[512];
+            char *psz;
             int i_child;
             mvar_t *itm = mvar_New( name, "set" );
 
-            mvar_AppendNewVar( itm, "name", p_node->input.psz_name );
-            mvar_AppendNewVar( itm, "uri", p_node->input.psz_name );
+            psz = FromUTF8( p_intf, p_node->input.psz_name );
+            mvar_AppendNewVar( itm, "name", psz );
+            mvar_AppendNewVar( itm, "uri", psz );
+            free( psz );
 
             sprintf( value, "Node" );
             mvar_AppendNewVar( itm, "type", value );
@@ -957,13 +1092,15 @@ void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
             mvar_AppendVar( s, itm );
 
             for (i_child = 0 ; i_child < p_node->i_children ; i_child++)
-                PlaylistListNode( p_pl, p_node->pp_children[i_child], name, s, i_depth + 1);
+                PlaylistListNode( p_intf, p_pl, p_node->pp_children[i_child],
+                                  name, s, i_depth + 1);
 
         }
     }
 }
 
-static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
+static mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,
+                                    playlist_t *p_pl )
 {
     playlist_view_t *p_view;
     mvar_t *s = mvar_New( name, "set" );
@@ -974,14 +1111,15 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
     p_view = playlist_ViewFind( p_pl, VIEW_CATEGORY ); /* FIXME */
 
     if( p_view != NULL )
-        PlaylistListNode( p_pl, p_view->p_root, name, s, 0 );
+        PlaylistListNode( p_intf, p_pl, p_view->p_root, name, s, 0 );
 
     vlc_mutex_unlock( &p_pl->object_lock );
 
     return s;
 }
 
-static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
+static mvar_t *mvar_InfoSetNew( intf_thread_t *p_intf, char *name,
+                                input_thread_t *p_input )
 {
     mvar_t *s = mvar_New( name, "set" );
     int i, j;
@@ -995,21 +1133,29 @@ static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
     for ( i = 0; i < p_input->input.p_item->i_categories; i++ )
     {
         info_category_t *p_category = p_input->input.p_item->pp_categories[i];
+        char *psz;
+
         mvar_t *cat  = mvar_New( name, "set" );
         mvar_t *iset = mvar_New( "info", "set" );
 
-        mvar_AppendNewVar( cat, "name", p_category->psz_name );
+        psz = FromUTF8( p_intf, p_category->psz_name );
+        mvar_AppendNewVar( cat, "name", psz );
+        free( psz );
         mvar_AppendVar( cat, iset );
 
         for ( j = 0; j < p_category->i_infos; j++ )
         {
             info_t *p_info = p_category->pp_infos[j];
             mvar_t *info = mvar_New( "info", "" );
+            char *psz_name = FromUTF8( p_intf, p_info->psz_name );
+            char *psz_value = FromUTF8( p_intf, p_info->psz_value );
 
             msg_Dbg( p_input, "adding info name=%s value=%s",
-                     p_info->psz_name, p_info->psz_value );
-            mvar_AppendNewVar( info, "name",  p_info->psz_name );
-            mvar_AppendNewVar( info, "value", p_info->psz_value );
+                     psz_name, psz_value );
+            mvar_AppendNewVar( info, "name",  psz_name );
+            mvar_AppendNewVar( info, "value", psz_value );
+            free( psz_name );
+            free( psz_value );
             mvar_AppendVar( iset, info );
         }
         mvar_AppendVar( s, cat );
@@ -1060,7 +1206,8 @@ static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 }
 #endif
 
-static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
+static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
+                                char *psz_dir )
 {
     mvar_t *s = mvar_New( name, "set" );
     char           tmp[MAX_DIR_SIZE], *p, *src;
@@ -1171,6 +1318,7 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     {
         mvar_t *f;
         const char *psz_ext;
+        char *psz_name, *psz_tmp;
 
         /* parse psz_src dir */
         if( ( p_dir_content = readdir( p_dir ) ) == NULL )
@@ -1191,12 +1339,20 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
         }
 #endif
         f = mvar_New( name, "set" );
+
+        psz_tmp = vlc_fix_readdir_charset( VLC_OBJECT(p_intf),
+                                           p_dir_content->d_name );
+        psz_name = FromUTF8( p_intf, psz_tmp );
+        free( psz_tmp );
+        sprintf( tmp, "%s/%s", psz_dir, psz_name );
         mvar_AppendNewVar( f, "name", tmp );
-        mvar_AppendNewVar( f, "basename", p_dir_content->d_name );
+        mvar_AppendNewVar( f, "basename", psz_name );
 
         /* put file extension in 'ext' */
-        psz_ext = strrchr( p_dir_content->d_name, '.' );
+        psz_ext = strrchr( psz_name, '.' );
         mvar_AppendNewVar( f, "ext", psz_ext != NULL ? psz_ext + 1 : "" );
+
+        free( psz_name );
 
 #ifdef HAVE_SYS_STAT_H
         if( S_ISDIR( stat_info.st_mode ) )
@@ -1311,7 +1467,8 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
 
 static void SSInit( rpn_stack_t * );
 static void SSClean( rpn_stack_t * );
-static void EvaluateRPN( mvar_t  *, rpn_stack_t *, char * );
+static void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *, rpn_stack_t *,
+                         char * );
 
 static void SSPush  ( rpn_stack_t *, char * );
 static char *SSPop  ( rpn_stack_t * );
@@ -1899,20 +2056,27 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 /* playlist management */
                 case MVLC_ADD:
                 {
-                    char mrl[512];
-                    playlist_item_t * p_item;
+                    char mrl[1024], psz_name[1024];
+                    playlist_item_t *p_item;
 
-                    uri_extract_value( p_request, "mrl", mrl, 512 );
+                    uri_extract_value( p_request, "mrl", mrl, 1024 );
                     uri_decode_url_encoded( mrl );
-                    p_item = parse_MRL( p_intf, mrl );
+                    uri_extract_value( p_request, "name", psz_name, 1024 );
+                    uri_decode_url_encoded( psz_name );
+                    if( !*psz_name )
+                    {
+                        memcpy( psz_name, mrl, 1024 );
+                    }
+                    p_item = parse_MRL( p_intf, mrl, psz_name );
 
                     if( !p_item || !p_item->input.psz_uri ||
                         !*p_item->input.psz_uri )
                     {
                         msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
-                    } else
+                    }
+                    else
                     {
-                        playlist_AddItem( p_sys->p_playlist , p_item ,
+                        playlist_AddItem( p_sys->p_playlist, p_item,
                                           PLAYLIST_APPEND, PLAYLIST_END );
                         msg_Dbg( p_intf, "requested mrl add: %s", mrl );
                     }
@@ -2316,7 +2480,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
             if( m->param1 )
             {
-                EvaluateRPN( p_args->vars, &p_args->stack, m->param1 );
+                EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m->param1 );
                 s = SSPop( &p_args->stack );
                 v = mvar_GetValue( p_args->vars, s );
             }
@@ -2330,7 +2494,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
             break;
         }
         case MVLC_RPN:
-            EvaluateRPN( p_args->vars, &p_args->stack, m->param1 );
+            EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m->param1 );
             break;
 
 /* Usefull for learning stack management */
@@ -2445,7 +2609,7 @@ static void Execute( httpd_file_sys_t *p_args,
                     vlc_bool_t i_test;
                     char    *endif;
 
-                    EvaluateRPN( p_args->vars, &p_args->stack, m.param1 );
+                    EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m.param1 );
                     if( SSPopN( &p_args->stack, p_args->vars ) )
                     {
                         i_test = 1;
@@ -2465,7 +2629,8 @@ static void Execute( httpd_file_sys_t *p_args,
                             char *stop  = MacroSearch( start, endif, MVLC_END, VLC_FALSE );
                             if( stop )
                             {
-                                Execute( p_args, p_request, i_request, pp_data, pi_data, &dst, start, stop );
+                                Execute( p_args, p_request, i_request,
+                                         pp_data, pi_data, &dst, start, stop );
                             }
                         }
                     }
@@ -2478,7 +2643,8 @@ static void Execute( httpd_file_sys_t *p_args,
                         }
                         if( stop )
                         {
-                            Execute( p_args, p_request, i_request, pp_data, pi_data, &dst, src, stop );
+                            Execute( p_args, p_request, i_request,
+                                     pp_data, pi_data, &dst, src, stop );
                         }
                     }
 
@@ -2505,16 +2671,18 @@ static void Execute( httpd_file_sys_t *p_args,
                         else if( !strcmp( m.param2, "directory" ) )
                         {
                             char *arg = SSPop( &p_args->stack );
-                            index = mvar_FileSetNew( m.param1, arg );
+                            index = mvar_FileSetNew( p_intf, m.param1, arg );
                             free( arg );
                         }
                         else if( !strcmp( m.param2, "playlist" ) )
                         {
-                            index = mvar_PlaylistSetNew( m.param1, p_intf->p_sys->p_playlist );
+                            index = mvar_PlaylistSetNew( p_intf, m.param1,
+                                                    p_intf->p_sys->p_playlist );
                         }
                         else if( !strcmp( m.param2, "information" ) )
                         {
-                            index = mvar_InfoSetNew( m.param1, p_intf->p_sys->p_input );
+                            index = mvar_InfoSetNew( p_intf, m.param1,
+                                                     p_intf->p_sys->p_input );
                         }
                         else if( !strcmp( m.param2, "vlm" ) )
                         {
@@ -2558,7 +2726,8 @@ static void Execute( httpd_file_sys_t *p_args,
 
 
                             mvar_PushVar( p_args->vars, f );
-                            Execute( p_args, p_request, i_request, pp_data, pi_data, &dst, start, stop );
+                            Execute( p_args, p_request, i_request,
+                                     pp_data, pi_data, &dst, start, stop );
                             mvar_RemoveVar( p_args->vars, f );
 
                             mvar_Delete( f );
@@ -2570,7 +2739,8 @@ static void Execute( httpd_file_sys_t *p_args,
                     break;
                 }
                 default:
-                    MacroDo( p_args, &m, p_request, i_request, pp_data, pi_data, &dst );
+                    MacroDo( p_args, &m, p_request, i_request,
+                             pp_data, pi_data, &dst );
                     break;
             }
 
@@ -2710,7 +2880,8 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
         dst = *pp_data = malloc( *pi_data );
 
         /* we parse executing all  <vlc /> macros */
-        Execute( p_args, p_request, i_request, pp_data, pi_data, &dst, &p_buffer[0], &p_buffer[i_buffer] );
+        Execute( p_args, p_request, i_request, pp_data, pi_data, &dst,
+                 &p_buffer[0], &p_buffer[i_buffer] );
 
         *dst     = '\0';
         *pi_data = dst - *pp_data;
@@ -2901,7 +3072,8 @@ static void SSPushN( rpn_stack_t *st, int i )
     SSPush( st, v );
 }
 
-static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
+static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
+                          rpn_stack_t *st, char *exp )
 {
     for( ;; )
     {
@@ -3154,17 +3326,22 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
             char *url = mvar_GetValue( vars, "url_value" );
             char *name = SSPop( st );
             char value[512];
+            char *tmp;
 
             uri_extract_value( url, name, value, 512 );
             uri_decode_url_encoded( value );
-            SSPush( st, value );
+            tmp = FromUTF8( p_intf, value );
+            SSPush( st, tmp );
+            free( tmp );
         }
         else if( !strcmp( s, "url_encode" ) )
         {
             char *url = SSPop( st );
-            char *value;
+            char *value, *tmp;
 
+            url = ToUTF8( p_intf, url );
             value = vlc_UrlEncode( url );
+            free( url );
             SSPush( st, value );
             free( value );
         }
@@ -3270,7 +3447,8 @@ static char *Find_end_MRL( char *psz )
  * create an item with all information in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
-static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz )
+static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz,
+                                   char *psz_name )
 {
     char **ppsz_options = NULL;
     char *mrl;
@@ -3367,7 +3545,7 @@ static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz )
     else
     {
         /* now create an item */
-        p_item = playlist_ItemNew( p_intf, mrl, mrl);
+        p_item = playlist_ItemNew( p_intf, mrl, psz_name );
         for( i = 0 ; i< i_options ; i++ )
         {
             playlist_ItemAddOption( p_item, ppsz_options[i] );
