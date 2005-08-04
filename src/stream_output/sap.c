@@ -612,18 +612,17 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             "c=IN IP%c %s/%d\r\n"
                             "m=video %d udp %d\r\n"
                             "a=tool:"PACKAGE_STRING"\r\n"
-                            "a=type:broadcast\r\n",
+                            "a=type:broadcast\r\n"
+                            "%s%s%s",
                             i_sdp_id, i_sdp_version,
                             ipv, p_addr->psz_machine,
                             psz_name, ipv,
                             psz_uri, p_session->i_ttl,
-                            p_session->i_port, p_session->i_payload ) == -1 )
+                            p_session->i_port, p_session->i_payload,
+                            psz_group ? "a=x-plgroup:" : "",
+                            psz_group ?: "", psz_group ? "\r\n" : "" ) == -1 )
         return NULL;
     
-    if( psz_group )
-        /* FIXME: this is illegal use of sprintf */
-        sprintf( psz_sdp, "%sa=x-plgroup:%s\r\n", psz_sdp, psz_group );
-
     msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),
              psz_sdp );
     return psz_sdp;
