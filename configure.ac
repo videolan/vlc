@@ -2066,6 +2066,11 @@ then
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
+
+      AC_CHECK_LIB(avutil, av_add_i, [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lavutil])
+        LDFLAGS="${LDFLAGS} -lavutil"])
+
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
@@ -2137,8 +2142,14 @@ then
 
       VLC_ADD_BUILTINS([ffmpeg])
       if test "${enable_sout}" != "no"; then
-          VLC_ADD_BUILTINS([stream_out_switcher])
+        VLC_ADD_BUILTINS([stream_out_switcher])
       fi
+
+      if test -f "${real_ffmpeg_tree}/libavutil/libavutil.a"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavutil ${real_ffmpeg_tree}/libavutil/libavutil.a])
+        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavutil])
+      fi
+
       VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
       VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
 
