@@ -864,7 +864,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
         wxU(_(" (wxWidgets interface)\n\n")) +
         wxU(_("(c) 1996-2005 - the VideoLAN Team\n\n")) +
 #ifdef __WXMSW__
-        wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +
+        wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,VLC_TRUE) ) + wxT("\n\n") +
 #else
         wxU( INTF_ABOUT_MSG ) + wxT("\n\n") +
 #endif
