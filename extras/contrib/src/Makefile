@@ -325,6 +325,7 @@ libiconv-$(LIBICONV_VERSION).tar.gz:
 
 libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/libiconv.patch
 
 .iconv: libiconv
 	(cd libiconv; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
