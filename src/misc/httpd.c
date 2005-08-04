@@ -2449,7 +2449,9 @@ int httpd_UrlCatch( httpd_url_t *a, int b, httpd_callback_t c,
                     httpd_callback_sys_t *d ){ return 0; }
 void httpd_UrlDelete( httpd_url_t *a ){}
 
-char *httpd_ClientIP( httpd_client_t *a ){ return 0; }
+char* httpd_ClientIP( httpd_client_t *cl, char *psz_ip ) { return NULL; }
+char* httpd_ServerIP( httpd_client_t *cl, char *psz_ip ) { return NULL; }
+
 void httpd_ClientModeStream( httpd_client_t *a ){}
 void httpd_ClientModeBidir( httpd_client_t *a ){}
 
