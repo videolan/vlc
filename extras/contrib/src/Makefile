@@ -1160,6 +1160,7 @@ libopendaap-$(DAAP_VERSION).tar.bz2:
 
 libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p 0 < Patches/daap.patch
 
 .daap: libopendaap
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install)
