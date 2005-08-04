@@ -27,6 +27,10 @@
 #include <vlc/vlc.h>
 #include "charset.h"
 
+/* Evil global variable */
+static vlc_bool_t native_utf8;
+
+
 /*****************************************************************************
  * FromLocale: converts a locale string to UTF-8
  *****************************************************************************/
@@ -38,7 +42,8 @@ char *FromLocale( const char *locale )
     if( locale == NULL )
         return NULL;
 
-    if( !vlc_current_charset( &psz_charset ) )
+    native_utf8 = vlc_current_charset( &psz_charset );
+    if( !native_utf8 )
     {
         char *iptr = (char *)locale, *output, *optr;
         size_t inb, outb;
@@ -78,7 +83,8 @@ char *ToLocale( const char *utf8 )
     if( utf8 == NULL )
         return NULL;
 
-    if( !vlc_current_charset( &psz_charset ) )
+    native_utf8 = vlc_current_charset( &psz_charset );
+    if( !native_utf8 )
     {
         char *iptr = (char *)utf8, *output, *optr;
         size_t inb, outb;
@@ -109,16 +115,8 @@ char *ToLocale( const char *utf8 )
 
 void LocaleFree( const char *str )
 {
-    if( str != NULL )
-    {
-        /* FIXME: this deserve a price for the most inefficient peice of code */
-        char *psz_charset;
-    
-        if( !vlc_current_charset( &psz_charset ) )
-            free( (char *)str );
-    
-        free( psz_charset );
-    }
+    if( ( str != NULL ) && ( !native_utf8 ) )
+        free( (char *)str );
 }
 
 /*****************************************************************************
