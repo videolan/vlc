@@ -813,6 +813,7 @@
 				DCF358BB077F10BA007DB450,
 				DCA693C30789DF8700139EC6,
 				DCFCCDB9085CE18F001E36AF,
+				DC7F46ED08A183FC0027DB24,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -895,6 +896,8 @@
 				8E9CA1A606D7DEE800B7186C,
 				DC769AB8085DF0DB001A838D,
 				DC769AB7085DF0DB001A838D,
+				DC7F46F008A187F60027DB24,
+				DC7F46F108A187F60027DB24,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -2159,12 +2162,15 @@
 //DC4
 		DC769AB7085DF0DB001A838D = {
 			fileEncoding = 5;
+			indentWidth = 4;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.objc;
 			name = wizard.m;
 			path = ../../modules/gui/macosx/wizard.m;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
+			tabWidth = 4;
+			usesTabs = 0;
 		};
 		DC769AB8085DF0DB001A838D = {
 			fileEncoding = 5;
@@ -2172,6 +2178,50 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = wizard.h;
 			path = ../../modules/gui/macosx/wizard.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		DC7F46EB08A183FC0027DB24 = {
+			children = (
+				DC7F46EC08A183FC0027DB24,
+			);
+			isa = PBXVariantGroup;
+			name = Extended.nib;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DC7F46EC08A183FC0027DB24 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
+			name = English;
+			path = Resources/English.lproj/Extended.nib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DC7F46ED08A183FC0027DB24 = {
+			fileRef = DC7F46EB08A183FC0027DB24;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		DC7F46F008A187F60027DB24 = {
+			explicitFileType = sourcecode.c.objc;
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			name = extended.h;
+			path = ../../modules/gui/macosx/extended.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+			usesTabs = 0;
+		};
+		DC7F46F108A187F60027DB24 = {
+			explicitFileType = sourcecode.c.objc;
+			fileEncoding = 5;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			name = extended.m;
+			path = ../../modules/gui/macosx/extended.m;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -2260,6 +2310,7 @@
 				DCF358B9077F10BA007DB450,
 				DCA693C10789DF8700139EC6,
 				DCFCCDB7085CE18F001E36AF,
+				DC7F46EB08A183FC0027DB24,
 			);
 			isa = PBXGroup;
 			name = nibs;

@@ -561,6 +561,8 @@ VLC-release.app: vlc
 	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
+	    extended.h \
+	    extended.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -671,6 +673,8 @@ VLC.app: vlc
 	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
+	    extended.h \
+	    extended.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \

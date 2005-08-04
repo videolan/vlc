@@ -30,5 +30,7 @@ SOURCES_macosx = \
 	vout.h \
 	wizard.h \
 	wizard.m \
+	extended.h \
+	extended.m \
 	$(NULL)
 

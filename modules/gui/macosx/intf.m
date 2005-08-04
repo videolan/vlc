@@ -39,6 +39,7 @@
 #include "about.h"
 #include "open.h"
 #include "wizard.h"
+#include "extended.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -298,6 +299,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
+    o_extended = [[VLCExtended alloc] init];
 
     i_lastShownVolume = -1;
     return _o_sharedMainInstance;
@@ -527,6 +529,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_controller setTitle: _NS("Controller")];
     [o_mi_equalizer setTitle: _NS("Equalizer")];
+    [o_mi_extended setTitle: _NS("Extended controls")];
     [o_mi_playlist setTitle: _NS("Playlist")];
     [o_mi_info setTitle: _NS("Info")];
     [o_mi_messages setTitle: _NS("Messages")];
@@ -1441,6 +1444,18 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_wizard showWizard];
     } else {
         [o_wizard showWizard];
+    }
+}
+
+- (IBAction)showExtended:(id)sender
+{
+    if (!nib_extended_loaded)
+    {
+        nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
+        [o_extended initStrings];
+        [o_extended showPanel];
+    } else {
+        [o_extended showPanel];
     }
 }
 

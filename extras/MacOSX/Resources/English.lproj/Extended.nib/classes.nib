@@ -1,0 +1,64 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                "adjImg_Enbl" = id; 
+                "adjImg_rstrDefaults" = id; 
+                "adjImg_sliders" = id; 
+                "audFtls_hdphnVirt" = id; 
+                "audFtls_maxLevelSld" = id; 
+                "audFtls_vlmeNorm" = id; 
+                "extWin_exp_adjImg" = id; 
+                "extWin_exp_audFlts" = id; 
+                "extWin_exp_vidFlts" = id; 
+                vidFlts = id; 
+                "vidFlts_mrInfo" = id; 
+            }; 
+            CLASS = VLCExtended; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_adjustImg_view" = id; 
+                "o_audioFlts_view" = id; 
+                "o_box_adjImg" = id; 
+                "o_box_audFlts" = id; 
+                "o_box_vidFlts" = id; 
+                "o_btn_rstrDefaults" = id; 
+                "o_btn_vidFlts_mrInfo" = id; 
+                "o_ckb_blur" = id; 
+                "o_ckb_distortion" = id; 
+                "o_ckb_enblAdjustImg" = id; 
+                "o_ckb_hdphnVirt" = id; 
+                "o_ckb_imgClone" = id; 
+                "o_ckb_imgCrop" = id; 
+                "o_ckb_imgInvers" = id; 
+                "o_ckb_trnsform" = id; 
+                "o_ckb_vlme_norm" = id; 
+                "o_expBtn_adjustImage" = id; 
+                "o_expBtn_audioFlts" = id; 
+                "o_expBtn_videoFlts" = id; 
+                "o_extWin_adjImg_sepe" = id; 
+                "o_extWin_vidFlts_sepe" = id; 
+                "o_extended_window" = id; 
+                "o_lbl_adjustImage" = id; 
+                "o_lbl_audioFlts" = id; 
+                "o_lbl_brightness" = id; 
+                "o_lbl_contrast" = id; 
+                "o_lbl_gamma" = id; 
+                "o_lbl_hue" = id; 
+                "o_lbl_maxLevel" = id; 
+                "o_lbl_saturation" = id; 
+                "o_lbl_videoFlts" = id; 
+                "o_sld_brightness" = id; 
+                "o_sld_contrast" = id; 
+                "o_sld_gamma" = id; 
+                "o_sld_hue" = id; 
+                "o_sld_maxLevel" = id; 
+                "o_sld_saturation" = id; 
+                "o_videoFilters_view" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

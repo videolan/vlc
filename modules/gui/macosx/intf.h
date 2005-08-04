@@ -91,9 +91,11 @@ struct intf_sys_t
     id o_about;                 /* VLAboutBox     */
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
+    id o_extended;              /* VLCExtended    */
     BOOL nib_open_loaded;       /* reference to the open-nib */
     BOOL nib_about_loaded;      /* reference to the about-nib */
     BOOL nib_wizard_loaded;     /* reference to the wizard-nib */
+    BOOL nib_extended_loaded;   /* reference to the extended-nib */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_playlist_view;/* playlist view  */
@@ -226,6 +228,7 @@ struct intf_sys_t
     IBOutlet id o_mi_close_window;
     IBOutlet id o_mi_controller;
     IBOutlet id o_mi_equalizer;
+    IBOutlet id o_mi_extended;
     IBOutlet id o_mi_playlist;
     IBOutlet id o_mi_info;
     IBOutlet id o_mi_messages;
@@ -292,6 +295,7 @@ struct intf_sys_t
 - (IBAction)intfOpenNet:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
+- (IBAction)showExtended:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;
