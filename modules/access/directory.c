@@ -56,6 +56,8 @@
 #   include <dirent.h>
 #endif
 
+#include "charset.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -417,7 +419,7 @@ static int Filter( const struct dirent *foo )
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
 static int ReadDir( playlist_t *p_playlist,
-                    char *psz_name , int i_mode, int *pi_position,
+                    char *psz_name, int i_mode, int *pi_position,
                     playlist_item_t *p_parent )
 {
     struct dirent   **pp_dir_content;
@@ -504,11 +506,15 @@ static int ReadDir( playlist_t *p_playlist,
                         char *psz_subdir = psz_uri;
                         /* Skip the parent path + the separator */
                         psz_subdir += strlen( psz_name ) + 1;
-                        psz_newname = strdup( psz_subdir );
+                        psz_newname = vlc_fix_readdir_charset(
+                                                VLC_OBJECT(p_playlist),
+                                                psz_subdir );
                     }
                     else
                     {
-                        psz_newname = strdup( psz_uri );
+                        psz_newname = vlc_fix_readdir_charset(
+                                                VLC_OBJECT(p_playlist),
+                                                psz_name );
                     }
                     p_node = playlist_NodeCreate( p_playlist,
                                        p_parent->pp_parents[0]->i_view,
@@ -530,6 +536,7 @@ static int ReadDir( playlist_t *p_playlist,
             else
             {
                 playlist_item_t *p_item;
+                char *psz_tmp1, *psz_tmp2;
 
 #ifdef HAVE_STRSEP
                 if( i_extensions > 0 )
@@ -553,8 +560,13 @@ static int ReadDir( playlist_t *p_playlist,
                 }
 #endif /* HAVE_STRSEP */
 
+                psz_tmp1 = vlc_fix_readdir_charset( VLC_OBJECT(p_playlist),
+                                                    psz_uri );
+                psz_tmp2 = vlc_fix_readdir_charset( VLC_OBJECT(p_playlist),
+                                                    p_dir_content->d_name );
+
                 p_item = playlist_ItemNewWithType( VLC_OBJECT(p_playlist),
-                        psz_uri, p_dir_content->d_name, ITEM_TYPE_VFILE );
+                        psz_tmp1, psz_tmp2, ITEM_TYPE_VFILE );
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,
