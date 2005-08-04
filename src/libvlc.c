@@ -92,6 +92,8 @@ static vlc_t *    p_static_vlc;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static void LocaleInit( void );
+static void LocaleDeinit( void );
 static void SetLanguage   ( char const * );
 static int  GetFilenames  ( vlc_t *, int, char *[] );
 static void Help          ( vlc_t *, char const *psz_help_name );
@@ -191,22 +193,6 @@ int VLC_Create( void )
         libvlc.b_color = VLC_FALSE;
 #endif
 
-        /*
-         * Global iconv
-         */
-        if( !vlc_current_charset( &psz_env ) )
-        {
-            vlc_mutex_init( p_libvlc, &libvlc.from_locale_lock );
-            vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
-            libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_env );
-            libvlc.to_locale = vlc_iconv_open( psz_env, "UTF-8" );
-        }
-        else
-        {
-            libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)-1;
-        }
-        free( psz_env );
-
         /* Initialize message queue */
         msg_Create( p_libvlc );
 
@@ -218,6 +204,9 @@ int VLC_Create( void )
         libvlc.p_module_bank = NULL;
 
         libvlc.b_ready = VLC_TRUE;
+
+        /* UTF-8 convertor are initialized after the locale */
+        libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)(-1);
     }
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc, "libvlc" );
@@ -300,6 +289,12 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * Support for gettext
      */
     SetLanguage( "" );
+
+    /*
+     * Global iconv, must be done after setlocale()
+     * so that vlc_current_charset() works.
+     */
+    LocaleInit();
 
     /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
@@ -431,6 +426,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
         /* Reset the default domain */
         SetLanguage( psz_language );
+        LocaleDeinit();
+        LocaleInit();
 
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
@@ -982,13 +979,7 @@ int VLC_Destroy( int i_object )
     msg_Destroy( p_libvlc );
 
     /* Destroy global iconv */
-    if( libvlc.to_locale != (vlc_iconv_t)(-1) )
-    {
-        vlc_mutex_destroy( &libvlc.from_locale_lock );
-        vlc_mutex_destroy( &libvlc.to_locale_lock );
-        vlc_iconv_close( libvlc.from_locale );
-        vlc_iconv_close( libvlc.to_locale );
-    }
+    LocaleDeinit();
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->config_lock );
@@ -1841,6 +1832,33 @@ int VLC_FullScreen( int i_object )
 }
 
 /* following functions are local */
+
+static void LocaleInit( void )
+{
+    char *psz_charset;
+
+    if( !vlc_current_charset( &psz_charset ) )
+    {
+        vlc_mutex_init( p_libvlc, &libvlc.from_locale_lock );
+        vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
+        libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_charset );
+        libvlc.to_locale = vlc_iconv_open( psz_charset, "UTF-8" );
+    }
+    else
+        libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)(-1);
+    free( psz_charset );
+}
+
+static void LocaleDeinit( void )
+{
+    if( libvlc.to_locale != (vlc_iconv_t)(-1) )
+    {
+        vlc_mutex_destroy( &libvlc.from_locale_lock );
+        vlc_mutex_destroy( &libvlc.to_locale_lock );
+        vlc_iconv_close( libvlc.from_locale );
+        vlc_iconv_close( libvlc.to_locale );
+    }
+}
 
 /*****************************************************************************
  * SetLanguage: set the interface language.
