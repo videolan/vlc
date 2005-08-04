@@ -230,7 +230,7 @@ static int Open( vlc_object_t * p_this )
         else
         {
             /* TODO handle rtjpeg */
-            msg_Warn( p_demux, "unsuported 'D' frame (c=%c)", fh.i_compression );
+            msg_Warn( p_demux, "unsupported 'D' frame (c=%c)", fh.i_compression );
             if( stream_Read( p_demux->s, NULL, fh.i_length ) != fh.i_length )
                 goto error;
         }

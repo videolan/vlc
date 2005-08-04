@@ -2228,7 +2228,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 default:
                     if( *control )
                     {
-                        PRINTS( "<!-- control param(%s) unsuported -->", control );
+                        PRINTS( "<!-- control param(%s) unsupported -->", control );
                     }
                     break;
             }

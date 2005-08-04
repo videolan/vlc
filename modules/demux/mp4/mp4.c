@@ -1713,7 +1713,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     unsigned int i;
     char language[4];
 
-    /* hint track unsuported */
+    /* hint track unsupported */
 
     /* set default value (-> track unusable) */
     p_track->b_ok       = VLC_FALSE;
