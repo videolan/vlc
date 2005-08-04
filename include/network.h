@@ -231,10 +231,10 @@ static inline char *vlc_UrlEncode( const char *psz_url )
     out = psz_enc;
     for( in = psz_url; *in; in++ )
     {
-        char c = *in;
+        unsigned char c = *(unsigned char *)in;
 
         if( ( c <= 32 ) || ( c == '%' ) || ( c == '?' ) || ( c == '&' )
-         || ( c == '+' ) )
+              || ( c == '+' ) || ( c >= 128 ) )
         {
             *out++ = '%';   
             *out++ = ( ( c >> 4 ) >= 0xA ) ? 'A' + ( c >> 4 ) - 0xA
@@ -243,7 +243,7 @@ static inline char *vlc_UrlEncode( const char *psz_url )
                                            : '0' + ( c & 0xf );
         }
         else
-            *out++ = c;
+            *out++ = (char)c;
     }
     *out++ = '\0';
 
