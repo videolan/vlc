@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 
 #include <Cocoa/Cocoa.h>
+#include <CoreFoundation/CFString.h>
 
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>
@@ -114,6 +115,9 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
         [o_pool release];
     }
+
+    vlc_mutex_init( p_this, &p_this->p_libvlc->iconv_lock );
+    p_this->p_libvlc->iconv_macosx = vlc_iconv_open( "UTF-8", "UTF-8-MAC" );
 }
 
 /*****************************************************************************
@@ -130,5 +134,9 @@ void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 void system_End( vlc_t *p_this )
 {
     free( p_this->p_libvlc->psz_vlcpath );
+
+    if ( p_this->p_libvlc->iconv_macosx != (vlc_iconv_t)-1 )
+        vlc_iconv_close( p_this->p_libvlc->iconv_macosx );
+    vlc_mutex_destroy( &p_this->p_libvlc->iconv_lock );
 }
 

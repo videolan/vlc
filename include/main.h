@@ -69,6 +69,8 @@ struct libvlc_t
     char *                 psz_vlcpath;
 #elif defined( SYS_DARWIN )
     char *                 psz_vlcpath;
+    vlc_iconv_t            iconv_macosx; /* for HFS+ file names */
+    vlc_mutex_t            iconv_lock;
 #elif defined( WIN32 ) && !defined( UNDER_CE )
     SIGNALOBJECTANDWAIT    SignalObjectAndWait;
     vlc_bool_t             b_fast_mutex;
