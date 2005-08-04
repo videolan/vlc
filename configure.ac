@@ -2069,7 +2069,7 @@ then
 
       AC_CHECK_LIB(avutil, av_add_i, [
         VLC_ADD_LDFLAGS([ffmpeg],[-lavutil])
-        LDFLAGS="${LDFLAGS} -lavutil"])
+        LDAVUTIL="-lavutil"])
 
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
@@ -2077,7 +2077,7 @@ then
         if test "${enable_sout}" != "no"; then
             VLC_ADD_BUILTINS([stream_out_switcher])
         fi],
-         [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
+         [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ], [$LDAVUTIL])
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         AC_DEFINE(HAVE_LIBAVFORMAT, 1,
         [Define if you have ffmpeg's libavformat.])
