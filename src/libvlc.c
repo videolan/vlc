@@ -201,6 +201,10 @@ int VLC_Create( void )
             libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_env );
             libvlc.to_locale = vlc_iconv_open( psz_env, "UTF-8" );
         }
+        else
+        {
+            libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)-1;
+        }
         free( psz_env );
 
         /* Initialize message queue */
