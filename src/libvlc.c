@@ -2493,9 +2493,15 @@ char *FromLocale( const char *locale )
         optr = output = calloc( outb , 1);
 
         vlc_mutex_lock( &libvlc.from_locale_lock );
+        vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
+
         while( vlc_iconv( libvlc.from_locale, &iptr, &inb, &optr, &outb )
                                                                == (size_t)-1 )
-            *iptr = '?'; /* should not happen, and yes, it sucks */
+        {
+            *optr++ = '?';
+            *iptr++;
+            vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
+        }
         vlc_mutex_unlock( &libvlc.from_locale_lock );
 
         return realloc( output, strlen( output ) + 1 );
@@ -2527,14 +2533,19 @@ char *ToLocale( const char *utf8 )
 
         optr = output = calloc( outb, 1 );
         vlc_mutex_lock( &libvlc.to_locale_lock );
+        vlc_iconv( libvlc.to_locale, NULL, NULL, NULL, NULL );
+
         while( vlc_iconv( libvlc.to_locale, &iptr, &inb, &optr, &outb )
                                                                == (size_t)-1 )
-            *iptr = '?'; /* should not happen, and yes, it sucks */
+        {
+            *optr++ = '?'; /* should not happen, and yes, it sucks */
+            *iptr++;
+            vlc_iconv( libvlc.to_locale, NULL, NULL, NULL, NULL );
+        }
         vlc_mutex_unlock( &libvlc.to_locale_lock );
 
         return realloc( output, strlen( output ) + 1 );
     }
-
     return (char *)utf8;
 }
 
