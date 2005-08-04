@@ -364,8 +364,8 @@ static void b64_decode( char *dest, char *src )
 
 static struct
 {
-    char *psz_ext;
-    char *psz_mime;
+    const char *psz_ext;
+    const char *psz_mime;
 } http_mime[] =
 {
     { ".htm",   "text/html" },
@@ -409,7 +409,7 @@ static struct
     /* end */
     { NULL,     NULL }
 };
-static char *httpd_MimeFromUrl( char *psz_url )
+static const char *httpd_MimeFromUrl( const char *psz_url )
 {
 
     char *psz_ext;
@@ -489,8 +489,8 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
 
 
 httpd_file_t *httpd_FileNew( httpd_host_t *host,
-                             char *psz_url, char *psz_mime,
-                             char *psz_user, char *psz_password,
+                             const char *psz_url, const char *psz_mime,
+                             const char *psz_user, const char *psz_password,
                              const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill,
                              httpd_file_sys_t *p_sys )
 {
@@ -573,7 +573,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
         "<title>Redirection</title>\n"
         "</head>\n"
         "<body>\n"
-        "<h1>You should be "
+        "<h1>You should be " 
         "<a href=\"%s\">redirected</a></h1>\n"
         "<hr />\n"
         "<p><a href=\"http://www.videolan.org\">VideoLAN</a>\n</p>"
@@ -590,8 +590,8 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     return VLC_SUCCESS;
 }
 
-httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, char *psz_url_dst,
-                                     char *psz_url_src )
+httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, const char *psz_url_dst,
+                                     const char *psz_url_src )
 {
     httpd_redirect_t *rdir = malloc( sizeof( httpd_redirect_t ) );
 
@@ -769,8 +769,8 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 }
 
 httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
-                                 char *psz_url, char *psz_mime,
-                                 char *psz_user, char *psz_password,
+                                 const char *psz_url, const char *psz_mime,
+                                 const char *psz_user, const char *psz_password,
                                  const vlc_acl_t *p_acl )
 {
     httpd_stream_t *stream = malloc( sizeof( httpd_stream_t ) );
@@ -1102,8 +1102,8 @@ void httpd_HostDelete( httpd_host_t *host )
 }
 
 /* register a new url */
-static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
-                                         char *psz_user, char *psz_password,
+static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url,
+                                         const char *psz_user, const char *psz_password,
                                          const vlc_acl_t *p_acl, vlc_bool_t b_check )
 {
     httpd_url_t *url;
@@ -1144,16 +1144,16 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, char *psz_url,
     return url;
 }
 
-httpd_url_t *httpd_UrlNew( httpd_host_t *host, char *psz_url,
-                           char *psz_user, char *psz_password,
+httpd_url_t *httpd_UrlNew( httpd_host_t *host, const char *psz_url,
+                           const char *psz_user, const char *psz_password,
                            const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,
                                 psz_password, p_acl, VLC_FALSE );
 }
 
-httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, char *psz_url,
-                                 char *psz_user, char *psz_password,
+httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, const char *psz_url,
+                                 const char *psz_user, const char *psz_password,
                                  const vlc_acl_t *p_acl )
 {
     return httpd_UrlNewPrivate( host, psz_url, psz_user,

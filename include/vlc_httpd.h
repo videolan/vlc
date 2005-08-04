@@ -121,8 +121,8 @@ VLC_EXPORT( httpd_host_t *, httpd_TLSHostNew, ( vlc_object_t *, const char *, in
 VLC_EXPORT( void,           httpd_HostDelete, ( httpd_host_t * ) );
 
 /* register a new url */
-VLC_EXPORT( httpd_url_t *,  httpd_UrlNew, ( httpd_host_t *, char *psz_url, char *psz_user, char *psz_password, const vlc_acl_t *p_acl ) );
-VLC_EXPORT( httpd_url_t *,  httpd_UrlNewUnique, ( httpd_host_t *, char *psz_url, char *psz_user, char *psz_password, const vlc_acl_t *p_acl ) );
+VLC_EXPORT( httpd_url_t *,  httpd_UrlNew, ( httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl ) );
+VLC_EXPORT( httpd_url_t *,  httpd_UrlNewUnique, ( httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl ) );
 /* register callback on a url */
 VLC_EXPORT( int,            httpd_UrlCatch, ( httpd_url_t *, int i_msg, httpd_callback_t, httpd_callback_sys_t * ) );
 /* delete an url */
@@ -136,15 +136,15 @@ VLC_EXPORT( char*,          httpd_ServerIP, ( httpd_client_t *cl, char *psz_ip )
 
 /* High level */
 
-VLC_EXPORT( httpd_file_t *, httpd_FileNew, ( httpd_host_t *, char *psz_url, char *psz_mime, char *psz_user, char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t * ) );
+VLC_EXPORT( httpd_file_t *, httpd_FileNew, ( httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t * ) );
 VLC_EXPORT( void,           httpd_FileDelete, ( httpd_file_t * ) );
 
 
-VLC_EXPORT( httpd_redirect_t *, httpd_RedirectNew, ( httpd_host_t *, char *psz_url_dst, char *psz_url_src ) );
+VLC_EXPORT( httpd_redirect_t *, httpd_RedirectNew, ( httpd_host_t *, const char *psz_url_dst, const char *psz_url_src ) );
 VLC_EXPORT( void,               httpd_RedirectDelete, ( httpd_redirect_t * ) );
 
 
-VLC_EXPORT( httpd_stream_t *, httpd_StreamNew,    ( httpd_host_t *, char *psz_url, char *psz_mime, char *psz_user, char *psz_password, const vlc_acl_t *p_acl ) );
+VLC_EXPORT( httpd_stream_t *, httpd_StreamNew,    ( httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl ) );
 VLC_EXPORT( void,             httpd_StreamDelete, ( httpd_stream_t * ) );
 VLC_EXPORT( int,              httpd_StreamHeader, ( httpd_stream_t *, uint8_t *p_data, int i_data ) );
 VLC_EXPORT( int,              httpd_StreamSend,   ( httpd_stream_t *, uint8_t *p_data, int i_data ) );

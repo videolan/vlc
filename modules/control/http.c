@@ -42,7 +42,6 @@
 #include "vlc_vlm.h"
 #include "vlc_tls.h"
 #include "vlc_acl.h"
-#include "charset.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -198,7 +197,6 @@ struct intf_sys_t
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
-    char                *psz_html_type;
 };
 
 
@@ -240,23 +238,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
 
-    /* determine Content-Type value for HTML pages */
-    vlc_current_charset(&psz_src);
-    if( psz_src == NULL )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-    p_sys->psz_html_type = malloc( 20 + strlen( psz_src ) );
-    if( p_sys->psz_html_type == NULL )
-    {
-        free( p_sys );
-        free( psz_src );
-        return VLC_ENOMEM ;
-    }
-    sprintf( p_sys->psz_html_type, "text/html; charset=%s", psz_src );
-    free( psz_src );
-
     /* determine SSL configuration */
     psz_cert = config_GetPsz( p_intf, "http-intf-cert" );
     if ( psz_cert != NULL )
@@ -284,7 +265,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
-        free( p_sys->psz_html_type );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -358,7 +338,6 @@ failed:
         free( p_sys->pp_files );
     }
     httpd_HostDelete( p_sys->p_httpd_host );
-    free( p_sys->psz_html_type );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -395,7 +374,6 @@ void Close ( vlc_object_t *p_this )
     }
     httpd_HostDelete( p_sys->p_httpd_host );
 
-    free( p_sys->psz_html_type );
     free( p_sys );
 }
 
@@ -513,6 +491,7 @@ static char *FileToUrl( char *name, vlc_bool_t *pb_index )
 static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                            char *psz_dir )
 {
+    static const char mimetype[] = "text/html; charset=UTF-8";
     intf_sys_t     *p_sys = p_intf->p_sys;
     char           dir[MAX_DIR_SIZE];
 #ifdef HAVE_SYS_STAT_H
@@ -630,7 +609,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
             f->p_file = httpd_FileNew( p_sys->p_httpd_host,
                                        f->name,
-                                       f->b_html ? p_sys->psz_html_type : NULL,
+                                       f->b_html ? mimetype : NULL,
                                        user, password, p_acl,
                                        HttpCallback, f );
 
