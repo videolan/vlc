@@ -191,6 +191,18 @@ int VLC_Create( void )
         libvlc.b_color = VLC_FALSE;
 #endif
 
+        /*
+         * Global iconv
+         */
+        if( !vlc_current_charset( &psz_env ) )
+        {
+            vlc_mutex_init( p_libvlc, &libvlc.from_locale_lock );
+            vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
+            libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_env );
+            libvlc.to_locale = vlc_iconv_open( psz_env, "UTF-8" );
+        }
+        free( psz_env );
+
         /* Initialize message queue */
         msg_Create( p_libvlc );
 
@@ -964,6 +976,15 @@ int VLC_Destroy( int i_object )
      */
     msg_Flush( p_vlc );
     msg_Destroy( p_libvlc );
+
+    /* Destroy global iconv */
+    if( libvlc.to_locale != (vlc_iconv_t)(-1) )
+    {
+        vlc_mutex_destroy( &libvlc.from_locale_lock );
+        vlc_mutex_destroy( &libvlc.to_locale_lock );
+        vlc_iconv_close( libvlc.from_locale );
+        vlc_iconv_close( libvlc.to_locale );
+    }
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->config_lock );
@@ -2445,4 +2466,80 @@ static void InitDeviceValues( vlc_t *p_vlc )
         hal_shutdown( ctx );
     }
 #endif
+}
+
+/*****************************************************************************
+ * FromLocale: converts a locale string to UTF-8
+ *****************************************************************************/
+char *FromLocale( const char *locale )
+{
+    if( locale == NULL )
+        return NULL;
+
+    if( libvlc.from_locale != (vlc_iconv_t)(-1) )
+    {
+        char *iptr = (char *)locale, *output, *optr;
+        size_t inb, outb;
+
+        /*
+         * We are not allowed to modify the locale pointer, even if we cast it
+         * to non-const.
+         */
+        inb = strlen( locale );
+        outb = inb * 6 + 1;
+
+        /* FIXME: I'm not sure about the value for the multiplication
+         * (for western people, multiplication by 3 (Latin9) is sufficient) */
+        optr = output = calloc( outb , 1);
+
+        vlc_mutex_lock( &libvlc.from_locale_lock );
+        while( vlc_iconv( libvlc.from_locale, &iptr, &inb, &optr, &outb )
+                                                               == (size_t)-1 )
+            *iptr = '?'; /* should not happen, and yes, it sucks */
+        vlc_mutex_unlock( &libvlc.from_locale_lock );
+
+        return realloc( output, strlen( output ) + 1 );
+    }
+    return (char *)locale;
+}
+
+/*****************************************************************************
+ * ToLocale: converts an UTF-8 string to locale
+ *****************************************************************************/
+char *ToLocale( const char *utf8 )
+{
+    if( utf8 == NULL )
+        return NULL;
+
+    if( libvlc.to_locale != (vlc_iconv_t)(-1) )
+    {
+        char *iptr = (char *)utf8, *output, *optr;
+        size_t inb, outb;
+
+        /*
+         * We are not allowed to modify the locale pointer, even if we cast it
+         * to non-const.
+         */
+        inb = strlen( utf8 );
+        /* FIXME: I'm not sure about the value for the multiplication
+         * (for western people, multiplication is not needed) */
+        outb = inb * 2 + 1;
+
+        optr = output = calloc( outb, 1 );
+        vlc_mutex_lock( &libvlc.to_locale_lock );
+        while( vlc_iconv( libvlc.to_locale, &iptr, &inb, &optr, &outb )
+                                                               == (size_t)-1 )
+            *iptr = '?'; /* should not happen, and yes, it sucks */
+        vlc_mutex_unlock( &libvlc.to_locale_lock );
+
+        return realloc( output, strlen( output ) + 1 );
+    }
+
+    return (char *)utf8;
+}
+
+void LocaleFree( const char *str )
+{
+    if( ( str != NULL ) && ( libvlc.to_locale != (vlc_iconv_t)(-1) ) )
+        free( (char *)str );
 }

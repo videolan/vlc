@@ -51,6 +51,12 @@ struct libvlc_t
     /* The message bank */
     msg_bank_t             msg_bank;
 
+    /* UTF-8 conversion */
+    vlc_mutex_t            from_locale_lock;
+    vlc_mutex_t            to_locale_lock;
+    vlc_iconv_t            from_locale;
+    vlc_iconv_t            to_locale;
+
     /* The module bank */
     module_bank_t *        p_module_bank;
 
