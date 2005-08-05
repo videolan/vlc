@@ -41,6 +41,7 @@
                 "o_extWin_vidFlts_sepe" = id; 
                 "o_extended_window" = id; 
                 "o_lbl_adjustImage" = id; 
+                "o_lbl_audio" = id; 
                 "o_lbl_audioFlts" = id; 
                 "o_lbl_brightness" = id; 
                 "o_lbl_contrast" = id; 
@@ -48,6 +49,7 @@
                 "o_lbl_hue" = id; 
                 "o_lbl_maxLevel" = id; 
                 "o_lbl_saturation" = id; 
+                "o_lbl_video" = id; 
                 "o_lbl_videoFlts" = id; 
                 "o_sld_brightness" = id; 
                 "o_sld_contrast" = id; 

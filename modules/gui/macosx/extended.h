@@ -42,6 +42,8 @@
     IBOutlet id o_lbl_audioFlts;
     IBOutlet id o_lbl_videoFlts;
     IBOutlet id o_lbl_adjustImage;
+    IBOutlet id o_lbl_video;
+    IBOutlet id o_lbl_audio;
     IBOutlet id o_extWin_adjImg_sepe;
     IBOutlet id o_extWin_vidFlts_sepe;
     IBOutlet id o_box_vidFlts;

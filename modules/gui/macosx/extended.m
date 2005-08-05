@@ -26,9 +26,9 @@
  * Note: 
  * the code used to bind with VLC's modules is heavily based upon 
  * ../wxwidgets/extrapanel.cpp, written by Clément Stenac.
- * the code used to insert/remove the view and resize/remove the other stuff
- * was inspired by intf.m, written by Derk-Jan Hartman. 
- * (both are members of the VideoLAN team) 
+ * the code used to insert/remove the views was inspired by intf.m, 
+ * written by Derk-Jan Hartman and Benjamin Pracht. 
+ * (all 3 are members of the VideoLAN team) 
  *****************************************************************************/
 
 
@@ -72,6 +72,29 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* localise GUI-strings */
     /* method is called from intf.m (in method showExtended) */
+    [o_extended_window setTitle: _NS("Extended controls")];
+    [o_lbl_video setStringValue: _NS("Video")];
+    [o_lbl_audio setStringValue: _NS("Audio")];
+    [o_lbl_audioFlts setStringValue: _NS("Audio filters")];
+    [o_lbl_videoFlts setStringValue: _NS("Video filters")];
+    [o_lbl_adjustImage setStringValue: _NS("Adjust Image")];
+    [o_btn_vidFlts_mrInfo setTitle: _NS("More Info")];
+    [o_ckb_blur setTitle: _NS("Blurring")];
+    [o_ckb_distortion setTitle: _NS("Distortion")];
+    [o_ckb_imgClone setTitle: _NS("Image clone")];
+    [o_ckb_imgCrop setTitle: _NS("Image cropping")];
+    [o_ckb_imgInvers setTitle: _NS("Image inversion")];
+    [o_ckb_trnsform setTitle: _NS("Transformation")];
+    [o_ckb_vlme_norm setTitle: _NS("Volume normalization")];
+    [o_ckb_hdphnVirt setTitle: _NS("Headphone virtualization")];
+    [o_lbl_maxLevel setStringValue: _NS("Maximum level")];
+    [o_btn_rstrDefaults setTitle: _NS("Restore Defaults")];
+    [o_ckb_enblAdjustImg setTitle: _NS("Enable")];
+    [o_lbl_brightness setStringValue: _NS("Brightness")];
+    [o_lbl_contrast setStringValue: _NS("Contrast")];
+    [o_lbl_gamma setStringValue: _NS("Gamma")];
+    [o_lbl_hue setStringValue: _NS("Hue")];
+    [o_lbl_saturation setStringValue: _NS("Saturation")];
 }
 
 - (void)awakeFromNib
@@ -217,6 +240,9 @@ static VLCExtended *_o_sharedInstance = nil;
         } else if (sender == o_sld_saturation)
         {
             config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100);
+        } else {
+            msg_Warn( p_intf, "cannot find adjust-image-subfilter related to " \
+                "moved slider");
         }
     } else {
         vlc_value_t val;
@@ -245,6 +271,9 @@ static VLCExtended *_o_sharedInstance = nil;
             val.f_float = [o_sld_saturation floatValue] / 100;
             var_Set( p_vout, "saturation", val );
             config_PutFloat( p_intf , "saturation" , [o_sld_saturation floatValue] / 100);
+        } else {
+            msg_Warn( p_intf, "cannot find adjust-image-subfilter related to " \
+                "moved slider");
         }
     }
 }
@@ -324,6 +353,7 @@ static VLCExtended *_o_sharedInstance = nil;
     if (o_adjImg_expanded)
     {
         o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height - 151;
+        msg_Dbg( VLCIntf, "collapsed adjust-image section");
         o_adjImg_expanded = NO;
     } else {
         /* insert view */
@@ -332,6 +362,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_adjustImg_view setNeedsDisplay:YES];
         [o_adjustImg_view setAutoresizesSubviews: YES];
         [[o_box_adjImg contentView] addSubview: o_adjustImg_view];
+        msg_Dbg( VLCIntf, "expanded adjust-image section");
         o_adjImg_expanded = YES;
     }
     [o_box_adjImg setFrameFromContentFrame: o_box_adjImg_rect];
@@ -364,6 +395,7 @@ static VLCExtended *_o_sharedInstance = nil;
     if (o_audFlts_expanded)
     {
         o_box_audFlts_rect.size.height = [o_box_audFlts frame].size.height - 66;
+        msg_Dbg( VLCIntf, "collapsed audio-filters section");
         o_audFlts_expanded = NO;
     } else {
         /* insert view */
@@ -372,6 +404,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_audioFlts_view setNeedsDisplay:YES];
         [o_audioFlts_view setAutoresizesSubviews: YES];
         [[o_box_audFlts contentView] addSubview: o_audioFlts_view];
+        msg_Dbg( VLCIntf, "expanded audio-filters section");
         o_audFlts_expanded = YES;
     }
     [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
@@ -409,6 +442,7 @@ static VLCExtended *_o_sharedInstance = nil;
     if (o_vidFlts_expanded)
     {
         o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height - 134;
+        msg_Dbg( VLCIntf, "collapsed video-filters section");
         o_vidFlts_expanded = NO;
     } else {
         /* insert view */
@@ -417,6 +451,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_videoFilters_view setNeedsDisplay:YES];
         [o_videoFilters_view setAutoresizesSubviews: YES];
         [[o_box_vidFlts contentView] addSubview: o_videoFilters_view];
+        msg_Dbg( VLCIntf, "expanded video-filters section");
         o_vidFlts_expanded = YES;
     }
     [o_box_vidFlts setFrameFromContentFrame: o_box_vidFlts_rect];
@@ -425,6 +460,33 @@ static VLCExtended *_o_sharedInstance = nil;
 - (IBAction)vidFlts:(id)sender
 {
     /* en-/disable video filters */
+    if (sender == o_ckb_blur)
+    {
+        [self changeVFiltersString: "motionblur" onOrOff: [o_ckb_blur state]];
+    }
+    else if (sender == o_ckb_distortion)
+    {
+        [self changeVFiltersString: "distort" onOrOff: [o_ckb_distortion state]];
+    }
+    else if (sender == o_ckb_imgClone)
+    {
+        [self changeVFiltersString: "clone" onOrOff: [o_ckb_imgClone state]];
+    }
+    else if (sender == o_ckb_imgCrop)
+    {
+        [self changeVFiltersString: "crop" onOrOff: [o_ckb_imgCrop state]];
+    }
+    else if (sender == o_ckb_imgInvers)
+    {
+        [self changeVFiltersString: "invert" onOrOff: [o_ckb_imgInvers state]];
+    }
+    else if (sender == o_ckb_trnsform)
+    {
+        [self changeVFiltersString: "transform" onOrOff: [o_ckb_trnsform state]];
+    } else {
+        /* this shouldn't happen */
+        msg_Warn (VLCIntf, "cannot find selected video-filter");
+    }
 }
 
 - (IBAction)vidFlts_mrInfo:(id)sender
