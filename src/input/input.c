@@ -1098,13 +1098,13 @@ static void End( input_thread_t * p_input )
         if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool && p_pl )
         {
             /* attach sout to the playlist */
-            msg_Warn( p_input, "keeping sout" );
+            msg_Dbg( p_input, "keeping sout" );
             vlc_object_detach( p_input->p_sout );
             vlc_object_attach( p_input->p_sout, p_pl );
         }
         else
         {
-            msg_Warn( p_input, "destroying sout" );
+            msg_Dbg( p_input, "destroying sout" );
             sout_DeleteInstance( p_input->p_sout );
         }
         if( p_pl )
