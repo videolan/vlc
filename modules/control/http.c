@@ -1212,7 +1212,7 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                                 char *psz_dir )
 {
     mvar_t *s = mvar_New( name, "set" );
-    char           tmp[MAX_DIR_SIZE], *p, *src;
+    char          tmp[MAX_DIR_SIZE], dir[MAX_DIR_SIZE], *p, *src;
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 #endif
@@ -1255,6 +1255,15 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     {
         return s;
     }
+
+    if( *psz_dir == '~' )
+    {
+        /* This is incomplete : we should also support the ~cmassiot/ syntax. */
+        snprintf( dir, sizeof(dir), "%s/%s", p_intf->p_vlc->psz_homedir,
+                  psz_dir + 1 );
+        psz_dir = dir;
+    }
+
     /* first fix all .. dir */
     p = src = psz_dir;
     while( *src )
@@ -1332,7 +1341,7 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
             continue;
         }
 
-        sprintf( tmp, "%s/%s", psz_dir, p_dir_content->d_name );
+        snprintf( tmp, sizeof(tmp), "%s/%s", psz_dir, p_dir_content->d_name );
 
 #ifdef HAVE_SYS_STAT_H
         if( stat( tmp, &stat_info ) == -1 )
@@ -1346,7 +1355,7 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                                            p_dir_content->d_name );
         psz_name = FromUTF8( p_intf, psz_tmp );
         free( psz_tmp );
-        sprintf( tmp, "%s/%s", psz_dir, psz_name );
+        snprintf( tmp, sizeof(tmp), "%s/%s", psz_dir, psz_name );
         mvar_AppendNewVar( f, "name", tmp );
         mvar_AppendNewVar( f, "basename", psz_name );
 
