@@ -342,17 +342,23 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         /* Don't warn immediately ... 100ms seems OK */
         if( i_delay == 2 )
         {
-            msg_Warn( p_this, "refcount is %i, delaying before deletion",
-                              p_this->i_refcount );
+            msg_Warn( p_this,
+                  "refcount is %i, delaying before deletion (id=%d,type=%d)",
+                  p_this->i_refcount, p_this->i_object_id,
+                  p_this->i_object_type );
         }
-        else if( i_delay == 12 )
+        else if( i_delay == 10 )
         {
-            msg_Err( p_this, "refcount is %i, I have a bad feeling about this",
-                             p_this->i_refcount );
+            msg_Err( p_this,
+                  "refcount is %i, delaying again (id=%d,type=%d)",
+                  p_this->i_refcount, p_this->i_object_id,
+                  p_this->i_object_type );
         }
-        else if( i_delay == 42 )
+        else if( i_delay == 20 )
         {
-            msg_Err( p_this, "we waited too long, cancelling destruction" );
+            msg_Err( p_this,
+                  "we waited too long, cancelling destruction (id=%d,type=%d)",
+                  p_this->i_object_id, p_this->i_object_type );
             return;
         }
 
