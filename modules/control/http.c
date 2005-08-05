@@ -3077,6 +3077,8 @@ static void SSPushN( rpn_stack_t *st, int i )
 static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                           rpn_stack_t *st, char *exp )
 {
+    intf_sys_t    *p_sys = p_intf->p_sys;
+
     for( ;; )
     {
         char s[100], *p;
@@ -3346,6 +3348,49 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             free( url );
             SSPush( st, value );
             free( value );
+        }
+        /* 5. player control */
+        else if( !strcmp( s, "play" ) )
+        {
+            int i_id = SSPopN( st, vars );
+            int i_ret;
+
+            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_ITEMPLAY,
+                                      playlist_ItemGetById( p_sys->p_playlist,
+                                      i_id ) );
+            msg_Dbg( p_intf, "requested playlist item: %i", i_id );
+            SSPushN( st, i_ret );
+        }
+        /* 6. playlist functions */
+        else if( !strcmp( s, "playlist_add" ) )
+        {
+            char *psz_name = SSPop( st );
+            char *mrl = SSPop( st );
+            playlist_item_t *p_item;
+            int i_id;
+
+            if( !*psz_name )
+            {
+                p_item = parse_MRL( p_intf, mrl, mrl );
+            }
+            else
+            {
+                p_item = parse_MRL( p_intf, mrl, psz_name );
+            }
+
+            if( p_item == NULL || p_item->input.psz_uri == NULL ||
+                !*p_item->input.psz_uri )
+            {
+                i_id = VLC_EGENERIC;
+                msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
+            }
+            else
+            {
+                i_id = playlist_AddItem( p_sys->p_playlist, p_item,
+                                         PLAYLIST_APPEND, PLAYLIST_END );
+                msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+            }
+            SSPushN( st, i_id );
         }
         else
         {
