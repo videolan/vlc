@@ -275,6 +275,7 @@ static VLCExtended *_o_sharedInstance = nil;
             msg_Warn( p_intf, "cannot find adjust-image-subfilter related to " \
                 "moved slider");
         }
+        vlc_object_release( p_vout );
     }
 }
 

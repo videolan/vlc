@@ -1311,6 +1311,14 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t * p_playlist;
     vout_thread_t * p_vout;
 
+#define p_input p_intf->p_sys->p_input
+    if( p_input )
+    {
+        vlc_object_release( p_input );
+        p_input = NULL;
+    }
+#undef p_input
+
     /* Stop playback */
     if( ( p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                         FIND_ANYWHERE ) ) )

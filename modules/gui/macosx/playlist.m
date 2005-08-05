@@ -145,8 +145,13 @@
     int i_return = 0;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL || outlineView != o_outline_view )
+    if( p_playlist == NULL )
         return 0;
+    if( outlineView != o_outline_view )
+    {
+        vlc_object_release( p_playlist );
+        return 0;
+    }
 
     if( item == nil )
     {
@@ -752,6 +757,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         playlist_Export( p_playlist, [[o_save_panel filename] fileSystemRepresentation], "export-m3u" );
     }
+    vlc_object_release( p_playlist );
 }
 
 

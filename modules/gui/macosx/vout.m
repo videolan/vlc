@@ -497,8 +497,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         return;
     }
     
-    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT,
-                                                FIND_PARENT );
+    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
     
     if( p_input == NULL )
     {
@@ -514,7 +513,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( o_title == nil )
         o_title = o_mrl;
 
-    vlc_object_release( p_input );
     if( o_mrl != nil )
     {
         if( p_input->input.p_access && !strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
@@ -530,6 +528,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     {
         [self setTitle: [NSString stringWithCString: VOUT_TITLE]];
     }
+    vlc_object_release( p_input );
 }
 
 /* This is actually the same as VLCControls::stop. */

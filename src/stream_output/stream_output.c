@@ -77,16 +77,15 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         msg_Warn( p_parent, "cannot get sout-keep value" );
         keep.b_bool = VLC_FALSE;
     }
-    else if( keep.b_bool )
+    if( keep.b_bool )
     {
-        msg_Warn( p_parent, "sout-keep true" );
         if( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT,
-                                        FIND_ANYWHERE ) ) )
+                                        FIND_ANYWHERE ) ) != NULL )
         {
             if( !strcmp( p_sout->psz_sout, psz_dest ) )
             {
-                msg_Warn( p_parent, "sout keep : reusing sout" );
-                msg_Warn( p_parent, "sout keep : you probably want to use "
+                msg_Dbg( p_parent, "sout keep : reusing sout" );
+                msg_Dbg( p_parent, "sout keep : you probably want to use "
                           "gather stream_out" );
                 vlc_object_detach( p_sout );
                 vlc_object_attach( p_sout, p_parent );
@@ -95,7 +94,8 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
             }
             else
             {
-                msg_Warn( p_parent, "sout keep : destroying unusable sout" );
+                msg_Dbg( p_parent, "sout keep : destroying unusable sout" );
+                vlc_object_release( p_sout );
                 sout_DeleteInstance( p_sout );
             }
         }
@@ -103,9 +103,10 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     else if( !keep.b_bool )
     {
         while( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT,
-                                           FIND_PARENT ) ) )
+                                           FIND_PARENT ) ) != NULL )
         {
-            msg_Warn( p_parent, "sout keep : destroying old sout" );
+            msg_Dbg( p_parent, "sout keep : destroying old sout" );
+            vlc_object_release( p_sout );
             sout_DeleteInstance( p_sout );
         }
     }
