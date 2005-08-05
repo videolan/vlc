@@ -789,7 +789,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
  * var and set handling
  ****************************************************************************/
 
-static mvar_t *mvar_New( char *name, char *value )
+static mvar_t *mvar_New( const char *name, const char *value )
 {
     mvar_t *v = malloc( sizeof( mvar_t ) );
 
@@ -826,7 +826,7 @@ static void mvar_AppendVar( mvar_t *v, mvar_t *f )
     v->i_field++;
 }
 
-static mvar_t *mvar_Duplicate( mvar_t *v )
+static mvar_t *mvar_Duplicate( const mvar_t *v )
 {
     int i;
     mvar_t *n;
@@ -874,7 +874,7 @@ static void mvar_RemoveVar( mvar_t *v, mvar_t *f )
     /* FIXME should do a realloc */
 }
 
-static mvar_t *mvar_GetVar( mvar_t *s, char *name )
+static mvar_t *mvar_GetVar( mvar_t *s, const char *name )
 {
     int i;
     char base[512], *field, *p;
@@ -955,13 +955,15 @@ static char *mvar_GetValue( mvar_t *v, char *field )
     }
 }
 
-static void mvar_PushNewVar( mvar_t *vars, char *name, char *value )
+static void mvar_PushNewVar( mvar_t *vars, const char *name,
+                             const char *value )
 {
     mvar_t *f = mvar_New( name, value );
     mvar_PushVar( vars, f );
 }
 
-static void mvar_AppendNewVar( mvar_t *vars, char *name, char *value )
+static void mvar_AppendNewVar( mvar_t *vars, const char *name,
+                               const char *value )
 {
     mvar_t *f = mvar_New( name, value );
     mvar_AppendVar( vars, f );
@@ -969,7 +971,7 @@ static void mvar_AppendNewVar( mvar_t *vars, char *name, char *value )
 
 
 /* arg= start[:stop[:step]],.. */
-static mvar_t *mvar_IntegerSetNew( char *name, char *arg )
+static mvar_t *mvar_IntegerSetNew( const char *name, const char *arg )
 {
     char *dup = strdup( arg );
     char *str = dup;
@@ -3337,7 +3339,7 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "url_encode" ) )
         {
             char *url = SSPop( st );
-            char *value, *tmp;
+            char *value;
 
             url = ToUTF8( p_intf, url );
             value = vlc_UrlEncode( url );
