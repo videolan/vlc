@@ -30,7 +30,8 @@ VLC_EXPORT( void, LocaleFree, ( const char * ) );
 VLC_EXPORT( char *, FromLocale, ( const char * ) );
 VLC_EXPORT( char *, ToLocale, ( const char * ) );
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
-VLC_EXPORT( char *, vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) );
+#define vlc_fix_readdir_charset(a,b) __vlc_fix_readdir_charset(VLC_OBJECT(a),b)
 
 # ifdef __cplusplus
 }

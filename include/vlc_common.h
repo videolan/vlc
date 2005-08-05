@@ -838,6 +838,20 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_strtoll NULL
 #endif
 
+#ifndef HAVE_SCANDIR
+#   define scandir vlc_scandir
+#   define alphasort vlc_alphasort
+    VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist,
+                                    int (*filter) ( const struct dirent * ),
+                                    int (*compar) ( const struct dirent **,
+                                                    const struct dirent ** ) ) );
+    VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a,
+                                      const struct dirent **b ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_scandir NULL
+#   define vlc_alphasort NULL
+#endif
+
 #ifndef HAVE_GETENV
 #   define getenv vlc_getenv
     VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );

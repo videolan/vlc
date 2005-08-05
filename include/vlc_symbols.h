@@ -387,7 +387,8 @@ struct module_symbols_t
     void (*LocaleFree_inner) (const char *);
     char * (*ToLocale_inner) (const char *);
     char * (*EnsureUTF8_inner) (char *);
-    char * (*vlc_fix_readdir_charset_inner) (vlc_object_t *, const char *);
+    void *vlc_fix_readdir_charset_deprecated;
+    char * (*__vlc_fix_readdir_charset_inner) (vlc_object_t *, const char *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -760,7 +761,7 @@ struct module_symbols_t
 #  define LocaleFree (p_symbols)->LocaleFree_inner
 #  define ToLocale (p_symbols)->ToLocale_inner
 #  define EnsureUTF8 (p_symbols)->EnsureUTF8_inner
-#  define vlc_fix_readdir_charset (p_symbols)->vlc_fix_readdir_charset_inner
+#  define __vlc_fix_readdir_charset (p_symbols)->__vlc_fix_readdir_charset_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1136,8 +1137,9 @@ struct module_symbols_t
     ((p_symbols)->LocaleFree_inner) = LocaleFree; \
     ((p_symbols)->ToLocale_inner) = ToLocale; \
     ((p_symbols)->EnsureUTF8_inner) = EnsureUTF8; \
-    ((p_symbols)->vlc_fix_readdir_charset_inner) = vlc_fix_readdir_charset; \
+    ((p_symbols)->__vlc_fix_readdir_charset_inner) = __vlc_fix_readdir_charset; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
+    (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */

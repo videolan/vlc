@@ -7,6 +7,7 @@
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -318,6 +319,55 @@ int64_t vlc_strtoll( const char *nptr, char **endptr, int base )
 int64_t vlc_atoll( const char *nptr )
 {
     return strtoll( nptr, (char **)NULL, 10 );
+}
+#endif
+
+/*****************************************************************************
+ * scandir: scan a directory alpha-sorted
+ *****************************************************************************/
+#if !defined( HAVE_SCANDIR )
+int vlc_alphasort( const struct dirent **a, const struct dirent **b )
+{
+    return strcoll( (*a)->d_name, (*b)->d_name );
+}
+
+int vlc_scandir( const char *name, struct dirent ***namelist,
+                    int (*filter) ( const struct dirent * ),
+                    int (*compar) ( const struct dirent **,
+                                    const struct dirent ** ) )
+{
+    DIR            * p_dir;
+    struct dirent  * p_content;
+    struct dirent ** pp_list;
+    int              ret, size;
+
+    if( !namelist || !( p_dir = opendir( name ) ) ) return -1;
+
+    ret     = 0;
+    pp_list = NULL;
+    while( ( p_content = readdir( p_dir ) ) )
+    {
+        if( filter && !filter( p_content ) )
+        {
+            continue;
+        }
+        pp_list = realloc( pp_list, ( ret + 1 ) * sizeof( struct dirent * ) );
+        size = sizeof( struct dirent ) + strlen( p_content->d_name ) + 1;
+        pp_list[ret] = malloc( size );
+        memcpy( pp_list[ret], p_content, size );
+        ret++;
+    }
+
+    closedir( p_dir );
+
+    if( compar )
+    {
+        qsort( pp_list, ret, sizeof( struct dirent * ),
+               (int (*)(const void *, const void *)) compar );
+    }
+
+    *namelist = pp_list;
+    return ret;
 }
 #endif
 

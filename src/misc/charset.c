@@ -336,7 +336,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     return VLC_FALSE;
 }
 
-char *vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
+char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
 {
 #ifdef SYS_DARWIN
     if ( p_this->p_libvlc->iconv_macosx != (vlc_iconv_t)-1 )

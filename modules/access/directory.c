@@ -4,7 +4,7 @@
  * Copyright (C) 2002-2004 the VideoLAN team
  * $Id$
  *
- * Authors: Derk-Jan Hartman <hartman at videolan dot org>>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -364,53 +364,6 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     return demux2_vaControlHelper( p_demux->s, 0, 0, 0, 1, i_query, args );
 }
 
-#if defined(SYS_BEOS) || defined(WIN32) || defined(SYS_SOLARIS)
-/* BeOS doesn't have scandir/alphasort/versionsort */
-static int alphasort( const struct dirent **a, const struct dirent **b )
-{
-    return strcoll( (*a)->d_name, (*b)->d_name );
-}
-
-static int scandir( const char *name, struct dirent ***namelist,
-                    int (*filter) ( const struct dirent * ),
-                    int (*compar) ( const struct dirent **,
-                                    const struct dirent ** ) )
-{
-    DIR            * p_dir;
-    struct dirent  * p_content;
-    struct dirent ** pp_list;
-    int              ret, size;
-
-    if( !namelist || !( p_dir = opendir( name ) ) ) return -1;
-
-    ret     = 0;
-    pp_list = NULL;
-    while( ( p_content = readdir( p_dir ) ) )
-    {
-        if( filter && !filter( p_content ) )
-        {
-            continue;
-        }
-        pp_list = realloc( pp_list, ( ret + 1 ) * sizeof( struct dirent * ) );
-        size = sizeof( struct dirent ) + strlen( p_content->d_name ) + 1;
-        pp_list[ret] = malloc( size );
-        memcpy( pp_list[ret], p_content, size );
-        ret++;
-    }
-
-    closedir( p_dir );
-
-    if( compar )
-    {
-        qsort( pp_list, ret, sizeof( struct dirent * ),
-               (int (*)(const void *, const void *)) compar );
-    }
-
-    *namelist = pp_list;
-    return ret;
-}
-#endif
-
 static int Filter( const struct dirent *foo )
 {
     return VLC_TRUE;
@@ -507,14 +460,12 @@ static int ReadDir( playlist_t *p_playlist,
                         /* Skip the parent path + the separator */
                         psz_subdir += strlen( psz_name ) + 1;
                         psz_newname = vlc_fix_readdir_charset(
-                                                VLC_OBJECT(p_playlist),
-                                                psz_subdir );
+                                                p_playlist, psz_subdir );
                     }
                     else
                     {
                         psz_newname = vlc_fix_readdir_charset(
-                                                VLC_OBJECT(p_playlist),
-                                                psz_name );
+                                                p_playlist, psz_name );
                     }
                     p_node = playlist_NodeCreate( p_playlist,
                                        p_parent->pp_parents[0]->i_view,

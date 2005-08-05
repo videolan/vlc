@@ -713,11 +713,10 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             f->p_file = NULL;
             f->p_redir = NULL;
             f->p_redir2 = NULL;
-            psz_tmp = vlc_fix_readdir_charset( VLC_OBJECT(p_intf),
-                                               dir );
+            psz_tmp = vlc_fix_readdir_charset( p_intf, dir );
             f->file = FromUTF8( p_intf, psz_tmp );
             free( psz_tmp );
-            psz_tmp = vlc_fix_readdir_charset( VLC_OBJECT(p_intf),
+            psz_tmp = vlc_fix_readdir_charset( p_intf,
                                                &dir[strlen( psz_root )] );
             f->name = FileToUrl( psz_tmp, &b_index );
             free( psz_tmp );
@@ -1208,6 +1207,12 @@ static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 }
 #endif
 
+/* Utility function for scandir */
+static int Filter( const struct dirent *foo )
+{
+    return VLC_TRUE;
+}
+
 static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                                 char *psz_dir )
 {
@@ -1216,8 +1221,8 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 #endif
-    DIR           *p_dir;
-    struct dirent *p_dir_content;
+    struct dirent **pp_dir_content;
+    int           i_dir_content, i;
     char          sep;
 
     /* convert all / to native separator */
@@ -1312,30 +1317,29 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     }
 #endif
 
-    if( ( p_dir = opendir( psz_dir ) ) == NULL )
+    /* parse psz_src dir */
+    if( ( i_dir_content = scandir( psz_dir, &pp_dir_content, Filter,
+                                   alphasort ) ) == -1 )
     {
-        fprintf( stderr, "cannot open dir (%s)", psz_dir );
+        msg_Warn( p_intf, "scandir error on %s (%s)", psz_dir,
+                  strerror(errno) );
         return s;
     }
 
-    /* remove traling / or \ */
+    /* remove trailing / or \ */
     for( p = &psz_dir[strlen( psz_dir) - 1];
          p >= psz_dir && ( *p =='/' || *p =='\\' ); p-- )
     {
         *p = '\0';
     }
 
-    for( ;; )
+    for( i = 0; i < i_dir_content; i++ )
     {
+        struct dirent *p_dir_content = pp_dir_content[i];
         mvar_t *f;
         const char *psz_ext;
         char *psz_name, *psz_tmp;
 
-        /* parse psz_src dir */
-        if( ( p_dir_content = readdir( p_dir ) ) == NULL )
-        {
-            break;
-        }
         if( !strcmp( p_dir_content->d_name, "." ) )
         {
             continue;
@@ -1351,8 +1355,7 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
 #endif
         f = mvar_New( name, "set" );
 
-        psz_tmp = vlc_fix_readdir_charset( VLC_OBJECT(p_intf),
-                                           p_dir_content->d_name );
+        psz_tmp = vlc_fix_readdir_charset( p_intf, p_dir_content->d_name );
         psz_name = FromUTF8( p_intf, psz_tmp );
         free( psz_tmp );
         snprintf( tmp, sizeof(tmp), "%s/%s", psz_dir, psz_name );
