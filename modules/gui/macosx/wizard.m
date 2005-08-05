@@ -23,8 +23,8 @@
 
 
 /*****************************************************************************
- * Note: this code is partially based upon ../wxwindows/wizard.cpp and
- *         ../wxwindows/streamdata.h; both written by Clément Stenac.
+ * Note: this code is partially based upon ../wxwidgets/wizard.cpp and
+ *         ../wxwidgets/streamdata.h; both written by Clément Stenac.
  *****************************************************************************/
 
 
@@ -338,7 +338,7 @@ static VLCWizard *_o_sharedInstance = nil;
 - (void)initStrings
 {
     /* localise all strings to the users lang */
-    /* method is called from intf.m (in method openWizard) */
+    /* method is called from intf.m (in method showWizard) */
 
     /* general items */
     [o_btn_backward setTitle: _NS("Back")];

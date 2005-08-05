@@ -299,7 +299,7 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
 #endif
 
     wxStaticBox *filter_box =
-                  new wxStaticBox( panel, -1, wxU(_("Video Filters")) );
+                  new wxStaticBox( panel, -1, wxU(_("Video filters")) );
     wxStaticBoxSizer *filter_sizer =
                    new wxStaticBoxSizer( filter_box, wxHORIZONTAL );
 
@@ -1005,7 +1005,7 @@ void ExtraPanel::OnFiltersInfo(wxCommandEvent& event)
                   "You can then configure each filter.\n"
                   "If you want fine control over the filters ( to choose "
                   "the order in which they are applied ), you need to enter "
-                  "manually a filters string (Preferences / General / Video)."
+                  "manually a filters string (Preferences / Video / Filters)."
                   ) ),
                     wxU( _("More information" ) ), wxOK | wxICON_INFORMATION,
                     this->p_parent );

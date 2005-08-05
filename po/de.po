@@ -10253,7 +10253,7 @@ msgstr "Steuerung"
 
 #: modules/gui/macosx/intf.m:532 modules/gui/wxwidgets/extrapanel.cpp:1213
 msgid "Extended controls"
-msgstr "Erweiterte Kontrollen"
+msgstr "Erweiterte Steuerung"
 
 #: modules/gui/macosx/intf.m:534 modules/gui/macosx/intf.m:561
 #: modules/gui/macosx/playlistinfo.m:202
@@ -11904,7 +11904,7 @@ msgstr "Bild justieren"
 #: modules/gui/wxwidgets/extrapanel.cpp:223
 #: modules/gui/wxwidgets/extrapanel.cpp:483
 msgid "Restore Defaults"
-msgstr "Standards wiederherstellen"
+msgstr "Standardwerte"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:241
 msgid "Saturation"
