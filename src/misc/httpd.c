@@ -565,7 +565,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
 
     p = answer->p_body = malloc( 1000 + strlen( rdir->psz_dst ) );
     p += sprintf( (char *)p,
-        "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+        "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
         "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
         "<html>\n"
@@ -2026,7 +2026,7 @@ static void httpd_HostThread( httpd_host_t *host )
                         p = answer->p_body = malloc( 1000 );
 
                         p += sprintf( (char *)p,
-                            "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                            "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
                             "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                             "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                             "<html>\n"
@@ -2143,7 +2143,7 @@ static void httpd_HostThread( httpd_host_t *host )
 
                             /* FIXME: lots of code duplication */
                             p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                                "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
                                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                                 "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                                 "<html>\n"
@@ -2163,7 +2163,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             answer->psz_status = strdup( "Authorization Required" );
 
                             p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                                "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
                                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                                 "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                                 "<html>\n"
@@ -2184,7 +2184,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             answer->psz_status = strdup( "Not found" );
 
                             p += sprintf( (char *)p,
-                                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                                "<?xml version=\"1.0\" encoding=\"ascii\" ?>"
                                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
                                 "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
                                 "<html>\n"
