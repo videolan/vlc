@@ -472,7 +472,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     eq_2p_chkbox =  new wxCheckBox( panel, Eq2Pass_Event,
                             wxU(_("2 Pass") ) );
 
-    eq_2p_chkbox->SetToolTip( wxU(_("If you enable this settting, the "
+    eq_2p_chkbox->SetToolTip( wxU(_("If you enable this setting, the "
      "equalizer filter will be applied twice. The effect will be sharper.") ) );
 
     top_sizer->Add( eq_2p_chkbox, 0, wxALL, 2 );

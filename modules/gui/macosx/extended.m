@@ -38,7 +38,6 @@
 
 #import "extended.h"
 #import "intf.h"
-#import <vlc/vlc.h>
 #import <vlc/aout.h>
 #import <aout_internal.h>
 #import <vlc/vout.h>
@@ -80,13 +79,23 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_lbl_adjustImage setStringValue: _NS("Adjust Image")];
     [o_btn_vidFlts_mrInfo setTitle: _NS("More Info")];
     [o_ckb_blur setTitle: _NS("Blurring")];
+    [o_ckb_blur setToolTip: _NS("Creates a motion blurring on the image")];
     [o_ckb_distortion setTitle: _NS("Distortion")];
+    [o_ckb_distortion setToolTip: _NS("Adds distorsion effects")];
     [o_ckb_imgClone setTitle: _NS("Image clone")];
+    [o_ckb_imgClone setToolTip: _NS("Creates several clones of the image")];
     [o_ckb_imgCrop setTitle: _NS("Image cropping")];
+    [o_ckb_imgCrop setToolTip: _NS("Crops the image")];
     [o_ckb_imgInvers setTitle: _NS("Image inversion")];
+    [o_ckb_imgInvers setToolTip: _NS("Inverts the image colors")];
     [o_ckb_trnsform setTitle: _NS("Transformation")];
+    [o_ckb_trnsform setToolTip: _NS("Rotates or flips the image")];
     [o_ckb_vlme_norm setTitle: _NS("Volume normalization")];
+    [o_ckb_vlme_norm setToolTip: _NS("This filters prevents the audio output " \
+        "power from going over a defined value.")];
     [o_ckb_hdphnVirt setTitle: _NS("Headphone virtualization")];
+    [o_ckb_hdphnVirt setToolTip: _NS("This filter gives the feeling of a " \
+        "5.1 speaker set when using a headphone.")];
     [o_lbl_maxLevel setStringValue: _NS("Maximum level")];
     [o_btn_rstrDefaults setTitle: _NS("Restore Defaults")];
     [o_ckb_enblAdjustImg setTitle: _NS("Enable")];
@@ -95,6 +104,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_lbl_gamma setStringValue: _NS("Gamma")];
     [o_lbl_hue setStringValue: _NS("Hue")];
     [o_lbl_saturation setStringValue: _NS("Saturation")];
+    
 }
 
 - (void)awakeFromNib
@@ -124,7 +134,6 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_hue setEnabled: NO];
         [o_sld_saturation setEnabled: NO];
     }
-    if( psz_vfilters ) free( psz_vfilters );
 
     int i_value = config_GetInt( p_intf, "hue" );
     if( i_value > 0 && i_value < 360 )
@@ -158,6 +167,18 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setIntValue: (int)(10 * f_value) ];
     }
     
+    /* set the other video-filter-checkboxes to the correct values */
+    if( psz_vfilters )
+    {
+        [o_ckb_blur setState: (int)strstr( psz_vfilters, "motionblur")];
+        [o_ckb_distortion setState: (int)strstr( psz_vfilters, "distort")];
+        [o_ckb_imgClone setState: (int)strstr( psz_vfilters, "clone")];
+        [o_ckb_imgCrop setState: (int)strstr( psz_vfilters, "crop")];
+        [o_ckb_imgInvers setState: (int)strstr( psz_vfilters, "invert")];
+        [o_ckb_trnsform setState: (int)strstr( psz_vfilters, "transform")];
+        
+        free( psz_vfilters );
+    }
     
     /* set the audio-filter-checkboxes to the values taken from the prefs */
     char * psz_afilters;
@@ -166,8 +187,12 @@ static VLCExtended *_o_sharedInstance = nil;
     {
         [o_ckb_hdphnVirt setState: (int)strstr( psz_afilters, "headphone" ) ];
         [o_ckb_vlme_norm setState: (int)strstr( psz_afilters, "normvol" ) ];
+        
         free( psz_afilters );
     }
+    
+    [o_sld_maxLevel setFloatValue: (config_GetFloat(p_intf, "norm-max-level") \
+        * 10)];
 }
 
 - (void)showPanel
@@ -188,7 +213,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setEnabled: YES];
         [o_sld_hue setEnabled: YES];
         [o_sld_saturation setEnabled: YES];
-        [self changeVFiltersString: "adjust" onOrOff: YES];
+        [self changeVFiltersString: "adjust" onOrOff: VLC_TRUE];
     }else{
         [o_btn_rstrDefaults setEnabled: NO];
         [o_sld_brightness setEnabled: NO];
@@ -196,7 +221,7 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_gamma setEnabled: NO];
         [o_sld_hue setEnabled: NO];
         [o_sld_saturation setEnabled: NO];
-        [self changeVFiltersString: "adjust" onOrOff: NO];
+        [self changeVFiltersString: "adjust" onOrOff: VLC_FALSE];
     }
 }
 
@@ -284,9 +309,9 @@ static VLCExtended *_o_sharedInstance = nil;
     /* en-/disable headphone virtualisation */
     if ([o_ckb_hdphnVirt state] == NSOnState)
     {
-        [self changeAFiltersString: "headphone" onOrOff: YES ];
+        [self changeAFiltersString: "headphone" onOrOff: VLC_TRUE ];
     }else{
-        [self changeAFiltersString: "headphone" onOrOff: NO ];
+        [self changeAFiltersString: "headphone" onOrOff: VLC_FALSE ];
     }
 }
 
@@ -503,7 +528,7 @@ static VLCExtended *_o_sharedInstance = nil;
         "string (Preferences / Video / Filters)."));
 }
 
-- (void)changeVFiltersString:(char *)psz_name onOrOff:(BOOL)o_onOrOff 
+- (void)changeVFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add 
 {
     /* copied from ../wxwidgets/extrapanel.cpp
      * renamed to conform with Cocoa's rules */
@@ -518,7 +543,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
     psz_parser = strstr( psz_string, psz_name );
 
-    if( o_onOrOff )
+    if( b_add )
     {
         if( !psz_parser )
         {
@@ -565,10 +590,12 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 
     free( psz_string );
+    
+    [self savePrefs];
 }
 
 
-- (void)changeAFiltersString: (char *)psz_name onOrOff: (BOOL)o_onOrOff;
+- (void)changeAFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
 {
     char *psz_parser, *psz_string;
     intf_thread_t * p_intf = VLCIntf;
@@ -588,7 +615,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
     psz_parser = strstr( psz_string, psz_name );
 
-    if( o_onOrOff )
+    if( b_add )
     {
         if( !psz_parser )
         {
@@ -638,5 +665,24 @@ static VLCExtended *_o_sharedInstance = nil;
         vlc_object_release( p_aout );
     }
     free( psz_string );
+    
+    [self savePrefs];
+}
+
+- (void)savePrefs
+{    
+    /* save the preferences to make sure that our module-changes will up on
+     * next launch again */
+    intf_thread_t * p_intf = VLCIntf;
+    int returnedValue;
+    
+    returnedValue = config_SaveConfigFile( p_intf, NULL);
+    if (returnedValue == 0)
+    {
+        msg_Dbg(p_intf, "VLCExtended: saved preferences successfully");
+    } else {
+        msg_Dbg(p_intf, "VLCExtended: error while saving the preferences (%i) " \
+            , returnedValue);
+    }
 }
 @end

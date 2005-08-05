@@ -26,6 +26,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import <vlc/vlc.h>
 
 @interface VLCExtended : NSObject
 {
@@ -80,9 +81,9 @@
     IBOutlet id o_sld_saturation;
     
     /* global variables */
-    BOOL * o_adjImg_expanded;
-    BOOL * o_audFlts_expanded;
-    BOOL * o_vidFlts_expanded;
+    BOOL o_adjImg_expanded;
+    BOOL o_audFlts_expanded;
+    BOOL o_vidFlts_expanded;
 }
 
 - (IBAction)adjImg_Enbl:(id)sender;
@@ -101,6 +102,7 @@
 
 - (void)showPanel;
 - (void)initStrings;
-- (void)changeVFiltersString: (char *)psz_name onOrOff: (BOOL)o_onOrOff;
-- (void)changeAFiltersString: (char *)psz_name onOrOff: (BOOL)o_onOrOff;
+- (void)changeVFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)changeAFiltersString: (char *)psz_name onOrOff: (vlc_bool_t )b_add;
+- (void)savePrefs;
 @end
