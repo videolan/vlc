@@ -37,6 +37,8 @@
 #include "vlc_filter.h"
 #include "osd.h"
 
+#define MASTER_SYNC_MAX_DRIFT 100000
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -1201,8 +1203,10 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
-            if ( i_dts == 1 )
+            if ( p_audio_buf->start_date - i_dts > MASTER_SYNC_MAX_DRIFT
+                  || p_audio_buf->start_date - i_dts < -MASTER_SYNC_MAX_DRIFT )
             {
+                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
                 date_Set( &id->interpolated_pts, p_audio_buf->start_date );
                 i_dts = p_audio_buf->start_date + 1;
             }
@@ -1609,8 +1613,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
             mtime_t i_pts;
 
             i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if ( i_pts == 1 )
+            if ( p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT
+                  || p_pic->date - i_pts < -MASTER_SYNC_MAX_DRIFT )
             {
+                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
                 date_Set( &id->interpolated_pts, p_pic->date );
                 i_pts = p_pic->date + 1;
             }
@@ -1849,8 +1855,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
         if( p_sys->b_master_sync )
         {
             mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if ( i_pts == 1 )
+            if ( p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT
+                  || p_pic->date - i_pts < -MASTER_SYNC_MAX_DRIFT )
             {
+                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
                 date_Set( &id->interpolated_pts, p_pic->date );
                 i_pts = p_pic->date + 1;
             }
@@ -1860,8 +1868,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
         if( p_sys->b_master_sync && i_duplicate > 1 )
         {
             mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if ( i_pts == 1 )
+            if ( p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT
+                  || p_pic->date - i_pts < -MASTER_SYNC_MAX_DRIFT )
             {
+                msg_Dbg( p_stream, "drift is too high, resetting master sync" );
                 date_Set( &id->interpolated_pts, p_pic->date );
                 i_pts = p_pic->date + 1;
             }
