@@ -1038,6 +1038,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
                                            FIND_ANYWHERE );
     if( !p_inp )
     {
+        vlc_object_release( p_pl );
         return VLC_ENOOBJ;
     }
 

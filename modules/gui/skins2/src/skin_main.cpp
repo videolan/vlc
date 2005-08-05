@@ -109,26 +109,31 @@ static int Open( vlc_object_t *p_this )
     if( OSFactory::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot initialize OSFactory" );
+	vlc_object_release( p_intf->p_sys->p_playlist );
         return VLC_EGENERIC;
     }
     if( AsyncQueue::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot initialize AsyncQueue" );
+	vlc_object_release( p_intf->p_sys->p_playlist );
         return VLC_EGENERIC;
     }
     if( Interpreter::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot instanciate Interpreter" );
+	vlc_object_release( p_intf->p_sys->p_playlist );
         return VLC_EGENERIC;
     }
     if( VarManager::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot instanciate VarManager" );
+	vlc_object_release( p_intf->p_sys->p_playlist );
         return VLC_EGENERIC;
     }
     if( VlcProc::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "Cannot initialize VLCProc" );
+	vlc_object_release( p_intf->p_sys->p_playlist );
         return VLC_EGENERIC;
     }
     Dialogs::instance( p_intf );
