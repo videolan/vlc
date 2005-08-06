@@ -35,7 +35,7 @@
 
 
 #define RANGE 40
-#define SCROLL_STEP 0.05
+#define SCROLL_STEP 0.05f
 
 
 CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,

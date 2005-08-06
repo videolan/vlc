@@ -216,8 +216,6 @@ static char *posixly_correct;
 /* Avoid depending on library functions or files
    whose names are inconsistent.  */
 
-char *getenv();
-
 static char *
      my_index(str, chr)
      const char *str;

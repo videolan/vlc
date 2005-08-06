@@ -46,6 +46,11 @@ class ThemeRepository;
 #   define M_PI 3.14159265358979323846
 #endif
 
+#ifdef _MSC_VER
+// turn off 'warning C4355: 'this' : used in base member initializer list'
+#pragma warning ( disable:4355 )
+#endif
+
 // Useful macros
 #define SKINS_DELETE( p ) \
    if( p ) \

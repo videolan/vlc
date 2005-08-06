@@ -39,7 +39,7 @@
 #   include "solaris_specific.h" // for lrint
 #endif
 
-#define SCROLL_STEP 0.05
+#define SCROLL_STEP 0.05f
 #define LINE_INTERVAL 1  // Number of pixels inserted between 2 lines
 
 

@@ -203,14 +203,13 @@ static const char* vlc_charset_aliases( const char *psz_name )
 
 /* Returns charset from "language_COUNTRY.charset@modifier" string */
 #if defined WIN32 || defined OS2 || !HAVE_LANGINFO_CODESET
-static const char *vlc_encoding_from_locale( char *psz_locale )
+static void vlc_encoding_from_locale( char *psz_locale, char *psz_charset )
 {
     char *psz_dot = strchr( psz_locale, '.' );
 
     if( psz_dot != NULL )
     {
         const char *psz_modifier;
-        char buf[2 + 10 + 1];
 
         psz_dot++;
 
@@ -218,17 +217,20 @@ static const char *vlc_encoding_from_locale( char *psz_locale )
         psz_modifier = strchr( psz_dot, '@' );
 
         if( psz_modifier == NULL )
-            return psz_dot;
-        if( 0 < ( psz_modifier - psz_dot )
-             && ( psz_modifier - psz_dot ) < sizeof( buf ))
         {
-            memcpy( buf, psz_dot, psz_modifier - psz_dot );
-            buf[ psz_modifier - psz_dot ] = '\0';
-            return buf;
+            strcpy( psz_charset, psz_dot );
+            return;
+        }
+        if( 0 < ( psz_modifier - psz_dot )
+             && ( psz_modifier - psz_dot ) < 2 + 10 + 1 )
+        {
+            memcpy( psz_charset, psz_dot, psz_modifier - psz_dot );
+            psz_charset[ psz_modifier - psz_dot ] = '\0';
+            return;
         }
     }
     /* try language mapping */
-    return vlc_encoding_from_language( psz_locale );
+    strcpy( psz_charset, vlc_encoding_from_language( psz_locale ) );
 }
 #endif
 
@@ -244,6 +246,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 # else
     /* On old systems which lack it, use setlocale or getenv.  */
     const char *psz_locale = NULL;
+    char buf[2 + 10 + 1];
 
     /* But most old systems don't have a complete set of locales.  Some
      * (like SunOS 4 or DJGPP) have only the C locale.  Therefore we don't
@@ -265,7 +268,8 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 
     /* On some old systems, one used to set locale = "iso8859_1". On others,
      * you set it to "language_COUNTRY.charset". Darwin only has LANG :( */
-    psz_codeset = vlc_encoding_from_locale( (char *)psz_locale );
+    vlc_encoding_from_locale( (char *)psz_locale, buf );
+    psz_codeset =  buf;
 # endif /* HAVE_LANGINFO_CODESET */
 
 #elif defined SYS_DARWIN
@@ -298,7 +302,8 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
             locale = getenv( "LANG" );
     }
     if( psz_locale != NULL && psz_locale[0] != '\0' )
-        psz_codeset = vlc_encoding_from_locale( psz_locale );
+        vlc_encoding_from_locale( psz_locale, buf );
+        psz_codeset = buf;
     else
     {
         /* OS/2 has a function returning the locale's codepage as a number. */
