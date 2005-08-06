@@ -620,7 +620,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             psz_uri, p_session->i_ttl,
                             p_session->i_port, p_session->i_payload,
                             psz_group ? "a=x-plgroup:" : "",
-                            psz_group ?: "", psz_group ? "\r\n" : "" ) == -1 )
+                            psz_group ? psz_group : "", psz_group ? "\r\n" : "" ) == -1 )
         return NULL;
     
     msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),

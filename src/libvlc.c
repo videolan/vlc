@@ -1843,6 +1843,12 @@ static void LocaleInit( void )
         vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
         libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_charset );
         libvlc.to_locale = vlc_iconv_open( psz_charset, "UTF-8" );
+        if( !libvlc.to_locale )
+        {
+            // Not sure it is the right thing to do, but at least it
+            // doesn't make vlc crash with msvc !
+            libvlc.to_locale = (vlc_iconv_t)(-1);
+        }
     }
     else
         libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)(-1);

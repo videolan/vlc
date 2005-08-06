@@ -25,14 +25,15 @@
 #ifdef WIN32_SKINS
 
 #define WINVER 0x500
-#ifndef AC_SRC_ALPHA
-#define AC_SRC_ALPHA 1
-#endif
 
 #include "win32_factory.hpp"
 #include "win32_graphics.hpp"
 #include "win32_window.hpp"
 #include "../src/generic_bitmap.hpp"
+
+#ifndef AC_SRC_ALPHA
+#define AC_SRC_ALPHA 1
+#endif
 
 Win32Graphics::Win32Graphics( intf_thread_t *pIntf, int width, int height ):
     OSGraphics( pIntf ), m_width( width ), m_height( height ), m_hDC( NULL )
