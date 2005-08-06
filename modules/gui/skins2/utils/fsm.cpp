@@ -33,7 +33,7 @@ void FSM::addState( const string &state )
 
 
 void FSM::addTransition( const string &state1, const string &event,
-                         const string &state2, Callback *pCmd )
+                         const string &state2, CmdGeneric *pCmd )
 {
     // Check that we already know the states
     if( m_states.find( state1 ) == m_states.end() ||
@@ -100,9 +100,9 @@ void FSM::handleTransition( const string &event )
     m_currentState = (*it).second.first;
 
     // Call the callback, if any
-    Callback *pCmd = (*it).second.second;
+    CmdGeneric *pCmd = (*it).second.second;
     if( pCmd != NULL )
     {
-        (*(pCmd->getFunc()))( pCmd->getObj() );
+        pCmd->execute();
     }
 }

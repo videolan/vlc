@@ -31,6 +31,7 @@
 #include <set>
 
 class EvtGeneric;
+class CmdGeneric;
 
 
 /// This class implements a Finite State Machine (FSM)
@@ -46,7 +47,7 @@ class FSM: public SkinObject
         /// Add a transition to the machine
         void addTransition( const string &state1, const string &event,
                             const string &state2,
-                            Callback *pCmd = NULL );
+                            CmdGeneric *pCmd = NULL );
 
         /// Retrieve the current state
         const string &getState() const { return m_currentState; }
@@ -65,7 +66,7 @@ class FSM: public SkinObject
 
         /// A Data_t contains the final state of a transition, and a callback
         /// to execute when the transition is applied
-        typedef pair<string, Callback*> Data_t;
+        typedef pair<string, CmdGeneric*> Data_t;
 
         /// Current state of the machine
         string m_currentState;

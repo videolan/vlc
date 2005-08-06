@@ -81,17 +81,7 @@ class CtrlCheckbox: public CtrlGeneric
         const UString m_tooltip1, m_tooltip2;
         /// Current tooltip
         const UString *m_pTooltip;
-        /// Callbacks objects
-        Callback m_cmdUpOverDownOver;
-        Callback m_cmdDownOverUpOver;
-        Callback m_cmdDownOverDown;
-        Callback m_cmdDownDownOver;
-        Callback m_cmdUpOverUp;
-        Callback m_cmdUpUpOver;
-        Callback m_cmdDownUp;
-        Callback m_cmdUpHidden;
-        Callback m_cmdHiddenUp;
-        /// Images of the checkbox in the different states
+         /// Images of the checkbox in the different states
         OSGraphics *m_pImgUp1, *m_pImgOver1, *m_pImgDown1;
         OSGraphics *m_pImgUp2, *m_pImgOver2, *m_pImgDown2;
         /// Current set of images (pointing to 1 or 2)
@@ -103,16 +93,16 @@ class CtrlCheckbox: public CtrlGeneric
         /// Current image
         OSGraphics *m_pImgCurrent;
 
-        /// Callback functions
-        static void transUpOverDownOver( SkinObject *pCtrl );
-        static void transDownOverUpOver( SkinObject *pCtrl );
-        static void transDownOverDown( SkinObject *pCtrl );
-        static void transDownDownOver( SkinObject *pCtrl );
-        static void transUpOverUp( SkinObject *pCtrl );
-        static void transUpUpOver( SkinObject *pCtrl );
-        static void transDownUp( SkinObject *pCtrl );
-        static void transUpHidden( SkinObject *pCtrl );
-        static void transHiddenUp( SkinObject *pCtrl );
+        /// Callback objects
+        DEFINE_CALLBACK( CtrlCheckbox, UpOverDownOver )
+        DEFINE_CALLBACK( CtrlCheckbox, DownOverUpOver )
+        DEFINE_CALLBACK( CtrlCheckbox, DownOverDown )
+        DEFINE_CALLBACK( CtrlCheckbox, DownDownOver )
+        DEFINE_CALLBACK( CtrlCheckbox, UpOverUp )
+        DEFINE_CALLBACK( CtrlCheckbox, UpUpOver )
+        DEFINE_CALLBACK( CtrlCheckbox, DownUp )
+        DEFINE_CALLBACK( CtrlCheckbox, UpHidden )
+        DEFINE_CALLBACK( CtrlCheckbox, HiddenUp )
 
         /// Method called when the observed variable is modified
         virtual void onVarBoolUpdate( VarBool &rVariable );

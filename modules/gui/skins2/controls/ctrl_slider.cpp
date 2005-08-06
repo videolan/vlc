@@ -50,10 +50,10 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rVariable( rVariable ), m_tooltip( rTooltip ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
-    m_cmdOverDown( this, &transOverDown ),
-    m_cmdDownOver( this, &transDownOver ), m_cmdOverUp( this, &transOverUp ),
-    m_cmdUpOver( this, &transUpOver ), m_cmdMove( this, &transMove ),
-    m_cmdScroll( this, &transScroll ),
+    m_cmdOverDown( pIntf, this ), m_cmdDownOver( pIntf, this ),
+    m_cmdOverUp( pIntf, this ), m_cmdUpOver( pIntf, this ),
+    m_cmdMove( pIntf, this ), m_cmdScroll( pIntf, this ),
+
     m_lastPercentage( 0 ), m_xOffset( 0 ), m_yOffset( 0 ),
     m_pEvt( NULL ), m_rCurve( rCurve )
 {
@@ -175,139 +175,130 @@ void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable )
 }
 
 
-void CtrlSliderCursor::transOverDown( SkinObject *pCtrl )
+void CtrlSliderCursor::CmdOverDown::execute()
 {
-    CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
-    EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
 
     // Compute the resize factors
     float factorX, factorY;
-    pThis->getResizeFactors( factorX, factorY );
+    m_pControl->getResizeFactors( factorX, factorY );
 
     // Get the position of the control
-    const Position *pPos = pThis->getPosition();
+    const Position *pPos = m_pControl->getPosition();
 
     // Compute the offset
     int tempX, tempY;
-    pThis->m_rCurve.getPoint( pThis->m_rVariable.get(), tempX, tempY );
-    pThis->m_xOffset = pEvtMouse->getXPos() - pPos->getLeft()
+    m_pControl->m_rCurve.getPoint( m_pControl->m_rVariable.get(), tempX, tempY );
+    m_pControl->m_xOffset = pEvtMouse->getXPos() - pPos->getLeft()
                        - (int)(tempX * factorX);
-    pThis->m_yOffset = pEvtMouse->getYPos() - pPos->getTop()
+    m_pControl->m_yOffset = pEvtMouse->getYPos() - pPos->getTop()
                        - (int)(tempY * factorY);
 
-    pThis->captureMouse();
-    pThis->m_pImg = pThis->m_pImgDown;
-    if( pThis->m_pImg )
+    m_pControl->captureMouse();
+    m_pControl->m_pImg = m_pControl->m_pImgDown;
+    if( m_pControl->m_pImg )
     {
-        pThis->notifyLayout(
-            pThis->m_rCurve.getWidth() + pThis->m_pImg->getWidth(),
-            pThis->m_rCurve.getHeight() + pThis->m_pImg->getHeight(),
-            - pThis->m_pImg->getWidth() / 2,
-            - pThis->m_pImg->getHeight() / 2 );
+        m_pControl->notifyLayout(
+            m_pControl->m_rCurve.getWidth() + m_pControl->m_pImg->getWidth(),
+            m_pControl->m_rCurve.getHeight() + m_pControl->m_pImg->getHeight(),
+            - m_pControl->m_pImg->getWidth() / 2,
+            - m_pControl->m_pImg->getHeight() / 2 );
     }
     else
-        pThis->notifyLayout();
+        m_pControl->notifyLayout();
 }
 
 
-void CtrlSliderCursor::transDownOver( SkinObject *pCtrl )
+void CtrlSliderCursor::CmdDownOver::execute()
 {
-    CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
-
     // Save the position
-    pThis->m_lastPercentage = pThis->m_rVariable.get();
+    m_pControl->m_lastPercentage = m_pControl->m_rVariable.get();
 
-    pThis->releaseMouse();
-    pThis->m_pImg = pThis->m_pImgUp;
-    if( pThis->m_pImg )
+    m_pControl->releaseMouse();
+    m_pControl->m_pImg = m_pControl->m_pImgUp;
+    if( m_pControl->m_pImg )
     {
-        pThis->notifyLayout(
-            pThis->m_rCurve.getWidth() + pThis->m_pImg->getWidth(),
-            pThis->m_rCurve.getHeight() + pThis->m_pImg->getHeight(),
-            - pThis->m_pImg->getWidth() / 2,
-            - pThis->m_pImg->getHeight() / 2 );
+        m_pControl->notifyLayout(
+            m_pControl->m_rCurve.getWidth() + m_pControl->m_pImg->getWidth(),
+            m_pControl->m_rCurve.getHeight() + m_pControl->m_pImg->getHeight(),
+            - m_pControl->m_pImg->getWidth() / 2,
+            - m_pControl->m_pImg->getHeight() / 2 );
     }
     else
-        pThis->notifyLayout();
+        m_pControl->notifyLayout();
 }
 
 
-void CtrlSliderCursor::transUpOver( SkinObject *pCtrl )
+void CtrlSliderCursor::CmdUpOver::execute()
 {
-    CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
-
-    pThis->m_pImg = pThis->m_pImgOver;
-    if( pThis->m_pImg )
+    m_pControl->m_pImg = m_pControl->m_pImgOver;
+    if( m_pControl->m_pImg )
     {
-        pThis->notifyLayout(
-            pThis->m_rCurve.getWidth() + pThis->m_pImg->getWidth(),
-            pThis->m_rCurve.getHeight() + pThis->m_pImg->getHeight(),
-            - pThis->m_pImg->getWidth() / 2,
-            - pThis->m_pImg->getHeight() / 2 );
+        m_pControl->notifyLayout(
+            m_pControl->m_rCurve.getWidth() + m_pControl->m_pImg->getWidth(),
+            m_pControl->m_rCurve.getHeight() + m_pControl->m_pImg->getHeight(),
+            - m_pControl->m_pImg->getWidth() / 2,
+            - m_pControl->m_pImg->getHeight() / 2 );
     }
     else
-        pThis->notifyLayout();
+        m_pControl->notifyLayout();
 }
 
 
-void CtrlSliderCursor::transOverUp( SkinObject *pCtrl )
+void CtrlSliderCursor::CmdOverUp::execute()
 {
-    CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
-
-    pThis->m_pImg = pThis->m_pImgUp;
-    if( pThis->m_pImg )
+    m_pControl->m_pImg = m_pControl->m_pImgUp;
+    if( m_pControl->m_pImg )
     {
-        pThis->notifyLayout(
-            pThis->m_rCurve.getWidth() + pThis->m_pImg->getWidth(),
-            pThis->m_rCurve.getHeight() + pThis->m_pImg->getHeight(),
-            - pThis->m_pImg->getWidth() / 2,
-            - pThis->m_pImg->getHeight() / 2 );
+        m_pControl->notifyLayout(
+            m_pControl->m_rCurve.getWidth() + m_pControl->m_pImg->getWidth(),
+            m_pControl->m_rCurve.getHeight() + m_pControl->m_pImg->getHeight(),
+            - m_pControl->m_pImg->getWidth() / 2,
+            - m_pControl->m_pImg->getHeight() / 2 );
     }
     else
-        pThis->notifyLayout();
+        m_pControl->notifyLayout();
 }
 
 
-void CtrlSliderCursor::transMove( SkinObject *pCtrl )
+void CtrlSliderCursor::CmdMove::execute()
 {
-    CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
-    EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
 
     // Get the position of the control
-    const Position *pPos = pThis->getPosition();
+    const Position *pPos = m_pControl->getPosition();
 
     // Compute the resize factors
     float factorX, factorY;
-    pThis->getResizeFactors( factorX, factorY );
+    m_pControl->getResizeFactors( factorX, factorY );
 
     // Compute the relative position of the centre of the cursor
-    float relX = pEvtMouse->getXPos() - pPos->getLeft() - pThis->m_xOffset;
-    float relY = pEvtMouse->getYPos() - pPos->getTop() - pThis->m_yOffset;
+    float relX = pEvtMouse->getXPos() - pPos->getLeft() - m_pControl->m_xOffset;
+    float relY = pEvtMouse->getYPos() - pPos->getTop() - m_pControl->m_yOffset;
     // Ponderate with the resize factors
     int relXPond = (int)(relX / factorX);
     int relYPond = (int)(relY / factorY);
 
     // Update the position
-    if( pThis->m_rCurve.getMinDist( relXPond, relYPond ) < RANGE )
+    if( m_pControl->m_rCurve.getMinDist( relXPond, relYPond ) < RANGE )
     {
-        float percentage = pThis->m_rCurve.getNearestPercent( relXPond,
+        float percentage = m_pControl->m_rCurve.getNearestPercent( relXPond,
                                                               relYPond );
-        pThis->m_rVariable.set( percentage );
+        m_pControl->m_rVariable.set( percentage );
     }
     else
     {
-        pThis->m_rVariable.set( pThis->m_lastPercentage );
+        m_pControl->m_rVariable.set( m_pControl->m_lastPercentage );
     }
 }
 
-void CtrlSliderCursor::transScroll( SkinObject *pCtrl )
+void CtrlSliderCursor::CmdScroll::execute()
 {
-    CtrlSliderCursor *pThis = (CtrlSliderCursor*)pCtrl;
-    EvtScroll *pEvtScroll = (EvtScroll*)pThis->m_pEvt;
+    EvtScroll *pEvtScroll = (EvtScroll*)m_pControl->m_pEvt;
 
     int direction = pEvtScroll->getDirection();
 
-    float percentage = pThis->m_rVariable.get();
+    float percentage = m_pControl->m_rVariable.get();
     if( direction == EvtScroll::kUp )
     {
         percentage += SCROLL_STEP;
@@ -317,7 +308,7 @@ void CtrlSliderCursor::transScroll( SkinObject *pCtrl )
         percentage -= SCROLL_STEP;
     }
 
-    pThis->m_rVariable.set( percentage );
+    m_pControl->m_rVariable.set( percentage );
 }
 
 

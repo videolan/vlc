@@ -69,10 +69,6 @@ class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
         VarPercent &m_rVariable;
         /// Min and max angles of the button
         float m_minAngle, m_maxAngle;
-        /// Callbacks objects
-        Callback m_cmdUpDown;
-        Callback m_cmdDownUp;
-        Callback m_cmdMove;
         /// Position of the cursor
         int m_position;
         /// Size of an image
@@ -84,10 +80,10 @@ class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
         /// Last saved position
         int m_lastPos;
 
-        /// Callback functions
-        static void transUpDown( SkinObject *pCtrl );
-        static void transDownUp( SkinObject *pCtrl );
-        static void transMove( SkinObject *pCtrl );
+        /// Callback objects
+        DEFINE_CALLBACK( CtrlRadialSlider, UpDown )
+        DEFINE_CALLBACK( CtrlRadialSlider, DownUp )
+        DEFINE_CALLBACK( CtrlRadialSlider, Move )
 
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarPercent> &rVariable );

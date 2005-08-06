@@ -57,13 +57,6 @@ class CtrlResize: public CtrlFlat
         /// Get the position of the decorated control in the layout, if any
         virtual const Position *getPosition() const;
 
-        static void transOutStill( SkinObject *pCtrl );
-        static void transStillOut( SkinObject *pCtrl );
-        static void transStillStill( SkinObject *pCtrl );
-        static void transStillResize( SkinObject *pCtrl );
-        static void transResizeStill( SkinObject *pCtrl );
-        static void transResizeResize( SkinObject *pCtrl );
-
         /// Get the type of control (custom RTTI)
         virtual string getType() const { return m_rCtrl.getType(); }
 
@@ -77,13 +70,14 @@ class CtrlResize: public CtrlFlat
         EvtGeneric *m_pEvt;
         /// Position of the click that started the resizing
         int m_xPos, m_yPos;
-        /// Callbacks
-        Callback m_cmdOutStill;
-        Callback m_cmdStillOut;
-        Callback m_cmdStillStill;
-        Callback m_cmdStillResize;
-        Callback m_cmdResizeStill;
-        Callback m_cmdResizeResize;
+
+        /// Callback objects
+        DEFINE_CALLBACK( CtrlResize, OutStill )
+        DEFINE_CALLBACK( CtrlResize, StillOut )
+        DEFINE_CALLBACK( CtrlResize, StillStill )
+        DEFINE_CALLBACK( CtrlResize, StillResize )
+        DEFINE_CALLBACK( CtrlResize, ResizeStill )
+        DEFINE_CALLBACK( CtrlResize, ResizeResize )
 
         // Size of the layout, before resizing
         int m_width, m_height;

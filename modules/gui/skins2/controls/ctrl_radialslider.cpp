@@ -40,8 +40,8 @@ CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
                                     VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_numImg( numImg ),
     m_rVariable( rVariable ), m_minAngle( minAngle ), m_maxAngle( maxAngle ),
-    m_cmdUpDown( this, &transUpDown ), m_cmdDownUp( this, &transDownUp ),
-    m_cmdMove( this, &transMove ), m_position( 0 ), m_lastPos( 0 )
+    m_cmdUpDown( pIntf, this ), m_cmdDownUp( pIntf, this ),
+    m_cmdMove( pIntf, this )
 {
     // Build the images of the sequence
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
@@ -105,35 +105,29 @@ void CtrlRadialSlider::onUpdate( Subject<VarPercent> &rVariable )
 }
 
 
-void CtrlRadialSlider::transUpDown( SkinObject *pCtrl )
+void CtrlRadialSlider::CmdUpDown::execute()
 {
-    CtrlRadialSlider *pThis = (CtrlRadialSlider*)pCtrl;
-
-    EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
 
     // Change the position of the cursor, in non-blocking mode
-    pThis->setCursor( pEvtMouse->getXPos(), pEvtMouse->getYPos(), false );
+    m_pControl->setCursor( pEvtMouse->getXPos(), pEvtMouse->getYPos(), false );
 
-    pThis->captureMouse();
+    m_pControl->captureMouse();
 }
 
 
-void CtrlRadialSlider::transDownUp( SkinObject *pCtrl )
+void CtrlRadialSlider::CmdDownUp::execute()
 {
-    CtrlRadialSlider *pThis = (CtrlRadialSlider*)pCtrl;
-
-    pThis->releaseMouse();
+    m_pControl->releaseMouse();
 }
 
 
-void CtrlRadialSlider::transMove( SkinObject *pCtrl )
+void CtrlRadialSlider::CmdMove::execute()
 {
-    CtrlRadialSlider *pThis = (CtrlRadialSlider*)pCtrl;
-
-    EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
 
     // Change the position of the cursor, in blocking mode
-    pThis->setCursor( pEvtMouse->getXPos(), pEvtMouse->getYPos(), true );
+    m_pControl->setCursor( pEvtMouse->getXPos(), pEvtMouse->getYPos(), true );
 }
 
 

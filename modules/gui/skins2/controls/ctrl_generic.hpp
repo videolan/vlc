@@ -30,6 +30,7 @@
 #include "../utils/fsm.hpp"
 #include "../utils/ustring.hpp"
 #include "../utils/observer.hpp"
+#include "../commands/cmd_generic.hpp"
 
 class EvtGeneric;
 class OSGraphics;
@@ -131,6 +132,23 @@ class CtrlGeneric: public SkinObject, public Observer<VarBool>
 };
 
 typedef CountedPtr<CtrlGeneric> CtrlGenericPtr;
+
+
+// Macro to define a control action command
+#define DEFINE_CALLBACK( control, action ) \
+class Cmd##action: public CmdGeneric \
+{ \
+    public: \
+        Cmd##action( intf_thread_t *pIntf, control *pControl ): \
+            CmdGeneric( pIntf ), m_pControl( pControl) {} \
+        virtual ~Cmd##action() {} \
+        virtual void execute(); \
+        virtual string getType() const { return "Cmd" #control #action; } \
+    private: \
+        control *m_pControl; \
+\
+} m_cmd##action; \
+friend class Cmd##action;
 
 
 #endif

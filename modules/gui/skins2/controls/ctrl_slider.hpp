@@ -75,13 +75,6 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
         const UString m_tooltip;
         /// Initial size of the control
         int m_width, m_height;
-        /// Callback objects
-        Callback m_cmdOverDown;
-        Callback m_cmdDownOver;
-        Callback m_cmdOverUp;
-        Callback m_cmdUpOver;
-        Callback m_cmdMove;
-        Callback m_cmdScroll;
         /// Position of the cursor
         int m_xPosition, m_yPosition;
         /// Last saved position of the cursor (stored as a percentage)
@@ -97,13 +90,13 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
         /// Bezier curve of the slider
         const Bezier &m_rCurve;
 
-        /// Callback functions
-        static void transOverDown( SkinObject *pCtrl );
-        static void transDownOver( SkinObject *pCtrl );
-        static void transOverUp( SkinObject *pCtrl );
-        static void transUpOver( SkinObject *pCtrl );
-        static void transMove( SkinObject *pCtrl );
-        static void transScroll( SkinObject *pCtrl );
+        /// Callback objects
+        DEFINE_CALLBACK( CtrlSliderCursor, OverDown )
+        DEFINE_CALLBACK( CtrlSliderCursor, DownOver )
+        DEFINE_CALLBACK( CtrlSliderCursor, OverUp )
+        DEFINE_CALLBACK( CtrlSliderCursor, UpOver )
+        DEFINE_CALLBACK( CtrlSliderCursor, Move )
+        DEFINE_CALLBACK( CtrlSliderCursor, Scroll )
 
         /// Method called when the position variable is modified
         virtual void onUpdate( Subject<VarPercent> &rVariable );
