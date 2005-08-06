@@ -21,7 +21,11 @@ Name "${PRODUCT_GROUP} ${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile ..\vlc-${VERSION}-win32.exe
 InstallDir "$PROGRAMFILES\VideoLAN\VLC"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" "Install_Dir"
+!ifdef NSIS_LZMA_COMPRESS_WHOLE
+SetCompressor lzma
+!else
 SetCompressor /SOLID lzma
+!endif
 ;ShowInstDetails show
 ;ShowUnInstDetails show
 SetOverwrite ifnewer
