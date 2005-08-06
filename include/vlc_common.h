@@ -841,6 +841,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #ifndef HAVE_SCANDIR
 #   define scandir vlc_scandir
 #   define alphasort vlc_alphasort
+    struct dirent;
     VLC_EXPORT( int, vlc_scandir, ( const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ) ) );
     VLC_EXPORT( int, vlc_alphasort, ( const struct dirent **a, const struct dirent **b ) );
 #elif !defined(__PLUGIN__)

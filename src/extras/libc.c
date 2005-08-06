@@ -38,6 +38,10 @@
 #   include <iconv.h>
 #endif
 
+#ifdef HAVE_DIRENT_H
+#   include <dirent.h>
+#endif
+
 /*****************************************************************************
  * getenv: just in case, but it should never be called
  *****************************************************************************/
