@@ -14,11 +14,16 @@ Video Filters:
 
 Interfaces:
  * Mac OS X
-    - new streaming and transcoding wizard with the same functionality as the WxWidgets one
+    - new streaming and transcoding wizard
+    - new extended controls panel
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*	
     - VLC update checker
+    
+Translations:
+ The following language was added:
+ * Romanian
 
 Changes between 0.8.1 and 0.8.2:
 -----------------------------------------------------
