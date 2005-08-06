@@ -40,7 +40,7 @@
 #include "open.h"
 #include "wizard.h"
 #include "extended.h"
-#include "bookmarks.h"
+//#include "bookmarks.h"
 
 /*****************************************************************************
  * Local prototypes.
