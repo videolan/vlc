@@ -40,6 +40,7 @@
 #include "open.h"
 #include "wizard.h"
 #include "extended.h"
+#include "bookmarks.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -300,6 +301,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
     o_extended = [[VLCExtended alloc] init];
+    //o_bookmarks = [[VLCBookmarks alloc] init];
 
     i_lastShownVolume = -1;
     return _o_sharedMainInstance;
@@ -424,6 +426,17 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 }
 
+- (void)dealloc
+{
+    [o_about release];
+    [o_prefs release];
+    [o_open release];
+    [o_extended release];
+    //[o_bookmarks release];
+    
+    [super dealloc];
+}
+
 - (void)initStrings
 {
     [o_window setTitle: _NS("VLC - Controller")];
@@ -530,6 +543,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_controller setTitle: _NS("Controller")];
     [o_mi_equalizer setTitle: _NS("Equalizer")];
     [o_mi_extended setTitle: _NS("Extended controls")];
+    //[o_mi_bookmarks setTitle: _NS("Bookmarks")];
     [o_mi_playlist setTitle: _NS("Playlist")];
     [o_mi_info setTitle: _NS("Info")];
     [o_mi_messages setTitle: _NS("Messages")];
@@ -1466,6 +1480,18 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_extended showPanel];
     }
 }
+
+/*- (IBAction)showBookmarks:(id)sender
+{
+    if (!nib_bookmarks_loaded)
+    {
+        nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
+        [o_bookmarks initStrings];
+        [o_bookmarks showPanel];
+    } else {
+        [o_bookmarks showPanel];
+    }
+}*/
 
 - (IBAction)viewAbout:(id)sender
 {
