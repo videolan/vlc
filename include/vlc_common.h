@@ -916,10 +916,13 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     VLC_EXPORT( void *, vlc_opendir, ( const char * ) );
     VLC_EXPORT( void *, vlc_readdir, ( void * ) );
     VLC_EXPORT( int, vlc_closedir, ( void * ) );
-#elif !defined(__PLUGIN__)
-#   define vlc_opendir  NULL
-#   define vlc_readdir  NULL
-#   define vlc_closedir NULL
+#else
+    struct dirent;  /* forward declaration for vlc_symbols.h */
+#   if !defined(__PLUGIN__)
+#       define vlc_opendir  NULL
+#       define vlc_readdir  NULL
+#       define vlc_closedir NULL
+#   endif
 #endif
 
 /* Format type specifiers for 64 bits numbers */
