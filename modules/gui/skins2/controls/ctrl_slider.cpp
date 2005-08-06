@@ -53,7 +53,6 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
     m_cmdOverDown( pIntf, this ), m_cmdDownOver( pIntf, this ),
     m_cmdOverUp( pIntf, this ), m_cmdUpOver( pIntf, this ),
     m_cmdMove( pIntf, this ), m_cmdScroll( pIntf, this ),
-
     m_lastPercentage( 0 ), m_xOffset( 0 ), m_yOffset( 0 ),
     m_pEvt( NULL ), m_rCurve( rCurve )
 {

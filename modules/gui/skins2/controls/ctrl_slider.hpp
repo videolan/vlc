@@ -77,6 +77,13 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
         int m_width, m_height;
         /// Position of the cursor
         int m_xPosition, m_yPosition;
+        /// Callback objects
+        DEFINE_CALLBACK( CtrlSliderCursor, OverDown )
+        DEFINE_CALLBACK( CtrlSliderCursor, DownOver )
+        DEFINE_CALLBACK( CtrlSliderCursor, OverUp )
+        DEFINE_CALLBACK( CtrlSliderCursor, UpOver )
+        DEFINE_CALLBACK( CtrlSliderCursor, Move )
+        DEFINE_CALLBACK( CtrlSliderCursor, Scroll )
         /// Last saved position of the cursor (stored as a percentage)
         float m_lastPercentage;
         /// Offset between the mouse pointer and the center of the cursor
@@ -89,14 +96,6 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
         OSGraphics *m_pImg;
         /// Bezier curve of the slider
         const Bezier &m_rCurve;
-
-        /// Callback objects
-        DEFINE_CALLBACK( CtrlSliderCursor, OverDown )
-        DEFINE_CALLBACK( CtrlSliderCursor, DownOver )
-        DEFINE_CALLBACK( CtrlSliderCursor, OverUp )
-        DEFINE_CALLBACK( CtrlSliderCursor, UpOver )
-        DEFINE_CALLBACK( CtrlSliderCursor, Move )
-        DEFINE_CALLBACK( CtrlSliderCursor, Scroll )
 
         /// Method called when the position variable is modified
         virtual void onUpdate( Subject<VarPercent> &rVariable );

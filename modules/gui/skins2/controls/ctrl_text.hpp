@@ -68,6 +68,11 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         FSM m_fsm;
         /// Variable associated to the control
         VarText &m_rVariable;
+        /// Callback objects
+        DEFINE_CALLBACK( CtrlText, ToManual )
+        DEFINE_CALLBACK( CtrlText, ManualMoving )
+        DEFINE_CALLBACK( CtrlText, ManualStill )
+        DEFINE_CALLBACK( CtrlText, Move )
         /// The last received event
         EvtGeneric *m_pEvt;
         /// Font used to render the text
@@ -88,12 +93,6 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         int m_xOffset;
          /// Timer to move the text
         OSTimer *m_pTimer;
-
-        /// Callback objects
-        DEFINE_CALLBACK( CtrlText, ToManual )
-        DEFINE_CALLBACK( CtrlText, ManualMoving )
-        DEFINE_CALLBACK( CtrlText, ManualStill )
-        DEFINE_CALLBACK( CtrlText, Move )
 
         /// Callback for the timer
         static void updateText( SkinObject *pCtrl );
