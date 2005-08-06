@@ -21,9 +21,9 @@ Name "${PRODUCT_GROUP} ${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile ..\vlc-${VERSION}-win32.exe
 InstallDir "$PROGRAMFILES\VideoLAN\VLC"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" "Install_Dir"
-SetCompressor lzma
-ShowInstDetails show
-ShowUnInstDetails show
+SetCompressor /SOLID lzma
+;ShowInstDetails show
+;ShowUnInstDetails show
 SetOverwrite ifnewer
 CRCCheck on
 
@@ -44,6 +44,7 @@ InstType "Full"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 
 ; Welcome page
+!define MUI_WELCOMEPAGE_TITLE_3LINES
 !insertmacro MUI_PAGE_WELCOME
 ; License page
 !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
@@ -55,20 +56,44 @@ InstType "Full"
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_RUN "$INSTDIR\vlc.exe"
+!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\NEWS.txt"
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "View changelog"
+!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+!define MUI_FINISHPAGE_LINK "Visit the VideoLAN VLC media player Website"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
+!insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
 ; Language files
-!insertmacro MUI_LANGUAGE "English"
+  !insertmacro MUI_LANGUAGE "English" # first language is the default language
+  !insertmacro MUI_LANGUAGE "French"
+  !insertmacro MUI_LANGUAGE "German"
+  !insertmacro MUI_LANGUAGE "Spanish"
+  !insertmacro MUI_LANGUAGE "SimpChinese"
+  !insertmacro MUI_LANGUAGE "TradChinese"
+  !insertmacro MUI_LANGUAGE "Japanese"
+  !insertmacro MUI_LANGUAGE "Korean"
+  !insertmacro MUI_LANGUAGE "Italian"
+  !insertmacro MUI_LANGUAGE "Dutch"
+  !insertmacro MUI_LANGUAGE "Danish"
+  !insertmacro MUI_LANGUAGE "Swedish"
+  !insertmacro MUI_LANGUAGE "Norwegian"
+  !insertmacro MUI_LANGUAGE "Finnish"
+  !insertmacro MUI_LANGUAGE "Greek"
+  !insertmacro MUI_LANGUAGE "Russian"
+  !insertmacro MUI_LANGUAGE "Portuguese"
+  !insertmacro MUI_LANGUAGE "Arabic"
+
+!insertmacro MUI_RESERVEFILE_LANGDLL
 
 ; Reserve files
 !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
 ; MUI end ------
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Push extensions on stack ;
@@ -162,6 +187,7 @@ FunctionEnd
 
 !macro RegisterExtensionSection EXT
   Section /o ${EXT}
+    SectionIn 2 3
     Push $R0
     StrCpy $R0 ${EXT}
     Call RegisterExtension
@@ -327,6 +353,7 @@ SectionEnd
 Section "Context Menus" SEC05
   SectionIn 1 2 3
   !insertmacro MacroAllExtensions AddContextMenu
+  !insertmacro AddContextMenu "Folder"
 SectionEnd
 
 SectionGroup "File type associations" SEC06
@@ -372,11 +399,28 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
     "The VLC ActiveX plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} \
-    "Add context menu items (Play With VLC and Add To VLC's Playlist)"
+    "Add context menu items ('Play With VLC' and 'Add To VLC's Playlist')"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} \
     "Sets VLC media player as the default application for the specified file type"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+Function .onInit
+  ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+  "UninstallString"
+  StrCmp $R0 "" done
+ 
+  MessageBox MB_YESNO|MB_ICONEXCLAMATION \
+  "VLC media player has already been installed. $\nDo you want to remove \
+  the previous version before installing $(^Name) ?" \
+  IDNO done
+  
+  ;Run the uninstaller
+  ;uninst:
+    ClearErrors
+    ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+  done:
+  !insertmacro MUI_LANGDLL_DISPLAY
+FunctionEnd
 
 Function un.onUninstSuccess
   HideWindow
@@ -385,9 +429,7 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 \
-    "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
-  Abort
+  !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
 
 Section Uninstall
@@ -395,6 +437,7 @@ Section Uninstall
 
   !insertmacro MacroAllExtensions DeleteContextMenu
   !insertmacro MacroAllExtensions UnRegisterExtensionSection
+  !insertmacro DeleteContextMenu "Folder"
 
   UnRegDLL "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
