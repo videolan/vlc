@@ -39,38 +39,41 @@ InstType "Full"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; MUI 1.67 compatible ------
-!include "MUI.nsh"
+  !include "MUI.nsh"
 
 ; MUI Settings
-!define MUI_ABORTWARNING
-!define MUI_ICON "vlc48x48new.ico"
-!define MUI_UNICON "vlc48x48new.ico"
-!define MUI_COMPONENTSPAGE_SMALLDESC
+  !define MUI_ABORTWARNING
+  !define MUI_ICON "vlc48x48new.ico"
+  !define MUI_UNICON "vlc48x48new.ico"
+  !define MUI_COMPONENTSPAGE_SMALLDESC
 
-; Welcome page
-!define MUI_WELCOMEPAGE_TITLE_3LINES
-!insertmacro MUI_PAGE_WELCOME
-; License page
-!insertmacro MUI_PAGE_LICENSE "COPYING.txt"
-; Components page
-!insertmacro MUI_PAGE_COMPONENTS
-; Directory page
-!insertmacro MUI_PAGE_DIRECTORY
-; Instfiles page
-!insertmacro MUI_PAGE_INSTFILES
-; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\vlc.exe"
-!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\NEWS.txt"
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "View changelog"
-!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
-!define MUI_FINISHPAGE_LINK "Visit the VideoLAN VLC media player Website"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
-!define MUI_FINISHPAGE_NOREBOOTSUPPORT
-!insertmacro MUI_PAGE_FINISH
+; Installer pages
+  ; Welcome page
+    !define MUI_WELCOMEPAGE_TITLE_3LINES
+    !insertmacro MUI_PAGE_WELCOME
+  ; License page
+    !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
+  ; Components page
+    !insertmacro MUI_PAGE_COMPONENTS
+  ; Directory page
+    !insertmacro MUI_PAGE_DIRECTORY
+  ; Instfiles page
+    !insertmacro MUI_PAGE_INSTFILES
+  ; Finish page
+    !define MUI_FINISHPAGE_RUN "$INSTDIR\vlc.exe"
+    !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\NEWS.txt"
+    !define MUI_FINISHPAGE_SHOWREADME_TEXT "View changelog"
+    !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+    !define MUI_FINISHPAGE_LINK "Visit the VideoLAN VLC media player Website"
+    !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
+    !define MUI_FINISHPAGE_NOREBOOTSUPPORT
+    !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
-!insertmacro MUI_UNPAGE_CONFIRM
-!insertmacro MUI_UNPAGE_INSTFILES
+    !insertmacro MUI_UNPAGE_CONFIRM
+    !insertmacro MUI_UNPAGE_COMPONENTS
+    !insertmacro MUI_UNPAGE_INSTFILES
+    !insertmacro MUI_UNPAGE_FINISH
 
 ; Language files
   !insertmacro MUI_LANGUAGE "English" # first language is the default language
@@ -95,13 +98,14 @@ InstType "Full"
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
 ; Reserve files
-!insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+  !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
 
 ; MUI end ------
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Push extensions on stack ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;
+; Extension lists ;
+;;;;;;;;;;;;;;;;;;;
+
 !macro MacroAudioExtensions _action
   !insertmacro ${_action} ".a52"
   !insertmacro ${_action} ".aac"
@@ -225,6 +229,30 @@ FunctionEnd
 !macro DeleteContextMenu EXT
   DeleteRegKey HKCR ${EXT}\shell\PlayWithVLC
   DeleteRegKey HKCR ${EXT}\shell\AddToPlaylistVLC
+!macroend
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Delete prefs and cache ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+!macro delprefs
+  SectionIn 2 3
+  StrCpy $0 0
+  !define Index 'Line${__LINE__}'
+  "${Index}-Loop:"
+  ; FIXME
+  ; this will loop through all the logged users and "virtual" windows users
+  ; (it looks like users are only present in HKEY_USERS when they are logged in)
+    ClearErrors
+    EnumRegKey $1 HKU "" $0
+    StrCmp $1 "" "${Index}-End"
+    IntOp $0 $0 + 1
+    ReadRegStr $2 HKU "$1\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" AppData
+    StrCmp $2 "" "${Index}-Loop"
+    RMDir /r "$2\vlc"
+    Goto "${Index}-Loop"
+  "${Index}-End:"
+  !undef Index
 !macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -372,27 +400,11 @@ SectionGroup "File type associations" SEC06
   SectionGroupEnd
 SectionGroupEnd
 
-Section -Post
-  WriteUninstaller "$INSTDIR\uninstall.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir" $INSTDIR
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "Version" "${VERSION}"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\vlc.exe"
-
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-    "DisplayName" "$(^Name)"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-    "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-    "DisplayIcon" "$INSTDIR\vlc.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-    "DisplayVersion" "${PRODUCT_VERSION}"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-    "URLInfoAbout" "${PRODUCT_WEB_SITE}"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-    "Publisher" "${PRODUCT_PUBLISHER}"
+Section /o "Delete preferences and cache" SEC07
+  !insertmacro delprefs
 SectionEnd
 
-; Section descriptions
+; Installer section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} \
     "The media player itself"
@@ -406,6 +418,8 @@ SectionEnd
     "Add context menu items ('Play With VLC' and 'Add To VLC's Playlist')"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} \
     "Sets VLC media player as the default application for the specified file type"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC07} \
+    "Deletes VLC media player preferences and cache files leftover from previous installations"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function .onInit
@@ -426,17 +440,32 @@ Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
 
-Function un.onUninstSuccess
-  HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK \
-    "$(^Name) was successfully removed from your computer."
-FunctionEnd
+Section -Post
+  WriteUninstaller "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "InstallDir" $INSTDIR
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "Version" "${VERSION}"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\vlc.exe"
 
-Function un.onInit
-  !insertmacro MUI_LANGDLL_DISPLAY
-FunctionEnd
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "DisplayName" "$(^Name)"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "DisplayIcon" "$INSTDIR\vlc.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "DisplayVersion" "${PRODUCT_VERSION}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "Publisher" "${PRODUCT_PUBLISHER}"
+SectionEnd
 
-Section Uninstall
+;;;;;;;;;;;;;;;;;;;;;;;;
+; Uninstaller sections ;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+Section "Uninstall" SEC91
+  SectionIn 1 2 3 RO
   SetShellVarContext all
 
   !insertmacro MacroAllExtensions DeleteContextMenu
@@ -496,3 +525,25 @@ Section Uninstall
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   SetAutoClose true
 SectionEnd
+
+Section /o "un.Delete preferences and cache" SEC92
+  !insertmacro delprefs
+SectionEnd
+
+; Uninstaller section descriptions
+!insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC91} \
+    "Uninstall VLC media player and all its components"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC92} \
+    "Deletes VLC media player preferences and cache files"
+!insertmacro MUI_UNFUNCTION_DESCRIPTION_END
+
+;Function un.onUninstSuccess
+;  HideWindow
+;  MessageBox MB_ICONINFORMATION|MB_OK \
+;    "$(^Name) was successfully removed from your computer."
+;FunctionEnd
+
+Function un.onInit
+  !insertmacro MUI_LANGDLL_DISPLAY
+FunctionEnd
