@@ -2004,14 +2004,14 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
     size_t i_track;
 
     /* add all es */
-    msg_Dbg( &sys.demuxer, "found %d es", tracks.size() );
+    msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
     sys.b_pci_packet_set = false;
 
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
         {
-            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", i_track, tracks[i_track]->i_number );
+            msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
             tracks[i_track]->p_es = NULL;
             continue;
         }
@@ -2228,13 +2228,13 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strcmp( tracks[i_track]->psz_codec, "A_TTA1" ) )
         {
             /* FIXME: support this codec */
-            msg_Err( &sys.demuxer, "TTA not supported yet[%d, n=%d]", i_track, tracks[i_track]->i_number );
+            msg_Err( &sys.demuxer, "TTA not supported yet[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_WAVPACK4" ) )
         {
             /* FIXME: support this codec */
-            msg_Err( &sys.demuxer, "Wavpack not supported yet[%d, n=%d]", i_track, tracks[i_track]->i_number );
+            msg_Err( &sys.demuxer, "Wavpack not supported yet[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/UTF8" ) )
@@ -4967,7 +4967,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             {
                 sz_name = N_("Segment ");
                 char psz_str[6];
-                sprintf( psz_str, "%d", i );
+                sprintf( psz_str, "%d", (int)i );
                 sz_name += psz_str;
                 p_title->psz_name = strdup( sz_name.c_str() );
             }
