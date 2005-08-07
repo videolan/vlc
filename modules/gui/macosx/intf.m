@@ -1484,12 +1484,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showExtended:(id)sender
 {
-    /* we need the wizard-nib for the bookmarks's extract functionality */
-    if (!nib_wizard_loaded)
-    {
-        nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
-    }
-
     if (!nib_extended_loaded)
     {
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
@@ -1502,6 +1496,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showBookmarks:(id)sender
 {
+    /* we need the wizard-nib for the bookmarks's extract functionality */
+    if (!nib_wizard_loaded)
+    {
+        nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
+    }
+    
     if (!nib_bookmarks_loaded)
     {
         nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
