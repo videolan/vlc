@@ -826,6 +826,7 @@
 				DCA693C30789DF8700139EC6,
 				DCFCCDB9085CE18F001E36AF,
 				DC7F46ED08A183FC0027DB24,
+				DCE7BD0508A56C8B007B10AE,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -910,6 +911,8 @@
 				DC769AB7085DF0DB001A838D,
 				DC7F46F008A187F60027DB24,
 				DC7F46F108A187F60027DB24,
+				DCE7BD0708A5724D007B10AE,
+				DCE7BD0608A5724D007B10AE,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -2291,6 +2294,48 @@
 			settings = {
 			};
 		};
+		DCE7BD0308A56C8B007B10AE = {
+			children = (
+				DCE7BD0408A56C8B007B10AE,
+			);
+			isa = PBXVariantGroup;
+			name = Bookmarks.nib;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCE7BD0408A56C8B007B10AE = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
+			name = English;
+			path = Resources/English.lproj/Bookmarks.nib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCE7BD0508A56C8B007B10AE = {
+			fileRef = DCE7BD0308A56C8B007B10AE;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		DCE7BD0608A5724D007B10AE = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = bookmarks.m;
+			path = ../../modules/gui/macosx/bookmarks.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		DCE7BD0708A5724D007B10AE = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = bookmarks.h;
+			path = ../../modules/gui/macosx/bookmarks.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
 		DCF358B9077F10BA007DB450 = {
 			children = (
 				DCF358BA077F10BA007DB450,
@@ -2323,6 +2368,7 @@
 				DCA693C10789DF8700139EC6,
 				DCFCCDB7085CE18F001E36AF,
 				DC7F46EB08A183FC0027DB24,
+				DCE7BD0308A56C8B007B10AE,
 			);
 			isa = PBXGroup;
 			name = nibs;

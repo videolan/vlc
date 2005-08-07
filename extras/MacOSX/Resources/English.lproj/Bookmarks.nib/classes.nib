@@ -1,0 +1,40 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                add = id; 
+                clear = id; 
+                edit = id; 
+                "edit_cancel" = id; 
+                "edit_ok" = id; 
+                extract = id; 
+                goToBookmark = id; 
+                myAction = id; 
+                remove = id; 
+            }; 
+            CLASS = VLCBookmarks; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_bookmarks_window" = id; 
+                "o_btn_add" = id; 
+                "o_btn_clear" = id; 
+                "o_btn_edit" = id; 
+                "o_btn_extract" = id; 
+                "o_btn_rm" = id; 
+                "o_edit_btn_cancel" = id; 
+                "o_edit_btn_ok" = id; 
+                "o_edit_fld_bytes" = id; 
+                "o_edit_fld_name" = id; 
+                "o_edit_fld_time" = id; 
+                "o_edit_lbl_bytes" = id; 
+                "o_edit_lbl_name" = id; 
+                "o_edit_lbl_time" = id; 
+                "o_edit_window" = id; 
+                "o_tbl_dataTable" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

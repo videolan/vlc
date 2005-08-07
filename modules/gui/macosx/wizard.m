@@ -287,8 +287,6 @@ static VLCWizard *_o_sharedInstance = nil;
     /* just present the window to the user */
     [o_tab_pageHolder selectFirstTabViewItem:self];
 
-    [self resetWizard];
-
     [o_wizard_window center];
     [o_wizard_window displayIfNeeded];
     [o_wizard_window makeKeyAndOrderFront:nil];
@@ -457,6 +455,28 @@ static VLCWizard *_o_sharedInstance = nil;
 
     /* wizard help window */
     [o_wh_btn_okay setTitle: _NS("OK")];
+}
+
+- (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to \
+    ofItem: (NSString *)item
+{
+    [self resetWizard];
+    msg_Dbg(VLCIntf, "wizard was resetted");
+    [o_userSelections setObject:@"trnscd" forKey:@"trnscdOrStrmg"];
+    [o_btn_backward setEnabled:YES];
+    [o_tab_pageHolder selectTabViewItemAtIndex:1];
+    [o_t2_fld_prtExtrctFrom setStringValue: from];
+    [o_t2_fld_prtExtrctTo setStringValue: to];
+    [o_t2_fld_pathToNewStrm setStringValue: item];
+    [o_t1_matrix_strmgOrTrnscd selectCellAtRow:1 column:0];
+    [[o_t1_matrix_strmgOrTrnscd cellAtRow:0 column:0] setState: NSOffState];
+    [o_t2_ckb_enblPartExtrct setState: NSOnState];
+    msg_Dbg(VLCIntf, "wizard interface is set");
+    
+    [o_wizard_window center];
+    [o_wizard_window display];
+    [o_wizard_window makeKeyAndOrderFront:nil];
+    msg_Dbg(VLCIntf, "wizard window displayed");
 }
 
 - (IBAction)cancelRun:(id)sender

@@ -107,6 +107,7 @@
                 openRecentItem = id; 
                 openWebsite = id; 
                 reportABug = id; 
+                showBookmarks = id; 
                 showExtended = id; 
                 showWizard = id; 
                 timesliderUpdate = id; 
@@ -143,6 +144,7 @@
                 "o_mi_about" = id; 
                 "o_mi_add_intf" = id; 
                 "o_mi_audiotrack" = id; 
+                "o_mi_bookmarks" = id; 
                 "o_mi_bring_atf" = id; 
                 "o_mi_bwd" = id; 
                 "o_mi_channels" = id; 

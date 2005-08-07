@@ -173,5 +173,7 @@
 - (void)createOpts;
 - (void)rebuildCodecMenus;
 - (id)getPlaylistWizard;
+- (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to \
+    ofItem: (NSString *)item;
 
 @end

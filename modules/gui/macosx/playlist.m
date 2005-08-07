@@ -45,7 +45,8 @@
 #include <vlc_keys.h>
 
 #include "intf.h"
-#include "wizard.h"
+#import "wizard.h"
+#import "bookmarks.h"
 #include "playlist.h"
 #include "controls.h"
 #include "osd.h"
@@ -524,6 +525,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
     [[[[VLCMain sharedInstance] getWizard] getPlaylistWizard] reloadOutlineView];
+    [[[[VLCMain sharedInstance] getBookmarks] getDataTable] reloadData];
 }
 
 - (void)playModeUpdated

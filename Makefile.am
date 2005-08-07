@@ -164,6 +164,9 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Wizard.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Wizard.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
+    extras/MacOSX/Resources/English.lproj/Bookmarks.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/a52.icns \
 	extras/MacOSX/Resources/aac.icns \
@@ -563,6 +566,8 @@ VLC-release.app: vlc
 	    wizard.m \
 	    extended.h \
 	    extended.m \
+        bookmarks.h \
+        bookmarks.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -576,9 +581,9 @@ VLC-release.app: vlc
 	    cd ../../../; \
 	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
-	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
+	  *darwin8*) cd $(top_builddir)/tmp/extras/Default/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
+	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
 	esac
 	rm -Rf $(top_builddir)/tmp
@@ -675,6 +680,8 @@ VLC.app: vlc
 	    wizard.m \
 	    extended.h \
 	    extended.m \
+        bookmarks.h \
+        bookmarks.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -688,9 +695,9 @@ VLC.app: vlc
 	    cd ../../../; \
 	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
-	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
+	  *darwin8*) cd $(top_builddir)/tmp/extras/Default/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
+	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
 	esac
 	rm -Rf $(top_builddir)/tmp

@@ -32,5 +32,7 @@ SOURCES_macosx = \
 	wizard.m \
 	extended.h \
 	extended.m \
+    bookmarks.h \
+    bookmarks.m \
 	$(NULL)
 

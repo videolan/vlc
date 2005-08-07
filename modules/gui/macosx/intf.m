@@ -40,7 +40,7 @@
 #include "open.h"
 #include "wizard.h"
 #include "extended.h"
-//#include "bookmarks.h"
+#include "bookmarks.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -301,7 +301,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
     o_extended = [[VLCExtended alloc] init];
-    //o_bookmarks = [[VLCBookmarks alloc] init];
+    o_bookmarks = [[VLCBookmarks alloc] init];
 
     i_lastShownVolume = -1;
     return _o_sharedMainInstance;
@@ -432,7 +432,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_prefs release];
     [o_open release];
     [o_extended release];
-    //[o_bookmarks release];
+    [o_bookmarks release];
     
     [super dealloc];
 }
@@ -543,7 +543,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_controller setTitle: _NS("Controller")];
     [o_mi_equalizer setTitle: _NS("Equalizer")];
     [o_mi_extended setTitle: _NS("Extended controls")];
-    //[o_mi_bookmarks setTitle: _NS("Bookmarks")];
+    [o_mi_bookmarks setTitle: _NS("Bookmarks")];
     [o_mi_playlist setTitle: _NS("Playlist")];
     [o_mi_info setTitle: _NS("Info")];
     [o_mi_messages setTitle: _NS("Messages")];
@@ -566,8 +566,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* error panel */
     [o_error setTitle: _NS("Error")];
-    [o_err_lbl setStringValue: _NS("An error has occurred which probably prevented the execution of your request:")];
-    [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, please follow the instructions at:")];
+    [o_err_lbl setStringValue: _NS("An error has occurred which probably " \
+        "prevented the execution of your request:")];
+    [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, " \
+        "please follow the instructions at:")];
     [o_err_btn_msgs setTitle: _NS("Open Messages Window")];
     [o_err_btn_dismiss setTitle: _NS("Dismiss")];
     [o_err_ckbk_surpress setTitle: _NS("Suppress further errors")];
@@ -788,6 +790,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     if ( o_wizard )
     {
         return o_wizard;
+    }
+    return nil;
+}
+
+- (id)getBookmarks
+{
+    if ( o_bookmarks )
+    {
+        return o_bookmarks;
     }
     return nil;
 }
@@ -1463,14 +1474,22 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
         [o_wizard initStrings];
+        [o_wizard resetWizard];
         [o_wizard showWizard];
     } else {
+        [o_wizard resetWizard];
         [o_wizard showWizard];
     }
 }
 
 - (IBAction)showExtended:(id)sender
 {
+    /* we need the wizard-nib for the bookmarks's extract functionality */
+    if (!nib_wizard_loaded)
+    {
+        nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
+    }
+
     if (!nib_extended_loaded)
     {
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
@@ -1481,17 +1500,16 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 }
 
-/*- (IBAction)showBookmarks:(id)sender
+- (IBAction)showBookmarks:(id)sender
 {
     if (!nib_bookmarks_loaded)
     {
         nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
-        [o_bookmarks initStrings];
-        [o_bookmarks showPanel];
+        [o_bookmarks showBookmarks];
     } else {
-        [o_bookmarks showPanel];
+        [o_bookmarks showBookmarks];
     }
-}*/
+}
 
 - (IBAction)viewAbout:(id)sender
 {
