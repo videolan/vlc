@@ -16,6 +16,7 @@ Interfaces:
  * Mac OS X
     - new streaming and transcoding wizard
     - new extended controls panel
+    - new bookmarks window
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*	
