@@ -263,6 +263,16 @@ void Dialogs::showFile( bool play )
 }
 
 
+void Dialogs::showDirectory( bool play )
+{
+    if( m_pProvider && m_pProvider->pf_show_dialog )
+    {
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_DIRECTORY,
+                                     (int)play, 0 );
+    }
+}
+
+
 void Dialogs::showDisc( bool play )
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
@@ -303,9 +313,18 @@ void Dialogs::showPrefs()
 
 void Dialogs::showFileInfo()
 {
-   if( m_pProvider && m_pProvider->pf_show_dialog )
+    if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-       m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILEINFO, 0, 0 );
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILEINFO, 0, 0 );
+    }
+}
+
+
+void Dialogs::showStreamingWizard()
+{
+    if( m_pProvider && m_pProvider->pf_show_dialog )
+    {
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_WIZARD, 0, 0 );
     }
 }
 

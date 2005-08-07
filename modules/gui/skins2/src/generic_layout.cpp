@@ -81,7 +81,7 @@ void GenericLayout::onControlRelease( const CtrlGeneric &rCtrl )
 
 
 void GenericLayout::addControl( CtrlGeneric *pControl,
-                              const Position &rPosition, int layer )
+                                const Position &rPosition, int layer )
 {
     if( pControl )
     {

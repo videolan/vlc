@@ -46,6 +46,8 @@ typedef CmdDialogs<10> CmdDlgHidePopupMenu;
 typedef CmdDialogs<11> CmdDlgAdd;
 typedef CmdDialogs<12> CmdDlgPlaylistLoad;
 typedef CmdDialogs<13> CmdDlgPlaylistSave;
+typedef CmdDialogs<14> CmdDlgDirectory;
+typedef CmdDialogs<15> CmdDlgStreamingWizard;
 
 
 /// Generic "Open dialog" command
@@ -106,6 +108,12 @@ class CmdDialogs: public CmdGeneric
                     break;
                 case 13:
                     pDialogs->showPlaylistSave();
+                    break;
+                case 14:
+                    pDialogs->showDirectory( true );
+                    break;
+                case 15:
+                    pDialogs->showStreamingWizard();
                     break;
                 default:
                     msg_Warn( getIntf(), "Unknown dialog type" );

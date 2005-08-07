@@ -88,6 +88,7 @@ enum
     MenuDummy_Event = wxID_HIGHEST + 1000,
     OpenFileSimple_Event = wxID_HIGHEST + 1100,
     OpenFile_Event,
+    OpenDirectory_Event,
     OpenDisc_Event,
     OpenNet_Event,
     OpenCapture_Event,
@@ -114,6 +115,7 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(MenuEvtHandler, wxEvtHandler)
     EVT_MENU(OpenFileSimple_Event, MenuEvtHandler::OnShowDialog)
     EVT_MENU(OpenFile_Event, MenuEvtHandler::OnShowDialog)
+    EVT_MENU(OpenDirectory_Event, MenuEvtHandler::OnShowDialog)
     EVT_MENU(OpenDisc_Event, MenuEvtHandler::OnShowDialog)
     EVT_MENU(OpenNet_Event, MenuEvtHandler::OnShowDialog)
     EVT_MENU(OpenCapture_Event, MenuEvtHandler::OnShowDialog)
@@ -128,6 +130,7 @@ wxMenu *OpenStreamMenu( intf_thread_t *p_intf )
     wxMenu *menu = new wxMenu;
     menu->Append( OpenFileSimple_Event, wxU(_("Quick &Open File...")) );
     menu->Append( OpenFile_Event, wxU(_("Open &File...")) );
+    menu->Append( OpenDirectory_Event, wxU(_("Open D&irectory...")) );
     menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")) );
     menu->Append( OpenNet_Event, wxU(_("Open &Network Stream...")) );
     menu->Append( OpenCapture_Event, wxU(_("Open &Capture Device...")) );
@@ -890,6 +893,9 @@ void MenuEvtHandler::OnShowDialog( wxCommandEvent& event )
             break;
         case OpenFile_Event:
             i_id = INTF_DIALOG_FILE;
+            break;
+        case OpenDirectory_Event:
+            i_id = INTF_DIALOG_DIRECTORY;
             break;
         case OpenDisc_Event:
             i_id = INTF_DIALOG_DISC;
