@@ -56,7 +56,7 @@ diff -urNad /home/sam/debian/official/vlc/debian/vlc-0.7.2.svn20040826/src/inter
      {
 +/*
          "skins2", "Skins 2",
-         "wxwindows", "wxWindows",
+         "wxwidgets", "wxWidgets",
 +*/
          NULL, NULL
      };

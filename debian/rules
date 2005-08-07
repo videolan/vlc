@@ -37,7 +37,7 @@ CONFIG_FLAGS += \
 	--disable-satellite \
 	--enable-ogg \
 	--enable-vorbis \
-	--enable-wxwindows \
+	--enable-wxwidgets \
 	--with-wx-config=wxgtk-2.4-config \
 	--disable-slp \
 	--enable-flac \
@@ -307,7 +307,7 @@ endif
 	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
 	cp debian/vlc/$(VIDDIR)/vlc.xpm debian/wxvlc/$(VIDDIR)/wxvlc.xpm
-	mv debian/vlc/usr/lib/vlc/gui/libwxwindows_plugin.so \
+	mv debian/vlc/usr/lib/vlc/gui/libwxwidgets_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
 	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz
 
