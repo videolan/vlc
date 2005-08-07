@@ -124,7 +124,7 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *subpanel_sizer = new wxBoxSizer( wxHORIZONTAL );
-    panel_sizer->Add( updates_tree, 0, wxGROW | wxALL, 5 );
+    panel_sizer->Add( updates_tree, 1, wxGROW | wxALL, 5 );
     wxButton *update_button =
         new wxButton( panel, CheckForUpdate_Event,
                       wxU(_("Check for updates now !")) );
@@ -147,7 +147,7 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
     panel_sizer->Add( subpanel_sizer, 0, wxALL , 0 );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
-    main_sizer->Add( panel, 0, wxALL | wxGROW, 0 );
+    main_sizer->Add( panel, 1, wxALL | wxGROW, 0 );
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
