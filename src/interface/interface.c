@@ -309,7 +309,7 @@ static void RunInterface( intf_thread_t *p_intf )
     static char *ppsz_interfaces[] =
     {
         "skins2", "Skins 2",
-        "wxwindows", "wxWindows",
+        "wxwidgets", "wxWidgets",
         NULL, NULL
     };
     char **ppsz_parser;
