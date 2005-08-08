@@ -1,10 +1,11 @@
 /*****************************************************************************
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman #_at_# m2x.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,6 +102,24 @@ static void Close ( vlc_object_t * );
 #define CAPMT_SYSID_TEXT N_("CAPMT System ID")
 #define CAPMT_SYSID_LONGTEXT N_("only forward descriptors from this SysID to the CAM")
 
+#define CPKT_TEXT N_("Packet size in bytes to decrypt")
+#define CPKT_LONGTEXT N_("Specify the size of the TS packet to decrypt. " \
+    "The decryption routines subtract the TS-header from the value before " \
+    "decrypting. " )
+
+#define TSDUMP_TEXT N_("Filename of dump")
+#define TSDUMP_LONGTEXT N_("Specify a filename where to dump the TS in")
+
+#define APPEND_TEXT N_("Append")
+#define APPEND_LONGTEXT N_( \
+    "If the file exists and this option is selected, the existing file " \
+    "will not be overwritten." )
+
+#define DUMPSIZE_TEXT N_("Dump buffer size")
+#define DUMPSIZE_LONGTEXT N_( \
+    "Tweak the buffer size for reading and writing an integer number of packets." \
+    "Specify the size of the buffer here and not the number of packets." )
+
 vlc_module_begin();
     set_description( _("MPEG Transport Stream demuxer") );
     set_shortname ( "MPEG-TS" );
@@ -113,7 +132,13 @@ vlc_module_begin();
     add_integer( "ts-out-mtu", 1500, NULL, MTUOUT_TEXT,
                  MTUOUT_LONGTEXT, VLC_TRUE );
     add_string( "ts-csa-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, VLC_TRUE );
+    add_integer( "ts-csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, VLC_TRUE );    
     add_bool( "ts-silent", 0, NULL, SILENT_TEXT, SILENT_LONGTEXT, VLC_TRUE );
+
+    add_file( "ts-dump-file", NULL, NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, VLC_FALSE );
+    add_bool( "ts-dump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT, VLC_FALSE );
+    add_integer( "ts-dump-size", 16384, NULL, DUMPSIZE_TEXT,
+                 DUMPSIZE_LONGTEXT, VLC_TRUE );
 
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
@@ -284,6 +309,7 @@ struct demux_sys_t
     /* */
     vlc_bool_t  b_es_id_pid;
     csa_t       *csa;
+    int         i_csa_pkt_size;
     vlc_bool_t  b_silent;
 
     vlc_bool_t  b_udp_out;
@@ -294,13 +320,19 @@ struct demux_sys_t
     int         i_dvb_program;
     vlc_list_t  *p_programs_list;
 
+    /* TS dump */
+    char        *psz_file;  /* file to dump data in */
+    FILE        *p_file;    /* filehandle */
+    uint64_t    i_write;    /* bytes written */
+    vlc_bool_t  b_file_out; /* dump mode enabled */
+    
     /* */
     vlc_bool_t  b_meta;
 };
 
-static int Demux  ( demux_t *p_demux );
+static int Demux    ( demux_t *p_demux );
+static int DemuxFile( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
-
 
 static void PIDInit ( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner );
 static void PIDClean( es_out_t *out, ts_pid_t *pid );
@@ -312,7 +344,6 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
 static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
                                  uint8_t  i_table_id, uint16_t i_extension );
 #endif
-
 
 static inline int PIDGet( block_t *p )
 {
@@ -343,7 +374,9 @@ static int Open( vlc_object_t *p_this )
     int          i_sync, i_peek, i;
     int          i_packet_size;
 
-    ts_pid_t     *pat;
+    ts_pid_t    *pat;
+    char        *psz_mode;
+    vlc_bool_t   b_append;
 
     vlc_value_t  val;
 
@@ -396,8 +429,61 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_sys->i_packet_size = i_packet_size;
+
+    /* Fill dump mode fields */
+    p_sys->i_write = 0;
+    p_sys->p_file = NULL;
+    p_sys->b_file_out = VLC_FALSE;
+    p_sys->psz_file = var_CreateGetString( p_demux, "ts-dump-file" );
+    if( *p_sys->psz_file != '\0' )
+    {
+        p_sys->b_file_out = VLC_TRUE;
+
+        var_Create( p_demux, "ts-dump-append", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+        var_Get( p_demux, "ts-dump-append", &val );
+        b_append = val.b_bool;
+        if ( b_append )
+            psz_mode = "ab";
+        else
+            psz_mode = "wb";
+
+        if( !strcmp( p_sys->psz_file, "-" ) )
+        {
+            msg_Info( p_demux, "dumping raw stream to standard output" );
+            p_sys->p_file = stdout;
+        }
+        else if( ( p_sys->p_file = fopen( p_sys->psz_file, psz_mode ) ) == NULL )
+        {
+            msg_Err( p_demux, "cannot create `%s' for writing", p_sys->psz_file );
+            p_sys->b_file_out = VLC_FALSE;
+        }
+
+        if( p_sys->b_file_out )
+        {
+            vlc_value_t bufsize;
+
+            /* Determine how many packets to read. */
+            var_Create( p_demux, "ts-dump-size",
+                        VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            var_Get( p_demux, "ts-dump-size", &bufsize );
+            p_sys->i_ts_read = (int) (bufsize.i_int / p_sys->i_packet_size);
+            if( p_sys->i_ts_read <= 0 )
+            {
+                p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
+            }
+            p_sys->buffer = malloc( p_sys->i_packet_size * p_sys->i_ts_read );
+            msg_Info( p_demux, "%s raw stream to file `%s' reading packets %d",
+                      b_append ? "appending" : "dumping", p_sys->psz_file,
+                      p_sys->i_ts_read );
+        }
+    }
+
     /* Fill p_demux field */
-    p_demux->pf_demux = Demux;
+    if( p_sys->b_file_out )
+        p_demux->pf_demux = DemuxFile;
+    else
+        p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
@@ -459,7 +545,7 @@ static int Open( vlc_object_t *p_this )
 
     var_Create( p_demux, "ts-out", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-out", &val );
-    if( val.psz_string && *val.psz_string )
+    if( val.psz_string && *val.psz_string && !p_sys->b_file_out )
     {
         vlc_value_t mtu;
         char *psz = strchr( val.psz_string, ':' );
@@ -498,7 +584,6 @@ static int Open( vlc_object_t *p_this )
     {
         free( val.psz_string );
     }
-
 
     /* We handle description of an extra PMT */
     var_Create( p_demux, "ts-extra-pmt", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -597,13 +682,28 @@ static int Open( vlc_object_t *p_this )
             {
                 ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
             }
-
+#ifndef TS_NO_CSA_CK_MSG
             msg_Dbg( p_demux, "using CSA scrambling with "
                      "ck=%x:%x:%x:%x:%x:%x:%x:%x",
                      ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
-
+#endif
             p_sys->csa = csa_New();
-            csa_SetCW( p_sys->csa, ck, ck );
+            
+            if( p_sys->csa )
+            {
+                csa_SetCW( p_sys->csa, ck, ck );
+            
+                var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+                var_Get( p_demux, "ts-csa-pkt", &val );
+                if( val.i_int < 4 || val.i_int > 188 )
+                {
+                    msg_Err( p_demux, "wrong packet size %d specified.", val.i_int );
+                    msg_Warn( p_demux, "using default packet size of 188 bytes" );
+                    p_sys->i_csa_pkt_size = 188;
+                }
+                else p_sys->i_csa_pkt_size = val.i_int;
+                msg_Dbg( p_demux, "decrypting %d bytes of packet", p_sys->i_csa_pkt_size );
+            }
         }
     }
     if( val.psz_string )
@@ -691,7 +791,133 @@ static void Close( vlc_object_t *p_this )
         var_Change( p_demux, "programs", VLC_VAR_FREELIST, &val, NULL );
     }
 
+    /* If in dump mode, then close the file */
+    if( p_sys->b_file_out )
+    {
+        msg_Info( p_demux ,"closing %s ("I64Fd" Kbytes dumped)", p_sys->psz_file,
+                  p_sys->i_write / 1024 );
+
+        if( p_sys->p_file != stdout )
+        {
+            fclose( p_sys->p_file );
+            p_sys->p_file = NULL;
+        }
+        free( p_sys->psz_file );
+        p_sys->psz_file = NULL;
+
+        free( p_sys->buffer );
+    }
+
     free( p_sys );
+}
+
+/*****************************************************************************
+ * DemuxFile:
+ *****************************************************************************/
+static int DemuxFile( demux_t *p_demux )
+{    
+    demux_sys_t *p_sys = p_demux->p_sys;
+    uint8_t     *p_buffer = p_sys->buffer; /* Put first on sync byte */
+    int i_diff= 0;
+    int i_data= 0;
+    int i_pos = 0;
+    int i_bufsize = p_sys->i_packet_size * p_sys->i_ts_read;
+    
+    i_data = stream_Read( p_demux->s, p_sys->buffer, i_bufsize );
+    if( (i_data <= 0) && (i_data < p_sys->i_packet_size) )
+    {
+        msg_Dbg( p_demux, "Error reading malformed packets" );
+        return i_data;
+    }
+
+    /* Test continuity counter */
+    while( i_pos < i_data )
+    {
+        ts_pid_t    *p_pid;   /* point to a PID structure */
+        vlc_bool_t b_payload; /* indicates a packet with payload */
+        vlc_bool_t b_adaptation; /* adaptation field */
+        int i_cc  = 0;        /* continuity counter */
+    
+        if( p_sys->buffer[i_pos] != 0x47 )
+        {
+            msg_Warn( p_demux, "lost sync" );
+            while( !p_demux->b_die && (i_pos < i_data) )
+            {
+                i_pos++;
+                if( p_sys->buffer[i_pos] == 0x47 )
+                    break;
+            }
+            if( !p_demux->b_die )
+                msg_Warn( p_demux, "sync found" );
+        }
+        
+        /* continuous when (one of this):
+         * diff == 1
+         * diff == 0 and payload == 0
+         * diff == 0 and duplicate packet (playload != 0) <- should we
+         *   test the content ?
+         */
+        i_cc  = p_buffer[i_pos+3]&0x0f;
+        b_payload = p_buffer[i_pos+3]&0x10;
+        b_adaptation = p_buffer[i_pos+3]&0x20;
+        
+        /* Get the PID */
+        p_pid = &p_sys->pid[ ((p_buffer[i_pos+1]&0x1f)<<8)|p_buffer[i_pos+2] ];
+        
+        /* Detect discontinuity indicator in adaptation field */
+        if( b_adaptation )
+        {
+            if( p_buffer[i_pos+5]&0x80 )
+                msg_Warn( p_demux, "discontinuity indicator (pid=%d) ", p_pid->i_pid );
+            if( p_buffer[i_pos+5]&0x40 )
+                msg_Warn( p_demux, "random access indicator (pid=%d) ", p_pid->i_pid );
+        }
+ 
+        i_diff = ( i_cc - p_pid->i_cc )&0x0f;
+        if( b_payload && i_diff == 1 )
+        {
+            p_pid->i_cc++;
+        }
+        else
+        {
+            if( p_pid->i_cc == 0xff )
+            {
+                msg_Warn( p_demux, "first packet for pid=%d cc=0x%x",
+                        p_pid->i_pid, i_cc );
+                p_pid->i_cc = i_cc;
+            }
+            else if( i_diff != 0 )
+            {
+                /* FIXME what to do when discontinuity_indicator is set ? */
+                msg_Warn( p_demux, "transport error detected 0x%x instead of 0x%x",
+                          i_cc, ( p_pid->i_cc + 1 )&0x0f );
+    
+                p_pid->i_cc = i_cc;
+                /* Mark transport error in the TS packet. */
+                p_buffer[i_pos+1] |= 0x80;
+            }
+        }
+        
+        /* Test if user wants to decrypt it first */
+        if( p_sys->csa )
+            csa_Decrypt( p_demux->p_sys->csa, &p_buffer[i_pos], p_demux->p_sys->i_csa_pkt_size );
+        
+        i_pos += p_sys->i_packet_size;
+    }
+
+    /* Then write */
+    i_data = fwrite( p_sys->buffer, 1, i_data, p_sys->p_file );
+    if( i_data < 0 )
+    {
+        msg_Err( p_demux, "failed to write data" );
+        return -1;
+    }
+#if 0
+    msg_Dbg( p_demux, "dumped %d bytes", i_data );
+#endif
+
+    p_sys->i_write += i_data;
+    return 1;
 }
 
 /*****************************************************************************
@@ -836,6 +1062,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double f, *pf;
     int64_t i64;
     int i_int;
+
+    if( p_sys->b_file_out )
+        return demux2_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
 
     switch( i_query )
     {
@@ -1409,7 +1638,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     if( p_demux->p_sys->csa )
     {
-        csa_Decrypt( p_demux->p_sys->csa, p_bk->p_buffer );
+        csa_Decrypt( p_demux->p_sys->csa, p_bk->p_buffer, p_demux->p_sys->i_csa_pkt_size );
     }
 
     if( !b_adaptation )
@@ -1682,7 +1911,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     p_iod = malloc( sizeof( iod_descriptor_t ) );
     memset( p_iod, 0, sizeof( iod_descriptor_t ) );
 
+#ifdef DEBUG
     fprintf( stderr, "\n************ IOD ************" );
+#endif
     for( i = 0; i < 255; i++ )
     {
         p_iod->es_descr[i].b_ok = 0;
@@ -1709,10 +1940,11 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         p_iod->i_iod_label = byte2;
         i_iod_tag = byte3;
     }
+#ifdef DEBUG
     fprintf( stderr, "\n* iod_label:%d", p_iod->i_iod_label );
     fprintf( stderr, "\n* ===========" );
     fprintf( stderr, "\n* tag:0x%x", i_iod_tag );
-
+#endif
     if( i_iod_tag != 0x02 )
     {
         fprintf( stderr, "\n ERR: tag %02x != 0x02", i_iod_tag );
@@ -1720,7 +1952,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     }
 
     i_iod_length = IODDescriptorLength( &i_data, &p_data );
+#ifdef DEBUG    
     fprintf( stderr, "\n* length:%d", i_iod_length );
+#endif
     if( i_iod_length > i_data )
     {
         i_iod_length = i_data;
@@ -1730,16 +1964,18 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     i_flags = IODGetByte( &i_data, &p_data );
     p_iod->i_od_id |= i_flags >> 6;
     b_url = ( i_flags >> 5  )&0x01;
-
+#ifdef DEBUG
     fprintf( stderr, "\n* od_id:%d", p_iod->i_od_id );
     fprintf( stderr, "\n* url flag:%d", b_url );
     fprintf( stderr, "\n* includeInlineProfileLevel flag:%d", ( i_flags >> 4 )&0x01 );
-
+#endif
     if( b_url )
     {
         p_iod->psz_url = IODGetURL( &i_data, &p_data );
+#ifdef DEBUG        
         fprintf( stderr, "\n* url string:%s", p_iod->psz_url );
         fprintf( stderr, "\n*****************************\n" );
+#endif        
         return p_iod;
     }
     else
@@ -1752,13 +1988,13 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     p_iod->i_audioProfileLevelIndication = IODGetByte( &i_data, &p_data );
     p_iod->i_visualProfileLevelIndication = IODGetByte( &i_data, &p_data );
     p_iod->i_graphicsProfileLevelIndication = IODGetByte( &i_data, &p_data );
-
+#ifdef DEBUG
     fprintf( stderr, "\n* ODProfileLevelIndication:%d", p_iod->i_ODProfileLevelIndication );
     fprintf( stderr, "\n* sceneProfileLevelIndication:%d", p_iod->i_sceneProfileLevelIndication );
     fprintf( stderr, "\n* audioProfileLevelIndication:%d", p_iod->i_audioProfileLevelIndication );
     fprintf( stderr, "\n* visualProfileLevelIndication:%d", p_iod->i_visualProfileLevelIndication );
     fprintf( stderr, "\n* graphicsProfileLevelIndication:%d", p_iod->i_graphicsProfileLevelIndication );
-
+#endif
 
     while( i_data > 0 && i_es_index < 255)
     {
@@ -1780,7 +2016,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 {
 #define es_descr    p_iod->es_descr[i_es_index]
                     int i_decoderConfigDescr_length;
+#ifdef DEBUG
                     fprintf( stderr, "\n* - ES_Descriptor length:%d", i_length );
+#endif
                     es_descr.b_ok = 1;
 
                     es_descr.i_es_id = IODGetWord( &i_data, &p_data );
@@ -1789,20 +2027,25 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     b_url = ( i_flags >> 6 )&0x01;
                     es_descr.b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
                     es_descr.i_streamPriority = i_flags & 0x1f;
+#ifdef DEBUG
                     fprintf( stderr, "\n*   * streamDependenceFlag:%d", es_descr.b_streamDependenceFlag );
                     fprintf( stderr, "\n*   * OCRStreamFlag:%d", es_descr.b_OCRStreamFlag );
                     fprintf( stderr, "\n*   * streamPriority:%d", es_descr.i_streamPriority );
-
+#endif
                     if( es_descr.b_streamDependenceFlag )
                     {
                         es_descr.i_dependOn_es_id = IODGetWord( &i_data, &p_data );
+#ifdef DEBUG
                         fprintf( stderr, "\n*   * dependOn_es_id:%d", es_descr.i_dependOn_es_id );
+#endif
                     }
 
                     if( b_url )
                     {
                         es_descr.psz_url = IODGetURL( &i_data, &p_data );
+#ifdef DEBUG
                         fprintf( stderr, "\n* url string:%s", es_descr.psz_url );
+#endif
                     }
                     else
                     {
@@ -1812,18 +2055,23 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     if( es_descr.b_OCRStreamFlag )
                     {
                         es_descr.i_OCR_es_id = IODGetWord( &i_data, &p_data );
+#ifdef DEBUG
                         fprintf( stderr, "\n*   * OCR_es_id:%d", es_descr.i_OCR_es_id );
+#endif
                     }
 
                     if( IODGetByte( &i_data, &p_data ) != 0x04 )
                     {
+#ifdef DEBUG
                         fprintf( stderr, "\n* ERR missing DecoderConfigDescr" );
+#endif
                         es_descr.b_ok = 0;
                         break;
                     }
                     i_decoderConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
-
+#ifdef DEBUG
                     fprintf( stderr, "\n*   - DecoderConfigDesc length:%d", i_decoderConfigDescr_length );
+#endif                    
 #define dec_descr   es_descr.dec_descr
                     dec_descr.i_objectTypeIndication = IODGetByte( &i_data, &p_data );
                     i_flags = IODGetByte( &i_data, &p_data );
@@ -1832,12 +2080,14 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     dec_descr.i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
                     dec_descr.i_maxBitrate = IODGetDWord( &i_data, &p_data );
                     dec_descr.i_avgBitrate = IODGetDWord( &i_data, &p_data );
+#ifdef DEBUG                    
                     fprintf( stderr, "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
                     fprintf( stderr, "\n*     * streamType:0x%x", dec_descr.i_streamType );
                     fprintf( stderr, "\n*     * upStream:%d", dec_descr.b_upStream );
                     fprintf( stderr, "\n*     * bufferSizeDB:%d", dec_descr.i_bufferSizeDB );
                     fprintf( stderr, "\n*     * maxBitrate:%d", dec_descr.i_maxBitrate );
                     fprintf( stderr, "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
+#endif                    
                     if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
                     {
                         int i;
@@ -1867,15 +2117,20 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
                     if( IODGetByte( &i_data, &p_data ) != 0x06 )
                     {
+#ifdef DEBUG                    
                         fprintf( stderr, "\n* ERR missing SLConfigDescr" );
+#endif
                         es_descr.b_ok = 0;
                         break;
                     }
                     i_SLConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
-
+#ifdef DEBUG
                     fprintf( stderr, "\n*   - SLConfigDescr length:%d", i_SLConfigDescr_length );
+#endif
                     i_predefined = IODGetByte( &i_data, &p_data );
+#ifdef DEBUG
                     fprintf( stderr, "\n*     * i_predefined:0x%x", i_predefined  );
+#endif
                     switch( i_predefined )
                     {
                         case 0x01:
@@ -1911,7 +2166,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                             }
                             break;
                         default:
+#ifdef DEBUG                        
                             fprintf( stderr, "\n* ERR unsupported SLConfigDescr predefined" );
+#endif                            
                             es_descr.b_ok = 0;
                             break;
                     }
@@ -1920,7 +2177,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 #undef  sl_descr
 #undef  es_descr
             default:
+#ifdef DEBUG            
                 fprintf( stderr, "\n* - OD tag:0x%x length:%d (Unsupported)", i_tag, i_length );
+#endif                
                 break;
         }
 
@@ -1928,9 +2187,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         i_data = i_data_sav - i_length;
         i_es_index++;
     }
-
-
+#ifdef DEBUG
     fprintf( stderr, "\n*****************************\n" );
+#endif    
     return p_iod;
 }
 

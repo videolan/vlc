@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _CSA_H
+#define _CSA_H 1
+
 typedef struct csa_t csa_t;
 #define csa_New     E_(__csa_New)
 #define csa_Delete  E_(__csa_Delete)
@@ -33,6 +36,7 @@ void   csa_Delete( csa_t * );
 
 void   csa_SetCW( csa_t *, uint8_t o_ck[8], uint8_t e_ck[8] );
 
-void   csa_Decrypt( csa_t *, uint8_t *pkt );
-void   csa_Encrypt( csa_t *, uint8_t *pkt, int b_odd );
+void   csa_Decrypt( csa_t *, uint8_t *pkt, int i_pkt_size );
+void   csa_Encrypt( csa_t *, uint8_t *pkt, int i_pkt_size, int b_odd );
 
+#endif /* _CSA_H */

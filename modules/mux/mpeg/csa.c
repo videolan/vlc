@@ -1,10 +1,11 @@
 /*****************************************************************************
  * libcsa.c: CSA scrambler/descrambler
  *****************************************************************************
- * Copyright (C) 2004 Laurent Aimar
+ * Copyright (C) 2004-2005 Laurent Aimar
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman #_at_# m2x.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +90,7 @@ void csa_SetCW( csa_t *c, uint8_t o_ck[8], uint8_t e_ck[8] )
 /*****************************************************************************
  * csa_Decrypt:
  *****************************************************************************/
-void csa_Decrypt( csa_t *c, uint8_t *pkt )
+void csa_Decrypt( csa_t *c, uint8_t *pkt, int i_pkt_size )
 {
     uint8_t *ck;
     uint8_t *kk;
@@ -133,8 +134,11 @@ void csa_Decrypt( csa_t *c, uint8_t *pkt )
     csa_StreamCypher( c, 1, ck, &pkt[i_hdr], ib );
 
     /* */
-    n = (188 - i_hdr) / 8;
-    i_residue = (188 - i_hdr) % 8;
+    n = (i_pkt_size - i_hdr) / 8;
+    if( n < 0 )
+        return;
+        
+    i_residue = (i_pkt_size - i_hdr) % 8;    
     for( i = 1; i < n + 1; i++ )
     {
         csa_BlockDecypher( kk, ib, block );
@@ -167,7 +171,7 @@ void csa_Decrypt( csa_t *c, uint8_t *pkt )
         csa_StreamCypher( c, 0, ck, NULL, stream );
         for( j = 0; j < i_residue; j++ )
         {
-            pkt[188 - i_residue + j] ^= stream[j];
+            pkt[i_pkt_size - i_residue + j] ^= stream[j];
         }
     }
 }
@@ -175,13 +179,13 @@ void csa_Decrypt( csa_t *c, uint8_t *pkt )
 /*****************************************************************************
  * csa_Encrypt:
  *****************************************************************************/
-void csa_Encrypt( csa_t *c, uint8_t *pkt, int b_odd )
+void csa_Encrypt( csa_t *c, uint8_t *pkt, int i_pkt_size, int b_odd )
 {
     uint8_t *ck;
     uint8_t *kk;
 
     int i, j;
-    int i_hdr;
+    int i_hdr = 4; /* hdr len */
     uint8_t  ib[184/8+2][8], stream[8], block[8];
     int n, i_residue;
 
@@ -210,10 +214,10 @@ void csa_Encrypt( csa_t *c, uint8_t *pkt, int b_odd )
         /* skip adaption field */
         i_hdr += pkt[4] + 1;
     }
-    n = (188 - i_hdr) / 8;
-    i_residue = (188 - i_hdr) % 8;
+    n = (i_pkt_size - i_hdr) / 8;
+    i_residue = (i_pkt_size - i_hdr) % 8;
 
-    if( n == 0 )
+    if( n <= 0 )
     {
         pkt[3] &= 0x3f;
         return;
@@ -253,7 +257,7 @@ void csa_Encrypt( csa_t *c, uint8_t *pkt, int b_odd )
         csa_StreamCypher( c, 0, ck, NULL, stream );
         for( j = 0; j < i_residue; j++ )
         {
-            pkt[188 - i_residue + j] ^= stream[j];
+            pkt[i_pkt_size - i_residue + j] ^= stream[j];
         }
     }
 }

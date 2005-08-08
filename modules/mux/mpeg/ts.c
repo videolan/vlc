@@ -6,6 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
+ *          Jean-Paul Saman <jpsaman #_at_# m2x.nl> 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,6 +131,11 @@ static void    Close  ( vlc_object_t * );
 #define CK_LONGTEXT N_("Defines the CSA encryption key. This must be a " \
   "16 char string (8 hexadecimal bytes).")
 
+#define CPKT_TEXT N_("Packet size in bytes to encrypt")
+#define CPKT_LONGTEXT N_("Specify the size of the TS packet to encrypt. " \
+    "The encryption routines subtract the TS-header from the value before " \
+    "encrypting. " )
+
 #define SOUT_CFG_PREFIX "sout-ts-"
 
 vlc_module_begin();
@@ -176,6 +182,7 @@ vlc_module_begin();
 
     add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, VLC_TRUE );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -186,7 +193,7 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "program-pmt",
     "es-id-pid", "shaping", "pcr", "bmin", "bmax", "use-key-frames",
-    "dts-delay", "csa-ck", "crypt-audio", "crypt-video",
+    "dts-delay", "csa-ck", "csa-pkt", "crypt-audio", "crypt-video",
     NULL
 };
 
@@ -203,6 +210,7 @@ static inline void BufferChainInit  ( sout_buffer_chain_t *c )
     c->p_first = NULL;
     c->pp_last = &c->p_first;
 }
+
 static inline void BufferChainAppend( sout_buffer_chain_t *c, block_t *b )
 {
     *c->pp_last = b;
@@ -215,6 +223,7 @@ static inline void BufferChainAppend( sout_buffer_chain_t *c, block_t *b )
     }
     c->pp_last = &b->p_next;
 }
+
 static inline block_t *BufferChainGet( sout_buffer_chain_t *c )
 {
     block_t *b = c->p_first;
@@ -233,12 +242,14 @@ static inline block_t *BufferChainGet( sout_buffer_chain_t *c )
     }
     return b;
 }
+
 static inline block_t *BufferChainPeek( sout_buffer_chain_t *c )
 {
     block_t *b = c->p_first;
 
     return b;
 }
+
 static inline void BufferChainClean( sout_instance_t *p_sout,
                                      sout_buffer_chain_t *c )
 {
@@ -293,14 +304,14 @@ struct sout_mux_sys_t
     int             i_pid_video;
     int             i_pid_audio;
     int             i_pid_spu;
-    int             i_pid_free; // first usable pid
+    int             i_pid_free; /* first usable pid */
 
     int             i_tsid;
     int             i_pat_version_number;
     ts_stream_t     pat;
 
     int             i_pmt_version_number;
-    ts_stream_t     pmt;        // Up to now only one program
+    ts_stream_t     pmt;        /* Up to now only one program */
     int             i_pmt_program_number;
 
     int             i_mpeg4_streams;
@@ -321,10 +332,10 @@ struct sout_mux_sys_t
     mtime_t             i_pcr;  /* last PCR emited */
 
     csa_t               *csa;
+    int                 i_csa_pkt_size;
     vlc_bool_t          b_crypt_audio;
     vlc_bool_t          b_crypt_video;
 };
-
 
 /* Reserve a pid and return it */
 static int  AllocatePID( sout_mux_sys_t *p_sys, int i_cat )
@@ -542,12 +553,25 @@ static int Open( vlc_object_t *p_this )
             {
                 ck[i] = ( i_ck >> ( 56 - 8*i) )&0xff;
             }
-
+#ifndef TS_NO_CSA_CK_MSG
             msg_Dbg( p_mux, "using CSA scrambling with ck=%x:%x:%x:%x:%x:%x:%x:%x",
                      ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
-
+#endif
             p_sys->csa = csa_New();
-            csa_SetCW( p_sys->csa, ck, ck );
+            if( p_sys->csa )
+            {
+                csa_SetCW( p_sys->csa, ck, ck );
+                
+                var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &val );
+                if( val.i_int < 12 || val.i_int > 188 )
+                {
+                    msg_Err( p_mux, "wrong packet size %d specified.", val.i_int );
+                    msg_Warn( p_mux, "using default packet size of 188 bytes" );
+                    p_sys->i_csa_pkt_size = 188;
+                }
+                else p_sys->i_csa_pkt_size = val.i_int;
+                msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
+            }    
         }
     }
     if( val.psz_string ) free( val.psz_string );
@@ -663,8 +687,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC( 'D', 'I', 'V', '2' ):
                 case VLC_FOURCC( 'D', 'I', 'V', '1' ):
                 case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
-                    p_stream->i_stream_type = 0xa0; // private
-                    p_stream->i_stream_id = 0xa0;   // beurk
+                    p_stream->i_stream_type = 0xa0; /* private */
+                    p_stream->i_stream_id = 0xa0;   /* beurk */
                     p_stream->i_bih_codec  = p_input->p_fmt->i_codec;
                     p_stream->i_bih_width  = p_input->p_fmt->video.i_width;
                     p_stream->i_bih_height = p_input->p_fmt->video.i_height;
@@ -772,7 +796,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                      p_stream->lang[0], p_stream->lang[1], p_stream->lang[2] );
         }
     }
-
 
     /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
     p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra;
@@ -1496,7 +1519,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         }
         if( p_ts->i_flags & BLOCK_FLAG_SCRAMBLED )
         {
-            csa_Encrypt( p_sys->csa, p_ts->p_buffer, 0 );
+            csa_Encrypt( p_sys->csa, p_ts->p_buffer, p_sys->i_csa_pkt_size, 0 );
         }
 
         /* latency */
@@ -1811,7 +1834,6 @@ static block_t *WritePSISection( sout_instance_t *p_sout,
 {
     block_t   *p_psi, *p_first = NULL;
 
-
     while( p_section )
     {
         int             i_size;
@@ -1825,7 +1847,7 @@ static block_t *WritePSISection( sout_instance_t *p_sout,
         p_psi->i_length = 0;
         p_psi->i_buffer = i_size + 1;
 
-        p_psi->p_buffer[0] = 0; // pointer
+        p_psi->p_buffer[0] = 0; /* pointer */
         memcpy( p_psi->p_buffer + 1,
                 p_section->p_data,
                 i_size );
@@ -1847,14 +1869,14 @@ static void GetPAT( sout_mux_t *p_mux,
     dvbpsi_psi_section_t *p_section;
 
     dvbpsi_InitPAT( &pat, p_sys->i_tsid, p_sys->i_pat_version_number,
-                    1 );      // b_current_next
+                    1 );      /* b_current_next */
     /* add all program (only one) */
     dvbpsi_PATAddProgram( &pat,
-                          p_sys->i_pmt_program_number,                    // i_number
-                          p_sys->pmt.i_pid );   // i_pid
+                          p_sys->i_pmt_program_number, /* i_number */
+                          p_sys->pmt.i_pid );   /* i_pid */
 
     p_section = dvbpsi_GenPATSections( &pat,
-                                       0 );     // max program per section
+                                       0 );     /* max program per section */
 
     p_pat = WritePSISection( p_mux->p_sout, p_section );
 
@@ -1888,9 +1910,9 @@ static void GetPMT( sout_mux_t *p_mux,
     int                 i_stream;
 
     dvbpsi_InitPMT( &pmt,
-                    p_sys->i_pmt_program_number,   // program number
+                    p_sys->i_pmt_program_number,   /* program number */
                     p_sys->i_pmt_version_number,
-                    1,      // b_current_next
+                    1,      /* b_current_next */
                     p_sys->i_pcr_pid );
 
     if( p_sys->i_mpeg4_streams > 0 )
@@ -1905,25 +1927,25 @@ static void GetPMT( sout_mux_t *p_mux,
         memset( iod, 0, 4096 );
 
         bits_initwrite( &bits, 4096, iod );
-	// IOD_label_scope
+        /* IOD_label_scope */
         bits_write( &bits, 8,   0x11 );
-        // IOD_label
+        /* IOD_label */
         bits_write( &bits, 8,   0x01 );
-        // InitialObjectDescriptor
+        /* InitialObjectDescriptor */
         bits_align( &bits );
-        bits_write( &bits, 8,   0x02 );     // tag
-        bits_fix_IOD = bits;    // save states to fix length later
+        bits_write( &bits, 8,   0x02 );     /* tag */
+        bits_fix_IOD = bits;    /* save states to fix length later */
         bits_write( &bits, 24,
-            GetDescriptorLength24b( 0 ) ); // variable length (fixed later)
-        bits_write( &bits, 10,  0x01 );     // ObjectDescriptorID
-        bits_write( &bits, 1,   0x00 );     // URL Flag
-        bits_write( &bits, 1,   0x00 );     // includeInlineProfileLevelFlag
-        bits_write( &bits, 4,   0x0f );     // reserved
-        bits_write( &bits, 8,   0xff );     // ODProfile (no ODcapability )
-        bits_write( &bits, 8,   0xff );     // sceneProfile
-        bits_write( &bits, 8,   0xfe );     // audioProfile (unspecified)
-        bits_write( &bits, 8,   0xfe );     // visualProfile( // )
-        bits_write( &bits, 8,   0xff );     // graphicProfile (no )
+            GetDescriptorLength24b( 0 ) );  /* variable length (fixed later) */
+        bits_write( &bits, 10,  0x01 );     /* ObjectDescriptorID */
+        bits_write( &bits, 1,   0x00 );     /* URL Flag */
+        bits_write( &bits, 1,   0x00 );     /* includeInlineProfileLevelFlag */
+        bits_write( &bits, 4,   0x0f );     /* reserved */
+        bits_write( &bits, 8,   0xff );     /* ODProfile (no ODcapability ) */
+        bits_write( &bits, 8,   0xff );     /* sceneProfile */
+        bits_write( &bits, 8,   0xfe );     /* audioProfile (unspecified) */
+        bits_write( &bits, 8,   0xfe );     /* visualProfile( // ) */
+        bits_write( &bits, 8,   0xff );     /* graphicProfile (no ) */
         for( i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
         {
             ts_stream_t *p_stream;
@@ -1936,41 +1958,41 @@ static void GetPMT( sout_mux_t *p_mux,
                 bits_buffer_t bits_fix_ESDescr, bits_fix_Decoder;
                 /* ES descriptor */
                 bits_align( &bits );
-                bits_write( &bits, 8,   0x03 );     // ES_DescrTag
+                bits_write( &bits, 8,   0x03 );     /* ES_DescrTag */
                 bits_fix_ESDescr = bits;
                 bits_write( &bits, 24,
-                            GetDescriptorLength24b( 0 ) ); // variable size
-                bits_write( &bits, 16,  p_stream->i_es_id );
-                bits_write( &bits, 1,   0x00 );     // streamDependency
-                bits_write( &bits, 1,   0x00 );     // URL Flag
-                bits_write( &bits, 1,   0x00 );     // OCRStreamFlag
-                bits_write( &bits, 5,   0x1f );     // streamPriority
+                            GetDescriptorLength24b( 0 ) ); /* variable size */
+                bits_write( &bits, 16,  p_stream->i_es_id ); 
+                bits_write( &bits, 1,   0x00 );     /* streamDependency */
+                bits_write( &bits, 1,   0x00 );     /* URL Flag */
+                bits_write( &bits, 1,   0x00 );     /* OCRStreamFlag */
+                bits_write( &bits, 5,   0x1f );     /* streamPriority */
 
-                // DecoderConfigDesciptor
+                /* DecoderConfigDesciptor */
                 bits_align( &bits );
-                bits_write( &bits, 8,   0x04 ); // DecoderConfigDescrTag
+                bits_write( &bits, 8,   0x04 ); /* DecoderConfigDescrTag */
                 bits_fix_Decoder = bits;
                 bits_write( &bits, 24,  GetDescriptorLength24b( 0 ) );
                 if( p_stream->i_stream_type == 0x10 )
                 {
-                    bits_write( &bits, 8, 0x20 );   // Visual 14496-2
-                    bits_write( &bits, 6, 0x04 );   // VisualStream
+                    bits_write( &bits, 8, 0x20 );   /* Visual 14496-2 */
+                    bits_write( &bits, 6, 0x04 );   /* VisualStream */
                 }
                 else if( p_stream->i_stream_type == 0x1b )
                 {
-                    bits_write( &bits, 8, 0x21 );   // Visual 14496-2
-                    bits_write( &bits, 6, 0x04 );   // VisualStream
+                    bits_write( &bits, 8, 0x21 );   /* Visual 14496-2 */
+                    bits_write( &bits, 6, 0x04 );   /* VisualStream */
                 }
                 else if( p_stream->i_stream_type == 0x11  || p_stream->i_stream_type == 0x0f )
                 {
-                    bits_write( &bits, 8, 0x40 );   // Audio 14496-3
-                    bits_write( &bits, 6, 0x05 );   // AudioStream
+                    bits_write( &bits, 8, 0x40 );   /* Audio 14496-3 */
+                    bits_write( &bits, 6, 0x05 );   /* AudioStream */
                 }
                 else if( p_stream->i_stream_type == 0x12 &&
                          p_stream->i_codec == VLC_FOURCC('s','u','b','t') )
                 {
-                    bits_write( &bits, 8, 0x0B );   // Text Stream
-                    bits_write( &bits, 6, 0x04 );   // VisualStream
+                    bits_write( &bits, 8, 0x0B );   /* Text Stream */
+                    bits_write( &bits, 6, 0x04 );   /* VisualStream */
                 }
                 else
                 {
@@ -1980,18 +2002,18 @@ static void GetPMT( sout_mux_t *p_mux,
                     msg_Err( p_mux->p_sout,"Unsupported stream_type => "
                              "broken IOD" );
                 }
-                bits_write( &bits, 1,   0x00 );     // UpStream
-                bits_write( &bits, 1,   0x01 );     // reserved
-                bits_write( &bits, 24,  1024 * 1024 );  // bufferSizeDB
-                bits_write( &bits, 32,  0x7fffffff );   // maxBitrate
-                bits_write( &bits, 32,  0 );            // avgBitrate
+                bits_write( &bits, 1,   0x00 );         /* UpStream */
+                bits_write( &bits, 1,   0x01 );         /* reserved */
+                bits_write( &bits, 24,  1024 * 1024 );  /* bufferSizeDB */
+                bits_write( &bits, 32,  0x7fffffff );   /* maxBitrate */
+                bits_write( &bits, 32,  0 );            /* avgBitrate */
 
                 if( p_stream->i_decoder_specific_info > 0 )
                 {
                     int i;
-                    // DecoderSpecificInfo
+                    /* DecoderSpecificInfo */
                     bits_align( &bits );
-                    bits_write( &bits, 8,   0x05 ); // tag
+                    bits_write( &bits, 8,   0x05 ); /* tag */
                     bits_write( &bits, 24, GetDescriptorLength24b(
                                 p_stream->i_decoder_specific_info ) );
                     for( i = 0; i < p_stream->i_decoder_specific_info; i++ )
@@ -2005,15 +2027,15 @@ static void GetPMT( sout_mux_t *p_mux,
                             GetDescriptorLength24b( bits.i_data -
                             bits_fix_Decoder.i_data - 3 ) );
 
-                /* SLConfigDescriptor : predifined (0x01) */
+                /* SLConfigDescriptor : predefined (0x01) */
                 bits_align( &bits );
-                bits_write( &bits, 8,   0x06 ); // tag
+                bits_write( &bits, 8,   0x06 ); /* tag */
                 bits_write( &bits, 24,  GetDescriptorLength24b( 8 ) );
-                bits_write( &bits, 8,   0x01 ); // predefined
-                bits_write( &bits, 1,   0 );   // durationFlag
-                bits_write( &bits, 32,  0 );   // OCRResolution
-                bits_write( &bits, 8,   0 );   // OCRLength
-                bits_write( &bits, 8,   0 );   // InstantBitrateLength
+                bits_write( &bits, 8,   0x01 );/* predefined */
+                bits_write( &bits, 1,   0 );   /* durationFlag */
+                bits_write( &bits, 32,  0 );   /* OCRResolution */
+                bits_write( &bits, 8,   0 );   /* OCRLength */
+                bits_write( &bits, 8,   0 );   /* InstantBitrateLength */
                 bits_align( &bits );
 
                 /* fix ESDescr length */
