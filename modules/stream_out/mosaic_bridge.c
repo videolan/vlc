@@ -161,10 +161,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_id = val.psz_string;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "height", &val );
-    p_sys->i_height = val.i_int; 
+    p_sys->i_height = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
-    p_sys->i_width = val.i_int; 
+    p_sys->i_width = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "sar", &val );
     if ( val.psz_string )
