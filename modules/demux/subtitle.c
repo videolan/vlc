@@ -318,6 +318,7 @@ static int Open ( vlc_object_t *p_this )
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
         msg_Err( p_demux, "failed to recognize subtitle type" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -347,6 +348,10 @@ static int Open ( vlc_object_t *p_this )
                                               sizeof(subtitle_t) * i_max ) ) )
             {
                 msg_Err( p_demux, "out of memory");
+                if( p_sys->subtitle != NULL )
+                    free( p_sys->subtitle );
+                TextUnload( &p_sys->txt );
+                free( p_sys );
                 return VLC_ENOMEM;
             }
         }
