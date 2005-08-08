@@ -231,6 +231,8 @@ XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
 dnl
 dnl Iconv stuff
 dnl
+AS_IF([test "$am_cv_func_iconv" != "yes"],
+	[AC_MSG_ERROR([libiconv is needed for VLC to work properly])])
 VLC_ADD_CFLAGS([vlc],[${INCICONV}])
 VLC_ADD_LDFLAGS([vlc],[${LIBICONV}])
 
