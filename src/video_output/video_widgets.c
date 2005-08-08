@@ -217,11 +217,15 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
     subpicture_t *p_subpic;
     int i_x_margin, i_y_margin, i_x, i_y, i_width, i_height;
 
-    if( p_vout == NULL || !config_GetInt( p_caller, "osd" ) || i_position < 0 )
+    if( p_vout == NULL )
     {
         return;
     }
-
+    if( !config_GetInt( p_caller, "osd" ) || i_position < 0 )
+    {
+        vlc_object_release( p_vout );
+        return;
+    }
     p_subpic = vout_CreateWidget( p_vout->p_spu, i_channel );
     if( p_subpic == NULL )
     {
