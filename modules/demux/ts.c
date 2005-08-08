@@ -429,6 +429,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_packet_size = i_packet_size;
 
     /* Fill dump mode fields */
@@ -485,8 +487,6 @@ static int Open( vlc_object_t *p_this )
     else
         p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     /* Init p_sys field */
     p_sys->b_meta = VLC_TRUE;
