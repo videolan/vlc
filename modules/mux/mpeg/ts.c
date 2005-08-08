@@ -390,13 +390,15 @@ static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, block_t *, ts_s
 static int Open( vlc_object_t *p_this )
 {
     sout_mux_t          *p_mux =(sout_mux_t*)p_this;
-    sout_mux_sys_t      *p_sys;
+    sout_mux_sys_t      *p_sys = NULL;
     vlc_value_t         val;
 
     msg_Dbg( p_mux, "Open" );
     sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
@@ -560,16 +562,18 @@ static int Open( vlc_object_t *p_this )
             p_sys->csa = csa_New();
             if( p_sys->csa )
             {
-                csa_SetCW( p_sys->csa, ck, ck );
+                vlc_value_t pkt_val;
+            
+                csa_SetCW( p_sys->csa, ck, ck );                
                 
-                var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &val );
-                if( val.i_int < 12 || val.i_int > 188 )
+                var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
+                if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
                 {
-                    msg_Err( p_mux, "wrong packet size %d specified.", val.i_int );
+                    msg_Err( p_mux, "wrong packet size %d specified.", pkt_val.i_int );
                     msg_Warn( p_mux, "using default packet size of 188 bytes" );
                     p_sys->i_csa_pkt_size = 188;
                 }
-                else p_sys->i_csa_pkt_size = val.i_int;
+                else p_sys->i_csa_pkt_size = pkt_val.i_int;
                 msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
             }    
         }

@@ -691,17 +691,19 @@ static int Open( vlc_object_t *p_this )
             
             if( p_sys->csa )
             {
+                vlc_value_t pkt_val;
+                
                 csa_SetCW( p_sys->csa, ck, ck );
             
                 var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-                var_Get( p_demux, "ts-csa-pkt", &val );
-                if( val.i_int < 4 || val.i_int > 188 )
+                var_Get( p_demux, "ts-csa-pkt", &pkt_val );
+                if( pkt_val.i_int < 4 || pkt_val.i_int > 188 )
                 {
-                    msg_Err( p_demux, "wrong packet size %d specified.", val.i_int );
+                    msg_Err( p_demux, "wrong packet size %d specified.", pkt_val.i_int );
                     msg_Warn( p_demux, "using default packet size of 188 bytes" );
                     p_sys->i_csa_pkt_size = 188;
                 }
-                else p_sys->i_csa_pkt_size = val.i_int;
+                else p_sys->i_csa_pkt_size = pkt_val.i_int;
                 msg_Dbg( p_demux, "decrypting %d bytes of packet", p_sys->i_csa_pkt_size );
             }
         }
