@@ -174,8 +174,10 @@ static void StreamRead( void *, unsigned int, unsigned int,
 static void StreamClose( void * );
 static void TaskInterrupt( void * );
 
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1117756800
 static unsigned char* parseH264ConfigStr( char const* configStr,
-                                          unsigned& configSize );
+                                          unsigned int& configSize );
+#endif
 
 /*****************************************************************************
  * DemuxOpen:
@@ -515,9 +517,10 @@ static int  Open ( vlc_object_t *p_this )
             }
             else if( !strcmp( sub->codecName(), "H264" ) )
             {
-                unsigned int i_extra;
-                uint8_t      *p_extra;
-
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1117756800
+                unsigned int i_extra = 0;
+                uint8_t      *p_extra = NULL;
+#endif
                 tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '4' );
                 tk->fmt.b_packetized = VLC_FALSE;
 
@@ -1322,11 +1325,13 @@ static int ParseASF( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1117756800
 static unsigned char* parseH264ConfigStr( char const* configStr,
-                                          unsigned& configSize )
+                                          unsigned int& configSize )
 {
     char *dup, *psz;
 
+    if( configSize )
     configSize = 0;
 
     if( configStr == NULL || *configStr == '\0' )
@@ -1352,10 +1357,10 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
         psz = p;
     }
 
-    free( dup );
-
+    if( dup ) free( dup );
     return cfg;
 }
+#endif
 
 /*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
 static int b64_decode( char *dest, char *src )
