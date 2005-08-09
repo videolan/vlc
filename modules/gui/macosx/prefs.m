@@ -400,7 +400,8 @@ static VLCTreeItem *o_root_item = nil;
 
                 [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc]
                     initWithName:[[VLCMain sharedInstance]
-                        localizedString: p_module->psz_object_name ]
+                        localizedString: p_module->psz_shortname ?
+                        p_module->psz_shortname : p_module->psz_object_name ]
                     ID: p_module->i_object_id
                     parent:p_subcategory_item
                     children:IsALeafNode
