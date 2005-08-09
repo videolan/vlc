@@ -2287,7 +2287,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
         dvbpsi_descriptor_t *p_dr;
 
         msg_Dbg( p_demux, "  * service id=%d eit schedule=%d present=%d "
-                 "runing=%d free_ca=%d",
+                 "running=%d free_ca=%d",
                  p_srv->i_service_id, p_srv->b_eit_schedule,
                  p_srv->b_eit_present, p_srv->i_running_status,
                  p_srv->b_free_ca );
