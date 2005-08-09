@@ -1194,6 +1194,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 {
     vlc_bool_t b_force_update = VLC_FALSE;
 
+    if( !p_input ) return b_force_update;
+        
     switch( i_type )
     {
         case INPUT_CONTROL_SET_DIE:
@@ -1239,8 +1241,6 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( p_input->i_slave > 0 )
                     SlaveSeek( p_input );
 
-                //input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
-                //es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
                 b_force_update = VLC_TRUE;
             }
             break;
@@ -1295,8 +1295,6 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( p_input->i_slave > 0 )
                     SlaveSeek( p_input );
 
-                //input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
-                //es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
                 b_force_update = VLC_TRUE;
             }
             break;
@@ -1332,6 +1330,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 /* Reset clock */
                 es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
             }
             else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
                      p_input->b_can_pause )
@@ -1888,7 +1887,13 @@ static void UpdateItemLength( input_thread_t *p_input, int64_t i_length,
  *****************************************************************************/
 static input_source_t *InputSourceNew( input_thread_t *p_input )
 {
-    input_source_t *in = malloc( sizeof( input_source_t ) );
+    input_source_t *in = (input_source_t*) malloc( sizeof( input_source_t ) );
+   
+    if( !in )
+    {
+        msg_Err( p_input, "out of memory for new input source" );
+        return NULL;
+    }
 
     in->p_item   = NULL;
     in->p_access = NULL;
@@ -1919,6 +1924,8 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz;
     vlc_value_t val;
 
+    if( !in ) return VLC_EGENERIC;
+    
     /* Split uri */
     if( !b_quick )
     {
@@ -2009,7 +2016,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( in->p_access == NULL &&
             *psz_access == '\0' && ( *psz_demux || *psz_path ) )
         {
-            free( psz_dup );
+            if( psz_dup ) free( psz_dup );
             psz_dup = strdup( psz_mrl );
             psz_access = "";
             psz_demux = "";
@@ -2047,7 +2054,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             psz = end;
         }
-        free( psz_tmp );
+        if( psz_tmp ) free( psz_tmp );
 
         /* Get infos from access */
         if( !b_quick )
@@ -2116,7 +2123,7 @@ static int InputSourceInit( input_thread_t *p_input,
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
 
-    free( psz_dup );
+    if( psz_dup ) free( psz_dup );
     return VLC_SUCCESS;
 
 error:
@@ -2128,7 +2135,7 @@ error:
 
     if( in->p_access )
         access2_Delete( in->p_access );
-    free( psz_dup );
+    if( psz_dup ) free( psz_dup );
 
     return VLC_EGENERIC;
 }
@@ -2162,6 +2169,7 @@ static void SlaveDemux( input_thread_t *p_input )
 {
     int64_t i_time;
     int i;
+    
     if( demux2_Control( p_input->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
@@ -2297,8 +2305,8 @@ static void DecodeUrl( char *psz )
             *psz++ = *p++;
         }
     }
-    *psz++  ='\0';
-    free( dup );
+    if( psz ) *psz++  ='\0';
+    if( dup ) free( dup );
 }
 
 /*****************************************************************************
