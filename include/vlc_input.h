@@ -283,7 +283,10 @@ enum input_state_e
     END_S,
 };
 
-/* "rate" default, min/max */
+/* "rate" default, min/max
+ * A rate below 1000 plays the movie faster,
+ * A rate above 1000 plays the movie slower.
+ */
 #define INPUT_RATE_DEFAULT  1000
 #define INPUT_RATE_MIN       125            /* Up to 8/1 */
 #define INPUT_RATE_MAX      8000            /* Up to 1/8 */
