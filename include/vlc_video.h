@@ -264,7 +264,7 @@ struct subpicture_t
     int          i_alpha;                                  /**< transparency */
     int          i_original_picture_width;  /**< original width of the movie */
     int          i_original_picture_height;/**< original height of the movie */
-    int          b_absolute;                       /**< position is absolute */
+    vlc_bool_t   b_absolute;                       /**< position is absolute */
     int          i_flags;                                /**< position flags */
      /**@}*/
 
