@@ -328,9 +328,9 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         int i_src_pitch = p_pic->p[0].i_pitch;
         uint8_t *p_dst = p_pic_dst->p[3].p_pixels;
         int i_dst_pitch = p_pic_dst->p[3].i_pitch;
-        int j;
+        uint32_t l,j;
 
-        for( i = 0; i < p_filter->fmt_out.video.i_height; i++ )
+        for( l = 0; l < p_filter->fmt_out.video.i_height; l++ )
         {
             for( j = 0; j < p_filter->fmt_out.video.i_width; j++ )
             {
