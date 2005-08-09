@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_demux.h
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -45,7 +45,7 @@ struct demux_t
     stream_t    *s;     /* NULL in case of a access+demux in one */
 
     /* es output */
-    es_out_t    *out;   /* ou p_es_out */
+    es_out_t    *out;   /* our p_es_out */
 
     /* set by demuxer */
     int (*pf_demux)  ( demux_t * );   /* demux one frame only */
