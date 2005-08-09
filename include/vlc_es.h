@@ -163,7 +163,7 @@ struct es_format_t
     video_format_t video;
     subs_format_t  subs;
 
-    int            i_bitrate;
+    unsigned int   i_bitrate;
 
     vlc_bool_t     b_packetized; /* wether the data is packetized
                                     (ie. not truncated) */
