@@ -286,12 +286,12 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     if( p_access->info.b_eof )
         return 0;
 
-    while( i_data < i_len )
+    while( i_data < (size_t) i_len )
     {
         if( p_access->info.i_pos < p_sys->i_start + p_sys->i_header )
         {
             int i_offset = p_access->info.i_pos - p_sys->i_start;
-            i_copy = __MIN( p_sys->i_header - i_offset, i_len - i_data );
+            i_copy = __MIN( p_sys->i_header - i_offset, (int)((size_t)i_len - i_data) );
             memcpy( &p_buffer[i_data], &p_sys->p_header[i_offset], i_copy );
 
             i_data += i_copy;

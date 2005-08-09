@@ -97,13 +97,13 @@ static int  mms_ReceivePacket( access_t * );
  * Merci :))
  */
 /*
- * Vous pourriez signer vos commentaires (même si on voit bien qui peut
- * écrire ce genre de trucs :p), et écrire en anglais, bordel de
+ * Vous pourriez signer vos commentaires (mï¿½e si on voit bien qui peut
+ * ï¿½rire ce genre de trucs :p), et ï¿½rire en anglais, bordel de
  * merde :p.
  */
 /*
- * Alors la ouai ç'est fou les gens qui écrivent des commentaires sans les
- * signer. Ca mériterait un coup de pied dans le cul ça :)
+ * Alors la ouai ï¿½est fou les gens qui ï¿½rivent des commentaires sans les
+ * signer. Ca mï¿½iterait un coup de pied dans le cul ï¿½ :)
  */
 
 int  E_(MMSTUOpen)( access_t *p_access )
@@ -1301,7 +1301,7 @@ static int mms_ReceivePacket( access_t *p_access )
             if( GetDWLE( p_sys->buffer_tcp + 4 ) == 0xb00bface  )
             {
                 if( GetDWLE( p_sys->buffer_tcp + 8 ) + 16 <=
-                    p_sys->i_buffer_tcp )
+                    (uint32_t)p_sys->i_buffer_tcp )
                 {
                     b_refill = VLC_FALSE;
                 }
