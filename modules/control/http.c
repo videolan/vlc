@@ -25,11 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-/* TODO:
- * - clean up ?
- * - doc ! (mouarf ;)
- */
-
 #include <stdlib.h>
 #include <ctype.h>
 #include <vlc/vlc.h>
@@ -1698,7 +1693,7 @@ StrToMacroTypeTab [] =
         { "vlm_save",       MVLC_VLM_SAVE },
 
     { "rpn",        MVLC_RPN },
-    { "stack",        MVLC_STACK },
+    { "stack",      MVLC_STACK },
 
     { "foreach",    MVLC_FOREACH },
     { "value",      MVLC_VALUE },
@@ -1706,8 +1701,8 @@ StrToMacroTypeTab [] =
     { "if",         MVLC_IF },
     { "else",       MVLC_ELSE },
     { "end",        MVLC_END },
-    { "get",         MVLC_GET },
-    { "set",         MVLC_SET },
+    { "get",        MVLC_GET },
+    { "set",        MVLC_SET },
         { "int",            MVLC_INT },
         { "float",          MVLC_FLOAT },
         { "string",         MVLC_STRING },
@@ -1798,7 +1793,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     break;
                 }
                 case MVLC_STOP:
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_STOP);
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_STOP );
                     msg_Dbg( p_intf, "requested playlist stop" );
                     break;
                 case MVLC_PAUSE:
@@ -1810,8 +1805,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_PREVIOUS:
-                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1);
-                    msg_Dbg( p_intf, "requested playlist next" );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1 );
+                    msg_Dbg( p_intf, "requested playlist previous" );
                     break;
                 case MVLC_FULLSCREEN:
                 {
@@ -2029,33 +2024,36 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         {
                             aout_VolumeSet( p_intf , AOUT_VOLUME_MAX );
                             msg_Dbg( p_intf, "requested volume set: max" );
-                        } else
+                        }
+                        else
                         {
                             aout_VolumeSet( p_intf , (i_volume + i_value) );
                             msg_Dbg( p_intf, "requested volume set: +%i", (i_volume + i_value) );
                         }
-                    } else
-                    if( vol[0] == '-' )
+                    }
+                    else if( vol[0] == '-' )
                     {
                         i_value = atoi( vol + 1 );
                         if( (i_volume - i_value) < AOUT_VOLUME_MIN )
                         {
                             aout_VolumeSet( p_intf , AOUT_VOLUME_MIN );
                             msg_Dbg( p_intf, "requested volume set: min" );
-                        } else
+                        }
+                        else
                         {
                             aout_VolumeSet( p_intf , (i_volume - i_value) );
                             msg_Dbg( p_intf, "requested volume set: -%i", (i_volume - i_value) );
                         }
-                    } else
-                    if( strstr(vol, "%") != NULL )
+                    }
+                    else if( strstr(vol, "%") != NULL )
                     {
                         i_value = atoi( vol );
                         if( (i_value <= 400) && (i_value>=0) ){
                             aout_VolumeSet( p_intf, (i_value * (AOUT_VOLUME_MAX - AOUT_VOLUME_MIN))/400+AOUT_VOLUME_MIN);
                             msg_Dbg( p_intf, "requested volume set: %i%%", atoi( vol ));
                         }
-                    } else
+                    }
+                    else
                     {
                         i_value = atoi( vol );
                         if( ( i_value <= AOUT_VOLUME_MAX ) && ( i_value >= AOUT_VOLUME_MIN ) )
@@ -2197,14 +2195,16 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                                     SORT_TITLE_NODES_FIRST,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by title (%d)" , i_order );
-                    } else if( !strcmp( type , "author" ) )
+                    }
+                    else if( !strcmp( type , "author" ) )
                     {
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
                                                     p_sys->p_playlist->pp_views[0]->p_root,
                                                     SORT_AUTHOR,
                                                     ( i_order == 0 ) ? ORDER_NORMAL : ORDER_REVERSE );
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
-                    } else if( !strcmp( type , "shuffle" ) )
+                    }
+                    else if( !strcmp( type , "shuffle" ) )
                     {
                         playlist_RecursiveNodeSort( p_sys->p_playlist, /*playlist_ItemGetById( p_sys->p_playlist, i_item ),*/
                                                     p_sys->p_playlist->pp_views[0]->p_root,
@@ -2228,7 +2228,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     if ( i_pos < i_newpos )
                     {
                         playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
-                    } else {
+                    }
+                    else
+                    {
                         playlist_Move( p_sys->p_playlist, i_pos, i_newpos );
                     }
                     msg_Dbg( p_intf, "requested move playlist item %d to %d", i_pos, i_newpos);
@@ -3095,7 +3097,7 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
     {
         char s[100], *p;
 
-        /* skip spcae */
+        /* skip space */
         while( *exp == ' ' )
         {
             exp++;
@@ -3108,6 +3110,9 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             exp++;
             while( *exp && *exp != '\'' )
             {
+                /* strip a level of backslashes */
+                if( *exp == '\\' && exp[1] != '\0' )
+                    exp++;
                 *p++ = *exp++;
             }
             *p = '\0';
@@ -3362,7 +3367,7 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             free( value );
         }
         /* 5. player control */
-        else if( !strcmp( s, "play" ) )
+        else if( !strcmp( s, "vlc_play" ) )
         {
             int i_id = SSPopN( st, vars );
             int i_ret;
@@ -3373,6 +3378,26 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );
             SSPushN( st, i_ret );
         }
+        else if( !strcmp( s, "vlc_stop" ) )
+        {
+            playlist_Control( p_sys->p_playlist, PLAYLIST_STOP );
+            msg_Dbg( p_intf, "requested playlist stop" );
+        }
+        else if( !strcmp( s, "vlc_pause" ) )
+        {
+            playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE );
+            msg_Dbg( p_intf, "requested playlist pause" );
+        }
+        else if( !strcmp( s, "vlc_next" ) )
+        {
+            playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, 1 );
+            msg_Dbg( p_intf, "requested playlist next" );
+        }
+        else if( !strcmp( s, "vlc_previous" ) )
+        {
+            playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1 );
+            msg_Dbg( p_intf, "requested playlist previous" );
+        }
         /* 6. playlist functions */
         else if( !strcmp( s, "playlist_add" ) )
         {
@@ -3380,6 +3405,9 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             char *mrl = SSPop( st );
             playlist_item_t *p_item;
             int i_id;
+
+            psz_name = ToUTF8( p_intf, psz_name );
+            mrl = ToUTF8( p_intf, mrl );
 
             if( !*psz_name )
             {
@@ -3403,6 +3431,14 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 msg_Dbg( p_intf, "requested mrl add: %s", mrl );
             }
             SSPushN( st, i_id );
+
+            free( mrl );
+            free( psz_name );
+        }
+        else if( !strcmp( s, "playlist_empty" ) )
+        {
+            playlist_LockClear( p_sys->p_playlist );
+            msg_Dbg( p_intf, "requested playlist empty" );
         }
         else
         {
