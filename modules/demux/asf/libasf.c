@@ -307,6 +307,9 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
 
     int i_peek, i_entries, i;
     uint8_t *p_peek;
+#ifdef ASF_DEBUG
+    unsigned int j;
+#endif
 
     p_meta->i_record_entries_count = 0;
     p_meta->record = 0;
@@ -401,9 +404,9 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     msg_Dbg( s,
             "read \"metadata object\" %d entries",
             p_meta->i_record_entries_count );
-    for( i = 0; i < p_meta->i_record_entries_count; i++ )
+    for( j = 0; j < p_meta->i_record_entries_count; j++ )
     {
-        asf_metadata_record_t *p_rec = &p_meta->record[i];
+        asf_metadata_record_t *p_rec = &p_meta->record[j];
         
         if( p_rec->i_type == ASF_METADATA_TYPE_STRING )
             msg_Dbg( s, "  - %s=%s",

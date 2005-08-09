@@ -77,7 +77,7 @@ typedef struct
 
 struct demux_sys_t
 {
-    mtime_t             i_time;     /* µs */
+    mtime_t             i_time;     /* s */
     mtime_t             i_length;   /* length of file file */
     int64_t             i_bitrate;  /* global file bitrate */
 
@@ -366,7 +366,7 @@ static int DemuxPacket( demux_t *p_demux )
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-//        i_packet_size_left = i_packet_length;   // XXX données reellement lu
+//        i_packet_size_left = i_packet_length;   // XXX donnï¿½s reellement lu
     /* FIXME I have to do that for some file, I don't known why */
     i_packet_size_left = i_data_packet_min;
 
@@ -719,7 +719,8 @@ static int DemuxInit( demux_t *p_demux )
             if( p_sys->p_root->p_metadata )
             {
                 asf_object_metadata_t *p_meta = p_sys->p_root->p_metadata;
-                int i, i_aspect_x = 0, i_aspect_y = 0;
+                int i_aspect_x = 0, i_aspect_y = 0;
+                unsigned int i;
 
                 for( i = 0; i < p_meta->i_record_entries_count; i++ )
                 {
