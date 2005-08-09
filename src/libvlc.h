@@ -1,12 +1,13 @@
 /*****************************************************************************
  * libvlc.h: main libvlc header
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Jean-Paul Saman <jpsaman #_at_# m2x.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -297,6 +298,7 @@ static char *ppsz_align_descriptions[] =
 #define CLOCK_SYNCHRO_LONGTEXT N_( \
     "Allows you to enable/disable the input clock synchronisation for " \
     "real-time sources.")
+
 static int pi_clock_values[] = { -1, 0, 1 };
 static char *ppsz_clock_descriptions[] =
 { N_("Default"), N_("Disable"), N_("Enable") };
@@ -482,9 +484,6 @@ static char *ppsz_clock_descriptions[] =
 #define SOCKS_PASS_TEXT N_("SOCKS password")
 #define SOCKS_PASS_LONGTEXT N_("Allows you to modify the password that will " \
     "be used for the connection to the SOCKS server.")
-
-
-
 
 #define META_TITLE_TEXT N_("Title metadata")
 #define META_TITLE_LONGTEXT N_( \
@@ -780,6 +779,8 @@ static char *ppsz_clock_descriptions[] =
 #define POSITION_KEY_TEXT N_("Position")
 #define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position.")
 
+#define JB3SEC_KEY_TEXT N_("Jump 3 seconds backwards")
+#define JB3SEC_KEY_LONGTEXT N_("Select the hotkey to jump 3 seconds backwards.")
 #define JB10SEC_KEY_TEXT N_("Jump 10 seconds backwards")
 #define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds backwards.")
 
@@ -787,12 +788,14 @@ static char *ppsz_clock_descriptions[] =
 #define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute backwards.")
 #define JB5MIN_KEY_TEXT N_("Jump 5 minutes backwards")
 #define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes backwards.")
+
+#define JF3SEC_KEY_TEXT N_("Jump 3 seconds forward")
+#define JF3SEC_KEY_LONGTEXT N_("Select the hotkey to jump 3 seconds forward.")
 #define JF10SEC_KEY_TEXT N_("Jump 10 seconds forward")
 #define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds forward.")
 
 #define JF1MIN_KEY_TEXT N_("Jump 1 minute forward")
 #define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute forward.")
-
 #define JF5MIN_KEY_TEXT N_("Jump 5 minutes forward")
 #define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes forward.")
 
@@ -808,6 +811,14 @@ static char *ppsz_clock_descriptions[] =
 #define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in DVD menus.")
 #define NAV_ACTIVATE_KEY_TEXT N_("Activate")
 #define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in DVD menus.")
+#define TITLE_PREV_TEXT N_("Select previous DVD title")
+#define TITLE_PREV_LONGTEXT N_("Select the key to choose the previous title from the DVD")
+#define TITLE_NEXT_TEXT N_("Select next DVD title")
+#define TITLE_NEXT_LONGTEXT N_("Select the key to choose the next title from the DVD")
+#define CHAPTER_PREV_TEXT N_("Select prev DVD chapter")
+#define CHAPTER_PREV_LONGTEXT N_("Select the key to choose the previous chapter from the DVD")
+#define CHAPTER_NEXT_TEXT N_("Select prev DVD chapter")
+#define CHAPTER_NEXT_LONGTEXT N_("Select the key to choose the next chapter from the DVD")
 #define VOL_UP_KEY_TEXT N_("Volume up")
 #define VOL_UP_KEY_LONGTEXT N_("Select the key to increase audio volume.")
 #define VOL_DOWN_KEY_TEXT N_("Volume down")
@@ -856,6 +867,8 @@ static char *ppsz_clock_descriptions[] =
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
 #define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows")
+#define INTF_HIDE_KEY_TEXT N_("Hide interface")
+#define INTF_HIDE_KEY_LONGTEXT N_("Lower the interface below all other windows")
 #define SNAP_KEY_TEXT N_("Take video snapshot")
 #define SNAP_KEY_LONGTEXT N_("Takes a video snapshot and writes it to disk.")
 
@@ -1344,6 +1357,8 @@ vlc_module_begin();
 #   define KEY_PREV               KEY_MODIFIER_COMMAND|KEY_LEFT
 #   define KEY_STOP               KEY_MODIFIER_COMMAND|'.'
 #   define KEY_POSITION           't'
+#   define KEY_JUMP_M3SEC         KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_LEFT
+#   define KEY_JUMP_P3SEC         KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_RIGHT
 #   define KEY_JUMP_M10SEC        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT
 #   define KEY_JUMP_P10SEC        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT
 #   define KEY_JUMP_M1MIN         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT
@@ -1366,6 +1381,11 @@ vlc_module_begin();
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_INTF_SHOW          'i'
+#   define KEY_INTF_HIDE          'I'
+#   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
+#   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
+#   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
+#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
 #   define KEY_SNAPSHOT           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'s'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
@@ -1403,6 +1423,8 @@ vlc_module_begin();
 #   define KEY_PREV               'p'
 #   define KEY_STOP               's'
 #   define KEY_POSITION           't'
+#   define KEY_JUMP_M3SEC         KEY_MODIFIER_SHIFT|KEY_LEFT
+#   define KEY_JUMP_P3SEC         KEY_MODIFIER_SHIFT|KEY_RIGHT
 #   define KEY_JUMP_M10SEC        KEY_MODIFIER_ALT|KEY_LEFT
 #   define KEY_JUMP_P10SEC        KEY_MODIFIER_ALT|KEY_RIGHT
 #   define KEY_JUMP_M1MIN         KEY_MODIFIER_CTRL|KEY_LEFT
@@ -1426,6 +1448,11 @@ vlc_module_begin();
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
 #   define KEY_INTF_SHOW          'i'
+#   define KEY_INTF_HIDE          'I'
+#   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
+#   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
+#   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
+#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
 #   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_CTRL|KEY_F1
@@ -1473,6 +1500,10 @@ vlc_module_begin();
              STOP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-position", KEY_POSITION, NULL, POSITION_KEY_TEXT,
              POSITION_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-jump-3sec", KEY_JUMP_M3SEC, NULL, JB3SEC_KEY_TEXT,
+             JB3SEC_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+3sec", KEY_JUMP_P3SEC, NULL, JF3SEC_KEY_TEXT,
+             JF3SEC_KEY_LONGTEXT, VLC_FALSE );             
     add_key( "key-jump-10sec", KEY_JUMP_M10SEC, NULL, JB10SEC_KEY_TEXT,
              JB10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump+10sec", KEY_JUMP_P10SEC, NULL, JF10SEC_KEY_TEXT,
@@ -1497,6 +1528,15 @@ vlc_module_begin();
     add_key( "key-nav-right", KEY_NAV_RIGHT, NULL, NAV_RIGHT_KEY_TEXT,
              NAV_RIGHT_KEY_LONGTEXT, VLC_TRUE );
 
+    add_key( "key-title-prev", KEY_TITLE_PREV, NULL, TITLE_PREV_TEXT,
+             TITLE_PREV_LONGTEXT, VLC_TRUE );
+    add_key( "key-title-next", KEY_TITLE_NEXT, NULL, TITLE_NEXT_TEXT,
+             TITLE_NEXT_LONGTEXT, VLC_TRUE );
+    add_key( "key-chapter-prev", KEY_CHAPTER_PREV, NULL, CHAPTER_PREV_TEXT,
+             CHAPTER_PREV_LONGTEXT, VLC_TRUE );
+    add_key( "key-chapter-next", KEY_CHAPTER_NEXT, NULL, CHAPTER_NEXT_TEXT,
+             CHAPTER_NEXT_LONGTEXT, VLC_TRUE );
+                          
     add_key( "key-quit", KEY_QUIT, NULL, QUIT_KEY_TEXT,
              QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", KEY_VOL_UP, NULL, VOL_UP_KEY_TEXT,
@@ -1519,6 +1559,8 @@ vlc_module_begin();
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-intf-show", KEY_INTF_SHOW, NULL,
              INTF_SHOW_KEY_TEXT, INTF_SHOW_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-intf-hide", KEY_INTF_HIDE, NULL,
+             INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, VLC_TRUE );             
     add_key( "key-snapshot", KEY_SNAPSHOT, NULL,
              SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, VLC_TRUE );
 
@@ -1612,62 +1654,68 @@ static module_config_t p_help_config[] =
  *****************************************************************************/
 static struct hotkey p_hotkeys[] =
 {
-    { "key-quit", ACTIONID_QUIT, 0 },
-    { "key-play-pause", ACTIONID_PLAY_PAUSE, 0 },
-    { "key-play", ACTIONID_PLAY, 0 },
-    { "key-pause", ACTIONID_PAUSE, 0 },
-    { "key-stop", ACTIONID_STOP, 0 },
-    { "key-position", ACTIONID_POSITION, 0 },
-    { "key-jump-10sec", ACTIONID_JUMP_BACKWARD_10SEC, 0 },
-    { "key-jump+10sec", ACTIONID_JUMP_FORWARD_10SEC, 0 },
-    { "key-jump-1min", ACTIONID_JUMP_BACKWARD_1MIN, 0 },
-    { "key-jump+1min", ACTIONID_JUMP_FORWARD_1MIN, 0 },
-    { "key-jump-5min", ACTIONID_JUMP_BACKWARD_5MIN, 0 },
-    { "key-jump+5min", ACTIONID_JUMP_FORWARD_5MIN, 0 },
-    { "key-prev", ACTIONID_PREV, 0 },
-    { "key-next", ACTIONID_NEXT, 0 },
-    { "key-faster", ACTIONID_FASTER, 0 },
-    { "key-slower", ACTIONID_SLOWER, 0 },
-    { "key-fullscreen", ACTIONID_FULLSCREEN, 0 },
-    { "key-vol-up", ACTIONID_VOL_UP, 0 },
-    { "key-vol-down", ACTIONID_VOL_DOWN, 0 },
-    { "key-vol-mute", ACTIONID_VOL_MUTE, 0 },
-    { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, 0 },
-    { "key-subdelay-up", ACTIONID_SUBDELAY_UP, 0 },
-    { "key-audiodelay-down", ACTIONID_AUDIODELAY_DOWN, 0 },
-    { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, 0 },
-    { "key-audio-track", ACTIONID_AUDIO_TRACK, 0},
-    { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0},
-    { "key-intf-show", ACTIONID_INTF_SHOW, 0},
-    { "key-snapshot", ACTIONID_SNAPSHOT, 0},
-    { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0 },
-    { "key-nav-up", ACTIONID_NAV_UP, 0 },
-    { "key-nav-down", ACTIONID_NAV_DOWN, 0 },
-    { "key-nav-left", ACTIONID_NAV_LEFT, 0 },
-    { "key-nav-right", ACTIONID_NAV_RIGHT, 0 },
-    { "key-set-bookmark1", ACTIONID_SET_BOOKMARK1, 0},
-    { "key-set-bookmark2", ACTIONID_SET_BOOKMARK2, 0},
-    { "key-set-bookmark3", ACTIONID_SET_BOOKMARK3, 0},
-    { "key-set-bookmark4", ACTIONID_SET_BOOKMARK4, 0},
-    { "key-set-bookmark5", ACTIONID_SET_BOOKMARK5, 0},
-    { "key-set-bookmark6", ACTIONID_SET_BOOKMARK6, 0},
-    { "key-set-bookmark7", ACTIONID_SET_BOOKMARK7, 0},
-    { "key-set-bookmark8", ACTIONID_SET_BOOKMARK8, 0},
-    { "key-set-bookmark9", ACTIONID_SET_BOOKMARK9, 0},
-    { "key-set-bookmark10", ACTIONID_SET_BOOKMARK10, 0},
-    { "key-play-bookmark1", ACTIONID_PLAY_BOOKMARK1, 0},
-    { "key-play-bookmark2", ACTIONID_PLAY_BOOKMARK2, 0},
-    { "key-play-bookmark3", ACTIONID_PLAY_BOOKMARK3, 0},
-    { "key-play-bookmark4", ACTIONID_PLAY_BOOKMARK4, 0},
-    { "key-play-bookmark5", ACTIONID_PLAY_BOOKMARK5, 0},
-    { "key-play-bookmark6", ACTIONID_PLAY_BOOKMARK6, 0},
-    { "key-play-bookmark7", ACTIONID_PLAY_BOOKMARK7, 0},
-    { "key-play-bookmark8", ACTIONID_PLAY_BOOKMARK8, 0},
-    { "key-play-bookmark9", ACTIONID_PLAY_BOOKMARK9, 0},
-    { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, 0},
-    { "key-history-back", ACTIONID_HISTORY_BACK, 0},
-    { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0},
-    { "key-record", ACTIONID_RECORD, 0 },
-    { NULL, 0, 0 }
+    { "key-quit", ACTIONID_QUIT, 0, 0, 0, 0 },
+    { "key-play-pause", ACTIONID_PLAY_PAUSE, 0, 0, 0, 0 },
+    { "key-play", ACTIONID_PLAY, 0, 0, 0, 0 },
+    { "key-pause", ACTIONID_PAUSE, 0, 0, 0, 0 },
+    { "key-stop", ACTIONID_STOP, 0, 0, 0, 0 },
+    { "key-position", ACTIONID_POSITION, 0, 0, 0, 0 },
+    { "key-jump-3sec", ACTIONID_JUMP_BACKWARD_3SEC, 0, 1000000, 0, 0 },
+    { "key-jump+3sec", ACTIONID_JUMP_FORWARD_3SEC, 0, 1000000, 0, 0 },
+    { "key-jump-10sec", ACTIONID_JUMP_BACKWARD_10SEC, 0, 1000000, 0, 0 },
+    { "key-jump+10sec", ACTIONID_JUMP_FORWARD_10SEC, 0, 1000000, 0, 0 },
+    { "key-jump-1min", ACTIONID_JUMP_BACKWARD_1MIN, 0, 1000000, 0, 0 },
+    { "key-jump+1min", ACTIONID_JUMP_FORWARD_1MIN, 0, 1000000, 0, 0 },
+    { "key-jump-5min", ACTIONID_JUMP_BACKWARD_5MIN, 0, 1000000, 0, 0 },
+    { "key-jump+5min", ACTIONID_JUMP_FORWARD_5MIN, 0, 1000000, 0, 0 },
+    { "key-prev", ACTIONID_PREV, 0, 0, 0, 0 },
+    { "key-next", ACTIONID_NEXT, 0, 0, 0, 0 },
+    { "key-faster", ACTIONID_FASTER, 0, 0, 0, 0 },
+    { "key-slower", ACTIONID_SLOWER, 0, 0, 0, 0 },
+    { "key-fullscreen", ACTIONID_FULLSCREEN, 0, 0, 0, 0 },
+    { "key-vol-up", ACTIONID_VOL_UP, 0, 0, 0, 0 },
+    { "key-vol-down", ACTIONID_VOL_DOWN, 0, 0, 0, 0 },
+    { "key-vol-mute", ACTIONID_VOL_MUTE, 0, 0, 0, 0 },
+    { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, 0, 0, 0, 0 },
+    { "key-subdelay-up", ACTIONID_SUBDELAY_UP, 0, 0, 0, 0 },
+    { "key-audiodelay-down", ACTIONID_AUDIODELAY_DOWN, 0, 0, 0, 0 },
+    { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, 0, 0, 0, 0 },
+    { "key-audio-track", ACTIONID_AUDIO_TRACK, 0, 0, 0, 0 },
+    { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0, 0, 0, 0 },
+    { "key-intf-show", ACTIONID_INTF_SHOW, 0, 0, 0, 0 },
+    { "key-intf-hide", ACTIONID_INTF_HIDE, 0, 0, 0, 0 },
+    { "key-snapshot", ACTIONID_SNAPSHOT, 0, 0, 0, 0 },
+    { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0, 0, 0, 0 },
+    { "key-nav-up", ACTIONID_NAV_UP, 0, 0, 0, 0 },
+    { "key-nav-down", ACTIONID_NAV_DOWN, 0, 0, 0, 0 },
+    { "key-nav-left", ACTIONID_NAV_LEFT, 0, 0, 0, 0 },
+    { "key-nav-right", ACTIONID_NAV_RIGHT, 0, 0, 0, 0 },
+    { "key-title-prev", ACTIONID_TITLE_PREV, 0, 0, 0, 0 },
+    { "key-title-next", ACTIONID_TITLE_NEXT, 0, 0, 0, 0 },
+    { "key-chapter-prev", ACTIONID_CHAPTER_PREV, 0, 0, 0, 0 },
+    { "key-chapter-next", ACTIONID_CHAPTER_NEXT, 0, 0, 0, 0 },
+    { "key-set-bookmark1", ACTIONID_SET_BOOKMARK1, 0, 0, 0, 0 },
+    { "key-set-bookmark2", ACTIONID_SET_BOOKMARK2, 0, 0, 0, 0 },
+    { "key-set-bookmark3", ACTIONID_SET_BOOKMARK3, 0, 0, 0, 0 },
+    { "key-set-bookmark4", ACTIONID_SET_BOOKMARK4, 0, 0, 0, 0 },
+    { "key-set-bookmark5", ACTIONID_SET_BOOKMARK5, 0, 0, 0, 0 },
+    { "key-set-bookmark6", ACTIONID_SET_BOOKMARK6, 0, 0, 0, 0 },
+    { "key-set-bookmark7", ACTIONID_SET_BOOKMARK7, 0, 0, 0, 0 },
+    { "key-set-bookmark8", ACTIONID_SET_BOOKMARK8, 0, 0, 0, 0 },
+    { "key-set-bookmark9", ACTIONID_SET_BOOKMARK9, 0, 0, 0, 0 },
+    { "key-set-bookmark10", ACTIONID_SET_BOOKMARK10, 0, 0, 0, 0 },
+    { "key-play-bookmark1", ACTIONID_PLAY_BOOKMARK1, 0, 0, 0, 0 },
+    { "key-play-bookmark2", ACTIONID_PLAY_BOOKMARK2, 0, 0, 0, 0 },
+    { "key-play-bookmark3", ACTIONID_PLAY_BOOKMARK3, 0, 0, 0, 0 },
+    { "key-play-bookmark4", ACTIONID_PLAY_BOOKMARK4, 0, 0, 0, 0 },
+    { "key-play-bookmark5", ACTIONID_PLAY_BOOKMARK5, 0, 0, 0, 0 },
+    { "key-play-bookmark6", ACTIONID_PLAY_BOOKMARK6, 0, 0, 0, 0 },
+    { "key-play-bookmark7", ACTIONID_PLAY_BOOKMARK7, 0, 0, 0, 0 },
+    { "key-play-bookmark8", ACTIONID_PLAY_BOOKMARK8, 0, 0, 0, 0 },
+    { "key-play-bookmark9", ACTIONID_PLAY_BOOKMARK9, 0, 0, 0, 0 },
+    { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, 0, 0, 0, 0 },
+    { "key-history-back", ACTIONID_HISTORY_BACK, 0, 0, 0, 0 },
+    { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0, 0, 0, 0 },
+    { "key-record", ACTIONID_RECORD, 0, 0, 0, 0 },
+    { NULL, 0, 0, 0, 0, 0 }
 };
-

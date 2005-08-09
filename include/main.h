@@ -116,7 +116,11 @@ struct vlc_t
         const char *psz_action;
         int i_action;
         int i_key;
-
+        
+        /* hotkey accounting information */
+        mtime_t i_delta_date;/*< minimum delta time between two key presses */
+        mtime_t i_last_date; /*< last date key was pressed */
+        int     i_times;     /*< n times pressed within delta date*/
     } *p_hotkeys;
 };
 
