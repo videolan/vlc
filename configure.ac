@@ -2014,29 +2014,50 @@ AC_CHECK_HEADERS(id3tag.h, [
 dnl
 dnl  ffmpeg decoder/demuxer plugin
 dnl
+dnl we try to find ffmpeg using : 1- ffmpeg-config, 2- pkg-config
+dnl 				3- default place, 4- given tree
+
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
 if test "${enable_ffmpeg}" != "no"
 then
-  FFMPEG_PATH="${PATH}"
-  AC_ARG_WITH(ffmpeg-config-path,
-    [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
-    [ if test "${with_ffmpeg_config_path}" != "no"
-      then
-        FFMPEG_PATH="${with_ffmpeg_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
-  if test "${FFMPEG_CONFIG}" != "no"
-  then
-    AC_CHECK_HEADERS(ffmpeg/avcodec.h)
-    AC_CHECK_HEADERS(postproc/postprocess.h)
-    VLC_ADD_PLUGINS([ffmpeg])
-    if test "${enable_sout}" != "no"; then
-        VLC_ADD_PLUGINS([stream_out_switcher])
-    fi
-    VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
+dnl Look for a ffmpeg-config (we are on debian )
+ 
+   FFMPEG_PATH="${PATH}"
+   AC_ARG_WITH(ffmpeg-config-path,
+     [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
+     [ if test "${with_ffmpeg_config_path}" != "no"
+       then
+         FFMPEG_PATH="${with_ffmpeg_config_path}"
+       fi ])
+   AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
+   if test "${FFMPEG_CONFIG}" != "no"
+   then
+     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+     AC_CHECK_HEADERS(postproc/postprocess.h)
+     VLC_ADD_PLUGINS([ffmpeg])
+     if test "${enable_sout}" != "no"; then
+         VLC_ADD_PLUGINS([stream_out_switcher])
+     fi
+     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
+     VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
+  
   else
+ Trying with pkg-config
+   PKG_CHECK_MODULES(FFMPEG,libavcodec libavformat,
+    [
+     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+     AC_CHECK_HEADERS(postproc/postprocess.h)
+     VLC_ADD_PLUGINS([ffmpeg])
+     if test "${enable_sout}" != "no"; then
+         VLC_ADD_PLUGINS([stream_out_switcher])
+     fi
+     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
+     VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
+
+    ],
+    [
+     
     AC_ARG_WITH(ffmpeg-mp3lame,
       [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
       [
@@ -2161,6 +2182,7 @@ then
         VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
       fi
     fi
+    ])
   fi
 fi
 
