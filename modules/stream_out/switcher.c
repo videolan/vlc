@@ -613,7 +613,7 @@ static int UnpackFromFile( sout_stream_t *p_stream, const char *psz_file,
         uint8_t *p_u = &p_pic->p[1].p_pixels[i/2 * p_pic->p[1].i_pitch];
         uint8_t *p_v = &p_pic->p[2].p_pixels[i/2 * p_pic->p[2].i_pitch];
 
-        if ( fread( p_buffer, 2, i_width, p_file ) != i_width )
+        if ( fread( p_buffer, 2, i_width, p_file ) != (size_t)i_width )
         {
             msg_Err( p_stream, "premature end of file %s", psz_file );
             fclose( p_file );
