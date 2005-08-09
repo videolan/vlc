@@ -254,7 +254,7 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_dec->fmt_out.audio.i_rate != p_sys->p_context->sample_rate )
+    if( p_dec->fmt_out.audio.i_rate != (unsigned int)p_sys->p_context->sample_rate )
     {
         aout_DateInit( &p_sys->end_date, p_sys->p_context->sample_rate );
         aout_DateSet( &p_sys->end_date, p_block->i_pts );
