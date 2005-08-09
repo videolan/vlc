@@ -121,9 +121,10 @@ static VLCBookmarks *_o_sharedInstance = nil;
 {
     /* add item to list */
     intf_thread_t * p_intf = VLCIntf;
-    input_thread_t * p_input = (input_thread_t *)vlc_object_find (p_intf, \
-        VLC_OBJECT_INPUT, FIND_ANYWHERE);
-    if (!p_input) return;
+    input_thread_t * p_input = (input_thread_t *)vlc_object_find( p_intf, \
+        VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+        return;
     
     seekpoint_t bookmark;
     vlc_value_t pos;
@@ -150,7 +151,8 @@ static VLCBookmarks *_o_sharedInstance = nil;
     input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_intf, \
         VLC_OBJECT_INPUT, FIND_ANYWHERE );
     
-    if( !p_input ) return;
+    if( !p_input )
+        return;
 
     input_Control( p_input, INPUT_CLEAR_BOOKMARKS );
 
@@ -176,7 +178,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     int row;
     row = [o_tbl_dataTable selectedRow];
     
-    if(!p_input)
+    if( !p_input )
     {
         return;
     } 
@@ -222,7 +224,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     
     intf_thread_t * p_intf = VLCIntf;
     seekpoint_t **pp_bookmarks;
-    int i_bookmarks;
+    int i_bookmarks, i;
     input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_intf, \
         VLC_OBJECT_INPUT, FIND_ANYWHERE );
     
@@ -250,8 +252,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
         vlc_object_release( p_input );
         return;
     } 
-    
-    int i;
+
     i = [o_tbl_dataTable selectedRow];
     
     if( pp_bookmarks[i]->psz_name ) 
@@ -408,15 +409,18 @@ static VLCBookmarks *_o_sharedInstance = nil;
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
     
-    if(!p_input)
+    if( !p_input )
     {
         return 0;
-    } else if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, \
+    }
+    else if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, \
                        &i_bookmarks ) != VLC_SUCCESS )
     {
         vlc_object_release( p_input );
         return 0;
-    } else {
+    }
+    else {
+        vlc_object_release( p_input );
         return i_bookmarks;
     }
 }
@@ -435,7 +439,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     int i_toBeReturned;
     i_toBeReturned = 0;
     
-    if(!p_input)
+    if( !p_input )
     {
         return @"";
     } 
@@ -444,7 +448,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
     {
         vlc_object_release( p_input );
         return @"";
-    } else {
+    }
+    else
+    {
         if ([[theTableColumn identifier] isEqualToString: @"description"])
         {
             toBeReturned = pp_bookmarks[row]->psz_name;
@@ -490,7 +496,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
         [o_btn_edit setEnabled: NO];
         [o_btn_rm setEnabled: NO];
         [o_btn_extract setEnabled: NO];
-    } else {
+    }
+    else
+    {
         /* a row is selected */
         [o_btn_edit setEnabled: YES];
         [o_btn_rm setEnabled: YES];
