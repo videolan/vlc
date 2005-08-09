@@ -156,7 +156,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     GUID subformat_guid = {0, 0, 0x10,{0x80, 0, 0, 0xaa, 0, 0x38, 0x9b, 0x71}};
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     WAVEFORMATEX *p_waveformat = &p_sys->waveformat.Format;
-    int i_bytes_per_sample, i_format, i;
+    int i_bytes_per_sample, i_format;
     vlc_bool_t b_ext;
 
     if( p_input->p_fmt->i_cat != AUDIO_ES )
@@ -178,6 +178,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_sys->i_channel_mask = 0;
     if( p_input->p_fmt->audio.i_physical_channels )
     {
+        unsigned int i;
+        
         for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
         {
             if( p_input->p_fmt->audio.i_physical_channels & pi_channels_src[i])
