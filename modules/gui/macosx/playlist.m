@@ -990,9 +990,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             NSMutableString *o_temp, *o_temp2;
             o_temp = [NSMutableString stringWithString: o_uri];
             o_temp2 = [NSMutableString stringWithCString: mounts[i_index].f_mntfromname];
-            [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-            [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
-            [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
+            [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:nil range:NSMakeRange(0, [o_temp length]) ];
+            [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:nil range:NSMakeRange(0, [o_temp2 length]) ];
+            [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:nil range:NSMakeRange(0, [o_temp2 length]) ];
 
             if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
             {
@@ -1017,9 +1017,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         statfs( [o_uri fileSystemRepresentation], buf );
         psz_dev = strdup(buf->f_mntfromname);
         o_temp = [NSMutableString stringWithCString: psz_dev ];
-        [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-        [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
-        [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:nil range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:nil range:NSMakeRange(0, [o_temp length]) ];
+        [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:nil range:NSMakeRange(0, [o_temp length]) ];
         o_uri = o_temp;
     }
 
@@ -1482,7 +1482,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 /* Required for drag & drop and reordering */
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
-    unsigned int i,j;
+    unsigned int i;
     playlist_t *p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
 
@@ -1518,6 +1518,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [self removeItemsFrom: o_items_array ifChildrenOf: o_nodes_array];
 
 #if 0
+    unsigned int j;
+
     for( i = 0 ; i < [o_nodes_array count] ; i++ )
     {
         for ( j = 0 ; j < [o_nodes_array count] ; j++ )

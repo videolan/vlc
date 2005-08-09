@@ -461,7 +461,7 @@ static VLCWizard *_o_sharedInstance = nil;
     ofItem: (NSString *)item
 {
     [self resetWizard];
-    msg_Dbg(VLCIntf, "wizard was resetted");
+    msg_Dbg(VLCIntf, "wizard was reseted");
     [o_userSelections setObject:@"trnscd" forKey:@"trnscdOrStrmg"];
     [o_btn_backward setEnabled:YES];
     [o_tab_pageHolder selectTabViewItemAtIndex:1];
@@ -1379,6 +1379,9 @@ static VLCWizard *_o_sharedInstance = nil;
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
         @"Input"])
     {
+        /* reset the wizard before going backwards. Otherwise, we might get
+         * unwanted behaviours in the Encap-Selection */
+        [self resetWizard];
         /* show "Hello" */
         [o_tab_pageHolder selectTabViewItemAtIndex:0];
         /* disable backwards-btn */
