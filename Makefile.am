@@ -164,7 +164,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Wizard.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Wizard.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
-    extras/MacOSX/Resources/English.lproj/Bookmarks.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
@@ -231,6 +231,9 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/README \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/macosx-dmg \
+	\
+	extras/Makefile \
+	extras/zsh.cpp \
 	$(NULL)
 
 ###############################################################################
