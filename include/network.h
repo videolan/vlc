@@ -213,6 +213,14 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_buffer   = NULL;
 }
 
+static inline int isurlsafe( int c )
+{
+    return ( (unsigned char)( c - 'a' ) < 26 )
+        || ( (unsigned char)( c - 'A' ) < 26 )
+        || ( (unsigned char)( c - '9' ) < 10 )
+        || ( strchr( "$-_.+!*'(),", c ) != NULL );
+}
+
 /*****************************************************************************
  * vlc_UrlEncode: 
  *****************************************************************************
@@ -233,10 +241,7 @@ static inline char *vlc_UrlEncode( const char *psz_url )
     {
         unsigned char c = *in;
 
-        if( ( (unsigned char)( c - 'a' ) < 26 )
-         || ( (unsigned char)( c - 'A' ) < 26 )
-         || ( (unsigned char)( c - '9' ) < 10 )
-         || strchr( "$-_.+!*'(),", c ) != NULL )
+        if( isurlsafe( c ) )
             *out++ = (char)c;
         else
         {
@@ -274,12 +279,12 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
             ptr += 2;
         }
         else
-        if( c == ' ' )
+        if( !isurlsafe( c ) )
             return 1;
     }
     return 0; /* looks fine - but maybe it is not encoded */
 }
-                    
+
 /*****************************************************************************
  * vlc_b64_encode:
  *****************************************************************************
