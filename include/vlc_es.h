@@ -61,7 +61,7 @@ struct audio_format_t
     unsigned int i_bytes_per_frame;
 
     /* Number of sampleframes contained in one compressed frame. */
-    unsigned int        i_frame_length;
+    unsigned int i_frame_length;
     /* Please note that it may be completely arbitrary - buffers are not
      * obliged to contain a integral number of so-called "frames". It's
      * just here for the division :
