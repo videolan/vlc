@@ -222,19 +222,23 @@ static inline void vlc_UrlClean( vlc_url_t *url )
 static inline char *vlc_UrlEncode( const char *psz_url )
 {
     char *psz_enc, *out;
-    const char *in;
+    const unsigned char *in;
 
     psz_enc = (char *)malloc( 3 * strlen( psz_url ) + 1 );
     if( psz_enc == NULL )
         return NULL;
 
     out = psz_enc;
-    for( in = psz_url; *in; in++ )
+    for( in = (const unsigned char *)psz_url; *in; in++ )
     {
-        unsigned char c = *(unsigned char *)in;
+        unsigned char c = *in;
 
-        if( ( c <= 32 ) || ( c == '%' ) || ( c == '?' ) || ( c == '&' )
-              || ( c == '+' ) || ( c >= 128 ) )
+        if( ( (unsigned char)( c - 'a' ) < 26 )
+         || ( (unsigned char)( c - 'A' ) < 26 )
+         || ( (unsigned char)( c - '9' ) < 10 )
+         || strchr( "$-_.+!*'(),", c ) != NULL )
+            *out++ = (char)c;
+        else
         {
             *out++ = '%';   
             *out++ = ( ( c >> 4 ) >= 0xA ) ? 'A' + ( c >> 4 ) - 0xA
@@ -242,8 +246,6 @@ static inline char *vlc_UrlEncode( const char *psz_url )
             *out++ = ( ( c & 0xf ) >= 0xA ) ? 'A' + ( c & 0xf ) - 0xA
                                            : '0' + ( c & 0xf );
         }
-        else
-            *out++ = (char)c;
     }
     *out++ = '\0';
 
