@@ -2095,7 +2095,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             char *psz_text, *psz_spaces = psz_spaces_text;
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             char *psz_suf = "", *psz_prefix = NULL;
-            size_t i;
+            signed int i;
 
             /* Skip deprecated options */
             if( p_item->psz_current )
