@@ -124,9 +124,7 @@ enum
 {
     COMMAND_NOP  = 0,
     COMMAND_QUIT = 1,
-    COMMAND_LOOP = 2,
     COMMAND_PAUSE= 3,
-    COMMAND_RUN  = 4,
 };
 
 static int Demux( demux_t * );
@@ -165,14 +163,6 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
         return VLC_SUCCESS;
     }
 
-    /* Check for a "vlc:loop" command */
-    if( i_len == 4 && !strncasecmp( psz_name, "loop", 4 ) )
-    {
-        msg_Info( p_demux, "command `loop'" );
-        p_sys->i_command = COMMAND_LOOP;
-        return VLC_SUCCESS;
-    }
-
     /* Check for a "vlc:pause:***" command */
     if( i_len > 6 && !strncasecmp( psz_name, "pause:", 6 ) )
     {
@@ -183,16 +173,6 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
         return VLC_SUCCESS;
     }
     
-    /* Check for a "vlc:run:***" command */
-    if ( i_len > 4 && !strncasecmp( psz_name, "run:", 4 ) )
-    {
-       p_sys->psz_command = malloc( i_len - 4 );
-       strcpy( p_sys->psz_command, psz_name + 4 );
-       msg_Info( p_demux, "command `run program %s'", p_sys->psz_command );
-       p_sys->i_command = COMMAND_RUN;
-       return VLC_SUCCESS;
-    } 
-
     msg_Err( p_demux, "unknown command `%s'", psz_name );
 
     free( p_sys );
@@ -232,10 +212,6 @@ static int Demux( demux_t *p_demux )
             b_eof = p_demux->p_vlc->b_die = VLC_TRUE;
             break;
 
-        case COMMAND_LOOP:
-            playlist_Goto( p_playlist, 0 );
-            break;
-
         case COMMAND_PAUSE:
             if( mdate() >= p_sys->expiration )
                 b_eof = VLC_TRUE;
@@ -243,12 +219,6 @@ static int Demux( demux_t *p_demux )
                 msleep( 10000 );
             break;
         
-        case COMMAND_RUN:
-            var_SetString( p_playlist, "run-program-command", p_sys->psz_command );
-            free( p_sys->psz_command );
-            b_eof = VLC_TRUE;
-            break;
-
         case COMMAND_NOP:
         default:
             b_eof = VLC_TRUE;
