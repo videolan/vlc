@@ -405,6 +405,13 @@ typedef struct vod_media_t vod_media_t;
 typedef struct opengl_t     opengl_t;
 typedef struct opengl_sys_t opengl_sys_t;
 
+/* osdmenu */
+typedef struct osd_menu_t   osd_menu_t;
+typedef struct osd_state_t  osd_state_t;
+typedef struct osd_event_t  osd_event_t;
+typedef struct osd_button_t osd_button_t;
+typedef struct osd_menu_state_t osd_menu_state_t;
+
 /* VLM */
 typedef struct vlm_t         vlm_t;
 typedef struct vlm_message_t vlm_message_t;

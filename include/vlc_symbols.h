@@ -391,6 +391,22 @@ struct module_symbols_t
     char * (*__vlc_fix_readdir_charset_inner) (vlc_object_t *, const char *);
     int (*vlc_scandir_inner) (const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ));
     int (*vlc_alphasort_inner) (const struct dirent **a, const struct dirent **b);
+    osd_state_t * (*__osd_StateChange_inner) (osd_state_t *, const int);
+    picture_t * (*osd_Slider_inner) (int i_width, int i_height, int i_position, short i_type);
+    void (*osd_ConfigUnload_inner) (vlc_object_t *, osd_menu_t **);
+    void (*__osd_MenuShow_inner) (vlc_object_t *);
+    picture_t * (*osd_Icon_inner) (int i_width, int i_height, short i_type);
+    void (*__osd_VolumeDown_inner) (vlc_object_t *);
+    void (*__osd_MenuNext_inner) (vlc_object_t *);
+    void (*__osd_MenuDelete_inner) (vlc_object_t *, osd_menu_t *);
+    void (*__osd_MenuHide_inner) (vlc_object_t *);
+    int (*osd_ConfigLoader_inner) (vlc_object_t *, const char *, osd_menu_t **);
+    void (*__osd_MenuUp_inner) (vlc_object_t *);
+    void (*__osd_MenuDown_inner) (vlc_object_t *);
+    osd_menu_t * (*__osd_MenuCreate_inner) (vlc_object_t *, const char *);
+    void (*__osd_MenuPrev_inner) (vlc_object_t *);
+    void (*__osd_VolumeUp_inner) (vlc_object_t *);
+    void (*__osd_MenuActivate_inner) (vlc_object_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -766,6 +782,22 @@ struct module_symbols_t
 #  define __vlc_fix_readdir_charset (p_symbols)->__vlc_fix_readdir_charset_inner
 #  define vlc_scandir (p_symbols)->vlc_scandir_inner
 #  define vlc_alphasort (p_symbols)->vlc_alphasort_inner
+#  define __osd_StateChange (p_symbols)->__osd_StateChange_inner
+#  define osd_Slider (p_symbols)->osd_Slider_inner
+#  define osd_ConfigUnload (p_symbols)->osd_ConfigUnload_inner
+#  define __osd_MenuShow (p_symbols)->__osd_MenuShow_inner
+#  define osd_Icon (p_symbols)->osd_Icon_inner
+#  define __osd_VolumeDown (p_symbols)->__osd_VolumeDown_inner
+#  define __osd_MenuNext (p_symbols)->__osd_MenuNext_inner
+#  define __osd_MenuDelete (p_symbols)->__osd_MenuDelete_inner
+#  define __osd_MenuHide (p_symbols)->__osd_MenuHide_inner
+#  define osd_ConfigLoader (p_symbols)->osd_ConfigLoader_inner
+#  define __osd_MenuUp (p_symbols)->__osd_MenuUp_inner
+#  define __osd_MenuDown (p_symbols)->__osd_MenuDown_inner
+#  define __osd_MenuCreate (p_symbols)->__osd_MenuCreate_inner
+#  define __osd_MenuPrev (p_symbols)->__osd_MenuPrev_inner
+#  define __osd_VolumeUp (p_symbols)->__osd_VolumeUp_inner
+#  define __osd_MenuActivate (p_symbols)->__osd_MenuActivate_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1144,6 +1176,22 @@ struct module_symbols_t
     ((p_symbols)->__vlc_fix_readdir_charset_inner) = __vlc_fix_readdir_charset; \
     ((p_symbols)->vlc_scandir_inner) = vlc_scandir; \
     ((p_symbols)->vlc_alphasort_inner) = vlc_alphasort; \
+    ((p_symbols)->__osd_StateChange_inner) = __osd_StateChange; \
+    ((p_symbols)->osd_Slider_inner) = osd_Slider; \
+    ((p_symbols)->osd_ConfigUnload_inner) = osd_ConfigUnload; \
+    ((p_symbols)->__osd_MenuShow_inner) = __osd_MenuShow; \
+    ((p_symbols)->osd_Icon_inner) = osd_Icon; \
+    ((p_symbols)->__osd_VolumeDown_inner) = __osd_VolumeDown; \
+    ((p_symbols)->__osd_MenuNext_inner) = __osd_MenuNext; \
+    ((p_symbols)->__osd_MenuDelete_inner) = __osd_MenuDelete; \
+    ((p_symbols)->__osd_MenuHide_inner) = __osd_MenuHide; \
+    ((p_symbols)->osd_ConfigLoader_inner) = osd_ConfigLoader; \
+    ((p_symbols)->__osd_MenuUp_inner) = __osd_MenuUp; \
+    ((p_symbols)->__osd_MenuDown_inner) = __osd_MenuDown; \
+    ((p_symbols)->__osd_MenuCreate_inner) = __osd_MenuCreate; \
+    ((p_symbols)->__osd_MenuPrev_inner) = __osd_MenuPrev; \
+    ((p_symbols)->__osd_VolumeUp_inner) = __osd_VolumeUp; \
+    ((p_symbols)->__osd_MenuActivate_inner) = __osd_MenuActivate; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
 

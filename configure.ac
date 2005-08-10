@@ -2689,6 +2689,7 @@ AC_CHECK_HEADERS(png.h, [
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LDFLAGS([png],[-lpng -lz])
     VLC_ADD_PLUGINS([png])
+    VLC_ADD_PLUGINS([osdmenu])
     AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])],
     [],[-lz])
   LDFLAGS="${LDFLAGS_save}"

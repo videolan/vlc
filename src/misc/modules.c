@@ -107,6 +107,7 @@
 #include "vlc_vlm.h"
 
 #include "vlc_image.h"
+#include "vlc_osd.h"
 
 #if defined( _MSC_VER ) && defined( UNDER_CE )
 #    include "modules_builtin_evc.h"

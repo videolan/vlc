@@ -59,6 +59,7 @@
 #define VLC_OBJECT_TLS        (-25)
 #define VLC_OBJECT_SD         (-26)
 #define VLC_OBJECT_XML        (-27)
+#define VLC_OBJECT_OSDMENU    (-28)
 
 #define VLC_OBJECT_GENERIC  (-666)
 

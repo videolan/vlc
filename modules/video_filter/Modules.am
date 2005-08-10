@@ -16,4 +16,5 @@ SOURCES_marq = marq.c
 SOURCES_rss = rss.c
 SOURCES_motiondetect = motiondetect.c
 SOURCES_rv32 = rv32.c
+SOURCES_osdmenu = osdmenu.c
 noinst_HEADERS += filter_common.h

@@ -55,6 +55,7 @@
 #include "vlc_vod.h"
 #include "vlc_tls.h"
 #include "vlc_xml.h"
+#include "vlc_osd.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -206,6 +207,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_ANNOUNCE:
             i_size = sizeof( announce_handler_t );
             psz_type = "announce handler";
+            break;
+        case VLC_OBJECT_OSDMENU:
+            i_size = sizeof( osd_menu_t );
+            psz_type = "osd menu";
             break;
         default:
             i_size = i_type > 0

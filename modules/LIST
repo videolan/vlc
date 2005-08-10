@@ -342,6 +342,8 @@ $Id$
  
  * opie: interface for Opie using QT/Embedded library.
 
+ * osdmenu: video_filter for displaying and streaming a On Screen Display menu
+
  * oss: audio output module using the OSS /dev/dsp interface.
  
  * packetizer_copy: Simple copy packetizer

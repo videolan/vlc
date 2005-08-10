@@ -6,6 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl> 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -271,6 +272,11 @@ static void transcode_spu_close  ( sout_stream_t *, sout_stream_id_t * );
 static int  transcode_spu_process( sout_stream_t *, sout_stream_id_t *,
                                    block_t *, block_t ** );
 
+static int  transcode_osd_new    ( sout_stream_t *, sout_stream_id_t * );
+static void transcode_osd_close  ( sout_stream_t *, sout_stream_id_t * );
+static int  transcode_osd_process( sout_stream_t *, sout_stream_id_t *,
+                                   block_t *, block_t ** );
+                                   
 static int  EncoderThread( struct sout_stream_sys_t * p_sys );
 
 static int pi_channels_maps[6] =
@@ -338,6 +344,13 @@ struct sout_stream_sys_t
     sout_cfg_t      *p_spu_cfg;
     spu_t           *p_spu;
 
+    /* OSD Menu */
+    sout_stream_id_t *id_osd;   /* extension for streaming OSD menus */
+    vlc_fourcc_t    i_osdcodec; /* codec osd menu (0 if not transcode) */
+    char            *psz_osdenc;
+    sout_cfg_t      *p_osd_cfg;
+    vlc_bool_t      b_osd;      /* VLC_TRUE when osd es is registered */
+    
     /* Sync */
     vlc_bool_t      b_master_sync;
     mtime_t         i_master_drift;
@@ -413,6 +426,13 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
+        if( (strncmp( (char *)&p_sys->i_acodec, "mp3", 3) == 0) &&
+                            (p_sys->i_channels > 2) )
+        {
+            msg_Warn( p_stream, "%d channels invalid for mp3, forcing to 2",
+                      p_sys->i_channels );
+            p_sys->i_channels = 2;
+        }                    
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
                  (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
                  p_sys->i_channels, p_sys->i_abitrate / 1000 );
@@ -518,7 +538,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Subpictures transcoding parameters */
-    p_sys->p_spu = 0;
+    p_sys->p_spu = NULL;
     p_sys->psz_senc = NULL;
     p_sys->p_spu_cfg = NULL;
     p_sys->i_scodec = 0;
@@ -560,6 +580,36 @@ static int Open( vlc_object_t *p_this )
     }
     if( val.psz_string ) free( val.psz_string );
 
+    /* OSD menu transcoding parameters */
+    p_sys->psz_osdenc = NULL;
+    p_sys->p_osd_cfg  = NULL;
+    p_sys->i_osdcodec = 0;
+    p_sys->b_osd      = VLC_FALSE;
+    if( config_GetInt( p_stream, "osd" ) )
+    {
+/*        vlc_value_t val;*/
+        char *psz_next;
+       
+        psz_next = sout_CfgCreate( &p_sys->psz_osdenc,
+                                   &p_sys->p_osd_cfg, strdup( "dvbsub") );
+        if( psz_next ) free( psz_next );
+        
+        p_sys->i_osdcodec = VLC_FOURCC('Y','U','V','P' );        
+
+        msg_Dbg( p_stream, "codec osd=%4.4s", (char *)&p_sys->i_osdcodec );
+
+/*        val.psz_string = strdup("osdmenu");
+        if( !p_sys->p_spu )
+        {
+            p_sys->p_spu = spu_Create( p_stream );
+            var_Create( p_sys->p_spu, "sub-filter", VLC_VAR_STRING );
+            spu_Init( p_sys->p_spu );
+        }            
+        var_Set( p_sys->p_spu, "sub-filter", val );        
+        if( val.psz_string ) free( val.psz_string );*/
+    }
+
+    /* Audio settings */
     var_Get( p_stream, SOUT_CFG_PREFIX "audio-sync", &val );
     p_sys->b_master_sync = val.b_bool;
     if( p_sys->f_fps > 0 ) p_sys->b_master_sync = VLC_TRUE;
@@ -639,6 +689,20 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->psz_senc ) free( p_sys->psz_senc );
 
     if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
+    
+    while( p_sys->p_osd_cfg != NULL )
+    {
+        sout_cfg_t *p_next = p_sys->p_osd_cfg->p_next;
+
+        if( p_sys->p_osd_cfg->psz_name )
+            free( p_sys->p_osd_cfg->psz_name );
+        if( p_sys->p_osd_cfg->psz_value )
+            free( p_sys->p_osd_cfg->psz_value );
+        free( p_sys->p_osd_cfg );
+
+        p_sys->p_osd_cfg = p_next;
+    }
+    if( p_sys->psz_osdenc ) free( p_sys->psz_osdenc );    
 
     vlc_object_destroy( p_sys );
 }
@@ -665,7 +729,6 @@ struct sout_stream_id_t
     /* Sync */
     date_t          interpolated_pts;
 };
-
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
@@ -833,6 +896,19 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( !id->id ) goto error;
     }
 
+    if( config_GetInt( p_stream, "osd" ) )
+    {
+        /* Create a fake OSD menu elementary stream */
+        if( !p_sys->b_osd && (p_sys->i_osdcodec != 0 || p_sys->psz_osdenc) )
+        {
+            if( transcode_osd_new( p_stream, p_sys->id_osd ) )
+            {
+                msg_Err( p_stream, "cannot create osd chain" );
+                goto error;
+            }
+            p_sys->b_osd = VLC_TRUE;
+        }
+    }
     return id;
 
  error:
@@ -855,6 +931,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    if( config_GetInt( p_stream, "osd" ) && p_sys->b_osd )
+        transcode_osd_close( p_stream, p_sys->id_osd );
 
     if( id->b_transcode )
     {
@@ -895,10 +974,15 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    block_t *p_out;
+    block_t *p_out = NULL;
 
     if( !id->b_transcode && id->id )
     {
+        /* Transcode OSD menu pictures. */
+        if( p_sys->b_osd )
+        {
+            transcode_osd_process( p_stream, id, p_buffer, &p_out );                
+        }
         return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
     }
     else if( !id->b_transcode )
@@ -1025,7 +1109,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->pf_decode_audio = 0;
     id->p_decoder->pf_aout_buffer_new = audio_new_buffer;
     id->p_decoder->pf_aout_buffer_del = audio_del_buffer;
-    //id->p_decoder->p_cfg = p_sys->p_video_cfg;
+    /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
 
     id->p_decoder->p_module =
         module_Need( id->p_decoder, "decoder", "$codec", 0 );
@@ -1318,7 +1402,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
         id->p_decoder->p_owner->pp_pics[i] = 0;
     id->p_decoder->p_owner->p_sys = p_sys;
-    //id->p_decoder->p_cfg = p_sys->p_video_cfg;
+    /* id->p_decoder->p_cfg = p_sys->p_video_cfg; */
 
     id->p_decoder->p_module =
         module_Need( id->p_decoder, "decoder", "$codec", 0 );
@@ -2114,7 +2198,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
     id->p_decoder->pf_spu_buffer_del = spu_del_buffer;
     id->p_decoder->p_owner = (decoder_owner_sys_t *)p_stream;
-    //id->p_decoder->p_cfg = p_sys->p_spu_cfg;
+    /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
     id->p_decoder->p_module =
         module_Need( id->p_decoder, "decoder", "$codec", 0 );
@@ -2216,4 +2300,187 @@ static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 {
     sout_stream_t *p_stream = (sout_stream_t *)p_dec->p_owner;
     spu_DestroySubpicture( p_stream->p_sys->p_spu, p_subpic );
+}
+
+/*
+ * OSD menu
+ */
+static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    es_format_t fmt;
+    
+    fmt.i_cat = SPU_ES;
+    fmt.i_id = 0xbd1f; /* pid ?? */
+    fmt.i_group = 3;   /* pmt entry ?? */
+    fmt.i_codec = VLC_FOURCC( 'Y', 'U', 'V', 'A' );
+    fmt.psz_language = strdup( "osd" );
+    
+    id = malloc( sizeof( sout_stream_id_t ) );
+    memset( id, 0, sizeof(sout_stream_id_t) );
+
+    id->id = NULL;
+    id->p_decoder = NULL;
+    id->p_encoder = NULL;
+
+    /* Create encoder object */
+    id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
+    if( !id->p_encoder )
+    {
+        msg_Err( p_stream, "out of memory" );
+        goto error;
+    }
+    vlc_object_attach( id->p_encoder, p_stream );
+    id->p_encoder->p_module = NULL;
+
+    /* Create fake destination format */
+    es_format_Init( &id->p_encoder->fmt_out, fmt.i_cat, 0 );
+    id->p_encoder->fmt_out.i_id    = fmt.i_id;
+    id->p_encoder->fmt_out.i_group = fmt.i_group;
+    id->p_encoder->fmt_out.psz_language = strdup( fmt.psz_language );
+    
+    if( p_sys->i_osdcodec != 0 || p_sys->psz_osdenc )
+    {
+        msg_Dbg( p_stream, "creating osdmenu transcoding from fcc=`%4.4s' "
+                 "to fcc=`%4.4s'", (char*)&fmt.i_codec,
+                 (char*)&p_sys->i_osdcodec );
+
+        /* Complete destination format */
+        id->p_encoder->fmt_out.i_codec = p_sys->i_osdcodec;
+        
+        /*
+         * Open encoder
+         */
+        
+        /* Initialization of encoder format structures */
+        es_format_Init( &id->p_encoder->fmt_in, fmt.i_cat, fmt.i_codec );
+        id->p_encoder->fmt_in.psz_language = strdup( fmt.psz_language );
+
+        id->p_encoder->p_cfg = p_sys->p_osd_cfg;
+
+        id->p_encoder->p_module =
+            module_Need( id->p_encoder, "encoder", p_sys->psz_osdenc, VLC_TRUE );
+
+        if( !id->p_encoder->p_module )
+        {
+            msg_Err( p_stream, "cannot find encoder" );
+            goto error;
+        }
+        
+        /* open output stream */
+        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_encoder->fmt_out );
+        id->b_transcode = VLC_TRUE;
+
+        if( !id->id ) goto error;
+    }
+    else
+    {
+        msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
+                 (char*)&fmt.i_codec );
+        id->id = p_sys->p_out->pf_add( p_sys->p_out, &fmt );
+        id->b_transcode = VLC_FALSE;
+
+        if( !id->id ) goto error;
+    }
+
+    p_sys->id_osd = id;
+    p_sys->b_osd = VLC_TRUE;
+
+    if( !p_sys->p_spu )
+    {
+        p_sys->p_spu = spu_Create( p_stream );
+        if( spu_Init( p_sys->p_spu ) != VLC_SUCCESS )
+            msg_Err( p_sys, "spu initialisation failed" );
+    }
+    
+    if( fmt.psz_language )
+        free( fmt.psz_language );
+        
+    return VLC_SUCCESS;
+    
+ error:
+    msg_Err( p_stream, "starting osd encoding thread failed" );
+    if( id->p_encoder->p_module )
+            module_Unneed( id->p_encoder, id->p_encoder->p_module );
+    if( id->p_encoder )
+    {
+        vlc_object_detach( id->p_encoder );
+        vlc_object_destroy( id->p_encoder );
+    }
+    if( fmt.psz_language ) free( fmt.psz_language );
+    if( id ) free( id );
+    p_sys->id_osd = NULL;
+    p_sys->b_osd = VLC_FALSE;
+    return VLC_EGENERIC;
+}
+    
+static void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_t *id)
+{    
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    
+    /* Close encoder */
+    if( p_sys->b_osd && id )
+    {
+        if( id->p_encoder->p_module )
+            module_Unneed( id->p_encoder, id->p_encoder->p_module );
+        
+        if( id->id ) p_sys->p_out->pf_del( p_sys->p_out, id->id );
+    
+        if( id->p_encoder )
+        {
+            vlc_object_detach( id->p_encoder );
+            vlc_object_destroy( id->p_encoder );
+        }
+    }
+    p_sys->b_osd = VLC_FALSE;
+    if( id ) free( id );
+}
+
+static int transcode_osd_process( sout_stream_t *p_stream,
+                                  sout_stream_id_t *id,
+                                  block_t *in, block_t **out )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    subpicture_t *p_subpic = NULL;
+    
+    /* Check if we have a subpicture to send */
+    if( p_sys->p_spu && in->i_dts > 0)
+    {
+        p_subpic = spu_SortSubpictures( p_sys->p_spu, in->i_dts );
+    }
+    else
+    {
+        msg_Warn( p_stream, "spu channel not initialized, doing it now" );
+        if( !p_sys->p_spu )
+        {
+            p_sys->p_spu = spu_Create( p_stream );
+            if( spu_Init( p_sys->p_spu ) != VLC_SUCCESS )
+                msg_Err( p_stream, "spu initialisation failed" );
+        }
+    }
+        
+    if( p_subpic )
+    {
+        block_t *p_block = NULL;
+        
+        if( p_sys->b_master_sync && p_sys->i_master_drift )
+        {
+            p_subpic->i_start -= p_sys->i_master_drift;
+            if( p_subpic->i_stop ) p_subpic->i_stop -= p_sys->i_master_drift;
+        }
+    
+        p_block = p_sys->id_osd->p_encoder->pf_encode_sub( p_sys->id_osd->p_encoder, p_subpic );
+        if( p_block )
+        {
+            p_block->i_dts = p_block->i_pts = in->i_dts;
+            block_ChainAppend( out, p_block );
+            if( *out )
+            {
+                if( p_sys->p_out->pf_send( p_sys->p_out, p_sys->id_osd->id, *out ) == VLC_SUCCESS )
+                    spu_DestroySubpicture( p_sys->p_spu, p_subpic );
+            }            
+            return VLC_SUCCESS;            
+        }
+    }
+    return VLC_EGENERIC;
 }

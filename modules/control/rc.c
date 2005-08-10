@@ -5,6 +5,7 @@
  * $Id$
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
+ *         Jean-Paul Saman <jpsaman #_at_# m2x _replaceWith#dot_ nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +37,7 @@
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
+#include <vlc_osd.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -58,6 +60,7 @@
 #endif
 
 #define MAX_LINE_LENGTH 256
+#define STATUS_CHANGE "status change: "
 
 /*****************************************************************************
  * Local prototypes
@@ -65,6 +68,8 @@
 static int  Activate     ( vlc_object_t * );
 static void Deactivate   ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
+
+static void Help         ( intf_thread_t *, vlc_bool_t );
 
 static vlc_bool_t ReadCommand( intf_thread_t *, char *, int * );
 
@@ -86,6 +91,18 @@ static int  VolumeMove   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  AudioConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static int  Menu         ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+
+/* Status Callbacks */
+static int TimeOffsetChanged( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t , void * );
+static int VolumeChanged    ( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+static int StateChanged     ( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+static int RateChanged      ( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 
 struct intf_sys_t
 {
@@ -93,6 +110,10 @@ struct intf_sys_t
     int i_socket;
     char *psz_unix_path;
 
+    /* status changes */
+    vlc_mutex_t       status_lock;
+    playlist_status_t i_last_state;
+    
 #ifdef WIN32
     HANDLE hConsoleIn;
     vlc_bool_t b_quiet;
@@ -108,10 +129,13 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
     va_start( args, psz_fmt );
-    if( p_intf->p_sys->i_socket == -1 ) vprintf( psz_fmt, args );
+    if( p_intf->p_sys->i_socket == -1 )
+        vprintf( psz_fmt, args );
     else
-    { net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, psz_fmt, args );
-      net_Printf( VLC_OBJECT(p_intf), p_intf->p_sys->i_socket, NULL, "\r" ); }
+    {
+        net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, psz_fmt, args );
+        net_Printf( VLC_OBJECT(p_intf), p_intf->p_sys->i_socket, NULL, "\r" );
+    }
     va_end( args );
 }
 
@@ -170,7 +194,7 @@ static int Activate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist;
     char *psz_host, *psz_unix_path;
-    int *pi_socket = NULL;
+    int  *pi_socket = NULL;
 
 #if defined(HAVE_ISATTY) && !defined(WIN32)
     /* Check that stdin is a TTY */
@@ -273,7 +297,9 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys->pi_socket_listen = pi_socket;
     p_intf->p_sys->i_socket = -1;
     p_intf->p_sys->psz_unix_path = psz_unix_path;
-
+    vlc_mutex_init( p_intf, &p_intf->p_sys->status_lock );
+    p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
+    
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
@@ -318,6 +344,7 @@ static void Deactivate( vlc_object_t *p_this )
 #endif
         free( p_intf->p_sys->psz_unix_path );
     }
+    vlc_mutex_destroy( &p_intf->p_sys->status_lock );    
     free( p_intf->p_sys );
 }
 
@@ -437,8 +464,12 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "logo-position", Other, NULL );
     var_Create( p_intf, "logo-transparency", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "logo-transparency", Other, NULL );
-    
-    
+
+    /* OSD menu commands */
+    var_Create( p_intf, "menu", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "menu", Menu, NULL ); 
+
+    /* DVD commands */
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
     var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -460,7 +491,14 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "fastforward", Input, NULL );
     var_Create( p_intf, "rewind", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "rewind", Input, NULL );
+    var_Create( p_intf, "faster", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "faster", Input, NULL );
+    var_Create( p_intf, "slower", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "slower", Input, NULL );
+    var_Create( p_intf, "normal", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "normal", Input, NULL );
 
+    /* audio commands */
     var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "volume", Volume, NULL );
     var_Create( p_intf, "volup", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
@@ -472,6 +510,10 @@ static void Run( intf_thread_t *p_intf )
     var_Create( p_intf, "achan", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "achan", AudioConfig, NULL );
 
+    /* status callbacks */
+    /* Listen to audio volume updates */
+    var_AddCallback( p_intf->p_vlc, "audio-volume", VolumeChanged, p_intf );
+    
 #ifdef WIN32
     /* Get the file descriptor of the console input */
     p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -514,11 +556,63 @@ static void Run( intf_thread_t *p_intf )
                                                            FIND_PARENT );
                 }
             }
+            /* New input has been registered */
+            if( p_input )
+            {
+                if( !p_input->b_dead || !p_input->b_die )
+                {
+                    msg_rc( STATUS_CHANGE "( New input: %s )\r\n", p_input->input.p_item->psz_uri );
+                    msg_rc( STATUS_CHANGE "( audio volume: %d )\r\n", config_GetInt( p_intf, "volume" ));
+                }
+                var_AddCallback( p_input, "state", StateChanged, p_intf );
+                var_AddCallback( p_input, "rate-faster", RateChanged, p_intf );
+                var_AddCallback( p_input, "rate-slower", RateChanged, p_intf );
+                var_AddCallback( p_input, "rate", RateChanged, p_intf );
+                var_AddCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
+            }
         }
         else if( p_input->b_dead )
         {
+            var_DelCallback( p_input, "state", StateChanged, p_intf );
+            var_DelCallback( p_input, "rate-faster", RateChanged, p_intf );
+            var_DelCallback( p_input, "rate-slower", RateChanged, p_intf );
+            var_DelCallback( p_input, "rate", RateChanged, p_intf );
+            var_DelCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
             vlc_object_release( p_input );
             p_input = NULL;
+
+            if( p_playlist )
+            {
+                vlc_mutex_lock( &p_playlist->object_lock );
+                p_intf->p_sys->i_last_state = (int) PLAYLIST_STOPPED;
+                msg_rc( STATUS_CHANGE "( stop state: 0 )\r\n" );
+                vlc_mutex_unlock( &p_playlist->object_lock );
+            }
+        }
+        
+        if( (p_input != NULL) && !p_input->b_dead && !p_input->b_die &&
+            (p_playlist != NULL) )
+        {
+            vlc_mutex_lock( &p_playlist->object_lock );
+            if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
+                (p_playlist->status.i_status == PLAYLIST_STOPPED) )
+            {
+                p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
+                msg_rc( STATUS_CHANGE "( stop state: 0 )\r\n" );
+            }
+            else if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
+                (p_playlist->status.i_status == PLAYLIST_RUNNING) )
+            {
+                p_intf->p_sys->i_last_state = p_playlist->status.i_status;
+                msg_rc( STATUS_CHANGE "( play state: 1 )\r\n" );
+            }
+            else if( (p_intf->p_sys->i_last_state != p_playlist->status.i_status) &&
+                (p_playlist->status.i_status == PLAYLIST_PAUSED) )
+            {
+                p_intf->p_sys->i_last_state = p_playlist->status.i_status;
+                msg_rc( STATUS_CHANGE "( pause state: 2 )\r\n" );
+            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
         }
 
         if( p_input && b_showpos )
@@ -632,6 +726,32 @@ static void Run( intf_thread_t *p_intf )
             else
             {
                 msg_rc( "1\n" );
+
+                /* FIXME: This is a hack */
+                /* Replay the current state of the system. */
+                msg_rc( STATUS_CHANGE "( New input: %s )\r\n", p_input->input.p_item->psz_uri );
+                msg_rc( STATUS_CHANGE "( audio volume: %d )\r\n", config_GetInt( p_intf, "volume" ));
+
+                if( p_playlist )
+                {
+                    vlc_mutex_lock( &p_playlist->object_lock );
+                    switch( p_playlist->status.i_status )
+                    {
+                        case PLAYLIST_STOPPED:
+                            msg_rc( STATUS_CHANGE "( stop state: 0 )\r\n" );
+                            break;
+                        case PLAYLIST_RUNNING:
+                            msg_rc( STATUS_CHANGE "( play state: %d )\r\n", var_GetInteger( p_input, "state" ) );
+                            break;
+                        case PLAYLIST_PAUSED:
+                            msg_rc( STATUS_CHANGE "( pause state: 2 )\r\n" );
+                            break;
+                        default:
+                            msg_rc( STATUS_CHANGE "( state unknown )\r\n" );
+                            break;
+                    }
+                    vlc_mutex_unlock( &p_playlist->object_lock );
+                } /* End of current playlist status */                
             }
         }
         else if( !strcmp( psz_cmd, "get_time" ) )
@@ -677,82 +797,8 @@ static void Run( intf_thread_t *p_intf )
             if( !strcmp( psz_cmd, "longhelp" ) || !strncmp( psz_cmd, "H", 1 ) )
                  b_longhelp = VLC_TRUE;
             else b_longhelp = VLC_FALSE;
-            
-            msg_rc(_("+----[ Remote control commands ]\n"));
-            msg_rc(  "| \n");
-            msg_rc(_("| add XYZ  . . . . . . . . . . add XYZ to playlist\n"));
-            msg_rc(_("| playlist . . .  show items currently in playlist\n"));
-            msg_rc(_("| play . . . . . . . . . . . . . . . . play stream\n"));
-            msg_rc(_("| stop . . . . . . . . . . . . . . . . stop stream\n"));
-            msg_rc(_("| next . . . . . . . . . . . .  next playlist item\n"));
-            msg_rc(_("| prev . . . . . . . . . .  previous playlist item\n"));
-            msg_rc(_("| goto . . . . . . . . . . . .  goto item at index\n"));
-            msg_rc(_("| title [X]  . . . . set/get title in current item\n"));
-            msg_rc(_("| title_n  . . . . . .  next title in current item\n"));
-            msg_rc(_("| title_p  . . . .  previous title in current item\n"));
-            msg_rc(_("| chapter [X]  . . set/get chapter in current item\n"));
-            msg_rc(_("| chapter_n  . . . .  next chapter in current item\n"));
-            msg_rc(_("| chapter_p  . .  previous chapter in current item\n"));
-            msg_rc(  "| \n");
-            msg_rc(_("| seek X . seek in seconds, for instance `seek 12'\n"));
-            msg_rc(_("| pause  . . . . . . . . . . . . . .  toggle pause\n"));
-            msg_rc(_("| fastforward  . . . . . .  .  set to maximum rate\n"));
-            msg_rc(_("| rewind  . . . . . . . . . .  set to minimum rate\n"));
-            msg_rc(_("| f  . . . . . . . . . . . . . . toggle fullscreen\n"));
-            msg_rc(_("| info . . .  information about the current stream\n"));
-            msg_rc(  "| \n");
-            msg_rc(_("| volume [X] . . . . . . . .  set/get audio volume\n"));
-            msg_rc(_("| volup [X]  . . . . .  raise audio volume X steps\n"));
-            msg_rc(_("| voldown [X]  . . . .  lower audio volume X steps\n"));
-            msg_rc(_("| adev [X] . . . . . . . . .  set/get audio device\n"));
-            msg_rc(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
-            msg_rc(  "| \n");
-            
-            if (b_longhelp)
-            {
-                msg_rc(_("| marq-marquee STRING  . . overlay STRING in video\n"));
-                msg_rc(_("| marq-x X . . . . . . . . . . . .offset from left\n"));
-                msg_rc(_("| marq-y Y . . . . . . . . . . . . offset from top\n"));
-                msg_rc(_("| marq-position #. . .  .relative position control\n"));
-                msg_rc(_("| marq-color # . . . . . . . . . . font color, RGB\n"));
-                msg_rc(_("| marq-opacity # . . . . . . . . . . . . . opacity\n"));
-                msg_rc(_("| marq-timeout T. . . . . . . . . . timeout, in ms\n"));
-                msg_rc(_("| marq-size # . . . . . . . . font size, in pixels\n"));
-                msg_rc(  "| \n");
-                msg_rc(_("| time-format STRING . . . overlay STRING in video\n"));
-                msg_rc(_("| time-x X . . . . . . . . . . . .offset from left\n"));
-                msg_rc(_("| time-y Y . . . . . . . . . . . . offset from top\n"));
-                msg_rc(_("| time-position #. . . . . . . . relative position\n"));
-                msg_rc(_("| time-color # . . . . . . . . . . font color, RGB\n"));
-                msg_rc(_("| time-opacity # . . . . . . . . . . . . . opacity\n"));
-                msg_rc(_("| time-size # . . . . . . . . font size, in pixels\n"));
-                msg_rc(  "| \n");
-                msg_rc(_("| logo-file STRING . . . the overlay file path/name\n"));
-                msg_rc(_("| logo-x X . . . . . . . . . . . .offset from left\n"));
-                msg_rc(_("| logo-y Y . . . . . . . . . . . . offset from top\n"));
-                msg_rc(_("| logo-position #. . . . . . . . relative position\n"));
-                msg_rc(_("| logo-transparency #. . . . . . . . .transparency\n"));
-                msg_rc(  "| \n");
-                msg_rc(_("| mosaic-alpha # . . . . . . . . . . . . . . alpha\n"));
-                msg_rc(_("| mosaic-height #. . . . . . . . . . . . . .height\n"));
-                msg_rc(_("| mosaic-width # . . . . . . . . . . . . . . width\n"));
-                msg_rc(_("| mosaic-xoffset # . . . .top left corner position\n"));
-                msg_rc(_("| mosaic-yoffset # . . . .top left corner position\n"));
-                msg_rc(_("| mosaic-align 0..2,4..6,8..10. . .mosaic alignment\n"));
-                msg_rc(_("| mosaic-vborder # . . . . . . . . vertical border\n"));
-                msg_rc(_("| mosaic-hborder # . . . . . . . horizontal border\n"));
-                msg_rc(_("| mosaic-position {0=auto,1=fixed} . . . .position\n"));
-                msg_rc(_("| mosaic-rows #. . . . . . . . . . .number of rows\n"));
-                msg_rc(_("| mosaic-cols #. . . . . . . . . . .number of cols\n"));
-                msg_rc(_("| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio\n"));
-                msg_rc(  "| \n");
-            }    
-            msg_rc(_("| help . . . . . . . . . . . . . this help message\n"));
-            msg_rc(_("| longhelp . . . . . . . . . a longer help message\n"));
-            msg_rc(_("| logout . . . . .  exit (if in socket connection)\n"));
-            msg_rc(_("| quit . . . . . . . . . . . . . . . . .  quit vlc\n"));
-            msg_rc(  "| \n");
-            msg_rc(_("+----[ end of help ]\n"));
+
+            Help( p_intf, b_longhelp );
         }
         else switch( psz_cmd[0] )
         {
@@ -790,8 +836,16 @@ static void Run( intf_thread_t *p_intf )
         i_size = 0; p_buffer[0] = 0;
     }
 
+    msg_rc( STATUS_CHANGE "( stop state: 0 )\r\n" );
+    msg_rc( STATUS_CHANGE "( quit )\r\n" );
+
     if( p_input )
     {
+        var_DelCallback( p_input, "state", StateChanged, p_intf );
+        var_DelCallback( p_input, "rate-faster", RateChanged, p_intf );
+        var_DelCallback( p_input, "rate-slower", RateChanged, p_intf );
+        var_DelCallback( p_input, "rate", RateChanged, p_intf );
+        var_DelCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
         vlc_object_release( p_input );
         p_input = NULL;
     }
@@ -801,8 +855,183 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         p_playlist = NULL;
     }
+    
+    var_DelCallback( p_intf->p_vlc, "audio-volume", VolumeChanged, p_intf );
 }
 
+static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
+{                
+    msg_rc(_("+----[ Remote control commands ]\n"));
+    msg_rc(  "| \n");
+    msg_rc(_("| add XYZ  . . . . . . . . . . add XYZ to playlist\n"));
+    msg_rc(_("| playlist . . .  show items currently in playlist\n"));
+    msg_rc(_("| play . . . . . . . . . . . . . . . . play stream\n"));
+    msg_rc(_("| stop . . . . . . . . . . . . . . . . stop stream\n"));
+    msg_rc(_("| next . . . . . . . . . . . .  next playlist item\n"));
+    msg_rc(_("| prev . . . . . . . . . .  previous playlist item\n"));
+    msg_rc(_("| goto . . . . . . . . . . . .  goto item at index\n"));
+    msg_rc(_("| title [X]  . . . . set/get title in current item\n"));
+    msg_rc(_("| title_n  . . . . . .  next title in current item\n"));
+    msg_rc(_("| title_p  . . . .  previous title in current item\n"));
+    msg_rc(_("| chapter [X]  . . set/get chapter in current item\n"));
+    msg_rc(_("| chapter_n  . . . .  next chapter in current item\n"));
+    msg_rc(_("| chapter_p  . .  previous chapter in current item\n"));
+    msg_rc(  "| \n");
+    msg_rc(_("| seek X . seek in seconds, for instance `seek 12'\n"));
+    msg_rc(_("| pause  . . . . . . . . . . . . . .  toggle pause\n"));
+    msg_rc(_("| fastforward  . . . . . .  .  set to maximum rate\n"));
+    msg_rc(_("| rewind  . . . . . . . . . .  set to minimum rate\n"));
+    msg_rc(_("| faster . . . . . . . .  faster playing of stream\n"));
+    msg_rc(_("| slower . . . . . . . .  slower playing of stream\n"));
+    msg_rc(_("| normal . . . . . . . .  normal playing of stream\n"));
+    msg_rc(_("| f  . . . . . . . . . . . . . . toggle fullscreen\n"));
+    msg_rc(_("| info . . .  information about the current stream\n"));
+    msg_rc(  "| \n");
+    msg_rc(_("| volume [X] . . . . . . . .  set/get audio volume\n"));
+    msg_rc(_("| volup [X]  . . . . .  raise audio volume X steps\n"));
+    msg_rc(_("| voldown [X]  . . . .  lower audio volume X steps\n"));
+    msg_rc(_("| adev [X] . . . . . . . . .  set/get audio device\n"));
+    msg_rc(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
+    msg_rc(_("| menu [on|off|up|down|left|right|select] use menu\n"));
+    msg_rc(  "| \n");
+    
+    if (b_longhelp)
+    {
+        msg_rc(_("| marq-marquee STRING  . . overlay STRING in video\n"));
+        msg_rc(_("| marq-x X . . . . . . . . . . . .offset from left\n"));
+        msg_rc(_("| marq-y Y . . . . . . . . . . . . offset from top\n"));
+        msg_rc(_("| marq-position #. . .  .relative position control\n"));
+        msg_rc(_("| marq-color # . . . . . . . . . . font color, RGB\n"));
+        msg_rc(_("| marq-opacity # . . . . . . . . . . . . . opacity\n"));
+        msg_rc(_("| marq-timeout T. . . . . . . . . . timeout, in ms\n"));
+        msg_rc(_("| marq-size # . . . . . . . . font size, in pixels\n"));
+        msg_rc(  "| \n");
+        msg_rc(_("| time-format STRING . . . overlay STRING in video\n"));
+        msg_rc(_("| time-x X . . . . . . . . . . . .offset from left\n"));
+        msg_rc(_("| time-y Y . . . . . . . . . . . . offset from top\n"));
+        msg_rc(_("| time-position #. . . . . . . . relative position\n"));
+        msg_rc(_("| time-color # . . . . . . . . . . font color, RGB\n"));
+        msg_rc(_("| time-opacity # . . . . . . . . . . . . . opacity\n"));
+        msg_rc(_("| time-size # . . . . . . . . font size, in pixels\n"));
+        msg_rc(  "| \n");
+        msg_rc(_("| logo-file STRING . . . the overlay file path/name\n"));
+        msg_rc(_("| logo-x X . . . . . . . . . . . .offset from left\n"));
+        msg_rc(_("| logo-y Y . . . . . . . . . . . . offset from top\n"));
+        msg_rc(_("| logo-position #. . . . . . . . relative position\n"));
+        msg_rc(_("| logo-transparency #. . . . . . . . .transparency\n"));
+        msg_rc(  "| \n");
+        msg_rc(_("| mosaic-alpha # . . . . . . . . . . . . . . alpha\n"));
+        msg_rc(_("| mosaic-height #. . . . . . . . . . . . . .height\n"));
+        msg_rc(_("| mosaic-width # . . . . . . . . . . . . . . width\n"));
+        msg_rc(_("| mosaic-xoffset # . . . .top left corner position\n"));
+        msg_rc(_("| mosaic-yoffset # . . . .top left corner position\n"));
+        msg_rc(_("| mosaic-align 0..2,4..6,8..10. . .mosaic alignment\n"));
+        msg_rc(_("| mosaic-vborder # . . . . . . . . vertical border\n"));
+        msg_rc(_("| mosaic-hborder # . . . . . . . horizontal border\n"));
+        msg_rc(_("| mosaic-position {0=auto,1=fixed} . . . .position\n"));
+        msg_rc(_("| mosaic-rows #. . . . . . . . . . .number of rows\n"));
+        msg_rc(_("| mosaic-cols #. . . . . . . . . . .number of cols\n"));
+        msg_rc(_("| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio\n"));
+        msg_rc(  "| \n");
+    }
+    msg_rc(_("| help . . . . . . . . . . . . . this help message\n"));
+    msg_rc(_("| longhelp . . . . . . . . . a longer help message\n"));
+    msg_rc(_("| logout . . . . .  exit (if in socket connection)\n"));
+    msg_rc(_("| quit . . . . . . . . . . . . . . . . .  quit vlc\n"));
+    msg_rc(  "| \n");
+    msg_rc(_("+----[ end of help ]\n"));
+}
+
+/********************************************************************
+ * Status callback routines
+ ********************************************************************/
+static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
+    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_data;
+    input_thread_t *p_input = NULL;
+    
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( p_input )
+    {
+        msg_rc( STATUS_CHANGE "( time-offset: %d )\r\n", var_GetInteger( p_input, "time-offset" ) );
+        vlc_object_release( p_input );
+    }
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
+    return VLC_SUCCESS;
+}
+
+static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
+    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_data;
+    
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    msg_rc( STATUS_CHANGE "( audio volume: %d )\r\n", newval.i_int );
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
+    return VLC_SUCCESS;
+}
+
+static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
+    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_data;
+    playlist_t    *p_playlist = NULL;
+    input_thread_t *p_input = NULL;
+        
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( p_input )
+    {
+        p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+        if( p_playlist )
+        {
+            char cmd[5] = "";
+            switch( p_playlist->status.i_status )
+            {
+            case PLAYLIST_STOPPED:
+                strncpy( &cmd[0], "stop", 4);
+                cmd[4] = '\0';
+                break;
+            case PLAYLIST_RUNNING:
+                strncpy( &cmd[0], "play", 4);
+                cmd[4] = '\0';
+                break;
+            case PLAYLIST_PAUSED:
+                strncpy( &cmd[0], "pause", 5);
+                cmd[5] = '\0';
+                break;
+            } /* var_GetInteger( p_input, "state" )  */
+            msg_rc( STATUS_CHANGE "( %s state: %d )\r\n", &cmd[0], newval.i_int );
+            vlc_object_release( p_playlist );
+        }
+        vlc_object_release( p_input );
+    }
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
+    return VLC_SUCCESS;
+}
+
+static int RateChanged( vlc_object_t *p_this, char const *psz_cmd,
+    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_data;
+    input_thread_t *p_input = NULL;
+    
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( p_input )
+    {
+        msg_rc( STATUS_CHANGE "( new rate: %d )\r\n", var_GetInteger( p_input, "rate" ) );
+        vlc_object_release( p_input );
+    }
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
+    return VLC_SUCCESS;
+}
+
+/********************************************************************
+ * Command routines
+ ********************************************************************/
 static int Input( vlc_object_t *p_this, char const *psz_cmd,
                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -813,6 +1042,15 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( !p_input ) return VLC_ENOOBJ;
 
+    var_Get( p_input, "state", &val );
+    if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
+        ( strcmp( psz_cmd, "pause" ) != 0 ) )
+    {
+        msg_rc( _("press pause to continue\r\n") );
+        vlc_object_release( p_input );
+        return VLC_EGENERIC;
+    }
+    
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
@@ -840,15 +1078,39 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "fastforward" ) )
     {
-        val.i_int = INPUT_RATE_MAX;
-
-        var_Set( p_input, "rate", val );
+        val.i_int = config_GetInt( p_intf, "key-jump+3sec" );
+        var_Set( p_intf->p_vlc, "key-pressed", val );
+        
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "rewind" ) )
     {
-        val.i_int = INPUT_RATE_MIN;
+        val.i_int = config_GetInt( p_intf, "key-jump-3sec" );
+        var_Set( p_intf->p_vlc, "key-pressed", val );
+
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+    else if ( !strcmp( psz_cmd, "faster" ) )
+    {
+        val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-faster", val );
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+    else if ( !strcmp( psz_cmd, "slower" ) )
+    {
+        val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, "rate-slower", val );
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+    else if ( !strcmp( psz_cmd, "normal" ) )
+    {
+        val.i_int = INPUT_RATE_DEFAULT;
 
         var_Set( p_input, "rate", val );
         vlc_object_release( p_input );
@@ -953,6 +1215,19 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_ENOOBJ;
     }
 
+    if( p_playlist->p_input )
+    {
+        vlc_value_t val;
+        var_Get( p_playlist->p_input, "state", &val );
+        if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
+            ( strcmp( psz_cmd, "pause" ) != 0 ) )
+        {
+            msg_rc( _("press pause to continue\r\n") );
+            vlc_object_release( p_playlist );
+            return VLC_EGENERIC;
+        }
+    }    
+    
     /* Parse commands that require a playlist */
     if( !strcmp( psz_cmd, "prev" ) )
     {
@@ -964,7 +1239,21 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "play" ) )
     {
-        playlist_Play( p_playlist );
+        if( p_playlist->p_input )
+        {
+            vlc_value_t val;
+            
+            var_Get( p_playlist->p_input, "rate", &val );
+            if( val.i_int != INPUT_RATE_DEFAULT )
+            {
+                val.i_int = INPUT_RATE_DEFAULT;
+                var_Set( p_playlist->p_input, "rate", val );
+            }
+            else
+            {
+                playlist_Play( p_playlist );
+            }
+        }
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
@@ -1023,37 +1312,48 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    vlc_object_t *p_pl;
-    vlc_value_t     val;
-    vlc_object_t *p_inp;
+    vlc_object_t  *p_playlist;
+    vlc_value_t    val;
+    vlc_object_t  *p_input;
 
-    p_pl = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-    if( !p_pl )
+    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist )
     {
         return VLC_ENOOBJ;
     }
     
-    p_inp = vlc_object_find( p_this, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
-    if( !p_inp )
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
     {
-        vlc_object_release( p_pl );
+        vlc_object_release( p_playlist );
         return VLC_ENOOBJ;
     }
 
+    if( p_input )
+    {
+        var_Get( p_input, "state", &val );
+        if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
+            ( strcmp( psz_cmd, "pause" ) != 0 ) )
+        {
+            msg_rc( _("press pause to continue\r\n") );
+            vlc_object_release( p_playlist );
+            vlc_object_release( p_input );
+            return VLC_EGENERIC;
+        }
+    }
+    
     /* Parse miscellaneous commands */
     if( !strcmp( psz_cmd, "marq-marquee" ) )
     {
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_inp->p_libvlc, "marq-marquee", val );
+            var_Set( p_input->p_libvlc, "marq-marquee", val );
         }
         else 
         {
                 val.psz_string = "";
-                var_Set( p_inp->p_libvlc, "marq-marquee", val);
+                var_Set( p_input->p_libvlc, "marq-marquee", val);
         }
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
@@ -1061,7 +1361,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "marq-x", val );
+            var_Set( p_input->p_libvlc, "marq-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-y" ) )
@@ -1069,7 +1369,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "marq-y", val );
+            var_Set( p_input->p_libvlc, "marq-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-position" ) )
@@ -1077,7 +1377,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "marq-position", val );
+            var_Set( p_input->p_libvlc, "marq-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-color" ) )
@@ -1085,7 +1385,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_inp->p_libvlc, "marq-color", val );
+            var_Set( p_input->p_libvlc, "marq-color", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-opacity" ) )
@@ -1093,7 +1393,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_inp->p_libvlc, "marq-opacity", val );
+            var_Set( p_input->p_libvlc, "marq-opacity", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-size" ) )
@@ -1101,7 +1401,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "marq-size", val );
+            var_Set( p_input->p_libvlc, "marq-size", val );
         }
     }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
@@ -1109,7 +1409,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp, "marq-timeout", val );
+            var_Set( p_input, "marq-timeout", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-alpha" ) )
@@ -1117,7 +1417,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-alpha", val );
+            var_Set( p_input->p_libvlc, "mosaic-alpha", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-height" ) )
@@ -1125,7 +1425,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-height", val );
+            var_Set( p_input->p_libvlc, "mosaic-height", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-width" ) )
@@ -1133,7 +1433,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-width", val );
+            var_Set( p_input->p_libvlc, "mosaic-width", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-xoffset" ) )
@@ -1141,7 +1441,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-xoffset", val );
+            var_Set( p_input->p_libvlc, "mosaic-xoffset", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-yoffset" ) )
@@ -1149,7 +1449,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-yoffset", val );
+            var_Set( p_input->p_libvlc, "mosaic-yoffset", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-align" ) )
@@ -1157,7 +1457,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-align", val );
+            var_Set( p_input->p_libvlc, "mosaic-align", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-vborder" ) )
@@ -1165,7 +1465,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-vborder", val );
+            var_Set( p_input->p_libvlc, "mosaic-vborder", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-hborder" ) )
@@ -1173,7 +1473,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-hborder", val );
+            var_Set( p_input->p_libvlc, "mosaic-hborder", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-position" ) )
@@ -1181,7 +1481,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-position", val );
+            var_Set( p_input->p_libvlc, "mosaic-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-rows" ) )
@@ -1189,7 +1489,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-rows", val );
+            var_Set( p_input->p_libvlc, "mosaic-rows", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-cols" ) )
@@ -1197,7 +1497,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-cols", val );
+            var_Set( p_input->p_libvlc, "mosaic-cols", val );
         }
     }
     else if( !strcmp( psz_cmd, "mosaic-keep-aspect-ratio" ) )
@@ -1205,7 +1505,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "mosaic-keep-aspect-ratio", val );
+            var_Set( p_input->p_libvlc, "mosaic-keep-aspect-ratio", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-format" ) )
@@ -1213,12 +1513,12 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_inp->p_libvlc, "time-format", val );
+            var_Set( p_input->p_libvlc, "time-format", val );
         }
         else 
         {
-                val.psz_string = "";
-                var_Set( p_inp->p_libvlc, "time-format", val);
+            val.psz_string = "";
+            var_Set( p_input->p_libvlc, "time-format", val);
         }
     }
     else if( !strcmp( psz_cmd, "time-x" ) )
@@ -1226,7 +1526,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "time-x", val );
+            var_Set( p_input->p_libvlc, "time-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-y" ) )
@@ -1234,7 +1534,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "time-y", val );
+            var_Set( p_input->p_libvlc, "time-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-position" ) )
@@ -1242,7 +1542,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "time-position", val );
+            var_Set( p_input->p_libvlc, "time-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-color" ) )
@@ -1250,7 +1550,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_inp->p_libvlc, "time-color", val );
+            var_Set( p_input->p_libvlc, "time-color", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-opacity" ) )
@@ -1258,7 +1558,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_inp->p_libvlc, "time-opacity", val );
+            var_Set( p_input->p_libvlc, "time-opacity", val );
         }
     }
     else if( !strcmp( psz_cmd, "time-size" ) )
@@ -1266,7 +1566,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "time-size", val );
+            var_Set( p_input->p_libvlc, "time-size", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-file" ) )
@@ -1274,7 +1574,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0 )
         {
             val.psz_string = newval.psz_string;
-            var_Set( p_inp->p_libvlc, "logo-file", val );
+            var_Set( p_input->p_libvlc, "logo-file", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-x" ) )
@@ -1282,7 +1582,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "logo-x", val );
+            var_Set( p_input->p_libvlc, "logo-x", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-y" ) )
@@ -1290,7 +1590,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "logo-y", val );
+            var_Set( p_input->p_libvlc, "logo-y", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-position" ) )
@@ -1298,7 +1598,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = atoi( newval.psz_string );
-            var_Set( p_inp->p_libvlc, "logo-position", val );
+            var_Set( p_input->p_libvlc, "logo-position", val );
         }
     }
     else if( !strcmp( psz_cmd, "logo-transparency" ) )
@@ -1306,7 +1606,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         if( strlen( newval.psz_string ) > 0) 
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
-            var_Set( p_inp->p_libvlc, "logo-transparency", val );
+            var_Set( p_input->p_libvlc, "logo-transparency", val );
         }
     }
 
@@ -1318,14 +1618,22 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
         msg_rc( "unknown command!\n" );
     }
 
-    vlc_object_release( p_pl );
-    vlc_object_release( p_inp );
+    vlc_object_release( p_playlist );
+    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
 static int Quit( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    playlist_t *p_playlist;
+    
+    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
+    {
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
+    }    
     p_this->p_vlc->b_die = VLC_TRUE;
     return VLC_SUCCESS;
 }
@@ -1360,13 +1668,23 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     {
         /* Set. */
         audio_volume_t i_volume = atoi( newval.psz_string );
-        if ( i_volume > AOUT_VOLUME_MAX )
+        if ( (i_volume > (audio_volume_t)AOUT_VOLUME_MAX) )
         {
             msg_rc( "Volume must be in the range %d-%d\n", AOUT_VOLUME_MIN,
                     AOUT_VOLUME_MAX );
             i_error = VLC_EBADVAR;
         }
-        else i_error = aout_VolumeSet( p_this, i_volume );
+        else
+        {
+            if( i_volume == AOUT_VOLUME_MIN )
+            {
+                vlc_value_t keyval;
+
+                keyval.i_int = config_GetInt( p_intf, "key-vol-mute" );
+                var_Set( p_intf->p_vlc, "key-pressed", keyval );
+            }        
+            i_error = aout_VolumeSet( p_this, i_volume );
+        }
     }
     else
     {
@@ -1378,7 +1696,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            msg_rc( "Volume is %d\n", i_volume );
+            msg_rc( STATUS_CHANGE "( audio volume: %d )\r\n", i_volume );
             i_error = VLC_SUCCESS;
         }
     }
@@ -1403,14 +1721,16 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
     {
         if ( aout_VolumeUp( p_this, i_nb_steps, &i_volume ) < 0 )
             i_error = VLC_EGENERIC;
+        osd_VolumeUp( p_this );
     }
     else
     {
         if ( aout_VolumeDown( p_this, i_nb_steps, &i_volume ) < 0 )
             i_error = VLC_EGENERIC;
+        osd_VolumeDown( p_this );
     }
 
-    if ( !i_error ) msg_rc( "Volume is %d\n", i_volume );
+    if ( !i_error ) msg_rc( STATUS_CHANGE "( audio volume: %d )\r\n", i_volume );
     return i_error;
 }
 
@@ -1486,6 +1806,65 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
     }
     vlc_object_release( (vlc_object_t *)p_aout );
 
+    return i_error;
+}
+
+/* OSD menu commands */
+static int Menu( vlc_object_t *p_this, char const *psz_cmd,
+    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    playlist_t    *p_playlist = NULL;
+    vlc_value_t val;
+    int i_error = VLC_EGENERIC;
+
+    if ( !*newval.psz_string )
+    {
+        msg_rc( "please provide one of the following paramaters\r\n[on|off|up|down|left|right|select]\r\n" );
+        return i_error;
+    }
+    
+    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( !p_playlist )
+        return VLC_ENOOBJ;
+
+    if( p_playlist->p_input )
+    {
+        var_Get( p_playlist->p_input, "state", &val );
+        if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
+            ( strcmp( newval.psz_string, "select" ) != 0 ) )
+        {
+            msg_rc( _("press menu select to continue\r\n") );
+            vlc_object_release( p_playlist );
+            return VLC_EGENERIC;
+        }
+        vlc_object_release( p_playlist );
+    }
+    
+    val.psz_string = strdup( newval.psz_string );
+    if( !strcmp( val.psz_string, "on" ) || !strcmp( val.psz_string, "show" ))
+        osd_MenuShow( p_this );
+    else if( !strcmp( val.psz_string, "off" ) || !strcmp( val.psz_string, "hide" ) )
+        osd_MenuHide( p_this );
+    else if( !strcmp( val.psz_string, "up" ) )
+        osd_MenuUp( p_this );
+    else if( !strcmp( val.psz_string, "down" ) )
+        osd_MenuDown( p_this );
+    else if( !strcmp( val.psz_string, "left" ) )
+        osd_MenuPrev( p_this );
+    else if( !strcmp( val.psz_string, "right" ) )
+        osd_MenuNext( p_this );
+    else if( !strcmp( val.psz_string, "select" ) )
+        osd_MenuActivate( p_this );
+    else
+    {
+        msg_rc( "please provide one of the following paramaters\r\n[on|off|up|down|left|right|select]\r\n" );
+        if( val.psz_string ) free( val.psz_string );
+            return i_error;
+    }
+
+    i_error = VLC_SUCCESS;
+    if( val.psz_string ) free( val.psz_string );
     return i_error;
 }
 
