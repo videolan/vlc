@@ -55,6 +55,7 @@
     NSMutableDictionary *o_save_prefs;
     
     IBOutlet id o_prefs_window;
+    IBOutlet id o_title;
     IBOutlet id o_tree;
     IBOutlet id o_prefs_view;
     IBOutlet id o_save_btn;

@@ -492,6 +492,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_recursive_expand setTitle: _NS("Expand Node")];
     [o_mi_selectall setTitle: _NS("Select All")];
     [o_mi_info setTitle: _NS("Properties")];
+    [o_mi_preparse setTitle: _NS("Preparse")];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [o_mi_services setTitle: _NS("Services discovery")];
@@ -808,6 +809,49 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
         vlc_object_release( p_playlist );
     }
+}
+
+/* When called retrieves the selected outlineview row and plays that node or item */
+- (IBAction)preparseItem:(id)sender
+{
+    int i_count;
+    NSMutableArray *o_to_preparse;
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+                                                       
+    o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
+    i_count = [o_to_preparse count];
+
+    if( p_playlist != NULL )
+    {
+        int i, i_row;
+        NSNumber *o_number;
+        playlist_item_t *p_item = NULL;
+
+        for( i = 0; i < i_count; i++ )
+        {
+            o_number = [o_to_preparse lastObject];
+            i_row = [o_number intValue];
+            p_item = [[o_outline_view itemAtRow:i_row] pointerValue];
+            [o_to_preparse removeObject: o_number];
+            [o_outline_view deselectRow: i_row];
+
+            if( p_item )
+            {
+                if( p_item->i_children == -1 )
+                {
+                    playlist_PreparseEnqueue( p_playlist, &p_item->input );
+                }
+                else
+                {
+                    msg_Dbg( p_intf, "preparse of nodes not yet implemented" );
+                }
+            }
+        }
+        vlc_object_release( p_playlist );
+    }
+    [self playlistUpdated];
 }
 
 - (IBAction)servicesChange:(id)sender
@@ -1331,6 +1375,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_delete setEnabled: b_item_sel];
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
+    [o_mi_preparse setEnabled: b_item_sel];
     [o_mi_recursive_expand setEnabled: b_item_sel];
     [o_mi_sort_name setEnabled: b_item_sel];
     [o_mi_sort_author setEnabled: b_item_sel];

@@ -81,6 +81,7 @@
     IBOutlet id o_mi_play;
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_info;
+    IBOutlet id o_mi_preparse;
     IBOutlet id o_mi_selectall;
     IBOutlet id o_mi_sort_name;
     IBOutlet id o_mi_sort_author;
@@ -119,6 +120,7 @@
 
 - (IBAction)servicesChange:(id)sender;
 - (IBAction)playItem:(id)sender;
+- (IBAction)preparseItem:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
