@@ -70,6 +70,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_SET_PAUSE_STATE:
         case ACCESS_GET_TITLE_INFO:
+        case ACCESS_GET_META:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:
             return VLC_EGENERIC;
