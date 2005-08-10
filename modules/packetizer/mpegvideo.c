@@ -67,7 +67,7 @@ vlc_module_begin();
     set_capability( "packetizer", 50 );
     set_callbacks( Open, Close );
 
-    add_bool( "packetizer-mpegvideo-sync-iframe", 1, NULL, SYNC_INTRAFRAME_TEXT,
+    add_bool( "packetizer-mpegvideo-sync-iframe", 0, NULL, SYNC_INTRAFRAME_TEXT,
               SYNC_INTRAFRAME_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
