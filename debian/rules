@@ -69,7 +69,7 @@ CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad2
 CONFIG_FLAGS += --enable-x264 --with-x264-tree=extras/x264
 
 # Glide and svgalib are only for x86
-ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
 CONFIG_FLAGS += --enable-glide
 CONFIG_FLAGS += --enable-svgalib
 endif
@@ -257,7 +257,7 @@ install: build
 	  debian/vlc-plugin-ggi/usr/lib/vlc/video_output/
 
 	# Package: vlc-plugin-glide
-ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
 	ln -s vlc debian/vlc-plugin-glide/usr/share/doc/vlc-plugin-glide
 	mv debian/vlc/usr/lib/vlc/video_output/libglide_plugin.so \
 	  debian/vlc-plugin-glide/usr/lib/vlc/video_output/
@@ -297,7 +297,7 @@ endif
 	#mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
 
 	# Package: vlc-plugin-svgalib
-ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
 	ln -s vlc debian/vlc-plugin-svgalib/usr/share/doc/vlc-plugin-svgalib
 	mv debian/vlc/usr/lib/vlc/video_output/libsvgalib_plugin.so \
 	  debian/vlc-plugin-svgalib/usr/lib/vlc/video_output
@@ -307,6 +307,7 @@ endif
 	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
 	cp debian/vlc/$(VIDDIR)/vlc.xpm debian/wxvlc/$(VIDDIR)/wxvlc.xpm
+	cp debian/vlc.desktop debian/wxvlc/$(GNOMEDIR)
 	mv debian/vlc/usr/lib/vlc/gui/libwxwidgets_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
 	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz

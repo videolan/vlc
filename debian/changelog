@@ -1,13 +1,29 @@
-vlc (UNRELEASED) experimental; urgency=low
+vlc (0.8.4-svn20050810-1) unstable; urgency=low
 
-  * Experimental build.
+  * New SVN snapshot.
+  * Rebuilt against libaa1 and new wxWin and SDL packages to complete the
+    aalib transition (Closes: #320874) and make the packages installable again
+    (Closes: #319292, #319598, #321461, #322166, #317380).
+  * debian/rules:
+    + Use DEB_BUILD_ARCH_CPU instead of DEB_BUILD_GNU_CPU.
+  * debian/vlc.desktop:
+    + Added desktop file, thanks to Mantas Kriauciunas (Closes: #290612).
   * debian/control:
-    + Build-depend on libwxgtk2.6-dev instead of libwxgtk2.4-dev.
+    + Removed unused dummy packages (Closes: #321988, #322003, #322013).
+    + Build-depend on libmatroska-dev (>= 0.7.7).
+    + Build-depend on libwxgtk2.4-dev (>= 2.4.4).
     + Build-depend on libdvbpsi4-dev instead of libdvbpsi3-dev.
+    * Build-depend on libsdl1.2-dev (>= 1.2.7+1.2.8cvs20041007-5.3).
     + Build-depend on a newer version of libmatroska-dev because of the C++
       transition.
+    + Build-depend on libsvga1-dev instead of svgalib1-dev.
+  * This snapshot no longer uses tune=opteron on amd64 (Closes: #316161).
+  * The SVN version adds support for Freebox users (Closes: #317035).
+  * Various gcc-4.x FTBFS were fixed upstream (Closes: #317055).
+  * mozilla/support/npunix.c: fixed undeclared NPP_GetJavaClass
+    (Closes: #317067).
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 15 Jul 2005 03:22:46 +0300
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 13 Jul 2005 21:54:09 +0200
 
 vlc (0.8.2-1) unstable; urgency=low
 

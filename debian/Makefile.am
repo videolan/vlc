@@ -7,6 +7,7 @@ EXTRA_DIST = \
 	control \
 	copyright \
 	rules \
+	vlc.desktop \
 	vlc.dirs \
 	vlc.docs \
 	vlc.menu \
