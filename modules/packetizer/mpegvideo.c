@@ -1,12 +1,13 @@
 /*****************************************************************************
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +49,11 @@
 
 #include "vlc_block_helper.h"
 
+#define SYNC_INTRAFRAME_TEXT N_("Sync on intraframe")
+#define SYNC_INTRAFRAME_LONGTEXT N_("Normally the packetizer would " \
+    "sync on the next full frame. This flags instructs the packetizer " \
+    "to sync on the first intraframe found.")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -60,6 +66,9 @@ vlc_module_begin();
     set_description( _("MPEG-I/II video packetizer") );
     set_capability( "packetizer", 50 );
     set_callbacks( Open, Close );
+
+    add_bool( "packetizer-mpegvideo-sync-iframe", 1, NULL, SYNC_INTRAFRAME_TEXT,
+              SYNC_INTRAFRAME_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -112,7 +121,10 @@ struct decoder_sys_t
 
     /* Number of pictures since last sequence header */
     int i_seq_old;
-
+    
+    /* Sync behaviour */
+    vlc_bool_t  b_sync_on_intra_frame;
+    vlc_bool_t  b_discontinuity;
 };
 
 enum {
@@ -174,6 +186,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_old_duration = 0;
     p_sys->i_last_ref_pts = 0;
 
+    p_sys->b_discontinuity = VLC_FALSE;
+    p_sys->b_sync_on_intra_frame = var_CreateGetBool( p_dec, "packetizer-mpegvideo-sync-iframe" );
+    if( p_sys->b_sync_on_intra_frame )
+        msg_Dbg( p_dec, "syncing happens on intraframe now." );
+        
     return VLC_SUCCESS;
 }
 
@@ -199,6 +216,8 @@ static void Close( vlc_object_t *p_this )
     {
         block_ChainRelease( p_sys->p_frame );
     }
+    
+    var_Destroy( p_dec, "packetizer-mpegvideo-sync-iframe" );
 
     free( p_sys );
 }
@@ -219,7 +238,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     if( (*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         p_sys->i_state = STATE_NOSYNC;
-        if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
+        p_sys->b_discontinuity = VLC_TRUE;
+        if( p_sys->p_frame )
+            block_ChainRelease( p_sys->p_frame );        
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = VLC_FALSE;
@@ -294,6 +315,24 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
+            /* If a discontinuity has been encountered, then wait till
+             * the next Intra frame before continuing with packetizing */
+            if( p_sys->b_discontinuity &&
+                p_sys->b_sync_on_intra_frame )
+            {
+                if( p_pic->i_flags & BLOCK_FLAG_TYPE_I )
+                {
+                    msg_Dbg( p_dec, "synced on Intra frame" );
+                    p_sys->b_discontinuity = VLC_FALSE;
+                    p_pic->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                }
+                else
+                {
+                    p_sys->i_state = STATE_NOSYNC;
+                    break;
+                }
+            }
+            
             /* We've just started the stream, wait for the first PTS.
              * We discard here so we can still get the sequence header. */
             if( p_sys->i_dts <= 0 && p_sys->i_pts <= 0 &&

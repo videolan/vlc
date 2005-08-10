@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -1613,9 +1613,9 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     const vlc_bool_t b_adaptation = p[3]&0x20;
     const vlc_bool_t b_payload    = p[3]&0x10;
     const int        i_cc         = p[3]&0x0f;   /* continuity counter */
+    vlc_bool_t       b_discontinuity = VLC_FALSE;/* discontinuity */    
 
     /* transport_scrambling_control is ignored */
-
     int         i_skip = 0;
     vlc_bool_t  i_ret  = VLC_FALSE;
     int         i_diff;
@@ -1660,6 +1660,10 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 msg_Warn( p_demux, "discontinuity_indicator (pid=%d) "
                           "ignored", pid->i_pid );
             }
+            /* discontinuity indicator found in stream */
+            b_discontinuity = p[5]&0x80 ? VLC_TRUE : VLC_FALSE;
+            if( p[5]&0x40 )
+                msg_Dbg( p_demux, "random access indicator (pid=%d) ", pid->i_pid );
         }
     }
 
@@ -1670,7 +1674,6 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         * diff == 0 and duplicate packet (playload != 0) <- should we
         *   test the content ?
      */
-
     i_diff = ( i_cc - pid->i_cc )&0x0f;
     if( b_payload && i_diff == 1 )
     {
@@ -1684,14 +1687,13 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                       pid->i_pid, i_cc );
             pid->i_cc = i_cc;
         }
-        else if( i_diff != 0 )
+        else if( i_diff != 0 && !b_discontinuity )
         {
             /* FIXME what to do when discontinuity_indicator is set ? */
             msg_Warn( p_demux, "discontinuity received 0x%x instead of 0x%x (pid=%d)",
                       i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
 
             pid->i_cc = i_cc;
-
             if( pid->es->p_pes && pid->es->fmt.i_cat != VIDEO_ES )
             {
                 /* Small video artifacts are usually better then
@@ -1757,7 +1759,13 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             }
         }
     }
-
+    
+    if( b_discontinuity && pid->es->p_pes )
+    {
+        msg_Warn( p_demux, "discontinuity indicator (pid=%d) ",
+                     pid->i_pid );
+        pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
     return i_ret;
 }
 
@@ -1949,7 +1957,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 #endif
     if( i_iod_tag != 0x02 )
     {
+#ifdef DEBUG    
         fprintf( stderr, "\n ERR: tag %02x != 0x02", i_iod_tag );
+#endif        
         return p_iod;
     }
 

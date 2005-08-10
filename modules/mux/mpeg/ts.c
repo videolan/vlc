@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001-2005 VideoLAN (Centrale Réseaux) and its contributors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -270,6 +270,7 @@ typedef struct ts_stream_t
     int             i_stream_type;
     int             i_stream_id;
     int             i_continuity_counter;
+    vlc_bool_t      b_discontinuity;
 
     /* to be used for carriege of DIV3 */
     vlc_fourcc_t    i_bih_codec;
@@ -653,6 +654,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
     p_stream->i_codec = p_input->p_fmt->i_codec;
     p_stream->i_continuity_counter    = 0;
+    p_stream->b_discontinuity         = VLC_FALSE;
     p_stream->i_decoder_specific_info = 0;
     p_stream->p_decoder_specific_info = NULL;
 
@@ -1568,6 +1570,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
         p_stream->i_continuity_counter;
 
     p_stream->i_continuity_counter = (p_stream->i_continuity_counter+1)%16;
+    p_stream->b_discontinuity = (p_pes->i_flags & BLOCK_FLAG_DISCONTINUITY);
 
     if( b_adaptation_field )
     {
@@ -1581,6 +1584,11 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
 
             p_ts->p_buffer[4] = 7 + i_stuffing;
             p_ts->p_buffer[5] = 0x10;   /* flags */
+            if( p_stream->b_discontinuity )
+            {
+                p_ts->p_buffer[5] |= 0x80; /* flag TS dicontinuity */
+                p_stream->b_discontinuity = VLC_FALSE;
+            }            
             p_ts->p_buffer[6] = ( 0 )&0xff;
             p_ts->p_buffer[7] = ( 0 )&0xff;
             p_ts->p_buffer[8] = ( 0 )&0xff;
@@ -1645,7 +1653,6 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
 
     return p_ts;
 }
-
 
 static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
 {
@@ -1800,6 +1807,11 @@ static void PEStoTS( sout_instance_t *p_sout,
             if( i_stuffing > 1 )
             {
                 p_ts->p_buffer[5] = 0x00;
+                if( p_stream->b_discontinuity )
+                {
+                    p_ts->p_buffer[5] |= 0x80;
+                    p_stream->b_discontinuity = VLC_FALSE;
+                }
                 for( i = 6; i < 6 + i_stuffing - 2; i++ )
                 {
                     p_ts->p_buffer[i] = 0xff;
