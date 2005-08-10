@@ -248,7 +248,7 @@ static char *ppsz_align_descriptions[] =
 #define VIDEO_DECO_TEXT N_("Window decorations")
 #define VIDEO_DECO_LONGTEXT N_( \
     "If this option is disabled, VLC will avoid creating window caption, " \
-    "frames, etc... around the video. Currently only supported on Windows.")
+    "frames, etc... around the video.")
 
 #define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
@@ -904,7 +904,7 @@ static char *ppsz_clock_descriptions[] =
     "\n  [cdda://][device]              Audio CD device" \
     "\n  udp:[[<source address>]@[<bind address>][:<bind port>]]" \
     "\n                                 UDP stream sent by a streaming server"\
-    "\n  vlc:pause                      Special item to pause the playlist" \
+    "\n  vlc:pause:<seconds>            Special item to pause the playlist for a certain time" \
     "\n  vlc:quit                       Special item to quit VLC" \
     "\n")
 
@@ -1232,7 +1232,7 @@ vlc_module_begin();
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
 
-#if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, VLC_TRUE );
 #endif
