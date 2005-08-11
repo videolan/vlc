@@ -799,7 +799,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         var_Get( p_input, "sub-autodetect-file", &val );
         if( val.b_bool )
         {
-           char *psz_autopath = var_GetString( p_input, "sub-autodetect-path" );
+            char *psz_autopath = var_GetString( p_input, "sub-autodetect-path" );
             char **subs = subtitles_Detect( p_input, psz_autopath,
                                             p_input->input.p_item->psz_uri );
             input_source_t *sub;
