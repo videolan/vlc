@@ -243,6 +243,8 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 # if HAVE_LANGINFO_CODESET
     /* Most systems support nl_langinfo( CODESET ) nowadays.  */
     psz_codeset = nl_langinfo( CODESET );
+    if( !strcmp( psz_codeset, "ANSI_X3.4-1968" ) )
+        psz_codeset = "ASCII";
 # else
     /* On old systems which lack it, use setlocale or getenv.  */
     const char *psz_locale = NULL;
