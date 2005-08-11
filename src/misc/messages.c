@@ -448,9 +448,6 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #   define RED     COL(31)
 #   define GREEN   COL(32)
 #   define YELLOW  COL(33)
-#   define BLUE    COL(34)
-#   define MAGENTA COL(35)
-#   define CYAN    COL(36)
 #   define WHITE   COL(37)
 #   define GRAY    "\033[0m"
 
@@ -458,9 +455,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     int i_dummy;
 #endif
     static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
-    static const char *ppsz_color[4] = { WHITE, RED, YELLOW, CYAN };
-    static const char *ppsz_colors[7] = {RED, GREEN,YELLOW,BLUE,MAGENTA,CYAN,WHITE};
-    int i_int = 0;
+    static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
     char *psz_object = "private";
     int i_type = p_item->i_type;
 
@@ -519,17 +514,10 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     /* Send the message to stderr */
     if( p_this->p_libvlc->b_color )
     {
-        /*fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s" GRAY ": %s%s" GRAY "\n",
+        fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s: %s%s" GRAY "\n",
                          p_item->i_object_id, p_item->psz_module, psz_object,
                          ppsz_type[i_type], ppsz_color[i_type],
-                         p_item->psz_msg );*/
-        fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s" GRAY ": ", p_item->i_object_id, p_item->psz_module, psz_object,
-                                 ppsz_type[i_type]);
-        for( i_int=0; p_item->psz_msg[i_int]!=0; i_int++ )
-        {
-            fprintf( stderr, "%s%c", ppsz_colors[i_int%7],  p_item->psz_msg[i_int] );
-        }
-        fprintf( stderr, GRAY "\n");
+                         p_item->psz_msg );
     }
     else
     {
