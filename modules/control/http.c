@@ -150,7 +150,6 @@ static int uri_test_param( char *psz_uri, const char *psz_name );
 
 static void uri_decode_url_encoded( char *psz );
 
-static char *Find_end_MRL( char *psz );
 static playlist_item_t *parse_MRL( intf_thread_t *, char *psz, char *psz_name );
 
 /*****************************************************************************
@@ -696,7 +695,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         if( ( p_dir_content->d_name[0] == '.' )
          || ( i_dirlen + strlen( p_dir_content->d_name ) > MAX_DIR_SIZE ) )
             continue;
-        
+
         sprintf( dir, "%s/%s", psz_dir, p_dir_content->d_name );
         if( ParseDirectory( p_intf, psz_root, dir ) )
         {
@@ -1303,7 +1302,6 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
         }
     }
     *p = '\0';
-
 
 #ifdef HAVE_SYS_STAT_H
     if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
@@ -2922,7 +2920,8 @@ static int uri_test_param( char *psz_uri, const char *psz_name )
     while( (p = strstr( p, psz_name )) )
     {
         /* Verify that we are dealing with a post/get argument */
-        if( p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n' )
+        if( (p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n')
+              && p[strlen(psz_name)] == '=' )
         {
             return VLC_TRUE;
         }
@@ -2939,7 +2938,8 @@ static char *uri_extract_value( char *psz_uri, const char *psz_name,
     while( (p = strstr( p, psz_name )) )
     {
         /* Verify that we are dealing with a post/get argument */
-        if( p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n' )
+        if( (p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n')
+              && p[strlen(psz_name)] == '=' )
             break;
         p++;
     }
@@ -3024,6 +3024,46 @@ static void uri_decode_url_encoded( char *psz )
     free( dup );
 }
 
+/* Since the resulting string is smaller we can work in place, so it is
+ * permitted to have psz == new. new points to the first word of the
+ * string, the function returns the remaining string. */
+static char *FirstWord( char *psz, char *new )
+{
+    vlc_bool_t b_end;
+
+    while( *psz == ' ' )
+        psz++;
+
+    while( *psz != '\0' && *psz != ' ' )
+    {
+        if( *psz == '\'' )
+        {
+            char c = *psz++;
+            while( *psz != '\0' && *psz != c )
+            {
+                if( *psz == '\\' && psz[1] != '\0' )
+                    psz++;
+                *new++ = *psz++;
+            }
+            if( *psz == c )
+                psz++;
+        }
+        else
+        {
+            if( *psz == '\\' && psz[1] != '\0' )
+                psz++;
+            *new++ = *psz++;
+        }
+    }
+    b_end = !*psz;
+
+    *new++ = '\0';
+    if( !b_end )
+        return psz + 1;
+    else
+        return NULL;
+}
+
 /****************************************************************************
  * Light RPN evaluator
  ****************************************************************************/
@@ -3093,9 +3133,9 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
 
-    for( ;; )
+    while( exp != NULL && *exp != '\0' )
     {
-        char s[100], *p;
+        char *p, *s;
 
         /* skip space */
         while( *exp == ' ' )
@@ -3106,36 +3146,22 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         if( *exp == '\'' )
         {
             /* extract string */
-            p = &s[0];
-            exp++;
-            while( *exp && *exp != '\'' )
-            {
-                /* strip a level of backslashes */
-                if( *exp == '\\' && exp[1] != '\0' )
-                    exp++;
-                *p++ = *exp++;
-            }
-            *p = '\0';
-            exp++;
-            SSPush( st, s );
+            p = FirstWord( exp, exp );
+            SSPush( st, exp );
+            exp = p;
             continue;
         }
 
         /* extract token */
-        p = strchr( exp, ' ' );
-        if( !p )
+        p = FirstWord( exp, exp );
+        s = exp;
+        if( p == NULL )
         {
-            strcpy( s, exp );
-
             exp += strlen( exp );
         }
         else
         {
-            int i = p -exp;
-            strncpy( s, exp, i );
-            s[i] = '\0';
-
-            exp = p + 1;
+            exp = p;
         }
 
         if( *s == '\0' )
@@ -3289,12 +3315,226 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             free( s );
             free( str );
         }
-       else if( !strcmp( s, "strlen" ) )
+        else if( !strcmp( s, "strlen" ) )
         {
             char *str = SSPop( st );
 
             SSPushN( st, strlen( str ) );
             free( str );
+        }
+        else if( !strcmp( s, "str_replace" ) )
+        {
+            char *psz_to = SSPop( st );
+            char *psz_from = SSPop( st );
+            char *psz_in = SSPop( st );
+            char *psz_in_current = psz_in;
+            char *psz_out = malloc( strlen(psz_in) * strlen(psz_to) + 1 );
+            char *psz_out_current = psz_out;
+
+            while( (p = strstr( psz_in_current, psz_from )) != NULL )
+            {
+                memcpy( psz_out_current, psz_in, p - psz_in_current );
+                psz_out_current += p - psz_in_current;
+                memcpy( psz_out_current, psz_to, strlen(psz_to) );
+                psz_out_current += strlen(psz_out);
+                psz_in_current = p + strlen(psz_from);
+            }
+            *psz_out_current = '\0';
+
+            SSPush( st, psz_out );
+            free( psz_to );
+            free( psz_from );
+            free( psz_in );
+            free( psz_out );
+        }
+        else if( !strcmp( s, "url_extract" ) )
+        {
+            char *url = mvar_GetValue( vars, "url_value" );
+            char *name = SSPop( st );
+            char value[512];
+            char *tmp;
+
+            uri_extract_value( url, name, value, 512 );
+            uri_decode_url_encoded( value );
+            tmp = FromUTF8( p_intf, value );
+            SSPush( st, tmp );
+            free( tmp );
+            free( name );
+        }
+        else if( !strcmp( s, "url_encode" ) )
+        {
+            char *url = SSPop( st );
+            char *value;
+
+            value = ToUTF8( p_intf, url );
+            free( url );
+            url = value;
+            value = vlc_UrlEncode( url );
+            free( url );
+            SSPush( st, value );
+            free( value );
+        }
+        else if( !strcmp( s, "addslashes" ) )
+        {
+            char *psz_src = SSPop( st );
+            char *psz_dest;
+            char *str = psz_src;
+
+            p = psz_dest = malloc( strlen( str ) * 2 + 1 );
+
+            while( *str != '\0' )
+            {
+                if( *str == '"' || *str == '\'' )
+                {
+                    *p++ = '\\';
+                }
+                *p++ = *str;
+                str++;
+            }
+            *p = '\0';
+
+            SSPush( st, psz_dest );
+            free( psz_src );
+            free( psz_dest );
+        }
+        else if( !strcmp( s, "stripslashes" ) )
+        {
+            char *psz_src = SSPop( st );
+            char *psz_dest;
+
+            p = psz_dest = strdup( psz_src );
+
+            while( *psz_src != '\0' )
+            {
+                if( *psz_src == '\\' )
+                {
+                    *psz_src++;
+                }
+                *p++ = *psz_src;
+                psz_src++;
+            }
+            *p = '\0';
+
+            SSPush( st, psz_dest );
+            free( psz_src );
+            free( psz_dest );
+        }
+        else if( !strcmp( s, "htmlspecialchars" ) )
+        {
+            char *psz_src = SSPop( st );
+            char *psz_dest;
+            char *str = psz_src;
+
+            p = psz_dest = malloc( strlen( str ) * 6 + 1 );
+
+            while( *str != '\0' )
+            {
+                if( *str == '&' )
+                {
+                    strcpy( p, "&amp;" );
+                    p += 5;
+                }
+                else if( *str == '\"' )
+                {
+                    strcpy( p, "&quot;" );
+                    p += 6;
+                }
+                else if( *str == '\'' )
+                {
+                    strcpy( p, "&#039;" );
+                    p += 6;
+                }
+                else if( *str == '<' )
+                {
+                    strcpy( p, "&lt;" );
+                    p += 4;
+                }
+                else if( *str == '>' )
+                {
+                    strcpy( p, "&gt;" );
+                    p += 4;
+                }
+                else
+                {
+                    *p++ = *str;
+                }
+                str++;
+            }
+            *p = '\0';
+
+            SSPush( st, psz_dest );
+            free( psz_src );
+            free( psz_dest );
+        }
+        else if( !strcmp( s, "realpath" ) )
+        {
+            char dir[MAX_DIR_SIZE], *src;
+            char *psz_src = SSPop( st );
+            char *psz_dir = psz_src;
+            char sep;
+
+            /* convert all / to native separator */
+#if defined( WIN32 )
+            while( (p = strchr( psz_dir, '/' )) )
+            {
+                *p = '\\';
+            }
+            sep = '\\';
+#else
+            sep = '/';
+#endif
+
+            if( *psz_dir == '~' )
+            {
+                /* This is incomplete : we should also support the ~cmassiot/ syntax. */
+                snprintf( dir, sizeof(dir), "%s/%s", p_intf->p_vlc->psz_homedir,
+                          psz_dir + 1 );
+                psz_dir = dir;
+            }
+
+            /* first fix all .. dir */
+            p = src = psz_dir;
+            while( *src )
+            {
+                if( src[0] == '.' && src[1] == '.' )
+                {
+                    src += 2;
+                    if( p <= &psz_dir[1] )
+                    {
+                        continue;
+                    }
+
+                    p -= 2;
+
+                    while( p > &psz_dir[1] && *p != sep )
+                    {
+                        p--;
+                    }
+                }
+                else if( *src == sep )
+                {
+                    if( p > psz_dir && p[-1] == sep )
+                    {
+                        src++;
+                    }
+                    else
+                    {
+                        *p++ = *src++;
+                    }
+                }
+                else
+                {
+                    do
+                    {
+                        *p++ = *src++;
+                    } while( *src && *src != sep );
+                }
+            }
+            if( p != psz_dir + 1 && p[-1] == '/' ) p--;
+            *p = '\0';
+
+            SSPush( st, psz_dir );
+            free( psz_src );
         }
         /* 4. stack functions */
         else if( !strcmp( s, "dup" ) )
@@ -3342,30 +3582,6 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
 
             free( name );
         }
-        else if( !strcmp( s, "url_extract" ) )
-        {
-            char *url = mvar_GetValue( vars, "url_value" );
-            char *name = SSPop( st );
-            char value[512];
-            char *tmp;
-
-            uri_extract_value( url, name, value, 512 );
-            uri_decode_url_encoded( value );
-            tmp = FromUTF8( p_intf, value );
-            SSPush( st, tmp );
-            free( tmp );
-        }
-        else if( !strcmp( s, "url_encode" ) )
-        {
-            char *url = SSPop( st );
-            char *value;
-
-            url = ToUTF8( p_intf, url );
-            value = vlc_UrlEncode( url );
-            free( url );
-            SSPush( st, value );
-            free( value );
-        }
         /* 5. player control */
         else if( !strcmp( s, "vlc_play" ) )
         {
@@ -3403,11 +3619,16 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         {
             char *psz_name = SSPop( st );
             char *mrl = SSPop( st );
+            char *tmp;
             playlist_item_t *p_item;
             int i_id;
 
-            psz_name = ToUTF8( p_intf, psz_name );
-            mrl = ToUTF8( p_intf, mrl );
+            tmp = ToUTF8( p_intf, psz_name );
+            free( psz_name );
+            psz_name = tmp;
+            tmp = ToUTF8( p_intf, mrl );
+            free( mrl );
+            mrl = tmp;
 
             if( !*psz_name )
             {
@@ -3419,7 +3640,7 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             }
 
             if( p_item == NULL || p_item->input.psz_uri == NULL ||
-                !*p_item->input.psz_uri )
+                 !*p_item->input.psz_uri )
             {
                 i_id = VLC_EGENERIC;
                 msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
@@ -3448,207 +3669,45 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
 }
 
 /**********************************************************************
- * Find_end_MRL: Find the end of the sentence :
- * this function parses the string psz and find the end of the item
- * and/or option with detecting the " and ' problems.
- * returns NULL if an error is detected, otherwise, returns a pointer
- * of the end of the sentence (after the last character)
- **********************************************************************/
-static char *Find_end_MRL( char *psz )
-{
-    char *s_sent = psz;
-
-    switch( *s_sent )
-    {
-        case '\"':
-        {
-            s_sent++;
-
-            while( ( *s_sent != '\"' ) && ( *s_sent != '\0' ) )
-            {
-                if( *s_sent == '\'' )
-                {
-                    s_sent = Find_end_MRL( s_sent );
-
-                    if( s_sent == NULL )
-                    {
-                        return NULL;
-                    }
-                } else
-                {
-                    s_sent++;
-                }
-            }
-
-            if( *s_sent == '\"' )
-            {
-                s_sent++;
-                return s_sent;
-            } else  /* *s_sent == '\0' , which means the number of " is incorrect */
-            {
-                return NULL;
-            }
-            break;
-        }
-        case '\'':
-        {
-            s_sent++;
-
-            while( ( *s_sent != '\'' ) && ( *s_sent != '\0' ) )
-            {
-                if( *s_sent == '\"' )
-                {
-                    s_sent = Find_end_MRL( s_sent );
-
-                    if( s_sent == NULL )
-                    {
-                        return NULL;
-                    }
-                } else
-                {
-                    s_sent++;
-                }
-            }
-
-            if( *s_sent == '\'' )
-            {
-                s_sent++;
-                return s_sent;
-            } else  /* *s_sent == '\0' , which means the number of ' is incorrect */
-            {
-                return NULL;
-            }
-            break;
-        }
-        default: /* now we can look for spaces */
-        {
-            while( ( *s_sent != ' ' ) && ( *s_sent != '\0' ) )
-            {
-                if( ( *s_sent == '\'' ) || ( *s_sent == '\"' ) )
-                {
-                    s_sent = Find_end_MRL( s_sent );
-                } else
-                {
-                    s_sent++;
-                }
-            }
-            return s_sent;
-        }
-    }
-}
-
-/**********************************************************************
  * parse_MRL: parse the MRL, find the mrl string and the options,
  * create an item with all information in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
-static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz,
+static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *_psz,
                                    char *psz_name )
 {
-    char **ppsz_options = NULL;
-    char *mrl;
+    char *psz = strdup( _psz );
     char *s_mrl = psz;
-    int i_error = 0;
     char *s_temp;
-    int i = 0;
-    int i_options = 0;
     playlist_item_t * p_item = NULL;
 
-    /* In case there is spaces before the mrl */
-    while( ( *s_mrl == ' ' ) && ( *s_mrl != '\0' ) )
-    {
-        s_mrl++;
-    }
-
     /* extract the mrl */
-    s_temp = strstr( s_mrl , " :" );
+    s_temp = FirstWord( s_mrl, s_mrl );
     if( s_temp == NULL )
     {
         s_temp = s_mrl + strlen( s_mrl );
-    } else
-    {
-        while( (*s_temp == ' ') && (s_temp != s_mrl ) )
-        {
-            s_temp--;
-        }
-        s_temp++;
     }
 
-    /* if the mrl is between " or ', we must remove them */
-    if( (*s_mrl == '\'') || (*s_mrl == '\"') )
-    {
-        mrl = (char *)malloc( (s_temp - s_mrl - 1) * sizeof( char ) );
-        strncpy( mrl , (s_mrl + 1) , s_temp - s_mrl - 2 );
-        mrl[ s_temp - s_mrl - 2 ] = '\0';
-    } else
-    {
-        mrl = (char *)malloc( (s_temp - s_mrl + 1) * sizeof( char ) );
-        strncpy( mrl , s_mrl , s_temp - s_mrl );
-        mrl[ s_temp - s_mrl ] = '\0';
-    }
-
+    p_item = playlist_ItemNew( p_intf, s_mrl, psz_name );
     s_mrl = s_temp;
 
     /* now we can take care of the options */
-    while( (*s_mrl != '\0') && (i_error == 0) )
+    while( *s_mrl != '\0' )
     {
-        switch( *s_mrl )
+        s_temp = FirstWord( s_mrl, s_mrl );
+        if( s_mrl == '\0' )
+            break;
+        if( s_temp == NULL )
         {
-            case ' ':
-            {
-                s_mrl++;
-                break;
-            }
-            case ':': /* an option */
-            {
-                s_temp = Find_end_MRL( s_mrl );
-
-                if( s_temp == NULL )
-                {
-                    i_error = 1;
-                }
-                else
-                {
-                    i_options++;
-                    ppsz_options = realloc( ppsz_options , i_options *
-                                            sizeof(char *) );
-                    ppsz_options[ i_options - 1 ] =
-                        malloc( (s_temp - s_mrl + 1) * sizeof(char) );
-
-                    strncpy( ppsz_options[ i_options - 1 ] , s_mrl ,
-                             s_temp - s_mrl );
-
-                    /* don't forget to finish the string with a '\0' */
-                    (ppsz_options[ i_options - 1 ])[ s_temp - s_mrl ] = '\0';
-
-                    s_mrl = s_temp;
-                }
-                break;
-            }
-            default:
-            {
-                i_error = 1;
-                break;
-            }
+            s_temp = s_mrl + strlen( s_mrl );
         }
+        if( *s_mrl != ':' )
+            msg_Warn( p_intf, "invalid MRL option: %s", s_mrl );
+        else
+            playlist_ItemAddOption( p_item, s_mrl );
+        s_mrl = s_temp;
     }
 
-    if( i_error != 0 )
-    {
-        free( mrl );
-    }
-    else
-    {
-        /* now create an item */
-        p_item = playlist_ItemNew( p_intf, mrl, psz_name );
-        for( i = 0 ; i< i_options ; i++ )
-        {
-            playlist_ItemAddOption( p_item, ppsz_options[i] );
-        }
-    }
-
-    for( i = 0; i < i_options; i++ ) free( ppsz_options[i] );
-    if( i_options ) free( ppsz_options );
-
+    free( psz );
     return p_item;
 }
