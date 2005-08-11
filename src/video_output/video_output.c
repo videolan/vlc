@@ -216,7 +216,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
     char           * psz_plugin;
-    vlc_value_t      val, text;
+    vlc_value_t      val, val2, text;
 
     unsigned int i_width = p_fmt->i_width;
     unsigned int i_height = p_fmt->i_height;
@@ -316,25 +316,49 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
      * the video output pipe */
     if( p_parent->i_object_type != VLC_OBJECT_VOUT )
     {
+        int i_screen_aspect_x = 4 , i_screen_aspect_y = 3;
         var_Get( p_vout, "aspect-ratio", &val );
+        var_Get( p_vout, "screen-aspect-ratio", &val2 );
+
+        if( val2.psz_string )
+        {
+            char *psz_parser = strchr( val2.psz_string, ':' );
+            if( psz_parser )
+            {
+                *psz_parser++ = '\0';
+                i_screen_aspect_x = atoi( val2.psz_string );
+                i_screen_aspect_y = atoi( psz_parser );
+            } else {
+                AspectRatio( VOUT_ASPECT_FACTOR * atof( val2.psz_string ),
+                                 &i_screen_aspect_x, &i_screen_aspect_y );
+            }
+
+            free( val2.psz_string );
+        }
 
         /* Check whether the user tried to override aspect ratio */
         if( val.psz_string )
         {
             unsigned int i_new_aspect = i_aspect;
             char *psz_parser = strchr( val.psz_string, ':' );
+                int i_aspect_x, i_aspect_y;
+                AspectRatio( i_aspect, &i_aspect_x, &i_aspect_y );
 
             if( psz_parser )
             {
                 *psz_parser++ = '\0';
-                i_new_aspect = atoi( val.psz_string ) * VOUT_ASPECT_FACTOR
-                                                      / atoi( psz_parser );
+                i_new_aspect = atoi( val.psz_string )
+                               * VOUT_ASPECT_FACTOR / atoi( psz_parser );
             }
             else
             {
-                i_new_aspect = VOUT_ASPECT_FACTOR
-                                       * atof( val.psz_string );
+                if( atof( val.psz_string ) != 0 )
+                {
+                i_new_aspect = VOUT_ASPECT_FACTOR * atof( val.psz_string );
+                }
             }
+            i_new_aspect = (int)((float)i_new_aspect
+                * (float)i_screen_aspect_y*4.0/((float)i_screen_aspect_x*3.0));
 
             free( val.psz_string );
 
