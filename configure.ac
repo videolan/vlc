@@ -73,7 +73,11 @@ AC_C_INLINE
 dnl
 dnl  Check for the contrib directory
 dnl
-topdir="`pwd`"
+topdir="`dirname $0`"
+if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
+  topdir="`pwd`/$topdir"
+fi
+
 if test -d ${topdir}/extras/contrib/lib; then
   export PATH=${topdir}/extras/contrib/bin:$PATH
   CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
