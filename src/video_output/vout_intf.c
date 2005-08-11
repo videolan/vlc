@@ -177,7 +177,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "snapshot-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "screen-aspect-ratio",
+    var_Create( p_vout, "monitor-aspect-ratio",
                                       VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );

@@ -275,11 +275,11 @@ static char *ppsz_align_descriptions[] =
     "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
     "squareness.")
 
-#define SASPECT_RATIO_TEXT N_("Screen aspect ratio")
-#define SASPECT_RATIO_LONGTEXT N_( \
-    "This will force the scree aspect ratio. Default screen aspect ratio" \
-    "is 4:3. Setting the screen aspect ratio to 4:3 will have no effect," \
-    "other settings (like 16:9) will change the image.")
+#define MASPECT_RATIO_TEXT N_("Monitor aspect ratio")
+#define MASPECT_RATIO_LONGTEXT N_( \
+    "This will force the monitor aspect ratio. Most monitors have a 4:3." \
+    "If you have a 16:9 screen, you will need to change this to 16:9 in" \
+    "order to keep proportions.")
 
 #define SKIP_FRAMES_TEXT N_("Skip frames")
 #define SKIP_FRAMES_LONGTEXT N_( \
@@ -997,8 +997,8 @@ vlc_module_begin();
     add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
     add_string( "aspect-ratio", "", NULL,
                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_FALSE );
-    add_string( "screen-aspect-ratio", "", NULL,
-               SASPECT_RATIO_TEXT, SASPECT_RATIO_LONGTEXT, VLC_FALSE );
+    add_string( "monitor-aspect-ratio", "4:3", NULL,
+               MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, VLC_FALSE );
     add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
