@@ -238,6 +238,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_sys->p_buffer = NULL;
 
     p_sys->p_context = p_context = avcodec_alloc_context();
+    p_context->debug = config_GetInt( p_enc, "ffmpeg-debug" );
+    p_context->opaque = (void *)p_this;
 
     /* Set CPU capabilities */
     p_context->dsp_mask = 0;

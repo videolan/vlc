@@ -240,6 +240,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* *** get a p_context *** */
     p_context = avcodec_alloc_context();
     p_context->debug = config_GetInt( p_dec, "ffmpeg-debug" );
+    p_context->opaque = (void *)p_this;
 
     /* Set CPU capabilities */
     p_context->dsp_mask = 0;
@@ -325,6 +326,46 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * local Functions
  *****************************************************************************/
+static void LibavcodecCallback( void *p_opaque, int i_level,
+                                const char *psz_format, va_list va )
+{
+    int i_vlc_level;
+    AVCodecContext *p_avctx = (AVCodecContext *)p_opaque;
+    AVClass *p_avc;
+    vlc_object_t *p_this;
+    char *psz_new_format;
+    const char *psz_item_name;
+
+    if( p_avctx == NULL || p_avctx->opaque == NULL )
+        return;
+    p_this = (vlc_object_t *)p_avctx->opaque;
+    p_avc = p_avctx->av_class;
+
+    switch( i_level )
+    {
+    case AV_LOG_QUIET:
+        i_vlc_level = VLC_MSG_ERR;
+        break;
+    case AV_LOG_ERROR:
+        i_vlc_level = VLC_MSG_WARN;
+        break;
+    case AV_LOG_INFO:
+        i_vlc_level = VLC_MSG_DBG;
+        break;
+    case AV_LOG_DEBUG:
+    default:
+        return;
+    }
+
+    psz_item_name = p_avc->item_name(p_opaque);
+    psz_new_format = malloc( strlen(psz_format) + strlen(psz_item_name)
+                              + 16 + 7 );
+    sprintf( psz_new_format, "%s (%s@0x%p)", psz_format,
+             p_avc->item_name(p_opaque), p_opaque );
+    msg_GenericVa( p_this, i_vlc_level, MODULE_STRING, psz_new_format, va );
+    free( psz_new_format );
+}
+
 void E_(InitLibavcodec)( vlc_object_t *p_object )
 {
     static int b_ffmpeginit = 0;
@@ -338,6 +379,7 @@ void E_(InitLibavcodec)( vlc_object_t *p_object )
     {
         avcodec_init();
         avcodec_register_all();
+        av_log_set_callback( LibavcodecCallback );
         b_ffmpeginit = 1;
 
         msg_Dbg( p_object, "libavcodec initialized (interface %d )",
