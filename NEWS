@@ -5,6 +5,7 @@ Changes between 0.8.2 and 0.8.4-svn (not yet released):
 
 Core support:
 * IPv6 and Extended passive mode support for FTP
+* new --screen-aspect-ratio option
 
 Services discovery:
 * Bleeding edge UPnP service discovery
