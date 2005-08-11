@@ -3333,12 +3333,14 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
 
             while( (p = strstr( psz_in_current, psz_from )) != NULL )
             {
-                memcpy( psz_out_current, psz_in, p - psz_in_current );
+                memcpy( psz_out_current, psz_in_current, p - psz_in_current );
                 psz_out_current += p - psz_in_current;
                 memcpy( psz_out_current, psz_to, strlen(psz_to) );
                 psz_out_current += strlen(psz_out);
                 psz_in_current = p + strlen(psz_from);
             }
+            memcpy( psz_out_current, psz_in_current, strlen(psz_in_current) );
+            psz_out_current += strlen(psz_in_current);
             *psz_out_current = '\0';
 
             SSPush( st, psz_out );
