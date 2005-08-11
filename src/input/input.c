@@ -1469,11 +1469,10 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->input.i_title )
                 {
-                    demux2_Control( p_demux, DEMUX_SET_TITLE, i_title );
-
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
 
+                    demux2_Control( p_demux, DEMUX_SET_TITLE, i_title );
                     input_ControlVarTitle( p_input, i_title );
                 }
             }
@@ -1491,11 +1490,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->input.i_title )
                 {
-                    access2_Control( p_access, ACCESS_SET_TITLE, i_title );
-                    stream_AccessReset( p_input->input.p_stream );
-
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                    
+                    access2_Control( p_access, ACCESS_SET_TITLE, i_title );
+                    stream_AccessReset( p_input->input.p_stream );
                 }
             }
             break;
@@ -1532,10 +1531,10 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->input.title[p_demux->info.i_title]->i_seekpoint )
                 {
-                    demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
-
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                    
+                    demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
                 }
             }
             else if( p_input->input.i_title > 0 )
@@ -1568,11 +1567,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->input.title[p_access->info.i_title]->i_seekpoint )
                 {
-                    access2_Control( p_access, ACCESS_SET_SEEKPOINT, i_seekpoint );
-                    stream_AccessReset( p_input->input.p_stream );
-
                     input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                    
+                    access2_Control( p_access, ACCESS_SET_SEEKPOINT, i_seekpoint );
+                    stream_AccessReset( p_input->input.p_stream );
                 }
             }
             break;
