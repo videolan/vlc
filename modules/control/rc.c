@@ -512,7 +512,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* status callbacks */
     /* Listen to audio volume updates */
-    var_AddCallback( p_intf->p_vlc, "audio-volume", VolumeChanged, p_intf );
+    var_AddCallback( p_intf->p_vlc, "volume", VolumeChanged, p_intf );
     
 #ifdef WIN32
     /* Get the file descriptor of the console input */
@@ -856,7 +856,7 @@ static void Run( intf_thread_t *p_intf )
         p_playlist = NULL;
     }
     
-    var_DelCallback( p_intf->p_vlc, "audio-volume", VolumeChanged, p_intf );
+    var_DelCallback( p_intf->p_vlc, "volume", VolumeChanged, p_intf );
 }
 
 static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
