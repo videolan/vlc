@@ -82,12 +82,18 @@ static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
 
 #define OSD_CFG "osdmenu-"
 
+#if defined( WIN32 ) || defined( UNDER_CE )
+#define OSD_DEFAULT_CFG "osdmenu/default.cfg"
+#else
+#define OSD_DEFAULT_CFG "share/osdmenu/default.cfg"
+#endif
+
 vlc_module_begin();
     add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_string( OSD_CFG "file", NULL, NULL, OSD_FILE_TEXT, OSD_FILE_LONGTEXT, VLC_FALSE );
+    add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT, OSD_FILE_LONGTEXT, VLC_FALSE );
     add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT, OSD_PATH_LONGTEXT, VLC_FALSE );
     add_integer( OSD_CFG "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );
 

@@ -126,6 +126,10 @@
     "transcoding. The subpictures produced by the filters will be overlayed " \
     "directly onto the video." )
 
+#define OSD_TEXT N_("OSD menu")
+#define OSD_LONGTEXT N_(\
+    "Enable streaming of the On Screen Display. It uses the osdmenu subfilter." )
+                  
 #define THREADS_TEXT N_("Number of threads")
 #define THREADS_LONGTEXT N_( \
     "Allows you to specify the number of threads used for the transcoding." )
@@ -222,6 +226,10 @@ vlc_module_begin();
                      NULL, NULL,
                      SFILTER_TEXT, SFILTER_LONGTEXT, VLC_FALSE );
 
+    set_section( N_("On Screen Display"), NULL );
+    add_bool( SOUT_CFG_PREFIX "osd", 0, NULL, OSD_TEXT,
+              OSD_LONGTEXT, VLC_FALSE );
+    
     set_section( N_("Miscellaneous"), NULL );
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, VLC_TRUE );
@@ -235,7 +243,7 @@ static const char *ppsz_sout_options[] = {
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
     "samplerate", "channels", "senc", "scodec", "soverlay", "sfilter",
-    "audio-sync", "high-priority", NULL
+    "osd", "audio-sync", "high-priority", NULL
 };
 
 /*****************************************************************************
@@ -349,8 +357,9 @@ struct sout_stream_sys_t
     vlc_fourcc_t    i_osdcodec; /* codec osd menu (0 if not transcode) */
     char            *psz_osdenc;
     sout_cfg_t      *p_osd_cfg;
-    vlc_bool_t      b_osd;      /* VLC_TRUE when osd es is registered */
-    
+    vlc_bool_t      b_es_osd;      /* VLC_TRUE when osd es is registered */
+    vlc_bool_t      b_sout_osd;
+        
     /* Sync */
     vlc_bool_t      b_master_sync;
     mtime_t         i_master_drift;
@@ -584,10 +593,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_osdenc = NULL;
     p_sys->p_osd_cfg  = NULL;
     p_sys->i_osdcodec = 0;
-    p_sys->b_osd      = VLC_FALSE;
-    if( config_GetInt( p_stream, "osd" ) )
+    p_sys->b_es_osd   = VLC_FALSE;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "osd", &val );
+    p_sys->b_sout_osd = val.b_bool;
+    if( p_sys->b_sout_osd )
     {
-/*        vlc_value_t val;*/
+        vlc_value_t osd_val;
         char *psz_next;
        
         psz_next = sout_CfgCreate( &p_sys->psz_osdenc,
@@ -598,15 +610,21 @@ static int Open( vlc_object_t *p_this )
 
         msg_Dbg( p_stream, "codec osd=%4.4s", (char *)&p_sys->i_osdcodec );
 
-/*        val.psz_string = strdup("osdmenu");
         if( !p_sys->p_spu )
         {
+            osd_val.psz_string = strdup("osdmenu");
             p_sys->p_spu = spu_Create( p_stream );
             var_Create( p_sys->p_spu, "sub-filter", VLC_VAR_STRING );
+            var_Set( p_sys->p_spu, "sub-filter", osd_val );
             spu_Init( p_sys->p_spu );
-        }            
-        var_Set( p_sys->p_spu, "sub-filter", val );        
-        if( val.psz_string ) free( val.psz_string );*/
+            if( osd_val.psz_string ) free( osd_val.psz_string );
+        }
+        else
+        {
+            osd_val.psz_string = strdup("osdmenu");
+            var_Set( p_sys->p_spu, "sub-filter", osd_val );
+            if( osd_val.psz_string ) free( osd_val.psz_string );
+        }         
     }
 
     /* Audio settings */
@@ -896,17 +914,17 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( !id->id ) goto error;
     }
 
-    if( config_GetInt( p_stream, "osd" ) )
+    if( p_sys->b_sout_osd )
     {
         /* Create a fake OSD menu elementary stream */
-        if( !p_sys->b_osd && (p_sys->i_osdcodec != 0 || p_sys->psz_osdenc) )
+        if( !p_sys->b_es_osd && (p_sys->i_osdcodec != 0 || p_sys->psz_osdenc) )
         {
             if( transcode_osd_new( p_stream, p_sys->id_osd ) )
             {
                 msg_Err( p_stream, "cannot create osd chain" );
                 goto error;
             }
-            p_sys->b_osd = VLC_TRUE;
+            p_sys->b_es_osd = VLC_TRUE;
         }
     }
     return id;
@@ -932,7 +950,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if( config_GetInt( p_stream, "osd" ) && p_sys->b_osd )
+    if( p_sys->b_es_osd )
         transcode_osd_close( p_stream, p_sys->id_osd );
 
     if( id->b_transcode )
@@ -979,7 +997,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     if( !id->b_transcode && id->id )
     {
         /* Transcode OSD menu pictures. */
-        if( p_sys->b_osd )
+        if( p_sys->b_es_osd )
         {
             transcode_osd_process( p_stream, id, p_buffer, &p_out );                
         }
@@ -2384,7 +2402,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
 
     p_sys->id_osd = id;
-    p_sys->b_osd = VLC_TRUE;
+    p_sys->b_es_osd = VLC_TRUE;
 
     if( !p_sys->p_spu )
     {
@@ -2410,7 +2428,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( fmt.psz_language ) free( fmt.psz_language );
     if( id ) free( id );
     p_sys->id_osd = NULL;
-    p_sys->b_osd = VLC_FALSE;
+    p_sys->b_es_osd = VLC_FALSE;
     return VLC_EGENERIC;
 }
     
@@ -2419,7 +2437,7 @@ static void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_t *id)
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     
     /* Close encoder */
-    if( p_sys->b_osd && id )
+    if( p_sys->b_es_osd && id )
     {
         if( id->p_encoder->p_module )
             module_Unneed( id->p_encoder, id->p_encoder->p_module );
@@ -2432,7 +2450,7 @@ static void transcode_osd_close( sout_stream_t *p_stream, sout_stream_id_t *id)
             vlc_object_destroy( id->p_encoder );
         }
     }
-    p_sys->b_osd = VLC_FALSE;
+    p_sys->b_es_osd = VLC_FALSE;
     if( id ) free( id );
 }
 
