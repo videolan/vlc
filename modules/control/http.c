@@ -1207,6 +1207,12 @@ static int Filter( const struct dirent *foo )
     return VLC_TRUE;
 }
 
+static int InsensitiveAlphasort( const struct dirent **foo1,
+                                 const struct dirent **foo2 )
+{
+    return strcasecmp( (*foo1)->d_name, (*foo2)->d_name );
+}
+
 static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
                                 char *psz_dir )
 {
@@ -1312,7 +1318,7 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
 
     /* parse psz_src dir */
     if( ( i_dir_content = scandir( psz_dir, &pp_dir_content, Filter,
-                                   alphasort ) ) == -1 )
+                                   InsensitiveAlphasort ) ) == -1 )
     {
         msg_Warn( p_intf, "scandir error on %s (%s)", psz_dir,
                   strerror(errno) );
@@ -3335,11 +3341,11 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             {
                 memcpy( psz_out_current, psz_in_current, p - psz_in_current );
                 psz_out_current += p - psz_in_current;
-                memcpy( psz_out_current, psz_to, strlen(psz_to) );
-                psz_out_current += strlen(psz_out);
+                strcpy( psz_out_current, psz_to );
+                psz_out_current += strlen(psz_to);
                 psz_in_current = p + strlen(psz_from);
             }
-            memcpy( psz_out_current, psz_in_current, strlen(psz_in_current) );
+            strcpy( psz_out_current, psz_in_current );
             psz_out_current += strlen(psz_in_current);
             *psz_out_current = '\0';
 
