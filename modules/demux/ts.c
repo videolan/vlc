@@ -1655,13 +1655,14 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         i_skip = 5 + p[4];
         if( p[4] > 0 )
         {
-            if( p[5]&0x80 )
-            {
-                msg_Warn( p_demux, "discontinuity_indicator (pid=%d) "
-                          "ignored", pid->i_pid );
-            }
             /* discontinuity indicator found in stream */
-            b_discontinuity = p[5]&0x80 ? VLC_TRUE : VLC_FALSE;
+            b_discontinuity = (p[5]&0x80) ? VLC_TRUE : VLC_FALSE;
+            if( b_discontinuity && pid->es->p_pes )
+            {
+                msg_Warn( p_demux, "discontinuity indicator (pid=%d) ",
+                            pid->i_pid );
+                /* pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY; */
+            }
             if( p[5]&0x40 )
                 msg_Dbg( p_demux, "random access indicator (pid=%d) ", pid->i_pid );
         }
@@ -1760,12 +1761,6 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         }
     }
     
-    if( b_discontinuity && pid->es->p_pes )
-    {
-        msg_Warn( p_demux, "discontinuity indicator (pid=%d) ",
-                     pid->i_pid );
-        pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    }
     return i_ret;
 }
 
