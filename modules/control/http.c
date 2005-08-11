@@ -1500,6 +1500,184 @@ typedef struct
     char *param2;
 } macro_t;
 
+static void Seek( intf_thread_t *p_intf, char *p_value )
+{
+    intf_sys_t     *p_sys = p_intf->p_sys;
+    vlc_value_t val;
+    int i_stock = 0;
+    uint64_t i_length;
+    int i_value = 0;
+    int i_relative = 0;
+#define POSITION_ABSOLUTE 12
+#define POSITION_REL_FOR 13
+#define POSITION_REL_BACK 11
+#define VL_TIME_ABSOLUTE 0
+#define VL_TIME_REL_FOR 1
+#define VL_TIME_REL_BACK -1
+    if( p_sys->p_input )
+    {
+        var_Get( p_sys->p_input, "length", &val );
+        i_length = val.i_time;
+
+        while( p_value[0] != '\0' )
+        {
+            switch(p_value[0])
+            {
+                case '+':
+                {
+                    i_relative = VL_TIME_REL_FOR;
+                    p_value++;
+                    break;
+                }
+                case '-':
+                {
+                    i_relative = VL_TIME_REL_BACK;
+                    p_value++;
+                    break;
+                }
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9':
+                {
+                    i_stock = strtol( p_value , &p_value , 10 );
+                    break;
+                }
+                case '%': /* for percentage ie position */
+                {
+                    i_relative += POSITION_ABSOLUTE;
+                    i_value = i_stock;
+                    i_stock = 0;
+                    p_value[0] = '\0';
+                    break;
+                }
+                case ':':
+                {
+                    i_value = 60 * (i_value + i_stock) ;
+                    i_stock = 0;
+                    p_value++;
+                    break;
+                }
+                case 'h': case 'H': /* hours */
+                {
+                    i_value += 3600 * i_stock;
+                    i_stock = 0;
+                    /* other characters which are not numbers are not important */
+                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                    {
+                        p_value++;
+                    }
+                    break;
+                }
+                case 'm': case 'M': case '\'': /* minutes */
+                {
+                    i_value += 60 * i_stock;
+                    i_stock = 0;
+                    p_value++;
+                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                    {
+                        p_value++;
+                    }
+                    break;
+                }
+                case 's': case 'S': case '"':  /* seconds */
+                {
+                    i_value += i_stock;
+                    i_stock = 0;
+                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                    {
+                        p_value++;
+                    }
+                    break;
+                }
+                default:
+                {
+                    p_value++;
+                    break;
+                }
+            }
+        }
+
+        /* if there is no known symbol, I consider it as seconds. Otherwise, i_stock = 0 */
+        i_value += i_stock;
+
+        switch(i_relative)
+        {
+            case VL_TIME_ABSOLUTE:
+            {
+                if( (uint64_t)( i_value ) * 1000000 <= i_length )
+                    val.i_time = (uint64_t)( i_value ) * 1000000;
+                else
+                    val.i_time = i_length;
+
+                var_Set( p_sys->p_input, "time", val );
+                msg_Dbg( p_intf, "requested seek position: %dsec", i_value );
+                break;
+            }
+            case VL_TIME_REL_FOR:
+            {
+                var_Get( p_sys->p_input, "time", &val );
+                if( (uint64_t)( i_value ) * 1000000 + val.i_time <= i_length )
+                {
+                    val.i_time = ((uint64_t)( i_value ) * 1000000) + val.i_time;
+                } else
+                {
+                    val.i_time = i_length;
+                }
+                var_Set( p_sys->p_input, "time", val );
+                msg_Dbg( p_intf, "requested seek position forward: %dsec", i_value );
+                break;
+            }
+            case VL_TIME_REL_BACK:
+            {
+                var_Get( p_sys->p_input, "time", &val );
+                if( (int64_t)( i_value ) * 1000000 > val.i_time )
+                {
+                    val.i_time = 0;
+                } else
+                {
+                    val.i_time = val.i_time - ((uint64_t)( i_value ) * 1000000);
+                }
+                var_Set( p_sys->p_input, "time", val );
+                msg_Dbg( p_intf, "requested seek position backward: %dsec", i_value );
+                break;
+            }
+            case POSITION_ABSOLUTE:
+            {
+                val.f_float = __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                var_Set( p_sys->p_input, "position", val );
+                msg_Dbg( p_intf, "requested seek percent: %d", i_value );
+                break;
+            }
+            case POSITION_REL_FOR:
+            {
+                var_Get( p_sys->p_input, "position", &val );
+                val.f_float += __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                var_Set( p_sys->p_input, "position", val );
+                msg_Dbg( p_intf, "requested seek percent forward: %d", i_value );
+                break;
+            }
+            case POSITION_REL_BACK:
+            {
+                var_Get( p_sys->p_input, "position", &val );
+                val.f_float -= __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                var_Set( p_sys->p_input, "position", val );
+                msg_Dbg( p_intf, "requested seek percent backward: %d", i_value );
+                break;
+            }
+            default:
+            {
+                msg_Dbg( p_intf, "requested seek: what the f*** is going on here ?" );
+                break;
+            }
+        }
+    }
+#undef POSITION_ABSOLUTE
+#undef POSITION_REL_FOR
+#undef POSITION_REL_BACK
+#undef VL_TIME_ABSOLUTE
+#undef VL_TIME_REL_FOR
+#undef VL_TIME_REL_BACK
+}
+
 static int FileLoad( FILE *f, char **pp_data, int *pi_data )
 {
     int i_read;
@@ -1813,7 +1991,6 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     msg_Dbg( p_intf, "requested playlist previous" );
                     break;
                 case MVLC_FULLSCREEN:
-                {
                     if( p_sys->p_input )
                     {
                         vout_thread_t *p_vout;
@@ -1827,188 +2004,13 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             msg_Dbg( p_intf, "requested fullscreen toggle" );
                         }
                     }
-                }
-                break;
+                    break;
                 case MVLC_SEEK:
                 {
-                    vlc_value_t val;
                     char value[30];
-                    char * p_value;
-                    int i_stock = 0;
-                    uint64_t i_length;
-                    int i_value = 0;
-                    int i_relative = 0;
-#define POSITION_ABSOLUTE 12
-#define POSITION_REL_FOR 13
-#define POSITION_REL_BACK 11
-#define VL_TIME_ABSOLUTE 0
-#define VL_TIME_REL_FOR 1
-#define VL_TIME_REL_BACK -1
-                    if( p_sys->p_input )
-                    {
-                        uri_extract_value( p_request, "seek_value", value, 20 );
-                        uri_decode_url_encoded( value );
-                        p_value = value;
-                        var_Get( p_sys->p_input, "length", &val);
-                        i_length = val.i_time;
-
-                        while( p_value[0] != '\0' )
-                        {
-                            switch(p_value[0])
-                            {
-                                case '+':
-                                {
-                                    i_relative = VL_TIME_REL_FOR;
-                                    p_value++;
-                                    break;
-                                }
-                                case '-':
-                                {
-                                    i_relative = VL_TIME_REL_BACK;
-                                    p_value++;
-                                    break;
-                                }
-                                case '0': case '1': case '2': case '3': case '4':
-                                case '5': case '6': case '7': case '8': case '9':
-                                {
-                                    i_stock = strtol( p_value , &p_value , 10 );
-                                    break;
-                                }
-                                case '%': /* for percentage ie position */
-                                {
-                                    i_relative += POSITION_ABSOLUTE;
-                                    i_value = i_stock;
-                                    i_stock = 0;
-                                    p_value[0] = '\0';
-                                    break;
-                                }
-                                case ':':
-                                {
-                                    i_value = 60 * (i_value + i_stock) ;
-                                    i_stock = 0;
-                                    p_value++;
-                                    break;
-                                }
-                                case 'h': case 'H': /* hours */
-                                {
-                                    i_value += 3600 * i_stock;
-                                    i_stock = 0;
-                                    /* other characters which are not numbers are not important */
-                                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
-                                    {
-                                        p_value++;
-                                    }
-                                    break;
-                                }
-                                case 'm': case 'M': case '\'': /* minutes */
-                                {
-                                    i_value += 60 * i_stock;
-                                    i_stock = 0;
-                                    p_value++;
-                                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
-                                    {
-                                        p_value++;
-                                    }
-                                    break;
-                                }
-                                case 's': case 'S': case '"':  /* seconds */
-                                {
-                                    i_value += i_stock;
-                                    i_stock = 0;
-                                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
-                                    {
-                                        p_value++;
-                                    }
-                                    break;
-                                }
-                                default:
-                                {
-                                    p_value++;
-                                    break;
-                                }
-                            }
-                        }
-
-                        /* if there is no known symbol, I consider it as seconds. Otherwise, i_stock = 0 */
-                        i_value += i_stock;
-
-                        switch(i_relative)
-                        {
-                            case VL_TIME_ABSOLUTE:
-                            {
-                                if( (uint64_t)( i_value ) * 1000000 <= i_length )
-                                    val.i_time = (uint64_t)( i_value ) * 1000000;
-                                else
-                                    val.i_time = i_length;
-
-                                var_Set( p_sys->p_input, "time", val );
-                                msg_Dbg( p_intf, "requested seek position: %dsec", i_value );
-                                break;
-                            }
-                            case VL_TIME_REL_FOR:
-                            {
-                                var_Get( p_sys->p_input, "time", &val );
-                                if( (uint64_t)( i_value ) * 1000000 + val.i_time <= i_length )
-                                {
-                                    val.i_time = ((uint64_t)( i_value ) * 1000000) + val.i_time;
-                                } else
-                                {
-                                    val.i_time = i_length;
-                                }
-                                var_Set( p_sys->p_input, "time", val );
-                                msg_Dbg( p_intf, "requested seek position forward: %dsec", i_value );
-                                break;
-                            }
-                            case VL_TIME_REL_BACK:
-                            {
-                                var_Get( p_sys->p_input, "time", &val );
-                                if( (int64_t)( i_value ) * 1000000 > val.i_time )
-                                {
-                                    val.i_time = 0;
-                                } else
-                                {
-                                    val.i_time = val.i_time - ((uint64_t)( i_value ) * 1000000);
-                                }
-                                var_Set( p_sys->p_input, "time", val );
-                                msg_Dbg( p_intf, "requested seek position backward: %dsec", i_value );
-                                break;
-                            }
-                            case POSITION_ABSOLUTE:
-                            {
-                                val.f_float = __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
-                                var_Set( p_sys->p_input, "position", val );
-                                msg_Dbg( p_intf, "requested seek percent: %d", i_value );
-                                break;
-                            }
-                            case POSITION_REL_FOR:
-                            {
-                                var_Get( p_sys->p_input, "position", &val );
-                                val.f_float += __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
-                                var_Set( p_sys->p_input, "position", val );
-                                msg_Dbg( p_intf, "requested seek percent forward: %d", i_value );
-                                break;
-                            }
-                            case POSITION_REL_BACK:
-                            {
-                                var_Get( p_sys->p_input, "position", &val );
-                                val.f_float -= __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
-                                var_Set( p_sys->p_input, "position", val );
-                                msg_Dbg( p_intf, "requested seek percent backward: %d", i_value );
-                                break;
-                            }
-                            default:
-                            {
-                                msg_Dbg( p_intf, "requested seek: what the f*** is going on here ?" );
-                                break;
-                            }
-                        }
-                    }
-#undef POSITION_ABSOLUTE
-#undef POSITION_REL_FOR
-#undef POSITION_REL_BACK
-#undef VL_TIME_ABSOLUTE
-#undef VL_TIME_REL_FOR
-#undef VL_TIME_REL_BACK
+                    uri_extract_value( p_request, "seek_value", value, 30 );
+                    uri_decode_url_encoded( value );
+                    Seek( p_intf, value );
                     break;
                 }
                 case MVLC_VOLUME:
@@ -3621,6 +3623,13 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         {
             playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1 );
             msg_Dbg( p_intf, "requested playlist previous" );
+        }
+        else if( !strcmp( s, "vlc_seek" ) )
+        {
+            char *psz_value = SSPop( st );
+            Seek( p_intf, psz_value );
+            msg_Dbg( p_intf, "requested playlist seek: %s", psz_value );
+            free( psz_value );
         }
         /* 6. playlist functions */
         else if( !strcmp( s, "playlist_add" ) )
