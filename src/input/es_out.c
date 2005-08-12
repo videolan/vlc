@@ -1036,13 +1036,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         }
     }
 
-    p_block->i_rate = p_input->i_rate;
-    if( es->b_discontinuity )
-    {
-        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        es->b_discontinuity = VLC_FALSE;
-    }
-
     /* TODO handle mute */
     if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||
         p_input->i_rate == INPUT_RATE_DEFAULT ) )
