@@ -6,6 +6,7 @@
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -394,7 +395,7 @@ failed:
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-void Close ( vlc_object_t *p_this )
+static void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
@@ -1159,6 +1160,110 @@ static mvar_t *mvar_InfoSetNew( intf_thread_t *p_intf, char *name,
 
     return s;
 }
+
+static mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
+                                    input_thread_t *p_input,
+                                    const char *psz_variable )
+{
+    intf_sys_t     *p_sys = p_intf->p_sys;
+    mvar_t *s = mvar_New( name, "set" );
+    vlc_value_t val, val_list, text_list;
+    int i_type, i;
+
+    if( p_input == NULL )
+    {
+        return s;
+    }
+
+    /* Check the type of the object variable */
+    i_type = var_Type( p_sys->p_input, psz_variable );
+
+    /* Make sure we want to display the variable */
+    if( i_type & VLC_VAR_HASCHOICE )
+    {
+        var_Change( p_sys->p_input, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL );
+        if( val.i_int == 0 ) return s;
+        if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
+            return s;
+    }
+    else
+    {
+        return s;
+    }
+
+    switch( i_type & VLC_VAR_TYPE )
+    {
+    case VLC_VAR_VOID:
+    case VLC_VAR_BOOL:
+    case VLC_VAR_VARIABLE:
+    case VLC_VAR_STRING:
+    case VLC_VAR_INTEGER:
+        break;
+    default:
+        /* Variable doesn't exist or isn't handled */
+        return s;
+    }
+
+    if( var_Get( p_sys->p_input, psz_variable, &val ) < 0 )
+    {
+        return s;
+    }
+
+    if( var_Change( p_sys->p_input, psz_variable, VLC_VAR_GETLIST,
+                    &val_list, &text_list ) < 0 )
+    {
+        if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+        return s;
+    }
+
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        char *psz, psz_int[16];
+        mvar_t *itm;
+
+        switch( i_type & VLC_VAR_TYPE )
+        {
+        case VLC_VAR_STRING:
+            itm = mvar_New( name, "set" );
+            psz = FromUTF8( p_intf, text_list.p_list->p_values[i].psz_string );
+            mvar_AppendNewVar( itm, "name", psz );
+            psz = FromUTF8( p_intf, val_list.p_list->p_values[i].psz_string );
+            mvar_AppendNewVar( itm, "id", psz );
+            free( psz );
+            snprintf( psz_int, sizeof(psz_int), "%d",
+                      ( !strcmp( val.psz_string,
+                                   val_list.p_list->p_values[i].psz_string )
+                           && !( i_type & VLC_VAR_ISCOMMAND ) ) );
+            mvar_AppendNewVar( itm, "selected", psz_int );
+            mvar_AppendVar( s, itm );
+            break;
+
+        case VLC_VAR_INTEGER:
+            itm = mvar_New( name, "set" );
+            psz = FromUTF8( p_intf, text_list.p_list->p_values[i].psz_string );
+            mvar_AppendNewVar( itm, "name", psz );
+            snprintf( psz_int, sizeof(psz_int), "%d",
+                      val_list.p_list->p_values[i].i_int );
+            mvar_AppendNewVar( itm, "id", psz_int );
+            snprintf( psz_int, sizeof(psz_int), "%d",
+                      ( val.i_int == val_list.p_list->p_values[i].i_int )
+                         && !( i_type & VLC_VAR_ISCOMMAND ) );
+            mvar_AppendNewVar( itm, "selected", psz_int );
+            mvar_AppendVar( s, itm );
+            break;
+
+        default:
+            break;
+        }
+    }
+    
+    /* clean up everything */
+    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+    var_Change( p_sys->p_input, psz_variable, VLC_VAR_FREELIST, &val_list,
+                &text_list );
+    return s;
+}
+
 #if 0
 static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 {
@@ -2706,6 +2811,17 @@ static void Execute( httpd_file_sys_t *p_args,
                             index = mvar_InfoSetNew( p_intf, m.param1,
                                                      p_intf->p_sys->p_input );
                         }
+                        else if( !strcmp( m.param2, "program" )
+                                  || !strcmp( m.param2, "title" )
+                                  || !strcmp( m.param2, "chapter" )
+                                  || !strcmp( m.param2, "audio-es" )
+                                  || !strcmp( m.param2, "video-es" )
+                                  || !strcmp( m.param2, "spu-es" ) )
+                        {
+                            index = mvar_InputVarSetNew( p_intf, m.param1,
+                                                         p_intf->p_sys->p_input,
+                                                         m.param2 );
+                        }
                         else if( !strcmp( m.param2, "vlm" ) )
                         {
                             if( p_intf->p_sys->p_vlm == NULL )
@@ -3630,6 +3746,36 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             Seek( p_intf, psz_value );
             msg_Dbg( p_intf, "requested playlist seek: %s", psz_value );
             free( psz_value );
+        }
+        else if( !strcmp( s, "vlc_set_var" ) )
+        {
+            char *psz_variable = SSPop( st );
+            char *psz_value = NULL;
+            vlc_value_t val;
+            int i_type;
+
+            if( p_sys->p_input != NULL )
+            {
+                i_type = var_Type( p_sys->p_input, psz_variable );
+
+                if( i_type == VLC_VAR_INTEGER )
+                {
+                    int i_value = SSPopN( st, vars );
+                    val.i_int = i_value;
+                }
+                else
+                {
+                    psz_value = SSPop( st );
+                    val.psz_string = psz_value;
+                }
+
+                var_Set( p_sys->p_input, psz_variable, val );
+            }
+            msg_Dbg( p_intf, "requested input var change: %s->%s",
+                     psz_variable, psz_value );
+            if( psz_value != NULL )
+                free( psz_value );
+            free( psz_variable );
         }
         /* 6. playlist functions */
         else if( !strcmp( s, "playlist_add" ) )
