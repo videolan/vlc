@@ -1036,6 +1036,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         }
     }
 
+    p_block->i_rate = p_input->i_rate;
+
     /* TODO handle mute */
     if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||
         p_input->i_rate == INPUT_RATE_DEFAULT ) )
