@@ -2978,14 +2978,17 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
             if( val.i_int == PLAYING_S )
             {
                 sprintf( state, "playing" );
-            } else if( val.i_int == PAUSE_S )
+            }
+            else if( val.i_int == PAUSE_S )
             {
                 sprintf( state, "paused" );
-            } else
+            }
+            else
             {
                 sprintf( state, "stop" );
             }
-        } else
+        }
+        else
         {
             sprintf( position, "%d", 0 );
             sprintf( time, "%d", 0 );
@@ -3758,21 +3761,23 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             {
                 i_type = var_Type( p_sys->p_input, psz_variable );
 
-                if( i_type == VLC_VAR_INTEGER )
+                if( (i_type & VLC_VAR_TYPE) == VLC_VAR_INTEGER )
                 {
                     int i_value = SSPopN( st, vars );
                     val.i_int = i_value;
+                    msg_Dbg( p_intf, "requested input var change: %s->%d",
+                             psz_variable, i_value );
                 }
                 else
                 {
                     psz_value = SSPop( st );
                     val.psz_string = psz_value;
+                    msg_Dbg( p_intf, "requested input var change: %s->%s",
+                             psz_variable, psz_value );
                 }
 
                 var_Set( p_sys->p_input, psz_variable, val );
             }
-            msg_Dbg( p_intf, "requested input var change: %s->%s",
-                     psz_variable, psz_value );
             if( psz_value != NULL )
                 free( psz_value );
             free( psz_variable );

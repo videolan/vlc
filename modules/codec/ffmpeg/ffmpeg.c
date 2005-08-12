@@ -359,8 +359,8 @@ static void LibavcodecCallback( void *p_opaque, int i_level,
 
     psz_item_name = p_avc->item_name(p_opaque);
     psz_new_format = malloc( strlen(psz_format) + strlen(psz_item_name)
-                              + 16 + 7 );
-    sprintf( psz_new_format, "%s (%s@0x%p)", psz_format,
+                              + 18 + 5 );
+    sprintf( psz_new_format, "%s (%s@%p)", psz_format,
              p_avc->item_name(p_opaque), p_opaque );
     msg_GenericVa( p_this, i_vlc_level, MODULE_STRING, psz_new_format, va );
     free( psz_new_format );
