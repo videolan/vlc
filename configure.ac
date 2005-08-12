@@ -4568,12 +4568,8 @@ AC_CONFIG_FILES([
   modules/gui/Makefile
   modules/gui/beos/Makefile
   modules/gui/pda/Makefile
-  modules/gui/gtk/Makefile
-  modules/gui/gtk2/Makefile
-  modules/gui/kde/Makefile
   modules/gui/macosx/Makefile
   modules/gui/qnx/Makefile
-  modules/gui/qt/Makefile
   modules/gui/skins2/Makefile
   modules/gui/wxwidgets/Makefile
   modules/gui/wince/Makefile
