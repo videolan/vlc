@@ -73,6 +73,12 @@
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
     "Allows you to specify the output video height." )
+#define MAXWIDTH_TEXT N_("Maximum video width")
+#define MAXWIDTH_LONGTEXT N_( \
+    "Allows you to specify a maximum output video width." )
+#define MAXHEIGHT_TEXT N_("Maximum video height")
+#define MAXHEIGHT_LONGTEXT N_( \
+    "Allows you to specify a maximum output video height." )
 #define VFILTER_TEXT N_("Video filter")
 #define VFILTER_LONGTEXT N_( \
     "Allows you to specify video filters used after the video " \
@@ -188,6 +194,10 @@ vlc_module_begin();
                  WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "maxwidth", 0, NULL, MAXWIDTH_TEXT,
+                 MAXWIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "maxheight", 0, NULL, MAXHEIGHT_TEXT,
+                 MAXHEIGHT_LONGTEXT, VLC_TRUE );
     add_module_list_cat( SOUT_CFG_PREFIX "vfilter", SUBCAT_VIDEO_VFILTER,
                      NULL, NULL,
                      VFILTER_TEXT, VFILTER_LONGTEXT, VLC_FALSE );
@@ -243,7 +253,7 @@ static const char *ppsz_sout_options[] = {
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
     "samplerate", "channels", "senc", "scodec", "soverlay", "sfilter",
-    "osd", "audio-sync", "high-priority", NULL
+    "osd", "audio-sync", "high-priority", "maxwidth", "maxheight", NULL
 };
 
 /*****************************************************************************
@@ -328,8 +338,8 @@ struct sout_stream_sys_t
     int             i_vbitrate;
     double          f_scale;
     double          f_fps;
-    int             i_width;
-    int             i_height;
+    unsigned int    i_width, i_maxwidth;
+    unsigned int    i_height, i_maxheight;
     vlc_bool_t      b_deinterlace;
     char            *psz_deinterlace;
     sout_cfg_t      *p_deinterlace_cfg;
@@ -488,6 +498,12 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "height", &val );
     p_sys->i_height = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "maxwidth", &val );
+    p_sys->i_maxwidth = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "maxheight", &val );
+    p_sys->i_maxheight = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "vfilter", &val );
     p_sys->i_vfilters = 0;
@@ -1534,6 +1550,13 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
             id->p_encoder->fmt_out.video.i_height / (double)i_height * i_width;
     }
 
+    if( p_sys->i_maxwidth
+         && id->p_encoder->fmt_out.video.i_width > p_sys->i_maxwidth )
+        id->p_encoder->fmt_out.video.i_width = p_sys->i_maxwidth;
+    if( p_sys->i_maxheight
+         && id->p_encoder->fmt_out.video.i_height > p_sys->i_maxheight )
+        id->p_encoder->fmt_out.video.i_height = p_sys->i_maxheight;
+
     /* Make sure the size is at least a multiple of 2 */
     id->p_encoder->fmt_out.video.i_width =
         (id->p_encoder->fmt_out.video.i_width + 1) >> 1 << 1;
@@ -1689,7 +1712,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_duplicate = 1, i;
-    picture_t *p_pic;
+    picture_t *p_pic, *p_pic2 = NULL;
     *out = NULL;
 
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
@@ -1937,17 +1960,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             p_pic = id->pp_vfilter[i]->pf_video_filter(id->pp_vfilter[i], p_pic);
         }
 
-        if( p_sys->i_threads >= 1 )
-        {
-            vlc_mutex_lock( &p_sys->lock_out );
-            p_sys->pp_pics[p_sys->i_last_pic++] = p_pic;
-            p_sys->i_last_pic %= PICTURE_RING_SIZE;
-            *out = p_sys->p_buffers;
-            p_sys->p_buffers = NULL;
-            vlc_cond_signal( &p_sys->cond );
-            vlc_mutex_unlock( &p_sys->lock_out );
-        }
-        else
+        if( p_sys->i_threads == 0 )
         {
             block_t *p_block;
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
@@ -1982,17 +1995,11 @@ static int transcode_video_process( sout_stream_t *p_stream,
             if( p_sys->i_threads >= 1 )
             {
                 /* We can't modify the picture, we need to duplicate it */
-                picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
-                if( p_tmp != NULL )
+                p_pic2 = video_new_buffer_decoder( id->p_decoder );
+                if( p_pic2 != NULL )
                 {
-                    vout_CopyPicture( p_stream, p_tmp, p_pic );
-                    p_pic = p_tmp;
-
-                    vlc_mutex_lock( &p_sys->lock_out );
-                    p_sys->pp_pics[p_sys->i_last_pic++] = p_pic;
-                    p_sys->i_last_pic %= PICTURE_RING_SIZE;
-                    vlc_cond_signal( &p_sys->cond );
-                    vlc_mutex_unlock( &p_sys->lock_out );
+                    vout_CopyPicture( p_stream, p_pic2, p_pic );
+                    p_pic2->date = i_pts;
                 }
             }
             else
@@ -2005,7 +2012,25 @@ static int transcode_video_process( sout_stream_t *p_stream,
         }
 
         if( p_sys->i_threads == 0 )
+        {
             p_pic->pf_release( p_pic );
+        }
+        else
+        {
+            vlc_mutex_lock( &p_sys->lock_out );
+            p_sys->pp_pics[p_sys->i_last_pic++] = p_pic;
+            p_sys->i_last_pic %= PICTURE_RING_SIZE;
+            *out = p_sys->p_buffers;
+            p_sys->p_buffers = NULL;
+            if( p_pic2 != NULL )
+            {
+                p_sys->pp_pics[p_sys->i_last_pic++] = p_pic2;
+                p_sys->i_last_pic %= PICTURE_RING_SIZE;
+            }
+            vlc_cond_signal( &p_sys->cond );
+            vlc_mutex_unlock( &p_sys->lock_out );
+        }
+
     }
 
     return VLC_SUCCESS;
