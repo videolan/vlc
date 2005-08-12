@@ -2047,44 +2047,20 @@ dnl Look for a ffmpeg-config (we are on debian )
      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
   
   else
- Trying with pkg-config
+dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,libavcodec libavformat,
     [
      AC_CHECK_HEADERS(ffmpeg/avcodec.h)
      AC_CHECK_HEADERS(postproc/postprocess.h)
-     VLC_ADD_PLUGINS([ffmpeg])
+     VLC_ADD_BUILTINS([ffmpeg])
      if test "${enable_sout}" != "no"; then
-         VLC_ADD_PLUGINS([stream_out_switcher])
+         VLC_ADD_BUILTINS([stream_out_switcher])
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
-     VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_LIBS}])
+     VLC_ADD_LDFLAGS([ffmpeg],[${FFMPEG_LIBS}])
 
-    ],
-    [
+    ],[
      
-    AC_ARG_WITH(ffmpeg-mp3lame,
-      [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
-
-    AC_ARG_WITH(ffmpeg-faac,
-      [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
-
-    AC_ARG_WITH(ffmpeg-dts,
-      [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
-
-    AC_ARG_WITH(ffmpeg-zlib,
-      [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
-
-    AC_ARG_WITH(ffmpeg-tree,
-      [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
-
     dnl
     dnl test for !(--with-ffmpeg-tree)
     dnl
@@ -2187,6 +2163,30 @@ dnl Look for a ffmpeg-config (we are on debian )
       fi
     fi
     ])
+
+    AC_ARG_WITH(ffmpeg-mp3lame,
+      [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
+      [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
+
+    AC_ARG_WITH(ffmpeg-faac,
+      [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
+      [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
+
+    AC_ARG_WITH(ffmpeg-dts,
+      [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
+      [
+        VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
+
+    AC_ARG_WITH(ffmpeg-zlib,
+      [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
+      [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
+
+    AC_ARG_WITH(ffmpeg-tree,
+      [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
+
   fi
 fi
 
