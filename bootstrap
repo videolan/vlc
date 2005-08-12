@@ -223,9 +223,9 @@ clean-local:
 all: all-modules
 all-modules:
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
-	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --target plugin); for mod in `sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < ${mf} | xargs`; do case "\$\$z" in */lib\$\${mod}_plugin*) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; fi; \\
-	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --target builtin); for mod in `sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < ${mf} | xargs`; do case "\$\$z" in */lib\$\${mod}.a*) echo lib\$\${mod}.a;; esac; done; fi; \\
-	if test "\$(pic)" != "no"; then z=\$\$(\$(VLC_CONFIG) --target builtin pic); for mod in `sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < ${mf} | xargs`; do case "\$\$z" in */lib\$\${mod}_pic.a*) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
+	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in `sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < ${mf} | xargs`; do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; fi; \\
+	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in `sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < ${mf} | xargs`; do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.a;; esac; done; fi; \\
+	if test "\$(pic)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in `sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < ${mf} | xargs`; do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
 

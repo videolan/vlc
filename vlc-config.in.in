@@ -37,6 +37,7 @@ Options:
         [--version]               print version and exit
         [--linkage]               print linkage mode (c, c++, objc)
         [--target]                print targets and exit
+        [--list]                  print modules names and exit
         [--libs]                  output linking flags
         [--cflags]                output C compilation flags
         [--cxxflags]              output C++ compilation flags
@@ -174,6 +175,9 @@ while test $# -gt 0; do
     --target)
       echo_target=yes
       ;;
+    --list)
+      echo_list=yes
+      ;;
     --cflags)
       echo_cflags=yes
       ;;
@@ -265,6 +269,18 @@ if test "${echo_target}" = yes; then
     else
       for target in `echo "${list}"`; do printf "${top_builddir}modules/${target}.a "; done
     fi
+    printf '\n'
+  fi
+  exit 0
+fi
+
+if test "${echo_list}" = yes; then
+  if test "${echo_plugin}" = yes; then
+    echo "${plugins}"
+    printf '\n'
+  fi
+  if test "${echo_builtin}" = yes; then
+    echo "${builtins}"
     printf '\n'
   fi
   exit 0
