@@ -486,7 +486,7 @@ static void Run( intf_thread_t *p_intf )
 /*****************************************************************************
  * Local functions
  *****************************************************************************/
-#define MAX_DIR_SIZE 10240
+#define MAX_DIR_SIZE 2560
 
 /****************************************************************************
  * FileToUrl: create a good name for an url from filename
@@ -1923,6 +1923,7 @@ enum macroType
         MVLC_VLM_LOAD,
         MVLC_VLM_SAVE,
 
+    MVLC_INCLUDE,
     MVLC_FOREACH,
     MVLC_IF,
     MVLC_RPN,
@@ -1982,6 +1983,7 @@ StrToMacroTypeTab [] =
     { "rpn",        MVLC_RPN },
     { "stack",      MVLC_STACK },
 
+    { "include",    MVLC_INCLUDE },
     { "foreach",    MVLC_FOREACH },
     { "value",      MVLC_VALUE },
 
@@ -2624,7 +2626,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
             EvaluateRPN( p_intf, p_args->vars, &p_args->stack, m->param1 );
             break;
 
-/* Usefull for learning stack management */
+        /* Useful to learn stack management */
         case MVLC_STACK:
         {
             int i;
@@ -2731,6 +2733,46 @@ static void Execute( httpd_file_sys_t *p_args,
 
             switch( StrToMacroType( m.id ) )
             {
+                case MVLC_INCLUDE:
+                {
+                    FILE *f;
+                    int  i_buffer;
+                    char *p_buffer;
+                    char psz_file[MAX_DIR_SIZE];
+                    char *p;
+
+                    if( m.param1[0] != '/' )
+                    {
+                        strcpy( psz_file, p_args->file );
+                        p = strrchr( psz_file, '/' );
+                        if( p != NULL )
+                            strcpy( p + 1, m.param1 );
+                        else
+                            strcpy( psz_file, m.param1 );
+                    }
+                    else
+                    {
+                        strcpy( psz_file, m.param1 );
+                    }
+
+                    if( ( f = fopen( psz_file, "r" ) ) == NULL )
+                    {
+                        msg_Warn( p_args->p_intf,
+                                  "unable to include file %s (%s)",
+                                  psz_file, strerror(errno) );
+                        break;
+                    }
+
+                    /* first we load in a temporary buffer */
+                    FileLoad( f, &p_buffer, &i_buffer );
+
+                    /* we parse executing all  <vlc /> macros */
+                    Execute( p_args, p_request, i_request, pp_data, pi_data,
+                             &dst, &p_buffer[0], &p_buffer[i_buffer] );
+                    free( p_buffer );
+                    fclose(f);
+                    break;
+                }
                 case MVLC_IF:
                 {
                     vlc_bool_t i_test;

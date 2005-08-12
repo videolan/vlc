@@ -538,7 +538,7 @@ void httpd_FileDelete( httpd_file_t *file )
 }
 
 /*****************************************************************************
- * High Level Funtions: httpd_redirect_t
+ * High Level Functions: httpd_redirect_t
  *****************************************************************************/
 struct httpd_redirect_t
 {
