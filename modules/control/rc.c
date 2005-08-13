@@ -131,7 +131,10 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
     va_start( args, psz_fmt );
     
     if( p_intf->p_sys->i_socket == -1 )
+    {
         vprintf( psz_fmt, args );
+        printf( "\n" );
+    }
     else
     {
         net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, psz_fmt, args );
