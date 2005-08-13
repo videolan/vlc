@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include "network.h"
 
 #include "wxwidgets.h"
 
@@ -141,7 +142,7 @@ END_EVENT_TABLE()
 
 #define INVALID_MCAST_ADDRESS _("This does not appear to be a valid " \
                                 "multicast address" )
-#define NO_ADDRESS _("You need to enter an address" )
+#define NO_ADDRESS_TEXT _("You need to enter an address" )
 
 /* Encap  */
 #define ENCAP_TITLE _("Encapsulation format")
@@ -303,7 +304,8 @@ END_EVENT_TABLE()
 class wizStreamingMethodPage : public wxWizardPage
 {
 public:
-    wizStreamingMethodPage( wxWizard *parent, wxWizardPage *next);
+    wizStreamingMethodPage( intf_thread_t *p_this, wxWizard *parent,
+                            wxWizardPage *next) ;
     void OnWizardPageChanging(wxWizardEvent& event);
     virtual wxWizardPage *GetPrev() const;
     virtual wxWizardPage *GetNext() const;
@@ -320,6 +322,7 @@ protected:
     wxRadioButton *method_radios[4];
     wxWizardPage *p_prev;
     wxWizardPage *p_next;
+    intf_thread_t *p_intf;
 };
 
 BEGIN_EVENT_TABLE(wizStreamingMethodPage, wxWizardPage)
@@ -424,8 +427,6 @@ END_EVENT_TABLE()
 
 
 /* Local functions */
-static int ismult( const char *psz_uri );
-
 static void pageHeader( wxWindow *window, wxBoxSizer *sizer,
                        char *psz_title, char *psz_text);
 
@@ -988,8 +989,8 @@ void wizTranscodeCodecPage::SetPrev( wxWizardPage *page) {p_prev = page; }
 /***************************************************
  * First streaming page: choose method             *
  ***************************************************/
-wizStreamingMethodPage::wizStreamingMethodPage( wxWizard *parent,
-    wxWizardPage *next) : wxWizardPage(parent)
+wizStreamingMethodPage::wizStreamingMethodPage( intf_thread_t *p_this, wxWizard *parent,
+    wxWizardPage *next) : wxWizardPage(parent), p_intf( p_this )
 {
     int i;
     p_next = next;
@@ -1060,7 +1061,9 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     if( !event.GetDirection() ) return;
 
     /* Check valid address */
-    if( i_method == 1 && !ismult( address_txtctrl->GetValue().mb_str()) )
+    if( i_method == 1
+     && !net_AddressIsMulticast( (vlc_object_t *)p_intf,
+                                 address_txtctrl->GetValue().mb_str()) )
     {
         wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this->p_parent );
@@ -1069,7 +1072,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     }
     else if( i_method == 0 && address_txtctrl->GetValue().IsEmpty() )
     {
-        wxMessageBox( wxU( NO_ADDRESS ) , wxU( ERROR_MSG ),
+        wxMessageBox( wxU( NO_ADDRESS_TEXT ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this->p_parent );
         event.Veto();
 
@@ -1402,7 +1405,7 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
 
     encap_page = new wizEncapPage(this );
     tr_page1 = new wizTranscodeCodecPage(this, encap_page );
-    st_page1 = new wizStreamingMethodPage(this, encap_page);
+    st_page1 = new wizStreamingMethodPage( p_intf, this, encap_page);
 
     tr_page2 = new wizTranscodeExtraPage(this, encap_page, NULL );
     st_page2 = new wizStreamingExtraPage(this, encap_page, NULL );
@@ -1637,23 +1640,4 @@ void WizardDialog::Run()
                           wxICON_WARNING | wxOK, this );
         }
     }
-}
-/****************************************************************
- * Local helper functions
- ****************************************************************/
-static int ismult( const char *psz_uri )
-{
-    char *psz_end;
-    unsigned long i_value;
-
-    /* IPv6 */
-    if( psz_uri[0] == '[')
-            return strncasecmp( &psz_uri[1], "FF" , 2) ? VLC_FALSE : VLC_TRUE;
-
-    /* IPv4 */
-    i_value = strtoul( psz_uri, &psz_end, 10 );
-    if( *psz_end != '.' ) { return( VLC_FALSE ); }
-
-    return( ( i_value >= 224 && i_value < 240 ) ? VLC_TRUE : VLC_FALSE );
-
 }
