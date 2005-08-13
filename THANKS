@@ -11,6 +11,7 @@ The VideoLAN team would like to thank the following contributors:
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
 Andres Krapf <dae at via.ecp.fr> - FreeBSD port and tests, KDE interface
+Andrey Brilevskiy <director at macwest.ru> - Russian translation
 Andy Lindsay <andy_vl at ananam.com> - fixes in the TS demux
 Arkadiusz Lipiec <A.Lipiec at elka.pw.edu.pl> - Polish translation
 Arkadiusz Miskiewicz <misiek at pld.ORG.PL> - autoconf and Makefile patches
