@@ -222,7 +222,7 @@ static inline int isurlsafe( int c )
          * (even if they are not URL-safe), nor URL-safe characters.
          * We still encode some of them because of Microsoft's crap browser.
          */
-        || ( strchr( "/:.[]@&?-_.", c ) != NULL );
+        || ( strchr( "-_.", c ) != NULL );
 }
 
 /*****************************************************************************

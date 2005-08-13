@@ -152,7 +152,7 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    char         *psz;
+    char         *psz, *p;
 
     /* Set up p_access */
     p_access->pf_read = Read;
@@ -187,21 +187,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
 
-    /* Parse URI */
-    if( vlc_UrlIsNotEncoded( p_access->psz_path ) )
-    {
-        psz = vlc_UrlEncode( p_access->psz_path );
-        if( psz == NULL )
-        {
-            free( p_sys );
-            return VLC_ENOMEM;
-        }
-
-        vlc_UrlParse( &p_sys->url, psz, 0 );
-        free( psz );
-    }
-    else
-        vlc_UrlParse( &p_sys->url, p_access->psz_path, 0 );
+    /* Parse URI - remove spaces */
+    p = psz = strdup( p_access->psz_path );
+    while( (p = strchr( p, ' ' )) != NULL )
+        *p = '+';
+    vlc_UrlParse( &p_sys->url, psz, 0 );
+    free( psz );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
