@@ -138,7 +138,8 @@ then
   fi
 
   #  The evil ^M. printf '\r' does not work in Cygwin.
-  M=''
+  M='
+'
 
   #  Variables we get from configure.ac
   LIBVLC_VERSION=`sed -ne '/AC_INIT/s/.*,\(.*\))/\1/p' < configure.ac`
@@ -370,27 +371,9 @@ fi
 if test "${action}" = "po"
 then
   # find out the source files
-  rm -f po/POTFILES.in
-  echo "# automatically created by toolbox --update-po" > po/POTFILES.in
-  echo "" >> po/POTFILES.in
-  echo "# main sources" >> po/POTFILES.in
-  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
-    | grep -v '\(vlc_symbols\|misc/modules_\)' \
-    | sort >> po/POTFILES.in
-  echo "" >> po/POTFILES.in
-  echo "# modules" >> po/POTFILES.in
-  find modules -name '*.[chm]' -o -name '*.[ch]pp' \
-    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
-    | sort >> po/POTFILES.in
-  # clean old potfiles
-  cd po
-  rm -f vlc.pot
-  # update
-  make vlc.pot || exit 1
-  make update-po || exit 1
-  cd ..
-
-  exit 0
+  echo "WARNING: you should run \"make update-po\" instead!" >&2
+  make update-po
+  exit $?
 fi
 
 ##

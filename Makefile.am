@@ -1023,6 +1023,32 @@ package-translations:
 	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
 ###############################################################################
+# PO translation files update
+###############################################################################
+.PHONY: update-po
+
+update-po:
+	rm -f $(top_srcdir)/po/POTFILES.in
+	{ \
+	  cd $(top_srcdir) ; \
+	  echo "# automatically created by make update-po" ; \
+	  echo "" ; \
+	  echo "# main sources" ; \
+	  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
+	    | grep -v '\(vlc_symbols\|misc/modules_\)' \
+	    | sort ; \
+	  echo "" ; \
+	  echo "# modules" ; \
+	  find modules -name '*.[chm]' -o -name '*.[ch]pp' \
+	    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
+	    | sort ; \
+	} > $(top_srcdir)/po/POTFILES.in
+	rm -f $(top_srcdir)/po/vlc.pot
+	cd po && $(MAKE) POTFILES $(top_srcdir)/../po/vlc.pot update-po
+
+#cd po && $(MAKE) update-po
+
+###############################################################################
 # Stamp rules
 ###############################################################################
 clean: clean-stamp clean-recursive
