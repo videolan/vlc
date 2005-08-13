@@ -758,6 +758,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     char *psz_filename, *psz_homedir, *psz_configfile;
     int i_index;
 
+    setlocale( LC_NUMERIC, "C" );
+
     psz_configfile = p_this->p_vlc->psz_configfile;
     if( !psz_configfile || !psz_configfile )
     {
@@ -1025,6 +1027,8 @@ int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     vlc_bool_t b_backup;
     char *psz_filename, *psz_homedir, *psz_configfile;
     int i_index;
+
+    setlocale( LC_NUMERIC, "C" );
 
     /* Acquire config file lock */
     vlc_mutex_lock( &p_this->p_vlc->config_lock );

@@ -1918,6 +1918,7 @@ static void SetLanguage ( char const *psz_lang )
 #endif
 
         setlocale( LC_ALL, psz_lang );
+        setlocale(LC_NUMERIC, "C" );
     }
 
     /* Specify where to find the locales for current domain */
