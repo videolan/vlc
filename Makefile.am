@@ -258,8 +258,8 @@ EXTRA_DIST += \
 	$(NULL)
 
 dist-hook:
-	cd $(distdir) && srcdir=$(srcdir) $(srcdir)/toolbox --update-vc
-	distdir=$(distdir) srcdir=$(srcdir) $(srcdir)/toolbox --dist-contrib
+	cd $(distdir) && srcdir=. $(SHELL) ./toolbox --update-vc
+	distdir=$(distdir) srcdir=$(srcdir) $(SHELL) $(srcdir)/toolbox --dist-contrib
 
 ###############################################################################
 # Building libvlc
