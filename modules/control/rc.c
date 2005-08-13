@@ -1686,6 +1686,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                 var_Set( p_intf->p_vlc, "key-pressed", keyval );
             }        
             i_error = aout_VolumeSet( p_this, i_volume );
+            msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
         }
     }
     else
