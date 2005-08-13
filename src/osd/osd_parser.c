@@ -29,7 +29,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_config.h>
-//#include <vlc_es.h>
 #include <vlc_video.h>
 
 #include <vlc_keys.h>
