@@ -1373,7 +1373,10 @@ static void Seek   ( demux_t *, mtime_t i_date, double f_percent, chapter_item_c
 
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
-static char *UTF8ToStr          ( const UTFstring &u );
+static inline char * ToUTF8( const UTFstring &u )
+{
+    return strdup( u.GetUTF8().c_str() );
+}
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -3962,7 +3965,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             KaxTrackName &tname = *(KaxTrackName*)l;
 
-            tk->fmt.psz_description = UTF8ToStr( UTFstring( tname ) );
+            tk->fmt.psz_description = ToUTF8( UTFstring( tname ) );
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Name=%s", tk->fmt.psz_description );
         }
         else  if( MKV_IS_ID( l, KaxTrackLanguage ) )
@@ -3996,7 +3999,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             KaxCodecName &cname = *(KaxCodecName*)l;
 
-            tk->psz_codec_name = UTF8ToStr( UTFstring( cname ) );
+            tk->psz_codec_name = ToUTF8( UTFstring( cname ) );
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Name=%s", tk->psz_codec_name );
         }
         else if( MKV_IS_ID( l, KaxContentEncodings ) )
@@ -4069,7 +4072,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 //        {
 //            KaxCodecSettings &cset = *(KaxCodecSettings*)l;
 
-//            tk->psz_codec_settings = UTF8ToStr( UTFstring( cset ) );
+//            tk->psz_codec_settings = ToUTF8( UTFstring( cset ) );
 //            msg_Dbg( &sys.demuxer, "|   |   |   + Track Codec Settings=%s", tk->psz_codec_settings );
 //        }
 //        else if( EbmlId( *l ) == KaxCodecInfoURL::ClassInfos.GlobalId )
@@ -4322,7 +4325,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         {
             KaxMuxingApp &mapp = *(KaxMuxingApp*)l;
 
-            psz_muxing_application = UTF8ToStr( UTFstring( mapp ) );
+            psz_muxing_application = ToUTF8( UTFstring( mapp ) );
 
             msg_Dbg( &sys.demuxer, "|   |   + Muxing Application=%s",
                      psz_muxing_application );
@@ -4331,7 +4334,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         {
             KaxWritingApp &wapp = *(KaxWritingApp*)l;
 
-            psz_writing_application = UTF8ToStr( UTFstring( wapp ) );
+            psz_writing_application = ToUTF8( UTFstring( wapp ) );
 
             msg_Dbg( &sys.demuxer, "|   |   + Writing Application=%s",
                      psz_writing_application );
@@ -4340,7 +4343,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         {
             KaxSegmentFilename &sfn = *(KaxSegmentFilename*)l;
 
-            psz_segment_filename = UTF8ToStr( UTFstring( sfn ) );
+            psz_segment_filename = ToUTF8( UTFstring( sfn ) );
 
             msg_Dbg( &sys.demuxer, "|   |   + Segment Filename=%s",
                      psz_segment_filename );
@@ -4349,7 +4352,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         {
             KaxTitle &title = *(KaxTitle*)l;
 
-            psz_title = UTF8ToStr( UTFstring( title ) );
+            psz_title = ToUTF8( UTFstring( title ) );
 
             msg_Dbg( &sys.demuxer, "|   |   + Title=%s", psz_title );
         }
@@ -4474,10 +4477,10 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                     for (k = 0; k < i_level; k++)
                         chapters.psz_name += '+';
                     chapters.psz_name += ' ';
-                    chapters.psz_name += UTF8ToStr( UTFstring( name ) );
+                    chapters.psz_name += ToUTF8( UTFstring( name ) );
                     chapters.b_user_display = true;
 
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterString '%s'", UTF8ToStr(UTFstring(name)) );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterString '%s'", ToUTF8(UTFstring(name)) );
                 }
                 else if( MKV_IS_ID( l, KaxChapterLanguage ) )
                 {
@@ -4741,34 +4744,6 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
         p_indexes = (mkv_index_t*)realloc( p_indexes, sizeof( mkv_index_t ) * i_index_max );
     }
 #undef idx
-}
-
-static char * UTF8ToStr( const UTFstring &u )
-{
-    int     i_src;
-    const wchar_t *src;
-    char *dst, *p;
-
-    i_src = u.length();
-    src   = u.c_str();
-
-    p = dst = (char*)malloc( i_src + 1);
-    while( i_src > 0 )
-    {
-        if( *src < 255 )
-        {
-            *p++ = (char)*src;
-        }
-        else
-        {
-            *p++ = '?';
-        }
-        src++;
-        i_src--;
-    }
-    *p++= '\0';
-
-    return dst;
 }
 
 void chapter_edition_c::RefreshChapters( )
