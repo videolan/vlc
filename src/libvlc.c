@@ -529,9 +529,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * Override default configuration with config file settings
      */
-    /* (dionoea 13/08/2005) : we need to load locale here in order to have
-     * coherent float encoding with subsequent SaveConfigFile calls */
-    setlocale( LC_NUMERIC, "" );
     config_LoadConfigFile( p_vlc, NULL );
 
     /* Hack: insert the help module here */
