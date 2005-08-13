@@ -1066,7 +1066,7 @@ stamp-builtin: FORCE
 
 stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl src/misc/modules_builtin.h.in
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
-	  ( pwd; top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl )
+	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
 
 ###############################################################################
