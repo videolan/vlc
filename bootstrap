@@ -313,11 +313,7 @@ lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
 
-libvlc_LIBRARIES += \$(L${mod}b) \$(L${mod}pic)
-lib${mod}_DATA = \$(D${mod}p)
-
 lib${mod}dir = \$(libdir)/vlc/${topdir}
-${PRIVATE}noinst_LIBRARIES += \$(L${mod}p)
 ${PRIVATE}lib${mod}_plugin\$(LIBEXT): \$(lib${mod}_plugin_a_OBJECTS)
 ${PRIVATE}	@case \`\$(VLC_CONFIG) --linkage ${mod}\` in \\
 ${PRIVATE}	  c++) echo \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
