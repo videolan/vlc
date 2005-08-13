@@ -242,7 +242,7 @@ all-modules:
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
 
-\$(srcdir)Makefile.am: \$(srcdir)Modules.am \$(top_srcdir)bootstrap
+\$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
 	cd \$(top_srcdir) && \$(SHELL) ./bootstrap
 
 EOF
