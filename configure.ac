@@ -3379,20 +3379,20 @@ AC_ARG_ENABLE(portaudio,
    fi])
 
 dnl
-dnl  aRts module
+dnl  aRts module -- broken (freeze wxWidgets)
 dnl
-AC_ARG_ENABLE(arts,
-  [  --enable-arts           aRts sound server (default disabled)],
-  [if test "${enable_arts}" = "yes"
-   then
-     AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
-     if test "${ARTS_CONFIG}" != "no"
-     then
-       VLC_ADD_PLUGINS([arts])
-       VLC_ADD_CFLAGS([arts],[`${ARTS_CONFIG} --cflags`])
-       VLC_ADD_LDFLAGS([arts],[`${ARTS_CONFIG} --libs `])
-     fi
-   fi])
+dnl AC_ARG_ENABLE(arts,
+dnl  [  --enable-arts           aRts sound server (default disabled)],
+dnl  [if test "${enable_arts}" = "yes"
+dnl   then
+dnl     AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
+dnl     if test "${ARTS_CONFIG}" != "no"
+dnl     then
+dnl       VLC_ADD_PLUGINS([arts])
+dnl       VLC_ADD_CFLAGS([arts],[`${ARTS_CONFIG} --cflags`])
+dnl       VLC_ADD_LDFLAGS([arts],[`${ARTS_CONFIG} --libs `])
+dnl     fi
+dnl   fi])
 
 dnl
 dnl  ALSA module

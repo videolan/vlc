@@ -1,5 +1,4 @@
 SOURCES_alsa = alsa.c
-SOURCES_arts = arts.c
 SOURCES_coreaudio = coreaudio.c
 SOURCES_aout_directx = directx.c
 SOURCES_esd = esd.c
