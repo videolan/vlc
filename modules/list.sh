@@ -4,10 +4,10 @@
 LANG=C
 export LANG
 
-TEMPFILE=/tmp/list.tmp
+TEMPFILE=/tmp/vlclist.tmp.$$
 LISTFILE=LIST
-LISTFILE2=/tmp/list2.tmp
-LISTFILE3=/tmp/list3.tmp
+LISTFILE2=/tmp/vlclist2.tmp.$$
+LISTFILE3=/tmp/vlclist3.tmp.$$
 
 
 rm -f $TEMPFILE
