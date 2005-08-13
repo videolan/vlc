@@ -1690,7 +1690,6 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         }
         else if( i_diff != 0 && !b_discontinuity )
         {
-            /* FIXME what to do when discontinuity_indicator is set ? */
             msg_Warn( p_demux, "discontinuity received 0x%x instead of 0x%x (pid=%d)",
                       i_cc, ( pid->i_cc + 1 )&0x0f, pid->i_pid );
 
