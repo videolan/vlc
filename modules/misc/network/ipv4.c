@@ -53,6 +53,7 @@
 #   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
+#   include <iphlpapi.h>
 #   define close closesocket
 #   if defined(UNDER_CE)
 #       undef IP_MULTICAST_TTL
@@ -333,16 +334,52 @@ static int OpenUDP( vlc_object_t * p_this )
          {
              struct ip_mreq imr;
 
+             imr.imr_interface.s_addr = INADDR_ANY;
              imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
              if( psz_if_addr != NULL && *psz_if_addr
                 && inet_addr(psz_if_addr) != INADDR_NONE )
             {
                 imr.imr_interface.s_addr = inet_addr(psz_if_addr);
             }
+#if defined (WIN32) || defined (UNDER_CE)
             else
             {
-                imr.imr_interface.s_addr = INADDR_ANY;
+                DWORD i_index;
+                if( GetBestInterface( sock.sin_addr.s_addr,
+                                      &i_index ) == NO_ERROR )
+                {
+                    PMIB_IPADDRTABLE p_table;
+                    DWORD i = 0;
+
+                    msg_Dbg( p_this, "Winsock best interface is %lu",
+                             (unsigned long)i_index );
+                    GetIpAddrTable( NULL, &i, 0 );
+
+                    p_table = (PMIB_IPADDRTABLE)malloc( i );
+                    if( p_table != NULL )
+                    {
+                        if( GetIpAddrTable( p_table, &i, 0 ) == NO_ERROR)
+                        {
+                            for( i = 0; i < p_table->dwNumEntries; i-- )
+                            {
+                                if( p_table->table[i].dwIndex == i_index )
+                                {
+                                    imr.imr_interface.s_addr =
+                                                     p_table->table[i].dwAddr;
+                                    msg_Dbg( p_this, "using interface 0x%08x",
+                                             p_table->table[i].dwAddr );
+                                }
+                            }
+                        }
+                        else
+                            msg_Warn( p_this, "GetIpAddrTable failed" );
+                        free( p_table );
+                    }
+                }
+                else
+                    msg_Dbg( p_this, "GetBestInterface failed" );
             }
+#endif
             if( psz_if_addr != NULL ) free( psz_if_addr );
 
             msg_Dbg( p_this, "IP_ADD_MEMBERSHIP multicast request" );
