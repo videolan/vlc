@@ -396,7 +396,7 @@ struct module_symbols_t
     void (*osd_ConfigUnload_inner) (vlc_object_t *, osd_menu_t **);
     void (*__osd_MenuShow_inner) (vlc_object_t *);
     picture_t * (*osd_Icon_inner) (int i_width, int i_height, short i_type);
-    void (*__osd_VolumeDown_inner) (vlc_object_t *);
+    void *__osd_VolumeDown_deprecated;
     void (*__osd_MenuNext_inner) (vlc_object_t *);
     void (*__osd_MenuDelete_inner) (vlc_object_t *, osd_menu_t *);
     void (*__osd_MenuHide_inner) (vlc_object_t *);
@@ -405,8 +405,9 @@ struct module_symbols_t
     void (*__osd_MenuDown_inner) (vlc_object_t *);
     osd_menu_t * (*__osd_MenuCreate_inner) (vlc_object_t *, const char *);
     void (*__osd_MenuPrev_inner) (vlc_object_t *);
-    void (*__osd_VolumeUp_inner) (vlc_object_t *);
+    void *__osd_VolumeUp_deprecated;
     void (*__osd_MenuActivate_inner) (vlc_object_t *);
+    void (*__osd_Volume_inner) (vlc_object_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -787,7 +788,6 @@ struct module_symbols_t
 #  define osd_ConfigUnload (p_symbols)->osd_ConfigUnload_inner
 #  define __osd_MenuShow (p_symbols)->__osd_MenuShow_inner
 #  define osd_Icon (p_symbols)->osd_Icon_inner
-#  define __osd_VolumeDown (p_symbols)->__osd_VolumeDown_inner
 #  define __osd_MenuNext (p_symbols)->__osd_MenuNext_inner
 #  define __osd_MenuDelete (p_symbols)->__osd_MenuDelete_inner
 #  define __osd_MenuHide (p_symbols)->__osd_MenuHide_inner
@@ -796,8 +796,8 @@ struct module_symbols_t
 #  define __osd_MenuDown (p_symbols)->__osd_MenuDown_inner
 #  define __osd_MenuCreate (p_symbols)->__osd_MenuCreate_inner
 #  define __osd_MenuPrev (p_symbols)->__osd_MenuPrev_inner
-#  define __osd_VolumeUp (p_symbols)->__osd_VolumeUp_inner
 #  define __osd_MenuActivate (p_symbols)->__osd_MenuActivate_inner
+#  define __osd_Volume (p_symbols)->__osd_Volume_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1181,7 +1181,6 @@ struct module_symbols_t
     ((p_symbols)->osd_ConfigUnload_inner) = osd_ConfigUnload; \
     ((p_symbols)->__osd_MenuShow_inner) = __osd_MenuShow; \
     ((p_symbols)->osd_Icon_inner) = osd_Icon; \
-    ((p_symbols)->__osd_VolumeDown_inner) = __osd_VolumeDown; \
     ((p_symbols)->__osd_MenuNext_inner) = __osd_MenuNext; \
     ((p_symbols)->__osd_MenuDelete_inner) = __osd_MenuDelete; \
     ((p_symbols)->__osd_MenuHide_inner) = __osd_MenuHide; \
@@ -1190,10 +1189,12 @@ struct module_symbols_t
     ((p_symbols)->__osd_MenuDown_inner) = __osd_MenuDown; \
     ((p_symbols)->__osd_MenuCreate_inner) = __osd_MenuCreate; \
     ((p_symbols)->__osd_MenuPrev_inner) = __osd_MenuPrev; \
-    ((p_symbols)->__osd_VolumeUp_inner) = __osd_VolumeUp; \
     ((p_symbols)->__osd_MenuActivate_inner) = __osd_MenuActivate; \
+    ((p_symbols)->__osd_Volume_inner) = __osd_Volume; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
+    (p_symbols)->__osd_VolumeDown_deprecated = NULL; \
+    (p_symbols)->__osd_VolumeUp_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */
