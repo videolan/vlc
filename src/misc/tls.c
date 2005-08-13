@@ -26,6 +26,69 @@
 
 #include "vlc_tls.h"
 
+static tls_t *
+tls_Init( vlc_object_t *p_this )
+{
+    tls_t *p_tls;
+    vlc_value_t lockval;
+
+    var_Create( p_this->p_libvlc, "tls_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "tls_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+
+    p_tls = vlc_object_find( p_this, VLC_OBJECT_TLS, FIND_ANYWHERE );
+
+    if( p_tls == NULL )
+    {
+        p_tls = vlc_object_create( p_this, VLC_OBJECT_TLS );
+        if( p_tls == NULL )
+        {
+            vlc_mutex_unlock( lockval.p_address );
+            return NULL;
+        }
+
+        p_tls->p_module = module_Need( p_tls, "tls", 0, 0 );
+        if( p_tls->p_module == NULL )
+        {
+            msg_Err( p_tls, "TLS/SSL provider not found" );
+            vlc_mutex_unlock( lockval.p_address );
+            vlc_object_destroy( p_tls );
+            return NULL;
+        }
+
+        vlc_object_attach( p_tls, p_this->p_vlc );
+        vlc_object_yield( p_tls );
+        msg_Dbg( p_tls, "TLS/SSL provider initialized" );
+    }
+    vlc_mutex_unlock( lockval.p_address );
+
+    return p_tls;
+}
+
+static void
+tls_Deinit( tls_t *p_tls )
+{
+    int i;
+    vlc_value_t lockval;
+
+    var_Get( p_tls->p_libvlc, "tls_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+
+    vlc_object_release( p_tls );
+    
+    i = p_tls->i_refcount;
+    if( i == 0 )
+        vlc_object_detach( p_tls );
+
+    vlc_mutex_unlock( lockval.p_address );
+
+    if( i == 0 )
+    {
+        module_Unneed( p_tls, p_tls->p_module );
+        msg_Dbg( p_tls, "TLS/SSL provider deinitialized" );
+        vlc_object_destroy( p_tls );
+    }
+}
 
 /*****************************************************************************
  * tls_ServerCreate:
@@ -40,30 +103,23 @@ tls_ServerCreate( vlc_object_t *p_this, const char *psz_cert,
     tls_t *p_tls;
     tls_server_t *p_server;
 
-    p_tls = vlc_object_create( p_this, VLC_OBJECT_TLS );
-    vlc_object_attach( p_tls, p_this );
+    p_tls = tls_Init( p_this );
+    if( p_tls == NULL )
+        return NULL;
 
-    p_tls->p_module = module_Need( p_tls, "tls", 0, 0 );
-    if( p_tls->p_module != NULL )
+    if( psz_key == NULL )
+        psz_key = psz_cert;
+
+    p_server = p_tls->pf_server_create( p_tls, psz_cert, psz_key );
+    if( p_server != NULL )
     {
-        if( psz_key == NULL )
-            psz_key = psz_cert;
-
-        p_server = p_tls->pf_server_create( p_tls, psz_cert, psz_key );
-        if( p_server != NULL )
-        {
-            msg_Dbg( p_tls, "TLS/SSL provider initialized" );
-            return p_server;
-        }
-        else
-            msg_Err( p_tls, "TLS/SSL provider error" );
-        module_Unneed( p_tls, p_tls->p_module );
+        msg_Dbg( p_tls, "TLS/SSL server initialized" );
+        return p_server;
     }
     else
-        msg_Err( p_tls, "TLS/SSL provider not found" );
+        msg_Err( p_tls, "TLS/SSL server error" );
 
-    vlc_object_detach( p_tls );
-    vlc_object_destroy( p_tls );
+    tls_Deinit( p_tls );
     return NULL;
 }
 
@@ -80,9 +136,7 @@ tls_ServerDelete( tls_server_t *p_server )
 
     p_server->pf_delete( p_server );
 
-    module_Unneed( p_tls, p_tls->p_module );
-    vlc_object_detach( p_tls );
-    vlc_object_destroy( p_tls );
+    tls_Deinit( p_tls );
 }
 
 
@@ -98,38 +152,31 @@ tls_ClientCreate( vlc_object_t *p_this, int fd, const char *psz_hostname )
     tls_t *p_tls;
     tls_session_t *p_session;
 
-    p_tls = vlc_object_create( p_this, VLC_OBJECT_TLS );
-    vlc_object_attach( p_tls, p_this );
-
-    p_tls->p_module = module_Need( p_tls, "tls", 0, 0 );
-    if( p_tls->p_module != NULL )
+    p_tls = tls_Init( p_this );
+    if( p_tls == NULL )
+        return NULL;
+        
+    p_session = p_tls->pf_client_create( p_tls );
+    if( p_session != NULL )
     {
-        p_session = p_tls->pf_client_create( p_tls );
-        if( p_session != NULL )
-        {
-            int i_val;
+        int i_val;
 
-            for( i_val = tls_ClientSessionHandshake( p_session, fd,
-                                                     psz_hostname );
-                 i_val > 0;
-                 i_val = tls_SessionContinueHandshake( p_session ) );
-            
-            if( i_val == 0 )
-            {
-                msg_Dbg( p_this, "TLS/SSL provider initialized" );
-                return p_session;
-            }
-            msg_Err( p_this, "TLS/SSL session handshake error" );
+        for( i_val = tls_ClientSessionHandshake( p_session, fd,
+                                                 psz_hostname );
+             i_val > 0;
+             i_val = tls_SessionContinueHandshake( p_session ) );
+
+        if( i_val == 0 )
+        {
+            msg_Dbg( p_this, "TLS/SSL client initialized" );
+            return p_session;
         }
-        else
-            msg_Err( p_this, "TLS/SSL provider error" );
-        module_Unneed( p_tls, p_tls->p_module );
+        msg_Err( p_this, "TLS/SSL session handshake error" );
     }
     else
-        msg_Err( p_this, "TLS/SSL provider not found" );
+        msg_Err( p_this, "TLS/SSL client error" );
 
-    vlc_object_detach( p_tls );
-    vlc_object_destroy( p_tls );
+    tls_Deinit( p_tls );
     return NULL;
 }
 
@@ -146,7 +193,5 @@ tls_ClientDelete( tls_session_t *p_session )
 
     p_session->pf_close( p_session );
 
-    module_Unneed( p_tls, p_tls->p_module );
-    vlc_object_detach( p_tls );
-    vlc_object_destroy( p_tls );
+    tls_Deinit( p_tls );
 }
