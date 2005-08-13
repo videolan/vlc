@@ -2,7 +2,7 @@
 # Building the Mozilla plugin
 ###############################################################################
 
-noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
+EXTRA_LIBRARIES = libplugin.a
 	                                     
 MOSTLYCLEANFILES = $(LIBRARIES_mozilla)
 EXTRA_DIST = $(SOURCES_mozilla) $(DIST_rsrc) vlcintf.idl
@@ -51,10 +51,6 @@ endif
 endif
 
 if BUILD_MOZILLA
-if UNTRUE
-noinst_LIBRARIES_mozilla = libplugin.a
-endif
-
 libplugin_a_SOURCES = $(SOURCES_mozilla)
 libplugin_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla $(pic)` \
 	             $(CPPFLAGS_mozilla_EXTRA) -Imozilla
