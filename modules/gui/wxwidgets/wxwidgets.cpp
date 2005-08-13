@@ -332,8 +332,9 @@ bool Instance::OnInit()
     locale.Init( wxLANGUAGE_DEFAULT );
 
     /* FIXME: The stream output mrl parsing uses ',' already so we want to
-     * keep the default '.' for floating point numbers. */
-    setlocale( LC_NUMERIC, "C" );
+     * keep the default '.' for floating point numbers.
+     * XXX (dionoea 13/08/2005) : This breaks prefs handling for floats
+     * setlocale( LC_NUMERIC, "C" ); */
 
     /* Load saved window settings */
     p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );

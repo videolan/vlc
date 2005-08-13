@@ -460,13 +460,13 @@ void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
 {
     bool b_waschecked = false;
     wxString newtext =  text->GetValue();
-    
+
     for( unsigned int i = 0 ; i< pp_checkboxes.size() ; i++ )
     {
         b_waschecked = newtext.Find( wxU(pp_checkboxes[i]->psz_module)) != -1 ;
         /* For some reasons, ^^ doesn't compile :( */
         if( (pp_checkboxes[i]->checkbox->IsChecked() && ! b_waschecked )||
-			(! pp_checkboxes[i]->checkbox->IsChecked() && b_waschecked) )
+            (! pp_checkboxes[i]->checkbox->IsChecked() && b_waschecked) )
         {
             if( b_waschecked )
             {
@@ -477,7 +477,7 @@ void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
                 {
                     if( ! newtext.Replace(wxString(wxU(pp_checkboxes[i]->psz_module))
                                            + wxT(":"),wxT("")))
-		    { 
+            {
                         newtext.Replace(wxU(pp_checkboxes[i]->psz_module),wxU(""));
                     }
                 }
