@@ -305,21 +305,14 @@ VLC_EXPORT( void, __osd_MenuDown, ( vlc_object_t * ) );
 #define osd_MenuDown(object) __osd_MenuDown( VLC_OBJECT(object) )
 
 /**
- * Turn Volume Up
+ * Display the audio volume bitmap.
  *
- * Use the OSD menu to turn the audio volume up.
+ * Display the correct audio volume bitmap that corresponds to the
+ * current Audio Volume setting.
  */
-VLC_EXPORT( void, __osd_VolumeUp, ( vlc_object_t * ) );
+VLC_EXPORT( void, __osd_Volume, ( vlc_object_t * ) );
 
-/**
- * Turn Volume Down
- *
- * Use the OSD menu to turn the audio volume down.
- */
-VLC_EXPORT( void, __osd_VolumeDown, ( vlc_object_t * ) );
-
-#define osd_VolumeUp(object)   __osd_VolumeUp( VLC_OBJECT(object) )
-#define osd_VolumeDown(object) __osd_VolumeDown( VLC_OBJECT(object) )
+#define osd_Volume(object)     __osd_Volume( VLC_OBJECT(object) )
 
 /**
  * Retrieve a non modifyable pointer to the OSD Menu state

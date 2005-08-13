@@ -1686,7 +1686,8 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
                 var_Set( p_intf->p_vlc, "key-pressed", keyval );
             }        
             i_error = aout_VolumeSet( p_this, i_volume );
-            msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
+            osd_Volume( p_this );
+            msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );            
         }
     }
     else
@@ -1724,14 +1725,13 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
     {
         if ( aout_VolumeUp( p_this, i_nb_steps, &i_volume ) < 0 )
             i_error = VLC_EGENERIC;
-        osd_VolumeUp( p_this );
     }
     else
     {
         if ( aout_VolumeDown( p_this, i_nb_steps, &i_volume ) < 0 )
             i_error = VLC_EGENERIC;
-        osd_VolumeDown( p_this );
     }
+    osd_Volume( p_this );
 
     if ( !i_error ) msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
     return i_error;

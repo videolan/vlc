@@ -33,6 +33,9 @@
 
 #undef OSD_MENU_DEBUG
 
+/* 3 is a magic number for 32 volume decrease steps */
+#define OSD_VOLUME_STEPS(i_volume,i_n) (i_volume/AOUT_VOLUME_STEP) / (AOUT_VOLUME_STEP/(i_n-1))
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -77,7 +80,7 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
 
         /* Update the volume state images to match the current volume */
         i_volume = config_GetInt( p_this, "volume" );
-        i_steps = (i_volume / AOUT_VOLUME_STEP / 3); /* 3 is a magic number for 32 volume decrease steps */
+        i_steps = OSD_VOLUME_STEPS( i_volume, p_osd->p_state->p_volume->i_ranges );
         p_osd->p_state->p_volume->p_current_state = osd_VolumeStateChange( p_osd->p_state->p_volume->p_states, i_steps );
 
         /* Initialize OSD state */
@@ -156,6 +159,8 @@ static inline osd_state_t *osd_VolumeStateChange( osd_state_t *p_current, int i_
 {
     osd_state_t *p_temp = NULL;
     int i;
+
+    if( i_steps < 0 ) i_steps = 0;
     
     for( i=0; (i < i_steps) && (p_current != NULL); i++ )
     {    
@@ -522,12 +527,12 @@ void __osd_MenuDown( vlc_object_t *p_this )
 }
 
 /**
- * Audio volume up
+ * Display current audio volume bitmap
  *
  * The OSD Menu audio volume bar is updated to reflect the new audio volume. Call this function
- * when the audio volume is updated outside the OSD menu command "menu up".
+ * when the audio volume is updated outside the OSD menu command "menu up", "menu down" or "menu select".
  */
-void __osd_VolumeUp( vlc_object_t *p_this )
+void __osd_Volume( vlc_object_t *p_this )
 {
     osd_menu_t *p_osd = NULL;
     osd_button_t *p_button = NULL;
@@ -537,77 +542,24 @@ void __osd_VolumeUp( vlc_object_t *p_this )
     
     if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
     {
-        msg_Err( p_this, "osd_VolumeUp failed" );
+        msg_Err( p_this, "OSD menu volume update failed" );
         return;
     }
     
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
-    /* Update the volume state images to match the current volume */
-    i_volume = config_GetInt( p_this, "volume" );
-    i_steps = (i_volume / AOUT_VOLUME_STEP / 3); /* 3 is a magic number for 32 volume decrease steps */
-    p_osd->p_state->p_volume->p_current_state = osd_VolumeStateChange( p_osd->p_state->p_volume->p_states, i_steps );
-    
     p_button = p_osd->p_state->p_volume;
     if( p_osd->p_state->p_volume ) 
         p_osd->p_state->p_visible = p_osd->p_state->p_volume;
     if( p_button && p_button->b_range )
     {
-        osd_state_t *p_temp = p_button->p_current_state;
-        if( p_temp->p_next )
-            p_button->p_current_state = p_temp->p_next;
-        
-        osd_UpdateState( p_osd->p_state, 
-                p_button->i_x, p_button->i_y,
-                p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
-                p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
-                p_button->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
-        osd_SetMenuVisible( p_osd, VLC_TRUE );
-    }
-    vlc_object_release( (vlc_object_t*) p_osd );
-    vlc_mutex_unlock( lockval.p_address );
-}
+        /* Update the volume state images to match the current volume */
+        i_volume = config_GetInt( p_this, "volume" );
+        i_steps = OSD_VOLUME_STEPS( i_volume, p_button->i_ranges );
+        p_button->p_current_state = osd_VolumeStateChange( p_button->p_states, i_steps );
 
-/**
- * Audio volume down
- *
- * The OSD Menu audio volume bar is updated to reflect the new audio volume. Call this function
- * when the audio volume is updated outside the OSD menu command "menu down".
- */
-void __osd_VolumeDown( vlc_object_t *p_this )
-{
-    osd_menu_t *p_osd = NULL;
-    osd_button_t *p_button = NULL;
-    vlc_value_t lockval;
-    int i_volume = 0;
-    int i_steps = 0;
-        
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
-    {
-        msg_Err( p_this, "osd_VolumeDown failed" );
-        return;
-    }
-    
-    var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
-    vlc_mutex_lock( lockval.p_address );
-
-    /* Update the volume state images to match the current volume */
-    i_volume = config_GetInt( p_this, "volume" );
-    i_steps = (i_volume / AOUT_VOLUME_STEP / 3); /* 3 is a magic number for 32 volume decrease steps */
-    p_osd->p_state->p_volume->p_current_state = osd_VolumeStateChange( p_osd->p_state->p_volume->p_states, i_steps );
-
-    p_button = p_osd->p_state->p_volume;
-    if( p_osd->p_state->p_volume ) 
-        p_osd->p_state->p_visible = p_osd->p_state->p_volume;            
-    if( p_button && p_button->b_range )
-    {
-        osd_state_t *p_temp = p_button->p_current_state;
-        if( p_temp && p_temp->p_prev )
-            p_button->p_current_state = p_temp->p_prev;
-
-        osd_UpdateState( p_osd->p_state, 
+        osd_UpdateState( p_osd->p_state,
                 p_button->i_x, p_button->i_y,
                 p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
                 p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
