@@ -1065,7 +1065,8 @@ stamp-builtin: FORCE
 	@if test ! -f $@; then printf "" > $@; fi
 
 stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl src/misc/modules_builtin.h.in
-	cd $(srcdir) && cat $(HEADERS_include) | perl ./vlc-api.pl
+	( cd $(srcdir) && cat $(HEADERS_include) ) | \
+	  ( pwd; top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl )
 	touch stamp-api
 
 ###############################################################################
