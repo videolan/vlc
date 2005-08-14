@@ -224,8 +224,8 @@ if !BUILD_MOZILLA
 pic = no
 else
 if HAVE_WIN32
-dnl There's no need for pic code on win32 so get rid of this to substantially
-dnl reduce the compilation time.
+### There's no need for pic code on win32 so get rid of this to substantially
+### reduce the compilation time.
 pic = no
 endif
 endif
