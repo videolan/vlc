@@ -402,7 +402,7 @@ static int OpenDemux( vlc_object_t *p_this )
         }
 
         i_max_sdp += 1000;
-        psz_sdp = (uint8_t*)realloc( psz_sdp, i_max_sdp );
+        psz_sdp = (char *)realloc( psz_sdp, i_max_sdp );
     }
 
     p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
@@ -584,16 +584,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 {
     int                 i_version, i_address_type, i_hash, i;
-    uint8_t             *psz_sdp;
-    uint8_t             *psz_initial_sdp;
+    char                *psz_sdp, *psz_foo, *psz_initial_sdp;
     sdp_t               *p_sdp;
     vlc_bool_t          b_compressed;
     vlc_bool_t          b_need_delete = VLC_FALSE;
-#ifdef HAVE_ZLIB_H
-    int                 i_decompressed_size;
-    uint8_t             *p_decompressed_buffer;
-#endif
-    uint8_t             *psz_foo;
 
     /* First, check the sap announce is correct */
     i_version = p_buffer[0] >> 5;
@@ -632,7 +626,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         return VLC_EGENERIC;
     }
 
-    psz_sdp  = &p_buffer[4];
+    psz_sdp  = (char *)p_buffer + 4;
     psz_initial_sdp = psz_sdp;
 
     if( i_address_type == 0 ) /* ipv4 source address */
@@ -657,8 +651,11 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     if( b_compressed )
     {
 #ifdef HAVE_ZLIB_H
-        i_decompressed_size = Decompress( psz_sdp,
-                   &p_decompressed_buffer,i_read - ( psz_sdp - p_buffer ) );
+        uint8_t *p_decompressed_buffer = NULL;
+        int      i_decompressed_size;
+
+        i_decompressed_size = Decompress( (uint8_t *)psz_sdp,
+                   &p_decompressed_buffer, i_read - ( psz_sdp - (char *)p_buffer ) );
         if( i_decompressed_size > 0 && i_decompressed_size < MAX_SAP_BUFFER )
         {
             memcpy( psz_sdp, p_decompressed_buffer, i_decompressed_size );
@@ -695,11 +692,11 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     {
         psz_sdp++;
     }
-    if( psz_sdp != psz_foo && strcasecmp( psz_foo, "application/sdp" ) )
+    if( ( psz_sdp != psz_foo ) && strcasecmp( psz_foo, "application/sdp" ) )
     {
         msg_Dbg( p_sd, "unhandled content type: %s", psz_foo );        
     }
-    if( psz_sdp -p_buffer >= i_read )
+    if( ( psz_sdp - (char *)p_buffer ) >= i_read )
     {
         msg_Warn( p_sd, "package without content" );
         return VLC_EGENERIC;
