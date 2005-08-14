@@ -2247,7 +2247,8 @@ static vlc_bool_t DVBProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
     demux_sys_t          *p_sys = p_demux->p_sys;
 
     if ( !p_sys->b_dvb_control ) return VLC_FALSE;
-    if ( p_sys->i_dvb_program == -1 && p_sys->p_programs_list == NULL )
+    if ( (p_sys->i_dvb_program == -1 && p_sys->p_programs_list == NULL)
+           || p_sys->i_dvb_program == 0 )
         return VLC_TRUE;
     if ( p_sys->i_dvb_program == i_pgrm ) return VLC_TRUE;
 
