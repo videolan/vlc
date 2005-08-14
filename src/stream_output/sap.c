@@ -332,6 +332,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             else
             /* other addresses => 224.2.127.254 */
                 ipv4 = 0xe0027ffe;
+
+            ((struct sockaddr_in *)&addr)->sin_addr.s_addr = htonl( ipv4 );
             break;
         }
         
