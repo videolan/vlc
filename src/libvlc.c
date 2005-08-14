@@ -1920,6 +1920,7 @@ static void SetLanguage ( char const *psz_lang )
         setlocale( LC_ALL, psz_lang );
         setlocale(LC_NUMERIC, "C" );
     }
+    setlocale( LC_ALL, "C" );
 
     /* Specify where to find the locales for current domain */
 #if !defined( SYS_DARWIN ) && !defined( WIN32 ) && !defined( SYS_BEOS )
