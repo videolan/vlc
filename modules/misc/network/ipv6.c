@@ -194,7 +194,7 @@ static int OpenUDP( vlc_object_t * p_this )
 # ifdef IPV6_PROTECTION_LEVEL
     if( ptr->ai_family == AF_INET6 )
     {
-        int i_val = PROTECTION_LEVEL_UNRESTRICTED;
+        int i_val = 30 /*PROTECTION_LEVEL_UNRESTRICTED*/;
         setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
                     sizeof( i_val ) );
     }

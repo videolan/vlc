@@ -128,7 +128,7 @@ static int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
 # ifdef IPV6_PROTECTION_LEVEL
     if( i_family == AF_INET6 )
     {
-        i_val = PROTECTION_LEVEL_UNRESTRICTED;
+        i_val = 30 /*PROTECTION_LEVEL_UNRESTRICTED*/;
         setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
                    (const char*)&i_val, sizeof( i_val ) );
     }
