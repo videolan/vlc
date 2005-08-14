@@ -167,6 +167,7 @@ case "${target_os}" in
         VLC_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
         VLC_ADD_LDFLAGS([vcdx cddax],[-lwinmm])
         VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync],[-lws2_32])
+        VLC_ADD_LDFLAGS([ipv4],[-liphlpapi])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
@@ -174,7 +175,8 @@ case "${target_os}" in
         VLC_ADD_CPPFLAGS([vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([vlc],[-lws2 -e WinMainCRTStartup])
         VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
-    fi
+         VLC_ADD_LDFLAGS([ipv4],[-liphlpapi])
+   fi
     ;;
   *nto*)
     SYS=nto
