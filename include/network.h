@@ -399,7 +399,9 @@ int inet_pton(int af, const char *src, void *dst);
 # define net_StopSend( fd ) (void)shutdown( fd, SD_SEND )
 # define net_StopRecv( fd ) (void)shutdown( fd, SD_RECEIVE )
 #else
-# warning FIXME: implement shutdown on your platform!
+# ifndef SYS_BEOS /* R5 just doesn't have a working shutdown() */
+#  warning FIXME: implement shutdown on your platform!
+# endif
 # define net_StopSend( fd ) (void)0
 # define net_StopRecv( fd ) (void)0
 #endif
@@ -515,13 +517,13 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, const c
                    && ( ntohl( v4->sin_addr.s_addr ) <= 0xefffffff );
 #endif
     }
+#if defined( WIN32 ) || defined( HAVE_GETADDRINFO )
     else if( res->ai_family == AF_INET6 )
     {
-#if defined( WIN32 ) || defined( HAVE_GETADDRINFO )
         struct sockaddr_in6 *v6 = (struct sockaddr_in6 *)res->ai_addr;
         b_multicast = IN6_IS_ADDR_MULTICAST( &v6->sin6_addr );
-#endif
     }
+#endif
     
     vlc_freeaddrinfo( res );
     return b_multicast;

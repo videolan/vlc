@@ -271,6 +271,7 @@ static void parseEXTINF(char *psz_string, char **ppsz_author,
 {
     char *end=NULL;
     char *psz_item=NULL;
+    char *pos;
 
     end = psz_string + strlen( psz_string );
 
@@ -299,7 +300,6 @@ static void parseEXTINF(char *psz_string, char **ppsz_author,
     }
 
     /* read the author */
-    char *pos;
     /* parse the author until unescaped comma is reached */
     psz_item = pos = psz_string;
     while( psz_string < end && *psz_string != ',' )

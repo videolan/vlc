@@ -42,7 +42,9 @@
 #   include <ws2tcpip.h>
 #else
 #   include <netdb.h>
-#   include <arpa/inet.h>
+#   ifdef HAVE_ARPA_INET_H
+#       include <arpa/inet.h>
+#   endif
 #endif
 #include "charset.h"
 
@@ -447,8 +449,21 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     psz_head[2] = (i_hash & 0xFF00) >> 8; /* Msg id hash */
     psz_head[3] = (i_hash & 0xFF);        /* Msg id hash 2 */
 
-    inet_pton( b_ipv6 ? AF_INET6 : AF_INET, /* can't fail */
-               p_sap_session->p_address->psz_machine, psz_head + 4 );
+#if defined (HAVE_INET_PTON) || defined (WIN32)
+    if( b_ipv6 )
+    {
+        inet_pton( AF_INET6, /* can't fail */
+                   p_sap_session->p_address->psz_machine,
+                   psz_head + 4 );
+    }
+    else
+#else
+    {
+        inet_pton( AF_INET, /* can't fail */
+                   p_sap_session->p_address->psz_machine,
+                   psz_head + 4 );
+    }
+#endif
 
     memcpy( psz_head + (b_ipv6 ? 20 : 8), "application/sdp", 15 );
 

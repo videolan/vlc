@@ -1248,7 +1248,7 @@ int inet_pton(int af, const char *src, void *dst)
     if( ipv4 == INADDR_NONE )
         return -1;
 
-    memcpy( dst; &ipv4, 4 );
+    memcpy( dst, &ipv4, 4 );
 # endif /* WIN32 */
     return 0;
 }
