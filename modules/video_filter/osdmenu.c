@@ -338,18 +338,9 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
         return NULL;
     }
-    if( fmt.i_chroma == VLC_FOURCC('Y','U','V','P') )
+    if( !p_pic && fmt.i_chroma == VLC_FOURCC('Y','U','V','P') )
     {
-        int i;
-        
-        p_region->fmt.p_palette->i_entries = 4;
-        for( i = 0; i < 4; i++ )
-        {
-            p_region->fmt.p_palette->palette[i][0] = 0;
-            p_region->fmt.p_palette->palette[i][1] = 0;
-            p_region->fmt.p_palette->palette[i][2] = 0;
-            p_region->fmt.p_palette->palette[i][3] = 0;
-        }
+        p_region->fmt.p_palette->i_entries = 0;
         fmt.i_width = fmt.i_visible_width = 0;
         fmt.i_height = fmt.i_visible_height = 0;
     }
