@@ -312,8 +312,12 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
 }    
 #endif
 
+static void osdmenu_RegionPictureRelease( picture_t *p_pic )
+{
+    if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
+}
 /*****************************************************************************
- * create_picture_region : compose a text region SPU
+ * create_picture_region : compose a picture region SPU
  *****************************************************************************/
 static subpicture_region_t *create_picture_region( filter_t *p_filter, subpicture_t *p_spu,
     int i_width, int i_height, picture_t *p_pic )
@@ -321,7 +325,9 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     subpicture_region_t *p_region;
     video_format_t       fmt;    
 
-        /* Create new SPU region */
+    if( !p_spu ) return NULL;
+    
+    /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
@@ -336,11 +342,32 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
         return NULL;
     }
-    vout_CopyPicture( p_filter, &p_region->picture, p_pic );
+    if( p_pic )
+        vout_CopyPicture( p_filter, &p_region->picture, p_pic );
+    else
+    {
+        picture_t *dest_pic = NULL;
+
+        /* Create an empty subpicture */
+        dest_pic = (picture_t*) malloc( sizeof( picture_t ) );
+        if( vout_AllocatePicture( p_filter, dest_pic,
+                            fmt.i_chroma,
+                            fmt.i_width,
+                            fmt.i_height,
+                            fmt.i_aspect )
+            != VLC_SUCCESS )
+        {
+            free( dest_pic );
+            return NULL;
+        }
+        dest_pic->pf_release = osdmenu_RegionPictureRelease;
+        vout_CopyPicture( p_filter, &p_region->picture, dest_pic );
+        dest_pic->pf_release( dest_pic );
+    }
     p_region->i_x = 0;
     p_region->i_y = 0;
 
-#if 0        
+#if 0
     msg_Dbg( p_filter, "SPU picture region position (%d,%d) (%d,%d) [%p]", 
         p_region->i_x, p_region->i_y, 
         p_region->fmt.i_width, p_region->fmt.i_height, p_pic );
@@ -359,7 +386,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
     
-    if( !p_filter->p_sys->b_update ) return NULL;
+    if( !p_filter->p_sys->b_update &&
+        (p_sys->i_last_date + (mtime_t)(p_sys->i_timeout * 1000000) < i_date) )
+            return NULL;
 
     p_filter->p_sys->i_last_date = i_date;
     p_filter->p_sys->b_update = VLC_FALSE; 
@@ -370,7 +399,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     
     p_spu->b_absolute = p_sys->b_absolute;    
     p_spu->i_start = p_sys->i_last_date = i_date; 
-    /* this never works why ? */
     p_spu->i_stop = (p_sys->i_timeout == 0) ? 0 : i_date + (mtime_t)(p_sys->i_timeout * 1000000);
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_fade = VLC_TRUE;    
@@ -380,20 +408,33 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     /* Send an empty subpicture to clear the display
      * when OSD menu should be hidden and menu picture is not allocated.
      */
-    if( !p_filter->p_sys->p_menu->p_state->p_pic )
+    if( !p_filter->p_sys->p_menu->p_state->p_pic ||
+        ( p_filter->p_sys->b_visible == VLC_FALSE ) )
+    {
+        /* Create new spu regions and allocate an empty picture in it. */    
+        p_region = create_picture_region( p_filter, p_spu, 
+            p_filter->p_sys->p_menu->p_state->i_width,
+            p_filter->p_sys->p_menu->p_state->i_height, 
+            NULL );
+        /* proper positioning of OSD menu image */
+        p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
+        p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
+        
+        p_spu->p_region = p_region;
+        msg_Dbg( p_filter, "sending empty subpicture." );
         return p_spu;
-    if( p_filter->p_sys->b_visible == VLC_FALSE )
-        return p_spu;
-            
+    }
+    
     /* Create new spu regions */    
     p_region = create_picture_region( p_filter, p_spu, 
-        p_filter->p_sys->p_menu->p_state->i_width, p_filter->p_sys->p_menu->p_state->i_height, 
+        p_filter->p_sys->p_menu->p_state->i_width,
+        p_filter->p_sys->p_menu->p_state->i_height, 
         p_filter->p_sys->p_menu->p_state->p_pic );
-    #if 0        
+#if 0
     p_region->p_next = create_text_region( p_filter, p_spu, 
         p_filter->p_sys->p_menu->p_state->i_width, p_filter->p_sys->p_menu->p_state->i_height,         
         p_filter->p_sys->p_menu->p_state->p_visible->psz_action );
-    #endif  
+#endif
     
     /* proper positioning of OSD menu image */
     p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
