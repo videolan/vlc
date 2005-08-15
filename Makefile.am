@@ -275,7 +275,8 @@ vlc-config.in: vlc-config.in.in
 
 $(SOURCES): vlc-config
 
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES) stamp-builtin
+DISTCLEANFILES = vlc-config.in vlc-config
 
 lib_LIBRARIES = lib/libvlc.a $(LIBRARIES_libvlc_pic)
 
@@ -1051,10 +1052,6 @@ update-po:
 ###############################################################################
 # Stamp rules
 ###############################################################################
-clean: clean-stamp clean-recursive
-clean-stamp:
-	rm -f stamp-builtin stamp-api
-
 stamp-builtin: FORCE
 	@for dep in "" `$(VLC_CONFIG) --target builtin`; do \
 	  if test "$${dep}" -nt "$(top_builddir)/vlc$(EXEEXT)"; then \
