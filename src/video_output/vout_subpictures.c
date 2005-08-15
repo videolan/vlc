@@ -263,7 +263,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
             malloc( sizeof(video_palette_t) );
     else p_fmt->p_palette = p_region->fmt.p_palette = NULL;
 
-    p_region->picture.p_data_orig = 0;
+    p_region->picture.p_data_orig = NULL;
 
     if( p_fmt->i_chroma == VLC_FOURCC('T','E','X','T') ) return p_region;
 
