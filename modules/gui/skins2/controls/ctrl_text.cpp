@@ -44,14 +44,14 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                     const GenericFont &rFont, const UString &rHelp,
                     uint32_t color, VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
-    m_rVariable( rVariable ), m_cmdToManual( pIntf, this ),
-    m_cmdManualMoving( pIntf, this ), m_cmdManualStill( pIntf, this ),
-    m_cmdMove( pIntf, this ), m_pEvt( NULL ), m_rFont( rFont ),
+    m_rVariable( rVariable ), m_cmdToManual( this ),
+    m_cmdManualMoving( this ), m_cmdManualStill( this ),
+    m_cmdMove( this ), m_pEvt( NULL ), m_rFont( rFont ),
     m_color( color ), m_pImg( NULL ), m_pImgDouble( NULL ),
-    m_pCurrImg( NULL ), m_xPos( 0 ), m_xOffset( 0 )
+    m_pCurrImg( NULL ), m_xPos( 0 ), m_xOffset( 0 ),
+    m_cmdUpdateText( this )
 {
-    m_pTimer = OSFactory::instance( getIntf() )->createOSTimer(
-        Callback( this, &updateText ) );
+    m_pTimer = OSFactory::instance( pIntf )->createOSTimer( m_cmdUpdateText );
 
     // States
     m_fsm.addState( "still" );
@@ -254,72 +254,70 @@ void CtrlText::onChangePosition()
 
 void CtrlText::CmdToManual::execute()
 {
-    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
 
     // Compute the offset
-    m_pControl->m_xOffset = pEvtMouse->getXPos() - m_pControl->m_xPos;
+    m_pParent->m_xOffset = pEvtMouse->getXPos() - m_pParent->m_xPos;
 
-    m_pControl->m_pTimer->stop();
-    m_pControl->captureMouse();
+    m_pParent->m_pTimer->stop();
+    m_pParent->captureMouse();
 }
 
 
 void CtrlText::CmdManualMoving::execute()
 {
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 
     // Start the automatic movement, but only if the text is wider than the
     // control
-    if( m_pControl->m_pImg &&
-        m_pControl->m_pImg->getWidth() >= m_pControl->getPosition()->getWidth() )
+    if( m_pParent->m_pImg &&
+        m_pParent->m_pImg->getWidth() >= m_pParent->getPosition()->getWidth() )
     {
         // The current image may have been set incorrectly in displayText(), so
         // set the correct value
-        m_pControl->m_pCurrImg = m_pControl->m_pImgDouble;
+        m_pParent->m_pCurrImg = m_pParent->m_pImgDouble;
 
-        m_pControl->m_pTimer->start( MOVING_TEXT_DELAY, false );
+        m_pParent->m_pTimer->start( MOVING_TEXT_DELAY, false );
     }
 }
 
 
 void CtrlText::CmdManualStill::execute()
 {
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 }
 
 
 void CtrlText::CmdMove::execute()
 {
-    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
 
     // Do nothing if the text fits in the control
-    if( m_pControl->m_pImg &&
-        m_pControl->m_pImg->getWidth() >= m_pControl->getPosition()->getWidth() )
+    if( m_pParent->m_pImg &&
+        m_pParent->m_pImg->getWidth() >= m_pParent->getPosition()->getWidth() )
     {
         // The current image may have been set incorrectly in displayText(), so
         // we set the correct value
-        m_pControl->m_pCurrImg = m_pControl->m_pImgDouble;
+        m_pParent->m_pCurrImg = m_pParent->m_pImgDouble;
 
         // Compute the new position of the left side, and make sure it is
         // in the correct range
-        m_pControl->m_xPos = (pEvtMouse->getXPos() - m_pControl->m_xOffset);
-        m_pControl->adjust( m_pControl->m_xPos );
+        m_pParent->m_xPos = (pEvtMouse->getXPos() - m_pParent->m_xOffset);
+        m_pParent->adjust( m_pParent->m_xPos );
 
-        m_pControl->notifyLayout( m_pControl->getPosition()->getWidth(),
-                             m_pControl->getPosition()->getHeight() );
+        m_pParent->notifyLayout( m_pParent->getPosition()->getWidth(),
+                             m_pParent->getPosition()->getHeight() );
     }
 }
 
 
-void CtrlText::updateText( SkinObject *pCtrl )
+void CtrlText::CmdUpdateText::execute()
 {
-    CtrlText *m_pControl = (CtrlText*)pCtrl;
+    m_pParent->m_xPos -= MOVING_TEXT_STEP;
+    m_pParent->adjust( m_pParent->m_xPos );
 
-    m_pControl->m_xPos -= MOVING_TEXT_STEP;
-    m_pControl->adjust( m_pControl->m_xPos );
-
-    m_pControl->notifyLayout( m_pControl->getPosition()->getWidth(),
-                         m_pControl->getPosition()->getHeight() );
+    m_pParent->notifyLayout( m_pParent->getPosition()->getWidth(),
+                         m_pParent->getPosition()->getHeight() );
 }
 
 

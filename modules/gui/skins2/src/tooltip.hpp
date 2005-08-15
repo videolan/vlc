@@ -26,6 +26,7 @@
 #define TOOLTIP_HPP
 
 #include "../utils/var_text.hpp"
+#include "../commands/cmd_generic.hpp"
 
 class GenericFont;
 class OSTooltip;
@@ -72,8 +73,8 @@ class Tooltip: public SkinObject, public Observer<VarText>
         /// Build m_pImage with the given text
         void makeImage( const UString &rText );
 
-        /// Show the tooltip window
-        static void doShow( SkinObject *pObj );
+        /// Callback to show the tooltip window
+        DEFINE_CALLBACK( Tooltip, Show );
 };
 
 

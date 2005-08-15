@@ -37,9 +37,9 @@ CtrlMove::CtrlMove( intf_thread_t *pIntf, WindowManager &rWindowManager,
     CtrlFlat( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rWindowManager( rWindowManager ),
     m_rCtrl( rCtrl ), m_rWindow( rWindow ),
-    m_cmdMovingMoving( pIntf, this ),
-    m_cmdStillMoving( pIntf, this ),
-    m_cmdMovingStill( pIntf, this )
+    m_cmdMovingMoving( this ),
+    m_cmdStillMoving( this ),
+    m_cmdMovingStill( this )
 {
     m_pEvt = NULL;
     m_xPos = 0;
@@ -98,33 +98,33 @@ void CtrlMove::handleEvent( EvtGeneric &rEvent )
 
 void CtrlMove::CmdStillMoving::execute()
 {
-    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
 
-    m_pControl->m_xPos = pEvtMouse->getXPos();
-    m_pControl->m_yPos = pEvtMouse->getYPos();
+    m_pParent->m_xPos = pEvtMouse->getXPos();
+    m_pParent->m_yPos = pEvtMouse->getYPos();
 
-    m_pControl->captureMouse();
+    m_pParent->captureMouse();
 
-    m_pControl->m_rWindowManager.startMove( m_pControl->m_rWindow );
+    m_pParent->m_rWindowManager.startMove( m_pParent->m_rWindow );
 }
 
 
 void CtrlMove::CmdMovingMoving::execute()
 {
-    EvtMotion *pEvtMotion = (EvtMotion*)m_pControl->m_pEvt;
+    EvtMotion *pEvtMotion = (EvtMotion*)m_pParent->m_pEvt;
 
-    int xNewLeft = pEvtMotion->getXPos() - m_pControl->m_xPos +
-                   m_pControl->m_rWindow.getLeft();
-    int yNewTop = pEvtMotion->getYPos() - m_pControl->m_yPos +
-                  m_pControl->m_rWindow.getTop();
+    int xNewLeft = pEvtMotion->getXPos() - m_pParent->m_xPos +
+                   m_pParent->m_rWindow.getLeft();
+    int yNewTop = pEvtMotion->getYPos() - m_pParent->m_yPos +
+                  m_pParent->m_rWindow.getTop();
 
-    m_pControl->m_rWindowManager.move( m_pControl->m_rWindow, xNewLeft, yNewTop );
+    m_pParent->m_rWindowManager.move( m_pParent->m_rWindow, xNewLeft, yNewTop );
 }
 
 
 void CtrlMove::CmdMovingStill::execute()
 {
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 
-    m_pControl->m_rWindowManager.stopMove();
+    m_pParent->m_rWindowManager.stopMove();
 }

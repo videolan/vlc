@@ -44,6 +44,23 @@ class Cmd##name: public CmdGeneric \
 };
 
 
+/// Macro to define a "callback" command inside a class
+#define DEFINE_CALLBACK( parent, action ) \
+class Cmd##action: public CmdGeneric \
+{ \
+    public: \
+        Cmd##action( parent *pParent ): \
+            CmdGeneric( pParent->getIntf() ), m_pParent( pParent ) {} \
+        virtual ~Cmd##action() {} \
+        virtual void execute(); \
+        virtual string getType() const { return "Cmd" #parent #action; } \
+    private: \
+        parent *m_pParent; \
+\
+} m_cmd##action; \
+friend class Cmd##action;
+
+
 /// Base class for skins commands
 class CmdGeneric: public SkinObject
 {

@@ -56,8 +56,8 @@ class Win32Factory: public OSFactory
         ///
         virtual void minimize();
 
-        /// Instantiate an OSTimer with the given callback
-        virtual OSTimer *createOSTimer( const Callback &rCallback );
+        /// Instantiate an OSTimer with the given command
+        virtual OSTimer *createOSTimer( CmdGeneric &rCmd );
 
         /// Instantiate an OSWindow object
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,

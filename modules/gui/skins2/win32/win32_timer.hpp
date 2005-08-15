@@ -27,13 +27,13 @@
 
 #include "../src/os_timer.hpp"
 
+class CmdGeneric;
 
 // Win32 specific timer
 class Win32Timer: public OSTimer
 {
     public:
-        Win32Timer( intf_thread_t *pIntf, const Callback &rCallback,
-                    HWND hWnd );
+        Win32Timer( intf_thread_t *pIntf, CmdGeneric &rCmd, HWND hWnd );
         virtual ~Win32Timer();
 
         /// (Re)start the timer with the given delay (in ms). If oneShot is
@@ -47,8 +47,8 @@ class Win32Timer: public OSTimer
         void execute();
 
     private:
-        /// Callback to execute
-        Callback m_callback;
+        /// Command to execute
+        CmdGeneric &m_rCommand;
 
         /// Delay between two execute
         mtime_t m_interval;

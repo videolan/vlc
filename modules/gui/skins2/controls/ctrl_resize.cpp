@@ -37,12 +37,12 @@ CtrlResize::CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
                         GenericLayout &rLayout, const UString &rHelp,
                         VarBool *pVisible ):
     CtrlFlat( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_rCtrl( rCtrl ),
-    m_rLayout( rLayout ), m_cmdOutStill( pIntf, this ),
-    m_cmdStillOut( pIntf, this ),
-    m_cmdStillStill( pIntf, this ),
-    m_cmdStillResize( pIntf, this ),
-    m_cmdResizeStill( pIntf, this ),
-    m_cmdResizeResize( pIntf, this )
+    m_rLayout( rLayout ), m_cmdOutStill( this ),
+    m_cmdStillOut( this ),
+    m_cmdStillStill( this ),
+    m_cmdStillResize( this ),
+    m_cmdResizeStill( this ),
+    m_cmdResizeResize( this )
 {
     m_pEvt = NULL;
     m_xPos = 0;
@@ -105,87 +105,87 @@ void CtrlResize::handleEvent( EvtGeneric &rEvent )
 
 void CtrlResize::CmdOutStill::execute()
 {
-    OSFactory *pOsFactory = OSFactory::instance( m_pControl->getIntf() );
+    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
     pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 }
 
 
 void CtrlResize::CmdStillOut::execute()
 {
-    OSFactory *pOsFactory = OSFactory::instance( m_pControl->getIntf() );
+    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
     pOsFactory->changeCursor( OSFactory::kDefaultArrow );
 }
 
 
 void CtrlResize::CmdStillStill::execute()
 {
-    OSFactory *pOsFactory = OSFactory::instance( m_pControl->getIntf() );
+    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
     pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 }
 
 
 void CtrlResize::CmdStillResize::execute()
 {
-    EvtMouse *pEvtMouse = (EvtMouse*)m_pControl->m_pEvt;
+    EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
 
     // Set the cursor
-    OSFactory *pOsFactory = OSFactory::instance( m_pControl->getIntf() );
+    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
     pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 
-    m_pControl->m_xPos = pEvtMouse->getXPos();
-    m_pControl->m_yPos = pEvtMouse->getYPos();
+    m_pParent->m_xPos = pEvtMouse->getXPos();
+    m_pParent->m_yPos = pEvtMouse->getYPos();
 
-    m_pControl->captureMouse();
+    m_pParent->captureMouse();
 
-    m_pControl->m_width = m_pControl->m_rLayout.getWidth();
-    m_pControl->m_height = m_pControl->m_rLayout.getHeight();
+    m_pParent->m_width = m_pParent->m_rLayout.getWidth();
+    m_pParent->m_height = m_pParent->m_rLayout.getHeight();
 }
 
 
 void CtrlResize::CmdResizeStill::execute()
 {
     // Set the cursor
-    OSFactory *pOsFactory = OSFactory::instance( m_pControl->getIntf() );
+    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
     pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 }
 
 
 void CtrlResize::CmdResizeResize::execute()
 {
-    EvtMotion *pEvtMotion = (EvtMotion*)m_pControl->m_pEvt;
+    EvtMotion *pEvtMotion = (EvtMotion*)m_pParent->m_pEvt;
 
     // Set the cursor
-    OSFactory *pOsFactory = OSFactory::instance( m_pControl->getIntf() );
+    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
     pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 
-    int newWidth = pEvtMotion->getXPos() - m_pControl->m_xPos + m_pControl->m_width;
-    int newHeight = pEvtMotion->getYPos() - m_pControl->m_yPos + m_pControl->m_height;
+    int newWidth = pEvtMotion->getXPos() - m_pParent->m_xPos + m_pParent->m_width;
+    int newHeight = pEvtMotion->getYPos() - m_pParent->m_yPos + m_pParent->m_height;
 
     // Check boundaries
-    if( newWidth < m_pControl->m_rLayout.getMinWidth() )
+    if( newWidth < m_pParent->m_rLayout.getMinWidth() )
     {
-        newWidth = m_pControl->m_rLayout.getMinWidth();
+        newWidth = m_pParent->m_rLayout.getMinWidth();
     }
-    if( newWidth > m_pControl->m_rLayout.getMaxWidth() )
+    if( newWidth > m_pParent->m_rLayout.getMaxWidth() )
     {
-        newWidth = m_pControl->m_rLayout.getMaxWidth();
+        newWidth = m_pParent->m_rLayout.getMaxWidth();
     }
-    if( newHeight < m_pControl->m_rLayout.getMinHeight() )
+    if( newHeight < m_pParent->m_rLayout.getMinHeight() )
     {
-        newHeight = m_pControl->m_rLayout.getMinHeight();
+        newHeight = m_pParent->m_rLayout.getMinHeight();
     }
-    if( newHeight > m_pControl->m_rLayout.getMaxHeight() )
+    if( newHeight > m_pParent->m_rLayout.getMaxHeight() )
     {
-        newHeight = m_pControl->m_rLayout.getMaxHeight();
+        newHeight = m_pParent->m_rLayout.getMaxHeight();
     }
 
     // Create a resize command
-    CmdGeneric *pCmd = new CmdResize( m_pControl->getIntf(), m_pControl->m_rLayout,
+    CmdGeneric *pCmd = new CmdResize( m_pParent->getIntf(), m_pParent->m_rLayout,
                                       newWidth, newHeight );
     // Push the command in the asynchronous command queue
-    AsyncQueue *pQueue = AsyncQueue::instance( m_pControl->getIntf() );
+    AsyncQueue *pQueue = AsyncQueue::instance( m_pParent->getIntf() );
     pQueue->remove( "resize" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 }

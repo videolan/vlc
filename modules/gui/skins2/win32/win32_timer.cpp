@@ -25,6 +25,7 @@
 #ifdef WIN32_SKINS
 
 #include "win32_timer.hpp"
+#include "../commands/cmd_generic.hpp"
 
 
 void CALLBACK CallbackTimer( HWND hwnd, UINT uMsg,
@@ -38,9 +39,8 @@ void CALLBACK CallbackTimer( HWND hwnd, UINT uMsg,
 }
 
 
-Win32Timer::Win32Timer( intf_thread_t *pIntf, const Callback &rCallback,
-                        HWND hWnd ):
-    OSTimer( pIntf ), m_callback( rCallback ), m_hWnd( hWnd )
+Win32Timer::Win32Timer( intf_thread_t *pIntf, CmdGeneric &rCmd, HWND hWnd ):
+    OSTimer( pIntf ), m_rCommand( rCmd ), m_hWnd( hWnd )
 {
 }
 
@@ -68,7 +68,7 @@ void Win32Timer::stop()
 void Win32Timer::execute()
 {
     // Execute the callback
-    (*(m_callback.getFunc()))( m_callback.getObj() );
+    m_rCommand.execute();
 
     // Restart the timer if needed
     if( ! m_oneShot )

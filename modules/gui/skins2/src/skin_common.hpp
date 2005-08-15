@@ -114,28 +114,6 @@ class SkinObject
         /// interface)
         intf_thread_t *getIntf() const { return m_pIntf; }
 
-        /// Class for callbacks
-        class Callback {
-            public:
-                /// Type for callback methods
-                typedef void (*CallbackFunc_t)( SkinObject* );
-
-                /// Create a callback with the given object and function
-                Callback( SkinObject *pObj, CallbackFunc_t pFunc ):
-                    m_pObj( pObj ), m_pFunc( pFunc ) {}
-                ~Callback() {}
-
-                /// Getters
-                SkinObject *getObj() const { return m_pObj; }
-                CallbackFunc_t getFunc() const { return m_pFunc; }
-
-            private:
-                /// Pointer on the callback object
-                SkinObject *const m_pObj;
-                /// Pointer on the callback method
-                CallbackFunc_t m_pFunc;
-        };
-
     private:
         intf_thread_t *m_pIntf;
 };

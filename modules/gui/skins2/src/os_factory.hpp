@@ -31,6 +31,7 @@
 #include <list>
 
 class GenericWindow;
+class CmdGeneric;
 class OSBitmap;
 class OSGraphics;
 class OSLoop;
@@ -75,8 +76,8 @@ class OSFactory: public SkinObject
         ///
         virtual void minimize() = 0;
 
-        /// Instantiate an OSTimer with the given callback
-        virtual OSTimer *createOSTimer( const Callback &rCallback ) = 0;
+        /// Instantiate an OSTimer with the given command
+        virtual OSTimer *createOSTimer( CmdGeneric &rCmd ) = 0;
 
         /// Instantiate an object OSWindow.
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,

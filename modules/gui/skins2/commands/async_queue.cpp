@@ -27,14 +27,15 @@
 #include "../src/os_timer.hpp"
 
 
-AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf )
+AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf ),
+    m_cmdFlush( this )
 {
     // Initialize the mutex
     vlc_mutex_init( pIntf, &m_lock );
 
     // Create a timer
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pTimer = pOsFactory->createOSTimer( Callback( this, &doFlush ) );
+    m_pTimer = pOsFactory->createOSTimer( m_cmdFlush );
 
     // Flush the queue every 10 ms
     m_pTimer->start( 10, false );
@@ -129,9 +130,8 @@ void AsyncQueue::flush()
 }
 
 
-void AsyncQueue::doFlush( SkinObject *pObj )
+void AsyncQueue::CmdFlush::execute()
 {
-    AsyncQueue *pThis = (AsyncQueue*)pObj;
     // Flush the queue
-    pThis->flush();
+    m_pParent->flush();
 }

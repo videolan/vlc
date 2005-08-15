@@ -59,8 +59,8 @@ class X11Factory: public OSFactory
         /// Destroy the instance of OSLoop.
         virtual void destroyOSLoop();
 
-        /// Instantiate an OSTimer with the given callback
-        virtual OSTimer *createOSTimer( const Callback &rCallback );
+        /// Instantiate an OSTimer with the given command
+        virtual OSTimer *createOSTimer( CmdGeneric &rCmd );
 
         ///
         virtual void minimize();

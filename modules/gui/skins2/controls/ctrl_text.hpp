@@ -95,7 +95,7 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         OSTimer *m_pTimer;
 
         /// Callback for the timer
-        static void updateText( SkinObject *pCtrl );
+        DEFINE_CALLBACK( CtrlText, UpdateText );
 
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarText> &rVariable );

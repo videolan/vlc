@@ -47,11 +47,11 @@ CtrlCheckbox::CtrlCheckbox( intf_thread_t *pIntf,
     m_rVariable( rVariable ),
     m_rCommand1( rCommand1 ), m_rCommand2( rCommand2 ),
     m_tooltip1( rTooltip1 ), m_tooltip2( rTooltip2 ),
-    m_cmdUpOverDownOver( pIntf, this ), m_cmdDownOverUpOver( pIntf, this ),
-    m_cmdDownOverDown( pIntf, this ), m_cmdDownDownOver( pIntf, this ),
-    m_cmdUpOverUp( pIntf, this ), m_cmdUpUpOver( pIntf, this ),
-    m_cmdDownUp( pIntf, this ), m_cmdUpHidden( pIntf, this ),
-    m_cmdHiddenUp( pIntf, this )
+    m_cmdUpOverDownOver( this ), m_cmdDownOverUpOver( this ),
+    m_cmdDownOverDown( this ), m_cmdDownDownOver( this ),
+    m_cmdUpOverUp( this ), m_cmdUpUpOver( this ),
+    m_cmdDownUp( this ), m_cmdUpHidden( this ),
+    m_cmdHiddenUp( this )
 {
     // Build the images of the checkbox
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -171,78 +171,78 @@ void CtrlCheckbox::draw( OSGraphics &rImage, int xDest, int yDest )
 
 void CtrlCheckbox::CmdUpOverDownOver::execute()
 {
-    m_pControl->captureMouse();
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgDown;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    m_pParent->captureMouse();
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgDown;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::CmdDownOverUpOver::execute()
 {
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 
     // Invert the state variable
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 
     // Execute the command
-    m_pControl->m_pCommand->execute();
+    m_pParent->m_pCommand->execute();
 }
 
 
 void CtrlCheckbox::CmdDownOverDown::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::CmdDownDownOver::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgDown;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgDown;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::CmdUpUpOver::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgOver;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgOver;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::CmdUpOverUp::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::CmdDownUp::execute()
 {
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 }
 
 
 void CtrlCheckbox::CmdUpHidden::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = NULL;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = NULL;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 
 void CtrlCheckbox::CmdHiddenUp::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImgCurrent;
-    m_pControl->m_pImgCurrent = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImgCurrent );
+    const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
+    m_pParent->m_pImgCurrent = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 }
 
 

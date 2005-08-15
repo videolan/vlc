@@ -35,10 +35,10 @@
 
 Tooltip::Tooltip( intf_thread_t *pIntf, const GenericFont &rFont, int delay ):
     SkinObject( pIntf ), m_rFont( rFont ), m_delay( delay ), m_pImage( NULL ),
-    m_xPos( -1 ), m_yPos( -1 )
+    m_xPos( -1 ), m_yPos( -1 ), m_cmdShow( this )
 {
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pTimer = pOsFactory->createOSTimer( Callback( this, &doShow ) );
+    m_pTimer = pOsFactory->createOSTimer( m_cmdShow );
     m_pOsTooltip = pOsFactory->createOSTooltip();
 
     // Observe the tooltip text variable
@@ -119,22 +119,20 @@ void Tooltip::makeImage( const UString &rText )
 }
 
 
-void Tooltip::doShow( SkinObject *pObj )
+void Tooltip::CmdShow::execute()
 {
-    Tooltip *pThis = (Tooltip*)pObj;
-
-    if( pThis->m_pImage )
+    if( m_pParent->m_pImage )
     {
-        if( pThis->m_xPos == -1 )
+        if( m_pParent->m_xPos == -1 )
         {
             // Get the mouse coordinates and the image size
-            OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+            OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
             int x, y;
             pOsFactory->getMousePos( x, y );
             int scrWidth = pOsFactory->getScreenWidth();
             int scrHeight = pOsFactory->getScreenHeight();
-            int w = pThis->m_pImage->getWidth();
-            int h = pThis->m_pImage->getHeight();
+            int w = m_pParent->m_pImage->getWidth();
+            int h = m_pParent->m_pImage->getHeight();
 
             // Compute the position of the tooltip
             x -= (w / 2 + 4);
@@ -146,13 +144,13 @@ void Tooltip::doShow( SkinObject *pObj )
             if( y + h > scrHeight )
                 y -= (2 * h + 20);
 
-            pThis->m_xPos = x;
-            pThis->m_yPos = y;
+            m_pParent->m_xPos = x;
+            m_pParent->m_yPos = y;
         }
 
         // Show the tooltip window
-        pThis->m_pOsTooltip->show( pThis->m_xPos, pThis->m_yPos,
-                                   *(pThis->m_pImage) );
+        m_pParent->m_pOsTooltip->show( m_pParent->m_xPos, m_pParent->m_yPos,
+                                   *(m_pParent->m_pImage) );
     }
 }
 

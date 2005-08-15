@@ -31,13 +31,14 @@
 
 // Forward declaration
 class X11TimerLoop;
+class CmdGeneric;
 
 
 // X11 specific timer
 class X11Timer: public OSTimer
 {
     public:
-        X11Timer( intf_thread_t *pIntf, const Callback &rCallback );
+        X11Timer( intf_thread_t *pIntf, CmdGeneric &rCmd );
         virtual ~X11Timer();
 
         /// (Re)start the timer with the given delay (in ms). If oneShot is
@@ -54,8 +55,8 @@ class X11Timer: public OSTimer
         bool execute();
 
     private:
-        /// Callback to execute
-        Callback m_callback;
+        /// Command to execute
+        CmdGeneric m_rCommand;
         /// Timer loop
         X11TimerLoop *m_pTimerLoop;
         /// Delay between two execute

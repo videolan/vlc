@@ -60,11 +60,12 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 }
 
 
-VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL )
+VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL ),
+    m_cmdManage( this )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pTimer = pOsFactory->createOSTimer( Callback( this, &doManage ) );
+    m_pTimer = pOsFactory->createOSTimer( m_cmdManage );
     m_pTimer->start( 100, false );
 
     // Create and register VLC variables
@@ -272,10 +273,10 @@ void VlcProc::manage()
 }
 
 
-void VlcProc::doManage( SkinObject *pObj )
+void VlcProc::CmdManage::execute()
 {
-    VlcProc *pThis = (VlcProc*)pObj;
-    pThis->manage();
+    // Just forward to VlcProc
+    m_pParent->manage();
 }
 
 

@@ -37,11 +37,11 @@ CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
                         VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rCommand( rCommand ), m_tooltip( rTooltip ),
-    m_cmdUpOverDownOver( pIntf, this ), m_cmdDownOverUpOver( pIntf, this ),
-    m_cmdDownOverDown( pIntf, this ), m_cmdDownDownOver( pIntf, this ),
-    m_cmdUpOverUp( pIntf, this ), m_cmdUpUpOver( pIntf, this ),
-    m_cmdDownUp( pIntf, this ), m_cmdUpHidden( pIntf, this ),
-    m_cmdHiddenUp( pIntf, this )
+    m_cmdUpOverDownOver( this ), m_cmdDownOverUpOver( this ),
+    m_cmdDownOverDown( this ), m_cmdDownDownOver( this ),
+    m_cmdUpOverUp( this ), m_cmdUpUpOver( this ),
+    m_cmdDownUp( this ), m_cmdUpHidden( this ),
+    m_cmdHiddenUp( this )
 {
     // Build the images of the button
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -127,74 +127,74 @@ void CtrlButton::draw( OSGraphics &rImage, int xDest, int yDest )
 
 void CtrlButton::CmdUpOverDownOver::execute()
 {
-    m_pControl->captureMouse();
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgDown;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    m_pParent->captureMouse();
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgDown;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 
 
 void CtrlButton::CmdDownOverUpOver::execute()
 {
-    m_pControl->releaseMouse();
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    m_pParent->releaseMouse();
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
     // Execute the command associated to this button
-    m_pControl->m_rCommand.execute();
+    m_pParent->m_rCommand.execute();
 }
 
 
 void CtrlButton::CmdDownOverDown::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 
 
 void CtrlButton::CmdDownDownOver::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgDown;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgDown;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 
 
 void CtrlButton::CmdUpUpOver::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgOver;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgOver;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 
 
 void CtrlButton::CmdUpOverUp::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 
 
 void CtrlButton::CmdDownUp::execute()
 {
-    m_pControl->releaseMouse();
+    m_pParent->releaseMouse();
 }
 
 
 void CtrlButton::CmdUpHidden::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = NULL;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = NULL;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 
 
 void CtrlButton::CmdHiddenUp::execute()
 {
-    const OSGraphics *pOldImg = m_pControl->m_pImg;
-    m_pControl->m_pImg = m_pControl->m_pImgUp;
-    m_pControl->notifyLayoutMaxSize( pOldImg, m_pControl->m_pImg );
+    const OSGraphics *pOldImg = m_pParent->m_pImg;
+    m_pParent->m_pImg = m_pParent->m_pImgUp;
+    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
 }
 

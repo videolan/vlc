@@ -102,9 +102,9 @@ void X11Factory::minimize()
                     DefaultScreen( m_pDisplay->getDisplay() ) );
 }
 
-OSTimer *X11Factory::createOSTimer( const Callback &rCallback )
+OSTimer *X11Factory::createOSTimer( CmdGeneric &rCmd )
 {
-    return new X11Timer( getIntf(), rCallback );
+    return new X11Timer( getIntf(), rCmd );
 }
 
 

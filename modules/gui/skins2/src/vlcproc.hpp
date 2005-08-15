@@ -31,6 +31,7 @@
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
 #include "../utils/var_text.hpp"
+#include "../commands/cmd_generic.hpp"
 
 class OSTimer;
 class VarBool;
@@ -123,12 +124,11 @@ class VlcProc: public SkinObject
          */
         void manage();
 
+        /// Define the command that calls manage()
+        DEFINE_CALLBACK( VlcProc, Manage );
+
         /// Update the stream name variable
         void updateStreamName( playlist_t *p_playlist );
-
-        /// This function directly calls manage(), because it's boring to
-        /// always write "pThis->"
-        static void doManage( SkinObject *pObj );
 
         /// Callback for intf-change variable
         static int onIntfChange( vlc_object_t *pObj, const char *pVariable,

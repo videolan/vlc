@@ -237,9 +237,9 @@ void Win32Factory::minimize()
     ShowWindow( m_hParentWindow, SW_MINIMIZE );
 }
 
-OSTimer *Win32Factory::createOSTimer( const Callback &rCallback )
+OSTimer *Win32Factory::createOSTimer( CmdGeneric &rCmd )
 {
-    return new Win32Timer( getIntf(), rCallback, m_hParentWindow );
+    return new Win32Timer( getIntf(), rCmd, m_hParentWindow );
 }
 
 

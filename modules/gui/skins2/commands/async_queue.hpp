@@ -65,8 +65,8 @@ class AsyncQueue: public SkinObject
         AsyncQueue( intf_thread_t *pIntf );
         virtual ~AsyncQueue();
 
-        /// Callback for the timer
-        static void doFlush( SkinObject *pObj );
+        // Callback to flush the queue
+        DEFINE_CALLBACK( AsyncQueue, Flush );
 };
 
 
