@@ -105,7 +105,7 @@ enum demux_query_e
     DEMUX_CAN_PAUSE,            /* arg1= vlc_bool_t*    cannot fail */
     DEMUX_CAN_CONTROL_PACE,     /* arg1= vlc_bool_t*    cannot fail */
     DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */
-    DEMUX_SET_PAUSE_STATE, /* arg1= vlc_bool_t     can fail */
+    DEMUX_SET_PAUSE_STATE       /* arg1= vlc_bool_t     can fail */
 };
 
 /* stream_t *s could be null and then it mean a access+demux in one */

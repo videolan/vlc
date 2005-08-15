@@ -280,7 +280,7 @@ enum input_state_e
     INIT_S,
     PLAYING_S,
     PAUSE_S,
-    END_S,
+    END_S
 };
 
 /* "rate" default, min/max
@@ -463,7 +463,7 @@ enum input_query_e
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
 
     /* On the fly input slave */
-    INPUT_ADD_SLAVE,       /* arg1= char * */
+    INPUT_ADD_SLAVE        /* arg1= char * */
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );

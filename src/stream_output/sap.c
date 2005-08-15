@@ -552,7 +552,7 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                                      sap_session_t *p_session )
 {
-    int i_ret;
+    unsigned int i_ret;
 
     /* This announce has never been sent yet */
     if( p_session->i_last == 0 )

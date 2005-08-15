@@ -54,8 +54,8 @@ enum stream_query_e
 
     /* Special for direct access control from demuxer.
      * XXX: avoid using it by all means */
-    STREAM_CONTROL_ACCESS,      /* arg1= int i_access_query, args   res: can fail
-                                   if access unreachable or access control answer */
+    STREAM_CONTROL_ACCESS   /* arg1= int i_access_query, args   res: can fail
+                             if access unreachable or access control answer */
 };
 
 /**

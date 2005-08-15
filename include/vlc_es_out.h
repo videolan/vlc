@@ -81,7 +81,7 @@ enum es_out_query_e
     /* Set meta data for group (dynamic) */
     ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=vlc_meta_t */
     /* */
-    ES_OUT_DEL_GROUP,       /* arg1=int i_group */
+    ES_OUT_DEL_GROUP        /* arg1=int i_group */
 };
 
 struct es_out_t
