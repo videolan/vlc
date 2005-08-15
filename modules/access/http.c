@@ -39,7 +39,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
+satic int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define PROXY_TEXT N_("HTTP proxy")
