@@ -1795,14 +1795,20 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') &&
         p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') ) return NULL;
     
-    if( p_region->fmt.p_palette &&
-        ( p_region->fmt.p_palette->i_entries != 4 ) &&
-        ( p_region->fmt.p_palette->i_entries != 16 ) &&
-        ( p_region->fmt.p_palette->i_entries != 256 ) )
+    if( p_region->fmt.p_palette )
     {
-        msg_Err( p_enc, "subpicture palette (%d) not handled",
-                    p_region->fmt.p_palette->i_entries );
-        return NULL;
+        switch( p_region->fmt.p_palette->i_entries )
+        {
+            case 0:
+            case 4:
+            case 16:
+            case 256:
+                break;
+            default:
+                msg_Err( p_enc, "subpicture palette (%d) not handled",
+                            p_region->fmt.p_palette->i_entries );
+                return NULL;                        
+        }
     }
     /* End of hack */
     
@@ -2187,6 +2193,9 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
     {
         switch( p_region->fmt.p_palette->i_entries )
         {
+        case 0:
+            break;
+            
         case 4:
             bs_write( s, 8, 0x10 ); /* 2 bit/pixel code string */
             encode_pixel_line_2bp( p_enc, s, p_region, i_line );
