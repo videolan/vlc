@@ -56,7 +56,7 @@ class X11Timer: public OSTimer
 
     private:
         /// Command to execute
-        CmdGeneric m_rCommand;
+        CmdGeneric &m_rCommand;
         /// Timer loop
         X11TimerLoop *m_pTimerLoop;
         /// Delay between two execute
