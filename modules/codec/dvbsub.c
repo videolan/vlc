@@ -216,21 +216,21 @@ struct decoder_sys_t
 };
 
 
-// List of different SEGMENT TYPES
-// According to EN 300-743, table 2
+/* List of different SEGMENT TYPES */
+/* According to EN 300-743, table 2 */
 #define DVBSUB_ST_PAGE_COMPOSITION      0x10
 #define DVBSUB_ST_REGION_COMPOSITION    0x11
 #define DVBSUB_ST_CLUT_DEFINITION       0x12
 #define DVBSUB_ST_OBJECT_DATA           0x13
 #define DVBSUB_ST_ENDOFDISPLAY          0x80
 #define DVBSUB_ST_STUFFING              0xff
-// List of different OBJECT TYPES
-// According to EN 300-743, table 6
+/* List of different OBJECT TYPES */
+/* According to EN 300-743, table 6 */
 #define DVBSUB_OT_BASIC_BITMAP          0x00
 #define DVBSUB_OT_BASIC_CHAR            0x01
 #define DVBSUB_OT_COMPOSITE_STRING      0x02
-// Pixel DATA TYPES
-// According to EN 300-743, table 9
+/* Pixel DATA TYPES */
+/* According to EN 300-743, table 9 */ 
 #define DVBSUB_DT_2BP_CODE_STRING       0x10
 #define DVBSUB_DT_4BP_CODE_STRING       0x11
 #define DVBSUB_DT_8BP_CODE_STRING       0x12
@@ -238,8 +238,8 @@ struct decoder_sys_t
 #define DVBSUB_DT_28_TABLE_DATA         0x21
 #define DVBSUB_DT_48_TABLE_DATA         0x22
 #define DVBSUB_DT_END_LINE              0xf0
-// List of different Page Composition Segment state
-// According to EN 300-743, 7.2.1 table 3
+/* List of different Page Composition Segment state */
+/* According to EN 300-743, 7.2.1 table 3 */
 #define DVBSUB_PCS_STATE_ACQUISITION    0x01
 #define DVBSUB_PCS_STATE_CHANGE         0x10
 
@@ -1528,7 +1528,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
     {
         msg_Err( p_enc, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
     p_enc->p_sys = p_sys;
 
@@ -1563,7 +1563,9 @@ static int OpenEncoder( vlc_object_t *p_this )
 static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
 {
     subpicture_region_t *p_region = NULL;
-     
+
+    if( !p_subpic ) return NULL;
+    
     for( p_region = p_subpic->p_region; p_region; p_region = p_region->p_next )
     {
         video_format_t *p_fmt = &p_region->fmt;
@@ -1581,9 +1583,13 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
                             * p_region->picture.p[0].i_pitch
                         + p_region->picture.p[0].i_pitch * 1 / 3;
         int i_tolerance = 0;
-    
+
+#if DEBUG_DVBSUB
+        msg_Err( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
+#endif        
         p_fmt->i_chroma = VLC_FOURCC('Y','U','V','P');
         p_fmt->p_palette = (video_palette_t *) malloc( sizeof( video_palette_t ) );
+        if( !p_fmt->p_palette ) break;
         p_fmt->p_palette->i_entries = 0;
     
         /* Find best iterator using Euclide’s algorithm */
@@ -1773,7 +1779,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
      */
     p_region = p_subpic->p_region;
     if( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','A') )
-    {
+    {            
         p_temp = YuvaYuvp( p_enc, p_subpic );
         if( !p_temp )
         {
@@ -1782,8 +1788,10 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
         }
         p_region = p_subpic->p_region;
     }
+    
     /* Sanity check */
     if( !p_region ) return NULL;
+    
     if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') &&
         p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') ) return NULL;
     
