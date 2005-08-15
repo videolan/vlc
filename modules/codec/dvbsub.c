@@ -40,7 +40,7 @@
 
 #include "vlc_bits.h"
 
-#define DEBUG_DVBSUB 1
+/* #define DEBUG_DVBSUB 1 */
 
 #define POSX_TEXT N_("X coordinate of the subpicture")
 #define POSX_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
