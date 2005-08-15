@@ -152,7 +152,6 @@ static int Open( vlc_object_t *p_this )
     char *psz;
 
 #ifdef HAVE_SYS_STAT_H
-    int                 i_stat;
     struct stat         stat_info;
 #endif
     vlc_bool_t          b_stdin;
@@ -163,11 +162,16 @@ static int Open( vlc_object_t *p_this )
     b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
 
 #ifdef HAVE_SYS_STAT_H
-    if( !b_stdin && (i_stat = stat( psz_name, &stat_info )) == (-1) )
+    if( !b_stdin )
     {
-        msg_Warn( p_access, "cannot stat() file `%s' (%s)",
-                  psz_name, strerror(errno));
-        return VLC_EGENERIC;
+        psz = ToLocale( psz_name );
+        if( stat( psz, &stat_info ) )
+        {
+            msg_Warn( p_access, "%s: %s", psz_name, strerror( errno ) );
+            LocaleFree( psz );
+            return VLC_EGENERIC;
+        }
+        LocaleFree( psz );
     }
 #endif
 
