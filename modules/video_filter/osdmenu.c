@@ -312,10 +312,6 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
 }    
 #endif
 
-static void osdmenu_RegionPictureRelease( picture_t *p_pic )
-{
-    if( p_pic->p_data_orig ) free( p_pic->p_data_orig );
-}
 /*****************************************************************************
  * create_picture_region : compose a picture region SPU
  *****************************************************************************/
@@ -329,44 +325,39 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt.i_chroma = (p_pic == NULL) ? VLC_FOURCC('Y','U','V','P') : VLC_FOURCC('Y','U','V','A');
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );    
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
         p_filter->pf_sub_buffer_del( p_filter, p_spu );
         return NULL;
     }
-    if( p_pic )
-        vout_CopyPicture( p_filter, &p_region->picture, p_pic );
-    else
+    if( fmt.i_chroma == VLC_FOURCC('Y','U','V','P') )
     {
-        picture_t *dest_pic = NULL;
-
-        /* Create an empty subpicture */
-        dest_pic = (picture_t*) malloc( sizeof( picture_t ) );
-        if( vout_AllocatePicture( p_filter, dest_pic,
-                            fmt.i_chroma,
-                            fmt.i_width,
-                            fmt.i_height,
-                            fmt.i_aspect )
-            != VLC_SUCCESS )
+        int i;
+        
+        p_region->fmt.p_palette->i_entries = 4;
+        for( i = 0; i < 4; i++ )
         {
-            free( dest_pic );
-            return NULL;
+            p_region->fmt.p_palette->palette[i][0] = 0;
+            p_region->fmt.p_palette->palette[i][1] = 0;
+            p_region->fmt.p_palette->palette[i][2] = 0;
+            p_region->fmt.p_palette->palette[i][3] = 0;
         }
-        dest_pic->pf_release = osdmenu_RegionPictureRelease;
-        vout_CopyPicture( p_filter, &p_region->picture, dest_pic );
-        dest_pic->pf_release( dest_pic );
+        fmt.i_width = fmt.i_visible_width = 0;
+        fmt.i_height = fmt.i_visible_height = 0;
     }
+    if( p_pic != NULL )
+        vout_CopyPicture( p_filter, &p_region->picture, p_pic );
+
     p_region->i_x = 0;
     p_region->i_y = 0;
-
 #if 0
     msg_Dbg( p_filter, "SPU picture region position (%d,%d) (%d,%d) [%p]", 
         p_region->i_x, p_region->i_y, 
@@ -386,9 +377,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
     
-    if( !p_filter->p_sys->b_update &&
-        (p_sys->i_last_date + (mtime_t)(p_sys->i_timeout * 1000000) < i_date) )
-            return NULL;
+    if( !p_filter->p_sys->b_update ) return NULL;
 
     p_filter->p_sys->i_last_date = i_date;
     p_filter->p_sys->b_update = VLC_FALSE; 
@@ -416,12 +405,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
             p_filter->p_sys->p_menu->p_state->i_width,
             p_filter->p_sys->p_menu->p_state->i_height, 
             NULL );
+            
         /* proper positioning of OSD menu image */
         p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
-        p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
-        
+        p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;        
         p_spu->p_region = p_region;
-        msg_Dbg( p_filter, "sending empty subpicture." );
+        p_spu->i_alpha = 0xFF; /* Picture is completely transparent. */
         return p_spu;
     }
     
@@ -438,8 +427,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     
     /* proper positioning of OSD menu image */
     p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
-    p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
-    
+    p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;    
     p_spu->p_region = p_region;
     return p_spu;
 }

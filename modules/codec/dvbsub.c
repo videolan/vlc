@@ -40,7 +40,7 @@
 
 #include "vlc_bits.h"
 
-/* #define DEBUG_DVBSUB 1 */
+#define DEBUG_DVBSUB 1
 
 #define POSX_TEXT N_("X coordinate of the subpicture")
 #define POSX_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
@@ -1585,7 +1585,7 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
         int i_tolerance = 0;
 
 #if DEBUG_DVBSUB
-        msg_Err( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
+        msg_Dbg( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
 #endif        
         p_fmt->i_chroma = VLC_FOURCC('Y','U','V','P');
         p_fmt->p_palette = (video_palette_t *) malloc( sizeof( video_palette_t ) );
@@ -1783,7 +1783,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
         p_temp = YuvaYuvp( p_enc, p_subpic );
         if( !p_temp )
         {
-            msg_Dbg( p_enc, "no picture in subpicture" );
+            msg_Err( p_enc, "no picture in subpicture" );
             return NULL;
         }
         p_region = p_subpic->p_region;
