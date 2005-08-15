@@ -1842,6 +1842,16 @@ static void LocaleInit( void )
 
     if( !vlc_current_charset( &psz_charset ) )
     {
+        char *psz_conv = psz_charset;
+
+        /*
+         * Still allow non-ASCII characters when the locale is not set.
+         * Western Europeans are being favored for historical reasons.
+         */
+        psz_conv = strcmp( psz_charset, "ASCII" )
+            ? psz_charset
+            : "ISO-8859-15";
+
         vlc_mutex_init( p_libvlc, &libvlc.from_locale_lock );
         vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
         libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_charset );
