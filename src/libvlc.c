@@ -435,12 +435,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
-        textdomain( PACKAGE_NAME );
-
-#if defined( ENABLE_UTF8 )
-        bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
-#endif
-
         module_EndBank( p_vlc );
         module_InitBank( p_vlc );
         config_LoadConfigFile( p_vlc, "main" );
@@ -1854,8 +1848,8 @@ static void LocaleInit( void )
         libvlc.to_locale = vlc_iconv_open( psz_charset, "UTF-8" );
         if( !libvlc.to_locale )
         {
-            // Not sure it is the right thing to do, but at least it
-            // doesn't make vlc crash with msvc !
+            /* Not sure it is the right thing to do, but at least it
+             doesn't make vlc crash with msvc ! */
             libvlc.to_locale = (vlc_iconv_t)(-1);
         }
     }
@@ -1918,9 +1912,11 @@ static void SetLanguage ( char const *psz_lang )
 #endif
 
         setlocale( LC_ALL, psz_lang );
+        /* many code paths assume that float numbers are formatted according
+         * to the US standard (ie. with dot as decimal point), so we keep
+         * C for LC_NUMERIC. */
         setlocale(LC_NUMERIC, "C" );
     }
-    setlocale( LC_ALL, "C" );
 
     /* Specify where to find the locales for current domain */
 #if !defined( SYS_DARWIN ) && !defined( WIN32 ) && !defined( SYS_BEOS )
@@ -1938,7 +1934,6 @@ static void SetLanguage ( char const *psz_lang )
 
     /* Set the default domain */
     textdomain( PACKAGE_NAME );
-
     bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
 #endif
 }
