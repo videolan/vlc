@@ -336,6 +336,7 @@ static int Demux ( demux_t *p_demux )
     demux_sys_t     *p_sys = p_demux->p_sys;
     playlist_t      *p_playlist;
     playlist_item_t *p_item;
+    playlist_item_t *p_child;
     
     char            *psz_line;
     int             i_position;
@@ -348,8 +349,9 @@ static int Demux ( demux_t *p_demux )
         return -1;
     }
 
-    p_playlist->status.p_item->i_flags = PLAYLIST_DEL_FLAG;
-    i_position = -1;  /* FIXME p_playlist->i_index + 1; */
+    p_item = playlist_LockItemGetByInput( p_playlist,
+                        ((input_thread_t *)p_demux->p_parent)->input.p_item );
+    playlist_ItemToNode( p_playlist, p_item );
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
@@ -403,10 +405,10 @@ static int Demux ( demux_t *p_demux )
         free( temp );
     }
 
-    p_item = playlist_ItemNew( p_playlist, p_sys->psz_uri,
+    p_child = playlist_ItemNew( p_playlist, p_sys->psz_uri,
                       p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri );
 
-    if( !p_item || !p_item->input.psz_uri )
+    if( !p_child || !p_child->input.psz_uri )
     {
         msg_Err( p_demux, "A valid playlistitem could not be created" );
         return VLC_EGENERIC;
@@ -417,26 +419,30 @@ static int Demux ( demux_t *p_demux )
         char *psz_option;
         p_sys->i_packet_size += 1000;
         asprintf( &psz_option, "mtu=%i", p_sys->i_packet_size );
-        playlist_ItemAddOption( p_item, psz_option );
+        playlist_ItemAddOption( p_child, psz_option );
         free( psz_option );
     }
     if( !p_sys->psz_mcast_ip )
     {
         char *psz_option;
 	asprintf( &psz_option, "rtsp-caching=5000" );
-	playlist_ItemAddOption( p_item, psz_option );
+	playlist_ItemAddOption( p_child, psz_option );
 	free( psz_option );
     }
     if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
     {
         char *psz_option;
         asprintf( &psz_option, "rtsp-kasenna" );
-        playlist_ItemAddOption( p_item, psz_option );
+        playlist_ItemAddOption( p_child, psz_option );
         free( psz_option );
     }
 
-    playlist_ItemSetDuration( p_item, p_sys->i_duration );
-    playlist_AddItem( p_playlist, p_item, PLAYLIST_INSERT, i_position );
+    playlist_ItemSetDuration( p_child, p_sys->i_duration );
+    playlist_NodeAddItem( p_playlist, p_child, p_item->pp_parents[0]->i_view, p_item, PLAYLIST_APPEND, PLAYLIST_END );
+    playlist_CopyParents( p_item, p_child );
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                           p_playlist->status.i_view,
+                           p_playlist->status.p_item, NULL );
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
