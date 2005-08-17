@@ -318,15 +318,15 @@ Section "Start Menu + Desktop Shortcut" SEC02
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" "--intf wxwin --wxwin-embed"
+    "$INSTDIR\vlc.exe" "--intf wx --wx-embed"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (alt).lnk" \
-    "$INSTDIR\vlc.exe" "--intf wxwin --no-wxwin-embed"
+    "$INSTDIR\vlc.exe" "--intf wx --no-wx-embed"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (skins).lnk" \
     "$INSTDIR\vlc.exe" "--intf skins"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC defaults and quit.lnk" \
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit "
   CreateShortCut "$DESKTOP\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" "--intf wxwin"
+    "$INSTDIR\vlc.exe" "--intf wx"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
     "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_NAME} Website.lnk" \
