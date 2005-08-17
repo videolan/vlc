@@ -606,28 +606,21 @@ static void FreeRSS( filter_t *p_filter)
     int i_feed;
     int i_item;
 
-fprintf( stderr, "freeing ...\n" );
     for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
-fprintf( stderr, "i_feed = %d\n", i_feed );
         p_feed = p_sys->p_feeds+i_feed;
         for( i_item = 0; i_item < p_feed->i_items; i_item++ )
         {
-fprintf( stderr, "i_feed = %d, i_item = %d\n", i_feed, i_item );
             p_item = p_feed->p_items+i_item;
             free( p_item->psz_title );
             free( p_item->psz_link );
-        fprintf( stderr, "psz_description : %p %s \n", p_item->psz_description, p_item->psz_description);
             free( p_item->psz_description );
-fprintf( stderr, "i_item done\n");
         }
         free( p_feed->p_items );
         free( p_feed->psz_title);
         free( p_feed->psz_link );
         free( p_feed->psz_description );
-fprintf( stderr, "i_feed done\n");
     }
     free( p_sys->p_feeds );
     p_sys->i_feeds = 0;
-fprintf( stderr, "done freeing.\n" );
 }
