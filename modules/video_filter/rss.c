@@ -114,7 +114,7 @@ struct filter_sys_t
 #define LENGTH_TEXT N_("RSS feed max number of chars displayed")
 #define LENGTH_LONGTEXT N_("RSS feed max number of chars displayed")
 #define TTL_TEXT N_("Number of seconds between each forced refresh of the feeds")
-#define TTL_LONGTEXT N_("Number of seconds between each forced refresh of the feeds")
+#define TTL_LONGTEXT N_("Number of seconds between each forced refresh of the feeds. If 0, the feeds will never be updated.")
 
 
 #define POSX_TEXT N_("X offset, from left")
@@ -302,7 +302,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     /* Do we need to update the feeds ? */
-    if( time( NULL ) > p_sys->t_last_update + (time_t)p_sys->i_ttl )
+    if( p_sys->i_ttl
+        && time( NULL ) > p_sys->t_last_update + (time_t)p_sys->i_ttl )
     {
         msg_Dbg( p_filter, "Forcing update of all the RSS feeds" );
         if( FetchRSS( p_filter ) )
