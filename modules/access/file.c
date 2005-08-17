@@ -148,7 +148,7 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    char *psz_name = p_access->psz_path;
+    char *psz_name = strdup( p_access->psz_path );
     char *psz;
 
 #ifdef HAVE_SYS_STAT_H
@@ -161,19 +161,31 @@ static int Open( vlc_object_t *p_this )
 
     b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
 
-#ifdef HAVE_SYS_STAT_H
     if( !b_stdin )
     {
+        if( psz_name[0] == '~' && psz_name[1] == '/' )
+        {
+            psz = malloc( strlen(p_access->p_vlc->psz_homedir)
+                           + strlen(psz_name) );
+            /* This is incomplete : we should also support the ~cmassiot/
+             * syntax. */
+            sprintf( psz, "%s/%s", p_access->p_vlc->psz_homedir, psz_name + 2 );
+            free( psz_name );
+            psz_name = psz;
+        }
+
+#ifdef HAVE_SYS_STAT_H
         psz = ToLocale( psz_name );
         if( stat( psz, &stat_info ) )
         {
             msg_Warn( p_access, "%s: %s", psz_name, strerror( errno ) );
             LocaleFree( psz );
+            free( psz_name );
             return VLC_EGENERIC;
         }
         LocaleFree( psz );
-    }
 #endif
+    }
 
     p_access->pf_read = Read;
     p_access->pf_block = NULL;
@@ -253,6 +265,7 @@ static int Open( vlc_object_t *p_this )
     else if( _OpenFile( p_access, psz_name ) )
     {
         free( p_sys );
+        free( psz_name );
         return VLC_EGENERIC;
     }
 
@@ -261,6 +274,7 @@ static int Open( vlc_object_t *p_this )
         /* FIXME that's bad because all others access will be probed */
         msg_Err( p_access, "file %s is empty, aborting", psz_name );
         free( p_sys );
+        free( psz_name );
         return VLC_EGENERIC;
     }
 
@@ -272,7 +286,7 @@ static int Open( vlc_object_t *p_this )
      */
     p_file = malloc( sizeof(file_entry_t) );
     p_file->i_size = p_access->info.i_size;
-    p_file->psz_name = strdup( psz_name );
+    p_file->psz_name = psz_name;
     TAB_APPEND( p_sys->i_file, p_sys->file, p_file );
 
     psz = var_CreateGetString( p_access, "file-cat" );
