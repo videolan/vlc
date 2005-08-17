@@ -408,6 +408,14 @@ struct module_symbols_t
     void *__osd_VolumeUp_deprecated;
     void (*__osd_MenuActivate_inner) (vlc_object_t *);
     void (*__osd_Volume_inner) (vlc_object_t *);
+    const char * (*VLC_Compiler_inner) (void);
+    const char * (*VLC_Error_inner) (int);
+    const char * (*VLC_Changeset_inner) (void);
+    const char * (*VLC_CompileBy_inner) (void);
+    const char * (*VLC_CompileDomain_inner) (void);
+    const char * (*VLC_CompileHost_inner) (void);
+    const char * (*VLC_Version_inner) (void);
+    const char * (*VLC_CompileTime_inner) (void);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -798,6 +806,14 @@ struct module_symbols_t
 #  define __osd_MenuPrev (p_symbols)->__osd_MenuPrev_inner
 #  define __osd_MenuActivate (p_symbols)->__osd_MenuActivate_inner
 #  define __osd_Volume (p_symbols)->__osd_Volume_inner
+#  define VLC_Compiler (p_symbols)->VLC_Compiler_inner
+#  define VLC_Error (p_symbols)->VLC_Error_inner
+#  define VLC_Changeset (p_symbols)->VLC_Changeset_inner
+#  define VLC_CompileBy (p_symbols)->VLC_CompileBy_inner
+#  define VLC_CompileDomain (p_symbols)->VLC_CompileDomain_inner
+#  define VLC_CompileHost (p_symbols)->VLC_CompileHost_inner
+#  define VLC_Version (p_symbols)->VLC_Version_inner
+#  define VLC_CompileTime (p_symbols)->VLC_CompileTime_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1191,6 +1207,14 @@ struct module_symbols_t
     ((p_symbols)->__osd_MenuPrev_inner) = __osd_MenuPrev; \
     ((p_symbols)->__osd_MenuActivate_inner) = __osd_MenuActivate; \
     ((p_symbols)->__osd_Volume_inner) = __osd_Volume; \
+    ((p_symbols)->VLC_Compiler_inner) = VLC_Compiler; \
+    ((p_symbols)->VLC_Error_inner) = VLC_Error; \
+    ((p_symbols)->VLC_Changeset_inner) = VLC_Changeset; \
+    ((p_symbols)->VLC_CompileBy_inner) = VLC_CompileBy; \
+    ((p_symbols)->VLC_CompileDomain_inner) = VLC_CompileDomain; \
+    ((p_symbols)->VLC_CompileHost_inner) = VLC_CompileHost; \
+    ((p_symbols)->VLC_Version_inner) = VLC_Version; \
+    ((p_symbols)->VLC_CompileTime_inner) = VLC_CompileTime; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \

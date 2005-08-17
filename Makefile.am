@@ -48,6 +48,7 @@ AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 BUILT_SOURCES += \
 	stamp-api \
 	src/misc/modules_builtin.h \
+	src/misc/version.c \
 	$(NULL)
 
 pkgincludedir = $(includedir)/vlc
@@ -130,6 +131,9 @@ HEADERS_include = \
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 	touch $@
+
+src/misc/version.c: FORCE
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-version
 
 # These dependencies are mandatory
 $(SOURCES_libvlc): src/misc/modules_builtin.h $(LIB_intl)
@@ -412,6 +416,7 @@ SOURCES_libvlc_common = \
 	src/misc/getaddrinfo.c \
 	src/misc/vlm.c \
 	src/misc/xml.c \
+	src/misc/version.c \
 	src/extras/libc.c \
 	src/control/core.c \
 	src/control/util.c \

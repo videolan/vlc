@@ -139,6 +139,24 @@ char const * VLC_Version( void )
 }
 
 /*****************************************************************************
+ * VLC_CompileTime, VLC_CompileBy, VLC_CompileHost, VLC_CompileDomain,
+ * VLC_Compiler, VLC_Changeset
+ *****************************************************************************/
+#define DECLARE_VLC_VERSION( func, var )                                    \
+extern const char psz_vlc_##var [];                                         \
+char const * VLC_##func ( void )                                            \
+{                                                                           \
+    return psz_vlc_##var ;                                                  \
+}
+
+DECLARE_VLC_VERSION( CompileTime, compile_time );
+DECLARE_VLC_VERSION( CompileBy, compile_by );
+DECLARE_VLC_VERSION( CompileHost, compile_host );
+DECLARE_VLC_VERSION( CompileDomain, compile_domain );
+DECLARE_VLC_VERSION( Compiler, compiler );
+DECLARE_VLC_VERSION( Changeset, changeset );
+
+/*****************************************************************************
  * VLC_Error: strerror() equivalent
  *****************************************************************************
  * This function returns full version string (numeric version and codename).
@@ -2360,7 +2378,13 @@ static void Version( void )
     ShowConsole();
 #endif
 
-    fprintf( stdout, VERSION_MESSAGE "\n" );
+    fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
+    fprintf( stdout, _("Compiled on %s by %s@%s.%s\n"), VLC_CompileTime(),
+             VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
+    fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
+    if( *VLC_Changeset() )
+        fprintf( stdout, _("Based upon svn changeset [%s]\n"),
+                 VLC_Changeset() );
     fprintf( stdout,
       _("This program comes with NO WARRANTY, to the extent permitted by "
         "law.\nYou may redistribute it under the terms of the GNU General "

@@ -152,7 +152,8 @@ struct vlc_list_t
 /*****************************************************************************
  * Exported libvlc API
  *****************************************************************************/
-
+#if !defined( __VLC__ )
+/* Otherwise they are declared and exported in vlc_common.h */
 /**
  * Retrieve libvlc version
  *
@@ -161,12 +162,56 @@ struct vlc_list_t
 char const * VLC_Version ( void );
 
 /**
+ * Retrieve libvlc compile time
+ *
+ * \return a string containing the libvlc compile time
+ */
+char const * VLC_CompileTime ( void );
+
+/**
+ * Retrieve the username of the libvlc builder
+ *
+ * \return a string containing the username of the libvlc builder
+ */
+char const * VLC_CompileBy ( void );
+
+/**
+ * Retrieve the host of the libvlc builder
+ *
+ * \return a string containing the host of the libvlc builder
+ */
+char const * VLC_CompileHost ( void );
+
+/**
+ * Retrieve the domain name of the host of the libvlc builder
+ *
+ * \return a string containing the domain name of the host of the libvlc builder
+ */
+char const * VLC_CompileDomain ( void );
+
+/**
+ * Retrieve libvlc compiler version
+ *
+ * \return a string containing the libvlc compiler version
+ */
+char const * VLC_Compiler ( void );
+
+/**
+ * Retrieve libvlc changeset
+ *
+ * \return a string containing the libvlc subversion changeset
+ */
+char const * VLC_Changeset ( void );
+
+/**
  * Return an error string
  *
  * \param i_err an error code
  * \return an error string
  */
 char const * VLC_Error ( int i_err );
+
+#endif /* __VLC__ */
 
 /**
  * Initialize libvlc

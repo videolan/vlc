@@ -28,6 +28,7 @@ recognized flags are:
   --update-vc             update Microsoft Visual Studio files
   --update-po             update translation files
   --update-includes       generate various include files
+  --update-version        generate src/misc/version.c
   --update-glade          generate and fix Glade code
   --update-glade2         generate and fix Glade 2 code
   --update-flexml         generate and fix flexml and flex code
@@ -70,6 +71,9 @@ case "$1" in
     ;;
   --update-includes)
     action=includes
+    ;;
+  --update-version)
+    action=version
     ;;
   --update-flexml)
     action=flexml
@@ -423,6 +427,48 @@ then
   fi
 
   exit 0
+fi
+
+##
+##  Create version file
+##
+if test "${action}" = "version"
+then
+  if test -z "${srcdir}"; then
+    srcdir="`sed -ne 's/^srcdir *= *//p' < Makefile`"
+  fi
+  if test -z "${builddir}"; then
+    builddir="`sed -ne 's/^top_builddir *= *//p' < Makefile`"
+  fi
+  if test -z "${CC}"; then
+    CC="`sed -ne 's/^CC *= *//p' < Makefile`"
+  fi
+
+  VLC_COMPILE_TIME=`LC_ALL=C LANG=C date`
+  VLC_COMPILE_BY=`whoami`
+  VLC_COMPILE_HOST=`hostname`
+  if which dnsdomainname 2>&1 >/dev/null; then
+    VLC_COMPILE_DOMAIN=`dnsdomainname`
+  elif which domainname 2>&1 >/dev/null; then
+    VLC_COMPILE_DOMAIN=`domainname`
+  else
+    VLC_COMPILE_DOMAIN=unknown
+  fi
+  VLC_COMPILER=`$CC -v 2>&1 | tail -n 1`
+  if which svnversion 2>&1 >/dev/null; then
+    VLC_CHANGESET=`svnversion $srcdir`
+  else
+    VLC_CHANGESET=''
+  fi
+
+  cat >| src/misc/version.c << EOF
+const char psz_vlc_compile_time[] = "${VLC_COMPILE_TIME}";
+const char psz_vlc_compile_by[] = "${VLC_COMPILE_BY}";
+const char psz_vlc_compile_host[] = "${VLC_COMPILE_HOST}";
+const char psz_vlc_compile_domain[] = "${VLC_COMPILE_DOMAIN}";
+const char psz_vlc_compiler[] = "${VLC_COMPILER}";
+const char psz_vlc_changeset[] = "${VLC_CHANGESET}";
+EOF
 fi
 
 ##
