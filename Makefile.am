@@ -608,9 +608,9 @@ VLC-release.app: vlc
 	    then $(INSTALL) "$$i$(LIBEXT)" \
 			   "$(top_builddir)/VLC-release.app/Contents/MacOS/modules" ; \
 	  fi ; done
-	if test -d $(top_builddir)/extras/contrib/vlc-lib; then \
+	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/lib ; \
-	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.dylib ; do \
+	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
 	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
 	  done ; \
 	fi
@@ -722,9 +722,9 @@ VLC.app: vlc
 	    then ln -sfn "`pwd`/$$i$(LIBEXT)" \
 			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
-	if test -d $(top_builddir)/extras/contrib/vlc-lib; then \
+	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
-	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.dylib ; do \
+	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
 	    ln -sfn `pwd`/$${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
 	  done ; \
 	fi
