@@ -95,11 +95,12 @@ struct filter_sys_t
 
     mtime_t last_date;
 
-    //vlc_bool_t b_need_update;
-
     char *psz_urls;
     int i_feeds;
     struct rss_feed_t *p_feeds;
+
+    int i_ttl;
+    time_t t_last_update;
 
     int i_cur_feed;
     int i_cur_item;
@@ -107,11 +108,14 @@ struct filter_sys_t
 };
 
 #define MSG_TEXT N_("RSS feed URLs")
-#define MSG_LONGTEXT N_("RSS feed comma seperated URLs")
+#define MSG_LONGTEXT N_("RSS feed '|' (pipe) seperated URLs")
 #define SPEED_TEXT N_("RSS feed speed")
 #define SPEED_LONGTEXT N_("RSS feed speed (bigger is slower)")
 #define LENGTH_TEXT N_("RSS feed max number of chars displayed")
 #define LENGTH_LONGTEXT N_("RSS feed max number of chars displayed")
+#define TTL_TEXT N_("Number of seconds between each forced refresh of the feeds")
+#define TTL_LONGTEXT N_("Number of seconds between each forced refresh of the feeds")
+
 
 #define POSX_TEXT N_("X offset, from left")
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
@@ -170,6 +174,7 @@ vlc_module_begin();
                  VLC_FALSE );
     add_integer( "rss-length", 60, NULL, LENGTH_TEXT, LENGTH_LONGTEXT,
                  VLC_FALSE );
+    add_integer( "rss-ttl", 900, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_FALSE );
 
     set_description( _("RSS feed display sub filter") );
     add_shortcut( "rss" );
@@ -203,6 +208,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_feeds = NULL;
     p_sys->i_speed = var_CreateGetInteger( p_filter, "rss-speed" );
     p_sys->i_length = var_CreateGetInteger( p_filter, "rss-length" );
+    p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, "rss-ttl" ) );
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length );
 
     p_sys->i_xoff = var_CreateGetInteger( p_filter, "rss-x" );
@@ -219,6 +225,7 @@ static int CreateFilter( vlc_object_t *p_this )
         vlc_mutex_unlock( &p_sys->lock );
         return VLC_EGENERIC;
     }
+    p_sys->t_last_update = time( NULL );
 
     if( p_sys->i_feeds == 0 )
     {
@@ -261,6 +268,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_filter, "rss-urls" );
     var_Destroy( p_filter, "rss-speed" );
     var_Destroy( p_filter, "rss-length" );
+    var_Destroy( p_filter, "rss-ttl" );
     var_Destroy( p_filter, "rss-x" );
     var_Destroy( p_filter, "rss-y" );
     var_Destroy( p_filter, "rss-position" );
@@ -284,11 +292,27 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     vlc_mutex_lock( &p_sys->lock );
 
-    /* wait more for the 1st char */
-    if( p_sys->last_date + ( p_sys->i_cur_char == 0 && p_sys->i_cur_item == 0 ? 5 : 1 ) * p_sys->i_speed > date )
+    if( p_sys->last_date
+       + ( p_sys->i_cur_char == 0 && p_sys->i_cur_item == 0 ? 5 : 1 )
+           /* ( ... ? 5 : 1 ) means "wait more for the 1st char" */
+       * p_sys->i_speed > date )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
+    }
+
+    /* Do we need to update the feeds ? */
+    if( time( NULL ) > p_sys->t_last_update + (time_t)p_sys->i_ttl )
+    {
+        msg_Dbg( p_filter, "Forcing update of all the RSS feeds" );
+        if( FetchRSS( p_filter ) )
+        {
+            msg_Err( p_filter, "failed while fetching RSS ... too bad" );
+            vlc_mutex_unlock( &p_sys->lock );
+            return NULL; /* FIXME : we most likely messed up all the data,
+                          * so we might need to do something about it */
+        }
+        p_sys->t_last_update = time( NULL );
     }
 
     p_sys->last_date = date;
@@ -398,7 +422,7 @@ static int FetchRSS( filter_t *p_filter)
     p_sys->i_feeds = 1;
     i_int = 0;
     while( p_sys->psz_urls[i_int] != 0 )
-        if( p_sys->psz_urls[i_int++] == ',' )
+        if( p_sys->psz_urls[i_int++] == '|' )
             p_sys->i_feeds++;
     p_sys->p_feeds = (struct rss_feed_t *)malloc( p_sys->i_feeds
                                 * sizeof( struct rss_feed_t ) );
@@ -419,7 +443,7 @@ static int FetchRSS( filter_t *p_filter)
         if( psz_buffer == NULL ) break;
         if( psz_buffer[0] == 0 ) psz_buffer++;
         psz_feed = psz_buffer;
-        psz_buffer = strchr( psz_buffer, ',' );
+        psz_buffer = strchr( psz_buffer, '|' );
         if( psz_buffer != NULL ) psz_buffer[0] = 0;
 
         p_feed->psz_title = NULL;
@@ -456,35 +480,52 @@ static int FetchRSS( filter_t *p_filter)
                     return 1;
 
                 case XML_READER_STARTELEM:
-                    if( psz_eltname ) free( psz_eltname );
+                    if( psz_eltname )
+                    {
+                        free( psz_eltname );
+                        psz_eltname = NULL;
+                    }
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
                     {
                         return 1;
                     }
+#                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element name : %s", psz_eltname );
+#                   endif
                     if( !strcmp( psz_eltname, "item" ) )
                     {
                         i_is_item = VLC_TRUE;
                         p_feed->i_items++;
                         p_feed->p_items = (struct rss_item_t *)realloc( p_feed->p_items, p_feed->i_items * sizeof( struct rss_item_t ) );
+                        p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
+                        p_feed->p_items[p_feed->i_items-1].psz_description
+                                                                     = NULL;
+                        p_feed->p_items[p_feed->i_items-1].psz_link = NULL;
                     }
                     break;
 
                 case XML_READER_ENDELEM:
-                    if( psz_eltname ) free( psz_eltname );
+                    if( psz_eltname )
+                    {
+                        free( psz_eltname );
+                        psz_eltname = NULL;
+                    }
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
                     {
                         return 1;
                     }
+#                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element end : %s", psz_eltname );
+#                   endif
                     if( !strcmp( psz_eltname, "item" ) )
                     {
                         i_is_item = VLC_FALSE;
                         i_item++;
                     }
-                    free( psz_eltname ); psz_eltname = NULL;
+                    free( psz_eltname );
+                    psz_eltname = NULL;
                     break;
 
                 case XML_READER_TEXT:
@@ -493,7 +534,9 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         return 1;
                     }
+#                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "  text : %s", psz_eltvalue );
+#                   endif
                     if( i_is_item == VLC_FALSE )
                     {
                         if( !strcmp( psz_eltname, "title" ) )
@@ -511,6 +554,7 @@ static int FetchRSS( filter_t *p_filter)
                         else
                         {
                             free( psz_eltvalue );
+                            psz_eltvalue = NULL;
                         }
                     }
                     else
@@ -532,6 +576,7 @@ static int FetchRSS( filter_t *p_filter)
                         else
                         {
                             free( psz_eltvalue );
+                            psz_eltvalue = NULL;
                         }
                     }
                     break;
@@ -540,6 +585,7 @@ static int FetchRSS( filter_t *p_filter)
 
         if( p_xml_reader && p_xml ) xml_ReaderDelete( p_xml, p_xml_reader );
         if( p_stream ) stream_Delete( p_stream );
+        msg_Dbg( p_filter, "Done with %s RSS feed.", psz_feed );
     }
     free( psz_buffer_2 );
     if( p_xml ) xml_Delete( p_xml );
@@ -560,21 +606,28 @@ static void FreeRSS( filter_t *p_filter)
     int i_feed;
     int i_item;
 
+fprintf( stderr, "freeing ...\n" );
     for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
+fprintf( stderr, "i_feed = %d\n", i_feed );
         p_feed = p_sys->p_feeds+i_feed;
         for( i_item = 0; i_item < p_feed->i_items; i_item++ )
         {
+fprintf( stderr, "i_feed = %d, i_item = %d\n", i_feed, i_item );
             p_item = p_feed->p_items+i_item;
             free( p_item->psz_title );
             free( p_item->psz_link );
+        fprintf( stderr, "psz_description : %p %s \n", p_item->psz_description, p_item->psz_description);
             free( p_item->psz_description );
+fprintf( stderr, "i_item done\n");
         }
         free( p_feed->p_items );
         free( p_feed->psz_title);
         free( p_feed->psz_link );
         free( p_feed->psz_description );
+fprintf( stderr, "i_feed done\n");
     }
     free( p_sys->p_feeds );
     p_sys->i_feeds = 0;
+fprintf( stderr, "done freeing.\n" );
 }
