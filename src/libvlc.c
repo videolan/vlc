@@ -366,6 +366,17 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Set the config file stuff */
     p_vlc->psz_homedir = config_GetHomeDir();
     p_vlc->psz_configfile = config_GetPsz( p_vlc, "config" );
+    if( p_vlc->psz_configfile != NULL && p_vlc->psz_configfile[0] == '~'
+         && p_vlc->psz_configfile[1] == '/' )
+    {
+        char *psz = malloc( strlen(p_vlc->psz_homedir)
+                             + strlen(p_vlc->psz_configfile) );
+        /* This is incomplete : we should also support the ~cmassiot/ syntax. */
+        sprintf( psz, "%s/%s", p_vlc->psz_homedir,
+                               p_vlc->psz_configfile + 2 );
+        free( p_vlc->psz_configfile );
+        p_vlc->psz_configfile = psz;
+    }
 
     /* Check for plugins cache options */
     if( config_GetInt( p_vlc, "reset-plugins-cache" ) )

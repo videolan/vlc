@@ -1012,8 +1012,8 @@ int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
  * save.
  * Really stupid no ?
  *****************************************************************************/
-int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
-                    vlc_bool_t b_autosave )
+static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
+                           vlc_bool_t b_autosave )
 {
     module_t *p_parser;
     vlc_list_t *p_list;

@@ -1366,11 +1366,11 @@ static mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
         return s;
     }
 
-    if( *psz_dir == '~' )
+    if( psz_dir[0] == '~' && psz_dir[1] == '/' )
     {
         /* This is incomplete : we should also support the ~cmassiot/ syntax. */
         snprintf( dir, sizeof(dir), "%s/%s", p_intf->p_vlc->psz_homedir,
-                  psz_dir + 1 );
+                  psz_dir + 2 );
         psz_dir = dir;
     }
 
@@ -4036,6 +4036,26 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                           psz_variable );
             }
             free( psz_variable );
+        }
+        else if( !strcmp( s, "vlc_config_save" ) )
+        {
+            char *psz_module = SSPop( st );
+            int i_result;
+
+            if( !*psz_module )
+            {
+                free( psz_module );
+                psz_module = NULL;
+            }
+            i_result = config_SaveConfigFile( p_intf, psz_module );
+
+            if( psz_module != NULL )
+                free( psz_module );
+            SSPushN( st, i_result );
+        }
+        else if( !strcmp( s, "vlc_config_reset" ) )
+        {
+            config_ResetAll( p_intf );
         }
         /* 6. playlist functions */
         else if( !strcmp( s, "playlist_add" ) )
