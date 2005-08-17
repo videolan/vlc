@@ -169,8 +169,8 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
-    
-    p_sys->psz_filename = var_CreateGetString( p_this , "logo-file" ); 
+
+    p_sys->psz_filename = var_CreateGetString( p_this , "logo-file" );
     if( !p_sys->psz_filename || !*p_sys->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
@@ -196,7 +196,7 @@ static int Create( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    
+
     p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
     p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
 
@@ -468,7 +468,7 @@ struct filter_sys_t
     int pos, posx, posy;
     char *psz_filename;
     int i_trans;
-    
+
     vlc_bool_t b_absolute;
 
     mtime_t i_last_date;
@@ -506,7 +506,7 @@ static int CreateFilter( vlc_object_t *p_this )
     }
 
     p_sys->psz_filename =
-        var_CreateGetString( p_input->p_libvlc , "logo-file" ); 
+        var_CreateGetString( p_input->p_libvlc , "logo-file" );
     if( !p_sys->psz_filename || !*p_sys->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
@@ -649,7 +649,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
     else
     {   /*  set to an absolute xy, referenced to upper left corner */
-	    p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
         p_spu->i_x = p_sys->posx;
         p_spu->i_y = p_sys->posy;
         p_spu->b_absolute = VLC_TRUE;
@@ -672,7 +672,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     if( !strncmp( psz_var, "logo-file", 6 ) )
     {
         if( p_sys->psz_filename ) free( p_sys->psz_filename );
-        p_sys->psz_filename = strdup( newval.psz_string ); 
+        p_sys->psz_filename = strdup( newval.psz_string );
         p_sys->b_new_image = VLC_TRUE;
     }
     else if ( !strncmp( psz_var, "logo-x", 6 ) )
