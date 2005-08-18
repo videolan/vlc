@@ -7,6 +7,12 @@ Core support:
 * IPv6 and Extended passive mode support for FTP
 * new --monitor-aspect-ratio option
 
+Input:
+* Improved DVB support for satellite bands other than Ku-band
+
+Decoders:
+* Support for libSDL_image to import different image types
+
 Services discovery:
 * Bleeding edge UPnP service discovery
 
@@ -22,6 +28,11 @@ Interfaces:
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*	
     - VLC update checker
+ * HTTP
+    - new RPN functions to control VLC features (see play-howto)
+    - facilities to correctly handle non-ASCII characters and spaces in
+      the names of files
+    - include macro to include other files
     
 Translations:
  The following language was added:
