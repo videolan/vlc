@@ -74,11 +74,13 @@
     IBOutlet id o_lbl_gamma;
     IBOutlet id o_lbl_hue;
     IBOutlet id o_lbl_saturation;
+    IBOutlet id o_lbl_opaque;
     IBOutlet id o_sld_brightness;
     IBOutlet id o_sld_contrast;
     IBOutlet id o_sld_gamma;
     IBOutlet id o_sld_hue;
     IBOutlet id o_sld_saturation;
+    IBOutlet id o_sld_opaque;
     
     /* global variables */
     BOOL o_adjImg_expanded;
@@ -89,6 +91,7 @@
 - (IBAction)adjImg_Enbl:(id)sender;
 - (IBAction)adjImg_rstrDefaults:(id)sender;
 - (IBAction)adjImg_sliders:(id)sender;
+- (IBAction)adjImg_opaque:(id)sender;
 - (IBAction)audFtls_hdphnVirt:(id)sender;
 - (IBAction)audFtls_maxLevelSld:(id)sender;
 - (IBAction)audFtls_vlmeNorm:(id)sender;

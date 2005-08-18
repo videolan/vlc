@@ -38,6 +38,7 @@
 
 #import "extended.h"
 #import "intf.h"
+#import "vout.h"
 #import <vlc/aout.h>
 #import <aout_internal.h>
 #import <vlc/vout.h>
@@ -66,6 +67,10 @@ static VLCExtended *_o_sharedInstance = nil;
 
     return _o_sharedInstance;
 }
+
+/*****************************************************************************
+ * GUI methods
+ *****************************************************************************/
 
 - (void)initStrings
 {
@@ -104,6 +109,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_lbl_gamma setStringValue: _NS("Gamma")];
     [o_lbl_hue setStringValue: _NS("Hue")];
     [o_lbl_saturation setStringValue: _NS("Saturation")];
+    [o_lbl_opaque setStringValue: _NS("Opaqueness")];
     
 }
 
@@ -134,38 +140,6 @@ static VLCExtended *_o_sharedInstance = nil;
         [o_sld_hue setEnabled: NO];
         [o_sld_saturation setEnabled: NO];
     }
-
-    int i_value = config_GetInt( p_intf, "hue" );
-    if( i_value > 0 && i_value < 360 )
-    {
-        [o_sld_hue setIntValue: i_value];
-    }
-    
-    float f_value;
-    
-    f_value = config_GetFloat( p_intf, "saturation" );
-    if( f_value > 0 && f_value < 5 )
-    {
-        [o_sld_saturation setIntValue: (int)(100 * f_value) ];
-    }
-    
-    f_value = config_GetFloat( p_intf, "contrast" );
-    if( f_value > 0 && f_value < 4 )
-    {
-        [o_sld_contrast setIntValue: (int)(100 * f_value) ];
-    }
-    
-    f_value = config_GetFloat( p_intf, "brightness" );
-    if( f_value > 0 && f_value < 2 )
-    {
-        [o_sld_brightness setIntValue: (int)(100 * f_value) ];
-    }
-    
-    f_value = config_GetFloat( p_intf, "gamma" );
-    if( f_value > 0 && f_value < 10 )
-    {
-        [o_sld_gamma setIntValue: (int)(10 * f_value) ];
-    }
     
     /* set the other video-filter-checkboxes to the correct values */
     if( psz_vfilters )
@@ -190,13 +164,53 @@ static VLCExtended *_o_sharedInstance = nil;
         
         free( psz_afilters );
     }
-    
-    [o_sld_maxLevel setFloatValue: (config_GetFloat(p_intf, "norm-max-level") \
-        * 10)];
 }
 
 - (void)showPanel
 {
+    /* get the correct slider values from the prefs, in case they were changed
+     * elsewhere */
+    intf_thread_t * p_intf = VLCIntf;
+
+    int i_value = config_GetInt( p_intf, "hue" );
+    if( i_value > 0 && i_value < 360 )
+    {
+        [o_sld_hue setIntValue: i_value];
+    }
+
+    float f_value;
+    
+    f_value = config_GetFloat( p_intf, "saturation" );
+    if( f_value > 0 && f_value < 5 )
+    {
+        [o_sld_saturation setIntValue: (int)(100 * f_value) ];
+    }
+
+    f_value = config_GetFloat( p_intf, "contrast" );
+    if( f_value > 0 && f_value < 4 )
+    {
+        [o_sld_contrast setIntValue: (int)(100 * f_value) ];
+    }
+
+    f_value = config_GetFloat( p_intf, "brightness" );
+    if( f_value > 0 && f_value < 2 )
+    {
+        [o_sld_brightness setIntValue: (int)(100 * f_value) ];
+    }
+
+    f_value = config_GetFloat( p_intf, "gamma" );
+    if( f_value > 0 && f_value < 10 )
+    {
+        [o_sld_gamma setIntValue: (int)(10 * f_value) ];
+    }
+
+    [o_sld_maxLevel setFloatValue: (config_GetFloat(p_intf, "norm-max-level") \
+        * 10)];
+
+    [o_sld_opaque setFloatValue: (config_GetFloat( p_intf, \
+        "macosx-opaqueness") * 100)];
+
+
     /* show the window */
     [o_extended_window displayIfNeeded];
     [o_extended_window makeKeyAndOrderFront:nil];
@@ -304,6 +318,34 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 }
 
+- (IBAction)adjImg_opaque:(id)sender
+{
+    /* change the opaqueness of the vouts */
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST, \
+        FIND_ANYWHERE );
+    vout_thread_t * p_vout = (vout_thread_t *)vlc_object_find( p_playlist, \
+        VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    
+    vlc_value_t val;
+    val.f_float = [o_sld_opaque floatValue] / 100;
+
+    /* Try to set on the fly */
+    if( p_vout )
+    {
+        /* FIXME: insert the correct pointer here */
+        /* [p_vout->p_sys->o_window setAlpha: var_CreateGetFloat( p_vout, \
+            "macosx-opaqueness")]; */
+        msg_Dbg( p_playlist, "p_vout found");
+        var_Set( p_vout, "macosx-opaqueness", val );
+        vlc_object_release( p_vout );
+    }
+    
+    /* store to prefs */
+    config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
+    
+    vlc_object_release( p_playlist );
+}
+
 - (IBAction)audFtls_hdphnVirt:(id)sender
 {
     /* en-/disable headphone virtualisation */
@@ -355,20 +397,20 @@ static VLCExtended *_o_sharedInstance = nil;
     {
         /* move the window contents upwards (partially done through settings
          * inside the nib) and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height - 151;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y + 151;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 151;
-        o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y + 151;
+        o_win_rect.size.height = o_win_rect.size.height - 171;
+        o_win_rect.origin.y = [o_extended_window frame].origin.y + 171;
+        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 171;
+        o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y + 171;
         
         /* remove the inserted view */
         [o_adjustImg_view removeFromSuperviewWithoutNeedingDisplay];
     }else{
     
         /* move the window contents downwards and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height + 151;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y - 151;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 151;
-        o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y - 151;
+        o_win_rect.size.height = o_win_rect.size.height + 171;
+        o_win_rect.origin.y = [o_extended_window frame].origin.y - 171;
+        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 171;
+        o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y - 171;
     }
     
     [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
@@ -378,13 +420,13 @@ static VLCExtended *_o_sharedInstance = nil;
     
     if (o_adjImg_expanded)
     {
-        o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height - 151;
+        o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height - 171;
         msg_Dbg( VLCIntf, "collapsed adjust-image section");
         o_adjImg_expanded = NO;
     } else {
         /* insert view */
-        o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height + 151;
-        [o_adjustImg_view setFrame: NSMakeRect( 20, -10, 370, 161)];
+        o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height + 171;
+        [o_adjustImg_view setFrame: NSMakeRect( 20, -10, 370, 181)];
         [o_adjustImg_view setNeedsDisplay:YES];
         [o_adjustImg_view setAutoresizesSubviews: YES];
         [[o_box_adjImg contentView] addSubview: o_adjustImg_view];
@@ -527,6 +569,11 @@ static VLCExtended *_o_sharedInstance = nil;
         "which they are applied ), you need to enter manually a filters " \
         "string (Preferences / Video / Filters)."));
 }
+
+
+/*****************************************************************************
+ * methods to communicate changes to VLC's core
+ *****************************************************************************/
 
 - (void)changeVFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add 
 {
@@ -673,16 +720,31 @@ static VLCExtended *_o_sharedInstance = nil;
 {    
     /* save the preferences to make sure that our module-changes will up on
      * next launch again */
-    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST, \
+        FIND_ANYWHERE );
     int returnedValue;
     
-    returnedValue = config_SaveConfigFile( p_intf, NULL);
+    returnedValue = config_SaveConfigFile( p_playlist, NULL);
     if (returnedValue == 0)
     {
-        msg_Dbg(p_intf, "VLCExtended: saved preferences successfully");
+        msg_Dbg(p_playlist, "VLCExtended: saved preferences successfully");
     } else {
-        msg_Dbg(p_intf, "VLCExtended: error while saving the preferences (%i) " \
-            , returnedValue);
+        msg_Dbg(p_playlist, "VLCExtended: error while saving the preferences " \
+            "(%i)" , returnedValue);
     }
+    vlc_object_release( p_playlist );
+}
+
+
+/*****************************************************************************
+ * delegate method
+ *****************************************************************************/
+
+- (BOOL)applicationShouldTerminate:(NSWindow *)sender
+{
+    /* save the prefs before shutting down */
+    [self savePrefs];
+    
+    return YES;
 }
 @end

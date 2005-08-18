@@ -4,6 +4,7 @@
         {
             ACTIONS = {
                 "adjImg_Enbl" = id; 
+                "adjImg_opaque" = id; 
                 "adjImg_rstrDefaults" = id; 
                 "adjImg_sliders" = id; 
                 "audFtls_hdphnVirt" = id; 
@@ -48,6 +49,7 @@
                 "o_lbl_gamma" = id; 
                 "o_lbl_hue" = id; 
                 "o_lbl_maxLevel" = id; 
+                "o_lbl_opaque" = id; 
                 "o_lbl_saturation" = id; 
                 "o_lbl_video" = id; 
                 "o_lbl_videoFlts" = id; 
@@ -56,6 +58,7 @@
                 "o_sld_gamma" = id; 
                 "o_sld_hue" = id; 
                 "o_sld_maxLevel" = id; 
+                "o_sld_opaque" = id; 
                 "o_sld_saturation" = id; 
                 "o_videoFilters_view" = id; 
             }; 
