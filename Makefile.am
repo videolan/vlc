@@ -487,22 +487,8 @@ vlc-bundle: vlc
 	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
 
-# Install the modules and the symlinks
+# Install the symlinks
 install-exec-local:
-	for i in "" `$(VLC_CONFIG) --target plugin` ; do if test -n "$$i" ; then \
-	  echo $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | sed -e 's,.*modules/\([^/]*\).*,\1,'`" ; \
-	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | sed -e 's,.*modules/\([^/]*\).*,\1,'`" ; \
-	fi ; done
-	for i in "" `$(VLC_CONFIG) --target builtin` ; do if test -n "$$i" ; then \
-	  echo $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
-	  $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
-	fi ; done
-if BUILD_MOZILLA
-	for i in "" `$(VLC_CONFIG) --target builtin pic` ; do if test -n "$$i" ; then \
-	  echo $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
-	  $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
-	fi ; done
-endif
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
 	  ln -s vlc "$(DESTDIR)$(bindir)/$$i" ; \
@@ -510,20 +496,6 @@ endif
 
 # the opposite of install-{data,exec}-local
 uninstall-local:
-	@for i in "" `$(VLC_CONFIG) --target plugin` ; do if test -n "$$i" ; then \
-	  echo rm -f "$(DESTDIR)$(libdir)/vlc/`echo $$i | sed -e 's,.*modules/\([^/]*\).*,\1,'`/$$(basename $$i$(LIBEXT))" ; \
-	  rm -f "$(DESTDIR)$(libdir)/vlc/`echo $$i | sed -e 's,.*modules/\([^/]*\).*,\1,'`/$$(basename $$i$(LIBEXT))" ; \
-	fi ; done
-	@for i in "" `$(VLC_CONFIG) --target builtin` ; do if test -n "$$i" ; then \
-	  echo rm -f "$(DESTDIR)$(libdir)/vlc/$$(basename $$i)" ; \
-	  rm -f "$(DESTDIR)$(libdir)/vlc/$$(basename $$i)" ; \
-	fi ; done
-if BUILD_MOZILLA
-	@for i in "" `$(VLC_CONFIG) --target builtin pic` ; do if test -n "$$i" ; then \
-	  echo rm -f "$$i" "$(DESTDIR)$(libdir)/vlc/$$(basename $$i)" ; \
-	  rm -f "$$i" "$(DESTDIR)$(libdir)/vlc/$$(basename $$i)" ; \
-	fi ; done
-endif
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
