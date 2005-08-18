@@ -325,6 +325,7 @@ static VLCExtended *_o_sharedInstance = nil;
         FIND_ANYWHERE );
     vout_thread_t * p_vout = (vout_thread_t *)vlc_object_find( p_playlist, \
         VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    vout_thread_t * p_real_vout;
     
     vlc_value_t val;
     val.f_float = [o_sld_opaque floatValue] / 100;
@@ -332,11 +333,21 @@ static VLCExtended *_o_sharedInstance = nil;
     /* Try to set on the fly */
     if( p_vout )
     {
+        if( p_vout->i_object_type == VLC_OBJECT_OPENGL )
+        {
+            p_real_vout = (vout_thread_t *) p_vout->p_parent;
+        }
+        else
+        {
+            p_real_vout = p_vout;
+        }
+        
         /* FIXME: insert the correct pointer here */
-        /* [p_vout->p_sys->o_window setAlpha: var_CreateGetFloat( p_vout, \
-            "macosx-opaqueness")]; */
-        msg_Dbg( p_playlist, "p_vout found");
+        /*[p_vout->p_sys->o_window setAlpha: var_CreateGetFloat( p_vout, \
+            "macosx-opaqueness")];*/
+        
         var_Set( p_vout, "macosx-opaqueness", val );
+        vlc_object_release( p_real_vout );
         vlc_object_release( p_vout );
     }
     
