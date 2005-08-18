@@ -173,7 +173,7 @@ void MacroDo( httpd_file_sys_t *p_args,
             {
                 break;
             }
-            E_(uri_extract_value)( p_request, "control", control, 512 );
+            E_(ExtractURIValue)( p_request, "control", control, 512 );
             if( *m->param1 && !strstr( m->param1, control ) )
             {
                 msg_Warn( p_intf, "unauthorized control=%s", control );
@@ -186,7 +186,7 @@ void MacroDo( httpd_file_sys_t *p_args,
                     int i_item;
                     char item[512];
 
-                    E_(uri_extract_value)( p_request, "item", item, 512 );
+                    E_(ExtractURIValue)( p_request, "item", item, 512 );
                     i_item = atoi( item );
                     playlist_Control( p_sys->p_playlist, PLAYLIST_ITEMPLAY,
                                       playlist_ItemGetById( p_sys->p_playlist,
@@ -228,9 +228,9 @@ void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_SEEK:
                 {
                     char value[30];
-                    E_(uri_extract_value)( p_request, "seek_value", value, 30 );
-                    E_(uri_decode_url_encoded)( value );
-                    E_(Seek)( p_intf, value );
+                    E_(ExtractURIValue)( p_request, "seek_value", value, 30 );
+                    E_(DecodeEncodedURI)( value );
+                    E_(HandleSeek)( p_intf, value );
                     break;
                 }
                 case MVLC_VOLUME:
@@ -239,9 +239,9 @@ void MacroDo( httpd_file_sys_t *p_args,
                     audio_volume_t i_volume;
                     int i_value;
 
-                    E_(uri_extract_value)( p_request, "value", vol, 8 );
+                    E_(ExtractURIValue)( p_request, "value", vol, 8 );
                     aout_VolumeGet( p_intf, &i_volume );
-                    E_(uri_decode_url_encoded)( vol );
+                    E_(DecodeEncodedURI)( vol );
 
                     if( vol[0] == '+' )
                     {
@@ -297,10 +297,10 @@ void MacroDo( httpd_file_sys_t *p_args,
                     char mrl[1024], psz_name[1024];
                     playlist_item_t *p_item;
 
-                    E_(uri_extract_value)( p_request, "mrl", mrl, 1024 );
-                    E_(uri_decode_url_encoded)( mrl );
-                    E_(uri_extract_value)( p_request, "name", psz_name, 1024 );
-                    E_(uri_decode_url_encoded)( psz_name );
+                    E_(ExtractURIValue)( p_request, "mrl", mrl, 1024 );
+                    E_(DecodeEncodedURI)( mrl );
+                    E_(ExtractURIValue)( p_request, "name", psz_name, 1024 );
+                    E_(DecodeEncodedURI)( psz_name );
                     if( !*psz_name )
                     {
                         memcpy( psz_name, mrl, 1024 );
@@ -328,7 +328,7 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     /* Get the list of items to delete */
                     while( (p_parser =
-                            E_(uri_extract_value)( p_parser, "item", item, 512 )) )
+                            E_(ExtractURIValue)( p_parser, "item", item, 512 )) )
                     {
                         if( !*item ) continue;
 
@@ -362,7 +362,7 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     /* Get the list of items to keep */
                     while( (p_parser =
-                       E_(uri_extract_value)( p_parser, "item", item, 512 )) )
+                       E_(ExtractURIValue)( p_parser, "item", item, 512 )) )
                     {
                         if( !*item ) continue;
 
@@ -406,9 +406,9 @@ void MacroDo( httpd_file_sys_t *p_args,
                     int i_order;
                     int i_item;
 
-                    E_(uri_extract_value)( p_request, "type", type, 12 );
-                    E_(uri_extract_value)( p_request, "order", order, 2 );
-                    E_(uri_extract_value)( p_request, "item", item, 512 );
+                    E_(ExtractURIValue)( p_request, "type", type, 12 );
+                    E_(ExtractURIValue)( p_request, "order", order, 2 );
+                    E_(ExtractURIValue)( p_request, "item", item, 512 );
                     i_item = atoi( item );
 
                     if( order[0] == '0' ) i_order = ORDER_NORMAL;
@@ -447,8 +447,8 @@ void MacroDo( httpd_file_sys_t *p_args,
                     char psz_newpos[6];
                     int i_pos;
                     int i_newpos;
-                    E_(uri_extract_value)( p_request, "psz_pos", psz_pos, 6 );
-                    E_(uri_extract_value)( p_request, "psz_newpos", psz_newpos, 6 );
+                    E_(ExtractURIValue)( p_request, "psz_pos", psz_pos, 6 );
+                    E_(ExtractURIValue)( p_request, "psz_newpos", psz_newpos, 6 );
                     i_pos = atoi( psz_pos );
                     i_newpos = atoi( psz_newpos );
                     if ( i_pos < i_newpos )
@@ -467,7 +467,7 @@ void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_CLOSE:
                 {
                     char id[512];
-                    E_(uri_extract_value)( p_request, "id", id, 512 );
+                    E_(ExtractURIValue)( p_request, "id", id, 512 );
                     msg_Dbg( p_intf, "requested close id=%s", id );
 #if 0
                     if( p_sys->p_httpd->pf_control( p_sys->p_httpd, HTTPD_SET_CLOSE, id, NULL ) )
@@ -506,11 +506,11 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(uri_extract_value)( p_request, "name", name, 512 );
+                    E_(ExtractURIValue)( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_NEW )
                     {
                         char type[20];
-                        E_(uri_extract_value)( p_request, "type", type, 20 );
+                        E_(ExtractURIValue)( p_request, "type", type, 20 );
                         p += sprintf( psz, "new %s %s", name, type );
                     }
                     else
@@ -521,14 +521,14 @@ void MacroDo( httpd_file_sys_t *p_args,
                     for( i = 0; i < 11; i++ )
                     {
                         char val[512];
-                        E_(uri_extract_value)( p_request,
+                        E_(ExtractURIValue)( p_request,
                                                vlm_properties[i], val, 512 );
-                        E_(uri_decode_url_encoded)( val );
+                        E_(DecodeEncodedURI)( val );
                         if( strlen( val ) > 0 && i >= 4 )
                         {
                             p += sprintf( p, " %s %s", vlm_properties[i], val );
                         }
-                        else if( E_(uri_test_param)( p_request, vlm_properties[i] ) && i < 4 )
+                        else if( E_(TestURIParam)( p_request, vlm_properties[i] ) && i < 4 )
                         {
                             p += sprintf( p, " %s", vlm_properties[i] );
                         }
@@ -565,7 +565,7 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(uri_extract_value)( p_request, "name", name, 512 );
+                    E_(ExtractURIValue)( p_request, "name", name, 512 );
                     sprintf( psz, "del %s", name );
 
                     vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
@@ -587,7 +587,7 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(uri_extract_value)( p_request, "name", name, 512 );
+                    E_(ExtractURIValue)( p_request, "name", name, 512 );
                     if( StrToMacroType( control ) == MVLC_VLM_PLAY )
                         sprintf( psz, "control %s play", name );
                     else if( StrToMacroType( control ) == MVLC_VLM_PAUSE )
@@ -597,7 +597,7 @@ void MacroDo( httpd_file_sys_t *p_args,
                     else if( StrToMacroType( control ) == MVLC_VLM_SEEK )
                     {
                         char percent[20];
-                        E_(uri_extract_value)( p_request, "percent", percent, 512 );
+                        E_(ExtractURIValue)( p_request, "percent", percent, 512 );
                         sprintf( psz, "control %s seek %s", name, percent );
                     }
 
@@ -618,8 +618,8 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     if( p_intf->p_sys->p_vlm == NULL ) break;
 
-                    E_(uri_extract_value)( p_request, "file", file, 512 );
-                    E_(uri_decode_url_encoded)( file );
+                    E_(ExtractURIValue)( p_request, "file", file, 512 );
+                    E_(DecodeEncodedURI)( file );
 
                     if( StrToMacroType( control ) == MVLC_VLM_LOAD )
                         sprintf( psz, "load %s", file );
@@ -653,8 +653,8 @@ void MacroDo( httpd_file_sys_t *p_args,
             {
                 break;
             }
-            E_(uri_extract_value)( p_request, m->param1,  value, 512 );
-            E_(uri_decode_url_encoded)( value );
+            E_(ExtractURIValue)( p_request, m->param1,  value, 512 );
+            E_(DecodeEncodedURI)( value );
 
             switch( StrToMacroType( m->param2 ) )
             {

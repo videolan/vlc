@@ -100,7 +100,7 @@
 
 /** This function recursively parses a directory and adds all files */
 int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
-                           char *psz_dir );
+                        char *psz_dir );
 /** This function loads a file into a buffer */
 int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data );
 /** This function creates a suitable URL for a filename */
@@ -115,18 +115,18 @@ char *E_(ToUTF8)( intf_thread_t *p_intf, char *psz_local );
 
 /** This command parses the "seek" command for the HTTP interface
  * and performs the requested action */
-void E_(Seek)( intf_thread_t *p_intf, char *p_value );
+void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value );
 
 /* URI Handling functions */
 
 /** This function extracts the value for a given argument name
  * from an HTTP request */
-char *E_(uri_extract_value)( char *psz_uri, const char *psz_name,
+char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
                              char *psz_value, int i_value_max );
 /** \todo Describe this function */
-int E_(uri_test_param)( char *psz_uri, const char *psz_name );
+int E_(TestURIParam)( char *psz_uri, const char *psz_name );
 /** This function extracts the original value from an URL-encoded string */
-void E_(uri_decode_url_encoded)( char *psz );
+void E_(DecodeEncodedURI)( char *psz );
 
 /** This function parses a MRL */
 playlist_item_t *E_(MRLParse)( intf_thread_t *, char *psz, char *psz_name );
@@ -142,22 +142,25 @@ char *E_(FirstWord)( char *psz, char *new );
 
 /** \defgroup http_vars Macro variables
  * \ingroup http_intf
- * These variables are used in macros
+ * These variables can be used in the <vlc> macros and in the RPN evaluator.
+ * The variables make a tree: each variable can have an arbitrary
+ * number of "children" variables.
+ * A number of helper functions are provided to manipulate the main variable
+ * structure
  * @{
  */
 
 /**
  * \struct mvar_t
- * This structure defines a macro variable as used by the HTTP interface.
- * These variables can be used in the <vlc> macros
+ * This structure defines a macro variable
  */
 typedef struct mvar_s
 {
-    char *name;
-    char *value;
+    char *name;                 ///< Variable name
+    char *value;                ///< Variable value
 
-    int           i_field;
-    struct mvar_s **field;
+    int           i_field;      ///< Number of children variables
+    struct mvar_s **field;      ///< Children variables array
 } mvar_t;
 
 
@@ -187,8 +190,11 @@ void     mvar_AppendNewVar( mvar_t *vars, const char *name,
                                const char *value );
 /** @} */
 
-/** \defgroup http_sets Set variables *
+/** \defgroup http_sets Sets *
  * \ingroup http_intf
+ * Sets are an application of the macro variables. There are a number of
+ * predefined functions that will give you variables whose children represent
+ * VLC internal data (playlist, stream info, ...)
  * @{
  */
 
@@ -198,26 +204,26 @@ mvar_t *mvar_IntegerSetNew( const char *name, const char *arg );
 
 /** This function creates a set variable with the contents of the playlist */
 mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,
-                                    playlist_t *p_pl );
+                             playlist_t *p_pl );
 /** This function creates a set variable with the contents of the Stream
  * and media info box */
 mvar_t *mvar_InfoSetNew( intf_thread_t *p_intf, char *name,
-                                input_thread_t *p_input );
+                         input_thread_t *p_input );
 /** This function creates a set variable with the input parameters */
 mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
-                                    input_thread_t *p_input,
-                                    const char *psz_variable );
+                             input_thread_t *p_input,
+                             const char *psz_variable );
 /** This function creates a set variable representing the files of the psz_dir
  * directory */
 mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
-                                char *psz_dir );
+                         char *psz_dir );
 /** This function creates a set variable representing the VLM streams */
 mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm );
 
 /** This function converts the listing of a playlist node into a mvar set */
 void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
-                       playlist_item_t *p_node, char *name, mvar_t *s,
-                       int i_depth );
+                           playlist_item_t *p_node, char *name, mvar_t *s,
+                           int i_depth );
 
 /**@}*/
 
@@ -267,20 +273,22 @@ int  SSPopN  ( rpn_stack_t *, mvar_t  * );
 
 /** \defgroup http_macros <vlc> Macros Handling
  * \ingroup http_intf
+ * A macro is a code snippet in the HTML page looking like
+ * <vlc id="macro_id" param1="value1" param2="value2">
+ * Macros string ids are mapped to macro types, and specific handling code
+ * must be written for each macro type
  * @{
  */
 
 
 /** \struct macro_t
  * This structure represents a HTTP Interface macro.
- * A macro is a code snippet in the HTML page looking like
- * <vlc id="macro_id" param1="value1" param2="value2"
  */
 typedef struct
 {
-    char *id;
-    char *param1;
-    char *param2;
+    char *id;           ///< Macro ID string
+    char *param1;       ///< First parameter
+    char *param2;       ///< Second parameter
 } macro_t;
 
 /** This function creates a macro from a <vlc ....> tag */

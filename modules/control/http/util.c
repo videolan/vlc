@@ -417,8 +417,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
 /****************************************************************************
  * Seek command parsing handling
  ****************************************************************************/
-
-void E_(Seek)( intf_thread_t *p_intf, char *p_value )
+void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     vlc_value_t val;
@@ -600,7 +599,7 @@ void E_(Seek)( intf_thread_t *p_intf, char *p_value )
 /****************************************************************************
  * URI Parsing functions
  ****************************************************************************/
-int E_(uri_test_param)( char *psz_uri, const char *psz_name )
+int E_(TestURIParam)( char *psz_uri, const char *psz_name )
 {
     char *p = psz_uri;
 
@@ -617,7 +616,7 @@ int E_(uri_test_param)( char *psz_uri, const char *psz_name )
 
     return VLC_FALSE;
 }
-char *E_(uri_extract_value)( char *psz_uri, const char *psz_name,
+char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
                              char *psz_value, int i_value_max )
 {
     char *p = psz_uri;
@@ -675,7 +674,7 @@ char *E_(uri_extract_value)( char *psz_uri, const char *psz_name,
     return p;
 }
 
-void E_(uri_decode_url_encoded)( char *psz )
+void E_(DecodeEncodedURI)( char *psz )
 {
     char *dup = strdup( psz );
     char *p = dup;
