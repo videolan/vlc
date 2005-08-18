@@ -1018,11 +1018,12 @@ static VLCMain *_o_sharedMainInstance = nil;
         if( p_intf->p_sys->b_volume_update )
         {
             NSString *o_text;
+            int i_volume_step = 0;
             o_text = [NSString stringWithFormat: _NS("Volume: %d%%"), i_lastShownVolume * 400 / AOUT_VOLUME_MAX];
             if( i_lastShownVolume != -1 )
             [self setScrollField:o_text stopAfter:1000000];
-
-            [o_volumeslider setFloatValue: (float)i_lastShownVolume / AOUT_VOLUME_STEP];
+            i_volume_step = config_GetInt( p_intf->p_vlc, "volume-step" );
+            [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
             [o_volumeslider setEnabled: TRUE];
             p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
             p_intf->p_sys->b_volume_update = FALSE;

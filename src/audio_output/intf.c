@@ -147,10 +147,11 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
 {
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
-    int i_result = 0, i_volume = 0;
+    int i_result = 0, i_volume = 0, i_volume_step = 0;
 
+    i_volume_step = config_GetInt( p_object->p_vlc, "volume-step" );
     i_volume = config_GetInt( p_object, "volume" );
-    i_volume += AOUT_VOLUME_STEP * i_nb_steps;
+    i_volume += i_volume_step * i_nb_steps;
     if ( i_volume > AOUT_VOLUME_MAX )
     {
         i_volume = AOUT_VOLUME_MAX;
@@ -184,10 +185,11 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
 {
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
-    int i_result = 0, i_volume = 0;
+    int i_result = 0, i_volume = 0, i_volume_step = 0;
 
+    i_volume_step = config_GetInt( p_object->p_vlc, "volume-step" );
     i_volume = config_GetInt( p_object, "volume" );
-    i_volume -= AOUT_VOLUME_STEP * i_nb_steps;
+    i_volume -= i_volume_step * i_nb_steps;
     if ( i_volume < AOUT_VOLUME_MIN )
     {
         i_volume = AOUT_VOLUME_MIN;

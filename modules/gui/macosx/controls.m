@@ -250,7 +250,9 @@
 {
     intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
-    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_STEP );
+    int i_volume_step = 0;
+    i_volume_step = config_GetInt( p_intf->p_vlc, "volume-step" );
+    aout_VolumeSet( p_intf, i_volume * i_volume_step );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }

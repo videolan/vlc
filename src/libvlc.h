@@ -124,6 +124,11 @@ static char *ppsz_snap_formats[] =
 #define VOLUME_SAVE_LONGTEXT N_( \
     "This saves the audio output volume when you select mute.")
 
+#define VOLUME_STEP_TEXT N_("Audio output volume step")
+#define VOLUME_STEP_LONGTEXT N_( \
+    "The step size of the volume is adjustable using this option, " \
+    "in a range from 0 to 1024." )
+
 #define AOUT_RATE_TEXT N_("Audio output frequency (Hz)")
 #define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
@@ -942,6 +947,9 @@ vlc_module_begin();
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
                             VOLUME_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, AOUT_VOLUME_MIN,
+                            AOUT_VOLUME_MAX, NULL, VOLUME_STEP_TEXT,
+                            VOLUME_STEP_LONGTEXT, VLC_TRUE );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, VLC_TRUE );
 #if !defined( SYS_DARWIN )

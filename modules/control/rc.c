@@ -756,7 +756,7 @@ static void Run( intf_thread_t *p_intf )
                             break;
                     }
                     vlc_mutex_unlock( &p_playlist->object_lock );
-                } /* End of current playlist status */                
+                } /* End of current playlist status */
             }
         }
         else if( !strcmp( psz_cmd, "get_time" ) )
@@ -860,7 +860,7 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         p_playlist = NULL;
     }
-    
+
     var_DelCallback( p_intf->p_vlc, "volume", VolumeChanged, p_intf );
 }
 
@@ -971,7 +971,7 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
-    
+
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     msg_rc( STATUS_CHANGE "( audio volume: %d )", newval.i_int );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
@@ -984,7 +984,7 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
     playlist_t    *p_playlist = NULL;
     input_thread_t *p_input = NULL;
-        
+
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
@@ -1247,7 +1247,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_playlist->p_input )
         {
             vlc_value_t val;
-            
+ 
             var_Get( p_playlist->p_input, "rate", &val );
             if( val.i_int != INPUT_RATE_DEFAULT )
             {
@@ -1718,8 +1718,10 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
     audio_volume_t i_volume;
     int i_nb_steps = atoi(newval.psz_string);
     int i_error = VLC_SUCCESS;
+    int i_volume_step = 0;
 
-    if ( i_nb_steps <= 0 || i_nb_steps > (AOUT_VOLUME_MAX/AOUT_VOLUME_STEP) )
+    i_volume_step = config_GetInt( p_intf->p_vlc, "volume-step" );
+    if ( i_nb_steps <= 0 || i_nb_steps > (AOUT_VOLUME_MAX/i_volume_step) )
     {
         i_nb_steps = 1;
     }
