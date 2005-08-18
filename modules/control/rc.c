@@ -129,7 +129,7 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
     va_start( args, psz_fmt );
-    
+
     if( p_intf->p_sys->i_socket == -1 )
     {
         vprintf( psz_fmt, args );
@@ -457,7 +457,7 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "time-opacity", Other, NULL );
     var_Create( p_intf, "time-size", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "time-size", Other, NULL );
-    
+
     /* logo on the fly items */
     var_Create( p_intf, "logo-file", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "logo-file", Other, NULL );
@@ -518,7 +518,7 @@ static void Run( intf_thread_t *p_intf )
     /* status callbacks */
     /* Listen to audio volume updates */
     var_AddCallback( p_intf->p_vlc, "volume", VolumeChanged, p_intf );
-    
+
 #ifdef WIN32
     /* Get the file descriptor of the console input */
     p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -594,7 +594,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_mutex_unlock( &p_playlist->object_lock );
             }
         }
-        
+
         if( (p_input != NULL) && !p_input->b_dead && !p_input->b_die &&
             (p_playlist != NULL) )
         {
@@ -746,7 +746,7 @@ static void Run( intf_thread_t *p_intf )
                             msg_rc( STATUS_CHANGE "( stop state: 0 )" );
                             break;
                         case PLAYLIST_RUNNING:
-                            msg_rc( STATUS_CHANGE "( play state: %d )", var_GetInteger( p_input, "state" ) );
+                            msg_rc( STATUS_CHANGE "( play state: 1 )" );
                             break;
                         case PLAYLIST_PAUSED:
                             msg_rc( STATUS_CHANGE "( pause state: 2 )" );
@@ -865,7 +865,7 @@ static void Run( intf_thread_t *p_intf )
 }
 
 static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
-{                
+{
     msg_rc(_("+----[ Remote control commands ]"));
     msg_rc(  "| ");
     msg_rc(_("| add XYZ  . . . . . . . . . . add XYZ to playlist"));
@@ -899,7 +899,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| achan [X]. . . . . . . .  set/get audio channels"));
     msg_rc(_("| menu [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
-   
+
     if (b_longhelp)
     {
         msg_rc(_("| marq-marquee STRING  . . overlay STRING in video"));
@@ -955,7 +955,7 @@ static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
     input_thread_t *p_input = NULL;
-    
+
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
@@ -1022,7 +1022,7 @@ static int RateChanged( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
     input_thread_t *p_input = NULL;
-    
+
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
@@ -1055,7 +1055,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_release( p_input );
         return VLC_EGENERIC;
     }
-    
+
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
@@ -1231,8 +1231,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             vlc_object_release( p_playlist );
             return VLC_EGENERIC;
         }
-    }    
-    
+    }
+
     /* Parse commands that require a playlist */
     if( !strcmp( psz_cmd, "prev" ) )
     {
@@ -1326,7 +1326,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     {
         return VLC_ENOOBJ;
     }
-    
+
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( !p_input )
     {
@@ -1346,7 +1346,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             return VLC_EGENERIC;
         }
     }
-    
+
     /* Parse miscellaneous commands */
     if( !strcmp( psz_cmd, "marq-marquee" ) )
     {
@@ -1632,7 +1632,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     playlist_t *p_playlist;
-    
+
     p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist )
     {
@@ -1687,7 +1687,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
 
                 keyval.i_int = config_GetInt( p_intf, "key-vol-mute" );
                 var_Set( p_intf->p_vlc, "key-pressed", keyval );
-            }        
+            }
             i_error = aout_VolumeSet( p_this, i_volume );
             osd_Volume( p_this );
             msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );            
@@ -1832,7 +1832,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         msg_rc( "[on|off|up|down|left|right|select]" );
         return i_error;
     }
-    
+
     p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_playlist )
         return VLC_ENOOBJ;
@@ -1849,7 +1849,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         }
         vlc_object_release( p_playlist );
     }
-    
+
     val.psz_string = strdup( newval.psz_string );
     if( !strcmp( val.psz_string, "on" ) || !strcmp( val.psz_string, "show" ))
         osd_MenuShow( p_this );
