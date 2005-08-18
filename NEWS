@@ -4,20 +4,23 @@ Changes between 0.8.2 and 0.8.4-svn (not yet released):
 -----------------------------------------------------
 
 Core support:
-* IPv6 and Extended passive mode support for FTP
+* Internal strings handling is now UTF-8 based
+
+Video output:
 * new --monitor-aspect-ratio option
 
 Input:
 * Improved DVB support for satellite bands other than Ku-band
+* IPv6 and Extended passive mode support for FTP
 
 Decoders:
 * Support for libSDL_image to import different image types
 
 Services discovery:
-* Bleeding edge UPnP service discovery
+* UPnP service discovery
 
 Video Filters:
-* RSS feed
+* RSS feed overlay
 
 Interfaces:
  * Mac OS X
@@ -39,7 +42,7 @@ Translations:
  * Romanian
 
 Changes between 0.8.1 and 0.8.2:
------------------------------------------------------
+--------------------------------
 
 Core support:
  * Rewrite of the playlist
