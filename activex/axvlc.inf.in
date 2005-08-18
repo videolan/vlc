@@ -9,13 +9,13 @@
   axvlc.dll=axvlc.dll
 
 [axvlc.dll]
-  FileVersion=@VERSION32@
+  FileVersion=@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,0
   clsid={E23FE9C6-778E-49d4-B537-38FCDE4887D8}
   RegisterServer=no
   hook=nsiinstaller
 
 [vlc-@VERSION@-win32.exe]
-  FileVersion=@VERSION32@
+  FileVersion=@VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,0
   file-win32-x86=thiscab
 
 [nsiinstaller]

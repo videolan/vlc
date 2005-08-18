@@ -4438,6 +4438,9 @@ AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MAJOR,"${VERSION_MAJOR}", [version major numb
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MINOR,"${VERSION_MINOR}", [version minor number])
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_REVISION,"${VERSION_REVISION}", [version minor number])
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION_EXTRA,"${VERSION_EXTRA}", [version minor number])
+AC_SUBST(VERSION_MAJOR)
+AC_SUBST(VERSION_MINOR)
+AC_SUBST(VERSION_REVISION)
 
 dnl Old definitions for version-dependant plugins
 dnl VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
@@ -4447,11 +4450,6 @@ dnl AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module f
 dnl New definitions with value matching 0.8.2 release
 AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__0_8_2", [String suffix for module functions])
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, 0_8_2, [Symbol suffix for module functions])
-
-dnl Version number for ActiveX INF
-VERSION32="`echo -n ${VERSION} | sed -e 's/@<:@a-z\-@:>@//g' | sed -e 'y/./,/'`"
-VERSION32="`echo -n ${VERSION32}',0'`"
-AC_SUBST(VERSION32)
 
 DATA_PATH="${ac_tool_prefix}/share/vlc"
 AC_SUBST(DATA_PATH)
