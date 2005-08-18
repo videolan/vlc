@@ -270,6 +270,7 @@ Section "Media player (required)" SEC01
 
   File  /r plugins
   File  /r locale
+  File  /r osdmenu
   File  /r skins
   File  /r http
 
