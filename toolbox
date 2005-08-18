@@ -458,7 +458,7 @@ then
   if which svnversion 2>&1 >/dev/null; then
     VLC_CHANGESET=`svnversion $srcdir`
   else
-    VLC_CHANGESET=''
+    VLC_CHANGESET='exported'
   fi
 
   cat >| src/misc/version.c << EOF
