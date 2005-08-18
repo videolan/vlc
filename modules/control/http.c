@@ -4104,6 +4104,27 @@ static void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             playlist_LockClear( p_sys->p_playlist );
             msg_Dbg( p_intf, "requested playlist empty" );
         }
+        else if( !strcmp( s, "playlist_delete" ) )
+        {
+            int i_id = SSPopN( st, vars );
+            playlist_LockDelete( p_sys->p_playlist, i_id );
+            msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
+        }
+        else if( !strcmp( s, "playlist_move" ) )
+        {
+            int i_newpos = SSPopN( st, vars );
+            int i_pos = SSPopN( st, vars );
+            if ( i_pos < i_newpos )
+            {
+                playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
+            }
+            else
+            {
+                playlist_Move( p_sys->p_playlist, i_pos, i_newpos );
+            }
+            msg_Dbg( p_intf, "requested to move playlist item %d to %d",
+                     i_pos, i_newpos);
+        }
         else
         {
             SSPush( st, s );
