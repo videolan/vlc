@@ -1795,7 +1795,7 @@ then
     else
       VLC_ADD_BUILTINS([dvb])
     fi
-  ],[])
+  ],[AC_MSG_WARN(linux-dvb headers not found, dvb disabled)])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
