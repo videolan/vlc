@@ -173,7 +173,7 @@ static int Demux( demux_t *p_demux )
 
     i_data = fwrite( p_sys->buffer, 1, i_data, p_sys->p_file );
 
-    if( i_data < 0 )
+    if( i_data == 0 )
     {
         msg_Err( p_demux, "failed to write data" );
         return -1;
