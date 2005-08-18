@@ -169,6 +169,10 @@ static int OpenUDP( vlc_object_t * p_this )
 
     p_socket->i_handle = -1;
 
+    /* Build the local socket */
+    if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )        
+        return 0;
+
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET6, SOCK_DGRAM, 0 )) == -1 )
@@ -222,13 +226,6 @@ static int OpenUDP( vlc_object_t * p_this )
     {
         msg_Warn( p_this, "cannot configure socket (SO_RCVBUF: %s)",
                           strerror(errno) );
-    }
-
-    /* Build the local socket */
-    if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )        
-    {
-        close( i_handle );
-        return 0;
     }
 
 #if defined(WIN32)
