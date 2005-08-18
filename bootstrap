@@ -216,6 +216,7 @@ noinst_HEADERS =
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 SUBDIRS = ${subdirs}
+SUFFIXES = _plugin\$(LIBEXT) _plugin.a
 
 libvlcdir = \$(libdir)/vlc/\$(basedir)
 
@@ -233,6 +234,8 @@ endif
 endif
 
 all: all-modules
+
+# Find out which modules were enabled and tell make to build them
 all-modules:
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
 	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; fi; \\
@@ -240,6 +243,18 @@ all-modules:
 	if test "\$(pic)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
+
+# Build a plugin with the adequate linker and linker's flags
+_plugin.a_plugin\$(LIBEXT):
+	@mod="\$*" ; mod=\$\${mod:3} ; \
+	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` -u vlc_entry__0_8_2" ; \
+	case \`\$(VLC_CONFIG) --linkage \$\$mod\` in \\
+	  c++)  ld="\$(CXXLINK)" ;; \
+	  objc) ld="\$(OBJCLINK)" ;; \
+	  c|*)  ld="\$(LINK)" ;; \
+	esac ; \
+	echo \$\$ld \$< \$\$ldfl ; \
+	\$\$ld \$< \$\$ldfl
 
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
 	cd \$(top_srcdir) && \$(SHELL) ./bootstrap
@@ -315,9 +330,6 @@ endif
 EOF
   for mod in $mods
   do
-    if grep '^SOURCES_'${mod}'.*=.*PRIVATE' < "${modf}" >/dev/null 2>&1; then
-        PRIVATE='#'; else
-        PRIVATE=''; fi
     if grep '^nodist_SOURCES_'${mod}'' < "${modf}" >/dev/null 2>&1; then
         NODIST=''; else
         NODIST='#'; fi
@@ -343,14 +355,14 @@ clean-${mod}:
 EOF
     fi
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
-${PRIVATE}BUILT_SOURCES += \$(B${mod})
+BUILT_SOURCES += \$(B${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
-${PRIVATE}lib${mod}_plugin_a_SOURCES = \$(SOURCES_${mod})
+lib${mod}_plugin_a_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
-${PRIVATE}nodist_lib${mod}_plugin_a_SOURCES = \$(nodist_SOURCES_${mod})
+nodist_lib${mod}_plugin_a_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
@@ -358,10 +370,10 @@ lib${mod}_plugin_a_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
 lib${mod}_plugin_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
 lib${mod}_plugin_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
 
-lib${mod}_pic_a_SOURCES = ${PRIVATE}\$(SOURCES_${mod})
+lib${mod}_pic_a_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
-nodist_lib${mod}_pic_a_SOURCES = ${PRIVATE}\$(nodist_SOURCES_${mod})
+nodist_lib${mod}_pic_a_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
@@ -379,15 +391,6 @@ EOF
 lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
-
-lib${mod}dir = \$(libdir)/vlc/${topdir}
-${PRIVATE}lib${mod}_plugin\$(LIBEXT): \$(lib${mod}_plugin_a_OBJECTS)
-${PRIVATE}	@case \`\$(VLC_CONFIG) --linkage ${mod}\` in \\
-${PRIVATE}	  c++) echo \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(CXXLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
-${PRIVATE}	  objc) echo \$(OBJCLINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(OBJCLINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
-${PRIVATE}	  c|*) echo \$(LINK) \$(lib${mod}_plugin_a_OBJECTS) \\\`\$(VLC_CONFIG) --libs plugin ${mod}\\\` ; \$(LINK) \$(lib${mod}_plugin_a_OBJECTS) \`\$(VLC_CONFIG) --libs plugin ${mod}\` ;; \\
-${PRIVATE}	esac
-
 
 EOF
   done

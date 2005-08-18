@@ -1,4 +1,4 @@
-SUFFIXES = .rc
+SUFFIXES += .rc
 .rc.o:
 	$(WINDRES) -DUNDER_CE -D__MINGW32__ -I. -I$(srcdir) -i $< -o $@
 
