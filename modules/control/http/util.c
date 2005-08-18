@@ -756,7 +756,7 @@ char *E_(FirstWord)( char *psz, char *new )
  * create an item with all information in it, and return the item.
  * return NULL if there is an error.
  **********************************************************************/
-playlist_item_t *E_(parse_MRL)( intf_thread_t *p_intf, char *_psz,
+playlist_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *_psz,
                                    char *psz_name )
 {
     char *psz = strdup( _psz );
