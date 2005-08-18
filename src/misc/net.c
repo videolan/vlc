@@ -763,7 +763,7 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
 #endif
         if( ( i_recv = (p_vs != NULL)
               ? p_vs->pf_recv( p_vs->p_sys, p_data, i_data )
-              : recv( fd, p_data, i_data, 0 ) ) <= 0 )
+              : recv( fd, p_data, i_data, 0 ) ) < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             /* For udp only */
@@ -843,7 +843,7 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
                 i_recv = ((pp_vs != NULL) && (pp_vs[i] != NULL))
                          ? pp_vs[i]->pf_recv( pp_vs[i]->p_sys, p_data, i_data )
                          : recv( pi_fd[i], p_data, i_data, 0 );
-                if( i_recv <= 0 )
+                if( i_recv < 0 )
                 {
 #ifdef WIN32
                     /* For udp only */
@@ -858,7 +858,7 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
                     else msg_Err( p_this, "recv failed (%i)",
                                   WSAGetLastError() );
 #else
-                     msg_Err( p_this, "recv failed (%s)", strerror(errno) );
+                    msg_Err( p_this, "recv failed (%s)", strerror(errno) );
 #endif
                     return VLC_EGENERIC;
                 }
