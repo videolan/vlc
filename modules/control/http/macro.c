@@ -188,6 +188,13 @@ void MacroDo( httpd_file_sys_t *p_args,
 
                     E_(ExtractURIValue)( p_request, "item", item, 512 );
                     i_item = atoi( item );
+                    /* id = 0 : simply ask playlist to play */
+                    if( i_item == 0 )
+                    {
+                        playlist_Play( p_sys->p_playlist );
+                        msg_Dbg( p_intf, "requested playlist play" );
+                        break;
+                    }
                     playlist_Control( p_sys->p_playlist, PLAYLIST_ITEMPLAY,
                                       playlist_ItemGetById( p_sys->p_playlist,
                                       i_item ) );

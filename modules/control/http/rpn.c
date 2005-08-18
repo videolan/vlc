@@ -314,8 +314,8 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             char value[512];
             char *tmp;
 
-            E_(uri_extract_value)( url, name, value, 512 );
-            E_(uri_decode_url_encoded)( value );
+            E_(ExtractURIValue)( url, name, value, 512 );
+            E_(DecodeEncodedURI)( value );
             tmp = E_(FromUTF8)( p_intf, value );
             SSPush( st, tmp );
             free( tmp );
@@ -577,7 +577,7 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "vlc_seek" ) )
         {
             char *psz_value = SSPop( st );
-            E_(Seek)( p_intf, psz_value );
+            E_(HandleSeek)( p_intf, psz_value );
             msg_Dbg( p_intf, "requested playlist seek: %s", psz_value );
             free( psz_value );
         }
