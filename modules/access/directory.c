@@ -528,7 +528,6 @@ static int ReadDir( playlist_t *p_playlist,
                 psz_loc = FromLocale( p_dir_content->d_name );
                 psz_tmp2 = vlc_fix_readdir_charset( VLC_OBJECT(p_playlist),
                                                     psz_loc );
-                msg_Err( p_playlist, "adding file %s from %s", psz_loc, p_dir_content->d_name );
                 LocaleFree( psz_loc );
 
                 p_item = playlist_ItemNewWithType( VLC_OBJECT(p_playlist),
