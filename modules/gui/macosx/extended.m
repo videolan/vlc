@@ -350,6 +350,7 @@ static VLCExtended *_o_sharedInstance = nil;
             {
                 [o_window setAlphaValue: val.f_float];
             }
+            break;
         }
         vlc_object_release( p_vout );
     }
