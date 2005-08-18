@@ -485,7 +485,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
 
     wxTreeItemData *p_data = treectrl->GetItemData( item );
     if( !p_data ) return;
-    
+
     LockPlaylist( p_intf->p_sys, p_playlist );
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
                                           ((PlaylistItem *)p_data)->i_id );
@@ -595,7 +595,7 @@ update:
 void Playlist::UpdateItem( int i )
 {
     if( i < 0 ) return; /* Sanity check */
-    
+
     wxTreeItemId item = FindItem( treectrl->GetRootItem(), i );
 
     if( item.IsOk() )
@@ -647,7 +647,7 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, int i_id )
     {
         wxTreeItemId dummy;
         return dummy;
-    }        
+    }
 
     if( p_wxcurrent->i_id == i_id )
     {
@@ -687,7 +687,7 @@ int Playlist::CountItems( wxTreeItemId root )
     wxTreeItemIdValue cookie;
     int count = 0;
     wxTreeItemId item = treectrl->GetFirstChild( root, cookie );
-    
+
     while( item.IsOk() )
     {
         if( treectrl->ItemHasChildren( item ) )
@@ -1402,7 +1402,7 @@ void Playlist::OnPopupSort( wxCommandEvent& event )
     {
         playlist_RecursiveNodeSort( p_playlist, p_item,
                                     SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
-        
+
         treectrl->DeleteChildren( i_wx_popup_item );
         i_saved_id = -1;
         UpdateNodeChildren( p_item, i_wx_popup_item );
