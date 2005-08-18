@@ -750,8 +750,6 @@ modules/services_discovery/hal.c
 modules/services_discovery/sap.c
 modules/services_discovery/shout.c
 modules/services_discovery/upnp.cpp
-modules/services_discovery/upnp_media_server.cpp
-modules/services_discovery/upnp_media_server.h
 modules/stream_out/announce.c
 modules/stream_out/announce.h
 modules/stream_out/bridge.c
