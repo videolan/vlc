@@ -1,1 +1,7 @@
-SOURCES_http = http.c rpn.c macro.c mvar.c util.c
+SOURCES_http = \
+	http.c \
+	rpn.c \
+	macro.c \
+	mvar.c \
+	util.c \
+	$(NULL)
