@@ -296,6 +296,9 @@ dnl Plugin compilation stuff
 
 VLC_LIBRARY_SUFFIX
 
+VLC_SYMBOL_PREFIX
+AC_SUBST(SYMPREF)
+
 case "${SYS}" in
   mingw32|cygwin)
     VLC_ADD_CFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
