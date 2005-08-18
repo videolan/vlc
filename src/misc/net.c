@@ -875,7 +875,7 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
 
 /* Write exact amount requested */
 int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
-                 uint8_t *p_data, int i_data )
+                 const uint8_t *p_data, int i_data )
 {
     struct timeval  timeout;
     fd_set          fds_w, fds_e;

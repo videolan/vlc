@@ -97,7 +97,7 @@ struct module_symbols_t
     int (*__net_Read_inner) (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data, vlc_bool_t b_retry);
     int (*__net_ReadNonBlock_inner) (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data, mtime_t i_wait);
     int (*__net_Select_inner) (vlc_object_t *p_this, int *pi_fd, v_socket_t **, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait);
-    int (*__net_Write_inner) (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data);
+    int (*__net_Write_inner) (vlc_object_t *p_this, int fd, v_socket_t *, const uint8_t *p_data, int i_data);
     char * (*__net_Gets_inner) (vlc_object_t *p_this, int fd, v_socket_t *);
     int (*net_Printf_inner) (vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, ...);
     int (*__net_vaPrintf_inner) (vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args);

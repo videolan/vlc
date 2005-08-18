@@ -368,7 +368,7 @@ VLC_EXPORT( int, __net_ReadNonBlock, ( vlc_object_t *p_this, int fd, v_socket_t 
 VLC_EXPORT( int, __net_Select, ( vlc_object_t *p_this, int *pi_fd, v_socket_t **, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait ) );
 
 #define net_Write(a,b,c,d,e) __net_Write(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data ) );
+VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, v_socket_t *, const uint8_t *p_data, int i_data ) );
 
 #define net_Gets(a,b,c) __net_Gets(VLC_OBJECT(a),b,c)
 VLC_EXPORT( char *, __net_Gets, ( vlc_object_t *p_this, int fd, v_socket_t * ) );
