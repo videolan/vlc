@@ -316,6 +316,13 @@ static void parseEXTINF(char *psz_string, char **ppsz_author,
     /* the title doesn't need to be escaped */
     *ppsz_name = psz_string;
 
+    if( !**ppsz_name )
+    {
+        /* Assume a syntax without author name */
+        *ppsz_name = *ppsz_author;
+        *ppsz_author = NULL;
+    }
+
     return;
 }
 
