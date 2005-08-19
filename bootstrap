@@ -218,7 +218,6 @@ BUILT_SOURCES =
 SUBDIRS = ${subdirs}
 SUFFIXES = _plugin\$(LIBEXT) _plugin.a
 ### TODO ought to be defined somewhere else
-VLC_ENTRY = \$(SYMPREF)vlc_entry__0_8_2
 
 libvlcdir = \$(libdir)/vlc/\$(basedir)
 
@@ -249,7 +248,7 @@ all-modules:
 # Build a plugin with the adequate linker and linker's flags
 _plugin.a_plugin\$(LIBEXT):
 	@mod="\$*" ; mod=\$\${mod:3} ; \
-	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` -u \$(VLC_ENTRY)" ; \
+	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` -u \$(SYMPREF)\$(VLC_ENTRY)" ; \
 	case \`\$(VLC_CONFIG) --linkage \$\$mod\` in \\
 	  c++)  ld="\$(CXXLINK)" ;; \
 	  objc) ld="\$(OBJCLINK)" ;; \
@@ -272,8 +271,8 @@ install-exec-local: all-modules
 	for mod in \$(mods); do \
 	  case "\$\$z " \
 	    in *\ \$\${mod}\ *) \
-	      echo \$(INSTALL_PROGRAM) -m 755 "lib\$\${mod}_plugin\$(LIBEXT)" "\$(DESTDIR)\$(libvlcdir)/" ; \
-	      \$(INSTALL_PROGRAM) -m 755 "lib\$\${mod}_plugin\$(LIBEXT)" "\$(DESTDIR)\$(libvlcdir)/" || exit \$\$?; \
+	      echo \$(INSTALL_PROGRAM) "lib\$\${mod}_plugin\$(LIBEXT)" "\$(DESTDIR)\$(libvlcdir)/" ; \
+	      \$(INSTALL_PROGRAM) "lib\$\${mod}_plugin\$(LIBEXT)" "\$(DESTDIR)\$(libvlcdir)/" || exit \$\$?; \
 	      ;; \
 	  esac; \
 	done
@@ -281,8 +280,8 @@ install-exec-local: all-modules
 	for mod in \$(mods); do \
 	  case "\$\$z " \
 	    in *\ \$\${mod}\ *) \
-	      echo \$(INSTALL_DATA) -m 644 "lib\$\${mod}.a" "\$(DESTDIR)\$(libdir)/vlc/" ; \
-	      \$(INSTALL_DATA) -m 644 "lib\$\${mod}.a" "\$(DESTDIR)\$(libvlcdir)/" || exit \$\$?; \
+	      echo \$(INSTALL_DATA) "lib\$\${mod}.a" "\$(DESTDIR)\$(libdir)/vlc/" ; \
+	      \$(INSTALL_DATA) "lib\$\${mod}.a" "\$(DESTDIR)\$(libdir)/vlc/" || exit \$\$?; \
 	      ;; \
 	  esac; \
 	done
@@ -291,8 +290,8 @@ if BUILD_MOZILLA
 	for mod in \$(mods); do \
 	  case "\$\$z " \
 	    in *\ \$\${mod}\ *) \
-	      echo \$(INSTALL_DATA) -m 644 "lib\$\${mod}_pic.a" "\$(DESTDIR)\$(libdir)/vlc/" ; \
-	      \$(INSTALL_DATA) -m 644 "lib\$\${mod}_pic.a" "\$(DESTDIR)\$(libvlcdir)/" || exit \$\$?; \
+	      echo \$(INSTALL_DATA) "lib\$\${mod}_pic.a" "\$(DESTDIR)\$(libdir)/vlc/" ; \
+	      \$(INSTALL_DATA) "lib\$\${mod}_pic.a" "\$(DESTDIR)\$(libdir)/vlc/" || exit \$\$?; \
 	      ;; \
 	  esac; \
 	done
