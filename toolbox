@@ -447,13 +447,7 @@ then
   VLC_COMPILE_TIME=`LC_ALL=C LANG=C date`
   VLC_COMPILE_BY=`whoami`
   VLC_COMPILE_HOST=`hostname`
-  if which dnsdomainname 2>&1 >/dev/null; then
-    VLC_COMPILE_DOMAIN=`dnsdomainname`
-  elif which domainname 2>&1 >/dev/null; then
-    VLC_COMPILE_DOMAIN=`domainname`
-  else
-    VLC_COMPILE_DOMAIN=unknown
-  fi
+  VLC_COMPILE_DOMAIN=`dnsdomainname 2>/dev/null || domainname 2>/dev/null || echo unknown`
   VLC_COMPILER=`$CC -v 2>&1 | tail -n 1`
   if which svnversion 2>&1 >/dev/null; then
     VLC_CHANGESET=`svnversion $srcdir`
