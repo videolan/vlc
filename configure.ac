@@ -4451,8 +4451,11 @@ dnl AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for modu
 dnl AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
 
 dnl New definitions with value matching 0.8.2 release
-AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__0_8_2", [String suffix for module functions])
-AC_DEFINE_UNQUOTED(MODULE_SYMBOL, 0_8_2, [Symbol suffix for module functions])
+module_symbol="0_8_4"
+AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${module_symbol}", [String suffix for module functions])
+AC_DEFINE_UNQUOTED(MODULE_SYMBOL, $module_symbol, [Symbol suffix for module functions])
+VLC_ENTRY="vlc_entry_${module_symbol}"
+AC_SUBST(VLC_ENTRY)
 
 DATA_PATH="${ac_tool_prefix}/share/vlc"
 AC_SUBST(DATA_PATH)
