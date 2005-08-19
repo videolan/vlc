@@ -13,7 +13,7 @@ NULL =
 #  - po should come before . because VLC.app needs the pofiles
 #  - loader should come before modules because some plugins need it
 SUBDIRS = intl loader modules po . mozilla activex share m4 doc
-DIST_SUBDIRS = $(SUBDIRS) src debian ipkg lib
+DIST_SUBDIRS = $(SUBDIRS) debian ipkg lib
 
 EXTRA_DIST = \
 	HACKING \
@@ -31,7 +31,12 @@ EXTRA_DIST = \
 	vlc.win32.nsi \
 	$(NULL)
 
-BUILT_SOURCES =
+BUILT_SOURCES = \
+	stamp-api \
+	src/misc/modules_builtin.h \
+	src/misc/version.c \
+	$(NULL)
+
 SUFFIXES = 
 
 # Tell aclocal to use -I m4. Wonder if it really works.
@@ -44,12 +49,6 @@ AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 ###############################################################################
 # Headers
 ###############################################################################
-
-BUILT_SOURCES += \
-	stamp-api \
-	src/misc/modules_builtin.h \
-	src/misc/version.c \
-	$(NULL)
 
 pkgincludedir = $(includedir)/vlc
 
@@ -259,6 +258,7 @@ EXTRA_DIST += \
 	evc/errno.h \
 	evc/config.h.in \
 	evc/modules_builtin_evc.h \
+	src/misc/modules_builtin.h.in \
 	$(NULL)
 
 dist-hook:
