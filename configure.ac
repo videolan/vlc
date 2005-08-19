@@ -4516,7 +4516,6 @@ AC_CONFIG_FILES([
   m4/Makefile
   po/Makefile.in
   share/Makefile
-  src/Makefile
 ])
 
 AC_CONFIG_FILES([
