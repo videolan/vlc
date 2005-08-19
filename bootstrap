@@ -267,7 +267,7 @@ mostlyclean-local:
 ### automake creates libvlcdir after running install-*-local
 ### so we have to create it ourselves first
 install-exec-local: all-modules
-	\$(mkdir_p) "\$(DESTDIR)\$(libvlcdir)"
+	mkdir -p -- "\$(DESTDIR)\$(libvlcdir)"
 	@z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	for mod in \$(mods); do \
 	  case "\$\$z " \
