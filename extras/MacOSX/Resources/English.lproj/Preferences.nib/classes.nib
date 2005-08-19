@@ -437,6 +437,7 @@
                 "o_prefs_window" = id; 
                 "o_reset_btn" = id; 
                 "o_save_btn" = id; 
+                "o_title" = id; 
                 "o_tree" = id; 
             }; 
             SUPERCLASS = NSObject; 

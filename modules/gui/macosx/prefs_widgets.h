@@ -216,7 +216,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view;
-
+           
 @end
 
 //#undef CONFIG_ITEM_LIST_STRING

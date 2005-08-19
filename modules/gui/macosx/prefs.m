@@ -101,6 +101,11 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_tree selectRow:0 byExtendingSelection:NO];
 }
 
+- (void)setTitle: (NSString *) o_title_name
+{
+    [o_title setStringValue: o_title_name];
+}
+
 - (void)showPrefs
 {
     /* load our nib (if not already loaded) */
@@ -214,7 +219,10 @@ static VLCTreeItem *o_root_item = nil;
 
 #define IsALeafNode ((id)-1)
 
-- (id)initWithName: (NSString *)o_item_name ID: (int)i_id
+- (id)initWithName: (NSString *)o_item_name
+    withTitle: (NSString *)o_item_title
+    withHelp: (NSString *)o_item_help
+    ID: (int)i_id
     parent:(VLCTreeItem *)o_parent_item
     children:(NSMutableArray *)o_children_array
     whithCategory: (int) i_category
@@ -224,6 +232,8 @@ static VLCTreeItem *o_root_item = nil;
     if( self != nil )
     {
         o_name = [o_item_name copy];
+        o_title= [o_item_title copy];
+        o_help= [o_item_help copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
         o_children = o_children_array;
@@ -236,7 +246,7 @@ static VLCTreeItem *o_root_item = nil;
 + (VLCTreeItem *)rootItem
 {
    if (o_root_item == nil)
-        o_root_item = [[VLCTreeItem alloc] initWithName:@"main" ID:0
+        o_root_item = [[VLCTreeItem alloc] initWithName:@"main" withTitle:@"main" withHelp:@"" ID:0
             parent:nil children:[[NSMutableArray alloc] initWithCapacity:10]
             whithCategory: -1];
    return o_root_item;
@@ -246,6 +256,8 @@ static VLCTreeItem *o_root_item = nil;
 {
     if (o_children != IsALeafNode) [o_children release];
     [o_name release];
+    [o_title release];
+    [o_help release];
     [super dealloc];
 }
 
@@ -295,14 +307,21 @@ static VLCTreeItem *o_root_item = nil;
                 if( p_item ) do
                 {
                     NSString *o_child_name;
+                    NSString *o_child_title;
+                    NSString *o_child_help;
                     switch( p_item->i_type )
                     {
                     case CONFIG_CATEGORY:
                         o_child_name = [[VLCMain sharedInstance]
-    localizedString: config_CategoryNameGet(p_item->i_value ) ];
+                            localizedString: config_CategoryNameGet( p_item->i_value ) ];
+                        o_child_title = o_child_name;
+                        o_child_help = [[VLCMain sharedInstance]
+                            localizedString: config_CategoryHelpGet( p_item->i_value ) ];
                         p_last_category = [VLCTreeItem alloc];
                         [o_children addObject:[p_last_category
                             initWithName: o_child_name
+                            withTitle: o_child_title
+                            withHelp: o_child_help
                             ID: p_item->i_value
                             parent:self
                             children:[[NSMutableArray alloc]
@@ -311,13 +330,18 @@ static VLCTreeItem *o_root_item = nil;
                         break;
                     case CONFIG_SUBCATEGORY:
                         o_child_name = [[VLCMain sharedInstance]
-    localizedString: config_CategoryNameGet(p_item->i_value ) ];
+                            localizedString: config_CategoryNameGet( p_item->i_value ) ];
+                        o_child_title = o_child_name;
+                        o_child_help = [[VLCMain sharedInstance]
+                            localizedString: config_CategoryHelpGet( p_item->i_value ) ];
                         if( p_item->i_value != SUBCAT_PLAYLIST_GENERAL &&
                             p_item->i_value != SUBCAT_VIDEO_GENERAL &&
                             p_item->i_value != SUBCAT_AUDIO_GENERAL )
                             [p_last_category->o_children
                                 addObject:[[VLCTreeItem alloc]
                                 initWithName: o_child_name
+                                withTitle: o_child_title
+                                withHelp: o_child_help
                                 ID: p_item->i_value
                                 parent:p_last_category
                                 children:[[NSMutableArray alloc]
@@ -402,6 +426,10 @@ static VLCTreeItem *o_root_item = nil;
                     initWithName:[[VLCMain sharedInstance]
                         localizedString: p_module->psz_shortname ?
                         p_module->psz_shortname : p_module->psz_object_name ]
+                    withTitle:[[VLCMain sharedInstance]
+                        localizedString: p_module->psz_longname ?
+                        p_module->psz_longname : p_module->psz_object_name ]
+                    withHelp: @""
                     ID: p_module->i_object_id
                     parent:p_subcategory_item
                     children:IsALeafNode
@@ -421,6 +449,16 @@ static VLCTreeItem *o_root_item = nil;
 - (NSString *)getName
 {
     return o_name;
+}
+
+- (NSString *)getTitle
+{
+    return o_title;
+}
+
+- (NSString *)getHelp
+{
+    return o_help;
 }
 
 - (VLCTreeItem *)childAtIndex:(int)i_index
@@ -469,6 +507,8 @@ static VLCTreeItem *o_root_item = nil;
     NSRect          s_vrc;
     NSView          *o_view;
 
+    [[VLCPrefs sharedInstance] setTitle: [self getTitle]];
+    /* NSLog( [self getHelp] ); */ 
     s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
     [o_view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin |
@@ -509,9 +549,9 @@ static VLCTreeItem *o_root_item = nil;
                 {
                 case CONFIG_SUBCATEGORY:
                     break;
-                case CONFIG_SECTION:
-                    break;
                 case CONFIG_CATEGORY:
+                    break;
+                case CONFIG_SECTION:
                     break;
                 case CONFIG_HINT_END:
                     break;
@@ -519,6 +559,7 @@ static VLCTreeItem *o_root_item = nil;
                     break;
                 default:
                 {
+                NSLog( @"one" );
                     VLCConfigControl *o_control = nil;
                     o_control = [VLCConfigControl newControl:p_item
                                                   withView:o_view];
@@ -572,13 +613,13 @@ static VLCTreeItem *o_root_item = nil;
                     msg_Err( p_intf, "null item found" );
                     break;
                 }
-                switch(p_item->i_type)
+                switch( p_item->i_type )
                 {
                 case CONFIG_SUBCATEGORY:
                     break;
-                case CONFIG_SECTION:
-                    break;
                 case CONFIG_CATEGORY:
+                    break;
+                case CONFIG_SECTION:
                     break;
                 case CONFIG_HINT_END:
                     break;

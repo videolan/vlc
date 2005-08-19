@@ -24,6 +24,8 @@
 @interface VLCTreeItem : NSObject
 {
     NSString *o_name;
+    NSString *o_title;
+    NSString *o_help;
     int i_object_id;
     VLCTreeItem *o_parent;
     NSMutableArray *o_children;
@@ -36,6 +38,8 @@
 - (VLCTreeItem *)childAtIndex:(int)i_index;
 - (int)getObjectID;
 - (NSString *)getName;
+- (NSString *)getTitle;
+- (NSString *)getHelp;
 - (BOOL)hasPrefs:(NSString *)o_module_name;
 - (NSView *)showView:(NSScrollView *)o_prefs_view advancedView:(vlc_bool_t) b_advanced;
 - (void)applyChanges;
@@ -67,6 +71,7 @@
 + (VLCPrefs *)sharedInstance;
 
 - (void)initStrings;
+- (void)setTitle: (NSString *) o_title_name;
 - (void)showPrefs;
 - (IBAction)savePrefs: (id)sender;
 - (IBAction)closePrefs: (id)sender;
