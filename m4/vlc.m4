@@ -157,7 +157,7 @@ AC_DEFUN([VLC_SYMBOL_PREFIX], [
   AC_MSG_CHECKING(for prefix to exported symbols)
   SYMPREF=""
   case "${target_os}" in
-    darwin*)
+    darwin* | *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
       SYMPREF="_"
       ;;
   esac
