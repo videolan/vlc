@@ -83,11 +83,13 @@ static int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
     if( fd == -1 )
     {
 #if defined(WIN32) || defined(UNDER_CE)
-        msg_Warn( p_this, "cannot create socket (%i)",
-                  WSAGetLastError() );
+        if( WSAGetLastError ( ) != WSAEAFNOSUPPORT )
+            msg_Warn( p_this, "cannot create socket (%i)",
+                      WSAGetLastError() );
 #else
-        msg_Warn( p_this, "cannot create socket (%s)",
-                  strerror( errno ) );
+        if( errno != EAFNOSUPPORT )
+            msg_Warn( p_this, "cannot create socket (%s)",
+                      strerror( errno ) );
 #endif
         return -1;
     }
