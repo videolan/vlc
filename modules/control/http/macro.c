@@ -861,11 +861,18 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                     char *p_buffer;
                     char psz_file[MAX_DIR_SIZE];
                     char *p;
+                    char sep;
 
-                    if( m.param1[0] != '/' )
+#if defined( WIN32 )
+                    sep = '\\';
+#else
+                    sep = '/';
+#endif
+
+                    if( m.param1[0] != sep )
                     {
                         strcpy( psz_file, p_args->file );
-                        p = strrchr( psz_file, '/' );
+                        p = strrchr( psz_file, sep );
                         if( p != NULL )
                             strcpy( p + 1, m.param1 );
                         else

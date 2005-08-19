@@ -25,6 +25,43 @@
 
 #include "http.h"
 
+static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
+                                   const char *psz_object,
+                                   vlc_bool_t *pb_need_release )
+{
+    intf_sys_t    *p_sys = p_intf->p_sys;
+    int i_object_type = 0;
+    vlc_object_t *p_object = NULL;
+    *pb_need_release = VLC_FALSE;
+
+    if( !strcmp( psz_object, "VLC_OBJECT_ROOT" ) )
+        i_object_type = VLC_OBJECT_ROOT;
+    else if( !strcmp( psz_object, "VLC_OBJECT_VLC" ) )
+        p_object = VLC_OBJECT(p_intf->p_vlc);
+    else if( !strcmp( psz_object, "VLC_OBJECT_INTF" ) )
+        p_object = VLC_OBJECT(p_intf);
+    else if( !strcmp( psz_object, "VLC_OBJECT_PLAYLIST" ) )
+        p_object = VLC_OBJECT(p_sys->p_playlist);
+    else if( !strcmp( psz_object, "VLC_OBJECT_INPUT" ) )
+        p_object = VLC_OBJECT(p_sys->p_input);
+    else if( !strcmp( psz_object, "VLC_OBJECT_VOUT" ) )
+        i_object_type = VLC_OBJECT_VOUT;
+    else if( !strcmp( psz_object, "VLC_OBJECT_AOUT" ) )
+        i_object_type = VLC_OBJECT_AOUT;
+    else if( !strcmp( psz_object, "VLC_OBJECT_SOUT" ) )
+        i_object_type = VLC_OBJECT_SOUT;
+    else
+        msg_Warn( p_intf, "unknown object type (%s)", psz_object );
+
+    if( p_object == NULL && i_object_type )
+    {
+        *pb_need_release = VLC_TRUE;
+        p_object = vlc_object_find( p_intf, i_object_type, FIND_ANYWHERE );
+    }
+
+    return p_object;
+}
+
 void SSInit( rpn_stack_t *st )
 {
     st->i_stack = 0;
@@ -344,7 +381,7 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
 
             while( *str != '\0' )
             {
-                if( *str == '"' || *str == '\'' )
+                if( *str == '"' || *str == '\'' || *str == '\\' )
                 {
                     *p++ = '\\';
                 }
@@ -428,73 +465,13 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "realpath" ) )
         {
-            char dir[MAX_DIR_SIZE], *src;
             char *psz_src = SSPop( st );
-            char *psz_dir = psz_src;
+            char *psz_dir = E_(RealPath)( p_intf, psz_src );
             char sep;
-
-            /* convert all / to native separator */
-#if defined( WIN32 )
-            while( (p = strchr( psz_dir, '/' )) )
-            {
-                *p = '\\';
-            }
-            sep = '\\';
-#else
-            sep = '/';
-#endif
-
-            if( *psz_dir == '~' )
-            {
-                /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-                snprintf( dir, sizeof(dir), "%s/%s", p_intf->p_vlc->psz_homedir,
-                          psz_dir + 1 );
-                psz_dir = dir;
-            }
-
-            /* first fix all .. dir */
-            p = src = psz_dir;
-            while( *src )
-            {
-                if( src[0] == '.' && src[1] == '.' )
-                {
-                    src += 2;
-                    if( p <= &psz_dir[1] )
-                    {
-                        continue;
-                    }
-
-                    p -= 2;
-
-                    while( p > &psz_dir[1] && *p != sep )
-                    {
-                        p--;
-                    }
-                }
-                else if( *src == sep )
-                {
-                    if( p > psz_dir && p[-1] == sep )
-                    {
-                        src++;
-                    }
-                    else
-                    {
-                        *p++ = *src++;
-                    }
-                }
-                else
-                {
-                    do
-                    {
-                        *p++ = *src++;
-                    } while( *src && *src != sep );
-                }
-            }
-            if( p != psz_dir + 1 && p[-1] == '/' ) p--;
-            *p = '\0';
 
             SSPush( st, psz_dir );
             free( psz_src );
+            free( psz_dir );
         }
         /* 4. stack functions */
         else if( !strcmp( s, "dup" ) )
@@ -584,21 +561,31 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "vlc_var_type" )
                   || !strcmp( s, "vlc_config_type" ) )
         {
-            const char *psz_type = NULL;
-            char *psz_variable = SSPop( st );
             vlc_object_t *p_object;
-            int i_type;
+            const char *psz_type = NULL;
+            int i_type = 0;
 
             if( !strcmp( s, "vlc_var_type" ) )
             {
-                p_object = VLC_OBJECT(p_sys->p_input);
+                char *psz_object = SSPop( st );
+                char *psz_variable = SSPop( st );
+                vlc_bool_t b_need_release;
+
+                p_object = GetVLCObject( p_intf, psz_object, &b_need_release );
+
                 if( p_object != NULL )
                     i_type = var_Type( p_object, psz_variable );
+                free( psz_variable );
+                free( psz_object );
+                if( b_need_release && p_object != NULL )
+                    vlc_object_release( p_object );
             }
             else
             {
+                char *psz_variable = SSPop( st );
                 p_object = VLC_OBJECT(p_intf);
                 i_type = config_GetType( p_object, psz_variable );
+                free( psz_variable );
             }
 
             if( p_object != NULL )
@@ -640,33 +627,37 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 psz_type = "INVALID";
 
             SSPush( st, psz_type );
-            free( psz_variable );
         }
         else if( !strcmp( s, "vlc_var_set" ) )
         {
+            char *psz_object = SSPop( st );
             char *psz_variable = SSPop( st );
+            vlc_bool_t b_need_release;
 
-            if( p_sys->p_input != NULL )
+            vlc_object_t *p_object = GetVLCObject( p_intf, psz_object,
+                                                   &b_need_release );
+
+            if( p_object != NULL )
             {
                 vlc_bool_t b_error = VLC_FALSE;
                 char *psz_value = NULL;
                 vlc_value_t val;
                 int i_type;
 
-                i_type = var_Type( p_sys->p_input, psz_variable );
+                i_type = var_Type( p_object, psz_variable );
 
                 switch( i_type & VLC_VAR_TYPE )
                 {
                 case VLC_VAR_BOOL:
                     val.b_bool = SSPopN( st, vars );
-                    msg_Dbg( p_intf, "requested input var change: %s->%d",
-                             psz_variable, val.b_bool );
+                    msg_Dbg( p_intf, "requested %s var change: %s->%d",
+                             psz_object, psz_variable, val.b_bool );
                     break;
                 case VLC_VAR_INTEGER:
                 case VLC_VAR_HOTKEY:
                     val.i_int = SSPopN( st, vars );
-                    msg_Dbg( p_intf, "requested input var change: %s->%d",
-                             psz_variable, val.i_int );
+                    msg_Dbg( p_intf, "requested %s var change: %s->%d",
+                             psz_object, psz_variable, val.i_int );
                     break;
                 case VLC_VAR_STRING:
                 case VLC_VAR_MODULE:
@@ -674,41 +665,51 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 case VLC_VAR_DIRECTORY:
                 case VLC_VAR_VARIABLE:
                     val.psz_string = psz_value = SSPop( st );
-                    msg_Dbg( p_intf, "requested input var change: %s->%s",
-                             psz_variable, psz_value );
+                    msg_Dbg( p_intf, "requested %s var change: %s->%s",
+                             psz_object, psz_variable, psz_value );
                     break;
                 case VLC_VAR_FLOAT:
                     psz_value = SSPop( st );
                     val.f_float = atof( psz_value );
-                    msg_Dbg( p_intf, "requested input var change: %s->%f",
-                             psz_variable, val.f_float );
+                    msg_Dbg( p_intf, "requested %s var change: %s->%f",
+                             psz_object, psz_variable, val.f_float );
                     break;
                 default:
-                    msg_Warn( p_intf, "invalid variable type %d (%s)",
-                              i_type & VLC_VAR_TYPE, psz_variable );
+                    SSPopN( st, vars );
+                    msg_Warn( p_intf, "invalid %s variable type %d (%s)",
+                              psz_object, i_type & VLC_VAR_TYPE, psz_variable );
                     b_error = VLC_TRUE;
                 }
 
                 if( !b_error )
-                    var_Set( p_sys->p_input, psz_variable, val );
+                    var_Set( p_object, psz_variable, val );
                 if( psz_value != NULL )
                     free( psz_value );
             }
             else
-                msg_Warn( p_intf, "vlc_var_set called without an input" );
+                msg_Warn( p_intf, "vlc_var_set called without an object" );
             free( psz_variable );
+            free( psz_object );
+
+            if( b_need_release && p_object != NULL )
+                vlc_object_release( p_object );
         }
         else if( !strcmp( s, "vlc_var_get" ) )
         {
+            char *psz_object = SSPop( st );
             char *psz_variable = SSPop( st );
+            vlc_bool_t b_need_release;
 
-            if( p_sys->p_input != NULL )
+            vlc_object_t *p_object = GetVLCObject( p_intf, psz_object,
+                                                   &b_need_release );
+
+            if( p_object != NULL )
             {
                 vlc_value_t val;
                 int i_type;
 
-                i_type = var_Type( p_sys->p_input, psz_variable );
-                var_Get( p_sys->p_input, psz_variable, &val );
+                i_type = var_Type( p_object, psz_variable );
+                var_Get( p_object, psz_variable, &val );
 
                 switch( i_type & VLC_VAR_TYPE )
                 {
@@ -735,17 +736,21 @@ void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                     break;
                 }
                 default:
-                    msg_Warn( p_intf, "invalid variable type %d (%s)",
-                              i_type & VLC_VAR_TYPE, psz_variable );
+                    msg_Warn( p_intf, "invalid %s variable type %d (%s)",
+                              psz_object, i_type & VLC_VAR_TYPE, psz_variable );
                     SSPush( st, "" );
                 }
             }
             else
             {
-                msg_Warn( p_intf, "vlc_var_get called without an input" );
+                msg_Warn( p_intf, "vlc_var_get called without an object" );
                 SSPush( st, "" );
             }
             free( psz_variable );
+            free( psz_object );
+
+            if( b_need_release && p_object != NULL )
+                vlc_object_release( p_object );
         }
         else if( !strcmp( s, "vlc_config_set" ) )
         {

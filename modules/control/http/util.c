@@ -120,6 +120,14 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     int           i_dirlen;
 
+    char sep;
+
+#if defined( WIN32 )
+    sep = '\\';
+#else
+    sep = '/';
+#endif
+
 #ifdef HAVE_SYS_STAT_H
     if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
     {
@@ -142,7 +150,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     msg_Dbg( p_intf, "dir=%s", psz_dir );
 
-    sprintf( dir, "%s/.access", psz_dir );
+    sprintf( dir, "%s%c.access", psz_dir, sep );
     if( ( file = fopen( dir, "r" ) ) != NULL )
     {
         char line[1024];
@@ -176,7 +184,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
         fclose( file );
     }
 
-    sprintf( dir, "%s/.hosts", psz_dir );
+    sprintf( dir, "%s%c.hosts", psz_dir, sep );
     p_acl = ACL_Create( p_intf, VLC_FALSE );
     if( ACL_LoadFile( p_acl, dir ) )
     {
@@ -196,7 +204,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
          || ( i_dirlen + strlen( p_dir_content->d_name ) > MAX_DIR_SIZE ) )
             continue;
 
-        sprintf( dir, "%s/%s", psz_dir, p_dir_content->d_name );
+        sprintf( dir, "%s%c%s", psz_dir, sep, p_dir_content->d_name );
         if( E_(ParseDirectory)( p_intf, psz_root, dir ) )
         {
             httpd_file_sys_t *f = malloc( sizeof( httpd_file_sys_t ) );
@@ -792,4 +800,93 @@ playlist_item_t *E_(MRLParse)( intf_thread_t *p_intf, char *_psz,
 
     free( psz );
     return p_item;
+}
+
+/**********************************************************************
+ * RealPath: parse ../, ~ and path stuff
+ **********************************************************************/
+char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
+{
+    char *psz_dir;
+    char *p;
+    int i_len = strlen(psz_src);
+    char sep;
+
+#if defined( WIN32 )
+    sep = '\\';
+#else
+    sep = '/';
+#endif
+
+    psz_dir = malloc( i_len + 2 );
+    strcpy( psz_dir, psz_src );
+
+    /* Add a trailing sep to ease the .. step */
+    psz_dir[i_len] = sep;
+    psz_dir[i_len + 1] = '\0';
+
+#ifdef WIN32
+    /* Convert all / to native separator */
+    p = psz_dir;
+    while( (p = strchr( p, '/' )) != NULL )
+    {
+        *p = sep;
+    }
+#endif
+
+    /* Remove multiple separators and /./ */
+    p = psz_dir;
+    while( (p = strchr( p, sep )) != NULL )
+    {
+        if( p[1] == sep )
+            memmove( &p[1], &p[2], strlen(&p[2]) + 1 );
+        else if( p[1] == '.' && p[2] == sep )
+            memmove( &p[1], &p[3], strlen(&p[3]) + 1 );
+        else
+            p++;
+    }
+
+    if( psz_dir[0] == '~' )
+    {
+        char *dir = malloc( strlen(psz_dir)
+                             + strlen(p_intf->p_vlc->psz_homedir) );
+        /* This is incomplete : we should also support the ~cmassiot/ syntax. */
+        sprintf( dir, "%s%s", p_intf->p_vlc->psz_homedir, psz_dir + 1 );
+        free( psz_dir );
+        psz_dir = dir;
+    }
+
+    if( strlen(psz_dir) > 2 )
+    {
+        /* Fix all .. dir */
+        p = psz_dir + 3;
+        while( (p = strchr( p, sep )) != NULL )
+        {
+            if( p[-1] == '.' && p[-2] == '.' && p[-3] == sep )
+            {
+                char *q;
+                p[-3] = '\0';
+                if( (q = strrchr( psz_dir, sep )) != NULL )
+                {
+                    memmove( q + 1, p + 1, strlen(p + 1) + 1 );
+                    p = q + 1;
+                }
+                else
+                {
+                    memmove( psz_dir, p + 1, strlen(p + 1) + 1 );
+                    p = psz_dir + 3;
+                }
+            }
+            else
+                p++;
+        }
+    }
+
+    /* Remove trailing sep if there are at least 2 sep in the string
+     * (handles the C:\ stuff) */
+    p = strrchr( psz_dir, sep );
+    if( p != NULL && p[1] == '\0' && p != strchr( psz_dir, sep ) )
+        *p = '\0';
+
+    return psz_dir;
 }

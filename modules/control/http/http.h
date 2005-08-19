@@ -105,6 +105,8 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data );
 /** This function creates a suitable URL for a filename */
 char *E_(FileToUrl)( char *name, vlc_bool_t *pb_index );
+/** This function returns the real path of a file or directory */
+char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src );
 
 /* Locale handling functions */
 

@@ -495,10 +495,10 @@ mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 #endif
 
 mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
-                                char *psz_dir )
+                         char *psz_dir )
 {
     mvar_t *s = mvar_New( name, "set" );
-    char          tmp[MAX_DIR_SIZE], dir[MAX_DIR_SIZE], *p, *src;
+    char          tmp[MAX_DIR_SIZE];
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 #endif
@@ -508,91 +508,17 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
 
     /* convert all / to native separator */
 #if defined( WIN32 )
-    while( (p = strchr( psz_dir, '/' )) )
-    {
-        *p = '\\';
-    }
     sep = '\\';
 #else
     sep = '/';
 #endif
 
-    /* remove trailling separator */
-    while( strlen( psz_dir ) > 1 &&
-#if defined( WIN32 )
-           !( strlen(psz_dir)==3 && psz_dir[1]==':' && psz_dir[2]==sep ) &&
-#endif
-           psz_dir[strlen( psz_dir ) -1 ] == sep )
-    {
-        psz_dir[strlen( psz_dir ) -1 ]  ='\0';
-    }
-    /* remove double separator */
-    for( p = src = psz_dir; *src != '\0'; src++, p++ )
-    {
-        if( src[0] == sep && src[1] == sep )
-        {
-            src++;
-        }
-        *p = *src;
-    }
-    *p = '\0';
-
-    if( *psz_dir == '\0' )
-    {
-        return s;
-    }
-
-    if( psz_dir[0] == '~' && psz_dir[1] == '/' )
-    {
-        /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-        snprintf( dir, sizeof(dir), "%s/%s", p_intf->p_vlc->psz_homedir,
-                  psz_dir + 2 );
-        psz_dir = dir;
-    }
-
-    /* first fix all .. dir */
-    p = src = psz_dir;
-    while( *src )
-    {
-        if( src[0] == '.' && src[1] == '.' )
-        {
-            src += 2;
-            if( p <= &psz_dir[1] )
-            {
-                continue;
-            }
-
-            p -= 2;
-
-            while( p > &psz_dir[1] && *p != sep )
-            {
-                p--;
-            }
-        }
-        else if( *src == sep )
-        {
-            if( p > psz_dir && p[-1] == sep )
-            {
-                src++;
-            }
-            else
-            {
-                *p++ = *src++;
-            }
-        }
-        else
-        {
-            do
-            {
-                *p++ = *src++;
-            } while( *src && *src != sep );
-        }
-    }
-    *p = '\0';
+    psz_dir = E_(RealPath)( p_intf, psz_dir );
 
 #ifdef HAVE_SYS_STAT_H
     if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
     {
+        free( psz_dir );
         return s;
     }
 #endif
@@ -603,14 +529,8 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     {
         msg_Warn( p_intf, "scandir error on %s (%s)", psz_dir,
                   strerror(errno) );
+        free( psz_dir );
         return s;
-    }
-
-    /* remove trailing / or \ */
-    for( p = &psz_dir[strlen( psz_dir) - 1];
-         p >= psz_dir && ( *p =='/' || *p =='\\' ); p-- )
-    {
-        *p = '\0';
     }
 
     for( i = 0; i < i_dir_content; i++ )
@@ -625,7 +545,8 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
             continue;
         }
 
-        snprintf( tmp, sizeof(tmp), "%s/%s", psz_dir, p_dir_content->d_name );
+        snprintf( tmp, sizeof(tmp), "%s%c%s", psz_dir, sep,
+                  p_dir_content->d_name );
 
 #ifdef HAVE_SYS_STAT_H
         if( stat( tmp, &stat_info ) == -1 )
@@ -638,7 +559,7 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
         psz_tmp = vlc_fix_readdir_charset( p_intf, p_dir_content->d_name );
         psz_name = E_(FromUTF8)( p_intf, psz_tmp );
         free( psz_tmp );
-        snprintf( tmp, sizeof(tmp), "%s/%s", psz_dir, psz_name );
+        snprintf( tmp, sizeof(tmp), "%s%c%s", psz_dir, sep, psz_name );
         mvar_AppendNewVar( f, "name", tmp );
         mvar_AppendNewVar( f, "basename", psz_name );
 
@@ -681,6 +602,7 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
         mvar_AppendVar( s, f );
     }
 
+    free( psz_dir );
     return s;
 }
 
