@@ -375,7 +375,7 @@ static void Run( intf_thread_t *p_intf )
     p_buffer[0] = 0;
     p_input = NULL;
     p_playlist = NULL;
- 
+
     /* Register commands that will be cleaned up upon object destruction */
     var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "quit", Quit, NULL );
@@ -731,32 +731,6 @@ static void Run( intf_thread_t *p_intf )
             else
             {
                 msg_rc( "1" );
-
-                /* FIXME: This is a hack */
-                /* Replay the current state of the system. */
-                msg_rc( STATUS_CHANGE "( New input: %s )", p_input->input.p_item->psz_uri );
-                msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
-
-                if( p_playlist )
-                {
-                    vlc_mutex_lock( &p_playlist->object_lock );
-                    switch( p_playlist->status.i_status )
-                    {
-                        case PLAYLIST_STOPPED:
-                            msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-                            break;
-                        case PLAYLIST_RUNNING:
-                            msg_rc( STATUS_CHANGE "( play state: 1 )" );
-                            break;
-                        case PLAYLIST_PAUSED:
-                            msg_rc( STATUS_CHANGE "( pause state: 2 )" );
-                            break;
-                        default:
-                            msg_rc( STATUS_CHANGE "( state unknown )" );
-                            break;
-                    }
-                    vlc_mutex_unlock( &p_playlist->object_lock );
-                } /* End of current playlist status */
             }
         }
         else if( !strcmp( psz_cmd, "get_time" ) )
@@ -1286,21 +1260,49 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
     {
-        int i;
-        for ( i = 0; i < p_playlist->i_size; i++ )
+        if( !strcmp( newval.psz_string, "status" ) )
         {
-            msg_rc( "|%s%s   %s|%s|", i == p_playlist->i_index ? "*" : " ",
-                    p_playlist->pp_items[i]->input.psz_name,
-                    p_playlist->pp_items[i]->input.psz_uri,
-                    p_playlist->pp_items[i]->i_parents > 0 ?
-                    p_playlist->pp_items[i]->pp_parents[0]->p_parent->input.psz_name : "" );
+            /* Replay the current state of the system. */
+            msg_rc( STATUS_CHANGE "( New input: %s )", p_playlist->p_input->input.p_item->psz_uri );
+            msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
+
+            vlc_mutex_lock( &p_playlist->object_lock );
+            switch( p_playlist->status.i_status )
+            {
+                case PLAYLIST_STOPPED:
+                    msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+                    break;
+                case PLAYLIST_RUNNING:
+                    msg_rc( STATUS_CHANGE "( play state: 1 )" );
+                    break;
+                case PLAYLIST_PAUSED:
+                    msg_rc( STATUS_CHANGE "( pause state: 2 )" );
+                    break;
+                default:
+                    msg_rc( STATUS_CHANGE "( state unknown )" );
+                    break;
+            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
         }
-        if ( i == 0 )
+        else
         {
-            msg_rc( "| no entries" );
+            int i;
+
+            for ( i = 0; i < p_playlist->i_size; i++ )
+            {
+                msg_rc( "|%s%s   %s|%s|", i == p_playlist->i_index ? "*" : " ",
+                        p_playlist->pp_items[i]->input.psz_name,
+                        p_playlist->pp_items[i]->input.psz_uri,
+                        p_playlist->pp_items[i]->i_parents > 0 ?
+                        p_playlist->pp_items[i]->pp_parents[0]->p_parent->input.psz_name : "" );
+            }
+            if ( i == 0 )
+            {
+                msg_rc( "| no entries" );
+            }
         }
     }
- 
+
     /*
      * sanity check
      */
