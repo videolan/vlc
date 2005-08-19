@@ -136,7 +136,7 @@ src/misc/version.c: FORCE
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-version
 
 # These dependencies are mandatory
-$(SOURCES_libvlc): src/misc/modules_builtin.h $(LIB_intl)
+$(SOURCES_libvlc): $(LIB_intl)
 
 ###############################################################################
 # Optional libintl - FIXME, bad dependencies
@@ -1038,7 +1038,7 @@ stamp-builtin: FORCE
 	done
 	@if test ! -f $@; then printf "" > $@; fi
 
-stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl src/misc/modules_builtin.h.in
+stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
