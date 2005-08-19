@@ -9,7 +9,7 @@
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Damien LUCAS <damien.lucas@anevia.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
- *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl> 
+ *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 
 #define POSX_TEXT N_("X coordinate of the subpicture")
 #define POSX_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
- 
+
 #define POSY_TEXT N_("Y coordinate of the subpicture")
 #define POSY_LONGTEXT N_("You can reposition the subpicture by providing another value here." )
 
@@ -88,7 +88,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );
     set_callbacks( Open, Close );
-    
+
     add_integer( DVBSUB_CFG_PREFIX "position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer( DVBSUB_CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
@@ -99,7 +99,7 @@ vlc_module_begin();
     set_description( _("DVB subtitles encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
-    
+
     add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "timeout", 15, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );    
@@ -207,7 +207,7 @@ struct decoder_sys_t
     int             i_spu_position;
     int             i_spu_x;
     int             i_spu_y;
-    
+
     vlc_bool_t      b_page;
     dvbsub_page_t   *p_page;
     dvbsub_region_t *p_regions;
@@ -286,7 +286,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_regions      = NULL;
     p_sys->p_cluts        = NULL;
     p_sys->p_page         = NULL;
-   
+
     var_Create( p_this, DVBSUB_CFG_PREFIX "position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, DVBSUB_CFG_PREFIX "position", &val );
     p_sys->i_spu_position = val.i_int;
@@ -296,7 +296,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_this, DVBSUB_CFG_PREFIX "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, DVBSUB_CFG_PREFIX "y", &val );
     posy = val.i_int;
- 
+
     /* Check if subpicture position was overridden */
     p_sys->b_absolute = VLC_TRUE;
     if( posx < 0 || posy < 0)
@@ -316,7 +316,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_spu_x = 0;
         p_sys->i_spu_y = 0;
     }
-    
+
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 'd','v','b','s' ) );
 
     default_clut_init( p_dec );
@@ -335,7 +335,7 @@ static void Close( vlc_object_t *p_this )
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "x" );
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "y" );
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "position" );    
-    
+
     free_all( p_dec );
     free( p_sys );
 }
@@ -685,7 +685,6 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
     int i_version, i_state, i_segment_length, i_timeout, i;
 
     /* A page is composed by 0 or more region */
-
     i_segment_length = bs_read( s, 16 );
     i_timeout = bs_read( s, 8 );
     i_version = bs_read( s, 4 );
@@ -814,6 +813,9 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
 
     i_width = bs_read( s, 16 );
     i_height = bs_read( s, 16 );
+#ifdef DEBUG_DVBSUB
+    msg_Dbg( p_dec, " width=%d height=%d", i_width, i_height );
+#endif
     i_level_comp = bs_read( s, 3 );
     i_depth = bs_read( s, 3 );
     bs_skip( s, 2 ); /* Reserved */
@@ -841,7 +843,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     {
         if( p_region->p_pixbuf )
         {
-            msg_Dbg( p_dec, "region size changed (not allowed)" );
+            msg_Dbg( p_dec, " changed (not allowed)" );
             free( p_region->p_pixbuf );
         }
 
@@ -1467,12 +1469,12 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_fade = VLC_TRUE;
-        
+
     /* Correct positioning of SPU */
     p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_flags = p_sys->i_spu_position;
     p_spu->i_x = p_sys->i_spu_x;
-    p_spu->i_y = p_sys->i_spu_y;    
+    p_spu->i_y = p_sys->i_spu_y;
 
     return p_spu;
 }
@@ -1497,11 +1499,11 @@ struct encoder_sys_t
     encoder_region_t *p_regions;
 
     mtime_t i_pts;
-    
+
     /* subpicture positioning */
     int i_offset_x;
     int i_offset_y;
-    int i_timeout_delay;    
+    int i_timeout_delay;
 };
 
 static void encode_page_composition( encoder_t *, bs_t *, subpicture_t * );
@@ -1552,8 +1554,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_offset_y = val.i_int;
     var_Create( p_this, ENC_CFG_PREFIX "timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, ENC_CFG_PREFIX "timeout", &val );
-    p_sys->i_timeout_delay = val.i_int;    
-    
+    p_sys->i_timeout_delay = val.i_int;
+
     return VLC_SUCCESS;
 }
 
@@ -1565,7 +1567,7 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
     subpicture_region_t *p_region = NULL;
 
     if( !p_subpic ) return NULL;
-    
+
     for( p_region = p_subpic->p_region; p_region; p_region = p_region->p_next )
     {
         video_format_t *p_fmt = &p_region->fmt;
@@ -1586,38 +1588,38 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
 
 #if DEBUG_DVBSUB
         msg_Dbg( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
-#endif        
+#endif
         p_fmt->i_chroma = VLC_FOURCC('Y','U','V','P');
         p_fmt->p_palette = (video_palette_t *) malloc( sizeof( video_palette_t ) );
         if( !p_fmt->p_palette ) break;
         p_fmt->p_palette->i_entries = 0;
-    
+
         /* Find best iterator using Euclide’s algorithm */
         for( ; i_iterator > 1 ; i_iterator-- )
         {
             int a = i_pixels;
             int b = i_iterator;
             int c;
-    
+
             while( b )
             {
                 c = a % b;
                 a = b;
                 b = c;
             }
-    
+
             if( a == 1 )
             {
                 break;
             }
         }
-    
+
         /* Count colors, build best palette */
         for( i_tolerance = 0; i_tolerance < 128; i_tolerance++ )
         {
             vlc_bool_t b_success = VLC_TRUE;
             p_fmt->p_palette->i_entries = 0;
-    
+
             for( i = 0; i < i_pixels ; )
             {
                 uint8_t y, u, v, a;
@@ -1654,13 +1656,13 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
                     i -= i_pixels;
                 }
             }
-    
+
             if( b_success )
             {
                 break;
             }
         }
-    
+
 #if DEBUG_DVBSUB
         msg_Dbg( p_enc, "best palette has %d colors", p_fmt->p_palette->i_entries );
 #endif
@@ -1678,18 +1680,18 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
         for( p = 0; p < p_region->picture.p[0].i_visible_lines ; p++ )
         {
             int i_ydelta = 0, i_udelta = 0, i_vdelta = 0, i_adelta = 0;
-    
+
             for( n = 0; n < p_region->picture.p[0].i_pitch ; n++ )
             {
                 int i_offset = p * p_region->picture.p[0].i_pitch + n;
                 int y, u, v, a;
                 int i_mindist, i_best;
-    
+
                 y = (int)p_region->picture.p[0].p_pixels[i_offset];
                 u = (int)p_region->picture.p[1].p_pixels[i_offset];
                 v = (int)p_region->picture.p[2].p_pixels[i_offset];
                 a = (int)p_region->picture.p[3].p_pixels[i_offset];
-    
+
                 /* Add dithering compensation */
 #ifdef RANDOM_DITHERING
                 y += ((i_seed & 0xff) - 0x80) * i_tolerance / 0x80;
@@ -1707,22 +1709,22 @@ static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
                 for( i_mindist = 99999999, i_best = 0, j = 0; j < p_fmt->p_palette->i_entries; j++ )
                 {
                     int i_dist = 0;
-    
+
                     i_dist += abs((int)p_fmt->p_palette->palette[j][0] - y);
                     i_dist += abs((int)p_fmt->p_palette->palette[j][1] - u);
                     i_dist += abs((int)p_fmt->p_palette->palette[j][2] - v);
                     i_dist += 2 * abs((int)p_fmt->p_palette->palette[j][3] - a);
-    
+
                     if( i_dist < i_mindist )
                     {
                         i_mindist = i_dist;
                         i_best = j;
                     }
                 }
-    
+
                 /* Set pixel to best color */
                 p_region->picture.p[0].p_pixels[i_offset] = i_best;
-    
+
                 /* Update dithering state */
 #ifdef RANDOM_DITHERING
                 i_seed = (i_seed * 0x1283837) ^ 0x789479 ^ (i_seed >> 13);
@@ -1773,13 +1775,13 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     block_t *p_block;
 
     if( !p_subpic || !p_subpic->p_region ) return NULL;
-    
+
     /* FIXME: this is a hack to convert VLC_FOURCC('Y','U','V','A') into
      *  VLC_FOURCC('Y','U','V','P')
      */
     p_region = p_subpic->p_region;
     if( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','A') )
-    {            
+    {
         p_temp = YuvaYuvp( p_enc, p_subpic );
         if( !p_temp )
         {
@@ -1788,13 +1790,13 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
         }
         p_region = p_subpic->p_region;
     }
-    
+
     /* Sanity check */
     if( !p_region ) return NULL;
-    
+
     if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') &&
         p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') ) return NULL;
-    
+
     if( p_region->fmt.p_palette )
     {
         switch( p_region->fmt.p_palette->i_entries )
@@ -1807,11 +1809,11 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
             default:
                 msg_Err( p_enc, "subpicture palette (%d) not handled",
                             p_region->fmt.p_palette->i_entries );
-                return NULL;                        
+                return NULL;
         }
     }
     /* End of hack */
-    
+
 #if DEBUG_DVBSUB
     msg_Dbg( p_enc, "encoding subpicture" );
 #endif
@@ -1873,7 +1875,7 @@ static void CloseEncoder( vlc_object_t *p_this )
 
     var_Destroy( p_this , ENC_CFG_PREFIX "x" );
     var_Destroy( p_this , ENC_CFG_PREFIX "y" );
-    var_Destroy( p_this , ENC_CFG_PREFIX "timeout" );    
+    var_Destroy( p_this , ENC_CFG_PREFIX "timeout" );
 
     if( p_sys->i_regions ) free( p_sys->p_regions );
     free( p_sys );
@@ -1904,8 +1906,10 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
             p_sys->p_regions[p_sys->i_regions++] = region;
         }
 
-        if( p_sys->p_regions[i_regions].i_width <
-            (int)p_region->fmt.i_visible_width )
+        if( ( p_sys->p_regions[i_regions].i_width <
+              (int)p_region->fmt.i_visible_width ) || 
+            ( p_sys->p_regions[i_regions].i_width >
+              (int)p_region->fmt.i_visible_width ) )
         {
             b_mode_change = VLC_TRUE;
             msg_Dbg( p_enc, "region %i width change: %i -> %i",
@@ -1914,8 +1918,10 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
             p_sys->p_regions[i_regions].i_width =
                 p_region->fmt.i_visible_width;
         }
-        if( p_sys->p_regions[i_regions].i_height <
-            (int)p_region->fmt.i_visible_height )
+        if( ( p_sys->p_regions[i_regions].i_height <
+             (int)p_region->fmt.i_visible_height ) ||
+            ( p_sys->p_regions[i_regions].i_height >
+              (int)p_region->fmt.i_visible_height ) )
         {
             b_mode_change = VLC_TRUE;
             msg_Dbg( p_enc, "region %i height change: %i -> %i",
@@ -1935,7 +1941,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         i_timeout = (p_subpic->i_stop - p_subpic->i_start) / 1000000;
     }
 
-    bs_write( s, 8, i_timeout + p_sys->i_timeout_delay ); /* Timeout */    
+    bs_write( s, 8, i_timeout + p_sys->i_timeout_delay ); /* Timeout */
     bs_write( s, 4, p_sys->i_page_ver++ );
     bs_write( s, 2, b_mode_change ?
               DVBSUB_PCS_STATE_CHANGE : DVBSUB_PCS_STATE_ACQUISITION );
@@ -2028,7 +2034,7 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
         if( !b_text )
         {
             video_palette_t *p_pal = p_region->fmt.p_palette;
-        
+
             if( !p_pal )
             {
                 msg_Err( p_enc, "subpicture has no palette - ignoring it" );
@@ -2135,7 +2141,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
             for( i = 0; i < i_size; i++ )
             {
                 bs_write( s, 16, p_region->psz_text[i] );
-            }     
+            }
 
             /* Update segment length */
             SetWBE( &s->p_start[i_length_pos/8],
@@ -2195,7 +2201,7 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
         {
         case 0:
             break;
-            
+
         case 4:
             bs_write( s, 8, 0x10 ); /* 2 bit/pixel code string */
             encode_pixel_line_2bp( p_enc, s, p_region, i_line );
