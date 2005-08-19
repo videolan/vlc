@@ -5,6 +5,7 @@ Changes between 0.8.2 and 0.8.4-svn (not yet released):
 
 Core support:
 * Internal strings handling is now UTF-8 based
+* New OSD system
 
 Video output:
 * new --monitor-aspect-ratio option
