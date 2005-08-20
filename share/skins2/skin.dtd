@@ -58,7 +58,7 @@
         maxheight   CDATA   "-1"
     >
 <!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
-                 Anchor|Video)+>
+                 Anchor|Video|Playtree)+>
     <!ATTLIST Group
         x           CDATA   "0"
         y           CDATA   "0"
@@ -183,6 +183,28 @@
         rightbottom CDATA   "lefttop"
         font        CDATA   #REQUIRED
         bgimage     CDATA   "none"
+        fgcolor     CDATA   "#000000"
+        playcolor   CDATA   "#FF0000"
+        bgcolor1    CDATA   "#FFFFFF"
+        bgcolor2    CDATA   "#FFFFFF"
+        selcolor    CDATA   "#0000FF"
+        help        CDATA   ""
+    >
+<!ELEMENT Playtree (Slider)?>
+    <!ATTLIST Playtree
+        id          CDATA   #REQUIRED
+        visible     CDATA   "true"
+        x           CDATA   "0"
+        y           CDATA   "0"
+        width       CDATA   "0"
+        height      CDATA   "0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        font        CDATA   #REQUIRED
+        bgimage     CDATA   "none"
+        itemimage   CDATA   "none"
+        openimage   CDATA   "none"
+        closedimage CDATA   "none"
         fgcolor     CDATA   "#000000"
         playcolor   CDATA   "#FF0000"
         bgcolor1    CDATA   "#FFFFFF"
