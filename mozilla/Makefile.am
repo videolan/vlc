@@ -39,13 +39,11 @@ BUNDLE_mozilla = VLC\ Plugin.plugin
 vlc_moz_FLAGS = `$(VLC_CONFIG) --libs vlc builtin pic mozilla`
 moz_CFLAGS = `$(MOZILLA_CONFIG) --cflags plugin java nspr/obsolete nspr oji xpcom xpconnect`
 moz_plugin_FLAGS = -I. -I$(top_builddir) -I$(srcdir)/../include -c -F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) -I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings -O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 -DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g -include mozilla-config.h
-pic = pic
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc_pic.a
 
 else
 LIBRARIES_mozilla = libvlcplugin$(LIBEXT)
 SOURCES_unix = support/npunix.c
-pic = pic
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc_pic.a
 endif
 endif

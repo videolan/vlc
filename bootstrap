@@ -199,22 +199,11 @@ EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 SUBDIRS = ${subdirs}
 SUFFIXES = _plugin\$(LIBEXT) _plugin.a
-### TODO ought to be defined somewhere else
 
 libvlcdir = \$(libdir)/vlc/\$(basedir)
 
 EXTRA_LIBRARIES = ${extra_libs}
 include Modules.am
-
-if !BUILD_MOZILLA
-pic = no
-else
-if HAVE_WIN32
-### There's no need for pic code on win32 so get rid of this to substantially
-### reduce the compilation time.
-pic = no
-endif
-endif
 
 all: all-modules
 
@@ -223,7 +212,7 @@ all-modules:
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
 	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; fi; \\
 	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.a;; esac; done; fi; \\
-	if test "\$(pic)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
+	if test "\$(pic)" == "pic"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
 
@@ -406,7 +395,7 @@ set -x
 
 # remove autotools cruft
 rm -f aclocal.m4 configure config.log config.h config.h.in
-rm -Rf autom4te.cache
+rm -Rf autom4te*.cache
 # remove old autotools extra cruft
 rm -f config.guess config.sub missing mkinstalldirs compile depcomp install-sh
 # remove new autotools extra cruft

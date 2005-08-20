@@ -33,6 +33,7 @@ EXTRA_DIST = \
 	$(NULL)
 
 BUILT_SOURCES = \
+	vlc-config \
 	stamp-api \
 	src/misc/modules_builtin.h \
 	src/misc/version.c \
@@ -65,6 +66,7 @@ dist_pkginclude_HEADERS = \
 	$(NULL)
 
 noinst_HEADERS = $(HEADERS_include)
+noinst_DATA = $(DATA_noinst_beos) $(DATA_noinst_libvlc)
 
 HEADERS_include = \
 	include/aout_internal.h \
@@ -130,7 +132,7 @@ HEADERS_include = \
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
-	touch $@
+	touch src/misc/modules_builtin.h
 
 src/misc/version.c: FORCE
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-version
@@ -271,18 +273,28 @@ dist-hook:
 
 bin_SCRIPTS = vlc-config
 vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
-	cd $(top_builddir) && $(SHELL) ./config.status --file=$@
-	-cd $(top_builddir) && chmod 0755 $@
+	$(SHELL) ./config.status --file=vlc-config
+	chmod 0755 vlc-config
 
 vlc-config.in: vlc-config.in.in
 	./config.status --recheck
 
-$(SOURCES): vlc-config
-
+MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 CLEANFILES = $(BUILT_SOURCES) stamp-builtin
-DISTCLEANFILES = vlc-config.in vlc-config
+DISTCLEANFILES = vlc-config.in
 
-lib_LIBRARIES = lib/libvlc.a $(LIBRARIES_libvlc_pic)
+if HAVE_WIN32
+lib_LIBRARIES = lib/libvlc.a
+else
+if BUILD_SHARED
+lib_LIBRARIES = lib/libvlc_pic.a
+else
+lib_LIBRARIES = lib/libvlc.a
+if BUILD_MOZILLA
+lib_LIBRARIES += lib/libvlc_pic.a
+endif
+endif
+endif
 
 lib_libvlc_a_SOURCES = $(SOURCES_libvlc)
 lib_libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
@@ -312,11 +324,26 @@ endif
 if BUILD_GETOPT
 OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
 endif
-if BUILD_MOZILLA
-if !HAVE_WIN32
-LIBRARIES_libvlc_pic = lib/libvlc_pic.a
+
+# Build libvlc as a shared library
+if BUILD_SHARED
+DATA_noinst_libvlc = libvlc$(LIBEXT)
+if HAVE_WIN32
+OBJECTS_libvlc_so = $(lib_libvlc_a_OBJECTS)
+else
+OBJECTS_libvlc_so = $(lib_libvlc_pic_a_OBJECTS)
 endif
 endif
+
+libvlc$(LIBEXT): $(OBJECTS_libvlc_so)
+	@ldfl="`$(VLC_CONFIG) --libs plugin vlc $(pic) builtin`" ; \
+	case `$(VLC_CONFIG) --linkage vlc` in \
+	  c++)  ld="$(CXXLINK)" ;; \
+	  objc) ld="$(OBJCLINK)" ;; \
+	  c|*)  ld="$(LINK)" ;; \
+	esac ; \
+	echo $$ld $(OBJECTS_libvlc_so) $$ldfl ; \
+	$$ld $(OBJECTS_libvlc_so) $$ldfl
 
 EXTRA_DIST += \
 	$(SOURCES_libvlc_beos) \
@@ -442,27 +469,40 @@ vlc_SOURCES = src/vlc.c
 
 # Work around a bug in the arm-wince-pe linker
 if HAVE_WINCE
-vlc_WORKAROUNDLDFLAGS = lib/libvlc.a
+vlc_WORKAROUNDLDFLAGS = $(LIB_libvlc)
 endif
 
-vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin` $(vlc_WORKAROUNDLDFLAGS)
-vlc_LDADD = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
+if BUILD_SHARED
+### libvlc.so cannot be created into lib/
+LIB_libvlc = libvlc$(LIBEXT)
+LDFLAGS_libvlc =
+#-Wl,-rpath $(libdir)
+else
+LIB_libvlc = lib/libvlc.a
+LDFLAGS_libvlc = `$(VLC_CONFIG) --libs vlc builtin` 
+endif
+
+vlc_LDFLAGS = $(LDFLAGS_libvlc) $(vlc_WORKAROUNDLDFLAGS)
+vlc_LDADD = $(LIB_libvlc) $(DATA_win32_rc) $(LIB_intl)
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = lib/libvlc.a $(DATA_win32_rc) $(LIB_intl)
+DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc) $(LIB_intl)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
-	@rm -f $(top_builddir)/vlc$(EXEEXT)
+	@rm -f vlc$(EXEEXT)
 	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
-	  c++) echo $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDFLAGS) $(LIBS) ; $(CXXLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) $(vlc_LDADD) ;; \
-	  objc) echo $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDFLAGS) $(LIBS) ; $(OBJCLINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) $(vlc_LDADD) ;; \
-	  c|*) echo $(LINK) $(vlc_OBJECTS) $(vlc_LDFLAGS) $(LIBS) ; $(LINK) $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS) $(vlc_LDADD) ;; \
-	esac
+	  c++) cmd="$(CXXLINK)" ;; \
+	  objc) cmd="$(OBJCLINK)" ;; \
+	  c|*) cmd="$(LINK)" ;; \
+	esac ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDFLAGS) $(vlc_LDADD) $(LIBS)" ; \
+	echo $$cmd ; \
+	eval $$cmd
 
 if HAVE_BEOS
-noinst_DATA = vlc-bundle
+DATA_noinst_beos = vlc-bundle
 vlc-bundle: vlc
 	rm -Rf $(top_builddir)/vlc-bundle ; mkdir -p $(top_builddir)/vlc-bundle
 	cp $(top_builddir)/vlc $(top_builddir)/vlc-bundle/
