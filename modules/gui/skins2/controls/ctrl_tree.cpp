@@ -235,13 +235,12 @@ void CtrlTree::onPositionChange()
                 }
 void CtrlTree::handleEvent( EvtGeneric &rEvent )
 {
-    // TODO TODO FIXME TODO TODO
     if( rEvent.getAsString().find( "key:down" ) != string::npos )
     {
         int key = ((EvtKey&)rEvent).getKey();
-        VarTree::Iterator it = m_rTree.begin();
+        VarTree::Iterator it;
         bool previousWasSelected = false;
-        while( it != m_rTree.end() )
+        for( it = m_rTree.begin(); it != m_rTree.end(); )
         {
             VarTree::Iterator next = it;
             IT_DISP_LOOP_END( next );
@@ -281,25 +280,47 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             }
             else if( key == KEY_RIGHT )
             {
-                // Go down one level
-                if( it->m_expanded )
+                // Go down one level (and expand node)
+                if( &*it == m_pLastSelected )
                 {
-                    if( it->size() )
+                    if( it->m_expanded )
                     {
-                        /* FIXME : finir */
-                        m_pLastSelected = &*(it->begin());
+                        if( it->size() )
+                        {
+                            it->m_selected = false;
+                            it->begin()->m_selected = true;
+                            m_pLastSelected = &*(it->begin());
+                        }
+                        else
+                        {
+                            m_rTree.action( &*it );
+                        }
                     }
-                }
-                else
-                {
-                    it->m_expanded = true;
+                    else
+                    {
+                        it->m_expanded = true;
+                    }
                 }
             }
             else if( key == KEY_LEFT )
             {
                 // Go up one level (and close node)
-                // TODO
-                it->m_expanded = false;
+                if( &*it == m_pLastSelected )
+                {
+                    if( it->m_expanded && it->size() )
+                    {
+                        it->m_expanded = false;
+                    }
+                    else
+                    {
+                        if( it->parent() && it->parent() != &m_rTree)
+                        {
+                            it->m_selected = false;
+                            m_pLastSelected = it->parent();
+                            m_pLastSelected->m_selected = true;
+                        }
+                    }
+                }
             }
             it = next;
         }
@@ -520,7 +541,6 @@ void CtrlTree::autoScroll()
 
 void CtrlTree::makeImage()
 {
-    fprintf( stderr, "CtrlTree::makeImage()\n");
     if( m_pImage )
     {
         delete m_pImage;
