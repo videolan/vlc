@@ -29,6 +29,7 @@ EXTRA_DIST = \
 	vlc.spec \
 	vlc.spec.mdk \
 	vlc.win32.nsi \
+	src/misc/modules_builtin.h.in \
 	$(NULL)
 
 BUILT_SOURCES = \
@@ -258,7 +259,6 @@ EXTRA_DIST += \
 	evc/errno.h \
 	evc/config.h.in \
 	evc/modules_builtin_evc.h \
-	src/misc/modules_builtin.h.in \
 	$(NULL)
 
 dist-hook:
