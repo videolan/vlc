@@ -31,6 +31,8 @@ class VarText;
 
 /// Command to notify the playlist of a change
 DEFINE_COMMAND( NotifyPlaylist, "notify playlist" )
+/// Command to notify the playtree of a change
+DEFINE_COMMAND( NotifyPlaytree, "notify playtree" )
 
 
 /// Command to set a text variable

@@ -20,6 +20,8 @@ SOURCES_skins2 = \
 	commands/cmd_on_top.hpp \
 	commands/cmd_playlist.cpp \
 	commands/cmd_playlist.hpp \
+	commands/cmd_playtree.cpp \
+	commands/cmd_playtree.hpp \
 	commands/cmd_minimize.cpp \
 	commands/cmd_minimize.hpp \
 	commands/cmd_quit.cpp \
@@ -41,6 +43,8 @@ SOURCES_skins2 = \
 	controls/ctrl_image.hpp \
 	controls/ctrl_list.cpp \
 	controls/ctrl_list.hpp \
+	controls/ctrl_tree.cpp \
+	controls/ctrl_tree.hpp \
 	controls/ctrl_move.cpp \
 	controls/ctrl_move.hpp \
 	controls/ctrl_resize.cpp \
@@ -153,9 +157,13 @@ SOURCES_skins2 = \
 	utils/var_percent.hpp \
 	utils/var_text.cpp \
 	utils/var_text.hpp \
+	utils/var_tree.cpp \
+	utils/var_tree.hpp \
 	\
 	vars/playlist.cpp \
 	vars/playlist.hpp \
+	vars/playtree.cpp \
+	vars/playtree.hpp \
 	vars/time.cpp \
 	vars/time.hpp \
 	vars/volume.cpp \

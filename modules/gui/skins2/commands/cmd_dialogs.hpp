@@ -48,6 +48,8 @@ typedef CmdDialogs<12> CmdDlgPlaylistLoad;
 typedef CmdDialogs<13> CmdDlgPlaylistSave;
 typedef CmdDialogs<14> CmdDlgDirectory;
 typedef CmdDialogs<15> CmdDlgStreamingWizard;
+typedef CmdDialogs<16> CmdDlgPlaytreeLoad;
+typedef CmdDialogs<17> CmdDlgPlaytreeSave;
 
 
 /// Generic "Open dialog" command

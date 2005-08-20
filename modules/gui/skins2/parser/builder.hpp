@@ -77,6 +77,7 @@ class Builder: public SkinObject
         void addRadialSlider( const BuilderData::RadialSlider &rData );
         void addSlider( const BuilderData::Slider &rData );
         void addList( const BuilderData::List &rData );
+        void addTree( const BuilderData::Tree &rData );
         void addVideo( const BuilderData::Video &rData );
 
        /// Compute the position of a control

@@ -31,6 +31,7 @@
 class Theme;
 class VarBool;
 class VarList;
+class VarTree;
 class VarPercent;
 
 
@@ -58,6 +59,9 @@ class Interpreter: public SkinObject
 
         /// Returns the list variable corresponding to the given name
         VarList *getVarList( const string &rName, Theme *pTheme );
+
+        /// Returns the tree variable corresponding to the given name
+        VarTree *getVarTree( const string &rName, Theme *pTheme );
 
     private:
         /// Map of global commands

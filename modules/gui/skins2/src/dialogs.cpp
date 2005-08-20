@@ -27,6 +27,7 @@
 #include "../commands/cmd_change_skin.hpp"
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_playlist.hpp"
+#include "../commands/cmd_playtree.hpp"
 
 
 /// Callback called when a new skin is chosen
@@ -71,6 +72,7 @@ void Dialogs::showPlaylistLoadCB( intf_dialog_args_t *pArg )
         // Push the command in the asynchronous command queue
         AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
         pQueue->remove( "load playlist" );
+        pQueue->remove( "load playtree" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 }
@@ -89,6 +91,7 @@ void Dialogs::showPlaylistSaveCB( intf_dialog_args_t *pArg )
         // Push the command in the asynchronous command queue
         AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
         pQueue->remove( "load playlist" );
+        pQueue->remove( "load playtree" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 }

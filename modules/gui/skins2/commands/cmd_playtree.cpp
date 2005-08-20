@@ -1,10 +1,10 @@
 /*****************************************************************************
- * cmd_vars.cpp
+ * cmd_playtree.cpp
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
- * $Id$
+ * Copyright (C) 2005 VideoLAN
+ * $Id: cmd_playlist.cpp 10101 2005-03-02 16:47:31Z robux4 $
  *
- * Authors: Cyril Deguet     <asmax@via.ecp.fr>
+ * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,31 +21,51 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "cmd_vars.hpp"
+#include "cmd_playtree.hpp"
 #include "../src/vlcproc.hpp"
-#include "../utils/var_text.hpp"
-#include "../vars/playlist.hpp"
-#include "../vars/playtree.hpp"
+#include "../utils/var_bool.hpp"
 
-
-void CmdNotifyPlaylist::execute()
+void CmdPlaytreeDel::execute()
 {
-    // Notify the playlist variable
-    Playlist &rVar = VlcProc::instance( getIntf() )->getPlaylistVar();
-    rVar.onChange();
+    m_rTree.delSelected();
 }
 
-void CmdNotifyPlaytree::execute()
+void CmdPlaytreeSort::execute()
 {
-    // Notify  the playtree variable
-    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
-    rVar.onChange();
+    // TODO
 }
 
-
-void CmdSetText::execute()
+void CmdPlaytreeNext::execute()
 {
-    // Change the text variable
-    m_rText.set( m_value );
+    // TODO
 }
 
+void CmdPlaytreePrevious::execute()
+{
+    // TODO
+}
+
+void CmdPlaytreeRandom::execute()
+{
+    // TODO
+}
+
+void CmdPlaytreeLoop::execute()
+{
+    // TODO
+}
+
+void CmdPlaytreeRepeat::execute()
+{
+    // TODO
+}
+
+void CmdPlaytreeLoad::execute()
+{
+    // TODO
+}
+
+void CmdPlaytreeSave::execute()
+{
+    // TODO
+}

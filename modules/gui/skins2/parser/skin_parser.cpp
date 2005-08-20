@@ -239,6 +239,46 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_data.m_listList.push_back( listData );
     }
 
+    else if( rName == "Playtree" )
+    {
+        RequireDefault( "id" );
+        RequireDefault( "font" );
+        CheckDefault( "visible", "true" );
+        CheckDefault( "x", "0" );
+        CheckDefault( "y", "0" );
+        CheckDefault( "width", "0" );
+        CheckDefault( "height", "0" );
+        CheckDefault( "lefttop", "lefttop" );
+        CheckDefault( "rightbottom", "lefttop" );
+        CheckDefault( "bgimage", "none" );
+        CheckDefault( "itemimage", "none" );
+        CheckDefault( "openimage", "none" );
+        CheckDefault( "closedimage", "none" );
+        CheckDefault( "fgcolor", "#000000" );
+        CheckDefault( "playcolor", "#FF0000" );
+        CheckDefault( "bgcolor1", "#FFFFFF" );
+        CheckDefault( "bgcolor2", "#FFFFFF" );
+        CheckDefault( "selcolor", "#0000FF" );
+        CheckDefault( "help", "" );
+
+        m_curListId = uniqueId( attr["id"] );
+        const BuilderData::Tree treeData( m_curListId, atoi( attr["x"] ) +
+                m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
+                atoi( attr["width"]), atoi( attr["height"] ),
+                attr["lefttop"], attr["rightbottom"],
+                attr["font"], "playtree",
+                attr["bgimage"], attr["itemimage"],
+                attr["openimage"], attr["closedimage"],
+                convertColor( attr["fgcolor"] ),
+                convertColor( attr["playcolor"] ),
+                convertColor( attr["bgcolor1"] ),
+                convertColor( attr["bgcolor2"] ),
+                convertColor( attr["selcolor"] ), attr["help"],
+                m_curLayer, m_curWindowId, m_curLayoutId );
+        m_curLayer++;
+        m_data.m_listTree.push_back( treeData );
+    }
+
     else if( rName == "RadialSlider" )
     {
         RequireDefault( "sequence" );
@@ -291,6 +331,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         {
             // Slider associated to a list
             newValue = "playlist.slider";
+            // FIXME
+            newValue = "playtree.slider";
         }
         const BuilderData::Slider slider( uniqueId( attr["id"] ),
                 attr["visible"],
@@ -409,7 +451,7 @@ void SkinParser::handleEndElement( const string &rName )
         m_yOffsetList.pop_back();
     }
 
-    else if( rName == "Playlist" )
+    else if( rName == "Playlist" || rName == "Playtree" )
     {
         m_curListId = "";
     }

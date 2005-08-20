@@ -481,8 +481,8 @@ void CtrlList::makeImage()
     int yPos = 0;
     for( it = m_rList[m_lastPos]; it != m_rList.end() && yPos < height; it++ )
     {
-        UString *pStr = (UString*)((*it).m_cString.get());
-        uint32_t color = ( (*it).m_playing ? m_playColor : m_fgColor );
+        UString *pStr = (UString*)(it->m_cString.get());
+        uint32_t color = ( it->m_playing ? m_playColor : m_fgColor );
 
         // Draw the text
         GenericBitmap *pText = m_rFont.drawString( *pStr, color, width );

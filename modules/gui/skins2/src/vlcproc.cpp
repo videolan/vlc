@@ -80,6 +80,12 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL ),
     REGISTER_VAR( m_cVarRandom, VarBoolImpl, "playlist.isRandom" )
     REGISTER_VAR( m_cVarLoop, VarBoolImpl, "playlist.isLoop" )
     REGISTER_VAR( m_cVarRepeat, VarBoolImpl, "playlist.isRepeat" )
+    REGISTER_VAR( m_cPlaytree, Playtree, "playtree" )
+    pVarManager->registerVar( getPlaytreeVar().getPositionVarPtr(),
+                              "playtree.slider" );
+    REGISTER_VAR( m_cVarRandom, VarBoolImpl, "playtree.isRandom" )
+    REGISTER_VAR( m_cVarLoop, VarBoolImpl, "playtree.isLoop" )
+    REGISTER_VAR( m_cVarRepeat, VarBoolImpl, "playtree.isRepeat" )
     REGISTER_VAR( m_cVarTime, StreamTime, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" )
@@ -292,11 +298,15 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
 
     // Create a playlist notify command
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+    // Create a playtree notify command
+    CmdNotifyPlaytree *pCmdTree = new CmdNotifyPlaytree( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
+    pQueue->remove( "notify playtree" );
     pQueue->push( CmdGenericPtr( pCmd ) );
+    pQueue->push( CmdGenericPtr( pCmdTree ) );
 
     return VLC_SUCCESS;
 }
@@ -337,11 +347,15 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     // Create a playlist notify command
     // TODO: selective update
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+    // Create a playtree notify command
+    CmdNotifyPlaytree *pCmdTree = new CmdNotifyPlaytree( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
+    pQueue->remove( "notify playtree" );
     pQueue->push( CmdGenericPtr( pCmd ) );
+    pQueue->push( CmdGenericPtr( pCmdTree ) );
 
     return VLC_SUCCESS;
 }
@@ -362,10 +376,14 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     // Create a playlist notify command
     // TODO: selective update
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+    // Create a playtree notify command
+    CmdNotifyPlaytree *pCmdTree = new CmdNotifyPlaytree( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
     pQueue->remove( "notify playlist" );
+    pQueue->remove( "notify playtree" );
     pQueue->push( CmdGenericPtr( pCmd ) );
+    pQueue->push( CmdGenericPtr( pCmdTree ) );
 
     return VLC_SUCCESS;
 }

@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Olivier Teuliere <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -327,6 +327,39 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
     };
     /// List
     list<List> m_listList;
+
+    /// Type definition
+    struct Tree
+    {
+        Tree( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & itemImageId, const string & openImageId, const string & closedImageId, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_itemImageId( itemImageId ), m_openImageId( openImageId ), m_closedImageId( closedImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+
+        const string m_id;
+        int m_xPos;
+        int m_yPos;
+        const string m_visible;
+        int m_width;
+        int m_height;
+        const string m_leftTop;
+        const string m_rightBottom;
+        const string m_fontId;
+        const string m_var;
+        const string m_bgImageId;
+        const string m_itemImageId;
+        const string m_openImageId;
+        const string m_closedImageId;
+        uint32_t m_fgColor;
+        uint32_t m_playColor;
+        uint32_t m_bgColor1;
+        uint32_t m_bgColor2;
+        uint32_t m_selColor;
+        const string m_help;
+        int m_layer;
+        const string m_windowId;
+        const string m_layoutId;
+    };
+    /// List
+    list<Tree> m_listTree;
 
     /// Type definition
     struct Video
