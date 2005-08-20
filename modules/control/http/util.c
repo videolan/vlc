@@ -60,9 +60,7 @@ char *E_(FileToUrl)( char *name, vlc_bool_t *pb_index )
     while( *name )
     {
         if( *name == '\\' )
-        {
-            *p++ = '/';
-        }
+            *name = '/';
         name++;
     }
 #endif
