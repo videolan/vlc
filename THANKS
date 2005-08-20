@@ -66,6 +66,7 @@ Julien Blache <jb at technologeek.org> - disc ejection code
 kty0ne - WinAmp 5 skin for VLC
 Lorena Gomes - Catalan translation
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
+Marco Munderloh <Marco.Munderloh@web.de> - HTTP fix for Win32 to URL filenames
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
 Markus Kern <markus-kern at gmx dot net> - video output window fixes (win32)
 Markus Kuespert <ltlBeBoy at beosmail.com> - BeOS CSS support
