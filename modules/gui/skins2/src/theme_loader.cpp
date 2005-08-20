@@ -576,7 +576,9 @@ int gzclose_frontend( int fd )
 {
     if( currentGzVp != NULL && fd != -1 )
     {
-        return gzclose( currentGzVp );
+        void *toClose = currentGzVp;
+        currentGzVp = NULL;  currentGzFd = -1;
+        return gzclose( toClose );
     }
     return -1;
 }
