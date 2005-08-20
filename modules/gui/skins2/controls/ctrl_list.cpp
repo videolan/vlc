@@ -332,13 +332,14 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
         int direction = ((EvtScroll&)rEvent).getDirection();
 
         double percentage = m_rList.getPositionVar().get();
+        double step = 2.0 / (double)m_rList.size();
         if( direction == EvtScroll::kUp )
         {
-            percentage += SCROLL_STEP;
+            percentage += step;
         }
         else
         {
-            percentage -= SCROLL_STEP;
+            percentage -= step;
         }
         m_rList.getPositionVar().set( percentage );
     }

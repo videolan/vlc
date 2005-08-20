@@ -331,7 +331,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         {
             // Slider associated to a list
             newValue = "playlist.slider";
-            // FIXME
+            // FIXME : this breaks slider usage in old style Playlists
             newValue = "playtree.slider";
         }
         const BuilderData::Slider slider( uniqueId( attr["id"] ),

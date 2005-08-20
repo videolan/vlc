@@ -345,13 +345,14 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         int direction = ((EvtScroll&)rEvent).getDirection();
 
         double percentage = m_rTree.getPositionVar().get();
+        double step = 2.0 / (double)m_rTree.visibleItems();
         if( direction == EvtScroll::kUp )
         {
-            percentage += SCROLL_STEP;
+            percentage += step;
         }
         else
         {
-            percentage -= SCROLL_STEP;
+            percentage -= step;
         }
         m_rTree.getPositionVar().set( percentage );
     }
