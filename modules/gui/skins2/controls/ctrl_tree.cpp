@@ -2,7 +2,7 @@
  * ctrl_tree.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.cpp 11009 2005-05-14 14:39:05Z ipkiss $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
