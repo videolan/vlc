@@ -527,18 +527,20 @@ vlc-bundle: vlc
 	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
 
-# Install the symlinks
+# Install the symlinks and shared libvlc
 install-exec-local:
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
 	  ln -s vlc "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
+	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"
 
 # the opposite of install-{data,exec}-local
 uninstall-local:
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
+	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
 
 if HAVE_DARWIN
 # Create the MacOS X app
