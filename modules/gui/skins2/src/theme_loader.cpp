@@ -50,7 +50,10 @@
 #if defined( HAVE_ZLIB_H )
 #   include <zlib.h>
 #   include <errno.h>
-int gzopen_frontend( char *pathname, int oflags, int mode );
+int gzopen_frontend ( char *pathname, int oflags, int mode );
+int gzclose_frontend( int );
+int gzread_frontend ( int, void *, size_t );
+int gzwrite_frontend( int, const void *, size_t );
 #if defined( HAVE_LIBTAR_H )
 #   include <libtar.h>
 #else
@@ -111,8 +114,10 @@ bool ThemeLoader::extractTarGz( const string &tarFile, const string &rootDir )
 {
     TAR *t;
 #if defined( HAVE_LIBTAR_H )
-    tartype_t gztype = { (openfunc_t) gzopen_frontend, (closefunc_t) gzclose,
-        (readfunc_t) gzread, (writefunc_t) gzwrite };
+    tartype_t gztype = { (openfunc_t) gzopen_frontend,
+                         (closefunc_t) gzclose_frontend,
+                         (readfunc_t) gzread_frontend,
+                         (writefunc_t) gzwrite_frontend };
 
     if( tar_open( &t, (char *)tarFile.c_str(), &gztype, O_RDONLY, 0,
                   TAR_GNU ) == -1 )
@@ -530,6 +535,10 @@ int makedir( char *newdir )
 #endif
 
 #ifdef HAVE_ZLIB_H
+
+static int currentGzFd = -1;
+static void * currentGzVp = NULL;
+
 int gzopen_frontend( char *pathname, int oflags, int mode )
 {
     char *gzflags;
@@ -556,6 +565,38 @@ int gzopen_frontend( char *pathname, int oflags, int mode )
         return -1;
     }
 
-    return (int)gzf;
+    /** Hum ... */
+    currentGzFd = 42;
+    currentGzVp = gzf;
+
+    return currentGzFd;
 }
+
+int gzclose_frontend( int fd )
+{
+    if( currentGzVp != NULL && fd != -1 )
+    {
+        return gzclose( currentGzVp );
+    }
+    return -1;
+}
+
+int gzread_frontend( int fd, void *p_buffer, size_t i_length )
+{
+    if( currentGzVp != NULL && fd != -1 )
+    {
+        return gzread( currentGzVp, p_buffer, i_length );
+    }
+    return -1;
+}
+
+int gzwrite_frontend( int fd, const void * p_buffer, size_t i_length )
+{
+    if( currentGzVp != NULL && fd != -1 )
+    {
+        return gzwrite( currentGzVp, p_buffer, i_length );
+    }
+    return -1;
+}
+
 #endif
