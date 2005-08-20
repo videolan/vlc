@@ -497,7 +497,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
 	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDFLAGS) $(vlc_LDADD) $(LIBS)" ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS)" ; \
 	echo $$cmd ; \
 	eval $$cmd
 
