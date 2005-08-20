@@ -128,9 +128,9 @@ struct subs_format_t
         uint32_t palette[16+1];
 
         /* the width of the original movie the spu was extracted from */
-        int	i_original_frame_width;
+        int i_original_frame_width;
         /* the height of the original movie the spu was extracted from */
-        int	i_original_frame_height;
+        int i_original_frame_height;
     } spu;
 
     struct
