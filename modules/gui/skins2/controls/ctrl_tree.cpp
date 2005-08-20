@@ -142,6 +142,8 @@ void CtrlTree::onUpdate( Subject<VarPercent> &rPercent )
 
     int excessItems = m_rTree.visibleItems() - maxItems();
 
+    fprintf( stderr, "Hullo\n");
+
     if( excessItems > 0)
     {
         VarPercent &rVarPos = m_rTree.getPositionVar();
@@ -149,15 +151,18 @@ void CtrlTree::onUpdate( Subject<VarPercent> &rPercent )
 #ifdef _MSC_VER
 #   define lrint (int)
 #endif
-        it = m_rTree.visibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1); /* FIXME : shouldn't need this +1 */
+        it = m_rTree.visibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1);
     }
     if( m_lastPos != it )
     {
+        fprintf( stderr, "updating\n" );
         // Redraw the control if the position has changed
         m_lastPos = it;
         makeImage();
         notifyLayout();
     }
+    else
+        fprintf( stderr, "not updating\n" );
 }
 
 void CtrlTree::onResize()
@@ -175,7 +180,7 @@ void CtrlTree::onResize()
 #ifdef _MSC_VER
 #   define lrint (int)
 #endif
-        it = m_rTree.visibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1); /* FIXME : shouldn't need this +1 */
+        it = m_rTree.visibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1);
     }
     // Redraw the control if the position has changed
     m_lastPos = it;
@@ -474,13 +479,48 @@ void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest )
 
 void CtrlTree::autoScroll()
 {
-    // TODO FIXME TODO
-    makeImage();
-    notifyLayout();
+    // Find the current playing stream
+    int playIndex = 0;
+    VarTree::Iterator it;
+    for( it = m_rTree.begin(); it != m_rTree.end(); )
+    {
+        if( it->m_playing ) break;
+        playIndex++;
+        IT_DISP_LOOP_END( it );
+    }
+
+    if( it == m_rTree.end() ) return;
+
+    // Find  m_lastPos
+    int lastPosIndex = 0;
+    for( it = m_rTree.begin(); it != m_rTree.end(); )
+    {
+        if( it == m_lastPos ) break;
+        lastPosIndex++;
+        IT_DISP_LOOP_END( it );
+    }
+
+    if( it == m_rTree.end() ) return;
+
+
+    if( it != m_rTree.end()
+        && ( playIndex < lastPosIndex
+           || playIndex > lastPosIndex + maxItems() ) )
+    {
+        // Scroll to have the playing stream visible
+        VarPercent &rVarPos = m_rTree.getPositionVar();
+        rVarPos.set( 1.0 - (double)playIndex / (double)m_rTree.visibleItems() );
+    }
+    else
+    {
+        makeImage();
+        notifyLayout();
+    }
 }
 
 void CtrlTree::makeImage()
 {
+    fprintf( stderr, "CtrlTree::makeImage()\n");
     if( m_pImage )
     {
         delete m_pImage;
@@ -509,7 +549,6 @@ void CtrlTree::makeImage()
         ScaledBitmap bmp( getIntf(), *m_pBgBitmap, width, height );
         m_pImage->drawBitmap( bmp, 0, 0 );
 
-        // FIXME : Take care of the selection color
         for( int yPos = 0; yPos < height; yPos += i_itemHeight )
         {
             int rectHeight = __MIN( i_itemHeight, height - yPos );
@@ -550,7 +589,6 @@ void CtrlTree::makeImage()
 
     int bitmapWidth = itemImageWidth();
 
-    // FIXME : Draw the items
     int yPos = 0;
     it = m_lastPos;
     while( it != m_rTree.end() && yPos < height )
