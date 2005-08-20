@@ -261,6 +261,7 @@ VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 VLC_EXPORT( int,  playlist_LockClear, ( playlist_t * ) );
 
 VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
+VLC_EXPORT( int, playlist_PreparseEnqueueItem, (playlist_t *, playlist_item_t *) );
 
 /* Services discovery */
 

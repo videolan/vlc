@@ -52,6 +52,8 @@ static int ItemChange( vlc_object_t *, const char *,
 
 int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args );
 
+void playlist_PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
+
 
 /**
  * Create playlist
@@ -447,6 +449,39 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
                  p_playlist->p_preparse->i_waiting,
                  p_item );
     vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
+    return VLC_SUCCESS;
+}
+
+/* Should only be called if playlist and preparser are locked */
+void playlist_PreparseEnqueueItemSub( playlist_t *p_playlist,
+                                     playlist_item_t *p_item )
+{
+    int i;
+    if( p_item->i_children == -1 )
+    {
+        INSERT_ELEM( p_playlist->p_preparse->pp_waiting,
+                     p_playlist->p_preparse->i_waiting,
+                     p_playlist->p_preparse->i_waiting,
+                     &(p_item->input) );
+    }
+    else
+    {
+        for( i = 0; i < p_item->i_children; i++)
+        {
+            playlist_PreparseEnqueueItemSub( p_playlist,
+                                             p_item->pp_children[i] );
+        }
+    }
+}
+
+int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
+                                  playlist_item_t *p_item )
+{
+    vlc_mutex_lock( &p_playlist->object_lock );
+    vlc_mutex_lock( &p_playlist->p_preparse->object_lock );
+    playlist_PreparseEnqueueItemSub( p_playlist, p_item );
+    vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
     return VLC_SUCCESS;
 }
 

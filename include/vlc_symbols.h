@@ -416,6 +416,7 @@ struct module_symbols_t
     const char * (*VLC_CompileHost_inner) (void);
     const char * (*VLC_Version_inner) (void);
     const char * (*VLC_CompileTime_inner) (void);
+    int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -814,6 +815,7 @@ struct module_symbols_t
 #  define VLC_CompileHost (p_symbols)->VLC_CompileHost_inner
 #  define VLC_Version (p_symbols)->VLC_Version_inner
 #  define VLC_CompileTime (p_symbols)->VLC_CompileTime_inner
+#  define playlist_PreparseEnqueueItem (p_symbols)->playlist_PreparseEnqueueItem_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1215,6 +1217,7 @@ struct module_symbols_t
     ((p_symbols)->VLC_CompileHost_inner) = VLC_CompileHost; \
     ((p_symbols)->VLC_Version_inner) = VLC_Version; \
     ((p_symbols)->VLC_CompileTime_inner) = VLC_CompileTime; \
+    ((p_symbols)->playlist_PreparseEnqueueItem_inner) = playlist_PreparseEnqueueItem; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \
