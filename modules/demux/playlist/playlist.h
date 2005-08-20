@@ -39,3 +39,6 @@ void E_(Close_PLS) ( vlc_object_t * );
 
 int E_(Import_B4S) ( vlc_object_t * );
 void E_(Close_B4S) ( vlc_object_t * );
+
+int E_(Import_DVB) ( vlc_object_t * );
+void E_(Close_DVB) ( vlc_object_t * );

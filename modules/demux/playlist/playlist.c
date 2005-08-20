@@ -74,6 +74,11 @@ vlc_module_begin();
         add_shortcut( "shout-b4s" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_B4S), E_(Close_B4S) );
+    add_submodule();
+        set_description( _("DVB playlist import") );
+        add_shortcut( "dvb-open" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_DVB), E_(Close_DVB) );
 vlc_module_end();
 
 
