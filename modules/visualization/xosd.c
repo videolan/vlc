@@ -99,6 +99,7 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    xosd *p_osd;
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
@@ -115,22 +116,27 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Initialize library */
-    p_intf->p_sys->p_osd =
 #if defined(HAVE_XOSD_VERSION_0) || defined(HAVE_XOSD_VERSION_1)
+    p_osd  = p_intf->p_sys->p_osd =
         xosd_init( config_GetPsz( p_intf, "xosd-font" ),
                    config_GetPsz( p_intf,"xosd-colour" ), 3,
                    XOSD_top, 0, 1 );
-#else
-        xosd_init( config_GetPsz( p_intf, "xosd-font" ),
-                   config_GetPsz( p_intf,"xosd-colour" ), 3,
-                    XOSD_top, 0, 0, 1 );
-#endif
-
     if( p_intf->p_sys->p_osd == NULL )
     {
         msg_Err( p_intf, "couldn't initialize libxosd" );
         return VLC_EGENERIC;
     }
+#else
+    p_osd = p_intf->p_sys->p_osd = xosd_create( 1 );
+    if( p_osd == NULL )
+    {
+        msg_Err( p_intf, "couldn't initialize libxosd" );
+        return VLC_EGENERIC;
+    }
+    xosd_set_colour( p_osd, config_GetPsz( p_intf,"xosd-colour" ) );
+    xosd_set_timeout( p_osd, 3 );
+#endif
+
 
     playlist_t *p_playlist =
             (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -165,10 +171,7 @@ static int Open( vlc_object_t *p_this )
                                          XOSD_bottom: XOSD_top );
 
     /* Initialize to NULL */
-    xosd_display( p_intf->p_sys->p_osd,
-                  0,
-                  XOSD_string,
-                  "xosd interface initialized" );
+    xosd_display( p_osd, 0, XOSD_string, "XOSD interface initialized" );
 
     p_intf->pf_run = Run;
 
