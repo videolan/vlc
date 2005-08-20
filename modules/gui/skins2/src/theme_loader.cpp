@@ -596,7 +596,7 @@ int gzwrite_frontend( int fd, const void * p_buffer, size_t i_length )
 {
     if( currentGzVp != NULL && fd != -1 )
     {
-        return gzwrite( currentGzVp, p_buffer, i_length );
+        return gzwrite( currentGzVp, const_cast<void*>(p_buffer), i_length );
     }
     return -1;
 }
