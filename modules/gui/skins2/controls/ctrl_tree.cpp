@@ -322,6 +322,14 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     }
                 }
             }
+            else if( key == KEY_ENTER || key == KEY_SPACE )
+            {
+                // Go up one level (and close node)
+                if( &*it == m_pLastSelected )
+                {
+                    m_rTree.action( &*it );
+                }
+            }
             it = next;
         }
 
