@@ -100,6 +100,24 @@ int CtrlTree::itemHeight()
     return itemHeight;
 }
 
+int CtrlTree::itemImageWidth()
+{
+    int bitmapWidth = 5;
+    if( m_pClosedBitmap )
+    {
+        bitmapWidth = __MAX( m_pClosedBitmap->getWidth(), bitmapWidth );
+    }
+    if( m_pOpenBitmap )
+    {
+        bitmapWidth = __MAX( m_pOpenBitmap->getWidth(), bitmapWidth );
+    }
+    if( m_pItemBitmap )
+    {
+        bitmapWidth = __MAX( m_pItemBitmap->getWidth(), bitmapWidth );
+    }
+    return bitmapWidth + 2;
+}
+
 int CtrlTree::maxItems()
 {
     const Position *pPos = getPosition();
@@ -291,11 +309,84 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         EvtMouse &rEvtMouse = (EvtMouse&)rEvent;
         const Position *pos = getPosition();
         int yPos = ( rEvtMouse.getYPos() - pos->getTop() ) / itemHeight();
+        int xPos = rEvtMouse.getXPos() - pos->getLeft();
         VarTree::Iterator it;
         int index = 0;
 
-        // TODO : add all other mouse controls
-        /**/ if( rEvent.getAsString().find( "mouse:left:down" ) !=
+        if( rEvent.getAsString().find( "mouse:left:down:ctrl,shift" ) !=
+            string::npos )
+        {
+            // Flag to know if the currend item must be selected
+            bool select = false;
+            index = -1;
+            for( it = m_rTree.begin(); it != m_rTree.end(); )
+            {
+                bool nextSelect = select;
+                if( it == m_lastPos ) index = 0;
+                if( index == yPos || &*it == m_pLastSelected )
+                {
+                    if( select )
+                    {
+                        nextSelect = false;
+                    }
+                    else
+                    {
+                        select = true;
+                        nextSelect = true;
+                    }
+                }
+                it->m_selected = (*it).m_selected || select;
+                select = nextSelect;
+                if( index != -1 )
+                    index++;
+                IT_DISP_LOOP_END( it );
+            }
+        }
+        else if( rEvent.getAsString().find( "mouse:left:down:ctrl" ) !=
+                 string::npos )
+        {
+            for( it = m_lastPos; it != m_rTree.end(); )
+            {
+                if( index == yPos )
+                {
+                    it->m_selected = !it->m_selected;
+                    m_pLastSelected = &*it;
+                    break;
+                }
+                index++;
+                IT_DISP_LOOP_END( it );
+            }
+        }
+        else if( rEvent.getAsString().find( "mouse:left:down:shift" ) !=
+                 string::npos )
+        {
+            // Flag to know if the currend item must be selected
+            bool select = false;
+            index = -1;
+            for( it = m_rTree.begin(); it != m_rTree.end(); )
+            {
+                bool nextSelect = select;
+                if( it == m_lastPos ) index = 0;
+                if( index == yPos || &*it == m_pLastSelected )
+                {
+                    if( select )
+                    {
+                        nextSelect = false;
+                    }
+                    else
+                    {
+                        select = true;
+                        nextSelect = true;
+                    }
+                }
+                it->m_selected = select;
+                select = nextSelect;
+                if( index != -1 )
+                    index++;
+                IT_DISP_LOOP_END( it );
+            }
+        }
+        else if( rEvent.getAsString().find( "mouse:left:down" ) !=
                  string::npos )
         {
             for( it = m_lastPos; it != m_rTree.end(); )
@@ -321,10 +412,17 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             {
                 if( index == yPos )
                 {
-                    it->m_selected = true;
-                    m_pLastSelected = &*it;
-                    // Execute the action associated to this item
-                    m_rTree.action( &*it );
+                    if( it->size() && xPos < it->depth() * itemImageWidth() )
+                    {
+                        it->m_expanded = !it->m_expanded;
+                    }
+                    else
+                    {
+                        it->m_selected = true;
+                        m_pLastSelected = &*it;
+                        // Execute the action associated to this item
+                        m_rTree.action( &*it );
+                    }
                 }
                 else
                 {
@@ -450,20 +548,7 @@ void CtrlTree::makeImage()
     }
 //    fprintf( stderr, "done\n");
 
-    int bitmapWidth = 5;
-    if( m_pClosedBitmap )
-    {
-        bitmapWidth = __MAX( m_pClosedBitmap->getWidth(), bitmapWidth );
-    }
-    if( m_pOpenBitmap )
-    {
-        bitmapWidth = __MAX( m_pOpenBitmap->getWidth(), bitmapWidth );
-    }
-    if( m_pItemBitmap )
-    {
-        bitmapWidth = __MAX( m_pItemBitmap->getWidth(), bitmapWidth );
-    }
-    bitmapWidth += 2;
+    int bitmapWidth = itemImageWidth();
 
     // FIXME : Draw the items
     int yPos = 0;

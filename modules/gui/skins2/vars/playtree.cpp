@@ -63,6 +63,9 @@ void Playtree::delSelected()
 
 void Playtree::action( VarTree *pItem )
 {
+    /* do we really want to call preparse here ? */
+    playlist_PreparseEnqueueItem( m_pPlaylist,
+                                  (playlist_item_t *)pItem->m_pData );
     vlc_mutex_lock( &m_pPlaylist->object_lock );
     VarTree::Iterator it;
     if( pItem->size() )

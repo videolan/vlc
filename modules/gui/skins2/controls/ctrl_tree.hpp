@@ -116,6 +116,9 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree>,
         /// Compute the item's height (depends on fonts and images used)
         int itemHeight();
 
+        /// Compute the width of an item's bitmap
+        int itemImageWidth();
+
         /// Check if the tree must be scrolled
         void autoScroll();
 
