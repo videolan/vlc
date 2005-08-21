@@ -1,3 +1,11 @@
+vlc (0.8.4-svn20050810-2) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend on libarts1-dev (>= 1.4.2-1).
+    + Build-depend on a newer version of libavcodec.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 16 Aug 2005 17:36:21 +0200
+
 vlc (0.8.4-svn20050810-1) unstable; urgency=low
 
   * New SVN snapshot.
@@ -14,8 +22,8 @@ vlc (0.8.4-svn20050810-1) unstable; urgency=low
     + Build-depend on libwxgtk2.4-dev (>= 2.4.4).
     + Build-depend on libdvbpsi4-dev instead of libdvbpsi3-dev.
     * Build-depend on libsdl1.2-dev (>= 1.2.7+1.2.8cvs20041007-5.3).
-    + Build-depend on a newer version of libmatroska-dev because of the C++
-      transition.
+    + Build-depend on a newer version of libmatroska-dev and mozilla-dev
+      because of the C++ transition.
     + Build-depend on libsvga1-dev instead of svgalib1-dev.
   * This snapshot no longer uses tune=opteron on amd64 (Closes: #316161).
   * The SVN version adds support for Freebox users (Closes: #317035).
@@ -23,7 +31,7 @@ vlc (0.8.4-svn20050810-1) unstable; urgency=low
   * mozilla/support/npunix.c: fixed undeclared NPP_GetJavaClass
     (Closes: #317067).
 
- -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 13 Jul 2005 21:54:09 +0200
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 10 Aug 2005 16:18:37 +0200
 
 vlc (0.8.2-1) unstable; urgency=low
 

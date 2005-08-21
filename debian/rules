@@ -171,6 +171,9 @@ clean: unpatch
 	  cd extras/faad2 && $(MAKE) distclean; \
 	fi
 
+	# Clean zsh completion stuff
+	rm -f extras/zsh
+
 	# Removed ugly cruft
 	rm -f src/misc/modules_builtin.h
 	rm -f mozilla/vlcintf.xpt mozilla/vlcintf.h
