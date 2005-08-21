@@ -158,7 +158,6 @@ static int Open( vlc_object_t *p_this )
 
     file_entry_t *      p_file;
 
-
     b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
 
     if( !b_stdin )
@@ -173,6 +172,18 @@ static int Open( vlc_object_t *p_this )
             free( psz_name );
             psz_name = psz;
         }
+#if defined(WIN32)
+        else if( !strcasecmp( p_access->psz_access, "file" )
+                && ('/' == psz_name[0]) && psz_name[1]
+                && (':' == psz_name[2]) && ('/' == psz_name[3]) )
+        {
+            /*
+            ** explorer can open path such as file:/C:/ or file:///C:/...
+            ** hence remove leading / if found
+            */
+            ++psz_name;
+        }
+#endif
 
 #ifdef HAVE_SYS_STAT_H
         psz = ToLocale( psz_name );
