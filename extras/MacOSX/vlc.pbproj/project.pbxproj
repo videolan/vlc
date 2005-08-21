@@ -827,6 +827,7 @@
 				DCFCCDB9085CE18F001E36AF,
 				DC7F46ED08A183FC0027DB24,
 				DCE7BD0508A56C8B007B10AE,
+				DCF49B4308B50FAF007E304F,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -913,6 +914,8 @@
 				DC7F46F108A187F60027DB24,
 				DCE7BD0708A5724D007B10AE,
 				DCE7BD0608A5724D007B10AE,
+				DCF49B4408B51992007E304F,
+				DCF49B4508B51992007E304F,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -2369,11 +2372,54 @@
 				DCFCCDB7085CE18F001E36AF,
 				DC7F46EB08A183FC0027DB24,
 				DCE7BD0308A56C8B007B10AE,
+				DCF49B4108B50FAF007E304F,
 			);
 			isa = PBXGroup;
 			name = nibs;
 			refType = 4;
 			sourceTree = "<group>";
+		};
+		DCF49B4108B50FAF007E304F = {
+			children = (
+				DCF49B4208B50FAF007E304F,
+			);
+			isa = PBXVariantGroup;
+			name = Update.nib;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCF49B4208B50FAF007E304F = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
+			name = English;
+			path = Resources/English.lproj/Update.nib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCF49B4308B50FAF007E304F = {
+			fileRef = DCF49B4108B50FAF007E304F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		DCF49B4408B51992007E304F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = update.h;
+			path = ../../modules/gui/macosx/update.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		DCF49B4508B51992007E304F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = update.m;
+			path = ../../modules/gui/macosx/update.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		DCFCCDB7085CE18F001E36AF = {
 			children = (

@@ -174,6 +174,12 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
+	extras/MacOSX/Resources/English.lproj/Extended.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/Extended.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/Extended.nib/keyedobjects.nib \
+	extras/MacOSX/Resources/English.lproj/Update.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/Update.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/Update.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/a52.icns \
 	extras/MacOSX/Resources/aac.icns \
@@ -598,6 +604,8 @@ VLC-release.app: vlc
 	    extended.m \
         bookmarks.h \
         bookmarks.m \
+	    update.h \
+	    update.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -712,6 +720,8 @@ VLC.app: vlc
 	    extended.m \
         bookmarks.h \
         bookmarks.m \
+	    update.h \
+	    update.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \

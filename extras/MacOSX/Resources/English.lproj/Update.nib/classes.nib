@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {cancel = id; download = id; okay = id; }; 
+            CLASS = VLCUpdate; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_bar_checking" = id; 
+                "o_bar_progress" = id; 
+                "o_btn_DownloadNow" = id; 
+                "o_btn_cancel" = id; 
+                "o_btn_okay" = id; 
+                "o_fld_currentVersion" = id; 
+                "o_fld_dest" = id; 
+                "o_fld_elpTime" = id; 
+                "o_fld_releaseNote" = id; 
+                "o_fld_releasedOn" = id; 
+                "o_fld_remTime" = id; 
+                "o_fld_size" = id; 
+                "o_fld_source" = id; 
+                "o_fld_userVersion" = id; 
+                "o_lbl_checkForUpdate" = id; 
+                "o_lbl_currentVersion" = id; 
+                "o_lbl_mirror" = id; 
+                "o_lbl_releasedOn" = id; 
+                "o_lbl_size" = id; 
+                "o_lbl_userVersion" = id; 
+                "o_pop_mirror" = id; 
+                "o_progress_window" = id; 
+                "o_update_window" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
