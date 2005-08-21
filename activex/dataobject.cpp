@@ -192,18 +192,16 @@ HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedi
             SIZEL size = _p_instance->getExtent();
             RECTL wBounds = { 0L, 0L, size.cx, size.cy };
 
-            LONG width = size.cx*GetDeviceCaps(hicTargetDev, LOGPIXELSX)/2540L;
-            LONG height = size.cy*GetDeviceCaps(hicTargetDev, LOGPIXELSY)/2540L;
-
             pMetaFilePict->mm   = MM_ANISOTROPIC;
             pMetaFilePict->xExt = size.cx;
             pMetaFilePict->yExt = size.cy;
 
-            SetMapMode(hdcMeta, MM_ANISOTROPIC);
-            SetWindowOrgEx(hdcMeta, 0, 0, NULL);
-            SetWindowExtEx(hdcMeta, width, height, NULL);
+            DPFromHimetric(hicTargetDev, (LPPOINT)&size, 1);
 
-            RECTL bounds = { 0L, 0L, width, height };
+            SetMapMode(hdcMeta, MM_ANISOTROPIC);
+            SetWindowExtEx(hdcMeta, size.cx, size.cy, NULL);
+
+            RECTL bounds = { 0L, 0L, size.cx, size.cy };
 
             _p_instance->onDraw(pFormatEtc->ptd, hicTargetDev, hdcMeta, &bounds, &wBounds);
             pMetaFilePict->hMF = CloseMetaFile(hdcMeta);
@@ -230,10 +228,9 @@ HRESULT VLCDataObject::getEnhMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pM
     {
         RECTL wBounds = { 0L, 0L, size.cx, size.cy };
 
-        LONG width = size.cx*GetDeviceCaps(hicTargetDev, LOGPIXELSX)/2540L;
-        LONG height = size.cy*GetDeviceCaps(hicTargetDev, LOGPIXELSY)/2540L;
+        DPFromHimetric(hicTargetDev, (LPPOINT)&size, 1);
 
-        RECTL bounds = { 0L, 0L, width, height };
+        RECTL bounds = { 0L, 0L, size.cx, size.cy };
 
         _p_instance->onDraw(pFormatEtc->ptd, hicTargetDev, hdcMeta, &bounds, &wBounds);
         pMedium->hEnhMetaFile = CloseEnhMetaFile(hdcMeta);
@@ -278,6 +275,11 @@ STDMETHODIMP VLCDataObject::SetData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium,
 {
     return E_NOTIMPL;
 };
+
+/*void VLCDataObject::onDataChange(void)
+{
+    _p_adviseHolder->SendOnDataChange(this, 0, 0);
+};*/
 
 void VLCDataObject::onClose(void)
 {

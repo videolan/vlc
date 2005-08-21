@@ -36,6 +36,9 @@ extern HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v);
 
 // properties
 extern HDC CreateDevDC(DVTARGETDEVICE *ptd);
+extern void DPFromHimetric(HDC hdc, LPPOINT pt, int count);
+extern void HimetricFromDP(HDC hdc, LPPOINT pt, int count);
+
 
 // enumeration
 template<class T> class VLCEnum : IUnknown

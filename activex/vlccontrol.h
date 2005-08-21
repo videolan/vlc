@@ -64,7 +64,6 @@ public:
     STDMETHODIMP pause(void);
     STDMETHODIMP stop(void);
     STDMETHODIMP get_Playing(VARIANT_BOOL *isPlaying);
-    STDMETHODIMP put_Playing(VARIANT_BOOL isPlaying);
     STDMETHODIMP get_Position(float *position);
     STDMETHODIMP put_Position(float position);
     STDMETHODIMP get_Time(int *seconds);
@@ -86,6 +85,12 @@ public:
     STDMETHODIMP playlistPrev(void);
     STDMETHODIMP playlistClear(void);
     STDMETHODIMP get_VersionInfo(BSTR *version);
+    STDMETHODIMP get_MRL(BSTR *mrl);
+    STDMETHODIMP put_MRL(BSTR mrl);
+    STDMETHODIMP get_AutoLoop(VARIANT_BOOL *autoloop);
+    STDMETHODIMP put_AutoLoop(VARIANT_BOOL autoloop);
+    STDMETHODIMP get_AutoPlay(VARIANT_BOOL *autoplay);
+    STDMETHODIMP put_AutoPlay(VARIANT_BOOL autoplay);
  
 private:
 

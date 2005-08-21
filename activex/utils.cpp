@@ -40,7 +40,10 @@ char *CStrFromBSTR(int codePage, BSTR bstr)
             char *buffer = (char *)CoTaskMemAlloc(mblen+1);
             ZeroMemory(buffer, mblen+1);
             if( WideCharToMultiByte(codePage, 0, bstr, len, buffer, mblen, NULL, NULL) )
+            {
+                buffer[mblen] = '\0';
                 return buffer;
+            }
         }
     }
     return NULL;
@@ -130,4 +133,29 @@ errReturn:
 	return hdc;
 };
 
+#define HIMETRIC_PER_INCH 2540
+
+void DPFromHimetric(HDC hdc, LPPOINT pt, int count)
+{
+    LONG lpX = GetDeviceCaps(hdc, LOGPIXELSX);
+    LONG lpY = GetDeviceCaps(hdc, LOGPIXELSY);
+    while( count-- )
+    {
+        pt->x = pt->x*lpX/HIMETRIC_PER_INCH;
+        pt->y = pt->y*lpY/HIMETRIC_PER_INCH;
+        ++pt;
+    }
+};
+
+void HimetricFromDP(HDC hdc, LPPOINT pt, int count)
+{
+    LONG lpX = GetDeviceCaps(hdc, LOGPIXELSX);
+    LONG lpY = GetDeviceCaps(hdc, LOGPIXELSY);
+    while( count-- )
+    {
+        pt->x = pt->x*HIMETRIC_PER_INCH/lpX;
+        pt->y = pt->y*HIMETRIC_PER_INCH/lpY;
+        ++pt;
+    }
+};
 

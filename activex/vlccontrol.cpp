@@ -126,26 +126,6 @@ STDMETHODIMP VLCControl::play(void)
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
     {
-        if( ! _p_instance->isInPlaceActive() )
-        {
-            /*
-            ** object has not yet been activated. try doing it by ourself
-            ** if parent container is known
-            */
-            LPOLEOBJECT p_oleobject;
-            if( SUCCEEDED(QueryInterface(IID_IOleObject, (LPVOID *)&p_oleobject)) )
-            {
-                LPOLECLIENTSITE p_clientsite;
-                if( SUCCEEDED(p_oleobject->GetClientSite(&p_clientsite)
-                    && (NULL != p_clientsite)) )
-                {
-                    p_oleobject->DoVerb(OLEIVERB_INPLACEACTIVATE,
-                            NULL, p_clientsite, 0, NULL, NULL);
-                    p_clientsite->Release();
-                }
-                p_oleobject->Release();
-            }
-        }
         VLC_Play(i_vlc);
         _p_instance->fireOnPlayEvent();
         return NOERROR;
@@ -175,7 +155,7 @@ STDMETHODIMP VLCControl::stop(void)
         return NOERROR;
     }
     return E_UNEXPECTED;
-}
+};
         
 STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
 {
@@ -189,26 +169,6 @@ STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
         return NOERROR;
     }
     *isPlaying = VARIANT_FALSE;
-    return E_UNEXPECTED;
-};
-        
-STDMETHODIMP VLCControl::put_Playing(VARIANT_BOOL isPlaying)
-{
-    int i_vlc = _p_instance->getVLCObject();
-    if( i_vlc )
-    {
-        if( VARIANT_FALSE == isPlaying )
-        {
-            if( VLC_IsPlaying(i_vlc) )
-                VLC_Stop(i_vlc);
-        }
-        else
-        {
-            if( ! VLC_IsPlaying(i_vlc) )
-                VLC_Play(i_vlc);
-        }
-        return NOERROR;
-    }
     return E_UNEXPECTED;
 };
         
@@ -360,7 +320,7 @@ STDMETHODIMP VLCControl::toggleMute(void)
     return E_UNEXPECTED;
 };
 
-STDMETHODIMP VLCControl::setVariable( BSTR name, VARIANT value)
+STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
 {
     if( 0 == SysStringLen(name) )
         return E_INVALIDARG;
@@ -755,27 +715,26 @@ STDMETHODIMP VLCControl::addTarget( BSTR uri, VARIANT options, enum VLCPlaylistM
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
     {
-        int codePage = _p_instance->getCodePage();
-        char *cUri = CStrFromBSTR(codePage, uri);
+        char *cUri = CStrFromBSTR(CP_UTF8, uri);
         if( NULL == cUri )
             return E_OUTOFMEMORY;
 
         int cOptionsCount;
         char **cOptions;
 
-        if( FAILED(createTargetOptions(codePage, &options, &cOptions, &cOptionsCount)) )
+        if( FAILED(createTargetOptions(CP_UTF8, &options, &cOptions, &cOptionsCount)) )
             return E_INVALIDARG;
 
         if( VLC_SUCCESS <= VLC_AddTarget(i_vlc, cUri, (const char **)cOptions, cOptionsCount, mode, position) )
         {
             hr = NOERROR;
-            if( mode & VLCPlayListGo )
+            if( mode & PLAYLIST_GO )
                 _p_instance->fireOnPlayEvent();
         }
         else
         {
             hr = E_FAIL;
-            if( mode & VLCPlayListGo )
+            if( mode & PLAYLIST_GO )
                 _p_instance->fireOnStopEvent();
         }
 
@@ -861,3 +820,49 @@ STDMETHODIMP VLCControl::get_VersionInfo(BSTR *version)
     return E_FAIL;
 };
  
+STDMETHODIMP VLCControl::get_MRL(BSTR *mrl)
+{
+    if( NULL == mrl )
+        return E_POINTER;
+
+    *mrl = SysAllocString(_p_instance->getMRL());
+    return NOERROR;
+};
+
+STDMETHODIMP VLCControl::put_MRL(BSTR mrl)
+{
+    _p_instance->setMRL(mrl);
+
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl::get_AutoPlay(VARIANT_BOOL *autoplay)
+{
+    if( NULL == autoplay )
+        return E_POINTER;
+
+    *autoplay = _p_instance->getAutoPlay() ? VARIANT_TRUE: VARIANT_FALSE;
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl::put_AutoPlay(VARIANT_BOOL autoplay)
+{
+    _p_instance->setAutoPlay((VARIANT_FALSE != autoplay) ? TRUE: FALSE);
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl::get_AutoLoop(VARIANT_BOOL *autoloop)
+{
+    if( NULL == autoloop )
+        return E_POINTER;
+
+    *autoloop = _p_instance->getAutoLoop() ? VARIANT_TRUE: VARIANT_FALSE;
+    return S_OK;
+};
+
+STDMETHODIMP VLCControl::put_AutoLoop(VARIANT_BOOL autoloop)
+{
+    _p_instance->setAutoLoop((VARIANT_FALSE != autoloop) ? TRUE: FALSE);
+    return S_OK;
+};
+

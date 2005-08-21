@@ -33,7 +33,35 @@ STDMETHODIMP VLCViewObject::Draw(DWORD dwAspect, LONG lindex, PVOID pvAspect,
 {
     if( dwAspect & DVASPECT_CONTENT )
     {
-        _p_instance->onDraw(ptd, hicTargetDev, hdcDraw, lprcBounds, lprcWBounds);
+        if( NULL == lprcBounds )
+            return E_INVALIDARG;
+
+        BOOL releaseDC = FALSE;
+        SIZEL size = _p_instance->getExtent();
+
+        if( NULL == ptd )
+        {
+            hicTargetDev = CreateDevDC(NULL);
+            releaseDC = TRUE;
+        }
+        DPFromHimetric(hicTargetDev, (LPPOINT)&size, 1);
+
+        RECTL bounds = { 0L, 0L, size.cx, size.cy };
+
+        int sdc = SaveDC(hdcDraw);
+        SetMapMode(hdcDraw, MM_ANISOTROPIC);
+        SetWindowOrgEx(hdcDraw, 0, 0, NULL);
+        SetWindowExtEx(hdcDraw, size.cx, size.cy, NULL);
+        OffsetViewportOrgEx(hdcDraw, lprcBounds->left, lprcBounds->top, NULL);
+        SetViewportExtEx(hdcDraw, lprcBounds->right-lprcBounds->left,
+                lprcBounds->bottom-lprcBounds->top, NULL);
+
+        _p_instance->onDraw(ptd, hicTargetDev, hdcDraw, &bounds, lprcWBounds);
+        RestoreDC(hdcDraw, sdc);
+
+        if( releaseDC )
+            DeleteDC(hicTargetDev);
+
         return S_OK;
     }
     return E_NOTIMPL;

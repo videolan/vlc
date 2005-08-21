@@ -37,8 +37,9 @@ _p_clientsite(NULL), _p_instance(p_instance)
 
 VLCOleObject::~VLCOleObject()
 {
+    SetClientSite(NULL);
+    Close(OLECLOSE_NOSAVE);
     _p_advise_holder->Release();
-    SetClientSite(NULL); 
 };
 
 STDMETHODIMP VLCOleObject::Advise(IAdviseSink *pAdvSink, DWORD *dwConnection)
@@ -48,8 +49,12 @@ STDMETHODIMP VLCOleObject::Advise(IAdviseSink *pAdvSink, DWORD *dwConnection)
 
 STDMETHODIMP VLCOleObject::Close(DWORD dwSaveOption)
 {
-    _p_advise_holder->SendOnClose();
-    return _p_instance->onClose(dwSaveOption);
+    if( _p_instance->isRunning() )
+    {
+        _p_advise_holder->SendOnClose();
+        return _p_instance->onClose(dwSaveOption);
+    }
+    return S_OK;
 };
 
 STDMETHODIMP VLCOleObject::DoVerb(LONG iVerb, LPMSG lpMsg, LPOLECLIENTSITE pActiveSite,
@@ -115,6 +120,7 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
             LPOLEINPLACEUIWINDOW p_inPlaceUIWindow;
             OLEINPLACEFRAMEINFO oleFrameInfo;
 
+            oleFrameInfo.cb = sizeof(OLEINPLACEFRAMEINFO);
             if( SUCCEEDED(p_inPlaceSite->GetWindowContext(&p_inPlaceFrame, &p_inPlaceUIWindow, &posRect, &clipRect, &oleFrameInfo)) )
             {
                 lprcPosRect = &posRect;
@@ -302,29 +308,16 @@ STDMETHODIMP VLCOleObject::IsUpToDate(void)
 
 STDMETHODIMP VLCOleObject::SetClientSite(LPOLECLIENTSITE pClientSite)
 {
-    if( NULL != pClientSite )
-    {
-        pClientSite->AddRef();
-
-        /*
-        ** retrieve container ambient properties
-        */
-        VARIANT v;
-        VariantInit(&v);
-        V_VT(&v) = VT_I4;
-        if( SUCCEEDED(GetObjectProperty(pClientSite, DISPID_AMBIENT_CODEPAGE, v)) )
-        {
-            _p_instance->setCodePage(V_I4(&v));
-            VariantClear(&v);
-        }
-    }
-
     if( NULL != _p_clientsite )
         _p_clientsite->Release();
 
     _p_clientsite = pClientSite;
-    _p_instance->onClientSiteChanged(pClientSite);
 
+    if( NULL != pClientSite )
+    {
+        pClientSite->AddRef();
+        _p_instance->onAmbientChanged(pClientSite, DISPID_UNKNOWN);
+    }
     return S_OK;
 };
 

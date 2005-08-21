@@ -28,18 +28,15 @@ using namespace std;
 STDMETHODIMP VLCOleInPlaceActiveObject::GetWindow(HWND *pHwnd)
 {
     if( NULL == pHwnd )
-        return E_INVALIDARG;
+        return E_POINTER;
 
+    *pHwnd = NULL;
     if( _p_instance->isInPlaceActive() )
     {
         if( NULL != (*pHwnd = _p_instance->getInPlaceWindow()) )
             return S_OK;
-
-        return E_FAIL;
     }
-    *pHwnd = NULL;
-
-    return E_UNEXPECTED;
+    return E_FAIL;
 };
 
 STDMETHODIMP VLCOleInPlaceActiveObject::EnableModeless(BOOL fEnable)

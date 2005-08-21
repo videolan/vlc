@@ -96,7 +96,7 @@ static LPCTSTR TStrFromGUID(REFGUID clsid)
     if( len > 0 )
     {
         clsidStr = (wchar_t *)CoTaskMemAlloc(len*sizeof(wchar_t));
-        WideCharToMultiByte(CP_ACP, 0, oleStr, -1, pct_CLSID, len);
+        MultiByteToWideChar(CP_ACP, 0, oleStr, -1, pct_CLSID, len);
     }
 #endif
     CoTaskMemFree(oleStr);

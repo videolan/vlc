@@ -2,7 +2,7 @@
 
 
 /* File created by MIDL compiler version 5.01.0164 */
-/* at Tue May 10 21:24:51 2005
+/* at Sun Aug 21 17:16:22 2005
  */
 /* Compiler settings for axvlc.idl:
     Oicf (OptLev=i2), W1, Zp8, env=Win32, ms_ext, c_ext
@@ -67,30 +67,38 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 
 enum VLCPlaylistMode
     {	VLCPlayListInsert	= 1,
+	VLCPlayListInsertAndGo	= 9,
 	VLCPlayListReplace	= 2,
+	VLCPlayListReplaceAndGo	= 10,
 	VLCPlayListAppend	= 4,
-	VLCPlayListGo	= 8,
+	VLCPlayListAppendAndGo	= 12,
 	VLCPlayListCheckInsert	= 16
     };
 #define	VLCPlayListEnd	( -666 )
 
-#define	DISPID_Visible	( 1 )
+#define	DISPID_Visible	( 100 )
 
-#define	DISPID_Playing	( 2 )
+#define	DISPID_Playing	( 101 )
 
-#define	DISPID_Position	( 3 )
+#define	DISPID_Position	( 102 )
 
-#define	DISPID_Time	( 4 )
+#define	DISPID_Time	( 103 )
 
-#define	DISPID_Length	( 5 )
+#define	DISPID_Length	( 104 )
 
-#define	DISPID_Volume	( 6 )
+#define	DISPID_Volume	( 105 )
 
-#define	DISPID_PlayEvent	( 1 )
+#define	DISPID_MRL	( 106 )
 
-#define	DISPID_PauseEvent	( 2 )
+#define	DISPID_AutoPlay	( 107 )
 
-#define	DISPID_StopEvent	( 3 )
+#define	DISPID_AutoLoop	( 108 )
+
+#define	DISPID_PlayEvent	( 100 )
+
+#define	DISPID_PauseEvent	( 101 )
+
+#define	DISPID_StopEvent	( 102 )
 
 
 EXTERN_C const IID LIBID_AXVLC;
@@ -122,16 +130,13 @@ EXTERN_C const IID IID_IVLCControl;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE stop( void) = 0;
         
-        virtual /* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE get_Playing( 
+        virtual /* [helpstring][propget][hidden][id] */ HRESULT STDMETHODCALLTYPE get_Playing( 
             /* [retval][out] */ VARIANT_BOOL __RPC_FAR *isPlaying) = 0;
         
-        virtual /* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE put_Playing( 
-            /* [in] */ VARIANT_BOOL isPlaying) = 0;
-        
-        virtual /* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE get_Position( 
+        virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_Position( 
             /* [retval][out] */ float __RPC_FAR *position) = 0;
         
-        virtual /* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE put_Position( 
+        virtual /* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE put_Position( 
             /* [in] */ float position) = 0;
         
         virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_Time( 
@@ -145,17 +150,17 @@ EXTERN_C const IID IID_IVLCControl;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE fullscreen( void) = 0;
         
-        virtual /* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE get_Length( 
+        virtual /* [helpstring][hidden][propget][id] */ HRESULT STDMETHODCALLTYPE get_Length( 
             /* [retval][out] */ int __RPC_FAR *seconds) = 0;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE playFaster( void) = 0;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE playSlower( void) = 0;
         
-        virtual /* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE get_Volume( 
+        virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_Volume( 
             /* [retval][out] */ int __RPC_FAR *volume) = 0;
         
-        virtual /* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE put_Volume( 
+        virtual /* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE put_Volume( 
             /* [in] */ int volume) = 0;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE toggleMute( void) = 0;
@@ -186,8 +191,26 @@ EXTERN_C const IID IID_IVLCControl;
         
         virtual /* [helpstring] */ HRESULT STDMETHODCALLTYPE playlistClear( void) = 0;
         
-        virtual /* [helpstring][propget] */ HRESULT STDMETHODCALLTYPE get_VersionInfo( 
+        virtual /* [helpstring][hidden][propget] */ HRESULT STDMETHODCALLTYPE get_VersionInfo( 
             /* [retval][out] */ BSTR __RPC_FAR *version) = 0;
+        
+        virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_MRL( 
+            /* [retval][out] */ BSTR __RPC_FAR *mrl) = 0;
+        
+        virtual /* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE put_MRL( 
+            /* [in] */ BSTR mrl) = 0;
+        
+        virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_AutoPlay( 
+            /* [retval][out] */ VARIANT_BOOL __RPC_FAR *autoplay) = 0;
+        
+        virtual /* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE put_AutoPlay( 
+            /* [in] */ VARIANT_BOOL autoplay) = 0;
+        
+        virtual /* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE get_AutoLoop( 
+            /* [retval][out] */ VARIANT_BOOL __RPC_FAR *autoloop) = 0;
+        
+        virtual /* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE put_AutoLoop( 
+            /* [in] */ VARIANT_BOOL autoloop) = 0;
         
     };
     
@@ -254,19 +277,15 @@ EXTERN_C const IID IID_IVLCControl;
         /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *stop )( 
             IVLCControl __RPC_FAR * This);
         
-        /* [helpstring][propget][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Playing )( 
+        /* [helpstring][propget][hidden][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Playing )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ VARIANT_BOOL __RPC_FAR *isPlaying);
         
-        /* [helpstring][propput][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Playing )( 
-            IVLCControl __RPC_FAR * This,
-            /* [in] */ VARIANT_BOOL isPlaying);
-        
-        /* [helpstring][propget][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Position )( 
+        /* [helpstring][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Position )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ float __RPC_FAR *position);
         
-        /* [helpstring][propput][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Position )( 
+        /* [helpstring][propput][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Position )( 
             IVLCControl __RPC_FAR * This,
             /* [in] */ float position);
         
@@ -285,7 +304,7 @@ EXTERN_C const IID IID_IVLCControl;
         /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *fullscreen )( 
             IVLCControl __RPC_FAR * This);
         
-        /* [helpstring][propget][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Length )( 
+        /* [helpstring][hidden][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Length )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ int __RPC_FAR *seconds);
         
@@ -295,11 +314,11 @@ EXTERN_C const IID IID_IVLCControl;
         /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *playSlower )( 
             IVLCControl __RPC_FAR * This);
         
-        /* [helpstring][propget][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Volume )( 
+        /* [helpstring][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_Volume )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ int __RPC_FAR *volume);
         
-        /* [helpstring][propput][bindable][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Volume )( 
+        /* [helpstring][propput][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_Volume )( 
             IVLCControl __RPC_FAR * This,
             /* [in] */ int volume);
         
@@ -340,9 +359,33 @@ EXTERN_C const IID IID_IVLCControl;
         /* [helpstring] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *playlistClear )( 
             IVLCControl __RPC_FAR * This);
         
-        /* [helpstring][propget] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_VersionInfo )( 
+        /* [helpstring][hidden][propget] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_VersionInfo )( 
             IVLCControl __RPC_FAR * This,
             /* [retval][out] */ BSTR __RPC_FAR *version);
+        
+        /* [helpstring][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_MRL )( 
+            IVLCControl __RPC_FAR * This,
+            /* [retval][out] */ BSTR __RPC_FAR *mrl);
+        
+        /* [helpstring][propput][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_MRL )( 
+            IVLCControl __RPC_FAR * This,
+            /* [in] */ BSTR mrl);
+        
+        /* [helpstring][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_AutoPlay )( 
+            IVLCControl __RPC_FAR * This,
+            /* [retval][out] */ VARIANT_BOOL __RPC_FAR *autoplay);
+        
+        /* [helpstring][propput][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_AutoPlay )( 
+            IVLCControl __RPC_FAR * This,
+            /* [in] */ VARIANT_BOOL autoplay);
+        
+        /* [helpstring][propget][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *get_AutoLoop )( 
+            IVLCControl __RPC_FAR * This,
+            /* [retval][out] */ VARIANT_BOOL __RPC_FAR *autoloop);
+        
+        /* [helpstring][propput][id] */ HRESULT ( STDMETHODCALLTYPE __RPC_FAR *put_AutoLoop )( 
+            IVLCControl __RPC_FAR * This,
+            /* [in] */ VARIANT_BOOL autoloop);
         
         END_INTERFACE
     } IVLCControlVtbl;
@@ -397,9 +440,6 @@ EXTERN_C const IID IID_IVLCControl;
 
 #define IVLCControl_get_Playing(This,isPlaying)	\
     (This)->lpVtbl -> get_Playing(This,isPlaying)
-
-#define IVLCControl_put_Playing(This,isPlaying)	\
-    (This)->lpVtbl -> put_Playing(This,isPlaying)
 
 #define IVLCControl_get_Position(This,position)	\
     (This)->lpVtbl -> get_Position(This,position)
@@ -463,6 +503,24 @@ EXTERN_C const IID IID_IVLCControl;
 
 #define IVLCControl_get_VersionInfo(This,version)	\
     (This)->lpVtbl -> get_VersionInfo(This,version)
+
+#define IVLCControl_get_MRL(This,mrl)	\
+    (This)->lpVtbl -> get_MRL(This,mrl)
+
+#define IVLCControl_put_MRL(This,mrl)	\
+    (This)->lpVtbl -> put_MRL(This,mrl)
+
+#define IVLCControl_get_AutoPlay(This,autoplay)	\
+    (This)->lpVtbl -> get_AutoPlay(This,autoplay)
+
+#define IVLCControl_put_AutoPlay(This,autoplay)	\
+    (This)->lpVtbl -> put_AutoPlay(This,autoplay)
+
+#define IVLCControl_get_AutoLoop(This,autoloop)	\
+    (This)->lpVtbl -> get_AutoLoop(This,autoloop)
+
+#define IVLCControl_put_AutoLoop(This,autoloop)	\
+    (This)->lpVtbl -> put_AutoLoop(This,autoloop)
 
 #endif /* COBJMACROS */
 
@@ -528,7 +586,7 @@ void __RPC_STUB IVLCControl_stop_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Playing_Proxy( 
+/* [helpstring][propget][hidden][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Playing_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [retval][out] */ VARIANT_BOOL __RPC_FAR *isPlaying);
 
@@ -540,19 +598,7 @@ void __RPC_STUB IVLCControl_get_Playing_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Playing_Proxy( 
-    IVLCControl __RPC_FAR * This,
-    /* [in] */ VARIANT_BOOL isPlaying);
-
-
-void __RPC_STUB IVLCControl_put_Playing_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-/* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Position_Proxy( 
+/* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Position_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [retval][out] */ float __RPC_FAR *position);
 
@@ -564,7 +610,7 @@ void __RPC_STUB IVLCControl_get_Position_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Position_Proxy( 
+/* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Position_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [in] */ float position);
 
@@ -623,7 +669,7 @@ void __RPC_STUB IVLCControl_fullscreen_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Length_Proxy( 
+/* [helpstring][hidden][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Length_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [retval][out] */ int __RPC_FAR *seconds);
 
@@ -657,7 +703,7 @@ void __RPC_STUB IVLCControl_playSlower_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propget][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Volume_Proxy( 
+/* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_Volume_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [retval][out] */ int __RPC_FAR *volume);
 
@@ -669,7 +715,7 @@ void __RPC_STUB IVLCControl_get_Volume_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propput][bindable][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Volume_Proxy( 
+/* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_Volume_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [in] */ int volume);
 
@@ -790,12 +836,84 @@ void __RPC_STUB IVLCControl_playlistClear_Stub(
     DWORD *_pdwStubPhase);
 
 
-/* [helpstring][propget] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_VersionInfo_Proxy( 
+/* [helpstring][hidden][propget] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_VersionInfo_Proxy( 
     IVLCControl __RPC_FAR * This,
     /* [retval][out] */ BSTR __RPC_FAR *version);
 
 
 void __RPC_STUB IVLCControl_get_VersionInfo_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_MRL_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [retval][out] */ BSTR __RPC_FAR *mrl);
+
+
+void __RPC_STUB IVLCControl_get_MRL_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_MRL_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [in] */ BSTR mrl);
+
+
+void __RPC_STUB IVLCControl_put_MRL_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_AutoPlay_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [retval][out] */ VARIANT_BOOL __RPC_FAR *autoplay);
+
+
+void __RPC_STUB IVLCControl_get_AutoPlay_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_AutoPlay_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [in] */ VARIANT_BOOL autoplay);
+
+
+void __RPC_STUB IVLCControl_put_AutoPlay_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring][propget][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_get_AutoLoop_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [retval][out] */ VARIANT_BOOL __RPC_FAR *autoloop);
+
+
+void __RPC_STUB IVLCControl_get_AutoLoop_Stub(
+    IRpcStubBuffer *This,
+    IRpcChannelBuffer *_pRpcChannelBuffer,
+    PRPC_MESSAGE _pRpcMessage,
+    DWORD *_pdwStubPhase);
+
+
+/* [helpstring][propput][id] */ HRESULT STDMETHODCALLTYPE IVLCControl_put_AutoLoop_Proxy( 
+    IVLCControl __RPC_FAR * This,
+    /* [in] */ VARIANT_BOOL autoloop);
+
+
+void __RPC_STUB IVLCControl_put_AutoLoop_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,

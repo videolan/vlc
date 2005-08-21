@@ -33,11 +33,14 @@ library AXVLC
     interface IVLCControl;
     dispinterface DVLCEvents;
 
-    enum VLCPlaylistMode {
+    enum VLCPlaylistMode
+    {
         VLCPlayListInsert       =  1,
+        VLCPlayListInsertAndGo  =  9,
         VLCPlayListReplace      =  2,
+        VLCPlayListReplaceAndGo = 10,
         VLCPlayListAppend       =  4,
-        VLCPlayListGo           =  8,
+        VLCPlayListAppendAndGo  = 12,
         VLCPlayListCheckInsert  = 16
     };
 
@@ -45,16 +48,15 @@ library AXVLC
     const int VLCPlayListEnd    = -666;
 
     // DISPID definitions
-    const int DISPID_Visible    = 1;
-    const int DISPID_Playing    = 2;
-    const int DISPID_Position   = 3;
-    const int DISPID_Time       = 4;
-    const int DISPID_Length     = 5;
-    const int DISPID_Volume     = 6;
-
-    const int DISPID_PlayEvent  = 1;
-    const int DISPID_PauseEvent = 2;
-    const int DISPID_StopEvent  = 3;
+    const int DISPID_Visible    = 100;
+    const int DISPID_Playing    = 101;
+    const int DISPID_Position   = 102;
+    const int DISPID_Time       = 103;
+    const int DISPID_Length     = 104;
+    const int DISPID_Volume     = 105;
+    const int DISPID_MRL        = 106;
+    const int DISPID_AutoPlay   = 107;
+    const int DISPID_AutoLoop   = 108;
 
     [
       odl,
@@ -64,8 +66,8 @@ library AXVLC
       hidden,
       oleautomation
     ]
-    interface IVLCControl : IDispatch {
-
+    interface IVLCControl : IDispatch
+    {
         [id(DISPID_Visible), propget, bindable, helpstring("Shows or hides plugin.")]
         HRESULT Visible([out, retval] VARIANT_BOOL* visible);
         [id(DISPID_Visible), propput, bindable, helpstring("Shows or hides plugin.")]
@@ -76,13 +78,11 @@ library AXVLC
         HRESULT pause();
         [helpstring("Stop playback.")]
         HRESULT stop();
-        [id(DISPID_Playing), bindable, propget, helpstring("Specifies whether VLC is playing.")]
+        [id(DISPID_Playing), hidden, propget, helpstring("Returns whether VLC is playing.")]
         HRESULT Playing([out, retval] VARIANT_BOOL* isPlaying);
-        [id(DISPID_Playing), bindable, propput, helpstring("Specifies whether VLC is playing.")]
-        HRESULT Playing([in] VARIANT_BOOL isPlaying);
-        [id(DISPID_Position), bindable, propget, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), propget, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([out, retval] float* position);
-        [id(DISPID_Position), bindable, propput, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
+        [id(DISPID_Position), propput, helpstring("Specifies playback position within current target in playlist, position is a relative value ranging from 0.0 to 1.0.")]
         HRESULT Position([in] float position);
         [id(DISPID_Time), propget, helpstring("Specifies playback time relative to the start of current target in playlist.")]
         HRESULT Time([out, retval] int* seconds);
@@ -92,15 +92,15 @@ library AXVLC
         HRESULT shuttle([in] int seconds);
         [helpstring("Switch between normal and fullscreen video.")]
         HRESULT fullscreen();
-        [id(DISPID_Length), bindable, propget, helpstring("Returns total length in seconds of current target in playlist, may be unknown.")]
+        [id(DISPID_Length), propget, hidden, helpstring("Returns total length in seconds of current target in playlist, may be unknown.")]
         HRESULT Length([out, retval] int* seconds);
         [helpstring("Increases playback speed, one of 1x, 2x, 4x, 8x.")]
         HRESULT playFaster();
         [helpstring("Decreases playback speed, one of 1x, 2x, 4x, 8x.")]
         HRESULT playSlower();
-        [id(DISPID_Volume), bindable, propget, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
+        [id(DISPID_Volume), propget, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
         HRESULT Volume([out, retval] int* volume);
-        [id(DISPID_Volume), bindable, propput, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
+        [id(DISPID_Volume), propput, helpstring("Specifies playback sound volume, ranges from 0 to 200%.")]
         HRESULT Volume([in] int volume);
         [helpstring("Mute/unmute playback sound volume.")]
         HRESULT toggleMute();
@@ -126,24 +126,41 @@ library AXVLC
         HRESULT playlistPrev();
         [helpstring("Remove all items from playlist.")]
         HRESULT playlistClear();
-        [propget, helpstring("Returns VLC Version.")]
+        [propget, hidden, helpstring("Returns VLC Version.")]
         HRESULT VersionInfo([out, retval] BSTR* version);
+        [id(DISPID_MRL), propget, helpstring("Returns initial MRL in default playlist")]
+        HRESULT MRL([out, retval] BSTR* mrl);
+        [id(DISPID_MRL), propput, helpstring("Specifies initial MRL in default playlist")]
+        HRESULT MRL([in] BSTR mrl);
+        [id(DISPID_AutoPlay), propget, helpstring("Specifies whether default playlist is played on startup")]
+        HRESULT AutoPlay([out, retval] VARIANT_BOOL* autoplay);
+        [id(DISPID_AutoPlay), propput, helpstring("Returns whether default playlist is played on startup")]
+        HRESULT AutoPlay([in] VARIANT_BOOL autoplay);
+        [id(DISPID_AutoLoop), propget, helpstring("Specifies whether default playlist is looped")]
+        HRESULT AutoLoop([out, retval] VARIANT_BOOL* autoloop);
+        [id(DISPID_AutoLoop), propput, helpstring("Returns whether default playlist is looped")]
+        HRESULT AutoLoop([in] VARIANT_BOOL autoloop);
     };
+
+    const int DISPID_PlayEvent  = 100;
+    const int DISPID_PauseEvent = 101;
+    const int DISPID_StopEvent  = 102;
 
     [
       uuid(DF48072F-5EF8-434e-9B40-E2F3AE759B5F),
       helpstring("Event interface for VLC control"),
       hidden
     ]
-    dispinterface DVLCEvents {
+    dispinterface DVLCEvents
+    {
         properties:
         methods:
             [id(DISPID_PlayEvent), helpstring("Playback in progress")]
-            void Play();
+            void play();
             [id(DISPID_PauseEvent), helpstring("Playback has paused")]
-            void Pause();
+            void pause();
             [id(DISPID_StopEvent), helpstring("Playback has stopped")]
-            void Stop();
+            void stop();
     };
 
     [
@@ -151,7 +168,8 @@ library AXVLC
       helpstring("VLC control"),
       control
     ]
-    coclass VLCPlugin {
+    coclass VLCPlugin
+    {
         [default] interface IVLCControl;
         [default, source] dispinterface DVLCEvents;
     };

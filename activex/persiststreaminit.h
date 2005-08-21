@@ -30,8 +30,8 @@ class VLCPersistStreamInit : public IPersistStreamInit
 
 public:
 
-    VLCPersistStreamInit(VLCPlugin *p_instance) : _p_instance(p_instance) {};
-    virtual ~VLCPersistStreamInit() {};
+    VLCPersistStreamInit(VLCPlugin *p_instance);
+    virtual ~VLCPersistStreamInit();
 
     // IUnknown methods
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
@@ -63,6 +63,7 @@ public:
 private:
 
     VLCPlugin *_p_instance;
+    class VLCPropertyBag *_p_props;
 };
 
 #endif

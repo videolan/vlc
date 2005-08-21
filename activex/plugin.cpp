@@ -40,6 +40,10 @@
 
 #include <string.h>
 #include <winreg.h>
+#include <winuser.h>
+#include <servprov.h>
+#include <shlwapi.h>
+#include <wininet.h>
 
 using namespace std;
 
@@ -104,7 +108,7 @@ VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance) :
 
     if( ! GetClassInfo(hInstance, getInPlaceWndClassName(), &wClass) )
     {
-        wClass.style          = CS_NOCLOSE|CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS;
+        wClass.style          = CS_NOCLOSE|CS_DBLCLKS;
         wClass.lpfnWndProc    = VLCInPlaceClassWndProc;
         wClass.cbClsExtra     = 0;
         wClass.cbWndExtra     = 0;
@@ -124,7 +128,7 @@ VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance) :
 
     if( ! GetClassInfo(hInstance, getVideoWndClassName(), &wClass) )
     {
-        wClass.style          = CS_NOCLOSE|CS_HREDRAW|CS_VREDRAW;
+        wClass.style          = CS_NOCLOSE;
         wClass.lpfnWndProc    = VLCVideoClassWndProc;
         wClass.cbClsExtra     = 0;
         wClass.cbWndExtra     = 0;
@@ -241,17 +245,17 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     _inplacewnd(NULL),
     _p_class(p_class),
     _i_ref(1UL),
-    _codepage(CP_ACP),
-    _psz_src(NULL),
-    _b_autostart(TRUE),
-    _b_loopmode(FALSE),
+    _i_codepage(CP_ACP),
+    _b_usermode(TRUE),
+    _bstr_mrl(NULL),
+    _b_autoplay(TRUE),
+    _b_autoloop(FALSE),
     _b_visible(TRUE),
     _b_mute(FALSE),
     _i_vlc(0)
 {
     p_class->AddRef();
 
-    vlcOleObject = new VLCOleObject(this);
     vlcOleControl = new VLCOleControl(this);
     vlcOleInPlaceObject = new VLCOleInPlaceObject(this);
     vlcOleInPlaceActiveObject = new VLCOleInPlaceActiveObject(this);
@@ -264,29 +268,28 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     vlcControl = new VLCControl(this);
     vlcViewObject = new VLCViewObject(this);
     vlcDataObject = new VLCDataObject(this);
+    vlcOleObject = new VLCOleObject(this);
 
     // configure controlling IUnknown interface for implemented interfaces
     this->pUnkOuter = (NULL != pUnkOuter) ? pUnkOuter : dynamic_cast<LPUNKNOWN>(this);
 
     // default picure
-    _pict = p_class->getInPlacePict();
+    _p_pict = p_class->getInPlacePict();
 
     // set default/preferred size (320x240) pixels in HIMETRIC
     HDC hDC = CreateDevDC(NULL);
-    _extent.cx = (320*2540L)/GetDeviceCaps(hDC, LOGPIXELSX);
-    _extent.cy = (240*2540L)/GetDeviceCaps(hDC, LOGPIXELSY);
+    _extent.cx = 320;
+    _extent.cy = 240;
+    HimetricFromDP(hDC, (LPPOINT)&_extent, 1);
     DeleteDC(hDC);
 };
 
 VLCPlugin::~VLCPlugin()
 {
-    vlcOleInPlaceObject->UIDeactivate();
-    vlcOleInPlaceObject->InPlaceDeactivate();
-
+    delete vlcOleObject;
     delete vlcDataObject;
     delete vlcViewObject;
     delete vlcControl;
-    delete vlcObjectSafety;
     delete vlcConnectionPointContainer;
     delete vlcProvideClassInfo;
     delete vlcPersistPropertyBag;
@@ -294,14 +297,13 @@ VLCPlugin::~VLCPlugin()
     delete vlcPersistStorage;
     delete vlcOleInPlaceActiveObject;
     delete vlcOleInPlaceObject;
+    delete vlcObjectSafety;
+
     delete vlcOleControl;
-    delete vlcOleObject;
+    if( _p_pict )
+        _p_pict->Release();
 
-    if( _pict )
-        _pict->Release();
-
-    if( _psz_src )
-        free(_psz_src);
+    SysFreeString(_bstr_mrl),
 
     _p_class->Release();
 };
@@ -324,7 +326,7 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
     else if( IID_IOleInPlaceActiveObject == riid )
         *ppv = reinterpret_cast<LPVOID>(vlcOleInPlaceActiveObject);
     else if( IID_IPersist == riid )
-        *ppv = reinterpret_cast<LPVOID>(vlcPersistPropertyBag);
+        *ppv = reinterpret_cast<LPVOID>(vlcPersistStreamInit);
     else if( IID_IPersistStreamInit == riid )
         *ppv = reinterpret_cast<LPVOID>(vlcPersistStreamInit);
     else if( IID_IPersistStorage == riid )
@@ -471,8 +473,9 @@ HRESULT VLCPlugin::onInit(void)
 {
     if( 0 == _i_vlc )
     {
-#ifdef ACTIVEX_DEBUG
-        char *ppsz_argv[] = { "vlc", "-vvv", "--fast-mutex", "--win9x-cv-method=1" };
+//#ifdef ACTIVEX_DEBUG
+#if 1
+        char *ppsz_argv[] = { "vlc", "-vv", "--fast-mutex", "--win9x-cv-method=1" };
 #else
         char *ppsz_argv[] = { "vlc", "-vv" };
 #endif
@@ -494,7 +497,7 @@ HRESULT VLCPlugin::onInit(void)
              RegCloseKey( h_key );
         }
 
-#if 0
+#if 1
         ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
 #endif
 
@@ -516,33 +519,144 @@ HRESULT VLCPlugin::onLoad(void)
     if( _b_mute )
         VLC_VolumeMute(_i_vlc);
 
-    if( NULL != _psz_src )
+    if( NULL != _bstr_mrl )
     {
-        // add default target to playlist
-        char *cOptions[1];
-        int  cOptionsCount = 0;
-
-        if( _b_loopmode )
+        /*
+        ** try to combine MRL with client site moniker, which for Internet Explorer
+        ** is the URL of the page the plugin is embedded into. Hence, if the MRL
+        ** is a relative URL, we should end up with an absolute URL
+        */
+        IOleClientSite *pClientSite;
+        if( SUCCEEDED(vlcOleObject->GetClientSite(&pClientSite)) )
         {
-            cOptions[cOptionsCount++] = "loop";
+            IBindCtx *pBC = 0;
+            if( SUCCEEDED(CreateBindCtx(0, &pBC)) )
+            {
+                LPMONIKER pContMoniker = NULL;
+                if( SUCCEEDED(pClientSite->GetMoniker(OLEGETMONIKER_ONLYIFTHERE,
+                                OLEWHICHMK_CONTAINER, &pContMoniker)) )
+                {
+                    LPOLESTR name;
+                    if( SUCCEEDED(pContMoniker->GetDisplayName(pBC, NULL, &name)) )
+                    {
+                        if( UrlIsW(name, URLIS_URL) )
+                        {
+                            LPOLESTR url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*INTERNET_MAX_URL_LENGTH);
+                            if( NULL != url )
+                            {
+                                DWORD len = INTERNET_MAX_URL_LENGTH;
+                                if( SUCCEEDED(UrlCombineW(name, _bstr_mrl, url, &len,
+                                                URL_ESCAPE_UNSAFE)) )
+                                {
+                                    SysFreeString(_bstr_mrl);
+                                    _bstr_mrl = SysAllocString(url);
+                                }
+                                CoTaskMemFree(url);
+                            }
+                        }
+                        CoTaskMemFree(name);
+                    }
+                    pContMoniker->Release();
+                }
+                pBC->Release();
+            }
+            pClientSite->Release();
         }
-        VLC_AddTarget(_i_vlc, _psz_src, (const char **)&cOptions, cOptionsCount, PLAYLIST_APPEND, PLAYLIST_END);
+
+        char *psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
+        if( NULL != psz_mrl )
+        {
+            // add default target to playlist
+            char *cOptions[1];
+            int  cOptionsCount = 0;
+
+            if( _b_autoloop )
+            {
+                cOptions[cOptionsCount++] = "loop";
+            }
+            VLC_AddTarget(_i_vlc, psz_mrl, (const char **)&cOptions, cOptionsCount, PLAYLIST_APPEND, PLAYLIST_END);
+            CoTaskMemFree(psz_mrl);
+        }
     }
+    setDirty(FALSE);
     return S_OK;
 };
 
-HRESULT VLCPlugin::onClientSiteChanged(LPOLECLIENTSITE pActiveSite)
+HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
 {
-    if( NULL != pActiveSite )
+    VARIANT v;
+    switch( dispID )
     {
-        /*
-        ** object is embedded in container 
-        ** try to activate in place if it has already been initialized
-        */
-        if( _i_vlc )
-        {
-            vlcOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pActiveSite, 0, NULL, NULL);
-        }
+        case DISPID_AMBIENT_BACKCOLOR:
+            break;
+        case DISPID_AMBIENT_DISPLAYNAME:
+            break;
+        case DISPID_AMBIENT_FONT:
+            break;
+        case DISPID_AMBIENT_FORECOLOR:
+            break;
+        case DISPID_AMBIENT_LOCALEID:
+            break;
+        case DISPID_AMBIENT_MESSAGEREFLECT:
+            break;
+        case DISPID_AMBIENT_SCALEUNITS:
+            break;
+        case DISPID_AMBIENT_TEXTALIGN:
+            break;
+        case DISPID_AMBIENT_USERMODE:
+            VariantInit(&v);
+            V_VT(&v) = VT_BOOL;
+            if( SUCCEEDED(GetObjectProperty(pContainer, dispID, v)) )
+            {
+                setUserMode(V_BOOL(&v) != VARIANT_FALSE);
+                VariantClear(&v);
+            }
+            break;
+        case DISPID_AMBIENT_UIDEAD:
+            break;
+        case DISPID_AMBIENT_SHOWGRABHANDLES:
+            break;
+        case DISPID_AMBIENT_SHOWHATCHING:
+            break;
+        case DISPID_AMBIENT_DISPLAYASDEFAULT:
+            break;
+        case DISPID_AMBIENT_SUPPORTSMNEMONICS:
+            break;
+        case DISPID_AMBIENT_AUTOCLIP:
+            break;
+        case DISPID_AMBIENT_APPEARANCE:
+            break;
+        case DISPID_AMBIENT_CODEPAGE:
+            VariantInit(&v);
+            V_VT(&v) = VT_I4;
+            if( SUCCEEDED(GetObjectProperty(pContainer, dispID, v)) )
+            {
+                setCodePage(V_I4(&v));
+            }
+            break;
+        case DISPID_AMBIENT_PALETTE:
+            break;
+        case DISPID_AMBIENT_CHARSET:
+            break;
+        case DISPID_AMBIENT_RIGHTTOLEFT:
+            break;
+        case DISPID_AMBIENT_TOPTOBOTTOM:
+            break;
+        case DISPID_UNKNOWN:
+            VariantInit(&v);
+            V_VT(&v) = VT_BOOL;
+            if( SUCCEEDED(GetObjectProperty(pContainer, DISPID_AMBIENT_USERMODE, v)) )
+            {
+                setUserMode(V_BOOL(&v) != VARIANT_FALSE);
+                VariantClear(&v);
+            }
+            VariantInit(&v);
+            V_VT(&v) = VT_I4;
+            if( SUCCEEDED(GetObjectProperty(pContainer, dispID, v)) )
+            {
+                setCodePage(V_I4(&v));
+            }
+            break;
     }
     return S_OK;
 };
@@ -593,7 +707,7 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     */
     _inplacewnd = CreateWindow(_p_class->getInPlaceWndClassName(),
             "VLC Plugin In-Place Window",
-            WS_CHILD|WS_CLIPCHILDREN|WS_TABSTOP,
+            WS_CHILD|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
             clipRect.left,
             clipRect.top,
             clipRect.right-clipRect.left,
@@ -642,8 +756,12 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     vlc_value_t val;
     val.i_int = reinterpret_cast<int>(_videownd);
     VLC_VariableSet(_i_vlc, "drawable", val);
+    val.i_int = posRect.right-posRect.left;
+    VLC_VariableSet(_i_vlc, "width", val);
+    val.i_int = posRect.bottom-posRect.top;
+    VLC_VariableSet(_i_vlc, "height", val);
 
-    if( _b_autostart & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
+    if( _b_usermode && _b_autoplay & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
     {
         VLC_Play(_i_vlc);
         fireOnPlayEvent();
@@ -691,18 +809,6 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
         long width = lprcBounds->right-lprcBounds->left;
         long height = lprcBounds->bottom-lprcBounds->top;
 
-        SIZEL devSize;
-        if( NULL != hicTargetDev ) {
-            devSize.cx = GetDeviceCaps(hicTargetDev, LOGPIXELSX);
-            devSize.cy = GetDeviceCaps(hicTargetDev, LOGPIXELSY);
-        }
-        else if( NULL != (hicTargetDev = CreateDevDC(ptd)) )
-        {
-            devSize.cx = GetDeviceCaps(hicTargetDev, LOGPIXELSX);
-            devSize.cy = GetDeviceCaps(hicTargetDev, LOGPIXELSY);
-            DeleteDC(hicTargetDev);
-        }
-
         RECT bounds = { lprcBounds->left, lprcBounds->top, lprcBounds->right, lprcBounds->bottom };
         FillRect(hdcDraw, &bounds, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
@@ -715,25 +821,34 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
             pict->get_Width(&picWidth);
             pict->get_Height(&picHeight);
 
-            POINT dstSize = { picWidth*devSize.cx/2540L, picHeight*devSize.cy/2540L };
+            SIZEL picSize = { picWidth, picHeight };
 
-            DPtoLP(hdcDraw, &dstSize, 1);
-            if( dstSize.x > width-4 )
-                dstSize.x = width-4;
-            if( dstSize.y > height-4 )
-                dstSize.y = height-4;
+            if( NULL != hicTargetDev )
+            {
+                DPFromHimetric(hicTargetDev, (LPPOINT)&picSize, 1);
+            }
+            else if( NULL != (hicTargetDev = CreateDevDC(ptd)) )
+            {
+                DPFromHimetric(hicTargetDev, (LPPOINT)&picSize, 1);
+                DeleteDC(hicTargetDev);
+            }
 
-            long dstX = lprcBounds->left+(width-dstSize.x)/2;
-            long dstY = lprcBounds->top+(height-dstSize.y)/2;
+            if( picSize.cx > width-4 )
+                picSize.cx = width-4;
+            if( picSize.cy > height-4 )
+                picSize.cy = height-4;
+
+            LONG dstX = lprcBounds->left+(width-picSize.cx)/2;
+            LONG dstY = lprcBounds->top+(height-picSize.cy)/2;
 
             if( NULL != lprcWBounds )
             {
                 RECT wBounds = { lprcWBounds->left, lprcWBounds->top, lprcWBounds->right, lprcWBounds->bottom };
-                pict->Render(hdcDraw, dstX, dstY, dstSize.x, dstSize.y,
+                pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
                         0L, picHeight, picWidth, -picHeight, &wBounds);
             }
             else 
-                pict->Render(hdcDraw, dstX, dstY, dstSize.x, dstSize.y,
+                pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
                         0L, picHeight, picWidth, -picHeight, NULL);
 
             pict->Release();
@@ -755,27 +870,41 @@ void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &clipRect)
     {
         /** if VLC is playing, it may not display any VIDEO content 
         ** hence, draw control logo*/
-        HDC hdcPict = CreateCompatibleDC(hdc);
-        if( NULL != hdcPict )
+        HDC hdcDraw = CreateCompatibleDC(hdc);
+        if( NULL != hdcDraw )
         {
+            SIZEL size = getExtent();
+            DPFromHimetric(hdc, (LPPOINT)&size, 1);
+            RECTL posRect = { 0, 0, size.cx, size.cy };
+
             int width = bounds.right-bounds.left;
             int height = bounds.bottom-bounds.top;
+
             HBITMAP hBitmap = CreateCompatibleBitmap(hdc, width, height);
             if( NULL != hBitmap )
             {
-                HBITMAP oldBmp = (HBITMAP)SelectObject(hdcPict, hBitmap);
+                HBITMAP oldBmp = (HBITMAP)SelectObject(hdcDraw, hBitmap);
 
-                RECTL rcBounds = { bounds.left, bounds.top, bounds.right, bounds.bottom };
+                if( (size.cx != width) || (size.cx != height) )
+                {
+                    // needs to scale canvas
+                    SetMapMode(hdcDraw, MM_ANISOTROPIC);
+                    SetWindowExtEx(hdcDraw, size.cx, size.cy, NULL);
+                    SetViewportExtEx(hdcDraw, width, height, NULL);
+                }
 
-                onDraw(NULL, hdc, hdcPict, &rcBounds, NULL);
+                onDraw(NULL, hdc, hdcDraw, &posRect, NULL);
 
-                BitBlt(hdc, bounds.left, bounds.top, width, height,
-                        hdcPict, 0, 0, SRCCOPY);
+                SetMapMode(hdcDraw, MM_TEXT);
+                BitBlt(hdc, bounds.left, bounds.top,
+                        width, height,
+                        hdcDraw, 0, 0,
+                        SRCCOPY);
 
-                SelectObject(hdcPict, oldBmp);
+                SelectObject(hdcDraw, oldBmp);
                 DeleteObject(hBitmap);
             }
-            DeleteDC(hdcPict);
+            DeleteDC(hdcDraw);
         }
     }
 };
@@ -785,16 +914,11 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     RECT clipRect = *lprcClipRect;
     RECT posRect  = *lprcPosRect;
 
-    /*
-    ** tell container that previous area needs redrawing
-    */
-
-    InvalidateRect(GetParent(_inplacewnd), &_posRect, TRUE);
+    //RedrawWindow(GetParent(_inplacewnd), &_posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
 
     /*
     ** record keeping of control geometry within container
     */
-
     _posRect = posRect;
 
     /*
@@ -805,35 +929,35 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     /*
     ** change in-place window geometry to match clipping region
     */
-    MoveWindow(_inplacewnd,
+    SetWindowPos(_inplacewnd, NULL,
             clipRect.left,
             clipRect.top,
             clipRect.right-clipRect.left,
             clipRect.bottom-clipRect.top,
-            FALSE);
+            SWP_NOACTIVATE|
+            SWP_NOCOPYBITS|
+            SWP_NOZORDER|
+            SWP_NOOWNERZORDER );
 
     /*
     ** change video window geometry to match object bounds within clipping region
     */
-    MoveWindow(_videownd,
+    SetWindowPos(_videownd, NULL,
             posRect.left,
             posRect.top,
             posRect.right-posRect.left,
             posRect.bottom-posRect.top,
-            FALSE);
+            SWP_NOACTIVATE|
+            SWP_NOCOPYBITS|
+            SWP_NOZORDER|
+            SWP_NOOWNERZORDER );
 
-    /*
-    ** force a full refresh of control content
-    */
-    RECT updateRect;
-    updateRect.left = -posRect.left;
-    updateRect.top = -posRect.top;
-    updateRect.right = posRect.right-posRect.left;
-    updateRect.bottom = posRect.bottom-posRect.top;
-
-    ValidateRect(_videownd, NULL);
-    InvalidateRect(_videownd, &updateRect, FALSE);
-    UpdateWindow(_videownd);
+    //RedrawWindow(_videownd, &posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
+    vlc_value_t val;
+    val.i_int = posRect.right-posRect.left;
+    VLC_VariableSet(_i_vlc, "width", val);
+    val.i_int = posRect.bottom-posRect.top;
+    VLC_VariableSet(_i_vlc, "height", val);
 };
 
 void VLCPlugin::freezeEvents(BOOL freeze)
