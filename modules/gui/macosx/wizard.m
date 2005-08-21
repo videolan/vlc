@@ -471,6 +471,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t1_matrix_strmgOrTrnscd selectCellAtRow:1 column:0];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:0 column:0] setState: NSOffState];
     [o_t2_ckb_enblPartExtrct setState: NSOnState];
+    [self t2_enableExtract: nil];
     msg_Dbg(VLCIntf, "wizard interface is set");
     
     [o_wizard_window center];
@@ -959,12 +960,14 @@ static VLCWizard *_o_sharedInstance = nil;
             }
         } else {
             /* we don't do any transcoding
-             * -> enabled the encap-formats allowed when streaming content via http
-             * since this should work fine in most cases */
+             * -> enabled the encap-formats allowed when streaming content via
+             * http plus MP4 since this should work fine in most cases */
+
             /* FIXME: choose a selection of encap-formats based upon the 
              * actually used codecs */
 
-            /* enable MPEG PS, MPEG TS, MPEG 1, OGG, RAW and ASF; select MPEG PS */
+            /* enable MPEG PS, MPEG TS, MPEG 1, OGG, RAW, ASF, MP4 and MOV
+             * select MPEG PS */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:YES];
             [[o_t5_matrix_encap cellAtRow:1 column:0] setEnabled:YES];
             [[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:YES];
@@ -972,8 +975,8 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:4 column:0] setEnabled:YES];
             [[o_t5_matrix_encap cellAtRow:5 column:0] setEnabled:YES];
             [[o_t5_matrix_encap cellAtRow:6 column:0] setEnabled:NO];
-            [[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:NO];
-            [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:NO];
+            [[o_t5_matrix_encap cellAtRow:7 column:0] setEnabled:YES];
+            [[o_t5_matrix_encap cellAtRow:8 column:0] setEnabled:YES];
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
             [o_t5_matrix_encap selectCellAtRow:0 column:0];

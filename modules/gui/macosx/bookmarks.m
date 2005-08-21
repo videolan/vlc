@@ -285,7 +285,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     /* extract */
     
     intf_thread_t * p_intf = VLCIntf;
-    /*
+    
     if( [o_tbl_dataTable numberOfSelectedRows] < 2 )
     {
         NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), \
@@ -303,7 +303,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
                 "The stream must be playing or paused for bookmarks to work"));
         return;
     }
-
+    
     seekpoint_t **pp_bookmarks;
     int i_bookmarks ;
     int i_first = -1;
@@ -318,18 +318,18 @@ static VLCBookmarks *_o_sharedInstance = nil;
             {
                 i_first = x;
                 c = 1;
-                return;
             } 
             else if (i_second == -1)
             {
                 i_second = x;
                 c = 2;
-                return;
             }
         }
         x = (x + 1);
     }
-
+    
+    msg_Dbg(p_intf, "got the bookmark-indexes");
+    
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, \
         &i_bookmarks ) != VLC_SUCCESS )
     {
@@ -337,7 +337,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
         msg_Err(p_intf, "bookmarks couldn't be retrieved from core");
         return;
     }
-    msg_Dbg(p_intf, "calling for wizard");
+    msg_Dbg(p_intf, "calling wizard");
 
     [[[VLCMain sharedInstance] getWizard] initWithExtractValuesFrom: \
             [[NSNumber numberWithInt: \
@@ -347,8 +347,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
             ofItem: [NSString stringWithUTF8String: \
             p_input->input.p_item->psz_uri]];
     vlc_object_release( p_input );
-    msg_Dbg(p_intf, "released input");*/
-    msg_Err(p_intf, "not implemented yet, sorry");
+    msg_Dbg(p_intf, "released input");
 }
 
 - (IBAction)goToBookmark:(id)sender
