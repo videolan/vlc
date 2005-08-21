@@ -56,7 +56,7 @@ print { $new_sym }
 	"/*\n".
 	" * In an ideal world, plugins would include all the headers they need.\n".
 	" * But of course, many, if not all, of them don't, so we have to make sure\n".
-	" * the while libvlc API is defined here in any case when included from a\n".
+	" * the whole libvlc API is defined here in any case when included from a\n".
 	" * plugin.\n".
 	" */\n".
 	"#  ifdef __PLUGIN__\n".
