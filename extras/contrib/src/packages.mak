@@ -29,7 +29,8 @@ VIDEOLAN=http://download.videolan.org/pub/videolan
 PERL_VERSION=5.8.5
 PERL_URL=http://ftp.funet.fi/pub/CPAN/src/perl-$(PERL_VERSION).tar.gz
 # Autoconf > 2.57 doesn't work ok on BeOS. Don't ask why.
-AUTOCONF_VERSION=2.57
+# we have to use a newer though, because bootstrap won't work otherwise
+AUTOCONF_VERSION=2.59
 AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.gz
 LIBTOOL_VERSION=1.5.6
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
