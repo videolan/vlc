@@ -4433,6 +4433,9 @@ AC_ARG_ENABLE(shared-libvlc,
   ,[shared_libvlc=no])
 
 AM_CONDITIONAL(BUILD_SHARED, [test "${shared_libvlc}" != "no"])
+AS_IF([test "${shared_libvlc}" != "no"], [
+  AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
+])
 
 pic=no
 AS_IF([test "${shared_libvlc}" != "no"], [pic=pic])

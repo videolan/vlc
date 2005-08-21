@@ -52,6 +52,30 @@ print { $new_sym }
 	"#ifndef __VLC_SYMBOLS_H\n".
 	"# define __VLC_SYMBOLS_H\n".
 	"\n".
+	"# ifdef HAVE_SHARED_LIBVLC\n".
+	"/*\n".
+	" * In an ideal world, plugins would include all the headers they need.\n".
+	" * But of course, many, if not all, of them don't, so we have to make sure\n".
+	" * the while libvlc API is defined here in any case when included from a\n".
+	" * plugin.\n".
+	" */\n".
+	"#  ifdef __PLUGIN__\n".
+	"#   ifdef __cplusplus\n".
+	"extern \"C\" {\n".
+	"#   endif\n";
+
+foreach (keys %new_APIs)
+{
+	print { $new_sym }
+		$new_APIs{$_}[0]." $_ (".$new_APIs{$_}[1].");\n";
+}
+
+print { $new_sym }
+	"#   ifdef __cplusplus\n".
+	"}\n".
+	"#   endif\n".
+	"#  endif /* __PLUGIN__ */\n".
+	"# else /* HAVE_LIBVLC_SHARED */\n".
 	"/*\n".
 	" * This is the big VLC API structure for plugins :\n".
 	" * Changing its layout breaks plugin's binary compatibility,\n".
@@ -70,15 +94,24 @@ my $changes = 0;
 #
 my @API;
 my @deprecated_API;
+my $parse = 0;
 
 open my $oldfd, "< $srcdir/include/vlc_symbols.h";
+
 while (<$oldfd>)
 {
-	if (/^    void \*(\w*)_deprecated;$/)
+	if (/^struct module_symbols_t/)
 	{
-		if (defined $new_APIs{$2})
+		$parse = 1;
+	}
+	elsif ($parse == 0)
+	{
+	}
+	elsif (/^    void \*(\w*)_deprecated;$/)
+	{
+		if (defined $new_APIs{$1})
 		{
-			print "[info] $2 was RESTORED!\n";
+			print "[info] $1 was RESTORED!\n";
 			print { $new_sym }
 				"    ".$new_APIs{$1}[0]." (*$1_inner) (".$new_APIs{$1}[1].");\n";
 			delete $new_APIs{$1};
@@ -143,19 +176,19 @@ foreach (keys %new_APIs)
 #
 print { $new_sym }
 	"};\n".
-	"# if defined (__PLUGIN__)\n";
-	
+	"#  if defined (__PLUGIN__)\n";
+
 foreach (@API)
 {
 	print { $new_sym } "#  define $_ (p_symbols)->${_}_inner\n";
 }
 
 print { $new_sym }
-	"# elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)\n".
+	"#  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)\n".
 	"/******************************************************************\n".
 	" * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.\n".
 	" ******************************************************************/\n".
-	"#  define STORE_SYMBOLS( p_symbols ) \\\n";
+	"#   define STORE_SYMBOLS( p_symbols ) \\\n";
 
 foreach (@API)
 {
@@ -168,7 +201,8 @@ foreach (@deprecated_API)
 
 print { $new_sym }
 	"\n".
-	"# endif /* __PLUGIN__ */\n".
+	"#  endif /* __PLUGIN__ */\n".
+	"# endif /* HAVE_SHARED_LIBVLC */\n".
 	"#endif /* __VLC_SYMBOLS_H */\n";
 close $new_sym;
 

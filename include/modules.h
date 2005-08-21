@@ -55,7 +55,9 @@ struct module_bank_t
     VLC_COMMON_MEMBERS
 
     int              i_usage;
+#ifndef HAVE_SHARED_LIBVLC
     module_symbols_t symbols;
+#endif
 
     vlc_bool_t       b_main;
     vlc_bool_t       b_builtins;

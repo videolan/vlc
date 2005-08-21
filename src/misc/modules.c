@@ -194,7 +194,7 @@ void __module_InitBank( vlc_object_t *p_this )
     /*
      * Store the symbols to be exported
      */
-#ifdef HAVE_DYNAMIC_PLUGINS
+#if defined (HAVE_DYNAMIC_PLUGINS) && !defined (HAVE_SHARED_LIBVLC)
     STORE_SYMBOLS( &p_bank->symbols );
 #endif
 
@@ -1090,7 +1090,9 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     /* We need to fill these since they may be needed by CallEntry() */
     p_module->psz_filename = psz_file;
     p_module->handle = handle;
+#ifndef HAVE_SHARED_LIBVLC
     p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
+#endif
     p_module->b_loaded = VLC_TRUE;
 
     /* Initialize the module: fill p_module, default config */
@@ -2146,7 +2148,9 @@ static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
 
     p_cache->pf_activate = p_module->pf_activate;
     p_cache->pf_deactivate = p_module->pf_deactivate;
+#ifndef HAVE_SHARED_LIBVLC
     p_cache->p_symbols = p_module->p_symbols;
+#endif
     p_cache->handle = p_module->handle;
 
     for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
@@ -2155,7 +2159,9 @@ static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
         module_t *p_cchild = (module_t*)p_cache->pp_children[i_submodule];
         p_cchild->pf_activate = p_child->pf_activate;
         p_cchild->pf_deactivate = p_child->pf_deactivate;
+#ifndef HAVE_SHARED_LIBVLC
         p_cchild->p_symbols = p_child->p_symbols;
+#endif
     }
 
     p_cache->b_loaded = VLC_TRUE;

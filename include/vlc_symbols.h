@@ -6,6 +6,419 @@
 #ifndef __VLC_SYMBOLS_H
 # define __VLC_SYMBOLS_H
 
+# ifdef HAVE_SHARED_LIBVLC
+/*
+ * In an ideal world, plugins would include all the headers they need.
+ * But of course, many, if not all, of them don't, so we have to make sure
+ * the while libvlc API is defined here in any case when included from a
+ * plugin.
+ */
+#  ifdef __PLUGIN__
+#   ifdef __cplusplus
+extern "C" {
+#   endif
+char * config_GetHomeDir (void);
+int playlist_ItemDelete (playlist_item_t *);
+osd_state_t * __osd_StateChange (osd_state_t *, const int);
+int vlm_ScheduleSetup (vlm_schedule_t *, char *, char *);
+vlc_acl_t * __ACL_Duplicate (vlc_object_t *p_this, const vlc_acl_t *p_acl);
+picture_t * osd_Slider (int i_width, int i_height, int i_position, short i_type);
+int playlist_ServicesDiscoveryRemove (playlist_t *, const char *);
+int playlist_NodeDelete (playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t);
+void vlm_MediaDelete (vlm_t *, vlm_media_t *, char *);
+int __var_Destroy (vlc_object_t *, const char *);
+int playlist_ItemSetDuration (playlist_item_t *, mtime_t);
+void aout_Delete (aout_instance_t *);
+int playlist_Control (playlist_t *, int, ...);
+vlc_acl_t * __ACL_Create (vlc_object_t *p_this, vlc_bool_t b_allow);
+playlist_item_t * playlist_ItemGetByPos (playlist_t *, int);
+int playlist_Clear (playlist_t *);
+vout_thread_t * __vout_Create (vlc_object_t *, video_format_t *);
+void aout_FormatPrint (aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format);
+void vlm_ScheduleDelete (vlm_t *, vlm_schedule_t *, char *);
+void osd_ConfigUnload (vlc_object_t *, osd_menu_t **);
+void input_DecoderDelete (decoder_t *);
+void __msg_Info (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
+int playlist_ViewDump (playlist_t *, playlist_view_t *);
+int __net_Select (vlc_object_t *p_this, int *pi_fd, v_socket_t **, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait);
+aout_instance_t * __aout_New (vlc_object_t *);
+const char * VLC_Compiler (void);
+void vout_DatePicture (vout_thread_t *, picture_t *, mtime_t);
+int __var_Type (vlc_object_t *, const char *);
+int vlc_strncasecmp (const char *s1, const char *s2, size_t n);
+int vlc_getaddrinfo (vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo **);
+void access2_Delete (access_t *);
+void vout_SynchroNewPicture (vout_synchro_t *, int, int, mtime_t, mtime_t, int, vlc_bool_t);
+int __vout_AllocatePicture (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect);
+playlist_item_t * playlist_NodeCreate (playlist_t *,int,char *, playlist_item_t * p_parent);
+void * vlc_readdir (void *);
+int sout_AnnounceRegister (sout_instance_t *,session_descriptor_t*, announce_method_t*);
+void * __vlc_object_get (vlc_object_t *, int);
+void vout_SynchroTrash (vout_synchro_t *);
+picture_t * vout_CreatePicture (vout_thread_t *, vlc_bool_t, vlc_bool_t, unsigned int);
+void vout_SynchroEnd (vout_synchro_t *, int, vlc_bool_t);
+int playlist_ItemSetName (playlist_item_t *,  char *);
+void __osd_MenuShow (vlc_object_t *);
+httpd_url_t * httpd_UrlNewUnique (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
+void httpd_ClientModeStream (httpd_client_t *cl);
+void httpd_RedirectDelete (httpd_redirect_t *);
+void __sout_CfgParse (vlc_object_t *, char *psz_prefix, const char **ppsz_options, sout_cfg_t *);
+vlm_media_t * vlm_MediaNew (vlm_t *, char *, int);
+int playlist_LockItemToNode (playlist_t *,playlist_item_t *);
+void spu_Destroy (spu_t *);
+picture_t * osd_Icon (int i_width, int i_height, short i_type);
+char* httpd_ServerIP (httpd_client_t *cl, char *psz_ip);
+int spu_Init (spu_t *);
+void httpd_HostDelete (httpd_host_t *);
+int __aout_VolumeGet (vlc_object_t *, audio_volume_t *);
+void spu_DestroySubpicture (spu_t *, subpicture_t *);
+int aout_CheckChannelReorder (const uint32_t *, const uint32_t *, uint32_t, int, int *);
+void stream_DemuxSend (stream_t *s, block_t *p_block);
+int __config_LoadConfigFile (vlc_object_t *, const char *);
+int vlc_asprintf (char **, const char *, ...);
+int __var_Change (vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t *);
+int playlist_Disable (playlist_t *, playlist_item_t *);
+char * vlc_input_item_GetInfo (input_item_t *p_i, const char *psz_cat,const char *psz_name);
+int vout_VarCallback (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
+session_descriptor_t* sout_AnnounceSessionCreate (void);
+void __osd_Volume (vlc_object_t *);
+int vlc_vasprintf (char **, const char *, va_list);
+int playlist_Sort (playlist_t *, int, int);
+int aout_DecDelete (aout_instance_t *, aout_input_t *);
+int vlc_strcasecmp (const char *s1, const char *s2);
+sout_packetizer_input_t * sout_InputNew (sout_instance_t *, es_format_t *);
+char * secstotimestr (char *psz_buffer, int secs);
+int playlist_NodeInsert (playlist_t *,int,playlist_item_t*,playlist_item_t *, int);
+void tls_ClientDelete (tls_session_t *);
+void msleep (mtime_t delay);
+const char * VLC_Error (int);
+sout_access_out_t * sout_AccessOutNew (sout_instance_t *, char *psz_access, char *psz_name);
+int playlist_Replace (playlist_t *,playlist_item_t *, input_item_t*);
+int __config_LoadCmdLine (vlc_object_t *, int *, char *[], vlc_bool_t);
+void __config_PutInt (vlc_object_t *, const char *, int);
+vlm_t * __vlm_New (vlc_object_t *);
+int __input_Preparse (vlc_object_t *, input_item_t *);
+int vlc_input_item_AddInfo (input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ...);
+void __msg_Unsubscribe (vlc_object_t *, msg_subscription_t *);
+void aout_DateSet (audio_date_t *, mtime_t);
+char * FromLocale (const char *);
+int playlist_ViewInsert (playlist_t *, int, char *);
+char * __vlc_fix_readdir_charset (vlc_object_t *, const char *);
+int __config_GetInt (vlc_object_t *, const char *);
+void input_DecoderDecode (decoder_t *, block_t *);
+void * vout_RequestWindow (vout_thread_t *, int *, int *, unsigned int *, unsigned int *);
+char * vlc_getenv (const char *name);
+block_t * block_FifoShow (block_fifo_t *);
+void sout_MuxSendBuffer (sout_mux_t *, sout_input_t  *, block_t *);
+void __osd_MenuNext (vlc_object_t *);
+void vlm_MessageDelete (vlm_message_t *);
+void vout_SynchroDecode (vout_synchro_t *);
+int playlist_Delete (playlist_t *, int);
+void aout_FiltersPlay (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_buffer_t ** pp_input_buffer);
+char* httpd_ClientIP (httpd_client_t *cl, char *psz_ip);
+void httpd_FileDelete (httpd_file_t *);
+module_t * __module_Need (vlc_object_t *, const char *, const char *, vlc_bool_t);
+const char * VLC_Changeset (void);
+void LocaleFree (const char *);
+void __vlc_object_attach (vlc_object_t *, vlc_object_t *);
+stream_t * __stream_UrlNew (vlc_object_t *p_this, const char *psz_url);
+sout_mux_t * sout_MuxNew (sout_instance_t*, char *, sout_access_out_t *);
+stream_t * __stream_DemuxNew (vlc_object_t *p_obj, char *psz_demux, es_out_t *out);
+int vout_ShowTextRelative (vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t);
+int block_FifoPut (block_fifo_t *, block_t *);
+int playlist_ItemAddParent (playlist_item_t *, int,playlist_item_t *);
+int __var_Create (vlc_object_t *, const char *, int);
+void httpd_ClientModeBidir (httpd_client_t *cl);
+mtime_t mdate (void);
+void demux2_Delete (demux_t *);
+void __msg_Dbg (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
+int vlc_getnameinfo (const struct sockaddr *, int, char *, int, int *, int);
+int vlm_ExecuteCommand (vlm_t *, char *, vlm_message_t **);
+httpd_stream_t * httpd_StreamNew (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
+int __config_GetType (vlc_object_t *, const char *);
+void __vlc_thread_ready (vlc_object_t *);
+int playlist_Export (playlist_t *, const char *, const char *);
+demux_t * __demux2_New (vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t);
+int __vlc_threads_end (vlc_object_t *);
+int sout_AccessOutRead (sout_access_out_t *, block_t *);
+int demux2_vaControlHelper (stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args);
+int httpd_UrlCatch (httpd_url_t *, int i_msg, httpd_callback_t, httpd_callback_sys_t *);
+void __vlc_object_yield (vlc_object_t *);
+const char * VLC_CompileBy (void);
+playlist_item_t * playlist_LockItemGetByPos (playlist_t *, int);
+input_thread_t * __input_CreateThread (vlc_object_t *, input_item_t *);
+const char * DecodeLanguage (uint16_t);
+int __aout_VolumeSet (vlc_object_t *, audio_volume_t);
+void InitMD5 (struct md5_s *);
+mtime_t aout_DateIncrement (audio_date_t *, uint32_t);
+int __net_Write (vlc_object_t *p_this, int fd, v_socket_t *, const uint8_t *p_data, int i_data);
+int playlist_GetPositionById (playlist_t *,int);
+int vlc_iconv_close (vlc_iconv_t);
+int * __net_ListenTCP (vlc_object_t *, const char *, int);
+void EndMD5 (struct md5_s *);
+tls_server_t * tls_ServerCreate (vlc_object_t *, const char *, const char *);
+int vlm_MediaSetup (vlm_t *, vlm_media_t *, char *, char *);
+void sout_StreamDelete (sout_stream_t *);
+void __osd_MenuDelete (vlc_object_t *, osd_menu_t *);
+int vout_ShowTextAbsolute (vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
+int sout_AnnounceUnRegister (sout_instance_t *,session_descriptor_t*);
+vlc_bool_t vlc_ureduce (unsigned *, unsigned *, uint64_t, uint64_t, uint64_t);
+httpd_host_t * httpd_HostNew (vlc_object_t *, const char *psz_host, int i_port);
+char * vlc_strcasestr (const char *s1, const char *s2);
+httpd_file_t * httpd_FileNew (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t *);
+void vlc_freeaddrinfo (struct addrinfo *);
+void vlm_Delete (vlm_t *);
+void vout_DisplayPicture (vout_thread_t *, picture_t *);
+void httpd_MsgClean (httpd_message_t *);
+int vout_ControlWindow (vout_thread_t *, void *, int, va_list);
+int playlist_NodeChildrenCount (playlist_t *,playlist_item_t*);
+size_t vlc_iconv (vlc_iconv_t, char **, size_t *, char **, size_t *);
+int playlist_Enable (playlist_t *, playlist_item_t *);
+playlist_item_t* __playlist_ItemCopy (vlc_object_t *,playlist_item_t*);
+char * vlc_strdup (const char *s);
+playlist_item_t* __playlist_ItemNew (vlc_object_t *,const char *,const char *);
+int __var_Get (vlc_object_t *, const char *, vlc_value_t *);
+int __net_OpenTCP (vlc_object_t *p_this, const char *psz_host, int i_port);
+void tls_ServerDelete (tls_server_t *);
+unsigned int aout_FormatNbChannels (const audio_sample_format_t * p_format);
+int __vlc_mutex_destroy (char *, int, vlc_mutex_t *);
+vlc_bool_t playlist_IsServicesDiscoveryLoaded (playlist_t *,const char *);
+int vlm_Save (vlm_t *, char *);
+int ACL_AddNet (vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow);
+void AddMD5 (struct md5_s *, const uint8_t *, uint32_t);
+void config_Duplicate (module_t *, module_config_t *);
+block_t * __block_New (vlc_object_t *, int);
+void xml_Delete (xml_t *);
+void __msg_Warn (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
+httpd_host_t * httpd_TLSHostNew (vlc_object_t *, const char *, int, const char *, const char *, const char *, const char *);
+int vlc_scandir (const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ));
+int sout_AccessOutWrite (sout_access_out_t *, block_t *);
+void config_UnsetCallbacks (module_config_t *);
+void vout_SynchroRelease (vout_synchro_t *);
+void __msg_Generic (vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5);
+int playlist_ServicesDiscoveryAdd (playlist_t *, const char *);
+char * vlc_strndup (const char *s, size_t n);
+void vout_PlacePicture (vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
+float __config_GetFloat (vlc_object_t *, const char *);
+playlist_item_t * playlist_ItemGetById (playlist_t *, int);
+const char * vlc_gai_strerror (int);
+void net_ListenClose (int *fd);
+int playlist_NodeAppend (playlist_t *,int,playlist_item_t*,playlist_item_t *);
+const iso639_lang_t * GetLang_2B (const char *);
+void sout_AccessOutDelete (sout_access_out_t *);
+int httpd_StreamHeader (httpd_stream_t *, uint8_t *p_data, int i_data);
+void __config_PutFloat (vlc_object_t *, const char *, float);
+void vout_OSDIcon (vlc_object_t *, int, short);
+void __vlc_thread_join (vlc_object_t *, char *, int);
+void __vlc_object_release (vlc_object_t *);
+int __var_Set (vlc_object_t *, const char *, vlc_value_t);
+void vout_LinkPicture (vout_thread_t *, picture_t *);
+void vout_DestroyPicture (vout_thread_t *, picture_t *);
+int64_t vlc_strtoll (const char *nptr, char **endptr, int base);
+void __osd_MenuHide (vlc_object_t *);
+subpicture_region_t * __spu_MakeRegion (vlc_object_t *, video_format_t *, picture_t *);
+void sout_AnnounceSessionDestroy (session_descriptor_t *);
+subpicture_region_t * __spu_CreateRegion (vlc_object_t *, video_format_t *);
+int playlist_AddSDModules (playlist_t *, char *);
+void vout_Destroy (vout_thread_t *);
+block_fifo_t * __block_FifoNew (vlc_object_t *);
+int playlist_NodeSort (playlist_t *, playlist_item_t *,int, int);
+int osd_ConfigLoader (vlc_object_t *, const char *, osd_menu_t **);
+int aout_Restart (aout_instance_t * p_aout);
+void * __vlc_object_create (vlc_object_t *, int);
+int __aout_VolumeInfos (vlc_object_t *, audio_volume_t *);
+const iso639_lang_t * GetLang_2T (const char *);
+int playlist_NodeAddItem (playlist_t *, playlist_item_t *,int,playlist_item_t *,int , int);
+int __aout_VolumeMute (vlc_object_t *, audio_volume_t *);
+const char * VLC_CompileDomain (void);
+void input_DestroyThread (input_thread_t *);
+int playlist_LockControl (playlist_t *, int, ...);
+vlc_bool_t vlc_current_charset (char **);
+char * __net_Gets (vlc_object_t *p_this, int fd, v_socket_t *);
+void aout_DateMove (audio_date_t *, mtime_t);
+void sout_MuxDelete (sout_mux_t *);
+void vout_InitFormat (video_frame_format_t *, uint32_t, int, int, int);
+void vout_UnlinkPicture (vout_thread_t *, picture_t *);
+const char * aout_FormatPrintChannels (const audio_sample_format_t *);
+char * __config_GetPsz (vlc_object_t *, const char *);
+void httpd_StreamDelete (httpd_stream_t *);
+image_handler_t * __image_HandlerCreate (vlc_object_t *);
+aout_buffer_t * aout_DecNewBuffer (aout_instance_t *, aout_input_t *, size_t);
+void vout_OSDSlider (vlc_object_t *, int, int , short);
+int vout_ChromaCmp (uint32_t, uint32_t);
+int sout_InputDelete (sout_packetizer_input_t *);
+int playlist_Import (playlist_t *, const char *);
+access_t * access2_FilterNew (access_t *p_source, char *psz_access_filter);
+const char * VLC_CompileHost (void);
+httpd_url_t * httpd_UrlNew (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
+int __vlc_thread_create (vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), int, vlc_bool_t);
+void __module_Unneed (vlc_object_t *, module_t *);
+int net_Printf (vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, ...);
+int __vlc_thread_set_priority (vlc_object_t *, char *, int, int);
+int ACL_LoadFile (vlc_acl_t *p_acl, const char *path);
+void input_StopThread (input_thread_t *);
+intf_thread_t * __intf_Create (vlc_object_t *, const char *);
+void aout_ChannelReorder (uint8_t *, int, int, const int *, int);
+int __var_DelCallback (vlc_object_t *, const char *, vlc_callback_t, void *);
+void __vlc_object_detach (vlc_object_t *);
+int aout_FindAndRestart (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
+int sout_InputSendBuffer (sout_packetizer_input_t *, block_t*);
+int __config_SaveConfigFile (vlc_object_t *, const char *);
+int ACL_Check (vlc_acl_t *p_acl, const char *psz_ip);
+void aout_DecDeleteBuffer (aout_instance_t *, aout_input_t *, aout_buffer_t *);
+access_t * __access2_New (vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, vlc_bool_t b_quick);
+tls_session_t * tls_ClientCreate (vlc_object_t *, int, const char *);
+void intf_Destroy (intf_thread_t *);
+void spu_RenderSubpictures (spu_t *,  video_format_t *, picture_t *, picture_t *, subpicture_t *, int, int);
+void __msg_Err (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
+void __spu_DestroyRegion (vlc_object_t *, subpicture_region_t *);
+int playlist_ItemAdd (playlist_t *, playlist_item_t *, int, int);
+aout_buffer_t * aout_OutputNextBuffer (aout_instance_t *, mtime_t, vlc_bool_t);
+int playlist_LockReplace (playlist_t *,playlist_item_t *, input_item_t*);
+int __intf_Eject (vlc_object_t *, const char *);
+int input_Control (input_thread_t *, int i_query, ...);
+int __aout_VolumeUp (vlc_object_t *, int, audio_volume_t *);
+vout_thread_t * __vout_Request (vlc_object_t *, vout_thread_t *, video_format_t *);
+void __osd_MenuUp (vlc_object_t *);
+int __aout_VolumeDown (vlc_object_t *, int, audio_volume_t *);
+sout_instance_t * __sout_NewInstance (vlc_object_t *, char *);
+subpicture_t * spu_CreateSubpicture (spu_t *);
+void httpd_MsgAdd (httpd_message_t *, char *psz_name, char *psz_value, ...);
+int vout_vaControlDefault (vout_thread_t *, int, va_list);
+int playlist_NodeEmpty (playlist_t *, playlist_item_t *, vlc_bool_t);
+spu_t * __spu_Create (vlc_object_t *);
+int playlist_NodeRemoveItem (playlist_t *,playlist_item_t*,playlist_item_t *);
+int __net_Accept (vlc_object_t *, int *, mtime_t);
+void ACL_Destroy (vlc_acl_t *p_acl);
+void vout_ReleaseWindow (vout_thread_t *, void *);
+void __osd_MenuDown (vlc_object_t *);
+int playlist_ViewDelete (playlist_t *,playlist_view_t*);
+void vout_SynchroReset (vout_synchro_t *);
+void date_Change (date_t *, uint32_t, uint32_t);
+int playlist_LockDelete (playlist_t *, int);
+mtime_t vout_SynchroDate (vout_synchro_t *);
+int __var_AddCallback (vlc_object_t *, const char *, vlc_callback_t, void *);
+void httpd_MsgInit (httpd_message_t *);
+char * EnsureUTF8 (char *);
+block_t * block_FifoGet (block_fifo_t *);
+mtime_t date_Increment (date_t *, uint32_t);
+int playlist_Add (playlist_t *, const char *, const char *, int, int);
+char * sout_CfgCreate (char **, sout_cfg_t **, char *);
+osd_menu_t * __osd_MenuCreate (vlc_object_t *, const char *);
+void * vlc_opendir (const char *);
+int playlist_NodeRemoveParent (playlist_t *,playlist_item_t*,playlist_item_t *);
+char ** vlc_parse_cmdline (const char *, int *);
+int __vlc_cond_init (vlc_object_t *, vlc_cond_t *);
+int __net_OpenUDP (vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server);
+vlc_iconv_t vlc_iconv_open (const char *, const char *);
+int playlist_PreparseEnqueue (playlist_t *, input_item_t *);
+aout_buffer_t * aout_FifoPop (aout_instance_t * p_aout, aout_fifo_t * p_fifo);
+int __vout_InitPicture (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect);
+int playlist_LockClear (playlist_t *);
+char * mstrtime (char *psz_buffer, mtime_t date);
+void aout_FormatPrepare (audio_sample_format_t * p_format);
+void spu_DisplaySubpicture (spu_t *, subpicture_t *);
+int httpd_StreamSend (httpd_stream_t *, uint8_t *p_data, int i_data);
+decoder_t * input_DecoderNew (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
+int intf_RunThread (intf_thread_t *);
+xml_t * __xml_Create (vlc_object_t *);
+msg_subscription_t* __msg_Subscribe (vlc_object_t *);
+const char * VLC_Version (void);
+session_descriptor_t* sout_AnnounceRegisterSDP (sout_instance_t *,const char *, announce_method_t*);
+char * stream_ReadLine (stream_t *);
+int playlist_PreparseEnqueueItem (playlist_t *, playlist_item_t *);
+void __osd_MenuPrev (vlc_object_t *);
+void date_Set (date_t *, mtime_t);
+module_t * config_FindModule (vlc_object_t *, const char *);
+void aout_VolumeSoftInit (aout_instance_t *);
+void block_FifoRelease (block_fifo_t *);
+void block_FifoEmpty (block_fifo_t *);
+int playlist_ItemAddOption (playlist_item_t *, const char *);
+void aout_VolumeNoneInit (aout_instance_t *);
+void aout_DateInit (audio_date_t *, uint32_t);
+void vlc_list_release (vlc_list_t *);
+subpicture_t * spu_SortSubpictures (spu_t *, mtime_t);
+playlist_item_t * playlist_LockItemGetByInput (playlist_t *,input_item_t *);
+int __net_vaPrintf (vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args);
+int vlm_MediaControl (vlm_t *, vlm_media_t *, char *, char *, char *);
+vlc_bool_t vout_SynchroChoose (vout_synchro_t *, int, int, vlc_bool_t);
+int playlist_RecursiveNodeSort (playlist_t *, playlist_item_t *,int, int);
+int64_t vlc_atoll (const char *nptr);
+int vlm_MediaVodControl (void *, vod_media_t *, char *, int, va_list);
+void __vlc_object_destroy (vlc_object_t *);
+int sout_AccessOutSeek (sout_access_out_t *, off_t);
+double vlc_atof (const char *nptr);
+void httpd_UrlDelete (httpd_url_t *);
+int __vlc_mutex_init (vlc_object_t *, vlc_mutex_t *);
+int __net_ReadNonBlock (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data, mtime_t i_wait);
+playlist_view_t * playlist_ViewFind (playlist_t *, int);
+module_config_t * config_FindConfig (vlc_object_t *, const char *);
+playlist_item_t * playlist_ItemGetByInput (playlist_t *,input_item_t *);
+void config_SetCallbacks (module_config_t *, module_config_t *);
+int __vlc_cond_destroy (char *, int, vlc_cond_t *);
+vlc_list_t * __vlc_list_find (vlc_object_t *, int, int);
+char * ToLocale (const char *);
+int vlm_Load (vlm_t *, char *);
+int aout_FiltersCreatePipeline (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int * pi_nb_filters, const audio_sample_format_t * p_input_format, const audio_sample_format_t * p_output_format);
+playlist_item_t * playlist_ChildSearchName (playlist_item_t*, const char*);
+void __msg_GenericVa (vlc_object_t *, int, const char *, const char *, va_list args);
+int aout_ChannelsRestart (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
+char const * vlc_error (int);
+int playlist_NodeGroup (playlist_t *, int,playlist_item_t *,playlist_item_t **,int, int, int);
+playlist_item_t* playlist_ItemNewWithType (vlc_object_t *,const char *,const char *, int);
+void __config_PutPsz (vlc_object_t *, const char *, const char *);
+const char * VLC_CompileTime (void);
+vlm_schedule_t * vlm_ScheduleNew (vlm_t *, char *);
+void net_Close (int fd);
+int __vlc_threads_init (vlc_object_t *);
+void __vout_CopyPicture (vlc_object_t *p_this, picture_t *p_dst, picture_t *p_src);
+void sout_MuxDeleteStream (sout_mux_t *, sout_input_t *);
+char * httpd_MsgGet (httpd_message_t *, char *psz_name);
+const iso639_lang_t * GetLang_1 (const char *);
+void aout_FormatsPrint (aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2);
+void __vout_OSDMessage (vlc_object_t *, int, char *, ...);
+void intf_StopThread (intf_thread_t *);
+stream_t * __stream_MemoryNew (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, vlc_bool_t i_preserve_memory);
+void mwait (mtime_t date);
+void __config_ResetAll (vlc_object_t *);
+httpd_redirect_t * httpd_RedirectNew (httpd_host_t *, const char *psz_url_dst, const char *psz_url_src);
+playlist_item_t * playlist_LockItemGetById (playlist_t *, int);
+mtime_t date_Get (const date_t *);
+int aout_DecPlay (aout_instance_t *, aout_input_t *, aout_buffer_t *);
+int input_vaControl (input_thread_t *, int i_query, va_list);
+mtime_t aout_FifoFirstDate (aout_instance_t *, aout_fifo_t *);
+vout_synchro_t * __vout_SynchroInit (vlc_object_t *, int);
+int vlc_alphasort (const struct dirent **a, const struct dirent **b);
+mtime_t aout_DateGet (const audio_date_t *);
+int playlist_CopyParents (playlist_item_t *,playlist_item_t *);
+int playlist_Move (playlist_t *, int, int);
+void date_Init (date_t *, uint32_t, uint32_t);
+void DigestMD5 (struct md5_s *, uint32_t *);
+void image_HandlerDelete (image_handler_t *);
+int __net_Read (vlc_object_t *p_this, int fd, v_socket_t *, uint8_t *p_data, int i_data, vlc_bool_t b_retry);
+char * vlc_dgettext (const char *package, const char *msgid);
+void sout_DeleteInstance (sout_instance_t *);
+int playlist_ItemToNode (playlist_t *,playlist_item_t *);
+void stream_DemuxDelete (stream_t *s);
+aout_input_t * __aout_DecNew (vlc_object_t *, aout_instance_t **, audio_sample_format_t *);
+int playlist_AddExt (playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int);
+void date_Move (date_t *, mtime_t);
+int vlc_closedir (void *);
+void aout_FiltersDestroyPipeline (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters);
+void * __vlc_object_find (vlc_object_t *, int, int);
+announce_method_t* sout_AnnounceMethodCreate (int);
+sout_input_t * sout_MuxAddStream (sout_mux_t *, es_format_t *);
+void __osd_MenuActivate (vlc_object_t *);
+sout_stream_t * sout_StreamNew (sout_instance_t *, char *psz_chain);
+int playlist_ViewEmpty (playlist_t *, int, vlc_bool_t);
+block_t * block_Realloc (block_t *, int i_pre, int i_body);
+char * vlc_wraptext (const char *, int, vlc_bool_t);
+int playlist_ViewUpdate (playlist_t *, int);
+#   ifdef __cplusplus
+}
+#   endif
+#  endif /* __PLUGIN__ */
+# else /* HAVE_LIBVLC_SHARED */
 /*
  * This is the big VLC API structure for plugins :
  * Changing its layout breaks plugin's binary compatibility,
@@ -418,7 +831,7 @@ struct module_symbols_t
     const char * (*VLC_CompileTime_inner) (void);
     int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
 };
-# if defined (__PLUGIN__)
+#  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
 #  define aout_FiltersDestroyPipeline (p_symbols)->aout_FiltersDestroyPipeline_inner
 #  define aout_FiltersPlay (p_symbols)->aout_FiltersPlay_inner
@@ -816,11 +1229,11 @@ struct module_symbols_t
 #  define VLC_Version (p_symbols)->VLC_Version_inner
 #  define VLC_CompileTime (p_symbols)->VLC_CompileTime_inner
 #  define playlist_PreparseEnqueueItem (p_symbols)->playlist_PreparseEnqueueItem_inner
-# elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
+#  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
  ******************************************************************/
-#  define STORE_SYMBOLS( p_symbols ) \
+#   define STORE_SYMBOLS( p_symbols ) \
     ((p_symbols)->aout_FiltersCreatePipeline_inner) = aout_FiltersCreatePipeline; \
     ((p_symbols)->aout_FiltersDestroyPipeline_inner) = aout_FiltersDestroyPipeline; \
     ((p_symbols)->aout_FiltersPlay_inner) = aout_FiltersPlay; \
@@ -1223,5 +1636,6 @@ struct module_symbols_t
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \
     (p_symbols)->__osd_VolumeUp_deprecated = NULL; \
 
-# endif /* __PLUGIN__ */
+#  endif /* __PLUGIN__ */
+# endif /* HAVE_SHARED_LIBVLC */
 #endif /* __VLC_SYMBOLS_H */
