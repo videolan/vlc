@@ -127,16 +127,15 @@ static int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
 #endif
 
 #if defined( WIN32 ) || defined( UNDER_CE )
-# ifdef IPV6_PROTECTION_LEVEL
+# ifndef IPV6_PROTECTION_LEVEL
+#  define IPV6_PROTECTION_LEVEL 23
+# endif
     if( i_family == AF_INET6 )
     {
         i_val = 30 /*PROTECTION_LEVEL_UNRESTRICTED*/;
         setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL,
                    (const char*)&i_val, sizeof( i_val ) );
     }
-# else
-# warning You are using outdated headers for Winsock !
-# endif
 #endif
     return fd;
 }

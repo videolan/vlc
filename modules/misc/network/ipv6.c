@@ -195,16 +195,15 @@ static int OpenUDP( vlc_object_t * p_this )
 #endif
 
 #ifdef WIN32
-# ifdef IPV6_PROTECTION_LEVEL
+# ifndef IPV6_PROTECTION_LEVEL
+#   define IPV6_PROTECTION_LEVEL 23
+#  endif
     if( ptr->ai_family == AF_INET6 )
     {
         int i_val = 30 /*PROTECTION_LEVEL_UNRESTRICTED*/;
         setsockopt( fd, IPPROTO_IPV6, IPV6_PROTECTION_LEVEL, &i_val,
                     sizeof( i_val ) );
     }
-# else
-#  warning You are using outdated headers for Winsock !
-# endif
 #endif
 
     /* We may want to reuse an already used socket */
