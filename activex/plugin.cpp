@@ -497,7 +497,7 @@ HRESULT VLCPlugin::onInit(void)
              RegCloseKey( h_key );
         }
 
-#if 1
+#if 0
         ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
 #endif
 
