@@ -103,6 +103,15 @@
  *****************************************************************************/
 @implementation VLCPlaylistCommon
 
+- (id)init
+{
+    self = [super init];
+    if ( self != nil )
+    {
+        o_outline_dict = [[NSMutableDictionary alloc] init];
+    }
+    return self;
+}        
 - (void)awakeFromNib
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
@@ -162,6 +171,7 @@
         if( p_view && p_view->p_root )
         {
             i_return = p_view->p_root->i_children;
+
             if( i_current_view == VIEW_CATEGORY )
             {
                 i_return--; /* remove the GENERAL item from the list */
@@ -223,8 +233,11 @@
 
     vlc_object_release( p_playlist );
 
-    o_value = [[NSValue valueWithPointer: p_return] retain];
-
+    o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
+    if( o_value == nil )
+    {
+        o_value = [[NSValue valueWithPointer: p_return] retain];
+    }
     return o_value;
 }
 
@@ -362,12 +375,8 @@
     self = [super init];
     if ( self != nil )
     {
-        o_outline_dict = [[NSMutableDictionary alloc] init];
         o_nodes_array = [[NSMutableArray alloc] init];
         o_items_array = [[NSMutableArray alloc] init];
-
-
-        //i_moveRow = -1;
     }
     return self;
 }
@@ -630,7 +639,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release(p_playlist);
 }
 
-/* Check if p_item is a child of p_node recursively. We need to check the item     existence first since OSX sometimes tries to redraw items that have been
+/* Check if p_item is a child of p_node recursively. We need to check the item
+   existence first since OSX sometimes tries to redraw items that have been
    deleted. We don't do it when not required  since this verification takes
    quite a long time on big playlists (yes, pretty hacky). */
 - (BOOL)isItem: (playlist_item_t *)p_item
@@ -1603,6 +1613,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     [pboard declareTypes: [NSArray arrayWithObjects:
         @"VLCPlaylistItemPboardType",NSFilenamesPboardType, nil] owner: self];
+    [pboard setData:[NSData data] forType:@"VLCPlaylistItemPboardType"];
     [pboard setPropertyList:[NSArray array]
                                         forType:NSFilenamesPboardType];
 
@@ -1617,14 +1628,21 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
     if( !p_playlist ) return NSDragOperationNone;
+    
+    /* Dropping ON items is not allowed */
+    if( index == NSOutlineViewDropOnItemIndex )
+    {
+        vlc_object_release( p_playlist );
+        return NSDragOperationNone;
+    }
 
     /* We refuse to drop an item in anything else than a child of the General
        Node. We still accept items that would be root nodes of the outlineview
-       however, to allow drop in an empty playlist.*/
+       however, to allow drop in an empty playlist. */
     if( !([self isItem: [item pointerValue] inNode: p_playlist->p_general
                                     checkItemExistence: NO] || item == nil) )
     {
-        vlc_object_release(p_playlist);
+        vlc_object_release( p_playlist );
         return NSDragOperationNone;
     }
 
@@ -1639,7 +1657,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                     [[o_nodes_array objectAtIndex: i] pointerValue]
                     checkItemExistence: NO] )
             {
-                vlc_object_release(p_playlist);
+                vlc_object_release( p_playlist );
                 return NSDragOperationNone;
             }
         }

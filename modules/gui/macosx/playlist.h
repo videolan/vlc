@@ -41,6 +41,7 @@
     IBOutlet id o_tc_duration;
     IBOutlet id o_outline_view;
 
+    NSMutableDictionary *o_outline_dict;
     int i_current_view;
 }
 
@@ -98,7 +99,6 @@
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
-    NSMutableDictionary *o_outline_dict;
     NSMutableArray *o_nodes_array;
     NSMutableArray *o_items_array;
 
