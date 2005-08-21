@@ -761,6 +761,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     var_Create( p_vlc, "drawableh", VLC_VAR_INTEGER );
     var_Create( p_vlc, "drawableportx", VLC_VAR_INTEGER );
     var_Create( p_vlc, "drawableporty", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "width", VLC_VAR_INTEGER );
+    var_Create( p_vlc, "height", VLC_VAR_INTEGER );
 
     /*
      * Get input filenames given as commandline arguments
