@@ -1125,7 +1125,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
 
         /* Add the item */
-        playlist_AddItem( p_playlist, p_item, PLAYLIST_APPEND, i_position == -1 ? PLAYLIST_END : i_position + i_item );
+        playlist_AddItem( p_playlist, p_item, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item );
 
         if( i_item == 0 && !b_enqueue )
         {
@@ -1159,7 +1159,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         }
 
         /* Add the item */
-        playlist_NodeAddItem( p_playlist, p_item, i_view, p_node, PLAYLIST_APPEND, i_position + i_item );
+        playlist_NodeAddItem( p_playlist, p_item, i_view, p_node, PLAYLIST_INSERT, i_position + i_item );
 
         if( i_item == 0 && !b_enqueue )
         {
