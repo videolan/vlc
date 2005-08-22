@@ -32,14 +32,14 @@ EXTRA_DIST = \
 	src/misc/modules_builtin.h.in \
 	$(NULL)
 
-DISTCLEAN_BUILT_SOURCES = vlc-config
-CLEAN_BUILT_SOURCES = \
+BUILT_SOURCES_distclean = vlc-config
+BUILT_SOURCES_clean = \
 	stamp-api \
 	src/misc/modules_builtin.h \
 	src/misc/version.c \
 	$(NULL)
 
-BUILT_SOURCES = $(CLEAN_BUILT_SOURCES) $(DISTCLEAN_BUILT_SOURCES)
+BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
 
 SUFFIXES = 
 
@@ -290,8 +290,8 @@ vlc-config.in: vlc-config.in.in
 	./config.status --recheck
 
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
-CLEANFILES = $(CLEAN_BUILT_SOURCES) stamp-builtin
-DISTCLEANFILES = $(DISTCLEAN_BUILT_SOURCES) vlc-config.in
+CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
+DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in
 
 if HAVE_WIN32
 lib_LIBRARIES = lib/libvlc.a
