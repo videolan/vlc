@@ -511,6 +511,9 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     network_socket_t sock;
     module_t         *p_network = NULL;
 
+    if( psz_server == NULL ) psz_server = "";
+    if( psz_bind == NULL ) psz_bind = "";
+
     /* Prepare the network_socket_t structure */
     sock.psz_bind_addr   = psz_bind;
     sock.i_bind_port     = i_bind;
@@ -519,11 +522,6 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     sock.i_ttl           = 0;
     sock.v6only          = 0;
     sock.i_handle        = -1;
-
-    if( psz_server == NULL )
-        psz_server = "";
-    if( psz_bind == NULL )
-        psz_bind = "";
 
     msg_Dbg( p_this, "net: connecting to '[%s]:%d@[%s]:%d'",
              psz_server, i_server, psz_bind, i_bind );
