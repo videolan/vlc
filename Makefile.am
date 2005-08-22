@@ -136,6 +136,8 @@ src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 	touch src/misc/modules_builtin.h
 
+src/misc/modules.c: src/misc/modules_builtin.h
+
 src/misc/version.c: FORCE
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-version
 
