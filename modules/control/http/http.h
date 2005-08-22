@@ -167,29 +167,29 @@ typedef struct mvar_s
 
 
 /** This function creates a new variable */
-mvar_t  *mvar_New( const char *name, const char *value );
+mvar_t  *E_(mvar_New)( const char *name, const char *value );
 /** This function deletes a variable */
-void     mvar_Delete( mvar_t *v );
+void     E_(mvar_Delete)( mvar_t *v );
 /** This function adds f to the children variables of v, at last position */
-void     mvar_AppendVar( mvar_t *v, mvar_t *f );
+void     E_(mvar_AppendVar)( mvar_t *v, mvar_t *f );
 /** This function duplicates a variable */
-mvar_t  *mvar_Duplicate( const mvar_t *v );
+mvar_t  *E_(mvar_Duplicate)( const mvar_t *v );
 /** This function adds f to the children variables of v, at fist position */
-void     mvar_PushVar( mvar_t *v, mvar_t *f );
+void     E_(mvar_PushVar)( mvar_t *v, mvar_t *f );
 /** This function removes f from the children variables of v */
-void     mvar_RemoveVar( mvar_t *v, mvar_t *f );
+void     E_(mvar_RemoveVar)( mvar_t *v, mvar_t *f );
 /** This function retrieves the child variable named "name" */
-mvar_t  *mvar_GetVar( mvar_t *s, const char *name );
+mvar_t  *E_(mvar_GetVar)( mvar_t *s, const char *name );
 /** This function retrieves the value of the child variable named "field" */
-char    *mvar_GetValue( mvar_t *v, char *field );
+char    *E_(mvar_GetValue)( mvar_t *v, char *field );
 /** This function creates a variable with the given name and value and
  * adds it as first child of vars */
-void     mvar_PushNewVar( mvar_t *vars, const char *name,
-                             const char *value );
+void     E_(mvar_PushNewVar)( mvar_t *vars, const char *name,
+                              const char *value );
 /** This function creates a variable with the given name and value and
  * adds it as last child of vars */
-void     mvar_AppendNewVar( mvar_t *vars, const char *name,
-                               const char *value );
+void     E_(mvar_AppendNewVar)( mvar_t *vars, const char *name,
+                                const char *value );
 /** @} */
 
 /** \defgroup http_sets Sets *
@@ -202,25 +202,25 @@ void     mvar_AppendNewVar( mvar_t *vars, const char *name,
 
 /** This function creates a set variable which represents a series of integer
  * The arg parameter must be of the form "start[:stop[:step]]"  */
-mvar_t *mvar_IntegerSetNew( const char *name, const char *arg );
+mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg );
 
 /** This function creates a set variable with the contents of the playlist */
-mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,
-                             playlist_t *p_pl );
+mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
+                                 playlist_t *p_pl );
 /** This function creates a set variable with the contents of the Stream
  * and media info box */
-mvar_t *mvar_InfoSetNew( intf_thread_t *p_intf, char *name,
-                         input_thread_t *p_input );
+mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
+                             input_thread_t *p_input );
 /** This function creates a set variable with the input parameters */
-mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
-                             input_thread_t *p_input,
-                             const char *psz_variable );
+mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
+                                 input_thread_t *p_input,
+                                 const char *psz_variable );
 /** This function creates a set variable representing the files of the psz_dir
  * directory */
-mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
-                         char *psz_dir );
+mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
+                             char *psz_dir );
 /** This function creates a set variable representing the VLM streams */
-mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm );
+mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm );
 
 /** This function converts the listing of a playlist node into a mvar set */
 void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
@@ -250,21 +250,21 @@ typedef struct
 } rpn_stack_t;
 
 /** This function creates the RPN evaluator stack */
-void SSInit( rpn_stack_t * );
+void E_(SSInit)( rpn_stack_t * );
 /** This function cleans the evaluator stack */
-void SSClean( rpn_stack_t * );
+void E_(SSClean)( rpn_stack_t * );
 /* Evaluate and execute the RPN Stack */
-void  EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
-                          rpn_stack_t *st, char *exp );
+void  E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
+                       rpn_stack_t *st, char *exp );
 
 /* Push an operand on top of the RPN stack */
-void SSPush  ( rpn_stack_t *, const char * );
+void E_(SSPush)  ( rpn_stack_t *, const char * );
 /* Remove the first operand from the RPN Stack */
-char *SSPop  ( rpn_stack_t * );
+char *E_(SSPop)  ( rpn_stack_t * );
 /* Pushes an operand at a given position in the stack */
-void SSPushN ( rpn_stack_t *, int );
+void E_(SSPushN) ( rpn_stack_t *, int );
 /* Removes an operand at the given position in the stack */
-int  SSPopN  ( rpn_stack_t *, mvar_t  * );
+int  E_(SSPopN)  ( rpn_stack_t *, mvar_t  * );
 
 /**@}*/
 
@@ -294,19 +294,19 @@ typedef struct
 } macro_t;
 
 /** This function creates a macro from a <vlc ....> tag */
-int MacroParse( macro_t *m, char *psz_src );
+int E_(MacroParse)( macro_t *m, char *psz_src );
 /** This function cleans a macro */
-void MacroClean( macro_t *m );
+void E_(MacroClean)( macro_t *m );
 
 /** This function returns the macro type identifier from its id= string value
  * It uses the StrToMacroTypeTab mapping array for this */
-int StrToMacroType( char *name );
+int E_(StrToMacroType)( char *name );
 /** This function actually executes the macro */
-void MacroDo( httpd_file_sys_t *p_args, macro_t *m,
-              char *p_request, int i_request, char **pp_data,
-              int *pi_data, char **pp_dst );
+void E_(MacroDo)( httpd_file_sys_t *p_args, macro_t *m,
+                  char *p_request, int i_request, char **pp_data,
+                  int *pi_data, char **pp_dst );
 /** This function looks for macros in a string */
-char *MacroSearch( char *src, char *end,
+char *E_(MacroSearch)( char *src, char *end,
                    int i_mvlc, vlc_bool_t b_after );
 
 /** This function parses a file for macros */

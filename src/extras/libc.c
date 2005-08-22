@@ -8,6 +8,7 @@
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -327,6 +328,103 @@ int64_t vlc_atoll( const char *nptr )
 #endif
 
 /*****************************************************************************
+ * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters
+ * when called with an empty argument or just '\'
+ *****************************************************************************/
+#if defined(WIN32) || defined(UNDER_CE)
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h> /* for GetLogicalDrives */
+
+typedef struct vlc_DIR
+{
+    DIR *p_real_dir;
+    int i_drives;
+    struct dirent dd_dir;
+    vlc_bool_t b_insert_back;
+} vlc_DIR;
+
+void *vlc_opendir_wrapper( const char *psz_path )
+{
+    vlc_DIR *p_dir;
+    DIR *p_real_dir;
+
+    if ( psz_path == NULL || psz_path[0] == '\0'
+          || (psz_path[0] == '\\' && psz_path[1] == '\0') )
+    {
+        /* Special mode to list drive letters */
+        p_dir = malloc( sizeof(vlc_DIR) );
+        p_dir->p_real_dir = NULL;
+        p_dir->i_drives = GetLogicalDrives();
+        return (void *)p_dir;
+    }
+
+    p_real_dir = opendir( psz_path );
+    if ( p_real_dir == NULL )
+        return NULL;
+
+    p_dir = malloc( sizeof(vlc_DIR) );
+    p_dir->p_real_dir = p_real_dir;
+    p_dir->b_insert_back = ( psz_path[1] == ':' && psz_path[2] == '\\'
+                              && psz_path[3] =='\0' );
+    return (void *)p_dir;
+}
+
+struct dirent *vlc_readdir_wrapper( void *_p_dir )
+{
+    vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
+    unsigned int i;
+    DWORD i_drives;
+
+    if ( p_dir->p_real_dir != NULL )
+    {
+        if ( p_dir->b_insert_back )
+        {
+            p_dir->dd_dir.d_ino = 0;
+            p_dir->dd_dir.d_reclen = 0;
+            p_dir->dd_dir.d_namlen = 2;
+            strcpy( p_dir->dd_dir.d_name, ".." );
+            p_dir->b_insert_back = VLC_FALSE;
+            return &p_dir->dd_dir;
+        }
+
+        return readdir( p_dir->p_real_dir );
+    }
+
+    /* Drive letters mode */
+    i_drives = p_dir->i_drives;
+    if ( !i_drives )
+        return NULL; /* end */
+
+    for ( i = 0; i < sizeof(DWORD)*8; i++, i_drives >>= 1 )
+        if ( i_drives & 1 ) break;
+
+    if ( i >= 26 )
+        return NULL; /* this should not happen */
+
+    sprintf( p_dir->dd_dir.d_name, "%c:\\", 'A' + i );
+    p_dir->dd_dir.d_namlen = strlen(p_dir->dd_dir.d_name);
+    p_dir->i_drives &= ~(1UL << i);
+    return &p_dir->dd_dir;
+}
+
+int vlc_closedir_wrapper( void *_p_dir )
+{
+    vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
+
+    if ( p_dir->p_real_dir != NULL )
+    {
+        int i_ret = closedir( p_dir->p_real_dir );
+        free( p_dir );
+        return i_ret;
+    }
+
+    free( p_dir );
+    return 0;
+}
+#endif
+
+/*****************************************************************************
  * scandir: scan a directory alpha-sorted
  *****************************************************************************/
 #if !defined( HAVE_SCANDIR )
@@ -345,11 +443,11 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
     struct dirent ** pp_list;
     int              ret, size;
 
-    if( !namelist || !( p_dir = opendir( name ) ) ) return -1;
+    if( !namelist || !( p_dir = vlc_opendir_wrapper( name ) ) ) return -1;
 
     ret     = 0;
     pp_list = NULL;
-    while( ( p_content = readdir( p_dir ) ) )
+    while( ( p_content = vlc_readdir_wrapper( p_dir ) ) )
     {
         if( filter && !filter( p_content ) )
         {
@@ -362,7 +460,7 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
         ret++;
     }
 
-    closedir( p_dir );
+    vlc_closedir_wrapper( p_dir );
 
     if( compar )
     {

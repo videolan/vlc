@@ -361,55 +361,55 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
         {
             char value[512];
             char *psz;
-            mvar_t *itm = mvar_New( name, "set" );
+            mvar_t *itm = E_(mvar_New)( name, "set" );
 
             sprintf( value, "%d", ( p_pl->status.p_item == p_node )? 1 : 0 );
-            mvar_AppendNewVar( itm, "current", value );
+            E_(mvar_AppendNewVar)( itm, "current", value );
 
             sprintf( value, "%d", p_node->input.i_id );
-            mvar_AppendNewVar( itm, "index", value );
+            E_(mvar_AppendNewVar)( itm, "index", value );
 
             psz = E_(FromUTF8)( p_intf, p_node->input.psz_name );
-            mvar_AppendNewVar( itm, "name", psz );
+            E_(mvar_AppendNewVar)( itm, "name", psz );
             free( psz );
 
             psz = E_(FromUTF8)( p_intf, p_node->input.psz_uri );
-            mvar_AppendNewVar( itm, "uri", psz );
+            E_(mvar_AppendNewVar)( itm, "uri", psz );
             free( psz );
 
             sprintf( value, "Item");
-            mvar_AppendNewVar( itm, "type", value );
+            E_(mvar_AppendNewVar)( itm, "type", value );
 
             sprintf( value, "%d", i_depth );
-            mvar_AppendNewVar( itm, "depth", value );
+            E_(mvar_AppendNewVar)( itm, "depth", value );
 
-            mvar_AppendVar( s, itm );
+            E_(mvar_AppendVar)( s, itm );
         }
         else
         {
             char value[512];
             char *psz;
             int i_child;
-            mvar_t *itm = mvar_New( name, "set" );
+            mvar_t *itm = E_(mvar_New)( name, "set" );
 
             psz = E_(FromUTF8)( p_intf, p_node->input.psz_name );
-            mvar_AppendNewVar( itm, "name", psz );
-            mvar_AppendNewVar( itm, "uri", psz );
+            E_(mvar_AppendNewVar)( itm, "name", psz );
+            E_(mvar_AppendNewVar)( itm, "uri", psz );
             free( psz );
 
             sprintf( value, "Node" );
-            mvar_AppendNewVar( itm, "type", value );
+            E_(mvar_AppendNewVar)( itm, "type", value );
 
             sprintf( value, "%d", p_node->input.i_id );
-            mvar_AppendNewVar( itm, "index", value );
+            E_(mvar_AppendNewVar)( itm, "index", value );
 
             sprintf( value, "%d", p_node->i_children);
-            mvar_AppendNewVar( itm, "i_children", value );
+            E_(mvar_AppendNewVar)( itm, "i_children", value );
 
             sprintf( value, "%d", i_depth );
-            mvar_AppendNewVar( itm, "depth", value );
+            E_(mvar_AppendNewVar)( itm, "depth", value );
 
-            mvar_AppendVar( s, itm );
+            E_(mvar_AppendVar)( s, itm );
 
             for (i_child = 0 ; i_child < p_node->i_children ; i_child++)
                 E_(PlaylistListNode)( p_intf, p_pl,
@@ -871,7 +871,7 @@ char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
                 }
                 else
                 {
-                    memmove( psz_dir, p + 1, strlen(p + 1) + 1 );
+                    memmove( psz_dir, p, strlen(p) + 1 );
                     p = psz_dir + 3;
                 }
             }

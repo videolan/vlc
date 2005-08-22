@@ -932,6 +932,16 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   endif
 #endif
 
+#if defined(WIN32) || defined(UNDER_CE)
+    VLC_EXPORT( void *, vlc_opendir_wrapper, ( const char * ) );
+    VLC_EXPORT( struct dirent *, vlc_readdir_wrapper, ( void * ) );
+    VLC_EXPORT( int, vlc_closedir_wrapper, ( void * ) );
+#else
+#   define vlc_opendir_wrapper opendir
+#   define vlc_readdir_wrapper readdir
+#   define vlc_closedir_wrapper closedir
+#endif
+
 /* Format type specifiers for 64 bits numbers */
 #if defined(__CYGWIN32__) || (!defined(WIN32) && !defined(UNDER_CE))
 #   if defined(__WORDSIZE) && __WORDSIZE == 64

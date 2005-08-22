@@ -10,7 +10,7 @@
 /*
  * In an ideal world, plugins would include all the headers they need.
  * But of course, many, if not all, of them don't, so we have to make sure
- * the while libvlc API is defined here in any case when included from a
+ * the whole libvlc API is defined here in any case when included from a
  * plugin.
  */
 #  ifdef __PLUGIN__
@@ -193,9 +193,11 @@ void __msg_Warn (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
 httpd_host_t * httpd_TLSHostNew (vlc_object_t *, const char *, int, const char *, const char *, const char *, const char *);
 int vlc_scandir (const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ));
 int sout_AccessOutWrite (sout_access_out_t *, block_t *);
+struct dirent * vlc_readdir_wrapper (void *);
 void config_UnsetCallbacks (module_config_t *);
 void vout_SynchroRelease (vout_synchro_t *);
 void __msg_Generic (vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5);
+int vlc_closedir_wrapper (void *);
 int playlist_ServicesDiscoveryAdd (playlist_t *, const char *);
 char * vlc_strndup (const char *s, size_t n);
 void vout_PlacePicture (vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
@@ -336,6 +338,7 @@ void block_FifoEmpty (block_fifo_t *);
 int playlist_ItemAddOption (playlist_item_t *, const char *);
 void aout_VolumeNoneInit (aout_instance_t *);
 void aout_DateInit (audio_date_t *, uint32_t);
+void * vlc_opendir_wrapper (const char *);
 void vlc_list_release (vlc_list_t *);
 subpicture_t * spu_SortSubpictures (spu_t *, mtime_t);
 playlist_item_t * playlist_LockItemGetByInput (playlist_t *,input_item_t *);
@@ -830,6 +833,9 @@ struct module_symbols_t
     const char * (*VLC_Version_inner) (void);
     const char * (*VLC_CompileTime_inner) (void);
     int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
+    struct dirent * (*vlc_readdir_wrapper_inner) (void *);
+    int (*vlc_closedir_wrapper_inner) (void *);
+    void * (*vlc_opendir_wrapper_inner) (const char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1229,6 +1235,9 @@ struct module_symbols_t
 #  define VLC_Version (p_symbols)->VLC_Version_inner
 #  define VLC_CompileTime (p_symbols)->VLC_CompileTime_inner
 #  define playlist_PreparseEnqueueItem (p_symbols)->playlist_PreparseEnqueueItem_inner
+#  define vlc_readdir_wrapper (p_symbols)->vlc_readdir_wrapper_inner
+#  define vlc_closedir_wrapper (p_symbols)->vlc_closedir_wrapper_inner
+#  define vlc_opendir_wrapper (p_symbols)->vlc_opendir_wrapper_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1631,6 +1640,9 @@ struct module_symbols_t
     ((p_symbols)->VLC_Version_inner) = VLC_Version; \
     ((p_symbols)->VLC_CompileTime_inner) = VLC_CompileTime; \
     ((p_symbols)->playlist_PreparseEnqueueItem_inner) = playlist_PreparseEnqueueItem; \
+    ((p_symbols)->vlc_readdir_wrapper_inner) = vlc_readdir_wrapper; \
+    ((p_symbols)->vlc_closedir_wrapper_inner) = vlc_closedir_wrapper; \
+    ((p_symbols)->vlc_opendir_wrapper_inner) = vlc_opendir_wrapper; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \

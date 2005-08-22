@@ -473,28 +473,28 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
         aout_VolumeGet( p_args->p_intf , &i_volume );
         sprintf( volume , "%d" , (int)i_volume );
 
-        p_args->vars = mvar_New( "variables", "" );
-        mvar_AppendNewVar( p_args->vars, "url_param",
+        p_args->vars = E_(mvar_New)( "variables", "" );
+        E_(mvar_AppendNewVar)( p_args->vars, "url_param",
                            i_request > 0 ? "1" : "0" );
-        mvar_AppendNewVar( p_args->vars, "url_value", p_request );
-        mvar_AppendNewVar( p_args->vars, "version", VLC_Version() );
-        mvar_AppendNewVar( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
-        mvar_AppendNewVar( p_args->vars, "vlc_compile_time",
+        E_(mvar_AppendNewVar)( p_args->vars, "url_value", p_request );
+        E_(mvar_AppendNewVar)( p_args->vars, "version", VLC_Version() );
+        E_(mvar_AppendNewVar)( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
+        E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_time",
                            VLC_CompileTime() );
-        mvar_AppendNewVar( p_args->vars, "vlc_compile_by", VLC_CompileBy() );
-        mvar_AppendNewVar( p_args->vars, "vlc_compile_host",
+        E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_by", VLC_CompileBy() );
+        E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_host",
                            VLC_CompileHost() );
-        mvar_AppendNewVar( p_args->vars, "vlc_compile_domain",
+        E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_domain",
                            VLC_CompileDomain() );
-        mvar_AppendNewVar( p_args->vars, "vlc_compiler", VLC_Compiler() );
-        mvar_AppendNewVar( p_args->vars, "vlc_changeset", VLC_Changeset() );
-        mvar_AppendNewVar( p_args->vars, "stream_position", position );
-        mvar_AppendNewVar( p_args->vars, "stream_time", time );
-        mvar_AppendNewVar( p_args->vars, "stream_length", length );
-        mvar_AppendNewVar( p_args->vars, "volume", volume );
-        mvar_AppendNewVar( p_args->vars, "stream_state", state );
+        E_(mvar_AppendNewVar)( p_args->vars, "vlc_compiler", VLC_Compiler() );
+        E_(mvar_AppendNewVar)( p_args->vars, "vlc_changeset", VLC_Changeset() );
+        E_(mvar_AppendNewVar)( p_args->vars, "stream_position", position );
+        E_(mvar_AppendNewVar)( p_args->vars, "stream_time", time );
+        E_(mvar_AppendNewVar)( p_args->vars, "stream_length", length );
+        E_(mvar_AppendNewVar)( p_args->vars, "volume", volume );
+        E_(mvar_AppendNewVar)( p_args->vars, "stream_state", state );
 
-        SSInit( &p_args->stack );
+        E_(SSInit)( &p_args->stack );
 
         /* first we load in a temporary buffer */
         E_(FileLoad)( f, &p_buffer, &i_buffer );
@@ -510,8 +510,8 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
         *dst     = '\0';
         *pi_data = dst - *pp_data;
 
-        SSClean( &p_args->stack );
-        mvar_Delete( p_args->vars );
+        E_(SSClean)( &p_args->stack );
+        E_(mvar_Delete)( p_args->vars );
         free( p_buffer );
     }
 
