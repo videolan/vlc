@@ -1,6 +1,7 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = ITSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
         {CLASS = MPSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
         {CLASS = VLBrushedMetalImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
         {CLASS = VLCApplication; LANGUAGE = ObjC; SUPERCLASS = NSApplication; }, 
