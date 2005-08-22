@@ -1417,8 +1417,8 @@ void wxVolCtrl::OnChange( wxMouseEvent& event )
 {
     if( !event.LeftDown() && !event.LeftIsDown() ) return;
 
-    int i_volume = event.GetX() * 200 / GetClientSize().GetWidth();
-    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
+    int i_volume = event.GetX() * 400 / GetClientSize().GetWidth();
+    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 400 / 2 );
     UpdateVolume();
 }
 
@@ -1427,7 +1427,7 @@ void wxVolCtrl::UpdateVolume()
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
 
-    int i_gauge_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
+    int i_gauge_volume = i_volume * 400 * 2 / AOUT_VOLUME_MAX;
     if( i_gauge_volume == GetValue() ) return;
 
     SetValue( i_gauge_volume );
