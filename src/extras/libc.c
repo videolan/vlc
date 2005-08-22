@@ -422,6 +422,19 @@ int vlc_closedir_wrapper( void *_p_dir )
     free( p_dir );
     return 0;
 }
+#else
+void *vlc_opendir_wrapper( const char *psz_path )
+{
+    return (void *)opendir( psz_path );
+}
+struct dirent *vlc_readdir_wrapper( void *_p_dir )
+{
+    return readdir( (DIR *)_p_dir );
+}
+int vlc_closedir_wrapper( void *_p_dir )
+{
+    return closedir( (DIR *)_p_dir );
+}
 #endif
 
 /*****************************************************************************
