@@ -559,7 +559,6 @@ static VLCTreeItem *o_root_item = nil;
                     break;
                 default:
                 {
-                NSLog( @"one" );
                     VLCConfigControl *o_control = nil;
                     o_control = [VLCConfigControl newControl:p_item
                                                   withView:o_view];
