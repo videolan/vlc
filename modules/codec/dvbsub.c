@@ -268,7 +268,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys;
     vlc_value_t    val;
-    int posx, posy;    
+    int i_posx, i_posy;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('d','v','b','s') )
     {
@@ -287,34 +287,28 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_cluts        = NULL;
     p_sys->p_page         = NULL;
 
-    var_Create( p_this, DVBSUB_CFG_PREFIX "position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, DVBSUB_CFG_PREFIX "position",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, DVBSUB_CFG_PREFIX "position", &val );
     p_sys->i_spu_position = val.i_int;
-    var_Create( p_this, DVBSUB_CFG_PREFIX "x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, DVBSUB_CFG_PREFIX "x",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, DVBSUB_CFG_PREFIX "x", &val );
-    posx = val.i_int;
-    var_Create( p_this, DVBSUB_CFG_PREFIX "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    i_posx = val.i_int;
+    var_Create( p_this, DVBSUB_CFG_PREFIX "y",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, DVBSUB_CFG_PREFIX "y", &val );
-    posy = val.i_int;
+    i_posy = val.i_int;
 
     /* Check if subpicture position was overridden */
     p_sys->b_absolute = VLC_TRUE;
-    if( posx < 0 || posy < 0)
+    p_sys->i_spu_x = p_sys->i_spu_y = 0;
+
+    if( i_posx >= 0 && i_posy >= 0 )
     {
         p_sys->b_absolute = VLC_FALSE;
-        p_sys->i_spu_x = 0;
-        p_sys->i_spu_y = 0;
-    }
-    else if( posx >= 0 || posy >= 0 )
-    {
-        p_sys->i_spu_x = posx;
-        p_sys->i_spu_y = posy;
-    }
-    else if( p_sys->i_spu_x < 0 || p_sys->i_spu_y < 0 )
-    {
-        p_sys->b_absolute = VLC_FALSE;
-        p_sys->i_spu_x = 0;
-        p_sys->i_spu_y = 0;
+        p_sys->i_spu_x = i_posx;
+        p_sys->i_spu_y = i_posy;
     }
 
     es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 'd','v','b','s' ) );
