@@ -1076,7 +1076,7 @@ update-po:
 	    | sort ; \
 	} > $(top_srcdir)/po/POTFILES.in
 	rm -f $(top_srcdir)/po/vlc.pot
-	cd po && $(MAKE) POTFILES $(top_srcdir)/../po/vlc.pot update-po
+	cd po && $(MAKE) POTFILES vlc.pot update-po
 
 #cd po && $(MAKE) update-po
 
