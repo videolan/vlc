@@ -520,8 +520,8 @@ void __osd_MenuDown( vlc_object_t *p_this )
         }
     }
 #if defined(OSD_MENU_DEBUG)
-    msg_Dbg( p_osd, "direction down [button %s]", p_osd->p_state->p_visible->psz_action );            
-#endif            
+    msg_Dbg( p_osd, "direction down [button %s]", p_osd->p_state->p_visible->psz_action ); 
+#endif
 
     vlc_object_release( (vlc_object_t*) p_osd );
     vlc_mutex_unlock( lockval.p_address );
