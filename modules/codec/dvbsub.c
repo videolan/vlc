@@ -837,7 +837,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
     {
         if( p_region->p_pixbuf )
         {
-            msg_Dbg( p_dec, " changed (not allowed)" );
+            msg_Dbg( p_dec, "region size changed (not allowed)" );
             free( p_region->p_pixbuf );
         }
 
@@ -1392,7 +1392,7 @@ static subpicture_t *render( decoder_t *p_dec )
         fmt.i_height = fmt.i_visible_height = p_region->i_height;
         fmt.i_x_offset = fmt.i_y_offset = 0;
         p_spu_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-        if( !p_region )
+        if( !p_spu_region )
         {
             msg_Err( p_dec, "cannot allocate SPU region" );
             continue;
@@ -1431,7 +1431,7 @@ static subpicture_t *render( decoder_t *p_dec )
          * (since there are not rendered in the pixbuffer) */
         for( j = 0; j < p_region->i_object_defs; j++ )
         {
-            dvbsub_objectdef_t *p_object_def = &p_region->p_object_defs[i];
+            dvbsub_objectdef_t *p_object_def = &p_region->p_object_defs[j];
 
             if( p_object_def->i_type != 1 || !p_object_def->psz_text )
                 continue;
