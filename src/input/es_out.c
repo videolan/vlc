@@ -1058,6 +1058,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 static void EsOutDel( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t *p_sys = out->p_sys;
+    vlc_bool_t b_reselect = VLC_FALSE;
+    int i;
 
     /* We don't try to reselect */
     if( es->p_dec )
@@ -1073,6 +1075,9 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     {
         msg_Dbg( p_sys->p_input, "Program doesn't contain anymore ES" );
     }
+
+    if( p_sys->p_es_audio == es || p_sys->p_es_video == es ||
+        p_sys->p_es_sub == es ) b_reselect = VLC_TRUE;
 
     if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
     if( p_sys->p_es_video == es ) p_sys->p_es_video = NULL;
@@ -1090,6 +1095,14 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
             p_sys->i_video--;
             break;
     }
+
+    /* Re-select another track when needed */
+    if( b_reselect )
+        for( i = 0; i < p_sys->i_es; i++ )
+        {
+            if( es->fmt.i_cat == p_sys->es[i]->fmt.i_cat )
+                EsOutSelect( out, p_sys->es[i], VLC_FALSE );
+        }
 
     if( es->psz_language )
         free( es->psz_language );
