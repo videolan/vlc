@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <math.h>
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
@@ -463,49 +462,49 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_3SEC && b_seekable )
             {
-                val.i_time = (-3000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (-3000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_3SEC && b_seekable )
             {
-                val.i_time = (3000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (3000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC && b_seekable )
             {
-                val.i_time = (-10000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (-10000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC && b_seekable )
             {
-                val.i_time = (10000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (10000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN && b_seekable )
             {
-                val.i_time = (-60000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (-60000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN && b_seekable )
             {
-                val.i_time = (60000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (60000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN && b_seekable )
             {
-                val.i_time = (-300000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (-300000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN && b_seekable )
             {
-                val.i_time = (300000000 * ((mtime_t)pow(2,i_times)));
+                val.i_time = (300000000 * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
