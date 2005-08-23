@@ -66,14 +66,11 @@
     "OSD menu pictures get a default timeout of 15 seconds added to their remaining time." \
     "This will ensure that they are at least the specified time visible.")
 
-#define OSD_REPEAT_TEXT N_("Repeat the same OSD menu pictures n-times (default is 2)")
-#define OSD_REPEAT_LONGTEXT N_( \
-    "Resend the same OSD menu picture n-times. In an environment where " \
-    "transmissions errors occur having a little redundancy is helpfull." )
- 
-#define OSD_REPEAT_DELAY_TEXT N_("Delay the subsequent OSD menu pictures by n ms (default is 200ms) ")
-#define OSD_REPEAT_DELAY_LONGTEXT N_( \
-    "Delay the resending of the OSD menu picture for at least n-ms." )
+#define OSD_UPDATE_TEXT N_("Update speed of OSD menu pictures in ms (default is 200ms)")
+#define OSD_UPDATE_LONGTEXT N_( \
+    "Update the OSD menu picture every 200ms (default). Shorten the update time for " \
+    "environments that experience transmissions errors. Be carefull with this option " \
+    "because encoding OSD menu pictures is very computing intensive. The range is 0 - 1000 ms." )
     
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =
@@ -97,6 +94,10 @@ static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
 #define OSD_DEFAULT_CFG "share/osdmenu/default.cfg"
 #endif
 
+#define OSD_UPDATE_MIN     0
+#define OSD_UPDATE_DEFAULT 0
+#define OSD_UPDATE_MAX     1000        
+
 vlc_module_begin();
     add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
@@ -106,12 +107,11 @@ vlc_module_begin();
         OSD_FILE_LONGTEXT, VLC_FALSE );
     add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT,
         OSD_PATH_LONGTEXT, VLC_FALSE );
-    add_integer( OSD_CFG "timeout", 0, NULL, TIMEOUT_TEXT,
+    add_integer( OSD_CFG "timeout", 15, NULL, TIMEOUT_TEXT,
         TIMEOUT_LONGTEXT, VLC_FALSE );
-    add_integer( OSD_CFG "repeat", 0, NULL, OSD_REPEAT_TEXT,
-        OSD_REPEAT_LONGTEXT, VLC_TRUE );
-    add_integer( OSD_CFG "repeat-delay", 200, NULL, OSD_REPEAT_DELAY_TEXT,
-        OSD_REPEAT_DELAY_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
+        OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,
+        OSD_UPDATE_LONGTEXT, VLC_TRUE );
 
     set_capability( "sub filter", 100 );
     set_description( N_("On Screen Display menu subfilter") );
@@ -135,15 +135,14 @@ struct filter_sys_t
 
     int          position;      /* relative positioning of SPU images */
     mtime_t      i_last_date;   /* last mdate SPU object has been sent to SPU subsytem */
-    int          i_timeout;     /* duration SPU object is valid on the video output in seconds */
+    mtime_t      i_timeout;     /* duration SPU object is valid on the video output in seconds */
 
     vlc_bool_t   b_absolute;    /* do we use absolute positioning or relative? */
     vlc_bool_t   b_update;      /* Update OSD Menu by sending SPU objects */
     vlc_bool_t   b_visible;     /* OSD Menu is visible */
-    int          i_repeat_delay;/* Delay OSD menu repeat by n-ms */
-    int          i_repeat;      /* default value to use for OSD menu repeat */
-    int          i_spu_repeat;  /* repeat OSD menu */
-
+    mtime_t      i_update;      /* Update the OSD menu every n ms */
+    mtime_t      i_end_date;    /* End data of display OSD menu */
+    
     char        *psz_file;      /* OSD Menu configuration file */
     osd_menu_t  *p_menu;        /* pointer to OSD Menu object */
 };
@@ -155,7 +154,7 @@ static int CreateFilter ( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     vlc_value_t val;
-    int posx, posy;
+    int i_posx, i_posy;
 
     p_filter->p_sys = (filter_sys_t *) malloc( sizeof( filter_sys_t ) );
     if( !p_filter->p_sys )
@@ -182,22 +181,19 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_filter->p_sys->position = val.i_int;
     var_Create( p_this, OSD_CFG "x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, OSD_CFG "x", &val );
-    posx = val.i_int;
+    i_posx = val.i_int;
     var_Create( p_this, OSD_CFG "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, OSD_CFG "y", &val );
-    posy = val.i_int;
+    i_posy = val.i_int;
+    
+    /* in micro seconds - divide by 2 to match user expectations */
     var_Create( p_this, OSD_CFG "timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, OSD_CFG "timeout", &val );
-    p_filter->p_sys->i_timeout = val.i_int; /* in seconds */
+    p_filter->p_sys->i_timeout = (mtime_t)(val.i_int * 1000000) >> 2; 
+    var_Create( p_this, OSD_CFG "update", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, OSD_CFG "update", &val );
+    p_filter->p_sys->i_update = (mtime_t)(val.i_int * 1000); /* in micro seconds */
 
-    /* repeat the OSD menu n-times */
-    var_Create( p_this, OSD_CFG "repeat", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, OSD_CFG "repeat", &val );
-    p_filter->p_sys->i_repeat = val.i_int;    
-    var_Create( p_this, OSD_CFG "repeat-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, OSD_CFG "repeat-delay", &val );
-    p_filter->p_sys->i_repeat_delay = val.i_int;
-    
     /* Load the osd menu subsystem */
     p_filter->p_sys->p_menu = osd_MenuCreate( p_this, p_filter->p_sys->psz_file );
     if( p_filter->p_sys->p_menu == NULL )
@@ -205,17 +201,16 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     /* Check if menu position was overridden */
     p_filter->p_sys->b_absolute = VLC_TRUE;
-
-    if( posx < 0 || posy < 0)
+    if( i_posx < 0 || i_posy < 0)
     {
         p_filter->p_sys->b_absolute = VLC_FALSE;
         p_filter->p_sys->p_menu->i_x = 0;
         p_filter->p_sys->p_menu->i_y = 0;
     }
-    else if( posx >= 0 || posy >= 0 )
+    else if( i_posx >= 0 || i_posy >= 0 )
     {
-        p_filter->p_sys->p_menu->i_x = posx;
-        p_filter->p_sys->p_menu->i_y = posy;
+        p_filter->p_sys->p_menu->i_x = i_posx;
+        p_filter->p_sys->p_menu->i_y = i_posy;
     }
     else if( p_filter->p_sys->p_menu->i_x < 0 || p_filter->p_sys->p_menu->i_y < 0 )
     {
@@ -269,8 +264,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_this, OSD_CFG "y" );
     var_Destroy( p_this, OSD_CFG "position" );
     var_Destroy( p_this, OSD_CFG "timeout" );
-    var_Destroy( p_this, OSD_CFG "repeat" );
-    var_Destroy( p_this, OSD_CFG "repeat-delay" );
+    var_Destroy( p_this, OSD_CFG "update" );
 
     var_DelCallback( p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );
     var_DelCallback( p_sys->p_menu, "osd-menu-visible", OSDMenuVisibleEvent, p_filter );
@@ -302,7 +296,7 @@ static int OSDMenuUpdateEvent( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *) p_data;
 
     p_filter->p_sys->b_update = VLC_TRUE;
-    p_filter->p_sys->i_spu_repeat = p_filter->p_sys->i_repeat;
+    p_filter->p_sys->i_end_date = (mtime_t) 0;
     return VLC_SUCCESS;
 }
 
@@ -398,40 +392,39 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
 
-    if( !p_filter->p_sys->b_update )
+    if( !p_sys->b_update )
             return NULL;
-
-    /* use a window of 200ms by default */
-    if( ( p_filter->p_sys->i_spu_repeat < p_filter->p_sys->i_repeat ) &&
-        ( p_filter->p_sys->i_last_date +
-          (mtime_t)( p_filter->p_sys->i_repeat_delay * 1000 ) < i_date ) )
-    {
-#if 0
-        msg_Dbg( p_filter, " waiting a bit %d", p_filter->p_sys->i_spu_repeat );
-#endif        
-        return NULL;
-    }
-    p_filter->p_sys->i_last_date = i_date;
-        
-    /* repeat the OSD menu ? */
-    p_filter->p_sys->i_spu_repeat--;
-    if( p_filter->p_sys->i_spu_repeat <= 0 )
-        p_filter->p_sys->b_update = VLC_FALSE;
-#if 0
-    msg_Dbg( p_filter, "i_spu_repeat %d, i_repeat %d, i_date "I64Fd,
-         p_filter->p_sys->i_spu_repeat, p_filter->p_sys->i_repeat, i_date );
-#endif
+            
+    /* Am I too early? */
+    if( ( ( p_sys->i_last_date + p_sys->i_update ) > i_date ) &&
+        ( p_sys->i_end_date > 0 ) )
+        return NULL; /* we are too early, so wait */
     
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
-
-    p_spu->b_absolute = p_sys->b_absolute;
-    p_spu->i_start = p_sys->i_last_date = i_date; 
-    p_spu->i_stop = (p_sys->i_timeout == 0) ? 0 : i_date + (mtime_t)(p_sys->i_timeout * 1000000);
     p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_fade = VLC_TRUE;
+    p_spu->b_fade = VLC_TRUE;    
+    p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_flags = p_sys->position;
+
+    /* Determine the duration of the subpicture */
+    if( p_sys->i_end_date > 0 )
+    {
+        /* Display the subpicture again. */
+        p_spu->i_stop = p_sys->i_end_date - i_date;
+        if( ( i_date + p_sys->i_update ) >= p_sys->i_end_date )
+            p_sys->b_update = VLC_FALSE;
+    }
+    else
+    {
+        /* There is a new OSD picture to display */
+        p_spu->i_stop = i_date + p_sys->i_timeout;
+        p_sys->i_end_date = p_spu->i_stop;
+    }
+    
+    p_sys->i_last_date = i_date;
+    p_spu->i_start = p_sys->i_last_date = i_date;
 
     /* Send an empty subpicture to clear the display
      * when OSD menu should be hidden and menu picture is not allocated.
