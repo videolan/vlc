@@ -108,6 +108,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_pic_dst;
     int i_plane, i, j, k, l;
 
+    if( !p_pic ) return NULL;
+    
     /* Request output picture */
     p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
     if( !p_pic_dst )
