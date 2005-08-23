@@ -1125,19 +1125,19 @@ CPPFLAGS="${CPPFLAGS_save}"
 
 AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
     [ac_cv_c_altivec],
-    [# Darwin test
-     CFLAGS="${CFLAGS_save} -faltivec"
-     AC_TRY_COMPILE([],
+    [# Linux/PPC test (no flags)
+     CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -maltivec -mabi=altivec"
+     AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
+                     #include <altivec.h>
+                     #endif],
        [vec_ld(0, (unsigned char *)0);],
-       [ac_cv_c_altivec="-faltivec"],
-       [# Linux/PPC test (no flags)
-        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -maltivec -mabi=altivec"
-        AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
-                        #include <altivec.h>
-                        #endif],
+       [ac_cv_c_altivec=""
+        ac_cv_c_altivec_abi="-maltivec -mabi=altivec"],
+       [# Darwin test
+        CFLAGS="${CFLAGS_save} -faltivec"
+        AC_TRY_COMPILE([],
           [vec_ld(0, (unsigned char *)0);],
-          [ac_cv_c_altivec=""
-           ac_cv_c_altivec_abi="-maltivec -mabi=altivec"],
+          [ac_cv_c_altivec="-faltivec"],
           [# Linux/PPC test (old GCC versions)
            CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -fvec"
            AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
