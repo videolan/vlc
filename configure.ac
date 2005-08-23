@@ -73,38 +73,42 @@ AC_C_INLINE
 dnl
 dnl  Check for the contrib directory
 dnl
-topdir="`dirname $0`"
-if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
-  topdir="`pwd`/$topdir"
-fi
+AC_ARG_WITH(contrib,
+    [  --without-contrib       do not use the libraries in extras/contrib],[],[])
+  if test "${with_contrib}" != "no"; then 
 
-if test -d ${topdir}/extras/contrib/lib; then
-  export PATH=${topdir}/extras/contrib/bin:$PATH
-  CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
-  CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
-  CFLAGS="${CFLAGS} -I${topdir}/extras/contrib/include"
-  CFLAGS_save="${CFLAGS_save} -I${topdir}/extras/contrib/include"
-  CXXFLAGS="${CXXFLAGS} -I${topdir}/extras/contrib/include"
-  CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
-  OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
-  OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
-  if test -d ${topdir}/extras/contrib/vlc-lib; then
-    LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/vlc-lib"
-    LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/vlc-lib"
-  fi
-  LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
-  LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
-  with_livedotcom_tree=${topdir}/extras/contrib/src/live
-  with_goom_tree=${topdir}/extras/contrib/src/goom
-  if test ".`uname -s`" = ".Darwin"; then
-    export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
-    export DYLD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$DYLD_LIBRARY_PATH
-  elif test ".`uname -s`" = ".BeOS"; then
-    export LIBRARY_PATH=${topdir}/extras/contrib/lib:$LIBRARY_PATH
-    export BELIBRARIES=${topdir}/extras/contrib/lib:$BELIBRARIES
+    topdir="`dirname $0`"
+    if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
+       topdir="`pwd`/$topdir"
+    fi
+
+  if test -d ${topdir}/extras/contrib/lib; then
+    export PATH=${topdir}/extras/contrib/bin:$PATH
+    CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
+    CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
+    CFLAGS="${CFLAGS} -I${topdir}/extras/contrib/include"
+    CFLAGS_save="${CFLAGS_save} -I${topdir}/extras/contrib/include"
+    CXXFLAGS="${CXXFLAGS} -I${topdir}/extras/contrib/include"
+    CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
+    OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
+    if test -d ${topdir}/extras/contrib/vlc-lib; then
+      LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/vlc-lib"
+      LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/vlc-lib"
+    fi
+    LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
+    LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
+    with_livedotcom_tree=${topdir}/extras/contrib/src/live
+    with_goom_tree=${topdir}/extras/contrib/src/goom
+    if test ".`uname -s`" = ".Darwin"; then
+      export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
+      export DYLD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$DYLD_LIBRARY_PATH
+    elif test ".`uname -s`" = ".BeOS"; then
+      export LIBRARY_PATH=${topdir}/extras/contrib/lib:$LIBRARY_PATH
+      export BELIBRARIES=${topdir}/extras/contrib/lib:$BELIBRARIES
+    fi
   fi
 fi
-
 dnl
 dnl  Set default values
 dnl
