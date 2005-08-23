@@ -655,7 +655,7 @@ AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h stdbool.h getopt.h strings.h i
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-AC_CHECK_HEADERS(machine/param.h sys/shm.h altivec.h)
+AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS(linux/version.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
@@ -1107,6 +1107,17 @@ if test "${ac_cv_altivec_inline}" != "no"; then
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
+
+dnl Check for <altivec.h>, gcc 4.x needs -maltivec for it
+AC_CACHE_CHECK([if \$CC accepts -maltivec],
+    [ac_cv_c_maltivec],
+    [CFLAGS="${CFLAGS_save} -maltivec"
+     AC_TRY_COMPILE([],,ac_cv_c_maltivec=yes, ac_cv_c_maltivec=no)])
+if test "${ac_cv_c_maltivec}" != "no"; then
+  CPPFLAGS="${CPPFLAGS_save} -maltivec"
+fi
+AC_CHECK_HEADERS(altivec.h)
+CPPFLAGS="${CPPFLAGS_save}"
 
 AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
     [ac_cv_c_altivec],
