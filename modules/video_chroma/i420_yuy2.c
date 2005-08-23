@@ -30,7 +30,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
-#ifdef HAVE_ALTIVEC_H
+#if defined (MODULE_NAME_IS_i420_yuy2_altivec) && defined(HAVE_ALTIVEC_H)
 #   include <altivec.h>
 #endif
 
