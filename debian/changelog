@@ -1,3 +1,30 @@
+vlc (0.8.4-svn20050823-1) unstable; urgency=low
+
+  * New SVN snapshot.
+  * debian/control:
+    + Build-depend on libsmbclient-dev.
+    + Build-depend on libwxgtk2.6-dev (Closes: #285373), which means the
+      interface now works with non-UTF8 locales (Closes: #308770, #322665).
+    + Build-depend on a newer version of libavcodec.
+  * debian/rules:
+    + Activated SMB client support.
+    + Install desktop files in usr/share/applications instead of
+      usr/share/gnome/apps/Multimedia.
+  * debian/patches/00list:
+    + 20_no-wx-updates.dpatch: disabled the update check.
+    + 20_interfaces.dpatch: disabled deprecated patch.
+  * configure.ac:
+    + Fixes powerpc build.
+  * include/network.h src/misc/net.c:
+    + Fixes HTTP input (Closes: #322757).
+    + Fixes URL encoding in the RTSP module (Closes: #323813).
+  * modules/gui/skins2 modules/gui/wxwidgets:
+    + Fixes a compilation issue on 64-bit architectures (Closes: #324031).
+  * modules/visualization/xosd.c:
+    + Fixes libxosd initialisation (Closes: #324039).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Mon, 22 Aug 2005 14:43:48 +0200
+
 vlc (0.8.4-svn20050810-2) unstable; urgency=low
 
   * debian/control:

@@ -38,7 +38,7 @@ CONFIG_FLAGS += \
 	--enable-ogg \
 	--enable-vorbis \
 	--enable-wxwidgets \
-	--with-wx-config=wxgtk-2.4-config \
+	--with-wx-config=wx-config \
 	--disable-slp \
 	--enable-flac \
 	--disable-skins \
@@ -62,6 +62,7 @@ CONFIG_FLAGS += \
 	--enable-gnutls \
 	--enable-ffmpeg \
 	--enable-ncurses \
+	--enable-smb \
 	$(NULL)
 
 # These ones are currently shipped with VLC
@@ -80,7 +81,7 @@ CONFIG_FLAGS += --enable-dvd --without-dvdcss
 # A few shortcuts
 VIDDIR = usr/share/vlc
 PIXDIR = usr/share/pixmaps
-GNOMEDIR = usr/share/gnome/apps/Multimedia
+APPDIR = usr/share/applications
 
 #
 # Build rules
@@ -196,8 +197,8 @@ install: build
 	# Package: vlc
 	mv debian/vlc/$(VIDDIR)/vlc48x48.png debian/vlc/$(PIXDIR)/vlc.png
 	mv debian/vlc/$(VIDDIR)/vlc32x32.xpm debian/vlc/$(VIDDIR)/vlc.xpm
-	cp debian/gvlc.desktop debian/gvlc/$(GNOMEDIR)
-	cp debian/gnome-vlc.desktop debian/gnome-vlc/$(GNOMEDIR)
+	cp debian/gvlc.desktop debian/gvlc/$(APPDIR)
+	cp debian/gnome-vlc.desktop debian/gnome-vlc/$(APPDIR)
 
 	#cp doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc
 	#strfile doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc.dat
@@ -310,7 +311,7 @@ endif
 	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
 	cp debian/vlc/$(VIDDIR)/vlc.xpm debian/wxvlc/$(VIDDIR)/wxvlc.xpm
-	cp debian/vlc.desktop debian/wxvlc/$(GNOMEDIR)
+	cp debian/vlc.desktop debian/wxvlc/$(APPDIR)
 	mv debian/vlc/usr/lib/vlc/gui/libwxwidgets_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
 	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz
