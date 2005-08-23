@@ -244,9 +244,7 @@ void __osd_MenuHide( vlc_object_t *p_this )
 #endif
     osd_UpdateState( p_osd->p_state,
                 p_osd->p_state->i_x, p_osd->p_state->i_y,
-                p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
-                p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
-                NULL );
+                0, 0, NULL );
     osd_SetMenuUpdate( p_osd, VLC_TRUE );
 
     vlc_object_release( (vlc_object_t*) p_osd );
@@ -566,7 +564,6 @@ void __osd_Volume( vlc_object_t *p_this )
         /* Update the volume state images to match the current volume */
         i_volume = config_GetInt( p_this, "volume" );
         i_steps = osd_VolumeStep( p_this, i_volume, p_button->i_ranges );
-        msg_Err( p_this, "OSD steps=%d", i_steps );
         p_button->p_current_state = osd_VolumeStateChange( p_button->p_states, i_steps );
 
         osd_UpdateState( p_osd->p_state,
