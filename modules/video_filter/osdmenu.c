@@ -66,6 +66,15 @@
     "OSD menu pictures get a default timeout of 15 seconds added to their remaining time." \
     "This will ensure that they are at least the specified time visible.")
 
+#define OSD_REPEAT_TEXT N_("Repeat the same OSD menu pictures n-times (default is 2)")
+#define OSD_REPEAT_LONGTEXT N_( \
+    "Resend the same OSD menu picture n-times. In an environment where " \
+    "transmissions errors occur having a little redundancy is helpfull." )
+ 
+#define OSD_REPEAT_DELAY_TEXT N_("Delay the subsequent OSD menu pictures by n ms (default is 200ms) ")
+#define OSD_REPEAT_DELAY_LONGTEXT N_( \
+    "Delay the resending of the OSD menu picture for at least n-ms." )
+    
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -93,9 +102,16 @@ vlc_module_begin();
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT, OSD_FILE_LONGTEXT, VLC_FALSE );
-    add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT, OSD_PATH_LONGTEXT, VLC_FALSE );
-    add_integer( OSD_CFG "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );
+    add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT,
+        OSD_FILE_LONGTEXT, VLC_FALSE );
+    add_string( OSD_CFG "file-path", NULL, NULL, OSD_PATH_TEXT,
+        OSD_PATH_LONGTEXT, VLC_FALSE );
+    add_integer( OSD_CFG "timeout", 0, NULL, TIMEOUT_TEXT,
+        TIMEOUT_LONGTEXT, VLC_FALSE );
+    add_integer( OSD_CFG "repeat", 0, NULL, OSD_REPEAT_TEXT,
+        OSD_REPEAT_LONGTEXT, VLC_TRUE );
+    add_integer( OSD_CFG "repeat-delay", 200, NULL, OSD_REPEAT_DELAY_TEXT,
+        OSD_REPEAT_DELAY_LONGTEXT, VLC_TRUE );
 
     set_capability( "sub filter", 100 );
     set_description( N_("On Screen Display menu subfilter") );
@@ -124,6 +140,9 @@ struct filter_sys_t
     vlc_bool_t   b_absolute;    /* do we use absolute positioning or relative? */
     vlc_bool_t   b_update;      /* Update OSD Menu by sending SPU objects */
     vlc_bool_t   b_visible;     /* OSD Menu is visible */
+    int          i_repeat_delay;/* Delay OSD menu repeat by n-ms */
+    int          i_repeat;      /* default value to use for OSD menu repeat */
+    int          i_spu_repeat;  /* repeat OSD menu */
 
     char        *psz_file;      /* OSD Menu configuration file */
     osd_menu_t  *p_menu;        /* pointer to OSD Menu object */
@@ -171,6 +190,14 @@ static int CreateFilter ( vlc_object_t *p_this )
     var_Get( p_this, OSD_CFG "timeout", &val );
     p_filter->p_sys->i_timeout = val.i_int; /* in seconds */
 
+    /* repeat the OSD menu n-times */
+    var_Create( p_this, OSD_CFG "repeat", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, OSD_CFG "repeat", &val );
+    p_filter->p_sys->i_repeat = val.i_int;    
+    var_Create( p_this, OSD_CFG "repeat-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, OSD_CFG "repeat-delay", &val );
+    p_filter->p_sys->i_repeat_delay = val.i_int;
+    
     /* Load the osd menu subsystem */
     p_filter->p_sys->p_menu = osd_MenuCreate( p_this, p_filter->p_sys->psz_file );
     if( p_filter->p_sys->p_menu == NULL )
@@ -201,7 +228,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_filter->p_sys->i_last_date = mdate();
 
     /* Keep track of OSD Events */
-    p_filter->p_sys->b_update = VLC_FALSE;
+    p_filter->p_sys->b_update  = VLC_FALSE;
     p_filter->p_sys->b_visible = VLC_FALSE;
 
     var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );        
@@ -242,6 +269,8 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_this, OSD_CFG "y" );
     var_Destroy( p_this, OSD_CFG "position" );
     var_Destroy( p_this, OSD_CFG "timeout" );
+    var_Destroy( p_this, OSD_CFG "repeat" );
+    var_Destroy( p_this, OSD_CFG "repeat-delay" );
 
     var_DelCallback( p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );
     var_DelCallback( p_sys->p_menu, "osd-menu-visible", OSDMenuVisibleEvent, p_filter );
@@ -273,6 +302,7 @@ static int OSDMenuUpdateEvent( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *) p_data;
 
     p_filter->p_sys->b_update = VLC_TRUE;
+    p_filter->p_sys->i_spu_repeat = p_filter->p_sys->i_repeat;
     return VLC_SUCCESS;
 }
 
@@ -368,11 +398,30 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
 
-    if( !p_filter->p_sys->b_update ) return NULL;
+    if( !p_filter->p_sys->b_update )
+            return NULL;
 
+    /* use a window of 200ms by default */
+    if( ( p_filter->p_sys->i_spu_repeat < p_filter->p_sys->i_repeat ) &&
+        ( p_filter->p_sys->i_last_date +
+          (mtime_t)( p_filter->p_sys->i_repeat_delay * 1000 ) < i_date ) )
+    {
+#if 0
+        msg_Dbg( p_filter, " waiting a bit %d", p_filter->p_sys->i_spu_repeat );
+#endif        
+        return NULL;
+    }
     p_filter->p_sys->i_last_date = i_date;
-    p_filter->p_sys->b_update = VLC_FALSE; 
-
+        
+    /* repeat the OSD menu ? */
+    p_filter->p_sys->i_spu_repeat--;
+    if( p_filter->p_sys->i_spu_repeat <= 0 )
+        p_filter->p_sys->b_update = VLC_FALSE;
+#if 0
+    msg_Dbg( p_filter, "i_spu_repeat %d, i_repeat %d, i_date "I64Fd,
+         p_filter->p_sys->i_spu_repeat, p_filter->p_sys->i_repeat, i_date );
+#endif
+    
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
@@ -383,7 +432,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_fade = VLC_TRUE;
     p_spu->i_flags = p_sys->position;
-    p_filter->p_sys->b_update = VLC_FALSE; 
 
     /* Send an empty subpicture to clear the display
      * when OSD menu should be hidden and menu picture is not allocated.
