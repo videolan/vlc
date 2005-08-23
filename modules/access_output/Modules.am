@@ -2,3 +2,4 @@ SOURCES_access_output_dummy = dummy.c
 SOURCES_access_output_file = file.c
 SOURCES_access_output_udp = udp.c
 SOURCES_access_output_http = http.c
+SOURCES_access_output_shout = shout.c

@@ -1269,6 +1269,18 @@ then
   AC_DEFINE(ENABLE_SOUT, 1, Define if you want the stream output support)
 fi
 
+dnl Check for libshout
+AC_ARG_ENABLE(shout,
+  [  --enable-shout          libshout output plugin (default disabled)])
+if test "${enable_shout}" = "yes"; then
+  PKG_CHECK_MODULES(SHOUT, shout >= 2.1,
+    [AC_DEFINE(HAVE_SHOUT, [], [Define if you have the libshout library])
+     VLC_ADD_PLUGINS([access_output_shout])
+     VLC_ADD_LDFLAGS([vlc shout],[$SHOUT_LIBS])
+     VLC_ADD_CFLAGS([vlc shout],[$SHOUT_CFLAGS])],
+    [AC_MSG_WARN(libshout library not found)])
+fi
+
 dnl
 dnl HTTP daemon
 dnl
