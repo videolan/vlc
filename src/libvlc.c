@@ -139,22 +139,25 @@ char const * VLC_Version( void )
 }
 
 /*****************************************************************************
- * VLC_CompileTime, VLC_CompileBy, VLC_CompileHost, VLC_CompileDomain,
+ * VLC_CompileBy, VLC_CompileHost, VLC_CompileDomain,
  * VLC_Compiler, VLC_Changeset
  *****************************************************************************/
 #define DECLARE_VLC_VERSION( func, var )                                    \
-extern const char psz_vlc_##var [];                                         \
 char const * VLC_##func ( void )                                            \
 {                                                                           \
-    return psz_vlc_##var ;                                                  \
+    return VLC_##var ;                                                      \
 }
 
-DECLARE_VLC_VERSION( CompileTime, compile_time );
-DECLARE_VLC_VERSION( CompileBy, compile_by );
-DECLARE_VLC_VERSION( CompileHost, compile_host );
-DECLARE_VLC_VERSION( CompileDomain, compile_domain );
-DECLARE_VLC_VERSION( Compiler, compiler );
-DECLARE_VLC_VERSION( Changeset, changeset );
+DECLARE_VLC_VERSION( CompileBy, COMPILE_BY );
+DECLARE_VLC_VERSION( CompileHost, COMPILE_HOST );
+DECLARE_VLC_VERSION( CompileDomain, COMPILE_HOST );
+DECLARE_VLC_VERSION( Compiler, COMPILER );
+
+extern const char psz_vlc_changeset[];
+char const * VLC_Changeset( void )
+{
+    return psz_vlc_changeset;
+}
 
 /*****************************************************************************
  * VLC_Error: strerror() equivalent
@@ -2392,10 +2395,10 @@ static void Version( void )
 #endif
 
     fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
-    fprintf( stdout, _("Compiled on %s by %s@%s.%s\n"), VLC_CompileTime(),
+    fprintf( stdout, _("Compiled by %s@%s.%s\n"),
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
     fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
-    if( *VLC_Changeset() )
+    if( strcmp( VLC_Changeset(), "exported" ) )
         fprintf( stdout, _("Based upon svn changeset [%s]\n"),
                  VLC_Changeset() );
     fprintf( stdout,

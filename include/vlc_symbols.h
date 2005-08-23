@@ -370,7 +370,6 @@ char const * vlc_error (int);
 int playlist_NodeGroup (playlist_t *, int,playlist_item_t *,playlist_item_t **,int, int, int);
 playlist_item_t* playlist_ItemNewWithType (vlc_object_t *,const char *,const char *, int);
 void __config_PutPsz (vlc_object_t *, const char *, const char *);
-const char * VLC_CompileTime (void);
 vlm_schedule_t * vlm_ScheduleNew (vlm_t *, char *);
 void net_Close (int fd);
 int __vlc_threads_init (vlc_object_t *);
@@ -831,7 +830,7 @@ struct module_symbols_t
     const char * (*VLC_CompileDomain_inner) (void);
     const char * (*VLC_CompileHost_inner) (void);
     const char * (*VLC_Version_inner) (void);
-    const char * (*VLC_CompileTime_inner) (void);
+    void *VLC_CompileTime_deprecated;
     int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
     struct dirent * (*vlc_readdir_wrapper_inner) (void *);
     int (*vlc_closedir_wrapper_inner) (void *);
@@ -1233,7 +1232,6 @@ struct module_symbols_t
 #  define VLC_CompileDomain (p_symbols)->VLC_CompileDomain_inner
 #  define VLC_CompileHost (p_symbols)->VLC_CompileHost_inner
 #  define VLC_Version (p_symbols)->VLC_Version_inner
-#  define VLC_CompileTime (p_symbols)->VLC_CompileTime_inner
 #  define playlist_PreparseEnqueueItem (p_symbols)->playlist_PreparseEnqueueItem_inner
 #  define vlc_readdir_wrapper (p_symbols)->vlc_readdir_wrapper_inner
 #  define vlc_closedir_wrapper (p_symbols)->vlc_closedir_wrapper_inner
@@ -1638,7 +1636,6 @@ struct module_symbols_t
     ((p_symbols)->VLC_CompileDomain_inner) = VLC_CompileDomain; \
     ((p_symbols)->VLC_CompileHost_inner) = VLC_CompileHost; \
     ((p_symbols)->VLC_Version_inner) = VLC_Version; \
-    ((p_symbols)->VLC_CompileTime_inner) = VLC_CompileTime; \
     ((p_symbols)->playlist_PreparseEnqueueItem_inner) = playlist_PreparseEnqueueItem; \
     ((p_symbols)->vlc_readdir_wrapper_inner) = vlc_readdir_wrapper; \
     ((p_symbols)->vlc_closedir_wrapper_inner) = vlc_closedir_wrapper; \
@@ -1647,6 +1644,7 @@ struct module_symbols_t
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \
     (p_symbols)->__osd_VolumeUp_deprecated = NULL; \
+    (p_symbols)->VLC_CompileTime_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
 # endif /* HAVE_SHARED_LIBVLC */

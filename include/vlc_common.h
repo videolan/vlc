@@ -1094,7 +1094,6 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
  * libvlc features
  *****************************************************************************/
 VLC_EXPORT( const char *, VLC_Version, ( void ) );
-VLC_EXPORT( const char *, VLC_CompileTime, ( void ) );
 VLC_EXPORT( const char *, VLC_CompileBy, ( void ) );
 VLC_EXPORT( const char *, VLC_CompileHost, ( void ) );
 VLC_EXPORT( const char *, VLC_CompileDomain, ( void ) );

@@ -2956,7 +2956,7 @@ then
   if test "${SDL_CONFIG}" != "no"
   then
     # SDL on Darwin is heavily patched and can only run SDL_image
-    if test "${SYS}" != "darwin"; then
+    if test "${SYS}" != "darwin" -a "${SYS}" != "mingw32"; then
       VLC_ADD_PLUGINS([vout_sdl aout_sdl])
     fi
     VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`])
@@ -2973,6 +2973,12 @@ Please install it and try again. Alternatively you can also configure with
     AC_CHECK_HEADERS(${SDL_IMAGE}, [AC_DEFINE_UNQUOTED(SDL_IMAGE_INCLUDE_FILE,
       <${SDL_IMAGE}>, Indicate the path of SDL_image.h)
       VLC_ADD_PLUGINS([sdl_image])
+      AC_CHECK_LIB(png, png_set_rows,
+        [VLC_ADD_LDFLAGS([sdl_image],[-lpng -lz])],[],[-lz])
+      AC_CHECK_LIB(jpeg, jpeg_start_decompress,
+        [VLC_ADD_LDFLAGS([sdl_image],[-ljpeg])])
+      AC_CHECK_LIB(tiff, TIFFClientOpen,
+        [VLC_ADD_LDFLAGS([sdl_image],[-ltiff])])
       VLC_ADD_LDFLAGS([sdl_image], [-lSDL_image])],
       [ AC_CHECK_HEADERS(SDL_image.h, AC_DEFINE(SDL_IMAGE_INCLUDE_FILE, <SDL_image.h>,
           As a last resort we also test for SDL_image.h presence),
@@ -2986,6 +2992,7 @@ You should install it alongside your SDL package.])
 Please install it and try again. Alternatively you can also configure with
 --disable-sdl.])
     fi
+
   elif test "${enable_sdl}" =  "yes"
   then
     AC_MSG_ERROR([I couldn't find the SDL package. You can download libSDL
@@ -4472,13 +4479,17 @@ AC_DEFINE_UNQUOTED(PACKAGE_VERSION_EXTRA,"${VERSION_EXTRA}", [version minor numb
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION_MINOR)
 AC_SUBST(VERSION_REVISION)
+AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure]) 
+AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", [host which ran configure]) 
+AC_DEFINE_UNQUOTED(VLC_COMPILE_DOMAIN, "`dnsdomainname 2>/dev/null || domainname 2>/dev/null || echo unknown`", [domain of the host which ran configure]) 
+AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler]) 
 
 dnl Old definitions for version-dependant plugins
 dnl VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
 dnl AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module functions])
 dnl AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
 
-dnl New definitions with value matching 0.8.2 release
+dnl New definitions with value matching 0.8.4 release
 module_symbol="0_8_4"
 AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${module_symbol}", [String suffix for module functions])
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, $module_symbol, [Symbol suffix for module functions])

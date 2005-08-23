@@ -479,8 +479,6 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
         E_(mvar_AppendNewVar)( p_args->vars, "url_value", p_request );
         E_(mvar_AppendNewVar)( p_args->vars, "version", VLC_Version() );
         E_(mvar_AppendNewVar)( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
-        E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_time",
-                           VLC_CompileTime() );
         E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_by", VLC_CompileBy() );
         E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_host",
                            VLC_CompileHost() );
