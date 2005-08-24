@@ -56,7 +56,7 @@ case $HOST in
 # ENVP defines the oldest environment on which the program will be able to run
 # SDK 10.2.8 requires gcc-3.3 (so we cannot use that SDK)
             echo "ENVP = MACOSX_DEPLOYMENT_TARGET=10.3" >> config.mak
-	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
+	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.0.sdk" >> config.mak
 #	    echo "EXTRA_CFLAGS = -D\${ENVP} -isysroot \${MACOSX_SDK}" >> config.mak
 	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
 #	    echo "EXTRA_LDFLAGS = -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}" >> config.mak

@@ -84,7 +84,7 @@ endif
 ifdef HAVE_DARWIN_OS
  all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
-	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
+	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .SDL_image \
 	.aclocal
@@ -530,7 +530,6 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/theora.patch
 
 .theora: libtheora
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
@@ -540,6 +539,25 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 CLEAN_FILE += .theora
 CLEAN_PKG += libtheora
 DISTCLEAN_PKG += libtheora-$(THEORA_VERSION).tar.bz2
+
+# ***************************************************************************
+# shout
+# ***************************************************************************
+
+libshout-$(SHOUT_VERSION).tar.gz:
+	$(WGET) $(SHOUT_URL)
+
+libshout: libshout-$(SHOUT_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.shout: libshout
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .shout
+CLEAN_PKG += libshout
+DISTCLEAN_PKG += libshout-$(SHOUT_VERSION).tar.gz
 
 # ***************************************************************************
 # flac
@@ -569,7 +587,6 @@ speex-$(SPEEX_VERSION).tar.gz:
 
 speex: speex-$(SPEEX_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p 0 < Patches/speex.patch
 
 .speex: speex
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make && make install)
