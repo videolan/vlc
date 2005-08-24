@@ -228,6 +228,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     size_t i_write = 0;
 
+    shout_sync( p_access->p_sys->p_shout );
     while( p_buffer )
     {
         block_t *p_next = p_buffer->p_next;
@@ -246,7 +247,6 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
         block_Release( p_buffer );
 
         /* XXX: Unsure if that's the cause for some audio trouble... */
-        //shout_sync( p_access->p_sys->p_shout );
 
         p_buffer = p_next;
     }
