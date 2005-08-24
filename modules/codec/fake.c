@@ -228,11 +228,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if ( i_aspect )
     {
-        p_dec->fmt_out.video.i_aspect = i_aspect;
+        fmt_out.video.i_aspect = i_aspect;
     }
     else
     {
-        p_dec->fmt_out.video.i_aspect = fmt_out.i_width
+        fmt_out.video.i_aspect = fmt_out.i_width
                                * VOUT_ASPECT_FACTOR / fmt_out.i_height;
     }
 
