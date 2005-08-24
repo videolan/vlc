@@ -66,7 +66,7 @@
     "OSD menu pictures get a default timeout of 15 seconds added to their remaining time." \
     "This will ensure that they are at least the specified time visible.")
 
-#define OSD_UPDATE_TEXT N_("Update speed of OSD menu pictures in ms (default is 200ms)")
+#define OSD_UPDATE_TEXT N_("Update speed of OSD menu")
 #define OSD_UPDATE_LONGTEXT N_( \
     "Update the OSD menu picture every 200ms (default). Shorten the update time for " \
     "environments that experience transmissions errors. Be carefull with this option " \
