@@ -1778,7 +1778,7 @@ diff -Naur libiconv.old/lib/flags.h libiconv/lib/flags.h
 diff -Naur libiconv.old/lib/utf8mac.h libiconv/lib/utf8mac.h
 --- libiconv.old/lib/utf8mac.h	1970-01-01 01:00:00.000000000 +0100
 +++ libiconv/lib/utf8mac.h	2005-08-04 18:54:43.000000000 +0200
-@@ -0,0 +1,1593 @@
+@@ -0,0 +1,1595 @@
 +/*
 + * Copyright (C) 2003 Apple Computer, Inc. All rights reserved.
 + *
@@ -1807,6 +1807,8 @@ diff -Naur libiconv.old/lib/utf8mac.h libiconv/lib/utf8mac.h
 + /*
 + 	Includes Unicode 3.2 decomposition code derived from Core Foundation
 + */
++
++#include <inttypes.h>
 +
 +#define	UTF_REVERSE_ENDIAN	0x01	/* reverse UCS-2 byte order */
 +#define	UTF_NO_NULL_TERM	0x02	/* do not add null termination */
