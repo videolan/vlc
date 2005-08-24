@@ -228,12 +228,12 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if ( i_aspect )
     {
-        fmt_out.video.i_aspect = i_aspect;
+        fmt_out.i_aspect = i_aspect;
     }
     else
     {
-        fmt_out.video.i_aspect = fmt_out.i_width
-                               * VOUT_ASPECT_FACTOR / fmt_out.i_height;
+        fmt_out.i_aspect = fmt_out.i_width
+                            * VOUT_ASPECT_FACTOR / fmt_out.i_height;
     }
 
     var_Create( p_dec, "fake-deinterlace", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
