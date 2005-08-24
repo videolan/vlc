@@ -89,7 +89,7 @@ public:
     void OnChange( wxMouseEvent& event );
     void UpdateVolume();
 
-  private:
+private:
     DECLARE_EVENT_TABLE()
 
     wxVolCtrl *gauge;
@@ -99,7 +99,7 @@ public:
 };
 
 BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
-   EVT_PAINT(VLCVolCtrl::OnPaint)
+    EVT_PAINT(VLCVolCtrl::OnPaint)
 
     /* Mouse events */
     EVT_LEFT_UP(VLCVolCtrl::OnChange)
@@ -1426,13 +1426,11 @@ void wxVolCtrl::UpdateVolume()
 {
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
-
+ 
     int i_gauge_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
     if( i_gauge_volume == GetValue() ) return;
-
+    
     SetValue( i_gauge_volume );
-    SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_gauge_volume / 2 ) );
 }
 
 #if defined(__WXGTK__)
@@ -1474,6 +1472,9 @@ void VLCVolCtrl::UpdateVolume()
     gauge->UpdateVolume();
 
     int i_volume = gauge->GetValue();
+    wxWindow::SetToolTip( (wxString)wxU(_("Volume")) +
+         wxString::Format( wxT(" %d"), i_volume/2 ) );
+    
     if( !!i_volume == !b_mute ) return;
     b_mute = !b_mute;
     Refresh();
