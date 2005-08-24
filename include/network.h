@@ -47,6 +47,9 @@
 #   include <netdb.h>
 #endif
 
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /*****************************************************************************
  * network_socket_t: structure passed to a network plug-in to define the
@@ -550,5 +553,9 @@ static inline int net_GetPeerAddress( int fd, char *address, int *port )
                             NI_MAXNUMERICHOST, port, NI_NUMERICHOST )
         ? VLC_EGENERIC : 0;
 }
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif
