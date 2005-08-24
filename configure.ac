@@ -1001,7 +1001,7 @@ VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 if test "${SYS}" != "mingwce"; then
 dnl  VLC_ADD_PLUGINS([externrun])
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record])
-  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap shout fake])
+  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap fake])
   VLC_ADD_PLUGINS([rss mosaic wall motiondetect clone crop])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
@@ -1291,8 +1291,8 @@ if test "${enable_shout}" = "yes"; then
   PKG_CHECK_MODULES(SHOUT, shout >= 2.1,
     [AC_DEFINE(HAVE_SHOUT, [], [Define if you have the libshout library])
      VLC_ADD_PLUGINS([access_output_shout])
-     VLC_ADD_LDFLAGS([vlc shout],[$SHOUT_LIBS])
-     VLC_ADD_CFLAGS([vlc shout],[$SHOUT_CFLAGS])],
+     VLC_ADD_LDFLAGS([vlc access_output_shout],[$SHOUT_LIBS])
+     VLC_ADD_CFLAGS([vlc access_output_shout],[$SHOUT_CFLAGS])],
     [AC_MSG_WARN(libshout library not found)])
 fi
 
@@ -1359,7 +1359,7 @@ AC_ARG_WITH(,[Input plugins:])
 dnl  live.com input
 dnl
 AC_ARG_ENABLE(livedotcom,
-[  --enable-livedotcom     live.com input plugin (default disabled)])
+[  --enable-livedotcom     live.com RTSP input plugin (default disabled)])
 if test "${enable_livedotcom}" = "yes"; then
   AC_ARG_WITH(livedotcom-tree,
     [    --with-livedotcom-tree=PATH live.com tree for static linking])
