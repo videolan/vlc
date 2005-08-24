@@ -919,9 +919,15 @@ CLEAN_PKG += libdts
 DISTCLEAN_PKG += libdts-$(LIBDTS_VERSION).tar.gz
 
 # ***************************************************************************
-# libdts
+# libx264
 # ***************************************************************************
 
+ifdef SVN
+x264: 
+	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
+	patch -p 0 < Patches/x264_svn.patch
+	rm x264/x264.c
+else
 x264-$(X264_VERSION).tar.gz:
 	$(WGET) $(X264_URL)
 
@@ -929,6 +935,7 @@ x264: x264-$(X264_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/x264.patch
 	rm x264/x264.c
+endif
 
 .x264: x264
 	(cd $<; ./configure --enable-pthread --prefix=$(PREFIX) && make && make install)
