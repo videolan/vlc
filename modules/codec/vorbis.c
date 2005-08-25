@@ -311,6 +311,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_headers == 0 && p_dec->fmt_in.i_extra )
     {
         /* Headers already available as extra data */
+        msg_Dbg( p_dec, "Headers already available as extra data" );
         p_sys->i_headers = 3;
     }
     else if( oggpacket.bytes && p_sys->i_headers < 3 )
@@ -617,12 +618,12 @@ static void ParseVorbisComments( decoder_t *p_dec )
             input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
                            psz_name, psz_value );
             /* HACK, we should use meta */
-            if( strstr( psz_name, "artist" ) )
+            if( strcasestr( psz_name, "artist" ) )
             {
                 input_Control( p_input, INPUT_ADD_INFO, _("Meta-information"),
                                _("Artist"), psz_value );
             }
-            else if( strstr( psz_name, "title" ) )
+            else if( strcasestr( psz_name, "title" ) )
             {
                 p_input->input.p_item->psz_name = strdup( psz_value );
             }
