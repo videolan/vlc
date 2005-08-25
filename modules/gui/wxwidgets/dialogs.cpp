@@ -402,15 +402,17 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
         p_file_dialog->GetPaths( paths );
 
         for( size_t i = 0; i < paths.GetCount(); i++ )
+        {
+            char *psz_utf8 = FromLocale( paths[i].mb_str() );
             if( event.GetInt() )
-                playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
-                              (const char *)paths[i].mb_str(),
+                playlist_Add( p_playlist, psz_utf8, psz_utf8,
                               PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO),
                               PLAYLIST_END );
             else
-                playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
-                              (const char *)paths[i].mb_str(),
+                playlist_Add( p_playlist, psz_utf8, psz_utf8,
                               PLAYLIST_APPEND, PLAYLIST_END );
+            LocaleFree( psz_utf8 );
+        }
     }
 
     vlc_object_release( p_playlist );
@@ -432,11 +434,11 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
     if( p_dir_dialog && p_dir_dialog->ShowModal() == wxID_OK )
     {
         wxString path = p_dir_dialog->GetPath();
-
-        playlist_Add( p_playlist, (const char *)path.mb_str(),
-                      (const char *)path.mb_str(),
+        char *psz_utf8 = FromLocale( path.mb_str() );
+        playlist_Add( p_playlist, psz_utf8, psz_utf8,
                       PLAYLIST_APPEND | (event.GetInt() ? PLAYLIST_GO : 0),
                       PLAYLIST_END );
+        LocaleFree( psz_utf8 );
     }
 
     vlc_object_release( p_playlist );

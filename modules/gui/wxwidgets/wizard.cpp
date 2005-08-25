@@ -1495,7 +1495,9 @@ void WizardDialog::SetStream( char const *method, char const *address )
 
 void WizardDialog::SetTranscodeOut( char const *address )
 {
-    this->address = strdup( address );
+    char *psz_utf8 = FromLocale( address );
+    this->address = strdup( psz_utf8 );
+    LocaleFree( psz_utf8 );
 }
 
 void WizardDialog::SetMux( char const *mux )

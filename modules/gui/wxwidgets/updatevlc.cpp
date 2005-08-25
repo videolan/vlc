@@ -625,8 +625,9 @@ void UpdateVLC::OnUpdatesTreeActivate( wxTreeEvent& event )
 
 void UpdateVLC::DownloadFile( wxString url, wxString dst )
 {
+    char *psz_local = ToLocale( dst.mb_str() );
     msg_Dbg( p_intf, "Downloading %s to %s",
-             (const char *)url.mb_str(), (const char *)dst.mb_str() );
+             (const char *)url.mb_str(), psz_local );
 
     stream_t *p_stream = NULL;
     p_stream = stream_UrlNew( p_intf, (const char *)url.mb_str() );
@@ -638,13 +639,14 @@ void UpdateVLC::DownloadFile( wxString url, wxString dst )
     }
 
     FILE *p_file = NULL;
-    p_file = fopen( (const char *)dst.mb_str(), "w" );
+    p_file = fopen( psz_local, "w" );
     if( !p_file )
     {
-        msg_Err( p_intf, "Failed to open %s for writing", (const char *)dst.mb_str() );
+        msg_Err( p_intf, "Failed to open %s for writing", psz_local );
         // FIXME : display error message in dialog
         return;
     }
+    LocaleFree( psz_local );
 
     int i_progress = 0;
     wxProgressDialog *progressdialog =

@@ -1117,15 +1117,20 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
         vlc_bool_t b_start = !i && i_open_arg;
-        playlist_item_t *p_item =
-            playlist_ItemNew( p_intf, (const char*)mrl[i].mb_str(),
-                              (const char *)mrl[i].mb_str() );
+        playlist_item_t *p_item;
+        char *psz_utf8;
+
+        psz_utf8 = FromLocale( mrl[i].mb_str() );
+        p_item = playlist_ItemNew( p_intf, psz_utf8, psz_utf8 );
+        LocaleFree( psz_utf8 );
 
         /* Insert options */
         while( i + 1 < (int)mrl.GetCount() &&
                ((const char *)mrl[i + 1].mb_str())[0] == ':' )
         {
-            playlist_ItemAddOption( p_item, mrl[i + 1].mb_str() );
+            psz_utf8 = FromLocale( mrl[i + 1].mb_str() );
+            playlist_ItemAddOption( p_item, psz_utf8 );
+            LocaleFree( psz_utf8 );
             i++;
         }
 
@@ -1134,7 +1139,9 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
-                playlist_ItemAddOption( p_item, subsfile_mrl[j].mb_str() );
+                psz_utf8 = FromLocale( subsfile_mrl[j].mb_str() );
+                playlist_ItemAddOption( p_item, psz_utf8 );
+                LocaleFree( psz_utf8 );
             }
         }
 
@@ -1143,16 +1150,17 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
+                psz_utf8 = FromLocale( sout_mrl[j].mb_str() );
                 playlist_ItemAddOption( p_item, sout_mrl[j].mb_str() );
+                LocaleFree( psz_utf8 );
             }
         }
 
-        playlist_AddItem( p_playlist, p_item,
-                          PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_AddItem( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END );
 
         if( b_start )
         {
-            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY , p_item );
+            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
         }
     }
 
