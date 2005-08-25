@@ -429,7 +429,6 @@ SOURCES_libvlc_common = \
 	src/stream_output/sap.c \
 	src/stream_output/acl.c \
 	src/osd/osd.c \
-	src/osd/osd_widgets.c \
 	src/osd/osd_parser.c \
 	src/misc/charset.c \
 	src/misc/httpd.c \
@@ -606,8 +605,8 @@ VLC-release.app: vlc
 	    wizard.m \
 	    extended.h \
 	    extended.m \
-        bookmarks.h \
-        bookmarks.m \
+	    bookmarks.h \
+	    bookmarks.m \
 	    update.h \
 	    update.m \
 	    vout.m; do \
@@ -722,8 +721,8 @@ VLC.app: vlc
 	    wizard.m \
 	    extended.h \
 	    extended.m \
-        bookmarks.h \
-        bookmarks.m \
+	    bookmarks.h \
+	    bookmarks.m \
 	    update.h \
 	    update.m \
 	    vout.m; do \
