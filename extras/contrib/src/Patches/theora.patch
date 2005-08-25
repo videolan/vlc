@@ -1,24 +1,24 @@
-diff -ru libtheora.old/Makefile.am libtheora/Makefile.am
---- libtheora.old/Makefile.am	Thu Sep 26 04:50:51 2002
-+++ libtheora/Makefile.am	Wed Nov 12 00:06:14 2003
+diff -ruN libtheora-1.0alpha5/Makefile.am libtheora/Makefile.am
+--- libtheora-1.0alpha5/Makefile.am	Mon Aug 15 20:02:15 2005
++++ libtheora/Makefile.am	Thu Aug 25 21:11:34 2005
 @@ -2,7 +2,7 @@
  
- AUTOMAKE_OPTIONS = foreign dist-zip
+ AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
  
--SUBDIRS = lib include doc examples debian
-+SUBDIRS = lib include
+-SUBDIRS = lib include doc examples debian tests
++SUBDIRS = lib include doc debian tests
  
- EXTRA_DIST = COPYING autogen.sh 
- 
-diff -ru libtheora.old/Makefile.in libtheora/Makefile.in
---- libtheora.old/Makefile.in	Mon Jun  9 23:26:11 2003
-+++ libtheora/Makefile.in	Wed Nov 12 00:06:37 2003
-@@ -206,7 +206,7 @@
+ EXTRA_DIST = COPYING autogen.sh win32 libtheora.spec libtheora.spec.in \
+ 	theora-uninstalled.pc.in
+diff -ruN libtheora-1.0alpha5/Makefile.in libtheora/Makefile.in
+--- libtheora-1.0alpha5/Makefile.in	Sat Aug 20 21:30:42 2005
++++ libtheora/Makefile.in	Thu Aug 25 21:11:46 2005
+@@ -224,7 +224,7 @@
  target_os = @target_os@
  target_vendor = @target_vendor@
  AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
--SUBDIRS = lib include doc examples debian
-+SUBDIRS = lib include
+-SUBDIRS = lib include doc examples debian tests
++SUBDIRS = lib include doc debian tests
  EXTRA_DIST = COPYING autogen.sh win32 libtheora.spec libtheora.spec.in \
  	theora-uninstalled.pc.in
-
+ 

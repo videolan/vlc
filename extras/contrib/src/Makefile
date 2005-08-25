@@ -531,6 +531,7 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p0 < Patches/theora.patch
 
 .theora: libtheora
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest && make && make install)
@@ -848,7 +849,7 @@ live: live-$(LIVEDOTCOM_VERSION).tar.gz
 	patch -p 0 < Patches/live.patch
 
 .live: live
-	(cd $<; ./genMakefiles macosx && make )
+	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
 	touch $@
 
 CLEAN_FILE += .live
