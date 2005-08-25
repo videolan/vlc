@@ -107,7 +107,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
         val.psz_string = ""; text.psz_string = _("Disable");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = "random"; text.psz_string = _("Random");
+        val.psz_string = "spectrometer"; text.psz_string = _("Spectrometer");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         val.psz_string = "scope"; text.psz_string = _("Scope");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );

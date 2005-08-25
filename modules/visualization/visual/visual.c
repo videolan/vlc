@@ -38,7 +38,7 @@
 #define ELIST_TEXT N_( "Effects list" )
 #define ELIST_LONGTEXT N_( \
       "A list of visual effect, separated by commas.\n"  \
-      "Current effects include: dummy, random, scope, spectrum" )
+      "Current effects include: dummy, scope, spectrum" )
 
 #define WIDTH_TEXT N_( "Video width" )
 #define WIDTH_LONGTEXT N_( \
@@ -63,6 +63,38 @@
 #define PEAKS_TEXT N_( "Enable peaks" )
 #define PEAKS_LONGTEXT N_( \
         "Defines whether to draw peaks." )
+
+#define ORIG_TEXT N_( "Enable original graphic spectrum" )
+#define ORIG_LONGTEXT N_( \
+        "Defines whether to draw the original spectrum graphic routine." )
+
+#define BANDS_TEXT N_( "Enable bands" )
+#define BANDS_LONGTEXT N_( \
+        "Defines whether to draw the bands." )
+
+#define BASE_TEXT N_( "Enable base" )
+#define BASE_LONGTEXT N_( \
+        "Defines whether to draw the base of the bands." )
+
+#define RADIUS_TEXT N_( "Base pixel radius" )
+#define RADIUS_LONGTEXT N_( \
+        "Defines radius size in pixels, of base of bands(beginning)." )
+
+#define SECT_TEXT N_( "Spectral sections" )
+#define SECT_LONGTEXT N_( \
+        "Determines how many sections of spectrum will exist." )
+
+#define PEAK_HEIGHT_TEXT N_( "Peak height" )
+#define PEAK_HEIGHT_LONGTEXT N_( \
+        "This is the total pixel height of the peak items." )
+
+#define PEAK_WIDTH_TEXT N_( "Peak extra width" )
+#define PEAK_WIDTH_LONGTEXT N_( \
+        "Additions or subtractions of pixels on the peak width." )
+
+#define COLOR1_TEXT N_( "V-plane color" )
+#define COLOR1_LONGTEXT N_( \
+        "YUV-Color cube shifting across the V-plane ( 0 - 127 )." )
 
 #define STARS_TEXT N_( "Number of stars" )
 #define STARS_LONGTEXT N_( \
@@ -92,9 +124,31 @@ vlc_module_begin();
              AMP_TEXT, AMP_LONGTEXT, VLC_TRUE );
     add_bool("visual-peaks", VLC_TRUE, NULL,
              PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
-    set_section( N_( "Random effect") , NULL );
-    add_integer("visual-stars", 200, NULL,
-             STARS_TEXT, STARS_LONGTEXT, VLC_TRUE );
+    set_section( N_("Spectrometer") , NULL );
+    add_bool("spect-show-original", VLC_TRUE, NULL,
+             ORIG_TEXT, ORIG_LONGTEXT, VLC_TRUE );
+    add_bool("spect-show-base", VLC_TRUE, NULL,
+             BASE_TEXT, BASE_LONGTEXT, VLC_TRUE );
+    add_integer("spect-radius", 22, NULL,
+             RADIUS_TEXT, RADIUS_LONGTEXT, VLC_TRUE );
+    add_integer("spect-sections", 2, NULL,
+             SECT_TEXT, SECT_LONGTEXT, VLC_TRUE );
+    add_integer("spect-color", 16, NULL,
+             COLOR1_TEXT, COLOR1_LONGTEXT, VLC_TRUE );
+    add_bool("spect-show-bands", VLC_TRUE, NULL,
+             BANDS_TEXT, BANDS_LONGTEXT, VLC_TRUE );
+    add_integer("spect-nbbands", 80, NULL,
+             NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_TRUE );
+    add_integer("spect-separ", 1, NULL,
+             SEPAR_TEXT, SEPAR_LONGTEXT, VLC_TRUE );
+    add_integer("spect-amp", 3, NULL,
+             AMP_TEXT, AMP_LONGTEXT, VLC_TRUE );
+    add_bool("spect-show-peaks", VLC_TRUE, NULL,
+             PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
+    add_integer("spect-peak-width", 1, NULL,
+             PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer("spect-peak-height", 1, NULL,
+             PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, VLC_TRUE );
     set_capability( "visualization", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "visualizer");
@@ -117,7 +171,7 @@ static struct
 {
     { "scope",      scope_Run },
     { "spectrum",   spectrum_Run },
-    { "random",     random_Run},
+    { "spectrometer",   spectrometer_Run },
     { "dummy",      dummy_Run},
     { NULL,         dummy_Run}
 };
@@ -163,8 +217,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_filter, "effect-list", &val);
     psz_parser = psz_effects = strdup( val.psz_string );
     free( val.psz_string );
-    msg_Dbg( p_filter , "Building list of effects" );
-    
+
     var_AddCallback( p_filter, "effect-list", FilterCallback, NULL );
 
     while( psz_parser && *psz_parser != '\0' )
