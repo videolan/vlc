@@ -6,7 +6,6 @@ pkgdatadir = $(datadir)/vlc
 
 dist_pkgdata_DATA = \
 	$(DIST_pda) \
-	$(DIST_familiar) \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
 	$(DIST_icons48) \
@@ -30,17 +29,6 @@ DIST_rsrc = \
 	vlc_beos.rsrc \
 	vlc_win32_rc.rc \
 	vlc-icons.xcf \
-	$(NULL)
-
-DIST_familiar = \
-	familiar-forwardb16x16.xpm \
-	familiar-openb16x16.xpm \
-	familiar-pauseb16x16.xpm \
-	familiar-playb16x16.xpm \
-	familiar-playlistb16x16.xpm \
-	familiar-preferencesb16x16.xpm \
-	familiar-rewindb16x16.xpm \
-	familiar-stopb16x16.xpm \
 	$(NULL)
 
 DIST_pda = \
