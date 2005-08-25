@@ -863,10 +863,10 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     msg.Printf( wxString(wxT("VLC media player " PACKAGE_VERSION)) +
         wxU(_(" (wxWidgets interface)\n\n")) +
         wxU(_("(c) 1996-2005 - the VideoLAN Team\n\n")) +
-       wxU(_("Compiled by "))+ wxT(VLC_CompileBy())+ wxT("@") +
-       wxT(VLC_CompileHost())+ wxT(".")+ wxT(VLC_CompileDomain())+ wxT(".\n") +
-       wxU(_("Compiler: "))+ wxT(VLC_Compiler())+wxT( ".\n") +
-       wxU(_("Based on SVN revision: "))+wxT(VLC_Changeset())+wxT(".\n\n") +
+       wxU(_("Compiled by "))+ wxU(VLC_CompileBy())+ wxU("@") +
+       wxU(VLC_CompileHost())+ wxT(".")+ wxU(VLC_CompileDomain())+ wxT(".\n") +
+       wxU(_("Compiler: "))+ wxU(VLC_Compiler())+wxT( ".\n") +
+       wxU(_("Based on SVN revision: "))+wxU(VLC_Changeset())+wxT(".\n\n") +
 #ifdef __WXMSW__
         wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,VLC_TRUE) ) + wxT("\n\n") +
 #else
