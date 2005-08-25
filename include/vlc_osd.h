@@ -373,17 +373,6 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
 } 
 
 /**
- * Default feedback images
- *
- * Functions that provide the default OSD feedback images on hotkey commands. These feedback
- * images are also part of the osd_button_t object. The types are declared in the include file
- * include/osd.h
- * @see osd.h 
- */
-VLC_EXPORT( picture_t *, osd_Slider, ( int i_width, int i_height, int i_position, short i_type ) );
-VLC_EXPORT( picture_t *, osd_Icon,   ( int i_width, int i_height, short i_type ) );
-
-/**
  * Loading and parse the OSD Configuration file
  *
  * These functions load/unload the OSD menu configuration file and create/destroy the
