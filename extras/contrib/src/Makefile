@@ -477,6 +477,7 @@ libogg-$(OGG_VERSION).tar.gz:
 
 libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/ogg.patch
 
 .ogg: libogg
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)

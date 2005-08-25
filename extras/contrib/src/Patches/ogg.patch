@@ -1,0 +1,16 @@
+diff -ruN libogg.orig/include/ogg/os_types.h libogg/include/ogg/os_types.h
+--- libogg.orig/include/ogg/os_types.h	2004-09-23 15:26:58.000000000 +0200
++++ libogg/include/ogg/os_types.h	2005-08-25 18:42:01.000000000 +0200
+@@ -120,6 +120,12 @@
+ #else
+ 
+ #  include <sys/types.h>
++#if defined( HAVE_INTTYPES_H )
++#  include <inttypes.h>
++#endif
++#if defined( HAVE_STDINT_H )
++#  include <stdint.h>
++#endif
+ #  include <ogg/config_types.h>
+ 
+ #endif
