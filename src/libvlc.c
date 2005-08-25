@@ -150,7 +150,7 @@ char const * VLC_##func ( void )                                            \
 
 DECLARE_VLC_VERSION( CompileBy, COMPILE_BY );
 DECLARE_VLC_VERSION( CompileHost, COMPILE_HOST );
-DECLARE_VLC_VERSION( CompileDomain, COMPILE_HOST );
+DECLARE_VLC_VERSION( CompileDomain, COMPILE_DOMAIN );
 DECLARE_VLC_VERSION( Compiler, COMPILER );
 
 extern const char psz_vlc_changeset[];
