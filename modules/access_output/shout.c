@@ -1,5 +1,5 @@
 /*****************************************************************************
- * shout.c
+ * shout.c: This module forwards vorbis streams to an icecast server
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
  * $Id$
@@ -25,8 +25,6 @@
  * Some Comments:
  *
  * o this only works for ogg streams, and there's no checking about that yet.
- * o i have lots of problems with audio, but i think they are not caused
- *   by this patch
  * o there's a memleak somewhere, quite huge. i'm unsure if its somewhere
  *   in libshout, in vlc or even in this patch...
  *
@@ -56,6 +54,18 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-shout-"
 
+#define NAME_TEXT N_("Stream-name")
+#define NAME_LONGTEXT N_("The name this stream/channel will get on the icecast server." )
+
+#define DESCRIPTION_TEXT N_("Stream-description")
+#define DESCRIPTION_LONGTEXT N_("A description of the stream content. (Information about " \
+                         "your channel)." )
+
+#define MP3_TEXT N_("Stream MP3")
+#define MP3_LONGTEXT N_("Normally you have to feed the shoutcast module with Ogg streams. " \
+                         "This option allows you to feed MP3 streams instead, so you can " \
+                         "forward MP3 streams to the icecast server." )
+
 vlc_module_begin();
     set_description( _("libshout (icecast) output") );
     set_shortname( N_("Shout" ));
@@ -63,8 +73,22 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_shortcut( "shout" );
+    add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream", NULL,
+                NAME_TEXT, NAME_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "description", "Live stream from VLC media player. " \
+                "http://www.videolan.org/vlc", NULL,
+                DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, VLC_FALSE );
+    add_bool(   SOUT_CFG_PREFIX "mp3", VLC_FALSE, NULL,
+                MP3_TEXT, MP3_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
+
+/*****************************************************************************
+ * Exported prototypes
+ *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "name", "description", "mp3", NULL
+};
 
 
 /*****************************************************************************
@@ -88,12 +112,22 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_sys_t *p_sys;
     shout_t *p_shout;
     long i_ret;
-
-    char *psz_user, *psz_pass, *psz_host, *psz_mount;
     unsigned int i_port;
+    vlc_value_t val;
 
-    char *parser = strdup( p_access->psz_name );
-    char *tmp_port;
+    char *psz_accessname = NULL;
+    char *psz_parser = NULL;
+    char *psz_user = NULL;
+    char *psz_pass = NULL;
+    char *psz_host = NULL;
+    char *psz_mount = NULL;
+    char *psz_name = NULL;
+    char *psz_description = NULL;
+    char *tmp_port = NULL;
+  
+    sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
+
+    psz_accessname = psz_parser = strdup( p_access->psz_name );
 
     if( !p_access->psz_name )
     {
@@ -103,19 +137,19 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Parse connection data user:pwd@host:port/mountpoint */
-    psz_user = parser;
-    while( parser[0] && parser[0] != ':' ) parser++;
-    if( parser[0] ) { parser[0] = 0; parser++; }
-    psz_pass = parser;
-    while( parser[0] && parser[0] != '@' ) parser++;
-    if( parser[0] ) { parser[0] = 0; parser++; }
-    psz_host = parser;
-    while( parser[0] && parser[0] != ':' ) parser++;
-    if( parser[0] ) { parser[0] = 0; parser++; }
-    tmp_port = parser;
-    while( parser[0] && parser[0] != '/' ) parser++;
-    if( parser[0] ) { parser[0] = 0; parser++; }
-    psz_mount = parser;
+    psz_user = psz_parser;
+    while( psz_parser[0] && psz_parser[0] != ':' ) psz_parser++;
+    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
+    psz_pass = psz_parser;
+    while( psz_parser[0] && psz_parser[0] != '@' ) psz_parser++;
+    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
+    psz_host = psz_parser;
+    while( psz_parser[0] && psz_parser[0] != ':' ) psz_parser++;
+    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
+    tmp_port = psz_parser;
+    while( psz_parser[0] && psz_parser[0] != '/' ) psz_parser++;
+    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
+    psz_mount = psz_parser;
 
     i_port = atoi( tmp_port );
 
@@ -123,9 +157,21 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
     {
         msg_Err( p_access, "out of memory" );
-        free( parser );
+        free( psz_accessname );
         return VLC_ENOMEM;
     }
+
+    var_Get( p_access, SOUT_CFG_PREFIX "name", &val );
+    if( *val.psz_string )
+        psz_name = val.psz_string;
+    else
+        free( val.psz_string );
+
+    var_Get( p_access, SOUT_CFG_PREFIX "description", &val );
+    if( *val.psz_string )
+        psz_description = val.psz_string;
+    else
+        free( val.psz_string );
 
     p_shout = p_sys->p_shout = shout_new();
     if( !p_shout
@@ -136,14 +182,33 @@ static int Open( vlc_object_t *p_this )
          || shout_set_password( p_shout, psz_pass ) != SHOUTERR_SUCCESS
          || shout_set_mount( p_shout, psz_mount ) != SHOUTERR_SUCCESS
          || shout_set_user( p_shout, psz_user ) != SHOUTERR_SUCCESS
-         || shout_set_format( p_shout, SHOUT_FORMAT_OGG ) != SHOUTERR_SUCCESS
-  //       || shout_set_nonblocking( p_shout, 1 ) != SHOUTERR_SUCCESS
+         || shout_set_agent( p_shout, "VLC media player " VERSION ) != SHOUTERR_SUCCESS
+         || shout_set_name( p_shout, psz_name ) != SHOUTERR_SUCCESS
+         || shout_set_description( p_shout, psz_description ) != SHOUTERR_SUCCESS 
+//       || shout_set_nonblocking( p_shout, 1 ) != SHOUTERR_SUCCESS
       )
     {
-        msg_Err( p_access, "failed to initialize shout streaming to %s:%i%s",
+        msg_Err( p_access, "failed to initialize shout streaming to %s:%i/%s",
                  psz_host, i_port, psz_mount );
         free( p_access->p_sys );
-        free( parser );
+        free( psz_accessname );
+        return VLC_EGENERIC;
+    }
+
+    if( psz_name ) free( psz_name );
+    if( psz_description ) free( psz_description );
+
+    var_Get( p_access, SOUT_CFG_PREFIX "mp3", &val );
+    if( val.b_bool == VLC_TRUE )
+        i_ret = shout_set_format( p_shout, SHOUT_FORMAT_MP3 );
+    else
+        i_ret = shout_set_format( p_shout, SHOUT_FORMAT_OGG );
+
+    if( i_ret != SHOUTERR_SUCCESS )
+    {
+        msg_Err( p_access, "failed to set the shoutcast streaming format" );
+        free( p_access->p_sys );
+        free( psz_accessname );
         return VLC_EGENERIC;
     }
 
@@ -163,10 +228,10 @@ static int Open( vlc_object_t *p_this )
 */
     if( i_ret != SHOUTERR_CONNECTED )
     {
-        msg_Err( p_access, "failed to open shout stream to %s:%i%s: %s",
+        msg_Err( p_access, "failed to open shout stream to %s:%i/%s: %s",
                  psz_host, i_port, psz_mount, shout_get_error(p_shout) );
         free( p_access->p_sys );
-        free( parser );
+        free( psz_accessname );
         return VLC_EGENERIC;
     }
 
@@ -174,7 +239,7 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_read  = Read;
     p_access->pf_seek  = Seek;
 
-    msg_Dbg( p_access, "shout access output opened (%s@%s:%i%s)",
+    msg_Dbg( p_access, "shout access output opened (%s@%s:%i/%s)",
              psz_user, psz_host, i_port, psz_mount );
 
     /* Update pace control flag */
@@ -183,8 +248,7 @@ static int Open( vlc_object_t *p_this )
         p_access->p_sout->i_out_pace_nocontrol++;
     }
 
-    /* FIXME: it should be free()d somewhere, but not here.... ? */
-    //free( parser );
+    free( psz_accessname );
 
     return VLC_SUCCESS;
 }
