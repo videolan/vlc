@@ -1,0 +1,29 @@
+diff -ruN speex-1.1.10/Makefile.am speex/Makefile.am
+--- speex-1.1.10/Makefile.am	Thu Jun  9 08:22:08 2005
++++ speex/Makefile.am	Fri Aug 26 14:55:35 2005
+@@ -13,9 +13,9 @@
+ EXTRA_DIST = Speex.spec Speex.spec.in Speex.kdevelop speex.m4 speex.pc.in
+ 
+ #Fools KDevelop into including all files
+-SUBDIRS = libspeex include @src@ doc win32 symbian
++SUBDIRS = libspeex include doc win32 symbian
+ 
+-DIST_SUBDIRS = libspeex include src doc win32 symbian
++DIST_SUBDIRS = libspeex include doc win32 symbian
+ 
+ rpm: dist
+ 	rpmbuild -ta ${PACKAGE}-${VERSION}.tar.gz
+diff -ruN speex-1.1.10/Makefile.in speex/Makefile.in
+--- speex-1.1.10/Makefile.in	Thu Jun  9 08:25:48 2005
++++ speex/Makefile.in	Fri Aug 26 14:56:21 2005
+@@ -194,8 +194,8 @@
+ EXTRA_DIST = Speex.spec Speex.spec.in Speex.kdevelop speex.m4 speex.pc.in
+ 
+ #Fools KDevelop into including all files
+-SUBDIRS = libspeex include @src@ doc win32 symbian
+-DIST_SUBDIRS = libspeex include src doc win32 symbian
++SUBDIRS = libspeex include doc win32 symbian
++DIST_SUBDIRS = libspeex include doc win32 symbian
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+ 

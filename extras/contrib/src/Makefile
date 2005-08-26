@@ -589,6 +589,7 @@ speex-$(SPEEX_VERSION).tar.gz:
 
 speex: speex-$(SPEEX_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/speex.patch
 
 .speex: speex
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make && make install)
@@ -849,7 +850,7 @@ live: live-$(LIVEDOTCOM_VERSION).tar.gz
 	patch -p 0 < Patches/live.patch
 
 .live: live
-	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
+	(cd $<; ./genMakefiles macosx-before-version-10.4-before-version-10.4 && make )
 	touch $@
 
 CLEAN_FILE += .live
