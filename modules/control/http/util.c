@@ -101,7 +101,7 @@ int E_(FileLoad)( FILE *f, char **pp_data, int *pi_data )
 
 /* Parse a directory and recursively add files */
 int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
-                           char *psz_dir )
+                        char *psz_dir )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     char           dir[MAX_DIR_SIZE];
@@ -205,21 +205,46 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
         sprintf( dir, "%s%c%s", psz_dir, sep, p_dir_content->d_name );
         if( E_(ParseDirectory)( p_intf, psz_root, dir ) )
         {
-            httpd_file_sys_t *f = malloc( sizeof( httpd_file_sys_t ) );
+            httpd_file_sys_t *f = NULL;
+            httpd_handler_sys_t *h = NULL;
             vlc_bool_t b_index;
-            char *psz_tmp;
+            char *psz_tmp, *psz_file, *psz_name, *psz_ext;
+
+            psz_tmp = vlc_fix_readdir_charset( p_intf, dir );
+            psz_file = E_(FromUTF8)( p_intf, psz_tmp );
+            free( psz_tmp );
+            psz_tmp = vlc_fix_readdir_charset( p_intf,
+                                               &dir[strlen( psz_root )] );
+            psz_name = E_(FileToUrl)( psz_tmp, &b_index );
+            free( psz_tmp );
+            psz_ext = strrchr( psz_file, '.' );
+            if( psz_ext != NULL )
+            {
+                int i;
+                psz_ext++;
+                for( i = 0; i < p_sys->i_handlers; i++ )
+                    if( !strcmp( p_sys->pp_handlers[i]->psz_ext, psz_ext ) )
+                        break;
+                if( i < p_sys->i_handlers )
+                {
+                    f = malloc( sizeof( httpd_handler_sys_t ) );
+                    h = (httpd_handler_sys_t *)f;
+                    f->b_handler = VLC_TRUE;
+                    h->p_association = p_sys->pp_handlers[i];
+                }
+            }
+            if( f == NULL )
+            {
+                f = malloc( sizeof( httpd_file_sys_t ) );
+                f->b_handler = VLC_FALSE;
+            }
 
             f->p_intf  = p_intf;
             f->p_file = NULL;
             f->p_redir = NULL;
             f->p_redir2 = NULL;
-            psz_tmp = vlc_fix_readdir_charset( p_intf, dir );
-            f->file = E_(FromUTF8)( p_intf, psz_tmp );
-            free( psz_tmp );
-            psz_tmp = vlc_fix_readdir_charset( p_intf,
-                                               &dir[strlen( psz_root )] );
-            f->name = E_(FileToUrl)( psz_tmp, &b_index );
-            free( psz_tmp );
+            f->file = psz_file;
+            f->name = psz_name;
             f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) ? VLC_TRUE : VLC_FALSE;
 
             if( !f->name )
@@ -232,16 +257,32 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             msg_Dbg( p_intf, "file=%s (url=%s)",
                      f->file, f->name );
 
-            f->p_file = httpd_FileNew( p_sys->p_httpd_host,
-                                       f->name,
-                                       f->b_html ? p_sys->psz_html_type : NULL,
-                                       user, password, p_acl,
-                                       E_(HttpCallback), f );
-
-            if( f->p_file )
+            if( !f->b_handler )
             {
-                TAB_APPEND( p_sys->i_files, p_sys->pp_files, f );
+                f->p_file = httpd_FileNew( p_sys->p_httpd_host,
+                                           f->name,
+                                           f->b_html ? p_sys->psz_html_type :
+                                            NULL,
+                                           user, password, p_acl,
+                                           E_(HttpCallback), f );
+                if( f->p_file != NULL )
+                {
+                    TAB_APPEND( p_sys->i_files, p_sys->pp_files, f );
+                }
             }
+            else
+            {
+                h->p_handler = httpd_HandlerNew( p_sys->p_httpd_host,
+                                                 f->name,
+                                                 user, password, p_acl,
+                                                 E_(HandlerCallback), h );
+                if( h->p_handler != NULL )
+                {
+                    TAB_APPEND( p_sys->i_files, p_sys->pp_files,
+                                (httpd_file_sys_t *)h );
+                }
+            }
+
             /* for url that ends by / add
              *  - a redirect from rep to rep/
              *  - in case of index.* rep/index.html to rep/ */

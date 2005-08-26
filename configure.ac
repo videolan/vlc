@@ -325,7 +325,7 @@ CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcd
 dnl Check for system libs needed
 need_libc=false
 
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork)
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof)
@@ -1882,7 +1882,7 @@ have_ipv6=no
 AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
   AC_CHECK_LIB(resolv,inet_pton,
     [have_ipv6=yes
-     VLC_ADD_LDFLAGS([ipv6],[-lresolv])])
+     VLC_ADD_LDFLAGS([ipv6 vlc],[-lresolv])])
 ])
 
 AS_IF([test "${have_ipv6}" == "yes"], [

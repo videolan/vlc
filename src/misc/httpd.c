@@ -431,7 +431,7 @@ static const char *httpd_MimeFromUrl( const char *psz_url )
 }
 
 /*****************************************************************************
- * High Level Funtions: httpd_file_t
+ * High Level Functions: httpd_file_t
  *****************************************************************************/
 struct httpd_file_t
 {
@@ -449,6 +449,9 @@ struct httpd_file_t
 static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, httpd_message_t *answer, httpd_message_t *query )
 {
     httpd_file_t *file = (httpd_file_t*)p_sys;
+    uint8_t *psz_args = query->psz_args;
+    uint8_t **pp_body, *p_body;
+    int *pi_body, i_body;
 
     if( answer == NULL || query == NULL )
     {
@@ -466,15 +469,30 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
 
     if( query->i_type != HTTPD_MSG_HEAD )
     {
-        uint8_t *psz_args = query->psz_args;
-        if( query->i_type == HTTPD_MSG_POST )
-        {
-            /* Check that */
-            psz_args = query->p_body;
-        }
-        file->pf_fill( file->p_sys, file, psz_args, &answer->p_body,
-                       &answer->i_body );
+        pp_body = &answer->p_body;
+        pi_body = &answer->i_body;
     }
+    else
+    {
+        /* The file still needs to be executed. */
+        p_body = NULL;
+        i_body = 0;
+        pp_body = &p_body;
+        pi_body = &i_body;
+    }
+
+    if( query->i_type == HTTPD_MSG_POST )
+    {
+        /* msg_Warn not supported */
+    }
+
+    file->pf_fill( file->p_sys, file, psz_args, pp_body, pi_body );
+
+    if( query->i_type == HTTPD_MSG_HEAD && p_body != NULL )
+    {
+        free( p_body );
+    }
+
     /* We respect client request */
     if( strcmp( httpd_MsgGet( &cl->query, "Connection" ), "" ) )
     {
@@ -535,6 +553,164 @@ void httpd_FileDelete( httpd_file_t *file )
     free( file->psz_mime );
 
     free( file );
+}
+
+/*****************************************************************************
+ * High Level Functions: httpd_handler_t (for CGIs)
+ *****************************************************************************/
+struct httpd_handler_t
+{
+    httpd_url_t *url;
+
+    httpd_handler_callback_t pf_fill;
+    httpd_handler_sys_t      *p_sys;
+
+};
+
+static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, httpd_message_t *answer, httpd_message_t *query )
+{
+    httpd_handler_t *handler = (httpd_handler_t*)p_sys;
+    uint8_t *psz_args = query->psz_args;
+    char psz_remote_addr[100];
+
+    if( answer == NULL || query == NULL )
+    {
+        return VLC_SUCCESS;
+    }
+    answer->i_proto  = HTTPD_PROTO_NONE;
+    answer->i_type   = HTTPD_MSG_ANSWER;
+
+    /* We do it ourselves, thanks */
+    answer->i_status = 0;
+    answer->psz_status = NULL;
+
+    switch( cl->sock.ss_family )
+    {
+#ifdef HAVE_INET_PTON
+    case AF_INET:
+        inet_ntop( cl->sock.ss_family,
+                   &((struct sockaddr_in *)&cl->sock)->sin_addr,
+                   psz_remote_addr, sizeof(psz_remote_addr) );
+        break;
+    case AF_INET6:
+        inet_ntop( cl->sock.ss_family,
+                   &((struct sockaddr_in6 *)&cl->sock)->sin6_addr,
+                   psz_remote_addr, sizeof(psz_remote_addr) );
+        break;
+#else
+    case AF_INET:
+    {
+        char *psz_tmp = inet_ntoa( ((struct sockaddr_in *)&cl->sock)->sin_addr );
+        strncpy( psz_remote_addr, psz_tmp, sizeof(psz_remote_addr) );
+        break;
+    }
+#endif
+    default:
+        psz_remote_addr[0] = '\0';
+    }
+
+    handler->pf_fill( handler->p_sys, handler, query->psz_url, psz_args,
+                      query->i_type, query->p_body, query->i_body,
+                      psz_remote_addr, NULL,
+                      &answer->p_body, &answer->i_body );
+
+    if( query->i_type == HTTPD_MSG_HEAD )
+    {
+        char *p = answer->p_body;
+        while ( (p = strchr( p, '\r' )) != NULL )
+        {
+            if( p[1] && p[1] == '\n' && p[2] && p[2] == '\r'
+                 && p[3] && p[3] == '\n' )
+            {
+                break;
+            }
+        }
+        if( p != NULL )
+        {
+            p[4] = '\0';
+            answer->i_body = strlen(answer->p_body) + 1;
+            answer->p_body = realloc( answer->p_body, answer->i_body );
+        }
+    }
+
+    if( strncmp( answer->p_body, "HTTP/1.", 7 ) )
+    {
+        int i_status, i_headers;
+        char *psz_headers, *psz_new, *psz_status;
+        char psz_code[12];
+        if( !strncmp( answer->p_body, "Status: ", 8 ) )
+        {
+            /* Apache-style */
+            i_status = strtol( &answer->p_body[8], &psz_headers, 0 );
+            if( *psz_headers ) psz_headers++;
+            if( *psz_headers ) psz_headers++;
+            i_headers = answer->i_body - (psz_headers - (char *)answer->p_body);
+        }
+        else
+        {
+            i_status = 200;
+            psz_headers = answer->p_body;
+            i_headers = answer->i_body;
+        }
+        switch( i_status )
+        {
+        case 200:
+            psz_status = "OK";
+            break;
+        case 401:
+            psz_status = "Unauthorized";
+            break;
+        default:
+            psz_status = "Undefined";
+            break;
+        }
+        snprintf( psz_code, sizeof(psz_code), "%d", i_status );
+        answer->i_body = sizeof("HTTP/1.0  \r\n") + strlen(psz_code)
+                           + strlen(psz_status) + i_headers - 1;
+        psz_new = malloc( answer->i_body + 1);
+        sprintf( psz_new, "HTTP/1.0 %s %s\r\n", psz_code, psz_status );
+        memcpy( &psz_new[strlen(psz_new)], psz_headers, i_headers );
+        free( answer->p_body );
+        answer->p_body = psz_new;
+    }
+
+    return VLC_SUCCESS;
+}
+
+httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
+                                   const char *psz_user,
+                                   const char *psz_password,
+                                   const vlc_acl_t *p_acl,
+                                   httpd_handler_callback_t pf_fill,
+                                   httpd_handler_sys_t *p_sys )
+{
+    httpd_handler_t *handler = malloc( sizeof( httpd_handler_t ) );
+
+    if( ( handler->url = httpd_UrlNewUnique( host, psz_url, psz_user,
+                                             psz_password, p_acl )
+        ) == NULL )
+    {
+        free( handler );
+        return NULL;
+    }
+
+    handler->pf_fill = pf_fill;
+    handler->p_sys   = p_sys;
+
+    httpd_UrlCatch( handler->url, HTTPD_MSG_HEAD, httpd_HandlerCallBack,
+                    (httpd_callback_sys_t*)handler );
+    httpd_UrlCatch( handler->url, HTTPD_MSG_GET,  httpd_HandlerCallBack,
+                    (httpd_callback_sys_t*)handler );
+    httpd_UrlCatch( handler->url, HTTPD_MSG_POST, httpd_HandlerCallBack,
+                    (httpd_callback_sys_t*)handler );
+
+    return handler;
+}
+
+void httpd_HandlerDelete( httpd_handler_t *handler )
+{
+    httpd_UrlDelete( handler->url );
+    free( handler );
 }
 
 /*****************************************************************************
@@ -1407,7 +1583,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
     if( cl->query.i_proto == HTTPD_PROTO_NONE )
     {
-        /* enought to see if it's rtp over rtsp or RTSP/HTTP */
+        /* enough to see if it's rtp over rtsp or RTSP/HTTP */
         i_len = httpd_NetRecv( cl, &cl->p_buffer[cl->i_buffer],
                                4 - cl->i_buffer );
         if( i_len > 0 )
@@ -1781,7 +1957,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
     i_len = httpd_NetSend( cl, &cl->p_buffer[cl->i_buffer],
                            cl->i_buffer_size - cl->i_buffer );
-    if( i_len > 0 )
+    if( i_len >= 0 )
     {
         cl->i_activity_date = mdate();
         cl->i_buffer += i_len;
@@ -2117,6 +2293,14 @@ static void httpd_HostThread( httpd_host_t *host )
 
                                 if( !url->catch[i_msg].cb( url->catch[i_msg].p_sys, cl, answer, query ) )
                                 {
+                                    if( answer->i_proto == HTTPD_PROTO_NONE )
+                                    {
+                                        /* Raw answer from a CGI */
+                                        cl->i_buffer = cl->i_buffer_size;
+                                    }
+                                    else
+                                        cl->i_buffer = -1;
+
                                     /* only one url can answer */
                                     answer = NULL;
                                     if( cl->url == NULL )
@@ -2200,9 +2384,10 @@ static void httpd_HostThread( httpd_host_t *host )
                         }
 
                         answer->i_body = p - answer->p_body;
+                        cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
                         httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
                     }
-                    cl->i_buffer = -1;  /* Force the creation of the answer in httpd_ClientSend */
+
                     cl->i_state = HTTPD_CLIENT_SENDING;
                 }
             }

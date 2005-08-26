@@ -166,6 +166,7 @@ char * vlc_strcasestr (const char *s1, const char *s2);
 httpd_file_t * httpd_FileNew (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t *);
 void vlc_freeaddrinfo (struct addrinfo *);
 void vlm_Delete (vlm_t *);
+void httpd_HandlerDelete (httpd_handler_t *);
 void vout_DisplayPicture (vout_thread_t *, picture_t *);
 void httpd_MsgClean (httpd_message_t *);
 int vout_ControlWindow (vout_thread_t *, void *, int, va_list);
@@ -203,6 +204,7 @@ float __config_GetFloat (vlc_object_t *, const char *);
 playlist_item_t * playlist_ItemGetById (playlist_t *, int);
 const char * vlc_gai_strerror (int);
 void net_ListenClose (int *fd);
+int __vlc_execve (vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data);
 int playlist_NodeAppend (playlist_t *,int,playlist_item_t*,playlist_item_t *);
 const iso639_lang_t * GetLang_2B (const char *);
 void sout_AccessOutDelete (sout_access_out_t *);
@@ -357,6 +359,7 @@ module_config_t * config_FindConfig (vlc_object_t *, const char *);
 playlist_item_t * playlist_ItemGetByInput (playlist_t *,input_item_t *);
 void config_SetCallbacks (module_config_t *, module_config_t *);
 int __vlc_cond_destroy (char *, int, vlc_cond_t *);
+httpd_handler_t * httpd_HandlerNew (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_handler_callback_t pf_fill, httpd_handler_sys_t *);
 vlc_list_t * __vlc_list_find (vlc_object_t *, int, int);
 char * ToLocale (const char *);
 int vlm_Load (vlm_t *, char *);
@@ -833,6 +836,9 @@ struct module_symbols_t
     struct dirent * (*vlc_readdir_wrapper_inner) (void *);
     int (*vlc_closedir_wrapper_inner) (void *);
     void * (*vlc_opendir_wrapper_inner) (const char *);
+    void (*httpd_HandlerDelete_inner) (httpd_handler_t *);
+    int (*__vlc_execve_inner) (vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data);
+    httpd_handler_t * (*httpd_HandlerNew_inner) (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_handler_callback_t pf_fill, httpd_handler_sys_t *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1232,6 +1238,9 @@ struct module_symbols_t
 #  define vlc_readdir_wrapper (p_symbols)->vlc_readdir_wrapper_inner
 #  define vlc_closedir_wrapper (p_symbols)->vlc_closedir_wrapper_inner
 #  define vlc_opendir_wrapper (p_symbols)->vlc_opendir_wrapper_inner
+#  define httpd_HandlerDelete (p_symbols)->httpd_HandlerDelete_inner
+#  define __vlc_execve (p_symbols)->__vlc_execve_inner
+#  define httpd_HandlerNew (p_symbols)->httpd_HandlerNew_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1634,6 +1643,9 @@ struct module_symbols_t
     ((p_symbols)->vlc_readdir_wrapper_inner) = vlc_readdir_wrapper; \
     ((p_symbols)->vlc_closedir_wrapper_inner) = vlc_closedir_wrapper; \
     ((p_symbols)->vlc_opendir_wrapper_inner) = vlc_opendir_wrapper; \
+    ((p_symbols)->httpd_HandlerDelete_inner) = httpd_HandlerDelete; \
+    ((p_symbols)->__vlc_execve_inner) = __vlc_execve; \
+    ((p_symbols)->httpd_HandlerNew_inner) = httpd_HandlerNew; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->osd_Slider_deprecated = NULL; \

@@ -334,11 +334,34 @@ struct httpd_file_sys_t
     char          *file;
     char          *name;
 
-    vlc_bool_t    b_html;
+    vlc_bool_t    b_html, b_handler;
 
     /* inited for each access */
     rpn_stack_t   stack;
     mvar_t        *vars;
+};
+
+/** \struct
+ * Structure associating an extension to an external program
+ */
+typedef struct http_association_t
+{
+    char                *psz_ext;
+    int                 i_argc;
+    char                **ppsz_argv;
+} http_association_t;
+
+/** \struct
+ * This structure represent a single CGI file to be parsed by the macros
+ * handling engine */
+struct httpd_handler_sys_t
+{
+    httpd_file_sys_t file;
+
+    /* HACK ALERT: this is added below so that casting httpd_handler_sys_t
+     * to httpd_file_sys_t works */
+    httpd_handler_t  *p_handler;
+    http_association_t *p_association;
 };
 
 /** \struct
@@ -351,11 +374,17 @@ struct intf_sys_t
     int                 i_files;
     httpd_file_sys_t    **pp_files;
 
+    int                 i_handlers;
+    http_association_t  **pp_handlers;
+
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
     char                *psz_html_type;
     vlc_iconv_t         iconv_from_utf8, iconv_to_utf8;
+
+    char                *psz_address;
+    unsigned short      i_port;
 };
 
 /** This function is the main HTTPD Callback used by the HTTP Interface */
@@ -363,6 +392,13 @@ int E_(HttpCallback)( httpd_file_sys_t *p_args,
                       httpd_file_t *,
                       uint8_t *p_request,
                       uint8_t **pp_data, int *pi_data );
+/** This function is the HTTPD Callback used for CGIs */
+int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
+                          httpd_handler_t *p_handler, uint8_t *_p_url,
+                          uint8_t *_p_request, int i_type,
+                          uint8_t *_p_in, int i_in,
+                          char *psz_remote_addr, char *psz_remote_host,
+                          uint8_t **_pp_data, int *pi_data );
 /**@}*/
 
 #endif

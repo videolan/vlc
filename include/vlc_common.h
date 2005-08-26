@@ -378,7 +378,10 @@ typedef struct httpd_message_t  httpd_message_t;
 typedef int    (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, httpd_message_t *query );
 typedef struct httpd_file_t     httpd_file_t;
 typedef struct httpd_file_sys_t httpd_file_sys_t;
-typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+typedef int (*httpd_file_callback_t)( httpd_file_sys_t *, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
+typedef struct httpd_handler_t  httpd_handler_t;
+typedef struct httpd_handler_sys_t httpd_handler_sys_t;
+typedef int (*httpd_handler_callback_t)( httpd_handler_sys_t *, httpd_handler_t *, uint8_t *psz_url, uint8_t *psz_request, int i_type, uint8_t *p_in, int i_in, char *psz_remote_addr, char *psz_remote_host, uint8_t **pp_data, int *pi_data );
 typedef struct httpd_redirect_t httpd_redirect_t;
 typedef struct httpd_stream_t httpd_stream_t;
 
@@ -1050,6 +1053,10 @@ typedef void *vlc_iconv_t;
 VLC_EXPORT( vlc_iconv_t, vlc_iconv_open, ( const char *, const char * ) );
 VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, char **, size_t *, char **, size_t * ) );
 VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
+
+/* execve wrapper (defined in src/extras/libc.c) */
+VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data ) );
+#define vlc_execve(a,b,c,d,e,f,g,h,i) __vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 /*****************************************************************************
  * CPU capabilities

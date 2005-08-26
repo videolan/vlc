@@ -43,6 +43,13 @@
 #   include <dirent.h>
 #endif
 
+#ifdef HAVE_FORK
+#   include <sys/time.h>
+#   include <unistd.h>
+#   include <errno.h>
+#   include <sys/wait.h>
+#endif
+
 /*****************************************************************************
  * getenv: just in case, but it should never be called
  *****************************************************************************/
@@ -809,4 +816,138 @@ char **vlc_parse_cmdline( const char *psz_cmdline, int *i_args )
     if( i_args ) *i_args = argc;
     free( psz_orig );
     return argv;
+}
+
+/*************************************************************************
+ * vlc_execve: Execute an external program with a given environment,
+ * wait until it finishes and return its standard output
+ *************************************************************************/
+int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
+                  char **ppsz_env, char *psz_cwd, char *p_in, int i_in,
+                  char **pp_data, int *pi_data )
+{
+#ifdef HAVE_FORK
+    int pi_stdin[2];
+    int pi_stdout[2];
+    pid_t i_child_pid;
+
+    pipe( pi_stdin );
+    pipe( pi_stdout );
+
+    if ( (i_child_pid = fork()) == -1 )
+    {
+        msg_Err( p_object, "unable to fork (%s)", strerror(errno) );
+        return -1;
+    }
+
+    if ( i_child_pid == 0 )
+    {
+        close(0);
+        dup(pi_stdin[1]);
+        close(pi_stdin[0]);
+
+        close(1);
+        dup(pi_stdout[1]);
+        close(pi_stdout[0]);
+
+        close(2);
+
+        if ( psz_cwd != NULL )
+            chdir( psz_cwd );
+        execve( ppsz_argv[0], ppsz_argv, ppsz_env );
+        exit(1);
+    }
+
+    close(pi_stdin[1]);
+    close(pi_stdout[1]);
+    if ( !i_in )
+        close( pi_stdin[0] );
+
+    *pi_data = 0;
+    *pp_data = malloc( 1025 );  /* +1 for \0 */
+
+    while ( !p_object->b_die )
+    {
+        int i_ret, i_status;
+        fd_set readfds, writefds;
+        struct timeval tv;
+
+        FD_ZERO( &readfds );
+        FD_ZERO( &writefds );
+        FD_SET( pi_stdout[0], &readfds );
+        if ( i_in )
+            FD_SET( pi_stdin[0], &writefds );
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 10000;
+        
+        i_ret = select( pi_stdin[0] > pi_stdout[0] ? pi_stdin[0] + 1 :
+                        pi_stdout[0] + 1, &readfds, &writefds, NULL, &tv );
+        if ( i_ret > 0 )
+        {
+            if ( FD_ISSET( pi_stdout[0], &readfds ) )
+            {
+                ssize_t i_read = read( pi_stdout[0], &(*pp_data)[*pi_data],
+                                       1024 );
+                if ( i_read > 0 )
+                {
+                    *pi_data += i_read;
+                    *pp_data = realloc( *pp_data, *pi_data + 1025 );
+                }
+            }
+            if ( FD_ISSET( pi_stdin[0], &writefds ) )
+            {
+                ssize_t i_write = write( pi_stdin[0], p_in, __MIN(i_in, 1024) );
+
+                if ( i_write > 0 )
+                {
+                    p_in += i_write;
+                    i_in -= i_write;
+                }
+                if ( !i_in )
+                    close( pi_stdin[0] );
+            }
+        }
+
+        if ( waitpid( i_child_pid, &i_status, WNOHANG ) == i_child_pid )
+        {
+            if ( WIFEXITED( i_status ) )
+            {
+                if ( WEXITSTATUS( i_status ) )
+                {
+                    msg_Warn( p_object,
+                              "child %s returned with error code %d",
+                              ppsz_argv[0], WEXITSTATUS( i_status ) );
+                }
+            }
+            else
+            {
+                if ( WIFSIGNALED( i_status ) )
+                {
+                    msg_Warn( p_object,
+                              "child %s quit on signal %d", ppsz_argv[0],
+                              WTERMSIG( i_status ) );
+                }
+            }
+            if ( i_in )
+                close( pi_stdin[0] );
+            close( pi_stdout[0] );
+            break;
+        }
+
+        if ( i_ret < 0 && errno != EINTR )
+        {
+            msg_Warn( p_object, "select failed (%s)", strerror(errno) );
+        }
+    }
+
+#else
+    msg_Err( p_intf, "vlc_execve called but no implementation is available" );
+    return -1;
+
+#endif
+
+    (*pp_data)[*pi_data] = '\0';
+
+    return 0;
 }
