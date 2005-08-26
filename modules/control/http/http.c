@@ -613,12 +613,13 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     int i_request = p_request != NULL ? strlen( p_request ) : 0;
     char *p;
     int i_env = 0;
-    char **pp_env = NULL;
+    char **ppsz_env = NULL;
     char *psz_tmp;
     char sep;
     int  i_buffer;
     char *p_buffer;
     char *psz_cwd;
+    int i_ret;
 
 #ifdef WIN32
     sep = '\\';
@@ -627,20 +628,20 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
 #endif
 
     /* Create environment for the CGI */
-    TAB_APPEND( i_env, pp_env, strdup("GATEWAY_INTERFACE=CGI/1.1") );
-    TAB_APPEND( i_env, pp_env, strdup("SERVER_PROTOCOL=HTTP/1.1") );
-    TAB_APPEND( i_env, pp_env, strdup("SERVER_SOFTWARE=" COPYRIGHT_MESSAGE) );
+    TAB_APPEND( i_env, ppsz_env, strdup("GATEWAY_INTERFACE=CGI/1.1") );
+    TAB_APPEND( i_env, ppsz_env, strdup("SERVER_PROTOCOL=HTTP/1.1") );
+    TAB_APPEND( i_env, ppsz_env, strdup("SERVER_SOFTWARE=" COPYRIGHT_MESSAGE) );
 
     switch( i_type )
     {
     case HTTPD_MSG_GET:
-        TAB_APPEND( i_env, pp_env, strdup("REQUEST_METHOD=GET") );
+        TAB_APPEND( i_env, ppsz_env, strdup("REQUEST_METHOD=GET") );
         break;
     case HTTPD_MSG_POST:
-        TAB_APPEND( i_env, pp_env, strdup("REQUEST_METHOD=POST") );
+        TAB_APPEND( i_env, ppsz_env, strdup("REQUEST_METHOD=POST") );
         break;
     case HTTPD_MSG_HEAD:
-        TAB_APPEND( i_env, pp_env, strdup("REQUEST_METHOD=HEAD") );
+        TAB_APPEND( i_env, ppsz_env, strdup("REQUEST_METHOD=HEAD") );
         break;
     default:
         break;
@@ -650,50 +651,50 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     {
         psz_tmp = malloc( sizeof("QUERY_STRING=") + i_request );
         sprintf( psz_tmp, "QUERY_STRING=%s", p_request );
-        TAB_APPEND( i_env, pp_env, psz_tmp );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
         psz_tmp = malloc( sizeof("REQUEST_URI=?") + strlen(p_url)
                            + i_request );
         sprintf( psz_tmp, "REQUEST_URI=%s?%s", p_url, p_request );
-        TAB_APPEND( i_env, pp_env, psz_tmp );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
     else
     {
         psz_tmp = malloc( sizeof("REQUEST_URI=") + strlen(p_url) );
         sprintf( psz_tmp, "REQUEST_URI=%s", p_url );
-        TAB_APPEND( i_env, pp_env, psz_tmp );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
     psz_tmp = malloc( sizeof("SCRIPT_NAME=") + strlen(p_url) );
     sprintf( psz_tmp, "SCRIPT_NAME=%s", p_url );
-    TAB_APPEND( i_env, pp_env, psz_tmp );
+    TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
     psz_tmp = malloc( sizeof("SCRIPT_FILENAME=") + strlen(p_args->file.file) );
     sprintf( psz_tmp, "SCRIPT_FILENAME=%s", p_args->file.file );
-    TAB_APPEND( i_env, pp_env, psz_tmp );
+    TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
 #define p_sys p_args->file.p_intf->p_sys
     psz_tmp = malloc( sizeof("SERVER_NAME=") + strlen(p_sys->psz_address) );
     sprintf( psz_tmp, "SERVER_NAME=%s", p_sys->psz_address );
-    TAB_APPEND( i_env, pp_env, psz_tmp );
+    TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
     psz_tmp = malloc( sizeof("SERVER_PORT=") + 5 );
     sprintf( psz_tmp, "SERVER_PORT=%u", p_sys->i_port );
-    TAB_APPEND( i_env, pp_env, psz_tmp );
+    TAB_APPEND( i_env, ppsz_env, psz_tmp );
 #undef p_sys
 
     if( psz_remote_addr != NULL && *psz_remote_addr )
     {
         psz_tmp = malloc( sizeof("REMOTE_ADDR=") + strlen(psz_remote_addr) );
         sprintf( psz_tmp, "REMOTE_ADDR=%s", psz_remote_addr );
-        TAB_APPEND( i_env, pp_env, psz_tmp );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
     if( psz_remote_host != NULL && *psz_remote_host )
     {
         psz_tmp = malloc( sizeof("REMOTE_HOST=") + strlen(psz_remote_host) );
         sprintf( psz_tmp, "REMOTE_HOST=%s", psz_remote_host );
-        TAB_APPEND( i_env, pp_env, psz_tmp );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
     if( i_in )
@@ -709,7 +710,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
                 *end = '\0';
                 psz_tmp = malloc( sizeof("CONTENT_TYPE=") + strlen(p) );
                 sprintf( psz_tmp, "CONTENT_TYPE=%s", p );
-                TAB_APPEND( i_env, pp_env, psz_tmp );
+                TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
             if( !strncmp( p, "Content-Length: ", strlen("Content-Length: ") ) )
@@ -720,7 +721,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
                 *end = '\0';
                 psz_tmp = malloc( sizeof("CONTENT_LENGTH=") + strlen(p) );
                 sprintf( psz_tmp, "CONTENT_LENGTH=%s", p );
-                TAB_APPEND( i_env, pp_env, psz_tmp );
+                TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
 
@@ -734,7 +735,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
         }
     }
 
-    TAB_APPEND( i_env, pp_env, NULL );
+    TAB_APPEND( i_env, ppsz_env, NULL );
 
     TAB_APPEND( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
                 p_args->file.file );
@@ -754,27 +755,23 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
         psz_cwd = NULL;
     }
 
-    if( vlc_execve( p_args->file.p_intf, p_args->p_association->i_argc,
-                    p_args->p_association->ppsz_argv, pp_env, psz_cwd,
-                    (char *)p_in, i_in, &p_buffer, &i_buffer ) == -1 )
-    {
-        TAB_REMOVE( p_args->p_association->i_argc,
-                    p_args->p_association->ppsz_argv, NULL );
-        TAB_REMOVE( p_args->p_association->i_argc,
-                    p_args->p_association->ppsz_argv, p_args->file.file );
-        if( psz_cwd != NULL )
-            free( psz_cwd );
-
-        Callback404( (httpd_file_sys_t *)p_args, pp_data, pi_data );
-        return VLC_SUCCESS;
-    }
+    i_ret = vlc_execve( p_args->file.p_intf, p_args->p_association->i_argc,
+                        p_args->p_association->ppsz_argv, ppsz_env, psz_cwd,
+                        (char *)p_in, i_in, &p_buffer, &i_buffer );
     TAB_REMOVE( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
                 NULL );
     TAB_REMOVE( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
                 p_args->file.file );
     if( psz_cwd != NULL )
         free( psz_cwd );
+    while( i_env )
+        TAB_REMOVE( i_env, ppsz_env, ppsz_env[0] );
 
+    if( i_ret == -1 )
+    {
+        Callback404( (httpd_file_sys_t *)p_args, pp_data, pi_data );
+        return VLC_SUCCESS;
+    }
     p = p_buffer;
     while( strncmp( p, "Content-Type: text/html",
                     strlen("Content-Type: text/html") ) )

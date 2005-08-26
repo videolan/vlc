@@ -942,7 +942,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     }
 
 #else
-    msg_Err( p_intf, "vlc_execve called but no implementation is available" );
+    msg_Err( p_object, "vlc_execve called but no implementation is available" );
     return -1;
 
 #endif
