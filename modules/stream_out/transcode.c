@@ -36,7 +36,7 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 #include "vlc_filter.h"
-#include "osd.h"
+#include "vlc_osd.h"
 
 #define MASTER_SYNC_MAX_DRIFT 100000
 

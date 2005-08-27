@@ -31,7 +31,7 @@
 #include <vlc/vout.h>
 
 #include "vlc_keys.h"
-#include <osd.h>
+#include <vlc_osd.h>
 #include <errno.h>
 #include <time.h>
 

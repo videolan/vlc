@@ -32,7 +32,7 @@
 #include <vlc/input.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
-#include <osd.h>
+#include <vlc_osd.h>
 
 #include "vlc_keys.h"
 
@@ -243,9 +243,9 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_hotkeys[i].i_key == i_key )
             {
-                 i_action = p_hotkeys[i].i_action;
-                 i_times  = p_hotkeys[i].i_times; /* times key pressed within max. delta time */
-		p_hotkeys[i].i_times = 0;
+                i_action = p_hotkeys[i].i_action;
+                i_times  = p_hotkeys[i].i_times; /* times key pressed within max. delta time */
+                p_hotkeys[i].i_times = 0;
             }
         }
 

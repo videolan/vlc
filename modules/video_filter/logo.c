@@ -34,7 +34,7 @@
 #include "vlc_filter.h"
 #include "filter_common.h"
 #include "vlc_image.h"
-#include "osd.h"
+#include "vlc_osd.h"
 
 #ifdef LoadImage
 #   undef LoadImage

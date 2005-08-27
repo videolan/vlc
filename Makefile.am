@@ -86,7 +86,6 @@ HEADERS_include = \
 	include/modules_inner.h \
 	include/mtime.h \
 	include/network.h \
-	include/osd.h \
 	include/os_specific.h \
 	include/snapshot.h \
 	include/stream_output.h \
@@ -430,6 +429,8 @@ SOURCES_libvlc_common = \
 	src/stream_output/acl.c \
 	src/osd/osd.c \
 	src/osd/osd_parser.c \
+	src/osd/osd_text.c \
+	src/osd/osd_widgets.c \
 	src/misc/charset.c \
 	src/misc/httpd.c \
 	src/misc/tls.c \

@@ -1,10 +1,14 @@
 /*****************************************************************************
- * osd.h - OSD menu definitions and function prototypes
+ * vlc_osd.h - OSD menu definitions and function prototypes
  *****************************************************************************
  * Copyright (C) 2004-2005 M2X
- * $Id: osd.h 9451 2004-12-01 01:07:08Z jpsaman $
+ * $Id: vlc_osd.h 9451 2004-12-01 01:07:08Z jpsaman $
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
+ *
+ * Added code from include/osd.h written by:
+ * Copyright (C) 2003-2005 the VideoLAN team
+ * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +67,7 @@ extern "C" {
 # endif
 
 /**
- * The OSD Menu configuration file format.
+ * \brief The OSD Menu configuration file format.
  *
  * The configuration file syntax is very basic and so is its parser. See the
  * BNF formal representation below:
@@ -95,6 +99,37 @@ extern "C" {
  *
  */ 
 
+/**
+ * OSD menu position and picture type defines
+ */
+
+#define OSD_ALIGN_LEFT 0x1
+#define OSD_ALIGN_RIGHT 0x2
+#define OSD_ALIGN_TOP 0x4
+#define OSD_ALIGN_BOTTOM 0x8
+
+#define OSD_HOR_SLIDER 1
+#define OSD_VERT_SLIDER 2
+
+#define OSD_PLAY_ICON 1
+#define OSD_PAUSE_ICON 2
+#define OSD_SPEAKER_ICON 3
+#define OSD_MUTE_ICON 4
+
+/**
+ * Text style information.
+ * This struct is currently ignored
+ */
+struct text_style_t
+{
+    int i_size;
+    uint32_t i_color;
+    vlc_bool_t b_italic;
+    vlc_bool_t b_bold;
+    vlc_bool_t b_underline;
+};
+static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FALSE, VLC_FALSE };
+ 
 /**
  * OSD menu button states
  *
@@ -371,6 +406,29 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
     val.b_bool = p_osd->p_state->b_update = b_value;
     var_Set( p_osd, "osd-menu-update", val );
 } 
+
+/**
+ * Textual feedback
+ *
+ * Functions that provide the textual feedback on the OSD. They are shown on hotkey commands. The feedback
+ * is also part of the osd_button_t object. The types are declared in the include file
+ * include/vlc_osd.h
+ * @see vlc_osd.h 
+ */
+VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) );
+
+/**
+ * Default feedback images
+ *
+ * Functions that provide the default OSD feedback images on hotkey commands. These feedback
+ * images are also part of the osd_button_t object. The types are declared in the include file
+ * include/vlc_osd.h
+ * @see vlc_osd.h 
+ */
+VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, short ) );
+VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, short ) );
 
 /**
  * Loading and parse the OSD Configuration file

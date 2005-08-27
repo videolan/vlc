@@ -31,7 +31,7 @@
 #include <vlc/decoder.h>
 #include <vlc/intf.h>
 
-#include <osd.h>
+#include <vlc_osd.h>
 
 #include "charset.h"
 

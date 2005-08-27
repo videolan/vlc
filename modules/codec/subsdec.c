@@ -29,7 +29,7 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
-#include "osd.h"
+#include "vlc_osd.h"
 #include "vlc_filter.h"
 
 #include "charset.h"

@@ -34,7 +34,7 @@
 #include "vout.h"
 #include "open.h"
 #include "controls.h"
-#include <osd.h>
+#include <vlc_osd.h>
 
 /*****************************************************************************
  * VLCControls implementation 

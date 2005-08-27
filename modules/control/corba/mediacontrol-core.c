@@ -5,7 +5,7 @@
 #include <vlc/aout.h>
 #include <vlc_demux.h>
 
-#include <osd.h>
+#include <vlc_osd.h>
 
 #define HAS_SNAPSHOT 1
 

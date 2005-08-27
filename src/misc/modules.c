@@ -92,7 +92,6 @@
 #include "aout_internal.h"
 
 #include "stream_output.h"
-#include "osd.h"
 #include "vlc_httpd.h"
 #include "vlc_acl.h"
 #include "vlc_tls.h"

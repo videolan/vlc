@@ -32,7 +32,6 @@
 #include <vlc_filter.h>
 #include <vlc_video.h>
 
-#include <osd.h>
 #include <vlc_osd.h>
 
 /*****************************************************************************

@@ -34,7 +34,7 @@
 
 #include "vlc_filter.h"
 #include "vlc_block.h"
-#include "osd.h"
+#include "vlc_osd.h"
 
 /*****************************************************************************
  * Local prototypes
