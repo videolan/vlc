@@ -8,11 +8,13 @@ Core support:
 * New OSD system
 
 Video output:
-* new --monitor-aspect-ratio option
+* Fixed problems with OpenGL output
+* New --monitor-aspect-ratio option
 
 Input:
 * Improved DVB support for satellite bands other than Ku-band
 * IPv6 and Extended passive mode support for FTP
+* IPv6 Source Specific Multicast support
 
 Decoders:
 * Support for libSDL_image to import different image types
@@ -23,21 +25,29 @@ Services discovery:
 Video Filters:
 * RSS feed overlay
 
+Stream output:
+* New shout output module to forward streams to icecast servers
+* Fixed several SAP and SDP announcement bugs
+ 
 Interfaces:
  * Mac OS X
-    - new streaming and transcoding wizard
-    - new extended controls panel
-    - new bookmarks window
+    - New streaming and transcoding wizard
+    - New extended controls panel
+    - New bookmarks window
+    - Fixed playlist sorting
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*	
     - VLC update checker
  * HTTP
-    - new RPN functions to control VLC features (see play-howto)
-    - facilities to correctly handle non-ASCII characters and spaces in
+    - New RPN functions to control VLC features (see play-howto)
+    - Facilities to correctly handle non-ASCII characters and spaces in
       the names of files
-    - include macro to include other files
-    
+    - Include macro to include other files
+
+ActiveX plugin:
+* Should now work outside IE as well
+
 Translations:
  The following language was added:
  * Romanian
