@@ -160,7 +160,8 @@ static int Demux( demux_t *p_demux )
                 /* Extended info */
                 psz_parse += sizeof("EXTINF:") - 1;
                 parseEXTINF( psz_parse, &psz_author, &psz_name, &i_parsed_duration );
-                i_duration = i_parsed_duration * 1000000;
+                if( i_parsed_duration >= 0 )
+                    i_duration = i_parsed_duration * 1000000;
                 if ( psz_name )
                     psz_name = strdup( psz_name );
                 if ( psz_author )
@@ -270,31 +271,26 @@ static void parseEXTINF(char *psz_string, char **ppsz_author,
                         char **ppsz_name, int *pi_duration)
 {
     char *end=NULL;
-    char *psz_item=NULL;
+    char *psz_item = NULL;
+    char *psz_duration = NULL;
     char *pos;
 
     end = psz_string + strlen( psz_string );
 
     /* ignore whitespaces */
-    for (; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ); 
+    for(; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ); 
          psz_string++ );
 
     /* read all digits */
     psz_item = psz_string;
-    while ( psz_string < end && *psz_string >= '0' && *psz_string <= '9' )
+    psz_duration = strchr( psz_string, ',' );
+    if( psz_duration )
     {
-        psz_string++;
+       *psz_duration = '\0';
+       *pi_duration = atoi(psz_item);
+       psz_string = psz_duration;
     }
-    if ( *psz_item >= '0' && *psz_item <= '9' && *psz_string == ',' )
-    {
-        *psz_string = '\0';
-        *pi_duration = atoi(psz_item);
-    }
-    else
-    {
-        return;
-    }
-    if ( psz_string < end )               /* continue parsing if possible */
+    if( psz_string < end )               /* continue parsing if possible */
     {
         psz_string++;
     }
