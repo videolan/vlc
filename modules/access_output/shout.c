@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Daniel Fischer <dan at subsignal dot org>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +25,9 @@
 /*****************************************************************************
  * Some Comments:
  *
- * o this only works for ogg streams, and there's no checking about that yet.
- * o there's a memleak somewhere, quite huge. i'm unsure if its somewhere
- *   in libshout, in vlc or even in this patch...
+ * - this only works for ogg and/or mp3, and we don't check this yet.
+ * - MP3 metadata is not passed along, since metadata is only available after
+ *   this module is opened.
  *
  * Typical usage:
  *
