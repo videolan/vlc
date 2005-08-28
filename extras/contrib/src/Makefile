@@ -87,8 +87,8 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .SDL_image \
-	.aclocal
-# mozilla support? add before .aclocal:  .glib .libidl .mozilla
+	.glib .libidl .gecko .aclocal
+# .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 else
 
  ifeq ($(HOST),i586-pc-beos)
@@ -1230,6 +1230,24 @@ libIDL: libIDL-$(LIBIDL_VERSION).tar.gz
 CLEAN_FILE += .libidl
 CLEAN_PKG += libIDL
 DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
+
+# ***************************************************************************
+# Gecko SDK
+# ***************************************************************************
+
+gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz:
+	$(WGET) $(GECKO_SDK_MAC_URL)
+
+gecko-sdk: gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
+	$(EXTRACT_GZ)
+
+.gecko: gecko-sdk
+	(cd $<)
+	touch $@
+
+CLEAN_FILE += .gecko
+CLEAN_PKG += gecko-sdk
+DISTCLEAN_PKG += gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 
 # ***************************************************************************
 # mozilla

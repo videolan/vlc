@@ -126,6 +126,7 @@ GLIB_VERSION=1.2.8
 GLIB_URL=ftp://ftp.gtk.org/pub/gtk/v1.2/glib-1.2.8.tar.gz
 LIBIDL_VERSION=0.6.8
 LIBIDL_URL=http://andrewtv.org/libIDL/libIDL-$(LIBIDL_VERSION).tar.gz
+GECKO_SDK_MAC_URL=$(VIDEOLAN)/testing/contrib/gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 MOZILLA_VERSION=1.7.5
 MOZILLA_URL=http://ftp.mozilla.org/pub/mozilla.org/mozilla/releases/mozilla$(MOZILLA_VERSION)/source/mozilla-source-$(MOZILLA_VERSION).tar.bz2
 TWOLAME_VERSION=0.3.2
