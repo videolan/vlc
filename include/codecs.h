@@ -236,6 +236,14 @@ typedef struct
 #define WAVE_FORMAT_DK3                 0x0061
 #define WAVE_FORMAT_DK4                 0x0062
 
+#define WAVE_FORMAT_VORB_1              0x674f
+#define WAVE_FORMAT_VORB_1PLUS          0x676f
+#define WAVE_FORMAT_VORB_2              0x6750
+#define WAVE_FORMAT_VORB_2PLUS          0x6770
+#define WAVE_FORMAT_VORB_3              0x6751
+#define WAVE_FORMAT_VORB_3PLUS          0x6771
+
+
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
 #define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
 #endif
@@ -285,28 +293,34 @@ static struct
 }
 wave_format_tag_to_fourcc[] =
 {
-    { WAVE_FORMAT_PCM,      VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
-    { WAVE_FORMAT_ADPCM,    VLC_FOURCC( 'm', 's', 0x00,0x02), "Adpcm" },
+    { WAVE_FORMAT_PCM,        VLC_FOURCC( 'a', 'r', 'a', 'w' ), "Raw audio" },
+    { WAVE_FORMAT_ADPCM,      VLC_FOURCC( 'm', 's', 0x00,0x02), "Adpcm" },
     { WAVE_FORMAT_IEEE_FLOAT, VLC_FOURCC( 'a', 'f', 'l', 't' ), "IEEE Float audio" },
-    { WAVE_FORMAT_ALAW,     VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
-    { WAVE_FORMAT_MULAW,    VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
-    { WAVE_FORMAT_IMA_ADPCM,VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
-    { WAVE_FORMAT_G726,     VLC_FOURCC( 'g', '7', '2', '6' ), "G.726 Adpcm" },
-    { WAVE_FORMAT_MPEGLAYER3,VLC_FOURCC('m', 'p', 'g', 'a' ), "Mpeg Audio" },
-    { WAVE_FORMAT_MPEG,     VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
-    { WAVE_FORMAT_A52,      VLC_FOURCC( 'a', '5', '2', ' ' ), "A/52" },
-    { WAVE_FORMAT_WMA1,     VLC_FOURCC( 'w', 'm', 'a', '1' ), "Window Media Audio v1" },
-    { WAVE_FORMAT_WMA2,     VLC_FOURCC( 'w', 'm', 'a', '2' ), "Window Media Audio v2" },
-    { WAVE_FORMAT_WMA2,     VLC_FOURCC( 'w', 'm', 'a', ' ' ), "Window Media Audio v2" },
-    { WAVE_FORMAT_WMAP,     VLC_FOURCC( 'w', 'm', 'a', 'p' ), "Window Media Audio 9 Professional" },
-    { WAVE_FORMAT_WMAL,     VLC_FOURCC( 'w', 'm', 'a', 'l' ), "Window Media Audio 9 Lossless" },
-    { WAVE_FORMAT_DK3,      VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
-    { WAVE_FORMAT_DK4,      VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
-    { WAVE_FORMAT_DTS,      VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
-    { WAVE_FORMAT_DTS_MS,   VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
-    { WAVE_FORMAT_DIVIO_AAC,VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio (Divio)" },
-    { WAVE_FORMAT_AAC,      VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio" },
-    { WAVE_FORMAT_UNKNOWN,  VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
+    { WAVE_FORMAT_ALAW,       VLC_FOURCC( 'a', 'l', 'a', 'w' ), "A-Law" },
+    { WAVE_FORMAT_MULAW,      VLC_FOURCC( 'm', 'l', 'a', 'w' ), "Mu-Law" },
+    { WAVE_FORMAT_IMA_ADPCM,  VLC_FOURCC( 'm', 's', 0x00,0x11), "Ima-Adpcm" },
+    { WAVE_FORMAT_G726,       VLC_FOURCC( 'g', '7', '2', '6' ), "G.726 Adpcm" },
+    { WAVE_FORMAT_MPEGLAYER3, VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
+    { WAVE_FORMAT_MPEG,       VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
+    { WAVE_FORMAT_A52,        VLC_FOURCC( 'a', '5', '2', ' ' ), "A/52" },
+    { WAVE_FORMAT_WMA1,       VLC_FOURCC( 'w', 'm', 'a', '1' ), "Window Media Audio v1" },
+    { WAVE_FORMAT_WMA2,       VLC_FOURCC( 'w', 'm', 'a', '2' ), "Window Media Audio v2" },
+    { WAVE_FORMAT_WMA2,       VLC_FOURCC( 'w', 'm', 'a', ' ' ), "Window Media Audio v2" },
+    { WAVE_FORMAT_WMAP,       VLC_FOURCC( 'w', 'm', 'a', 'p' ), "Window Media Audio 9 Professional" },
+    { WAVE_FORMAT_WMAL,       VLC_FOURCC( 'w', 'm', 'a', 'l' ), "Window Media Audio 9 Lossless" },
+    { WAVE_FORMAT_DK3,        VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
+    { WAVE_FORMAT_DK4,        VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
+    { WAVE_FORMAT_DTS,        VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
+    { WAVE_FORMAT_DTS_MS,     VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
+    { WAVE_FORMAT_DIVIO_AAC,  VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio (Divio)" },
+    { WAVE_FORMAT_AAC,        VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio" },
+    { WAVE_FORMAT_VORB_1,     VLC_FOURCC( 'v', 'o', 'r', '1' ), "Vorbis 1 Audio" },
+    { WAVE_FORMAT_VORB_1PLUS, VLC_FOURCC( 'v', 'o', '1', '+' ), "Vorbis 1+ Audio" },
+    { WAVE_FORMAT_VORB_2,     VLC_FOURCC( 'v', 'o', 'r', '2' ), "Vorbis 2 Audio" },
+    { WAVE_FORMAT_VORB_2PLUS, VLC_FOURCC( 'v', 'o', '2', '+' ), "Vorbis 2+ Audio" },
+    { WAVE_FORMAT_VORB_3,     VLC_FOURCC( 'v', 'o', 'r', '3' ), "Vorbis 3 Audio" },
+    { WAVE_FORMAT_VORB_3PLUS, VLC_FOURCC( 'v', 'o', '3', '+' ), "Vorbis 3+ Audio" },
+    { WAVE_FORMAT_UNKNOWN,    VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
 static inline void wf_tag_to_fourcc( uint16_t i_tag, vlc_fourcc_t *fcc,
