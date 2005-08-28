@@ -1607,7 +1607,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
 #endif
     /* We add the "VLCPlaylistItemPboardType" type to be able to recognize
-       a Drop operation com�ng from the playlist.
+       a Drop operation coming from the playlist.
        We need to add NSFilenamesPboardType otherwise the outlineview refuses
        to the drop. */
 
