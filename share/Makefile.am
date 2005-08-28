@@ -101,6 +101,7 @@ DIST_http = \
 
 DIST_osdmenu_default = \
 	osdmenu/default.cfg \
+	osdmenu/default/unselected.png \
 	osdmenu/default/selection/bw.png \
 	osdmenu/default/selection/esc.png \
 	osdmenu/default/selection/fw.png \
