@@ -12,6 +12,9 @@
 /* Define if we have support for dynamic plugins */
 #define HAVE_DYNAMIC_PLUGINS 1
 
+/* Define if you want the HTTP dameon support */
+#define ENABLE_HTTPD 1
+
 /* Define if you have Windows' LoadLibrary */
 #define HAVE_DL_WINDOWS 1
 
@@ -146,6 +149,18 @@
 
 /* Simple version string */
 #define VERSION_MESSAGE "@VERSION@ @CODENAME@"
+
+/* compiler */
+#define VLC_COMPILER "Microsoft Visual C++"
+
+/* user who ran configure */
+#define VLC_COMPILE_BY "user"
+
+/* domain of the host which ran configure */
+#define VLC_COMPILE_DOMAIN "videolan.org"
+
+/* host which ran configure */
+#define VLC_COMPILE_HOST "machine"
 
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */
