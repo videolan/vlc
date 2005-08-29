@@ -551,23 +551,31 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
 
 #if defined( WIN32 )
         if( psz_dir[0] == '\0' || (psz_dir[0] == '\\' && psz_dir[1] == '\0') )
+        {
             snprintf( tmp, sizeof(tmp), "%s", p_dir_content->d_name );
+        }
         else
 #endif
+        {
             snprintf( tmp, sizeof(tmp), "%s%c%s", psz_dir, sep,
                       p_dir_content->d_name );
 
 #ifdef HAVE_SYS_STAT_H
-        if( stat( tmp, &stat_info ) == -1 )
-        {
-            continue;
-        }
+            if( stat( tmp, &stat_info ) == -1 )
+            {
+                continue;
+            }
 #endif
+        }
         f = E_(mvar_New)( name, "set" );
 
         psz_tmp = vlc_fix_readdir_charset( p_intf, p_dir_content->d_name );
         psz_name = E_(FromUTF8)( p_intf, psz_tmp );
         free( psz_tmp );
+
+        /* put file extension in 'ext' */
+        psz_ext = strrchr( psz_name, '.' );
+        E_(mvar_AppendNewVar)( f, "ext", psz_ext != NULL ? psz_ext + 1 : "" );
 
 #if defined( WIN32 )
         if( psz_dir[0] == '\0' || (psz_dir[0] == '\\' && psz_dir[1] == '\0') )
@@ -575,6 +583,9 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
             snprintf( tmp, sizeof(tmp), "%c:", psz_name[0] );
             E_(mvar_AppendNewVar)( f, "name", psz_name );
             E_(mvar_AppendNewVar)( f, "basename", tmp );
+            E_(mvar_AppendNewVar)( f, "type", "directory" );
+            E_(mvar_AppendNewVar)( f, "size", "unknown" );
+            E_(mvar_AppendNewVar)( f, "date", "unknown" );
         }
         else
 #endif
@@ -582,45 +593,42 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
             snprintf( tmp, sizeof(tmp), "%s%c%s", psz_dir, sep, psz_name );
             E_(mvar_AppendNewVar)( f, "name", tmp );
             E_(mvar_AppendNewVar)( f, "basename", psz_name );
-        }
-
-        /* put file extension in 'ext' */
-        psz_ext = strrchr( psz_name, '.' );
-        E_(mvar_AppendNewVar)( f, "ext", psz_ext != NULL ? psz_ext + 1 : "" );
-
-        free( psz_name );
 
 #ifdef HAVE_SYS_STAT_H
-        if( S_ISDIR( stat_info.st_mode ) )
-        {
-            E_(mvar_AppendNewVar)( f, "type", "directory" );
-        }
-        else if( S_ISREG( stat_info.st_mode ) )
-        {
-            E_(mvar_AppendNewVar)( f, "type", "file" );
-        }
-        else
-        {
-            E_(mvar_AppendNewVar)( f, "type", "unknown" );
-        }
+            if( S_ISDIR( stat_info.st_mode ) )
+            {
+                E_(mvar_AppendNewVar)( f, "type", "directory" );
+            }
+            else if( S_ISREG( stat_info.st_mode ) )
+            {
+                E_(mvar_AppendNewVar)( f, "type", "file" );
+            }
+            else
+            {
+                E_(mvar_AppendNewVar)( f, "type", "unknown" );
+            }
 
-        sprintf( tmp, I64Fd, (int64_t)stat_info.st_size );
-        E_(mvar_AppendNewVar)( f, "size", tmp );
+            sprintf( tmp, I64Fd, (int64_t)stat_info.st_size );
+            E_(mvar_AppendNewVar)( f, "size", tmp );
 
-        /* FIXME memory leak FIXME */
+            /* FIXME memory leak FIXME */
 #   ifdef HAVE_CTIME_R
-        ctime_r( &stat_info.st_mtime, tmp );
-        E_(mvar_AppendNewVar)( f, "date", tmp );
+            ctime_r( &stat_info.st_mtime, tmp );
+            E_(mvar_AppendNewVar)( f, "date", tmp );
 #   else
-        E_(mvar_AppendNewVar)( f, "date", ctime( &stat_info.st_mtime ) );
+            E_(mvar_AppendNewVar)( f, "date", ctime( &stat_info.st_mtime ) );
 #   endif
 
 #else
-        E_(mvar_AppendNewVar)( f, "type", "unknown" );
-        E_(mvar_AppendNewVar)( f, "size", "unknown" );
-        E_(mvar_AppendNewVar)( f, "date", "unknown" );
+            E_(mvar_AppendNewVar)( f, "type", "unknown" );
+            E_(mvar_AppendNewVar)( f, "size", "unknown" );
+            E_(mvar_AppendNewVar)( f, "date", "unknown" );
 #endif
+        }
+
         E_(mvar_AppendVar)( s, f );
+
+        free( psz_name );
     }
 
     free( psz_dir );
