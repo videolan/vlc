@@ -142,8 +142,7 @@ then
   fi
 
   #  The evil ^M. printf '\r' does not work in Cygwin.
-  M='
-'
+  M=''
 
   #  Variables we get from configure.ac
   LIBVLC_VERSION=`sed -ne '/AC_INIT/s/.*,\(.*\))/\1/p' < configure.ac`
