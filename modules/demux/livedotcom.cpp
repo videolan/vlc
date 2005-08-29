@@ -425,7 +425,7 @@ static int  Open ( vlc_object_t *p_this )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('u','n','d','f') );
             tk->fmt.audio.i_channels = sub->numChannels();
-            tk->fmt.audio.i_rate = sub->rtpSource()->timestampFrequency();
+            tk->fmt.audio.i_rate = sub->rtpTimestampFrequency();
 
             if( !strcmp( sub->codecName(), "MPA" ) ||
                 !strcmp( sub->codecName(), "MPA-ROBUST" ) ||
@@ -456,6 +456,14 @@ static int  Open ( vlc_object_t *p_this )
             else if( !strcmp( sub->codecName(), "PCMA" ) )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'a', 'l', 'a', 'w' );
+            }
+            else if( !strcmp( sub->codecName(), "AMR" ) )
+            {
+                tk->fmt.i_codec = VLC_FOURCC( 's', 'a', 'm', 'r' );
+            }
+            else if( !strcmp( sub->codecName(), "AMR-WB" ) )
+            {
+                tk->fmt.i_codec = VLC_FOURCC( 's', 'a', 'w', 'b' );
             }
             else if( !strcmp( sub->codecName(), "MP4A-LATM" ) )
             {
@@ -778,7 +786,7 @@ static int Demux( demux_t *p_demux )
         live_track_t *tk = p_sys->track[i];
 
         if( !tk->b_muxed && !tk->b_rtcp_sync &&
-            tk->rtpSource->hasBeenSynchronizedUsingRTCP() )
+            tk->rtpSource && tk->rtpSource->hasBeenSynchronizedUsingRTCP() )
         {
             msg_Dbg( p_demux, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
 
