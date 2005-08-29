@@ -62,7 +62,7 @@ vlc_module_begin();
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
         add_string ( "http-charset", "UTF-8", NULL, CHARSET_TEXT, CHARSET_LONGTEXT, VLC_TRUE );
-#if defined( HAVE_FORK )
+#if defined( HAVE_FORK ) || defined( WIN32 )
         add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, VLC_TRUE );
 #endif
         set_section( N_("HTTP SSL" ), 0 );
@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
     /* determine file handler associations */
     p_sys->i_handlers = 0;
     p_sys->pp_handlers = NULL;
-#if defined( HAVE_FORK )
+#if defined( HAVE_FORK ) || defined( WIN32 )
     psz_src = config_GetPsz( p_intf, "http-handlers" );
     if( psz_src != NULL && *psz_src )
     {
@@ -529,9 +529,9 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     E_(mvar_AppendNewVar)( p_args->vars, "copyright", COPYRIGHT_MESSAGE );
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_by", VLC_CompileBy() );
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_host",
-                       VLC_CompileHost() );
+                           VLC_CompileHost() );
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_domain",
-                       VLC_CompileDomain() );
+                           VLC_CompileDomain() );
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_compiler", VLC_Compiler() );
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_changeset", VLC_Changeset() );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_position", position );
@@ -669,10 +669,6 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     sprintf( psz_tmp, "SCRIPT_NAME=%s", p_url );
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
-    psz_tmp = malloc( sizeof("SCRIPT_FILENAME=") + strlen(p_args->file.file) );
-    sprintf( psz_tmp, "SCRIPT_FILENAME=%s", p_args->file.file );
-    TAB_APPEND( i_env, ppsz_env, psz_tmp );
-
 #define p_sys p_args->file.p_intf->p_sys
     psz_tmp = malloc( sizeof("SERVER_NAME=") + strlen(p_sys->psz_address) );
     sprintf( psz_tmp, "SERVER_NAME=%s", p_sys->psz_address );
@@ -735,10 +731,20 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
         }
     }
 
+    p = strrchr( p_args->file.file, sep );
+    if( p != NULL )
+    {
+        p++;
+        psz_tmp = malloc( sizeof("SCRIPT_FILENAME=") + strlen(p) );
+        sprintf( psz_tmp, "SCRIPT_FILENAME=%s", p );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
+
+        TAB_APPEND( p_args->p_association->i_argc,
+                    p_args->p_association->ppsz_argv, p );
+    }
+
     TAB_APPEND( i_env, ppsz_env, NULL );
 
-    TAB_APPEND( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
-                p_args->file.file );
     TAB_APPEND( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
                 NULL );
 

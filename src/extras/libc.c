@@ -50,6 +50,11 @@
 #   include <sys/wait.h>
 #endif
 
+#if defined(WIN32) || defined(UNDER_CE)
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#endif
+
 /*****************************************************************************
  * getenv: just in case, but it should never be called
  *****************************************************************************/
@@ -339,10 +344,6 @@ int64_t vlc_atoll( const char *nptr )
  * when called with an empty argument or just '\'
  *****************************************************************************/
 #if defined(WIN32) || defined(UNDER_CE)
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h> /* for GetLogicalDrives */
-
 typedef struct vlc_DIR
 {
     DIR *p_real_dir;
@@ -940,6 +941,160 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
             msg_Warn( p_object, "select failed (%s)", strerror(errno) );
         }
     }
+
+#elif defined( WIN32 )
+    SECURITY_ATTRIBUTES saAttr; 
+    PROCESS_INFORMATION piProcInfo; 
+    STARTUPINFO siStartInfo;
+    BOOL bFuncRetn = FALSE; 
+    HANDLE hChildStdinRd, hChildStdinWr, hChildStdoutRd, hChildStdoutWr;
+    DWORD i_status;
+    char *psz_cmd, *p_env, *p;
+    char **ppsz_parser;
+    int i_size;
+
+    /* Set the bInheritHandle flag so pipe handles are inherited. */
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+    saAttr.bInheritHandle = TRUE; 
+    saAttr.lpSecurityDescriptor = NULL; 
+
+    /* Create a pipe for the child process's STDOUT. */
+    if ( !CreatePipe( &hChildStdoutRd, &hChildStdoutWr, &saAttr, 0 ) ) 
+    {
+        msg_Err( p_object, "stdout pipe creation failed" ); 
+        return -1;
+    }
+
+    /* Ensure the read handle to the pipe for STDOUT is not inherited. */
+    SetHandleInformation( hChildStdoutRd, HANDLE_FLAG_INHERIT, 0 );
+
+    /* Create a pipe for the child process's STDIN. */
+    if ( !CreatePipe( &hChildStdinRd, &hChildStdinWr, &saAttr, 0 ) ) 
+    {
+        msg_Err( p_object, "stdin pipe creation failed" ); 
+        return -1;
+    }
+
+    /* Ensure the write handle to the pipe for STDIN is not inherited. */
+    SetHandleInformation( hChildStdinWr, HANDLE_FLAG_INHERIT, 0 );
+
+    /* Set up members of the PROCESS_INFORMATION structure. */
+    ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
+ 
+    /* Set up members of the STARTUPINFO structure. */
+    ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
+    siStartInfo.cb = sizeof(STARTUPINFO); 
+    siStartInfo.hStdError = hChildStdoutWr;
+    siStartInfo.hStdOutput = hChildStdoutWr;
+    siStartInfo.hStdInput = hChildStdinRd;
+    siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+    /* Set up the command line. */
+    psz_cmd = malloc(32768);
+    psz_cmd[0] = '\0';
+    i_size = 32768;
+    ppsz_parser = &ppsz_argv[0];
+    while ( ppsz_parser[0] != NULL && i_size > 0 )
+    {
+        /* Protect the last argument with quotes ; the other arguments
+         * are supposed to be already protected because they have been
+         * passed as a command-line option. */
+        if ( ppsz_parser[1] == NULL )
+        {
+            strncat( psz_cmd, "\"", i_size );
+            i_size--;
+        }
+        strncat( psz_cmd, *ppsz_parser, i_size );
+        i_size -= strlen( *ppsz_parser );
+        if ( ppsz_parser[1] == NULL )
+        {
+            strncat( psz_cmd, "\"", i_size );
+            i_size--;
+        }
+        strncat( psz_cmd, " ", i_size );
+        i_size--;
+        ppsz_parser++;
+    }
+
+    /* Set up the environment. */
+    p = p_env = malloc(32768);
+    i_size = 32768;
+    ppsz_parser = &ppsz_env[0];
+    while ( *ppsz_parser != NULL && i_size > 0 )
+    {
+        memcpy( p, *ppsz_parser,
+                __MIN((int)(strlen(*ppsz_parser) + 1), i_size) );
+        p += strlen(*ppsz_parser) + 1;
+        i_size -= strlen(*ppsz_parser) + 1;
+        ppsz_parser++;
+    }
+    *p = '\0';
+ 
+    /* Create the child process. */
+    bFuncRetn = CreateProcess( NULL,
+          psz_cmd,       // command line 
+          NULL,          // process security attributes 
+          NULL,          // primary thread security attributes 
+          TRUE,          // handles are inherited 
+          0,             // creation flags 
+          p_env,
+          psz_cwd,
+          &siStartInfo,  // STARTUPINFO pointer 
+          &piProcInfo ); // receives PROCESS_INFORMATION 
+
+    free( psz_cmd );
+    free( p_env );
+   
+    if ( bFuncRetn == 0 ) 
+    {
+        msg_Err( p_object, "child creation failed" ); 
+        return -1;
+    }
+
+    /* Read from a file and write its contents to a pipe. */
+    while ( i_in > 0 && !p_object->b_die )
+    {
+        DWORD i_written;
+        if ( !WriteFile( hChildStdinWr, p_in, i_in, &i_written, NULL ) )
+            break;
+        i_in -= i_written;
+        p_in += i_written;
+    }
+
+    /* Close the pipe handle so the child process stops reading. */
+    CloseHandle(hChildStdinWr);
+
+    /* Close the write end of the pipe before reading from the
+     * read end of the pipe. */
+    CloseHandle(hChildStdoutWr);
+ 
+    /* Read output from the child process. */
+    *pi_data = 0;
+    *pp_data = malloc( 1025 );  /* +1 for \0 */
+
+    while ( !p_object->b_die )
+    {
+        DWORD i_read;
+        if ( !ReadFile( hChildStdoutRd, &(*pp_data)[*pi_data], 1024, &i_read, 
+                        NULL )
+              || i_read == 0 )
+            break; 
+        *pi_data += i_read;
+        *pp_data = realloc( *pp_data, *pi_data + 1025 );
+    }
+
+    while ( !p_object->b_die
+             && !GetExitCodeProcess( piProcInfo.hProcess, &i_status )
+             && i_status != STILL_ACTIVE )
+        msleep( 10000 );
+
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
+
+    if ( i_status )
+        msg_Warn( p_object,
+                  "child %s returned with error code %ld",
+                  ppsz_argv[0], i_status );
 
 #else
     msg_Err( p_object, "vlc_execve called but no implementation is available" );
