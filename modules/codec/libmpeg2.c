@@ -114,7 +114,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->fmt_in.i_codec != VLC_FOURCC('P','I','M','1') &&
         /* ATI Video */
         p_dec->fmt_in.i_codec != VLC_FOURCC('V','C','R','2') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','2') )
+        p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','2') &&
+        p_dec->fmt_in.i_codec != VLC_FOURCC('h','d','v','2') )
     {
         return VLC_EGENERIC;
     }
