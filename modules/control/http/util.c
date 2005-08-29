@@ -335,14 +335,36 @@ char *E_(FromUTF8)( intf_thread_t *p_intf, char *psz_utf8 )
 
     if ( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
     {
-        char *psz_in = psz_utf8;
-        size_t i_in = strlen(psz_in);
+        size_t i_in = strlen(psz_utf8);
         size_t i_out = i_in * 2;
         char *psz_local = malloc(i_out + 1);
         char *psz_out = psz_local;
+        size_t i_ret;
+        char psz_tmp[i_in + 1];
+        char *psz_in = psz_tmp;
+        uint8_t *p = (uint8_t *)psz_tmp;
+        strcpy( psz_tmp, psz_utf8 );
 
-        size_t i_ret = vlc_iconv( p_sys->iconv_from_utf8, &psz_in, &i_in,
-                                  &psz_out, &i_out );
+        /* Fix Unicode quotes. If we are here we are probably converting
+         * to an inferior charset not understanding Unicode quotes. */
+        while( *p )
+        {
+            if( p[0] == 0xe2 && p[1] == 0x80 && p[2] == 0x99 )
+            {
+                *p = '\'';
+                memmove( &p[1], &p[3], strlen(&p[3]) + 1 );
+            }
+            if( p[0] == 0xe2 && p[1] == 0x80 && p[2] == 0x9a )
+            {
+                *p = '"';
+                memmove( &p[1], &p[3], strlen(&p[3]) + 1 );
+            }
+            p++;
+        }
+        i_in = strlen( psz_tmp );
+
+        i_ret = vlc_iconv( p_sys->iconv_from_utf8, &psz_in, &i_in,
+                           &psz_out, &i_out );
         if( i_ret == (size_t)-1 || i_in )
         {
             msg_Warn( p_intf,
@@ -888,9 +910,9 @@ char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
     if( psz_dir[0] == '~' )
     {
         char *dir = malloc( strlen(psz_dir)
-                             + strlen(p_intf->p_vlc->psz_homedir) );
+                             + strlen(p_intf->p_vlc->psz_userdir) );
         /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-        sprintf( dir, "%s%s", p_intf->p_vlc->psz_homedir, psz_dir + 1 );
+        sprintf( dir, "%s%s", p_intf->p_vlc->psz_userdir, psz_dir + 1 );
         free( psz_dir );
         psz_dir = dir;
     }

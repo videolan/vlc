@@ -93,7 +93,8 @@ struct vlc_t
     /* Global properties */
     int                    i_argc;           /* command line arguments count */
     char **                ppsz_argv;              /* command line arguments */
-    char *                 psz_homedir;             /* user's home directory */
+    char *                 psz_homedir;           /* configuration directory */
+    char *                 psz_userdir;             /* user's home directory */
     char *                 psz_configfile;        /* location of config file */
 
     /* Fast memcpy plugin used */

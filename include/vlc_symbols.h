@@ -135,6 +135,7 @@ void demux2_Delete (demux_t *);
 void __msg_Dbg (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
 int vlc_getnameinfo (const struct sockaddr *, int, char *, int, int *, int);
 int vlm_ExecuteCommand (vlm_t *, char *, vlm_message_t **);
+char * config_GetUserDir (void);
 httpd_stream_t * httpd_StreamNew (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
 int __config_GetType (vlc_object_t *, const char *);
 void __vlc_thread_ready (vlc_object_t *);
@@ -847,6 +848,7 @@ struct module_symbols_t
     int (*osd_ShowTextRelative_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t);
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
+    char * (*config_GetUserDir_inner) (void);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1254,6 +1256,7 @@ struct module_symbols_t
 #  define osd_ShowTextRelative (p_symbols)->osd_ShowTextRelative_inner
 #  define osd_Message (p_symbols)->osd_Message_inner
 #  define osd_ShowTextAbsolute (p_symbols)->osd_ShowTextAbsolute_inner
+#  define config_GetUserDir (p_symbols)->config_GetUserDir_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1664,6 +1667,7 @@ struct module_symbols_t
     ((p_symbols)->osd_ShowTextRelative_inner) = osd_ShowTextRelative; \
     ((p_symbols)->osd_Message_inner) = osd_Message; \
     ((p_symbols)->osd_ShowTextAbsolute_inner) = osd_ShowTextAbsolute; \
+    ((p_symbols)->config_GetUserDir_inner) = config_GetUserDir; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \

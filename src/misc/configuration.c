@@ -1704,13 +1704,13 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
 }
 
 /*****************************************************************************
- * config_GetHomeDir: find the user's home directory.
+ * config_GetHomeDir, config_GetUserDir: find the user's home directory.
  *****************************************************************************
  * This function will try by different ways to find the user's home path.
  * Note that this function is not reentrant, it should be called only once
  * at the beginning of main where the result will be stored for later use.
  *****************************************************************************/
-char *config_GetHomeDir( void )
+static char *GetDir( vlc_bool_t b_appdata )
 {
     char *p_tmp, *p_homedir = NULL;
 
@@ -1726,6 +1726,9 @@ char *config_GetHomeDir( void )
 #endif
 #ifndef CSIDL_APPDATA
 #   define CSIDL_APPDATA 0x1A
+#endif
+#ifndef CSIDL_PROFILE
+#   define CSIDL_PROFILE 0x28
 #endif
 #ifndef SHGFP_TYPE_CURRENT
 #   define SHGFP_TYPE_CURRENT 0
@@ -1746,7 +1749,8 @@ char *config_GetHomeDir( void )
 
             /* get the "Application Data" folder for the current user */
             if( S_OK == SHGetFolderPath( NULL,
-                                         CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                                         (b_appdata ? CSIDL_APPDATA :
+                                           CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
                                          NULL, SHGFP_TYPE_CURRENT,
                                          p_homedir ) )
             {
@@ -1800,6 +1804,16 @@ char *config_GetHomeDir( void )
 #endif
 
     return p_homedir;
+}
+
+char *config_GetHomeDir( void )
+{
+    return GetDir( VLC_TRUE );
+}
+
+char *config_GetUserDir( void )
+{
+    return GetDir( VLC_FALSE );
 }
 
 
