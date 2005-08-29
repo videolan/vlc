@@ -94,6 +94,7 @@ struct intf_sys_t
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
     id o_update;                /* VLCUpdate      */
+    BOOL nib_main_loaded;       /* reference to the main-nib */
     BOOL nib_open_loaded;       /* reference to the open-nib */
     BOOL nib_about_loaded;      /* reference to the about-nib */
     BOOL nib_wizard_loaded;     /* reference to the wizard-nib */

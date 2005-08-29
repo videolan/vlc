@@ -323,6 +323,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t *p_playlist;
     vlc_value_t val;
 
+    /* Check if we already did this once. Opening the other nibs calls it too, because VLCMain is the owner */
+    if( nib_main_loaded ) return;
+
     [self initStrings];
     [o_window setExcludedFromWindowsMenu: TRUE];
     [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
@@ -426,6 +429,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )];
         vlc_object_release( p_playlist );
     }
+    nib_main_loaded = TRUE;
 }
 
 - (void)dealloc
