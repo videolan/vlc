@@ -987,7 +987,8 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     siStartInfo.hStdError = hChildStdoutWr;
     siStartInfo.hStdOutput = hChildStdoutWr;
     siStartInfo.hStdInput = hChildStdinRd;
-    siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+    siStartInfo.wShowWindow = SW_HIDE;
+    siStartInfo.dwFlags |= STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 
     /* Set up the command line. */
     psz_cmd = malloc(32768);
