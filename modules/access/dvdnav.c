@@ -1368,6 +1368,12 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
     uint16_t i_tag_id = 0;
     int i_fd, i_ret;
 
+    if( !*psz_name )
+    {
+        /* Triggers libdvdcss autodetection */
+        return VLC_SUCCESS;
+    }
+
     if( stat( psz_name, &stat_info ) || !S_ISREG( stat_info.st_mode ) )
     {
         /* Let dvdnav_open() do the probing */
