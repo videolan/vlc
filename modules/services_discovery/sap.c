@@ -176,7 +176,7 @@ struct  sdp_t
     /* "computed" URI */
     char *psz_uri;
 
-    int         i_in; /* IP version */
+    int           i_in; /* IP version */
 
     int           i_media;
     int           i_media_type;
@@ -909,13 +909,17 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 
         if( psz_eof )
         {
-            *psz_eof = 0;
+            *psz_eof = '\0';
         }
         else
         {
             msg_Dbg( p_obj, "incorrect c field, %s", p_sdp->psz_connection );
         }
-        psz_uri = strdup( psz_parse );
+        if( p_sdp->i_in == 6 && ( isxdigit( *psz_parse ) || *psz_parse == ':' ) )
+        {
+            asprintf( &psz_uri, "[%s]", psz_parse );
+        }
+        else psz_uri = strdup( psz_parse );
 
     }
 
@@ -931,7 +935,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
             *psz_eof = '\0';
 
             if( strncmp( psz_parse, "audio", 5 )  &&
-                strncmp( psz_parse, "video",5 ) )
+                strncmp( psz_parse, "video", 5 ) )
             {
                 msg_Warn( p_obj, "unhandled media type -%s-", psz_parse );
                 FREE( psz_uri );
