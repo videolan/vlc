@@ -533,7 +533,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/theora.patch
 
-.theora: libtheora
+.theora: libtheora .ogg
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest && make && make install)
 	$(INSTALL_NAME)
 	touch $@
