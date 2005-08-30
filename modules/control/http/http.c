@@ -618,7 +618,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     char sep;
     int  i_buffer;
     char *p_buffer;
-    char *psz_cwd;
+    char *psz_cwd, *psz_file = NULL;
     int i_ret;
 
 #ifdef WIN32
@@ -731,16 +731,16 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
         }
     }
 
-    p = strrchr( p_args->file.file, sep );
-    if( p != NULL )
+    psz_file = strrchr( p_args->file.file, sep );
+    if( psz_file != NULL )
     {
-        p++;
-        psz_tmp = malloc( sizeof("SCRIPT_FILENAME=") + strlen(p) );
-        sprintf( psz_tmp, "SCRIPT_FILENAME=%s", p );
+        psz_file++;
+        psz_tmp = malloc( sizeof("SCRIPT_FILENAME=") + strlen(psz_file) );
+        sprintf( psz_tmp, "SCRIPT_FILENAME=%s", psz_file );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
         TAB_APPEND( p_args->p_association->i_argc,
-                    p_args->p_association->ppsz_argv, p );
+                    p_args->p_association->ppsz_argv, psz_file );
     }
 
     TAB_APPEND( i_env, ppsz_env, NULL );
@@ -767,7 +767,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     TAB_REMOVE( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
                 NULL );
     TAB_REMOVE( p_args->p_association->i_argc, p_args->p_association->ppsz_argv,
-                p_args->file.file );
+                psz_file );
     if( psz_cwd != NULL )
         free( psz_cwd );
     while( i_env )
