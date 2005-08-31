@@ -654,7 +654,6 @@ private:
 
     /* Event handlers for the misc panel */
     void OnSAPMiscChange( wxCommandEvent& event );
-    void OnSLPMiscChange( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -679,7 +678,6 @@ private:
     wxPanel *misc_panel;
     wxPanel *misc_subpanels[MISC_SOUT_NUM];
     wxCheckBox *sap_checkbox;
-    wxCheckBox *slp_checkbox;
     wxTextCtrl *announce_group;
     wxTextCtrl *announce_addr;
     wxSpinCtrl *ttl_spin;
