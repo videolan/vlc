@@ -1112,7 +1112,7 @@ vlc_module_begin();
 
     set_section( N_( "Default devices") , NULL )
 
-    add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
+    add_file( "dvd", NULL, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
               VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT,
               VLC_FALSE );

@@ -1,6 +1,6 @@
-diff -ru libdvdnav-orig/configure.ac libdvdnav/configure.ac
---- libdvdnav-orig/configure.ac	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/configure.ac	Sat Mar 12 16:44:26 2005
+diff -ru libdvdnav-0.1.10/configure.ac libdvdnav/configure.ac
+--- libdvdnav-0.1.10/configure.ac	2004-06-10 23:13:02.000000000 +0200
++++ libdvdnav/configure.ac	2005-08-31 19:56:21.000000000 +0200
 @@ -8,7 +8,7 @@
  dnl --------------------------------------------------------------
  dnl Require autoconf version 2.53
@@ -110,9 +110,9 @@ diff -ru libdvdnav-orig/configure.ac libdvdnav/configure.ac
  
  dnl ---------------------------------------------
  dnl cflags
-diff -ru libdvdnav-orig/examples/Makefile.am libdvdnav/examples/Makefile.am
---- libdvdnav-orig/examples/Makefile.am	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/examples/Makefile.am	Sat Mar 12 16:44:26 2005
+diff -ru libdvdnav-0.1.10/examples/Makefile.am libdvdnav/examples/Makefile.am
+--- libdvdnav-0.1.10/examples/Makefile.am	2004-01-11 22:43:12.000000000 +0100
++++ libdvdnav/examples/Makefile.am	2005-08-31 19:56:21.000000000 +0200
 @@ -7,7 +7,7 @@
  noinst_PROGRAMS = menus
  
@@ -122,9 +122,9 @@ diff -ru libdvdnav-orig/examples/Makefile.am libdvdnav/examples/Makefile.am
  menus_LDADD   = $(DVDNAV_LIB)
  
  $(DVDNAV_LIB):
-diff -ru libdvdnav-orig/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
---- libdvdnav-orig/src/dvdnav_internal.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdnav_internal.h	Sat Mar 12 16:44:26 2005
+diff -ru libdvdnav-0.1.10/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
+--- libdvdnav-0.1.10/src/dvdnav_internal.h	2004-02-13 20:16:17.000000000 +0100
++++ libdvdnav/src/dvdnav_internal.h	2005-08-31 19:56:21.000000000 +0200
 @@ -58,6 +58,15 @@
  #include <io.h> /* read() */
  #define lseek64 _lseeki64
@@ -141,9 +141,9 @@ diff -ru libdvdnav-orig/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
  #else
  
  #include <pthread.h>
-diff -ru libdvdnav-orig/src/dvdread/bswap.h libdvdnav/src/dvdread/bswap.h
---- libdvdnav-orig/src/dvdread/bswap.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/bswap.h	Sat Mar 12 16:44:26 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/bswap.h libdvdnav/src/dvdread/bswap.h
+--- libdvdnav-0.1.10/src/dvdread/bswap.h	2004-01-11 22:43:13.000000000 +0100
++++ libdvdnav/src/dvdread/bswap.h	2005-08-31 19:56:21.000000000 +0200
 @@ -65,7 +65,7 @@
   * functionality! 
   */
@@ -153,9 +153,9 @@ diff -ru libdvdnav-orig/src/dvdread/bswap.h libdvdnav/src/dvdread/bswap.h
  #define B2N_16(x) \
   x = ((((x) & 0xff00) >> 8) | \
        (((x) & 0x00ff) << 8))
-diff -ru libdvdnav-orig/src/dvdread/dvd_input.h libdvdnav/src/dvdread/dvd_input.h
---- libdvdnav-orig/src/dvdread/dvd_input.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/dvd_input.h	Sat Mar 12 17:36:26 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/dvd_input.h libdvdnav/src/dvdread/dvd_input.h
+--- libdvdnav-0.1.10/src/dvdread/dvd_input.h	2004-01-11 22:43:13.000000000 +0100
++++ libdvdnav/src/dvdread/dvd_input.h	2005-08-31 19:56:21.000000000 +0200
 @@ -20,6 +20,8 @@
   * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
   */
@@ -165,10 +165,30 @@ diff -ru libdvdnav-orig/src/dvdread/dvd_input.h libdvdnav/src/dvdread/dvd_input.
  /**
   * Defines and flags.  Make sure they fit the libdvdcss API!
   */
-diff -ru libdvdnav-orig/src/dvdread/dvd_reader.c libdvdnav/src/dvdread/dvd_reader.c
---- libdvdnav-orig/src/dvdread/dvd_reader.c	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/dvd_reader.c	Sat Mar 12 17:34:48 2005
-@@ -403,14 +403,16 @@
+diff -ru libdvdnav-0.1.10/src/dvdread/dvd_reader.c libdvdnav/src/dvdread/dvd_reader.c
+--- libdvdnav-0.1.10/src/dvdread/dvd_reader.c	2004-03-03 17:48:36.000000000 +0100
++++ libdvdnav/src/dvdread/dvd_reader.c	2005-08-31 19:58:34.000000000 +0200
+@@ -346,9 +346,7 @@
+ 	}
+ #endif
+     
+-    ret = stat( path, &fileinfo );
+-
+-    if( ret < 0 ) {
++    if( *path && (ret = stat( path, &fileinfo )) < 0 ) {
+ 
+         /* maybe "host:port" url? try opening it with acCeSS library */
+         if( strchr(path,':') ) {
+@@ -365,7 +363,7 @@
+     }
+ 
+     /* First check if this is a block/char device or a file*/
+-    if( S_ISBLK( fileinfo.st_mode ) || 
++    if( !*path || S_ISBLK( fileinfo.st_mode ) || 
+ 	S_ISCHR( fileinfo.st_mode ) || 
+ 	S_ISREG( fileinfo.st_mode ) ) {
+ 
+@@ -403,14 +401,16 @@
  
  	/* Resolve any symlinks and get the absolut dir name. */
  	{
@@ -189,7 +209,7 @@ diff -ru libdvdnav-orig/src/dvdread/dvd_reader.c libdvdnav/src/dvdread/dvd_reade
  		if( new_path ) {
  		    free( path_copy );
  		    path_copy = new_path;
-@@ -585,10 +587,12 @@
+@@ -585,10 +585,12 @@
              sprintf( filename, "%s%s%s", path,
                       ( ( path[ strlen( path ) - 1 ] == '/' ) ? "" : "/" ),
                       ent->d_name );
@@ -202,9 +222,9 @@ diff -ru libdvdnav-orig/src/dvdread/dvd_reader.c libdvdnav/src/dvdread/dvd_reade
      return -1;
  }
  
-diff -ru libdvdnav-orig/src/dvdread/dvd_reader.h libdvdnav/src/dvdread/dvd_reader.h
---- libdvdnav-orig/src/dvdread/dvd_reader.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/dvd_reader.h	Sat Mar 12 17:43:28 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/dvd_reader.h libdvdnav/src/dvdread/dvd_reader.h
+--- libdvdnav-0.1.10/src/dvdread/dvd_reader.h	2004-02-01 18:55:19.000000000 +0100
++++ libdvdnav/src/dvdread/dvd_reader.h	2005-08-31 19:56:21.000000000 +0200
 @@ -21,6 +21,20 @@
   * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   */
@@ -226,9 +246,9 @@ diff -ru libdvdnav-orig/src/dvdread/dvd_reader.h libdvdnav/src/dvdread/dvd_reade
  #ifdef _MSC_VER
  #include <config.h>
  
-diff -ru libdvdnav-orig/src/dvdread/dvd_udf.h libdvdnav/src/dvdread/dvd_udf.h
---- libdvdnav-orig/src/dvdread/dvd_udf.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/dvd_udf.h	Sat Mar 12 17:44:45 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/dvd_udf.h libdvdnav/src/dvdread/dvd_udf.h
+--- libdvdnav-0.1.10/src/dvdread/dvd_udf.h	2004-01-11 22:43:13.000000000 +0100
++++ libdvdnav/src/dvdread/dvd_udf.h	2005-08-31 19:56:21.000000000 +0200
 @@ -31,6 +31,13 @@
   * http://www.gnu.org/copyleft/gpl.html
   */
@@ -243,9 +263,9 @@ diff -ru libdvdnav-orig/src/dvdread/dvd_udf.h libdvdnav/src/dvdread/dvd_udf.h
  #include <inttypes.h>
  
  #include "dvd_reader.h"
-diff -ru libdvdnav-orig/src/dvdread/ifo_print.h libdvdnav/src/dvdread/ifo_print.h
---- libdvdnav-orig/src/dvdread/ifo_print.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/ifo_print.h	Sat Mar 12 17:46:07 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/ifo_print.h libdvdnav/src/dvdread/ifo_print.h
+--- libdvdnav-0.1.10/src/dvdread/ifo_print.h	2004-01-11 22:43:13.000000000 +0100
++++ libdvdnav/src/dvdread/ifo_print.h	2005-08-31 19:56:21.000000000 +0200
 @@ -20,6 +20,21 @@
  #ifndef IFO_PRINT_H_INCLUDED
  #define IFO_PRINT_H_INCLUDED
@@ -268,9 +288,9 @@ diff -ru libdvdnav-orig/src/dvdread/ifo_print.h libdvdnav/src/dvdread/ifo_print.
  #include <inttypes.h>
  #ifdef DVDNAV_COMPILE
  #  include "ifo_types.h"
-diff -ru libdvdnav-orig/src/dvdread/ifo_read.h libdvdnav/src/dvdread/ifo_read.h
---- libdvdnav-orig/src/dvdread/ifo_read.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/ifo_read.h	Sat Mar 12 17:48:22 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/ifo_read.h libdvdnav/src/dvdread/ifo_read.h
+--- libdvdnav-0.1.10/src/dvdread/ifo_read.h	2004-01-11 22:43:13.000000000 +0100
++++ libdvdnav/src/dvdread/ifo_read.h	2005-08-31 19:56:21.000000000 +0200
 @@ -20,6 +20,37 @@
   * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   */
@@ -309,9 +329,9 @@ diff -ru libdvdnav-orig/src/dvdread/ifo_read.h libdvdnav/src/dvdread/ifo_read.h
  #include "ifo_types.h"
  #include "dvd_reader.h"
  
-diff -ru libdvdnav-orig/src/dvdread/md5.h libdvdnav/src/dvdread/md5.h
---- libdvdnav-orig/src/dvdread/md5.h	Sat Mar 12 16:44:18 2005
-+++ libdvdnav/src/dvdread/md5.h	Sat Mar 12 17:49:33 2005
+diff -ru libdvdnav-0.1.10/src/dvdread/md5.h libdvdnav/src/dvdread/md5.h
+--- libdvdnav-0.1.10/src/dvdread/md5.h	2004-01-11 22:43:13.000000000 +0100
++++ libdvdnav/src/dvdread/md5.h	2005-08-31 19:56:21.000000000 +0200
 @@ -21,6 +21,14 @@
  #ifndef _MD5_H
  #define _MD5_H 1
