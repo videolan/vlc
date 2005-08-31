@@ -1189,6 +1189,7 @@ libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 
 .daap: libopendaap
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install)
+	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .daap
