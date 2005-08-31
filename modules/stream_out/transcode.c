@@ -849,7 +849,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_encoder->fmt_out );
         id->b_transcode = VLC_TRUE;
 
-        if( !id->id ) goto error;
+        if( !id->id )
+        {
+            transcode_audio_close( p_stream, id );
+            goto error;
+        }
 
         date_Init( &id->interpolated_pts, p_fmt->audio.i_rate, 1 );
     }
@@ -904,7 +908,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_encoder->fmt_out );
         id->b_transcode = VLC_TRUE;
 
-        if( !id->id ) goto error;
+        if( !id->id )
+        {
+            transcode_spu_close( p_stream, id );
+            goto error;
+        }
     }
     else if( p_fmt->i_cat == SPU_ES && p_sys->b_soverlay )
     {
@@ -955,6 +963,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( id->p_encoder )
     {
         vlc_object_detach( id->p_encoder );
+        es_format_Clean( &id->p_encoder->fmt_out );
         vlc_object_destroy( id->p_encoder );
     }
 
@@ -996,6 +1005,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( id->p_encoder )
     {
         vlc_object_detach( id->p_encoder );
+        es_format_Clean( &id->p_encoder->fmt_out );
         vlc_object_destroy( id->p_encoder );
     }
 
@@ -2352,13 +2362,13 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     es_format_t fmt;
-    
+
     fmt.i_cat = SPU_ES;
     fmt.i_id = 0xbd1f; /* pid ?? */
     fmt.i_group = 3;   /* pmt entry ?? */
     fmt.i_codec = VLC_FOURCC( 'Y', 'U', 'V', 'A' );
     fmt.psz_language = strdup( "osd" );
-    
+
     id = malloc( sizeof( sout_stream_id_t ) );
     memset( id, 0, sizeof(sout_stream_id_t) );
 

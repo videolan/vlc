@@ -537,6 +537,8 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 p_dec->p_owner->sout.i_id = p_dec->fmt_in.i_id;
                 if( p_dec->fmt_in.psz_language )
                 {
+                    if( p_dec->p_owner->sout.psz_language )
+                        free( p_dec->p_owner->sout.psz_language );
                     p_dec->p_owner->sout.psz_language =
                         strdup( p_dec->fmt_in.psz_language );
                 }
@@ -547,7 +549,8 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
                 if( p_dec->p_owner->p_sout_input == NULL )
                 {
-                    msg_Err( p_dec, "cannot create packetizer output" );
+                    msg_Err( p_dec, "cannot create packetizer output (%4.4s)",
+                             (char *)&p_dec->p_owner->sout.i_codec );
                     p_dec->b_error = VLC_TRUE;
 
                     while( p_sout_block )
