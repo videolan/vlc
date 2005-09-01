@@ -679,6 +679,14 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 #undef p_sys
 
+    p = getenv( "PATH" );
+    if( p != NULL )
+    {
+        psz_tmp = malloc( sizeof("SERVER_PATH=") + strlen(p) );
+        sprintf( psz_tmp, "SERVER_PATH=%s", p );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
+    }
+
     if( psz_remote_addr != NULL && *psz_remote_addr )
     {
         psz_tmp = malloc( sizeof("REMOTE_ADDR=") + strlen(psz_remote_addr) );
