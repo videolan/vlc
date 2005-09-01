@@ -86,7 +86,7 @@ ifdef HAVE_DARWIN_OS
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.png .gpg-error .gcrypt .gnutls .daap .cddb .cdio .vcdimager .SDL_image \
+	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 else
@@ -759,11 +759,17 @@ DISTCLEAN_PKG += openslp-$(OPENSLP_VERSION).tar.gz
 # libdvdcss
 # ***************************************************************************
 
+ifdef SVN
+libdvdcss: 
+	$(SVN) co svn://svn.videolan.org/libdvdcss/trunk libdvdcss
+	cd $@ && sh bootstrap
+else
 libdvdcss-$(LIBDVDCSS_VERSION).tar.gz:
 	$(WGET) $(LIBDVDCSS_URL)
 
 libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 	$(EXTRACT_GZ)
+endif
 
 .dvdcss: libdvdcss
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
@@ -1187,12 +1193,12 @@ libopendaap: libopendaap-$(DAAP_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/daap.patch
 
-.daap: libopendaap
+.opendaap: libopendaap
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make install)
 	$(INSTALL_NAME)
 	touch $@
 
-CLEAN_FILE += .daap
+CLEAN_FILE += .opendaap
 CLEAN_PKG += libopendaap
 DISTCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
 
