@@ -682,10 +682,20 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     p = getenv( "PATH" );
     if( p != NULL )
     {
-        psz_tmp = malloc( sizeof("SERVER_PATH=") + strlen(p) );
-        sprintf( psz_tmp, "SERVER_PATH=%s", p );
+        psz_tmp = malloc( sizeof("PATH=") + strlen(p) );
+        sprintf( psz_tmp, "PATH=%s", p );
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
+
+#ifdef WIN32
+    p = getenv( "windir" );
+    if( p != NULL )
+    {
+        psz_tmp = malloc( sizeof("SYSTEMROOT=") + strlen(p) );
+        sprintf( psz_tmp, "SYSTEMROOT=%s", p );
+        TAB_APPEND( i_env, ppsz_env, psz_tmp );
+    }
+#endif
 
     if( psz_remote_addr != NULL && *psz_remote_addr )
     {
