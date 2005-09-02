@@ -1664,31 +1664,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         else
         p_new_parent = [item pointerValue];
 
-        /* If the proposed parent is not a node, then use the parent node of
-           this item. */
-        if( p_new_parent->i_children <= 0 )
-        {
-            int j;
-            playlist_item_t *p_temp_item = p_new_parent;
-            p_new_parent = [self parentOfItem: p_new_parent];
-            if( !p_new_parent )
-            {
-                vlc_object_release(p_playlist);
-                return NO;
-            }
-            /* Calculate the position of the dropped item in this new parent:
-               following the first proposed parent. */
-            for( j = 0; j < p_new_parent->i_children; j++ )
-            {
-                if( p_new_parent->pp_children[j] == p_temp_item )
-                {
-                    index = j;
-                    break;
-                }
-                else if( j == p_new_parent->i_children - 1 )
-                index = -1;
-            }
-        }
+        /* Make sure the proposed parent is a node.
+           (This should never be true) */
+        if( p_new_parent->i_children < 0 ) return NO;
 
         for( i = 0; i < [o_all_items count]; i++ )
         {
