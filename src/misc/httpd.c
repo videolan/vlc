@@ -1267,10 +1267,10 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_mutex_destroy( &host->lock );
     vlc_object_destroy( host );
 
+    vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
         msg_Info( httpd, "httpd doesn't reference any host, deleting" );
-        vlc_object_release( httpd );
         vlc_object_detach( httpd );
         vlc_object_destroy( httpd );
     }
