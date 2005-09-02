@@ -586,7 +586,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)updateRowSelection
 {
-//    int i;
     int i_row;
     unsigned int j;
 
@@ -786,7 +785,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         playlist_item_t *p_item;
         playlist_item_t *p_node = NULL;
-//        int i;
 
         p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
 
@@ -1592,11 +1590,15 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     if( !p_playlist ) return NSDragOperationNone;
 
-    /* Dropping ON items is not allowed */
-    if( index == NSOutlineViewDropOnItemIndex )
+    /* Dropping ON items is not allowed if item is not a node */
+    if( item )
     {
-        vlc_object_release( p_playlist );
-        return NSDragOperationNone;
+        if( index == NSOutlineViewDropOnItemIndex &&
+                ((playlist_item_t *)[item pointerValue])->i_children == -1 )
+        {
+            vlc_object_release( p_playlist );
+            return NSDragOperationNone;
+        }
     }
 
     /* We refuse to drop an item in anything else than a child of the General
@@ -1715,14 +1717,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             /* If we move the playing item in a different node or we move the
                node containing the playing item in a different node, then stop
                playback, or the playlist refuses to detach the item. */
-/*            if( p_playlist->status.i_status != PLAYLIST_STOPPED &&
-                (( p_item == p_playlist->status.p_item &&
-                p_new_parent != p_old_parent) ||
-                ( p_item->i_children > 0 &&
-                [self isItem: p_playlist->status.p_item inNode:p_item] == YES))
-            {
-                playlist_Stop( p_playlist );
-            }*/
+
             vlc_mutex_lock( &p_playlist->object_lock );
             // Acually detach the item from the old position
             if( playlist_NodeRemoveItem( p_playlist, p_item, p_old_parent ) ==
