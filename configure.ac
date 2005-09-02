@@ -1553,6 +1553,9 @@ if test "${enable_smb}" != "no"; then
     [ if test -n "${enable_smb}"; then
         AC_MSG_ERROR([cannot find libsmbclient headers])
      fi ])
+  AC_CHECK_MEMBER([struct _SMBCCTX.close_fn],
+    AC_DEFINE([HAVE__SMBCCTX_CLOSE_FN], [1], [Define if samba has _SMBCCTX.close_fn]),,
+    [#include <libsmbclient.h>])
 fi
 
 dnl

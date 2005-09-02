@@ -301,7 +301,11 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
 #ifdef USE_CTX
+#  ifndef HAVE__SMBCCTX_CLOSE_FN
     p_sys->p_smb->close( p_sys->p_smb, p_sys->p_file );
+#  else
+    p_sys->p_smb->close_fn( p_sys->p_smb, p_sys->p_file );
+#  endif
     smbc_free_context( p_sys->p_smb, 1 );
 #else
     smbc_close( p_sys->i_smb );
