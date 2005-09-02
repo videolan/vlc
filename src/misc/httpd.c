@@ -2645,6 +2645,17 @@ httpd_file_t *httpd_FileNew( httpd_host_t *a, char *b, char *c, char *d,
                              char *e, httpd_file_callback_t f,
                              httpd_file_sys_t *g ){ return 0; }
 
+httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
+                                   const char *psz_user,
+                                   const char *psz_password,
+                                   const vlc_acl_t *p_acl,
+                                   httpd_handler_callback_t pf_fill,
+                                   httpd_handler_sys_t *p_sys )
+{
+    return NULL;
+}
+void httpd_HandlerDelete( httpd_handler_t *handler ) {}
+
 void httpd_RedirectDelete( httpd_redirect_t *a ){}
 httpd_redirect_t *httpd_RedirectNew( httpd_host_t *a,
                                      char *b, char *c ){ return 0; }
