@@ -1,18 +1,20 @@
---- x264.orig/encoder/ratecontrol.c	2005-08-24 21:46:21.000000000 +0200
-+++ x264/encoder/ratecontrol.c	2005-08-24 21:45:53.000000000 +0200
-@@ -37,7 +37,7 @@
- #include "common/macroblock.h"
- #include "ratecontrol.h"
- 
--#if defined(SYS_FREEBSD) || defined(SYS_BEOS) || defined(SYS_NETBSD)
-+#if defined(SYS_FREEBSD) || defined(SYS_BEOS) || defined(SYS_MACOSX)
+Index: encoder/ratecontrol.c
+===================================================================
+--- encoder/ratecontrol.c	(revision 291)
++++ encoder/ratecontrol.c	(working copy)
+@@ -40,7 +40,7 @@
+ #if defined(SYS_FREEBSD) || defined(SYS_BEOS) || defined(SYS_NETBSD)
  #define exp2f(x) powf( 2, (x) )
  #endif
- #if defined(_MSC_VER) || defined(SYS_SunOS)
-
-
---- x264.orig/Makefile	2005-08-24 21:44:32.000000000 +0200
-+++ x264/Makefile	2005-08-24 21:44:11.000000000 +0200
+-#if defined(_MSC_VER) || defined(SYS_SunOS)
++#if defined(_MSC_VER) || defined(SYS_SunOS) || defined(SYS_MACOSX)
+ #define exp2f(x) pow( 2, (x) )
+ #define sqrtf sqrt
+ #endif
+Index: Makefile
+===================================================================
+--- Makefile	(revision 291)
++++ Makefile	(working copy)
 @@ -53,7 +53,7 @@
  OBJS = $(SRCS:%.c=%.o)
  DEP  = depend

@@ -552,7 +552,7 @@ libshout-$(SHOUT_VERSION).tar.gz:
 libshout: libshout-$(SHOUT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.shout: libshout
+.shout: libshout .theora .ogg
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
@@ -951,7 +951,7 @@ DISTCLEAN_PKG += libdts-$(LIBDTS_VERSION).tar.gz
 ifdef SVN
 x264: 
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
-	patch -p 0 < Patches/x264_svn.patch
+	cd x264 && patch -p 0 < ../Patches/x264_svn.patch
 	rm x264/x264.c
 else
 x264-$(X264_VERSION).tar.gz:
