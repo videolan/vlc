@@ -120,6 +120,7 @@ static int Open( vlc_object_t *p_this )
                   *psz_crl = NULL;
     int           i_port       = 0;
     char          *psz_src;
+    char          psz_tmp[10];
 
     psz_address = config_GetPsz( p_intf, "http-host" );
     if( psz_address != NULL )
@@ -248,6 +249,10 @@ static int Open( vlc_object_t *p_this )
         if( i_port <= 0 )
             i_port= 8080;
     }
+
+    /* Ugly hack to allow to run several HTTP servers on different ports. */
+    sprintf( psz_tmp, ":%d", i_port + 1 );
+    config_PutPsz( p_intf, "http-host", psz_tmp );
 
     msg_Dbg( p_intf, "base %s:%d", psz_address, i_port );
 
