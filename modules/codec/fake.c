@@ -105,7 +105,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     image_handler_t *p_handler;
     video_format_t fmt_in, fmt_out;
     picture_t *p_image;
-    char *psz_file;
+    char *psz_file, *psz_local;
     vlc_bool_t b_keep_ar;
     int i_aspect = 0;
 
@@ -160,7 +160,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     p_handler = image_HandlerCreate( p_dec );
-    p_image = image_ReadUrl( p_handler, psz_file, &fmt_in, &fmt_out );
+    psz_local = ToLocale( psz_file );
+    p_image = image_ReadUrl( p_handler, psz_local, &fmt_in, &fmt_out );
+    LocaleFree( psz_local );
     image_HandlerDelete( p_handler );
 
     if ( p_image == NULL )
