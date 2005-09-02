@@ -395,7 +395,8 @@
     [o_outline_view setDoubleAction: @selector(playItem:)];
 
     [o_outline_view registerForDraggedTypes:
-        [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+        [NSArray arrayWithObjects: NSFilenamesPboardType,
+        @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
 /* We need to check whether _defaultTableHeaderSortImage exists, since it 
@@ -1572,50 +1573,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [self removeItemsFrom: o_nodes_array ifChildrenOf: o_nodes_array];
     [self removeItemsFrom: o_items_array ifChildrenOf: o_nodes_array];
 
-#if 0
-    unsigned int j;
-
-    for( i = 0 ; i < [o_nodes_array count] ; i++ )
-    {
-        for ( j = 0 ; j < [o_nodes_array count] ; j++ )
-        {
-            if( j == i ) continue;
-            if( [self isItem: [[o_nodes_array objectAtIndex:i] pointerValue]
-                    inNode: [[o_nodes_array objectAtIndex:j] pointerValue]] )
-            {
-                [o_nodes_array removeObjectAtIndex:i];
-                /* We need to execute the next iteration with the same index
-                   since the current item has been deleted */
-                i--;
-                break;
-            }
-        }
-    }
-
-    for( i = 0 ; i < [o_items_array count] ; i++ )
-    {
-        for ( j = 0 ; j < [o_nodes_array count] ; j++ )
-        {
-            if( [self isItem: [[o_items_array objectAtIndex:i] pointerValue]
-                    inNode: [[o_nodes_array objectAtIndex:j] pointerValue]] )
-            {
-                [o_items_array removeObjectAtIndex:i];
-                i--;
-                break;
-            }
-        }
-    }
-#endif
     /* We add the "VLCPlaylistItemPboardType" type to be able to recognize
-       a Drop operation coming from the playlist.
-       We need to add NSFilenamesPboardType otherwise the outlineview refuses
-       to the drop. */
+       a Drop operation coming from the playlist. */
 
     [pboard declareTypes: [NSArray arrayWithObjects:
-        @"VLCPlaylistItemPboardType",NSFilenamesPboardType, nil] owner: self];
+        @"VLCPlaylistItemPboardType", nil] owner: self];
     [pboard setData:[NSData data] forType:@"VLCPlaylistItemPboardType"];
-    [pboard setPropertyList:[NSArray array]
-                                        forType:NSFilenamesPboardType];
 
     vlc_object_release(p_playlist);
     return YES;
@@ -1628,7 +1591,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
     if( !p_playlist ) return NSDragOperationNone;
-    
+
     /* Dropping ON items is not allowed */
     if( index == NSOutlineViewDropOnItemIndex )
     {
