@@ -4309,7 +4309,10 @@ dnl
 mozilla=false
 AC_ARG_ENABLE(mozilla,
   [  --enable-mozilla        build a vlc-based Mozilla plugin (default disabled)])
-if test "${enable_mozilla}" = "yes" -a "${SYS}" != "mingw32"
+AC_ARG_WITH(mozilla-sdk-path,
+  [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
+
+if test "${enable_mozilla}" = "yes" -a "${with_mozilla_sdk_path}" = ""
 then
   AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
   if test "${MOZILLA_CONFIG}" = "no"
@@ -4337,23 +4340,29 @@ then
 dnl special case for mingw32
 elif test "${enable_mozilla}" = "yes"
 then
-  AC_CHECK_TOOL(CYGPATH, cygpath, "")
-  AC_ARG_WITH(mozilla-sdk-path,
-    [    --with-mozilla-sdk-path=PATH path to win32 mozilla sdk], [
-    real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
-    CPPFLAGS="${CPPFLAGS_save} ${real_mozilla_sdk}"
-    AC_CHECK_HEADERS(mozilla-config.h, [
-      mozilla=:
-      VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk} -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
-      VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -lnspr4 -lplds4 -lplc4 -lembedstring -lxpcomglue -Wl,--kill-at])
-      XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl"
-      if test -n "${CYGPATH}"; then
-        XPIDL="${real_mozilla_sdk}/xpcom/bin/xpidl"
-        real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
-        XPIDL_INCL="${XPIDL_INCL} -I\"${real_mozilla_sdk}/xpcom/idl\""
-      fi ])
-    CPPFLAGS="${CPPFLAGS_save}"
-  ])
+  if test "${SYS}" = "mingw32"; then
+    AC_CHECK_TOOL(CYGPATH, cygpath, "")
+    mozilla_sdk_xpcom="/xpcom"
+  fi
+
+  real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
+  CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include"
+  AC_CHECK_HEADERS(mozilla-config.h, [
+    mozilla=:
+    VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
+    VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
+    if test "${SYS}" = "mingw32"; then
+      VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+    fi
+
+    XPIDL_INCL="-I${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl"
+    XPIDL="${real_mozilla_sdk}${mozilla_sdk_xpcom}/bin/xpidl"
+
+    if test -n "${CYGPATH}"; then
+      real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
+      XPIDL_INCL="${XPIDL_INCL} -I\"${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl\""
+    fi ])
+  CPPFLAGS="${CPPFLAGS_save}"
 fi
 
 dnl Not necessarily in ${PATH}
