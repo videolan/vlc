@@ -688,13 +688,13 @@ static int Open( vlc_object_t *p_this )
                      ck[0], ck[1], ck[2], ck[3], ck[4], ck[5], ck[6], ck[7] );
 #endif
             p_sys->csa = csa_New();
-            
+
             if( p_sys->csa )
             {
                 vlc_value_t pkt_val;
-                
+
                 csa_SetCW( p_sys->csa, ck, ck );
-            
+
                 var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
                 var_Get( p_demux, "ts-csa-pkt", &pkt_val );
                 if( pkt_val.i_int < 4 || pkt_val.i_int > 188 )
@@ -817,14 +817,14 @@ static void Close( vlc_object_t *p_this )
  * DemuxFile:
  *****************************************************************************/
 static int DemuxFile( demux_t *p_demux )
-{    
+{
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t     *p_buffer = p_sys->buffer; /* Put first on sync byte */
     int i_diff= 0;
     int i_data= 0;
     int i_pos = 0;
     int i_bufsize = p_sys->i_packet_size * p_sys->i_ts_read;
-    
+
     i_data = stream_Read( p_demux->s, p_sys->buffer, i_bufsize );
     if( (i_data <= 0) && (i_data < p_sys->i_packet_size) )
     {
@@ -839,7 +839,7 @@ static int DemuxFile( demux_t *p_demux )
         vlc_bool_t b_payload; /* indicates a packet with payload */
         vlc_bool_t b_adaptation; /* adaptation field */
         int i_cc  = 0;        /* continuity counter */
-    
+
         if( p_sys->buffer[i_pos] != 0x47 )
         {
             msg_Warn( p_demux, "lost sync" );
@@ -852,7 +852,7 @@ static int DemuxFile( demux_t *p_demux )
             if( !p_demux->b_die )
                 msg_Warn( p_demux, "sync found" );
         }
-        
+
         /* continuous when (one of this):
          * diff == 1
          * diff == 0 and payload == 0
@@ -862,10 +862,10 @@ static int DemuxFile( demux_t *p_demux )
         i_cc  = p_buffer[i_pos+3]&0x0f;
         b_payload = p_buffer[i_pos+3]&0x10;
         b_adaptation = p_buffer[i_pos+3]&0x20;
-        
+
         /* Get the PID */
         p_pid = &p_sys->pid[ ((p_buffer[i_pos+1]&0x1f)<<8)|p_buffer[i_pos+2] ];
-        
+
         /* Detect discontinuity indicator in adaptation field */
         if( b_adaptation )
         {
@@ -874,7 +874,7 @@ static int DemuxFile( demux_t *p_demux )
             if( p_buffer[i_pos+5]&0x40 )
                 msg_Warn( p_demux, "random access indicator (pid=%d) ", p_pid->i_pid );
         }
- 
+
         i_diff = ( i_cc - p_pid->i_cc )&0x0f;
         if( b_payload && i_diff == 1 )
         {
@@ -893,17 +893,17 @@ static int DemuxFile( demux_t *p_demux )
                 /* FIXME what to do when discontinuity_indicator is set ? */
                 msg_Warn( p_demux, "transport error detected 0x%x instead of 0x%x",
                           i_cc, ( p_pid->i_cc + 1 )&0x0f );
-    
+
                 p_pid->i_cc = i_cc;
                 /* Mark transport error in the TS packet. */
                 p_buffer[i_pos+1] |= 0x80;
             }
         }
-        
+
         /* Test if user wants to decrypt it first */
         if( p_sys->csa )
             csa_Decrypt( p_demux->p_sys->csa, &p_buffer[i_pos], p_demux->p_sys->i_csa_pkt_size );
-        
+
         i_pos += p_sys->i_packet_size;
     }
 
@@ -1663,8 +1663,10 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                             pid->i_pid );
                 /* pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY; */
             }
+#if 0
             if( p[5]&0x40 )
                 msg_Dbg( p_demux, "random access indicator (pid=%d) ", pid->i_pid );
+#endif
         }
     }
 
@@ -1759,7 +1761,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             }
         }
     }
-    
+
     return i_ret;
 }
 
@@ -1951,14 +1953,14 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 #endif
     if( i_iod_tag != 0x02 )
     {
-#ifdef DEBUG    
+#ifdef DEBUG
         fprintf( stderr, "\n ERR: tag %02x != 0x02", i_iod_tag );
-#endif        
+#endif
         return p_iod;
     }
 
     i_iod_length = IODDescriptorLength( &i_data, &p_data );
-#ifdef DEBUG    
+#ifdef DEBUG
     fprintf( stderr, "\n* length:%d", i_iod_length );
 #endif
     if( i_iod_length > i_data )
@@ -1978,10 +1980,10 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     if( b_url )
     {
         p_iod->psz_url = IODGetURL( &i_data, &p_data );
-#ifdef DEBUG        
+#ifdef DEBUG
         fprintf( stderr, "\n* url string:%s", p_iod->psz_url );
         fprintf( stderr, "\n*****************************\n" );
-#endif        
+#endif
         return p_iod;
     }
     else
@@ -2077,7 +2079,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     i_decoderConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
 #ifdef DEBUG
                     fprintf( stderr, "\n*   - DecoderConfigDesc length:%d", i_decoderConfigDescr_length );
-#endif                    
+#endif
 #define dec_descr   es_descr.dec_descr
                     dec_descr.i_objectTypeIndication = IODGetByte( &i_data, &p_data );
                     i_flags = IODGetByte( &i_data, &p_data );
@@ -2086,14 +2088,14 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     dec_descr.i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
                     dec_descr.i_maxBitrate = IODGetDWord( &i_data, &p_data );
                     dec_descr.i_avgBitrate = IODGetDWord( &i_data, &p_data );
-#ifdef DEBUG                    
+#ifdef DEBUG
                     fprintf( stderr, "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
                     fprintf( stderr, "\n*     * streamType:0x%x", dec_descr.i_streamType );
                     fprintf( stderr, "\n*     * upStream:%d", dec_descr.b_upStream );
                     fprintf( stderr, "\n*     * bufferSizeDB:%d", dec_descr.i_bufferSizeDB );
                     fprintf( stderr, "\n*     * maxBitrate:%d", dec_descr.i_maxBitrate );
                     fprintf( stderr, "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
-#endif                    
+#endif
                     if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
                     {
                         int i;
@@ -2123,7 +2125,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
                     if( IODGetByte( &i_data, &p_data ) != 0x06 )
                     {
-#ifdef DEBUG                    
+#ifdef DEBUG
                         fprintf( stderr, "\n* ERR missing SLConfigDescr" );
 #endif
                         es_descr.b_ok = 0;
@@ -2172,9 +2174,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                             }
                             break;
                         default:
-#ifdef DEBUG                        
+#ifdef DEBUG
                             fprintf( stderr, "\n* ERR unsupported SLConfigDescr predefined" );
-#endif                            
+#endif
                             es_descr.b_ok = 0;
                             break;
                     }
@@ -2183,9 +2185,9 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 #undef  sl_descr
 #undef  es_descr
             default:
-#ifdef DEBUG            
+#ifdef DEBUG
                 fprintf( stderr, "\n* - OD tag:0x%x length:%d (Unsupported)", i_tag, i_length );
-#endif                
+#endif
                 break;
         }
 
@@ -2195,7 +2197,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     }
 #ifdef DEBUG
     fprintf( stderr, "\n*****************************\n" );
-#endif    
+#endif
     return p_iod;
 }
 
