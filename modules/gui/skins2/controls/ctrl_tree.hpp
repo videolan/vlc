@@ -2,7 +2,7 @@
  * ctrl_tree.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.hpp 11009 2005-05-14 14:39:05Z ipkiss $
+ * $Id$
  *
  * Authors: Antoine Cellerier
  *
@@ -124,6 +124,13 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree>,
 
         /// Draw the image of the control
         void makeImage();
+
+        /// Return the n'th displayed item (starting at position 0)
+        /**
+         *  Return m_rTree.end() if such an item cannot be found (n < 0, or
+         *  n too big)
+         */
+        VarTree::Iterator findItemAtPos( int n );
 };
 
 #endif

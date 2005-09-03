@@ -35,14 +35,18 @@
 class VarTree: public Variable, public Subject<VarTree>
 {
     public:
-        VarTree( intf_thread_t *pIntf, VarTree *m_pParent2 );
+        VarTree( intf_thread_t *pIntf, VarTree *pParent );
         virtual ~VarTree();
 
         /// Get the variable type
         virtual const string &getType() const { return m_type; }
 
         /// Add a pointer on string in the children's list
-        virtual void add( const UStringPtr &rcString, bool selected=true, bool playing=true, bool expanded=true, void *pData=NULL );
+        virtual void add( const UStringPtr &rcString,
+                          bool selected = true,
+                          bool playing = true,
+                          bool expanded = true,
+                          void *pData = NULL );
 
         /// Remove the selected item from the children's list
         virtual void delSelected();
@@ -80,22 +84,35 @@ class VarTree: public Variable, public Subject<VarTree>
 
         /// Parent node
         VarTree *parent() { return m_pParent; }
-        void VarTree::checkParents( VarTree *m_pParent2 );
+        void VarTree::checkParents( VarTree *pParent );
 
         Iterator uncle();
 
         /// Get root node
-        VarTree *root() { VarTree *parent=this; while( parent->parent() != NULL ) parent = parent->parent(); return parent; }
+        VarTree *root()
+        {
+            VarTree *parent = this;
+            while( parent->parent() != NULL )
+                parent = parent->parent();
+            return parent;
+        }
 
         /// Get depth (root depth is 0)
-        int depth() { VarTree *parent=this; int depth=0; while( ( parent = parent->parent() ) != NULL ) depth++; return depth; }
+        int depth()
+        {
+            VarTree *parent = this;
+            int depth = 0;
+            while( ( parent = parent->parent() ) != NULL )
+                depth++;
+            return depth;
+        }
 
         /// Execute the action associated to this item
         virtual void action( VarTree *pItem ) {}
 
         /// Get a reference on the position variable
         VarPercent &getPositionVar() const
-            { return *((VarPercent*)m_cPosition.get()); }
+        { return *((VarPercent*)m_cPosition.get()); }
 
         /// Get a counted pointer on the position variable
         const VariablePtr &getPositionVarPtr() const { return m_cPosition; }
@@ -104,18 +121,21 @@ class VarTree: public Variable, public Subject<VarTree>
         int visibleItems();
 
         /// Return iterator to the n'th visible item
-        Iterator visibleItem( int n );
+        Iterator getVisibleItem( int n );
+
+        /// Given an iterator to a visible item, return the next visible item
+        Iterator getNextVisibleItem( Iterator it );
 
     private:
 //        intf_thread_t *pIntf;
 
-        ///list of children
+        /// List of children
         list<VarTree> m_children;
 
-        ///Pointer to parent node
+        /// Pointer to parent node
         VarTree *m_pParent;
 
-        ///Variable type
+        /// Variable type
         static const string m_type;
 
         /// Position variable

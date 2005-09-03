@@ -23,16 +23,17 @@
 
 #include "var_tree.hpp"
 
+
 const string VarTree::m_type = "tree";
 
-VarTree::VarTree( intf_thread_t *pIntf, VarTree *m_pParent2 )
-      :Variable( pIntf )
+VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent )
+    : Variable( pIntf )
 {
     m_selected = false;
     m_playing = false;
     m_expanded = true;
     m_pData = NULL;
-    m_pParent = m_pParent2;
+    m_pParent = pParent;
 
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
@@ -44,7 +45,11 @@ VarTree::~VarTree()
 // TODO : check that children are deleted
 }
 
-void VarTree::add( const UStringPtr &rcString, bool selected, bool playing, bool expanded, void *pData )
+void VarTree::add( const UStringPtr &rcString,
+                   bool selected,
+                   bool playing,
+                   bool expanded,
+                   void *pData )
 {
     m_children.push_back( VarTree( getIntf(), this ) );
     back().m_cString = rcString;
@@ -107,7 +112,6 @@ VarTree::ConstIterator VarTree::operator[]( int n ) const
  * ... which means parent++ or grandparent++ or grandgrandparent++ ... */
 VarTree::Iterator VarTree::uncle()
 {
-//    fprintf( stderr, "trying to find uncle\n");
     VarTree *p_parent = parent();
     if( p_parent != NULL )
     {
@@ -115,7 +119,7 @@ VarTree::Iterator VarTree::uncle()
         while( p_grandparent != NULL )
         {
             Iterator it = p_grandparent->begin();
-            while( !(it == p_grandparent->end()) && &(*it) != p_parent ) it++;
+            while( it != p_grandparent->end() && &(*it) != p_parent ) it++;
             if( it != p_grandparent->end() )
             {
                 it++;
@@ -138,11 +142,11 @@ VarTree::Iterator VarTree::uncle()
     return root()->end();
 }
 
-void VarTree::checkParents( VarTree *m_pParent2 )
+void VarTree::checkParents( VarTree *pParent )
 {
-    m_pParent = m_pParent2;
+    m_pParent = pParent;
     Iterator it = begin();
-    while( it!=end() )
+    while( it != end() )
     {
         it->checkParents( this );
         it++;
@@ -164,7 +168,7 @@ int VarTree::visibleItems()
     return i_count;
 }
 
-VarTree::Iterator VarTree::visibleItem( int n )
+VarTree::Iterator VarTree::getVisibleItem( int n )
 {
     Iterator it = begin();
     while( it != end() )
@@ -174,10 +178,30 @@ VarTree::Iterator VarTree::visibleItem( int n )
         if( it->m_expanded )
         {
             int i = n - it->visibleItems();
-            if( i <= 0 ) return it->visibleItem( n );
+            if( i <= 0 ) return it->getVisibleItem( n );
             n = i;
         }
         it++;
     }
     return end();
 }
+
+VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
+{
+    if( it->m_expanded && it->size() )
+    {
+        it = it->begin();
+    }
+    else
+    {
+        VarTree::Iterator it_old = it;
+        it++;
+        // Was 'it' the last brother? If so, look for uncles
+        if( it_old->parent() && it_old->parent()->end() == it )
+        {
+            it = it_old->uncle();
+        }
+    }
+    return it;
+}
+
