@@ -200,15 +200,13 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Initializations */
     p_intf = _p_intf;
+    pp_sds = NULL;
     i_update_counter = 0;
     i_sort_mode = MODE_NONE;
     b_need_update = VLC_FALSE;
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    if( p_playlist == NULL ) return;
 
     SetIcon( *p_intf->p_sys->p_icon );
 
@@ -395,13 +393,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 Playlist::~Playlist()
 {
-    if( pp_sds != NULL )
-        free( pp_sds );
+    if( pp_sds != NULL ) free( pp_sds );
 
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    if( p_playlist == NULL ) return;
 
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
