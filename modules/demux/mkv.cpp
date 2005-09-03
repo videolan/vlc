@@ -1903,6 +1903,10 @@ msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block
         {
             p_block->i_length = i_duration * 1000;
         }
+        if( !strcmp( tk->psz_codec, "V_MS/VFW/FOURCC" ) )
+        {
+            p_block->i_pts = 0;
+        }
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
 
