@@ -232,7 +232,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         // Refresh the window... but do not paint on a video control!
         if( iterVideo == m_controlList.end() )
         {
-            // No video control, we can safely repain the rectangle
+            // No video control, we can safely repaint the rectangle
             pWindow->refresh( x, y, width, height );
         }
         else
