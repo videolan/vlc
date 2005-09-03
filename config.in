@@ -215,8 +215,8 @@ bool 'Mozilla plugin' CONFIG_MOZILLA
 if [ "$CONFIG_MOZILLA" = "y" ]; then
    string '    Path to win32 mozilla sdk' CONFIG_WITHMOZILLASDKPATH ""
 fi
-bool 'Build test modules' COFIG_TESTSUITE
-bool 'Enable http daemon' COFIG_HTTPD
+bool 'Build test modules' CONFIG_TESTSUITE
+bool 'Enable http daemon' CONFIG_HTTPD
 # TODO: --disable-plugins
 endmenu
 
