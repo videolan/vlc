@@ -403,9 +403,9 @@ mediacontrol_sound_set_volume( mediacontrol_Instance *self,
     aout_VolumeSet( self->p_intf,( audio_volume_t )volume );
 }
 
-bool mediacontrol_set_visual(mediacontrol_Instance* self,
-			     WINDOWHANDLE visual_id,
-			     mediacontrol_Exception *exception)
+vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
+		 	            WINDOWHANDLE visual_id,
+			            mediacontrol_Exception *exception )
 {
     vlc_value_t value;
     int ret;
