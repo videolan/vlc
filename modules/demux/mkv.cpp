@@ -1481,21 +1481,30 @@ static int Open( vlc_object_t * p_this )
 #endif
                     {
                         // test wether this file belongs to our family
-                        vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( stream_UrlNew( p_demux, s_filename.c_str()), VLC_TRUE );
-                        EbmlStream *p_estream = new EbmlStream(*p_file_io);
-
-                        p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
-                        if ( p_stream == NULL )
+                        stream_t *p_file_stream = stream_UrlNew( p_demux, s_filename.c_str());
+                        if ( p_file_stream != NULL )
                         {
-                            msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
-                            delete p_estream;
-                            delete p_file_io;
+                            vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, VLC_TRUE );
+                            EbmlStream *p_estream = new EbmlStream(*p_file_io);
+
+                            p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
+
+                            if ( p_stream == NULL )
+                            {
+                                msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
+                                delete p_estream;
+                                delete p_file_io;
+                            }
+                            else
+                            {
+                                p_stream->p_in = p_file_io;
+                                p_stream->p_es = p_estream;
+                                p_sys->streams.push_back( p_stream );
+                            }
                         }
                         else
                         {
-                            p_stream->p_in = p_file_io;
-                            p_stream->p_es = p_estream;
-                            p_sys->streams.push_back( p_stream );
+                            msg_Dbg( p_demux, "the file '%s' cannot be opened", s_filename.c_str() );
                         }
                     }
                 }
@@ -3324,6 +3333,8 @@ size_t vlc_stream_io_callback::write( const void *p_buffer, size_t i_size )
 }
 uint64 vlc_stream_io_callback::getFilePointer( void )
 {
+    if ( s == NULL )
+        return 0;
     return stream_Tell( s );
 }
 void vlc_stream_io_callback::close( void )

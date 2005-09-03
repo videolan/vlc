@@ -123,6 +123,9 @@ static inline int stream_Control( stream_t *s, int i_query, ... )
     va_list args;
     int     i_result;
 
+    if ( s == NULL )
+        return VLC_EGENERIC;
+
     va_start( args, i_query );
     i_result = s->pf_control( s, i_query, args );
     va_end( args );
