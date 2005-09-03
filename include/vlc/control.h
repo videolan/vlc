@@ -36,10 +36,6 @@ extern "C" {
 #define WINDOWHANDLE int
 #endif
 
-#ifndef true
-typedef int bool;
-#endif
-
 /************************************************************************
  * Position Object Manipulation
  *************************************************************************/
@@ -65,19 +61,19 @@ typedef struct {
   int  width;
   int  height;
   long type;
-  long long date;
+  vlc_int64_t date;
   int  size;
-  char* data;
+  char *data;
 } mediacontrol_RGBPicture;
 
 typedef struct {
   int size;
-  char** data;
+  char **data;
 } mediacontrol_PlaylistSeq;
 
 typedef struct {
   int code;
-  char* message;
+  char *message;
 } mediacontrol_Exception;
 
 /* Exception codes */
@@ -96,118 +92,136 @@ typedef struct {
 
 /* Cf stream_control.h */
 enum mediacontrol_PlayerStatusList
-  {
+{
     mediacontrol_PlayingStatus, mediacontrol_PauseStatus,
     mediacontrol_ForwardStatus, mediacontrol_BackwardStatus,
     mediacontrol_InitStatus,    mediacontrol_EndStatus,
     mediacontrol_UndefinedStatus
-  };
+};
 typedef enum mediacontrol_PlayerStatusList mediacontrol_PlayerStatus;
 
 typedef struct {
     mediacontrol_PlayerStatus streamstatus;
-    char* url;         /* The URL of the current media stream */
-    long long position;     /* actual location in the stream (in ms) */
-    long long length;         /* total length of the stream (in ms) */
-  } mediacontrol_StreamInformation;
+    char *url;         /* The URL of the current media stream */
+    vlc_int64_t position;     /* actual location in the stream (in ms) */
+    vlc_int64_t length;         /* total length of the stream (in ms) */
+} mediacontrol_StreamInformation;
 
 /**************************************************************************
  *  Helper functions
  ***************************************************************************/
-long long mediacontrol_unit_convert (input_thread_t *p_input,
-                                     mediacontrol_PositionKey from,
-                                     mediacontrol_PositionKey to,
-                                     long long value);
-long long
-mediacontrol_position2microsecond (input_thread_t* p_input, const mediacontrol_Position * pos);
+vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
+                                       mediacontrol_PositionKey from,
+                                       mediacontrol_PositionKey to,
+                                       vlc_int64_t value );
+vlc_int64_t mediacontrol_position2microsecond(
+                                     input_thread_t *p_input,
+                                     const mediacontrol_Position *pos );
 
-mediacontrol_RGBPicture* mediacontrol_RGBPicture__alloc (int datasize);
-void mediacontrol_RGBPicture__free (mediacontrol_RGBPicture* pic);
-mediacontrol_RGBPicture* _mediacontrol_createRGBPicture (int, int, long, long long l_date, char*, int);
-mediacontrol_PlaylistSeq* mediacontrol_PlaylistSeq__alloc (int size);
-void mediacontrol_PlaylistSeq__free (mediacontrol_PlaylistSeq* ps);
+mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int datasize );
 
-mediacontrol_Exception* mediacontrol_exception_init(mediacontrol_Exception *exception);
+void mediacontrol_RGBPicture__free( mediacontrol_RGBPicture *pic );
+
+mediacontrol_RGBPicture *
+  _mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
+                                  char *, int);
+
+mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
+
+void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
+
+mediacontrol_Exception *
+  mediacontrol_exception_init( mediacontrol_Exception *exception );
+
 void mediacontrol_exception_free(mediacontrol_Exception *exception);
 
 /*****************************************************************************
  * Core functions
  *****************************************************************************/
-mediacontrol_Instance* mediacontrol_new(char** args, mediacontrol_Exception *exception);
-mediacontrol_Instance* mediacontrol_new_from_object(vlc_object_t* p_object,
-                            mediacontrol_Exception *exception);
+mediacontrol_Instance *
+  mediacontrol_new( char **args, mediacontrol_Exception *exception );
 
-mediacontrol_Position* mediacontrol_get_media_position(
-                                       mediacontrol_Instance *self,
-                                       mediacontrol_PositionOrigin an_origin,
-                                       mediacontrol_PositionKey a_key,
-                                       mediacontrol_Exception *exception);
-void mediacontrol_set_media_position(mediacontrol_Instance *self,
-                                     const mediacontrol_Position* a_position,
-                                     mediacontrol_Exception *exception);
+mediacontrol_Instance *
+  mediacontrol_new_from_object( vlc_object_t *p_object,
+                                mediacontrol_Exception *exception );
+
+mediacontrol_Position *
+  mediacontrol_get_media_position(
+                         mediacontrol_Instance *self,
+                         const mediacontrol_PositionOrigin an_origin,
+                         const mediacontrol_PositionKey a_key,
+                         mediacontrol_Exception *exception );
+
+void mediacontrol_set_media_position( mediacontrol_Instance *self,
+                                      const mediacontrol_Position *a_position,
+                                      mediacontrol_Exception *exception );
+
 void mediacontrol_start( mediacontrol_Instance *self,
-                         const mediacontrol_Position* a_position,
-                         mediacontrol_Exception *exception);
+                         const mediacontrol_Position *a_position,
+                         mediacontrol_Exception *exception );
 
-void mediacontrol_pause(mediacontrol_Instance *self,
-                        const mediacontrol_Position* a_position, 
-                        mediacontrol_Exception *exception);
+void mediacontrol_pause( mediacontrol_Instance *self,
+                         const mediacontrol_Position *a_position, 
+                         mediacontrol_Exception *exception );
 
-void mediacontrol_resume(mediacontrol_Instance *self,
-                         const mediacontrol_Position* a_position,
-                         mediacontrol_Exception *exception);
+void mediacontrol_resume( mediacontrol_Instance *self,
+                          const mediacontrol_Position *a_position,
+                          mediacontrol_Exception *exception );
 
-void mediacontrol_stop(mediacontrol_Instance *self,
-                       const mediacontrol_Position* a_position,
-                       mediacontrol_Exception *exception);
-void mediacontrol_exit(mediacontrol_Instance *self);
+void mediacontrol_stop( mediacontrol_Instance *self,
+                        const mediacontrol_Position *a_position,
+                        mediacontrol_Exception *exception );
 
-void mediacontrol_playlist_add_item (mediacontrol_Instance *self,
+void mediacontrol_exit( mediacontrol_Instance *self );
+
+void mediacontrol_playlist_add_item( mediacontrol_Instance *self,
                                      const char* psz_file,
-                                     mediacontrol_Exception *exception);
-void mediacontrol_playlist_clear (mediacontrol_Instance *self,
-                                  mediacontrol_Exception *exception);
-mediacontrol_PlaylistSeq* mediacontrol_playlist_get_list (
-                                mediacontrol_Instance *self,
-                                mediacontrol_Exception *exception);
+                                     mediacontrol_Exception *exception );
+void mediacontrol_playlist_clear( mediacontrol_Instance *self,
+                                  mediacontrol_Exception *exception );
+mediacontrol_PlaylistSeq *
+  mediacontrol_playlist_get_list( mediacontrol_Instance *self,
+                                  mediacontrol_Exception *exception );
 
 
 /*****************************************************************************
  * A/V functions
  *****************************************************************************/
-mediacontrol_RGBPicture* mediacontrol_snapshot (mediacontrol_Instance *self,
-                                const mediacontrol_Position* a_position,
-                                mediacontrol_Exception *exception);
+mediacontrol_RGBPicture *
+  mediacontrol_snapshot( mediacontrol_Instance *self,
+                         const mediacontrol_Position *a_position,
+                         mediacontrol_Exception *exception );
 
 /* Return a NULL terminated list */
-mediacontrol_RGBPicture** mediacontrol_all_snapshots (mediacontrol_Instance *self,
-						      mediacontrol_Exception *exception);
+mediacontrol_RGBPicture **
+  mediacontrol_all_snapshots( mediacontrol_Instance *self,
+                              mediacontrol_Exception *exception );
 
-// Displays the message string, between "begin" and "end" positions
-void mediacontrol_display_text (mediacontrol_Instance *self,
-				const char* message, 
-				const mediacontrol_Position* begin, 
-				const mediacontrol_Position* end,
-				mediacontrol_Exception *exception);
+/* Displays the message string, between "begin" and "end" positions */
+void mediacontrol_display_text( mediacontrol_Instance *self,
+                                const char *message, 
+                                const mediacontrol_Position *begin, 
+                                const mediacontrol_Position *end,
+                                mediacontrol_Exception *exception );
 
-mediacontrol_StreamInformation* 
-mediacontrol_get_stream_information(mediacontrol_Instance* self,
-				    mediacontrol_PositionKey a_key,
-				    mediacontrol_Exception *exception);
+mediacontrol_StreamInformation *
+  mediacontrol_get_stream_information( mediacontrol_Instance *self,
+                                       mediacontrol_PositionKey a_key,
+                                       mediacontrol_Exception *exception );
 
-unsigned short mediacontrol_sound_get_volume(mediacontrol_Instance* self,
-					     mediacontrol_Exception *exception);
-void mediacontrol_sound_set_volume(mediacontrol_Instance* self,
-				   const unsigned short volume,
-				   mediacontrol_Exception *exception);
+unsigned short
+  mediacontrol_sound_get_volume( mediacontrol_Instance *self,
+                                 mediacontrol_Exception *exception );
+void mediacontrol_sound_set_volume( mediacontrol_Instance *self,
+                                    const unsigned short volume,
+                                    mediacontrol_Exception *exception );
 
-bool mediacontrol_set_visual(mediacontrol_Instance* self,
-			     WINDOWHANDLE visual_id,
-			     mediacontrol_Exception *exception);
+vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
+                                    WINDOWHANDLE visual_id,
+                                    mediacontrol_Exception *exception );
 
 # ifdef __cplusplus
 }
 # endif
 
 #endif
-

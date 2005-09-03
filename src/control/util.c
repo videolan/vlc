@@ -55,10 +55,10 @@
 #define RAISE( c, m )  exception->code = c; \
                        exception->message = strdup(m);
 
-long long mediacontrol_unit_convert( input_thread_t *p_input,
-                                     mediacontrol_PositionKey from,
-                                     mediacontrol_PositionKey to,
-                                     long long value )
+vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
+                                       mediacontrol_PositionKey from,
+                                       mediacontrol_PositionKey to,
+                                       vlc_int64_t value )
 {
     if( to == from )
         return value;
@@ -101,12 +101,12 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
         {
             /* FIXME */
             /* vlc < 0.8 API */
-/*             return ( long long )( value * 50 * p_input->stream.i_mux_rate / f_fps ); */
+/*             return ( vlc_int64_t )( value * 50 * p_input->stream.i_mux_rate / f_fps ); */
             return 0;
         }
 
         if( to == mediacontrol_MediaTime )
-            return( long long )( value * 1000.0 / ( double )f_fps );
+            return( vlc_int64_t )( value * 1000.0 / ( double )f_fps );
 
         /* Cannot happen */
         break;
@@ -124,7 +124,7 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
 //            i_mux_rate : the rate we read the stream (in units of 50 bytes/s) ;
 //            0 if undef */
 //         if( to == mediacontrol_MediaTime )
-//             return ( long long )( 1000 * value / 50 / p_input->stream.i_mux_rate );
+//             return ( vlc_int64_t )( 1000 * value / 50 / p_input->stream.i_mux_rate );
 // 
 //         if( to == mediacontrol_SampleCount )
 //         {
@@ -132,7 +132,7 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
 //             if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
 //                 return 0;
 //             else
-//                 return ( long long )( value * f_fps / 50 / p_input->stream.i_mux_rate );
+//                 return ( vlc_int64_t )( value * f_fps / 50 / p_input->stream.i_mux_rate );
 //         }
         /* Cannot happen */
         break;
@@ -143,7 +143,7 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
 
 /* Converts a mediacontrol_Position into a time in microseconds in
    movie clock time */
-long long
+vlc_int64_t
 mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_Position * pos )
 {
     switch( pos->origin )
@@ -156,7 +156,7 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
         break;
     case mediacontrol_RelativePosition:
     {
-        long long l_pos;
+        vlc_int64_t l_pos;
         vlc_value_t val;
 
         val.i_time = 0;
@@ -174,7 +174,7 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
     }
     case mediacontrol_ModuloPosition:
     {
-        long long l_pos;
+        vlc_int64_t l_pos;
         vlc_value_t val;
 
         val.i_time = 0;
@@ -273,7 +273,7 @@ mediacontrol_exception_free( mediacontrol_Exception *exception )
 }
 
 mediacontrol_RGBPicture*
-_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, long long l_date,
+_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, vlc_int64_t l_date,
                                 char* p_data, int i_datasize )
 {
     mediacontrol_RGBPicture *retval;
