@@ -5031,15 +5031,18 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, chapter_item_c * p_chapt
 
 bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a, const matroska_segment_c * p_item_b )
 {
+    if ( p_item_a == NULL || p_item_b == NULL )
+        return false;
+
     EbmlBinary * p_itema = (EbmlBinary *)(p_item_a->p_segment_uid);
-    if ( *p_itema == *p_item_b->p_prev_segment_uid )
+    if ( p_item_b->p_prev_segment_uid != NULL && *p_itema == *p_item_b->p_prev_segment_uid )
         return true;
 
     p_itema = (EbmlBinary *)(&p_item_a->p_next_segment_uid);
-    if ( *p_itema == *p_item_b->p_segment_uid )
+    if ( p_item_b->p_segment_uid != NULL && *p_itema == *p_item_b->p_segment_uid )
         return true;
 
-    if ( *p_itema == *p_item_b->p_prev_segment_uid )
+    if ( p_item_b->p_prev_segment_uid != NULL && *p_itema == *p_item_b->p_prev_segment_uid )
         return true;
 
     return false;
