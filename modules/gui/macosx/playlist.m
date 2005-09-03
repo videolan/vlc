@@ -1651,7 +1651,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     /* Drag & Drop inside the playlist */
     if( [[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] )
     {
-        int i_row;
+        int i_row, i_removed_from_node = 0;
         unsigned int i;
         playlist_item_t *p_new_parent, *p_item = NULL;
         NSArray *o_all_items = [o_nodes_array arrayByAddingObjectsFromArray:
@@ -1666,7 +1666,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
         /* Make sure the proposed parent is a node.
            (This should never be true) */
-        if( p_new_parent->i_children < 0 ) return NO;
+        if( p_new_parent->i_children < 0 )
+        {
+            vlc_object_release( p_playlist );
+            return NO;
+        }
 
         for( i = 0; i < [o_all_items count]; i++ )
         {
@@ -1691,11 +1695,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 }
             }
 
-
-            /* If we move the playing item in a different node or we move the
-               node containing the playing item in a different node, then stop
-               playback, or the playlist refuses to detach the item. */
-
             vlc_mutex_lock( &p_playlist->object_lock );
             // Acually detach the item from the old position
             if( playlist_NodeRemoveItem( p_playlist, p_item, p_old_parent ) ==
@@ -1709,12 +1708,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 i_new_index = -1;
                 /* If we move the item in the same node, we need to take into
                    account that one item will be deleted */
-                else if((p_new_parent == p_old_parent &&
-                                                i_old_index < index + (int)i)
-                       || p_new_parent == p_playlist->p_general || index == 0 )
-                i_new_index = index + i;
                 else
-                i_new_index = index + i + 1;
+                {
+                    if ((p_new_parent == p_old_parent &&
+                                   i_old_index < index + (int)i)
+                                   || p_new_parent == p_playlist->p_general )
+                    {
+                        i_removed_from_node++;
+                    }
+                    i_new_index = index + i - i_removed_from_node;
+                }
                 // Reattach the item to the new position
                 playlist_NodeInsert( p_playlist, i_current_view, p_item,
                                                     p_new_parent, i_new_index );
