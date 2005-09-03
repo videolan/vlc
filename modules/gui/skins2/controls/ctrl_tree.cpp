@@ -43,19 +43,19 @@
 
 
 CtrlTree::CtrlTree( intf_thread_t *pIntf,
-                  VarTree &rTree,
-                  const GenericFont &rFont,
-                  const GenericBitmap *pBgBitmap,
-                  const GenericBitmap *pItemBitmap,
-                  const GenericBitmap *pOpenBitmap,
-                  const GenericBitmap *pClosedBitmap,
-                  uint32_t fgColor,
-                  uint32_t playColor,
-                  uint32_t bgColor1,
-                  uint32_t bgColor2,
-                  uint32_t selColor,
-                  const UString &rHelp,
-                  VarBool *pVisible ):
+                    VarTree &rTree,
+                    const GenericFont &rFont,
+                    const GenericBitmap *pBgBitmap,
+                    const GenericBitmap *pItemBitmap,
+                    const GenericBitmap *pOpenBitmap,
+                    const GenericBitmap *pClosedBitmap,
+                    uint32_t fgColor,
+                    uint32_t playColor,
+                    uint32_t bgColor1,
+                    uint32_t bgColor2,
+                    uint32_t selColor,
+                    const UString &rHelp,
+                    VarBool *pVisible ):
     CtrlGeneric( pIntf,rHelp, pVisible), m_rTree( rTree), m_rFont( rFont ),
     m_pBgBitmap( pBgBitmap ), m_pItemBitmap( pItemBitmap ),
     m_pOpenBitmap( pOpenBitmap ), m_pClosedBitmap( pClosedBitmap ),
@@ -132,6 +132,9 @@ int CtrlTree::maxItems()
 
 void CtrlTree::onUpdate( Subject<VarTree> &rTree )
 {
+    // Invalidate the position when the tree is updated
+    m_lastPos = m_rTree.begin();
+
     autoScroll();
     m_pLastSelected = NULL;
 }
