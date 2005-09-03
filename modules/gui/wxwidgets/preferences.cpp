@@ -336,7 +336,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     b_advanced = VLC_FALSE;
 
     root_item = AddRoot( wxT("") );
-    wxASSERT_MSG(root_item.IsOk(), "Could not add root item");
+    wxASSERT_MSG(root_item.IsOk(), wxT("Could not add root item"));
 
     wxImageList *p_images = new wxImageList( 16,16,TRUE );
     p_images->Add( wxIcon( audio_xpm ) );
