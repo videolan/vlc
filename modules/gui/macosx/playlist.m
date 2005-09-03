@@ -1766,26 +1766,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         {
             [self appendArray: o_array atPos: index enqueue: YES];
         }
+        /* This should never occur */
         else if( p_node->i_children == -1 )
         {
-            int i_counter;
-            playlist_item_t *p_real_node = NULL;
-
-            for( i_counter = 0 ; i_counter < p_node->i_parents ; i_counter++ )
-            {
-                if( p_node->pp_parents[i_counter]->i_view == i_current_view )
-                {
-                    p_real_node = p_node->pp_parents[i_counter]->p_parent;
-                    break;
-                }
-                if( i_counter == p_node->i_parents )
-                {
-                    vlc_object_release(p_playlist);
-                    return NO;
-                }
-            }
-            [self appendNodeArray: o_array inNode: p_real_node
-                atPos: index inView: i_current_view enqueue: YES];
+            vlc_object_release( p_playlist );
+            return NO;
         }
         else
         {
