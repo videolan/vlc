@@ -82,7 +82,7 @@ endif
 # ***************************************************************************
 
 ifdef HAVE_DARWIN_OS
- all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
+ all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
@@ -94,7 +94,7 @@ else
  ifeq ($(HOST),i586-pc-beos)
   ifeq ($(HOST),$(BUILD))
 # Native build: we need perl, autoconf, etc first
-   all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
+   all: .perl .autoconf .automake .libtool .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi .aclocal
