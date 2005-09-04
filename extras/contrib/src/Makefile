@@ -227,7 +227,10 @@ ifdef HAVE_DARWIN_OS
 .libtool:
 	if test -x /usr/bin/glibtoolize; then \
 		ln -sf /usr/bin/glibtoolize $(PREFIX)/bin/libtoolize ; \
-		ln -sf /usr/share/aclocal/libtool.m4 $(PREFIX)/share/aclocal-$(AUTOMAKE_VERSION) ; \
+	fi
+	if test -f /usr/share/aclocal/libtool.m4; then \
+		mkdir -p $(PREFIX)/share/aclocal ; \
+		ln -sf /usr/share/aclocal/libtool.m4 $(PREFIX)/share/aclocal ; \
 	fi
 	touch $@
 endif
