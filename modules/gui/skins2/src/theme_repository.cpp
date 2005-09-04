@@ -126,10 +126,15 @@ void ThemeRepository::parseDirectory( const string &rDir )
             msg_Dbg( getIntf(), "found skin %s", path.c_str() );
 
             // Add the theme in the popup menu
-            val.psz_string = (char*)path.c_str();
-            text.psz_string = (char*)name.substr(0, name.size() - 4).c_str();
+            string shortname = name.substr( 0, name.size() - 4 );
+            val.psz_string = new char[path.size() + 1];
+            text.psz_string = new char[shortname.size() + 1];
+            strcpy( val.psz_string, path.c_str() );
+            strcpy( text.psz_string, shortname.c_str() );
             var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                         &text );
+            delete[] val.psz_string;
+            delete[] text.psz_string;
         }
 
         pDirContent = (dirent*)readdir( pDir );
