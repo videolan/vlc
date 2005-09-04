@@ -953,9 +953,9 @@ public:
     
     std::vector<chapter_codec_cmds_c*> codecs;
 
-    bool operator<( const chapter_item_c & item ) const
+    static bool CompareTimecode( const chapter_item_c * & itemA, const chapter_item_c * & itemB )
     {
-        return ( i_user_start_time < item.i_user_start_time || (i_user_start_time == item.i_user_start_time && i_user_end_time < item.i_user_end_time) );
+        return ( itemA->i_user_start_time < itemB->i_user_start_time || (itemA->i_user_start_time == itemB->i_user_start_time && itemA->i_user_end_time < itemB->i_user_end_time) );
     }
 
     bool Enter( bool b_do_subchapters );
@@ -1880,21 +1880,23 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
             }
             return;
         }
-        // TODO implement correct timestamping when B frames are used
-#if 0
+        // correct timestamping when B frames are used
         if( tk->fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;
         }
         else
         {
-            p_block->i_pts = i_pts;
+            if( !strcmp( tk->psz_codec, "V_MS/VFW/FOURCC" ) )
+            {
+                p_block->i_pts = 0;
+            }
+            else
+            {
+                p_block->i_pts = i_pts;
+            }
             p_block->i_dts = p_sys->i_pts;
         }
-#else
-        p_block->i_pts = i_pts;
-        p_block->i_dts = p_sys->i_last_dts;
-#endif
 
 #if 0
 msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block->i_pts);
@@ -1902,10 +1904,6 @@ msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
             p_block->i_length = i_duration * 1000;
-        }
-        if( !strcmp( tk->psz_codec, "V_MS/VFW/FOURCC" ) )
-        {
-            p_block->i_pts = 0;
         }
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
@@ -4801,7 +4799,8 @@ int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     }
     else
     {
-        std::sort( sub_chapters.begin(), sub_chapters.end() );
+        if ( sub_chapters.begin() != sub_chapters.end() )
+            std::sort( sub_chapters.begin(), sub_chapters.end(), chapter_item_c::CompareTimecode );
         i_user_start_time = i_start_time;
         if ( i_end_time != -1 )
             i_user_end_time = i_end_time;
