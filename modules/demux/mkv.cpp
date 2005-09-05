@@ -953,7 +953,7 @@ public:
     
     std::vector<chapter_codec_cmds_c*> codecs;
 
-    static bool CompareTimecode( const chapter_item_c * & itemA, const chapter_item_c * & itemB )
+    static bool CompareTimecode( const chapter_item_c * itemA, const chapter_item_c * itemB )
     {
         return ( itemA->i_user_start_time < itemB->i_user_start_time || (itemA->i_user_start_time == itemB->i_user_start_time && itemA->i_user_end_time < itemB->i_user_end_time) );
     }
