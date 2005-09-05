@@ -367,8 +367,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /* Set the config file stuff */
-    p_vlc->psz_userdir = config_GetUserDir();
     p_vlc->psz_homedir = config_GetHomeDir();
+    p_vlc->psz_userdir = config_GetUserDir();
+    if( p_vlc->psz_userdir == NULL )
+        p_vlc->psz_userdir = strdup(p_vlc->psz_homedir);
     p_vlc->psz_configfile = config_GetPsz( p_vlc, "config" );
     if( p_vlc->psz_configfile != NULL && p_vlc->psz_configfile[0] == '~'
          && p_vlc->psz_configfile[1] == '/' )
