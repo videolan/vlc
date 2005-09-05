@@ -2422,11 +2422,21 @@ static void Version( void )
 static void ShowConsole( void )
 {
 #   ifndef UNDER_CE
+    FILE *f_help;
 
     if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
 
     AllocConsole();
-    freopen( "CONOUT$", "w", stdout );
+
+    if( (f_help = fopen( "vlc-help.txt", "wt" )) )
+    {
+        fclose( f_help );
+        freopen( "vlc-help.txt", "wt", stdout );
+        fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
+    }
+
+    else freopen( "CONOUT$", "w", stdout );
+
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
 
@@ -2445,8 +2455,10 @@ static void PauseConsole( void )
 #   ifndef UNDER_CE
 
     if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
-    fprintf( stdout, _("\nPress the RETURN key to continue...\n") );
+
+    fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
     getchar();
+    fclose( stdout );
 
 #   endif
 }
