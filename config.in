@@ -11,15 +11,15 @@ choice 'Operating System' \
 
 mainmenu_option next_comment
 comment 'User Interfaces'
-bool 'Skins module' CONFIG_SKINS
+bool 'wxWidgets interface' CONFIG_WXWIDGETS
+if [ "$CONFIG_WXWIDGETS" = "y" ]; then
+  string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
+fi
+bool 'Skins interface' CONFIG_SKINS
 if [ "$CONFIG_SKINS" = "y" ]; then
   string 'xml2-config path' CONFIG_WITHXML2CONFIGPATH ""
 fi
 bool 'PDA interface (via Gtk2) support' CONFIG_PDA
-bool 'wxWidgets support' CONFIG_WXWIDGETS
-if [ "$CONFIG_WXWIDGETS" = "y" ]; then
-  string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
-fi
 bool 'Qt embedded interface support (opie)' CONFIG_OPIE
 if [ "$CONFIG_OPIE" = "y" ]; then
   string 'Qt Embedded headers and libraries' CONFIG_WITHQTE ""
@@ -36,12 +36,7 @@ if [ "$CONFIG_GOOM" = "y" ]; then
   string 'goom tree for static linking' CONFIG_WITHGOOMTREE ""
 fi
 bool 'GaLaktos visualization plugin' CONFIG_GALAKTOS
-bool 'SLP service discovery support' CONFIG_SLP
-if [ "$CONFIG_SLP" = "y" ]; then
-  string 'libslp headers and libraries' CONFIG_WITHSLP ""
-fi
 bool 'IR remote control support' CONFIG_LIRC
-bool 'Joystick control' CONFIG_JOYSTICK
 bool 'Corba interface support' CONFIG_CORBA
 endmenu
 
