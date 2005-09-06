@@ -882,16 +882,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( p_sys->rtsp && p_sys->i_length > 0 )
             {
-                MediaSubsessionIterator *iter =
-                    new MediaSubsessionIterator( *p_sys->ms );
-                MediaSubsession *sub;
                 int i;
 
-                while( ( sub = iter->next() ) != NULL )
+                if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time ) )
                 {
-                    p_sys->rtsp->playMediaSubsession( *sub, time );
+                    msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
+                    return VLC_EGENERIC;
                 }
-                delete iter;
                 p_sys->i_start = (mtime_t)(f * (double)p_sys->i_length);
                 p_sys->i_pcr_start = 0;
                 p_sys->i_pcr       = 0;
@@ -928,8 +925,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_PAUSE_STATE:
             double d_npt;
-            MediaSubsessionIterator *iter;
-            MediaSubsession *sub;
 
             d_npt = ( (double)( p_sys->i_pcr - p_sys->i_pcr_start +
                                 p_sys->i_start ) ) / 1000000.00;
@@ -938,18 +933,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->rtsp == NULL )
                 return VLC_EGENERIC;
 
-            iter = new MediaSubsessionIterator( *p_sys->ms );
-            while( ( sub = iter->next() ) != NULL )
-            {
-                if( ( b_bool && !p_sys->rtsp->pauseMediaSubsession( *sub ) ) ||
-                    ( !b_bool && !p_sys->rtsp->playMediaSubsession( *sub,
+            if( ( b_bool && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
+                    ( !b_bool && !p_sys->rtsp->playMediaSession( *p_sys->ms,
                       d_npt > 0 ? d_npt : -1 ) ) )
-                {
-                    delete iter;
+            {
+                    msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
-                }
             }
-            delete iter;
 #if 0
             /* reset PCR and PCR start, mmh won't work well for multi-stream I fear */
             for( i = 0; i < p_sys->i_track; i++ )
