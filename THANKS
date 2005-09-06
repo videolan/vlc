@@ -21,6 +21,7 @@ Benjamin Mironer <bmironer at noos.fr> - Mac OS X fixes
 Benoit Steiner <benny at via.ecp.fr> - MPEG system input, network input
 Bill Eldridge <bill at rfa.org> - documentation
 Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
+Brian Robb <vascy at hotmail dot com> - win32 CD/DVD drive detection in wx
 Brieuc Jeunhomme <bbp at via.ecp.fr> - bug fixes
 Bruno Vella <allevb at tin.it> - Italian localization
 Carlo Calabrò <murray at via.ecp.fr> - Italian localization
