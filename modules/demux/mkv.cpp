@@ -397,7 +397,7 @@ vlc_module_begin();
             N_("Use chapter codecs found in the segment."), VLC_TRUE );
 
     add_bool( "mkv-seek-percent", 0, NULL,
-            N_("Seek based on percent not time."),
+            N_("Seek based on percent not time"),
             N_("Seek based on percent not time."), VLC_TRUE );
 
     add_bool( "mkv-use-dummy", 0, NULL,
@@ -2067,7 +2067,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             else if( !strcmp( tracks[i_track]->psz_codec, "V_MPEG4/ISO/AVC" ) )
             {
                 tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'a', 'v', 'c', '1' );
-                tracks[i_track]->fmt.b_packetized = VLC_FALSE;
                 tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
                 tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
                 memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
