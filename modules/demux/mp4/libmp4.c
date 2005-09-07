@@ -1003,7 +1003,7 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
     }
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream,
-             "read box: \"avcC\" version=%d profile=0x%x level=0x%x lengh size=%d sps=%d pps=%d",
+             "read box: \"avcC\" version=%d profile=0x%x level=0x%x length size=%d sps=%d pps=%d",
              p_avcC->i_version, p_avcC->i_profile, p_avcC->i_level,
              p_avcC->i_length_size,
              p_avcC->i_sps, p_avcC->i_pps );
