@@ -45,9 +45,10 @@ Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
 François Seingier <francois.seingier at club-internet.fr> - TTL setting in the wx stream output dialog
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
-Gregory Hazel <ghazel et gmail dot com> - wxWidgets fixes and improvements
+Gregory Hazel <ghazel at gmail dot com> - wxWidgets fixes and improvements
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
+Han HoJoong <0demon0 at paran dot com> - Korean translation
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
 Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf

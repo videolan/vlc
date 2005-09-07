@@ -35,6 +35,7 @@ Interfaces:
     - New extended controls panel
     - New bookmarks window
     - Fixed playlist sorting
+    - Fixed drag-and-drop inside the playlist
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*	
@@ -49,7 +50,8 @@ ActiveX plugin:
 * Should now work outside IE as well
 
 Translations:
- The following language was added:
+ The following languages were added:
+ * Korean
  * Romanian
 
 Changes between 0.8.1 and 0.8.2:
