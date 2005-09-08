@@ -247,6 +247,8 @@ struct intf_sys_t
     IBOutlet id o_mi_reportabug;
     IBOutlet id o_mi_website;
     IBOutlet id o_mi_license;
+    IBOutlet id o_mi_donation;
+    IBOutlet id o_mi_forum;
 
     /* dock menu */
     IBOutlet id o_dmi_play;

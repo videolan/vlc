@@ -160,6 +160,7 @@
                 "o_mi_deinterlace" = id; 
                 "o_mi_device" = id; 
                 "o_mi_documentation" = id; 
+                "o_mi_donation" = id; 
                 "o_mi_double_window" = id; 
                 "o_mi_equalizer" = id; 
                 "o_mi_extended" = id; 
@@ -167,6 +168,7 @@
                 "o_mi_ffmpeg_pp" = id; 
                 "o_mi_fittoscreen" = id; 
                 "o_mi_floatontop" = id; 
+                "o_mi_forum" = id; 
                 "o_mi_fullscreen" = id; 
                 "o_mi_fwd" = id; 
                 "o_mi_half_window" = id; 

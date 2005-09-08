@@ -465,8 +465,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
 
     /* main menu */
-    [o_mi_about setTitle: _NS("About VLC media player...")];
-    [o_mi_checkForUpdate setTitle: _NS("Check for update...")];
+    [o_mi_about setTitle: [_NS("About VLC media player") \
+        stringByAppendingString: @"..."]];
+    [o_mi_checkForUpdate setTitle: _NS("Check for Update...")];
     [o_mi_prefs setTitle: _NS("Preferences...")];
     [o_mi_add_intf setTitle: _NS("Add Interface")];
     [o_mu_add_intf setTitle: _NS("Add Interface")];
@@ -483,7 +484,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_open_recent_cm setTitle: _NS("Clear Menu")];
-    [o_mi_open_wizard setTitle: _NS("Wizard...")];
+    [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
 
     [o_mu_edit setTitle: _NS("Edit")];
     [o_mi_cut setTitle: _NS("Cut")];
@@ -492,7 +493,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_clear setTitle: _NS("Clear")];
     [o_mi_select_all setTitle: _NS("Select All")];
 
-    [o_mu_controls setTitle: _NS("Controls")];
+    [o_mu_controls setTitle: _NS("Playback")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_stop setTitle: _NS("Stop")];
     [o_mi_faster setTitle: _NS("Faster")];
@@ -549,7 +550,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_controller setTitle: _NS("Controller")];
     [o_mi_equalizer setTitle: _NS("Equalizer")];
-    [o_mi_extended setTitle: _NS("Extended controls")];
+    [o_mi_extended setTitle: _NS("Extended Controls")];
     [o_mi_bookmarks setTitle: _NS("Bookmarks")];
     [o_mi_playlist setTitle: _NS("Playlist")];
     [o_mi_info setTitle: _NS("Info")];
@@ -563,6 +564,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_reportabug setTitle: _NS("Report a Bug")];
     [o_mi_website setTitle: _NS("VideoLAN Website")];
     [o_mi_license setTitle: _NS("License")];
+    [o_mi_donation setTitle: _NS("Make a donation")];
+    [o_mi_forum setTitle: _NS("Online Forum")];
 
     /* dock menu */
     [o_dmi_play setTitle: _NS("Play")];
