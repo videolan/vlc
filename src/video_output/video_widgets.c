@@ -60,9 +60,11 @@ void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
 
     if( !p_vout ) return;
 
-    if( p_vout && config_GetInt( p_caller, "osd" ) )
+    if( config_GetInt( p_caller, "osd" ) )
     {
         osd_Icon( p_caller, p_vout->p_spu, p_vout->render.i_width,
             p_vout->render.i_height, i_channel, i_type );
     }
+    vlc_object_release( p_vout );
 }
+
