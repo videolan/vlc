@@ -344,21 +344,36 @@ static int OpenUDP( vlc_object_t * p_this )
 #if defined (WIN32) || defined (UNDER_CE)
             else
             {
+                DWORD WINAPI (*OurGetBestInterface)(IPAddr,PDWORD);
+                DWORD WINAPI (*OurGetIpAddrTable)(PMIB_IPADDRTABLE,PULONG,BOOL);
+                HINSTANCE hiphlpapi = LoadLibrary(_T("Iphlpapi.dll"));
                 DWORD i_index;
-                if( GetBestInterface( sock.sin_addr.s_addr,
-                                      &i_index ) == NO_ERROR )
+
+                if( hiphlpapi )
+                {
+                    OurGetBestInterface =
+                        (void *)GetProcAddress( hiphlpapi,
+                                                _T("GetBestInterface") );
+                    OurGetIpAddrTable =
+                        (void *)GetProcAddress( hiphlpapi,
+                                                _T("GetIpAddrTable") );
+                }
+
+                if( hiphlpapi && OurGetBestInterface && OurGetIpAddrTable &&
+                    OurGetBestInterface( sock.sin_addr.s_addr,
+                                         &i_index ) == NO_ERROR )
                 {
                     PMIB_IPADDRTABLE p_table;
                     DWORD i = 0;
 
                     msg_Dbg( p_this, "Winsock best interface is %lu",
                              (unsigned long)i_index );
-                    GetIpAddrTable( NULL, &i, 0 );
+                    OurGetIpAddrTable( NULL, &i, 0 );
 
                     p_table = (PMIB_IPADDRTABLE)malloc( i );
                     if( p_table != NULL )
                     {
-                        if( GetIpAddrTable( p_table, &i, 0 ) == NO_ERROR)
+                        if( OurGetIpAddrTable( p_table, &i, 0 ) == NO_ERROR )
                         {
                             for( i = 0; i < p_table->dwNumEntries; i-- )
                             {
@@ -371,13 +386,13 @@ static int OpenUDP( vlc_object_t * p_this )
                                 }
                             }
                         }
-                        else
-                            msg_Warn( p_this, "GetIpAddrTable failed" );
+                        else msg_Warn( p_this, "GetIpAddrTable failed" );
                         free( p_table );
                     }
                 }
-                else
-                    msg_Dbg( p_this, "GetBestInterface failed" );
+                else msg_Dbg( p_this, "GetBestInterface failed" );
+
+                if( hiphlpapi ) FreeLibrary( hiphlpapi );
             }
 #endif
             if( psz_if_addr != NULL ) free( psz_if_addr );

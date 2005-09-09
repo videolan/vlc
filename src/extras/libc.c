@@ -55,6 +55,10 @@
 #   include <windows.h>
 #endif
 
+#ifdef UNDER_CE
+#   define strcoll strcmp
+#endif
+
 /*****************************************************************************
  * getenv: just in case, but it should never be called
  *****************************************************************************/
@@ -343,7 +347,7 @@ int64_t vlc_atoll( const char *nptr )
  * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters
  * when called with an empty argument or just '\'
  *****************************************************************************/
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(WIN32) && !defined(UNDER_CE)
 typedef struct vlc_DIR
 {
     DIR *p_real_dir;
@@ -949,7 +953,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
         }
     }
 
-#elif defined( WIN32 )
+#elif defined( WIN32 ) && !defined( UNDER_CE )
     SECURITY_ATTRIBUTES saAttr; 
     PROCESS_INFORMATION piProcInfo; 
     STARTUPINFO siStartInfo;
