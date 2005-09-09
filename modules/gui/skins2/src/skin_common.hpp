@@ -49,6 +49,8 @@ class ThemeRepository;
 #ifdef _MSC_VER
 // turn off 'warning C4355: 'this' : used in base member initializer list'
 #pragma warning ( disable:4355 )
+// turn off 'identifier was truncated to '255' characters in the debug info'
+#pragma warning ( disable:4786 )
 #endif
 
 // Useful macros
