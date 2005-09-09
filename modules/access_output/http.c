@@ -1,10 +1,11 @@
 /*****************************************************************************
  * http.c
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2001-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Jon Lech Johansen <jon@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +29,18 @@
 
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
+
+#ifdef HAVE_AVAHI_CLIENT
+    #include <vlc/intf.h>
+
+    #include "bonjour.h"
+
+    #if defined( WIN32 )
+        #define DIRECTORY_SEPARATOR '\\'
+    #else
+        #define DIRECTORY_SEPARATOR '/'
+    #endif
+#endif
 
 #include "vlc_httpd.h"
 
@@ -120,6 +133,10 @@ struct sout_access_out_sys_t
     int                 i_header_size;
     uint8_t             *p_header;
     vlc_bool_t          b_header_complete;
+
+#ifdef HAVE_AVAHI_CLIENT
+    void                *p_bonjour;
+#endif
 };
 
 /*****************************************************************************
@@ -141,6 +158,11 @@ static int Open( vlc_object_t *p_this )
     const char          *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
                         *psz_crl = NULL;
     vlc_value_t         val;
+
+#ifdef HAVE_AVAHI_CLIENT
+    playlist_t          *p_playlist;
+    char                *psz_txt;
+#endif
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
@@ -271,8 +293,44 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+#ifdef HAVE_AVAHI_CLIENT
+    asprintf( &psz_txt, "path=%s", psz_file_name );
+#endif
+
     free( psz_file_name );
     free( psz_name );
+
+#ifdef HAVE_AVAHI_CLIENT
+    p_playlist = (playlist_t *)vlc_object_find( p_access, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        msg_Err( p_access, "unable to find playlist" );
+        httpd_HostDelete( p_sys->p_httpd_host );
+        free( (void *)psz_txt );
+        free( (void *)p_sys );
+        return VLC_EGENERIC;
+    }
+
+    psz_name = strrchr( p_playlist->status.p_item->input.psz_uri,
+                        DIRECTORY_SEPARATOR );
+    if( psz_name != NULL ) psz_name++;
+    else psz_name = p_playlist->status.p_item->input.psz_uri;
+
+    p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
+                                              "_vlc-http._tcp",
+                                              psz_name, i_bind_port, psz_txt );
+    free( (void *)psz_txt );
+    if( p_sys->p_bonjour == NULL )
+    {
+        vlc_object_release( p_playlist );
+        httpd_HostDelete( p_sys->p_httpd_host );
+        free( (void *)p_sys );
+        return VLC_EGENERIC;
+    }
+
+    vlc_object_release( p_playlist );
+#endif
 
     p_sys->i_header_allocated = 1024;
     p_sys->i_header_size      = 0;
@@ -296,6 +354,10 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
+
+#ifdef HAVE_AVAHI_CLIENT
+    bonjour_stop_service( p_sys->p_bonjour );
+#endif
 
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol--;

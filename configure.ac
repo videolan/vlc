@@ -1607,7 +1607,7 @@ then
           VLC_ADD_BUILTINS([mux_ts])
         fi
         VLC_ADD_CPPFLAGS([mux_ts ts dvb],[-I${real_dvbpsi_tree}/src])
-        VLC_ADD_LDFLAGS([mux_ts ts dvb],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
+        VLC_ADD_LDFLAGS([mux_ts ts dvb],[${real_dvbpsi_tree}/src/.libs/libdvbpsi.a])
       else
         dnl  The given libdvbpsi wasn't built
         AC_MSG_RESULT(no)
@@ -4150,6 +4150,21 @@ then
        VLC_ADD_LDFLAGS([daap],[$DAAP_LIBS])
        VLC_ADD_CFLAGS([daap],[$DAAP_CFLAGS])]:,
       [AC_MSG_WARN(DAAP library not found)])
+fi
+
+dnl
+dnl  Bonjour services discovery
+dnl
+AC_ARG_ENABLE(bonjour,
+  [  --enable-bonjour        Bonjour services discovery (default enabled)])
+if test "${enable_bonjour}" != "no"
+then
+  PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.3,
+    [AC_DEFINE(HAVE_AVAHI_CLIENT, [], [Define if you have the avahi-client library])
+      VLC_ADD_LDFLAGS([bonjour access_output_http],[$BONJOUR_LIBS])
+      VLC_ADD_CFLAGS([bonjour access_output_http],[$BONJOUR_CFLAGS])
+      VLC_ADD_PLUGINS([bonjour]) ],
+    [AC_MSG_WARN(avahi-client library not found)])
 fi
 
 dnl
