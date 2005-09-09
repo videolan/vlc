@@ -29,6 +29,7 @@
 #include <ctype.h>
 
 #include <vlc/vlc.h>
+#include <vlc_common.h>
 
 #undef iconv_t
 #undef iconv_open
@@ -612,7 +613,14 @@ size_t vlc_iconv( vlc_iconv_t cd, char **inbuf, size_t *inbytesleft,
 #if defined(HAVE_ICONV)
     return iconv( cd, inbuf, inbytesleft, outbuf, outbytesleft );
 #else
-    int i_bytes = __MIN(*inbytesleft, *outbytesleft);
+    int i_bytes;
+
+    if (inbytesleft == NULL || outbytesleft == NULL)
+    {
+        return 0;
+    }
+
+    i_bytes = __MIN(*inbytesleft, *outbytesleft);
     if( !inbuf || !outbuf || !i_bytes ) return (size_t)(-1);
     memcpy( *outbuf, *inbuf, i_bytes );
     inbuf += i_bytes;
