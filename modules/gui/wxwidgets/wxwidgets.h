@@ -26,6 +26,11 @@
 #undef CreateDialog
 #endif
 
+#ifdef _MSC_VER
+// turn off 'identifier was truncated to '255' characters in the debug info'
+#   pragma warning( disable:4786 )
+#endif
+
 /* Let vlc take care of the i18n stuff */
 #define WXINTL_NO_GETTEXT_MACRO
 

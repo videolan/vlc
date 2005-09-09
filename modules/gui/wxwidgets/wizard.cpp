@@ -240,6 +240,7 @@ class wizInputPage : public wxWizardPage
         OpenDialog *p_open_dialog;
         wxListView *listview;
         wxPanel *open_panel;
+        wxPanel *radio_panel; /* radio buttons should be in their own panel... */
         wxWizardPage *p_prev;
         wxWizardPage *p_streaming_page;
         wxWizardPage *p_transcode_page;
@@ -530,7 +531,8 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
     p_parent = (WizardDialog *)parent;
     b_chosen = false;
     p_open_dialog = NULL;
-    listview = NULL;    
+    listview = NULL;
+    mrl_text = NULL;
     mainSizer = new wxBoxSizer(wxVERTICAL);
 
     /* Create the texts */
@@ -538,30 +540,42 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
 
     mainSizer->Add( 0,20,0 );
 
+    radio_panel = new wxPanel(this, -1);
+    radio_panel->SetAutoLayout( TRUE );
+
+    wxBoxSizer *radioSizer = new wxBoxSizer(wxVERTICAL);
+
     /* Create the radio buttons */
-    input_radios[0] = new wxRadioButton( this, InputRadio0_Event ,
+    input_radios[0] = new wxRadioButton( radio_panel, InputRadio0_Event ,
                                wxU( INPUT_OPEN ) );
-    mainSizer->Add( input_radios[0], 0, wxALL, 5 );
-    input_radios[1] = new wxRadioButton( this, InputRadio1_Event ,
-                               wxU( INPUT_PL ) );
+    radioSizer->Add( input_radios[0], 0, wxALL, 5 );
+    input_radios[1] = new wxRadioButton( radio_panel, InputRadio1_Event ,
+                               wxU( INPUT_PL ) );  
+    radioSizer->Add( input_radios[1], 0, wxALL, 5 );
+
+    radio_panel->SetSizer( radioSizer );
+    radioSizer->Layout();
+    radioSizer->Fit(radio_panel);
+    mainSizer->Add( radio_panel );
+
     i_input = 0;
-    mainSizer->Add( input_radios[1], 0, wxALL, 5 );
 
     /* Open Panel */
     open_panel = new wxPanel(this, -1);
     open_panel->SetAutoLayout( TRUE );
+
     wxBoxSizer *openSizer = new wxBoxSizer(wxHORIZONTAL);
 
     mrl_text = new wxTextCtrl( open_panel, -1, wxU( "" ), wxDefaultPosition,
                               wxSize(200,25) );
+
     openSizer->Add( mrl_text, 0 , wxALL, 5 );
     openSizer->Add( new wxButton( open_panel, Choose_Event, wxU(_("Choose...")) ), 0, wxALL, 5 );
+
     open_panel->SetSizer( openSizer );
     openSizer->Layout();
     openSizer->Fit(open_panel);
-
     mainSizer->Add( open_panel );
-
 
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -779,6 +793,8 @@ void wizInputPage::SetPartial( int i_from, int i_to )
 wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
                        wxWizardPage *next) : wxWizardPage(parent)
 {
+    int i;
+
     p_next = next;
 
     acodec = NULL;
@@ -804,7 +820,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     video_combo = new wxComboBox( this, VideoCodec_Event, wxT(""),
                                   wxDefaultPosition, wxSize(200,25), 0, NULL, 
                                   wxCB_DROPDOWN| wxCB_READONLY );
-    for( int i= 0; vcodecs_array[i].psz_display != NULL; i++ )
+    for( i= 0; vcodecs_array[i].psz_display != NULL; i++ )
     {
         video_combo->Append( wxU( vcodecs_array[i].psz_display ) ,
                             (void *)&vcodecs_array[i] );
@@ -844,7 +860,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     audio_combo = new wxComboBox( this, AudioCodec_Event, wxT(""),
                                   wxDefaultPosition, wxSize(200,25), 0, NULL, 
                                   wxCB_DROPDOWN| wxCB_READONLY );
-    for( int i= 0; acodecs_array[i].psz_display != NULL; i++ )
+    for( i= 0; acodecs_array[i].psz_display != NULL; i++ )
     {
         audio_combo->Append( wxU( acodecs_array[i].psz_display ) ,
                             (void *)&acodecs_array[i] );
