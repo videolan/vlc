@@ -144,6 +144,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-background", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Get the pref value when this is the first time, otherwise retrieve the device from the top level video-device var */
     if( var_Type( p_real_vout->p_vlc, "video-device" ) == 0 )
@@ -233,6 +234,19 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             BeginFullScreen( &p_fullscreen_state, NULL, 0, 0,
                              NULL, NULL, fullScreenAllowEvents );
         }
+    }
+    else if( var_GetBool( p_real_vout, "macosx-background" ) )
+    {
+        NSRect screen_rect = [o_screen frame];
+        screen_rect.origin.x = screen_rect.origin.y = 0;
+
+        /* Creates a window with size: screen_rect on o_screen */
+        [self initWithContentRect: screen_rect
+              styleMask: NSBorderlessWindowMask
+              backing: NSBackingStoreBuffered
+              defer: YES screen: o_screen];
+
+        [self setLevel: CGWindowLevelForKey(kCGDesktopWindowLevelKey)];
     }
     else
     {
