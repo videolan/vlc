@@ -358,5 +358,11 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
  *****************************************************************************/
 void system_End( vlc_t *p_this )
 {
+    if( p_this && p_this->p_libvlc && p_this->p_libvlc->psz_vlcpath )
+    {
+        free( p_this->p_libvlc->psz_vlcpath );
+        p_this->p_libvlc->psz_vlcpath = NULL;
+    }
+
     WSACleanup();
 }
