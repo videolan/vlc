@@ -119,30 +119,49 @@ static void resolve_callback(
     {
         char a[128];
         char *psz_uri = NULL;
-        AvahiStringList *asl;
+        char *psz_addr = NULL;
+        AvahiStringList *asl = NULL;
         playlist_item_t *p_item = NULL;
 
         msg_Dbg( p_sd, "service '%s' of type '%s' in domain '%s'",
                  name, type, domain );
 
         avahi_address_snprint(a, (sizeof(a)/sizeof(a[0]))-1, address);
+        if( protocol == AVAHI_PROTO_INET6 )
+            asprintf( &psz_addr, "[%s]", a );
 
-        asl = avahi_string_list_find( txt, "path" );
+        if( txt != NULL )
+            asl = avahi_string_list_find( txt, "path" );
         if( asl != NULL )
         {
             size_t size;
             char *key = NULL;
             char *value = NULL;
-            if( avahi_string_list_get_pair( asl, &key, &value, &size ) == 0 )
-                asprintf( &psz_uri, "http://%s:%d%s", a, port, value );
+            if( avahi_string_list_get_pair( asl, &key, &value, &size ) == 0 &&
+                value != NULL )
+            {
+                asprintf( &psz_uri, "http://%s:%d%s",
+                          psz_addr != NULL ? psz_addr : a, port, value );
+            }
+            if( key != NULL )
+                avahi_free( (void *)key );
+            if( value != NULL )
+                avahi_free( (void *)value );
         }
         else
         {
-            asprintf( &psz_uri, "http://%s:%d", a, port );
+            asprintf( &psz_uri, "http://%s:%d",
+                      psz_addr != NULL ? psz_addr : a, port );
         }
 
+        if( psz_addr != NULL )
+            free( (void *)psz_addr );
+
         if( psz_uri != NULL )
+        {
             p_item = playlist_ItemNew( p_sd, psz_uri, name );
+            free( (void *)psz_uri );
+        }
         if( p_item != NULL )
         {
             p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
