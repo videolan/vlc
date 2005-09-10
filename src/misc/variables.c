@@ -193,6 +193,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_this->i_vars++;
 
     p_var = &p_this->p_vars[i_new];
+    memset( p_var, 0, sizeof(*p_var) );
 
     p_var->i_hash = HashString( psz_name );
     p_var->psz_name = strdup( psz_name );
