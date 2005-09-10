@@ -988,6 +988,12 @@ int VLC_Destroy( int i_object )
         p_vlc->psz_homedir = NULL;
     }
 
+    if( p_vlc->psz_userdir )
+    {
+        free( p_vlc->psz_userdir );
+        p_vlc->psz_userdir = NULL;
+    }
+
     if( p_vlc->psz_configfile )
     {
         free( p_vlc->psz_configfile );
