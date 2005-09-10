@@ -1337,7 +1337,7 @@ public:
     void PreloadFamily( const matroska_segment_c & of_segment );
     void PreloadLinked( matroska_segment_c *p_segment );
     bool PreparePlayback( virtual_segment_c *p_new_segment );
-    matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream );
+    matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream, bool b_initial = false );
     void JumpTo( virtual_segment_c & p_segment, chapter_item_c * p_chapter );
 
     void StartUiThread();
@@ -1415,7 +1415,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_stream = p_sys->AnalyseAllSegmentsFound( p_io_stream );
+    p_stream = p_sys->AnalyseAllSegmentsFound( p_io_stream, true );
     if( p_stream == NULL )
     {
         msg_Err( p_demux, "cannot find KaxSegment" );
@@ -1915,7 +1915,7 @@ msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block
 #undef tk
 }
 
-matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
+matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, bool b_initial )
 {
     int i_upper_lvl = 0;
     size_t i;
@@ -1946,7 +1946,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
         {
             EbmlParser  *ep;
             matroska_segment_c *p_segment1 = new matroska_segment_c( *this, *p_estream );
-            b_keep_segment = false;
+            b_keep_segment = b_initial;
 
             ep = new EbmlParser(p_estream, p_l0, &demuxer );
             p_segment1->ep = ep;
@@ -1967,7 +1967,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
                         if( MKV_IS_ID( l, KaxSegmentUID ) )
                         {
                             KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
-                            b_keep_segment = (FindSegment( *p_uid ) == NULL);
+                            b_keep_segment = b_initial || (FindSegment( *p_uid ) == NULL);
                             if ( !b_keep_segment )
                                 break; // this segment is already known
                             opened_segments.push_back( p_segment1 );
