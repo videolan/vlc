@@ -344,8 +344,11 @@ static int OpenUDP( vlc_object_t * p_this )
 #if defined (WIN32) || defined (UNDER_CE)
             else
             {
-                DWORD WINAPI (*OurGetBestInterface)(IPAddr,PDWORD);
-                DWORD WINAPI (*OurGetIpAddrTable)(PMIB_IPADDRTABLE,PULONG,BOOL);
+				typedef DWORD (CALLBACK * GETBESTINTERFACE) ( IPAddr, PDWORD );
+				typedef DWORD (CALLBACK * GETIPADDRTABLE) ( PMIB_IPADDRTABLE, PULONG, BOOL );
+
+                GETBESTINTERFACE OurGetBestInterface;
+				GETIPADDRTABLE OurGetIpAddrTable;
                 HINSTANCE hiphlpapi = LoadLibrary(_T("Iphlpapi.dll"));
                 DWORD i_index;
 
