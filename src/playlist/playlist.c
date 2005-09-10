@@ -54,6 +54,35 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args );
 
 void playlist_PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
 
+playlist_item_t *playlist_RecursiveFindLast(playlist_t *p_playlist,
+                                            playlist_item_t *p_node );
+
+/*****************************************************************************
+ * Helper Function for NextItem
+ *****************************************************************************/
+
+playlist_item_t *playlist_RecursiveFindLast(playlist_t *p_playlist,
+                                            playlist_item_t *p_node )
+{
+    int i;
+    playlist_item_t *p_item;
+    for ( i = p_node->i_children - 1; i >= 0; i-- )
+    {
+        if( p_node->pp_children[i]->i_children == -1 )
+            return p_node->pp_children[i];
+        else if(p_node->pp_children[i]->i_children > 0)
+        {
+             p_item = playlist_RecursiveFindLast( p_playlist,
+                                        p_node->pp_children[i] );
+            if ( p_item != NULL )
+                return p_item;
+        }
+        else if( i == 0 )
+            return NULL;
+    }
+    return NULL;
+}
+
 
 /**
  * Create playlist
@@ -957,22 +986,15 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                                     p_new );
                     if( p_new == NULL )
                     {
-                        if( b_loop )
-                        {
 #ifdef PLAYLIST_DEBUG
-                            msg_Dbg( p_playlist, "looping" );
+                        msg_Dbg( p_playlist, "looping" );
 #endif
-                            p_new = playlist_FindNextFromParent( p_playlist,
-                                      p_playlist->request.i_view,
-                                      p_view->p_root,
-                                      p_playlist->request.p_node,
-                                      NULL );
-                            if( p_new == NULL ) break;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        p_new = playlist_FindNextFromParent( p_playlist,
+                                  p_playlist->request.i_view,
+                                  p_view->p_root,
+                                  p_playlist->request.p_node,
+                                  NULL );
+                        if( p_new == NULL ) break;
                     }
                 }
             }
@@ -985,6 +1007,13 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                                     p_view->p_root,
                                     p_playlist->request.p_node,
                                     p_new );
+                    if( p_new == NULL )
+                    {
+                    /* We reach the beginning of the playlist.
+                       Go back to the last item. */
+                        p_new = playlist_RecursiveFindLast( p_playlist,
+                                                            p_view->p_root );
+                    }
                     if( p_new == NULL ) break;
                 }
 
