@@ -1021,14 +1021,14 @@ public:
             {
                 free( tracks[i_track]->fmt.psz_description );
             }
-/*            if( tracks[i_track]->psz_codec )
+            if( tracks[i_track]->psz_codec )
             {
                 free( tracks[i_track]->psz_codec );
             }
             if( tracks[i_track]->fmt.psz_language )
             {
                 free( tracks[i_track]->fmt.psz_language );
-            }*/
+            }
             delete tracks[i_track];
         }
         
@@ -1928,7 +1928,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, 
     {
         return NULL;
     }
-    p_l0->SkipData(*p_estream, EbmlHead_Context);
+    p_l0->SkipData(*p_estream, KaxMatroska_Context);
     delete p_l0;
 
     // find all segments in this file
@@ -1967,7 +1967,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, 
                         if( MKV_IS_ID( l, KaxSegmentUID ) )
                         {
                             KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
-                            b_keep_segment = b_initial || (FindSegment( *p_uid ) == NULL);
+                            b_keep_segment = (FindSegment( *p_uid ) == NULL);
                             if ( !b_keep_segment )
                                 break; // this segment is already known
                             opened_segments.push_back( p_segment1 );
@@ -1999,9 +1999,13 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, 
             else
                 delete p_segment1;
         }
-
-        p_l0->SkipData(*p_estream, EbmlHead_Context);
-        p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+        if (p_l0->IsFiniteSize() )
+        {
+            p_l0->SkipData(*p_estream, KaxMatroska_Context);
+            p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
+        }
+        else
+            p_l0 = p_l0->SkipData(*p_estream, KaxSegment_Context);
     }
 
     if ( !b_keep_stream )
@@ -5587,8 +5591,8 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     if ( i_size != 8 )
         return false;
 
-    virtual_segment_c *p_segment;
-    chapter_item_c *p_chapter;
+    virtual_segment_c *p_segment = NULL;
+    chapter_item_c *p_chapter = NULL;
     bool f_result = false;
     uint16 i_command = ( p_command[0] << 8 ) + p_command[1];
 
