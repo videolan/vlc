@@ -1056,6 +1056,7 @@ public:
             free( p_indexes );
 
         delete ep;
+        delete segment;
         delete p_segment_uid;
         delete p_prev_segment_uid;
         delete p_next_segment_uid;
@@ -1071,6 +1072,12 @@ public:
         {
             delete (*indext);
             indext++;
+        }
+        std::vector<KaxSegmentFamily*>::iterator indexf = families.begin();
+        while ( indexf != families.end() )
+        {
+            delete (*indexf);
+            indexf++;
         }
     }
 
@@ -1119,7 +1126,7 @@ public:
     int                             i_default_edition;
 
     std::vector<chapter_translation_c*> translations;
-    std::vector<KaxSegmentFamily>  families;
+    std::vector<KaxSegmentFamily*>  families;
     
     demux_sys_t                    & sys;
     EbmlParser                     *ep;
@@ -1985,7 +1992,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, 
                         else if( MKV_IS_ID( l, KaxSegmentFamily ) )
                         {
                             KaxSegmentFamily *p_fam = new KaxSegmentFamily( *static_cast<KaxSegmentFamily*>(l) );
-                            p_segment1->families.push_back( *p_fam );
+                            p_segment1->families.push_back( p_fam );
                         }
                     }
                     break;
@@ -3241,6 +3248,7 @@ static int Demux( demux_t *p_demux)
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
                 i_return = 1;
+                delete block;
                 break;
             }
         
@@ -3248,7 +3256,10 @@ static int Demux( demux_t *p_demux)
         {
             /* nothing left to read in this ordered edition */
             if ( !p_vsegment->SelectNext() )
+            {
+                delete block;
                 break;
+            }
             p_segment->UnSelect( );
             
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -3258,8 +3269,10 @@ static int Demux( demux_t *p_demux)
             if ( !p_segment->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );
+                delete block;
                 break;
             }
+            delete block;
             continue;
         }
 
@@ -4381,7 +4394,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         {
             KaxSegmentFamily *uid = static_cast<KaxSegmentFamily*>(l);
 
-            families.push_back(*uid);
+            families.push_back( new KaxSegmentFamily(*uid) );
 
             msg_Dbg( &sys.demuxer, "|   |   + family=%d", *(uint32*)uid->GetBuffer() );
         }
@@ -4498,10 +4511,12 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                     for (k = 0; k < i_level; k++)
                         chapters.psz_name += '+';
                     chapters.psz_name += ' ';
-                    chapters.psz_name += ToUTF8( UTFstring( name ) );
+                    char *psz_tmp_utf8 = ToUTF8( UTFstring( name ) );
+                    chapters.psz_name += psz_tmp_utf8;
                     chapters.b_user_display = true;
 
-                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterString '%s'", ToUTF8(UTFstring(name)) );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterString '%s'", psz_tmp_utf8 );
+                    free( psz_tmp_utf8 );
                 }
                 else if( MKV_IS_ID( l, KaxChapterLanguage ) )
                 {
@@ -4900,7 +4915,7 @@ bool matroska_segment_c::PreloadFamily( const matroska_segment_c & of_segment )
     {
         for (size_t j=0; j<of_segment.families.size(); j++)
         {
-            if ( families[i] == of_segment.families[j] )
+            if ( *(families[i]) == *(of_segment.families[j]) )
                 return Preload( );
         }
     }
