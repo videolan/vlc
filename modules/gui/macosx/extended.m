@@ -652,8 +652,6 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 
     free( psz_string );
-    
-    [self savePrefs];
 }
 
 
@@ -727,8 +725,6 @@ static VLCExtended *_o_sharedInstance = nil;
         vlc_object_release( p_aout );
     }
     free( psz_string );
-    
-    [self savePrefs];
 }
 
 - (void)savePrefs
@@ -757,6 +753,20 @@ static VLCExtended *_o_sharedInstance = nil;
 
 - (BOOL)applicationShouldTerminate:(NSWindow *)sender
 {
+    /* collaps all views so Cocoa saves the window position correctly */
+    if( o_adjImg_expanded )
+    {
+        [self extWin_exp_adjImg: nil];
+    }
+    if( o_audFlts_expanded )
+    {
+        [self extWin_exp_audFlts: nil];
+    }
+    if( o_vidFlts_expanded )
+    {
+        [self extWin_exp_vidFlts: nil];
+    }
+
     /* save the prefs before shutting down */
     [self savePrefs];
     
