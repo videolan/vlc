@@ -46,6 +46,7 @@ class SkinParser: public XMLParser
         string m_curWindowId;
         string m_curLayoutId;
         string m_curListId;
+        string m_curTreeId;
         /// Current offset of the controls
         int m_xOffset, m_yOffset;
         list<int> m_xOffsetList, m_yOffsetList;

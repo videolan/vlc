@@ -261,8 +261,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "selcolor", "#0000FF" );
         CheckDefault( "help", "" );
 
-        m_curListId = uniqueId( attr["id"] );
-        const BuilderData::Tree treeData( m_curListId, atoi( attr["x"] ) +
+        m_curTreeId = uniqueId( attr["id"] );
+        const BuilderData::Tree treeData( m_curTreeId, atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
                 atoi( attr["width"]), atoi( attr["height"] ),
                 attr["lefttop"], attr["rightbottom"],
@@ -331,7 +331,10 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         {
             // Slider associated to a list
             newValue = "playlist.slider";
-            // FIXME : this breaks slider usage in old style Playlists
+        }
+        else if( m_curTreeId != "" )
+        {
+            // Slider associated to a tree
             newValue = "playtree.slider";
         }
         const BuilderData::Slider slider( uniqueId( attr["id"] ),
@@ -450,10 +453,13 @@ void SkinParser::handleEndElement( const string &rName )
         m_xOffsetList.pop_back();
         m_yOffsetList.pop_back();
     }
-
-    else if( rName == "Playlist" || rName == "Playtree" )
+    else if( rName == "Playlist" )
     {
         m_curListId = "";
+    }
+    else if( rName == "Playtree" )
+    {
+        m_curTreeId = "";
     }
 }
 

@@ -28,6 +28,7 @@
 
 #include "charset.h"
 
+
 Playtree::Playtree( intf_thread_t *pIntf )
          :VarTree( pIntf, /*m_parent = */NULL )
 {
@@ -41,7 +42,7 @@ Playtree::Playtree( intf_thread_t *pIntf )
     msg_Dbg( pIntf, "Using character encoding: %s", pCharset );
     free( pCharset );
 
-    if( iconvHandle == (vlc_iconv_t)-1 )
+    if( iconvHandle == (vlc_iconv_t) - 1 )
     {
         msg_Warn( pIntf, "Unable to do requested conversion" );
     }
@@ -51,7 +52,7 @@ Playtree::Playtree( intf_thread_t *pIntf )
 
 Playtree::~Playtree()
 {
-    if( iconvHandle != (vlc_iconv_t)-1 ) vlc_iconv_close( iconvHandle );
+    if( iconvHandle != (vlc_iconv_t) - 1 ) vlc_iconv_close( iconvHandle );
     // TODO : check that everything is destroyed
 }
 
@@ -96,10 +97,8 @@ void Playtree::onChange()
 
 void Playtree::buildNode( playlist_item_t *p_node, VarTree &m_pNode )
 {
-    fprintf( stderr, "[32;1mPlaytree::buildNode[0m\n");
     for( int i = 0; i < p_node->i_children; i++ )
     {
-        fprintf( stderr, "[33;1m"__FILE__ "%d :[0m adding playtree item : %s\n", __LINE__, p_node->pp_children[i]->input.psz_name );
         UString *pName = new UString( getIntf(), p_node->pp_children[i]->input.psz_name );
         m_pNode.add( UStringPtr( pName ),
                      false,
