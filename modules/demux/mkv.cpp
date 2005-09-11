@@ -3988,6 +3988,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             KaxTrackLanguage &lang = *(KaxTrackLanguage*)l;
 
+            if ( tk->fmt.psz_language != NULL )
+                free( tk->fmt.psz_language );
             tk->fmt.psz_language = strdup( string( lang ).c_str() );
             msg_Dbg( &sys.demuxer,
                      "|   |   |   + Track Language=`%s'", tk->fmt.psz_language );
@@ -4303,19 +4305,22 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
         if( MKV_IS_ID( l, KaxSegmentUID ) )
         {
-            p_segment_uid = new KaxSegmentUID(*static_cast<KaxSegmentUID*>(l));
+            if ( p_segment_uid == NULL )
+                p_segment_uid = new KaxSegmentUID(*static_cast<KaxSegmentUID*>(l));
 
             msg_Dbg( &sys.demuxer, "|   |   + UID=%d", *(uint32*)p_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxPrevUID ) )
         {
-            p_prev_segment_uid = new KaxPrevUID(*static_cast<KaxPrevUID*>(l));
+            if ( p_prev_segment_uid == NULL )
+                p_prev_segment_uid = new KaxPrevUID(*static_cast<KaxPrevUID*>(l));
 
             msg_Dbg( &sys.demuxer, "|   |   + PrevUID=%d", *(uint32*)p_prev_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxNextUID ) )
         {
-            p_next_segment_uid = new KaxNextUID(*static_cast<KaxNextUID*>(l));
+            if ( p_next_segment_uid == NULL )
+                p_next_segment_uid = new KaxNextUID(*static_cast<KaxNextUID*>(l));
 
             msg_Dbg( &sys.demuxer, "|   |   + NextUID=%d", *(uint32*)p_next_segment_uid->GetBuffer() );
         }
