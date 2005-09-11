@@ -992,7 +992,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                         p_new = playlist_FindNextFromParent( p_playlist,
                                   p_playlist->request.i_view,
                                   p_view->p_root,
-                                  p_playlist->request.p_node,
+                                  p_view->p_root,
                                   NULL );
                         if( p_new == NULL ) break;
                     }
@@ -1080,7 +1080,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                     p_new = playlist_FindNextFromParent( p_playlist,
                                    p_playlist->status.i_view,
                                    p_view->p_root,
-                                   p_playlist->status.p_node,
+                                   p_view->p_root,
                                    NULL );
                 }
                 if( p_new != NULL && !(p_new->i_flags & PLAYLIST_SKIP_FLAG) )
