@@ -546,3 +546,15 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<Meuuh> and what's the news ?
+<nto> Mac OS 10.2 and 10.3 support hopefully
+<nto> Win98 maybe
+<Meuuh> haven't had any chance to test it ?
+<nto> I need to send a new version to a tester
+<E-bola> hire him meuuh :P
+<Meuuh> E-bola : we already did :p
+<E-bola> ahhh
+<E-bola> lol
+
+  -- #videolan
+%
