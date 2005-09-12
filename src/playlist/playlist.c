@@ -337,6 +337,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
     case PLAYLIST_STOP:
         p_playlist->status.i_status = PLAYLIST_STOPPED;
         p_playlist->request.b_request = VLC_TRUE;
+        p_playlist->request.p_item = NULL;
         break;
 
     case PLAYLIST_ITEMPLAY:
@@ -404,7 +405,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.b_request = VLC_TRUE;
         p_playlist->request.i_view = p_playlist->status.i_view;
         p_playlist->request.p_node = p_playlist->status.p_node;
-        p_playlist->request.p_item = p_playlist->status.p_item;
+        p_playlist->request.p_item = p_playlist->status.p_item = NULL;
         p_playlist->request.i_skip = 0;
         p_playlist->request.i_goto = -1;
         break;
