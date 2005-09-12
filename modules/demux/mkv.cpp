@@ -84,6 +84,12 @@
 
 #include "ebml/StdIOCallback.h"
 
+#if LIBMATROSKA_VERSION < 0x000706
+START_LIBMATROSKA_NAMESPACE
+extern const EbmlSemanticContext MATROSKA_DLL_API KaxMatroska_Context;
+END_LIBMATROSKA_NAMESPACE
+#endif
+
 #include "vlc_keys.h"
 
 extern "C" {
