@@ -77,8 +77,8 @@ static VLAboutBox *_o_sharedInstance = nil;
         
         /* setup the creator / revision field */
         [o_revision_field setStringValue: [NSString stringWithFormat: \
-            _NS("Compiled by %s, based on SVN revision: %s"), \
-            VLC_CompileBy(), VLC_Changeset()]];
+            _NS("Compiled by %s, based on SVN revision %s"), VLC_CompileBy(), \
+            VLC_Changeset()]];
     
         /* Setup the nameversion field */
         o_name_version = [NSString stringWithFormat:@"%@ - Version %@", o_name, o_version];

@@ -2,5 +2,5 @@
 
 CFBundleName = "VLC";
 CFBundleShortVersionString = "0.8.4-svn";
-CFBundleGetInfoString = "VLC media player 0.8.4-svn, Copyright (c) 1996-2005 VideoLAN.";
-NSHumanReadableCopyright = "Copyright (c) 1996-2005 VideoLAN.";
+CFBundleGetInfoString = "VLC media player 0.8.4-svn, Copyright (c) 1996-2005 the VideoLAN team";
+NSHumanReadableCopyright = "Copyright (c) 1996-2005 the VideoLAN team";
