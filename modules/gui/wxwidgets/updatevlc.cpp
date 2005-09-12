@@ -106,7 +106,7 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    release_type = wxT( "stable" );
+    release_type = wxT( "testing" );
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout( TRUE );
 
@@ -507,6 +507,32 @@ void UpdateVLC::UpdateUpdatesTree()
     it = m_versions.begin();
     while( it != m_versions.end() )
     {
+        if( it->type != release_type )
+        {
+            it++;
+            continue;
+        }
+
+        if( release_type != wxT( "stable" ) && it->type == wxT( "stable" ) )
+        {
+            it++;
+            continue;
+        }
+
+        if( release_type != wxT( "stable" ) && release_type != wxT( "testing" )
+            && it->type == wxT( "testing" ) )
+        {
+            it++;
+            continue;
+        }
+
+        if( release_type != wxT( "stable" ) && release_type != wxT( "testing" )
+            && release_type != wxT( "nightly" ) )
+        {
+            it++;
+            continue;
+        }
+
         if( atoi((const char *)it->major.mb_str()) <
             atoi(PACKAGE_VERSION_MAJOR)
          || ( atoi((const char *)it->major.mb_str()) ==
