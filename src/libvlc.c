@@ -402,7 +402,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "daemon" ) )
     {
 #if HAVE_DAEMON
-        if( daemon( 0, 0) != 0 )
+        if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_vlc, "Unable to fork vlc to daemon mode" );
             b_exit = VLC_TRUE;
