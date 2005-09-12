@@ -296,11 +296,9 @@ void _drawFrameInRect(NSRect frameRect)
         [newCell setMinValue:[oldCell minValue]];
         [newCell setDoubleValue:[oldCell doubleValue]];
         [newCell setNumberOfTickMarks:[oldCell numberOfTickMarks]];
-        [newCell setSliderType:[oldCell sliderType]];
         [newCell setEditable:[oldCell isEditable]];
         [newCell setEnabled:[oldCell isEnabled]];
         [newCell setEntryType:[oldCell entryType]];
-        [newCell setFocusRingType:[oldCell focusRingType]];
         [newCell setHighlighted:[oldCell isHighlighted]];
         [newCell setTickMarkPosition:[oldCell tickMarkPosition]];
         [self setCell:newCell];
