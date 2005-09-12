@@ -1516,12 +1516,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         if( p_playlist->i_size == 0 )
         {
             [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("no items in playlist"), p_playlist->i_size]];
+                    _NS("no items in playlist")]];
         }
         else
         {
             [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("1 item in playlist"), p_playlist->i_size]];
+                    _NS("1 item in playlist")]];
         }
     }
     vlc_object_release( p_playlist );
