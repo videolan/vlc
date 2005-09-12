@@ -1679,10 +1679,26 @@ then
   VLC_ADD_PLUGINS([pvr])
 fi
 
+dnl
+dnl  gnomeVFS access module
+dnl
+AC_ARG_ENABLE(gnomevfs,
+  [  --enable-gnomevfs      GnomeVFS access module (default enables)])
+if test "{enable_gnomevfs}" != "no"
+then
+  PKG_CHECK_MODULES(GNOMEVFS, gnome-vfs-2.0,
+    VLC_ADD_LDFLAGS([access_gnomevfs],[$GNOMEVFS_LIBS])
+    VLC_ADD_CPPFLAGS([access_gnomevfs],[$GNOMEVFS_CPPFLAGS])
+    VLC_ADD_CFLAGS([access_gnomevfs],[$GNOMEVFS_CFLAGS])
+    VLC_ADD_PLUGINS([access_gnomevfs]),
+    AC_MSG_WARN([GnomeVFS support disbaled because GnomeVFS development headers not found]))
+fi
+
 dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
 AC_ARG_ENABLE(libcdio,
   [  --enable-libcdio        CD input and control library support (default enabled)])
- 
+
+
 have_libcdio=no
 have_libvcdinfo=no
 if test "${enable_libcdio}" != "no"
