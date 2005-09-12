@@ -881,13 +881,15 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         msg_Dbg( p_playlist, "no-skip mode, stopping") ;
         return NULL;
     }
-
+msg_Dbg( p_playlist, "b_random %d, b_request %d, skip %d", b_random, p_playlist->request.b_request, p_playlist->request.i_skip );
     /* TODO: improve this (only use current node) */
     /* TODO: use the "shuffled view" internally ? */
     /* Random case. This is an exception: if request, but request is skip +- 1
      * we don't go to next item but select a new random one. */
-    if( b_random && (!p_playlist->request.b_request ||
-        p_playlist->request.i_skip == 1 || p_playlist->request.i_skip == -1 ) )
+    if( b_random && 
+        ( !p_playlist->request.b_request ||
+        ( p_playlist->request.b_request && ( p_playlist->request.p_item == NULL ||
+          p_playlist->request.i_skip == 1 || p_playlist->request.i_skip == -1 ) ) ) )
     {
         srand( (unsigned int)mdate() );
         i_new = 0;
