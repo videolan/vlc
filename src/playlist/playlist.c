@@ -881,7 +881,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         msg_Dbg( p_playlist, "no-skip mode, stopping") ;
         return NULL;
     }
-msg_Dbg( p_playlist, "b_random %d, b_request %d, skip %d", b_random, p_playlist->request.b_request, p_playlist->request.i_skip );
+
     /* TODO: improve this (only use current node) */
     /* TODO: use the "shuffled view" internally ? */
     /* Random case. This is an exception: if request, but request is skip +- 1
