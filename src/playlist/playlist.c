@@ -412,6 +412,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
 
     case PLAYLIST_AUTOPLAY:
         p_playlist->status.i_status = PLAYLIST_RUNNING;
+        p_playlist->status.p_node = p_playlist->p_general;
 
         p_playlist->request.b_request = VLC_FALSE;
         break;
