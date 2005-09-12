@@ -3,7 +3,6 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = MPSlider; LANGUAGE = ObjC; SUPERCLASS = NSSlider; }, 
         {
-            ACTIONS = {}; 
             CLASS = VLAboutBox; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -12,6 +11,7 @@
                 "o_credits_scrollview" = id; 
                 "o_credits_textview" = id; 
                 "o_name_version_field" = id; 
+                "o_revision_field" = id; 
             }; 
             SUPERCLASS = NSObject; 
         }, 

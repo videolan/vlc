@@ -28,6 +28,7 @@
 {
     IBOutlet id o_about_window;
     IBOutlet id o_name_version_field;
+    IBOutlet id o_revision_field;
     IBOutlet id o_copyright_field;
     IBOutlet id o_credits_textview;
     IBOutlet id o_credits_scrollview;
