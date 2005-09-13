@@ -564,7 +564,8 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
             case KEY_ENTER:
             case 0x0d:
-                if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file )
+            case ' ':
+                if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ' )
                 {
                     int i_size_entry = strlen( p_sys->psz_current_dir ) +
                                        strlen( p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) + 2;
@@ -1260,6 +1261,11 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "     A           Add an entry" );
         MainBoxWrite( p_intf, l++, 1, "     D, <del>    Delete an entry" );
         MainBoxWrite( p_intf, l++, 1, "     <backspace> Delete an entry" );
+        MainBoxWrite( p_intf, l++, 1, "" );
+
+        MainBoxWrite( p_intf, l++, 1, "[Filebrowser]" );
+        MainBoxWrite( p_intf, l++, 1, "     <enter>     Add the selected file to the playlist" );
+        MainBoxWrite( p_intf, l++, 1, "     <space>     Add the selected directory to the playlist" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Boxes]" );
