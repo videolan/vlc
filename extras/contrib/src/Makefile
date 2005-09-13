@@ -6,6 +6,8 @@
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
+#          Eric Petit <titer@m0k.org>
+#          Felix Kühne <fkuehne@users.sourceforge.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -997,11 +999,11 @@ DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
 # libcddb
 # ***************************************************************************
 
-libcddb-$(CDDB_VERSION).tar.gz:
+libcddb-$(CDDB_VERSION).tar.bz2:
 	$(WGET) $(CDDB_URL)
 
-libcddb: libcddb-$(CDDB_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libcddb: libcddb-$(CDDB_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/libcddb.patch
 
 .cddb: libcddb
@@ -1010,7 +1012,7 @@ libcddb: libcddb-$(CDDB_VERSION).tar.gz
 
 CLEAN_FILE += .cddb
 CLEAN_PKG += libcddb
-DISTCLEAN_PKG += libcddb-$(CDDB_VERSION).tar.gz
+DISTCLEAN_PKG += libcddb-$(CDDB_VERSION).tar.bz2
 
 # ***************************************************************************
 # vcdimager

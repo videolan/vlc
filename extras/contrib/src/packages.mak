@@ -6,7 +6,7 @@
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
-#          Felix KÃ¼hne <fkuehne@users.sourceforge.net>
+#          Felix Kühne <fkuehne@users.sourceforge.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -105,9 +105,9 @@ LIBDTS_URL=$(VIDEOLAN)/libdts/$(LIBDTS_VERSION)/libdts-$(LIBDTS_VERSION).tar.gz
 MODPLUG_VERSION=0.7
 MODPLUG_URL=$(VIDEOLAN)/testing/contrib/libmodplug-$(MODPLUG_VERSION).tar.gz
 MASH_VERSION=5.2
-MASH_URL=$(SF)/openmash/mash-src-$(MASH_VERSION).tar.gz
-CDDB_VERSION=0.9.6
-CDDB_URL=$(SF)/libcddb/libcddb-$(CDDB_VERSION).tar.gz
+MASH_URL=$(SF)/openmash/mash-src-$(MASH_VERSION).tar.bz2
+CDDB_VERSION=1.2.1
+CDDB_URL=$(SF)/libcddb/libcddb-$(CDDB_VERSION).tar.bz2
 VCDIMAGER_VERSION=0.7.21
 VCDIMAGER_URL=$(GNU)/vcdimager/vcdimager-$(VCDIMAGER_VERSION).tar.gz
 CDIO_VERSION=0.72
