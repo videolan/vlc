@@ -1,8 +1,8 @@
 /*****************************************************************************
- * file.c: file input (file: access plug-in)
+ * gnomevfs.c: GnomeVFS input
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
- * $Id: file.c 12318 2005-08-21 17:46:48Z damienf $
+ * Copyright (C) 2005 the VideoLAN team
+ * $Id$
  *
  * Authors: Benjamin Pracht <bigben -AT- videolan -DOT- org>
  *
