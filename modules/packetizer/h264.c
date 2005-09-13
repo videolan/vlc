@@ -72,6 +72,8 @@ struct decoder_sys_t
 
     /* avcC data */
     int i_avcC_length_size;
+    block_t *p_sps;
+    block_t *p_pps;
 
     /* Useful values of the Sequence Parameter Set */
     int i_log2_max_frame_num;
@@ -152,6 +154,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_frame = NULL;
     p_sys->b_sps   = VLC_FALSE;
     p_sys->b_pps   = VLC_FALSE;
+    p_sys->p_sps   = 0;
+    p_sys->p_pps   = 0;
 
     p_sys->i_nal_type = -1;
     p_sys->i_nal_ref_idc = -1;
@@ -182,6 +186,7 @@ static int Open( vlc_object_t *p_this )
             int i_length = GetWBE( p );
             block_t *p_sps = nal_get_annexeb( p_dec, p + 2, i_length );
 
+            p_sys->p_sps = block_Duplicate( p_sps );
             p_sps->i_pts = p_sps->i_dts = mdate();
             ParseNALBlock( p_dec, p_sps );
             p += 2 + i_length;
@@ -193,6 +198,7 @@ static int Open( vlc_object_t *p_this )
             int i_length = GetWBE( p );
             block_t *p_pps = nal_get_annexeb( p_dec, p + 2, i_length );
 
+            p_sys->p_pps = block_Duplicate( p_pps );
             p_pps->i_pts = p_pps->i_dts = mdate();
             ParseNALBlock( p_dec, p_pps );
             p += 2 + i_length;
@@ -236,6 +242,8 @@ static void Close( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    if( p_sys->p_sps ) block_Release( p_sys->p_sps );
+    if( p_sys->p_pps ) block_Release( p_sys->p_pps );
     block_BytestreamRelease( &p_sys->bytestream );
     free( p_sys );
 }
@@ -281,15 +289,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             case STATE_NEXT_SYNC:
                 /* Find the next startcode */
                 if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                      &p_sys->i_offset, p_sys->startcode, 3 ) != VLC_SUCCESS)
+                      &p_sys->i_offset, p_sys->startcode+1, 3 ) != VLC_SUCCESS)
                 {
-                    if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                          &p_sys->i_offset, p_sys->startcode+1, 3 ) !=
-                        VLC_SUCCESS )
-                    {
-                        /* Need more data */
-                        return NULL;
-                    }
+                    /* Need more data */
+                    return NULL;
                 }
 
                 /* Get the new fragment and set the pts/dts */
@@ -300,6 +303,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 block_GetBytes( &p_sys->bytestream, p_pic->p_buffer,
                                 p_pic->i_buffer );
 
+                if( !p_pic->p_buffer[p_pic->i_buffer-1] ) p_pic->i_buffer--;
                 p_sys->i_offset = 0;
 
                 /* Parse the NAL */
@@ -337,6 +341,22 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
     *pp_block = NULL;
+
+#if 0
+    if( //(p_block->i_flags & BLOCK_FLAG_TYPE_I) &&
+        p_sys->p_sps && p_sys->p_pps )
+    {
+        block_t *p_pic;
+        block_t *p_sps = block_Duplicate( p_sys->p_sps );
+        block_t *p_pps = block_Duplicate( p_sys->p_pps );
+        p_sps->i_dts = p_pps->i_dts = p_block->i_dts;
+        p_sps->i_pts = p_pps->i_pts = p_block->i_pts;
+        p_pic = ParseNALBlock( p_dec, p_sps );
+        if( p_pic ) block_ChainAppend( &p_ret, p_pic );
+        p_pic = ParseNALBlock( p_dec, p_pps );
+        if( p_pic ) block_ChainAppend( &p_ret, p_pic );
+    }
+#endif
 
     for( p = p_block->p_buffer; p < &p_block->p_buffer[p_block->i_buffer]; )
     {
@@ -534,8 +554,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         }
         p_sys->i_nal_type = i_nal_type;
 
-        if( b_pic && p_sys->b_slice )
-            OUTPUT;
+        if( b_pic && p_sys->b_slice ) OUTPUT;
 
         p_sys->b_slice = VLC_TRUE;
 
@@ -548,8 +567,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
         int i_tmp;
 
-        if( !p_sys->b_sps )
-            msg_Dbg( p_dec, "found NAL_SPS" );
+        if( !p_sys->b_sps ) msg_Dbg( p_dec, "found NAL_SPS" );
 
         p_sys->b_sps = VLC_TRUE;
 
@@ -649,8 +667,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
                     h = bs_read( &s, 16 );
                 }
                 if( h != 0 )
-                    p_dec->fmt_out.video.i_aspect =
-                        VOUT_ASPECT_FACTOR * w / h * p_dec->fmt_out.video.i_width /
+                    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * w /
+                        h * p_dec->fmt_out.video.i_width /
                         p_dec->fmt_out.video.i_height;
                 else
                     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
@@ -660,29 +678,25 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         free( dec );
 
 
-        if( p_sys->b_slice )
-            OUTPUT;
+        if( p_sys->b_slice ) OUTPUT;
     }
     else if( i_nal_type == NAL_PPS )
     {
         bs_t s;
         bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
 
-        if( !p_sys->b_pps )
-            msg_Dbg( p_dec, "found NAL_PPS" );
+        if( !p_sys->b_pps ) msg_Dbg( p_dec, "found NAL_PPS" );
         p_sys->b_pps = VLC_TRUE;
 
         /* TODO */
 
-        if( p_sys->b_slice )
-            OUTPUT;
+        if( p_sys->b_slice ) OUTPUT;
     }
     else if( i_nal_type == NAL_AU_DELIMITER ||
              i_nal_type == NAL_SEI ||
              ( i_nal_type >= 13 && i_nal_type <= 18 ) )
     {
-        if( p_sys->b_slice )
-            OUTPUT;
+        if( p_sys->b_slice ) OUTPUT;
     }
 
 #undef OUTPUT
