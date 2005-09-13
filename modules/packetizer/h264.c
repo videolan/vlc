@@ -182,6 +182,7 @@ static int Open( vlc_object_t *p_this )
             int i_length = GetWBE( p );
             block_t *p_sps = nal_get_annexeb( p_dec, p + 2, i_length );
 
+            p_sps->i_pts = p_sps->i_dts = mdate();
             ParseNALBlock( p_dec, p_sps );
             p += 2 + i_length;
         }
@@ -192,6 +193,7 @@ static int Open( vlc_object_t *p_this )
             int i_length = GetWBE( p );
             block_t *p_pps = nal_get_annexeb( p_dec, p + 2, i_length );
 
+            p_pps->i_pts = p_pps->i_dts = mdate();
             ParseNALBlock( p_dec, p_pps );
             p += 2 + i_length;
         }
