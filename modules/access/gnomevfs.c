@@ -129,7 +129,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_pace_control = VLC_TRUE;
 
 
-    if( strcmp( "gnomevfs", p_access->psz_access ) )
+    if( strcmp( "gnomevfs", p_access->psz_access ) &&
+                                            *(p_access->psz_access) != '\0')
     {
         psz_name = malloc( strlen( p_access->psz_access ) +
                                             strlen( p_access->psz_path ) + 3 );
@@ -146,7 +147,6 @@ static int Open( vlc_object_t *p_this )
     psz_uri = gnome_vfs_make_uri_from_input_with_dirs( psz,
                                     GNOME_VFS_MAKE_URI_DIR_CURRENT);
     p_uri = gnome_vfs_uri_new( psz_uri );
-    msg_Dbg( p_access, "opening file `%s'", psz_name );
 
     if( p_uri )
     {
@@ -176,6 +176,7 @@ static int Open( vlc_object_t *p_this )
     }
     LocaleFree( psz );
 
+    msg_Dbg( p_access, "opening file `%s'", psz_name );
     i_ret = gnome_vfs_open( &(p_sys->p_handle), psz_uri, 5 );
     if( i_ret )
     {
