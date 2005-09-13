@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "charset.h"
 
@@ -93,6 +94,10 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_access, "couldn't initilize GnomeVFS" );
         return VLC_EGENERIC;
     }
+    /* FIXME
+       Since GnomeVFS segfaults on exit if we initialize it without trying to
+       open a file with a valid protocol, try top open at least file:// */
+    gnome_vfs_open( &(p_sys->p_handle), "file://", 5 );
 
     p_access->pf_read = Read;
     p_access->pf_block = NULL;
@@ -124,8 +129,18 @@ static int Open( vlc_object_t *p_this )
     }
 
     psz = ToLocale( psz_name );
+
+    /* Use gnome_vfs_make_uri_from_input_with_dirs for local paths, as it deals
+       relative directories, and gnome_vfs_make_uri_from_input_with_dirs
+       otherwise */
     psz_uri = gnome_vfs_make_uri_from_input_with_dirs( psz,
                                     GNOME_VFS_MAKE_URI_DIR_CURRENT);
+    if( *psz_uri != '/' )
+    {
+        g_free( psz_uri );
+        psz_uri = gnome_vfs_escape_host_and_path_string( psz );
+    }
+
     p_uri = gnome_vfs_uri_new( psz_uri );
 
     if( p_uri )
@@ -136,18 +151,19 @@ static int Open( vlc_object_t *p_this )
 
         if( i_ret )
         {
-            msg_Err( p_access, "cannot get file info %s", 
+            msg_Err( p_access, "cannot get file info (%s)", 
                                     gnome_vfs_result_to_string( i_ret ) );
             gnome_vfs_file_info_unref( p_sys->p_file_info );
             gnome_vfs_uri_unref( p_uri);
             free( p_sys );
+            free( psz_uri );
             free( psz_name );
             return VLC_EGENERIC;
         }
     }
     else
     {
-        msg_Warn( p_access, "cannot parse MRL %s", psz_name );
+        msg_Warn( p_access, "cannot parse MRL %s or unsupported protocol", psz_name );
         LocaleFree( psz );
         g_free( psz_uri );
         free( p_sys );
@@ -156,17 +172,18 @@ static int Open( vlc_object_t *p_this )
     }
     LocaleFree( psz );
 
-    msg_Dbg( p_access, "opening file `%s'", psz_name );
+    msg_Dbg( p_access, "opening file `%s'", psz_uri );
     i_ret = gnome_vfs_open( &(p_sys->p_handle), psz_uri, 5 );
     if( i_ret )
     {
-        msg_Warn( p_access, "cannot open file %s: %s", psz_name,
+        msg_Warn( p_access, "cannot open file %s: %s", psz_uri,
                                 gnome_vfs_result_to_string( i_ret ) );
 
         LocaleFree( psz );
         g_free( psz_uri );
         gnome_vfs_uri_unref( p_uri);
-        free( p_sys );
+        free( p_sys ); 
+        free( psz_uri );
         free( psz_name );
         return VLC_EGENERIC;
     }
@@ -200,6 +217,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "file %s is empty, aborting", psz_name );
         gnome_vfs_file_info_unref( p_sys->p_file_info );
         free( p_sys );
+        free( psz_uri );
         free( psz_name );
         return VLC_EGENERIC;
     }
@@ -282,6 +300,12 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
     p_access->info.i_pos += (int64_t)i_read_len;
 
+    /* Some Acces (http) never return EOF and loop on the file */
+    if( p_access->info.i_pos > p_access->info.i_size )
+    {
+        p_access->info.b_eof = VLC_TRUE;
+        return 0;
+    }
     return (int)i_read_len;
 }
 
