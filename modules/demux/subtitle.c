@@ -633,7 +633,7 @@ static int TextLoad( text_t *txt, stream_t *s )
         if( txt->i_line_count >= i_line_max )
         {
             i_line_max += 100;
-            txt->line = realloc( txt->line, i_line_max * sizeof( char*) );
+            txt->line = realloc( txt->line, i_line_max * sizeof( char * ) );
         }
     }
 
@@ -996,12 +996,12 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
             if( p_sys->psz_header != NULL )
             {
                 if( !( p_sys->psz_header = realloc( p_sys->psz_header,
-                          strlen( p_sys->psz_header ) + strlen( s ) + 2 ) ) )
+                          strlen( p_sys->psz_header ) + 1 + strlen( s ) + 2 ) ) )
                 {
                     msg_Err( p_demux, "out of memory");
                     return VLC_ENOMEM;
                 }
-                p_sys->psz_header = strcat( p_sys->psz_header, strdup( s ) );
+                p_sys->psz_header = strcat( p_sys->psz_header,  s );
                 p_sys->psz_header = strcat( p_sys->psz_header, "\n" );
             }
             else
@@ -1011,7 +1011,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
                     msg_Err( p_demux, "out of memory");
                     return VLC_ENOMEM;
                 }
-                p_sys->psz_header = strdup( s );
+                p_sys->psz_header = s;
                 p_sys->psz_header = strcat( p_sys->psz_header, "\n" );
             }
         }
