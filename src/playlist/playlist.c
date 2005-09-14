@@ -405,7 +405,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.b_request = VLC_TRUE;
         p_playlist->request.i_view = p_playlist->status.i_view;
         p_playlist->request.p_node = p_playlist->status.p_node;
-        p_playlist->request.p_item = p_playlist->status.p_item = NULL;
+        p_playlist->request.p_item = p_playlist->status.p_item;
         p_playlist->request.i_skip = 0;
         p_playlist->request.i_goto = -1;
         break;
@@ -700,6 +700,13 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->status.i_status == PLAYLIST_STOPPED )
         {
+            if( p_playlist->status.p_item && p_playlist->status.p_item->i_flags
+                & PLAYLIST_REMOVE_FLAG )
+            {
+                 playlist_ItemDelete( p_item );
+                 p_playlist->status.p_item = NULL;
+            }
+
             /* Collect garbage */
             vlc_mutex_unlock( &p_playlist->object_lock );
             i_sout_destroyed_date =
