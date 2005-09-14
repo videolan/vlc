@@ -809,15 +809,12 @@ struct module_symbols_t
     void (*LocaleFree_inner) (const char *);
     char * (*ToLocale_inner) (const char *);
     char * (*EnsureUTF8_inner) (char *);
-    void *vlc_fix_readdir_charset_deprecated;
     char * (*__vlc_fix_readdir_charset_inner) (vlc_object_t *, const char *);
     int (*vlc_scandir_inner) (const char *name, struct dirent ***namelist, int (*filter) ( const struct dirent * ), int (*compar) ( const struct dirent **, const struct dirent ** ));
     int (*vlc_alphasort_inner) (const struct dirent **a, const struct dirent **b);
     osd_state_t * (*__osd_StateChange_inner) (osd_state_t *, const int);
-    int (*osd_Slider_inner) (vlc_object_t *, spu_t *, int, int, int, int, short);
     void (*osd_ConfigUnload_inner) (vlc_object_t *, osd_menu_t **);
     void (*__osd_MenuShow_inner) (vlc_object_t *);
-    int (*osd_Icon_inner) (vlc_object_t *, spu_t *, int, int, int, short);
     void *__osd_VolumeDown_deprecated;
     void (*__osd_MenuNext_inner) (vlc_object_t *);
     void (*__osd_MenuDelete_inner) (vlc_object_t *, osd_menu_t *);
@@ -827,7 +824,6 @@ struct module_symbols_t
     void (*__osd_MenuDown_inner) (vlc_object_t *);
     osd_menu_t * (*__osd_MenuCreate_inner) (vlc_object_t *, const char *);
     void (*__osd_MenuPrev_inner) (vlc_object_t *);
-    void *__osd_VolumeUp_deprecated;
     void (*__osd_MenuActivate_inner) (vlc_object_t *);
     void (*__osd_Volume_inner) (vlc_object_t *);
     const char * (*VLC_Compiler_inner) (void);
@@ -837,7 +833,6 @@ struct module_symbols_t
     const char * (*VLC_CompileDomain_inner) (void);
     const char * (*VLC_CompileHost_inner) (void);
     const char * (*VLC_Version_inner) (void);
-    void *VLC_CompileTime_deprecated;
     int (*playlist_PreparseEnqueueItem_inner) (playlist_t *, playlist_item_t *);
     struct dirent * (*vlc_readdir_wrapper_inner) (void *);
     int (*vlc_closedir_wrapper_inner) (void *);
@@ -845,7 +840,9 @@ struct module_symbols_t
     void (*httpd_HandlerDelete_inner) (httpd_handler_t *);
     int (*__vlc_execve_inner) (vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data);
     httpd_handler_t * (*httpd_HandlerNew_inner) (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_handler_callback_t pf_fill, httpd_handler_sys_t *);
+    int (*osd_Slider_inner) (vlc_object_t *, spu_t *, int, int, int, int, short);
     int (*osd_ShowTextRelative_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t);
+    int (*osd_Icon_inner) (vlc_object_t *, spu_t *, int, int, int, short);
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     char * (*config_GetUserDir_inner) (void);
@@ -1225,10 +1222,8 @@ struct module_symbols_t
 #  define vlc_scandir (p_symbols)->vlc_scandir_inner
 #  define vlc_alphasort (p_symbols)->vlc_alphasort_inner
 #  define __osd_StateChange (p_symbols)->__osd_StateChange_inner
-#  define osd_Slider (p_symbols)->osd_Slider_inner
 #  define osd_ConfigUnload (p_symbols)->osd_ConfigUnload_inner
 #  define __osd_MenuShow (p_symbols)->__osd_MenuShow_inner
-#  define osd_Icon (p_symbols)->osd_Icon_inner
 #  define __osd_MenuNext (p_symbols)->__osd_MenuNext_inner
 #  define __osd_MenuDelete (p_symbols)->__osd_MenuDelete_inner
 #  define __osd_MenuHide (p_symbols)->__osd_MenuHide_inner
@@ -1253,7 +1248,9 @@ struct module_symbols_t
 #  define httpd_HandlerDelete (p_symbols)->httpd_HandlerDelete_inner
 #  define __vlc_execve (p_symbols)->__vlc_execve_inner
 #  define httpd_HandlerNew (p_symbols)->httpd_HandlerNew_inner
+#  define osd_Slider (p_symbols)->osd_Slider_inner
 #  define osd_ShowTextRelative (p_symbols)->osd_ShowTextRelative_inner
+#  define osd_Icon (p_symbols)->osd_Icon_inner
 #  define osd_Message (p_symbols)->osd_Message_inner
 #  define osd_ShowTextAbsolute (p_symbols)->osd_ShowTextAbsolute_inner
 #  define config_GetUserDir (p_symbols)->config_GetUserDir_inner
@@ -1636,10 +1633,8 @@ struct module_symbols_t
     ((p_symbols)->vlc_scandir_inner) = vlc_scandir; \
     ((p_symbols)->vlc_alphasort_inner) = vlc_alphasort; \
     ((p_symbols)->__osd_StateChange_inner) = __osd_StateChange; \
-    ((p_symbols)->osd_Slider_inner) = osd_Slider; \
     ((p_symbols)->osd_ConfigUnload_inner) = osd_ConfigUnload; \
     ((p_symbols)->__osd_MenuShow_inner) = __osd_MenuShow; \
-    ((p_symbols)->osd_Icon_inner) = osd_Icon; \
     ((p_symbols)->__osd_MenuNext_inner) = __osd_MenuNext; \
     ((p_symbols)->__osd_MenuDelete_inner) = __osd_MenuDelete; \
     ((p_symbols)->__osd_MenuHide_inner) = __osd_MenuHide; \
@@ -1664,15 +1659,14 @@ struct module_symbols_t
     ((p_symbols)->httpd_HandlerDelete_inner) = httpd_HandlerDelete; \
     ((p_symbols)->__vlc_execve_inner) = __vlc_execve; \
     ((p_symbols)->httpd_HandlerNew_inner) = httpd_HandlerNew; \
+    ((p_symbols)->osd_Slider_inner) = osd_Slider; \
     ((p_symbols)->osd_ShowTextRelative_inner) = osd_ShowTextRelative; \
+    ((p_symbols)->osd_Icon_inner) = osd_Icon; \
     ((p_symbols)->osd_Message_inner) = osd_Message; \
     ((p_symbols)->osd_ShowTextAbsolute_inner) = osd_ShowTextAbsolute; \
     ((p_symbols)->config_GetUserDir_inner) = config_GetUserDir; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
-    (p_symbols)->vlc_fix_readdir_charset_deprecated = NULL; \
     (p_symbols)->__osd_VolumeDown_deprecated = NULL; \
-    (p_symbols)->__osd_VolumeUp_deprecated = NULL; \
-    (p_symbols)->VLC_CompileTime_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
 # endif /* HAVE_SHARED_LIBVLC */
