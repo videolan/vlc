@@ -53,6 +53,17 @@
 
 #define MAX_EMPTY_BLOCKS 200
 
+#if defined(WIN32) || defined(UNDER_CE)
+# define WINSOCK_STRERROR_SIZE 20
+static const char *winsock_strerror( char *buf )
+{
+    snprintf( buf, WINSOCK_STRERROR_SIZE, "Winsock error %d",
+              WSAGetLastError( ) );
+    buf[WINSOCK_STRERROR_SIZE - 1] = '\0';
+    return buf;
+}
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -528,6 +539,10 @@ static void ThreadWrite( vlc_object_t *p_this )
     mtime_t              i_date_last = -1;
     mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
+#if defined(WIN32) || defined(UNDER_CE)
+    char strerror_buf[WINSOCK_STRERROR_SIZE];
+# define strerror( x ) winsock_strerror( strerror_buf )
+#endif
 
     while( !p_thread->b_die )
     {
@@ -564,12 +579,16 @@ static void ThreadWrite( vlc_object_t *p_this )
         }
 
         i_to_send--;
-        if ( !i_to_send || (p_pk->i_flags & BLOCK_FLAG_CLOCK) )
+        if( !i_to_send || (p_pk->i_flags & BLOCK_FLAG_CLOCK) )
         {
             mwait( i_date );
             i_to_send = p_thread->i_group;
         }
-        send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 );
+        if( send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 )
+              == -1 )
+        {
+            msg_Warn( p_thread, "send error: %s", strerror(errno) );
+        }
 
         if( i_dropped_packets )
         {
