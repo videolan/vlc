@@ -231,11 +231,16 @@ static int OpenUDP( vlc_object_t * p_this )
 
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
-    i_opt = 0x80000;
 #if !defined( SYS_BEOS )
+    i_opt = 0x80000;
     if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *) &i_opt,
                     sizeof( i_opt ) ) == -1 )
         msg_Dbg( p_this, "cannot configure socket (SO_RCVBUF: %s)",
+                          strerror(errno));
+    i_opt = 0x80000;
+    if( setsockopt( i_handle, SOL_SOCKET, SO_SNDBUF, (void *) &i_opt,
+                    sizeof( i_opt ) ) == -1 )
+        msg_Dbg( p_this, "cannot configure socket (SO_SNDBUF: %s)",
                           strerror(errno));
 #endif
 
