@@ -142,7 +142,7 @@
                                           FIND_ANYWHERE );
     vlc_value_t val;
 
-    if ([self isItemInPlaylist: p_item] )
+    if( [self isItemInPlaylist: p_item] )
     {
         vlc_mutex_lock( &p_item->input.lock );
 
@@ -154,7 +154,7 @@
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );
     }
-
+    vlc_object_release( p_playlist );
     [o_info_window orderOut: self];
 }
 
