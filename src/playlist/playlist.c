@@ -700,8 +700,8 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->status.i_status == PLAYLIST_STOPPED )
         {
-            if( p_playlist->status.p_item && p_playlist->status.p_item->i_flags
-                & PLAYLIST_REMOVE_FLAG )
+            if( p_item && p_playlist->status.p_item &&
+                p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
             {
                  playlist_ItemDelete( p_item );
                  p_playlist->status.p_item = NULL;
