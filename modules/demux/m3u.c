@@ -127,7 +127,7 @@ static int Activate( vlc_object_t * p_this )
     if( i_type != TYPE_M3U )
     {
         char *p_peek;
-        int i_size = stream_Peek( p_demux->s, (uint8_t *)&p_peek, MAX_LINE );
+        int i_size = stream_Peek( p_demux->s, (uint8_t **)&p_peek, MAX_LINE );
         i_size -= sizeof("[Reference]") - 1;
 
         if( i_size > 0 )

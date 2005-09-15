@@ -44,7 +44,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static void parseEXTINF( char *psz_string, char **ppsz_author, char **ppsz_name, int *pi_duration );
+static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name, int *pi_duration );
 
 /*****************************************************************************
  * Import_M3U: main import function
@@ -110,7 +110,7 @@ static int Demux( demux_t *p_demux )
     char       *psz_line;
 
     char       *psz_name = NULL;
-    char       *psz_author = NULL;
+    char       *psz_artist = NULL;
     int        i_parsed_duration = 0;
     mtime_t    i_duration = -1;
     char       **ppsz_options = NULL;
@@ -159,17 +159,16 @@ static int Demux( demux_t *p_demux )
             {
                 /* Extended info */
                 psz_parse += sizeof("EXTINF:") - 1;
-                parseEXTINF( psz_parse, &psz_author, &psz_name, &i_parsed_duration );
-                if( i_parsed_duration >= 0 )
+                parseEXTINF( psz_parse, &psz_artist, &psz_name, &i_parsed_duration );
+                if ( i_parsed_duration >= 0 )
                     i_duration = i_parsed_duration * 1000000;
                 if ( psz_name )
                     psz_name = strdup( psz_name );
-                if ( psz_author )
-                    psz_author = strdup( psz_author );
+                if ( psz_artist )
+                    psz_artist = strdup( psz_artist );
             }
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
-
             {
                 /* VLC Option */
                 char *psz_option;
@@ -206,9 +205,9 @@ static int Demux( demux_t *p_demux )
                 playlist_ItemAddOption( p_item, ppsz_options[i] );
             }
             p_item->input.i_duration = i_duration;
-            if ( psz_author )
+            if ( psz_artist && *psz_artist )
                 vlc_input_item_AddInfo( &p_item->input, _("Meta-information"),
-                                        _("Artist"), "%s", psz_author );
+                                        _("Artist"), "%s", psz_artist );
             playlist_NodeAddItem( p_playlist, p_item,
                                   p_current->pp_parents[0]->i_view,
                                   p_current, PLAYLIST_APPEND,
@@ -239,8 +238,8 @@ static int Demux( demux_t *p_demux )
             ppsz_options = NULL; i_options = 0;
             if( psz_name ) free( psz_name );
             psz_name = NULL;
-            if ( psz_author ) free( psz_author );
-            psz_author = NULL;
+            if ( psz_artist ) free( psz_artist );
+            psz_artist = NULL;
             i_parsed_duration = 0;
             i_duration = -1;
 
@@ -267,58 +266,70 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-static void parseEXTINF(char *psz_string, char **ppsz_author, 
+static void parseEXTINF(char *psz_string, char **ppsz_artist, 
                         char **ppsz_name, int *pi_duration)
 {
-    char *end=NULL;
+    char *end = NULL;
     char *psz_item = NULL;
-    char *psz_duration = NULL;
-    char *pos;
 
     end = psz_string + strlen( psz_string );
 
     /* ignore whitespaces */
-    for(; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ); 
+    for (; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ); 
          psz_string++ );
 
-    /* read all digits */
+    /* duration: read to next comma */
     psz_item = psz_string;
-    psz_duration = strchr( psz_string, ',' );
-    if( psz_duration )
+    psz_string = strchr( psz_string, ',' );
+    if ( psz_string )
     {
-       *psz_duration = '\0';
-       *pi_duration = atoi(psz_item);
-       psz_string = psz_duration;
+        *psz_string = '\0';
+        *pi_duration = atoi( psz_item );
     }
-    if( psz_string < end )               /* continue parsing if possible */
+    else
     {
+        return;
+    }
+
+    if ( psz_string < end )               /* continue parsing if possible */
         psz_string++;
-    }
 
-    /* read the author */
-    /* parse the author until unescaped comma is reached */
-    psz_item = pos = psz_string;
-    while( psz_string < end && *psz_string != ',' )
+    /* analyse the remaining string */
+    psz_item = strstr( psz_string, " - " );
+
+    /* here we have the 0.8.2+ format with artist */
+    if ( psz_item )
     {
-        if( *psz_string == '\\' )
-            psz_string++;                 /* Skip escape character */
-        *pos++ = *psz_string++;
-    }
-    *pos = '\0';                          /* terminate the item */
-    *ppsz_author = psz_item;
+        /* *** "EXTINF:time,artist - name" */
+        *psz_item = '\0';
+        *ppsz_artist = psz_string;
+        *ppsz_name = psz_item + 3;          /* points directly after ' - ' */
+        return;
+    } 
 
-    if( psz_string < end )               /* continue parsing if possible */
+    /* reaching this point means: 0.8.1- with artist or something without artist */
+    if ( *psz_string == ',' )
+    {
+        /* *** "EXTINF:time,,name" */
         psz_string++;
-    /* the title doesn't need to be escaped */
-    *ppsz_name = psz_string;
+        *ppsz_name = psz_string;
+        return;
+    } 
 
-    if( !**ppsz_name )
+    psz_item = psz_string;
+    psz_string = strchr( psz_string, ',' );
+    if ( psz_string )
     {
-        /* Assume a syntax without author name */
-        *ppsz_name = *ppsz_author;
-        *ppsz_author = NULL;
+        /* *** "EXTINF:time,artist,name" */
+        *psz_string = '\0';
+        *ppsz_artist = psz_item;
+        *ppsz_name = psz_string+1;
     }
-
+    else
+    {
+        /* *** "EXTINF:time,name" */
+        *ppsz_name = psz_item;
+    }
     return;
 }
 

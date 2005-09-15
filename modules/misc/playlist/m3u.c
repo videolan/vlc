@@ -63,52 +63,26 @@ int Export_M3U( vlc_object_t *p_this )
              strcmp( p_playlist->pp_items[i]->input.psz_name,
                     p_playlist->pp_items[i]->input.psz_uri ) )
         {
-            char *psz_author =
-                   vlc_input_item_GetInfo( &p_playlist->pp_items[i]->input,
-                                         _("Meta-information"), _("Artist") );
-            if( psz_author && *psz_author )
+            char *psz_artist =
+                vlc_input_item_GetInfo( &p_playlist->pp_items[i]->input,
+                                        _("Meta-information"), _("Artist") );
+            if( psz_artist && *psz_artist )
             {
-                /* the author must be escaped if it contains a comma */
-                char *p_src; short i_cnt;
-                /* so count the commas or backslash */
-                for( i_cnt = 0, p_src = psz_author; *p_src; p_src++ )
-                    if(*p_src == ',' || *p_src == '\\' )
-                        i_cnt++;
-                /* Is there a comma ? */
-                if( i_cnt )
-                {
-                    char *psz_escaped=NULL;
-                    char *p_dst;
-                    psz_escaped = (char *)malloc( ( strlen( psz_author )
-                                             + i_cnt + 1 ) * sizeof( char ) );
-                    if( !psz_escaped )
-                        return VLC_ENOMEM;
-                    /* copy the string and escape every comma with backslash */
-                    for( p_src=psz_author, p_dst=psz_escaped; *p_src;
-                         p_src++, p_dst++ )
-                    {
-                        if( *p_src == ',' || *p_src == '\\' )
-                            *p_dst++ = '\\';
-                        *p_dst = *p_src;
-                    }
-                    *p_dst = '\0';
-                    free( psz_author);
-                    psz_author = psz_escaped;
-                }
-                fprintf( p_export->p_file, "#EXTINF:%i,%s,%s\n",
-                       (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
-                         psz_author,
+                /* write EXTINF with artist */
+                fprintf( p_export->p_file, "#EXTINF:%i,%s - %s\n",
+                         (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
+                         psz_artist,
                          p_playlist->pp_items[i]->input.psz_name );
             }
             else
             {
-                /* write EXTINF without author */
-                fprintf( p_export->p_file, "#EXTINF:%i,,%s\n",
+                /* write EXTINF without artist */
+                fprintf( p_export->p_file, "#EXTINF:%i,%s\n",
                        (int)(p_playlist->pp_items[i]->input.i_duration/1000000),
                          p_playlist->pp_items[i]->input.psz_name );
             }
-            if( psz_author )
-                free( psz_author );
+            if( psz_artist )
+                free( psz_artist );
         }
 
         /* VLC specific options */
