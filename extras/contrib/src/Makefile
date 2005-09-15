@@ -111,9 +111,9 @@ else
  else
 # Standard Linux or other UNIX-like systems
    all: .iconv .intl .freetype .fribidi \
-	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdread .dvdnav .dvbpsi .aclocal
+	.dvdread .dvdnav .dvbpsi .live .aclocal
  endif
 endif
 
