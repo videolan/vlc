@@ -187,6 +187,7 @@ int playlist_ViewUpdate( playlist_t *p_playlist, int i_view)
         switch( i_view )
         {
             case VIEW_S_AUTHOR: i_sort_type = SORT_AUTHOR;break;
+            case VIEW_S_ALBUM: i_sort_type = SORT_ALBUM;break;
             case VIEW_S_GENRE: i_sort_type = SORT_GENRE;break;
             default: i_sort_type = SORT_AUTHOR;
         }

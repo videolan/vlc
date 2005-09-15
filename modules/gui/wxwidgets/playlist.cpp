@@ -1219,6 +1219,8 @@ wxMenu * Playlist::ViewMenu()
                            wxU(_("Normal") ) );
     p_view_menu->Append( FirstView_Event + VIEW_S_AUTHOR,
                            wxU(_("Sorted by artist") ) );
+    p_view_menu->Append( FirstView_Event + VIEW_S_ALBUM,
+                           wxU(_("Sorted by Album") ) );
 
     return p_view_menu;
 }

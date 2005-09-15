@@ -34,7 +34,7 @@ Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
 Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
-Daniel Stränger <vlc at schmaller d0t de> - M3U improvements
+Daniel Stränger <vlc at schmaller d0t de> - M3U and playlist improvements
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
@@ -89,6 +89,7 @@ Olivier Pomel <pomel at via.ecp.fr> - original VLC code
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
+Pierre Marc Dumuid <pierre.dumuid at adelaide dot edu dot au> - Playlist patches
 Régis Duchesne <regis at via.ecp.fr> - original VLC code
 Remco Poortinga <poortinga at telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix

@@ -108,6 +108,7 @@ struct playlist_view_t
 #define VIEW_FIRST_SORTED  4
 #define VIEW_S_AUTHOR 4
 #define VIEW_S_GENRE 5
+#define VIEW_S_ALBUM  6
 
 #define VIEW_LAST_SORTED  10
 
@@ -232,6 +233,7 @@ struct playlist_add_t
 #define SORT_RANDOM 5
 #define SORT_DURATION 6
 #define SORT_TITLE_NUMERIC 7
+#define SORT_ALBUM 8
 
 #define ORDER_NORMAL 0
 #define ORDER_REVERSE 1
@@ -351,6 +353,7 @@ VLC_EXPORT( int, playlist_ItemAddOption, (playlist_item_t *, const char *) );
 #define playlist_SortID(p, i) playlist_Sort( p, SORT_ID, i)
 #define playlist_SortTitle(p, i) playlist_Sort( p, SORT_TITLE, i)
 #define playlist_SortAuthor(p, i) playlist_Sort( p, SORT_AUTHOR, i)
+#define playlist_SortAlbum(p, i) playlist_Sort( p, SORT_ALBUM, i)
 #define playlist_SortGroup(p, i) playlist_Sort( p, SORT_GROUP, i)
 VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int, int) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );

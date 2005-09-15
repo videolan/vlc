@@ -40,7 +40,7 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 /**
  * Sort the playlist.
  * \param p_playlist the playlist
- * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_RANDOM
+ * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_ALBUM, SORT_RANDOM
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return VLC_SUCCESS on success
  */
@@ -86,7 +86,7 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
  *
  * \param p_playlist the playlist
  * \param p_node the node to sort
- * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_RANDOM
+ * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_ALBUM, SORT_RANDOM
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return VLC_SUCCESS on success
  */
@@ -110,7 +110,7 @@ int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
  *
  * \param p_playlist the playlist
  * \param p_node the node to sort
- * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_RANDOM
+ * \param i_mode: SORT_ID, SORT_TITLE, SORT_AUTHOR, SORT_ALBUM, SORT_RANDOM
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return VLC_SUCCESS on success
  */
@@ -226,6 +226,49 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
                     i_test = strcmp( psz_b, psz_a );
                 }
             }
+            else if( i_mode == SORT_ALBUM )
+	    {
+                char *psz_a = vlc_input_item_GetInfo(
+                                 &pp_items[i]->input,
+                                 _( "Meta-information"), _("Album/movie/show title") );
+                char *psz_b = vlc_input_item_GetInfo(
+                                 &pp_items[i_small]->input,
+                                 _( "Meta-information"), _("Album/movie/show title") );
+                if( pp_items[i]->i_children == -1 &&
+                    pp_items[i_small]->i_children >= 0 )
+                {
+                    i_test = 1;
+                }
+                else if( pp_items[i]->i_children >= 0 &&
+                         pp_items[i_small]->i_children == -1 )
+                {
+                    i_test = -1;
+                }
+                // both are nodes
+                else if( pp_items[i]->i_children >= 0 &&
+                         pp_items[i_small]->i_children >= 0 )
+                {
+                    i_test = strcasecmp( pp_items[i]->input.psz_name,
+                                         pp_items[i_small]->input.psz_name );
+                }
+                else if( psz_a == NULL && psz_b != NULL )
+                {
+                    i_test = 1;
+                }
+                else if( psz_a != NULL && psz_b == NULL )
+                {
+                    i_test = -1;
+                }
+                else if( psz_a == NULL && psz_b == NULL )
+                {
+                    i_test = strcasecmp( pp_items[i]->input.psz_name,
+                                         pp_items[i_small]->input.psz_name );
+                }
+                else
+                {
+                    i_test = strcmp( psz_b, psz_a );
+                }
+	    }
             else if( i_mode == SORT_TITLE_NODES_FIRST )
             {
                 /* Alphabetic sort, all nodes first */
@@ -283,6 +326,11 @@ int playlist_NodeGroup( playlist_t * p_playlist , int i_view,
         {
             psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
                             _("Meta-information"), _( "Artist" ) );
+        }
+        else if ( i_mode == SORT_ALBUM )
+        {
+            psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
+                            _("Meta-information"), _( "Album/movie/show title" ) );
         }
         else if ( i_mode == SORT_GENRE )
         {
