@@ -49,7 +49,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static char *get_next_token(char *cur_string);
+static char *GetNextToken(char *psz_cur_string);
 static int IsWhitespace( char *psz_string );
 static void ShoutcastAdd( playlist_t *p_playlist, playlist_item_t* p_genre,
                           playlist_item_t *p_bitrate, playlist_item_t *p_item,
@@ -372,7 +372,7 @@ static int Demux( demux_t *p_demux )
                         /* split up the combined genre string form
                         shoutcast and add the individual genres */
                         while ( psz_genreToken &&
-                          ( psz_otherToken = get_next_token(psz_genreToken )))
+                          ( psz_otherToken = GetNextToken(psz_genreToken )))
                         {
                             if( strlen(psz_genreToken)>2 )
                             /* We dont want genres below 2 letters,
@@ -442,12 +442,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-static char *get_next_token(char *cur_string) {
-        while (*cur_string && !isspace(*cur_string)) cur_string++;
-        if (!*cur_string) return NULL;
-        *cur_string++ = '\0';
-        while (*cur_string && isspace(*cur_string)) cur_string++;
-        return cur_string;
+/**
+ * Get a in-string pointer to the start of the next token from a
+ * string terminating the pointer returned by a previous call.
+ *
+ * \param psz_cur_string The string to search for the token from
+ * \return a pointer to withing psz_cur_string, or NULL if no token
+ * was found
+ * \note The returned pointer may contain more than one
+ * token, Run GetNextToken once more to terminate the token properly
+ */
+static char *GetNextToken(char *psz_cur_string) {
+    while (*psz_cur_string && !isspace(*psz_cur_string))
+        psz_cur_string++;
+    if (!*psz_cur_string)
+        return NULL;
+    *psz_cur_string++ = '\0';
+    while (*psz_cur_string && isspace(*psz_cur_string))
+        psz_cur_string++;
+    return psz_cur_string;
 }
 
 static int IsWhitespace( char *psz_string )
