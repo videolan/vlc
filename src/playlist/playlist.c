@@ -899,28 +899,36 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         ( p_playlist->request.b_request && ( p_playlist->request.p_item == NULL ||
           p_playlist->request.i_skip == 1 || p_playlist->request.i_skip == -1 ) ) ) )
     {
-        srand( (unsigned int)mdate() );
-        i_new = 0;
-        for( i_count = 0; i_count < p_playlist->i_size - 1 ; i_count ++ )
+        /* how many items to choose from ? */
+        i_count = 0;
+        for ( i = 0; i < p_playlist->i_size; i++ )
         {
-            i_new =
-                (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
-            /* Check if the item has not already been played */
-            if( p_playlist->pp_items[i_new]->i_nb_played == 0 )
-                break;
+            if ( p_playlist->pp_items[i]->i_nb_played == 0 )
+                i_count++;
         }
-        if( i_count == p_playlist->i_size )
+        /* Nothing left? */
+        if ( i_count == 0 )
         {
-            /* The whole playlist has been played: reset the counters */
-            while( i_count > 0 )
-            {
-                p_playlist->pp_items[--i_count]->i_nb_played = 0;
-            }
+            /* Don't loop? Exit! */
             if( !b_loop )
-            {
                 return NULL;
+            /* Otherwise reset the counter */
+            for ( i = 0; i < p_playlist->i_size; i++ )
+            {
+                p_playlist->pp_items[i]->i_nb_played = 0;
             }
+            i_count = p_playlist->i_size;
         }
+        srand( (unsigned int)mdate() );
+        i = rand() % i_count + 1 ;
+        /* loop thru the list and count down the unplayed items to the selected one */
+        for ( i_new = 0; i_new < p_playlist->i_size && i > 0; i_new++ )
+        {
+            if ( p_playlist->pp_items[i_new]->i_nb_played == 0 )
+                i--;
+        }
+        i_new--;
+
         p_playlist->request.i_skip = 0;
         p_playlist->request.b_request = VLC_FALSE;
         return p_playlist->pp_items[i_new];
