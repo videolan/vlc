@@ -108,6 +108,7 @@ Vicente Jimenez Aguilar <vice at v1ce.net> - Spanish translation
 Vitalijus Slavinskas <Vitalijus.Slavinskas at stud.ktu dot lt> - nsv patches
 Vladimir Chernyshov - MMX motion optimizations
 Wade Majors <guru at startrek.com> - BeOS icon integration, debugging and fixes
+Wallace Wadge <wwadge at gmail.com> - multiple programs TS mux
 Watanabe Go <go at dsl.gr.jp> - fix for non-ASCII filenames
 Xavier Maillard <zedek at fxgsproject.org> - audio converters
 Xavier Marchesini <xav at alarue.net> - Win32 fixes
