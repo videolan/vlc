@@ -516,6 +516,8 @@ static struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('M','4','C','C'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('F','M','P','4'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
     /* 3ivx delta 3.5 Unsupported
      * putting it here gives extreme distorted images
     { VLC_FOURCC('3','I','V','1'), CODEC_ID_MPEG4,
