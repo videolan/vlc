@@ -50,7 +50,7 @@ export PATH = $(PREFIX)/bin:.:/boot/home/config/bin:/bin:/boot/apps:/boot/prefer
 export LIBRARY_PATH = $(PREFIX)/lib:%A/lib:/boot/home/config/lib:/boot/beos/system/lib
 else
 # Cross compiling from Linux
-export PATH = $(PREFIX)/bin:/opt/cross-tools/bin:/usr/bin:/bin
+export PATH = $(PREFIX)/bin:/opt/beos-tools/bin:/opt/cross-tools/bin:/usr/bin:/bin
 endif
 endif
 
@@ -512,11 +512,9 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .vorbis: libvorbis .ogg
-# libvorbis' configure doesn't handle --host
-# FIXME: shared libs disabled for now because configure thinks we should
-# link the .so to -lc when cross-compiling to BeOS (-> fails)
-#   -- titer 2005/02/12
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --disable-shared && make && make install)
+# FIXME: shared libs disabled for now because of linking errors
+#   -- titer 2005/09/16
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
 #	$(INSTALL_NAME)
 	touch $@
 
