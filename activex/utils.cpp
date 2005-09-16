@@ -52,7 +52,7 @@ char *CStrFromBSTR(int codePage, BSTR bstr)
 BSTR BSTRFromCStr(int codePage, const char *s)
 {
     int wideLen = MultiByteToWideChar(codePage, 0, s, -1, NULL, 0);
-    if( wideLen )
+    if( wideLen > 0 )
     {
         WCHAR* wideStr = (WCHAR*)CoTaskMemAlloc(wideLen*sizeof(WCHAR));
         if( NULL != wideStr )
@@ -61,7 +61,7 @@ BSTR BSTRFromCStr(int codePage, const char *s)
 
             ZeroMemory(wideStr, wideLen*sizeof(WCHAR));
             MultiByteToWideChar(codePage, 0, s, -1, wideStr, wideLen);
-            bstr = SysAllocString(wideStr);
+            bstr = SysAllocStringLen(wideStr, wideLen);
             free(wideStr);
 
             return bstr;

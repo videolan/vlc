@@ -90,7 +90,7 @@ public:
     void setMRL(BSTR mrl)
     {
         SysFreeString(_bstr_mrl);
-        _bstr_mrl = SysAllocString(mrl);
+        _bstr_mrl = SysAllocStringLen(mrl, SysStringLen(mrl));
         setDirty(TRUE);
     };
     const BSTR getMRL(void) { return _bstr_mrl; };

@@ -825,7 +825,8 @@ STDMETHODIMP VLCControl::get_MRL(BSTR *mrl)
     if( NULL == mrl )
         return E_POINTER;
 
-    *mrl = SysAllocString(_p_instance->getMRL());
+    *mrl = SysAllocStringLen(_p_instance->getMRL(),
+                SysStringLen(_p_instance->getMRL()));
     return NOERROR;
 };
 

@@ -102,7 +102,8 @@ static LRESULT CALLBACK VLCVideoClassWndProc(HWND hWnd, UINT uMsg, WPARAM wParam
 
 VLCPluginClass::VLCPluginClass(LONG *p_class_ref, HINSTANCE hInstance) :
     _p_class_ref(p_class_ref),
-    _hinstance(hInstance)
+    _hinstance(hInstance),
+    _inplace_picture(NULL)
 {
     WNDCLASS wClass;
 
@@ -303,7 +304,7 @@ VLCPlugin::~VLCPlugin()
     if( _p_pict )
         _p_pict->Release();
 
-    SysFreeString(_bstr_mrl),
+    SysFreeString(_bstr_mrl);
 
     _p_class->Release();
 };
@@ -473,8 +474,7 @@ HRESULT VLCPlugin::onInit(void)
 {
     if( 0 == _i_vlc )
     {
-//#ifdef ACTIVEX_DEBUG
-#if 1
+#ifdef ACTIVEX_DEBUG
         char *ppsz_argv[] = { "vlc", "-vv", "--fast-mutex", "--win9x-cv-method=1" };
 #else
         char *ppsz_argv[] = { "vlc", "-vv" };
@@ -502,6 +502,11 @@ HRESULT VLCPlugin::onInit(void)
 #endif
 
         _i_vlc = VLC_Create();
+        if( _i_vlc < 0 )
+        {
+            _i_vlc = 0;
+            return E_FAIL;
+        }
 
         if( VLC_Init(_i_vlc, sizeof(ppsz_argv)/sizeof(char*), ppsz_argv) )
         {
@@ -519,7 +524,7 @@ HRESULT VLCPlugin::onLoad(void)
     if( _b_mute )
         VLC_VolumeMute(_i_vlc);
 
-    if( NULL != _bstr_mrl )
+    if( SysStringLen(_bstr_mrl) > 0 )
     {
         /*
         ** try to combine MRL with client site moniker, which for Internet Explorer
@@ -527,7 +532,7 @@ HRESULT VLCPlugin::onLoad(void)
         ** is a relative URL, we should end up with an absolute URL
         */
         IOleClientSite *pClientSite;
-        if( SUCCEEDED(vlcOleObject->GetClientSite(&pClientSite)) )
+        if( SUCCEEDED(vlcOleObject->GetClientSite(&pClientSite)) && (NULL != pClientSite) )
         {
             IBindCtx *pBC = 0;
             if( SUCCEEDED(CreateBindCtx(0, &pBC)) )
@@ -549,7 +554,7 @@ HRESULT VLCPlugin::onLoad(void)
                                                 URL_ESCAPE_UNSAFE)) )
                                 {
                                     SysFreeString(_bstr_mrl);
-                                    _bstr_mrl = SysAllocString(url);
+                                    _bstr_mrl = SysAllocStringLen(url, len);
                                 }
                                 CoTaskMemFree(url);
                             }

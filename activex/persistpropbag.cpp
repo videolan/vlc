@@ -198,7 +198,8 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
     pPropBag->Write(OLESTR("ExtentHeight"), &value);
 
     V_VT(&value) = VT_BSTR;
-    V_BSTR(&value) = SysAllocString(_p_instance->getMRL());
+    V_BSTR(&value) = SysAllocStringLen(_p_instance->getMRL(),
+                            SysStringLen(_p_instance->getMRL()));
     pPropBag->Write(OLESTR("MRL"), &value);
     VariantClear(&value);
 

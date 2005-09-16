@@ -76,6 +76,7 @@ public:
         VARIANT arg;
         V_VT(&arg) = VT_BSTR;
         V_BSTR(&arg) = bstr;
+        VariantInit(&_v);
         VariantCopy(&_v, &arg);
     };
 
@@ -153,7 +154,8 @@ public:
 
     inline bool operator==(const AxVLCWSTR &s) const
     {
-        return compareNoCase(s.wstr()) == 0;
+        return size() == s.size() ?
+                    (compareNoCase(s.wstr()) == 0) : false;
     };
 
     inline bool operator==(LPCWSTR s) const
@@ -247,12 +249,15 @@ public:
         if( notfound != iter )
         {
             VARTYPE vtype = V_VT(pVar);
-            VariantCopy(pVar, const_cast<VARIANTARG*>((*iter).second.variantArg()));
-            if( (V_VT(pVar) != vtype) && FAILED(VariantChangeType(pVar, pVar, 0, vtype)) )
+            VARIANTARG v;
+            VariantInit(&v);
+            VariantCopy(&v, const_cast<VARIANTARG*>((*iter).second.variantArg()));
+            if( (V_VT(&v) != vtype) && FAILED(VariantChangeType(&v, &v, 0, vtype)) )
             {
-                VariantClear(pVar);
+                VariantClear(&v);
                 return E_FAIL;
             }
+            *pVar = v;
             return S_OK;
         }
         else
@@ -400,7 +405,7 @@ private:
         return result;
     };
 
-    static HRESULT ReadProperty(LPSTREAM pStm, AxVLCPropertyPair **prop)
+    HRESULT ReadProperty(LPSTREAM pStm, AxVLCPropertyPair **prop)
     {
         HRESULT result;
 
