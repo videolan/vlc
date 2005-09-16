@@ -1112,10 +1112,11 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
             {
                 int i_convert = WideCharToMultiByte(CP_ACP, 0, var.bstrVal,
                         SysStringLen(var.bstrVal), NULL, 0, NULL, NULL);
-                char *p_buf = (char *)alloca( i_convert ); p_buf[0] = 0;
+                char *p_buf = (char *)alloca( i_convert+1 ); p_buf[0] = 0;
                 WideCharToMultiByte( CP_ACP, 0, var.bstrVal,
                         SysStringLen(var.bstrVal), p_buf, i_convert, NULL, NULL );
                 SysFreeString(var.bstrVal);
+                p_buf[i_convert] = '\0';
 
                 if( p_listdevices ) p_listdevices->push_back( p_buf );
 
