@@ -15,12 +15,14 @@ Input:
 * Improved DVB support for satellite bands other than Ku-band
 * IPv6 and Extended passive mode support for FTP
 * IPv6 Source Specific Multicast support
+* GnomeVFS input module
 
 Decoders:
 * Support for libSDL_image to import different image types
 
 Services discovery:
 * UPnP service discovery
+* Bonjour service discovery using avahi
 
 Video Filters:
 * RSS feed overlay
