@@ -41,8 +41,6 @@ static void Run          ( intf_thread_t *p_intf );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_description( _("X Screensaver disabler") );
     set_capability( "interface", 0 );
     set_callbacks( Activate, NULL );

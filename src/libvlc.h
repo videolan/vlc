@@ -250,6 +250,9 @@ static char *ppsz_align_descriptions[] =
 #define VIDEO_ON_TOP_LONGTEXT N_("Always place the video window on top of " \
     "other windows." )
 
+#define SS_TEXT N_("Disable screensaver")
+#define SS_LONGTEXT N_("Disable the screensaver during video playback." )
+
 #define VIDEO_DECO_TEXT N_("Window decorations")
 #define VIDEO_DECO_LONGTEXT N_( \
     "If this option is disabled, VLC will avoid creating window caption, " \
@@ -990,6 +993,8 @@ vlc_module_begin();
 #endif
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
+    add_bool( "disable-screensaver", VLC_TRUE, NULL, SS_TEXT, SS_LONGTEXT,
+              VLC_TRUE );
 
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,

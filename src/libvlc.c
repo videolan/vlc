@@ -748,9 +748,20 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /*
-     * Allways load the hotkeys interface if it exists
+     * Always load the hotkeys interface if it exists
      */
     VLC_AddIntf( 0, "hotkeys,none", VLC_FALSE, VLC_FALSE );
+
+    /*
+     * If needed, load the Xscreensaver interface
+     * Currently, only for X
+     */
+#ifdef HAVE_X11_XLIB_H
+    if( config_GetInt( p_vlc, "disable-screensaver" ) == 1 )
+    {
+        VLC_AddIntf( 0, "screensaver", VLC_FALSE, VLC_FALSE );
+    }
+#endif
 
     /*
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
