@@ -98,7 +98,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys          = malloc( sizeof( sout_stream_sys_t ) );
     p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT,
-                                      FIND_ANYWHERE );
+                                      FIND_PARENT );
     if( !p_sys->p_input )
     {
         msg_Err( p_stream, "cannot find p_input" );
