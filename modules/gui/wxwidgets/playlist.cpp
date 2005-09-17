@@ -504,12 +504,12 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
 
     if( !strcmp( psz_author, "" ) || p_item->input.b_fixed_name == VLC_TRUE )
     {
-        msg.Printf( wxString( wxU( p_item->input.psz_name ) ) + duration );
+        msg = wxString( wxU( p_item->input.psz_name ) ) + duration;
     }
     else
     {
-        msg.Printf( wxString(wxU( psz_author )) + wxT(" - ") +
-                    wxString(wxU(p_item->input.psz_name)) + duration );
+        msg = wxString(wxU( psz_author )) + wxT(" - ") +
+                    wxString(wxU(p_item->input.psz_name)) + duration;
     }
     free( psz_author );
     treectrl->SetItemText( item , msg );
