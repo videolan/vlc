@@ -151,6 +151,7 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     const char      *psz_realhost;
     char            *psz_socks;
     int             i_realport, i_val, i_handle = -1;
+    vlc_bool_t      b_unreach = VLC_FALSE;
 
     if( i_port == 0 )
         i_port = 80; /* historical VLC thing */
@@ -169,7 +170,7 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         psz_realhost = psz_socks;
         i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
 
-        msg_Dbg( p_this, "net: connecting to '%s:%d' for '%s:%d'",
+        msg_Dbg( p_this, "net: connecting to %s port %d for %s port %d",
                  psz_realhost, i_realport, psz_host, i_port );
     }
     else
@@ -177,14 +178,14 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         psz_realhost = psz_host;
         i_realport = i_port;
 
-        msg_Dbg( p_this, "net: connecting to '%s:%d'", psz_realhost,
+        msg_Dbg( p_this, "net: connecting to %s port %d", psz_realhost,
                  i_realport );
     }
 
     i_val = vlc_getaddrinfo( p_this, psz_realhost, i_realport, &hints, &res );
     if( i_val )
     {
-        msg_Err( p_this, "cannot resolve '%s:%d' : %s", psz_realhost,
+        msg_Err( p_this, "cannot resolve %s port %d : %s", psz_realhost,
                  i_realport, vlc_gai_strerror( i_val ) );
         free( psz_socks );
         return -1;
@@ -205,19 +206,26 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             div_t d;
             struct timeval tv;
             vlc_value_t timeout;
+
 #if defined( WIN32 ) || defined( UNDER_CE )
             if( WSAGetLastError() != WSAEWOULDBLOCK )
             {
-                msg_Warn( p_this, "connection to %s:%d failed (%d)", psz_host,
-                          i_port, WSAGetLastError( ) );
+                if( WSAGetLastError () == WSAENETUNREACH )
+                    b_unreach = VLC_TRUE;
+                else
+                    msg_Warn( p_this, "connection to %s port %d failed (%d)",
+                              psz_host, i_port, WSAGetLastError( ) );
                 net_Close( fd );
                 continue;
             }
 #else
             if( errno != EINPROGRESS )
             {
-                msg_Warn( p_this, "connection to %s:%d : %s", psz_host,
-                          i_port, strerror( errno ) );
+                if( errno == ENETUNREACH )
+                    b_unreach = VLC_FALSE;
+                else
+                    msg_Warn( p_this, "connection to %s port %d : %s", psz_host,
+                              i_port, strerror( errno ) );
                 net_Close( fd );
                 continue;
             }
@@ -289,13 +297,18 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
                             &i_val_size ) == -1 || i_val != 0 )
             {
+                if( i_val == ENETUNREACH )
+                    b_unreach = VLC_TRUE;
+                else
+                {
 #ifdef WIN32
-                msg_Warn( p_this, "connection to %s:%d failed (%d)", psz_host,
-                          i_port, WSAGetLastError( ) );
+                    msg_Warn( p_this, "connection to %s port %d failed (%d)",
+                              psz_host, i_port, WSAGetLastError( ) );
 #else
-                msg_Warn( p_this, "connection to %s:%d : %s", psz_host,
-                          i_port, strerror( i_val ) );
+                    msg_Warn( p_this, "connection to %s port %d : %s", psz_host,
+                              i_port, strerror( i_val ) );
 #endif
+                }
                 net_Close( fd );
                 continue;
             }
@@ -303,8 +316,16 @@ int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         }
         i_handle = fd; /* success! */
     }
-    
+
     vlc_freeaddrinfo( res );
+
+    if( i_handle == -1 )
+    {
+        if( b_unreach )
+            msg_Err( p_this, "Host %s port %d is unreachable", psz_host,
+                     i_port );
+        return -1;
+    }
 
     if( *psz_socks && *psz_socks != ':' )
     {
@@ -343,12 +364,12 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    msg_Dbg( p_this, "net: listening to '%s:%d'", psz_host, i_port );
+    msg_Dbg( p_this, "net: listening to %s port %d", psz_host, i_port );
 
     i_val = vlc_getaddrinfo( p_this, psz_host, i_port, &hints, &res );
     if( i_val )
     {
-        msg_Err( p_this, "cannot resolve '%s:%d' : %s", psz_host, i_port,
+        msg_Err( p_this, "cannot resolve %s port %d : %s", psz_host, i_port,
                  vlc_gai_strerror( i_val ) );
         return NULL;
     }
@@ -403,7 +424,7 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             pi_handles = newpi;
         }
     }
-    
+
     vlc_freeaddrinfo( res );
 
     if( pi_handles != NULL )
@@ -691,7 +712,7 @@ int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
             else if( WSAGetLastError() == WSAEINTR ) continue;
             else msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
 #else
-            /* EAGAIN only happens with p_vs (SSL) and it's not an error */
+            /* EAGAIN only happens with p_vs (TLS) and it's not an error */
             if( errno != EAGAIN )
                 msg_Err( p_this, "recv failed (%s)", strerror(errno) );
 #endif
