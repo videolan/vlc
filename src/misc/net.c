@@ -45,6 +45,7 @@
 #   include <io.h>
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
+#   define ENETUNREACH WSAENETUNREACH
 #else
 #   include <sys/socket.h>
 #   include <netinet/in.h>
