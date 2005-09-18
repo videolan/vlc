@@ -2403,6 +2403,15 @@ if test "${enable_real}" = "yes"; then
 fi
 
 dnl
+dnl  Real RTSP plugin
+dnl
+AC_ARG_ENABLE(realrtsp,
+  [  --enable-realrtsp       Real RTSP module (default disabled)])
+if test "${enable_realrtsp}" = "yes"; then
+  VLC_ADD_PLUGINS([access_realrtsp])
+fi
+
+dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
@@ -4653,6 +4662,7 @@ AC_CONFIG_FILES([
   modules/access/pvr/Makefile
   modules/access/v4l/Makefile
   modules/access/cdda/Makefile
+  modules/access/rtsp/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
