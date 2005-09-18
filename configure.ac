@@ -1059,6 +1059,16 @@ if test "${ac_cv_mmx_inline}" != "no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
 fi
 
+dnl Check for -mmmx
+AC_CACHE_CHECK([if \$CC groks MMX intrinsics],
+    [ac_cv_c_mmx_intrinsics],
+    [CFLAGS="${CFLAGS_save} -mmmx"
+     AC_TRY_COMPILE([#include <mmintrin.h>],,ac_cv_c_mmx_intrinsics=yes, ac_cv_c_mmx_intrinsics=no)])
+if test "${ac_cv_c_mmx_intrinsics}" != "no"; then
+  AC_DEFINE(HAVE_MMX_INTRINSICS, 1, Define if MMX intrinsics are available.)
+  VLC_ADD_CFLAGS([i420_rgb_mmx],[-mmmx])
+fi
+
 AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
     [ac_cv_mmxext_inline],
     [CFLAGS="${CFLAGS_save}"
