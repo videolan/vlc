@@ -390,6 +390,7 @@ static int  Open ( vlc_object_t *p_this )
         if( !p_sys->rtsp->playMediaSession( *p_sys->ms ) )
         {
             msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
+            delete iter;
             goto error;
         }
     }
