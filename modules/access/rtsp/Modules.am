@@ -9,5 +9,4 @@ SOURCES_access_realrtsp = \
         real_sdpplin.c \
         real_sdpplin.h \
         real_asmrp.c \
-        real_asmrp.h \
         $(NULL)
