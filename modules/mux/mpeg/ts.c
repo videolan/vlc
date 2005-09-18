@@ -2120,8 +2120,7 @@ static uint32_t GetDescriptorLength24b( int i_length )
     return( 0x808000 | ( i_l3 << 16 ) | ( i_l2 << 8 ) | i_l1 );
 }
 
-static void GetPMT( sout_mux_t *p_mux,
-                    sout_buffer_chain_t *c )
+static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     block_t   *p_pmt[MAX_PMT];
@@ -2325,8 +2324,8 @@ static void GetPMT( sout_mux_t *p_mux,
                     GetDescriptorLength24b( bits.i_data -
                                             bits_fix_IOD.i_data - 3 ) );
 
-#ifdef HAVE_BSEARCH
-        i_pidinput = ((es_format_t *)(p_mux->pp_inputs[i]->p_fmt))->i_id;
+#if 0//def HAVE_BSEARCH /* FIXME!!! This can't possibly work */
+        i_pidinput = p_mux->pp_inputs[i]->p_fmt->i_id;
         p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
                             sizeof(pmt_map_t), intcompare ); 
         p_usepid = bsearch( &p_usepid, p_sys->pmtmap, p_sys->i_num_pmt,
@@ -2347,12 +2346,13 @@ static void GetPMT( sout_mux_t *p_mux,
     {
         ts_stream_t *p_stream;
 
-        p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
-        i_pidinput = ((es_format_t *)(p_mux->pp_inputs[i_stream]->p_fmt))->i_id;
+        p_stream = (ts_stream_t *)p_mux->pp_inputs[i_stream]->p_sys;
+
+#ifdef HAVE_BSEARCH
+        i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
         p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
                             sizeof(pmt_map_t), intcompare ); 
 
-#ifdef HAVE_BSEARCH
         if( p_usepid != NULL )
             p_es = dvbpsi_PMTAddES(
                     &p_sys->dvbpmt[((pmt_map_t *)p_usepid)->i_prog],
