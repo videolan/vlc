@@ -2394,6 +2394,15 @@ then
 fi
 
 dnl
+dnl  Real plugin
+dnl
+AC_ARG_ENABLE(real,
+  [  --enable-real           Real audio module (default disabled)])
+if test "${enable_real}" = "yes"; then
+  VLC_ADD_PLUGINS([realaudio])
+fi
+
+dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
@@ -4308,6 +4317,8 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LDFLAGS([dmo],[../../../loader/libloader.a])
     VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/loader])
     VLC_ADD_LDFLAGS([quicktime],[../../loader/libloader.a])
+    VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/loader])
+    VLC_ADD_LDFLAGS([realaudio],[../../loader/libloader.a])
   ])
 
 dnl
