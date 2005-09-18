@@ -85,7 +85,7 @@ D: Satellite input
 D: libdvbpsi support
 S: France
 
-N: Stéphane Borel
+N: StÃ©phane Borel
 E: stef@via.ecp.fr
 C: stef
 D: MPEG video decoder
@@ -125,7 +125,7 @@ D: skins module (X11 port)
 D: skins2 module (core and X11 port)
 S: France
 
-N: Rémi Denis-Courmont
+N: RÃ©mi Denis-Courmont
 E: rem#videolan.org
 C: courmisch
 D: SSL/TLS support (core, HTTP server, HTTP input)
@@ -138,7 +138,7 @@ C: colin
 D: MacOS X sound support
 S: France
 
-N: Boris Dorès
+N: Boris DorÃ¨s
 E: babal(at)via.ecp.fr
 C: babal
 D: Win32 network input
@@ -200,7 +200,7 @@ D: Mac OS X Audio Output
 D: Kasenna client support
 S: Netherlands
 
-N: Gaël Hendryckx
+N: GaÃ«l Hendryckx
 E: jimmy@via.ecp.fr
 C: jimmy
 D: IDCT and YUV transforms
@@ -243,7 +243,7 @@ D: AC3 decoder
 D: MPEG audio decoder
 S: France
 
-N: Felix Kühne
+N: Felix KÃ¼hne
 E: fkuehne@users.sourceforge.net
 C: fkuehne
 D: MacOS X Interface (Wizard, structure, extended controls panel, bookmarks window)
@@ -261,7 +261,7 @@ S: France
 N: Pascal Levesque
 E: pascal.levesque@mindready.com
 D: QNX RTOS video output and audio output
-S: Canada, Québec
+S: Canada, QuÃ©bec
 
 N: Christophe Massiot
 E: massiot@via.ecp.fr
@@ -276,7 +276,7 @@ D: TS muxer/demuxer improvements
 D: documentation
 S: France
 
-N: Loïc Minier
+N: LoÃ¯c Minier
 E: lool@via.ecp.fr
 C: lool
 D: Gtk/gnome enhancements
@@ -316,7 +316,7 @@ C: karibu
 D: skins module (core and win32 port)
 S: France
 
-N: Frédéric RUGET
+N: FrÃ©dÃ©ric RUGET
 E: frederic.ruget@free.fr
 D: Portaudio audio output
 S: France
@@ -354,7 +354,7 @@ C: richards
 D: BeOS video output (BBitmap and Overlay)
 S: United Kingdom
 
-N: Clément Stenac
+N: ClÃ©ment Stenac
 E: zorglub@videolan.org
 C: zorglub
 D: Playlist core and demuxers, SAP parser
@@ -368,7 +368,7 @@ E: shurdeek@panorama.sth.ac.at
 D: rc plugin for VLC control through /dev/stdin
 S: Austria
 
-N: Olivier Teulière
+N: Olivier TeuliÃ¨re
 E: ipkiss@via.ecp.fr
 C: ipkiss
 D: Win32 interface
