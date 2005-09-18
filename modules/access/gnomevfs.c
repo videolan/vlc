@@ -82,22 +82,25 @@ struct access_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    access_t     *p_access = (access_t*)p_this;
-    access_sys_t *p_sys;
-    char *psz_name;
-    char *psz, *psz_uri;
-    GnomeVFSURI         *p_uri;
-    GnomeVFSResult      i_ret;
+    access_t       *p_access = (access_t*)p_this;
+    access_sys_t   *p_sys = NULL;
+    char           *psz_name = NULL;
+    char           *psz = NULL;
+    char           *psz_uri = NULL;
+    GnomeVFSURI    *p_uri = NULL;
+    GnomeVFSResult  i_ret;
+    GnomeVFSHandle *p_handle = NULL;
 
     if( !(gnome_vfs_init()) )
     {
         msg_Warn( p_access, "couldn't initilize GnomeVFS" );
         return VLC_EGENERIC;
     }
+
     /* FIXME
        Since GnomeVFS segfaults on exit if we initialize it without trying to
-       open a file with a valid protocol, try top open at least file:// */
-    gnome_vfs_open( &(p_sys->p_handle), "file://", 5 );
+       open a file with a valid protocol, try to open at least file:// */
+    gnome_vfs_open( &p_handle, "file://", 5 );
 
     p_access->pf_read = Read;
     p_access->pf_block = NULL;
@@ -109,10 +112,14 @@ static int Open( vlc_object_t *p_this )
     p_access->info.b_eof = VLC_FALSE;
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
+
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+    p_sys->p_handle = p_handle;
     p_sys->i_nb_reads = 0;
     p_sys->b_pace_control = VLC_TRUE;
-
 
     if( strcmp( "gnomevfs", p_access->psz_access ) &&
                                             *(p_access->psz_access) != '\0')
@@ -142,7 +149,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_uri = gnome_vfs_uri_new( psz_uri );
-
     if( p_uri )
     {
         p_sys->p_file_info = gnome_vfs_file_info_new();
@@ -230,7 +236,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_name = psz_name;
     gnome_vfs_uri_unref( p_uri);
     return VLC_SUCCESS;
-
 }
 
 /*****************************************************************************
@@ -261,12 +266,11 @@ static void Close( vlc_object_t * p_this )
 static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_ret;
     GnomeVFSFileSize i_read_len;
+    int i_ret;
 
     i_ret = gnome_vfs_read( p_sys->p_handle, p_buffer,
                                   (GnomeVFSFileSize)i_len, &i_read_len );
-
     if( i_ret )
     {
         p_access->info.b_eof = VLC_TRUE;
@@ -319,7 +323,6 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     i_ret = gnome_vfs_seek( p_sys->p_handle, GNOME_VFS_SEEK_START,
                                             (GnomeVFSFileOffset)i_pos);
-
     if ( !i_ret )
     {
         p_access->info.i_pos = i_pos;
@@ -400,4 +403,3 @@ static int Control( access_t *p_access, int i_query, va_list args )
     }
     return VLC_SUCCESS;
 }
-
