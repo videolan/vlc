@@ -81,6 +81,7 @@ static int Demux( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static int HeaderRead( demux_t *p_demux );
+static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num );
 
 /*****************************************************************************
  * Open
@@ -196,10 +197,8 @@ static int Demux( demux_t *p_demux )
                  (uint32_t)p_sys->i_data_offset_next );
     }
 
-    if( stream_Read( p_demux->s, header, 12 ) < 12 )
-    {
-        return 0;
-    }
+    if( stream_Read( p_demux->s, header, 12 ) < 12 ) return 0;
+
     i_size = GetWBE( &header[2] ) - 12;
     i_id   = GetWBE( &header[4] );
     i_pts  = 1000 * GetDWBE( &header[6] );
@@ -227,7 +226,7 @@ static int Demux( demux_t *p_demux )
 
     if( tk->fmt.i_cat == VIDEO_ES && b_selected )
     {
-        uint8_t     *p = p_sys->buffer;
+        uint8_t *p = p_sys->buffer;
 
         while( p < &p_sys->buffer[i_size - 2] )
         {
@@ -275,6 +274,7 @@ static int Demux( demux_t *p_demux )
                 }
                 i_seqnum = *p++;
             }
+
             i_copy = i_len - i_offset;
             if( i_copy > &p_sys->buffer[i_size] - p )
             {
@@ -293,7 +293,8 @@ static int Demux( demux_t *p_demux )
                 /* last fragment -> fixes */
                 i_copy = i_offset;
                 i_offset = i_len - i_copy;
-                msg_Dbg( p_demux, "last fixing copy=%d offset=%d", i_copy, i_offset );
+                msg_Dbg( p_demux, "last fixing copy=%d offset=%d",
+                         i_copy, i_offset );
             }
 
             if( tk->p_frame &&
@@ -306,7 +307,8 @@ static int Demux( demux_t *p_demux )
                 {
                     p_sys->i_pcr = tk->p_frame->i_dts;
 
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                                    (int64_t)p_sys->i_pcr );
                 }
                 es_out_Send( p_demux->out, tk->p_es, tk->p_frame );
 
@@ -314,7 +316,7 @@ static int Demux( demux_t *p_demux )
                 tk->p_frame = NULL;
             }
 
-            if( (h&0xc0) != 0x80 && (h&0xc0) != 0x00 && tk->p_frame == NULL )
+            if( (h&0xc0) != 0x80 && (h&0xc0) != 0x00 && !tk->p_frame )
             {
                 /* no fragment */
                 i_len = i_copy;
@@ -326,7 +328,7 @@ static int Demux( demux_t *p_demux )
             {
                 msg_Dbg( p_demux, "new frame size=%d", i_len );
                 tk->i_frame = i_len;
-                if( ( tk->p_frame = block_New( p_demux, i_len + 8 + 1000) ) == NULL )
+                if( !( tk->p_frame = block_New( p_demux, i_len + 8 + 1000) ) )
                 {
                     return -1;
                 }
@@ -342,12 +344,12 @@ static int Demux( demux_t *p_demux )
             {
                 int i_ck = ((uint32_t*)tk->p_frame->p_buffer)[1]++;
 
-                msg_Dbg( p_demux, "copying new buffer n=%d offset=%d copy=%d", i_ck, i_offset, i_copy );
+                msg_Dbg( p_demux, "copying new buffer n=%d offset=%d copy=%d",
+                         i_ck, i_offset, i_copy );
 
                 ((uint32_t*)(tk->p_frame->p_buffer+i_len+8))[i_ck] = i_offset;
 
-                memcpy( &tk->p_frame->p_buffer[i_offset + 8],
-                        p, i_copy );
+                memcpy( &tk->p_frame->p_buffer[i_offset + 8], p, i_copy );
             }
 
             p += i_copy;
@@ -356,6 +358,7 @@ static int Demux( demux_t *p_demux )
             {
                 break;
             }
+
 #if 0
             if( tk->p_frame )
             {
@@ -375,7 +378,8 @@ static int Demux( demux_t *p_demux )
                     if( p_sys->i_pcr < tk->p_frame->i_dts )
                     {
                         p_sys->i_pcr = tk->p_frame->i_dts;
-                        es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
+                        es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                                        (int64_t)p_sys->i_pcr );
                     }
                     es_out_Send( p_demux->out, tk->p_es, tk->p_frame );
 
@@ -395,7 +399,7 @@ static int Demux( demux_t *p_demux )
                 block_t *p_frame;
 
                 /* not fragmented */
-                if( ( p_frame = block_New( p_demux, i_copy + 8 + 8 ) ) == NULL )
+                if( !( p_frame = block_New( p_demux, i_copy + 8 + 8 ) ) )
                 {
                     return -1;
                 }
@@ -412,7 +416,8 @@ static int Demux( demux_t *p_demux )
                 if( p_sys->i_pcr < p_frame->i_dts )
                 {
                     p_sys->i_pcr = p_frame->i_dts;
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                                    (int64_t)p_sys->i_pcr );
                 }
                 es_out_Send( p_demux->out, tk->p_es, p_frame );
             }
@@ -420,7 +425,7 @@ static int Demux( demux_t *p_demux )
             {
                 /* First fragment */
                 tk->i_frame = i_len;
-                if( ( tk->p_frame = block_New( p_demux, i_len + 8 + 1000) ) == NULL )
+                if( !( tk->p_frame = block_New( p_demux, i_len + 8 + 1000) ) )
                 {
                     return -1;
                 }
@@ -444,7 +449,8 @@ static int Demux( demux_t *p_demux )
         if( p_sys->i_pcr < i_pts )
         {
             p_sys->i_pcr = i_pts;
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_pcr );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                            (int64_t)p_sys->i_pcr );
         }
 
         if( tk->fmt.i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
@@ -590,18 +596,12 @@ static int HeaderRead( demux_t *p_demux )
         msg_Dbg( p_demux, "object %4.4s size=%d version=%d",
                  (char*)&i_id, i_size, i_version );
 
-        if( i_size < 10 )
-        {
-            return VLC_EGENERIC;
-        }
+        if( i_size < 10 ) return VLC_EGENERIC;
         i_skip = i_size - 10;
 
         if( i_id == VLC_FOURCC('.','R','M','F') )
         {
-            if( stream_Read( p_demux->s, header, 8 ) < 8 )
-            {
-                return VLC_EGENERIC;
-            }
+            if( stream_Read( p_demux->s, header, 8 ) < 8 ) return VLC_EGENERIC;
             msg_Dbg( p_demux, "    - file version=0x%x num headers=%d",
                      GetDWBE( &header[0] ), GetDWBE( &header[4] ) );
 
@@ -611,21 +611,19 @@ static int HeaderRead( demux_t *p_demux )
         {
             int i_flags;
 
-            if( stream_Read( p_demux->s, header, 40 ) < 40 )
-            {
-                return VLC_EGENERIC;
-            }
+            if( stream_Read(p_demux->s, header, 40) < 40 ) return VLC_EGENERIC;
+
             msg_Dbg( p_demux, "    - max bitrate=%d avg bitrate=%d",
-                     GetDWBE( &header[0] ), GetDWBE( &header[4] ) );
+                     GetDWBE(&header[0]), GetDWBE(&header[4]) );
             msg_Dbg( p_demux, "    - max packet size=%d avg bitrate=%d",
-                     GetDWBE( &header[8] ), GetDWBE( &header[12] ) );
-            msg_Dbg( p_demux, "    - packets count=%d", GetDWBE( &header[16] ) );
-            msg_Dbg( p_demux, "    - duration=%d ms", GetDWBE( &header[20] ) );
-            msg_Dbg( p_demux, "    - preroll=%d ms", GetDWBE( &header[24] ) );
-            msg_Dbg( p_demux, "    - index offset=%d", GetDWBE( &header[28] ) );
-            msg_Dbg( p_demux, "    - data offset=%d", GetDWBE( &header[32] ) );
-            msg_Dbg( p_demux, "    - num streams=%d", GetWBE( &header[36] ) );
-            i_flags = GetWBE( &header[38]);
+                     GetDWBE(&header[8]), GetDWBE(&header[12]) );
+            msg_Dbg( p_demux, "    - packets count=%d", GetDWBE(&header[16]) );
+            msg_Dbg( p_demux, "    - duration=%d ms", GetDWBE(&header[20]) );
+            msg_Dbg( p_demux, "    - preroll=%d ms", GetDWBE(&header[24]) );
+            msg_Dbg( p_demux, "    - index offset=%d", GetDWBE(&header[28]) );
+            msg_Dbg( p_demux, "    - data offset=%d", GetDWBE(&header[32]) );
+            msg_Dbg( p_demux, "    - num streams=%d", GetWBE(&header[36]) );
+            i_flags = GetWBE(&header[38]);
             msg_Dbg( p_demux, "    - flags=0x%x %s%s%s",
                      i_flags,
                      i_flags&0x0001 ? "PN_SAVE_ENABLED " : "",
@@ -692,23 +690,22 @@ static int HeaderRead( demux_t *p_demux )
         }
         else if( i_id == VLC_FOURCC('M','D','P','R') )
         {
+            /* Media properties header */
             int  i_num;
             int  i_len;
             char *psz;
 
-            if( stream_Read( p_demux->s, header, 30 ) < 30 )
-            {
-                return VLC_EGENERIC;
-            }
+            if( stream_Read(p_demux->s, header, 30) < 30 ) return VLC_EGENERIC;
             i_num = GetWBE( header );
             msg_Dbg( p_demux, "    - id=0x%x", i_num );
-            msg_Dbg( p_demux, "    - max bitrate=%d avg bitrate=%d", GetDWBE( &header[2] ), GetDWBE( &header[6] ) );
-            msg_Dbg( p_demux, "    - max packet size=%d avg packet size=%d", GetDWBE( &header[10] ), GetDWBE( &header[14] ));
-            msg_Dbg( p_demux, "    - start time=%d", GetDWBE( &header[18] ) );
-            msg_Dbg( p_demux, "    - preroll=%d", GetDWBE( &header[22] ) );
-            msg_Dbg( p_demux, "    - duration=%d", GetDWBE( &header[26] ));
+            msg_Dbg( p_demux, "    - max bitrate=%d avg bitrate=%d",
+                     GetDWBE(&header[2]), GetDWBE(&header[6]) );
+            msg_Dbg( p_demux, "    - max packet size=%d avg packet size=%d",
+                     GetDWBE(&header[10]), GetDWBE(&header[14]) );
+            msg_Dbg( p_demux, "    - start time=%d", GetDWBE(&header[18]) );
+            msg_Dbg( p_demux, "    - preroll=%d", GetDWBE(&header[22]) );
+            msg_Dbg( p_demux, "    - duration=%d", GetDWBE(&header[26]) );
             i_skip -= 30;
-
 
             stream_Read( p_demux->s, header, 1 );
             if( ( i_len = header[0] ) > 0 )
@@ -739,127 +736,7 @@ static int HeaderRead( demux_t *p_demux )
             stream_Read( p_demux->s, header, 4 );
             if( ( i_len = GetDWBE( header ) ) > 0 )
             {
-                es_format_t  fmt;
-                real_track_t *tk;
-                uint8_t *p_peek;
-
-                msg_Dbg( p_demux, "    - specific data len=%d", i_len );
-                if( stream_Peek( p_demux->s, &p_peek, 34 ) >= 34 )
-                {
-                    if( !strncmp( (char *)&p_peek[4], "VIDO", 4 ) )
-                    {
-                        es_format_Init( &fmt, VIDEO_ES,
-                                        VLC_FOURCC( p_peek[8], p_peek[9], p_peek[10], p_peek[11] ) );
-                        fmt.video.i_width = GetWBE( &p_peek[12] );
-                        fmt.video.i_height= GetWBE( &p_peek[14] );
-
-                        fmt.i_extra = 8;
-                        fmt.p_extra = malloc( 8 );
-                        ((uint32_t*)fmt.p_extra)[0] = GetDWBE( &p_peek[26] );
-                        ((uint32_t*)fmt.p_extra)[1] = GetDWBE( &p_peek[30] );
-
-                        msg_Dbg( p_demux, "    - video 0x%08x 0x%08x",
-                                 ((uint32_t*)fmt.p_extra)[0],
-                                 ((uint32_t*)fmt.p_extra)[1] );
-
-                        if( GetDWBE( &p_peek[30] ) == 0x10003000 ||
-                            GetDWBE( &p_peek[30] ) == 0x10003001 )
-                        {
-                            fmt.i_codec = VLC_FOURCC( 'R','V','1','3' );
-                        }
-
-                        msg_Dbg( p_demux, "    - video %4.4s %dx%d",
-                                 (char*)&fmt.i_codec,
-                                 fmt.video.i_width, fmt.video.i_height );
-
-                        tk = malloc( sizeof( real_track_t ) );
-                        tk->i_id = i_num;
-                        tk->fmt = fmt;
-                        tk->i_frame = 0;
-                        tk->p_frame = NULL;
-                        tk->p_es = es_out_Add( p_demux->out, &fmt );
-
-                        TAB_APPEND( p_sys->i_track, p_sys->track, tk );
-                    }
-                    else if( !strncmp( (char *)p_peek, ".ra\xfd", 4 ) )
-                    {
-                        int     i_version = GetWBE( &p_peek[4] );
-                        uint8_t *p_extra = NULL;
-                        msg_Dbg( p_demux, "    - audio version=%d", i_version );
-
-                        es_format_Init( &fmt, AUDIO_ES, 0 );
-                        if( i_version == 4 && stream_Peek( p_demux->s, &p_peek, 56 ) >= 56 )
-                        {
-                            fmt.audio.i_channels = GetWBE( &p_peek[54] );
-                            fmt.audio.i_rate = GetWBE( &p_peek[48] );
-
-                            if( stream_Peek( p_demux->s, &p_peek, 57 ) >= 57 )
-                            {
-                                int i_extra = p_peek[56] + 1 + 4;
-                                if( stream_Peek( p_demux->s, &p_peek, 57 + i_extra ) >= 57 + i_extra )
-                                {
-                                    memcpy( &fmt.i_codec, &p_peek[57 + p_peek[56] + 1], 4 );
-                                }
-                                p_extra = &p_peek[57 + p_peek[56] + 1+ 4 + 3];
-                            }
-                        }
-                        else if( i_version == 5 && stream_Peek( p_demux->s, &p_peek, 70 ) >= 70 )
-                        {
-                            memcpy( &fmt.i_codec, &p_peek[66], 4 );
-                            fmt.audio.i_channels = GetWBE( &p_peek[60] );
-                            fmt.audio.i_rate = GetWBE( &p_peek[54] );
-
-                            p_extra = &p_peek[66+4+3+1];
-                        }
-                        msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
-                                (char*)&fmt.i_codec,
-                                fmt.audio.i_channels, fmt.audio.i_rate );
-
-                        if( fmt.i_codec == VLC_FOURCC( 'd', 'n', 'e', 't' ) )
-                        {
-                            fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
-                        }
-                        else if( fmt.i_codec == VLC_FOURCC( 'r', 'a', 'a', 'c' ) ||
-                                 fmt.i_codec == VLC_FOURCC( 'r', 'a', 'c', 'p' ) )
-                        {
-                            int i_peek = p_extra - p_peek;
-                            if( stream_Peek( p_demux->s, &p_peek, i_peek + 4 ) >= i_peek + 4 )
-                            {
-                                int i_extra = GetDWBE( &p_peek[i_peek] );
-
-                                if( i_extra > 1 && i_peek + 4 + i_extra <= i_len &&
-                                    stream_Peek( p_demux->s, &p_peek, i_peek + 4 + i_extra ) >= i_peek + 4 + i_extra )
-                                {
-                                    fmt.i_extra = i_extra - 1;
-                                    fmt.p_extra = malloc ( i_extra - 1 );
-                                    memcpy( fmt.p_extra, &p_peek[i_peek+4+1], i_extra - 1 );
-
-                                    msg_Dbg( p_demux, "        - extra data=%d", i_extra );
-                                    {
-                                        int i;
-                                        for( i = 0; i < fmt.i_extra; i++ )
-                                        {
-                                            msg_Dbg( p_demux, "          data[%d] = 0x%x", i,((uint8_t*)fmt.p_extra)[i] );
-                                        }
-                                    }
-                                }
-                            }
-                            fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
-                        }
-
-                        if( fmt.i_codec != 0 )
-                        {
-                            tk = malloc( sizeof( real_track_t ) );
-                            tk->i_id = i_num;
-                            tk->fmt = fmt;
-                            tk->i_frame = 0;
-                            tk->p_frame = NULL;
-                            tk->p_es = es_out_Add( p_demux->out, &fmt );
-
-                            TAB_APPEND( p_sys->i_track, p_sys->track, tk );
-                        }
-                    }
-                }
+                ReadCodecSpecificData( p_demux, i_len, i_num );
                 stream_Read( p_demux->s, NULL, i_len );
 
                 i_skip -= i_len;
@@ -889,10 +766,7 @@ static int HeaderRead( demux_t *p_demux )
             msg_Dbg( p_demux, "unknown chunk" );
         }
 
-        if( i_skip < 0 )
-        {
-            return VLC_EGENERIC;
-        }
+        if( i_skip < 0 ) return VLC_EGENERIC;
         stream_Read( p_demux->s, NULL, i_skip );
     }
 
@@ -901,4 +775,167 @@ static int HeaderRead( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    es_format_t fmt;
+    real_track_t *tk;
+    uint8_t *p_peek;
 
+    msg_Dbg( p_demux, "    - specific data len=%d", i_len );
+    if( stream_Peek(p_demux->s, &p_peek, i_len) < i_len ) return VLC_EGENERIC;
+
+    if( !strncmp( (char *)&p_peek[4], "VIDO", 4 ) )
+    {
+        es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( p_peek[8], p_peek[9],
+                        p_peek[10], p_peek[11] ) );
+        fmt.video.i_width = GetWBE( &p_peek[12] );
+        fmt.video.i_height= GetWBE( &p_peek[14] );
+
+        fmt.i_extra = 8;
+        fmt.p_extra = malloc( 8 );
+        ((uint32_t*)fmt.p_extra)[0] = GetDWBE( &p_peek[26] );
+        ((uint32_t*)fmt.p_extra)[1] = GetDWBE( &p_peek[30] );
+
+        msg_Dbg( p_demux, "    - video 0x%08x 0x%08x",
+                 ((uint32_t*)fmt.p_extra)[0], ((uint32_t*)fmt.p_extra)[1] );
+
+        if( GetDWBE( &p_peek[30] ) == 0x10003000 ||
+            GetDWBE( &p_peek[30] ) == 0x10003001 )
+        {
+            fmt.i_codec = VLC_FOURCC( 'R','V','1','3' );
+        }
+
+        msg_Dbg( p_demux, "    - video %4.4s %dx%d",
+                 (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
+
+        tk = malloc( sizeof( real_track_t ) );
+        tk->i_id = i_num;
+        tk->fmt = fmt;
+        tk->i_frame = 0;
+        tk->p_frame = NULL;
+        tk->p_es = es_out_Add( p_demux->out, &fmt );
+
+        TAB_APPEND( p_sys->i_track, p_sys->track, tk );
+    }
+    else if( !strncmp( (char *)p_peek, ".ra\xfd", 4 ) )
+    {
+        int i_version = GetWBE( &p_peek[4] );
+        int i_header_size, i_flavor, i_coded_frame_size, i_subpacket_h;
+        int i_frame_size, i_subpacket_size;
+
+        msg_Dbg( p_demux, "    - audio version=%d", i_version );
+
+        p_peek += 6;
+        es_format_Init( &fmt, AUDIO_ES, 0 );
+
+        if( i_version == 3 )
+        {
+            msg_Dbg( p_demux, "    - audio version 3 is not supported!" );
+            return VLC_EGENERIC;
+        }
+
+        p_peek += 2; /* 00 00 */
+        p_peek += 4; /* .ra4 or .ra5 */
+        p_peek += 4; /* ?? */
+        p_peek += 2; /* version (4 or 5) */
+        i_header_size = GetDWBE( p_peek ); p_peek += 4; /* header size */
+        i_flavor = GetWBE( p_peek ); p_peek += 2; /* codec flavor */
+        i_coded_frame_size = GetDWBE( p_peek ); p_peek += 4;
+        p_peek += 4; /* ?? */
+        p_peek += 4; /* ?? */
+        p_peek += 4; /* ?? */
+        i_subpacket_h = GetWBE( p_peek ); p_peek += 2;
+        i_frame_size = GetWBE( p_peek ); p_peek += 2;
+        i_subpacket_size = GetWBE( p_peek ); p_peek += 2;
+        p_peek += 2; /* ?? */
+
+        if( i_version == 5 ) p_peek += 6; /* 0, srate, 0 */
+
+        fmt.audio.i_rate = GetWBE( p_peek ); p_peek += 2;
+        p_peek += 2; /* ?? */
+        fmt.audio.i_bitspersample = GetWBE( p_peek ); p_peek += 2;
+        fmt.audio.i_channels = GetWBE( p_peek ); p_peek += 2;
+        fmt.audio.i_blockalign = i_frame_size;
+
+        if( i_version == 5 )
+        {
+            p_peek += 4; /* genr */
+            memcpy( (char *)&fmt.i_codec, p_peek, 4 ); p_peek += 4;
+        }
+        else
+        {
+            p_peek += p_peek[0] + 1; /* descr 1 */
+            memcpy( (char *)&fmt.i_codec, p_peek + 1, 4 ); /* descr 2 */
+            p_peek += p_peek[0] + 1;
+        }
+
+        msg_Dbg( p_demux, "    - audio codec=%4.4s channels=%d rate=%dHz",
+                 (char*)&fmt.i_codec, fmt.audio.i_channels, fmt.audio.i_rate );
+
+        p_peek += 3; /* ?? */
+        if( i_version == 5 ) p_peek++;
+
+        switch( fmt.i_codec )
+        {
+        case VLC_FOURCC( 'd', 'n', 'e', 't' ):
+            fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+            break;
+
+        case VLC_FOURCC( 'r', 'a', 'a', 'c' ):
+        case VLC_FOURCC( 'r', 'a', 'c', 'p' ):
+            fmt.i_extra = GetDWBE( p_peek ); p_peek += 4;
+            if( fmt.i_extra > 0 ) { fmt.i_extra--; p_peek++; }
+            if( fmt.i_extra > 0 )
+            {
+                fmt.p_extra = malloc( fmt.i_extra );
+                memcpy( fmt.p_extra, p_peek, fmt.i_extra );
+            }
+
+            fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
+            break;
+
+        case VLC_FOURCC('c','o','o','k'):
+            fmt.i_extra = GetDWBE( p_peek ); p_peek += 4;
+            fmt.p_extra = malloc( fmt.i_extra + 10 );
+
+            ((short*)(fmt.p_extra))[0] = i_subpacket_size;
+            ((short*)(fmt.p_extra))[1] = i_subpacket_h;
+            ((short*)(fmt.p_extra))[2] = i_flavor;
+            ((short*)(fmt.p_extra))[3] = i_coded_frame_size;
+            ((short*)(fmt.p_extra))[4] = fmt.i_extra;
+            if( fmt.i_extra ) memcpy( fmt.p_extra + 10, p_peek, fmt.i_extra );
+            fmt.i_extra += 10;
+            break;
+
+        default:
+            msg_Dbg( p_demux, "    - unknown audio codec=%4.4s",
+                     (char*)&fmt.i_codec );
+            break;
+        }
+
+        if( fmt.i_codec != 0 )
+        {
+            msg_Dbg( p_demux, "        - extra data=%d", fmt.i_extra );
+            {
+                int i;
+                for( i = 0; i < fmt.i_extra; i++ )
+                {
+                    msg_Dbg( p_demux, "          data[%d] = 0x%x", i,
+                             ((uint8_t*)fmt.p_extra)[i] );
+                }
+            }
+
+            tk = malloc( sizeof( real_track_t ) );
+            tk->i_id = i_num;
+            tk->fmt = fmt;
+            tk->i_frame = 0;
+            tk->p_frame = NULL;
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
+
+            TAB_APPEND( p_sys->i_track, p_sys->track, tk );
+        }
+    }
+
+    return VLC_SUCCESS;
+}
