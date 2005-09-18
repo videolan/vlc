@@ -233,7 +233,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_no_data = VLC_TRUE;
     p_sys->i_no_data_ti = 0;
     p_sys->b_multicast = VLC_FALSE;
-    p_sys->psz_path = p_demux->psz_path;
+    p_sys->psz_path = strdup(p_demux->psz_path);
 
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
@@ -250,8 +250,7 @@ static int  Open ( vlc_object_t *p_this )
     if( strcasecmp( p_demux->psz_access, "sdp" ) )
     {
         char *p = p_sys->psz_path;
-        while( (p = strchr( p, ' ' )) != NULL )
-            *p = '+';
+        while( (p = strchr( p, ' ' )) != NULL ) *p = '+';
     }
 
     if( p_demux->s == NULL && !strcasecmp( p_demux->psz_access, "rtsp" ) )
@@ -270,8 +269,7 @@ static int  Open ( vlc_object_t *p_this )
         sprintf( psz_url, "rtsp://%s", p_sys->psz_path );
 
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
-        if( psz_options )
-            delete [] psz_options;
+        if( psz_options ) delete [] psz_options;
 
         p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
                               NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
@@ -402,10 +400,7 @@ static int  Open ( vlc_object_t *p_this )
     {
         live_track_t *tk;
 
-        if( sub->readSource() == NULL )
-        {
-            continue;
-        }
+        if( sub->readSource() == NULL ) continue;
 
         tk = (live_track_t*)malloc( sizeof( live_track_t ) );
         tk->p_demux = p_demux;
@@ -647,33 +642,13 @@ static int  Open ( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys->p_out_asf )
-    {
-        stream_DemuxDelete( p_sys->p_out_asf );
-    }
-    if( p_sys->ms )
-    {
-        Medium::close( p_sys->ms );
-    }
-    if( p_sys->rtsp )
-    {
-        Medium::close( p_sys->rtsp );
-    }
-    if( p_sys->env )
-    {
-        RECLAIM_ENV(p_sys->env);
-    }
-    if( p_sys->scheduler )
-    {
-        delete p_sys->scheduler;
-    }
-    if( p_sys->p_sdp )
-    {
-        free( p_sys->p_sdp );
-    }
-    if( ( p_sys->psz_path != NULL )
-     && ( p_sys->psz_path != p_demux->psz_path ) )
-        free( p_sys->psz_path );
+    if( p_sys->p_out_asf ) stream_DemuxDelete( p_sys->p_out_asf );
+    if( p_sys->ms ) Medium::close( p_sys->ms );
+    if( p_sys->rtsp ) Medium::close( p_sys->rtsp );
+    if( p_sys->env ) RECLAIM_ENV(p_sys->env);
+    if( p_sys->scheduler ) delete p_sys->scheduler;
+    if( p_sys->p_sdp ) free( p_sys->p_sdp );
+    if( p_sys->psz_path ) free( p_sys->psz_path );
 
     free( p_sys );
     return VLC_EGENERIC;
@@ -712,8 +687,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->env ) RECLAIM_ENV(p_sys->env);
     if( p_sys->scheduler ) delete p_sys->scheduler;
     if( p_sys->p_sdp ) free( p_sys->p_sdp );
-    if( p_sys->psz_path != p_demux->psz_path )
-        free( p_sys->psz_path );
+    if( p_sys->psz_path ) free( p_sys->psz_path );
     free( p_sys );
 }
 
