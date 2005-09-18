@@ -341,6 +341,8 @@ Interface::~Interface()
                          GetPosition(), GetSize() );
     }
 
+	PopEventHandler(true);
+
     if( video_window ) delete video_window;
 
 #ifdef wxHAS_TASK_BAR_ICON

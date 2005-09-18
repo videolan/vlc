@@ -214,6 +214,8 @@ DialogsProvider::~DialogsProvider()
 
 #undef UPDATE
 
+	PopEventHandler(true);
+
     /* Clean up */
     if( p_open_dialog )     delete p_open_dialog;
     if( p_prefs_dialog )    p_prefs_dialog->Destroy();
