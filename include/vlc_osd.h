@@ -402,7 +402,7 @@ static inline void osd_SetMenuVisible( osd_menu_t *p_osd, vlc_bool_t b_value )
 static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
 {
     vlc_value_t val;
-    
+
     val.b_bool = p_osd->p_state->b_update = b_value;
     var_Set( p_osd, "osd-menu-update", val );
 } 

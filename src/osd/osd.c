@@ -40,6 +40,15 @@
 static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t * );
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
+static vlc_bool_t osd_isVisible( osd_menu_t *p_osd );
+
+static vlc_bool_t osd_isVisible( osd_menu_t *p_osd )
+{
+    vlc_value_t val;
+
+    var_Get( p_osd, "osd-menu-visible", &val );
+    return val.b_bool;
+}
 
 /*****************************************************************************
  * OSD menu Funtions
@@ -256,16 +265,22 @@ void __osd_MenuActivate( vlc_object_t *p_this )
     osd_menu_t *p_osd = NULL;
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
-    
+
     if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
     {
         msg_Err( p_this, "osd_MenuNext failed" );
         return;
     }
-    
+
+    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    {
+        vlc_object_release( (vlc_object_t*) p_osd );
+        return;
+    }
+
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    
+
 #if defined(OSD_MENU_DEBUG)
     msg_Dbg( p_osd, "select" );
 #endif
@@ -279,9 +294,9 @@ void __osd_MenuActivate( vlc_object_t *p_this )
         vlc_mutex_unlock( lockval.p_address );
         __osd_MenuUp( p_this );   /* "menu select" means go to menu item above. */
         return;
-    }    
+    }
     if( p_button && p_button->p_down)
-    {    
+    {
         vlc_object_release( (vlc_object_t*) p_osd );
         vlc_mutex_unlock( lockval.p_address );
         __osd_MenuDown( p_this ); /* "menu select" means go to menu item below. */
@@ -304,24 +319,30 @@ void __osd_MenuActivate( vlc_object_t *p_this )
 #endif
     }
     vlc_object_release( (vlc_object_t*) p_osd );
-    vlc_mutex_unlock( lockval.p_address );            
-}           
+    vlc_mutex_unlock( lockval.p_address );
+}
 
 void __osd_MenuNext( vlc_object_t *p_this )
 {
     osd_menu_t *p_osd = NULL;
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
-    
+
     if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
     {
         msg_Err( p_this, "osd_MenuNext failed" );
         return;
     }
-            
+
+    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    {
+        vlc_object_release( (vlc_object_t*) p_osd );
+        return;
+    }
+
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    
+
     p_button = p_osd->p_state->p_visible;
     if( p_button )
     {
@@ -331,11 +352,11 @@ void __osd_MenuNext( vlc_object_t *p_this )
             p_osd->p_state->p_visible = p_button->p_next;
         else
             p_osd->p_state->p_visible = p_osd->p_button;
-            
+
         if( !p_osd->p_state->p_visible->b_range ) 
             p_osd->p_state->p_visible->p_current_state =
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
-        
+
         osd_UpdateState( p_osd->p_state, 
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
@@ -344,9 +365,9 @@ void __osd_MenuNext( vlc_object_t *p_this )
         osd_SetMenuUpdate( p_osd, VLC_TRUE );
     }
 #if defined(OSD_MENU_DEBUG)
-    msg_Dbg( p_osd, "direction right [button %s]", p_osd->p_state->p_visible->psz_action );            
+    msg_Dbg( p_osd, "direction right [button %s]", p_osd->p_state->p_visible->psz_action );
 #endif
-    
+
     vlc_object_release( (vlc_object_t*) p_osd );
     vlc_mutex_unlock( lockval.p_address );
 }
@@ -356,30 +377,36 @@ void __osd_MenuPrev( vlc_object_t *p_this )
     osd_menu_t *p_osd = NULL;
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
-    
+
     if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
     {
         msg_Err( p_this, "osd_MenuPrev failed" );
         return;
     }
 
+    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    {
+        vlc_object_release( (vlc_object_t*) p_osd );
+        return;
+    }
+
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-    
+
     p_button = p_osd->p_state->p_visible;
     if( p_button )
-    {                    
+    {
         if( !p_button->b_range ) 
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_UNSELECT );
         if( p_button->p_prev )
             p_osd->p_state->p_visible = p_button->p_prev;
         else
-            p_osd->p_state->p_visible = p_osd->p_last_button;                
-        
+            p_osd->p_state->p_visible = p_osd->p_last_button;
+
         if( !p_osd->p_state->p_visible->b_range ) 
             p_osd->p_state->p_visible->p_current_state =
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
-        
+
         osd_UpdateState( p_osd->p_state, 
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
@@ -388,9 +415,9 @@ void __osd_MenuPrev( vlc_object_t *p_this )
         osd_SetMenuUpdate( p_osd, VLC_TRUE );
     }
 #if defined(OSD_MENU_DEBUG)
-    msg_Dbg( p_osd, "direction left [button %s]", p_osd->p_state->p_visible->psz_action );            
+    msg_Dbg( p_osd, "direction left [button %s]", p_osd->p_state->p_visible->psz_action );
 #endif
-            
+
     vlc_object_release( (vlc_object_t*) p_osd );
     vlc_mutex_unlock( lockval.p_address );
 }
@@ -400,16 +427,22 @@ void __osd_MenuUp( vlc_object_t *p_this )
     osd_menu_t *p_osd = NULL;
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
-#if defined(OSD_MENU_DEBUG)    
+#if defined(OSD_MENU_DEBUG)
     vlc_value_t val;
 #endif
-        
+
     if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
     {
         msg_Err( p_this, "osd_MenuDown failed" );
         return;
     }
-            
+
+    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    {
+        vlc_object_release( (vlc_object_t*) p_osd );
+        return;
+    }
+
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
@@ -420,21 +453,21 @@ void __osd_MenuUp( vlc_object_t *p_this )
         {
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_SELECT );
             if( p_button->p_up )
-                p_osd->p_state->p_visible = p_button->p_up;                    
+                p_osd->p_state->p_visible = p_button->p_up;
         }
-        
+
         if( p_button->b_range && p_osd->p_state->p_visible->b_range ) 
-        {                    
+        {
             osd_state_t *p_temp = p_osd->p_state->p_visible->p_current_state;
             if( p_temp && p_temp->p_next )
                 p_osd->p_state->p_visible->p_current_state = p_temp->p_next;
         }
         else if( !p_osd->p_state->p_visible->b_range )
-        {    
+        {
             p_osd->p_state->p_visible->p_current_state =
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
-        } 
-        
+        }
+
         osd_UpdateState( p_osd->p_state, 
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
@@ -453,9 +486,9 @@ void __osd_MenuUp( vlc_object_t *p_this )
         }
     }
 #if defined(OSD_MENU_DEBUG)
-    msg_Dbg( p_osd, "direction up [button %s]", p_osd->p_state->p_visible->psz_action );            
-#endif            
-    
+    msg_Dbg( p_osd, "direction up [button %s]", p_osd->p_state->p_visible->psz_action );
+#endif
+
     vlc_object_release( (vlc_object_t*) p_osd );
     vlc_mutex_unlock( lockval.p_address );
 }
@@ -474,7 +507,13 @@ void __osd_MenuDown( vlc_object_t *p_this )
         msg_Err( p_this, "osd_MenuDown failed" );
         return;
     }
-    
+
+    if( osd_isVisible( p_osd ) == VLC_FALSE )
+    {
+        vlc_object_release( (vlc_object_t*) p_osd );
+        return;
+    }
+
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
     
