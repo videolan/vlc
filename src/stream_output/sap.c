@@ -570,7 +570,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
         i_ret = net_Write( p_sap, p_session->p_address->i_wfd, NULL,
                            p_session->psz_data,
                            p_session->i_length );
-        if( i_ret != (int)p_session->i_length )
+        if( i_ret != (unsigned int)p_session->i_length )
         {
             msg_Warn( p_sap, "SAP send failed on address %s (%i %i)",
                    p_session->p_address->psz_address,
