@@ -301,6 +301,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist, int i_view,
 
     p_item->pp_parents = NULL;
     p_item->i_parents = 0;
+    p_item->i_serial = 0;
 
     p_item->i_flags |= PLAYLIST_SKIP_FLAG; /* Default behaviour */
 

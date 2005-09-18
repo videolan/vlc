@@ -33,7 +33,7 @@
 #include <vlc/decoder.h>
 
 /* ffmpeg header */
-#define HAVE_MMX
+#define HAVE_MMX 1
 #ifdef HAVE_FFMPEG_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
 #else

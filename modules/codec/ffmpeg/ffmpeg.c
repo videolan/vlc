@@ -29,7 +29,7 @@
 #include <vlc/decoder.h>
 
 /* ffmpeg header */
-#define HAVE_MMX
+#define HAVE_MMX 1
 #ifdef HAVE_FFMPEG_AVCODEC_H
 #   include <ffmpeg/avcodec.h>
 #else
@@ -360,8 +360,8 @@ static void LibavcodecCallback( void *p_opaque, int i_level,
     psz_item_name = p_avc->item_name(p_opaque);
     psz_new_format = malloc( strlen(psz_format) + strlen(psz_item_name)
                               + 18 + 5 );
-    sprintf( psz_new_format, "%s (%s@%p)", psz_format,
-             p_avc->item_name(p_opaque), p_opaque );
+    snprintf( psz_new_format, strlen(psz_format) + strlen(psz_item_name)
+              + 18 + 5, "%s (%s@%p)", psz_format, p_avc->item_name(p_opaque), p_opaque );
     msg_GenericVa( p_this, i_vlc_level, MODULE_STRING, psz_new_format, va );
     free( psz_new_format );
 }

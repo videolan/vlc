@@ -483,6 +483,9 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
         i_result = !CloseHandle( p_condvar->event )
           || !CloseHandle( p_condvar->semaphore );
 
+    if( p_condvar->semaphore != NULL )
+		DeleteCriticalSection( &p_condvar->csection );
+
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;
     return 0;
