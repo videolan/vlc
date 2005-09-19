@@ -680,7 +680,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
              "answer 0x06 flags:0x%8.8x media_length:%ds packet_length:%d packet_count:%d max_bit_rate:%d header_size:%d",
              p_sys->i_flags_broadcast,
              p_sys->i_media_length,
-             p_sys->i_packet_length,
+             (int) p_sys->i_packet_length,
              p_sys->i_packet_count,
              p_sys->i_max_bit_rate,
              p_sys->i_header_size );
@@ -1035,13 +1035,13 @@ static int NetFillBuffer( access_t *p_access )
 
         if( i_tcp > 0 )
         {
-            FD_SET( p_sys->i_handle_tcp, &fds_r );
-            FD_SET( p_sys->i_handle_tcp, &fds_e );
+            FD_SET( (unsigned int) p_sys->i_handle_tcp, &fds_r );
+            FD_SET( (unsigned int) p_sys->i_handle_tcp, &fds_e );
         }
         if( i_udp > 0 )
         {
-            FD_SET( p_sys->i_handle_udp, &fds_r );
-            FD_SET( p_sys->i_handle_udp, &fds_e );
+            FD_SET( (unsigned int) p_sys->i_handle_udp, &fds_r );
+            FD_SET( (unsigned int) p_sys->i_handle_udp, &fds_e );
         }
 
         /* We'll wait 0.5 second if nothing happens */
