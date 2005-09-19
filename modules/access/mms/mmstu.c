@@ -1016,7 +1016,7 @@ static int NetFillBuffer( access_t *p_access )
 
     if( i_handle_max == 0 )
     {
-        msg_Warn( p_access, "nothing to read %d:%d", i_tcp, i_udp );
+        msg_Warn( p_access, "nothing to read %d:%d", (int)i_tcp, (int)i_udp );
         return 0;
     }
     else
