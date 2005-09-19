@@ -532,11 +532,11 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
   return header;
 }
 
-int real_get_rdt_chunk(rtsp_client_t *rtsp_session, unsigned char **buffer) {
+int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph)
+{
 
   int n=1;
   uint8_t header[8];
-  rmff_pheader_t ph;
   int size;
   int flags1;
   int unknown1;
@@ -582,17 +582,22 @@ int real_get_rdt_chunk(rtsp_client_t *rtsp_session, unsigned char **buffer) {
 
   size+=2;
   
-  ph.object_version=0;
-  ph.length=size;
-  ph.stream_number=(flags1>>1)&1;
-  ph.timestamp=ts;
-  ph.reserved=0;
-  ph.flags=0;      /* TODO: determine keyframe flag and insert here? */
-  //xine_buffer_ensure_size(*buffer, 12+size);
-  rmff_dump_pheader(&ph, *buffer);
-  size-=12;
-  n=rtsp_read_data(rtsp_session, (*buffer)+12, size);
-  
+  ph->object_version=0;
+  ph->length=size;
+  ph->stream_number=(flags1>>1)&1;
+  ph->timestamp=ts;
+  ph->reserved=0;
+  ph->flags=0;      /* TODO: determine keyframe flag and insert here? */
+
+  return size;
+}
+
+int real_get_rdt_chunk(rtsp_client_t *rtsp_session, rmff_pheader_t *ph,
+                       unsigned char **buffer)
+{
+  int n;
+  rmff_dump_pheader(ph, *buffer);
+  n=rtsp_read_data(rtsp_session, *buffer + 12, ph->length - 12);
   return (n <= 0) ? 0 : n+12;
 }
 

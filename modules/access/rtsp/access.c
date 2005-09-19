@@ -259,6 +259,8 @@ static block_t *BlockRead( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p_block;
+    rmff_pheader_t pheader;
+    int i_size;
 
     if( p_sys->p_header )
     {
@@ -267,8 +269,11 @@ static block_t *BlockRead( access_t *p_access )
         return p_block;
     }
 
-    p_block = block_New( p_access, 4096 );
-    p_block->i_buffer = real_get_rdt_chunk( p_access->p_sys->p_rtsp,
+    i_size = real_get_rdt_chunk_header( p_access->p_sys->p_rtsp, &pheader );
+    if( i_size <= 0 ) return 0;
+
+    p_block = block_New( p_access, i_size );
+    p_block->i_buffer = real_get_rdt_chunk( p_access->p_sys->p_rtsp, &pheader,
                                             &p_block->p_buffer );
 
     return p_block;
