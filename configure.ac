@@ -1059,11 +1059,26 @@ if test "${ac_cv_mmx_inline}" != "no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
 fi
 
-dnl Check for -mmmx
+dnl  Check for fully workin MMX intrinsics
+dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
+dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_CACHE_CHECK([if \$CC groks MMX intrinsics],
     [ac_cv_c_mmx_intrinsics],
-    [CFLAGS="${CFLAGS_save} -mmmx"
-     AC_TRY_COMPILE([#include <mmintrin.h>],,ac_cv_c_mmx_intrinsics=yes, ac_cv_c_mmx_intrinsics=no)])
+    [CFLAGS="${CFLAGS_save} -O -mmmx"
+     AC_TRY_COMPILE([#include <mmintrin.h>
+                     #include <stdint.h>
+                     uint64_t frobzor;],
+                    [__m64 a, b, c;
+                     a = b = c = (__m64)frobzor;
+                     a = _mm_slli_pi16(a, 3);
+                     a = _mm_adds_pi16(a, b);
+                     c = _mm_srli_pi16(c, 8);
+                     c = _mm_slli_pi16(c, 3);
+                     b = _mm_adds_pi16(b, c);
+                     a = _mm_unpacklo_pi8(a, b);
+                     frobzor = (uint64_t)a;],
+                    [ac_cv_c_mmx_intrinsics=yes],
+                    [ac_cv_c_mmx_intrinsics=no])])
 if test "${ac_cv_c_mmx_intrinsics}" != "no"; then
   AC_DEFINE(HAVE_MMX_INTRINSICS, 1, Define if MMX intrinsics are available.)
   VLC_ADD_CFLAGS([i420_rgb_mmx],[-mmmx])
@@ -3512,6 +3527,7 @@ then
   AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
   if test "${have_alsa}" = "true"
   then
+    CFLAGS="${CFLAGS_save}"
     AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
                     #define ALSA_PCM_NEW_SW_PARAMS_API
                     #include <alsa/asoundlib.h>],
