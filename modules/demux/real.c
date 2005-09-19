@@ -202,9 +202,15 @@ static int Demux( demux_t *p_demux )
     i_size = GetWBE( &header[2] ) - 12;
     i_id   = GetWBE( &header[4] );
     i_pts  = 1000 * GetDWBE( &header[6] );
+    i_pts += 1000; /* Avoid 0 pts */
+
     /* header[11] -> flags 0x02 -> keyframe */
+
+#if 0
     msg_Dbg( p_demux, "packet %d size=%d id=%d pts=%u",
              p_sys->i_data_packets, i_size, i_id, (uint32_t)(i_pts/1000) );
+#endif
+
     p_sys->i_data_packets++;
 
     stream_Read( p_demux->s, p_sys->buffer, i_size );
