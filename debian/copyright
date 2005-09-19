@@ -16,7 +16,7 @@ x264 authors: Laurent Aimar <fenrir@via.ecp.fr>
               Justin Clay (justin_clay(at)hotmail.com)
               Måns Rullgård (mru(at)mru.ath.cx)
 
-VideoLAN is Copyright 1996-2004 The VideoLAN Team
+VideoLAN is Copyright 1996-2005 The VideoLAN Team
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ VideoLAN is Copyright 1996-2004 The VideoLAN Team
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
-  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 On Debian GNU/Linux systems, the complete text of the GNU General
 Public License can be found in `/usr/share/common-licenses/GPL'.
