@@ -580,3 +580,21 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<zorglub> gibalou: y'a un doc quelque part qui explique un peu plus le format
+          real ou fen a fait le demux directement en lisant des dumps / le
+          demuxer de mplayer ?
+<gibalou> zorglub: la meilleure doc c'est le code de mplayer/xine
+<zorglub> c'est bien ce que je craignais :)
+<zorglub> j'ai pas regardé xine ceci dit
+<zorglub> c'est plus agréable à lire que mplayer
+<sam> mouahaha
+<sam> non rien.
+<zorglub> ah bah si quand même
+<bigben> tu veux dire que les variables ont un nom qui reflète ce qu'elles
+         font ?
+<sam> avoir des noms de variables qu'on peut prononcer nuit fortement à la
+      lisibilité car cela détourne l'attention du vrai code, constitué des
+      mots-clés du langage et des divers opérateurs
+<sam> j'appelle mes variables Illl, lIll, lIlI, IllI, IlII, etc.
+  -- #videolan
+%

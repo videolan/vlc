@@ -174,14 +174,18 @@ vlc_module_begin();
                  PMTPID_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
                  TSID_LONGTEXT, VLC_TRUE );
+#ifdef HAVE_DVBPSI_SDT
     add_integer( SOUT_CFG_PREFIX "netid", 0, NULL, NETID_TEXT,
                  NETID_LONGTEXT, VLC_TRUE );
+#endif
     add_string( SOUT_CFG_PREFIX "program-pmt", NULL, NULL, PMTPROG_TEXT,
                 PMTPROG_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
               VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, VLC_TRUE );
+#ifdef HAVE_DVBPSI_SDT
     add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, VLC_TRUE );
+#endif
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
@@ -2139,8 +2143,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
     if( p_sys->dvbpmt == NULL )
         p_sys->dvbpmt = malloc( p_sys->i_num_pmt * sizeof(dvbpsi_pmt_t) ); 
+#ifdef HAVE_DVBPSI_SDT
     if( p_sys->b_sdt )
         dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid ); 
+#endif
 
     for( i = 0; i < p_sys->i_num_pmt; i++ )
     {
@@ -2150,6 +2156,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                         1,      /* b_current_next */
                         p_sys->i_pcr_pid );
 
+#ifdef HAVE_DVBPSI_SDT
         if( p_sys->b_sdt )
         {
             p_service = dvbpsi_SDTAddService( &sdt, 
@@ -2187,6 +2194,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #undef psz_sdtprov
 #undef psz_sdtserv
         }
+#endif
     }
 
     if( p_sys->i_mpeg4_streams > 0 )
@@ -2462,6 +2470,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         dvbpsi_EmptyPMT( &p_sys->dvbpmt[i] );
     }
 
+#ifdef HAVE_DVBPSI_SDT
     if( p_sys->b_sdt )
     {
         p_section2 = dvbpsi_GenSDTSections( &sdt ); 
@@ -2471,4 +2480,5 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         dvbpsi_DeletePSISections( p_section2 );
         dvbpsi_EmptySDT( &sdt );
     }
+#endif
 }

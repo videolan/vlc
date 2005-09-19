@@ -1659,6 +1659,10 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
   ;;
   esac
+  AC_CHECK_LIB(dvbpsi, dvbpsi_GenSDTSections, [
+    AC_DEFINE(HAVE_DVBPSI_SDT, 1, [Define if you have dvbpsi_GenSDTSections.])
+  ], [], [${LDFLAGS_ts}])
+
 fi
 
 dnl
@@ -1704,7 +1708,7 @@ then
     VLC_ADD_CPPFLAGS([access_gnomevfs],[$GNOMEVFS_CPPFLAGS])
     VLC_ADD_CFLAGS([access_gnomevfs],[$GNOMEVFS_CFLAGS])
     VLC_ADD_PLUGINS([access_gnomevfs]),
-    AC_MSG_WARN([GnomeVFS support disbaled because GnomeVFS development headers not found]))
+    AC_MSG_WARN([GnomeVFS support disabled because GnomeVFS development headers not found]))
 fi
 
 dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
