@@ -234,10 +234,10 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     msg_Dbg( p_demux, "    - format = %s (%s)",
              p_sys->fmt->name, p_sys->fmt->long_name );
     msg_Dbg( p_demux, "    - start time = "I64Fd,
-             ( p_sys->ic->start_time != AV_NOPTS_VALUE ) ?
+             ( p_sys->ic->start_time != (signed int) AV_NOPTS_VALUE ) ?
              p_sys->ic->start_time * 1000000 / AV_TIME_BASE : -1 );
     msg_Dbg( p_demux, "    - duration = "I64Fd,
-             ( p_sys->ic->duration != AV_NOPTS_VALUE ) ?
+             ( p_sys->ic->duration != (signed int) AV_NOPTS_VALUE ) ?
              p_sys->ic->duration * 1000000 / AV_TIME_BASE : -1 );
 
     return VLC_SUCCESS;
@@ -283,12 +283,12 @@ static int Demux( demux_t *p_demux )
 
     memcpy( p_frame->p_buffer, pkt.data, pkt.size );
 
-    i_start_time = ( p_sys->ic->start_time != AV_NOPTS_VALUE ) ?
+    i_start_time = ( p_sys->ic->start_time != (signed int) AV_NOPTS_VALUE ) ?
         p_sys->ic->start_time : 0;
 
-    p_frame->i_dts = ( pkt.dts == AV_NOPTS_VALUE ) ?
+    p_frame->i_dts = ( pkt.dts == (signed int) AV_NOPTS_VALUE ) ?
         0 : (pkt.dts - i_start_time) * 1000000 / AV_TIME_BASE;
-    p_frame->i_pts = ( pkt.pts == AV_NOPTS_VALUE ) ?
+    p_frame->i_pts = ( pkt.pts == (signed int) AV_NOPTS_VALUE ) ?
         0 : (pkt.pts - i_start_time) * 1000000 / AV_TIME_BASE;
 
 #ifdef AVFORMAT_DEBUG
@@ -329,7 +329,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
             }
 
-            if( p_sys->ic->duration != AV_NOPTS_VALUE && p_sys->i_pcr > 0 )
+            if( p_sys->ic->duration != (signed int) AV_NOPTS_VALUE && p_sys->i_pcr > 0 )
             {
                 *pf = (double)p_sys->i_pcr / (double)p_sys->ic->duration;
             }
@@ -344,10 +344,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 int64_t i_size = stream_Size( p_demux->s );
 
                 i64 = p_sys->i_pcr * i_size / i64 * f;
-                if( p_sys->ic->start_time != AV_NOPTS_VALUE )
+                if( p_sys->ic->start_time != (signed int) AV_NOPTS_VALUE )
                     i64 += p_sys->ic->start_time;
 
-                if( p_sys->ic->duration != AV_NOPTS_VALUE )
+                if( p_sys->ic->duration != (signed int) AV_NOPTS_VALUE )
                     i64 = p_sys->ic->duration * f;
 
                 msg_Warn( p_demux, "DEMUX_SET_POSITION: "I64Fd, i64 );
@@ -363,7 +363,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->ic->duration != AV_NOPTS_VALUE )
+            if( p_sys->ic->duration != (signed int) AV_NOPTS_VALUE )
             {
                 *pi64 = p_sys->ic->duration;
             }
@@ -377,7 +377,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            if( p_sys->ic->start_time != AV_NOPTS_VALUE )
+            if( p_sys->ic->start_time != (signed int) AV_NOPTS_VALUE )
                 i64 += p_sys->ic->start_time;
 
             msg_Warn( p_demux, "DEMUX_SET_TIME: "I64Fd, i64 );
