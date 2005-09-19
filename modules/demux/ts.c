@@ -500,6 +500,8 @@ static int Open( vlc_object_t *p_this )
         pid->b_seen     = VLC_FALSE;
         pid->b_valid    = VLC_FALSE;
     }
+    /* PID 8191 is padding */
+    p_sys->pid[8191].b_seen = VLC_TRUE;
     p_sys->i_packet_size = i_packet_size;
     p_sys->b_udp_out = VLC_FALSE;
     p_sys->i_ts_read = 50;
