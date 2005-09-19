@@ -86,7 +86,9 @@ struct decoder_sys_t
     int i_frame;
 
     /* Output buffer */
+    char *p_out_buffer;
     char *p_out;
+    unsigned int i_out;
 
     /* Codec params */
     void *context;
@@ -238,7 +240,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_subpacket = 0;
     p_sys->i_frame = 0;
 
-    p_sys->p_out = malloc( 4096 * 10 );
+    p_sys->p_out_buffer = malloc( 4096 * 10 );
+    p_sys->p_out = 0;
+    p_sys->i_out = 0;
 
     return VLC_SUCCESS;
 }
@@ -252,7 +256,7 @@ static void Close( vlc_object_t *p_this )
 
     CloseDll( p_dec );
     if( p_dec->p_sys->p_frame ) free( p_dec->p_sys->p_frame );
-    if( p_dec->p_sys->p_out ) free( p_dec->p_sys->p_out );
+    if( p_dec->p_sys->p_out_buffer ) free( p_dec->p_sys->p_out_buffer );
     free( p_dec->p_sys );
 }
 
@@ -267,8 +271,6 @@ static int OpenDll( decoder_t *p_dec )
     char *ppsz_path[] =
     {
       ".",
-      "z:\\home\\videolan\\vlc",
-      "/home/videolan/vlc",
 #ifndef WIN32
       "/usr/local/RealPlayer8/Codecs",
       "/usr/RealPlayer8/Codecs",
@@ -602,37 +604,25 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 #endif
 
-    /* If we have a full frame ready then we can start decoding */
-    if( p_sys->i_frame )
+    /* Output 1024 samples at a time
+     * (the audio output doesn't like big audio packets) */
+    if( p_sys->i_out )
     {
-        char *p_out = p_sys->p_out;
-        unsigned int i_out, i_result;
-        int i_samples;
+        int i_out;
+        int i_samples = p_sys->i_out * 8 /
+            p_dec->fmt_out.audio.i_bitspersample /
+              p_dec->fmt_out.audio.i_channels;
 
-        if( p_sys->dll )
-            i_result = p_sys->raDecode( p_sys->context, p_sys->p_frame +
-                                        p_sys->i_frame_size - p_sys->i_frame,
-                                        p_dec->fmt_in.audio.i_blockalign,
-                                        p_out, &i_out, -1 );
-        else
-            i_result = p_sys->wraDecode( p_sys->context, p_sys->p_frame +
-                                         p_sys->i_frame_size - p_sys->i_frame,
-                                         p_dec->fmt_in.audio.i_blockalign,
-                                         p_out, &i_out, -1 );
-
-        i_samples = i_out * 8 / p_dec->fmt_out.audio.i_bitspersample /
-            p_dec->fmt_out.audio.i_channels;
-
-#if 0
-        msg_Err( p_dec, "decoded: %i samples (%i)",
-		 i_samples, i_result );
-#endif
-
-        p_sys->i_frame -= p_dec->fmt_in.audio.i_blockalign;
+        i_samples = __MIN( i_samples, 1024 );
+        i_out = i_samples * p_dec->fmt_out.audio.i_bitspersample *
+            p_dec->fmt_out.audio.i_channels / 8;
 
         p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples );
         if( p_aout_buffer == NULL ) return NULL;
-        memcpy( p_aout_buffer->p_buffer, p_out, i_out );
+        memcpy( p_aout_buffer->p_buffer, p_sys->p_out, i_out );
+
+        p_sys->i_out -= i_out;
+        p_sys->p_out += i_out;
 
         /* Date management */
         p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
@@ -640,6 +630,35 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
             aout_DateIncrement( &p_sys->end_date, i_samples );
 
         return p_aout_buffer;
+    }
+
+    /* If we have a full frame ready then we can start decoding */
+    if( p_sys->i_frame )
+    {
+        unsigned int i_result;
+
+        p_sys->p_out = p_sys->p_out_buffer;
+
+        if( p_sys->dll )
+            i_result = p_sys->raDecode( p_sys->context, p_sys->p_frame +
+                                        p_sys->i_frame_size - p_sys->i_frame,
+                                        p_dec->fmt_in.audio.i_blockalign,
+                                        p_sys->p_out, &p_sys->i_out, -1 );
+        else
+            i_result = p_sys->wraDecode( p_sys->context, p_sys->p_frame +
+                                         p_sys->i_frame_size - p_sys->i_frame,
+                                         p_dec->fmt_in.audio.i_blockalign,
+                                         p_sys->p_out, &p_sys->i_out, -1 );
+
+#if 0
+        msg_Err( p_dec, "decoded: %i samples (%i)",
+                 p_sys->i_out * 8 / p_dec->fmt_out.audio.i_bitspersample /
+                 p_dec->fmt_out.audio.i_channels, i_result );
+#endif
+
+        p_sys->i_frame -= p_dec->fmt_in.audio.i_blockalign;
+
+        return Decode( p_dec, pp_block );
     }
 
 
