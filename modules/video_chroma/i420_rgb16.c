@@ -34,6 +34,9 @@
 #if defined (MODULE_NAME_IS_i420_rgb)
 #   include "i420_rgb_c.h"
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
+#   if defined(HAVE_MMX_INTRINSICS)
+#       include <mmintrin.h>
+#   endif
 #   include "i420_rgb_mmx.h"
 #endif
 
@@ -278,6 +281,13 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
             /* 15bpp 5/5/5 */
             for ( i_x = p_vout->render.i_width / 8; i_x--; )
             {
+#   if defined (HAVE_MMX_INTRINSICS)
+                __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+                INTRINSICS_INIT_16
+                INTRINSICS_YUV_MUL
+                INTRINSICS_YUV_ADD
+                INTRINSICS_UNPACK_15
+#   else
                 __asm__( MMX_INIT_16
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
@@ -286,6 +296,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                          MMX_YUV_ADD
                          MMX_UNPACK_15
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
 
                 p_y += 8;
                 p_u += 4;
@@ -298,6 +309,13 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
             /* 16bpp 5/6/5 */
             for ( i_x = p_vout->render.i_width / 8; i_x--; )
             {
+#   if defined (HAVE_MMX_INTRINSICS)
+                __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+                INTRINSICS_INIT_16
+                INTRINSICS_YUV_MUL
+                INTRINSICS_YUV_ADD
+                INTRINSICS_UNPACK_16
+#   else
                 __asm__( MMX_INIT_16
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
@@ -306,6 +324,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                          MMX_YUV_ADD
                          MMX_UNPACK_16
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
 
                 p_y += 8;
                 p_u += 4;
@@ -319,6 +338,11 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
          * at least we have all the pixels */
         if( i_rewind )
         {
+#if defined (MODULE_NAME_IS_i420_rgb_mmx)
+#   if defined (HAVE_MMX_INTRINSICS)
+            __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+#   endif
+#endif
             p_y -= i_rewind;
             p_u -= i_rewind >> 1;
             p_v -= i_rewind >> 1;
@@ -329,26 +353,43 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
             CONVERT_YUV_PIXEL(2);  CONVERT_Y_PIXEL(2);
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
+
+#   if defined (HAVE_MMX_INTRINSICS)
+            INTRINSICS_INIT_16
+#   else
             __asm__( MMX_INIT_16
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
 
             if( p_vout->output.i_rmask == 0x7c00 )
             {
                 /* 15bpp 5/5/5 */
+#   if defined (HAVE_MMX_INTRINSICS)
+                INTRINSICS_YUV_MUL
+                INTRINSICS_YUV_ADD
+                INTRINSICS_UNPACK_15
+#   else
                 __asm__( ".align 8"
                          MMX_YUV_MUL
                          MMX_YUV_ADD
                          MMX_UNPACK_15
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
             }
             else
             {
+#   if defined (HAVE_MMX_INTRINSICS)
+                INTRINSICS_YUV_MUL
+                INTRINSICS_YUV_ADD
+                INTRINSICS_UNPACK_16
+#   else
                 /* 16bpp 5/6/5 */
                 __asm__( ".align 8"
                          MMX_YUV_MUL
                          MMX_YUV_ADD
                          MMX_UNPACK_16
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
             }
 
             p_y += 8;
@@ -453,6 +494,13 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
+#   if defined (HAVE_MMX_INTRINSICS)
+            __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+            INTRINSICS_INIT_32
+            INTRINSICS_YUV_MUL
+            INTRINSICS_YUV_ADD
+            INTRINSICS_UNPACK_32
+#   else
             __asm__( MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
@@ -461,6 +509,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
                      MMX_YUV_ADD
                      MMX_UNPACK_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
 
             p_y += 8;
             p_u += 4;
@@ -473,6 +522,11 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
          * at least we have all the pixels */
         if( i_rewind )
         {
+#if defined (MODULE_NAME_IS_i420_rgb_mmx)
+#   if defined (HAVE_MMX_INTRINSICS)
+            __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+#   endif
+#endif
             p_y -= i_rewind;
             p_u -= i_rewind >> 1;
             p_v -= i_rewind >> 1;
@@ -483,6 +537,12 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
             CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
+#   if defined (HAVE_MMX_INTRINSICS)
+            INTRINSICS_INIT_32
+            INTRINSICS_YUV_MUL
+            INTRINSICS_YUV_ADD
+            INTRINSICS_UNPACK_32
+#   else
             __asm__( MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
@@ -491,6 +551,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
                      MMX_YUV_ADD
                      MMX_UNPACK_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
+#   endif
 
             p_y += 8;
             p_u += 4;

@@ -53,6 +53,13 @@ movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 #movl      $0, (%3)         # cache preload for image                       \n\
 "
 
+#define INTRINSICS_INIT_16 \
+    mm0 = (__m64)(uint64_t)*(uint32_t *)p_u; \
+    mm1 = (__m64)(uint64_t)*(uint32_t *)p_v; \
+    mm4 = (__m64)(uint64_t)0; \
+    mm6 = (__m64)*(uint64_t *)p_y; \
+    /* *(uint16_t *)p_buffer = 0; */
+
 #define MMX_INIT_16_GRAY "                                                  \n\
 movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 #movl      $0, (%3)         # cache preload for image                       \n\
@@ -65,6 +72,13 @@ movd      (%2), %%mm1       # Load 4 Cr       00 00 00 00 v3 v2 v1 v0       \n\
 pxor      %%mm4, %%mm4      # zero mm4                                      \n\
 movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 "
+
+#define INTRINSICS_INIT_32 \
+    mm0 = (__m64)(uint64_t)*(uint32_t *)p_u; \
+    *(uint16_t *)p_buffer = 0; \
+    mm1 = (__m64)(uint64_t)*(uint32_t *)p_v; \
+    mm4 = (__m64)(uint64_t)0; \
+    mm6 = (__m64)*(uint64_t *)p_y;
 
 /*
  * Do the multiply part of the conversion for even and odd pixels,
@@ -101,6 +115,30 @@ pmulhw    mmx_Y_coeff, %%mm6    # Mul 4 Y even    00 y6 00 y4 00 y2 00 y0   \n\
 pmulhw    mmx_Y_coeff, %%mm7    # Mul 4 Y odd     00 y7 00 y5 00 y3 00 y1   \n\
 "
 
+#define INTRINSICS_YUV_MUL \
+    mm0 = _mm_unpacklo_pi8(mm0, mm4); \
+    mm1 = _mm_unpacklo_pi8(mm1, mm4); \
+    mm0 = _mm_subs_pi16(mm0, (__m64)mmx_80w); \
+    mm1 = _mm_subs_pi16(mm1, (__m64)mmx_80w); \
+    mm0 = _mm_slli_pi16(mm0, 3); \
+    mm1 = _mm_slli_pi16(mm1, 3); \
+    mm2 = mm0; \
+    mm3 = mm1; \
+    mm2 = _mm_mulhi_pi16(mm2, (__m64)mmx_U_green); \
+    mm3 = _mm_mulhi_pi16(mm3, (__m64)mmx_V_green); \
+    mm0 = _mm_mulhi_pi16(mm0, (__m64)mmx_U_blue); \
+    mm1 = _mm_mulhi_pi16(mm1, (__m64)mmx_V_red); \
+    mm2 = _mm_adds_pi16(mm2, mm3); \
+    \
+    mm6 = _mm_subs_pu8(mm6, (__m64)mmx_10w); \
+    mm7 = mm6; \
+    mm6 = _mm_and_si64(mm6, (__m64)mmx_00ffw); \
+    mm7 = _mm_srli_pi16(mm7, 8); \
+    mm6 = _mm_slli_pi16(mm6, 3); \
+    mm7 = _mm_slli_pi16(mm7, 3); \
+    mm6 = _mm_mulhi_pi16(mm6, (__m64)mmx_Y_coeff); \
+    mm7 = _mm_mulhi_pi16(mm7, (__m64)mmx_Y_coeff);
+
 /*
  * Do the addition part of the conversion for even and odd pixels,
  * register usage:
@@ -136,6 +174,29 @@ punpcklbw %%mm3, %%mm0          #                 B7 B6 B5 B4 B3 B2 B1 B0   \n\
 punpcklbw %%mm4, %%mm1          #                 R7 R6 R5 R4 R3 R2 R1 R0   \n\
 punpcklbw %%mm5, %%mm2          #                 G7 G6 G5 G4 G3 G2 G1 G0   \n\
 "
+
+#define INTRINSICS_YUV_ADD \
+    mm3 = mm0; \
+    mm4 = mm1; \
+    mm5 = mm2; \
+    mm0 = _mm_adds_pi16(mm0, mm6); \
+    mm3 = _mm_adds_pi16(mm3, mm7); \
+    mm1 = _mm_adds_pi16(mm1, mm6); \
+    mm4 = _mm_adds_pi16(mm4, mm7); \
+    mm2 = _mm_adds_pi16(mm2, mm6); \
+    mm5 = _mm_adds_pi16(mm5, mm7); \
+    \
+    mm0 = _mm_packs_pu16(mm0, mm0); \
+    mm1 = _mm_packs_pu16(mm1, mm1); \
+    mm2 = _mm_packs_pu16(mm2, mm2); \
+    \
+    mm3 = _mm_packs_pu16(mm3, mm3); \
+    mm4 = _mm_packs_pu16(mm4, mm4); \
+    mm5 = _mm_packs_pu16(mm5, mm5); \
+    \
+    mm0 = _mm_unpacklo_pi8(mm0, mm3); \
+    mm1 = _mm_unpacklo_pi8(mm1, mm4); \
+    mm2 = _mm_unpacklo_pi8(mm2, mm5);
 
 /*
  * Grayscale case, only use Y
@@ -215,6 +276,31 @@ movd      4(%2), %%mm1          # Load 4 Cr       __ __ __ __ v3 v2 v1 v0   \n\
 movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
 "
 
+#define INTRINSICS_UNPACK_15 \
+    mm0 = _mm_and_si64(mm0, (__m64)mmx_mask_f8); \
+    mm0 = _mm_srli_pi16(mm0, 3); \
+    mm2 = _mm_and_si64(mm2, (__m64)mmx_mask_f8); \
+    mm1 = _mm_and_si64(mm1, (__m64)mmx_mask_f8); \
+    mm1 = _mm_srli_pi16(mm1, 1); \
+    mm4 = (__m64)(uint64_t)0; \
+    mm5 = mm0; \
+    mm7 = mm2; \
+    \
+    mm2 = _mm_unpacklo_pi8(mm2, mm4); \
+    mm0 = _mm_unpacklo_pi8(mm0, mm1); \
+    mm2 = _mm_slli_pi16(mm2, 2); \
+    mm0 = _mm_or_si64(mm0, mm2); \
+    mm6 = (__m64)*(uint64_t *)(p_y + 8); \
+    *(uint64_t *)p_buffer = (uint64_t)mm0; \
+    \
+    mm7 = _mm_unpackhi_pi8(mm7, mm4); \
+    mm5 = _mm_unpackhi_pi8(mm5, mm1); \
+    mm7 = _mm_slli_pi16(mm7, 2); \
+    mm0 = (__m64)(uint64_t)*(uint32_t *)(p_u + 4); \
+    mm5 = _mm_or_si64(mm5, mm7); \
+    mm1 = (__m64)(uint64_t)*(uint32_t *)(p_v + 4); \
+    *(uint64_t *)(p_buffer + 4) = (uint64_t)mm5;
+
 /*
  * convert RGB plane to RGB 16 bits,
  * mm0 -> B, mm1 -> R, mm2 -> G,
@@ -249,6 +335,30 @@ por       %%mm7, %%mm5          # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3       \n\
 movd      4(%2), %%mm1          # Load 4 Cr       __ __ __ __ v3 v2 v1 v0   \n\
 movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
 "
+
+#define INTRINSICS_UNPACK_16 \
+    mm0 = _mm_and_si64(mm0, (__m64)mmx_mask_f8); \
+    mm2 = _mm_and_si64(mm2, (__m64)mmx_mask_fc); \
+    mm1 = _mm_and_si64(mm1, (__m64)mmx_mask_f8); \
+    mm0 = _mm_srli_pi16(mm0, 3); \
+    mm4 = (__m64)(uint64_t)0; \
+    mm5 = mm0; \
+    mm7 = mm2; \
+    \
+    mm2 = _mm_unpacklo_pi8(mm2, mm4); \
+    mm0 = _mm_unpacklo_pi8(mm0, mm1); \
+    mm2 = _mm_slli_pi16(mm2, 3); \
+    mm0 = _mm_or_si64(mm0, mm2); \
+    mm6 = (__m64)*(uint64_t *)(p_y + 8); \
+    *(uint64_t *)p_buffer = (uint64_t)mm0; \
+    \
+    mm7 = _mm_unpackhi_pi8(mm7, mm4); \
+    mm5 = _mm_unpackhi_pi8(mm5, mm1); \
+    mm7 = _mm_slli_pi16(mm7, 3); \
+    mm0 = (__m64)(uint64_t)*(uint32_t *)(p_u + 4); \
+    mm5 = _mm_or_si64(mm5, mm7); \
+    mm1 = (__m64)(uint64_t)*(uint32_t *)(p_v + 4); \
+    *(uint64_t *)(p_buffer + 4) = (uint64_t)mm5;
 
 /*
  * convert RGB plane to RGB packed format,
@@ -285,4 +395,27 @@ movq      %%mm4, 24(%3) # Store ARGB7 ARGB6                                 \n\
 #pxor      %%mm4, %%mm4  # zero mm4                                          \n\
 #movq      8(%0), %%mm6  # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0           \n\
 "
+
+#define INTRINSICS_UNPACK_32 \
+    mm3 = (__m64)(uint64_t)0; \
+    mm6 = mm0; \
+    mm7 = mm1; \
+    mm4 = mm0; \
+    mm5 = mm1; \
+    mm6 = _mm_unpacklo_pi8(mm6, mm2); \
+    mm7 = _mm_unpacklo_pi8(mm7, mm3); \
+    mm6 = _mm_unpacklo_pi16(mm6, mm7); \
+    *(uint64_t *)p_buffer = (uint64_t)mm6; \
+    mm6 = mm0; \
+    mm6 = _mm_unpacklo_pi8(mm6, mm2); \
+    mm6 = _mm_unpackhi_pi16(mm6, mm7); \
+    *(uint64_t *)(p_buffer + 2) = (uint64_t)mm6; \
+    mm4 = _mm_unpackhi_pi8(mm4, mm2); \
+    mm5 = _mm_unpackhi_pi8(mm5, mm3); \
+    mm4 = _mm_unpacklo_pi16(mm4, mm5); \
+    *(uint64_t *)(p_buffer + 4) = (uint64_t)mm4; \
+    mm4 = mm0; \
+    mm4 = _mm_unpackhi_pi8(mm4, mm2); \
+    mm4 = _mm_unpackhi_pi16(mm4, mm5); \
+    *(uint64_t *)(p_buffer + 6) = (uint64_t)mm4; \
 
