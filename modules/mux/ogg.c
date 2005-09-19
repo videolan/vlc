@@ -729,7 +729,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
 
             /* comment */
             com[0] = PACKET_TYPE_COMMENT;
-            i_com = snprintf( &com[1], 128, PACKAGE_VERSION" stream output" )
+            i_com = snprintf( &com[1], 127, PACKAGE_VERSION" stream output" )
                      + 1;
             op.packet = com;
             op.bytes  = i_com;
