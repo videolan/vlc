@@ -378,13 +378,13 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     int16_t p_dest[FFT_BUFFER_SIZE];      /* Adapted FFT result */
     int16_t p_buffer1[FFT_BUFFER_SIZE];   /* Buffer on which we perform
                                              the FFT (first channel) */
-    i_line = 0;
-
     float *p_buffl =                     /* Original buffer */
             (float*)p_buffer->p_buffer;
 
     int16_t  *p_buffs;                    /* int16_t converted buffer */
     int16_t  *p_s16_buff = NULL;                /* int16_t converted buffer */
+
+    i_line = 0;
 
     p_s16_buff = (int16_t*)malloc(
               p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
