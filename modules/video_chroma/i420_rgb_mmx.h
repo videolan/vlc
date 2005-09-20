@@ -356,15 +356,18 @@ movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
     mm0 = _mm_unpacklo_pi8(mm0, mm1); \
     mm2 = _mm_slli_pi16(mm2, 3); \
     mm0 = _mm_or_si64(mm0, mm2); \
-    mm6 = (__m64)*(uint64_t *)(p_y + 8); \
+    tmp64 = *(uint64_t *)(p_y + 8); \
+    mm6 = (__m64)tmp64; \
     *(uint64_t *)p_buffer = (uint64_t)mm0; \
     \
     mm7 = _mm_unpackhi_pi8(mm7, mm4); \
     mm5 = _mm_unpackhi_pi8(mm5, mm1); \
     mm7 = _mm_slli_pi16(mm7, 3); \
-    mm0 = (__m64)(uint64_t)*(uint32_t *)(p_u + 4); \
+    tmp64 = (uint64_t)*(uint32_t *)(p_u + 4); \
+    mm0 = (__m64)tmp64; \
     mm5 = _mm_or_si64(mm5, mm7); \
-    mm1 = (__m64)(uint64_t)*(uint32_t *)(p_v + 4); \
+    tmp64 = (uint64_t)*(uint32_t *)(p_v + 4); \
+    mm1 = (__m64)tmp64; \
     *(uint64_t *)(p_buffer + 4) = (uint64_t)mm5;
 
 /*
