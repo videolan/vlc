@@ -283,6 +283,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
             {
 #   if defined (HAVE_MMX_INTRINSICS)
                 __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+                uint64_t tmp64;
                 INTRINSICS_INIT_16
                 INTRINSICS_YUV_MUL
                 INTRINSICS_YUV_ADD
@@ -311,6 +312,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
             {
 #   if defined (HAVE_MMX_INTRINSICS)
                 __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+                uint64_t tmp64;
                 INTRINSICS_INIT_16
                 INTRINSICS_YUV_MUL
                 INTRINSICS_YUV_ADD
@@ -341,6 +343,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
 #if defined (MODULE_NAME_IS_i420_rgb_mmx)
 #   if defined (HAVE_MMX_INTRINSICS)
             __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+            uint64_t tmp64;
 #   endif
 #endif
             p_y -= i_rewind;
@@ -496,6 +499,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
 #   if defined (HAVE_MMX_INTRINSICS)
             __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+            uint64_t tmp64;
             INTRINSICS_INIT_32
             INTRINSICS_YUV_MUL
             INTRINSICS_YUV_ADD
@@ -525,6 +529,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
 #if defined (MODULE_NAME_IS_i420_rgb_mmx)
 #   if defined (HAVE_MMX_INTRINSICS)
             __m64 mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+            uint64_t tmp64;
 #   endif
 #endif
             p_y -= i_rewind;
