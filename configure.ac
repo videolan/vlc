@@ -1183,8 +1183,8 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
    CFLAGS="${CFLAGS_save}"
   ])
 
-if test "${ac_cv_c_maltivec}" != "no"; then
-  CPPFLAGS="${CPPFLAGS_save} ${ac_cv_c_maltivec}"
+if test "${ac_cv_c_altivec}" != "no"; then
+  CPPFLAGS="${CPPFLAGS_save} ${ac_cv_c_altivec}"
 fi
 AC_CHECK_HEADERS(altivec.h)
 CPPFLAGS="${CPPFLAGS_save}"
