@@ -401,14 +401,13 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 
             p = psz_dest = strdup( psz_src );
 
-            while( *psz_src != '\0' )
+            while( *psz_src )
             {
-                if( *psz_src == '\\' )
+                if( *psz_src == '\\' && *(psz_src + 1) )
                 {
-                    *psz_src++;
+                    psz_src++;
                 }
-                *p++ = *psz_src;
-                psz_src++;
+                *p++ = *psz_src++;
             }
             *p = '\0';
 
