@@ -78,6 +78,9 @@ else
 # Building natively
 RANLIB=ranlib
 endif
+ifeq ($(HOST),i586-pc-beos)
+FFMPEGCONF+=--cpu=x86
+endif
 
 # ***************************************************************************
 # Standard rules
