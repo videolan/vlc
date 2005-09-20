@@ -1,3 +1,15 @@
+diff -ru speex-1.1.10/libspeex/stack_alloc.h speex/libspeex/stack_alloc.h
+--- speex-1.1.10/libspeex/stack_alloc.h	2005-04-25 07:58:00.000000000 +0000
++++ speex/libspeex/stack_alloc.h	2005-09-20 19:59:55.049666072 +0000
+@@ -64,7 +64,7 @@
+ 
+ #endif
+ 
+-#if defined(VAR_ARRAYS)
++#if defined(VAR_ARRAYS) && !( defined(__GNUC__) && __GNUC__ < 3 )
+ #define VARDECL(var) 
+ #define ALLOC(var, size, type) type var[size]
+ #elif defined(USE_ALLOCA)
 diff -ruN speex-1.1.10/Makefile.am speex/Makefile.am
 --- speex-1.1.10/Makefile.am	Thu Jun  9 08:22:08 2005
 +++ speex/Makefile.am	Fri Aug 26 14:55:35 2005
