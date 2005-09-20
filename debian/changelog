@@ -1,3 +1,26 @@
+vlc (0.8.4-svn20050920-1) unstable; urgency=low
+
+  * New SVN snapshot.
+  * configure.ac:
+    + Upstream fixed the AltiVec build on PPC.
+  * debian/control:
+    + Build-depend on a newer version of libavcodec. mp2v and mp1v encoders
+      work again (Closes: #324840).
+    + Build-depend on gcc-snapshot on i386 and amd64, because currently only
+      that version of gcc properly builds some of the MMX modules.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 20 Sep 2005 13:43:41 +0200
+
+vlc (0.8.4-svn20050823-2) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend on libflac-dev (>= 1.1.2-3) because of the soname
+      change (Closes: #325948).
+  * debian/copyright:
+    + Fixed the FSF address.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu,  1 Sep 2005 12:36:10 +0200
+
 vlc (0.8.4-svn20050823-1) unstable; urgency=low
 
   * New SVN snapshot.

@@ -75,6 +75,16 @@ CONFIG_FLAGS += --enable-glide
 CONFIG_FLAGS += --enable-svgalib
 endif
 
+# We need this hack for i386 and amd64
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
+CC = $(shell pwd)/debian/gcc-snapshot
+export CC
+endif
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),amd64)
+CC = $(shell pwd)/debian/gcc-snapshot
+export CC
+endif
+
 # Remove --without-dvdcss in non-totalitarian countries
 CONFIG_FLAGS += --enable-dvd --without-dvdcss
 
@@ -82,6 +92,7 @@ CONFIG_FLAGS += --enable-dvd --without-dvdcss
 VIDDIR = usr/share/vlc
 PIXDIR = usr/share/pixmaps
 APPDIR = usr/share/applications
+
 
 #
 # Build rules
@@ -102,7 +113,8 @@ configure-stamp:
 	test -d extras/x264
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/x264 \
-	  && jam -dx libx264.a; \
+	  && ./configure --extra-cflags='$$(ECFLAGS)' \
+	  && $(MAKE); \
 	fi
 
 	# Check that we have an faad2 tree in here (can be a symlink)
@@ -137,11 +149,8 @@ build-stamp: patch configure-stamp
 	# Hackety hackety hack
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/x264 \
-	  && jam -dx clean \
-	  && rm -f Jamfile.pic \
-	  && sed 's/^CCFLAGS *=/& -fPIC -DPIC /' <Jamfile >Jamfile.pic \
-	  && jam -dx -sJAMFILE=Jamfile.pic libx264.a \
-	  && rm -f Jamfile.pic; \
+	  && $(MAKE) clean \
+	  && $(MAKE) ECFLAGS=-fPIC; \
 	fi
 
 	# HACKETY HACKETY HACK
@@ -164,7 +173,7 @@ clean: unpatch
 	# Check that we have an x264 tree in here (can be a symlink)
 	test -d extras/x264
 	-if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/x264 && jam -dx clean; \
+	  cd extras/x264 && $(MAKE) distclean; \
 	fi
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
