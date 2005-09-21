@@ -66,6 +66,7 @@
 
 #if LIBCDIO_VERSION_NUM >= 72
 #include <cdio/cdda.h>
+#include <cdio/paranoia.h>
 #else
 #define CdIo_t CdIo
 #endif    
