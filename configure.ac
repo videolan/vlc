@@ -709,7 +709,7 @@ dnl Check for hal
 AC_ARG_ENABLE(hal,
   [  --enable-hal            Linux HAL services discovery (default enabled)])
  
-if test "${enable_hal}" != "no"
+if test "${enable_hal}" != "no" -a "${SYS}" = "linux"
 then
   PKG_CHECK_MODULES(HAL, hal >= 0.2.97,
     [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
