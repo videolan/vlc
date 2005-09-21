@@ -2614,8 +2614,9 @@ char *FromLocale( const char *locale )
         while( vlc_iconv( libvlc.from_locale, &iptr, &inb, &optr, &outb )
                                                                == (size_t)-1 )
         {
-            *optr++ = '?';
-            *iptr++;
+            *optr = '?';
+            optr++;
+            iptr++;
             vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &libvlc.from_locale_lock );
@@ -2654,8 +2655,9 @@ char *ToLocale( const char *utf8 )
         while( vlc_iconv( libvlc.to_locale, &iptr, &inb, &optr, &outb )
                                                                == (size_t)-1 )
         {
-            *optr++ = '?'; /* should not happen, and yes, it sucks */
-            *iptr++;
+            *optr = '?'; /* should not happen, and yes, it sucks */
+            optr++;
+            iptr++;
             vlc_iconv( libvlc.to_locale, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &libvlc.to_locale_lock );
