@@ -863,7 +863,11 @@ live: live-$(LIVEDOTCOM_VERSION).tar.gz
 	patch -p 0 < Patches/live.patch
 
 .live: live
+ifeq ($(HOST),ppc-darwin)
+	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
+else
 	(cd $<; ./genMakefiles macosx && make )
+endif
 	touch $@
 
 CLEAN_FILE += .live
