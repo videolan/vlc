@@ -487,7 +487,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 {
     char psz_servbuf[6], *psz_serv;
     int i_servlen, i_val;
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
     /*
      * Here is the kind of kludge you need to keep binary compatibility among
      * varying OS versions...
@@ -509,7 +509,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         psz_serv = NULL;
         i_servlen = 0;
     }
-#ifdef WIN32    
+#if defined( WIN32 ) && !defined( UNDER_CE )
     wship6_module = LoadLibrary( "wship6.dll" );
     if( wship6_module != NULL )
     {
@@ -530,9 +530,8 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         FreeLibrary( wship6_module );
     }
 #endif
-#if HAVE_GETNAMEINFO
-    i_val = getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
-                         flags );
+#if defined( HAVE_GETNAMEINFO ) || defined( UNDER_CE )
+    i_val = getnameinfo(sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #else
     {
 # ifdef HAVE_USABLE_MUTEX_THAT_DONT_NEED_LIBVLC_POINTER
@@ -632,7 +631,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         }
     }
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
     {
         typedef int (CALLBACK * GETADDRINFO) ( const char *, const char *,
                                             const struct addrinfo *,
@@ -659,7 +658,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         }
     }
 #endif
-#if HAVE_GETADDRINFO
+#if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
     return getaddrinfo( psz_node, psz_service, &hints, res );
 #else
 {
@@ -681,7 +680,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
 void vlc_freeaddrinfo( struct addrinfo *infos )
 {
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
     typedef void (CALLBACK * FREEADDRINFO) ( struct addrinfo * );
     HINSTANCE wship6_module;
     FREEADDRINFO ws2_freeaddrinfo;
@@ -706,7 +705,7 @@ void vlc_freeaddrinfo( struct addrinfo *infos )
         FreeLibrary( wship6_module );
     }
 #endif
-#ifdef HAVE_GETADDRINFO
+#if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
     freeaddrinfo( infos );
 #else
     __freeaddrinfo( infos );
