@@ -125,7 +125,7 @@ along those lines:
   CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
   ./configure --host=i586-mingw32msvc --build=i386-linux \
       --disable-gtk \
-      --enable-nls --enable-sdl \
+      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
@@ -149,7 +149,7 @@ along those lines:
   CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
   ./configure --host=i586-mingw32msvc --build=i386-linux \
       --disable-gtk \
-      --enable-nls --enable-sdl \
+      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
@@ -174,7 +174,7 @@ emulation layer, use something like this:
   CC="gcc -mno-cygwin" CXX="g++ -mno-cygwin" \
   ./configure \
       --disable-gtk \
-      --enable-nls --enable-sdl \
+      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
@@ -198,7 +198,7 @@ lines:
   LDFLAGS=-L/usr/win32/lib \
   ./configure \
       --disable-gtk \
-      --enable-nls --enable-sdl \
+      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
