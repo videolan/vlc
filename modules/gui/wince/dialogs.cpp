@@ -383,14 +383,14 @@ void DialogsProvider::OnOpenDirectory( int i_arg )
     HMODULE ceshell_dll = LoadLibrary( _T("ceshell") );
     if( !ceshell_dll ) return;
 
-    HRESULT WINAPI (*SHGetMalloc)(LPMALLOC *) =
-        (HRESULT WINAPI (*)(LPMALLOC *))
+    HRESULT (WINAPI *SHGetMalloc)(LPMALLOC *) =
+        (HRESULT (WINAPI *)(LPMALLOC *))
         GetProcAddress( ceshell_dll, _T("SHGetMalloc") );
-    LPITEMIDLIST WINAPI (*SHBrowseForFolder)(LPBROWSEINFO) =
-        (LPITEMIDLIST WINAPI (*)(LPBROWSEINFO))
+    LPITEMIDLIST (WINAPI *SHBrowseForFolder)(LPBROWSEINFO) =
+        (LPITEMIDLIST (WINAPI *)(LPBROWSEINFO))
         GetProcAddress( ceshell_dll, _T("SHBrowseForFolder") );
-    BOOL WINAPI (*SHGetPathFromIDList)(LPCITEMIDLIST, LPTSTR) =
-        (BOOL WINAPI (*)(LPCITEMIDLIST, LPTSTR))
+    BOOL (WINAPI *SHGetPathFromIDList)(LPCITEMIDLIST, LPTSTR) =
+        (BOOL (WINAPI *)(LPCITEMIDLIST, LPTSTR))
         GetProcAddress( ceshell_dll, _T("SHGetPathFromIDList") );
 
     if( !SHGetMalloc || !SHBrowseForFolder || !SHGetPathFromIDList )
