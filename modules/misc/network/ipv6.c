@@ -28,18 +28,20 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <errno.h>
-#include <fcntl.h>
 
 #include <vlc/vlc.h>
 
+#include <errno.h>
+
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
 #endif
 
 #ifdef WIN32
