@@ -31,9 +31,7 @@
 
 #include "vlc_acl.h"
 
-#ifdef HAVE_ERRNO_H
 #include <errno.h>
-#endif
 
 #include "network.h"
 

@@ -33,28 +33,9 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
-
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
 #endif
-
-#if defined( WIN32 ) || defined( UNDER_CE )
-#   if defined(UNDER_CE) && defined(sockaddr_storage)
-#       undef sockaddr_storage
-#   endif
-#   include <io.h>
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   define ENETUNREACH WSAENETUNREACH
-#else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>
-#   endif
-#   include <netdb.h>
-#endif
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif

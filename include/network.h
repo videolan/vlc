@@ -30,8 +30,14 @@
 #   if defined(UNDER_CE) && defined(sockaddr_storage)
 #       undef sockaddr_storage
 #   endif
+#   if defined(UNDER_CE)
+#       define HAVE_STRUCT_ADDRINFO
+#   else
+#       include <io.h>
+#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
+#   define ENETUNREACH WSAENETUNREACH
 #else
 #   if HAVE_SYS_SOCKET_H
 #      include <sys/socket.h>

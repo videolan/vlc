@@ -34,18 +34,6 @@
 #include <vlc/sout.h>
 
 #include "network.h"
-#if defined( WIN32 ) || defined( UNDER_CE )
-#   if defined(UNDER_CE) && defined(sockaddr_storage)
-#       undef sockaddr_storage
-#   endif
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#else
-#   include <netdb.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>
-#   endif
-#endif
 #include "charset.h"
 
 /* SAP is always on that port */

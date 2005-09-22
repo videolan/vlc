@@ -27,30 +27,17 @@
 #include <stddef.h> /* size_t */
 #include <string.h> /* strncpy(), strlen(), memcpy(), memset(), strchr() */
 #include <stdlib.h> /* malloc(), free(), strtoul() */
-#include <sys/types.h>
-#ifdef HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-# include <netinet/in.h>
-#endif
 #include <errno.h>
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-#   if defined(UNDER_CE) && defined(sockaddr_storage)
-#       undef sockaddr_storage
-#   endif
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>
-#   endif
-#   include <netdb.h>
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
 #endif
-
+#ifdef HAVE_ARPA_INET_H
+#   include <arpa/inet.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#   include <netinet/in.h>
+#endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif

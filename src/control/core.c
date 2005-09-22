@@ -46,11 +46,12 @@
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
-
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
 #endif
-#include <sys/types.h>
+#ifdef HAVE_SYS_TYPES_H
+#    include <sys/types.h>
+#endif
 
 #define RAISE( c, m )  exception->code = c; \
                        exception->message = strdup(m);
