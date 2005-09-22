@@ -62,7 +62,11 @@ case $HOST in
 #	    echo "EXTRA_LDFLAGS = -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}" >> config.mak
         ;;
     i586-pc-beos)
-	    echo "EXTRA_LDFLAGS = -lnet" >> config.mak
+            if test -f /boot/beos/system/lib/libbind.so; then
+                echo "EXTRA_LDFLAGS = -lbind -lsocket" >> config.mak
+            else
+                echo "EXTRA_LDFLAGS = -lnet" >> config.mak
+            fi
         ;;
     *)
         ;;
