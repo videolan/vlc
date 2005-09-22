@@ -994,8 +994,8 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 /* several type definitions */
 #   if defined( __MINGW32__ )
 #       if !defined( _OFF_T_ )
-typedef long long _off_t;
-typedef _off_t off_t;
+            typedef long long _off_t;
+            typedef _off_t off_t;
 #           define _OFF_T_
 #       else
 #           ifdef off_t
@@ -1005,17 +1005,15 @@ typedef _off_t off_t;
 #       endif
 #   endif
 
-/*
-#   if (defined( _MSC_VER ) && (!defined(__WXMSW__)))
+#   if defined( _MSC_VER ) && !defined( __WXMSW__ )
 #       if !defined( _OFF_T_DEFINED )
-typedef __int64 off_t;
+            typedef __int64 off_t;
 #           define _OFF_T_DEFINED
 #       else
+            /* for wx compatibility typedef long off_t; */
 #           define off_t __int64
-            // for wx compatibility typedef long off_t;
 #       endif
 #   endif
-*/
 
 #   if defined( __BORLANDC__ )
 #       undef off_t
