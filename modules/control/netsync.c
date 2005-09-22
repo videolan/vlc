@@ -32,32 +32,11 @@
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
-
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
 #endif
-#include <sys/types.h>
-
-#ifdef WIN32
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
-#else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   if HAVE_ARPA_INET_H
-#      include <arpa/inet.h>
-#   elif defined( SYS_BEOS )
-#      include <net/netdb.h>
-#   endif
-#endif
-
-#ifdef UNDER_CE
-#   define close(a) CloseHandle(a);
-#elif defined( WIN32 )
-#   define close(a) closesocket(a);
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
 #endif
 
 #include "network.h"
