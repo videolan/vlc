@@ -95,9 +95,9 @@ else
   autopoint=:
   GETTEXT=old
 fi;else
-  # we don't have gettext. grmbl. try to continue anyway.
-  autopoint=:
-  GETTEXT=no
+  set +x
+  echo "you need gettextize (package gettext-devel or gettext)"
+  exit 1
 fi
 
 # Check for pkg-config
@@ -439,17 +439,8 @@ set +x
 ##
 ##  Tell the user about gettext, pkg-config and sed
 ##
-case "${GETTEXT}" in
-  yes) ;;
-  no) cat << EOF
-
-===========================================================
-IMPORTANT NOTE: you do not have gettext installed on your
-system. The vlc build will work, but you will not have
-internationalization support. We suggest installing gettext.
-EOF
-  ;;
-  old) cat << EOF
+if [ "${GETTEXT}" == "old" ]; then
+  cat << EOF
 
 ==========================================================
 NOTE: you have an old version of gettext installed on your
@@ -458,11 +449,10 @@ have libintl you will not have internationalization support.
 We suggest upgrading to gettext 0.11.5 or later.
 EOF
   ;;
-esac
+fi
 
-case "$PKGCONFIG" in
-  yes) ;;
-  no) cat << EOF
+if [ "$PKGCONFIG" == "no" ]; then
+  cat << EOF
 
 ==============================================================
 NOTE: you do not have the "pkg-config" utility on your system;
@@ -470,11 +460,10 @@ detection of the Gtk-2.0 and GNOME 2.0 libraries will not be
 reliable.
 EOF
   ;;
-esac
+fi
 
-case "$AUTOMAKESUCKS" in
-  no) ;;
-  yes) cat << EOF
+if [ "$AUTOMAKESUCKS" == "yes" ]; then
+  cat << EOF
 
 =============================================================
 IMPORTANT NOTE: your version of automake has a bug which will
@@ -483,11 +472,10 @@ the --disable-plugins flag, or use a version of automake newer
 than 1.6.1 (1.6.2 is OK, and so are the 1.5 series).
 EOF
   ;;
-esac
+fi
 
-case "$INSTALLSUCKS" in
-  no) ;;
-  yes) cat << EOF
+if [ "$INSTALLSUCKS" == "yes" ]; then
+  cat << EOF
 
 =============================================================
 IMPORTANT NOTE: your version of automake has a bug which will
@@ -496,5 +484,5 @@ version of automake, or use a version of automake newer than 1.5
 (such as 1.6 or 1.7).
 EOF
   ;;
-esac
+fi
 
