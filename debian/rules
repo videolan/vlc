@@ -7,12 +7,17 @@
 #export DH_VERBOSE=1
 include /usr/share/dpatch/dpatch.make
 
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+confflags = --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) 
+
 #
 # Compilation options
 #
-
-CONFIG_FLAGS = --enable-release --prefix=/usr
-CONFIG_FLAGS += \
+vlc_confflags = --enable-release --prefix=/usr
+vlc_confflags += \
 	--disable-gnome \
 	--disable-gtk \
 	--disable-familiar \
@@ -66,13 +71,13 @@ CONFIG_FLAGS += \
 	$(NULL)
 
 # These ones are currently shipped with VLC
-CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad2
-CONFIG_FLAGS += --enable-x264 --with-x264-tree=extras/x264
+vlc_confflags += --enable-faad --with-faad-tree=extras/faad2
+vlc_confflags += --enable-x264 --with-x264-tree=extras/x264
 
 # Glide and svgalib are only for x86
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
-CONFIG_FLAGS += --enable-glide
-CONFIG_FLAGS += --enable-svgalib
+vlc_confflags += --enable-glide
+vlc_confflags += --enable-svgalib
 endif
 
 # We need this hack for i386 and amd64
@@ -86,7 +91,7 @@ export CC
 endif
 
 # Remove --without-dvdcss in non-totalitarian countries
-CONFIG_FLAGS += --enable-dvd --without-dvdcss
+vlc_confflags += --enable-dvd --without-dvdcss
 
 # A few shortcuts
 VIDDIR = usr/share/vlc
@@ -111,29 +116,25 @@ configure-stamp:
 
 	# Check that we have an x264 tree in here (can be a symlink)
 	test -d extras/x264
-	if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/x264 \
-	  && ./configure --extra-cflags='$$(ECFLAGS)' \
-	  && $(MAKE); \
-	fi
+	cd extras/x264 \
+	 && ./configure $(confflags) --extra-cflags='$$(ECFLAGS)' \
+	 && $(MAKE)
 
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
-	if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/faad2 \
-	  && touch `find . -name configure.in` \
-	  && touch `find . -name aclocal.m4` \
-	  && touch `find . -name configure` \
-	  && touch `find . -name config.h.in` \
-	  && touch `find . -name Makefile.in` \
-	  && ./configure --disable-shared \
-	  && cd libfaad \
-	  && $(MAKE); \
-	fi
+	cd extras/faad2 \
+	 && touch `find . -name configure.in` \
+	 && touch `find . -name aclocal.m4` \
+	 && touch `find . -name configure` \
+	 && touch `find . -name config.h.in` \
+	 && touch `find . -name Makefile.in` \
+	 && ./configure $(confflags) --disable-shared \
+	 && cd libfaad \
+	 && $(MAKE)
 
 	# Configure VLC
 	./configure --mandir=$${prefix}/share/man \
-	  --infodir=$${prefix}/share/info $(CONFIG_FLAGS)
+	  --infodir=$${prefix}/share/info $(confflags) $(vlc_confflags)
 
 	touch configure-stamp
 
@@ -147,18 +148,10 @@ build-stamp: patch configure-stamp
 	$(MAKE) vlc
 
 	# Hackety hackety hack
-	if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/x264 \
-	  && $(MAKE) clean \
-	  && $(MAKE) ECFLAGS=-fPIC; \
-	fi
+	cd extras/x264 && $(MAKE) clean && $(MAKE) ECFLAGS=-fPIC
 
 	# HACKETY HACKETY HACK
-	if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/faad2/libfaad \
-	  && $(MAKE) clean \
-	  && $(MAKE) AM_CFLAGS=-fPIC; \
-	fi
+	cd extras/faad2/libfaad && $(MAKE) clean && $(MAKE) AM_CFLAGS=-fPIC
 
 	# Build all the rest, with the PIC libs
 	AM_MAKEFLAGS='builtin=no' $(MAKE)
@@ -172,14 +165,10 @@ clean: unpatch
 
 	# Check that we have an x264 tree in here (can be a symlink)
 	test -d extras/x264
-	-if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/x264 && $(MAKE) distclean; \
-	fi
+	-cd extras/x264 && $(MAKE) distclean
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
-	-if test ! '(' -d CVS -o -d .svn ')'; then \
-	  cd extras/faad2 && $(MAKE) distclean; \
-	fi
+	-cd extras/faad2 && $(MAKE) distclean
 
 	# Clean zsh completion stuff
 	rm -f extras/zsh
