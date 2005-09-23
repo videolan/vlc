@@ -448,7 +448,6 @@ system. The vlc build will work, but if your system does not
 have libintl you will not have internationalization support.
 We suggest upgrading to gettext 0.11.5 or later.
 EOF
-  ;;
 fi
 
 if [ "$PKGCONFIG" == "no" ]; then
@@ -459,7 +458,6 @@ NOTE: you do not have the "pkg-config" utility on your system;
 detection of the Gtk-2.0 and GNOME 2.0 libraries will not be
 reliable.
 EOF
-  ;;
 fi
 
 if [ "$AUTOMAKESUCKS" == "yes" ]; then
@@ -471,7 +469,6 @@ prevent proper plugin compilation. Either compile VLC with
 the --disable-plugins flag, or use a version of automake newer
 than 1.6.1 (1.6.2 is OK, and so are the 1.5 series).
 EOF
-  ;;
 fi
 
 if [ "$INSTALLSUCKS" == "yes" ]; then
@@ -483,6 +480,5 @@ prevent proper installation. Do not use "make install" with this
 version of automake, or use a version of automake newer than 1.5
 (such as 1.6 or 1.7).
 EOF
-  ;;
 fi
 
