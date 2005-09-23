@@ -20,6 +20,9 @@ dnl them. And we need the comma otherwize automake will choke on it.
 AM_INIT_AUTOMAKE(vlc,0.8.4-svn)
 AM_CONFIG_HEADER(config.h)
 
+dnl HA! HA!
+AM_MAINTAINER_MODE
+
 dnl
 dnl  Save *FLAGS
 dnl

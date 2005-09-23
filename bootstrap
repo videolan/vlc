@@ -228,8 +228,10 @@ _plugin.a_plugin\$(LIBEXT):
 	echo \$\$ld \$< \$\$ldfl ; \
 	\$\$ld \$< \$\$ldfl
 
+if MAINTAINER_MODE
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
 	cd \$(top_srcdir) && \$(SHELL) ./bootstrap
+endif
 
 mostlyclean-local:
 	-rm -f *.a *\$(LIBEXT)
