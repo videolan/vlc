@@ -322,14 +322,14 @@ D: Portaudio audio output
 S: France
 
 N: Jean-Paul Saman
-E: jean-paul dot saman#planet dot nl
+E: jp_dot_saman#videolan_dot_nl
 D: libmad plug-in
 D: iPAQ port
-D: Familiar and PDA Linux interface
-D: Opie PDA Linux interface
+D: PDA (Familiar Linux) interface 
 D: Dutch Translation
 D: DVB-S/C/T on v4l2 API
 D: HD1000 port 
+D: OSD menu
 S: Netherlands
 
 N: Arnaud Schauly
