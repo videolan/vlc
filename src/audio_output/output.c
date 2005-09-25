@@ -189,6 +189,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FormatPrint( p_aout, "mixer", &p_aout->output.output );
 
     /* Create filters. */
+    p_aout->output.i_nb_filters = 0;
     if ( aout_FiltersCreatePipeline( p_aout, p_aout->output.pp_filters,
                                      &p_aout->output.i_nb_filters,
                                      &p_aout->mixer.mixer,

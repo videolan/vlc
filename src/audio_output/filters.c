@@ -116,36 +116,49 @@ static int SplitConversion( const audio_sample_format_t * p_input_format,
     return 2;
 }
 
+static void ReleaseFilter( aout_filter_t * p_filter )
+{
+    module_Unneed( p_filter, p_filter->p_module );
+    vlc_object_detach( p_filter );
+    vlc_object_destroy( p_filter );
+}
+
 /*****************************************************************************
  * aout_FiltersCreatePipeline: create a filters pipeline to transform a sample
  *                             format to another
  *****************************************************************************
- * TODO : allow the user to add/remove specific filters
+ * pi_nb_filters must be initialized before calling this function
  *****************************************************************************/
 int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
-                                aout_filter_t ** pp_filters,
+                                aout_filter_t ** pp_filters_start,
                                 int * pi_nb_filters,
                                 const audio_sample_format_t * p_input_format,
                                 const audio_sample_format_t * p_output_format )
 {
+    aout_filter_t** pp_filters = pp_filters_start + *pi_nb_filters;
     audio_sample_format_t temp_format;
     int i_nb_conversions;
 
     if ( AOUT_FMTS_IDENTICAL( p_input_format, p_output_format ) )
     {
         msg_Dbg( p_aout, "no need for any filter" );
-        *pi_nb_filters = 0;
         return 0;
     }
 
     aout_FormatsPrint( p_aout, "filter(s)", p_input_format, p_output_format );
+
+    if( *pi_nb_filters + 1 > AOUT_MAX_FILTERS )
+    {
+        msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
+        return -1;
+    }
 
     /* Try to find a filter to do the whole conversion. */
     pp_filters[0] = FindFilter( p_aout, p_input_format, p_output_format );
     if ( pp_filters[0] != NULL )
     {
         msg_Dbg( p_aout, "found a filter for the whole conversion" );
-        *pi_nb_filters = 1;
+        ++*pi_nb_filters;
         return 0;
     }
 
@@ -177,6 +190,12 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
 
     /* We have the first stage of the conversion. Find a filter for
      * the rest. */
+    if( *pi_nb_filters + 2 > AOUT_MAX_FILTERS )
+    {
+        ReleaseFilter( pp_filters[0] );
+        msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
+        return -1;
+    }
     pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
                                 p_output_format );
     if ( pp_filters[1] == NULL )
@@ -186,10 +205,16 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                                            p_output_format, &temp_format );
         if ( !i_nb_conversions )
         {
-            vlc_object_detach( pp_filters[0] );
-            vlc_object_destroy( pp_filters[0] );
+            ReleaseFilter( pp_filters[0] );
             msg_Err( p_aout,
               "couldn't find a filter for the second part of the conversion" );
+            return -1;
+        }
+        if( *pi_nb_filters + 3 > AOUT_MAX_FILTERS )
+        {
+            ReleaseFilter( pp_filters[0] );
+            msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
+            return -1;
         }
         pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
                                     &temp_format );
@@ -198,31 +223,28 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
 
         if ( pp_filters[1] == NULL || pp_filters[2] == NULL )
         {
-            vlc_object_detach( pp_filters[0] );
-            vlc_object_destroy( pp_filters[0] );
+            ReleaseFilter( pp_filters[0] );
             if ( pp_filters[1] != NULL )
             {
-                vlc_object_detach( pp_filters[1] );
-                vlc_object_destroy( pp_filters[1] );
+                ReleaseFilter( pp_filters[1] );
             }
             if ( pp_filters[2] != NULL )
             {
-                vlc_object_detach( pp_filters[2] );
-                vlc_object_destroy( pp_filters[2] );
+                ReleaseFilter( pp_filters[2] );
             }
             msg_Err( p_aout,
                "couldn't find filters for the second part of the conversion" );
+            return -1;
         }
-        *pi_nb_filters = 3;
+        *pi_nb_filters += 3;
+        msg_Dbg( p_aout, "found 3 filters for the whole conversion" );
     }
     else
     {
-        *pi_nb_filters = 2;
+        *pi_nb_filters += 2;
+        msg_Dbg( p_aout, "found 2 filters for the whole conversion" );
     }
 
-    /* We have enough filters. */
-    msg_Dbg( p_aout, "found %d filters for the whole conversion",
-             *pi_nb_filters );
     return 0;
 }
 

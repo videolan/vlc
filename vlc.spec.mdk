@@ -808,6 +808,7 @@ rm -fr %buildroot
 
 %dir %_libdir/vlc/audio_filter
 %_libdir/vlc/audio_filter/libbandlimited_resampler_plugin.so
+%_libdir/vlc/audio_filter/libdolby_surround_decoder_plugin.so
 %_libdir/vlc/audio_filter/libdtstospdif_plugin.so
 %_libdir/vlc/audio_filter/libfixed32tofloat32_plugin.so
 %_libdir/vlc/audio_filter/libfixed32tos16_plugin.so

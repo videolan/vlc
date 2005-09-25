@@ -109,6 +109,8 @@ $Id$
 
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
 
+ * dolby_surround_decoder: simple decoder for dolby surround encoded streams
+
  * dshow: DirectShow access plugin for encoding cards under Windows
 
  * dts: DTS basic parser/packetizer

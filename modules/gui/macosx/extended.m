@@ -366,9 +366,9 @@ static VLCExtended *_o_sharedInstance = nil;
     /* en-/disable headphone virtualisation */
     if ([o_ckb_hdphnVirt state] == NSOnState)
     {
-        [self changeAFiltersString: "headphone" onOrOff: VLC_TRUE ];
+        [self changeAFiltersString: "headphone_channel_mixer" onOrOff: VLC_TRUE ];
     }else{
-        [self changeAFiltersString: "headphone" onOrOff: VLC_FALSE ];
+        [self changeAFiltersString: "headphone_channel_mixer" onOrOff: VLC_FALSE ];
     }
 }
 

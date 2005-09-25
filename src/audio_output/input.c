@@ -37,66 +37,37 @@
 #include "audio_output.h"
 #include "aout_internal.h"
 
+static void inputFailure( aout_instance_t *, aout_input_t *, char * );
 static int VisualizationCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int EqualizerCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
-static aout_filter_t * allocateUserChannelMixer( aout_instance_t *,
-                                                 audio_sample_format_t *,
-                                                 audio_sample_format_t * );
 
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
-    audio_sample_format_t user_filter_format;
-    audio_sample_format_t intermediate_format;/* input of resampler */
+    audio_sample_format_t chain_input_format;
+    audio_sample_format_t chain_output_format;
     vlc_value_t val, text;
     char * psz_filters, *psz_visual;
-    aout_filter_t * p_user_channel_mixer;
 
     aout_FormatPrint( p_aout, "input", &p_input->input );
+
+    p_input->i_nb_filters = 0;
 
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
     p_input->p_first_byte_to_mix = NULL;
 
     /* Prepare format structure */
-    memcpy( &intermediate_format, &p_aout->mixer.mixer,
+    memcpy( &chain_input_format, &p_input->input,
             sizeof(audio_sample_format_t) );
-    intermediate_format.i_rate = p_input->input.i_rate;
-
-    /* Try to use the channel mixer chosen by the user */
-    memcpy ( &user_filter_format, &intermediate_format,
-             sizeof(audio_sample_format_t) );
-    user_filter_format.i_physical_channels = p_input->input.i_physical_channels;
-    user_filter_format.i_original_channels = p_input->input.i_original_channels;
-    user_filter_format.i_bytes_per_frame = user_filter_format.i_bytes_per_frame
-                              * aout_FormatNbChannels( &user_filter_format )
-                              / aout_FormatNbChannels( &intermediate_format );
-    p_user_channel_mixer = allocateUserChannelMixer( p_aout, &user_filter_format,
-                                                   &intermediate_format );
-    /* If it failed, let the main pipeline do channel mixing */
-    if ( ! p_user_channel_mixer )
-    {
-        memcpy ( &user_filter_format, &intermediate_format,
-                 sizeof(audio_sample_format_t) );
-    }
-
-    /* Create filters. */
-    if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
-                                     &p_input->i_nb_filters,
-                                     &p_input->input,
-                                     &user_filter_format
-                                     ) < 0 )
-    {
-        msg_Err( p_aout, "couldn't set an input pipeline" );
-
-        aout_FifoDestroy( p_aout, &p_input->fifo );
-        p_input->b_error = 1;
-        return -1;
-    }
+    memcpy( &chain_output_format, &p_aout->mixer.mixer,
+            sizeof(audio_sample_format_t) );
+    chain_output_format.i_rate = p_input->input.i_rate;
+    aout_FormatPrepare( &chain_output_format );
 
     /* Now add user filters */
     if( var_Type( p_aout, "visual" ) == 0 )
@@ -198,13 +169,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         psz_filters = strdup( psz_visual );
     }
 
+    /* parse user filter list */
     if( psz_filters && *psz_filters )
     {
         char *psz_parser = psz_filters;
         char *psz_next;
         while( psz_parser && *psz_parser )
         {
-            aout_filter_t * p_filter;
+            aout_filter_t * p_filter = NULL;
 
             if( p_input->i_nb_filters >= AOUT_MAX_FILTERS )
             {
@@ -225,8 +197,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 break;
             }
 
-            msg_Dbg( p_aout, "user filter \"%s\"", psz_parser );
-
             /* Create a VLC object */
             p_filter = vlc_object_create( p_aout, sizeof(aout_filter_t) );
             if( p_filter == NULL )
@@ -238,33 +208,80 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             }
 
             vlc_object_attach( p_filter , p_aout );
-            memcpy( &p_filter->input, &user_filter_format,
+
+            /* request format */
+            memcpy( &p_filter->input, &chain_input_format,
                     sizeof(audio_sample_format_t) );
-            memcpy( &p_filter->output, &user_filter_format,
+            memcpy( &p_filter->output, &chain_output_format,
                     sizeof(audio_sample_format_t) );
 
-            p_filter->p_module =
-                module_Need( p_filter,"audio filter", psz_parser, VLC_FALSE );
+            /* try to find the requested filter */
+            p_filter->p_module = module_Need( p_filter, "audio filter",
+                                              psz_parser, VLC_TRUE );
 
-            if( p_filter->p_module== NULL )
+            if ( p_filter->p_module == NULL )
             {
-                p_filter->p_module =
-                    module_Need( p_filter,"visualization", psz_parser,
-                                                           VLC_FALSE );
-                if( p_filter->p_module == NULL )
+                /* if the filter requested a special format, retry */
+                if ( !( AOUT_FMTS_IDENTICAL( &p_filter->input,
+                                             &chain_input_format )
+                        && AOUT_FMTS_IDENTICAL( &p_filter->output,
+                                                &chain_output_format ) ) )
+                {
+                    aout_FormatPrepare( &p_filter->input );
+                    aout_FormatPrepare( &p_filter->output );
+                    p_filter->p_module = module_Need( p_filter, "audio filter",
+                                                      psz_parser, VLC_TRUE );
+                }
+                /* try visual filters */
+                else
+                {
+                    memcpy( &p_filter->input, &chain_output_format,
+                            sizeof(audio_sample_format_t) );
+                    memcpy( &p_filter->output, &chain_output_format,
+                            sizeof(audio_sample_format_t) );
+                    p_filter->p_module = module_Need( p_filter, "visualization",
+                                                      psz_parser, VLC_TRUE );
+                }
+            }
+
+            /* failure */
+            if ( p_filter->p_module == NULL )
+            {
+                msg_Err( p_aout, "cannot add user filter %s (skipped)",
+                         psz_parser );
+
+                vlc_object_detach( p_filter );
+                vlc_object_destroy( p_filter );
+
+                psz_parser = psz_next;
+                continue;
+            }
+
+            /* complete the filter chain if necessary */
+            if ( !AOUT_FMTS_IDENTICAL( &chain_input_format, &p_filter->input ) )
+            {
+                if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
+                                                 &p_input->i_nb_filters,
+                                                 &chain_input_format,
+                                                 &p_filter->input ) < 0 )
                 {
                     msg_Err( p_aout, "cannot add user filter %s (skipped)",
                              psz_parser );
 
+                    module_Unneed( p_filter, p_filter->p_module );
                     vlc_object_detach( p_filter );
                     vlc_object_destroy( p_filter );
+
                     psz_parser = psz_next;
                     continue;
                 }
             }
-            p_filter->b_continuity = VLC_FALSE;
 
+            /* success */
+            p_filter->b_continuity = VLC_FALSE;
             p_input->pp_filters[p_input->i_nb_filters++] = p_filter;
+            memcpy( &chain_input_format, &p_filter->output,
+                    sizeof( audio_sample_format_t ) );
 
             /* next filter if any */
             psz_parser = psz_next;
@@ -273,60 +290,62 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     if( psz_filters ) free( psz_filters );
     if( psz_visual ) free( psz_visual );
 
-    /* Attach the user channel mixer */
-    if ( p_user_channel_mixer )
+    /* complete the filter chain if necessary */
+    if ( !AOUT_FMTS_IDENTICAL( &chain_input_format, &chain_output_format ) )
     {
-        p_input->pp_filters[p_input->i_nb_filters++] = p_user_channel_mixer;
+        if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
+                                         &p_input->i_nb_filters,
+                                         &chain_input_format,
+                                         &chain_output_format ) < 0 )
+        {
+            inputFailure( p_aout, p_input, "couldn't set an input pipeline" );
+            return -1;
+        }
     }
 
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_input->input_alloc.i_bytes_per_sec = -1;
 
+    /* Create resamplers. */
     if ( AOUT_FMT_NON_LINEAR( &p_aout->mixer.mixer ) )
     {
         p_input->i_nb_resamplers = 0;
     }
     else
     {
-        /* Create resamplers. */
-        intermediate_format.i_rate = (__MAX(p_input->input.i_rate,
+        chain_output_format.i_rate = (__MAX(p_input->input.i_rate,
                                             p_aout->mixer.mixer.i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
-        if ( intermediate_format.i_rate == p_aout->mixer.mixer.i_rate )
+        if ( chain_output_format.i_rate == p_aout->mixer.mixer.i_rate )
         {
             /* Just in case... */
-            intermediate_format.i_rate++;
+            chain_output_format.i_rate++;
         }
+        p_input->i_nb_resamplers = 0;
         if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
                                          &p_input->i_nb_resamplers,
-                                         &intermediate_format,
+                                         &chain_output_format,
                                          &p_aout->mixer.mixer ) < 0 )
         {
-            msg_Err( p_aout, "couldn't set a resampler pipeline" );
-
-            aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
-                                         p_input->i_nb_filters );
-            aout_FifoDestroy( p_aout, &p_input->fifo );
-            var_Destroy( p_aout, "visual" );
-            p_input->b_error = 1;
-
+            inputFailure( p_aout, p_input, "couldn't set a resampler pipeline");
             return -1;
         }
 
         aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
                                  p_input->i_nb_resamplers,
                                  &p_input->input_alloc );
+        p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
         /* Setup the initial rate of the resampler */
         p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
     }
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
-    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
                              p_input->i_nb_filters,
                              &p_input->input_alloc );
+    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
     /* i_bytes_per_sec is still == -1 if no filters */
     p_input->input_alloc.i_bytes_per_sec = __MAX(
@@ -334,9 +353,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                                     (int)(p_input->input.i_bytes_per_frame
                                      * p_input->input.i_rate
                                      / p_input->input.i_frame_length) );
-    /* Allocate in the heap, it is more convenient for the decoder. */
-    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
+    /* Success */
     p_input->b_error = VLC_FALSE;
     p_input->b_restart = VLC_FALSE;
 
@@ -354,8 +372,10 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
                                  p_input->i_nb_filters );
+    p_input->i_nb_filters = 0;
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
+    p_input->i_nb_resamplers = 0;
     aout_FifoDestroy( p_aout, &p_input->fifo );
 
     return 0;
@@ -572,13 +592,38 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
-static int ChangeFiltersString( aout_instance_t * p_aout,
+/*****************************************************************************
+ * static functions
+ *****************************************************************************/
+
+static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
+                          char * psz_error_message )
+{
+    /* error message */
+    msg_Err( p_aout, "couldn't set an input pipeline" );
+
+    /* clean up */
+    aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
+                                 p_input->i_nb_filters );
+    aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
+                                 p_input->i_nb_resamplers );
+    aout_FifoDestroy( p_aout, &p_input->fifo );
+    var_Destroy( p_aout, "visual" );
+    var_Destroy( p_aout, "equalizer" );
+    var_Destroy( p_aout, "audio-filter" );
+    var_Destroy( p_aout, "audio-visual" );
+
+    /* error flag */
+    p_input->b_error = 1;
+}
+
+static int ChangeFiltersString( aout_instance_t * p_aout, char* psz_variable,
                                  char *psz_name, vlc_bool_t b_add )
 {
     vlc_value_t val;
     char *psz_parser;
 
-    var_Get( p_aout, "audio-filter", &val );
+    var_Get( p_aout, psz_variable, &val );
 
     if( !val.psz_string ) val.psz_string = strdup("");
 
@@ -613,7 +658,7 @@ static int ChangeFiltersString( aout_instance_t * p_aout,
         }
     }
 
-    var_Set( p_aout, "audio-filter", val );
+    var_Set( p_aout, psz_variable, val );
     free( val.psz_string );
     return 1;
 }
@@ -628,23 +673,23 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !psz_mode || !*psz_mode )
     {
-        ChangeFiltersString( p_aout, "goom", VLC_FALSE );
-        ChangeFiltersString( p_aout, "visual", VLC_FALSE );
-        ChangeFiltersString( p_aout, "galaktos", VLC_FALSE );
+        ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_FALSE );
+        ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_FALSE );
+        ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_FALSE );
     }
     else
     {
         if( !strcmp( "goom", psz_mode ) )
         {
-            ChangeFiltersString( p_aout, "visual", VLC_FALSE );
-            ChangeFiltersString( p_aout, "goom", VLC_TRUE );
-            ChangeFiltersString( p_aout, "galaktos", VLC_FALSE );
+            ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_FALSE );
+            ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_TRUE );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_FALSE);
         }
         else if( !strcmp( "galaktos", psz_mode ) )
         {
-            ChangeFiltersString( p_aout, "visual", VLC_FALSE );
-            ChangeFiltersString( p_aout, "goom", VLC_FALSE );
-            ChangeFiltersString( p_aout, "galaktos", VLC_TRUE );
+            ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_FALSE );
+            ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_FALSE );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_TRUE );
         }
         else
         {
@@ -652,9 +697,9 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
             var_Create( p_aout, "effect-list", VLC_VAR_STRING );
             var_Set( p_aout, "effect-list", val );
 
-            ChangeFiltersString( p_aout, "goom", VLC_FALSE );
-            ChangeFiltersString( p_aout, "visual", VLC_TRUE );
-            ChangeFiltersString( p_aout, "galaktos", VLC_FALSE );
+            ChangeFiltersString( p_aout, "audio-visual", "goom", VLC_FALSE );
+            ChangeFiltersString( p_aout, "audio-visual", "visual", VLC_TRUE );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", VLC_FALSE);
         }
     }
 
@@ -678,14 +723,16 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !psz_mode || !*psz_mode )
     {
-        i_ret = ChangeFiltersString( p_aout, "equalizer", VLC_FALSE );
+        i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
+                                     VLC_FALSE );
     }
     else
     {
         val.psz_string = psz_mode;
         var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING );
         var_Set( p_aout, "equalizer-preset", val );
-        i_ret = ChangeFiltersString( p_aout, "equalizer", VLC_TRUE );
+        i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
+                                     VLC_TRUE );
 
     }
 
@@ -699,49 +746,4 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     return VLC_SUCCESS;
-}
-
-static aout_filter_t * allocateUserChannelMixer( aout_instance_t * p_aout,
-                                     audio_sample_format_t * p_input_format,
-                                     audio_sample_format_t * p_output_format )
-{
-    aout_filter_t * p_channel_mixer;
-
-    /* Retreive user preferred channel mixer */
-    char * psz_name = config_GetPsz( p_aout, "audio-channel-mixer" );
-
-    /* Not specified => let the main pipeline do the mixing */
-    if ( ! psz_name ) return NULL;
-
-    /* Debug information */
-    aout_FormatsPrint( p_aout, "channel mixer", p_input_format,
-                       p_output_format );
-
-    /* Create a VLC object */
-    p_channel_mixer = vlc_object_create( p_aout, sizeof(aout_filter_t) );
-    if( p_channel_mixer == NULL )
-    {
-        msg_Err( p_aout, "cannot add user channel mixer %s", psz_name );
-        return NULL;
-    }
-    vlc_object_attach( p_channel_mixer , p_aout );
-
-    /* Attach the suitable module */
-    memcpy( &p_channel_mixer->input, p_input_format,
-                    sizeof(audio_sample_format_t) );
-    memcpy( &p_channel_mixer->output, p_output_format,
-                    sizeof(audio_sample_format_t) );
-    p_channel_mixer->p_module =
-        module_Need( p_channel_mixer,"audio filter", psz_name, VLC_TRUE );
-    if( p_channel_mixer->p_module== NULL )
-    {
-        msg_Err( p_aout, "cannot add user channel mixer %s", psz_name );
-        vlc_object_detach( p_channel_mixer );
-        vlc_object_destroy( p_channel_mixer );
-        return NULL;
-    }
-    p_channel_mixer->b_continuity = VLC_FALSE;
-
-    /* Ok */
-    return p_channel_mixer;
 }

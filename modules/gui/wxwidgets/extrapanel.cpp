@@ -819,7 +819,7 @@ void ExtraPanel::OnHeadphone( wxCommandEvent &event )
 {
     aout_instance_t *p_aout= (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
-    ChangeFiltersString( p_intf , p_aout, "headphone",
+    ChangeFiltersString( p_intf , p_aout, "headphone_channel_mixer",
                          event.IsChecked() ? VLC_TRUE : VLC_FALSE );
     if( p_aout != NULL )
         vlc_object_release( p_aout );

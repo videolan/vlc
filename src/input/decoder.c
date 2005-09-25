@@ -853,10 +853,30 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
     if( p_sys->p_aout_input == NULL )
     {
+        audio_sample_format_t format;
+        int i_force_dolby = config_GetInt( p_dec, "force-dolby-surround" );
+
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
         p_sys->audio = p_dec->fmt_out.audio;
+
+        memcpy( &format, &p_sys->audio, sizeof( audio_sample_format_t ) );
+        if ( i_force_dolby && (format.i_original_channels&AOUT_CHAN_PHYSMASK)
+                                    == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
+        {
+            if ( i_force_dolby > 0 )
+            {
+                format.i_original_channels = format.i_original_channels |
+                                             AOUT_CHAN_DOLBYSTEREO;
+            }
+            else
+            {
+                format.i_original_channels = format.i_original_channels &
+                                             ~AOUT_CHAN_DOLBYSTEREO;
+            }
+        }
+
         p_sys->p_aout_input =
-            aout_DecNew( p_dec, &p_sys->p_aout, &p_sys->audio );
+            aout_DecNew( p_dec, &p_sys->p_aout, &format );
         if( p_sys->p_aout_input == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );

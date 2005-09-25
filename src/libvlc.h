@@ -159,6 +159,14 @@ static char *ppsz_snap_formats[] =
     "This option allows you to use the S/PDIF audio output by default when " \
     "your hardware supports it as well as the audio stream being played.")
 
+#define FORCE_DOLBY_TEXT N_("Force detection of Dolby Surround")
+#define FORCE_DOLBY_LONGTEXT N_( \
+    "Use this when you know your stream is or is not encoded with Dolby Surround " \
+    "but fails to be detected as such." )
+static int pi_force_dolby_values[] = { 0, 1, -1 };
+static char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off") };
+
+
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
     "This allows you to add audio post processing filters, to modify " \
@@ -168,12 +176,6 @@ static char *ppsz_snap_formats[] =
 #define AUDIO_VISUAL_LONGTEXT N_( \
     "This allows you to add visualization modules " \
     "(spectrum analyzer, etc.).")
-
-#define AUDIO_CHANNEL_MIXER N_("Channel mixer")
-#define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
-     "This allows you to choose a specific audio channel mixer. For " \
-     "instance, you can use the \"headphone\" mixer that gives 5.1 feeling " \
-     "with a headphone.")
 
 #define VOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the video output " \
@@ -960,6 +962,9 @@ vlc_module_begin();
               AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
+    add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
+                 FORCE_DOLBY_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, 0 );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, VLC_TRUE );
     set_subcategory( SUBCAT_AUDIO_AOUT );
@@ -1239,8 +1244,6 @@ vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, VLC_TRUE );
-    add_module( "audio-channel-mixer", "audio mixer", NULL, NULL,
-                AUDIO_CHANNEL_MIXER, AUDIO_CHANNEL_MIXER_LONGTEXT, VLC_TRUE );
         change_short('A');
 
     set_section( N_("Plugins" ), NULL );
