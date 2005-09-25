@@ -149,7 +149,7 @@ build-stamp: patch configure-stamp
 	$(MAKE) vlc
 
 	# Hackety hackety hack
-	cd extras/x264 && $(MAKE) clean && $(MAKE) ECFLAGS=-fPIC EASFLAGS=__PIC__
+	cd extras/x264 && $(MAKE) clean && $(MAKE) ECFLAGS=-fPIC EASFLAGS=-D__PIC__
 
 	# HACKETY HACKETY HACK
 	cd extras/faad2/libfaad && $(MAKE) clean && $(MAKE) AM_CFLAGS=-fPIC
