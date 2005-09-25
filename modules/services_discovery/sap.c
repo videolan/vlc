@@ -1011,14 +1011,8 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         i_port = 1234;
     }
 
-    if( net_AddressIsMulticast( p_obj, psz_uri ) )
-    {
-        asprintf( &p_sdp->psz_uri, "%s://@%s:%i", psz_proto, psz_uri, i_port );
-    }
-    else
-    {
-        asprintf( &p_sdp->psz_uri, "%s://%s:%i", psz_proto, psz_uri, i_port );
-    }
+    asprintf( &p_sdp->psz_uri, "%s://@%s:%i", psz_proto, psz_uri, i_port );
+
     FREE( psz_uri );
     FREE( psz_proto );
     return VLC_SUCCESS;
