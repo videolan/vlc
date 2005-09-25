@@ -118,6 +118,7 @@ configure-stamp:
 	test -d extras/x264
 	cd extras/x264 \
 	 && ./configure $(confflags) --extra-cflags='$$(ECFLAGS)' \
+	                             --extra-asflags='$$(EASFLAGS)' \
 	 && $(MAKE)
 
 	# Check that we have an faad2 tree in here (can be a symlink)
@@ -148,7 +149,7 @@ build-stamp: patch configure-stamp
 	$(MAKE) vlc
 
 	# Hackety hackety hack
-	cd extras/x264 && $(MAKE) clean && $(MAKE) ECFLAGS=-fPIC
+	cd extras/x264 && $(MAKE) clean && $(MAKE) ECFLAGS=-fPIC EASFLAGS=__PIC__
 
 	# HACKETY HACKETY HACK
 	cd extras/faad2/libfaad && $(MAKE) clean && $(MAKE) AM_CFLAGS=-fPIC
