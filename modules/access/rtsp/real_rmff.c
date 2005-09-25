@@ -250,7 +250,7 @@ void rmff_dump_pheader(rmff_pheader_t *h, char *data) {
 rmff_fileheader_t *rmff_new_fileheader(uint32_t num_headers)
 {
     rmff_fileheader_t *fileheader = malloc(sizeof(rmff_fileheader_t));
-    if( !filehandler ) return NULL;
+    if( !fileheader ) return NULL;
 
     memset(fileheader, 0, sizeof(rmff_fileheader_t));
     fileheader->object_id=RMF_TAG;
@@ -475,8 +475,8 @@ void rmff_print_header(rmff_header_t *h)
 
 void rmff_fix_header(rmff_header_t *h)
 {
-    int num_headers=0;
-    int header_size=0;
+    unsigned int num_headers=0;
+    unsigned int header_size=0;
     rmff_mdpr_t **streams;
     int num_streams=0;
 

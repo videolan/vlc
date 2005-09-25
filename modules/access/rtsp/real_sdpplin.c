@@ -32,7 +32,8 @@
 static char *b64_decode(const char *in, char *out, int *size)
 {
     char dtable[256];              /* Encode / decode table */
-    int i,j,k;
+    int i,k;
+    unsigned int j;
 
     for (i = 0; i < 255; i++) {
         dtable[i] = 0x80;
@@ -109,7 +110,6 @@ static int filter(const char *in, const char *filter, char **out)
         (*out)[len-flen]=0;
         return len-flen;
     }
-
     return 0;
 }
 
@@ -120,8 +120,11 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data)
     char      *decoded = malloc(32000);
     int       handled;
 
-    if( !desc ) goto error;
+    if( !desc ) return NULL;
     memset(desc, 0, sizeof(sdpplin_stream_t));
+
+    if( !buf ) goto error;
+    if( !decoded ) goto error;
 
     if (filter(*data, "m=", &buf))
     {
@@ -130,10 +133,7 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data)
     else
     {
         lprintf("sdpplin: no m= found.\n");
-        if( decoded ) free(decoded);
-        if( desc ) free( desc );
-        if( buf ) free( buf );
-        return NULL;
+        goto error;
     }
     *data=nl(*data);
 
@@ -225,6 +225,12 @@ static sdpplin_stream_t *sdpplin_parse_stream(char **data)
     if( buf ) free(buf);
     if( decoded )free(decoded);
     return desc;
+
+error:
+    if( decoded ) free(decoded);
+    if( desc ) free( desc );
+    if( buf ) free( buf );
+    return NULL;
 }
 
 sdpplin_t *sdpplin_parse(char *data)
