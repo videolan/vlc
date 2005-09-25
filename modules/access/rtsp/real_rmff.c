@@ -43,7 +43,7 @@ static void rmff_dump_fileheader(rmff_fileheader_t *fileheader, char *buffer) {
   fileheader->object_version=BE_16(&fileheader->object_version);
   fileheader->file_version=BE_32(&fileheader->file_version);
   fileheader->num_headers=BE_32(&fileheader->num_headers);
-  
+
   memcpy(buffer, fileheader, 8);
   memcpy(&buffer[8], &fileheader->object_version, 2);
   memcpy(&buffer[10], &fileheader->file_version, 8);
@@ -78,7 +78,7 @@ static void rmff_dump_prop(rmff_prop_t *prop, char *buffer) {
   memcpy(&buffer[10], &prop->max_bit_rate, 36);
   memcpy(&buffer[46], &prop->num_streams, 2);
   memcpy(&buffer[48], &prop->flags, 2);
-  
+
   prop->size=BE_32(&prop->size);
   prop->object_version=BE_16(&prop->object_version);
   prop->max_bit_rate=BE_32(&prop->max_bit_rate);
@@ -123,7 +123,7 @@ static void rmff_dump_mdpr(rmff_mdpr_t *mdpr, char *buffer) {
   memcpy(&buffer[41+s1], &mdpr->mime_type_size, 1);
   s2=mdpr->mime_type_size;
   memcpy(&buffer[42+s1], mdpr->mime_type, s2);
-  
+
   mdpr->type_specific_len=BE_32(&mdpr->type_specific_len);
   memcpy(&buffer[42+s1+s2], &mdpr->type_specific_len, 4);
   mdpr->type_specific_len=BE_32(&mdpr->type_specific_len);
@@ -154,7 +154,7 @@ static void rmff_dump_cont(rmff_cont_t *cont, char *buffer) {
 
   memcpy(buffer, cont, 8);
   memcpy(&buffer[8], &cont->object_version, 2);
-  
+
   cont->title_len=BE_16(&cont->title_len);
   memcpy(&buffer[10], &cont->title_len, 2);
   cont->title_len=BE_16(&cont->title_len);
@@ -183,24 +183,25 @@ static void rmff_dump_cont(rmff_cont_t *cont, char *buffer) {
   cont->object_id=BE_32(&cont->object_id);
 }
 
-static void rmff_dump_dataheader(rmff_data_t *data, char *buffer) {
+static void rmff_dump_dataheader(rmff_data_t *data, char *buffer)
+{
+    if (!data) return;
 
-  if (!data) return;
-  data->object_id=BE_32(&data->object_id);
-  data->size=BE_32(&data->size);
-  data->object_version=BE_16(&data->object_version);
-  data->num_packets=BE_32(&data->num_packets);
-  data->next_data_header=BE_32(&data->next_data_header);
+    data->object_id=BE_32(&data->object_id);
+    data->size=BE_32(&data->size);
+    data->object_version=BE_16(&data->object_version);
+    data->num_packets=BE_32(&data->num_packets);
+    data->next_data_header=BE_32(&data->next_data_header);
 
-  memcpy(buffer, data, 8);
-  memcpy(&buffer[8], &data->object_version, 2);
-  memcpy(&buffer[10], &data->num_packets, 8);
-  
-  data->num_packets=BE_32(&data->num_packets);
-  data->next_data_header=BE_32(&data->next_data_header);
-  data->size=BE_32(&data->size);
-  data->object_version=BE_16(&data->object_version);
-  data->object_id=BE_32(&data->object_id);
+    memcpy(buffer, data, 8);
+    memcpy(&buffer[8], &data->object_version, 2);
+    memcpy(&buffer[10], &data->num_packets, 8);
+
+    data->num_packets=BE_32(&data->num_packets);
+    data->next_data_header=BE_32(&data->next_data_header);
+    data->size=BE_32(&data->size);
+    data->object_version=BE_16(&data->object_version);
+    data->object_id=BE_32(&data->object_id);
 }
 
 int rmff_dump_header(rmff_header_t *h, char *buffer, int max) {
@@ -223,7 +224,7 @@ int rmff_dump_header(rmff_header_t *h, char *buffer, int max) {
       stream++;
     }
   }
-    
+
   rmff_dump_dataheader(h->data, &buffer[written]);
   written+=18;
 
@@ -246,18 +247,19 @@ void rmff_dump_pheader(rmff_pheader_t *h, char *data) {
   data[11]=h->flags;
 }
 
-rmff_fileheader_t *rmff_new_fileheader(uint32_t num_headers) {
+rmff_fileheader_t *rmff_new_fileheader(uint32_t num_headers)
+{
+    rmff_fileheader_t *fileheader = malloc(sizeof(rmff_fileheader_t));
+    if( !filehandler ) return NULL;
 
-  rmff_fileheader_t *fileheader = malloc(sizeof(rmff_fileheader_t));
-  memset(fileheader, 0, sizeof(rmff_fileheader_t));
+    memset(fileheader, 0, sizeof(rmff_fileheader_t));
+    fileheader->object_id=RMF_TAG;
+    fileheader->size=18;
+    fileheader->object_version=0;
+    fileheader->file_version=0;
+    fileheader->num_headers=num_headers;
 
-  fileheader->object_id=RMF_TAG;
-  fileheader->size=18;
-  fileheader->object_version=0;
-  fileheader->file_version=0;
-  fileheader->num_headers=num_headers;
-
-  return fileheader;
+    return fileheader;
 }
 
 rmff_prop_t *rmff_new_prop (
@@ -271,28 +273,28 @@ rmff_prop_t *rmff_new_prop (
     uint32_t index_offset,
     uint32_t data_offset,
     uint16_t num_streams,
-    uint16_t flags ) {
+    uint16_t flags )
+{
+    rmff_prop_t *prop = malloc(sizeof(rmff_prop_t));
+    if( !prop ) return NULL;
 
-  rmff_prop_t *prop = malloc(sizeof(rmff_prop_t));
-  memset(prop, 0, sizeof(rmff_prop_t));
+    memset(prop, 0, sizeof(rmff_prop_t));
+    prop->object_id=PROP_TAG;
+    prop->size=50;
+    prop->object_version=0;
+    prop->max_bit_rate=max_bit_rate;
+    prop->avg_bit_rate=avg_bit_rate;
+    prop->max_packet_size=max_packet_size;
+    prop->avg_packet_size=avg_packet_size;
+    prop->num_packets=num_packets;
+    prop->duration=duration;
+    prop->preroll=preroll;
+    prop->index_offset=index_offset;
+    prop->data_offset=data_offset;
+    prop->num_streams=num_streams;
+    prop->flags=flags;
 
-  prop->object_id=PROP_TAG;
-  prop->size=50;
-  prop->object_version=0;
-
-  prop->max_bit_rate=max_bit_rate;
-  prop->avg_bit_rate=avg_bit_rate;
-  prop->max_packet_size=max_packet_size;
-  prop->avg_packet_size=avg_packet_size;
-  prop->num_packets=num_packets;
-  prop->duration=duration;
-  prop->preroll=preroll;
-  prop->index_offset=index_offset;
-  prop->data_offset=data_offset;
-  prop->num_streams=num_streams;
-  prop->flags=flags;
-   
-  return prop;
+    return prop;
 }
 
 rmff_mdpr_t *rmff_new_mdpr(
@@ -307,304 +309,317 @@ rmff_mdpr_t *rmff_new_mdpr(
       const char *stream_name,
       const char *mime_type,
       uint32_t   type_specific_len,
-      const char *type_specific_data ) {
+      const char *type_specific_data )
+{
+    rmff_mdpr_t *mdpr = malloc(sizeof(rmff_mdpr_t));
+    if( !mdpr ) return NULL;
 
-  rmff_mdpr_t *mdpr = malloc(sizeof(rmff_mdpr_t));
-  memset(mdpr, 0, sizeof(rmff_mdpr_t));
-  
-  mdpr->object_id=MDPR_TAG;
-  mdpr->object_version=0;
+    memset(mdpr, 0, sizeof(rmff_mdpr_t));
+    mdpr->object_id=MDPR_TAG;
+    mdpr->object_version=0;
+    mdpr->stream_number=stream_number;
+    mdpr->max_bit_rate=max_bit_rate;
+    mdpr->avg_bit_rate=avg_bit_rate;
+    mdpr->max_packet_size=max_packet_size;
+    mdpr->avg_packet_size=avg_packet_size;
+    mdpr->start_time=start_time;
+    mdpr->preroll=preroll;
+    mdpr->duration=duration;
+    mdpr->stream_name_size=0;
+    if (stream_name)
+    {
+        mdpr->stream_name=strdup(stream_name);
+        mdpr->stream_name_size=strlen(stream_name);
+    }
+    mdpr->mime_type_size=0;
+    if (mime_type)
+    {
+        mdpr->mime_type=strdup(mime_type);
+        mdpr->mime_type_size=strlen(mime_type);
+    }
+    mdpr->type_specific_len=type_specific_len;
 
-  mdpr->stream_number=stream_number;
-  mdpr->max_bit_rate=max_bit_rate;
-  mdpr->avg_bit_rate=avg_bit_rate;
-  mdpr->max_packet_size=max_packet_size;
-  mdpr->avg_packet_size=avg_packet_size;
-  mdpr->start_time=start_time;
-  mdpr->preroll=preroll;
-  mdpr->duration=duration;
-  mdpr->stream_name_size=0;
-  if (stream_name) {
-    mdpr->stream_name=strdup(stream_name);
-    mdpr->stream_name_size=strlen(stream_name);
-  }
-  mdpr->mime_type_size=0;
-  if (mime_type) {
-    mdpr->mime_type=strdup(mime_type);
-    mdpr->mime_type_size=strlen(mime_type);
-  }
-  mdpr->type_specific_len=type_specific_len;
-  mdpr->type_specific_data = malloc(sizeof(char)*type_specific_len);
-  memcpy(mdpr->type_specific_data,type_specific_data,type_specific_len);
-  mdpr->mlti_data=NULL;
-  
-  mdpr->size=mdpr->stream_name_size+mdpr->mime_type_size+mdpr->type_specific_len+46;
-
-  return mdpr;
+    mdpr->type_specific_data = malloc(sizeof(char)*type_specific_len);
+    if( !mdpr->type_specific_data )
+    {
+        if( mdpr->stream_name ) free( mdpr->stream_name );
+        free( mdpr );
+        return NULL;
+    }
+    memcpy(mdpr->type_specific_data,type_specific_data,type_specific_len);
+    mdpr->mlti_data=NULL;
+    mdpr->size=mdpr->stream_name_size+mdpr->mime_type_size+mdpr->type_specific_len+46;
+    return mdpr;
 }
 
-rmff_cont_t *rmff_new_cont(const char *title, const char *author, const char *copyright, const char *comment) {
+rmff_cont_t *rmff_new_cont(const char *title, const char *author, const char *copyright, const char *comment)
+{
+    rmff_cont_t *cont = malloc(sizeof(rmff_cont_t));
+    if( !cont ) return NULL;
 
-  rmff_cont_t *cont = malloc(sizeof(rmff_cont_t));
-  memset(cont, 0, sizeof(rmff_cont_t));
+    memset(cont, 0, sizeof(rmff_cont_t));
+    cont->object_id=CONT_TAG;
+    cont->object_version=0;
+    cont->title=NULL;
+    cont->author=NULL;
+    cont->copyright=NULL;
+    cont->comment=NULL;
+    cont->title_len=0;
+    cont->author_len=0;
+    cont->copyright_len=0;
+    cont->comment_len=0;
 
-  cont->object_id=CONT_TAG;
-  cont->object_version=0;
-
-  cont->title=NULL;
-  cont->author=NULL;
-  cont->copyright=NULL;
-  cont->comment=NULL;
-  
-  cont->title_len=0;
-  cont->author_len=0;
-  cont->copyright_len=0;
-  cont->comment_len=0;
-
-  if (title) {
-    cont->title_len=strlen(title);
-    cont->title=strdup(title);
-  }
-  if (author) {
-    cont->author_len=strlen(author);
-    cont->author=strdup(author);
-  }
-  if (copyright) {
-    cont->copyright_len=strlen(copyright);
-    cont->copyright=strdup(copyright);
-  }
-  if (comment) {
-    cont->comment_len=strlen(comment);
-    cont->comment=strdup(comment);
-  }
-  cont->size=cont->title_len+cont->author_len+cont->copyright_len+cont->comment_len+18;
-
-  return cont;
+    if (title)
+    {
+        cont->title_len=strlen(title);
+        cont->title=strdup(title);
+    }
+    if (author)
+    {
+        cont->author_len=strlen(author);
+        cont->author=strdup(author);
+    }
+    if (copyright)
+    {
+        cont->copyright_len=strlen(copyright);
+        cont->copyright=strdup(copyright);
+    }
+    if (comment)
+    {
+        cont->comment_len=strlen(comment);
+        cont->comment=strdup(comment);
+    }
+    cont->size=cont->title_len+cont->author_len+cont->copyright_len+cont->comment_len+18;
+    return cont;
 }
 
-rmff_data_t *rmff_new_dataheader(uint32_t num_packets, uint32_t next_data_header) {
+rmff_data_t *rmff_new_dataheader(uint32_t num_packets, uint32_t next_data_header)
+{
+    rmff_data_t *data = malloc(sizeof(rmff_data_t));
+    if( !data ) return NULL;
 
-  rmff_data_t *data = malloc(sizeof(rmff_data_t));
-  memset(data, 0, sizeof(rmff_data_t));
+    memset(data, 0, sizeof(rmff_data_t));
+    data->object_id=DATA_TAG;
+    data->size=18;
+    data->object_version=0;
+    data->num_packets=num_packets;
+    data->next_data_header=next_data_header;
 
-  data->object_id=DATA_TAG;
-  data->size=18;
-  data->object_version=0;
-  data->num_packets=num_packets;
-  data->next_data_header=next_data_header;
-
-  return data;
+    return data;
 }
-  
-void rmff_print_header(rmff_header_t *h) {
 
+void rmff_print_header(rmff_header_t *h)
+{
   rmff_mdpr_t **stream;
-  
-  if(!h) {
-    printf("rmff_print_header: NULL given\n");
-    return;
-  }
-  if(h->fileheader)
-  {
-    printf("\nFILE:\n");
-    printf("file version      : %d\n", h->fileheader->file_version);
-    printf("number of headers : %d\n", h->fileheader->num_headers);
-  }
-  if(h->cont)
-  {
-    printf("\nCONTENT:\n");
-    printf("title     : %s\n", h->cont->title);
-    printf("author    : %s\n", h->cont->author);
-    printf("copyright : %s\n", h->cont->copyright);
-    printf("comment   : %s\n", h->cont->comment);
-  }
-  if(h->prop)
-  {
-    printf("\nSTREAM PROPERTIES:\n");
-    printf("bit rate (max/avg)    : %i/%i\n", h->prop->max_bit_rate, h->prop->avg_bit_rate);
-    printf("packet size (max/avg) : %i/%i bytes\n", h->prop->max_packet_size, h->prop->avg_packet_size);
-    printf("packets       : %i\n", h->prop->num_packets);
-    printf("duration      : %i ms\n", h->prop->duration);
-    printf("pre-buffer    : %i ms\n", h->prop->preroll);
-    printf("index offset  : %i bytes\n", h->prop->index_offset);
-    printf("data offset   : %i bytes\n", h->prop->data_offset);
-    printf("media streams : %i\n", h->prop->num_streams);
-    printf("flags         : ");
-    if (h->prop->flags & PN_SAVE_ENABLED) printf("save_enabled ");
-    if (h->prop->flags & PN_PERFECT_PLAY_ENABLED) printf("perfect_play_enabled ");
-    if (h->prop->flags & PN_LIVE_BROADCAST) printf("live_broadcast ");
-    printf("\n");
-  }
-  stream=h->streams;
-  if(stream)
-  {
-    while (*stream)
+
+    if(!h)
     {
-      printf("\nSTREAM %i:\n", (*stream)->stream_number);
-      printf("stream name [mime type] : %s [%s]\n", (*stream)->stream_name, (*stream)->mime_type);
-      printf("bit rate (max/avg)      : %i/%i\n", (*stream)->max_bit_rate, (*stream)->avg_bit_rate);
-      printf("packet size (max/avg)   : %i/%i bytes\n", (*stream)->max_packet_size, (*stream)->avg_packet_size);
-      printf("start time : %i\n", (*stream)->start_time);
-      printf("pre-buffer : %i ms\n", (*stream)->preroll);
-      printf("duration   : %i ms\n", (*stream)->duration);
-      printf("type specific data:\n");
-      stream++;
+        printf("rmff_print_header: NULL given\n");
+        return;
     }
-  }
-  if(h->data)
-  {
-    printf("\nDATA:\n");
-    printf("size      : %i\n", h->data->size);
-    printf("packets   : %i\n", h->data->num_packets);
-    printf("next DATA : 0x%08x\n", h->data->next_data_header);
-  } 
+    if(h->fileheader)
+    {
+        printf("\nFILE:\n");
+        printf("file version      : %d\n", h->fileheader->file_version);
+        printf("number of headers : %d\n", h->fileheader->num_headers);
+    }
+    if(h->cont)
+    {
+        printf("\nCONTENT:\n");
+        printf("title     : %s\n", h->cont->title);
+        printf("author    : %s\n", h->cont->author);
+        printf("copyright : %s\n", h->cont->copyright);
+        printf("comment   : %s\n", h->cont->comment);
+    }
+    if(h->prop)
+    {
+        printf("\nSTREAM PROPERTIES:\n");
+        printf("bit rate (max/avg)    : %i/%i\n", h->prop->max_bit_rate, h->prop->avg_bit_rate);
+        printf("packet size (max/avg) : %i/%i bytes\n", h->prop->max_packet_size, h->prop->avg_packet_size);
+        printf("packets       : %i\n", h->prop->num_packets);
+        printf("duration      : %i ms\n", h->prop->duration);
+        printf("pre-buffer    : %i ms\n", h->prop->preroll);
+        printf("index offset  : %i bytes\n", h->prop->index_offset);
+        printf("data offset   : %i bytes\n", h->prop->data_offset);
+        printf("media streams : %i\n", h->prop->num_streams);
+        printf("flags         : ");
+        if (h->prop->flags & PN_SAVE_ENABLED) printf("save_enabled ");
+        if (h->prop->flags & PN_PERFECT_PLAY_ENABLED) printf("perfect_play_enabled ");
+        if (h->prop->flags & PN_LIVE_BROADCAST) printf("live_broadcast ");
+        printf("\n");
+    }
+    stream=h->streams;
+    if(stream)
+    {
+        while (*stream)
+        {
+        printf("\nSTREAM %i:\n", (*stream)->stream_number);
+        printf("stream name [mime type] : %s [%s]\n", (*stream)->stream_name, (*stream)->mime_type);
+        printf("bit rate (max/avg)      : %i/%i\n", (*stream)->max_bit_rate, (*stream)->avg_bit_rate);
+        printf("packet size (max/avg)   : %i/%i bytes\n", (*stream)->max_packet_size, (*stream)->avg_packet_size);
+        printf("start time : %i\n", (*stream)->start_time);
+        printf("pre-buffer : %i ms\n", (*stream)->preroll);
+        printf("duration   : %i ms\n", (*stream)->duration);
+        printf("type specific data:\n");
+        stream++;
+        }
+    }
+    if(h->data)
+    {
+        printf("\nDATA:\n");
+        printf("size      : %i\n", h->data->size);
+        printf("packets   : %i\n", h->data->num_packets);
+        printf("next DATA : 0x%08x\n", h->data->next_data_header);
+    }
 }
 
-void rmff_fix_header(rmff_header_t *h) {
+void rmff_fix_header(rmff_header_t *h)
+{
+    int num_headers=0;
+    int header_size=0;
+    rmff_mdpr_t **streams;
+    int num_streams=0;
 
-  int num_headers=0;
-  int header_size=0;
-  rmff_mdpr_t **streams;
-  int num_streams=0;
-
-  if (!h) {
-    lprintf("rmff_fix_header: fatal: no header given.\n");
-    return;
-  }
-
-  if (!h->streams) {
-    lprintf("rmff_fix_header: warning: no MDPR chunks\n");
-  } else
-  {
-    streams=h->streams;
-    while (*streams)
+    if (!h)
     {
-      num_streams++;
-      num_headers++;
-      header_size+=(*streams)->size;
-      streams++;
+        lprintf("rmff_fix_header: fatal: no header given.\n");
+        return;
     }
-  }
-  
-  if (h->prop) {
-    if (h->prop->size != 50)
+    if (!h->streams)
     {
-      lprintf("rmff_fix_header: correcting prop.size from %i to %i\n", h->prop->size, 50);
-
-      h->prop->size=50;
+        lprintf("rmff_fix_header: warning: no MDPR chunks\n");
     }
-    if (h->prop->num_streams != num_streams)
+    else
     {
-      lprintf("rmff_fix_header: correcting prop.num_streams from %i to %i\n", h->prop->num_streams, num_streams);
+        streams=h->streams;
+        while (*streams)
+        {
+            num_streams++;
+            num_headers++;
+            header_size+=(*streams)->size;
+            streams++;
+        }
+    }
+    if (h->prop)
+    {
+        if (h->prop->size != 50)
+        {
+            lprintf("rmff_fix_header: correcting prop.size from %i to %i\n", h->prop->size, 50);
+            h->prop->size=50;
+        }
+        if (h->prop->num_streams != num_streams)
+        {
+            lprintf("rmff_fix_header: correcting prop.num_streams from %i to %i\n", h->prop->num_streams, num_streams);
+            h->prop->num_streams=num_streams;
+        }
+        num_headers++;
+        header_size+=50;
+    }
+    else lprintf("rmff_fix_header: warning: no PROP chunk.\n");
 
-      h->prop->num_streams=num_streams;
+    if (h->cont)
+    {
+        num_headers++;
+        header_size+=h->cont->size;
+    }
+    else lprintf("rmff_fix_header: warning: no CONT chunk.\n");
+
+    if (!h->data)
+    {
+        lprintf("rmff_fix_header: no DATA chunk, creating one\n");
+        h->data = malloc(sizeof(rmff_data_t));
+        if( h->data )
+        {
+            memset(h->data, 0, sizeof(rmff_data_t));
+            h->data->object_id=DATA_TAG;
+            h->data->object_version=0;
+            h->data->size=34;
+            h->data->num_packets=0;
+            h->data->next_data_header=0;
+        }
     }
     num_headers++;
-    header_size+=50;
-  } else
-    lprintf("rmff_fix_header: warning: no PROP chunk.\n");
 
-  if (h->cont) {
+    if (!h->fileheader)
+    {
+        lprintf("rmff_fix_header: no fileheader, creating one");
+        h->fileheader = malloc(sizeof(rmff_fileheader_t));
+        if( h->fileheader )
+        {
+            memset(h->fileheader, 0, sizeof(rmff_fileheader_t));
+            h->fileheader->object_id=RMF_TAG;
+            h->fileheader->size=34;
+            h->fileheader->object_version=0;
+            h->fileheader->file_version=0;
+            h->fileheader->num_headers=num_headers+1;
+        }
+    }
+    header_size+=h->fileheader->size;
     num_headers++;
-    header_size+=h->cont->size;
-  } else
-    lprintf("rmff_fix_header: warning: no CONT chunk.\n");
 
-  if (!h->data) {
-    lprintf("rmff_fix_header: no DATA chunk, creating one\n");
-
-    h->data = malloc(sizeof(rmff_data_t));
-    memset(h->data, 0, sizeof(rmff_data_t));
-    h->data->object_id=DATA_TAG;
-    h->data->object_version=0;
-    h->data->size=34;
-    h->data->num_packets=0;
-    h->data->next_data_header=0;
-  }
-  num_headers++;
-
-  
-  if (!h->fileheader) {
-    lprintf("rmff_fix_header: no fileheader, creating one");
-
-    h->fileheader = malloc(sizeof(rmff_fileheader_t));
-    memset(h->fileheader, 0, sizeof(rmff_fileheader_t));
-    h->fileheader->object_id=RMF_TAG;
-    h->fileheader->size=34;
-    h->fileheader->object_version=0;
-    h->fileheader->file_version=0;
-    h->fileheader->num_headers=num_headers+1;
-  }
-  header_size+=h->fileheader->size;
-  num_headers++;
-
-  if(h->fileheader->num_headers != num_headers) {
-    lprintf("rmff_fix_header: setting num_headers from %i to %i\n", h->fileheader->num_headers, num_headers); 
-
-    h->fileheader->num_headers=num_headers;
-  }
-
-  if(h->prop) {
-    if (h->prop->data_offset != header_size) {
-      lprintf("rmff_fix_header: setting prop.data_offset from %i to %i\n", h->prop->data_offset, header_size); 
-
-      h->prop->data_offset=header_size;
+    if(h->fileheader->num_headers != num_headers)
+    {
+        lprintf("rmff_fix_header: setting num_headers from %i to %i\n", h->fileheader->num_headers, num_headers);
+        h->fileheader->num_headers=num_headers;
     }
-    if (h->prop->num_packets == 0) {
-      int p=(int)(h->prop->avg_bit_rate/8.0*(h->prop->duration/1000.0)/h->prop->avg_packet_size);
-
-      lprintf("rmff_fix_header: assuming prop.num_packets=%i\n", p); 
-
-      h->prop->num_packets=p;
+    if(h->prop)
+    {
+        if (h->prop->data_offset != header_size)
+        {
+            lprintf("rmff_fix_header: setting prop.data_offset from %i to %i\n", h->prop->data_offset, header_size);
+            h->prop->data_offset=header_size;
+        }
+        if (h->prop->num_packets == 0)
+        {
+            int p=(int)(h->prop->avg_bit_rate/8.0*(h->prop->duration/1000.0)/h->prop->avg_packet_size);
+            lprintf("rmff_fix_header: assuming prop.num_packets=%i\n", p);
+            h->prop->num_packets=p;
+        }
+        if (h->data->num_packets == 0)
+        {
+            lprintf("rmff_fix_header: assuming data.num_packets=%i\n", h->prop->num_packets);
+            h->data->num_packets=h->prop->num_packets;
+        }
+        lprintf("rmff_fix_header: assuming data.size=%i\n", h->prop->num_packets*h->prop->avg_packet_size);
+        h->data->size=h->prop->num_packets*h->prop->avg_packet_size;
     }
-    if (h->data->num_packets == 0) {
-      lprintf("rmff_fix_header: assuming data.num_packets=%i\n", h->prop->num_packets); 
-
-      h->data->num_packets=h->prop->num_packets;
-    }
-    
-    lprintf("rmff_fix_header: assuming data.size=%i\n", h->prop->num_packets*h->prop->avg_packet_size); 
-
-    h->data->size=h->prop->num_packets*h->prop->avg_packet_size;
-  }
 }
 
-int rmff_get_header_size(rmff_header_t *h) {
-
-  if (!h) return 0;
-  if (!h->prop) return -1;
-
-  return h->prop->data_offset+18;
-  
+int rmff_get_header_size(rmff_header_t *h)
+{
+    if (!h) return 0;
+    if (!h->prop) return -1;
+    return h->prop->data_offset+18;
 }
 
-void rmff_free_header(rmff_header_t *h) {
+void rmff_free_header(rmff_header_t *h)
+{
+    if (!h) return;
 
-  if (!h) return;
-
-  if (h->fileheader) free(h->fileheader);
-  if (h->prop) free(h->prop);
-  if (h->data) free(h->data);
-  if (h->cont)
-  {
-    free(h->cont->title);
-    free(h->cont->author);
-    free(h->cont->copyright);
-    free(h->cont->comment);
-    free(h->cont);
-  }
-  if (h->streams)
-  {
-    rmff_mdpr_t **s=h->streams;
-
-    while(*s) {
-      free((*s)->stream_name);
-      free((*s)->mime_type);
-      free((*s)->type_specific_data);
-      free(*s);
-      s++;
+    if (h->fileheader) free(h->fileheader);
+    if (h->prop) free(h->prop);
+    if (h->data) free(h->data);
+    if (h->cont)
+    {
+        free(h->cont->title);
+        free(h->cont->author);
+        free(h->cont->copyright);
+        free(h->cont->comment);
+        free(h->cont);
     }
-    free(h->streams);
-  }
-  free(h);
+    if (h->streams)
+    {
+        rmff_mdpr_t **s=h->streams;
+
+        while(*s)
+        {
+            free((*s)->stream_name);
+            free((*s)->mime_type);
+            free((*s)->type_specific_data);
+            free(*s);
+            s++;
+        }
+        free(h->streams);
+    }
+    free(h);
 }

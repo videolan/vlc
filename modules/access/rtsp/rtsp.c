@@ -103,7 +103,7 @@ static char *rtsp_get( rtsp_client_t *rtsp )
 /*
  * rtsp_put puts a line on stream
  */
- 
+
 static int rtsp_put( rtsp_client_t *rtsp, const char *psz_string )
 {
     int i_buffer = strlen( psz_string );
@@ -128,7 +128,7 @@ static int rtsp_get_status_code( rtsp_client_t *rtsp, const char *psz_string )
 {
     char psz_buffer[4];
     int i_code = 0;
- 
+
     if( !strncmp( psz_string, "RTSP/1.0", sizeof("RTSP/1.0") - 1 ) )
     {
         memcpy( psz_buffer, psz_string + sizeof("RTSP/1.0"), 3 );
@@ -202,7 +202,7 @@ static void rtsp_schedule_standard( rtsp_client_t *rtsp )
 /*
  * get the answers, if server responses with something != 200, return NULL
  */
- 
+
 static int rtsp_get_answers( rtsp_client_t *rtsp )
 {
     char *answer = NULL;
@@ -210,7 +210,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
     char **answer_ptr = rtsp->p_private->answers;
     int code;
     int ans_count = 0;
-  
+
     answer = rtsp_get( rtsp );
     if( !answer ) return 0;
     code = rtsp_get_status_code( rtsp, answer );
@@ -222,7 +222,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
 
       answer = rtsp_get( rtsp );
       if( !answer ) return 0;
-    
+
       if( !strncasecmp( answer, "Cseq:", 5 ) )
       {
           sscanf( answer, "%*s %u", &answer_seq );
@@ -283,7 +283,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
 int rtsp_send_ok( rtsp_client_t *rtsp )
 {
     char cseq[16];
-  
+
     rtsp_put( rtsp, "RTSP/1.0 200 OK" );
     sprintf( cseq, "CSeq: %u", rtsp->p_private->cseq );
     rtsp_put( rtsp, cseq );

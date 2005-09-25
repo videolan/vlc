@@ -47,17 +47,16 @@ const unsigned char xor_table[] = {
 #define MAX(x,y) ((x>y) ? x : y)
 
 
-static void hash(char *field, char *param) {
-
+static void hash(char *field, char *param)
+{
   uint32_t a, b, c, d;
- 
 
   /* fill variables */
   a = LE_32(field);
   b = LE_32(field+4);
   c = LE_32(field+8);
   d = LE_32(field+12);
-  
+
   lprintf("hash input: %x %x %x %x\n", a, b, c, d);
   lprintf("hash parameter:\n");
 
@@ -126,7 +125,7 @@ static void hash(char *field, char *param) {
   c = ((c << 0x0e) | (c >> 0x12)) + d;
   b = ((c & a) | (~a & d)) + LE_32((param+0x30)) + b - 0x72D5B376;
   b = ((b << 0x14) | (b >> 0x0c)) + c;
-  
+
   a = (b ^ c ^ d) + LE_32((param+0x14)) + a - 0x0005C6BE;
   a = ((a << 0x04) | (a >> 0x1c)) + b;
   d = (a ^ b ^ c) + LE_32((param+0x20)) + d - 0x788E097F;
@@ -159,7 +158,7 @@ static void hash(char *field, char *param) {
   c = ((c << 0x10) | (c >> 0x10)) + d;
   b = (c ^ d ^ a) + LE_32((param+0x08)) + b - 0x3B53A99B;
   b = ((b << 0x17) | (b >> 0x09)) + c;
-  
+
   a = ((~d | b) ^ c)  + LE_32((param+0x00)) + a - 0x0BD6DDBC;
   a = ((a << 0x06) | (a >> 0x1a)) + b; 
   d = ((~c | a) ^ b)  + LE_32((param+0x1c)) + d + 0x432AFF97;
@@ -194,7 +193,7 @@ static void hash(char *field, char *param) {
   b = ((b << 0x15) | (b >> 0x0b)) + c; 
 
   lprintf("hash output: %x %x %x %x\n", a, b, c, d);
-  
+
   a += LE_32(field);
   b += LE_32(field+4);
   c += LE_32(field+8);
@@ -210,15 +209,15 @@ static void call_hash (char *key, char *challenge, int len) {
 
   uint8_t *ptr1, *ptr2;
   uint32_t a, b, c, d, tmp;
-  
+
   ptr1=(key+16);
   ptr2=(key+20);
-  
+
   a = LE_32(ptr1);
   b = (a >> 3) & 0x3f;
   a += len * 8;
   LE_32C(ptr1, a);
-  
+
   if (a < (len << 3))
   {
     lprintf("not verified: (len << 3) > a true\n");
@@ -228,15 +227,14 @@ static void call_hash (char *key, char *challenge, int len) {
   tmp = LE_32(ptr2) + (len >> 0x1d);
   LE_32C(ptr2, tmp);
   a = 64 - b;
-  c = 0;  
+  c = 0;
   if (a <= len)
   {
-
     memcpy(key+b+24, challenge, a);
     hash(key, key+24);
     c = a;
     d = c + 0x3f;
-    
+
     while ( d < len ) {
       lprintf("not verified:  while ( d < len )\n");
       hash(key, challenge+d-0x3f);
@@ -245,44 +243,43 @@ static void call_hash (char *key, char *challenge, int len) {
     }
     b = 0;
   }
-  
+
   memcpy(key+b+24, challenge+c, len-c);
 }
 
-static void calc_response (char *result, char *field) {
-
+static void calc_response (char *result, char *field)
+{
   char buf1[128];
   char buf2[128];
   int i;
 
   memset (buf1, 0, 64);
   *buf1 = 128;
-  
+
   memcpy (buf2, field+16, 8);
-  
   i = ( LE_32((buf2)) >> 3 ) & 0x3f;
- 
-  if (i < 56) {
+
+  if (i < 56)
+  {
     i = 56 - i;
-  } else {
+  } else
+  {
     lprintf("not verified: ! (i < 56)\n");
     i = 120 - i;
   }
 
   call_hash (field, buf1, i);
   call_hash (field, buf2, 8);
-
   memcpy (result, field, 16);
-
 }
 
 
-static void calc_response_string (char *result, char *challenge) {
- 
+static void calc_response_string (char *result, char *challenge)
+{
   char field[128];
   char zres[20];
   int  i;
-      
+
   /* initialize our field */
   BE_32C (field,      0x01234567);
   BE_32C ((field+4),  0x89ABCDEF);
@@ -294,11 +291,11 @@ static void calc_response_string (char *result, char *challenge) {
   /* calculate response */
   call_hash(field, challenge, 64);
   calc_response(zres,field);
- 
+
   /* convert zres to ascii string */
   for (i=0; i<16; i++ ) {
     char a, b;
-    
+
     a = (zres[i] >> 4) & 15;
     b = zres[i] & 15;
 
@@ -307,8 +304,8 @@ static void calc_response_string (char *result, char *challenge) {
   }
 }
 
-void real_calc_response_and_checksum (char *response, char *chksum, char *challenge) {
-
+void real_calc_response_and_checksum (char *response, char *chksum, char *challenge)
+{
   int   ch_len, table_len, resp_len;
   int   i;
   char *ptr;
@@ -337,11 +334,11 @@ void real_calc_response_and_checksum (char *response, char *chksum, char *challe
       ch_len=32;
     }
     if ( ch_len > 56 ) ch_len=56;
-    
+
     /* copy challenge to buf */
     memcpy(ptr, challenge, ch_len);
   }
-  
+
   if (xor_table != NULL)
   {
     table_len = strlen(xor_table);
@@ -369,14 +366,12 @@ void real_calc_response_and_checksum (char *response, char *chksum, char *challe
  * takes a MLTI-Chunk and a rule number got from match_asm_rule,
  * returns a pointer to selected data and number of bytes in that.
  */
-
-static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection, char **out) {
-
+static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection, char **out)
+{
   int numrules, codec, size;
   int i;
-  
-  /* MLTI chunk should begin with MLTI */
 
+  /* MLTI chunk should begin with MLTI */
   if ((mlti_chunk[0] != 'M')
       ||(mlti_chunk[1] != 'L')
       ||(mlti_chunk[2] != 'T')
@@ -412,13 +407,12 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
   }
 
   mlti_chunk+=2;
- 
+
   /* now seek to selected codec */
   for (i=0; i<codec; i++) {
     size=BE_32(mlti_chunk);
     mlti_chunk+=size+4;
   }
-  
   size=BE_32(mlti_chunk);
 
   memcpy(*out, mlti_chunk+4, size);
@@ -429,301 +423,343 @@ static int select_mlti_data(const char *mlti_chunk, int mlti_size, int selection
  * looking at stream description.
  */
 
-rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidth) {
+rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidth)
+{
+    sdpplin_t *desc = NULL;
+    rmff_header_t *header = NULL;
+    char *buf = NULL;
+    int len, i;
+    int max_bit_rate=0;
+    int avg_bit_rate=0;
+    int max_packet_size=0;
+    int avg_packet_size=0;
+    int duration=0;
 
-  sdpplin_t *desc;
-  rmff_header_t *header;
-  char *buf;
-  int len, i;
-  int max_bit_rate=0;
-  int avg_bit_rate=0;
-  int max_packet_size=0;
-  int avg_packet_size=0;
-  int duration=0;
-  
+    if( !data ) return NULL;
 
-  if (!data) return NULL;
+    desc=sdpplin_parse(data);
+    if( !desc ) return NULL;
 
-  desc=sdpplin_parse(data);
+    buf= (char *)malloc(sizeof(char)*2048);
+    if( !buf ) goto error;
 
-  if (!desc) return NULL;
+    header = (rmff_header_t*)malloc(sizeof(rmff_header_t));
+    if( !header ) goto error;
 
-  buf=malloc(2048);
-  header = malloc(sizeof(rmff_header_t));
-  memset(header, 0, sizeof(rmff_header_t));
+    memset(header, 0, sizeof(rmff_header_t));
+    header->fileheader=rmff_new_fileheader(4+desc->stream_count);
+    header->cont=rmff_new_cont(
+        desc->title,
+        desc->author,
+        desc->copyright,
+        desc->abstract);
 
-  header->fileheader=rmff_new_fileheader(4+desc->stream_count);
-  header->cont=rmff_new_cont(
-      desc->title,
-      desc->author,
-      desc->copyright,
-      desc->abstract);
-  header->data=rmff_new_dataheader(0,0);
-  header->streams = malloc(sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
-  memset(header->streams, 0, sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
-  lprintf("number of streams: %u\n", desc->stream_count);
+    header->data=rmff_new_dataheader(0,0);
+    if( !header->data ) goto error;
 
-  for (i=0; i<desc->stream_count; i++) {
+    header->streams = (rmff_mdpr_t*)malloc(sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
+    if( !header->streams ) goto error;
 
-    int j=0;
-    int n;
-    char b[64];
-    int rulematches[16];
+    memset(header->streams, 0, sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
+    lprintf("number of streams: %u\n", desc->stream_count);
+    for (i=0; i<desc->stream_count; i++)
+    {
+        int j=0;
+        int n;
+        char b[64];
+        int rulematches[16];
 
-    lprintf("calling asmrp_match with:\n%s\n%u\n", desc->stream[i]->asm_rule_book, bandwidth);
+        lprintf("calling asmrp_match with:\n%s\n%u\n", desc->stream[i]->asm_rule_book, bandwidth);
 
-    n=asmrp_match(desc->stream[i]->asm_rule_book, bandwidth, rulematches);
-    for (j=0; j<n; j++) {
-      lprintf("asmrp rule match: %u for stream %u\n", rulematches[j], desc->stream[i]->stream_id);
-      sprintf(b,"stream=%u;rule=%u,", desc->stream[i]->stream_id, rulematches[j]);
-      strcat(*stream_rules, b);
+        n=asmrp_match(desc->stream[i]->asm_rule_book, bandwidth, rulematches);
+        for (j=0; j<n; j++)
+        {
+            lprintf("asmrp rule match: %u for stream %u\n", rulematches[j], desc->stream[i]->stream_id);
+            sprintf(b,"stream=%u;rule=%u,", desc->stream[i]->stream_id, rulematches[j]);
+            strcat(*stream_rules, b);
+        }
+
+        if (!desc->stream[i]->mlti_data)
+        {
+            len = 0;
+            if( buf ) free( buf );
+            buf = NULL;
+        }
+        else
+            len=select_mlti_data(desc->stream[i]->mlti_data,
+                    desc->stream[i]->mlti_data_size, rulematches[0], &buf);
+
+        header->streams[i]=rmff_new_mdpr(
+            desc->stream[i]->stream_id,
+                desc->stream[i]->max_bit_rate,
+                desc->stream[i]->avg_bit_rate,
+                desc->stream[i]->max_packet_size,
+                desc->stream[i]->avg_packet_size,
+                desc->stream[i]->start_time,
+                desc->stream[i]->preroll,
+                desc->stream[i]->duration,
+                desc->stream[i]->stream_name,
+                desc->stream[i]->mime_type,
+                len,
+                buf);
+        if( !header->streams[i] ) goto error;
+
+        duration=MAX(duration,desc->stream[i]->duration);
+        max_bit_rate+=desc->stream[i]->max_bit_rate;
+        avg_bit_rate+=desc->stream[i]->avg_bit_rate;
+        max_packet_size=MAX(max_packet_size, desc->stream[i]->max_packet_size);
+        if (avg_packet_size)
+            avg_packet_size=(avg_packet_size + desc->stream[i]->avg_packet_size) / 2;
+        else
+            avg_packet_size=desc->stream[i]->avg_packet_size;
     }
 
-    if (!desc->stream[i]->mlti_data) {
-     len = 0;
-     buf = NULL;
+    if (*stream_rules && strlen(*stream_rules) && (*stream_rules)[strlen(*stream_rules)-1] == ',')
+        (*stream_rules)[strlen(*stream_rules)-1]=0; /* delete last ',' in stream_rules */
+
+    header->prop=rmff_new_prop(
+        max_bit_rate,
+        avg_bit_rate,
+        max_packet_size,
+        avg_packet_size,
+        0,
+        duration,
+        0,
+        0,
+        0,
+        desc->stream_count,
+        desc->flags);
+    if( !header->prop ) goto error;
+
+    rmff_fix_header(header);
+
+    if( desc )
+    {
+        sdpplin_free( desc );
+        free( desc );
     }
-    else
-      len=select_mlti_data(desc->stream[i]->mlti_data, desc->stream[i]->mlti_data_size, rulematches[0], &buf);
-    
-    header->streams[i]=rmff_new_mdpr(
-	desc->stream[i]->stream_id,
-        desc->stream[i]->max_bit_rate,
-        desc->stream[i]->avg_bit_rate,
-        desc->stream[i]->max_packet_size,
-        desc->stream[i]->avg_packet_size,
-        desc->stream[i]->start_time,
-        desc->stream[i]->preroll,
-        desc->stream[i]->duration,
-        desc->stream[i]->stream_name,
-        desc->stream[i]->mime_type,
-	len,
-	buf);
+    if( buf ) free(buf);
+    return header;
 
-    duration=MAX(duration,desc->stream[i]->duration);
-    max_bit_rate+=desc->stream[i]->max_bit_rate;
-    avg_bit_rate+=desc->stream[i]->avg_bit_rate;
-    max_packet_size=MAX(max_packet_size, desc->stream[i]->max_packet_size);
-    if (avg_packet_size)
-      avg_packet_size=(avg_packet_size + desc->stream[i]->avg_packet_size) / 2;
-    else
-      avg_packet_size=desc->stream[i]->avg_packet_size;
-  }
-  
-  if (*stream_rules && strlen(*stream_rules) && (*stream_rules)[strlen(*stream_rules)-1] == ',')
-    (*stream_rules)[strlen(*stream_rules)-1]=0; /* delete last ',' in stream_rules */
-
-  header->prop=rmff_new_prop(
-      max_bit_rate,
-      avg_bit_rate,
-      max_packet_size,
-      avg_packet_size,
-      0,
-      duration,
-      0,
-      0,
-      0,
-      desc->stream_count,
-      desc->flags);
-
-  rmff_fix_header(header);
-  free(buf);
-
-  return header;
+error:
+    if( desc )
+    {
+        sdpplin_free( desc );
+        free( desc );
+    }
+    if( header )
+    {
+        rmff_free_header( header );
+        free( header );
+    }
+    if( buf ) free( buf );
+    return NULL;
 }
 
 int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph)
 {
+    int n=1;
+    uint8_t header[8];
+    int size;
+    int flags1;
+    int unknown1;
+    uint32_t ts;
 
-  int n=1;
-  uint8_t header[8];
-  int size;
-  int flags1;
-  int unknown1;
-  uint32_t ts;
-
-  n=rtsp_read_data(rtsp_session, header, 8);
-  if (n<8) return 0;
-  if (header[0] != 0x24)
-  {
-    lprintf("rdt chunk not recognized: got 0x%02x\n", header[0]);
-    return 0;
-  }
-  size=(header[1]<<16)+(header[2]<<8)+(header[3]);
-  flags1=header[4];
-  if ((flags1!=0x40)&&(flags1!=0x42))
-  {
-    lprintf("got flags1: 0x%02x\n",flags1);
-    if (header[6]==0x06)
+    n=rtsp_read_data(rtsp_session, header, 8);
+    if (n<8)
+        return 0;
+    if (header[0] != 0x24)
     {
-    lprintf("got end of stream packet\n");
-    return 0;
+        lprintf("rdt chunk not recognized: got 0x%02x\n", header[0]);
+        return 0;
     }
-    header[0]=header[5];
-    header[1]=header[6];
-    header[2]=header[7];
-    n=rtsp_read_data(rtsp_session, header+3, 5);
-    if (n<5) return 0;
-    lprintf("ignoring bytes:\n");
-    n=rtsp_read_data(rtsp_session, header+4, 4);
-    if (n<4) return 0;
+    size=(header[1]<<16)+(header[2]<<8)+(header[3]);
     flags1=header[4];
-    size-=9;
-  }
-  unknown1=(header[5]<<16)+(header[6]<<8)+(header[7]);
-  n=rtsp_read_data(rtsp_session, header, 6);
-  if (n<6) return 0;
-  ts=BE_32(header);
+    if ((flags1!=0x40)&&(flags1!=0x42))
+    {
+        lprintf("got flags1: 0x%02x\n",flags1);
+        if (header[6]==0x06)
+        {
+            lprintf("got end of stream packet\n");
+            return 0;
+        }
+        header[0]=header[5];
+        header[1]=header[6];
+        header[2]=header[7];
+        n=rtsp_read_data(rtsp_session, header+3, 5);
+        if (n<5)
+            return 0;
+        lprintf("ignoring bytes:\n");
+        n=rtsp_read_data(rtsp_session, header+4, 4);
+        if (n<4)
+            return 0;
+        flags1=header[4];
+        size-=9;
+    }
+    unknown1=(header[5]<<16)+(header[6]<<8)+(header[7]);
+    n=rtsp_read_data(rtsp_session, header, 6);
+    if (n<6)
+        return 0;
+    ts=BE_32(header);
 
 #if 0
-  lprintf("ts: %u size: %u, flags: 0x%02x, unknown values: %u 0x%02x 0x%02x\n", 
-          ts, size, flags1, unknown1, header[4], header[5]);
+    lprintf("ts: %u size: %u, flags: 0x%02x, unknown values: %u 0x%02x 0x%02x\n",
+            ts, size, flags1, unknown1, header[4], header[5]);
 #endif
 
-  size+=2;
-  
-  ph->object_version=0;
-  ph->length=size;
-  ph->stream_number=(flags1>>1)&1;
-  ph->timestamp=ts;
-  ph->reserved=0;
-  ph->flags=0;      /* TODO: determine keyframe flag and insert here? */
-
-  return size;
+    size+=2;
+    ph->object_version=0;
+    ph->length=size;
+    ph->stream_number=(flags1>>1)&1;
+    ph->timestamp=ts;
+    ph->reserved=0;
+    ph->flags=0;      /* TODO: determine keyframe flag and insert here? */
+    return size;
 }
 
 int real_get_rdt_chunk(rtsp_client_t *rtsp_session, rmff_pheader_t *ph,
                        unsigned char **buffer)
 {
-  int n;
-  rmff_dump_pheader(ph, *buffer);
-  n=rtsp_read_data(rtsp_session, *buffer + 12, ph->length - 12);
-  return (n <= 0) ? 0 : n+12;
+    int n;
+    rmff_dump_pheader(ph, *buffer);
+    n=rtsp_read_data(rtsp_session, *buffer + 12, ph->length - 12);
+    return (n <= 0) ? 0 : n+12;
 }
 
 //! maximum size of the rtsp description, must be < INT_MAX
 #define MAX_DESC_BUF (20 * 1024 * 1024)
-rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandwidth) {
+rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandwidth)
+{
+    char *description=NULL;
+    char *session_id=NULL;
+    rmff_header_t *h;
+    char *challenge1 = NULL;
+    char challenge2[64];
+    char checksum[34];
+    char *subscribe=NULL;
+    char *buf=(char*)malloc(sizeof(char)*256);
+    char *mrl=rtsp_get_mrl(rtsp_session);
+    unsigned int size;
+    int status;
 
-  char *description=NULL;
-  char *session_id=NULL;
-  rmff_header_t *h;
-  char *challenge1;
-  char challenge2[64];
-  char checksum[34];
-  char *subscribe;
-  char *buf=malloc(256);
-  char *mrl=rtsp_get_mrl(rtsp_session);
-  unsigned int size;
-  int status;
-  
-  /* get challenge */
-  challenge1=strdup(rtsp_search_answers(rtsp_session,"RealChallenge1"));
-  lprintf("Challenge1: %s\n", challenge1);
-  
-  /* request stream description */
-  rtsp_schedule_field(rtsp_session, "Accept: application/sdp");
-  sprintf(buf, "Bandwidth: %u", bandwidth);
-  rtsp_schedule_field(rtsp_session, buf);
-  rtsp_schedule_field(rtsp_session, "GUID: 00000000-0000-0000-0000-000000000000");
-  rtsp_schedule_field(rtsp_session, "RegionData: 0");
-  rtsp_schedule_field(rtsp_session, "ClientID: Linux_2.4_6.0.9.1235_play32_RN01_EN_586");
-  rtsp_schedule_field(rtsp_session, "SupportsMaximumASMBandwidth: 1");
-  rtsp_schedule_field(rtsp_session, "Language: en-US");
-  rtsp_schedule_field(rtsp_session, "Require: com.real.retain-entity-for-setup");
-  status=rtsp_request_describe(rtsp_session,NULL);
+    /* get challenge */
+    challenge1=strdup(rtsp_search_answers(rtsp_session,"RealChallenge1"));
+    lprintf("Challenge1: %s\n", challenge1);
 
-  if ( status<200 || status>299 )
-  {
-    char *alert=rtsp_search_answers(rtsp_session,"Alert");
-    if (alert) {
-      lprintf("real: got message from server:\n%s\n", alert);
+    /* request stream description */
+    rtsp_schedule_field(rtsp_session, "Accept: application/sdp");
+    sprintf(buf, "Bandwidth: %u", bandwidth);
+    rtsp_schedule_field(rtsp_session, buf);
+    rtsp_schedule_field(rtsp_session, "GUID: 00000000-0000-0000-0000-000000000000");
+    rtsp_schedule_field(rtsp_session, "RegionData: 0");
+    rtsp_schedule_field(rtsp_session, "ClientID: Linux_2.4_6.0.9.1235_play32_RN01_EN_586");
+    rtsp_schedule_field(rtsp_session, "SupportsMaximumASMBandwidth: 1");
+    rtsp_schedule_field(rtsp_session, "Language: en-US");
+    rtsp_schedule_field(rtsp_session, "Require: com.real.retain-entity-for-setup");
+
+    status=rtsp_request_describe(rtsp_session,NULL);
+    if ( status<200 || status>299 )
+    {
+        char *alert=rtsp_search_answers(rtsp_session,"Alert");
+        if (alert) {
+            lprintf("real: got message from server:\n%s\n", alert);
+        }
+        printf( "bou\n");
+        rtsp_send_ok(rtsp_session);
+        if( challenge1 ) free(challenge1);
+        if( alert ) free(alert);
+        if( buf ) free(buf);
+        return NULL;
     }
-    printf( "bou\n");
-    rtsp_send_ok(rtsp_session);
-    free(buf);
-    return NULL;
-  }
 
-  /* receive description */
-  size=0;
-  if (!rtsp_search_answers(rtsp_session,"Content-length"))
-    lprintf("real: got no Content-length!\n");
-  else
-    size=atoi(rtsp_search_answers(rtsp_session,"Content-length"));
+    /* receive description */
+    size=0;
+    if (!rtsp_search_answers(rtsp_session,"Content-length"))
+        lprintf("real: got no Content-length!\n");
+    else
+        size=atoi(rtsp_search_answers(rtsp_session,"Content-length"));
 
-  if (size > MAX_DESC_BUF) {
-    printf("real: Content-length for description too big (> %uMB)!\n",
-           MAX_DESC_BUF/(1024*1024) );
-    free(buf);
-    return NULL;
-  }
+    if (size > MAX_DESC_BUF) {
+        printf("real: Content-length for description too big (> %uMB)!\n",
+            MAX_DESC_BUF/(1024*1024) );
+        goto error;
+    }
 
-  if (!rtsp_search_answers(rtsp_session,"ETag"))
-    lprintf("real: got no ETag!\n");
-  else
-    session_id=strdup(rtsp_search_answers(rtsp_session,"ETag"));
-    
-  lprintf("Stream description size: %i\n", size);
+    if (!rtsp_search_answers(rtsp_session,"ETag"))
+        lprintf("real: got no ETag!\n");
+    else
+        session_id=strdup(rtsp_search_answers(rtsp_session,"ETag"));
 
-  description = malloc(sizeof(char)*(size+1));
+    lprintf("Stream description size: %i\n", size);
 
-  if( rtsp_read_data(rtsp_session, description, size) <= 0) {
-    free(buf);
-    return NULL;
-  }
-  description[size]=0;
+    description = (char*)malloc(sizeof(char)*(size+1));
+    if( !description )
+        goto error;
+    if( rtsp_read_data(rtsp_session, description, size) <= 0)
+        goto error;
+    description[size]=0;
+    fprintf(stderr,description);
 
-  fprintf(stderr,description);
-  /* parse sdp (sdpplin) and create a header and a subscribe string */
-  subscribe=malloc(256);
-  strcpy(subscribe, "Subscribe: ");
-  h=real_parse_sdp(description, &subscribe, bandwidth);
-  if (!h) {
-    free(subscribe);
-    free(buf);
-    return NULL;
-  }
-  rmff_fix_header(h);
+    /* parse sdp (sdpplin) and create a header and a subscribe string */
+    subscribe = (char *) malloc(sizeof(char)*256);
+    if( !subscribe )
+        goto error;
 
-#if 0
-  fprintf("Title: %s\nCopyright: %s\nAuthor: %s\nStreams: %i\n",
-	  h->cont->title, h->cont->copyright, h->cont->author, h->prop->num_streams);
-#endif
-  
-  /* setup our streams */
-  real_calc_response_and_checksum (challenge2, checksum, challenge1);
-  buf = realloc(buf, strlen(challenge2) + strlen(checksum) + 32);
-  sprintf(buf, "RealChallenge2: %s, sd=%s", challenge2, checksum);
-  rtsp_schedule_field(rtsp_session, buf);
-  buf = realloc(buf, strlen(session_id) + 32);
-  sprintf(buf, "If-Match: %s", session_id);
-  rtsp_schedule_field(rtsp_session, buf);
-  rtsp_schedule_field(rtsp_session, "Transport: x-pn-tng/tcp;mode=play,rtp/avp/tcp;unicast;mode=play");
-  buf = realloc(buf, strlen(mrl) + 32);
-  sprintf(buf, "%s/streamid=0", mrl);
-  rtsp_request_setup(rtsp_session,buf);
+    strcpy(subscribe, "Subscribe: ");
+    h=real_parse_sdp(description, &subscribe, bandwidth);
+    if (!h)
+        goto error;
 
-  if (h->prop->num_streams > 1) {
-    rtsp_schedule_field(rtsp_session, "Transport: x-pn-tng/tcp;mode=play,rtp/avp/tcp;unicast;mode=play");
+    rmff_fix_header(h);
+
+    #if 0
+    fprintf("Title: %s\nCopyright: %s\nAuthor: %s\nStreams: %i\n",
+        h->cont->title, h->cont->copyright, h->cont->author, h->prop->num_streams);
+    #endif
+
+    /* setup our streams */
+    real_calc_response_and_checksum (challenge2, checksum, challenge1);
+    buf = realloc(buf, strlen(challenge2) + strlen(checksum) + 32);
+    sprintf(buf, "RealChallenge2: %s, sd=%s", challenge2, checksum);
+    rtsp_schedule_field(rtsp_session, buf);
     buf = realloc(buf, strlen(session_id) + 32);
     sprintf(buf, "If-Match: %s", session_id);
     rtsp_schedule_field(rtsp_session, buf);
-
+    rtsp_schedule_field(rtsp_session, "Transport: x-pn-tng/tcp;mode=play,rtp/avp/tcp;unicast;mode=play");
     buf = realloc(buf, strlen(mrl) + 32);
-    sprintf(buf, "%s/streamid=1", mrl);
+    sprintf(buf, "%s/streamid=0", mrl);
     rtsp_request_setup(rtsp_session,buf);
-  }
-  /* set stream parameter (bandwidth) with our subscribe string */
-  rtsp_schedule_field(rtsp_session, subscribe);
-  rtsp_request_setparameter(rtsp_session,NULL);
 
-  /* and finally send a play request */
-  rtsp_schedule_field(rtsp_session, "Range: npt=0-");
-  rtsp_request_play(rtsp_session,NULL);
+    if (h->prop->num_streams > 1) {
+        rtsp_schedule_field(rtsp_session, "Transport: x-pn-tng/tcp;mode=play,rtp/avp/tcp;unicast;mode=play");
+        buf = realloc(buf, strlen(session_id) + 32);
+        sprintf(buf, "If-Match: %s", session_id);
+        rtsp_schedule_field(rtsp_session, buf);
+        buf = realloc(buf, strlen(mrl) + 32);
+        sprintf(buf, "%s/streamid=1", mrl);
+        rtsp_request_setup(rtsp_session,buf);
+    }
+    /* set stream parameter (bandwidth) with our subscribe string */
+    rtsp_schedule_field(rtsp_session, subscribe);
+    rtsp_request_setparameter(rtsp_session,NULL);
 
-  free(subscribe);
-  free(buf);
-  return h;
+    /* and finally send a play request */
+    rtsp_schedule_field(rtsp_session, "Range: npt=0-");
+    rtsp_request_play(rtsp_session,NULL);
+
+    if( challenge1 ) free( challenge1 );
+    if( session_id ) free( session_id );
+    if( description ) free(description);
+    if( subscribe ) free(subscribe);
+    if( buf ) free(buf);
+    return h;
+
+error:
+    if( h ) rmff_free_header( h );
+    if( challenge1 ) free( challenge1 );
+    if( session_id ) free( session_id );
+    if( description ) free(description);
+    if( subscribe ) free(subscribe);
+    if( buf ) free(buf);
+    return NULL;
 }
-
