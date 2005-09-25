@@ -262,7 +262,7 @@ int E_(Activate) ( vlc_object_t *p_this )
     /* Set main window's size */
     p_vout->p_sys->original_window.i_width = p_vout->i_window_width;
     p_vout->p_sys->original_window.i_height = p_vout->i_window_height;
-
+    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     /* Spawn base window - this window will include the video output window,
      * but also command buttons, subtitles and other indicators */
     if( CreateWindow( p_vout, &p_vout->p_sys->original_window ) )
@@ -914,6 +914,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     vlc_bool_t              b_expose = VLC_FALSE;
     vlc_bool_t              b_configure_notify = VLC_FALSE;
     vlc_bool_t              b_map_notify = VLC_FALSE;
+    vlc_value_t             val;
 
     /* Prepare window manager hints and properties */
     p_win->wm_protocols =
@@ -1003,15 +1004,24 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             }
             else
             {
-                XStoreName( p_vout->p_sys->p_display, p_win->base_window,
+                 var_Get( p_vout, "video-title", &val );
+                 if( !val.psz_string || !*val.psz_string )
+                 {
+                    XStoreName( p_vout->p_sys->p_display, p_win->base_window,
 #ifdef MODULE_NAME_IS_x11
-                        VOUT_TITLE " (X11 output)"
+                                VOUT_TITLE " (X11 output)"
 #elif defined(MODULE_NAME_IS_glx)
-                        VOUT_TITLE " (GLX output)"
+                                VOUT_TITLE " (GLX output)"
 #else
-                        VOUT_TITLE " (XVideo output)"
+                                VOUT_TITLE " (XVideo output)"
 #endif
                       );
+                }
+                else
+                {
+                    XStoreName( p_vout->p_sys->p_display,
+                               p_win->base_window, val.psz_string );
+                }
             }
         }
     }
