@@ -458,7 +458,7 @@ int rtsp_connect( rtsp_client_t *rtsp, const char *psz_mrl,
     rtsp_t *s;
     char *mrl_ptr;
     char *slash, *colon;
-    int hostend, pathbegin, i;
+    unsigned int hostend, pathbegin, i;
 
     if( !psz_mrl ) return -1;
     s = malloc( sizeof(rtsp_t) );

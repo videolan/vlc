@@ -292,7 +292,6 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;

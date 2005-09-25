@@ -218,7 +218,7 @@ static void call_hash (char *key, char *challenge, int len) {
   a += len * 8;
   LE_32C(ptr1, a);
 
-  if (a < (len << 3))
+  if (a < (uint32_t)(len << 3))
   {
     lprintf("not verified: (len << 3) > a true\n");
     ptr2 += 4;
@@ -228,14 +228,14 @@ static void call_hash (char *key, char *challenge, int len) {
   LE_32C(ptr2, tmp);
   a = 64 - b;
   c = 0;
-  if (a <= len)
+  if (a <= (uint32_t)len)
   {
     memcpy(key+b+24, challenge, a);
     hash(key, key+24);
     c = a;
     d = c + 0x3f;
 
-    while ( d < len ) {
+    while ( d < (uint32_t)len ) {
       lprintf("not verified:  while ( d < len )\n");
       hash(key, challenge+d-0x3f);
       d += 64;
@@ -457,7 +457,7 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
     header->data=rmff_new_dataheader(0,0);
     if( !header->data ) goto error;
 
-    header->streams = (rmff_mdpr_t*)malloc(sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
+    header->streams = (rmff_mdpr_t**) malloc(sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
     if( !header->streams ) goto error;
 
     memset(header->streams, 0, sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
