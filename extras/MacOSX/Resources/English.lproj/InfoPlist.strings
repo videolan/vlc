@@ -1,6 +1,6 @@
 /* Localized versions of Info.plist keys */
 
 CFBundleName = "VLC";
-CFBundleShortVersionString = "0.8.4-svn";
-CFBundleGetInfoString = "VLC media player 0.8.4-svn, Copyright (c) 1996-2005 the VideoLAN team";
+CFBundleShortVersionString = "0.8.4-test1";
+CFBundleGetInfoString = "VLC media player 0.8.4-test1, Copyright (c) 1996-2005 the VideoLAN team";
 NSHumanReadableCopyright = "Copyright (c) 1996-2005 the VideoLAN team";
