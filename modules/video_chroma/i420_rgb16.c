@@ -40,7 +40,8 @@
 #   include "i420_rgb_mmx.h"
 #endif
 
-static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
+static void SetOffset( int, int, int, int, vlc_bool_t *,
+                       unsigned int *, int * );
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 /*****************************************************************************
@@ -63,7 +64,7 @@ void E_(I420_RGB16_dithering)( vout_thread_t *p_vout, picture_t *p_src,
     uint8_t  *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t   b_hscale;                        /* horizontal scaling type */
-    int          i_vscale;                          /* vertical scaling type */
+    unsigned int i_vscale;                          /* vertical scaling type */
     unsigned int i_x, i_y;                /* horizontal and vertical indexes */
     unsigned int i_real_y;                                          /* y % 4 */
 
@@ -586,7 +587,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
  *****************************************************************************/
 static void SetOffset( int i_width, int i_height, int i_pic_width,
                        int i_pic_height, vlc_bool_t *pb_hscale,
-                       int *pi_vscale, int *p_offset )
+                       unsigned int *pi_vscale, int *p_offset )
 {
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */
