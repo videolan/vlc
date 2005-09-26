@@ -86,7 +86,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         
         /* Setup our credits */
         o_credits_path = [[NSBundle mainBundle] pathForResource:@"AUTHORS" ofType:nil];
-        o_credits = [[NSString alloc] initWithData: [NSData dataWithContentsOfFile: o_credits_path ] encoding:NSWindowsCP1252StringEncoding];
+        o_credits = [[NSString alloc] initWithData: [NSData dataWithContentsOfFile: o_credits_path ] encoding:NSUTF8StringEncoding];
         
         /* Parse the authors string */
         NSMutableString *o_outString = [NSMutableString stringWithFormat: @"%@\n\n", _NS(INTF_ABOUT_MSG)];
@@ -130,7 +130,7 @@ static VLAboutBox *_o_sharedInstance = nil;
         /* Parse the thanks string */
         o_thanks_path = [[NSBundle mainBundle] pathForResource:@"THANKS" ofType:nil];
         o_thanks = [[NSString alloc] initWithData: [NSData dataWithContentsOfFile: 
-                        o_thanks_path ] encoding:NSWindowsCP1252StringEncoding];
+                        o_thanks_path ] encoding:NSUTF8StringEncoding];
         
         NSScanner *o_scan_thanks = [NSScanner scannerWithString: o_thanks];
         [o_scan_thanks scanUpToCharactersFromSet: o_stopSet intoString: nil];
