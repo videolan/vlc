@@ -496,6 +496,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         return; 
     }
 
+    if( p_stream->fmt.i_codec == VLC_FOURCC( 's','u','b','t' ) &&
+        p_oggpacket->packet[0] & PACKET_TYPE_BITS ) return;
+
     /* Check the ES is selected */
     es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                     p_stream->p_es, &b_selected );
