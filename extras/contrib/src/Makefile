@@ -855,10 +855,10 @@ DISTCLEAN_PKG += libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 # live
 # ***************************************************************************
 
-live-$(LIVEDOTCOM_VERSION).tar.gz:
+live555-$(LIVEDOTCOM_VERSION).tar.gz:
 	$(WGET) $(LIVEDOTCOM_URL)
 
-live: live-$(LIVEDOTCOM_VERSION).tar.gz
+live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
 
