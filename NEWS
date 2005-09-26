@@ -4,32 +4,32 @@ Changes between 0.8.2 and 0.8.4-svn (not yet released):
 -----------------------------------------------------
 
 Core support:
-* Internal strings handling is now UTF-8 based
-* New OSD system
+ * Internal strings handling is now UTF-8 based
+ * New OSD system
 
 Video output:
-* Fixed problems with OpenGL output
-* New --monitor-aspect-ratio option
+ * Fixed problems with OpenGL output
+ * New --monitor-aspect-ratio option
 
 Input:
-* Improved DVB support for satellite bands other than Ku-band
-* IPv6 and Extended passive mode support for FTP
-* IPv6 Source Specific Multicast support
-* GnomeVFS input module
+ * Improved DVB support for satellite bands other than Ku-band
+ * IPv6 and Extended passive mode support for FTP
+ * IPv6 Source Specific Multicast support
+ * GnomeVFS input module
 
 Decoders:
-* Support for libSDL_image to import different image types
+ * Support for libSDL_image to import different image types
 
 Services discovery:
-* UPnP service discovery
-* Bonjour service discovery using avahi
+ * UPnP service discovery
+ * Bonjour service discovery using avahi
 
 Video Filters:
-* RSS feed overlay
+ * RSS feed overlay
 
 Stream output:
-* New shout output module to forward streams to icecast servers
-* Fixed several SAP and SDP announcement bugs
+ * New shout output module to forward streams to icecast servers
+ * Fixed several SAP and SDP announcement bugs
  
 Interfaces:
  * Mac OS X
@@ -42,11 +42,14 @@ Interfaces:
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*	
     - VLC update checker
+ * Skins2
+    - Tree playlist
  * HTTP
     - New RPN functions to control VLC features (see play-howto)
     - Facilities to correctly handle non-ASCII characters and spaces in
       the names of files
     - Include macro to include other files
+    - CGI 1.0 support
 
 ActiveX plugin:
 * Should now work outside IE as well
