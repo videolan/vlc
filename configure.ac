@@ -1044,10 +1044,7 @@ fi
 dnl
 dnl  Accelerated modules
 dnl
-MMX_MODULES="memcpymmx i422_yuy2_mmx i420_ymga_mmx"
-if test "${target_cpu}" != "x86_64"; then
-  MMX_MODULES="${MMX_MODULES} i420_rgb_mmx"
-fi
+MMX_MODULES="memcpymmx i420_rgb_mmx i422_yuy2_mmx i420_ymga_mmx"
 #MMX_MODULES="${MMX_MODULES} idctmmx motionmmx"
 MMXEXT_MODULES="memcpymmxext"
 #MMXEXT_MODULES="${MMXEXT_MODULES} idctmmxext motionmmxext"
