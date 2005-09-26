@@ -174,6 +174,14 @@ collect_folder_contents( BDirectory& dir, BList& list, bool& deep, bool& asked, 
     }
 }
 
+static int PlaylistChanged( vlc_object_t *p_this, const char * psz_variable,
+                            vlc_value_t old_val, vlc_value_t new_val,
+                            void * param )
+{
+    InterfaceWindow * w = (InterfaceWindow *) param;
+    w->UpdatePlaylist();
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
  * InterfaceWindow
@@ -193,6 +201,15 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
       fLastUpdateTime( system_time() ),
       fSettings( new BMessage( 'sett' ) )
 {
+    p_playlist = (playlist_t *)
+        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
+    var_AddCallback( p_playlist, "item-change", PlaylistChanged, this );
+    var_AddCallback( p_playlist, "item-append", PlaylistChanged, this );
+    var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, this );
+    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, this );
+
     char psz_tmp[1024];
 #define ADD_ELLIPSIS( a ) \
     memset( psz_tmp, 0, 1024 ); \
@@ -416,7 +433,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     playlist_Add( p_playlist, psz_uri, psz_device,
                                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
                 }
-                _UpdatePlaylist();
+                UpdatePlaylist();
             }
             break;
 
@@ -731,7 +748,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 }
             }
 
-            _UpdatePlaylist();
+            UpdatePlaylist();
             break;
         }
 
@@ -792,12 +809,6 @@ bool InterfaceWindow::QuitRequested()
  *****************************************************************************/
 void InterfaceWindow::UpdateInterface()
 {
-    /* Manage the input part */
-    if( !p_playlist )
-    {
-        p_playlist = (playlist_t *)
-            vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    }
     if( !p_input )
     {
         p_input = (input_thread_t *)
@@ -813,6 +824,17 @@ void InterfaceWindow::UpdateInterface()
     if( LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) != B_OK )
     {
         return;
+    }
+
+    if( b_playlist_update )
+    {
+        if( fPlaylistWindow->Lock() )
+        {
+            fPlaylistWindow->UpdatePlaylist( true );
+            fPlaylistWindow->Unlock();
+            b_playlist_update = false;
+        }
+        p_mediaControl->SetEnabled( p_playlist->i_size );
     }
 
     if( p_input )
@@ -840,13 +862,6 @@ void InterfaceWindow::UpdateInterface()
         aout_VolumeGet( p_intf, &i_volume );
         p_mediaControl->SetAudioEnabled( true );
         p_mediaControl->SetMuted( i_volume );
-
-        // update playlist as well
-        if( fPlaylistWindow->LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK )
-        {
-            fPlaylistWindow->UpdatePlaylist();
-            fPlaylistWindow->Unlock();
-        }
     }
     else
     {
@@ -877,26 +892,21 @@ void InterfaceWindow::UpdateInterface()
 }
 
 /*****************************************************************************
+ * InterfaceWindow::UpdatePlaylist
+ *****************************************************************************/
+void
+InterfaceWindow::UpdatePlaylist()
+{
+    b_playlist_update = true;
+}
+
+/*****************************************************************************
  * InterfaceWindow::IsStopped
  *****************************************************************************/
 bool
 InterfaceWindow::IsStopped() const
 {
     return (system_time() - fLastUpdateTime > INTERFACE_UPDATE_TIMEOUT);
-}
-
-/*****************************************************************************
- * InterfaceWindow::_UpdatePlaylist
- *****************************************************************************/
-void
-InterfaceWindow::_UpdatePlaylist()
-{
-    if( fPlaylistWindow->Lock() )
-    {
-        fPlaylistWindow->UpdatePlaylist( true );
-        fPlaylistWindow->Unlock();
-    }
-    p_mediaControl->SetEnabled( p_playlist->i_size );
 }
 
 /*****************************************************************************

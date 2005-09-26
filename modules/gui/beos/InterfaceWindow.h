@@ -102,26 +102,28 @@ class InterfaceWindow : public BWindow
 
                             // InterfaceWindow
             void            UpdateInterface();
+            void            UpdatePlaylist();
+
             bool            IsStopped() const;
         
     MediaControlView*        p_mediaControl;
     MessagesWindow*         fMessagesWindow;
 
  private:    
-            void            _UpdatePlaylist();
             void            _SetMenusEnabled( bool hasFile,
                                               bool hasChapters = false,
                                               bool hasTitles = false );
             void            _UpdateSpeedMenu( int rate );
-            void			_ShowFilePanel( uint32 command,
-            								const char* windowTitle );
-			void			_RestoreSettings();
-			void			_StoreSettings();
+            void            _ShowFilePanel( uint32 command,
+                                            const char* windowTitle );
+            void            _RestoreSettings();
+            void            _StoreSettings();
 
     intf_thread_t         * p_intf;
     input_thread_t        * p_input;
     playlist_t            * p_playlist;
     es_descriptor_t       * p_spu_es;
+    bool                    b_playlist_update;
 
     BFilePanel*             fFilePanel;
     PlayListWindow*         fPlaylistWindow;
@@ -149,19 +151,19 @@ class InterfaceWindow : public BWindow
     BMenu*                  fSpeedMenu;
     BMenu*                  fShowMenu;
     bigtime_t               fLastUpdateTime;
-	BMessage*				fSettings;	// we keep the message arround
-										// for forward compatibility
+    BMessage*               fSettings;  // we keep the message arround
+                                        // for forward compatibility
 };
 
 
 // some global support functions
 status_t load_settings( BMessage* message,
-						const char* fileName,
-						const char* folder = NULL );
+                        const char* fileName,
+                        const char* folder = NULL );
 
 status_t save_settings( BMessage* message,
-						const char* fileName,
-						const char* folder = NULL );
+                        const char* fileName,
+                        const char* folder = NULL );
 
 
 #endif    // BEOS_INTERFACE_WINDOW_H
