@@ -33,6 +33,7 @@
 #include <stdio.h>
 
 #include "charset.h"
+#include "network.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -87,6 +88,8 @@ static int Open( vlc_object_t *p_this )
     char           *psz_name = NULL;
     char           *psz = NULL;
     char           *psz_uri = NULL;
+    char           *psz_unescaped = NULL;
+    char           *psz_expand_tilde = NULL;
     GnomeVFSURI    *p_uri = NULL;
     GnomeVFSResult  i_ret;
     GnomeVFSHandle *p_handle = NULL;
@@ -125,29 +128,56 @@ static int Open( vlc_object_t *p_this )
                                             *(p_access->psz_access) != '\0')
     {
         psz_name = malloc( strlen( p_access->psz_access ) +
-                                            strlen( p_access->psz_path ) + 3 );
-        strcpy( psz_name, p_access->psz_access );
-        strcat( psz_name, "://" );
-        strcat( psz_name, p_access->psz_path );
+                                            strlen( p_access->psz_path ) + 4 );
+        sprintf( psz_name, "%s://%s", p_access->psz_access,
+                                                    p_access->psz_path );
     }
     else
     {
         psz_name = strdup( p_access->psz_path );
     }
-
     psz = ToLocale( psz_name );
+    psz_expand_tilde = gnome_vfs_expand_initial_tilde( psz );
+    LocaleFree( psz );
 
-    /* Use gnome_vfs_make_uri_from_input_with_dirs for local paths, as it deals
-       relative directories, and gnome_vfs_make_uri_from_input_with_dirs
-       otherwise */
-    psz_uri = gnome_vfs_make_uri_from_input_with_dirs( psz,
-                                    GNOME_VFS_MAKE_URI_DIR_CURRENT);
-    if( *psz_uri != '/' )
+    psz_unescaped = gnome_vfs_make_uri_from_shell_arg( psz_expand_tilde );
+
+   /* gnome_vfs_make_uri_from_shell_arg will only escape the uri
+      for relative paths. So we need to use
+      gnome_vfs_escape_host_and_path_string in other cases. */
+
+    if( !strcmp( psz_unescaped, psz_expand_tilde ) )
     {
-        g_free( psz_uri );
-        psz_uri = gnome_vfs_escape_host_and_path_string( psz );
+    /* Now we are sure that we have a complete valid unescaped URI beginning
+       with the protocol. We want to escape it. However, gnomevfs's escaping
+       function are broken and will try to escape characters un the username/
+       password field. So parse the URI with vlc_UrlParse ans only escape the
+       path */
+
+        vlc_url_t url;
+        char *psz_escaped_path;
+        char *psz_path_begin;
+
+        vlc_UrlParse( &url, psz_unescaped, 0 );
+
+        psz_escaped_path = gnome_vfs_escape_path_string( url.psz_path );
+
+    /* Now let's reconstruct a valid URI from all that stuff */
+        psz_path_begin = strstr( psz_unescaped, url.psz_path );
+        *psz_path_begin = '\0';
+        psz_uri = malloc( strlen( psz_unescaped ) +
+                                        strlen( psz_escaped_path ) + 1 );
+        sprintf( psz_uri, "%s%s",psz_unescaped, psz_escaped_path );
+
+        g_free( psz_escaped_path );
+        g_free( psz_unescaped );
+    }
+    else
+    {
+        psz_uri = psz_unescaped;
     }
 
+    g_free( psz_expand_tilde );
     p_uri = gnome_vfs_uri_new( psz_uri );
     if( p_uri )
     {
@@ -157,12 +187,12 @@ static int Open( vlc_object_t *p_this )
 
         if( i_ret )
         {
-            msg_Err( p_access, "cannot get file info (%s)", 
-                                    gnome_vfs_result_to_string( i_ret ) );
+            msg_Err( p_access, "cannot get file info for uri %s (%s)", 
+                                psz_uri, gnome_vfs_result_to_string( i_ret ) );
             gnome_vfs_file_info_unref( p_sys->p_file_info );
             gnome_vfs_uri_unref( p_uri);
             free( p_sys );
-            free( psz_uri );
+            g_free( psz_uri );
             free( psz_name );
             return VLC_EGENERIC;
         }
@@ -170,13 +200,11 @@ static int Open( vlc_object_t *p_this )
     else
     {
         msg_Warn( p_access, "cannot parse MRL %s or unsupported protocol", psz_name );
-        LocaleFree( psz );
         g_free( psz_uri );
         free( p_sys );
         free( psz_name );
         return VLC_EGENERIC;
     }
-    LocaleFree( psz );
 
     msg_Dbg( p_access, "opening file `%s'", psz_uri );
     i_ret = gnome_vfs_open( &(p_sys->p_handle), psz_uri, 5 );
@@ -185,11 +213,9 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_access, "cannot open file %s: %s", psz_uri,
                                 gnome_vfs_result_to_string( i_ret ) );
 
-        LocaleFree( psz );
-        g_free( psz_uri );
         gnome_vfs_uri_unref( p_uri);
+        g_free( psz_uri );
         free( p_sys ); 
-        free( psz_uri );
         free( psz_name );
         return VLC_EGENERIC;
     }
@@ -222,8 +248,9 @@ static int Open( vlc_object_t *p_this )
         /* FIXME that's bad because all others access will be probed */
         msg_Err( p_access, "file %s is empty, aborting", psz_name );
         gnome_vfs_file_info_unref( p_sys->p_file_info );
+        gnome_vfs_uri_unref( p_uri);
         free( p_sys );
-        free( psz_uri );
+        g_free( psz_uri );
         free( psz_name );
         return VLC_EGENERIC;
     }
