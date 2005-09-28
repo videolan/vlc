@@ -912,7 +912,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     if( i_cm_size )
     {
         int64_t i_num, i_den;
-        int i_dst_num, i_dst_den;
+        unsigned int i_dst_num, i_dst_den;
 
         for( i = 0; i < p_sys->i_track; i++ )
             if( p_sys->track[i].i_cat == VIDEO_ES ) break;
