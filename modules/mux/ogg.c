@@ -648,7 +648,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
         else if( p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
         {
             /* flac stream marker (yeah, only that in the 1st packet) */
-            op.packet = "fLaC";
+            op.packet = (unsigned char *)"fLaC";
             op.bytes  = 4;
             op.b_o_s  = 1;
             op.e_o_s  = 0;
@@ -729,7 +729,8 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
 
             /* comment */
             com[0] = PACKET_TYPE_COMMENT;
-            i_com = snprintf( &com[1], 127, PACKAGE_VERSION" stream output" )
+            i_com = snprintf( (char *)(com+1), 127,
+                              PACKAGE_VERSION" stream output" )
                      + 1;
             op.packet = com;
             op.bytes  = i_com;
