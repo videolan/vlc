@@ -145,6 +145,8 @@ struct demux_sys_t
     live_track_t     **track;   /* XXX mallocated */
     mtime_t          i_pcr;
     mtime_t          i_pcr_start;
+    mtime_t          i_pcr_previous;
+    int              i_pcr_repeats;
 
     /* Asf */
     asf_header_t     asfh;
@@ -227,6 +229,8 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->track   = NULL;
     p_sys->i_pcr   = 0;
     p_sys->i_pcr_start = 0;
+    p_sys->i_pcr_previous = 0;
+    p_sys->i_pcr_repeats = 0;
     p_sys->i_length = 0;
     p_sys->i_start = 0;
     p_sys->p_out_asf = NULL;
@@ -733,6 +737,24 @@ static int Demux( demux_t *p_demux )
         }
     }
 
+    /* When a On Demand QT stream ends, the last frame keeps going with the same PCR/PTS value */
+    /* This tests for that, so we can later decide to end this session */
+    if( p_sys->i_pcr == p_sys->i_pcr_previous )
+    {
+        p_sys->i_pcr_repeats++;
+    }
+    else
+    {
+        p_sys->i_pcr_previous = p_sys->i_pcr;
+        p_sys->i_pcr_repeats = 0;
+    }
+    
+    if( p_sys->i_pcr_repeats > 5 )
+    {
+        /* 5 seemed a reasonable value. no basis whatsoever though */
+        return 0;
+    }
+
     /* First warm we want to read data */
     p_sys->event = 0;
     for( i = 0; i < p_sys->i_track; i++ )
@@ -867,12 +889,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_start = (mtime_t)(f * (double)p_sys->i_length);
                 p_sys->i_pcr_start = 0;
                 p_sys->i_pcr       = 0;
-                
+
+#if 0 /* disabled. probably useless */
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->i_pts = 0;
                 }
-
+#endif
                 return VLC_SUCCESS;
             }
             return VLC_SUCCESS;
@@ -894,8 +917,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #if 0       /* Disable for now until we have a clock synchro algo
              * which works with something else than MPEG over UDP */
             *pb = VLC_FALSE;
-#endif
+#else
             *pb = VLC_TRUE;
+#endif
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:
@@ -1188,7 +1212,6 @@ static void StreamRead( void *p_private, unsigned int i_size,
         p_block->i_dts = ( tk->fmt.i_cat == VIDEO_ES ) ? 0 : i_pts;
         p_block->i_pts = i_pts;
     }
-    //fprintf( stderr, "tk -> dpts=%lld\n", i_pts - tk->i_pts );
 
     if( tk->b_muxed )
     {
@@ -1226,7 +1249,7 @@ static void StreamClose( void *p_private )
     demux_t        *p_demux = tk->p_demux;
     demux_sys_t    *p_sys = p_demux->p_sys;
 
-    fprintf( stderr, "StreamClose\n" );
+    msg_Dbg( p_demux, "StreamClose" );
 
     p_sys->event = 0xff;
     p_demux->b_error = VLC_TRUE;
@@ -1280,7 +1303,7 @@ static int ParseASF( demux_t *p_demux )
     /* Always smaller */
     p_header = block_New( p_demux, psz_end - psz_asf );
     p_header->i_buffer = b64_decode( (char*)p_header->p_buffer, psz_asf );
-    fprintf( stderr, "Size=%d Hdrb64=%s\n", p_header->i_buffer, psz_asf );
+    //msg_Dbg( p_demux, "Size=%d Hdrb64=%s", p_header->i_buffer, psz_asf );
     if( p_header->i_buffer <= 0 )
     {
         free( psz_asf );
