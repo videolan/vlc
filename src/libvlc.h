@@ -904,7 +904,7 @@ static char *ppsz_clock_descriptions[] =
     "\n            and that overrides previous settings." \
     "\n" \
     "\nPlaylistitem MRL syntax:" \
-    "\n  URL[@[title][:chapter][-[title][:chapter]]] [:option=value ...]" \
+    "\n  [[access][/demux]://]URL[@[title][:chapter][-[title][:chapter]]] [:option=value ...]" \
     "\n" \
     "\n  Many of the global --options can also be used as MRL specific :options." \
     "\n  Multiple :option=value pairs can be specified." \
