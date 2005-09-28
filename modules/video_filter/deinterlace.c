@@ -125,7 +125,7 @@ vlc_module_begin();
 
     add_submodule();
     set_capability( "video filter2", 0 );
-    set_section( N_("Streamming"),NULL);
+    set_section( N_("Streaming"),NULL);
     add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, MODE_TEXT,
                 MODE_LONGTEXT, VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
