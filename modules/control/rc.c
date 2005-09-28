@@ -800,7 +800,10 @@ static void Run( intf_thread_t *p_intf )
 
                 if( p_vout )
                 {
-                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    vlc_value_t val;
+                    var_Get( p_vout, "fullscreen", &val );
+                    val.b_bool = !val.b_bool;
+                    var_Set( p_vout, "fullscreen", val );
                     vlc_object_release( p_vout );
                 }
             }
