@@ -276,7 +276,7 @@ static int  Open ( vlc_object_t *p_this )
         if( psz_options ) delete [] psz_options;
 
         p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
-                              NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
+                              NULL ) ;
         if( p_sdp == NULL )
         {
             msg_Err( p_demux, "describeURL failed (%s)",
@@ -739,7 +739,7 @@ static int Demux( demux_t *p_demux )
 
     /* When a On Demand QT stream ends, the last frame keeps going with the same PCR/PTS value */
     /* This tests for that, so we can later decide to end this session */
-    if( p_sys->i_pcr == p_sys->i_pcr_previous )
+    if( i_pcr > 0 && p_sys->i_pcr == p_sys->i_pcr_previous )
     {
         p_sys->i_pcr_repeats++;
     }
