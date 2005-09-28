@@ -968,7 +968,7 @@ static bo_t *GetSVQ3Tag( mp4_stream_t *p_stream )
                 /* FIXME handle 1 as long size */
                 break;
             }
-            if( !strncmp( &p[4], "SMI ", 4 ) )
+            if( !strncmp( (const char *)&p[4], "SMI ", 4 ) )
             {
                 bo_add_mem( smi, p_end - p - 8, &p[8] );
                 return smi;
@@ -1007,7 +1007,7 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
             bo_add_16be( box, sizeof("QuickTime 6.0 or greater") - 1);
             bo_add_16be( box, 0 );
             bo_add_mem( box, sizeof("QuickTime 6.0 or greater") - 1,
-                        "QuickTime 6.0 or greater" );
+                        (uint8_t *)"QuickTime 6.0 or greater" );
             box_fix( box );
             box_gather( udta, box );
             break;
@@ -1021,7 +1021,7 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
         bo_add_16be( box, sizeof(PACKAGE_STRING " stream output") - 1);
         bo_add_16be( box, 0 );
         bo_add_mem( box, sizeof(PACKAGE_STRING " stream output") - 1,
-                    PACKAGE_STRING " stream output" );
+                    (uint8_t*)PACKAGE_STRING " stream output" );
         box_fix( box );
         box_gather( udta, box );
     }
@@ -1056,7 +1056,7 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
                 bo_add_16be( box, strlen( p_meta->value[i] ) );
                 bo_add_16be( box, 0 );
                 bo_add_mem( box, strlen( p_meta->value[i] ),
-                            p_meta->value[i] );
+                            (uint8_t*)(p_meta->value[i]) );
                 box_fix( box );
                 box_gather( udta, box );
             }
@@ -1317,7 +1317,7 @@ static bo_t *GetTextBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     }
 
     bo_add_8 ( text, 9 );
-    bo_add_mem( text, 9, "Helvetica" );
+    bo_add_mem( text, 9, (uint8_t*)"Helvetica" );
 
     box_fix( text );
 
@@ -1810,11 +1810,11 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
             bo_add_8( hdlr, 12 );   /* Pascal string for .mov */
 
         if( p_stream->fmt.i_cat == AUDIO_ES )
-            bo_add_mem( hdlr, 12, "SoundHandler" );
+            bo_add_mem( hdlr, 12, (uint8_t*)"SoundHandler" );
         else if( p_stream->fmt.i_cat == VIDEO_ES )
-            bo_add_mem( hdlr, 12, "VideoHandler" );
+            bo_add_mem( hdlr, 12, (uint8_t*)"VideoHandler" );
         else
-            bo_add_mem( hdlr, 12, "Text Handler" );
+            bo_add_mem( hdlr, 12, (uint8_t*)"Text Handler" );
 
         if( !p_sys->b_mov )
             bo_add_8( hdlr, 0 );   /* asciiz string for .mp4, yes that's BRAIN DAMAGED F**K MP4 */
