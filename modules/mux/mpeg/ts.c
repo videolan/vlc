@@ -6,7 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
- *          Jean-Paul Saman <jpsaman #_at_# m2x.nl> 
+ *          Jean-Paul Saman <jpsaman #_at_# m2x.nl>
  *          Wallace Wadge <wwadge #_at_# gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -232,7 +232,7 @@ typedef struct pmt_map_t   /* Holds the mapping between the pmt-pid/pmt table */
 
 typedef struct sdt_desc_t
 {
-    char *psz_provider;    
+    char *psz_provider;
     char *psz_service_name;  /* name of program */
 } sdt_desc_t;
 
@@ -355,7 +355,7 @@ struct sout_mux_sys_t
     ts_stream_t     pat;
 
     int             i_pmt_version_number;
-    ts_stream_t     pmt[MAX_PMT];        
+    ts_stream_t     pmt[MAX_PMT];
     pmt_map_t       pmtmap[MAX_PMT_PID];
     int             i_pmt_program_number[MAX_PMT];
     sdt_desc_t      sdt_descriptors[MAX_PMT];
@@ -363,7 +363,7 @@ struct sout_mux_sys_t
     int             i_mpeg4_streams;
 
     int             i_null_continuity_counter;  /* Needed ? */
-    ts_stream_t     sdt;        
+    ts_stream_t     sdt;
     dvbpsi_pmt_t    *dvbpmt;
 
     /* for TS building */
@@ -491,7 +491,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_es_id_pid = val.b_bool;
 
     var_Get( p_mux, SOUT_CFG_PREFIX "muxpmt", &val );
-    /* 
+    /*
        fetch string of pmts. Here's a sample: --sout-ts-muxpmt="0x451,0x200,0x28a,0x240,,0x450,0x201,0x28b,0x241,,0x452,0x202,0x28c,0x242"
        This would mean 0x451, 0x200, 0x28a, 0x240 would fall under one pmt (program), 0x450,0x201,0x28b,0x241 would fall under another
     */
@@ -505,11 +505,11 @@ static int Open( vlc_object_t *p_this )
         while( psz != NULL )
         {
             i_pid = strtoul( psz, &psz_next, 0 );
-    
+
             if ( strlen(psz_next) > 0 )
                 psz = &psz_next[1];
             if ( i_pid == 0 )
-            { 
+            {
                 p_sys->i_num_pmt++;
                 if ( p_sys->i_num_pmt > MAX_PMT )
                 {
@@ -518,7 +518,7 @@ static int Open( vlc_object_t *p_this )
                     p_sys->i_num_pmt = MAX_PMT;
                 }
             }
-            else 
+            else
             {
                 p_sys->pmtmap[p_sys->i_pmtslots].i_pid = i_pid;
                 p_sys->pmtmap[p_sys->i_pmtslots].i_prog = p_sys->i_num_pmt - 1;
@@ -531,11 +531,11 @@ static int Open( vlc_object_t *p_this )
                     p_sys->i_pmtslots = MAX_PMT_PID;
                 }
             }
-    
+
             /* Now sort according to pids for fast search later on */
             qsort( (void *)p_sys->pmtmap, p_sys->i_pmtslots,
                    sizeof(pmt_map_t), &pmtcompare );
-            if ( !*psz_next ) 
+            if ( !*psz_next )
                 psz = NULL;
         }
     }
@@ -563,7 +563,7 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_mux, SOUT_CFG_PREFIX "sdtdesc", &val );
     p_sys->b_sdt = val.psz_string && *val.psz_string ? VLC_TRUE : VLC_FALSE;
-    
+
     /* Syntax is provider_sdt1,service_name_sdt1,provider_sdt2,service_name_sdt2... */
     if( val.psz_string != NULL && *val.psz_string )
     {
@@ -587,7 +587,7 @@ static int Open( vlc_object_t *p_this )
             else
             {
                 p_sys->sdt_descriptors[i/2].psz_service_name
-                    = strdup(psz_sdttoken);    
+                    = strdup(psz_sdttoken);
             }
 
             i++;
@@ -612,9 +612,9 @@ static int Open( vlc_object_t *p_this )
                 psz = &psz_next[1];
             else
                 psz = NULL;
- 
+
             if( i_pid == 0 )
-            { 
+            {
                 if( i > MAX_PMT )
                     msg_Err( p_mux, "Number of PMTs > maximum (%d)",
                              MAX_PMT );
@@ -643,7 +643,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         for( i = 0; i < p_sys->i_num_pmt; i++ )
-            p_sys->pmt[i].i_pid = 0x42 + i;       
+            p_sys->pmt[i].i_pid = 0x42 + i;
     }
 
     p_sys->i_pid_free = p_sys->pmt[p_sys->i_num_pmt - 1].i_pid + 1;
@@ -763,9 +763,9 @@ static int Open( vlc_object_t *p_this )
             if( p_sys->csa )
             {
                 vlc_value_t pkt_val;
-            
-                csa_SetCW( p_sys->csa, ck, ck );                
-                
+
+                csa_SetCW( p_sys->csa, ck, ck );
+
                 var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
                 if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
                 {
@@ -775,7 +775,7 @@ static int Open( vlc_object_t *p_this )
                 }
                 else p_sys->i_csa_pkt_size = pkt_val.i_int;
                 msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
-            }    
+            }
         }
     }
     if( val.psz_string ) free( val.psz_string );
@@ -1797,7 +1797,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
             {
                 p_ts->p_buffer[5] |= 0x80; /* flag TS dicontinuity */
                 p_stream->b_discontinuity = VLC_FALSE;
-            }            
+            }
             p_ts->p_buffer[6] = ( 0 )&0xff;
             p_ts->p_buffer[7] = ( 0 )&0xff;
             p_ts->p_buffer[8] = ( 0 )&0xff;
@@ -2100,7 +2100,7 @@ static void GetPAT( sout_mux_t *p_mux,
     for ( i = 0; i < p_sys->i_num_pmt; i++ )
         dvbpsi_PATAddProgram( &pat,
                               p_sys->i_pmt_program_number[i],
-                              p_sys->pmt[i].i_pid );   
+                              p_sys->pmt[i].i_pid );
 
     p_section = dvbpsi_GenPATSections( &pat,
                                        0 );     /* max program per section */
@@ -2142,10 +2142,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     int             *p_usepid = NULL;
 
     if( p_sys->dvbpmt == NULL )
-        p_sys->dvbpmt = malloc( p_sys->i_num_pmt * sizeof(dvbpsi_pmt_t) ); 
+        p_sys->dvbpmt = malloc( p_sys->i_num_pmt * sizeof(dvbpsi_pmt_t) );
 #ifdef HAVE_DVBPSI_SDT
     if( p_sys->b_sdt )
-        dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid ); 
+        dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid );
 #endif
 
     for( i = 0; i < p_sys->i_num_pmt; i++ )
@@ -2159,7 +2159,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #ifdef HAVE_DVBPSI_SDT
         if( p_sys->b_sdt )
         {
-            p_service = dvbpsi_SDTAddService( &sdt, 
+            p_service = dvbpsi_SDTAddService( &sdt,
                 p_sys->i_pmt_program_number[i],  /* service id */
                 0,         /* eit schedule */
                 0,         /* eit present */
@@ -2177,18 +2177,18 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                 psz_sdt_desc[0] = 0x01; /* digital television service */
 
                 /* service provider name length */
-                psz_sdt_desc[1] = (char)strlen(psz_sdtprov); 
+                psz_sdt_desc[1] = (char)strlen(psz_sdtprov);
                 memcpy( &psz_sdt_desc[2], psz_sdtprov, strlen(psz_sdtprov) );
 
                 /* service name length */
                 psz_sdt_desc[ 2 + strlen(psz_sdtprov) ]
-                    = (char)strlen(psz_sdtserv); 
+                    = (char)strlen(psz_sdtserv);
                 memcpy( &psz_sdt_desc[3+strlen(psz_sdtprov)], psz_sdtserv,
                         strlen(psz_sdtserv) );
 
                 dvbpsi_SDTServiceAddDescriptor( p_service, 0x48,
                         3 + strlen(psz_sdtprov) + strlen(psz_sdtserv),
-                        psz_sdt_desc ); 
+                        psz_sdt_desc );
                 free( psz_sdt_desc );
             }
 #undef psz_sdtprov
@@ -2244,7 +2244,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                 bits_fix_ESDescr = bits;
                 bits_write( &bits, 24,
                             GetDescriptorLength24b( 0 ) ); /* variable size */
-                bits_write( &bits, 16,  p_stream->i_es_id ); 
+                bits_write( &bits, 16,  p_stream->i_es_id );
                 bits_write( &bits, 1,   0x00 );     /* streamDependency */
                 bits_write( &bits, 1,   0x00 );     /* URL Flag */
                 bits_write( &bits, 1,   0x00 );     /* OCRStreamFlag */
@@ -2335,9 +2335,9 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #if 0//def HAVE_BSEARCH /* FIXME!!! This can't possibly work */
         i_pidinput = p_mux->pp_inputs[i]->p_fmt->i_id;
         p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
-                            sizeof(pmt_map_t), intcompare ); 
+                            sizeof(pmt_map_t), intcompare );
         p_usepid = bsearch( &p_usepid, p_sys->pmtmap, p_sys->i_num_pmt,
-                            sizeof(pmt_map_t), pmtcompare ); 
+                            sizeof(pmt_map_t), pmtcompare );
         if( p_usepid != NULL )
             dvbpsi_PMTAddDescriptor(
                     &p_sys->dvbpmt[((pmt_map_t *)p_usepid)->i_prog], 0x1d,
@@ -2359,7 +2359,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #ifdef HAVE_BSEARCH
         i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
         p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
-                            sizeof(pmt_map_t), intcompare ); 
+                            sizeof(pmt_map_t), intcompare );
 
         if( p_usepid != NULL )
             p_es = dvbpsi_PMTAddES(
@@ -2473,7 +2473,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 #ifdef HAVE_DVBPSI_SDT
     if( p_sys->b_sdt )
     {
-        p_section2 = dvbpsi_GenSDTSections( &sdt ); 
+        p_section2 = dvbpsi_GenSDTSections( &sdt );
         p_sdt = WritePSISection( p_mux->p_sout, p_section2 );
         p_sys->sdt.i_pid = 0x11;
         PEStoTS( p_mux->p_sout, c, p_sdt, &p_sys->sdt );
