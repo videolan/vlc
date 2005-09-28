@@ -974,6 +974,85 @@ package-win32: package-win32-base package-win32-base-exe package-win32-base-zip
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
+package-wince-base:
+# Check that tmp isn't in the way
+	@if test -e "$(top_builddir)/vlc-${VERSION}"; then \
+	  echo "Error: please remove $(top_builddir)/vlc-${VERSION}, it is in the way"; \
+	  false; \
+	else \
+	  echo "OK."; mkdir -p "$(top_builddir)/vlc-${VERSION}"; \
+	fi
+
+# Copy relevant files
+	cp "$(top_builddir)/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
+	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
+	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
+
+	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
+	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
+	  unix2dos "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; done
+
+	mkdir $(top_builddir)/vlc-${VERSION}/locale
+	for i in $(ALL_LINGUAS); do \
+	  mkdir -p "$(top_builddir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES" ; \
+	  cp "$(srcdir)/po/$${i}.gmo" \
+	    "$(top_builddir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES/vlc.mo" \
+            || true ; \
+	done
+
+
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/admin"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/vlm"
+	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
+	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
+	cp $(srcdir)/share/http/*.png $(top_builddir)/vlc-${VERSION}/http/
+	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
+	cp $(srcdir)/share/http/admin/*.html \
+           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/*.html ;
+	cp $(srcdir)/share/http/admin/dboxfiles.html \
+           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
+	cp $(srcdir)/share/http/admin/.access \
+           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/.access ;
+	cp $(srcdir)/share/http/vlm/*.html \
+           $(top_builddir)/vlc-${VERSION}/http/vlm/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/vlm/*.html ;
+
+	cp $(srcdir)/share/vlc48x48new.ico $(top_builddir)/vlc-${VERSION}/ ;
+
+if BUILD_MOZILLA
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/mozilla"
+	cp $(top_builddir)/mozilla/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/mozilla/ ;
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
+	cp $(top_builddir)/mozilla/vlcintf.xpt  $(top_builddir)/vlc-${VERSION}/mozilla/ ;
+endif
+
+if BUILD_ACTIVEX
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/activex"
+	cp $(srcdir)/activex/README.TXT  $(top_builddir)/vlc-${VERSION}/activex/ ;
+	cp $(srcdir)/activex/test.html  $(top_builddir)/vlc-${VERSION}/activex/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/activex/* ;
+
+	cp $(top_builddir)/activex/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
+endif
+# Rebase all those DLLs to speed up loading (need cygwin rebase)
+	if [ -x rebase ]; then \
+		find $(top_builddir)/vlc-${VERSION} -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
+	fi
+
+package-wince-base-zip:
+# Create package 
+	zip -r vlc-${VERSION}-wince.zip vlc-${VERSION}
+
+package-wince: package-wince-base  package-wince-base-zip
+# Clean up
+	rm -Rf $(top_builddir)/vlc-${VERSION}
+
+
 package-beos:
 # Check that tmp isn't in the way
 	@if test -e $(srcdir)/tmp; then \
