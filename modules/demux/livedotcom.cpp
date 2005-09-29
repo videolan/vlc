@@ -146,6 +146,7 @@ struct demux_sys_t
     mtime_t          i_pcr;
     mtime_t          i_pcr_start;
     mtime_t          i_pcr_previous;
+    mtime_t          i_pcr_repeatdate;
     int              i_pcr_repeats;
 
     /* Asf */
@@ -230,6 +231,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_pcr   = 0;
     p_sys->i_pcr_start = 0;
     p_sys->i_pcr_previous = 0;
+    p_sys->i_pcr_repeatdate = 0;
     p_sys->i_pcr_repeats = 0;
     p_sys->i_length = 0;
     p_sys->i_start = 0;
@@ -741,17 +743,21 @@ static int Demux( demux_t *p_demux )
     /* This tests for that, so we can later decide to end this session */
     if( i_pcr > 0 && p_sys->i_pcr == p_sys->i_pcr_previous )
     {
+        if( p_sys->i_pcr_repeats == 0 )
+            p_sys->i_pcr_repeatdate = mdate();
         p_sys->i_pcr_repeats++;
     }
     else
     {
         p_sys->i_pcr_previous = p_sys->i_pcr;
+        p_sys->i_pcr_repeatdate = 0;
         p_sys->i_pcr_repeats = 0;
     }
-    
-    if( p_sys->i_pcr_repeats > 5 )
+
+    if( p_sys->i_pcr_repeats > 5 && mdate() > p_sys->i_pcr_repeatdate + 1000000 )
     {
-        /* 5 seemed a reasonable value. no basis whatsoever though */
+        /* We need at least 5 repeats over at least a second of time before we EOF */
+        msg_Dbg( p_demux, "suspect EOF due to end of VoD session" );
         return 0;
     }
 
