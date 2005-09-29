@@ -70,7 +70,7 @@
     "Update the OSD menu picture every 200ms (default). Shorten the update time for " \
     "environments that experience transmissions errors. Be carefull with this option " \
     "because encoding OSD menu pictures is very computing intensive. The range is 0 - 1000 ms." )
-    
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -95,7 +95,7 @@ static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
 
 #define OSD_UPDATE_MIN     0
 #define OSD_UPDATE_DEFAULT 0
-#define OSD_UPDATE_MAX     1000        
+#define OSD_UPDATE_MAX     1000
 
 vlc_module_begin();
     add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
@@ -141,7 +141,7 @@ struct filter_sys_t
     vlc_bool_t   b_visible;     /* OSD Menu is visible */
     mtime_t      i_update;      /* Update the OSD menu every n ms */
     mtime_t      i_end_date;    /* End data of display OSD menu */
-    
+
     char        *psz_file;      /* OSD Menu configuration file */
     osd_menu_t  *p_menu;        /* pointer to OSD Menu object */
 };
@@ -184,7 +184,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     var_Create( p_this, OSD_CFG "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, OSD_CFG "y", &val );
     i_posy = val.i_int;
-    
+
     /* in micro seconds - divide by 2 to match user expectations */
     var_Create( p_this, OSD_CFG "timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, OSD_CFG "timeout", &val );
