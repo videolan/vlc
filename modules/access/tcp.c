@@ -87,7 +87,7 @@ static int Open( vlc_object_t *p_this )
             psz_parser = psz_dup;
     }
     psz_parser = strchr( psz_parser, ':' );
-    
+
     if( psz_parser == NULL )
     {
         msg_Err( p_access, "missing port number : %s", psz_dup );
