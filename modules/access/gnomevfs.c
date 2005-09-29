@@ -93,7 +93,6 @@ static int Open( vlc_object_t *p_this )
     GnomeVFSURI    *p_uri = NULL;
     GnomeVFSResult  i_ret;
     GnomeVFSHandle *p_handle = NULL;
-
     if( !(gnome_vfs_init()) )
     {
         msg_Warn( p_access, "couldn't initilize GnomeVFS" );
@@ -159,18 +158,25 @@ static int Open( vlc_object_t *p_this )
         char *psz_path_begin;
 
         vlc_UrlParse( &url, psz_unescaped, 0 );
-
         psz_escaped_path = gnome_vfs_escape_path_string( url.psz_path );
 
+        if( psz_escaped_path && strcmp( psz_escaped_path,"/" )
+                                        && strcmp( psz_escaped_path,"//" ) )
+        {
     /* Now let's reconstruct a valid URI from all that stuff */
-        psz_path_begin = strstr( psz_unescaped, url.psz_path );
-        *psz_path_begin = '\0';
-        psz_uri = malloc( strlen( psz_unescaped ) +
+            psz_path_begin = strstr( psz_unescaped, url.psz_path );
+            if( psz_path_begin ) *psz_path_begin = '\0';
+            psz_uri = malloc( strlen( psz_unescaped ) +
                                         strlen( psz_escaped_path ) + 1 );
-        sprintf( psz_uri, "%s%s",psz_unescaped, psz_escaped_path );
+            sprintf( psz_uri, "%s%s",psz_unescaped, psz_escaped_path );
 
-        g_free( psz_escaped_path );
-        g_free( psz_unescaped );
+            g_free( psz_escaped_path );
+            g_free( psz_unescaped );
+        }
+        else
+        {
+            psz_uri = psz_unescaped;
+        }
     }
     else
     {
