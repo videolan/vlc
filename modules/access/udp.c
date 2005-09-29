@@ -89,7 +89,7 @@ struct access_sys_t
 
     int i_mtu;
     vlc_bool_t b_auto_mtu;
-    
+
     /* rtp only */
     int i_sequence_number;
 };
@@ -158,7 +158,6 @@ static int Open( vlc_object_t *p_this )
                 i_bind_port = atoi( psz_parser );
             }
         }
-  
     }
 
     psz_server_addr = psz_name;
@@ -226,7 +225,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Keep track of RTP sequence number */
     p_sys->i_sequence_number = -1;
-    
+
     return VLC_SUCCESS;
 }
 
@@ -329,10 +328,10 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     int     i_payload_type;
     int     i_skip = 0;
     int     i_sequence_number = 0;
- 
+
     if( p_block == NULL )
         return NULL;
-        
+
     if( p_block->i_buffer < RTP_HEADER_LEN )
         goto trash;
 
@@ -360,13 +359,13 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     /* Return the packet without the RTP header. */
     p_block->i_buffer -= i_skip;
     p_block->p_buffer += i_skip;
-    
+
 #define RTP_SEQ_NUM_SIZE 65536
     /* Detect RTP packet loss through tracking sequence numbers.
      * See RFC 1889. */
     if( p_access->p_sys->i_sequence_number == -1 )
         p_access->p_sys->i_sequence_number = i_sequence_number;
-    
+
     if( ((p_access->p_sys->i_sequence_number + 1) % RTP_SEQ_NUM_SIZE) != i_sequence_number )
     {
         msg_Warn( p_access, "RTP packet(s) lost, expected sequence number %d got %d",
