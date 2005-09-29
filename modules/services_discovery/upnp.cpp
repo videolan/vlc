@@ -30,7 +30,6 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 
-
 #include <cybergarage/upnp/media/player/MediaPlayer.h>
 
 #undef PACKAGE_NAME
