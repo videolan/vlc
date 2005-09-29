@@ -92,7 +92,7 @@ vlc_module_begin();
     add_integer( DVBSUB_CFG_PREFIX "position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer( DVBSUB_CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( DVBSUB_CFG_PREFIX "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );    
+    add_integer( DVBSUB_CFG_PREFIX "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
 
 #   define ENC_CFG_PREFIX "sout-dvbsub-"
     add_submodule();
