@@ -304,8 +304,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
                    line_desc_t *p_line, int i_width, int i_height )
 {
     static uint8_t pi_gamma[16] =
-        {0x00, 0x41, 0x52, 0x63, 0x84, 0x85, 0x96, 0xa7, 0xb8, 0xc9,
-         0xca, 0xdb, 0xdc, 0xed, 0xee, 0xff};
+        {0x00, 0x52, 0x84, 0x96, 0xb8, 0xca, 0xdc, 0xee, 0xff,
+          0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
     uint8_t *p_dst;
     video_format_t fmt;
@@ -342,7 +342,16 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
-    for( i = 0; i < fmt.p_palette->i_entries; i++ )
+    for( i = 0; i < 8; i++ )
+    {
+        fmt.p_palette->palette[i][0] = 0;
+        fmt.p_palette->palette[i][1] = 0x80;
+        fmt.p_palette->palette[i][2] = 0x80;
+        fmt.p_palette->palette[i][3] = pi_gamma[i];
+        fmt.p_palette->palette[i][3] =
+            (int)fmt.p_palette->palette[i][3] * (255 - p_line->i_alpha) / 255;
+    }
+    for( i = 8; i < fmt.p_palette->i_entries; i++ )
     {
         fmt.p_palette->palette[i][0] = i * 16 * i_y / 256;
         fmt.p_palette->palette[i][1] = i_u;
@@ -418,8 +427,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
             for( x = 1; x < (int)fmt.i_width - 1; x++ )
             {
                 current = p_dst[x];
-                p_dst[x] = ( 4 * (int)p_dst[x] + left + p_top[x] + p_dst[x+1] +
-                             p_dst[x + p_region->picture.Y_PITCH]) / 8;
+                p_dst[x] = ( 8 * (int)p_dst[x] + left + p_dst[x+1] + p_top[x -1]+ p_top[x] + p_top[x+1] +
+                             p_dst[x -1 + p_region->picture.Y_PITCH ] + p_dst[x + p_region->picture.Y_PITCH] + p_dst[x + 1 + p_region->picture.Y_PITCH]) / 16;
                 left = current;
             }
         }
