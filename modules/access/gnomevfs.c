@@ -160,12 +160,12 @@ static int Open( vlc_object_t *p_this )
         vlc_UrlParse( &url, psz_unescaped, 0 );
         psz_escaped_path = gnome_vfs_escape_path_string( url.psz_path );
 
-        if( psz_escaped_path && strcmp( psz_escaped_path,"/" )
-                                        && strcmp( psz_escaped_path,"//" ) )
+        if( psz_escaped_path )
         {
     /* Now let's reconstruct a valid URI from all that stuff */
-            psz_path_begin = strstr( psz_unescaped, url.psz_path );
-            if( psz_path_begin ) *psz_path_begin = '\0';
+            psz_path_begin = psz_unescaped + strlen( psz_unescaped )
+                                           - strlen( url.psz_path );
+            *psz_path_begin = '\0';
             psz_uri = malloc( strlen( psz_unescaped ) +
                                         strlen( psz_escaped_path ) + 1 );
             sprintf( psz_uri, "%s%s",psz_unescaped, psz_escaped_path );
