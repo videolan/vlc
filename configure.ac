@@ -1724,7 +1724,7 @@ dnl
 dnl  gnomeVFS access module
 dnl
 AC_ARG_ENABLE(gnomevfs,
-  [  --enable-gnomevfs      GnomeVFS access module (default enables)])
+  [  --enable-gnomevfs      GnomeVFS access module (default enabled)])
 if test "${enable_gnomevfs}" != "no"
 then
   PKG_CHECK_MODULES(GNOMEVFS, gnome-vfs-2.0,
