@@ -89,7 +89,7 @@ uint32_t CPUCapabilities( void )
             asm volatile ( "cpuid\n\t"         \
                            "movl %%ebx,%1\n\t" \
                          : "=a" ( i_eax ),     \
-                           "=r" ( i_ebx ),     \
+                           "=b" ( i_ebx ),     \
                            "=c" ( i_ecx ),     \
                            "=d" ( i_edx )      \
                          : "a"  ( reg )        \
