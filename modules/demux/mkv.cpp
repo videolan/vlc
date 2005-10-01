@@ -402,6 +402,10 @@ vlc_module_begin();
             N_("Chapter codecs"),
             N_("Use chapter codecs found in the segment."), VLC_TRUE );
 
+    add_bool( "mkv-preload-local-dir", 1, NULL,
+            N_("Preload Directory"),
+            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), VLC_TRUE );
+
     add_bool( "mkv-seek-percent", 0, NULL,
             N_("Seek based on percent not time"),
             N_("Seek based on percent not time."), VLC_TRUE );
@@ -1452,81 +1456,86 @@ static int Open( vlc_object_t * p_this )
         p_stream->p_in->setFilePointer( p_segment->cluster->GetElementPosition() );
     }
 
-    /* get the files from the same dir from the same family (based on p_demux->psz_path) */
-    if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
+    if (config_GetInt( p_demux, "mkv-preload-local-dir" ))
     {
-        // assume it's a regular file
-        // get the directory path
-        s_path = p_demux->psz_path;
-        if (s_path.at(s_path.length() - 1) == DIRECTORY_SEPARATOR)
+        /* get the files from the same dir from the same family (based on p_demux->psz_path) */
+        if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
         {
-            s_path = s_path.substr(0,s_path.length()-1);
-        }
-        else
-        {
-            if (s_path.find_last_of(DIRECTORY_SEPARATOR) > 0) 
+            // assume it's a regular file
+            // get the directory path
+            s_path = p_demux->psz_path;
+            if (s_path.at(s_path.length() - 1) == DIRECTORY_SEPARATOR)
             {
-                s_path = s_path.substr(0,s_path.find_last_of(DIRECTORY_SEPARATOR));
+                s_path = s_path.substr(0,s_path.length()-1);
             }
-        }
-
-        struct dirent *p_file_item;
-        DIR *p_src_dir = opendir(s_path.c_str());
-
-        if (p_src_dir != NULL)
-        {
-            while ((p_file_item = (dirent *) readdir(p_src_dir)))
+            else
             {
-                if (strlen(p_file_item->d_name) > 4)
+                if (s_path.find_last_of(DIRECTORY_SEPARATOR) > 0) 
                 {
-                    s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
+                    s_path = s_path.substr(0,s_path.find_last_of(DIRECTORY_SEPARATOR));
+                }
+            }
 
-                    if (!s_filename.compare(p_demux->psz_path))
-                        continue; // don't reuse the original opened file
+            struct dirent *p_file_item;
+            DIR *p_src_dir = opendir(s_path.c_str());
+
+            if (p_src_dir != NULL)
+            {
+                while ((p_file_item = (dirent *) readdir(p_src_dir)))
+                {
+                    if (strlen(p_file_item->d_name) > 4)
+                    {
+                        s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
+
+                        if (!s_filename.compare(p_demux->psz_path))
+                            continue; // don't reuse the original opened file
 
 #if defined(__GNUC__) && (__GNUC__ < 3)
-                    if (!s_filename.compare("mkv", s_filename.length() - 3, 3) || 
-                        !s_filename.compare("mka", s_filename.length() - 3, 3))
+                        if (!s_filename.compare("mkv", s_filename.length() - 3, 3) || 
+                            !s_filename.compare("mka", s_filename.length() - 3, 3))
 #else
-                    if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") || 
-                        !s_filename.compare(s_filename.length() - 3, 3, "mka"))
+                        if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") || 
+                            !s_filename.compare(s_filename.length() - 3, 3, "mka"))
 #endif
-                    {
-                        // test wether this file belongs to our family
-                        stream_t *p_file_stream = stream_UrlNew( p_demux, s_filename.c_str());
-                        if ( p_file_stream != NULL )
                         {
-                            vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, VLC_TRUE );
-                            EbmlStream *p_estream = new EbmlStream(*p_file_io);
-
-                            p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
-
-                            if ( p_stream == NULL )
+                            // test wether this file belongs to our family
+                            stream_t *p_file_stream = stream_UrlNew( p_demux, s_filename.c_str());
+                            if ( p_file_stream != NULL )
                             {
-                                msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
-                                delete p_estream;
-                                delete p_file_io;
+                                vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, VLC_TRUE );
+                                EbmlStream *p_estream = new EbmlStream(*p_file_io);
+
+                                p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
+
+                                if ( p_stream == NULL )
+                                {
+                                    msg_Dbg( p_demux, "the file '%s' will not be used", s_filename.c_str() );
+                                    delete p_estream;
+                                    delete p_file_io;
+                                }
+                                else
+                                {
+                                    p_stream->p_in = p_file_io;
+                                    p_stream->p_es = p_estream;
+                                    p_sys->streams.push_back( p_stream );
+                                }
                             }
                             else
                             {
-                                p_stream->p_in = p_file_io;
-                                p_stream->p_es = p_estream;
-                                p_sys->streams.push_back( p_stream );
+                                msg_Dbg( p_demux, "the file '%s' cannot be opened", s_filename.c_str() );
                             }
-                        }
-                        else
-                        {
-                            msg_Dbg( p_demux, "the file '%s' cannot be opened", s_filename.c_str() );
                         }
                     }
                 }
+                closedir( p_src_dir );
             }
-            closedir( p_src_dir );
         }
+
+        p_sys->PreloadFamily( *p_segment );
     }
 
-    p_sys->PreloadFamily( *p_segment );
     p_sys->PreloadLinked( p_segment );
+
     if ( !p_sys->PreparePlayback( NULL ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
