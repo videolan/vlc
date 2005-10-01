@@ -855,52 +855,21 @@ package-win32-base:
 	done
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/dvd"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/dvd/selected"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/dvd/unselect"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/dvd/selection"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/dvd/volume"
-	for i in $(srcdir)/share/osdmenu/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/ || true ; \
-	  unix2dos $(top_builddir)/vlc-${VERSION}/osdmenu/`basename $$i` ; \
+	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-${VERSION}/osdmenu"
+	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume;do \
+		mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/$$dir"; \
+		for file in $(srcdir)/share/osdmenu/$${dir}/*.*;do \
+			 cp $$file "$(top_builddir)/vlc-${VERSION}/osdmenu/$$dir" || true; \
+		done; \
 	done
-	for i in $(srcdir)/share/osdmenu/dvd/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/dvd || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/dvd/unselect/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/dvd/unselect || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/dvd/selected/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/dvd/selected/ || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/dvd/selection/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/dvd/selection/ || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/dvd/volume/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/dvd/volume/ || true ; \
-	done
-
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/default"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/default/selected"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/default/selection"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/default/volume"
-	for i in $(srcdir)/share/osdmenu/default/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/default || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/default/selected/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/default/selected/ || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/default/selection/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/default/selection/ || true ; \
-	done
-	for i in $(srcdir)/share/osdmenu/default/volume/*.*; do \
-	  cp $$i $(top_builddir)/vlc-${VERSION}/osdmenu/default/volume/ || true ; \
-	done
+	unix2dos $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg;
+	sed -i 's%share/osdmenu%osdmenu%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg
+	sed -i 's%/%\\%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg 
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/admin"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/vlm"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;:
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
 	cp $(srcdir)/share/http/*.png $(top_builddir)/vlc-${VERSION}/http/
