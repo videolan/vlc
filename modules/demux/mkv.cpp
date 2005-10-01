@@ -573,6 +573,7 @@ typedef struct
 
     uint64_t     i_default_duration;
     float        f_timecodescale;
+    mtime_t      i_last_dts;
 
     /* video */
     es_format_t fmt;
@@ -1287,7 +1288,6 @@ public:
     demux_sys_t( demux_t & demux )
         :demuxer(demux)
         ,i_pts(0)
-        ,i_last_dts(0)
         ,i_start_pts(0)
         ,i_chapter_time(0)
         ,meta(NULL)
@@ -1320,7 +1320,6 @@ public:
     demux_t                 & demuxer;
 
     mtime_t                 i_pts;
-    mtime_t                 i_last_dts;
     mtime_t                 i_start_pts;
     mtime_t                 i_chapter_time;
 
@@ -1803,7 +1802,7 @@ static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem)
 }
 
 static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
-                         mtime_t i_duration )
+                         mtime_t i_duration, bool f_unreferenced )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
@@ -1902,14 +1901,21 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         {
             if( !strcmp( tk->psz_codec, "V_MS/VFW/FOURCC" ) )
             {
+                // in VFW we have no idea about B frames
                 p_block->i_pts = 0;
+                p_block->i_dts = i_pts;
             }
             else
             {
                 p_block->i_pts = i_pts;
+                if ( f_unreferenced )
+                    p_block->i_dts = p_block->i_pts;
+                else
+                    p_block->i_dts = min( i_pts, tk->i_last_dts + (tk->i_default_duration >> 10));
+                p_sys->i_pts = p_block->i_dts;
             }
-            p_block->i_dts = p_sys->i_pts;
         }
+        tk->i_last_dts = p_block->i_dts;
 
 #if 0
 msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block->i_pts);
@@ -1917,6 +1923,11 @@ msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
             p_block->i_length = i_duration * 1000;
+        }
+
+        if( p_sys->i_pts >= p_sys->i_start_pts  )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
@@ -3197,7 +3208,7 @@ static int Demux( demux_t *p_demux)
                     if ( p_chap->i_user_start_time == p_chap->i_user_start_time )
                         p_vsegment->SelectNext();
                     */
-                    p_sys->i_last_dts = p_sys->i_pts = p_chap->i_user_end_time;
+                    p_sys->i_pts = p_chap->i_user_end_time;
                     p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
 
                     i_return = 1;
@@ -3227,30 +3238,9 @@ static int Demux( demux_t *p_demux)
             }
         }
 
-        mtime_t i_pts, i_dts;
-
-        mtime_t i_time = block->GlobalTimecode();
-        if ( i_block_ref1 != 0 )
-            i_time += min( 0, i_block_ref1 );
-        if ( i_block_ref2 != 0 )
-            i_time += min( 0, i_block_ref2 );
-
-        i_pts = (p_sys->i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
-        i_dts = (p_sys->i_chapter_time + i_time) / (mtime_t) 1000;
-
-        if ( i_dts != i_pts && p_sys->i_last_dts >= i_dts )
-            p_sys->i_last_dts += 200;
-        else
-            p_sys->i_last_dts = i_dts;
-
-        p_sys->i_pts = i_pts;
+        p_sys->i_pts = (p_sys->i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
-        {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
-        }
-
-        if( i_pts >= p_sys->i_start_pts  )
             if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
                 i_return = 1;
@@ -3282,7 +3272,7 @@ static int Demux( demux_t *p_demux)
             continue;
         }
 
-        BlockDecode( p_demux, block, i_pts, i_block_duration );
+        BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration, i_block_ref1 >= 0 || i_block_ref2 > 0 );
 
         delete block;
         i_block_count++;
@@ -5361,7 +5351,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
             }
         }
 
-        sys.i_last_dts = sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
+        sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
 
         if( i_track < tracks.size() )
         {
@@ -5379,7 +5369,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
                 }
                 if( !tracks[i_track]->b_search_keyframe )
                 {
-                    BlockDecode( &sys.demuxer, block, sys.i_pts, 0 );
+                    BlockDecode( &sys.demuxer, block, sys.i_pts, 0, i_block_ref1 >= 0 || i_block_ref2 > 0 );
                 }
             } 
         }
