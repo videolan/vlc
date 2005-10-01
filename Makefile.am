@@ -18,6 +18,7 @@ DIST_SUBDIRS = $(SUBDIRS) debian ipkg lib
 EXTRA_DIST = \
 	HACKING \
 	INSTALL.win32 \
+	INSTALL.wince \
 	vlc.exe.manifest \
 	MAINTAINERS \
 	README.MacOSX.rtf \
