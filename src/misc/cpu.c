@@ -86,10 +86,8 @@ uint32_t CPUCapabilities( void )
     /* Needed for x86 CPU capabilities detection */
 #   if defined( __x86_64__ )
 #       define cpuid( reg )                    \
-            asm volatile ( "push %%rbx\n\t"    \
-                           "cpuid\n\t"         \
+            asm volatile ( "cpuid\n\t"         \
                            "movl %%ebx,%1\n\t" \
-                           "pop %%rbx\n\t"     \
                          : "=a" ( i_eax ),     \
                            "=r" ( i_ebx ),     \
                            "=c" ( i_ecx ),     \
