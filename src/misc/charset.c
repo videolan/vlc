@@ -379,7 +379,7 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
 /**********************************************************************
  * UTF32toUTF8: converts UTF-32 to UTF-8
  *********************************************************************/
-char *UTF32toUTF8( wchar_t *src, size_t len, size_t *newlen )
+char *UTF32toUTF8( const wchar_t *src, size_t len, size_t *newlen )
 {
     char *res, *out;
 
@@ -430,10 +430,10 @@ char *UTF32toUTF8( wchar_t *src, size_t len, size_t *newlen )
 }
 
 
-char *FromUTF32( wchar_t *src )
+char *FromUTF32( const wchar_t *src )
 {
     size_t len;
-    wchar_t *in;
+    const wchar_t *in;
 
     /* determine the size of the string */
     for( len = 1, in = src; GetWBE( in ); len++ )
