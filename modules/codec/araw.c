@@ -59,7 +59,9 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
+#ifdef ENABLE_SOUT
 static block_t *EncoderEncode( encoder_t *, aout_buffer_t * );
+#endif
 
 struct decoder_sys_t
 {
