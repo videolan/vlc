@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc_playlist.h>
+#include <vlc_md5.h>
 #include "iso_lang.h"
 #include "vlc_meta.h"
 
@@ -164,7 +165,7 @@ static int      MP4_TrackSampleSize( mp4_track_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t * );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
-/* Return time in µs of a track */
+/* Return time in s of a track */
 static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
 #define chunk p_track->chunk[p_track->i_chunk]

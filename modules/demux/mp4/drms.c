@@ -32,7 +32,7 @@
 
 #ifdef __VLC__
 #   include <vlc/vlc.h>
-#   include "vlc_md5.h"
+#   include <vlc_md5.h>
 #   include "libmp4.h"
 #else
 #   include "drmsvl.h"
