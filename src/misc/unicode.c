@@ -174,3 +174,73 @@ char *EnsureUTF8( char *str )
 
     return str;
 }
+
+/**********************************************************************
+ * UTF32toUTF8: converts an array from UTF-32 to UTF-8
+ *********************************************************************/
+char *UTF32toUTF8( const wchar_t *src, size_t len, size_t *newlen )
+{
+    char *res, *out;
+
+    /* allocate memory */
+    out = res = (char *)malloc( 6 * len );
+    if( res == NULL )
+        return NULL;
+
+    while( len > 0 )
+    {
+        uint32_t uv = *src++;
+        len--;
+
+        if( uv < 0x80 )
+        {
+            *out++ = uv;
+            continue;
+        }
+        else
+        if( uv < 0x800 )
+        {
+            *out++ = (( uv >>  6)         | 0xc0);
+            *out++ = (( uv        & 0x3f) | 0x80);
+            continue;
+        }
+        else
+        if( uv < 0x10000 )
+        {
+            *out++ = (( uv >> 12)         | 0xe0);
+            *out++ = (((uv >>  6) & 0x3f) | 0x80);
+            *out++ = (( uv        & 0x3f) | 0x80);
+            continue;
+        }
+        else
+        {
+            *out++ = (( uv >> 18)         | 0xf0);
+            *out++ = (((uv >> 12) & 0x3f) | 0x80);
+            *out++ = (((uv >>  6) & 0x3f) | 0x80);
+            *out++ = (( uv        & 0x3f) | 0x80);
+            continue;
+        }
+    }
+    len = out - res;
+    res = realloc( res, len );
+    if( newlen != NULL )
+        *newlen = len;
+    return res;
+}
+
+/**********************************************************************
+ * FromUTF32: converts an UTF-32 string to UTF-8
+ **********************************************************************
+ * The result must be free()'d. NULL on error.
+ *********************************************************************/
+char *FromUTF32( const wchar_t *src )
+{
+    size_t len;
+    const wchar_t *in;
+
+    /* determine the size of the string */
+    for( len = 1, in = src; GetWBE( in ); len++ )
+        in++;
+
+    return UTF32toUTF8( src, len, NULL );
+}
