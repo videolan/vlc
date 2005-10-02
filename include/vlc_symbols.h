@@ -385,7 +385,7 @@ void sout_MuxDeleteStream (sout_mux_t *, sout_input_t *);
 char * httpd_MsgGet (httpd_message_t *, char *psz_name);
 const iso639_lang_t * GetLang_1 (const char *);
 void aout_FormatsPrint (aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2);
-char * FromUTF32 (wchar_t *);
+char * FromUTF32 (const wchar_t *);
 void __vout_OSDMessage (vlc_object_t *, int, char *, ...);
 void intf_StopThread (intf_thread_t *);
 stream_t * __stream_MemoryNew (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, vlc_bool_t i_preserve_memory);
@@ -846,7 +846,7 @@ struct module_symbols_t
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     char * (*config_GetUserDir_inner) (void);
-    char * (*FromUTF32_inner) (wchar_t *);
+    char * (*FromUTF32_inner) (const wchar_t *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
