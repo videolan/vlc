@@ -1926,17 +1926,12 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
         tk->i_last_dts = p_block->i_dts;
 
-#if 0
+#if 1
 msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block->i_pts);
 #endif
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
         {
             p_block->i_length = i_duration * 1000;
-        }
-
-        if( p_sys->i_pts >= p_sys->i_start_pts  )
-        {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
@@ -2414,7 +2409,10 @@ int demux_sys_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
     event_thread_t *p_ev = (event_thread_t *) p_data;
     vlc_mutex_lock( &p_ev->lock );
     if( psz_var[6] == 'c' )
+	{
         p_ev->b_clicked = VLC_TRUE;
+		msg_Dbg( p_this, "Event Mouse: clicked");
+	}
     else if( psz_var[6] == 'm' )
         p_ev->b_moved = VLC_TRUE;
     vlc_mutex_unlock( &p_ev->lock );
@@ -2429,6 +2427,7 @@ int demux_sys_t::EventKey( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_ev->lock );
     p_ev->b_key = VLC_TRUE;
     vlc_mutex_unlock( &p_ev->lock );
+	msg_Dbg( p_this, "Event Key");
 
     return VLC_SUCCESS;
 }
@@ -2464,6 +2463,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             vlc_value_t valk;
             struct vlc_t::hotkey *p_hotkeys = p_ev->p_vlc->p_hotkeys;
             int i, i_action = -1;
+
+			msg_Dbg( p_ev->p_demux, "Handle Key Event");
 
             vlc_mutex_lock( &p_ev->lock );
 
@@ -2613,6 +2614,8 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 int32_t button;
                 int32_t best,dist,d;
                 int32_t mx,my,dx,dy;
+
+				msg_Dbg( p_ev->p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", (unsigned)valx.i_int, (unsigned)valy.i_int);
 
                 b_activated = VLC_TRUE;
                 // get current button
@@ -3250,12 +3253,16 @@ static int Demux( demux_t *p_demux)
         p_sys->i_pts = (p_sys->i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
-            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
+
+			if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
                 i_return = 1;
                 delete block;
                 break;
             }
+		}
         
         if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
