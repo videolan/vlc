@@ -1147,15 +1147,15 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         playlist_item_t *p_item;
         char *psz_utf8;
 
-        psz_utf8 = FromUTF32( mrl[i].wc_str() );
+        psz_utf8 = FromUTF32( (wchar_t *)mrl[i].wc_str() );
         p_item = playlist_ItemNew( p_intf, psz_utf8, psz_utf8 );
         free( psz_utf8 );
 
         /* Insert options */
         while( i + 1 < (int)mrl.GetCount() &&
-               ((const char *)mrl[i + 1].wc_str())[0] == ':'L )
+               ((const char *)mrl[i + 1].wc_str())[0] == ':' )
         {
-            psz_utf8 = FromUTF32( mrl[i + 1].wc_str() );
+            psz_utf8 = FromUTF32( (wchar_t *)mrl[i + 1].wc_str() );
             playlist_ItemAddOption( p_item, psz_utf8 );
             free( psz_utf8 );
             i++;
@@ -1166,7 +1166,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
-                psz_utf8 = FromUTF32( subsfile_mrl[j].wc_str() );
+                psz_utf8 = FromUTF32( (wchar_t *)subsfile_mrl[j].wc_str() );
                 playlist_ItemAddOption( p_item, psz_utf8 );
                 free( psz_utf8 );
             }
@@ -1177,7 +1177,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
-                psz_utf8 = FromUTF32( sout_mrl[j].wc_str() );
+                psz_utf8 = FromUTF32( (wchar_t *)sout_mrl[j].wc_str() );
                 playlist_ItemAddOption( p_item, psz_utf8 );
                 free( psz_utf8 );
             }
