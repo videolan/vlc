@@ -4,7 +4,7 @@
  * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <charset.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 
