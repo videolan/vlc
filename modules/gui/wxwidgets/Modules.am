@@ -8,6 +8,7 @@ SOURCES_wxwidgets = \
 	streamout.cpp \
 	wizard.cpp \
 	streamdata.h \
+	streamdata.cpp \
 	messages.cpp \
 	playlist.cpp \
 	iteminfo.cpp \
