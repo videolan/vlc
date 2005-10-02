@@ -325,7 +325,8 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     SpeexCallback callback;
 
     p_sys->p_header = p_header =
-        speex_packet_to_header( p_oggpacket->packet, p_oggpacket->bytes );
+        speex_packet_to_header( (char *)p_oggpacket->packet,
+                                p_oggpacket->bytes );
     if( !p_header )
     {
         msg_Err( p_dec, "cannot read Speex header" );
@@ -448,7 +449,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     if( p_oggpacket->bytes )
     {
         /* Copy Ogg packet to Speex bitstream */
-        speex_bits_read_from( &p_sys->bits, p_oggpacket->packet,
+        speex_bits_read_from( &p_sys->bits, (char *)p_oggpacket->packet,
                               p_oggpacket->bytes );
         p_sys->i_frame_in_packet = 0;
     }
@@ -713,7 +714,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_block, *p_chain = NULL;
 
-    char *p_buffer = p_aout_buf->p_buffer;
+    unsigned char *p_buffer = p_aout_buf->p_buffer;
     int i_samples = p_aout_buf->i_nb_samples;
     int i_samples_delay = p_sys->i_samples_delay;
 
