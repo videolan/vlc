@@ -106,6 +106,11 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_title setStringValue: o_title_name];
 }
 
+- (void)setHelp: (NSString *) o_help_name
+{
+    [o_help setStringValue: o_help_name];
+}
+
 - (void)showPrefs
 {
     /* load our nib (if not already loaded) */
@@ -508,6 +513,7 @@ static VLCTreeItem *o_root_item = nil;
     NSView          *o_view;
 
     [[VLCPrefs sharedInstance] setTitle: [self getTitle]];
+    [[VLCPrefs sharedInstance] setHelp: [self getHelp]];
     /* NSLog( [self getHelp] ); */ 
     s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];

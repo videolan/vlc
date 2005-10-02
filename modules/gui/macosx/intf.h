@@ -93,14 +93,14 @@ struct intf_sys_t
     id o_wizard;                /* VLCWizard      */
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
-    id o_update;                /* VLCUpdate      */
+    /*id o_update;                 VLCUpdate      */
     BOOL nib_main_loaded;       /* reference to the main-nib */
     BOOL nib_open_loaded;       /* reference to the open-nib */
     BOOL nib_about_loaded;      /* reference to the about-nib */
     BOOL nib_wizard_loaded;     /* reference to the wizard-nib */
     BOOL nib_extended_loaded;   /* reference to the extended-nib */
     BOOL nib_bookmarks_loaded;  /* reference to the bookmarks-nib */ 
-    BOOL nib_update_loaded;     /* reference to the update-nib */
+    /*BOOL nib_update_loaded;      reference to the update-nib */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_playlist_view;/* playlist view  */
@@ -149,7 +149,7 @@ struct intf_sys_t
 
     IBOutlet id o_mi_about;
     IBOutlet id o_mi_prefs;
-    IBOutlet id o_mi_checkForUpdate;
+    /*IBOutlet id o_mi_checkForUpdate;*/
     IBOutlet id o_mi_add_intf;
     IBOutlet id o_mu_add_intf;
     IBOutlet id o_mi_services;
@@ -310,7 +310,7 @@ struct intf_sys_t
 
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;
-- (IBAction)checkForUpdate:(id)sender;
+/*- (IBAction)checkForUpdate:(id)sender;*/
 - (IBAction)closeError:(id)sender;
 - (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;

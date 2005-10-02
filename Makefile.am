@@ -609,8 +609,6 @@ VLC-release.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
-	    update.h \
-	    update.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -725,8 +723,6 @@ VLC.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
-	    update.h \
-	    update.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
