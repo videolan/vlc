@@ -388,7 +388,7 @@ char *UTF32toUTF8( wchar_t *src, size_t len, size_t *newlen )
     if( res == NULL )
         return NULL;
 
-    while( len >= sizeof( wchar_t ) )
+    while( len > 0 )
     {
         uint32_t uv = *src++;
         len--;
