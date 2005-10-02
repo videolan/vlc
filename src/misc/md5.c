@@ -24,7 +24,7 @@
 
 #include <string.h>
 #include <vlc/vlc.h>
-#include "vlc_md5.h"
+#include <vlc_md5.h>
 
 #ifdef WORDS_BIGENDIAN
 /*****************************************************************************
