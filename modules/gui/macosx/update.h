@@ -32,7 +32,6 @@
     IBOutlet id o_fld_currentVersion;
     IBOutlet id o_fld_dest;
     IBOutlet id o_fld_elpTime;
-    IBOutlet id o_fld_releasedOn;
     IBOutlet id o_fld_releaseNote;
     IBOutlet id o_fld_remTime;
     IBOutlet id o_fld_size;
@@ -40,7 +39,6 @@
     IBOutlet id o_fld_userVersion;
     IBOutlet id o_lbl_currentVersion;
     IBOutlet id o_lbl_mirror;
-    IBOutlet id o_lbl_releasedOn;
     IBOutlet id o_lbl_size;
     IBOutlet id o_lbl_userVersion;
     IBOutlet id o_pop_mirror;
@@ -48,6 +46,9 @@
     IBOutlet id o_update_window;
     IBOutlet id o_bar_checking;
     IBOutlet id o_lbl_checkForUpdate;
+    
+    NSMutableArray * o_mirrors;
+    NSMutableDictionary * o_files;
 }
 
 
@@ -57,6 +58,7 @@
 
 - (void)showUpdateWindow;
 - (void)initStrings;
+- (void)getData;
 
 + (VLCUpdate *)sharedInstance;
 
