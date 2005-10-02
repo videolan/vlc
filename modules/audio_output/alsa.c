@@ -52,7 +52,7 @@
 struct aout_sys_t
 {
     snd_pcm_t         * p_snd_pcm;
-    int                 i_period_time;
+    unsigned int                 i_period_time;
 
 #ifdef ALSA_DEBUG
     snd_output_t      * p_snd_stderr;
@@ -579,7 +579,7 @@ static int Open( vlc_object_t *p_this )
                                     &p_sys->i_period_time, NULL ) ) < 0 )
 #else
     if( ( p_sys->i_period_time =
-                  snd_pcm_hw_params_get_period_time( p_hw, NULL ) ) < 0 )
+                  (int)snd_pcm_hw_params_get_period_time( p_hw, NULL ) ) < 0 )
 #endif
     {
         msg_Err( p_aout, "unable to get period time (%s)",
