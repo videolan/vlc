@@ -234,7 +234,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Should be resiliant against bad subtitles */
-    psz_subtitle = strndup( p_block->p_buffer, p_block->i_buffer );
+    psz_subtitle = strndup( (const char *)p_block->p_buffer,
+                            p_block->i_buffer );
 
     i_align_h = p_sys->i_align ? 20 : 0;
     i_align_v = 10;
