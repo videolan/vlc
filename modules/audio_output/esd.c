@@ -169,7 +169,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->latency = 0;
     }
-        
+
     /* ESD latency is calculated for 44100 Hz. We don't have any way to get the
      * number of buffered samples, so I assume ESD_BUF_SIZE/2 */
     p_sys->latency +=
@@ -199,10 +199,10 @@ static void Play( aout_instance_t *p_aout )
 
     if ( p_buffer != NULL )
     {
-        int pos;
-        char *data = p_buffer->p_buffer;
+        unsigned int pos;
+        unsigned char *data = p_buffer->p_buffer;
 
-        for( pos = 0; pos + ESD_BUF_SIZE <= p_buffer->i_nb_bytes; 
+        for( pos = 0; pos + ESD_BUF_SIZE <= p_buffer->i_nb_bytes;
              pos += ESD_BUF_SIZE )
         {
             i_tmp = write( p_sys->i_fd, data + pos, ESD_BUF_SIZE );
