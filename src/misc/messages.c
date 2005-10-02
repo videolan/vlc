@@ -99,8 +99,6 @@ void __msg_Create( vlc_object_t *p_this )
  */
 void __msg_Flush( vlc_object_t *p_this )
 {
-    int i_index;
-
     vlc_mutex_lock( &p_this->p_libvlc->msg_bank.lock );
 
     p_this->p_libvlc->msg_bank.b_configured = VLC_TRUE;
