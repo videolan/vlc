@@ -22,7 +22,7 @@ Decoders:
 
 Services discovery:
  * UPnP service discovery
- * Bonjour service discovery using avahi
+ * Bonjour service discovery using avahi (Linux only)
 
 Video Filters:
  * RSS feed overlay
