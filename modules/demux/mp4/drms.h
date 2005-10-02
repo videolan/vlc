@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _VLC_DRMS_H
+#define _VLC_DRMS_H 1
+
 extern void *drms_alloc( char *psz_homedir );
 extern void drms_free( void *p_drms );
 extern int drms_init( void *p_drms, uint32_t i_type,
@@ -28,3 +31,4 @@ extern int drms_init( void *p_drms, uint32_t i_type,
 extern void drms_decrypt( void *p_drms, uint32_t *p_buffer,
                           uint32_t i_len );
 
+#endif

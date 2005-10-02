@@ -19,6 +19,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#ifndef _VLC_MP4_H
+#define _VLC_MP4_H 1
+
 
 #define FOURCC_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
 
@@ -922,3 +925,5 @@ int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... );
 int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box );
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
 void MP4_FreeBox_sample_vide( MP4_Box_t *p_box );
+
+#endif
