@@ -105,12 +105,15 @@ void __msg_Flush( vlc_object_t *p_this )
 
     p_this->p_libvlc->msg_bank.b_configured = VLC_TRUE;
 
+#if 0
+    /* Some messages remain in the queue, dont rewrite them */
     for( i_index = p_this->p_libvlc->msg_bank.i_start;
          i_index != p_this->p_libvlc->msg_bank.i_stop;
          i_index = (i_index+1) % VLC_MSG_QSIZE )
     {
         PrintMsg( p_this, &p_this->p_libvlc->msg_bank.msg[i_index] );
     }
+#endif
 
     FlushMsg( &p_this->p_libvlc->msg_bank );
 
