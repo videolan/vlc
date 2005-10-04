@@ -32,6 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/intf.h>
+#include "charset.h"
 
 #include "wxwidgets.h"
 

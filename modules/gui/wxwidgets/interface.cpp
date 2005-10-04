@@ -29,6 +29,7 @@
 #include <vlc/vout.h>
 #include <vlc/input.h>
 #include <vlc/intf.h>
+#include "charset.h"
 
 #include "wxwidgets.h"
 

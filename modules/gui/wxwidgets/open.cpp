@@ -31,6 +31,7 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
+#include "charset.h"
 
 #ifdef HAVE_LIBCDIO
 #include <cdio/cdio.h>
