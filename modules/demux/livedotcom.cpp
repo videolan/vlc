@@ -278,7 +278,7 @@ static int  Open ( vlc_object_t *p_this )
         if( psz_options ) delete [] psz_options;
 
         p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
-                              NULL ) ;
+                              NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) ) ;
         if( p_sdp == NULL )
         {
             msg_Err( p_demux, "describeURL failed (%s)",
