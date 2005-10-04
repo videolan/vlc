@@ -528,22 +528,13 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
 
   rmff_fix_header(header);
 
-  if( desc ) {
-      sdpplin_free( desc );
-      free( desc );
-  }
+  if( desc ) sdpplin_free( desc );
   if( buf ) free(buf);
   return header;
 
 error:
-  if( desc ) {
-      sdpplin_free( desc );
-      free( desc );
-  }
-  if( header ) {
-      rmff_free_header( header );
-      free( header );
-  }
+  if( desc ) sdpplin_free( desc );
+  if( header ) rmff_free_header( header );
   if( buf ) free( buf );
   return NULL;
 }
