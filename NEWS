@@ -55,6 +55,9 @@ Interfaces:
 ActiveX plugin:
 * Should now work outside IE as well
 
+Mac OS X port:
+* New script to delete the preferences automatically
+
 Translations:
  The following languages were added:
  * Korean
