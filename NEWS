@@ -40,8 +40,9 @@ Interfaces:
     - Fixed drag-and-drop inside the playlist
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
-    - All the --wxwin-* options are now --wx-*	
+    - All the --wxwin-* options are now --wx-*
     - VLC update checker
+    - Now require wx2.6 with Unicode support
  * Skins2
     - Tree playlist
  * HTTP
