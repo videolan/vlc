@@ -722,9 +722,13 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ffmpeg
 # ***************************************************************************
 
+# Note: we are using this cvs-snapshot of ffmpeg now, because this one 
+# compiles finely on 10.2 and is used in the win32-port as well, so we
+# experience the same bugs in both ports ;)
+
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
-	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
+	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co -D "2005-09-27" ffmpeg
 	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
