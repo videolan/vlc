@@ -86,6 +86,8 @@
     BOOL o_adjImg_expanded;
     BOOL o_audFlts_expanded;
     BOOL o_vidFlts_expanded;
+    
+    BOOL o_config_changed;
 }
 
 - (IBAction)adjImg_Enbl:(id)sender;
@@ -102,6 +104,8 @@
 - (IBAction)vidFlts_mrInfo:(id)sender;
 
 + (VLCExtended *)sharedInstance;
+- (BOOL)getConfigChanged;
+- (void)collapsAll;
 
 - (void)showPanel;
 - (void)initStrings;

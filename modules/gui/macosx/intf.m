@@ -432,17 +432,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     nib_main_loaded = TRUE;
 }
 
-- (void)dealloc
-{
-    [o_about release];
-    [o_prefs release];
-    [o_open release];
-    [o_extended release];
-    [o_bookmarks release];
-    
-    [super dealloc];
-}
-
 - (void)initStrings
 {
     [o_window setTitle: _NS("VLC - Controller")];
@@ -1412,6 +1401,35 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_msg_lock release];
         o_msg_lock = nil;
     }
+
+    /* save the prefs if they were changed in the extended panel */
+    if (o_extended && [o_extended getConfigChanged])
+    {
+        [o_extended savePrefs];
+    }
+
+    /* release some other objects here, because it isn't sure whether dealloc
+     * will be called later on -- FK (10/6/05) */
+    if ( o_about )
+        [o_about release];
+    
+    if ( o_prefs )
+        [o_prefs release];
+    
+    if ( o_open )
+        [o_open release];
+    
+    if ( o_extended )
+    {
+        [o_extended collapsAll];
+        [o_extended release];
+    }
+    
+    if ( o_bookmarks )
+        [o_bookmarks release];
+
+    if ( o_wizard )
+        [o_wizard release];
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
