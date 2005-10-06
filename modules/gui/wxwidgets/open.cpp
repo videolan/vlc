@@ -718,7 +718,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     for( char drive_letter = 'A'; drive_letter <= 'Z'; ++drive_letter )
     {
         char drive_name[3] = {drive_letter, ':', 0};
-        UINT type = GetDriveType( drive_name );
+        UINT type = GetDriveTypeA( drive_name );
         if( type == DRIVE_CDROM )
         {
             psz_default_device[0] = drive_letter;

@@ -3881,6 +3881,12 @@ then
     fi
     VLC_ADD_LDFLAGS([wxwidgets],[`${WX_CONFIG} --libs`])
     VLC_ADD_CXXFLAGS([wxwidgets],[`${WX_CONFIG} --cxxflags`])
+    if ${WX_CONFIG} --unicode
+    then 
+      # wxwidgets should provide the following flags but does not
+      # the following is required to compile for win32
+      VLC_ADD_CXXFLAGS([wxwidgets],[-D_UNICODE -DUNICODE])
+    fi
     if test "$have_libcdio" = "yes"
     then 
       VLC_ADD_LDFLAGS([wxwidgets],[$LIBCDIO_LIBS])
