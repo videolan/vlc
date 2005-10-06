@@ -328,6 +328,8 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     int     i_payload_type;
     int     i_skip = 0;
     int     i_sequence_number = 0;
+    int     i_extention_flag;
+    int     i_extention_length = 0;
 
     if( p_block == NULL )
         return NULL;
@@ -337,10 +339,11 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
 
     /* Parse the header and make some verifications.
      * See RFC 1889 & RFC 2250. */
-    i_rtp_version  = ( p_block->p_buffer[0] & 0xC0 ) >> 6;
-    i_CSRC_count   = ( p_block->p_buffer[0] & 0x0F );
-    i_payload_type = ( p_block->p_buffer[1] & 0x7F );
-    i_sequence_number = ( (p_block->p_buffer[2] << 8 ) + p_block->p_buffer[3] );
+    i_rtp_version     = ( p_block->p_buffer[0] & 0xC0 ) >> 6;
+    i_CSRC_count      = p_block->p_buffer[0] & 0x0F;
+    i_extention_flag  = p_block->p_buffer[0] & 0x10;
+    i_payload_type    = p_block->p_buffer[1] & 0x7F;
+    i_sequence_number = (p_block->p_buffer[2] << 8 ) + p_block->p_buffer[3];
 
     if ( i_rtp_version != 2 )
         msg_Dbg( p_access, "RTP version is %u, should be 2", i_rtp_version );
@@ -349,10 +352,13 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
         i_skip = 4;
     else if( i_payload_type !=  33 && i_payload_type != 32 )
         msg_Dbg( p_access, "unsupported RTP payload type (%u)", i_payload_type );
+    if( i_extention_flag )
+        i_extention_length = 4 +
+            4 * ( (p_block->p_buffer[14] << 8) + p_block->p_buffer[15] );
 
-    i_skip += RTP_HEADER_LEN + 4*i_CSRC_count;
+    /* Skip header + CSRC extension field n*(32 bits) + extention */
+    i_skip += RTP_HEADER_LEN + 4*i_CSRC_count + i_extention_length;
 
-    /* A CSRC extension field is 32 bits in size (4 bytes) */
     if( i_skip >= p_block->i_buffer )
         goto trash;
 
