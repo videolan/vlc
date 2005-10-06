@@ -498,10 +498,10 @@ void Interface::CreateOurMenuBar()
     {
         //                [ MENU BUTTON WIDTH CALCULATION ]
         // [ SM_CXDLGFRAME + pixels + textextent + pixels + SM_CXDLGFRAME ]
-        GetTextExtentPoint32( hdc, menubar->GetLabelTop(i),
-                                        strlen( menubar->GetLabelTop(i) ),
-                                        &sizing );
-        i_size += sizing.cx;                             // + text size..
+        GetTextExtentPoint32( hdc, menubar->GetLabelTop(i).c_str(),
+                                menubar->GetLabelTop(i).Length(), &sizing );
+        // + text size..
+        i_size += sizing.cx;
         // +1 more pixel on each size
         i_size += 2;
         // width of 2 DLGFRAME
