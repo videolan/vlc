@@ -178,6 +178,7 @@
 #define FOURCC_priv VLC_FOURCC( 'p', 'r', 'i', 'v' )
 
 #define FOURCC_text VLC_FOURCC( 't', 'e', 'x', 't' )
+#define FOURCC_tx3g VLC_FOURCC( 't', 'x', '3', 'g' )
 #define FOURCC_subp VLC_FOURCC( 's', 'u', 'b', 'p' )
 
 #define FOURCC_0xa9nam VLC_FOURCC( 0xa9, 'n', 'a', 'm' )
@@ -458,23 +459,45 @@ typedef struct MP4_Box_data_sample_vide_s
 
 } MP4_Box_data_sample_vide_t;
 
+#define MP4_TEXT_DISPLAY_FLAG_DONT_DISPLAY       (1<<0)
+#define MP4_TEXT_DISPLAY_FLAG_AUTO_SCALE         (1<<1)
+#define MP4_TEXT_DISPLAY_FLAG_CLIP_TO_TEXT_BOX   (1<<2)
+#define MP4_TEXT_DISPLAY_FLAG_USE_MOVIE_BG_COLOR (1<<3)
+#define MP4_TEXT_DISPLAY_FLAG_SHRINK_TEXT_BOX_TO_FIT (1<<4)
+#define MP4_TEXT_DISPLAY_FLAG_SCROLL_IN          (1<<5)
+#define MP4_TEXT_DISPLAY_FLAG_SCROLL_OUT         (1<<6)
+#define MP4_TEXT_DISPLAY_FLAG_HORIZONTAL_SCROLL  (1<<7)
+#define MP4_TEXT_DISPLAY_FLAG_REVERSE_SCROLL     (1<<8)
+#define MP4_TEXT_DISPLAY_FLAG_CONTINUOUS_SCROLL  (1<<9)
+#define MP4_TEXT_DISPLAY_FLAG_FLOW_HORIZONTAL    (1<<10)
+#define MP4_TEXT_DISPLAY_FLAG_CONTINUOUS_KARAOKE (1<<11)
+#define MP4_TEXT_DISPLAY_FLAG_DROP_SHADOW        (1<<12)
+#define MP4_TEXT_DISPLAY_FLAG_ANTI_ALIAS         (1<<13)
+#define MP4_TEXT_DISPLAY_FLAG_KEYED_TEXT         (1<<14)
+#define MP4_TEXT_DISPLAY_FLAG_INVERSE_HILITE     (1<<15)
+#define MP4_TEXT_DISPLAY_FLAG_COLOR_HILITE       (1<<16)
+#define MP4_TEXT_DISPLAY_FLAG_WRITE_VERTICALLY   (1<<17)
+
 typedef struct
 {
-    uint8_t  i_reserved1[6];
+    uint32_t i_reserved1;
+    uint16_t i_reserved2;
+
     uint16_t i_data_reference_index;
 
-    uint32_t i_display_flags;
-    uint32_t i_justification;
-    uint16_t i_background_color[3];
-    uint64_t i_text_box;
-    uint64_t i_reserved2;
-    uint16_t i_font_number;
-    uint16_t i_font_face;
-    uint16_t i_reserved3;
+    uint32_t i_display_flags;   // TextDescription and Tx3gDescription
 
-    uint16_t i_foreground_color[3];
+    int8_t i_justification_horizontal; // left(0), centered(1), right(-1)
+    int8_t i_justification_vertical;   // top(0), centered(1), bottom(-1)
 
-    char    *psz_text_name;
+    uint16_t i_background_color[4];
+
+    uint16_t i_text_box_top;
+    uint16_t i_text_box_left;
+    uint16_t i_text_box_bottom;
+    uint16_t i_text_box_right;
+
+    // TODO to complete
 } MP4_Box_data_sample_text_t;
 
 typedef struct MP4_Box_data_sample_hint_s

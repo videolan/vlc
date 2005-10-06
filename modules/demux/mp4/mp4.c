@@ -1278,6 +1278,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
+        case( VLC_FOURCC( 't', 'x', '3', 'g' ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
             /* FIXME: Not true, could be UTF-16 with a Byte Order Mark (0xfeff) */
             /* FIXME UTF-8 doesn't work here ? */
@@ -1777,6 +1778,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
         case( FOURCC_text ):
         case( FOURCC_subp ):
+        case( FOURCC_tx3g ):
             p_track->fmt.i_cat = SPU_ES;
             break;
 
