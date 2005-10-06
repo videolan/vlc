@@ -615,16 +615,18 @@ static int ReadICYMeta( access_t *p_access )
             if( psz ) *psz = '\0';
         }
 
-        if( p_sys->psz_icy_title ) free( p_sys->psz_icy_title );
+        if( !p_sys->psz_icy_title ||
+            strcmp( p_sys->psz_icy_title, &p[1] ) )
+        {
+            if( p_sys->psz_icy_title )
+                free( p_sys->psz_icy_title );
+            p_sys->psz_icy_title = strdup( &p[1] );
+            p_access->info.i_update |= INPUT_UPDATE_META;
 
-        p_sys->psz_icy_title = strdup( &p[1] );
-
-        p_access->info.i_update |= INPUT_UPDATE_META;
+            msg_Dbg( p_access, "New Title=%s", p_sys->psz_icy_title );
+        }
     }
-
     free( psz_meta );
-
-    msg_Dbg( p_access, "New Title=%s", p_sys->psz_icy_title );
 
     return VLC_SUCCESS;
 }
@@ -698,8 +700,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_META:
             pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
             *pp_meta = vlc_meta_New();
-            msg_Dbg( p_access, "GET META %s %s %s",
-                     p_sys->psz_icy_name, p_sys->psz_icy_genre, p_sys->psz_icy_title );
+
             if( p_sys->psz_icy_name )
                 vlc_meta_Add( *pp_meta, VLC_META_TITLE,
                               p_sys->psz_icy_name );
