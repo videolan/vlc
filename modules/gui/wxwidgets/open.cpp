@@ -1334,7 +1334,7 @@ static char * ProbeDVD(const wxChar *device)
 {
   char **ppsz_cd_drives;
   const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
-  char *psz_device = (char *) tmp_buf;
+  char *psz_device = const_cast<char *>(tmp_buf.data());
 
   if( IsDVD(psz_device) )
   {
@@ -1404,7 +1404,7 @@ static char * ProbeCDDA(const wxChar *device)
 {
    char *ppsz_device[2];
    const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
-   char *psz_device = (char *) tmp_buf;
+   char *psz_device = const_cast<char *>(tmp_buf.data());
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device, CDIO_FS_AUDIO, false);
@@ -1417,7 +1417,7 @@ static char * ProbeVCD(const wxChar *device)
 {
    char *ppsz_device[2];
    const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
-   char *psz_device = (char *) tmp_buf;
+   char *psz_device = const_cast<char *>(tmp_buf.data());
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device,
