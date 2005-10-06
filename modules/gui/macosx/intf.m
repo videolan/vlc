@@ -301,7 +301,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
-    o_extended = [[VLCExtended alloc] init];
+    o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     /*o_update = [[VLCUpdate alloc] init];*/
 
@@ -1365,6 +1365,35 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
     msleep( 500000 );
 
+    /* save the prefs if they were changed in the extended panel */
+    if (o_extended && [o_extended getConfigChanged])
+    {
+        [o_extended savePrefs];
+    }
+
+    /* release some other objects here, because it isn't sure whether dealloc
+     * will be called later on -- FK (10/6/05) */
+    if ( o_about )
+        [o_about release];
+    
+    if ( o_prefs )
+        [o_prefs release];
+    
+    if ( o_open )
+        [o_open release];
+    
+    if ( o_extended )
+    {
+        [o_extended collapsAll];
+        [o_extended release];
+    }
+    
+    if ( o_bookmarks )
+        [o_bookmarks release];
+
+    if ( o_wizard )
+        [o_wizard release];
+
     if( o_img_pause_pressed != nil )
     {
         [o_img_pause_pressed release];
@@ -1401,35 +1430,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_msg_lock release];
         o_msg_lock = nil;
     }
-
-    /* save the prefs if they were changed in the extended panel */
-    if (o_extended && [o_extended getConfigChanged])
-    {
-        [o_extended savePrefs];
-    }
-
-    /* release some other objects here, because it isn't sure whether dealloc
-     * will be called later on -- FK (10/6/05) */
-    if ( o_about )
-        [o_about release];
-    
-    if ( o_prefs )
-        [o_prefs release];
-    
-    if ( o_open )
-        [o_open release];
-    
-    if ( o_extended )
-    {
-        [o_extended collapsAll];
-        [o_extended release];
-    }
-    
-    if ( o_bookmarks )
-        [o_bookmarks release];
-
-    if ( o_wizard )
-        [o_wizard release];
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1513,6 +1513,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)showExtended:(id)sender
 {
+    if ( o_extended == nil )
+    {
+        o_extended = [[VLCExtended alloc] init];
+    }
     if (!nib_extended_loaded)
     {
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner:self];
