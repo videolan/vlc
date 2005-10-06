@@ -456,8 +456,7 @@ static block_t *BlockChoose( access_t *p_access )
     {
         case 33:
             msg_Dbg( p_access, "detected TS over RTP" );
-            /* Disabled because it is auto-detected. */
-            /* p_access->psz_demux = strdup( "ts" ); */
+            p_access->psz_demux = strdup( "ts" );
             break;
 
         case 14:

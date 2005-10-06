@@ -1924,7 +1924,7 @@ static int InputSourceInit( input_thread_t *p_input,
     vlc_value_t val;
 
     if( !in ) return VLC_EGENERIC;
-    
+
     /* Split uri */
     if( !b_quick )
     {
@@ -1944,7 +1944,29 @@ static int InputSourceInit( input_thread_t *p_input,
                      &in->i_seekpoint_start, &in->i_seekpoint_end );
 
         if( psz_forced_demux && *psz_forced_demux )
+        {
+            if( psz_demux ) free( psz_demux );
             psz_demux = psz_forced_demux;
+        }
+        else if( !psz_demux || *psz_demux == '\0' )
+        {
+            /* special hack for forcing a demuxer with --demux=module
+             * (and do nothing with a list) */
+            char *psz_var_demux = var_GetString( p_input, "demux" );
+
+            if( *psz_var_demux != '\0' &&
+                !strchr(psz_var_demux, ',' ) &&
+                !strchr(psz_var_demux, ':' ) )
+            {
+                psz_demux = psz_var_demux;
+
+                msg_Dbg( p_input, "Enforce demux ` %s'", psz_demux );
+            }
+            else if( psz_var_demux )
+            {
+                free( psz_var_demux );
+            }
+        }
 
         /* Try access_demux if no demux given */
         if( *psz_demux == '\0' )
