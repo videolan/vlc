@@ -87,7 +87,25 @@ struct access_sys_t
 
     vout_thread_t *p_vout;
     int            i_vout_chan;
+
+    int i_update_sav;
 };
+
+static inline void PreUpdateFlags( access_t *p_access )
+{
+    access_t *p_src = p_access->p_source;
+    /* backport flags turned off 0 */
+    p_src->info.i_update &= p_access->p_sys->i_update_sav ^ (~p_access->info.i_update);
+}
+
+static inline void PostUpdateFlags( access_t *p_access )
+{
+    access_t *p_src = p_access->p_source;
+    /* */
+    p_access->info = p_src->info;
+    p_access->p_sys->i_update_sav = p_access->info.i_update;
+}
+
 
 /*****************************************************************************
  * Open:
@@ -119,6 +137,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_dump = VLC_FALSE;
     p_sys->p_vout = NULL;
     p_sys->i_vout_chan = -1;
+    p_sys->i_update_sav = p_access->info.i_update;
 
     if( !strncasecmp( p_src->psz_access, "dvb", 3 ) ||
         !strncasecmp( p_src->psz_access, "udp", 3 ) )
@@ -169,12 +188,15 @@ static block_t *Block( access_t *p_access )
     block_t      *p_block;
 
     /* */
+    PreUpdateFlags( p_access );
+
+    /* */
     p_block = p_src->pf_block( p_src );
     if( p_block && p_block->i_buffer )
         Dump( p_access, p_block->p_buffer, p_block->i_buffer );
 
     /* */
-    p_access->info = p_src->info;
+    PostUpdateFlags( p_access );
 
     return p_block;
 }
@@ -187,13 +209,17 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     access_t     *p_src = p_access->p_source;
     int i_ret;
 
+    /* */
+    PreUpdateFlags( p_access );
+
+    /* */
     i_ret = p_src->pf_read( p_src, p_buffer, i_len );
 
     if( i_ret > 0 )
         Dump( p_access, p_buffer, i_ret );
 
     /* */
-    p_access->info = p_src->info;
+    PostUpdateFlags( p_access );
 
     return i_ret;
 }
@@ -206,10 +232,14 @@ static int Control( access_t *p_access, int i_query, va_list args )
     access_t     *p_src = p_access->p_source;
     int i_ret;
 
+    /* */
+    PreUpdateFlags( p_access );
+
+    /* */
     i_ret = p_src->pf_control( p_src, i_query, args );
 
     /* */
-    p_access->info = p_src->info;
+    PostUpdateFlags( p_access );
 
     return i_ret;
 }
@@ -222,10 +252,14 @@ static int Seek( access_t *p_access, int64_t i_pos )
     access_t     *p_src = p_access->p_source;
     int i_ret;
 
+    /* */
+    PreUpdateFlags( p_access );
+
+    /* */
     i_ret = p_src->pf_seek( p_src, i_pos );
 
     /* */
-    p_access->info = p_src->info;
+    PostUpdateFlags( p_access );
 
     return i_ret;
 }
