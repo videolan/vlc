@@ -330,6 +330,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     int     i_sequence_number = 0;
     int     i_extention_flag;
     int     i_extention_length = 0;
+    int     i_sequence_expected;
 
     if( p_block == NULL )
         return NULL;
@@ -367,23 +368,34 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     p_block->p_buffer += i_skip;
 
 #define RTP_SEQ_NUM_SIZE 65536
+#define RTP_SEQ_MAX_NO_DELTA 50
     /* Detect RTP packet loss through tracking sequence numbers.
      * See RFC 1889. */
     if( p_access->p_sys->i_sequence_number == -1 )
-        p_access->p_sys->i_sequence_number = i_sequence_number;
+        p_access->p_sys->i_sequence_number =
+                (i_sequence_number - 1 + RTP_SEQ_NUM_SIZE ) % RTP_SEQ_NUM_SIZE;
 
-    if( ((p_access->p_sys->i_sequence_number + 1) % RTP_SEQ_NUM_SIZE) != i_sequence_number )
+    i_sequence_expected = (p_access->p_sys->i_sequence_number + 1) % RTP_SEQ_NUM_SIZE;
+
+    if( i_sequence_expected != i_sequence_number )
     {
-        msg_Warn( p_access, "RTP packet(s) lost, expected sequence number %d got %d",
-            ((p_access->p_sys->i_sequence_number + 1) % RTP_SEQ_NUM_SIZE),
-            i_sequence_number );
-        if( i_payload_type == 33 )
+        if( ((p_access->p_sys->i_sequence_number - i_sequence_number + RTP_SEQ_NUM_SIZE) % RTP_SEQ_NUM_SIZE) < RTP_SEQ_MAX_NO_DELTA )
         {
-            /* Mark transport error in the first TS packet in the RTP stream. */
-            p_block->p_buffer[1] |= 0x80;
+            msg_Warn( p_access, "Trashing reordered/duplicate RTP packet, expected sequence number %d got %d",
+                      i_sequence_expected, i_sequence_number );
+            block_Release( p_block );
+            return NULL;
         }
+
+        msg_Warn( p_access,
+                  "RTP packet(s) lost, expected sequence number %d got %d",
+                  i_sequence_expected, i_sequence_number );
+        /* Mark transport error in the first TS packet in the RTP stream. */
+        if( i_payload_type == 33 && p_block->p_buffer[0] == 0x47 )
+            p_block->p_buffer[1] |= 0x80;
     }
     p_access->p_sys->i_sequence_number = i_sequence_number;
+#undef RTP_SEQ_MAX_NO_DELTA
 #undef RTP_SEQ_NUM_SIZE
     return p_block;
 
