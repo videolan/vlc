@@ -769,18 +769,36 @@ static VLCExtended *_o_sharedInstance = nil;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST, \
         FIND_ANYWHERE );
     int returnedValue;
+    NSArray * theModules;
+    theModules = [[NSArray alloc] initWithObjects: @"main", @"headphone", \
+        @"transform", @"adjust", @"invert", @"motionblur", @"distort", \
+        @"clone", @"crop", @"normvol", @"headphone_channel_mixer", @"macosx", \
+        nil];
+    unsigned int x = 0;
     
-    /* FIXME: we should only save the settings actually changed in this panel
-     * and no other. This would make the termination much quicker and is better
-     * for people who are using cmd-line-options (trac #382) -- FK (10/6/05) */
-    returnedValue = config_SaveConfigFile( p_playlist, NULL);
-    if (returnedValue == 0)
+    while ( x != [theModules count] )
     {
-        msg_Dbg(p_playlist, "VLCExtended: saved preferences successfully");
-    } else {
-        msg_Dbg(p_playlist, "VLCExtended: error while saving the preferences " \
-            "(%i)" , returnedValue);
+        returnedValue = config_SaveConfigFile( p_playlist, [[theModules \
+            objectAtIndex: x] UTF8String] );
+
+        if (returnedValue != 0)
+        {
+            msg_Err(p_playlist, "VLCExtended: error while saving the " \
+            "preferences of '%s' (%i)", [[theModules objectAtIndex: x] \
+            UTF8String] , returnedValue);
+            
+            [theModules release];
+            vlc_object_release( p_playlist );
+            
+            return;
+        }
+
+        x = ( x + 1 );
     }
+    
+    msg_Dbg( p_playlist, "VLCExtended: saved certain preferences successfully" );
+    
+    [theModules release];
     vlc_object_release( p_playlist );
 }
 @end
