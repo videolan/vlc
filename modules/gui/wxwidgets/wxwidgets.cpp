@@ -89,6 +89,8 @@ private:
 #define BOOKMARKS_TEXT N_("Show bookmarks dialog")
 #define BOOKMARKS_LONGTEXT N_("Show bookmarks dialog when the interface " \
     "starts.")
+#define EXTENDED_TEXT N_("Show extended GUI")
+#define EXTENDED_LONGTEXT N_("Show extended GUI")
 #define TASKBAR_TEXT N_("Show taskbar entry")
 #define TASKBAR_LONGTEXT N_("Show taskbar entry")
 #define MINIMAL_TEXT N_("Minimal interface")
@@ -125,6 +127,8 @@ vlc_module_begin();
     add_bool( "wx-taskbar", 1, NULL,
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
     add_deprecated( "wxwin-taskbar", VLC_FALSE); /*Deprecated since 0.8.4*/
+    add_bool( "wx-extended", 0, NULL,
+              EXTENDED_TEXT, EXTENDED_LONGTEXT, VLC_FALSE );
     add_bool( "wx-minimal", 0, NULL,
               MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
     add_deprecated( "wxwin-minimal", VLC_FALSE); /*Deprecated since 0.8.4*/
