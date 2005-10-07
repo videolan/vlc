@@ -230,11 +230,11 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mov;
     NSArray * o_wav;
     NSArray * o_asfh;
-    o_ps = [NSArray arrayWithObjects: @"ps", @"MPEG PS", \
+    o_ps = [NSArray arrayWithObjects: @"mpg", @"MPEG PS", \
         _NS("MPEG Program Stream"), nil];
     o_ts = [NSArray arrayWithObjects: @"ts", @"MPEG TS", \
         _NS("MPEG Transport Stream"), nil];
-    o_mpeg = [NSArray arrayWithObjects: @"ps", @"MPEG 1", \
+    o_mpeg = [NSArray arrayWithObjects: @"mpg", @"MPEG 1", \
         _NS("MPEG 1 Format"), nil];
     o_ogg = [NSArray arrayWithObjects: @"ogg", @"OGG", @"OGG", nil];
     o_raw = [NSArray arrayWithObjects: @"raw", @"RAW", @"RAW", nil];
