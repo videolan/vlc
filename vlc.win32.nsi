@@ -315,7 +315,7 @@ Section "Media player (required)" SEC01
 
 SectionEnd
 
-Section "Start Menu + Desktop Shortcut" SEC02
+Section "Start Menu Shortcut" SEC02a
   SectionIn 1 2 3
   CreateDirectory "$SMPROGRAMS\VideoLAN"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player.lnk" \
@@ -326,8 +326,6 @@ Section "Start Menu + Desktop Shortcut" SEC02
     "$INSTDIR\vlc.exe" "--intf skins"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Reset VLC defaults and quit.lnk" \
     "$INSTDIR\vlc.exe" "--reset-config --reset-plugins-cache --save-config vlc:quit "
-  CreateShortCut "$DESKTOP\VLC media player.lnk" \
-    "$INSTDIR\vlc.exe" "--intf wx"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \
     "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\VideoLAN\${PRODUCT_NAME} Website.lnk" \
@@ -336,6 +334,12 @@ Section "Start Menu + Desktop Shortcut" SEC02
     "${PRODUCT_WEB_SITE}/doc/"
   CreateShortCut "$SMPROGRAMS\VideoLAN\Documentation.lnk" \
     "$INSTDIR\Documentation.url"
+SectionEnd
+
+Section "Desktop Shortcut" SEC02b
+  SectionIn 1 2 3
+  CreateShortCut "$DESKTOP\VLC media player.lnk" \
+    "$INSTDIR\vlc.exe" "--intf wx"
 SectionEnd
 
 Section /o "Mozilla plugin" SEC03
@@ -409,8 +413,10 @@ SectionEnd
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} \
     "The media player itself"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} \
-    "Adds icons to your start menu and your desktop for easy access"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} \
+    "Adds icons to your start menu for easy access"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} \
+    "Adds icon to your desktop for easy access"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} \
     "The VLC Mozilla and Mozilla Firefox plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
