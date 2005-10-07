@@ -328,12 +328,6 @@ static char *ppsz_clock_descriptions[] =
     "This is the typical size of UDP packets that we expect. On Ethernet " \
     "it is usually 1500.")
 
-#define IFACE_ADDR_TEXT N_("Network interface address")
-#define IFACE_ADDR_LONGTEXT N_( \
-    "If you have several interfaces on your machine and use the " \
-    "multicast solution, you will probably have to indicate the IP address " \
-    "of your multicasting interface here.")
-
 #define TTL_TEXT N_("Time To Live")
 #define TTL_LONGTEXT N_( \
     "Indicate here the Time To Live of the multicast packets sent by " \
@@ -1134,8 +1128,6 @@ vlc_module_begin();
     add_integer( "server-port", 1234, NULL,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
     add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
-    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT,
-                IFACE_ADDR_LONGTEXT, VLC_TRUE );
     add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
         change_short('6');
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
