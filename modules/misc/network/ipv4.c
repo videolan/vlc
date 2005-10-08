@@ -300,7 +300,7 @@ static int OpenUDP( vlc_object_t * p_this )
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         /* Determine interface to be used for multicast */
-        char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
+        char * psz_if_addr = config_GetPsz( p_this, "miface-addr" );
 
         /* If we have a source address, we use IP_ADD_SOURCE_MEMBERSHIP
            so that IGMPv3 aware OSes running on IGMPv3 aware networks
