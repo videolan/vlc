@@ -1945,7 +1945,6 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( psz_forced_demux && *psz_forced_demux )
         {
-            if( psz_demux ) free( psz_demux );
             psz_demux = psz_forced_demux;
         }
         else if( !psz_demux || *psz_demux == '\0' )
