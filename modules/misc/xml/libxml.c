@@ -197,6 +197,7 @@ static int ReaderNodeType( xml_reader_t *p_reader )
     case XML_READER_TYPE_END_ELEMENT:
         i_ret = XML_READER_ENDELEM;
         break;
+    case XML_READER_TYPE_CDATA:
     case XML_READER_TYPE_TEXT:
         i_ret = XML_READER_TEXT;
         break;
