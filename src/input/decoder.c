@@ -863,12 +863,12 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         if ( i_force_dolby && (format.i_original_channels&AOUT_CHAN_PHYSMASK)
                                     == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
         {
-            if ( i_force_dolby > 0 )
+            if ( i_force_dolby == 1 )
             {
                 format.i_original_channels = format.i_original_channels |
                                              AOUT_CHAN_DOLBYSTEREO;
             }
-            else
+            else /* i_force_dolby == 2 */
             {
                 format.i_original_channels = format.i_original_channels &
                                              ~AOUT_CHAN_DOLBYSTEREO;

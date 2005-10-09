@@ -25,8 +25,12 @@ Services discovery:
  * UPnP service discovery
  * Bonjour service discovery using avahi (Linux only)
 
-Video Filters:
+Video filters:
  * RSS feed overlay
+
+Audio filters:
+* Fixes, enhancements and new options related to the Headphone Channel
+  Mixer and Dolby Surround
 
 Stream output:
  * New shout output module to forward streams to icecast servers

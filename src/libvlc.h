@@ -161,9 +161,12 @@ static char *ppsz_snap_formats[] =
 
 #define FORCE_DOLBY_TEXT N_("Force detection of Dolby Surround")
 #define FORCE_DOLBY_LONGTEXT N_( \
-    "Use this when you know your stream is or is not encoded with Dolby Surround " \
-    "but fails to be detected as such." )
-static int pi_force_dolby_values[] = { 0, 1, -1 };
+    "Use this when you know your stream is (or is not) encoded with Dolby "\
+    "Surround but fails to be detected as such. And even if the stream is "\
+    "not actually encoded with Dolby Surround, turning on this option might "\
+    "enhance your experience, especially when combined with the Headphone "\
+    "Channel Mixer." )
+static int pi_force_dolby_values[] = { 0, 1, 2 };
 static char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_("Off") };
 
 

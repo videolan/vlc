@@ -98,6 +98,9 @@ struct filter_sys_t
     "environment without disturbing anyone. If you disable the dynamic range "\
     "compression the playback will be more adapted to a movie theater or a " \
     "listening room.")
+#define UPMIX_TEXT N_("Enable internal upmixing")
+#define UPMIX_LONGTEXT N_( \
+    "Enable the internal upmixing algorithm (not recommended).")
 
 vlc_module_begin();
     set_shortname( "A/52" );
@@ -105,6 +108,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
     add_bool( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, VLC_FALSE );
+    add_bool( "a52-upmix", 0, NULL, UPMIX_TEXT, UPMIX_LONGTEXT, VLC_TRUE );
     set_capability( "audio filter", 100 );
     set_callbacks( Create, Destroy );
 
@@ -164,6 +168,16 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
 {
     p_sys->b_dynrng = config_GetInt( p_this, "a52-dynrng" );
     p_sys->b_dontwarn = 0;
+
+    /* No upmixing: it's not necessary and some other filters may want to do
+     * it themselves. */
+    if ( aout_FormatNbChannels( &output ) > aout_FormatNbChannels( &input ) )
+    {
+        if ( ! config_GetInt( p_this, "a52-upmix" ) )
+        {
+            return VLC_EGENERIC;
+        }
+    }
 
     /* We'll do our own downmixing, thanks. */
     p_sys->i_nb_channels = aout_FormatNbChannels( &output );
