@@ -294,7 +294,6 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i;
     double   f, *pf;
     int64_t i64, *pi64;
     vlc_meta_t **pp_meta;
