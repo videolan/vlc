@@ -571,15 +571,18 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_create( &p_this->thread_id, NULL, func, p_data );
 
-#ifndef SYS_DARWIN
-    if ( config_GetInt( p_this, "rt-priority" ) )
+#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+    i_ret = config_GetInt( p_this, "rt-priority" );
 #endif
+    if( i_ret )
     {
         int i_error, i_policy;
         struct sched_param param;
 
         memset( &param, 0, sizeof(struct sched_param) );
+#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
         i_priority += config_GetInt( p_this, "rt-offset" );
+#endif
         if ( i_priority <= 0 )
         {
             param.sched_priority = (-1) * i_priority;
@@ -598,12 +601,10 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
             i_priority = 0;
         }
     }
-#ifndef SYS_DARWIN
     else
     {
         i_priority = 0;
     }
-#endif
 
 #elif defined( HAVE_CTHREADS_H )
     p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
@@ -649,6 +650,8 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
                                int i_line, int i_priority )
 {
+    int i_ret;
+
 #if defined( PTH_INIT_IN_PTH_H ) || defined( ST_INIT_IN_ST_H )
 #elif defined( WIN32 ) || defined( UNDER_CE )
     if ( !SetThreadPriority(GetCurrentThread(), i_priority) )
@@ -658,8 +661,9 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-#ifndef SYS_DARWIN
-    if ( config_GetInt( p_this, "rt-priority" ) )
+#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+    i_ret = config_GetInt( p_this, "rt-priority" );
+    if( i_ret )
 #endif
     {
         int i_error, i_policy;

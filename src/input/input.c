@@ -1287,8 +1287,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             if( i_ret )
             {
-                msg_Err( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) "I64Fd
-                         " failed", i_time );
+                msg_Warn( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) "I64Fd
+                         " failed or not possible", i_time );
             }
             else
             {
