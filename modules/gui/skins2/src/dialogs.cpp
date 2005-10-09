@@ -175,7 +175,7 @@ bool Dialogs::init()
     m_pModule = module_Need( m_pProvider, "dialogs provider", NULL, 0 );
     if( m_pModule == NULL )
     {
-        msg_Err( getIntf(), "No suitable dialogs provider found" );
+        msg_Err( getIntf(), "No suitable dialogs provider found (hint: compile the wxWidgets plugin, and make sure it is loaded properly)" );
         vlc_object_destroy( m_pProvider );
         m_pProvider = NULL;
         return false;
