@@ -475,7 +475,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264 goom],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer vlc freetype],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer vlc freetype mpc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
@@ -2049,6 +2049,19 @@ then
     VLC_ADD_CXXFLAGS([mod],[])
     VLC_ADD_LDFLAGS([mod],[-lmodplug])])
 fi
+
+dnl
+dnl  mpc demux plugin
+dnl
+AC_ARG_ENABLE(mpc,
+  [  --enable-mpc            Mpc demux support (default enabled)])
+if test "${enable_mpc}" != "no"
+then
+  AC_CHECK_HEADERS(mpcdec/mpcdec.h, [
+    VLC_ADD_PLUGINS([mpc])
+    VLC_ADD_LDFLAGS([mpc],[-lmpcdec])])
+fi
+
 
 dnl
 dnl  Codec plugins

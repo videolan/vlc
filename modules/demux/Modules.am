@@ -25,3 +25,4 @@ SOURCES_voc = voc.c
 SOURCES_xa = xa.c
 SOURCES_nuv = nuv.c
 SOURCES_nsc = nsc.c
+SOURCES_mpc = mpc.c
