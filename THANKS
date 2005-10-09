@@ -107,6 +107,7 @@ Thomas L. Wood <twood at lucent.com> - fixed a bug in QuantMatrixExtension
 Tong Ka Man <kmtong at cwbase dot com> - playlist_Clear addition
 Valek Filippov <frob at df.ru> - Russian translation
 Vicente Jimenez Aguilar <vice at v1ce.net> - Spanish translation
+Vincent van den Heuvel <heuvel@mac.com> - OSX about window artwork (v0.8.4)
 Vitalijus Slavinskas <Vitalijus.Slavinskas at stud.ktu dot lt> - nsv patches
 Vladimir Chernyshov - MMX motion optimizations
 Wade Majors <guru at startrek.com> - BeOS icon integration, debugging and fixes
