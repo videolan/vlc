@@ -584,7 +584,7 @@ static int ReadICYMeta( access_t *p_access )
         return VLC_SUCCESS;
 
     i_read = buffer << 4;
-    msg_Dbg( p_access, "ICY meta size=%u", i_read);
+    /* msg_Dbg( p_access, "ICY meta size=%u", i_read); */
 
     psz_meta = malloc( i_read + 1 );
     if( net_Read( p_access, p_sys->fd, p_sys->p_vs,
@@ -593,7 +593,7 @@ static int ReadICYMeta( access_t *p_access )
 
     psz_meta[i_read] = '\0'; /* Just in case */
 
-    msg_Dbg( p_access, "icy-meta=%s", psz_meta );
+    /* msg_Dbg( p_access, "icy-meta=%s", psz_meta ); */
 
     /* Now parse the meta */
     /* Look for StreamTitle= */
