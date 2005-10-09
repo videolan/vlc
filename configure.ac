@@ -3863,9 +3863,9 @@ then
   AC_PATH_PROG(WX_CONFIG, ${WXWIDGETS_NAME}, no, ${WXWIDGETS_PATH})
   if test "${WX_CONFIG}" != "no" -a "${CXX}" != ""
   then
-    if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
+    if expr 2.6.0 \> `${WX_CONFIG} --version` >/dev/null
     then
-      AC_MSG_ERROR([Your development package for wxWidgets is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwidgets.])
+      AC_MSG_ERROR([Your development package for wxWidgets is too old, you need at least version 2.6.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwidgets.])
     fi
     AC_LANG_PUSH(C++)
     # Turn this error:
