@@ -48,9 +48,14 @@
 #define MUX_LONGTEXT N_( \
     "Allows you to specify the output muxer method used for the streaming " \
     "output." )
-#define URL_TEXT N_("Output URL")
+#define URL_TEXT N_("Output URL (deprecated)")
 #define URL_LONGTEXT N_( \
-    "Allows you to specify the output URL used for the streaming output." )
+    "Allows you to specify the output URL used for the streaming output." \
+    "Deprecated, use dst instead." )
+
+#define DST_TEXT N_("Output destination")
+#define DST_LONGTEXT N_( \
+    "Allows you to specify the output destination used for the streaming output." )
 
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
@@ -86,6 +91,8 @@ vlc_module_begin();
                 MUX_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
                 URL_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
+                DST_LONGTEXT, VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT, NAME_LONGTEXT,
@@ -104,7 +111,7 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "access", "mux", "url",
+    "access", "mux", "url", "dst",
     "sap", "name", "group", "slp", NULL
 };
 
@@ -146,15 +153,23 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "access", &val );
     psz_access = *val.psz_string ? val.psz_string : NULL;
-    if( val.psz_string && !*val.psz_string ) free( val.psz_string );
+    if( !*val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "mux", &val );
     psz_mux = *val.psz_string ? val.psz_string : NULL;
-    if( val.psz_string && !*val.psz_string ) free( val.psz_string );
+    if( !*val.psz_string ) free( val.psz_string );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
     psz_url = *val.psz_string ? val.psz_string : NULL;
-    if( val.psz_string && !*val.psz_string ) free( val.psz_string );
+    if( !*val.psz_string ) free( val.psz_string );
+    if( !psz_url )
+    {
+        /* XXX dst take preference over url (url will be removed later) */
+        var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
+        psz_url = *val.psz_string ? val.psz_string : NULL;
+        if( !*val.psz_string ) free( val.psz_string );
+    }
 
     p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
     p_stream->p_sys->p_session = NULL;
@@ -182,6 +197,7 @@ static int Open( vlc_object_t *p_this )
             { "mpeg","ps" },
             { "ps",  "ps" },
             { "mpeg1","mpeg1" },
+            { "wav","wav" },
             { NULL,  NULL }
         };
         char *psz_ext = strrchr( psz_url, '.' ) + 1;
