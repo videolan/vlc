@@ -92,7 +92,7 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-	.glib .libidl .gecko .aclocal
+	.glib .libidl .gecko .libmpcdec .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 else
 
@@ -1366,6 +1366,24 @@ SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 CLEAN_FILE += .SDL_image
 CLEAN_PKG += SDL_image
 DISTCLEAN_PKG += SDL_image-$(SDL_IMAGE_VERSION).tar.gz
+
+# ***************************************************************************
+# Musepack decoder library (libmpcdec)
+# ***************************************************************************
+
+libmpcdec-$(MUSE_VERSION).tar.bz2:
+	$(WGET) $(MUSE_URL)
+
+libmpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
+	$(EXTRACT_BZ2)
+
+.libmpcdec: libmpcdec
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .libmpcdec
+CLEAN_PKG += libmpcdec
+DISTCLEAN_PKG += libmpcdec-$(MUSE_VERSION).tar.bz2
 
 # ***************************************************************************
 # Copy aclocal files

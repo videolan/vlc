@@ -13,7 +13,7 @@ D: input and decoders core improvements
 D: avi, asf/wmv/wma, mp4/mov, mp3, aac, wav demultiplexers
 D: MPEG-4, Div & OpenDivX and various decoders (ffmpeg)
 D: AAC decoder (libfaad2)
-D: cinepak, adpcm, araw decoders
+D: cinepak, adpcm, araw, musepack decoders
 D: Subtile file parser.
 D: mms, ftp access
 D: Stream output

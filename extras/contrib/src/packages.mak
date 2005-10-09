@@ -141,3 +141,5 @@ SDL_VERSION=1.2.8
 SDL_URL=http://www.libsdl.org/release/SDL-$(SDL_VERSION).tar.gz
 SDL_IMAGE_VERSION=1.2.4
 SDL_IMAGE_URL=http://www.libsdl.org/projects/SDL_image/release/SDL_image-$(SDL_IMAGE_VERSION).tar.gz
+MUSE_VERSION=1.2.1
+MUSE_URL=http://files.musepack.net/source/libmpcdec-$(MUSE_VERSION).tar.bz2

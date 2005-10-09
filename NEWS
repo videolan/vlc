@@ -19,6 +19,7 @@ Input:
 
 Decoders:
  * Support for libSDL_image to import different image types
+ * Musepack decoder using libmpdec
 
 Services discovery:
  * UPnP service discovery
