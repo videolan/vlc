@@ -781,7 +781,6 @@
 				DCC9AE9507F77DE600394C42,
 				A0E6B59904407FBD0080DD97,
 				8EDAC3440440F72D0059A3A7,
-				8EE1AFA40444660F0059A3A7,
 				8E9CC7B2046EFD700059A3A7,
 				8E445F9D04728A700059A3A7,
 				8E445F9E04728A700059A3A7,
@@ -839,6 +838,7 @@
 				DCFCCDB9085CE18F001E36AF,
 				DC7F46ED08A183FC0027DB24,
 				DCE7BD0508A56C8B007B10AE,
+				DCDA5E6508F94518009D93A8,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -861,9 +861,9 @@
 		089C167CFE841241C02AAC07 = {
 			children = (
 				DCF358BC077F1236007DB450,
+				DCDA5E6408F94518009D93A8,
 				8E445F86047289E50059A3A7,
 				8ECA7E520563CD9500DFC000,
-				8EE1AFA30444660F0059A3A7,
 				F69B0CA602E24F6401A80112,
 				8ED6C29D03E2F32E0059A3A7,
 				8E9CC7B1046EFD700059A3A7,
@@ -2138,20 +2138,6 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
-		8EE1AFA30444660F0059A3A7 = {
-			isa = PBXFileReference;
-			lastKnownFileType = image.png;
-			name = about_bg.png;
-			path = Resources/about_bg.png;
-			refType = 2;
-			sourceTree = SOURCE_ROOT;
-		};
-		8EE1AFA40444660F0059A3A7 = {
-			fileRef = 8EE1AFA30444660F0059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 //8E0
 //8E1
 //8E2
@@ -2302,6 +2288,20 @@
 		};
 		DCC9AE9507F77DE600394C42 = {
 			fileRef = 8EBF3FA503F140960059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		DCDA5E6408F94518009D93A8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.png;
+			name = about_bg.png;
+			path = Resources/about_bg.png;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCDA5E6508F94518009D93A8 = {
+			fileRef = DCDA5E6408F94518009D93A8;
 			isa = PBXBuildFile;
 			settings = {
 			};

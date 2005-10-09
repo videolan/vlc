@@ -81,7 +81,7 @@ static VLAboutBox *_o_sharedInstance = nil;
             VLC_Changeset()]];
     
         /* Setup the nameversion field */
-        o_name_version = [NSString stringWithFormat:@"%@ - Version %@", o_name, o_version];
+        o_name_version = [NSString stringWithFormat:@"Version %@", o_version];
         [o_name_version_field setStringValue: o_name_version];
         
         /* Setup our credits */
