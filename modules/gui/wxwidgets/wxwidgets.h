@@ -36,7 +36,6 @@
 
 #include <list>
 
-#define wxUSE_UNICODE 1
 #include <wx/wxprec.h>
 #include <wx/wx.h>
 
@@ -64,14 +63,30 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 /* wxU is used to convert ansi/utf8 strings to unicode strings (wchar_t) */
 #if defined( ENABLE_NLS )
+#if wxUSE_UNICODE
 #   define wxU(utf8) wxString(utf8, wxConvUTF8)
+#else
+#   define wxU(utf8) wxString(wxConvUTF8.cMB2WC(utf8), *wxConvCurrent)
+#endif
 #else // ENABLE_NLS
+#if wxUSE_UNICODE
 #   define wxU(ansi) wxString(ansi, wxConvLocal)
+#else
+#   define wxU(ansi) (ansi)
+#endif
 #endif
 
 /* wxL2U (locale to unicode) is used to convert ansi strings to unicode
  * strings (wchar_t) */
 #define wxL2U(ansi) wxU(ansi)
+
+#if wxUSE_UNICODE
+#   define wxFromLocale(wxstring) FromUTF32(wxstring.wc_str())
+#   define wxLocaleFree(string) free(string)
+#else
+#   define wxFromLocale(wxstring) FromLocale(wxstring.mb_str())
+#   define wxLocaleFree(string) LocaleFree(string)
+#endif
 
 #define WRAPCOUNT 80
 

@@ -1418,11 +1418,11 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
-        char *psz_utf8 = FromUTF32( filenames[i].wc_str() );
+        char *psz_utf8 = wxFromLocale( filenames[i] );
         playlist_Add( p_playlist, psz_utf8, psz_utf8,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
                       PLAYLIST_END );
-        free( psz_utf8 );
+        wxLocaleFree( psz_utf8 );
     }
 
     vlc_object_release( p_playlist );
