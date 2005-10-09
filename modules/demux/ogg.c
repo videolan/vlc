@@ -514,26 +514,30 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         case VLC_FOURCC( 'v','o','r','b' ):
         case VLC_FOURCC( 's','p','x',' ' ):
         case VLC_FOURCC( 't','h','e','o' ):
-          if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
-          break;
+            if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
+            break;
 
         case VLC_FOURCC( 'f','l','a','c' ):
-          if( !p_stream->fmt.audio.i_rate && p_stream->i_packets_backup == 2 )
-          {
-              Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
-              p_stream->b_force_backup = 0;
-          }
-          else if( p_stream->fmt.audio.i_rate )
-          {
-              p_stream->b_force_backup = 0;
-              p_oggpacket->packet += 9; p_oggpacket->bytes -= 9;
-          }
-          b_store_size = VLC_FALSE;
-          break;
+            if( !p_stream->fmt.audio.i_rate && p_stream->i_packets_backup == 2 )
+            {
+                Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
+                p_stream->b_force_backup = 0;
+            }
+            else if( p_stream->fmt.audio.i_rate )
+            {
+                p_stream->b_force_backup = 0;
+                if( p_oggpacket->bytes >= 9 )
+                {
+                    p_oggpacket->packet += 9;
+                    p_oggpacket->bytes -= 9;
+                }
+            }
+            b_store_size = VLC_FALSE;
+            break;
 
         default:
-          p_stream->b_force_backup = 0;
-          break;
+            p_stream->b_force_backup = 0;
+            break;
         }
 
         /* Backup the ogg packet (likely an header packet) */
@@ -626,6 +630,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         return;
     }
 
+    if( p_oggpacket->bytes <= 0 )
+        return;
+
     if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
 
     /* Normalize PTS */
@@ -663,7 +670,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         {
             /* But with subtitles we need to retrieve the duration first */
             int i, lenbytes = 0;
-        
+
             if( i_header_len > 0 && p_oggpacket->bytes >= i_header_len + 1 )
             {
                 for( i = 0, lenbytes = 0; i < i_header_len; i++ )
@@ -683,7 +690,10 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         }
 
         i_header_len++;
-        p_block->i_buffer -= i_header_len;
+        if( p_block->i_buffer >= i_header_len )
+            p_block->i_buffer -= i_header_len;
+        else
+            p_block->i_buffer = 0;
     }
 
     if( p_stream->fmt.i_codec == VLC_FOURCC( 't','a','r','k' ) )
@@ -1313,7 +1323,8 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
                                    logical_stream_t *p_stream,
                                    ogg_packet *p_oggpacket )
 {
-    if( ! memcmp( &p_oggpacket->packet[0], "Annodex", 7 ) )
+    if( p_oggpacket->bytes >= 28 &&
+        !memcmp( &p_oggpacket->packet[0], "Annodex", 7 ) )
     {
         oggpack_buffer opb;
 
@@ -1331,7 +1342,8 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
         timebase_numerator = GetQWLE( &p_oggpacket->packet[16] );
         timebase_denominator = GetQWLE( &p_oggpacket->packet[24] );
     }
-    else if( ! memcmp( &p_oggpacket->packet[0], "AnxData", 7 ) )
+    else if( p_oggpacket->bytes >= 42 &&
+             !memcmp( &p_oggpacket->packet[0], "AnxData", 7 ) )
     {
         uint64_t granule_rate_numerator;
         uint64_t granule_rate_denominator;
@@ -1346,10 +1358,14 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
         /* we are guaranteed that the first header field will be
          * the content-type (by the Annodex standard) */
+        content_type_string[0] = '\0';
         if( !strncasecmp( &p_oggpacket->packet[28], "Content-Type: ", 14 ) )
         {
-            sscanf( &p_oggpacket->packet[42], "%1024s\r\n",
-                    content_type_string );
+            uint8_t *p = memchr( &p_oggpacket->packet[42], '\r',
+                                 p_oggpacket->bytes - 1 );
+            if( p && p[0] == '\r' && p[1] == '\n' )
+                sscanf( &p_oggpacket->packet[42], "%1024s\r\n",
+                        content_type_string );
         }
 
         msg_Dbg( p_this, "AnxData packet info: "I64Fd" / "I64Fd", %d, ``%s''",
