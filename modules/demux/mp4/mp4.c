@@ -2007,7 +2007,11 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
         VLC_SUCCESS )
     {
         p_track->b_selected = VLC_TRUE;
+
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                        p_track->p_es, i_start );
     }
+
     return( p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC );
 }
 
