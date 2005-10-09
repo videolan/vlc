@@ -895,7 +895,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( ( p_frame = stream_Block( p_demux->s, __EVEN( i_size ) ) )==NULL )
         {
-            msg_Warn( p_demux, "failled reading data" );
+            msg_Warn( p_demux, "failed reading data" );
             tk->b_activated = VLC_FALSE;
             toread[i_track].b_ok = VLC_FALSE;
             continue;
