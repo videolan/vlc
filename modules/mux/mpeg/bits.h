@@ -43,18 +43,9 @@ static inline int bits_initwrite( bits_buffer_t *p_buffer,
     if( !p_buffer->p_data )
     {
         if( !( p_buffer->p_data = malloc( i_size ) ) )
-        {
-            return( -1 );
-        }
-        else
-        {
-            return( 0 );
-        }
+            return -1;
     }
-    else
-    {
-        return( 0 );
-    }
+    return 0;
 }
 
 static inline void bits_align( bits_buffer_t *p_buffer )

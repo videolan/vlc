@@ -544,28 +544,38 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pat_version_number = rand() % 32;
     p_sys->pat.i_pid = 0;
     p_sys->pat.i_continuity_counter = 0;
+    p_sys->pat.b_discontinuity = VLC_FALSE;
 
     var_Get( p_mux, SOUT_CFG_PREFIX "tsid", &val );
     if ( val.i_int )
         p_sys->i_tsid = val.i_int;
     else
         p_sys->i_tsid = rand() % 65536;
+
+    p_sys->i_netid = rand() % 65536;
+#ifdef HAVE_DVBPSI_SDT
     var_Get( p_mux, SOUT_CFG_PREFIX "netid", &val );
     if ( val.i_int )
         p_sys->i_netid = val.i_int;
-    else
-        p_sys->i_netid = rand() % 65536;
+#endif
+
     p_sys->i_pmt_version_number = rand() % 32;
-    p_sys->sdt.i_continuity_counter = 0;
-
     for( i = 0; i < p_sys->i_num_pmt; i++ )
+    {
         p_sys->pmt[i].i_continuity_counter = 0;
+        p_sys->pmt[i].b_discontinuity = VLC_FALSE;
+    }
 
+    p_sys->sdt.i_pid = 0x11;
+    p_sys->sdt.i_continuity_counter = 0;
+    p_sys->sdt.b_discontinuity = VLC_FALSE;
+
+#ifdef HAVE_DVBPSI_SDT
     var_Get( p_mux, SOUT_CFG_PREFIX "sdtdesc", &val );
     p_sys->b_sdt = val.psz_string && *val.psz_string ? VLC_TRUE : VLC_FALSE;
 
     /* Syntax is provider_sdt1,service_name_sdt1,provider_sdt2,service_name_sdt2... */
-    if( val.psz_string != NULL && *val.psz_string )
+    if( p_sys->b_sdt )
     {
 
         char *psz = val.psz_string;
@@ -595,6 +605,9 @@ static int Open( vlc_object_t *p_this )
         }
     }
     if( val.psz_string != NULL ) free( val.psz_string );
+#else
+    p_sys->b_sdt = VLC_FALSE;
+#endif
 
     var_Get( p_mux, SOUT_CFG_PREFIX "program-pmt", &val );
     if( val.psz_string && *val.psz_string )
@@ -2475,7 +2488,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     {
         p_section2 = dvbpsi_GenSDTSections( &sdt );
         p_sdt = WritePSISection( p_mux->p_sout, p_section2 );
-        p_sys->sdt.i_pid = 0x11;
         PEStoTS( p_mux->p_sout, c, p_sdt, &p_sys->sdt );
         dvbpsi_DeletePSISections( p_section2 );
         dvbpsi_EmptySDT( &sdt );

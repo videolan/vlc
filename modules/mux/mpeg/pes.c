@@ -65,7 +65,6 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
         }
     }
 
-
     bits_initwrite( &bits, 50, p_hdr );
 
     /* add start code */
@@ -271,6 +270,10 @@ int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
     p_data = p_es->p_buffer;
 
     *pp_pes = p_pes = NULL;
+
+#ifdef DEBUG
+    memset( header, 0, 50 );
+#endif
 
     do
     {
