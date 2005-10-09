@@ -373,7 +373,7 @@ Interface::~Interface()
 void Interface::Init()
 {
     /* Misc init */
-    //SetupHotkeys();
+    SetupHotkeys();
 }
 
 void Interface::Update()
