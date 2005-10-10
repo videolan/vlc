@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef __VLC_CHARSET_H
+#define __VLC_CHARSET_H 1
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -37,3 +40,5 @@ VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) 
 # ifdef __cplusplus
 }
 # endif
+
+#endif
