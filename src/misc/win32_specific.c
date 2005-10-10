@@ -284,6 +284,15 @@ static void IPCHelperThread( vlc_object_t *p_this )
 LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                                 LPARAM lParam )
 {
+    /* zcot's screensaver patch */
+    if( uMsg == WM_SYSCOMMAND )
+    {
+        if( ( wParam & 0xFFF0 ) == SC_SCREENSAVE )
+            return 0;
+        return DefWindowProc( hwnd, uMsg, wParam, lParam );
+    }
+    /* End zcot's screensaver patch */
+
     if( uMsg == WM_COPYDATA )
     {
         COPYDATASTRUCT *pwm_data = (COPYDATASTRUCT*)lParam;
