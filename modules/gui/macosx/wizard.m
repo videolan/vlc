@@ -230,12 +230,12 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mov;
     NSArray * o_wav;
     NSArray * o_asfh;
-    o_ps = [NSArray arrayWithObjects: @"mpg", @"MPEG PS", \
-        _NS("MPEG Program Stream"), nil];
+    o_ps = [NSArray arrayWithObjects: @"ps", @"MPEG PS", \
+        _NS("MPEG Program Stream"), @"mpg", nil];
     o_ts = [NSArray arrayWithObjects: @"ts", @"MPEG TS", \
         _NS("MPEG Transport Stream"), nil];
-    o_mpeg = [NSArray arrayWithObjects: @"mpg", @"MPEG 1", \
-        _NS("MPEG 1 Format"), nil];
+    o_mpeg = [NSArray arrayWithObjects: @"ps", @"MPEG 1", \
+        _NS("MPEG 1 Format"), @"mpg", nil];
     o_ogg = [NSArray arrayWithObjects: @"ogg", @"OGG", @"OGG", nil];
     o_raw = [NSArray arrayWithObjects: @"raw", @"RAW", @"RAW", nil];
     o_asf = [NSArray arrayWithObjects: @"asf", @"ASF", @"ASF", nil];
@@ -1610,8 +1610,17 @@ static VLCWizard *_o_sharedInstance = nil;
     /* provide a save-to-dialogue, so the user can choose a location for his/her new file */
     NSSavePanel * savePanel = [NSSavePanel savePanel];
     SEL sel = @selector(t7_getTrnscdDestFile:returnCode:contextInfo:);
-    [savePanel setRequiredFileType:[[o_encapFormats objectAtIndex: \
-        [[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:0]];
+    NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
+        [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
+        objectAtIndex:0];
+    
+    if (theEncapFormat != @"ps")
+    {
+        [savePanel setRequiredFileType: theEncapFormat];
+    } else {
+        [savePanel setRequiredFileType: @"mpg"];
+    }
+    
     [savePanel setCanSelectHiddenExtension:YES];
     [savePanel beginSheetForDirectory:nil file:nil modalForWindow: \
         o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
