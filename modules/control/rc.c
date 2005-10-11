@@ -37,6 +37,7 @@
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
+#include <vlc_video.h>
 #include <vlc_osd.h>
 
 #ifdef HAVE_UNISTD_H
@@ -378,7 +379,9 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "next", Playlist, NULL );
     var_Create( p_intf, "goto", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "goto", Playlist, NULL );
- 
+    var_Create( p_intf, "status", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "status", Playlist, NULL );
+
     /* marquee on the fly items */
     var_Create( p_intf, "marq-marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "marq-marquee", Other, NULL );
@@ -861,6 +864,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| next . . . . . . . . . . . .  next playlist item"));
     msg_rc(_("| prev . . . . . . . . . .  previous playlist item"));
     msg_rc(_("| goto . . . . . . . . . . . .  goto item at index"));
+    msg_rc(_("| status . . . . . . . . . current playlist status"));
     msg_rc(_("| title [X]  . . . . set/get title in current item"));
     msg_rc(_("| title_n  . . . . . .  next title in current item"));
     msg_rc(_("| title_p  . . . .  previous title in current item"));
@@ -1285,29 +1289,32 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( "| no entries" );
         }
     }
-    else if( !strcmp( newval.psz_string, "status" ) )
+    else if( !strcmp( psz_cmd, "status" ) )
     {
-        /* Replay the current state of the system. */
-        msg_rc( STATUS_CHANGE "( New input: %s )", p_playlist->p_input->input.p_item->psz_uri );
-        msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
-
-        vlc_mutex_lock( &p_playlist->object_lock );
-        switch( p_playlist->status.i_status )
+        if( p_playlist->p_input )
         {
-            case PLAYLIST_STOPPED:
-                msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-                break;
-            case PLAYLIST_RUNNING:
-                msg_rc( STATUS_CHANGE "( play state: 1 )" );
-                break;
-            case PLAYLIST_PAUSED:
-                msg_rc( STATUS_CHANGE "( pause state: 2 )" );
-                break;
-            default:
-                msg_rc( STATUS_CHANGE "( state unknown )" );
-                break;
+            /* Replay the current state of the system. */
+            msg_rc( STATUS_CHANGE "( New input: %s )", p_playlist->p_input->input.p_item->psz_uri );
+            msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
+    
+            vlc_mutex_lock( &p_playlist->object_lock );
+            switch( p_playlist->status.i_status )
+            {
+                case PLAYLIST_STOPPED:
+                    msg_rc( STATUS_CHANGE "( stop state: 0 )" );
+                    break;
+                case PLAYLIST_RUNNING:
+                    msg_rc( STATUS_CHANGE "( play state: 1 )" );
+                    break;
+                case PLAYLIST_PAUSED:
+                    msg_rc( STATUS_CHANGE "( pause state: 2 )" );
+                    break;
+                default:
+                    msg_rc( STATUS_CHANGE "( state unknown )" );
+                    break;
+            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
         }
-        vlc_mutex_unlock( &p_playlist->object_lock );
     }
 
     /*
