@@ -337,6 +337,7 @@ static void Close( vlc_object_t * p_this )
         p_dummy->i_dts = 0;
         p_dummy->i_pts = 0;
         p_dummy->i_length = 0;
+        memset( p_dummy->p_buffer, 0, p_dummy->i_buffer );
         block_FifoPut( p_sys->p_thread->p_fifo, p_dummy );
     }
     vlc_thread_join( p_sys->p_thread );
