@@ -474,11 +474,19 @@ HRESULT VLCPlugin::onInit(void)
 {
     if( 0 == _i_vlc )
     {
-#ifdef ACTIVEX_DEBUG
-        char *ppsz_argv[] = { "vlc", "-vv", "--fast-mutex", "--win9x-cv-method=1" };
-#else
-        char *ppsz_argv[] = { "vlc", "-vv" };
-#endif
+        _i_vlc = VLC_Create();
+        if( _i_vlc < 0 )
+        {
+            _i_vlc = 0;
+            return E_FAIL;
+        }
+
+        /*
+        ** default initialization options
+        */
+        char *ppsz_argv[10] = { "vlc", "-vv" };
+        int   ppsz_argc = 2;
+
         HKEY h_key;
         DWORD i_type, i_data = MAX_PATH + 1;
         char p_data[MAX_PATH + 1];
@@ -497,18 +505,25 @@ HRESULT VLCPlugin::onInit(void)
              RegCloseKey( h_key );
         }
 
-#if 0
+#if 1
         ppsz_argv[0] = "C:\\cygwin\\home\\Damien_Fouilleul\\dev\\videolan\\vlc-trunk\\vlc";
 #endif
 
-        _i_vlc = VLC_Create();
-        if( _i_vlc < 0 )
+        if( IsDebuggerPresent() )
         {
-            _i_vlc = 0;
-            return E_FAIL;
+            /*
+            ** VLC default threading mechanism is designed to be as compatible
+            ** with POSIX as possible, however when debugged on win32, threads
+            ** lose signals and eventually VLC get stuck during initialization.
+            ** threading support can be configured to be more debugging friendly
+            ** but it will be less compatible with POSIX.
+            ** This is done by initializing with the following options
+            */
+            ppsz_argv[ppsz_argc++] = "--fast-mutex";
+            ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
         }
 
-        if( VLC_Init(_i_vlc, sizeof(ppsz_argv)/sizeof(char*), ppsz_argv) )
+        if( VLC_Init(_i_vlc, ppsz_argc, ppsz_argv) )
         {
             VLC_Destroy(_i_vlc);
             _i_vlc = 0;
@@ -657,9 +672,10 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
             }
             VariantInit(&v);
             V_VT(&v) = VT_I4;
-            if( SUCCEEDED(GetObjectProperty(pContainer, dispID, v)) )
+            if( SUCCEEDED(GetObjectProperty(pContainer, DISPID_AMBIENT_CODEPAGE, v)) )
             {
                 setCodePage(V_I4(&v));
+                VariantClear(&v);
             }
             break;
     }

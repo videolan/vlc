@@ -28,8 +28,8 @@
 #include <vector>
 
 // utilities
-extern char *CStrFromBSTR(int codePage, BSTR bstr);
-extern BSTR BSTRFromCStr(int codePage, const char *s);
+extern char *CStrFromBSTR(UINT codePage, BSTR bstr);
+extern BSTR BSTRFromCStr(UINT codePage, LPCSTR s);
 
 // properties
 extern HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v);

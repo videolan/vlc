@@ -433,16 +433,18 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
 
 STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
 {
-    if( 0 == SysStringLen(name) )
-        return E_INVALIDARG;
-
     if( NULL == value )
         return E_POINTER;
+
+    VariantInit(value);
+
+    if( 0 == SysStringLen(name) )
+        return E_INVALIDARG;
 
     int i_vlc = _p_instance->getVLCObject();
     if( i_vlc )
     {
-        int codePage = _p_instance->getCodePage();
+        UINT codePage = _p_instance->getCodePage();
         char *psz_varname = CStrFromBSTR(codePage, name);
         if( NULL == psz_varname )
             return E_OUTOFMEMORY;
@@ -481,7 +483,8 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
                 case VLC_VAR_VARIABLE:
                     V_VT(value) = VT_BSTR;
                     V_BSTR(value) = BSTRFromCStr(codePage, val.psz_string);
-                    CoTaskMemFree(val.psz_string);
+                    if( NULL != val.psz_string)
+                        free(val.psz_string);
                     break;
 
                 case VLC_VAR_TIME:

@@ -133,7 +133,7 @@ STDMETHODIMP VLCConnectionPoint::EnumConnections(IEnumConnections **ppEnum)
     return (NULL != *ppEnum ) ? S_OK : E_OUTOFMEMORY;
 };
 
-void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS* pDispParams)
+void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS *pDispParams)
 {
     vector<CONNECTDATA>::iterator end = _connections.end();
     vector<CONNECTDATA>::iterator iter = _connections.begin();
@@ -297,9 +297,9 @@ void VLCConnectionPointContainer::freezeEvents(BOOL freeze)
         while( ! _q_events.empty() )
         {
             VLCDispatchEvent *ev = _q_events.front();
+            _q_events.pop();
             _p_events->fireEvent(ev->_dispId, &ev->_dispParams);
             delete ev;
-            _q_events.pop();
         }
     }
     _b_freeze = freeze;
@@ -307,11 +307,10 @@ void VLCConnectionPointContainer::freezeEvents(BOOL freeze)
 
 void VLCConnectionPointContainer::fireEvent(DISPID dispId, DISPPARAMS* pDispParams)
 {
-    VLCDispatchEvent *evt = new VLCDispatchEvent(dispId, *pDispParams);
     if( _b_freeze )
     {
         // queue event for later use when container is ready
-        _q_events.push(evt);
+        _q_events.push(new VLCDispatchEvent(dispId, *pDispParams));
         if( _q_events.size() > 10 )
         {
             // too many events in queue, get rid of older one
@@ -322,7 +321,6 @@ void VLCConnectionPointContainer::fireEvent(DISPID dispId, DISPPARAMS* pDispPara
     else
     {
         _p_events->fireEvent(dispId, pDispParams);
-        delete evt;
     }
 };
 

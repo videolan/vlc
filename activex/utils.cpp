@@ -28,7 +28,7 @@
 
 using namespace std;
 
-char *CStrFromBSTR(int codePage, BSTR bstr)
+char *CStrFromBSTR(UINT codePage, BSTR bstr)
 {
     UINT len = SysStringLen(bstr);
     if( len > 0 )
@@ -49,7 +49,7 @@ char *CStrFromBSTR(int codePage, BSTR bstr)
     return NULL;
 };
 
-BSTR BSTRFromCStr(int codePage, const char *s)
+BSTR BSTRFromCStr(UINT codePage, LPCSTR s)
 {
     int wideLen = MultiByteToWideChar(codePage, 0, s, -1, NULL, 0);
     if( wideLen > 0 )

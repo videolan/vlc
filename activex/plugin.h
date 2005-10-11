@@ -143,7 +143,14 @@ public:
     void setFocus(BOOL fFocus);
 
     inline UINT getCodePage(void) { return _i_codepage; };
-    inline void setCodePage(UINT cp) { _i_codepage = cp; };
+    inline void setCodePage(UINT cp)
+    {
+        // accept new codepage only if it works on this system
+        size_t mblen = WideCharToMultiByte(cp,
+                0, L"test", -1, NULL, 0, NULL, NULL);
+        if( mblen > 0 )
+            _i_codepage = cp;
+    };
 
     inline BOOL isUserMode(void) { return _b_usermode; };
     inline void setUserMode(BOOL um) { _b_usermode = um; };
