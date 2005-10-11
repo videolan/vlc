@@ -345,20 +345,20 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
             switch( i_type )
             {
                 case VLC_VAR_BOOL:
-                    hr = VariantChangeType(&value, &arg, 0, VT_BOOL);
+                    hr = VariantChangeType(&arg, &value, 0, VT_BOOL);
                     if( SUCCEEDED(hr) )
                         val.b_bool = (VARIANT_TRUE == V_BOOL(&arg)) ? VLC_TRUE : VLC_FALSE;
                     break;
 
                 case VLC_VAR_INTEGER:
                 case VLC_VAR_HOTKEY:
-                    hr = VariantChangeType(&value, &arg, 0, VT_I4);
+                    hr = VariantChangeType(&arg, &value, 0, VT_I4);
                     if( SUCCEEDED(hr) )
                         val.i_int = V_I4(&arg);
                     break;
 
                 case VLC_VAR_FLOAT:
-                    hr = VariantChangeType(&value, &arg, 0, VT_R4);
+                    hr = VariantChangeType(&arg, &value, 0, VT_R4);
                     if( SUCCEEDED(hr) )
                         val.f_float = V_R4(&arg);
                     break;
@@ -368,7 +368,7 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
                 case VLC_VAR_FILE:
                 case VLC_VAR_DIRECTORY:
                 case VLC_VAR_VARIABLE:
-                    hr = VariantChangeType(&value, &arg, 0, VT_BSTR);
+                    hr = VariantChangeType(&arg, &value, 0, VT_BSTR);
                     if( SUCCEEDED(hr) )
                     {
                         val.psz_string = CStrFromBSTR(codePage, V_BSTR(&arg));
@@ -378,7 +378,7 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
 
                 case VLC_VAR_TIME:
                     // use a double value to represent time (base is expressed in seconds)
-                    hr = VariantChangeType(&value, &arg, 0, VT_R8);
+                    hr = VariantChangeType(&arg, &value, 0, VT_R8);
                     if( SUCCEEDED(hr) )
                         val.i_time = (signed __int64)(V_R8(&arg)*1000000.0);
                     break;
