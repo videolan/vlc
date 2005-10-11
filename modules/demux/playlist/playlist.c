@@ -46,7 +46,7 @@ vlc_module_begin();
               VLC_FALSE );
 
     set_shortname( _("Playlist") );
-    set_description( _("Old playlist open") );
+    set_description( _("Playlist") );
     add_shortcut( "old-open" );
     set_capability( "demux2", 10 );
     set_callbacks( E_(Import_Old), NULL );

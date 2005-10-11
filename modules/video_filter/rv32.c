@@ -51,8 +51,6 @@ static picture_t *Filter( filter_t *, picture_t * );
 vlc_module_begin();
     set_description( _("RV32 conversion filter") );
     set_capability( "video filter2", 1 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();
 

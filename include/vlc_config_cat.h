@@ -97,13 +97,15 @@
 
 #define ACCESS_TITLE N_( "Access modules" )
 #define ACCESS_HELP N_( \
-    "Settings related to the various access methods used by VLC.\n" \
+    "Settings related to the various access methods used by VLC. " \
     "Common settings you may want to alter are HTTP proxy or " \
     "caching settings." )
 
-#define ACCESS_FILTER_TITLE N_( "Access filter modules" )
+#define ACCESS_FILTER_TITLE N_( "Access filters" )
 #define ACCESS_FILTER_HELP N_( \
-    "Settings related to the various access filter used by VLC.\n" )
+    "Access filters are special modules that allow advanced operations on " \
+    "the input side of VLC. You should not touch anything here unless you " \
+    "know what you are doing.\n" )
 
 #define DEMUX_TITLE N_("Demuxers")
 #define DEMUX_HELP N_( "Demuxers are used to separate audio and video streams" )

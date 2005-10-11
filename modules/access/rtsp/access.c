@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
     "value should be set in millisecond units." )
 
 vlc_module_begin();
-    set_description( _("Standard filesystem file input") );
+    set_description( _("Real RTSP") );
     set_shortname( _("Real RTSP") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

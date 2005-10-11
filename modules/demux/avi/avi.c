@@ -42,7 +42,8 @@
 
 #define INDEX_TEXT N_("Force index creation")
 #define INDEX_LONGTEXT N_( \
-    "Recreate a index for the AVI file so we can seek trough it more reliably." )
+    "Recreate a index for the AVI file. Use this if your AVI file is damaged "\
+    "or incomplete (not seekable)" )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -57,7 +58,7 @@ vlc_module_begin();
     add_bool( "avi-interleaved", 0, NULL,
               INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, VLC_TRUE );
     add_bool( "avi-index", 0, NULL,
-              INDEX_TEXT, INDEX_LONGTEXT, VLC_TRUE );
+              INDEX_TEXT, INDEX_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Open, Close );
 vlc_module_end();

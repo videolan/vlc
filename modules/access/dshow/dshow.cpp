@@ -158,10 +158,10 @@ vlc_module_begin();
                 VLC_TRUE );
 
     add_bool( "dshow-config", VLC_FALSE, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
-              VLC_FALSE );
+              VLC_TRUE );
 
     add_bool( "dshow-tuner", VLC_FALSE, NULL, TUNER_TEXT, TUNER_LONGTEXT,
-              VLC_FALSE );
+              VLC_TRUE );
 
     add_integer( "dshow-tuner-channel", 0, NULL, CHANNEL_TEXT,
                  CHANNEL_LONGTEXT, VLC_TRUE );

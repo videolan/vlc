@@ -125,7 +125,7 @@ static char *enc_analyse_list_text[] =
     N_("fast"), N_("none") };
 
 vlc_module_begin();
-    set_description( _("h264 video encoder using x264 library"));
+    set_description( _("H264 encoder (using x264 library)"));
     set_capability( "encoder", 200 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );

@@ -69,9 +69,9 @@ static void Close( vlc_object_t * );
     "for communication. In this mode you cannot talk to normal RTSP servers." )
 
 vlc_module_begin();
-    set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );
+    set_description( _("RTP/RTSP/SDP demuxer (using Live.com)" ) );
     set_capability( "demux2", 50 );
-    set_shortname( "Live.com RTP/RTSP");
+    set_shortname( "RTP/RTSP");
     set_callbacks( Open, Close );
     add_shortcut( "live" );
     set_category( CAT_INPUT );

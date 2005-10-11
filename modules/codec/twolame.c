@@ -53,14 +53,18 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
   "instead of specifying a particular bitrate. " \
   "This will produce a VBR stream." )
 #define ENC_MODE_TEXT N_("Stereo mode")
-#define ENC_MODE_LONGTEXT N_( \
-  "[0=stereo, 1=dual-mono, 2=joint-stereo]" )
+#define ENC_MODE_LONGTEXT N_( "Select how stereo streams will be handled" )
 #define ENC_VBR_TEXT N_("VBR mode")
 #define ENC_VBR_LONGTEXT N_( \
   "By default the encoding is CBR." )
 #define ENC_PSY_TEXT N_("Psycho-acoustic model")
 #define ENC_PSY_LONGTEXT N_( \
   "Integer from -1 (no model) to 4." )
+
+static int pi_stereo_values[] = { 0, 1, 2 };
+static char *ppsz_stereo_descriptions[] =
+{ N_("Stereo"), N_("Dual mono"), N_("Joint stereo") };
+
 
 vlc_module_begin();
     set_shortname( "Twolame");
@@ -74,6 +78,7 @@ vlc_module_begin();
                ENC_QUALITY_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_stereo_values, ppsz_stereo_descriptions, 0 );
     add_bool( ENC_CFG_PREFIX "vbr", 0, NULL, ENC_VBR_TEXT,
               ENC_VBR_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "psy", 3, NULL, ENC_PSY_TEXT,

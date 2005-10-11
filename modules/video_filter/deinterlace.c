@@ -100,7 +100,10 @@ static int FilterCallback ( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Deinterlace mode")
-#define MODE_LONGTEXT N_("You can choose the default deinterlace mode")
+#define MODE_LONGTEXT N_("Default deinterlace method to use for local playback")
+
+#define SOUT_MODE_TEXT N_("Deinterlace mode")
+#define SOUT_MODE_LONGTEXT N_("Default deinterlace methode to use for streaming")
 
 #define FILTER_CFG_PREFIX "sout-deinterlace-"
 
@@ -126,8 +129,8 @@ vlc_module_begin();
     add_submodule();
     set_capability( "video filter2", 0 );
     set_section( N_("Streaming"),NULL);
-    add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, MODE_TEXT,
-                MODE_LONGTEXT, VLC_FALSE );
+    add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, SOUT_MODE_TEXT,
+                SOUT_MODE_LONGTEXT, VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
     set_callbacks( OpenFilter, CloseFilter );
 vlc_module_end();

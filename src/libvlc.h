@@ -74,9 +74,9 @@ static char *ppsz_snap_formats[] =
 #define QUIET_LONGTEXT N_( \
     "This option turns off all warning and information messages.")
 
-#define OPEN_TEXT N_("Open MRL")
+#define OPEN_TEXT N_("Default stream")
 #define OPEN_LONGTEXT N_( \
-    "This option allows you to open a default MRL on start-up.")
+    "This option allows you to always open a default stream on start-up." )
 
 #define LANGUAGE_TEXT N_("Language")
 #define LANGUAGE_LONGTEXT N_( "This option allows you to set the language " \
@@ -115,7 +115,7 @@ static char *ppsz_snap_formats[] =
 #define MONO_TEXT N_("Force mono audio")
 #define MONO_LONGTEXT N_("This will force a mono audio output.")
 
-#define VOLUME_TEXT N_("Audio output volume")
+#define VOLUME_TEXT N_("Default audio volume")
 #define VOLUME_LONGTEXT N_( \
     "You can set the default audio output volume here, in a range from 0 to " \
     "1024.")
@@ -296,7 +296,8 @@ static char *ppsz_align_descriptions[] =
 
 #define SKIP_FRAMES_TEXT N_("Skip frames")
 #define SKIP_FRAMES_LONGTEXT N_( \
-    "Disable this option to disable frame drops on MPEG-2 streams.")
+    "This option enables framedropping on MPEG2 stream. Framedropping " \
+    "occurs when your computer is not powerful enough" )
 
 #define QUIET_SYNCHRO_TEXT N_("Quiet synchro")
 #define QUIET_SYNCHRO_LONGTEXT N_( \
@@ -336,35 +337,35 @@ static char *ppsz_clock_descriptions[] =
     "Indicate here the Time To Live of the multicast packets sent by " \
     "the stream output.")
 
-#define INPUT_PROGRAM_TEXT N_("Choose program (SID)")
+#define INPUT_PROGRAM_TEXT N_("Program to select")
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID.\n" \
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example)." )
 
-#define INPUT_PROGRAMS_TEXT N_("Choose programs")
+#define INPUT_PROGRAMS_TEXT N_("Programs to select")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
     "Choose the programs to select by giving a comma-separated list of " \
     "SIDs.\n" \
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example)." )
 
-#define INPUT_AUDIOTRACK_TEXT N_("Choose audio track")
+#define INPUT_AUDIOTRACK_TEXT N_("Audio track")
 #define INPUT_AUDIOTRACK_LONGTEXT N_( \
     "Give the stream number of the audio track you want to use" \
     "(from 0 to n).")
 
-#define INPUT_SUBTRACK_TEXT N_("Choose subtitles track")
+#define INPUT_SUBTRACK_TEXT N_("Subtitles track")
 #define INPUT_SUBTRACK_LONGTEXT N_( \
     "Give the stream number of the subtitle track you want to use " \
     "(from 0 to n).")
 
-#define INPUT_AUDIOTRACK_LANG_TEXT N_("Choose audio language")
+#define INPUT_AUDIOTRACK_LANG_TEXT N_("Audio language")
 #define INPUT_AUDIOTRACK_LANG_LONGTEXT N_( \
     "Give the language of the audio track you want to use " \
     "(comma separted, two or tree letter country code).")
 
-#define INPUT_SUBTRACK_LANG_TEXT N_("Choose subtitle language")
+#define INPUT_SUBTRACK_LANG_TEXT N_("Subtitle language")
 #define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
     "Give the language of the subtitle track you want to use " \
     "(comma separted, two or tree letter country code).")
@@ -381,12 +382,12 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_LIST_TEXT N_("Input list")
 #define INPUT_LIST_LONGTEXT N_("Allows you to specify a comma-separated list " \
-    "of inputs that will be concatenated.")
+    "of inputs that will be concatenated after the normal one.")
 
 #define INPUT_SLAVE_TEXT N_("Input slave (experimental)")
-#define INPUT_SLAVE_LONGTEXT N_("Allows you to play from several files at " \
+#define INPUT_SLAVE_LONGTEXT N_("Allows you to play from several streams at " \
     "the same time. This feature is experimental, not all formats " \
- 	"are supported.")
+    "are supported.")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
@@ -680,7 +681,9 @@ static char *ppsz_clock_descriptions[] =
 
 #define ACCESS_TEXT N_("Access module")
 #define ACCESS_LONGTEXT N_( \
-    "This is a legacy entry to let you configure access modules.")
+    "This allows you to force an access module. You can use it if " \
+    "the correct access is not automatically detected. You should not "\
+    "set this as a global option unless you really know what you are doing." )
 
 #define ACCESS_FILTER_TEXT N_("Access filter module")
 #define ACCESS_FILTER_LONGTEXT N_( \
@@ -958,9 +961,9 @@ vlc_module_begin();
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
-    add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
+    add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_TRUE );
     add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
-                 FORCE_DOLBY_LONGTEXT, VLC_FALSE );
+                 FORCE_DOLBY_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, 0 );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, VLC_TRUE );
@@ -987,7 +990,7 @@ vlc_module_begin();
               FULLSCREEN_LONGTEXT, VLC_FALSE );
         change_short('f');
     add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
-              SKIP_FRAMES_LONGTEXT, VLC_FALSE );
+              SKIP_FRAMES_LONGTEXT, VLC_TRUE );
     add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, VLC_TRUE );
 #ifndef SYS_DARWIN
@@ -1087,12 +1090,12 @@ vlc_module_begin();
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
     add_string( "programs", "", NULL,
-                INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_FALSE );
+                INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_TRUE );
     add_integer( "audio-track", -1, NULL,
-                 INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, VLC_FALSE );
+                 INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, VLC_TRUE );
        add_deprecated( "audio-channel", VLC_FALSE ); /*deprecated since 0.8.2 */
     add_integer( "sub-track", -1, NULL,
-                 INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, VLC_FALSE );
+                 INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, VLC_TRUE );
        add_deprecated("spu-channel",VLC_FALSE); /*deprecated since 0.8.2*/
     add_string( "audio-language", "", NULL,
                  INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT,
@@ -1101,10 +1104,9 @@ vlc_module_begin();
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
                   VLC_FALSE );
 
-
     set_section( N_( "Playback control" ) , NULL);
     add_integer( "input-repeat", 0, NULL,
-                 INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, VLC_TRUE );
+                 INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, VLC_FALSE );
     add_integer( "start-time", 0, NULL,
                  START_TIME_TEXT, START_TIME_LONGTEXT, VLC_TRUE );
     add_integer( "stop-time", 0, NULL,

@@ -77,7 +77,7 @@ vlc_module_begin();
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
-                AGENT_LONGTEXT, VLC_FALSE );
+                AGENT_LONGTEXT, VLC_TRUE );
     add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,
               RECONNECT_LONGTEXT, VLC_TRUE );
     add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,

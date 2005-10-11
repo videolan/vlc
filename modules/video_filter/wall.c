@@ -74,7 +74,8 @@ vlc_module_begin();
 
     add_integer( "wall-cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
     add_integer( "wall-rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
-    add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, VLC_FALSE );
+    add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
+                 VLC_TRUE );
     add_string( "wall-element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, VLC_FALSE );
 
     add_shortcut( "wall" );

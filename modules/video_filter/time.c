@@ -105,15 +105,17 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_callbacks( CreateFilter, DestroyFilter );
-    add_string( "time-format", "%Y-%m-%d   %H:%M:%S", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
-    add_integer( "time-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "time-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_integer( "time-position", 9, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+    add_string( "time-format", "%Y-%m-%d   %H:%M:%S", NULL, MSG_TEXT,
+                MSG_LONGTEXT, VLC_TRUE );
+    add_integer( "time-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
+    add_integer( "time-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
+    add_integer( "time-position", 9, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
     /* 9 sets the default to bottom-left, minimizing jitter */
     change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer_with_range( "time-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
-    add_integer( "time-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_integer( "time-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
+                 VLC_FALSE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( "time-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE );
     set_description( _("Time display sub filter") );

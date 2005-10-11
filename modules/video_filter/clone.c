@@ -67,7 +67,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
     add_integer( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, VLC_FALSE );
-    add_string ( "clone-vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_FALSE );
+    add_string ( "clone-vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "clone" );
     set_callbacks( Create, Destroy );
