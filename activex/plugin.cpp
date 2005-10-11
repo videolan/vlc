@@ -556,25 +556,28 @@ HRESULT VLCPlugin::onLoad(void)
                 if( SUCCEEDED(pClientSite->GetMoniker(OLEGETMONIKER_ONLYIFTHERE,
                                 OLEWHICHMK_CONTAINER, &pContMoniker)) )
                 {
-                    LPOLESTR name;
-                    if( SUCCEEDED(pContMoniker->GetDisplayName(pBC, NULL, &name)) )
+                    LPOLESTR base_url;
+                    if( SUCCEEDED(pContMoniker->GetDisplayName(pBC, NULL, &base_url)) )
                     {
-                        if( UrlIsW(name, URLIS_URL) )
+		        /*
+			** check that the moinker is in a URL
+			*/
+                        if( UrlIsW(base_url, URLIS_URL) )
                         {
-                            LPOLESTR url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*INTERNET_MAX_URL_LENGTH);
-                            if( NULL != url )
+			    DWORD len = INTERNET_MAX_URL_LENGTH;
+                            LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
+                            if( NULL != abs_url )
                             {
-                                DWORD len = INTERNET_MAX_URL_LENGTH;
-                                if( SUCCEEDED(UrlCombineW(name, _bstr_mrl, url, &len,
+                                if( SUCCEEDED(UrlCombineW(base_url, _bstr_mrl, abs_url, &len,
                                                 URL_ESCAPE_UNSAFE)) )
                                 {
                                     SysFreeString(_bstr_mrl);
-                                    _bstr_mrl = SysAllocStringLen(url, len);
+                                    _bstr_mrl = SysAllocStringLen(abs_url, len);
                                 }
-                                CoTaskMemFree(url);
+                                CoTaskMemFree(abs_url);
                             }
                         }
-                        CoTaskMemFree(name);
+                        CoTaskMemFree(base_url);
                     }
                     pContMoniker->Release();
                 }
@@ -629,7 +632,6 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
             if( SUCCEEDED(GetObjectProperty(pContainer, dispID, v)) )
             {
                 setUserMode(V_BOOL(&v) != VARIANT_FALSE);
-                VariantClear(&v);
             }
             break;
         case DISPID_AMBIENT_UIDEAD:
@@ -663,19 +665,20 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
         case DISPID_AMBIENT_TOPTOBOTTOM:
             break;
         case DISPID_UNKNOWN:
+	    /*
+	    ** multiple property change, look up the ones we are interested in
+	    */
             VariantInit(&v);
             V_VT(&v) = VT_BOOL;
             if( SUCCEEDED(GetObjectProperty(pContainer, DISPID_AMBIENT_USERMODE, v)) )
             {
                 setUserMode(V_BOOL(&v) != VARIANT_FALSE);
-                VariantClear(&v);
             }
             VariantInit(&v);
             V_VT(&v) = VT_I4;
             if( SUCCEEDED(GetObjectProperty(pContainer, DISPID_AMBIENT_CODEPAGE, v)) )
             {
                 setCodePage(V_I4(&v));
-                VariantClear(&v);
             }
             break;
     }
@@ -723,8 +726,9 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     /*
     ** Create a window for in place activated control.
-    ** the window geometry represents the control viewport
-    ** so that embedded video is always properly clipped.
+    ** the window geometry matches the control viewport
+    ** within container so that embedded video is always
+    ** properly clipped.
     */
     _inplacewnd = CreateWindow(_p_class->getInPlaceWndClassName(),
             "VLC Plugin In-Place Window",
@@ -745,8 +749,9 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     SetWindowLongPtr(_inplacewnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
     /*
-    ** VLC embedded video geometry automatically matches parent window.
-    ** hence create a child window so that video position and size
+    ** VLC embedded video automatically grows to cover client
+    ** area of parent window.
+    ** hence create a such a 'parent' window whose geometry
     ** is always correct relative to the viewport bounds
     */
     _videownd = CreateWindow(_p_class->getVideoWndClassName(),
@@ -773,14 +778,17 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     if( getVisible() )
         ShowWindow(_inplacewnd, SW_SHOWNORMAL);
 
-    /* horrible cast there */
+    /* set internal video width and height */
     vlc_value_t val;
-    val.i_int = reinterpret_cast<int>(_videownd);
-    VLC_VariableSet(_i_vlc, "drawable", val);
     val.i_int = posRect.right-posRect.left;
     VLC_VariableSet(_i_vlc, "width", val);
     val.i_int = posRect.bottom-posRect.top;
     VLC_VariableSet(_i_vlc, "height", val);
+
+    /* set internal video parent window */
+    /* horrible cast there */
+    val.i_int = reinterpret_cast<int>(_videownd);
+    VLC_VariableSet(_i_vlc, "drawable", val);
 
     if( _b_usermode && _b_autoplay & (VLC_PlaylistNumberOfItems(_i_vlc) > 0) )
     {
@@ -906,7 +914,7 @@ void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &clipRect)
             {
                 HBITMAP oldBmp = (HBITMAP)SelectObject(hdcDraw, hBitmap);
 
-                if( (size.cx != width) || (size.cx != height) )
+                if( (size.cx != width) || (size.cy != height) )
                 {
                     // needs to scale canvas
                     SetMapMode(hdcDraw, MM_ANISOTROPIC);
