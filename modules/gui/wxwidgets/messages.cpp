@@ -143,10 +143,10 @@ void Messages::UpdateLog()
     int i_stop = *p_sub->pi_stop;
     vlc_mutex_unlock( p_sub->p_lock );
 
-    textctrl->SetInsertionPointEnd();
-
     if( p_sub->i_start != i_stop )
     {
+        textctrl->SetInsertionPointEnd();
+
         for( i_start = p_sub->i_start;
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
