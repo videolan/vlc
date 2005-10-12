@@ -56,6 +56,7 @@ static int FindLanguage( const char * psz_lang )
         "Romanian", "ro",
         "Russian", "ru",
         "Turkish", "tr",
+        "Simplified Chinese", "zh_CN", 
         "Chinese Traditional", "zh_TW",
         NULL
     };
