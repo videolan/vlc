@@ -83,9 +83,9 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL ),
     REGISTER_VAR( m_cPlaytree, Playtree, "playtree" )
     pVarManager->registerVar( getPlaytreeVar().getPositionVarPtr(),
                               "playtree.slider" );
-    REGISTER_VAR( m_cVarRandom, VarBoolImpl, "playtree.isRandom" )
-    REGISTER_VAR( m_cVarLoop, VarBoolImpl, "playtree.isLoop" )
-    REGISTER_VAR( m_cVarRepeat, VarBoolImpl, "playtree.isRepeat" )
+    pVarManager->registerVar( m_cVarRandom, "playtree.isRandom" );
+    pVarManager->registerVar( m_cVarLoop, "playtree.isLoop" );
+    pVarManager->registerVar( m_cVarRepeat, "playtree.isRepeat" );
     REGISTER_VAR( m_cVarTime, StreamTime, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
     REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" )
