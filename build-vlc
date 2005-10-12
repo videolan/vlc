@@ -91,6 +91,7 @@ HTTPD httpd
 PATHS="
 WITHXML2CONFIGPATH xml2-config-path
 WITHWXCONFIGPATH wx-config-path
+WITHWXCONFIG wx-config
 WITHQTE qte
 WITHGOOMTREE goom-tree
 WITHSLP slp

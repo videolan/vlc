@@ -14,6 +14,7 @@ comment 'User Interfaces'
 bool 'wxWidgets interface' CONFIG_WXWIDGETS
 if [ "$CONFIG_WXWIDGETS" = "y" ]; then
   string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
+  string 'wx-config name' CONFIG_WITHWXCONFIG ""
 fi
 bool 'Skins interface' CONFIG_SKINS
 if [ "$CONFIG_SKINS" = "y" ]; then
