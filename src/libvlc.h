@@ -961,9 +961,9 @@ vlc_module_begin();
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
-    add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_TRUE );
+    add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
-                 FORCE_DOLBY_LONGTEXT, VLC_TRUE );
+                 FORCE_DOLBY_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, 0 );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, VLC_TRUE );
