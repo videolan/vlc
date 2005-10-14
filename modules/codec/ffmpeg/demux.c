@@ -217,8 +217,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
             }
             break;
         default:
-            E_(CloseDemux)( p_this );
-            return VLC_EGENERIC;
+            break;
         }
 
         fmt.i_extra = cc->extradata_size;
