@@ -133,7 +133,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
 
         if( strcasecmp( &p_demux->psz_path[i_len - 4], ".str" ) &&
             strcasecmp( &p_demux->psz_path[i_len - 4], ".xai" ) &&
-            strcasecmp( &p_demux->psz_path[i_len - 4], ".xa" ) )
+            strcasecmp( &p_demux->psz_path[i_len - 3], ".xa" ) )
         {
             return VLC_EGENERIC;
         }
