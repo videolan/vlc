@@ -804,9 +804,22 @@ static void Run( intf_thread_t *p_intf )
                 if( p_vout )
                 {
                     vlc_value_t val;
+                    vlc_bool_t b_update = VLC_FALSE;
                     var_Get( p_vout, "fullscreen", &val );
                     val.b_bool = !val.b_bool;
-                    var_Set( p_vout, "fullscreen", val );
+                    if( !strncmp(psz_arg, "on", 2) && (val.b_bool == VLC_TRUE) )
+                    {
+                        b_update = VLC_TRUE;
+                        val.b_bool = VLC_TRUE;
+                    }
+                    else if( !strncmp(psz_arg, "off", 3)  && (val.b_bool == VLC_FALSE) )
+                    {
+                        b_update = VLC_TRUE;
+                        val.b_bool = VLC_FALSE;
+                    }
+                    else if( strncmp(psz_arg, "off", 3) && strncmp(psz_arg, "on", 2) )
+                        b_update = VLC_TRUE;
+                    if( b_update ) var_Set( p_vout, "fullscreen", val );
                     vlc_object_release( p_vout );
                 }
             }
@@ -879,7 +892,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| faster . . . . . . . .  faster playing of stream"));
     msg_rc(_("| slower . . . . . . . .  slower playing of stream"));
     msg_rc(_("| normal . . . . . . . .  normal playing of stream"));
-    msg_rc(_("| f  . . . . . . . . . . . . . . toggle fullscreen"));
+    msg_rc(_("| f [on|off] . . . . . . . . . . toggle fullscreen"));
     msg_rc(_("| info . . .  information about the current stream"));
     msg_rc(  "| ");
     msg_rc(_("| volume [X] . . . . . . . .  set/get audio volume"));
