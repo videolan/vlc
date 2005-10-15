@@ -1964,14 +1964,14 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     EDocType doc_type = GetChild<EDocType>(*static_cast<EbmlHead*>(p_l0));
     if (std::string(doc_type) != "matroska")
     {
-        msg_Err( p_demux, "Not a Matroska file : %s ", std::string(doc_type).c_str());
+        msg_Err( p_demux, "Not a Matroska file : DocType = %s ", std::string(doc_type).c_str());
         return NULL;
     }
 
     EDocTypeReadVersion doc_read_version = GetChild<EDocTypeReadVersion>(*static_cast<EbmlHead*>(p_l0));
     if (uint64(doc_read_version) != 1)
     {
-        msg_Err( p_demux, "Matroska Read version not matching : "I64Fd, uint64(doc_read_version));
+        msg_Err( p_demux, "This matroska file is needs version "I64Fd" and this VLC only supports version 1", uint64(doc_read_version));
         return NULL;
     }
 
