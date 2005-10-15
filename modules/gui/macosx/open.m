@@ -323,7 +323,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             intf_thread_t * p_intf = VLCIntf;
             module_config_t * p_item;
 
-            [o_options addObject: [NSString stringWithFormat: @"sub-file=%s", [[o_file_sub_path stringValue] fileSystemRepresentation]]];
+            [o_options addObject: [NSString stringWithFormat: @"sub-file=%@", [o_file_sub_path stringValue]]];
             if( [o_file_sub_override state] == NSOnState )
             {
                 [o_options addObject: [NSString stringWithFormat: @"sub-delay=%i", (int)( [o_file_sub_delay intValue] * 10 )]];
