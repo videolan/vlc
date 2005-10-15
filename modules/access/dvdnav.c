@@ -744,10 +744,10 @@ static int Demux( demux_t *p_demux )
          */
         DemuxBlock( p_demux, packet, i_len );
         if( p_sys->b_spu_change ) 
-	{
-		ButtonUpdate( p_demux, VLC_FALSE );
-	        p_sys->b_spu_change = VLC_FALSE;
-	}
+        {
+            ButtonUpdate( p_demux, VLC_FALSE );
+            p_sys->b_spu_change = VLC_FALSE;
+        }
         break;
     }
 
