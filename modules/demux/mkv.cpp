@@ -5223,7 +5223,7 @@ size_t virtual_segment_c::AddSegment( matroska_segment_c *p_segment )
     // check if it's not already in here
     for ( i=0; i<linked_segments.size(); i++ )
     {
-        if ( *p_segment->p_segment_uid == *linked_segments[i]->p_segment_uid )
+        if ( linked_segments[i]->p_segment_uid != NULL && *p_segment->p_segment_uid == *linked_segments[i]->p_segment_uid )
             return 0;
     }
 
