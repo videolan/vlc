@@ -1353,7 +1353,7 @@ public:
     void PreloadFamily( const matroska_segment_c & of_segment );
     void PreloadLinked( matroska_segment_c *p_segment );
     bool PreparePlayback( virtual_segment_c *p_new_segment );
-    matroska_stream_c *AnalyseAllSegmentsFound( EbmlStream *p_estream, bool b_initial = false );
+    matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
     void JumpTo( virtual_segment_c & p_segment, chapter_item_c * p_chapter );
 
     void StartUiThread();
@@ -1431,7 +1431,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_stream = p_sys->AnalyseAllSegmentsFound( p_io_stream, true );
+    p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_io_stream, true );
     if( p_stream == NULL )
     {
         msg_Err( p_demux, "cannot find KaxSegment" );
@@ -1505,7 +1505,7 @@ static int Open( vlc_object_t * p_this )
                                 vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, VLC_TRUE );
                                 EbmlStream *p_estream = new EbmlStream(*p_file_io);
 
-                                p_stream = p_sys->AnalyseAllSegmentsFound( p_estream );
+                                p_stream = p_sys->AnalyseAllSegmentsFound( p_demux, p_estream );
 
                                 if ( p_stream == NULL )
                                 {
@@ -1943,7 +1943,7 @@ msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block
 #undef tk
 }
 
-matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, bool b_initial )
+matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial )
 {
     int i_upper_lvl = 0;
     size_t i;
@@ -1956,8 +1956,26 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream, 
     {
         return NULL;
     }
-    p_l0->SkipData(*p_estream, KaxMatroska_Context);
+
+    // verify we can read this Segment, we only support Matroska version 1 for now
+    p_l0->Read(*p_estream, EbmlHead::ClassInfos.Context, i_upper_lvl, p_l0, true);
+
+    EDocType doc_type = GetChild<EDocType>(*static_cast<EbmlHead*>(p_l0));
+    if (std::string(doc_type) != "matroska")
+    {
+        msg_Dbg( p_demux, "Not a Matroska file : %s ", std::string(doc_type).c_str());
+        return NULL;
+    }
+
+    EDocTypeReadVersion doc_read_version = GetChild<EDocTypeReadVersion>(*static_cast<EbmlHead*>(p_l0));
+    if (uint64(doc_read_version) != 1)
+    {
+        msg_Dbg( p_demux, "Matroska Read version not matching : "I64Fd, uint64(doc_read_version));
+        return NULL;
+    }
+
     delete p_l0;
+
 
     // find all segments in this file
     p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFFLL);
@@ -2409,10 +2427,10 @@ int demux_sys_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
     event_thread_t *p_ev = (event_thread_t *) p_data;
     vlc_mutex_lock( &p_ev->lock );
     if( psz_var[6] == 'c' )
-	{
+    {
         p_ev->b_clicked = VLC_TRUE;
-		msg_Dbg( p_this, "Event Mouse: clicked");
-	}
+        msg_Dbg( p_this, "Event Mouse: clicked");
+    }
     else if( psz_var[6] == 'm' )
         p_ev->b_moved = VLC_TRUE;
     vlc_mutex_unlock( &p_ev->lock );
@@ -2427,7 +2445,7 @@ int demux_sys_t::EventKey( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_ev->lock );
     p_ev->b_key = VLC_TRUE;
     vlc_mutex_unlock( &p_ev->lock );
-	msg_Dbg( p_this, "Event Key");
+    msg_Dbg( p_this, "Event Key");
 
     return VLC_SUCCESS;
 }
@@ -2464,7 +2482,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
             struct vlc_t::hotkey *p_hotkeys = p_ev->p_vlc->p_hotkeys;
             int i, i_action = -1;
 
-			msg_Dbg( p_ev->p_demux, "Handle Key Event");
+            msg_Dbg( p_ev->p_demux, "Handle Key Event");
 
             vlc_mutex_lock( &p_ev->lock );
 
@@ -2615,7 +2633,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 int32_t best,dist,d;
                 int32_t mx,my,dx,dy;
 
-				msg_Dbg( p_ev->p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", (unsigned)valx.i_int, (unsigned)valy.i_int);
+                msg_Dbg( p_ev->p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", (unsigned)valx.i_int, (unsigned)valy.i_int);
 
                 b_activated = VLC_TRUE;
                 // get current button
@@ -3256,13 +3274,13 @@ static int Demux( demux_t *p_demux)
         {
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
 
-			if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             {
                 i_return = 1;
                 delete block;
                 break;
             }
-		}
+        }
         
         if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
@@ -5224,8 +5242,8 @@ size_t virtual_segment_c::AddSegment( matroska_segment_c *p_segment )
     for ( i=0; i<linked_segments.size(); i++ )
     {
         if ( linked_segments[i]->p_segment_uid != NULL 
-			&& p_segment->p_segment_uid != NULL
-			&& *p_segment->p_segment_uid == *linked_segments[i]->p_segment_uid )
+            && p_segment->p_segment_uid != NULL
+            && *p_segment->p_segment_uid == *linked_segments[i]->p_segment_uid )
             return 0;
     }
 
