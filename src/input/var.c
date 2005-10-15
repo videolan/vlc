@@ -40,7 +40,6 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title );
 
 void input_ConfigVarInit ( input_thread_t *p_input );
 
-
 /*****************************************************************************
  * Callbacks
  *****************************************************************************/
@@ -94,7 +93,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "rate-faster", VLC_VAR_VOID );
     var_AddCallback( p_input, "rate-faster", RateCallback, NULL );
 
-
     /* Position */
     var_Create( p_input, "position",  VLC_VAR_FLOAT );
     var_Create( p_input, "position-offset",  VLC_VAR_FLOAT );
@@ -111,14 +109,12 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_AddCallback( p_input, "time", TimeCallback, NULL );
     var_AddCallback( p_input, "time-offset", TimeCallback, NULL );
 
-
     /* Bookmark */
     var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
                 VLC_VAR_ISCOMMAND );
     val.psz_string = _("Bookmark");
     var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, &val, NULL );
     var_AddCallback( p_input, "bookmark", BookmarkCallback, NULL );
-
 
     /* Program */
     var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
@@ -162,7 +158,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
     var_AddCallback( p_input, "spu-delay", EsDelayCallback, NULL );
 
-
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Video Track");
@@ -181,7 +176,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_input, "spu-es", ESCallback, NULL );
 
-
     /* Special read only objects variables for intf */
     var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
@@ -189,8 +183,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     val.i_time = 0;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
-
-   /* Special "intf-change" variable, it allows intf to set up a callback
+    /* Special "intf-change" variable, it allows intf to set up a callback
      * to be notified of some changes.
      * TODO list all changes warn by this callbacks */
     var_Create( p_input, "intf-change", VLC_VAR_BOOL );
@@ -384,7 +377,6 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
     }
 }
 
-
 /*****************************************************************************
  * input_ConfigVarInit:
  *  Create all config object variables
@@ -473,6 +465,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_EGENERIC;
 }
+
 static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -528,7 +521,6 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-
 static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -538,7 +530,6 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( !strcmp( psz_cmd, "time-offset" ) )
     {
         input_ControlPush( p_input, INPUT_CONTROL_SET_TIME_OFFSET, &newval );
-
         val.i_time = var_GetTime( p_input, "time" ) + newval.i_time;
         if( val.i_time < 0 ) val.i_time = 0;
         /* TODO maybe test against i_length ? */
