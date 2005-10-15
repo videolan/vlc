@@ -443,11 +443,16 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         break;
 
     case PLAYLIST_SKIP:
+        p_playlist->request.i_view = p_playlist->status.i_view;
         if( p_playlist->status.i_view > -1 )
         {
-            p_playlist->request.i_view = p_playlist->status.i_view;
             p_playlist->request.p_node = p_playlist->status.p_node;
             p_playlist->request.p_item = p_playlist->status.p_item;
+        }
+        else
+        {
+            p_playlist->request.p_node = NULL;
+            p_playlist->request.p_item = NULL;
         }
         p_playlist->request.i_skip = (int) va_arg( args, int );
         p_playlist->request.b_request = VLC_TRUE;
