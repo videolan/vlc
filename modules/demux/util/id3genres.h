@@ -4,7 +4,7 @@
  * Copyright (C) 2002-2003 the VideoLAN team
  * $Id$
  *
- * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
+ * Author: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *         list found at http://www.id3.org/id3v2.4.0-frames.txt
  *
  * This program is free software; you can redistribute it and/or modify

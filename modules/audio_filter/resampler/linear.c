@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
- *          Sigmund Augdal <sigmunau@idi.ntnu.no>
+ *          Sigmund Augdal Helberg <dnumgis@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -4,7 +4,7 @@
  * Copyright (C) 2001-2004 the VideoLAN team
  * $Id$
  *
- * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
+ * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Clément Stenac <zorglub@via.ecp.fr>
  *

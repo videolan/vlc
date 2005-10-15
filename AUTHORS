@@ -38,15 +38,16 @@ E: oaubert at lisi dot univ-lyon1 dot fr
 D: CORBA interface
 S: France
 
-N: Sigmund Augdal
-E: sigmunau@idi.ntnu.no
+N: Sigmund Augdal Helberg
+E: dnumgis@videolan.org
 C: sigmunau
 D: lirc plugin
-D: norwegian translation
 D: aalib plugin
-D: KDE plug-in
 D: Subtitles and freetype
 D: Hotkeys
+D: Shoutcast discovery module and b4s playlist parser
+D: wxWidgets preferences
+D: File-Info and metadata handling
 S: Norway
 
 N: Pierre Baillet
