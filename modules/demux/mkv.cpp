@@ -1954,6 +1954,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     p_l0 = p_estream->FindNextID(EbmlHead::ClassInfos, 0xFFFFFFFFL);
     if (p_l0 == NULL)
     {
+        msg_Err( p_demux, "No EBML header found" );
         return NULL;
     }
 
@@ -1963,14 +1964,14 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     EDocType doc_type = GetChild<EDocType>(*static_cast<EbmlHead*>(p_l0));
     if (std::string(doc_type) != "matroska")
     {
-        msg_Dbg( p_demux, "Not a Matroska file : %s ", std::string(doc_type).c_str());
+        msg_Err( p_demux, "Not a Matroska file : %s ", std::string(doc_type).c_str());
         return NULL;
     }
 
     EDocTypeReadVersion doc_read_version = GetChild<EDocTypeReadVersion>(*static_cast<EbmlHead*>(p_l0));
     if (uint64(doc_read_version) != 1)
     {
-        msg_Dbg( p_demux, "Matroska Read version not matching : "I64Fd, uint64(doc_read_version));
+        msg_Err( p_demux, "Matroska Read version not matching : "I64Fd, uint64(doc_read_version));
         return NULL;
     }
 
