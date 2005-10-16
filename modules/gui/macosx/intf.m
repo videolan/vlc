@@ -1373,25 +1373,22 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on -- FK (10/6/05) */
-    if ( o_about )
+    if( nib_about_loaded && o_about )
         [o_about release];
     
-    if ( o_prefs )
-        [o_prefs release];
-    
-    if ( o_open )
+    if( nib_open_loaded && o_open )
         [o_open release];
     
-    if ( o_extended )
+    if( nib_extended_loaded && o_extended )
     {
         [o_extended collapsAll];
         [o_extended release];
     }
     
-    if ( o_bookmarks )
+    if( nib_bookmarks_loaded && o_bookmarks )
         [o_bookmarks release];
 
-    if ( o_wizard )
+    if( nib_wizard_loaded && o_wizard )
         [o_wizard release];
 
     if( o_img_pause_pressed != nil )
