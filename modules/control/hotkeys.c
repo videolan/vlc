@@ -462,49 +462,49 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_3SEC && b_seekable )
             {
-                val.i_time = (-3000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (-3000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_3SEC && b_seekable )
             {
-                val.i_time = (3000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (3000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC && b_seekable )
             {
-                val.i_time = (-10000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (-10000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC && b_seekable )
             {
-                val.i_time = (10000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (10000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN && b_seekable )
             {
-                val.i_time = (-60000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (-60000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN && b_seekable )
             {
-                val.i_time = (60000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (60000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN && b_seekable )
             {
-                val.i_time = (-300000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (-300000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN && b_seekable )
             {
-                val.i_time = (300000000 * ((mtime_t)(1 << i_times)));
+                val.i_time = (300000000L * ((mtime_t)(1 << i_times)));
                 var_Set( p_input, "time-offset", val );
                 DisplayPosition( p_intf, p_vout, p_input );
             }
@@ -557,7 +557,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_value_t val, list, list2;
                 int i_count, i;
                 var_Get( p_input, "spu-es", &val );
-                
+
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
                             &list, &list2 );
                 i_count = list.p_list->i_count;
@@ -738,7 +738,7 @@ static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
         if( !strcmp( p_hotkeys[i].psz_action, psz_var ) )
         {
             p_hotkeys[i].i_key = newval.i_int;
-            /* do hotkey accounting */            
+            /* do hotkey accounting */
             i_date = mdate();
             if( (p_hotkeys[i].i_delta_date > 0) &&
                 (p_hotkeys[i].i_delta_date <= (i_date - p_hotkeys[i].i_last_date) ) )
