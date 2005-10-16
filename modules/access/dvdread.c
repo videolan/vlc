@@ -4,7 +4,7 @@
  * Copyright (C) 2001-2004 the VideoLAN team
  * $Id$
  *
- * Authors: Stéphane Borel <stef@via.ecp.fr>
+ * Authors: Stï¿½hane Borel <stef@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -134,6 +134,8 @@ struct demux_sys_t
     int i_cur_block;
     int i_next_vobu;
 
+    int i_mux_rate;
+
     /* Current title start/end blocks */
     int i_title_start_block;
     int i_title_end_block;
@@ -261,6 +263,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_vts_file = NULL;
 
     p_sys->i_title = p_sys->i_chapter = -1;
+    p_sys->i_mux_rate = 0;
 
     var_Create( p_demux, "dvdread-angle", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Get( p_demux, "dvdread-angle", &val );
@@ -344,7 +347,7 @@ static int64_t dvdtime_to_time( dvd_time_t *dtime, uint8_t still_time )
         i_micro_second = still_time;
         i_micro_second = (int64_t)((double)i_micro_second * 1000000.0);
     }
-    
+
     return i_micro_second;
 }
 
@@ -384,9 +387,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_title_cur_time > 0 )
+            if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = (int64_t)p_sys->i_title_cur_time;
+                *pi64 = (int64_t)1000000 * DVD_VIDEO_LB_LEN *
+                        p_sys->i_title_offset / 50 / p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
@@ -394,9 +398,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if (p_demux->info.i_title >= 0 && p_demux->info.i_title < p_sys->i_titles)
+            if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time, 0 );
+                *pi64 = (int64_t)1000000 * DVD_VIDEO_LB_LEN *
+                        p_sys->i_title_blocks / 50 / p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
@@ -617,6 +622,7 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr );
+                if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );
             break;
@@ -1131,7 +1137,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     /*
      * Store the timecodes so we can get the current time
      */
-    p_sys->i_title_cur_time = (mtime_t) p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000;
+    p_sys->i_title_cur_time = (mtime_t) (p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000);
     p_sys->i_cell_cur_time = (mtime_t) dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 );
 
     /*
