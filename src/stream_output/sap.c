@@ -272,7 +272,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         vlc_mutex_unlock( &p_sap->object_lock );
         vlc_freeaddrinfo( res );
         msg_Err( p_sap, "Unsupported address family of size %d > %u",
-                 res->ai_addrlen, sizeof( addr ) );
+                 res->ai_addrlen, (unsigned) sizeof( addr ) );
         return VLC_EGENERIC;
     }
 
@@ -530,7 +530,7 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
      * TODO: - address refcount
              - send a SAP deletion packet */
 
-    msg_Dbg( p_sap,"%i announces remaining", p_sap->i_sessions );
+    msg_Dbg( p_sap,"%i announcements remaining", p_sap->i_sessions );
 
     vlc_mutex_unlock( &p_sap->object_lock );
 

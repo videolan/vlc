@@ -77,30 +77,30 @@ static const char ipv6_scopes[] = "1456789ABCDE";
  * Module descriptor
  *****************************************************************************/
 #define SAP_ADDR_TEXT N_( "SAP multicast address" )
-#define SAP_ADDR_LONGTEXT N_( "Listen for SAP announces on another address" )
+#define SAP_ADDR_LONGTEXT N_( "Listen for SAP announcements on another address" )
 #define SAP_IPV4_TEXT N_( "IPv4-SAP listening" )
 #define SAP_IPV4_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv4 announces " \
+      "Set this if you want the SAP module to listen to IPv4 announcements " \
       "on the standard address." )
 #define SAP_IPV6_TEXT N_( "IPv6-SAP listening" )
 #define SAP_IPV6_LONGTEXT N_( \
-      "Set this if you want the SAP module to listen to IPv6 announces " \
+      "Set this if you want the SAP module to listen to IPv6 announcements " \
       "on the standard address." )
 #define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
-       "Sets the scope for IPv6 announces (default is 8)." )
+       "Sets the scope for IPv6 announcements (default is 8)." )
 #define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
 #define SAP_TIMEOUT_LONGTEXT N_( \
-       "Sets the time before SAP items get deleted if no new announce " \
+       "Sets the time before SAP items get deleted if no new announcement " \
        "is received." )
 #define SAP_PARSE_TEXT N_( "Try to parse the SAP" )
 #define SAP_PARSE_LONGTEXT N_( \
        "When SAP can it will try to parse the SAP. If you don't select " \
-       "this, all announces will be parsed by the livedotcom module." )
+       "this, all announcements will be parsed by the livedotcom module." )
 #define SAP_STRICT_TEXT N_( "SAP Strict mode" )
 #define SAP_STRICT_LONGTEXT N_( \
        "When this is set, the SAP parser will discard some non-compliant " \
-       "announces." )
+       "announcements." )
 #define SAP_CACHE_TEXT N_("Use SAP cache")
 #define SAP_CACHE_LONGTEXT N_( \
        "If this option is selected, a SAP caching mechanism will be used. " \
@@ -115,7 +115,7 @@ static const char ipv6_scopes[] = "1456789ABCDE";
 
 vlc_module_begin();
     set_shortname( _("SAP"));
-    set_description( _("SAP announces") );
+    set_description( _("SAP announcements") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
@@ -334,7 +334,7 @@ static int Open( vlc_object_t *p_this )
 
     p_view = playlist_ViewFind( p_sys->p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
-                                         _("SAP"), p_view->p_root );
+                                         _("Session Announcements (SAP)"), p_view->p_root );
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     p_sys->p_node->i_flags &= ~PLAYLIST_SKIP_FLAG;
     val.b_bool = VLC_TRUE;
