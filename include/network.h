@@ -484,12 +484,6 @@ struct addrinfo
 #  define AI_NUMERICHOST 4
 # endif /* if !HAVE_STRUCT_ADDRINFO */
 
-/*** libidn support ***/
-# ifndef AI_IDN
-#  define AI_IDN      0
-#  define AI_CANONIDN 0
-# endif
-
 VLC_EXPORT( const char *, vlc_gai_strerror, ( int ) );
 VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, int *, int ) );
 VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );

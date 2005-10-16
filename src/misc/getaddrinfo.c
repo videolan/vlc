@@ -638,7 +638,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
                                             struct addrinfo ** );
         HINSTANCE wship6_module;
         GETADDRINFO ws2_getaddrinfo;
-         
+
         wship6_module = LoadLibrary( "wship6.dll" );
         if( wship6_module != NULL )
         {
@@ -659,6 +659,30 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
 #endif
 #if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
+# ifdef AI_IDN
+    /* Run-time I18n Domain Names support */
+    {
+        static int i_idn = AI_IDN; /* beware of thread-safety */
+
+        if( i_idn )
+        {
+            int i_ret;
+
+            hints.ai_flags |= i_idn;
+            i_ret = getaddrinfo( psz_node, psz_service, &hints, res );
+
+            if( i_ret != EAI_BADFLAGS )
+                return i_ret;
+
+            /* libidn not available: disable and retry without it */
+
+            /* NOTE: Using i_idn here would not be thread-safe */
+            hints.ai_flags &= ~AI_IDN;
+            i_idn = 0;
+            msg_Dbg( p_this, "I18n Domain Names not supported - disabled" );
+        }
+    }
+# endif
     return getaddrinfo( psz_node, psz_service, &hints, res );
 #else
 {
