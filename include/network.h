@@ -306,39 +306,53 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
 static inline char *vlc_b64_encode( char *src )
 {
     static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-                                                                                
-    char *dst = (char *)malloc( strlen( src ) * 4 / 3 + 12 );
+    size_t len = strlen( src );
+
+    char *dst = (char *)malloc( ( len + 4 ) * 4 / 3 );
+    if( dst == NULL )
+        return NULL;
+
     char *ret = dst;
-    unsigned i_bits = 0;
-    unsigned i_shift = 0;
-                                                                                
-    for( ;; )
+
+    while( len > 0 )
     {
-        if( *src )
+        /* pops (up to) 3 bytes of input */
+        uint32_t v = *src++ << 24;
+
+        if( len >= 2 )
         {
-            i_bits = ( i_bits << 8 )|( *src++ );
-            i_shift += 8;
+            v |= *src++ << 16;
+            if( len >= 3 )
+                v |= *src++ << 8;
         }
-        else if( i_shift > 0 )
+
+        /* pushes (up to) 4 bytes of output */
+        while( v )
         {
-           i_bits <<= 6 - i_shift;
-           i_shift = 6;
+            *dst++ = b64[v >> 26];
+            v = v << 6;
         }
-        else
+
+        switch( len )
         {
-            *dst++ = '=';
-            break;
-        }
-                                                                                
-        while( i_shift >= 6 )
-        {
-            i_shift -= 6;
-            *dst++ = b64[(i_bits >> i_shift)&0x3f];
+            case 1:
+                *dst++ = '=';
+                *dst++ = '=';
+                len--;
+                break;
+
+            case 2:
+                *dst++ = '=';
+                len -= 2;
+                break;
+
+            default:
+                len -= 3;
         }
     }
-                                                                                
-    *dst++ = '\0';
-                                                                                
+
+    *dst = '\0';
+
     return ret;
 }
 
