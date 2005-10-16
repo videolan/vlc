@@ -1487,7 +1487,11 @@ static int Open( vlc_object_t * p_this )
                     {
                         s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
 
+#ifdef WIN32
+                        if (!strcasecmp(s_filename.c_str(), p_demux->psz_path))
+#else
                         if (!s_filename.compare(p_demux->psz_path))
+#endif
                             continue; // don't reuse the original opened file
 
 #if defined(__GNUC__) && (__GNUC__ < 3)
