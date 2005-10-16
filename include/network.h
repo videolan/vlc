@@ -308,11 +308,12 @@ static inline char *vlc_b64_encode( char *src )
     static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     size_t len = strlen( src );
 
+    char *ret;
     char *dst = (char *)malloc( ( len + 4 ) * 4 / 3 );
     if( dst == NULL )
         return NULL;
 
-    char *ret = dst;
+    ret = dst;
 
     while( len > 0 )
     {
