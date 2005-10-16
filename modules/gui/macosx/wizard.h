@@ -105,6 +105,8 @@
     IBOutlet id o_t6_txt_ttl;
     IBOutlet id o_t6_btn_mrInfo_ttl;
     IBOutlet id o_t6_btn_mrInfo_sap;
+    IBOutlet id o_t6_btn_mrInfo_local;
+    IBOutlet id o_t6_ckb_local;
     
     /* page seven ("Transcode 2") */
     IBOutlet id o_t7_btn_chooseFile;
@@ -112,6 +114,8 @@
     IBOutlet id o_t7_text;
     IBOutlet id o_t7_title;
     IBOutlet id o_t7_txt_saveFileTo;
+    IBOutlet id o_t7_btn_mrInfo_local;
+    IBOutlet id o_t7_ckb_local;
     
     /* page eight ("Summary") */
     IBOutlet id o_t8_fld_destination;
@@ -125,6 +129,7 @@
     IBOutlet id o_t8_fld_trnscdVideo;
     IBOutlet id o_t8_fld_ttl;
     IBOutlet id o_t8_fld_mrl;
+    IBOutlet id o_t8_fld_local;
     IBOutlet id o_t8_txt_destination;
     IBOutlet id o_t8_txt_encapFormat;
     IBOutlet id o_t8_txt_inputStream;
@@ -138,6 +143,7 @@
     IBOutlet id o_t8_txt_trnscdVideo;
     IBOutlet id o_t8_txt_ttl;
     IBOutlet id o_t8_txt_mrl;
+    IBOutlet id o_t8_txt_local;
     
     NSMutableDictionary * o_userSelections;
     NSArray * o_videoCodecs;
@@ -162,6 +168,7 @@
 - (IBAction)t6_enblSapAnnce:(id)sender;
 - (IBAction)t6_mrInfo_ttl:(id)sender;
 - (IBAction)t6_mrInfo_sap:(id)sender;
+- (IBAction)t67_mrInfo_local:(id)sender;
 - (IBAction)t7_selectTrnscdDestFile:(id)sender;
 - (IBAction)wh_closeSheet:(id)sender;
 

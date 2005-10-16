@@ -28,6 +28,7 @@
                 "t4_VidCdcChanged" = id; 
                 "t4_enblAudTrnscd" = id; 
                 "t4_enblVidTrnscd" = id; 
+                "t67_mrInfo_local" = id; 
                 "t6_enblSapAnnce" = id; 
                 "t6_mrInfo_sap" = id; 
                 "t6_mrInfo_ttl" = id; 
@@ -86,8 +87,10 @@
                 "o_t5_matrix_encap" = id; 
                 "o_t5_text" = id; 
                 "o_t5_title" = id; 
+                "o_t6_btn_mrInfo_local" = id; 
                 "o_t6_btn_mrInfo_sap" = id; 
                 "o_t6_btn_mrInfo_ttl" = id; 
+                "o_t6_ckb_local" = id; 
                 "o_t6_ckb_sap" = id; 
                 "o_t6_fld_sap" = id; 
                 "o_t6_fld_ttl" = id; 
@@ -95,6 +98,8 @@
                 "o_t6_title" = id; 
                 "o_t6_txt_ttl" = id; 
                 "o_t7_btn_chooseFile" = id; 
+                "o_t7_btn_mrInfo_local" = id; 
+                "o_t7_ckb_local" = id; 
                 "o_t7_fld_filePath" = id; 
                 "o_t7_text" = id; 
                 "o_t7_title" = id; 
@@ -102,6 +107,7 @@
                 "o_t8_fld_destination" = id; 
                 "o_t8_fld_encapFormat" = id; 
                 "o_t8_fld_inptStream" = id; 
+                "o_t8_fld_local" = id; 
                 "o_t8_fld_mrl" = id; 
                 "o_t8_fld_partExtract" = id; 
                 "o_t8_fld_sap" = id; 
@@ -113,6 +119,7 @@
                 "o_t8_txt_destination" = id; 
                 "o_t8_txt_encapFormat" = id; 
                 "o_t8_txt_inputStream" = id; 
+                "o_t8_txt_local" = id; 
                 "o_t8_txt_mrl" = id; 
                 "o_t8_txt_partExtract" = id; 
                 "o_t8_txt_sap" = id; 

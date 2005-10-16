@@ -372,9 +372,9 @@ static VLCWizard *_o_sharedInstance = nil;
         setStringValue: _NS("Author")];
     [o_t2_box_prtExtrct setTitle: _NS("Partial Extract")];
     [o_t2_ckb_enblPartExtrct setTitle: _NS("Enable")];
-    [o_t2_ckb_enblPartExtrct setToolTip: _NS("Use this to read only a part of " \
+    [o_t2_ckb_enblPartExtrct setToolTip: _NS("Use this to read only a part of "\
         "the stream. You must be able to control the incoming stream " \
-        "(for example, a file or a disc, but not an UDP network stream.)\n" \
+        "(for example, a file or a disc, but not an UDP network stream.) " \
         "Enter the starting and ending times (in seconds).")];
     [o_t2_txt_prtExtrctFrom setStringValue: _NS("From")];
     [o_t2_txt_prtExtrctTo setStringValue: _NS("To")];
@@ -426,7 +426,7 @@ static VLCWizard *_o_sharedInstance = nil;
     /* page seven ("Transcode 2") */
     [o_t7_title setStringValue: _NS("Additional transcode options")];
     [o_t7_text setStringValue: _NS("In this page, you will define a few " \
-                              "additionnal parameters for your transcoding.")];
+                              "additional parameters for your transcoding.")];
     [o_t7_txt_saveFileTo setStringValue: _NS("Select the file to save to")];
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
 
@@ -451,6 +451,8 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t8_txt_trnscdAudio setStringValue: [_NS("Transcode audio") \
         stringByAppendingString: @":"]];
     [o_t8_txt_trnscdVideo setStringValue: [_NS("Transcode video") \
+        stringByAppendingString: @":"]];
+    [o_t8_txt_local setStringValue: [_NS("Local playback") \
         stringByAppendingString: @":"]];
 
     /* wizard help window */
@@ -1080,13 +1082,29 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             [o_userSelections setObject:@"NO" forKey:@"sap"];
         }
-
+        
+        /* local playback? */
+        if ([o_t6_ckb_local state] == NSOnState)
+        {
+            [o_userSelections setObject:@"YES" forKey:@"localPb"];
+        } else {
+            [o_userSelections setObject:@"NO" forKey:@"localPb"];
+        }
+        
         /* go to "Summary" */
         [self showSummary];
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
         @"Transcode 2"])
     {
+        /* local playback? */
+        if ([o_t7_ckb_local state] == NSOnState)
+        {
+            [o_userSelections setObject:@"YES" forKey:@"localPb"];
+        } else {
+            [o_userSelections setObject:@"NO" forKey:@"localPb"];
+        }
+
         /* check whether the path != "" and store it */
         if( [[o_t7_fld_filePath stringValue] isEqualToString: @""] )
         {
@@ -1173,6 +1191,13 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     [o_btn_forward setTitle: _NS("Finish")];
     [o_t8_fld_inptStream setStringValue:[o_userSelections objectForKey:@"pathToStrm"]];
+    
+    if ([[o_userSelections objectForKey:@"localPb"] isEqualToString: @"YES"])
+    {
+        [o_t8_fld_local setStringValue: _NS("yes")];
+    } else {
+        [o_t8_fld_local setStringValue: _NS("no")];
+    }
 
     if ([[o_userSelections objectForKey:@"partExtract"] isEqualToString: @"YES"])
     {
@@ -1250,6 +1275,7 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     NSMutableString * o_opts_string = [NSMutableString stringWithString:@""];
     NSMutableString *o_trnscdCmd = [NSMutableString stringWithString:@""];
+    NSMutableString *o_duplicateCmd = [NSMutableString stringWithString:@""];
     
     /* check whether we transcode the audio and/or the video and compose a
      * string reflecting the settings, if needed */
@@ -1269,6 +1295,14 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_trnscdCmd appendString: @"}:"];
         }
     }
+    
+    /* check whether the user requested local playback. if yes, prepare the
+     * string, if not, let it empty */
+    if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
+    {
+        [o_duplicateCmd appendString: @"duplicate{dst=display,dst=\""];
+    }
+    
     if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
     {
         if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"NO"])
@@ -1285,11 +1319,12 @@ static VLCWizard *_o_sharedInstance = nil;
     if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"trnscd"])
     {
         /* we are just transcoding and dumping the stuff to a file */
-        [o_opts_string appendFormat: @":sout=#%sstandard{mux=%s,url=%s,access=file}", \
-            [o_trnscdCmd UTF8String], [[[o_encapFormats objectAtIndex: \
-            [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
-            objectAtIndex:0] UTF8String], [[o_userSelections objectForKey: \
-            @"trnscdFilePath"] UTF8String]];
+        [o_opts_string appendFormat: \
+            @":sout=#%s%sstandard{mux=%s,url=%s,access=file}", [o_duplicateCmd \
+            UTF8String], [o_trnscdCmd UTF8String], [[[o_encapFormats \
+            objectAtIndex: [[o_userSelections objectForKey:@"encapFormat"] \
+            intValue]] objectAtIndex:0] UTF8String], [[o_userSelections \
+            objectForKey: @"trnscdFilePath"] UTF8String]];
 
     } else {
 
@@ -1305,23 +1340,34 @@ static VLCWizard *_o_sharedInstance = nil;
                 [o_sap_option appendFormat: @"sap,name=\"%s\"",[[o_userSelections \
                     objectForKey:@"sapText"] UTF8String]];
             }
-            [o_opts_string appendFormat: @":sout=#%sstandard{mux=%s,url=%s,access=%s,%s}", \
-                [o_trnscdCmd UTF8String], [[[o_encapFormats objectAtIndex: \
-                [[o_userSelections objectForKey: @"encapFormat"] intValue]] \
-                objectAtIndex:0] UTF8String], [[o_userSelections objectForKey: \
-                @"stmgDest"] UTF8String], [[[o_strmgMthds objectAtIndex: \
-                [[o_userSelections objectForKey: @"stmgMhd"] intValue]] \
-                objectAtIndex:0] UTF8String], [o_sap_option UTF8String]];
+            [o_opts_string appendFormat: \
+                @":sout=#%s%sstandard{mux=%s,url=%s,access=%s,%s}", \
+                [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
+                [[[o_encapFormats objectAtIndex: [[o_userSelections \
+                objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
+                UTF8String], [[o_userSelections objectForKey: @"stmgDest"] \
+                UTF8String], [[[o_strmgMthds objectAtIndex: [[o_userSelections \
+                objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] \
+                UTF8String], [o_sap_option UTF8String]];
         } else {
             /* no SAP, just streaming */
-            [o_opts_string appendFormat: @":sout=#%sstandard{mux=%s,url=%s,access=%s}", \
-                [o_trnscdCmd UTF8String], [[[o_encapFormats objectAtIndex: \
-                [[o_userSelections objectForKey: @"encapFormat"] intValue]] \
-                objectAtIndex:0] UTF8String], [[o_userSelections objectForKey: \
+            [o_opts_string appendFormat: \
+                @":sout=#%s%sstandard{mux=%s,url=%s,access=%s}", \
+                [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
+                [[[o_encapFormats objectAtIndex: [[o_userSelections \
+                objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
+                UTF8String], [[o_userSelections objectForKey: \
                 @"stmgDest"] UTF8String], [[[o_strmgMthds objectAtIndex: \
                 [[o_userSelections objectForKey: @"stmgMhd"] intValue]] \
                 objectAtIndex:0] UTF8String]];
         }
+    }
+
+    /* check whether the user requested local playback. if yes, close the
+     * string with an additional bracket */
+    if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
+    {
+        [o_opts_string appendString: @"\"}"];
     }
 
     [o_userSelections setObject:o_opts_string forKey:@"opts"];
@@ -1603,6 +1649,16 @@ static VLCWizard *_o_sharedInstance = nil;
             modalDelegate: o_wizardhelp_window
             didEndSelector: nil
             contextInfo: nil];
+}
+
+- (IBAction)t67_mrInfo_local:(id)sender
+{
+    /* show a sheet for the help */
+    NSBeginInformationalAlertSheet(_NS("Local playback"), \
+            _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+            _NS("When this option is enabled, the stream will be both played " \
+            "and transcoded/streamed.\n\nNote that this requires much more " \
+            "CPU power than simple transcoding or streaming."));
 }
 
 - (IBAction)t7_selectTrnscdDestFile:(id)sender
