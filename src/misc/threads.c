@@ -577,9 +577,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         struct sched_param param;
 
         memset( &param, 0, sizeof(struct sched_param) );
-#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
         i_priority += config_GetInt( p_this, "rt-offset" );
-#endif
         if( i_priority <= 0 )
         {
             param.sched_priority = (-1) * i_priority;
