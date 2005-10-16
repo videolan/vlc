@@ -115,7 +115,7 @@ static const char ipv6_scopes[] = "1456789ABCDE";
 
 vlc_module_begin();
     set_shortname( _("SAP"));
-    set_description( _("SAP announcements") );
+    set_description( _("SAP Announcements") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
