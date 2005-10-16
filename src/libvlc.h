@@ -1253,11 +1253,7 @@ vlc_module_begin();
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
 
-    /* Always set prio's on Darwin */
-#if defined(SYS_DARWIN)
-    add_bool( "rt-priority", VLC_TRUE, NULL, RT_PRIORITY_TEXT,
-              RT_PRIORITY_LONGTEXT, VLC_TRUE );
-#elif !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", VLC_FALSE, NULL, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, VLC_TRUE );
 #endif
