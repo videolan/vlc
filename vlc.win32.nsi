@@ -305,7 +305,7 @@ Section "Media player (required)" SEC01
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
   WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
   WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
-    '$INSTDIR\vlc.exe dvd:%1@1:0'
+    '$INSTDIR\vlc.exe dvd:%1'
   WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
   WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
