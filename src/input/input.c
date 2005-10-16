@@ -1195,7 +1195,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
     vlc_bool_t b_force_update = VLC_FALSE;
 
     if( !p_input ) return b_force_update;
-        
+
     switch( i_type )
     {
         case INPUT_CONTROL_SET_DIE:
@@ -1274,8 +1274,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             if( i_ret )
             {
                 int64_t i_length;
-                /* Emulate it with a SET_POS */
 
+                /* Emulate it with a SET_POS */
                 demux2_Control( p_input->input.p_demux,
                                 DEMUX_GET_LENGTH, &i_length );
                 if( i_length > 0 )
