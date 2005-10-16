@@ -37,6 +37,10 @@
 #   include <dirent.h>
 #endif
 
+#ifdef HAVE_LIMITS_H  
+#   include <limits.h>  
+#endif
+
 #include <ctype.h>
 
 /**
