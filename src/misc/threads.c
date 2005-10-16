@@ -343,7 +343,7 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_mutex_destroy( &p_mutex->mutex );
-    if ( i_result )
+    if( i_result )
     {
         i_thread = (int)pthread_self();
         psz_error = strerror(i_result);
@@ -492,7 +492,7 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_result = pthread_cond_destroy( &p_condvar->cond );
-    if ( i_result )
+    if( i_result )
     {
         i_thread = (int)pthread_self();
         psz_error = strerror(i_result);
@@ -552,9 +552,9 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #endif
     }
 
-    if ( p_this->thread_id && i_priority )
+    if( p_this->thread_id && i_priority )
     {
-        if ( !SetThreadPriority(p_this->thread_id, i_priority) )
+        if( !SetThreadPriority(p_this->thread_id, i_priority) )
         {
             msg_Warn( p_this, "couldn't set a faster priority" );
             i_priority = 0;
@@ -571,16 +571,16 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     i_ret = pthread_create( &p_this->thread_id, NULL, func, p_data );
 
-#ifndef SYS_DARWIN
-    if ( config_GetInt( p_this, "rt-priority" ) )
-#endif
+    if( config_GetType( p_this, "rt-priority" ) && config_GetInt( p_this, "rt-priority" ) )
     {
         int i_error, i_policy;
         struct sched_param param;
 
         memset( &param, 0, sizeof(struct sched_param) );
+#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
         i_priority += config_GetInt( p_this, "rt-offset" );
-        if ( i_priority <= 0 )
+#endif
+        if( i_priority <= 0 )
         {
             param.sched_priority = (-1) * i_priority;
             i_policy = SCHED_OTHER;
@@ -590,7 +590,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
             param.sched_priority = i_priority;
             i_policy = SCHED_RR;
         }
-        if ( (i_error = pthread_setschedparam( p_this->thread_id,
+        if( (i_error = pthread_setschedparam( p_this->thread_id,
                                                i_policy, &param )) )
         {
             msg_Warn( p_this, "couldn't set thread priority (%s:%d): %s",
@@ -598,12 +598,10 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
             i_priority = 0;
         }
     }
-#ifndef SYS_DARWIN
     else
     {
         i_priority = 0;
     }
-#endif
 
 #elif defined( HAVE_CTHREADS_H )
     p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
@@ -651,23 +649,21 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
 {
 #if defined( PTH_INIT_IN_PTH_H ) || defined( ST_INIT_IN_ST_H )
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    if ( !SetThreadPriority(GetCurrentThread(), i_priority) )
+    if( !SetThreadPriority(GetCurrentThread(), i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );
         return 1;
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-#ifndef SYS_DARWIN
-    if ( config_GetInt( p_this, "rt-priority" ) )
-#endif
+    if( config_GetType( p_this, "rt-priority" ) && config_GetInt( p_this, "rt-priority" ) )
     {
         int i_error, i_policy;
         struct sched_param param;
 
         memset( &param, 0, sizeof(struct sched_param) );
         i_priority += config_GetInt( p_this, "rt-offset" );
-        if ( i_priority <= 0 )
+        if( i_priority <= 0 )
         {
             param.sched_priority = (-1) * i_priority;
             i_policy = SCHED_OTHER;
@@ -677,9 +673,9 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
             param.sched_priority = i_priority;
             i_policy = SCHED_RR;
         }
-        if ( !p_this->thread_id )
+        if( !p_this->thread_id )
             p_this->thread_id = pthread_self();
-        if ( (i_error = pthread_setschedparam( p_this->thread_id,
+        if( (i_error = pthread_setschedparam( p_this->thread_id,
                                                i_policy, &param )) )
         {
             msg_Warn( p_this, "couldn't set thread priority (%s:%d): %s",
