@@ -74,7 +74,7 @@ struct filter_sys_t
 #define POSX_LONGTEXT N_("X offset, from the left screen edge" )
 #define POSY_TEXT N_("Y offset, from the top")
 #define POSY_LONGTEXT N_("Y offset, down from the top" )
-#define OPACITY_TEXT N_("Opacity, 0..255")
+#define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of " \
     "overlay text. 0 = transparent, 255 = totally opaque. " )
 #define SIZE_TEXT N_("Font size, pixels")

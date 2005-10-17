@@ -1068,23 +1068,7 @@ vlc_module_begin();
 
 /* Input options */
     set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
-    add_module( "access", "access2", NULL, NULL, ACCESS_TEXT,
-                ACCESS_LONGTEXT, VLC_TRUE );
-
-    set_subcategory( SUBCAT_INPUT_ACCESS_FILTER );
-    add_module_list_cat( "access-filter", SUBCAT_INPUT_ACCESS_FILTER, NULL, NULL,
-                ACCESS_FILTER_TEXT, ACCESS_FILTER_LONGTEXT, VLC_FALSE );
-
-
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    add_module( "demux", "demux2", NULL, NULL, DEMUX_TEXT,
-                DEMUX_LONGTEXT, VLC_TRUE );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
-    set_subcategory( SUBCAT_INPUT_ADVANCED );
+    set_subcategory( SUBCAT_INPUT_GENERAL );
 
     set_section( N_( "Track settings" ), NULL );
     add_integer( "program", 0, NULL,
@@ -1170,9 +1154,9 @@ vlc_module_begin();
     set_section( N_( "Advanced" ), NULL );
 
     add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
-                 CR_AVERAGE_LONGTEXT, VLC_FALSE );
+                 CR_AVERAGE_LONGTEXT, VLC_TRUE );
     add_integer( "clock-synchro", -1, NULL, CLOCK_SYNCHRO_TEXT,
-                 CLOCK_SYNCHRO_LONGTEXT, VLC_FALSE );
+                 CLOCK_SYNCHRO_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_clock_values, ppsz_clock_descriptions, 0 );
 
 /* Decoder options */
@@ -1181,6 +1165,23 @@ vlc_module_begin();
                 CODEC_LONGTEXT, VLC_TRUE );
     add_string( "encoder",  NULL, NULL, ENCODER_TEXT,
                 ENCODER_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_INPUT_ACCESS );
+    add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
+    add_module( "access", "access2", NULL, NULL, ACCESS_TEXT,
+                ACCESS_LONGTEXT, VLC_TRUE );
+
+    set_subcategory( SUBCAT_INPUT_ACCESS_FILTER );
+    add_module_list_cat( "access-filter", SUBCAT_INPUT_ACCESS_FILTER, NULL, NULL,
+                ACCESS_FILTER_TEXT, ACCESS_FILTER_LONGTEXT, VLC_FALSE );
+
+
+    set_subcategory( SUBCAT_INPUT_DEMUX );
+    add_module( "demux", "demux2", NULL, NULL, DEMUX_TEXT,
+                DEMUX_LONGTEXT, VLC_TRUE );
+    set_subcategory( SUBCAT_INPUT_VCODEC );
+    set_subcategory( SUBCAT_INPUT_ACODEC );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
 
 
 /* Stream output options */

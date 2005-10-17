@@ -119,8 +119,8 @@
 #define SDEC_TITLE N_( "Other codecs")
 #define SDEC_HELP N_( "Settings for audio+video and miscellaneous decoders and encoders" )
 
-#define ADVANCED_TITLE N_("Advanced")
-#define ADVANCED_HELP N_( "Advanced input settings. Use with care." )
+#define ADVANCED_TITLE N_("General")
+#define ADVANCED_HELP N_( "General input settings. Use with care." )
 
 /* Sout */
 #define SOUT_TITLE N_( "Stream output" )
@@ -302,13 +302,13 @@ static struct config_category_t categories_array[] =
 //    { SUBCAT_VIDEO_TEXT, TEXT_TITLE, TEXT_HELP },
 
     { CAT_INPUT, INPUT_TITLE, INPUT_HELP },
+    { SUBCAT_INPUT_GENERAL, ADVANCED_TITLE, ADVANCED_HELP },
     { SUBCAT_INPUT_ACCESS, ACCESS_TITLE, ACCESS_HELP },
     { SUBCAT_INPUT_ACCESS_FILTER, ACCESS_FILTER_TITLE, ACCESS_FILTER_HELP },
     { SUBCAT_INPUT_DEMUX, DEMUX_TITLE, DEMUX_HELP },
     { SUBCAT_INPUT_VCODEC, VDEC_TITLE, VDEC_HELP },
     { SUBCAT_INPUT_ACODEC, ADEC_TITLE, ADEC_HELP },
     { SUBCAT_INPUT_SCODEC, SDEC_TITLE, SDEC_HELP },
-    { SUBCAT_INPUT_ADVANCED, ADVANCED_TITLE, ADVANCED_HELP },
 
     { CAT_SOUT, SOUT_TITLE, SOUT_HELP },
     { SUBCAT_SOUT_GENERAL, GENERAL_TITLE, SOUT_GENERAL_HELP },
