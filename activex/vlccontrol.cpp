@@ -619,7 +619,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
         SafeArrayGetUBound(array, 1, &uBound);
 
         // have we got any options
-        if( uBound > lBound )
+        if( uBound >= lBound )
         {
             VARTYPE vType;
             hr = SafeArrayGetVartype(array, &vType);
@@ -636,7 +636,7 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
                     return E_OUTOFMEMORY;
 
                 ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound));
-                for(pos=lBound; SUCCEEDED(hr) && (pos<uBound); ++pos )
+                for(pos=lBound; SUCCEEDED(hr) && (pos<=uBound); ++pos )
                 {
                     VARIANT option;
                     hr = SafeArrayGetElement(array, &pos, &option);

@@ -559,12 +559,12 @@ HRESULT VLCPlugin::onLoad(void)
                     LPOLESTR base_url;
                     if( SUCCEEDED(pContMoniker->GetDisplayName(pBC, NULL, &base_url)) )
                     {
-		        /*
-			** check that the moinker is in a URL
-			*/
+                        /*
+                        ** check that the moniker name is a URL
+                        */
                         if( UrlIsW(base_url, URLIS_URL) )
                         {
-			    DWORD len = INTERNET_MAX_URL_LENGTH;
+                            DWORD len = INTERNET_MAX_URL_LENGTH;
                             LPOLESTR abs_url = (LPOLESTR)CoTaskMemAlloc(sizeof(OLECHAR)*len);
                             if( NULL != abs_url )
                             {
@@ -665,9 +665,9 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
         case DISPID_AMBIENT_TOPTOBOTTOM:
             break;
         case DISPID_UNKNOWN:
-	    /*
-	    ** multiple property change, look up the ones we are interested in
-	    */
+        /*
+        ** multiple property change, look up the ones we are interested in
+        */
             VariantInit(&v);
             V_VT(&v) = VT_BOOL;
             if( SUCCEEDED(GetObjectProperty(pContainer, DISPID_AMBIENT_USERMODE, v)) )
