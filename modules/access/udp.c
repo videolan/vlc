@@ -110,7 +110,7 @@ struct access_sys_t
     uint32_t i_rtp_late; /* number of ms an RTP packet may be too late*/
     uint32_t i_last_pcr; /* last known good PCR */
     block_t *p_list;     /* list of packets to rearrange */
-    block_t *p_end; /* last packet in p_list */
+    block_t *p_end;      /* last packet in p_list */
     block_t *p_next;     /* p_next ?? */
 };
 
@@ -376,19 +376,17 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
     p = *pp_end;
     i_cur = ( (p->p_buffer[2] << 8 ) + p->p_buffer[3] );
     i_expected = ((i_cur+1) % RTP_SEQ_NUM_SIZE);
-
-    if( i_new == i_expected ) /* Append at the end? */
+    if( (i_new - i_expected) >= 0 ) /* Append at the end? */
     {
         msg_Dbg( p_access, ">> append %p(%u)==%p(%u)\n", p_block, i_cur, p, i_new );
         p->p_next = *pp_end = p_block;
         return;
     }
-    /* Add to the fron fo the chain? */
+    /* Add to the front fo the chain? */
     p = *pp_list;
     i_new = ( (p_block->p_buffer[2] << 8 ) + p_block->p_buffer[3] );
     i_cur = ( (p->p_buffer[2] << 8 ) + p->p_buffer[3] );
-    i_expected = ((i_cur+1) % RTP_SEQ_NUM_SIZE);
-    if( i_expected > i_new )
+    if( (i_cur - i_new) > 0 )
     {
         msg_Dbg( p_access, ">> prepend %p(%u)==%p(%u)\n", p_block, i_cur, p, i_new );
         p_block->p_next = p;
@@ -398,7 +396,7 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
     /* The packet can't be added to the front or the end of the chain,
      * thus walk the chain from the start.
      */
-    while( p->p_next )
+    while( p )
     {
         i_cur = (p->p_buffer[2] << 8 ) + p->p_buffer[3];
         i_expected = (i_cur+1) % RTP_SEQ_NUM_SIZE;
@@ -421,7 +419,7 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
              * else if( i_pcr_cur < i_pcr_new ) */
             break;
         }
-        else if( i_expected == i_new ) /* insert in chain */
+        else if( (i_expected - i_new) >= 0 ) /* insert in chain */
         {
             p_tmp = p->p_next;
             msg_Dbg( p_access, ">> insert between %p(%u)==%p(%u)", p, i_cur, p_tmp, i_new );
@@ -449,21 +447,34 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
         int i_extension_bit = 0;
         int i_extension_length = 0;
         int i_CSRC_count = 0;
+        int i_payload_type = 0;
+        uint32_t i_pcr_prev = 0;
+        uint16_t i_seq_prev = 0;
         /* Data pointers */
         block_t *p_prev = NULL;
         block_t *p_send = *pp_list;
         block_t *p = *pp_list;
 
-        while( p->p_next )
+        while( p )
         {
             i_cur = ( (p->p_buffer[2] << 8 ) + p->p_buffer[3] );
             msg_Dbg( p_access, "rtp_ChainSend: i_cur %u, i_seq %u", i_cur, i_seq );
-            if( i_cur == i_seq )
+            if( (i_cur - i_seq) == 0 )
             {
-                /* sent all packets that are received in order */
-                i_seq++;
+                i_seq++; /* sent all packets that are received in order */
 
+                /* Remember PCR and sequence number of packet
+                 * for next iteration */
+                i_pcr_prev = ( (p->p_buffer[4] << 24) +
+                               (p->p_buffer[5] << 16) +
+                               (p->p_buffer[6] << 8) +
+                                p->p_buffer[7] );
+                i_seq_prev = ( (p->p_buffer[2] << 8 ) +
+                                p->p_buffer[3] );
+
+                /* Parse headerfields we need */
                 i_CSRC_count = p->p_buffer[0] & 0x0F;
+                i_payload_type = (p->p_buffer[1] & 0x7F);
                 i_extension_bit  = ( p->p_buffer[0] & 0x10 ) >> 4;
                 if ( i_extension_bit == 1)
                     i_extension_length = ( (p->p_buffer[14] << 8 ) +
@@ -471,23 +482,20 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
 
                 /* Skip header + CSRC extension field n*(32 bits) + extention */
                 i_skip = RTP_HEADER_LEN + 4*i_CSRC_count + i_extension_length;
+                if( i_payload_type == 14 ) i_skip += 4;
 
                 /* Return the packet without the RTP header. */
                 p->i_buffer -= i_skip;
                 p->p_buffer += i_skip;
             }
-            else if( i_cur > i_seq )
+            else if( (i_cur - i_seq) > 0)
             {
                 if( p_prev )
                 {
                     *pp_list = p;
                     p_prev->p_next = NULL;
-                    p_sys->i_last_pcr = ( (p_prev->p_buffer[4] << 24) +
-                                          (p_prev->p_buffer[5] << 16) +
-                                          (p_prev->p_buffer[6] << 8) +
-                                           p_prev->p_buffer[7] );
-                    p_sys->i_sequence_number = ( (p_prev->p_buffer[2] << 8 ) +
-                                                  p_prev->p_buffer[3] );
+                    p_sys->i_last_pcr = i_pcr_prev;
+                    p_sys->i_sequence_number = i_seq_prev;
                     return p_send;
                 }
                 /* FiXME: or should we return NULL here? */
@@ -500,6 +508,7 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
         /* We have walked through the complete chain and all packets are
          * in sequence - so send the whole chain
          */
+        i_payload_type = (p->p_buffer[1] & 0x7F);
         i_CSRC_count = p->p_buffer[0] & 0x0F;
         i_extension_bit  = ( p->p_buffer[0] & 0x10 ) >> 4;
         if( i_extension_bit == 1)
@@ -507,6 +516,7 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
 
         /* Skip header + CSRC extension field n*(32 bits) + extention */
         i_skip = RTP_HEADER_LEN + 4*i_CSRC_count + i_extension_length;
+        if( i_payload_type == 14 ) i_skip += 4;
 
         /* Update the list pointers */
         *pp_list = NULL;
@@ -591,7 +601,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
      */
     if( p_sys->b_first_seqno )
     {
-        p_sys->i_sequence_number = i_sequence_number;
+        p_sys->i_sequence_number = i_sequence_number-1;
         p_sys->i_last_pcr = i_pcr;
         p_sys->b_first_seqno = VLC_FALSE;
     }
@@ -605,18 +615,21 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     }
 #endif
     i_sequence_expected = ((p_sys->i_sequence_number + 1) % RTP_SEQ_NUM_SIZE);
-    if( i_sequence_expected != i_sequence_number )
+    if( (i_sequence_expected - i_sequence_number) != 0 )
     {
         /* Handle out of order packets */
         if( p_sys->i_rtp_late > 0 )
         {
-            if( i_sequence_expected < i_sequence_number )
+            if( (i_sequence_number - i_sequence_expected) > 0 )
             {
                 msg_Warn( p_access,
                     "RTP packet out of order (too early) expected %u, current %u",
                     i_sequence_expected, i_sequence_number );
                 if( (i_pcr - p_sys->i_last_pcr) > (p_sys->i_rtp_late*90) )
                 {
+                    block_t *p_start = p_sys->p_list;
+                    uint16_t i_start = (p_start->p_buffer[2] << 8) +
+                                        p_start->p_buffer[3];
                     /* Gap too big, we have been holding this data for too long,
                      * send what we have.
                      */
@@ -624,13 +637,13 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
                         "Gap too big resyncing: delta %u, held for %d ms",
                         (i_pcr - p_sys->i_last_pcr), p_sys->i_rtp_late );
                     rtp_ChainInsert( p_access, &p_sys->p_list, &p_sys->p_end, p_block );
-                    return rtp_ChainSend( p_access, &p_sys->p_list, i_sequence_expected );
+                    return rtp_ChainSend( p_access, &p_sys->p_list, i_start );
                 }
                 /* hold packets that arrive too early. */
                 rtp_ChainInsert( p_access, &p_sys->p_list, &p_sys->p_end, p_block );
-                return rtp_ChainSend( p_access, &p_sys->p_list, p_sys->i_sequence_number );
+                return rtp_ChainSend( p_access, &p_sys->p_list, i_sequence_expected );
             }
-            else if( /* (i_sequence_expected > i_sequence_number ) && */
+            else if( /* ((i_sequence_expected - i_sequence_number ) > 0) && */
                      (i_pcr <= p_sys->i_last_pcr) )
             {
                 msg_Warn( p_access,
@@ -659,10 +672,11 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
 
                 /* Return the packet without the RTP header. */
                 p = *p_send;
-                while( p->p_next )
+                while( p )
                 {
                     p->i_buffer -= i_skip;
                     p->p_buffer += i_skip;
+                    if( !p->p_next ) break;
                     p = p->p_next;
                 }
                 return *p_send;
