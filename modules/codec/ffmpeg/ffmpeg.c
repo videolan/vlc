@@ -992,9 +992,11 @@ static struct
       AUDIO_ES, "Apple Lossless Audio Codec" },
 #endif
 
+#if LIBAVCODEC_BUILD >= ((50<<16)+(0<<8)+0)
     /* QDM2 */
     { VLC_FOURCC('Q','D','M','2'), CODEC_ID_QDM2,
       AUDIO_ES, "QDM2" },
+#endif
 
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
