@@ -917,21 +917,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             return NULL;
         }
 
-        if( !p_dec->fmt_out.video.i_sar_num ||
-            !p_dec->fmt_out.video.i_sar_den )
-        {
-            p_dec->fmt_out.video.i_sar_num =
-              p_dec->fmt_out.video.i_aspect * p_dec->fmt_out.video.i_height;
-
-            p_dec->fmt_out.video.i_sar_den = VOUT_ASPECT_FACTOR *
-              p_dec->fmt_out.video.i_width;
-        }
-
-        vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,
-                     &p_dec->fmt_out.video.i_sar_den,
-                     p_dec->fmt_out.video.i_sar_num,
-                     p_dec->fmt_out.video.i_sar_den, 0 );
-
         if( !p_dec->fmt_out.video.i_visible_width ||
             !p_dec->fmt_out.video.i_visible_height )
         {
@@ -940,6 +925,27 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             p_dec->fmt_out.video.i_visible_height =
                 p_dec->fmt_out.video.i_height;
         }
+
+        if( p_dec->fmt_out.video.i_visible_height == 1088 )
+        {
+/*            p_dec->fmt_out.video.i_visible_height = 1080;  */
+            msg_Warn( p_dec, "Broken HDTV stream (display_height=1088)");
+        }
+
+        if( !p_dec->fmt_out.video.i_sar_num ||
+            !p_dec->fmt_out.video.i_sar_den )
+        {
+            p_dec->fmt_out.video.i_sar_num = p_dec->fmt_out.video.i_aspect * 
+              p_dec->fmt_out.video.i_visible_height;
+
+            p_dec->fmt_out.video.i_sar_den = VOUT_ASPECT_FACTOR *
+              p_dec->fmt_out.video.i_visible_width;
+        }
+
+        vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,
+                     &p_dec->fmt_out.video.i_sar_den,
+                     p_dec->fmt_out.video.i_sar_num,
+                     p_dec->fmt_out.video.i_sar_den, 0 );
 
         p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
         p_sys->video = p_dec->fmt_out.video;
