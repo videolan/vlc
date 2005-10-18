@@ -111,7 +111,6 @@ struct access_sys_t
     uint32_t i_last_pcr; /* last known good PCR */
     block_t *p_list;     /* list of packets to rearrange */
     block_t *p_end;      /* last packet in p_list */
-    block_t *p_next;     /* p_next ?? */
 };
 
 /*****************************************************************************
@@ -252,7 +251,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_rtp_late = var_CreateGetInteger( p_access, "rtp-late" );
     p_sys->p_list = NULL;
     p_sys->p_end = NULL;
-    p_sys->p_next = NULL;
 
     return VLC_SUCCESS;
 }
@@ -336,7 +334,7 @@ static block_t *BlockUDP( access_t *p_access )
         return NULL;
     }
 
-    if( p_block->i_buffer >= p_sys->i_mtu && p_sys->b_auto_mtu &&
+    if( (p_block->i_buffer >= p_sys->i_mtu) && p_sys->b_auto_mtu &&
         p_sys->i_mtu < 32767 )
     {
         /* Increase by 100% */
@@ -351,9 +349,11 @@ static block_t *BlockUDP( access_t *p_access )
  * rtp_ChainInsert - insert a p_block in the chain and
  * look at the sequence numbers.
  */
-static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block_t **pp_end, block_t *p_block )
+static inline void rtp_ChainInsert( access_t *p_access, block_t *p_block )
 {
-    block_t *p_tmp = NULL;
+    access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
+    block_t *p_list = p_sys->p_list;
+    block_t *p_end  = p_sys->p_end;
     block_t *p = NULL;
     uint16_t i_new = 0;
     uint16_t i_cur = 0;
@@ -361,37 +361,37 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
     uint32_t i_pcr_new = 0;
 
     if( !p_block ) return;
-    if( *pp_list == NULL )
+    if( !p_list )
     {
-        *pp_list = p_block;
-        *pp_end  = p_block;
+        p_sys->p_list = p_block;
+        p_sys->p_end  = p_block;
         return;
     }
+
     /* Appending packets at the end of the chain is the normal case */
     i_pcr_new = ( (p_block->p_buffer[4] << 24) +
                   (p_block->p_buffer[5] << 16) +
                   (p_block->p_buffer[6] << 8) +
                    p_block->p_buffer[7] );
     i_new = ( (p_block->p_buffer[2] << 8 ) + p_block->p_buffer[3] );
+    i_cur = ( (p_end->p_buffer[2] << 8 ) + p_end->p_buffer[3] );
 
-    p = *pp_end;
-    i_cur = ( (p->p_buffer[2] << 8 ) + p->p_buffer[3] );
-    i_expected = ((i_cur+1) % RTP_SEQ_NUM_SIZE);
+    i_expected = i_cur + 1;
     if( (i_new - i_expected) >= 0 ) /* Append at the end? */
     {
-        msg_Dbg( p_access, ">> append %p(%u)==%p(%u)\n", p_block, i_cur, p, i_new );
-        p->p_next = *pp_end = p_block;
+        msg_Dbg( p_access, "RTP: append %u after %u", i_new, i_cur );
+        p_end->p_next = p_block;
+        p_sys->p_end  = p_end->p_next;
         return;
     }
     /* Add to the front fo the chain? */
-    p = *pp_list;
-    i_new = ( (p_block->p_buffer[2] << 8 ) + p_block->p_buffer[3] );
+    p = p_list;
     i_cur = ( (p->p_buffer[2] << 8 ) + p->p_buffer[3] );
-    if( i_cur > i_new )
+    if( (i_expected - i_new) > 0 )
     {
-        msg_Dbg( p_access, ">> prepend %p(%u)==%p(%u)\n", p_block, i_cur, p, i_new );
+        msg_Dbg( p_access, "RTP: prepend %u before %u", i_cur, i_new );
         p_block->p_next = p;
-        *pp_list = p_block;
+        p_sys->p_list = p_block;
         return;
     }
     /* The packet can't be added to the front or the end of the chain,
@@ -400,10 +400,9 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
     while( p )
     {
         i_cur = (p->p_buffer[2] << 8 ) + p->p_buffer[3];
-        i_expected = (i_cur+1) % RTP_SEQ_NUM_SIZE;
+        i_expected = i_cur+1;
 
-        msg_Dbg( p_access,  "i_cur: %u, i_new: %u", i_cur, i_new);
-        if( i_cur == i_new )
+        if( (i_cur - i_new) == 0 )
         {
             uint32_t i_pcr_cur = ( (p->p_buffer[4] << 24) +
                                    (p->p_buffer[5] << 16) +
@@ -420,10 +419,12 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
              * else if( i_pcr_cur < i_pcr_new ) */
             break;
         }
-        else if( i_expected >= i_new ) /* insert in chain */
+        else if( (i_expected - i_new) >= 0 ) /* insert in chain */
         {
+            block_t *p_tmp = NULL;
+
             p_tmp = p->p_next;
-            msg_Dbg( p_access, ">> insert between %p(%u)==%p(%u)", p, i_cur, p_tmp, i_new );
+            msg_Dbg( p_access, "RTP: insert %u after  %u", i_new, i_cur );
             p->p_next = p_block;
             p_block->p_next = p_tmp;
             return;
@@ -431,6 +432,8 @@ static inline void rtp_ChainInsert( access_t *p_access, block_t **pp_list, block
         if( !p->p_next ) break;
         p = p->p_next;
     }
+    msg_Dbg(p_access, "RTP: trashing duplicate %d", i_new );
+    block_Release( p_block );
 }
 
 /*
@@ -458,10 +461,11 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
 
         while( p )
         {
-            i_cur = ( (p->p_buffer[2] << 8 ) + p->p_buffer[3] );
-            msg_Dbg( p_access, "rtp_ChainSend: i_cur %u, i_seq %u", i_cur, i_seq );
-            if( i_cur == i_seq )
+            i_cur = (p->p_buffer[2] << 8 ) + p->p_buffer[3];
+            if( (i_cur - i_seq) == 0 )
             {
+                msg_Dbg( p_access, "rtp_ChainSend: sequence number %u", i_seq );
+
                 i_seq++; /* sent all packets that are received in order */
 
                 /* Remember PCR and sequence number of packet
@@ -489,23 +493,24 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
                 p->i_buffer -= i_skip;
                 p->p_buffer += i_skip;
             }
-            else if( i_cur > i_seq )
+            else if( (i_cur - i_seq) > 0 )
             {
                 if( p_prev )
                 {
-                    *pp_list = p;
+                    p_sys->p_list = p;
                     p_prev->p_next = NULL;
                     p_sys->i_last_pcr = i_pcr_prev;
                     p_sys->i_sequence_number = i_seq_prev;
                     return p_send;
                 }
-                /* FiXME: or should we return NULL here? */
-                return NULL;
+                goto out;
             }
             p_prev = p;
             if (!p->p_next) break;
             p = p->p_next;
         }
+
+out:
         /* We have walked through the complete chain and all packets are
          * in sequence - so send the whole chain
          */
@@ -520,8 +525,7 @@ static inline block_t *rtp_ChainSend( access_t *p_access, block_t **pp_list, uin
         if( i_payload_type == 14 ) i_skip += 4;
 
         /* Update the list pointers */
-        *pp_list = NULL;
-        p_sys->p_next = NULL;
+        p_sys->p_list = NULL;
         p_sys->p_end = NULL;
         p_sys->i_sequence_number = ( (p->p_buffer[2] << 8 ) +
                                       p->p_buffer[3] );
@@ -602,10 +606,14 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
      */
     if( p_sys->b_first_seqno )
     {
-        p_sys->i_sequence_number = i_sequence_number - 1;
+        p_sys->i_sequence_number = i_sequence_number;
         p_sys->i_last_pcr = i_pcr;
         p_sys->b_first_seqno = VLC_FALSE;
+        i_sequence_expected = i_sequence_number;
     }
+    else
+        i_sequence_expected = p_sys->i_sequence_number + 1;
+
 #if 0
     /* Emulate packet loss */
     if ( (i_sequence_number % 4000) == 0)
@@ -615,18 +623,18 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
         return NULL;
     }
 #endif
-    i_sequence_expected = ((p_sys->i_sequence_number + 1) % RTP_SEQ_NUM_SIZE);
-    if( i_sequence_expected != i_sequence_number )
+
+    if( (i_sequence_expected - i_sequence_number) != 0 )
     {
         /* Handle out of order packets */
         if( p_sys->i_rtp_late > 0 )
         {
-            if( i_sequence_number > i_sequence_expected )
+            if( (i_sequence_number - i_sequence_expected) > 0 )
             {
                 msg_Warn( p_access,
                     "RTP packet out of order (too early) expected %u, current %u",
                     i_sequence_expected, i_sequence_number );
-                if( (i_pcr - p_sys->i_last_pcr) > (p_sys->i_rtp_late*90) )
+                if( (i_pcr - p_sys->i_last_pcr) >= (p_sys->i_rtp_late*90) )
                 {
                     block_t *p_start = p_sys->p_list;
                     uint16_t i_start = (!p_start) ? p_sys->i_sequence_number :
@@ -638,15 +646,15 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
                     msg_Warn( p_access,
                         "Gap too big resyncing: delta %u, held for %d ms",
                         (i_pcr - p_sys->i_last_pcr), p_sys->i_rtp_late );
-                    rtp_ChainInsert( p_access, &p_sys->p_list, &p_sys->p_end, p_block );
+                    rtp_ChainInsert( p_access, p_block );
                     return rtp_ChainSend( p_access, &p_sys->p_list, i_start );
                 }
                 /* hold packets that arrive too early. */
-                rtp_ChainInsert( p_access, &p_sys->p_list, &p_sys->p_end, p_block );
+                rtp_ChainInsert( p_access, p_block );
                 return rtp_ChainSend( p_access, &p_sys->p_list, i_sequence_expected );
             }
             else if( /* ((i_sequence_expected - i_sequence_number ) > 0) && */
-                     (i_pcr <= p_sys->i_last_pcr) )
+                     (p_sys->i_last_pcr - i_pcr) >= 0 )
             {
                 msg_Warn( p_access,
                     "RTP packet out of order (duplicate or too late) expected %u, current %u .. trashing it",
@@ -698,7 +706,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     }
     else if( (p_sys->i_rtp_late > 0) && p_sys->p_list )
     {
-        if( i_pcr <= p_sys->i_last_pcr )
+        if( (p_sys->i_last_pcr - i_pcr) >= 0 )
         {
             msg_Warn( p_access,
                 "RTP packet out of order (duplicate) expected %u, current %u .. trashing it",
@@ -708,7 +716,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
             p_sys->i_last_pcr = i_pcr;
             return NULL;
         }
-        rtp_ChainInsert( p_access, &p_sys->p_list, &p_sys->p_end, p_block );
+        rtp_ChainInsert( p_access, p_block );
         return rtp_ChainSend( p_access, &p_sys->p_list, i_sequence_expected );
     }
 
