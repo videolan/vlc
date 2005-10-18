@@ -1989,11 +1989,11 @@ AC_ARG_ENABLE(mkv,
 if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
-    AC_MSG_CHECKING(for libebml version >= 0.7.3)
+    AC_MSG_CHECKING(for libebml version >= 0.7.6)
     AC_EGREP_CPP(yes,
       [#include <ebml/EbmlVersion.h>
        #ifdef LIBEBML_VERSION
-       #if LIBEBML_VERSION >= 0x000703
+       #if LIBEBML_VERSION >= 0x000706
        yes
        #endif
        #endif],
