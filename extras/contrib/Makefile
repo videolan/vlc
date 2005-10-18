@@ -60,7 +60,11 @@ clean-bin: FORCE
 	$(MAKE) -C src clean-dots
 
 clean: FORCE
-	@echo "Do you mean to clean-src or clean-bin ?"
+#	@echo "    Do you mean to clean-src or clean-bin ?"
+	@echo "    'make bin' isn't available at the moment"
+	@echo "    you probably wanna run 'make clean-src' then"
+	@echo "    you can still run 'make clean-bin' manually if needed"
+	$(MAKE) clean-src
 
 package: FORCE
 	@if test -d tmp; then \
