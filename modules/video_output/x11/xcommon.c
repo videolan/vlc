@@ -2030,6 +2030,11 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
 
     /* Create XImage / XvImage */
 #ifdef MODULE_NAME_IS_xvideo
+
+    /* Make sure the buffer is aligned to multiple of 16 */
+    i_height = ( i_height + 15 ) >> 4 << 4;
+    i_width = ( i_width + 15 ) >> 4 << 4;
+
     p_image = XvShmCreateImage( p_display, i_xvport, i_chroma, 0,
                                 i_width, i_height, p_shm );
 #else
@@ -2114,6 +2119,11 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
 
     /* Allocate memory for image */
 #ifdef MODULE_NAME_IS_xvideo
+
+    /* Make sure the buffer is aligned to multiple of 16 */
+    i_height = ( i_height + 15 ) >> 4 << 4;
+    i_width = ( i_width + 15 ) >> 4 << 4;
+
     p_data = (byte_t *) malloc( i_width * i_height * i_bits_per_pixel / 8 );
 #elif defined(MODULE_NAME_IS_x11)
     i_bytes_per_line = i_width * i_bytes_per_pixel;

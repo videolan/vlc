@@ -42,7 +42,8 @@
 
 #include SDL_INCLUDE_FILE
 
-#define SDL_MAX_DIRECTBUFFERS 10
+/* SDL is not able to crop overlays - so use only 1 direct buffer */
+#define SDL_MAX_DIRECTBUFFERS 1
 #define SDL_DEFAULT_BPP 16
 
 /*****************************************************************************
