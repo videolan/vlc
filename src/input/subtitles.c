@@ -288,6 +288,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     char *psz_fname_original = strdup( psz_name );
     char *psz_fname = psz_fname_original;
 
+    if( psz_fname == NULL ) return NULL;
+
     if( !strncmp( psz_fname, "file://", 7 ) )
     {
         psz_fname += 7;
@@ -312,7 +314,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
     else
     {
-        f_fname = strdup( psz_fname );
+        /* FIXME: we should check the CWD here */
+        /* f_fname = strdup( psz_fname ); */
+        if( psz_fname_original ) free( psz_fname_original );
+        return NULL;
     }
 
     i_fname_len = strlen( f_fname );
@@ -336,6 +341,9 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     {
         pp_dir_content = NULL;
         i_dir_content = 0;
+
+        if( j < 0 && f_dir == NULL )
+            continue;
 
         /* parse psz_src dir */  
         if( ( i_dir_content = scandir( j < 0 ? f_dir : *subdirs, &pp_dir_content, Filter,
