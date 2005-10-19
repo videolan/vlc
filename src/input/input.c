@@ -804,7 +804,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                                             p_input->input.p_item->psz_uri );
             input_source_t *sub;
 
-            for( i = 0; subs[i] != NULL; i++ )
+            for( i = 0; subs && subs[i]; i++ )
             {
                 if( strcmp( psz_subtitle, subs[i] ) )
                 {
@@ -817,8 +817,8 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                 }
                 free( subs[i] );
             }
-            free( subs );
-            free( psz_autopath );
+            if( subs ) free( subs );
+            if( psz_autopath ) free( psz_autopath );
         }
         free( psz_subtitle );
 
