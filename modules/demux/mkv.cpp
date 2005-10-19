@@ -1157,7 +1157,11 @@ public:
     void LoadTags( );
     void InformationCreate( );
     void Seek( mtime_t i_date, mtime_t i_time_offset );
-    int BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration );
+#if LIBMATROSKA_VERSION >= 0x000800
+    int BlockGet( KaxBlock * &, KaxSimpleBlock * &, int64_t *, int64_t *, int64_t *);
+#else
+    int BlockGet( KaxBlock * &, int64_t *, int64_t *, int64_t *);
+#endif
     bool Select( mtime_t i_start_time );
     void UnSelect( );
 
@@ -1659,8 +1663,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 }
 
+#if LIBMATROSKA_VERSION >= 0x000800
+int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+#else
 int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64_t *pi_ref2, int64_t *pi_duration )
+#endif
 {
+#if LIBMATROSKA_VERSION >= 0x000800
+    pp_simpleblock = NULL;
+#endif
     pp_block = NULL;
     *pi_ref1  = 0;
     *pi_ref2  = 0;
@@ -1751,6 +1762,17 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
                 i_block_pos = el->GetElementPosition();
                 ep->Down();
             }
+#if LIBMATROSKA_VERSION >= 0x000800
+            else if( MKV_IS_ID( el, KaxSimpleBlock ) )
+            {
+                pp_simpleblock = (KaxSimpleBlock*)el;
+
+                pp_simpleblock->ReadData( es.I_O() );
+                pp_simpleblock->SetParent( *cluster );
+
+                ep->Keep();
+            }
+#endif
             break;
         case 3:
             if( MKV_IS_ID( el, KaxBlock ) )
@@ -1778,7 +1800,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
                 {
                     *pi_ref1 = int64( ref ) * cluster->GlobalTimecodeScale();
                 }
-                else
+                else if( *pi_ref2 == 0 )
                 {
                     *pi_ref2 = int64( ref ) * cluster->GlobalTimecodeScale();
                 }
@@ -3231,7 +3253,13 @@ static int Demux( demux_t *p_demux)
         int64_t i_block_ref1;
         int64_t i_block_ref2;
 
+#if LIBMATROSKA_VERSION >= 0x000800
+        KaxSimpleBlock *simpleblock;
+
+        if( p_segment->BlockGet( block, simpleblock, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+#else
         if( p_segment->BlockGet( block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+#endif
         {
             if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered )
             {
@@ -3283,6 +3311,9 @@ static int Demux( demux_t *p_demux)
             {
                 i_return = 1;
                 delete block;
+#if LIBMATROSKA_VERSION >= 0x000800
+                delete simpleblock;
+#endif
                 break;
             }
         }
@@ -3293,6 +3324,9 @@ static int Demux( demux_t *p_demux)
             if ( !p_vsegment->SelectNext() )
             {
                 delete block;
+#if LIBMATROSKA_VERSION >= 0x000800
+                delete simpleblock;
+#endif
                 break;
             }
             p_segment->UnSelect( );
@@ -3305,6 +3339,9 @@ static int Demux( demux_t *p_demux)
             {
                 msg_Err( p_demux, "Failed to select new segment" );
                 delete block;
+#if LIBMATROSKA_VERSION >= 0x000800
+                delete simpleblock;
+#endif
                 break;
             }
             delete block;
@@ -3314,6 +3351,9 @@ static int Demux( demux_t *p_demux)
         BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration, i_block_ref1 >= 0 || i_block_ref2 > 0 );
 
         delete block;
+#if LIBMATROSKA_VERSION >= 0x000800
+        delete simpleblock;
+#endif
         i_block_count++;
 
         // TODO optimize when there is need to leave or when seeking has been called
@@ -5319,6 +5359,9 @@ void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
 void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 {
     KaxBlock    *block;
+#if LIBMATROSKA_VERSION >= 0x000800
+    KaxSimpleBlock *simpleblock;
+#endif
     int         i_track_skipping;
     int64_t     i_block_duration;
     int64_t     i_block_ref1;
@@ -5376,7 +5419,11 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
     while( i_track_skipping > 0 )
     {
+#if LIBMATROSKA_VERSION >= 0x000800
+        if( BlockGet( block, simpleblock, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+#else
         if( BlockGet( block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
+#endif
         {
             msg_Warn( &sys.demuxer, "cannot get block EOF?" );
 
@@ -5416,6 +5463,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
         }
 
         delete block;
+#if LIBMATROSKA_VERSION >= 0x000800
+        delete simpleblock;
+#endif
     }
 }
 
