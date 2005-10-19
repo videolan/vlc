@@ -1395,6 +1395,7 @@ DISTCLEAN_PKG += libmpcdec-$(MUSE_VERSION).tar.bz2
 	cp -R $(PREFIX)/share/aclocal/* $(PREFIX)/../../m4/
 	touch $@
 
+CLEAN_FILE += .aclocal
 
 # ***************************************************************************
 # Some cleansing
