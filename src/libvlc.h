@@ -288,6 +288,13 @@ static char *ppsz_align_descriptions[] =
     "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
     "squareness.")
 
+#define HDTV_FIX_TEXT N_("Fix HDTV height")
+#define HDTV_FIX_LONGTEXT N_( \
+    "This option allows proper handling of HDTV-1080 video format " \
+    "even if broken encoder incorrectly set height to 1088 lines. " \
+    "Disable this option only if your video has non-standard format " \
+    "requiring all 1088 lines.")
+
 #define MASPECT_RATIO_TEXT N_("Monitor aspect ratio")
 #define MASPECT_RATIO_LONGTEXT N_( \
     "This will force the monitor aspect ratio. Most monitors have a 4:3." \
@@ -1017,6 +1024,7 @@ vlc_module_begin();
                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_FALSE );
     add_string( "monitor-aspect-ratio", "4:3", NULL,
                MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, VLC_FALSE );
+    add_bool( "hdtv-fix", 1, NULL, HDTV_FIX_TEXT, HDTV_FIX_LONGTEXT, VLC_TRUE );
     add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_string( "video-title", NULL, NULL, VIDEO_TITLE_TEXT,
