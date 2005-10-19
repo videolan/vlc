@@ -668,8 +668,8 @@ static void GetAR( decoder_t *p_dec )
     }
 
     msg_Dbg( p_dec, "%dx%d, aspect %d, %u.%03u fps",
-             p_sys->p_info->sequence->width,
-             p_sys->p_info->sequence->height, p_sys->i_aspect,
+             p_sys->p_info->sequence->display_width,
+             p_sys->p_info->sequence->display_height, p_sys->i_aspect,
              (uint32_t)((uint64_t)1001000000 * 27 /
                  p_sys->p_info->sequence->frame_period / 1001),
              (uint32_t)((uint64_t)1001000000 * 27 /
