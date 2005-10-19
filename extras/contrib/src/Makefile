@@ -876,7 +876,7 @@ endif
 
 CLEAN_FILE += .live
 CLEAN_PKG += live
-DISTCLEAN_PKG += live-$(LIVEDOTCOM_VERSION).tar.gz
+DISTCLEAN_PKG += live555-$(LIVEDOTCOM_VERSION).tar.gz
 
 # ***************************************************************************
 # goom
