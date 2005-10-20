@@ -369,6 +369,7 @@ static int Open( vlc_object_t *p_this )
 
             p_session->i_ttl = config_GetInt( p_sout, "ttl" );
             p_session->i_payload = 33;
+            p_session->b_rtp = strstr( psz_access, "rtp") ? 1 : 0;
 
             msg_Info( p_this, "SAP Enabled");
 

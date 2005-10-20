@@ -615,15 +615,16 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             "s=%s\r\n"
                             "t=0 0\r\n"
                             "c=IN IP%c %s/%d\r\n"
-                            "m=video %d udp %d\r\n"
+                            "m=video %d %s %d\r\n"
                             "a=tool:"PACKAGE_STRING"\r\n"
                             "a=type:broadcast\r\n"
                             "%s%s%s",
                             i_sdp_id, i_sdp_version,
                             ipv, p_addr->psz_machine,
-                            psz_name, ipv,
-                            psz_uri, p_session->i_ttl,
-                            p_session->i_port, p_session->i_payload,
+                            psz_name, ipv, psz_uri, p_session->i_ttl,
+                            p_session->i_port, 
+                            p_session->b_rtp ? "RTP/AVP" : "udp",
+                            p_session->i_payload,
                             psz_group ? "a=x-plgroup:" : "",
                             psz_group ? psz_group : "", psz_group ? "\r\n" : "" ) == -1 )
         return NULL;

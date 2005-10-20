@@ -253,6 +253,7 @@ struct session_descriptor_t
 
     sap_session_t *p_sap; /* If we have a sap session, remember it */
     char *psz_sdp;
+    vlc_bool_t b_rtp;
 };
 
 #define METHOD_TYPE_SAP 1
