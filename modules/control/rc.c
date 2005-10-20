@@ -1088,7 +1088,6 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     {
         val.i_int = config_GetInt( p_intf, "key-jump+3sec" );
         var_Set( p_intf->p_vlc, "key-pressed", val );
-        
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -1096,14 +1095,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     {
         val.i_int = config_GetInt( p_intf, "key-jump-3sec" );
         var_Set( p_intf->p_vlc, "key-pressed", val );
-
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "faster" ) )
     {
         val.b_bool = VLC_TRUE;
-
         var_Set( p_input, "rate-faster", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -1111,7 +1108,6 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     else if ( !strcmp( psz_cmd, "slower" ) )
     {
         val.b_bool = VLC_TRUE;
-
         var_Set( p_input, "rate-slower", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -1119,7 +1115,6 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     else if ( !strcmp( psz_cmd, "normal" ) )
     {
         val.i_int = INPUT_RATE_DEFAULT;
-
         var_Set( p_input, "rate", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -1160,7 +1155,6 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             val.b_bool = VLC_TRUE;
             var_Set( p_input, "prev-chapter", val );
         }
-
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -1206,6 +1200,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     /* Never reached. */
+    vlc_object_release( p_input );
     return VLC_EGENERIC;
 }
 
@@ -1309,7 +1304,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             /* Replay the current state of the system. */
             msg_rc( STATUS_CHANGE "( New input: %s )", p_playlist->p_input->input.p_item->psz_uri );
             msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_intf, "volume" ));
-    
+
             vlc_mutex_lock( &p_playlist->object_lock );
             switch( p_playlist->status.i_status )
             {
