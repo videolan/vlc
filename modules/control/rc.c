@@ -1930,8 +1930,8 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
             vlc_object_release( p_playlist );
             return VLC_EGENERIC;
         }
-        vlc_object_release( p_playlist );
     }
+    vlc_object_release( p_playlist );
 
     val.psz_string = strdup( newval.psz_string );
     if( !strcmp( val.psz_string, "on" ) || !strcmp( val.psz_string, "show" ))
