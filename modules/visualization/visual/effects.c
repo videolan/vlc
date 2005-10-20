@@ -396,11 +396,6 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
 
     p_buffs = p_s16_buff;
-    //i_nb_bands = config_GetInt ( p_aout, "visual-nbbands" );
-    //i_separ    = config_GetInt( p_aout, "visual-separ" );
-    //i_amp     = config_GetInt ( p_aout, "visual-amp" );
-    //i_peak     = config_GetInt ( p_aout, "visual-peaks" );
-    /* previous 4 vars changed.. using them as `spect' variables */
     i_original     = config_GetInt ( p_aout, "spect-show-original" );
     i_nb_bands     = config_GetInt ( p_aout, "spect-nbbands" );
     i_separ        = config_GetInt ( p_aout, "spect-separ" );
@@ -420,12 +415,10 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
     else
     {
-        i_nb_bands = 80;
+        if( i_nb_bands > 80 )
+            i_nb_bands = 80;
         xscale = xscale2;
     }
-    i_nb_bands *= i_sections;
-    /* whoops, dont malloc the following memory for all the duplicated bands..
-        -only the original 20 or 80 will be fine */
 
     if( !p_effect->p_data )
     {
@@ -446,13 +439,13 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         peaks =(int *)p_effect->p_data;
     }
 
-
     height = (int *)malloc( i_nb_bands * sizeof(int) );
     if( !height)
     {
         msg_Err(p_aout,"Out of memory");
         return -1;
     }
+
     /* Convert the buffer to int16_t  */
     /* Pasted from float32tos16.c */
     for (i = p_buffer->i_nb_samples * p_effect->i_nb_chans; i--; )
@@ -481,6 +474,8 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     fft_perform( p_buffer1, p_output, p_state);
     for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
         p_dest[i] = ( (int) sqrt( p_output [ i + 1 ] ) ) >> 8;
+
+    i_nb_bands *= i_sections;
 
     for ( i = 0 ; i< i_nb_bands/i_sections ;i++)
     {
@@ -660,24 +655,20 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                     y /= 2;
 
                     *(p_picture->p[1].p_pixels + x + y * p_picture->p[1].i_pitch
-                    - p_picture->p[1].i_pitch
                     ) = 0;/* U(R,G,B); */
 
                     if( 0x04 * (i_line + k ) - 0x0f > 0 )
                     {
                         if ( 0x04 * (i_line + k ) -0x0f < 0xff)
                             *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                            - p_picture->p[2].i_pitch
                             ) = ( 0x04 * ( i_line + k ) ) -(color1-1);/* -V(R,G,B); */
                         else
                             *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                            - p_picture->p[2].i_pitch
                             ) = 255;/* V(R,G,B); */
                     }
                     else
                     {
                         *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                        - p_picture->p[2].i_pitch
                         ) = color1;/* V(R,G,B); */
                     }
                 }
@@ -705,24 +696,20 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             y /= 2;
 
             *(p_picture->p[1].p_pixels + x + y * p_picture->p[1].i_pitch
-            - p_picture->p[1].i_pitch
             ) = 0;/* U(R,G,B); */
 
             if( 0x04 * i_line - 0x0f > 0 )
             {
                 if( 0x04 * i_line -0x0f < 0xff)
                     *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                    - p_picture->p[2].i_pitch
                     ) = ( 0x04 * i_line) -(color1-1);/* -V(R,G,B); */
                 else
                     *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                    - p_picture->p[2].i_pitch
                     ) = 255;/* V(R,G,B); */
             }
             else
             {
                 *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                - p_picture->p[2].i_pitch
                 ) = color1;/* V(R,G,B); */
             }
         }
@@ -755,24 +742,20 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                 y /= 2;
 
                 *(p_picture->p[1].p_pixels + x + y * p_picture->p[1].i_pitch
-                - p_picture->p[1].i_pitch
                 ) = 0;
 
                 if( 0x04 * i_line - 0x0f > 0 )
                 {
                     if ( 0x04 * i_line -0x0f < 0xff)
                         *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                        - p_picture->p[2].i_pitch
                         ) = ( 0x04 * i_line) -(color1-1);
                     else
                         *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                        - p_picture->p[2].i_pitch
                         ) = 255;
                 }
                 else
                 {
                     *(p_picture->p[2].p_pixels + x + y * p_picture->p[2].i_pitch
-                    - p_picture->p[2].i_pitch
                     ) = color1;
                 }
             }

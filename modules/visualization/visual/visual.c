@@ -51,6 +51,8 @@
 #define NBBANDS_TEXT N_( "Number of bands" )
 #define NBBANDS_LONGTEXT N_( \
       "Number of bands used by spectrum analyzer, should be 20 or 80." )
+#define SPNBBANDS_LONGTEXT N_( \
+      "Number of bands used by the spectrOmeter, from 20 to 80." )
 
 #define SEPAR_TEXT N_( "Band separator" )
 #define SEPAR_LONGTEXT N_( \
@@ -125,27 +127,27 @@ vlc_module_begin();
     add_bool("visual-peaks", VLC_TRUE, NULL,
              PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
     set_section( N_("Spectrometer") , NULL );
-    add_bool("spect-show-original", VLC_TRUE, NULL,
+    add_bool("spect-show-original", VLC_FALSE, NULL,
              ORIG_TEXT, ORIG_LONGTEXT, VLC_TRUE );
     add_bool("spect-show-base", VLC_TRUE, NULL,
              BASE_TEXT, BASE_LONGTEXT, VLC_TRUE );
-    add_integer("spect-radius", 22, NULL,
+    add_integer("spect-radius", 42, NULL,
              RADIUS_TEXT, RADIUS_LONGTEXT, VLC_TRUE );
-    add_integer("spect-sections", 2, NULL,
+    add_integer("spect-sections", 3, NULL,
              SECT_TEXT, SECT_LONGTEXT, VLC_TRUE );
-    add_integer("spect-color", 16, NULL,
+    add_integer("spect-color", 80, NULL,
              COLOR1_TEXT, COLOR1_LONGTEXT, VLC_TRUE );
     add_bool("spect-show-bands", VLC_TRUE, NULL,
              BANDS_TEXT, BANDS_LONGTEXT, VLC_TRUE );
-    add_integer("spect-nbbands", 80, NULL,
-             NBBANDS_TEXT, NBBANDS_LONGTEXT, VLC_TRUE );
+    add_integer("spect-nbbands", 32, NULL,
+             NBBANDS_TEXT, SPNBBANDS_LONGTEXT, VLC_TRUE );
     add_integer("spect-separ", 1, NULL,
              SEPAR_TEXT, SEPAR_LONGTEXT, VLC_TRUE );
-    add_integer("spect-amp", 3, NULL,
+    add_integer("spect-amp", 8, NULL,
              AMP_TEXT, AMP_LONGTEXT, VLC_TRUE );
     add_bool("spect-show-peaks", VLC_TRUE, NULL,
              PEAKS_TEXT, PEAKS_LONGTEXT, VLC_TRUE );
-    add_integer("spect-peak-width", 1, NULL,
+    add_integer("spect-peak-width", 61, NULL,
              PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, VLC_TRUE );
     add_integer("spect-peak-height", 1, NULL,
              PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, VLC_TRUE );
