@@ -361,6 +361,45 @@ void SoutDialog::UpdateMRL()
                                       net_ports[MMSH_ACCESS_OUT]->GetValue() );
         dup_opts += wxT("}");
     }
+    if( access_checkboxes[RTP_ACCESS_OUT]->IsChecked() )
+    {
+        if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
+        dup_opts += wxT("dst=std{access=rtp,mux=");
+        dup_opts += encapsulation + wxT(",url=");
+
+        wxString rtp_addr = net_addrs[RTP_ACCESS_OUT]->GetLineText(0);
+        if ((rtp_addr[0u] != '[') && (rtp_addr.Find(':') != -1))
+        {
+            dup_opts += wxT ("[") + rtp_addr + wxT ("]");
+        }
+        else
+        {
+            dup_opts += rtp_addr;
+        }
+        dup_opts += wxString::Format( wxT(":%d"),
+                                      net_ports[RTP_ACCESS_OUT]->GetValue() );
+
+        /* SAP if RTP */
+        if( sap_checkbox->IsChecked() )
+        {
+            dup_opts += wxT(",sap");
+            if( ! announce_group->GetLineText(0).IsEmpty() )
+            {
+                dup_opts += wxT(",group=\"");
+                dup_opts += announce_group->GetLineText(0);
+                dup_opts += wxT("\"");
+            }
+            if( ! announce_addr->GetLineText(0).IsEmpty() )
+            {
+                dup_opts += wxT(",name=\"");
+                dup_opts += announce_addr->GetLineText(0);
+                dup_opts += wxT("\"");
+            }
+        }
+
+        dup_opts += wxT("}");
+    }
+
     if( access_checkboxes[UDP_ACCESS_OUT]->IsChecked() )
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
@@ -379,7 +418,7 @@ void SoutDialog::UpdateMRL()
         dup_opts += wxString::Format( wxT(":%d"),
                                       net_ports[UDP_ACCESS_OUT]->GetValue() );
 
-        /* SAP only if UDP */
+        /* SAP if UDP */
         if( sap_checkbox->IsChecked() )
         {
             dup_opts += wxT(",sap");
@@ -439,6 +478,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
         wxU(_("File")),
         wxU(_("HTTP")),
         wxU(_("MMSH")),
+        wxU(_("RTP")),
         wxU(_("UDP")),
     };
 
@@ -922,6 +962,7 @@ void SoutDialog::OnAccessTypeChange( wxCommandEvent& event )
     switch( i_access_type )
     {
     case UDP_ACCESS_OUT:
+    case RTP_ACCESS_OUT:
         misc_subpanels[ANN_MISC_SOUT]->Enable( event.GetInt() );
 
         for( i = 1; i < ENCAPS_NUM; i++ )
