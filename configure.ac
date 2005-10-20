@@ -2171,6 +2171,38 @@ dnl Look for a ffmpeg-config (we are on debian )
      VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
   
   else
+
+dnl Those options have to be here because the .pc can be bogus for ffmpeg previous nov 05
+
+	AC_ARG_WITH(ffmpeg-mp3lame,
+      [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
+      [
+        if test "$with_ffmpeg_mp3lame" = "yes";	then
+		VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
+	fi
+	])
+
+    AC_ARG_WITH(ffmpeg-faac,
+      [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
+      [
+        if test "$with_ffmpeg_faac" = "yes"; then
+		VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
+	fi])
+
+    AC_ARG_WITH(ffmpeg-dts,
+      [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
+      [
+        if test "$with_ffmpeg_dts" = "yes"; then
+		VLC_ADD_LDFLAGS([ffmpeg],[-ldts])
+	fi])
+
+    AC_ARG_WITH(ffmpeg-zlib,
+      [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
+      [
+        if test "$with_ffmpeg_zlib" = "yes"; then
+		VLC_ADD_LDFLAGS([ffmpeg],[-lz])
+	fi])
+
 dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
     [
@@ -2201,25 +2233,6 @@ dnl Trying with pkg-config
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
 
-	AC_ARG_WITH(ffmpeg-mp3lame,
-      [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
-
-    AC_ARG_WITH(ffmpeg-faac,
-      [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
-
-    AC_ARG_WITH(ffmpeg-dts,
-      [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
-
-    AC_ARG_WITH(ffmpeg-zlib,
-      [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
-      [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
 
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
         if test "${enable_sout}" != "no"; then
