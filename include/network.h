@@ -552,7 +552,7 @@ static inline int net_GetSockAddress( int fd, char *address, int *port )
     struct sockaddr_storage addr;
     socklen_t addrlen = sizeof( addr );
 
-    return getpeername( fd, (struct sockaddr *)&addr, &addrlen )
+    return getsockname( fd, (struct sockaddr *)&addr, &addrlen )
         || vlc_getnameinfo( (struct sockaddr *)&addr, addrlen, address,
                             NI_MAXNUMERICHOST, port, NI_NUMERICHOST )
         ? VLC_EGENERIC : 0;
