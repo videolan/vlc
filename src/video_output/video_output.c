@@ -298,6 +298,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
+    var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
     /* Initialize subpicture unit */
     p_vout->p_spu = spu_Create( p_vout );
     spu_Attach( p_vout->p_spu, p_parent, VLC_TRUE );
