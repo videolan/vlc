@@ -135,9 +135,6 @@ int ProbeFormat( aout_instance_t * p_aout, const char * psz_device,
 
     /* Now test linear PCM capabilities */
 
-    gettimeofday( &tval, NULL );
-    msg_Err( p_aout, "Time before open: %i", tval.tv_usec );
-
     /* Since it seems snd_pcm_close hasen't really released the device at
        the time it returns, probe if the device is available in loop for 1s.
        We cannot use blocking mode since the we would wait indefinitely when
