@@ -107,12 +107,12 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT,
                 EMAIL_LONGTEXT, VLC_TRUE );
 
-    add_integer( SOUT_CFG_PREFIX "port-audio", 1234, NULL, PORT_AUDIO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, PORT_TEXT,
                  PORT_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "port-video", 1236, NULL, PORT_VIDEO_TEXT,
-                 PORT_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "port", 1238, NULL, PORT_TEXT,
-                 PORT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "port-audio", 1230, NULL, PORT_AUDIO_TEXT,
+                 PORT_AUDIO_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "port-video", 1232, NULL, PORT_VIDEO_TEXT,
+                 PORT_VIDEO_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
                  TTL_LONGTEXT, VLC_TRUE );
@@ -1353,7 +1353,7 @@ static int HttpSetup( sout_stream_t *p_stream, vlc_url_t *url)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host, url->i_port );
+    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host, url->i_port > 0 ? url->i_port : 80 );
     if( p_sys->p_httpd_host )
     {
         p_sys->p_httpd_file = httpd_FileNew( p_sys->p_httpd_host,
