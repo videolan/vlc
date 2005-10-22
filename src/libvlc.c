@@ -2447,6 +2447,9 @@ static void ShowConsole( void )
 
     AllocConsole();
 
+    freopen( "CONOUT$", "w", stderr );
+    freopen( "CONIN$", "r", stdin );
+
     if( (f_help = fopen( "vlc-help.txt", "wt" )) )
     {
         fclose( f_help );
@@ -2455,9 +2458,6 @@ static void ShowConsole( void )
     }
 
     else freopen( "CONOUT$", "w", stdout );
-
-    freopen( "CONOUT$", "w", stderr );
-    freopen( "CONIN$", "r", stdin );
 
 #   endif
 }
