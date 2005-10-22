@@ -298,9 +298,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
-    var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     /* Initialize subpicture unit */
     p_vout->p_spu = spu_Create( p_vout );
     spu_Attach( p_vout->p_spu, p_parent, VLC_TRUE );
@@ -644,9 +641,8 @@ static int InitThread( vout_thread_t *p_vout )
     AspectRatio( p_vout->fmt_out.i_aspect, &i_aspect_x, &i_aspect_y );
 
     msg_Dbg( p_vout, "picture out %ix%i, chroma %4.4s, ar %i:%i, sar %i:%i",
-             p_vout->output.i_width, p_vout->output.i_height,
-             (char*)&p_vout->output.i_chroma,
-             i_aspect_x, i_aspect_y,
+             p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
+             (char*)&p_vout->fmt_out.i_chroma, i_aspect_x, i_aspect_y,
              p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den );
 
     /* Calculate shifts from system-updated masks */
