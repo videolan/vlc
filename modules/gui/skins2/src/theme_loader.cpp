@@ -98,7 +98,7 @@ bool ThemeLoader::load( const string &fileName )
     {
         config_PutPsz( getIntf(), "skins2-last", fileName.c_str() );
         // Show the windows
-        pNewTheme->getWindowManager().showAll();
+        pNewTheme->getWindowManager().showAll( true );
     }
     if( skin_last ) free( skin_last );
 

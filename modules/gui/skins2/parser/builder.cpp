@@ -186,8 +186,9 @@ void Builder::addWindow( const BuilderData::Window &rData )
 {
     TopWindow *pWin =
         new TopWindow( getIntf(), rData.m_xPos, rData.m_yPos,
-                           m_pTheme->getWindowManager(),
-                           rData.m_dragDrop, rData.m_playOnDrop );
+                       m_pTheme->getWindowManager(),
+                       rData.m_dragDrop, rData.m_playOnDrop,
+                       rData.m_visible );
 
     m_pTheme->m_windows[rData.m_id] = TopWindowPtr( pWin );
 }

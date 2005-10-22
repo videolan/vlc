@@ -51,7 +51,7 @@ void Theme::loadConfig()
     if( !strcmp( save, "" ) )
     {
         // Show the windows
-        m_windowManager.showAll();
+        m_windowManager.showAll( true );
         return;
     }
 

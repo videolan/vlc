@@ -49,12 +49,11 @@
 
 TopWindow::TopWindow( intf_thread_t *pIntf, int left, int top,
                       WindowManager &rWindowManager,
-                      bool dragDrop, bool playOnDrop ):
-    GenericWindow( pIntf, left, top, dragDrop, playOnDrop,
-                   NULL),
-    m_rWindowManager( rWindowManager ), m_pActiveLayout( NULL ),
-    m_pLastHitControl( NULL ), m_pCapturingControl( NULL ),
-    m_pFocusControl( NULL ), m_currModifier( 0 )
+                      bool dragDrop, bool playOnDrop, bool visible ):
+    GenericWindow( pIntf, left, top, dragDrop, playOnDrop, NULL ),
+    m_visible( visible ), m_rWindowManager( rWindowManager ),
+    m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
+    m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_currModifier( 0 )
 {
     // Register as a moving window
     m_rWindowManager.registerWindow( *this );

@@ -71,7 +71,7 @@ class WindowManager: public SkinObject
         void raiseAll() const;
 
         /// Show all the registered windows
-        void showAll() const;
+        void showAll(bool firstTime = false) const;
 
         /// Hide all the registered windows
         void hideAll() const;

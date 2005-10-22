@@ -195,13 +195,18 @@ void WindowManager::raiseAll() const
 }
 
 
-void WindowManager::showAll() const
+void WindowManager::showAll( bool firstTime ) const
 {
     // Show all the windows
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        (*it)->show();
+        // When the theme is opened for the first time,
+        // only show the window if set as visible in the XML
+        if ((*it)->isVisible() || !firstTime)
+        {
+            (*it)->show();
+        }
         (*it)->setOpacity( m_alpha );
     }
 }
