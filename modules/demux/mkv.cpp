@@ -99,8 +99,11 @@ extern "C" {
 #   include <zlib.h>
 #endif
 
-#define MATROSKA_COMPRESSION_NONE 0
-#define MATROSKA_COMPRESSION_ZLIB 1
+#define MATROSKA_COMPRESSION_NONE  -1
+#define MATROSKA_COMPRESSION_ZLIB   0
+#define MATROSKA_COMPRESSION_BLIB   1
+#define MATROSKA_COMPRESSION_LZOX   2
+#define MATROSKA_COMPRESSION_HEADER 3
 
 #define MKVD_TIMECODESCALE 1000000
 
@@ -600,7 +603,8 @@ typedef struct
     char         *psz_codec_download_url;
     
     /* encryption/compression */
-    int           i_compression_type;
+    int                    i_compression_type;
+    KaxContentCompSettings *p_compression_data;
 
 } mkv_track_t;
 
@@ -1028,6 +1032,10 @@ public:
     {
         for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
         {
+            if ( tracks[i_track]->p_compression_data )
+            {
+                delete tracks[i_track]->p_compression_data;
+            }
             if( tracks[i_track]->fmt.psz_description )
             {
                 free( tracks[i_track]->fmt.psz_description );
@@ -1833,11 +1841,11 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, int64_t *pi_ref1, int64
     }
 }
 
-static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem)
+static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, int i_mem, size_t offset)
 {
     block_t *p_block;
-    if( !(p_block = block_New( p_demux, i_mem ) ) ) return NULL;
-    memcpy( p_block->p_buffer, p_mem, i_mem );
+    if( !(p_block = block_New( p_demux, i_mem + offset ) ) ) return NULL;
+    memcpy( p_block->p_buffer + offset, p_mem, i_mem );
     //p_block->i_rate = p_input->stream.control.i_rate;
     return p_block;
 }
@@ -1904,7 +1912,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         block_t *p_init;
 
         msg_Dbg( p_demux, "sending header (%d bytes)", tk->i_data_init );
-        p_init = MemToBlock( p_demux, tk->p_data_init, tk->i_data_init );
+        p_init = MemToBlock( p_demux, tk->p_data_init, tk->i_data_init, 0 );
         if( p_init ) es_out_Send( p_demux->out, tk->p_es, p_init );
     }
     tk->b_inited = VLC_TRUE;
@@ -1931,7 +1939,10 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #endif
         data = &block->GetBuffer(i);
 
-        p_block = MemToBlock( p_demux, data->Buffer(), data->Size() );
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER && tk->p_compression_data != NULL )
+            p_block = MemToBlock( p_demux, data->Buffer(), data->Size(), tk->p_compression_data->GetSize() );
+        else
+            p_block = MemToBlock( p_demux, data->Buffer(), data->Size(), 0 );
 
         if( p_block == NULL )
         {
@@ -1939,11 +1950,16 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 
 #if defined(HAVE_ZLIB_H)
-        if( tk->i_compression_type )
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_ZLIB )
         {
             p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
         }
+        else
 #endif
+        if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER )
+        {
+            memcpy( p_block->p_buffer, tk->p_compression_data->GetBuffer(), tk->p_compression_data->GetSize() );
+        }
 
         if ( tk->fmt.i_cat == NAV_ES )
         {
@@ -1984,7 +2000,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
         tk->i_last_dts = p_block->i_dts;
 
-#if 1
+#if 0
 msg_Dbg( p_demux, "block i_dts: "I64Fd" / i_pts: "I64Fd, p_block->i_dts, p_block->i_pts);
 #endif
         if( strcmp( tk->psz_codec, "S_VOBSUB" ) )
@@ -4006,6 +4022,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->psz_codec_download_url = NULL;
     
     tk->i_compression_type = MATROSKA_COMPRESSION_NONE;
+    tk->p_compression_data = NULL;
 
     for( i = 0; i < m->ListSize(); i++ )
     {
@@ -4185,10 +4202,11 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                                 {
                                     KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
                                     MkvTree( sys.demuxer, 6, "Compression Algorithm: %i", uint32(compalg) );
-                                    if( uint32( compalg ) == 0 )
-                                    {
-                                        tk->i_compression_type = MATROSKA_COMPRESSION_ZLIB;
-                                    }
+                                    tk->i_compression_type = uint32( compalg );
+                                }
+                                else if( MKV_IS_ID( l4, KaxContentCompSettings ) )
+                                {
+                                    tk->p_compression_data = new KaxContentCompSettings( *(KaxContentCompSettings*)l4 );
                                 }
                                 else
                                 {
