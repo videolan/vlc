@@ -43,9 +43,6 @@
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
 
-/* Time to sleep between to attempts to open the device */
-#define SLEEP_TIME 100000
-
 /*****************************************************************************
  * aout_sys_t: ALSA audio output method descriptor
  *****************************************************************************
@@ -112,82 +109,9 @@ vlc_module_begin();
         change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") );
 
-
-
     set_capability( "audio output", 150 );
     set_callbacks( Open, Close );
 vlc_module_end();
-
-
-/*****************************************************************************
- * ProbeFormat: probe the audio device for available formats
- *****************************************************************************/
-int ProbeFormat( aout_instance_t * p_aout, const char * psz_device,
-                          int *pi_snd_pcm_format )
-{
-    int i_ret, i;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    struct timeval tval;
-
-    /* We'll open the audio device in non blocking mode so we can just exit
-     * when it is already in use, but for the real stuff we'll still use
-     * the blocking mode */
-
-    /* Now test linear PCM capabilities */
-
-    /* Since it seems snd_pcm_close hasen't really released the device at
-       the time it returns, probe if the device is available in loop for 1s.
-       We cannot use blocking mode since the we would wait indefinitely when
-       switching from a dmx device to surround51. */
-
-    for( i = 10; i >= 0; i-- )
-    {
-        if ( !(i_ret = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
-                                 SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK) ) )
-        {
-            snd_pcm_hw_params_t * p_hw;
-            snd_pcm_hw_params_alloca (&p_hw);
-
-            if ( snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw ) < 0 )
-            {
-                msg_Warn( p_aout, "unable to retrieve initial hardware"
-                                "parameters, disabling linear PCM audio" );
-                snd_pcm_close( p_sys->p_snd_pcm );
-                var_Destroy( p_aout, "audio-device" );
-                return -1;
-            }
-
-            if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                           *pi_snd_pcm_format ) < 0 )
-            {
-                if( *pi_snd_pcm_format != SND_PCM_FORMAT_S16 )
-                {
-                    *pi_snd_pcm_format = SND_PCM_FORMAT_S16;
-                    if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                                   *pi_snd_pcm_format ) < 0 )
-                    {
-                        msg_Warn( p_aout, "unable to set stream sample size"
-                                "and word order, disabling linear PCM audio" );
-                        snd_pcm_close( p_sys->p_snd_pcm );
-                        var_Destroy( p_aout, "audio-device" );
-                        return -1;
-                    }
-                }
-            }
-            snd_pcm_close( p_sys->p_snd_pcm );
-            return 0;
-        }
-        else if ( i_ret == -EBUSY && i == 0 )
-        {
-            msg_Err( p_aout, "audio device: %s is already in use", psz_device );
-        }
-        else if ( i_ret == -EBUSY )
-        {
-            msleep( SLEEP_TIME );
-        }
-    }
-    return -1;
-}
 
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
@@ -226,23 +150,26 @@ static void Probe( aout_instance_t * p_aout,
             return;
         }
 
-/*        if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
+        if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
                                            *pi_snd_pcm_format ) < 0 )
         {
+            int i_snd_rc = -1;
+
             if( *pi_snd_pcm_format != SND_PCM_FORMAT_S16 )
             {
                 *pi_snd_pcm_format = SND_PCM_FORMAT_S16;
-                if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                                   *pi_snd_pcm_format ) < 0 )
-                {
-                    msg_Warn( p_aout, "unable to set stream sample size and "
-                              "word order, disabling linear PCM audio" );
-                    snd_pcm_close( p_sys->p_snd_pcm );
-                    var_Destroy( p_aout, "audio-device" );
-                    return;
-                }
+                i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm,
+                                                    p_hw, *pi_snd_pcm_format );
             }
-        }*/
+            if ( i_snd_rc < 0 )
+            {
+                msg_Warn( p_aout, "unable to set stream sample size and "
+                          "word order, disabling linear PCM audio" );
+                snd_pcm_close( p_sys->p_snd_pcm );
+                var_Destroy( p_aout, "audio-device" );
+                return;
+            }
+        }
 
         i_channels = aout_FormatNbChannels( &p_aout->output.output );
 
@@ -359,7 +286,6 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     vlc_value_t val;
-    vlc_bool_t b_spdif = 0;
 
     char psz_default_iec_device[128]; /* Buffer used to store the default
                                          S/PDIF device */
@@ -453,11 +379,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( val.i_int == AOUT_VAR_SPDIF )
-    {
-        b_spdif = 1;
-    }
-    else if ( val.i_int == AOUT_VAR_5_1 )
+    p_aout->output.output.i_format = i_vlc_pcm_format;
+    if ( val.i_int == AOUT_VAR_5_1 )
     {
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
@@ -483,7 +406,6 @@ static int Open( vlc_object_t *p_this )
     {
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
     }
-
     else
     {
         /* This should not happen ! */
@@ -493,38 +415,12 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Now that we know the device we will open, probe for available formats
-       on that specific one */
-    if ( ProbeFormat( p_aout, psz_device, &i_snd_pcm_format ) )
-    {
-        free( p_sys );
-        free( psz_device );
-        return VLC_EGENERIC;
-    }
-    switch( i_snd_pcm_format )
-    {
-    case SND_PCM_FORMAT_FLOAT:
-        i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
-        break;
-    case SND_PCM_FORMAT_S16:
-        i_vlc_pcm_format = AOUT_FMT_S16_NE;
-        break;
-    }
-    if( b_spdif )
-    {
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
-    }
-    else
-    {
-        p_aout->output.output.i_format = i_vlc_pcm_format;
-    }
-
 #ifdef ALSA_DEBUG
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
 #endif
 
     /* Open the device */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    if ( val.i_int == AOUT_VAR_SPDIF )
     {
         if ( ( i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
                             SND_PCM_STREAM_PLAYBACK, 0 ) ) < 0 )
@@ -539,6 +435,7 @@ static int Open( vlc_object_t *p_this )
         i_snd_pcm_format = SND_PCM_FORMAT_S16;
         i_channels = 2;
 
+        i_vlc_pcm_format = VLC_FOURCC('s','p','d','i');
         p_aout->output.i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
@@ -547,10 +444,28 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
+        int i;
+
         msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
 
-        if ( ( i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
-                            SND_PCM_STREAM_PLAYBACK, 0 ) ) < 0 )
+        /* Since it seems snd_pcm_close hasen't really released the device at
+          the time it returns, probe if the device is available in loop for 1s.
+          We cannot use blocking mode since the we would wait indefinitely when
+          switching from a dmx device to surround51. */
+
+        for( i = 10; i >= 0; i-- )
+        {
+            if ( ( i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
+                   SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK ) ) == -EBUSY )
+            {
+                if( i ) msleep( 100000 /* 100ms */ );
+                else msg_Err( p_aout, "audio device: %s is already in use",
+                              psz_device );
+                continue;
+            }
+            break;
+        }
+        if( i_snd_rc < 0 )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_device, snd_strerror( i_snd_rc ) );
@@ -558,6 +473,10 @@ static int Open( vlc_object_t *p_this )
             free( psz_device );
             return VLC_EGENERIC;
         }
+
+        /* We want blocking mode */
+        snd_pcm_nonblock( p_sys->p_snd_pcm, 0 );
+
         i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
         i_channels = aout_FormatNbChannels( &p_aout->output.output );
 
@@ -586,10 +505,30 @@ static int Open( vlc_object_t *p_this )
     if ( ( i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
                                                     i_snd_pcm_format ) ) < 0 )
     {
-        msg_Err( p_aout, "unable to set stream sample size and word order (%s)",
-                         snd_strerror( i_snd_rc ) );
-        goto error;
+        if( i_snd_pcm_format != SND_PCM_FORMAT_S16 )
+        {
+            i_snd_pcm_format = SND_PCM_FORMAT_S16;
+            i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm,
+                                                     p_hw, i_snd_pcm_format );
+        }
+        if ( i_snd_rc < 0 )
+        {
+            msg_Err( p_aout, "unable to set stream sample size and "
+                     "word order (%s)", snd_strerror( i_snd_rc ) );
+            goto error;
+        }
     }
+    if( i_vlc_pcm_format != VLC_FOURCC('s','p','d','i') )
+    switch( i_snd_pcm_format )
+    {
+    case SND_PCM_FORMAT_FLOAT:
+        i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
+        break;
+    case SND_PCM_FORMAT_S16:
+        i_vlc_pcm_format = AOUT_FMT_S16_NE;
+        break;
+    }
+    p_aout->output.output.i_format = i_vlc_pcm_format;
 
     if ( ( i_snd_rc = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
                                     SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
@@ -746,6 +685,7 @@ static void Close( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int i_snd_rc;
+
     /* make sure the audio output thread is waken up */
     vlc_mutex_lock( &p_aout->output.p_sys->lock );
     vlc_cond_signal( &p_aout->output.p_sys->wait );
@@ -1039,4 +979,3 @@ static void GetDevices( module_config_t *p_item )
         }
     }
 }
-
