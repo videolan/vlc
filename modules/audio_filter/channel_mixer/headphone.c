@@ -344,17 +344,21 @@ static int Create( vlc_object_t *p_this )
     vlc_bool_t b_fit = VLC_TRUE;
 
     /* Activate this filter only with stereo devices */
-    if ( p_filter->output.i_physical_channels != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
-          || p_filter->output.i_physical_channels
-                != ( p_filter->output.i_original_channels & AOUT_CHAN_PHYSMASK )
-          || p_filter->input.i_physical_channels
-                != ( p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK ) )
+    if ( p_filter->output.i_physical_channels
+            != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
     {
         msg_Dbg( p_filter, "Filter discarded (incompatible format)" );
         return VLC_EGENERIC;
     }
 
     /* Request a specific format if not already compatible */
+    if ( p_filter->input.i_original_channels
+            != p_filter->output.i_original_channels )
+    {
+        b_fit = VLC_FALSE;
+        p_filter->input.i_original_channels =
+                                        p_filter->output.i_original_channels;
+    }
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
           || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
@@ -376,7 +380,6 @@ static int Create( vlc_object_t *p_this )
                                               AOUT_CHAN_CENTER |
                                               AOUT_CHAN_REARLEFT |
                                               AOUT_CHAN_REARRIGHT;
-        p_filter->input.i_original_channels = p_filter->input.i_physical_channels;
     }
     if ( ! b_fit )
     {
