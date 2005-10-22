@@ -58,6 +58,13 @@
 #   endif
 #endif
 
+#if defined( WIN32 )
+/* We need HUGE buffer otherwise TCP throughput is very limited */
+#define HTTPD_CL_BUFSIZE 1000000
+#else
+#define HTTPD_CL_BUFSIZE 10000
+#endif
+
 #if 0
 typedef struct httpd_t          httpd_t;
 
@@ -854,9 +861,9 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 
         i_pos   = answer->i_body_offset % stream->i_buffer_size;
         i_write = stream->i_buffer_pos - answer->i_body_offset;
-        if( i_write > 1000000 )
+        if( i_write > HTTPD_CL_BUFSIZE )
         {
-            i_write = 1000000;
+            i_write = HTTPD_CL_BUFSIZE;
         }
         else if( i_write <= 0 )
         {
@@ -1485,7 +1492,7 @@ static void httpd_ClientInit( httpd_client_t *cl )
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = mdate();
     cl->i_activity_timeout = I64C(10000000);
-    cl->i_buffer_size = 1000000;
+    cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
     cl->p_buffer = malloc( cl->i_buffer_size );
     cl->i_mode   = HTTPD_CLIENT_FILE;
