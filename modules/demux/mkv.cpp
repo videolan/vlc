@@ -3993,13 +3993,13 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 {
     size_t i, j, k, n;
+    bool bSupported = true;
 
     mkv_track_t *tk;
 
     msg_Dbg( &sys.demuxer, "|   |   + Track Entry" );
 
     tk = new mkv_track_t();
-    tracks.push_back( tk );
 
     /* Init the track */
     memset( tk, 0, sizeof( mkv_track_t ) );
@@ -4172,6 +4172,11 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             EbmlMaster *cencs = static_cast<EbmlMaster*>(l);
             MkvTree( sys.demuxer, 3, "Content Encodings" );
+            if ( cencs->ListSize() > 1 )
+            {
+                msg_Err( &sys.demuxer, "Multiple Compression method not supported" );
+                bSupported = false;
+            }
             for( j = 0; j < cencs->ListSize(); j++ )
             {
                 EbmlElement *l2 = (*cencs)[j];
@@ -4209,6 +4214,12 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                                     KaxContentCompAlgo &compalg = *(KaxContentCompAlgo*)l4;
                                     MkvTree( sys.demuxer, 6, "Compression Algorithm: %i", uint32(compalg) );
                                     tk->i_compression_type = uint32( compalg );
+                                    if ( ( tk->i_compression_type != MATROSKA_COMPRESSION_ZLIB ) && 
+                                         ( tk->i_compression_type != MATROSKA_COMPRESSION_HEADER ) )
+                                    {
+                                        msg_Err( &sys.demuxer, "Track Compression method %d not supported", tk->i_compression_type );
+                                        bSupported = false;
+                                    }
                                 }
                                 else if( MKV_IS_ID( l4, KaxContentCompSettings ) )
                                 {
@@ -4400,6 +4411,16 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)",
                      typeid(*l).name() );
         }
+    }
+
+    if ( bSupported )
+    {
+        tracks.push_back( tk );
+    }
+    else
+    {
+        msg_Err( &sys.demuxer, "Track Entry %d not supported", tk->i_number );
+        delete tk;
     }
 }
 
@@ -5239,6 +5260,11 @@ bool matroska_segment_c::Preload( )
         else if( MKV_IS_ID( el, KaxTracks ) )
         {
             ParseTracks( static_cast<KaxTracks*>( el ) );
+            if ( tracks.size() == 0 )
+            {
+                msg_Err( &sys.demuxer, "No tracks supported" );
+                return false;
+            }
         }
         else if( MKV_IS_ID( el, KaxSeekHead ) )
         {
