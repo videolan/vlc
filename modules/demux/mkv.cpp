@@ -2357,6 +2357,12 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             ((uint8_t*)tracks[i_track]->fmt.p_extra)[0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
             ((uint8_t*)tracks[i_track]->fmt.p_extra)[1] = ((i_srate & 0x1) << 7) | (tracks[i_track]->fmt.audio.i_channels << 3);
         }
+        else if( !strcmp( tracks[i_track]->psz_codec, "A_AAC" ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
+            tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
+        }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_PCM/INT/BIG" ) ||
                  !strcmp( tracks[i_track]->psz_codec, "A_PCM/INT/LIT" ) ||
                  !strcmp( tracks[i_track]->psz_codec, "A_PCM/FLOAT/IEEE" ) )
