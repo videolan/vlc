@@ -327,50 +327,6 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
         }
-        else if( i_action == ACTIONID_SUBDELAY_DOWN )
-        {
-            int64_t i_delay = var_GetTime( p_input, "spu-delay" );
-
-            i_delay -= 50000;    /* 50 ms */
-
-            var_SetTime( p_input, "spu-delay", i_delay );
-            ClearChannels( p_intf, p_vout );
-            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
-                                 (int)(i_delay/1000) );
-        }
-        else if( i_action == ACTIONID_SUBDELAY_UP )
-        {
-            int64_t i_delay = var_GetTime( p_input, "spu-delay" );
-
-            i_delay += 50000;    /* 50 ms */
-
-            var_SetTime( p_input, "spu-delay", i_delay );
-            ClearChannels( p_intf, p_vout );
-            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
-                                 (int)(i_delay/1000) );
-        }
-        else if( i_action == ACTIONID_AUDIODELAY_DOWN )
-        {
-            int64_t i_delay = var_GetTime( p_input, "audio-delay" );
-
-            i_delay -= 50000;    /* 50 ms */
-
-            var_SetTime( p_input, "audio-delay", i_delay );
-            ClearChannels( p_intf, p_vout );
-            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
-                                 (int)(i_delay/1000) );
-        }
-        else if( i_action == ACTIONID_AUDIODELAY_UP )
-        {
-            int64_t i_delay = var_GetTime( p_input, "audio-delay" );
-
-            i_delay += 50000;    /* 50 ms */
-
-            var_SetTime( p_input, "audio-delay", i_delay );
-            ClearChannels( p_intf, p_vout );
-            vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
-                                 (int)(i_delay/1000) );
-        }
         else if( i_action == ACTIONID_FULLSCREEN )
         {
             if( p_vout )
@@ -389,31 +345,6 @@ static void Run( intf_thread_t *p_intf )
                     vlc_object_release( p_playlist );
                 }
             }
-        }
-        else if( i_action == ACTIONID_PLAY )
-        {
-            p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-            if( p_playlist )
-            {
-                var_Get( p_input, "rate", &val );
-                msg_Dbg( p_input, "rate %d", val.i_int );
-                if( val.i_int != INPUT_RATE_DEFAULT )
-                {
-                    /* Return to normal speed */
-                    val.i_int = INPUT_RATE_DEFAULT;
-                    var_Set( p_input, "rate", val );
-                }
-                else
-                {
-                    ClearChannels( p_intf, p_vout );
-                    vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
-                                  OSD_PAUSE_ICON );
-                    playlist_Play( p_playlist );
-                }
-                vlc_object_release( p_playlist );
-            }
-
         }
         else if( i_action == ACTIONID_PLAY_PAUSE )
         {
@@ -674,6 +605,74 @@ static void Run( intf_thread_t *p_intf )
             {
                 val.b_bool = VLC_TRUE;
                 var_Set( p_input, "next-chapter", val );
+            }
+            else if( i_action == ACTIONID_SUBDELAY_DOWN )
+            {
+                int64_t i_delay = var_GetTime( p_input, "spu-delay" );
+
+                i_delay -= 50000;    /* 50 ms */
+
+                var_SetTime( p_input, "spu-delay", i_delay );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
+                                 (int)(i_delay/1000) );
+            }
+            else if( i_action == ACTIONID_SUBDELAY_UP )
+            {
+                int64_t i_delay = var_GetTime( p_input, "spu-delay" );
+
+                i_delay += 50000;    /* 50 ms */
+
+                var_SetTime( p_input, "spu-delay", i_delay );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
+                                 (int)(i_delay/1000) );
+            }
+            else if( i_action == ACTIONID_AUDIODELAY_DOWN )
+            {
+                int64_t i_delay = var_GetTime( p_input, "audio-delay" );
+
+                i_delay -= 50000;    /* 50 ms */
+
+                var_SetTime( p_input, "audio-delay", i_delay );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
+                                 (int)(i_delay/1000) );
+            }
+            else if( i_action == ACTIONID_AUDIODELAY_UP )
+            {
+                int64_t i_delay = var_GetTime( p_input, "audio-delay" );
+
+                i_delay += 50000;    /* 50 ms */
+
+                var_SetTime( p_input, "audio-delay", i_delay );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN, "Audio delay %i ms",
+                                 (int)(i_delay/1000) );
+            }
+            else if( i_action == ACTIONID_PLAY )
+            {
+                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+                if( p_playlist )
+                {
+                    var_Get( p_input, "rate", &val );
+                    msg_Dbg( p_input, "rate %d", val.i_int );
+                    if( val.i_int != INPUT_RATE_DEFAULT )
+                    {
+                        /* Return to normal speed */
+                        val.i_int = INPUT_RATE_DEFAULT;
+                        var_Set( p_input, "rate", val );
+                    }
+                    else
+                    {
+                        ClearChannels( p_intf, p_vout );
+                        vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
+                                      OSD_PAUSE_ICON );
+                        playlist_Play( p_playlist );
+                    }
+                    vlc_object_release( p_playlist );
+                }
             }
         }
     }
