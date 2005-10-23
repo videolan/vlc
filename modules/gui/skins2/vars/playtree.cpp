@@ -29,8 +29,7 @@
 #include "charset.h"
 
 
-Playtree::Playtree( intf_thread_t *pIntf )
-         :VarTree( pIntf, /*m_parent = */NULL )
+Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
 {
     // Get the VLC playlist object
     m_pPlaylist = pIntf->p_sys->p_playlist;
@@ -95,19 +94,38 @@ void Playtree::onChange()
     notify();
 }
 
-void Playtree::buildNode( playlist_item_t *p_node, VarTree &m_pNode )
+void Playtree::onUpdate( int id )
 {
-    for( int i = 0; i < p_node->i_children; i++ )
+    Iterator it = findById( id );
+    if( it != end() )
     {
-        UString *pName = new UString( getIntf(), p_node->pp_children[i]->input.psz_name );
-        m_pNode.add( UStringPtr( pName ),
+        // Update the item
+        playlist_item_t* pNode = (playlist_item_t*)(it->m_pData);
+        UString *pName = new UString( getIntf(), pNode->input.psz_name );
+        it->m_cString = UStringPtr( pName );
+        it->m_playing = m_pPlaylist->status.p_item == pNode;
+    }
+    else
+    {
+        msg_Warn(getIntf(), "Cannot find node with id %d", id );
+    }
+    // TODO update only the right node
+    notify();
+}
+
+void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
+{
+    for( int i = 0; i < pNode->i_children; i++ )
+    {
+        UString *pName = new UString( getIntf(),
+                                      pNode->pp_children[i]->input.psz_name );
+        rTree.add( pNode->pp_children[i]->input.i_id, UStringPtr( pName ),
                      false,
-                     m_pPlaylist->status.p_item == p_node->pp_children[i],
-                     true,
-                     p_node->pp_children[i] );
-        if( p_node->pp_children[i]->i_children )
+                     m_pPlaylist->status.p_item == pNode->pp_children[i],
+                     true, pNode->pp_children[i] );
+        if( pNode->pp_children[i]->i_children )
         {
-            buildNode( p_node->pp_children[i], m_pNode.back() );
+            buildNode( pNode->pp_children[i], rTree.back() );
         }
     }
 }
@@ -133,3 +151,4 @@ void Playtree::buildTree()
     vlc_mutex_unlock( &m_pPlaylist->object_lock );
     checkParents( NULL );
 }
+

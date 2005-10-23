@@ -35,18 +35,20 @@
 class VarTree: public Variable, public Subject<VarTree>
 {
     public:
-        VarTree( intf_thread_t *pIntf, VarTree *pParent );
+        VarTree( intf_thread_t *pIntf );
+
+        VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
+                 const UStringPtr &rcString, bool selected, bool playing,
+                 bool expanded, void *pData );
+
         virtual ~VarTree();
 
         /// Get the variable type
         virtual const string &getType() const { return m_type; }
 
         /// Add a pointer on string in the children's list
-        virtual void add( const UStringPtr &rcString,
-                          bool selected = true,
-                          bool playing = true,
-                          bool expanded = true,
-                          void *pData = NULL );
+        virtual void add( int id, const UStringPtr &rcString, bool selected,
+                          bool playing, bool expanded, void *pData );
 
         /// Remove the selected item from the children's list
         virtual void delSelected();
@@ -54,6 +56,8 @@ class VarTree: public Variable, public Subject<VarTree>
         /// Remove all elements from the children's list
         virtual void clear();
 
+        /// FIXME should be private
+        int m_id;
         UStringPtr m_cString;
         bool m_selected;
         bool m_playing;
@@ -126,9 +130,10 @@ class VarTree: public Variable, public Subject<VarTree>
         /// Given an iterator to a visible item, return the next visible item
         Iterator getNextVisibleItem( Iterator it );
 
-    private:
-//        intf_thread_t *pIntf;
+        /// Find a children node with the given id
+        Iterator findById( int id );
 
+    private:
         /// List of children
         list<VarTree> m_children;
 

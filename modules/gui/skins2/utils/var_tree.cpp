@@ -26,15 +26,22 @@
 
 const string VarTree::m_type = "tree";
 
-VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent )
-    : Variable( pIntf )
+VarTree::VarTree( intf_thread_t *pIntf )
+    : Variable( pIntf ), m_id( 0 ), m_selected( false ), m_playing( false ),
+    m_expanded( true ), m_pData( NULL ), m_pParent( NULL )
 {
-    m_selected = false;
-    m_playing = false;
-    m_expanded = true;
-    m_pData = NULL;
-    m_pParent = pParent;
+    // Create the position variable
+    m_cPosition = VariablePtr( new VarPercent( pIntf ) );
+    getPositionVar().set( 1.0 );
+}
 
+VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
+                  const UStringPtr &rcString, bool selected, bool playing,
+                  bool expanded, void *pData )
+    : Variable( pIntf ), m_id( id ), m_cString( rcString ),
+    m_selected( selected ), m_playing( playing ), m_expanded( expanded ),
+    m_pData( pData ), m_pParent( pParent )
+{
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
     getPositionVar().set( 1.0 );
@@ -45,19 +52,11 @@ VarTree::~VarTree()
 // TODO : check that children are deleted
 }
 
-void VarTree::add( const UStringPtr &rcString,
-                   bool selected,
-                   bool playing,
-                   bool expanded,
-                   void *pData )
+void VarTree::add( int id, const UStringPtr &rcString, bool selected,
+                   bool playing, bool expanded, void *pData )
 {
-    m_children.push_back( VarTree( getIntf(), this ) );
-    back().m_cString = rcString;
-    back().m_selected = selected;
-    back().m_playing = playing;
-    back().m_expanded = expanded;
-    back().m_pData = pData;
-
+    m_children.push_back( VarTree( getIntf(), this, id, rcString, selected,
+                                   playing, expanded, pData ) );
     notify();
 }
 
@@ -203,5 +202,19 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
         }
     }
     return it;
+}
+
+VarTree::Iterator VarTree::findById( int id )
+{
+    for (Iterator it = begin(); it != end(); ++it )
+    {
+        if( it->m_id == id )
+        {
+            return it;
+        }
+        Iterator result = it->findById( id );
+        if( result != it->end() ) return result;
+    }
+    return end();
 }
 

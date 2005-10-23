@@ -42,6 +42,9 @@ class Playtree: public VarTree
         /// Function called to notify playlist changes
         void onChange();
 
+        /// Function called to notify playlist item update
+        void onUpdate( int id );
+
     private:
         /// VLC playlist object
         playlist_t *m_pPlaylist;

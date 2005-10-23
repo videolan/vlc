@@ -31,8 +31,28 @@ class VarText;
 
 /// Command to notify the playlist of a change
 DEFINE_COMMAND( NotifyPlaylist, "notify playlist" )
-/// Command to notify the playtree of a change
-DEFINE_COMMAND( NotifyPlaytree, "notify playtree" )
+
+/// Command to notify the playlist of a change
+DEFINE_COMMAND( PlaytreeChanged, "playtree changed" )
+
+/// Command to notify the playtree of an item update
+class CmdPlaytreeUpdate: public CmdGeneric
+{
+    public:
+        CmdPlaytreeUpdate( intf_thread_t *pIntf, int id ):
+            CmdGeneric( pIntf ), m_id( id ) {}
+        virtual ~CmdPlaytreeUpdate() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playtree update"; }
+
+    private:
+        /// Playlist item ID
+        int m_id;
+};
 
 
 /// Command to set a text variable

@@ -299,12 +299,12 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
     // Create a playlist notify command
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
     // Create a playtree notify command
-    CmdNotifyPlaytree *pCmdTree = new CmdNotifyPlaytree( pThis->getIntf() );
+    CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
-    pQueue->remove( "notify playtree" );
+    pQueue->remove( "playtree changed" );
     pQueue->push( CmdGenericPtr( pCmd ) );
     pQueue->push( CmdGenericPtr( pCmdTree ) );
 
@@ -348,12 +348,13 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     // TODO: selective update
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
     // Create a playtree notify command
-    CmdNotifyPlaytree *pCmdTree = new CmdNotifyPlaytree( pThis->getIntf() );
+    CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
+                                                         newVal.i_int );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
-    pQueue->remove( "notify playtree" );
+    pQueue->remove( "playtree update" );
     pQueue->push( CmdGenericPtr( pCmd ) );
     pQueue->push( CmdGenericPtr( pCmdTree ) );
 
@@ -377,11 +378,11 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     // TODO: selective update
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
     // Create a playtree notify command
-    CmdNotifyPlaytree *pCmdTree = new CmdNotifyPlaytree( pThis->getIntf() );
+    CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
     pQueue->remove( "notify playlist" );
-    pQueue->remove( "notify playtree" );
+    pQueue->remove( "playtree changed" );
     pQueue->push( CmdGenericPtr( pCmd ) );
     pQueue->push( CmdGenericPtr( pCmdTree ) );
 

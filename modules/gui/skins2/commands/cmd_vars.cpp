@@ -35,11 +35,19 @@ void CmdNotifyPlaylist::execute()
     rVar.onChange();
 }
 
-void CmdNotifyPlaytree::execute()
+void CmdPlaytreeChanged::execute()
 {
     // Notify  the playtree variable
     Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
     rVar.onChange();
+}
+
+
+void CmdPlaytreeUpdate::execute()
+{
+    // Notify  the playtree variable
+    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
+    rVar.onUpdate( m_id );
 }
 
 
