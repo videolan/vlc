@@ -188,12 +188,12 @@ static int CreateVout( vlc_object_t *p_this )
 
     p_sys->i_index = 0;
 #ifdef SYS_DARWIN
-    p_sys->i_tex_width  = p_vout->fmt_in.i_visible_width;
-    p_sys->i_tex_height = p_vout->fmt_in.i_visible_height;
+    p_sys->i_tex_width  = p_vout->fmt_in.i_width;
+    p_sys->i_tex_height = p_vout->fmt_in.i_height;
 #else
     /* A texture must have a size aligned on a power of 2 */
-    p_sys->i_tex_width  = GetAlignedSize( p_vout->fmt_in.i_visible_width );
-    p_sys->i_tex_height = GetAlignedSize( p_vout->fmt_in.i_visible_height );
+    p_sys->i_tex_width  = GetAlignedSize( p_vout->fmt_in.i_width );
+    p_sys->i_tex_height = GetAlignedSize( p_vout->fmt_in.i_height );
 #endif
 
     msg_Dbg( p_vout, "Texture size: %dx%d", p_sys->i_tex_width,
@@ -594,8 +594,13 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* glTexCoord works differently with GL_TEXTURE_2D and
        GL_TEXTURE_RECTANGLE_EXT */
+#ifdef SYS_DARWIN
+    f_width = (float)p_vout->fmt_out.i_visible_width;
+    f_height = (float)p_vout->fmt_out.i_visible_height;
+#else
     f_width = (float)p_vout->fmt_out.i_visible_width / p_sys->i_tex_width;
     f_height = (float)p_vout->fmt_out.i_visible_height / p_sys->i_tex_height;
+#endif
 
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call pf_display to force redraw. Currently,
