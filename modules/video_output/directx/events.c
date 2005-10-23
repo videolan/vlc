@@ -649,16 +649,20 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_src.bottom = p_vout->render.i_height;
 
     /* Clip the source image */
-    rect_src_clipped.left = (rect_dest_clipped.left - rect_dest.left) *
-      p_vout->render.i_width / (rect_dest.right - rect_dest.left);
-    rect_src_clipped.right = p_vout->render.i_width -
-      (rect_dest.right - rect_dest_clipped.right) * p_vout->render.i_width /
-      (rect_dest.right - rect_dest.left);
-    rect_src_clipped.top = (rect_dest_clipped.top - rect_dest.top) *
-      p_vout->render.i_height / (rect_dest.bottom - rect_dest.top);
-    rect_src_clipped.bottom = p_vout->render.i_height -
-      (rect_dest.bottom - rect_dest_clipped.bottom) * p_vout->render.i_height /
-      (rect_dest.bottom - rect_dest.top);
+    rect_src_clipped.left = p_vout->fmt_out.i_x_offset +
+      (rect_dest_clipped.left - rect_dest.left) *
+      p_vout->fmt_out.i_visible_width / (rect_dest.right - rect_dest.left);
+    rect_src_clipped.right = p_vout->fmt_out.i_x_offset +
+      p_vout->fmt_out.i_visible_width -
+      (rect_dest.right - rect_dest_clipped.right) *
+      p_vout->fmt_out.i_visible_width / (rect_dest.right - rect_dest.left);
+    rect_src_clipped.top = p_vout->fmt_out.i_y_offset +
+      (rect_dest_clipped.top - rect_dest.top) *
+      p_vout->fmt_out.i_visible_height / (rect_dest.bottom - rect_dest.top);
+    rect_src_clipped.bottom = p_vout->fmt_out.i_y_offset +
+      p_vout->fmt_out.i_visible_height -
+      (rect_dest.bottom - rect_dest_clipped.bottom) *
+      p_vout->fmt_out.i_visible_height / (rect_dest.bottom - rect_dest.top);
 
     /* Apply overlay hardware constraints */
     if( p_vout->p_sys->b_using_overlay )

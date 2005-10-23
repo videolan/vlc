@@ -356,6 +356,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
+    p_vout->fmt_out = p_vout->fmt_in;
 
 #define MAX_DIRECTBUFFERS 1
     /* Right now we use only 1 directbuffer because we don't want the
@@ -413,6 +414,7 @@ static int Init( vout_thread_t *p_vout )
     /* Change the window title bar text */
     PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 
+    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
     return VLC_SUCCESS;
 }
 
@@ -1223,14 +1225,16 @@ int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout )
     RECT            rect_dest = p_vout->p_sys->rect_dest_clipped;
 
     if( !p_vout->p_sys->b_using_overlay ) return VLC_EGENERIC;
+    msg_Err( p_vout, "update overlay");
 
     if( p_vout->p_sys->b_wallpaper )
     {
         int i_x, i_y, i_width, i_height;
 
-        rect_src.left = rect_src.top = 0;
-        rect_src.right = p_vout->render.i_width;
-        rect_src.bottom = p_vout->render.i_height;
+        rect_src.left = p_vout->fmt_out.i_x_offset;
+        rect_src.top = p_vout->fmt_out.i_y_offset;
+        rect_src.right = rect_src.left + p_vout->fmt_out.i_visible_width;
+        rect_src.bottom = rect_src.top + p_vout->fmt_out.i_visible_height;
 
         rect_dest = p_vout->p_sys->rect_display;
         vout_PlacePicture( p_vout, rect_dest.right, rect_dest.bottom,
