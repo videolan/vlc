@@ -865,6 +865,7 @@ live555-$(LIVEDOTCOM_VERSION).tar.gz:
 live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
+	patch -p 0 < Patches/livedotcom-osx.patch
 
 .live: live
 ifeq ($(HOST),ppc-darwin)
