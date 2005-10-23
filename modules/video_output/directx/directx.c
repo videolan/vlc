@@ -357,6 +357,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
     p_vout->fmt_out = p_vout->fmt_in;
+    E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
 
 #define MAX_DIRECTBUFFERS 1
     /* Right now we use only 1 directbuffer because we don't want the
