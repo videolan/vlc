@@ -396,18 +396,27 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         else if( rEvent.getAsString().find( "mouse:left:down" ) !=
                  string::npos )
         {
-            // Unselect any previously selected item
-            for( it = m_rTree.begin(); it != m_rTree.end();
-                 it = m_rTree.getNextVisibleItem( it ) )
-            {
-                it->m_selected = false;
-            }
-            // Select the new item
             it = findItemAtPos(yPos);
-            if( it != m_rTree.end() )
+            if( it->size() && xPos > (it->depth() - 1) * itemImageWidth()
+                && xPos < it->depth() * itemImageWidth() )
             {
-                it->m_selected = true;
-                m_pLastSelected = &*it;
+                // Fold/unfold the item
+                it->m_expanded = !it->m_expanded;
+            }
+            else
+            {
+                // Unselect any previously selected item
+                for( it = m_rTree.begin(); it != m_rTree.end();
+                     it = m_rTree.getNextVisibleItem( it ) )
+                {
+                    it->m_selected = false;
+                }
+                // Select the new item
+                if( it != m_rTree.end() )
+                {
+                    it->m_selected = true;
+                    m_pLastSelected = &*it;
+                }
             }
         }
 
@@ -417,15 +426,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             it = findItemAtPos(yPos);
             if( it != m_rTree.end() )
             {
-                if( it->size() && xPos < it->depth() * itemImageWidth() )
-                {
-                    it->m_expanded = !it->m_expanded;
-                }
-                else
-                {
-                    // Execute the action associated to this item
-                    m_rTree.action( &*it );
-                }
+               // Execute the action associated to this item
+               m_rTree.action( &*it );
             }
         }
 

@@ -88,8 +88,6 @@ void Playtree::action( VarTree *pItem )
 
 void Playtree::onChange()
 {
-    /* FIXME : updateTree could be a nice idea so we don't have to
-     * start from scratch each time the playlist changes */
     buildTree();
     notify();
 }
