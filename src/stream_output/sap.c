@@ -244,11 +244,10 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
     vlc_mutex_lock( &p_sap->object_lock );
 
-    if( p_session->psz_uri == NULL )
+    if( p_session->psz_uri == NULL && p_session->psz_sdp == NULL )
     {
         vlc_mutex_unlock( &p_sap->object_lock );
-        msg_Err( p_sap, "*FIXME* Unexpected NULL URI for SAP announce" );
-        msg_Err( p_sap, "This should not happen. VLC needs fixing." );
+        msg_Err( p_sap, "Trying to create a NULL SAP announce" );
         return VLC_EGENERIC;
     }
 
