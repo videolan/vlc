@@ -19,7 +19,15 @@ diff -ru ffmpeg-orig/configure ffmpeg/configure
    ;;
    --build-suffix=*) BUILDSUF=${opt#--build-suffix=}
    ;;
-@@ -867,6 +867,18 @@
+@@ -473,7 +473,6 @@
+   --disable-audio-oss) audio_oss="no"
+   ;;
+   --disable-audio-beos) audio_beos="no"
+-    extralibs="$extralibs -lbe -lmedia"
+   ;;
+   --disable-dv1394) dv1394="no"
+   ;;                                                                           
+@@ -867,6 +866,18 @@
  ranlib="${cross_prefix}${ranlib}"
  strip="${cross_prefix}${strip}"
  
@@ -38,7 +46,7 @@ diff -ru ffmpeg-orig/configure ffmpeg/configure
  if test -z "$cross_prefix" ; then
  
  # ---
-@@ -985,6 +997,7 @@
+@@ -985,6 +996,7 @@
  EOF
  
  have_lrintf="no"
@@ -46,7 +54,7 @@ diff -ru ffmpeg-orig/configure ffmpeg/configure
  if $cc $CFLAGS $LDFLAGS $extralibs -o $TMPE $TMPC 2> /dev/null ; then
    have_lrintf="yes"
    # allanc@chickenandporn.com: cannot execute cross-compiled
-@@ -993,6 +1006,7 @@
+@@ -993,6 +1005,7 @@
      $TMPE 2> /dev/null > /dev/null || have_lrintf="no"
    fi
  fi
