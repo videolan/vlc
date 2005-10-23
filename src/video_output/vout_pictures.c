@@ -444,19 +444,19 @@ void vout_PlacePicture( vout_thread_t *p_vout,
         *pi_height = __MIN( i_height, p_vout->fmt_in.i_visible_height );
     }
 
-    if( p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num *
+    if( p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
         *pi_height /
         (p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den) >
         *pi_width )
     {
         *pi_height = p_vout->fmt_in.i_visible_height *
-            p_vout->fmt_in.i_sar_den * *pi_width /
+            (int64_t)p_vout->fmt_in.i_sar_den * *pi_width /
             (p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num);
     }
     else
     {
         *pi_width = p_vout->fmt_in.i_visible_width *
-            p_vout->fmt_in.i_sar_num * *pi_height /
+            (int64_t)p_vout->fmt_in.i_sar_num * *pi_height /
             (p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den);
     }
 
