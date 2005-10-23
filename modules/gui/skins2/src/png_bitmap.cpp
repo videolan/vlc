@@ -49,14 +49,24 @@ PngBitmap::PngBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     {
         for( int x = 0; x < m_width; x++ )
         {
-            uint32_t b = *(pData++) = *(pSrc++);
-            uint32_t g = *(pData++) = *(pSrc++);
-            uint32_t r = *(pData++) = *(pSrc++);
-            *pData = *pSrc;
+            uint32_t b = *(pSrc++);
+            uint32_t g = *(pSrc++);
+            uint32_t r = *(pSrc++);
+            uint8_t a = *(pSrc++);
+            *(pData++) = (b * a) >> 8;
+            *(pData++) = (g * a) >> 8;
+            *(pData++) = (r * a) >> 8;
 
             // Transparent pixel ?
-            if( aColor == (r<<16 | g<<8 | b) ) *pData = 0;
-            pData++; pSrc++;
+            if( aColor == (r<<16 | g<<8 | b) )
+            {
+                *pData = 0;
+            }
+            else
+            {
+                *pData = a;
+            }
+            pData++;
         }
         pSrc += pPic->p->i_pitch - m_width * 4;
     }

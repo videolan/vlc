@@ -146,8 +146,6 @@ void CtrlTree::onUpdate( Subject<VarPercent> &rPercent )
 
     int excessItems = m_rTree.visibleItems() - maxItems();
 
-    fprintf( stderr, "Hullo\n");
-
     if( excessItems > 0)
     {
         VarPercent &rVarPos = m_rTree.getPositionVar();
@@ -159,14 +157,11 @@ void CtrlTree::onUpdate( Subject<VarPercent> &rPercent )
     }
     if( m_lastPos != it )
     {
-        fprintf( stderr, "updating\n" );
         // Redraw the control if the position has changed
         m_lastPos = it;
         makeImage();
         notifyLayout();
     }
-    else
-        fprintf( stderr, "not updating\n" );
 }
 
 void CtrlTree::onResize()
