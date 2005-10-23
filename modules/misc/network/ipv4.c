@@ -54,9 +54,7 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
-#   if !defined(INCL_WINSOCK_API_PROTOTYPES)
-#       define close closesocket
-#   endif
+#   define close closesocket
 #   if defined(UNDER_CE)
 #       undef IP_MULTICAST_TTL
 #       define IP_MULTICAST_TTL 3
