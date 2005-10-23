@@ -356,7 +356,7 @@ void SoutDialog::UpdateMRL()
         dup_opts += encapsulation;
         if( i_encapsulation_type == ASF_ENCAPSULATION ) dup_opts += wxT("h");
         dup_opts += wxT(",url=");
-        dup_opts += net_addrs[HTTP_ACCESS_OUT]->GetLineText(0);
+        dup_opts += net_addrs[MMSH_ACCESS_OUT]->GetLineText(0);
         dup_opts += wxString::Format( wxT(":%d"),
                                       net_ports[MMSH_ACCESS_OUT]->GetValue() );
         dup_opts += wxT("}");
