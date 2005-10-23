@@ -1274,14 +1274,14 @@ wizTranscodeExtraPage::wizTranscodeExtraPage( wxWizard *parent,
 
 void wizTranscodeExtraPage::OnSelectFile( wxCommandEvent &event)
 {
-    wxFileDialog *file_dialog =  new wxFileDialog( this, wxU(_("Open File")),
+    wxFileDialog *file_dialog =  new wxFileDialog( this, wxU(_("Save to file")),
                    wxT(""), wxT(""), wxT("*"), wxSAVE );
 
     if( file_dialog && file_dialog->ShowModal() == wxID_OK )
     {
         if( file_dialog->GetFilename().mb_str() )
         {
-            file_text->SetValue( file_dialog->GetFilename() );
+            file_text->SetValue( file_dialog->GetPath() );
         }
     }
 }
