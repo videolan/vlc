@@ -331,7 +331,7 @@ int intf_RunThread (intf_thread_t *);
 xml_t * __xml_Create (vlc_object_t *);
 msg_subscription_t* __msg_Subscribe (vlc_object_t *);
 const char * VLC_Version (void);
-session_descriptor_t* sout_AnnounceRegisterSDP (sout_instance_t *,const char *, announce_method_t*);
+session_descriptor_t* sout_AnnounceRegisterSDP (sout_instance_t *,const char *, const char *, announce_method_t*);
 char * stream_ReadLine (stream_t *);
 int playlist_PreparseEnqueueItem (playlist_t *, playlist_item_t *);
 void __osd_MenuPrev (vlc_object_t *);
@@ -549,7 +549,7 @@ struct module_symbols_t
     sout_stream_t * (*sout_StreamNew_inner) (sout_instance_t *, char *psz_chain);
     void (*sout_StreamDelete_inner) (sout_stream_t *);
     int (*sout_AnnounceRegister_inner) (sout_instance_t *,session_descriptor_t*, announce_method_t*);
-    session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *,const char *, announce_method_t*);
+    session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *,const char *, const char *, announce_method_t*);
     int (*sout_AnnounceUnRegister_inner) (sout_instance_t *,session_descriptor_t*);
     session_descriptor_t* (*sout_AnnounceSessionCreate_inner) (void);
     void (*sout_AnnounceSessionDestroy_inner) (session_descriptor_t *);

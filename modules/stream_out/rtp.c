@@ -1314,6 +1314,7 @@ static int SapSetup( sout_stream_t *p_stream )
     if( ( p_sys->i_es > 0 || p_sys->p_mux ) && p_sys->psz_sdp && *p_sys->psz_sdp )
     {
         p_sys->p_session = sout_AnnounceRegisterSDP( p_sout, p_sys->psz_sdp,
+                                                     p_sys->psz_session_url,
                                                      p_method );
     }
 

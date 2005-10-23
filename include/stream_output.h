@@ -337,7 +337,7 @@ static inline char *sout_cfg_find_value( sout_cfg_t *p_cfg, char *psz_name )
 
 /* Announce system */
 VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,session_descriptor_t*, announce_method_t* ) );
-VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *,const char *, announce_method_t* ) );
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *,const char *, const char *, announce_method_t* ) );
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
 
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (void) );

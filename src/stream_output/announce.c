@@ -83,11 +83,13 @@ int sout_AnnounceRegister( sout_instance_t *p_sout,
  *
  * \param p_sout a sout instance structure
  * \param psz_sdp the SDP to register
+ * \param psz_uri session URI (needed for SAP address auto detection
  * \param p_method an announce method descriptor
  * \return the new session descriptor structure
  */
 session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
-                          const char *psz_sdp, announce_method_t *p_method )
+                          const char *psz_sdp, const char *psz_uri,
+                          announce_method_t *p_method )
 {
     session_descriptor_t *p_session;
     announce_handler_t *p_announce = (announce_handler_t*)
@@ -113,6 +115,7 @@ session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
 
     p_session = sout_AnnounceSessionCreate();
     p_session->psz_sdp = strdup( psz_sdp );
+    p_session->psz_uri = strdup( psz_uri );
     announce_Register( p_announce, p_session, p_method );
 
     vlc_object_release( p_announce );
