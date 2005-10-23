@@ -1,7 +1,7 @@
 diff -ru ffmpeg-orig/configure ffmpeg/configure
---- ffmpeg-orig/configure	2005-02-28 01:05:48.000000000 +0100
-+++ ffmpeg/configure	2005-03-01 21:39:22.000000000 +0100
-@@ -212,7 +212,7 @@
+--- ffmpeg-orig/configure	2005-10-23 16:00:23.000000000 +0200
++++ ffmpeg/configure	2005-10-23 16:05:03.000000000 +0200
+@@ -254,7 +254,7 @@
  2.9-beos-991026*|2.9-beos-000224*) echo "R5/GG gcc"
  mmx="no"
  ;;
@@ -10,16 +10,16 @@ diff -ru ffmpeg-orig/configure ffmpeg/configure
  CFLAGS="$CFLAGS -fno-expensive-optimizations"
  ;;
  esac
-@@ -387,7 +387,7 @@
+@@ -448,7 +448,7 @@
    ;;
    --extra-ldflags=*) LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
    ;;
 -  --extra-libs=*) extralibs=${opt#--extra-libs=}
 +  --extra-libs=*) extralibs="$extralibs ${opt#--extra-libs=}"
    ;;
-   --cpu=*) cpu=`echo $opt | cut -d '=' -f 2`
+   --build-suffix=*) BUILDSUF=${opt#--build-suffix=}
    ;;
-@@ -740,6 +740,18 @@
+@@ -867,6 +867,18 @@
  ranlib="${cross_prefix}${ranlib}"
  strip="${cross_prefix}${strip}"
  
@@ -38,17 +38,15 @@ diff -ru ffmpeg-orig/configure ffmpeg/configure
  if test -z "$cross_prefix" ; then
  
  # ---
-@@ -858,6 +870,9 @@
+@@ -985,6 +997,7 @@
  EOF
  
  have_lrintf="no"
-+# BeOS doesn't have lrintf, make sure it is not enabled when
-+# cross-compiling
 +if test "${cross_prefix}" != "i586-pc-beos-"; then
- if $cc $extralibs -o $TMPE $TMPC 2> /dev/null ; then
+ if $cc $CFLAGS $LDFLAGS $extralibs -o $TMPE $TMPC 2> /dev/null ; then
    have_lrintf="yes"
    # allanc@chickenandporn.com: cannot execute cross-compiled
-@@ -866,6 +881,7 @@
+@@ -993,6 +1006,7 @@
      $TMPE 2> /dev/null > /dev/null || have_lrintf="no"
    fi
  fi
@@ -57,8 +55,8 @@ diff -ru ffmpeg-orig/configure ffmpeg/configure
  _restrict=
  for restrict_keyword in restrict __restrict__ __restrict; do
 diff -ru ffmpeg-orig/libavcodec/eval.c ffmpeg/libavcodec/eval.c
---- ffmpeg-orig/libavcodec/eval.c	2005-01-17 19:25:32.000000000 +0100
-+++ ffmpeg/libavcodec/eval.c	2005-03-01 00:27:04.000000000 +0100
+--- ffmpeg-orig/libavcodec/eval.c	2005-10-23 16:00:22.000000000 +0200
++++ ffmpeg/libavcodec/eval.c	2005-10-23 16:05:34.000000000 +0200
 @@ -34,6 +34,8 @@
  #include <string.h>
  #include <math.h>
@@ -69,8 +67,8 @@ diff -ru ffmpeg-orig/libavcodec/eval.c ffmpeg/libavcodec/eval.c
    #define NAN 0
  #endif
 diff -ru ffmpeg-orig/libavformat/tcp.c ffmpeg/libavformat/tcp.c
---- ffmpeg-orig/libavformat/tcp.c	2005-02-24 20:08:50.000000000 +0100
-+++ ffmpeg/libavformat/tcp.c	2005-03-01 00:27:04.000000000 +0100
+--- ffmpeg-orig/libavformat/tcp.c	2005-10-23 16:00:22.000000000 +0200
++++ ffmpeg/libavformat/tcp.c	2005-10-23 16:06:19.000000000 +0200
 @@ -32,6 +32,7 @@
  #include <netdb.h>
  #include <sys/time.h>
