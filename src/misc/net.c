@@ -1210,8 +1210,15 @@ int inet_pton(int af, const char *src, void *dst)
     int len = sizeof( addr );
 
     /* Damn it, they didn't even put LPCSTR for the firs parameter!!! */
+#ifdef UNICODE
+    wchar_t *workaround_for_ill_designed_api =
+        malloc( MAX_PATH * sizeof(wchar_t) );
+    mbstowcs( workaround_for_ill_designed_api, src, MAX_PATH );
+    workaround_for_ill_designed_api[MAX_PATH-1] = 0;
+#else
     char *workaround_for_ill_designed_api = strdup( src );
-    
+#endif
+
     if( !WSAStringToAddress( workaround_for_ill_designed_api, af, NULL,
                              (LPSOCKADDR)&addr, &len ) )
     {
