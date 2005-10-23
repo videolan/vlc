@@ -365,6 +365,9 @@ static int InitVideo( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
+    p_vout->fmt_out = p_vout->fmt_in;
+    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
+
     switch( p_vout->output.i_chroma )
     {
         case VLC_FOURCC('R','V','1','5'):
@@ -443,6 +446,7 @@ static int InitVideo( vout_thread_t *p_vout )
         /* U and V inverted compared to I420
          * Fixme: this should be handled by the vout core */
         p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
+        p_vout->fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
     }
 
     return VLC_SUCCESS;
@@ -473,7 +477,8 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                        p_vout->p_sys->p_win->video_window,
                        p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
                        0 /*src_x*/, 0 /*src_y*/,
-                       p_vout->output.i_width, p_vout->output.i_height,
+                       p_vout->fmt_out.i_visible_width,
+                       p_vout->fmt_out.i_visible_height,
                        0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                        False /* Don't put True here or you'll waste your CPU */ );
 #   else
@@ -494,7 +499,8 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                     p_vout->p_sys->p_win->video_window,
                     p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
                     0 /*src_x*/, 0 /*src_y*/,
-                    p_vout->output.i_width, p_vout->output.i_height,
+                    p_vout->fmt_out.i_visible_width,
+                    p_vout->fmt_out.i_visible_height,
                     0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height );
 #else
         XPutImage( p_vout->p_sys->p_display,
