@@ -265,7 +265,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int OpenDll( decoder_t *p_dec )
 {
-    char *psz_codec, *psz_dll;
+    char *psz_dll;
     int i, i_result;
 
     char *ppsz_path[] =
@@ -281,50 +281,79 @@ static int OpenDll( decoder_t *p_dec )
       "/usr/lib64/RealPlayer9/users/Real/Codecs",
       "/usr/lib/win32",
 #endif
+      NULL,
+      NULL,
       NULL
     };
 
-    switch( p_dec->fmt_in.i_codec )
-    {
-    case VLC_FOURCC('c','o','o','k'):
-        psz_codec = "cook.so.6.0";
-        break;
-    case VLC_FOURCC('2','8','_','8'):
-        psz_codec = "28_8.so.6.0";
-        break;
-    case VLC_FOURCC('1','4','_','4'):
-        psz_codec = "14_4.so.6.0";
-        break;
-    default:
-        return VLC_EGENERIC;
-    }
+#ifdef WIN32
+    char psz_win32_real_codecs[MAX_PATH + 1];
+    char psz_win32_helix_codecs[MAX_PATH + 1];
+#endif
 
     for( i = 0; ppsz_path[i]; i++ )
     {
-        asprintf( &psz_dll, "%s/%s", ppsz_path[i], psz_codec );
+        asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec );
         i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
         free( psz_dll );
         if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
     }
 
-    switch( p_dec->fmt_in.i_codec )
+#ifdef WIN32
     {
-    case VLC_FOURCC('c','o','o','k'):
-        psz_codec = "cook3260.dll";
-        break;
-    case VLC_FOURCC('2','8','_','8'):
-        psz_codec = "28_83260.dll";
-        break;
-    case VLC_FOURCC('1','4','_','4'):
-        psz_codec = "14_43260.dll";
-        break;
-    default:
-        return VLC_EGENERIC;
+        HKEY h_key;
+        DWORD i_type, i_data = MAX_PATH + 1, i_index = 1;
+        char *p_data;
+
+        p_data = psz_win32_real_codecs;
+        if( RegOpenKeyEx( HKEY_CLASSES_ROOT,
+                          _T("Software\\RealNetworks\\Preferences\\DT_Codecs"),
+                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+        {
+             if( RegQueryValueEx( h_key, _T(""), 0, &i_type,
+                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS &&
+                 i_type == REG_SZ )
+             {
+                 int i_len = strlen( p_data );
+                 if( i_len && p_data[i_len-1] == '\\' ) p_data[i_len-1] = 0;
+                 ppsz_path[i_index++] = p_data;
+                 msg_Err( p_dec, "Real: %s", p_data );
+             }
+             RegCloseKey( h_key );
+        }
+
+        p_data = psz_win32_helix_codecs;
+        if( RegOpenKeyEx( HKEY_CLASSES_ROOT,
+                          _T("Helix\\HelixSDK\\10.0\\Preferences\\DT_Codecs"),
+                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+        {
+             if( RegQueryValueEx( h_key, _T(""), 0, &i_type,
+                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS &&
+                 i_type == REG_SZ )
+             {
+                 int i_len = strlen( p_data );
+                 if( i_len && p_data[i_len-1] == '\\' ) p_data[i_len-1] = 0;
+                 ppsz_path[i_index++] = p_data;
+                 msg_Err( p_dec, "Real: %s", p_data );
+             }
+             RegCloseKey( h_key );
+        }
     }
+#endif
 
     for( i = 0; ppsz_path[i]; i++ )
     {
-        asprintf( &psz_dll, "%s\\%s", ppsz_path[i], psz_codec );
+        /* New format */
+        asprintf( &psz_dll, "%s\\%4.4s.dll", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec );
+        i_result = OpenWin32Dll( p_dec, ppsz_path[i], psz_dll );
+        free( psz_dll );
+        if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
+
+        /* Old format */
+        asprintf( &psz_dll, "%s\\%4.4s3260.dll", ppsz_path[i],
+                  (char *)&p_dec->fmt_in.i_codec );
         i_result = OpenWin32Dll( p_dec, ppsz_path[i], psz_dll );
         free( psz_dll );
         if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
@@ -455,7 +484,7 @@ static int OpenWin32Dll( decoder_t *p_dec, char *psz_path, char *psz_dll )
         p_sys->i_extra, p_sys->p_extra
     };
 
-    msg_Err( p_dec, "opening win32 dll '%s'", psz_dll );
+    msg_Dbg( p_dec, "opening win32 dll '%s'", psz_dll );
 
 #ifdef LOADER
     Setup_LDT_Keeper();
