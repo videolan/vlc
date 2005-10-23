@@ -64,9 +64,21 @@
 #define VLCGL_RGB_FORMAT GL_RGBA
 #define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
 
+/* YUY2 */
+#ifndef YCBCR_MESA
+#define YCBCR_MESA 0x8757
+#endif
+#ifndef UNSIGNED_SHORT_8_8_MESA
+#define UNSIGNED_SHORT_8_8_MESA 0x85BA
+#endif
+#define VLCGL_YUV_FORMAT YCBCR_MESA
+#define VLCGL_YUV_TYPE UNSIGNED_SHORT_8_8_MESA
+
 /* Use RGB on Win32/GLX */
 #define VLCGL_FORMAT VLCGL_RGB_FORMAT
 #define VLCGL_TYPE   VLCGL_RGB_TYPE
+//#define VLCGL_FORMAT VLCGL_YUV_FORMAT
+//#define VLCGL_TYPE   VLCGL_YUV_TYPE
 #endif
 
 #ifndef GL_CLAMP_TO_EDGE
@@ -176,12 +188,12 @@ static int CreateVout( vlc_object_t *p_this )
 
     p_sys->i_index = 0;
 #ifdef SYS_DARWIN
-    p_sys->i_tex_width  = p_vout->render.i_width;
-    p_sys->i_tex_height = p_vout->render.i_height;
+    p_sys->i_tex_width  = p_vout->fmt_in.i_visible_width;
+    p_sys->i_tex_height = p_vout->fmt_in.i_visible_height;
 #else
     /* A texture must have a size aligned on a power of 2 */
-    p_sys->i_tex_width  = GetAlignedSize( p_vout->render.i_width );
-    p_sys->i_tex_height = GetAlignedSize( p_vout->render.i_height );
+    p_sys->i_tex_width  = GetAlignedSize( p_vout->fmt_in.i_visible_width );
+    p_sys->i_tex_height = GetAlignedSize( p_vout->fmt_in.i_visible_height );
 #endif
 
     msg_Dbg( p_vout, "Texture size: %dx%d", p_sys->i_tex_width,
@@ -203,6 +215,8 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->render.i_width = p_vout->render.i_width;
     p_sys->p_vout->render.i_height = p_vout->render.i_height;
     p_sys->p_vout->render.i_aspect = p_vout->render.i_aspect;
+    p_sys->p_vout->fmt_render = p_vout->fmt_render;
+    p_sys->p_vout->fmt_in = p_vout->fmt_in;
     p_sys->p_vout->b_scale = p_vout->b_scale;
     p_sys->p_vout->i_alignment = p_vout->i_alignment;
 
@@ -254,15 +268,12 @@ static int Init( vout_thread_t *p_vout )
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
-#ifdef SYS_DARWIN
+#if defined( SYS_DARWIN ) || (VLCGL_FORMAT == YCBCR_MESA)
     p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
-    p_vout->output.i_rmask = 0x00ff0000;
-    p_vout->output.i_gmask = 0x0000ff00;
-    p_vout->output.i_bmask = 0x000000ff;
     i_pixel_pitch = 2;
-#else
-#if VLCGL_RGB_FORMAT == GL_RGB
-#   if VLCGL_RGB_TYPE == GL_UNSIGNED_BYTE
+
+#elif VLCGL_FORMAT == GL_RGB
+#   if VLCGL_TYPE == GL_UNSIGNED_BYTE
     p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
     p_vout->output.i_rmask = 0x000000ff;
     p_vout->output.i_gmask = 0x0000ff00;
@@ -282,13 +293,15 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_bmask = 0x00ff0000;
     i_pixel_pitch = 4;
 #endif
-#endif
 
     /* Since OpenGL can do rescaling for us, stick to the default
      * coordinates and aspect. */
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
+
+    p_vout->fmt_out = p_vout->fmt_in;
+    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
     /* We know the chroma, allocate one buffer which will be used
      * directly by the decoder */
@@ -536,9 +549,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Update the texture */
     glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_new_index] );
-    glTexSubImage2D( VLCGL_TARGET, 0, 0, 0, p_sys->i_tex_width,
-                     p_sys->i_tex_height, VLCGL_FORMAT, VLCGL_TYPE,
-                     p_sys->pp_buffer[i_new_index] );
+    glTexSubImage2D( VLCGL_TARGET, 0,
+                     p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
+                     p_vout->fmt_out.i_visible_width,
+                     p_vout->fmt_out.i_visible_height,
+                     VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[i_new_index] );
 
     /* Bind to the previous texture for drawing */
     glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
@@ -549,9 +564,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
 #else
     /* Update the texture */
-    glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
-                     p_vout->render.i_width, p_vout->render.i_height,
-                     VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->pp_buffer[0] );
+    glTexSubImage2D( GL_TEXTURE_2D, 0,
+                     p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
+                     p_vout->fmt_out.i_visible_width,
+                     p_vout->fmt_out.i_visible_height,
+                     VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[0] );
 #endif
 
     if( p_sys->p_vout->pf_unlock )
@@ -577,13 +594,8 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* glTexCoord works differently with GL_TEXTURE_2D and
        GL_TEXTURE_RECTANGLE_EXT */
-#ifdef SYS_DARWIN
-    f_width = (float)p_vout->output.i_width;
-    f_height = (float)p_vout->output.i_height;
-#else
-    f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
-    f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
-#endif
+    f_width = (float)p_vout->fmt_out.i_visible_width / p_sys->i_tex_width;
+    f_height = (float)p_vout->fmt_out.i_visible_height / p_sys->i_tex_height;
 
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call pf_display to force redraw. Currently,
