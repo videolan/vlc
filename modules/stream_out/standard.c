@@ -241,7 +241,8 @@ static int Open( vlc_object_t *p_this )
         {
             psz_mux = strdup("asfh");
         }
-        else if( !strncmp( psz_access, "udp", 3 ) )
+        else if( !strncmp( psz_access, "udp", 3 ) ||
+                 !strncmp( psz_access, "rtp", 3 ) )
         {
             psz_mux = strdup("ts");
         }
