@@ -218,8 +218,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     char           * psz_plugin;
     vlc_value_t      val, val2, text;
 
-    unsigned int i_width = p_fmt->i_visible_width;
-    unsigned int i_height = p_fmt->i_visible_height;
+    unsigned int i_width = p_fmt->i_width;
+    unsigned int i_height = p_fmt->i_height;
     vlc_fourcc_t i_chroma = p_fmt->i_chroma;
     unsigned int i_aspect = p_fmt->i_aspect;
 
@@ -640,9 +640,14 @@ static int InitThread( vout_thread_t *p_vout )
 
     AspectRatio( p_vout->fmt_out.i_aspect, &i_aspect_x, &i_aspect_y );
 
-    msg_Dbg( p_vout, "picture out %ix%i, chroma %4.4s, ar %i:%i, sar %i:%i",
+    msg_Dbg( p_vout, "picture out %ix%i (%i,%i,%ix%i), "
+             "chroma %4.4s, ar %i:%i, sar %i:%i",
              p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
-             (char*)&p_vout->fmt_out.i_chroma, i_aspect_x, i_aspect_y,
+             p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
+             p_vout->fmt_out.i_visible_width,
+             p_vout->fmt_out.i_visible_height,
+             (char*)&p_vout->fmt_out.i_chroma,
+             i_aspect_x, i_aspect_y,
              p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den );
 
     /* Calculate shifts from system-updated masks */
