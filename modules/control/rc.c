@@ -373,6 +373,8 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "play", Playlist, NULL );
     var_Create( p_intf, "stop", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "stop", Playlist, NULL );
+    var_Create( p_intf, "clear", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "clear", Playlist, NULL );
     var_Create( p_intf, "prev", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "prev", Playlist, NULL );
     var_Create( p_intf, "next", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
@@ -877,6 +879,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| next . . . . . . . . . . . .  next playlist item"));
     msg_rc(_("| prev . . . . . . . . . .  previous playlist item"));
     msg_rc(_("| goto . . . . . . . . . . . .  goto item at index"));
+    msg_rc(_("| clear . . . . . . . . . . .   clear the playlist"));
     msg_rc(_("| status . . . . . . . . . current playlist status"));
     msg_rc(_("| title [X]  . . . . set/get title in current item"));
     msg_rc(_("| title_n  . . . . . .  next title in current item"));
@@ -1267,6 +1270,13 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "stop" ) )
     {
         playlist_Stop( p_playlist );
+    }
+    else if( !strcmp( psz_cmd, "clear" ) )
+    {
+        playlist_Stop( p_playlist );
+        vlc_mutex_lock( &p_playlist->object_lock );
+        playlist_Clear( p_playlist );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( !strcmp( psz_cmd, "add" ) &&
              newval.psz_string && *newval.psz_string )
