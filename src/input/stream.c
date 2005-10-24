@@ -566,6 +566,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 static void AStreamPrebufferBlock( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
+    access_t     *p_access = p_sys->p_access;
 
     int64_t i_first = 0;
     int64_t i_start;
@@ -606,12 +607,6 @@ static void AStreamPrebufferBlock( stream_t *s )
             continue;
         }
 
-        if( i_first == 0 )
-        {
-            i_first = mdate();
-            msg_Dbg( s, "received first data for our buffer");
-        }
-
         while( b )
         {
             /* Append the block */
@@ -622,6 +617,21 @@ static void AStreamPrebufferBlock( stream_t *s )
             p_sys->stat.i_read_count++;
             b = b->p_next;
         }
+
+        if( p_access->info.b_prebuffered ) 
+        {
+            /* Access has already prebufferred - update stats and exit */
+            p_sys->stat.i_bytes = p_sys->block.i_size;
+            p_sys->stat.i_read_time = mdate() - i_start;
+            break;
+        }
+
+        if( i_first == 0 )
+        {
+            i_first = mdate();
+            msg_Dbg( s, "received first data for our buffer");
+        }
+
     }
 
     p_sys->block.p_current = p_sys->block.p_first;

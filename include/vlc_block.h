@@ -77,6 +77,7 @@ typedef struct block_sys_t block_sys_t;
 struct block_t
 {
     block_t     *p_next;
+    block_t     *p_prev;
 
     uint32_t    i_flags;
 
@@ -86,6 +87,8 @@ struct block_t
 
     int         i_samples; /* Used for audio */
     int         i_rate;
+
+    uint16_t	i_seqno;   /* Used for RTP */
 
     int         i_buffer;
     uint8_t     *p_buffer;
