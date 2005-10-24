@@ -594,6 +594,11 @@ static void Close( vlc_object_t * p_this )
         {
             block_Release( p_sys->packet );
         }
+        if( p_sys->b_export_sap )
+        {   
+            p_sys->p_mux = NULL;
+            SapSetup( p_stream );
+        }
     }
 
     while( p_sys->i_rtsp > 0 )
@@ -1175,7 +1180,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( id->rtsp_access ) free( id->rtsp_access );
 
     /* Update SDP (sap/file) */
-    if( p_sys->b_export_sap ) SapSetup( p_stream );
+    if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
     if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
     free( id );
