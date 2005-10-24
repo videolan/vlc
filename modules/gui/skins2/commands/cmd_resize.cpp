@@ -39,3 +39,20 @@ void CmdResize::execute()
     // Resize the layout
     m_rLayout.resize( m_width, m_height );
 }
+
+
+CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, void *pWindow, int width,
+                              int height ):
+    CmdGeneric( pIntf ), m_pWindow( pWindow ), m_width( width ),
+    m_height( height )
+{
+}
+
+
+void CmdResizeVout::execute()
+{
+    // TODO
+    msg_Dbg( getIntf(), "New vout size requested: %d x %d", m_width,
+             m_height );
+}
+

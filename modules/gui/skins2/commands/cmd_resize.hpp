@@ -50,4 +50,26 @@ class CmdResize: public CmdGeneric
         int m_width, m_height;
 };
 
+
+/// Command to resize the vout window
+class CmdResizeVout: public CmdGeneric
+{
+    public:
+        /// Resize the given layout
+        CmdResizeVout( intf_thread_t *pIntf, void *pWindow, int width,
+                       int height );
+        virtual ~CmdResizeVout() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "resize vout"; }
+
+    private:
+        void *m_pWindow;
+        int m_width, m_height;
+};
+
+
 #endif

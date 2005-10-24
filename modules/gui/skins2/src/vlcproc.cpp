@@ -35,6 +35,7 @@
 #include "../commands/cmd_change_skin.hpp"
 #include "../commands/cmd_show_window.hpp"
 #include "../commands/cmd_quit.hpp"
+#include "../commands/cmd_resize.hpp"
 #include "../commands/cmd_vars.hpp"
 #include "../utils/var_bool.hpp"
 
@@ -454,7 +455,15 @@ void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
     }
     else
     {
-        return *pThis->m_handleSet.begin();
+        // Get the window handle
+        void *pWindow = *pThis->m_handleSet.begin();
+        // Post a resize vout command
+        CmdResizeVout *pCmd = new CmdResizeVout( pThis->getIntf(), pWindow,
+                                                 *pWidthHint, *pHeightHint );
+        AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+        pQueue->remove( "resize vout" );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+        return pWindow;
     }
 }
 
@@ -469,6 +478,35 @@ void VlcProc::releaseWindow( intf_thread_t *pIntf, void *pWindow )
 int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
                             int query, va_list args )
 {
+    VlcProc *pThis = pIntf->p_sys->p_vlcProc;
+
+    switch( query )
+    {
+        case VOUT_SET_ZOOM:
+        {
+            double fArg = va_arg( args, double );
+
+            if( pThis->m_pVout )
+            {
+                // Compute requested vout dimensions
+                int width = (int)( pThis->m_pVout->i_window_width * fArg );
+                int height = (int)( pThis->m_pVout->i_window_height * fArg );
+
+                // Post a resize vout command
+                CmdResizeVout *pCmd =
+                    new CmdResizeVout( pThis->getIntf(), pWindow,
+                                       width, height );
+                AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+                pQueue->remove( "resize vout" );
+                pQueue->push( CmdGenericPtr( pCmd ) );
+            }
+        }
+
+        default:
+            msg_Dbg( pIntf, "control query not supported" );
+            break;
+    }
+
     return VLC_SUCCESS;
 }
 
