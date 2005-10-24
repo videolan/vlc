@@ -1226,7 +1226,6 @@ int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout )
     RECT            rect_dest = p_vout->p_sys->rect_dest_clipped;
 
     if( !p_vout->p_sys->b_using_overlay ) return VLC_EGENERIC;
-    msg_Err( p_vout, "update overlay");
 
     if( p_vout->p_sys->b_wallpaper )
     {
