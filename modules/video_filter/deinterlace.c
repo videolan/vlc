@@ -319,6 +319,7 @@ static int Init( vout_thread_t *p_vout )
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
             p_vout->output.i_aspect = p_vout->render.i_aspect;
+            p_vout->fmt_out = p_vout->fmt_in;
             break;
 
         default:
@@ -358,13 +359,7 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "spawning the real video output" );
 
-    fmt.i_width = fmt.i_visible_width = p_vout->output.i_width;
-    fmt.i_height = fmt.i_visible_height = p_vout->output.i_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_chroma = p_vout->output.i_chroma;
-    fmt.i_aspect = p_vout->output.i_aspect;
-    fmt.i_sar_num = p_vout->output.i_aspect * fmt.i_height / fmt.i_width;
-    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
+    fmt = p_vout->fmt_out;
 
     switch( p_vout->render.i_chroma )
     {
@@ -375,7 +370,8 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
         {
         case DEINTERLACE_MEAN:
         case DEINTERLACE_DISCARD:
-            fmt.i_height = fmt.i_visible_height = p_vout->output.i_height / 2;
+            fmt.i_height /= 2; fmt.i_visible_height /= 2; fmt.i_y_offset /= 2;
+            fmt.i_aspect /= 2; fmt.i_sar_den *= 2;
             p_real_vout = vout_Create( p_vout, &fmt );
             break;
 
