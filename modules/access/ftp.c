@@ -238,6 +238,12 @@ static int Open( vlc_object_t *p_this )
         p_sys->url.i_port = 21; /* default port */
     }
 
+    /* FTP URLs are relative to user's default directory (RFC1738)
+       For absolute path use ftp://foo.bar//usr/local/etc/filename */
+
+    if( *p_sys->url.psz_path == '/' )
+        p_sys->url.psz_path++;
+
     if( Connect( p_access, p_sys ) < 0 )
         goto exit_error;
 
