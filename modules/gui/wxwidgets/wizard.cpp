@@ -115,7 +115,7 @@ END_EVENT_TABLE()
 
 #define PARTIAL _("Use this to read only a part of the stream. " \
                   "You must be able to control the incoming stream " \
-                  "(for example, a file or a disc, but not an UDP " \
+                  "(for example, a file or a disc, but not a RTP/UDP " \
                   "network stream.)\n" \
                   "Enter the starting and ending times (in seconds).")
 
@@ -168,7 +168,7 @@ END_EVENT_TABLE()
               "If you don't know what it means, or if you want to stream on " \
               "your local network only, leave this setting to 1." )
 
-#define SAP _("When streaming using UDP, you can announce your streams " \
+#define SAP _("When streaming using RTP, you can announce your streams " \
               "using the SAP/SDP announcing protocol. This way, the clients " \
               "won't have to type in the multicast address, it will appear " \
               "in their playlist if they enable the SAP extra interface.\n" \
@@ -1177,7 +1177,7 @@ void wizEncapPage::OnWizardPageChanging(wxWizardEvent& event)
 
     if( p_parent->GetAction() == ACTION_STREAM )
     {
-        if( strstr( p_parent->method, "udp" ))
+        if( strstr( p_parent->method, "rtp" ))
         {
             ((wizStreamingExtraPage *)GetNext())->sap_checkbox->Enable();
             ((wizStreamingExtraPage *)GetNext())->sap_text->Enable(false);
