@@ -120,14 +120,8 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
-
-    fmt.i_width = fmt.i_visible_width = p_vout->render.i_width;
-    fmt.i_height = fmt.i_visible_height = p_vout->render.i_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_chroma = p_vout->render.i_chroma;
-    fmt.i_aspect = p_vout->render.i_aspect;
-    fmt.i_sar_num = p_vout->render.i_aspect * fmt.i_height / fmt.i_width;
-    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
+    p_vout->fmt_out = p_vout->fmt_in;
+    fmt = p_vout->fmt_out;
 
     /* Try to open the real video output */
     msg_Dbg( p_vout, "spawning the real video output" );
