@@ -193,7 +193,13 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
+    int i_index;
     vout_thread_t *p_vout = ( vout_thread_t * )p_this;
+
+    for( i_index = I_OUTPUTPICTURES-1; i_index >= 0; i_index-- )
+    {
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
+    }
 
     /* Destroy structure */
     image_HandlerDelete( p_vout->p_sys->p_image );
