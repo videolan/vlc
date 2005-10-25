@@ -336,8 +336,8 @@ static char *ppsz_clock_descriptions[] =
 
 #define MTU_TEXT N_("MTU of the network interface")
 #define MTU_LONGTEXT N_( \
-    "This is the typical size of UDP packets that we expect. On Ethernet " \
-    "it is usually 1500.")
+    "This is the maximum packet size that can be transmitted " \ 
+    "over network interface. On Ethernet it is usually 1500 bytes.")
 
 #define TTL_TEXT N_("Time To Live")
 #define TTL_LONGTEXT N_( \
