@@ -41,6 +41,8 @@
 /* Object variables callbacks */
 static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
+static int CropCallback( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 static int OnTopCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static int FullscreenCallback( vlc_object_t *, char const *,
@@ -212,6 +214,27 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Set( p_vout, "zoom", old_val );
 
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
+
+    var_Create( p_vout, "crop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
+                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
+
+    text.psz_string = _("Crop");
+    var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text, NULL );
+
+    val.psz_string = "";
+    var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
+    val.psz_string = ""; text.psz_string = _("Default");
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "001:1"; text.psz_string = _("1:1");
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "004:3"; text.psz_string = _("4:3");
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "16:9"; text.psz_string = _("16:9");
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "221:100"; text.psz_string = _("221:100");
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+
+    var_AddCallback( p_vout, "crop", CropCallback, NULL );
 
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -444,6 +467,57 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_Control( p_vout, VOUT_SET_ZOOM, newval.f_float );
+    return VLC_SUCCESS;
+}
+
+static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    int64_t i_aspect_num, i_aspect_den;
+    unsigned int i_width, i_height;
+
+    char *psz_end, *psz_parser = strchr( newval.psz_string, ':' );
+
+    /* Restore defaults */
+    p_vout->fmt_in.i_x_offset = p_vout->fmt_render.i_x_offset;
+    p_vout->fmt_in.i_visible_width = p_vout->fmt_render.i_visible_width;
+    p_vout->fmt_in.i_y_offset = p_vout->fmt_render.i_y_offset;
+    p_vout->fmt_in.i_visible_height = p_vout->fmt_render.i_visible_height;
+
+    if( !psz_parser ) goto crop_end;
+
+    i_aspect_num = strtol( newval.psz_string, &psz_end, 0 );
+    if( psz_end == newval.psz_string ) goto crop_end;
+
+    i_aspect_den = strtol( ++psz_parser, &psz_end, 0 );
+    if( psz_end == psz_parser ) goto crop_end;
+
+    i_width = p_vout->fmt_in.i_sar_den * p_vout->fmt_render.i_visible_height *
+        i_aspect_num / i_aspect_den / p_vout->fmt_in.i_sar_num;
+    i_height = p_vout->fmt_render.i_visible_width * p_vout->fmt_in.i_sar_num *
+        i_aspect_den / i_aspect_num / p_vout->fmt_in.i_sar_den;
+
+    if( i_width < p_vout->fmt_render.i_visible_height )
+    {
+        p_vout->fmt_in.i_x_offset = p_vout->fmt_render.i_x_offset +
+            (p_vout->fmt_render.i_visible_width - i_width) / 2;
+        p_vout->fmt_in.i_visible_width = i_width;
+    }
+    else
+    {
+        p_vout->fmt_in.i_y_offset = p_vout->fmt_render.i_y_offset +
+            (p_vout->fmt_render.i_visible_height - i_height) / 2;
+        p_vout->fmt_in.i_visible_height = i_height;
+    }
+
+ crop_end:
+    msg_Dbg( p_vout, "cropping picture %ix%i to %i,%i,%ix%i",
+             p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
+             p_vout->fmt_in.i_x_offset, p_vout->fmt_in.i_y_offset,
+             p_vout->fmt_in.i_visible_width,
+             p_vout->fmt_in.i_visible_height );
+
     return VLC_SUCCESS;
 }
 
