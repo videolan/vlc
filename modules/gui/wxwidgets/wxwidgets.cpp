@@ -332,8 +332,25 @@ bool Instance::OnInit()
 {
     /* Initialization of i18n stuff.
      * Usefull for things we don't have any control over, like wxWidgets
-     * provided facilities (eg. open file dialog) */
-    locale.Init( wxLANGUAGE_DEFAULT );
+     * provided facilities (eg. open file dialog)
+     * 
+     * FIXME FIXME FIXME
+     * Note that gettext is already initialized by the VLC core, that it
+     * handles charset conversion and that we DO NOT want wxWidgets to set
+     * our LC_NUMERIC to non-C. However, it always does it anyway :-(
+     * Strangely, when calling the "obsoleted" locale.Init() prototype
+     * setlocale( LC_NUMERIC, "C" ) afterward works, while it is not the
+     * case with the newer locale.Init() prototype.
+     *
+     * In any case, that's ugly and thread-safe. The proper solution would
+     * be to reimplement an atof() version that is locale-independant and
+     * use in the many places that expect C/American float numbers. Even
+     * then, there might be some buggy underlying libraries breakage
+     * (e.g. Live555).
+     */
+    //locale.Init( wxLANGUAGE_DEFAULT, wxLOCALE_LOAD_DEFAULT );
+    locale.Init( NULL, NULL, NULL, true, false );
+    setlocale( LC_NUMERIC, "C" );
 
     /* Load saved window settings */
     p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );
