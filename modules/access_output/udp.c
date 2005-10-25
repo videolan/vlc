@@ -77,6 +77,10 @@ static void Close( vlc_object_t * );
     "Allows you to modify the default caching value for UDP streams. This " \
     "value should be set in millisecond units." )
 
+#define TTL_TEXT N_("Time To Live")
+#define TTL_LONGTEXT N_("Allows you to define the time to live of the " \
+                        "outgoing stream.")
+
 #define GROUP_TEXT N_("Group packets")
 #define GROUP_LONGTEXT N_("Packets can be sent one by one at the right time " \
                           "or by groups. This allows you to give the number " \
@@ -95,6 +99,8 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL,TTL_TEXT, TTL_LONGTEXT,
+                                 VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  VLC_TRUE );
     add_suppressed_integer( SOUT_CFG_PREFIX "late" );
@@ -113,6 +119,7 @@ vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "caching",
+    "ttl",
     "group",
     "raw",
     NULL
@@ -249,7 +256,9 @@ static int Open( vlc_object_t *p_this )
     socket_desc.i_bind_port     = 0;
     socket_desc.i_handle        = -1;
     socket_desc.v6only          = 0;
-    socket_desc.i_ttl           = 0;
+
+    var_Get( p_access, SOUT_CFG_PREFIX "ttl", &val );
+    socket_desc.i_ttl = val.i_int;
 
     p_sys->p_thread->p_private = (void*)&socket_desc;
     p_network = module_Need( p_sys->p_thread, "network", "ipv4", VLC_TRUE );
