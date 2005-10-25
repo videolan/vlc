@@ -847,6 +847,20 @@ static int ManageVideo( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
+#ifdef MODULE_NAME_IS_xvideo
+    if( p_vout->fmt_out.i_x_offset != p_vout->fmt_in.i_x_offset ||
+        p_vout->fmt_out.i_y_offset != p_vout->fmt_in.i_y_offset ||
+        p_vout->fmt_out.i_visible_width != p_vout->fmt_in.i_visible_width ||
+        p_vout->fmt_out.i_visible_height != p_vout->fmt_in.i_visible_height )
+    {
+        p_vout->fmt_out.i_x_offset = p_vout->fmt_in.i_x_offset;
+        p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
+        p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
+        p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+#endif
+
     /*
      * Size change
      *
