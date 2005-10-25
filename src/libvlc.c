@@ -451,6 +451,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
+    setlocale( LC_NUMERIC, "" );
+
     /* This ain't really nice to have to reload the config here but it seems
      * the only way to do it. */
     config_LoadConfigFile( p_vlc, "main" );
