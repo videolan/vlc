@@ -458,6 +458,15 @@ static int Manage( vout_thread_t *p_vout )
 
     i_fullscreen_change = ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE );
 
+    p_vout->fmt_out.i_x_offset = p_sys->p_vout->fmt_in.i_x_offset =
+        p_vout->fmt_in.i_x_offset;
+    p_vout->fmt_out.i_y_offset = p_sys->p_vout->fmt_in.i_y_offset =
+        p_vout->fmt_in.i_y_offset;
+    p_vout->fmt_out.i_visible_width = p_sys->p_vout->fmt_in.i_visible_width =
+        p_vout->fmt_in.i_visible_width;
+    p_vout->fmt_out.i_visible_height = p_sys->p_vout->fmt_in.i_visible_height =
+        p_vout->fmt_in.i_visible_height;
+
     p_sys->p_vout->i_changes = p_vout->i_changes;
     i_ret = p_sys->p_vout->pf_manage( p_sys->p_vout );
     p_vout->i_changes = p_sys->p_vout->i_changes;
@@ -549,10 +558,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Update the texture */
     glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_new_index] );
-    glTexSubImage2D( VLCGL_TARGET, 0,
-                     p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
-                     p_vout->fmt_out.i_visible_width,
-                     p_vout->fmt_out.i_visible_height,
+    glTexSubImage2D( VLCGL_TARGET, 0, 0, 0,
+                     p_vout->fmt_out.i_width,
+                     p_vout->fmt_out.i_height,
                      VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[i_new_index] );
 
     /* Bind to the previous texture for drawing */
@@ -564,10 +572,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
 #else
     /* Update the texture */
-    glTexSubImage2D( GL_TEXTURE_2D, 0,
-                     p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
-                     p_vout->fmt_out.i_visible_width,
-                     p_vout->fmt_out.i_visible_height,
+    glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
+                     p_vout->fmt_out.i_width,
+                     p_vout->fmt_out.i_height,
                      VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[0] );
 #endif
 
@@ -583,7 +590,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    float f_width, f_height;
+    float f_width, f_height, f_x, f_y;
 
     if( p_sys->p_vout->pf_lock &&
         p_sys->p_vout->pf_lock( p_sys->p_vout ) )
@@ -595,11 +602,19 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     /* glTexCoord works differently with GL_TEXTURE_2D and
        GL_TEXTURE_RECTANGLE_EXT */
 #ifdef SYS_DARWIN
-    f_width = (float)p_vout->fmt_out.i_visible_width;
-    f_height = (float)p_vout->fmt_out.i_visible_height;
+    f_x = (float)p_vout->fmt_out.i_x_offset;
+    f_y = (float)p_vout->fmt_out.i_y_offset;
+    f_width = (float)p_vout->fmt_out.i_x_offset +
+              (float)p_vout->fmt_out.i_visible_width;
+    f_height = (float)p_vout->fmt_out.i_y_offset +
+               (float)p_vout->fmt_out.i_visible_height;
 #else
-    f_width = (float)p_vout->fmt_out.i_visible_width / p_sys->i_tex_width;
-    f_height = (float)p_vout->fmt_out.i_visible_height / p_sys->i_tex_height;
+    f_x = (float)p_vout->fmt_out.i_x_offset / p_sys->i_tex_width;
+    f_y = (float)p_vout->fmt_out.i_y_offset / p_sys->i_tex_height;
+    f_width = ( (float)p_vout->fmt_out.i_x_offset +
+                p_vout->fmt_out.i_visible_width ) / p_sys->i_tex_width;
+    f_height = ( (float)p_vout->fmt_out.i_y_offset +
+                 p_vout->fmt_out.i_visible_height ) / p_sys->i_tex_height;
 #endif
 
     /* Why drawing here and not in Render()? Because this way, the
@@ -612,10 +627,10 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     {
         glEnable( VLCGL_TARGET );
         glBegin( GL_POLYGON );
-        glTexCoord2f( 0.0, 0.0 ); glVertex2f( -1.0, 1.0 );
-        glTexCoord2f( f_width, 0.0 ); glVertex2f( 1.0, 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex2f( -1.0, 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex2f( 1.0, 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
-        glTexCoord2f( 0.0, f_height ); glVertex2f( -1.0, -1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex2f( -1.0, -1.0 );
         glEnd();
     }
     else
@@ -626,40 +641,40 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
         glBegin( GL_QUADS );
 
         /* Front */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex3f( 1.0, 1.0, 1.0 );
 
         /* Left */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex3f( - 1.0, 1.0, 1.0 );
 
         /* Back */
-        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex3f( - 1.0, 1.0, - 1.0 );
 
         /* Right */
-        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Top */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex3f( - 1.0, 1.0, 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Bottom */
-        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_x, f_y ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_x, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
         glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, f_y ); glVertex3f( 1.0, - 1.0, 1.0 );
         glEnd();
     }
 

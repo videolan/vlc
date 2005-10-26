@@ -441,8 +441,25 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *pp_outpic[2];
 
+    p_vout->fmt_out.i_x_offset = p_sys->p_vout->fmt_in.i_x_offset =
+        p_vout->fmt_in.i_x_offset;
+    p_vout->fmt_out.i_y_offset = p_sys->p_vout->fmt_in.i_y_offset =
+        p_vout->fmt_in.i_y_offset;
+    p_vout->fmt_out.i_visible_width = p_sys->p_vout->fmt_in.i_visible_width =
+        p_vout->fmt_in.i_visible_width;
+    p_vout->fmt_out.i_visible_height = p_sys->p_vout->fmt_in.i_visible_height =
+        p_vout->fmt_in.i_visible_height;
+    if( p_vout->p_sys->i_mode == DEINTERLACE_MEAN ||
+        p_vout->p_sys->i_mode == DEINTERLACE_DISCARD )
+    {
+        p_vout->fmt_out.i_y_offset /= 2; p_sys->p_vout->fmt_in.i_y_offset /= 2;
+        p_vout->fmt_out.i_visible_height /= 2;
+        p_sys->p_vout->fmt_in.i_visible_height /= 2;
+    }
+ 
     pp_outpic[0] = pp_outpic[1] = NULL;
 
     vlc_mutex_lock( &p_vout->p_sys->filter_lock );
