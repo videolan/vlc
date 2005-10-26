@@ -539,6 +539,19 @@ static int Manage( vout_thread_t *p_vout )
         }
     }
 
+    /* Check for cropping changes */
+    if( p_vout->fmt_out.i_x_offset != p_vout->fmt_in.i_x_offset ||
+        p_vout->fmt_out.i_y_offset != p_vout->fmt_in.i_y_offset ||
+        p_vout->fmt_out.i_visible_width != p_vout->fmt_in.i_visible_width ||
+        p_vout->fmt_out.i_visible_height != p_vout->fmt_in.i_visible_height )
+    {
+        p_vout->fmt_out.i_x_offset = p_vout->fmt_in.i_x_offset;
+        p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
+        p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
+        p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
+        E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+    }
+
     /* We used to call the Win32 PeekMessage function here to read the window
      * messages. But since window can stay blocked into this function for a
      * long time (for example when you move your window on the screen), I
