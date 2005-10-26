@@ -218,7 +218,7 @@ all-modules:
 
 # Build a plugin with the adequate linker and linker's flags
 _plugin.a_plugin\$(LIBEXT):
-	@mod="\$*" ; mod=\$\${mod:3} ; \
+	@mod="\$*" ; mod=\$\${mod#lib} ; \
 	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` -u \$(SYMPREF)\$(VLC_ENTRY)" ; \
 	case \`\$(VLC_CONFIG) --linkage \$\$mod\` in \\
 	  c++)  ld="\$(CXXLINK)" ;; \
