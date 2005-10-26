@@ -181,9 +181,9 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Extended.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Extended.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Extended.nib/keyedobjects.nib \
-	extras/MacOSX/Resources/English.lproj/Update.nib/classes.nib \
-	extras/MacOSX/Resources/English.lproj/Update.nib/info.nib \
-	extras/MacOSX/Resources/English.lproj/Update.nib/keyedobjects.nib \
+#	extras/MacOSX/Resources/English.lproj/Update.nib/classes.nib \
+#	extras/MacOSX/Resources/English.lproj/Update.nib/info.nib \
+#	extras/MacOSX/Resources/English.lproj/Update.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/a52.icns \
 	extras/MacOSX/Resources/aac.icns \
