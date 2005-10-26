@@ -498,7 +498,7 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
     i_height = p_vout->fmt_render.i_visible_width * p_vout->fmt_in.i_sar_num *
         i_aspect_den / i_aspect_num / p_vout->fmt_in.i_sar_den;
 
-    if( i_width < p_vout->fmt_render.i_visible_height )
+    if( i_width < p_vout->fmt_render.i_visible_width )
     {
         p_vout->fmt_in.i_x_offset = p_vout->fmt_render.i_x_offset +
             (p_vout->fmt_render.i_visible_width - i_width) / 2;
