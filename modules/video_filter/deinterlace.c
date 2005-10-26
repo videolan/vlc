@@ -371,7 +371,7 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
         case DEINTERLACE_MEAN:
         case DEINTERLACE_DISCARD:
             fmt.i_height /= 2; fmt.i_visible_height /= 2; fmt.i_y_offset /= 2;
-            fmt.i_aspect /= 2; fmt.i_sar_den *= 2;
+            fmt.i_sar_den *= 2;
             p_real_vout = vout_Create( p_vout, &fmt );
             break;
 
