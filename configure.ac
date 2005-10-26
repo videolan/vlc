@@ -1155,7 +1155,7 @@ dnl
 dnl There are several possible cases:
 dnl - OS X PPC, gcc 4.x: use -mpim-altivec, don't need <altivec.h>
 dnl - OS X PPC, gcc 3.x: need -faltivec, don't need <altivec.h>
-dnl - Linux PPC, gcc 4.x: need <altivec.h> which itself requires -maltivec
+dnl - Linux PPC, gcc 3.4, 4.x: need <altivec.h> which requires -maltivec
 dnl - Linux PPC, gcc 3.3: need <altivec.h> and -maltivec -mabi=altivec
 dnl - Linux PPC, gcc 3.x: need <altivec.h> and -fvec
 dnl - Others: test should fail
@@ -1949,7 +1949,7 @@ AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
      VLC_ADD_LDFLAGS([ipv6 vlc],[-lresolv])])
 ])
 
-AS_IF([test "${have_ipv6}" == "yes"], [
+AS_IF([test "${have_ipv6}" = "yes"], [
   AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
 
 if test "${SYS}" != "nto" &&
@@ -2332,7 +2332,7 @@ dnl  ffmpeg decoder/demuxer plugin
 dnl
 AC_ARG_ENABLE(ffmpegaltivec,
 [  --enable-ffmpegaltivec  ffmpegaltivec codec (DO NOT USE)])
-if test "${enable_ffmpegaltivec}" == "yes"
+if test "${enable_ffmpegaltivec}" = "yes"
 then
   if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
     AC_MSG_CHECKING(for libavcodecaltivec.a in ${with_ffmpeg_tree})
@@ -3259,7 +3259,7 @@ dnl  SVG module
 dnl
 AC_ARG_ENABLE(svg,
   [  --enable-svg            SVG support (default disabled)])
-if test "${enable_svg}" == "yes"
+if test "${enable_svg}" = "yes"
 then
   PKG_CHECK_MODULES(SVG, 
 	librsvg-2.0 >= 2.5.0,
