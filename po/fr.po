@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-26 18:03+0200\n"
+"POT-Creation-Date: 2005-10-27 20:16+0200\n"
 "PO-Revision-Date: 2005-06-25 01:49+0200\n"
 "Last-Translator: \n"
 "Language-Team:  <fr@li.org>\n"
@@ -1829,7 +1829,7 @@ msgstr ""
 "Ceci est la taille classique des paquets UDP que nous attendons. Sur "
 "l’Ethernet, elle est généralement de 1500 octets."
 
-#: src/libvlc.h:342 modules/access_output/udp.c:80 modules/stream_out/rtp.c:77
+#: src/libvlc.h:342 modules/access_output/udp.c:80 modules/stream_out/rtp.c:80
 msgid "Time To Live"
 msgstr "TTL"
 
@@ -7351,6 +7351,11 @@ msgstr "Empaqueteur audio Flac"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "Décodeur vidéo MPEG I/II (utilisant libmpeg2)"
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Décodeur Tarkin"
+
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
 msgstr "Parseur audio pour PCM linéaire"
@@ -9588,9 +9593,10 @@ msgstr ""
 msgid "Input has changed"
 msgstr "L’entrée a changé"
 
-#: modules/gui/macosx/bookmarks.m:242 modules/gui/wxwidgets/bookmarks.cpp:511
+#: modules/gui/macosx/bookmarks.m:242
+#, fuzzy
 msgid ""
-"Input has changed, unable to save bookmark. Use \"pause\" while editing "
+"Input has changed, unable to save bookmark. Use \"Pause\" while editing "
 "bookmarks to keep the same input."
 msgstr ""
 "L’entrée a changé, impossible de sauvegarder les signets. Utilisez « pause » "
@@ -9601,16 +9607,18 @@ msgstr ""
 msgid "Invalid selection"
 msgstr "Sélection invalide"
 
-#: modules/gui/macosx/bookmarks.m:292 modules/gui/wxwidgets/bookmarks.cpp:409
-msgid "You must select two bookmarks"
+#: modules/gui/macosx/bookmarks.m:292
+#, fuzzy
+msgid "You have to select two bookmarks."
 msgstr "Vous devez sélectionner deux signets"
 
 #: modules/gui/macosx/bookmarks.m:301 modules/gui/wxwidgets/bookmarks.cpp:420
 msgid "No input found"
 msgstr "Aucune entrée trouvée"
 
-#: modules/gui/macosx/bookmarks.m:302 modules/gui/wxwidgets/bookmarks.cpp:419
-msgid "The stream must be playing or paused for bookmarks to work"
+#: modules/gui/macosx/bookmarks.m:302
+#, fuzzy
+msgid "The stream must be playing or paused for bookmarks to work."
 msgstr ""
 "Le flux doit être en cours de lecture ou en pause pour que les signets "
 "fonctionnent."
@@ -10183,7 +10191,7 @@ msgstr "DVD"
 #: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/output.m:147 modules/gui/wxwidgets/open.cpp:811
 #: modules/gui/wxwidgets/open.cpp:838 modules/gui/wxwidgets/streamout.cpp:538
-#: modules/stream_out/rtp.c:67
+#: modules/stream_out/rtp.c:70
 msgid "Port"
 msgstr "Port"
 
@@ -10722,7 +10730,7 @@ msgstr ""
 "envoyé."
 
 #: modules/gui/macosx/wizard.m:386 modules/gui/macosx/wizard.m:437
-#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:41
+#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:44
 msgid "Destination"
 msgstr "Destination"
 
@@ -10871,8 +10879,8 @@ msgstr "Aucune entrée trouvée"
 
 #: modules/gui/macosx/wizard.m:590
 msgid ""
-"You selected neither a new stream nor a valid playlist item. VLC is unable "
-"to guess, which input you want use. \n"
+"You have selected neither a new stream nor a valid playlist item. VLC is "
+"unable to guess, which input you want use.\n"
 "\n"
 " Choose one before going to the next page."
 msgstr ""
@@ -10905,7 +10913,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1113
 msgid ""
-"You you need to select a file, you want to save to. \n"
+"You you need to select a file, you want to save to.\n"
 "\n"
 " Enter either a valid path or choose a location through the button's dialog-"
 "box."
@@ -11627,6 +11635,24 @@ msgstr "Fournisseur de dialogues WinCE"
 msgid "Edit bookmark"
 msgstr "Editer le signet"
 
+#: modules/gui/wxwidgets/bookmarks.cpp:409
+msgid "You must select two bookmarks"
+msgstr "Vous devez sélectionner deux signets"
+
+#: modules/gui/wxwidgets/bookmarks.cpp:419
+msgid "The stream must be playing or paused for bookmarks to work"
+msgstr ""
+"Le flux doit être en cours de lecture ou en pause pour que les signets "
+"fonctionnent."
+
+#: modules/gui/wxwidgets/bookmarks.cpp:511
+msgid ""
+"Input has changed, unable to save bookmark. Use \"pause\" while editing "
+"bookmarks to keep the same input."
+msgstr ""
+"L’entrée a changé, impossible de sauvegarder les signets. Utilisez « pause » "
+"pendant l’édition des signets pour garder la même entrée;"
+
 #: modules/gui/wxwidgets/bookmarks.cpp:514
 msgid "Input has changed "
 msgstr "L’entrée a changé"
@@ -12251,7 +12277,7 @@ msgstr "Méthode de sortie"
 msgid "MMSH"
 msgstr "MMSH"
 
-#: modules/gui/wxwidgets/streamout.cpp:481 modules/stream_out/rtp.c:87
+#: modules/gui/wxwidgets/streamout.cpp:481 modules/stream_out/rtp.c:90
 msgid "RTP"
 msgstr "RTP"
 
@@ -13637,7 +13663,7 @@ msgstr ""
 msgid "Output muxer"
 msgstr "Multiplexeur de sortie"
 
-#: modules/stream_out/es.c:52 modules/stream_out/rtp.c:52
+#: modules/stream_out/es.c:52 modules/stream_out/rtp.c:55
 msgid "Allows you to specify the muxer used for the streaming output."
 msgstr ""
 "Ceci vous permet de spécifier le multiplexeur utiliser pour la diffusion."
@@ -13666,7 +13692,7 @@ msgstr ""
 msgid "Output URL"
 msgstr "URL de sortie"
 
-#: modules/stream_out/es.c:62 modules/stream_out/rtp.c:43
+#: modules/stream_out/es.c:62 modules/stream_out/rtp.c:46
 msgid "Allows you to specify the output URL used for the streaming output."
 msgstr ""
 "Ceci vous permet de spécifier l’URL de sortie utilisée pour la diffusion."
@@ -13718,11 +13744,11 @@ msgstr "Mosaïque"
 msgid "Mosaic bridge stream output"
 msgstr "Flux de sortie de la mosaïque"
 
-#: modules/stream_out/rtp.c:44
+#: modules/stream_out/rtp.c:47
 msgid "SDP"
 msgstr "SDP"
 
-#: modules/stream_out/rtp.c:46
+#: modules/stream_out/rtp.c:49
 msgid ""
 "Allows you to specify the SDP used for the streaming output. You must use an "
 "url: http://location to access the SDP via HTTP, rtsp://location for RTSP "
@@ -13732,78 +13758,78 @@ msgstr ""
 "Vous devez utiliser une url : http://adresse pour accéder au SDP via HTTP, "
 "rtsp://adresse pour un accès RTSP, et sap:// pour annoncer le SDP via SAP."
 
-#: modules/stream_out/rtp.c:50
+#: modules/stream_out/rtp.c:53
 msgid "Muxer"
 msgstr "Multiplexeur :"
 
-#: modules/stream_out/rtp.c:54 modules/stream_out/standard.c:60
+#: modules/stream_out/rtp.c:57 modules/stream_out/standard.c:60
 msgid "Session name"
 msgstr "Nom de session"
 
-#: modules/stream_out/rtp.c:56
+#: modules/stream_out/rtp.c:59
 msgid "Allows you to specify the session name used for the streaming output."
 msgstr ""
 "Ceci vous permet de spécifier le nom de session utilisé pour la diffusion."
 
-#: modules/stream_out/rtp.c:57
+#: modules/stream_out/rtp.c:60
 msgid "Session description"
 msgstr "Description de session"
 
-#: modules/stream_out/rtp.c:59
+#: modules/stream_out/rtp.c:62
 msgid "Allows you to give a broader description of the stream."
 msgstr "Ceci vous permet de donner une description étendue du flux."
 
-#: modules/stream_out/rtp.c:60
+#: modules/stream_out/rtp.c:63
 msgid "Session URL"
 msgstr "URL de session"
 
-#: modules/stream_out/rtp.c:62
+#: modules/stream_out/rtp.c:65
 msgid "Allows you to specify a URL with additional information on the stream."
 msgstr ""
 "Ceci vous permet de spécifier une URI avec plus d’informations sur la "
 "session."
 
-#: modules/stream_out/rtp.c:63
+#: modules/stream_out/rtp.c:66
 msgid "Session email"
 msgstr "Courriel de session"
 
-#: modules/stream_out/rtp.c:65
+#: modules/stream_out/rtp.c:68
 msgid "Allows you to specify contact e-mail address for this session."
 msgstr ""
 "Ceci vous permet de spécifier l’adresse e-mail de contact pour cette session."
 
-#: modules/stream_out/rtp.c:69
+#: modules/stream_out/rtp.c:72
 msgid "Allows you to specify the base port used for the RTP streaming."
 msgstr ""
 "Ceci vous permet de spécifier le port de base utilisé pour la diffusion RTP."
 
-#: modules/stream_out/rtp.c:70
+#: modules/stream_out/rtp.c:73
 msgid "Audio port"
 msgstr "Port audio"
 
-#: modules/stream_out/rtp.c:72
+#: modules/stream_out/rtp.c:75
 msgid ""
 "Allows you to specify the default audio port used for the RTP streaming."
 msgstr ""
 "Ceci vous permet de modifier le port audio par défaut utilisé pour la "
 "diffusion RTP."
 
-#: modules/stream_out/rtp.c:73
+#: modules/stream_out/rtp.c:76
 msgid "Video port"
 msgstr "Port vidéo"
 
-#: modules/stream_out/rtp.c:75
+#: modules/stream_out/rtp.c:78
 msgid ""
 "Allows you to specify the default video port used for the RTP streaming."
 msgstr ""
 "Ceci vous permet de modifier le port vidéo par défaut utilisé pour la "
 "diffusion RTP."
 
-#: modules/stream_out/rtp.c:79
+#: modules/stream_out/rtp.c:82
 msgid "Allows you to specify the time to live for the output stream."
 msgstr "Ceci vous permet de spécifier le TTL pour le flux de sortie."
 
-#: modules/stream_out/rtp.c:88
+#: modules/stream_out/rtp.c:91
 msgid "RTP stream output"
 msgstr "Flux de sortie RTP"
 

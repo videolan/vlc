@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: da\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-26 18:03+0200\n"
+"POT-Creation-Date: 2005-10-27 20:16+0200\n"
 "PO-Revision-Date: 2005-06-23 21:55+0100\n"
 "Last-Translator: Jonas A. Larsen <jonas@vrt.dk>\n"
 "Language-Team: Danish <da@li.org>\n"
@@ -1764,7 +1764,7 @@ msgstr ""
 "Dette er den typiske størrelse på UDP-pakker som vi forventer. På Ethernet "
 "vil det normalt være 1500."
 
-#: src/libvlc.h:342 modules/access_output/udp.c:80 modules/stream_out/rtp.c:77
+#: src/libvlc.h:342 modules/access_output/udp.c:80 modules/stream_out/rtp.c:80
 msgid "Time To Live"
 msgstr "Time To Live"
 
@@ -6858,6 +6858,11 @@ msgstr ""
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr ""
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Videofilter modul"
+
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
 msgstr "Linear PCM lyd-dekoder"
@@ -8993,9 +8998,10 @@ msgstr ""
 msgid "Input has changed"
 msgstr "Inddata har ændret sig"
 
-#: modules/gui/macosx/bookmarks.m:242 modules/gui/wxwidgets/bookmarks.cpp:511
+#: modules/gui/macosx/bookmarks.m:242
+#, fuzzy
 msgid ""
-"Input has changed, unable to save bookmark. Use \"pause\" while editing "
+"Input has changed, unable to save bookmark. Use \"Pause\" while editing "
 "bookmarks to keep the same input."
 msgstr ""
 "Inddata har ændret sig, kunne ikke gemme bogmærke. Brug \"pause\" mens du "
@@ -9006,16 +9012,17 @@ msgstr ""
 msgid "Invalid selection"
 msgstr "Ugyldigt valg"
 
-#: modules/gui/macosx/bookmarks.m:292 modules/gui/wxwidgets/bookmarks.cpp:409
-msgid "You must select two bookmarks"
+#: modules/gui/macosx/bookmarks.m:292
+msgid "You have to select two bookmarks."
 msgstr ""
 
 #: modules/gui/macosx/bookmarks.m:301 modules/gui/wxwidgets/bookmarks.cpp:420
 msgid "No input found"
 msgstr "Ingen inddata fundet"
 
-#: modules/gui/macosx/bookmarks.m:302 modules/gui/wxwidgets/bookmarks.cpp:419
-msgid "The stream must be playing or paused for bookmarks to work"
+#: modules/gui/macosx/bookmarks.m:302
+#, fuzzy
+msgid "The stream must be playing or paused for bookmarks to work."
 msgstr ""
 "Streammen skal være spillende eller sat på pause for at bogmærker kan virke"
 
@@ -9566,7 +9573,7 @@ msgstr "DVD"
 #: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/output.m:147 modules/gui/wxwidgets/open.cpp:811
 #: modules/gui/wxwidgets/open.cpp:838 modules/gui/wxwidgets/streamout.cpp:538
-#: modules/stream_out/rtp.c:67
+#: modules/stream_out/rtp.c:70
 msgid "Port"
 msgstr "Port"
 
@@ -10077,7 +10084,7 @@ msgid "In this page, you will select how your input stream will be sent."
 msgstr "Her vælger du hvordan din stream skal sendes."
 
 #: modules/gui/macosx/wizard.m:386 modules/gui/macosx/wizard.m:437
-#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:41
+#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:44
 msgid "Destination"
 msgstr "Destination"
 
@@ -10222,8 +10229,8 @@ msgstr "Ingen inddata fundet"
 
 #: modules/gui/macosx/wizard.m:590
 msgid ""
-"You selected neither a new stream nor a valid playlist item. VLC is unable "
-"to guess, which input you want use. \n"
+"You have selected neither a new stream nor a valid playlist item. VLC is "
+"unable to guess, which input you want use.\n"
 "\n"
 " Choose one before going to the next page."
 msgstr ""
@@ -10256,7 +10263,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1113
 msgid ""
-"You you need to select a file, you want to save to. \n"
+"You you need to select a file, you want to save to.\n"
 "\n"
 " Enter either a valid path or choose a location through the button's dialog-"
 "box."
@@ -10948,6 +10955,23 @@ msgstr "WinCE dialogudbyder"
 msgid "Edit bookmark"
 msgstr "Redigér bogmærke"
 
+#: modules/gui/wxwidgets/bookmarks.cpp:409
+msgid "You must select two bookmarks"
+msgstr ""
+
+#: modules/gui/wxwidgets/bookmarks.cpp:419
+msgid "The stream must be playing or paused for bookmarks to work"
+msgstr ""
+"Streammen skal være spillende eller sat på pause for at bogmærker kan virke"
+
+#: modules/gui/wxwidgets/bookmarks.cpp:511
+msgid ""
+"Input has changed, unable to save bookmark. Use \"pause\" while editing "
+"bookmarks to keep the same input."
+msgstr ""
+"Inddata har ændret sig, kunne ikke gemme bogmærke. Brug \"pause\" mens du "
+"redigerer bogmærker for at beholde det samme inddata."
+
 #: modules/gui/wxwidgets/bookmarks.cpp:514
 msgid "Input has changed "
 msgstr "Inddata har ændret sig"
@@ -11555,7 +11579,7 @@ msgstr ""
 msgid "MMSH"
 msgstr "MMSH"
 
-#: modules/gui/wxwidgets/streamout.cpp:481 modules/stream_out/rtp.c:87
+#: modules/gui/wxwidgets/streamout.cpp:481 modules/stream_out/rtp.c:90
 msgid "RTP"
 msgstr "RTP"
 
@@ -12836,7 +12860,7 @@ msgstr ""
 msgid "Output muxer"
 msgstr ""
 
-#: modules/stream_out/es.c:52 modules/stream_out/rtp.c:52
+#: modules/stream_out/es.c:52 modules/stream_out/rtp.c:55
 msgid "Allows you to specify the muxer used for the streaming output."
 msgstr ""
 
@@ -12860,7 +12884,7 @@ msgstr ""
 msgid "Output URL"
 msgstr ""
 
-#: modules/stream_out/es.c:62 modules/stream_out/rtp.c:43
+#: modules/stream_out/es.c:62 modules/stream_out/rtp.c:46
 msgid "Allows you to specify the output URL used for the streaming output."
 msgstr ""
 
@@ -12913,80 +12937,80 @@ msgstr "Mosaic indstilling"
 msgid "Mosaic bridge stream output"
 msgstr "Bro stream-uddata"
 
-#: modules/stream_out/rtp.c:44
+#: modules/stream_out/rtp.c:47
 msgid "SDP"
 msgstr "SDP"
 
-#: modules/stream_out/rtp.c:46
+#: modules/stream_out/rtp.c:49
 msgid ""
 "Allows you to specify the SDP used for the streaming output. You must use an "
 "url: http://location to access the SDP via HTTP, rtsp://location for RTSP "
 "access, and sap:// for the SDP to be announced via SAP."
 msgstr ""
 
-#: modules/stream_out/rtp.c:50
+#: modules/stream_out/rtp.c:53
 msgid "Muxer"
 msgstr "Muxer"
 
-#: modules/stream_out/rtp.c:54 modules/stream_out/standard.c:60
+#: modules/stream_out/rtp.c:57 modules/stream_out/standard.c:60
 msgid "Session name"
 msgstr "Sesions navn"
 
-#: modules/stream_out/rtp.c:56
+#: modules/stream_out/rtp.c:59
 msgid "Allows you to specify the session name used for the streaming output."
 msgstr ""
 
-#: modules/stream_out/rtp.c:57
+#: modules/stream_out/rtp.c:60
 msgid "Session description"
 msgstr "Sesions beskrivelse"
 
-#: modules/stream_out/rtp.c:59
+#: modules/stream_out/rtp.c:62
 msgid "Allows you to give a broader description of the stream."
 msgstr ""
 
-#: modules/stream_out/rtp.c:60
+#: modules/stream_out/rtp.c:63
 msgid "Session URL"
 msgstr "Sesions URL"
 
-#: modules/stream_out/rtp.c:62
+#: modules/stream_out/rtp.c:65
 msgid "Allows you to specify a URL with additional information on the stream."
 msgstr ""
 
-#: modules/stream_out/rtp.c:63
+#: modules/stream_out/rtp.c:66
 msgid "Session email"
 msgstr "Sesions e-mail"
 
-#: modules/stream_out/rtp.c:65
+#: modules/stream_out/rtp.c:68
 msgid "Allows you to specify contact e-mail address for this session."
 msgstr ""
 
-#: modules/stream_out/rtp.c:69
+#: modules/stream_out/rtp.c:72
 msgid "Allows you to specify the base port used for the RTP streaming."
 msgstr ""
 
-#: modules/stream_out/rtp.c:70
+#: modules/stream_out/rtp.c:73
 msgid "Audio port"
 msgstr "Lyd port"
 
-#: modules/stream_out/rtp.c:72
+#: modules/stream_out/rtp.c:75
 msgid ""
 "Allows you to specify the default audio port used for the RTP streaming."
 msgstr ""
 
-#: modules/stream_out/rtp.c:73
+#: modules/stream_out/rtp.c:76
 msgid "Video port"
 msgstr "Video port"
 
-#: modules/stream_out/rtp.c:75
+#: modules/stream_out/rtp.c:78
 msgid ""
 "Allows you to specify the default video port used for the RTP streaming."
 msgstr ""
 
-#: modules/stream_out/rtp.c:79
+#: modules/stream_out/rtp.c:82
 msgid "Allows you to specify the time to live for the output stream."
 msgstr ""
 
-#: modules/stream_out/rtp.c:88
+#: modules/stream_out/rtp.c:91
 msgid "RTP stream output"
 msgstr "RTP stream-uddata"
 

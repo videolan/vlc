@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-26 18:03+0200\n"
+"POT-Creation-Date: 2005-10-27 20:16+0200\n"
 "PO-Revision-Date: 2005-06-19 06:49+0100\n"
 "Last-Translator: \n"
 "Language-Team: Spanish-English\n"
@@ -1809,7 +1809,7 @@ msgid ""
 msgstr ""
 "El típico tamaño de paquetes UDP solicitado. En Ethernet normalmente es 1500."
 
-#: src/libvlc.h:342 modules/access_output/udp.c:80 modules/stream_out/rtp.c:77
+#: src/libvlc.h:342 modules/access_output/udp.c:80 modules/stream_out/rtp.c:80
 msgid "Time To Live"
 msgstr "Tiempo de vida (TTL)"
 
@@ -7208,6 +7208,11 @@ msgstr "Empaquetador de audio Flac"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "Decodificador de vídeo I/II (usando libmpeg2)"
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Módulo decodificador Tarkin"
+
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
 msgstr "Decodificador de audio PCM lineal"
@@ -9434,9 +9439,10 @@ msgstr ""
 msgid "Input has changed"
 msgstr "La entrada ha cambiado"
 
-#: modules/gui/macosx/bookmarks.m:242 modules/gui/wxwidgets/bookmarks.cpp:511
+#: modules/gui/macosx/bookmarks.m:242
+#, fuzzy
 msgid ""
-"Input has changed, unable to save bookmark. Use \"pause\" while editing "
+"Input has changed, unable to save bookmark. Use \"Pause\" while editing "
 "bookmarks to keep the same input."
 msgstr ""
 "La entrada ha cambiado, incapaz de salvar favorito. Usa \"pausa\" mientras "
@@ -9447,16 +9453,18 @@ msgstr ""
 msgid "Invalid selection"
 msgstr "Selección no válida"
 
-#: modules/gui/macosx/bookmarks.m:292 modules/gui/wxwidgets/bookmarks.cpp:409
-msgid "You must select two bookmarks"
+#: modules/gui/macosx/bookmarks.m:292
+#, fuzzy
+msgid "You have to select two bookmarks."
 msgstr "Debes elegir dos favoritos"
 
 #: modules/gui/macosx/bookmarks.m:301 modules/gui/wxwidgets/bookmarks.cpp:420
 msgid "No input found"
 msgstr "Entrada no hallada"
 
-#: modules/gui/macosx/bookmarks.m:302 modules/gui/wxwidgets/bookmarks.cpp:419
-msgid "The stream must be playing or paused for bookmarks to work"
+#: modules/gui/macosx/bookmarks.m:302
+#, fuzzy
+msgid "The stream must be playing or paused for bookmarks to work."
 msgstr "El volcado debe ejecutarse o estar pausado para que funcione favoritos"
 
 #: modules/gui/macosx/controls.m:126
@@ -10026,7 +10034,7 @@ msgstr "DVD"
 #: modules/gui/macosx/open.m:178 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/output.m:147 modules/gui/wxwidgets/open.cpp:811
 #: modules/gui/wxwidgets/open.cpp:838 modules/gui/wxwidgets/streamout.cpp:538
-#: modules/stream_out/rtp.c:67
+#: modules/stream_out/rtp.c:70
 msgid "Port"
 msgstr "Puerto"
 
@@ -10564,7 +10572,7 @@ msgid "In this page, you will select how your input stream will be sent."
 msgstr "En esta página, elegirás cómo se enviará tu volcado de entrada."
 
 #: modules/gui/macosx/wizard.m:386 modules/gui/macosx/wizard.m:437
-#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:41
+#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:44
 msgid "Destination"
 msgstr "Destino"
 
@@ -10708,8 +10716,8 @@ msgstr "Entrada no hallada"
 
 #: modules/gui/macosx/wizard.m:590
 msgid ""
-"You selected neither a new stream nor a valid playlist item. VLC is unable "
-"to guess, which input you want use. \n"
+"You have selected neither a new stream nor a valid playlist item. VLC is "
+"unable to guess, which input you want use.\n"
 "\n"
 " Choose one before going to the next page."
 msgstr ""
@@ -10742,7 +10750,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1113
 msgid ""
-"You you need to select a file, you want to save to. \n"
+"You you need to select a file, you want to save to.\n"
 "\n"
 " Enter either a valid path or choose a location through the button's dialog-"
 "box."
@@ -11461,6 +11469,22 @@ msgstr "proveedor de diálogos WinCE"
 msgid "Edit bookmark"
 msgstr "Edita favorito"
 
+#: modules/gui/wxwidgets/bookmarks.cpp:409
+msgid "You must select two bookmarks"
+msgstr "Debes elegir dos favoritos"
+
+#: modules/gui/wxwidgets/bookmarks.cpp:419
+msgid "The stream must be playing or paused for bookmarks to work"
+msgstr "El volcado debe ejecutarse o estar pausado para que funcione favoritos"
+
+#: modules/gui/wxwidgets/bookmarks.cpp:511
+msgid ""
+"Input has changed, unable to save bookmark. Use \"pause\" while editing "
+"bookmarks to keep the same input."
+msgstr ""
+"La entrada ha cambiado, incapaz de salvar favorito. Usa \"pausa\" mientras "
+"editas favoritos para mantener la misma entrada."
+
 #: modules/gui/wxwidgets/bookmarks.cpp:514
 msgid "Input has changed "
 msgstr "La entrada ha cambiado"
@@ -12087,7 +12111,7 @@ msgstr "Métodos de salida"
 msgid "MMSH"
 msgstr "MMSH"
 
-#: modules/gui/wxwidgets/streamout.cpp:481 modules/stream_out/rtp.c:87
+#: modules/gui/wxwidgets/streamout.cpp:481 modules/stream_out/rtp.c:90
 msgid "RTP"
 msgstr "RTP"
 
@@ -13470,7 +13494,7 @@ msgstr ""
 msgid "Output muxer"
 msgstr "Muxor de salida"
 
-#: modules/stream_out/es.c:52 modules/stream_out/rtp.c:52
+#: modules/stream_out/es.c:52 modules/stream_out/rtp.c:55
 msgid "Allows you to specify the muxer used for the streaming output."
 msgstr "Te permite indicar el muxor usado para la salida de volcado."
 
@@ -13494,7 +13518,7 @@ msgstr "Te permite indicar el muxor usado para la salida de volcado de vídeo."
 msgid "Output URL"
 msgstr "URL de salida"
 
-#: modules/stream_out/es.c:62 modules/stream_out/rtp.c:43
+#: modules/stream_out/es.c:62 modules/stream_out/rtp.c:46
 msgid "Allows you to specify the output URL used for the streaming output."
 msgstr "Te permite indicar la URL de salida usada para la salida de volcado."
 
@@ -13547,11 +13571,11 @@ msgstr "Puente de mosaico"
 msgid "Mosaic bridge stream output"
 msgstr "Salida de volcado puente de mosaico"
 
-#: modules/stream_out/rtp.c:44
+#: modules/stream_out/rtp.c:47
 msgid "SDP"
 msgstr "SDP"
 
-#: modules/stream_out/rtp.c:46
+#: modules/stream_out/rtp.c:49
 msgid ""
 "Allows you to specify the SDP used for the streaming output. You must use an "
 "url: http://location to access the SDP via HTTP, rtsp://location for RTSP "
@@ -13561,74 +13585,74 @@ msgstr ""
 "una url: http://lugar para acceder al SDP por HTTP, rtsp://lugar para acceso "
 "RTSP, y sap:// para anunciar el SDP por SAP."
 
-#: modules/stream_out/rtp.c:50
+#: modules/stream_out/rtp.c:53
 msgid "Muxer"
 msgstr "Muxor"
 
-#: modules/stream_out/rtp.c:54 modules/stream_out/standard.c:60
+#: modules/stream_out/rtp.c:57 modules/stream_out/standard.c:60
 msgid "Session name"
 msgstr "Nombre de sesión"
 
-#: modules/stream_out/rtp.c:56
+#: modules/stream_out/rtp.c:59
 msgid "Allows you to specify the session name used for the streaming output."
 msgstr ""
 "Te permite indicar el nombre de sesión usado para la salida de volcado."
 
-#: modules/stream_out/rtp.c:57
+#: modules/stream_out/rtp.c:60
 msgid "Session description"
 msgstr "Descripción de sesión"
 
-#: modules/stream_out/rtp.c:59
+#: modules/stream_out/rtp.c:62
 msgid "Allows you to give a broader description of the stream."
 msgstr "Te permite dar una descripción más amplia del volcado."
 
-#: modules/stream_out/rtp.c:60
+#: modules/stream_out/rtp.c:63
 msgid "Session URL"
 msgstr "URL de sesión"
 
-#: modules/stream_out/rtp.c:62
+#: modules/stream_out/rtp.c:65
 msgid "Allows you to specify a URL with additional information on the stream."
 msgstr "Te permite indicar una URL con información adicional sobre el volcado."
 
-#: modules/stream_out/rtp.c:63
+#: modules/stream_out/rtp.c:66
 msgid "Session email"
 msgstr "Correo de sesión"
 
-#: modules/stream_out/rtp.c:65
+#: modules/stream_out/rtp.c:68
 msgid "Allows you to specify contact e-mail address for this session."
 msgstr ""
 "Te permite indicar la dirección de contacto de correo para esta sesión."
 
-#: modules/stream_out/rtp.c:69
+#: modules/stream_out/rtp.c:72
 msgid "Allows you to specify the base port used for the RTP streaming."
 msgstr "Te permite especificar el puerto base usado para el volcado RTP."
 
-#: modules/stream_out/rtp.c:70
+#: modules/stream_out/rtp.c:73
 msgid "Audio port"
 msgstr "Puerto de audio"
 
-#: modules/stream_out/rtp.c:72
+#: modules/stream_out/rtp.c:75
 msgid ""
 "Allows you to specify the default audio port used for the RTP streaming."
 msgstr ""
 "Te permite indicar el puerto de audio por defecto usado para el volcado RTP."
 
-#: modules/stream_out/rtp.c:73
+#: modules/stream_out/rtp.c:76
 msgid "Video port"
 msgstr "Puerto de vídeo"
 
-#: modules/stream_out/rtp.c:75
+#: modules/stream_out/rtp.c:78
 msgid ""
 "Allows you to specify the default video port used for the RTP streaming."
 msgstr ""
 "Te permite indicar el puerto de vídeo por defecto usado para el volcado RTP."
 
-#: modules/stream_out/rtp.c:79
+#: modules/stream_out/rtp.c:82
 msgid "Allows you to specify the time to live for the output stream."
 msgstr ""
 "Te permite indicar la hora de emisión en vivo para el volcado de salida."
 
-#: modules/stream_out/rtp.c:88
+#: modules/stream_out/rtp.c:91
 msgid "RTP stream output"
 msgstr "Salida de volcado RTP"
 
