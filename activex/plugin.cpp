@@ -781,9 +781,9 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     /* set internal video width and height */
     vlc_value_t val;
     val.i_int = posRect.right-posRect.left;
-    VLC_VariableSet(_i_vlc, "width", val);
+    VLC_VariableSet(_i_vlc, "conf::width", val);
     val.i_int = posRect.bottom-posRect.top;
-    VLC_VariableSet(_i_vlc, "height", val);
+    VLC_VariableSet(_i_vlc, "conf::height", val);
 
     /* set internal video parent window */
     /* horrible cast there */
