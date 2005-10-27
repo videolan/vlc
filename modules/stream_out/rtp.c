@@ -38,6 +38,9 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+#define MTU_REDUCE 50
+
 #define DST_TEXT N_("Destination")
 #define DST_LONGTEXT N_( \
     "Allows you to specify the output URL used for the streaming output." )
@@ -451,11 +454,12 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
         p_sys->i_mtu = config_GetInt( p_stream, "mtu" );  /* XXX beurk */
-        if( p_sys->i_mtu <= 16 )
+        if( p_sys->i_mtu <= 16 + MTU_REDUCE )
         {
             /* better than nothing */
             p_sys->i_mtu = 1500;
         }
+        p_sys->i_mtu -= MTU_REDUCE;
 
         /* the access out grabber TODO export it as sout_AccessOutGrabberNew */
         p_grab = p_sys->p_grab =
@@ -1093,12 +1097,13 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->i_timestamp_start = rand()&0xffffffff;
 
     id->i_mtu    = config_GetInt( p_stream, "mtu" );  /* XXX beuk */
-    if( id->i_mtu <= 16 )
+    if( id->i_mtu <= 16 + MTU_REDUCE )
     {
         /* better than nothing */
         id->i_mtu = 1500;
     }
-    msg_Dbg( p_stream, "using mtu=%d", id->i_mtu );
+    id->i_mtu -= MTU_REDUCE;
+    msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
     if( p_sys->p_rtsp_url )
     {
