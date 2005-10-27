@@ -447,6 +447,20 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 static int WriteRaw( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
+    block_t *p_buf;
+
+    vlc_mutex_lock( &p_sys->p_thread->blocks_lock );
+    while ( p_sys->p_thread->i_empty_depth >= MAX_EMPTY_BLOCKS )
+    {
+        p_buf = p_sys->p_thread->p_empty_blocks;
+        p_sys->p_thread->p_empty_blocks =
+                    p_sys->p_thread->p_empty_blocks->p_next;
+        p_sys->p_thread->i_empty_depth--;
+        vlc_mutex_unlock( &p_sys->p_thread->blocks_lock );
+        block_Release( p_buf );
+        vlc_mutex_lock( &p_sys->p_thread->blocks_lock );
+    }
+    vlc_mutex_unlock( &p_sys->p_thread->blocks_lock );
 
     block_FifoPut( p_sys->p_thread->p_fifo, p_buffer );
 
