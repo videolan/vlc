@@ -416,7 +416,6 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
  *****************************************************************************/
 static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
 {
-    access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
     int      i_rtp_version;
     int      i_CSRC_count;
     int      i_payload_type;
@@ -442,9 +441,9 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     if( i_rtp_version != 2 )
         msg_Dbg( p_access, "RTP version is %u, should be 2", i_rtp_version );
 
-    if( i_payload_type == 14 )
+    if( i_payload_type == 14 || i_payload_type == 32)
         i_skip = 4;
-    else if( i_payload_type !=  33 && i_payload_type != 32 )
+    else if( i_payload_type !=  33 )
         msg_Dbg( p_access, "unsupported RTP payload type (%u)", i_payload_type );
     if( i_extension_flag )
         i_extension_length = 4 +
