@@ -569,6 +569,8 @@ static vlc_fourcc_t __GetFOURCC( uint8_t *p )
  *****************************************************************************/
 typedef struct
 {
+//    ~mkv_track_t();
+
     vlc_bool_t   b_default;
     vlc_bool_t   b_enabled;
     unsigned int i_number;
@@ -4288,7 +4290,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             tk->f_fps = 0.0;
 
             tk->fmt.video.i_frame_rate_base = (unsigned int)(tk->i_default_duration / 1000);
-            tk->fmt.video.i_frame_rate = 1000000;     
+            tk->fmt.video.i_frame_rate = 1000000;
             
             for( j = 0; j < tkv->ListSize(); j++ )
             {
@@ -4310,14 +4312,14 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 {
                     KaxVideoPixelWidth &vwidth = *(KaxVideoPixelWidth*)l;
 
-                    tk->fmt.video.i_width = uint16( vwidth );
+                    tk->fmt.video.i_width += uint16( vwidth );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + width=%d", uint16( vwidth ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoPixelHeight ) )
                 {
                     KaxVideoPixelWidth &vheight = *(KaxVideoPixelWidth*)l;
 
-                    tk->fmt.video.i_height = uint16( vheight );
+                    tk->fmt.video.i_height += uint16( vheight );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + height=%d", uint16( vheight ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoDisplayWidth ) )
@@ -4333,6 +4335,36 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
                     tk->fmt.video.i_visible_height = uint16( vheight );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + display height=%d", uint16( vheight ) );
+                }
+                else if( MKV_IS_ID( l, KaxVideoPixelCropBottom ) )
+                {
+                    KaxVideoPixelCropBottom &cropval = *(KaxVideoPixelCropBottom*)l;
+
+                    tk->fmt.video.i_height -= uint16( cropval );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel bottom=%d", uint16( cropval ) );
+                }
+                else if( MKV_IS_ID( l, KaxVideoPixelCropTop ) )
+                {
+                    KaxVideoPixelCropTop &cropval = *(KaxVideoPixelCropTop*)l;
+
+                    tk->fmt.video.i_height -= uint16( cropval );
+                    tk->fmt.video.i_y_offset += uint16( cropval );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel top=%d", uint16( cropval ) );
+                }
+                else if( MKV_IS_ID( l, KaxVideoPixelCropRight ) )
+                {
+                    KaxVideoPixelCropRight &cropval = *(KaxVideoPixelCropRight*)l;
+
+                    tk->fmt.video.i_width -= uint16( cropval );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel right=%d", uint16( cropval ) );
+                }
+                else if( MKV_IS_ID( l, KaxVideoPixelCropLeft ) )
+                {
+                    KaxVideoPixelCropLeft &cropval = *(KaxVideoPixelCropLeft*)l;
+
+                    tk->fmt.video.i_width -= uint16( cropval );
+                    tk->fmt.video.i_x_offset += uint16( cropval );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + crop pixel left=%d", uint16( cropval ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoFrameRate ) )
                 {
