@@ -587,9 +587,9 @@ static VLCWizard *_o_sharedInstance = nil;
             /* show a sheet that the user didn't select a file */
             NSBeginInformationalAlertSheet(_NS("No input selected"), \
                 _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
-                _NS("You selected neither a new stream nor a valid playlist " \
-                "item. VLC is unable to guess, which input you want use. "\
-                "\n\n Choose one before going to the next page."));
+                _NS("You have selected neither a new stream nor a valid " \
+                "playlist item. VLC is unable to guess, which input you " \
+                "want use.\n\n Choose one before going to the next page."));
         }
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
@@ -1111,7 +1111,7 @@ static VLCWizard *_o_sharedInstance = nil;
             /* complain to the user that "" is no valid path */
             NSBeginInformationalAlertSheet(_NS("No file selected"), _NS("OK"), \
                 @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You you " \
-                "need to select a file, you want to save to. \n\n Enter either " \
+                "need to select a file, you want to save to.\n\n Enter either " \
                 "a valid path or choose a location through the button's " \
                 "dialog-box."));
         } else {
@@ -1670,6 +1670,8 @@ static VLCWizard *_o_sharedInstance = nil;
         [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
         objectAtIndex:0];
     
+    /* don't use ".ps" as suffix, since the OSX Finder confuses our creations 
+     * with PostScript-files and wants to open them with Preview.app */
     if (theEncapFormat != @"ps")
     {
         [savePanel setRequiredFileType: theEncapFormat];
