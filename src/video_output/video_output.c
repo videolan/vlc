@@ -249,6 +249,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     I_RENDERPICTURES = 0;
     p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
     p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
+    vlc_ureduce( &p_vout->fmt_render.i_sar_num, &p_vout->fmt_render.i_sar_den,
+              p_vout->fmt_render.i_sar_num, p_vout->fmt_render.i_sar_den, 0 );
+    vlc_ureduce( &p_vout->fmt_in.i_sar_num, &p_vout->fmt_in.i_sar_den,
+              p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den, 0 );
+
     p_vout->render.i_width    = i_width;
     p_vout->render.i_height   = i_height;
     p_vout->render.i_chroma   = i_chroma;
