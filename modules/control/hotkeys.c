@@ -606,6 +606,12 @@ static void Run( intf_thread_t *p_intf )
                 val.b_bool = VLC_TRUE;
                 var_Set( p_input, "next-chapter", val );
             }
+            else if( i_action == ACTIONID_DISC_MENU )
+            {
+                vlc_value_t val; val.i_int = 2;
+msg_Dbg( p_input, "set dvdmenu" );
+                var_Set( p_input, "title  0", val);
+            }
             else if( i_action == ACTIONID_SUBDELAY_DOWN )
             {
                 int64_t i_delay = var_GetTime( p_input, "spu-delay" );

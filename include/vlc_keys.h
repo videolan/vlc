@@ -252,3 +252,4 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_AUDIODELAY_DOWN       63
 #define ACTIONID_SNAPSHOT              64
 #define ACTIONID_RECORD                65
+#define ACTIONID_DISC_MENU             66

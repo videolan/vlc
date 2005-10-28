@@ -834,6 +834,8 @@ static char *ppsz_clock_descriptions[] =
 #define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in DVD menus.")
 #define NAV_ACTIVATE_KEY_TEXT N_("Activate")
 #define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in DVD menus.")
+#define DISC_MENU_TEXT N_("Go to the DVD menu")
+#define DISC_MENU_LONGTEXT N_("Select the key to take you to the DVD menu")
 #define TITLE_PREV_TEXT N_("Select previous DVD title")
 #define TITLE_PREV_LONGTEXT N_("Select the key to choose the previous title from the DVD")
 #define TITLE_NEXT_TEXT N_("Select next DVD title")
@@ -1412,6 +1414,7 @@ vlc_module_begin();
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          'I'
+#   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
 #   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
 #   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
 #   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
@@ -1479,6 +1482,7 @@ vlc_module_begin();
 #   define KEY_SUBTITLE_TRACK     'k'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          'I'
+#   define KEY_DISC MENU          KEY_MODIFIER_CTRL|'m'
 #   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
 #   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
 #   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
@@ -1558,6 +1562,8 @@ vlc_module_begin();
     add_key( "key-nav-right", KEY_NAV_RIGHT, NULL, NAV_RIGHT_KEY_TEXT,
              NAV_RIGHT_KEY_LONGTEXT, VLC_TRUE );
 
+    add_key( "key-disc-menu", KEY_DISC_MENU, NULL, DISC_MENU_TEXT,
+             DISC_MENU_LONGTEXT, VLC_TRUE );
     add_key( "key-title-prev", KEY_TITLE_PREV, NULL, TITLE_PREV_TEXT,
              TITLE_PREV_LONGTEXT, VLC_TRUE );
     add_key( "key-title-next", KEY_TITLE_NEXT, NULL, TITLE_NEXT_TEXT,
@@ -1720,6 +1726,7 @@ static struct hotkey p_hotkeys[] =
     { "key-nav-down", ACTIONID_NAV_DOWN, 0, 0, 0, 0 },
     { "key-nav-left", ACTIONID_NAV_LEFT, 0, 0, 0, 0 },
     { "key-nav-right", ACTIONID_NAV_RIGHT, 0, 0, 0, 0 },
+    { "key-disc-menu", ACTIONID_DISC_MENU, 0, 0, 0, 0 },
     { "key-title-prev", ACTIONID_TITLE_PREV, 0, 0, 0, 0 },
     { "key-title-next", ACTIONID_TITLE_NEXT, 0, 0, 0, 0 },
     { "key-chapter-prev", ACTIONID_CHAPTER_PREV, 0, 0, 0, 0 },
