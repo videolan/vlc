@@ -216,7 +216,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
     char           * psz_plugin;
-    vlc_value_t      val, val2, text;
+    vlc_value_t      val, text;
 
     unsigned int i_width = p_fmt->i_width;
     unsigned int i_height = p_fmt->i_height;
@@ -286,6 +286,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->b_filter_change = 0;
     p_vout->pf_control = 0;
     p_vout->p_parent_intf = 0;
+    p_vout->i_par_num = p_vout->i_par_den = 1;
 
     /* Initialize locks */
     vlc_mutex_init( p_vout, &p_vout->picture_lock );
@@ -316,67 +317,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
      * the video output pipe */
     if( p_parent->i_object_type != VLC_OBJECT_VOUT )
     {
-        int i_monitor_aspect_x = 4 , i_monitor_aspect_y = 3;
-        var_Get( p_vout, "aspect-ratio", &val );
-        var_Get( p_vout, "monitor-aspect-ratio", &val2 );
-
-        if( val2.psz_string )
-        {
-            char *psz_parser = strchr( val2.psz_string, ':' );
-            if( psz_parser )
-            {
-                *psz_parser++ = '\0';
-                i_monitor_aspect_x = atoi( val2.psz_string );
-                i_monitor_aspect_y = atoi( psz_parser );
-            } else {
-                AspectRatio( VOUT_ASPECT_FACTOR * atof( val2.psz_string ),
-                                 &i_monitor_aspect_x, &i_monitor_aspect_y );
-            }
-
-            free( val2.psz_string );
-        }
-
-        /* Check whether the user tried to override aspect ratio */
-        if( val.psz_string )
-        {
-            unsigned int i_new_aspect = i_aspect;
-            char *psz_parser = strchr( val.psz_string, ':' );
-                int i_aspect_x, i_aspect_y;
-                AspectRatio( i_aspect, &i_aspect_x, &i_aspect_y );
-
-            if( psz_parser )
-            {
-                *psz_parser++ = '\0';
-                i_new_aspect = atoi( val.psz_string )
-                               * VOUT_ASPECT_FACTOR / atoi( psz_parser );
-            }
-            else
-            {
-                if( atof( val.psz_string ) != 0 )
-                {
-                i_new_aspect = VOUT_ASPECT_FACTOR * atof( val.psz_string );
-                }
-            }
-            i_new_aspect = (int)((float)i_new_aspect
-                * (float)i_monitor_aspect_y*4.0/((float)i_monitor_aspect_x*3.0));
-
-            free( val.psz_string );
-
-            if( i_new_aspect && i_new_aspect != i_aspect )
-            {
-                int i_aspect_x, i_aspect_y;
-
-                AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
-
-                msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
-                         i_aspect_x, i_aspect_y );
-
-                p_vout->render.i_aspect = i_new_aspect;
-
-                p_vout->b_override_aspect = VLC_TRUE;
-            }
-        }
-
         /* Look for the default filter configuration */
         var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_vout, "vout-filter", &val );

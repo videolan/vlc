@@ -89,6 +89,8 @@ struct vout_thread_t
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
     unsigned int        i_alignment;          /**< video alignment in window */
+    unsigned int        i_par_num;           /**< monitor pixel aspect-ratio */
+    unsigned int        i_par_den;           /**< monitor pixel aspect-ratio */
 
     intf_thread_t       *p_parent_intf;   /**< parent interface for embedded
                                                                vout (if any) */
@@ -183,8 +185,12 @@ struct vout_thread_t
 #define VOUT_DEPTH_CHANGE       0x0400
 /** change chroma tables */
 #define VOUT_CHROMA_CHANGE      0x0800
+/** cropping parameters changed */
+#define VOUT_CROP_CHANGE        0x1000
+/** aspect ratio changed */
+#define VOUT_ASPECT_CHANGE      0x2000
 /** change/recreate picture buffers */
-#define VOUT_PICTURE_BUFFERS_CHANGE 0x1000
+#define VOUT_PICTURE_BUFFERS_CHANGE 0x4000
 /**@}*/
 
 /* Alignment flags */
