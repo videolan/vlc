@@ -848,15 +848,20 @@ static int ManageVideo( vout_thread_t *p_vout )
     }
 
 #ifndef MODULE_NAME_IS_x11
-    if( p_vout->fmt_out.i_x_offset != p_vout->fmt_in.i_x_offset ||
-        p_vout->fmt_out.i_y_offset != p_vout->fmt_in.i_y_offset ||
-        p_vout->fmt_out.i_visible_width != p_vout->fmt_in.i_visible_width ||
-        p_vout->fmt_out.i_visible_height != p_vout->fmt_in.i_visible_height )
+    if( p_vout->i_changes & VOUT_CROP_CHANGE ||
+        p_vout->i_changes & VOUT_ASPECT_CHANGE )
     {
+        p_vout->i_changes &= ~VOUT_CROP_CHANGE;
+        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
+
         p_vout->fmt_out.i_x_offset = p_vout->fmt_in.i_x_offset;
         p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
         p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
         p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
+        p_vout->fmt_out.i_aspect = p_vout->fmt_in.i_aspect;
+        p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
+        p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
+        p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
 #endif
