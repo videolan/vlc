@@ -356,6 +356,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
+    msg_Dbg( p_vout, "Window size: %dx%d", p_vout->i_window_width, 
+             p_vout->i_window_height );
 
     /* Create the vout thread */
     p_vout->p_module = module_Need( p_vout,
@@ -1256,29 +1258,31 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
     {
         *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( i_width * ll_zoom * VOUT_ASPECT_FACTOR /
-                            p_vout->render.i_aspect / FP_FACTOR );
+                            p_vout->fmt_in.i_aspect / FP_FACTOR );
         return;
     }
     else if( i_height > 0 )
     {
         *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
-        *pi_width = (int)( i_height * ll_zoom * p_vout->render.i_aspect /
+        *pi_width = (int)( i_height * ll_zoom * p_vout->fmt_in.i_aspect /
                            VOUT_ASPECT_FACTOR / FP_FACTOR );
         return;
     }
 
-    if( p_vout->render.i_height * p_vout->render.i_aspect
-        >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
+    if( p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_aspect
+        >= p_vout->fmt_in.i_visible_width * VOUT_ASPECT_FACTOR )
     {
-        *pi_width = (int)( p_vout->render.i_height * ll_zoom
-          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR / FP_FACTOR );
-        *pi_height = (int)( p_vout->render.i_height * ll_zoom / FP_FACTOR );
+        *pi_width = (int)( p_vout->fmt_in.i_visible_height * ll_zoom
+            * p_vout->fmt_in.i_aspect / VOUT_ASPECT_FACTOR / FP_FACTOR );
+        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom 
+            / FP_FACTOR );
     }
     else
     {
-        *pi_width = (int)( p_vout->render.i_width * ll_zoom / FP_FACTOR );
-        *pi_height = (int)( p_vout->render.i_width * ll_zoom
-          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect / FP_FACTOR );
+        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom 
+            / FP_FACTOR );
+        *pi_height = (int)( p_vout->fmt_in.i_visible_width * ll_zoom
+            * VOUT_ASPECT_FACTOR / p_vout->fmt_in.i_aspect / FP_FACTOR );
     }
 
 #undef FP_FACTOR

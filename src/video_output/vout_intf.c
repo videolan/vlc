@@ -265,7 +265,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
         if( !i_aspect_num || !i_aspect_den )
         {
             i_aspect_num = 4;
-            i_aspect_num = 3;
+            i_aspect_den = 3;
         }
         p_vout->i_par_num = i_aspect_num * 3 * 4;
         p_vout->i_par_den = i_aspect_den;
