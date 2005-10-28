@@ -1975,14 +1975,43 @@ AC_ARG_ENABLE(ogg,
   [  --enable-ogg            Ogg demux support (default enabled)])
 if test "${enable_ogg}" != "no"
 then
-  AC_CHECK_HEADERS(ogg/ogg.h, [
-    AC_CHECK_LIB( ogg, oggpack_read, [
+  AC_ARG_WITH(ogg-tree,
+  [    --with-ogg-tree=PATH ogg tree for static linking])
+  if test -n "${with_ogg_tree}"
+  then
+    AC_MSG_CHECKING(for libogg.a in ${with_ogg_tree})
+    real_ogg_tree="`cd ${with_ogg_tree} 2>/dev/null && pwd`"
+    if test -z "${real_ogg_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_ogg_tree}])
+    fi
+    if test -f "${real_ogg_tree}/src/.libs/libogg.a"
+    then
+      dnl  Use a custom ogg
+      AC_MSG_RESULT(${real_ogg_tree}/src/.libs/libogg.a)
       VLC_ADD_PLUGINS([ogg])
       if test "${enable_sout}" != "no"; then
         VLC_ADD_PLUGINS([mux_ogg])
       fi
-      VLC_ADD_LDFLAGS([ogg mux_ogg],[-logg])])
-   ],[])
+      VLC_ADD_LDFLAGS([ogg mux_ogg speex vorbis],[${real_ogg_tree}/src/.libs/libogg.a])
+      VLC_ADD_CFLAGS([ogg mux_ogg speex vorbis],[-I${real_ogg_tree}/include])
+    else
+      dnl  The given ogg wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_ogg_tree}/src/.libs/libogg.a, make sure you compiled ogg in ${with_ogg_tree}])
+    fi
+  else
+    AC_CHECK_HEADERS(ogg/ogg.h, [
+      AC_CHECK_LIB( ogg, oggpack_read, [
+        VLC_ADD_PLUGINS([ogg])
+        if test "${enable_sout}" != "no"; then
+          VLC_ADD_PLUGINS([mux_ogg])
+        fi
+        VLC_ADD_LDFLAGS([ogg mux_ogg],[-logg])])
+     ],[])
+  fi
 fi
 
 dnl
@@ -2048,10 +2077,36 @@ AC_ARG_ENABLE(mod,
   [  --enable-mod            Mod demux support (default enabled)])
 if test "${enable_mod}" != "no"
 then
-  AC_CHECK_HEADERS(libmodplug/modplug.h, [
-    VLC_ADD_PLUGINS([mod])
-    VLC_ADD_CXXFLAGS([mod],[])
-    VLC_ADD_LDFLAGS([mod],[-lmodplug])])
+  AC_ARG_WITH(mod-tree,
+  [    --with-mod-tree=PATH mod tree for static linking])
+  if test -n "${with_mod_tree}"
+  then
+    AC_MSG_CHECKING(for libmodplug.a in ${with_mod_tree})
+    real_mod_tree="`cd ${with_mod_tree} 2>/dev/null && pwd`"
+    if test -z "${real_mod_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_mod_tree}])
+    fi
+    if test -f "${real_mod_tree}/src/.libs/libmodplug.a"
+    then
+      dnl  Use a custom mod
+      AC_MSG_RESULT(${real_mod_tree}/src/.libs/libmodplug.a)
+      VLC_ADD_PLUGINS([mod])
+      VLC_ADD_LDFLAGS([mod],[${real_mod_tree}/src/.libs/libmodplug.a])
+      VLC_ADD_CFLAGS([mod],[-I${real_mod_tree}/include])
+    else
+      dnl  The given mod wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_mod_tree}/src/.libs/libmodplug.a, make sure you compiled mod in ${with_mod_tree}])
+    fi
+  else
+    AC_CHECK_HEADERS(libmodplug/modplug.h, [
+      VLC_ADD_PLUGINS([mod])
+      VLC_ADD_CXXFLAGS([mod],[])
+      VLC_ADD_LDFLAGS([mod],[-lmodplug])])
+  fi
 fi
 
 dnl
@@ -2667,9 +2722,35 @@ AC_ARG_ENABLE(flac,
   [  --enable-flac           flac decoder support (default disabled)])
 if test "${enable_flac}" = "yes"
 then
-  AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
-    VLC_ADD_LDFLAGS([flacdec],[-lFLAC])
-   ],[])
+  AC_ARG_WITH(flac-tree,
+  [    --with-flac-tree=PATH flac tree for static linking])
+  if test -n "${with_flac_tree}"
+  then
+    AC_MSG_CHECKING(for libFLAC.a in ${with_flac_tree})
+    real_flac_tree="`cd ${with_flac_tree} 2>/dev/null && pwd`"
+    if test -z "${real_flac_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_flac_tree}])
+    fi
+    if test -f "${real_flac_tree}/src/libFLAC/.libs/libFLAC.a"
+    then
+      dnl  Use a custom flac
+      AC_MSG_RESULT(${real_flac_tree}/src/libFLAC/.libs/libFLAC.a)
+      VLC_ADD_LDFLAGS([flacdec],[${real_flac_tree}/src/libFLAC/.libs/libFLAC.a])
+      VLC_ADD_CFLAGS([flacdec],[-I${real_flac_tree}/include])
+      AC_DEFINE(HAVE_FLAC_STREAM_DECODER_H, 1, [Define if you have FLAC])
+    else
+      dnl  The given flac wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_flac_tree}/src/libFLAC/.libs/libFLAC.a, make sure you compiled flac in ${with_flac_tree}])
+    fi
+  else
+    AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
+      VLC_ADD_LDFLAGS([flacdec],[-lFLAC])
+     ],[])
+  fi
 fi
 
 dnl
@@ -2732,12 +2813,38 @@ AC_ARG_ENABLE(vorbis,
   [  --enable-vorbis         Vorbis decoder support (default enabled)])
 if test "${enable_vorbis}" != "no"
 then
-  AC_CHECK_HEADERS(vorbis/codec.h, [
-    VLC_ADD_PLUGINS([vorbis])
-    VLC_ADD_LDFLAGS([vorbis],[-lvorbis -logg]) ],[])
+  AC_ARG_WITH(vorbis-tree,
+  [    --with-vorbis-tree=PATH vorbis tree for static linking])
+  if test -n "${with_vorbis_tree}"
+  then
+    AC_MSG_CHECKING(for libvorbis.a in ${with_vorbis_tree})
+    real_vorbis_tree="`cd ${with_vorbis_tree} 2>/dev/null && pwd`"
+    if test -z "${real_vorbis_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_vorbis_tree}])
+    fi
+    if test -f "${real_vorbis_tree}/lib/.libs/libvorbis.a"
+    then
+      dnl  Use a custom vorbis 
+      AC_MSG_RESULT(${real_vorbis_tree}/lib/.libs/libvorbis.a)
+      VLC_ADD_PLUGINS([vorbis])
+      VLC_ADD_LDFLAGS([vorbis],[${real_vorbis_tree}/lib/.libs/libvorbis.a ${real_vorbis_tree}/lib/.libs/libvorbisenc.a])
+      VLC_ADD_CFLAGS([vorbis],[-I${real_vorbis_tree}/include])
+    else
+      dnl  The given vorbis wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_vorbis_tree}/lib/.libs/libvorbis.a, make sure you compiled vorbis in ${with_vorbis_tree}])
+    fi
+  else
+    AC_CHECK_HEADERS(vorbis/codec.h, [
+      VLC_ADD_PLUGINS([vorbis])
+      VLC_ADD_LDFLAGS([vorbis],[-lvorbis -logg]) ],[])
 
-  AC_CHECK_HEADERS(vorbis/vorbisenc.h, [
-    VLC_ADD_LDFLAGS([vorbis],[-lvorbisenc]) ],[])
+    AC_CHECK_HEADERS(vorbis/vorbisenc.h, [
+      VLC_ADD_LDFLAGS([vorbis],[-lvorbisenc]) ],[])
+  fi
 fi
 
 dnl
@@ -2760,16 +2867,42 @@ AC_ARG_ENABLE(speex,
   [  --enable-speex          Speex decoder support (default enabled)])
 if test "${enable_speex}" != "no"
 then
-  AC_CHECK_HEADERS(speex/speex.h, [
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_speex}"
-    AC_CHECK_LIB(speex, speex_decode_int, [
+  AC_ARG_WITH(speex-tree,
+  [    --with-speex-tree=PATH speex tree for static linking])
+  if test -n "${with_speex_tree}"
+  then
+    AC_MSG_CHECKING(for libspeex.a in ${with_speex_tree})
+    real_speex_tree="`cd ${with_speex_tree} 2>/dev/null && pwd`"
+    if test -z "${real_speex_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_speex_tree}])
+    fi
+    if test -f "${real_speex_tree}/libspeex/.libs/libspeex.a"
+    then
+      dnl  Use a custom speex
+      AC_MSG_RESULT(${real_speex_tree}/libspeex/.libs/libspeex.a)
       VLC_ADD_PLUGINS([speex])
-      VLC_ADD_LDFLAGS([speex],[-lspeex]) ],
-      [ AC_MSG_RESULT([no])
-        AC_MSG_WARN([Your libspeex is too old, please get the development
-                     version.]) ],[])
-    LDFLAGS="${LDFLAGS_save}"
-    ],[])
+      VLC_ADD_LDFLAGS([speex],[${real_speex_tree}/libspeex/.libs/libspeex.a])
+      VLC_ADD_CFLAGS([speex],[-I${real_speex_tree}/include])
+    else
+      dnl  The given speex wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_speex_tree}/libspeex/.libs/libspeex.a, make sure you compiled speex in ${with_speex_tree}])
+    fi
+  else
+    AC_CHECK_HEADERS(speex/speex.h, [
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_speex}"
+      AC_CHECK_LIB(speex, speex_decode_int, [
+        VLC_ADD_PLUGINS([speex])
+        VLC_ADD_LDFLAGS([speex],[-lspeex]) ],
+        [ AC_MSG_RESULT([no])
+          AC_MSG_WARN([Your libspeex is too old, please get the development
+                       version.]) ],[])
+      LDFLAGS="${LDFLAGS_save}"
+      ],[])
+  fi
 fi
 
 dnl
