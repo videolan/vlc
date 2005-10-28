@@ -59,7 +59,6 @@ static void     DestroyThread     ( vout_thread_t * );
 static void     AspectRatio       ( int, int *, int * );
 static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
-static void     InitWindowSize    ( vout_thread_t *, unsigned *, unsigned * );
 
 /* Object variables callbacks */
 static int DeinterlaceCallback( vlc_object_t *, char const *,
@@ -357,12 +356,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
                                   psz_end - p_vout->psz_filter_chain );
         else psz_plugin = strdup( p_vout->psz_filter_chain );
     }
-
-    /* Initialize the dimensions of the video window */
-    InitWindowSize( p_vout, &p_vout->i_window_width,
-                    &p_vout->i_window_height );
-    msg_Dbg( p_vout, "Window size: %dx%d", p_vout->i_window_width, 
-             p_vout->i_window_height );
 
     /* Create the vout thread */
     p_vout->p_module = module_Need( p_vout,
@@ -1226,71 +1219,6 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
     /* Update pointers and return */
     *pi_left =   i_low;
     *pi_right = (8 - i_high + i_low);
-}
-
-/*****************************************************************************
- * InitWindowSize: find the initial dimensions the video window should have.
- *****************************************************************************
- * This function will check the "width", "height" and "zoom" config options and
- * will calculate the size that the video window should have.
- *****************************************************************************/
-static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
-                            unsigned *pi_height )
-{
-    vlc_value_t val;
-    int i_width, i_height;
-    uint64_t ll_zoom;
-
-#define FP_FACTOR 1000                             /* our fixed point factor */
-
-    var_Get( p_vout, "align", &val );
-    p_vout->i_alignment = val.i_int;
-
-    var_Get( p_vout, "width", &val );
-    i_width = val.i_int;
-    var_Get( p_vout, "height", &val );
-    i_height = val.i_int;
-    var_Get( p_vout, "zoom", &val );
-    ll_zoom = (uint64_t)( FP_FACTOR * val.f_float );
-
-    if( i_width > 0 && i_height > 0)
-    {
-        *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
-        *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
-        return;
-    }
-    else if( i_width > 0 )
-    {
-        *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
-        *pi_height = (int)( i_width * ll_zoom * VOUT_ASPECT_FACTOR /
-                            p_vout->fmt_in.i_aspect / FP_FACTOR );
-        return;
-    }
-    else if( i_height > 0 )
-    {
-        *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
-        *pi_width = (int)( i_height * ll_zoom * p_vout->fmt_in.i_aspect /
-                           VOUT_ASPECT_FACTOR / FP_FACTOR );
-        return;
-    }
-
-    if( p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_aspect
-        >= p_vout->fmt_in.i_visible_width * VOUT_ASPECT_FACTOR )
-    {
-        *pi_width = (int)( p_vout->fmt_in.i_visible_height * ll_zoom
-            * p_vout->fmt_in.i_aspect / VOUT_ASPECT_FACTOR / FP_FACTOR );
-        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom 
-            / FP_FACTOR );
-    }
-    else
-    {
-        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom 
-            / FP_FACTOR );
-        *pi_height = (int)( p_vout->fmt_in.i_visible_width * ll_zoom
-            * VOUT_ASPECT_FACTOR / p_vout->fmt_in.i_aspect / FP_FACTOR );
-    }
-
-#undef FP_FACTOR
 }
 
 /*****************************************************************************
