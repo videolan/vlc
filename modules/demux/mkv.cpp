@@ -589,6 +589,9 @@ typedef struct
     float       f_fps;
     es_out_id_t *p_es;
 
+    /* audio */
+    unsigned int i_original_rate;
+
     vlc_bool_t      b_inited;
     /* data to be send first */
     int             i_data_init;
@@ -2318,7 +2321,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         else if( !strncmp( tracks[i_track]->psz_codec, "A_AAC/MPEG2/", strlen( "A_AAC/MPEG2/" ) ) ||
                  !strncmp( tracks[i_track]->psz_codec, "A_AAC/MPEG4/", strlen( "A_AAC/MPEG4/" ) ) )
         {
-            int i_profile, i_srate;
+            int i_profile, i_srate, sbr = 0;
             static unsigned int i_sample_rates[] =
             {
                     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
@@ -2340,6 +2343,11 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             {
                 i_profile = 2;
             }
+            else if( !strcmp( &tracks[i_track]->psz_codec[12], "LC/SBR" ) )
+            {
+                i_profile = 1;
+                sbr = 1;
+            }
             else
             {
                 i_profile = 3;
@@ -2347,23 +2355,35 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
             for( i_srate = 0; i_srate < 13; i_srate++ )
             {
-                if( i_sample_rates[i_srate] == tracks[i_track]->fmt.audio.i_rate )
+                if( i_sample_rates[i_srate] == tracks[i_track]->i_original_rate )
                 {
                     break;
                 }
             }
             msg_Dbg( &sys.demuxer, "profile=%d srate=%d", i_profile, i_srate );
 
-            tracks[i_track]->fmt.i_extra = 2;
+            tracks[i_track]->fmt.i_extra = sbr ? 5 : 2;
             tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
             ((uint8_t*)tracks[i_track]->fmt.p_extra)[0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
             ((uint8_t*)tracks[i_track]->fmt.p_extra)[1] = ((i_srate & 0x1) << 7) | (tracks[i_track]->fmt.audio.i_channels << 3);
+            if (sbr != 0)
+            {
+                int syncExtensionType = 0x2B7;
+                int iDSRI;
+                for (iDSRI=0; iDSRI<13; iDSRI++)
+                    if( i_sample_rates[iDSRI] == tracks[i_track]->fmt.audio.i_rate )
+                        break;
+                ((uint8_t*)tracks[i_track]->fmt.p_extra)[2] = (syncExtensionType >> 3) & 0xFF;
+                ((uint8_t*)tracks[i_track]->fmt.p_extra)[3] = ((syncExtensionType & 0x7) << 5) | 5;
+                ((uint8_t*)tracks[i_track]->fmt.p_extra)[4] = ((1 & 0x1) << 7) | (iDSRI << 3);
+            }
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_AAC" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
             tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
             tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
+            memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_PCM/INT/BIG" ) ||
                  !strcmp( tracks[i_track]->psz_codec, "A_PCM/INT/LIT" ) ||
@@ -4415,8 +4435,15 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 {
                     KaxAudioSamplingFreq &afreq = *(KaxAudioSamplingFreq*)l;
 
-                    tk->fmt.audio.i_rate = (int)float( afreq );
+                    tk->i_original_rate = tk->fmt.audio.i_rate = (int)float( afreq );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + afreq=%d", tk->fmt.audio.i_rate );
+                }
+                else if( MKV_IS_ID( l, KaxAudioOutputSamplingFreq ) )
+                {
+                    KaxAudioOutputSamplingFreq &afreq = *(KaxAudioOutputSamplingFreq*)l;
+
+                    tk->fmt.audio.i_rate = (int)float( afreq );
+                    msg_Dbg( &sys.demuxer, "|   |   |   |   + aoutfreq=%d", tk->fmt.audio.i_rate );
                 }
                 else if( MKV_IS_ID( l, KaxAudioChannels ) )
                 {
