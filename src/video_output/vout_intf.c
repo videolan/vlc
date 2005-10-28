@@ -176,6 +176,7 @@ int vout_ControlWindow( vout_thread_t *p_vout, void *p_window,
 void vout_IntfInit( vout_thread_t *p_vout )
 {
     vlc_value_t val, text, old_val;
+    vlc_bool_t b_force_par = VLC_FALSE;
 
     /* Create a few object variables we'll need later on */
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -242,10 +243,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
     if( old_val.psz_string ) free( old_val.psz_string );
 
     /* Monitor pixel aspect-ratio */
-    var_Create( p_vout, "monitor-aspect-ratio",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "monitor-aspect-ratio", &val );
-    if( val.psz_string )
+    var_Create( p_vout, "monitor-par", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_vout, "monitor-par", &val );
+    if( val.psz_string && *val.psz_string )
     {
         char *psz_parser = strchr( val.psz_string, ':' );
         unsigned int i_aspect_num = 0, i_aspect_den = 0;
@@ -262,16 +262,17 @@ void vout_IntfInit( vout_thread_t *p_vout )
                          i_aspect *VOUT_ASPECT_FACTOR, VOUT_ASPECT_FACTOR, 0 );
         }
         free( val.psz_string );
-        if( !i_aspect_num || !i_aspect_den )
-        {
-            i_aspect_num = 4;
-            i_aspect_den = 3;
-        }
-        p_vout->i_par_num = i_aspect_num * 3 * 4;
+        if( !i_aspect_num || !i_aspect_den ) i_aspect_num = i_aspect_den = 1;
+
+        p_vout->i_par_num = i_aspect_num;
         p_vout->i_par_den = i_aspect_den;
 
         vlc_ureduce( &p_vout->i_par_num, &p_vout->i_par_den,
                      p_vout->i_par_num, p_vout->i_par_den, 0 );
+
+        msg_Dbg( p_vout, "monitor pixel aspect-ratio overriding: %i:%i",
+                 p_vout->i_par_num, p_vout->i_par_den );
+        b_force_par = VLC_TRUE;
     }
 
     /* Aspect-ratio object var */
@@ -296,7 +297,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
     var_Get( p_vout, "aspect-ratio", &old_val );
-    if( old_val.psz_string && *old_val.psz_string )
+    if( (old_val.psz_string && *old_val.psz_string) || b_force_par )
         var_Change( p_vout, "aspect-ratio", VLC_VAR_TRIGGER_CALLBACKS, 0, 0 );
     if( old_val.psz_string ) free( old_val.psz_string );
 
@@ -619,6 +620,15 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
     p_vout->render.i_aspect = p_vout->fmt_in.i_aspect;
 
  aspect_end:
+    if( p_vout->i_par_num && p_vout->i_par_den )
+    {
+        p_vout->fmt_in.i_sar_num *= p_vout->i_par_den;
+        p_vout->fmt_in.i_sar_den *= p_vout->i_par_num;
+        p_vout->fmt_in.i_aspect = p_vout->fmt_in.i_aspect *
+            p_vout->i_par_den / p_vout->i_par_num;
+        p_vout->render.i_aspect = p_vout->fmt_in.i_aspect;
+    }
+
     p_vout->i_changes |= VOUT_ASPECT_CHANGE;
 
     vlc_ureduce( &i_aspect_num, &i_aspect_den,
