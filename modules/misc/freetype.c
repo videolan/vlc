@@ -420,7 +420,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
         for( y = 1; y < (int)fmt.i_height - 1; y++ )
         {
-            memcpy( p_top, p_dst, fmt.i_width );
+            if( y > 1 ) memcpy( p_top, p_dst, fmt.i_width );
             p_dst += p_region->picture.Y_PITCH;
             left = 0;
 
@@ -615,7 +615,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
         i_error = FT_Glyph_To_Bitmap( &tmp_glyph, ft_render_mode_normal, 0, 1);
-        if( i_error ) continue;
+        if( i_error )
+        {
+            FT_Done_Glyph( tmp_glyph );
+            continue;
+        }
         p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
 
         /* Do rest */

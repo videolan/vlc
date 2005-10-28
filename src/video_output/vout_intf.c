@@ -265,7 +265,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
             vlc_ureduce( &i_aspect_num, &i_aspect_den,
                          i_aspect *VOUT_ASPECT_FACTOR, VOUT_ASPECT_FACTOR, 0 );
         }
-        free( val.psz_string );
         if( !i_aspect_num || !i_aspect_den ) i_aspect_num = i_aspect_den = 1;
 
         p_vout->i_par_num = i_aspect_num;
@@ -278,6 +277,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
                  p_vout->i_par_num, p_vout->i_par_den );
         b_force_par = VLC_TRUE;
     }
+    if( val.psz_string ) free( val.psz_string );
 
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING |
