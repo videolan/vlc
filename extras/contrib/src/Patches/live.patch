@@ -22,3 +22,117 @@ diff -ru live/groupsock/NetInterface.cpp live-patched/groupsock/NetInterface.cpp
  #endif
  
  ////////// NetInterface //////////
+--- live/liveMedia/RTSPClient.cpp	2005-10-28 18:54:17.000000000 +0200
++++ live-patched/liveMedia/RTSPClient.cpp	2005-10-28 22:04:54.000000000 +0200
+@@ -32,40 +32,47 @@
+ #define _strncasecmp strncasecmp
+ #endif
+ 
+-// Experimental support for temporarily setting the locale (e.g., to POSIX,
+-// for parsing or printing floating-point numbers in protocol headers).
+-#ifdef USE_LOCALE
+ #include <locale.h>
+-#else
+-#ifndef LC_NUMERIC
+-#define LC_NUMERIC 0
+-#endif
+-#endif
++#include <stdarg.h>
+ 
+-class Locale {
+-public:
+-  Locale(char const* newLocale, int category = LC_NUMERIC)
+-    : fCategory(category) {
+-#ifdef USE_LOCALE
+-    fPrevLocale = strDup(setlocale(category, NULL));
+-    setlocale(category, newLocale);
+-#endif
+-  }
++/* Radix safe (always uses .) printf and friends */
++int radix_safe_sprintf( char *str, const char *format, ...)
++{
++    va_list args;
++    int result = 0;
++    char *locale = NULL;
+ 
+-  virtual ~Locale() {
+-#ifdef USE_LOCALE
+-    if (fPrevLocale != NULL) {
+-      setlocale(fCategory, fPrevLocale);
+-      delete[] fPrevLocale;
+-    }
+-#endif
+-  }
++    locale = strDup( setlocale( LC_NUMERIC, NULL ) );
++    setlocale( LC_NUMERIC, "C" );
++
++    va_start( args, format );
++    result = vsprintf(str, format, args );
++    va_end( args );
+ 
+-private:
+-  int fCategory;
+-  char* fPrevLocale;
+-};
++    setlocale( LC_NUMERIC, locale );
++    delete[] locale;
+ 
++    return result;
++}
++
++int radix_safe_sscanf( const char *str, const char *format, ...)
++{
++    va_list args;
++    int result = 0;
++    char *locale = NULL;
++
++    locale = strDup( setlocale( LC_NUMERIC, NULL ) );
++    setlocale( LC_NUMERIC, "C" );
++
++    va_start( args, format );
++    result = vsscanf(str, format, args );
++    va_end( args );
++
++    setlocale( LC_NUMERIC, locale );
++    delete[] locale;
++
++    return result;
++}
+ 
+ 
+ ////////// RTSPClient //////////
+@@ -948,8 +955,7 @@
+     // This is the default value; we don't need a "Scale:" header:
+     buf[0] = '\0';
+   } else {
+-    Locale("POSIX");
+-    sprintf(buf, "Scale: %f\r\n", scale);
++    radix_safe_sprintf(buf, "Scale: %f\r\n", scale);
+   }
+ 
+   return strDup(buf);
+@@ -962,12 +968,10 @@
+     buf[0] = '\0';
+   } else if (end < 0) {
+     // There's no end time:
+-    Locale("POSIX");
+-    sprintf(buf, "Range: npt=%.3f-\r\n", start);
++    radix_safe_sprintf(buf, "Range: npt=%.3f-\r\n", start);
+   } else {
+     // There's both a start and an end time; include them both in the "Range:" hdr
+-    Locale("POSIX");
+-    sprintf(buf, "Range: npt=%.3f-%.3f\r\n", start, end);
++    radix_safe_sprintf(buf, "Range: npt=%.3f-%.3f\r\n", start, end);
+   }
+ 
+   return strDup(buf);
+@@ -2153,8 +2157,7 @@
+   if (_strncasecmp(line, "Scale: ", 7) != 0) return False;
+   line += 7;
+ 
+-  Locale("POSIX");
+-  return sscanf(line, "%f", &scale) == 1;
++  return radix_safe_sscanf(line, "%f", &scale) == 1;
+ }
+ 
+ Boolean RTSPClient::parseGetParameterHeader(char const* line, 
