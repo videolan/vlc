@@ -1482,7 +1482,7 @@ vlc_module_begin();
 #   define KEY_SUBTITLE_TRACK     'k'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          'I'
-#   define KEY_DISC MENU          KEY_MODIFIER_CTRL|'m'
+#   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
 #   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
 #   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'n'
 #   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
