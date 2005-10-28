@@ -1065,9 +1065,8 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
-        val.i_int = PAUSE_S;
-
-        var_Set( p_input, "state", val );
+        val.i_int = config_GetInt( p_intf, "key-play-pause" );
+        var_Set( p_intf->p_vlc, "key-pressed", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
