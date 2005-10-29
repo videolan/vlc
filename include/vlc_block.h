@@ -88,8 +88,6 @@ struct block_t
     int         i_samples; /* Used for audio */
     int         i_rate;
 
-    uint16_t	i_seqno;   /* Used for RTP */
-
     int         i_buffer;
     uint8_t     *p_buffer;
 

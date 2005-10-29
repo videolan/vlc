@@ -70,7 +70,6 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     p_block->i_dts          = 0;
     p_block->i_length       = 0;
     p_block->i_rate         = 0;
-    p_block->i_seqno        = 0;
     p_block->i_buffer       = i_size;
     p_block->p_buffer       =
         &p_sys->p_allocated_buffer[BLOCK_PADDING_SIZE +

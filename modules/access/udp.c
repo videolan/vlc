@@ -343,7 +343,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
     access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
     block_t *p_prev = NULL;
     block_t *p = p_sys->p_end;
-    uint16_t i_new = p_block->i_seqno;
+    uint16_t i_new = (uint16_t) p_block->i_dts;
     uint16_t i_tmp = 0;
 
     if( !p_sys->p_list )
@@ -357,13 +357,13 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
 
     for( ;; )
     {
-        i_tmp = i_new - p->i_seqno;
+        i_tmp = i_new - (uint16_t) p->i_dts;
 
         if( !i_tmp )   /* trash duplicate */
             break; 
 
         if ( i_tmp < 32768 )
-        {   /* insert after this block ( i_new > p->i_seqno ) */
+        {   /* insert after this block ( i_new > p->i_dts ) */
             p_block->p_next = p->p_next;
             p->p_next = p_block;
             p_block->p_prev = p;
@@ -371,7 +371,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             {
                 p_prev->p_prev = p_block;
                 msg_Dbg(p_access, "RTP reordering: insert after %d, new %d", 
-                    p->i_seqno, i_new );
+                    (uint16_t) p->i_dts, i_new );
             }
             else 
             {
@@ -385,7 +385,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             if( !p_access->info.b_prebuffered || (i_tmp > 32767) )
             {
                 msg_Dbg(p_access, "RTP reordering: prepend %d before %d", 
-                        i_new, p->i_seqno );
+                        i_new, (uint16_t) p->i_dts );
                 p_block->p_next = p;
                 p->p_prev = p_block;
                 p_sys->p_list = p_block;
@@ -397,8 +397,8 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
 
             /* reordering failed - append the packet to the end of queue */
             msg_Dbg(p_access, "RTP: sequence changed (or buffer too small) "
-                "new: %d, buffer %d...%d", i_new, p->i_seqno, 
-                p_sys->p_end->i_seqno);
+                "new: %d, buffer %d...%d", i_new, (uint16_t) p->i_dts, 
+                (uint16_t) p_sys->p_end->i_dts);
             p_sys->p_end->p_next = p_block;
             p_block->p_prev = p_sys->p_end;
             p_sys->p_end = p_block;
@@ -455,10 +455,10 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     if( i_skip >= p_block->i_buffer )
         goto trash;
 
-    /* Return the packet without the RTP header, remember seqno */
+    /* Return the packet without the RTP header, remember seqno in i_dts */
     p_block->i_buffer -= i_skip;
     p_block->p_buffer += i_skip;
-    p_block->i_seqno = i_sequence_number;
+    p_block->i_dts = (mtime_t) i_sequence_number;
 
 #if 0
     /* Emulate packet loss */
@@ -509,7 +509,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
     p_access->info.b_prebuffered = VLC_TRUE;
     p = p_sys->p_list;
     p_sys->p_list = p_sys->p_list->p_next;
-    p_sys->i_last_seqno = p->i_seqno;
+    p_sys->i_last_seqno = (uint16_t) p->i_dts;
     p->p_next = NULL;
     return p;
 }
@@ -534,11 +534,11 @@ again:
     p = p_sys->p_list;
     p_sys->p_list = p_sys->p_list->p_next;
     p_sys->i_last_seqno++;
-    if( p_sys->i_last_seqno != p->i_seqno )
+    if( p_sys->i_last_seqno != (uint16_t) p->i_dts )
     {
         msg_Dbg( p_access, "RTP: packet(s) lost, expected %d, got %d",
-                 p_sys->i_last_seqno, p->i_seqno );
-        p_sys->i_last_seqno = p->i_seqno;
+                 p_sys->i_last_seqno, (uint16_t) p->i_dts );
+        p_sys->i_last_seqno = (uint16_t) p->i_dts;
     }
     p->p_next = NULL;
     return p;
