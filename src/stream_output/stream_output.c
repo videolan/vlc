@@ -473,7 +473,7 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
 
     if( !p_mux->b_add_stream_any_time && !p_mux->b_waiting_stream )
     {
-        msg_Err( p_mux, "cannot add a new stream (unsuported while muxing "
+        msg_Err( p_mux, "cannot add a new stream (unsupported while muxing "
                         "for this format)" );
         return NULL;
     }
