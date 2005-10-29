@@ -186,9 +186,15 @@ vlc_module_begin();
                  SCENE_LONGTEXT, VLC_FALSE );
         change_integer_range( -1, 100 );
 
+#if X264_BUILD >= 30
+    add_integer( SOUT_CFG_PREFIX "subpel", 6, NULL, SUBPEL_TEXT,
+                 SUBPEL_LONGTEXT, VLC_FALSE );
+        change_integer_range( 1, 6 );
+#else
     add_integer( SOUT_CFG_PREFIX "subpel", 5, NULL, SUBPEL_TEXT,
                  SUBPEL_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, 5 );
+#endif
 
 vlc_module_end();
 
@@ -350,7 +356,11 @@ static int  Open ( vlc_object_t *p_this )
 
 #if X264_BUILD >= 22
     var_Get( p_enc, SOUT_CFG_PREFIX "subpel", &val );
+#if X264_BUILD >= 30
+    if( val.i_int >= 1 && val.i_int <= 6 )
+#else
     if( val.i_int >= 1 && val.i_int <= 5 )
+#endif
         p_sys->param.analyse.i_subpel_refine = val.i_int;
 #endif
 
@@ -544,7 +554,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 }
 
 /*****************************************************************************
- * CloseEncoder: ffmpeg encoder destruction
+ * CloseEncoder: x264 encoder destruction
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
