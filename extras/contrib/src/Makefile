@@ -1009,11 +1009,11 @@ DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
 # libcddb
 # ***************************************************************************
 
-libcddb-$(CDDB_VERSION).tar.bz2:
+libcddb-$(CDDB_VERSION).tar.gz:
 	$(WGET) $(CDDB_URL)
 
-libcddb: libcddb-$(CDDB_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+libcddb: libcddb-$(CDDB_VERSION).tar.gz
+	$(EXTRACT_GZ)
 
 .cddb: libcddb
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
@@ -1021,7 +1021,7 @@ libcddb: libcddb-$(CDDB_VERSION).tar.bz2
 
 CLEAN_FILE += .cddb
 CLEAN_PKG += libcddb
-DISTCLEAN_PKG += libcddb-$(CDDB_VERSION).tar.bz2
+DISTCLEAN_PKG += libcddb-$(CDDB_VERSION).tar.gz
 
 # ***************************************************************************
 # vcdimager
