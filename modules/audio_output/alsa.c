@@ -355,11 +355,11 @@ static int Open( vlc_object_t *p_this )
     /* Choose the linear PCM format (read the comment above about FPU
        and float32) */
     if( p_aout->p_libvlc->i_cpu & CPU_CAPABILITY_FPU )
-    {
+   /* {
         i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
         i_snd_pcm_format = SND_PCM_FORMAT_FLOAT;
     }
-    else
+    else */
     {
         i_vlc_pcm_format = AOUT_FMT_S16_NE;
         i_snd_pcm_format = SND_PCM_FORMAT_S16;
@@ -501,6 +501,24 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    /* Set rate. */
+    i_old_rate = p_aout->output.output.i_rate;
+#ifdef HAVE_ALSA_NEW_API
+    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+                                                &(p_aout->output.output.i_rate),
+                                                NULL );
+#else
+    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+                                                p_aout->output.output.i_rate,
+                                                NULL );
+#endif
+    if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
+    {
+        msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
+                  "Using %d Hz instead.\n", i_old_rate,
+                  p_aout->output.output.i_rate );
+    }
+
     /* Set format. */
     if ( ( i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
                                                     i_snd_pcm_format ) ) < 0 )
@@ -545,24 +563,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "unable to set number of output channels (%s)",
                          snd_strerror( i_snd_rc ) );
         goto error;
-    }
-
-    /* Set rate. */
-    i_old_rate = p_aout->output.output.i_rate;
-#ifdef HAVE_ALSA_NEW_API
-    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
-                                                &p_aout->output.output.i_rate,
-                                                NULL );
-#else
-    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
-                                                p_aout->output.output.i_rate,
-                                                NULL );
-#endif
-    if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
-    {
-        msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
-                  "Using %d Hz instead.\n", i_old_rate,
-                  p_aout->output.output.i_rate );
     }
 
     /* Set buffer size. */
