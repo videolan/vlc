@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+#include <vlc/intf.h>
 #include <vlc/vout.h>
 
 #include <commctrl.h>
@@ -92,6 +93,7 @@
 #define SetWindowLongPtr SetWindowLong
 #define GetWindowLongPtr GetWindowLong
 #define GWLP_USERDATA GWL_USERDATA
+#define AdjustWindowRect(a,b,c)
 #endif //UNDER_CE
 
 #ifndef WS_NONAVDONEBUTTON
@@ -146,6 +148,7 @@ struct vout_sys_t
     int          i_window_y;
     int          i_window_width;
     int          i_window_height;
+    int          i_window_style;
     int          render_width;
     int          render_height;
 
@@ -404,7 +407,11 @@ static int Init( vout_thread_t *p_vout )
 #else
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
+
+    p_vout->fmt_out = p_vout->fmt_in;
+    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 #endif
+
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     p_pic->p->p_pixels = p_vout->p_sys->p_pic_buffer;
@@ -801,6 +808,8 @@ static void EventThread ( vlc_object_t *p_event )
     else
         i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
 
+    p_vout->p_sys->i_window_style = i_style;
+
     p_vout->p_sys->hwnd =
         CreateWindow( _T("VLC WinGDI"), _T(VOUT_TITLE), i_style,
                       (p_vout->p_sys->i_window_x < 0) ? CW_USEDEFAULT :
@@ -1150,6 +1159,19 @@ static long FAR PASCAL WndProc( HWND hWnd, UINT message,
             p_vout->p_sys->b_video_display = VLC_TRUE;
         break;
 
+    /* the user wants to close the window */
+    case WM_CLOSE:
+    {
+        playlist_t * p_playlist =
+            (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist == NULL ) return 0;
+
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
+        return 0;
+    }
+
     case WM_DESTROY:
         msg_Dbg( p_vout, "WinProc WM_DESTROY" );
         PostQuitMessage( 0 );
@@ -1261,9 +1283,55 @@ static void InitBuffers( vout_thread_t *p_vout )
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     vlc_bool_t b_bool;
+    double f_arg;
+    RECT rect_window;
+    POINT point;
 
     switch( i_query )
     {
+    case VOUT_SET_ZOOM:
+        if( p_vout->p_sys->hparent )
+            return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->hparent, i_query, args );
+
+        f_arg = va_arg( args, double );
+
+        /* Update dimensions */
+        rect_window.top = rect_window.left = 0;
+        rect_window.right  = p_vout->i_window_width * f_arg;
+        rect_window.bottom = p_vout->i_window_height * f_arg;
+        AdjustWindowRect( &rect_window, p_vout->p_sys->i_window_style, 0 );
+
+        SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                      rect_window.right - rect_window.left,
+                      rect_window.bottom - rect_window.top, SWP_NOMOVE );
+
+        return VLC_SUCCESS;
+
+    case VOUT_CLOSE:
+        ShowWindow( p_vout->p_sys->hwnd, SW_HIDE );
+    case VOUT_REPARENT:
+        /* Change window style, borders and title bar */
+        //vlc_mutex_lock( &p_vout->p_sys->lock );
+        p_vout->p_sys->hparent = 0;
+        //vlc_mutex_unlock( &p_vout->p_sys->lock );
+
+        /* Retrieve the window position */
+        point.x = point.y = 0;
+        ClientToScreen( p_vout->p_sys->hwnd, &point );
+
+        SetParent( p_vout->p_sys->hwnd, 0 );
+        p_vout->p_sys->i_window_style =
+            WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
+                       p_vout->p_sys->i_window_style |
+                       (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW );
+        SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
+                      SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
+
+        return vout_vaControlDefault( p_vout, i_query, args );
+
     case VOUT_SET_FOCUS:
         b_bool = va_arg( args, vlc_bool_t );
 
