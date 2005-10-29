@@ -554,7 +554,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 }
 
 /*****************************************************************************
- * CloseEncoder: ffmpeg encoder destruction
+ * CloseEncoder: x264 encoder destruction
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
