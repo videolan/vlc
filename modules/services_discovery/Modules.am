@@ -4,3 +4,4 @@ SOURCES_daap = daap.c
 SOURCES_shout = shout.c
 SOURCES_upnp = upnp.cpp
 SOURCES_bonjour = bonjour.c
+SOURCES_podcast = podcast.c

@@ -79,6 +79,11 @@ vlc_module_begin();
         add_shortcut( "dvb-open" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_DVB), E_(Close_DVB) );
+    add_submodule();
+        set_description( _("Podcast playlist import") );
+        add_shortcut( "podcast" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(Import_podcast), E_(Close_podcast) );
 vlc_module_end();
 
 
