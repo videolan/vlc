@@ -785,11 +785,13 @@ static int ManageVideo( vout_thread_t *p_vout )
                                p_vout->p_sys->p_win->i_height,
                                &i_x, &i_y, &i_width, &i_height );
 
-            val.i_int = ( xevent.xmotion.x - i_x )
-                         * p_vout->render.i_width / i_width;
+            val.i_int = ( xevent.xmotion.x - i_x ) *
+                p_vout->fmt_in.i_visible_width / i_width +
+                p_vout->fmt_in.i_x_offset;
             var_Set( p_vout, "mouse-x", val );
-            val.i_int = ( xevent.xmotion.y - i_y )
-                         * p_vout->render.i_height / i_height;
+            val.i_int = ( xevent.xmotion.y - i_y ) *
+                p_vout->fmt_in.i_visible_height / i_height +
+                p_vout->fmt_in.i_y_offset;
             var_Set( p_vout, "mouse-y", val );
 
             val.b_bool = VLC_TRUE;
