@@ -191,9 +191,9 @@ vlc_module_begin();
                  SUBPEL_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, 6 );
 #else
-    add_integer( SOUT_CFG_PREFIX "subpel", 6, NULL, SUBPEL_TEXT,
+    add_integer( SOUT_CFG_PREFIX "subpel", 5, NULL, SUBPEL_TEXT,
                  SUBPEL_LONGTEXT, VLC_FALSE );
-        change_integer_range( 1, 6 );
+        change_integer_range( 1, 5 );
 #endif
 
 vlc_module_end();
