@@ -52,6 +52,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     audio_sample_format_t chain_output_format;
     vlc_value_t val, text;
     char * psz_filters, *psz_visual;
+    int i_visual;
 
     aout_FormatPrint( p_aout, "input", &p_input->input );
 
@@ -157,23 +158,15 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     var_Get( p_aout, "audio-visual", &val );
     psz_visual = val.psz_string;
 
-    if( psz_filters && *psz_filters && psz_visual && *psz_visual )
+    /* parse user filter lists */
+    for( i_visual = 0; i_visual < 2; i_visual++ )
     {
-        psz_filters = (char *)realloc( psz_filters, strlen( psz_filters ) +
-                                                    strlen( psz_visual )  + 1);
-        sprintf( psz_filters, "%s:%s", psz_filters, psz_visual );
-    }
-    else if(  psz_visual && *psz_visual )
-    {
-        if( psz_filters ) free( psz_filters );
-        psz_filters = strdup( psz_visual );
-    }
+        char *psz_next = NULL;
+        char *psz_parser = i_visual ? psz_visual : psz_filters;
 
-    /* parse user filter list */
-    if( psz_filters && *psz_filters )
-    {
-        char *psz_parser = psz_filters;
-        char *psz_next;
+        if( psz_parser == NULL || !*psz_parser )
+            continue;
+        
         while( psz_parser && *psz_parser )
         {
             aout_filter_t * p_filter = NULL;
@@ -209,38 +202,52 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
             vlc_object_attach( p_filter , p_aout );
 
-            /* request format */
-            memcpy( &p_filter->input, &chain_input_format,
-                    sizeof(audio_sample_format_t) );
-            memcpy( &p_filter->output, &chain_output_format,
-                    sizeof(audio_sample_format_t) );
-
             /* try to find the requested filter */
-            p_filter->p_module = module_Need( p_filter, "audio filter",
+            if( i_visual == 1 ) /* this can only be a visualization module */
+            {
+                /* request format */
+                memcpy( &p_filter->input, &chain_output_format,
+                        sizeof(audio_sample_format_t) );
+                memcpy( &p_filter->output, &chain_output_format,
+                        sizeof(audio_sample_format_t) );
+                        
+                p_filter->p_module = module_Need( p_filter, "visualization",
+                                                  psz_parser, VLC_TRUE );
+            }
+            else /* this can be a audio filter module as well as a visualization module */
+            {
+                /* request format */
+                memcpy( &p_filter->input, &chain_input_format,
+                        sizeof(audio_sample_format_t) );
+                memcpy( &p_filter->output, &chain_output_format,
+                        sizeof(audio_sample_format_t) );
+
+                p_filter->p_module = module_Need( p_filter, "audio filter",
                                               psz_parser, VLC_TRUE );
 
-            if ( p_filter->p_module == NULL )
-            {
-                /* if the filter requested a special format, retry */
-                if ( !( AOUT_FMTS_IDENTICAL( &p_filter->input,
-                                             &chain_input_format )
-                        && AOUT_FMTS_IDENTICAL( &p_filter->output,
-                                                &chain_output_format ) ) )
+                if ( p_filter->p_module == NULL )
                 {
-                    aout_FormatPrepare( &p_filter->input );
-                    aout_FormatPrepare( &p_filter->output );
-                    p_filter->p_module = module_Need( p_filter, "audio filter",
-                                                      psz_parser, VLC_TRUE );
-                }
-                /* try visual filters */
-                else
-                {
-                    memcpy( &p_filter->input, &chain_output_format,
-                            sizeof(audio_sample_format_t) );
-                    memcpy( &p_filter->output, &chain_output_format,
-                            sizeof(audio_sample_format_t) );
-                    p_filter->p_module = module_Need( p_filter, "visualization",
-                                                      psz_parser, VLC_TRUE );
+                    /* if the filter requested a special format, retry */
+                    if ( !( AOUT_FMTS_IDENTICAL( &p_filter->input,
+                                                 &chain_input_format )
+                            && AOUT_FMTS_IDENTICAL( &p_filter->output,
+                                                    &chain_output_format ) ) )
+                    {
+                        aout_FormatPrepare( &p_filter->input );
+                        aout_FormatPrepare( &p_filter->output );
+                        p_filter->p_module = module_Need( p_filter, "audio filter",
+                                                          psz_parser, VLC_TRUE );
+                    }
+                    /* try visual filters */
+                    else
+                    {
+                        memcpy( &p_filter->input, &chain_output_format,
+                                sizeof(audio_sample_format_t) );
+                        memcpy( &p_filter->output, &chain_output_format,
+                                sizeof(audio_sample_format_t) );
+                        p_filter->p_module = module_Need( p_filter, "visualization",
+                                                          psz_parser, VLC_TRUE );
+                    }
                 }
             }
 
