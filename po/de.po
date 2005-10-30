@@ -11,7 +11,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2005-10-27 20:16+0200\n"
 "PO-Revision-Date: 2005-04-13 08:27+0100\n"
 "Last-Translator: Felix Kühne <fkuehne@users.sf.net>\n"
@@ -190,9 +190,8 @@ msgstr ""
 "Einstellungen."
 
 #: include/vlc_config_cat.h:104
-#, fuzzy
 msgid "Access filters"
-msgstr "Access-Filter-Module"
+msgstr "Access-Filter"
 
 #: include/vlc_config_cat.h:106
 msgid ""
@@ -200,6 +199,9 @@ msgid ""
 "input side of VLC. You should not touch anything here unless you know what "
 "you are doing.\n"
 msgstr ""
+"Access-Filter sind spezielle Module, die fortgeschrittene Funktionen auf der "
+"Input-Seite von VLC ausführen können. Sie sollten hier nichts berühren, wenn "
+"Sie nicht genau wissen, was Sie tun.\n"
 
 #: include/vlc_config_cat.h:110
 msgid "Demuxers"
@@ -1010,17 +1012,17 @@ msgstr "Farbumkehrung"
 #: src/libvlc.c:2416
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
-msgstr ""
+msgstr "Compiliert von %s@%s.%s\n"
 
 #: src/libvlc.c:2418
 #, c-format
 msgid "Compiler: %s\n"
-msgstr ""
+msgstr "Compiler: %s\n"
 
 #: src/libvlc.c:2420
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
-msgstr ""
+msgstr "Basiert auf svn-Revision [%s]\n"
 
 #: src/libvlc.c:2423
 #, c-format
@@ -1042,6 +1044,8 @@ msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
+"\n"
+"Inhalt in vlc-help.txt Datei gespeichert.\n"
 
 #: src/libvlc.c:2476
 #, c-format
@@ -1103,9 +1107,8 @@ msgid "Dutch"
 msgstr "Niederländisch"
 
 #: src/libvlc.h:34
-#, fuzzy
 msgid "Brazilian Portuguese"
-msgstr "Portugiesisch"
+msgstr "Brasilianisches Portugiesisch"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:153
 msgid "Romanian"
@@ -1121,7 +1124,7 @@ msgstr "Türkisch"
 
 #: src/libvlc.h:34
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "Vereinfachtes Chinesisch"
 
 #: src/libvlc.h:34
 msgid "Chinese Traditional"
@@ -1388,9 +1391,8 @@ msgstr ""
 "dies unterstützen."
 
 #: src/libvlc.h:162
-#, fuzzy
 msgid "Force detection of Dolby Surround"
-msgstr "Auswahl von allen Streams erzwingen"
+msgstr "Erkennung von Dolby Surround erzwingen"
 
 #: src/libvlc.h:164
 msgid ""
@@ -1399,11 +1401,14 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
+"Benutzen Sie dies, wenn Ihre Stream mit Dolby Surround kodiert wurde (oder "
+"nicht) und dessen Erkennung fehlschlägt. Auch wenn der Stream nicht mit "
+"Dolby Surround kodiert wurde, kann diese Option vielleicht Ihr Hörerlebnis "
+"erhöhen, besonders wenn sie mit dem Kopfhörer-Kanal-Mixer kombiniert wird."
 
 #: src/libvlc.h:170
-#, fuzzy
 msgid "On"
-msgstr "Öffnen"
+msgstr "An"
 
 #: src/libvlc.h:170
 msgid "Off"
@@ -1642,25 +1647,23 @@ msgstr "Plaziert das Videofenster immer über allen anderen Fenstern."
 
 #: src/libvlc.h:258
 msgid "Disable screensaver"
-msgstr ""
+msgstr "Bildschirmschoner deaktivieren"
 
 #: src/libvlc.h:259
 msgid "Disable the screensaver during video playback."
-msgstr ""
+msgstr "Deaktiviert den Bildschirmschoner während der Videowiedergabe."
 
 #: src/libvlc.h:261
 msgid "Window decorations"
 msgstr "Fensterdekorationen"
 
 #: src/libvlc.h:263
-#, fuzzy
 msgid ""
 "If this option is disabled, VLC will avoid creating window caption, frames, "
 "etc... around the video."
 msgstr ""
 "Wenn Sie diese Option aktivieren, wird VLC die Erstellung von "
-"Fensterbeschriftungen, Rahmen, etc. um das Video verhindern. Dies wird "
-"derzeit nur unter Windows unterstützt."
+"Fensterbeschriftungen, Rahmen, etc. um das Video verhindern."
 
 #: src/libvlc.h:266
 msgid "Video filter module"
@@ -1719,7 +1722,7 @@ msgstr ""
 
 #: src/libvlc.h:291
 msgid "Fix HDTV height"
-msgstr ""
+msgstr "HDTV-Höhe korrigieren"
 
 #: src/libvlc.h:293
 msgid ""
@@ -1727,11 +1730,14 @@ msgid ""
 "encoder incorrectly set height to 1088 lines. Disable this option only if "
 "your video has non-standard format requiring all 1088 lines."
 msgstr ""
+"Diese Option erlaubt den korrekten Umgang mit dem HDTV-1080-Videoformat, auch "
+"wenn ein defekter Encoder die Höhe auf 1088 Zeilen gesetzt hat. Deaktivieren "
+"Sie diese Option, wenn Ihr Video ein nicht standardkonformes Format hat, "
+"welches alle 1088 Zeilen umfasst."
 
 #: src/libvlc.h:298
-#, fuzzy
 msgid "Monitor aspect ratio"
-msgstr "Bildseitenverhältnis"
+msgstr "Monitorseitenverhältnis"
 
 #: src/libvlc.h:300
 msgid ""
@@ -1739,6 +1745,9 @@ msgid ""
 "have a 16:9 screen, you will need to change this to 16:9 inorder to keep "
 "proportions."
 msgstr ""
+"Dies bestimmt das Monitorseitenverhältnis. Die meisten Monitore haben ein "
+"4:3-Format. Wenn Sie einen 16:9-Bildschirm haben, müssen Sie dies auf 16:9 "
+"ändern, damit die korrekten Proportionen beibehalten werden."
 
 #: src/libvlc.h:304
 msgid "Skip frames"
@@ -1749,6 +1758,8 @@ msgid ""
 "This option enables framedropping on MPEG2 stream. Framedropping occurs when "
 "your computer is not powerful enough"
 msgstr ""
+"Diese Option aktiviert das Fallenlassen von Frames bei MPEG2-Streams. "
+"Dies kann notwendig sein, wenn Ihre Computer nicht schnell genug ist."
 
 #: src/libvlc.h:309
 msgid "Quiet synchro"
@@ -2620,7 +2631,7 @@ msgstr ""
 
 #: src/libvlc.h:689
 msgid "Access module"
-msgstr "Zugriffsmodul"
+msgstr "Access-Modul"
 
 #: src/libvlc.h:691
 msgid ""
@@ -2628,6 +2639,9 @@ msgid ""
 "access is not automatically detected. You should not set this as a global "
 "option unless you really know what you are doing."
 msgstr ""
+"Dies erlaubt die Erzwingung eines Access-Moduls. Sie können es benutzen, wenn "
+"das korrekte Module nicht automatisch erkannt wird. Sie sollten dies nicht "
+"als globale Option speichern, es sei denn Sie wissen wirklich, was Sie tun."
 
 #: src/libvlc.h:695
 msgid "Access filter module"
@@ -2753,13 +2767,15 @@ msgstr ""
 
 #: src/libvlc.h:749
 msgid "Enqueue items to playlist when in one instance mode"
-msgstr ""
+msgstr "Objekte an Wiedergabeliste anhängen, wenn VLC im 1-Instanz-Modus läuft"
 
 #: src/libvlc.h:751
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
+"Wenn die nur-1-Instanz-Option benutzt wird, Objekte an die Wiedergabeliste "
+"anhängen und das gerade wiedergegebene Objekt beibehalten."
 
 #: src/libvlc.h:754
 msgid "Increase the priority of the process"
@@ -4119,7 +4135,7 @@ msgstr "Alle Objekte, unsortiert"
 
 #: src/playlist/sort.c:233 src/playlist/sort.c:236 src/playlist/sort.c:333
 msgid "Album/movie/show title"
-msgstr ""
+msgstr "Album/Film/Sendungstitel"
 
 #: src/playlist/sort.c:344 src/playlist/view.c:79 src/playlist/view.c:280
 msgid "Undefined"
@@ -5012,9 +5028,8 @@ msgid "Framerate"
 msgstr "Framerate"
 
 #: modules/access/fake.c:46
-#, fuzzy
 msgid "Specifies the number of frames per second (eg. 24, 25, 29.97, 30)."
-msgstr "Die Anzahl von Frames pro Sekunde festlegen (eg. 24, 25, 29.97, 30)."
+msgstr "Legt die Anzahl von Frames pro Sekunde fest (eg. 24, 25, 29.97, 30)."
 
 #: modules/access/fake.c:47 modules/stream_out/bridge.c:36
 #: modules/stream_out/mosaic_bridge.c:100
@@ -5026,25 +5041,28 @@ msgid ""
 "Allows you to set the ID of the fake elementary stream for use in #duplicate"
 "{} constructs (default 0)."
 msgstr ""
+"Erlaubt Ihnen die Einstellung der ID von Fake-Elementarstreams zur Benutzung "
+"in #duplicate{}-Konstrukten (standardmäßig 0)."
 
 #: modules/access/fake.c:51
-#, fuzzy
 msgid "Duration in ms"
-msgstr "Laufzeit"
+msgstr "Laufzeit in ms"
 
 #: modules/access/fake.c:53
 msgid ""
 "Specifies the duration of the fake streaming before faking an end-of-file "
 "(default 0 means the stream is unlimited)."
 msgstr ""
+"Legt die Länge des Fake-Streams fest, bevor ein Ende der Datei vorgetäuscht "
+"wird (standardmäßig 0, d.h. der Stream hat kein festgelegtes Ende)."
 
 #: modules/access/fake.c:57 modules/codec/fake.c:74
 msgid "Fake"
-msgstr "Vortäuschen"
+msgstr "Vortäuschung"
 
 #: modules/access/fake.c:58
 msgid "Fake input"
-msgstr "Input vortäuschen"
+msgstr "Vorgetäuschter Input"
 
 #: modules/access/file.c:82
 msgid ""
@@ -5122,18 +5140,16 @@ msgid "FTP input"
 msgstr "FTP Input"
 
 #: modules/access/gnomevfs.c:46
-#, fuzzy
 msgid ""
 "Allows you to modify the default caching value for GnomeVFS streams.This "
 "value should be set in millisecond units."
 msgstr ""
-"Erlaubt Ihnen den Standard-Cachewert für FTP-Streams zu ändern. Dieser Wert "
-"sollte in Millisekunden sein."
+"Erlaubt Ihnen den Standard-Cachewert für GnomeVFS-Streams zu ändern. Dieser "
+"Wert sollte in Millisekunden sein."
 
 #: modules/access/gnomevfs.c:50
-#, fuzzy
 msgid "GnomeVFS filesystem file input"
-msgstr "Standard-Dateisystem Datei-Input"
+msgstr "GnomeVFS-Dateisystem Datei-Input"
 
 #: modules/access/gnomevfs.c:51
 msgid "GnomeVFS"
@@ -5151,8 +5167,8 @@ msgid ""
 "variable will be tried."
 msgstr ""
 "Sie können einen zu benutzenden HTTP-Proxy festlegen. Dies muss in der Form "
-"http://myproxy.mydomain:myport/ sein. Wenn keiner angegeben ist, wird die "
-"HTTP_PROXY Umgebungsvariable benutzt."
+"http://[Benutzer[:Passwort]@]myproxy.mydomain:myport/ sein. Wenn keiner "
+"angegeben ist, wird die Umgebungsvariable HTTP_PROXY benutzt."
 
 #: modules/access/http.c:53
 msgid ""
@@ -5215,15 +5231,16 @@ msgid "Force selection of all streams"
 msgstr "Auswahl von allen Streams erzwingen"
 
 #: modules/access/mms/mms.c:53
-#, fuzzy
 msgid "Maximum bitrate"
-msgstr "Maximale lokale Bitrate"
+msgstr "Maximale Bitrate"
 
 #: modules/access/mms/mms.c:55
 msgid ""
 "If this is set, the stream with the maximum bitrate under that limit      "
 "will be selected"
 msgstr ""
+"Wenn dies aktiviert ist, wird der Stream mit der maximalen Bitrate unter "
+"diesen Limit gewählt werden."
 
 #: modules/access/mms/mms.c:59
 msgid "MMS"
@@ -5862,23 +5879,22 @@ msgstr ""
 "werden."
 
 #: modules/access_filter/timeshift.c:42
-#, fuzzy
 msgid "Timeshift granularity"
-msgstr "Timeshift"
+msgstr "Timeshift-Granularität"
 
 #: modules/access_filter/timeshift.c:43
-#, fuzzy
 msgid "Size of the temporary files use to store the timeshifted stream."
-msgstr "Videofilter werden benutzt, um den Videostream nachzubearbeiten"
+msgstr "Größe der temporären Dateien, die zur Zwischenspeicherung des "
+"Streams benutzt werden."
 
 #: modules/access_filter/timeshift.c:45
-#, fuzzy
 msgid "Timeshift directory"
-msgstr "Videoschnappschuss-Verzeichnis"
+msgstr "Timeshift-Verzeichnis"
 
 #: modules/access_filter/timeshift.c:46
 msgid "Directory used to store the timeshift temporary files."
-msgstr ""
+msgstr "Verzeichnis, in das die temporören Timeshift-Dateien gespeichert "
+"werden."
 
 #: modules/access_filter/timeshift.c:50 modules/access_filter/timeshift.c:51
 msgid "Timeshift"
@@ -5997,27 +6013,24 @@ msgid "HTTP"
 msgstr "HTTP"
 
 #: modules/access_output/shout.c:58
-#, fuzzy
 msgid "Stream-name"
-msgstr "Stream"
+msgstr "Stream-Name"
 
 #: modules/access_output/shout.c:59
 msgid "The name this stream/channel will get on the icecast server."
-msgstr ""
+msgstr "Der Name den dieser Stream/Kanal auf dem Icecast-Server bekommen wird."
 
 #: modules/access_output/shout.c:61
-#, fuzzy
 msgid "Stream-description"
-msgstr "Sessionsbeschreibung"
+msgstr "Stream-Beschreibung"
 
 #: modules/access_output/shout.c:62
 msgid "A description of the stream content. (Information about your channel)."
-msgstr ""
+msgstr "Eine Beschreibung des Streaminhalts. (Informationen über Ihren Kanal.)"
 
 #: modules/access_output/shout.c:65
-#, fuzzy
 msgid "Stream MP3"
-msgstr "Stream"
+msgstr "MP3 streamen"
 
 #: modules/access_output/shout.c:66
 msgid ""
@@ -6025,10 +6038,13 @@ msgid ""
 "allows you to feed MP3 streams instead, so you can forward MP3 streams to "
 "the icecast server."
 msgstr ""
+"Normalerweise benötigt das Shoutcast-Modul Ogg-Streams. Diese Option erlaubt "
+"Ihnen die Benutzung von MP3-Streams, sodass Sie MP3-Streams auf den "
+"Icecast-Server weiterleiten können."
 
 #: modules/access_output/shout.c:71
 msgid "libshout (icecast) output"
-msgstr ""
+msgstr "libshout (icecast) Ausgabe"
 
 #: modules/access_output/shout.c:72
 #, fuzzy
@@ -6079,12 +6095,11 @@ msgstr "UDP"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
 msgid "Simple decoder for dolby surround encoded streams"
-msgstr ""
+msgstr "Einfacher Dekoder für Dolby-Surround-kodierte Streams"
 
 #: modules/audio_filter/channel_mixer/dolby.c:48
-#, fuzzy
 msgid "Dolby surround decoder"
-msgstr "Dolby Surround"
+msgstr "Dolby Surround Dekoder"
 
 #: modules/audio_filter/channel_mixer/headphone.c:49
 #, fuzzy
@@ -6111,24 +6126,29 @@ msgstr "Distanz zwischen dem linken Lautsprecher und dem Hörer in Metern."
 
 #: modules/audio_filter/channel_mixer/headphone.c:60
 msgid "Compensate delay"
-msgstr ""
+msgstr "Verzögerung ausgleichen"
 
 #: modules/audio_filter/channel_mixer/headphone.c:62
 msgid ""
 "The delay which is introduced by the physical algorithm may sometimes be "
 "disturbing for the lipsync. In that case, turn this on to compensate."
 msgstr ""
+"Die vom physikalischen Algorithmus ausgelöste Verzögerung, kann sich "
+"manchmal störend auf die Lippensynchronheit auswirken. Aktivieren Sie dies "
+"dann, um es auszugleichen."
 
 #: modules/audio_filter/channel_mixer/headphone.c:66
-#, fuzzy
 msgid "No decoding of Dolby Surround"
-msgstr "Auswahl von allen Streams erzwingen"
+msgstr "Keine Dekodierung von Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/headphone.c:68
 msgid ""
 "If this option is turned on (not recommended), Dolby Surround encoded "
 "streams won't be decoded before being processed by this filter."
 msgstr ""
+"Wenn diese Option aktiviert ist (nicht empfohlen), werden "
+"Dolby-Surround-kodierte Streams nicht dekodiert, bevor sie von diesem Filter "
+"bearbeitet wurden."
 
 #: modules/audio_filter/channel_mixer/headphone.c:73
 msgid "Headphone channel mixer with virtual spatialization effect"
@@ -6165,13 +6185,12 @@ msgstr ""
 "deaktivieren, wird die Wiedergabe ähnlich wie im Kino."
 
 #: modules/audio_filter/converter/a52tofloat32.c:101
-#, fuzzy
 msgid "Enable internal upmixing"
-msgstr "Interlaced-Encoding aktivieren"
+msgstr "Internes Vermischen aktivieren"
 
 #: modules/audio_filter/converter/a52tofloat32.c:103
 msgid "Enable the internal upmixing algorithm (not recommended)."
-msgstr ""
+msgstr "Aktiviert den internen Vermischungsalgorithmus (nicht empfohlen)."
 
 #: modules/audio_filter/converter/a52tofloat32.c:107
 #: modules/audio_filter/converter/a52tofloat32.c:116
@@ -6513,6 +6532,8 @@ msgid ""
 "DirectX device number: 0 default device, 1..N device by number(Note that the "
 "default device appears as 0 AND another number)."
 msgstr ""
+"DirectX-Gerätenummer: 0 = Standardgerät, 1...N Gerät nach Zahl (beachten Sie, "
+"dass das Standardgerät sowohl als 0 UND als eine andere Nummer auftaucht)."
 
 #: modules/audio_output/directx.c:217 modules/audio_output/waveout.c:133
 msgid "Use float32 output"
@@ -6703,55 +6724,52 @@ msgid "DTS audio packetizer"
 msgstr "DTS Audiopacketizer"
 
 #: modules/codec/dvbsub.c:45
-#, fuzzy
 msgid "X coordinate of the subpicture"
-msgstr "X-Koordinate des Logos"
+msgstr "X-Koordinate des Subbildes"
 
 #: modules/codec/dvbsub.c:46 modules/codec/dvbsub.c:49
 #: modules/codec/dvbsub.c:58 modules/codec/dvbsub.c:61
 msgid "You can reposition the subpicture by providing another value here."
-msgstr ""
+msgstr "Sie können das Subbild neupositioniereen, indem Sie hier einen anderen "
+"Wert eingeben."
 
 #: modules/codec/dvbsub.c:48
-#, fuzzy
 msgid "Y coordinate of the subpicture"
-msgstr "Y-Koordinate des Logos"
+msgstr "Y-Koordinate des Subbildes"
 
 #: modules/codec/dvbsub.c:51
-#, fuzzy
 msgid "Subpicture position"
-msgstr "Unterbilder"
+msgstr "Subbild-Position"
 
 #: modules/codec/dvbsub.c:53
-#, fuzzy
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values)."
 msgstr ""
-"Sie können die Logoposition im Video festlegen (0=zentriert, 1=links, "
+"Sie können die Subbildposition im Video festlegen (0=zentriert, 1=links, "
 "2=rechts, 4=oben, 8=unten; Sie können auch Kombinationen dieser Werte "
 "benutzen)."
 
 #: modules/codec/dvbsub.c:57
-#, fuzzy
 msgid "X coordinate of the encoded subpicture"
-msgstr "X-Koordinate des Logos"
+msgstr "X-Koordinate des encodierten Subbildes"
 
 #: modules/codec/dvbsub.c:60
-#, fuzzy
 msgid "Y coordinate of encoded the subpicture"
-msgstr "Y-Koordinate des Logos"
+msgstr "Y-Koordinate des encodierten Subbildes"
 
 #: modules/codec/dvbsub.c:63
-#, fuzzy
 msgid "Timeout of subpictures"
-msgstr "Unterbilder"
+msgstr "Timeout der Subbilder"
 
 #: modules/codec/dvbsub.c:65
 msgid ""
 "Subpictures get a default timeout of 15 seconds added to their remaining "
 "time.This will ensure that they are at least the specified time visible."
 msgstr ""
+"Subbilder wird standardmäßig ein Timeout von 15 Sekunden zu ihrer "
+"verbleibenden Zeit hinzugefügt. Dies stellt sicher, dass sie zumindest für "
+"die festgelegte Zeit sichtbar sind." 
 
 #: modules/codec/dvbsub.c:86
 msgid "DVB subtitles decoder"
@@ -6771,7 +6789,7 @@ msgstr "Bilddatei"
 
 #: modules/codec/fake.c:46
 msgid "Path of the image file when using the fake input."
-msgstr ""
+msgstr "Pfad der Bilddatei, wenn der Fake-Input benutzt wird."
 
 #: modules/codec/fake.c:49 modules/stream_out/mosaic_bridge.c:106
 #: modules/stream_out/transcode.c:72
@@ -6784,33 +6802,30 @@ msgid "Allows you to specify the output video height."
 msgstr "Erlaubt Ihnen die Videoausgabehöhe festzulegen."
 
 #: modules/codec/fake.c:53
-#, fuzzy
 msgid "Keep aspect ratio"
-msgstr "Element-Seitenverhältnis"
+msgstr "Seitenverhältnis beibehalten"
 
 #: modules/codec/fake.c:55
 msgid "If selected, width and height will be considered as maximum values."
-msgstr ""
+msgstr "Wenn ausgewählt, werden Breite und Höhe als maximale Werte angesehen."
 
 #: modules/codec/fake.c:56
-#, fuzzy
 msgid "Background aspect ratio"
-msgstr "Bildseitenverhältnis"
+msgstr "Hintergrund-Seitenverhältnis"
 
 #: modules/codec/fake.c:58
-#, fuzzy
 msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
-msgstr "Seitenverhältnis (4:3, 16:9)."
+msgstr "Seitenverhältnis der Bilddatei (4:3, 16:9). Dies sind standardmäßig "
+"quadratische Pixel."
 
 #: modules/codec/fake.c:59 modules/stream_out/transcode.c:64
 msgid "Deinterlace video"
 msgstr "Deinterlace auf das Video anwenden"
 
 #: modules/codec/fake.c:61
-#, fuzzy
 msgid "Allows you to deinterlace the image after loading."
 msgstr ""
-"Erlaubt Ihnen 'deinterlace' auf das Video vor der Kodierung anzuwenden."
+"Erlaubt Ihnen 'deinterlace' nach dem Laden auf das Bild anzuwenden."
 
 #: modules/codec/fake.c:62 modules/stream_out/transcode.c:67
 msgid "Deinterlace module"
@@ -7193,49 +7208,49 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:257
 msgid "Luminance masking"
-msgstr ""
+msgstr "Helligkeitsmaskierung"
 
 #: modules/codec/ffmpeg/ffmpeg.h:258
-#, fuzzy
 msgid ""
 "Allows you to raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
-"Erlaubt Ihnen die Geschwindigkeit der Animation zu reduzieren (standardmäßig "
-"6, max. 10)."
+"Erlaubt Ihnen die Quantisierung für sehr helle Makroblöcke zu erhöhen "
+"(standardmäßig 0.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:261
 msgid "Darkness masking"
-msgstr ""
+msgstr "Dunkelheitsmaskierung"
 
 #: modules/codec/ffmpeg/ffmpeg.h:262
-#, fuzzy
 msgid ""
 "Allows you to raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
-"Erlaubt Ihnen die Geschwindigkeit der Animation zu reduzieren (standardmäßig "
-"6, max. 10)."
+"Erlaubt Ihnen die Quantisierung für sehr dunkle Makroblöcke zu erhöhen "
+"(standardmäßig 0.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:265
-#, fuzzy
 msgid "Motion masking"
-msgstr "Aktionsmapping"
+msgstr "Bewegungsmaskierung"
 
 #: modules/codec/ffmpeg/ffmpeg.h:266
 msgid ""
 "Allows you to raise the quantizer for macroblocks with a high temporal "
 "complexity (default: 0.0)."
 msgstr ""
+"Erlaubt Ihnen die Quantisierung für Makroblöcke mit einer hohen zeitlichen "
+"Komplexität zu erhönen (standardmäßig 0.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:269
-#, fuzzy
 msgid "Border masking"
-msgstr "Bridge-Eingang"
+msgstr "Randmaskierung"
 
 #: modules/codec/ffmpeg/ffmpeg.h:270
 msgid ""
 "Allows you to raise the quantizer for macroblocks at the border of the frame "
 "(default: 0.0)."
 msgstr ""
+"Erlaubt Ihnen die Quantisierung für Makroblöcke am Rande des Frames zu "
+"erhöhen (standardmäßig 0.0)"
 
 #: modules/codec/ffmpeg/ffmpeg.h:273
 msgid "Luminance elimination"
@@ -9466,7 +9481,7 @@ msgstr "Über VLC media player"
 #: modules/gui/macosx/about.m:80
 #, c-format
 msgid "Compiled by %s, based on SVN revision %s"
-msgstr ""
+msgstr "Kompiliert von %s, basiert auf SVN-Revision %s"
 
 #: modules/gui/macosx/bookmarks.m:92 modules/gui/macosx/intf.m:543
 #: modules/gui/wxwidgets/bookmarks.cpp:201
@@ -9520,12 +9535,10 @@ msgstr ""
 "damit die Lesezeichen funktionieren."
 
 #: modules/gui/macosx/bookmarks.m:241
-#, fuzzy
 msgid "Input has changed"
 msgstr "Input hat gewechselt"
 
 #: modules/gui/macosx/bookmarks.m:242
-#, fuzzy
 msgid ""
 "Input has changed, unable to save bookmark. Use \"Pause\" while editing "
 "bookmarks to keep the same input."
@@ -9540,16 +9553,14 @@ msgid "Invalid selection"
 msgstr "Ungültige Auswahl"
 
 #: modules/gui/macosx/bookmarks.m:292
-#, fuzzy
 msgid "You have to select two bookmarks."
-msgstr "Sie müssen zwei Lesezeichen auswählen"
+msgstr "Sie müssen zwei Lesezeichen auswählen."
 
 #: modules/gui/macosx/bookmarks.m:301 modules/gui/wxwidgets/bookmarks.cpp:420
 msgid "No input found"
 msgstr "Kein Input gefunden"
 
 #: modules/gui/macosx/bookmarks.m:302
-#, fuzzy
 msgid "The stream must be playing or paused for bookmarks to work."
 msgstr ""
 "Der Stream muss wiedergegeben oder pausiert werden, damit die Lesezeichen "
@@ -9647,7 +9658,6 @@ msgid "Extended controls"
 msgstr "Erweiterte Steuerung"
 
 #: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:302
-#, fuzzy
 msgid "Video filters"
 msgstr "Videofilter"
 
@@ -9717,11 +9727,10 @@ msgid "Volume normalization"
 msgstr "Lautstärkennormalisierung"
 
 #: modules/gui/macosx/extended.m:99
-#, fuzzy
 msgid ""
 "This filters prevents the audio output power from going over a defined value."
 msgstr ""
-"Dieser Filter verhindert, dass die Audio-Ausgabelautstärle einen definierten "
+"Dieser Filter verhindert, dass die Audio-Ausgabelautstärke einen definierten "
 "Wert übersteigt."
 
 #: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:398
@@ -9762,7 +9771,6 @@ msgid "More information"
 msgstr "Mehr Informationen"
 
 #: modules/gui/macosx/extended.m:607 modules/gui/wxwidgets/extrapanel.cpp:1001
-#, fuzzy
 msgid ""
 "Select the video effects filters to apply. You must restart the stream for "
 "these settings to take effect.\n"
@@ -9778,7 +9786,7 @@ msgstr ""
 "Module/Videofilter. Sie können dann jeden Filter konfigurieren.\n"
 "Wenn Sie genaue Kontrolle über die Filter wünschen (um die Reihenfolge "
 "festzulegen, in der sie angewendet werden), müssen Sie manuell einen Filter-"
-"String eingeben (Einstellungen / Allgemein / Video)."
+"String eingeben (Einstellungen / Video / Filters)."
 
 #: modules/gui/macosx/intf.m:437
 msgid "VLC - Controller"
@@ -9868,9 +9876,8 @@ msgid "Clear Menu"
 msgstr "Menü löschen"
 
 #: modules/gui/macosx/intf.m:476
-#, fuzzy
 msgid "Streaming/Exporting Wizard..."
-msgstr "Streaming/Transcoding Assistent"
+msgstr "Streaming & Export Assistent"
 
 #: modules/gui/macosx/intf.m:479
 msgid "Cut"
@@ -9885,9 +9892,8 @@ msgid "Paste"
 msgstr "Einsetzen"
 
 #: modules/gui/macosx/intf.m:485
-#, fuzzy
 msgid "Playback"
-msgstr "Pausiert die Wiedergabe"
+msgstr "Wiedergabe"
 
 #: modules/gui/macosx/intf.m:506
 msgid "Volume Up"
@@ -9915,7 +9921,6 @@ msgid "Controller"
 msgstr "Steuerung"
 
 #: modules/gui/macosx/intf.m:542
-#, fuzzy
 msgid "Extended Controls"
 msgstr "Erweiterte Steuerung"
 
@@ -9955,14 +9960,12 @@ msgid "License"
 msgstr "Lizenz"
 
 #: modules/gui/macosx/intf.m:556
-#, fuzzy
 msgid "Make a donation"
-msgstr "Makedonisch"
+msgstr "Eine Spende machen"
 
 #: modules/gui/macosx/intf.m:557
-#, fuzzy
 msgid "Online Forum"
-msgstr "Online Dokumentation"
+msgstr "Online Forum"
 
 #: modules/gui/macosx/intf.m:567 modules/gui/wxwidgets/wizard.cpp:87
 msgid "Error"
@@ -10013,11 +10016,8 @@ msgid "No CrashLog found"
 msgstr "Kein CrashLog gefunden"
 
 #: modules/gui/macosx/intf.m:1655
-#, fuzzy
 msgid "You haven't experienced any heavy crashes yet."
-msgstr ""
-"Entweder benutzten Sie eine ältere Version von Mac OS X als 10.2 oder Sie "
-"hatten bislang keine ernsthaften Abstürze."
+msgstr "Sie hatten bislang keine ernsthaften Abstürze."
 
 #: modules/gui/macosx/macosx.m:50
 msgid "Video device"
@@ -10065,13 +10065,15 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:70
 msgid "Use as Desktop Background"
-msgstr ""
+msgstr "Als Schreibtischhintergrund benutzen"
 
 #: modules/gui/macosx/macosx.m:71
 msgid ""
 "Use the video as the Desktop Background of the Finder. Desktop icons cannot "
 "be interacted with in this mode."
 msgstr ""
+"Das Video als Schreibtischhintergrund des Finders benutzen. Icons auf dem "
+"Schreibtisch können in diesem Modus nicht benutzt werden."
 
 #: modules/gui/macosx/macosx.m:75
 msgid "Mac OS X interface"
@@ -10279,7 +10281,7 @@ msgstr "Löschen"
 
 #: modules/gui/macosx/playlist.m:502
 msgid "Expand Node"
-msgstr ""
+msgstr "Knoten aufklappen"
 
 #: modules/gui/macosx/playlist.m:504 modules/gui/macosx/playlistinfo.m:53
 msgid "Properties"
@@ -10299,7 +10301,6 @@ msgid "Sort Node by Author"
 msgstr "Knoten nach Autor sortieren"
 
 #: modules/gui/macosx/playlist.m:510 modules/gui/macosx/playlist.m:1518
-#, fuzzy
 msgid "No items in the playlist"
 msgstr "Keine Objekte in der Wiedergabeliste"
 
@@ -10308,9 +10309,8 @@ msgid "Search"
 msgstr "Suchen"
 
 #: modules/gui/macosx/playlist.m:516
-#, fuzzy
 msgid "Search in Playlist"
-msgstr "Wiedergabeliste öffnen"
+msgstr "In Wiedergabeliste suchen"
 
 #: modules/gui/macosx/playlist.m:517
 msgid "Standard Play"
@@ -10321,12 +10321,11 @@ msgid "Save Playlist"
 msgstr "Wiedergabeliste sichern"
 
 #: modules/gui/macosx/playlist.m:1512
-#, fuzzy, c-format
+#, c-format
 msgid "%i items in the playlist"
 msgstr "%i Objekte in der Wiedergabeliste"
 
 #: modules/gui/macosx/playlist.m:1522
-#, fuzzy
 msgid "1 item in the playlist"
 msgstr "1 Objekt in der Wiedergabeliste"
 
@@ -10375,110 +10374,111 @@ msgstr "Auswählen"
 
 #: modules/gui/macosx/wizard.m:114
 msgid "MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-msgstr ""
+msgstr "MPEG-1 Videocodec (benutzbar mit MPEG PS, MPEG TS, MPEG1, OGG und RAW)"
 
 #: modules/gui/macosx/wizard.m:118
 msgid "MPEG-2 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-msgstr ""
+msgstr "MPEG-2 Videocodec (benutzbar mit MPEG PS, MPEG TS, MPEG1, OGG und RAW)"
 
 #: modules/gui/macosx/wizard.m:122
 msgid ""
 "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MP4, OGG and "
 "RAW)"
 msgstr ""
+"MPEG-4 Videocodec (benutzbar mit MPEG PS, MPEG TS, MPEG1, ASF, MP4, OGG und "
+"RAW)"
 
 #: modules/gui/macosx/wizard.m:126 modules/gui/wxwidgets/streamdata.cpp:43
 msgid "DivX first version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "Erste DivX-Version (benutzbar mit MPEG TS, MPEG1, ASF und OGG)"
 
 #: modules/gui/macosx/wizard.m:130 modules/gui/wxwidgets/streamdata.cpp:47
 msgid "DivX second version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "Zweite DivX-Version (benutzbar mit MPEG TS, MPEG1, ASF und OGG)"
 
 #: modules/gui/macosx/wizard.m:134 modules/gui/wxwidgets/streamdata.cpp:50
 msgid "DivX third version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "Dritte DivX-Version (benutzbar mit MPEG TS, MPEG1, ASF und OGG)"
 
 #: modules/gui/macosx/wizard.m:138 modules/gui/wxwidgets/streamdata.cpp:53
-#, fuzzy
 msgid ""
 "H263 is a video codec optimized for videoconference (low rates, useable with "
 "MPEG TS)"
 msgstr ""
-"H263 ist ein für Videokonferenzen (niedrige Raten) optimierter Videocodec"
+"H263 ist ein für Videokonferenzen optimierter Videocodec (niedrige Raten, "
+"benutzbar mit MPEG TS)"
 
 #: modules/gui/macosx/wizard.m:142
-#, fuzzy
 msgid "H264 is a new video codec (useable with MPEG TS and MP4)"
-msgstr "H264 ist ein neuer Videocodec"
+msgstr "H264 ist ein neuer Videocodec (benutzbar mit MPEG TS und MP4)"
 
 #: modules/gui/macosx/wizard.m:146
 msgid "WMV (Windows Media Video) 1 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "WMV (Windows Media Video) 1 (benutzbar mit MPEG TS, MPEG1, ASF und OGG)"
 
 #: modules/gui/macosx/wizard.m:150
 msgid "WMV (Windows Media Video) 2 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr ""
+msgstr "WMV (Windows Media Video) 2 (benutzbar mit MPEG TS, MPEG1, ASF und OGG)"
 
 #: modules/gui/macosx/wizard.m:154 modules/gui/wxwidgets/streamdata.cpp:70
-#, fuzzy
 msgid ""
 "MJPEG consists of a series of JPEG pictures (useable with MPEG TS, MPEG1, "
 "ASF and OGG)"
-msgstr "MJPEG besteht aus einer Serie von JPEG-Bildern"
+msgstr "MJPEG besteht aus einer Serie von JPEG-Bildern (benutzbar mit MPEG TS, "
+"MPEG1, ASF und OGG)"
 
 #: modules/gui/macosx/wizard.m:158 modules/gui/wxwidgets/streamdata.cpp:73
-#, fuzzy
 msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
-msgstr "Theora ist ein freier, allzweck Codec"
+msgstr "Theora ist ein freier, Allzweckcodec (benutzbar mit MPEG TS)"
 
 #: modules/gui/macosx/wizard.m:161 modules/gui/macosx/wizard.m:212
 #: modules/gui/wxwidgets/streamdata.cpp:76
 #: modules/gui/wxwidgets/streamdata.cpp:113
 msgid "Dummy codec (do not transcode, useable with all encapsulation formats)"
-msgstr ""
+msgstr "Dummy-Codec (nicht damit kodieren, benutzbar mit allen "
+"Verkapselungsformaten)"
 
 #: modules/gui/macosx/wizard.m:180 modules/gui/wxwidgets/streamdata.cpp:84
 msgid ""
 "The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, MPEG1, "
 "ASF, OGG and RAW)"
 msgstr ""
+"Das Standard-MPEG-Audioformat (1/2) (benutzbar mit MPEG PS, MPEG TS, MPEG1, "
+"ASF, OGG und RAW)"
 
 #: modules/gui/macosx/wizard.m:184 modules/gui/wxwidgets/streamdata.cpp:88
 msgid ""
 "MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
 msgstr ""
+"MPEG Audio Layer 3 (benutzbar mit MPEG PS, MPEG TS, MPEG1, ASF, OGG und RAW)"
 
 #: modules/gui/macosx/wizard.m:188 modules/gui/wxwidgets/streamdata.cpp:92
 msgid "Audio format for MPEG4 (useable with MPEG TS and MPEG4)"
-msgstr ""
+msgstr "Audioformat für MPEG4 (benutzbar mit MPEG TS und MPEG4)"
 
 #: modules/gui/macosx/wizard.m:191 modules/gui/wxwidgets/streamdata.cpp:95
 msgid ""
 "DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
 msgstr ""
+"DVD-Audioformat (benutzbar mit MPEG PS, MPEG TS, MPEG1, ASF, OGG und RAW)"
 
 #: modules/gui/macosx/wizard.m:195 modules/gui/wxwidgets/streamdata.cpp:99
-#, fuzzy
 msgid "Vorbis is a free audio codec (useable with OGG)"
-msgstr "Vorbis ist ein freier Audiocodec"
+msgstr "Vorbis ist ein freier Audiocodec (benutzbar mit OGG)"
 
 #: modules/gui/macosx/wizard.m:198 modules/gui/wxwidgets/streamdata.cpp:101
-#, fuzzy
 msgid "FLAC is a lossless audio codec (useable with OGG and RAW)"
-msgstr "FLAC ist ein verlustfreier Audiocodec"
+msgstr "FLAC ist ein verlustfreier Audiocodec (benutzbar mit OGG und RAW)"
 
 #: modules/gui/macosx/wizard.m:202
-#, fuzzy
 msgid "A free audio codec dedicated to compression of voice (useable with OGG"
-msgstr "Ein freier Audiocodec für Stimmkomprimierungen"
+msgstr "Ein freier Audiocodec für Stimmkomprimierungen (benutzbar mit OGG)"
 
 #: modules/gui/macosx/wizard.m:206 modules/gui/macosx/wizard.m:209
 #: modules/gui/wxwidgets/streamdata.cpp:107
 #: modules/gui/wxwidgets/streamdata.cpp:110
-#, fuzzy
 msgid "Uncompressed audio samples (useable with WAV)"
-msgstr "Unkomprimierte Audiosamples"
+msgstr "Unkomprimierte Audiosamples (benutzbar mit WAV)"
 
 #: modules/gui/macosx/wizard.m:234 modules/gui/wxwidgets/streamdata.cpp:148
 msgid "MPEG Program Stream"
@@ -10493,20 +10493,18 @@ msgid "MPEG 1 Format"
 msgstr "MPEG-1-Format"
 
 #: modules/gui/macosx/wizard.m:255 modules/gui/wxwidgets/streamdata.cpp:137
-#, fuzzy
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
 "you want to listen to all adresses or if you don't understand. This is "
 "generally the best thing to do. Other computers can then access the stream "
 "at http://yourip:8080 by default."
 msgstr ""
-"Geben Sie die lokalen Adressen ein, nach denen Sie hören möchten. Geben Sie "
-"nichts ein, wenn Sie nach allen Adressen hören möchten oder nicht verstehen, "
+"Geben Sie die lokalen Adressen ein, auf denen Sie hören möchten. Geben Sie "
+"nichts ein, wenn Sie auf allen Adressen hören möchten oder nicht verstehen, "
 "was gemeint ist. Dies ist normalerweise das Beste. Andere Computer greifen "
-"dann standardmäßig auf den Stream über http://IhreIP:8080 zu."
+"dann auf den Stream über http://IhreIP:8080 zu."
 
 #: modules/gui/macosx/wizard.m:259 modules/gui/wxwidgets/streamdata.cpp:134
-#, fuzzy
 msgid ""
 "Use this to stream to several computers. This method is less efficient, as "
 "the server needs to send the stream several times."
@@ -10515,17 +10513,16 @@ msgstr ""
 "weniger Effizient, weil der Server den Stream mehrmals senden muss."
 
 #: modules/gui/macosx/wizard.m:262
-#, fuzzy
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
 "you want to listen to all adresses or if you don't understand. This is "
 "generally the best thing to do. Other computers can then access the stream "
 "at mms://yourip:8080 by default."
 msgstr ""
-"Geben Sie die lokalen Adressen ein, nach denen Sie hören möchten. Geben Sie "
-"nichts ein, wenn Sie nach allen Adressen hören möchten oder nicht verstehen, "
+"Geben Sie die lokalen Adressen ein, auf denen Sie hören möchten. Geben Sie "
+"nichts ein, wenn Sie auf allen Adressen hören möchten oder nicht verstehen, "
 "was gemeint ist. Dies ist normalerweise das Beste. Andere Computer greifen "
-"dann standardmäßig auf den Stream über http://IhreIP:8080 zu."
+"dann auf den Stream über mms://IhreIP:8080 zu."
 
 #: modules/gui/macosx/wizard.m:266
 msgid ""
@@ -10534,21 +10531,22 @@ msgid ""
 "Note that only a small part of the MMS protocol is supported (MMS "
 "encapsulated in HTTP)."
 msgstr ""
+"Benutzen Sie dies um zu mehreren Computern über das Microsoft-MMS-Protokoll "
+"zu streamen. Dieses Protokoll wird als Transportmethode von vielen "
+"Microsoftprogrammen benutzen. Beachten Sie, dass nur ein kleiner Teil des "
+"MMS-Protokolls unterstützt wird (MMS verkapselt in HTTP)."
 
 #: modules/gui/macosx/wizard.m:271 modules/gui/macosx/wizard.m:388
 #: modules/gui/wxwidgets/streamdata.cpp:123
-#, fuzzy
 msgid "Enter the address of the computer to stream to."
-msgstr "Geben Sie die Adresse des Computers ein, zu dem gestreamt wird"
+msgstr "Geben Sie die Adresse des Computers ein, zu dem gestreamt werden soll."
 
 #: modules/gui/macosx/wizard.m:272 modules/gui/macosx/wizard.m:392
 #: modules/gui/wxwidgets/streamdata.cpp:122
-#, fuzzy
 msgid "Use this to stream to a single computer."
-msgstr "Benutzen Sie dies um zu einem einzelnen Computer zu streamen"
+msgstr "Benutzen Sie dies um zu einem einzelnen Computer zu streamen."
 
 #: modules/gui/macosx/wizard.m:274
-#, fuzzy
 msgid ""
 "Enter the multicast address to stream to in this field. This must be an IP "
 "address between 224.0.0.0 and 239.255.255.255. For a private use, enter an "
@@ -10580,14 +10578,12 @@ msgid "Streaming/Transcoding Wizard"
 msgstr "Streaming/Transcoding Assistent"
 
 #: modules/gui/macosx/wizard.m:349 modules/gui/wxwidgets/wizard.cpp:92
-#, fuzzy
 msgid "This wizard helps you to stream, transcode or save a stream."
 msgstr ""
 "Dieser Assistent hilft Ihnen beim Streamen, Transcodieren oder Sichern eines "
 "Streams."
 
 #: modules/gui/macosx/wizard.m:353 modules/gui/wxwidgets/wizard.cpp:98
-#, fuzzy
 msgid ""
 "This wizard only gives access to a small subset of VLC's streaming and "
 "transcoding capabilities. Use the Open and Stream Output dialogs to get all "
@@ -10595,7 +10591,7 @@ msgid ""
 msgstr ""
 "Dieser Assistent gewährt Ihnen nur auf einen kleinen Teil von VLCs "
 "Streaming- und Transcodierungsmöglichkeiten Zugriff. Benutzen Sie die "
-"Öffnen- und Streamausgabe-Dialoge, um alle erreichen zu können."
+"Öffnen- und Streamausgabe-Dialoge, um alle benutzen zu können."
 
 #: modules/gui/macosx/wizard.m:356 modules/gui/macosx/wizard.m:503
 #: modules/gui/macosx/wizard.m:1445 modules/gui/wxwidgets/wizard.cpp:94
@@ -10612,9 +10608,8 @@ msgid "Choose input"
 msgstr "Input wählen"
 
 #: modules/gui/macosx/wizard.m:363 modules/gui/wxwidgets/wizard.cpp:108
-#, fuzzy
 msgid "Choose here your input stream."
-msgstr "Wählen Sie Ihren Input-Stream hier"
+msgstr "Wählen Sie hier Ihren Input-Stream."
 
 #: modules/gui/macosx/wizard.m:365 modules/gui/macosx/wizard.m:537
 #: modules/gui/macosx/wizard.m:1494 modules/gui/wxwidgets/wizard.cpp:110
@@ -10636,7 +10631,6 @@ msgid "Partial Extract"
 msgstr "Teilweises extrahieren"
 
 #: modules/gui/macosx/wizard.m:375
-#, fuzzy
 msgid ""
 "Use this to read only a part of the stream. You must be able to control the "
 "incoming stream (for example, a file or a disc, but not an UDP network "
@@ -10644,8 +10638,8 @@ msgid ""
 msgstr ""
 "Benutzen Sie dies, um nur einen Teil des Streams zu lesen. Sie müssen in der "
 "Lage sein, den eingehenden Stream zu kontrollieren (zum Beispiel eine Datei "
-"oder eine Disk, aber kein UDP-Netzwerkstream).\n"
-"Geben Sie die Start- und Endzeiten (in Sekunden) ein."
+"oder eine Disk, aber kein UDP-Netzwerkstream). Geben Sie die Start- und "
+"Endzeiten (in Sekunden) ein."
 
 #: modules/gui/macosx/wizard.m:379 modules/gui/wxwidgets/wizard.cpp:634
 msgid "From"
@@ -10689,13 +10683,12 @@ msgid "Transcode"
 msgstr "Umkodieren"
 
 #: modules/gui/macosx/wizard.m:397 modules/gui/wxwidgets/wizard.cpp:126
-#, fuzzy
 msgid ""
 "If you want to change the compression format of the audio or video tracks, "
 "fill in this page. (If you only want to change the container format, proceed "
 "to next page.)"
 msgstr ""
-"Wenn Sie das Kompressionsformat von den Audio oder Videospuren ändern "
+"Wenn Sie das Kompressionsformat von der Audio- oder Videospuren ändern "
 "möchten, füllen Sie diese Seite aus. (Wenn Sie nur das Containerformat "
 "ändern möchten, fahren Sie mit der nächsten Seite fort.)"
 
@@ -10711,18 +10704,16 @@ msgstr "Video transcodieren"
 
 #: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:1581
 #: modules/gui/wxwidgets/wizard.cpp:133
-#, fuzzy
 msgid "If your stream has audio and you want to transcode it, enable this."
 msgstr ""
-"Wenn Ihr Stream Audio enthält und Sie dies transcodieren möchten, aktivieren "
+"Wenn Ihr Stream Audio enthält und Sie dies umkodieren möchten, aktivieren "
 "Sie dies."
 
 #: modules/gui/macosx/wizard.m:408 modules/gui/macosx/wizard.m:1598
 #: modules/gui/wxwidgets/wizard.cpp:128
-#, fuzzy
 msgid "If your stream has video and you want to transcode it, enable this."
 msgstr ""
-"Wenn Ihr Stream Video enthält und Sie dies transcodieren möchten, aktivieren "
+"Wenn Ihr Stream Video enthält und Sie dies umkodieren möchten, aktivieren "
 "Sie dies."
 
 #: modules/gui/macosx/wizard.m:412 modules/gui/wxwidgets/wizard.cpp:148
@@ -10743,7 +10734,6 @@ msgid "Additional streaming options"
 msgstr "Zusätzliche Streamingoptionen"
 
 #: modules/gui/macosx/wizard.m:419
-#, fuzzy
 msgid ""
 "In this page, you will define a few additional parameters for your stream."
 msgstr ""
@@ -10766,7 +10756,6 @@ msgid "Additional transcode options"
 msgstr "Zusätzliche Transcodierungsoptionen"
 
 #: modules/gui/macosx/wizard.m:428
-#, fuzzy
 msgid ""
 "In this page, you will define a few additional parameters for your "
 "transcoding."
@@ -10783,36 +10772,32 @@ msgid ""
 "This page lists all your selections. Click \"Finish\" to start your "
 "streaming or transcoding."
 msgstr ""
+"Diese Seite listet alle Ihre Auswahlen auf. Klicken Sie auf \"Fertig\", um "
+"Ihr Streaming oder Umkodieren zu starten."
 
 #: modules/gui/macosx/wizard.m:436
-#, fuzzy
 msgid "Summary"
-msgstr "Dummy"
+msgstr "Zusammenfassung"
 
 #: modules/gui/macosx/wizard.m:439
-#, fuzzy
 msgid "Encap. format"
-msgstr "Verkapselungsmethode"
+msgstr "Verkaps'format"
 
 #: modules/gui/macosx/wizard.m:441
-#, fuzzy
 msgid "Input stream"
-msgstr "Sout-Stream"
+msgstr "Input-Stream"
 
 #: modules/gui/macosx/wizard.m:447
-#, fuzzy
 msgid "Save file to"
-msgstr "Datei sichern"
+msgstr "Datei sichern nach"
 
 #: modules/gui/macosx/wizard.m:455 modules/gui/macosx/wizard.m:1657
-#, fuzzy
 msgid "Local playback"
-msgstr "Stoppt die Wiedergabe"
+msgstr "Lokale Wiedergabe"
 
 #: modules/gui/macosx/wizard.m:588
-#, fuzzy
 msgid "No input selected"
-msgstr "Kein Input gefunden"
+msgstr "Kein Input gewählt"
 
 #: modules/gui/macosx/wizard.m:590
 msgid ""
@@ -10821,11 +10806,14 @@ msgid ""
 "\n"
 " Choose one before going to the next page."
 msgstr ""
+"Sie haben weder einen neuen Stream noch ein gültiges Wiedergabelistenobjekt "
+"ausgewählt. VLC kann den Input nicht erraten, den Sie benutzen möchten.\n"
+"\n"
+"Wählen Sie einen, bevor Sie mit der nächsten Seite fortfahren."
 
 #: modules/gui/macosx/wizard.m:654
-#, fuzzy
 msgid "No valid destination"
-msgstr "Ziel"
+msgstr "Keine gültige Zieladresse"
 
 #: modules/gui/macosx/wizard.m:656
 msgid ""
@@ -10835,6 +10823,11 @@ msgid ""
 " If you don't know what this means, have a look at the VLC Streaming HOWTO "
 "and the help texts in this window."
 msgstr ""
+"Sie müssen eine gültige Zieladresse eingeben, zu der Sie streamen möchten. "
+"Geben Sie entweder eine Unicast-IP oder eine Multicast-IP ein.\n"
+"\n"
+"Wenn Sie nicht wissen, was dies bedeutet, schauen Sie in das VLC Streaming "
+"HOWTO und beachten Sie die Hilfetexte in diesem Fenster."
 
 #: modules/gui/macosx/wizard.m:1047
 msgid ""
@@ -10843,10 +10836,14 @@ msgid ""
 "\n"
 "Correct your selection and try again."
 msgstr ""
+"Ihre gewählten Codecs sind nicht miteinander kompatible. Sie können "
+"beispielsweise unkomprimiertes Audio mit keinem Videocodec mischen.\n"
+"\n"
+"Korrigieren Sie Ihre Auswahl und probieren Sie es erneut."
 
 #: modules/gui/macosx/wizard.m:1112
 msgid "No file selected"
-msgstr ""
+msgstr "Keine Datei ausgewählt"
 
 #: modules/gui/macosx/wizard.m:1113
 msgid ""
@@ -10855,30 +10852,30 @@ msgid ""
 " Enter either a valid path or choose a location through the button's dialog-"
 "box."
 msgstr ""
+"Sie müssen eine Datei auswählen, in die Sie sichern möchten.\n"
+"\n"
+"Geben Sie entweder einen gültigen Pfad ein oder wählen Sie einen Ort über "
+"das Dialogfenster des Buttons."
 
 #: modules/gui/macosx/wizard.m:1192
-#, fuzzy
 msgid "Finish"
-msgstr "Finnisch"
+msgstr "Fertig"
 
 #: modules/gui/macosx/wizard.m:1197 modules/gui/macosx/wizard.m:1204
 #: modules/gui/macosx/wizard.m:1228 modules/gui/macosx/wizard.m:1240
 #: modules/gui/macosx/wizard.m:1252
-#, fuzzy
 msgid "yes"
-msgstr "Bytes"
+msgstr "ja"
 
 #: modules/gui/macosx/wizard.m:1199 modules/gui/macosx/wizard.m:1211
 #: modules/gui/macosx/wizard.m:1230 modules/gui/macosx/wizard.m:1248
 #: modules/gui/macosx/wizard.m:1260
-#, fuzzy
 msgid "no"
-msgstr "gar nicht"
+msgstr "nein"
 
 #: modules/gui/macosx/wizard.m:1206
-#, fuzzy
 msgid "from "
-msgstr "Von"
+msgstr "von "
 
 #: modules/gui/macosx/wizard.m:1208 modules/video_chroma/i420_ymga.c:48
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:75
@@ -10888,12 +10885,10 @@ msgid " to "
 msgstr " nach "
 
 #: modules/gui/macosx/wizard.m:1446 modules/gui/wxwidgets/wizard.cpp:95
-#, fuzzy
 msgid "Use this to stream on a network."
 msgstr "Benutzen Sie dies, um über ein Netzwerk zu streamen."
 
 #: modules/gui/macosx/wizard.m:1458 modules/gui/wxwidgets/wizard.cpp:102
-#, fuzzy
 msgid ""
 "Use this to save a stream to a file. You have the possibility to reencode "
 "the stream. You can save whatever VLC can read.\n"
@@ -10903,23 +10898,21 @@ msgstr ""
 "Benutzen Sie dies, um einen Stream in einer Datei zu sichern. Sie haben die "
 "Möglichkeit, den Stream erneut zu kodieren. Sie können alles sichern, was "
 "VLC lesen kann.\n"
-"Bitte beachten Sie, dass VLC nicht dafür ausgelegt ist, von eine Datei in "
-"eine andere zu transcodieren. Sie sollten die Transcodierungsfeatures "
-"beispielsweise zum Sichern von Netzwerkstreamen benutzen."
+"Bitte beachten Sie, dass VLC nicht dafür ausgelegt ist, Dateien umzukodieren."
+"Sie sollten die Umkodierungsfeatures beispielsweise zum Sichern von "
+"Netzwerkstreams benutzen."
 
 #: modules/gui/macosx/wizard.m:1576 modules/gui/wxwidgets/wizard.cpp:135
-#, fuzzy
 msgid "Select your audio codec. Click one to get more information."
 msgstr ""
 "Wählen Sie Ihren Audiocodec. Klicken Sie auf einen, um mehr Informationen zu "
 "erhalten."
 
 #: modules/gui/macosx/wizard.m:1593 modules/gui/wxwidgets/wizard.cpp:130
-#, fuzzy
 msgid "Select your video codec. Click one to get more information."
 msgstr ""
 "Wählen Sie Ihren Videocodec. Klicken Sie auf einen, um mehr Informationen zu "
-"erhalten"
+"erhalten."
 
 #: modules/gui/macosx/wizard.m:1626 modules/gui/wxwidgets/wizard.cpp:166
 msgid ""
@@ -10934,7 +10927,6 @@ msgstr ""
 "möchten, belassen Sie diese Einstellung bei 1."
 
 #: modules/gui/macosx/wizard.m:1641
-#, fuzzy
 msgid ""
 "When streaming using UDP, you can announce your streams using the SAP/SDP "
 "announcing protocol. This way, the clients won't have to type in the "
@@ -10958,6 +10950,11 @@ msgid ""
 "Note that this requires much more CPU power than simple transcoding or "
 "streaming."
 msgstr ""
+"Wenn diese Option aktiviert ist, wird der Stream sowohl wiedergegeben als "
+"auch umkodiert/gestreamt.\n"
+"\n"
+"Beachten Sie, dass dies deutlich mehr CPU-Leistung benötigt als einfaches "
+"Umkodieren oder Streamen."
 
 #: modules/gui/ncurses.c:93
 msgid "Filebrowser starting point"
@@ -11620,7 +11617,7 @@ msgstr "Mehr Infos"
 msgid ""
 "This filter prevents the audio output power from going over a defined value."
 msgstr ""
-"Dieser Filter verhindert, dass die Audio-Ausgabelautstärle einen definierten "
+"Dieser Filter verhindert, dass die Audio-Ausgabelautstärke einen definierten "
 "Wert übersteigt."
 
 #: modules/gui/wxwidgets/extrapanel.cpp:468
