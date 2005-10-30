@@ -831,6 +831,9 @@ static struct
 #endif
 
 #if LIBAVCODEC_BUILD >= 4752
+    { VLC_FOURCC('r','l','e',' '), CODEC_ID_QTRLE,
+      VIDEO_ES, "Apple QuickTime RLE Video" },
+
     { VLC_FOURCC('q','d','r','w'), CODEC_ID_QDRAW,
       VIDEO_ES, "Apple QuickDraw Video" },
 
