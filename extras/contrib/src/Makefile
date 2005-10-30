@@ -1014,6 +1014,7 @@ libcddb-$(CDDB_VERSION).tar.gz:
 
 libcddb: libcddb-$(CDDB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/libcddb.patch
 
 .cddb: libcddb
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
