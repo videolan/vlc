@@ -505,7 +505,7 @@ void rmff_fix_header(rmff_header_t *h) {
       memset(h->data, 0, sizeof(rmff_data_t));
       h->data->object_id=DATA_TAG;
       h->data->object_version=0;
-      h->data->size=34;
+      h->data->size=18;
       h->data->num_packets=0;
       h->data->next_data_header=0;
     }
@@ -518,7 +518,7 @@ void rmff_fix_header(rmff_header_t *h) {
     if( h->fileheader ) {
       memset(h->fileheader, 0, sizeof(rmff_fileheader_t));
       h->fileheader->object_id=RMF_TAG;
-      h->fileheader->size=34;
+      h->fileheader->size=18;
       h->fileheader->object_version=0;
       h->fileheader->file_version=0;
       h->fileheader->num_headers=num_headers+1;
@@ -536,6 +536,9 @@ void rmff_fix_header(rmff_header_t *h) {
       lprintf("rmff_fix_header: setting prop.data_offset from %i to %i\n", h->prop->data_offset, header_size);
       h->prop->data_offset=header_size;
     }
+
+    /* FIXME: I doubt this is right to do this here.
+     * It should belong to the demux. */
     if (h->prop->num_packets == 0) {
       int p=(int)(h->prop->avg_bit_rate/8.0*(h->prop->duration/1000.0)/h->prop->avg_packet_size);
       lprintf("rmff_fix_header: assuming prop.num_packets=%i\n", p);
@@ -545,8 +548,10 @@ void rmff_fix_header(rmff_header_t *h) {
       lprintf("rmff_fix_header: assuming data.num_packets=%i\n", h->prop->num_packets);
       h->data->num_packets=h->prop->num_packets;
     }
-    lprintf("rmff_fix_header: assuming data.size=%i\n", h->prop->num_packets*h->prop->avg_packet_size);
-    h->data->size=h->prop->num_packets*h->prop->avg_packet_size;
+    if (h->data->size == 18 || !h->data->size ) {
+      lprintf("rmff_fix_header: assuming data.size=%i\n", h->prop->num_packets*h->prop->avg_packet_size);
+      h->data->size+=h->prop->num_packets*h->prop->avg_packet_size;
+    }
   }
 }
 
