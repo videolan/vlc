@@ -946,7 +946,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,
                      &p_dec->fmt_out.video.i_sar_den,
                      p_dec->fmt_out.video.i_sar_num,
-                     p_dec->fmt_out.video.i_sar_den, 0 );
+                     p_dec->fmt_out.video.i_sar_den, 50000 );
 
         p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
         p_sys->video = p_dec->fmt_out.video;

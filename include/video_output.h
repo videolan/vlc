@@ -84,7 +84,6 @@ struct vout_thread_t
     vlc_bool_t          b_interface;                   /**< render interface */
     vlc_bool_t          b_scale;                  /**< allow picture scaling */
     vlc_bool_t          b_fullscreen;         /**< toogle fullscreen display */
-    vlc_bool_t          b_override_aspect;       /**< aspect ratio overriden */
     uint32_t            render_time;           /**< last picture render time */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */

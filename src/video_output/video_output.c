@@ -173,8 +173,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         if( ( p_vout->fmt_render.i_width != p_fmt->i_width ) ||
             ( p_vout->fmt_render.i_height != p_fmt->i_height ) ||
             ( p_vout->fmt_render.i_chroma != p_fmt->i_chroma ) ||
-            ( p_vout->fmt_render.i_aspect != p_fmt->i_aspect
-                    && !p_vout->b_override_aspect ) ||
+            ( p_vout->fmt_render.i_aspect != p_fmt->i_aspect ) ||
             p_vout->b_filter_change )
         {
             /* We are not interested in this format, close this vout */
@@ -246,12 +245,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
+
+    vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
+                 p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
     p_vout->fmt_render        = *p_fmt;   /* FIXME palette */
     p_vout->fmt_in            = *p_fmt;   /* FIXME palette */
-    vlc_ureduce( &p_vout->fmt_render.i_sar_num, &p_vout->fmt_render.i_sar_den,
-              p_vout->fmt_render.i_sar_num, p_vout->fmt_render.i_sar_den, 0 );
-    vlc_ureduce( &p_vout->fmt_in.i_sar_num, &p_vout->fmt_in.i_sar_den,
-              p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den, 0 );
 
     p_vout->render.i_width    = i_width;
     p_vout->render.i_height   = i_height;
@@ -314,8 +312,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit( p_vout );
-
-    p_vout->b_override_aspect = VLC_FALSE;
 
     /* If the parent is not a VOUT object, that means we are at the start of
      * the video output pipe */
