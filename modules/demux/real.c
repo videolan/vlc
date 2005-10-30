@@ -100,6 +100,7 @@ static int Open( vlc_object_t *p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->i_data_offset = 0;
     p_sys->i_track = 0;
     p_sys->track   = NULL;
@@ -175,9 +176,9 @@ static int Demux( demux_t *p_demux )
     real_track_t *tk = NULL;
     vlc_bool_t  b_selected;
 
-    if( p_sys->i_data_packets >= p_sys->i_data_packets_count )
+    if( p_sys->i_data_packets >= p_sys->i_data_packets_count &&
+        p_sys->i_data_packets_count )
     {
-
         if( stream_Read( p_demux->s, header, 18 ) < 18 )
         {
             return 0;
@@ -602,7 +603,11 @@ static int HeaderRead( demux_t *p_demux )
         msg_Dbg( p_demux, "object %4.4s size=%d version=%d",
                  (char*)&i_id, i_size, i_version );
 
-        if( i_size < 10 ) return VLC_EGENERIC;
+        if( i_size < 10 )
+        {
+            msg_Dbg( p_demux, "invalid size for object %4.4s", (char*)&i_id );
+            return VLC_EGENERIC;
+        }
         i_skip = i_size - 10;
 
         if( i_id == VLC_FOURCC('.','R','M','F') )
@@ -923,14 +928,6 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         if( fmt.i_codec != 0 )
         {
             msg_Dbg( p_demux, "        - extra data=%d", fmt.i_extra );
-            {
-                int i;
-                for( i = 0; i < fmt.i_extra; i++ )
-                {
-                    msg_Dbg( p_demux, "          data[%d] = 0x%x", i,
-                             ((uint8_t*)fmt.p_extra)[i] );
-                }
-            }
 
             tk = malloc( sizeof( real_track_t ) );
             tk->i_id = i_num;

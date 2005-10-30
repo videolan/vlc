@@ -336,10 +336,20 @@ static void LibavcodecCallback( void *p_opaque, int i_level,
     char *psz_new_format;
     const char *psz_item_name;
 
-    if( p_avctx == NULL || p_avctx->opaque == NULL )
+    p_avc = p_avctx ? p_avctx->av_class : 0;
+
+#define cln p_avc->class_name
+    /* Make sure we can get p_this back */
+    if( !p_avctx || !p_avc || !cln ||
+        cln[0]!='A' || cln[1]!='V' || cln[2]!='C' || cln[3]!='o' ||
+        cln[4]!='d' || cln[5]!='e' || cln[6]!='c' )
+    {
+        if( i_level == AV_LOG_ERROR ) vfprintf( stderr, psz_format, va );
         return;
+    }
+#undef cln
+
     p_this = (vlc_object_t *)p_avctx->opaque;
-    p_avc = p_avctx->av_class;
 
     switch( i_level )
     {
@@ -831,6 +841,9 @@ static struct
 #endif
 
 #if LIBAVCODEC_BUILD >= 4752
+    { VLC_FOURCC('r','l','e',' '), CODEC_ID_QTRLE,
+      VIDEO_ES, "Apple QuickTime RLE Video" },
+
     { VLC_FOURCC('q','d','r','w'), CODEC_ID_QDRAW,
       VIDEO_ES, "Apple QuickDraw Video" },
 

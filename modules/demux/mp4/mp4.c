@@ -1427,6 +1427,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     case( VIDEO_ES ):
         p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
         p_track->fmt.video.i_height = p_sample->data.p_sample_vide->i_height;
+        p_track->fmt.video.i_bits_per_pixel =
+            p_sample->data.p_sample_vide->i_depth;
 
         /* fall on display size */
         if( p_track->fmt.video.i_width <= 0 )
