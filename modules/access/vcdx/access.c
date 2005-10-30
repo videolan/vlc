@@ -361,7 +361,7 @@ VCDEntryPoints( access_t * p_access )
 	  seekpoint_t *s = vlc_seekpoint_New();
 	  char psz_entry[100];
 	  
-	  snprintf(psz_entry, sizeof(psz_entry), "%s%02d", _("Entry "), i );
+	  snprintf(psz_entry, sizeof(psz_entry), "%s %02d", _("Entry"), i );
 
 	  p_vcdplayer->p_entries[i] = vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i);
 	  
@@ -425,7 +425,7 @@ VCDSegments( access_t * p_access )
         seekpoint_t *s = vlc_seekpoint_New();
         p_vcdplayer->p_segments[i] = vcdinfo_get_seg_lsn(p_vcdplayer->vcd, i);
 
-        snprintf( psz_segment, sizeof(psz_segment), "%s%02d", _("Segment "),
+        snprintf( psz_segment, sizeof(psz_segment), "%s %02d", _("Segment"),
                   i );
 
         s->i_byte_offset = 0; /* Not sure what this would mean here */
@@ -469,7 +469,7 @@ VCDTitles( access_t * p_access )
               vlc_input_title_New();
             char psz_track[80];
 
-            snprintf( psz_track, sizeof(psz_track), "%s%02d", _("Track "),
+            snprintf( psz_track, sizeof(psz_track), "%s %02d", _("Track"),
                                                     i );
             t->i_size    = (int64_t) vcdinfo_get_track_size( p_vcdplayer->vcd, 
 							     i ) 
@@ -530,7 +530,7 @@ VCDLIDs( access_t * p_access )
         char psz_lid[100];
         seekpoint_t *s = vlc_seekpoint_New();
 
-        snprintf( psz_lid, sizeof(psz_lid), "%s%02d", _("LID "),
+        snprintf( psz_lid, sizeof(psz_lid), "%s %02d", _("LID"),
                   i_lid );
 
         s->i_byte_offset = 0; /*  A lid doesn't have an offset

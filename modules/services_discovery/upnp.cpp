@@ -54,7 +54,7 @@ using namespace CyberLink;
     static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_shortname( _("UPnP"));
+    set_shortname( "UPnP");
     set_description( _("Universal Plug'n'Play discovery") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
@@ -110,7 +110,7 @@ static int Open( vlc_object_t *p_this )
 
     p_view = playlist_ViewFind( p_sys->p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY,
-                                         _("UPnP"), p_view->p_root );
+                                         "UPnP", p_view->p_root );
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     p_sys->p_node->i_flags &= ~PLAYLIST_SKIP_FLAG;
     val.b_bool = VLC_TRUE;

@@ -5193,9 +5193,9 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             // create a name if there is none
             if ( p_title->psz_name == NULL )
             {
-                sz_name = N_("Segment ");
+                sz_name = N_("Segment");
                 char psz_str[6];
-                sprintf( psz_str, "%d", (int)i );
+                sprintf( psz_str, " %d", (int)i );
                 sz_name += psz_str;
                 p_title->psz_name = strdup( sz_name.c_str() );
             }

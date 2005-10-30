@@ -48,7 +48,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("GnomeVFS filesystem file input") );
-    set_shortname( _("GnomeVFS") );
+    set_shortname( "GnomeVFS" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "gnomevfs-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
