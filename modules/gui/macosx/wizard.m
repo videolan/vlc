@@ -200,7 +200,7 @@ static VLCWizard *_o_sharedInstance = nil;
         @"-1", nil];
     o_spx = [NSArray arrayWithObjects: @"Speex", @"spx", \
         _NS("A free audio codec dedicated to compression of voice (useable " \
-        "with OGG"), @"MUX_OGG", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", \
+        "with OGG)"), @"MUX_OGG", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", \
         @"-1", @"-1", nil];
     o_s16l = [NSArray arrayWithObjects: @"Uncompressed, integer", @"s16l", \
         _NS("Uncompressed audio samples (useable with WAV)"), @"MUX_WAV", \
@@ -252,6 +252,7 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mms;
     NSArray * o_udp_uni;
     NSArray * o_udp_multi;
+    NSArray * o_rtp;
     o_http = [NSArray arrayWithObjects: @"http", @"HTTP", _NS("Enter the local " \
         "addresses you want to listen to. Do not enter anything if you want to " \
         "listen to all adresses or if you don't understand. This is generally " \
@@ -278,8 +279,11 @@ static VLCWizard *_o_sharedInstance = nil;
         "to a dynamic group of computers on a multicast-enabled network. This " \
         "is the most efficient method to stream to several computers, but it " \
         "does not work over Internet."), nil];
+    o_rtp = [NSArray arrayWithObjects: @"rtp", @"RTP", _NS("Enter the " \
+        "address of the computer to stream to.") , _NS("Use this to stream " \
+        "to a single computer."), nil];
     o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_mms, \
-        o_udp_uni, o_udp_multi, nil];
+        o_udp_uni, o_udp_multi, o_rtp, nil];
 }
 
 - (void)showWizard
@@ -589,7 +593,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
                 _NS("You have selected neither a new stream nor a valid " \
                 "playlist item. VLC is unable to guess, which input you " \
-                "want use.\n\n Choose one before going to the next page."));
+                "want use.\n\nChoose one before going to the next page."));
         }
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
@@ -655,7 +659,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
                     _NS("You need to enter a valid destination you want to "\
                     "stream to. Enter either a Unicast-IP or a Multicast-IP." \
-                    "\n\n If you don't know what this means, have a look at " \
+                    "\n\nIf you don't know what this means, have a look at " \
                     "the VLC Streaming HOWTO and the help texts in this " \
                     "window."));
             } else {
@@ -1111,7 +1115,7 @@ static VLCWizard *_o_sharedInstance = nil;
             /* complain to the user that "" is no valid path */
             NSBeginInformationalAlertSheet(_NS("No file selected"), _NS("OK"), \
                 @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You you " \
-                "need to select a file, you want to save to.\n\n Enter either " \
+                "need to select a file, you want to save to.\n\nEnter either " \
                 "a valid path or choose a location through the button's " \
                 "dialog-box."));
         } else {
@@ -1554,6 +1558,14 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:1] \
             objectAtIndex:2]];
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:1] \
+            objectAtIndex:3]];
+    }
+    else if( [o_mode intValue] == 4 )
+    {
+        /* RTP */
+        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:4] \
+            objectAtIndex:2]];
+        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:4] \
             objectAtIndex:3]];
     }
     [o_mode release];
