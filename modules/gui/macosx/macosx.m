@@ -57,7 +57,7 @@ void E_(CloseVideoGL) ( vlc_object_t * );
     "Set the transparency of the video output. 1 is non-transparent (default) " \
     "0 is fully transparent.")
     
-#define STRETCH_TEXT N_("Stretch Aspect Ratio")
+#define STRETCH_TEXT N_("Stretch video to fill window")
 #define STRETCH_LONGTEXT N_("Instead of keeping the aspect ratio " \
         "of the movie when resizing the video, stretch the video " \
         "to fill the entire window." )
