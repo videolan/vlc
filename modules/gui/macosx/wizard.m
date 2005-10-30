@@ -422,6 +422,8 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t6_btn_mrInfo_ttl setTitle: _NS("More Info")];
     [o_t6_ckb_sap setTitle: _NS("SAP Announce")];
     [o_t6_btn_mrInfo_sap setTitle: _NS("More Info")];
+    [o_t6_ckb_local setTitle: _NS("Local playback")];
+    [o_t6_btn_mrInfo_local setTitle: _NS("More Info")];
 
     /* page seven ("Transcode 2") */
     [o_t7_title setStringValue: _NS("Additional transcode options")];
@@ -429,6 +431,8 @@ static VLCWizard *_o_sharedInstance = nil;
                               "additional parameters for your transcoding.")];
     [o_t7_txt_saveFileTo setStringValue: _NS("Select the file to save to")];
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
+    [o_t7_ckb_local setTitle: _NS("Local playback")];
+    [o_t7_btn_mrInfo_local setTitle: _NS("More Info")];
 
     /* page eight ("Summary") */
     [o_t8_txt_text setStringValue: _NS("This page lists all your selections. " \
