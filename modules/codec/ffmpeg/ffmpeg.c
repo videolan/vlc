@@ -336,10 +336,17 @@ static void LibavcodecCallback( void *p_opaque, int i_level,
     char *psz_new_format;
     const char *psz_item_name;
 
-    if( p_avctx == NULL || p_avctx->opaque == NULL )
+    p_avc = p_avctx ? p_avctx->av_class : 0;
+
+    /* Make sure we can get p_this back */
+    if( !p_avctx || !p_avc || !p_avc->class_name ||
+        strcmp( p_avc->class_name, "AVCodecContext" ) )
+    {
+        if( i_level == AV_LOG_ERROR ) vfprintf( stderr, psz_format, va );
         return;
+    }
+
     p_this = (vlc_object_t *)p_avctx->opaque;
-    p_avc = p_avctx->av_class;
 
     switch( i_level )
     {
