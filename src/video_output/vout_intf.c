@@ -37,6 +37,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static void InitWindowSize( vout_thread_t *, unsigned *, unsigned * );
 
 /* Object variables callbacks */
 static int ZoomCallback( vlc_object_t *, char const *,
@@ -184,6 +185,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_vout, "align", &val );
+    p_vout->i_alignment = val.i_int;
+
     var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
@@ -261,7 +265,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
             vlc_ureduce( &i_aspect_num, &i_aspect_den,
                          i_aspect *VOUT_ASPECT_FACTOR, VOUT_ASPECT_FACTOR, 0 );
         }
-        free( val.psz_string );
         if( !i_aspect_num || !i_aspect_den ) i_aspect_num = i_aspect_den = 1;
 
         p_vout->i_par_num = i_aspect_num;
@@ -274,6 +277,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
                  p_vout->i_par_num, p_vout->i_par_den );
         b_force_par = VLC_TRUE;
     }
+    if( val.psz_string ) free( val.psz_string );
 
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING |
@@ -300,6 +304,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     if( (old_val.psz_string && *old_val.psz_string) || b_force_par )
         var_Change( p_vout, "aspect-ratio", VLC_VAR_TRIGGER_CALLBACKS, 0, 0 );
     if( old_val.psz_string ) free( old_val.psz_string );
+
+    /* Initialize the dimensions of the video window */
+    InitWindowSize( p_vout, &p_vout->i_window_width,
+                    &p_vout->i_window_height );
+    msg_Dbg( p_vout, "window size: %dx%d", p_vout->i_window_width, 
+             p_vout->i_window_height );
 
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -525,6 +535,69 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
 }
 
 /*****************************************************************************
+ * InitWindowSize: find the initial dimensions the video window should have.
+ *****************************************************************************
+ * This function will check the "width", "height" and "zoom" config options and
+ * will calculate the size that the video window should have.
+ *****************************************************************************/
+static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
+                            unsigned *pi_height )
+{
+    vlc_value_t val;
+    int i_width, i_height;
+    uint64_t ll_zoom;
+
+#define FP_FACTOR 1000                             /* our fixed point factor */
+
+    var_Get( p_vout, "width", &val );
+    i_width = val.i_int;
+    var_Get( p_vout, "height", &val );
+    i_height = val.i_int;
+    var_Get( p_vout, "zoom", &val );
+    ll_zoom = (uint64_t)( FP_FACTOR * val.f_float );
+
+    if( i_width > 0 && i_height > 0)
+    {
+        *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
+        *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
+        return;
+    }
+    else if( i_width > 0 )
+    {
+        *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
+        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom *
+            p_vout->fmt_in.i_sar_den * i_width / p_vout->fmt_in.i_sar_num /
+            FP_FACTOR / p_vout->fmt_in.i_visible_width );
+        return;
+    }
+    else if( i_height > 0 )
+    {
+        *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
+        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom *
+            p_vout->fmt_in.i_sar_num * i_height / p_vout->fmt_in.i_sar_den /
+            FP_FACTOR / p_vout->fmt_in.i_visible_height );
+        return;
+    }
+
+    if( p_vout->fmt_in.i_sar_num >= p_vout->fmt_in.i_sar_den )
+    {
+        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom *
+            p_vout->fmt_in.i_sar_num / p_vout->fmt_in.i_sar_den / FP_FACTOR );
+        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom 
+            / FP_FACTOR );
+    }
+    else
+    {
+        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom 
+            / FP_FACTOR );
+        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom *
+            p_vout->fmt_in.i_sar_den / p_vout->fmt_in.i_sar_num / FP_FACTOR );
+    }
+
+#undef FP_FACTOR
+}
+
+/*****************************************************************************
  * Object variables callbacks
  *****************************************************************************/
 static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -577,6 +650,9 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
  crop_end:
+    InitWindowSize( p_vout, &p_vout->i_window_width,
+                    &p_vout->i_window_height );
+
     p_vout->i_changes |= VOUT_CROP_CHANGE;
 
     msg_Dbg( p_vout, "cropping picture %ix%i to %i,%i,%ix%i",

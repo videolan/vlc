@@ -445,19 +445,18 @@ void vout_PlacePicture( vout_thread_t *p_vout,
     }
 
     if( p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
-        *pi_height /
-        (p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den) >
-        *pi_width )
+        *pi_height / p_vout->fmt_in.i_visible_height /
+        p_vout->fmt_in.i_sar_den > *pi_width )
     {
         *pi_height = p_vout->fmt_in.i_visible_height *
             (int64_t)p_vout->fmt_in.i_sar_den * *pi_width /
-            (p_vout->fmt_in.i_visible_width * p_vout->fmt_in.i_sar_num);
+            p_vout->fmt_in.i_visible_width / p_vout->fmt_in.i_sar_num;
     }
     else
     {
         *pi_width = p_vout->fmt_in.i_visible_width *
             (int64_t)p_vout->fmt_in.i_sar_num * *pi_height /
-            (p_vout->fmt_in.i_visible_height * p_vout->fmt_in.i_sar_den);
+            p_vout->fmt_in.i_visible_height / p_vout->fmt_in.i_sar_den;
     }
 
     switch( p_vout->i_alignment & VOUT_ALIGN_HMASK )

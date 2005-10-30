@@ -144,11 +144,13 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
 
             if( i_width && i_height )
             {
-                val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x )
-                             * p_event->p_vout->render.i_width / i_width;
+                val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x ) *
+                    p_event->p_vout->fmt_in.i_visible_width / i_width +
+                    p_event->p_vout->fmt_in.i_x_offset;
                 var_Set( p_event->p_vout, "mouse-x", val );
-                val.i_int = ( GET_Y_LPARAM(msg.lParam) - i_y )
-                             * p_event->p_vout->render.i_height / i_height;
+                val.i_int = ( GET_Y_LPARAM(msg.lParam) - i_y ) *
+                    p_event->p_vout->fmt_in.i_visible_height / i_height +
+                    p_event->p_vout->fmt_in.i_y_offset;
                 var_Set( p_event->p_vout, "mouse-y", val );
 
                 val.b_bool = VLC_TRUE;

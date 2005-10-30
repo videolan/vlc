@@ -72,6 +72,8 @@ struct decoder_sys_t
      */
     vout_synchro_t *p_synchro;
     int            i_aspect;
+    int            i_sar_num;
+    int            i_sar_den;
     mtime_t        i_last_frame_pts;
 
 };
@@ -581,6 +583,8 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     p_dec->fmt_out.video.i_visible_height =
         p_sys->p_info->sequence->picture_height;
     p_dec->fmt_out.video.i_aspect = p_sys->i_aspect;
+    p_dec->fmt_out.video.i_sar_num = p_sys->i_sar_num;
+    p_dec->fmt_out.video.i_sar_den = p_sys->i_sar_den;
 
     if( p_sys->p_info->sequence->frame_period > 0 )
     {
@@ -632,17 +636,24 @@ static void GetAR( decoder_t *p_dec )
         {
         case AR_3_4_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
+            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 4;
+            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 3;
             break;
         case AR_16_9_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 16 / 9;
+            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 16;
+            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 9;
             break;
         case AR_221_1_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
+            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 221;
+            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 100;
             break;
         case AR_SQUARE_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR *
                            p_sys->p_info->sequence->width /
                            p_sys->p_info->sequence->height;
+            p_sys->i_sar_num = p_sys->i_sar_den = 1;
             break;
         }
     }
@@ -657,6 +668,8 @@ static void GetAR( decoder_t *p_dec )
                 VOUT_ASPECT_FACTOR /
                 p_sys->p_info->sequence->display_height /
                 p_sys->p_info->sequence->pixel_height;
+            p_sys->i_sar_num = p_sys->p_info->sequence->pixel_width;
+            p_sys->i_sar_den = p_sys->p_info->sequence->pixel_height;
         }
         else
         {
@@ -664,12 +677,15 @@ static void GetAR( decoder_t *p_dec )
              * This shouldn't happen and if it does it is a bug
              * in libmpeg2 (likely triggered by an invalid stream) */
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
+            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 4;
+            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 3;
         }
     }
 
-    msg_Dbg( p_dec, "%dx%d, aspect %d, %u.%03u fps",
+    msg_Dbg( p_dec, "%dx%d, aspect %d, sar %i:%i, %u.%03u fps",
              p_sys->p_info->sequence->display_width,
-             p_sys->p_info->sequence->display_height, p_sys->i_aspect,
+             p_sys->p_info->sequence->display_height,
+             p_sys->i_aspect, p_sys->i_sar_num, p_sys->i_sar_den,
              (uint32_t)((uint64_t)1001000000 * 27 /
                  p_sys->p_info->sequence->frame_period / 1001),
              (uint32_t)((uint64_t)1001000000 * 27 /
