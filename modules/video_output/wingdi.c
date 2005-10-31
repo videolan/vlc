@@ -216,11 +216,11 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
 #ifdef MODULE_NAME_IS_wingapi
-    set_shortname( _("Windows GAPI") );
+    set_shortname( "Windows GAPI" );
     set_description( _("Windows GAPI video output") );
     set_capability( "video output", 20 );
 #else
-    set_shortname( _("Windows GDI") );
+    set_shortname( "Windows GDI" );
     set_description( _("Windows GDI video output") );
     set_capability( "video output", 10 );
 #endif

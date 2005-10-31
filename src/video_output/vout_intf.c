@@ -231,15 +231,15 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
     val.psz_string = ""; text.psz_string = _("Default");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "001:1"; text.psz_string = _("1:1");
+    val.psz_string = "001:1"; text.psz_string = "1:1";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "004:3"; text.psz_string = _("4:3");
+    val.psz_string = "004:3"; text.psz_string = "4:3";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:10"; text.psz_string = _("16:10");
+    val.psz_string = "16:10"; text.psz_string = "16:10";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:9"; text.psz_string = _("16:9");
+    val.psz_string = "16:9"; text.psz_string = "16:9";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "221:100"; text.psz_string = _("221:100");
+    val.psz_string = "221:100"; text.psz_string = "221:100";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
@@ -292,13 +292,13 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "aspect-ratio", VLC_VAR_DELCHOICE, &val, 0 );
     val.psz_string = ""; text.psz_string = _("Default");
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "001:1"; text.psz_string = _("1:1");
+    val.psz_string = "001:1"; text.psz_string = "1:1";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "004:3"; text.psz_string = _("4:3");
+    val.psz_string = "004:3"; text.psz_string = "4:3";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:9"; text.psz_string = _("16:9");
+    val.psz_string = "16:9"; text.psz_string = "16:9";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "221:100"; text.psz_string = _("221:100");
+    val.psz_string = "221:100"; text.psz_string = "221:100";
     var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
