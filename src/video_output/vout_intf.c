@@ -231,13 +231,13 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
     val.psz_string = ""; text.psz_string = _("Default");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "001:1"; text.psz_string = "1:1";
+    val.psz_string = "001:1"; text.psz_string = _("1:1");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "004:3"; text.psz_string = "4:3";
+    val.psz_string = "004:3"; text.psz_string = _("4:3");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "16:9"; text.psz_string = "16:9";
+    val.psz_string = "16:9"; text.psz_string = _("16:9");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "221:100"; text.psz_string = "221:100";
+    val.psz_string = "221:100"; text.psz_string = _("221:100");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
 
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
@@ -308,8 +308,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
-    msg_Dbg( p_vout, "window size: %dx%d", p_vout->i_window_width, 
-             p_vout->i_window_height );
 
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -560,7 +558,7 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
     {
         *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
-        return;
+        goto initwsize_end;
     }
     else if( i_width > 0 )
     {
@@ -568,7 +566,7 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
         *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom *
             p_vout->fmt_in.i_sar_den * i_width / p_vout->fmt_in.i_sar_num /
             FP_FACTOR / p_vout->fmt_in.i_visible_width );
-        return;
+        goto initwsize_end;
     }
     else if( i_height > 0 )
     {
@@ -576,7 +574,7 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
         *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom *
             p_vout->fmt_in.i_sar_num * i_height / p_vout->fmt_in.i_sar_den /
             FP_FACTOR / p_vout->fmt_in.i_visible_height );
-        return;
+        goto initwsize_end;
     }
 
     if( p_vout->fmt_in.i_sar_num >= p_vout->fmt_in.i_sar_den )
@@ -594,6 +592,10 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
             p_vout->fmt_in.i_sar_den / p_vout->fmt_in.i_sar_num / FP_FACTOR );
     }
 
+initwsize_end:
+    msg_Dbg( p_vout, "window size: %dx%d", p_vout->i_window_width, 
+             p_vout->i_window_height );
+
 #undef FP_FACTOR
 }
 
@@ -604,7 +606,9 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    vout_Control( p_vout, VOUT_SET_ZOOM, newval.f_float );
+    InitWindowSize( p_vout, &p_vout->i_window_width,
+                    &p_vout->i_window_height );
+    vout_Control( p_vout, VOUT_SET_ZOOM );
     return VLC_SUCCESS;
 }
 

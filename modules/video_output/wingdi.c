@@ -216,11 +216,11 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
 #ifdef MODULE_NAME_IS_wingapi
-    set_shortname( "Windows GAPI" );
+    set_shortname( _("Windows GAPI") );
     set_description( _("Windows GAPI video output") );
     set_capability( "video output", 20 );
 #else
-    set_shortname( "Windows GDI" );
+    set_shortname( _("Windows GDI") );
     set_description( _("Windows GDI video output") );
     set_capability( "video output", 10 );
 #endif
@@ -1294,12 +1294,10 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->hparent, i_query, args );
 
-        f_arg = va_arg( args, double );
-
         /* Update dimensions */
         rect_window.top = rect_window.left = 0;
-        rect_window.right  = p_vout->i_window_width * f_arg;
-        rect_window.bottom = p_vout->i_window_height * f_arg;
+        rect_window.right  = p_vout->i_window_width;
+        rect_window.bottom = p_vout->i_window_height;
         AdjustWindowRect( &rect_window, p_vout->p_sys->i_window_style, 0 );
 
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,

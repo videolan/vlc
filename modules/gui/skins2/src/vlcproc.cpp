@@ -484,18 +484,13 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
     {
         case VOUT_SET_ZOOM:
         {
-            double fArg = va_arg( args, double );
-
             if( pThis->m_pVout )
             {
-                // Compute requested vout dimensions
-                int width = (int)( pThis->m_pVout->i_window_width * fArg );
-                int height = (int)( pThis->m_pVout->i_window_height * fArg );
-
                 // Post a resize vout command
                 CmdResizeVout *pCmd =
                     new CmdResizeVout( pThis->getIntf(), pWindow,
-                                       width, height );
+                                       pThis->m_pVout->i_window_width,
+                                       pThis->m_pVout->i_window_height );
                 AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
                 pQueue->remove( "resize vout" );
                 pQueue->push( CmdGenericPtr( pCmd ) );

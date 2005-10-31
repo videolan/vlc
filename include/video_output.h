@@ -254,7 +254,7 @@ static inline int vout_Control( vout_thread_t *p_vout, int i_query, ... )
 
 enum output_query_e
 {
-    VOUT_SET_ZOOM,         /* arg1= double           res=    */
+    VOUT_SET_ZOOM,
     VOUT_SET_STAY_ON_TOP,  /* arg1= vlc_bool_t       res=    */
     VOUT_REPARENT,
     VOUT_SNAPSHOT,
