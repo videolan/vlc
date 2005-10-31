@@ -694,15 +694,18 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 i_y_offset = p_region->i_y +
                     p_subpic->i_y * i_scale_height / 1000;
 
-                if( p_spu->i_margin >= 0 )
-                {
-                    if( p_subpic->i_height + (unsigned int)p_spu->i_margin <=
-                        p_fmt->i_height )
-                    {
-                        i_y_offset = p_fmt->i_height -
-                            p_spu->i_margin - p_subpic->i_height;
-                    }
-                }
+            }
+
+            if( p_spu->i_margin != 0 && p_spu->b_force_crop == VLC_FALSE )
+            {
+                int i_diff = 0;
+                int i_low = i_y_offset - p_spu->i_margin;
+                int i_high = i_y_offset + p_region->fmt.i_height - p_spu->i_margin;
+
+                /* crop extra margin to keep within bounds */
+                if( i_low < 0 ) i_diff = i_low;
+                if( i_high > (int)p_fmt->i_height ) i_diff = i_high - p_fmt->i_height;
+                i_y_offset -= ( p_spu->i_margin + i_diff );
             }
 
             p_spu->p_blend->fmt_in.video = p_region->fmt;

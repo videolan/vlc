@@ -1076,7 +1076,7 @@ vlc_module_begin();
 #endif
     add_string( "sub-autodetect-path", SUB_PATH, NULL,
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
-    add_integer( "sub-margin", -1, NULL, SUB_MARGIN_TEXT,
+    add_integer( "sub-margin", 0, NULL, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, VLC_TRUE );
         add_deprecated( "spu-margin", VLC_FALSE ); /*Deprecated since 0.8.2 */
     set_section( N_( "Overlays" ) , NULL );
