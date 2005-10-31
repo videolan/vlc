@@ -235,6 +235,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "004:3"; text.psz_string = _("4:3");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "16:10"; text.psz_string = _("16:10");
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "16:9"; text.psz_string = _("16:9");
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "221:100"; text.psz_string = _("221:100");
