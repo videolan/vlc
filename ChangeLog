@@ -1,4 +1,26 @@
 ------------------------------------------------------------------------
+r13068 | jpsaman | 2005-11-01 00:13:22 +0100 (Tue, 01 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/src/audio_output/intf.c
+
+Fixed p_aout was used after the object was released.
+------------------------------------------------------------------------
+r13067 | gbazin | 2005-11-01 00:12:10 +0100 (Tue, 01 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/codec/ffmpeg/encoder.c
+
+* modules/codec/ffmpeg/encoder.c: backport of 13065 from trunk.
+------------------------------------------------------------------------
+r13066 | hartman | 2005-11-01 00:10:46 +0100 (Tue, 01 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/ChangeLog
+   M /branches/0.8.4/configure.ac
+   M /branches/0.8.4/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /branches/0.8.4/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* 0.8.4-test2 !!!! weeeeeee. happy. smile smile finally.
+
+------------------------------------------------------------------------
 r13064 | gbazin | 2005-11-01 00:04:16 +0100 (Tue, 01 Nov 2005) | 1 line
 Changed paths:
    M /branches/0.8.4/modules/codec/libmpeg2.c
