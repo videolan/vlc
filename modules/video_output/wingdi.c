@@ -1294,12 +1294,10 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->hparent, i_query, args );
 
-        f_arg = va_arg( args, double );
-
         /* Update dimensions */
         rect_window.top = rect_window.left = 0;
-        rect_window.right  = p_vout->i_window_width * f_arg;
-        rect_window.bottom = p_vout->i_window_height * f_arg;
+        rect_window.right  = p_vout->i_window_width;
+        rect_window.bottom = p_vout->i_window_height;
         AdjustWindowRect( &rect_window, p_vout->p_sys->i_window_style, 0 );
 
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
