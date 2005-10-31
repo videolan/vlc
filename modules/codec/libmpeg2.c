@@ -630,24 +630,25 @@ static void GetAR( decoder_t *p_dec )
     /* Check whether the input gave a particular aspect ratio */
     if( p_dec->fmt_in.video.i_aspect )
     {
+        /* AR is relative to width/height, not display_width/height */
         p_sys->i_aspect = p_dec->fmt_in.video.i_aspect;
         if( p_sys->i_aspect <= AR_221_1_PICTURE )
         switch( p_sys->i_aspect )
         {
         case AR_3_4_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
-            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 4;
-            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 3;
+            p_sys->i_sar_num = p_sys->p_info->sequence->height * 4;
+            p_sys->i_sar_den = p_sys->p_info->sequence->width * 3;
             break;
         case AR_16_9_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 16 / 9;
-            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 16;
-            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 9;
+            p_sys->i_sar_num = p_sys->p_info->sequence->height * 16;
+            p_sys->i_sar_den = p_sys->p_info->sequence->width * 9;
             break;
         case AR_221_1_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
-            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 221;
-            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 100;
+            p_sys->i_sar_num = p_sys->p_info->sequence->height * 221;
+            p_sys->i_sar_den = p_sys->p_info->sequence->width * 100;
             break;
         case AR_SQUARE_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR *
@@ -691,4 +692,3 @@ static void GetAR( decoder_t *p_dec )
              (uint32_t)((uint64_t)1001000000 * 27 /
                  p_sys->p_info->sequence->frame_period % 1001) );
 }
-
