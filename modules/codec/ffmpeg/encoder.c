@@ -601,7 +601,12 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     vlc_mutex_unlock( lockval.p_address );
 
     p_enc->fmt_out.i_extra = p_context->extradata_size;
-    p_enc->fmt_out.p_extra = p_context->extradata;
+    if( p_enc->fmt_out.i_extra )
+    {
+        p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+        memcpy( p_enc->fmt_out.p_extra, p_context->extradata,
+                p_enc->fmt_out.i_extra );
+    }
     p_context->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
