@@ -318,6 +318,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
         E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+        vout_Control( p_vout, VOUT_SET_ZOOM );
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window
