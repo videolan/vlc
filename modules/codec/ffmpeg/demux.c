@@ -191,7 +191,55 @@ int E_(OpenDemux)( vlc_object_t *p_this )
         vlc_fourcc_t fcc;
 
         if( !E_(GetVlcFourcc)( cc->codec_id, NULL, &fcc, NULL ) )
+        {
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+
+            /* Special case for raw video data */
+            if( cc->codec_id == CODEC_ID_RAWVIDEO )
+            {
+                msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
+                switch( cc->pix_fmt )
+                {
+                case PIX_FMT_YUV444P:
+                    fcc = VLC_FOURCC( 'I', '4', '4', '4' );
+                    break;
+                case PIX_FMT_YUV422P:
+                    fcc = VLC_FOURCC( 'I', '4', '2', '2' );
+                    break;
+                case PIX_FMT_YUV420P:
+                    fcc = VLC_FOURCC( 'I', '4', '2', '0' );
+                    break;
+                case PIX_FMT_YUV411P:
+                    fcc = VLC_FOURCC( 'I', '4', '1', '1' );
+                    break;
+                case PIX_FMT_YUV410P:
+                    fcc = VLC_FOURCC( 'I', '4', '1', '0' );
+                    break;
+
+                case PIX_FMT_YUV422:
+                    fcc = VLC_FOURCC('Y','U','Y','2');
+                    break;
+
+                case PIX_FMT_RGB555:
+                    fcc = VLC_FOURCC('R','V','1','5');
+                    break;
+                case PIX_FMT_RGB565:
+                    fcc = VLC_FOURCC('R','V','1','6');
+                    break;
+                case PIX_FMT_RGB24:
+                    fcc = VLC_FOURCC('R','V','2','4');
+                    break;
+                case PIX_FMT_RGBA32:
+                    fcc = VLC_FOURCC('R','V','3','2');
+                    break;
+                case PIX_FMT_GRAY8:
+                    fcc = VLC_FOURCC('G','R','E','Y');
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
 
         switch( cc->codec_type )
         {
