@@ -931,7 +931,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         {
             p_dec->fmt_out.video.i_visible_height = 1080;
             p_dec->fmt_out.video.i_sar_num *= 135; 
-            p_dec->fmt_out.video.i_sar_num /= 136; 
+            p_dec->fmt_out.video.i_sar_den *= 136; 
             msg_Warn( p_dec, "Fixing broken HDTV stream (display_height=1088)");
         }
 
