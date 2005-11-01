@@ -3,6 +3,13 @@ $Id$
 README for the VLC media player
 ===============================
 
+The VideoLAN web site . . . http://www.videolan.org/
+Documentation . . . . . . . http://www.videolan.org/doc/
+Support . . . . . . . . . . http://www.videolan.org/support/
+Forums  . . . . . . . . . . http://forum.videolan.org/
+Wiki  . . . . . . . . . . . http://wiki.videolan.org/
+The Developers site . . . . http://developers.videolan.org/vlc/
+
 ABOUT-NLS          - Notes on the Free Translation Project.
 AUTHORS            - Main VLC authors.
 COPYING            - The GPL license.
@@ -15,12 +22,3 @@ README             - This file.
 README.MacOSX.rtf  - Information specific to the MacOS X port.
 THANKS             - All VLC contributors.
 doc/               - Miscellaneous documentation.
-
-Resources
-=========
-
-The VideoLAN web site: http://www.videolan.org/
-Documentation and support: http://w.videolan.org/support/
-Forums: http://forum.videolan.org/
-The Developers site: http://developers.videolan.org/vlc/
-

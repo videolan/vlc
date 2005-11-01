@@ -61,8 +61,7 @@ InstType "Full"
     !insertmacro MUI_PAGE_INSTFILES
   ; Finish page
     !define MUI_FINISHPAGE_RUN "$INSTDIR\vlc.exe"
-    !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\NEWS.txt"
-    !define MUI_FINISHPAGE_SHOWREADME_TEXT "View changelog"
+    !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
     !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
     !define MUI_FINISHPAGE_LINK "Visit the VideoLAN VLC media player Website"
     !define MUI_FINISHPAGE_LINK_LOCATION "http://www.videolan.org/vlc/"
