@@ -731,19 +731,19 @@ DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 # libebml
 # ***************************************************************************
 
-#ifdef SVN
-#libebml: 
-#	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
-#else
+ifdef SVN
+libebml: 
+	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
+else
 libebml-$(LIBEBML_VERSION).tar.bz2:
 	$(WGET) $(LIBEBML_URL)
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+endif
 ifdef HAVE_WIN32
 	(cd $@; patch -p 0 < ../Patches/libebml-svn-win32.patch)
 endif
-#endif
 
 .ebml: libebml
 ifdef HAVE_WIN32
@@ -762,19 +762,19 @@ DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
 # libmatroska
 # ***************************************************************************
 
-#ifdef SVN
-#libmatroska:
-#	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
-#else
+ifdef SVN
+libmatroska:
+	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
+else
 libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 	$(WGET) $(LIBMATROSKA_URL)
 
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+endif
 ifdef HAVE_WIN32
 	(cd $@; patch -p 0 < ../Patches/libmatroska-win32.patch)
 endif
-#endif
 
 .matroska: libmatroska .ebml
 ifdef HAVE_WIN32
@@ -1113,11 +1113,11 @@ DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
 # libcddb
 # ***************************************************************************
 
-libcddb-$(CDDB_VERSION).tar.bz2:
+libcddb-$(CDDB_VERSION).tar.gz:
 	$(WGET) $(CDDB_URL)
 
-libcddb: libcddb-$(CDDB_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+libcddb: libcddb-$(CDDB_VERSION).tar.gz
+	$(EXTRACT_GZ)
 	patch -p 0 < Patches/libcddb.patch
 
 .cddb: libcddb
@@ -1318,7 +1318,7 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 
 CLEAN_FILE += .zvbi
 CLEAN_PKG += zvbi
-#DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
+DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 
 # ***************************************************************************
 # gpg-error 
@@ -1372,11 +1372,11 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	(cd gnutls/gl ;ln -s alloca_.h alloca.h)
 
 .gnutls: gnutls .gcrypt .gpg-error
-ifdef HAVE_WIN32
+#ifdef HAVE_WIN32
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && cd crypto && make && cd ../gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
-else
-	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)"  && cd lib &&make && make install)
-endif
+#else
+#	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)"  && cd lib &&make && make install)
+#endif
 	$(INSTALL_NAME)
 	touch $@
 
