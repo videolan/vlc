@@ -137,12 +137,12 @@ else
 
    all: .iconv .intl .freetype .fribidi .zlib\
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ebml .dts .matroska .ffmpeg .dvdcss \
+	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
 	.png .gpg-error .gcrypt .gnutls \
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
-#	.SDL_image  .daap .cddb .cdio .vcdimager 
+#	.SDL_image  .daap .cddb .cdio .vcdimager .dts
    else
 # Standard Linux or other UNIX-like systems
    all: .iconv .intl .freetype .fribidi .zlib\
@@ -809,7 +809,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	$(EXTRACT_GZ)
 #	patch -p 0 < Patches/ffmpeg.patch
 
-.ffmpeg: ffmpeg .faac .lame .zlib
+.ffmpeg: ffmpeg .faac .lame 
 	(cd $<; ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver  --enable-a52 --disable-ffplay && for dir in libavcodec/libpostproc libavcodec libavformat libavutil; do make -C $$dir && make -C $$dir installlib; done)
 	touch $@
 
@@ -1285,7 +1285,7 @@ libpng: libpng-$(PNG_VERSION).tar.bz2
 ifdef HAVE_WIN32
 	(cd $@; cat ../Patches/libpng-1.2.5-win32.patch | sed s,££PREFIX££,$(PREFIX), | patch -p0)
 endif
-.png: libpng .zlib
+.png: libpng 
 ifdef HAVE_DARWIN_OS
 	(cd $<; cp scripts/makefile.macosx Makefile && make && make install)
 else
