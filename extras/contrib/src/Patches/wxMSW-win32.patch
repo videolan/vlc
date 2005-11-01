@@ -1,0 +1,592 @@
+# This patch was done from wxWidgets-2.6.1-Patch01.zip
+# found on the download page of wxwidgets
+# 24/08/05 -- Xtophe
+diff -Naur wxwidgets-orig/include/wx/msw/listbox.h wxwidgets/include/wx/msw/listbox.h
+--- wxwidgets-orig/include/wx/msw/listbox.h	2005-04-11 20:18:36.000000000 +0000
++++ wxwidgets/include/wx/msw/listbox.h	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Julian Smart
+ // Modified by:
+ // Created:     01/02/97
+-// RCS-ID:      $Id: listbox.h,v 1.42 2005/04/10 15:22:57 VZ Exp $
++// RCS-ID:      $Id: listbox.h,v 1.43 2005/06/16 15:36:42 JS Exp $
+ // Copyright:   (c) Julian Smart
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -151,6 +151,13 @@
+ 
+     virtual wxSize DoGetBestSize() const;
+ 
++    // under XP when using "transition effect for menus and tooltips" if we
++    // return true for WM_PRINTCLIENT here then it causes noticable slowdown
++    virtual bool MSWShouldPropagatePrintChild()
++    {
++        return false;
++    }
++
+ #if wxUSE_OWNER_DRAWN
+     // control items
+     wxListBoxItemsArray m_aItems;
+diff -Naur wxwidgets-orig/include/wx/msw/uxthemep.h wxwidgets/include/wx/msw/uxthemep.h
+--- wxwidgets-orig/include/wx/msw/uxthemep.h	2005-05-14 16:57:49.000000000 +0000
++++ wxwidgets/include/wx/msw/uxthemep.h	2005-08-24 16:47:00.000000000 +0000
+@@ -12,7 +12,7 @@
+ #ifndef __WINE_UXTHEME_H
+ #define __WINE_UXTHEME_H
+ 
+-#include <commctrl.h>
++#include "wx/msw/wrapcctl.h"
+ 
+ typedef HANDLE HTHEME;
+ 
+diff -Naur wxwidgets-orig/include/wx/msw/window.h wxwidgets/include/wx/msw/window.h
+--- wxwidgets-orig/include/wx/msw/window.h	2005-05-31 20:47:32.000000000 +0000
++++ wxwidgets/include/wx/msw/window.h	2005-08-24 16:47:00.000000000 +0000
+@@ -5,7 +5,7 @@
+ // Modified by: Vadim Zeitlin on 13.05.99: complete refont of message handling,
+ //              elimination of Default(), ...
+ // Created:     01/02/97
+-// RCS-ID:      $Id: window.h,v 1.146 2005/05/19 22:17:01 RD Exp $
++// RCS-ID:      $Id: window.h,v 1.147 2005/06/16 15:36:42 JS Exp $
+ // Copyright:   (c) Julian Smart
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -391,6 +391,14 @@
+         return false;
+     }
+ 
++    // some controls (e.g. wxListBox) need to set the return value themselves
++    //
++    // return true to let parent handle it if we don't, false otherwise
++    virtual bool MSWShouldPropagatePrintChild()
++    {
++        return true;
++    }
++
+ 
+     // Responds to colour changes: passes event on to children.
+     void OnSysColourChanged(wxSysColourChangedEvent& event);
+diff -Naur wxwidgets-orig/src/generic/grid.cpp wxwidgets/src/generic/grid.cpp
+--- wxwidgets-orig/src/generic/grid.cpp	2005-06-02 15:19:48.000000000 +0000
++++ wxwidgets/src/generic/grid.cpp	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Michael Bedward (based on code by Julian Smart, Robin Dunn)
+ // Modified by: Robin Dunn, Vadim Zeitlin
+ // Created:     1/08/1999
+-// RCS-ID:      $Id: grid.cpp,v 1.339 2005/06/02 11:38:16 VZ Exp $
++// RCS-ID:      $Id: grid.cpp,v 1.341 2005/06/09 14:49:54 JS Exp $
+ // Copyright:   (c) Michael Bedward (mbedward@ozemail.com.au)
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -242,7 +242,8 @@
+ public:
+     wxGridCellEditorEvtHandler(wxGrid* grid, wxGridCellEditor* editor)
+         : m_grid(grid),
+-          m_editor(editor)
++          m_editor(editor),
++          m_inSetFocus(false)
+     {
+     }
+ 
+@@ -250,10 +251,16 @@
+     void OnKeyDown(wxKeyEvent& event);
+     void OnChar(wxKeyEvent& event);
+ 
++    void SetInSetFocus(bool inSetFocus) { m_inSetFocus = inSetFocus; }
++
+ private:
+     wxGrid*             m_grid;
+     wxGridCellEditor*   m_editor;
+ 
++    // Work around the fact that a focus kill event can be sent to
++    // a combobox within a set focus event.
++    bool                m_inSetFocus;
++    
+     DECLARE_EVENT_TABLE()
+     DECLARE_DYNAMIC_CLASS(wxGridCellEditorEvtHandler)
+     DECLARE_NO_COPY_CLASS(wxGridCellEditorEvtHandler)
+@@ -571,7 +578,7 @@
+     // through in that case.
+     if ((ctrl || alt) && !(ctrl && alt))
+         return false;
+-    
++
+ #if wxUSE_UNICODE
+     int key = event.GetUnicodeKey();
+     bool keyOk = true;
+@@ -588,7 +595,7 @@
+     return keyOk;
+ #else // !wxUSE_UNICODE
+     int key = event.GetKeyCode();
+-    if (key <= 255) 
++    if (key <= 255)
+         return true;
+     return false;
+ #endif // wxUSE_UNICODE/!wxUSE_UNICODE
+@@ -752,7 +759,7 @@
+     wxTextCtrl* tc = Text();
+     wxChar ch;
+     long pos;
+-    
++
+ #if wxUSE_UNICODE
+     ch = event.GetUnicodeKey();
+     if (ch <= 127)
+@@ -1106,7 +1113,7 @@
+     tmpbuf[0] = (char) keycode;
+     tmpbuf[1] = '\0';
+     wxString strbuf(tmpbuf, *wxConvCurrent);
+-#if wxUSE_INTL        
++#if wxUSE_INTL
+     bool is_decimal_point = ( strbuf ==
+        wxLocale::GetInfo(wxLOCALE_DECIMAL_POINT, wxLOCALE_CAT_NUMBER) );
+ #else
+@@ -1184,14 +1191,14 @@
+         tmpbuf[0] = (char) keycode;
+         tmpbuf[1] = '\0';
+         wxString strbuf(tmpbuf, *wxConvCurrent);
+-#if wxUSE_INTL        
++#if wxUSE_INTL
+         bool is_decimal_point =
+             ( strbuf == wxLocale::GetInfo(wxLOCALE_DECIMAL_POINT,
+                                           wxLOCALE_CAT_NUMBER) );
+ #else
+         bool is_decimal_point = ( strbuf == _T(".") );
+ #endif
+-        if ( (keycode < 128) && 
++        if ( (keycode < 128) &&
+              (wxIsdigit(keycode) || tolower(keycode) == 'e' ||
+               is_decimal_point || keycode == '+' || keycode == '-') )
+             return true;
+@@ -1375,11 +1382,11 @@
+         case WXK_SPACE:
+             CBox()->SetValue(!CBox()->GetValue());
+             break;
+-            
++
+         case '+':
+             CBox()->SetValue(true);
+             break;
+-                
++
+         case '-':
+             CBox()->SetValue(false);
+             break;
+@@ -1460,6 +1467,14 @@
+     wxASSERT_MSG(m_control,
+                  wxT("The wxGridCellEditor must be Created first!"));
+ 
++    wxGridCellEditorEvtHandler* evtHandler = NULL;
++    if (m_control)
++        evtHandler = wxDynamicCast(m_control->GetEventHandler(), wxGridCellEditorEvtHandler);
++
++    // Don't immediately end if we get a kill focus event within BeginEdit
++    if (evtHandler)
++        evtHandler->SetInSetFocus(true);
++
+     m_startValue = grid->GetTable()->GetValue(row, col);
+ 
+     if (m_allowOthers)
+@@ -1468,12 +1483,15 @@
+     {
+         // find the right position, or default to the first if not found
+         int pos = Combo()->FindString(m_startValue);
+-        if (pos == -1)
++        if (pos == wxNOT_FOUND)
+             pos = 0;
+         Combo()->SetSelection(pos);
+     }
+     Combo()->SetInsertionPointEnd();
+     Combo()->SetFocus();
++
++    if (evtHandler)
++        evtHandler->SetInSetFocus(false);
+ }
+ 
+ bool wxGridCellChoiceEditor::EndEdit(int row, int col,
+@@ -1525,6 +1543,10 @@
+ 
+ void wxGridCellEditorEvtHandler::OnKillFocus(wxFocusEvent& event)
+ {
++    // Don't disable the cell if we're just starting to edit it
++    if (m_inSetFocus)
++        return;
++
+     // accept changes
+     m_grid->DisableCellEditControl();
+ 
+@@ -3783,7 +3805,7 @@
+ {
+     if (event.ButtonDown(wxMOUSE_BTN_LEFT) && FindFocus() != this)
+         SetFocus();
+-    
++
+     m_owner->ProcessGridCellMouseEvent( event );
+ }
+ 
+@@ -4905,6 +4927,7 @@
+                 break;
+ 
+                 case WXGRID_CURSOR_SELECT_ROW:
++                {
+                     if ( (row = YToRow( y )) >= 0 )
+                     {
+                         if ( m_selection )
+@@ -4916,6 +4939,8 @@
+                                                     event.MetaDown() );
+                         }
+                     }
++                }
++                break;
+ 
+                 // default label to suppress warnings about "enumeration value
+                 // 'xxx' not handled in switch
+@@ -5127,6 +5152,7 @@
+                 break;
+ 
+                 case WXGRID_CURSOR_SELECT_COL:
++                {
+                     if ( (col = XToCol( x )) >= 0 )
+                     {
+                         if ( m_selection )
+@@ -5138,6 +5164,8 @@
+                                                     event.MetaDown() );
+                         }
+                     }
++                }
++                break;
+ 
+                 // default label to suppress warnings about "enumeration value
+                 // 'xxx' not handled in switch
+diff -Naur wxwidgets-orig/src/generic/splitter.cpp wxwidgets/src/generic/splitter.cpp
+--- wxwidgets-orig/src/generic/splitter.cpp	2005-03-29 12:22:43.000000000 +0000
++++ wxwidgets/src/generic/splitter.cpp	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Julian Smart
+ // Modified by:
+ // Created:     01/02/97
+-// RCS-ID:      $Id: splitter.cpp,v 1.114 2005/03/29 12:22:43 JS Exp $
++// RCS-ID:      $Id: splitter.cpp,v 1.115 2005/06/21 16:08:22 JS Exp $
+ // Copyright:   (c) Julian Smart
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -94,6 +94,11 @@
+     if ( !wxWindow::Create(parent, id, pos, size, style, name) )
+         return false;
+ 
++    if (size.x >= 0)
++        m_lastSize.x = size.x;
++    if (size.y >= 0)
++        m_lastSize.y = size.y;
++    
+     m_permitUnsplitAlways = (style & wxSP_PERMIT_UNSPLIT) != 0;
+ 
+     // FIXME: with this line the background is not erased at all under GTK1,
+@@ -700,8 +705,8 @@
+             y2 = size2;
+         }
+ 
+-        GetWindow1()->SetSize(border, border, w1, h1);
+         GetWindow2()->SetSize(x2, y2, w2, h2);
++        GetWindow1()->SetSize(border, border, w1, h1);
+     }
+ 
+     wxClientDC dc(this);
+diff -Naur wxwidgets-orig/src/msw/helpchm.cpp wxwidgets/src/msw/helpchm.cpp
+--- wxwidgets-orig/src/msw/helpchm.cpp	2005-05-31 20:49:53.000000000 +0000
++++ wxwidgets/src/msw/helpchm.cpp	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Julian Smart
+ // Modified by:
+ // Created:     16/04/2000
+-// RCS-ID:      $Id: helpchm.cpp,v 1.23 2005/05/24 08:53:32 CE Exp $
++// RCS-ID:      $Id: helpchm.cpp,v 1.24 2005/06/20 14:02:35 JS Exp $
+ // Copyright:   (c) Julian Smart
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -243,7 +243,6 @@
+ 
+ wxCHMHelpController::~wxCHMHelpController()
+ {
+-	gs_htmlHelp(GetSuitableHWND(), 0, HH_CLOSE_ALL, 0L);
+     UnloadHtmlHelpLibrary();
+ }
+ 
+diff -Naur wxwidgets-orig/src/msw/notebook.cpp wxwidgets/src/msw/notebook.cpp
+--- wxwidgets-orig/src/msw/notebook.cpp	2005-05-31 20:49:55.000000000 +0000
++++ wxwidgets/src/msw/notebook.cpp	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Vadim Zeitlin
+ // Modified by:
+ // Created:     11.06.98
+-// RCS-ID:      $Id: notebook.cpp,v 1.155 2005/05/30 11:23:27 JS Exp $
++// RCS-ID:      $Id: notebook.cpp,v 1.158 2005/06/19 19:11:11 JS Exp $
+ // Copyright:   (c) 1998 Vadim Zeitlin <zeitlin@dptmaths.ens-cachan.fr>
+ // Licence:     wxWindows licence
+ ///////////////////////////////////////////////////////////////////////////////
+@@ -93,6 +93,14 @@
+ // the pointer to standard spin button wnd proc
+ static WXFARPROC gs_wndprocNotebookSpinBtn = (WXFARPROC)NULL;
+ 
++// the pointer to standard tab control wnd proc
++static WXFARPROC gs_wndprocNotebook = (WXFARPROC)NULL; 
++
++LRESULT APIENTRY _EXPORT wxNotebookWndProc(HWND hwnd,
++                                           UINT message,
++                                           WPARAM wParam,
++                                           LPARAM lParam);
++
+ #endif // USE_NOTEBOOK_ANTIFLICKER
+ 
+ // ----------------------------------------------------------------------------
+@@ -285,6 +293,7 @@
+ 
+     LPCTSTR className = WC_TABCONTROL;
+ 
++#if USE_NOTEBOOK_ANTIFLICKER
+     // SysTabCtl32 class has natively CS_HREDRAW and CS_VREDRAW enabled and it
+     // causes horrible flicker when resizing notebook, so get rid of it by
+     // using a class without these styles (but otherwise identical to it)
+@@ -296,11 +305,14 @@
+             // get a copy of standard class and modify it
+             WNDCLASS wc;
+ 
+-            if ( ::GetClassInfo(::GetModuleHandle(NULL), WC_TABCONTROL, &wc) )
++            if ( ::GetClassInfo(NULL, WC_TABCONTROL, &wc) )
+             {
++                gs_wndprocNotebook =
++                    wx_reinterpret_cast(WXFARPROC, wc.lpfnWndProc);
+                 wc.lpszClassName = wxT("_wx_SysTabCtl32");
+                 wc.style &= ~(CS_HREDRAW | CS_VREDRAW);
+-
++                wc.hInstance = wxGetInstance();
++                wc.lpfnWndProc = wxNotebookWndProc;
+                 s_clsNotebook.Register(wc);
+             }
+             else
+@@ -318,6 +330,7 @@
+             className = s_clsNotebook.GetName().c_str();
+         }
+     }
++#endif // USE_NOTEBOOK_ANTIFLICKER
+ 
+     if ( !CreateControl(parent, id, pos, size, style | wxTAB_TRAVERSAL,
+                         wxDefaultValidator, name) )
+@@ -789,6 +802,16 @@
+                             hwnd, message, wParam, lParam);
+ }
+ 
++LRESULT APIENTRY _EXPORT wxNotebookWndProc(HWND hwnd,
++                                           UINT message,
++                                           WPARAM wParam,
++                                           LPARAM lParam)
++{
++    return ::CallWindowProc(CASTWNDPROC gs_wndprocNotebook,
++                            hwnd, message, wParam, lParam);
++}
++
++ 
+ 
+ void wxNotebook::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
+ {
+@@ -918,7 +941,7 @@
+         RefreshRect(wxRect(0, rc.top, rc.left, height), false);
+         RefreshRect(wxRect(0, rc.bottom, widthNbook, heightNbook - rc.bottom),
+                     false);
+-        RefreshRect(wxRect(rc.right, rc.top, widthNbook - rc.bottom, height),
++        RefreshRect(wxRect(rc.right, rc.top, widthNbook - rc.right, height),
+                     false);
+     }
+ 
+@@ -967,7 +990,7 @@
+       {
+         wxNotebookPage *pPage = m_pages[sel];
+         pPage->Show(true);
+-        
++
+         // As per bug report:
+         // http://sourceforge.net/tracker/index.php?func=detail&aid=1150659&group_id=9863&atid=109863,
+         // we should not set the page focus (and thereby the focus for
+@@ -1102,17 +1125,17 @@
+     if ( child )
+         ::MapWindowPoints(GetHwnd(), GetHwndOf(child), (POINT *)&rc, 2);
+ 
+-
+-    // apparently DrawThemeBackground() modifies the rect passed to it and if we
+-    // don't do these adjustments, there are some drawing artifacts which are
+-    // only visible with some non default themes; so modify the rect here using
+-    // the magic numbers below so that it still paints the correct area
+-    rc.left   -= 2;
+-    rc.top    -= 2;
+-    rc.right  += 4;
+-    rc.bottom += 5;
+-
+-
++    // we have the content area (page size), but we need to draw all of the
++    // background for it to be aligned correctly
++    wxUxThemeEngine::Get()->GetThemeBackgroundExtent
++                            (
++                                theme,
++                                (HDC) hDC,
++                                9 /* TABP_PANE */,
++                                0,
++                                &rc,
++                                &rc
++                            );
+     wxUxThemeEngine::Get()->DrawThemeBackground
+                             (
+                                 theme,
+diff -Naur wxwidgets-orig/src/msw/tbar95.cpp wxwidgets/src/msw/tbar95.cpp
+--- wxwidgets-orig/src/msw/tbar95.cpp	2005-05-31 20:49:56.000000000 +0000
++++ wxwidgets/src/msw/tbar95.cpp	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Julian Smart
+ // Modified by:
+ // Created:     04/01/98
+-// RCS-ID:      $Id: tbar95.cpp,v 1.153 2005/05/27 09:14:58 JS Exp $
++// RCS-ID:      $Id: tbar95.cpp,v 1.156 2005/06/09 20:18:24 VZ Exp $
+ // Copyright:   (c) Julian Smart
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -93,9 +93,6 @@
+ // these values correspond to those used by comctl32.dll
+ #define DEFAULTBITMAPX   16
+ #define DEFAULTBITMAPY   15
+-#define DEFAULTBUTTONX   24
+-#define DEFAULTBUTTONY   24
+-#define DEFAULTBARHEIGHT 27
+ 
+ // ----------------------------------------------------------------------------
+ // wxWin macros
+@@ -245,31 +242,20 @@
+     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+     SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+ 
+-    // workaround for flat toolbar on Windows XP classic style
++    // workaround for flat toolbar on Windows XP classic style: we have to set
++    // the style after creating the control, doing it at creation time doesn't
++    // work
+ #if wxUSE_UXTHEME
+     if ( style & wxTB_FLAT )
+     {
+-        // Testing for an active theme appears to be unnecessary (see comments in patch 1204217).
+-        // Disabling the test brings back separator lines.
+-        // However, the separators can look ugly and distracting, especially between controls,
+-        // so I'm restoring the test and removing the separators again - JACS
+-#if 1
+-        wxUxThemeEngine *p = wxUxThemeEngine::Get();
+-        if ( !p || !p->IsThemeActive() )
+-#endif            
+-        {
+-            DWORD dwToolbarStyle;
+-
+-            dwToolbarStyle = (DWORD)::SendMessage(GetHwnd(), TB_GETSTYLE, 0, 0L );
++        LRESULT style = ::SendMessage(GetHwnd(), TB_GETSTYLE, 0, 0L);
+ 
+-            if ((dwToolbarStyle & TBSTYLE_FLAT) == 0)
+-            {
+-                dwToolbarStyle |= TBSTYLE_FLAT;
+-                ::SendMessage(GetHwnd(), TB_SETSTYLE, 0, (LPARAM)dwToolbarStyle );
+-            }
++        if ( !(style & TBSTYLE_FLAT) )
++        {
++            ::SendMessage(GetHwnd(), TB_SETSTYLE, 0, style | TBSTYLE_FLAT);
+         }
+     }
+-#endif
++#endif // wxUSE_UXTHEME
+ 
+     return true;
+ }
+@@ -897,7 +883,7 @@
+                                 wxToolBarToolBase *tool = nodePrev->GetData();
+                                 if ( !tool->IsButton() || tool->GetKind() != wxITEM_RADIO )
+                                     break;
+-                                
++
+                                 if ( tool->Toggle(false) )
+                                 {
+                                     DoToggleTool(tool, false);
+@@ -905,7 +891,7 @@
+                                 prevButton.fsState = TBSTATE_ENABLED;
+                                 nodePrev = nodePrev->GetPrevious();
+                                 prevIndex--;
+-                            }                            
++                            }
+                         }
+ 
+                         isRadio = true;
+@@ -1249,14 +1235,15 @@
+         return (wxToolBarToolBase *)NULL;
+     }
+ 
+-    // if comctl32 version < 4.71 wxToolBar95 adds dummy spacers
+-#if defined(_WIN32_IE) && (_WIN32_IE >= 0x400 )
++    // when TB_SETBUTTONINFO is available (both during compile- and run-time),
++    // we don't use the dummy separators hack
++#ifdef TB_SETBUTTONINFO
+     if ( wxApp::GetComCtl32Version() >= 471 )
+     {
+         return m_tools.Item((size_t)index)->GetData();
+     }
+     else
+-#endif
++#endif // TB_SETBUTTONINFO
+     {
+         return GetItemSkippingDummySpacers( m_tools, (size_t) index );
+     }
+diff -Naur wxwidgets-orig/src/msw/window.cpp wxwidgets/src/msw/window.cpp
+--- wxwidgets-orig/src/msw/window.cpp	2005-05-31 20:49:58.000000000 +0000
++++ wxwidgets/src/msw/window.cpp	2005-08-24 16:47:00.000000000 +0000
+@@ -4,7 +4,7 @@
+ // Author:      Julian Smart
+ // Modified by: VZ on 13.05.99: no more Default(), MSWOnXXX() reorganisation
+ // Created:     04/01/98
+-// RCS-ID:      $Id: window.cpp,v 1.619 2005/05/31 09:20:34 JS Exp $
++// RCS-ID:      $Id: window.cpp,v 1.622 2005/06/21 16:06:45 JS Exp $
+ // Copyright:   (c) Julian Smart
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+@@ -2353,6 +2353,7 @@
+             break;
+ #endif // !__WXWINCE__
+ 
++#if !(defined(_WIN32_WCE) && _WIN32_WCE < 400)
+         case WM_WINDOWPOSCHANGED:
+             {
+                 WINDOWPOS *lpPos = (WINDOWPOS *)lParam;
+@@ -2365,19 +2366,15 @@
+                     AutoHRGN hrgnClient(::CreateRectRgnIndirect(&rc));
+                     AutoHRGN hrgnNew(::CreateRectRgn(lpPos->x,  lpPos->y,
+                                                      lpPos->cx, lpPos->cy));
+-                    AutoHRGN hrgn(::CreateRectRgn(0, 0, 0, 0));
+ 
+                     // we need to invalidate any new exposed areas here
+                     // to force them to repaint
+-                    if ( ::CombineRgn(hrgn, hrgnNew, hrgnClient, RGN_DIFF) != NULLREGION )
+-                        ::InvalidateRgn(GetHwnd(), hrgn, TRUE);
+-                    if ( ::CombineRgn(hrgn, hrgnClient, hrgnNew, RGN_DIFF) != NULLREGION )
+-                        ::InvalidateRgn(GetHwnd(), hrgn, TRUE);
+-
++                    if ( ::CombineRgn(hrgnNew, hrgnNew, hrgnClient, RGN_DIFF) != NULLREGION )
++                        ::InvalidateRgn(GetHwnd(), hrgnNew, TRUE);
+                 }
+             }
+             break;
+-
++#endif
+ #if !defined(__WXMICROWIN__) && !defined(__WXWINCE__)
+         case WM_ACTIVATEAPP:
+             // This implicitly sends a wxEVT_ACTIVATE_APP event
+@@ -4150,6 +4147,11 @@
+     if ( IsTopLevel() || InheritsBackgroundColour() )
+         return false;
+ 
++    // sometimes we don't want the parent to handle it at all, instead
++    // return whatever value this window wants
++    if ( !MSWShouldPropagatePrintChild() )
++        return MSWPrintChild(hDC, (wxWindow *)this);
++
+     for ( wxWindow *win = GetParent(); win; win = win->GetParent() )
+     {
+         if ( win->MSWPrintChild(hDC, (wxWindow *)this) )

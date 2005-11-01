@@ -1,0 +1,17 @@
+Index: make/linux/Makefile
+===================================================================
+--- make/linux/Makefile	(revision 1206)
++++ make/linux/Makefile	(working copy)
+@@ -29,9 +29,9 @@
+ INSTALL_OPTS_LIB = -m 644
+ INSTALL_DIR_OPTS = -m 755
+ 
+-ifneq (,$(shell $(CXX) -v 2>&1 | tail -n 1 | grep -i mingw))
+-$(error Please use the Makefile in ../mingw32)
+-endif
++#ifneq (,$(shell $(CXX) -v 2>&1 | tail -n 1 | grep -i mingw))
++#$(error Please use the Makefile in ../mingw32)
++#endif
+ 
+ CWD=$(shell pwd)
+ 

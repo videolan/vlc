@@ -1,0 +1,529 @@
+Index: common/i386/mc-a.asm
+===================================================================
+--- common/i386/mc-a.asm	(revision 346)
++++ common/i386/mc-a.asm	(working copy)
+@@ -46,22 +46,6 @@
+ %endmacro
+ 
+ ;=============================================================================
+-; Constants
+-;=============================================================================
+-
+-%ifdef FORMAT_COFF
+-SECTION .rodata data
+-%else
+-SECTION .rodata data align=16
+-%endif
+-
+-ALIGN 16
+-pw_4:  times 4 dw  4
+-pw_8:  times 4 dw  8
+-pw_32: times 4 dw 32
+-pw_64: times 4 dw 64
+-
+-;=============================================================================
+ ; Code
+ ;=============================================================================
+ 
+@@ -589,3 +573,20 @@
+ .finish
+     pop     edi
+     ret
++
++;=============================================================================
++; Constants
++;=============================================================================
++
++%ifdef FORMAT_COFF
++SECTION .rodata data
++%else
++SECTION .rodata data align=16
++%endif
++
++ALIGN 16
++pw_4:  times 4 dw  4
++pw_8:  times 4 dw  8
++pw_32: times 4 dw 32
++pw_64: times 4 dw 64
++
+Index: common/i386/deblock-a.asm
+===================================================================
+--- common/i386/deblock-a.asm	(revision 346)
++++ common/i386/deblock-a.asm	(working copy)
+@@ -31,11 +31,6 @@
+     %endif
+ %endmacro
+ 
+-SECTION .rodata align=16
+-pb_01: times 16 db 0x01
+-pb_3f: times 16 db 0x3f
+-pb_ff: times 16 db 0xff
+-
+ SECTION .text
+ cglobal x264_deblock_v8_luma_mmxext
+ cglobal x264_deblock_h_luma_mmxext
+@@ -525,3 +520,11 @@
+     pop  ebp
+     CHROMA_END
+ 
++;=============================================================================
++; Local Data (Read Only)
++;=============================================================================
++SECTION .rodata align=16
++pb_01: times 16 db 0x01
++pb_3f: times 16 db 0x3f
++pb_ff: times 16 db 0xff
++
+Index: common/i386/dct-a.asm
+===================================================================
+--- common/i386/dct-a.asm	(revision 346)
++++ common/i386/dct-a.asm	(working copy)
+@@ -124,31 +124,6 @@
+ %endmacro
+ 
+ ;=============================================================================
+-; Local Data (Read Only)
+-;=============================================================================
+-
+-%ifdef FORMAT_COFF
+-SECTION .rodata data
+-%else
+-SECTION .rodata data align=16
+-%endif
+-
+-;-----------------------------------------------------------------------------
+-; Various memory constants (trigonometric values or rounding values)
+-;-----------------------------------------------------------------------------
+-
+-ALIGN 16
+-x264_mmx_1:        dw  1,  1,  1,  1
+-x264_mmx_32:       dw 32, 32, 32, 32
+-x264_mmx_PPNN:     dw  1,  1, -1, -1
+-x264_mmx_PNPN:     dw  1, -1,  1, -1 
+-x264_mmx_PNNP:     dw  1, -1, -1,  1 
+-x264_mmx_PPPN:     dw  1,  1,  1, -1 
+-x264_mmx_PPNP:     dw  1,  1, -1,  1 
+-x264_mmx_2121:     dw  2,  1,  2,  1 
+-x264_mmx_p2n2p1p1: dw  2, -2,  1,  1
+-
+-;=============================================================================
+ ; Code
+ ;=============================================================================
+ 
+@@ -729,3 +704,28 @@
+     %endrep
+     ret
+ 
++;=============================================================================
++; Local Data (Read Only)
++;=============================================================================
++
++%ifdef FORMAT_COFF
++SECTION .rodata data
++%else
++SECTION .rodata data align=16
++%endif
++
++;-----------------------------------------------------------------------------
++; Various memory constants (trigonometric values or rounding values)
++;-----------------------------------------------------------------------------
++
++ALIGN 16
++x264_mmx_1:        dw  1,  1,  1,  1
++x264_mmx_32:       dw 32, 32, 32, 32
++x264_mmx_PPNN:     dw  1,  1, -1, -1
++x264_mmx_PNPN:     dw  1, -1,  1, -1 
++x264_mmx_PNNP:     dw  1, -1, -1,  1 
++x264_mmx_PPPN:     dw  1,  1,  1, -1 
++x264_mmx_PPNP:     dw  1,  1, -1,  1 
++x264_mmx_2121:     dw  2,  1,  2,  1 
++x264_mmx_p2n2p1p1: dw  2, -2,  1,  1
++
+Index: common/i386/pixel-sse2.asm
+===================================================================
+--- common/i386/pixel-sse2.asm	(revision 346)
++++ common/i386/pixel-sse2.asm	(working copy)
+@@ -36,15 +36,6 @@
+ %endmacro
+ 
+ 
+-%ifdef FORMAT_COFF
+-SECTION .rodata data
+-%else
+-SECTION .rodata data align=16
+-%endif
+-
+-pd_0000ffff: times 4 dd 0x0000ffff
+-
+-
+ SECTION .text
+ 
+ 
+@@ -531,3 +522,15 @@
+ 
+     SATD_END
+ 
++;=============================================================================
++; Local Data (Read Only)
++;=============================================================================
++%ifdef FORMAT_COFF
++SECTION .rodata data
++%else
++SECTION .rodata data align=16
++%endif
++
++pd_0000ffff: times 4 dd 0x0000ffff
++
++
+Index: common/i386/mc-a2.asm
+===================================================================
+--- common/i386/mc-a2.asm	(revision 346)
++++ common/i386/mc-a2.asm	(working copy)
+@@ -33,22 +33,6 @@
+     %endif
+ %endmacro
+ 
+-;=============================================================================
+-; Read only data
+-;=============================================================================
+-
+-SECTION .rodata data align=16
+-
+-ALIGN 16
+-mmx_dw_one:
+-    times 4 dw 16
+-mmx_dd_one:
+-    times 2 dd 512
+-mmx_dw_20:
+-    times 4 dw 20
+-mmx_dw_5:
+-    times 4 dw -5
+-
+ %assign twidth  0
+ %assign theight 4
+ %assign tdstp1  8
+@@ -374,3 +358,20 @@
+     pop         edi
+ 
+     ret
++
++;=============================================================================
++; Read only data
++;=============================================================================
++
++SECTION .rodata data align=16
++
++ALIGN 16
++mmx_dw_one:
++    times 4 dw 16
++mmx_dd_one:
++    times 2 dd 512
++mmx_dw_20:
++    times 4 dw 20
++mmx_dw_5:
++    times 4 dw -5
++
+--- configure.crosscompile~	2005-10-23 14:48:21.000000000 +0200
++++ configure	2005-10-27 17:04:09.000000000 +0200
+@@ -7,6 +7,7 @@
+ echo "available options:"
+ echo ""
+ echo "  --help                   print this message"
++echo "  --crosscompile=ARCH      crosscompile for ARCH"
+ echo "  --enable-avis-input      enables avisynth input (win32 only)"
+ echo "  --enable-mp4-output      enables mp4 output (using gpac)"
+ echo "  --enable-vfw             compiles the VfW frontend"
+@@ -45,43 +46,138 @@
+ 
+ EXE=""
+ 
+-UNAMES="`uname -s`"
++AR="ar"
++AROPTS="rc"
++RANLIB="ranlib"
++
++UNAMES="`uname -s |tr A-Z a-z`"
++UNAMEM="`uname -m |tr A-Z a-z`"
++
++# parse options
++
++for opt do
++    optarg="${opt#*=}"
++    case "$opt" in
++	--crosscompile=*)
++	    CROSS="$optarg"
++	    CC="$CROSS-gcc"
++	    AR="$CROSS-ar"
++	    RANLIB="$CROSS-ranlib"
++	    UNAMES="`echo $CROSS | cut -d- -f3`"
++	    UNAMEM="`echo $CROSS | cut -d- -f1`"
++	    ;;
++	--prefix=*)
++	    prefix="$optarg"
++	    ;;
++	--exec-prefix=*)
++	    eprefix="$optarg"
++	    ;;
++	--bindir=*)
++	    bindir="$optarg"
++	    ;;
++	--libdir=*)
++	    libdir="$optarg"
++	    ;;
++	--includedir=*)
++	    includedir="$optarg"
++	    ;;
++        --enable-avis-input)
++            if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
++                CFLAGS="$CFLAGS -DAVIS_INPUT"
++                LDFLAGS="$LDFLAGS -lvfw32"
++                avis_input="yes"
++            fi
++            ;;
++        --enable-mp4-output)
++            CFLAGS="$CFLAGS -DMP4_OUTPUT"
++            LDFLAGS="$LDFLAGS -lgpac_static"
++            if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
++                LDFLAGS="$LDFLAGS -lwinmm"
++            fi
++            mp4_output="yes"
++            ;;
++        --extra-asflags=*)
++            ASFLAGS="$ASFLAGS ${opt#--extra-asflags=}"
++            ;;
++        --extra-cflags=*)
++            CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
++            VFW_CFLAGS="${opt#--extra-cflags=}"
++            ;;
++        --extra-ldflags=*)
++            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
++            VFW_LDFLAGS="${opt#--extra-ldflags=}"
++            ;;
++        --enable-pthread)
++            CFLAGS="$CFLAGS -DHAVE_PTHREAD=1"
++            pthread="yes"
++            case $SYS in
++              MINGW|CYGWIN|BEOS)
++                ;;
++              *)
++                LDFLAGS="$LDFLAGS -lpthread"
++                ;;
++            esac
++            ;;
++        --enable-debug)
++            CFLAGS="$CFLAGS -g"
++            debug="yes"
++            ;;
++        --enable-gprof)
++            CFLAGS="$CFLAGS -pg"
++            LDFLAGS="$LDFLAGS -pg"
++            gprof="yes"
++            ;;
++        --enable-vfw)
++            vfw="yes"
++            ;;
++        --enable-visualize)
++            LDFLAGS="$LDFLAGS -L/usr/X11R6/lib -lX11"
++            CFLAGS="$CFLAGS -DVISUALIZE=1"
++            vis="yes"
++            ;;
++        *)
++            echo "Unknown option $opt, ignored"
++            ;;
++    esac
++done
++
++
+ case "$UNAMES" in
+-  BeOS)
++  beos)
+     SYS="BEOS"
+     CFLAGS="$CFLAGS -DHAVE_MALLOC_H"
+     ;;
+-  Darwin)
++  darwin)
+     SYS="MACOSX"
+     CFLAGS="$CFLAGS -falign-loops=16"
+     LDFLAGS="$LDFLAGS -lm -lmx"
+     ;;
+-  FreeBSD)
++  freebsd)
+     SYS="FREEBSD"
+     LDFLAGS="$LDFLAGS -lm"
+     ;;
+-  NetBSD)
++  netbsd)
+     SYS="NETBSD"
+     LDFLAGS="$LDFLAGS -lm"
+     ;;
+-  Linux)
++  linux)
+     SYS="LINUX"
+     CFLAGS="$CFLAGS -DHAVE_MALLOC_H"
+     LDFLAGS="$LDFLAGS -lm"
+     ;;
+-  CYGWIN*)
++  cygwin*)
+     SYS="CYGWIN"
+     CFLAGS="$CFLAGS -mno-cygwin"
+     LDFLAGS="$LDFLAGS -mno-cygwin"
+     ASFLAGS="-f win32 -DPREFIX"
+     EXE=".exe"
+     ;;
+-  MINGW*)
++  mingw*)
+     SYS="MINGW"
+     ASFLAGS="-f win32 -DPREFIX"
+     EXE=".exe"
+     ;;
+-  SunOS)
++  sunos)
+     SYS="SunOS"
+     CFLAGS="$CFLAGS -DHAVE_MALLOC_H"
+     LDFLAGS="$LDFLAGS -lm"
+@@ -93,9 +189,8 @@
+     ;;
+ esac
+ 
+-UNAMEM="`uname -m`"
+ case "$UNAMEM" in
+-  i386|i486|i586|i686|BePC)
++  i386|i486|i586|i686|bepc)
+     ARCH="X86"
+     CFLAGS="$CFLAGS -DHAVE_MMXEXT -DHAVE_SSE2"
+     ;;
+@@ -105,7 +200,7 @@
+     AS="yasm"
+     ASFLAGS="-f elf -m amd64"
+     ;;
+-  "Power Macintosh"|ppc)
++  "power macintosh"|ppc)
+     ARCH="PPC"
+     if [ $SYS = MACOSX ]
+     then
+@@ -150,86 +245,6 @@
+ 
+ CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
+ 
+-# parse options
+-
+-for opt do
+-    optarg="${opt#*=}"
+-    case "$opt" in
+-        --prefix=*)
+-            prefix="$optarg"
+-            ;;
+-        --exec-prefix=*)
+-            eprefix="$optarg"
+-            ;;
+-        --bindir=*)
+-            bindir="$optarg"
+-            ;;
+-        --libdir=*)
+-            libdir="$optarg"
+-            ;;
+-        --includedir=*)
+-            includedir="$optarg"
+-            ;;
+-        --enable-avis-input)
+-            if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
+-                CFLAGS="$CFLAGS -DAVIS_INPUT"
+-                LDFLAGS="$LDFLAGS -lvfw32"
+-                avis_input="yes"
+-            fi
+-            ;;
+-        --enable-mp4-output)
+-            CFLAGS="$CFLAGS -DMP4_OUTPUT"
+-            LDFLAGS="$LDFLAGS -lgpac_static"
+-            if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
+-                LDFLAGS="$LDFLAGS -lwinmm"
+-            fi
+-            mp4_output="yes"
+-            ;;
+-        --extra-asflags=*)
+-            ASFLAGS="$ASFLAGS ${opt#--extra-asflags=}"
+-            ;;
+-        --extra-cflags=*)
+-            CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
+-            VFW_CFLAGS="${opt#--extra-cflags=}"
+-            ;;
+-        --extra-ldflags=*)
+-            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
+-            VFW_LDFLAGS="${opt#--extra-ldflags=}"
+-            ;;
+-        --enable-pthread)
+-            CFLAGS="$CFLAGS -DHAVE_PTHREAD=1"
+-            pthread="yes"
+-            case $SYS in
+-              MINGW|CYGWIN|BEOS)
+-                ;;
+-              *)
+-                LDFLAGS="$LDFLAGS -lpthread"
+-                ;;
+-            esac
+-            ;;
+-        --enable-debug)
+-            CFLAGS="$CFLAGS -g"
+-            debug="yes"
+-            ;;
+-        --enable-gprof)
+-            CFLAGS="$CFLAGS -pg"
+-            LDFLAGS="$LDFLAGS -pg"
+-            gprof="yes"
+-            ;;
+-        --enable-vfw)
+-            vfw="yes"
+-            ;;
+-        --enable-visualize)
+-            LDFLAGS="$LDFLAGS -L/usr/X11R6/lib -lX11"
+-            CFLAGS="$CFLAGS -DVISUALIZE=1"
+-            vis="yes"
+-            ;;
+-        *)
+-            echo "Unknown option $opt, ignored"
+-            ;;
+-    esac
+-done
+-
+ VFWFLAGS=
+ if [ "$debug" != "yes" -a "$gprof" != "yes" ]; then
+     CFLAGS="$CFLAGS -s -fomit-frame-pointer"
+@@ -253,6 +268,9 @@
+ ASFLAGS=$ASFLAGS
+ VFW=$vfw
+ EXE=$EXE
++AR=$AR
++AROPTS=$AROPTS
++RANLIB=$RANLIB
+ VIS=$vis
+ HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
+ EOF
+--- x264/Makefile.crosscompile~	2005-10-27 17:01:35.000000000 +0200
++++ x264/Makefile	2005-10-27 17:02:51.000000000 +0200
+@@ -62,8 +62,8 @@
+ default: $(DEP) x264$(EXE)
+ 
+ libx264.a: .depend $(OBJS) $(OBJASM)
+-	ar rc libx264.a $(OBJS) $(OBJASM)
+-	ranlib libx264.a
++	$(AR) $(AROPTS) libx264.a $(OBJS) $(OBJASM)
++	$(RANLIB) libx264.a
+ 
+ x264$(EXE): libx264.a x264.o matroska.o
+ 	$(CC) -o $@ x264.o matroska.o libx264.a $(LDFLAGS)
+@@ -100,12 +100,12 @@
+ distclean: clean
+ 	rm -f config.mak vfw/build/cygwin/config.mak
+ 
+-install: x264
++install: x264$(EXE)
+ 	install -d $(DESTDIR)$(bindir) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir)
+ 	install -m 644 x264.h $(DESTDIR)$(includedir)
+ 	install -m 644 libx264.a $(DESTDIR)$(libdir)
+-	install x264 $(DESTDIR)$(bindir)
+-	ranlib $(DESTDIR)$(libdir)/libx264.a
++	install x264$(EXE) $(DESTDIR)$(bindir)
++	$(RANLIB) $(DESTDIR)$(libdir)/libx264.a
+ 
+ etags: TAGS
+ 

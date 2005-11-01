@@ -1,0 +1,16 @@
+Index: include/ogg/os_types.h
+===================================================================
+RCS file: /usr/local/cvsroot/ogg/include/ogg/os_types.h,v
+retrieving revision 1.12
+diff -u -r1.12 os_types.h
+--- include/ogg/os_types.h	18 Sep 2002 04:42:09 -0000	1.12
++++ include/ogg/os_types.h	18 Apr 2003 13:48:18 -0000
+@@ -24,7 +24,7 @@
+ #define _ogg_realloc realloc
+ #define _ogg_free    free
+ 
+-#ifdef _WIN32 
++#if defined(_WIN32) && !defined(__MINGW32__)
+ 
+ #  ifndef __GNUC__
+    /* MSVC/Borland */

@@ -87,6 +87,8 @@ AC_ARG_WITH(contrib,
 
   if test -d ${topdir}/extras/contrib/lib; then
     export PATH=${topdir}/extras/contrib/bin:$PATH
+dnl kludge because only the debian package provides a ffmpeg-config
+    with_ffmpeg_config_path=${topdir}/extras/contrib/bin	
     CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
     CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
     CFLAGS="${CFLAGS} -I${topdir}/extras/contrib/include"
@@ -95,6 +97,11 @@ AC_ARG_WITH(contrib,
     CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
     OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
     OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
+    if test $BUILD = $HOST; then
+    	export PKG_CONFIG_PATH=${topdir}/extras/contrib/bin:$PKG_CONFIG_PATH
+    else
+    	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/bin
+    fi
     if test -d ${topdir}/extras/contrib/vlc-lib; then
       LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/vlc-lib"
       LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/vlc-lib"

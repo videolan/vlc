@@ -1,0 +1,13 @@
+diff -u -r1.49 init.cpp
+--- src/common/init.cpp 2004/10/19 13:38:15     1.49
++++ src/common/init.cpp 2005/02/09 12:46:59
+@@ -332,7 +332,7 @@
+ {
+     wxModule::CleanUpModules();
+
+-    wxClassInfo::CleanUp();
++    //wxClassInfo::CleanUp();
+
+     // we can't do this in wxApp itself because it doesn't know if argv had
+     // been allocated
+

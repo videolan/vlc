@@ -1,0 +1,78 @@
+--- dirac/Makefile.am	2005-05-20 15:05:25.000000000 +0200
++++ dirac-new/Makefile.am	2005-09-16 18:43:26.000000000 +0200
+@@ -2,18 +2,12 @@
+ #
+ 
+ SUBDIRS = libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder \
+-encoder decoder util $(CPPUNITTESTS_DIR) tests $(DOC_DIR) win32
++encoder decoder util $(CPPUNITTESTS_DIR)  win32
+ 
+ .PHONY: valgrind-check
+ valgrind-check:
+ 	cd tests && $(MAKE) $(AM_MAKEFLAGS) $@
+ 
+-if HAVE_DOXYGEN
+-DOC_DIR = doc
+-else
+-DOC_DIR =
+-endif
+-
+ if HAVE_LATEX
+ DOC_DIR = doc
+ endif
+--- dirac/configure.ac	2005-08-22 14:51:34.000000000 +0200
++++ dirac-new/configure.ac	2005-09-05 16:18:00.000000000 +0200
+@@ -143,7 +143,7 @@
+ dnl algorithm documentation is not distributed in
+ dnl the release. It is available only from CVS
+ dnl -----------------------------------------------
+-AC_CHECK_FILE($srcdir/doc/documentation/algorithm/algorithm/index.htm,[HAVE_ALGO="true"], [HAVE_ALGO="false"])
++dnl AC_CHECK_FILE($srcdir/doc/documentation/algorithm/algorithm/index.htm,[HAVE_ALGO="true"], [HAVE_ALGO="false"])
+ AM_CONDITIONAL(HAVE_ALGO, $HAVE_ALGO)
+ 
+ dnl -----------------------------------------------
+@@ -151,7 +151,7 @@
+ dnl Enhancements is not distributed in
+ dnl the release. It is available only from CVS
+ dnl -----------------------------------------------
+-AC_CHECK_FILE($srcdir/doc/documentation/algorithm/enhancements/index.htm,[HAVE_ENHANCE="true"], [HAVE_ENHANCE="false"])
++dnl AC_CHECK_FILE($srcdir/doc/documentation/algorithm/enhancements/index.htm,[HAVE_ENHANCE="true"], [HAVE_ENHANCE="false"])
+ AM_CONDITIONAL(HAVE_ENHANCE, $HAVE_ENHANCE)
+ 
+ dnl -----------------------------------------------
+@@ -159,7 +159,7 @@
+ dnl Global Motion documentation is not distributed in
+ dnl the release. It is available only from CVS
+ dnl -----------------------------------------------
+-AC_CHECK_FILE($srcdir/doc/documentation/algorithm/global_motion/index.htm,[HAVE_GM="true"], [HAVE_GM="false"])
++dnl AC_CHECK_FILE($srcdir/doc/documentation/algorithm/global_motion/index.htm,[HAVE_GM="true"], [HAVE_GM="false"])
+ AM_CONDITIONAL(HAVE_GM, $HAVE_GM)
+ 
+ dnl -----------------------------------------------
+@@ -167,7 +167,7 @@
+ dnl Upconversion doc is not distributed in
+ dnl the release. It is available only from CVS
+ dnl -----------------------------------------------
+-AC_CHECK_FILE($srcdir/doc/documentation/algorithm/upconversion/index.htm,[HAVE_UPCONV="true"], [HAVE_UPCONV="false"])
++dnl AC_CHECK_FILE($srcdir/doc/documentation/algorithm/upconversion/index.htm,[HAVE_UPCONV="true"], [HAVE_UPCONV="false"])
+ AM_CONDITIONAL(HAVE_UPCONV, $HAVE_UPCONV)
+ 
+ dnl -----------------------------------------------
+@@ -175,7 +175,7 @@
+ dnl programmer's guide is not distributed in
+ dnl the release. It is available only from CVS
+ dnl -----------------------------------------------
+-AC_CHECK_FILE($srcdir/doc/documentation/code/programmers_guide/index.htm,[HAVE_PROG="true"], [HAVE_PROG="false"])
++dnl AC_CHECK_FILE($srcdir/doc/documentation/code/programmers_guide/index.htm,[HAVE_PROG="true"], [HAVE_PROG="false"])
+ AM_CONDITIONAL(HAVE_PROG, $HAVE_PROG)
+ 
+ dnl -----------------------------------------------
+@@ -183,7 +183,7 @@
+ dnl Diagnostics tools docs are is not distributed in
+ dnl the release. It is available only from CVS
+ dnl -----------------------------------------------
+-AC_CHECK_FILE($srcdir/doc/documentation/tools/diagnostics/index.htm,[HAVE_DIAG="true"], [HAVE_DIAG="false"])
++dnl AC_CHECK_FILE($srcdir/doc/documentation/tools/diagnostics/index.htm,[HAVE_DIAG="true"], [HAVE_DIAG="false"])
+ AM_CONDITIONAL(HAVE_DIAG, $HAVE_DIAG)
+ 
+ dnl -----------------------------------------------

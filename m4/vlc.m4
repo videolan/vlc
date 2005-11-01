@@ -3,6 +3,8 @@ dnl  $Id$
 
 dnl ===========================================================================
 dnl  Macros to add plugins or builtins and handle their flags
+m4_pattern_allow([^PKG_CONFIG(_LIBDIR)?$])
+
 
 AC_DEFUN([VLC_ADD_BUILTINS], [
   BUILTINS="${BUILTINS} $1"

@@ -1,0 +1,193 @@
+# Get rid of the test programs. -- Xtophe
+--- xml/Makefile.am	2005-07-11 00:53:13.000000000 +0200
++++ xml-new/Makefile.am	2005-08-30 21:36:51.000000000 +0200
+@@ -1,16 +1,16 @@
+ ## Process this file with automake to produce Makefile.in
+ 
+-SUBDIRS = include . doc example xstc @PYTHON_SUBDIR@
++SUBDIRS = include . 
+ 
+-DIST_SUBDIRS = include . doc example python xstc
++DIST_SUBDIRS = include . 
+ 
+ INCLUDES = -I$(top_builddir)/include -I@srcdir@/include @THREAD_CFLAGS@ @Z_CFLAGS@ 
+ 
+-noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
+-                testThreads testC14N testAutomata testRegexp \
+-                testReader testapi testModule runtest runsuite
++#noinst_PROGRAMS=testSchemas testRelax testSAX testHTML testXPath testURI \
++#                testThreads testC14N testAutomata testRegexp \
++#                testReader testapi testModule runtest runsuite
+ 
+-bin_PROGRAMS = xmllint xmlcatalog
++#bin_PROGRAMS = xmllint xmlcatalog
+ 
+ bin_SCRIPTS=xml2-config
+ 
+@@ -49,86 +49,86 @@
+ m4datadir = $(datadir)/aclocal
+ m4data_DATA = libxml.m4
+ 
+-runtest_SOURCES=runtest.c
+-runtest_LDFLAGS = 
+-runtest_DEPENDENCIES = $(DEPS)
+-runtest_LDADD= @BASE_THREAD_LIBS@ @RDL_LIBS@ $(LDADDS)
+-
+-runsuite_SOURCES=runsuite.c
+-runsuite_LDFLAGS = 
+-runsuite_DEPENDENCIES = $(DEPS)
+-runsuite_LDADD= @RDL_LIBS@ $(LDADDS)
+-
+-xmllint_SOURCES=xmllint.c
+-xmllint_LDFLAGS = 
+-xmllint_DEPENDENCIES = $(DEPS)
+-xmllint_LDADD=  @RDL_LIBS@ $(LDADDS)
+-
+-testSAX_SOURCES=testSAX.c
+-testSAX_LDFLAGS = 
+-testSAX_DEPENDENCIES = $(DEPS)
+-testSAX_LDADD= $(LDADDS)
+-
+-testHTML_SOURCES=testHTML.c
+-testHTML_LDFLAGS = 
+-testHTML_DEPENDENCIES = $(DEPS)
+-testHTML_LDADD= $(LDADDS)
+-
+-xmlcatalog_SOURCES=xmlcatalog.c
+-xmlcatalog_LDFLAGS = 
+-xmlcatalog_DEPENDENCIES = $(DEPS)
+-xmlcatalog_LDADD= @RDL_LIBS@ $(LDADDS)
+-
+-testXPath_SOURCES=testXPath.c
+-testXPath_LDFLAGS = 
+-testXPath_DEPENDENCIES = $(DEPS)
+-testXPath_LDADD= $(LDADDS)
+-
+-testC14N_SOURCES=testC14N.c
+-testC14N_LDFLAGS = 
+-testC14N_DEPENDENCIES = $(DEPS)
+-testC14N_LDADD= $(LDADDS)
+-
+-testThreads_SOURCES=testThreads@THREADS_W32@.c
+-testThreads_LDFLAGS = 
+-testThreads_DEPENDENCIES = $(DEPS)
+-testThreads_LDADD= @BASE_THREAD_LIBS@  $(LDADDS)
+-
+-testURI_SOURCES=testURI.c
+-testURI_LDFLAGS = 
+-testURI_DEPENDENCIES = $(DEPS)
+-testURI_LDADD= $(LDADDS)
+-
+-testRegexp_SOURCES=testRegexp.c
+-testRegexp_LDFLAGS = 
+-testRegexp_DEPENDENCIES = $(DEPS)
+-testRegexp_LDADD= $(LDADDS)
+-
+-testAutomata_SOURCES=testAutomata.c
+-testAutomata_LDFLAGS = 
+-testAutomata_DEPENDENCIES = $(DEPS)
+-testAutomata_LDADD= $(LDADDS)
+-
+-testSchemas_SOURCES=testSchemas.c
+-testSchemas_LDFLAGS = 
+-testSchemas_DEPENDENCIES = $(DEPS)
+-testSchemas_LDADD= $(LDADDS)
+-
+-testRelax_SOURCES=testRelax.c
+-testRelax_LDFLAGS = 
+-testRelax_DEPENDENCIES = $(DEPS)
+-testRelax_LDADD= $(LDADDS)
+-
+-testReader_SOURCES=testReader.c
+-testReader_LDFLAGS = 
+-testReader_DEPENDENCIES = $(DEPS)
+-testReader_LDADD= $(LDADDS)
+-
+-testModule_SOURCES=testModule.c
+-testModule_LDFLAGS = 
+-testModule_DEPENDENCIES = $(DEPS)
+-testModule_LDADD= $(LDADDS)
+-
++#runtest_SOURCES=runtest.c
++#runtest_LDFLAGS = 
++#runtest_DEPENDENCIES = $(DEPS)
++#runtest_LDADD= @BASE_THREAD_LIBS@ @RDL_LIBS@ $(LDADDS)
++#
++#runsuite_SOURCES=runsuite.c
++#runsuite_LDFLAGS = 
++#runsuite_DEPENDENCIES = $(DEPS)
++#runsuite_LDADD= @RDL_LIBS@ $(LDADDS)
++#
++##xmllint_SOURCES=xmllint.c
++##xmllint_LDFLAGS = 
++##xmllint_DEPENDENCIES = $(DEPS)
++##xmllint_LDADD=  @RDL_LIBS@ $(LDADDS)
++##
++#testSAX_SOURCES=testSAX.c
++#testSAX_LDFLAGS = 
++#testSAX_DEPENDENCIES = $(DEPS)
++#testSAX_LDADD= $(LDADDS)
++#
++#testHTML_SOURCES=testHTML.c
++#testHTML_LDFLAGS = 
++#testHTML_DEPENDENCIES = $(DEPS)
++#testHTML_LDADD= $(LDADDS)
++#
++##xmlcatalog_SOURCES=xmlcatalog.c
++##xmlcatalog_LDFLAGS = 
++##xmlcatalog_DEPENDENCIES = $(DEPS)
++##xmlcatalog_LDADD= @RDL_LIBS@ $(LDADDS)
++##
++#testXPath_SOURCES=testXPath.c
++#testXPath_LDFLAGS = 
++#testXPath_DEPENDENCIES = $(DEPS)
++#testXPath_LDADD= $(LDADDS)
++#
++#testC14N_SOURCES=testC14N.c
++#testC14N_LDFLAGS = 
++#testC14N_DEPENDENCIES = $(DEPS)
++#testC14N_LDADD= $(LDADDS)
++#
++#testThreads_SOURCES=testThreads@THREADS_W32@.c
++#testThreads_LDFLAGS = 
++#testThreads_DEPENDENCIES = $(DEPS)
++#testThreads_LDADD= @BASE_THREAD_LIBS@  $(LDADDS)
++#
++#testURI_SOURCES=testURI.c
++#testURI_LDFLAGS = 
++#testURI_DEPENDENCIES = $(DEPS)
++#testURI_LDADD= $(LDADDS)
++#
++#testRegexp_SOURCES=testRegexp.c
++#testRegexp_LDFLAGS = 
++#testRegexp_DEPENDENCIES = $(DEPS)
++#testRegexp_LDADD= $(LDADDS)
++#
++#testAutomata_SOURCES=testAutomata.c
++#testAutomata_LDFLAGS = 
++#testAutomata_DEPENDENCIES = $(DEPS)
++#testAutomata_LDADD= $(LDADDS)
++#
++#testSchemas_SOURCES=testSchemas.c
++#testSchemas_LDFLAGS = 
++#testSchemas_DEPENDENCIES = $(DEPS)
++#testSchemas_LDADD= $(LDADDS)
++#
++#testRelax_SOURCES=testRelax.c
++#testRelax_LDFLAGS = 
++#testRelax_DEPENDENCIES = $(DEPS)
++#testRelax_LDADD= $(LDADDS)
++#
++#testReader_SOURCES=testReader.c
++#testReader_LDFLAGS = 
++#testReader_DEPENDENCIES = $(DEPS)
++#testReader_LDADD= $(LDADDS)
++#
++#testModule_SOURCES=testModule.c
++#testModule_LDFLAGS = 
++#testModule_DEPENDENCIES = $(DEPS)
++#testModule_LDADD= $(LDADDS)
++#
+ noinst_LTLIBRARIES = testdso.la
+ testdso_la_SOURCES = testdso.c
+ testdso_la_LDFLAGS = -module -rpath $(libdir)

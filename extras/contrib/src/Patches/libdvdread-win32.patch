@@ -1,0 +1,61 @@
+Index: dvdread/bswap.h
+===================================================================
+RCS file: /cvsroot/ogle/libdvdread/dvdread/bswap.h,v
+retrieving revision 1.10
+diff -u -r1.10 bswap.h
+--- dvdread/bswap.h	18 Jun 2003 13:35:03 -0000	1.10
++++ dvdread/bswap.h	2 Sep 2004 13:43:25 -0000
+@@ -85,14 +85,14 @@
+       (((x) & 0x0000ff00) <<  8) | \
+       (((x) & 0x000000ff) << 24))
+ #define B2N_64(x) \
+- x = ((((x) & 0xff00000000000000) >> 56) | \
+-      (((x) & 0x00ff000000000000) >> 40) | \
+-      (((x) & 0x0000ff0000000000) >> 24) | \
+-      (((x) & 0x000000ff00000000) >>  8) | \
+-      (((x) & 0x00000000ff000000) <<  8) | \
+-      (((x) & 0x0000000000ff0000) << 24) | \
+-      (((x) & 0x000000000000ff00) << 40) | \
+-      (((x) & 0x00000000000000ff) << 56))
++ x = ((((x) & 0xff00000000000000LL) >> 56) | \
++      (((x) & 0x00ff000000000000LL) >> 40) | \
++      (((x) & 0x0000ff0000000000LL) >> 24) | \
++      (((x) & 0x000000ff00000000LL) >>  8) | \
++      (((x) & 0x00000000ff000000LL) <<  8) | \
++      (((x) & 0x0000000000ff0000LL) << 24) | \
++      (((x) & 0x000000000000ff00LL) << 40) | \
++      (((x) & 0x00000000000000ffLL) << 56))
+ 
+ #else
+ 
+Index: dvdread/dvd_input.c
+===================================================================
+RCS file: /cvsroot/ogle/libdvdread/dvdread/dvd_input.c,v
+retrieving revision 1.8
+diff -u -r1.8 dvd_input.c
+--- dvdread/dvd_input.c	4 Apr 2004 20:02:27 -0000	1.8
++++ dvdread/dvd_input.c	2 Sep 2004 13:43:25 -0000
+@@ -21,11 +21,23 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++
++#if defined(HAVE_INTTYPES_H)
++#include <inttypes.h>
++#elif defined(HAVE_STDINT_H)
++#include <stdint.h>
++#endif
++
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+ #include "dvd_reader.h"
+ #include "dvd_input.h"
++
++#ifdef WIN32
++#   define lseek _lseeki64
++#   define off_t int64_t
++#endif
+ 
+ /* The function pointers that is the exported interface of this file. */
+ dvd_input_t (*dvdinput_open)  (const char *);

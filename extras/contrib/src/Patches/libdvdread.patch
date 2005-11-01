@@ -1,4 +1,3 @@
-Only in libdvdread/dvdread: .dvd_input.c.swp
 diff -ru libdvdread-0.9.4/dvdread/bswap.h libdvdread/dvdread/bswap.h
 --- libdvdread-0.9.4/dvdread/bswap.h	2002-12-15 01:09:12.000000000 +0100
 +++ libdvdread/dvdread/bswap.h	2005-08-31 19:24:57.000000000 +0200
@@ -6,24 +5,24 @@ diff -ru libdvdread-0.9.4/dvdread/bswap.h libdvdread/dvdread/bswap.h
   * functionality! 
   */
  
--#elif defined(__FreeBSD__) || defined(__sun) || defined(__bsdi__)
-+#elif defined(__FreeBSD__) || defined(__sun) || defined(__bsdi__) || defined( __BEOS__ )
+-#elif defined(__FreeBSD__) || defined(__sun) || defined(__bsdi__) || defined(WIN32)
++#elif defined(__FreeBSD__) || defined(__sun) || defined(__bsdi__) || defined(WIN32) || defined( __BEOS__ )
  #define B2N_16(x) \
   x = ((((x) & 0xff00) >> 8) | \
        (((x) & 0x00ff) << 8))
 diff -ru libdvdread-0.9.4/dvdread/dvd_reader.c libdvdread/dvdread/dvd_reader.c
 --- libdvdread-0.9.4/dvdread/dvd_reader.c	2003-02-13 23:31:21.000000000 +0100
 +++ libdvdread/dvdread/dvd_reader.c	2005-08-31 19:24:57.000000000 +0200
-@@ -303,8 +303,7 @@
-     if( path == NULL )
-       return 0;
- 
--    ret = stat( path, &fileinfo );
--    if( ret < 0 ) {
-+    if( *path && (ret = stat( path, &fileinfo ) < 0) ) {
- 	/* If we can't stat the file, give up */
- 	fprintf( stderr, "libdvdread: Can't stat %s\n", path );
- 	perror("");
+@@ -324,8 +324,7 @@
+     else
+ #endif
+     {
+-        ret = stat( path, &fileinfo );
+-        if( ret < 0 ) {
++        if( *path && (ret = stat( path, &fileinfo ) < 0) ) {
+ 	    /* If we can't stat the file, give up */
+ 	    fprintf( stderr, "libdvdread: Can't stat %s\n", path );
+ 	    perror("");
 @@ -315,7 +314,7 @@
      have_css = dvdinput_setup();
  
@@ -68,4 +67,3 @@ diff -ru libdvdread-0.9.4/dvdread/dvd_reader.c libdvdread/dvdread/dvd_reader.c
      return -1;
  }
  
-Only in libdvdread/dvdread: dvd_reader.c.orig

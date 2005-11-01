@@ -1,0 +1,112 @@
+? winwx.sh
+Index: configure.in
+===================================================================
+RCS file: /cvsroot/ogle/libdvdread/configure.in,v
+retrieving revision 1.24
+diff -u -r1.24 configure.in
+--- configure.in	5 Jul 2003 18:30:25 -0000	1.24
++++ configure.in	2 Sep 2004 13:43:23 -0000
+@@ -77,6 +77,11 @@
+       [ ],
+       AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
+     )
++    case "x${host}" in
++    x*mingw32* | x*cygwin*)
++    CSS_LIBS=-ldvdcss
++    ;;
++    x*)
+     AC_MSG_CHECKING([for dvdcss_interface_2 in -ldvdcss])
+     saved_LDFLAGS=$LDFLAGS
+     LDFLAGS="$LDFLAGS -ldvdcss"
+@@ -88,6 +93,8 @@
+         ] )
+     LDFLAGS=$saved_LDFLAGS
+     AC_MSG_RESULT([yes])
++    ;;
++    esac
+   else
+     dnl -w added to shutup GCC3.1's cpp warning about -I/usr/local
+     saved_CPPFLAGS=$CPPFLAGS
+@@ -99,6 +106,12 @@
+     CPPFLAGS=$saved_CPPFLAGS
+     saved_CFLAGS=$CFLAGS
+     CFLAGS="$CFLAGS -I$dvdcss_path/include -L$dvdcss_path/lib -ldvdcss"
++    case "x${host}" in
++    x*mingw32* | x*cygwin*)
++    CSS_LIBS="-L$dvdcss_path/lib -R$dvdcss_path/lib -ldvdcss"
++    CSS_CFLAGS=-I$dvdcss_path/include
++    ;;
++    x*)
+     AC_MSG_CHECKING([for dvdcss_interface_2 in -ldvdcss])
+     AC_TRY_LINK([#include <dvdcss/dvdcss.h>], 
+                 [if(!dvdcss_interface_2) { return 1; }],
+@@ -109,6 +122,8 @@
+         ] )
+     CFLAGS=$saved_CFLAGS
+     AC_MSG_RESULT([yes])
++    ;;
++    esac
+   fi
+ fi
+ 
+Index: dvdread/bswap.h
+===================================================================
+RCS file: /cvsroot/ogle/libdvdread/dvdread/bswap.h,v
+retrieving revision 1.10
+diff -u -r1.10 bswap.h
+--- dvdread/bswap.h	18 Jun 2003 13:35:03 -0000	1.10
++++ dvdread/bswap.h	2 Sep 2004 13:43:25 -0000
+@@ -85,14 +85,14 @@
+       (((x) & 0x0000ff00) <<  8) | \
+       (((x) & 0x000000ff) << 24))
+ #define B2N_64(x) \
+- x = ((((x) & 0xff00000000000000) >> 56) | \
+-      (((x) & 0x00ff000000000000) >> 40) | \
+-      (((x) & 0x0000ff0000000000) >> 24) | \
+-      (((x) & 0x000000ff00000000) >>  8) | \
+-      (((x) & 0x00000000ff000000) <<  8) | \
+-      (((x) & 0x0000000000ff0000) << 24) | \
+-      (((x) & 0x000000000000ff00) << 40) | \
+-      (((x) & 0x00000000000000ff) << 56))
++ x = ((((x) & 0xff00000000000000LL) >> 56) | \
++      (((x) & 0x00ff000000000000LL) >> 40) | \
++      (((x) & 0x0000ff0000000000LL) >> 24) | \
++      (((x) & 0x000000ff00000000LL) >>  8) | \
++      (((x) & 0x00000000ff000000LL) <<  8) | \
++      (((x) & 0x0000000000ff0000LL) << 24) | \
++      (((x) & 0x000000000000ff00LL) << 40) | \
++      (((x) & 0x00000000000000ffLL) << 56))
+ 
+ #else
+ 
+Index: dvdread/dvd_input.c
+===================================================================
+RCS file: /cvsroot/ogle/libdvdread/dvdread/dvd_input.c,v
+retrieving revision 1.8
+diff -u -r1.8 dvd_input.c
+--- dvdread/dvd_input.c	4 Apr 2004 20:02:27 -0000	1.8
++++ dvdread/dvd_input.c	2 Sep 2004 13:43:25 -0000
+@@ -21,11 +21,23 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++
++#if defined(HAVE_INTTYPES_H)
++#include <inttypes.h>
++#elif defined(HAVE_STDINT_H)
++#include <stdint.h>
++#endif
++
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+ #include "dvd_reader.h"
+ #include "dvd_input.h"
++
++#ifdef WIN32
++#   define lseek _lseeki64
++#   define off_t int64_t
++#endif
+ 
+ /* The function pointers that is the exported interface of this file. */
+ dvd_input_t (*dvdinput_open)  (const char *);

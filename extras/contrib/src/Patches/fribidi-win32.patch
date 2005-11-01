@@ -1,0 +1,21 @@
+diff -Naur fribidi-orig/Makefile.am fribidi/Makefile.am
+--- fribidi-orig/Makefile.am	2002-05-16 12:25:37.000000000 +0200
++++ fribidi/Makefile.am	2005-08-26 15:20:26.000000000 +0200
+@@ -1,7 +1,7 @@
+ 
+ AUTOMAKE_OPTIONS = gnu 
+ 
+-noinst_PROGRAMS = fribidi_benchmark	\
++noinst_PROGRAMS = \
+ 		fribidi_create_char_types	\
+ 		fribidi_create_mirroring
+ 
+@@ -103,8 +103,6 @@
+ 	$(OTHER_FILES)	\
+ 	$(EXTRA_HEADERS)
+ 
+-fribidi_benchmark_SOURCES = fribidi_benchmark.c $(GETOPT_SRC)
+-fribidi_benchmark_LDADD = libfribidi.la
+ 
+ fribidi_create_char_types_SOURCES = fribidi_create_char_types.c packtab.c
+ 

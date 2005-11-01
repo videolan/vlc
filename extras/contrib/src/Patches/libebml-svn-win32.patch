@@ -1,0 +1,41 @@
+Index: make/linux/Makefile
+===================================================================
+--- make/linux/Makefile	(revision 1206)
++++ make/linux/Makefile	(working copy)
+@@ -36,9 +36,9 @@
+ DEBUGFLAGS=-g -DDEBUG
+ endif
+ 
+-ifneq (,$(shell $(CXX) -v 2>&1 | tail -n 1 | grep -i mingw))
+-$(error Please use the Makefile in ../mingw32)
+-endif
++#ifneq (,$(shell $(CXX) -v 2>&1 | tail -n 1 | grep -i mingw))
++#$(error Please use the Makefile in ../mingw32)
++#endif
+ 
+ CWD=$(shell pwd)
+ 
+Index: make/mingw32/Makefile
+===================================================================
+--- make/mingw32/Makefile	(revision 1206)
++++ make/mingw32/Makefile	(working copy)
+@@ -19,6 +19,8 @@
+ CXX  = g++.exe
+ CC   = gcc.exe
+ WINDRES = windres.exe
++AR = ar rcvu
++RANLIB = ranlib
+ RES  = 
+ SRC  = $(wildcard ../../src/*.cpp)
+ OBJ  = $(patsubst %.cpp,%.o,$(SRC))
+@@ -47,8 +49,8 @@
+ 	rm -f .depend
+ 
+ libebml.a: $(OBJ)
+-	ar r $@ $(OBJ)
+-	ranlib $@
++	$(AR) $@ $(OBJ)
++	$(RANLIB) $@
+ 
+ libebml.dll: $(OBJ)
+ 	$(CXX) -shared -Wl,--export-all -Wl,--out-implib=$@.a -o $@ $(OBJ)
