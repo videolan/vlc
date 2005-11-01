@@ -498,8 +498,8 @@ Index: common/i386/mc-a2.asm
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  EOF
---- x264/Makefile.crosscompile~	2005-10-27 17:01:35.000000000 +0200
-+++ x264/Makefile	2005-10-27 17:02:51.000000000 +0200
+--- Makefile.crosscompile~	2005-10-27 17:01:35.000000000 +0200
++++ Makefile	2005-10-27 17:02:51.000000000 +0200
 @@ -62,8 +62,8 @@
  default: $(DEP) x264$(EXE)
  
