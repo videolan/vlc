@@ -109,7 +109,8 @@ S: Australia
 N: Antoine Cellerier
 E: dionoea@videolan.org
 C: dionoea
-D: mosaic
+D: Video Filters: mosaic, gradient and edge detection, magnify, rss
+D: Podcast demux
 S: France
 
 N: Renaud Dartus
