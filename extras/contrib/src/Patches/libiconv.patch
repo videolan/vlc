@@ -1,0 +1,3376 @@
+diff -Naur libiconv.old/lib/aliases.gperf libiconv/lib/aliases.gperf
+--- libiconv.old/lib/aliases.gperf	2003-05-22 22:17:15.000000000 +0200
++++ libiconv/lib/aliases.gperf	2005-08-04 18:54:43.000000000 +0200
+@@ -21,6 +21,7 @@
+ US, ei_ascii
+ CSASCII, ei_ascii
+ UTF-8, ei_utf8
++UTF-8-MAC, ei_utf8mac
+ UCS-2, ei_ucs2
+ ISO-10646-UCS-2, ei_ucs2
+ CSUNICODE, ei_ucs2
+diff -Naur libiconv.old/lib/aliases.h libiconv/lib/aliases.h
+--- libiconv.old/lib/aliases.h	2003-05-22 22:17:17.000000000 +0200
++++ libiconv/lib/aliases.h	2005-08-04 18:54:43.000000000 +0200
+@@ -1,4 +1,4 @@
+-/* ANSI-C code produced by gperf version 3.0 */
++/* ANSI-C code produced by gperf version 3.0.1 */
+ /* Command-line: gperf -m 10 lib/aliases.gperf  */
+ /* Computed positions: -k'1,3-11,$' */
+ 
+@@ -32,7 +32,7 @@
+ #line 1 "lib/aliases.gperf"
+ struct alias { int name; unsigned int encoding_index; };
+ 
+-#define TOTAL_KEYWORDS 324
++#define TOTAL_KEYWORDS 325
+ #define MIN_WORD_LENGTH 2
+ #define MAX_WORD_LENGTH 45
+ #define MIN_HASH_VALUE 15
+@@ -55,11 +55,11 @@
+       880, 880, 880, 880, 880, 880, 880, 880, 880, 880,
+       880, 880, 880, 880, 880, 880, 880, 880, 880, 880,
+       880, 880, 880, 880, 880, 880, 880, 880, 880, 880,
+-      880, 880, 880, 880, 880,   6,  69, 880,  44,   5,
+-        6,  18,  60,   9,   8,  50,  14,  13, 271, 880,
++      880, 880, 880, 880, 880,   6, 142, 880,  44,   5,
++        6,  18,  60,   9,   8,  50,  14,  13, 291, 880,
+       880, 880, 880, 880, 880, 107, 152,   5,  29,   7,
+-       43, 112,  42,   5, 341, 106,  10, 158,   8,   5,
+-        6, 880,  61,  38,  98, 152, 194, 112,  30,  10,
++      205, 112,  42,   5, 341, 106,  10, 158,   8,   5,
++        6, 880,  61,  38,  98, 152, 110, 112,  30,  10,
+         6, 880, 880, 880, 880,  60, 880, 880, 880, 880,
+       880, 880, 880, 880, 880, 880, 880, 880, 880, 880,
+       880, 880, 880, 880, 880, 880, 880, 880, 880, 880,
+@@ -205,6 +205,7 @@
+     char stringpool_str171[sizeof("MAC")];
+     char stringpool_str172[sizeof("ISO_8859-3")];
+     char stringpool_str173[sizeof("ISO-IR-109")];
++    char stringpool_str174[sizeof("VISCII")];
+     char stringpool_str175[sizeof("ISO8859-7")];
+     char stringpool_str176[sizeof("ISO-8859-10")];
+     char stringpool_str177[sizeof("CSASCII")];
+@@ -212,6 +213,7 @@
+     char stringpool_str179[sizeof("ISO-IR-179")];
+     char stringpool_str182[sizeof("ISO-8859-7")];
+     char stringpool_str184[sizeof("ISO-IR-203")];
++    char stringpool_str186[sizeof("CSVISCII")];
+     char stringpool_str189[sizeof("ISO-IR-149")];
+     char stringpool_str190[sizeof("MS-EE")];
+     char stringpool_str191[sizeof("ISO-IR-148")];
+@@ -237,34 +239,28 @@
+     char stringpool_str222[sizeof("ISO-IR-14")];
+     char stringpool_str225[sizeof("ELOT_928")];
+     char stringpool_str227[sizeof("LATIN7")];
+-    char stringpool_str228[sizeof("UTF-16")];
++    char stringpool_str228[sizeof("TCVN")];
+     char stringpool_str230[sizeof("ISO_8859-10")];
+     char stringpool_str232[sizeof("CSUNICODE")];
+     char stringpool_str233[sizeof("UCS-2LE")];
+-    char stringpool_str234[sizeof("UTF-8")];
+     char stringpool_str235[sizeof("ISO-IR-100")];
+     char stringpool_str236[sizeof("ISO_8859-7")];
+-    char stringpool_str237[sizeof("UTF-32")];
+     char stringpool_str238[sizeof("CHAR")];
+     char stringpool_str241[sizeof("UNICODE-1-1")];
+     char stringpool_str242[sizeof("CSUNICODE11")];
+     char stringpool_str244[sizeof("TIS620")];
+     char stringpool_str245[sizeof("EUCKR")];
+-    char stringpool_str246[sizeof("UTF-16LE")];
+     char stringpool_str247[sizeof("LATIN4")];
+     char stringpool_str250[sizeof("KSC_5601")];
+     char stringpool_str251[sizeof("TIS-620")];
+     char stringpool_str252[sizeof("EUC-KR")];
+     char stringpool_str254[sizeof("IBM-CP1133")];
+     char stringpool_str256[sizeof("ISO_8859-4")];
+-    char stringpool_str257[sizeof("UTF-32LE")];
+-    char stringpool_str258[sizeof("VISCII")];
+     char stringpool_str259[sizeof("KOI8-R")];
+     char stringpool_str262[sizeof("ISO_8859-14")];
+     char stringpool_str264[sizeof("CSKOI8R")];
+     char stringpool_str266[sizeof("GREEK8")];
+     char stringpool_str267[sizeof("MS-CYRL")];
+-    char stringpool_str270[sizeof("CSVISCII")];
+     char stringpool_str280[sizeof("IBM850")];
+     char stringpool_str283[sizeof("ISO-IR-144")];
+     char stringpool_str286[sizeof("BIG5")];
+@@ -283,12 +279,11 @@
+     char stringpool_str303[sizeof("KOREAN")];
+     char stringpool_str304[sizeof("CSISOLATIN2")];
+     char stringpool_str305[sizeof("CN-BIG5")];
+-    char stringpool_str306[sizeof("UTF-7")];
++    char stringpool_str307[sizeof("TCVN-5712")];
+     char stringpool_str308[sizeof("CSISOLATIN6")];
+     char stringpool_str309[sizeof("CSISOLATINCYRILLIC")];
+     char stringpool_str310[sizeof("CSISOLATIN5")];
+-    char stringpool_str312[sizeof("TCVN")];
+-    char stringpool_str315[sizeof("TIS620.2529-1")];
++    char stringpool_str312[sizeof("TCVN5712-1")];
+     char stringpool_str318[sizeof("CSGB2312")];
+     char stringpool_str320[sizeof("ISO-10646-UCS-2")];
+     char stringpool_str321[sizeof("UCS-4")];
+@@ -301,12 +296,12 @@
+     char stringpool_str328[sizeof("CSISOLATIN3")];
+     char stringpool_str329[sizeof("ISO646-US")];
+     char stringpool_str331[sizeof("US-ASCII")];
+-    char stringpool_str332[sizeof("TIS620.2533-1")];
+     char stringpool_str333[sizeof("KOI8-T")];
+     char stringpool_str334[sizeof("MS-ANSI")];
+     char stringpool_str335[sizeof("KS_C_5601-1989")];
+     char stringpool_str336[sizeof("GB_1988-80")];
+     char stringpool_str339[sizeof("EUCTW")];
++    char stringpool_str342[sizeof("VISCII1.1-1")];
+     char stringpool_str343[sizeof("GREEK")];
+     char stringpool_str346[sizeof("EUC-TW")];
+     char stringpool_str347[sizeof("WINDOWS-1251")];
+@@ -314,7 +309,6 @@
+     char stringpool_str349[sizeof("JP")];
+     char stringpool_str350[sizeof("WINDOWS-1256")];
+     char stringpool_str351[sizeof("WINDOWS-1255")];
+-    char stringpool_str353[sizeof("VISCII1.1-1")];
+     char stringpool_str354[sizeof("CSISO2022KR")];
+     char stringpool_str356[sizeof("WINDOWS-1258")];
+     char stringpool_str360[sizeof("WINDOWS-1253")];
+@@ -323,7 +317,6 @@
+     char stringpool_str368[sizeof("ROMAN8")];
+     char stringpool_str369[sizeof("HZ-GB-2312")];
+     char stringpool_str370[sizeof("EUCJP")];
+-    char stringpool_str371[sizeof("TIS620.2533-0")];
+     char stringpool_str372[sizeof("KS_C_5601-1987")];
+     char stringpool_str373[sizeof("MACICELAND")];
+     char stringpool_str374[sizeof("ISO-10646-UCS-4")];
+@@ -331,76 +324,81 @@
+     char stringpool_str377[sizeof("EUC-JP")];
+     char stringpool_str386[sizeof("WINDOWS-1250")];
+     char stringpool_str387[sizeof("ARABIC")];
+-    char stringpool_str388[sizeof("UTF-16BE")];
+-    char stringpool_str391[sizeof("TCVN-5712")];
++    char stringpool_str388[sizeof("TIS620.2529-1")];
++    char stringpool_str390[sizeof("UTF-16")];
+     char stringpool_str392[sizeof("WINDOWS-1257")];
+     char stringpool_str394[sizeof("CSPC862LATINHEBREW")];
+-    char stringpool_str396[sizeof("TCVN5712-1")];
+-    char stringpool_str399[sizeof("UTF-32BE")];
++    char stringpool_str396[sizeof("UTF-8")];
++    char stringpool_str399[sizeof("UTF-32")];
+     char stringpool_str402[sizeof("WINDOWS-1254")];
+     char stringpool_str404[sizeof("CSEUCKR")];
++    char stringpool_str405[sizeof("TIS620.2533-1")];
+     char stringpool_str406[sizeof("ASMO-708")];
++    char stringpool_str408[sizeof("UTF-16LE")];
+     char stringpool_str409[sizeof("CSISOLATINARABIC")];
+     char stringpool_str410[sizeof("MACINTOSH")];
+     char stringpool_str411[sizeof("UCS-2-INTERNAL")];
+     char stringpool_str412[sizeof("CSISOLATIN4")];
+     char stringpool_str416[sizeof("ECMA-114")];
+     char stringpool_str418[sizeof("CN-GB-ISOIR165")];
+-    char stringpool_str420[sizeof("ANSI_X3.4-1986")];
++    char stringpool_str419[sizeof("UTF-32LE")];
+     char stringpool_str421[sizeof("CSISO57GB1988")];
+     char stringpool_str423[sizeof("CSISO58GB231280")];
+     char stringpool_str424[sizeof("HP-ROMAN8")];
+-    char stringpool_str426[sizeof("ANSI_X3.4-1968")];
+     char stringpool_str427[sizeof("MACTHAI")];
+     char stringpool_str429[sizeof("UCS-4BE")];
+     char stringpool_str430[sizeof("CSHPROMAN8")];
+     char stringpool_str432[sizeof("CN-GB")];
+     char stringpool_str434[sizeof("UNICODELITTLE")];
+-    char stringpool_str435[sizeof("ISO_8859-5:1988")];
+-    char stringpool_str438[sizeof("ISO_8859-9:1989")];
+-    char stringpool_str440[sizeof("ISO_8859-8:1988")];
+     char stringpool_str441[sizeof("KOI8-U")];
+-    char stringpool_str444[sizeof("ISO_8859-3:1988")];
++    char stringpool_str444[sizeof("TIS620.2533-0")];
+     char stringpool_str448[sizeof("ISO-2022-JP")];
+     char stringpool_str449[sizeof("ISO-2022-JP-1")];
+     char stringpool_str450[sizeof("ISO-2022-JP-2")];
+     char stringpool_str451[sizeof("CSISOLATINHEBREW")];
+     char stringpool_str454[sizeof("ISO646-JP")];
++    char stringpool_str455[sizeof("ISO_8859-5:1988")];
+     char stringpool_str457[sizeof("EXTENDED_UNIX_CODE_PACKED_FORMAT_FOR_JAPANESE")];
++    char stringpool_str458[sizeof("ISO_8859-9:1989")];
++    char stringpool_str460[sizeof("ISO_8859-8:1988")];
++    char stringpool_str464[sizeof("ISO_8859-3:1988")];
+     char stringpool_str465[sizeof("UCS-4-INTERNAL")];
+-    char stringpool_str467[sizeof("ISO_8859-1:1987")];
+-    char stringpool_str468[sizeof("ISO_8859-2:1987")];
+-    char stringpool_str470[sizeof("ISO_8859-6:1987")];
++    char stringpool_str468[sizeof("UTF-7")];
+     char stringpool_str479[sizeof("CSISO2022JP")];
+     char stringpool_str480[sizeof("CSISO2022JP2")];
+-    char stringpool_str486[sizeof("ISO_8859-4:1988")];
++    char stringpool_str485[sizeof("ISO_646.IRV:1991")];
++    char stringpool_str487[sizeof("ISO_8859-1:1987")];
++    char stringpool_str488[sizeof("ISO_8859-2:1987")];
+     char stringpool_str489[sizeof("MACCENTRALEUROPE")];
++    char stringpool_str490[sizeof("ISO_8859-6:1987")];
+     char stringpool_str492[sizeof("HEBREW")];
++    char stringpool_str493[sizeof("ANSI_X3.4-1986")];
+     char stringpool_str494[sizeof("MS-HEBR")];
+-    char stringpool_str496[sizeof("ISO_646.IRV:1991")];
+     char stringpool_str498[sizeof("CSEUCTW")];
++    char stringpool_str499[sizeof("ANSI_X3.4-1968")];
+     char stringpool_str503[sizeof("KOI8-RU")];
+     char stringpool_str505[sizeof("WINDOWS-874")];
++    char stringpool_str506[sizeof("ISO_8859-4:1988")];
+     char stringpool_str508[sizeof("JIS0208")];
+     char stringpool_str509[sizeof("GEORGIAN-PS")];
+-    char stringpool_str512[sizeof("ISO_8859-7:1987")];
+     char stringpool_str514[sizeof("CSISOLATINGREEK")];
+     char stringpool_str515[sizeof("JIS_C6226-1983")];
+     char stringpool_str518[sizeof("MACROMAN")];
+     char stringpool_str519[sizeof("UCS-2-SWAPPED")];
+     char stringpool_str524[sizeof("CSMACINTOSH")];
+-    char stringpool_str527[sizeof("BIGFIVE")];
+     char stringpool_str528[sizeof("CSISO159JISX02121990")];
+     char stringpool_str529[sizeof("CSISO14JISC6220RO")];
+     char stringpool_str530[sizeof("CSPC850MULTILINGUAL")];
+-    char stringpool_str534[sizeof("BIG-FIVE")];
++    char stringpool_str532[sizeof("ISO_8859-7:1987")];
+     char stringpool_str541[sizeof("JIS_C6220-1969-RO")];
+     char stringpool_str545[sizeof("JIS_X0212")];
+     char stringpool_str549[sizeof("BIG5HKSCS")];
++    char stringpool_str550[sizeof("UTF-16BE")];
+     char stringpool_str553[sizeof("JISX0201-1976")];
+     char stringpool_str554[sizeof("GEORGIAN-ACADEMY")];
+     char stringpool_str556[sizeof("BIG5-HKSCS")];
+     char stringpool_str560[sizeof("CSISO87JISX0208")];
++    char stringpool_str561[sizeof("UTF-32BE")];
+     char stringpool_str570[sizeof("MACGREEK")];
+     char stringpool_str571[sizeof("MS-GREEK")];
+     char stringpool_str573[sizeof("UCS-4-SWAPPED")];
+@@ -410,25 +408,28 @@
+     char stringpool_str594[sizeof("UNICODEBIG")];
+     char stringpool_str599[sizeof("JIS_X0212-1990")];
+     char stringpool_str600[sizeof("JIS_X0208")];
++    char stringpool_str605[sizeof("BIGFIVE")];
++    char stringpool_str612[sizeof("BIG-FIVE")];
+     char stringpool_str614[sizeof("MACARABIC")];
+-    char stringpool_str619[sizeof("CSHALFWIDTHKATAKANA")];
+     char stringpool_str620[sizeof("JIS_X0208-1983")];
+-    char stringpool_str621[sizeof("SHIFT-JIS")];
++    char stringpool_str621[sizeof("TCVN5712-1:1993")];
+     char stringpool_str626[sizeof("MACUKRAINE")];
+-    char stringpool_str635[sizeof("CSEUCPKDFMTJAPANESE")];
+     char stringpool_str646[sizeof("JIS_X0208-1990")];
+-    char stringpool_str663[sizeof("CSSHIFTJIS")];
+-    char stringpool_str664[sizeof("JIS_X0212.1990-0")];
+     char stringpool_str665[sizeof("MACHEBREW")];
+-    char stringpool_str675[sizeof("SHIFT_JIS")];
+-    char stringpool_str685[sizeof("TCVN5712-1:1993")];
++    char stringpool_str667[sizeof("UTF-8-MAC")];
++    char stringpool_str669[sizeof("JAVA")];
+     char stringpool_str694[sizeof("MS-TURK")];
+     char stringpool_str717[sizeof("MACTURKISH")];
+     char stringpool_str731[sizeof("MACROMANIA")];
++    char stringpool_str737[sizeof("JIS_X0212.1990-0")];
+     char stringpool_str750[sizeof("MS-ARAB")];
+-    char stringpool_str753[sizeof("JAVA")];
++    char stringpool_str781[sizeof("CSHALFWIDTHKATAKANA")];
++    char stringpool_str783[sizeof("SHIFT-JIS")];
++    char stringpool_str797[sizeof("CSEUCPKDFMTJAPANESE")];
+     char stringpool_str798[sizeof("MS_KANJI")];
+     char stringpool_str799[sizeof("JOHAB")];
++    char stringpool_str825[sizeof("CSSHIFTJIS")];
++    char stringpool_str837[sizeof("SHIFT_JIS")];
+     char stringpool_str879[sizeof("WINBALTRIM")];
+   };
+ static const struct stringpool_t stringpool_contents =
+@@ -532,6 +533,7 @@
+     "MAC",
+     "ISO_8859-3",
+     "ISO-IR-109",
++    "VISCII",
+     "ISO8859-7",
+     "ISO-8859-10",
+     "CSASCII",
+@@ -539,6 +541,7 @@
+     "ISO-IR-179",
+     "ISO-8859-7",
+     "ISO-IR-203",
++    "CSVISCII",
+     "ISO-IR-149",
+     "MS-EE",
+     "ISO-IR-148",
+@@ -564,34 +567,28 @@
+     "ISO-IR-14",
+     "ELOT_928",
+     "LATIN7",
+-    "UTF-16",
++    "TCVN",
+     "ISO_8859-10",
+     "CSUNICODE",
+     "UCS-2LE",
+-    "UTF-8",
+     "ISO-IR-100",
+     "ISO_8859-7",
+-    "UTF-32",
+     "CHAR",
+     "UNICODE-1-1",
+     "CSUNICODE11",
+     "TIS620",
+     "EUCKR",
+-    "UTF-16LE",
+     "LATIN4",
+     "KSC_5601",
+     "TIS-620",
+     "EUC-KR",
+     "IBM-CP1133",
+     "ISO_8859-4",
+-    "UTF-32LE",
+-    "VISCII",
+     "KOI8-R",
+     "ISO_8859-14",
+     "CSKOI8R",
+     "GREEK8",
+     "MS-CYRL",
+-    "CSVISCII",
+     "IBM850",
+     "ISO-IR-144",
+     "BIG5",
+@@ -610,12 +607,11 @@
+     "KOREAN",
+     "CSISOLATIN2",
+     "CN-BIG5",
+-    "UTF-7",
++    "TCVN-5712",
+     "CSISOLATIN6",
+     "CSISOLATINCYRILLIC",
+     "CSISOLATIN5",
+-    "TCVN",
+-    "TIS620.2529-1",
++    "TCVN5712-1",
+     "CSGB2312",
+     "ISO-10646-UCS-2",
+     "UCS-4",
+@@ -628,12 +624,12 @@
+     "CSISOLATIN3",
+     "ISO646-US",
+     "US-ASCII",
+-    "TIS620.2533-1",
+     "KOI8-T",
+     "MS-ANSI",
+     "KS_C_5601-1989",
+     "GB_1988-80",
+     "EUCTW",
++    "VISCII1.1-1",
+     "GREEK",
+     "EUC-TW",
+     "WINDOWS-1251",
+@@ -641,7 +637,6 @@
+     "JP",
+     "WINDOWS-1256",
+     "WINDOWS-1255",
+-    "VISCII1.1-1",
+     "CSISO2022KR",
+     "WINDOWS-1258",
+     "WINDOWS-1253",
+@@ -650,7 +645,6 @@
+     "ROMAN8",
+     "HZ-GB-2312",
+     "EUCJP",
+-    "TIS620.2533-0",
+     "KS_C_5601-1987",
+     "MACICELAND",
+     "ISO-10646-UCS-4",
+@@ -658,76 +652,81 @@
+     "EUC-JP",
+     "WINDOWS-1250",
+     "ARABIC",
+-    "UTF-16BE",
+-    "TCVN-5712",
++    "TIS620.2529-1",
++    "UTF-16",
+     "WINDOWS-1257",
+     "CSPC862LATINHEBREW",
+-    "TCVN5712-1",
+-    "UTF-32BE",
++    "UTF-8",
++    "UTF-32",
+     "WINDOWS-1254",
+     "CSEUCKR",
++    "TIS620.2533-1",
+     "ASMO-708",
++    "UTF-16LE",
+     "CSISOLATINARABIC",
+     "MACINTOSH",
+     "UCS-2-INTERNAL",
+     "CSISOLATIN4",
+     "ECMA-114",
+     "CN-GB-ISOIR165",
+-    "ANSI_X3.4-1986",
++    "UTF-32LE",
+     "CSISO57GB1988",
+     "CSISO58GB231280",
+     "HP-ROMAN8",
+-    "ANSI_X3.4-1968",
+     "MACTHAI",
+     "UCS-4BE",
+     "CSHPROMAN8",
+     "CN-GB",
+     "UNICODELITTLE",
+-    "ISO_8859-5:1988",
+-    "ISO_8859-9:1989",
+-    "ISO_8859-8:1988",
+     "KOI8-U",
+-    "ISO_8859-3:1988",
++    "TIS620.2533-0",
+     "ISO-2022-JP",
+     "ISO-2022-JP-1",
+     "ISO-2022-JP-2",
+     "CSISOLATINHEBREW",
+     "ISO646-JP",
++    "ISO_8859-5:1988",
+     "EXTENDED_UNIX_CODE_PACKED_FORMAT_FOR_JAPANESE",
++    "ISO_8859-9:1989",
++    "ISO_8859-8:1988",
++    "ISO_8859-3:1988",
+     "UCS-4-INTERNAL",
+-    "ISO_8859-1:1987",
+-    "ISO_8859-2:1987",
+-    "ISO_8859-6:1987",
++    "UTF-7",
+     "CSISO2022JP",
+     "CSISO2022JP2",
+-    "ISO_8859-4:1988",
++    "ISO_646.IRV:1991",
++    "ISO_8859-1:1987",
++    "ISO_8859-2:1987",
+     "MACCENTRALEUROPE",
++    "ISO_8859-6:1987",
+     "HEBREW",
++    "ANSI_X3.4-1986",
+     "MS-HEBR",
+-    "ISO_646.IRV:1991",
+     "CSEUCTW",
++    "ANSI_X3.4-1968",
+     "KOI8-RU",
+     "WINDOWS-874",
++    "ISO_8859-4:1988",
+     "JIS0208",
+     "GEORGIAN-PS",
+-    "ISO_8859-7:1987",
+     "CSISOLATINGREEK",
+     "JIS_C6226-1983",
+     "MACROMAN",
+     "UCS-2-SWAPPED",
+     "CSMACINTOSH",
+-    "BIGFIVE",
+     "CSISO159JISX02121990",
+     "CSISO14JISC6220RO",
+     "CSPC850MULTILINGUAL",
+-    "BIG-FIVE",
++    "ISO_8859-7:1987",
+     "JIS_C6220-1969-RO",
+     "JIS_X0212",
+     "BIG5HKSCS",
++    "UTF-16BE",
+     "JISX0201-1976",
+     "GEORGIAN-ACADEMY",
+     "BIG5-HKSCS",
+     "CSISO87JISX0208",
++    "UTF-32BE",
+     "MACGREEK",
+     "MS-GREEK",
+     "UCS-4-SWAPPED",
+@@ -737,25 +736,28 @@
+     "UNICODEBIG",
+     "JIS_X0212-1990",
+     "JIS_X0208",
++    "BIGFIVE",
++    "BIG-FIVE",
+     "MACARABIC",
+-    "CSHALFWIDTHKATAKANA",
+     "JIS_X0208-1983",
+-    "SHIFT-JIS",
++    "TCVN5712-1:1993",
+     "MACUKRAINE",
+-    "CSEUCPKDFMTJAPANESE",
+     "JIS_X0208-1990",
+-    "CSSHIFTJIS",
+-    "JIS_X0212.1990-0",
+     "MACHEBREW",
+-    "SHIFT_JIS",
+-    "TCVN5712-1:1993",
++    "UTF-8-MAC",
++    "JAVA",
+     "MS-TURK",
+     "MACTURKISH",
+     "MACROMANIA",
++    "JIS_X0212.1990-0",
+     "MS-ARAB",
+-    "JAVA",
++    "CSHALFWIDTHKATAKANA",
++    "SHIFT-JIS",
++    "CSEUCPKDFMTJAPANESE",
+     "MS_KANJI",
+     "JOHAB",
++    "CSSHIFTJIS",
++    "SHIFT_JIS",
+     "WINBALTRIM"
+   };
+ #define stringpool ((const char *) &stringpool_contents)
+@@ -764,820 +766,830 @@
+   {
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 271 "lib/aliases.gperf"
++#line 272 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str15, ei_iso646_cn},
+     {-1},
+-#line 60 "lib/aliases.gperf"
++#line 61 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str17, ei_iso8859_1},
+-#line 68 "lib/aliases.gperf"
++#line 69 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str18, ei_iso8859_2},
+     {-1},
+-#line 133 "lib/aliases.gperf"
++#line 134 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str20, ei_iso8859_10},
+-#line 125 "lib/aliases.gperf"
++#line 126 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str21, ei_iso8859_9},
+     {-1}, {-1}, {-1}, {-1},
+-#line 147 "lib/aliases.gperf"
++#line 148 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str26, ei_iso8859_14},
+     {-1}, {-1},
+-#line 196 "lib/aliases.gperf"
++#line 197 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str29, ei_cp862},
+-#line 76 "lib/aliases.gperf"
++#line 77 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str30, ei_iso8859_3},
+     {-1}, {-1},
+-#line 200 "lib/aliases.gperf"
++#line 201 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str33, ei_cp866},
+-#line 51 "lib/aliases.gperf"
++#line 52 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str34, ei_c99},
+     {-1}, {-1}, {-1},
+-#line 301 "lib/aliases.gperf"
++#line 302 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str38, ei_euc_cn},
+     {-1}, {-1},
+-#line 167 "lib/aliases.gperf"
++#line 168 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str41, ei_cp1251},
+     {-1},
+-#line 170 "lib/aliases.gperf"
++#line 171 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str43, ei_cp1252},
+-#line 194 "lib/aliases.gperf"
++#line 195 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str44, ei_cp862},
+-#line 300 "lib/aliases.gperf"
++#line 301 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str45, ei_euc_cn},
+     {-1},
+-#line 182 "lib/aliases.gperf"
++#line 183 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str47, ei_cp1256},
+-#line 198 "lib/aliases.gperf"
++#line 199 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str48, ei_cp866},
+-#line 179 "lib/aliases.gperf"
++#line 180 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str49, ei_cp1255},
+-#line 311 "lib/aliases.gperf"
++#line 312 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str50, ei_hz},
+     {-1},
+-#line 331 "lib/aliases.gperf"
++#line 332 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str52, ei_johab},
+-#line 294 "lib/aliases.gperf"
++#line 295 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str53, ei_cp932},
+     {-1},
+-#line 57 "lib/aliases.gperf"
++#line 58 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str55, ei_iso8859_1},
+     {-1},
+-#line 306 "lib/aliases.gperf"
++#line 307 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str57, ei_ces_gbk},
+-#line 265 "lib/aliases.gperf"
++#line 266 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str58, ei_jisx0212},
+-#line 188 "lib/aliases.gperf"
++#line 189 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str59, ei_cp1258},
+     {-1}, {-1},
+-#line 140 "lib/aliases.gperf"
++#line 141 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str62, ei_iso8859_13},
+     {-1}, {-1}, {-1}, {-1},
+-#line 173 "lib/aliases.gperf"
++#line 174 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str67, ei_cp1253},
+     {-1}, {-1}, {-1}, {-1},
+-#line 84 "lib/aliases.gperf"
++#line 85 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str72, ei_iso8859_4},
+     {-1}, {-1},
+-#line 227 "lib/aliases.gperf"
++#line 228 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str75, ei_cp1133},
+     {-1},
+-#line 219 "lib/aliases.gperf"
++#line 220 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str77, ei_hp_roman8},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 276 "lib/aliases.gperf"
++#line 277 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str84, ei_gb2312},
+-#line 62 "lib/aliases.gperf"
++#line 63 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str85, ei_iso8859_1},
+     {-1},
+-#line 70 "lib/aliases.gperf"
++#line 71 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str87, ei_iso8859_2},
+     {-1}, {-1}, {-1},
+-#line 102 "lib/aliases.gperf"
++#line 103 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str91, ei_iso8859_6},
+-#line 53 "lib/aliases.gperf"
++#line 54 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str92, ei_iso8859_1},
+-#line 93 "lib/aliases.gperf"
++#line 94 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str93, ei_iso8859_5},
+-#line 63 "lib/aliases.gperf"
++#line 64 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str94, ei_iso8859_2},
+-#line 252 "lib/aliases.gperf"
++#line 253 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str95, ei_jisx0201},
+     {-1},
+-#line 159 "lib/aliases.gperf"
++#line 160 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str97, ei_iso8859_16},
+-#line 94 "lib/aliases.gperf"
++#line 95 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str98, ei_iso8859_6},
+-#line 154 "lib/aliases.gperf"
++#line 155 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str99, ei_iso8859_15},
+-#line 87 "lib/aliases.gperf"
++#line 88 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str100, ei_iso8859_5},
+-#line 127 "lib/aliases.gperf"
++#line 128 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str101, ei_iso8859_9},
+     {-1},
+-#line 119 "lib/aliases.gperf"
++#line 120 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str103, ei_iso8859_8},
+-#line 155 "lib/aliases.gperf"
++#line 156 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str104, ei_iso8859_16},
+-#line 192 "lib/aliases.gperf"
++#line 193 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str105, ei_cp850},
+-#line 150 "lib/aliases.gperf"
++#line 151 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str106, ei_iso8859_15},
+     {-1},
+-#line 120 "lib/aliases.gperf"
++#line 121 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str108, ei_iso8859_9},
+-#line 328 "lib/aliases.gperf"
++#line 329 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str109, ei_cp949},
+-#line 113 "lib/aliases.gperf"
++#line 114 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str110, ei_iso8859_8},
+-#line 78 "lib/aliases.gperf"
++#line 79 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str111, ei_iso8859_3},
+ #line 16 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str112, ei_ascii},
+-#line 258 "lib/aliases.gperf"
++#line 259 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str113, ei_jisx0208},
+-#line 91 "lib/aliases.gperf"
++#line 92 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str114, ei_iso8859_5},
+     {-1},
+-#line 308 "lib/aliases.gperf"
++#line 309 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str116, ei_iso2022_cn},
+-#line 141 "lib/aliases.gperf"
++#line 142 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str117, ei_iso8859_13},
+-#line 71 "lib/aliases.gperf"
++#line 72 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str118, ei_iso8859_3},
+-#line 164 "lib/aliases.gperf"
++#line 165 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str119, ei_cp1250},
+-#line 322 "lib/aliases.gperf"
++#line 323 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str120, ei_cp950},
+-#line 190 "lib/aliases.gperf"
++#line 191 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str121, ei_cp850},
+-#line 269 "lib/aliases.gperf"
++#line 270 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str122, ei_iso646_cn},
+-#line 291 "lib/aliases.gperf"
++#line 292 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str123, ei_sjis},
+-#line 136 "lib/aliases.gperf"
++#line 137 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str124, ei_iso8859_13},
+-#line 106 "lib/aliases.gperf"
++#line 107 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str125, ei_iso8859_7},
+-#line 158 "lib/aliases.gperf"
++#line 159 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str126, ei_iso8859_16},
+-#line 235 "lib/aliases.gperf"
++#line 236 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str127, ei_tis620},
+     {-1},
+-#line 277 "lib/aliases.gperf"
++#line 278 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str129, ei_isoir165},
+     {-1},
+-#line 185 "lib/aliases.gperf"
++#line 186 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str131, ei_cp1257},
+ #line 13 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str132, ei_ascii},
+     {-1},
+-#line 274 "lib/aliases.gperf"
++#line 275 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str134, ei_gb2312},
+     {-1},
+ #line 19 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str136, ei_ascii},
+-#line 59 "lib/aliases.gperf"
++#line 60 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str137, ei_iso8859_1},
+-#line 266 "lib/aliases.gperf"
++#line 267 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str138, ei_jisx0212},
+-#line 67 "lib/aliases.gperf"
++#line 68 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str139, ei_iso8859_2},
+     {-1}, {-1},
+-#line 145 "lib/aliases.gperf"
++#line 146 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str142, ei_iso8859_14},
+-#line 132 "lib/aliases.gperf"
++#line 133 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str143, ei_iso8859_10},
+     {-1},
+-#line 124 "lib/aliases.gperf"
++#line 125 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str145, ei_iso8859_9},
+-#line 54 "lib/aliases.gperf"
++#line 55 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str146, ei_iso8859_1},
+-#line 309 "lib/aliases.gperf"
++#line 310 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str147, ei_iso2022_cn},
+-#line 64 "lib/aliases.gperf"
++#line 65 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str148, ei_iso8859_2},
+-#line 116 "lib/aliases.gperf"
++#line 117 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str149, ei_iso8859_8},
+     {-1},
+-#line 176 "lib/aliases.gperf"
++#line 177 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str151, ei_cp1254},
+-#line 95 "lib/aliases.gperf"
++#line 96 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str152, ei_iso8859_6},
+     {-1},
+-#line 88 "lib/aliases.gperf"
++#line 89 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str154, ei_iso8859_5},
+-#line 146 "lib/aliases.gperf"
++#line 147 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str155, ei_iso8859_14},
+     {-1},
+-#line 66 "lib/aliases.gperf"
++#line 67 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str157, ei_iso8859_2},
+-#line 156 "lib/aliases.gperf"
++#line 157 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str158, ei_iso8859_16},
+-#line 302 "lib/aliases.gperf"
++#line 303 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str159, ei_euc_cn},
+-#line 151 "lib/aliases.gperf"
++#line 152 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str160, ei_iso8859_15},
+-#line 148 "lib/aliases.gperf"
++#line 149 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str161, ei_iso8859_14},
+-#line 121 "lib/aliases.gperf"
++#line 122 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str162, ei_iso8859_9},
+-#line 75 "lib/aliases.gperf"
++#line 76 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str163, ei_iso8859_3},
+-#line 114 "lib/aliases.gperf"
++#line 115 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str164, ei_iso8859_8},
+-#line 329 "lib/aliases.gperf"
++#line 330 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str165, ei_cp949},
+     {-1}, {-1}, {-1},
+-#line 135 "lib/aliases.gperf"
++#line 136 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str169, ei_iso8859_10},
+-#line 152 "lib/aliases.gperf"
++#line 153 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str170, ei_iso8859_15},
+-#line 204 "lib/aliases.gperf"
++#line 205 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str171, ei_mac_roman},
+-#line 72 "lib/aliases.gperf"
++#line 73 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str172, ei_iso8859_3},
+-#line 74 "lib/aliases.gperf"
++#line 75 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str173, ei_iso8859_3},
+-    {-1},
+-#line 112 "lib/aliases.gperf"
++#line 239 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str174, ei_viscii},
++#line 113 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str175, ei_iso8859_7},
+-#line 128 "lib/aliases.gperf"
++#line 129 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str176, ei_iso8859_10},
+ #line 22 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str177, ei_ascii},
+-#line 137 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str178, ei_iso8859_13},
+ #line 138 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str178, ei_iso8859_13},
++#line 139 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str179, ei_iso8859_13},
+     {-1}, {-1},
+-#line 103 "lib/aliases.gperf"
++#line 104 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str182, ei_iso8859_7},
+     {-1},
+-#line 153 "lib/aliases.gperf"
++#line 154 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str184, ei_iso8859_15},
+-    {-1}, {-1}, {-1}, {-1},
+-#line 282 "lib/aliases.gperf"
++    {-1},
++#line 241 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str186, ei_viscii},
++    {-1}, {-1},
++#line 283 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str189, ei_ksc5601},
+-#line 166 "lib/aliases.gperf"
++#line 167 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str190, ei_cp1250},
+-#line 123 "lib/aliases.gperf"
++#line 124 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str191, ei_iso8859_9},
+ #line 21 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str192, ei_ascii},
+     {-1},
+-#line 236 "lib/aliases.gperf"
++#line 237 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str194, ei_cp874},
+-#line 86 "lib/aliases.gperf"
++#line 87 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str195, ei_iso8859_4},
+-#line 82 "lib/aliases.gperf"
++#line 83 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str196, ei_iso8859_4},
+-#line 130 "lib/aliases.gperf"
++#line 131 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str197, ei_iso8859_10},
+     {-1},
+-#line 157 "lib/aliases.gperf"
++#line 158 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str199, ei_iso8859_16},
+     {-1},
+-#line 149 "lib/aliases.gperf"
++#line 150 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str201, ei_iso8859_14},
+-#line 79 "lib/aliases.gperf"
++#line 80 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str202, ei_iso8859_4},
+-#line 195 "lib/aliases.gperf"
++#line 196 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str203, ei_cp862},
+     {-1}, {-1},
+-#line 270 "lib/aliases.gperf"
++#line 271 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str206, ei_iso646_cn},
+-#line 199 "lib/aliases.gperf"
++#line 200 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str207, ei_cp866},
+-#line 142 "lib/aliases.gperf"
++#line 143 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str208, ei_iso8859_14},
+-#line 97 "lib/aliases.gperf"
++#line 98 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str209, ei_iso8859_6},
+-#line 310 "lib/aliases.gperf"
++#line 311 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str210, ei_iso2022_cn_ext},
+-#line 259 "lib/aliases.gperf"
++#line 260 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str211, ei_jisx0208},
+-#line 131 "lib/aliases.gperf"
++#line 132 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str212, ei_iso8859_10},
+-#line 24 "lib/aliases.gperf"
++#line 25 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str213, ei_ucs2},
+-#line 58 "lib/aliases.gperf"
++#line 59 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str214, ei_iso8859_1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 144 "lib/aliases.gperf"
++#line 145 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str221, ei_iso8859_14},
+-#line 247 "lib/aliases.gperf"
++#line 248 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str222, ei_iso646_jp},
+     {-1}, {-1},
+-#line 108 "lib/aliases.gperf"
++#line 109 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str225, ei_iso8859_7},
+     {-1},
+-#line 139 "lib/aliases.gperf"
++#line 140 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str227, ei_iso8859_13},
+-#line 38 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str228, ei_utf16},
++#line 242 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str228, ei_tcvn},
+     {-1},
+-#line 129 "lib/aliases.gperf"
++#line 130 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str230, ei_iso8859_10},
+     {-1},
+-#line 26 "lib/aliases.gperf"
++#line 27 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str232, ei_ucs2},
+-#line 31 "lib/aliases.gperf"
++#line 32 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str233, ei_ucs2le},
+-#line 23 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str234, ei_utf8},
+-#line 56 "lib/aliases.gperf"
++    {-1},
++#line 57 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str235, ei_iso8859_1},
+-#line 104 "lib/aliases.gperf"
++#line 105 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str236, ei_iso8859_7},
+-#line 41 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str237, ei_utf32},
+-#line 334 "lib/aliases.gperf"
++    {-1},
++#line 335 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str238, ei_local_char},
+     {-1}, {-1},
+-#line 29 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str241, ei_ucs2be},
+ #line 30 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str241, ei_ucs2be},
++#line 31 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str242, ei_ucs2be},
+     {-1},
+-#line 230 "lib/aliases.gperf"
++#line 231 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str244, ei_tis620},
+-#line 326 "lib/aliases.gperf"
++#line 327 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str245, ei_euc_kr},
+-#line 40 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str246, ei_utf16le},
+-#line 83 "lib/aliases.gperf"
++    {-1},
++#line 84 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str247, ei_iso8859_4},
+     {-1}, {-1},
+-#line 279 "lib/aliases.gperf"
++#line 280 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str250, ei_ksc5601},
+-#line 229 "lib/aliases.gperf"
++#line 230 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str251, ei_tis620},
+-#line 325 "lib/aliases.gperf"
++#line 326 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str252, ei_euc_kr},
+     {-1},
+-#line 228 "lib/aliases.gperf"
++#line 229 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str254, ei_cp1133},
+     {-1},
+-#line 80 "lib/aliases.gperf"
++#line 81 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str256, ei_iso8859_4},
+-#line 43 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str257, ei_utf32le},
+-#line 238 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str258, ei_viscii},
+-#line 160 "lib/aliases.gperf"
++    {-1}, {-1},
++#line 161 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str259, ei_koi8_r},
+     {-1}, {-1},
+-#line 143 "lib/aliases.gperf"
++#line 144 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str262, ei_iso8859_14},
+     {-1},
+-#line 161 "lib/aliases.gperf"
++#line 162 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str264, ei_koi8_r},
+     {-1},
+-#line 109 "lib/aliases.gperf"
++#line 110 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str266, ei_iso8859_7},
+-#line 169 "lib/aliases.gperf"
++#line 170 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str267, ei_cp1251},
+-    {-1}, {-1},
+-#line 240 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str270, ei_viscii},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 191 "lib/aliases.gperf"
++    {-1}, {-1}, {-1},
++#line 192 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str280, ei_cp850},
+     {-1}, {-1},
+-#line 90 "lib/aliases.gperf"
++#line 91 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str283, ei_iso8859_5},
+     {-1}, {-1},
+-#line 316 "lib/aliases.gperf"
++#line 317 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str286, ei_ces_big5},
+-#line 37 "lib/aliases.gperf"
++#line 38 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str287, ei_ucs4le},
+-#line 307 "lib/aliases.gperf"
++#line 308 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str288, ei_gb18030},
+     {-1},
+-#line 210 "lib/aliases.gperf"
++#line 211 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str290, ei_mac_cyrillic},
+-#line 46 "lib/aliases.gperf"
++#line 47 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str291, ei_utf7},
+-#line 45 "lib/aliases.gperf"
++#line 46 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str292, ei_utf7},
+-#line 317 "lib/aliases.gperf"
++#line 318 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str293, ei_ces_big5},
+     {-1},
+ #line 20 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str295, ei_ascii},
+-#line 231 "lib/aliases.gperf"
++#line 232 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str296, ei_tis620},
+     {-1},
+-#line 321 "lib/aliases.gperf"
++#line 322 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str298, ei_ces_big5},
+-#line 221 "lib/aliases.gperf"
++#line 222 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str299, ei_nextstep},
+     {-1},
+-#line 283 "lib/aliases.gperf"
++#line 284 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str301, ei_ksc5601},
+-#line 61 "lib/aliases.gperf"
++#line 62 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str302, ei_iso8859_1},
+-#line 284 "lib/aliases.gperf"
++#line 285 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str303, ei_ksc5601},
+-#line 69 "lib/aliases.gperf"
++#line 70 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str304, ei_iso8859_2},
+-#line 320 "lib/aliases.gperf"
++#line 321 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str305, ei_ces_big5},
+-#line 44 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str306, ei_utf7},
+     {-1},
+-#line 134 "lib/aliases.gperf"
++#line 243 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str307, ei_tcvn},
++#line 135 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str308, ei_iso8859_10},
+-#line 92 "lib/aliases.gperf"
++#line 93 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str309, ei_iso8859_5},
+-#line 126 "lib/aliases.gperf"
++#line 127 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str310, ei_iso8859_9},
+     {-1},
+-#line 241 "lib/aliases.gperf"
++#line 244 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str312, ei_tcvn},
+-    {-1}, {-1},
+-#line 232 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str315, ei_tis620},
+-    {-1}, {-1},
+-#line 304 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1}, {-1},
++#line 305 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str318, ei_euc_cn},
+     {-1},
+-#line 25 "lib/aliases.gperf"
++#line 26 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str320, ei_ucs2},
+-#line 33 "lib/aliases.gperf"
++#line 34 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str321, ei_ucs4},
+-#line 226 "lib/aliases.gperf"
++#line 227 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str322, ei_mulelao},
+-#line 332 "lib/aliases.gperf"
++#line 333 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str323, ei_iso2022_kr},
+-#line 107 "lib/aliases.gperf"
++#line 108 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str324, ei_iso8859_7},
+-#line 273 "lib/aliases.gperf"
++#line 274 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str325, ei_gb2312},
+-#line 35 "lib/aliases.gperf"
++#line 36 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str326, ei_ucs4},
+-#line 305 "lib/aliases.gperf"
++#line 306 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str327, ei_ces_gbk},
+-#line 77 "lib/aliases.gperf"
++#line 78 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str328, ei_iso8859_3},
+ #line 14 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str329, ei_ascii},
+     {-1},
+ #line 12 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str331, ei_ascii},
+-#line 234 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str332, ei_tis620},
+-#line 225 "lib/aliases.gperf"
++    {-1},
++#line 226 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str333, ei_koi8_t},
+-#line 172 "lib/aliases.gperf"
++#line 173 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str334, ei_cp1252},
+-#line 281 "lib/aliases.gperf"
++#line 282 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str335, ei_ksc5601},
+-#line 268 "lib/aliases.gperf"
++#line 269 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str336, ei_iso646_cn},
+     {-1}, {-1},
+-#line 314 "lib/aliases.gperf"
++#line 315 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str339, ei_euc_tw},
+-    {-1}, {-1}, {-1},
+-#line 110 "lib/aliases.gperf"
++    {-1}, {-1},
++#line 240 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str342, ei_viscii},
++#line 111 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str343, ei_iso8859_7},
+     {-1}, {-1},
+-#line 313 "lib/aliases.gperf"
++#line 314 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str346, ei_euc_tw},
+-#line 168 "lib/aliases.gperf"
++#line 169 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str347, ei_cp1251},
+-#line 171 "lib/aliases.gperf"
++#line 172 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str348, ei_cp1252},
+-#line 248 "lib/aliases.gperf"
++#line 249 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str349, ei_iso646_jp},
+-#line 183 "lib/aliases.gperf"
++#line 184 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str350, ei_cp1256},
+-#line 180 "lib/aliases.gperf"
++#line 181 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str351, ei_cp1255},
+-    {-1},
+-#line 239 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str353, ei_viscii},
+-#line 333 "lib/aliases.gperf"
++    {-1}, {-1},
++#line 334 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str354, ei_iso2022_kr},
+     {-1},
+-#line 189 "lib/aliases.gperf"
++#line 190 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str356, ei_cp1258},
+     {-1}, {-1}, {-1},
+-#line 174 "lib/aliases.gperf"
++#line 175 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str360, ei_cp1253},
+-#line 222 "lib/aliases.gperf"
++#line 223 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str361, ei_armscii_8},
+     {-1}, {-1}, {-1}, {-1},
+-#line 201 "lib/aliases.gperf"
++#line 202 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str366, ei_cp866},
+     {-1},
+-#line 218 "lib/aliases.gperf"
++#line 219 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str368, ei_hp_roman8},
+-#line 312 "lib/aliases.gperf"
++#line 313 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str369, ei_hz},
+-#line 286 "lib/aliases.gperf"
++#line 287 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str370, ei_euc_jp},
+-#line 233 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str371, ei_tis620},
+-#line 280 "lib/aliases.gperf"
++    {-1},
++#line 281 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str372, ei_ksc5601},
+-#line 207 "lib/aliases.gperf"
++#line 208 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str373, ei_mac_iceland},
+-#line 34 "lib/aliases.gperf"
++#line 35 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str374, ei_ucs4},
+-#line 27 "lib/aliases.gperf"
++#line 28 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str375, ei_ucs2be},
+     {-1},
+-#line 285 "lib/aliases.gperf"
++#line 286 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str377, ei_euc_jp},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 165 "lib/aliases.gperf"
++#line 166 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str386, ei_cp1250},
+-#line 100 "lib/aliases.gperf"
++#line 101 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str387, ei_iso8859_6},
++#line 233 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str388, ei_tis620},
++    {-1},
+ #line 39 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str388, ei_utf16be},
+-    {-1}, {-1},
+-#line 242 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str391, ei_tcvn},
+-#line 186 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str390, ei_utf16},
++    {-1},
++#line 187 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str392, ei_cp1257},
+     {-1},
+-#line 197 "lib/aliases.gperf"
++#line 198 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str394, ei_cp862},
+     {-1},
+-#line 243 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str396, ei_tcvn},
++#line 23 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str396, ei_utf8},
+     {-1}, {-1},
+ #line 42 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str399, ei_utf32be},
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str399, ei_utf32},
+     {-1}, {-1},
+-#line 177 "lib/aliases.gperf"
++#line 178 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str402, ei_cp1254},
+     {-1},
+-#line 327 "lib/aliases.gperf"
++#line 328 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str404, ei_euc_kr},
+-    {-1},
+-#line 99 "lib/aliases.gperf"
++#line 235 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str405, ei_tis620},
++#line 100 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str406, ei_iso8859_6},
+-    {-1}, {-1},
+-#line 101 "lib/aliases.gperf"
++    {-1},
++#line 41 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str408, ei_utf16le},
++#line 102 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str409, ei_iso8859_6},
+-#line 203 "lib/aliases.gperf"
++#line 204 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str410, ei_mac_roman},
+-#line 47 "lib/aliases.gperf"
++#line 48 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str411, ei_ucs2internal},
+-#line 85 "lib/aliases.gperf"
++#line 86 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str412, ei_iso8859_4},
+     {-1}, {-1}, {-1},
+-#line 98 "lib/aliases.gperf"
++#line 99 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str416, ei_iso8859_6},
+     {-1},
+-#line 278 "lib/aliases.gperf"
++#line 279 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str418, ei_isoir165},
++#line 44 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str419, ei_utf32le},
+     {-1},
+-#line 18 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str420, ei_ascii},
+-#line 272 "lib/aliases.gperf"
++#line 273 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str421, ei_iso646_cn},
+     {-1},
+-#line 275 "lib/aliases.gperf"
++#line 276 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str423, ei_gb2312},
+-#line 217 "lib/aliases.gperf"
++#line 218 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str424, ei_hp_roman8},
+-    {-1},
+-#line 17 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str426, ei_ascii},
+-#line 216 "lib/aliases.gperf"
++    {-1}, {-1},
++#line 217 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str427, ei_mac_thai},
+     {-1},
+-#line 36 "lib/aliases.gperf"
++#line 37 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str429, ei_ucs4be},
+-#line 220 "lib/aliases.gperf"
++#line 221 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str430, ei_hp_roman8},
+     {-1},
+-#line 303 "lib/aliases.gperf"
++#line 304 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str432, ei_euc_cn},
+     {-1},
+-#line 32 "lib/aliases.gperf"
++#line 33 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str434, ei_ucs2le},
+-#line 89 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str435, ei_iso8859_5},
+-    {-1}, {-1},
+-#line 122 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str438, ei_iso8859_9},
+-    {-1},
+-#line 115 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str440, ei_iso8859_8},
+-#line 162 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 163 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str441, ei_koi8_u},
+     {-1}, {-1},
+-#line 73 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str444, ei_iso8859_3},
++#line 234 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str444, ei_tis620},
+     {-1}, {-1}, {-1},
+-#line 295 "lib/aliases.gperf"
++#line 296 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str448, ei_iso2022_jp},
+-#line 297 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str449, ei_iso2022_jp1},
+ #line 298 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str449, ei_iso2022_jp1},
++#line 299 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str450, ei_iso2022_jp2},
+-#line 118 "lib/aliases.gperf"
++#line 119 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str451, ei_iso8859_8},
+     {-1}, {-1},
+-#line 246 "lib/aliases.gperf"
++#line 247 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str454, ei_iso646_jp},
+-    {-1}, {-1},
+-#line 287 "lib/aliases.gperf"
++#line 90 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str455, ei_iso8859_5},
++    {-1},
++#line 288 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str457, ei_euc_jp},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 49 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str465, ei_ucs4internal},
++#line 123 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str458, ei_iso8859_9},
+     {-1},
+-#line 55 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str467, ei_iso8859_1},
+-#line 65 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str468, ei_iso8859_2},
++#line 116 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str460, ei_iso8859_8},
++    {-1}, {-1}, {-1},
++#line 74 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str464, ei_iso8859_3},
++#line 50 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str465, ei_ucs4internal},
++    {-1}, {-1},
++#line 45 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str468, ei_utf7},
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1},
+-#line 96 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str470, ei_iso8859_6},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 296 "lib/aliases.gperf"
++#line 297 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str479, ei_iso2022_jp},
+-#line 299 "lib/aliases.gperf"
++#line 300 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str480, ei_iso2022_jp2},
+-    {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 81 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str486, ei_iso8859_4},
+-    {-1}, {-1},
+-#line 206 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1},
++#line 15 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str485, ei_ascii},
++    {-1},
++#line 56 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str487, ei_iso8859_1},
++#line 66 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str488, ei_iso8859_2},
++#line 207 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str489, ei_mac_centraleurope},
+-    {-1}, {-1},
+-#line 117 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str492, ei_iso8859_8},
++#line 97 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str490, ei_iso8859_6},
+     {-1},
+-#line 181 "lib/aliases.gperf"
++#line 118 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str492, ei_iso8859_8},
++#line 18 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str493, ei_ascii},
++#line 182 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str494, ei_cp1255},
+-    {-1},
+-#line 15 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str496, ei_ascii},
+-    {-1},
+-#line 315 "lib/aliases.gperf"
++    {-1}, {-1}, {-1},
++#line 316 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str498, ei_euc_tw},
+-    {-1}, {-1}, {-1}, {-1},
+-#line 163 "lib/aliases.gperf"
++#line 17 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str499, ei_ascii},
++    {-1}, {-1}, {-1},
++#line 164 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str503, ei_koi8_ru},
+     {-1},
+-#line 237 "lib/aliases.gperf"
++#line 238 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str505, ei_cp874},
+-    {-1}, {-1},
+-#line 257 "lib/aliases.gperf"
++#line 82 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str506, ei_iso8859_4},
++    {-1},
++#line 258 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str508, ei_jisx0208},
+-#line 224 "lib/aliases.gperf"
++#line 225 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str509, ei_georgian_ps},
+-    {-1}, {-1},
+-#line 105 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str512, ei_iso8859_7},
+-    {-1},
+-#line 111 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1},
++#line 112 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str514, ei_iso8859_7},
+-#line 260 "lib/aliases.gperf"
++#line 261 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str515, ei_jisx0208},
+     {-1}, {-1},
+-#line 202 "lib/aliases.gperf"
++#line 203 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str518, ei_mac_roman},
+-#line 48 "lib/aliases.gperf"
++#line 49 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str519, ei_ucs2swapped},
+     {-1}, {-1}, {-1}, {-1},
+-#line 205 "lib/aliases.gperf"
++#line 206 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str524, ei_mac_roman},
+-    {-1}, {-1},
+-#line 319 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str527, ei_ces_big5},
+-#line 267 "lib/aliases.gperf"
++    {-1}, {-1}, {-1},
++#line 268 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str528, ei_jisx0212},
+-#line 249 "lib/aliases.gperf"
++#line 250 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str529, ei_iso646_jp},
+-#line 193 "lib/aliases.gperf"
++#line 194 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str530, ei_cp850},
+-    {-1}, {-1}, {-1},
+-#line 318 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str534, ei_ces_big5},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 245 "lib/aliases.gperf"
++    {-1},
++#line 106 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str532, ei_iso8859_7},
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 246 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str541, ei_iso646_jp},
+     {-1}, {-1}, {-1},
+-#line 262 "lib/aliases.gperf"
++#line 263 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str545, ei_jisx0212},
+     {-1}, {-1}, {-1},
+-#line 324 "lib/aliases.gperf"
++#line 325 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str549, ei_big5hkscs},
+-    {-1}, {-1}, {-1},
+-#line 251 "lib/aliases.gperf"
++#line 40 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str550, ei_utf16be},
++    {-1}, {-1},
++#line 252 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str553, ei_jisx0201},
+-#line 223 "lib/aliases.gperf"
++#line 224 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str554, ei_georgian_academy},
+     {-1},
+-#line 323 "lib/aliases.gperf"
++#line 324 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str556, ei_big5hkscs},
+     {-1}, {-1}, {-1},
+-#line 261 "lib/aliases.gperf"
++#line 262 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str560, ei_jisx0208},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 212 "lib/aliases.gperf"
++#line 43 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str561, ei_utf32be},
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 213 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str570, ei_mac_greek},
+-#line 175 "lib/aliases.gperf"
++#line 176 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str571, ei_cp1253},
+     {-1},
+-#line 50 "lib/aliases.gperf"
++#line 51 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str573, ei_ucs4swapped},
+     {-1}, {-1}, {-1}, {-1},
+-#line 208 "lib/aliases.gperf"
++#line 209 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str578, ei_mac_croatian},
+     {-1}, {-1}, {-1},
+-#line 250 "lib/aliases.gperf"
++#line 251 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str582, ei_jisx0201},
+     {-1}, {-1},
+-#line 335 "lib/aliases.gperf"
++#line 336 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str585, ei_local_wchar_t},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 28 "lib/aliases.gperf"
++#line 29 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str594, ei_ucs2be},
+     {-1}, {-1}, {-1}, {-1},
+-#line 264 "lib/aliases.gperf"
++#line 265 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str599, ei_jisx0212},
+-#line 254 "lib/aliases.gperf"
++#line 255 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str600, ei_jisx0208},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1},
+-#line 215 "lib/aliases.gperf"
++#line 320 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str605, ei_ces_big5},
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 319 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str612, ei_ces_big5},
++    {-1},
++#line 216 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str614, ei_mac_arabic},
+-    {-1}, {-1}, {-1}, {-1},
+-#line 253 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str619, ei_jisx0201},
+-#line 255 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1}, {-1},
++#line 256 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str620, ei_jisx0208},
+-#line 290 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str621, ei_sjis},
++#line 245 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str621, ei_tcvn},
+     {-1}, {-1}, {-1}, {-1},
+-#line 211 "lib/aliases.gperf"
++#line 212 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str626, ei_mac_ukraine},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 288 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str635, ei_euc_jp},
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1},
+-#line 256 "lib/aliases.gperf"
++#line 257 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str646, ei_jisx0208},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 293 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str663, ei_sjis},
+-#line 263 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str664, ei_jisx0212},
+-#line 214 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 215 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str665, ei_mac_hebrew},
++    {-1},
++#line 24 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str667, ei_utf8mac},
++    {-1},
++#line 53 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str669, ei_java},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 289 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str675, ei_sjis},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 244 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str685, ei_tcvn},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 178 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 179 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str694, ei_cp1254},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1},
+-#line 213 "lib/aliases.gperf"
++#line 214 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str717, ei_mac_turkish},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1},
+-#line 209 "lib/aliases.gperf"
++#line 210 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str731, ei_mac_romania},
++    {-1}, {-1}, {-1}, {-1}, {-1},
++#line 264 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str737, ei_jisx0212},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 184 "lib/aliases.gperf"
++    {-1}, {-1}, {-1},
++#line 185 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str750, ei_cp1256},
+-    {-1}, {-1},
+-#line 52 "lib/aliases.gperf"
+-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str753, ei_java},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++    {-1}, {-1}, {-1},
++#line 254 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str781, ei_jisx0201},
++    {-1},
++#line 291 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str783, ei_sjis},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 292 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1},
++#line 289 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str797, ei_euc_jp},
++#line 293 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str798, ei_sjis},
+-#line 330 "lib/aliases.gperf"
++#line 331 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str799, ei_johab},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++#line 294 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str825, ei_sjis},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
++    {-1}, {-1},
++#line 290 "lib/aliases.gperf"
++    {(int)(long)&((struct stringpool_t *)0)->stringpool_str837, ei_sjis},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+-#line 187 "lib/aliases.gperf"
++    {-1}, {-1}, {-1}, {-1}, {-1},
++#line 188 "lib/aliases.gperf"
+     {(int)(long)&((struct stringpool_t *)0)->stringpool_str879, ei_cp1257}
+   };
+ 
+diff -Naur libiconv.old/lib/converters.h libiconv/lib/converters.h
+--- libiconv.old/lib/converters.h	2002-05-29 16:06:52.000000000 +0200
++++ libiconv/lib/converters.h	2005-08-04 18:54:52.000000000 +0200
+@@ -109,6 +109,7 @@
+ /* General multi-byte encodings */
+ #include "utf8.h"
+ #include "ucs2.h"
++#include "utf8mac.h"
+ #include "ucs2be.h"
+ #include "ucs2le.h"
+ #include "ucs4.h"
+diff -Naur libiconv.old/lib/encodings.def libiconv/lib/encodings.def
+--- libiconv.old/lib/encodings.def	2003-04-24 12:48:06.000000000 +0200
++++ libiconv/lib/encodings.def	2005-08-04 18:54:43.000000000 +0200
+@@ -60,6 +60,13 @@
+             utf8,
+             { utf8_mbtowc, NULL },        { utf8_wctomb, NULL })
+ 
++DEFENCODING(( "UTF-8-MAC",               /* utf8-nfd */
++	      "UTF8-MAC",		 /* label from samba 2.2jp */
++            ),
++            utf8mac,
++            { utf8mac_mbtowc, NULL },     { utf8mac_wctomb, NULL })
++
++
+ DEFENCODING(( "UCS-2",                  /* glibc */
+               "ISO-10646-UCS-2",        /* IANA */
+               "csUnicode",              /* IANA */
+diff -Naur libiconv.old/lib/flags.h libiconv/lib/flags.h
+--- libiconv.old/lib/flags.h	2003-05-06 11:18:02.000000000 +0200
++++ libiconv/lib/flags.h	2005-08-04 18:54:43.000000000 +0200
+@@ -14,6 +14,7 @@
+ 
+ #define ei_ascii_oflags (0)
+ #define ei_utf8_oflags (HAVE_ACCENTS | HAVE_QUOTATION_MARKS | HAVE_HANGUL_JAMO)
++#define ei_utf8mac_oflags (HAVE_ACCENTS | HAVE_QUOTATION_MARKS | HAVE_HANGUL_JAMO)
+ #define ei_ucs2_oflags (HAVE_ACCENTS | HAVE_QUOTATION_MARKS | HAVE_HANGUL_JAMO)
+ #define ei_ucs2be_oflags (HAVE_ACCENTS | HAVE_QUOTATION_MARKS | HAVE_HANGUL_JAMO)
+ #define ei_ucs2le_oflags (HAVE_ACCENTS | HAVE_QUOTATION_MARKS | HAVE_HANGUL_JAMO)
+diff -Naur libiconv.old/lib/utf8mac.h libiconv/lib/utf8mac.h
+--- libiconv.old/lib/utf8mac.h	1970-01-01 01:00:00.000000000 +0100
++++ libiconv/lib/utf8mac.h	2005-08-04 18:54:43.000000000 +0200
+@@ -0,0 +1,1595 @@
++/*
++ * Copyright (C) 2003 Apple Computer, Inc. All rights reserved.
++ *
++ * This file is part of the GNU LIBICONV Library.
++ *
++ * The GNU LIBICONV Library is free software; you can redistribute it
++ * and/or modify it under the terms of the GNU Library General Public
++ * License as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * The GNU LIBICONV Library is distributed in the hope that it will be
++ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Library General Public License for more details.
++ *
++ * You should have received a copy of the GNU Library General Public
++ * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
++ * If not, write to the Free Software Foundation, Inc., 59 Temple Place -
++ * Suite 330, Boston, MA 02111-1307, USA.
++ */
++
++/*
++ * UTF-8-MAC
++ */
++
++ /*
++ 	Includes Unicode 3.2 decomposition code derived from Core Foundation
++ */
++
++#include <inttypes.h>
++
++#define	UTF_REVERSE_ENDIAN	0x01	/* reverse UCS-2 byte order */
++#define	UTF_NO_NULL_TERM	0x02	/* do not add null termination */
++#define	UTF_DECOMPOSED		0x04	/* generate fully decomposed UCS-2 */
++#define	UTF_PRECOMPOSED		0x08	/* generate precomposed UCS-2 */
++
++int	utf8_encodestr (const u_int16_t *, size_t, u_int8_t *, size_t *,
++		size_t, u_int16_t, int);
++
++int	utf8_decodestr (const u_int8_t *, size_t, u_int16_t *,size_t *,
++		size_t, u_int16_t, int, size_t *);
++
++/*
++	Derived from Core Foundation headers:
++
++		CFUniCharDecompData.h
++		CFUniCharPrecompData.h
++		CFUniCharNonBaseData.h
++*/
++
++static const u_int16_t
++__CFUniCharDecompositionTable[] = {
++	0x00C0, 0x2000,   0x00C1, 0x2002,   0x00C2, 0x2004,   0x00C3, 0x2006,
++	0x00C4, 0x2008,   0x00C5, 0x200A,   0x00C7, 0x200C,   0x00C8, 0x200E,
++	0x00C9, 0x2010,   0x00CA, 0x2012,   0x00CB, 0x2014,   0x00CC, 0x2016,
++	0x00CD, 0x2018,   0x00CE, 0x201A,   0x00CF, 0x201C,   0x00D1, 0x201E,
++	0x00D2, 0x2020,   0x00D3, 0x2022,   0x00D4, 0x2024,   0x00D5, 0x2026,
++	0x00D6, 0x2028,   0x00D9, 0x202A,   0x00DA, 0x202C,   0x00DB, 0x202E,
++	0x00DC, 0x2030,   0x00DD, 0x2032,   0x00E0, 0x2034,   0x00E1, 0x2036,
++	0x00E2, 0x2038,   0x00E3, 0x203A,   0x00E4, 0x203C,   0x00E5, 0x203E,
++	0x00E7, 0x2040,   0x00E8, 0x2042,   0x00E9, 0x2044,   0x00EA, 0x2046,
++	0x00EB, 0x2048,   0x00EC, 0x204A,   0x00ED, 0x204C,   0x00EE, 0x204E,
++	0x00EF, 0x2050,   0x00F1, 0x2052,   0x00F2, 0x2054,   0x00F3, 0x2056,
++	0x00F4, 0x2058,   0x00F5, 0x205A,   0x00F6, 0x205C,   0x00F9, 0x205E,
++	0x00FA, 0x2060,   0x00FB, 0x2062,   0x00FC, 0x2064,   0x00FD, 0x2066,
++	0x00FF, 0x2068,   0x0100, 0x206A,   0x0101, 0x206C,   0x0102, 0x206E,
++	0x0103, 0x2070,   0x0104, 0x2072,   0x0105, 0x2074,   0x0106, 0x2076,
++	0x0107, 0x2078,   0x0108, 0x207A,   0x0109, 0x207C,   0x010A, 0x207E,
++	0x010B, 0x2080,   0x010C, 0x2082,   0x010D, 0x2084,   0x010E, 0x2086,
++	0x010F, 0x2088,   0x0112, 0x208A,   0x0113, 0x208C,   0x0114, 0x208E,
++	0x0115, 0x2090,   0x0116, 0x2092,   0x0117, 0x2094,   0x0118, 0x2096,
++	0x0119, 0x2098,   0x011A, 0x209A,   0x011B, 0x209C,   0x011C, 0x209E,
++	0x011D, 0x20A0,   0x011E, 0x20A2,   0x011F, 0x20A4,   0x0120, 0x20A6,
++	0x0121, 0x20A8,   0x0122, 0x20AA,   0x0123, 0x20AC,   0x0124, 0x20AE,
++	0x0125, 0x20B0,   0x0128, 0x20B2,   0x0129, 0x20B4,   0x012A, 0x20B6,
++	0x012B, 0x20B8,   0x012C, 0x20BA,   0x012D, 0x20BC,   0x012E, 0x20BE,
++	0x012F, 0x20C0,   0x0130, 0x20C2,   0x0134, 0x20C4,   0x0135, 0x20C6,
++	0x0136, 0x20C8,   0x0137, 0x20CA,   0x0139, 0x20CC,   0x013A, 0x20CE,
++	0x013B, 0x20D0,   0x013C, 0x20D2,   0x013D, 0x20D4,   0x013E, 0x20D6,
++	0x0143, 0x20D8,   0x0144, 0x20DA,   0x0145, 0x20DC,   0x0146, 0x20DE,
++	0x0147, 0x20E0,   0x0148, 0x20E2,   0x014C, 0x20E4,   0x014D, 0x20E6,
++	0x014E, 0x20E8,   0x014F, 0x20EA,   0x0150, 0x20EC,   0x0151, 0x20EE,
++	0x0154, 0x20F0,   0x0155, 0x20F2,   0x0156, 0x20F4,   0x0157, 0x20F6,
++	0x0158, 0x20F8,   0x0159, 0x20FA,   0x015A, 0x20FC,   0x015B, 0x20FE,
++	0x015C, 0x2100,   0x015D, 0x2102,   0x015E, 0x2104,   0x015F, 0x2106,
++	0x0160, 0x2108,   0x0161, 0x210A,   0x0162, 0x210C,   0x0163, 0x210E,
++	0x0164, 0x2110,   0x0165, 0x2112,   0x0168, 0x2114,   0x0169, 0x2116,
++	0x016A, 0x2118,   0x016B, 0x211A,   0x016C, 0x211C,   0x016D, 0x211E,
++	0x016E, 0x2120,   0x016F, 0x2122,   0x0170, 0x2124,   0x0171, 0x2126,
++	0x0172, 0x2128,   0x0173, 0x212A,   0x0174, 0x212C,   0x0175, 0x212E,
++	0x0176, 0x2130,   0x0177, 0x2132,   0x0178, 0x2134,   0x0179, 0x2136,
++	0x017A, 0x2138,   0x017B, 0x213A,   0x017C, 0x213C,   0x017D, 0x213E,
++	0x017E, 0x2140,   0x01A0, 0x2142,   0x01A1, 0x2144,   0x01AF, 0x2146,
++	0x01B0, 0x2148,   0x01CD, 0x214A,   0x01CE, 0x214C,   0x01CF, 0x214E,
++	0x01D0, 0x2150,   0x01D1, 0x2152,   0x01D2, 0x2154,   0x01D3, 0x2156,
++	0x01D4, 0x2158,   0x01D5, 0xA15A,   0x01D6, 0xA15C,   0x01D7, 0xA15E,
++	0x01D8, 0xA160,   0x01D9, 0xA162,   0x01DA, 0xA164,   0x01DB, 0xA166,
++	0x01DC, 0xA168,   0x01DE, 0xA16A,   0x01DF, 0xA16C,   0x01E0, 0xA16E,
++	0x01E1, 0xA170,   0x01E2, 0x2172,   0x01E3, 0x2174,   0x01E6, 0x2176,
++	0x01E7, 0x2178,   0x01E8, 0x217A,   0x01E9, 0x217C,   0x01EA, 0x217E,
++	0x01EB, 0x2180,   0x01EC, 0xA182,   0x01ED, 0xA184,   0x01EE, 0x2186,
++	0x01EF, 0x2188,   0x01F0, 0x218A,   0x01F4, 0x218C,   0x01F5, 0x218E,
++	0x01F8, 0x2190,   0x01F9, 0x2192,   0x01FA, 0xA194,   0x01FB, 0xA196,
++	0x01FC, 0x2198,   0x01FD, 0x219A,   0x01FE, 0x219C,   0x01FF, 0x219E,
++	0x0200, 0x21A0,   0x0201, 0x21A2,   0x0202, 0x21A4,   0x0203, 0x21A6,
++	0x0204, 0x21A8,   0x0205, 0x21AA,   0x0206, 0x21AC,   0x0207, 0x21AE,
++	0x0208, 0x21B0,   0x0209, 0x21B2,   0x020A, 0x21B4,   0x020B, 0x21B6,
++	0x020C, 0x21B8,   0x020D, 0x21BA,   0x020E, 0x21BC,   0x020F, 0x21BE,
++	0x0210, 0x21C0,   0x0211, 0x21C2,   0x0212, 0x21C4,   0x0213, 0x21C6,
++	0x0214, 0x21C8,   0x0215, 0x21CA,   0x0216, 0x21CC,   0x0217, 0x21CE,
++	0x0218, 0x21D0,   0x0219, 0x21D2,   0x021A, 0x21D4,   0x021B, 0x21D6,
++	0x021E, 0x21D8,   0x021F, 0x21DA,   0x0226, 0x21DC,   0x0227, 0x21DE,
++	0x0228, 0x21E0,   0x0229, 0x21E2,   0x022A, 0xA1E4,   0x022B, 0xA1E6,
++	0x022C, 0xA1E8,   0x022D, 0xA1EA,   0x022E, 0x21EC,   0x022F, 0x21EE,
++	0x0230, 0xA1F0,   0x0231, 0xA1F2,   0x0232, 0x21F4,   0x0233, 0x21F6,
++	0x0340, 0x1300,   0x0341, 0x1301,   0x0343, 0x1313,   0x0344, 0x21F8,
++	0x0374, 0x12B9,   0x037E, 0x103B,   0x0385, 0x21FA,   0x0386, 0x21FC,
++	0x0387, 0x10B7,   0x0388, 0x21FE,   0x0389, 0x2200,   0x038A, 0x2202,
++	0x038C, 0x2204,   0x038E, 0x2206,   0x038F, 0x2208,   0x0390, 0xA20A,
++	0x03AA, 0x220C,   0x03AB, 0x220E,   0x03AC, 0x2210,   0x03AD, 0x2212,
++	0x03AE, 0x2214,   0x03AF, 0x2216,   0x03B0, 0xA218,   0x03CA, 0x221A,
++	0x03CB, 0x221C,   0x03CC, 0x221E,   0x03CD, 0x2220,   0x03CE, 0x2222,
++	0x03D3, 0x2224,   0x03D4, 0x2226,   0x0400, 0x2228,   0x0401, 0x222A,
++	0x0403, 0x222C,   0x0407, 0x222E,   0x040C, 0x2230,   0x040D, 0x2232,
++	0x040E, 0x2234,   0x0419, 0x2236,   0x0439, 0x2238,   0x0450, 0x223A,
++	0x0451, 0x223C,   0x0453, 0x223E,   0x0457, 0x2240,   0x045C, 0x2242,
++	0x045D, 0x2244,   0x045E, 0x2246,   0x0476, 0x2248,   0x0477, 0x224A,
++	0x04C1, 0x224C,   0x04C2, 0x224E,   0x04D0, 0x2250,   0x04D1, 0x2252,
++	0x04D2, 0x2254,   0x04D3, 0x2256,   0x04D6, 0x2258,   0x04D7, 0x225A,
++	0x04DA, 0x225C,   0x04DB, 0x225E,   0x04DC, 0x2260,   0x04DD, 0x2262,
++	0x04DE, 0x2264,   0x04DF, 0x2266,   0x04E2, 0x2268,   0x04E3, 0x226A,
++	0x04E4, 0x226C,   0x04E5, 0x226E,   0x04E6, 0x2270,   0x04E7, 0x2272,
++	0x04EA, 0x2274,   0x04EB, 0x2276,   0x04EC, 0x2278,   0x04ED, 0x227A,
++	0x04EE, 0x227C,   0x04EF, 0x227E,   0x04F0, 0x2280,   0x04F1, 0x2282,
++	0x04F2, 0x2284,   0x04F3, 0x2286,   0x04F4, 0x2288,   0x04F5, 0x228A,
++	0x04F8, 0x228C,   0x04F9, 0x228E,   0x0622, 0x2290,   0x0623, 0x2292,
++	0x0624, 0x2294,   0x0625, 0x2296,   0x0626, 0x2298,   0x06C0, 0x229A,
++	0x06C2, 0x229C,   0x06D3, 0x229E,   0x0929, 0x22A0,   0x0931, 0x22A2,
++	0x0934, 0x22A4,   0x0958, 0x22A6,   0x0959, 0x22A8,   0x095A, 0x22AA,
++	0x095B, 0x22AC,   0x095C, 0x22AE,   0x095D, 0x22B0,   0x095E, 0x22B2,
++	0x095F, 0x22B4,   0x09CB, 0x22B6,   0x09CC, 0x22B8,   0x09DC, 0x22BA,
++	0x09DD, 0x22BC,   0x09DF, 0x22BE,   0x0A33, 0x22C0,   0x0A36, 0x22C2,
++	0x0A59, 0x22C4,   0x0A5A, 0x22C6,   0x0A5B, 0x22C8,   0x0A5E, 0x22CA,
++	0x0B48, 0x22CC,   0x0B4B, 0x22CE,   0x0B4C, 0x22D0,   0x0B5C, 0x22D2,
++	0x0B5D, 0x22D4,   0x0B94, 0x22D6,   0x0BCA, 0x22D8,   0x0BCB, 0x22DA,
++	0x0BCC, 0x22DC,   0x0C48, 0x22DE,   0x0CC0, 0x22E0,   0x0CC7, 0x22E2,
++	0x0CC8, 0x22E4,   0x0CCA, 0x22E6,   0x0CCB, 0xA2E8,   0x0D4A, 0x22EA,
++	0x0D4B, 0x22EC,   0x0D4C, 0x22EE,   0x0DDA, 0x22F0,   0x0DDC, 0x22F2,
++	0x0DDD, 0xA2F4,   0x0DDE, 0x22F6,   0x0F43, 0x22F8,   0x0F4D, 0x22FA,
++	0x0F52, 0x22FC,   0x0F57, 0x22FE,   0x0F5C, 0x2300,   0x0F69, 0x2302,
++	0x0F73, 0x2304,   0x0F75, 0x2306,   0x0F76, 0x2308,   0x0F78, 0x230A,
++	0x0F81, 0x230C,   0x0F93, 0x230E,   0x0F9D, 0x2310,   0x0FA2, 0x2312,
++	0x0FA7, 0x2314,   0x0FAC, 0x2316,   0x0FB9, 0x2318,   0x1026, 0x231A,
++	0x1E00, 0x231C,   0x1E01, 0x231E,   0x1E02, 0x2320,   0x1E03, 0x2322,
++	0x1E04, 0x2324,   0x1E05, 0x2326,   0x1E06, 0x2328,   0x1E07, 0x232A,
++	0x1E08, 0xA32C,   0x1E09, 0xA32E,   0x1E0A, 0x2330,   0x1E0B, 0x2332,
++	0x1E0C, 0x2334,   0x1E0D, 0x2336,   0x1E0E, 0x2338,   0x1E0F, 0x233A,
++	0x1E10, 0x233C,   0x1E11, 0x233E,   0x1E12, 0x2340,   0x1E13, 0x2342,
++	0x1E14, 0xA344,   0x1E15, 0xA346,   0x1E16, 0xA348,   0x1E17, 0xA34A,
++	0x1E18, 0x234C,   0x1E19, 0x234E,   0x1E1A, 0x2350,   0x1E1B, 0x2352,
++	0x1E1C, 0xA354,   0x1E1D, 0xA356,   0x1E1E, 0x2358,   0x1E1F, 0x235A,
++	0x1E20, 0x235C,   0x1E21, 0x235E,   0x1E22, 0x2360,   0x1E23, 0x2362,
++	0x1E24, 0x2364,   0x1E25, 0x2366,   0x1E26, 0x2368,   0x1E27, 0x236A,
++	0x1E28, 0x236C,   0x1E29, 0x236E,   0x1E2A, 0x2370,   0x1E2B, 0x2372,
++	0x1E2C, 0x2374,   0x1E2D, 0x2376,   0x1E2E, 0xA378,   0x1E2F, 0xA37A,
++	0x1E30, 0x237C,   0x1E31, 0x237E,   0x1E32, 0x2380,   0x1E33, 0x2382,
++	0x1E34, 0x2384,   0x1E35, 0x2386,   0x1E36, 0x2388,   0x1E37, 0x238A,
++	0x1E38, 0xA38C,   0x1E39, 0xA38E,   0x1E3A, 0x2390,   0x1E3B, 0x2392,
++	0x1E3C, 0x2394,   0x1E3D, 0x2396,   0x1E3E, 0x2398,   0x1E3F, 0x239A,
++	0x1E40, 0x239C,   0x1E41, 0x239E,   0x1E42, 0x23A0,   0x1E43, 0x23A2,
++	0x1E44, 0x23A4,   0x1E45, 0x23A6,   0x1E46, 0x23A8,   0x1E47, 0x23AA,
++	0x1E48, 0x23AC,   0x1E49, 0x23AE,   0x1E4A, 0x23B0,   0x1E4B, 0x23B2,
++	0x1E4C, 0xA3B4,   0x1E4D, 0xA3B6,   0x1E4E, 0xA3B8,   0x1E4F, 0xA3BA,
++	0x1E50, 0xA3BC,   0x1E51, 0xA3BE,   0x1E52, 0xA3C0,   0x1E53, 0xA3C2,
++	0x1E54, 0x23C4,   0x1E55, 0x23C6,   0x1E56, 0x23C8,   0x1E57, 0x23CA,
++	0x1E58, 0x23CC,   0x1E59, 0x23CE,   0x1E5A, 0x23D0,   0x1E5B, 0x23D2,
++	0x1E5C, 0xA3D4,   0x1E5D, 0xA3D6,   0x1E5E, 0x23D8,   0x1E5F, 0x23DA,
++	0x1E60, 0x23DC,   0x1E61, 0x23DE,   0x1E62, 0x23E0,   0x1E63, 0x23E2,
++	0x1E64, 0xA3E4,   0x1E65, 0xA3E6,   0x1E66, 0xA3E8,   0x1E67, 0xA3EA,
++	0x1E68, 0xA3EC,   0x1E69, 0xA3EE,   0x1E6A, 0x23F0,   0x1E6B, 0x23F2,
++	0x1E6C, 0x23F4,   0x1E6D, 0x23F6,   0x1E6E, 0x23F8,   0x1E6F, 0x23FA,
++	0x1E70, 0x23FC,   0x1E71, 0x23FE,   0x1E72, 0x2400,   0x1E73, 0x2402,
++	0x1E74, 0x2404,   0x1E75, 0x2406,   0x1E76, 0x2408,   0x1E77, 0x240A,
++	0x1E78, 0xA40C,   0x1E79, 0xA40E,   0x1E7A, 0xA410,   0x1E7B, 0xA412,
++	0x1E7C, 0x2414,   0x1E7D, 0x2416,   0x1E7E, 0x2418,   0x1E7F, 0x241A,
++	0x1E80, 0x241C,   0x1E81, 0x241E,   0x1E82, 0x2420,   0x1E83, 0x2422,
++	0x1E84, 0x2424,   0x1E85, 0x2426,   0x1E86, 0x2428,   0x1E87, 0x242A,
++	0x1E88, 0x242C,   0x1E89, 0x242E,   0x1E8A, 0x2430,   0x1E8B, 0x2432,
++	0x1E8C, 0x2434,   0x1E8D, 0x2436,   0x1E8E, 0x2438,   0x1E8F, 0x243A,
++	0x1E90, 0x243C,   0x1E91, 0x243E,   0x1E92, 0x2440,   0x1E93, 0x2442,
++	0x1E94, 0x2444,   0x1E95, 0x2446,   0x1E96, 0x2448,   0x1E97, 0x244A,
++	0x1E98, 0x244C,   0x1E99, 0x244E,   0x1E9B, 0x2450,   0x1EA0, 0x2452,
++	0x1EA1, 0x2454,   0x1EA2, 0x2456,   0x1EA3, 0x2458,   0x1EA4, 0xA45A,
++	0x1EA5, 0xA45C,   0x1EA6, 0xA45E,   0x1EA7, 0xA460,   0x1EA8, 0xA462,
++	0x1EA9, 0xA464,   0x1EAA, 0xA466,   0x1EAB, 0xA468,   0x1EAC, 0xA46A,
++	0x1EAD, 0xA46C,   0x1EAE, 0xA46E,   0x1EAF, 0xA470,   0x1EB0, 0xA472,
++	0x1EB1, 0xA474,   0x1EB2, 0xA476,   0x1EB3, 0xA478,   0x1EB4, 0xA47A,
++	0x1EB5, 0xA47C,   0x1EB6, 0xA47E,   0x1EB7, 0xA480,   0x1EB8, 0x2482,
++	0x1EB9, 0x2484,   0x1EBA, 0x2486,   0x1EBB, 0x2488,   0x1EBC, 0x248A,
++	0x1EBD, 0x248C,   0x1EBE, 0xA48E,   0x1EBF, 0xA490,   0x1EC0, 0xA492,
++	0x1EC1, 0xA494,   0x1EC2, 0xA496,   0x1EC3, 0xA498,   0x1EC4, 0xA49A,
++	0x1EC5, 0xA49C,   0x1EC6, 0xA49E,   0x1EC7, 0xA4A0,   0x1EC8, 0x24A2,
++	0x1EC9, 0x24A4,   0x1ECA, 0x24A6,   0x1ECB, 0x24A8,   0x1ECC, 0x24AA,
++	0x1ECD, 0x24AC,   0x1ECE, 0x24AE,   0x1ECF, 0x24B0,   0x1ED0, 0xA4B2,
++	0x1ED1, 0xA4B4,   0x1ED2, 0xA4B6,   0x1ED3, 0xA4B8,   0x1ED4, 0xA4BA,
++	0x1ED5, 0xA4BC,   0x1ED6, 0xA4BE,   0x1ED7, 0xA4C0,   0x1ED8, 0xA4C2,
++	0x1ED9, 0xA4C4,   0x1EDA, 0xA4C6,   0x1EDB, 0xA4C8,   0x1EDC, 0xA4CA,
++	0x1EDD, 0xA4CC,   0x1EDE, 0xA4CE,   0x1EDF, 0xA4D0,   0x1EE0, 0xA4D2,
++	0x1EE1, 0xA4D4,   0x1EE2, 0xA4D6,   0x1EE3, 0xA4D8,   0x1EE4, 0x24DA,
++	0x1EE5, 0x24DC,   0x1EE6, 0x24DE,   0x1EE7, 0x24E0,   0x1EE8, 0xA4E2,
++	0x1EE9, 0xA4E4,   0x1EEA, 0xA4E6,   0x1EEB, 0xA4E8,   0x1EEC, 0xA4EA,
++	0x1EED, 0xA4EC,   0x1EEE, 0xA4EE,   0x1EEF, 0xA4F0,   0x1EF0, 0xA4F2,
++	0x1EF1, 0xA4F4,   0x1EF2, 0x24F6,   0x1EF3, 0x24F8,   0x1EF4, 0x24FA,
++	0x1EF5, 0x24FC,   0x1EF6, 0x24FE,   0x1EF7, 0x2500,   0x1EF8, 0x2502,
++	0x1EF9, 0x2504,   0x1F00, 0x2506,   0x1F01, 0x2508,   0x1F02, 0xA50A,
++	0x1F03, 0xA50C,   0x1F04, 0xA50E,   0x1F05, 0xA510,   0x1F06, 0xA512,
++	0x1F07, 0xA514,   0x1F08, 0x2516,   0x1F09, 0x2518,   0x1F0A, 0xA51A,
++	0x1F0B, 0xA51C,   0x1F0C, 0xA51E,   0x1F0D, 0xA520,   0x1F0E, 0xA522,
++	0x1F0F, 0xA524,   0x1F10, 0x2526,   0x1F11, 0x2528,   0x1F12, 0xA52A,
++	0x1F13, 0xA52C,   0x1F14, 0xA52E,   0x1F15, 0xA530,   0x1F18, 0x2532,
++	0x1F19, 0x2534,   0x1F1A, 0xA536,   0x1F1B, 0xA538,   0x1F1C, 0xA53A,
++	0x1F1D, 0xA53C,   0x1F20, 0x253E,   0x1F21, 0x2540,   0x1F22, 0xA542,
++	0x1F23, 0xA544,   0x1F24, 0xA546,   0x1F25, 0xA548,   0x1F26, 0xA54A,
++	0x1F27, 0xA54C,   0x1F28, 0x254E,   0x1F29, 0x2550,   0x1F2A, 0xA552,
++	0x1F2B, 0xA554,   0x1F2C, 0xA556,   0x1F2D, 0xA558,   0x1F2E, 0xA55A,
++	0x1F2F, 0xA55C,   0x1F30, 0x255E,   0x1F31, 0x2560,   0x1F32, 0xA562,
++	0x1F33, 0xA564,   0x1F34, 0xA566,   0x1F35, 0xA568,   0x1F36, 0xA56A,
++	0x1F37, 0xA56C,   0x1F38, 0x256E,   0x1F39, 0x2570,   0x1F3A, 0xA572,
++	0x1F3B, 0xA574,   0x1F3C, 0xA576,   0x1F3D, 0xA578,   0x1F3E, 0xA57A,
++	0x1F3F, 0xA57C,   0x1F40, 0x257E,   0x1F41, 0x2580,   0x1F42, 0xA582,
++	0x1F43, 0xA584,   0x1F44, 0xA586,   0x1F45, 0xA588,   0x1F48, 0x258A,
++	0x1F49, 0x258C,   0x1F4A, 0xA58E,   0x1F4B, 0xA590,   0x1F4C, 0xA592,
++	0x1F4D, 0xA594,   0x1F50, 0x2596,   0x1F51, 0x2598,   0x1F52, 0xA59A,
++	0x1F53, 0xA59C,   0x1F54, 0xA59E,   0x1F55, 0xA5A0,   0x1F56, 0xA5A2,
++	0x1F57, 0xA5A4,   0x1F59, 0x25A6,   0x1F5B, 0xA5A8,   0x1F5D, 0xA5AA,
++	0x1F5F, 0xA5AC,   0x1F60, 0x25AE,   0x1F61, 0x25B0,   0x1F62, 0xA5B2,
++	0x1F63, 0xA5B4,   0x1F64, 0xA5B6,   0x1F65, 0xA5B8,   0x1F66, 0xA5BA,
++	0x1F67, 0xA5BC,   0x1F68, 0x25BE,   0x1F69, 0x25C0,   0x1F6A, 0xA5C2,
++	0x1F6B, 0xA5C4,   0x1F6C, 0xA5C6,   0x1F6D, 0xA5C8,   0x1F6E, 0xA5CA,
++	0x1F6F, 0xA5CC,   0x1F70, 0x25CE,   0x1F71, 0x93AC,   0x1F72, 0x25D0,
++	0x1F73, 0x93AD,   0x1F74, 0x25D2,   0x1F75, 0x93AE,   0x1F76, 0x25D4,
++	0x1F77, 0x93AF,   0x1F78, 0x25D6,   0x1F79, 0x93CC,   0x1F7A, 0x25D8,
++	0x1F7B, 0x93CD,   0x1F7C, 0x25DA,   0x1F7D, 0x93CE,   0x1F80, 0xA5DC,
++	0x1F81, 0xA5DE,   0x1F82, 0xA5E0,   0x1F83, 0xA5E2,   0x1F84, 0xA5E4,
++	0x1F85, 0xA5E6,   0x1F86, 0xA5E8,   0x1F87, 0xA5EA,   0x1F88, 0xA5EC,
++	0x1F89, 0xA5EE,   0x1F8A, 0xA5F0,   0x1F8B, 0xA5F2,   0x1F8C, 0xA5F4,
++	0x1F8D, 0xA5F6,   0x1F8E, 0xA5F8,   0x1F8F, 0xA5FA,   0x1F90, 0xA5FC,
++	0x1F91, 0xA5FE,   0x1F92, 0xA600,   0x1F93, 0xA602,   0x1F94, 0xA604,
++	0x1F95, 0xA606,   0x1F96, 0xA608,   0x1F97, 0xA60A,   0x1F98, 0xA60C,
++	0x1F99, 0xA60E,   0x1F9A, 0xA610,   0x1F9B, 0xA612,   0x1F9C, 0xA614,
++	0x1F9D, 0xA616,   0x1F9E, 0xA618,   0x1F9F, 0xA61A,   0x1FA0, 0xA61C,
++	0x1FA1, 0xA61E,   0x1FA2, 0xA620,   0x1FA3, 0xA622,   0x1FA4, 0xA624,
++	0x1FA5, 0xA626,   0x1FA6, 0xA628,   0x1FA7, 0xA62A,   0x1FA8, 0xA62C,
++	0x1FA9, 0xA62E,   0x1FAA, 0xA630,   0x1FAB, 0xA632,   0x1FAC, 0xA634,
++	0x1FAD, 0xA636,   0x1FAE, 0xA638,   0x1FAF, 0xA63A,   0x1FB0, 0x263C,
++	0x1FB1, 0x263E,   0x1FB2, 0xA640,   0x1FB3, 0x2642,   0x1FB4, 0xA644,
++	0x1FB6, 0x2646,   0x1FB7, 0xA648,   0x1FB8, 0x264A,   0x1FB9, 0x264C,
++	0x1FBA, 0x264E,   0x1FBB, 0x9386,   0x1FBC, 0x2650,   0x1FBE, 0x13B9,
++	0x1FC1, 0x2652,   0x1FC2, 0xA654,   0x1FC3, 0x2656,   0x1FC4, 0xA658,
++	0x1FC6, 0x265A,   0x1FC7, 0xA65C,   0x1FC8, 0x265E,   0x1FC9, 0x9388,
++	0x1FCA, 0x2660,   0x1FCB, 0x9389,   0x1FCC, 0x2662,   0x1FCD, 0x2664,
++	0x1FCE, 0x2666,   0x1FCF, 0x2668,   0x1FD0, 0x266A,   0x1FD1, 0x266C,
++	0x1FD2, 0xA66E,   0x1FD3, 0x9390,   0x1FD6, 0x2670,   0x1FD7, 0xA672,
++	0x1FD8, 0x2674,   0x1FD9, 0x2676,   0x1FDA, 0x2678,   0x1FDB, 0x938A,
++	0x1FDD, 0x267A,   0x1FDE, 0x267C,   0x1FDF, 0x267E,   0x1FE0, 0x2680,
++	0x1FE1, 0x2682,   0x1FE2, 0xA684,   0x1FE3, 0x93B0,   0x1FE4, 0x2686,
++	0x1FE5, 0x2688,   0x1FE6, 0x268A,   0x1FE7, 0xA68C,   0x1FE8, 0x268E,
++	0x1FE9, 0x2690,   0x1FEA, 0x2692,   0x1FEB, 0x938E,   0x1FEC, 0x2694,
++	0x1FED, 0x2696,   0x1FEE, 0x9385,   0x1FEF, 0x1060,   0x1FF2, 0xA698,
++	0x1FF3, 0x269A,   0x1FF4, 0xA69C,   0x1FF6, 0x269E,   0x1FF7, 0xA6A0,
++	0x1FF8, 0x26A2,   0x1FF9, 0x938C,   0x1FFA, 0x26A4,   0x1FFB, 0x938F,
++	0x1FFC, 0x26A6,   0x1FFD, 0x10B4,   0x304C, 0x26A8,   0x304E, 0x26AA,
++	0x3050, 0x26AC,   0x3052, 0x26AE,   0x3054, 0x26B0,   0x3056, 0x26B2,
++	0x3058, 0x26B4,   0x305A, 0x26B6,   0x305C, 0x26B8,   0x305E, 0x26BA,
++	0x3060, 0x26BC,   0x3062, 0x26BE,   0x3065, 0x26C0,   0x3067, 0x26C2,
++	0x3069, 0x26C4,   0x3070, 0x26C6,   0x3071, 0x26C8,   0x3073, 0x26CA,
++	0x3074, 0x26CC,   0x3076, 0x26CE,   0x3077, 0x26D0,   0x3079, 0x26D2,
++	0x307A, 0x26D4,   0x307C, 0x26D6,   0x307D, 0x26D8,   0x3094, 0x26DA,
++	0x309E, 0x26DC,   0x30AC, 0x26DE,   0x30AE, 0x26E0,   0x30B0, 0x26E2,
++	0x30B2, 0x26E4,   0x30B4, 0x26E6,   0x30B6, 0x26E8,   0x30B8, 0x26EA,
++	0x30BA, 0x26EC,   0x30BC, 0x26EE,   0x30BE, 0x26F0,   0x30C0, 0x26F2,
++	0x30C2, 0x26F4,   0x30C5, 0x26F6,   0x30C7, 0x26F8,   0x30C9, 0x26FA,
++	0x30D0, 0x26FC,   0x30D1, 0x26FE,   0x30D3, 0x2700,   0x30D4, 0x2702,
++	0x30D6, 0x2704,   0x30D7, 0x2706,   0x30D9, 0x2708,   0x30DA, 0x270A,
++	0x30DC, 0x270C,   0x30DD, 0x270E,   0x30F4, 0x2710,   0x30F7, 0x2712,
++	0x30F8, 0x2714,   0x30F9, 0x2716,   0x30FA, 0x2718,   0x30FE, 0x271A,
++	0xFB1D, 0x271C,   0xFB1F, 0x271E,   0xFB2A, 0x2720,   0xFB2B, 0x2722,
++	0xFB2C, 0xA724,   0xFB2D, 0xA726,   0xFB2E, 0x2728,   0xFB2F, 0x272A,
++	0xFB30, 0x272C,   0xFB31, 0x272E,   0xFB32, 0x2730,   0xFB33, 0x2732,
++	0xFB34, 0x2734,   0xFB35, 0x2736,   0xFB36, 0x2738,   0xFB38, 0x273A,
++	0xFB39, 0x273C,   0xFB3A, 0x273E,   0xFB3B, 0x2740,   0xFB3C, 0x2742,
++	0xFB3E, 0x2744,   0xFB40, 0x2746,   0xFB41, 0x2748,   0xFB43, 0x274A,
++	0xFB44, 0x274C,   0xFB46, 0x274E,   0xFB47, 0x2750,   0xFB48, 0x2752,
++	0xFB49, 0x2754,   0xFB4A, 0x2756,   0xFB4B, 0x2758,   0xFB4C, 0x275A,
++	0xFB4D, 0x275C,   0xFB4E, 0x275E
++};
++
++static const u_int32_t __UniCharDecompositionTableLength =
++	(sizeof(__CFUniCharDecompositionTable) / (sizeof(u_int16_t) * 2));
++
++
++static const u_int16_t
++__CFUniCharMultipleDecompositionTable[] = {
++	0x0041, 0x0300, 0x0041, 0x0301, 0x0041, 0x0302, 0x0041, 0x0303,
++	0x0041, 0x0308, 0x0041, 0x030A, 0x0043, 0x0327, 0x0045, 0x0300,
++	0x0045, 0x0301, 0x0045, 0x0302, 0x0045, 0x0308, 0x0049, 0x0300,
++	0x0049, 0x0301, 0x0049, 0x0302, 0x0049, 0x0308, 0x004E, 0x0303,
++	0x004F, 0x0300, 0x004F, 0x0301, 0x004F, 0x0302, 0x004F, 0x0303,
++	0x004F, 0x0308, 0x0055, 0x0300, 0x0055, 0x0301, 0x0055, 0x0302,
++	0x0055, 0x0308, 0x0059, 0x0301, 0x0061, 0x0300, 0x0061, 0x0301,
++	0x0061, 0x0302, 0x0061, 0x0303, 0x0061, 0x0308, 0x0061, 0x030A,
++	0x0063, 0x0327, 0x0065, 0x0300, 0x0065, 0x0301, 0x0065, 0x0302,
++	0x0065, 0x0308, 0x0069, 0x0300, 0x0069, 0x0301, 0x0069, 0x0302,
++	0x0069, 0x0308, 0x006E, 0x0303, 0x006F, 0x0300, 0x006F, 0x0301,
++	0x006F, 0x0302, 0x006F, 0x0303, 0x006F, 0x0308, 0x0075, 0x0300,
++	0x0075, 0x0301, 0x0075, 0x0302, 0x0075, 0x0308, 0x0079, 0x0301,
++	0x0079, 0x0308, 0x0041, 0x0304, 0x0061, 0x0304, 0x0041, 0x0306,
++	0x0061, 0x0306, 0x0041, 0x0328, 0x0061, 0x0328, 0x0043, 0x0301,
++	0x0063, 0x0301, 0x0043, 0x0302, 0x0063, 0x0302, 0x0043, 0x0307,
++	0x0063, 0x0307, 0x0043, 0x030C, 0x0063, 0x030C, 0x0044, 0x030C,
++	0x0064, 0x030C, 0x0045, 0x0304, 0x0065, 0x0304, 0x0045, 0x0306,
++	0x0065, 0x0306, 0x0045, 0x0307, 0x0065, 0x0307, 0x0045, 0x0328,
++	0x0065, 0x0328, 0x0045, 0x030C, 0x0065, 0x030C, 0x0047, 0x0302,
++	0x0067, 0x0302, 0x0047, 0x0306, 0x0067, 0x0306, 0x0047, 0x0307,
++	0x0067, 0x0307, 0x0047, 0x0327, 0x0067, 0x0327, 0x0048, 0x0302,
++	0x0068, 0x0302, 0x0049, 0x0303, 0x0069, 0x0303, 0x0049, 0x0304,
++	0x0069, 0x0304, 0x0049, 0x0306, 0x0069, 0x0306, 0x0049, 0x0328,
++	0x0069, 0x0328, 0x0049, 0x0307, 0x004A, 0x0302, 0x006A, 0x0302,
++	0x004B, 0x0327, 0x006B, 0x0327, 0x004C, 0x0301, 0x006C, 0x0301,
++	0x004C, 0x0327, 0x006C, 0x0327, 0x004C, 0x030C, 0x006C, 0x030C,
++	0x004E, 0x0301, 0x006E, 0x0301, 0x004E, 0x0327, 0x006E, 0x0327,
++	0x004E, 0x030C, 0x006E, 0x030C, 0x004F, 0x0304, 0x006F, 0x0304,
++	0x004F, 0x0306, 0x006F, 0x0306, 0x004F, 0x030B, 0x006F, 0x030B,
++	0x0052, 0x0301, 0x0072, 0x0301, 0x0052, 0x0327, 0x0072, 0x0327,
++	0x0052, 0x030C, 0x0072, 0x030C, 0x0053, 0x0301, 0x0073, 0x0301,
++	0x0053, 0x0302, 0x0073, 0x0302, 0x0053, 0x0327, 0x0073, 0x0327,
++	0x0053, 0x030C, 0x0073, 0x030C, 0x0054, 0x0327, 0x0074, 0x0327,
++	0x0054, 0x030C, 0x0074, 0x030C, 0x0055, 0x0303, 0x0075, 0x0303,
++	0x0055, 0x0304, 0x0075, 0x0304, 0x0055, 0x0306, 0x0075, 0x0306,
++	0x0055, 0x030A, 0x0075, 0x030A, 0x0055, 0x030B, 0x0075, 0x030B,
++	0x0055, 0x0328, 0x0075, 0x0328, 0x0057, 0x0302, 0x0077, 0x0302,
++	0x0059, 0x0302, 0x0079, 0x0302, 0x0059, 0x0308, 0x005A, 0x0301,
++	0x007A, 0x0301, 0x005A, 0x0307, 0x007A, 0x0307, 0x005A, 0x030C,
++	0x007A, 0x030C, 0x004F, 0x031B, 0x006F, 0x031B, 0x0055, 0x031B,
++	0x0075, 0x031B, 0x0041, 0x030C, 0x0061, 0x030C, 0x0049, 0x030C,
++	0x0069, 0x030C, 0x004F, 0x030C, 0x006F, 0x030C, 0x0055, 0x030C,
++	0x0075, 0x030C, 0x00DC, 0x0304, 0x00FC, 0x0304, 0x00DC, 0x0301,
++	0x00FC, 0x0301, 0x00DC, 0x030C, 0x00FC, 0x030C, 0x00DC, 0x0300,
++	0x00FC, 0x0300, 0x00C4, 0x0304, 0x00E4, 0x0304, 0x0226, 0x0304,
++	0x0227, 0x0304, 0x00C6, 0x0304, 0x00E6, 0x0304, 0x0047, 0x030C,
++	0x0067, 0x030C, 0x004B, 0x030C, 0x006B, 0x030C, 0x004F, 0x0328,
++	0x006F, 0x0328, 0x01EA, 0x0304, 0x01EB, 0x0304, 0x01B7, 0x030C,
++	0x0292, 0x030C, 0x006A, 0x030C, 0x0047, 0x0301, 0x0067, 0x0301,
++	0x004E, 0x0300, 0x006E, 0x0300, 0x00C5, 0x0301, 0x00E5, 0x0301,
++	0x00C6, 0x0301, 0x00E6, 0x0301, 0x00D8, 0x0301, 0x00F8, 0x0301,
++	0x0041, 0x030F, 0x0061, 0x030F, 0x0041, 0x0311, 0x0061, 0x0311,
++	0x0045, 0x030F, 0x0065, 0x030F, 0x0045, 0x0311, 0x0065, 0x0311,
++	0x0049, 0x030F, 0x0069, 0x030F, 0x0049, 0x0311, 0x0069, 0x0311,
++	0x004F, 0x030F, 0x006F, 0x030F, 0x004F, 0x0311, 0x006F, 0x0311,
++	0x0052, 0x030F, 0x0072, 0x030F, 0x0052, 0x0311, 0x0072, 0x0311,
++	0x0055, 0x030F, 0x0075, 0x030F, 0x0055, 0x0311, 0x0075, 0x0311,
++	0x0053, 0x0326, 0x0073, 0x0326, 0x0054, 0x0326, 0x0074, 0x0326,
++	0x0048, 0x030C, 0x0068, 0x030C, 0x0041, 0x0307, 0x0061, 0x0307,
++	0x0045, 0x0327, 0x0065, 0x0327, 0x00D6, 0x0304, 0x00F6, 0x0304,
++	0x00D5, 0x0304, 0x00F5, 0x0304, 0x004F, 0x0307, 0x006F, 0x0307,
++	0x022E, 0x0304, 0x022F, 0x0304, 0x0059, 0x0304, 0x0079, 0x0304,
++	0x0308, 0x0301, 0x00A8, 0x0301, 0x0391, 0x0301, 0x0395, 0x0301,
++	0x0397, 0x0301, 0x0399, 0x0301, 0x039F, 0x0301, 0x03A5, 0x0301,
++	0x03A9, 0x0301, 0x03CA, 0x0301, 0x0399, 0x0308, 0x03A5, 0x0308,
++	0x03B1, 0x0301, 0x03B5, 0x0301, 0x03B7, 0x0301, 0x03B9, 0x0301,
++	0x03CB, 0x0301, 0x03B9, 0x0308, 0x03C5, 0x0308, 0x03BF, 0x0301,
++	0x03C5, 0x0301, 0x03C9, 0x0301, 0x03D2, 0x0301, 0x03D2, 0x0308,
++	0x0415, 0x0300, 0x0415, 0x0308, 0x0413, 0x0301, 0x0406, 0x0308,
++	0x041A, 0x0301, 0x0418, 0x0300, 0x0423, 0x0306, 0x0418, 0x0306,
++	0x0438, 0x0306, 0x0435, 0x0300, 0x0435, 0x0308, 0x0433, 0x0301,
++	0x0456, 0x0308, 0x043A, 0x0301, 0x0438, 0x0300, 0x0443, 0x0306,
++	0x0474, 0x030F, 0x0475, 0x030F, 0x0416, 0x0306, 0x0436, 0x0306,
++	0x0410, 0x0306, 0x0430, 0x0306, 0x0410, 0x0308, 0x0430, 0x0308,
++	0x0415, 0x0306, 0x0435, 0x0306, 0x04D8, 0x0308, 0x04D9, 0x0308,
++	0x0416, 0x0308, 0x0436, 0x0308, 0x0417, 0x0308, 0x0437, 0x0308,
++	0x0418, 0x0304, 0x0438, 0x0304, 0x0418, 0x0308, 0x0438, 0x0308,
++	0x041E, 0x0308, 0x043E, 0x0308, 0x04E8, 0x0308, 0x04E9, 0x0308,
++	0x042D, 0x0308, 0x044D, 0x0308, 0x0423, 0x0304, 0x0443, 0x0304,
++	0x0423, 0x0308, 0x0443, 0x0308, 0x0423, 0x030B, 0x0443, 0x030B,
++	0x0427, 0x0308, 0x0447, 0x0308, 0x042B, 0x0308, 0x044B, 0x0308,
++	0x0627, 0x0653, 0x0627, 0x0654, 0x0648, 0x0654, 0x0627, 0x0655,
++	0x064A, 0x0654, 0x06D5, 0x0654, 0x06C1, 0x0654, 0x06D2, 0x0654,
++	0x0928, 0x093C, 0x0930, 0x093C, 0x0933, 0x093C, 0x0915, 0x093C,
++	0x0916, 0x093C, 0x0917, 0x093C, 0x091C, 0x093C, 0x0921, 0x093C,
++	0x0922, 0x093C, 0x092B, 0x093C, 0x092F, 0x093C, 0x09C7, 0x09BE,
++	0x09C7, 0x09D7, 0x09A1, 0x09BC, 0x09A2, 0x09BC, 0x09AF, 0x09BC,
++	0x0A32, 0x0A3C, 0x0A38, 0x0A3C, 0x0A16, 0x0A3C, 0x0A17, 0x0A3C,
++	0x0A1C, 0x0A3C, 0x0A2B, 0x0A3C, 0x0B47, 0x0B56, 0x0B47, 0x0B3E,
++	0x0B47, 0x0B57, 0x0B21, 0x0B3C, 0x0B22, 0x0B3C, 0x0B92, 0x0BD7,
++	0x0BC6, 0x0BBE, 0x0BC7, 0x0BBE, 0x0BC6, 0x0BD7, 0x0C46, 0x0C56,
++	0x0CBF, 0x0CD5, 0x0CC6, 0x0CD5, 0x0CC6, 0x0CD6, 0x0CC6, 0x0CC2,
++	0x0CCA, 0x0CD5, 0x0D46, 0x0D3E, 0x0D47, 0x0D3E, 0x0D46, 0x0D57,
++	0x0DD9, 0x0DCA, 0x0DD9, 0x0DCF, 0x0DDC, 0x0DCA, 0x0DD9, 0x0DDF,
++	0x0F42, 0x0FB7, 0x0F4C, 0x0FB7, 0x0F51, 0x0FB7, 0x0F56, 0x0FB7,
++	0x0F5B, 0x0FB7, 0x0F40, 0x0FB5, 0x0F71, 0x0F72, 0x0F71, 0x0F74,
++	0x0FB2, 0x0F80, 0x0FB3, 0x0F80, 0x0F71, 0x0F80, 0x0F92, 0x0FB7,
++	0x0F9C, 0x0FB7, 0x0FA1, 0x0FB7, 0x0FA6, 0x0FB7, 0x0FAB, 0x0FB7,
++	0x0F90, 0x0FB5, 0x1025, 0x102E, 0x0041, 0x0325, 0x0061, 0x0325,
++	0x0042, 0x0307, 0x0062, 0x0307, 0x0042, 0x0323, 0x0062, 0x0323,
++	0x0042, 0x0331, 0x0062, 0x0331, 0x00C7, 0x0301, 0x00E7, 0x0301,
++	0x0044, 0x0307, 0x0064, 0x0307, 0x0044, 0x0323, 0x0064, 0x0323,
++	0x0044, 0x0331, 0x0064, 0x0331, 0x0044, 0x0327, 0x0064, 0x0327,
++	0x0044, 0x032D, 0x0064, 0x032D, 0x0112, 0x0300, 0x0113, 0x0300,
++	0x0112, 0x0301, 0x0113, 0x0301, 0x0045, 0x032D, 0x0065, 0x032D,
++	0x0045, 0x0330, 0x0065, 0x0330, 0x0228, 0x0306, 0x0229, 0x0306,
++	0x0046, 0x0307, 0x0066, 0x0307, 0x0047, 0x0304, 0x0067, 0x0304,
++	0x0048, 0x0307, 0x0068, 0x0307, 0x0048, 0x0323, 0x0068, 0x0323,
++	0x0048, 0x0308, 0x0068, 0x0308, 0x0048, 0x0327, 0x0068, 0x0327,
++	0x0048, 0x032E, 0x0068, 0x032E, 0x0049, 0x0330, 0x0069, 0x0330,
++	0x00CF, 0x0301, 0x00EF, 0x0301, 0x004B, 0x0301, 0x006B, 0x0301,
++	0x004B, 0x0323, 0x006B, 0x0323, 0x004B, 0x0331, 0x006B, 0x0331,
++	0x004C, 0x0323, 0x006C, 0x0323, 0x1E36, 0x0304, 0x1E37, 0x0304,
++	0x004C, 0x0331, 0x006C, 0x0331, 0x004C, 0x032D, 0x006C, 0x032D,
++	0x004D, 0x0301, 0x006D, 0x0301, 0x004D, 0x0307, 0x006D, 0x0307,
++	0x004D, 0x0323, 0x006D, 0x0323, 0x004E, 0x0307, 0x006E, 0x0307,
++	0x004E, 0x0323, 0x006E, 0x0323, 0x004E, 0x0331, 0x006E, 0x0331,
++	0x004E, 0x032D, 0x006E, 0x032D, 0x00D5, 0x0301, 0x00F5, 0x0301,
++	0x00D5, 0x0308, 0x00F5, 0x0308, 0x014C, 0x0300, 0x014D, 0x0300,
++	0x014C, 0x0301, 0x014D, 0x0301, 0x0050, 0x0301, 0x0070, 0x0301,
++	0x0050, 0x0307, 0x0070, 0x0307, 0x0052, 0x0307, 0x0072, 0x0307,
++	0x0052, 0x0323, 0x0072, 0x0323, 0x1E5A, 0x0304, 0x1E5B, 0x0304,
++	0x0052, 0x0331, 0x0072, 0x0331, 0x0053, 0x0307, 0x0073, 0x0307,
++	0x0053, 0x0323, 0x0073, 0x0323, 0x015A, 0x0307, 0x015B, 0x0307,
++	0x0160, 0x0307, 0x0161, 0x0307, 0x1E62, 0x0307, 0x1E63, 0x0307,
++	0x0054, 0x0307, 0x0074, 0x0307, 0x0054, 0x0323, 0x0074, 0x0323,
++	0x0054, 0x0331, 0x0074, 0x0331, 0x0054, 0x032D, 0x0074, 0x032D,
++	0x0055, 0x0324, 0x0075, 0x0324, 0x0055, 0x0330, 0x0075, 0x0330,
++	0x0055, 0x032D, 0x0075, 0x032D, 0x0168, 0x0301, 0x0169, 0x0301,
++	0x016A, 0x0308, 0x016B, 0x0308, 0x0056, 0x0303, 0x0076, 0x0303,
++	0x0056, 0x0323, 0x0076, 0x0323, 0x0057, 0x0300, 0x0077, 0x0300,
++	0x0057, 0x0301, 0x0077, 0x0301, 0x0057, 0x0308, 0x0077, 0x0308,
++	0x0057, 0x0307, 0x0077, 0x0307, 0x0057, 0x0323, 0x0077, 0x0323,
++	0x0058, 0x0307, 0x0078, 0x0307, 0x0058, 0x0308, 0x0078, 0x0308,
++	0x0059, 0x0307, 0x0079, 0x0307, 0x005A, 0x0302, 0x007A, 0x0302,
++	0x005A, 0x0323, 0x007A, 0x0323, 0x005A, 0x0331, 0x007A, 0x0331,
++	0x0068, 0x0331, 0x0074, 0x0308, 0x0077, 0x030A, 0x0079, 0x030A,
++	0x017F, 0x0307, 0x0041, 0x0323, 0x0061, 0x0323, 0x0041, 0x0309,
++	0x0061, 0x0309, 0x00C2, 0x0301, 0x00E2, 0x0301, 0x00C2, 0x0300,
++	0x00E2, 0x0300, 0x00C2, 0x0309, 0x00E2, 0x0309, 0x00C2, 0x0303,
++	0x00E2, 0x0303, 0x1EA0, 0x0302, 0x1EA1, 0x0302, 0x0102, 0x0301,
++	0x0103, 0x0301, 0x0102, 0x0300, 0x0103, 0x0300, 0x0102, 0x0309,
++	0x0103, 0x0309, 0x0102, 0x0303, 0x0103, 0x0303, 0x1EA0, 0x0306,
++	0x1EA1, 0x0306, 0x0045, 0x0323, 0x0065, 0x0323, 0x0045, 0x0309,
++	0x0065, 0x0309, 0x0045, 0x0303, 0x0065, 0x0303, 0x00CA, 0x0301,
++	0x00EA, 0x0301, 0x00CA, 0x0300, 0x00EA, 0x0300, 0x00CA, 0x0309,
++	0x00EA, 0x0309, 0x00CA, 0x0303, 0x00EA, 0x0303, 0x1EB8, 0x0302,
++	0x1EB9, 0x0302, 0x0049, 0x0309, 0x0069, 0x0309, 0x0049, 0x0323,
++	0x0069, 0x0323, 0x004F, 0x0323, 0x006F, 0x0323, 0x004F, 0x0309,
++	0x006F, 0x0309, 0x00D4, 0x0301, 0x00F4, 0x0301, 0x00D4, 0x0300,
++	0x00F4, 0x0300, 0x00D4, 0x0309, 0x00F4, 0x0309, 0x00D4, 0x0303,
++	0x00F4, 0x0303, 0x1ECC, 0x0302, 0x1ECD, 0x0302, 0x01A0, 0x0301,
++	0x01A1, 0x0301, 0x01A0, 0x0300, 0x01A1, 0x0300, 0x01A0, 0x0309,
++	0x01A1, 0x0309, 0x01A0, 0x0303, 0x01A1, 0x0303, 0x01A0, 0x0323,
++	0x01A1, 0x0323, 0x0055, 0x0323, 0x0075, 0x0323, 0x0055, 0x0309,
++	0x0075, 0x0309, 0x01AF, 0x0301, 0x01B0, 0x0301, 0x01AF, 0x0300,
++	0x01B0, 0x0300, 0x01AF, 0x0309, 0x01B0, 0x0309, 0x01AF, 0x0303,
++	0x01B0, 0x0303, 0x01AF, 0x0323, 0x01B0, 0x0323, 0x0059, 0x0300,
++	0x0079, 0x0300, 0x0059, 0x0323, 0x0079, 0x0323, 0x0059, 0x0309,
++	0x0079, 0x0309, 0x0059, 0x0303, 0x0079, 0x0303, 0x03B1, 0x0313,
++	0x03B1, 0x0314, 0x1F00, 0x0300, 0x1F01, 0x0300, 0x1F00, 0x0301,
++	0x1F01, 0x0301, 0x1F00, 0x0342, 0x1F01, 0x0342, 0x0391, 0x0313,
++	0x0391, 0x0314, 0x1F08, 0x0300, 0x1F09, 0x0300, 0x1F08, 0x0301,
++	0x1F09, 0x0301, 0x1F08, 0x0342, 0x1F09, 0x0342, 0x03B5, 0x0313,
++	0x03B5, 0x0314, 0x1F10, 0x0300, 0x1F11, 0x0300, 0x1F10, 0x0301,
++	0x1F11, 0x0301, 0x0395, 0x0313, 0x0395, 0x0314, 0x1F18, 0x0300,
++	0x1F19, 0x0300, 0x1F18, 0x0301, 0x1F19, 0x0301, 0x03B7, 0x0313,
++	0x03B7, 0x0314, 0x1F20, 0x0300, 0x1F21, 0x0300, 0x1F20, 0x0301,
++	0x1F21, 0x0301, 0x1F20, 0x0342, 0x1F21, 0x0342, 0x0397, 0x0313,
++	0x0397, 0x0314, 0x1F28, 0x0300, 0x1F29, 0x0300, 0x1F28, 0x0301,
++	0x1F29, 0x0301, 0x1F28, 0x0342, 0x1F29, 0x0342, 0x03B9, 0x0313,
++	0x03B9, 0x0314, 0x1F30, 0x0300, 0x1F31, 0x0300, 0x1F30, 0x0301,
++	0x1F31, 0x0301, 0x1F30, 0x0342, 0x1F31, 0x0342, 0x0399, 0x0313,
++	0x0399, 0x0314, 0x1F38, 0x0300, 0x1F39, 0x0300, 0x1F38, 0x0301,
++	0x1F39, 0x0301, 0x1F38, 0x0342, 0x1F39, 0x0342, 0x03BF, 0x0313,
++	0x03BF, 0x0314, 0x1F40, 0x0300, 0x1F41, 0x0300, 0x1F40, 0x0301,
++	0x1F41, 0x0301, 0x039F, 0x0313, 0x039F, 0x0314, 0x1F48, 0x0300,
++	0x1F49, 0x0300, 0x1F48, 0x0301, 0x1F49, 0x0301, 0x03C5, 0x0313,
++	0x03C5, 0x0314, 0x1F50, 0x0300, 0x1F51, 0x0300, 0x1F50, 0x0301,
++	0x1F51, 0x0301, 0x1F50, 0x0342, 0x1F51, 0x0342, 0x03A5, 0x0314,
++	0x1F59, 0x0300, 0x1F59, 0x0301, 0x1F59, 0x0342, 0x03C9, 0x0313,
++	0x03C9, 0x0314, 0x1F60, 0x0300, 0x1F61, 0x0300, 0x1F60, 0x0301,
++	0x1F61, 0x0301, 0x1F60, 0x0342, 0x1F61, 0x0342, 0x03A9, 0x0313,
++	0x03A9, 0x0314, 0x1F68, 0x0300, 0x1F69, 0x0300, 0x1F68, 0x0301,
++	0x1F69, 0x0301, 0x1F68, 0x0342, 0x1F69, 0x0342, 0x03B1, 0x0300,
++	0x03B5, 0x0300, 0x03B7, 0x0300, 0x03B9, 0x0300, 0x03BF, 0x0300,
++	0x03C5, 0x0300, 0x03C9, 0x0300, 0x1F00, 0x0345, 0x1F01, 0x0345,
++	0x1F02, 0x0345, 0x1F03, 0x0345, 0x1F04, 0x0345, 0x1F05, 0x0345,
++	0x1F06, 0x0345, 0x1F07, 0x0345, 0x1F08, 0x0345, 0x1F09, 0x0345,
++	0x1F0A, 0x0345, 0x1F0B, 0x0345, 0x1F0C, 0x0345, 0x1F0D, 0x0345,
++	0x1F0E, 0x0345, 0x1F0F, 0x0345, 0x1F20, 0x0345, 0x1F21, 0x0345,
++	0x1F22, 0x0345, 0x1F23, 0x0345, 0x1F24, 0x0345, 0x1F25, 0x0345,
++	0x1F26, 0x0345, 0x1F27, 0x0345, 0x1F28, 0x0345, 0x1F29, 0x0345,
++	0x1F2A, 0x0345, 0x1F2B, 0x0345, 0x1F2C, 0x0345, 0x1F2D, 0x0345,
++	0x1F2E, 0x0345, 0x1F2F, 0x0345, 0x1F60, 0x0345, 0x1F61, 0x0345,
++	0x1F62, 0x0345, 0x1F63, 0x0345, 0x1F64, 0x0345, 0x1F65, 0x0345,
++	0x1F66, 0x0345, 0x1F67, 0x0345, 0x1F68, 0x0345, 0x1F69, 0x0345,
++	0x1F6A, 0x0345, 0x1F6B, 0x0345, 0x1F6C, 0x0345, 0x1F6D, 0x0345,
++	0x1F6E, 0x0345, 0x1F6F, 0x0345, 0x03B1, 0x0306, 0x03B1, 0x0304,
++	0x1F70, 0x0345, 0x03B1, 0x0345, 0x03AC, 0x0345, 0x03B1, 0x0342,
++	0x1FB6, 0x0345, 0x0391, 0x0306, 0x0391, 0x0304, 0x0391, 0x0300,
++	0x0391, 0x0345, 0x00A8, 0x0342, 0x1F74, 0x0345, 0x03B7, 0x0345,
++	0x03AE, 0x0345, 0x03B7, 0x0342, 0x1FC6, 0x0345, 0x0395, 0x0300,
++	0x0397, 0x0300, 0x0397, 0x0345, 0x1FBF, 0x0300, 0x1FBF, 0x0301,
++	0x1FBF, 0x0342, 0x03B9, 0x0306, 0x03B9, 0x0304, 0x03CA, 0x0300,
++	0x03B9, 0x0342, 0x03CA, 0x0342, 0x0399, 0x0306, 0x0399, 0x0304,
++	0x0399, 0x0300, 0x1FFE, 0x0300, 0x1FFE, 0x0301, 0x1FFE, 0x0342,
++	0x03C5, 0x0306, 0x03C5, 0x0304, 0x03CB, 0x0300, 0x03C1, 0x0313,
++	0x03C1, 0x0314, 0x03C5, 0x0342, 0x03CB, 0x0342, 0x03A5, 0x0306,
++	0x03A5, 0x0304, 0x03A5, 0x0300, 0x03A1, 0x0314, 0x00A8, 0x0300,
++	0x1F7C, 0x0345, 0x03C9, 0x0345, 0x03CE, 0x0345, 0x03C9, 0x0342,
++	0x1FF6, 0x0345, 0x039F, 0x0300, 0x03A9, 0x0300, 0x03A9, 0x0345,
++	0x304B, 0x3099, 0x304D, 0x3099, 0x304F, 0x3099, 0x3051, 0x3099,
++	0x3053, 0x3099, 0x3055, 0x3099, 0x3057, 0x3099, 0x3059, 0x3099,
++	0x305B, 0x3099, 0x305D, 0x3099, 0x305F, 0x3099, 0x3061, 0x3099,
++	0x3064, 0x3099, 0x3066, 0x3099, 0x3068, 0x3099, 0x306F, 0x3099,
++	0x306F, 0x309A, 0x3072, 0x3099, 0x3072, 0x309A, 0x3075, 0x3099,
++	0x3075, 0x309A, 0x3078, 0x3099, 0x3078, 0x309A, 0x307B, 0x3099,
++	0x307B, 0x309A, 0x3046, 0x3099, 0x309D, 0x3099, 0x30AB, 0x3099,
++	0x30AD, 0x3099, 0x30AF, 0x3099, 0x30B1, 0x3099, 0x30B3, 0x3099,
++	0x30B5, 0x3099, 0x30B7, 0x3099, 0x30B9, 0x3099, 0x30BB, 0x3099,
++	0x30BD, 0x3099, 0x30BF, 0x3099, 0x30C1, 0x3099, 0x30C4, 0x3099,
++	0x30C6, 0x3099, 0x30C8, 0x3099, 0x30CF, 0x3099, 0x30CF, 0x309A,
++	0x30D2, 0x3099, 0x30D2, 0x309A, 0x30D5, 0x3099, 0x30D5, 0x309A,
++	0x30D8, 0x3099, 0x30D8, 0x309A, 0x30DB, 0x3099, 0x30DB, 0x309A,
++	0x30A6, 0x3099, 0x30EF, 0x3099, 0x30F0, 0x3099, 0x30F1, 0x3099,
++	0x30F2, 0x3099, 0x30FD, 0x3099, 0x05D9, 0x05B4, 0x05F2, 0x05B7,
++	0x05E9, 0x05C1, 0x05E9, 0x05C2, 0xFB49, 0x05C1, 0xFB49, 0x05C2,
++	0x05D0, 0x05B7, 0x05D0, 0x05B8, 0x05D0, 0x05BC, 0x05D1, 0x05BC,
++	0x05D2, 0x05BC, 0x05D3, 0x05BC, 0x05D4, 0x05BC, 0x05D5, 0x05BC,
++	0x05D6, 0x05BC, 0x05D8, 0x05BC, 0x05D9, 0x05BC, 0x05DA, 0x05BC,
++	0x05DB, 0x05BC, 0x05DC, 0x05BC, 0x05DE, 0x05BC, 0x05E0, 0x05BC,
++	0x05E1, 0x05BC, 0x05E3, 0x05BC, 0x05E4, 0x05BC, 0x05E6, 0x05BC,
++	0x05E7, 0x05BC, 0x05E8, 0x05BC, 0x05E9, 0x05BC, 0x05EA, 0x05BC,
++	0x05D5, 0x05B9, 0x05D1, 0x05BF, 0x05DB, 0x05BF, 0x05E4, 0x05BF
++};
++
++static const u_int8_t
++__CFUniCharDecomposableBitmap[] = {
++	0x01, 0x02, 0x03, 0x04, 0x05, 0x00, 0x06, 0x00,
++	0x00, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x00, 0x0C,
++	0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E, 0x0F,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x11,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x00,
++
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xBF, 0xFF, 0x7E, 0x3E, 0xBF, 0xFF, 0x7E, 0xBE,
++	0xFF, 0xFF, 0xFC, 0xFF, 0x3F, 0xFF, 0xF1, 0x7E,
++	0xF8, 0xF1, 0xF3, 0xFF, 0x3F, 0xFF, 0xFF, 0x7F,
++	0x00, 0x00, 0x00, 0x00, 0x03, 0x80, 0x01, 0x00,
++	0x00, 0xE0, 0xFF, 0xDF, 0xCF, 0xFF, 0x31, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xCF, 0xC0, 0xFF, 0x0F, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x1B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x40,
++	0xE0, 0xD7, 0x01, 0x00, 0x00, 0xFC, 0x01, 0x00,
++	0x00, 0x7C, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x8B, 0x70, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02,
++	0x00, 0x00, 0x8B, 0x70, 0x00, 0x00, 0xC0, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x06, 0x00, 0xCF, 0xFC, 0xFC, 0xFC, 0x3F, 0x03,
++	0x00, 0x00, 0x00, 0x00, 0x7C, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x05, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x12, 0x00,
++	0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x18, 0x00, 0xB0, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x00,
++	0x00, 0x00, 0x00, 0x4E, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x19, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x1C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x81, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x1C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x74, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x08, 0x20, 0x84, 0x10, 0x00, 0x02, 0x68, 0x01,
++	0x02, 0x00, 0x08, 0x20, 0x84, 0x10, 0x00, 0x02,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0x0B, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x03,
++	0xFF, 0xFF, 0x3F, 0x3F, 0xFF, 0xFF, 0xFF, 0xFF,
++	0x3F, 0x3F, 0xFF, 0xAA, 0xFF, 0xFF, 0xFF, 0x3F,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xDF, 0x5F,
++	0xDE, 0xFF, 0xCF, 0xEF, 0xFF, 0xFF, 0xDC, 0x3F,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x50, 0x55, 0x55, 0xA5, 0x02, 0xDB, 0x36,
++	0x00, 0x00, 0x10, 0x40, 0x00, 0x50, 0x55, 0x55,
++	0xA5, 0x02, 0xDB, 0x36, 0x00, 0x00, 0x90, 0x47,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0xFF, 0xFF, 0x0F, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0xA0, 0x00, 0xFC, 0x7F, 0x5F,
++	0xDB, 0x7F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static const u_int32_t
++__CFUniCharPrecompSourceTable[] = {
++	0x00000300, 0x00540000, 0x00000301, 0x00750054,
++	0x00000302, 0x002000C9, 0x00000303, 0x001C00E9,
++	0x00000304, 0x002C0105, 0x00000306, 0x00200131,
++	0x00000307, 0x002E0151, 0x00000308, 0x0036017F,
++	0x00000309, 0x001801B5, 0x0000030A, 0x000601CD,
++	0x0000030B, 0x000601D3, 0x0000030C, 0x002501D9,
++	0x0000030F, 0x000E01FE, 0x00000311, 0x000C020C,
++	0x00000313, 0x000E0218, 0x00000314, 0x00100226,
++	0x0000031B, 0x00040236, 0x00000323, 0x002A023A,
++	0x00000324, 0x00020264, 0x00000325, 0x00020266,
++	0x00000326, 0x00040268, 0x00000327, 0x0016026C,
++	0x00000328, 0x000A0282, 0x0000032D, 0x000C028C,
++	0x0000032E, 0x00020298, 0x00000330, 0x0006029A,
++	0x00000331, 0x001102A0, 0x00000338, 0x002C02B1,
++	0x00000342, 0x001D02DD, 0x00000345, 0x003F02FA,
++	0x00000653, 0x00010339, 0x00000654, 0x0006033A,
++	0x00000655, 0x00010340, 0x0000093C, 0x00030341,
++	0x000009BE, 0x00010344, 0x000009D7, 0x00010345,
++	0x00000B3E, 0x00010346, 0x00000B56, 0x00010347,
++	0x00000B57, 0x00010348, 0x00000BBE, 0x00020349,
++	0x00000BD7, 0x0002034B, 0x00000C56, 0x0001034D,
++	0x00000CC2, 0x0001034E, 0x00000CD5, 0x0003034F,
++	0x00000CD6, 0x00010352, 0x00000D3E, 0x00020353,
++	0x00000D57, 0x00010355, 0x00000DCA, 0x00020356,
++	0x00000DCF, 0x00010358, 0x00000DDF, 0x00010359,
++	0x0000102E, 0x0001035A, 0x00003099, 0x0030035B,
++	0x0000309A, 0x000A038B
++};
++
++static const u_int32_t __CFUniCharPrecompositionTableLength =
++		(sizeof(__CFUniCharPrecompSourceTable) / (sizeof(u_int32_t) * 2));
++
++
++static const u_int16_t
++__CFUniCharBMPPrecompDestinationTable[] = {
++	0x0041, 0x00C0, 0x0045, 0x00C8, 0x0049, 0x00CC, 0x004E, 0x01F8,
++	0x004F, 0x00D2, 0x0055, 0x00D9, 0x0057, 0x1E80, 0x0059, 0x1EF2,
++	0x0061, 0x00E0, 0x0065, 0x00E8, 0x0069, 0x00EC, 0x006E, 0x01F9,
++	0x006F, 0x00F2, 0x0075, 0x00F9, 0x0077, 0x1E81, 0x0079, 0x1EF3,
++	0x00A8, 0x1FED, 0x00C2, 0x1EA6, 0x00CA, 0x1EC0, 0x00D4, 0x1ED2,
++	0x00DC, 0x01DB, 0x00E2, 0x1EA7, 0x00EA, 0x1EC1, 0x00F4, 0x1ED3,
++	0x00FC, 0x01DC, 0x0102, 0x1EB0, 0x0103, 0x1EB1, 0x0112, 0x1E14,
++	0x0113, 0x1E15, 0x014C, 0x1E50, 0x014D, 0x1E51, 0x01A0, 0x1EDC,
++	0x01A1, 0x1EDD, 0x01AF, 0x1EEA, 0x01B0, 0x1EEB, 0x0391, 0x1FBA,
++	0x0395, 0x1FC8, 0x0397, 0x1FCA, 0x0399, 0x1FDA, 0x039F, 0x1FF8,
++	0x03A5, 0x1FEA, 0x03A9, 0x1FFA, 0x03B1, 0x1F70, 0x03B5, 0x1F72,
++	0x03B7, 0x1F74, 0x03B9, 0x1F76, 0x03BF, 0x1F78, 0x03C5, 0x1F7A,
++	0x03C9, 0x1F7C, 0x03CA, 0x1FD2, 0x03CB, 0x1FE2, 0x0415, 0x0400,
++	0x0418, 0x040D, 0x0435, 0x0450, 0x0438, 0x045D, 0x1F00, 0x1F02,
++	0x1F01, 0x1F03, 0x1F08, 0x1F0A, 0x1F09, 0x1F0B, 0x1F10, 0x1F12,
++	0x1F11, 0x1F13, 0x1F18, 0x1F1A, 0x1F19, 0x1F1B, 0x1F20, 0x1F22,
++	0x1F21, 0x1F23, 0x1F28, 0x1F2A, 0x1F29, 0x1F2B, 0x1F30, 0x1F32,
++	0x1F31, 0x1F33, 0x1F38, 0x1F3A, 0x1F39, 0x1F3B, 0x1F40, 0x1F42,
++	0x1F41, 0x1F43, 0x1F48, 0x1F4A, 0x1F49, 0x1F4B, 0x1F50, 0x1F52,
++	0x1F51, 0x1F53, 0x1F59, 0x1F5B, 0x1F60, 0x1F62, 0x1F61, 0x1F63,
++	0x1F68, 0x1F6A, 0x1F69, 0x1F6B, 0x1FBF, 0x1FCD, 0x1FFE, 0x1FDD,
++	0x0041, 0x00C1, 0x0043, 0x0106, 0x0045, 0x00C9, 0x0047, 0x01F4,
++	0x0049, 0x00CD, 0x004B, 0x1E30, 0x004C, 0x0139, 0x004D, 0x1E3E,
++	0x004E, 0x0143, 0x004F, 0x00D3, 0x0050, 0x1E54, 0x0052, 0x0154,
++	0x0053, 0x015A, 0x0055, 0x00DA, 0x0057, 0x1E82, 0x0059, 0x00DD,
++	0x005A, 0x0179, 0x0061, 0x00E1, 0x0063, 0x0107, 0x0065, 0x00E9,
++	0x0067, 0x01F5, 0x0069, 0x00ED, 0x006B, 0x1E31, 0x006C, 0x013A,
++	0x006D, 0x1E3F, 0x006E, 0x0144, 0x006F, 0x00F3, 0x0070, 0x1E55,
++	0x0072, 0x0155, 0x0073, 0x015B, 0x0075, 0x00FA, 0x0077, 0x1E83,
++	0x0079, 0x00FD, 0x007A, 0x017A, 0x00A8, 0x0385, 0x00C2, 0x1EA4,
++	0x00C5, 0x01FA, 0x00C6, 0x01FC, 0x00C7, 0x1E08, 0x00CA, 0x1EBE,
++	0x00CF, 0x1E2E, 0x00D4, 0x1ED0, 0x00D5, 0x1E4C, 0x00D8, 0x01FE,
++	0x00DC, 0x01D7, 0x00E2, 0x1EA5, 0x00E5, 0x01FB, 0x00E6, 0x01FD,
++	0x00E7, 0x1E09, 0x00EA, 0x1EBF, 0x00EF, 0x1E2F, 0x00F4, 0x1ED1,
++	0x00F5, 0x1E4D, 0x00F8, 0x01FF, 0x00FC, 0x01D8, 0x0102, 0x1EAE,
++	0x0103, 0x1EAF, 0x0112, 0x1E16, 0x0113, 0x1E17, 0x014C, 0x1E52,
++	0x014D, 0x1E53, 0x0168, 0x1E78, 0x0169, 0x1E79, 0x01A0, 0x1EDA,
++	0x01A1, 0x1EDB, 0x01AF, 0x1EE8, 0x01B0, 0x1EE9, 0x0391, 0x0386,
++	0x0395, 0x0388, 0x0397, 0x0389, 0x0399, 0x038A, 0x039F, 0x038C,
++	0x03A5, 0x038E, 0x03A9, 0x038F, 0x03B1, 0x03AC, 0x03B5, 0x03AD,
++	0x03B7, 0x03AE, 0x03B9, 0x03AF, 0x03BF, 0x03CC, 0x03C5, 0x03CD,
++	0x03C9, 0x03CE, 0x03CA, 0x0390, 0x03CB, 0x03B0, 0x03D2, 0x03D3,
++	0x0413, 0x0403, 0x041A, 0x040C, 0x0433, 0x0453, 0x043A, 0x045C,
++	0x1F00, 0x1F04, 0x1F01, 0x1F05, 0x1F08, 0x1F0C, 0x1F09, 0x1F0D,
++	0x1F10, 0x1F14, 0x1F11, 0x1F15, 0x1F18, 0x1F1C, 0x1F19, 0x1F1D,
++	0x1F20, 0x1F24, 0x1F21, 0x1F25, 0x1F28, 0x1F2C, 0x1F29, 0x1F2D,
++	0x1F30, 0x1F34, 0x1F31, 0x1F35, 0x1F38, 0x1F3C, 0x1F39, 0x1F3D,
++	0x1F40, 0x1F44, 0x1F41, 0x1F45, 0x1F48, 0x1F4C, 0x1F49, 0x1F4D,
++	0x1F50, 0x1F54, 0x1F51, 0x1F55, 0x1F59, 0x1F5D, 0x1F60, 0x1F64,
++	0x1F61, 0x1F65, 0x1F68, 0x1F6C, 0x1F69, 0x1F6D, 0x1FBF, 0x1FCE,
++	0x1FFE, 0x1FDE, 0x0041, 0x00C2, 0x0043, 0x0108, 0x0045, 0x00CA,
++	0x0047, 0x011C, 0x0048, 0x0124, 0x0049, 0x00CE, 0x004A, 0x0134,
++	0x004F, 0x00D4, 0x0053, 0x015C, 0x0055, 0x00DB, 0x0057, 0x0174,
++	0x0059, 0x0176, 0x005A, 0x1E90, 0x0061, 0x00E2, 0x0063, 0x0109,
++	0x0065, 0x00EA, 0x0067, 0x011D, 0x0068, 0x0125, 0x0069, 0x00EE,
++	0x006A, 0x0135, 0x006F, 0x00F4, 0x0073, 0x015D, 0x0075, 0x00FB,
++	0x0077, 0x0175, 0x0079, 0x0177, 0x007A, 0x1E91, 0x1EA0, 0x1EAC,
++	0x1EA1, 0x1EAD, 0x1EB8, 0x1EC6, 0x1EB9, 0x1EC7, 0x1ECC, 0x1ED8,
++	0x1ECD, 0x1ED9, 0x0041, 0x00C3, 0x0045, 0x1EBC, 0x0049, 0x0128,
++	0x004E, 0x00D1, 0x004F, 0x00D5, 0x0055, 0x0168, 0x0056, 0x1E7C,
++	0x0059, 0x1EF8, 0x0061, 0x00E3, 0x0065, 0x1EBD, 0x0069, 0x0129,
++	0x006E, 0x00F1, 0x006F, 0x00F5, 0x0075, 0x0169, 0x0076, 0x1E7D,
++	0x0079, 0x1EF9, 0x00C2, 0x1EAA, 0x00CA, 0x1EC4, 0x00D4, 0x1ED6,
++	0x00E2, 0x1EAB, 0x00EA, 0x1EC5, 0x00F4, 0x1ED7, 0x0102, 0x1EB4,
++	0x0103, 0x1EB5, 0x01A0, 0x1EE0, 0x01A1, 0x1EE1, 0x01AF, 0x1EEE,
++	0x01B0, 0x1EEF, 0x0041, 0x0100, 0x0045, 0x0112, 0x0047, 0x1E20,
++	0x0049, 0x012A, 0x004F, 0x014C, 0x0055, 0x016A, 0x0059, 0x0232,
++	0x0061, 0x0101, 0x0065, 0x0113, 0x0067, 0x1E21, 0x0069, 0x012B,
++	0x006F, 0x014D, 0x0075, 0x016B, 0x0079, 0x0233, 0x00C4, 0x01DE,
++	0x00C6, 0x01E2, 0x00D5, 0x022C, 0x00D6, 0x022A, 0x00DC, 0x01D5,
++	0x00E4, 0x01DF, 0x00E6, 0x01E3, 0x00F5, 0x022D, 0x00F6, 0x022B,
++	0x00FC, 0x01D6, 0x01EA, 0x01EC, 0x01EB, 0x01ED, 0x0226, 0x01E0,
++	0x0227, 0x01E1, 0x022E, 0x0230, 0x022F, 0x0231, 0x0391, 0x1FB9,
++	0x0399, 0x1FD9, 0x03A5, 0x1FE9, 0x03B1, 0x1FB1, 0x03B9, 0x1FD1,
++	0x03C5, 0x1FE1, 0x0418, 0x04E2, 0x0423, 0x04EE, 0x0438, 0x04E3,
++	0x0443, 0x04EF, 0x1E36, 0x1E38, 0x1E37, 0x1E39, 0x1E5A, 0x1E5C,
++	0x1E5B, 0x1E5D, 0x0041, 0x0102, 0x0045, 0x0114, 0x0047, 0x011E,
++	0x0049, 0x012C, 0x004F, 0x014E, 0x0055, 0x016C, 0x0061, 0x0103,
++	0x0065, 0x0115, 0x0067, 0x011F, 0x0069, 0x012D, 0x006F, 0x014F,
++	0x0075, 0x016D, 0x0228, 0x1E1C, 0x0229, 0x1E1D, 0x0391, 0x1FB8,
++	0x0399, 0x1FD8, 0x03A5, 0x1FE8, 0x03B1, 0x1FB0, 0x03B9, 0x1FD0,
++	0x03C5, 0x1FE0, 0x0410, 0x04D0, 0x0415, 0x04D6, 0x0416, 0x04C1,
++	0x0418, 0x0419, 0x0423, 0x040E, 0x0430, 0x04D1, 0x0435, 0x04D7,
++	0x0436, 0x04C2, 0x0438, 0x0439, 0x0443, 0x045E, 0x1EA0, 0x1EB6,
++	0x1EA1, 0x1EB7, 0x0041, 0x0226, 0x0042, 0x1E02, 0x0043, 0x010A,
++	0x0044, 0x1E0A, 0x0045, 0x0116, 0x0046, 0x1E1E, 0x0047, 0x0120,
++	0x0048, 0x1E22, 0x0049, 0x0130, 0x004D, 0x1E40, 0x004E, 0x1E44,
++	0x004F, 0x022E, 0x0050, 0x1E56, 0x0052, 0x1E58, 0x0053, 0x1E60,
++	0x0054, 0x1E6A, 0x0057, 0x1E86, 0x0058, 0x1E8A, 0x0059, 0x1E8E,
++	0x005A, 0x017B, 0x0061, 0x0227, 0x0062, 0x1E03, 0x0063, 0x010B,
++	0x0064, 0x1E0B, 0x0065, 0x0117, 0x0066, 0x1E1F, 0x0067, 0x0121,
++	0x0068, 0x1E23, 0x006D, 0x1E41, 0x006E, 0x1E45, 0x006F, 0x022F,
++	0x0070, 0x1E57, 0x0072, 0x1E59, 0x0073, 0x1E61, 0x0074, 0x1E6B,
++	0x0077, 0x1E87, 0x0078, 0x1E8B, 0x0079, 0x1E8F, 0x007A, 0x017C,
++	0x015A, 0x1E64, 0x015B, 0x1E65, 0x0160, 0x1E66, 0x0161, 0x1E67,
++	0x017F, 0x1E9B, 0x1E62, 0x1E68, 0x1E63, 0x1E69, 0x0041, 0x00C4,
++	0x0045, 0x00CB, 0x0048, 0x1E26, 0x0049, 0x00CF, 0x004F, 0x00D6,
++	0x0055, 0x00DC, 0x0057, 0x1E84, 0x0058, 0x1E8C, 0x0059, 0x0178,
++	0x0061, 0x00E4, 0x0065, 0x00EB, 0x0068, 0x1E27, 0x0069, 0x00EF,
++	0x006F, 0x00F6, 0x0074, 0x1E97, 0x0075, 0x00FC, 0x0077, 0x1E85,
++	0x0078, 0x1E8D, 0x0079, 0x00FF, 0x00D5, 0x1E4E, 0x00F5, 0x1E4F,
++	0x016A, 0x1E7A, 0x016B, 0x1E7B, 0x0399, 0x03AA, 0x03A5, 0x03AB,
++	0x03B9, 0x03CA, 0x03C5, 0x03CB, 0x03D2, 0x03D4, 0x0406, 0x0407,
++	0x0410, 0x04D2, 0x0415, 0x0401, 0x0416, 0x04DC, 0x0417, 0x04DE,
++	0x0418, 0x04E4, 0x041E, 0x04E6, 0x0423, 0x04F0, 0x0427, 0x04F4,
++	0x042B, 0x04F8, 0x042D, 0x04EC, 0x0430, 0x04D3, 0x0435, 0x0451,
++	0x0436, 0x04DD, 0x0437, 0x04DF, 0x0438, 0x04E5, 0x043E, 0x04E7,
++	0x0443, 0x04F1, 0x0447, 0x04F5, 0x044B, 0x04F9, 0x044D, 0x04ED,
++	0x0456, 0x0457, 0x04D8, 0x04DA, 0x04D9, 0x04DB, 0x04E8, 0x04EA,
++	0x04E9, 0x04EB, 0x0041, 0x1EA2, 0x0045, 0x1EBA, 0x0049, 0x1EC8,
++	0x004F, 0x1ECE, 0x0055, 0x1EE6, 0x0059, 0x1EF6, 0x0061, 0x1EA3,
++	0x0065, 0x1EBB, 0x0069, 0x1EC9, 0x006F, 0x1ECF, 0x0075, 0x1EE7,
++	0x0079, 0x1EF7, 0x00C2, 0x1EA8, 0x00CA, 0x1EC2, 0x00D4, 0x1ED4,
++	0x00E2, 0x1EA9, 0x00EA, 0x1EC3, 0x00F4, 0x1ED5, 0x0102, 0x1EB2,
++	0x0103, 0x1EB3, 0x01A0, 0x1EDE, 0x01A1, 0x1EDF, 0x01AF, 0x1EEC,
++	0x01B0, 0x1EED, 0x0041, 0x00C5, 0x0055, 0x016E, 0x0061, 0x00E5,
++	0x0075, 0x016F, 0x0077, 0x1E98, 0x0079, 0x1E99, 0x004F, 0x0150,
++	0x0055, 0x0170, 0x006F, 0x0151, 0x0075, 0x0171, 0x0423, 0x04F2,
++	0x0443, 0x04F3, 0x0041, 0x01CD, 0x0043, 0x010C, 0x0044, 0x010E,
++	0x0045, 0x011A, 0x0047, 0x01E6, 0x0048, 0x021E, 0x0049, 0x01CF,
++	0x004B, 0x01E8, 0x004C, 0x013D, 0x004E, 0x0147, 0x004F, 0x01D1,
++	0x0052, 0x0158, 0x0053, 0x0160, 0x0054, 0x0164, 0x0055, 0x01D3,
++	0x005A, 0x017D, 0x0061, 0x01CE, 0x0063, 0x010D, 0x0064, 0x010F,
++	0x0065, 0x011B, 0x0067, 0x01E7, 0x0068, 0x021F, 0x0069, 0x01D0,
++	0x006A, 0x01F0, 0x006B, 0x01E9, 0x006C, 0x013E, 0x006E, 0x0148,
++	0x006F, 0x01D2, 0x0072, 0x0159, 0x0073, 0x0161, 0x0074, 0x0165,
++	0x0075, 0x01D4, 0x007A, 0x017E, 0x00DC, 0x01D9, 0x00FC, 0x01DA,
++	0x01B7, 0x01EE, 0x0292, 0x01EF, 0x0041, 0x0200, 0x0045, 0x0204,
++	0x0049, 0x0208, 0x004F, 0x020C, 0x0052, 0x0210, 0x0055, 0x0214,
++	0x0061, 0x0201, 0x0065, 0x0205, 0x0069, 0x0209, 0x006F, 0x020D,
++	0x0072, 0x0211, 0x0075, 0x0215, 0x0474, 0x0476, 0x0475, 0x0477,
++	0x0041, 0x0202, 0x0045, 0x0206, 0x0049, 0x020A, 0x004F, 0x020E,
++	0x0052, 0x0212, 0x0055, 0x0216, 0x0061, 0x0203, 0x0065, 0x0207,
++	0x0069, 0x020B, 0x006F, 0x020F, 0x0072, 0x0213, 0x0075, 0x0217,
++	0x0391, 0x1F08, 0x0395, 0x1F18, 0x0397, 0x1F28, 0x0399, 0x1F38,
++	0x039F, 0x1F48, 0x03A9, 0x1F68, 0x03B1, 0x1F00, 0x03B5, 0x1F10,
++	0x03B7, 0x1F20, 0x03B9, 0x1F30, 0x03BF, 0x1F40, 0x03C1, 0x1FE4,
++	0x03C5, 0x1F50, 0x03C9, 0x1F60, 0x0391, 0x1F09, 0x0395, 0x1F19,
++	0x0397, 0x1F29, 0x0399, 0x1F39, 0x039F, 0x1F49, 0x03A1, 0x1FEC,
++	0x03A5, 0x1F59, 0x03A9, 0x1F69, 0x03B1, 0x1F01, 0x03B5, 0x1F11,
++	0x03B7, 0x1F21, 0x03B9, 0x1F31, 0x03BF, 0x1F41, 0x03C1, 0x1FE5,
++	0x03C5, 0x1F51, 0x03C9, 0x1F61, 0x004F, 0x01A0, 0x0055, 0x01AF,
++	0x006F, 0x01A1, 0x0075, 0x01B0, 0x0041, 0x1EA0, 0x0042, 0x1E04,
++	0x0044, 0x1E0C, 0x0045, 0x1EB8, 0x0048, 0x1E24, 0x0049, 0x1ECA,
++	0x004B, 0x1E32, 0x004C, 0x1E36, 0x004D, 0x1E42, 0x004E, 0x1E46,
++	0x004F, 0x1ECC, 0x0052, 0x1E5A, 0x0053, 0x1E62, 0x0054, 0x1E6C,
++	0x0055, 0x1EE4, 0x0056, 0x1E7E, 0x0057, 0x1E88, 0x0059, 0x1EF4,
++	0x005A, 0x1E92, 0x0061, 0x1EA1, 0x0062, 0x1E05, 0x0064, 0x1E0D,
++	0x0065, 0x1EB9, 0x0068, 0x1E25, 0x0069, 0x1ECB, 0x006B, 0x1E33,
++	0x006C, 0x1E37, 0x006D, 0x1E43, 0x006E, 0x1E47, 0x006F, 0x1ECD,
++	0x0072, 0x1E5B, 0x0073, 0x1E63, 0x0074, 0x1E6D, 0x0075, 0x1EE5,
++	0x0076, 0x1E7F, 0x0077, 0x1E89, 0x0079, 0x1EF5, 0x007A, 0x1E93,
++	0x01A0, 0x1EE2, 0x01A1, 0x1EE3, 0x01AF, 0x1EF0, 0x01B0, 0x1EF1,
++	0x0055, 0x1E72, 0x0075, 0x1E73, 0x0041, 0x1E00, 0x0061, 0x1E01,
++	0x0053, 0x0218, 0x0054, 0x021A, 0x0073, 0x0219, 0x0074, 0x021B,
++	0x0043, 0x00C7, 0x0044, 0x1E10, 0x0045, 0x0228, 0x0047, 0x0122,
++	0x0048, 0x1E28, 0x004B, 0x0136, 0x004C, 0x013B, 0x004E, 0x0145,
++	0x0052, 0x0156, 0x0053, 0x015E, 0x0054, 0x0162, 0x0063, 0x00E7,
++	0x0064, 0x1E11, 0x0065, 0x0229, 0x0067, 0x0123, 0x0068, 0x1E29,
++	0x006B, 0x0137, 0x006C, 0x013C, 0x006E, 0x0146, 0x0072, 0x0157,
++	0x0073, 0x015F, 0x0074, 0x0163, 0x0041, 0x0104, 0x0045, 0x0118,
++	0x0049, 0x012E, 0x004F, 0x01EA, 0x0055, 0x0172, 0x0061, 0x0105,
++	0x0065, 0x0119, 0x0069, 0x012F, 0x006F, 0x01EB, 0x0075, 0x0173,
++	0x0044, 0x1E12, 0x0045, 0x1E18, 0x004C, 0x1E3C, 0x004E, 0x1E4A,
++	0x0054, 0x1E70, 0x0055, 0x1E76, 0x0064, 0x1E13, 0x0065, 0x1E19,
++	0x006C, 0x1E3D, 0x006E, 0x1E4B, 0x0074, 0x1E71, 0x0075, 0x1E77,
++	0x0048, 0x1E2A, 0x0068, 0x1E2B, 0x0045, 0x1E1A, 0x0049, 0x1E2C,
++	0x0055, 0x1E74, 0x0065, 0x1E1B, 0x0069, 0x1E2D, 0x0075, 0x1E75,
++	0x0042, 0x1E06, 0x0044, 0x1E0E, 0x004B, 0x1E34, 0x004C, 0x1E3A,
++	0x004E, 0x1E48, 0x0052, 0x1E5E, 0x0054, 0x1E6E, 0x005A, 0x1E94,
++	0x0062, 0x1E07, 0x0064, 0x1E0F, 0x0068, 0x1E96, 0x006B, 0x1E35,
++	0x006C, 0x1E3B, 0x006E, 0x1E49, 0x0072, 0x1E5F, 0x0074, 0x1E6F,
++	0x007A, 0x1E95, 0x003C, 0x226E, 0x003D, 0x2260, 0x003E, 0x226F,
++	0x2190, 0x219A, 0x2192, 0x219B, 0x2194, 0x21AE, 0x21D0, 0x21CD,
++	0x21D2, 0x21CF, 0x21D4, 0x21CE, 0x2203, 0x2204, 0x2208, 0x2209,
++	0x220B, 0x220C, 0x2223, 0x2224, 0x2225, 0x2226, 0x223C, 0x2241,
++	0x2243, 0x2244, 0x2245, 0x2247, 0x2248, 0x2249, 0x224D, 0x226D,
++	0x2261, 0x2262, 0x2264, 0x2270, 0x2265, 0x2271, 0x2272, 0x2274,
++	0x2273, 0x2275, 0x2276, 0x2278, 0x2277, 0x2279, 0x227A, 0x2280,
++	0x227B, 0x2281, 0x227C, 0x22E0, 0x227D, 0x22E1, 0x2282, 0x2284,
++	0x2283, 0x2285, 0x2286, 0x2288, 0x2287, 0x2289, 0x2291, 0x22E2,
++	0x2292, 0x22E3, 0x22A2, 0x22AC, 0x22A8, 0x22AD, 0x22A9, 0x22AE,
++	0x22AB, 0x22AF, 0x22B2, 0x22EA, 0x22B3, 0x22EB, 0x22B4, 0x22EC,
++	0x22B5, 0x22ED, 0x00A8, 0x1FC1, 0x03B1, 0x1FB6, 0x03B7, 0x1FC6,
++	0x03B9, 0x1FD6, 0x03C5, 0x1FE6, 0x03C9, 0x1FF6, 0x03CA, 0x1FD7,
++	0x03CB, 0x1FE7, 0x1F00, 0x1F06, 0x1F01, 0x1F07, 0x1F08, 0x1F0E,
++	0x1F09, 0x1F0F, 0x1F20, 0x1F26, 0x1F21, 0x1F27, 0x1F28, 0x1F2E,
++	0x1F29, 0x1F2F, 0x1F30, 0x1F36, 0x1F31, 0x1F37, 0x1F38, 0x1F3E,
++	0x1F39, 0x1F3F, 0x1F50, 0x1F56, 0x1F51, 0x1F57, 0x1F59, 0x1F5F,
++	0x1F60, 0x1F66, 0x1F61, 0x1F67, 0x1F68, 0x1F6E, 0x1F69, 0x1F6F,
++	0x1FBF, 0x1FCF, 0x1FFE, 0x1FDF, 0x0391, 0x1FBC, 0x0397, 0x1FCC,
++	0x03A9, 0x1FFC, 0x03AC, 0x1FB4, 0x03AE, 0x1FC4, 0x03B1, 0x1FB3,
++	0x03B7, 0x1FC3, 0x03C9, 0x1FF3, 0x03CE, 0x1FF4, 0x1F00, 0x1F80,
++	0x1F01, 0x1F81, 0x1F02, 0x1F82, 0x1F03, 0x1F83, 0x1F04, 0x1F84,
++	0x1F05, 0x1F85, 0x1F06, 0x1F86, 0x1F07, 0x1F87, 0x1F08, 0x1F88,
++	0x1F09, 0x1F89, 0x1F0A, 0x1F8A, 0x1F0B, 0x1F8B, 0x1F0C, 0x1F8C,
++	0x1F0D, 0x1F8D, 0x1F0E, 0x1F8E, 0x1F0F, 0x1F8F, 0x1F20, 0x1F90,
++	0x1F21, 0x1F91, 0x1F22, 0x1F92, 0x1F23, 0x1F93, 0x1F24, 0x1F94,
++	0x1F25, 0x1F95, 0x1F26, 0x1F96, 0x1F27, 0x1F97, 0x1F28, 0x1F98,
++	0x1F29, 0x1F99, 0x1F2A, 0x1F9A, 0x1F2B, 0x1F9B, 0x1F2C, 0x1F9C,
++	0x1F2D, 0x1F9D, 0x1F2E, 0x1F9E, 0x1F2F, 0x1F9F, 0x1F60, 0x1FA0,
++	0x1F61, 0x1FA1, 0x1F62, 0x1FA2, 0x1F63, 0x1FA3, 0x1F64, 0x1FA4,
++	0x1F65, 0x1FA5, 0x1F66, 0x1FA6, 0x1F67, 0x1FA7, 0x1F68, 0x1FA8,
++	0x1F69, 0x1FA9, 0x1F6A, 0x1FAA, 0x1F6B, 0x1FAB, 0x1F6C, 0x1FAC,
++	0x1F6D, 0x1FAD, 0x1F6E, 0x1FAE, 0x1F6F, 0x1FAF, 0x1F70, 0x1FB2,
++	0x1F74, 0x1FC2, 0x1F7C, 0x1FF2, 0x1FB6, 0x1FB7, 0x1FC6, 0x1FC7,
++	0x1FF6, 0x1FF7, 0x0627, 0x0622, 0x0627, 0x0623, 0x0648, 0x0624,
++	0x064A, 0x0626, 0x06C1, 0x06C2, 0x06D2, 0x06D3, 0x06D5, 0x06C0,
++	0x0627, 0x0625, 0x0928, 0x0929, 0x0930, 0x0931, 0x0933, 0x0934,
++	0x09C7, 0x09CB, 0x09C7, 0x09CC, 0x0B47, 0x0B4B, 0x0B47, 0x0B48,
++	0x0B47, 0x0B4C, 0x0BC6, 0x0BCA, 0x0BC7, 0x0BCB, 0x0B92, 0x0B94,
++	0x0BC6, 0x0BCC, 0x0C46, 0x0C48, 0x0CC6, 0x0CCA, 0x0CBF, 0x0CC0,
++	0x0CC6, 0x0CC7, 0x0CCA, 0x0CCB, 0x0CC6, 0x0CC8, 0x0D46, 0x0D4A,
++	0x0D47, 0x0D4B, 0x0D46, 0x0D4C, 0x0DD9, 0x0DDA, 0x0DDC, 0x0DDD,
++	0x0DD9, 0x0DDC, 0x0DD9, 0x0DDE, 0x1025, 0x1026, 0x3046, 0x3094,
++	0x304B, 0x304C, 0x304D, 0x304E, 0x304F, 0x3050, 0x3051, 0x3052,
++	0x3053, 0x3054, 0x3055, 0x3056, 0x3057, 0x3058, 0x3059, 0x305A,
++	0x305B, 0x305C, 0x305D, 0x305E, 0x305F, 0x3060, 0x3061, 0x3062,
++	0x3064, 0x3065, 0x3066, 0x3067, 0x3068, 0x3069, 0x306F, 0x3070,
++	0x3072, 0x3073, 0x3075, 0x3076, 0x3078, 0x3079, 0x307B, 0x307C,
++	0x309D, 0x309E, 0x30A6, 0x30F4, 0x30AB, 0x30AC, 0x30AD, 0x30AE,
++	0x30AF, 0x30B0, 0x30B1, 0x30B2, 0x30B3, 0x30B4, 0x30B5, 0x30B6,
++	0x30B7, 0x30B8, 0x30B9, 0x30BA, 0x30BB, 0x30BC, 0x30BD, 0x30BE,
++	0x30BF, 0x30C0, 0x30C1, 0x30C2, 0x30C4, 0x30C5, 0x30C6, 0x30C7,
++	0x30C8, 0x30C9, 0x30CF, 0x30D0, 0x30D2, 0x30D3, 0x30D5, 0x30D6,
++	0x30D8, 0x30D9, 0x30DB, 0x30DC, 0x30EF, 0x30F7, 0x30F0, 0x30F8,
++	0x30F1, 0x30F9, 0x30F2, 0x30FA, 0x30FD, 0x30FE, 0x306F, 0x3071,
++	0x3072, 0x3074, 0x3075, 0x3077, 0x3078, 0x307A, 0x307B, 0x307D,
++	0x30CF, 0x30D1, 0x30D2, 0x30D4, 0x30D5, 0x30D7, 0x30D8, 0x30DA,
++	0x30DB, 0x30DD
++};
++
++static const u_int8_t
++__CFUniCharCombiningBitmap[] = {
++	0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
++	0x00, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C,
++	0x0D, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E,
++	0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x13, 0x00,
++
++	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
++	0xFF, 0xFF, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x78, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xFE, 0xFF, 0xFB, 0xFF, 0xFF, 0xBB,
++	0x16, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0xF8, 0x3F, 0x00, 0x00, 0x00, 0x01, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xC0, 0xFF, 0x9F, 0x3D, 0x00, 0x00,
++	0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0xFF, 0xFF,
++	0xFF, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0xC0, 0xFF, 0x01, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD0,
++	0xFF, 0x3F, 0x1E, 0x00, 0x0C, 0x00, 0x00, 0x00,
++	0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD0,
++	0x9F, 0x39, 0x80, 0x00, 0x0C, 0x00, 0x00, 0x00,
++	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD0,
++	0x87, 0x39, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
++	0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD0,
++	0xBF, 0x3B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD0,
++	0x8F, 0x39, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0,
++	0xC7, 0x3D, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0,
++	0xDF, 0x3D, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0,
++	0xDF, 0x3D, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0,
++	0xCF, 0x3D, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x84, 0x5F, 0xFF, 0x00, 0x00, 0x0C, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF2, 0x07,
++	0x80, 0x7F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF2, 0x1B,
++	0x00, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xA0, 0xC2,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFE, 0xFF,
++	0xDF, 0x00, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF, 0x1F,
++	0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0xC7, 0x03,
++	0x00, 0x00, 0xC0, 0x03, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x1C, 0x00,
++	0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x0C, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0xFF,
++	0xFF, 0xFF, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xFF, 0xFF, 0xFF, 0x07, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0xFC, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xFF, 0xFF, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0xFE, 0xFF, 0x3F, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF,
++	0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* Surrogate Pair Constants */
++#define SP_HALF_SHIFT	10
++#define SP_HALF_BASE	0x0010000UL
++#define SP_HALF_MASK	0x3FFUL
++
++#define SP_HIGH_FIRST	0xD800UL
++#define SP_HIGH_LAST	0xDBFFUL
++#define SP_LOW_FIRST	0xDC00UL
++#define SP_LOW_LAST	0xDFFFUL
++
++/*
++ * Test for a combining character.
++ *
++ * Similar to __CFUniCharIsNonBaseCharacter except that
++ * unicode_combinable also includes Hangul Jamo characters.
++ */
++static inline int
++unicode_combinable(u_int16_t character)
++{
++	const u_int8_t *bitmap = __CFUniCharCombiningBitmap;
++	u_int8_t value;
++
++	if (character < 0x0300)
++		return (0);
++
++	value = bitmap[(character >> 8) & 0xFF];
++
++	if (value == 0xFF) {
++		return (1);
++	} else if (value) {
++		bitmap = bitmap + ((value - 1) * 32) + 256;
++		return (bitmap[(character & 0xFF) / 8] & (1 << (character % 8)) ? 1 : 0);
++	}
++	return (0);
++}
++
++/*
++ * Test for a precomposed character.
++ *
++ * Similar to __CFUniCharIsDecomposableCharacter.
++ */
++static inline int
++unicode_decomposeable(u_int16_t character) {
++	const u_int8_t *bitmap = __CFUniCharDecomposableBitmap;
++	u_int8_t value;
++	
++	if (character < 0x00C0)
++		return (0);
++
++	value = bitmap[(character >> 8) & 0xFF];
++
++	if (value == 0xFF) {
++		return (1);
++	} else if (value) {
++		bitmap = bitmap + ((value - 1) * 32) + 256;
++		return (bitmap[(character & 0xFF) / 8] & (1 << (character % 8)) ? 1 : 0);
++	}
++    	return (0);
++}
++
++static int unicode_decompose(u_int16_t character, u_int16_t *convertedChars);
++static u_int16_t unicode_combine(u_int16_t base, u_int16_t combining);
++
++char utf_extrabytes[32] = {
++	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
++	-1, -1, -1, -1, -1, -1, -1, -1,  1,  1,  1,  1,  2,  2,  3, -1
++};
++
++/*
++ * utf8_encodestr - Encodes a Unicode string to UTF-8
++ *
++ * NOTES:
++ *    The resulting UTF-8 string is NULL terminated.
++ *
++ *    If '/' chars are allowed on disk then an alternate
++ *    (replacement) char must be provided in altslash.
++ *
++ * input flags:
++ *    UTF_REVERSE_ENDIAN: Unicode byteorder is opposite current runtime
++ *    UTF_NO_NULL_TERM:  don't add NULL termination to UTF-8 output
++ *
++ * result:
++ *    ENAMETOOLONG: Name didn't fit; only buflen bytes were encoded
++ *    EINVAL: Illegal char found; char was replaced by an '_'.
++ */
++int
++utf8_encodestr(const u_int16_t * ucsp, size_t ucslen, u_int8_t * utf8p,
++               size_t * utf8len, size_t buflen, u_int16_t altslash, int flags)
++{
++	u_int8_t * bufstart;
++	u_int8_t * bufend;
++	u_int16_t ucs_ch;
++	u_int16_t * chp = NULL;
++	u_int16_t sequence[8];
++	int extra = 0;
++	int charcnt;
++	int swapbytes = (flags & UTF_REVERSE_ENDIAN);
++	int nullterm  = ((flags & UTF_NO_NULL_TERM) == 0);
++	int decompose = (flags & UTF_DECOMPOSED);
++	int result = 0;
++	
++	bufstart = utf8p;
++	bufend = bufstart + buflen;
++	if (nullterm)
++		--bufend;
++	charcnt = ucslen / 2;
++
++	while (charcnt-- > 0) {
++		if (extra > 0) {
++			--extra;
++			ucs_ch = *chp++;
++		} else {
++			ucs_ch = swapbytes ? (*ucsp++) : *ucsp++;
++
++			if (decompose && unicode_decomposeable(ucs_ch)) {
++				extra = unicode_decompose(ucs_ch, sequence) - 1;
++				charcnt += extra;
++				ucs_ch = sequence[0];
++				chp = &sequence[1];
++			}
++		}
++
++		if (ucs_ch < 0x0080) {
++			if (utf8p >= bufend) {
++				result = ENAMETOOLONG;
++				break;
++			}			
++			*utf8p++ = ucs_ch;
++
++		} else if (ucs_ch < 0x800) {
++			if ((utf8p + 1) >= bufend) {
++				result = ENAMETOOLONG;
++				break;
++			}
++			*utf8p++ = 0xc0 | (ucs_ch >> 6);
++			*utf8p++ = 0x80 | (0x3f & ucs_ch);
++
++		} else {
++			/* Combine valid surrogate pairs */
++			if (ucs_ch >= SP_HIGH_FIRST && ucs_ch <= SP_HIGH_LAST
++				&& charcnt > 0) {
++				u_int16_t ch2;
++				u_int32_t pair;
++
++				ch2 = swapbytes ? (*ucsp) : *ucsp;
++				if (ch2 >= SP_LOW_FIRST && ch2 <= SP_LOW_LAST) {
++					pair = ((ucs_ch - SP_HIGH_FIRST) << SP_HALF_SHIFT)
++						+ (ch2 - SP_LOW_FIRST) + SP_HALF_BASE;
++					if ((utf8p + 3) >= bufend) {
++						result = ENAMETOOLONG;
++						break;
++					}
++					--charcnt;
++					++ucsp;				
++					*utf8p++ = 0xf0 | (pair >> 18);
++					*utf8p++ = 0x80 | (0x3f & (pair >> 12));
++					*utf8p++ = 0x80 | (0x3f & (pair >> 6));
++					*utf8p++ = 0x80 | (0x3f & pair);
++					continue;
++				}
++			}
++			if ((utf8p + 2) >= bufend) {
++				result = ENAMETOOLONG;
++				break;
++			}
++			*utf8p++ = 0xe0 | (ucs_ch >> 12);
++			*utf8p++ = 0x80 | (0x3f & (ucs_ch >> 6));
++			*utf8p++ = 0x80 | (0x3f & ucs_ch);
++		}	
++	}
++	
++	*utf8len = utf8p - bufstart;
++	if (nullterm)
++		*utf8p++ = '\0';
++
++	return (result);
++}
++
++
++/*
++ * utf8_decodestr - Decodes a UTF-8 string back to Unicode
++ *
++ * NOTES:
++ *    The input UTF-8 string does not need to be null terminated
++ *    if utf8len is set.
++ *
++ *    If '/' chars are allowed on disk then an alternate
++ *    (replacement) char must be provided in altslash.
++ *
++ * input flags:
++ *    UTF_REV_ENDIAN:   Unicode byteorder is oposite current runtime
++ *    UTF_DECOMPOSED:   Unicode output string must be fully decompsed
++ *
++ * result:
++ *    ENAMETOOLONG: Name didn't fit; only ucslen chars were decoded.
++ *    EINVAL: Illegal UTF-8 sequence found.
++ */
++int
++utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
++               size_t *ucslen, size_t buflen, u_int16_t altslash, int flags, size_t *consumed)
++{
++	u_int16_t* bufstart;
++	u_int16_t* bufend;
++	unsigned int ucs_ch;
++	unsigned int byte;
++	int result = 0;
++	int decompose, precompose, swapbytes;
++	const u_int8_t *utf8start, *utf8lastpass;
++
++	decompose =  (flags & UTF_DECOMPOSED);
++	precompose = (flags & UTF_PRECOMPOSED);
++	swapbytes =  (flags & UTF_REVERSE_ENDIAN);
++
++	bufstart = ucsp;
++	bufend = (u_int16_t *)((u_int8_t *)ucsp + buflen);
++	utf8start = utf8p;
++
++	while (utf8len-- > 0) {
++		byte = *utf8p++;
++
++		if (ucsp >= bufend)
++			goto toolong;
++
++		/* check for ascii */
++		if (byte < 0x80) {
++			ucs_ch = byte;                 /* 1st byte */
++		} else {
++			u_int32_t ch;
++			int extrabytes = utf_extrabytes[byte >> 3];
++
++			if (utf8len < extrabytes)
++				goto invalid;
++			utf8len -= extrabytes;
++
++			switch (extrabytes) {
++			case 1:
++				ch = byte; ch <<= 6;   /* 1st byte */
++				byte = *utf8p++;       /* 2nd byte */
++				if ((byte >> 6) != 2)
++					goto invalid;
++				ch += byte;
++				ch -= 0x00003080UL;
++				if (ch < 0x0080)
++					goto invalid;
++				ucs_ch = ch;
++			        break;
++			case 2:
++				ch = byte; ch <<= 6;   /* 1st byte */
++				byte = *utf8p++;       /* 2nd byte */
++				if ((byte >> 6) != 2)
++					goto invalid;
++				ch += byte; ch <<= 6;
++				byte = *utf8p++;       /* 3rd byte */
++				if ((byte >> 6) != 2)
++					goto invalid;
++				ch += byte;
++				ch -= 0x000E2080UL;
++				if (ch < 0x0800)
++					goto invalid;
++				if (ch >= 0xD800) {
++					if (ch <= 0xDFFF)
++						goto invalid;
++					if (ch == 0xFFFE || ch == 0xFFFF)
++						goto invalid;
++				}
++				ucs_ch = ch;
++				break;
++			case 3:
++				ch = byte; ch <<= 6;   /* 1st byte */
++				byte = *utf8p++;       /* 2nd byte */
++				if ((byte >> 6) != 2)
++					goto invalid;
++				ch += byte; ch <<= 6;
++				byte = *utf8p++;       /* 3rd byte */
++				if ((byte >> 6) != 2)
++					goto invalid;
++				ch += byte; ch <<= 6;
++				byte = *utf8p++;       /* 4th byte */
++				if ((byte >> 6) != 2)
++					goto invalid;
++			        ch += byte;
++				ch -= 0x03C82080UL + SP_HALF_BASE;
++				ucs_ch = (ch >> SP_HALF_SHIFT) + SP_HIGH_FIRST;
++				if (ucs_ch < SP_HIGH_FIRST || ucs_ch > SP_HIGH_LAST)
++					goto invalid;
++				*ucsp++ = swapbytes ? (ucs_ch) : ucs_ch;
++				if (ucsp >= bufend)
++					goto toolong;
++				ucs_ch = (ch & SP_HALF_MASK) + SP_LOW_FIRST;
++				if (ucs_ch < SP_LOW_FIRST || ucs_ch > SP_LOW_LAST)
++					goto invalid;
++				*ucsp++ = swapbytes ? (ucs_ch) : ucs_ch;
++			        continue;
++			default:
++				goto invalid;
++			}
++		}
++	if (precompose && (ucsp != bufstart)) {
++		u_int16_t composite, base;
++
++		if (unicode_combinable(ucs_ch)) {
++			base = swapbytes ? (*(ucsp - 1)) : *(ucsp - 1);
++			composite = unicode_combine(base, ucs_ch);
++			if (composite) {
++				--ucsp;
++				ucs_ch = composite;
++			} else {
++				goto exit;
++			}
++		} else {
++			goto exit;
++		}
++	}
++	*ucsp++ = swapbytes ? (ucs_ch) : ucs_ch;
++	utf8lastpass = utf8p;
++	}
++
++exit:
++	*ucslen = (u_int8_t*)ucsp - (u_int8_t*)bufstart;
++	*consumed = utf8lastpass - utf8start;
++	return (result);
++
++invalid:
++	result = EINVAL;
++	goto exit;
++
++toolong:
++	result = ENAMETOOLONG;
++	goto exit;
++}
++
++ /*
++  * Unicode 3.2 decomposition code (derived from Core Foundation)
++  */
++
++typedef struct {
++	u_int32_t _key;
++	u_int32_t _value;
++} unicode_mappings32;
++
++static inline u_int32_t
++getmappedvalue32(const unicode_mappings32 *theTable, u_int32_t numElem,
++		u_int16_t character)
++{
++	const unicode_mappings32 *p, *q, *divider;
++
++	if ((character < theTable[0]._key) || (character > theTable[numElem-1]._key))
++		return (0);
++
++	p = theTable;
++	q = p + (numElem-1);
++	while (p <= q) {
++		divider = p + ((q - p) >> 1);	/* divide by 2 */
++		if (character < divider->_key) { q = divider - 1; }
++		else if (character > divider->_key) { p = divider + 1; }
++		else { return (divider->_value); }
++	}
++	return (0);
++}
++
++#define RECURSIVE_DECOMPOSITION	(1 << 15)
++#define EXTRACT_COUNT(value)	(((value) >> 12) & 0x0007)
++
++typedef struct {
++	u_int16_t _key;
++	u_int16_t _value;
++} unicode_mappings16;
++
++static inline u_int16_t
++getmappedvalue16(const unicode_mappings16 *theTable, u_int32_t numElem,
++		u_int16_t character)
++{
++	const unicode_mappings16 *p, *q, *divider;
++
++	if ((character < theTable[0]._key) || (character > theTable[numElem-1]._key))
++		return (0);
++
++	p = theTable;
++	q = p + (numElem-1);
++	while (p <= q) {
++		divider = p + ((q - p) >> 1);	/* divide by 2 */
++		if (character < divider->_key)
++			q = divider - 1;
++		else if (character > divider->_key)
++			p = divider + 1;
++		else
++			return (divider->_value);
++	}
++	return (0);
++}
++
++
++static u_int32_t
++unicode_recursive_decompose(u_int16_t character, u_int16_t *convertedChars)
++{
++	u_int16_t value;
++	u_int32_t length;
++	u_int16_t firstChar;
++	u_int16_t theChar;
++	const u_int16_t *bmpMappings;
++	u_int32_t usedLength;
++
++	value = getmappedvalue16(
++		(const unicode_mappings16 *)__CFUniCharDecompositionTable,
++		__UniCharDecompositionTableLength, character);
++	length = EXTRACT_COUNT(value);
++	firstChar = value & 0x0FFF;
++	theChar = firstChar;
++	bmpMappings = (length == 1 ? &theChar : __CFUniCharMultipleDecompositionTable + firstChar);
++	usedLength = 0;
++
++	if (value & RECURSIVE_DECOMPOSITION) {
++	    usedLength = unicode_recursive_decompose((u_int16_t)*bmpMappings, convertedChars);
++	
++	    --length;	/* Decrement for the first char */
++	    if (!usedLength)
++	    	return 0;
++	    ++bmpMappings;
++	    convertedChars += usedLength;
++	}
++	
++	usedLength += length;
++	
++	while (length--)
++		*(convertedChars++) = *(bmpMappings++);
++	
++	return (usedLength);
++}
++
++#define HANGUL_SBASE 0xAC00
++#define HANGUL_LBASE 0x1100
++#define HANGUL_VBASE 0x1161
++#define HANGUL_TBASE 0x11A7
++
++#define HANGUL_SCOUNT 11172
++#define HANGUL_LCOUNT 19
++#define HANGUL_VCOUNT 21
++#define HANGUL_TCOUNT 28
++#define HANGUL_NCOUNT (HANGUL_VCOUNT * HANGUL_TCOUNT)
++
++/*
++ * unicode_decompose - decompose a composed Unicode char
++ *
++ * Composed Unicode characters are forbidden on
++ * HFS Plus volumes. ucs_decompose will convert a
++ * composed character into its correct decomposed
++ * sequence.
++ *
++ * Similar to CFUniCharDecomposeCharacter
++ */
++static int
++unicode_decompose(u_int16_t character, u_int16_t *convertedChars)
++{
++	if ((character >= HANGUL_SBASE) &&
++	    (character <= (HANGUL_SBASE + HANGUL_SCOUNT))) {
++		u_int32_t length;
++
++		character -= HANGUL_SBASE;
++		length = (character % HANGUL_TCOUNT ? 3 : 2);
++
++		*(convertedChars++) =
++			character / HANGUL_NCOUNT + HANGUL_LBASE;
++		*(convertedChars++) =
++			(character % HANGUL_NCOUNT) / HANGUL_TCOUNT + HANGUL_VBASE;
++		if (length > 2)
++			*convertedChars = (character % HANGUL_TCOUNT) + HANGUL_TBASE;
++		return (length);
++	} else {
++		return (unicode_recursive_decompose(character, convertedChars));
++	}
++}
++
++/*
++ * unicode_combine - generate a precomposed Unicode char
++ *
++ * Precomposed Unicode characters are required for some volume
++ * formats and network protocols.  unicode_combine will combine
++ * a decomposed character sequence into a single precomposed
++ * (composite) character.
++ *
++ * Similar toCFUniCharPrecomposeCharacter but unicode_combine
++ * also handles Hangul Jamo characters.
++ */
++static u_int16_t
++unicode_combine(u_int16_t base, u_int16_t combining)
++{
++	u_int32_t value;
++
++	/* Check HANGUL */
++	if ((combining >= HANGUL_VBASE) && (combining < (HANGUL_TBASE + HANGUL_TCOUNT))) {
++		/* 2 char Hangul sequences */
++		if ((combining < (HANGUL_VBASE + HANGUL_VCOUNT)) &&
++		    (base >= HANGUL_LBASE && base < (HANGUL_LBASE + HANGUL_LCOUNT))) {
++		    return (HANGUL_SBASE +
++		            ((base - HANGUL_LBASE)*(HANGUL_VCOUNT*HANGUL_TCOUNT)) +
++		            ((combining  - HANGUL_VBASE)*HANGUL_TCOUNT));
++		}
++	
++		/* 3 char Hangul sequences */
++		if ((combining > HANGUL_TBASE) &&
++		    (base >= HANGUL_SBASE && base < (HANGUL_SBASE + HANGUL_SCOUNT))) {
++			if ((base - HANGUL_SBASE) % HANGUL_TCOUNT)
++				return (0);
++			else
++				return (base + (combining - HANGUL_TBASE));
++		}
++	}
++
++	value = getmappedvalue32(
++		(const unicode_mappings32 *)__CFUniCharPrecompSourceTable,
++		__CFUniCharPrecompositionTableLength, combining);
++
++	if (value) {
++		value = getmappedvalue16(
++			(const unicode_mappings16 *)
++			((u_int32_t *)__CFUniCharBMPPrecompDestinationTable + (value & 0xFFFF)),
++			(value >> 16), base);
++	}
++	return (value);
++}
++
++static int
++utf8mac_mbtowc (conv_t conv, ucs4_t *pwc, const unsigned char *s, int n)
++{
++    u_int16_t ucsp[13];
++    size_t ucslen = 0, consumed = 0;
++    int ret;
++
++    bzero(&ucsp, sizeof(ucsp));
++    *pwc = 0;
++
++    ret = utf8_decodestr(s, n, ucsp, &ucslen, sizeof(ucsp), NULL, UTF_PRECOMPOSED, &consumed);
++
++    if (ret == ENAMETOOLONG)	/* Name didn't fit; only ucslen chars were decoded */
++	return RET_TOOFEW(0);
++
++    if ( ret == EINVAL)		/* Illegal UTF-8 sequence found */
++	return RET_ILSEQ;
++
++    if((ret = ucs2_mbtowc(conv, pwc, (const unsigned char *) ucsp, ucslen)) < 0)
++	return ret;
++
++    return consumed;
++}
++
++static int
++utf8mac_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, int n) /* n == 0 is acceptable */
++{
++    int ret;
++    size_t len;
++    u_int16_t ucs_string[13];
++
++    if((ret = ucs2_wctomb(conv, (unsigned char *) ucs_string, wc, sizeof(ucs_string))) < 0)
++	return ret;
++
++    utf8_encodestr(ucs_string, ret, r, &len, n, 0, UTF_NO_NULL_TERM | UTF_DECOMPOSED);
++
++    return len;
++}
