@@ -255,7 +255,7 @@ Index: common/i386/mc-a2.asm
 +	    CC="$CROSS-gcc"
 +	    AR="$CROSS-ar"
 +	    RANLIB="$CROSS-ranlib"
-+	    UNAMES="`echo $CROSS | cut -d- -f3`"
++	    UNAMES="`echo $CROSS | cut -d- -f2`"
 +	    UNAMEM="`echo $CROSS | cut -d- -f1`"
 +	    ;;
 +	--prefix=*)

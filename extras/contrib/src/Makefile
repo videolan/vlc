@@ -86,7 +86,7 @@ HOSTCC=CC=$(HOST)-gcc CXX=$(HOST)-g++ AR=$(HOST)-ar RANLIB=$(HOST)-ranlib
 # For libebml/libmatroska. Grrr.
 HOSTCC2=CC=$(HOST)-gcc CXX=$(HOST)-g++ AR="$(HOST)-ar rcvu" RANLIB=$(HOST)-ranlib
 FFMPEGCONF=--cross-prefix=$(HOST)-
-X264CONF=--cross-prefix=$(HOST)
+X264CONF=--crosscompile=$(HOST)
 LIVECC=C_COMPILER=$(HOST)-gcc CPP=$(HOST)-cpp CPLUSPLUS_COMPILER=$(HOST)-g++ LINK="$(HOST)-g++ -o" LIBRARY_LINK="$(HOST)-ld -o"
 RANLIB=$(HOST)-ranlib
 else
