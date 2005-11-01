@@ -631,8 +631,11 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifneq ($(HOST),$(BUILD))
+	(patch -p 0 < Patches/flac-cross.patch && cd $@ && autoconf)
+endif
 
-.FLAC: flac .ogg
+.FLAC: flac 
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 #	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install && make -C libOggFLAC &&make -C libOggFLAC install && cd .. && make -C include install)
 	$(INSTALL_NAME)

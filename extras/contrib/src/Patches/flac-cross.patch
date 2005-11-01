@@ -1,0 +1,15 @@
+--- flac-orig/configure.in	2005-11-01 19:00:02.381241515 +0100
++++ flac/configure.in	2005-11-01 19:01:50.034829963 +0100
+@@ -36,6 +36,12 @@
+ AC_PROG_CXX
+ AC_PROG_MAKE_SET
+ 
++dnl Find the right ranlib, even when cross-compiling
++AC_CHECK_TOOL(RANLIB, ranlib, :)
++AC_CHECK_TOOL(STRIP, strip, :)
++AC_CHECK_TOOL(AR, ar, :)
++AC_CHECK_TOOL(LD, ld, :)
++
+ AC_CHECK_TYPES(socklen_t, [], [])
+ 
+ dnl check for getopt in standard library
