@@ -62,6 +62,7 @@ HAVE_WIN32=1
 endif
 ifdef HAVE_WIN32
 export PATH := $(PREFIX)/bin:$(PATH)
+export PKG_CONFIG_PATH = $(PREFIX)/lib/pkgconfig
 #EXTRA_CPPFLAGS = /usr/win32/include
 #EXTRA_LDFLAGS = /usr/win32/lib
 endif
