@@ -236,6 +236,7 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+#if X264_BUILD < 37
     if( p_enc->fmt_in.video.i_width % 16 != 0 ||
         p_enc->fmt_in.video.i_height % 16!= 0 )
     {
@@ -253,6 +254,7 @@ static int  Open ( vlc_object_t *p_this )
                   p_enc->fmt_in.video.i_width >> 4 << 4,
                   p_enc->fmt_in.video.i_height >> 4 << 4 );
     }
+#endif
 
     sout_CfgParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
@@ -265,8 +267,12 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_last_ref_pts = 0;
 
     x264_param_default( &p_sys->param );
-    p_sys->param.i_width  = p_enc->fmt_in.video.i_width >> 4 << 4;
-    p_sys->param.i_height = p_enc->fmt_in.video.i_height >> 4 << 4;
+    p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
+    p_sys->param.i_height = p_enc->fmt_in.video.i_height;
+#if X264_BUILD < 37
+    p_sys->param.i_width  = p_sys->param.i_width >> 4 << 4;
+    p_sys->param.i_height = p_sys->param.i_height >> 4 << 4;
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "qp-min", &val );
     if( val.i_int >= 1 && val.i_int <= 51 ) i_qmin = val.i_int;
