@@ -1,0 +1,103 @@
+diff -ru gettext-original/gettext-runtime/intl/libgnuintl.h.in gettext/gettext-runtime/intl/libgnuintl.h.in
+--- gettext-original/gettext-runtime/intl/libgnuintl.h.in	Sun Nov 16 16:27:58 2003
++++ gettext/gettext-runtime/intl/libgnuintl.h.in	Fri Aug 20 12:34:40 2004
+@@ -280,7 +280,7 @@
+    or gettext() but for which the format string could be the return value
+    of _() or gettext() need to add this #include.  Oh well.  */
+ 
+-#if !@HAVE_POSIX_PRINTF@
++#if !@HAVE_POSIX_PRINTF@ && !defined(__BEOS__)
+ 
+ #include <stdio.h>
+ #include <stddef.h>
+diff -ru gettext-original/gettext-runtime/intl/printf.c gettext/gettext-runtime/intl/printf.c
+--- gettext-original/gettext-runtime/intl/printf.c	Wed Sep 17 18:09:12 2003
++++ gettext/gettext-runtime/intl/printf.c	Fri Aug 20 12:34:40 2004
+@@ -45,7 +45,7 @@
+ 
+ #include <stdio.h>
+ 
+-#if !HAVE_POSIX_PRINTF
++#if !HAVE_POSIX_PRINTF && !defined(__BEOS__)
+ 
+ #include <stdlib.h>
+ #include <string.h>
+diff -ru gettext-original/gettext-runtime/libasprintf/autosprintf.cc gettext/gettext-runtime/libasprintf/autosprintf.cc
+--- gettext-original/gettext-runtime/libasprintf/autosprintf.cc	Mon Oct 28 20:44:32 2002
++++ gettext/gettext-runtime/libasprintf/autosprintf.cc	Fri Aug 20 13:09:56 2004
+@@ -32,6 +32,51 @@
+ #include <string.h>
+ #include "lib-asprintf.h"
+ 
++#ifdef __BEOS__
++/* vasprintf emulation (borrowed from VLC) */
++#define vasprintf beossux_vasprintf
++int beossux_vasprintf(char **strp, const char *fmt, va_list ap)
++{
++    /* Guess we need no more than 100 bytes. */
++    int     i_size = 100;
++    char    *p = (char *) malloc( i_size );
++    int     n;
++
++    if( p == NULL )
++    {
++        *strp = NULL;
++        return -1;
++    }
++
++    for( ;; )
++    {
++        /* Try to print in the allocated space. */
++        n = vsnprintf( p, i_size, fmt, ap );
++
++        /* If that worked, return the string. */
++        if (n > -1 && n < i_size)
++        {
++            *strp = p;
++            return strlen( p );
++        }
++        /* Else try again with more space. */
++        if (n > -1)    /* glibc 2.1 */
++        {
++           i_size = n+1; /* precisely what is needed */
++        }
++        else           /* glibc 2.0 */
++        {
++           i_size *= 2;  /* twice the old size */
++        }
++        if( (p = (char *) realloc( p, i_size ) ) == NULL)
++        {
++            *strp = NULL;
++            return -1;
++        }
++    }
++}
++#endif
++
+ namespace gnu
+ {
+ 
+diff -ru gettext-original/gettext-runtime/libasprintf/lib-asprintf.c gettext/gettext-runtime/libasprintf/lib-asprintf.c
+--- gettext-original/gettext-runtime/libasprintf/lib-asprintf.c	Fri Jun 20 14:52:05 2003
++++ gettext/gettext-runtime/libasprintf/lib-asprintf.c	Fri Aug 20 12:34:40 2004
+@@ -21,7 +21,7 @@
+ # include <config.h>
+ #endif
+ 
+-#if !(HAVE_VASPRINTF && HAVE_POSIX_PRINTF)
++#if !(HAVE_VASPRINTF && HAVE_POSIX_PRINTF) && !defined(__BEOS__)
+ 
+ #define STATIC static
+ 
+diff -ru gettext-original/gettext-runtime/libasprintf/lib-asprintf.h gettext/gettext-runtime/libasprintf/lib-asprintf.h
+--- gettext-original/gettext-runtime/libasprintf/lib-asprintf.h	Fri Jun 20 14:56:51 2003
++++ gettext/gettext-runtime/libasprintf/lib-asprintf.h	Fri Aug 20 12:34:40 2004
+@@ -21,7 +21,7 @@
+ # include <config.h>
+ #endif
+ 
+-#if HAVE_VASPRINTF && HAVE_POSIX_PRINTF
++#if ( HAVE_VASPRINTF && HAVE_POSIX_PRINTF ) || defined(__BEOS__)
+ 
+ /* Get asprintf(), vasprintf() declarations.  */
+ #include <stdio.h>
