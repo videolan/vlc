@@ -25,15 +25,16 @@
 #define CTRL_VIDEO_HPP
 
 #include "ctrl_generic.hpp"
+#include "../utils/position.hpp"
 
 class VoutWindow;
 
 /// Control video
-class CtrlVideo: public CtrlGeneric
+class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
 {
     public:
-        CtrlVideo( intf_thread_t *pIntf, const UString &rHelp,
-                   VarBool *pVisible );
+        CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
+                   bool autoResize, const UString &rHelp, VarBool *pVisible );
         virtual ~CtrlVideo();
 
         /// Handle an event on the control
@@ -45,15 +46,25 @@ class CtrlVideo: public CtrlGeneric
         /// Callback for layout resize
         virtual void onResize();
 
+        /// Called when the Position is set
+        virtual void onPositionChange();
+
         /// Draw the control on the given graphics
         virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
         /// Get the type of control (custom RTTI)
         virtual string getType() const { return "video"; }
 
+        /// Method called when the vout size is updated
+        virtual void onUpdate( Subject<VarBox> &rVoutSize );
+
     private:
         /// Vout window
         VoutWindow *m_pVout;
+        /// Associated layout
+        GenericLayout &m_rLayout;
+        /// Difference between layout size and video size
+        int m_xShift, m_yShift;
 };
 
 #endif

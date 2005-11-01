@@ -364,8 +364,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
     /// Type definition
     struct Video
     {
-        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, const string & visible, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, const string & visible, bool autoResize, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_autoResize( autoResize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
@@ -375,6 +375,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height )
         const string m_leftTop;
         const string m_rightBottom;
         const string m_visible;
+        bool m_autoResize;
         const string m_help;
         int m_layer;
         const string m_windowId;

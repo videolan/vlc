@@ -29,8 +29,6 @@
 #include "../commands/cmd_generic.hpp"
 #include "../utils/fsm.hpp"
 
-class GenericLayout;
-
 
 /// Control decorator for resizing windows
 class CtrlResize: public CtrlFlat

@@ -62,7 +62,7 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 
 
 VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL ),
-    m_cmdManage( this )
+    m_cmdManage( this ), m_varVoutSize( pIntf )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );

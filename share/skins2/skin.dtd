@@ -222,5 +222,6 @@
         height      CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
+        autoresize  CDATA   "false"
         help        CDATA   ""
     >

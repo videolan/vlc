@@ -25,6 +25,9 @@
 #ifndef POSITION_HPP
 #define POSITION_HPP
 
+#include "variable.hpp"
+#include "observer.hpp"
+
 
 /// Interface for rectangular objects
 class Box
@@ -102,6 +105,32 @@ class Position
         const Box &m_rBox;
         Ref_t m_refLeftTop;
         Ref_t m_refRighBottom;
+};
+
+
+/// Variable implementing the Box interface
+class VarBox: public Variable, public Box, public Subject<VarBox>
+{
+    public:
+        VarBox( intf_thread_t *pIntf, int width = 0, int height = 0 );
+
+        virtual ~VarBox() {}
+
+        /// Get the variable type
+        virtual const string &getType() const { return m_type; }
+
+        /// Get the size of the box
+        virtual int getWidth() const;
+        virtual int getHeight() const;
+
+        /// Change the size of the box
+        void setSize( int width, int height );
+
+    private:
+        /// Variable type
+        static const string m_type;
+        /// Size
+        int m_width, m_height;
 };
 
 

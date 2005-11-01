@@ -25,6 +25,9 @@
 #include "position.hpp"
 
 
+const string VarBox::m_type = "box";
+
+
 Rect::Rect( int left, int top, int right, int bottom ):
     m_left( left ), m_top( top ), m_right( right ), m_bottom( bottom )
 {
@@ -121,5 +124,31 @@ int Position::getWidth() const
 int Position::getHeight() const
 {
     return getBottom() - getTop() + 1;
+}
+
+
+VarBox::VarBox( intf_thread_t *pIntf, int width, int height ):
+    Variable( pIntf ), m_width( width ), m_height( height )
+{
+}
+
+
+int VarBox::getWidth() const
+{
+    return m_width;
+}
+
+
+int VarBox::getHeight() const
+{
+    return m_height;
+}
+
+
+void VarBox::setSize( int width, int height )
+{
+    m_width = width;
+    m_height = height;
+    notify();
 }
 

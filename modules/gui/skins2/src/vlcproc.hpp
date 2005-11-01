@@ -31,6 +31,7 @@
 #include "../vars/playtree.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
+#include "../utils/position.hpp"
 #include "../utils/var_text.hpp"
 #include "../commands/cmd_generic.hpp"
 
@@ -68,6 +69,9 @@ class VlcProc: public SkinObject
         /// Getter for the stream URI variable
         VarText &getStreamURIVar()
             { return *((VarText*)(m_cVarStreamURI.get())); }
+
+        /// Getter for the vout size variable
+        VarBox &getVoutSizeVar() { return m_varVoutSize; }
 
         /// Set the vout window handle
         void registerVoutWindow( void *pVoutWindow );
@@ -111,6 +115,8 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarStopped;
         VariablePtr m_cVarPaused;
         VariablePtr m_cVarSeekable;
+        /// Variable for the vout
+        VarBox m_varVoutSize;
 
         /// Set of handles of vout windows
         /**

@@ -25,17 +25,31 @@
 #include "../src/theme.hpp"
 #include "../src/vout_window.hpp"
 #include "../src/os_graphics.hpp"
+#include "../src/vlcproc.hpp"
+#include "../commands/async_queue.hpp"
+#include "../commands/cmd_resize.hpp"
 
 
-CtrlVideo::CtrlVideo( intf_thread_t *pIntf, const UString &rHelp,
+CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
+                      bool autoResize, const UString &rHelp,
                       VarBool *pVisible ):
-    CtrlGeneric( pIntf, rHelp, pVisible ), m_pVout( NULL )
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_pVout( NULL ),
+    m_rLayout( rLayout ), m_xShift( 0 ), m_yShift( 0 )
 {
+    // Observe the vout size variable if the control is auto-resizable
+    if( autoResize )
+    {
+        VarBox &rVoutSize = VlcProc::instance( pIntf )->getVoutSizeVar();
+        rVoutSize.addObserver( this );
+    }
 }
 
 
 CtrlVideo::~CtrlVideo()
 {
+    VarBox &rVoutSize = VlcProc::instance( getIntf() )->getVoutSizeVar();
+    rVoutSize.delObserver( this );
+
     if( m_pVout )
     {
         delete m_pVout;
@@ -65,6 +79,14 @@ void CtrlVideo::onResize()
 }
 
 
+void CtrlVideo::onPositionChange()
+{
+    // Compute the difference between layout size and video size
+    m_xShift = m_rLayout.getWidth() - getPosition()->getWidth();
+    m_yShift = m_rLayout.getHeight() - getPosition()->getHeight();
+}
+
+
 void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
 {
     GenericWindow *pParent = getWindow();
@@ -85,3 +107,19 @@ void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
         }
     }
 }
+
+
+void CtrlVideo::onUpdate( Subject<VarBox> &rVoutSize )
+{
+    int newWidth = ((VarBox&)rVoutSize).getWidth() + m_xShift;
+    int newHeight = ((VarBox&)rVoutSize).getHeight() + m_yShift;
+
+    // Create a resize command
+    CmdGeneric *pCmd = new CmdResize( getIntf(), m_rLayout, newWidth,
+                                      newHeight );
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
+    pQueue->remove( "resize" );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
+

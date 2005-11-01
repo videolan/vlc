@@ -412,14 +412,15 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "height", "0" );
         CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "rightbottom", "lefttop" );
+        CheckDefault( "autoresize", "false" );
         CheckDefault( "help", "" );
 
         const BuilderData::Video videoData( uniqueId( attr["id"] ),
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 atoi( attr["width"] ), atoi( attr["height" ]),
                 attr["lefttop"], attr["rightbottom"],
-                attr["visible"], attr["help"], m_curLayer,
-                m_curWindowId, m_curLayoutId );
+                attr["visible"], convertBoolean( attr["autoresize"] ),
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listVideo.push_back( videoData );
     }

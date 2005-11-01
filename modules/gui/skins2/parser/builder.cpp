@@ -702,8 +702,9 @@ void Builder::addVideo( const BuilderData::Video &rData )
     Interpreter *pInterpreter = Interpreter::instance( getIntf() );
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
-    CtrlVideo *pVideo = new CtrlVideo( getIntf(),
-        UString( getIntf(), rData.m_help.c_str() ), pVisible );
+    CtrlVideo *pVideo = new CtrlVideo( getIntf(), *pLayout,
+        rData.m_autoResize, UString( getIntf(), rData.m_help.c_str() ),
+        pVisible );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,

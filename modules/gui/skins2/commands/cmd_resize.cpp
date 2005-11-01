@@ -24,6 +24,7 @@
 
 #include "cmd_resize.hpp"
 #include "../src/generic_layout.hpp"
+#include "../src/vlcproc.hpp"
 
 
 CmdResize::CmdResize( intf_thread_t *pIntf, GenericLayout &rLayout, int width,
@@ -51,8 +52,7 @@ CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, void *pWindow, int width,
 
 void CmdResizeVout::execute()
 {
-    // TODO
-    msg_Dbg( getIntf(), "New vout size requested: %d x %d", m_width,
-             m_height );
+    VarBox &rVoutSize = VlcProc::instance( getIntf() )->getVoutSizeVar();
+    rVoutSize.setSize( m_width, m_height );
 }
 

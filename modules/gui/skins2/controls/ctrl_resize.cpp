@@ -163,24 +163,6 @@ void CtrlResize::CmdResizeResize::execute()
     int newWidth = pEvtMotion->getXPos() - m_pParent->m_xPos + m_pParent->m_width;
     int newHeight = pEvtMotion->getYPos() - m_pParent->m_yPos + m_pParent->m_height;
 
-    // Check boundaries
-    if( newWidth < m_pParent->m_rLayout.getMinWidth() )
-    {
-        newWidth = m_pParent->m_rLayout.getMinWidth();
-    }
-    if( newWidth > m_pParent->m_rLayout.getMaxWidth() )
-    {
-        newWidth = m_pParent->m_rLayout.getMaxWidth();
-    }
-    if( newHeight < m_pParent->m_rLayout.getMinHeight() )
-    {
-        newHeight = m_pParent->m_rLayout.getMinHeight();
-    }
-    if( newHeight > m_pParent->m_rLayout.getMaxHeight() )
-    {
-        newHeight = m_pParent->m_rLayout.getMaxHeight();
-    }
-
     // Create a resize command
     CmdGeneric *pCmd = new CmdResize( m_pParent->getIntf(), m_pParent->m_rLayout,
                                       newWidth, newHeight );
