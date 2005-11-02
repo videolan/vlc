@@ -27,7 +27,10 @@ include ./config.mak
 BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp
 
 all: FORCE
-	@echo "Do you mean to make src or make bin ?"
+#	@echo "Do you mean to make src or make bin ?"
+	@echo "    'make bin' isn't functional at the moment,"
+	@echo "    running 'make src' instead..."
+	$(MAKE) src
 
 src: FORCE
 	$(MAKE) -C src all
