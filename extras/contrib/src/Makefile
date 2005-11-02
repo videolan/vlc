@@ -683,10 +683,10 @@ faad2-$(FAAD2_VERSION).tar.bz2:
 faad2: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
-	(cd faad2;patch -p 0  < ../Patches/faad2-20050513-win32.patch)
+	(cd faad2;patch -p 0  < ../Patches/faad2-20050513-win32.patch && ./bootstrap)
 endif
 .faad: faad2
-	(cd $<; ./bootstrap && ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
+	(cd $< && ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
 	$(INSTALL_NAME)
 	touch $@
 
