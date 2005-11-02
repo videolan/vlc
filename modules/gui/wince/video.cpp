@@ -227,9 +227,6 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
 
     switch( i_query )
     {
-    case VOUT_SET_ZOOM:
-        break;
-
     case VOUT_SET_STAY_ON_TOP:
         break;
 
