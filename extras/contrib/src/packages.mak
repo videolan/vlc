@@ -156,3 +156,5 @@ DIRAC_VERSION=0.5.3
 DIRAC_URL=$(SF)/dirac/dirac-$(DIRAC_VERSION).tar.gz
 DX_HEADERS_URL=$(VIDEOLAN)/testing/contrib/win32-dx7headers.tgz
 DSHOW_HEADERS_URL=$(VIDEOLAN)/contrib/dshow-headers.tgz
+PORTAUDIO_VERSION=18
+PORTAUDIO_URL=http://www.portaudio.com/archives/pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz

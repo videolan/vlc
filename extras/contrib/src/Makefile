@@ -141,7 +141,7 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls .libmpcdec\
+	.png .gpg-error .gcrypt .gnutls .libmpcdec .portaudio\
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts
@@ -1247,6 +1247,26 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz
 CLEAN_FILE += .zlib
 CLEAN_PKG += zlib
 DISTCLEAN_PKG += zlib-$(ZLIB_VERSION).tar.gz
+
+
+# ***************************************************************************
+# PortAudio 
+# ***************************************************************************
+
+pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz:
+	$(WGET) $(PORTAUDIO_URL)
+
+portaudio: pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.portaudio: portaudio 
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make  install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .portaudio
+CLEAN_PKG += portaudio
+DISTCLEAN_PKG += pa_snapshot_v$(PORTAUDIO__VERSION).tar.gz
 
 
 
