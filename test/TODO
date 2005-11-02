@@ -1,0 +1,4 @@
+
+* Write wrapper around MediaControl with output redirection / use of logger interface + log checker (look for error in log and fail if any)
+
+* 
