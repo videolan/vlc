@@ -10,8 +10,8 @@ gprof="@gprof@"
 cprof="@cprof@"
 optim="@optim@"
 
-plugins="@PLUGINS@"
-builtins="@BUILTINS@"
+plugins="@PLUGINS@ "
+builtins="@BUILTINS@ "
 
 cppflags=""
 cflags=""
