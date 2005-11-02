@@ -22,23 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
+#include "wxwidgets.hpp"
+#include "preferences_widgets.h"
+#include <vlc_keys.h>
 #include <vlc_config_cat.h>
 
-#include "wxwidgets.h"
-#include "preferences_widgets.h"
-
 #include <wx/statline.h>
+#include <wx/spinctrl.h>
 
 /*****************************************************************************
  * CreateConfigControl wrapper

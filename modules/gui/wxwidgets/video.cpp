@@ -28,7 +28,8 @@
 #include <vlc/vout.h>
 #include <vlc/intf.h>
 
-#include "wxwidgets.h"
+#include "video.hpp"
+#include "interface.hpp"
 
 static void *GetWindow( intf_thread_t *p_intf, vout_thread_t *,
                         int *pi_x_hint, int *pi_y_hint,
@@ -47,40 +48,6 @@ enum
     UpdateHide_Event,
     SetStayOnTop_Event,
     ID_HIDE_TIMER
-};
-
-class VideoWindow: public wxWindow
-{
-public:
-    /* Constructor */
-    VideoWindow( intf_thread_t *_p_intf, wxWindow *p_parent );
-    virtual ~VideoWindow();
-
-    void *GetWindow( vout_thread_t *p_vout, int *, int *,
-                     unsigned int *, unsigned int * );
-    void ReleaseWindow( void * );
-    int  ControlWindow( void *, int, va_list );
-
-    mtime_t i_creation_date;
-
-private:
-    intf_thread_t *p_intf;
-    vout_thread_t *p_vout;
-    wxWindow *p_parent;
-    vlc_mutex_t lock;
-    vlc_bool_t b_shown;
-    vlc_bool_t b_auto_size;
-
-    wxWindow *p_child_window;
-
-    wxTimer m_hide_timer;
-
-    void UpdateSize( wxEvent& event );
-    void UpdateHide( wxEvent& event );
-    void OnControlEvent( wxCommandEvent& event );
-    void OnHideTimer( wxTimerEvent& WXUNUSED(event));
-
-    DECLARE_EVENT_TABLE();
 };
 
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_VLC_VIDEO );

@@ -24,24 +24,17 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
+#include "dialogs/preferences.hpp"
 #include <vlc_config_cat.h>
-
-#include "wxwidgets.h"
-#include "preferences_widgets.h"
+#include "dialogs/preferences_widgets.h"
 
 #include <wx/combobox.h>
 #include <wx/statline.h>
 #include <wx/clntdata.h>
 #include <wx/dynarray.h>
 #include <wx/imaglist.h>
+#include <wx/treectrl.h>
 
 #include "bitmaps/type_net.xpm"
 #include "bitmaps/codec.xpm"
@@ -1082,7 +1075,7 @@ void PrefsPanel::SwitchAdvanced( vlc_bool_t b_new_advanced )
 {
     bool hidden = false;
 
-    if( b_advanced == b_new_advanced ) 
+    if( b_advanced == b_new_advanced )
     {
         goto hide;
     }

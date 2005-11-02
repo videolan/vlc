@@ -24,20 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-#include "network.h"
-
-#include "wxwidgets.h"
-
+#include "dialogs/wizard.hpp"
 #include "streamdata.h"
+#include "dialogs/open.hpp"
 
 #include <wx/statline.h>
+#include <network.h>
 
 class wizHelloPage;
 class wizInputPage;

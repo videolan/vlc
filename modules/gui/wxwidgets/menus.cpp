@@ -32,7 +32,8 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include "wxwidgets.h"
+#include "wxwidgets.hpp"
+#include "interface.hpp"
 
 class wxMenuItemExt: public wxMenuItem
 {

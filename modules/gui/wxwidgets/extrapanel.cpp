@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-#include "wxwidgets.h"
+#include "extrapanel.hpp"
 
 /*****************************************************************************
  * Local class declarations.

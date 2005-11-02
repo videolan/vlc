@@ -21,22 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
-#include <vlc/vlc.h>
-
+#include "dialogs/iteminfo.hpp"
 #include <wx/combobox.h>
 #include <wx/statline.h>
-
-#include <vlc/intf.h>
-
-#include "wxwidgets.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0

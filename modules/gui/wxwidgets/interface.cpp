@@ -24,14 +24,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/vout.h>
-#include <vlc/input.h>
-#include <vlc/intf.h>
+#include "interface.hpp"
+#include "extrapanel.hpp"
+#include "timer.hpp"
+#include "video.hpp"
+#include <vlc_keys.h>
+
 #include "charset.h"
 
-#include "wxwidgets.h"
+#include <vlc/aout.h>
+#include "charset.h"
 
 /* include the toolbar graphics */
 #include "bitmaps/play.xpm"
@@ -158,6 +160,7 @@ enum
      * (where it is special and put into the "Apple" menu) */
     About_Event = wxID_ABOUT,
     UpdateVLC_Event,
+    VLM_Event,
 
     Iconize_Event
 };
@@ -167,6 +170,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Exit_Event, Interface::OnExit)
     EVT_MENU(About_Event, Interface::OnAbout)
     EVT_MENU(UpdateVLC_Event, Interface::OnShowDialog)
+    EVT_MENU(VLM_Event, Interface::OnShowDialog)
 
     EVT_MENU(Playlist_Event, Interface::OnShowDialog)
     EVT_MENU(Logs_Event, Interface::OnShowDialog)
@@ -356,7 +360,7 @@ Interface::~Interface()
                          GetPosition(), GetSize() );
     }
 
-	PopEventHandler(true);
+    PopEventHandler(true);
 
     if( video_window ) delete video_window;
 
@@ -444,6 +448,8 @@ void Interface::CreateOurMenuBar()
     view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")) );
     view_menu->Append( FileInfo_Event,
                        wxU(_("Stream and Media &info...\tCtrl-I")) );
+    view_menu->Append( VLM_Event,
+                       wxU(_("VLM Control...\tCtrl-I")) );
 
     /* Create the "Auto-generated" menus */
     p_settings_menu = SettingsMenu( p_intf, this );
@@ -739,6 +745,7 @@ void Interface::SetupHotkeys()
 
 void Interface::HideSlider( bool layout )
 {
+        fprintf( stderr, "Hiding slider\n");
     ShowSlider( false, layout );
 }
 
@@ -939,6 +946,7 @@ void Interface::OnShowDialog( wxCommandEvent& event )
             break;
         case OpenAdv_Event:
             i_id = INTF_DIALOG_FILE;
+            break;
         case OpenFile_Event:
             i_id = INTF_DIALOG_FILE;
             break;
@@ -978,6 +986,9 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case UpdateVLC_Event:
             i_id = INTF_DIALOG_UPDATEVLC;
             break;
+        case VLM_Event:
+            i_id = INTF_DIALOG_VLM;
+            break;
         default:
             i_id = INTF_DIALOG_FILE;
             break;
@@ -1004,93 +1015,6 @@ void Interface::OnExtended(wxCommandEvent& event)
     frame_sizer->Layout();
     frame_sizer->Fit(this);
 }
-
-#if 0
-        if( b_undock == VLC_TRUE )
-        {
-                fprintf(stderr,"Deleting window\n");
-            if( extra_window )
-            {
-                delete extra_window;
-                extra_window = NULL;
-            }
-        }
-        else
-        {
-            extra_frame->Hide();
-            frame_sizer->Hide( extra_frame );
-            frame_sizer->Layout();
-            frame_sizer->Fit(this);
-        }
-    }
-    else
-    {
-        if( b_undock == VLC_TRUE )
-        {
-                fprintf(stderr,"Creating window\n");
-            extra_frame->Hide();
-            frame_sizer->Hide( extra_frame );
-#if (wxCHECK_VERSION(2,5,0))
-            frame_sizer->Detach( extra_frame );
-#else
-            frame_sizer->Remove( extra_frame );
-#endif
-            frame_sizer->Layout();
-            frame_sizer->Fit(this);
-            extra_window = new ExtraWindow( p_intf, this, extra_frame );
-        }
-        else
-        {
-                fprintf(stderr,"Deleting window\n");
-            if( extra_window )
-            {
-                delete extra_window;
-            }
-            extra_frame->Show();
-            frame_sizer->Show( extra_frame );
-            frame_sizer->Layout();
-            frame_sizer->Fit(this);
-        }
-    }
-}
-
-void Interface::OnUndock(wxCommandEvent& event)
-{
-    b_undock = (b_undock == VLC_TRUE ? VLC_FALSE : VLC_TRUE );
-
-    if( b_extra == VLC_TRUE )
-    {
-        if( b_undock == VLC_FALSE )
-        {
-                fprintf(stderr,"Deleting window\n");
-            if( extra_window )
-            {
-                delete extra_window;
-                extra_window = NULL;
-            }
-            extra_frame->Show();
-            frame_sizer->Show( extra_frame );
-            frame_sizer->Layout();
-            frame_sizer->Fit(this);
-        }
-        else
-        {
-                fprintf(stderr,"Creating window\n");
-            extra_frame->Hide();
-            frame_sizer->Hide( extra_frame );
-#if (wxCHECK_VERSION(2,5,0))
-            frame_sizer->Detach( extra_frame );
-#else
-            frame_sizer->Remove( extra_frame );
-#endif
-            frame_sizer->Layout();
-            frame_sizer->Fit(this);
-            extra_window = new ExtraWindow( p_intf, this, extra_frame );
-        }
-    }
-}
-#endif
-
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 {
@@ -1230,22 +1154,6 @@ void Interface::PrevStream()
         return;
     }
 
-    /* FIXME --fenrir */
-#if 0
-    if( p_playlist->p_input != NULL )
-    {
-        vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-        if( p_playlist->p_input->stream.p_selected_area->i_id > 1 )
-        {
-            vlc_value_t val; val.b_bool = VLC_TRUE;
-            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-            var_Set( p_playlist->p_input, "prev-title", val );
-        } else
-            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-    }
-    vlc_mutex_unlock( &p_playlist->object_lock );
-#endif
-
     playlist_Prev( p_playlist );
     vlc_object_release( p_playlist );
 }
@@ -1264,26 +1172,6 @@ void Interface::NextStream()
     {
         return;
     }
-
-    /* FIXME --fenrir */
-#if 0
-    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->p_input != NULL )
-    {
-        vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
-        if( p_playlist->p_input->stream.i_area_nb > 1 &&
-            p_playlist->p_input->stream.p_selected_area->i_id <
-              p_playlist->p_input->stream.i_area_nb - 1 )
-        {
-            vlc_value_t val; val.b_bool = VLC_TRUE;
-            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-            var_Set( p_playlist->p_input, "next-title", val );
-        } else
-            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
-    }
-    vlc_mutex_unlock( &p_playlist->object_lock );
-#endif
     playlist_Next( p_playlist );
     vlc_object_release( p_playlist );
 }
@@ -1419,6 +1307,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
         char *psz_utf8 = wxFromLocale( filenames[i] );
+
         playlist_Add( p_playlist, psz_utf8, psz_utf8,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
                       PLAYLIST_END );

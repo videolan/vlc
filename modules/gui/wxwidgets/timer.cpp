@@ -24,19 +24,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
-#include <vlc/vlc.h>
-#include <vlc/aout.h>
-#include <vlc/intf.h>
-
+#include "timer.hpp"
+#include "main_slider_manager.hpp"
+#include "interface.hpp"
 #include "vlc_meta.h"
-
-#include "wxwidgets.h"
-#include <wx/timer.h>
 
 //void DisplayStreamDate( wxControl *, intf_thread_t *, int );
 
@@ -54,6 +45,9 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
     b_init = 0;
+
+    msm = new MainSliderManager( p_intf, p_main_interface );
+
     i_old_playing_status = PAUSE_S;
     i_old_rate = INPUT_RATE_DEFAULT;
 
@@ -84,10 +78,7 @@ Timer::~Timer()
         vlc_object_release( p_playlist );
     }
 
-    vlc_mutex_lock( &p_intf->change_lock );
-    if( p_intf->p_sys->p_input ) vlc_object_release( p_intf->p_sys->p_input );
-    p_intf->p_sys->p_input = NULL;
-    vlc_mutex_unlock( &p_intf->change_lock );
+    delete msm;
 }
 
 /*****************************************************************************
@@ -112,204 +103,15 @@ void Timer::Notify()
 
     vlc_mutex_lock( &p_intf->change_lock );
 
-    /* Update the input */
-    if( p_intf->p_sys->p_input == NULL )
-    {
-        playlist_t *p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-        if( p_playlist != NULL )
-        {
-            LockPlaylist( p_intf->p_sys, p_playlist );
-            p_intf->p_sys->p_input = p_playlist->p_input;
-            if( p_intf->p_sys->p_input )
-                vlc_object_yield( p_intf->p_sys->p_input );
-            UnlockPlaylist( p_intf->p_sys, p_playlist );
-            vlc_object_release( p_playlist );
-        }
+    /* Call update */
+    msm->Update();
 
-        /* Refresh interface */
-        if( p_intf->p_sys->p_input )
-        {
-            p_main_interface->slider->SetValue( 0 );
-
-            char *psz_now_playing = vlc_input_item_GetInfo(
-                p_intf->p_sys->p_input->input.p_item,
-                _("Meta-information"), _(VLC_META_NOW_PLAYING) );
-            if( psz_now_playing && *psz_now_playing )
-            {
-                p_main_interface->statusbar->SetStatusText(
-                    wxString(wxU(psz_now_playing)) + wxT( " - " ) +
-                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
-            }
-            else
-            {
-                p_main_interface->statusbar->SetStatusText(
-                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
-            }
-            free( psz_now_playing );
-
-            p_main_interface->TogglePlayButton( PLAYING_S );
-#ifdef wxHAS_TASK_BAR_ICON
-            if( p_main_interface->p_systray )
-            {
-                p_main_interface->p_systray->UpdateTooltip( wxU(p_intf->p_sys->p_input->input.p_item->psz_name) + wxString(wxT(" - ")) + wxU(_("Playing")));
-            }
-#endif
-            i_old_playing_status = PLAYING_S;
-        }
-    }
-    else if( p_intf->p_sys->p_input->b_dead )
-    {
-        //controls auto-hide after a timer
-        p_main_interface->m_controls_timer.Start(200, wxTIMER_ONE_SHOT);
-
-        p_main_interface->TogglePlayButton( PAUSE_S );
-        i_old_playing_status = PAUSE_S;
-
-        p_main_interface->statusbar->SetStatusText( wxT(""), 0 );
-        p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
-
-#ifdef wxHAS_TASK_BAR_ICON
-        if( p_main_interface->p_systray )
-        {
-            p_main_interface->p_systray->UpdateTooltip( wxString(wxT("VLC media player - ")) + wxU(_("Stopped")) );
-        }
-#endif
-        vlc_object_release( p_intf->p_sys->p_input );
-        p_intf->p_sys->p_input = NULL;
-    }
-
+    vlc_value_t val;
+    input_thread_t *p_input = p_intf->p_sys->p_input;
     if( p_intf->p_sys->p_input )
     {
-        input_thread_t *p_input = p_intf->p_sys->p_input;
-        vlc_value_t val;
-
-        if( !p_input->b_die )
+        if( !p_intf->p_sys->p_input->b_die )
         {
-            vlc_value_t pos;
-
-            //prevent the controls from auto-hiding
-            p_main_interface->m_controls_timer.Stop();
-
-            /* New input or stream map change */
-            p_intf->p_sys->b_playing = 1;
-
-            /* Update the item name */
-            char *psz_now_playing = vlc_input_item_GetInfo(
-                p_intf->p_sys->p_input->input.p_item,
-                _("Meta-information"), _(VLC_META_NOW_PLAYING) );
-            if( psz_now_playing && *psz_now_playing )
-            {
-                p_main_interface->statusbar->SetStatusText(
-                    wxString(wxU(psz_now_playing)) + wxT( " - " ) +
-                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
-            }
-            else
-            {
-                p_main_interface->statusbar->SetStatusText(
-                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
-            }
-            free( psz_now_playing );
-
-            /* Manage the slider */
-            var_Get( p_input, "position", &pos );
-
-            var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
-            if( val.i_int > 0 && !p_main_interface->disc_frame->IsShown() )
-            {
-                vlc_value_t val;
-
-                    #define HELP_MENU N_("Menu")
-                    #define HELP_PCH N_("Previous chapter")
-                    #define HELP_NCH N_("Next chapter")
-                    #define HELP_PTR N_("Previous track")
-                    #define HELP_NTR N_("Next track")
-
-                var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val,
-                            NULL );
-
-                if( val.i_int > 0 )
-                {
-                    p_main_interface->disc_menu_button->Show();
-                    p_main_interface->disc_sizer->Show(
-                        p_main_interface->disc_menu_button );
-                    p_main_interface->disc_sizer->Layout();
-                    p_main_interface->disc_sizer->Fit(
-                        p_main_interface->disc_frame );
-                    p_main_interface->disc_menu_button->SetToolTip(
-                        wxU(_( HELP_MENU ) ) );
-                    p_main_interface->disc_prev_button->SetToolTip(
-                        wxU(_( HELP_PCH ) ) );
-                    p_main_interface->disc_next_button->SetToolTip(
-                        wxU(_( HELP_NCH ) ) );
-                }
-                else
-                {
-                    p_main_interface->disc_menu_button->Hide();
-                    p_main_interface->disc_sizer->Hide(
-                        p_main_interface->disc_menu_button );
-
-                    p_main_interface->disc_prev_button->SetToolTip(
-                        wxU(_( HELP_PTR ) ) );
-                    p_main_interface->disc_next_button->SetToolTip(
-                        wxU(_( HELP_NTR ) ) );
-                }
-
-                p_main_interface->ShowDiscFrame();
-            }
-            else if( val.i_int == 0 && p_main_interface->disc_frame->IsShown() )
-            {
-                p_main_interface->HideDiscFrame();
-            }
-
-
-            if( pos.f_float > 0.0 &&
-                !p_main_interface->slider_frame->IsShown() )
-            {
-                /* Show the slider if it's position is significant */
-                p_main_interface->ShowSlider();
-            }
-            else if( pos.f_float <= 0.0 )
-            {
-                p_main_interface->m_slider_timer.Start(200, wxTIMER_ONE_SHOT);
-            }
-
-            if( p_intf->p_sys->b_playing &&
-                p_main_interface->slider_frame->IsShown() )
-            {
-                /* Update the slider if the user isn't dragging it. */
-                if( p_intf->p_sys->b_slider_free )
-                {
-                    char psz_time[ MSTRTIME_MAX_SIZE ];
-                    char psz_total[ MSTRTIME_MAX_SIZE ];
-                    vlc_value_t time;
-                    mtime_t i_seconds;
-
-                    /* Update the value */
-                    if( pos.f_float >= 0.0 )
-                    {
-                        p_intf->p_sys->i_slider_pos =
-                            (int)(SLIDER_MAX_POS * pos.f_float);
-
-                        p_main_interface->slider->SetValue(
-                            p_intf->p_sys->i_slider_pos );
-
-                        var_Get( p_intf->p_sys->p_input, "time", &time );
-                        i_seconds = time.i_time / 1000000;
-                        secstotimestr ( psz_time, i_seconds );
-
-                        var_Get( p_intf->p_sys->p_input, "length",  &time );
-                        i_seconds = time.i_time / 1000000;
-                        secstotimestr ( psz_total, i_seconds );
-
-                        p_main_interface->statusbar->SetStatusText(
-                            wxU(psz_time) + wxString(wxT(" / ")) +
-                            wxU(psz_total), 0 );
-                    }
-                }
-            }
-
             /* Take care of the volume, etc... */
             p_main_interface->Update();
 

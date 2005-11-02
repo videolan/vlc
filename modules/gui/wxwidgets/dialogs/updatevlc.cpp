@@ -1,5 +1,5 @@
 /*****************************************************************************
- * updatevlc.cpp : Check for VLC updates dialog
+ * updatevlc.cpp : VLC Update checker
  *****************************************************************************
  * Copyright (C) 2000-2004 the VideoLAN team
  * $Id$
@@ -24,12 +24,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
+#include "updatevlc.hpp"
 #include <wx/progdlg.h>
-
-#include "wxwidgets.h"
+#include <wx/treectrl.h>
 
 #include "vlc_block.h"
 #include "vlc_stream.h"
@@ -158,6 +155,7 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 UpdateVLC::~UpdateVLC()
 {
+    fprintf( stderr, "Fooing\n");
 }
 
 /* this function gets all the info from the xml files hosted on

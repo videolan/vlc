@@ -32,9 +32,20 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/intf.h>
+
 #include "charset.h"
 
-#include "wxwidgets.h"
+#include "dialogs/vlm/vlm_panel.hpp"
+#include "dialogs/bookmarks.hpp"
+#include "dialogs/wizard.hpp"
+#include "dialogs/playlist.hpp"
+#include "dialogs/open.hpp"
+#include "dialogs/updatevlc.hpp"
+#include "dialogs/fileinfo.hpp"
+#include "dialogs/iteminfo.hpp"
+#include "dialogs/preferences.hpp"
+#include "dialogs/messages.hpp"
+#include "interface.hpp"
 
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"
@@ -52,6 +63,7 @@ private:
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnUpdateVLC( wxCommandEvent& event );
+    void OnVLM( wxCommandEvent& event );
     void OnExit( wxCommandEvent& event );
     void OnPlaylist( wxCommandEvent& event );
     void OnMessages( wxCommandEvent& event );
@@ -92,6 +104,7 @@ public:
     wxFrame             *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
     UpdateVLC           *p_updatevlc_dialog;
+    VLMFrame            *p_vlm_dialog;
 };
 
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_DIALOG );
@@ -131,6 +144,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnExitThread)
     EVT_COMMAND(INTF_DIALOG_UPDATEVLC, wxEVT_DIALOG,
                 DialogsProvider::OnUpdateVLC)
+    EVT_COMMAND(INTF_DIALOG_VLM, wxEVT_DIALOG,
+                DialogsProvider::OnVLM)
 END_EVENT_TABLE()
 
 wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent )
@@ -157,6 +172,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_bookmarks_dialog = NULL;
     p_dir_dialog = NULL;
     p_updatevlc_dialog = NULL;
+    p_vlm_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -191,7 +207,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     INIT( ID_PLAYLIST, p_playlist_dialog, new Playlist(p_intf,this), ShowPlaylist );
     INIT( ID_MESSAGES, p_messages_dialog, new Messages(p_intf,this), Show );
     INIT( ID_FILE_INFO, p_fileinfo_dialog, new FileInfo(p_intf,this), Show );
-    INIT( ID_BOOKMARKS, p_bookmarks_dialog, BookmarksDialog(p_intf,this), Show);
+    INIT( ID_BOOKMARKS, p_bookmarks_dialog, new BookmarksDialog(p_intf,this), Show);
 #undef INIT
 }
 
@@ -215,7 +231,7 @@ DialogsProvider::~DialogsProvider()
 
 #undef UPDATE
 
-	PopEventHandler(true);
+    PopEventHandler(true);
 
     /* Clean up */
     if( p_open_dialog )     delete p_open_dialog;
@@ -228,6 +244,7 @@ DialogsProvider::~DialogsProvider()
     if( p_wizard_dialog ) delete p_wizard_dialog;
     if( p_bookmarks_dialog ) delete p_bookmarks_dialog;
     if( p_updatevlc_dialog ) delete p_updatevlc_dialog;
+    if( p_vlm_dialog ) delete p_vlm_dialog;
 
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
@@ -319,7 +336,7 @@ void DialogsProvider::OnBookmarks( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the open dialog */
     if( !p_bookmarks_dialog )
-        p_bookmarks_dialog = BookmarksDialog( p_intf, this );
+        p_bookmarks_dialog = new BookmarksDialog( p_intf, this );
 
     if( p_bookmarks_dialog )
     {
@@ -500,5 +517,17 @@ void DialogsProvider::OnUpdateVLC( wxCommandEvent& WXUNUSED(event) )
     if( p_updatevlc_dialog )
     {
         p_updatevlc_dialog->Show( !p_updatevlc_dialog->IsShown() );
+    }
+}
+
+void DialogsProvider::OnVLM( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the file info window */
+    if( !p_vlm_dialog )
+        p_vlm_dialog = new VLMFrame( p_intf, this );
+
+    if( p_vlm_dialog )
+    {
+        p_vlm_dialog->Show( !p_vlm_dialog->IsShown() );
     }
 }

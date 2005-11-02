@@ -21,18 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include "wxwidgets.h"
+#include "dialogs/messages.hpp"
 
 /*****************************************************************************
  * Event Table.
@@ -142,6 +131,7 @@ void Messages::UpdateLog()
     vlc_mutex_lock( p_sub->p_lock );
     int i_stop = *p_sub->pi_stop;
     vlc_mutex_unlock( p_sub->p_lock );
+
 
     if( p_sub->i_start != i_stop )
     {

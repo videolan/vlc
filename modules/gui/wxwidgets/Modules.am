@@ -1,27 +1,33 @@
 SOURCES_wxwidgets = \
 	wxwidgets.cpp \
-	wxwidgets.h \
-	interface.cpp \
-	extrapanel.cpp \
-	dialogs.cpp \
-	open.cpp \
-	streamout.cpp \
-	wizard.cpp \
 	streamdata.h \
 	streamdata.cpp \
-	messages.cpp \
-	playlist.cpp \
-	iteminfo.cpp \
+	interface.cpp \
+	extrapanel.cpp \
 	menus.cpp \
-	preferences.cpp \
-	preferences_widgets.cpp \
-	preferences_widgets.h \
 	timer.cpp \
-	fileinfo.cpp \
-	updatevlc.cpp \
-	subtitles.cpp \
-	bookmarks.cpp \
 	video.cpp \
+	slider_manager.cpp \
+	main_slider_manager.cpp \
+	dialogs.cpp \
+	dialogs/open.cpp \
+	dialogs/streamout.cpp \
+	dialogs/wizard.cpp \
+	dialogs/messages.cpp \
+	dialogs/playlist.cpp \
+	dialogs/iteminfo.cpp \
+	dialogs/preferences.cpp \
+	dialogs/preferences_widgets.cpp \
+	dialogs/preferences_widgets.h \
+	dialogs/fileinfo.cpp \
+	dialogs/updatevlc.cpp \
+	dialogs/subtitles.cpp \
+	dialogs/bookmarks.cpp \
+	dialogs/vlm/vlm_slider_manager.cpp \
+	dialogs/vlm/vlm_stream.cpp \
+	dialogs/vlm/vlm_wrapper.cpp \
+	dialogs/vlm/vlm_streampanel.cpp \
+	dialogs/vlm/vlm_panel.cpp \
 	$(NULL)
 
 EXTRA_DIST += \
@@ -53,4 +59,9 @@ EXTRA_DIST += \
 	bitmaps/type_playlist.xpm \
 	bitmaps/type_unknown.xpm \
 	bitmaps/type_vfile.xpm \
-	bitmaps/video.xpm
+	bitmaps/video.xpm \
+	vlm/vlm_slider_manager.hpp \
+	vlm/vlm_stream.hpp \
+	vlm/vlm_wrapper.hpp \
+	vlm/vlm_streampanel.hpp \
+	vlm/vlm_panel.hpp

@@ -24,15 +24,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
+#include "dialogs/streamout.hpp"
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include "wxwidgets.h"
+#include <wx/spinctrl.h>
 #include <wx/combobox.h>
 #include <wx/statline.h>
 

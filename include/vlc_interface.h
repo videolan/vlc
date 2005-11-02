@@ -158,6 +158,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_FILE_GENERIC 30
 
 #define INTF_DIALOG_UPDATEVLC   90
+#define INTF_DIALOG_VLM   91
 
 #define INTF_DIALOG_EXIT       99
 

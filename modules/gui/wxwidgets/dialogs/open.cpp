@@ -1,5 +1,5 @@
 /*****************************************************************************
- * open.cpp : wxWindows plugin for vlc
+ * open.cpp : Open dialog box
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$
@@ -24,13 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "dialogs/open.hpp"
+#include "dialogs/streamout.hpp"
+#include "dialogs/preferences_widgets.h"
+#include "dialogs/subtitles.hpp"
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
-#include <vlc/vlc.h>
 #include "charset.h"
 
 #ifdef HAVE_LIBCDIO
@@ -51,12 +49,8 @@
 #include <wx/statline.h>
 #include <wx/tokenzr.h>
 
-#include <vlc/intf.h>
-
 #include <vector>
 
-#include "wxwidgets.h"
-#include "preferences_widgets.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
@@ -1332,9 +1326,10 @@ static bool IsDVD(const char *psz_drive)
 */
 static char * ProbeDVD(const wxChar *device)
 {
+        /*
   char **ppsz_cd_drives;
   const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
-  char *psz_device = const_cast<char *>(tmp_buf.data());
+  char *psz_device = (char *) tmp_buf;
 
   if( IsDVD(psz_device) )
   {
@@ -1355,7 +1350,7 @@ static char * ProbeDVD(const wxChar *device)
           }
       }
       cdio_free_device_list(ppsz_cd_drives);
-  }
+  }*/
   return NULL;
 }
 
@@ -1402,27 +1397,30 @@ static char * ProbeDevice(char **ppsz_search_devices, cdio_fs_anal_t mask,
 */
 static char * ProbeCDDA(const wxChar *device)
 {
+        /*
    char *ppsz_device[2];
    const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
-   char *psz_device = const_cast<char *>(tmp_buf.data());
+   char *psz_device = (char *) tmp_buf;
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device, CDIO_FS_AUDIO, false);
+   */ return NULL;
 }
 
 /* Return a device that has a VCD in it. The caller needs to free
    the returned string.
 */
 static char * ProbeVCD(const wxChar *device)
-{
+{/*
    char *ppsz_device[2];
    const wxWX2MBbuf tmp_buf = wxConvCurrent->cWX2MB(device);
-   char *psz_device = const_cast<char *>(tmp_buf.data());
+   char *psz_device = (char *) tmp_buf;
    ppsz_device[0] = (device && *device) ? psz_device : NULL;
    ppsz_device[1] = NULL;
    return ProbeDevice(ppsz_device,
                       (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD|CDIO_FS_ANAL_VIDEOCD
                        |CDIO_FS_UNKNOWN), true);
+                       */ return NULL;
 }
 
 

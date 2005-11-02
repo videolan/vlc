@@ -36,7 +36,7 @@
 #   include <locale.h>
 #endif
 
-#include "wxwidgets.h"
+#include "interface.hpp"
 
 /* Temporary hack */
 #if defined(WIN32) && defined(_WX_INIT_H_)

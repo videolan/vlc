@@ -24,23 +24,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
+#include "dialogs/bookmarks.hpp"
 
-#include <vlc/vlc.h>
-#include <vlc/intf.h>
-
-#include "wxwidgets.h"
-#include <wx/dialog.h>
+#include "wizard.hpp"
 
 /* Callback prototype */
 static int PlaylistChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
- * Class declaration.
+ * Event Table.
  *****************************************************************************/
 
 /* IDs for the controls and the menu commands */
@@ -53,41 +46,6 @@ enum
     ButtonExtract_Event,
     ButtonEdit_Event
 };
-
-class BookmarksDialog: public wxFrame
-{
-public:
-    /* Constructor */
-    BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
-    virtual ~BookmarksDialog();
-
-    bool Show( bool );
-
-private:
-
-    void Update();
-
-    /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxCloseEvent& event );
-    void OnAdd( wxCommandEvent& event );
-    void OnDel( wxCommandEvent& event );
-    void OnClear( wxCommandEvent& event );
-    void OnActivateItem( wxListEvent& event );
-    void OnUpdate( wxCommandEvent &event );
-    void OnEdit( wxCommandEvent& event );
-    void OnExtract( wxCommandEvent& event );
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-    wxWindow *p_parent;
-
-    wxListView *list_ctrl;
-};
-
-/*****************************************************************************
- * Event Table.
- *****************************************************************************/
 
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_BOOKMARKS );
 
@@ -105,30 +63,10 @@ BEGIN_EVENT_TABLE(BookmarksDialog, wxFrame)
     EVT_COMMAND( -1, wxEVT_BOOKMARKS, BookmarksDialog::OnUpdate )
 END_EVENT_TABLE()
 
-/* Declaration of class BookmarkEditDialog */
-class BookmarkEditDialog : public wxDialog
-{
-public:
-    /* Constructor */
-    BookmarkEditDialog( intf_thread_t *p_intf, wxWindow *p_parent,
-                  seekpoint_t *p_seekpoint );
-    virtual ~BookmarkEditDialog();
-    seekpoint_t *p_seekpoint;
-private:
-
-    wxTextCtrl *name_text, *time_text, *bytes_text;
-
-    void OnOK( wxCommandEvent& event);
-    void OnCancel( wxCommandEvent& event);
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-};
-
 BEGIN_EVENT_TABLE( BookmarkEditDialog, wxDialog)
-            EVT_BUTTON( wxID_OK, BookmarkEditDialog::OnOK)
+    EVT_BUTTON( wxID_OK, BookmarkEditDialog::OnOK)
 END_EVENT_TABLE()
+
 /****************************************************************************
  * BookmarkEditDialog
  ***************************************************************************/
@@ -294,10 +232,10 @@ BookmarksDialog::~BookmarksDialog()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-wxFrame *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent )
-{
-    return new class BookmarksDialog( p_intf, p_parent );
-}
+//wxFrame *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent )
+//{
+//    return new class BookmarksDialog( p_intf, p_parent );
+//}
 
 void BookmarksDialog::Update()
 {
