@@ -1,7 +1,7 @@
 /*****************************************************************************
- * cmd_vars.cpp
+ * equalizer.hpp
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
@@ -21,47 +21,39 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "cmd_vars.hpp"
-#include "../src/vlcproc.hpp"
-#include "../utils/var_text.hpp"
-#include "../vars/equalizer.hpp"
-#include "../vars/playlist.hpp"
-#include "../vars/playtree.hpp"
+#ifndef EQUALIZER_HPP
+#define EQUALIZER_HPP
+
+#include "../utils/var_percent.hpp"
+#include <string>
 
 
-void CmdNotifyPlaylist::execute()
+/// Variable for graphical equalizer
+class EqualizerBands: public SkinObject, public Observer<VarPercent>
 {
-    // Notify the playlist variable
-    Playlist &rVar = VlcProc::instance( getIntf() )->getPlaylistVar();
-    rVar.onChange();
-}
+    public:
+        /// Number of bands
+        static const int kNbBands = 10;
 
-void CmdPlaytreeChanged::execute()
-{
-    // Notify  the playtree variable
-    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
-    rVar.onChange();
-}
+        EqualizerBands( intf_thread_t *pIntf );
+        virtual ~EqualizerBands();
 
+        /// Set the equalizer bands from a configuration string,
+        /// e.g. "1 5.2 -3.6 0 0 2.5 0 0 0 0"
+        void set( string bands );
 
-void CmdPlaytreeUpdate::execute()
-{
-    // Notify  the playtree variable
-    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
-    rVar.onUpdate( m_id );
-}
+        /// Return the variable for a specific band
+        VariablePtr getBand( int band );
 
+    private:
+        /// Array of equalizer bands
+        VariablePtr m_cBands[kNbBands];
+        /// Flag set when an update is in progress
+        bool m_isUpdating;
 
-void CmdSetText::execute()
-{
-    // Change the text variable
-    m_rText.set( m_value );
-}
+        /// Callback for band updates
+        virtual void onUpdate( Subject<VarPercent> &rBand );
+};
 
 
-void CmdSetEqBands::execute()
-{
-    // Change the equalizer bands
-    m_rEqBands.set( m_value );
-}
-
+#endif

@@ -27,6 +27,7 @@
 #include "cmd_generic.hpp"
 #include "../utils/ustring.hpp"
 
+class EqualizerBands;
 class VarText;
 
 /// Command to notify the playlist of a change
@@ -75,6 +76,29 @@ class CmdSetText: public CmdGeneric
         VarText &m_rText;
         /// Value to set
         const UString m_value;
+};
+
+
+/// Command to set the equalizerbands
+class CmdSetEqBands: public CmdGeneric
+{
+    public:
+        CmdSetEqBands( intf_thread_t *pIntf, EqualizerBands &rEqBands,
+                       const string &rValue ):
+            CmdGeneric( pIntf ), m_rEqBands( rEqBands ), m_value( rValue ) {}
+        virtual ~CmdSetEqBands() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "set equalizer bands"; }
+
+    private:
+        /// Equalizer variable to set
+        EqualizerBands &m_rEqBands;
+        /// Value to set
+        const string m_value;
 };
 
 

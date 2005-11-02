@@ -163,7 +163,6 @@ int ThemeRepository::changeSkin( vlc_object_t *pIntf, char const *pCmd,
         CmdChangeSkin *pCmd = new CmdChangeSkin( pThis->getIntf(),
                                                  newval.psz_string );
         AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-        pQueue->remove( "change skin" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 

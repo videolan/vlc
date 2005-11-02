@@ -44,8 +44,9 @@ class AsyncQueue: public SkinObject
         /// Destroy the instance of AsyncQueue
         static void destroy( intf_thread_t *pIntf );
 
-        /// Add a command in the queue
-        void push( const CmdGenericPtr &rcCommand );
+        /// Add a command in the queue, after having removed the commands
+        /// of the same type already in the queue if needed
+        void push( const CmdGenericPtr &rcCommand, bool removePrev = true );
 
         /// Remove the commands of the given type
         void remove( const string &rType );

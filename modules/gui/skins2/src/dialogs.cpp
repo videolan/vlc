@@ -45,7 +45,6 @@ void Dialogs::showChangeSkinCB( intf_dialog_args_t *pArg )
 
             // Push the command in the asynchronous command queue
             AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-            pQueue->remove( "change skin" );
             pQueue->push( CmdGenericPtr( pCmd ) );
         }
     }
@@ -71,8 +70,6 @@ void Dialogs::showPlaylistLoadCB( intf_dialog_args_t *pArg )
 
         // Push the command in the asynchronous command queue
         AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-        pQueue->remove( "load playlist" );
-        pQueue->remove( "load playtree" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 }
@@ -90,8 +87,6 @@ void Dialogs::showPlaylistSaveCB( intf_dialog_args_t *pArg )
 
         // Push the command in the asynchronous command queue
         AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-        pQueue->remove( "load playlist" );
-        pQueue->remove( "load playtree" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 }

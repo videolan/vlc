@@ -160,6 +160,8 @@ SOURCES_skins2 = \
 	utils/var_tree.cpp \
 	utils/var_tree.hpp \
 	\
+	vars/equalizer.cpp \
+	vars/equalizer.hpp \
 	vars/playlist.cpp \
 	vars/playlist.hpp \
 	vars/playtree.cpp \

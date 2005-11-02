@@ -119,7 +119,6 @@ void CtrlVideo::onUpdate( Subject<VarBox> &rVoutSize )
                                       newHeight );
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-    pQueue->remove( "resize" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
 

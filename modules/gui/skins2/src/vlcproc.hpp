@@ -27,6 +27,7 @@
 
 #include <set>
 
+#include "../vars/equalizer.hpp"
 #include "../vars/playlist.hpp"
 #include "../vars/playtree.hpp"
 #include "../vars/time.hpp"
@@ -37,6 +38,7 @@
 
 class OSTimer;
 class VarBool;
+struct aout_instance_t;
 
 
 /// Singleton object handling VLC internal state and playlist
@@ -117,6 +119,8 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarSeekable;
         /// Variable for the vout
         VarBox m_varVoutSize;
+        /// Equalizer variable
+        EqualizerBands m_varEqBands;
 
         /// Set of handles of vout windows
         /**
@@ -126,6 +130,8 @@ class VlcProc: public SkinObject
         set<void *> m_handleSet;
         /// Vout thread
         vout_thread_t *m_pVout;
+        /// Audio output
+        aout_instance_t *m_pAout;
 
         /**
          * Poll VLC internals to update the status (volume, current time in
@@ -138,6 +144,9 @@ class VlcProc: public SkinObject
 
         /// Define the command that calls manage()
         DEFINE_CALLBACK( VlcProc, Manage );
+
+        /// Refresh audio variables
+        void refreshAudio();
 
         /// Update the stream name variable
         void updateStreamName( playlist_t *p_playlist );
@@ -179,6 +188,11 @@ class VlcProc: public SkinObject
         /// Callback to change a vout window
         static int controlWindow( intf_thread_t *pIntf, void *pWindow,
                                   int query, va_list args );
+
+        /// Callback for equalizer-bands variable
+        static int onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
+                                    vlc_value_t oldVal, vlc_value_t newVal,
+                                    void *pParam );
 };
 
 

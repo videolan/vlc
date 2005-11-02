@@ -75,8 +75,13 @@ void AsyncQueue::destroy( intf_thread_t *pIntf )
 }
 
 
-void AsyncQueue::push( const CmdGenericPtr &rcCommand )
+void AsyncQueue::push( const CmdGenericPtr &rcCommand, bool removePrev )
 {
+    if( removePrev )
+    {
+        // Remove the commands of the same type
+        remove( rcCommand.get()->getType() );
+    }
     m_cmdList.push_back( rcCommand );
 }
 

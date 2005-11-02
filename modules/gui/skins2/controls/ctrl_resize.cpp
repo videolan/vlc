@@ -168,6 +168,5 @@ void CtrlResize::CmdResizeResize::execute()
                                       newWidth, newHeight );
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( m_pParent->getIntf() );
-    pQueue->remove( "resize" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 }

@@ -24,6 +24,7 @@
 
 #include <vlc/aout.h>
 #include <vlc/vout.h>
+#include <aout_internal.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"
@@ -38,6 +39,7 @@
 #include "../commands/cmd_resize.hpp"
 #include "../commands/cmd_vars.hpp"
 #include "../utils/var_bool.hpp"
+#include <sstream>
 
 
 VlcProc *VlcProc::instance( intf_thread_t *pIntf )
@@ -61,8 +63,9 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 }
 
 
-VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL ),
-    m_cmdManage( this ), m_varVoutSize( pIntf )
+VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
+    m_varVoutSize( pIntf ), m_varEqBands( pIntf ), m_pVout( NULL ),
+    m_pAout( NULL ), m_cmdManage( this )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -99,6 +102,14 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVout( NULL ),
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
     m_cVarStreamURI = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamURI, "streamURI" );
+
+    // Register the equalizer bands
+    for( int i = 0; i < EqualizerBands::kNbBands; i++)
+    {
+        stringstream ss;
+        ss << "equalizer.band(" << i << ")";
+        pVarManager->registerVar( m_varEqBands.getBand( i ), ss.str() );
+    }
 
     // XXX WARNING XXX
     // The object variable callbacks are called from other VLC threads,
@@ -208,24 +219,18 @@ void VlcProc::manage()
 
     // Get the VLC variables
     StreamTime *pTime = (StreamTime*)m_cVarTime.get();
-    Volume *pVolume = (Volume*)m_cVarVolume.get();
     VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
     VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
     VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
     VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
-    VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
     VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
     VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
     VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
 
-    // Refresh sound volume
-    audio_volume_t volume;
-    aout_VolumeGet( getIntf(), &volume );
-    pVolume->set( (double)volume * 2.0 / AOUT_VOLUME_MAX );
-    // Set the mute variable
-    pVarMute->set( volume == 0 );
+    // Refresh audio variables
+    refreshAudio();
 
-    // Update the input
+   // Update the input
     if( getIntf()->p_sys->p_input == NULL )
     {
         getIntf()->p_sys->p_input = (input_thread_t *)vlc_object_find(
@@ -287,6 +292,39 @@ void VlcProc::CmdManage::execute()
 }
 
 
+void VlcProc::refreshAudio()
+{
+    // Check if the audio output has changed
+    aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
+            VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if( pAout != NULL )
+    {
+        if( pAout != m_pAout )
+        {
+            // Register the equalizer callback
+            if( !var_AddCallback( pAout, "equalizer-bands",
+                                 onEqBandsChange, this ) )
+            {
+                m_pAout = pAout;
+
+                //char * psz_bands = var_GetString( p_aout, "equalizer-bands" );
+            }
+        }
+        vlc_object_release( pAout );
+    }
+
+    // Refresh sound volume
+    audio_volume_t volume;
+    aout_VolumeGet( getIntf(), &volume );
+    Volume *pVolume = (Volume*)m_cVarVolume.get();
+    pVolume->set( (double)volume * 2.0 / AOUT_VOLUME_MAX );
+
+    // Set the mute variable
+    VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
+    pVarMute->set( volume == 0 );
+}
+
+
 int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
                            void *pParam )
@@ -304,8 +342,6 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->remove( "notify playlist" );
-    pQueue->remove( "playtree changed" );
     pQueue->push( CmdGenericPtr( pCmd ) );
     pQueue->push( CmdGenericPtr( pCmdTree ) );
 
@@ -327,7 +363,6 @@ int VlcProc::onIntfShow( vlc_object_t *pObj, const char *pVariable,
 
         // Push the command in the asynchronous command queue
         AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-        pQueue->remove( "raise all windows" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 
@@ -354,8 +389,6 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->remove( "notify playlist" );
-    pQueue->remove( "playtree update" );
     pQueue->push( CmdGenericPtr( pCmd ) );
     pQueue->push( CmdGenericPtr( pCmdTree ) );
 
@@ -382,8 +415,6 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
-    pQueue->remove( "notify playlist" );
-    pQueue->remove( "playtree changed" );
     pQueue->push( CmdGenericPtr( pCmd ) );
     pQueue->push( CmdGenericPtr( pCmdTree ) );
 
@@ -403,7 +434,6 @@ int VlcProc::onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->remove( "change skin" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 
     return VLC_SUCCESS;
@@ -461,7 +491,6 @@ void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
         CmdResizeVout *pCmd = new CmdResizeVout( pThis->getIntf(), pWindow,
                                                  *pWidthHint, *pHeightHint );
         AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-        pQueue->remove( "resize vout" );
         pQueue->push( CmdGenericPtr( pCmd ) );
         return pWindow;
     }
@@ -492,7 +521,6 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
                                        pThis->m_pVout->i_window_width,
                                        pThis->m_pVout->i_window_height );
                 AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-                pQueue->remove( "resize vout" );
                 pQueue->push( CmdGenericPtr( pCmd ) );
             }
         }
@@ -501,6 +529,23 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
             msg_Dbg( pIntf, "control query not supported" );
             break;
     }
+
+    return VLC_SUCCESS;
+}
+
+
+int VlcProc::onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
+                              vlc_value_t oldVal, vlc_value_t newVal,
+                              void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+
+    // Post a set equalizer bands command
+    CmdSetEqBands *pCmd = new CmdSetEqBands( pThis->getIntf(),
+                                             pThis->m_varEqBands,
+                                             newVal.psz_string );
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd ) );
 
     return VLC_SUCCESS;
 }
