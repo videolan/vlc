@@ -35,7 +35,7 @@
 
 /* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */
-#define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
+#define AR_4_3_PICTURE          2                        /* 4:3 picture (TV) */
 #define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */
 #define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
 
@@ -625,35 +625,34 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
  *****************************************************************************/
 static void GetAR( decoder_t *p_dec )
 {
-    decoder_sys_t   *p_sys = p_dec->p_sys;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Check whether the input gave a particular aspect ratio */
     if( p_dec->fmt_in.video.i_aspect )
     {
-        /* AR is relative to width/height, not display_width/height */
         p_sys->i_aspect = p_dec->fmt_in.video.i_aspect;
         if( p_sys->i_aspect <= AR_221_1_PICTURE )
         switch( p_sys->i_aspect )
         {
-        case AR_3_4_PICTURE:
+        case AR_4_3_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
-            p_sys->i_sar_num = p_sys->p_info->sequence->height * 4;
-            p_sys->i_sar_den = p_sys->p_info->sequence->width * 3;
+            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 4;
+            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 3;
             break;
         case AR_16_9_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 16 / 9;
-            p_sys->i_sar_num = p_sys->p_info->sequence->height * 16;
-            p_sys->i_sar_den = p_sys->p_info->sequence->width * 9;
+            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 16;
+            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 9;
             break;
         case AR_221_1_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 221 / 100;
-            p_sys->i_sar_num = p_sys->p_info->sequence->height * 221;
-            p_sys->i_sar_den = p_sys->p_info->sequence->width * 100;
+            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 221;
+            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 100;
             break;
         case AR_SQUARE_PICTURE:
             p_sys->i_aspect = VOUT_ASPECT_FACTOR *
-                           p_sys->p_info->sequence->width /
-                           p_sys->p_info->sequence->height;
+                           p_sys->p_info->sequence->picture_width /
+                           p_sys->p_info->sequence->picture_height;
             p_sys->i_sar_num = p_sys->i_sar_den = 1;
             break;
         }
@@ -664,10 +663,10 @@ static void GetAR( decoder_t *p_dec )
         if( p_sys->p_info->sequence->pixel_height > 0 )
         {
             p_sys->i_aspect =
-                ((uint64_t)p_sys->p_info->sequence->display_width) *
+                ((uint64_t)p_sys->p_info->sequence->picture_width) *
                 p_sys->p_info->sequence->pixel_width *
                 VOUT_ASPECT_FACTOR /
-                p_sys->p_info->sequence->display_height /
+                p_sys->p_info->sequence->picture_height /
                 p_sys->p_info->sequence->pixel_height;
             p_sys->i_sar_num = p_sys->p_info->sequence->pixel_width;
             p_sys->i_sar_den = p_sys->p_info->sequence->pixel_height;
@@ -678,12 +677,14 @@ static void GetAR( decoder_t *p_dec )
              * This shouldn't happen and if it does it is a bug
              * in libmpeg2 (likely triggered by an invalid stream) */
             p_sys->i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
-            p_sys->i_sar_num = p_sys->p_info->sequence->display_height * 4;
-            p_sys->i_sar_den = p_sys->p_info->sequence->display_width * 3;
+            p_sys->i_sar_num = p_sys->p_info->sequence->picture_height * 4;
+            p_sys->i_sar_den = p_sys->p_info->sequence->picture_width * 3;
         }
     }
 
-    msg_Dbg( p_dec, "%dx%d, aspect %d, sar %i:%i, %u.%03u fps",
+    msg_Dbg( p_dec, "%dx%d (display %d,%d), aspect %d, sar %i:%i, %u.%03u fps",
+             p_sys->p_info->sequence->picture_width,
+             p_sys->p_info->sequence->picture_height,
              p_sys->p_info->sequence->display_width,
              p_sys->p_info->sequence->display_height,
              p_sys->i_aspect, p_sys->i_sar_num, p_sys->i_sar_den,
