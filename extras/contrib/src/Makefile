@@ -692,7 +692,7 @@ ifdef HAVE_WIN32
 endif
 .faad: faad2
 	(cd $< && ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
-ifdef HAVE_WIN32
+ifndef HAVE_DARWIN
 	$(INSTALL_NAME)
 endif
 	touch $@
