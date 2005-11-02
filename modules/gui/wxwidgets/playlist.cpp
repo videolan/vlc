@@ -483,15 +483,23 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     LockPlaylist( p_intf->p_sys, p_playlist );
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
                                           ((PlaylistItem *)p_data)->i_id );
-    if( !p_item ) return;
+    if( !p_item )
+    {
+        UnlockPlaylist( p_intf->p_sys, p_playlist );
+        return;
+    }
 
     wxString msg;
     wxString duration = wxU( "" );
     char *psz_author = vlc_input_item_GetInfo( &p_item->input,
                                                      _("Meta-information"),
                                                      _("Artist"));
-    if( psz_author == NULL )
+    if( !psz_author )
+    {
+        UnlockPlaylist( p_intf->p_sys, p_playlist );
         return;
+    }
+
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->input.i_duration;
 
@@ -851,20 +859,12 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
        return;
    }
 
-   if( p_item->i_children == -1 )
-   {
-       UnlockPlaylist( p_intf->p_sys, p_playlist );
-       DeleteItem( p_item->input.i_id );
-   }
-   else
-   {
-       UnlockPlaylist( p_intf->p_sys, p_playlist );
-       DeleteNode( p_item );
-   }
+   if( p_item->i_children == -1 ) DeleteItem( p_item->input.i_id );
+   else DeleteNode( p_item );
+
    RemoveItem( item );
+   UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
-
-
 
 void Playlist::DeleteItem( int item_id )
 {
@@ -1078,7 +1078,11 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
 
     LockPlaylist( p_intf->p_sys, p_playlist );
 
-    if( !( p_wxitem && p_wxparent ) ) return;
+    if( !( p_wxitem && p_wxparent ) )
+    {
+        UnlockPlaylist( p_intf->p_sys, p_playlist );
+        return;
+    }
 
     p_item2 = playlist_ItemGetById(p_playlist, p_wxitem->i_id);
     p_node2 = playlist_ItemGetById(p_playlist, p_wxparent->i_id);
