@@ -141,7 +141,7 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls \
+	.png .gpg-error .gcrypt .gnutls .libmpcdec\
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts
@@ -151,7 +151,7 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .dts .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls \
+	.png .gpg-error .gcrypt .gnutls .libmpcdec\
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal 
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
@@ -1625,7 +1625,11 @@ libmpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .libmpcdec: libmpcdec
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+ifdef HAVE_WIN32 
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS=-D_PTRDIFF_T=mpc_int32_t && make && make install)
+else
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .libmpcdec
