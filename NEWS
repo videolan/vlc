@@ -20,10 +20,10 @@ Input:
 Decoders:
  * Support for libSDL_image to import different image types
  * Musepack decoder using libmpdec
- * QDM2 audio support (needs ffmpeg from 19th oct 2005 or later)
+ * QDM2 audio support (needs ffmpeg from 19th Oct 2005 or later)
 
 Services discovery:
- * UPnP service discovery
+ * UPnP service discovery (Linux only at the moment)
  * Bonjour service discovery using avahi (Linux only)
 
 Video filters:
