@@ -273,6 +273,7 @@ void VideoWindow::UpdateSize( wxEvent &_event )
         SetFocus();
         b_shown = VLC_TRUE;
     }
+
     p_intf->p_sys->p_video_sizer->SetMinSize( event->GetSize() );
 
     i_creation_date = mdate();
@@ -327,16 +328,32 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
 
     switch( i_query )
     {
-        case VOUT_SET_ZOOM:
+        case VOUT_GET_SIZE:
+        {
+            unsigned int *pi_width  = va_arg( args, unsigned int * );
+            unsigned int *pi_height = va_arg( args, unsigned int * );
+
+	    *pi_width = GetSize().GetWidth();
+	    *pi_height = GetSize().GetHeight();
+            i_ret = VLC_SUCCESS;
+        }
+        break;
+
+        case VOUT_SET_SIZE:
         {
             if( !b_auto_size ) break;
 
-            /* Update dimensions */
-            wxSizeEvent event( wxSize( p_vout->i_window_width,
-                                       p_vout->i_window_height ),
-                               UpdateSize_Event );
+            unsigned int i_width  = va_arg( args, unsigned int );
+            unsigned int i_height = va_arg( args, unsigned int );
 
-              
+            vlc_mutex_lock( &lock );
+            if( !i_width && p_vout ) i_width = p_vout->i_window_width;
+            if( !i_height && p_vout ) i_height = p_vout->i_window_height;
+            vlc_mutex_unlock( &lock );
+
+            /* Update dimensions */
+            wxSizeEvent event( wxSize( i_width, i_height ), UpdateSize_Event );
+
             AddPendingEvent( event );
 
             i_ret = VLC_SUCCESS;

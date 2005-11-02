@@ -2288,23 +2288,42 @@ static void SetPalette( vout_thread_t *p_vout,
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    double f_arg;
     vlc_bool_t b_arg;
+    unsigned int i_width, i_height;
+    unsigned int *pi_width, *pi_height;
 
     switch( i_query )
     {
-        case VOUT_SET_ZOOM:
+        case VOUT_GET_SIZE:
+            if( p_vout->p_sys->p_win->owner_window )
+                return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
+
+            pi_width  = va_arg( args, unsigned int * );
+            pi_height = va_arg( args, unsigned int * );
+
+            vlc_mutex_lock( &p_vout->p_sys->lock );
+            *pi_width  = p_vout->p_sys->p_win->i_width;
+            *pi_height = p_vout->p_sys->p_win->i_height;
+            vlc_mutex_unlock( &p_vout->p_sys->lock );
+            return VLC_SUCCESS;
+
+        case VOUT_SET_SIZE:
             if( p_vout->p_sys->p_win->owner_window )
                 return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
 
             vlc_mutex_lock( &p_vout->p_sys->lock );
 
+            i_width  = va_arg( args, unsigned int );
+            i_height = va_arg( args, unsigned int );
+            if( !i_width ) i_width = p_vout->i_window_width;
+            if( !i_height ) i_height = p_vout->i_window_height;
+
             /* Update dimensions */
             XResizeWindow( p_vout->p_sys->p_display,
                            p_vout->p_sys->p_win->base_window,
-                           p_vout->i_window_width,
-                           p_vout->i_window_height );
+                           i_width, i_height );
 
             vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;

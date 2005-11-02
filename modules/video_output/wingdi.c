@@ -1282,22 +1282,38 @@ static void InitBuffers( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
+    unsigned int *pi_width, *pi_height;
     vlc_bool_t b_bool;
-    double f_arg;
     RECT rect_window;
     POINT point;
 
     switch( i_query )
     {
-    case VOUT_SET_ZOOM:
+    case VOUT_GET_SIZE:
+        if( p_vout->p_sys->hparent )
+            return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->hparent, i_query, args );
+
+        pi_width  = va_arg( args, unsigned int * );
+        pi_height = va_arg( args, unsigned int * );
+
+        GetClientRect( p_vout->p_sys->hwnd, &rect_window );
+
+        *pi_width  = rect_window.right - rect_window.left;
+        *pi_height = rect_window.bottom - rect_window.top;
+        return VLC_SUCCESS;
+
+    case VOUT_SET_SIZE:
         if( p_vout->p_sys->hparent )
             return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->hparent, i_query, args );
 
         /* Update dimensions */
         rect_window.top = rect_window.left = 0;
-        rect_window.right  = p_vout->i_window_width;
-        rect_window.bottom = p_vout->i_window_height;
+        rect_window.right  = va_arg( args, unsigned int );
+        rect_window.bottom = va_arg( args, unsigned int );
+        if( !rect_window.right ) rect_window.right = p_vout->i_window_width;
+        if( !rect_window.bottom ) rect_window.bottom = p_vout->i_window_height;
         AdjustWindowRect( &rect_window, p_vout->p_sys->i_window_style, 0 );
 
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,

@@ -511,10 +511,15 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
 
     switch( query )
     {
-        case VOUT_SET_ZOOM:
+        case VOUT_SET_SIZE:
         {
             if( pThis->m_pVout )
             {
+                unsigned int i_width  = va_arg( args, unsigned int );
+                unsigned int i_height = va_arg( args, unsigned int );
+                if( !i_width ) i_width = pThis->m_pVout->i_window_width;
+                if( !i_height ) i_height = pThis->m_pVout->i_window_height;
+
                 // Post a resize vout command
                 CmdResizeVout *pCmd =
                     new CmdResizeVout( pThis->getIntf(), pWindow,
