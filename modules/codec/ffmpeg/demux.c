@@ -191,7 +191,16 @@ int E_(OpenDemux)( vlc_object_t *p_this )
         vlc_fourcc_t fcc;
 
         if( !E_(GetVlcFourcc)( cc->codec_id, NULL, &fcc, NULL ) )
+        {
             fcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
+
+            /* Special case for raw video data */
+            if( cc->codec_id == CODEC_ID_RAWVIDEO )
+            {
+                msg_Dbg( p_demux, "raw video, pixel format: %i", cc->pix_fmt );
+                fcc = E_(GetVlcChroma)( cc->pix_fmt );
+            }
+        }
 
         switch( cc->codec_type )
         {
