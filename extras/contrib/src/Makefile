@@ -1,13 +1,14 @@
 # ***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003, 2004, 2005 the VideoLAN team
+# Copyright (C) 2003 - 2005 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Eric Petit <titer@m0k.org>
 #          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Christophe Mutricy <xtophe@nxtelevision.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -691,7 +692,9 @@ ifdef HAVE_WIN32
 endif
 .faad: faad2
 	(cd $< && ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
+ifdef HAVE_WIN32
 	$(INSTALL_NAME)
+endif
 	touch $@
 
 CLEAN_FILE += .faad
@@ -808,6 +811,12 @@ ffmpeg:
 ifeq ($(HOST),i586-pc-beos)
 	patch -p 0 < Patches/ffmpeg-beos.patch.cvs
 	(cd $@; ./bootstrap)
+endif
+ifdef HAVE_WIN32
+	patch -p 0 < Patches/ffmpeg-cvs-win32.patch
+endif
+ifdef HAVE_DARWIN_OS
+	patch -p 0 < Patches/ffmpeg-cvs-osx.patch
 endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
@@ -1014,7 +1023,11 @@ ifdef HAVE_WIN32
 endif
 
 .goom2k4: goom
-	(cd $<&& autoconf configure.in >|configure &&./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install )
+ifdef HAVE_DARWIN_OS
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+else
+	(cd $<&& autoconf configure.in >|configure &&./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .goom2k4
@@ -1302,8 +1315,8 @@ ifdef HAVE_WIN32
 else
 	(cd $<;./configure $(HOSTCONF) --prefix=$(PREFIX) && make   && make install)
 endif
-endif
-	$(INSTALL_NAME)  
+	$(INSTALL_NAME)
+endif 
 	touch $@
 
 CLEAN_FILE += .png
@@ -1550,7 +1563,11 @@ ifneq ($(HOST),$(BUILD))
 endif
 
 .tiff: tiff
+ifdef HAVE_WIN32
 	(cd $<;  ./configure  --noninteractive --target=$(HOST) --with-CC=$(HOST)-gcc --with-DIR_BIN=$(PREFIX)/bin --with-DIR_LIB=$(PREFIX)/lib --with-DIR_INC=$(PREFIX)/include --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no  && make -C libtiff && make -C libtiff install)
+else
+	(cd $<; ./configure --noninteractive --with-DIR_BIN=$(PREFIX)/bin --with-DIR_LIB=$(PREFIX)/lib --with-DIR_INC=$(PREFIX)/include --with-CFLAGS="$(CFLAGS)" --with-JPEG=no --with-ZIP=no && make -C libtiff && make -C libtiff install)
+endif
 	touch $@
 
 CLEAN_FILE += .tiff
