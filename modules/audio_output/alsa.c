@@ -355,11 +355,11 @@ static int Open( vlc_object_t *p_this )
     /* Choose the linear PCM format (read the comment above about FPU
        and float32) */
     if( p_aout->p_libvlc->i_cpu & CPU_CAPABILITY_FPU )
-   /* {
+    {
         i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
         i_snd_pcm_format = SND_PCM_FORMAT_FLOAT;
     }
-    else */
+    else
     {
         i_vlc_pcm_format = AOUT_FMT_S16_NE;
         i_snd_pcm_format = SND_PCM_FORMAT_S16;
