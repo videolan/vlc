@@ -204,6 +204,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_update_counter = 0;
     i_sort_mode = MODE_NONE;
     b_need_update = VLC_FALSE;
+    i_items_to_append = 0;
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
@@ -540,23 +541,23 @@ void Playlist::AppendItem( wxCommandEvent& event )
 {
     playlist_add_t *p_add = (playlist_add_t *)event.GetClientData();
     playlist_item_t *p_item = NULL;
+    wxTreeItemId item, node;
 
-    wxTreeItemId item,node;
+    i_items_to_append--;
 
-    if( p_add->i_view != i_current_view )
-    {
-        goto update;
-    }
+    /* No need to do anything if the playlist is going to be rebuilt */
+    if( b_need_update ) return;
+
+    if( p_add->i_view != i_current_view ) goto update;
 
     node = FindItem( treectrl->GetRootItem(), p_add->i_node );
-    if( !node.IsOk() )
-    {
-        goto update;
-    }
+    if( !node.IsOk() ) goto update;
 
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
-    if( !p_item )
-        goto update;
+    if( !p_item ) goto update;
+
+    item = FindItem( treectrl->GetRootItem(), p_add->i_item );
+    if( item.IsOk() ) goto update;
 
     item = treectrl->AppendItem( node,
                                  wxL2U( p_item->input.psz_name ), -1,-1,
@@ -754,6 +755,8 @@ wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string
 void Playlist::Rebuild( vlc_bool_t b_root )
 {
     playlist_view_t *p_view;
+
+    i_items_to_append = 0;
 
     /* We can remove the callbacks before locking, anyway, we won't
      * miss anything */
@@ -1509,8 +1512,15 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     Playlist *p_playlist_dialog = (Playlist *)param;
 
     playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
-
     memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
+
+    if( p_playlist_dialog->i_items_to_append++ > 50 )
+    {
+        /* Too many items waiting to be added, it will be quicker to rebuild
+         * the whole playlist */
+        p_playlist_dialog->b_need_update = VLC_TRUE;
+        return VLC_SUCCESS;
+    }
 
     wxCommandEvent event( wxEVT_PLAYLIST, AppendItem_Event );
     event.SetClientData( (void *)p_add );

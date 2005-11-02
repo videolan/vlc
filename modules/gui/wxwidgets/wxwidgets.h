@@ -878,6 +878,7 @@ public:
     void AppendItem( wxCommandEvent& );
 
     bool b_need_update;
+    int  i_items_to_append;
 
 private:
     void RemoveItem( int );
