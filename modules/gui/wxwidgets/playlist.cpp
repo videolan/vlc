@@ -527,7 +527,11 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     if( p_playlist->status.p_item == p_item )
     {
         treectrl->SetItemBold( item, true );
-        treectrl->EnsureVisible( item );
+        while( treectrl->GetItemParent( item ).IsOk() )
+        {
+            item = treectrl->GetItemParent( item );
+            treectrl->Expand( item );
+        }
     }
     else
     {
