@@ -186,7 +186,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         p_aout->mixer.mixer.i_format = p_format->i_format;
     }
 
-    aout_FormatPrint( p_aout, "mixer", &p_aout->output.output );
+    aout_FormatPrint( p_aout, "mixer", &p_aout->mixer.mixer );
 
     /* Create filters. */
     p_aout->output.i_nb_filters = 0;

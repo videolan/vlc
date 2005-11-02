@@ -74,7 +74,8 @@ mediacontrol_Instance* mediacontrol_new_from_object( vlc_object_t* p_object,
     retval->vlc_object_id = p_vlc->i_object_id;
 
     /* We can keep references on these, which should not change. Is it true ? */
-    retval->p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    retval->p_playlist = vlc_object_find( p_vlc,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     retval->p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_ANYWHERE );
 
     if( ! retval->p_playlist || ! retval->p_intf )
@@ -272,7 +273,8 @@ mediacontrol_playlist_add_item( mediacontrol_Instance *self,
         return;
     }
 
-    playlist_Add( self->p_playlist, psz_file, psz_file , PLAYLIST_REPLACE, 0 );
+    playlist_Add( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
+                  PLAYLIST_END );
 }
 
 void

@@ -62,7 +62,8 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
     retval->vlc_object_id = p_vlc_id;
 
     /* We can keep references on these, which should not change. Is it true ? */
-    retval->p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    retval->p_playlist = vlc_object_find( p_vlc,
+                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     retval->p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_ANYWHERE );
 
     if( ! retval->p_playlist || ! retval->p_intf )
@@ -71,16 +72,19 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
         exception->message = strdup( "No available interface" );
         return NULL;
     }
+
+    
     return retval;  
 };
 
 void
 mediacontrol_exit( mediacontrol_Instance *self )
 {
-  /*
+  
     vlc_object_release( (vlc_object_t* )self->p_playlist );
     vlc_object_release( (vlc_object_t* )self->p_intf );
-  */
+    vlc_object_release( (vlc_object_t*)self->p_vlc );
+  
     VLC_CleanUp( self->vlc_object_id );
     VLC_Destroy( self->vlc_object_id );
 }
