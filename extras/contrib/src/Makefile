@@ -1645,11 +1645,11 @@ dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifneq ($(HOST),$(BUILD))
 	patch -p 0 <Patches/dirac-cross.patch
-	(cd $@; autoconf && automake)
+	(cd $@; aclocal && autoconf && automake)
 endif
 
 .dirac: dirac
-	(cd $<; aclocal && ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make && DOC_DIR="" make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make && DOC_DIR="" make install)
 	$(INSTALL_NAME)
 	touch $@
 
