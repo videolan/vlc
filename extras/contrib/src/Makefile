@@ -137,11 +137,11 @@ else
  else
   ifdef HAVE_WIN32
 
-   all: .iconv .intl .freetype .fribidi .zlib\
+   all: .iconv .intl .freetype .fribidi .zlib \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
-	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls .libmpcdec .portaudio\
+	.live .goom2k4 .caca .mod .x264  .xml .twolame \
+	.png .gpg-error .gcrypt .gnutls .libmpcdec .portaudio \
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts
@@ -642,8 +642,11 @@ ifneq ($(HOST),$(BUILD))
 endif
 
 .FLAC: flac 
+ifdef HAVE_WIN32
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest --disable-asm-optimizations && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
+else
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
-#	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install && make -C libOggFLAC &&make -C libOggFLAC install && cd .. && make -C include install)
+endif
 	$(INSTALL_NAME)
 	touch $@
 
