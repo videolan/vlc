@@ -25,6 +25,7 @@
 #define _WXVLC_BOOKMARKS_H_
 
 #include "wxwidgets.hpp"
+#include <wx/listctrl.h>
 
 namespace wxvlc
 {

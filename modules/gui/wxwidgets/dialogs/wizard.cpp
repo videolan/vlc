@@ -28,6 +28,7 @@
 #include "streamdata.h"
 #include "dialogs/open.hpp"
 
+#include <wx/listctrl.h>
 #include <wx/statline.h>
 #include <network.h>
 

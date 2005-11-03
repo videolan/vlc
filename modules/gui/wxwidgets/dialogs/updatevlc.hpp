@@ -25,6 +25,7 @@
 #define _WXVLC_UPDATEVLC_H_
 
 #include "wxwidgets.hpp"
+#include <wx/treectrl.h>
 #include <list>
 
 class wxTreeCtrl;
