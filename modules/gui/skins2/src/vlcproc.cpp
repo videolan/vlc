@@ -523,8 +523,7 @@ int VlcProc::controlWindow( intf_thread_t *pIntf, void *pWindow,
                 // Post a resize vout command
                 CmdResizeVout *pCmd =
                     new CmdResizeVout( pThis->getIntf(), pWindow,
-                                       pThis->m_pVout->i_window_width,
-                                       pThis->m_pVout->i_window_height );
+                                       i_width, i_height );
                 AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
                 pQueue->push( CmdGenericPtr( pCmd ) );
             }
