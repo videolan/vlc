@@ -58,8 +58,10 @@ endif
 ifeq ($(HOST),i586-mingw32msvc)
 HAVE_WIN32=1
 endif
-ifeq ($(HOST),cygwin)
+ifeq ($(HOST),i686-pc-cygwin)
 HAVE_WIN32=1
+EXTRA_CFLAGS=-mno-cygwin
+EXTRA_LDFLAGS=-mno-cygwin
 endif
 ifdef HAVE_WIN32
 export PATH := $(PREFIX)/bin:$(PATH)
