@@ -141,10 +141,10 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
-	.png .gpg-error .gcrypt .gnutls .libmpcdec .portaudio \
+	.png .gpg-error .gcrypt .gnutls .libmpcdec \
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
-#	.SDL_image  .daap .cddb .cdio .vcdimager .dts
+#	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio
    else
 # Standard Linux or other UNIX-like systems
    all: .iconv .intl .freetype .fribidi .zlib\
