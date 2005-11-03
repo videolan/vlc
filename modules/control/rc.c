@@ -135,7 +135,7 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
     if( p_intf->p_sys->i_socket == -1 )
     {
         vprintf( psz_fmt, args );
-        printf( "\n" );
+        printf( "\r\n" );
     }
     else
     {
@@ -531,7 +531,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* status callbacks */
     /* Listen to audio volume updates */
-    var_AddCallback( p_intf->p_vlc, "volume", VolumeChanged, p_intf );
+    var_AddCallback( p_intf->p_vlc, "volume-change", VolumeChanged, p_intf );
 
 #ifdef WIN32
     /* Get the file descriptor of the console input */
@@ -865,7 +865,7 @@ static void Run( intf_thread_t *p_intf )
         p_playlist = NULL;
     }
 
-    var_DelCallback( p_intf->p_vlc, "volume", VolumeChanged, p_intf );
+    var_DelCallback( p_intf->p_vlc, "volume-change", VolumeChanged, p_intf );
 }
 
 static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
@@ -979,7 +979,7 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
 
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
-    msg_rc( STATUS_CHANGE "( audio volume: %d )", newval.i_int );
+    msg_rc( STATUS_CHANGE "( audio volume: %d )", config_GetInt( p_this, "volume") );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
     return VLC_SUCCESS;
 }
@@ -1699,7 +1699,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input = NULL;
-    int i_error;
+    int i_error = VLC_EGENERIC;
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( !p_input )
