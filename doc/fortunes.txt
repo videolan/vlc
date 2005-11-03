@@ -598,3 +598,12 @@ the Boston strangler is to the woman home alone.
 <sam> j'appelle mes variables Illl, lIll, lIlI, IllI, IlII, etc.
   -- #videolan
 %
+20:47:12 < glspi> can you get rid of the wxwidgets interface and only show the 
+                  video somehow?
+20:47:17 < zorglub> -I dummy
+20:50:10 < glspi> -I didn't work btw, in windows at least
+20:52:28 < glspi> i don't see it in interface/general either! ahhh :(
+20:58:46 < glspi> ok i thought you were calling ME dummy, not saying use -I 
+                  dummy :p
+  -- #videolan
+%
