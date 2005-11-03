@@ -87,8 +87,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
 int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 {
     vlc_value_t val;
-    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
+    aout_instance_t *p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT, FIND_ANYWHERE );
     int i_result = 0;
 
     config_PutInt( p_object, "volume", i_volume );
@@ -106,6 +105,8 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 
     val.b_bool = VLC_TRUE;
     var_Set( p_aout, "intf-change", val );
+    var_Set( p_aout->p_vlc, "volume-change", val );
+    vlc_object_release( p_aout );
     return i_result;
 }
 

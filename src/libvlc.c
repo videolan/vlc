@@ -779,6 +779,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     var_Create( p_vlc, "drawableportx", VLC_VAR_INTEGER );
     var_Create( p_vlc, "drawableporty", VLC_VAR_INTEGER );
 
+    /* Create volume callback system. */
+    var_Create( p_vlc, "volume-change", VLC_VAR_BOOL );
+
     /*
      * Get input filenames given as commandline arguments
      */
