@@ -9,21 +9,24 @@ Core support:
 
 Video output:
  * Fixed problems with OpenGL output
- * New --monitor-aspect-ratio option
+ * New --monitor-par (pixel aspect ratio) option
+ * Fixed display problems with HDTV-1080 format
 
 Input:
  * Improved DVB support for satellite bands other than Ku-band
  * IPv6 and Extended passive mode support for FTP
  * IPv6 Source Specific Multicast support
  * GnomeVFS input module
+ * Support for RTP packet reordering
+ * Fixed syntax for FTP URLs
 
 Decoders:
  * Support for libSDL_image to import different image types
  * Musepack decoder using libmpdec
- * QDM2 audio support (needs ffmpeg from 19th oct 2005 or later)
+ * QDM2 audio support (needs ffmpeg from 19th Oct 2005 or later)
 
 Services discovery:
- * UPnP service discovery
+ * UPnP service discovery (Linux only at the moment)
  * Bonjour service discovery using avahi (Linux only)
 
 Video filters:
@@ -36,6 +39,7 @@ Audio filters:
 Stream output:
  * New shout output module to forward streams to icecast servers
  * Fixed several SAP and SDP announcement bugs
+ * Fixed MTU handling to avoid IP fragments
  
 Interfaces:
  * Mac OS X
@@ -48,6 +52,7 @@ Interfaces:
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*
     - VLC update checker
+    - Support for RTP streaming in Stream Ouput dialog
     - Now require wx2.6 with Unicode support
  * Skins2
     - Tree playlist
@@ -63,6 +68,9 @@ ActiveX plugin:
 
 Mac OS X port:
 * New script to delete the preferences automatically
+
+Windows port:
+* Fixed bandwidth problems of HTTP streaming
 
 Translations:
  The following languages were added:
