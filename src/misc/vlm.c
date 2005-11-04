@@ -360,7 +360,11 @@ static int ExecuteCommand( vlm_t *p_vlm, char *psz_command,
 
             psz_temp = FindEndCommand( psz_cmd );
 
-            if( psz_temp == NULL ) goto error;
+            if( psz_temp == NULL )
+            {
+                p_message = vlm_MessageNew( "Incomplete command", psz_cmd );
+                goto error;
+            }
 
             i_temp = psz_temp - psz_cmd;
 
