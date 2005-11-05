@@ -95,6 +95,8 @@ SOURCES_skins2 = \
 	src/bitmap_font.hpp \
 	src/dialogs.cpp \
 	src/dialogs.hpp \
+	src/file_bitmap.cpp \
+	src/file_bitmap.hpp \
 	src/ft2_bitmap.cpp \
 	src/ft2_bitmap.hpp \
 	src/ft2_font.cpp \
@@ -115,8 +117,6 @@ SOURCES_skins2 = \
 	src/os_timer.hpp \
 	src/os_window.hpp \
 	src/os_tooltip.hpp \
-	src/png_bitmap.cpp \
-	src/png_bitmap.hpp \
 	src/scaled_bitmap.cpp \
 	src/scaled_bitmap.hpp \
 	src/skin_main.cpp \

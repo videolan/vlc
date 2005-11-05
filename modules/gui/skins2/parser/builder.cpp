@@ -26,7 +26,7 @@
 #include "builder.hpp"
 #include "builder_data.hpp"
 #include "interpreter.hpp"
-#include "../src/png_bitmap.hpp"
+#include "../src/file_bitmap.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/generic_bitmap.hpp"
 #include "../src/top_window.hpp"
@@ -143,8 +143,8 @@ void Builder::addTheme( const BuilderData::Theme &rData )
 void Builder::addBitmap( const BuilderData::Bitmap &rData )
 {
     GenericBitmap *pBmp =
-        new PngBitmap( getIntf(), m_pImageHandler,
-                       rData.m_fileName, rData.m_alphaColor );
+        new FileBitmap( getIntf(), m_pImageHandler,
+                        rData.m_fileName, rData.m_alphaColor );
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 }
 
@@ -152,7 +152,7 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
 void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 {
     GenericBitmap *pBmp =
-        new PngBitmap( getIntf(), m_pImageHandler, rData.m_file, 0 );
+        new FileBitmap( getIntf(), m_pImageHandler, rData.m_file, 0 );
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 
     GenericFont *pFont = new BitmapFont( getIntf(), *pBmp, rData.m_type );

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * png_bitmap.cpp
+ * file_bitmap.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
@@ -24,10 +24,10 @@
 
 #include <vlc/vlc.h>
 #include "vlc_image.h"
-#include "png_bitmap.hpp"
+#include "file_bitmap.hpp"
 
-PngBitmap::PngBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-                      string fileName, uint32_t aColor ):
+FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
+                        string fileName, uint32_t aColor ):
     GenericBitmap( pIntf ), m_width( 0 ), m_height( 0 )
 {
     video_format_t fmt_in = {0}, fmt_out = {0};
@@ -76,17 +76,17 @@ PngBitmap::PngBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 }
 
 
-PngBitmap::~PngBitmap()
+FileBitmap::~FileBitmap()
 {
     if( m_pData ) delete[] m_pData;
 }
 
 
-uint8_t *PngBitmap::getData() const
+uint8_t *FileBitmap::getData() const
 {
     if( m_pData == NULL )
     {
-        msg_Warn( getIntf(), "PngBitmap::getData() returns NULL" );
+        msg_Warn( getIntf(), "FileBitmap::getData() returns NULL" );
     }
     return m_pData;
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * png_bitmap.hpp
+ * file_bitmap.hpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
@@ -22,23 +22,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef PNG_BITMAP_HPP
-#define PNG_BITMAP_HPP
+#ifndef FILE_BITMAP_HPP
+#define FILE_BITMAP_HPP
 
 #include "generic_bitmap.hpp"
 #include <string>
 
 
-/// Class for PNG bitmaps
-class PngBitmap: public GenericBitmap
+/// Class for file bitmaps
+class FileBitmap: public GenericBitmap
 {
     public:
-        /// Load a PNG bitmap from a file. aColor is the transparency
+        /// Load a bitmap from a file. aColor is the transparency
         /// color, in the format 0xRRGGBB
-        PngBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-                   string fileName, uint32_t aColor );
+        FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
+                    string fileName, uint32_t aColor );
 
-        virtual ~PngBitmap();
+        virtual ~FileBitmap();
 
         /// Get the width of the bitmap
         virtual int getWidth() const { return m_width; }
