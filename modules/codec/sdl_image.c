@@ -136,7 +136,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_rw = SDL_RWFromConstMem( p_block->p_buffer, p_block->i_buffer );
 
     /* Decode picture. */
-    p_surface = IMG_LoadTyped_RW( p_rw, 1, p_sys->psz_sdl_type );
+    p_surface = IMG_LoadTyped_RW( p_rw, 1, (char*)p_sys->psz_sdl_type );
     if ( p_surface == NULL )
     {
         msg_Warn( p_dec, "SDL_image couldn't load the image (%s)",
@@ -170,42 +170,90 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
     if ( p_pic == NULL ) goto error;
 
-    if ( p_surface->format->BitsPerPixel == 8 )
+    switch ( p_surface->format->BitsPerPixel )
     {
-        int i, j;
-        uint8_t *r = p_pic->p[0].p_pixels;
-        uint8_t *g = p_pic->p[0].p_pixels + 1;
-        uint8_t *b = p_pic->p[0].p_pixels + 2;
-        SDL_Palette *p_palette = p_surface->format->palette;
-
-        for ( i = 0; i < p_surface->h; i++ )
+        case 8:
         {
-            for ( j = 0; j < p_surface->w; j++ )
+            int i, j;
+            uint8_t *r = p_pic->p[0].p_pixels;
+            uint8_t *g = p_pic->p[0].p_pixels + 1;
+            uint8_t *b = p_pic->p[0].p_pixels + 2;
+            SDL_Palette *p_palette = p_surface->format->palette;
+
+            for ( i = 0; i < p_surface->h; i++ )
             {
-                uint8_t i_index = ((uint8_t *)p_surface->pixels)[j];
-                SDL_Color *p_color = &p_palette->colors[i_index];
-                r[j] = p_color->r;
-                g[j] = p_color->g;
-                b[j] = p_color->b;
+                for ( j = 0; j < p_surface->w; j++ )
+                {
+                    uint8_t i_index = ((uint8_t *)p_surface->pixels)[j];
+                    SDL_Color *p_color = &p_palette->colors[i_index];
+                    r[j] = p_color->r;
+                    g[j] = p_color->g;
+                    b[j] = p_color->b;
+                }
             }
+            r += p_pic->p[0].i_pitch;
+            g += p_pic->p[0].i_pitch;
+            b += p_pic->p[0].i_pitch;
+            break;
         }
-        r += p_pic->p[0].i_pitch;
-        g += p_pic->p[0].i_pitch;
-        b += p_pic->p[0].i_pitch;
-    }
-    else
-    {
-        int i;
-        uint8_t *p_src = p_surface->pixels;
-        uint8_t *p_dst = p_pic->p[0].p_pixels;
-        int i_pitch = p_pic->p[0].i_pitch < p_surface->pitch ?
-                      p_pic->p[0].i_pitch : p_surface->pitch;
-
-        for ( i = 0; i < p_surface->h; i++ )
+        case 16:
         {
-            p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_pitch );
-            p_src += p_surface->pitch;
-            p_dst += p_pic->p[0].i_pitch;
+            int i;
+            uint8_t *p_src = p_surface->pixels;
+            uint8_t *p_dst = p_pic->p[0].p_pixels;
+            int i_pitch = p_pic->p[0].i_pitch < p_surface->pitch ?
+                p_pic->p[0].i_pitch : p_surface->pitch;
+
+            for ( i = 0; i < p_surface->h; i++ )
+            {
+                p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_pitch );
+                p_src += p_surface->pitch;
+                p_dst += p_pic->p[0].i_pitch;
+            }
+            break;
+        }
+        case 24:
+        {
+            int i, j;
+            uint8_t *p_src, *p_dst;
+            uint8_t r, g, b;
+            for ( i = 0; i < p_surface->h; i++ )
+            {
+                p_src = p_surface->pixels + i * p_surface->pitch;
+                p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
+                for ( j = 0; j < p_surface->w; j++ )
+                {
+                    SDL_GetRGB( *(uint32_t*)p_src, p_surface->format,
+                                &r, &g, &b );
+                    *(p_dst++) = r;
+                    *(p_dst++) = g;
+                    *(p_dst++) = b;
+                    p_src += 3;
+                }
+            }
+            break;
+        }
+        case 32:
+        {
+            int i, j;
+            uint8_t *p_src, *p_dst;
+            uint8_t r, g, b, a;
+            for ( i = 0; i < p_surface->h; i++ )
+            {
+                p_src = p_surface->pixels + i * p_surface->pitch;
+                p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
+                for ( j = 0; j < p_surface->w; j++ )
+                {
+                    SDL_GetRGBA( *(uint32_t*)p_src, p_surface->format,
+                                &r, &g, &b, &a );
+                    *(p_dst++) = b;
+                    *(p_dst++) = g;
+                    *(p_dst++) = r;
+                    *(p_dst++) = a;
+                    p_src += 4;
+                }
+            }
+            break;
         }
     }
 
