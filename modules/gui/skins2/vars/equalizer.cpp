@@ -98,10 +98,12 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand )
 
         aout_instance_t *pAout= (aout_instance_t *)vlc_object_find( getIntf(),
                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        char *bands = (char*)ss.str().c_str();
+        config_PutPsz( getIntf(), "equalizer-bands", bands );
         if( pAout )
         {
             // Update the audio output
-            var_SetString( pAout, "equalizer-bands", (char*)ss.str().c_str() );
+            var_SetString( pAout, "equalizer-bands", bands );
             vlc_object_release( pAout );
         }
     }

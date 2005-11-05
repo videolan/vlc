@@ -64,8 +64,8 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 
 
 VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
-    m_varVoutSize( pIntf ), m_varEqBands( pIntf ), m_pVout( NULL ),
-    m_pAout( NULL ), m_cmdManage( this )
+    m_varVoutSize( pIntf ), m_varEqBands( pIntf ),
+    m_pVout( NULL ), m_pAout( NULL ), m_cmdManage( this )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -97,6 +97,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarStopped, VarBoolImpl, "vlc.isStopped" )
     REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
+    REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
 #undef REGISTER_VAR
     m_cVarStreamName = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
@@ -294,10 +295,12 @@ void VlcProc::CmdManage::execute()
 
 void VlcProc::refreshAudio()
 {
+    char *pFilters = NULL;
+
     // Check if the audio output has changed
     aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
             VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if( pAout != NULL )
+    if( pAout )
     {
         if( pAout != m_pAout )
         {
@@ -306,11 +309,17 @@ void VlcProc::refreshAudio()
                                  onEqBandsChange, this ) )
             {
                 m_pAout = pAout;
-
                 //char * psz_bands = var_GetString( p_aout, "equalizer-bands" );
             }
         }
+        // Get the audio filters
+        pFilters = var_GetString( pAout, "audio-filter" );
         vlc_object_release( pAout );
+    }
+    else
+    {
+        // Get the audio filters
+        pFilters = config_GetPsz( getIntf(), "audio-filter" );
     }
 
     // Refresh sound volume
@@ -322,6 +331,10 @@ void VlcProc::refreshAudio()
     // Set the mute variable
     VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
     pVarMute->set( volume == 0 );
+
+    // Refresh the equalizer variable
+    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
+    pVarEqualizer->set( pFilters && strstr( pFilters, "equalizer" ) );
 }
 
 

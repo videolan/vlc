@@ -24,6 +24,7 @@
 
 #include "interpreter.hpp"
 #include "expr_evaluator.hpp"
+#include "../commands/cmd_audio.hpp"
 #include "../commands/cmd_muxer.hpp"
 #include "../commands/cmd_playlist.hpp"
 #include "../commands/cmd_playtree.hpp"
@@ -113,6 +114,10 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.minimize()", CmdMinimize )
     REGISTER_CMD( "vlc.onTop()", CmdOnTop )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
+    m_commandMap["equalizer.enable()"] =
+        CmdGenericPtr( new CmdSetEqualizer( getIntf(), true ) );
+    m_commandMap["equalizer.disable()"] =
+        CmdGenericPtr( new CmdSetEqualizer( getIntf(), false ) );
 
     // Register the constant bool variables in the var manager
     VarManager *pVarManager = VarManager::instance( getIntf() );

@@ -121,6 +121,7 @@ class VlcProc: public SkinObject
         VarBox m_varVoutSize;
         /// Equalizer variable
         EqualizerBands m_varEqBands;
+        VariablePtr m_cVarEqualizer;
 
         /// Set of handles of vout windows
         /**
