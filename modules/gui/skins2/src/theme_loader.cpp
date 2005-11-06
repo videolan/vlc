@@ -205,7 +205,9 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
 
     // Get the path of the file
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-    string fullPath = rootDir + pOsFactory->getDirSeparator() + filenameInZip;
+    string fullPath = rootDir
+        + pOsFactory->getDirSeparator()
+        + fixDirSeparators( filenameInZip );
     string basePath = getFilePath( fullPath );
 
     // Extract the file if is not a directory
@@ -370,6 +372,21 @@ string ThemeLoader::getFilePath( const string &rFullPath )
         }
     }
     return basePath;
+}
+
+
+string ThemeLoader::fixDirSeparators( const string &rPath )
+{
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    const string &sep = pOsFactory->getDirSeparator();
+    string::size_type p = rPath.find( "/", 0 );
+    string newPath = rPath;
+    while( p != string::npos )
+    {
+        newPath = newPath.replace( p, 1, sep );
+        p = newPath.find( "/", p + 1 );
+    }
+    return newPath;
 }
 
 

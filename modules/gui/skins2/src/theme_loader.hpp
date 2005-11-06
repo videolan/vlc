@@ -69,6 +69,9 @@ class ThemeLoader: public SkinObject
 
         /// Get the base path of a file
         string getFilePath( const string &rFullPath );
+
+        /// Replace '/' separators by the actual separator of the OS
+        string fixDirSeparators( const string &rPath );
 };
 
 #endif
