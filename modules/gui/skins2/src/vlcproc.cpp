@@ -403,7 +403,7 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
-    pQueue->push( CmdGenericPtr( pCmdTree ) );
+    pQueue->push( CmdGenericPtr( pCmdTree ), false );
 
     return VLC_SUCCESS;
 }
@@ -479,8 +479,8 @@ void VlcProc::updateStreamName( playlist_t *p_playlist )
         CmdSetText *pCmd2 = new CmdSetText( getIntf(), rStreamURI, srcURI );
         // Push the commands in the asynchronous command queue
         AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-        pQueue->push( CmdGenericPtr( pCmd1 ) );
-        pQueue->push( CmdGenericPtr( pCmd2 ) );
+        pQueue->push( CmdGenericPtr( pCmd1 ), false );
+        pQueue->push( CmdGenericPtr( pCmd2 ), false );
     }
 }
 

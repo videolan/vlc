@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "skin_parser.hpp"
+#include "../src/os_factory.hpp"
 #include <math.h>
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
@@ -497,7 +498,8 @@ int SkinParser::convertColor( const char *transcolor ) const
 
 string SkinParser::convertFileName( const char *fileName ) const
 {
-    return m_path + string( fileName );
+    OSFactory *pFactory = OSFactory::instance( getIntf() );
+    return m_path + pFactory->getDirSeparator() + string( fileName );
 }
 
 

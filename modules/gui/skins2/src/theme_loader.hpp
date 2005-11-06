@@ -58,13 +58,17 @@ class ThemeLoader: public SkinObject
 #endif
 
         /// Parse the XML file given as a parameter and build the skin
-        bool parse( const string &xmlFile );
+        bool parse( const string &path, const string &xmlFile );
 
         /// Recursively look for the XML file from rootDir.
         /// The first corresponding file found will be chosen and themeFilePath
         /// will be updated accordingly.
         /// The method returns true if a theme file was found, false otherwise
-        bool findThemeFile( const string &rootDir, string &themeFilePath );
+        bool findFile( const string &rootDir, const string &rFileName,
+                       string &themeFilePath );
+
+        /// Get the base path of a file
+        string getFilePath( const string &rFullPath );
 };
 
 #endif

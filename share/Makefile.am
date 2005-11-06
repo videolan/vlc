@@ -80,6 +80,7 @@ DIST_skins2 = \
 	skins2/fonts/FreeSans.ttf \
 	skins2/skin.dtd \
 	skins2/skin.catalog \
+	skins2/winamp2.xml \
 	$(NULL)
 
 DIST_http = \

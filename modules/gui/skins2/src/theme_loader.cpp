@@ -67,6 +67,7 @@ int makedir( const char *newdir );
 #endif
 
 #define DEFAULT_XML_FILE "theme.xml"
+#define WINAMP2_XML_FILE "winamp2.xml"
 #define ZIP_BUFFER_SIZE 4096
 
 
@@ -74,11 +75,12 @@ bool ThemeLoader::load( const string &fileName )
 {
     // First, we try to un-targz the file, and if it fails we hope it's a XML
     // file...
+    string path = getFilePath( fileName );
 #if defined( HAVE_ZLIB_H )
-    if( ! extract( fileName ) && ! parse( fileName ) )
+    if( ! extract( fileName ) && ! parse( path, fileName ) )
         return false;
 #else
-    if( ! parse( fileName ) )
+    if( ! parse( path, fileName ) )
         return false;
 #endif
 
@@ -203,22 +205,10 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
 
     // Get the path of the file
     string fullPath = rootDir + "/" + filenameInZip;
-    string::size_type pos = fullPath.rfind( '/' );
-    string basePath;
-    if( pos != string::npos )
-    {
-        if( pos < fullPath.size() - 1)
-        {
-            basePath = fullPath.substr( 0, pos );
-        }
-        else
-        {
-            basePath = fullPath;
-        }
-    }
+    string basePath = getFilePath( fullPath );
 
     // Extract the file if is not a directory
-    if( pos != fullPath.size() - 1 )
+    if( basePath != fullPath )
     {
         if( unzOpenCurrentFile( file ) )
         {
@@ -273,6 +263,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
 
 bool ThemeLoader::extract( const string &fileName )
 {
+    bool result = true;
     char *tmpdir = tempnam( NULL, "vlt" );
     string tempPath = tmpdir;
     free( tmpdir );
@@ -282,19 +273,47 @@ bool ThemeLoader::extract( const string &fileName )
         ! extractZip( fileName, tempPath ) )
         return false;
 
-    // Find the XML file and parse it
+    string path;
     string xmlFile;
-    if( ! findThemeFile( tempPath, xmlFile ) || ! parse( xmlFile ) )
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    // Find the XML file in the theme
+    if( findFile( tempPath, DEFAULT_XML_FILE, xmlFile ) )
     {
-        msg_Err( getIntf(), "%s doesn't contain a " DEFAULT_XML_FILE " file",
-                 fileName.c_str() );
-        deleteTempFiles( tempPath );
-        return false;
+        path = getFilePath( xmlFile );
+    }
+    else
+    {
+        // No XML file, assume it is a winamp2 skin
+        path = tempPath;
+
+        // Look for winamp2.xml in the resource path
+        list<string> resPath = pOsFactory->getResourcePath();
+        list<string>::const_iterator it;
+        for( it = resPath.begin(); it != resPath.end(); it++ )
+        {
+            if( findFile( *it, WINAMP2_XML_FILE, xmlFile ) )
+                break;
+        }
+    }
+
+    if( !xmlFile.empty() )
+    {
+        // Parse the XML file
+        if (! parse( path, xmlFile ) )
+        {
+            msg_Err( getIntf(), "Error while parsing %s", xmlFile.c_str() );
+            result = false;
+        }
+    }
+    else
+    {
+        msg_Err( getIntf(), "No XML found in theme %s", fileName.c_str() );
+        result = false;
     }
 
     // Clean-up
     deleteTempFiles( tempPath );
-    return true;
+    return result;
 }
 
 
@@ -305,23 +324,10 @@ void ThemeLoader::deleteTempFiles( const string &path )
 #endif // HAVE_ZLIB_H
 
 
-bool ThemeLoader::parse( const string &xmlFile )
+bool ThemeLoader::parse( const string &path, const string &xmlFile )
 {
     // File loaded
     msg_Dbg( getIntf(), "Using skin file: %s", xmlFile.c_str() );
-
-    // Extract the path of the XML file
-    string path;
-    const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
-    string::size_type p = xmlFile.rfind( sep, xmlFile.size() );
-    if( p != string::npos )
-    {
-        path = xmlFile.substr( 0, p + 1 );
-    }
-    else
-    {
-        path = "";
-    }
 
     // Start the parser
     SkinParser parser( getIntf(), xmlFile, path );
@@ -339,7 +345,30 @@ bool ThemeLoader::parse( const string &xmlFile )
 }
 
 
-bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
+string ThemeLoader::getFilePath( const string &rFullPath )
+{
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    const string &sep = pOsFactory->getDirSeparator();
+    // Find the last separator ('/' or '\')
+    string::size_type p = rFullPath.rfind( sep, rFullPath.size() );
+    string basePath;
+    if( p != string::npos )
+    {
+        if( p < rFullPath.size() - 1)
+        {
+            basePath = rFullPath.substr( 0, p );
+        }
+        else
+        {
+            basePath = rFullPath;
+        }
+    }
+    return basePath;
+}
+
+
+bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
+                            string &themeFilePath )
 {
     // Path separator
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
@@ -379,8 +408,8 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
             if( 0 )
 #endif
             {
-                // Can we find the theme file in this subdirectory?
-                if( findThemeFile( newURI, themeFilePath ) )
+                // Can we find the file in this subdirectory?
+                if( findFile( newURI, rFileName, themeFilePath ) )
                 {
                     closedir( pCurrDir );
                     return true;
@@ -389,8 +418,7 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
             else
             {
                 // Found the theme file?
-                if( string( DEFAULT_XML_FILE ) ==
-                    string( pDirContent->d_name ) )
+                if( rFileName == string( pDirContent->d_name ) )
                 {
                     themeFilePath = newURI;
                     closedir( pCurrDir );

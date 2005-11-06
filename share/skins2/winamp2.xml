@@ -1,0 +1,45 @@
+<!DOCTYPE Theme PUBLIC "-//VideoLAN//DTD VLC Skins V2.0//EN" "skins.dtd">
+
+<Theme version="2.0" magnet="9" alpha="255">
+    <ThemeInfo name="Winamp2" author="Cyril Deguet"/>
+
+    <Bitmap id="main" file="main.bmp" alphacolor="#FF0000" />
+    <Bitmap id="cbuttons" file="cbuttons.bmp" alphacolor="#FF0000">
+       <SubBitmap id="previous_up" x="0" y="0" width="23" height="18" />
+       <SubBitmap id="previous_down" x="0" y="18" width="23" height="18" />
+       <SubBitmap id="play_up" x="23" y="0" width="23" height="18" />
+       <SubBitmap id="play_down" x="23" y="18" width="23" height="18" />
+       <SubBitmap id="pause_up" x="46" y="0" width="23" height="18" />
+       <SubBitmap id="pause_down" x="46" y="18" width="23" height="18" />
+       <SubBitmap id="stop_up" x="69" y="0" width="23" height="18" />
+       <SubBitmap id="stop_down" x="69" y="18" width="23" height="18" />
+       <SubBitmap id="next_up" x="92" y="0" width="22" height="18" />
+       <SubBitmap id="next_down" x="92" y="18" width="22" height="18" />
+       <SubBitmap id="eject_up" x="114" y="0" width="22" height="16" />
+       <SubBitmap id="eject_down" x="114" y="16" width="22" height="16" />
+    </Bitmap>
+    <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0000" >
+       <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
+       <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
+    </Bitmap>
+    <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits"/>
+    <BitmapFont id="text_font" file="text.bmp" type="text"/>
+
+    <Window id="mainWindow" x="400" y="50">
+        <Layout id="bigLayout" width="275" height="116">
+            <Group x="0" y="0">
+                <Image x="0" y="0" image="main" action="move" />
+                <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
+                <Text font="text_font" x="111" y="27" width="155" text="$N"/>
+                <Button x="263"  y="3" up="quit_up"  down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
+                <Button x="16"  y="88" up="previous_up"  down="previous_down"  action="playlist.previous()" tooltiptext="Previous" />
+                <Button x="39"  y="88" up="play_up"  down="play_down"  action="vlc.play()" tooltiptext="Play" />
+                <Button x="62"  y="88" up="pause_up"  down="pause_down"  action="vlc.pause()" tooltiptext="Pause" />
+                <Button x="85"  y="88" up="stop_up"  down="stop_down"  action="vlc.stop()" tooltiptext="Stop" />
+                <Button x="108"  y="88" up="next_up"  down="next_down"  action="playlist.next()" tooltiptext="Next" />
+                <Button x="136"  y="88" up="eject_up"  down="eject_down"  action="dialogs.fileSimple()" tooltiptext="Open" />
+            </Group>
+        </Layout>
+    </Window>
+
+</Theme>
