@@ -204,7 +204,8 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
     }
 
     // Get the path of the file
-    string fullPath = rootDir + "/" + filenameInZip;
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    string fullPath = rootDir + pOsFactory->getDirSeparator() + filenameInZip;
     string basePath = getFilePath( fullPath );
 
     // Extract the file if is not a directory
