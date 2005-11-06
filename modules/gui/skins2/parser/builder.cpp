@@ -146,6 +146,12 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler,
                         rData.m_fileName, rData.m_alphaColor );
+    if( !pBmp->getData() )
+    {
+        // Invalid bitmap
+        delete pBmp;
+        return;
+    }
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 }
 
@@ -175,6 +181,13 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 {
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler, rData.m_file, 0 );
+    if( !pBmp->getData() )
+    {
+        // invalid bitmap
+        delete pBmp;
+        return;
+    }
+
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 
     GenericFont *pFont = new BitmapFont( getIntf(), *pBmp, rData.m_type );

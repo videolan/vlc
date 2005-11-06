@@ -22,6 +22,7 @@
        <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
        <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
     </Bitmap>
+    <BitmapFont id="digits_font" file="numbers.bmp" type="digits"/>
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits"/>
     <BitmapFont id="text_font" file="text.bmp" type="text"/>
 

@@ -283,16 +283,21 @@ bool ThemeLoader::extract( const string &fileName )
     }
     else
     {
-        // No XML file, assume it is a winamp2 skin
-        path = tempPath;
-
-        // Look for winamp2.xml in the resource path
-        list<string> resPath = pOsFactory->getResourcePath();
-        list<string>::const_iterator it;
-        for( it = resPath.begin(); it != resPath.end(); it++ )
+        // No XML file, check if it is a winamp2 skin
+        string mainBmp;
+        if( findFile( tempPath, "main.bmp", mainBmp ) )
         {
-            if( findFile( *it, WINAMP2_XML_FILE, xmlFile ) )
-                break;
+            msg_Dbg( getIntf(), "Try to load a winamp2 skin" );
+            path = getFilePath( mainBmp );
+
+            // Look for winamp2.xml in the resource path
+            list<string> resPath = pOsFactory->getResourcePath();
+            list<string>::const_iterator it;
+            for( it = resPath.begin(); it != resPath.end(); it++ )
+            {
+                if( findFile( *it, WINAMP2_XML_FILE, xmlFile ) )
+                    break;
+            }
         }
     }
 

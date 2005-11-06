@@ -44,6 +44,11 @@ void BitmapImpl::drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
 {
     int srcWidth = rSource.getWidth();
     uint32_t *pSrc = (uint32_t*)rSource.getData() + ySrc * srcWidth + xSrc;
+    if( !pSrc )
+    {
+        return;
+    }
+
     uint32_t *pDest = (uint32_t*)m_pData + yDest * m_width + xDest ;
     for( int y = 0; y < height; y++ )
     {
