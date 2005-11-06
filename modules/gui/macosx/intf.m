@@ -1530,6 +1530,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (!nib_wizard_loaded)
     {
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
+        [o_wizard initStrings];
     }
     
     if (!nib_bookmarks_loaded)
