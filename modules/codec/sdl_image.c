@@ -175,25 +175,21 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case 8:
         {
             int i, j;
-            uint8_t *r = p_pic->p[0].p_pixels;
-            uint8_t *g = p_pic->p[0].p_pixels + 1;
-            uint8_t *b = p_pic->p[0].p_pixels + 2;
-            SDL_Palette *p_palette = p_surface->format->palette;
-
+            uint8_t *p_src, *p_dst;
+            uint8_t r, g, b;
             for ( i = 0; i < p_surface->h; i++ )
             {
+                p_src = p_surface->pixels + i * p_surface->pitch;
+                p_dst = p_pic->p[0].p_pixels + i * p_pic->p[0].i_pitch;
                 for ( j = 0; j < p_surface->w; j++ )
                 {
-                    uint8_t i_index = ((uint8_t *)p_surface->pixels)[j];
-                    SDL_Color *p_color = &p_palette->colors[i_index];
-                    r[j] = p_color->r;
-                    g[j] = p_color->g;
-                    b[j] = p_color->b;
+                    SDL_GetRGB( *(p_src++), p_surface->format,
+                                &r, &g, &b );
+                    *(p_dst++) = r;
+                    *(p_dst++) = g;
+                    *(p_dst++) = b;
                 }
             }
-            r += p_pic->p[0].i_pitch;
-            g += p_pic->p[0].i_pitch;
-            b += p_pic->p[0].i_pitch;
             break;
         }
         case 16:
