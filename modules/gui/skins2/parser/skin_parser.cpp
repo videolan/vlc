@@ -64,10 +64,25 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "file" );
         RequireDefault( "alphacolor" );
 
-        const BuilderData::Bitmap bitmap( uniqueId( attr["id"] ),
+        m_curBitmapId = uniqueId( attr["id"] );
+        const BuilderData::Bitmap bitmap( m_curBitmapId,
                 convertFileName( attr["file"] ),
                 convertColor( attr["alphacolor"] ) );
         m_data.m_listBitmap.push_back( bitmap );
+    }
+
+    else if( rName == "SubBitmap" )
+    {
+        RequireDefault( "id" );
+        RequireDefault( "x" );
+        RequireDefault( "y" );
+        RequireDefault( "width" );
+        RequireDefault( "height" );
+
+        const BuilderData::SubBitmap bitmap( uniqueId( attr["id"] ),
+                m_curBitmapId, atoi( attr["x"] ), atoi( attr["y"] ),
+                atoi( attr["width"] ), atoi( attr["height"] ) );
+        m_data.m_listSubBitmap.push_back( bitmap );
     }
 
     else if( rName == "BitmapFont" )

@@ -65,6 +65,7 @@ class Builder: public SkinObject
 
         void addTheme( const BuilderData::Theme &rData );
         void addBitmap( const BuilderData::Bitmap &rData );
+        void addSubBitmap( const BuilderData::SubBitmap &rData );
         void addBitmapFont( const BuilderData::BitmapFont &rData );
         void addFont( const BuilderData::Font &rData );
         void addWindow( const BuilderData::Window &rData );

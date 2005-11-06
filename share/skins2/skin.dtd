@@ -12,11 +12,19 @@
     >
 
 <!-- main elements -->
-<!ELEMENT Bitmap EMPTY>
+<!ELEMENT Bitmap (SubBitmap)*>
     <!ATTLIST Bitmap
         id          CDATA   #REQUIRED
         file        CDATA   #REQUIRED
         alphacolor  CDATA   #REQUIRED
+    >
+<!ELEMENT SubBitmap EMPTY>
+    <!ATTLIST SubBitmap
+        id          CDATA   #REQUIRED
+        x           CDATA   #REQUIRED
+        y           CDATA   #REQUIRED
+        width       CDATA   #REQUIRED
+        height      CDATA   #REQUIRED
     >
 <!ELEMENT Font EMPTY>
     <!ATTLIST Font

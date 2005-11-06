@@ -1,5 +1,6 @@
 Theme tooltipfont:string magnet:int alpha:uint32_t moveAlpha:uint32_t
 Bitmap id:string fileName:string alphaColor:uint32_t
+SubBitmap id:string parent:string x:int y:int width:int height:int
 BitmapFont id:string file:string type:string
 Font id:string fontFile:string size:int
 Window id:string xPos:int yPos:int visible:bool dragDrop:bool playOnDrop:bool

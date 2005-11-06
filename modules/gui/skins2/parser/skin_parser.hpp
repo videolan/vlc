@@ -43,6 +43,7 @@ class SkinParser: public XMLParser
         /// Container for mapping data from the XML
         BuilderData m_data;
         /// Current IDs
+        string m_curBitmapId;
         string m_curWindowId;
         string m_curLayoutId;
         string m_curListId;

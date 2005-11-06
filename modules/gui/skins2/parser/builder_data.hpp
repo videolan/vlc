@@ -67,6 +67,22 @@ m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
     list<Bitmap> m_listBitmap;
 
     /// Type definition
+    struct SubBitmap
+    {
+        SubBitmap( const string & id, const string & parent, int x, int y, int width, int height ):
+m_id( id ), m_parent( parent ), m_x( x ), m_y( y ), m_width( width ), m_height( height ) {}
+
+        const string m_id;
+        const string m_parent;
+        int m_x;
+        int m_y;
+        int m_width;
+        int m_height;
+    };
+    /// List
+    list<SubBitmap> m_listSubBitmap;
+
+    /// Type definition
     struct BitmapFont
     {
         BitmapFont( const string & id, const string & file, const string & type ):

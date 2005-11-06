@@ -90,6 +90,7 @@ Theme *Builder::build()
     // Create everything from the data in the XML
     ADD_OBJECTS( Theme );
     ADD_OBJECTS( Bitmap );
+    ADD_OBJECTS( SubBitmap );
     ADD_OBJECTS( BitmapFont );
     ADD_OBJECTS( Font );
     ADD_OBJECTS( Window );
@@ -145,6 +146,27 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler,
                         rData.m_fileName, rData.m_alphaColor );
+    m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
+}
+
+
+void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
+{
+    // Get the parent bitmap
+    GenericBitmap *pParentBmp = NULL;
+    GET_BMP( pParentBmp, rData.m_parent );
+    if( !pParentBmp )
+    {
+        msg_Err( getIntf(), "unknown bitmap id: %s", rData.m_parent.c_str() );
+        return;
+    }
+
+    // Copy a region of the parent bitmap to the new one
+    BitmapImpl *pBmp =
+        new BitmapImpl( getIntf(), rData.m_width, rData.m_height );
+    pBmp->drawBitmap( *pParentBmp, rData.m_x, rData.m_y, 0, 0, rData.m_width,
+                      rData.m_height );
+
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 }
 
