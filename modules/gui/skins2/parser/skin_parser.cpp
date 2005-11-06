@@ -92,7 +92,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "file" );
         CheckDefault( "type", "digits" );
 
-        const BuilderData::BitmapFont font( uniqueId( attr["id"] ),
+        const BuilderData::BitmapFont font( attr["id"],
                 convertFileName( attr["file"] ),
                 attr["type"] );
         m_data.m_listBitmapFont.push_back( font );

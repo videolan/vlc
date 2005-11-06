@@ -18,9 +18,24 @@
        <SubBitmap id="eject_up" x="114" y="0" width="22" height="16" />
        <SubBitmap id="eject_down" x="114" y="16" width="22" height="16" />
     </Bitmap>
+    <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0000" >
+       <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
+       <SubBitmap id="time_up" x="248" y="0" width="29" height="10" />
+       <SubBitmap id="time_down" x="278" y="0" width="29" height="10" />
+    </Bitmap>
     <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0000" >
        <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
        <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
+    </Bitmap>
+    <Bitmap id="shufrep" file="shufrep.bmp" alphacolor="#FF0000">
+       <SubBitmap id="noloop_up" x="0" y="0" width="28" height="15" />
+       <SubBitmap id="noloop_down" x="0" y="15" width="28" height="15" />
+       <SubBitmap id="loop_up" x="0" y="30" width="28" height="15" />
+       <SubBitmap id="loop_down" x="0" y="45" width="28" height="15" />
+       <SubBitmap id="noshuffle_up" x="28" y="0" width="47" height="15" />
+       <SubBitmap id="noshuffle_down" x="28" y="15" width="47" height="15" />
+       <SubBitmap id="shuffle_up" x="28" y="30" width="47" height="15" />
+       <SubBitmap id="shuffle_down" x="28" y="45" width="47" height="15" />
     </Bitmap>
     <BitmapFont id="digits_font" file="numbers.bmp" type="digits"/>
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits"/>
@@ -32,6 +47,8 @@
                 <Image x="0" y="0" image="main" action="move" />
                 <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
                 <Text font="text_font" x="111" y="27" width="155" text="$N"/>
+                <Image x="15" y="72" image="time_bg"/>
+                <Slider value="time" up="time_up" down="time_down" points="(30,78),(250,78)" thickness="5" tooltiptext="Time: $T"/>
                 <Button x="263"  y="3" up="quit_up"  down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
                 <Button x="16"  y="88" up="previous_up"  down="previous_down"  action="playlist.previous()" tooltiptext="Previous" />
                 <Button x="39"  y="88" up="play_up"  down="play_down"  action="vlc.play()" tooltiptext="Play" />
@@ -39,6 +56,8 @@
                 <Button x="85"  y="88" up="stop_up"  down="stop_down"  action="vlc.stop()" tooltiptext="Stop" />
                 <Button x="108"  y="88" up="next_up"  down="next_down"  action="playlist.next()" tooltiptext="Next" />
                 <Button x="136"  y="88" up="eject_up"  down="eject_down"  action="dialogs.fileSimple()" tooltiptext="Open" />
+                <Checkbox x="162"  y="89" up1="noshuffle_up" down1="noshuffle_down" up2="shuffle_up" down2="shuffle_down" state="playlist.isRandom" action1="playlist.setRandom(true)" action2="playlist.setRandom(false)" tooltiptext1="Shuffle" tooltiptext2="Shuffle"/>
+                <Checkbox x="210"  y="89" up1="noloop_up" down1="noloop_down" up2="loop_up" down2="loop_down" state="playlist.isLoop" action1="playlist.setLoop(true)" action2="playlist.setLoop(false)" tooltiptext1="Loop" tooltiptext2="Loop"/>
             </Group>
         </Layout>
     </Window>
