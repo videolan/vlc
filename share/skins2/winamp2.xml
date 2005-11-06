@@ -39,8 +39,8 @@
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0000">
        <SubBitmap id="volume_bg" x="0" y="405" width="68" height="13" />
-       <SubBitmap id="volume_up" x="0" y="422" width="14" height="11" />
-       <SubBitmap id="volume_down" x="15" y="422" width="14" height="11" />
+       <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
+       <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
     <BitmapFont id="digits_font" file="numbers.bmp" type="digits"/>
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits"/>
