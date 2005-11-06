@@ -61,10 +61,13 @@ typedef gzFile TAR;
 int tar_open        ( TAR **t, char *pathname, int oflags );
 int tar_extract_all ( TAR *t, char *prefix );
 int tar_close       ( TAR *t );
+int getoct( char *p, int width );
 #endif
+int makedir( const char *newdir );
 #endif
 
 #define DEFAULT_XML_FILE "theme.xml"
+#define ZIP_BUFFER_SIZE 4096
 
 
 bool ThemeLoader::load( const string &fileName )
@@ -143,6 +146,131 @@ bool ThemeLoader::extractTarGz( const string &tarFile, const string &rootDir )
 }
 
 
+bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
+{
+    // Try to open the ZIP file
+    unzFile file = unzOpen( zipFile.c_str() );
+    unz_global_info info;
+
+    if( unzGetGlobalInfo( file, &info ) != UNZ_OK )
+    {
+        return false;
+    }
+    // Extract all the files in the archive
+    for( unsigned long i = 0; i < info.number_entry; i++ )
+    {
+        if( !extractFileInZip( file, rootDir ) )
+        {
+            msg_Warn( getIntf(), "Error while unzipping %s",
+                      zipFile.c_str() );
+            return false;
+        }
+
+        if( i < info.number_entry - 1 )
+        {
+            // Go the next file in the archive
+            if( unzGoToNextFile( file ) !=UNZ_OK )
+            {
+                msg_Warn( getIntf(), "Error while unzipping %s",
+                          zipFile.c_str() );
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
+{
+    // Read info for the current file
+    char filenameInZip[256];
+    unz_file_info fileInfo;
+    if( unzGetCurrentFileInfo( file, &fileInfo, filenameInZip,
+                               sizeof( filenameInZip), NULL, 0, NULL, 0 )
+        != UNZ_OK )
+    {
+        return false;
+    }
+
+    // Allocate the buffer
+    void *pBuffer = malloc( ZIP_BUFFER_SIZE );
+    if( !pBuffer )
+    {
+        msg_Err( getIntf(), "Failed to allocate memory" );
+        return false;
+    }
+
+    // Get the path of the file
+    string fullPath = rootDir + "/" + filenameInZip;
+    string::size_type pos = fullPath.rfind( '/' );
+    string basePath;
+    if( pos != string::npos )
+    {
+        if( pos < fullPath.size() - 1)
+        {
+            basePath = fullPath.substr( 0, pos );
+        }
+        else
+        {
+            basePath = fullPath;
+        }
+    }
+
+    // Extract the file if is not a directory
+    if( pos != fullPath.size() - 1 )
+    {
+        if( unzOpenCurrentFile( file ) )
+        {
+            free( pBuffer );
+            return false;
+        }
+        makedir( basePath.c_str() );
+        FILE *fout = fopen( fullPath.c_str(), "wb" );
+        if( fout == NULL )
+        {
+            msg_Err( getIntf(), "Error opening %s", fullPath.c_str() );
+            free( pBuffer );
+            return false;
+        }
+
+        // Extract the current file
+        int n;
+        do
+        {
+            n = unzReadCurrentFile( file, pBuffer, ZIP_BUFFER_SIZE );
+            if( n < 0 )
+            {
+                msg_Err( getIntf(), "Error while reading zip file" );
+                free( pBuffer );
+                return false;
+            }
+            else if( n > 0 )
+            {
+                if( fwrite( pBuffer, n , 1, fout) != 1 )
+                {
+                    msg_Err( getIntf(), "Error while writing %s",
+                             fullPath.c_str() );
+                    free( pBuffer );
+                    return false;
+                }
+            }
+        } while( n > 0 );
+
+        fclose(fout);
+
+        if( unzCloseCurrentFile( file ) != UNZ_OK )
+        {
+            free( pBuffer );
+            return false;
+        }
+    }
+
+    free( pBuffer );
+    return true;
+}
+
+
 bool ThemeLoader::extract( const string &fileName )
 {
     char *tmpdir = tempnam( NULL, "vlt" );
@@ -150,7 +278,8 @@ bool ThemeLoader::extract( const string &fileName )
     free( tmpdir );
 
     // Extract the file in a temporary directory
-    if( ! extractTarGz( fileName, tempPath ) )
+    if( ! extractTarGz( fileName, tempPath ) &&
+        ! extractZip( fileName, tempPath ) )
         return false;
 
     // Find the XML file and parse it
@@ -280,10 +409,6 @@ bool ThemeLoader::findThemeFile( const string &rootDir, string &themeFilePath )
 
 #if !defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
 
-#ifdef WIN32
-#  define mkdir(dirname,mode) _mkdir(dirname)
-#endif
-
 /* Values used in typeflag field */
 #define REGTYPE  '0'            /* regular file */
 #define AREGTYPE '\0'           /* regular file */
@@ -319,9 +444,6 @@ union tar_buffer {
 };
 
 
-/* helper functions */
-int getoct( char *p, int width );
-int makedir( char *newdir );
 
 int tar_open( TAR **t, char *pathname, int oflags )
 {
@@ -483,6 +605,11 @@ int getoct( char *p, int width )
     return result;
 }
 
+#endif
+
+#ifdef WIN32
+#  define mkdir(dirname,mode) _mkdir(dirname)
+#endif
 
 /* Recursive make directory
  * Abort if you get an ENOENT errno somewhere in the middle
@@ -490,7 +617,7 @@ int getoct( char *p, int width )
  *
  * return 1 if OK, 0 on error
  */
-int makedir( char *newdir )
+int makedir( const char *newdir )
 {
     char *p, *buffer = strdup( newdir );
     int  len = strlen( buffer );
@@ -532,7 +659,6 @@ int makedir( char *newdir )
     free( buffer );
     return 1;
 }
-#endif
 
 #ifdef HAVE_ZLIB_H
 

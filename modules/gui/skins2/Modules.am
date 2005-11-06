@@ -204,7 +204,7 @@ SOURCES_skins2 = \
 	x11/x11_window.hpp \
 	x11/x11_tooltip.cpp \
 	x11/x11_tooltip.hpp \
-    \
+	\
 	macosx/macosx_dragdrop.cpp \
 	macosx/macosx_dragdrop.hpp \
 	macosx/macosx_factory.cpp \
@@ -218,5 +218,11 @@ SOURCES_skins2 = \
 	macosx/macosx_window.cpp \
 	macosx/macosx_window.hpp \
 	macosx/macosx_tooltip.cpp \
-    macosx/macosx_tooltip.hpp \
+	macosx/macosx_tooltip.hpp \
+	\
+	unzip/crypt.h \
+	unzip/ioapi.c \
+	unzip/ioapi.h \
+	unzip/unzip.c \
+	unzip/unzip.h \
 	$(NULL)

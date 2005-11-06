@@ -27,7 +27,9 @@
 
 #include "skin_common.hpp"
 #include <string>
-
+#if defined( HAVE_ZLIB_H )
+#   include "../unzip/unzip.h"
+#endif
 
 class ThemeLoader: public SkinObject
 {
@@ -39,11 +41,17 @@ class ThemeLoader: public SkinObject
 
     private:
 #if defined( HAVE_ZLIB_H )
-        /// Extract files from an archive (currently only handles tar.gz)
+        /// Extract files from an archive (handles tar.gz and zip)
         bool extract( const string &fileName );
 
         /// Extract files from a tar.gz archive
         bool extractTarGz( const string &tarFile, const string &rootDir );
+
+        /// Extract files from a .zip archive
+        bool extractZip( const string &zipFile, const string &rootDir );
+
+        /// Extract the current file from a .zip archive
+        bool extractFileInZip( unzFile file, const string &rootDir );
 
         /// Clean up the temporary files created by the extraction
         void deleteTempFiles( const string &path );
