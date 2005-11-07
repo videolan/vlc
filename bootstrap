@@ -36,7 +36,9 @@ ACLOCAL_ARGS="-I m4"
 # Check for contrib directory
 if test -d extras/contrib/bin; then
   export PATH=./extras/contrib/bin:$PATH
-  ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
+  if test -d extras/contrib/share/aclocal; then
+    ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
+  fi
   if test ".`uname -s`" = ".Darwin"; then
     export LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
     export DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
