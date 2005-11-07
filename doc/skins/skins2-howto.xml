@@ -86,11 +86,13 @@ difficulty to understand how VLC skins work.</para>
 <sect1>
 <title>The bitmaps</title>
 
-<para>Basically, you need one bitmap file (in PNG format) by state of control. For example, with a <link linkend="Image">Image</link> control you need 1 image, with a <link linkend="Button">Button</link> control you need 3 images (for the up, down and mouseover states). Of course, the same bitmap file can be used for many controls, provided you want to display the same image!</para>
+<para>Basically, you need one bitmap file (in PNG format) by state of control. For example, with a <link linkend="Image">Image</link> control you need 1 image, with a <link linkend="Button">Button</link> control you need 3 images (for the up, down and mouseover states). The same bitmap file can be used for many controls, using <link linkend="SubBitmap">sub-bitmaps</link>.</para>
 
 <para>The PNG format allows setting a transparency mask, which will be used wherever the image needs to be displayed (only non-transparent parts will be drawn). In addition, you can also specify a transparency color in the XML file: the bitmap will be considered as transparent wherever this color appears in the bitmap file.</para>
 
 <note><para>Both the transparency mask and the transparent color will be taken into acount, so if the transparency mask is correctly set in the bitmap file you need to choose a unused color for the transparency color.</para></note>
+
+<note><para>Starting from VLC 0.8.5, it is not anymore necessary to use PNG format for the bitmap files: most common formats are supported. Using PNG format is still recommended, for compatibility with older VLC versions.</para></note>
 
 </sect1>
 
@@ -164,503 +166,533 @@ difficulty to understand how VLC skins work.</para>
 
 <sect3 id="Bitmap">
   <title>Bitmap</title>
-  <para>Associates a bitmap file in PNG format with an identifiant (=name) that will be used by the various controls. Obviously, you need one Bitmap tag for each bitmap file you have.</para>
-      <sect4 id="bitmapid">
-      <title>id</title>
-      <para>This is the identifiant of the bitmap that will be used with controls. Two bitmaps cannot have the same id.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="bitmapfile">
-      <title>file</title>
-      <para>This attribute is used to indicate the path and name of the bitmap file used. This path can be absolute (but you should definitely avoid it), or relative to the path of the XML file.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="alphacolor">
-      <title>alphacolor</title>
-      <para>This is the transparency color of the bitmap. It must be indicated with the following format: "#RRGGBB" (where RR stands for the hexadecimal value of the red component, GG for the green one, and BB for the blue one).</para>
-      <note><para>If your PNG file specifies a transparency mask, it will be taken into account too.</para></note>
-      <para>Default value: #000000</para><!--XXX: should we change it into a less often used color?-->
-    </sect4>
-  </sect3>
+  <para>Associates a bitmap file (usually in PNG format) with an identifiant (=name) that will be used by the various controls. Obviously, you need one Bitmap tag for each bitmap file you have.</para>
+  <sect4 id="bitmapid">
+    <title>id</title>
+    <para>Identifiant of the bitmap that will be used with controls. Two bitmaps cannot have the same id.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="bitmapfile">
+    <title>file</title>
+    <para>Indicates the path and name of the bitmap file used. This path can be absolute (but you should definitely avoid it), or relative to the path of the XML file.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="alphacolor">
+    <title>alphacolor</title>
+    <para>Transparency color of the bitmap. It must be indicated with the following format: "#RRGGBB", where RR stands for the hexadecimal value of the red component, GG for the green one, and BB for the blue one.</para>
+    <note><para>If your PNG file specifies a transparency mask, it will be taken into account too.</para></note>
+    <para>Default value: #000000</para><!--XXX: should we change it into a less often used color?-->
+  </sect4>
+</sect3>
+
+<sect3 id="SubBitmap">
+  <title>SubBitmap</title>
+  <para>Declares a portion of bitmap, that will be used with controls in the same way as a regular Bitmap. A SubBitmap tag can only be placed inside a <link linkend="Bitmap">Bitmap</link> tag, and references implicitly the same file. SubBitmaps are very convenient when a file contains images for several controls. (This tag was not available before VLC 0.8.5).</para>
+  <sect4 id="subbitmapid">
+    <title>id</title>
+    <para>Identifiant of the portion of bitmap that will be used with controls. It must be unique in the whole skin.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="subbitmapx">
+    <title>x</title>
+    <para>Horizontal offset of the sub-bitmap (in pixels), relative to the "parent" bitmap.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="subbitmapy">
+    <title>y</title>
+    <para>Vertical offset of the sub-bitmap (in pixels), relative to the "parent" bitmap.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="subbitmapwidth">
+    <title>width</title>
+    <para>Width of the sub-bitmap, in pixels.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="subbitmapheight">
+    <title>height</title>
+    <para>Height of the SubBitmap, in pixels.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+</sect3>
 
 <sect3 id="Font">
   <title>Font</title>
   <para>Declares a font to be used in a Text or Playlist.</para>
-      <sect4 id="fontid">
-      <title>id</title>
-      <para>Identifiant of the font that will be used with controls.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="fontfile">
-      <title>file</title>
-      <para>This is the file containing a TrueType font.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="size">
-      <title>size</title>
-      <para>This is the size of the font, in points.</para>
-      <para>Default value: 12</para>
-    </sect4>
-  </sect3>
+  <sect4 id="fontid">
+    <title>id</title>
+    <para>Identifiant of the font that will be used with controls.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="fontfile">
+    <title>file</title>
+    <para>This is the file containing a TrueType font.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="size">
+    <title>size</title>
+    <para>This is the size of the font, in points.</para>
+    <para>Default value: 12</para>
+  </sect4>
+</sect3>
 
 <sect3 id="BitmapFont">
   <title>BitmapFont</title>
   <para><!--TODO--></para>
-      <sect4 id="bitmapfontid">
-      <title>id</title>
-      <para>Identifiant of the font that will be used with controls.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="bitmapfontfile">
-      <title>file</title>
-      <para>This is the file containing a bitmap font, à la Winamp.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="type">
-      <title>type</title>
-      <para>Type of font, one of "digits" or "text".</para>
-      <para>Default value: digits</para>
-    </sect4>
-  </sect3>
+  <sect4 id="bitmapfontid">
+    <title>id</title>
+    <para>Identifiant of the font that will be used with controls.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="bitmapfontfile">
+    <title>file</title>
+    <para>This is the file containing a bitmap font, à la Winamp.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="type">
+    <title>type</title>
+    <para>Type of font, one of "digits" or "text".</para>
+    <para>Default value: digits</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Window">
   <title>Window</title>
   <para>A window that will appear on screen.</para>
-      <sect4 id="windowid">
-      <title>id</title>
-      <para>Name of the window (it may be used for actions). Two windows cannot have the same id.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="windowvisible">
-      <title>visible</title>
-      <para>Indicates whether the window should appear when VLC is started. Since VLC remembers the skin windows position and visibility, this attribute will only be used the first time the skin is started.</para>
-      <para>Default value: true</para>
-    </sect4>
-    <sect4 id="windowx">
-      <title>x</title>
-      <para>Initial left position of the window.</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="windowy">
-      <title>y</title>
-      <para>Initial top position of the window.</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="dragdrop">
-      <title>dragdrop</title>
-      <para>Indicates whether drag and drop of media files is allowed on this window.</para>
-      <para>Default value: true</para>
-    </sect4>
-    <sect4 id="playondrop">
-      <title>playondrop</title>
-      <para>Indicates whether a dropped file is played directly (true) or only enqueued (false). This attribute has no effect if <link linkend="dragdrop">dragdrop</link> is set to "false".</para>
-      <para>Default value: true</para>
-    </sect4>
-  </sect3>
+  <sect4 id="windowid">
+    <title>id</title>
+    <para>Name of the window (it may be used for actions). Two windows cannot have the same id.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="windowvisible">
+    <title>visible</title>
+    <para>Indicates whether the window should appear when VLC is started. Since VLC remembers the skin windows position and visibility, this attribute will only be used the first time the skin is started.</para>
+    <para>Default value: true</para>
+  </sect4>
+  <sect4 id="windowx">
+    <title>x</title>
+    <para>Initial left position of the window.</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="windowy">
+    <title>y</title>
+    <para>Initial top position of the window.</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="dragdrop">
+    <title>dragdrop</title>
+    <para>Indicates whether drag and drop of media files is allowed on this window.</para>
+    <para>Default value: true</para>
+  </sect4>
+  <sect4 id="playondrop">
+    <title>playondrop</title>
+    <para>Indicates whether a dropped file is played directly (true) or only enqueued (false). This attribute has no effect if <link linkend="dragdrop">dragdrop</link> is set to "false".</para>
+    <para>Default value: true</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Layout">
   <title>Layout</title>
   <para>A layout is one aspect of a window, i.e. a set of controls and anchors. A window can have many layouts, but only one will be visible at any time.</para>
-      <sect4 id="layoutwidth">
-      <title>width</title>
-      <para><!--TODO: calculate it in VLC :)-->Width of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="layoutheight">
-      <title>height</title>
-      <para><!--TODO: calculate it in VLC :)-->Height of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="minwidth">
-      <title>minwidth</title>
-      <para>Minimum width of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial width (as specified by the <link linkend="layoutwidth">width</link> attribute) will be used as minimum width.</para>
-      <para>Default value: -1</para>
-    </sect4>
-    <sect4 id="maxwidth">
-      <title>maxwidth</title>
-      <para>Maximum width of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial width (as specified by the <link linkend="layoutwidth">width</link> attribute) will be used as maximum width.</para>
-      <para>Default value: -1</para>
-    </sect4>
-    <sect4 id="minheight">
-      <title>minheight</title>
-      <para>Minimum height of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial height (as specified by the <link linkend="layoutheight">height</link> attribute) will be used as minimum height.</para>
-      <para>Default value: -1</para>
-    </sect4>
-    <sect4 id="maxheight">
-      <title>maxheight</title>
-      <para>Maximum height of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial height (as specified by the <link linkend="layoutheight">height</link> attribute) will be used as maximum height.</para>
-      <para>Default value: -1</para>
-    </sect4>
-  </sect3>
+  <sect4 id="layoutwidth">
+    <title>width</title>
+    <para><!--TODO: calculate it in VLC :)-->Width of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="layoutheight">
+    <title>height</title>
+    <para><!--TODO: calculate it in VLC :)-->Height of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="minwidth">
+    <title>minwidth</title>
+    <para>Minimum width of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial width (as specified by the <link linkend="layoutwidth">width</link> attribute) will be used as minimum width.</para>
+    <para>Default value: -1</para>
+  </sect4>
+  <sect4 id="maxwidth">
+    <title>maxwidth</title>
+    <para>Maximum width of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial width (as specified by the <link linkend="layoutwidth">width</link> attribute) will be used as maximum width.</para>
+    <para>Default value: -1</para>
+  </sect4>
+  <sect4 id="minheight">
+    <title>minheight</title>
+    <para>Minimum height of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial height (as specified by the <link linkend="layoutheight">height</link> attribute) will be used as minimum height.</para>
+    <para>Default value: -1</para>
+  </sect4>
+  <sect4 id="maxheight">
+    <title>maxheight</title>
+    <para>Maximum height of the layout. This value is only used when resizing the layout. If this value is set to "-1", the initial height (as specified by the <link linkend="layoutheight">height</link> attribute) will be used as maximum height.</para>
+    <para>Default value: -1</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Group">
   <title>Group</title>
   <para>Adds an offset to the elements it contains. A Group is only supposed to ease the job of the skin designer, who can adjust the position of a group of controls without modifying all the coordinates, but you can ignore it if you want (only one Group is necessary, inside the Window tag). Group tags can be nested.</para>
-      <sect4 id="groupx">
-      <title>x</title>
-      <para>Try and guess.</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="groupy">
-      <title>y</title>
-      <para>What do you think?</para>
-      <para>Default value: 0</para>
-    </sect4>
-  </sect3>
+  <sect4 id="groupx">
+    <title>x</title>
+    <para>Try and guess.</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="groupy">
+    <title>y</title>
+    <para>What do you think?</para>
+    <para>Default value: 0</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Anchor">
   <title>Anchor</title>
   <para>Create a "magnetic point" (or curve) in the current window. If an anchor of another window enters in the range of action of this anchor, the 2 anchors will automatically be on the same place, and the windows are "sticked". Each anchor has a priority (<link linkend="priority">priority</link> attribute), and the anchor with the highest priority is the winner, which means that when moving its window all the other anchored windows will move too. To break the effect of 2 anchored windows, you need to move the window whose anchor has the lower priority.</para>
-      <sect4 id="anchorx">
-      <title>x</title>
-      <para>Is it really necessary to explain ?</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="anchory">
-      <title>y</title>
-      <para>...</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="priority">
-      <title>priority</title>
-      <para>Priority of anchor (see the previous description).</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="anchorpoints">
-      <title>points</title>
-      <para>Points defining the <link linkend="bezier">Bezier curve</link> followed by the anchor.</para>
-      <note><para>You don't need to change this parameter if all you want is a ponctual anchor.</para></note>
-      <para>Default value: (0,0)</para>
-    </sect4>
-    <sect4 id="range">
-      <title>range</title>
-      <para>Range of action of the anchor, in pixels. Default is "10".</para>
-      <para>Default value: 10</para>
-    </sect4>
-  </sect3>
+  <sect4 id="anchorx">
+    <title>x</title>
+    <para>Is it really necessary to explain ?</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="anchory">
+    <title>y</title>
+    <para>...</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="priority">
+    <title>priority</title>
+    <para>Priority of anchor (see the previous description).</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="anchorpoints">
+    <title>points</title>
+    <para>Points defining the <link linkend="bezier">Bezier curve</link> followed by the anchor.</para>
+    <note><para>You don't need to change this parameter if all you want is a ponctual anchor.</para></note>
+    <para>Default value: (0,0)</para>
+  </sect4>
+  <sect4 id="range">
+    <title>range</title>
+    <para>Range of action of the anchor, in pixels. Default is "10".</para>
+    <para>Default value: 10</para>
+  </sect4>
+</sect3>
 
 
 <sect3 id="commattr">
   <title>Attributes common to all the controls</title>
   <para>The following attributes are common to all the controls (Image, Button, Checkbox, Text, Slider, RadialSlider, Playlist, Video)</para>
-      <sect4 id="attrid">
-      <title>id</title>
-      <para>Identifiant of the control. Currently unused.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="visible">
-      <title>visible</title>
-      <para>See <link linkend="boolexpr">Boolean expressions</link>.</para>
-      <para>Default value: true</para>
-    </sect4>
-    <sect4 id="x">
-      <title>x</title>
-      <para>Horizontal offset of the control, relative to the parent tag (usually <link linkend="Group">Group</link> or <link linkend="Layout">Layout</link>).</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="y">
-      <title>y</title>
-      <para>Vertical offset of the control, relative to the parent tag (usually <link linkend="Group">Group</link> or <link linkend="Layout">Layout</link>).</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="lefttop">
-      <title>lefttop</title>
-      <para>Indicate to which corner of the Layout the top-left-hand corner of this control is attached, in case of resizing. Possible values are 'lefttop', 'leftbottom', 'righttop' and 'rightbottom'.</para>
-      <para>Default value: lefttop</para>
-    </sect4>
-    <sect4 id="rightbottom">
-      <title>rightbottom</title>
-      <para>Indicate to which corner of the Layout the bottom-right-hand corner of this control is attached, in case of resizing.</para>
-      <para>Default value: lefttop</para>
-    </sect4>
-    <sect4 id="help">
-      <title>help</title>
-      <para>Help text for the current control. The variable '$H' will be expanded to this value when the mouse hovers the current control (see <link linkend="textvars">Text variables</link>).</para>
-      <para>Default value: </para>
-    </sect4>
- </sect3>
+  <sect4 id="attrid">
+    <title>id</title>
+    <para>Identifiant of the control. Currently unused.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="visible">
+    <title>visible</title>
+    <para>See <link linkend="boolexpr">Boolean expressions</link>.</para>
+    <para>Default value: true</para>
+  </sect4>
+  <sect4 id="x">
+    <title>x</title>
+    <para>Horizontal offset of the control, relative to the parent tag (usually <link linkend="Group">Group</link> or <link linkend="Layout">Layout</link>).</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="y">
+    <title>y</title>
+    <para>Vertical offset of the control, relative to the parent tag (usually <link linkend="Group">Group</link> or <link linkend="Layout">Layout</link>).</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="lefttop">
+    <title>lefttop</title>
+    <para>Indicate to which corner of the Layout the top-left-hand corner of this control is attached, in case of resizing. Possible values are 'lefttop', 'leftbottom', 'righttop' and 'rightbottom'.</para>
+    <para>Default value: lefttop</para>
+  </sect4>
+  <sect4 id="rightbottom">
+    <title>rightbottom</title>
+    <para>Indicate to which corner of the Layout the bottom-right-hand corner of this control is attached, in case of resizing.</para>
+    <para>Default value: lefttop</para>
+  </sect4>
+  <sect4 id="help">
+    <title>help</title>
+    <para>Help text for the current control. The variable '$H' will be expanded to this value when the mouse hovers the current control (see <link linkend="textvars">Text variables</link>).</para>
+    <para>Default value: </para>
+  </sect4>
+</sect3>
 
 <sect3 id="Image">
   <title>Image</title>
   <para>Create a simple image. Particularly useful for backgrounds.</para>
   <para>See the <link linkend="commattr">Common attributes</link>.</para>
-    <sect4 id="image">
-      <title>image</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="resize">
-      <title>resize</title>
-      <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'scale' (the image is actually rescaled). Beware that the 'scale' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
-      <para>Default value: mosaic.</para>
-    </sect4>
-    <sect4 id="imageaction">
-      <title>action</title>
-      <para>Action triggered by a click on the control. Possible values are "move", to move the window, or "resizeSE" (SE as in South-East ; other directions will be added in the future) to resize the window in the corresponding direction.</para>
-      <para>Default value: none</para>
-    </sect4>
-  </sect3>
+  <sect4 id="image">
+    <title>image</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="resize">
+    <title>resize</title>
+    <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'scale' (the image is actually rescaled). Beware that the 'scale' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
+    <para>Default value: mosaic.</para>
+  </sect4>
+  <sect4 id="imageaction">
+    <title>action</title>
+    <para>Action triggered by a click on the control. Possible values are "move", to move the window, or "resizeSE" (SE as in South-East ; other directions will be added in the future) to resize the window in the corresponding direction.</para>
+    <para>Default value: none</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Button">
   <title>Button</title>
   <para>Create a button.</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
-    <sect4 id="buttonup">
-      <title>up</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the button is up.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="buttondown">
-      <title>down</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the button is down.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="buttonover">
-      <title>over</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the button.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="buttonaction">
-      <title>action</title>
-      <para>Action executed when the button is clicked. See <link linkend="actions">Actions</link> for a list of possible actions.</para>
-      <para>Default value: none</para>
-    </sect4>
-  </sect3>
+  <sect4 id="buttonup">
+    <title>up</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the button is up.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="buttondown">
+    <title>down</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the button is down.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="buttonover">
+    <title>over</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the button.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="buttonaction">
+    <title>action</title>
+    <para>Action executed when the button is clicked. See <link linkend="actions">Actions</link> for a list of possible actions.</para>
+    <para>Default value: none</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Checkbox">
   <title>Checkbox</title>
   <para>Create a checkbox, i.e. a button with 2 states (checked/unchecked). So you need 6 images for a full-featured checkbox: each state has a basic image ('up' state), an image for the control being hovered by the mouse ('over' state) and an image corresponding to a click not yet released ('down' state). If you supply only the basic images, the other ones will be identical.</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
-    <sect4 id="up1">
-      <title>up1</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is up in the first state.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="down1">
-      <title>down1</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is down in the first state.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="over1">
-      <title>over1</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the checkbox in the first state.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="up2">
-      <title>up2</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is up in the second state.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="down2">
-      <title>down2</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is down in the second state.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="over2">
-      <title>over2</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the checkbox in the second state.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="state">
-      <title>state</title>
-      <para><link linkend="boolexpr">Boolean expression</link> specifying the state of the checkbox: if the expression resolves to 'false', the first state will be used, and if it resolves to 'true' the second state will be used. Example for a checkbox showing/hiding a window whose <link linkend="windowid">id</link> is "playlist_window": state="playlist_window.isVisible" (or state="not playlist_window.isVisible", depending on the states you chose).</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="action1">
-      <title>action1</title>
-      <para>Action executed when the checkbox is clicked (state 1 to state 2). See <link linkend="actions">Actions</link> for a list of possible actions.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="action2">
-      <title>action2</title>
-      <para>Action executed when the checkbox is clicked (state 2 to state 1). See <link linkend="actions">Actions</link> for a list of possible actions.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="tooltiptext1">
-      <title>tooltiptext1</title>
-      <para>Tooltip associated with the checkbox in state 1. See also <link linkend="textvars">Text variables</link>.</para>
-      <para>Default value: </para>
-    </sect4>
-    <sect4 id="tooltiptext2">
-      <title>tooltiptext2</title>
-      <para>Tooltip associated with the checkbox in state 2. See also <link linkend="textvars">Text variables</link>.</para>
-      <para>Default value: </para>
-    </sect4>
- </sect3>
+  <sect4 id="up1">
+    <title>up1</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is up in the first state.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="down1">
+    <title>down1</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is down in the first state.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="over1">
+    <title>over1</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the checkbox in the first state.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="up2">
+    <title>up2</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is up in the second state.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="down2">
+    <title>down2</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the checkbox is down in the second state.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="over2">
+    <title>over2</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the checkbox in the second state.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="state">
+    <title>state</title>
+    <para><link linkend="boolexpr">Boolean expression</link> specifying the state of the checkbox: if the expression resolves to 'false', the first state will be used, and if it resolves to 'true' the second state will be used. Example for a checkbox showing/hiding a window whose <link linkend="windowid">id</link> is "playlist_window": state="playlist_window.isVisible" (or state="not playlist_window.isVisible", depending on the states you chose).</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="action1">
+    <title>action1</title>
+    <para>Action executed when the checkbox is clicked (state 1 to state 2). See <link linkend="actions">Actions</link> for a list of possible actions.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="action2">
+    <title>action2</title>
+    <para>Action executed when the checkbox is clicked (state 2 to state 1). See <link linkend="actions">Actions</link> for a list of possible actions.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="tooltiptext1">
+    <title>tooltiptext1</title>
+    <para>Tooltip associated with the checkbox in state 1. See also <link linkend="textvars">Text variables</link>.</para>
+    <para>Default value: </para>
+  </sect4>
+  <sect4 id="tooltiptext2">
+    <title>tooltiptext2</title>
+    <para>Tooltip associated with the checkbox in state 2. See also <link linkend="textvars">Text variables</link>.</para>
+    <para>Default value: </para>
+  </sect4>
+</sect3>
 
 <sect3 id="Text">
   <title>Text</title>
   <para>Control to display some text.</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
-    <sect4 id="textfont">
-      <title>font</title>
-      <para>Identifiant of a <link linkend="Font">Font</link> or <link linkend="BitmapFont">BitmapFont</link> (beware that any character not present in the <link linkend="BitmapFont">BitmapFont</link> will be printed as a space, so will be invisible).</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="text">
-      <title>text</title>
-      <para>Text to display. See <link linkend="textvars">Text variables</link>.</para>
-      <para>Default value: </para>
-    </sect4>
-    <sect4 id="color">
-      <title>color</title>
-      <para>Color of the text, using the #RRGGBB format.</para>
-      <para>Default value: #000000</para>
-    </sect4>
-    <sect4 id="textwidth">
-      <title>width</title>
-      <para>Width of the text in pixels. If set to "0", the width is automatically calculated to fit with the current text.<!--XXX: Probably false...--></para>
-      <para>Default value: 0</para>
-    </sect4>
-  </sect3>
+  <sect4 id="textfont">
+    <title>font</title>
+    <para>Identifiant of a <link linkend="Font">Font</link> or <link linkend="BitmapFont">BitmapFont</link> (beware that any character not present in the <link linkend="BitmapFont">BitmapFont</link> will be printed as a space, so will be invisible).</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="text">
+    <title>text</title>
+    <para>Text to display. See <link linkend="textvars">Text variables</link>.</para>
+    <para>Default value: </para>
+  </sect4>
+  <sect4 id="color">
+    <title>color</title>
+    <para>Color of the text, using the #RRGGBB format.</para>
+    <para>Default value: #000000</para>
+  </sect4>
+  <sect4 id="textwidth">
+    <title>width</title>
+    <para>Width of the text in pixels. If set to "0", the width is automatically calculated to fit with the current text.<!--XXX: Probably false...--></para>
+    <para>Default value: 0</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Slider">
   <title>Slider</title>
   <para>Create a slider.</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
-    <sect4 id="sliderup">
-      <title>up</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the slider cursor is up.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="sliderdown">
-      <title>down</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the slider cursor is down.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="sliderover">
-      <title>over</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the slider cursor.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="sliderpoints">
-      <title>points</title>
-      <para>Points defining the <link linkend="bezier">Bezier curve</link> followed by the slider cursor.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="thickness">
-      <title>thickness</title>
-      <para>Thickness of the slider curve. This attribute is used to determine whether the mouse is over the slider (hence whether a mouse click will have an effect on the cursor position).</para>
-      <para>Default value: 10</para>
-    </sect4>
-    <sect4 id="slidervalue">
-      <title>value</title>
-      <para>Variable controlled by the slider. Recognized values are "volume" and "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playlist">Playlist</link> tag does not need to set this attribute).</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="slidertooltiptext">
-      <title>tooltiptext</title>
-      <para>Tooltip associated with the slider. See also <link linkend="textvars">Text variables</link>.</para>
-      <para>Default value: </para>
-    </sect4>
-  </sect3>
+  <sect4 id="sliderup">
+    <title>up</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the slider cursor is up.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="sliderdown">
+    <title>down</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the slider cursor is down.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="sliderover">
+    <title>over</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used when the mouse is over the slider cursor.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="sliderpoints">
+    <title>points</title>
+    <para>Points defining the <link linkend="bezier">Bezier curve</link> followed by the slider cursor.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="thickness">
+    <title>thickness</title>
+    <para>Thickness of the slider curve. This attribute is used to determine whether the mouse is over the slider (hence whether a mouse click will have an effect on the cursor position).</para>
+    <para>Default value: 10</para>
+  </sect4>
+  <sect4 id="slidervalue">
+    <title>value</title>
+    <para>Variable controlled by the slider. Recognized values are "volume" and "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playlist">Playlist</link> tag does not need to set this attribute).</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="slidertooltiptext">
+    <title>tooltiptext</title>
+    <para>Tooltip associated with the slider. See also <link linkend="textvars">Text variables</link>.</para>
+    <para>Default value: </para>
+  </sect4>
+</sect3>
 
 <sect3 id="RadialSlider">
   <title>RadialSlider</title>
   <para>Create a circular slider from a list of images with the different possible positions.</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
-    <sect4 id="sequence">
-      <title>sequence</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link> containing the list of images of the different positions of the slider, concatenated vertically.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="nbimages">
-      <title>nbimages</title>
-      <para>Number of elementary images contained in the sequence.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="minangle">
-      <title>minangle</title>
-      <para>Minimum angle of the rotation, corresponging to 0%.</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="maxangle">
-      <title>maxangle</title>
-      <para>Maximum angle of the rotation, corresponging to 100%.</para>
-      <para>Default value: 360</para>
-    </sect4>
-    <sect4 id="radialslidervalue">
-      <title>value</title>
-      <para>Variable controlled by the slider. Recognized values are "volume" and "time".</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="radialslidertooltiptext">
-      <title>tooltiptext</title>
-      <para>Tooltip associated with the slider. See also <link linkend="textvars">Text variables</link>.</para>
-      <para>Default value: </para>
-    </sect4>
-  </sect3>
+  <sect4 id="sequence">
+    <title>sequence</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link> containing the list of images of the different positions of the slider, concatenated vertically.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="nbimages">
+    <title>nbimages</title>
+    <para>Number of elementary images contained in the sequence.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="minangle">
+    <title>minangle</title>
+    <para>Minimum angle of the rotation, corresponging to 0%.</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="maxangle">
+    <title>maxangle</title>
+    <para>Maximum angle of the rotation, corresponging to 100%.</para>
+    <para>Default value: 360</para>
+  </sect4>
+  <sect4 id="radialslidervalue">
+    <title>value</title>
+    <para>Variable controlled by the slider. Recognized values are "volume" and "time".</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="radialslidertooltiptext">
+    <title>tooltiptext</title>
+    <para>Tooltip associated with the slider. See also <link linkend="textvars">Text variables</link>.</para>
+    <para>Default value: </para>
+  </sect4>
+</sect3>
 
 <sect3 id="Video">
   <title>Video</title>
   <para>Control containing a video. This allows skinable video outputs!</para>
   <note><para>this control is still under development and its behaviour may change a lot in the future.</para></note>
-      <sect4 id="videowidth">
-      <title>width</title>
-      <para>Initial width of the control, in pixels.<!--XXX: cannot be deduced?--></para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="videoheight">
-      <title>height</title>
-      <para>Initial height of the control, in pixels.<!--XXX: cannot be deduced?--></para>
-      <para>Default value: 0</para>
-    </sect4>
-  </sect3>
+  <sect4 id="videowidth">
+    <title>width</title>
+    <para>Initial width of the control, in pixels.<!--XXX: cannot be deduced?--></para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="videoheight">
+    <title>height</title>
+    <para>Initial height of the control, in pixels.<!--XXX: cannot be deduced?--></para>
+    <para>Default value: 0</para>
+  </sect4>
+</sect3>
 
 <sect3 id="Playlist">
   <title>Playlist</title>
   <para>Create a playlist. This tag must contain a <link linkend="Slider">Slider</link> tag (to allow scrolling in the playlist).</para>
   <para>See the <link linkend="commattr">common attributes</link>.</para>
-    <sect4 id="playlistwidth">
-      <title>width</title>
-      <para>Width of the playlist, in pixels. If playlist items are wider, the end of the name will be replaced with '...'.</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="playlistheight">
-      <title>height</title>
-      <para>Height of the playlist, in pixels.</para>
-      <para>Default value: 0</para>
-    </sect4>
-    <sect4 id="playlistfont">
-      <title>font</title>
-      <para>Identifiant of a <link linkend="Font">Font</link> tag.</para>
-      <para><emphasis>Required.</emphasis></para>
-    </sect4>
-    <sect4 id="var">
-      <title>var</title>
-      <para>Type of playlist. Currently, only "playlist" is recognized, so don't bother with this attribute :)</para>
-      <para>Default value: playlist</para>
-    </sect4>
-    <sect4 id="bgimage">
-      <title>bgimage</title>
-      <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used as the background image. When no bitmap is specified, the background will be filled using the <link linkend="bgcolor1">bgcolor1</link> and <link linkend="bgcolor2">bgcolor2</link> attributes.</para>
-      <para>Default value: none</para>
-    </sect4>
-    <sect4 id="fgcolor">
-      <title>fgcolor</title>
-      <para>Foreground color of the playlist items.</para>
-      <para>Default value: #000000</para>
-    </sect4>
-    <sect4 id="playcolor">
-      <title>playcolor</title>
-      <para>Foreground color of the item currently played.</para>
-      <para>Default value: #FF0000</para>
-    </sect4>
-    <sect4 id="selcolor">
-      <title>selcolor</title>
-      <para>Background color of selected items.</para>
-      <para>Default value: #0000FF</para>
-    </sect4>
-    <sect4 id="bgcolor1">
-      <title>bgcolor1</title>
-      <para>Background color for odd playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
-      <para>Default value: #FFFFFF</para>
-    </sect4>
-    <sect4 id="bgcolor2">
-      <title>bgcolor2</title>
-      <para>Background color for even playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
-      <para>Default value: #FFFFFF</para>
-    </sect4>
+  <sect4 id="playlistwidth">
+    <title>width</title>
+    <para>Width of the playlist, in pixels. If playlist items are wider, the end of the name will be replaced with '...'.</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="playlistheight">
+    <title>height</title>
+    <para>Height of the playlist, in pixels.</para>
+    <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="playlistfont">
+    <title>font</title>
+    <para>Identifiant of a <link linkend="Font">Font</link> tag.</para>
+    <para><emphasis>Required.</emphasis></para>
+  </sect4>
+  <sect4 id="var">
+    <title>var</title>
+    <para>Type of playlist. Currently, only "playlist" is recognized, so don't bother with this attribute :)</para>
+    <para>Default value: playlist</para>
+  </sect4>
+  <sect4 id="bgimage">
+    <title>bgimage</title>
+    <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>, used as the background image. When no bitmap is specified, the background will be filled using the <link linkend="bgcolor1">bgcolor1</link> and <link linkend="bgcolor2">bgcolor2</link> attributes.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="fgcolor">
+    <title>fgcolor</title>
+    <para>Foreground color of the playlist items.</para>
+    <para>Default value: #000000</para>
+  </sect4>
+  <sect4 id="playcolor">
+    <title>playcolor</title>
+    <para>Foreground color of the item currently played.</para>
+    <para>Default value: #FF0000</para>
+  </sect4>
+  <sect4 id="selcolor">
+    <title>selcolor</title>
+    <para>Background color of selected items.</para>
+    <para>Default value: #0000FF</para>
+  </sect4>
+  <sect4 id="bgcolor1">
+    <title>bgcolor1</title>
+    <para>Background color for odd playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
+    <para>Default value: #FFFFFF</para>
+  </sect4>
+  <sect4 id="bgcolor2">
+    <title>bgcolor2</title>
+    <para>Background color for even playlist items. This attribute is ignored if the <link linkend="bgimage">bgimage</link> one is used.</para>
+    <para>Default value: #FFFFFF</para>
+  </sect4>
 </sect3>
 
 </sect1>
