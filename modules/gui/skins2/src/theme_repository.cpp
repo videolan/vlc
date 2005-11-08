@@ -125,7 +125,7 @@ void ThemeRepository::parseDirectory( const string &rDir )
         {
             extension = name.substr( name.size() - 4, 4 );
         }
-        if( extension == ".vlt" || extension == ".zip" )
+        if( extension == ".vlt" || extension == ".wsz" )
         {
             string path = rDir + sep + name;
             msg_Dbg( getIntf(), "found skin %s", path.c_str() );

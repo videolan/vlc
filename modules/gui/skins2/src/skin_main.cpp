@@ -277,10 +277,10 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
 
-    // Test that we have a valid .vlt file, based on the extension
+    // Test that we have a valid .vlt or .wsz file, based on the extension
     // TODO: an actual check of the contents would be better...
     if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL ||
-        strcasecmp( ext, ".vlt" ) )
+        ( strcasecmp( ext, ".vlt" ) && strcasecmp( ext, ".wsz" ) ) )
     {
         return VLC_EGENERIC;
     }
