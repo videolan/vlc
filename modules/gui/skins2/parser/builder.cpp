@@ -165,9 +165,15 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
     // Copy a region of the parent bitmap to the new one
     BitmapImpl *pBmp =
         new BitmapImpl( getIntf(), rData.m_width, rData.m_height );
-    pBmp->drawBitmap( *pParentBmp, rData.m_x, rData.m_y, 0, 0, rData.m_width,
-                      rData.m_height );
-
+    bool res = pBmp->drawBitmap( *pParentBmp, rData.m_x, rData.m_y, 0, 0,
+                                 rData.m_width, rData.m_height );
+    if( !res )
+    {
+        // Invalid sub-bitmap
+        delete pBmp;
+        msg_Warn( getIntf(), "SubBitmap %s ignored", rData.m_id.c_str() );
+        return;
+    }
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 }
 
@@ -178,7 +184,7 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
         new FileBitmap( getIntf(), m_pImageHandler, rData.m_file, 0 );
     if( !pBmp->getData() )
     {
-        // invalid bitmap
+        // Invalid bitmap
         delete pBmp;
         return;
     }

@@ -69,7 +69,7 @@ class BitmapImpl: public GenericBitmap
         virtual uint8_t *getData() const { return m_pData; }
 
         // Copy a region of another bitmap on this bitmap
-        void drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
+        bool drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
                          int xDest, int yDest, int width, int height );
 
     private:

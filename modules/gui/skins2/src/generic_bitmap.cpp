@@ -39,14 +39,26 @@ BitmapImpl::~BitmapImpl()
 }
 
 
-void BitmapImpl::drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
+bool BitmapImpl::drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
                              int xDest, int yDest, int width, int height )
 {
     int srcWidth = rSource.getWidth();
     uint32_t *pSrc = (uint32_t*)rSource.getData() + ySrc * srcWidth + xSrc;
     if( !pSrc )
     {
-        return;
+        return false;
+    }
+    if( xSrc < 0 || xSrc + width > srcWidth ||
+        ySrc < 0 || ySrc + height > rSource.getHeight() )
+    {
+        msg_Warn( getIntf(), "drawBitmap: source rect too small, ignoring" );
+        return false;
+    }
+    if( xDest < 0 || xDest + width > m_width ||
+        yDest < 0 || yDest + height > m_height )
+    {
+        msg_Warn( getIntf(), "drawBitmap: dest rect too small, ignoring" );
+        return false;
     }
 
     uint32_t *pDest = (uint32_t*)m_pData + yDest * m_width + xDest ;
@@ -56,5 +68,6 @@ void BitmapImpl::drawBitmap( const GenericBitmap &rSource, int xSrc, int ySrc,
         pSrc += srcWidth;
         pDest += m_width;
     }
+    return true;
 }
 
