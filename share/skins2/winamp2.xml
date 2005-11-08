@@ -1,7 +1,7 @@
 <!DOCTYPE Theme PUBLIC "-//VideoLAN//DTD VLC Skins V2.0//EN" "skins.dtd">
 
 <Theme version="2.0" magnet="9" alpha="255">
-    <ThemeInfo name="Winamp2" author="Cyril Deguet"/>
+    <ThemeInfo name="Winamp2" author="See README.txt in the skin file"/>
 
     <Bitmap id="main" file="main.bmp" alphacolor="#FF0000" />
     <Bitmap id="cbuttons" file="cbuttons.bmp" alphacolor="#FF0000">
@@ -38,7 +38,7 @@
        <SubBitmap id="shuffle_down" x="28" y="45" width="47" height="15" />
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0000">
-       <SubBitmap id="volume_bg" x="0" y="405" width="68" height="13" />
+       <SubBitmap id="volume_bg" x="0" y="0" width="68" height="420" />
        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
@@ -52,8 +52,7 @@
                 <Image x="0" y="0" image="main" action="move" />
                 <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
                 <Text font="text_font" x="111" y="27" width="155" text="$N"/>
-                <Image x="107" y="57" image="volume_bg"/>
-                <Slider value="volume" up="volume_up" down="volume_down" points="(114,63),(165,63)" tooltiptext="Volume: $V%" />
+                <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" background="volume_bg" nbimages="28" tooltiptext="Volume: $V%" />
                 <Image x="15" y="72" image="time_bg"/>
                 <Slider value="time" up="time_up" down="time_down" points="(30,78),(250,78)" thickness="5" tooltiptext="Time: $T"/>
                 <Button x="263"  y="3" up="quit_up"  down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />

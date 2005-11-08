@@ -106,16 +106,20 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
 
 
 /// Slider background
-class CtrlSliderBg: public CtrlGeneric
+class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
 {
     public:
         CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                       const Bezier &rCurve, VarPercent &rVariable,
-                      int thickness, VarBool *pVisible, const UString &rHelp );
-        virtual ~CtrlSliderBg() {}
+                      int thickness, GenericBitmap *pBackground, int nbImages,
+                      VarBool *pVisible, const UString &rHelp );
+        virtual ~CtrlSliderBg();
 
         /// Tell whether the mouse is over the control
         virtual bool mouseOver( int x, int y ) const;
+
+        /// Draw the control on the given graphics
+        virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
         /// Handle an event
         virtual void handleEvent( EvtGeneric &rEvent );
@@ -134,6 +138,17 @@ class CtrlSliderBg: public CtrlGeneric
         const Bezier &m_rCurve;
         /// Initial size of the control
         int m_width, m_height;
+        /// Background image sequence (optional)
+        OSGraphics *m_pImgSeq;
+        /// Number of images in the background bitmap
+        int m_nbImages;
+        /// Size of a background image
+        int m_bgWidth, m_bgHeight;
+        /// Index of the current background image
+        int m_position;
+
+        /// Method called when the observed variable is modified
+        virtual void onUpdate( Subject<VarPercent> &rVariable );
 
         /// Methode to compute the resize factors
         void getResizeFactors( float &rFactorX, float &rFactorY ) const;

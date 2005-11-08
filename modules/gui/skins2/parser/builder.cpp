@@ -161,11 +161,6 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
     // Get the parent bitmap
     GenericBitmap *pParentBmp = NULL;
     GET_BMP( pParentBmp, rData.m_parent );
-    if( !pParentBmp )
-    {
-        msg_Err( getIntf(), "unknown bitmap id: %s", rData.m_parent.c_str() );
-        return;
-    }
 
     // Copy a region of the parent bitmap to the new one
     BitmapImpl *pBmp =
@@ -563,6 +558,12 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     GenericBitmap *pBmpOver = pBmpUp;
     GET_BMP( pBmpOver, rData.m_overId );
 
+    GenericBitmap *pBgImage = NULL;
+    if( rData.m_background != "none" )
+    {
+        GET_BMP( pBgImage, rData.m_background );
+    }
+
     GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
     if( pLayout == NULL )
     {
@@ -599,8 +600,8 @@ void Builder::addSlider( const BuilderData::Slider &rData )
         UString( getIntf(), rData.m_help.c_str() ) );
 
     CtrlSliderBg *pBackground = new CtrlSliderBg( getIntf(), *pCursor,
-        *pCurve, *pVar, rData.m_thickness, pVisible,
-        UString( getIntf(), rData.m_help.c_str() ) );
+        *pCurve, *pVar, rData.m_thickness, pBgImage, rData.m_nbImages,
+        pVisible, UString( getIntf(), rData.m_help.c_str() ) );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,

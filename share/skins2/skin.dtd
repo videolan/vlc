@@ -132,7 +132,7 @@
         tooltiptext2 CDATA   ""
         help         CDATA   ""
     >
-<!ELEMENT Slider EMPTY>
+<!ELEMENT Slider (SliderBackground)?>
     <!ATTLIST Slider
         id          CDATA   "none"
         visible     CDATA   "true"
@@ -146,6 +146,8 @@
         points      CDATA   #REQUIRED
         thickness   CDATA   "10"
         value       CDATA   "none"
+        background  CDATA   "none"
+        nbimages    CDATA   "1"
         tooltiptext CDATA   ""
         help        CDATA   ""
     >

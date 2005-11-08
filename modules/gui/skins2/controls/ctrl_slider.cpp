@@ -335,12 +335,39 @@ void CtrlSliderCursor::getResizeFactors( float &rFactorX,
 
 CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                             const Bezier &rCurve, VarPercent &rVariable,
-                            int thickness, VarBool *pVisible,
+                            int thickness, GenericBitmap *pBackground,
+                            int nbImages, VarBool *pVisible,
                             const UString &rHelp ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_rCursor( rCursor ),
     m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
-    m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() )
+    m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
+    m_pImgSeq( NULL ), m_nbImages( nbImages ), m_bgWidth( 0 ),
+    m_bgHeight( 0 ), m_position( 0 )
 {
+    if( pBackground )
+    {
+        // Build the background image sequence
+        OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+        m_pImgSeq = pOsFactory->createOSGraphics( pBackground->getWidth(),
+                                                  pBackground->getHeight() );
+        m_pImgSeq->drawBitmap( *pBackground, 0, 0 );
+
+        m_bgWidth = pBackground->getWidth();
+        m_bgHeight = pBackground->getHeight() / nbImages;
+
+        // Observe the position variable
+        m_rVariable.addObserver( this );
+
+        // Initial position
+        m_position = (int)( m_rVariable.get() * (m_nbImages - 1) );
+    }
+}
+
+
+CtrlSliderBg::~CtrlSliderBg()
+{
+    m_rVariable.delObserver( this );
+    delete m_pImgSeq;
 }
 
 
@@ -352,6 +379,18 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
 
     return (m_rCurve.getMinDist( (int)(x / factorX),
                                  (int)(y / factorY) ) < m_thickness );
+}
+
+
+void CtrlSliderBg::draw( OSGraphics &rImage, int xDest, int yDest )
+{
+    if( m_pImgSeq )
+    {
+        // Draw the background image
+        // XXX the "-3" is a hack for winamp skins...
+        rImage.drawGraphics( *m_pImgSeq, 0, m_position * m_bgHeight,
+                             xDest, yDest, m_bgWidth, m_bgHeight - 3);
+    }
 }
 
 
@@ -401,6 +440,13 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
 
         m_rVariable.set( percentage );
     }
+}
+
+
+void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable )
+{
+    m_position = (int)( m_rVariable.get() * (m_nbImages - 1) );
+    notifyLayout( m_bgWidth, m_bgHeight );
 }
 
 

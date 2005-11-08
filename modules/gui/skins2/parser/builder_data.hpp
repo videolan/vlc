@@ -290,8 +290,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct Slider
     {
-        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & background, int nbImages, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_background( background ), m_nbImages( nbImages ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         const string m_visible;
@@ -305,6 +305,8 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
         const string m_points;
         int m_thickness;
         const string m_value;
+        const string m_background;
+        int m_nbImages;
         const string m_tooltip;
         const string m_help;
         int m_layer;

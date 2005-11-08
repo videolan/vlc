@@ -339,6 +339,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "over", "none" );
         CheckDefault( "thickness", "10" );
         CheckDefault( "value", "none" );
+        CheckDefault( "background", "none" );
+        CheckDefault( "nbimages", "1" );
         CheckDefault( "tooltiptext", "" );
         CheckDefault( "help", "" );
 
@@ -358,7 +360,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["lefttop"], attr["rightbottom"], attr["up"], attr["down"],
                 attr["over"], attr["points"], atoi( attr["thickness"] ),
-                newValue, attr["tooltiptext"], attr["help"], m_curLayer,
+                newValue, attr["background"], atoi( attr["nbimages"] ),
+                attr["tooltiptext"], attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listSlider.push_back( slider );

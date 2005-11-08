@@ -195,6 +195,13 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
         return false;
     }
 
+    // Convert the file name to lower case, because some winamp skins
+    // use the wrong case...
+    for( int i=0; i< strlen( filenameInZip ); i++)
+    {
+        filenameInZip[i] = tolower( filenameInZip[i] );
+    }
+
     // Allocate the buffer
     void *pBuffer = malloc( ZIP_BUFFER_SIZE );
     if( !pBuffer )
