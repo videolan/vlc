@@ -281,7 +281,10 @@ bool ThemeLoader::extract( const string &fileName )
     // Extract the file in a temporary directory
     if( ! extractTarGz( fileName, tempPath ) &&
         ! extractZip( fileName, tempPath ) )
+    {
+        deleteTempFiles( tempPath );
         return false;
+    }
 
     string path;
     string xmlFile;
