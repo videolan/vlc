@@ -304,6 +304,7 @@ static int Open( vlc_object_t *p_this )
 
     int i_snd_rc = -1;
     unsigned int i_old_rate;
+    vlc_bool_t b_retry = VLC_TRUE;
 
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -493,113 +494,132 @@ static int Open( vlc_object_t *p_this )
     snd_pcm_hw_params_alloca(&p_hw);
     snd_pcm_sw_params_alloca(&p_sw);
 
-    /* Get Initial hardware parameters */
-    if ( ( i_snd_rc = snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw ) ) < 0 )
+    /* Due to some bugs in alsa with some drivers, we need to retry in s16l
+       if snd_pcm_hw_params fails in fl32 */
+    while ( b_retry )
     {
-        msg_Err( p_aout, "unable to retrieve initial hardware parameters (%s)",
-                         snd_strerror( i_snd_rc ) );
-        goto error;
-    }
+        b_retry = VLC_FALSE;
 
-    /* Set format. */
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                                    i_snd_pcm_format ) ) < 0 )
-    {
-        if( i_snd_pcm_format != SND_PCM_FORMAT_S16 )
+        /* Get Initial hardware parameters */
+        if ( ( i_snd_rc = snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw ) ) < 0 )
         {
-            i_snd_pcm_format = SND_PCM_FORMAT_S16;
-            i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm,
-                                                     p_hw, i_snd_pcm_format );
-        }
-        if ( i_snd_rc < 0 )
-        {
-            msg_Err( p_aout, "unable to set stream sample size and "
-                     "word order (%s)", snd_strerror( i_snd_rc ) );
+            msg_Err( p_aout, "unable to retrieve initial hardware parameters (%s)",
+                         snd_strerror( i_snd_rc ) );
             goto error;
         }
-    }
-    if( i_vlc_pcm_format != VLC_FOURCC('s','p','d','i') )
-    switch( i_snd_pcm_format )
-    {
-    case SND_PCM_FORMAT_FLOAT:
-        i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
-        break;
-    case SND_PCM_FORMAT_S16:
-        i_vlc_pcm_format = AOUT_FMT_S16_NE;
-        break;
-    }
-    p_aout->output.output.i_format = i_vlc_pcm_format;
 
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
+        /* Set format. */
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
+                                                    i_snd_pcm_format ) ) < 0 )
+        {
+            if( i_snd_pcm_format != SND_PCM_FORMAT_S16 )
+            {
+                i_snd_pcm_format = SND_PCM_FORMAT_S16;
+                i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm,
+                                                     p_hw, i_snd_pcm_format );
+            }
+            if ( i_snd_rc < 0 )
+            {
+                msg_Err( p_aout, "unable to set stream sample size and "
+                     "word order (%s)", snd_strerror( i_snd_rc ) );
+                goto error;
+            }
+        }
+        if( i_vlc_pcm_format != VLC_FOURCC('s','p','d','i') )
+        switch( i_snd_pcm_format )
+        {
+        case SND_PCM_FORMAT_FLOAT:
+            i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
+            break;
+        case SND_PCM_FORMAT_S16:
+            i_vlc_pcm_format = AOUT_FMT_S16_NE;
+            break;
+        }
+        p_aout->output.output.i_format = i_vlc_pcm_format;
+
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
                                     SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
-    {
-        msg_Err( p_aout, "unable to set interleaved stream format (%s)",
-                         snd_strerror( i_snd_rc ) );
-        goto error;
-    }
+        {
+            msg_Err( p_aout, "unable to set interleaved stream format (%s)",
+                             snd_strerror( i_snd_rc ) );
+            goto error;
+        }
 
-    /* Set channels. */
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_channels( p_sys->p_snd_pcm, p_hw,
+        /* Set channels. */
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_channels( p_sys->p_snd_pcm, p_hw,
                                                       i_channels ) ) < 0 )
-    {
-        msg_Err( p_aout, "unable to set number of output channels (%s)",
-                         snd_strerror( i_snd_rc ) );
-        goto error;
-    }
+        {
+            msg_Err( p_aout, "unable to set number of output channels (%s)",
+                             snd_strerror( i_snd_rc ) );
+            goto error;
+        }
 
-    /* Set rate. */
-    i_old_rate = p_aout->output.output.i_rate;
+        /* Set rate. */
+        i_old_rate = p_aout->output.output.i_rate;
 #ifdef HAVE_ALSA_NEW_API
-    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+        i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
                                                 &p_aout->output.output.i_rate,
                                                 NULL );
 #else
-    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+        i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
                                                 p_aout->output.output.i_rate,
                                                 NULL );
 #endif
-    if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
-    {
-        msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
+        if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
+        {
+            msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
                   "Using %d Hz instead.\n", i_old_rate,
                   p_aout->output.output.i_rate );
-    }
+        }
 
-    /* Set buffer size. */
+        /* Set buffer size. */
 #ifdef HAVE_ALSA_NEW_API
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
                                     p_hw, &i_buffer_size ) ) < 0 )
 #else
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
                                     p_hw, i_buffer_size ) ) < 0 )
 #endif
-    {
-        msg_Err( p_aout, "unable to set buffer size (%s)",
+        {
+            msg_Err( p_aout, "unable to set buffer size (%s)",
                          snd_strerror( i_snd_rc ) );
-        goto error;
-    }
+            goto error;
+        }
 
-    /* Set period size. */
+        /* Set period size. */
 #ifdef HAVE_ALSA_NEW_API
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
                                     p_hw, &i_period_size, NULL ) ) < 0 )
 #else
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
+        if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
                                     p_hw, i_period_size, NULL ) ) < 0 )
 #endif
-    {
-        msg_Err( p_aout, "unable to set period size (%s)",
+        {
+            msg_Err( p_aout, "unable to set period size (%s)",
                          snd_strerror( i_snd_rc ) );
-        goto error;
-    }
-    p_aout->output.i_nb_samples = i_period_size;
+            goto error;
+        }
+        p_aout->output.i_nb_samples = i_period_size;
 
-    /* Commit hardware parameters. */
-    if ( ( i_snd_rc = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw ) ) < 0 )
-    {
-        msg_Err( p_aout, "unable to commit hardware configuration (%s)",
+        /* Commit hardware parameters. */
+        if ( ( i_snd_rc = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw ) ) < 0 )
+        {
+            if ( b_retry == VLC_FALSE &&
+                                i_snd_pcm_format == SND_PCM_FORMAT_FLOAT)
+            {
+                b_retry = VLC_TRUE;
+                i_snd_pcm_format = SND_PCM_FORMAT_S16;
+                p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+                msg_Warn( p_aout, "unable to commit hardware configuration "
+                                  "with fl32 samples. Retrying with s16l (%s)",                                     snd_strerror( i_snd_rc ) );
+            }
+            else
+            {
+                msg_Err( p_aout, "unable to commit hardware configuration (%s)",
                          snd_strerror( i_snd_rc ) );
-        goto error;
+                goto error;
+            }
+        }
     }
 
 #ifdef HAVE_ALSA_NEW_API
