@@ -596,8 +596,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>mp4</string>
-				<string>m4a</string>
-				<string>m4p</string>
+				<string>m4v</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg4.icns</string>
@@ -658,7 +657,6 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>m4a</string>
-				<string>m4p</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg4.icns</string>
