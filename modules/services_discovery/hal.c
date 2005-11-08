@@ -103,13 +103,21 @@ static int Open( vlc_object_t *p_this )
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
 
+    DBusError           dbus_error;
+
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
+    dbus_error_init( &dbus_error );
+
+#ifdef HAVE_HAL_1
+    if( !( p_sys->p_ctx = libhal_ctx_init_direct( &dbus_error ) ) )
+#else
     if( !( p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
+#endif
     {
         free( p_sys );
-        msg_Err( p_sd, "hal not available" );
+        msg_Err( p_sd, "hal not available : %s", dbus_error.message );
         return VLC_EGENERIC;
     }
 
@@ -160,16 +168,27 @@ static void AddDvd( services_discovery_t *p_sd, char *psz_device )
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
     playlist_t          *p_playlist;
     playlist_item_t     *p_item;
+#ifdef HAVE_HAL_1
+    psz_name = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
+                                        psz_device, "volume.label", NULL );
+    psz_blockdevice = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
+                                        psz_device, "block.device", NULL );
+#else
     psz_name = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                psz_device, "volume.label" );
     psz_blockdevice = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                  psz_device, "block.device" );
+#endif
     asprintf( &psz_uri, "dvd://%s", psz_blockdevice );
     /* Create the playlist item here */
     p_item = playlist_ItemNew( p_sd, psz_uri,
                                psz_name );
     free( psz_uri );
+#ifdef HAVE_HAL_1
+    libhal_free_string( psz_device );
+#else
     hal_free_string( psz_device );
+#endif
     if( !p_item )
     {
         return;
@@ -197,14 +216,23 @@ static void AddCdda( services_discovery_t *p_sd, char *psz_device )
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
     playlist_t          *p_playlist;
     playlist_item_t     *p_item;
+#ifdef HAVE_HAL_1
+    psz_blockdevice = libhal_device_get_property_string( p_sd->p_sys->p_ctx,
+                                            psz_device, "block.device", NULL );
+#else
     psz_blockdevice = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                  psz_device, "block.device" );
+#endif
     asprintf( &psz_uri, "cdda://%s", psz_blockdevice );
     /* Create the playlist item here */
     p_item = playlist_ItemNew( p_sd, psz_uri,
                                psz_name );
     free( psz_uri );
+#ifdef HAVE_HAL_1
+    libhal_free_string( psz_device );
+#else
     hal_free_string( psz_device );
+#endif
     if( !p_item )
     {
         return;
@@ -229,24 +257,44 @@ static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
 {
     char *psz_disc_type;
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
+#ifdef HAVE_HAL_1
+    if( libhal_device_property_exists( p_sys->p_ctx, psz_device,
+                                       "volume.disc.type", NULL ) )
+    {
+        psz_disc_type = libhal_device_get_property_string( p_sys->p_ctx,
+                                                        psz_device,
+                                                        "volume.disc.type",
+                                                        NULL );
+#else
     if( hal_device_property_exists( p_sys->p_ctx, psz_device,
                                     "volume.disc.type" ) )
     {
         psz_disc_type = hal_device_get_property_string( p_sys->p_ctx,
                                                         psz_device,
                                                         "volume.disc.type" );
+#endif
         if( !strcmp( psz_disc_type, "dvd_rom" ) )
         {
             AddDvd( p_sd, psz_device );
         }
         else if( !strcmp( psz_disc_type, "cd_rom" ) )
         {
-            if( hal_device_get_property_bool( p_sys->p_ctx, psz_device, "volume.disc.has_audio" ) )
+#ifdef HAVE_HAL_1
+            if( libhal_device_get_property_bool( p_sys->p_ctx, psz_device,
+                                         "volume.disc.has_audio" , NULL ) )
+#else
+            if( hal_device_get_property_bool( p_sys->p_ctx, psz_device,
+                                         "volume.disc.has_audio" ) )
+#endif
             {
                 AddCdda( p_sd, psz_device );
             }
         }
+#ifdef HAVE_HAL_1
+        libhal_free_string( psz_disc_type );
+#else
         hal_free_string( psz_disc_type );
+#endif
     }
 }
 
@@ -260,7 +308,11 @@ static void Run( services_discovery_t *p_sd )
     services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
     /* parse existing devices first */
+#ifdef HAVE_HAL_1
+    if( ( devices = libhal_get_all_devices( p_sys->p_ctx, &i_devices, NULL ) ) )
+#else
     if( ( devices = hal_get_all_devices( p_sys->p_ctx, &i_devices ) ) )
+#endif
     {
         for( i = 0; i < i_devices; i++ )
         {

@@ -2550,23 +2550,41 @@ static void InitDeviceValues( vlc_t *p_vlc )
     char *block_dev;
     dbus_bool_t b_dvd;
 
+#ifdef HAVE_HAL_1
+    if( ( ctx = libhal_ctx_init_direct( NULL ) ) )
+#else
     if( ( ctx = hal_initialize( NULL, FALSE ) ) )
+#endif
     {
+#ifdef HAVE_HAL_1
+        if( ( devices = libhal_get_all_devices( ctx, &i_devices, NULL ) ) )
+#else
         if( ( devices = hal_get_all_devices( ctx, &i_devices ) ) )
+#endif
         {
             for( i = 0; i < i_devices; i++ )
             {
+#ifdef HAVE_HAL_1
+                if( !libhal_device_property_exists( ctx, devices[i],
+                                                "storage.cdrom.dvd", NULL ) )
+#else
                 if( !hal_device_property_exists( ctx, devices[ i ],
                                                 "storage.cdrom.dvd" ) )
+#endif
                 {
                     continue;
                 }
-
+#ifdef HAVE_HAL_1
+                b_dvd = libhal_device_get_property_bool( ctx, devices[ i ],
+                                                 "storage.cdrom.dvd", NULL  );
+                block_dev = libhal_device_get_property_string( ctx,
+                                devices[ i ], "block.device" , NULL );
+#else
                 b_dvd = hal_device_get_property_bool( ctx, devices[ i ],
                                                       "storage.cdrom.dvd" );
                 block_dev = hal_device_get_property_string( ctx, devices[ i ],
                                                             "block.device" );
-
+#endif
                 if( b_dvd )
                 {
                     config_PutPsz( p_vlc, "dvd", block_dev );
@@ -2574,13 +2592,24 @@ static void InitDeviceValues( vlc_t *p_vlc )
 
                 config_PutPsz( p_vlc, "vcd", block_dev );
                 config_PutPsz( p_vlc, "cd-audio", block_dev );
-
+#ifdef HAVE_HAL_1
+                libhal_free_string( block_dev );
+#else
                 hal_free_string( block_dev );
+#endif
             }
+#ifdef HAVE_HAL_1
+            libhal_free_string_array( devices );
+#else
             hal_free_string_array( devices );
+#endif
         }
 
+#ifdef HAVE_HAL_1
+        libhal_ctx_shutdown( ctx, NULL );
+#else
         hal_shutdown( ctx );
+#endif
     }
 #endif
 }

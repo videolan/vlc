@@ -731,12 +731,21 @@ AC_ARG_ENABLE(hal,
  
 if test "${enable_hal}" != "no" -a "${SYS}" = "linux"
 then
-  PKG_CHECK_MODULES(HAL, hal >= 0.2.97,
-    [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
-     VLC_ADD_PLUGINS([hal])
-     VLC_ADD_LDFLAGS([vlc hal],[$HAL_LIBS])
-     VLC_ADD_CFLAGS([vlc hal],[$HAL_CFLAGS])],
-    [AC_MSG_WARN(HAL library not found)])
+  PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
+    [ AC_DEFINE( HAVE_HAL_1, [] , [Define if you have the new HAL library API])
+      AC_DEFINE( HAVE_HAL, [], [Define if you have the HAL library] )
+      VLC_ADD_PLUGINS([hal]) 
+      VLC_ADD_LDFLAGS([vlc hal],[$HAL_LIBS])
+      VLC_ADD_CFLAGS([vlc hal],[$HAL_CFLAGS])],   
+    dnl No hal 0.5 Test for 0.2
+    [ PKG_CHECK_MODULES( HAL, hal >= 0.2.97, 
+       [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
+        VLC_ADD_PLUGINS([hal])
+        VLC_ADD_LDFLAGS([vlc hal],[$HAL_LIBS])
+        VLC_ADD_CFLAGS([vlc hal],[$HAL_CFLAGS])],
+       [AC_MSG_WARN(HAL library not found)])
+    ]
+  )
 fi
 
 dnl Build the gtk_main plugins?
