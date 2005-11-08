@@ -53,7 +53,7 @@
                 <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
                 <Text font="text_font" x="111" y="27" width="155" text="$N"/>
                 <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" background="volume_bg" nbimages="28" tooltiptext="Volume: $V%" />
-                <Image x="15" y="72" image="time_bg"/>
+                <Image x="16" y="72" image="time_bg"/>
                 <Slider value="time" up="time_up" down="time_down" points="(30,78),(250,78)" thickness="5" tooltiptext="Time: $T"/>
                 <Button x="263"  y="3" up="quit_up"  down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
                 <Button x="16"  y="88" up="previous_up"  down="previous_down"  action="playlist.previous()" tooltiptext="Previous" />
@@ -61,7 +61,7 @@
                 <Button x="62"  y="88" up="pause_up"  down="pause_down"  action="vlc.pause()" tooltiptext="Pause" />
                 <Button x="85"  y="88" up="stop_up"  down="stop_down"  action="vlc.stop()" tooltiptext="Stop" />
                 <Button x="108"  y="88" up="next_up"  down="next_down"  action="playlist.next()" tooltiptext="Next" />
-                <Button x="136"  y="88" up="eject_up"  down="eject_down"  action="dialogs.fileSimple()" tooltiptext="Open" />
+                <Button x="136"  y="89" up="eject_up"  down="eject_down"  action="dialogs.fileSimple()" tooltiptext="Open" />
                 <Checkbox x="164"  y="89" up1="noshuffle_up" down1="noshuffle_down" up2="shuffle_up" down2="shuffle_down" state="playlist.isRandom" action1="playlist.setRandom(true)" action2="playlist.setRandom(false)" tooltiptext1="Shuffle" tooltiptext2="Shuffle"/>
                 <Checkbox x="210"  y="89" up1="noloop_up" down1="noloop_down" up2="loop_up" down2="loop_down" state="playlist.isLoop" action1="playlist.setLoop(true)" action2="playlist.setLoop(false)" tooltiptext1="Loop" tooltiptext2="Loop"/>
             </Group>
