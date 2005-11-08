@@ -104,8 +104,11 @@ GenericBitmap *BitmapFont::drawString( const UString &rString,
         uint32_t c = *(pString++);
         if( c < 256 && m_table[c].m_xPos != -1 )
         {
-            pBmp->drawBitmap( m_rBitmap, m_table[c].m_xPos, m_table[c].m_yPos,
-                              xDest, 0, m_width, m_height );
+            bool res = pBmp->drawBitmap( m_rBitmap, m_table[c].m_xPos,
+                                         m_table[c].m_yPos, xDest, 0,
+                                         m_width, m_height );
+            if ( !res )
+                msg_Warn( getIntf(), "BitmapFont::drawString: ignoring char" );
             xDest += m_advance;
         }
         else
