@@ -31,12 +31,13 @@
 // Static variable to avoid initializing catalogs twice
 static bool m_initialized = false;
 
-XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
+XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName,
+                      bool useDTD ):
     SkinObject( pIntf )
 {
     m_pReader = NULL;
     m_pStream = NULL;
-    
+
     m_pXML = xml_Create( pIntf );
     if( !m_pXML )
     {
@@ -66,7 +67,7 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
         return;
     }
 
-    xml_ReaderUseDTD( m_pReader, VLC_TRUE );
+    xml_ReaderUseDTD( m_pReader, useDTD ? VLC_TRUE : VLC_FALSE );
 
 }
 

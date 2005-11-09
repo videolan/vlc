@@ -37,7 +37,8 @@
 class XMLParser: public SkinObject
 {
     public:
-        XMLParser( intf_thread_t *pIntf, const string &rFileName );
+        XMLParser( intf_thread_t *pIntf, const string &rFileName,
+                   bool useDTD = true );
         virtual ~XMLParser();
 
         /// Parse the file. Returns true on success

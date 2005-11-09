@@ -26,10 +26,24 @@
 #include <math.h>
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
-                        const string &rPath ):
-    XMLParser( pIntf, rFileName ), m_xOffset( 0 ), m_yOffset( 0 ),
-    m_path( rPath )
+                        const string &rPath, bool useDTD, BuilderData *pData ):
+    XMLParser( pIntf, rFileName, useDTD ), m_pData(pData),
+    m_ownData(pData == NULL), m_xOffset( 0 ), m_yOffset( 0 ), m_path( rPath )
 {
+    // Make sure the data is allocated
+    if( m_pData == NULL )
+    {
+        m_pData = new BuilderData();
+    }
+}
+
+
+SkinParser::~SkinParser()
+{
+    if( m_ownData )
+    {
+        delete m_pData;
+    }
 }
 
 
@@ -45,7 +59,19 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_errors = true; return; \
     }
 
-    if( rName == "Anchor" )
+    if( rName == "Include" )
+    {
+        RequireDefault( "file" );
+        msg_Dbg( getIntf(), "Opening included XML file: %s",
+                 convertFileName( attr["file"] ).c_str() );
+        // FIXME: We do not use the DTD to validate the included XML file,
+        // as the parser seems to dislike it otherwise...
+        SkinParser subParser( getIntf(), convertFileName( attr["file"] ),
+                              m_path, false, m_pData );
+        subParser.parse();
+    }
+
+    else if( rName == "Anchor" )
     {
         RequireDefault( "priority" );
         CheckDefault( "x", "0" );
@@ -56,7 +82,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::Anchor anchor( atoi( attr["x"] ) + m_xOffset,
                 atoi( attr["y"] ) + m_yOffset, atoi( attr["range"] ),
                 atoi( attr["priority"] ), attr["points"], m_curLayoutId );
-        m_data.m_listAnchor.push_back( anchor );
+        m_pData->m_listAnchor.push_back( anchor );
     }
 
     else if( rName == "Bitmap" )
@@ -69,7 +95,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::Bitmap bitmap( m_curBitmapId,
                 convertFileName( attr["file"] ),
                 convertColor( attr["alphacolor"] ) );
-        m_data.m_listBitmap.push_back( bitmap );
+        m_pData->m_listBitmap.push_back( bitmap );
     }
 
     else if( rName == "SubBitmap" )
@@ -83,7 +109,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::SubBitmap bitmap( uniqueId( attr["id"] ),
                 m_curBitmapId, atoi( attr["x"] ), atoi( attr["y"] ),
                 atoi( attr["width"] ), atoi( attr["height"] ) );
-        m_data.m_listSubBitmap.push_back( bitmap );
+        m_pData->m_listSubBitmap.push_back( bitmap );
     }
 
     else if( rName == "BitmapFont" )
@@ -95,7 +121,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::BitmapFont font( attr["id"],
                 convertFileName( attr["file"] ),
                 attr["type"] );
-        m_data.m_listBitmapFont.push_back( font );
+        m_pData->m_listBitmapFont.push_back( font );
     }
 
     else if( rName == "Button" )
@@ -120,7 +146,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["tooltiptext"], attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listButton.push_back( button );
+        m_pData->m_listButton.push_back( button );
     }
 
     else if( rName == "Checkbox" )
@@ -153,7 +179,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["tooltiptext2"], attr["help"], m_curLayer, m_curWindowId,
                 m_curLayoutId );
         m_curLayer++;
-        m_data.m_listCheckbox.push_back( checkbox );
+        m_pData->m_listCheckbox.push_back( checkbox );
     }
 
     else if( rName == "Font" )
@@ -165,7 +191,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::Font fontData( uniqueId( attr["id"] ),
                 convertFileName( attr["file"] ),
                 atoi( attr["size"] ) );
-        m_data.m_listFont.push_back( fontData );
+        m_pData->m_listFont.push_back( fontData );
     }
 
     else if( rName == "Group" )
@@ -198,7 +224,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["image"], attr["action"], attr["resize"], attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listImage.push_back( imageData );
+        m_pData->m_listImage.push_back( imageData );
     }
 
     else if( rName == "Layout" )
@@ -216,7 +242,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 atoi( attr["height"] ), atoi( attr["minwidth"] ),
                 atoi( attr["maxwidth"] ), atoi( attr["minheight"] ),
                 atoi( attr["maxheight"] ), m_curWindowId );
-        m_data.m_listLayout.push_back( layout );
+        m_pData->m_listLayout.push_back( layout );
         m_curLayer = 0;
     }
 
@@ -252,7 +278,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertColor( attr["selcolor"] ), attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listList.push_back( listData );
+        m_pData->m_listList.push_back( listData );
     }
 
     else if( rName == "Playtree" )
@@ -292,7 +318,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertColor( attr["selcolor"] ), attr["help"],
                 m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listTree.push_back( treeData );
+        m_pData->m_listTree.push_back( treeData );
     }
 
     else if( rName == "RadialSlider" )
@@ -320,7 +346,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["tooltiptext"], attr["help"], m_curLayer, m_curWindowId,
                 m_curLayoutId );
         m_curLayer++;
-        m_data.m_listRadialSlider.push_back( radial );
+        m_pData->m_listRadialSlider.push_back( radial );
     }
 
     else if( rName == "Slider" )
@@ -364,7 +390,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["tooltiptext"], attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listSlider.push_back( slider );
+        m_pData->m_listSlider.push_back( slider );
     }
 
     else if( rName == "Text" )
@@ -389,7 +415,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertColor( attr["color"] ), attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listText.push_back( textData );
+        m_pData->m_listText.push_back( textData );
     }
 
     else if( rName == "Theme" )
@@ -412,7 +438,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 atoi( attr["magnet"] ),
                 convertInRange( attr["alpha"], 1, 255, "alpha" ),
                 convertInRange( attr["movealpha"], 1, 255, "movealpha" ) );
-        m_data.m_listTheme.push_back( theme );
+        m_pData->m_listTheme.push_back( theme );
     }
 
     else if( rName == "ThemeInfo" )
@@ -441,7 +467,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["visible"], convertBoolean( attr["autoresize"] ),
                 attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
-        m_data.m_listVideo.push_back( videoData );
+        m_pData->m_listVideo.push_back( videoData );
     }
 
     else if( rName == "Window" )
@@ -459,7 +485,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["visible"] ),
                 convertBoolean( attr["dragdrop"] ),
                 convertBoolean( attr["playondrop"] ) );
-        m_data.m_listWindow.push_back( window );
+        m_pData->m_listWindow.push_back( window );
     }
 }
 

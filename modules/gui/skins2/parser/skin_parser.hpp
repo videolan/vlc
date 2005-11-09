@@ -34,14 +34,17 @@ class SkinParser: public XMLParser
 {
     public:
         SkinParser( intf_thread_t *pIntf, const string &rFileName,
-                    const string &rPath );
-        virtual ~SkinParser() {}
+                    const string &rPath, bool useDTD = true,
+                    BuilderData *pData = NULL );
+        virtual ~SkinParser();
 
-        const BuilderData &getData() const { return m_data; }
+        const BuilderData &getData() const { return *m_pData; }
 
     private:
         /// Container for mapping data from the XML
-        BuilderData m_data;
+        BuilderData *m_pData;
+        /// Indicate whether the class owns the data
+        bool m_ownData;
         /// Current IDs
         string m_curBitmapId;
         string m_curWindowId;
