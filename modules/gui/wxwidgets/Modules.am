@@ -24,10 +24,15 @@ SOURCES_wxwidgets = \
 	dialogs/subtitles.cpp \
 	dialogs/bookmarks.cpp \
 	dialogs/vlm/vlm_slider_manager.cpp \
+	dialogs/vlm/vlm_slider_manager.hpp \
 	dialogs/vlm/vlm_stream.cpp \
+	dialogs/vlm/vlm_stream.hpp \
+	dialogs/vlm/vlm_wrapper.hpp \
 	dialogs/vlm/vlm_wrapper.cpp \
 	dialogs/vlm/vlm_streampanel.cpp \
+	dialogs/vlm/vlm_streampanel.hpp \
 	dialogs/vlm/vlm_panel.cpp \
+	dialogs/vlm/vlm_panel.hpp
 	$(NULL)
 
 EXTRA_DIST += \
@@ -59,9 +64,4 @@ EXTRA_DIST += \
 	bitmaps/type_playlist.xpm \
 	bitmaps/type_unknown.xpm \
 	bitmaps/type_vfile.xpm \
-	bitmaps/video.xpm \
-	vlm/vlm_slider_manager.hpp \
-	vlm/vlm_stream.hpp \
-	vlm/vlm_wrapper.hpp \
-	vlm/vlm_streampanel.hpp \
-	vlm/vlm_panel.hpp
+	bitmaps/video.xpm
