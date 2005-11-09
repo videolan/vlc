@@ -165,6 +165,7 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
         {
             msg_Warn( getIntf(), "Error while unzipping %s",
                       zipFile.c_str() );
+            unzClose( file );
             return false;
         }
 
@@ -175,10 +176,12 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
             {
                 msg_Warn( getIntf(), "Error while unzipping %s",
                           zipFile.c_str() );
+                unzClose( file );
                 return false;
             }
         }
     }
+    unzClose( file );
     return true;
 }
 
