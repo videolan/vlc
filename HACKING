@@ -22,6 +22,8 @@ You will need the following tools if you plan to use the SVN version of vlc:
 
  - gettext version 0.10.40 (but 0.11.3 or later is recommended)
 
+ - perl version 5.005 or later
+
 After retrieving the SVN tree, you need to run the bootstrap script to
 generate all the files needed to build vlc. You can then run configure.
 Run ./configure --help for a description of the available options.
