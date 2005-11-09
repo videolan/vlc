@@ -69,7 +69,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("libshout (icecast) output") );
-    set_shortname( N_("Shout" ));
+    set_shortname( "Shout" );
     set_capability( "sout access", 50 );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_ACO );

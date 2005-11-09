@@ -52,7 +52,7 @@
 #define NBBANDS_LONGTEXT N_( \
       "Number of bands used by spectrum analyzer, should be 20 or 80." )
 #define SPNBBANDS_LONGTEXT N_( \
-      "Number of bands used by the spectrOmeter, from 20 to 80." )
+      "Number of bands used by the spectrometer, from 20 to 80." )
 
 #define SEPAR_TEXT N_( "Band separator" )
 #define SEPAR_LONGTEXT N_( \

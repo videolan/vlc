@@ -62,13 +62,14 @@
 
 #define TIMEOUT_TEXT N_("Timeout of OSD menu")
 #define TIMEOUT_LONGTEXT N_( \
-    "OSD menu pictures get a default timeout of 15 seconds added to their remaining time." \
-    "This will ensure that they are at least the specified time visible.")
+    "OSD menu pictures get a default timeout of 15 seconds added to their " \
+    "remaining time. This will ensure that they are at least the specified " \
+    "time visible.")
 
 #define OSD_UPDATE_TEXT N_("Update speed of OSD menu")
 #define OSD_UPDATE_LONGTEXT N_( \
-    "Update the OSD menu picture every 200ms (default). Shorten the update time for " \
-    "environments that experience transmissions errors. Be carefull with this option " \
+    "Update the OSD menu picture every 200 ms (default). Shorten the update time for " \
+    "environments that experience transmissions errors. Be careful with this option " \
     "because encoding OSD menu pictures is very computing intensive. The range is 0 - 1000 ms." )
 
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };

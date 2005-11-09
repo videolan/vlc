@@ -46,7 +46,7 @@ static void Close( vlc_object_t * );
 #define HOST_TEXT N_( "Host address" )
 #define HOST_LONGTEXT N_( \
     "You can set the address, port and path the rtsp interface will bind to." \
-    "\n Syntax is address:port/path. Default is to bind to any address "\
+    "\nSyntax is address:port/path. Default is to bind to any address "\
     "on port 554, with no path." )
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
