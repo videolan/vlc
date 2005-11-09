@@ -43,10 +43,13 @@
  * Local prototypes
  *****************************************************************************/
 static  int Run  ( input_thread_t *p_input );
+static  int RunAndClean  ( input_thread_t *p_input );
 
-static  int Init ( input_thread_t *p_input, vlc_bool_t b_quick );
-static void Error( input_thread_t *p_input );
-static void End  ( input_thread_t *p_input );
+static input_thread_t * Create  ( vlc_object_t *, input_item_t *, vlc_bool_t );
+static  int             Init    ( input_thread_t *p_input, vlc_bool_t b_quick );
+static void             Error   ( input_thread_t *p_input );
+static void             End     ( input_thread_t *p_input );
+static void             MainLoop( input_thread_t *p_input );
 
 static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t * );
 static void       ControlReduce( input_thread_t * );
@@ -76,8 +79,6 @@ static void SlaveSeek( input_thread_t *p_input );
 static vlc_meta_t *InputMetaUser( input_thread_t *p_input );
 
 /*****************************************************************************
- * input_CreateThread: creates a new input thread
- *****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
  *
@@ -101,9 +102,8 @@ static vlc_meta_t *InputMetaUser( input_thread_t *p_input );
  * TODO explain when Callback is called
  * TODO complete this list (?)
  *****************************************************************************/
-input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
-                                      input_item_t *p_item )
-
+static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
+                               vlc_bool_t b_quick )
 {
     input_thread_t *p_input;                        /* thread descriptor */
     vlc_value_t val;
@@ -172,62 +172,81 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     input_ControlVarInit( p_input );
     p_input->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
-    /* TODO */
-    var_Get( p_input, "bookmarks", &val );
-    if( val.psz_string )
+    if( !b_quick )
     {
-        /* FIXME: have a common cfg parsing routine used by sout and others */
-        char *psz_parser, *psz_start, *psz_end;
-        psz_parser = val.psz_string;
-        while( (psz_start = strchr( psz_parser, '{' ) ) )
+        var_Get( p_input, "bookmarks", &val );
+        if( val.psz_string )
         {
-            seekpoint_t *p_seekpoint = vlc_seekpoint_New();
-            char backup;
-            psz_start++;
-            psz_end = strchr( psz_start, '}' );
-            if( !psz_end ) break;
-            psz_parser = psz_end + 1;
-            backup = *psz_parser;
-            *psz_parser = 0;
-            *psz_end = ',';
-
-            while( (psz_end = strchr( psz_start, ',' ) ) )
+            /* FIXME: have a common cfg parsing routine used by sout and others */
+            char *psz_parser, *psz_start, *psz_end;
+            psz_parser = val.psz_string;
+            while( (psz_start = strchr( psz_parser, '{' ) ) )
             {
-                *psz_end = 0;
-                if( !strncmp( psz_start, "name=", 5 ) )
-                {
-                    p_seekpoint->psz_name = psz_start + 5;
+                 seekpoint_t *p_seekpoint = vlc_seekpoint_New();
+                 char backup;
+                 psz_start++;
+                 psz_end = strchr( psz_start, '}' );
+                 if( !psz_end ) break;
+                 psz_parser = psz_end + 1;
+                 backup = *psz_parser;
+                 *psz_parser = 0;
+                 *psz_end = ',';
+                 while( (psz_end = strchr( psz_start, ',' ) ) )
+                 {
+                     *psz_end = 0;
+                     if( !strncmp( psz_start, "name=", 5 ) )
+                     {
+                         p_seekpoint->psz_name = psz_start + 5;
+                     }
+                     else if( !strncmp( psz_start, "bytes=", 6 ) )
+                     {
+                         p_seekpoint->i_byte_offset = atoll(psz_start + 6);
+                     }
+                     else if( !strncmp( psz_start, "time=", 5 ) )
+                     {
+                         p_seekpoint->i_time_offset = atoll(psz_start + 5) * 1000000;
+                     }
+                     psz_start = psz_end + 1;
                 }
-                else if( !strncmp( psz_start, "bytes=", 6 ) )
-                {
-                    p_seekpoint->i_byte_offset = atoll(psz_start + 6);
-                }
-                else if( !strncmp( psz_start, "time=", 5 ) )
-                {
-                    p_seekpoint->i_time_offset = atoll(psz_start + 5) * 1000000;
-                }
-                psz_start = psz_end + 1;
+                msg_Dbg( p_input, "adding bookmark: %s, bytes="I64Fd", time="I64Fd,
+                                  p_seekpoint->psz_name, p_seekpoint->i_byte_offset,
+                                  p_seekpoint->i_time_offset );
+                input_Control( p_input, INPUT_ADD_BOOKMARK, p_seekpoint );
+                vlc_seekpoint_Delete( p_seekpoint );
+                *psz_parser = backup;
             }
-            msg_Dbg( p_input, "adding bookmark: %s, bytes="I64Fd", time="I64Fd,
-                     p_seekpoint->psz_name, p_seekpoint->i_byte_offset,
-                     p_seekpoint->i_time_offset );
-            input_Control( p_input, INPUT_ADD_BOOKMARK, p_seekpoint );
-            vlc_seekpoint_Delete( p_seekpoint );
-            *psz_parser = backup;
+            free( val.psz_string );
         }
-        free( val.psz_string );
     }
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_Control( p_input, INPUT_DEL_INFO, _("Meta-information"),
-                   VLC_META_NOW_PLAYING );
+                    VLC_META_NOW_PLAYING );
 
+    return p_input;
+}
+
+/**
+ * Initialize an input thread and run it. You will need to monitor the thread to clean
+ * up after it is done
+ *
+ * \param p_parent a vlc_object
+ * \param p_item an input item
+ * \return a pointer to the spawned input thread
+ */
+input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
+                                      input_item_t *p_item )
+
+{
+    input_thread_t *p_input;                        /* thread descriptor */
+
+    p_input = Create( p_parent, p_item, VLC_FALSE );
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
     if( vlc_thread_create( p_input, "input", Run,
-                           VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
+                            VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
         msg_Err( p_input, "cannot create input thread" );
         vlc_object_detach( p_input );
@@ -238,75 +257,55 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     return p_input;
 }
 
-/*****************************************************************************
- * input_PreParse: Lightweight input for playlist item preparsing
- *****************************************************************************/
+
+/**
+ * Initialize an input thread and run it. This thread will clean after himself,
+ * you can forget about it. It can work either in blocking or non-blocking mode
+ *
+ * \param p_parent a vlc_object
+ * \param p_item an input item
+ * \param b_block should we block until read is finished ?
+ */
+void __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
+                   vlc_bool_t b_block )
+{
+    input_thread_t *p_input;                        /* thread descriptor */
+
+    p_input = Create( p_parent, p_item, VLC_FALSE );
+    /* Now we can attach our new input */
+    vlc_object_attach( p_input, p_parent );
+
+    if( b_block )
+    {
+        RunAndClean( p_input );
+    }
+    else
+    {
+        if( vlc_thread_create( p_input, "input", RunAndClean,
+                               VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
+        {
+            msg_Err( p_input, "cannot create input thread" );
+            vlc_object_detach( p_input );
+            vlc_object_destroy( p_input );
+            return;
+        }
+    }
+}
+
+/**
+ * Initialize an input and initialize it to preparse the item
+ * This function is blocking. It will only accept to parse files
+ *
+ * \param p_parent a vlc_object_t
+ * \param p_item an input item
+ * \return VLC_SUCCESS or an error
+ */
 int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 {
     input_thread_t *p_input;                        /* thread descriptor */
-    int i;
 
     /* Allocate descriptor */
-    p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
-    if( p_input == NULL )
-    {
-        msg_Err( p_parent, "out of memory" );
-        return VLC_EGENERIC;
-    }
-
-    /* Init Common fields */
-    p_input->b_eof = VLC_FALSE;
-    p_input->b_can_pace_control = VLC_TRUE;
-    p_input->i_start = 0;
-    p_input->i_time  = 0;
-    p_input->i_stop  = 0;
-    p_input->i_title = 0;
-    p_input->title   = NULL;
-    p_input->i_title_offset = p_input->i_seekpoint_offset = 0;
-    p_input->i_state = INIT_S;
-    p_input->i_rate  = INPUT_RATE_DEFAULT;
-    p_input->i_bookmark = 0;
-    p_input->bookmark = NULL;
-    p_input->p_meta  = NULL;
-    p_input->p_es_out = NULL;
-    p_input->p_sout  = NULL;
-    p_input->b_out_pace_control = VLC_FALSE;
-    p_input->i_pts_delay = 0;
-
-    /* Init Input fields */
-    p_input->input.p_item = p_item;
-    p_input->input.p_access = NULL;
-    p_input->input.p_stream = NULL;
-    p_input->input.p_demux  = NULL;
-    p_input->input.b_title_demux = VLC_FALSE;
-    p_input->input.i_title  = 0;
-    p_input->input.title    = NULL;
-    p_input->input.i_title_offset = p_input->input.i_seekpoint_offset = 0;
-    p_input->input.b_can_pace_control = VLC_TRUE;
-    p_input->input.b_eof = VLC_FALSE;
-    p_input->input.i_cr_average = 0;
-
-    /* No slave */
-    p_input->i_slave = 0;
-    p_input->slave   = NULL;
-
-    /* Init control buffer */
-    vlc_mutex_init( p_input, &p_input->lock_control );
-    p_input->i_control = 0;
-
-    /* Parse input options */
-    vlc_mutex_lock( &p_item->lock );
-    for( i = 0; i < p_item->i_options; i++ )
-    {
-        ParseOption( p_input, p_item->ppsz_options[i] );
-    }
-    vlc_mutex_unlock( &p_item->lock );
-
-    /* Create Object Variables for private use only */
-    input_ConfigVarInit( p_input );
-    input_ControlVarInit( p_input );
-
-    p_input->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
+    p_input = Create( p_parent, p_item, VLC_TRUE );
 
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
@@ -332,11 +331,11 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * input_StopThread: mark an input thread as zombie
- *****************************************************************************
- * This function should not return until the thread is effectively cancelled.
- *****************************************************************************/
+/**
+ * Request a running input thread to stop and die
+ *
+ * \param the input thread to stop
+ */
 void input_StopThread( input_thread_t *p_input )
 {
     vlc_list_t *p_list;
@@ -375,11 +374,12 @@ void input_StopThread( input_thread_t *p_input )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
-/*****************************************************************************
- * input_DestroyThread: mark an input thread as zombie
- *****************************************************************************
- * This function should not return until the thread is effectively cancelled.
- *****************************************************************************/
+/**
+ * Clean up a dead input thread
+ * This function does not return until the thread is effectively cancelled.
+ *
+ * \param the input thread to kill
+ */
 void input_DestroyThread( input_thread_t *p_input )
 {
     /* Join the thread */
@@ -394,16 +394,11 @@ void input_DestroyThread( input_thread_t *p_input )
 
 /*****************************************************************************
  * Run: main thread loop
- *****************************************************************************
- * Thread in charge of processing the network packets and demultiplexing.
- *
- * TODO:
- *  read subtitle support (XXX take care of spu-delay in the right way).
- *  multi-input support (XXX may be done with subs)
+ * This is the "normal" thread that spawns the input processing chain,
+ * reads the stream, cleans up and waits
  *****************************************************************************/
 static int Run( input_thread_t *p_input )
 {
-    int64_t i_intf_update = 0;
 
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
@@ -421,7 +416,88 @@ static int Run( input_thread_t *p_input )
         return 0;
     }
 
-    /* Main loop */
+    MainLoop( p_input );
+
+    if( !p_input->b_eof && !p_input->b_error && p_input->input.b_eof )
+    {
+        /* We have finish to demux data but not to play them */
+        while( !p_input->b_die )
+        {
+            if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
+                break;
+
+            msg_Dbg( p_input, "waiting decoder fifos to empty" );
+
+            msleep( INPUT_IDLE_SLEEP );
+        }
+
+        /* We have finished */
+        p_input->b_eof = VLC_TRUE;
+    }
+
+    /* Wait we are asked to die */
+    if( !p_input->b_die )
+    {
+        Error( p_input );
+    }
+
+    /* Clean up */
+    End( p_input );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * RunAndClean: main thread loop
+ * This is the "just forget me" thread that spawns the input processing chain,
+ * reads the stream, cleans up and releases memory
+ *****************************************************************************/
+static int RunAndClean( input_thread_t *p_input )
+{
+    /* Signal that the thread is launched */
+    vlc_thread_ready( p_input );
+
+    if( Init( p_input, VLC_FALSE ) )
+    {
+        /* If we failed, just exit */
+        return 0;
+    }
+
+    MainLoop( p_input );
+
+    if( !p_input->b_eof && !p_input->b_error && p_input->input.b_eof )
+    {
+        /* We have finish to demux data but not to play them */
+        while( !p_input->b_die )
+        {
+            if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
+                break;
+
+            msg_Dbg( p_input, "waiting decoder fifos to empty" );
+
+            msleep( INPUT_IDLE_SLEEP );
+        }
+        /* We have finished */
+        p_input->b_eof = VLC_TRUE;
+    }
+
+    /* Clean up */
+    End( p_input );
+
+    /* Release memory */
+    vlc_object_detach( p_input );
+    vlc_object_destroy( p_input );
+
+    return 0;
+}
+
+
+/*****************************************************************************
+ * Main loop: Fill buffers from access, and demux
+ *****************************************************************************/
+static void MainLoop( input_thread_t *p_input )
+{
+    int64_t i_intf_update = 0;
     while( !p_input->b_die && !p_input->b_error && !p_input->input.b_eof )
     {
         vlc_bool_t b_force_update = VLC_FALSE;
@@ -570,34 +646,6 @@ static int Run( input_thread_t *p_input )
             i_intf_update = mdate() + I64C(150000);
         }
     }
-
-    if( !p_input->b_eof && !p_input->b_error && p_input->input.b_eof )
-    {
-        /* We have finish to demux data but not to play them */
-        while( !p_input->b_die )
-        {
-            if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
-                break;
-
-            msg_Dbg( p_input, "waiting decoder fifos to empty" );
-
-            msleep( INPUT_IDLE_SLEEP );
-        }
-
-        /* We have finished */
-        p_input->b_eof = VLC_TRUE;
-    }
-
-    /* Wait we are asked to die */
-    if( !p_input->b_die )
-    {
-        Error( p_input );
-    }
-
-    /* Clean up */
-    End( p_input );
-
-    return 0;
 }
 
 

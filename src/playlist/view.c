@@ -29,7 +29,7 @@
 
 #include "vlc_playlist.h"
 
-#undef PLAYLIST_DEBUG
+#define PLAYLIST_DEBUG 1
 
 /************************************************************************
  * Local prototypes

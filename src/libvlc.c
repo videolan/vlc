@@ -1219,7 +1219,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
 }
 
 /*****************************************************************************
- * VLC_Play: play
+ * VLC_Play: play the playlist
  *****************************************************************************/
 int VLC_Play( int i_object )
 {

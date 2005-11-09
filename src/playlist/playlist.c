@@ -37,7 +37,7 @@
 #define TITLE_ALL      N_( "All items, unsorted" )
 
 #undef PLAYLIST_PROFILE
-#undef PLAYLIST_DEBUG
+#define PLAYLIST_DEBUG 1
 
 /*****************************************************************************
  * Local prototypes
@@ -364,8 +364,8 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         i_view = (int)va_arg( args,int );
         p_node = (playlist_item_t *)va_arg( args, playlist_item_t * );
         p_item = (playlist_item_t *)va_arg( args, playlist_item_t * );
-        if ( p_node == NULL || (p_item != NULL && p_item->input.psz_uri
-                                                         == NULL ))
+        if ( p_node == NULL ) //|| (p_item != NULL && p_item->input.psz_uri
+                                //                         == NULL ))
         {
             p_playlist->status.i_status = PLAYLIST_STOPPED;
             p_playlist->request.b_request = VLC_TRUE;
@@ -378,10 +378,8 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         p_playlist->request.p_node = p_node;
         p_playlist->request.p_item = p_item;
 
-        /* If we select a node, play only it.
-         * If we select an item, continue */
-        if( p_playlist->request.p_item == NULL ||
-            ! p_playlist->request.p_node->i_flags & PLAYLIST_SKIP_FLAG )
+        /* Don't go further if the node doesn't want to */
+        if( ! p_playlist->request.p_node->i_flags & PLAYLIST_SKIP_FLAG )
         {
             p_playlist->b_go_next = VLC_FALSE;
         }
@@ -468,7 +466,7 @@ int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args )
         break;
 
     default:
-        msg_Err( p_playlist, "unimplemented playlist query" );
+        msg_Err( p_playlist, "unknown playlist query" );
         return VLC_EBADVAR;
         break;
     }
@@ -679,7 +677,6 @@ static void RunThread ( playlist_t *p_playlist )
             /* Start another input.
              * Get the next item to play */
             p_item = NextItem( p_playlist );
-
 
             /* We must stop */
             if( p_item == NULL )
@@ -899,7 +896,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     /* TODO: use the "shuffled view" internally ? */
     /* Random case. This is an exception: if request, but request is skip +- 1
      * we don't go to next item but select a new random one. */
-    if( b_random && 
+    if( b_random &&
         ( !p_playlist->request.b_request ||
         ( p_playlist->request.b_request && ( p_playlist->request.p_item == NULL ||
           p_playlist->request.i_skip == 1 || p_playlist->request.i_skip == -1 ) ) ) )
