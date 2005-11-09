@@ -37,7 +37,7 @@
 #define TITLE_ALL      N_( "All items, unsorted" )
 
 #undef PLAYLIST_PROFILE
-#define PLAYLIST_DEBUG 1
+#undef PLAYLIST_DEBUG
 
 /*****************************************************************************
  * Local prototypes
