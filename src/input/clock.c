@@ -136,7 +136,7 @@ void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average )
     cl->cr_ref = 0;
     cl->sysdate_ref = 0;
     cl->delta_cr = 0;
-    cl->c_average_count = 0;
+    cl->i_delta_cr_residue = 0;
 
     cl->i_cr_average = i_cr_average;
 
@@ -265,7 +265,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
         {
             cl->last_cr = 0;
             cl->delta_cr = 0;
-            cl->c_average_count = 0;
+            cl->i_delta_cr_residue = 0;
         }
     }
     else
@@ -312,11 +312,18 @@ void input_ClockSetPCR( input_thread_t *p_input,
         {
             /* Smooth clock reference variations. */
             mtime_t i_extrapoled_clock = ClockCurrent( p_input, cl );
+            mtime_t delta_cr;
 
             /* Bresenham algorithm to smooth variations. */
-            cl->delta_cr = ( cl->delta_cr * (cl->i_cr_average - 1)
-                               + ( i_extrapoled_clock - i_clock ) )
+            delta_cr = ( cl->delta_cr * (cl->i_cr_average - 1)
+                               + ( i_extrapoled_clock - i_clock )
+                               + cl->i_delta_cr_residue )
                            / cl->i_cr_average;
+            cl->i_delta_cr_residue = ( cl->delta_cr * (cl->i_cr_average - 1)
+                                       + ( i_extrapoled_clock - i_clock )
+                                       + cl->i_delta_cr_residue )
+                                    % cl->i_cr_average;
+            cl->delta_cr = delta_cr;
         }
     }
 }
