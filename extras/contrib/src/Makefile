@@ -832,7 +832,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg .faac .lame 
-	(cd $<; ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver  --enable-a52 --disable-ffplay && for dir in libavcodec/libpostproc libavcodec libavformat libavutil; do make -C $$dir && make -C $$dir installlib; done)
+	(cd $<; ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-ffserver  --enable-a52 --disable-ffplay && for dir in libavcodec/libpostproc libavcodec libavformat libavutil; do make -C $$dir && make -C $$dir installlib; done)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
