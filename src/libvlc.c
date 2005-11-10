@@ -1993,7 +1993,7 @@ static void SetLanguage ( char const *psz_lang )
 #endif
     if( !bindtextdomain( PACKAGE_NAME, psz_path ) )
     {
-        fprintf( stderr, "warning: no domain %s in directory %s\n",
+        fprintf( stderr, "warning: couldn't bind domain %s in directory %s\n",
                  PACKAGE_NAME, psz_path );
     }
 
