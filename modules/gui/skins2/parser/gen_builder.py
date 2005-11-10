@@ -79,8 +79,6 @@ while 1:
             initlist += ", "
         initlist += "m_" + varname + "( " + varname + " )"
         vartype = vardef[1]
-        if vartype == "string":
-            vartype = "const string"
         vars += "        " + vartype + " m_" + varname + ";\n"
     str += constructor + " ):\n" + initlist + " {}\n\n"
     str += vars + "    };\n"

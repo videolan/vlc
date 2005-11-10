@@ -45,7 +45,7 @@ struct BuilderData
         Theme( const string & tooltipfont, int magnet, uint32_t alpha, uint32_t moveAlpha ):
 m_tooltipfont( tooltipfont ), m_magnet( magnet ), m_alpha( alpha ), m_moveAlpha( moveAlpha ) {}
 
-        const string m_tooltipfont;
+        string m_tooltipfont;
         int m_magnet;
         uint32_t m_alpha;
         uint32_t m_moveAlpha;
@@ -59,8 +59,8 @@ m_tooltipfont( tooltipfont ), m_magnet( magnet ), m_alpha( alpha ), m_moveAlpha(
         Bitmap( const string & id, const string & fileName, uint32_t alphaColor ):
 m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
 
-        const string m_id;
-        const string m_fileName;
+        string m_id;
+        string m_fileName;
         uint32_t m_alphaColor;
     };
     /// List
@@ -72,8 +72,8 @@ m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
         SubBitmap( const string & id, const string & parent, int x, int y, int width, int height ):
 m_id( id ), m_parent( parent ), m_x( x ), m_y( y ), m_width( width ), m_height( height ) {}
 
-        const string m_id;
-        const string m_parent;
+        string m_id;
+        string m_parent;
         int m_x;
         int m_y;
         int m_width;
@@ -88,9 +88,9 @@ m_id( id ), m_parent( parent ), m_x( x ), m_y( y ), m_width( width ), m_height( 
         BitmapFont( const string & id, const string & file, const string & type ):
 m_id( id ), m_file( file ), m_type( type ) {}
 
-        const string m_id;
-        const string m_file;
-        const string m_type;
+        string m_id;
+        string m_file;
+        string m_type;
     };
     /// List
     list<BitmapFont> m_listBitmapFont;
@@ -101,8 +101,8 @@ m_id( id ), m_file( file ), m_type( type ) {}
         Font( const string & id, const string & fontFile, int size ):
 m_id( id ), m_fontFile( fontFile ), m_size( size ) {}
 
-        const string m_id;
-        const string m_fontFile;
+        string m_id;
+        string m_fontFile;
         int m_size;
     };
     /// List
@@ -114,7 +114,7 @@ m_id( id ), m_fontFile( fontFile ), m_size( size ) {}
         Window( const string & id, int xPos, int yPos, bool visible, bool dragDrop, bool playOnDrop ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_dragDrop( dragDrop ), m_playOnDrop( playOnDrop ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
         bool m_visible;
@@ -130,14 +130,14 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_dragDrop( dr
         Layout( const string & id, int width, int height, int minWidth, int maxWidth, int minHeight, int maxHeight, const string & windowId ):
 m_id( id ), m_width( width ), m_height( height ), m_minWidth( minWidth ), m_maxWidth( maxWidth ), m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_windowId( windowId ) {}
 
-        const string m_id;
+        string m_id;
         int m_width;
         int m_height;
         int m_minWidth;
         int m_maxWidth;
         int m_minHeight;
         int m_maxHeight;
-        const string m_windowId;
+        string m_windowId;
     };
     /// List
     list<Layout> m_listLayout;
@@ -152,8 +152,8 @@ m_xPos( xPos ), m_yPos( yPos ), m_range( range ), m_priority( priority ), m_poin
         int m_yPos;
         int m_range;
         int m_priority;
-        const string m_points;
-        const string m_layoutId;
+        string m_points;
+        string m_layoutId;
     };
     /// List
     list<Anchor> m_listAnchor;
@@ -164,21 +164,21 @@ m_xPos( xPos ), m_yPos( yPos ), m_range( range ), m_priority( priority ), m_poin
         Button( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & upId, const string & downId, const string & overId, const string & actionId, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_actionId( actionId ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_visible;
-        const string m_upId;
-        const string m_downId;
-        const string m_overId;
-        const string m_actionId;
-        const string m_tooltip;
-        const string m_help;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_visible;
+        string m_upId;
+        string m_downId;
+        string m_overId;
+        string m_actionId;
+        string m_tooltip;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Button> m_listButton;
@@ -189,27 +189,27 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         Checkbox( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & up1Id, const string & down1Id, const string & over1Id, const string & up2Id, const string & down2Id, const string & over2Id, const string & state, const string & action1, const string & action2, const string & tooltip1, const string & tooltip2, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_up1Id( up1Id ), m_down1Id( down1Id ), m_over1Id( over1Id ), m_up2Id( up2Id ), m_down2Id( down2Id ), m_over2Id( over2Id ), m_state( state ), m_action1( action1 ), m_action2( action2 ), m_tooltip1( tooltip1 ), m_tooltip2( tooltip2 ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_visible;
-        const string m_up1Id;
-        const string m_down1Id;
-        const string m_over1Id;
-        const string m_up2Id;
-        const string m_down2Id;
-        const string m_over2Id;
-        const string m_state;
-        const string m_action1;
-        const string m_action2;
-        const string m_tooltip1;
-        const string m_tooltip2;
-        const string m_help;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_visible;
+        string m_up1Id;
+        string m_down1Id;
+        string m_over1Id;
+        string m_up2Id;
+        string m_down2Id;
+        string m_over2Id;
+        string m_state;
+        string m_action1;
+        string m_action2;
+        string m_tooltip1;
+        string m_tooltip2;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Checkbox> m_listCheckbox;
@@ -220,19 +220,19 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & bmpId, const string & actionId, const string & resize, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_resize( resize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_visible;
-        const string m_bmpId;
-        const string m_actionId;
-        const string m_resize;
-        const string m_help;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_visible;
+        string m_bmpId;
+        string m_actionId;
+        string m_resize;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Image> m_listImage;
@@ -243,20 +243,20 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         Text( const string & id, int xPos, int yPos, const string & visible, const string & fontId, const string & text, int width, const string & leftTop, const string & rightBottom, uint32_t color, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( fontId ), m_text( text ), m_width( width ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_color( color ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
-        const string m_visible;
-        const string m_fontId;
-        const string m_text;
+        string m_visible;
+        string m_fontId;
+        string m_text;
         int m_width;
-        const string m_leftTop;
-        const string m_rightBottom;
+        string m_leftTop;
+        string m_rightBottom;
         uint32_t m_color;
-        const string m_help;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Text> m_listText;
@@ -267,22 +267,22 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_fontId( font
         RadialSlider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & sequence, int nbImages, float minAngle, float maxAngle, const string & value, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_sequence( sequence ), m_nbImages( nbImages ), m_minAngle( minAngle ), m_maxAngle( maxAngle ), m_value( value ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
-        const string m_visible;
+        string m_id;
+        string m_visible;
         int m_xPos;
         int m_yPos;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_sequence;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_sequence;
         int m_nbImages;
         float m_minAngle;
         float m_maxAngle;
-        const string m_value;
-        const string m_tooltip;
-        const string m_help;
+        string m_value;
+        string m_tooltip;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<RadialSlider> m_listRadialSlider;
@@ -290,28 +290,31 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
     /// Type definition
     struct Slider
     {
-        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & background, int nbImages, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_background( background ), m_nbImages( nbImages ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Slider( const string & id, const string & visible, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & upId, const string & downId, const string & overId, const string & points, int thickness, const string & value, const string & imageId, int nbHoriz, int nbVert, int padHoriz, int padVert, const string & tooltip, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_upId( upId ), m_downId( downId ), m_overId( overId ), m_points( points ), m_thickness( thickness ), m_value( value ), m_imageId( imageId ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ), m_tooltip( tooltip ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
-        const string m_visible;
+        string m_id;
+        string m_visible;
         int m_xPos;
         int m_yPos;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_upId;
-        const string m_downId;
-        const string m_overId;
-        const string m_points;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_upId;
+        string m_downId;
+        string m_overId;
+        string m_points;
         int m_thickness;
-        const string m_value;
-        const string m_background;
-        int m_nbImages;
-        const string m_tooltip;
-        const string m_help;
+        string m_value;
+        string m_imageId;
+        int m_nbHoriz;
+        int m_nbVert;
+        int m_padHoriz;
+        int m_padVert;
+        string m_tooltip;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Slider> m_listSlider;
@@ -322,26 +325,26 @@ m_id( id ), m_visible( visible ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( lef
         List( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
-        const string m_visible;
+        string m_visible;
         int m_width;
         int m_height;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_fontId;
-        const string m_var;
-        const string m_bgImageId;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_fontId;
+        string m_var;
+        string m_bgImageId;
         uint32_t m_fgColor;
         uint32_t m_playColor;
         uint32_t m_bgColor1;
         uint32_t m_bgColor2;
         uint32_t m_selColor;
-        const string m_help;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<List> m_listList;
@@ -352,29 +355,29 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
         Tree( const string & id, int xPos, int yPos, const string & visible, int width, int height, const string & leftTop, const string & rightBottom, const string & fontId, const string & var, const string & bgImageId, const string & itemImageId, const string & openImageId, const string & closedImageId, uint32_t fgColor, uint32_t playColor, uint32_t bgColor1, uint32_t bgColor2, uint32_t selColor, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_fontId( fontId ), m_var( var ), m_bgImageId( bgImageId ), m_itemImageId( itemImageId ), m_openImageId( openImageId ), m_closedImageId( closedImageId ), m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ), m_bgColor2( bgColor2 ), m_selColor( selColor ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
-        const string m_visible;
+        string m_visible;
         int m_width;
         int m_height;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_fontId;
-        const string m_var;
-        const string m_bgImageId;
-        const string m_itemImageId;
-        const string m_openImageId;
-        const string m_closedImageId;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_fontId;
+        string m_var;
+        string m_bgImageId;
+        string m_itemImageId;
+        string m_openImageId;
+        string m_closedImageId;
         uint32_t m_fgColor;
         uint32_t m_playColor;
         uint32_t m_bgColor1;
         uint32_t m_bgColor2;
         uint32_t m_selColor;
-        const string m_help;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Tree> m_listTree;
@@ -385,19 +388,19 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_visible( visible ), m_width( width
         Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, const string & visible, bool autoResize, const string & help, int layer, const string & windowId, const string & layoutId ):
 m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_autoResize( autoResize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
-        const string m_id;
+        string m_id;
         int m_xPos;
         int m_yPos;
         int m_width;
         int m_height;
-        const string m_leftTop;
-        const string m_rightBottom;
-        const string m_visible;
+        string m_leftTop;
+        string m_rightBottom;
+        string m_visible;
         bool m_autoResize;
-        const string m_help;
+        string m_help;
         int m_layer;
-        const string m_windowId;
-        const string m_layoutId;
+        string m_windowId;
+        string m_layoutId;
     };
     /// List
     list<Video> m_listVideo;

@@ -58,7 +58,6 @@
         dragdrop    CDATA   "true"
         playondrop  CDATA   "true"
     >
-
 <!ELEMENT Layout (Group)>
     <!ATTLIST Layout
         id          CDATA   "none"
@@ -151,9 +150,17 @@
         thickness   CDATA   "10"
         value       CDATA   "none"
         background  CDATA   "none"
-        nbimages    CDATA   "1"
         tooltiptext CDATA   ""
         help        CDATA   ""
+    >
+<!ELEMENT SliderBackground EMPTY>
+    <!ATTLIST SliderBackground
+        id          CDATA   "none"
+        image       CDATA   #REQUIRED
+        nbhoriz     CDATA   "1"
+        nbvert      CDATA   "1"
+        padhoriz    CDATA   "0"
+        padvert     CDATA   "0"
     >
 <!ELEMENT RadialSlider EMPTY>
     <!ATTLIST RadialSlider

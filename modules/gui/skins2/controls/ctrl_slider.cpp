@@ -332,16 +332,16 @@ void CtrlSliderCursor::getResizeFactors( float &rFactorX,
 }
 
 
-
 CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                             const Bezier &rCurve, VarPercent &rVariable,
                             int thickness, GenericBitmap *pBackground,
-                            int nbImages, VarBool *pVisible,
-                            const UString &rHelp ):
+                            int nbHoriz, int nbVert, int padHoriz, int padVert,
+                            VarBool *pVisible, const UString &rHelp ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_rCursor( rCursor ),
     m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
-    m_pImgSeq( NULL ), m_nbImages( nbImages ), m_bgWidth( 0 ),
+    m_pImgSeq( NULL ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ),
+    m_padHoriz( padHoriz ), m_padVert( padVert ), m_bgWidth( 0 ),
     m_bgHeight( 0 ), m_position( 0 )
 {
     if( pBackground )
@@ -352,14 +352,14 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                                                   pBackground->getHeight() );
         m_pImgSeq->drawBitmap( *pBackground, 0, 0 );
 
-        m_bgWidth = pBackground->getWidth();
-        m_bgHeight = pBackground->getHeight() / nbImages;
+        m_bgWidth = pBackground->getWidth() / nbHoriz;
+        m_bgHeight = pBackground->getHeight() / nbVert;
 
         // Observe the position variable
         m_rVariable.addObserver( this );
 
         // Initial position
-        m_position = (int)( m_rVariable.get() * (m_nbImages - 1) );
+        m_position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
     }
 }
 
@@ -386,10 +386,12 @@ void CtrlSliderBg::draw( OSGraphics &rImage, int xDest, int yDest )
 {
     if( m_pImgSeq )
     {
+        // Locate the right image in the background bitmap
+        int x = m_bgWidth * ( m_position % m_nbHoriz );
+        int y = m_bgHeight * ( m_position / m_nbHoriz );
         // Draw the background image
-        // XXX the "-2" is a hack for winamp skins...
-        rImage.drawGraphics( *m_pImgSeq, 0, m_position * m_bgHeight,
-                             xDest, yDest, m_bgWidth, m_bgHeight - 2);
+        rImage.drawGraphics( *m_pImgSeq, x, y, xDest, yDest,
+                             m_bgWidth - m_padHoriz, m_bgHeight - m_padVert );
     }
 }
 
@@ -445,7 +447,7 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
 
 void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable )
 {
-    m_position = (int)( m_rVariable.get() * (m_nbImages - 1) );
+    m_position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
     notifyLayout( m_bgWidth, m_bgHeight );
 }
 

@@ -363,8 +363,6 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "over", "none" );
         CheckDefault( "thickness", "10" );
         CheckDefault( "value", "none" );
-        CheckDefault( "background", "none" );
-        CheckDefault( "nbimages", "1" );
         CheckDefault( "tooltiptext", "" );
         CheckDefault( "help", "" );
 
@@ -380,15 +378,32 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
             newValue = "playtree.slider";
         }
         const BuilderData::Slider slider( uniqueId( attr["id"] ),
-                attr["visible"],
-                atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
-                attr["lefttop"], attr["rightbottom"], attr["up"], attr["down"],
+                attr["visible"], atoi( attr["x"] ) + m_xOffset,
+                atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
+                attr["rightbottom"], attr["up"], attr["down"],
                 attr["over"], attr["points"], atoi( attr["thickness"] ),
-                newValue, attr["background"], atoi( attr["nbimages"] ),
-                attr["tooltiptext"], attr["help"], m_curLayer,
-                m_curWindowId, m_curLayoutId );
+                newValue, "none", 0, 0, 0, 0, attr["tooltiptext"],
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_pData->m_listSlider.push_back( slider );
+    }
+
+    else if( rName == "SliderBackground" )
+    {
+        RequireDefault( "image" );
+        CheckDefault( "nbhoriz", "1" );
+        CheckDefault( "nbvert", "1" );
+        CheckDefault( "padhoriz", "0" );
+        CheckDefault( "padvert", "0" );
+
+        // Retrieve the current slider data
+        BuilderData::Slider &slider = m_pData->m_listSlider.back();
+
+        slider.m_imageId = attr["image"];
+        slider.m_nbHoriz = atoi( attr["nbhoriz"] );
+        slider.m_nbVert = atoi( attr["nbvert"] );
+        slider.m_padHoriz = atoi( attr["padhoriz"] );
+        slider.m_padVert = atoi( attr["padvert"] );
     }
 
     else if( rName == "Text" )

@@ -591,9 +591,9 @@ void Builder::addSlider( const BuilderData::Slider &rData )
     GET_BMP( pBmpOver, rData.m_overId );
 
     GenericBitmap *pBgImage = NULL;
-    if( rData.m_background != "none" )
+    if( rData.m_imageId != "none" )
     {
-        GET_BMP( pBgImage, rData.m_background );
+        GET_BMP( pBgImage, rData.m_imageId );
     }
 
     GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
@@ -632,7 +632,8 @@ void Builder::addSlider( const BuilderData::Slider &rData )
         UString( getIntf(), rData.m_help.c_str() ) );
 
     CtrlSliderBg *pBackground = new CtrlSliderBg( getIntf(), *pCursor,
-        *pCurve, *pVar, rData.m_thickness, pBgImage, rData.m_nbImages,
+        *pCurve, *pVar, rData.m_thickness, pBgImage, rData.m_nbHoriz,
+        rData.m_nbVert, rData.m_padHoriz, rData.m_padVert,
         pVisible, UString( getIntf(), rData.m_help.c_str() ) );
 
     // Compute the position of the control

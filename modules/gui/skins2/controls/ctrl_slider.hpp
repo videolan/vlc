@@ -111,8 +111,9 @@ class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
     public:
         CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                       const Bezier &rCurve, VarPercent &rVariable,
-                      int thickness, GenericBitmap *pBackground, int nbImages,
-                      VarBool *pVisible, const UString &rHelp );
+                      int thickness, GenericBitmap *pBackground, int nbHoriz,
+                      int nbVert, int padHoriz, int padVert, VarBool *pVisible,
+                      const UString &rHelp );
         virtual ~CtrlSliderBg();
 
         /// Tell whether the mouse is over the control
@@ -141,7 +142,9 @@ class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
         /// Background image sequence (optional)
         OSGraphics *m_pImgSeq;
         /// Number of images in the background bitmap
-        int m_nbImages;
+        int m_nbHoriz, m_nbVert;
+        /// Number of pixels between two images
+        int m_padHoriz, m_padVert;
         /// Size of a background image
         int m_bgWidth, m_bgHeight;
         /// Index of the current background image

@@ -20,6 +20,14 @@
     </Bitmap>
     <Bitmap id="eqmain" file="eqmain.bmp" alphacolor="#FF0000">
        <SubBitmap id="eq_bg" x="0" y="0" width="275" height="116" />
+       <SubBitmap id="eq_title_focus" x="0" y="134" width="275" height="14" />
+       <SubBitmap id="eq_notok_up" x="10" y="119" width="26" height="12" />
+       <SubBitmap id="eq_ok_up" x="69" y="119" width="26" height="12" />
+       <SubBitmap id="eq_notok_down" x="128" y="119" width="26" height="12" />
+       <SubBitmap id="eq_ok_down" x="187" y="119" width="26" height="12" />
+       <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
+       <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
+       <SubBitmap id="eq_slider_bg" x="13" y="164" width="210" height="130" />
     </Bitmap>
     <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0000">
        <SubBitmap id="pl_upleft_focus" x="0" y="0" width="25" height="20" />
@@ -81,7 +89,9 @@
                 <Image x="0" y="0" image="title_focus" action="move" />
                 <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
                 <Text font="text_font" x="111" y="27" width="155" text="$N"/>
-                <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" background="volume_bg" nbimages="28" tooltiptext="Volume: $V%" />
+                <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" tooltiptext="Volume: $V%">
+                    <SliderBackground image="volume_bg" nbvert="28" padvert="1"/>
+                </Slider>
                 <Image x="16" y="72" image="time_bg"/>
                 <Slider value="time" x="29" y="77" up="time_up" down="time_down" points="(0,0),(220,0)" thickness="5" tooltiptext="Time: $T"/>
                 <Button x="263" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
@@ -108,6 +118,38 @@
                 <Anchor x="275" y="116" priority="40" range="15" />
                 <Anchor x="20" y="116" points="(0,0),(235,0)" priority="30" range="15" />
                 <Image x="0" y="0" image="eq_bg" action="move" />
+                <Image x="0" y="0" image="eq_title_focus" action="move" />
+                <Checkbox x="15" y="20" up1="eq_notok_up" down1="eq_notok_down" up2="eq_ok_up" down2="eq_ok_down" state="equalizer.isEnabled" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable equalizer" tooltiptext2="Disable equalizer"/>
+                <Slider value="equalizer.band(0)" x="78" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(1)" x="96" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(2)" x="114" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(3)" x="132" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(4)" x="150" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(5)" x="168" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(6)" x="186" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(7)" x="204" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(8)" x="222" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
+                <Slider value="equalizer.band(9)" x="240" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
+                </Slider>
             </Group>
         </Layout>
     </Window>
