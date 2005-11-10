@@ -46,7 +46,8 @@ class Theme;
 class Builder: public SkinObject
 {
     public:
-        Builder( intf_thread_t *pIntf, const BuilderData &rData );
+        Builder( intf_thread_t *pIntf, const BuilderData &rData,
+                 const string &rPath );
         virtual ~Builder();
 
         /// Create a Theme object, ready to use.
@@ -59,6 +60,8 @@ class Builder: public SkinObject
     private:
         /// Data from the XML
         const BuilderData &m_rData;
+        /// Path of the theme
+        const string m_path;
 
         /// Theme under construction
         Theme *m_pTheme;
@@ -86,6 +89,9 @@ class Builder: public SkinObject
                                      const string &rRightBottom,
                                      int xPos, int yPos, int width, int height,
                                      const Box &rBox ) const;
+
+        // Build the full path of a file
+        string getFilePath( const string &fileName ) const;
 
         /// Get a font from its id
         GenericFont *getFont( const string &fontId );

@@ -200,7 +200,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
 
     // Convert the file name to lower case, because some winamp skins
     // use the wrong case...
-    for( int i=0; i< strlen( filenameInZip ); i++)
+    for( size_t i=0; i< strlen( filenameInZip ); i++)
     {
         filenameInZip[i] = tolower( filenameInZip[i] );
     }
@@ -359,7 +359,7 @@ bool ThemeLoader::parse( const string &path, const string &xmlFile )
     }
 
     // Build and store the theme
-    Builder builder( getIntf(), parser.getData() );
+    Builder builder( getIntf(), parser.getData(), path );
     getIntf()->p_sys->p_theme = builder.build();
 
     return true;

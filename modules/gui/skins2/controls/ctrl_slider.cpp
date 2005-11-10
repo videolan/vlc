@@ -387,9 +387,9 @@ void CtrlSliderBg::draw( OSGraphics &rImage, int xDest, int yDest )
     if( m_pImgSeq )
     {
         // Draw the background image
-        // XXX the "-3" is a hack for winamp skins...
+        // XXX the "-2" is a hack for winamp skins...
         rImage.drawGraphics( *m_pImgSeq, 0, m_position * m_bgHeight,
-                             xDest, yDest, m_bgWidth, m_bgHeight - 3);
+                             xDest, yDest, m_bgWidth, m_bgHeight - 2);
     }
 }
 

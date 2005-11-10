@@ -41,6 +41,8 @@ class SkinParser: public XMLParser
         const BuilderData &getData() const { return *m_pData; }
 
     private:
+        /// Path of the theme
+        const string m_path;
         /// Container for mapping data from the XML
         BuilderData *m_pData;
         /// Indicate whether the class owns the data
@@ -58,8 +60,6 @@ class SkinParser: public XMLParser
         int m_curLayer;
         /// Set of used id
         set<string> m_idSet;
-        /// Path of the XML file being parsed
-        const string m_path;
 
         /// Callbacks
         virtual void handleBeginElement( const string &rName,
@@ -70,7 +70,6 @@ class SkinParser: public XMLParser
         //@{
         bool convertBoolean( const char *value ) const;
         int convertColor( const char *transcolor ) const;
-        string convertFileName( const char *fileName ) const;
         /// Transform to int, and check that it is in the given range (if not,
         /// the closest range boundary will be used)
         int convertInRange( const char *value, int minValue, int maxValue,

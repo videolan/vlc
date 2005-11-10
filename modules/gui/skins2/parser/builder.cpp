@@ -52,8 +52,9 @@
 #include "vlc_image.h"
 
 
-Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData ):
-    SkinObject( pIntf ), m_rData( rData ), m_pTheme( NULL )
+Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData,
+                  const string &rPath ):
+    SkinObject( pIntf ), m_rData( rData ), m_path( rPath ), m_pTheme( NULL )
 {
     m_pImageHandler = image_HandlerCreate( pIntf );
 }
@@ -145,7 +146,7 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
 {
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler,
-                        rData.m_fileName, rData.m_alphaColor );
+                        getFilePath( rData.m_fileName ), rData.m_alphaColor );
     if( !pBmp->getData() )
     {
         // Invalid bitmap
@@ -181,7 +182,8 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
 void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 {
     GenericBitmap *pBmp =
-        new FileBitmap( getIntf(), m_pImageHandler, rData.m_file, 0 );
+        new FileBitmap( getIntf(), m_pImageHandler,
+                        getFilePath( rData.m_file ), 0 );
     if( !pBmp->getData() )
     {
         // Invalid bitmap
@@ -205,7 +207,9 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 
 void Builder::addFont( const BuilderData::Font &rData )
 {
-    GenericFont *pFont = new FT2Font( getIntf(), rData.m_fontFile,
+    // Try to load the font from the theme directory
+    GenericFont *pFont = new FT2Font( getIntf(),
+                                      getFilePath( rData.m_fontFile ),
                                       rData.m_size );
     if( pFont->init() )
     {
@@ -214,6 +218,28 @@ void Builder::addFont( const BuilderData::Font &rData )
     else
     {
         delete pFont;
+
+        // Font not found; try in the resource path
+        OSFactory *pOSFactory = OSFactory::instance( getIntf() );
+        const list<string> &resPath = pOSFactory->getResourcePath();
+        const string &sep = pOSFactory->getDirSeparator();
+
+        list<string>::const_iterator it;
+        for( it = resPath.begin(); it != resPath.end(); it++ )
+        {
+            string path = (*it) + sep + "fonts" + sep + rData.m_fontFile;
+            pFont = new FT2Font( getIntf(), path, rData.m_size );
+            if( pFont->init() )
+            {
+                // Font loaded successfully
+                m_pTheme->m_fonts[rData.m_id] = GenericFontPtr( pFont );
+                break;
+            }
+            else
+            {
+                delete pFont;
+            }
+        }
     }
 }
 
@@ -863,6 +889,14 @@ GenericFont *Builder::getFont( const string &fontId )
     }
     return pFont;
 }
+
+
+string Builder::getFilePath( const string &rFileName ) const
+{
+    OSFactory *pFactory = OSFactory::instance( getIntf() );
+    return m_path + pFactory->getDirSeparator() + rFileName;
+}
+
 
 
 Bezier *Builder::getPoints( const char *pTag ) const

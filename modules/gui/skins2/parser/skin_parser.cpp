@@ -27,8 +27,8 @@
 
 SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
                         const string &rPath, bool useDTD, BuilderData *pData ):
-    XMLParser( pIntf, rFileName, useDTD ), m_pData(pData),
-    m_ownData(pData == NULL), m_xOffset( 0 ), m_yOffset( 0 ), m_path( rPath )
+    XMLParser( pIntf, rFileName, useDTD ), m_path( rPath), m_pData(pData),
+    m_ownData(pData == NULL), m_xOffset( 0 ), m_yOffset( 0 )
 {
     // Make sure the data is allocated
     if( m_pData == NULL )
@@ -62,12 +62,13 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
     if( rName == "Include" )
     {
         RequireDefault( "file" );
-        msg_Dbg( getIntf(), "Opening included XML file: %s",
-                 convertFileName( attr["file"] ).c_str() );
+
+        OSFactory *pFactory = OSFactory::instance( getIntf() );
+        string fullPath = m_path + pFactory->getDirSeparator() + attr["file"];
+        msg_Dbg( getIntf(), "Opening included XML file: %s", fullPath.c_str() );
         // FIXME: We do not use the DTD to validate the included XML file,
         // as the parser seems to dislike it otherwise...
-        SkinParser subParser( getIntf(), convertFileName( attr["file"] ),
-                              m_path, false, m_pData );
+        SkinParser subParser( getIntf(), fullPath.c_str(), false, m_pData );
         subParser.parse();
     }
 
@@ -93,8 +94,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 
         m_curBitmapId = uniqueId( attr["id"] );
         const BuilderData::Bitmap bitmap( m_curBitmapId,
-                convertFileName( attr["file"] ),
-                convertColor( attr["alphacolor"] ) );
+                attr["file"], convertColor( attr["alphacolor"] ) );
         m_pData->m_listBitmap.push_back( bitmap );
     }
 
@@ -119,8 +119,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "type", "digits" );
 
         const BuilderData::BitmapFont font( attr["id"],
-                convertFileName( attr["file"] ),
-                attr["type"] );
+                attr["file"], attr["type"] );
         m_pData->m_listBitmapFont.push_back( font );
     }
 
@@ -189,8 +188,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "size", "12" );
 
         const BuilderData::Font fontData( uniqueId( attr["id"] ),
-                convertFileName( attr["file"] ),
-                atoi( attr["size"] ) );
+                attr["file"], atoi( attr["size"] ) );
         m_pData->m_listFont.push_back( fontData );
     }
 
@@ -522,13 +520,6 @@ int SkinParser::convertColor( const char *transcolor ) const
     iRed = iGreen = iBlue = 0;
     sscanf( transcolor, "#%2lX%2lX%2lX", &iRed, &iGreen, &iBlue );
     return ( iRed << 16 | iGreen << 8 | iBlue );
-}
-
-
-string SkinParser::convertFileName( const char *fileName ) const
-{
-    OSFactory *pFactory = OSFactory::instance( getIntf() );
-    return m_path + pFactory->getDirSeparator() + string( fileName );
 }
 
 
