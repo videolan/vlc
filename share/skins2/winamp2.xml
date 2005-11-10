@@ -119,7 +119,7 @@
                 <Anchor x="20" y="116" points="(0,0),(235,0)" priority="30" range="15" />
                 <Image x="0" y="0" image="eq_bg" action="move" />
                 <Image x="0" y="0" image="eq_title_focus" action="move" />
-                <Checkbox x="15" y="20" up1="eq_notok_up" down1="eq_notok_down" up2="eq_ok_up" down2="eq_ok_down" state="equalizer.isEnabled" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable equalizer" tooltiptext2="Disable equalizer"/>
+                <Checkbox x="15" y="18" up1="eq_notok_up" down1="eq_notok_down" up2="eq_ok_up" down2="eq_ok_down" state="equalizer.isEnabled" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable equalizer" tooltiptext2="Disable equalizer"/>
                 <Slider value="equalizer.band(0)" x="78" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
                 </Slider>
