@@ -1548,8 +1548,8 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
             break;
         }
 
-        if( i_start >= p_track->chunk[i_chunk].i_first_dts &&
-            i_start <  p_track->chunk[i_chunk + 1].i_first_dts )
+        if( (uint64_t)i_start >= p_track->chunk[i_chunk].i_first_dts &&
+            (uint64_t)i_start <  p_track->chunk[i_chunk + 1].i_first_dts )
         {
             break;
         }
@@ -1562,7 +1562,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     {
         if( i_dts +
             p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
-            p_track->chunk[i_chunk].p_sample_delta_dts[i_index] < i_start )
+            p_track->chunk[i_chunk].p_sample_delta_dts[i_index] < (uint64_t)i_start )
         {
             i_dts    +=
                 p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
@@ -1793,7 +1793,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     if( ( p_track->p_elst = p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
     {
         MP4_Box_data_elst_t *elst = p_elst->data.p_elst;
-        int i;
+        unsigned int i;
 
         msg_Warn( p_demux, "elst box found" );
         for( i = 0; i < elst->i_entry_count; i++ )
@@ -1802,7 +1802,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                      "ms) rate=%d.%d", i,
                      elst->i_segment_duration[i] * 1000 / p_sys->i_timescale,
                      elst->i_media_time[i] >= 0 ?
-                     elst->i_media_time[i] * 1000 / p_track->i_timescale : -1,
+                     (int64_t)(elst->i_media_time[i] * 1000 / p_track->i_timescale) :
+                     I64C(-1),
                      elst->i_media_rate_integer[i],
                      elst->i_media_rate_fraction[i] );
         }
@@ -2165,10 +2166,10 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
     {
         demux_sys_t *p_sys = p_demux->p_sys;
         MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
-        int64_t i_mvt = MP4_TrackGetDTS( p_demux, p_track ) *
+        uint64_t i_mvt = MP4_TrackGetDTS( p_demux, p_track ) *
                         p_sys->i_timescale / (int64_t)1000000;
 
-        if( p_track->i_elst < elst->i_entry_count &&
+        if( (unsigned int)p_track->i_elst < elst->i_entry_count &&
             i_mvt >= p_track->i_elst_time +
                      elst->i_segment_duration[p_track->i_elst] )
         {
@@ -2194,7 +2195,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         MP4_Box_data_elst_t *elst = tk->p_elst->data.p_elst;
         int64_t i_mvt= i_time * p_sys->i_timescale / (int64_t)1000000;
 
-        for( tk->i_elst = 0; tk->i_elst < elst->i_entry_count; tk->i_elst++ )
+        for( tk->i_elst = 0; (unsigned int)tk->i_elst < elst->i_entry_count; tk->i_elst++ )
         {
             mtime_t i_dur = elst->i_segment_duration[tk->i_elst];
 
@@ -2205,7 +2206,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
             tk->i_elst_time += i_dur;
         }
 
-        if( tk->i_elst >= elst->i_entry_count )
+        if( (unsigned int)tk->i_elst >= elst->i_entry_count )
         {
             /* msg_Dbg( p_demux, "invalid number of entry in elst" ); */
             tk->i_elst = elst->i_entry_count - 1;
