@@ -921,10 +921,12 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-#	patch -p 0 < Patches/dvdnav.patch
 ifdef HAVE_WIN32
 	(cd $@; patch -p 0 < ../Patches/libdvdnav-20050211-win32.patch)
+else
+	patch -p 0 < Patches/dvdnav.patch
 endif
+
 ifdef HAVE_DARWIN_OS
 	(cd $@; autoconf)
 else
