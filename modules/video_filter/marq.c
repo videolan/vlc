@@ -212,6 +212,15 @@ static void DestroyFilter( vlc_object_t *p_this )
     {
         return;
     }
+    var_DelCallback( p_input->p_libvlc, "marq-x", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-y", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-marquee", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-timeout", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-position", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-color", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-opacity", MarqueeCallback, p_sys );
+    var_DelCallback( p_input->p_libvlc, "marq-size", MarqueeCallback, p_sys );
+
     var_Destroy( p_input->p_libvlc , "marq-marquee" );
     var_Destroy( p_input->p_libvlc , "marq-x" );
     var_Destroy( p_input->p_libvlc , "marq-y" );
