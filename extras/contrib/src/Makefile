@@ -926,12 +926,7 @@ ifdef HAVE_WIN32
 else
 	patch -p 0 < Patches/dvdnav.patch
 endif
-
-ifdef HAVE_DARWIN_OS
-	(cd $@; autoconf)
-else
 	(cd $@; ./autogen.sh noconfig)
-endif
 
 .dvdnav: libdvdnav .dvdread
 ifdef HAVE_WIN32	
