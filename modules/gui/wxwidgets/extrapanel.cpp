@@ -171,7 +171,7 @@ ExtraPanel::ExtraPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     notebook = new wxNotebook( this, Notebook_Event );
 
-#if (!wxCHECK_VERSION(2,5,0))
+#if (!wxCHECK_VERSION(2,5,2))
     wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
 #endif
 
@@ -179,7 +179,7 @@ ExtraPanel::ExtraPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ):
     notebook->AddPage( EqzPanel( notebook ), wxU(_("Equalizer")) );
     notebook->AddPage( AudioPanel( notebook ), wxU(_("Audio")) );
 
-#if (!wxCHECK_VERSION(2,5,0))
+#if (!wxCHECK_VERSION(2,5,2))
     extra_sizer->Add( notebook_sizer, 1, wxEXPAND, 0 );
 #else
     extra_sizer->Add( notebook, 1, wxEXPAND, 0 );

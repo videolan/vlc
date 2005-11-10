@@ -339,7 +339,11 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
         s2 = video_window->GetSize();
         s.SetHeight( s.GetHeight() - s2.GetHeight() );
     }
+#if (wxCHECK_VERSION(2,5,4))
     SetMinSize( s );
+#else
+    frame_sizer->SetMinSize( s );
+#endif
 
     /* Show extended GUI if requested */
     if( ( b_extra = config_GetInt( p_intf, "wx-extended" ) ) )
