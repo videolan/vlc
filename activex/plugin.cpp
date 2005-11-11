@@ -984,9 +984,9 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     //RedrawWindow(_videownd, &posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
     vlc_value_t val;
     val.i_int = posRect.right-posRect.left;
-    VLC_VariableSet(_i_vlc, "width", val);
+    VLC_VariableSet(_i_vlc, "conf::width", val);
     val.i_int = posRect.bottom-posRect.top;
-    VLC_VariableSet(_i_vlc, "height", val);
+    VLC_VariableSet(_i_vlc, "conf::height", val);
 };
 
 void VLCPlugin::freezeEvents(BOOL freeze)

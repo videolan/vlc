@@ -142,6 +142,12 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         {
             return OLEOBJ_S_INVALIDHWND;
         }
+        else if( NULL == lprcPosRect )
+        {
+            SetRect(&posRect, 0, 0, 0, 0);
+            lprcPosRect = &posRect;
+            lprcClipRect = &posRect;
+        }
 
         if( FAILED(_p_instance->onActivateInPlace(lpMsg, hwndParent, lprcPosRect, lprcClipRect)) )
         {
@@ -151,16 +157,14 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         }
 
         if( NULL != p_inPlaceSite )
+        {
+            p_inPlaceSite->OnInPlaceActivate();
             p_inPlaceSite->OnPosRectChange(lprcPosRect);
+            p_inPlaceSite->Release();
+        }
 
         pActiveSite->ShowObject();
         _p_instance->setVisible(TRUE);
-
-        if( NULL != p_inPlaceSite )
-        {
-            p_inPlaceSite->OnInPlaceActivate();
-            p_inPlaceSite->Release();
-        }
 
         if( NULL != lpMsg )
         {
@@ -330,6 +334,7 @@ STDMETHODIMP VLCOleObject::SetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
 {
     if( NULL == pSizel )
         return E_POINTER;
+
 
     if( dwDrawAspect & DVASPECT_CONTENT )
     {
