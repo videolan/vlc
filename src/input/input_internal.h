@@ -133,6 +133,7 @@ typedef struct
     /* Synchronization information */
     mtime_t                 delta_cr;
     mtime_t                 cr_ref, sysdate_ref;
+    mtime_t                 last_sysdate;
     mtime_t                 last_cr; /* reference to detect unexpected stream
                                       * discontinuities                      */
     mtime_t                 last_pts;
