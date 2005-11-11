@@ -99,7 +99,7 @@ struct access_sys_t
     vlc_bool_t b_auto_mtu;
 
     /* reorder rtp packets when out-of-sequence */
-    int64_t i_rtp_late;
+    mtime_t i_rtp_late;
     uint16_t i_last_seqno;
     block_t *p_list;
     block_t *p_end;
@@ -458,6 +458,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     /* Return the packet without the RTP header, remember seqno in i_dts */
     p_block->i_buffer -= i_skip;
     p_block->p_buffer += i_skip;
+    p_block->i_pts = mdate();
     p_block->i_dts = (mtime_t) i_sequence_number;
 
 #if 0
@@ -482,19 +483,19 @@ trash:
 static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int64_t   i_first = mdate();
+    mtime_t   i_first = mdate();
     int       i_count = 0;
     block_t   *p = p_block;
 
     for( ;; )
     {
-        int64_t i_date = mdate();
+        mtime_t i_date = mdate();
 
         if( p && rtp_ChainInsert( p_access, p ))
             i_count++;
 
-        /* Require at least 3 packets in the buffer */
-        if( i_count > 3 && (i_date - i_first) > p_sys->i_rtp_late )
+        /* Require at least 2 packets in the buffer */
+        if( i_count > 2 && (i_date - i_first) > p_sys->i_rtp_late )
             break;
 
         p = BlockParseRTP( p_access, BlockUDP( p_access ));
@@ -519,17 +520,19 @@ static block_t *BlockRTP( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p;
 
-again:
-    p = BlockParseRTP( p_access, BlockUDP( p_access ));
+    while ( !p_sys->p_list || 
+             ( mdate() - p_sys->p_list->i_pts ) < p_sys->i_rtp_late )
+    {
+        p = BlockParseRTP( p_access, BlockUDP( p_access ));
 
-    if ( !p ) 
-        return NULL;
+        if ( !p ) 
+            return NULL;
 
-    if ( !p_access->info.b_prebuffered )
-        return BlockPrebufferRTP( p_access, p );
-
-    if( !rtp_ChainInsert( p_access, p ))
-        goto again;
+        if ( !p_access->info.b_prebuffered )
+            return BlockPrebufferRTP( p_access, p );
+ 
+        rtp_ChainInsert( p_access, p );
+    }
 
     p = p_sys->p_list;
     p_sys->p_list = p_sys->p_list->p_next;
