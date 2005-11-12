@@ -1,6 +1,7 @@
 # Simplified Chinese translation for VLC
 # Copyright (C) 2005 VideoLAN
 # This file is distributed under the same license as the VLC package.
+# $Id$
 #
 # Wei Mingzhi <whistler_wmz@users.sourceforge.net>, 2005.
 # King Norman <normankingxu@gmail.com>, 2005.
