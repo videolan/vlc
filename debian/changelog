@@ -1,3 +1,43 @@
+vlc (0.8.4-test2-2) unstable; urgency=low
+
+  * extras/x264/configure:
+    + Teach the configure script about the Alpha platform.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 11 Nov 2005 18:49:31 +0100
+
+vlc (0.8.4-test2-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    + Build-depend on a newer version of gnutls (Closes: #335774).
+    + Replaced occurrences of "wxwindows" with "wxwidgets" (Closes: #330141).
+  * debian/rules:
+    + Use dh_buildinfo because of all the static libraries we use.
+  * Upstream fixed the wx code so that it builds with newer versions of the
+    library (Closes: #332282, #332773).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 11 Nov 2005 10:41:35 +0100
+
+vlc (0.8.4-svn20050920-3) unstable; urgency=low
+
+  * configure.ac:
+    + Fixed a bug in the gnomevfs plugin configuration.
+  * debian/rules:
+    + Explicitly disable the GnomeVFS plugin (Closes: #329317).
+  * debian/control:
+    + Buuild-depend on yasm on amd64.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 21 Sep 2005 11:36:24 +0200
+
+vlc (0.8.4-svn20050920-2) unstable; urgency=low
+
+  * configure:
+    + Fixed the powerpc build with gcc-4.x.
+  * extras/x264/configure:
+    + Added missing Debian architectures to the configure script.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 20 Sep 2005 17:46:35 +0200
+
 vlc (0.8.4-svn20050920-1) unstable; urgency=low
 
   * New SVN snapshot.

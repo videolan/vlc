@@ -68,6 +68,7 @@ vlc_confflags += \
 	--enable-ffmpeg \
 	--enable-ncurses \
 	--enable-smb \
+	--disable-gnomevfs \
 	$(NULL)
 
 # These ones are currently shipped with VLC
@@ -156,6 +157,12 @@ build-stamp: patch configure-stamp
 
 	# Build all the rest, with the PIC libs
 	AM_MAKEFLAGS='builtin=no' $(MAKE)
+
+	# Minor test, to see which plugins were built and whether they load
+	# properly.
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+	./vlc --reset-plugins-cache -l -I rc vlc:quit
+endif
 
 	touch build-stamp
 
@@ -331,6 +338,7 @@ binary-arch: build install
 	dh_testroot
 #	dh_installdebconf	
 	dh_installdocs -p vlc
+	dh_buildinfo -p vlc
 #	dh_installexamples
 	dh_installmenu -s
 	dh_installmime -s

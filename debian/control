@@ -2,7 +2,7 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
-Build-Depends: debhelper (>= 4.0), dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7+1.2.8cvs20041007-5.3), libasound2-dev (>= 0.9.0beta10a), libarts1-dev (>= 1.4.2-1), libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, libaa1-dev, libdvbpsi4-dev, mozilla-dev (>= 2:1.7.10-1), libidl0, libglib2.0-0, libxosd-dev (>= 2.2.4-1.3), libsvga1-dev [i386], libogg-dev, libvorbis-dev, libwxgtk2.6-dev, libdvdread3-dev, libflac-dev (>= 1.1.2-3), libimlib2-dev, libmatroska-dev (>= 0.7.7), libfreetype6-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.11.11a-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libxml2-dev, libid3tag0-dev, libtheora-dev, nasm, libmodplug-dev, libhal-dev, libtar-dev, libdvdnav-dev, libgnutls11-dev, libavcodec-dev (>= 0.cvs20050918-2), libavformat-dev (>= 0.cvs20050918-2), libpostproc-dev (>= 0.cvs20050918-2), libncurses5-dev, libpng12-dev, xlibmesa-gl-dev, libsmbclient-dev, gcc-snapshot [i386 amd64]
+Build-Depends: debhelper (>= 4.0), dh-buildinfo, dpatch, gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7+1.2.8cvs20041007-5.3), libasound2-dev (>= 0.9.0beta10a), libarts1-dev (>= 1.4.2-1), libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, libaa1-dev, libdvbpsi4-dev, mozilla-dev (>= 2:1.7.10-1), libidl0, libglib2.0-0, libxosd-dev (>= 2.2.4-1.3), libsvga1-dev [i386], libogg-dev, libvorbis-dev, libwxgtk2.6-dev, libdvdread3-dev, libflac-dev (>= 1.1.2-3), libimlib2-dev, libmatroska-dev (>= 0.7.7), libfreetype6-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.11.11a-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libxml2-dev, libid3tag0-dev, libtheora-dev, nasm, libmodplug-dev, libhal-dev, libtar-dev, libdvdnav-dev, libgnutls-dev (>= 1.2.8), libavcodec-dev (>= 0.cvs20050918-2), libavformat-dev (>= 0.cvs20050918-2), libpostproc-dev (>= 0.cvs20050918-2), libncurses5-dev, libpng12-dev, xlibmesa-gl-dev, libsmbclient-dev, gcc-snapshot [i386 amd64], yasm [amd64]
 Standards-Version: 3.6.2.1
 
 Package: vlc
@@ -211,9 +211,9 @@ Description: SVGAlib video output plugin for VLC
 Package: wxvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: wxWindows frontend for VLC
- This plugin adds a wxWindow interface to the VLC media player. To activate
- the wxWindow GUI, use the `--intf wxwin' flag or run the `wxvlc' program.
+Description: wxWidgets frontend for VLC
+ This plugin adds a wxWidgets interface to the VLC media player. To activate
+ the wxWidgets GUI, use the `--intf wx' flag or run the `wxvlc' program.
  .
  VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
  DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
