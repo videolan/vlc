@@ -1169,7 +1169,8 @@ fi
 dnl The AltiVec C extensions
 dnl
 dnl There are several possible cases:
-dnl - OS X PPC, gcc 4.x: use -mpim-altivec, don't need <altivec.h>
+dnl - OS X PPC, gcc 4.x: use -mpim-altivec -force_cpusubtype_ALL, don't
+dnl                      need <altivec.h>
 dnl - OS X PPC, gcc 3.x: need -faltivec, don't need <altivec.h>
 dnl - Linux PPC, gcc 3.4, 4.x: need <altivec.h> which requires -maltivec
 dnl - Linux PPC, gcc 3.3: need <altivec.h> and -maltivec -mabi=altivec
@@ -1178,10 +1179,10 @@ dnl - Others: test should fail
 AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
   [ac_cv_c_altivec],
   [# OS X/PPC test (gcc 4.x)
-   CFLAGS="${CFLAGS_save} -mpim-altivec"
+   CFLAGS="${CFLAGS_save} -mpim-altivec -force_cpusubtype_ALL"
    AC_TRY_COMPILE([],
      [vec_ld(0, (unsigned char *)0);],
-     [ac_cv_c_altivec="-mpim-altivec"],
+     [ac_cv_c_altivec="-mpim-altivec -force_cpusubtype_ALL"],
      [# OS X/PPC test (gcc 3.x)
       CFLAGS="${CFLAGS_save} -faltivec"
       AC_TRY_COMPILE([],
