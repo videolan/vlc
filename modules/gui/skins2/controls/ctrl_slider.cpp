@@ -332,12 +332,12 @@ void CtrlSliderCursor::getResizeFactors( float &rFactorX,
 }
 
 
-CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
+CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
                             const Bezier &rCurve, VarPercent &rVariable,
                             int thickness, GenericBitmap *pBackground,
                             int nbHoriz, int nbVert, int padHoriz, int padVert,
                             VarBool *pVisible, const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp, pVisible ), m_rCursor( rCursor ),
+    CtrlGeneric( pIntf, rHelp, pVisible ),
     m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
     m_pImgSeq( NULL ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ),
@@ -418,12 +418,12 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
         // Forward the clic to the cursor
         EvtMouse evt( getIntf(), x, y, EvtMouse::kLeft, EvtMouse::kDown );
         TopWindow *pWin = getWindow();
-        if( pWin )
+        if( pWin && m_pCursor )
         {
             EvtEnter evtEnter( getIntf() );
             // XXX It was not supposed to be implemented like that !!
-            pWin->forwardEvent( evtEnter, m_rCursor );
-            pWin->forwardEvent( evt, m_rCursor );
+            pWin->forwardEvent( evtEnter, *m_pCursor );
+            pWin->forwardEvent( evt, *m_pCursor );
         }
     }
     else if( rEvent.getAsString().find( "scroll" ) != string::npos )
@@ -442,6 +442,12 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
 
         m_rVariable.set( percentage );
     }
+}
+
+
+void CtrlSliderBg::associateCursor( CtrlSliderCursor &rCursor )
+{
+    m_pCursor = &rCursor;
 }
 
 

@@ -580,16 +580,12 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
 
 void Builder::addSlider( const BuilderData::Slider &rData )
 {
-    // Get the bitmaps of the slider
-    GenericBitmap *pBmpUp = NULL;
-    GET_BMP( pBmpUp, rData.m_upId );
+    // Add the background first, so that we will still have something almost
+    // functional if the cursor cannot be created properly (this happens for
+    // some winamp2 skins, where the images of the cursor are not always
+    // present)
 
-    GenericBitmap *pBmpDown = pBmpUp;
-    GET_BMP( pBmpDown, rData.m_downId );
-
-    GenericBitmap *pBmpOver = pBmpUp;
-    GET_BMP( pBmpOver, rData.m_overId );
-
+    // Get the bitmaps of the background
     GenericBitmap *pBgImage = NULL;
     if( rData.m_imageId != "none" )
     {
@@ -625,13 +621,8 @@ void Builder::addSlider( const BuilderData::Slider &rData )
         return;
     }
 
-    // Create the cursor and background controls
-    CtrlSliderCursor *pCursor = new CtrlSliderCursor( getIntf(), *pBmpUp,
-        *pBmpOver, *pBmpDown, *pCurve, *pVar, pVisible,
-        UString( getIntf(), rData.m_tooltip.c_str() ),
-        UString( getIntf(), rData.m_help.c_str() ) );
-
-    CtrlSliderBg *pBackground = new CtrlSliderBg( getIntf(), *pCursor,
+    // Create the background control
+    CtrlSliderBg *pBackground = new CtrlSliderBg( getIntf(),
         *pCurve, *pVar, rData.m_thickness, pBgImage, rData.m_nbHoriz,
         rData.m_nbVert, rData.m_padHoriz, rData.m_padVert,
         pVisible, UString( getIntf(), rData.m_help.c_str() ) );
@@ -643,10 +634,31 @@ void Builder::addSlider( const BuilderData::Slider &rData )
                                        *pLayout );
 
     pLayout->addControl( pBackground, pos, rData.m_layer );
+
+    m_pTheme->m_controls[rData.m_id + "_bg"] = CtrlGenericPtr( pBackground );
+
+    // Get the bitmaps of the cursor
+    GenericBitmap *pBmpUp = NULL;
+    GET_BMP( pBmpUp, rData.m_upId );
+
+    GenericBitmap *pBmpDown = pBmpUp;
+    GET_BMP( pBmpDown, rData.m_downId );
+
+    GenericBitmap *pBmpOver = pBmpUp;
+    GET_BMP( pBmpOver, rData.m_overId );
+
+    // Create the cursor control
+    CtrlSliderCursor *pCursor = new CtrlSliderCursor( getIntf(), *pBmpUp,
+        *pBmpOver, *pBmpDown, *pCurve, *pVar, pVisible,
+        UString( getIntf(), rData.m_tooltip.c_str() ),
+        UString( getIntf(), rData.m_help.c_str() ) );
+
     pLayout->addControl( pCursor, pos, rData.m_layer );
 
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pCursor );
-    m_pTheme->m_controls[rData.m_id + "_bg"] = CtrlGenericPtr( pBackground );
+
+    // Associate the cursor to the background
+    pBackground->associateCursor( *pCursor );
 }
 
 

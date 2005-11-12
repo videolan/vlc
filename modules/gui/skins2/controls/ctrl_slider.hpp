@@ -109,7 +109,7 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
 class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
 {
     public:
-        CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
+        CtrlSliderBg( intf_thread_t *pIntf,
                       const Bezier &rCurve, VarPercent &rVariable,
                       int thickness, GenericBitmap *pBackground, int nbHoriz,
                       int nbVert, int padHoriz, int padVert, VarBool *pVisible,
@@ -128,9 +128,12 @@ class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
         /// Get the type of control (custom RTTI)
         virtual string getType() const { return "slider_bg"; }
 
+        /// Associate a cursor to this background
+        void associateCursor( CtrlSliderCursor &rCursor );
+
     private:
         /// Cursor of the slider
-        CtrlSliderCursor &m_rCursor;
+        CtrlSliderCursor *m_pCursor;
         /// Variable associated to the slider
         VarPercent &m_rVariable;
         /// Thickness of the curve
