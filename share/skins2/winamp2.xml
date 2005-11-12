@@ -27,7 +27,7 @@
        <SubBitmap id="eq_ok_down" x="187" y="119" width="26" height="12" />
        <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
        <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
-       <SubBitmap id="eq_slider_bg" x="13" y="164" width="210" height="129" />
+       <SubBitmap id="eq_slider_bg" x="13" y="164" width="209" height="128" />
        <SubBitmap id="eq_grid" x="0" y="294" width="113" height="19" />
     </Bitmap>
     <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0000">
@@ -79,7 +79,7 @@
        <SubBitmap id="plon_down" x="69" y="73" width="23" height="12" />
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0000">
-       <SubBitmap id="volume_bg" x="0" y="0" width="68" height="420" />
+       <SubBitmap id="volume_bg" x="0" y="0" width="68" height="419" />
        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
