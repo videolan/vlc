@@ -47,7 +47,7 @@
 
 /*****************************************************************************
  * DirectShow GUIDs.
- * Easier to define them hear as mingw doesn't provide them all.
+ * Easier to define them here as mingw doesn't provide them all.
  *****************************************************************************/
 const GUID CLSID_SystemDeviceEnum = {0x62be5d10, 0x60eb, 0x11d0, {0xbd, 0x3b, 0x00, 0xa0, 0xc9, 0x11, 0xce, 0x86}};
 const GUID CLSID_VideoInputDeviceCategory = {0x860BB310,0x5D01,0x11d0,{0xBD,0x3B,0x00,0xA0,0xC9,0x11,0xCE,0x86}};
