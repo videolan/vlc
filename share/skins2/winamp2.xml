@@ -28,18 +28,22 @@
        <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
        <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
        <SubBitmap id="eq_slider_bg" x="13" y="164" width="210" height="130" />
+       <SubBitmap id="eq_grid" x="0" y="294" width="113" height="19" />
     </Bitmap>
     <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0000">
        <SubBitmap id="pl_upleft_focus" x="0" y="0" width="25" height="20" />
        <SubBitmap id="pl_title_focus" x="26" y="0" width="100" height="20" />
        <SubBitmap id="pl_up_focus" x="127" y="0" width="25" height="20" />
        <SubBitmap id="pl_upright_focus" x="153" y="0" width="25" height="20" />
+       <SubBitmap id="pl_down1" x="179" y="0" width="25" height="38" />
+       <SubBitmap id="pl_down2" x="205" y="0" width="75" height="38" />
        <SubBitmap id="pl_left" x="0" y="42" width="25" height="29" />
        <SubBitmap id="pl_right" x="26" y="42" width="25" height="29" />
        <SubBitmap id="pl_slider_up" x="52" y="53" width="8" height="18" />
        <SubBitmap id="pl_slider_down" x="61" y="53" width="8" height="18" />
        <SubBitmap id="pl_downleft" x="0" y="72" width="125" height="38" />
        <SubBitmap id="pl_downright" x="126" y="72" width="150" height="38" />
+       <SubBitmap id="pl_resize" x="256" y="90" width="20" height="20" />
     </Bitmap>
     <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0000" >
        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
@@ -47,9 +51,14 @@
        <SubBitmap id="time_down" x="278" y="0" width="29" height="10" />
     </Bitmap>
     <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0000" >
-       <SubBitmap id="title_focus" x="27" y="0" width="275" height="14" />
+       <SubBitmap id="minimize_up" x="9" y="0" width="9" height="9" />
+       <SubBitmap id="minimize_down" x="9" y="9" width="9" height="9" />
        <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
        <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
+       <SubBitmap id="title_focus" x="27" y="0" width="275" height="14" />
+       <SubBitmap id="switch_up" x="0" y="18" width="9" height="9" />
+       <SubBitmap id="switch_down" x="9" y="18" width="9" height="9" />
+       <SubBitmap id="small_focus" x="27" y="29" width="275" height="14" />
     </Bitmap>
     <Bitmap id="shufrep" file="shufrep.bmp" alphacolor="#FF0000">
        <SubBitmap id="noloop_up" x="0" y="0" width="28" height="15" />
@@ -80,6 +89,17 @@
     <BitmapFont id="text_font" file="text.bmp" type="text"/>
 
     <Window id="main_window" x="100" y="100">
+        <Layout id="small_layout" width="275" height="14">
+            <Group x="0" y="0">
+                <Anchor x="0" y="14" priority="100" range="15" />
+                <Anchor x="275" y="14" priority="90" range="15" />
+                <Anchor x="20" y="14" points="(0,0),(235,0)" priority="80" range="15" />
+                <Image x="0" y="0" image="small_focus" action="move" />
+                <Button x="243" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
+                <Button x="253" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(big_layout)" tooltiptext="Switch" />
+                <Button x="263" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
+            </Group>
+        </Layout>
         <Layout id="big_layout" width="275" height="116">
             <Group x="0" y="0">
                 <Anchor x="0" y="116" priority="100" range="15" />
@@ -94,6 +114,8 @@
                 </Slider>
                 <Image x="16" y="72" image="time_bg"/>
                 <Slider value="time" x="29" y="77" up="time_up" down="time_down" points="(0,0),(220,0)" thickness="5" tooltiptext="Time: $T"/>
+                <Button x="243" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
+                <Button x="253" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(small_layout)" tooltiptext="Switch" />
                 <Button x="263" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
                 <Button x="16" y="88" up="previous_up" down="previous_down" action="playlist.previous()" tooltiptext="Previous" />
                 <Button x="39" y="88" up="play_up" down="play_down" action="vlc.play()" tooltiptext="Play" />
@@ -119,6 +141,7 @@
                 <Anchor x="20" y="116" points="(0,0),(235,0)" priority="30" range="15" />
                 <Image x="0" y="0" image="eq_bg" action="move" />
                 <Image x="0" y="0" image="eq_title_focus" action="move" />
+                <Image x="86" y="16" image="eq_grid" action="move" />
                 <Checkbox x="15" y="18" up1="eq_notok_up" down1="eq_notok_down" up2="eq_ok_up" down2="eq_ok_down" state="equalizer.isEnabled" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable equalizer" tooltiptext2="Disable equalizer"/>
                 <Slider value="equalizer.band(0)" x="78" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
@@ -155,7 +178,7 @@
     </Window>
 
     <Window id="playlist_window" x="100" y="332">
-        <Layout width="275" height="116">
+        <Layout width="275" height="116" minwidth="275" minheight="116" maxwidth="1000" maxheight="800">
             <Group x="0" y="0">
                 <Anchor x="0" y="0" priority="20" range="15" />
                 <Anchor x="275" y="0" priority="10" range="15" />
@@ -166,14 +189,17 @@
                 <Image x="87" y="0" image="pl_title_focus" action="move" />
                 <Image x="187" y="0" image="pl_up_focus" action="move" />
                 <Image x="200" y="0" image="pl_up_focus" action="move" />
-                <Image x="225" y="0" image="pl_up_focus" action="move" />
-                <Image x="250" y="0" image="pl_upright_focus" action="move" />
+                <Image x="225" y="0" image="pl_up_focus" action="move" rightbottom="righttop" />
+                <Image x="250" y="0" image="pl_upright_focus" action="move" lefttop="righttop" rightbottom="righttop" />
                 <Image x="0" y="20" image="pl_left" action="move" />
-                <Image x="250" y="20" image="pl_right" action="move" />
-                <Image x="0" y="49" image="pl_left" action="move" />
-                <Image x="250" y="49" image="pl_right" action="move" />
-                <Image x="0" y="78" image="pl_downleft" action="move" />
-                <Image x="125" y="78" image="pl_downright" action="move" />
+                <Image x="250" y="20" image="pl_right" action="move" lefttop="righttop" rightbottom="righttop" />
+                <Image x="0" y="49" image="pl_left" action="move" rightbottom="leftbottom" />
+                <Image x="250" y="49" image="pl_right" action="move" lefttop="righttop" rightbottom="rightbottom" />
+                <Image x="125" y="78" image="pl_down1" action="move" lefttop="leftbottom" rightbottom="rightbottom"/>
+                <Image x="50" y="78" image="pl_down2" action="move" lefttop="rightbottom" rightbottom="rightbottom" />
+                <Image x="0" y="78" image="pl_downleft" action="move" lefttop="leftbottom" rightbottom="leftbottom" />
+                <Image x="125" y="78" image="pl_downright" action="move" lefttop="rightbottom" rightbottom="rightbottom" />
+                <Image x="255" y="96" image="pl_resize" action="resizeSE" lefttop="rightbottom" rightbottom="rightbottom" />
                 <Playlist id="playlist" x="10" y="20" width="240" height="58" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#dfdfff" playcolor="#ffffff" bgcolor1="#000000" bgcolor2="#000000" selcolor="#202020" >
                     <Slider id="playlist_slider" x="264" y="28" lefttop="righttop" rightbottom="rightbottom" up="pl_slider_up" down="pl_slider_down" points="(0,40),(0,0)"/>
                 </Playlist>
