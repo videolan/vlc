@@ -352,8 +352,8 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf, CtrlSliderCursor &rCursor,
                                                   pBackground->getHeight() );
         m_pImgSeq->drawBitmap( *pBackground, 0, 0 );
 
-        m_bgWidth = pBackground->getWidth() / nbHoriz;
-        m_bgHeight = pBackground->getHeight() / nbVert;
+        m_bgWidth = (pBackground->getWidth() + m_padHoriz) / nbHoriz;
+        m_bgHeight = (pBackground->getHeight() + m_padVert) / nbVert;
 
         // Observe the position variable
         m_rVariable.addObserver( this );
