@@ -99,7 +99,7 @@ int main( int i_argc, char *ppsz_argv[] )
     if( i_ret < 0 )
     {
         VLC_Destroy( 0 );
-        return i_ret;
+        return i_ret == VLC_EEXITSUCCESS ? 0 : i_ret;
     }
 
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );

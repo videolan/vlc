@@ -275,6 +275,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       psz_parser;
     char *       psz_control;
     vlc_bool_t   b_exit = VLC_FALSE;
+    int          i_ret = VLC_EEXIT;
     vlc_t *      p_vlc = vlc_current_object( i_object );
     module_t    *p_help_module;
     playlist_t  *p_playlist;
@@ -358,12 +359,14 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         Help( p_vlc, "help" );
         b_exit = VLC_TRUE;
+        i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for version option */
     else if( config_GetInt( p_vlc, "version" ) )
     {
         Version();
         b_exit = VLC_TRUE;
+        i_ret = VLC_EEXITSUCCESS;
     }
 
     /* Set the config file stuff */
@@ -423,6 +426,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
             /* This is the parent, exit right now */
             msg_Dbg( p_vlc, "closing parent process" );
             b_exit = VLC_TRUE;
+            i_ret = VLC_EEXITSUCCESS;
         }
         else
         {
@@ -444,7 +448,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
-        return VLC_EEXIT;
+        return i_ret;
     }
 
     /* Check for translation config option */
@@ -505,18 +509,21 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         Help( p_vlc, p_tmp );
         free( p_tmp );
         b_exit = VLC_TRUE;
+        i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for long help option */
     else if( config_GetInt( p_vlc, "longhelp" ) )
     {
         Help( p_vlc, "longhelp" );
         b_exit = VLC_TRUE;
+        i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for module list option */
     else if( config_GetInt( p_vlc, "list" ) )
     {
         ListModules( p_vlc );
         b_exit = VLC_TRUE;
+        i_ret = VLC_EEXITSUCCESS;
     }
 
     /* Check for config file options */
@@ -547,7 +554,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
-        return VLC_EEXIT;
+        return i_ret;
     }
 
     /*
