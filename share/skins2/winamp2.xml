@@ -27,7 +27,7 @@
        <SubBitmap id="eq_ok_down" x="187" y="119" width="26" height="12" />
        <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
        <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
-       <SubBitmap id="eq_slider_bg" x="13" y="164" width="210" height="130" />
+       <SubBitmap id="eq_slider_bg" x="13" y="164" width="210" height="129" />
        <SubBitmap id="eq_grid" x="0" y="294" width="113" height="19" />
     </Bitmap>
     <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0000">
