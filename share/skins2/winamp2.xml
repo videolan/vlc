@@ -44,6 +44,15 @@
        <SubBitmap id="pl_downleft" x="0" y="72" width="125" height="38" />
        <SubBitmap id="pl_downright" x="126" y="72" width="150" height="38" />
        <SubBitmap id="pl_resize" x="256" y="90" width="20" height="20" />
+       <SubBitmap id="pl_switch_up" x="157" y="3" width="9" height="9" />
+       <SubBitmap id="pl_switch_down" x="61" y="42" width="9" height="9" />
+       <SubBitmap id="pl_close_up" x="167" y="3" width="9" height="9" />
+       <SubBitmap id="pl_close_down" x="51" y="42" width="9" height="9" />
+       <SubBitmap id="pl_small_left" x="72" y="42" width="25" height="14" />
+       <SubBitmap id="pl_small_middle" x="72" y="57" width="25" height="14" />
+       <SubBitmap id="pl_small_right_focus" x="99" y="42" width="50" height="14" />
+       <SubBitmap id="pl_small_switch_up" x="128" y="45" width="9" height="9" />
+       <SubBitmap id="pl_small_close_up" x="138" y="45" width="9" height="9" />
     </Bitmap>
     <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0000" >
        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
@@ -95,9 +104,9 @@
                 <Anchor x="275" y="14" priority="90" range="15" />
                 <Anchor x="20" y="14" points="(0,0),(235,0)" priority="80" range="15" />
                 <Image x="0" y="0" image="small_focus" action="move" />
-                <Button x="243" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
-                <Button x="253" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(big_layout)" tooltiptext="Switch" />
-                <Button x="263" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
+                <Button x="244" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
+                <Button x="254" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(big_layout)" tooltiptext="Switch" />
+                <Button x="264" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
             </Group>
         </Layout>
         <Layout id="big_layout" width="275" height="116">
@@ -114,9 +123,9 @@
                 </Slider>
                 <Image x="16" y="72" image="time_bg"/>
                 <Slider value="time" x="29" y="77" up="time_up" down="time_down" points="(0,0),(220,0)" thickness="5" tooltiptext="Time: $T"/>
-                <Button x="243" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
-                <Button x="253" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(small_layout)" tooltiptext="Switch" />
-                <Button x="263" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
+                <Button x="244" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
+                <Button x="254" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(small_layout)" tooltiptext="Switch" />
+                <Button x="264" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
                 <Button x="16" y="88" up="previous_up" down="previous_down" action="playlist.previous()" tooltiptext="Previous" />
                 <Button x="39" y="88" up="play_up" down="play_down" action="vlc.play()" tooltiptext="Play" />
                 <Button x="62" y="88" up="pause_up" down="pause_down" action="vlc.pause()" tooltiptext="Pause" />
@@ -178,7 +187,23 @@
     </Window>
 
     <Window id="playlist_window" x="100" y="332">
-        <Layout width="275" height="116" minwidth="275" minheight="116" maxwidth="1000" maxheight="800">
+        <Layout id="pl_small_layout" width="275" height="116" minwidth="275" minheight="116" maxwidth="1000" maxheight="800">
+            <Group>
+                <Image x="0" y="0" image="pl_small_left" action="move" />
+                <Image x="25" y="0" image="pl_small_middle" action="move" />
+                <Image x="50" y="0" image="pl_small_middle" action="move" />
+                <Image x="75" y="0" image="pl_small_middle" action="move" />
+                <Image x="100" y="0" image="pl_small_middle" action="move" />
+                <Image x="125" y="0" image="pl_small_middle" action="move" />
+                <Image x="150" y="0" image="pl_small_middle" action="move" />
+                <Image x="175" y="0" image="pl_small_middle" action="move" />
+                <Image x="200" y="0" image="pl_small_middle" action="move" />
+                <Image x="225" y="0" image="pl_small_right_focus" action="move" />
+                <Button x="254" y="3" up="pl_small_switch_up" down="pl_switch_down" over="pl_small_switch_up" action="playlist_window.setLayout(pl_big_layout)" tooltiptext="Switch" lefttop="righttop" rightbottom="righttop" />
+                <Button x="264" y="3" up="pl_small_close_up" down="pl_close_down" over="pl_small_close_up" action="playlist_window.hide()" tooltiptext="Close the window" lefttop="righttop" rightbottom="righttop" />
+            </Group>
+        </Layout>
+        <Layout id="pl_big_layout" width="275" height="116" minwidth="275" minheight="116" maxwidth="1000" maxheight="800">
             <Group x="0" y="0">
                 <Anchor x="0" y="0" priority="20" range="15" />
                 <Anchor x="275" y="0" priority="10" range="15" />
@@ -200,6 +225,8 @@
                 <Image x="0" y="78" image="pl_downleft" action="move" lefttop="leftbottom" rightbottom="leftbottom" />
                 <Image x="125" y="78" image="pl_downright" action="move" lefttop="rightbottom" rightbottom="rightbottom" />
                 <Image x="255" y="96" image="pl_resize" action="resizeSE" lefttop="rightbottom" rightbottom="rightbottom" />
+                <Button x="254" y="3" up="pl_switch_up" down="pl_switch_down" over="pl_switch_up" action="playlist_window.setLayout(pl_small_layout)" tooltiptext="Switch" lefttop="righttop" rightbottom="righttop" />
+                <Button x="264" y="3" up="pl_close_up" down="pl_close_down" over="pl_close_up" action="playlist_window.hide()" tooltiptext="Close the window" lefttop="righttop" rightbottom="righttop" />
                 <Playlist id="playlist" x="10" y="20" width="240" height="58" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#dfdfff" playcolor="#ffffff" bgcolor1="#000000" bgcolor2="#000000" selcolor="#202020" >
                     <Slider id="playlist_slider" x="264" y="28" lefttop="righttop" rightbottom="rightbottom" up="pl_slider_up" down="pl_slider_down" points="(0,40),(0,0)"/>
                 </Playlist>
