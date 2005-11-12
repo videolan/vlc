@@ -3,8 +3,8 @@
 <Theme version="2.0" magnet="9" alpha="255">
     <ThemeInfo name="Winamp2" author="See README.txt in the skin file"/>
 
-    <Bitmap id="main" file="main.bmp" alphacolor="#FF0000" />
-    <Bitmap id="cbuttons" file="cbuttons.bmp" alphacolor="#FF0000">
+    <Bitmap id="main" file="main.bmp" alphacolor="#FF0001" />
+    <Bitmap id="cbuttons" file="cbuttons.bmp" alphacolor="#FF0001">
        <SubBitmap id="previous_up" x="0" y="0" width="23" height="18" />
        <SubBitmap id="previous_down" x="0" y="18" width="23" height="18" />
        <SubBitmap id="play_up" x="23" y="0" width="23" height="18" />
@@ -18,19 +18,30 @@
        <SubBitmap id="eject_up" x="114" y="0" width="22" height="16" />
        <SubBitmap id="eject_down" x="114" y="16" width="22" height="16" />
     </Bitmap>
-    <Bitmap id="eqmain" file="eqmain.bmp" alphacolor="#FF0000">
+    <Bitmap id="eqmain" file="eqmain.bmp" alphacolor="#FF0001">
        <SubBitmap id="eq_bg" x="0" y="0" width="275" height="116" />
        <SubBitmap id="eq_title_focus" x="0" y="134" width="275" height="14" />
        <SubBitmap id="eq_notok_up" x="10" y="119" width="26" height="12" />
-       <SubBitmap id="eq_ok_up" x="69" y="119" width="26" height="12" />
        <SubBitmap id="eq_notok_down" x="128" y="119" width="26" height="12" />
+       <SubBitmap id="eq_ok_up" x="69" y="119" width="26" height="12" />
        <SubBitmap id="eq_ok_down" x="187" y="119" width="26" height="12" />
-       <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
+       <SubBitmap id="eq_switch_up" x="254" y="137" width="9" height="9" />
+       <SubBitmap id="eq_switch_down" x="254" y="152" width="9" height="9" />
+       <SubBitmap id="eq_close_up" x="0" y="116" width="9" height="9" />
+       <SubBitmap id="eq_close_down" x="0" y="125" width="9" height="9" />
        <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
        <SubBitmap id="eq_slider_bg" x="13" y="164" width="209" height="129" />
        <SubBitmap id="eq_grid" x="0" y="294" width="113" height="19" />
     </Bitmap>
-    <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0000">
+    <Bitmap id="eq_ex" file="eq_ex.bmp" alphacolor="#FF0001">
+        <SubBitmap id="eq_small_focus" x="0" y="0" width="275" height="14" />
+        <SubBitmap id="eq_small_switch_up" x="1" y="38" width="9" height="9" />
+        <SubBitmap id="eq_small_switch_down" x="1" y="47" width="9" height="9" />
+        <SubBitmap id="eq_small_close_up" x="11" y="38" width="9" height="9" />
+        <SubBitmap id="eq_small_close_down" x="11" y="47" width="9" height="9" />
+        <SubBitmap id="eq_small_volume_up" x="1" y="30" width="3" height="7" />
+    </Bitmap>
+    <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0001">
        <SubBitmap id="pl_upleft_focus" x="0" y="0" width="25" height="20" />
        <SubBitmap id="pl_title_focus" x="26" y="0" width="100" height="20" />
        <SubBitmap id="pl_up_focus" x="127" y="0" width="25" height="20" />
@@ -54,22 +65,24 @@
        <SubBitmap id="pl_small_switch_up" x="128" y="45" width="9" height="9" />
        <SubBitmap id="pl_small_close_up" x="138" y="45" width="9" height="9" />
     </Bitmap>
-    <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0000" >
+    <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0001" >
        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
        <SubBitmap id="time_up" x="248" y="0" width="29" height="10" />
        <SubBitmap id="time_down" x="278" y="0" width="29" height="10" />
     </Bitmap>
-    <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0000" >
+    <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0001" >
+       <SubBitmap id="menu_up" x="0" y="0" width="9" height="9" />
+       <SubBitmap id="menu_down" x="0" y="9" width="9" height="9" />
        <SubBitmap id="minimize_up" x="9" y="0" width="9" height="9" />
        <SubBitmap id="minimize_down" x="9" y="9" width="9" height="9" />
+       <SubBitmap id="switch_up" x="0" y="18" width="9" height="9" />
+       <SubBitmap id="switch_down" x="9" y="18" width="9" height="9" />
        <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
        <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
        <SubBitmap id="title_focus" x="27" y="0" width="275" height="14" />
-       <SubBitmap id="switch_up" x="0" y="18" width="9" height="9" />
-       <SubBitmap id="switch_down" x="9" y="18" width="9" height="9" />
        <SubBitmap id="small_focus" x="27" y="29" width="275" height="14" />
     </Bitmap>
-    <Bitmap id="shufrep" file="shufrep.bmp" alphacolor="#FF0000">
+    <Bitmap id="shufrep" file="shufrep.bmp" alphacolor="#FF0001">
        <SubBitmap id="noloop_up" x="0" y="0" width="28" height="15" />
        <SubBitmap id="noloop_down" x="0" y="15" width="28" height="15" />
        <SubBitmap id="loop_up" x="0" y="30" width="28" height="15" />
@@ -87,7 +100,7 @@
        <SubBitmap id="ploff_down" x="69" y="61" width="23" height="12" />
        <SubBitmap id="plon_down" x="69" y="73" width="23" height="12" />
     </Bitmap>
-    <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0000">
+    <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0001">
        <SubBitmap id="volume_bg" x="0" y="0" width="68" height="419" />
        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
@@ -100,10 +113,14 @@
     <Window id="main_window" x="100" y="100">
         <Layout id="small_layout" width="275" height="14">
             <Group x="0" y="0">
+                <Anchor x="0" y="0" priority="100" range="15" />
                 <Anchor x="0" y="14" priority="100" range="15" />
-                <Anchor x="275" y="14" priority="90" range="15" />
-                <Anchor x="20" y="14" points="(0,0),(235,0)" priority="80" range="15" />
+                <Anchor x="275" y="0" priority="100" range="15" />
+                <Anchor x="275" y="14" priority="100" range="15" />
+                <Anchor x="30" y="0" points="(0,0),(245,0)" priority="90" range="15" />
+                <Anchor x="30" y="14" points="(0,0),(245,0)" priority="90" range="15" />
                 <Image x="0" y="0" image="small_focus" action="move" />
+                <Button x="6" y="3" up="menu_up" down="menu_down" over="menu_up" action="dialogs.popup()" tooltiptext="Popup menu" />
                 <Button x="244" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
                 <Button x="254" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(big_layout)" tooltiptext="Switch" />
                 <Button x="264" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
@@ -111,9 +128,14 @@
         </Layout>
         <Layout id="big_layout" width="275" height="116">
             <Group x="0" y="0">
+                <Anchor x="0" y="0" priority="100" range="15" />
+                <Anchor x="275" y="0" priority="100" range="15" />
                 <Anchor x="0" y="116" priority="100" range="15" />
-                <Anchor x="275" y="116" priority="90" range="15" />
-                <Anchor x="20" y="116" points="(0,0),(235,0)" priority="80" range="15" />
+                <Anchor x="275" y="116" priority="100" range="15" />
+                <Anchor x="30" y="0" points="(0,0),(245,0)" priority="90" range="15" />
+                <Anchor x="30" y="116" points="(0,0),(245,0)" priority="90" range="15" />
+                <Anchor x="0" y="30" points="(0,0),(0,86)" priority="90" range="15" />
+                <Anchor x="275" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Image x="0" y="0" image="main" action="move" />
                 <Image x="0" y="0" image="title_focus" action="move" />
                 <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
@@ -123,6 +145,7 @@
                 </Slider>
                 <Image x="16" y="72" image="time_bg"/>
                 <Slider value="time" x="29" y="77" up="time_up" down="time_down" points="(0,0),(220,0)" thickness="5" tooltiptext="Time: $T"/>
+                <Button x="6" y="3" up="menu_up" down="menu_down" over="menu_up" action="dialogs.popup()" tooltiptext="Popup menu" />
                 <Button x="244" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
                 <Button x="254" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(small_layout)" tooltiptext="Switch" />
                 <Button x="264" y="3" up="quit_up" down="quit_down" over="quit_up" action="vlc.quit()" tooltiptext="Quit" />
@@ -141,16 +164,35 @@
     </Window>
 
     <Window id="equalizer_window" x="100" y="216">
-        <Layout width="275" height="116">
+        <Layout id="eq_small_layout" width="275" height="116">
             <Group x="0" y="0">
                 <Anchor x="0" y="0" priority="70" range="15" />
-                <Anchor x="275" y="0" priority="60" range="15" />
-                <Anchor x="0" y="116" priority="50" range="15" />
-                <Anchor x="275" y="116" priority="40" range="15" />
-                <Anchor x="20" y="116" points="(0,0),(235,0)" priority="30" range="15" />
+                <Anchor x="275" y="0" priority="70" range="15" />
+                <Anchor x="0" y="14" priority="70" range="15" />
+                <Anchor x="275" y="14" priority="70" range="15" />
+                <Anchor x="30" y="0" points="(0,0),(245,0)" priority="60" range="15" />
+                <Anchor x="30" y="14" points="(0,0),(245,0)" priority="60" range="15" />
+                <Image x="0" y="0" image="eq_small_focus" action="move" />
+                <Button x="254" y="3" up="eq_small_switch_up" down="eq_small_switch_down" over="eq_small_switch_up" action="equalizer_window.setLayout(eq_big_layout)" tooltiptext="Switch" />
+                <Button x="264" y="3" up="eq_small_close_up" down="eq_small_close_down" over="eq_small_close_up" action="equalizer_window.hide()" tooltiptext="Close the window" />
+                <Slider value="volume" x="62" y="4" up="eq_small_volume_up" down="eq_small_volume_up" points="(0,3),(94,3)" thickness="7" tooltiptext="Volume: $V%" />
+            </Group>
+        </Layout>
+        <Layout id="eq_big_layout" width="275" height="116">
+            <Group x="0" y="0">
+                <Anchor x="0" y="0" priority="70" range="15" />
+                <Anchor x="275" y="0" priority="70" range="15" />
+                <Anchor x="0" y="116" priority="70" range="15" />
+                <Anchor x="275" y="116" priority="70" range="15" />
+                <Anchor x="30" y="0" points="(0,0),(245,0)" priority="60" range="15" />
+                <Anchor x="30" y="116" points="(0,0),(245,0)" priority="60" range="15" />
+                <Anchor x="0" y="30" points="(0,0),(0,86)" priority="60" range="15" />
+                <Anchor x="275" y="30" points="(0,0),(0,86)" priority="60" range="15" />
                 <Image x="0" y="0" image="eq_bg" action="move" />
                 <Image x="0" y="0" image="eq_title_focus" action="move" />
                 <Image x="86" y="16" image="eq_grid" action="move" />
+                <Button x="254" y="3" up="eq_switch_up" down="eq_switch_down" over="eq_switch_up" action="equalizer_window.setLayout(eq_small_layout)" tooltiptext="Switch" />
+                <Button x="264" y="3" up="eq_close_up" down="eq_close_down" over="eq_close_up" action="equalizer_window.hide()" tooltiptext="Close the window" />
                 <Checkbox x="15" y="18" up1="eq_notok_up" down1="eq_notok_down" up2="eq_ok_up" down2="eq_ok_down" state="equalizer.isEnabled" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable equalizer" tooltiptext2="Disable equalizer"/>
                 <Slider value="equalizer.band(0)" x="78" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1"/>
@@ -189,6 +231,12 @@
     <Window id="playlist_window" x="100" y="332">
         <Layout id="pl_small_layout" width="275" height="116" minwidth="275" minheight="116" maxwidth="1000" maxheight="800">
             <Group>
+                <Anchor x="0" y="0" priority="30" range="15" />
+                <Anchor x="275" y="0" priority="30" range="15" />
+                <Anchor x="0" y="116" priority="30" range="15" />
+                <Anchor x="275" y="116" priority="30" range="15" />
+                <Anchor x="30" y="0" points="(0,0),(245,0)" priority="20" range="15" />
+                <Anchor x="30" y="116" points="(0,0),(245,0)" priority="20" range="15" />
                 <Image x="0" y="0" image="pl_small_left" action="move" />
                 <Image x="25" y="0" image="pl_small_middle" action="move" />
                 <Image x="50" y="0" image="pl_small_middle" action="move" />
@@ -205,8 +253,14 @@
         </Layout>
         <Layout id="pl_big_layout" width="275" height="116" minwidth="275" minheight="116" maxwidth="1000" maxheight="800">
             <Group x="0" y="0">
-                <Anchor x="0" y="0" priority="20" range="15" />
-                <Anchor x="275" y="0" priority="10" range="15" />
+                <Anchor x="0" y="0" priority="30" range="15" />
+                <Anchor x="275" y="0" priority="30" range="15" />
+                <Anchor x="0" y="116" priority="30" range="15" />
+                <Anchor x="275" y="116" priority="30" range="15" />
+                <Anchor x="30" y="0" points="(0,0),(245,0)" priority="20" range="15" />
+                <Anchor x="30" y="116" points="(0,0),(245,0)" priority="20" range="15" />
+                <Anchor x="0" y="30" points="(0,0),(0,86)" priority="20" range="15" />
+                <Anchor x="275" y="30" points="(0,0),(0,86)" priority="20" range="15" />
                 <Image x="0" y="0" image="pl_upleft_focus" action="move" />
                 <Image x="25" y="0" image="pl_up_focus" action="move" />
                 <Image x="50" y="0" image="pl_up_focus" action="move" />
