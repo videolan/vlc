@@ -28,33 +28,19 @@
 #include "../src/theme.hpp"
 
 
-CmdLayout::CmdLayout( intf_thread_t *pIntf, const string &windowId,
-                      const string &layoutId ):
-    CmdGeneric( pIntf ), m_windowId( windowId ), m_layoutId( layoutId )
+CmdLayout::CmdLayout( intf_thread_t *pIntf, TopWindow &rWindow,
+                      GenericLayout &rLayout ):
+    CmdGeneric( pIntf ), m_rWindow( rWindow ), m_rLayout( rLayout )
 {
 }
 
 
 void CmdLayout::execute()
 {
-    // Get the window and the layout
     if( !getIntf()->p_sys->p_theme )
     {
         return;
     }
-    TopWindow *pWindow =
-        getIntf()->p_sys->p_theme->getWindowById( m_windowId );
-    GenericLayout *pLayout =
-        getIntf()->p_sys->p_theme->getLayoutById( m_layoutId );
-    if( !pWindow || !pLayout )
-    {
-        msg_Err( getIntf(), "Cannot change layout (%s, %s)",
-                 m_windowId.c_str(), m_layoutId.c_str() );
-        return;
-    }
-
-    // XXX TODO: check that the layout isn't a layout of another window
-
-    getIntf()->p_sys->p_theme->getWindowManager().setActiveLayout( *pWindow,
-                                                                   *pLayout );
+    getIntf()->p_sys->p_theme->getWindowManager().setActiveLayout( m_rWindow,
+                                                                   m_rLayout );
 }

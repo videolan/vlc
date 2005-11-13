@@ -199,7 +199,27 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         int rightPos = rAction.find( ")", windowId.size() + 11 );
         string layoutId = rAction.substr( windowId.size() + 11,
                                           rightPos - (windowId.size() + 11) );
-        pCommand = new CmdLayout( getIntf(), windowId, layoutId );
+
+        TopWindow *pWin = pTheme->getWindowById( windowId );
+        GenericLayout *pLayout = pTheme->getLayoutById( layoutId );
+        if( !pWin )
+        {
+            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+        }
+        else if( !pLayout )
+        {
+            msg_Err( getIntf(), "Unknown layout (%s)", layoutId.c_str() );
+        }
+        // Check that the layout doesn't correspond to another window
+        else if( pWin != pLayout->getWindow() )
+        {
+            msg_Err( getIntf(), "Layout %s is not associated to window %s",
+                     layoutId.c_str(), windowId.c_str() );
+        }
+        else
+        {
+            pCommand = new CmdLayout( getIntf(), *pWin, *pLayout );
+        }
     }
     else if( rAction.find( ".show()" ) != string::npos )
     {

@@ -26,15 +26,16 @@
 #define CMD_LAYOUT_HPP
 
 #include "cmd_generic.hpp"
-#include <string>
 
+class TopWindow;
+class GenericLayout;
 
 /// "Change layout" command
 class CmdLayout: public CmdGeneric
 {
     public:
-        CmdLayout( intf_thread_t *pIntf, const string &windowId,
-                   const string &layoutId );
+        CmdLayout( intf_thread_t *pIntf, TopWindow &rWindow,
+                   GenericLayout &rLayout );
         virtual ~CmdLayout() {}
 
         /// This method does the real job of the command
@@ -44,8 +45,8 @@ class CmdLayout: public CmdGeneric
         virtual string getType() const { return "change layout"; }
 
     private:
-        string m_windowId;
-        string m_layoutId;
+        TopWindow &m_rWindow;
+        GenericLayout &m_rLayout;
 };
 
 #endif
