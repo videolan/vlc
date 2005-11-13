@@ -27,6 +27,7 @@
 #include "wxwidgets.hpp"
 
 #include <wx/spinctrl.h>
+#include <wx/notebook.h>
 
 class AutoBuiltPanel;
 namespace wxvlc

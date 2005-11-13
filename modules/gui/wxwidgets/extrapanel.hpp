@@ -25,7 +25,7 @@
 #define _WXVLC_EXTRAPANEL_H_
 
 #include "wxwidgets.hpp"
-
+#include <wx/notebook.h>
 
 namespace wxvlc
 {
