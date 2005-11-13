@@ -25,6 +25,7 @@
 #define _WXVLC_VLMPANEL_H_
 
 #include "wxwidgets.hpp"
+#include <wx/notebook.h>
 
 #include <vector>
 using namespace std;
