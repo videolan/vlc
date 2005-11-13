@@ -32,7 +32,7 @@
 #include "vlc_codec.h"
 #include "vlc_meta.h"
 
-#define MPGA_PACKET_SIZE 1024
+#define MPGA_PACKET_SIZE 4096
 
 /*****************************************************************************
  * Module descriptor

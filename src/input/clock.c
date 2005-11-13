@@ -133,7 +133,6 @@ void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average )
 
     cl->last_cr = 0;
     cl->last_pts = 0;
-    cl->last_sysdate = 0;
     cl->cr_ref = 0;
     cl->sysdate_ref = 0;
     cl->delta_cr = 0;
@@ -265,17 +264,15 @@ void input_ClockSetPCR( input_thread_t *p_input,
         else
         {
             cl->last_cr = 0;
-            cl->last_sysdate = 0;
             cl->delta_cr = 0;
             cl->i_delta_cr_residue = 0;
         }
     }
     else
     {
-        mtime_t clock_max_gap = CR_MAX_GAP * 90 / p_input->i_rate;
         if ( cl->last_cr != 0 &&
-               (    (cl->last_cr - i_clock) > clock_max_gap
-                 || (cl->last_cr - i_clock) < - clock_max_gap ) )
+               (    (cl->last_cr - i_clock) > CR_MAX_GAP
+                 || (cl->last_cr - i_clock) < - CR_MAX_GAP ) )
         {
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
@@ -311,7 +308,7 @@ void input_ClockSetPCR( input_thread_t *p_input,
             input_ClockManageControl( p_input, cl, i_clock );
 #endif
         }
-        else if ( mdate() - cl->last_sysdate > 200000 )
+        else
         {
             /* Smooth clock reference variations. */
             mtime_t i_extrapoled_clock = ClockCurrent( p_input, cl );
@@ -327,7 +324,6 @@ void input_ClockSetPCR( input_thread_t *p_input,
                                        + cl->i_delta_cr_residue )
                                     % cl->i_cr_average;
             cl->delta_cr = delta_cr;
-            cl->last_sysdate = mdate();
         }
     }
 }
