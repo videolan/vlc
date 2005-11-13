@@ -272,9 +272,10 @@ void input_ClockSetPCR( input_thread_t *p_input,
     }
     else
     {
+        mtime_t clock_max_gap = CR_MAX_GAP * 90 / p_input->i_rate;
         if ( cl->last_cr != 0 &&
-               (    (cl->last_cr - i_clock) > CR_MAX_GAP
-                 || (cl->last_cr - i_clock) < - CR_MAX_GAP ) )
+               (    (cl->last_cr - i_clock) > clock_max_gap
+                 || (cl->last_cr - i_clock) < - clock_max_gap ) )
         {
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
