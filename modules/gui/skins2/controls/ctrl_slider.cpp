@@ -337,7 +337,7 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
                             int thickness, GenericBitmap *pBackground,
                             int nbHoriz, int nbVert, int padHoriz, int padVert,
                             VarBool *pVisible, const UString &rHelp ):
-    CtrlGeneric( pIntf, rHelp, pVisible ),
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_pCursor( NULL ),
     m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
     m_pImgSeq( NULL ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ),
