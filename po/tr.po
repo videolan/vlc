@@ -1,11 +1,12 @@
 # Turkish localisation file for VLC
-# Copyright (C) 2005 VideoLAN
+# Copyright (C) 2005 the VideoLAN team
 # This file is distributed under the same license as the VLC package.
+# $Id$
 # Adem Gunes <xleopar@yahoo.com>, 2005.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.8.2\n"
+"Project-Id-Version: 0.8.4\n"
 "Report-Msgid-Bugs-To: <vlc-devel@videolan.org>\n"
 "POT-Creation-Date: 2005-06-03 16:57+0200\n"
 "PO-Revision-Date: 2005-11-12 07:55+0200\n"
