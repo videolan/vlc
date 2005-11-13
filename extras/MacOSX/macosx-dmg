@@ -36,10 +36,23 @@ dev=`hdid -nomount "${imgName}.dmg" | grep '/dev/disk[0-9]*' | cut -d " " -f 1`
 mkdir ./mountpoint
 mount -t hfs ${dev} ./mountpoint
 
+HOSTMACHINE=`gcc -dumpmachine`
+case $HOSTMACHINE in
+    ppc-darwin)
+# Mac OS X < 10.4
+        CP="/Developer/Tools/CpMac -r"
+        CPR="-r"
+        ;;
+    *)
+        CP="cp -R"
+        CPR="-R"
+        ;;
+esac
+
 echo "Copying contents to ${imgName}:"
 for i in ${dirName}/* ; do
     echo "  ${i}"
-    /Developer/Tools/CpMac -r "${i}" ./mountpoint
+    ${CP} "${i}" ./mountpoint
 done
 
 umount ./mountpoint
