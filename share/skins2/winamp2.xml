@@ -117,12 +117,13 @@
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0001">
        <SubBitmap id="volume_bg" x="0" y="0" width="68" height="418" />
+       <SubBitmap id="volume_bg" x="0" y="0" width="65" height="418" />
        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
     <Font id="playlist_font" file="FreeSansBold.ttf" size="11" />
-    <BitmapFont id="digits_font" file="numbers.bmp" type="digits" />
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits" />
+    <BitmapFont id="digits_font" file="numbers.bmp" type="digits" />
     <BitmapFont id="text_font" file="text.bmp" type="text" />
 
     <Window id="main_window" x="100" y="100">

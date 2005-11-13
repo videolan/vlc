@@ -159,6 +159,12 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
 
 void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
 {
+    if( m_pTheme->m_bitmaps.find( rData.m_id ) != m_pTheme->m_bitmaps.end() )
+    {
+        msg_Dbg( getIntf(), "Bitmap %s already exists", rData.m_id.c_str() );
+        return;
+    }
+
     // Get the parent bitmap
     GenericBitmap *pParentBmp = NULL;
     GET_BMP( pParentBmp, rData.m_parent );
@@ -181,6 +187,12 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
 
 void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 {
+    if( m_pTheme->m_fonts.find( rData.m_id ) != m_pTheme->m_fonts.end() )
+    {
+        msg_Dbg( getIntf(), "Font %s already exists", rData.m_id.c_str() );
+        return;
+    }
+
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler,
                         getFilePath( rData.m_file ), 0 );

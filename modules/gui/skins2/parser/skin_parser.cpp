@@ -106,7 +106,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "width" );
         RequireDefault( "height" );
 
-        const BuilderData::SubBitmap bitmap( uniqueId( attr["id"] ),
+        const BuilderData::SubBitmap bitmap( attr["id"],
                 m_curBitmapId, atoi( attr["x"] ), atoi( attr["y"] ),
                 atoi( attr["width"] ), atoi( attr["height"] ) );
         m_pData->m_listSubBitmap.push_back( bitmap );
