@@ -245,9 +245,6 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_ff_pic = avcodec_alloc_frame();
 
     /* ***** Fill p_context with init values ***** */
-    /* FIXME: remove when ffmpeg deals properly with avc1 */
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('a','v','c','1') )
-    /* End FIXME */
     p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_codec );
     p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_height;
@@ -295,12 +292,10 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     var_Create( p_dec, "ffmpeg-dr", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-dr", &val );
     if( val.b_bool && (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
-        ffmpeg_PixFmtToChroma( p_sys->p_context->pix_fmt ) &&
         /* Apparently direct rendering doesn't work with YUV422P */
         p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
         /* H264 uses too many reference frames */
         p_sys->i_codec_id != CODEC_ID_H264 &&
-        !(p_sys->p_context->width % 16) && !(p_sys->p_context->height % 16) &&
 #if LIBAVCODEC_BUILD >= 4698
         !p_sys->p_context->debug_mv )
 #else
@@ -918,7 +913,8 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
 
-    if( p_ff_pic->reference != 0 )
+    if( p_ff_pic->reference != 0 ||
+        p_sys->i_codec_id == CODEC_ID_H264 /* Bug in libavcodec */ )
     {
         p_dec->pf_picture_link( p_dec, p_pic );
     }
@@ -948,7 +944,8 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->data[2] = NULL;
     p_ff_pic->data[3] = NULL;
 
-    if( p_ff_pic->reference != 0 )
+    if( p_ff_pic->reference != 0 ||
+        p_dec->p_sys->i_codec_id == CODEC_ID_H264 /* Bug in libavcodec */ )
     {
         p_dec->pf_picture_unlink( p_dec, p_pic );
     }
