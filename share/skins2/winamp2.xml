@@ -65,6 +65,11 @@
        <SubBitmap id="pl_small_switch_up" x="128" y="45" width="9" height="9" />
        <SubBitmap id="pl_small_close_up" x="138" y="45" width="9" height="9" />
     </Bitmap>
+    <Bitmap id="playpaus" file="playpaus.bmp" alphacolor="#FF0001">
+        <SubBitmap id="play_icon" x="1" y="0" width="9" height="9" />
+        <SubBitmap id="pause_icon" x="10" y="0" width="9" height="9" />
+        <SubBitmap id="stop_icon" x="19" y="0" width="9" height="9" />
+    </Bitmap>
     <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0001" >
        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
        <SubBitmap id="time_up" x="248" y="0" width="29" height="10" />
@@ -101,7 +106,7 @@
        <SubBitmap id="plon_down" x="69" y="73" width="23" height="12" />
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0001">
-       <SubBitmap id="volume_bg" x="0" y="0" width="68" height="419" />
+       <SubBitmap id="volume_bg" x="0" y="0" width="68" height="418" />
        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
@@ -137,11 +142,14 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Image x="0" y="0" image="main" action="move" />
+                <Image x="27" y="29" image="play_icon" visible="vlc.isPlaying" />
+                <Image x="27" y="29" image="pause_icon" visible="vlc.isPaused" />
+                <Image x="27" y="29" image="stop_icon" visible="vlc.isStopped" />
                 <Image x="0" y="0" image="title_focus" action="move" />
                 <Text font="digits_font" x="30" y="26" width="75" text="$T"/>
                 <Text font="text_font" x="111" y="27" width="155" text="$N"/>
                 <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" tooltiptext="Volume: $V%">
-                    <SliderBackground image="volume_bg" nbvert="28" padvert="1"/>
+                    <SliderBackground image="volume_bg" nbvert="28" padvert="2"/>
                 </Slider>
                 <Image x="16" y="72" image="time_bg"/>
                 <Slider value="time" x="29" y="77" up="time_up" down="time_down" points="(0,0),(220,0)" thickness="5" tooltiptext="Time: $T"/>
