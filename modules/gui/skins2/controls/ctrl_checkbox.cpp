@@ -182,9 +182,23 @@ void CtrlCheckbox::CmdDownOverUpOver::execute()
 {
     m_pParent->releaseMouse();
 
+    // There is a little trick here: since we update the image of the control
+    // before executing the command, there is no way that the observed variable
+    // can have changed, so changeButton() has not been called, and m_pImgUp is
+    // still the "old" up state. That's why we don't use it, and use the other
+    // one instead. Otherwise, we would notice a "phantom effect", where the
+    // old up image is displayed for a few milliseconds, until the variable is
+    // updated and the correct up image is displayed.
+    // Executing the action before refreshing the state wouldn't work, because
+    // the variable may be updated asynchronously (when triggered by a callback
+    // from an object variable).
+
     // Invert the state variable
     const OSGraphics *pOldImg = m_pParent->m_pImgCurrent;
-    m_pParent->m_pImgCurrent = m_pParent->m_pImgUp;
+    if( m_pParent->m_pImgUp == m_pParent->m_pImgUp1 )
+        m_pParent->m_pImgCurrent = m_pParent->m_pImgUp2;
+    else
+        m_pParent->m_pImgCurrent = m_pParent->m_pImgUp1;
     m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImgCurrent );
 
     // Execute the command
