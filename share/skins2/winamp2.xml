@@ -74,9 +74,9 @@
        <SubBitmap id="pl_small_resize" x="25" y="3" width="9" height="8" />
     </Bitmap>
     <Bitmap id="playpaus" file="playpaus.bmp" alphacolor="#FF0001">
-        <SubBitmap id="play_icon" x="1" y="0" width="9" height="9" />
-        <SubBitmap id="pause_icon" x="10" y="0" width="9" height="9" />
-        <SubBitmap id="stop_icon" x="19" y="0" width="9" height="9" />
+        <SubBitmap id="play_icon" x="0" y="0" width="9" height="9" />
+        <SubBitmap id="pause_icon" x="9" y="0" width="9" height="9" />
+        <SubBitmap id="stop_icon" x="18" y="0" width="9" height="9" />
     </Bitmap>
     <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0001" >
        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
@@ -168,9 +168,9 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Image x="0" y="0" image="main" action="move" />
-                <Image x="27" y="29" image="play_icon" visible="vlc.isPlaying" />
-                <Image x="27" y="29" image="pause_icon" visible="vlc.isPaused" />
-                <Image x="27" y="29" image="stop_icon" visible="vlc.isStopped" />
+                <Image x="26" y="29" image="play_icon" visible="vlc.isPlaying" />
+                <Image x="26" y="29" image="pause_icon" visible="vlc.isPaused" />
+                <Image x="26" y="29" image="stop_icon" visible="vlc.isStopped" />
                 <Image x="0" y="0" image="title_focus" action="move" />
                 <Text font="digits_font" x="30" y="26" width="75" text="$T" visible="not vlc.isStopped" />
                 <Text font="text_font" x="111" y="27" width="155" text="$N" />
