@@ -42,15 +42,15 @@ class StreamTime: public VarPercent
         /// Return a string containing a value from 0 to 100
         virtual const string getAsStringPercent() const;
         /// Return the current time formatted as a time display (h:mm:ss)
-        virtual const string getAsStringCurrTime() const;
+        virtual const string getAsStringCurrTime( bool bShortFormat = false ) const;
         /// Return the time left formatted as a time display (h:mm:ss)
-        virtual const string getAsStringTimeLeft() const;
+        virtual const string getAsStringTimeLeft( bool bShortFormat = false ) const;
         /// Return the duration formatted as a time display (h:mm:ss)
-        virtual const string getAsStringDuration() const;
+        virtual const string getAsStringDuration( bool bShortFormat = false ) const;
 
     private:
         /// Convert a number of seconds into "h:mm:ss" format
-        const string formatTime( int seconds ) const;
+        const string formatTime( int seconds, bool bShortFormat ) const;
 };
 
 #endif

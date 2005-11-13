@@ -83,15 +83,30 @@ const UString VarText::get() const
         temp.replace( pos, 2,
                       pVlcProc->getTimeVar().getAsStringCurrTime().c_str() );
     }
+    while( (pos = temp.find( "$t" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getTimeVar().getAsStringCurrTime(true).c_str() );
+    }
     while( (pos = temp.find( "$L" )) != UString::npos )
     {
         temp.replace( pos, 2,
                       pVlcProc->getTimeVar().getAsStringTimeLeft().c_str() );
     }
+    while( (pos = temp.find( "$l" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getTimeVar().getAsStringTimeLeft(true).c_str() );
+    }
     while( (pos = temp.find( "$D" )) != UString::npos )
     {
         temp.replace( pos, 2,
                       pVlcProc->getTimeVar().getAsStringDuration().c_str() );
+    }
+    while( (pos = temp.find( "$d" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getTimeVar().getAsStringDuration(true).c_str() );
     }
     while( (pos = temp.find( "$V" )) != UString::npos )
     {
@@ -137,15 +152,18 @@ void VarText::set( const UString &rText )
         {
             pVarManager->getHelpText().addObserver( this );
         }
-        if( m_text.find( "$T" ) != UString::npos )
+        if( m_text.find( "$T" ) != UString::npos ||
+            m_text.find( "$t" ) != UString::npos )
         {
             pVlcProc->getTimeVar().addObserver( this );
         }
-        if( m_text.find( "$L" ) != UString::npos )
+        if( m_text.find( "$L" ) != UString::npos ||
+            m_text.find( "$l" ) != UString::npos )
         {
             pVlcProc->getTimeVar().addObserver( this );
         }
-        if( m_text.find( "$D" ) != UString::npos )
+        if( m_text.find( "$D" ) != UString::npos ||
+            m_text.find( "$d" ) != UString::npos )
         {
             pVlcProc->getTimeVar().addObserver( this );
         }

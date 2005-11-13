@@ -43,6 +43,7 @@ BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
         {
             m_table['0'+i].m_xPos = i * m_width;
         }
+        m_table[(size_t)' '].m_xPos = 10 * m_width;
         m_table[(size_t)'-'].m_xPos = 11 * m_width;
     }
     else if( rType == "text" )

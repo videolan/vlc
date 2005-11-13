@@ -56,7 +56,7 @@ const string StreamTime::getAsStringPercent() const
 }
 
 
-const string StreamTime::getAsStringCurrTime() const
+const string StreamTime::getAsStringCurrTime( bool bShortFormat ) const
 {
     if( getIntf()->p_sys->p_input == NULL )
     {
@@ -73,11 +73,11 @@ const string StreamTime::getAsStringCurrTime() const
     vlc_value_t time;
     var_Get( getIntf()->p_sys->p_input, "time", &time );
 
-    return formatTime( time.i_time / 1000000 );
+    return formatTime( time.i_time / 1000000, bShortFormat );
 }
 
 
-const string StreamTime::getAsStringTimeLeft() const
+const string StreamTime::getAsStringTimeLeft( bool bShortFormat ) const
 {
     if( getIntf()->p_sys->p_input == NULL )
     {
@@ -95,11 +95,12 @@ const string StreamTime::getAsStringTimeLeft() const
     var_Get( getIntf()->p_sys->p_input, "time", &time );
     var_Get( getIntf()->p_sys->p_input, "length", &duration );
 
-    return formatTime( (duration.i_time - time.i_time) / 1000000 );
+    return formatTime( (duration.i_time - time.i_time) / 1000000,
+                       bShortFormat );
 }
 
 
-const string StreamTime::getAsStringDuration() const
+const string StreamTime::getAsStringDuration( bool bShortFormat ) const
 {
     if( getIntf()->p_sys->p_input == NULL )
     {
@@ -116,17 +117,26 @@ const string StreamTime::getAsStringDuration() const
     vlc_value_t time;
     var_Get( getIntf()->p_sys->p_input, "length", &time );
 
-    return formatTime( time.i_time / 1000000 );
+    return formatTime( time.i_time / 1000000, bShortFormat );
 }
 
 
-const string StreamTime::formatTime( int seconds ) const
+const string StreamTime::formatTime( int seconds, bool bShortFormat ) const
 {
     char *psz_time = new char[MSTRTIME_MAX_SIZE];
-    snprintf( psz_time, MSTRTIME_MAX_SIZE, "%d:%02d:%02d",
-              (int) (seconds / (60 * 60)),
-              (int) (seconds / 60 % 60),
-              (int) (seconds % 60) );
+    if( bShortFormat && (seconds < 60 * 60) )
+    {
+        snprintf( psz_time, MSTRTIME_MAX_SIZE, "  %02d:%02d",
+                  (int) (seconds / 60 % 60),
+                  (int) (seconds % 60) );
+    }
+    else
+    {
+        snprintf( psz_time, MSTRTIME_MAX_SIZE, "%d:%02d:%02d",
+                  (int) (seconds / (60 * 60)),
+                  (int) (seconds / 60 % 60),
+                  (int) (seconds % 60) );
+    }
 
     string ret = psz_time;
     delete[] psz_time;
