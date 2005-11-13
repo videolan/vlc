@@ -70,6 +70,10 @@ struct decoder_sys_t
 static int OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
+static int  nloopf_list[] = { 0, 1, 2, 3, 4 };
+static char *nloopf_list_text[] =
+  { N_("None"), N_("Non-ref"), N_("Bidir"), N_("Non-key"), N_("All") };
+
 static char *enc_hq_list[] = { "rd", "bits", "simple" };
 static char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
 /*****************************************************************************
@@ -104,6 +108,9 @@ vlc_module_begin();
     add_integer ( "ffmpeg-lowres", 0, NULL, LOWRES_TEXT, LOWRES_LONGTEXT,
         VLC_TRUE );
         change_integer_range( 0, 2 );
+    add_integer ( "ffmpeg-skiploopfilter", 0, NULL, SKIPLOOPF_TEXT,
+                  SKIPLOOPF_LONGTEXT, VLC_TRUE );
+        change_integer_list( nloopf_list, nloopf_list_text, 0 );
 
 #ifdef LIBAVCODEC_PP
     add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, VLC_FALSE );

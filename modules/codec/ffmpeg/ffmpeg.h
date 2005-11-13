@@ -128,6 +128,11 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define LOWRES_LONGTEXT N_( "Will only decode a low resolution version of " \
     "the video." )
 
+#define SKIPLOOPF_TEXT N_( "Skip the loop filter for H.264 decoding" )
+#define SKIPLOOPF_LONGTEXT N_( "Skipping the loop filter (aka deblocking) " \
+    "usually has a detrimental effect on quality. However for HDTV streams " \
+    "this provides a big speedup." )
+
 #define LIBAVCODEC_PP_TEXT N_("ffmpeg post processing filter chains")
 /* FIXME (cut/past from ffmpeg */
 #define LIBAVCODEC_PP_LONGTEXT \

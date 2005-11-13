@@ -275,6 +275,16 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     if( val.i_int > 0 && val.i_int <= 2 ) p_sys->p_context->lowres = val.i_int;
 #endif
 
+    var_Create( p_dec, "ffmpeg-skiploopfilter",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "ffmpeg-skiploopfilter", &val );
+#if LIBAVCODEC_BUILD >= 4758
+    if( val.i_int > 0 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONREF;
+    if( val.i_int > 1 ) p_sys->p_context->skip_loop_filter = AVDISCARD_BIDIR;
+    if( val.i_int > 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
+    if( val.i_int > 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
+#endif
+
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-hurry-up", &val );
