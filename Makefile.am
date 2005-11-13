@@ -566,7 +566,7 @@ VLC-release.app: vlc
 	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras"; \
 	fi
 	rm -Rf $(top_builddir)/VLC-release.app
-	cp -r $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
+	cp -R $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
 	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -616,15 +616,15 @@ VLC-release.app: vlc
 	case $(target_triplet) in \
 	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
 	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
 	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC-release.app;; \
 	esac
 	rm -Rf $(top_builddir)/tmp
@@ -680,7 +680,7 @@ VLC.app: vlc
 	  echo "OK."; mkdir -p "$(top_builddir)/tmp/extras"; \
 	fi
 	rm -Rf $(top_builddir)/VLC.app
-	cp -r $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
+	cp -R $(srcdir)/extras/MacOSX $(top_builddir)/tmp/extras
 	for i in AUTHORS COPYING README.MacOSX.rtf THANKS; do \
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
@@ -730,15 +730,15 @@ VLC.app: vlc
 	case $(target_triplet) in \
 	  *darwin6*) cd $(top_builddir)/tmp/extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
 	  *darwin7*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
 	  *darwin8*) cd $(top_builddir)/tmp/extras/MacOSX && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)'; \
 	    cd ../../../; \
-	    cp -r $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
+	    cp -R $(top_builddir)/tmp/extras/MacOSX/build/Default/VLC.bundle \
 	          $(top_builddir)/VLC.app;; \
 	esac
 	rm -Rf $(top_builddir)/tmp
@@ -1065,7 +1065,7 @@ package-macosx:
 
 # Copy relevant files 
 	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/tmp/VLC.app"
-	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/ && cp -r extras/MacOSX/Delete\ Preferences.app $(top_builddir)/tmp/
+	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/ && cp -R extras/MacOSX/Delete\ Preferences.app $(top_builddir)/tmp/
 
 # Create disk image 
 	$(srcdir)/extras/MacOSX/macosx-dmg "vlc-${VERSION}" $(top_builddir)/tmp
