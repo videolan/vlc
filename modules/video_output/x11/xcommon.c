@@ -1540,14 +1540,13 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
             screens = XineramaQueryScreens( p_vout->p_sys->p_display,
                                             &i_num_screens );
 
-            if( !SCREEN )
-                SCREEN = config_GetInt( p_vout,
+            SCREEN = config_GetInt( p_vout,
                                         MODULE_STRING "-xineramascreen" );
 
             /* just check that user has entered a good value */
             if( SCREEN >= i_num_screens || SCREEN < 0 )
             {
-                msg_Dbg( p_vout, "requested screen number invalid" );
+                msg_Dbg( p_vout, "requested screen number invalid (%d/%d)", SCREEN, i_num_screens );
                 SCREEN = 0;
             }
 
