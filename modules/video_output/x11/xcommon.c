@@ -2287,7 +2287,6 @@ static void SetPalette( vout_thread_t *p_vout,
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    double f_arg;
     vlc_bool_t b_arg;
 
     switch( i_query )
