@@ -36,6 +36,7 @@ Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvemen
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
 Daniel Stränger <vlc at schmaller d0t de> - M3U and playlist improvements
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
+Daniel Nylander <info@danielnylander at se> - Swedish translation
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 DirektX <direktx at freemail.hu> - Hungarian translation
