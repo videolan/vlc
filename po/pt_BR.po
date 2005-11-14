@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_BR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-09 17:32+0100\n"
+"POT-Creation-Date: 2005-11-14 11:48+0100\n"
 "PO-Revision-Date: 2004-04-06 11:41-0300\n"
 "Last-Translator: André de Barros Martins Ribeiro <andrerib@ajato.com.br>\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -28,7 +28,7 @@ msgid "Click on \"Advanced Options\" to see all options."
 msgstr ""
 
 #: include/vlc_config_cat.h:36 include/vlc_config_cat.h:122
-#: src/input/input.c:1820 src/input/input.c:1880 src/playlist/item.c:366
+#: src/input/input.c:1868 src/input/input.c:1928 src/playlist/item.c:366
 #: src/playlist/playlist.c:164 modules/gui/wince/playlist.cpp:674
 #: modules/visualization/visual/visual.c:113
 msgid "General"
@@ -110,7 +110,7 @@ msgid "These are general settings for audio output modules."
 msgstr "Estas são configurações gerais para módulos de saída de audio"
 
 #: include/vlc_config_cat.h:68 src/libvlc.h:1259 src/libvlc.h:1297
-#: src/libvlc.h:1339 modules/gui/wxwidgets/menus.cpp:313
+#: src/libvlc.h:1339 modules/gui/wxwidgets/menus.cpp:311
 #: modules/stream_out/transcode.c:243
 msgid "Miscellaneous"
 msgstr "Variados"
@@ -352,7 +352,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:450
 #: modules/gui/macosx/intf.m:544 modules/gui/pda/pda_interface.c:1264
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:195
-#: modules/gui/wxwidgets/interface.cpp:541
+#: modules/gui/wxwidgets/interface.cpp:545
 msgid "Playlist"
 msgstr "Lista de reprodução"
 
@@ -519,7 +519,7 @@ msgstr ""
 msgid "Title"
 msgstr "Título"
 
-#: include/vlc_meta.h:29 src/input/input.c:1821
+#: include/vlc_meta.h:29 src/input/input.c:1869
 #: modules/gui/macosx/playlist.m:133 modules/gui/macosx/playlistinfo.m:56
 #: modules/gui/macosx/wizard.m:376 modules/gui/wince/playlist.cpp:674
 #: modules/mux/asf.c:51
@@ -726,7 +726,7 @@ msgstr "Estéreo"
 #: src/libvlc.h:232 modules/codec/dvbsub.c:70 modules/codec/subsdec.c:84
 #: modules/control/gestures.c:87 modules/video_filter/logo.c:85
 #: modules/video_filter/marq.c:106 modules/video_filter/mosaic.c:120
-#: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:144
+#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:144
 #: modules/video_filter/time.c:96
 msgid "Left"
 msgstr "Esquerdo"
@@ -735,7 +735,7 @@ msgstr "Esquerdo"
 #: src/libvlc.h:232 modules/codec/dvbsub.c:70 modules/codec/subsdec.c:84
 #: modules/control/gestures.c:87 modules/video_filter/logo.c:85
 #: modules/video_filter/marq.c:106 modules/video_filter/mosaic.c:120
-#: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:144
+#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:144
 #: modules/video_filter/time.c:96
 msgid "Right"
 msgstr "Direito"
@@ -821,8 +821,8 @@ msgstr "Faixa %i"
 msgid "Program"
 msgstr "Programa"
 
-#: src/input/es_out.c:459 src/input/es_out.c:627 src/input/input.c:222
-#: src/input/input.c:1823 src/playlist/sort.c:190 src/playlist/sort.c:193
+#: src/input/es_out.c:459 src/input/es_out.c:627 src/input/input.c:223
+#: src/input/input.c:1871 src/playlist/sort.c:190 src/playlist/sort.c:193
 #: src/playlist/sort.c:233 src/playlist/sort.c:236 src/playlist/sort.c:328
 #: src/playlist/sort.c:333 src/playlist/sort.c:338 modules/codec/vorbis.c:623
 #: modules/demux/playlist/b4s.c:324 modules/demux/playlist/b4s.c:332
@@ -906,13 +906,13 @@ msgstr "Taxa de Amostra:"
 msgid "Subtitle"
 msgstr "Legenda"
 
-#: src/input/input.c:1834 src/input/input.c:1838
+#: src/input/input.c:1882 src/input/input.c:1886
 #: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:253
 #: modules/gui/macosx/output.m:395
 msgid "Stream"
 msgstr "stream"
 
-#: src/input/input.c:1880 src/playlist/item.c:366
+#: src/input/input.c:1928 src/playlist/item.c:366
 #: modules/access/cdda/info.c:325 modules/access/cdda/info.c:393
 #: modules/gui/macosx/playlist.m:134
 msgid "Duration"
@@ -991,56 +991,56 @@ msgstr "Trocar a Interface"
 msgid "Add Interface"
 msgstr "Adicionar interface"
 
-#: src/libvlc.c:324 src/libvlc.c:471 src/misc/modules.c:1677
+#: src/libvlc.c:325 src/libvlc.c:475 src/misc/modules.c:1677
 #: src/misc/modules.c:1981
 msgid "C"
 msgstr "Pt_br"
 
-#: src/libvlc.c:341
+#: src/libvlc.c:342
 msgid "Help options"
 msgstr "Opções de ajuda"
 
-#: src/libvlc.c:2194 src/misc/configuration.c:1265
+#: src/libvlc.c:2201 src/misc/configuration.c:1265
 msgid "string"
 msgstr "string"
 
-#: src/libvlc.c:2211 src/misc/configuration.c:1229
+#: src/libvlc.c:2218 src/misc/configuration.c:1229
 msgid "integer"
 msgstr "inteiro"
 
-#: src/libvlc.c:2229 src/misc/configuration.c:1254
+#: src/libvlc.c:2236 src/misc/configuration.c:1254
 msgid "float"
 msgstr "flutuante"
 
-#: src/libvlc.c:2235
+#: src/libvlc.c:2242
 msgid " (default enabled)"
 msgstr "(padrão habilitado)"
 
-#: src/libvlc.c:2236
+#: src/libvlc.c:2243
 msgid " (default disabled)"
 msgstr "(padrão desabilitado)"
 
-#: src/libvlc.c:2418
+#: src/libvlc.c:2425
 #, fuzzy, c-format
 msgid "VLC version %s\n"
 msgstr "Conversões de "
 
-#: src/libvlc.c:2419
+#: src/libvlc.c:2426
 #, fuzzy, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr "Erro: %s\n"
 
-#: src/libvlc.c:2421
+#: src/libvlc.c:2428
 #, fuzzy, c-format
 msgid "Compiler: %s\n"
 msgstr "Erro: %s\n"
 
-#: src/libvlc.c:2423
+#: src/libvlc.c:2430
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
-#: src/libvlc.c:2426
+#: src/libvlc.c:2433
 #, c-format
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -1053,14 +1053,14 @@ msgstr ""
 "veja o arquivo de nome COPYING para detalhes.\n"
 "Escrito pelo time VideoLAN; veja o arquivo AUTHORS.\n"
 
-#: src/libvlc.c:2458
+#: src/libvlc.c:2465
 #, c-format
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
-#: src/libvlc.c:2479
+#: src/libvlc.c:2486
 #, c-format
 msgid ""
 "\n"
@@ -1565,49 +1565,49 @@ msgstr ""
 
 #: src/libvlc.h:232 modules/codec/dvbsub.c:70 modules/codec/subsdec.c:84
 #: modules/video_filter/logo.c:85 modules/video_filter/marq.c:106
-#: modules/video_filter/mosaic.c:120 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:120 modules/video_filter/osdmenu.c:77
 #: modules/video_filter/rss.c:144 modules/video_filter/time.c:96
 msgid "Center"
 msgstr "Centro"
 
 #: src/libvlc.h:232 modules/codec/dvbsub.c:70 modules/video_filter/logo.c:85
 #: modules/video_filter/marq.c:106 modules/video_filter/mosaic.c:120
-#: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:144
+#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:144
 #: modules/video_filter/time.c:96
 msgid "Top"
 msgstr "Acima"
 
 #: src/libvlc.h:232 modules/codec/dvbsub.c:70 modules/video_filter/logo.c:85
 #: modules/video_filter/marq.c:106 modules/video_filter/mosaic.c:120
-#: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:144
+#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:144
 #: modules/video_filter/time.c:96
 msgid "Bottom"
 msgstr "Em baixo"
 
 #: src/libvlc.h:233 modules/codec/dvbsub.c:71 modules/video_filter/logo.c:86
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:121
-#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:145
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:145
 #: modules/video_filter/time.c:97
 msgid "Top-Left"
 msgstr "Acima à esquerda"
 
 #: src/libvlc.h:233 modules/codec/dvbsub.c:71 modules/video_filter/logo.c:86
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:121
-#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:145
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:145
 #: modules/video_filter/time.c:97
 msgid "Top-Right"
 msgstr "Acima à direita"
 
 #: src/libvlc.h:233 modules/codec/dvbsub.c:71 modules/video_filter/logo.c:86
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:121
-#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:145
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:145
 #: modules/video_filter/time.c:97
 msgid "Bottom-Left"
 msgstr "Em baixo à esquerda"
 
 #: src/libvlc.h:233 modules/codec/dvbsub.c:71 modules/video_filter/logo.c:86
 #: modules/video_filter/marq.c:107 modules/video_filter/mosaic.c:121
-#: modules/video_filter/osdmenu.c:77 modules/video_filter/rss.c:145
+#: modules/video_filter/osdmenu.c:78 modules/video_filter/rss.c:145
 #: modules/video_filter/time.c:97
 msgid "Bottom-Right"
 msgstr "Em baixo à direita"
@@ -2864,7 +2864,7 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "Selecione o atalho a ser usado para trocar o estado de tela cheia."
 
 #: src/libvlc.h:792 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1499
+#: modules/gui/wxwidgets/interface.cpp:1502
 msgid "Play/Pause"
 msgstr "Tocar/Pausar"
 
@@ -2910,8 +2910,8 @@ msgstr "Selecione o atalho a ser usado para tocar em câmera lenta."
 #: modules/gui/macosx/controls.m:579 modules/gui/macosx/intf.m:446
 #: modules/gui/macosx/intf.m:491 modules/gui/macosx/intf.m:562
 #: modules/gui/macosx/wizard.m:306 modules/gui/macosx/wizard.m:348
-#: modules/gui/macosx/wizard.m:1398 modules/gui/wxwidgets/interface.cpp:1504
-#: modules/gui/wxwidgets/menus.cpp:289
+#: modules/gui/macosx/wizard.m:1398 modules/gui/wxwidgets/interface.cpp:1507
+#: modules/gui/wxwidgets/menus.cpp:287
 msgid "Next"
 msgstr "Próximo"
 
@@ -2924,8 +2924,8 @@ msgstr ""
 #: src/libvlc.h:804 modules/control/hotkeys.c:545
 #: modules/gui/macosx/controls.m:578 modules/gui/macosx/intf.m:441
 #: modules/gui/macosx/intf.m:490 modules/gui/macosx/intf.m:563
-#: modules/gui/wxwidgets/interface.cpp:1503
-#: modules/gui/wxwidgets/menus.cpp:288
+#: modules/gui/wxwidgets/interface.cpp:1506
+#: modules/gui/wxwidgets/menus.cpp:286
 msgid "Previous"
 msgstr "Anterior"
 
@@ -2940,9 +2940,9 @@ msgstr ""
 #: modules/gui/macosx/intf.m:561 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
-#: modules/gui/wxwidgets/interface.cpp:538
-#: modules/gui/wxwidgets/interface.cpp:1505
-#: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
+#: modules/gui/wxwidgets/interface.cpp:542
+#: modules/gui/wxwidgets/interface.cpp:1508
+#: modules/gui/wxwidgets/menus.cpp:285 modules/visualization/xosd.c:235
 #: modules/visualization/xosd.c:236
 #, c-format
 msgid "Stop"
@@ -4710,7 +4710,8 @@ msgid "Standard filesystem directory input"
 msgstr "Entrada de diretório padrão do sistema de arquivos"
 
 #: modules/access/dshow/dshow.cpp:72 modules/access/dshow/dshow.cpp:74
-#: modules/demux/mpc.c:53 modules/video_output/opengl.c:129
+#: modules/codec/ffmpeg/ffmpeg.c:75 modules/demux/mpc.c:53
+#: modules/video_output/opengl.c:129
 msgid "None"
 msgstr "Nenhum"
 
@@ -5881,7 +5882,7 @@ msgid "Volume Set"
 msgstr "Ajuste de Volume"
 
 #: modules/access/vcdx/info.c:97 modules/gui/macosx/intf.m:448
-#: modules/gui/wxwidgets/interface.cpp:1377
+#: modules/gui/wxwidgets/interface.cpp:1380
 msgid "Volume"
 msgstr "Volume"
 
@@ -6095,8 +6096,7 @@ msgid "Allows you to give the mime returned by the server."
 msgstr ""
 "Permite que você modifique o nome de usuário que será usado para a conexão."
 
-#: modules/access_output/http.c:69 modules/control/http.c:82
-#: modules/control/http/http.c:46
+#: modules/access_output/http.c:69 modules/control/http/http.c:46
 #, fuzzy
 msgid "Certificate file"
 msgstr "Usar arquivo de legendas"
@@ -6107,8 +6107,7 @@ msgid ""
 "stream output"
 msgstr ""
 
-#: modules/access_output/http.c:72 modules/control/http.c:85
-#: modules/control/http/http.c:49
+#: modules/access_output/http.c:72 modules/control/http/http.c:49
 msgid "Private key file"
 msgstr ""
 
@@ -6118,8 +6117,7 @@ msgid ""
 "stream output. Leave empty if you don't have one."
 msgstr ""
 
-#: modules/access_output/http.c:76 modules/control/http.c:87
-#: modules/control/http/http.c:51
+#: modules/access_output/http.c:76 modules/control/http/http.c:51
 #, fuzzy
 msgid "Root CA file"
 msgstr "Escolha o Arquivo"
@@ -6131,8 +6129,7 @@ msgid ""
 "don't have one."
 msgstr ""
 
-#: modules/access_output/http.c:81 modules/control/http.c:90
-#: modules/control/http/http.c:54
+#: modules/access_output/http.c:81 modules/control/http/http.c:54
 #, fuzzy
 msgid "CRL file"
 msgstr "Arquivo PLS"
@@ -6148,8 +6145,7 @@ msgstr ""
 msgid "HTTP stream output"
 msgstr "Stream Http de saída"
 
-#: modules/access_output/http.c:89 modules/control/http.c:94
-#: modules/control/http/http.c:58
+#: modules/access_output/http.c:89 modules/control/http/http.c:58
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:473
 msgid "HTTP"
 msgstr "HTTP"
@@ -6187,11 +6183,6 @@ msgstr ""
 #: modules/access_output/shout.c:71
 msgid "libshout (icecast) output"
 msgstr ""
-
-#: modules/access_output/shout.c:72
-#, fuzzy
-msgid "Shout"
-msgstr "multicast"
 
 #: modules/access_output/udp.c:81
 #, fuzzy
@@ -7013,59 +7004,78 @@ msgstr ""
 msgid "Fake video decoder"
 msgstr "Decodificador de vídeo Cinepak"
 
-#: modules/codec/ffmpeg/ffmpeg.c:74
+#: modules/codec/ffmpeg/ffmpeg.c:75
+#, fuzzy
+msgid "Non-ref"
+msgstr "Nenhum"
+
+#: modules/codec/ffmpeg/ffmpeg.c:75
+#, fuzzy
+msgid "Bidir"
+msgstr "Linear"
+
+#: modules/codec/ffmpeg/ffmpeg.c:75
+#, fuzzy
+msgid "Non-key"
+msgstr "Nenhum"
+
+#: modules/codec/ffmpeg/ffmpeg.c:75
+msgid "All"
+msgstr "Tudo"
+
+#: modules/codec/ffmpeg/ffmpeg.c:78
 msgid "rd"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:74
+#: modules/codec/ffmpeg/ffmpeg.c:78
 #, fuzzy
 msgid "bits"
 msgstr "bits/s"
 
-#: modules/codec/ffmpeg/ffmpeg.c:74
+#: modules/codec/ffmpeg/ffmpeg.c:78
 #, fuzzy
 msgid "simple"
 msgstr "Ripple"
 
-#: modules/codec/ffmpeg/ffmpeg.c:85
+#: modules/codec/ffmpeg/ffmpeg.c:89
 #, fuzzy
 msgid ""
 "AltiVec ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 msgstr "decodificador de audio/vídeo ffmpeg ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 
-#: modules/codec/ffmpeg/ffmpeg.c:89
+#: modules/codec/ffmpeg/ffmpeg.c:93
 #, fuzzy
 msgid "ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 msgstr "decodificador de audio/vídeo ffmpeg ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 
-#: modules/codec/ffmpeg/ffmpeg.c:92
+#: modules/codec/ffmpeg/ffmpeg.c:96
 #, fuzzy
 msgid "Decoding"
 msgstr "Codificação das legendas"
 
-#: modules/codec/ffmpeg/ffmpeg.c:120
+#: modules/codec/ffmpeg/ffmpeg.c:127
 msgid "ffmpeg chroma conversion"
 msgstr "conversão de chroma ffmpeg"
 
-#: modules/codec/ffmpeg/ffmpeg.c:124
+#: modules/codec/ffmpeg/ffmpeg.c:131
 #, fuzzy
 msgid "Encoding"
 msgstr "Codificação das legendas"
 
-#: modules/codec/ffmpeg/ffmpeg.c:125
+#: modules/codec/ffmpeg/ffmpeg.c:132
 msgid "ffmpeg audio/video encoder"
 msgstr "codificador de audio/vídeo ffmpeg"
 
-#: modules/codec/ffmpeg/ffmpeg.c:183
+#: modules/codec/ffmpeg/ffmpeg.c:190
 msgid "ffmpeg demuxer"
 msgstr "demuxer ffmpeg"
 
-#: modules/codec/ffmpeg/ffmpeg.c:191
+#: modules/codec/ffmpeg/ffmpeg.c:198
 #, fuzzy
 msgid "ffmpeg video filter"
 msgstr "Filtro de vídeo de corte."
 
-#: modules/codec/ffmpeg/ffmpeg.c:197
+#: modules/codec/ffmpeg/ffmpeg.c:204
 #, fuzzy
 msgid "ffmpeg deinterlace video filter"
 msgstr "Filtro de desentrelação de vídeo"
@@ -7115,7 +7125,7 @@ msgstr ""
 "32 ac vlc\n"
 "64 chroma Qpel"
 
-#: modules/codec/ffmpeg/ffmpeg.h:106 modules/codec/ffmpeg/ffmpeg.h:230
+#: modules/codec/ffmpeg/ffmpeg.h:106 modules/codec/ffmpeg/ffmpeg.h:235
 #: modules/stream_out/transcode.c:152
 msgid "Hurry up"
 msgstr "Apressar"
@@ -7174,15 +7184,25 @@ msgid "Will only decode a low resolution version of the video."
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:131
+msgid "Skip the loop filter for H.264 decoding"
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.h:132
+msgid ""
+"Skipping the loop filter (aka deblocking) usually has a detrimental effect "
+"on quality. However for HDTV streams this provides a big speedup."
+msgstr ""
+
+#: modules/codec/ffmpeg/ffmpeg.h:136
 #, fuzzy
 msgid "ffmpeg post processing filter chains"
 msgstr "cadeia de filtros pósproc ffmpeg"
 
-#: modules/codec/ffmpeg/ffmpeg.h:173
+#: modules/codec/ffmpeg/ffmpeg.h:178
 msgid "Ratio of key frames"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:174
+#: modules/codec/ffmpeg/ffmpeg.h:179
 #, fuzzy
 msgid ""
 "Allows you to specify the number of frames that will be coded for one key "
@@ -7190,11 +7210,11 @@ msgid ""
 msgstr ""
 "Permite que você modifique o nome de usuário que será usado para a conexão."
 
-#: modules/codec/ffmpeg/ffmpeg.h:177
+#: modules/codec/ffmpeg/ffmpeg.h:182
 msgid "Ratio of B frames"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:178
+#: modules/codec/ffmpeg/ffmpeg.h:183
 #, fuzzy
 msgid ""
 "Allows you to specify the number of B frames that will be coded between two "
@@ -7202,122 +7222,122 @@ msgid ""
 msgstr ""
 "Permite que você modifique o nome de usuário que será usado para a conexão."
 
-#: modules/codec/ffmpeg/ffmpeg.h:181
+#: modules/codec/ffmpeg/ffmpeg.h:186
 #, fuzzy
 msgid "Video bitrate tolerance"
 msgstr "Tolerância de Taxa de Bits:"
 
-#: modules/codec/ffmpeg/ffmpeg.h:182
+#: modules/codec/ffmpeg/ffmpeg.h:187
 #, fuzzy
 msgid "Allows you to specify the video bitrate tolerance in kbit/s."
 msgstr "Permite que você modifique a conta que será usada para a conexão."
 
-#: modules/codec/ffmpeg/ffmpeg.h:185
+#: modules/codec/ffmpeg/ffmpeg.h:190
 #, fuzzy
 msgid "Enable interlaced encoding"
 msgstr "Codificação das legendas"
 
-#: modules/codec/ffmpeg/ffmpeg.h:186
+#: modules/codec/ffmpeg/ffmpeg.h:191
 #, fuzzy
 msgid "Allows you to enable dedicated algorithms for interlaced frames."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:189
+#: modules/codec/ffmpeg/ffmpeg.h:194
 #, fuzzy
 msgid "Enable interlaced motion estimation"
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:190
+#: modules/codec/ffmpeg/ffmpeg.h:195
 #, fuzzy
 msgid ""
 "Allows you to enable interlaced motion estimation algorithms. It requires "
 "more CPU."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:193
+#: modules/codec/ffmpeg/ffmpeg.h:198
 #, fuzzy
 msgid "Enable pre motion estimation"
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:194
+#: modules/codec/ffmpeg/ffmpeg.h:199
 #, fuzzy
 msgid "Allows you to enable the pre motion estimation."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:197
+#: modules/codec/ffmpeg/ffmpeg.h:202
 #, fuzzy
 msgid "Enable strict rate control"
 msgstr "Codificação das legendas"
 
-#: modules/codec/ffmpeg/ffmpeg.h:198
+#: modules/codec/ffmpeg/ffmpeg.h:203
 #, fuzzy
 msgid "Allows you to enable the strict rate control algorithm."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:201
+#: modules/codec/ffmpeg/ffmpeg.h:206
 #, fuzzy
 msgid "Rate control buffer size"
 msgstr "Interface de controle remoto"
 
-#: modules/codec/ffmpeg/ffmpeg.h:202
+#: modules/codec/ffmpeg/ffmpeg.h:207
 #, fuzzy
 msgid "Allows you to specify the rate control buffer size."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:205
+#: modules/codec/ffmpeg/ffmpeg.h:210
 #, fuzzy
 msgid "Rate control buffer aggressiveness"
 msgstr "Interface de controle remoto"
 
-#: modules/codec/ffmpeg/ffmpeg.h:206
+#: modules/codec/ffmpeg/ffmpeg.h:211
 #, fuzzy
 msgid "Allows you to specify the rate control buffer aggressiveness."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:209
+#: modules/codec/ffmpeg/ffmpeg.h:214
 msgid "I quantization factor"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:210
+#: modules/codec/ffmpeg/ffmpeg.h:215
 msgid ""
 "Allows you to specify the quantization factor of I frames, compared with P "
 "frames (for instance 1.0 => same qscale for I and P frames)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:214 modules/demux/mod.c:54
+#: modules/codec/ffmpeg/ffmpeg.h:219 modules/demux/mod.c:54
 msgid "Noise reduction"
 msgstr "Resolução de ruido"
 
-#: modules/codec/ffmpeg/ffmpeg.h:215
+#: modules/codec/ffmpeg/ffmpeg.h:220
 msgid ""
 "Allows you to enable a simple noise reduction algorithm to lower the "
 "encoding length and bitrate, at the expense of lower quality frames."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:219
+#: modules/codec/ffmpeg/ffmpeg.h:224
 msgid "Enable MPEG4 quantization matrix"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:220
+#: modules/codec/ffmpeg/ffmpeg.h:225
 msgid ""
 "Allows you to use the MPEG4 quantization matrix for mpeg2 encoding. This "
 "generally yields a better looking picture, while still retaining the "
 "compatibility with standard MPEG-2 decoders."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:225
+#: modules/codec/ffmpeg/ffmpeg.h:230
 #, fuzzy
 msgid "Quality level"
 msgstr "Qualidade:"
 
-#: modules/codec/ffmpeg/ffmpeg.h:226
+#: modules/codec/ffmpeg/ffmpeg.h:231
 #, fuzzy
 msgid ""
 "Allows you to specify the quality level for the encoding of motions vectors "
 "(this can slow down the encoding very much)."
 msgstr "Permite que você modifique a conta que será usada para a conexão."
 
-#: modules/codec/ffmpeg/ffmpeg.h:231
+#: modules/codec/ffmpeg/ffmpeg.h:236
 msgid ""
 "Allows you to specify if the encoder should make on-the-fly quality "
 "tradeoffs if your CPU can't keep up with the encoding rate. It will disable "
@@ -7325,112 +7345,112 @@ msgid ""
 "raise the noise reduction threshold to ease the encoder's task."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:237
+#: modules/codec/ffmpeg/ffmpeg.h:242
 msgid "Minimum video quantizer scale"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:238
+#: modules/codec/ffmpeg/ffmpeg.h:243
 #, fuzzy
 msgid "Allows you to specify the minimum video quantizer scale."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:241
+#: modules/codec/ffmpeg/ffmpeg.h:246
 msgid "Maximum video quantizer scale"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:242
+#: modules/codec/ffmpeg/ffmpeg.h:247
 #, fuzzy
 msgid "Allows you to specify the maximum video quantizer scale."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:245
+#: modules/codec/ffmpeg/ffmpeg.h:250
 msgid "Enable trellis quantization"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:246
+#: modules/codec/ffmpeg/ffmpeg.h:251
 #, fuzzy
 msgid ""
 "Allows you to enable trellis quantization (rate distortion for block "
 "coefficients)."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:249
+#: modules/codec/ffmpeg/ffmpeg.h:254
 msgid "Use fixed video quantizer scale"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:250
+#: modules/codec/ffmpeg/ffmpeg.h:255
 msgid ""
 "Allows you to specify a fixed video quantizer scale for VBR encoding "
 "(accepted values: 0.01 to 255.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:253
+#: modules/codec/ffmpeg/ffmpeg.h:258
 msgid "Strict standard compliance"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:254
+#: modules/codec/ffmpeg/ffmpeg.h:259
 #, fuzzy
 msgid ""
 "Allows you to force a strict standard compliance when encoding (accepted "
 "values: -1, 0, 1)."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:257
+#: modules/codec/ffmpeg/ffmpeg.h:262
 msgid "Luminance masking"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:258
+#: modules/codec/ffmpeg/ffmpeg.h:263
 #, fuzzy
 msgid ""
 "Allows you to raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:261
+#: modules/codec/ffmpeg/ffmpeg.h:266
 msgid "Darkness masking"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:262
+#: modules/codec/ffmpeg/ffmpeg.h:267
 #, fuzzy
 msgid ""
 "Allows you to raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr "Permite remapear as ações."
 
-#: modules/codec/ffmpeg/ffmpeg.h:265
+#: modules/codec/ffmpeg/ffmpeg.h:270
 #, fuzzy
 msgid "Motion masking"
 msgstr "Mapeamento de ação"
 
-#: modules/codec/ffmpeg/ffmpeg.h:266
+#: modules/codec/ffmpeg/ffmpeg.h:271
 msgid ""
 "Allows you to raise the quantizer for macroblocks with a high temporal "
 "complexity (default: 0.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:269
+#: modules/codec/ffmpeg/ffmpeg.h:274
 msgid "Border masking"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:270
+#: modules/codec/ffmpeg/ffmpeg.h:275
 msgid ""
 "Allows you to raise the quantizer for macroblocks at the border of the frame "
 "(default: 0.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:273
+#: modules/codec/ffmpeg/ffmpeg.h:278
 msgid "Luminance elimination"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:274
+#: modules/codec/ffmpeg/ffmpeg.h:279
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:278
+#: modules/codec/ffmpeg/ffmpeg.h:283
 msgid "Chrominance elimination"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:279
+#: modules/codec/ffmpeg/ffmpeg.h:284
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
@@ -7999,62 +8019,27 @@ msgstr "Faixa de Legendas: %s"
 msgid "N/A"
 msgstr ""
 
-#: modules/control/http.c:74 modules/control/http/http.c:34
-#: modules/misc/rtsp.c:46
+#: modules/control/http/http.c:34 modules/misc/rtsp.c:46
 msgid "Host address"
 msgstr "Endereço do host"
 
-#: modules/control/http.c:76
+#: modules/control/http/http.c:36
 msgid "You can set the address and port the http interface will bind to."
 msgstr ""
 "Você pode ajustar o endereço e a porta em que a interface http será atada."
 
-#: modules/control/http.c:77 modules/control/http.c:78
 #: modules/control/http/http.c:37 modules/control/http/http.c:38
 msgid "Source directory"
 msgstr "Diretório fonte"
 
-#: modules/control/http.c:79 modules/control/http/http.c:39
+#: modules/control/http/http.c:39
 #, fuzzy
 msgid "Charset"
 msgstr "Cabaret"
 
-#: modules/control/http.c:81 modules/control/http/http.c:41
+#: modules/control/http/http.c:41
 msgid "Charset declared in Content-Type header (default UTF-8)."
 msgstr ""
-
-#: modules/control/http.c:83 modules/control/http/http.c:47
-msgid "HTTP interface x509 PEM certificate file (enables SSL)"
-msgstr ""
-
-#: modules/control/http.c:86 modules/control/http/http.c:50
-msgid "HTTP interface x509 PEM private key file"
-msgstr ""
-
-#: modules/control/http.c:88 modules/control/http/http.c:52
-msgid "HTTP interface x509 PEM trusted root CA certificates file"
-msgstr ""
-
-#: modules/control/http.c:91 modules/control/http/http.c:55
-msgid "HTTP interace Certificates Revocation List file"
-msgstr ""
-
-#: modules/control/http.c:95 modules/control/http/http.c:59
-msgid "HTTP remote control interface"
-msgstr "Interface de controle remoto HTTP"
-
-#: modules/control/http.c:101 modules/control/http/http.c:68
-#, fuzzy
-msgid "HTTP SSL"
-msgstr "HTTP"
-
-#: modules/control/http/http.c:36
-#, fuzzy
-msgid ""
-"You can set the address and port the http interface will bind to (default "
-"port 8080)."
-msgstr ""
-"Você pode ajustar o endereço e a porta em que a interface http será atada."
 
 #: modules/control/http/http.c:42
 msgid "Handlers"
@@ -8062,9 +8047,34 @@ msgstr ""
 
 #: modules/control/http/http.c:44
 msgid ""
-"List of extensions and executable paths (for instance: php=/usr/bin/php,pl=c:"
-"\\Programs\\perl.exe)."
+"List of extensions and executable paths (for instance: php=/usr/bin/php,pl=/"
+"usr/bin/perl)."
 msgstr ""
+
+#: modules/control/http/http.c:47
+msgid "HTTP interface x509 PEM certificate file (enables SSL)"
+msgstr ""
+
+#: modules/control/http/http.c:50
+msgid "HTTP interface x509 PEM private key file"
+msgstr ""
+
+#: modules/control/http/http.c:52
+msgid "HTTP interface x509 PEM trusted root CA certificates file"
+msgstr ""
+
+#: modules/control/http/http.c:55
+msgid "HTTP interace Certificates Revocation List file"
+msgstr ""
+
+#: modules/control/http/http.c:59
+msgid "HTTP remote control interface"
+msgstr "Interface de controle remoto HTTP"
+
+#: modules/control/http/http.c:68
+#, fuzzy
+msgid "HTTP SSL"
+msgstr "HTTP"
 
 #: modules/control/lirc.c:58
 msgid "Infrared remote control interface"
@@ -8667,7 +8677,7 @@ msgid ""
 msgstr ""
 
 #: modules/demux/livedotcom.cpp:72
-msgid "RTP/RTSP/SDP demuxer (using Live.com)"
+msgid "RTP/RTSP/SDP demuxer (using Live555.com)"
 msgstr ""
 
 #: modules/demux/livedotcom.cpp:81
@@ -9468,8 +9478,8 @@ msgstr "Cancelar"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:537
-#: modules/gui/wxwidgets/menus.cpp:317
+#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:541
+#: modules/gui/wxwidgets/menus.cpp:315
 msgid "Open"
 msgstr "Abrir"
 
@@ -9680,7 +9690,7 @@ msgid "Take Screen Shot"
 msgstr "Fazer Screenshot"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:457
-#: modules/gui/wxwidgets/interface.cpp:462
+#: modules/gui/wxwidgets/interface.cpp:466
 msgid "About VLC media player"
 msgstr "Sobre o VLC media player"
 
@@ -10029,9 +10039,9 @@ msgstr "Rebobinar"
 #: modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:267
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:275
-#: modules/gui/wxwidgets/interface.cpp:539
-#: modules/gui/wxwidgets/interface.cpp:1225
-#: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
+#: modules/gui/wxwidgets/interface.cpp:543
+#: modules/gui/wxwidgets/interface.cpp:1228
+#: modules/gui/wxwidgets/menus.cpp:292 modules/gui/wxwidgets/menus.cpp:306
 msgid "Play"
 msgstr "Tocar"
 
@@ -10063,7 +10073,7 @@ msgstr "Esconder Outros"
 msgid "Show All"
 msgstr "Mostrar Tudo"
 
-#: modules/gui/macosx/intf.m:467 modules/gui/wxwidgets/interface.cpp:1497
+#: modules/gui/macosx/intf.m:467 modules/gui/wxwidgets/interface.cpp:1500
 msgid "Quit VLC"
 msgstr "Sair do VLC"
 
@@ -10225,9 +10235,9 @@ msgstr "Abaixar volume"
 
 #: modules/gui/macosx/intf.m:1252 modules/gui/macosx/intf.m:1253
 #: modules/gui/macosx/intf.m:1254 modules/gui/pda/pda_interface.c:250
-#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:540
-#: modules/gui/wxwidgets/interface.cpp:1219
-#: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:241
+#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:544
+#: modules/gui/wxwidgets/interface.cpp:1222
+#: modules/gui/wxwidgets/menus.cpp:294 modules/visualization/xosd.c:241
 #: modules/visualization/xosd.c:242
 #, c-format
 msgid "Pause"
@@ -11730,7 +11740,7 @@ msgstr ""
 " (Interface wxWindows)\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:919
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:922
 #, fuzzy
 msgid ""
 "(c) 1996-2005 - the VideoLAN Team\n"
@@ -11739,7 +11749,7 @@ msgstr ""
 "(C) 1996-2004 - o Time VideoLAN\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:929
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:932
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
@@ -12247,7 +12257,7 @@ msgid "Open file"
 msgstr "Abrir arquivo"
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:101
-#: modules/gui/wxwidgets/interface.cpp:464
+#: modules/gui/wxwidgets/interface.cpp:468
 msgid "Check for updates ..."
 msgstr ""
 
@@ -12434,128 +12444,128 @@ msgid ""
 "effect will be sharper."
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:425
+#: modules/gui/wxwidgets/interface.cpp:429
 #, fuzzy
 msgid "Quick &Open File...\tCtrl-O"
 msgstr "Abertura Rápida de Arquiv&o"
 
-#: modules/gui/wxwidgets/interface.cpp:428
+#: modules/gui/wxwidgets/interface.cpp:432
 #, fuzzy
 msgid "Open &File...\tCtrl-F"
 msgstr "A&brir Arquivo..."
 
-#: modules/gui/wxwidgets/interface.cpp:429
+#: modules/gui/wxwidgets/interface.cpp:433
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
 msgstr "A&brir Arquivo..."
 
-#: modules/gui/wxwidgets/interface.cpp:430
+#: modules/gui/wxwidgets/interface.cpp:434
 #, fuzzy
 msgid "Open &Disc...\tCtrl-D"
 msgstr "Abrir &Disco"
 
-#: modules/gui/wxwidgets/interface.cpp:432
+#: modules/gui/wxwidgets/interface.cpp:436
 #, fuzzy
 msgid "Open &Network Stream...\tCtrl-N"
 msgstr "Abrir Stream de &Rede"
 
-#: modules/gui/wxwidgets/interface.cpp:434
+#: modules/gui/wxwidgets/interface.cpp:438
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
 msgstr "Abrir &Disco"
 
-#: modules/gui/wxwidgets/interface.cpp:437
+#: modules/gui/wxwidgets/interface.cpp:441
 #, fuzzy
 msgid "&Wizard...\tCtrl-W"
 msgstr "Assistente de Streaming..."
 
-#: modules/gui/wxwidgets/interface.cpp:440
+#: modules/gui/wxwidgets/interface.cpp:444
 msgid "E&xit\tCtrl-X"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:446
+#: modules/gui/wxwidgets/interface.cpp:450
 #, fuzzy
 msgid "&Playlist...\tCtrl-P"
 msgstr "Lista de Re&produção"
 
-#: modules/gui/wxwidgets/interface.cpp:448
+#: modules/gui/wxwidgets/interface.cpp:452
 #, fuzzy
 msgid "&Messages...\tCtrl-M"
 msgstr "&Mensagens..."
 
-#: modules/gui/wxwidgets/interface.cpp:450
+#: modules/gui/wxwidgets/interface.cpp:454
 #, fuzzy
 msgid "Stream and Media &info...\tCtrl-I"
 msgstr "Informação do &stream e mídia..."
 
-#: modules/gui/wxwidgets/interface.cpp:452
+#: modules/gui/wxwidgets/interface.cpp:456
 msgid "VLM Control...\tCtrl-I"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:468
+#: modules/gui/wxwidgets/interface.cpp:472
 msgid "&File"
 msgstr "&Arquivo"
 
-#: modules/gui/wxwidgets/interface.cpp:469
+#: modules/gui/wxwidgets/interface.cpp:473
 msgid "&View"
 msgstr "&Visão"
 
-#: modules/gui/wxwidgets/interface.cpp:470
+#: modules/gui/wxwidgets/interface.cpp:474
 msgid "&Settings"
 msgstr "&Configurações"
 
-#: modules/gui/wxwidgets/interface.cpp:471
+#: modules/gui/wxwidgets/interface.cpp:475
 msgid "&Audio"
 msgstr "A&udio"
 
-#: modules/gui/wxwidgets/interface.cpp:472
+#: modules/gui/wxwidgets/interface.cpp:476
 msgid "&Video"
 msgstr "&Vídeo"
 
-#: modules/gui/wxwidgets/interface.cpp:473
+#: modules/gui/wxwidgets/interface.cpp:477
 msgid "&Navigation"
 msgstr "&Navegação"
 
-#: modules/gui/wxwidgets/interface.cpp:474
+#: modules/gui/wxwidgets/interface.cpp:478
 msgid "&Help"
 msgstr "A&juda"
 
-#: modules/gui/wxwidgets/interface.cpp:542
+#: modules/gui/wxwidgets/interface.cpp:546
 msgid "Previous playlist item"
 msgstr "Ítem anterior da lista de reprodução"
 
-#: modules/gui/wxwidgets/interface.cpp:543
+#: modules/gui/wxwidgets/interface.cpp:547
 msgid "Next playlist item"
 msgstr "Próximo ítem da lista de reprodução"
 
-#: modules/gui/wxwidgets/interface.cpp:544
+#: modules/gui/wxwidgets/interface.cpp:548
 msgid "Play slower"
 msgstr "Tocar mais devagar"
 
-#: modules/gui/wxwidgets/interface.cpp:545
+#: modules/gui/wxwidgets/interface.cpp:549
 msgid "Play faster"
 msgstr "Tocar mais rápido"
 
-#: modules/gui/wxwidgets/interface.cpp:855
+#: modules/gui/wxwidgets/interface.cpp:858
 #, fuzzy
 msgid "Extended &GUI\tCtrl-G"
 msgstr "Interface &Extendida"
 
-#: modules/gui/wxwidgets/interface.cpp:859
+#: modules/gui/wxwidgets/interface.cpp:862
 msgid "&Undock Ext. GUI"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:863
+#: modules/gui/wxwidgets/interface.cpp:866
 #, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
 msgstr "Assistente de Streaming..."
 
-#: modules/gui/wxwidgets/interface.cpp:865
+#: modules/gui/wxwidgets/interface.cpp:868
 #, fuzzy
 msgid "Preference&s...\tCtrl-S"
 msgstr "Preferências..."
 
-#: modules/gui/wxwidgets/interface.cpp:918
+#: modules/gui/wxwidgets/interface.cpp:921
 #, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
@@ -12564,26 +12574,26 @@ msgstr ""
 " (Interface wxWindows)\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:920
+#: modules/gui/wxwidgets/interface.cpp:923
 #, fuzzy
 msgid "Compiled by "
 msgstr "Comédia"
 
-#: modules/gui/wxwidgets/interface.cpp:922
+#: modules/gui/wxwidgets/interface.cpp:925
 #, fuzzy
 msgid "Compiler: "
 msgstr "Erro: %s\n"
 
-#: modules/gui/wxwidgets/interface.cpp:923
+#: modules/gui/wxwidgets/interface.cpp:926
 msgid "Based on SVN revision: "
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:932
+#: modules/gui/wxwidgets/interface.cpp:935
 #, c-format
 msgid "About %s"
 msgstr "Sobre %s"
 
-#: modules/gui/wxwidgets/interface.cpp:1508
+#: modules/gui/wxwidgets/interface.cpp:1511
 #, fuzzy
 msgid "Show/Hide interface"
 msgstr "Mostrar Interface"
@@ -12654,7 +12664,7 @@ msgstr "Mensagens..."
 msgid "&Preferences..."
 msgstr "&Preferências"
 
-#: modules/gui/wxwidgets/menus.cpp:567 modules/gui/wxwidgets/menus.cpp:594
+#: modules/gui/wxwidgets/menus.cpp:565 modules/gui/wxwidgets/menus.cpp:592
 msgid "Empty"
 msgstr "Vazio"
 
@@ -13224,7 +13234,7 @@ msgstr "Vídeo"
 #, fuzzy
 msgid ""
 "You can set the address, port and path the rtsp interface will bind to.\n"
-" Syntax is address:port/path. Default is to bind to any address on port 554, "
+"Syntax is address:port/path. Default is to bind to any address on port 554, "
 "with no path."
 msgstr ""
 "Você pode ajustar o endereço e a porta em que a interface http será atada."
@@ -14471,7 +14481,7 @@ msgid ""
 "video."
 msgstr ""
 
-#: modules/stream_out/transcode.c:135 modules/video_filter/osdmenu.c:117
+#: modules/stream_out/transcode.c:135 modules/video_filter/osdmenu.c:118
 #, fuzzy
 msgid "OSD menu"
 msgstr "Usar menus DVD"
@@ -15087,24 +15097,24 @@ msgstr ""
 #: modules/video_filter/osdmenu.c:65
 msgid ""
 "OSD menu pictures get a default timeout of 15 seconds added to their "
-"remaining time.This will ensure that they are at least the specified time "
+"remaining time. This will ensure that they are at least the specified time "
 "visible."
 msgstr ""
 
-#: modules/video_filter/osdmenu.c:68
+#: modules/video_filter/osdmenu.c:69
 #, fuzzy
 msgid "Update speed of OSD menu"
 msgstr "coordenada x do logo"
 
-#: modules/video_filter/osdmenu.c:70
+#: modules/video_filter/osdmenu.c:71
 msgid ""
-"Update the OSD menu picture every 200ms (default). Shorten the update time "
-"for environments that experience transmissions errors. Be carefull with this "
+"Update the OSD menu picture every 200 ms (default). Shorten the update time "
+"for environments that experience transmissions errors. Be careful with this "
 "option because encoding OSD menu pictures is very computing intensive. The "
 "range is 0 - 1000 ms."
 msgstr ""
 
-#: modules/video_filter/osdmenu.c:116
+#: modules/video_filter/osdmenu.c:117
 #, fuzzy
 msgid "On Screen Display menu subfilter"
 msgstr "Mostrar na tela"
@@ -15752,7 +15762,7 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:55
 #, fuzzy
-msgid "Number of bands used by the spectrOmeter, from 20 to 80."
+msgid "Number of bands used by the spectrometer, from 20 to 80."
 msgstr ""
 "Número de faixas a serem usadas pelo analisador de espectro, deve ser 20 ou "
 "80"
@@ -15907,6 +15917,17 @@ msgstr "Fonte usada para mostrar texto na saída xosd"
 #: modules/visualization/xosd.c:82
 msgid "XOSD interface"
 msgstr "Interface XOSD"
+
+#, fuzzy
+#~ msgid "Shout"
+#~ msgstr "multicast"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can set the address and port the http interface will bind to (default "
+#~ "port 8080)."
+#~ msgstr ""
+#~ "Você pode ajustar o endereço e a porta em que a interface http será atada."
 
 #, fuzzy
 #~ msgid "Entry "
@@ -16348,9 +16369,6 @@ msgstr "Interface XOSD"
 #~ msgstr ""
 #~ "Desculpe, o gerenciador de módulo não é funcional ainda. Por favor tente "
 #~ "novamente em uma próxima versão."
-
-#~ msgid "All"
-#~ msgstr "Tudo"
 
 #~ msgid "Item"
 #~ msgstr "Ítem"

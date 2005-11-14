@@ -344,7 +344,6 @@ modules/control/corba/mediacontrol-init.c
 modules/control/corba/mediacontrol-plugin.c
 modules/control/gestures.c
 modules/control/hotkeys.c
-modules/control/http.c
 modules/control/http/http.c
 modules/control/http/http.h
 modules/control/http/macro.c
