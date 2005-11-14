@@ -158,3 +158,7 @@ DX_HEADERS_URL=$(VIDEOLAN)/testing/contrib/win32-dx7headers.tgz
 DSHOW_HEADERS_URL=$(VIDEOLAN)/contrib/dshow-headers.tgz
 PORTAUDIO_VERSION=19
 PORTAUDIO_URL=http://www.portaudio.com/archives/pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
+CLINKCC_VERSION=171
+CLINKCC_URL=$(SF)/clinkcc/clinkcc$(CLINKCC_VERSION).tar.gz
+EXPAT_VERSION=1.95.8
+EXPAT_URL=$(SF)/expat/expat-$(EXPAT_VERSION).tar.gz

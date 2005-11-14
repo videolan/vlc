@@ -117,7 +117,7 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-	.glib .libidl .gecko .libmpcdec .aclocal
+	.glib .libidl .gecko .libmpcdec .expat .clinkcc .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 else
 
@@ -1271,7 +1271,6 @@ CLEAN_PKG += portaudio
 DISTCLEAN_PKG += pa_snapshot_v$(PORTAUDIO__VERSION).tar.gz
 
 
-
 # ***************************************************************************
 # xml
 # ***************************************************************************
@@ -1288,7 +1287,9 @@ endif
 
 .xml: xml
 	(cd xml; ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-writer --with-output --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp && make && make install)
+ifndef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
+endif
 	touch $@
 
 CLEAN_FILE += .xml
@@ -1662,11 +1663,9 @@ CLEAN_FILE += .libmpcdec
 CLEAN_PKG += libmpcdec
 DISTCLEAN_PKG += libmpcdec-$(MUSE_VERSION).tar.bz2
 
-
-
 # ***************************************************************************
- # Dirac
- # ***************************************************************************
+# Dirac
+# ***************************************************************************
 
 dirac-$(DIRAC_VERSION).tar.gz:
 	$(WGET) $(DIRAC_URL)
@@ -1708,7 +1707,48 @@ dshow-headers.tgz:
 	touch $@
 CLEAN_FILE += .dshow_headers
 DISTCLEAN_PKG += dshow-headers.tgz
-                                                          
+
+# ***************************************************************************
+# libexpat
+# ***************************************************************************
+
+expat-$(EXPAT_VERSION).tar.gz:
+	$(WGET) $(EXPAT_URL)
+
+expat: expat-$(EXPAT_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.expat: expat
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .expat
+CLEAN_PKG += expat
+DISTCLEAN_PKG += expat-$(EXPAT_VERSION).tar.gz
+
+# ***************************************************************************
+# CyberLink C++ UPnP library
+# ***************************************************************************
+
+clinkcc$(CLINKCC_VERSION).tar.gz:
+	$(WGET) $(CLINKCC_URL)
+
+clinkcc: clinkcc$(CLINKCC_VERSION).tar.gz
+	tar xzf $<
+	mv $(patsubst %.tar.gz,Cyberlink,$(patsubst %.tgz,Cyberlink,$(notdir $<))) $@ || true
+	touch $@
+	patch -p 0 < Patches/clinkcc.patch
+ifdef HAVE_DARWIN_OS
+	patch -p 0 < Patches/clinkcc_osx.patch
+endif
+
+.clinkcc: clinkcc
+	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) --enable-expat && make && chmod 755 config/install-sh && make install )
+	touch $@
+
+CLEAN_FILE += .clinkcc
+CLEAN_PKG += clinkcc
+DISTCLEAN_PKG += clinkcc-$(CLINKCC_VERSION).tar.gz
 
 # ***************************************************************************
 # Copy aclocal files
