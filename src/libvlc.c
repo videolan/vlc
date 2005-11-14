@@ -1339,6 +1339,7 @@ vlc_bool_t VLC_IsPlaying( int i_object )
     if( !p_playlist->p_input )
     {
         if( i_object ) vlc_object_release( p_vlc );
+        vlc_object_release( p_playlist );
         return VLC_ENOOBJ;
     }
     var_Get( p_playlist->p_input, "state", &val );
