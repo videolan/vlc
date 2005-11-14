@@ -48,6 +48,7 @@ static int FindLanguage( const char * psz_lang )
         "English", "en",
         "Spanish", "es",
         "French", "fr",
+        "Galician", "gl",
         "Italian", "it",
         "Japanese", "ja",
         "Korean", "ko",
