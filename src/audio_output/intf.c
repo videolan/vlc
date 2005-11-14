@@ -92,6 +92,9 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 
     config_PutInt( p_object, "volume", i_volume );
 
+    val.b_bool = VLC_TRUE;
+    var_Set( p_object->p_vlc, "volume-change", val );
+
     if ( p_aout == NULL ) return 0;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
@@ -101,9 +104,7 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
     }
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
-    val.b_bool = VLC_TRUE;
     var_Set( p_aout, "intf-change", val );
-    var_Set( p_aout->p_vlc, "volume-change", val );
     vlc_object_release( p_aout );
     return i_result;
 }
