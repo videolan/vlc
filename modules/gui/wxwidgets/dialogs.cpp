@@ -51,7 +51,6 @@ private:
     void Open( int i_access_method, int i_arg );
 
     /* Event handlers (these functions should _not_ be virtual) */
-    void OnUpdateVLC( wxCommandEvent& event );
     void OnExit( wxCommandEvent& event );
     void OnPlaylist( wxCommandEvent& event );
     void OnMessages( wxCommandEvent& event );
@@ -91,7 +90,6 @@ public:
     wxFrame             *p_prefs_dialog;
     wxFrame             *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
-    UpdateVLC           *p_updatevlc_dialog;
 };
 
 DEFINE_LOCAL_EVENT_TYPE( wxEVT_DIALOG );
@@ -129,8 +127,6 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnPopupMenu)
     EVT_COMMAND(INTF_DIALOG_EXIT, wxEVT_DIALOG,
                 DialogsProvider::OnExitThread)
-    EVT_COMMAND(INTF_DIALOG_UPDATEVLC, wxEVT_DIALOG,
-                DialogsProvider::OnUpdateVLC)
 END_EVENT_TABLE()
 
 wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent )
@@ -156,7 +152,6 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_wizard_dialog = NULL;
     p_bookmarks_dialog = NULL;
     p_dir_dialog = NULL;
-    p_updatevlc_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -227,7 +222,6 @@ DialogsProvider::~DialogsProvider()
     if( p_file_generic_dialog ) delete p_file_generic_dialog;
     if( p_wizard_dialog ) delete p_wizard_dialog;
     if( p_bookmarks_dialog ) delete p_bookmarks_dialog;
-    if( p_updatevlc_dialog ) delete p_updatevlc_dialog;
 
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
@@ -489,16 +483,4 @@ void DialogsProvider::OnPopupMenu( wxCommandEvent& event )
 void DialogsProvider::OnExitThread( wxCommandEvent& WXUNUSED(event) )
 {
     wxTheApp->ExitMainLoop();
-}
-
-void DialogsProvider::OnUpdateVLC( wxCommandEvent& WXUNUSED(event) )
-{
-    /* Show/hide the file info window */
-    if( !p_updatevlc_dialog )
-        p_updatevlc_dialog = new UpdateVLC( p_intf, this );
-
-    if( p_updatevlc_dialog )
-    {
-        p_updatevlc_dialog->Show( !p_updatevlc_dialog->IsShown() );
-    }
 }

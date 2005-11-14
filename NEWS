@@ -51,7 +51,6 @@ Interfaces:
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*
-    - VLC update checker
     - Support for RTP streaming in Stream Ouput dialog
     - Now require wx2.6 with Unicode support
  * Skins2

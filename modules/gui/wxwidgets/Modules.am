@@ -18,7 +18,6 @@ SOURCES_wxwidgets = \
 	preferences_widgets.h \
 	timer.cpp \
 	fileinfo.cpp \
-	updatevlc.cpp \
 	subtitles.cpp \
 	bookmarks.cpp \
 	video.cpp \

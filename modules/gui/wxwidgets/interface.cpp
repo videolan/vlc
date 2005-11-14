@@ -157,7 +157,6 @@ enum
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
     About_Event = wxID_ABOUT,
-    UpdateVLC_Event,
 
     Iconize_Event
 };
@@ -166,7 +165,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Menu events */
     EVT_MENU(Exit_Event, Interface::OnExit)
     EVT_MENU(About_Event, Interface::OnAbout)
-    EVT_MENU(UpdateVLC_Event, Interface::OnShowDialog)
 
     EVT_MENU(Playlist_Event, Interface::OnShowDialog)
     EVT_MENU(Logs_Event, Interface::OnShowDialog)
@@ -458,8 +456,6 @@ void Interface::CreateOurMenuBar()
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
     help_menu->Append( About_Event, wxU(_("About VLC media player")) );
-    help_menu->AppendSeparator();
-    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates ...")) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar();
@@ -978,9 +974,6 @@ void Interface::OnShowDialog( wxCommandEvent& event )
             break;
         case Bookmarks_Event:
             i_id = INTF_DIALOG_BOOKMARKS;
-            break;
-        case UpdateVLC_Event:
-            i_id = INTF_DIALOG_UPDATEVLC;
             break;
         default:
             i_id = INTF_DIALOG_FILE;
