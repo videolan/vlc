@@ -377,8 +377,8 @@ bool CtrlSliderBg::mouseOver( int x, int y ) const
     float factorX, factorY;
     getResizeFactors( factorX, factorY );
 
-    return (m_rCurve.getMinDist( (int)(x / factorX),
-                                 (int)(y / factorY) ) < m_thickness );
+    return (m_rCurve.getMinDist( (int)(x / factorX), (int)(y / factorY),
+                                 factorX, factorY ) < m_thickness );
 }
 
 

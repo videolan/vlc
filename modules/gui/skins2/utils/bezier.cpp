@@ -107,11 +107,12 @@ float Bezier::getNearestPercent( int x, int y ) const
 }
 
 
-float Bezier::getMinDist( int x, int y ) const
+float Bezier::getMinDist( int x, int y, float xScale, float yScale ) const
 {
     int nearest = findNearestPoint( x, y );
-    return sqrt( (double)((m_leftVect[nearest] - x) * (m_leftVect[nearest] - x) +
-                 (m_topVect[nearest] - y) * (m_topVect[nearest] - y)) );
+    double xDist = xScale * (m_leftVect[nearest] - x);
+    double yDist = yScale * (m_topVect[nearest] - y);
+    return sqrt( xDist * xDist + yDist * yDist );
 }
 
 

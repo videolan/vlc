@@ -58,8 +58,10 @@ class Bezier: public SkinObject
         /// from (x, y)
         float getNearestPercent( int x, int y ) const;
 
-        /// Return the distance of (x, y) to the curve
-        float getMinDist( int x, int y ) const;
+        /// Return the distance of (x, y) to the curve, corrected
+        /// by the (optional) given scale factors
+        float getMinDist( int x, int y, float xScale = 1.0f,
+                          float yScale = 1.0f ) const;
 
         /// Get the coordinates of the point at t percent of
         /// the curve (t must be between 0 and 1)
