@@ -142,7 +142,7 @@
                 <Anchor x="30" y="0" points="(0,0),(245,0)" priority="90" range="15" />
                 <Anchor x="30" y="14" points="(0,0),(245,0)" priority="90" range="15" />
                 <Image x="0" y="0" image="small_focus" action="move" />
-                <Text font="text_font" x="122" y="4" width="55" text="$T" />
+                <Text font="text_font" x="122" y="4" width="35" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
                 <Button x="6" y="3" up="menu_up" down="menu_down" over="menu_up" action="dialogs.popup()" tooltiptext="Popup menu" />
                 <Button x="167" y="3" up="small_previous" action="playlist.previous()" />
                 <Button x="176" y="3" up="small_play" action="vlc.play()" />
@@ -172,7 +172,7 @@
                 <Image x="26" y="29" image="pause_icon" visible="vlc.isPaused" />
                 <Image x="26" y="29" image="stop_icon" visible="vlc.isStopped" />
                 <Image x="0" y="0" image="title_focus" action="move" />
-                <Text font="digits_font" x="30" y="26" width="75" text="$T" visible="not vlc.isStopped" />
+                <Text font="digits_font" x="30" y="26" width="72" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
                 <Text font="text_font" x="111" y="27" width="155" text="$N" />
                 <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" tooltiptext="Volume: $V%">
                     <SliderBackground image="volume_bg" nbvert="28" padvert="2" />
@@ -320,9 +320,7 @@
                 <Playlist id="playlist" x="10" y="20" width="240" height="58" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#dfdfff" playcolor="#ffffff" bgcolor1="#000000" bgcolor2="#000000" selcolor="#202020" >
                     <Slider id="playlist_slider" x="264" y="28" lefttop="righttop" rightbottom="rightbottom" up="pl_slider_up" down="pl_slider_down" points="(0,40),(0,0)" />
                 </Playlist>
-                <!-- Commented out for now, as the extra digit makes it dirty
-                <Text font="text_font" x="186" y="101" width="55" text="$T" lefttop="rightbottom" />
-                -->
+                <Text font="text_font" x="186" y="101" width="35" text="$t" visible="not vlc.isStopped" lefttop="rightbottom" scrolling="none" alignment="right" />
                 <Button x="131" y="101" up="pl_previous" down="pl_previous" over="pl_previous" action="playlist.previous()" lefttop="rightbottom" />
                 <Button x="140" y="101" up="pl_play" down="pl_play" over="pl_play" action="vlc.play()" lefttop="rightbottom" />
                 <Button x="149" y="101" up="pl_pause" down="pl_pause" over="pl_pause" action="vlc.pause()" lefttop="rightbottom" />
