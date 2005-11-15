@@ -1319,7 +1319,6 @@ vlc_bool_t VLC_IsPlaying( int i_object )
 {
     playlist_t * p_playlist;
     vlc_bool_t   b_playing;
-    vlc_value_t  val;
 
     vlc_t *p_vlc = vlc_current_object( i_object );
 
@@ -1336,14 +1335,18 @@ vlc_bool_t VLC_IsPlaying( int i_object )
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_ENOOBJ;
     }
-    if( !p_playlist->p_input )
+
+    if( p_playlist->p_input )
     {
-        if( i_object ) vlc_object_release( p_vlc );
-        vlc_object_release( p_playlist );
-        return VLC_ENOOBJ;
+        vlc_value_t  val;
+        var_Get( p_playlist->p_input, "state", &val );
+        b_playing = ( val.i_int == PLAYING_S );
     }
-    var_Get( p_playlist->p_input, "state", &val );
-    b_playing = ( val.i_int == PLAYING_S );
+    else
+    {
+        msg_Dbg(p_vlc, "polling playlist_IsPlaying");
+        b_playing = playlist_IsPlaying( p_playlist );
+    }
     vlc_object_release( p_playlist );
 
     if( i_object ) vlc_object_release( p_vlc );
