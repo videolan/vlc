@@ -46,7 +46,7 @@ class BitmapFont: public GenericFont
             uint32_t color, int maxWidth = -1 ) const;
 
         /// Get the font size
-        virtual int getSize() const { return 12; }
+        virtual int getSize() const { return m_height; }
 
     private:
         /// Description of a glyph
