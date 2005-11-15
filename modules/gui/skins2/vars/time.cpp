@@ -126,7 +126,7 @@ const string StreamTime::formatTime( int seconds, bool bShortFormat ) const
     char *psz_time = new char[MSTRTIME_MAX_SIZE];
     if( bShortFormat && (seconds < 60 * 60) )
     {
-        snprintf( psz_time, MSTRTIME_MAX_SIZE, "  %02d:%02d",
+        snprintf( psz_time, MSTRTIME_MAX_SIZE, "%02d:%02d",
                   (int) (seconds / 60 % 60),
                   (int) (seconds % 60) );
     }
