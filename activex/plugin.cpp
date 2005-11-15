@@ -569,7 +569,7 @@ HRESULT VLCPlugin::onLoad(void)
                             if( NULL != abs_url )
                             {
                                 if( SUCCEEDED(UrlCombineW(base_url, _bstr_mrl, abs_url, &len,
-                                                URL_ESCAPE_UNSAFE)) )
+                                                URL_ESCAPE_UNSAFE|URL_PLUGGABLE_PROTOCOL)) )
                                 {
                                     SysFreeString(_bstr_mrl);
                                     _bstr_mrl = SysAllocStringLen(abs_url, len);
