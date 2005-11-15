@@ -41,10 +41,30 @@ class VarText;
 class CtrlText: public CtrlGeneric, public Observer<VarText>
 {
     public:
+        enum Align_t
+        {
+            kLeft,
+            kCenter,
+            kRight
+        };
+
+        enum Scrolling_t
+        {
+            // The text starts scrolling automatically if it is larger than the
+            // width of the control. The user can still stop it or make it
+            // scroll manually with the mouse.
+            kAutomatic,
+            // Only manual scrolling is allowed (with the mouse)
+            kManual,
+            // No scrolling of the text is allowed
+            kNone
+        };
+
         /// Create a text control with the optional given color
         CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                   const GenericFont &rFont, const UString &rHelp,
-                  uint32_t color, VarBool *pVisible );
+                  uint32_t color, VarBool *pVisible, Scrolling_t scrollMode,
+                  Align_t alignment);
         virtual ~CtrlText();
 
         /// Handle an event
@@ -79,6 +99,10 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         const GenericFont &m_rFont;
         /// Color of the text
         uint32_t m_color;
+        /// Scrolling mode
+        Scrolling_t m_scrollMode;
+        /// Type of alignment
+        Align_t m_alignment;
         /// Image of the text
         GenericBitmap *m_pImg;
         /// Image of the text, repeated twice and with some blank between;
@@ -86,7 +110,7 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         GenericBitmap *m_pImgDouble;
         /// Current image (should always be equal to m_pImg or m_pImgDouble)
         GenericBitmap *m_pCurrImg;
-        /// Position of the left side of the moving text
+        /// Position of the left side of the moving text (always <= 0)
         int m_xPos;
         /// Offset between the mouse pointer and the left side of the
         /// moving text

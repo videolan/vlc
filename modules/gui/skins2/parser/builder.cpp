@@ -516,10 +516,37 @@ void Builder::addText( const BuilderData::Text &rData )
         return;
     }
 
+    // Convert the scrolling mode
+    CtrlText::Scrolling_t scrolling;
+    if( rData.m_scrolling == "auto" )
+        scrolling = CtrlText::kAutomatic;
+    else if( rData.m_scrolling == "manual" )
+        scrolling = CtrlText::kManual;
+    else if( rData.m_scrolling == "none" )
+        scrolling = CtrlText::kNone;
+    else
+    {
+        msg_Err( getIntf(), "Invalid scrolling mode: %s",
+                 rData.m_scrolling.c_str() );
+    }
+
+    // Convert the alignment
+    CtrlText::Align_t alignment;
+    if( rData.m_alignment == "left" )
+        alignment = CtrlText::kLeft;
+    else if( rData.m_alignment == "center" || rData.m_alignment == "centre" )
+        alignment = CtrlText::kCenter;
+    else if( rData.m_alignment == "right" )
+        alignment = CtrlText::kRight;
+    else
+    {
+        msg_Err( getIntf(), "Invalid alignment: %s",
+                 rData.m_alignment.c_str() );
+        return;
+    }
+
     // Create a text variable
     VarText *pVar = new VarText( getIntf() );
-    UString msg( getIntf(), rData.m_text.c_str() );
-    pVar->set( msg );
     m_pTheme->m_vars.push_back( VariablePtr( pVar ) );
 
     // Get the visibility variable
@@ -528,7 +555,8 @@ void Builder::addText( const BuilderData::Text &rData )
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
 
     CtrlText *pText = new CtrlText( getIntf(), *pVar, *pFont,
-        UString( getIntf(), rData.m_help.c_str() ), rData.m_color, pVisible );
+        UString( getIntf(), rData.m_help.c_str() ), rData.m_color, pVisible,
+        scrolling, alignment );
 
     int height = pFont->getSize();
 
@@ -539,6 +567,10 @@ void Builder::addText( const BuilderData::Text &rData )
                                        *pLayout );
 
     pLayout->addControl( pText, pos, rData.m_layer );
+
+    // Set the text of the control
+    UString msg( getIntf(), rData.m_text.c_str() );
+    pVar->set( msg );
 
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pText );
 }

@@ -190,6 +190,8 @@
         text        CDATA   ""
         font        CDATA   #REQUIRED
         color       CDATA   "#000000"
+        scrolling   CDATA   "auto"
+        alignment   CDATA   "left"
         help        CDATA   ""
     >
 <!ELEMENT Playlist (Slider)?>

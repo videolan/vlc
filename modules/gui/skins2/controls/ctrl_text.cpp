@@ -42,12 +42,14 @@
 
 CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                     const GenericFont &rFont, const UString &rHelp,
-                    uint32_t color, VarBool *pVisible ):
+                    uint32_t color, VarBool *pVisible, Scrolling_t scrollMode,
+                    Align_t alignment ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rVariable( rVariable ), m_cmdToManual( this ),
     m_cmdManualMoving( this ), m_cmdManualStill( this ),
     m_cmdMove( this ), m_pEvt( NULL ), m_rFont( rFont ),
-    m_color( color ), m_pImg( NULL ), m_pImgDouble( NULL ),
+    m_color( color ), m_scrollMode( scrollMode ), m_alignment( alignment ),
+    m_pImg( NULL ), m_pImgDouble( NULL ),
     m_pCurrImg( NULL ), m_xPos( 0 ), m_xOffset( 0 ),
     m_cmdUpdateText( this )
 {
@@ -62,23 +64,37 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
     m_fsm.addState( "outMoving" );
 
     // Transitions
-    m_fsm.addTransition( "still", "mouse:left:down", "manual1",
-                         &m_cmdToManual );
-    m_fsm.addTransition( "manual1", "mouse:left:up", "moving",
-                         &m_cmdManualMoving );
-    m_fsm.addTransition( "moving", "mouse:left:down", "manual2",
-                         &m_cmdToManual );
-    m_fsm.addTransition( "manual2", "mouse:left:up", "still",
-                         &m_cmdManualStill );
-    m_fsm.addTransition( "manual1", "motion", "manual1", &m_cmdMove );
-    m_fsm.addTransition( "manual2", "motion", "manual2", &m_cmdMove );
     m_fsm.addTransition( "still", "leave", "outStill" );
     m_fsm.addTransition( "outStill", "enter", "still" );
-    m_fsm.addTransition( "moving", "leave", "outMoving" );
-    m_fsm.addTransition( "outMoving", "enter", "moving" );
+    if( m_scrollMode == kManual )
+    {
+        m_fsm.addTransition( "still", "mouse:left:down", "manual1",
+                             &m_cmdToManual );
+        m_fsm.addTransition( "manual1", "mouse:left:up", "still",
+                             &m_cmdManualStill );
+        m_fsm.addTransition( "manual1", "motion", "manual1", &m_cmdMove );
+    }
+    else if( m_scrollMode == kAutomatic )
+    {
+        m_fsm.addTransition( "still", "mouse:left:down", "manual1",
+                             &m_cmdToManual );
+        m_fsm.addTransition( "manual1", "mouse:left:up", "moving",
+                             &m_cmdManualMoving );
+        m_fsm.addTransition( "moving", "mouse:left:down", "manual2",
+                             &m_cmdToManual );
+        m_fsm.addTransition( "manual2", "mouse:left:up", "still",
+                             &m_cmdManualStill );
+        m_fsm.addTransition( "manual1", "motion", "manual1", &m_cmdMove );
+        m_fsm.addTransition( "manual2", "motion", "manual2", &m_cmdMove );
+        m_fsm.addTransition( "moving", "leave", "outMoving" );
+        m_fsm.addTransition( "outMoving", "enter", "moving" );
+    }
 
     // Initial state
-    m_fsm.setState( "moving" );
+    if( m_scrollMode == kAutomatic )
+        m_fsm.setState( "outMoving" );
+    else
+        m_fsm.setState( "outStill" );
 
     // Observe the variable
     m_rVariable.addObserver( this );
@@ -157,8 +173,29 @@ void CtrlText::draw( OSGraphics &rImage, int xDest, int yDest )
         // Draw the current image
         if( width > 0 && height > 0 )
         {
-            rImage.drawBitmap( *m_pCurrImg, -m_xPos, 0, xDest, yDest,
-                            width, height, true );
+            int offset = 0;
+            if( m_alignment == kLeft )
+            {
+                // We align to the left
+                offset = 0;
+            }
+            else if( m_alignment == kRight &&
+                     width < getPosition()->getWidth() )
+
+            {
+                // The text is shorter than the width of the control, so we
+                // can align it to the right
+                offset = getPosition()->getWidth() - width;
+            }
+            else if( m_alignment == kCenter &&
+                     width < getPosition()->getWidth() )
+            {
+                    // The text is shorter than the width of the control, so we
+                    // can center it
+                offset = (getPosition()->getWidth() - width) / 2;
+            }
+            rImage.drawBitmap( *m_pCurrImg, -m_xPos, 0, xDest + offset,
+                               yDest, width, height, true );
         }
     }
 }
@@ -206,7 +243,21 @@ void CtrlText::displayText( const UString &rText )
 
     // Update the current image used, as if the control size had changed
     onChangePosition();
-    m_xPos = 0;
+
+    if( m_alignment == kRight && getPosition() &&
+        getPosition()->getWidth() < m_pImg->getWidth() )
+    {
+        m_xPos = getPosition()->getWidth() - m_pImg->getWidth();
+    }
+    else if( m_alignment == kCenter && getPosition() &&
+             getPosition()->getWidth() < m_pImg->getWidth() )
+    {
+        m_xPos = (getPosition()->getWidth() - m_pImg->getWidth()) / 2;
+    }
+    else
+    {
+        m_xPos = 0;
+    }
 
     if( getPosition() )
     {
@@ -269,7 +320,8 @@ void CtrlText::CmdManualMoving::execute()
     m_pParent->releaseMouse();
 
     // Start the automatic movement, but only if the text is wider than the
-    // control
+    // control and if the control can scroll (either in manual or automatic
+    // mode)
     if( m_pParent->m_pImg &&
         m_pParent->m_pImg->getWidth() >= m_pParent->getPosition()->getWidth() )
     {
@@ -306,7 +358,7 @@ void CtrlText::CmdMove::execute()
         m_pParent->adjust( m_pParent->m_xPos );
 
         m_pParent->notifyLayout( m_pParent->getPosition()->getWidth(),
-                             m_pParent->getPosition()->getHeight() );
+                                 m_pParent->getPosition()->getHeight() );
     }
 }
 
@@ -317,13 +369,13 @@ void CtrlText::CmdUpdateText::execute()
     m_pParent->adjust( m_pParent->m_xPos );
 
     m_pParent->notifyLayout( m_pParent->getPosition()->getWidth(),
-                         m_pParent->getPosition()->getHeight() );
+                             m_pParent->getPosition()->getHeight() );
 }
 
 
 void CtrlText::adjust( int &position )
 {
-    // {m_pImgDouble->getWidth()  - m_pImg->getWidth()} is the period of the
+    // {m_pImgDouble->getWidth() - m_pImg->getWidth()} is the period of the
     // bitmap; remember that the string used to generate m_pImgDouble is of the
     // form: "foo  foo", the number of spaces being a parameter
     if( !m_pImg )

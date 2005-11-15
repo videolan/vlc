@@ -415,6 +415,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "y", "0" );
         CheckDefault( "text", "" );
         CheckDefault( "color", "#000000" );
+        CheckDefault( "scrolling", "auto" );
+        CheckDefault( "alignment", "left" );
         CheckDefault( "width", "0" );
         CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "rightbottom", "lefttop" );
@@ -425,8 +427,9 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["visible"], attr["font"],
                 attr["text"], atoi( attr["width"] ),
                 attr["lefttop"], attr["rightbottom"],
-                convertColor( attr["color"] ), attr["help"], m_curLayer,
-                m_curWindowId, m_curLayoutId );
+                convertColor( attr["color"] ),
+                attr["scrolling"], attr["alignment"],
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_pData->m_listText.push_back( textData );
     }
