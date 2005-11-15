@@ -528,6 +528,7 @@ void Builder::addText( const BuilderData::Text &rData )
     {
         msg_Err( getIntf(), "Invalid scrolling mode: %s",
                  rData.m_scrolling.c_str() );
+        return;
     }
 
     // Convert the alignment
