@@ -100,8 +100,11 @@ class CtrlSliderCursor: public CtrlGeneric, public Observer<VarPercent>
         /// Method called when the position variable is modified
         virtual void onUpdate( Subject<VarPercent> &rVariable );
 
-        /// Methode to compute the resize factors
+        /// Method to compute the resize factors
         void getResizeFactors( float &rFactorX, float &rFactorY ) const;
+
+        /// Call notifyLayout
+        void refreshLayout();
 };
 
 
@@ -156,7 +159,7 @@ class CtrlSliderBg: public CtrlGeneric, public Observer<VarPercent>
         /// Method called when the observed variable is modified
         virtual void onUpdate( Subject<VarPercent> &rVariable );
 
-        /// Methode to compute the resize factors
+        /// Method to compute the resize factors
         void getResizeFactors( float &rFactorX, float &rFactorY ) const;
 };
 

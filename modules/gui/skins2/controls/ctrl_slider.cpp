@@ -162,15 +162,7 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
 void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable )
 {
     // The position has changed
-    if( m_pImg )
-    {
-        notifyLayout( m_rCurve.getWidth() + m_pImg->getWidth(),
-                      m_rCurve.getHeight() + m_pImg->getHeight(),
-                      - m_pImg->getWidth() / 2,
-                      - m_pImg->getHeight() / 2 );
-    }
-    else
-        notifyLayout();
+    refreshLayout();
 }
 
 
@@ -195,16 +187,7 @@ void CtrlSliderCursor::CmdOverDown::execute()
 
     m_pParent->captureMouse();
     m_pParent->m_pImg = m_pParent->m_pImgDown;
-    if( m_pParent->m_pImg )
-    {
-        m_pParent->notifyLayout(
-            m_pParent->m_rCurve.getWidth() + m_pParent->m_pImg->getWidth(),
-            m_pParent->m_rCurve.getHeight() + m_pParent->m_pImg->getHeight(),
-            - m_pParent->m_pImg->getWidth() / 2,
-            - m_pParent->m_pImg->getHeight() / 2 );
-    }
-    else
-        m_pParent->notifyLayout();
+    m_pParent->refreshLayout();
 }
 
 
@@ -215,48 +198,21 @@ void CtrlSliderCursor::CmdDownOver::execute()
 
     m_pParent->releaseMouse();
     m_pParent->m_pImg = m_pParent->m_pImgUp;
-    if( m_pParent->m_pImg )
-    {
-        m_pParent->notifyLayout(
-            m_pParent->m_rCurve.getWidth() + m_pParent->m_pImg->getWidth(),
-            m_pParent->m_rCurve.getHeight() + m_pParent->m_pImg->getHeight(),
-            - m_pParent->m_pImg->getWidth() / 2,
-            - m_pParent->m_pImg->getHeight() / 2 );
-    }
-    else
-        m_pParent->notifyLayout();
+    m_pParent->refreshLayout();
 }
 
 
 void CtrlSliderCursor::CmdUpOver::execute()
 {
     m_pParent->m_pImg = m_pParent->m_pImgOver;
-    if( m_pParent->m_pImg )
-    {
-        m_pParent->notifyLayout(
-            m_pParent->m_rCurve.getWidth() + m_pParent->m_pImg->getWidth(),
-            m_pParent->m_rCurve.getHeight() + m_pParent->m_pImg->getHeight(),
-            - m_pParent->m_pImg->getWidth() / 2,
-            - m_pParent->m_pImg->getHeight() / 2 );
-    }
-    else
-        m_pParent->notifyLayout();
+    m_pParent->refreshLayout();
 }
 
 
 void CtrlSliderCursor::CmdOverUp::execute()
 {
     m_pParent->m_pImg = m_pParent->m_pImgUp;
-    if( m_pParent->m_pImg )
-    {
-        m_pParent->notifyLayout(
-            m_pParent->m_rCurve.getWidth() + m_pParent->m_pImg->getWidth(),
-            m_pParent->m_rCurve.getHeight() + m_pParent->m_pImg->getHeight(),
-            - m_pParent->m_pImg->getWidth() / 2,
-            - m_pParent->m_pImg->getHeight() / 2 );
-    }
-    else
-        m_pParent->notifyLayout();
+    m_pParent->refreshLayout();
 }
 
 
@@ -329,6 +285,24 @@ void CtrlSliderCursor::getResizeFactors( float &rFactorX,
     {
         rFactorY = (float)pPos->getHeight() / (float)m_height;
     }
+}
+
+
+void CtrlSliderCursor::refreshLayout()
+{
+    if( m_pImg )
+    {
+        // Compute the resize factors
+        float factorX, factorY;
+        getResizeFactors( factorX, factorY );
+
+        notifyLayout( (int)(m_rCurve.getWidth() * factorX) + m_pImg->getWidth(),
+                      (int)(m_rCurve.getHeight() * factorY) + m_pImg->getHeight(),
+                      - m_pImg->getWidth() / 2,
+                      - m_pImg->getHeight() / 2 );
+    }
+    else
+        notifyLayout();
 }
 
 
