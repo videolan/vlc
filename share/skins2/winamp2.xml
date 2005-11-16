@@ -93,6 +93,17 @@
        <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
        <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
        <SubBitmap id="title_focus" x="27" y="0" width="275" height="14" />
+       <SubBitmap id="five_dots" x="304" y="0" width="8" height="43" />
+<!--        <SubBitmap id="dot1_down" x="304" y="46" width="8" height="8" /> -->
+<!--        <SubBitmap id="dot1_up" x="304" y="2" width="8" height="8" /> -->
+       <SubBitmap id="dot2_down" x="312" y="54" width="8" height="8" />
+       <SubBitmap id="dot2_up" x="304" y="10" width="8" height="8" />
+<!--        <SubBitmap id="dot3_down" x="320" y="62" width="8" height="8" /> -->
+<!--        <SubBitmap id="dot3_up" x="304" y="18" width="8" height="8" /> -->
+<!--        <SubBitmap id="dot4_down" x="328" y="70" width="8" height="8" /> -->
+<!--        <SubBitmap id="dot4_up" x="304" y="26" width="8" height="8" /> -->
+<!--        <SubBitmap id="dot5_down" x="336" y="78" width="8" height="8" /> -->
+<!--        <SubBitmap id="dot5_up" x="304" y="34" width="8" height="8" /> -->
        <SubBitmap id="small_focus" x="27" y="29" width="275" height="14" />
        <SubBitmap id="small_previous" x="194" y="32" width="8" height="8" />
        <SubBitmap id="small_play" x="203" y="32" width="8" height="8" />
@@ -168,6 +179,8 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Image x="0" y="0" image="main" action="move" />
+                <Image x="10" y="22" image="five_dots" />
+                <Checkbox x="10" y="32" up1="dot2_up" down1="dot2_down" up2="dot2_down" down2="dot2_up" state="vlc.isOnTop" action1="vlc.onTop()" action2="vlc.onTop()" tooltiptext1="Toggle Always-On-Top" tooltiptext2="Toggle Always-On-Top" />
                 <Image x="26" y="29" image="play_icon" visible="vlc.isPlaying" />
                 <Image x="26" y="29" image="pause_icon" visible="vlc.isPaused" />
                 <Image x="26" y="29" image="stop_icon" visible="vlc.isStopped" />
