@@ -1,0 +1,61 @@
+diff -ruN libogg-1.1.2/configure.in libogg/configure.in
+--- libogg-1.1.2/configure.in	2004-09-23 15:30:58.000000000 +0200
++++ libogg/configure.in	2005-11-14 22:16:04.000000000 +0100
+@@ -28,17 +28,17 @@
+         case $host in 
+         *-*-irix*)
+                 DEBUG="-g -signed" 
+-                CFLAGS="-O2 -w -signed"
++                EXTRA_CFLAGS="-O2 -w -signed"
+                 PROFILE="-p -g3 -O2 -signed"
+ 		;;
+         sparc-sun-solaris*)
+                 DEBUG="-v -g"
+-                CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
++                EXTRA_CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
+                 PROFILE="-v -xpg -g -xO4 -fast -native -fsimple -xcg92 -Dsuncc"
+ 		;;
+         *)
+                 DEBUG="-g"
+-                CFLAGS="-O"
++                EXTRA_CFLAGS="-O"
+                 PROFILE="-g -p" 
+ 		;;
+         esac
+@@ -46,30 +46,30 @@
+         case $host in 
+         *-*-linux*)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -ffast-math -fsigned-char"
++                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char"
+                 PROFILE="-Wall -W -pg -g -O20 -ffast-math -fsigned-char"
+ 		;;
+         sparc-sun-*)
+                 DEBUG="-g -Wall -fsigned-char -mv8"
+-                CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
++                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
+                 PROFILE="-pg -g -O20 -fsigned-char -mv8" 
+ 		;;
+ 	*-*-darwin*)
+ 		DEBUG="-fno-common -g -Wall -fsigned-char"
+-		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
++		EXTRA_CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
+ 		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+ 		;;
+         *)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -fsigned-char"
++                EXTRA_CFLAGS="-O20 -fsigned-char"
+                 PROFILE="-O20 -g -pg -fsigned-char" 
+ 		;;
+         esac
+ fi
+-CFLAGS="$CFLAGS $cflags_save"
++CFLAGS="$EXTRA_CFLAGS $cflags_save"
+ DEBUG="$DEBUG $cflags_save"
+ PROFILE="$PROFILE $cflags_save"
+-LDFLAGS="$LDFLAGS $ldflags_save"
++LDFLAGS="$EXTRA_LDFLAGS $ldflags_save"
+ 
+ dnl Checks for programs.
+ 

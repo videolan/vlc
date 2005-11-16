@@ -1,0 +1,23 @@
+diff -urN glib1.2-1.2.10 glib
+--- glib1.2-1.2.10 glib.h	2005-04-18 23:58:21.000000000 -0400
++++ glib/glib.h	2005-04-18 23:58:48.000000000 -0400
+@@ -272,7 +272,7 @@
+ /* Wrap the gcc __PRETTY_FUNCTION__ and __FUNCTION__ variables with
+  * macros, so we can refer to them as strings unconditionally.
+  */
+-#ifdef	__GNUC__
++#if defined(__GNUC__) && (__GNUC__ < 4)
+ #define	G_GNUC_FUNCTION		__FUNCTION__
+ #define	G_GNUC_PRETTY_FUNCTION	__PRETTY_FUNCTION__
+ #else	/* !__GNUC__ */
+--- glib1.2-1.2.10/gmain.c	Mon Feb 26 22:00:21 2001
++++ glib/gmain.c	Sun Aug 24 13:46:51 2003
+@@ -187,6 +187,8 @@
+ /* SunOS has poll, but doesn't provide a prototype. */
+ #  if defined (sun) && !defined (__SVR4)
+ extern gint poll (GPollFD *ufds, guint nfsd, gint timeout);
++#else
++#include <poll.h>      /* The opengroup defines the poll.h header as standard */
+ #  endif  /* !sun */
+ static GPollFunc poll_func = (GPollFunc) poll;
+ #else	/* !HAVE_POLL */

@@ -22,3 +22,31 @@ diff -ruN libtheora-1.0alpha5/Makefile.in libtheora/Makefile.in
  EXTRA_DIST = COPYING autogen.sh win32 libtheora.spec libtheora.spec.in \
  	theora-uninstalled.pc.in
  
+diff -ruN libtheora-1.0alpha5/configure.ac libtheora/configure.ac
+--- libtheora-1.0alpha5/configure.ac	2005-08-20 20:43:13.000000000 +0200
++++ libtheora/configure.ac	2005-11-14 22:49:14.000000000 +0100
+@@ -89,7 +89,7 @@
+         case $host in 
+         *)
+                 DEBUG="-g"
+-                CFLAGS="-O"
++                EXTRA_CFLAGS="-O"
+                 PROFILE="-g -p" ;;
+         esac
+ else
+@@ -97,12 +97,12 @@
+         case $host in 
+         *)
+                 DEBUG="-g -W -D__NO_MATH_INLINES"
+-                CFLAGS="-g -O2 -Wall"
++                EXTRA_CFLAGS="-g -O2 -Wall"
+                 PROFILE="-W -pg -g -O2 -fno-inline-functions";;
+         esac
+ fi
+-CFLAGS="$CFLAGS $cflags_save"
+-LDFLAGS="$LDFLAGS $ldflags_save"
++CFLAGS="$EXTRA_CFLAGS $cflags_save"
++LDFLAGS="$EXTRA_LDFLAGS $ldflags_save"
+ 
+ dnl Set extra linker options
+ case "$target_os" in

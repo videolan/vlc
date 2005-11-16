@@ -1,0 +1,73 @@
+diff -ruN libvorbis-1.1.1/configure.in libvorbis/configure.in
+--- libvorbis-1.1.1/configure.in	2005-06-21 15:47:45.000000000 +0200
++++ libvorbis/configure.in	2005-11-14 22:40:18.000000000 +0100
+@@ -86,15 +86,15 @@
+ 			CC=cc
+ 		fi
+ 		DEBUG="-g -signed" 
+-		CFLAGS="-O2 -w -signed"
++		EXTRA_CFLAGS="-O2 -w -signed"
+ 		PROFILE="-p -g3 -O2 -signed" ;;
+ 	sparc-sun-solaris*)
+ 		DEBUG="-v -g"
+-		CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
++		EXTRA_CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
+ 		PROFILE="-v -xpg -g -xO4 -fast -native -fsimple -xcg92 -Dsuncc" ;;
+ 	*)
+ 		DEBUG="-g"
+-		CFLAGS="-O"
++		EXTRA_CFLAGS="-O"
+ 		PROFILE="-g -p" ;;
+         esac
+ else
+@@ -102,7 +102,7 @@
+ 	case $host in 
+ 	*86-*-linux*)
+ 		DEBUG="-g -Wall -W -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+-		CFLAGS="-O20 -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char"
++		EXTRA_CFLAGS="-O20 -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char"
+ #              	PROFILE="-Wall -W -pg -g -O20 -ffast-math -D_REENTRANT -fsigned-char -fno-inline -static"
+ 		PROFILE="-Wall -W -pg -g -O20 -ffast-math -mno-ieee-fp -D_REENTRANT -fsigned-char -fno-inline"
+ 
+@@ -142,33 +142,33 @@
+  AC_MSG_WARN([********************************************************])
+  AC_MSG_WARN([                                                        ])
+ 
+-  		CFLAGS=${OPT}" -D__NO_MATH_INLINES"
++  		EXTRA_CFLAGS=${OPT}" -D__NO_MATH_INLINES"
+   		PROFILE=${PROFILE}" -D__NO_MATH_INLINES"
+   		fi;;
+ 	powerpc-*-linux*)
+ 		DEBUG="-g -Wall -W -D_REENTRANT -D__NO_MATH_INLINES"
+-		CFLAGS="-O3 -ffast-math -mfused-madd -mcpu=750 -D_REENTRANT"
++		EXTRA_CFLAGS="-O3 -ffast-math -mfused-madd -mcpu=750 -D_REENTRANT"
+ 		PROFILE="-pg -g -O3 -ffast-math -mfused-madd -mcpu=750 -D_REENTRANT";;
+ 	*-*-linux*)
+ 		DEBUG="-g -Wall -W -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+-		CFLAGS="-O20 -ffast-math -D_REENTRANT -fsigned-char"
++		EXTRA_CFLAGS="-O20 -ffast-math -D_REENTRANT -fsigned-char"
+ 		PROFILE="-pg -g -O20 -ffast-math -D_REENTRANT -fsigned-char";;
+ 	sparc-sun-*)
+ 		DEBUG="-g -Wall -W -D__NO_MATH_INLINES -fsigned-char -mv8"
+-		CFLAGS="-O20 -ffast-math -D__NO_MATH_INLINES -fsigned-char -mv8"
++		EXTRA_CFLAGS="-O20 -ffast-math -D__NO_MATH_INLINES -fsigned-char -mv8"
+ 		PROFILE="-pg -g -O20 -D__NO_MATH_INLINES -fsigned-char -mv8" ;;
+ 	*-*-darwin*)
+ 		DEBUG="-DDARWIN -fno-common -force_cpusubtype_ALL -Wall -g -O0 -fsigned-char"
+-		CFLAGS="-DDARWIN -fno-common -force_cpusubtype_ALL -Wall -g -O4 -ffast-math -fsigned-char"
++		EXTRA_CFLAGS="-DDARWIN -fno-common -force_cpusubtype_ALL -Wall -g -O4 -ffast-math -fsigned-char"
+ 		PROFILE="-DDARWIN -fno-common -force_cpusubtype_ALL -Wall -g -pg -O4 -ffast-math -fsigned-char";;
+ 	*)
+ 		DEBUG="-g -Wall -W -D__NO_MATH_INLINES -fsigned-char"
+-		CFLAGS="-O20 -D__NO_MATH_INLINES -fsigned-char"
++		EXTRA_CFLAGS="-O20 -D__NO_MATH_INLINES -fsigned-char"
+ 		PROFILE="-O20 -g -pg -D__NO_MATH_INLINES -fsigned-char" ;;
+         esac
+ fi
+-CFLAGS="$CFLAGS $cflags_save"
+-LDFLAGS="$LDFLAGS $ldflags_save"
++CFLAGS="$EXTRA_CFLAGS $cflags_save"
++LDFLAGS="$EXTRA_LDFLAGS $ldflags_save"
+ 
+ dnl --------------------------------------------------
+ dnl Check for headers
