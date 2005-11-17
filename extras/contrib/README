@@ -1,6 +1,6 @@
 This is the contrib build system for VLC Media Player. It has been
-primarily developed for Mac OS X, though it should be easy to adapt to
-other operating systems.
+primarily developed for Mac, it has been adapted for BeOs and win32.
+It would be not too difficult to extend it to other sytem.
 
 To use it, first in the contrib directory, type :
 	./bootstrap
@@ -19,7 +19,7 @@ make bin IS NOT WORKING atm USE make src
 
 Once the contribs are built, you can start building VLC.
 See: http://developers.videolan.org/vlc/osx-compile.html 
-for more details on that.
+or INSTALL.win32 for more details on that.
 
 Happy hacking.
 --Meuuh 2003-11-15

@@ -88,21 +88,25 @@ or mpeg4 video decoding, etc...
 Depending on your needs you will have to compile/install some or all of these
 external libraries.
 
-They can be found here (source code):
-http://download.videolan.org/pub/testing/contrib/
+* They can be found here (source code):
+  http://download.videolan.org/pub/testing/contrib/
 
-We also provide a package with all the libraries already compiled so it is
-actually really easy to compile a full-featured version of vlc (these compiled
-libraries will only work with mingw or cygwin):
-http://download.videolan.org/pub/testing/win32/contrib-20040902-win32-bin-gcc3.3.1-only.tar.bz2 (Check out fo more recent versions at the same location). 
+* We also provide a package with all the libraries already compiled so it is
+  actually really easy to compile a full-featured version of vlc (these compiled
+  libraries will only work with mingw or cygwin):
+  http://download.videolan.org/pub/testing/win32/contrib-20040902-win32-bin-gcc3.3.1-only.tar.bz2 (Check out fo more recent versions at the same location). 
 
-All you need to do is extract it in your root directory (the include files
-and libraries will be put in /usr/win32). You can do this with the following
-command: 
+  All you need to do is extract it in your root directory (the include files
+  and libraries will be put in /usr/win32). You can do this with the following
+  command: 
 
-  tar xjvf contrib-20040902-win32-bin-gcc3.3.1-only.tar.bz2 -C /
+    tar xjvf contrib-20040902-win32-bin-gcc3.3.1-only.tar.bz2 -C /
 
-Please note the "-C /". 
+  Please note the "-C /". 
+
+* An automated way of building the contrib libraries is provided in 
+  extra/contrib. It will download, configure and build the libraries.
+  See the extras/contrib/README for more info.
 
 A complete list of the libraries on which we depend can be found here:
 http://developers.videolan.org/vlc/
@@ -211,6 +215,19 @@ lines:
       --enable-twolame --enable-dvdread \
       --disable-mkv \
       --enable-debug
+
+If you have used the "extras/contrib" way, you don't need to precise 
+the CFLAGS, LDFLAGS and --with-foo-config-path=.
+ ./bootstrap && \
+  ./configure \
+      --disable-gtk \
+      --enable-nls --enable-sdl \
+      --enable-ffmpeg --enable-faad --enable-flac --enable-theora \
+      --disable-cddax --disable-vcdx --enable-goom \
+      --enable-twolame --enable-dvdread \
+      --enable-mkv --enable-caca \
+      --enable-debug
+
 
 See `./configure --help' for more information.
 
