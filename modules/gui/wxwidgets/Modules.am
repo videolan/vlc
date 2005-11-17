@@ -3,6 +3,7 @@ SOURCES_wxwidgets = \
 	streamdata.h \
 	streamdata.cpp \
 	interface.cpp \
+	interface.hpp \
 	extrapanel.cpp \
 	menus.cpp \
 	timer.cpp \
