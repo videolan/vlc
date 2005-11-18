@@ -4,7 +4,6 @@ SOURCES_wxwidgets = \
 	streamdata.h \
 	streamdata.cpp \
 	interface.cpp \
-	interface.hpp \
 	extrapanel.cpp \
 	menus.cpp \
 	timer.cpp \
@@ -38,6 +37,28 @@ SOURCES_wxwidgets = \
 	$(NULL)
 
 EXTRA_DIST += \
+	interface.hpp \
+	extrapanel.hpp \
+	timer.hpp \
+	video.hpp \
+	slider_manager.hpp \
+	main_slider_manager.hpp \
+	dialogs/fileinfo.hpp \
+	dialogs/preferences.hpp \
+	dialogs/wizard.hpp \
+	dialogs/vlm/vlm_streampanel.hpp \
+	dialogs/vlm/vlm_stream.hpp \
+	dialogs/vlm/vlm_panel.hpp \
+	dialogs/vlm/vlm_slider_manager.hpp \
+	dialogs/vlm/vlm_wrapper.hpp \
+	dialogs/playlist.hpp \
+	dialogs/open.hpp \	
+	dialogs/messages.hpp \
+	dialogs/iteminfo.hpp \
+	dialogs/subtitles.hpp \
+	dialogs/streamout.hpp \
+	dialogs/updatevlc.hpp \
+	dialogs/bookmarks.hpp \
 	bitmaps/advanced.xpm \
 	bitmaps/audio.xpm \
 	bitmaps/codec.xpm \
@@ -56,6 +77,7 @@ EXTRA_DIST += \
 	bitmaps/speaker_mute.xpm \
 	bitmaps/speaker.xpm \
 	bitmaps/stop.xpm \
+	bitmaps/trash.xpm \
 	bitmaps/type_afile.xpm \
 	bitmaps/type_card.xpm \
 	bitmaps/type_cdda.xpm \
