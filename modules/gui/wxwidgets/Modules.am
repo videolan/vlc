@@ -52,7 +52,7 @@ EXTRA_DIST += \
 	dialogs/vlm/vlm_slider_manager.hpp \
 	dialogs/vlm/vlm_wrapper.hpp \
 	dialogs/playlist.hpp \
-	dialogs/open.hpp \	
+	dialogs/open.hpp \
 	dialogs/messages.hpp \
 	dialogs/iteminfo.hpp \
 	dialogs/subtitles.hpp \
