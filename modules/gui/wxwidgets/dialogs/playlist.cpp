@@ -1100,7 +1100,8 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
     else
     {
         p_node = p_item2;
-        if( p_node && p_node->i_children > 0 &&
+        p_item = NULL;
+/*        if( p_node && p_node->i_children > 0 &&
             p_node->pp_children[0]->i_children == -1)
         {
             p_item = p_node->pp_children[0];
@@ -1108,7 +1109,7 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
         else
         {
             p_item = NULL;
-        }
+        }*/
     }
 
     playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, i_current_view,
