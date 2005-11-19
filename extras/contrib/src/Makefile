@@ -32,19 +32,12 @@ include ./packages.mak
 # Set a clean environment
 # ***************************************************************************
 
-ifeq ($(HOST),ppc-darwin)
-HAVE_DARWIN_OS=1
-endif
-ifeq ($(HOST),powerpc-apple-darwin8)
-HAVE_DARWIN_OS=1
-endif
-
 ifdef HAVE_DARWIN_OS
 export PATH = $(PREFIX)/bin:/bin:/usr/bin
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
 endif
 
-ifeq ($(HOST),i586-pc-beos)
+ifdef HAVE_BEOS
 ifeq ($(HOST),$(BUILD))
 # Compiling on BeOS
 export PATH = $(PREFIX)/bin:.:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/tools/gnupro/bin
@@ -55,14 +48,6 @@ export PATH = $(PREFIX)/bin:/opt/beos-tools/bin:/opt/cross-tools/bin:/usr/bin:/b
 endif
 endif
 
-ifeq ($(HOST),i586-mingw32msvc)
-HAVE_WIN32=1
-endif
-ifeq ($(HOST),i686-pc-cygwin)
-HAVE_WIN32=1
-EXTRA_CFLAGS=-mno-cygwin
-EXTRA_LDFLAGS=-mno-cygwin
-endif
 ifdef HAVE_WIN32
 export PATH := $(PREFIX)/bin:$(PATH)
 export PKG_CONFIG_PATH = $(PREFIX)/lib/pkgconfig
