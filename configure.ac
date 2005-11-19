@@ -2879,7 +2879,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([x264],[-I${real_x264_tree}])
       VLC_ADD_LDFLAGS([x264],[-L${real_x264_tree}])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264}"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264} ${THREAD_LIB}"
       AC_CHECK_LIB(x264, x264_encoder_open, [
         VLC_ADD_BUILTINS([x264])
         VLC_ADD_LDFLAGS([x264],[-lx264])
@@ -2892,7 +2892,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have x264.h])
     fi
   else
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264} ${THREAD_LIB}"
     AC_CHECK_HEADERS(x264.h, [
       AC_CHECK_LIB(x264, x264_encoder_open, [
         VLC_ADD_PLUGINS([x264])
