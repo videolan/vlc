@@ -180,14 +180,14 @@ case "${target_os}" in
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
         VLC_ADD_LDFLAGS([vcdx cddax],[-lwinmm])
-        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync],[-lws2_32])
+        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_rtp access_rtsp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_CPPFLAGS([vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([vlc],[-lws2 -e WinMainCRTStartup])
-        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
+        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_rtp access_rtsp  access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
    fi
     ;;
   *nto*)
@@ -373,7 +373,7 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp sap access_output_udp stream_out_standard],[-lsocket])
+    VLC_ADD_LDFLAGS([access_http access_mms access_udp access_rtp access_rtsp access_tcp access_ftp sap access_output_udp stream_out_standard],[-lsocket])
   ])
 ])
 
@@ -1022,7 +1022,7 @@ VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
 VLC_ADD_PLUGINS([playlist export sgimb m3u nsc xtag])
 VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo magnify])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au ty voc xa nuv])
-VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
+VLC_ADD_PLUGINS([access_directory access_file access_udp access_rtp access_rtsp access_tcp])
 VLC_ADD_PLUGINS([access_http access_mms access_ftp ipv4])
 VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
@@ -1625,7 +1625,7 @@ if test "${enable_dvbpsi}" != "no"
 then
   AC_ARG_WITH(dvbpsi,
   [    --with-dvbpsi=PATH    libdvbpsi headers and libraries])
-  AC_ARG_WITH(dvbpsi,
+  AC_ARG_WITH(dvbpsi-tree,
   [    --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
   case "${with_dvbpsi}" in
   ""|yes)
@@ -1664,7 +1664,7 @@ then
         if test "${enable_sout}" != "no"; then
           VLC_ADD_BUILTINS([mux_ts])
         fi
-        VLC_ADD_CPPFLAGS([mux_ts ts dvb],[-I${real_dvbpsi_tree}/src])
+        VLC_ADD_CPPFLAGS([mux_ts ts dvb],[-I${real_dvbpsi_tree}/src -I${real_dvbpsi_tree}/src/descriptors])
         VLC_ADD_LDFLAGS([mux_ts ts dvb],[${real_dvbpsi_tree}/src/.libs/libdvbpsi.a])
       else
         dnl  The given libdvbpsi wasn't built
@@ -3029,7 +3029,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([x264],[-I${real_x264_tree}])
       VLC_ADD_LDFLAGS([x264],[-L${real_x264_tree}])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264}"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264} ${THREAD_LIB}"
       AC_CHECK_LIB(x264, x264_encoder_open, [
         VLC_ADD_BUILTINS([x264])
         VLC_ADD_LDFLAGS([x264],[-lx264])
@@ -3042,7 +3042,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have x264.h])
     fi
   else
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_x264} ${THREAD_LIB}"
     AC_CHECK_HEADERS(x264.h, [
       AC_CHECK_LIB(x264, x264_encoder_open, [
         VLC_ADD_PLUGINS([x264])
@@ -4906,6 +4906,7 @@ AC_CONFIG_FILES([
   modules/access/pvr/Makefile
   modules/access/v4l/Makefile
   modules/access/cdda/Makefile
+  modules/access/rtp/Makefile
   modules/access/rtsp/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
