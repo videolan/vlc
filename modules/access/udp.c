@@ -564,6 +564,7 @@ static block_t *BlockChoose( access_t *p_access )
     {
         msg_Dbg( p_access, "detected TS over raw UDP" );
         p_access->pf_block = BlockUDP;
+        p_access->info.b_prebuffered = VLC_TRUE;
         return p_block;
     }
 
@@ -581,6 +582,7 @@ static block_t *BlockChoose( access_t *p_access )
     {
         msg_Dbg( p_access, "no supported RTP header detected" );
         p_access->pf_block = BlockUDP;
+        p_access->info.b_prebuffered = VLC_TRUE;
         return p_block;
     }
 
@@ -604,6 +606,7 @@ static block_t *BlockChoose( access_t *p_access )
         default:
             msg_Dbg( p_access, "no RTP header detected" );
             p_access->pf_block = BlockUDP;
+            p_access->info.b_prebuffered = VLC_TRUE;
             return p_block;
     }
 
