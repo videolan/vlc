@@ -27,7 +27,6 @@
 
 #include "../src/skin_common.hpp"
 #include "../utils/pointer.hpp"
-#include "../utils/fsm.hpp"
 #include "../utils/ustring.hpp"
 #include "../utils/observer.hpp"
 #include "../commands/cmd_generic.hpp"
