@@ -2251,8 +2251,7 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
       [
         if test "$with_ffmpeg_mp3lame" = "yes";	then
 		VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
-	fi
-	])
+	fi])
 
     AC_ARG_WITH(ffmpeg-faac,
       [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
@@ -2265,7 +2264,11 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
       [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
       [
         if test "$with_ffmpeg_dts" = "yes"; then
-		VLC_ADD_LDFLAGS([ffmpeg],[-ldts])
+                LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+                AC_CHECK_LIB(dts_pic, dts_free, 
+                  [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
+                  [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
+                LDFLAGS="${LDFLAGS_save}"
 	fi])
 
     AC_ARG_WITH(ffmpeg-zlib,
@@ -2360,7 +2363,11 @@ dnl Trying with pkg-config
       fi
       if fgrep -s "CONFIG_DTS=yes" "${real_ffmpeg_tree}/config.mak"; then
         if test "${with_ffmpeg_dts}" != "yes"; then
-          VLC_ADD_LDFLAGS([ffmpeg],[-ldts])
+          LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+          AC_CHECK_LIB(dts_pic, dts_free, 
+            [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
+            [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
+          LDFLAGS="${LDFLAGS_save}"
         fi
       fi
       if fgrep -s "CONFIG_VORBIS=yes" "${real_ffmpeg_tree}/config.mak"; then
