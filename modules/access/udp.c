@@ -191,16 +191,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set up p_access */
     p_access->pf_read = NULL;
-    if( !strcasecmp( p_access->psz_access, "rtp" )
-          || !strcasecmp( p_access->psz_access, "rtp4" )
-          || !strcasecmp( p_access->psz_access, "rtp6" ) )
-    {
-        p_access->pf_block = BlockRTP;
-    }
-    else
-    {
-        p_access->pf_block = BlockChoose;
-    }
+    p_access->pf_block = BlockChoose;
     p_access->pf_control = Control;
     p_access->pf_seek = NULL;
     p_access->info.i_update = 0;
@@ -528,9 +519,6 @@ static block_t *BlockRTP( access_t *p_access )
         if ( !p ) 
             return NULL;
 
-        if ( !p_access->info.b_prebuffered )
-            return BlockPrebufferRTP( p_access, p );
- 
         rtp_ChainInsert( p_access, p );
     }
 
