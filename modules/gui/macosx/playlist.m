@@ -1657,10 +1657,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         /* If the item is to be dropped as root item of the outline, make it a
            child of the General node.
            Else, choose the proposed parent as parent. */
-        if( item == nil )
-        p_new_parent = p_playlist->p_general;
-        else
-        p_new_parent = [item pointerValue];
+        if( item == nil ) p_new_parent = p_playlist->p_general;
+        else p_new_parent = [item pointerValue];
 
         /* Make sure the proposed parent is a node.
            (This should never be true) */
@@ -1709,8 +1707,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                 else
                 {
                     if ((p_new_parent == p_old_parent &&
-                                   i_old_index < index + (int)i)
-                                   || p_new_parent == p_playlist->p_general )
+                                   i_old_index < index + (int)i) )
                     {
                         i_removed_from_node++;
                     }
