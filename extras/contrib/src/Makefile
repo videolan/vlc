@@ -1315,9 +1315,9 @@ ifdef HAVE_DARWIN_OS
 	(cd $<; cp scripts/makefile.macosx Makefile && make && make install)
 else
 ifdef HAVE_WIN32
-	(cd $<; cp scripts/makefile.cygwin Makefile && make && make install)
+	(cd $<; rm -f INSTALL; cp scripts/makefile.cygwin Makefile && make $(HOSTCC) && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make   && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 endif
 	$(INSTALL_NAME)
 endif 
