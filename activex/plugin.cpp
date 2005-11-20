@@ -484,8 +484,8 @@ HRESULT VLCPlugin::onInit(void)
         /*
         ** default initialization options
         */
-        char *ppsz_argv[10] = { "vlc", "-vv" };
-        int   ppsz_argc = 2;
+        char *ppsz_argv[10] = { "vlc", "-vv", "--no-one-instance" };
+        int   ppsz_argc = 3;
 
         HKEY h_key;
         DWORD i_type, i_data = MAX_PATH + 1;
