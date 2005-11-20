@@ -113,6 +113,10 @@ case $HOST in
             EXTRA_LDFLAGS=" -mno-cygwin"
             echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
         ;;
+    arm-wince-pe)
+            echo "HAVE_WINCE = 1" >> config.mak
+            echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
+        ;;
     *)
         ;;
 esac

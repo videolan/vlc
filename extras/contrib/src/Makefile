@@ -9,6 +9,7 @@
 #          Eric Petit <titer@m0k.org>
 #          Felix Kühne <fkuehne@users.sourceforge.net>
 #          Christophe Mutricy <xtophe@nxtelevision.com>
+#          Gildas Bazin <gbazin at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,7 +103,7 @@ ifdef HAVE_DARWIN_OS
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 else
 
- ifeq ($(HOST),i586-pc-beos)
+ ifdef HAVE_BEOS
   ifeq ($(HOST),$(BUILD))
 # Native build: we need perl, autoconf, etc first
    all: .perl .autoconf .automake .libtool .iconv .intl .freetype .fribidi \
@@ -118,6 +119,7 @@ else
 	.dvdread .dvdnav .dvbpsi .aclocal
   endif
  else
+
   ifdef HAVE_WIN32
 
    all: .iconv .intl .freetype .fribidi .zlib \
@@ -128,7 +130,13 @@ else
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio
+  else
+
+   ifdef HAVE_WINCE
+
+   all: .a52 .mpeg2 .ffmpeg .dvbpsi
    else
+
 # Standard Linux or other UNIX-like systems
    all: .iconv .intl .freetype .fribidi .zlib\
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
@@ -138,8 +146,9 @@ else
 	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal 
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
+   endif
   endif
-  endif
+ endif
 endif
 
 FORCE:
@@ -887,7 +896,6 @@ endif
 	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
-	
 
 CLEAN_FILE += .dvdread
 CLEAN_PKG += libdvdread
