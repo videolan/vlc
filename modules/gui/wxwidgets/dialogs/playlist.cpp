@@ -1016,6 +1016,7 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
     {
         search_current = found;
         treectrl->EnsureVisible( found );
+        treectrl->UnselectAll();
         treectrl->SelectItem( found, true );
     }
 }
