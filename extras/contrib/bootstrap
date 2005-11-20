@@ -51,6 +51,7 @@ echo "PREFIX = `pwd`" >> config.mak
 if test "$HOST" != "$BUILD"; then
     CC="${HOST}-gcc"
     CXX="${HOST}-g++"
+    LD="${HOST}-ld"
     RANLIB="${HOST}-ranlib"
     AR="${HOST}-ar"
 fi
@@ -118,6 +119,7 @@ esac
 
 echo "CC = ${CC}" >> config.mak
 echo "CXX = ${CXX}" >> config.mak
+echo "LD = ${LD}" >> config.mak
 echo "RANLIB = ${RANLIB}" >> config.mak
 echo "AR = ${AR}" >> config.mak
 echo "EXTRA_CFLAGS = ${EXTRA_CFLAGS}" >> config.mak

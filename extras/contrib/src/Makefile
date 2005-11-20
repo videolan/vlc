@@ -54,6 +54,9 @@ endif
 ifneq ($(CXX),)
 HOSTCC+= CXX="$(CXX)"
 endif
+ifneq ($(LD),)
+HOSTCC+= LD="$(LD)"
+endif
 ifneq ($(RANLIB),)
 HOSTCC+= RANLIB="$(RANLIB)"
 endif
@@ -71,10 +74,6 @@ ifneq ($(BUILD),$(HOST))
 HOSTCONF=--host=$(HOST) --build=$(BUILD)
 FFMPEGCONF=--cross-prefix=$(HOST)-
 X264CONF=--crosscompile=$(HOST)
-endif
-
-ifneq ($(BUILD),$(HOST))
-LIVECC=C_COMPILER=$(HOST)-gcc CPP=$(HOST)-cpp CPLUSPLUS_COMPILER=$(HOST)-g++ LINK="$(HOST)-g++ -o" LIBRARY_LINK="$(HOST)-ld -o"
 endif
 
 #
@@ -960,7 +959,7 @@ ifeq ($(HOST),ppc-darwin)
 	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
 else
 ifdef HAVE_WIN32
-	(cd $<;./genMakefiles mingw && make)
+	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
 	(cd $<; ./genMakefiles macosx && make )
 endif
