@@ -52,9 +52,7 @@ case $HOST in
     ppc-darwin)
 # Mac OS X < 10.4
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
-	    echo "EXTRA_CFLAGS =" >> config.mak
-	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
-	    echo "EXTRA_LDLAGS =" >> config.mak
+	    EXTRA_CPPFLAGS=" -no-cpp-precomp"
 	    echo "PATH = /bin:/usr/bin" >> config.mak
 	;;
     powerpc-apple-darwin8)
@@ -65,52 +63,54 @@ case $HOST in
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
             echo "ENVP = MACOSX_DEPLOYMENT_TARGET=10.3" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.0.sdk" >> config.mak
-#	    echo "EXTRA_CFLAGS = -D\${ENVP} -isysroot \${MACOSX_SDK}" >> config.mak
-	    echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
-#	    echo "EXTRA_LDFLAGS = -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}" >> config.mak
+#	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+	    EXTRA_CPPFLAGS=" -no-cpp-precomp"
+#	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin" >> config.mak
         ;;
     i586-pc-beos)
             echo "HAVE_BEOS = 1" >> config.mak
-            echo "EXTRA_CFLAGS =" >> config.mak
-            echo "EXTRA_CPPFLAGS =" >> config.mak
             if test -f /boot/beos/system/lib/libbind.so; then
-                echo "EXTRA_LDFLAGS = -lbind -lsocket" >> config.mak
+                EXTRA_LDFLAGS=" -lbind -lsocket"
             else
-                echo "EXTRA_LDFLAGS = -lnet" >> config.mak
+                EXTRA_LDFLAGS=" -lnet"
             fi
             if test "$HOST" = "$BUILD"; then
-# Compiling on BeOS
-                echo "PATH = .:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/tools/gnupro/bin" >> config.mak
-                echo "LIBRARY_PATH = %A/lib:/boot/home/config/lib:/boot/beos/system/lib" >> config.mak
+#               Compiling on BeOS
+                PATH=".:/boot/home/config/bin:/bin:/boot/apps"
+                PATH="${PATH}:/boot/preferences:/boot/beos/apps"
+                PATH="${PATH}:/boot/beos/preferences"
+                PATH="${PATH}:/boot/develop/tools/gnupro/bin"
+                echo "PATH = ${PATH}" >> config.mak
+                LIBRARY_PATH="${LIBRARY_PATH}:%A/lib:/boot/home/config/lib"
+                LIBRARY_PATH="${LIBRARY_PATH}:/boot/beos/system/lib"
+                echo "LIBRARY_PATH = ${LIBRARY_PATH}" >> config.mak
             else
-# Cross compiling from Linux
-                echo "PATH = /opt/beos-tools/bin:/opt/cross-tools/bin:/usr/bin:/bin" >> config.mak
+#               Cross compiling from Linux
+                PATH="/opt/beos-tools/bin:/opt/cross-tools/bin"
+                PATH="${PATH}:/usr/bin:/bin"
+                echo "PATH = ${PATH}" >> config.mak
             fi
         ;;
     i586-mingw32msvc)
             echo "HAVE_WIN32 = 1" >> config.mak
-            echo "EXTRA_CFLAGS =" >> config.mak
-            echo "EXTRA_CPPFLAGS =" >> config.mak
-            echo "EXTRA_LDFLAGS =" >> config.mak
             echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
-            echo "EXTRA_PATH =" >> config.mak
         ;;
     i686-pc-cygwin)
             echo "HAVE_WIN32 = 1" >> config.mak
-            echo "EXTRA_CFLAGS = -mno-cygwin" >> config.mak
-            echo "EXTRA_CPPFLAGS = -mno-cygwin" >> config.mak
-            echo "EXTRA_LDFLAGS = -mno-cygwin" >> config.mak
+            EXTRA_CFLAGS=" -mno-cygwin"
+            EXTRA_CPPFLAGS=" -mno-cygwin"
+            EXTRA_LDFLAGS=" -mno-cygwin"
             echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
-            echo "EXTRA_PATH =" >> config.mak
         ;;
     *)
-            echo "EXTRA_CFLAGS =" >> config.mak
-            echo "EXTRA_CPPFLAGS =" >> config.mak
-            echo "EXTRA_LDFLAGS =" >> config.mak
-            echo "EXTRA_PATH =" >> config.mak
         ;;
 esac
+
+echo "EXTRA_CFLAGS = $(EXTRA_CFLAGS)" >> config.mak
+echo "EXTRA_CPPFLAGS = $(EXTRA_CPPFLAGS)" >> config.mak
+echo "EXTRA_LDFLAGS = $(EXTRA_LDFLAGS)" >> config.mak
+echo "EXTRA_PATH = $(EXTRA_PATH)" >> config.mak
 
 if which curl >/dev/null; then
 	echo "WGET = curl -O" >> config.mak
