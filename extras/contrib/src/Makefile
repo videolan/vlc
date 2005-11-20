@@ -32,29 +32,10 @@ include ./packages.mak
 # Set a clean environment
 # ***************************************************************************
 
-ifdef HAVE_DARWIN_OS
-export PATH = $(PREFIX)/bin:/bin:/usr/bin
+export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
+export PKG_CONFIG_PATH
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
-endif
-
-ifdef HAVE_BEOS
-ifeq ($(HOST),$(BUILD))
-# Compiling on BeOS
-export PATH = $(PREFIX)/bin:.:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/tools/gnupro/bin
-export LIBRARY_PATH = $(PREFIX)/lib:%A/lib:/boot/home/config/lib:/boot/beos/system/lib
-else
-# Cross compiling from Linux
-export PATH = $(PREFIX)/bin:/opt/beos-tools/bin:/opt/cross-tools/bin:/usr/bin:/bin
-endif
-endif
-
-ifdef HAVE_WIN32
-export PATH := $(PREFIX)/bin:$(PATH)
-export PKG_CONFIG_PATH = $(PREFIX)/lib/pkgconfig
-#EXTRA_CPPFLAGS = /usr/win32/include
-#EXTRA_LDFLAGS = /usr/win32/lib
-endif
-
+export LIBRARY_PATH := $(PREFIX)/lib:$(LIBRARY_PATH)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
