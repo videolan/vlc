@@ -1082,9 +1082,8 @@ msgid "French"
 msgstr "Français"
 
 #: src/libvlc.h:34
-#, fuzzy
 msgid "Galician"
-msgstr "Italien"
+msgstr "Galicien"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:99
 msgid "Italian"
@@ -1688,15 +1687,16 @@ msgstr ""
 "Ceci vous permet de spécifier le format utilisé pour les captures d'écrans."
 
 #: src/libvlc.h:282
-#, fuzzy
 msgid "Video cropping"
-msgstr "Coupe droite de l’image"
+msgstr "Découpage"
 
 #: src/libvlc.h:284
 msgid ""
 "This will force the cropping of the source video. Accepted formats are x:y "
 "(4:3, 16:9, etc.) expressing the global image aspect."
 msgstr ""
+"Ceci forcera la découpe de la source vidéo. Les formats acceptés sont de la "
+"forem x:y (4:3, 16:9, ...) et expriment l'aspect global de l'image."
 
 #: src/libvlc.h:288
 msgid "Source aspect ratio"
@@ -1732,20 +1732,18 @@ msgstr ""
 "standard nécessitant les 1088 lignes."
 
 #: src/libvlc.h:304
-#, fuzzy
 msgid "Monitor pixel aspect ratio"
-msgstr "Format de l'écran"
+msgstr "Aspect des pixels de l'écran"
 
 #: src/libvlc.h:306
-#, fuzzy
 msgid ""
 "This will force the monitor aspect ratio. Most monitors have square pixels "
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
 "order to keep proportions."
 msgstr ""
 "Ceci permet de forcer l'aspect de l'écran. La plupart des écrans utilisent "
-"un format 4:3. Si vous avez un écran 16:9, vous devrez utiliser 16:9 afin de "
-"préserver les proportions"
+"des pixels carrés (1:1). Si vous avez un écran 16:9, vous devrez peut-être "
+"utiliser 4:3 afin de préserver les proportions."
 
 #: src/libvlc.h:310
 msgid "Skip frames"
@@ -3073,16 +3071,13 @@ msgstr ""
 "sélectionné du menu DVD."
 
 #: src/libvlc.h:843
-#, fuzzy
 msgid "Go to the DVD menu"
-msgstr "Activer les menus DVD"
+msgstr "Aller au menu DVD"
 
 #: src/libvlc.h:844
-#, fuzzy
 msgid "Select the key to take you to the DVD menu"
 msgstr ""
-"Sélectionnez la combinaison de touches à utiliser pour activer l’élément "
-"sélectionné du menu DVD."
+"Sélectionnez la combinaison de touches à utiliser pour aller au menu DVD."
 
 #: src/libvlc.h:845
 msgid "Select previous DVD title"
@@ -4256,9 +4251,8 @@ msgid "221:100"
 msgstr "221:100"
 
 #: src/video_output/vout_intf.c:286
-#, fuzzy
 msgid "Aspect-ratio"
-msgstr "Format d’écran"
+msgstr "Aspect"
 
 #: modules/access/cdda.c:42 modules/access/dshow/dshow.cpp:79
 #: modules/access/dvb/access.c:67 modules/access/dvdnav.c:63
@@ -6230,11 +6224,11 @@ msgstr ""
 
 #: modules/audio_filter/converter/a52tofloat32.c:101
 msgid "Enable internal upmixing"
-msgstr ""
+msgstr "Activer le mixage interne"
 
 #: modules/audio_filter/converter/a52tofloat32.c:103
 msgid "Enable the internal upmixing algorithm (not recommended)."
-msgstr ""
+msgstr "Ceci active l'algorithme interne de mixage (non recommandé)"
 
 #: modules/audio_filter/converter/a52tofloat32.c:107
 #: modules/audio_filter/converter/a52tofloat32.c:116
@@ -6850,7 +6844,8 @@ msgstr "Conserver les proportions"
 
 #: modules/codec/fake.c:55
 msgid "If selected, width and height will be considered as maximum values."
-msgstr ""
+msgstr "Si ceci est sélectionné, la hauteur et la largeur seront considérés "
+"comme des valeurs maximales."
 
 #: modules/codec/fake.c:56
 msgid "Background aspect ratio"
@@ -8710,7 +8705,7 @@ msgstr "Démultiplexeur de flux MP4"
 
 #: modules/demux/mpc.c:46 modules/demux/mpc.c:47
 msgid "Replay Gain type"
-msgstr ""
+msgstr "Type de gain de lecture"
 
 #: modules/demux/mpc.c:57
 msgid "MPC demuxer"
@@ -12339,7 +12334,6 @@ msgstr ""
 "votre diffusion."
 
 #: modules/gui/wxwidgets/wizard.cpp:171
-#, fuzzy
 msgid ""
 "When streaming using UDP, you can announce your streams using the SAP/SDP "
 "announcing protocol. This way, the clients won't have to type in the "
