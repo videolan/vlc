@@ -6,20 +6,20 @@ diff -ru live.orig/config.mingw live/config.mingw
  C =                    c
 -C_COMPILER =           gcc
 -C_FLAGS =              $(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__MINGW32__
-+C_COMPILER =           i586-mingw32msvc-gcc
++C_COMPILER =           $(CC)
 +C_FLAGS =              $(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__MINGW32__ -DUSE_LOCALE
  CPP =                  cpp
 -CPLUSPLUS_COMPILER =   c++
 -CPLUSPLUS_FLAGS =      $(COMPILE_OPTS) -D__MINGW32__ -Wall -Wno-deprecated
-+CPLUSPLUS_COMPILER =   i586-mingw32msvc-g++
++CPLUSPLUS_COMPILER =   $(CXX)
 +CPLUSPLUS_FLAGS =      $(COMPILE_OPTS) -D__MINGW32__ -DUSE_LOCALE -Wall -Wno-deprecated 
  OBJ =                  o
 -LINK =                 c++ -o 
-+LINK =                 i586-mingw32msvc-g++ -o 
++LINK =                 $(CXX) -o 
  LINK_OPTS =            -L.
  CONSOLE_LINK_OPTS =    $(LINK_OPTS)
 -LIBRARY_LINK =         ld -o 
-+LIBRARY_LINK =         i586-mingw32msvc-ld -o 
++LIBRARY_LINK =         $(LD) -o 
  LIBRARY_LINK_OPTS =    $(LINK_OPTS) -r -Bstatic
  LIB_SUFFIX =                   a
  LIBS_FOR_CONSOLE_APPLICATION = -lws2_32
