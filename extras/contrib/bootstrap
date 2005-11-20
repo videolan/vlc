@@ -48,6 +48,13 @@ echo "HOST = $HOST" >> config.mak
 
 echo "PREFIX = `pwd`" >> config.mak
 
+if test "$HOST" != "$BUILD"; then
+    CC="${HOST}-gcc"
+    CXX="${HOST}-g++"
+    RANLIB="${HOST}-ranlib"
+    AR="${HOST}-ar"
+fi
+
 case $HOST in
     ppc-darwin)
 # Mac OS X < 10.4
@@ -98,6 +105,8 @@ case $HOST in
         ;;
     i686-pc-cygwin)
             echo "HAVE_WIN32 = 1" >> config.mak
+            CC="gcc -mno-cygwin"
+            CXX="g++ -mno-cygwin"
             EXTRA_CFLAGS=" -mno-cygwin"
             EXTRA_CPPFLAGS=" -mno-cygwin"
             EXTRA_LDFLAGS=" -mno-cygwin"
@@ -107,10 +116,14 @@ case $HOST in
         ;;
 esac
 
-echo "EXTRA_CFLAGS = $(EXTRA_CFLAGS)" >> config.mak
-echo "EXTRA_CPPFLAGS = $(EXTRA_CPPFLAGS)" >> config.mak
-echo "EXTRA_LDFLAGS = $(EXTRA_LDFLAGS)" >> config.mak
-echo "EXTRA_PATH = $(EXTRA_PATH)" >> config.mak
+echo "CC = ${CC}" >> config.mak
+echo "CXX = ${CXX}" >> config.mak
+echo "RANLIB = ${RANLIB}" >> config.mak
+echo "AR = ${AR}" >> config.mak
+echo "EXTRA_CFLAGS = ${EXTRA_CFLAGS}" >> config.mak
+echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS}" >> config.mak
+echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
+echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
 if which curl >/dev/null; then
 	echo "WGET = curl -O" >> config.mak
