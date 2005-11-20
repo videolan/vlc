@@ -875,12 +875,12 @@ libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch  -p 0 < Patches/libdvdread.patch
 ifdef HAVE_WIN32
-	if automake-1.4 --version >/dev/null 2>&1; then \
-		echo "Please get rid of your automake 1.4"; \
-		rm -rf $@ \
-		exit 1; \
-	fi
-	(cd libdvdread;patch -p 0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
+#	if automake-1.4 --version >/dev/null 2>&1; then \
+#		echo "Please get rid of your automake 1.4"; \
+#		rm -rf $@ \
+#		exit 1; \
+#	fi
+	(cd libdvdread; patch -p 0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
 endif
 
 .dvdread: libdvdread .dvdcss
@@ -1376,8 +1376,11 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 #	patch -p 0 < Patches/gcrypt.patch
 
 .gcrypt: libgcrypt .gpg-error
+ifdef HAVE_WIN32
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
-#	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install)
+endif
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1397,11 +1400,11 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	(cd gnutls/gl ;ln -s alloca_.h alloca.h)
 
 .gnutls: gnutls .gcrypt .gpg-error
-#ifdef HAVE_WIN32
+ifdef HAVE_WIN32
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc && cd crypto && make && cd ../gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && cd crypto && make && cd ../gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
-#else
-#	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)"  && cd lib &&make && make install)
-#endif
+endif
 	$(INSTALL_NAME)
 	touch $@
 
