@@ -598,6 +598,8 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
                 listview->InsertItem( i, filename );
                 listview->SetItem( i, 1, wxL2U( p_playlist->pp_items[i]->
                                                             input.psz_uri) );
+                listview->SetItemData( i,
+                                  (long)p_playlist->pp_items[i]->input.i_id );
             }
             listview->Select( p_playlist->i_index , TRUE);
             mainSizer->Add( listview, 1, wxALL|wxEXPAND, 5 );
@@ -722,14 +724,25 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
     else
     {
         int i = -1;
-        wxListItem listitem;
         i = listview->GetNextItem( i , wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
         if( i != -1 )
         {
-            listitem.SetId( i );
-            listitem.SetColumn( 1 );
-            listview->GetItem( listitem );
-            p_parent->SetMrl( (const char*) listitem.GetText().mb_str() );
+            long data = listview->GetItemData( i );            
+            playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                      VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
+            if( p_playlist )
+            {
+                playlist_item_t * p_item = playlist_LockItemGetById(
+                                                   p_playlist, (int)data );
+                if( p_item )
+                {
+                    p_parent->SetMrl( (const char*)p_item->input.psz_uri );
+                }
+                else
+                    event.Veto();
+            }
+            else
+                event.Veto();
         }
     }
     if( enable_checkbox->IsChecked() )
