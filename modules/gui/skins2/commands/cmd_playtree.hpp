@@ -2,7 +2,7 @@
  * cmd_playtree.hpp
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: cmd_playlist.hpp 9934 2005-02-15 13:55:08Z courmisch $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *

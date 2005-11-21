@@ -2,7 +2,7 @@
  * cmd_playtree.cpp
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: cmd_playlist.cpp 10101 2005-03-02 16:47:31Z robux4 $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *

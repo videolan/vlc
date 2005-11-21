@@ -336,12 +336,31 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
         Move( p );
 
     /* Set minimum window size to prevent user from glitching it */
+    wxSize  s2;
     s = GetSize();
+
+    /* save smallest possible default minimum size */
+    default_size = GetSize();
+
+    /* save slider size for height only for MinSizing */
+    slider_size = slider_sizer->GetSize();
+
+    /* and save extended gui size for MinSize scheme */
+    s2 = extra_frame->GetSize();
+    s2.SetWidth( s2.GetWidth() +
+                2 * wxSystemSettings::GetMetric( wxSYS_FRAMESIZE_X ) );
+    extended_size = s2;
+
+    /* Set initial minimum window size */
     if( config_GetInt( p_intf, "wx-embed" ) )
     {
-        wxSize  s2;
         s2 = video_window->GetSize();
         s.SetHeight( s.GetHeight() - s2.GetHeight() );
+    }
+    if( config_GetInt( p_intf, "wx-extended" ) )
+    {
+        s.SetWidth( extended_size.GetWidth() );
+        s.SetHeight( s.GetHeight() + extended_size.GetHeight() );
     }
 #if (wxCHECK_VERSION(2,5,4))
     SetMinSize( s );
@@ -506,22 +525,14 @@ void Interface::CreateOurMenuBar()
     HDC hdc = GetDC( NULL );
     for( unsigned int i = 0; i < menubar->GetMenuCount(); i++ )
     {
-        //                [ MENU BUTTON WIDTH CALCULATION ]
-        // [ SM_CXDLGFRAME + pixels + textextent + pixels + SM_CXDLGFRAME ]
         GetTextExtentPoint32( hdc, menubar->GetLabelTop(i).c_str(),
                                 menubar->GetLabelTop(i).Length(), &sizing );
-        // + text size..
-        i_size += sizing.cx;
-        // +1 more pixel on each size
-        i_size += 2;
-        // width of 2 DLGFRAME
-        i_size += GetSystemMetrics( SM_CXDLGFRAME ) * 2;
+
+        // [ SM_CXDLGFRAME + pixels + textextent + pixels + SM_CXDLGFRAME ]
+        i_size += sizing.cx + 2 + GetSystemMetrics( SM_CXDLGFRAME ) * 2;
     }
     ReleaseDC( NULL, hdc );
-    // Width of 2 edges of app window
-    i_size += GetSystemMetrics( SM_CXSIZEFRAME ) * 2;
-    // + 2 more pixels on each side..
-    i_size += 4;
+    i_size += GetSystemMetrics( SM_CXSIZEFRAME ) * 2 + 4;
 #endif
 /* End patch by zcot */
 
@@ -762,11 +773,27 @@ void Interface::ShowSlider( bool show, bool layout )
 
         //prevent continuous layout
         if( slider_frame->IsShown() ) return;
+        
+        wxSize ms = GetMinSize();
+        ms.SetHeight( ms.GetHeight() + slider_size.GetHeight() );
+#if ( wxCHECK_VERSION( 2,5,4 ) )
+        SetMinSize( ms );
+#else
+        frame_sizer->SetMinSize( ms );
+#endif
     }
     else
     {
         //prevent continuous layout
         if( !slider_frame->IsShown() ) return;
+        
+        wxSize ms = GetMinSize();
+        ms.SetHeight( ms.GetHeight() - slider_size.GetHeight() );
+#if ( wxCHECK_VERSION( 2,5,4 ) )
+        SetMinSize( ms );
+#else
+        frame_sizer->SetMinSize( ms );
+#endif
     }
 
     if( layout && p_intf->p_sys->b_video_autosize )
@@ -1009,11 +1036,27 @@ void Interface::OnExtended(wxCommandEvent& event)
     {
         extra_frame->Hide();
         frame_sizer->Hide( extra_frame );
+        wxSize ms = GetMinSize();
+        ms.SetHeight( ms.GetHeight() - extended_size.GetHeight() );
+        ms.SetWidth( default_size.GetWidth() );
+#if ( wxCHECK_VERSION( 2,5,4 ) )
+        SetMinSize( ms );
+#else
+        frame_sizer->SetMinSize( ms );
+#endif
     }
     else
     {
         extra_frame->Show();
         frame_sizer->Show( extra_frame );
+        wxSize ms = GetMinSize();
+        ms.SetHeight( ms.GetHeight() + extended_size.GetHeight() );
+        ms.SetWidth( extended_size.GetWidth() );
+#if ( wxCHECK_VERSION( 2,5,4 ) )
+        SetMinSize( ms );
+#else
+        frame_sizer->SetMinSize( ms );
+#endif
     }
     frame_sizer->Layout();
     frame_sizer->Fit(this);

@@ -1,4 +1,4 @@
-dnl $Id: configure.ac,v 1.2 2004/02/13 11:33:38 rocky Exp $
+dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(manual.xml.in,0.0.1)

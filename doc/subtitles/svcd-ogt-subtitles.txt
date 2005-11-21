@@ -1,4 +1,4 @@
-$Id: svcd-ogt-subtitles.txt,v 1.2 2004/02/13 00:57:03 rocky Exp $
+$Id$
 The following information is culled from information from 
 Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
 by Rocky Bernstein. 

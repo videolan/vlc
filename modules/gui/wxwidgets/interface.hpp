@@ -187,6 +187,11 @@ namespace wxvlc
         wxMenu *p_audio_menu;
         wxMenu *p_video_menu;
         wxMenu *p_navig_menu;
+
+        /* utility dimensions */
+        wxSize default_size;
+        wxSize extended_size;
+        wxSize slider_size;
     };
 
 

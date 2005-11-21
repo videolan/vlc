@@ -544,4 +544,4 @@ http://www.vcdhelp.com/
 http://www.vcdimager.org/
 http://www.vcdimager.org/guides/#guides
 
-$Id: intf-vcd.txt,v 1.5 2004/02/11 12:37:28 rocky Exp $
+$Id$
