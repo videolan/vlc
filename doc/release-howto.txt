@@ -4,99 +4,77 @@
   Release HOWTO
  - - - - - - - -
 
- * Tests préalables (compilation, regression test, etc.) (on ne rit pas)
+ * Tests : compilation, regression tests ...
 
- * Opérations sur la repository
+ * Changes on the svn repository
 
-  - générer un timestamp de release (par exemple avec 822-date)
-  - updater le numéro de version partout où c'est nécessaire
-     · configure.ac (relancer autoconf)
+  - update the version number everywhere it's needed
+     · configure.ac (rerun autoconf)
      · vlc.spec
-     · ipkg/control
+     · ipkg/control (does this still work ?)
      · debian/changelog
      · extras/MacOSX/vlc.pbprj/project.pbxproj
      · extras/MacOSX/Resources/English.lproj/InfoPlist.string
-  - mettre à jour les ChangeLog et la TODO list pour ceux qui auraient
-    étourdiment oublié de l'updater à chaque commit
-  - updater le numéro de version et le timestamp dans :
-     · vlc.spec
-     · ChangeLog
-     · debian/changelog
-  - updater debian/changelog (laissez faire sam si vous ne savez pas
-    comment faire)
+  - update the ChangeLog and NEWS files, as well as the Trac database
+     · ./toolbox --changelog
+     · read all the commits and add important things to the NEWS file
+     · update the milestones info on https://trac.videolan.org/vlc
+  - update debian/changelog
 
  * Commit
 
- * Tarballs
+ * Tarballs (Use a clean tree !!!)
 
-  - créer le tar.gz du vlc avec `make dist'.
-  - copier le tar.gz sur brahma, dans /opt/ftp/pub/vlc/XXX/
-  - si les répertoires créés ne sont pas en g+w, corriger cela
+  - make the VLC tar.gz and tar.bz2 files with `make dist'.
+  - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
+    /opt/ftp/pub/videolan/vlc/vlc-X.X.X/
+  - generate md5 hashes of these files
 
- * Packages Debian
-
-    mv vlc-XXX.tar.gz vlc_XXX.orig.tar.gz
-    tar xvzf vlc_XXX.orig.tar.gz
-    cd vlc-XXX
-    dpkg-buildpackage -rfakeroot
-    if [ $LOGNAME = sam ]; then debupload ../*XXX*; fi
-    # copier les fichiers créés sur brahma, dans /opt/ftp/pub/vlc/XXX/deb/
-
- * Packages RPM
-
-    rpm -ta vlc-XXX.tar.gz
-    # copier les fichiers créés sur brahma, dans /opt/ftp/pub/vlc/XXX/rpm/
-
- * Packages BeOS
+ * BeOS Packages
 
     builder: http://developers.videolan.org/vlc/beos-compile.html
-    # copier les .zip créés sur brahma, dans /opt/ftp/pub/vlc/XXX/beos/
+    # add the .zip files to /opt/ftp/pub/videolan/vlc/vlc-X.X.X/beos/
 
- * Packages Win32
+ * Win32 Packages
 
-    # aller sur vthr
-    tar xvzf vlc-XXX.tar.gz
-    cd vlc-XXX
-    configure-win32 --enable-release --disable-gtk --disable-sdl
-    make
-    make package-win32
-    # copier le .exe créé sur brahma, dans /opt/ftp/pub/vlc/XXX/win32/
+    make the packages using the nightly builds configure/options/...
+    add the .zip and .exe files to /opt/ftp/pub/videolan/vlc/vlc-X.X.X/win32/
 
- * Commit (ben oui, faut pas croire que tout aura marché du premier coup)
+ * Commit changes ... it never works the first time
 
- * Tag, selon le schéma v0_2_92 pour 0.2.92
+ * "Tag" the release
+   svn cp svn://svn.videolan.org/vlc/trunk svn://svn.videolan.org/vlc/tag/X.X.X
+   or
+   svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
 
- * Update sur le web
+ * Update the website
 
-  - le web se trouve dans /var/www/www.videolan.org/
-  - éditer vlc/download.html pour mettre à jour les tarballs
-  - éditer news.msg pour mettre une petite bafouille sur la release, en
-    s'inspirant des releases précédentes et du changelog quand on n'a pas
-    d'idées
+  - edit the /index.php /vlc/*.php pages
+  - add a news item to news.msg
 
- * Annonce sur www.gnome.org
+ * Announce on www.gnome.org
 
-  - cliquer à gauche sur "Get more software"
-  - cliquer sur "Edit an existing map entry"
-  - rentrer 'vlc' comme nom de package
-  - mettre à jour le numéro de version et d'éventuels détails, et submit
-  - l'update est instantanée
+  - click on "Get more software"
+  - click on "Edit an existing map entry"
+  - look for the 'vlc' package
+  - update the version number and other info and submit
+  - the change is instantaneaous
 
- * Annonce sur www.freshmeat.net
+ * Announce on www.freshmeat.net
 
-  - il faut avoir un compte sur freshmeat
-  - aller sur http://www.freshmeat.net/projects/vlc/
-  - cliquer sur la branche de la release, par exemple Ourumov
-  - choisir "add release" dans le menu déroulant
-  - remplir tout le bazar, et submit
-  - l'update peut mettre plusieurs heures
+  - you need a freshmeat account
+  - go to http://www.freshmeat.net/projects/vlc/
+  - click on the release's branch (ie Stable)
+  - chose "add release" in the dropdown menu
+  - fill out all the info and submit
+  - the update can take several hours
 
- * Annonce sur VersionTracker
+ * Announce on VersionTracker
 
-  - demander à Meuuh pour le moment
+  - ask Meuuh
 
- * Mail d'annonce
+ * Announce email
 
-  - s'inspirer du format des annonces précédentes
-  - poster dans videolan-announce, vlc et vlc-devel
-
+  - write something along the lines of previous releases
+  - post in videolan-announce (moderated), vlc et vlc-devel
+  - add a sticky thread in the "General VLC media player discussion" forum
