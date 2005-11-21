@@ -1,0 +1,839 @@
+Index: ../ffmpeg/configure
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/configure,v
+retrieving revision 1.215
+diff -u -r1.215 configure
+--- ../ffmpeg/configure	22 Oct 2005 19:17:39 -0000	1.215
++++ ../ffmpeg/configure	21 Nov 2005 23:01:53 -0000
+@@ -26,6 +26,7 @@
+ echo "  --enable-xvid            enable XviD support via xvidcore [default=no]"
+ echo "  --enable-x264            enable H.264 encoding via x264 [default=no]"
+ echo "  --enable-mingw32         enable MinGW native/cross Windows compile"
++echo "  --enable-mingwce         enable MinGW native/cross WinCE compile"
+ echo "  --enable-a52             enable GPLed A52 support [default=no]"
+ echo "  --enable-a52bin          open liba52.so.0 at runtime [default=no]"
+ echo "  --enable-dts             enable GPLed DTS support [default=no]"
+@@ -74,6 +75,7 @@
+ echo "  --disable-opts           disable compiler optimizations"
+ echo "  --disable-mpegaudio-hp   faster (but less accurate)"
+ echo "                           MPEG audio decoding [default=no]"
++echo "  --disable-protocols      disable I/O protocols support [default=no]"
+ echo "  --disable-ffserver       disable ffserver build"
+ echo "  --disable-ffplay         disable ffplay build"
+ echo "  --enable-small           optimize for size instead of speed"
+@@ -199,6 +201,7 @@
+ pp="no"
+ shared_pp="no"
+ mingw32="no"
++mingwce="no"
+ cygwin="no"
+ os2="no"
+ lshared="no"
+@@ -218,6 +221,7 @@
+ SHFLAGS=-shared
+ netserver="no"
+ need_inet_aton="no"
++protocols="yes"
+ ffserver="yes"
+ ffplay="yes"
+ LIBOBJFLAGS=""
+@@ -534,6 +538,8 @@
+   ;;
+   --enable-mingw32) mingw32="yes"
+   ;;
++  --enable-mingwce) mingwce="yes"
++  ;;
+   --enable-shared) lshared="yes"
+   ;;
+   --disable-debug) debug="no"
+@@ -542,6 +548,8 @@
+   ;;
+   --disable-mpegaudio-hp) mpegaudio_hp="no"
+   ;;
++  --disable-protocols) protocols="no"
++  ;;
+   --disable-ffserver) ffserver="no"
+   ;;
+   --disable-ffplay) ffplay="no"
+@@ -847,7 +855,7 @@
+ $cc -o $TMPE $TMPC 2> /dev/null || mmi="no"
+ fi
+ 
+-if test "$mingw32" = "yes" ; then
++if test "$mingw32" = "yes" -o "$mingwce" = "yes"; then
+     v4l="no"
+     bktr="no"
+     audio_oss="no"
+@@ -855,6 +863,9 @@
+     dc1394="no"
+     ffserver="no"
+     network="no"
++if test "$mingw32" = "yes"; then
++    protocols="no"
++fi
+     SLIBPREF=""
+     SLIBSUF=".dll"
+     EXESUF=".exe"
+@@ -1621,6 +1632,16 @@
+   echo "#endif" >> $TMPH
+ fi
+ 
++if test "$mingwce" = "yes" ; then
++  echo "#define CONFIG_WIN32 1" >> $TMPH
++  echo "CONFIG_WIN32=yes" >> config.mak
++  echo "#define CONFIG_WINCE 1" >> $TMPH
++  echo "CONFIG_WINCE=yes" >> config.mak
++  echo "#ifndef __MINGW32__" >> $TMPH
++  echo "#define __MINGW32__ 1" >> $TMPH
++  echo "#endif" >> $TMPH
++fi
++
+ if test "$os2" = "yes" ; then
+   echo "#define CONFIG_OS2 1" >> $TMPH
+   echo "CONFIG_OS2=yes" >> config.mak
+@@ -1671,6 +1692,11 @@
+   echo "#define SIMPLE_IDCT 1" >> $TMPH
+ fi
+ 
++if test "$protocols" = "yes" ; then
++  echo "#define CONFIG_PROTOCOLS 1" >> $TMPH
++  echo "CONFIG_PROTOCOLS=yes" >> config.mak
++fi
++
+ if test "$ffserver" = "yes" ; then
+   echo "#define CONFIG_FFSERVER 1" >> $TMPH
+   echo "CONFIG_FFSERVER=yes" >> config.mak
+Index: ../ffmpeg/libavcodec/4xm.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/4xm.c,v
+retrieving revision 1.15
+diff -u -r1.15 4xm.c
+--- ../ffmpeg/libavcodec/4xm.c	24 Apr 2005 17:21:07 -0000	1.15
++++ ../ffmpeg/libavcodec/4xm.c	21 Nov 2005 23:01:53 -0000
+@@ -26,9 +26,6 @@
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ #define BLOCK_TYPE_VLC_BITS 5
+ #define ACDC_VLC_BITS 9
+ 
+Index: ../ffmpeg/libavcodec/asv1.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/asv1.c,v
+retrieving revision 1.18
+diff -u -r1.18 asv1.c
+--- ../ffmpeg/libavcodec/asv1.c	7 May 2005 19:24:07 -0000	1.18
++++ ../ffmpeg/libavcodec/asv1.c	21 Nov 2005 23:01:53 -0000
+@@ -26,9 +26,6 @@
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ #define VLC_BITS 6
+ #define ASV2_LEVEL_VLC_BITS 10
+  
+Index: ../ffmpeg/libavcodec/cabac.h
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/cabac.h,v
+retrieving revision 1.11
+diff -u -r1.11 cabac.h
+--- ../ffmpeg/libavcodec/cabac.h	29 May 2005 18:18:13 -0000	1.11
++++ ../ffmpeg/libavcodec/cabac.h	21 Nov 2005 23:01:54 -0000
+@@ -24,9 +24,6 @@
+  */
+ 
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define CABAC_BITS 8
+ #define CABAC_MASK ((1<<CABAC_BITS)-1)
+ 
+Index: ../ffmpeg/libavcodec/dv.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/dv.c,v
+retrieving revision 1.65
+diff -u -r1.65 dv.c
+--- ../ffmpeg/libavcodec/dv.c	2 Sep 2005 08:30:26 -0000	1.65
++++ ../ffmpeg/libavcodec/dv.c	21 Nov 2005 23:01:54 -0000
+@@ -34,9 +34,6 @@
+ #include "simple_idct.h"
+ #include "dvdata.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ typedef struct DVVideoContext {
+     const DVprofile* sys;
+     AVFrame picture;
+Index: ../ffmpeg/libavcodec/dvdsubenc.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/dvdsubenc.c,v
+retrieving revision 1.1
+diff -u -r1.1 dvdsubenc.c
+--- ../ffmpeg/libavcodec/dvdsubenc.c	14 Nov 2005 22:17:29 -0000	1.1
++++ ../ffmpeg/libavcodec/dvdsubenc.c	21 Nov 2005 23:01:54 -0000
+@@ -18,9 +18,6 @@
+  */
+ #include "avcodec.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ typedef struct DVDSubtitleContext {
+ } DVDSubtitleContext;
+ 
+Index: ../ffmpeg/libavcodec/flac.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/flac.c,v
+retrieving revision 1.19
+diff -u -r1.19 flac.c
+--- ../ffmpeg/libavcodec/flac.c	5 Sep 2005 09:28:46 -0000	1.19
++++ ../ffmpeg/libavcodec/flac.c	21 Nov 2005 23:01:54 -0000
+@@ -37,9 +37,6 @@
+ #include "bitstream.h"
+ #include "golomb.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define MAX_CHANNELS 8
+ #define MAX_BLOCKSIZE 65535
+ #define FLAC_STREAMINFO_SIZE 34
+Index: ../ffmpeg/libavcodec/h263.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/h263.c,v
+retrieving revision 1.291
+diff -u -r1.291 h263.c
+--- ../ffmpeg/libavcodec/h263.c	19 Sep 2005 12:03:51 -0000	1.291
++++ ../ffmpeg/libavcodec/h263.c	21 Nov 2005 23:01:56 -0000
+@@ -39,9 +39,6 @@
+ #include "h263data.h"
+ #include "mpeg4data.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ #define INTRA_MCBPC_VLC_BITS 6
+ #define INTER_MCBPC_VLC_BITS 7
+ #define CBPY_VLC_BITS 6
+Index: ../ffmpeg/libavcodec/h264.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/h264.c,v
+retrieving revision 1.166
+diff -u -r1.166 h264.c
+--- ../ffmpeg/libavcodec/h264.c	10 Nov 2005 04:40:49 -0000	1.166
++++ ../ffmpeg/libavcodec/h264.c	21 Nov 2005 23:01:59 -0000
+@@ -33,9 +33,6 @@
+ 
+ #include "cabac.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define interlaced_dct interlaced_dct_is_a_bad_name
+ #define mb_intra mb_intra_isnt_initalized_see_mb_type
+ 
+Index: ../ffmpeg/libavcodec/mdec.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mdec.c,v
+retrieving revision 1.15
+diff -u -r1.15 mdec.c
+--- ../ffmpeg/libavcodec/mdec.c	13 Aug 2005 21:34:24 -0000	1.15
++++ ../ffmpeg/libavcodec/mdec.c	21 Nov 2005 23:01:59 -0000
+@@ -29,9 +29,6 @@
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ typedef struct MDECContext{
+     AVCodecContext *avctx;
+     DSPContext dsp;
+Index: ../ffmpeg/libavcodec/mjpeg.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mjpeg.c,v
+retrieving revision 1.114
+diff -u -r1.114 mjpeg.c
+--- ../ffmpeg/libavcodec/mjpeg.c	18 Sep 2005 21:21:01 -0000	1.114
++++ ../ffmpeg/libavcodec/mjpeg.c	21 Nov 2005 23:02:00 -0000
+@@ -28,9 +28,6 @@
+  * MJPEG encoder and decoder.
+  */
+  
+-//#define DEBUG
+-#include <assert.h>
+-
+ #include "avcodec.h"
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+Index: ../ffmpeg/libavcodec/motion_est.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/motion_est.c,v
+retrieving revision 1.110
+diff -u -r1.110 motion_est.c
+--- ../ffmpeg/libavcodec/motion_est.c	26 Aug 2005 19:05:44 -0000	1.110
++++ ../ffmpeg/libavcodec/motion_est.c	21 Nov 2005 23:02:01 -0000
+@@ -33,9 +33,6 @@
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define SQ(a) ((a)*(a))
+ 
+ #define P_LEFT P[1]
+Index: ../ffmpeg/libavcodec/mpeg12.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mpeg12.c,v
+retrieving revision 1.243
+diff -u -r1.243 mpeg12.c
+--- ../ffmpeg/libavcodec/mpeg12.c	20 Nov 2005 23:09:05 -0000	1.243
++++ ../ffmpeg/libavcodec/mpeg12.c	21 Nov 2005 23:02:02 -0000
+@@ -30,9 +30,6 @@
+ 
+ #include "mpeg12data.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ 
+ /* Start codes. */
+ #define SEQ_END_CODE		0x000001b7
+Index: ../ffmpeg/libavcodec/mpegvideo.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mpegvideo.c,v
+retrieving revision 1.489
+diff -u -r1.489 mpegvideo.c
+--- ../ffmpeg/libavcodec/mpegvideo.c	5 Nov 2005 00:16:03 -0000	1.489
++++ ../ffmpeg/libavcodec/mpegvideo.c	21 Nov 2005 23:02:04 -0000
+@@ -35,9 +35,6 @@
+ #include "fastmemcpy.h"
+ #endif
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ #ifdef CONFIG_ENCODERS
+ static void encode_picture(MpegEncContext *s, int picture_number);
+ #endif //CONFIG_ENCODERS
+Index: ../ffmpeg/libavcodec/oggvorbis.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/oggvorbis.c,v
+retrieving revision 1.24
+diff -u -r1.24 oggvorbis.c
+--- ../ffmpeg/libavcodec/oggvorbis.c	21 Sep 2005 23:09:16 -0000	1.24
++++ ../ffmpeg/libavcodec/oggvorbis.c	21 Nov 2005 23:02:04 -0000
+@@ -8,9 +8,6 @@
+ 
+ #include "avcodec.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define OGGVORBIS_FRAME_SIZE 64
+ 
+ #define BUFFER_SIZE (1024*64)
+Index: ../ffmpeg/libavcodec/qdm2.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/qdm2.c,v
+retrieving revision 1.2
+diff -u -r1.2 qdm2.c
+--- ../ffmpeg/libavcodec/qdm2.c	19 Oct 2005 22:27:34 -0000	1.2
++++ ../ffmpeg/libavcodec/qdm2.c	21 Nov 2005 23:02:05 -0000
+@@ -46,9 +46,6 @@
+ 
+ #include "qdm2data.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ 
+ #define SOFTCLIP_THRESHOLD 27600
+ #define HARDCLIP_THRESHOLD 35716
+Index: ../ffmpeg/libavcodec/ratecontrol.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/ratecontrol.c,v
+retrieving revision 1.49
+diff -u -r1.49 ratecontrol.c
+--- ../ffmpeg/libavcodec/ratecontrol.c	30 Apr 2005 21:43:57 -0000	1.49
++++ ../ffmpeg/libavcodec/ratecontrol.c	21 Nov 2005 23:02:05 -0000
+@@ -27,9 +27,6 @@
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+ 
+-#undef NDEBUG // allways check asserts, the speed effect is far too small to disable them
+-#include <assert.h>
+-
+ #ifndef M_E
+ #define M_E 2.718281828
+ #endif
+Index: ../ffmpeg/libavcodec/snow.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/snow.c,v
+retrieving revision 1.63
+diff -u -r1.63 snow.c
+--- ../ffmpeg/libavcodec/snow.c	21 Sep 2005 23:09:16 -0000	1.63
++++ ../ffmpeg/libavcodec/snow.c	21 Nov 2005 23:02:06 -0000
+@@ -25,9 +25,6 @@
+ 
+ #include "mpegvideo.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define MAX_DECOMPOSITIONS 8
+ #define MAX_PLANES 4
+ #define DWTELEM int
+Index: ../ffmpeg/libavcodec/svq1.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/svq1.c,v
+retrieving revision 1.58
+diff -u -r1.58 svq1.c
+--- ../ffmpeg/libavcodec/svq1.c	5 Sep 2005 10:26:10 -0000	1.58
++++ ../ffmpeg/libavcodec/svq1.c	21 Nov 2005 23:02:07 -0000
+@@ -45,9 +45,6 @@
+ #include "mpegvideo.h"
+ #include "bswap.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ extern const uint8_t mvtab[33][2];
+ 
+ static VLC svq1_block_type;
+Index: ../ffmpeg/libavcodec/vc9.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/vc9.c,v
+retrieving revision 1.24
+diff -u -r1.24 vc9.c
+--- ../ffmpeg/libavcodec/vc9.c	21 Sep 2005 23:09:16 -0000	1.24
++++ ../ffmpeg/libavcodec/vc9.c	21 Nov 2005 23:02:08 -0000
+@@ -33,9 +33,6 @@
+ #include "mpegvideo.h"
+ #include "vc9data.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ extern const uint32_t ff_table0_dc_lum[120][2], ff_table1_dc_lum[120][2];
+ extern const uint32_t ff_table0_dc_chroma[120][2], ff_table1_dc_chroma[120][2];
+ extern VLC ff_msmp4_dc_luma_vlc[2], ff_msmp4_dc_chroma_vlc[2];
+Index: ../ffmpeg/libavcodec/vcr1.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/vcr1.c,v
+retrieving revision 1.8
+diff -u -r1.8 vcr1.c
+--- ../ffmpeg/libavcodec/vcr1.c	24 Feb 2005 19:08:50 -0000	1.8
++++ ../ffmpeg/libavcodec/vcr1.c	21 Nov 2005 23:02:08 -0000
+@@ -25,9 +25,6 @@
+ #include "avcodec.h"
+ #include "mpegvideo.h"
+ 
+-//#undef NDEBUG
+-//#include <assert.h>
+-
+ typedef struct VCR1Context{
+     AVCodecContext *avctx;
+     AVFrame picture;
+Index: ../ffmpeg/libavcodec/vorbis.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/vorbis.c,v
+retrieving revision 1.11
+diff -u -r1.11 vorbis.c
+--- ../ffmpeg/libavcodec/vorbis.c	30 May 2005 22:02:00 -0000	1.11
++++ ../ffmpeg/libavcodec/vorbis.c	21 Nov 2005 23:02:08 -0000
+@@ -38,9 +38,6 @@
+ #define AV_DEBUG(...)
+ #endif
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ /* Helper functions */
+ 
+ /**
+Index: ../ffmpeg/libavcodec/xvmcvideo.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/xvmcvideo.c,v
+retrieving revision 1.11
+diff -u -r1.11 xvmcvideo.c
+--- ../ffmpeg/libavcodec/xvmcvideo.c	24 Apr 2005 17:21:10 -0000	1.11
++++ ../ffmpeg/libavcodec/xvmcvideo.c	21 Nov 2005 23:02:08 -0000
+@@ -24,9 +24,6 @@
+ #include "dsputil.h"
+ #include "mpegvideo.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #ifdef USE_FASTMEMCPY
+ #include "fastmemcpy.h"
+ #endif
+Index: ../ffmpeg/libavcodec/libpostproc/Makefile
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/libpostproc/Makefile,v
+retrieving revision 1.26
+diff -u -r1.26 Makefile
+--- ../ffmpeg/libavcodec/libpostproc/Makefile	26 Sep 2005 10:05:13 -0000	1.26
++++ ../ffmpeg/libavcodec/libpostproc/Makefile	21 Nov 2005 23:02:09 -0000
+@@ -56,7 +56,7 @@
+ 	$(AR) rc $@ $(PPOBJS)
+ 	$(RANLIB) $@
+ 
+-install: all
++installlib: all
+ ifeq ($(SHARED_PP),yes)
+ ifeq ($(CONFIG_WIN32),yes)
+ 	install $(INSTALLSTRIP) -m 755 $(SPPLIBNAME) "$(prefix)"
+Index: ../ffmpeg/libavformat/Makefile
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/Makefile,v
+retrieving revision 1.102
+diff -u -r1.102 Makefile
+--- ../ffmpeg/libavformat/Makefile	7 Nov 2005 01:32:29 -0000	1.102
++++ ../ffmpeg/libavformat/Makefile	21 Nov 2005 23:02:09 -0000
+@@ -11,13 +11,20 @@
+ OBJS= utils.o cutils.o os_support.o allformats.o
+ PPOBJS=
+ 
+-# mux and demuxes
+-OBJS+=mpeg.o mpegts.o mpegtsenc.o ffm.o crc.o img.o img2.o raw.o rm.o \
+-      avienc.o avidec.o wav.o mmf.o swf.o au.o gif.o mov.o mpjpeg.o dv.o \
+-      yuv4mpeg.o 4xm.o flvenc.o flvdec.o movenc.o psxstr.o idroq.o ipmovie.o \
++# demuxes
++OBJS+=mpeg.o mpegts.o img.o img2.o raw.o rm.o \
++      avidec.o wav.o mmf.o swf.o au.o gif.o mov.o mpjpeg.o dv.o \
++      yuv4mpeg.o 4xm.o flvdec.o psxstr.o idroq.o ipmovie.o \
+       nut.o wc3movie.o mp3.o westwood.o segafilm.o idcin.o flic.o \
+-      sierravmd.o matroska.o sol.o electronicarts.o nsvdec.o asf.o asf-enc.o \
++      sierravmd.o matroska.o sol.o electronicarts.o nsvdec.o asf.o \
+       ogg2.o oggparsevorbis.o oggparsetheora.o oggparseflac.o daud.o
++
++# muxers
++ifeq ($(CONFIG_MUXERS),yes)
++OBJS+= mpegtsenc.o crc.o avienc.o flvenc.o movenc.o asf-enc.o
++endif
++
++
+ AMROBJS=
+ ifeq ($(AMR_NB),yes)
+ AMROBJS= amr.o
+@@ -32,8 +39,6 @@
+ 
+ # image formats
+ OBJS+= pnm.o yuv.o png.o jpeg.o gifdec.o sgi.o
+-# file I/O
+-OBJS+= avio.o aviobuf.o file.o 
+ OBJS+= framehook.o 
+ 
+ ifeq ($(CONFIG_VIDEO4LINUX),yes)
+@@ -62,6 +67,15 @@
+ PPOBJS+= beosaudio.o
+ endif
+ 
++ifeq ($(CONFIG_FFSERVER),yes)
++OBJS+= ffm.o
++endif
++
++# protocols I/O
++OBJS+= avio.o aviobuf.o
++
++ifeq ($(CONFIG_PROTOCOLS),yes)
++OBJS+= file.o
+ ifeq ($(CONFIG_NETWORK),yes)
+ OBJS+= udp.o tcp.o http.o rtsp.o rtp.o rtpproto.o
+ # BeOS and Darwin network stuff
+@@ -69,6 +83,7 @@
+ OBJS+= barpainet.o
+ endif
+ endif
++endif
+ 
+ ifeq ($(CONFIG_LIBOGG),yes)
+ OBJS+= ogg.o
+Index: ../ffmpeg/libavformat/allformats.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/allformats.c,v
+retrieving revision 1.50
+diff -u -r1.50 allformats.c
+--- ../ffmpeg/libavformat/allformats.c	23 Sep 2005 00:25:41 -0000	1.50
++++ ../ffmpeg/libavformat/allformats.c	21 Nov 2005 23:02:09 -0000
+@@ -88,7 +88,10 @@
+     libogg_init();
+ #endif
+ 
++#if defined(CONFIG_FFSERVER)
+     ffm_init();
++#endif
++
+ #if defined(CONFIG_VIDEO4LINUX) || defined(CONFIG_BKTR)
+     video_grab_init();
+ #endif
+@@ -130,6 +133,7 @@
+ //    av_register_image_format(&sgi_image_format); heap corruption, dont enable
+ #endif //CONFIG_MUXERS
+ 
++#ifdef CONFIG_PROTOCOLS
+     /* file protocols */
+     register_protocol(&file_protocol);
+     register_protocol(&pipe_protocol);
+@@ -141,4 +145,5 @@
+     register_protocol(&tcp_protocol);
+     register_protocol(&http_protocol);
+ #endif
++#endif
+ }
+Index: ../ffmpeg/libavformat/asf-enc.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/asf-enc.c,v
+retrieving revision 1.73
+diff -u -r1.73 asf-enc.c
+--- ../ffmpeg/libavformat/asf-enc.c	23 Sep 2005 00:25:41 -0000	1.73
++++ ../ffmpeg/libavformat/asf-enc.c	21 Nov 2005 23:02:09 -0000
+@@ -20,9 +20,6 @@
+ #include "avi.h"
+ #include "asf.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #ifdef CONFIG_MUXERS
+ 
+ 
+Index: ../ffmpeg/libavformat/asf.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/asf.c,v
+retrieving revision 1.86
+diff -u -r1.86 asf.c
+--- ../ffmpeg/libavformat/asf.c	26 Oct 2005 12:15:09 -0000	1.86
++++ ../ffmpeg/libavformat/asf.c	21 Nov 2005 23:02:09 -0000
+@@ -21,9 +21,6 @@
+ #include "mpegaudio.h"
+ #include "asf.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define FRAME_HEADER_SIZE 17
+ // Fix Me! FRAME_HEADER_SIZE may be different. 
+ 
+Index: ../ffmpeg/libavformat/avidec.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/avidec.c,v
+retrieving revision 1.76
+diff -u -r1.76 avidec.c
+--- ../ffmpeg/libavformat/avidec.c	6 Sep 2005 21:25:35 -0000	1.76
++++ ../ffmpeg/libavformat/avidec.c	21 Nov 2005 23:02:09 -0000
+@@ -20,9 +20,6 @@
+ #include "avi.h"
+ #include "dv.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ //#define DEBUG
+ //#define DEBUG_SEEK
+ 
+Index: ../ffmpeg/libavformat/flvenc.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/flvenc.c,v
+retrieving revision 1.19
+diff -u -r1.19 flvenc.c
+--- ../ffmpeg/libavformat/flvenc.c	12 Nov 2005 20:01:23 -0000	1.19
++++ ../ffmpeg/libavformat/flvenc.c	21 Nov 2005 23:02:09 -0000
+@@ -18,9 +18,6 @@
+  */
+ #include "avformat.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ typedef struct FLVContext {
+     int hasAudio;
+     int hasVideo;
+Index: ../ffmpeg/libavformat/movenc.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/movenc.c,v
+retrieving revision 1.44
+diff -u -r1.44 movenc.c
+--- ../ffmpeg/libavformat/movenc.c	6 Sep 2005 21:25:35 -0000	1.44
++++ ../ffmpeg/libavformat/movenc.c	21 Nov 2005 23:02:10 -0000
+@@ -21,9 +21,6 @@
+ #include "avi.h"
+ #include "avio.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define MOV_INDEX_CLUSTER_SIZE 16384
+ #define globalTimescale 1000
+ 
+Index: ../ffmpeg/libavformat/mpeg.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/mpeg.c,v
+retrieving revision 1.89
+diff -u -r1.89 mpeg.c
+--- ../ffmpeg/libavformat/mpeg.c	23 Sep 2005 00:25:41 -0000	1.89
++++ ../ffmpeg/libavformat/mpeg.c	21 Nov 2005 23:02:11 -0000
+@@ -22,9 +22,6 @@
+ #define MAX_PAYLOAD_SIZE 4096
+ //#define DEBUG_SEEK
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ typedef struct PacketDesc {
+     int64_t pts;
+     int64_t dts;
+Index: ../ffmpeg/libavformat/nut.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/nut.c,v
+retrieving revision 1.56
+diff -u -r1.56 nut.c
+--- ../ffmpeg/libavformat/nut.c	23 Sep 2005 00:25:41 -0000	1.56
++++ ../ffmpeg/libavformat/nut.c	21 Nov 2005 23:02:11 -0000
+@@ -35,9 +35,6 @@
+ #include "mpegaudio.h"
+ #include "avi.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ //#define TRACE
+ 
+ //from /dev/random
+Index: ../ffmpeg/libavformat/ogg.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/ogg.c,v
+retrieving revision 1.26
+diff -u -r1.26 ogg.c
+--- ../ffmpeg/libavformat/ogg.c	23 Sep 2005 00:25:41 -0000	1.26
++++ ../ffmpeg/libavformat/ogg.c	21 Nov 2005 23:02:11 -0000
+@@ -12,9 +12,6 @@
+ 
+ #include "avformat.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ #define DECODER_BUFFER_SIZE 4096
+ 
+ 
+Index: ../ffmpeg/libavformat/os_support.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/os_support.c,v
+retrieving revision 1.4
+diff -u -r1.4 os_support.c
+--- ../ffmpeg/libavformat/os_support.c	9 Nov 2004 17:27:33 -0000	1.4
++++ ../ffmpeg/libavformat/os_support.c	21 Nov 2005 23:02:11 -0000
+@@ -18,7 +18,8 @@
+  */
+ #include "config.h"
+ #include "avformat.h"
+-#ifdef CONFIG_WIN32
++#if defined(CONFIG_WINCE)
++#elif defined(CONFIG_WIN32)
+ #include <sys/types.h>
+ #include <sys/timeb.h>
+ #elif defined(CONFIG_OS2)
+@@ -36,7 +37,9 @@
+  */
+ int64_t av_gettime(void)
+ {
+-#ifdef CONFIG_WIN32
++#if defined(CONFIG_WINCE)
++    return timeGetTime() * int64_t_C(1000);
++#elif defined(CONFIG_WIN32)
+     struct timeb tb;
+     _ftime(&tb);
+     return ((int64_t)tb.time * int64_t_C(1000) + (int64_t)tb.millitm) * int64_t_C(1000);
+@@ -47,6 +50,7 @@
+ #endif
+ }
+ 
++#if !defined(CONFIG_WINCE)
+ #if !defined(HAVE_LOCALTIME_R)
+ struct tm *localtime_r(const time_t *t, struct tm *tp)
+ {
+@@ -59,3 +63,4 @@
+     return tp;
+ }
+ #endif /* !defined(HAVE_LOCALTIME_R) */
++#endif /* !defined(CONFIG_WINCE) */
+Index: ../ffmpeg/libavformat/swf.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/swf.c,v
+retrieving revision 1.29
+diff -u -r1.29 swf.c
+--- ../ffmpeg/libavformat/swf.c	23 Sep 2005 00:25:41 -0000	1.29
++++ ../ffmpeg/libavformat/swf.c	21 Nov 2005 23:02:12 -0000
+@@ -54,9 +54,6 @@
+ #define VIDEO_ID 0
+ #define SHAPE_ID  1
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ typedef struct {
+ 
+     offset_t duration_pos;
+Index: ../ffmpeg/libavformat/utils.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/utils.c,v
+retrieving revision 1.168
+diff -u -r1.168 utils.c
+--- ../ffmpeg/libavformat/utils.c	4 Nov 2005 23:50:11 -0000	1.168
++++ ../ffmpeg/libavformat/utils.c	21 Nov 2005 23:02:13 -0000
+@@ -18,9 +18,6 @@
+  */
+ #include "avformat.h"
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ /**
+  * @file libavformat/utils.c
+  * Various utility functions for using ffmpeg library.
+@@ -2734,6 +2731,7 @@
+  *  S+[.m...]
+  * @endcode
+  */
++#ifndef CONFIG_WINCE
+ int64_t parse_date(const char *datestr, int duration)
+ {
+     const char *p;
+@@ -2841,6 +2839,7 @@
+     }
+     return negative ? -t : t;
+ }
++#endif /* CONFIG_WINCE */
+ 
+ /**
+  * Attempts to find a specific tag in a URL.
+Index: ../ffmpeg/libavutil/common.h
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavutil/common.h,v
+retrieving revision 1.153
+diff -u -r1.153 common.h
+--- ../ffmpeg/libavutil/common.h	19 Sep 2005 23:26:47 -0000	1.153
++++ ../ffmpeg/libavutil/common.h	21 Nov 2005 23:02:13 -0000
+@@ -172,6 +172,11 @@
+ 
+ #        define snprintf _snprintf
+ #        define vsnprintf _vsnprintf
++
++#        ifdef CONFIG_WINCE
++#            define perror(a)
++#        endif
++
+ #    endif
+ 
+ /* CONFIG_WIN32 end */

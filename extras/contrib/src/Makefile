@@ -82,7 +82,14 @@ endif
 #
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --with-included-opencdk --with-included-libtasn1 --disable-depedency-tracking
-FFMPEGCONF+= --enable-mingw32  --enable-memalign-hack --cpu=x86
+FFMPEGCONF+= --enable-mingw32 --enable-memalign-hack --cpu=x86
+endif
+
+ifdef HAVE_WINCE
+HOSTCONF+= --without-pic --disable-shared
+FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-codec=snow --disable-protocols
+else
+FFMPEGCONF+= --enable-mp3lame --enable-faac
 endif
 
 ifdef HAVE_BEOS
@@ -134,7 +141,7 @@ else
 
    ifdef HAVE_WINCE
 
-   all: .a52 .mpeg2 .ffmpeg .dvbpsi
+   all: .dvbpsi .ffmpeg
    else
 
 # Standard Linux or other UNIX-like systems
@@ -444,7 +451,7 @@ a52dec: a52dec-$(A52DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .a52: a52dec
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd liba52 && make && make install && cd ../include && make && make install)
 	touch $@
 
 CLEAN_FILE += .a52
@@ -474,7 +481,7 @@ mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && cd libmpeg2 && make && make install && cd ../include && make && make install)
 	touch $@
 
 CLEAN_FILE += .mpeg2
@@ -810,6 +817,9 @@ endif
 ifdef HAVE_WIN32
 	patch -p 0 < Patches/ffmpeg-cvs-win32.patch
 endif
+ifdef HAVE_WINCE
+	patch -p 1 < Patches/ffmpeg-cvs-wince.patch
+endif
 ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/ffmpeg-cvs-osx.patch
 endif
@@ -821,8 +831,12 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	$(EXTRACT_GZ)
 #	patch -p 0 < Patches/ffmpeg.patch
 
-.ffmpeg: ffmpeg .faac .lame 
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-ffserver  --enable-a52 --disable-ffplay && for dir in libavcodec/libpostproc libavcodec libavformat libavutil; do make -C $$dir && make -C $$dir installlib; done)
+ifdef HAVE_WINCE
+.ffmpeg: ffmpeg
+else
+.ffmpeg: ffmpeg .faac .lame
+endif
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && for dir in libavcodec/libpostproc libavcodec libavformat libavutil; do make -C $$dir && make -C $$dir installlib; done)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
@@ -941,7 +955,7 @@ libdvbpsi: libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
