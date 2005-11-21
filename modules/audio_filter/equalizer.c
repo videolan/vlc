@@ -359,7 +359,8 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
         strstr( p_sys->psz_newbands, val2.psz_string ) ) || !*val2.psz_string )
     {
         var_SetString( p_aout, "equalizer-bands", p_sys->psz_newbands );
-        var_SetFloat( p_aout, "equalizer-preamp", p_sys->f_newpreamp );
+        if( p_sys->f_newpreamp == p_sys->f_gamp )
+            var_SetFloat( p_aout, "equalizer-preamp", p_sys->f_newpreamp );
     }
 
     /* Add our own callbacks */
