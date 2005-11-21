@@ -16,10 +16,10 @@
      · extras/MacOSX/vlc.pbprj/project.pbxproj
      · extras/MacOSX/Resources/English.lproj/InfoPlist.string
   - update the ChangeLog and NEWS files, as well as the Trac database
-     · ./toolbox --changelog
+     · ./toolbox --changelog  ( with C as locale)
      · read all the commits and add important things to the NEWS file
      · update the milestones info on https://trac.videolan.org/vlc
-  - update debian/changelog
+   - Add a note about the matching contrib package in INSTALL.win32
 
  * Commit
 
@@ -29,6 +29,13 @@
   - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/vlc/vlc-X.X.X/
   - generate md5 hashes of these files
+
+ * Contribs
+
+  - Put a copy of the libraries or svn snapshot in vlc-X.X.X/contrib
+  - Put the relevant win32 contrib package
+  - Update developers.v.o/vlc and www.v.o/vlc/download-sources.html
+
 
  * BeOS Packages
 
