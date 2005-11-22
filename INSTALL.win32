@@ -94,7 +94,8 @@ http://download.videolan.org/pub/testing/contrib/
 We also provide a package with all the libraries already compiled so it is
 actually really easy to compile a full-featured version of vlc (these compiled
 libraries will only work with mingw or cygwin):
-http://download.videolan.org/pub/testing/win32/contrib-20051104-win32-bin-gcc3.3.1-only.tar.bz2 (Check out fo more recent versions at the same location). 
+http://download.videolan.org/pub/testing/win32/contrib-20051104-win32-bin-gcc3.3.1-only.tar.bz2 
+(This one was the current one when the release was done. More recent ones may work). 
 
 All you need to do is extract it in your root directory (the include files
 and libraries will be put in /usr/win32). You can do this with the following
