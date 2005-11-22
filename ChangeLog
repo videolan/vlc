@@ -1,4 +1,93 @@
 ------------------------------------------------------------------------
+r13326 | gbazin | 2005-11-22 22:22:20 +0100 (Tue, 22 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/audio_output/directx.c
+
+* modules/audio_output/directx.c: use s16l mode by default since it looks like directx has better latency reporting in this mode.
+------------------------------------------------------------------------
+r13324 | gbazin | 2005-11-22 22:13:42 +0100 (Tue, 22 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/audio_output/directx.c
+   M /tags/0.8.4/modules/video_filter/marq.c
+
+* modules/audio_output/directx.c: backported directx audio output fix from trunk (#13322).
+------------------------------------------------------------------------
+r13323 | zorglub | 2005-11-22 22:10:48 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/configure.ac
+   M /tags/0.8.4/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /tags/0.8.4/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+Test3 for directx audio fix
+
+------------------------------------------------------------------------
+r13321 | zorglub | 2005-11-22 11:57:56 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   D /branches/0.8.4
+   A /tags/0.8.4 (from /branches/0.8.4:13320)
+
+Tag 0.8.4 release
+
+------------------------------------------------------------------------
+r13319 | dionoea | 2005-11-22 11:27:45 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/NEWS
+
+same NEWS change
+
+------------------------------------------------------------------------
+r13317 | xtophe | 2005-11-22 11:22:18 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/po/POTFILES.in
+   M /branches/0.8.4/po/ca.po
+   M /branches/0.8.4/po/da.po
+   M /branches/0.8.4/po/de.po
+   M /branches/0.8.4/po/en_GB.po
+   M /branches/0.8.4/po/es.po
+   M /branches/0.8.4/po/fr.po
+   M /branches/0.8.4/po/gl.po
+   M /branches/0.8.4/po/it.po
+   M /branches/0.8.4/po/ja.po
+   M /branches/0.8.4/po/ko.po
+   M /branches/0.8.4/po/nl.po
+   M /branches/0.8.4/po/pt_BR.po
+   M /branches/0.8.4/po/ro.po
+   M /branches/0.8.4/po/ru.po
+   M /branches/0.8.4/po/sv.po
+   M /branches/0.8.4/po/tr.po
+   M /branches/0.8.4/po/vlc.pot
+   M /branches/0.8.4/po/zh_CN.po
+   M /branches/0.8.4/po/zh_TW.po
+
+Fix pofiles for updatevlc.cpp removal
+
+------------------------------------------------------------------------
+r13316 | dionoea | 2005-11-22 11:15:14 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/audio_output/directx.c
+   M /branches/0.8.4/modules/audio_output/waveout.c
+
+revert s16l -> fl32 commit
+
+------------------------------------------------------------------------
+r13314 | xtophe | 2005-11-22 11:02:33 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/INSTALL.win32
+
+Install.win32: reword the choice of contrib package
+
+------------------------------------------------------------------------
+r13313 | zorglub | 2005-11-22 10:56:31 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/ChangeLog
+   M /branches/0.8.4/INSTALL.win32
+   M /branches/0.8.4/configure.ac
+   M /branches/0.8.4/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /branches/0.8.4/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+Prepare for 0.8.4
+
+------------------------------------------------------------------------
 r13312 | md | 2005-11-22 08:51:20 +0100 (Tue, 22 Nov 2005) | 2 lines
 Changed paths:
    M /branches/0.8.4/modules/access/udp.c
