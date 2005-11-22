@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
 dnl $Id$
 
-AC_INIT(vlc,0.8.4)
+AC_INIT(vlc,0.8.4-test3)
 VERSION_MAJOR="0"
 VERSION_MINOR="8"
 VERSION_REVISION="4"
@@ -17,7 +17,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.8.4)
+AM_INIT_AUTOMAKE(vlc,0.8.4-test3)
 AM_CONFIG_HEADER(config.h)
 
 dnl HA! HA!
