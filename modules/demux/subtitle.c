@@ -50,11 +50,11 @@ static void Close( vlc_object_t *p_this );
     "It will only work with MicroDVD subtitles."
 #define SUB_TYPE_LONGTEXT \
     "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
-    "\"sami\" (auto for autodetection, it should always work)."
+    "\"sami\", \"dvdsubtitle\" (auto for autodetection, it should always work)."
 static char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
-    "ssa2-4", "ass", "vplayer", "sami"
+    "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle"
 };
 
 vlc_module_begin();
@@ -91,6 +91,7 @@ enum
     SUB_TYPE_VPLAYER,
     SUB_TYPE_SAMI,
     SUB_TYPE_SUBVIEWER,
+    SUB_TYPE_DVDSUBTITLE
 };
 
 typedef struct
@@ -130,12 +131,13 @@ struct demux_sys_t
     int64_t     i_length;
 };
 
-static int  ParseMicroDvd ( demux_t *, subtitle_t * );
-static int  ParseSubRip   ( demux_t *, subtitle_t * );
-static int  ParseSubViewer( demux_t *, subtitle_t * );
-static int  ParseSSA      ( demux_t *, subtitle_t * );
-static int  ParseVplayer  ( demux_t *, subtitle_t * );
-static int  ParseSami     ( demux_t *, subtitle_t * );
+static int  ParseMicroDvd   ( demux_t *, subtitle_t * );
+static int  ParseSubRip     ( demux_t *, subtitle_t * );
+static int  ParseSubViewer  ( demux_t *, subtitle_t * );
+static int  ParseSSA        ( demux_t *, subtitle_t * );
+static int  ParseVplayer    ( demux_t *, subtitle_t * );
+static int  ParseSami       ( demux_t *, subtitle_t * );
+static int  ParseDVDSubtitle( demux_t *, subtitle_t * );
 
 static struct
 {
@@ -145,15 +147,16 @@ static struct
     int  (*pf_read)( demux_t *, subtitle_t* );
 } sub_read_subtitle_function [] =
 {
-    { "microdvd",   SUB_TYPE_MICRODVD,  "MicroDVD", ParseMicroDvd },
-    { "subrip",     SUB_TYPE_SUBRIP,    "SubRIP",   ParseSubRip },
-    { "subviewer",  SUB_TYPE_SUBVIEWER, "SubViewer",ParseSubViewer },
-    { "ssa1",       SUB_TYPE_SSA1,      "SSA-1",    ParseSSA },
-    { "ssa2-4",     SUB_TYPE_SSA2_4,    "SSA-2/3/4",ParseSSA },
-    { "ass",        SUB_TYPE_ASS,       "SSA/ASS",  ParseSSA },
-    { "vplayer",    SUB_TYPE_VPLAYER,   "VPlayer",  ParseVplayer },
-    { "sami",       SUB_TYPE_SAMI,      "SAMI",     ParseSami },
-    { NULL,         SUB_TYPE_UNKNOWN,   "Unknown",  NULL }
+    { "microdvd",   SUB_TYPE_MICRODVD,    "MicroDVD",    ParseMicroDvd },
+    { "subrip",     SUB_TYPE_SUBRIP,      "SubRIP",      ParseSubRip },
+    { "subviewer",  SUB_TYPE_SUBVIEWER,   "SubViewer",   ParseSubViewer },
+    { "ssa1",       SUB_TYPE_SSA1,        "SSA-1",       ParseSSA },
+    { "ssa2-4",     SUB_TYPE_SSA2_4,      "SSA-2/3/4",   ParseSSA },
+    { "ass",        SUB_TYPE_ASS,         "SSA/ASS",     ParseSSA },
+    { "vplayer",    SUB_TYPE_VPLAYER,     "VPlayer",     ParseVplayer },
+    { "sami",       SUB_TYPE_SAMI,        "SAMI",        ParseSami },
+    { "dvdsubtitle",SUB_TYPE_DVDSUBTITLE, "DVDSubtitle", ParseDVDSubtitle },
+    { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
 static int Demux( demux_t * );
@@ -299,6 +302,12 @@ static int Open ( vlc_object_t *p_this )
                      sscanf( s, "%d:%d:%d ", &i_dummy, &i_dummy, &i_dummy ) == 3 )
             {
                 p_sys->i_type = SUB_TYPE_VPLAYER;
+                break;
+            }
+            else if( sscanf( s, "{T %d:%d:%d:%d", &i_dummy, &i_dummy,
+                             &i_dummy, &i_dummy ) == 4 )
+            {
+                p_sys->i_type = SUB_TYPE_DVDSUBTITLE;
                 break;
             }
 
@@ -1203,3 +1212,79 @@ static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
     return( VLC_SUCCESS );
 #undef ADDC
 }
+
+static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+
+    /*
+     * {T h1:m1:s1:c1
+     * Line1
+     * Line2
+     * ...
+     * }
+     *
+     */
+    char *s;
+    char buffer_text[ 10 * MAX_LINE];
+    int  i_buffer_text;
+    int64_t     i_start;
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->psz_text = NULL;
+
+    for( ;; )
+    {
+        int h1, m1, s1, c1;
+        if( ( s = TextGetLine( txt ) ) == NULL )
+        {
+            return( VLC_EGENERIC );
+        }
+        if( sscanf( s,
+                    "{T %d:%d:%d:%d",
+                    &h1, &m1, &s1, &c1 ) == 4 )
+        {
+            i_start = ( (int64_t)h1 * 3600*1000 +
+                        (int64_t)m1 * 60*1000 +
+                        (int64_t)s1 * 1000 +
+                        (int64_t)c1 * 10) * 1000;
+
+            /* Now read text until a line containing "}" */
+            for( i_buffer_text = 0;; )
+            {
+                int i_len;
+                if( ( s = TextGetLine( txt ) ) == NULL )
+                {
+                    return( VLC_EGENERIC );
+                }
+
+                i_len = strlen( s );
+                if( i_len == 1 && s[0] == '}' )
+                {
+                    /* "}" -> end of this subtitle */
+                    buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
+                    p_subtitle->i_start = i_start;
+                    p_subtitle->i_stop  = 0;
+                    p_subtitle->psz_text = strdup( buffer_text );
+                    return 0;
+                }
+                else
+                {
+                    if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
+                    {
+                        memcpy( buffer_text + i_buffer_text,
+                                s,
+                                i_len );
+                        i_buffer_text += i_len;
+
+                        buffer_text[i_buffer_text] = '\n';
+                        i_buffer_text++;
+                    }
+                }
+            }
+        }
+    }
+}
+
