@@ -141,7 +141,7 @@ else
 
    ifdef HAVE_WINCE
 
-   all: .dvbpsi .zlib .ffmpeg
+   all: .dvbpsi .zlib .ffmpeg .ogg .tremor
    else
 
 # Standard Linux or other UNIX-like systems
@@ -543,12 +543,12 @@ libogg-$(OGG_VERSION).tar.gz:
 libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/ogg.patch
-#ifdef HAVE_WIN32
-#	(cd libogg;patch -p 0 <../Patches/libogg-1.1-win32.patch)
-#endiF
+ifdef HAVE_WINCE
+	patch -p 0 < Patches/libogg-wince.patch
+endif
 
 .ogg: libogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -587,6 +587,32 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 CLEAN_FILE += .vorbis .vorbisenc
 CLEAN_PKG += libvorbis
 DISTCLEAN_PKG += libvorbis-$(VORBIS_VERSION).tar.gz
+
+# ***************************************************************************
+# tremor
+# ***************************************************************************
+
+ifdef SVN
+tremor: 
+	$(SVN) co http://svn.xiph.org/trunk/Tremor tremor
+	(cd $@ && patch -p0 < ../Patches/tremor.patch)
+	(cd $@; rm -f ogg.h && echo "#include <ogg/ogg.h>" > ogg.h && rm -f os_types.h && echo "#include <ogg/os_types.h>" > os_types.h && ./autogen.sh)
+else
+tremor-$(TREMOR_VERSION).tar.bz2:
+	$(WGET) $(TREMOR_URL)
+
+tremor: tremor-$(TREMOR_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+endif
+
+.tremor: tremor .ogg
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .tremor
+CLEAN_PKG += tremor
+DISTCLEAN_PKG += tremor-$(TREMOR_VERSION).tar.gz
 
 # ***************************************************************************
 # theora
