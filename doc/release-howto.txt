@@ -26,7 +26,7 @@
     correctly (currently fails)
   - make the VLC tar.gz and tar.bz2 files with `make dist'.
   - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
-    /opt/ftp/pub/videolan/vlc/vlc-X.X.X/
+    /opt/ftp/pub/videolan/testing/vlc-X.X.X/
   - generate md5 hashes of these files
 
  * Contribs
@@ -37,11 +37,11 @@
  * BeOS Packages
     Information on building: http://developers.videolan.org/vlc/beos-compile.html
     Build in the "buildbeos" chroot on altair.
-    # add the .zip files to /opt/ftp/pub/videolan/vlc/vlc-X.X.X/beos/
+    # add the .zip files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/beos/
 
  * Win32 Packages
     make the packages using the nightly builds configure/options/...
-    add the .zip and .exe files to /opt/ftp/pub/videolan/vlc/vlc-X.X.X/win32/
+    add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
 
  * OS X packages
     At the moment, only FK can do them (so they can be compatible with OS X 10.2)
@@ -53,6 +53,8 @@
     svn cp svn://svn.videolan.org/vlc/trunk svn://svn.videolan.org/vlc/tag/X.X.X
     or
     svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
+
+ * Move /opt/ftp/pub/videolan/testing/vlc-X.X.X to /opt/ftp/pub/videolan/vlc/X.X.X
 
  * Update the website
   - edit the /index.php /vlc/*.php pages
