@@ -141,11 +141,11 @@ else
 
    ifdef HAVE_WINCE
 
-   all: .dvbpsi .ffmpeg
+   all: .dvbpsi .zlib .ffmpeg
    else
 
 # Standard Linux or other UNIX-like systems
-   all: .iconv .intl .freetype .fribidi .zlib\
+   all: .iconv .intl .freetype .fribidi .zlib \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .dts .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
@@ -832,7 +832,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 ifdef HAVE_WINCE
-.ffmpeg: ffmpeg
+.ffmpeg: ffmpeg .zlib
 else
 .ffmpeg: ffmpeg .faac .lame
 endif
@@ -1243,9 +1243,10 @@ zlib-$(ZLIB_VERSION).tar.gz:
 
 zlib: zlib-$(ZLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/zlib.patch
 
 .zlib: zlib
-	(cd zlib; $(HOSTCC2) ./configure  --prefix=$(PREFIX) && make && make  install)
+	(cd zlib; $(HOSTCC2) ./configure  --prefix=$(PREFIX) && make install)
 	$(INSTALL_NAME)
 	touch $@
 
