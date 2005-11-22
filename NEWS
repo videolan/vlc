@@ -1,7 +1,7 @@
 $Id$
 
-Changes between 0.8.2 and 0.8.4-svn (not yet released):
------------------------------------------------------
+Changes between 0.8.2 and 0.8.4:
+--------------------------------
 
 Core support:
  * Internal strings handling is now UTF-8 based
