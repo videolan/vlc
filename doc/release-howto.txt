@@ -1,22 +1,20 @@
-
 [ Note: this howto is probably useful to core vlc developers only ]
 
   Release HOWTO
- - - - - - - - -
+  -------------
+
+ * Have an ECP guy send a mail to ingesys at cti dot ecp dot fr warning them of
+   the forecoming traffic (should ideally be done at least a few hours before release) 
 
  * Tests : compilation, regression tests ...
 
  * Changes on the svn repository
-
-  - update the version number everywhere it's needed
-     · configure.ac (rerun autoconf)
-     · vlc.spec
-     · ipkg/control (does this still work ?)
-     · debian/changelog
+   - update the version number everywhere it's needed
+     · configure.ac
      · extras/MacOSX/vlc.pbprj/project.pbxproj
      · extras/MacOSX/Resources/English.lproj/InfoPlist.string
-  - update the ChangeLog and NEWS files, as well as the Trac database
-     · ./toolbox --changelog  ( with C as locale)
+   - update the ChangeLog and NEWS files, as well as the Trac database
+     · LANG=C svn log -v -r '{YYYY-12-31}:{YYYY-01-01}' >! ChangeLog
      · read all the commits and add important things to the NEWS file
      · update the milestones info on https://trac.videolan.org/vlc
    - Add a note about the matching contrib package in INSTALL.win32
@@ -24,51 +22,50 @@
  * Commit
 
  * Tarballs (Use a clean tree !!!)
-
+  - Use 'make distcheck' to make sure all files are exported
+    correctly (currently fails)
   - make the VLC tar.gz and tar.bz2 files with `make dist'.
   - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/vlc/vlc-X.X.X/
   - generate md5 hashes of these files
 
  * Contribs
-
   - Put a copy of the libraries or svn snapshot in vlc-X.X.X/contrib
   - Put the relevant win32 contrib package
   - Update developers.v.o/vlc and www.v.o/vlc/download-sources.html
 
-
  * BeOS Packages
-
-    builder: http://developers.videolan.org/vlc/beos-compile.html
+    Information on building: http://developers.videolan.org/vlc/beos-compile.html
+    Build in the "buildbeos" chroot on altair.
     # add the .zip files to /opt/ftp/pub/videolan/vlc/vlc-X.X.X/beos/
 
  * Win32 Packages
-
     make the packages using the nightly builds configure/options/...
     add the .zip and .exe files to /opt/ftp/pub/videolan/vlc/vlc-X.X.X/win32/
+
+ * OS X packages
+    At the moment, only FK can do them (so they can be compatible with OS X 10.2)
+    Later: on the G5
 
  * Commit changes ... it never works the first time
 
  * "Tag" the release
-   svn cp svn://svn.videolan.org/vlc/trunk svn://svn.videolan.org/vlc/tag/X.X.X
-   or
-   svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
+    svn cp svn://svn.videolan.org/vlc/trunk svn://svn.videolan.org/vlc/tag/X.X.X
+    or
+    svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
 
  * Update the website
-
   - edit the /index.php /vlc/*.php pages
   - add a news item to news.msg
 
  * Announce on www.gnome.org
-
   - click on "Get more software"
   - click on "Edit an existing map entry"
   - look for the 'vlc' package
   - update the version number and other info and submit
   - the change is instantaneaous
 
- * Announce on www.freshmeat.net
-
+ * Announce on www.freshmeat.net (let sam do it)
   - you need a freshmeat account
   - go to http://www.freshmeat.net/projects/vlc/
   - click on the release's branch (ie Stable)
@@ -77,11 +74,10 @@
   - the update can take several hours
 
  * Announce on VersionTracker
-
   - ask Meuuh
 
  * Announce email
-
   - write something along the lines of previous releases
   - post in videolan-announce (moderated), vlc et vlc-devel
   - add a sticky thread in the "General VLC media player discussion" forum
+
