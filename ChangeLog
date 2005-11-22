@@ -1,4 +1,431 @@
 ------------------------------------------------------------------------
+r13312 | md | 2005-11-22 08:51:20 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/access/udp.c
+
+backport [13283] [13272]
+
+------------------------------------------------------------------------
+r13308 | zorglub | 2005-11-21 15:05:12 +0100 (Mon, 21 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/audio_filter/equalizer.c
+
+Backport [13307]
+
+------------------------------------------------------------------------
+r13306 | zorglub | 2005-11-21 11:23:12 +0100 (Mon, 21 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/gui/wxwidgets/wizard.cpp
+
+Backport [13305]
+
+------------------------------------------------------------------------
+r13304 | fkuehne | 2005-11-21 06:39:59 +0100 (Mon, 21 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/gl.po
+
+* updated Galician translation by Ivan
+------------------------------------------------------------------------
+r13302 | damienf | 2005-11-20 23:56:57 +0100 (Sun, 20 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/activex/plugin.cpp
+
+plugin.cpp: eclipse "one-instance" option in saved preferences, which prevents activex plugin from working properly if a player or another activex plugin is already running. 
+
+------------------------------------------------------------------------
+r13301 | xtophe | 2005-11-20 23:35:15 +0100 (Sun, 20 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/control/http/util.c
+
+backport of [13300]
+
+------------------------------------------------------------------------
+r13298 | zorglub | 2005-11-20 22:52:59 +0100 (Sun, 20 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/gui/wxwidgets/playlist.cpp
+
+Correctly select items in WX search
+
+------------------------------------------------------------------------
+r13297 | zorglub | 2005-11-20 22:21:48 +0100 (Sun, 20 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/po/fr.po
+
+A few adds to fr translation
+
+------------------------------------------------------------------------
+r13296 | fkuehne | 2005-11-20 21:53:38 +0100 (Sun, 20 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/ca.po
+   M /branches/0.8.4/po/da.po
+   M /branches/0.8.4/po/de.po
+   M /branches/0.8.4/po/en_GB.po
+   M /branches/0.8.4/po/es.po
+   M /branches/0.8.4/po/fr.po
+   M /branches/0.8.4/po/gl.po
+   M /branches/0.8.4/po/it.po
+   M /branches/0.8.4/po/ja.po
+   M /branches/0.8.4/po/ko.po
+   M /branches/0.8.4/po/nl.po
+   M /branches/0.8.4/po/pt_BR.po
+   M /branches/0.8.4/po/ro.po
+   M /branches/0.8.4/po/ru.po
+   M /branches/0.8.4/po/sv.po
+   M /branches/0.8.4/po/tr.po
+   M /branches/0.8.4/po/vlc.pot
+   M /branches/0.8.4/po/zh_CN.po
+   M /branches/0.8.4/po/zh_TW.po
+
+* updated the po-files, since all expected translations arrived. Added some last-minute fixes to the German translation.
+------------------------------------------------------------------------
+r13294 | fkuehne | 2005-11-20 21:25:17 +0100 (Sun, 20 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/da.po
+
+* updated Danish translation by Jonas Larsen
+------------------------------------------------------------------------
+r13288 | bigben | 2005-11-20 17:07:54 +0100 (Sun, 20 Nov 2005) | 3 lines
+Changed paths:
+   M /branches/0.8.4/modules/gui/macosx/playlist.m
+
+Backport of 13287
+
+
+------------------------------------------------------------------------
+r13278 | jpsaman | 2005-11-19 18:57:23 +0100 (Sat, 19 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/configure.ac
+
+Backport of revision 13277
+------------------------------------------------------------------------
+r13274 | dionoea | 2005-11-19 18:06:54 +0100 (Sat, 19 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/audio_output/directx.c
+   M /branches/0.8.4/modules/audio_output/waveout.c
+
+don't use float32 by default (should fix sound issues under windows)
+
+------------------------------------------------------------------------
+r13254 | damienf | 2005-11-15 15:52:19 +0100 (Tue, 15 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/activex/plugin.cpp
+   M /branches/0.8.4/src/libvlc.c
+
+backported changes in revision 13253
+
+------------------------------------------------------------------------
+r13250 | jpsaman | 2005-11-14 22:17:45 +0100 (Mon, 14 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/src/audio_output/intf.c
+
+Really fix volume-change reporting through callbacks to rc-interface.
+------------------------------------------------------------------------
+r13249 | damienf | 2005-11-14 22:10:25 +0100 (Mon, 14 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/src/libvlc.c
+
+libvlc.c: backported changes r13248
+
+------------------------------------------------------------------------
+r13247 | jpsaman | 2005-11-14 21:28:22 +0100 (Mon, 14 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/video_output/x11/xcommon.c
+
+Removed unused variable f_arg
+------------------------------------------------------------------------
+r13246 | dionoea | 2005-11-14 21:02:53 +0100 (Mon, 14 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/video_output/x11/xcommon.c
+
+backport [13245]
+
+------------------------------------------------------------------------
+r13243 | zorglub | 2005-11-14 19:31:22 +0100 (Mon, 14 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/NEWS
+   M /branches/0.8.4/THANKS
+   M /branches/0.8.4/configure.ac
+   M /branches/0.8.4/po/fr.po
+   M /branches/0.8.4/po/sv.po
+
+Merge fr and sv to 0.8.4
+
+------------------------------------------------------------------------
+r13240 | fkuehne | 2005-11-14 18:45:51 +0100 (Mon, 14 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/NEWS
+   M /branches/0.8.4/THANKS
+   M /branches/0.8.4/configure.ac
+   A /branches/0.8.4/po/gl.po
+   M /branches/0.8.4/src/libvlc.h
+   M /branches/0.8.4/src/misc/darwin_specific.m
+
+* initial Galician translation by Ivan. There are more translated strings to come as times passes by ;)
+------------------------------------------------------------------------
+r13239 | damienf | 2005-11-14 16:42:57 +0100 (Mon, 14 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/activex/utils.cpp
+
+backport of r13238
+
+------------------------------------------------------------------------
+r13236 | adn | 2005-11-14 01:52:36 +0100 (Mon, 14 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/mozilla/vlcshell.cpp
+
+backport revision 13225
+
+------------------------------------------------------------------------
+r13235 | dionoea | 2005-11-14 01:08:06 +0100 (Mon, 14 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/NEWS
+   M /branches/0.8.4/modules/gui/wxwidgets/Modules.am
+   M /branches/0.8.4/modules/gui/wxwidgets/dialogs.cpp
+   M /branches/0.8.4/modules/gui/wxwidgets/interface.cpp
+   D /branches/0.8.4/modules/gui/wxwidgets/updatevlc.cpp
+   M /branches/0.8.4/modules/gui/wxwidgets/wxwidgets.h
+
+remove VLC update checker stuff from 0.8.4
+
+------------------------------------------------------------------------
+r13227 | dionoea | 2005-11-13 19:32:16 +0100 (Sun, 13 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/demux/mpeg/mpga.c
+   M /branches/0.8.4/src/input/clock.c
+   M /branches/0.8.4/src/input/input_internal.h
+
+backport [13191] and [13192] once again
+
+------------------------------------------------------------------------
+r13226 | dionoea | 2005-11-13 19:31:39 +0100 (Sun, 13 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/demux/mpeg/mpga.c
+   M /branches/0.8.4/src/input/clock.c
+   M /branches/0.8.4/src/input/input_internal.h
+
+revert 13221 (feature/"big change" freeze)
+
+------------------------------------------------------------------------
+r13221 | md | 2005-11-13 12:57:13 +0100 (Sun, 13 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/demux/mpeg/mpga.c
+   M /branches/0.8.4/src/input/clock.c
+   M /branches/0.8.4/src/input/input_internal.h
+
+backport of [13220] [13191] [13192]
+
+------------------------------------------------------------------------
+r13219 | fkuehne | 2005-11-13 12:16:00 +0100 (Sun, 13 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/tr.po
+
+sorry for this quick fix again, I'll need some coffee (fixed svn:keywords and the copyright)
+------------------------------------------------------------------------
+r13218 | fkuehne | 2005-11-13 12:12:34 +0100 (Sun, 13 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/tr.po
+
+* updated Turkish translation by Adem Gunes
+------------------------------------------------------------------------
+r13203 | fkuehne | 2005-11-12 14:35:15 +0100 (Sat, 12 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/zh_CN.po
+
+* fixed svn keyword
+------------------------------------------------------------------------
+r13202 | fkuehne | 2005-11-12 14:31:39 +0100 (Sat, 12 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/THANKS
+   M /branches/0.8.4/po/zh_CN.po
+
+* final version of the Simplified Chinese translation by Wei Mingzhi and King Norman for 0.8.4 (1651 translated msgs, 1448 untra. msgs)
+------------------------------------------------------------------------
+r13195 | md | 2005-11-11 20:24:01 +0100 (Fri, 11 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/modules/access/udp.c
+
+fixed RTP (pre)buffering to correctly work with VBR streams
+
+------------------------------------------------------------------------
+r13194 | damienf | 2005-11-11 17:57:24 +0100 (Fri, 11 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/activex/oleobject.cpp
+   M /branches/0.8.4/activex/plugin.cpp
+
+all: backport of r13193
+
+------------------------------------------------------------------------
+r13186 | gbazin | 2005-11-10 20:23:12 +0100 (Thu, 10 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/demux/ps.c
+
+* modules/demux/ps.c: backport of 13156.
+------------------------------------------------------------------------
+r13185 | gbazin | 2005-11-10 20:14:22 +0100 (Thu, 10 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/src/input/clock.c
+   M /branches/0.8.4/src/input/input_internal.h
+
+* src/input/clock.c, input_internal.h: backport of 13165.
+------------------------------------------------------------------------
+r13184 | gbazin | 2005-11-10 19:51:31 +0100 (Thu, 10 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/demux/mp4/mp4.c
+
+* modules/demux/mp4/mp4.c: fix some signed/unsigned compiler warnings. Patch by Daniel Stranger (vlc at schmaller dot de).
+------------------------------------------------------------------------
+r13182 | gbazin | 2005-11-10 19:49:37 +0100 (Thu, 10 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/src/libvlc.c
+
+* src/libvlc.c: failing of bindtextdomain() does not mean that there exists no DOMAIN in the locale path. It means that a memory error has occured. The error message was generalized. Patch by Daniel Stranger (vlc at schmaller dot de).
+------------------------------------------------------------------------
+r13180 | gbazin | 2005-11-10 19:43:42 +0100 (Thu, 10 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/gui/wxwidgets/extrapanel.cpp
+   M /branches/0.8.4/modules/gui/wxwidgets/interface.cpp
+   M /branches/0.8.4/modules/gui/wxwidgets/open.cpp
+
+* modules/gui/wxwidgets: wx backward compatibility fixes by Daniel Stranger (vlc at schmaller dot de).
+------------------------------------------------------------------------
+r13173 | fkuehne | 2005-11-09 21:45:39 +0100 (Wed, 09 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/de.po
+
+* finished the German translation for 0.8.4 (refs #407)
+------------------------------------------------------------------------
+r13168 | courmisch | 2005-11-09 13:05:09 +0100 (Wed, 09 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/HACKING
+   M /branches/0.8.4/vlc-api.pl
+
+Backport [13167]
+
+------------------------------------------------------------------------
+r13166 | fkuehne | 2005-11-09 12:00:17 +0100 (Wed, 09 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/po/es.po
+
+* first update of the Spanish translation by Antonio Javier Varela Calvo (refs #407). 31 strings are untranslated and 146 fuzzy atm. He is going to finish his work until sunday.
+------------------------------------------------------------------------
+r13164 | bigben | 2005-11-09 00:36:22 +0100 (Wed, 09 Nov 2005) | 3 lines
+Changed paths:
+   M /branches/0.8.4/modules/audio_output/alsa.c
+
+Backport of r13160
+
+
+------------------------------------------------------------------------
+r13155 | fkuehne | 2005-11-08 19:29:14 +0100 (Tue, 08 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* backport [13154]
+------------------------------------------------------------------------
+r13146 | fkuehne | 2005-11-06 20:37:22 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/gui/macosx/intf.m
+
+* make sure that the wizard is shown with localised strings...
+------------------------------------------------------------------------
+r13140 | dionoea | 2005-11-06 16:48:40 +0100 (Sun, 06 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/configure.ac
+   M /branches/0.8.4/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /branches/0.8.4/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+bump version to 0.8.4-test3
+
+------------------------------------------------------------------------
+r13133 | courmisch | 2005-11-04 22:10:24 +0100 (Fri, 04 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/src/misc/vlm.c
+
+Backport 13132
+
+------------------------------------------------------------------------
+r13130 | md | 2005-11-04 09:10:59 +0100 (Fri, 04 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/NEWS
+
+added some news
+
+------------------------------------------------------------------------
+r13127 | jpsaman | 2005-11-03 21:39:41 +0100 (Thu, 03 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/control/rc.c
+   M /branches/0.8.4/src/audio_output/intf.c
+   M /branches/0.8.4/src/libvlc.c
+
+Added dynamic variable volume-change to notify upon a volume change. The rc-interface listens to it and prints some feedback on its output.
+------------------------------------------------------------------------
+r13118 | gbazin | 2005-11-03 00:32:56 +0100 (Thu, 03 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/codec/libmpeg2.c
+
+* modules/codec/libmpeg2.c: backport of 13117 from trunk.
+------------------------------------------------------------------------
+r13114 | bigben | 2005-11-02 22:44:03 +0100 (Wed, 02 Nov 2005) | 3 lines
+Changed paths:
+   M /branches/0.8.4/modules/audio_output/alsa.c
+
+Revert 13023 here too
+
+
+------------------------------------------------------------------------
+r13111 | fkuehne | 2005-11-02 21:22:04 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/NEWS
+
+* added a small note that UPnP is linux-only atm
+------------------------------------------------------------------------
+r13101 | gbazin | 2005-11-02 19:16:58 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/modules/codec/ffmpeg/demux.c
+   M /branches/0.8.4/modules/codec/x264.c
+   M /branches/0.8.4/modules/gui/wxwidgets/playlist.cpp
+   M /branches/0.8.4/modules/gui/wxwidgets/wxwidgets.h
+   M /branches/0.8.4/modules/stream_out/transcode.c
+
+ALL: backport of 13058,13059,13070,13088,13090,13091,13099 from trunk.
+------------------------------------------------------------------------
+r13096 | md | 2005-11-02 15:07:26 +0100 (Wed, 02 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/bootstrap
+   M /branches/0.8.4/vlc-config.in.in
+
+backport [13095]
+
+------------------------------------------------------------------------
+r13093 | fkuehne | 2005-11-02 12:51:07 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /branches/0.8.4/extras/contrib/Makefile
+
+* backport [13092]
+------------------------------------------------------------------------
+r13083 | dionoea | 2005-11-01 21:51:34 +0100 (Tue, 01 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/README
+   M /branches/0.8.4/vlc.win32.nsi
+
+backport 13082 (Misc changes)
+
+------------------------------------------------------------------------
+r13071 | bigben | 2005-11-01 08:59:50 +0100 (Tue, 01 Nov 2005) | 3 lines
+Changed paths:
+   M /branches/0.8.4/modules/audio_filter/resampler/linear.c
+
+Backport latest fix on the linear resampler.
+
+
+------------------------------------------------------------------------
+r13069 | hartman | 2005-11-01 00:17:06 +0100 (Tue, 01 Nov 2005) | 2 lines
+Changed paths:
+   M /branches/0.8.4/ChangeLog
+
+* update Changelog for 2 final fixes :D
+
+------------------------------------------------------------------------
 r13068 | jpsaman | 2005-11-01 00:13:22 +0100 (Tue, 01 Nov 2005) | 1 line
 Changed paths:
    M /branches/0.8.4/src/audio_output/intf.c
