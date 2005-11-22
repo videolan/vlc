@@ -38,8 +38,8 @@
 #include <mmsystem.h>
 #include <dsound.h>
 
-#define FRAME_SIZE 2048              /* The size is in samples, not in bytes */
-#define FRAMES_NUM 8
+#define FRAME_SIZE ((int)p_aout->output.output.i_rate/20) /* Size in samples */
+#define FRAMES_NUM 8                                      /* Needs to be > 3 */
 
 /* frame buffer status */
 #define FRAME_QUEUED 0
@@ -1038,7 +1038,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     HANDLE  notification_events[FRAMES_NUM];
     HRESULT dsresult;
     aout_instance_t *p_aout = p_notif->p_aout;
-    int i, i_which_frame, i_last_frame, i_next_frame;
+    int i, i_which_frame, i_last_frame;
     mtime_t mtime;
     vlc_bool_t b_sleek;
 
@@ -1083,7 +1083,7 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     while( !p_notif->b_die )
     {
         aout_buffer_t *p_buffer;
-        long l_latency;
+        long l_position, l_latency = 0;
 
         /* wait for the position notification */
         i_which_frame = WaitForMultipleObjects( FRAMES_NUM,
@@ -1098,52 +1098,43 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         /* We take into account the current latency */
         if SUCCEEDED( IDirectSoundBuffer_GetCurrentPosition(
                         p_aout->output.p_sys->p_dsbuffer,
-                        &l_latency, NULL ) )
+                        &l_position, NULL ) )
         {
-            if( l_latency > (i_which_frame * FRAME_SIZE)
-                  && l_latency < ((i_which_frame+1) * FRAME_SIZE) )
-            {
-                l_latency = - ( l_latency /
-                                p_aout->output.output.i_bytes_per_frame %
-                                FRAME_SIZE );
-            }
-            else
-            {
-                l_latency = FRAME_SIZE - ( l_latency /
-                                      p_aout->output.output.i_bytes_per_frame %
-                                      FRAME_SIZE );
-            }
-        }
-        else
-        {
-            l_latency = 0;
+            /* Latency is in samples */
+            l_position /= p_aout->output.output.i_bytes_per_frame;
+            l_latency = l_position - i_which_frame * FRAME_SIZE;
+
+            /* That sucks but latency can apparently be negative up to -FRAME_SIZE
+             * ie. the notification is done in advance. */
+            if( l_latency > FRAME_SIZE * (FRAMES_NUM-1) )
+                l_latency -= (FRAME_SIZE * FRAMES_NUM);
+            else if( l_latency < -FRAME_SIZE )
+                l_latency += (FRAME_SIZE * FRAMES_NUM);
         }
 
         /* Mark last frame as empty */
         i_last_frame = (i_which_frame + FRAMES_NUM -1) % FRAMES_NUM;
-        i_next_frame = (i_which_frame + 1) % FRAMES_NUM;
         p_notif->i_frame_status[i_last_frame] = FRAME_EMPTY;
 
         /* Try to fill in as many frame buffers as possible */
-        for( i = i_next_frame; (i % FRAMES_NUM) != i_which_frame; i++ )
+        for( i = i_which_frame + 1; i < i_which_frame + FRAMES_NUM; i++ )
         {
-
             /* Check if frame buf is already filled */
             if( p_notif->i_frame_status[i % FRAMES_NUM] == FRAME_QUEUED )
                 continue;
 
+            if( ((i - i_which_frame) * FRAME_SIZE - l_latency) < 0 )
+            {
+                msg_Warn( p_aout, "dectected underrun!");
+            }
+
             p_buffer = aout_OutputNextBuffer( p_aout,
-                mtime + 1000000 / p_aout->output.output.i_rate *
-                ((i - i_next_frame + 1) * FRAME_SIZE + l_latency), b_sleek );
+                mtime + I64C(1000000) * ((i - i_which_frame) * FRAME_SIZE -
+                l_latency) / p_aout->output.output.i_rate, b_sleek );
 
             /* If there is no audio data available and we have some buffered
              * already, then just wait for the next time */
-            if( !p_buffer && (i != i_next_frame) )
-            {
-                //msg_Err( p_aout, "only %i frame buffers filled!",
-                //         i - i_next_frame );
-                break;
-            }
+            if( !p_buffer && (i != i_which_frame + 1) ) break;
 
             if( FillBuffer( p_aout, (i%FRAMES_NUM), p_buffer )
                 != VLC_SUCCESS )
