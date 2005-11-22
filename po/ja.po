@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-20 21:25+0100\n"
+"POT-Creation-Date: 2005-11-22 11:20+0100\n"
 "PO-Revision-Date: 2004-09-20 02:46+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -67,7 +67,7 @@ msgstr "オーディオエンコーダー設定"
 #: modules/gui/beos/InterfaceWindow.cpp:280 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:505 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/wizard.m:400 modules/gui/wxwidgets/extrapanel.cpp:180
-#: modules/gui/wxwidgets/wizard.cpp:849 modules/stream_out/transcode.c:214
+#: modules/gui/wxwidgets/wizard.cpp:862 modules/stream_out/transcode.c:214
 msgid "Audio"
 msgstr "オーディオ"
 
@@ -124,7 +124,7 @@ msgstr "その他のオプション"
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:518
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/wizard.m:401
 #: modules/gui/wxwidgets/extrapanel.cpp:178
-#: modules/gui/wxwidgets/wizard.cpp:810 modules/misc/dummy/dummy.c:97
+#: modules/gui/wxwidgets/wizard.cpp:823 modules/misc/dummy/dummy.c:97
 #: modules/stream_out/transcode.c:174
 msgid "Video"
 msgstr "ビデオ"
@@ -830,7 +830,7 @@ msgid "Stream %d"
 msgstr "ストリーム %d"
 
 #: src/input/es_out.c:1535 modules/gui/macosx/wizard.m:405
-#: modules/gui/wxwidgets/wizard.cpp:819 modules/gui/wxwidgets/wizard.cpp:859
+#: modules/gui/wxwidgets/wizard.cpp:832 modules/gui/wxwidgets/wizard.cpp:872
 msgid "Codec"
 msgstr "コーデック"
 
@@ -1788,7 +1788,7 @@ msgstr "デフォルト"
 #: modules/gui/macosx/extended.m:106 modules/gui/macosx/wizard.m:374
 #: modules/gui/wxwidgets/extrapanel.cpp:218
 #: modules/gui/wxwidgets/extrapanel.cpp:467
-#: modules/gui/wxwidgets/wizard.cpp:629
+#: modules/gui/wxwidgets/wizard.cpp:631
 msgid "Enable"
 msgstr "有効"
 
@@ -10173,7 +10173,7 @@ msgstr "ストリームの一時停止"
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
 #: modules/gui/macosx/wizard.m:404 modules/gui/wxwidgets/streamout.cpp:780
 #: modules/gui/wxwidgets/streamout.cpp:855
-#: modules/gui/wxwidgets/wizard.cpp:833 modules/gui/wxwidgets/wizard.cpp:872
+#: modules/gui/wxwidgets/wizard.cpp:846 modules/gui/wxwidgets/wizard.cpp:885
 msgid "Bitrate (kb/s)"
 msgstr "ビットレート (kb/秒)"
 
@@ -10505,7 +10505,7 @@ msgstr "逆転"
 
 #: modules/gui/macosx/wizard.m:345 modules/gui/macosx/wizard.m:348
 #: modules/gui/macosx/wizard.m:1139 modules/gui/wxwidgets/wizard.cpp:88
-#: modules/gui/wxwidgets/wizard.cpp:91 modules/gui/wxwidgets/wizard.cpp:1394
+#: modules/gui/wxwidgets/wizard.cpp:91 modules/gui/wxwidgets/wizard.cpp:1407
 #, fuzzy
 msgid "Streaming/Transcoding Wizard"
 msgstr "ストリームの情報..."
@@ -10561,7 +10561,7 @@ msgid "Choose..."
 msgstr "選択..."
 
 #: modules/gui/macosx/wizard.m:373 modules/gui/macosx/wizard.m:447
-#: modules/gui/wxwidgets/wizard.cpp:623
+#: modules/gui/wxwidgets/wizard.cpp:625
 msgid "Partial Extract"
 msgstr ""
 
@@ -10572,11 +10572,11 @@ msgid ""
 "stream.) Enter the starting and ending times (in seconds)."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:379 modules/gui/wxwidgets/wizard.cpp:634
+#: modules/gui/macosx/wizard.m:379 modules/gui/wxwidgets/wizard.cpp:636
 msgid "From"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:380 modules/gui/wxwidgets/wizard.cpp:639
+#: modules/gui/macosx/wizard.m:380 modules/gui/wxwidgets/wizard.cpp:641
 #, fuzzy
 msgid "To"
 msgstr "上"
@@ -10592,13 +10592,13 @@ msgid "In this page, you will select how your input stream will be sent."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:386 modules/gui/macosx/wizard.m:441
-#: modules/gui/wxwidgets/wizard.cpp:1039 modules/stream_out/rtp.c:44
+#: modules/gui/wxwidgets/wizard.cpp:1052 modules/stream_out/rtp.c:44
 #, fuzzy
 msgid "Destination"
 msgstr "送信先のアスペクト・レシオ"
 
 #: modules/gui/macosx/wizard.m:387 modules/gui/macosx/wizard.m:453
-#: modules/gui/wxwidgets/wizard.cpp:1025
+#: modules/gui/wxwidgets/wizard.cpp:1038
 #, fuzzy
 msgid "Streaming method"
 msgstr "ストリームの停止"
@@ -10628,13 +10628,13 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:402 modules/gui/macosx/wizard.m:455
-#: modules/gui/wxwidgets/wizard.cpp:855
+#: modules/gui/wxwidgets/wizard.cpp:868
 #, fuzzy
 msgid "Transcode audio"
 msgstr "ストリームの一時停止"
 
 #: modules/gui/macosx/wizard.m:403 modules/gui/macosx/wizard.m:457
-#: modules/gui/wxwidgets/wizard.cpp:816
+#: modules/gui/wxwidgets/wizard.cpp:829
 #, fuzzy
 msgid "Transcode video"
 msgstr "ストリームの一時停止"
@@ -10672,13 +10672,13 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:421 modules/gui/macosx/wizard.m:1629
 #: modules/gui/wxwidgets/streamout.cpp:613
-#: modules/gui/wxwidgets/wizard.cpp:1326
+#: modules/gui/wxwidgets/wizard.cpp:1339
 #, fuzzy
 msgid "Time-To-Live (TTL)"
 msgstr "生存時間 (TTL):"
 
 #: modules/gui/macosx/wizard.m:423 modules/gui/macosx/wizard.m:449
-#: modules/gui/macosx/wizard.m:1644 modules/gui/wxwidgets/wizard.cpp:1334
+#: modules/gui/macosx/wizard.m:1644 modules/gui/wxwidgets/wizard.cpp:1347
 #, fuzzy
 msgid "SAP Announce"
 msgstr "SAP アナウンス:"
@@ -10700,7 +10700,7 @@ msgid ""
 "transcoding."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:432 modules/gui/wxwidgets/wizard.cpp:1258
+#: modules/gui/macosx/wizard.m:432 modules/gui/wxwidgets/wizard.cpp:1271
 #, fuzzy
 msgid "Select the file to save to"
 msgstr "再生に使うホットキーを選択"
@@ -11993,17 +11993,17 @@ msgstr "プレイリストが空です"
 msgid "Can't save"
 msgstr "保存できません"
 
-#: modules/gui/wxwidgets/playlist.cpp:1230 modules/misc/freetype.c:100
+#: modules/gui/wxwidgets/playlist.cpp:1231 modules/misc/freetype.c:100
 #: modules/misc/win32text.c:71
 msgid "Normal"
 msgstr "通常"
 
-#: modules/gui/wxwidgets/playlist.cpp:1232
+#: modules/gui/wxwidgets/playlist.cpp:1233
 #, fuzzy
 msgid "Sorted by artist"
 msgstr "作成者でソート(&A)"
 
-#: modules/gui/wxwidgets/playlist.cpp:1234
+#: modules/gui/wxwidgets/playlist.cpp:1235
 #, fuzzy
 msgid "Sorted by Album"
 msgstr "名前でソート"
@@ -12271,7 +12271,7 @@ msgid ""
 "name will be used"
 msgstr ""
 
-#: modules/gui/wxwidgets/wizard.cpp:1277
+#: modules/gui/wxwidgets/wizard.cpp:1290
 #, fuzzy
 msgid "Save to file"
 msgstr "ファイルの保存"

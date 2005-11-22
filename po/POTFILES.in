@@ -723,7 +723,6 @@ modules/gui/wxwidgets/streamdata.h
 modules/gui/wxwidgets/streamout.cpp
 modules/gui/wxwidgets/subtitles.cpp
 modules/gui/wxwidgets/timer.cpp
-modules/gui/wxwidgets/updatevlc.cpp
 modules/gui/wxwidgets/video.cpp
 modules/gui/wxwidgets/wizard.cpp
 modules/gui/wxwidgets/wxwidgets.cpp
