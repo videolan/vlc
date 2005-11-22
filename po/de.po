@@ -6328,7 +6328,7 @@ msgstr "Volle Bässe"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Full bass and treble"
-msgstr "Volle Bässe & Höhen"
+msgstr "Volle Bässe \& Höhen"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Full treble"
