@@ -1868,7 +1868,7 @@ dnl  gnomeVFS access module
 dnl
 AC_ARG_ENABLE(gnomevfs,
   [  --enable-gnomevfs      GnomeVFS access module (default enabled)])
-if test "${enable_gnomevfs}" != "no"
+if test "${enable_gnomevfs}" != "no" -a  "${SYS}" = "linux" 
 then
   PKG_CHECK_MODULES(GNOMEVFS, gnome-vfs-2.0,
     VLC_ADD_LDFLAGS([access_gnomevfs],[$GNOMEVFS_LIBS])
