@@ -55,7 +55,6 @@ DIST_icons32 = \
 DIST_icons48 = \
 	vlc48x48.ico \
 	vlc48x48.png \
-	vlc48x48.xpm \
 	$(NULL)
 
 DIST_icons128 = \
