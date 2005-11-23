@@ -223,8 +223,8 @@ Index: common/i386/mc-a2.asm
 +mmx_dw_5:
 +    times 4 dw -5
 +
---- configure.crosscompile~	2005-10-23 14:48:21.000000000 +0200
-+++ configure	2005-10-27 17:04:09.000000000 +0200
+--- configure	2005-11-23 18:31:49.062500000 +0000
++++ config.new	2005-11-23 18:30:07.343750000 +0000
 @@ -7,6 +7,7 @@
  echo "available options:"
  echo ""
@@ -262,7 +262,7 @@ Index: common/i386/mc-a2.asm
 +	    prefix="$optarg"
 +	    ;;
 +	--exec-prefix=*)
-+	    eprefix="$optarg"
++	    exec_prefix="$optarg"
 +	    ;;
 +	--bindir=*)
 +	    bindir="$optarg"
@@ -401,7 +401,7 @@ Index: common/i386/mc-a2.asm
      ARCH="PPC"
      if [ $SYS = MACOSX ]
      then
-@@ -150,86 +245,6 @@
+@@ -153,86 +248,6 @@
  
  CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
  
@@ -414,7 +414,7 @@ Index: common/i386/mc-a2.asm
 -            prefix="$optarg"
 -            ;;
 -        --exec-prefix=*)
--            eprefix="$optarg"
+-            exec_prefix="$optarg"
 -            ;;
 -        --bindir=*)
 -            bindir="$optarg"
@@ -488,7 +488,7 @@ Index: common/i386/mc-a2.asm
  VFWFLAGS=
  if [ "$debug" != "yes" -a "$gprof" != "yes" ]; then
      CFLAGS="$CFLAGS -s -fomit-frame-pointer"
-@@ -253,6 +268,9 @@
+@@ -256,6 +271,9 @@
  ASFLAGS=$ASFLAGS
  VFW=$vfw
  EXE=$EXE
@@ -498,32 +498,27 @@ Index: common/i386/mc-a2.asm
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  EOF
---- Makefile.crosscompile~	2005-10-27 17:01:35.000000000 +0200
-+++ Makefile	2005-10-27 17:02:51.000000000 +0200
+--- Makefile.old	2005-11-23 17:25:15.953125000 +0000
++++ Makefile	2005-11-23 17:38:09.796875000 +0000
 @@ -62,8 +62,8 @@
  default: $(DEP) x264$(EXE)
  
  libx264.a: .depend $(OBJS) $(OBJASM)
 -	ar rc libx264.a $(OBJS) $(OBJASM)
 -	ranlib libx264.a
-+	$(AR) $(AROPTS) libx264.a $(OBJS) $(OBJASM)
++	$(AR) rc libx264.a $(OBJS) $(OBJASM)
 +	$(RANLIB) libx264.a
  
  x264$(EXE): libx264.a x264.o matroska.o
  	$(CC) -o $@ x264.o matroska.o libx264.a $(LDFLAGS)
-@@ -100,12 +100,12 @@
- distclean: clean
- 	rm -f config.mak vfw/build/cygwin/config.mak
- 
--install: x264
-+install: x264$(EXE)
- 	install -d $(DESTDIR)$(bindir) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir)
+@@ -106,8 +106,8 @@
  	install -m 644 x264.h $(DESTDIR)$(includedir)
  	install -m 644 libx264.a $(DESTDIR)$(libdir)
+ 	install -m 644 x264.pc $(DESTDIR)$(libdir)/pkgconfig
 -	install x264 $(DESTDIR)$(bindir)
 -	ranlib $(DESTDIR)$(libdir)/libx264.a
 +	install x264$(EXE) $(DESTDIR)$(bindir)
 +	$(RANLIB) $(DESTDIR)$(libdir)/libx264.a
  
- etags: TAGS
- 
+ .PHONY: uninstall
+ uninstall:

@@ -432,7 +432,7 @@ ifdef HAVE_WIN32
 	patch -p 0 <Patches/fribidi-win32.patch
 endif
 .fribidi: fribidi .iconv
-	(cd $<; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
+	(cd $<; rm -f configure; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1057,7 +1057,7 @@ endif
 ifdef HAVE_DARWIN_OS
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 else
-	(cd $< && rm -f configure; autoconf configure.in > configure && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
+	(cd $< && rm -f configure; autoconf configure.in > configure && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
 endif
 	touch $@
 
