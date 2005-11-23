@@ -239,7 +239,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     extra_window = NULL;
 
     /* Give our interface a nice little icon */
-    SetIcon( wxIcon( vlc_xpm ) );
+    SetIcon( wxIcon( vlc32x32_xpm ) );
 
     /* Create a sizer for the main frame */
     frame_sizer = new wxBoxSizer( wxVERTICAL );
