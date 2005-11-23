@@ -320,8 +320,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->b_switcher_video = VLC_TRUE;
         p_fmt->i_codec = VLC_FOURCC('m', 'p', 'g', 'v');
         msg_Dbg( p_stream,
-                 "creating video switcher for fcc=`%4.4s'",
-                 (char*)&p_fmt->i_codec );
+                 "creating video switcher for fcc=`%4.4s' cmd:%d",
+                 (char*)&p_fmt->i_codec, p_sys->i_cmd );
     }
     else if ( p_fmt->i_cat == AUDIO_ES
                && p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'a')
@@ -332,8 +332,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         id->b_switcher_audio = VLC_TRUE;
         msg_Dbg( p_stream,
-                 "creating audio switcher for fcc=`%4.4s'",
-                 (char*)&p_fmt->i_codec );
+                 "creating audio switcher for fcc=`%4.4s' cmd:%d",
+                 (char*)&p_fmt->i_codec, p_sys->i_cmd );
 
         /* Allocate the encoder right now. */
         if( i_ff_codec == 0 )
@@ -663,6 +663,9 @@ static void NetCommand( sout_stream_t *p_stream )
         }
 
         p_sys->i_cmd = i_cmd;
+
+        msg_Dbg( p_stream, "new command: %d old:%d", p_sys->i_cmd,
+                 p_sys->i_old_cmd );
     }
 }
 
