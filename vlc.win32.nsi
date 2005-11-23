@@ -44,7 +44,7 @@ InstType "Full"
 ; MUI Settings
   !define MUI_ABORTWARNING
   !define MUI_ICON "vlc48x48.ico"
-  !define MUI_UNICON "vlc48x48new.ico"
+  !define MUI_UNICON "vlc48x48.ico"
   !define MUI_COMPONENTSPAGE_SMALLDESC
 
 ; Installer pages
