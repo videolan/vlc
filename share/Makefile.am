@@ -43,33 +43,16 @@ DIST_pda = \
         $(NULL)
 
 DIST_icons16 = \
-	gnome-vlc16x16.png \
-	gvlc16x16.png \
-	kvlc16x16.png \
-	qvlc16x16.png \
 	vlc16x16.png \
 	vlc16x16.xpm \
 	$(NULL)
 
 DIST_icons32 = \
-	gnome-vlc32x32.png \
-	gnome-vlc32x32.xpm \
-	gvlc32x32.png \
-	gvlc32x32.xpm \
-	kvlc32x32.png \
-	kvlc32x32.xpm \
-	qvlc32x32.png \
-	qvlc32x32.xpm \
 	vlc32x32.png \
 	vlc32x32.xpm \
 	$(NULL)
 
 DIST_icons48 = \
-	gnome-vlc48x48.png \
-	gvlc48x48.ico \
-	gvlc48x48.png \
-	kvlc48x48.png \
-	qvlc48x48.png \
 	vlc48x48new.ico \
 	vlc48x48.png \
 	$(NULL)
