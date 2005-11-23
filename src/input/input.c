@@ -2450,7 +2450,7 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
         break;
 
     case VLC_VAR_INTEGER:
-        val.i_int = atoi( psz_value );
+        val.i_int = strtol( psz_value, NULL, 0 );
         break;
 
     case VLC_VAR_FLOAT:
