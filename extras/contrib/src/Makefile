@@ -1252,7 +1252,7 @@ wxwidgets: wxWidgets-$(WXWIDGETS_VERSION).tar.gz
 #	(cd wxwidgets; patch -p1 <../Patches/wxMSW-win32.patch)
 
 .wxwidgets: wxwidgets
-	(cd wxwidgets; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-optimise --disable-debug --disable-threads --disable-gif --disable-pcx --disable-iff --disable-pnm --without-zlib  --without-libpng --without-libjpeg --without-libtiff --without-regex  --disable-zipstream --disable-fs_zip --enable-no_rtti  --enable-no_exceptions --disable-exceptions --disable-stl --disable-html --without-expat --disable-protocols --disable-protocol --disable-xrc --disable-sound --disable-dialupman --disable-mediactrl  --disable-joystick --disable-grid --disable-datepick --disable-postscript--disable-filesystem --disable-fileproto --disable-ipc --disable-sockets  && make && make install)
+	(cd wxwidgets; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-optimise --disable-debug --disable-threads --disable-gif --disable-pcx --disable-iff --disable-pnm --without-zlib  --without-libpng --without-libjpeg --without-libtiff --without-regex  --disable-zipstream --disable-fs_zip --enable-no_rtti  --enable-no_exceptions --disable-exceptions --disable-stl --disable-html --without-expat --disable-protocols --disable-protocol --disable-xrc --disable-sound --disable-dialupman --disable-mediactrl  --disable-joystick --disable-grid --disable-datepick --disable-postscript--disable-filesystem --disable-fileproto --disable-ipc --disable-sockets --disable-precomp-headers && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
