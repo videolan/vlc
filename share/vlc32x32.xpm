@@ -1,5 +1,5 @@
 /* XPM */
-static char *vlc_program_icon_files_v3_32x32[] = {
+static char *vlc32x32_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "32 32 144 2",
 /* colors */
