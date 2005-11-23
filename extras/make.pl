@@ -36,8 +36,8 @@ while(<STDIN>)
           $line =~ s/^.* (lib.*\.so).*/ LINK    : $1/g ||
           $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2 -> $1/g ||
           $line =~ s/^.* (lib.*\.o)\s`.*`(.*);/ COMPILE : $2 -> $1/g ||
-          $line =~ s/^ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*/ ARCHIVE : $1/g ||
-          $line =~ s/^ranlib\s(.*)/ RANLIB  : $1/g ||
+          $line =~ s/^[A-z0-9-]*ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*/ ARCHIVE : $1/g ||
+          $line =~ s/^[A-z0-9-]*ranlib\s(.*)/ RANLIB  : $1/g ||
           $line =~ s/^Making\sall\sin\s(.*)/MAKE     : $1/g ||
           $line =~ s/^Making\sclean\sin\s(.*)/CLEAN  : $1/g ||
           $line =~ s/^rm\s\-f\s(.*)/ REMOVE  : $1/g ||
