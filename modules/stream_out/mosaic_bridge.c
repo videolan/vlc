@@ -57,6 +57,9 @@ struct sout_stream_sys_t
 struct decoder_owner_sys_t
 {
     picture_t *pp_pics[PICTURE_RING_SIZE];
+
+    /* Current format in use by the output */
+    video_format_t video;
 };
 
 typedef void (* pf_release_t)( picture_t * );
@@ -246,6 +249,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
         p_sys->p_decoder->p_owner->pp_pics[i] = 0;
+    p_sys->p_decoder->p_owner->video = p_fmt->video;
     //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     p_sys->p_decoder->p_module =
@@ -326,12 +330,25 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         return VLC_SUCCESS;
     }
 
-    if ( p_sys->p_decoder )
+    if ( p_sys->p_decoder != NULL )
     {
+        picture_t **pp_ring = p_sys->p_decoder->p_owner->pp_pics;
+
         if( p_sys->p_decoder->p_module )
             module_Unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
         vlc_object_detach( p_sys->p_decoder );
         vlc_object_destroy( p_sys->p_decoder );
+
+        for( i = 0; i < PICTURE_RING_SIZE; i++ )
+        {
+            if ( pp_ring[i] != NULL )
+            {
+                if ( pp_ring[i]->p_data_orig != NULL )
+                    free( pp_ring[i]->p_data_orig );
+                free( pp_ring[i]->p_sys );
+                free( pp_ring[i] );
+            }
+        }
     }
 
     vlc_mutex_lock( p_sys->p_lock );
@@ -476,6 +493,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 struct picture_sys_t
 {
     vlc_object_t *p_owner;
+    vlc_bool_t b_dead;
 };
 
 static void video_release_buffer( picture_t *p_pic )
@@ -489,14 +507,67 @@ static void video_release_buffer( picture_t *p_pic )
 
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
+    decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
     picture_t **pp_ring = p_dec->p_owner->pp_pics;
     picture_t *p_pic;
     int i;
 
+    if( p_dec->fmt_out.video.i_width != p_sys->video.i_width ||
+        p_dec->fmt_out.video.i_height != p_sys->video.i_height ||
+        p_dec->fmt_out.video.i_chroma != p_sys->video.i_chroma ||
+        p_dec->fmt_out.video.i_aspect != p_sys->video.i_aspect )
+    {
+        if( !p_dec->fmt_out.video.i_sar_num ||
+            !p_dec->fmt_out.video.i_sar_den )
+        {
+            p_dec->fmt_out.video.i_sar_num =
+              p_dec->fmt_out.video.i_aspect * p_dec->fmt_out.video.i_height;
+
+            p_dec->fmt_out.video.i_sar_den = VOUT_ASPECT_FACTOR *
+              p_dec->fmt_out.video.i_width;
+        }
+
+        vlc_reduce( &p_dec->fmt_out.video.i_sar_num,
+                    &p_dec->fmt_out.video.i_sar_den,
+                    p_dec->fmt_out.video.i_sar_num,
+                    p_dec->fmt_out.video.i_sar_den, 0 );
+
+        if( !p_dec->fmt_out.video.i_visible_width ||
+            !p_dec->fmt_out.video.i_visible_height )
+        {
+            p_dec->fmt_out.video.i_visible_width =
+                p_dec->fmt_out.video.i_width;
+            p_dec->fmt_out.video.i_visible_height =
+                p_dec->fmt_out.video.i_height;
+        }
+
+        p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
+        p_sys->video = p_dec->fmt_out.video;
+
+        for( i = 0; i < PICTURE_RING_SIZE; i++ )
+        {
+            if ( pp_ring[i] != NULL )
+            {
+                if ( pp_ring[i]->i_status == DESTROYED_PICTURE )
+                {
+                    if ( pp_ring[i]->p_data_orig != NULL )
+                        free( pp_ring[i]->p_data_orig );
+                    free( pp_ring[i]->p_sys );
+                    free( pp_ring[i] );
+                }
+                else
+                {
+                    pp_ring[i]->p_sys->b_dead = VLC_TRUE;
+                }
+                pp_ring[i] = NULL;
+            }
+        }
+    }
+
     /* Find an empty space in the picture ring buffer */
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
     {
-        if( pp_ring[i] != 0 && pp_ring[i]->i_status == DESTROYED_PICTURE )
+        if( pp_ring[i] != NULL && pp_ring[i]->i_status == DESTROYED_PICTURE )
         {
             pp_ring[i]->i_status = RESERVED_PICTURE;
             return pp_ring[i];
@@ -504,7 +575,7 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     }
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
     {
-        if( pp_ring[i] == 0 ) break;
+        if( pp_ring[i] == NULL ) break;
     }
 
     if( i == PICTURE_RING_SIZE )
@@ -531,12 +602,13 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     if( !p_pic->i_planes )
     {
         free( p_pic );
-        return 0;
+        return NULL;
     }
 
     p_pic->pf_release = video_release_buffer;
     p_pic->p_sys = malloc( sizeof(picture_sys_t) );
     p_pic->p_sys->p_owner = VLC_OBJECT(p_dec);
+    p_pic->p_sys->b_dead = VLC_FALSE;
     p_pic->i_status = RESERVED_PICTURE;
 
     pp_ring[i] = p_pic;
@@ -548,6 +620,13 @@ static void video_del_buffer( decoder_t *p_this, picture_t *p_pic )
 {
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
+    if ( p_pic->p_sys->b_dead )
+    {
+        if ( p_pic->p_data_orig != NULL )
+            free( p_pic->p_data_orig );
+        free( p_pic->p_sys );
+        free( p_pic );
+    }
 }
 
 static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
