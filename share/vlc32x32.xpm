@@ -1,5 +1,5 @@
 /* XPM */
-static char *vlc32x32_xpm[] = {
+static char *vlc_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "32 32 144 2",
 /* colors */
