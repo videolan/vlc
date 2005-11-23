@@ -598,8 +598,7 @@
         o_transcode_string = [NSMutableString stringWithString:@"transcode{"];
         if ( [o_transcode_video_chkbox state] == NSOnState )
         {
-            [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\""
-                                                            ",scale=\"%@\"",
+            [o_transcode_string appendFormat: @"vcodec=\"%@\",vb=\"%@\",scale=\"%@\"",
                 [o_transcode_video_selector titleOfSelectedItem],
                 [o_transcode_video_bitrate stringValue],
                 [o_transcode_video_scale stringValue]];
