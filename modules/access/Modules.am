@@ -1,5 +1,6 @@
 SOURCES_access_file = file.c
 SOURCES_access_directory = directory.c
+SOURCES_access_dv = dv.c
 SOURCES_access_udp = udp.c
 SOURCES_access_tcp = tcp.c
 SOURCES_access_http = http.c

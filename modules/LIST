@@ -12,6 +12,8 @@ $Id$
  * aa: Ascii art video output
 
  * access_directory: Access module to read files in a directory
+
+ * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
   
  * access_fake: Fake access to use for mosaic and other special streaming setups
 

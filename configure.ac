@@ -1485,6 +1485,128 @@ if test "${enable_livedotcom}" = "yes"; then
   fi
 fi
 
+dnl
+dnl dv module: digital video module check for libraw1394
+dnl
+AC_ARG_ENABLE(dv,
+[  --enable-dv             dv input module (default disabled)])
+if test "{enable_dv}" != "no"
+then
+  AC_ARG_WITH(dv-raw1394,
+  [    --with-dv-raw1394=PATH   libraw1394 headers and libraries])
+  AC_ARG_WITH(dv-raw1394-tree,
+  [    --with-dv-raw1394=PATH   libraw1394 tree for static linking])
+
+  if test -z "${with_dv_raw1394}" -a "${with_dv_raw1394}" != ""
+  then
+    AC_MSG_CHECKING(for raw1394 headers in ${with_dv_raw1394})
+    if test -f ${with_dv_raw1394}/include/libraw1394/raw1394.h
+    then
+      dnl  Use ${with_dv_raw1394}/include/libraw1394/raw1394.h
+      AC_MSG_RESULT(yes)
+      VLC_ADD_PLUGINS([access_dv])
+      VLC_ADD_LDFLAGS([access_dv],[-L${with_dv_raw1394}/lib -lraw1394 -lpthread])
+      VLC_ADD_CPPFLAGS([access_dv],[-I${with_dv_raw1394}/include])
+    else
+      dnl  No libraw1394 could be found, sorry
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${with_dv_raw1394}/include/libraw1394/raw1394.h])
+    fi
+  else
+    AC_CHECK_HEADERS(libraw1394/raw1394.h,
+    [ VLC_ADD_PLUGINS([access_dv])
+        VLC_ADD_LDFLAGS([access_dv],[-lraw1394 -lavc1394])
+    ],[
+        if test -n "${enable_dv}"
+        then
+          AC_MSG_ERROR([cannot find libraw1394 headers])
+        fi
+    ])
+  fi
+
+  dnl Check for static linking of libraw1394
+  if test -z "${with_dv_raw1394_tree}" -a "${with_dv_raw1394_tree}" != ""
+  then
+    AC_MSG_CHECKING(for libraw1394.a in ${with_dv_raw1394_tree})
+    real_dv_raw1394_tree="`cd ${with_dv_raw1394_tree} 2>/dev/null && pwd`"
+    if test -z "${real_dv_raw1394_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${real_dv_raw1394_tree}])
+    fi
+    if test -f "${real_dv_raw1394_tree}/src/.libs/libraw1394.a"
+    then
+      dnl  Use a custom libraw1394
+      AC_MSG_RESULT(${real_dv_raw1394_tree}/src/.libs/libraw1394.a)
+      VLC_ADD_BUILTINS([access_dv])
+      VLC_ADD_LDFLAGS([access_dv],[-L${real_dv_raw1394_tree}/src/.libs -lraw1394])
+      VLC_ADD_CPPFLAGS([access_dv],[-I${real_dv_raw1394_tree}])
+    else
+      dnl  The given libraw1394 wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_dv_raw1394_tree}/src/.libs/libraw1394.a, make sure you compiled libraw1394 in ${with_dv_raw1394_tree}])
+    fi
+  fi
+
+  dnl
+  dnl Check for libavc1394
+  dnl
+
+  AC_ARG_WITH(dv-avc1394,
+  [    --with-dv-avc1394=PATH   libavc1394 headers and libraries])
+  AC_ARG_WITH(dv-avc1394-tree,
+  [    --with-dv-avc1394=PATH   libavc1394 tree for static linking])
+
+  if test -z "${with_dv_avc1394}" -a "${with_dv_avc1394}" != ""
+  then
+    AC_MSG_CHECKING(for avc1394 headers in ${with_dv_avc1394})
+    if test -f ${with_dv_avc1394}/include/libavc1394/avc1394.h
+    then
+      dnl  Use ${with_dv_avc1394}/include/libavc1394/avc1394.h
+      AC_MSG_RESULT(yes)
+      VLC_ADD_LDFLAGS([access_dv],[-L${with_dv_avc1394}/lib -lavc1394 -lrom1394 -lpthread])
+      VLC_ADD_CPPFLAGS([access_dv],[-I${with_avc1394}/include])
+    else
+      dnl  No libavc1394 could be found, sorry
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${with_dv_avc1394}/include/libavc1394/avc1394.h])
+    fi
+  else
+    AC_CHECK_HEADERS(libavc1394/avc1394.h,
+    [ VLC_ADD_LDFLAGS([access_dv],[-lavc1394 -lrom1394 -lpthread])
+    ],[
+        if test -n "${enable_dv}"
+        then
+          AC_MSG_ERROR([cannot find libavc1394 headers])
+        fi
+    ])
+  fi
+
+  dnl Check for static linking of libavc1394
+  if test -z "${with_dv_avc1394_tree}" -a "${with_dv_avc1394_tree}" != ""
+  then
+    AC_MSG_CHECKING(for libavc1394.a in ${with_dv_avc1394_tree})
+    real_dv_avc1394_tree="`cd ${with_dv_avc1394_tree} 2>/dev/null && pwd`"
+    if test -z "${real_dv_avc1394_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${real_dv_avc1394_tree}])
+    fi
+    if test -f "${real_dv_avc1394_tree}/src/.libs/libavc1394.a"
+    then
+      dnl  Use a custom libavc1394
+      AC_MSG_RESULT(${real_dv_avc1394_tree}/src/.libs/libavc1394.a)
+      VLC_ADD_LDFLAGS([access_dv],[-L${real_dv_avc1394_tree}/src/.libs -lavc1394 -lrom1394 -lpthread])
+      VLC_ADD_CPPFLAGS([access_dv],[-I${real_dv_avc1394_tree}])
+    else
+      dnl  The given libavc1394 wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_dv_avc1394_tree}/src/.libs/libavc1394.a, make sure you compiled libavc1394 in ${with_dv_avc1394_tree}])
+    fi
+  fi
+fi
 
 dnl
 dnl dvdread module: check for libdvdread
