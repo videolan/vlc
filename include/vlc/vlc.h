@@ -572,4 +572,10 @@ int             VLC_FullScreen( int );
 }
 # endif
 
+#define LICENSE_MSG \
+  _("This program comes with NO WARRANTY, to the extent permitted by " \
+    "law.\nYou may redistribute it under the terms of the GNU General " \
+    "Public License;\nsee the file named COPYING for details.\n" \
+    "Written by the VideoLAN team; see the AUTHORS file.\n")
+
 #endif /* <vlc/vlc.h> */

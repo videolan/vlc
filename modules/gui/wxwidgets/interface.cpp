@@ -952,9 +952,9 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
        wxU(_("Compiler: "))+ wxU(VLC_Compiler())+wxT( ".\n") +
        wxU(_("Based on SVN revision: "))+wxU(VLC_Changeset())+wxT(".\n\n") +
 #ifdef __WXMSW__
-        wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,VLC_TRUE) ) + wxT("\n\n") +
+        wxU( vlc_wraptext(LICENSE_MSG,WRAPCOUNT,VLC_TRUE) ) + wxT("\n\n") +
 #else
-        wxU( INTF_ABOUT_MSG ) + wxT("\n\n") +
+        wxU( LICENSE_MSG ) + wxT("\n\n") +
 #endif
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );

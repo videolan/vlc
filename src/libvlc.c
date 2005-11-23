@@ -2433,11 +2433,7 @@ static void Version( void )
     if( strcmp( VLC_Changeset(), "exported" ) )
         fprintf( stdout, _("Based upon svn changeset [%s]\n"),
                  VLC_Changeset() );
-    fprintf( stdout,
-      _("This program comes with NO WARRANTY, to the extent permitted by "
-        "law.\nYou may redistribute it under the terms of the GNU General "
-        "Public License;\nsee the file named COPYING for details.\n"
-        "Written by the VideoLAN team; see the AUTHORS file.\n") );
+    fprintf( stdout, LICENSE_MSG );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     PauseConsole();

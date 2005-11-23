@@ -163,12 +163,4 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_EXIT       99
 
 /* Useful text messages shared by interfaces */
-#define INTF_ABOUT_MSG \
-    _( "VLC is an open-source and cross-platform multimedia " \
-       "player for various audio and video formats (MPEG-1, MPEG-2, MPEG-4, " \
-       "DivX, mp3, Ogg, etc.) as well as DVDs, VCDs, CD audio, and various " \
-       "streaming protocols.\n\n" \
-       "VLC is also a streaming server with transcoding capabilities " \
-       "(UDP unicast and multicast, HTTP, etc.) mainly designed for " \
-       "high-bandwidth networks.\n\n"\
-       "For more information, have a look at the web site." )
+#define INTF_ABOUT_MSG LICENSE_MSG
