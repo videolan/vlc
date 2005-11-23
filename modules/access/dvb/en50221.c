@@ -470,6 +470,36 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
 }
 
 /*****************************************************************************
+ * SessionSendClose
+ *****************************************************************************/
+static void SessionSendClose( access_t * p_access, int i_session_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    uint8_t p_response[16];
+    uint8_t i_tag;
+    uint8_t i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+
+    p_response[0] = ST_CLOSE_SESSION_REQUEST;
+    p_response[1] = 0x2;
+    p_response[2] = i_session_id >> 8;
+    p_response[3] = i_session_id & 0xff;
+
+    if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p_response, 4 ) !=
+            VLC_SUCCESS )
+    {
+        msg_Err( p_access,
+                 "SessionSendClose: couldn't send TPDU on slot %d", i_slot );
+        return;
+    }
+    if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_access,
+                 "SessionSendClose: couldn't recv TPDU on slot %d", i_slot );
+        return;
+    }
+}
+
+/*****************************************************************************
  * SessionClose
  *****************************************************************************/
 static void SessionClose( access_t * p_access, int i_session_id )
@@ -493,13 +523,13 @@ static void SessionClose( access_t * p_access, int i_session_id )
             VLC_SUCCESS )
     {
         msg_Err( p_access,
-                 "SessionOpen: couldn't send TPDU on slot %d", i_slot );
+                 "SessionClose: couldn't send TPDU on slot %d", i_slot );
         return;
     }
     if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
     {
         msg_Err( p_access,
-                 "SessionOpen: couldn't recv TPDU on slot %d", i_slot );
+                 "SessionClose: couldn't recv TPDU on slot %d", i_slot );
         return;
     }
 }
@@ -532,6 +562,14 @@ static void SPDUHandle( access_t * p_access, uint8_t i_slot,
     case ST_CLOSE_SESSION_REQUEST:
         i_session_id = ((int)p_spdu[2] << 8) | p_spdu[3];
         SessionClose( p_access, i_session_id );
+        break;
+
+    case ST_CLOSE_SESSION_RESPONSE:
+        i_session_id = ((int)p_spdu[2] << 8) | p_spdu[3];
+        if ( p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
+            p_sys->p_sessions[i_session_id - 1].pf_close( p_access,
+                                                          i_session_id );
+        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
         break;
 
     default:
@@ -1251,16 +1289,151 @@ static void DateTimeOpen( access_t * p_access, int i_session_id )
  * MMI
  */
 
+/* Display Control Commands */
+
+#define DCC_SET_MMI_MODE                          0x01
+#define DCC_DISPLAY_CHARACTER_TABLE_LIST          0x02
+#define DCC_INPUT_CHARACTER_TABLE_LIST            0x03
+#define DCC_OVERLAY_GRAPHICS_CHARACTERISTICS      0x04
+#define DCC_FULL_SCREEN_GRAPHICS_CHARACTERISTICS  0x05
+
+/* MMI Modes */
+
+#define MM_HIGH_LEVEL                      0x01
+#define MM_LOW_LEVEL_OVERLAY_GRAPHICS      0x02
+#define MM_LOW_LEVEL_FULL_SCREEN_GRAPHICS  0x03
+
+/* Display Reply IDs */
+
+#define DRI_MMI_MODE_ACK                              0x01
+#define DRI_LIST_DISPLAY_CHARACTER_TABLES             0x02
+#define DRI_LIST_INPUT_CHARACTER_TABLES               0x03
+#define DRI_LIST_GRAPHIC_OVERLAY_CHARACTERISTICS      0x04
+#define DRI_LIST_FULL_SCREEN_GRAPHIC_CHARACTERISTICS  0x05
+#define DRI_UNKNOWN_DISPLAY_CONTROL_CMD               0xF0
+#define DRI_UNKNOWN_MMI_MODE                          0xF1
+#define DRI_UNKNOWN_CHARACTER_TABLE                   0xF2
+
+/* Enquiry Flags */
+
+#define EF_BLIND  0x01
+
+/* Answer IDs */
+
+#define AI_CANCEL  0x00
+#define AI_ANSWER  0x01
+
+/*****************************************************************************
+ * MMIDisplayReply
+ *****************************************************************************/
+static void MMIDisplayReply( access_t *p_access, int i_session_id )
+{
+    uint8_t p_response[2];
+
+    p_response[0] = DRI_MMI_MODE_ACK;
+    p_response[1] = MM_HIGH_LEVEL;
+
+    APDUSend( p_access, i_session_id, AOT_DISPLAY_REPLY, p_response, 2 );
+
+    msg_Dbg( p_access, "sending DisplayReply on session (%d)", i_session_id );
+}
+
+/*****************************************************************************
+ * MMIGetText
+ *****************************************************************************/
+static char *MMIGetText( access_t *p_access, char *psz_text,
+                         uint8_t **pp_apdu, int *pi_size )
+{
+    int i_tag = APDUGetTag( *pp_apdu, *pi_size );
+    int l;
+    uint8_t *d;
+
+    if ( i_tag != AOT_TEXT_LAST )
+    {
+        msg_Err( p_access, "unexpected text tag: %06x", i_tag );
+        psz_text[0] = '\0';
+        *pi_size = 0;
+        return psz_text;
+    }
+
+    d = APDUGetLength( *pp_apdu, &l );
+    strncpy( psz_text, (char *)d, l );
+    psz_text[l] = '\0';
+
+    *pp_apdu += l + 4;
+    *pi_size -= l + 4;
+    return psz_text;
+}
+
 /*****************************************************************************
  * MMIHandle
  *****************************************************************************/
-static void MMIHandle( access_t * p_access, int i_session_id,
-                            uint8_t *p_apdu, int i_size )
+static void MMIHandle( access_t *p_access, int i_session_id,
+                       uint8_t *p_apdu, int i_size )
 {
     int i_tag = APDUGetTag( p_apdu, i_size );
 
     switch ( i_tag )
     {
+    case AOT_DISPLAY_CONTROL:
+    {
+        int l;
+        uint8_t *d = APDUGetLength( p_apdu, &l );
+
+        if ( l > 0 )
+        {
+            switch ( *d )
+            {
+            case DCC_SET_MMI_MODE:
+                if ( l == 2 && d[1] == MM_HIGH_LEVEL )
+                    MMIDisplayReply( p_access, i_session_id );
+                else
+                    msg_Err( p_access, "unsupported MMI mode %02x", d[1] );
+                break;
+
+            default:
+                msg_Err( p_access, "unsupported display control command %02x",
+                         *d );
+                break;
+            }
+        }
+        break;
+    }
+
+    case AOT_LIST_LAST:
+    case AOT_MENU_LAST:
+    {
+        int l;
+        uint8_t *d = APDUGetLength( p_apdu, &l );
+        char psz_text[255];
+
+        if ( l > 0 )
+        {
+            l--; d++; /* choice_nb */
+
+            if ( l > 0 )
+                msg_Info( p_access, "MMI title: %s",
+                          MMIGetText( p_access, psz_text, &d, &l ) );
+            if ( l > 0 )
+                msg_Info( p_access, "MMI subtitle: %s",
+                          MMIGetText( p_access, psz_text, &d, &l ) );
+            if ( l > 0 )
+                msg_Info( p_access, "MMI bottom: %s",
+                          MMIGetText( p_access, psz_text, &d, &l ) );
+            while ( l > 0 )
+            {
+                msg_Info( p_access, "MMI: %s",
+                          MMIGetText( p_access, psz_text, &d, &l ) );
+            }
+        }
+        break;
+    }
+
+    case AOT_CLOSE_MMI:
+        SessionSendClose( p_access, i_session_id );
+        msg_Dbg( p_access, "closing MMI session (%d)", i_session_id );
+        break;
+
     default:
         msg_Err( p_access, "unexpected tag in MMIHandle (0x%x)", i_tag );
     }
@@ -1269,7 +1442,7 @@ static void MMIHandle( access_t * p_access, int i_session_id,
 /*****************************************************************************
  * MMIOpen
  *****************************************************************************/
-static void MMIOpen( access_t * p_access, int i_session_id )
+static void MMIOpen( access_t *p_access, int i_session_id )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
