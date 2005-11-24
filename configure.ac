@@ -5109,6 +5109,12 @@ dnl for a in `./vlc-config --target builtin` ; do echo $a; done | sed -e 's,modu
 dnl echo "Enabled plugin modules :"
 dnl for a in `./vlc-config --target plugin` ; do echo $a; done | sed -e 's,modules\/\(.*\)\/lib\(.*\)_plugin,\2 (\1),'
 
+dnl Shortcut to nice compile message
+rm -f compile
+echo '#! /bin/sh' >compile
+echo "PATH=$PATH LANG=C make 2>&1 | ${srcdir}/extras/make.pl" >>compile
+chmod a+x compile
+
 printf "
 vlc configuration
 --------------------
@@ -5125,6 +5131,6 @@ echo "
 vlc aliases           :${ALIASES}
 
 You can tune the compiler flags in vlc-config.
-To build vlc and its plugins, type \`make'.
+To build vlc and its plugins, type \`./compile' or \`make'.
 "
 
