@@ -23,7 +23,6 @@ DIST_fonts = \
 	$(NULL)
 
 DIST_rsrc = \
-	vlc.icns \
 	newres.h \
 	resource.h \
 	vlc_wince_rc.rc \
