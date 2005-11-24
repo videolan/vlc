@@ -94,7 +94,7 @@ static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
 #endif
 
 #define OSD_UPDATE_MIN     0
-#define OSD_UPDATE_DEFAULT 0
+#define OSD_UPDATE_DEFAULT 200
 #define OSD_UPDATE_MAX     1000
 
 vlc_module_begin();
