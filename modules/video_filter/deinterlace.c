@@ -166,6 +166,11 @@ struct vout_sys_t
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
+    if( i_query == VOUT_SET_ZOOM )
+    {
+        p_vout->p_sys->p_vout->i_window_width = p_vout->i_window_width;
+        p_vout->p_sys->p_vout->i_window_height = p_vout->i_window_height;
+    }
     return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
 }
 
