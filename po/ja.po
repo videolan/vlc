@@ -1,17 +1,14 @@
 # translation of ja.po to Japanese
 # Japanese translation for VLC
-# Copyright (C) 2002,2004 the VideoLAN team
-# $Id$
-#
-#
+# Copyright (C) 2002 VideoLAN project
 # Fumio Nakayama <endymion@ca2.so-net.ne.jp>, 2002.
-# Tadashi Jokagi <fedora@elf.no-ip.org>, 2004.
+# Tadashi Jokagi <elf2000@users.sourceforge.net>, 2004-2005.
 msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-11-22 11:20+0100\n"
-"PO-Revision-Date: 2004-09-20 02:46+0900\n"
+"PO-Revision-Date: 2005-11-20 02:02+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -25,43 +22,38 @@ msgstr "VLC 設定"
 
 #: include/vlc_config_cat.h:34
 msgid "Click on \"Advanced Options\" to see all options."
-msgstr ""
+msgstr "すべてのオプションを見るには「高度なオプション」をクリックします。"
 
 #: include/vlc_config_cat.h:36 include/vlc_config_cat.h:122
 #: src/input/input.c:1820 src/input/input.c:1880 src/playlist/item.c:366
 #: src/playlist/playlist.c:164 modules/gui/wince/playlist.cpp:674
 #: modules/visualization/visual/visual.c:113
 msgid "General"
-msgstr ""
+msgstr "一般"
 
 #: include/vlc_config_cat.h:39 src/libvlc.h:1328 modules/misc/dummy/dummy.c:67
 msgid "Interface"
 msgstr "インタフェース"
 
 #: include/vlc_config_cat.h:40
-#, fuzzy
 msgid "Settings for VLC interfaces"
-msgstr "ネットワーク・インタフェース"
+msgstr "VLC インターフェースの設定"
 
 #: include/vlc_config_cat.h:42
-#, fuzzy
 msgid "General interface setttings"
-msgstr "一般設定"
+msgstr "一般インターフェース設定"
 
 #: include/vlc_config_cat.h:44 src/libvlc.h:64
-#, fuzzy
 msgid "Control interfaces"
-msgstr "リモート・コントロール・インタフェース・モジュール"
+msgstr "制御インターフェース"
 
 #: include/vlc_config_cat.h:45
-#, fuzzy
 msgid "Control interface settings"
-msgstr "インターフェースプラグイン設定"
+msgstr "制御インターフェース設定"
 
 #: include/vlc_config_cat.h:47 include/vlc_config_cat.h:48
-#, fuzzy
 msgid "Hotkeys settings"
-msgstr "オーディオエンコーダー設定"
+msgstr "ホットキー設定"
 
 #: include/vlc_config_cat.h:51 src/input/es_out.c:1546 src/libvlc.h:964
 #: modules/gui/beos/InterfaceWindow.cpp:280 modules/gui/macosx/extended.m:81
@@ -72,14 +64,12 @@ msgid "Audio"
 msgstr "オーディオ"
 
 #: include/vlc_config_cat.h:52
-#, fuzzy
 msgid "Audio settings"
-msgstr "オーディオフィルター設定"
+msgstr "オーディオ設定"
 
 #: include/vlc_config_cat.h:54 include/vlc_config_cat.h:55
-#, fuzzy
 msgid "General audio settings"
-msgstr "一般設定"
+msgstr "一般オーディオ設定"
 
 #: include/vlc_config_cat.h:57 include/vlc_config_cat.h:82
 #: src/video_output/video_output.c:398
@@ -96,9 +86,8 @@ msgid "Visualizations"
 msgstr "ビジュアル化"
 
 #: include/vlc_config_cat.h:63 src/audio_output/input.c:152
-#, fuzzy
 msgid "Audio visualizations"
-msgstr "ビジュアル化"
+msgstr "オーディオのビジュアル化"
 
 #: include/vlc_config_cat.h:65 include/vlc_config_cat.h:78
 #, fuzzy
@@ -107,7 +96,7 @@ msgstr "出力方法"
 
 #: include/vlc_config_cat.h:66
 msgid "These are general settings for audio output modules."
-msgstr ""
+msgstr "これらはオーディオ出力モジュールの一般設定です"
 
 #: include/vlc_config_cat.h:68 src/libvlc.h:1259 src/libvlc.h:1297
 #: src/libvlc.h:1339 modules/gui/wxwidgets/menus.cpp:310
@@ -116,9 +105,8 @@ msgid "Miscellaneous"
 msgstr "その他"
 
 #: include/vlc_config_cat.h:69
-#, fuzzy
 msgid "Miscellaneous audio settings and modules"
-msgstr "その他のオプション"
+msgstr "その他のオーディオとモジュールの設定"
 
 #: include/vlc_config_cat.h:72 src/input/es_out.c:1568 src/libvlc.h:999
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:518
@@ -130,14 +118,12 @@ msgid "Video"
 msgstr "ビデオ"
 
 #: include/vlc_config_cat.h:73
-#, fuzzy
 msgid "Video settings"
-msgstr "ビデオフィルター設定"
+msgstr "ビデオ設定"
 
 #: include/vlc_config_cat.h:75 include/vlc_config_cat.h:76
-#, fuzzy
 msgid "General video settings"
-msgstr "一般設定"
+msgstr "一般ビデオ設定"
 
 #: include/vlc_config_cat.h:80
 #, fuzzy
@@ -160,9 +146,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:89
-#, fuzzy
 msgid "Text rendering"
-msgstr "ダイレクトレンダリング"
+msgstr "テキストレンダリング"
 
 #: include/vlc_config_cat.h:91
 msgid ""
@@ -172,7 +157,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:95
 msgid "Input / Codecs"
-msgstr ""
+msgstr "入力 / コーデック"
 
 #: include/vlc_config_cat.h:96
 msgid ""
@@ -181,7 +166,6 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:98
-#, fuzzy
 msgid "Access modules"
 msgstr "アクセスモジュール"
 
@@ -192,9 +176,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:104
-#, fuzzy
 msgid "Access filters"
-msgstr "アクセスモジュール"
+msgstr "アクセスフィルター"
 
 #: include/vlc_config_cat.h:106
 msgid ""
@@ -327,9 +310,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:167
-#, fuzzy
 msgid "VOD"
-msgstr "DVD"
+msgstr "VOD"
 
 #: include/vlc_config_cat.h:168
 msgid "VLC's implementation of Video On Demand"
@@ -343,7 +325,7 @@ msgstr ""
 #: modules/gui/wxwidgets/interface.cpp:535
 #: modules/gui/wxwidgets/playlist.cpp:196
 msgid "Playlist"
-msgstr "リスト"
+msgstr "プレイ一覧"
 
 #: include/vlc_config_cat.h:173
 msgid ""
@@ -353,8 +335,9 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:175
+#, fuzzy
 msgid "General playlist behaviour"
-msgstr ""
+msgstr "プレイ一覧を開く"
 
 #: include/vlc_config_cat.h:176 modules/gui/macosx/playlist.m:508
 #: modules/gui/wxwidgets/playlist.cpp:234
@@ -434,9 +417,8 @@ msgid "These are general settings for video/audio/subtitles encoding modules."
 msgstr ""
 
 #: include/vlc_config_cat.h:207
-#, fuzzy
 msgid "Dialog providers settings"
-msgstr "オーディオエンコーダー設定"
+msgstr "ダイアログ提供設定"
 
 #: include/vlc_config_cat.h:209
 msgid "Dialog providers can be configured here."
@@ -565,14 +547,12 @@ msgid "Now Playing"
 msgstr "再生"
 
 #: include/vlc_meta.h:41
-#, fuzzy
 msgid "CDDB Artist"
-msgstr "アーティスト"
+msgstr "CDDB アーティスト"
 
 #: include/vlc_meta.h:42
-#, fuzzy
 msgid "CDDB Category"
-msgstr "CDDB ディスクカテゴリ"
+msgstr "CDDB カテゴリ"
 
 #: include/vlc_meta.h:43
 msgid "CDDB Disc ID"
@@ -580,75 +560,68 @@ msgstr "CDDB ディスク ID"
 
 #: include/vlc_meta.h:44
 msgid "CDDB Extended Data"
-msgstr ""
+msgstr "CDDB 拡張データ"
 
 #: include/vlc_meta.h:45
-#, fuzzy
 msgid "CDDB Genre"
-msgstr "サーバーなし"
+msgstr "CDDB ジャンル"
 
 #: include/vlc_meta.h:46
 #, fuzzy
 msgid "CDDB Year"
-msgstr "サーバーなし"
+msgstr "CDDB 年"
 
 #: include/vlc_meta.h:47
-#, fuzzy
 msgid "CDDB Title"
-msgstr "タイトル"
+msgstr "CDDB タイトル"
 
 #: include/vlc_meta.h:49
 msgid "CD-Text Arranger"
-msgstr ""
+msgstr "CD テキストアレンジャー"
 
 #: include/vlc_meta.h:50
 msgid "CD-Text Composer"
-msgstr ""
+msgstr "CD テキストコンポーサー"
 
 #: include/vlc_meta.h:51
-#, fuzzy
 msgid "CD-Text Disc ID"
-msgstr "CDDB ディスク ID"
+msgstr "CD テキストディスク ID"
 
 #: include/vlc_meta.h:52
 msgid "CD-Text Genre"
-msgstr ""
+msgstr "CD テキストジャンル"
 
 #: include/vlc_meta.h:53
-#, fuzzy
 msgid "CD-Text Message"
-msgstr "メッセージ"
+msgstr "CD テキストメッセージ"
 
 #: include/vlc_meta.h:54
 msgid "CD-Text Songwriter"
-msgstr ""
+msgstr "CD テキストソングライター"
 
 #: include/vlc_meta.h:55
 msgid "CD-Text Performer"
-msgstr ""
+msgstr "<CD テキストパフォーマー"
 
 #: include/vlc_meta.h:56
-#, fuzzy
 msgid "CD-Text Title"
-msgstr "次のタイトル"
+msgstr "CD テキストタイトル"
 
 #: include/vlc_meta.h:58
-#, fuzzy
 msgid "ISO-9660 Application ID"
-msgstr "アプリケーション"
+msgstr "ISO-9660 アプリケーション ID"
 
 #: include/vlc_meta.h:59
-#, fuzzy
 msgid "ISO-9660 Preparer"
-msgstr "準備"
+msgstr "ISO-9660 準備"
 
 #: include/vlc_meta.h:60
 msgid "ISO-9660 Publisher"
-msgstr ""
+msgstr "ISO-9660 出版社"
 
 #: include/vlc_meta.h:61
 msgid "ISO-9660 Volume"
-msgstr ""
+msgstr "ISO-9660 ボリューム"
 
 #: include/vlc_meta.h:62
 #, fuzzy
@@ -685,9 +658,8 @@ msgstr "スペクトラム"
 #: src/audio_output/input.c:123 modules/audio_filter/equalizer.c:66
 #: modules/gui/macosx/equalizer.m:140 modules/gui/macosx/equalizer.m:154
 #: modules/gui/macosx/intf.m:541 modules/gui/wxwidgets/extrapanel.cpp:179
-#, fuzzy
 msgid "Equalizer"
-msgstr "ビデオ・フィルター・モジュール"
+msgstr "イコライザー"
 
 #: src/audio_output/input.c:145 src/libvlc.h:173
 #: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:392
@@ -820,9 +792,8 @@ msgstr "プログラム"
 #: modules/gui/wxwidgets/playlist.cpp:496 modules/gui/wxwidgets/timer.cpp:138
 #: modules/gui/wxwidgets/timer.cpp:201 modules/misc/playlist/m3u.c:68
 #: modules/services_discovery/daap.c:607 modules/services_discovery/daap.c:609
-#, fuzzy
 msgid "Meta-information"
-msgstr "バージョン情報の印刷"
+msgstr "メタ情報"
 
 #: src/input/es_out.c:1533
 #, c-format
@@ -851,7 +822,7 @@ msgstr "サンプルレート"
 #: src/input/es_out.c:1554
 #, c-format
 msgid "%d Hz"
-msgstr ""
+msgstr "%d Hz"
 
 #: src/input/es_out.c:1558
 msgid "Bits per sample"
@@ -876,9 +847,8 @@ msgid "Display resolution"
 msgstr "ディスプレイ解像度選択"
 
 #: src/input/es_out.c:1584 modules/access/screen/screen.c:41
-#, fuzzy
 msgid "Frame rate"
-msgstr "サンプルレート"
+msgstr "フレームレート"
 
 #: src/input/es_out.c:1591
 msgid "Subtitle"
@@ -901,7 +871,6 @@ msgid "Bookmark"
 msgstr "ブックマーク"
 
 #: src/input/var.c:131
-#, fuzzy
 msgid "Programs"
 msgstr "プログラム"
 
@@ -998,9 +967,9 @@ msgid " (default disabled)"
 msgstr " (デフォルト無効)"
 
 #: src/libvlc.c:2422
-#, fuzzy, c-format
+#, c-format
 msgid "VLC version %s\n"
-msgstr "サイズ"
+msgstr "VLC バージョン %s\n"
 
 #: src/libvlc.c:2423
 #, fuzzy, c-format
@@ -1008,9 +977,9 @@ msgid "Compiled by %s@%s.%s\n"
 msgstr "エラー"
 
 #: src/libvlc.c:2425
-#, fuzzy, c-format
+#, c-format
 msgid "Compiler: %s\n"
-msgstr "エラー"
+msgstr "コンパイラー: %s\n"
 
 #: src/libvlc.c:2427
 #, c-format
@@ -1058,7 +1027,7 @@ msgstr "アメリカ英語"
 #: src/libvlc.h:34
 #, fuzzy
 msgid "British English"
-msgstr "イギリス英語"
+msgstr "英語"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:59
 #, fuzzy
@@ -1098,7 +1067,7 @@ msgstr "日本語"
 #: src/libvlc.h:34 src/misc/iso-639_def.h:111
 #, fuzzy
 msgid "Korean"
-msgstr "真偽値"
+msgstr "韓国語"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:69
 msgid "Dutch"
@@ -1107,11 +1076,11 @@ msgstr ""
 #: src/libvlc.h:34
 #, fuzzy
 msgid "Brazilian Portuguese"
-msgstr "プログラムの選択"
+msgstr "ポルトガル語"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:153
 msgid "Romanian"
-msgstr ""
+msgstr "ルーマニア語"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:155
 msgid "Russian"
@@ -1197,14 +1166,13 @@ msgid "This option turns off all warning and information messages."
 msgstr "すべての警告と情報メッセージを抑止します。"
 
 #: src/libvlc.h:77
-#, fuzzy
 msgid "Default stream"
-msgstr "削除"
+msgstr "デフォルトストリーム"
 
 #: src/libvlc.h:79
 #, fuzzy
 msgid "This option allows you to always open a default stream on start-up."
-msgstr "VLCがプラグインを見つけるときに検索される追加のパスを設定します。"
+msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: src/libvlc.h:82
 #, fuzzy
@@ -1217,7 +1185,7 @@ msgstr ""
 
 #: src/libvlc.h:86
 msgid "Color messages"
-msgstr "カラーメッセージ"
+msgstr "色メッセージ"
 
 #: src/libvlc.h:88
 msgid ""
@@ -1282,9 +1250,8 @@ msgid "This will force a mono audio output."
 msgstr "オーディオ出力を強制的にモノラルにします。"
 
 #: src/libvlc.h:118
-#, fuzzy
 msgid "Default audio volume"
-msgstr "オーディオ・チャンネルの選択"
+msgstr "デフォルトのオーディオボリューム"
 
 #: src/libvlc.h:120
 msgid ""
@@ -1381,7 +1348,7 @@ msgstr ""
 
 #: src/libvlc.h:162
 msgid "Force detection of Dolby Surround"
-msgstr ""
+msgstr "ドルビーサラウンドの強制検知"
 
 #: src/libvlc.h:164
 msgid ""
@@ -1392,9 +1359,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:170
-#, fuzzy
 msgid "On"
-msgstr "開く"
+msgstr "オン"
 
 #: src/libvlc.h:170
 msgid "Off"
@@ -1650,8 +1616,9 @@ msgstr ""
 "ウの映像クォリティに効果を加えるフィルターを指定できます。"
 
 #: src/libvlc.h:272
+#, fuzzy
 msgid "Video snapshot directory"
-msgstr ""
+msgstr "ディレクトリを選択する"
 
 #: src/libvlc.h:274
 #, fuzzy
@@ -1874,7 +1841,7 @@ msgstr "DVDの中で使用したい字幕のチャンネル番号を指定しま
 #: src/libvlc.h:376
 #, fuzzy
 msgid "Audio language"
-msgstr "オーディオチャンネルの選択"
+msgstr "オーディオ・チャンネルの選択"
 
 #: src/libvlc.h:378
 #, fuzzy
@@ -1887,7 +1854,7 @@ msgstr ""
 #: src/libvlc.h:381
 #, fuzzy
 msgid "Subtitle language"
-msgstr "オーディオチャンネルの選択"
+msgstr "字幕ファイル"
 
 #: src/libvlc.h:383
 #, fuzzy
@@ -1970,7 +1937,7 @@ msgstr ""
 #: src/libvlc.h:422 src/libvlc.h:1061 src/misc/iso-639_def.h:143
 #: modules/stream_out/transcode.c:239
 msgid "On Screen Display"
-msgstr ""
+msgstr "オンスクリーンディスプレイ"
 
 #: src/libvlc.h:424
 msgid ""
@@ -1979,9 +1946,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:427
-#, fuzzy
 msgid "Subpictures filter module"
-msgstr "ビデオフィルターモジュール"
+msgstr "字幕フィルターモジュール"
 
 #: src/libvlc.h:429
 msgid ""
@@ -1990,9 +1956,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:432
-#, fuzzy
 msgid "Autodetect subtitle files"
-msgstr "字幕の選択"
+msgstr "字幕ファイルの自動検知"
 
 #: src/libvlc.h:434
 msgid ""
@@ -2096,9 +2061,8 @@ msgstr ""
 "て使用されます。"
 
 #: src/libvlc.h:492
-#, fuzzy
 msgid "Force IPv4"
-msgstr "強制で IPv4"
+msgstr "強制的に IPv4"
 
 #: src/libvlc.h:494
 msgid ""
@@ -2124,7 +2088,7 @@ msgstr ""
 #: src/libvlc.h:502
 #, fuzzy
 msgid "SOCKS server"
-msgstr "サーバーなし"
+msgstr "CDDB サーバー"
 
 #: src/libvlc.h:504
 msgid ""
@@ -2157,9 +2121,8 @@ msgid ""
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: src/libvlc.h:515
-#, fuzzy
 msgid "Title metadata"
-msgstr "ファイル"
+msgstr "タイトルメタデータ"
 
 #: src/libvlc.h:517
 msgid "Allows you to specify a \"title\" metadata for an input."
@@ -2190,9 +2153,8 @@ msgid "Allows you to specify a \"genre\" metadata for an input."
 msgstr ""
 
 #: src/libvlc.h:531
-#, fuzzy
 msgid "Copyright metadata"
-msgstr "コピー"
+msgstr "著作権メタデータ"
 
 #: src/libvlc.h:533
 msgid "Allows you to specify a \"copyright\" metadata for an input."
@@ -2230,9 +2192,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:552
-#, fuzzy
 msgid "Preferred codecs list"
-msgstr "準備されているコーデックの一覧の選択"
+msgstr "準備されているコーデックの一覧"
 
 #: src/libvlc.h:554
 msgid ""
@@ -2242,9 +2203,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:558
-#, fuzzy
 msgid "Preferred encoders list"
-msgstr "準備されているコーデックの一覧の選択"
+msgstr "準備されているエンコーダー一覧"
 
 #: src/libvlc.h:560
 #, fuzzy
@@ -2380,7 +2340,7 @@ msgstr ""
 #: src/libvlc.h:623
 #, fuzzy
 msgid "Enable FPU support"
-msgstr "CPU の MMX サポートを有効にする"
+msgstr "CPU の SSE サポートを有効にする"
 
 #: src/libvlc.h:625
 #, fuzzy
@@ -2453,7 +2413,6 @@ msgstr ""
 "ジを利用することができます。"
 
 #: src/libvlc.h:653
-#, fuzzy
 msgid "Enable CPU AltiVec support"
 msgstr "CPU の AltiVec サポートを有効にする"
 
@@ -2492,11 +2451,9 @@ msgid ""
 "When selected, VLC will randomly play files in the playlist until "
 "interrupted."
 msgstr ""
-"このオプションが選択されるとVLCはプレイリストのファイルをランダムに再生しま"
-"す。"
+"このオプションが選択されるとVLCはプレイ一覧のファイルをランダムに再生します。"
 
 #: src/libvlc.h:672
-#, fuzzy
 msgid "Repeat all"
 msgstr "すべて繰り返す"
 
@@ -2505,10 +2462,9 @@ msgid ""
 "If you want VLC to keep playing the playlist indefinitely then enable this "
 "option."
 msgstr ""
-"プレイリストの再生を繰り返して行いたい場合には、このオプションを選択します。"
+"プレイ一覧の再生を繰り返して行いたい場合には、このオプションを選択します。"
 
 #: src/libvlc.h:677
-#, fuzzy
 msgid "Repeat current item"
 msgstr "現在の項目を繰り返す"
 
@@ -2519,9 +2475,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:682
-#, fuzzy
 msgid "Play and stop"
-msgstr "常に最前面"
+msgstr "再生と停止"
 
 #: src/libvlc.h:684
 msgid "Stop the playlist after each played playlist item. "
@@ -2590,7 +2545,7 @@ msgstr ""
 
 #: src/libvlc.h:717
 msgid "Adjust VLC priority"
-msgstr ""
+msgstr "VLC 優先度調整"
 
 #: src/libvlc.h:719
 msgid ""
@@ -2619,9 +2574,8 @@ msgid ""
 msgstr "VLCがプラグインを見つけるときに検索される追加のパスを設定します。"
 
 #: src/libvlc.h:732
-#, fuzzy
 msgid "VLM configuration file"
-msgstr "コンフィグレーション・オプションにツールチップを表示"
+msgstr "VLM 設定ファイル"
 
 #: src/libvlc.h:734
 #, fuzzy
@@ -2632,7 +2586,7 @@ msgstr "VLCがプラグインを見つけるときに検索される追加のパ
 
 #: src/libvlc.h:737
 msgid "Use a plugins cache"
-msgstr ""
+msgstr "プラグインキャッシュを使う"
 
 #: src/libvlc.h:739
 msgid ""
@@ -2642,11 +2596,11 @@ msgstr ""
 
 #: src/libvlc.h:742
 msgid "Run as daemon process"
-msgstr ""
+msgstr "デーモンプロセスとして実行する"
 
 #: src/libvlc.h:744
 msgid "Runs VLC as a background daemon process."
-msgstr ""
+msgstr "バックグラウンドデーモンプロセスとして実行する"
 
 #: src/libvlc.h:746
 msgid "Allow only one running instance"
@@ -2826,14 +2780,12 @@ msgid "Select the hotkey to display the position."
 msgstr ""
 
 #: src/libvlc.h:811
-#, fuzzy
 msgid "Jump 3 seconds backwards"
-msgstr "10 秒前に戻る"
+msgstr "3 秒前に戻る"
 
 #: src/libvlc.h:812
-#, fuzzy
 msgid "Select the hotkey to jump 3 seconds backwards."
-msgstr "10 秒前に戻るホットキーを選択する"
+msgstr "3 秒前に戻るホットキーを選択する"
 
 #: src/libvlc.h:813
 msgid "Jump 10 seconds backwards"
@@ -2860,14 +2812,12 @@ msgid "Select the hotkey to jump 5 minutes backwards."
 msgstr "5 分前に戻るホットキーを選択する<"
 
 #: src/libvlc.h:821
-#, fuzzy
 msgid "Jump 3 seconds forward"
-msgstr "10 秒先に進む"
+msgstr "3 秒先に進む"
 
 #: src/libvlc.h:822
-#, fuzzy
 msgid "Select the hotkey to jump 3 seconds forward."
-msgstr "10 秒進むホットキーを選択する"
+msgstr "3 秒進むホットキーを選択する"
 
 #: src/libvlc.h:823
 msgid "Jump 10 seconds forward"
@@ -2901,7 +2851,7 @@ msgstr "終了"
 #: src/libvlc.h:832
 #, fuzzy
 msgid "Select the hotkey to quit the application."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:833
 #, fuzzy
@@ -2938,7 +2888,7 @@ msgstr "ナビゲーション(_N)"
 #: src/libvlc.h:840
 #, fuzzy
 msgid "Select the key to move the selector right in DVD menus."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:841
 msgid "Activate"
@@ -2956,7 +2906,7 @@ msgstr "DVD メニューを使用"
 #: src/libvlc.h:844
 #, fuzzy
 msgid "Select the key to take you to the DVD menu"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:845
 #, fuzzy
@@ -2966,7 +2916,7 @@ msgstr "前のタイトルを選択"
 #: src/libvlc.h:846
 #, fuzzy
 msgid "Select the key to choose the previous title from the DVD"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:847
 #, fuzzy
@@ -2976,7 +2926,7 @@ msgstr "ファイルの選択"
 #: src/libvlc.h:848
 #, fuzzy
 msgid "Select the key to choose the next title from the DVD"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:849 src/libvlc.h:851
 #, fuzzy
@@ -2986,12 +2936,12 @@ msgstr "前のチャプターを選択"
 #: src/libvlc.h:850
 #, fuzzy
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:852
 #, fuzzy
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:853
 msgid "Volume up"
@@ -3026,7 +2976,7 @@ msgstr "字幕"
 #: src/libvlc.h:860
 #, fuzzy
 msgid "Select the key to increase the subtitle delay."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:861
 #, fuzzy
@@ -3036,7 +2986,7 @@ msgstr "字幕・デコーダ・モジュール"
 #: src/libvlc.h:862
 #, fuzzy
 msgid "Select the key to decrease the subtitle delay."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:863
 #, fuzzy
@@ -3046,7 +2996,7 @@ msgstr "字幕"
 #: src/libvlc.h:864
 #, fuzzy
 msgid "Select the key to increase the audio delay."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:865
 #, fuzzy
@@ -3056,107 +3006,97 @@ msgstr "字幕・デコーダ・モジュール"
 #: src/libvlc.h:866
 #, fuzzy
 msgid "Select the key to decrease the audio delay."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:867
 msgid "Play playlist bookmark 1"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 1 を再生する"
 
 #: src/libvlc.h:868
 msgid "Play playlist bookmark 2"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 2 を再生する"
 
 #: src/libvlc.h:869
 msgid "Play playlist bookmark 3"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 3 を再生する"
 
 #: src/libvlc.h:870
 msgid "Play playlist bookmark 4"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 4 を再生する"
 
 #: src/libvlc.h:871
 msgid "Play playlist bookmark 5"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 5 を再生する"
 
 #: src/libvlc.h:872
 msgid "Play playlist bookmark 6"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 6 を再生する"
 
 #: src/libvlc.h:873
 msgid "Play playlist bookmark 7"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 7 を再生する"
 
 #: src/libvlc.h:874
 msgid "Play playlist bookmark 8"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 8 を再生する"
 
 #: src/libvlc.h:875
 msgid "Play playlist bookmark 9"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 9 を再生する"
 
 #: src/libvlc.h:876
 msgid "Play playlist bookmark 10"
-msgstr ""
+msgstr "プレイ一覧ブックマーク 10 を再生する"
 
 #: src/libvlc.h:877
 #, fuzzy
 msgid "Select the key to play this bookmark."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:878
-#, fuzzy
 msgid "Set playlist bookmark 1"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 1 を設定する"
 
 #: src/libvlc.h:879
-#, fuzzy
 msgid "Set playlist bookmark 2"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 2 を設定する"
 
 #: src/libvlc.h:880
-#, fuzzy
 msgid "Set playlist bookmark 3"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 3 を設定する"
 
 #: src/libvlc.h:881
-#, fuzzy
 msgid "Set playlist bookmark 4"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 4 を設定する"
 
 #: src/libvlc.h:882
-#, fuzzy
 msgid "Set playlist bookmark 5"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 5 を設定する"
 
 #: src/libvlc.h:883
-#, fuzzy
 msgid "Set playlist bookmark 6"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 6 を設定する"
 
 #: src/libvlc.h:884
-#, fuzzy
 msgid "Set playlist bookmark 7"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 7 を設定する"
 
 #: src/libvlc.h:885
-#, fuzzy
 msgid "Set playlist bookmark 8"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 8 を設定する"
 
 #: src/libvlc.h:886
-#, fuzzy
 msgid "Set playlist bookmark 9"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 9 を設定する"
 
 #: src/libvlc.h:887
-#, fuzzy
 msgid "Set playlist bookmark 10"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧ブックマーク 10 を設定する"
 
 #: src/libvlc.h:888
 #, fuzzy
 msgid "Select the key to set this playlist bookmark."
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: src/libvlc.h:890
 msgid "Go back in browsing history"
@@ -3197,9 +3137,8 @@ msgid "Cycle through the available subtitle tracks"
 msgstr ""
 
 #: src/libvlc.h:899
-#, fuzzy
 msgid "Show interface"
-msgstr "インターフェース表示"
+msgstr "インターフェースを表示する"
 
 #: src/libvlc.h:900
 #, fuzzy
@@ -3226,9 +3165,8 @@ msgstr ""
 
 #: src/libvlc.h:906 modules/access_filter/record.c:50
 #: modules/access_filter/record.c:51
-#, fuzzy
 msgid "Record"
-msgstr "ブレンド"
+msgstr "レコード"
 
 #: src/libvlc.h:907
 msgid "Record access filter start/stop."
@@ -3272,7 +3210,7 @@ msgid ""
 "  vlc:quit                       Special item to quit VLC\n"
 msgstr ""
 "\n"
-"プレイリスト 項目:\n"
+"プレイ一覧 項目:\n"
 "  *.mpg, *.vob                   MPEG-1/2ファイル\n"
 "  [dvd://][device][@raw_device][@[title][,[chapter][,angle]]\n"
 "                                 DVDデバイス\n"
@@ -3283,7 +3221,7 @@ msgstr ""
 "  udpstream:[[<source address>]@[<bind address>][:<bind port>]]\n"
 "                                 ストリーミングサーバーから送信された UDP ス"
 "トリーム\n"
-"  vlc:pause                      プレイリスト項目の再生停止\n"
+"  vlc:pause                      プレイ一覧項目の再生停止\n"
 "  vlc:quit                       VLC を終了\n"
 
 #: src/libvlc.h:1019 src/video_output/vout_intf.c:335
@@ -3291,12 +3229,11 @@ msgstr ""
 #: modules/gui/macosx/intf.m:525 modules/video_output/snapshot.c:75
 #, fuzzy
 msgid "Snapshot"
-msgstr "アクセスモジュール"
+msgstr "スナップショット幅"
 
 #: src/libvlc.h:1026
-#, fuzzy
 msgid "Window properties"
-msgstr "デバイスのプロパティ"
+msgstr "ウィンドウのプロパティ"
 
 #: src/libvlc.h:1062
 #, fuzzy
@@ -3309,66 +3246,57 @@ msgid "Subtitles"
 msgstr "字幕"
 
 #: src/libvlc.h:1082
-#, fuzzy
 msgid "Overlays"
-msgstr "ディレイ"
+msgstr "オーバーレイ"
 
 #: src/libvlc.h:1090
 #, fuzzy
 msgid "Track settings"
-msgstr "オーディオエンコーダー設定"
+msgstr "トラック設定"
 
 #: src/libvlc.h:1108
-#, fuzzy
 msgid "Playback control"
-msgstr "コントロール"
+msgstr "再生制御"
 
 #: src/libvlc.h:1123
-#, fuzzy
 msgid "Default devices"
-msgstr "デフォルト"
+msgstr "デフォルトデバイス"
 
 #: src/libvlc.h:1132
-#, fuzzy
 msgid "Network settings"
-msgstr "デコードモジュール設定"
+msgstr "ネットワーク設定"
 
 #: src/libvlc.h:1144
 msgid "Socks proxy"
-msgstr ""
+msgstr "Sock プロキシ"
 
 #: src/libvlc.h:1153
-#, fuzzy
 msgid "Metadata"
-msgstr "URL メタデータ"
+msgstr "メタデータ"
 
 #: src/libvlc.h:1180
 msgid "Decoders"
 msgstr "デコーダ"
 
 #: src/libvlc.h:1187
-#, fuzzy
 msgid "Input"
 msgstr "入力"
 
 #: src/libvlc.h:1243
-#, fuzzy
 msgid "CPU"
 msgstr "CPU"
 
 #: src/libvlc.h:1258
-#, fuzzy
 msgid "Special modules"
-msgstr "湾曲モード"
+msgstr "特殊モジュール"
 
 #: src/libvlc.h:1264
 msgid "Plugins"
 msgstr "プラグイン"
 
 #: src/libvlc.h:1270
-#, fuzzy
 msgid "Performance options"
-msgstr "ストリームの一時停止"
+msgstr "パフォーマンスオプションストリームの一時停止"
 
 #: src/libvlc.h:1358
 msgid "Hot keys"
@@ -3379,15 +3307,13 @@ msgid "main program"
 msgstr "メインプログラム"
 
 #: src/libvlc.h:1667
-#, fuzzy
 msgid "print help for VLC (can be combined with --advanced)"
-msgstr "ヘルプを表示する (--advanced と併用出来ます)"
+msgstr "VLC のヘルプを表示する (--advanced と併用できます)"
 
 #: src/libvlc.h:1669
-#, fuzzy
 msgid ""
 "print help for VLC and all it's modules (can be combined with --advanced)"
-msgstr "モジュールのヘルプを表示する (--advanced と併用出来ます)"
+msgstr "VLC とすべてのモジュールのヘルプを表示する (--advanced と併用できます)"
 
 #: src/libvlc.h:1671
 #, fuzzy
@@ -3405,7 +3331,7 @@ msgstr "有効なモジュールのリストを印刷"
 #: src/libvlc.h:1677
 #, fuzzy
 msgid "print help on a specific module (can be combined with --advanced)"
-msgstr "モジュールのヘルプを表示する (--advanced と併用出来ます)"
+msgstr "モジュールのヘルプを表示する (--advanced と併用できます)"
 
 #: src/libvlc.h:1679
 msgid "save the current command line options in the config"
@@ -3566,7 +3492,7 @@ msgstr ""
 
 #: src/misc/iso-639_def.h:71
 msgid "English"
-msgstr ""
+msgstr "英語"
 
 #: src/misc/iso-639_def.h:72
 msgid "Esperanto"
@@ -3755,7 +3681,7 @@ msgstr ""
 #: src/misc/iso-639_def.h:120
 #, fuzzy
 msgid "Macedonian"
-msgstr "メディア"
+msgstr "マケドニア語"
 
 #: src/misc/iso-639_def.h:121
 msgid "Marshall"
@@ -3763,47 +3689,44 @@ msgstr ""
 
 #: src/misc/iso-639_def.h:122
 msgid "Malayalam"
-msgstr ""
+msgstr "マラヤーラム語"
 
 #: src/misc/iso-639_def.h:123
 msgid "Maori"
-msgstr ""
+msgstr "マオリ語"
 
 #: src/misc/iso-639_def.h:124
 msgid "Marathi"
-msgstr ""
+msgstr "マラーティ語"
 
 #: src/misc/iso-639_def.h:125
-#, fuzzy
 msgid "Malay"
-msgstr "再生"
+msgstr "マライ語"
 
 #: src/misc/iso-639_def.h:126
 #, fuzzy
 msgid "Malagasy"
-msgstr "早送り"
+msgstr "マダガスカル語"
 
 #: src/misc/iso-639_def.h:127
 msgid "Maltese"
-msgstr ""
+msgstr "マルタ語"
 
 #: src/misc/iso-639_def.h:128
 msgid "Moldavian"
-msgstr ""
+msgstr "モルダビア語"
 
 #: src/misc/iso-639_def.h:129
-#, fuzzy
 msgid "Mongolian"
-msgstr "真偽値"
+msgstr ""
 
 #: src/misc/iso-639_def.h:130
 msgid "Nauru"
 msgstr ""
 
 #: src/misc/iso-639_def.h:131
-#, fuzzy
 msgid "Navajo"
-msgstr "ナビゲーション(_N)"
+msgstr "ナバホ"
 
 #: src/misc/iso-639_def.h:132
 msgid "Ndebele, South"
@@ -3814,13 +3737,12 @@ msgid "Ndebele, North"
 msgstr ""
 
 #: src/misc/iso-639_def.h:134
-#, fuzzy
 msgid "Ndonga"
-msgstr "なし"
+msgstr ""
 
 #: src/misc/iso-639_def.h:135
 msgid "Nepali"
-msgstr ""
+msgstr "ネパール語"
 
 #: src/misc/iso-639_def.h:136
 msgid "Norwegian"
@@ -3844,11 +3766,11 @@ msgstr ""
 
 #: src/misc/iso-639_def.h:141
 msgid "Oriya"
-msgstr ""
+msgstr "オーリヤ語"
 
 #: src/misc/iso-639_def.h:142
 msgid "Oromo"
-msgstr ""
+msgstr "オロモ語"
 
 #: src/misc/iso-639_def.h:144
 msgid "Ossetian; Ossetic"
@@ -3856,35 +3778,32 @@ msgstr ""
 
 #: src/misc/iso-639_def.h:145
 msgid "Panjabi"
-msgstr ""
+msgstr "パンジャブ語"
 
 #: src/misc/iso-639_def.h:146
-#, fuzzy
 msgid "Persian"
-msgstr "垂直"
+msgstr "ペルシア語"
 
 #: src/misc/iso-639_def.h:147
-#, fuzzy
 msgid "Pali"
-msgstr "リスト"
+msgstr "パーリ語"
 
 #: src/misc/iso-639_def.h:148
 msgid "Polish"
 msgstr ""
 
 #: src/misc/iso-639_def.h:149
-#, fuzzy
 msgid "Portuguese"
-msgstr "プログラムの選択"
+msgstr "ポルトガル語"
 
 #: src/misc/iso-639_def.h:150
 #, fuzzy
 msgid "Pushto"
-msgstr "作成者"
+msgstr "パシュト語"
 
 #: src/misc/iso-639_def.h:151
 msgid "Quechua"
-msgstr ""
+msgstr "ケチュア語"
 
 #: src/misc/iso-639_def.h:152
 msgid "Raeto-Romance"
@@ -3932,9 +3851,8 @@ msgid "Northern Sami"
 msgstr ""
 
 #: src/misc/iso-639_def.h:164
-#, fuzzy
 msgid "Samoan"
-msgstr "モノラル"
+msgstr "サモア語"
 
 #: src/misc/iso-639_def.h:165
 msgid "Shona"
@@ -4094,7 +4012,7 @@ msgstr ""
 #: src/playlist/playlist.c:35
 #, fuzzy
 msgid "By category"
-msgstr "CDDB ディスクカテゴリ"
+msgstr "CDDB カテゴリ"
 
 #: src/playlist/playlist.c:36
 msgid "Manually added"
@@ -4136,7 +4054,6 @@ msgid "Bob"
 msgstr ""
 
 #: src/video_output/video_output.c:384 modules/video_filter/deinterlace.c:112
-#, fuzzy
 msgid "Linear"
 msgstr "リニア"
 
@@ -4217,9 +4134,8 @@ msgid "Audio CD input"
 msgstr "オーディオ CD 入力"
 
 #: modules/access/cdda.c:55
-#, fuzzy
 msgid "[cdda:][device][@[track]]"
-msgstr "cddax://[device-or-file][@[T]num]"
+msgstr "[cdda:][device][@[track]]"
 
 #: modules/access/cdda.c:380
 #, fuzzy
@@ -4325,7 +4241,6 @@ msgid ""
 msgstr ""
 
 #: modules/access/cdda/cdda.c:112
-#, fuzzy
 msgid "cddax://[device-or-file][@[T]track]"
 msgstr "cddax://[device-or-file][@[T]num]"
 
@@ -4355,7 +4270,7 @@ msgstr "スレッドの数"
 #: modules/access/cdda/cdda.c:139
 msgid "Format to use in playlist \"title\" field when no CDDB"
 msgstr ""
-"CDDB がない場合のプレイリストの \"title\" フィールドで使用するフォーマット"
+"CDDB がない場合のプレイ一覧の \"title\" フィールドで使用するフォーマット"
 
 #: modules/access/cdda/cdda.c:144
 #, fuzzy
@@ -4388,12 +4303,12 @@ msgstr ""
 #: modules/access/cdda/cdda.c:174
 #, fuzzy
 msgid "CDDB"
-msgstr "サーバーなし"
+msgstr "CDDB 年"
 
 #: modules/access/cdda/cdda.c:177
 msgid "Format to use in playlist \"title\" field when using CDDB"
 msgstr ""
-"CDDB がある場合のプレイリストの \"title\" フィールドで使用するフォーマット"
+"CDDB がある場合のプレイ一覧の \"title\" フィールドで使用するフォーマット"
 
 #: modules/access/cdda/cdda.c:181
 msgid "Do CDDB lookups?"
@@ -4404,16 +4319,14 @@ msgid "If set, lookup CD-DA track information using the CDDB protocol"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:187
-#, fuzzy
 msgid "CDDB server"
-msgstr "サーバーなし"
+msgstr "CDDB サーバー"
 
 #: modules/access/cdda/cdda.c:188
 msgid "Contact this CDDB server look up CD-DA information"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:192
-#, fuzzy
 msgid "CDDB server port"
 msgstr "CDDB サーバーポート"
 
@@ -4490,9 +4403,8 @@ msgid "MRL"
 msgstr ""
 
 #: modules/access/cdda/info.c:857
-#, fuzzy
 msgid "Track Number"
-msgstr "トラック "
+msgstr "トラック番号"
 
 #: modules/access/directory.c:69
 msgid "Subdirectory behavior"
@@ -4602,7 +4514,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:102
 #, fuzzy
 msgid "Video input frame rate"
-msgstr "ビデオビットレート"
+msgstr "ビデオフレームレート"
 
 #: modules/access/dshow/dshow.cpp:104
 msgid ""
@@ -4620,9 +4532,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:110
-#, fuzzy
 msgid "Tuner properties"
-msgstr "デバイスのプロパティ"
+msgstr "チューナーのプロパティ"
 
 #: modules/access/dshow/dshow.cpp:112
 msgid "Show the tuner properties [channel selection] page."
@@ -4651,7 +4562,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:121
 #, fuzzy
 msgid "Tuner input type"
-msgstr "入力"
+msgstr "チューナー番号"
 
 #: modules/access/dshow/dshow.cpp:123
 #, fuzzy
@@ -4708,13 +4619,12 @@ msgid "In kHz for DVB-S or Hz for DVB-C/T"
 msgstr ""
 
 #: modules/access/dvb/access.c:81
-#, fuzzy
 msgid "Inversion mode"
-msgstr "変換元 "
+msgstr "反転モード"
 
 #: modules/access/dvb/access.c:82
 msgid "Inversion mode [0=off, 1=on, 2=auto]"
-msgstr ""
+msgstr "反転モード [0=オフ 1=オン 2=自動]"
 
 #: modules/access/dvb/access.c:84
 msgid "Probe DVB card for capabilities"
@@ -4744,15 +4654,16 @@ msgstr ""
 
 #: modules/access/dvb/access.c:94
 msgid "LNB voltage"
-msgstr ""
+msgstr "LNB 電圧"
 
 #: modules/access/dvb/access.c:95
 msgid "In Volts [0, 13=vertical, 18=horizontal]"
 msgstr ""
 
 #: modules/access/dvb/access.c:97
+#, fuzzy
 msgid "High LNB voltage"
-msgstr ""
+msgstr "LNB 電圧"
 
 #: modules/access/dvb/access.c:98
 msgid ""
@@ -4946,9 +4857,8 @@ msgstr "ファイル・ストリームの既定のキャッシング値を変更
 
 #: modules/access/fake.c:44 modules/access/pvr/pvr.c:69
 #: modules/access/v4l/v4l.c:136
-#, fuzzy
 msgid "Framerate"
-msgstr "シンボル・レート"
+msgstr "フレームレート"
 
 #: modules/access/fake.c:46
 msgid "Specifies the number of frames per second (eg. 24, 25, 29.97, 30)."
@@ -5108,9 +5018,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/http.c:60
-#, fuzzy
 msgid "Auto re-connect"
-msgstr "オーディオコーデック"
+msgstr "自動再接続"
 
 #: modules/access/http.c:61
 msgid ""
@@ -5161,21 +5070,20 @@ msgid ""
 msgstr ""
 
 #: modules/access/mms/mms.c:59
+#, fuzzy
 msgid "MMS"
-msgstr ""
+msgstr "MSN"
 
 #: modules/access/mms/mms.c:60
 msgid "Microsoft Media Server (MMS) input"
-msgstr ""
+msgstr "マイクロソフトメディアサーバー (MMS) 入力"
 
 #: modules/access/pvr/pvr.c:48 modules/access/pvr/pvr.c:99
 #, fuzzy
 msgid ""
 "Allows you to modify the default caching value for pvr streams. This value "
 "should be set in millisecond units."
-msgstr ""
-"udpストリームで使用される既定のキャッシング値が変更可能です。単位はミリ秒で指"
-"定します。"
+msgstr "ファイル・ストリームの既定のキャッシング値を変更できます。単位はミリ秒"
 
 #: modules/access/pvr/pvr.c:51
 msgid "Device"
@@ -5197,7 +5105,7 @@ msgstr ""
 
 #: modules/access/pvr/pvr.c:58 modules/access/v4l/v4l.c:102
 msgid "Width"
-msgstr ""
+msgstr "幅"
 
 #: modules/access/pvr/pvr.c:59 modules/access/v4l/v4l.c:103
 msgid "Width of the stream to capture (-1 for autodetect)"
@@ -5225,9 +5133,8 @@ msgid "Framerate to capture, if applicable (-1 for autodetect)"
 msgstr ""
 
 #: modules/access/pvr/pvr.c:73
-#, fuzzy
 msgid "Key interval"
-msgstr "キーフレーム間隔:"
+msgstr "キー間隔:"
 
 #: modules/access/pvr/pvr.c:74
 msgid "Interval between keyframes (-1 for autodetect)"
@@ -5235,7 +5142,7 @@ msgstr ""
 
 #: modules/access/pvr/pvr.c:76
 msgid "B Frames"
-msgstr ""
+msgstr "B フレーム"
 
 #: modules/access/pvr/pvr.c:77
 msgid ""
@@ -5276,7 +5183,6 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:93 modules/access/v4l/v4l.c:92
-#, fuzzy
 msgid "Channel"
 msgstr "チャンネル"
 
@@ -5286,22 +5192,20 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:105 modules/access/v4l/v4l.c:143
-#, fuzzy
 msgid "Automatic"
-msgstr "自動縁取り"
+msgstr "自動"
 
 #: modules/access/pvr/pvr.c:105 modules/access/v4l/v4l.c:143
 msgid "SECAM"
-msgstr ""
+msgstr "SECAM"
 
 #: modules/access/pvr/pvr.c:105 modules/access/v4l/v4l.c:143
 msgid "PAL"
-msgstr ""
+msgstr "PAL"
 
 #: modules/access/pvr/pvr.c:105 modules/access/v4l/v4l.c:143
-#, fuzzy
 msgid "NTSC"
-msgstr "TS"
+msgstr "NTSC"
 
 #: modules/access/pvr/pvr.c:108
 msgid "vbr"
@@ -5363,9 +5267,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/screen/screen.c:62
-#, fuzzy
 msgid "Screen Input"
-msgstr "スクリーン %d"
+msgstr "画面入力"
 
 #: modules/access/screen/screen.c:63 modules/gui/macosx/vout.m:185
 msgid "Screen"
@@ -5419,7 +5322,7 @@ msgstr ""
 #: modules/access/tcp.c:46
 #, fuzzy
 msgid "TCP"
-msgstr "CPU"
+msgstr "RTP"
 
 #: modules/access/tcp.c:47
 msgid "TCP input"
@@ -5521,7 +5424,7 @@ msgstr ""
 #: modules/access/v4l/v4l.c:114
 #, fuzzy
 msgid "Color"
-msgstr "国"
+msgstr "閉じる"
 
 #: modules/access/v4l/v4l.c:116
 msgid "Set the Color of the video input"
@@ -5548,7 +5451,7 @@ msgstr ""
 #: modules/access/v4l/v4l.c:122
 #, fuzzy
 msgid "Samplerate"
-msgstr "サンプルレート"
+msgstr "シンボル・レート"
 
 #: modules/access/v4l/v4l.c:124
 msgid "Samplerate of the captures audio stream, in Hz"
@@ -5607,7 +5510,7 @@ msgstr "VCD 入力"
 #: modules/access/vcd/vcd.c:53
 #, fuzzy
 msgid "[vcd:][device][@[title][,[chapter]]]"
-msgstr "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
+msgstr "[vcd:][device][@[title][,[chapter]]]"
 
 #: modules/access/vcdx/access.c:106
 msgid "The above message had unknown log level"
@@ -5628,9 +5531,8 @@ msgid "Entry "
 msgstr "エントリ"
 
 #: modules/access/vcdx/access.c:409 modules/access/vcdx/info.c:102
-#, fuzzy
 msgid "Segments"
-msgstr "スクリーン"
+msgstr "分割"
 
 #: modules/access/vcdx/access.c:428 modules/demux/mkv.cpp:5196
 #, fuzzy
@@ -5642,8 +5544,9 @@ msgid "Track "
 msgstr "トラック "
 
 #: modules/access/vcdx/access.c:533
+#, fuzzy
 msgid "LID "
-msgstr ""
+msgstr "PBC LID"
 
 #: modules/access/vcdx/access.c:709 modules/access/vcdx/info.c:294
 #: modules/access/vcdx/info.c:295
@@ -5794,12 +5697,12 @@ msgstr ""
 #: modules/access/vcdx/vcd.c:137
 #, fuzzy
 msgid "Format to use in the playlist's \"author\" field."
-msgstr "プレイリストの \"author\" フィールドで使用するフォーマット"
+msgstr "プレイ一覧の \"author\" フィールドで使用するフォーマット"
 
 #: modules/access/vcdx/vcd.c:143
 #, fuzzy
 msgid "Format to use in the playlist's \"title\" field."
-msgstr "プレイリストの \"author\" フィールドで使用するフォーマット"
+msgstr "プレイ一覧の \"author\" フィールドで使用するフォーマット"
 
 #: modules/access_filter/record.c:42
 #, fuzzy
@@ -5823,16 +5726,15 @@ msgstr ""
 #: modules/access_filter/timeshift.c:45
 #, fuzzy
 msgid "Timeshift directory"
-msgstr "ソースのアスペクト・レシオ"
+msgstr "ディレクトリを選択する"
 
 #: modules/access_filter/timeshift.c:46
 msgid "Directory used to store the timeshift temporary files."
 msgstr ""
 
 #: modules/access_filter/timeshift.c:50 modules/access_filter/timeshift.c:51
-#, fuzzy
 msgid "Timeshift"
-msgstr "垂直方向位置"
+msgstr "タイムシフト"
 
 #: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
 msgid "Dummy stream output"
@@ -5840,21 +5742,19 @@ msgstr "ダミーストリーム出力"
 
 #: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
 msgid "Dummy"
-msgstr ""
+msgstr "ダミー"
 
 #: modules/access_output/file.c:65
-#, fuzzy
 msgid "Append to file"
-msgstr "ファイルを開く"
+msgstr "ファイルに追加する"
 
 #: modules/access_output/file.c:66
 msgid "Append to file if it exists instead of replacing it."
 msgstr ""
 
 #: modules/access_output/file.c:70
-#, fuzzy
 msgid "File stream output"
-msgstr "ストリームの出力先の選択"
+msgstr "ファイルストリーム出力"
 
 #: modules/access_output/http.c:60
 msgid "Username"
@@ -5875,9 +5775,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/http.c:66
-#, fuzzy
 msgid "Mime"
-msgstr "時間"
+msgstr "Mime"
 
 #: modules/access_output/http.c:67
 #, fuzzy
@@ -5887,9 +5786,8 @@ msgstr ""
 "す。"
 
 #: modules/access_output/http.c:69 modules/control/http/http.c:46
-#, fuzzy
 msgid "Certificate file"
-msgstr "字幕ファイルを使用"
+msgstr "証明書ファイル"
 
 #: modules/access_output/http.c:70
 msgid ""
@@ -5899,7 +5797,7 @@ msgstr ""
 
 #: modules/access_output/http.c:72 modules/control/http/http.c:49
 msgid "Private key file"
-msgstr ""
+msgstr "秘密鍵のファイル"
 
 #: modules/access_output/http.c:73
 msgid ""
@@ -5908,9 +5806,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/http.c:76 modules/control/http/http.c:51
-#, fuzzy
 msgid "Root CA file"
-msgstr "ファイルを選択する"
+msgstr "ルート CA ファイル"
 
 #: modules/access_output/http.c:77
 msgid ""
@@ -5920,9 +5817,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/http.c:81 modules/control/http/http.c:54
-#, fuzzy
 msgid "CRL file"
-msgstr "PLS ファイル"
+msgstr "CRL ファイル"
 
 #: modules/access_output/http.c:82
 msgid ""
@@ -5931,19 +5827,17 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/http.c:87
-#, fuzzy
 msgid "HTTP stream output"
-msgstr "ストリームの出力先の選択"
+msgstr "HTTP ストリーム出力"
 
 #: modules/access_output/http.c:89 modules/control/http/http.c:58
 #: modules/gui/wxwidgets/streamout.cpp:479
 msgid "HTTP"
-msgstr ""
+msgstr "HTTP"
 
 #: modules/access_output/shout.c:58
-#, fuzzy
 msgid "Stream-name"
-msgstr "ストリーム"
+msgstr "ストリーム名"
 
 #: modules/access_output/shout.c:59
 msgid "The name this stream/channel will get on the icecast server."
@@ -5959,9 +5853,8 @@ msgid "A description of the stream content. (Information about your channel)."
 msgstr ""
 
 #: modules/access_output/shout.c:65
-#, fuzzy
 msgid "Stream MP3"
-msgstr "ストリーム "
+msgstr "ストリーム MP3"
 
 #: modules/access_output/shout.c:66
 msgid ""
@@ -5977,7 +5870,7 @@ msgstr ""
 #: modules/access_output/shout.c:72
 #, fuzzy
 msgid "Shout"
-msgstr "マルチキャスト"
+msgstr "VideoLANについて"
 
 #: modules/access_output/udp.c:81
 msgid "Allows you to define the time to live of the outgoing stream."
@@ -6006,7 +5899,6 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/udp.c:97
-#, fuzzy
 msgid "UDP stream output"
 msgstr "UDP ストリーム出力"
 
@@ -6077,9 +5969,8 @@ msgid "Headphone channel mixer with virtual spatialization effect"
 msgstr "ヘッドホーンの仮想的な音の広がり効果"
 
 #: modules/audio_filter/channel_mixer/headphone.c:74
-#, fuzzy
 msgid "Headphone effect"
-msgstr "スコープ効果"
+msgstr "ヘッドフォンエフェクト"
 
 #: modules/audio_filter/channel_mixer/simple.c:46
 #, fuzzy
@@ -6205,22 +6096,20 @@ msgid "audio filter for u8->float32 conversion"
 msgstr "s16->float32変換のためのオーディオ・フィルター"
 
 #: modules/audio_filter/equalizer.c:52
-#, fuzzy
 msgid "Equalizer preset"
-msgstr "ビデオ・フィルター・モジュール"
+msgstr "イコライザーのプリセット"
 
 #: modules/audio_filter/equalizer.c:55
 msgid "Bands gain"
-msgstr ""
+msgstr "バンドゲイン"
 
 #: modules/audio_filter/equalizer.c:56
 msgid "Override preset bands gain in dB (-20 ... 20)"
 msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
-#, fuzzy
 msgid "Two pass"
-msgstr "FTP パスワード"
+msgstr "2 パス"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Filter twice the audio"
@@ -6228,21 +6117,19 @@ msgstr ""
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Global gain"
-msgstr ""
+msgstr "全体のゲイン"
 
 #: modules/audio_filter/equalizer.c:62
 msgid "Set the global gain in dB (-20 ... 20)"
 msgstr ""
 
 #: modules/audio_filter/equalizer.c:65
-#, fuzzy
 msgid "Equalizer 10 bands"
-msgstr "ビデオ・フィルター・モジュール"
+msgstr "10 バンドイコライザー"
 
 #: modules/audio_filter/equalizer_presets.h:39
-#, fuzzy
 msgid "Flat"
-msgstr "早送り"
+msgstr "フラット"
 
 #: modules/audio_filter/equalizer_presets.h:39
 #: modules/demux/util/id3genres.h:60
@@ -6250,9 +6137,8 @@ msgid "Classical"
 msgstr "クラシカル"
 
 #: modules/audio_filter/equalizer_presets.h:39
-#, fuzzy
 msgid "Club"
-msgstr "キューブ"
+msgstr "倶楽部"
 
 #: modules/audio_filter/equalizer_presets.h:39
 #: modules/demux/util/id3genres.h:31
@@ -6261,35 +6147,31 @@ msgstr "ダンス"
 
 #: modules/audio_filter/equalizer_presets.h:39
 msgid "Full bass"
-msgstr ""
+msgstr "降るベース"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Full bass and treble"
-msgstr ""
+msgstr "フルベースとトレブル"
 
 #: modules/audio_filter/equalizer_presets.h:40
-#, fuzzy
 msgid "Full treble"
-msgstr "全画面化"
+msgstr "フルトレブル"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Headphones"
-msgstr ""
+msgstr "ヘッドフォン"
 
 #: modules/audio_filter/equalizer_presets.h:41
-#, fuzzy
 msgid "Large Hall"
-msgstr "大きい"
+msgstr "大きなホール大きい"
 
 #: modules/audio_filter/equalizer_presets.h:41
-#, fuzzy
 msgid "Live"
-msgstr "リニア"
+msgstr "ライブ"
 
 #: modules/audio_filter/equalizer_presets.h:41
-#, fuzzy
 msgid "Party"
-msgstr "ポート番号"
+msgstr "パーティ"
 
 #: modules/audio_filter/equalizer_presets.h:41
 #: modules/demux/util/id3genres.h:41
@@ -6312,14 +6194,12 @@ msgid "Ska"
 msgstr "スカ"
 
 #: modules/audio_filter/equalizer_presets.h:42
-#, fuzzy
 msgid "Soft"
-msgstr "ソート(&O)"
+msgstr "ソフト"
 
 #: modules/audio_filter/equalizer_presets.h:42
-#, fuzzy
 msgid "Soft rock"
-msgstr "西海岸ロック"
+msgstr "ソフトロック"
 
 #: modules/audio_filter/equalizer_presets.h:42
 #: modules/demux/util/id3genres.h:46
@@ -6344,9 +6224,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_filter/normvol.c:75
-#, fuzzy
 msgid "Max level"
-msgstr "品質レベル"
+msgstr "最大レベル"
 
 #: modules/audio_filter/normvol.c:76
 msgid ""
@@ -6445,8 +6324,9 @@ msgid "A/52 over S/PDIF"
 msgstr "A/52 over S/PDIF"
 
 #: modules/audio_output/alsa.c:926
+#, fuzzy
 msgid "Unknown soundcard"
-msgstr ""
+msgstr "不明のビデオ"
 
 #: modules/audio_output/arts.c:67
 #, fuzzy
@@ -6470,9 +6350,8 @@ msgid "CoreAudio output"
 msgstr "コアオーディオ出力"
 
 #: modules/audio_output/directx.c:213 modules/audio_output/portaudio.c:107
-#, fuzzy
 msgid "Output device"
-msgstr "出力フォーマット"
+msgstr "出力デバイス"
 
 #: modules/audio_output/directx.c:215
 msgid ""
@@ -6644,25 +6523,22 @@ msgid "Allows you to specify a quality between 1.0 (low) and 10.0 (high)."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/codec/dirac.c:73
-#, fuzzy
 msgid "Dirac video decoder"
-msgstr "DV ビデオデコーダ"
+msgstr "DV ビデオデコーダー"
 
 #: modules/codec/dirac.c:79
-#, fuzzy
 msgid "Dirac video encoder"
-msgstr "DVビデオ・デコーダ"
+msgstr "Dirac ビデオデコーダー"
 
 #: modules/codec/dmo/dmo.c:99
 msgid "DirectMedia Object decoder"
-msgstr ""
+msgstr "DirectMedia オブジェクトデコーダー"
 
 #: modules/codec/dmo/dmo.c:108
 msgid "DirectMedia Object encoder"
-msgstr ""
+msgstr "DirectMedia オブジェクトエンコーダー"
 
 #: modules/codec/dts.c:95
-#, fuzzy
 msgid "DTS parser"
 msgstr "DTS パーサー"
 
@@ -6685,9 +6561,8 @@ msgid "Y coordinate of the subpicture"
 msgstr ""
 
 #: modules/codec/dvbsub.c:51
-#, fuzzy
 msgid "Subpicture position"
-msgstr "字幕"
+msgstr "字幕の位置"
 
 #: modules/codec/dvbsub.c:53
 msgid ""
@@ -6704,9 +6579,8 @@ msgid "Y coordinate of encoded the subpicture"
 msgstr ""
 
 #: modules/codec/dvbsub.c:63
-#, fuzzy
 msgid "Timeout of subpictures"
-msgstr "字幕"
+msgstr "字幕のタイムアウト"
 
 #: modules/codec/dvbsub.c:65
 msgid ""
@@ -6730,9 +6604,8 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr "AAC オーディオデコーダ (libfaad2)"
 
 #: modules/codec/fake.c:44 modules/video_output/image.c:63
-#, fuzzy
 msgid "Image file"
-msgstr "サイズ"
+msgstr "画像ファイル"
 
 #: modules/codec/fake.c:46
 msgid "Path of the image file when using the fake input."
@@ -6752,16 +6625,15 @@ msgstr "VLCが選択するパケッタライザーの順序を選択します。
 #: modules/codec/fake.c:53
 #, fuzzy
 msgid "Keep aspect ratio"
-msgstr "送信先のアスペクト・レシオ"
+msgstr "ソースのアスペクト比"
 
 #: modules/codec/fake.c:55
 msgid "If selected, width and height will be considered as maximum values."
 msgstr ""
 
 #: modules/codec/fake.c:56
-#, fuzzy
 msgid "Background aspect ratio"
-msgstr "ソースのアスペクト比"
+msgstr "背景のアスペクト比"
 
 #: modules/codec/fake.c:58
 msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
@@ -6789,7 +6661,7 @@ msgstr ""
 #: modules/codec/fake.c:75
 #, fuzzy
 msgid "Fake video decoder"
-msgstr "シネパックビデオデコーダー"
+msgstr "DV ビデオデコーダ"
 
 #: modules/codec/ffmpeg/ffmpeg.c:74
 msgid "rd"
@@ -6815,23 +6687,20 @@ msgid "ffmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 msgstr "ffmpeg オーディオ/ビデオデコーダー((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:92
-#, fuzzy
 msgid "Decoding"
-msgstr "字幕エンコンコード中"
+msgstr "出k-土中"
 
 #: modules/codec/ffmpeg/ffmpeg.c:120
 msgid "ffmpeg chroma conversion"
-msgstr ""
+msgstr "ffmpeg クロマ変換"
 
 #: modules/codec/ffmpeg/ffmpeg.c:124
-#, fuzzy
 msgid "Encoding"
-msgstr "字幕エンコンコード中"
+msgstr "エンコード中"
 
 #: modules/codec/ffmpeg/ffmpeg.c:125
-#, fuzzy
 msgid "ffmpeg audio/video encoder"
-msgstr "疑似AC3オーディオ・デコーダ"
+msgstr "ffmpeg オーディオ/ビデオエンコーダー"
 
 #: modules/codec/ffmpeg/ffmpeg.c:183
 #, fuzzy
@@ -7784,7 +7653,7 @@ msgstr "ソースディレクトリ"
 #: modules/control/http/http.c:39
 #, fuzzy
 msgid "Charset"
-msgstr "ブラウズ..."
+msgstr "選択..."
 
 #: modules/control/http/http.c:41
 msgid "Charset declared in Content-Type header (default UTF-8)."
@@ -7853,8 +7722,9 @@ msgid ""
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/control/netsync.c:69
+#, fuzzy
 msgid "Netsync"
-msgstr ""
+msgstr "ネット"
 
 #: modules/control/netsync.c:70
 msgid "Network synchronisation"
@@ -7888,9 +7758,8 @@ msgstr ""
 "す。"
 
 #: modules/control/ntservice.c:48
-#, fuzzy
 msgid "Configuration options"
-msgstr "コンフィグレーション・オプションにツールチップを表示"
+msgstr "設定オプション"
 
 #: modules/control/ntservice.c:50
 #, fuzzy
@@ -7998,12 +7867,12 @@ msgstr "+----[ リモート制御コマンド ]\n"
 #: modules/control/rc.c:875
 #, fuzzy
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:876
 #, fuzzy
 msgid "| playlist . . .  show items currently in playlist"
-msgstr "| playlist . . . 現在のプレイリスト中の項目を表示\n"
+msgstr "| playlist . . . 現在のプレイ一覧中の項目を表示\n"
 
 #: modules/control/rc.c:877
 #, fuzzy
@@ -8023,7 +7892,7 @@ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
 #: modules/control/rc.c:880
 #, fuzzy
 msgid "| prev . . . . . . . . . .  previous playlist item"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:881
 #, fuzzy
@@ -8038,7 +7907,7 @@ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
 #: modules/control/rc.c:883
 #, fuzzy
 msgid "| status . . . . . . . . . current playlist status"
-msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:884
 msgid "| title [X]  . . . . set/get title in current item"
@@ -8077,12 +7946,12 @@ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
 #: modules/control/rc.c:893
 #, fuzzy
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:894
 #, fuzzy
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:895
 #, fuzzy
@@ -8111,7 +7980,7 @@ msgstr ""
 #: modules/control/rc.c:901
 #, fuzzy
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:902
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
@@ -8124,7 +7993,7 @@ msgstr ""
 #: modules/control/rc.c:904
 #, fuzzy
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:905
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
@@ -8141,7 +8010,7 @@ msgstr ""
 #: modules/control/rc.c:912
 #, fuzzy
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:913
 #, fuzzy
@@ -8171,7 +8040,7 @@ msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
 #: modules/control/rc.c:918
 #, fuzzy
 msgid "| marq-size # . . . . . . . . font size, in pixels"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:920
 msgid "| time-format STRING . . . overlay STRING in video"
@@ -8180,7 +8049,7 @@ msgstr ""
 #: modules/control/rc.c:921
 #, fuzzy
 msgid "| time-x X . . . . . . . . . . . .offset from left"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| play . . . . . . . . . . . . . . . . ストリーム再生\n"
 
 #: modules/control/rc.c:922
 #, fuzzy
@@ -8261,12 +8130,12 @@ msgstr ""
 #: modules/control/rc.c:940
 #, fuzzy
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:941
 #, fuzzy
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:942
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
@@ -8275,12 +8144,12 @@ msgstr ""
 #: modules/control/rc.c:943
 #, fuzzy
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:944
 #, fuzzy
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
-msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイリストに追加\n"
+msgstr "| add XYZ  . . . . . . . . . . XYZ をプレイ一覧に追加\n"
 
 #: modules/control/rc.c:945
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
@@ -8369,9 +8238,8 @@ msgid "Default to admin"
 msgstr "削除"
 
 #: modules/control/telnet.c:98
-#, fuzzy
 msgid "VLM remote control interface"
-msgstr "リモート・コントロール・インタフェース・モジュール"
+msgstr "VLM リモート制御インターフェース"
 
 #: modules/demux/a52.c:44
 #, fuzzy
@@ -8421,9 +8289,8 @@ msgid "Specify a file name to which the raw stream will be dumped."
 msgstr ""
 
 #: modules/demux/demuxdump.c:40 modules/demux/ts.c:113
-#, fuzzy
 msgid "Append"
-msgstr "開く"
+msgstr "追加する"
 
 #: modules/demux/demuxdump.c:42 modules/demux/ts.c:115
 msgid ""
@@ -8472,7 +8339,7 @@ msgstr "RTP オーバー RTSP (TCP)を使う"
 #: modules/demux/m3u.c:68
 #, fuzzy
 msgid "Playlist metademux"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: modules/demux/mjpeg.c:43 modules/demux/mpeg/h264.c:39
 msgid "Frames per Second"
@@ -8497,7 +8364,7 @@ msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 #: modules/demux/mkv.cpp:401
 #, fuzzy
 msgid "Ordered chapters"
-msgstr "次のチャプター"
+msgstr "次のチャプターを選択"
 
 #: modules/demux/mkv.cpp:402
 msgid "Play ordered chapters as specified in the segment."
@@ -8506,7 +8373,7 @@ msgstr ""
 #: modules/demux/mkv.cpp:405
 #, fuzzy
 msgid "Chapter codecs"
-msgstr "ステレオ"
+msgstr "チャプター %d"
 
 #: modules/demux/mkv.cpp:406
 msgid "Use chapter codecs found in the segment."
@@ -8552,7 +8419,7 @@ msgstr ""
 #: modules/demux/mkv.cpp:3163
 #, fuzzy
 msgid "Video Manager"
-msgstr "ビデオエンコーダー"
+msgstr "設定"
 
 #: modules/demux/mkv.cpp:3169
 #, fuzzy
@@ -8645,7 +8512,7 @@ msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 #: modules/demux/mpc.c:46 modules/demux/mpc.c:47
 #, fuzzy
 msgid "Replay Gain type"
-msgstr "常に最前面"
+msgstr "再生と停止"
 
 #: modules/demux/mpc.c:57
 #, fuzzy
@@ -8717,25 +8584,25 @@ msgstr ""
 #: modules/demux/playlist/playlist.c:55
 #, fuzzy
 msgid "Native playlist import"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: modules/demux/playlist/playlist.c:62
 msgid "M3U playlist import"
-msgstr "M3U プレイリストからインポート"
+msgstr "M3U プレイ一覧からインポート"
 
 #: modules/demux/playlist/playlist.c:67
 msgid "PLS playlist import"
-msgstr "PLS プレイリストからインポート"
+msgstr "PLS プレイ一覧からインポート"
 
 #: modules/demux/playlist/playlist.c:72
 #, fuzzy
 msgid "B4S playlist import"
-msgstr "PLS プレイリストからインポート"
+msgstr "PLS プレイ一覧からインポート"
 
 #: modules/demux/playlist/playlist.c:78
 #, fuzzy
 msgid "DVB playlist import"
-msgstr "PLS プレイリストからインポート"
+msgstr "PLS プレイ一覧からインポート"
 
 #: modules/demux/ps.c:47 modules/demux/ps.c:55
 #, fuzzy
@@ -9442,7 +9309,7 @@ msgstr "クリア"
 
 #: modules/gui/macosx/bookmarks.m:96 modules/gui/wxwidgets/bookmarks.cpp:229
 msgid "Extract"
-msgstr ""
+msgstr "展開"
 
 #: modules/gui/macosx/bookmarks.m:101 modules/gui/wxwidgets/bookmarks.cpp:259
 msgid "Size offset"
@@ -9458,9 +9325,8 @@ msgid "Time"
 msgstr "時間"
 
 #: modules/gui/macosx/bookmarks.m:110 modules/gui/wxwidgets/bookmarks.cpp:163
-#, fuzzy
 msgid "Bytes"
-msgstr "ブルース"
+msgstr "バイト"
 
 #: modules/gui/macosx/bookmarks.m:136 modules/gui/macosx/playlist.m:764
 msgid "Untitled"
@@ -9493,8 +9359,9 @@ msgid "Invalid selection"
 msgstr "選択"
 
 #: modules/gui/macosx/bookmarks.m:292
+#, fuzzy
 msgid "You have to select two bookmarks."
-msgstr ""
+msgstr "2 つのブックマークを選ばなければなりません"
 
 #: modules/gui/macosx/bookmarks.m:301 modules/gui/wxwidgets/bookmarks.cpp:420
 #, fuzzy
@@ -9910,7 +9777,7 @@ msgstr "ライセンス"
 #: modules/gui/macosx/intf.m:556
 #, fuzzy
 msgid "Make a donation"
-msgstr "メディア"
+msgstr "マケドニア語"
 
 #: modules/gui/macosx/intf.m:557
 #, fuzzy
@@ -9947,7 +9814,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:1021
 #, fuzzy, c-format
 msgid "Volume: %d%%"
-msgstr "ボリュームは %d です。\n"
+msgstr "音量 %d%%"
 
 #: modules/gui/macosx/intf.m:1252 modules/gui/macosx/intf.m:1253
 #: modules/gui/macosx/intf.m:1254 modules/gui/pda/pda_interface.c:250
@@ -10042,7 +9909,7 @@ msgstr "メディア・リソース・ロケータ (MRL)"
 #: modules/gui/wxwidgets/streamout.cpp:508
 #: modules/gui/wxwidgets/subtitles.cpp:91
 msgid "Browse..."
-msgstr "ブラウズ..."
+msgstr "参照..."
 
 #: modules/gui/macosx/open.m:165
 msgid "Treat as a pipe rather than as a file"
@@ -10178,9 +10045,8 @@ msgid "Bitrate (kb/s)"
 msgstr "ビットレート (kb/秒)"
 
 #: modules/gui/macosx/output.m:166 modules/gui/wxwidgets/streamout.cpp:786
-#, fuzzy
 msgid "Scale"
-msgstr "衛星"
+msgstr "スケール"
 
 #: modules/gui/macosx/output.m:180
 #, fuzzy
@@ -10201,22 +10067,20 @@ msgid "RTSP announce"
 msgstr "SAP アナウンス"
 
 #: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:653
-#, fuzzy
 msgid "HTTP announce"
-msgstr "SAP アナウンス"
+msgstr "HTTP アナウンス"
 
 #: modules/gui/macosx/output.m:185 modules/gui/macosx/output.m:659
 msgid "Export SDP as file"
-msgstr ""
+msgstr "ファイルとして SDP をエクスポートする"
 
 #: modules/gui/macosx/output.m:187
 msgid "Channel Name"
 msgstr "チャンネル名"
 
 #: modules/gui/macosx/output.m:188
-#, fuzzy
 msgid "SDP URL"
-msgstr "SDP"
+msgstr "SDP URL"
 
 #: modules/gui/macosx/output.m:537
 msgid "Save File"
@@ -10224,7 +10088,7 @@ msgstr "ファイルの保存"
 
 #: modules/gui/macosx/playlist.m:499
 msgid "Save Playlist..."
-msgstr "プレイリストを保存..."
+msgstr "プレイ一覧の保存..."
 
 #: modules/gui/macosx/playlist.m:501 modules/gui/pda/pda_interface.c:1254
 #: modules/gui/wxwidgets/playlist.cpp:272
@@ -10234,7 +10098,7 @@ msgstr "削除"
 
 #: modules/gui/macosx/playlist.m:502
 msgid "Expand Node"
-msgstr ""
+msgstr "ノードを展開する"
 
 #: modules/gui/macosx/playlist.m:504 modules/gui/macosx/playlistinfo.m:53
 msgid "Properties"
@@ -10247,19 +10111,16 @@ msgid "Preparse"
 msgstr "準備"
 
 #: modules/gui/macosx/playlist.m:506
-#, fuzzy
 msgid "Sort Node by Name"
-msgstr "名前でソート"
+msgstr "名前でノードをソートする"
 
 #: modules/gui/macosx/playlist.m:507
-#, fuzzy
 msgid "Sort Node by Author"
-msgstr "作成者でソート(&A)"
+msgstr "著者でノードをソートする"
 
 #: modules/gui/macosx/playlist.m:510 modules/gui/macosx/playlist.m:1518
-#, fuzzy
 msgid "No items in the playlist"
-msgstr "デフォルトでプレイリストに追加"
+msgstr "プレイ一覧に項目がありません"
 
 #: modules/gui/macosx/playlist.m:514 modules/gui/wxwidgets/playlist.cpp:316
 msgid "Search"
@@ -10268,7 +10129,7 @@ msgstr "検索"
 #: modules/gui/macosx/playlist.m:516
 #, fuzzy
 msgid "Search in Playlist"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: modules/gui/macosx/playlist.m:517
 msgid "Standard Play"
@@ -10276,17 +10137,17 @@ msgstr "標準再生"
 
 #: modules/gui/macosx/playlist.m:765
 msgid "Save Playlist"
-msgstr "プレイリストを保存"
+msgstr "プレイ一覧を保存"
 
 #: modules/gui/macosx/playlist.m:1512
 #, fuzzy, c-format
 msgid "%i items in the playlist"
-msgstr "デフォルトでプレイリストに追加"
+msgstr "デフォルトでプレイ一覧に追加"
 
 #: modules/gui/macosx/playlist.m:1522
 #, fuzzy
 msgid "1 item in the playlist"
-msgstr "デフォルトでプレイリストに追加"
+msgstr "デフォルトでプレイ一覧に追加"
 
 #: modules/gui/macosx/playlistinfo.m:54 modules/gui/wxwidgets/iteminfo.cpp:137
 #: modules/gui/wxwidgets/wizard.cpp:591
@@ -10299,7 +10160,7 @@ msgstr "すべてリセット"
 
 #: modules/gui/macosx/prefs.m:142 modules/gui/wxwidgets/preferences.cpp:296
 msgid "Reset Preferences"
-msgstr "設定をリセット"
+msgstr "設定をリセットする"
 
 #: modules/gui/macosx/prefs.m:143
 msgid "Continue"
@@ -10316,14 +10177,12 @@ msgid "Some options are available but hidden. Check \"Advanced\" to see them."
 msgstr ""
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#, fuzzy
 msgid "Select a directory"
-msgstr "ソースのアスペクト・レシオ"
+msgstr "ディレクトリを選択する"
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#, fuzzy
 msgid "Select a file"
-msgstr "ファイルの選択"
+msgstr "ファイルを瀬何託する"
 
 #: modules/gui/macosx/prefs_widgets.m:1223
 msgid "Select"
@@ -10535,25 +10394,21 @@ msgid "Transcode/Save to file"
 msgstr "キャンセル"
 
 #: modules/gui/macosx/wizard.m:362 modules/gui/wxwidgets/wizard.cpp:107
-#, fuzzy
 msgid "Choose input"
-msgstr "タイトルの選択"
+msgstr "入力の選択"
 
 #: modules/gui/macosx/wizard.m:363 modules/gui/wxwidgets/wizard.cpp:108
-#, fuzzy
 msgid "Choose here your input stream."
-msgstr "ストリームの一時停止"
+msgstr "入力ストリームをここで選択してください。"
 
 #: modules/gui/macosx/wizard.m:365 modules/gui/macosx/wizard.m:541
 #: modules/gui/macosx/wizard.m:1498 modules/gui/wxwidgets/wizard.cpp:110
-#, fuzzy
 msgid "Select a stream"
-msgstr "ネットワークストリームを選択する"
+msgstr "ストリームを選択する"
 
 #: modules/gui/macosx/wizard.m:367 modules/gui/wxwidgets/wizard.cpp:111
-#, fuzzy
 msgid "Existing playlist item"
-msgstr "プレイリストを開く"
+msgstr "存在するプレイ一覧の項目"
 
 #: modules/gui/macosx/wizard.m:368 modules/gui/macosx/wizard.m:433
 #: modules/gui/wxwidgets/wizard.cpp:573
@@ -10583,9 +10438,8 @@ msgstr "上"
 
 #: modules/gui/macosx/wizard.m:383 modules/gui/wxwidgets/wizard.cpp:139
 #: modules/video_filter/deinterlace.c:131
-#, fuzzy
 msgid "Streaming"
-msgstr "ストリームの停止"
+msgstr "すとリー民具"
 
 #: modules/gui/macosx/wizard.m:384 modules/gui/wxwidgets/wizard.cpp:140
 msgid "In this page, you will select how your input stream will be sent."
@@ -10605,14 +10459,12 @@ msgstr "ストリームの停止"
 
 #: modules/gui/macosx/wizard.m:390 modules/gui/macosx/wizard.m:636
 #: modules/gui/wxwidgets/streamdata.cpp:122
-#, fuzzy
 msgid "UDP Unicast"
-msgstr "湯にキャスト"
+msgstr "UDP ユニキャスト"
 
 #: modules/gui/macosx/wizard.m:391 modules/gui/wxwidgets/streamdata.cpp:125
-#, fuzzy
 msgid "UDP Multicast"
-msgstr "UDP/RTP マルチキャスト"
+msgstr "UDP マルチキャスト"
 
 #: modules/gui/macosx/wizard.m:396 modules/gui/pda/pda_interface.c:1221
 #: modules/gui/wxwidgets/wizard.cpp:125 modules/stream_out/transcode.c:167
@@ -10661,9 +10513,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:418 modules/gui/wxwidgets/wizard.cpp:162
-#, fuzzy
 msgid "Additional streaming options"
-msgstr "ストリームの一時停止"
+msgstr "追加ストリーミングオプション"
 
 #: modules/gui/macosx/wizard.m:419
 msgid ""
@@ -10673,21 +10524,18 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:421 modules/gui/macosx/wizard.m:1629
 #: modules/gui/wxwidgets/streamout.cpp:613
 #: modules/gui/wxwidgets/wizard.cpp:1339
-#, fuzzy
 msgid "Time-To-Live (TTL)"
 msgstr "生存時間 (TTL):"
 
 #: modules/gui/macosx/wizard.m:423 modules/gui/macosx/wizard.m:449
 #: modules/gui/macosx/wizard.m:1644 modules/gui/wxwidgets/wizard.cpp:1347
-#, fuzzy
 msgid "SAP Announce"
-msgstr "SAP アナウンス:"
+msgstr "SAP アナウンス"
 
 #: modules/gui/macosx/wizard.m:425 modules/gui/macosx/wizard.m:434
 #: modules/gui/macosx/wizard.m:459 modules/gui/macosx/wizard.m:1661
-#, fuzzy
 msgid "Local playback"
-msgstr "再生停止"
+msgstr "ローカル再生"
 
 #: modules/gui/macosx/wizard.m:429 modules/gui/wxwidgets/wizard.cpp:155
 #, fuzzy
@@ -10713,7 +10561,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:440
 msgid "Summary"
-msgstr ""
+msgstr "要約"
 
 #: modules/gui/macosx/wizard.m:443
 #, fuzzy
@@ -10721,9 +10569,8 @@ msgid "Encap. format"
 msgstr "出力フォーマット"
 
 #: modules/gui/macosx/wizard.m:445
-#, fuzzy
 msgid "Input stream"
-msgstr "ストリームの停止"
+msgstr "ストリーム入力"
 
 #: modules/gui/macosx/wizard.m:451
 #, fuzzy
@@ -10731,9 +10578,8 @@ msgid "Save file to"
 msgstr "ファイルの保存"
 
 #: modules/gui/macosx/wizard.m:592
-#, fuzzy
 msgid "No input selected"
-msgstr "%@s は見つかりません"
+msgstr "入力は選択されていません"
 
 #: modules/gui/macosx/wizard.m:594
 msgid ""
@@ -10767,7 +10613,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1116
 msgid "No file selected"
-msgstr ""
+msgstr "ファイルは選択されていません"
 
 #: modules/gui/macosx/wizard.m:1117
 msgid ""
@@ -10778,27 +10624,25 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:1196
-#, fuzzy
 msgid "Finish"
-msgstr "ディスク"
+msgstr "終了"
 
 #: modules/gui/macosx/wizard.m:1201 modules/gui/macosx/wizard.m:1208
 #: modules/gui/macosx/wizard.m:1232 modules/gui/macosx/wizard.m:1244
 #: modules/gui/macosx/wizard.m:1256
-#, fuzzy
 msgid "yes"
-msgstr "ブルース"
+msgstr "はい"
 
 #: modules/gui/macosx/wizard.m:1203 modules/gui/macosx/wizard.m:1215
 #: modules/gui/macosx/wizard.m:1234 modules/gui/macosx/wizard.m:1252
 #: modules/gui/macosx/wizard.m:1264
-#, fuzzy
 msgid "no"
-msgstr "なし"
+msgstr "いいえ"
 
 #: modules/gui/macosx/wizard.m:1210
+#, fuzzy
 msgid "from "
-msgstr ""
+msgstr "オロモ語"
 
 #: modules/gui/macosx/wizard.m:1212 modules/video_chroma/i420_ymga.c:48
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:75
@@ -10922,7 +10766,7 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:361 modules/gui/pda/pda_interface.c:543
 #: modules/gui/pda/pda_interface.c:869 modules/gui/pda/pda_interface.c:1216
 msgid "Add to Playlist"
-msgstr "プレイリストに追加"
+msgstr "プレイ一覧に追加"
 
 #: modules/gui/pda/pda_interface.c:384
 msgid "MRL:"
@@ -10938,7 +10782,7 @@ msgstr "アドレス:"
 
 #: modules/gui/pda/pda_interface.c:471
 msgid "unicast"
-msgstr "湯にキャスト"
+msgstr "ユニキャスト"
 
 #: modules/gui/pda/pda_interface.c:472
 msgid "multicast"
@@ -11343,7 +11187,7 @@ msgstr "スキンファイル (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
 #: modules/gui/skins2/src/dialogs.cpp:236
 #: modules/gui/wxwidgets/playlist.cpp:937
 msgid "Open playlist"
-msgstr "プレイリストを開く"
+msgstr "プレイ一覧を開く"
 
 #: modules/gui/skins2/src/dialogs.cpp:237
 msgid "All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"
@@ -11352,7 +11196,7 @@ msgstr ""
 #: modules/gui/skins2/src/dialogs.cpp:244
 #: modules/gui/wxwidgets/playlist.cpp:921
 msgid "Save playlist"
-msgstr "プレイリストを保存"
+msgstr "プレイ一覧を保存"
 
 #: modules/gui/skins2/src/dialogs.cpp:244
 #, fuzzy
@@ -11476,13 +11320,12 @@ msgid "WinCE dialogs provider"
 msgstr "wxWindows ダイアログ提供"
 
 #: modules/gui/wxwidgets/bookmarks.cpp:137
-#, fuzzy
 msgid "Edit bookmark"
-msgstr "リスト"
+msgstr "ブックマーク編集"
 
 #: modules/gui/wxwidgets/bookmarks.cpp:409
 msgid "You must select two bookmarks"
-msgstr ""
+msgstr "2 つのブックマークを選ばなければなりません"
 
 #: modules/gui/wxwidgets/bookmarks.cpp:419
 msgid "The stream must be playing or paused for bookmarks to work"
@@ -11513,9 +11356,8 @@ msgid "Aspect Ratio"
 msgstr "アスペクト比"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:319
-#, fuzzy
 msgid "More info"
-msgstr "デバイス名"
+msgstr "更なる情報"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:404
 msgid ""
@@ -11539,18 +11381,16 @@ msgid "Stream and media info"
 msgstr "ストリームとメディアの情報"
 
 #: modules/gui/wxwidgets/interface.cpp:423
-#, fuzzy
 msgid "Quick &Open File...\tCtrl-O"
-msgstr "ファイルを開く..."
+msgstr "ファイルを開く...\tCtrl-O"
 
 #: modules/gui/wxwidgets/interface.cpp:426
 msgid "Open &File...\tCtrl-F"
 msgstr "ファイルを開く(&F)...\tCtrl-F"
 
 #: modules/gui/wxwidgets/interface.cpp:427
-#, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
-msgstr "ファイルを開く(&F)...\tCtrl-F"
+msgstr "ディレクトリを開く(&D)...\tCtrl-E"
 
 #: modules/gui/wxwidgets/interface.cpp:428
 msgid "Open &Disc...\tCtrl-D"
@@ -11561,14 +11401,12 @@ msgid "Open &Network Stream...\tCtrl-N"
 msgstr "ネットワークストリームを開く(&N)...\tCtrl-N"
 
 #: modules/gui/wxwidgets/interface.cpp:432
-#, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
-msgstr "キャプチャデバイスを開く(&C)...\tCtrl-C"
+msgstr "キャプチャデバイスを開く(&A)...\tCtrl-C"
 
 #: modules/gui/wxwidgets/interface.cpp:435
-#, fuzzy
 msgid "&Wizard...\tCtrl-W"
-msgstr "ストリーミングウィザード(&W)...\tCtrl-W"
+msgstr "ウィザード(&W)...\tCtrl-W"
 
 #: modules/gui/wxwidgets/interface.cpp:438
 msgid "E&xit\tCtrl-X"
@@ -11576,7 +11414,7 @@ msgstr "終了(&X)\tCtrl-X"
 
 #: modules/gui/wxwidgets/interface.cpp:444
 msgid "&Playlist...\tCtrl-P"
-msgstr "プレイリスト(&P)...\tCtrl-P"
+msgstr "プレイ一覧(&P)...\tCtrl-P"
 
 #: modules/gui/wxwidgets/interface.cpp:446
 msgid "&Messages...\tCtrl-M"
@@ -11616,11 +11454,11 @@ msgstr "ヘルプ(&H)"
 
 #: modules/gui/wxwidgets/interface.cpp:536
 msgid "Previous playlist item"
-msgstr "前のプレイリスト項目"
+msgstr "前のプレイ一覧項目"
 
 #: modules/gui/wxwidgets/interface.cpp:537
 msgid "Next playlist item"
-msgstr "次のプレイリスト項目プレイリストを開く"
+msgstr "次のプレイ一覧項目プレイ一覧を開く"
 
 #: modules/gui/wxwidgets/interface.cpp:538
 msgid "Play slower"
@@ -11631,31 +11469,27 @@ msgid "Play faster"
 msgstr "早送り再生"
 
 #: modules/gui/wxwidgets/interface.cpp:848
-#, fuzzy
 msgid "Extended &GUI\tCtrl-G"
-msgstr "GUI 拡張(&E)"
+msgstr "GUI 拡張(&G)\tCtrl-G"
 
 #: modules/gui/wxwidgets/interface.cpp:852
 msgid "&Undock Ext. GUI"
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:856
-#, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
-msgstr "ブックマーク(&B)"
+msgstr "ブックマーク(&B)...\tCtrl-B"
 
 #: modules/gui/wxwidgets/interface.cpp:858
-#, fuzzy
 msgid "Preference&s...\tCtrl-S"
-msgstr "設定..."
+msgstr "設定(&S)...\tCtrl-S"
 
 #: modules/gui/wxwidgets/interface.cpp:911
-#, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
 msgstr ""
-"(wxWindows インタフェース)\n"
+"(wxWidgets インタフェース)\n"
 "\n"
 
 #: modules/gui/wxwidgets/interface.cpp:913
@@ -11664,9 +11498,8 @@ msgid "Compiled by "
 msgstr "コメディ"
 
 #: modules/gui/wxwidgets/interface.cpp:915
-#, fuzzy
 msgid "Compiler: "
-msgstr "エラー"
+msgstr "コンパイラー: "
 
 #: modules/gui/wxwidgets/interface.cpp:916
 msgid "Based on SVN revision: "
@@ -11678,13 +11511,12 @@ msgid "About %s"
 msgstr "%s について"
 
 #: modules/gui/wxwidgets/interface.cpp:1616
-#, fuzzy
 msgid "Show/Hide interface"
-msgstr "インターフェース表示"
+msgstr "インターフェース表示/非表示"
 
 #: modules/gui/wxwidgets/iteminfo.cpp:70
 msgid "Playlist item info"
-msgstr "プレイリスト項目情報"
+msgstr "プレイ一覧項目情報"
 
 #: modules/gui/wxwidgets/iteminfo.cpp:129
 msgid "Item Info"
@@ -11700,9 +11532,8 @@ msgid "Open &File..."
 msgstr "ファイルを開く(&F)..."
 
 #: modules/gui/wxwidgets/menus.cpp:133
-#, fuzzy
 msgid "Open D&irectory..."
-msgstr "ファイルを開く(&F)...\tCtrl-F"
+msgstr "ディレクトリを開く(&I)..."
 
 #: modules/gui/wxwidgets/menus.cpp:134
 msgid "Open &Disc..."
@@ -11717,14 +11548,12 @@ msgid "Open &Capture Device..."
 msgstr "キャプチャデバイスを開く(&C)..."
 
 #: modules/gui/wxwidgets/menus.cpp:143
-#, fuzzy
 msgid "Media &Info..."
-msgstr "ストリームの情報..."
+msgstr "メディア情報(&I)"
 
 #: modules/gui/wxwidgets/menus.cpp:144
-#, fuzzy
 msgid "&Messages..."
-msgstr "メッセージ..."
+msgstr "メッセージ(&M)..."
 
 #: modules/gui/wxwidgets/menus.cpp:145
 msgid "&Preferences..."
@@ -11845,7 +11674,7 @@ msgstr ""
 #: modules/gui/wxwidgets/open.cpp:1611
 #, fuzzy
 msgid "Title number."
-msgstr "demuxモジュール"
+msgstr "チューナー番号"
 
 #: modules/gui/wxwidgets/open.cpp:1613
 msgid ""
@@ -11869,7 +11698,7 @@ msgstr ""
 #: modules/gui/wxwidgets/open.cpp:1648
 #, fuzzy
 msgid "Track number."
-msgstr "トラック "
+msgstr "トラック番号"
 
 #: modules/gui/wxwidgets/open.cpp:1654
 msgid ""
@@ -11894,7 +11723,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/playlist.cpp:51
 msgid "Shuffle"
-msgstr ""
+msgstr "シャッフル"
 
 #: modules/gui/wxwidgets/playlist.cpp:230
 #, fuzzy
@@ -11911,11 +11740,11 @@ msgstr "MRL 追加(&A)..."
 
 #: modules/gui/wxwidgets/playlist.cpp:237
 msgid "&Open Playlist..."
-msgstr "プレイリストを開く(&O)"
+msgstr "プレイ一覧を開く(&O)"
 
 #: modules/gui/wxwidgets/playlist.cpp:238
 msgid "&Save Playlist..."
-msgstr "プレイリストを保存(&S)..."
+msgstr "プレイ一覧を保存(&S)..."
 
 #: modules/gui/wxwidgets/playlist.cpp:240
 #, fuzzy
@@ -11932,7 +11761,7 @@ msgstr "タイトルで逆ソート(&R)"
 
 #: modules/gui/wxwidgets/playlist.cpp:247
 msgid "&Shuffle Playlist"
-msgstr "プレイリストをシャッフル(&S)"
+msgstr "プレイ一覧をシャッフル(&S)"
 
 #: modules/gui/wxwidgets/playlist.cpp:251
 msgid "D&elete"
@@ -11973,13 +11802,13 @@ msgstr "ルート"
 #: modules/gui/wxwidgets/playlist.cpp:801
 #, fuzzy, c-format
 msgid "%i items in playlist (%i not shown)"
-msgstr "デフォルトでプレイリストに追加"
+msgstr "デフォルトでプレイ一覧に追加"
 
 #: modules/gui/wxwidgets/playlist.cpp:594
 #: modules/gui/wxwidgets/playlist.cpp:808
 #, fuzzy, c-format
 msgid "%i items in playlist"
-msgstr "デフォルトでプレイリストに追加"
+msgstr "デフォルトでプレイ一覧に追加"
 
 #: modules/gui/wxwidgets/playlist.cpp:903
 msgid "M3U file"
@@ -11987,7 +11816,7 @@ msgstr "M3U ファイル"
 
 #: modules/gui/wxwidgets/playlist.cpp:909
 msgid "Playlist is empty"
-msgstr "プレイリストが空です"
+msgstr "プレイ一覧が空です"
 
 #: modules/gui/wxwidgets/playlist.cpp:909
 msgid "Can't save"
@@ -12001,7 +11830,7 @@ msgstr "通常"
 #: modules/gui/wxwidgets/playlist.cpp:1233
 #, fuzzy
 msgid "Sorted by artist"
-msgstr "作成者でソート(&A)"
+msgstr "タイトルでソート(&T)"
 
 #: modules/gui/wxwidgets/playlist.cpp:1235
 #, fuzzy
@@ -12176,32 +12005,26 @@ msgid "Open file"
 msgstr "ファイルを開く"
 
 #: modules/gui/wxwidgets/timer.cpp:156 modules/gui/wxwidgets/timer.cpp:337
-#, fuzzy
 msgid "Playing"
-msgstr "再生"
+msgstr "再生中"
 
 #: modules/gui/wxwidgets/timer.cpp:176
-#, fuzzy
 msgid "Stopped"
 msgstr "停止"
 
 #: modules/gui/wxwidgets/timer.cpp:223
-#, fuzzy
 msgid "Menu"
-msgstr "メディア"
+msgstr "メニュー"
 
 #: modules/gui/wxwidgets/timer.cpp:226
-#, fuzzy
 msgid "Previous track"
-msgstr "前のチャプター"
+msgstr "前のトラック"
 
 #: modules/gui/wxwidgets/timer.cpp:227
-#, fuzzy
 msgid "Next track"
-msgstr "ビデオ"
+msgstr "次のトラック"
 
 #: modules/gui/wxwidgets/timer.cpp:333
-#, fuzzy
 msgid "Paused"
 msgstr "一時停止"
 
@@ -12210,14 +12033,12 @@ msgid "Use this to re-encode a stream and save it to a file."
 msgstr ""
 
 #: modules/gui/wxwidgets/wizard.cpp:100
-#, fuzzy
 msgid "Use this to stream on a network"
-msgstr "ネットワークを開く"
+msgstr ""
 
 #: modules/gui/wxwidgets/wizard.cpp:113
-#, fuzzy
 msgid "You must choose a stream"
-msgstr "ストリームの出力先の選択"
+msgstr "ストリームを選択しなければなりません"
 
 #: modules/gui/wxwidgets/wizard.cpp:114
 msgid "Uh Oh! Unable to find playlist !"
@@ -12232,9 +12053,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/wizard.cpp:122
-#, fuzzy
 msgid "Choose"
-msgstr "ブラウズ..."
+msgstr "選択..."
 
 #: modules/gui/wxwidgets/wizard.cpp:143
 msgid "This does not appear to be a valid multicast address"
@@ -12272,9 +12092,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/wizard.cpp:1290
-#, fuzzy
 msgid "Save to file"
-msgstr "ファイルの保存"
+msgstr "ファイルへ保存する"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:89
 msgid "Show bookmarks dialog"
@@ -12287,17 +12106,16 @@ msgstr ""
 #: modules/gui/wxwidgets/wxwidgets.cpp:92
 #: modules/gui/wxwidgets/wxwidgets.cpp:93
 msgid "Show extended GUI"
-msgstr ""
+msgstr "拡張 GUI を表示する"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:94
 #: modules/gui/wxwidgets/wxwidgets.cpp:95
 msgid "Show taskbar entry"
-msgstr ""
+msgstr "タスクバーに入れて表示する"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:96
-#, fuzzy
 msgid "Minimal interface"
-msgstr "スキン化インターフェース"
+msgstr "最小化インターフェース"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:97
 msgid "Use minimal interface, no toolbar, few menus"
@@ -12314,19 +12132,16 @@ msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:100
 #: modules/gui/wxwidgets/wxwidgets.cpp:101
-#, fuzzy
 msgid "Show systray icon"
-msgstr "ストリーム位置表示"
+msgstr "システムトレイアイコンを表示する"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:110
-#, fuzzy
 msgid "wxWidgets interface module"
-msgstr "wxWindows インターフェースモジュール"
+msgstr "wxWidgets インターフェースモジュール"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:149
-#, fuzzy
 msgid "wxWidgets dialogs provider"
-msgstr "wxWindows ダイアログ提供"
+msgstr "wxWidgets ダイアログ提供"
 
 #: modules/misc/dummy/dummy.c:37
 msgid "Dummy image chroma format"
@@ -12366,9 +12181,8 @@ msgid "Dummy interface function"
 msgstr "ダミーのインターフェース機能"
 
 #: modules/misc/dummy/dummy.c:66
-#, fuzzy
 msgid "Dummy Interface"
-msgstr "インタフェース"
+msgstr "ダミーインタフェース"
 
 #: modules/misc/dummy/dummy.c:71
 msgid "Dummy access function"
@@ -12445,7 +12259,7 @@ msgstr ""
 #: modules/video_filter/marq.c:93 modules/video_filter/rss.c:131
 #: modules/video_filter/time.c:84
 msgid "Text Default Color"
-msgstr ""
+msgstr "テキストのデフォルト色"
 
 #: modules/misc/freetype.c:93 modules/misc/win32text.c:64
 #: modules/video_filter/marq.c:94 modules/video_filter/rss.c:132
@@ -12478,41 +12292,39 @@ msgstr "とても大きい"
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:52 modules/video_filter/rss.c:55
 #: modules/video_filter/time.c:52
-#, fuzzy
 msgid "Black"
-msgstr "逆転"
+msgstr "黒"
 
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:53 modules/video_filter/rss.c:56
 #: modules/video_filter/time.c:53
 msgid "Gray"
-msgstr ""
+msgstr "灰"
 
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:53 modules/video_filter/rss.c:56
 #: modules/video_filter/time.c:53
-#, fuzzy
 msgid "Silver"
-msgstr "スロー"
+msgstr "銀"
 
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:53 modules/video_filter/rss.c:56
 #: modules/video_filter/time.c:53
 msgid "White"
-msgstr ""
+msgstr "白"
 
 #: modules/misc/freetype.c:108 modules/misc/win32text.c:79
 #: modules/video_filter/marq.c:53 modules/video_filter/rss.c:56
 #: modules/video_filter/time.c:53
+#, fuzzy
 msgid "Maroon"
-msgstr ""
+msgstr "モノラル"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:53 modules/video_filter/rss.c:56
 #: modules/video_filter/time.c:53
-#, fuzzy
 msgid "Red"
-msgstr "ブレンド"
+msgstr "赤"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:54 modules/video_filter/rss.c:57
@@ -12525,65 +12337,61 @@ msgstr "フュージョン"
 #: modules/video_filter/marq.c:54 modules/video_filter/rss.c:57
 #: modules/video_filter/time.c:54
 msgid "Yellow"
-msgstr ""
+msgstr "黄"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:54 modules/video_filter/rss.c:57
 #: modules/video_filter/time.c:54
-#, fuzzy
 msgid "Olive"
-msgstr "オールディーズ"
+msgstr "オリーブ"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:54 modules/video_filter/rss.c:57
 #: modules/video_filter/time.c:54
-#, fuzzy
 msgid "Green"
-msgstr "スクリーン"
+msgstr "緑"
 
 #: modules/misc/freetype.c:109 modules/misc/win32text.c:80
 #: modules/video_filter/marq.c:55 modules/video_filter/rss.c:58
 #: modules/video_filter/time.c:55
 #, fuzzy
 msgid "Teal"
-msgstr "タイトル"
+msgstr "メタル"
 
 #: modules/misc/freetype.c:110 modules/misc/win32text.c:81
 #: modules/video_filter/marq.c:55 modules/video_filter/rss.c:58
 #: modules/video_filter/time.c:55
-#, fuzzy
 msgid "Lime"
-msgstr "時間"
+msgstr "ライム"
 
 #: modules/misc/freetype.c:110 modules/misc/win32text.c:81
 #: modules/video_filter/marq.c:55 modules/video_filter/rss.c:58
 #: modules/video_filter/time.c:55
 msgid "Purple"
-msgstr ""
+msgstr "紫"
 
 #: modules/misc/freetype.c:110 modules/misc/win32text.c:81
 #: modules/video_filter/marq.c:55 modules/video_filter/rss.c:58
 #: modules/video_filter/time.c:55
 msgid "Navy"
-msgstr ""
+msgstr "ネイビー"
 
 #: modules/misc/freetype.c:110 modules/misc/win32text.c:81
 #: modules/video_filter/marq.c:55 modules/video_filter/rss.c:58
 #: modules/video_filter/time.c:55
-#, fuzzy
 msgid "Blue"
-msgstr "ブルース"
+msgstr "青"
 
 #: modules/misc/freetype.c:110 modules/misc/win32text.c:81
 #: modules/video_filter/marq.c:56 modules/video_filter/rss.c:59
 #: modules/video_filter/time.c:56
 msgid "Aqua"
-msgstr ""
+msgstr "アクア"
 
 #: modules/misc/freetype.c:113 modules/misc/win32text.c:84
 #, fuzzy
 msgid "Text renderer"
-msgstr "ダイレクトレンダリング"
+msgstr "テキストレンダラー設定"
 
 #: modules/misc/freetype.c:114
 msgid "Freetype2 font renderer"
@@ -12638,7 +12446,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:92
 msgid "GnuTLS TLS encryption layer"
-msgstr ""
+msgstr "GnuTLS TLS 暗号化レイヤー"
 
 #: modules/misc/gtk_main.c:60
 msgid "Gtk+ GUI helper"
@@ -12699,9 +12507,8 @@ msgid "AltiVec memcpy"
 msgstr "AltiVec memcpy"
 
 #: modules/misc/network/ipv4.c:94
-#, fuzzy
 msgid "Multicast output interface"
-msgstr "リモート・コントロール・インタフェース・モジュール"
+msgstr "マルチキャスト出力インターフェース)"
 
 #: modules/misc/network/ipv4.c:96
 msgid ""
@@ -12721,11 +12528,11 @@ msgstr "IPv6ネットワーク抽象レイヤ"
 
 #: modules/misc/playlist/export.c:44
 msgid "M3U playlist exporter"
-msgstr "M3U プレイリストをエクスポートする"
+msgstr "M3U プレイ一覧をエクスポートする"
 
 #: modules/misc/playlist/export.c:50
 msgid "Old playlist exporter"
-msgstr "古いプレイリストをエクスポートする"
+msgstr "古いプレイ一覧をエクスポートする"
 
 #: modules/misc/qte_main.cpp:66
 msgid "Run as standalone Qt/Embedded GUI Server"
@@ -12738,12 +12545,10 @@ msgid ""
 msgstr ""
 
 #: modules/misc/qte_main.cpp:72
-#, fuzzy
 msgid "Qt Embedded GUI helper"
 msgstr "QT 埋め込み GUI ヘルパー"
 
 #: modules/misc/qte_main.cpp:184
-#, fuzzy
 msgid "video"
 msgstr "ビデオ"
 
@@ -12755,14 +12560,12 @@ msgid ""
 msgstr ""
 
 #: modules/misc/rtsp.c:52
-#, fuzzy
 msgid "RTSP VoD"
-msgstr "サーバーなし"
+msgstr "RTSP VoD"
 
 #: modules/misc/rtsp.c:53
-#, fuzzy
 msgid "RTSP VoD server"
-msgstr "サーバーなし"
+msgstr "RTSP VoD サーバー"
 
 #: modules/misc/screensaver.c:44
 #, fuzzy
@@ -12782,7 +12585,7 @@ msgstr ""
 #: modules/misc/testsuite/playlist.c:94
 #, fuzzy
 msgid "Playlist stress tests"
-msgstr "プレイリストが空です"
+msgstr "プレイ一覧が空です"
 
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
@@ -12793,13 +12596,12 @@ msgid "Miscellaneous stress tests"
 msgstr "その他 負荷テスト"
 
 #: modules/misc/win32text.c:85
-#, fuzzy
 msgid "Win32 font renderer"
-msgstr "ダイレクトレンダリング"
+msgstr "Win32 フォントレンダラー"
 
 #: modules/misc/xml/libxml.c:43
 msgid "XML Parser (using libxml2)"
-msgstr ""
+msgstr "XML パーサー (libxml2 を使用する)"
 
 #: modules/misc/xml/xtag.c:90
 #, fuzzy
@@ -12832,9 +12634,8 @@ msgid "Allows you to define the \"rating\" that will be put in ASF comments."
 msgstr ""
 
 #: modules/mux/asf.c:63
-#, fuzzy
 msgid "Packet Size"
-msgstr "準備されているパケッタライザー一覧の選択"
+msgstr "パケットサイズ"
 
 #: modules/mux/asf.c:64
 msgid "The ASF packet size -- default is 4096 bytes"
@@ -12918,7 +12719,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:88
 msgid "SPU PID"
-msgstr ""
+msgstr "SPU PID"
 
 #: modules/mux/mpeg/ts.c:89
 msgid "Assigns a fixed PID to the SPU."
@@ -12926,7 +12727,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:90
 msgid "PMT PID"
-msgstr ""
+msgstr "PMT PID"
 
 #: modules/mux/mpeg/ts.c:91
 msgid "Assigns a fixed PID to the PMT"
@@ -12934,7 +12735,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:92
 msgid "TS ID"
-msgstr ""
+msgstr "TS ID"
 
 #: modules/mux/mpeg/ts.c:93
 msgid "Assigns a fixed Transport Stream ID."
@@ -12942,7 +12743,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:94
 msgid "NET ID"
-msgstr ""
+msgstr "NET ID"
 
 #: modules/mux/mpeg/ts.c:95
 msgid "Assigns a fixed Network ID (for SDT table)"
@@ -13136,8 +12937,9 @@ msgid "MPEG-I/II video packetizer"
 msgstr "MPEG 1/2ビデオ・デコーダ・モジュール"
 
 #: modules/services_discovery/bonjour.c:47
+#, fuzzy
 msgid "Bonjour services"
-msgstr ""
+msgstr "サーバーなし"
 
 #: modules/services_discovery/bonjour.c:279
 msgid "Bonjour"
@@ -13145,20 +12947,17 @@ msgstr ""
 
 #: modules/services_discovery/daap.c:53 modules/services_discovery/daap.c:187
 msgid "DAAP shares"
-msgstr ""
+msgstr "DAAP 共有"
 
 #: modules/services_discovery/daap.c:61
-#, fuzzy
 msgid "DAAP access"
-msgstr "アクセス:"
+msgstr "DAAP アクセス"
 
 #: modules/services_discovery/hal.c:63
-#, fuzzy
 msgid "HAL device detection"
-msgstr "選択"
+msgstr "HAL デバイス検知"
 
 #: modules/services_discovery/hal.c:127
-#, fuzzy
 msgid "Devices"
 msgstr "デバイス"
 
@@ -13172,7 +12971,7 @@ msgstr ""
 
 #: modules/services_discovery/sap.c:81
 msgid "IPv4-SAP listening"
-msgstr ""
+msgstr "IPv4-SAP の待ちうけ"
 
 #: modules/services_discovery/sap.c:83
 msgid ""
@@ -13182,7 +12981,7 @@ msgstr ""
 
 #: modules/services_discovery/sap.c:85
 msgid "IPv6-SAP listening"
-msgstr ""
+msgstr "IPv6-SAP の待ち受け"
 
 #: modules/services_discovery/sap.c:87
 msgid ""
@@ -13231,7 +13030,7 @@ msgstr ""
 
 #: modules/services_discovery/sap.c:104
 msgid "Use SAP cache"
-msgstr ""
+msgstr "SAP キャッシュを使う"
 
 #: modules/services_discovery/sap.c:106
 msgid ""
@@ -13255,19 +13054,16 @@ msgid "Session Announcements (SAP)"
 msgstr "セッション・アナウンスメント・プロトコルをサポートする"
 
 #: modules/services_discovery/sap.c:790 modules/services_discovery/sap.c:795
-#, fuzzy
 msgid "Session"
-msgstr "セッション名"
+msgstr "セッション"
 
 #: modules/services_discovery/sap.c:791
-#, fuzzy
 msgid "Tool"
-msgstr "上"
+msgstr "ツール"
 
 #: modules/services_discovery/sap.c:796
-#, fuzzy
 msgid "User"
-msgstr "ユーザー名"
+msgstr "ユーザー"
 
 #: modules/services_discovery/shout.c:60
 #, fuzzy
@@ -13279,9 +13075,8 @@ msgid "Shoutcast radio listings"
 msgstr ""
 
 #: modules/services_discovery/shout.c:137
-#, fuzzy
 msgid "Shoutcast"
-msgstr "マルチキャスト"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:57
 #: modules/services_discovery/upnp.cpp:113
@@ -13304,8 +13099,9 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/bridge.c:45
+#, fuzzy
 msgid "ID Offset"
-msgstr ""
+msgstr "時間オフセット"
 
 #: modules/stream_out/bridge.c:46
 msgid ""
@@ -13314,18 +13110,18 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/bridge.c:58
-#, fuzzy
 msgid "Bridge"
-msgstr "ブライトネス"
+msgstr "ブリッジ"
 
 #: modules/stream_out/bridge.c:59
 #, fuzzy
 msgid "Bridge stream output"
-msgstr "ストリームの出力先の選択"
+msgstr "ファイルストリーム出力"
 
 #: modules/stream_out/bridge.c:61
+#, fuzzy
 msgid "Bridge out"
-msgstr ""
+msgstr "ビデオポート"
 
 #: modules/stream_out/bridge.c:72
 msgid "Bridge in"
@@ -13349,9 +13145,8 @@ msgid "Introduces a delay in the display of the stream."
 msgstr ""
 
 #: modules/stream_out/display.c:50 modules/video_filter/deinterlace.c:121
-#, fuzzy
 msgid "Display"
-msgstr "再生"
+msgstr "表示"
 
 #: modules/stream_out/display.c:51
 msgid "Display stream output"
@@ -13463,9 +13258,8 @@ msgid "Specify an identifier string for this subpicture"
 msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:110
-#, fuzzy
 msgid "Sample aspect ratio"
-msgstr "ソースのアスペクト比"
+msgstr "サンプルのアスペクト比"
 
 #: modules/stream_out/mosaic_bridge.c:112
 msgid "Sample aspect ratio of the destination (1:1, 3:4, 2:3)."
@@ -13507,9 +13301,8 @@ msgid "Allows you to specify the session name used for the streaming output."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/stream_out/rtp.c:60
-#, fuzzy
 msgid "Session description"
-msgstr "コーデック説明"
+msgstr "セッションの説明"
 
 #: modules/stream_out/rtp.c:62
 #, fuzzy
@@ -13517,9 +13310,8 @@ msgid "Allows you to give a broader description of the stream."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/stream_out/rtp.c:63
-#, fuzzy
 msgid "Session URL"
-msgstr "セッション名"
+msgstr "セッション URL"
 
 #: modules/stream_out/rtp.c:65
 #, fuzzy
@@ -13542,9 +13334,8 @@ msgid "Allows you to specify the base port used for the RTP streaming."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/stream_out/rtp.c:73
-#, fuzzy
 msgid "Audio port"
-msgstr "設定"
+msgstr "オーディオポート"
 
 #: modules/stream_out/rtp.c:75
 #, fuzzy
@@ -13553,9 +13344,8 @@ msgid ""
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/stream_out/rtp.c:76
-#, fuzzy
 msgid "Video port"
-msgstr "ビデオビットレート"
+msgstr "ビデオポート"
 
 #: modules/stream_out/rtp.c:78
 #, fuzzy
@@ -13568,9 +13358,8 @@ msgid "Allows you to specify the time to live for the output stream."
 msgstr ""
 
 #: modules/stream_out/rtp.c:91
-#, fuzzy
 msgid "RTP stream output"
-msgstr "ストリームの出力先の選択"
+msgstr "RTP ストリーム出力"
 
 #: modules/stream_out/standard.c:49
 #, fuzzy
@@ -13581,7 +13370,7 @@ msgstr "VLCが選択するパケッタライザーの順序を選択します。
 #: modules/stream_out/standard.c:51
 #, fuzzy
 msgid "Output URL (deprecated)"
-msgstr "出力フォーマット"
+msgstr "出力デバイス"
 
 #: modules/stream_out/standard.c:53
 #, fuzzy
@@ -13606,9 +13395,8 @@ msgid "Name of the session that will be announced with SAP or SLP"
 msgstr ""
 
 #: modules/stream_out/standard.c:64
-#, fuzzy
 msgid "Session groupname"
-msgstr "セッション名"
+msgstr "セッショングループ名"
 
 #: modules/stream_out/standard.c:66
 msgid "Name of the group that will be announced for the session"
@@ -13633,16 +13421,14 @@ msgid "Announce this session with SLP"
 msgstr ""
 
 #: modules/stream_out/standard.c:80
-#, fuzzy
 msgid "Standard"
-msgstr "標準再生"
+msgstr "標準"
 
 #: modules/stream_out/standard.c:81
 msgid "Standard stream output"
 msgstr "標準ストリーム出力"
 
 #: modules/stream_out/switcher.c:81
-#, fuzzy
 msgid "Files"
 msgstr "ファイル"
 
@@ -13661,22 +13447,20 @@ msgid "List of sizes separated by colons (720x576:480x576)."
 msgstr ""
 
 #: modules/stream_out/switcher.c:87
-#, fuzzy
 msgid "Aspect ratio"
 msgstr "アスペクト比"
 
 #: modules/stream_out/switcher.c:89
 msgid "Aspect ratio (4:3, 16:9)."
-msgstr ""
+msgstr "アスペクト比(4:3 や 16:9)です。"
 
 #: modules/stream_out/switcher.c:90
-#, fuzzy
 msgid "Command UDP port"
-msgstr "ポート番号"
+msgstr "コマンド UDP ポート"
 
 #: modules/stream_out/switcher.c:92
 msgid "UDP port to listen to for commands."
-msgstr ""
+msgstr "コマンドを待ち受ける UDP ポートです。"
 
 #: modules/stream_out/switcher.c:93
 msgid "Command"
@@ -13688,7 +13472,7 @@ msgstr ""
 
 #: modules/stream_out/switcher.c:96
 msgid "GOP size"
-msgstr ""
+msgstr "GOP サイズ"
 
 #: modules/stream_out/switcher.c:98
 msgid "Number of P frames between two I frames."
@@ -13696,7 +13480,7 @@ msgstr ""
 
 #: modules/stream_out/switcher.c:99
 msgid "Quantizer scale"
-msgstr ""
+msgstr "スケールクオンタイズ"
 
 #: modules/stream_out/switcher.c:101
 msgid "Fixed quantizer scale to use."
@@ -13746,18 +13530,16 @@ msgid "Allows you to specify the video bitrate used for the streaming output."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/stream_out/transcode.c:58
-#, fuzzy
 msgid "Video scaling"
-msgstr "設定"
+msgstr "ビデオスケーリング"
 
 #: modules/stream_out/transcode.c:60
 msgid "Allows you to scale the video before encoding."
 msgstr ""
 
 #: modules/stream_out/transcode.c:61
-#, fuzzy
 msgid "Video frame-rate"
-msgstr "ビデオビットレート"
+msgstr "ビデオフレームレート"
 
 #: modules/stream_out/transcode.c:63
 #, fuzzy
@@ -13769,9 +13551,8 @@ msgid "Allows you to deinterlace the video before encoding."
 msgstr ""
 
 #: modules/stream_out/transcode.c:76
-#, fuzzy
 msgid "Maximum video width"
-msgstr "ビデオの幅"
+msgstr "ビデオの最大の幅"
 
 #: modules/stream_out/transcode.c:78
 #, fuzzy
@@ -13779,9 +13560,8 @@ msgid "Allows you to specify a maximum output video width."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
 #: modules/stream_out/transcode.c:79
-#, fuzzy
 msgid "Maximum video height"
-msgstr "ビデオの高さ"
+msgstr "ビデオの最大の高さ"
 
 #: modules/stream_out/transcode.c:81
 #, fuzzy
@@ -13791,7 +13571,7 @@ msgstr "VLCが選択するパケッタライザーの順序を選択します。
 #: modules/stream_out/transcode.c:82
 #, fuzzy
 msgid "Video filter"
-msgstr "ビデオタイトル"
+msgstr "ビデオフィルター"
 
 #: modules/stream_out/transcode.c:84
 #, fuzzy
@@ -13922,9 +13702,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode.c:135 modules/video_filter/osdmenu.c:117
-#, fuzzy
 msgid "OSD menu"
-msgstr "XOSDモジュール"
+msgstr "OSD メニュー"
 
 #: modules/stream_out/transcode.c:137
 msgid ""
@@ -13941,7 +13720,7 @@ msgstr ""
 
 #: modules/stream_out/transcode.c:142
 msgid "High priority"
-msgstr ""
+msgstr "高優先度"
 
 #: modules/stream_out/transcode.c:144
 msgid ""
@@ -13970,9 +13749,8 @@ msgid "Transcode stream output"
 msgstr "ストリームの一時停止"
 
 #: modules/stream_out/transcode.c:228
-#, fuzzy
 msgid "Overlays/Subtitles"
-msgstr "字幕を開く"
+msgstr "オーバーレイ/字幕"
 
 #: modules/stream_out/transrate/transrate.c:58
 #, fuzzy
@@ -14033,7 +13811,7 @@ msgstr "画像ブライトネス (0〜2)"
 
 #: modules/video_filter/adjust.c:67
 msgid "Set the image brightness, between 0 and 2. Defaults to 1"
-msgstr ""
+msgstr "画像ブライトネス設定。0〜2 の間でデフォルトは 1 です。"
 
 #: modules/video_filter/adjust.c:68
 msgid "Image gamma (0-10)"
@@ -14041,7 +13819,7 @@ msgstr "画像ガンマ (0〜10)"
 
 #: modules/video_filter/adjust.c:69
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1"
-msgstr ""
+msgstr "画像ガンマ設定。0.01〜10の間でデフォルトは 1 です。"
 
 #: modules/video_filter/adjust.c:73
 msgid "Image properties filter"
@@ -14049,12 +13827,11 @@ msgstr "ビデオプロパティフィルター"
 
 #: modules/video_filter/adjust.c:74
 msgid "Image adjust"
-msgstr ""
+msgstr "画像調整"
 
 #: modules/video_filter/blend.c:67
-#, fuzzy
 msgid "Video pictures blending"
-msgstr "ビデオフィルター設定"
+msgstr "ビデオピクチャーブレンディング"
 
 #: modules/video_filter/clone.c:55
 msgid "Number of clones"
@@ -14135,13 +13912,13 @@ msgid "Distort mode"
 msgstr "湾曲モード"
 
 #: modules/video_filter/distort.c:60
+#, fuzzy
 msgid "Distort mode, one of \"wave\" and \"ripple\""
 msgstr "湾曲モード(\"wave\", \"ripple\")"
 
 #: modules/video_filter/distort.c:63
-#, fuzzy
 msgid "Wave"
-msgstr "保存"
+msgstr "波形"
 
 #: modules/video_filter/distort.c:63
 #, fuzzy
@@ -14161,7 +13938,7 @@ msgstr "ビデオ逆転モジュール"
 #: modules/video_filter/invert.c:53
 #, fuzzy
 msgid "Color inversion"
-msgstr "サイズ"
+msgstr "変換元 "
 
 #: modules/video_filter/logo.c:68
 msgid "Logo filename"
@@ -14423,7 +14200,7 @@ msgstr ""
 
 #: modules/video_filter/motiondetect.c:56
 msgid "History parameter"
-msgstr ""
+msgstr "履歴パラメーター"
 
 #: modules/video_filter/motiondetect.c:57
 msgid "History parameter, number of frames used for detection"
@@ -14435,14 +14212,12 @@ msgid "Motion detect video filter"
 msgstr "イメージ・クローン・ビデオ・モジュール"
 
 #: modules/video_filter/motiondetect.c:61
-#, fuzzy
 msgid "Motion detect"
-msgstr "モジュレーションタイプ"
+msgstr "モーション検知"
 
 #: modules/video_filter/osdmenu.c:42
-#, fuzzy
 msgid "OSD menu configuration file"
-msgstr "コンフィグレーション・オプションにツールチップを表示"
+msgstr "OSD メニュー設定ファイル"
 
 #: modules/video_filter/osdmenu.c:44
 msgid "An OSD menu configuration file that menu actions with button images"
@@ -14450,7 +14225,7 @@ msgstr ""
 
 #: modules/video_filter/osdmenu.c:46
 msgid "Path to OSD menu images"
-msgstr ""
+msgstr "OSD メニュー画像へのパス"
 
 #: modules/video_filter/osdmenu.c:48
 msgid ""
@@ -14471,9 +14246,8 @@ msgid "Y coordinate of the OSD menu"
 msgstr ""
 
 #: modules/video_filter/osdmenu.c:57
-#, fuzzy
 msgid "OSD menu position"
-msgstr "垂直方向位置"
+msgstr "OSD メニューの位置"
 
 #: modules/video_filter/osdmenu.c:59
 msgid ""
@@ -14483,7 +14257,7 @@ msgstr ""
 
 #: modules/video_filter/osdmenu.c:63
 msgid "Timeout of OSD menu"
-msgstr ""
+msgstr "OSD メニューのタイムアウト"
 
 #: modules/video_filter/osdmenu.c:65
 msgid ""
@@ -14494,7 +14268,7 @@ msgstr ""
 
 #: modules/video_filter/osdmenu.c:68
 msgid "Update speed of OSD menu"
-msgstr ""
+msgstr "OSD メニューの更新速度"
 
 #: modules/video_filter/osdmenu.c:70
 msgid ""
@@ -14510,19 +14284,19 @@ msgstr ""
 
 #: modules/video_filter/rss.c:110
 msgid "RSS feed URLs"
-msgstr ""
+msgstr "RSS フィード URL"
 
 #: modules/video_filter/rss.c:111
 msgid "RSS feed '|' (pipe) seperated URLs"
-msgstr ""
+msgstr "RSS フィードは「|(パイプ)」で分けられた URL です"
 
 #: modules/video_filter/rss.c:112
 msgid "RSS feed speed"
-msgstr ""
+msgstr "RSS フィード速度"
 
 #: modules/video_filter/rss.c:113
 msgid "RSS feed speed (bigger is slower)"
-msgstr ""
+msgstr "RSS フィード速度(大きいほど遅い)"
 
 #: modules/video_filter/rss.c:114 modules/video_filter/rss.c:115
 msgid "RSS feed max number of chars displayed"
@@ -14543,9 +14317,8 @@ msgid "RSS"
 msgstr ""
 
 #: modules/video_filter/rss.c:180
-#, fuzzy
 msgid "RSS feed display"
-msgstr "埋め込みQTのX11ディスプレイ名"
+msgstr "RSS フィード表示"
 
 #: modules/video_filter/rv32.c:52
 #, fuzzy
@@ -14553,14 +14326,12 @@ msgid "RV32 conversion filter"
 msgstr "MMX 変換元 "
 
 #: modules/video_filter/scale.c:53 modules/video_filter/swscale/filter.c:74
-#, fuzzy
 msgid "Video scaling filter"
-msgstr "設定"
+msgstr "ビデオスケーリングフィルター"
 
 #: modules/video_filter/swscale/filter.c:63
-#, fuzzy
 msgid "Scaling mode"
-msgstr "湾曲モード"
+msgstr "スケーリングモード"
 
 #: modules/video_filter/swscale/filter.c:64
 msgid "You can choose the default scaling mode."
@@ -14582,25 +14353,23 @@ msgstr ""
 
 #: modules/video_filter/swscale/filter.c:69
 msgid "Experimental"
-msgstr ""
+msgstr "実験的"
 
 #: modules/video_filter/swscale/filter.c:69
 msgid "Nearest neighbour (bad quality)"
 msgstr ""
 
 #: modules/video_filter/swscale/filter.c:70
-#, fuzzy
 msgid "Area"
-msgstr "垂直"
+msgstr "範囲"
 
 #: modules/video_filter/swscale/filter.c:70
 msgid "Luma bicubic / chroma bilinear"
 msgstr ""
 
 #: modules/video_filter/swscale/filter.c:70
-#, fuzzy
 msgid "Gauss"
-msgstr "バス"
+msgstr "ガウス"
 
 #: modules/video_filter/swscale/filter.c:71
 msgid "SincR"
@@ -14625,9 +14394,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/time.c:88
-#, fuzzy
 msgid "Time position"
-msgstr "垂直方向位置"
+msgstr "時間の位置"
 
 #: modules/video_filter/time.c:90
 msgid ""
@@ -14637,18 +14405,16 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/time.c:104
-#, fuzzy
 msgid "Time overlay"
-msgstr "垂直オフセット"
+msgstr "時間のオーバーレイ"
 
 #: modules/video_filter/time.c:121
 msgid "Time display sub filter"
 msgstr ""
 
 #: modules/video_filter/transform.c:57
-#, fuzzy
 msgid "Transform type"
-msgstr "変換タイプ"
+msgstr "変換の種類"
 
 #: modules/video_filter/transform.c:58
 msgid "One of '90', '180', '270', 'hflip' and 'vflip'"
@@ -14656,15 +14422,15 @@ msgstr "'90', '180', '270', 'hflip', 'vflip'の中から一つ選択する。"
 
 #: modules/video_filter/transform.c:61
 msgid "Rotate by 90 degrees"
-msgstr ""
+msgstr "90 度回転"
 
 #: modules/video_filter/transform.c:62
 msgid "Rotate by 180 degrees"
-msgstr ""
+msgstr "180 度回転"
 
 #: modules/video_filter/transform.c:62
 msgid "Rotate by 270 degrees"
-msgstr ""
+msgstr "270 度回転"
 
 #: modules/video_filter/transform.c:63
 #, fuzzy
@@ -14736,9 +14502,8 @@ msgid "Color ASCII art video output"
 msgstr "ASCIIアート・ビデオ出力モジュール"
 
 #: modules/video_output/directx/directx.c:111
-#, fuzzy
 msgid "Use hardware YUV->RGB conversions"
-msgstr "ハードウェアによる YUV->RGB変換を使用"
+msgstr "ハードウェアによる YUV->RGB 変換を使用する"
 
 #: modules/video_output/directx/directx.c:113
 msgid ""
@@ -14749,7 +14514,6 @@ msgstr ""
 "する場合には何の効果もありません。"
 
 #: modules/video_output/directx/directx.c:116
-#, fuzzy
 msgid "Use video buffers in system memory"
 msgstr "システムメモリ中のビデオバッファを使用する"
 
@@ -14767,7 +14531,7 @@ msgstr ""
 
 #: modules/video_output/directx/directx.c:123
 msgid "Use triple buffering for overlays"
-msgstr ""
+msgstr "オーバーレイのトリプルバッファを使用する"
 
 #: modules/video_output/directx/directx.c:125
 msgid ""
@@ -14788,7 +14552,7 @@ msgstr ""
 
 #: modules/video_output/directx/directx.c:134
 msgid "Enable wallpaper mode "
-msgstr ""
+msgstr "壁紙モードを有効にする"
 
 #: modules/video_output/directx/directx.c:136
 msgid ""
@@ -14798,24 +14562,21 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/directx/directx.c:162
-#, fuzzy
 msgid "DirectX video output"
-msgstr "DirectXビデオ・モジュール"
+msgstr "DirectX ビデオ出力"
 
 #: modules/video_output/directx/directx.c:301
-#, fuzzy
 msgid "Wallpaper"
-msgstr "とても小さい"
+msgstr "壁紙"
 
 #: modules/video_output/directx/glwin32.c:65 modules/video_output/opengl.c:135
 #: modules/video_output/x11/glx.c:115
-#, fuzzy
 msgid "OpenGL video output"
-msgstr "オーバーレイビデオ出力"
+msgstr "OpenGL ビデオ出力"
 
 #: modules/video_output/fb.c:67
 msgid "Framebuffer device"
-msgstr "フレームバッファデバイス"
+msgstr "フレームバッファーデバイス"
 
 #: modules/video_output/fb.c:69
 msgid ""
@@ -14824,9 +14585,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/fb.c:78
-#, fuzzy
 msgid "GNU/Linux console framebuffer video output"
-msgstr "Linuxコンソール・フレーム・バッファ・モジュール"
+msgstr "GNU/Linux フレームバッファコンソールのビデオ出力"
 
 #: modules/video_output/ggi.c:56 modules/video_output/x11/glx.c:101
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
@@ -14848,18 +14608,16 @@ msgid "3dfx Glide video output"
 msgstr "フルスクリーン出力"
 
 #: modules/video_output/hd1000v.cpp:57
-#, fuzzy
 msgid "HD1000 video output"
-msgstr "HD1000 オーディオ出力"
+msgstr "HD1000 ビデオ出力"
 
 #: modules/video_output/image.c:48
-#, fuzzy
 msgid "Image format"
-msgstr "ログフォーマット"
+msgstr "画像の形式"
 
 #: modules/video_output/image.c:49
 msgid "Set the format of the output image."
-msgstr ""
+msgstr "出力画像の形式を設定します"
 
 #: modules/video_output/image.c:51
 msgid "Recording ratio"
@@ -14872,9 +14630,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/image.c:55
-#, fuzzy
 msgid "Filename prefix"
-msgstr "ファイル名"
+msgstr "ファイル名の接頭語"
 
 #: modules/video_output/image.c:56
 msgid ""
@@ -14883,9 +14640,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/image.c:64
-#, fuzzy
 msgid "Image video output"
-msgstr "X11 ビデオ出力"
+msgstr "画像ビデオ出力"
 
 #: modules/video_output/mga.c:59
 #, fuzzy
@@ -14901,9 +14657,8 @@ msgid "If the OpenGL cube effect is enabled, this controls its rotation speed."
 msgstr ""
 
 #: modules/video_output/opengl.c:122
-#, fuzzy
 msgid "Select effect"
-msgstr "次のチャプターを選択"
+msgstr "エフェクトの選択"
 
 #: modules/video_output/opengl.c:124
 #, fuzzy
@@ -14942,7 +14697,7 @@ msgstr "シンプル DirectMedia レイヤ・モジュール"
 
 #: modules/video_output/snapshot.c:60
 msgid "snapshot width"
-msgstr ""
+msgstr "スナップショット幅"
 
 #: modules/video_output/snapshot.c:61
 msgid "Set the width of the snapshot image."
@@ -14958,7 +14713,7 @@ msgstr ""
 
 #: modules/video_output/snapshot.c:66
 msgid "chroma"
-msgstr ""
+msgstr "クロマ"
 
 #: modules/video_output/snapshot.c:67
 msgid "Set the desired chroma for the snapshot image (a 4 character string)."
@@ -14966,21 +14721,19 @@ msgstr ""
 
 #: modules/video_output/snapshot.c:69
 msgid "cache size (number of images)"
-msgstr ""
+msgstr "キャッシュサイズ (画像の数)"
 
 #: modules/video_output/snapshot.c:70
 msgid "Set the cache size (number of images to keep)."
-msgstr ""
+msgstr "キャッシュサイズの設定(画像を維持する数)です。"
 
 #: modules/video_output/snapshot.c:74
-#, fuzzy
 msgid "snapshot module"
-msgstr "アクセスモジュール"
+msgstr "スナップショットモジュール"
 
 #: modules/video_output/svgalib.c:56
-#, fuzzy
 msgid "SVGAlib video output"
-msgstr "オーバーレイ"
+msgstr "SVGAlib ビデオ出力"
 
 #: modules/video_output/wingdi.c:219
 #, fuzzy
@@ -14988,9 +14741,8 @@ msgid "Windows GAPI"
 msgstr "ウィンドウ"
 
 #: modules/video_output/wingdi.c:220
-#, fuzzy
 msgid "Windows GAPI video output"
-msgstr "ビデオ出力モジュール"
+msgstr "Windows GAPI ビデオ出力"
 
 #: modules/video_output/wingdi.c:223
 #, fuzzy
@@ -14998,9 +14750,8 @@ msgid "Windows GDI"
 msgstr "ウィンドウ"
 
 #: modules/video_output/wingdi.c:224
-#, fuzzy
 msgid "Windows GDI video output"
-msgstr "ビデオ出力モジュール"
+msgstr "Windows GDI ビデオ出力"
 
 #: modules/video_output/x11/glx.c:87 modules/video_output/x11/xvideo.c:44
 msgid "XVideo adaptor number"
@@ -15016,9 +14767,8 @@ msgstr ""
 
 #: modules/video_output/x11/glx.c:92 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
-#, fuzzy
 msgid "Alternate fullscreen method"
-msgstr "代替えフルスクリーン"
+msgstr "代替えフルスクリーン方法"
 
 #: modules/video_output/x11/glx.c:94 modules/video_output/x11/x11.c:45
 #: modules/video_output/x11/xvideo.c:51
@@ -15060,7 +14810,6 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
-#, fuzzy
 msgid "Use shared memory"
 msgstr "共有メモリの使用"
 
@@ -15073,7 +14822,6 @@ msgid "choose the screen to be used for fullscreen mode."
 msgstr ""
 
 #: modules/video_output/x11/x11.c:78
-#, fuzzy
 msgid "X11 video output"
 msgstr "X11 ビデオ出力"
 
@@ -15262,19 +15010,16 @@ msgid "Defines the number of stars to draw with random effect."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:109
-#, fuzzy
 msgid "Visualizer"
-msgstr "ビジュアル化フィルター"
+msgstr "ビジュアライザー"
 
 #: modules/visualization/visual/visual.c:112
-#, fuzzy
 msgid "Visualizer filter"
-msgstr "ビジュアル化フィルター"
+msgstr "ビジュアライザーフィルター"
 
 #: modules/visualization/visual/visual.c:120
-#, fuzzy
 msgid "Spectrum analyser"
-msgstr "スペクトラム"
+msgstr "スペクトラム解析"
 
 #: modules/visualization/xosd.c:63
 #, fuzzy
@@ -15294,7 +15039,6 @@ msgid "Vertical offset in pixels of the displayed text"
 msgstr "表示されている文字列の垂直方向のオフセット"
 
 #: modules/visualization/xosd.c:70
-#, fuzzy
 msgid "Shadow offset"
 msgstr "陰のオフセット"
 
@@ -15309,43 +15053,164 @@ msgstr "xods出力でテキスト出力のために使用されるフォント"
 #: modules/visualization/xosd.c:82
 #, fuzzy
 msgid "XOSD interface"
-msgstr "ネットワーク・インタフェース"
+msgstr "XOSD インターフェース"
+
+#, fuzzy
+#~ msgid "Non-ref"
+#~ msgstr "なし"
+
+#, fuzzy
+#~ msgid "Bidir"
+#~ msgstr "リニア"
+
+#, fuzzy
+#~ msgid "Non-key"
+#~ msgstr "なし"
+
+#~ msgid "All"
+#~ msgstr "すべて"
+
+#~ msgid "Podcast playlist import"
+#~ msgstr "PLS プレイ一覧をインポートする"
+
+#~ msgid "Podcast Link"
+#~ msgstr "Podcast リンク"
+
+#~ msgid "Podcast Copyright"
+#~ msgstr "Podcast コピーライト"
+
+#~ msgid "Podcast Category"
+#~ msgstr "Podcast カテゴリ"
+
+#~ msgid "Podcast Keywords"
+#~ msgstr "Podcast キーワード"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Podcast 字幕"
+
+#~ msgid "Podcast Summary"
+#~ msgstr "Podcast 要約"
+
+#, fuzzy
+#~ msgid "Podcast Publication Date"
+#~ msgstr "モジュレーションタイプ"
+
+#~ msgid "Podcast Author"
+#~ msgstr "Podcast 作成者"
+
+#~ msgid "Podcast Subcategory"
+#~ msgstr "Podcast サブカテゴリ"
+
+#~ msgid "Podcast Duration"
+#~ msgstr "Podcast 期間"
+
+#~ msgid "Podcast Size"
+#~ msgstr "Podcast サイズ"
+
+#~ msgid "type : "
+#~ msgstr "種類 : "
+
+#~ msgid "URL : "
+#~ msgstr "URL : "
+
+#~ msgid "file size : "
+#~ msgstr "ファイルサイズ : "
+
+#, fuzzy
+#~ msgid "Choose a mirror"
+#~ msgstr "ミラーの選択"
+
+#, fuzzy
+#~ msgid "Save file ..."
+#~ msgstr "ファイルの保存"
+
+#~ msgid "Downloading..."
+#~ msgstr "ダウンロード中..."
+
+#~ msgid "Broadcasts"
+#~ msgstr "ブロードキャスト"
+
+#~ msgid "New broadcast"
+#~ msgstr "新規ブロードキャスト"
+
+#~ msgid "Output"
+#~ msgstr "出力"
+
+#~ msgid "Create"
+#~ msgstr "作成"
+
+#~ msgid "Enabled"
+#~ msgstr "有効"
+
+#~ msgid "Loop"
+#~ msgstr "ループ"
+
+#~ msgid "VLM configuration"
+#~ msgstr "YLM 設定"
+
+#~ msgid "VLM stream"
+#~ msgstr "VLM ストリーム"
+
+#~ msgid "VLM Control...\tCtrl-I"
+#~ msgstr "VLM 制御...\\tCtrl-I"
+
+#~ msgid "RTP Unicast"
+#~ msgstr "RTP ユニキャスト"
+
+#, fuzzy
+#~ msgid "RTP Multicast"
+#~ msgstr "RTP マルチキャスト"
+
+#~ msgid "MSN Title format string"
+#~ msgstr "MSN 題名書式文字列"
+
+#~ msgid "MSN Title format string. {0} artist, {1} title, {2} album"
+#~ msgstr ""
+#~ "MSN の題名の書式文字列です。「{0}はアーティスト、{1}は題名、{2}はアルバム"
+#~ "です"
+
+#~ msgid "MSN Title Plugin"
+#~ msgstr "MSN 題名プラグイン"
+
+#~ msgid "(no title)"
+#~ msgstr "(タイトルなし)"
+
+#~ msgid "(no artist)"
+#~ msgstr "(アーティストなし)"
+
+#~ msgid "(no album)"
+#~ msgstr "(アルバムなし)"
+
+#~ msgid "Podcast URLs list"
+#~ msgstr "Podcast URL 一覧"
+
+#, fuzzy
+#~ msgid "Podcast Service Discovery"
+#~ msgstr "ソースディレクトリ"
+
+#, fuzzy
+#~ msgid "Podcast"
+#~ msgstr "ペースト"
+
+#, fuzzy
+#~ msgid "Apply cartoon effect"
+#~ msgstr "次のチャプターを選択"
+
+#, fuzzy
+#~ msgid "Edge"
+#~ msgstr "ブライトネス"
+
+#, fuzzy
+#~ msgid "Magnify/Zoom interactive video filter"
+#~ msgstr "ビデオ逆転モジュール"
 
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "字幕・デコーダ・モジュール"
 
 #, fuzzy
-#~ msgid "RTP Unicast"
-#~ msgstr "湯にキャスト"
-
-#, fuzzy
-#~ msgid "RTP Multicast"
-#~ msgstr "UDP/RTP マルチキャスト"
-
-#, fuzzy
-#~ msgid "type : "
-#~ msgstr "タイプ"
-
-#, fuzzy
-#~ msgid "URL : "
-#~ msgstr "URL:"
-
-#, fuzzy
-#~ msgid "file size : "
-#~ msgstr "ビデオサイズ"
-
-#, fuzzy
-#~ msgid "Choose a mirror"
-#~ msgstr "オーディオの選択"
-
-#, fuzzy
-#~ msgid "Save file ..."
-#~ msgstr "ファイルの保存"
-
-#, fuzzy
 #~ msgid "Open MRL"
-#~ msgstr "開く"
+#~ msgstr "ストリームの出力MRL"
 
 #~ msgid "Audio output volume"
 #~ msgstr "オーディオ出力ボリューム"
@@ -15365,13 +15230,12 @@ msgstr "ネットワーク・インタフェース"
 #~ msgid "Choose program (SID)"
 #~ msgstr "プログラムの選択 (SID)"
 
-#, fuzzy
 #~ msgid "Choose programs"
 #~ msgstr "プログラムの選択"
 
 #, fuzzy
 #~ msgid "Choose audio track"
-#~ msgstr "オーディオトラック"
+#~ msgstr "オーディオの選択"
 
 #, fuzzy
 #~ msgid "Choose subtitles track"
@@ -15387,7 +15251,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Old playlist open"
-#~ msgstr "プレイリストの最後でループ"
+#~ msgstr "プレイ一覧の最後でループ"
 
 #, fuzzy
 #~ msgid "Current version"
@@ -15544,10 +15408,10 @@ msgstr "ネットワーク・インタフェース"
 #~ msgstr "チャプターの選択"
 
 #~ msgid "_Playlist..."
-#~ msgstr "プレイリスト(_P)..."
+#~ msgstr "プレイ一覧(_P)..."
 
 #~ msgid "Open the playlist window"
-#~ msgstr "プレイリストを開く"
+#~ msgstr "プレイ一覧を開く"
 
 #~ msgid "_Modules..."
 #~ msgstr "モジュール(_M)..."
@@ -15669,7 +15533,7 @@ msgstr "ネットワーク・インタフェース"
 #~ msgstr "メインウィンドウの表示/非表示(_I)"
 
 #~ msgid "Playlist..."
-#~ msgstr "プレイリスト..."
+#~ msgstr "プレイ一覧..."
 
 #~ msgid "(c) 1996-2004 the VideoLAN team"
 #~ msgstr "(c) 1996-2004 the VideoLAN チーム"
@@ -15716,9 +15580,6 @@ msgstr "ネットワーク・インタフェース"
 #~ msgstr ""
 #~ "すみませんが、このモジュール・マネージャーはまだ機能しません。新しいバー"
 #~ "ジョンで試してみてください。"
-
-#~ msgid "All"
-#~ msgstr "すべて"
 
 #~ msgid "Item"
 #~ msgstr "項目"
@@ -15810,7 +15671,7 @@ msgstr "ネットワーク・インタフェース"
 #~ msgstr "早送り再生"
 
 #~ msgid "Open Playlist"
-#~ msgstr "プレイリストを開く"
+#~ msgstr "プレイ一覧を開く"
 
 #~ msgid "Previous File"
 #~ msgstr "前のファイル"
@@ -15883,9 +15744,6 @@ msgstr "ネットワーク・インタフェース"
 
 #~ msgid "Chapter %d"
 #~ msgstr "チャプター %d"
-
-#~ msgid "PBC LID"
-#~ msgstr "PBC LID"
 
 #~ msgid "Selected:"
 #~ msgstr "選択済み:"
@@ -16082,7 +15940,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Pashto"
-#~ msgstr "作成者"
+#~ msgstr "パシュト語"
 
 #~ msgid "Brazilian"
 #~ msgstr "ブラジル語"
@@ -16100,7 +15958,6 @@ msgstr "ネットワーク・インタフェース"
 #~ "(Basic authentication only)."
 #~ msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
-#, fuzzy
 #~ msgid "HTTP password"
 #~ msgstr "HTTP パスワード"
 
@@ -16145,7 +16002,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Telnet"
-#~ msgstr "選択"
+#~ msgstr "削除"
 
 #, fuzzy
 #~ msgid "MPEG-TS"
@@ -16211,10 +16068,10 @@ msgstr "ネットワーク・インタフェース"
 #~ msgstr "出力ストリームがない場合、空にする"
 
 #~ msgid "Loop playlist on end"
-#~ msgstr "プレイリストの最後でループ"
+#~ msgstr "プレイ一覧の最後でループ"
 
 #~ msgid "print detailed help (can be combined with --advanced)"
-#~ msgstr "詳細なヘルプを表示する (--advanced と併用出来ます)"
+#~ msgstr "詳細なヘルプを表示する (--advanced と併用できます)"
 
 #~ msgid "Vol %%%d"
 #~ msgstr "音量 %%%d"
@@ -16252,9 +16109,6 @@ msgstr "ネットワーク・インタフェース"
 
 #~ msgid "vlc preferences"
 #~ msgstr "VLC 設定..."
-
-#~ msgid "Loop"
-#~ msgstr "ループ"
 
 #, fuzzy
 #~ msgid "Repeat"
@@ -16375,9 +16229,8 @@ msgstr "ネットワーク・インタフェース"
 #~ msgid "&Groups"
 #~ msgstr "グループ(&G)"
 
-#, fuzzy
 #~ msgid "Enter a name for the new group:"
-#~ msgstr "区画から縁取りまでのジオメトリを指定"
+#~ msgstr "新規グループ名前を入力:"
 
 #, fuzzy
 #~ msgid "Effect"
@@ -16728,7 +16581,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Open the playlist"
-#~ msgstr "プレイリストを開く"
+#~ msgstr "プレイ一覧を開く"
 
 #, fuzzy
 #~ msgid "Show the program logs"
@@ -16855,7 +16708,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Repeat Playlist"
-#~ msgstr "プレイリストを開く"
+#~ msgstr "プレイ一覧を開く"
 
 #, fuzzy
 #~ msgid "VLC Media Player"
@@ -16875,7 +16728,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Stop current playlist item"
-#~ msgstr "プレイリストを開く"
+#~ msgstr "プレイ一覧を開く"
 
 #, fuzzy
 #~ msgid "Quick"
@@ -16891,7 +16744,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "&Randomize Playlist"
-#~ msgstr "プレイリストを開く"
+#~ msgstr "プレイ一覧を開く"
 
 #, fuzzy
 #~ msgid "&Delete"
@@ -16910,10 +16763,6 @@ msgstr "ネットワーク・インタフェース"
 
 #~ msgid "Using the logger interface plugin..."
 #~ msgstr "ロギング・インタフェース・プラグインを使用します。"
-
-#, fuzzy
-#~ msgid "ES stream"
-#~ msgstr "ストリームの停止"
 
 #, fuzzy
 #~ msgid "Gather stream"
@@ -17083,7 +16932,7 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Only enqueue in playlist, do not play"
-#~ msgstr "デフォルトでプレイリストに追加"
+#~ msgstr "デフォルトでプレイ一覧に追加"
 
 #, fuzzy
 #~ msgid "Stream:"
@@ -17219,8 +17068,8 @@ msgstr "ネットワーク・インタフェース"
 #~ "If you want VLC to add items to the playlist as you open them, then "
 #~ "enable this option."
 #~ msgstr ""
-#~ "プレイリストにオープンしている項目を追加したい場合には、このオプションを選"
-#~ "択します。"
+#~ "プレイ一覧にオープンしている項目を追加したい場合には、このオプションを選択"
+#~ "します。"
 
 #, fuzzy
 #~ msgid "Audio encoding codec"
@@ -17307,13 +17156,12 @@ msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
 #~ msgid "Launch playlist on startup"
-#~ msgstr "起動時にプレイリストを開く"
+#~ msgstr "起動時にプレイ一覧を開く"
 
 #~ msgid ""
 #~ "If you want VLC to start playing on startup, then enable this option."
 #~ msgstr ""
-#~ "VLCの起動時にプレイリストを起動したい場合には、このオプションを選択しま"
-#~ "す。"
+#~ "VLCの起動時にプレイ一覧を起動したい場合には、このオプションを選択します。"
 
 #, fuzzy
 #~ msgid "Device &name:"
@@ -17657,3 +17505,24 @@ msgstr "ネットワーク・インタフェース"
 #, fuzzy
 #~ msgid "Jump to next chapter"
 #~ msgstr "次のチャプターを選択"
+
+#~ msgid "British"
+#~ msgstr "イギリス英語"
+
+#~ msgid "Disc ID (CDDB)"
+#~ msgstr "ディスク ID (CDDB)"
+
+#, fuzzy
+#~ msgid "Volume is %d\n"
+#~ msgstr "ボリュームは %d です。\n"
+
+#, fuzzy
+#~ msgid "The average bitrate of the stream"
+#~ msgstr "ストリームをナビゲートする"
+
+#~ msgid "XOSD module"
+#~ msgstr "XOSDモジュール"
+
+#, fuzzy
+#~ msgid "Input Type"
+#~ msgstr "入力"
