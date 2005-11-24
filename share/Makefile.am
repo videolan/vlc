@@ -9,6 +9,7 @@ dist_pkgdata_DATA = \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
 	$(DIST_icons48) \
+	$(DIST_icons128) \
 	$(NULL)
 
 nobase_dist_pkgdata_DATA = \
@@ -22,13 +23,11 @@ DIST_fonts = \
 	$(NULL)
 
 DIST_rsrc = \
-	vlc.icns \
 	newres.h \
 	resource.h \
 	vlc_wince_rc.rc \
 	vlc_beos.rsrc \
 	vlc_win32_rc.rc \
-	vlc-icons.xcf \
 	$(NULL)
 
 DIST_pda = \
@@ -53,8 +52,12 @@ DIST_icons32 = \
 	$(NULL)
 
 DIST_icons48 = \
-	vlc48x48new.ico \
+	vlc48x48.ico \
 	vlc48x48.png \
+	$(NULL)
+
+DIST_icons128 = \
+	vlc128x128.png \
 	$(NULL)
 
 DIST_skins2 = \

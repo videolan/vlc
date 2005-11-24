@@ -1,4 +1,4 @@
-VLC_ICON ICON "vlc48x48new.ico"
+VLC_ICON ICON "vlc48x48.ico"
 #ifndef VERSION_NUMBER
 #define VERSION_NUMBER 0,0,0,0
 #endif
