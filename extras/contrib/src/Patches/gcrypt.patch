@@ -1,34 +1,11 @@
-diff -ruN libgcrypts.orig/cipher/serpent.c libgcrypt/cipher/serpent.c
---- libgcrypts.orig/cipher/serpent.c	2003-12-11 15:29:14.000000000 +0100
-+++ libgcrypt/cipher/serpent.c	2005-04-09 18:58:57.000000000 +0200
-@@ -55,6 +55,10 @@
-   serpent_subkeys_t keys;	/* Generated subkeys.  */
- } serpent_context_t;
- 
-+/* A prototype.  */
-+static const char *serpent_test (void);
-+
-+
- #define byte_swap_32(x) \
-   (0 \
-    | (((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >>  8) \
-@@ -687,8 +691,6 @@
-   if (! serpent_init_done)
-     {
-       /* Execute a self-test the first time, Serpent is used.  */
--      static const char *serpent_test (void);
--      
-       serpent_test_ret = serpent_test ();
-       if (serpent_test_ret)
- 	log_error ("Serpent test failure: %s\n", serpent_test_ret);
-diff -ruN libgcrypts.orig/src/gcrypt.h libgcrypt/src/gcrypt.h
---- libgcrypts.orig/src/gcrypt.h	2004-04-15 11:10:37.000000000 +0200
-+++ libgcrypt/src/gcrypt.h	2005-04-09 18:57:14.000000000 +0200
-@@ -29,6 +29,7 @@
- 
- #include <sys/types.h>
- #include <sys/socket.h>
-+#include <sys/time.h>
- 
- /* This is required for error code compatibility. */
- #define _GCRY_ERR_SOURCE_DEFAULT GPG_ERR_SOURCE_GCRYPT
+--- libgcrypt/configure.old	2005-01-05 13:53:24.000000000 +0000
++++ libgcrypt/configure	2005-11-24 12:28:28.703125000 +0000
+@@ -25685,7 +25685,7 @@
+ #
+ tmp_do_check="no"
+ case "${target}" in
+-    i386-emx-os2 | i345686-pc-os2*emx | i386-pc-msdosdjgpp)
++    i386-emx-os2 | i345686-pc-os2*emx | i386-pc-msdosdjgpp | *mingw32*)
+         ac_cv_sys_symbol_underscore=yes
+         ;;
+     *)
