@@ -75,7 +75,7 @@ vlc_module_begin();
     set_shortname( _("dv") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_integer( "dv-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( "dv-caching", 60000 / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access2", 50 );
     add_shortcut( "dv" );
     add_shortcut( "dv1394" );
@@ -226,7 +226,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev->p_access = p_access;
     vlc_mutex_init( p_access, &p_sys->p_ev->lock );
     vlc_thread_create( p_sys->p_ev, "dv event thread handler", Raw1394EventThread,
-                       VLC_THREAD_PRIORITY_INPUT, VLC_FALSE );
+                       VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE );
 
     free( psz_name );
     return VLC_SUCCESS;
@@ -278,7 +278,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     vlc_bool_t   *pb_bool;
-   // int          *pi_int;
     int64_t      *pi_64;
 
     switch( i_query )
@@ -287,6 +286,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;
+            break;
+
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
             *pb_bool = VLC_FALSE;
