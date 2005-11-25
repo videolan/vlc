@@ -141,7 +141,7 @@ vlc_module_begin();
     set_capability( "audio output", 50 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_bool( "waveout-float32", 0, 0, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
+    add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -250,6 +250,8 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
+        WAVEOUTCAPS wocaps;
+
         if( val.i_int == AOUT_VAR_5_1 )
         {
             p_aout->output.output.i_physical_channels
@@ -292,9 +294,20 @@ static int Open( vlc_object_t *p_this )
 
         aout_VolumeSoftInit( p_aout );
 
-        p_aout->output.pf_volume_infos = VolumeInfos;
-        p_aout->output.pf_volume_get = VolumeGet;
-        p_aout->output.pf_volume_set = VolumeSet;
+        /* Check for hardware volume support */
+        if( waveOutGetDevCaps( (UINT_PTR)p_aout->output.p_sys->h_waveout,
+                               &wocaps, sizeof(wocaps) == MMSYSERR_NOERROR ) &&
+            wocaps.dwSupport == WAVECAPS_VOLUME )
+        {
+            DWORD i_dummy;
+            if( waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_dummy )
+                == MMSYSERR_NOERROR )
+            {
+                p_aout->output.pf_volume_infos = VolumeInfos;
+                p_aout->output.pf_volume_get = VolumeGet;
+                p_aout->output.pf_volume_set = VolumeSet;
+            }
+        }
     }
 
 
