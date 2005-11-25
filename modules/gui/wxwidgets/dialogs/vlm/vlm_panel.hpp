@@ -25,6 +25,8 @@
 #define _WXVLC_VLMPANEL_H_
 
 #include "wxwidgets.hpp"
+#include "dialogs/open.hpp"
+#include "dialogs/streamout.hpp"
 #include <wx/notebook.h>
 
 #include <vector>
@@ -55,6 +57,8 @@ namespace wxvlc
     private:
         void OnCreate( wxCommandEvent& );
         void OnClear( wxCommandEvent& );
+        void OnChooseInput( wxCommandEvent& );
+        void OnChooseOutput( wxCommandEvent& );
 
         wxTextCtrl *name_text;
         wxTextCtrl *input_text;
@@ -66,8 +70,11 @@ namespace wxvlc
         intf_thread_t *p_intf;
         VLMWrapper *p_vlm;
 
-
         vlc_bool_t b_edit, b_broadcast;
+
+        OpenDialog *p_open_dialog;
+        SoutDialog *p_sout_dialog;
+        wxFileDialog *p_file_dialog;
 
         DECLARE_EVENT_TABLE();
     };

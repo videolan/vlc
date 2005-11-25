@@ -291,6 +291,8 @@ enum
 BEGIN_EVENT_TABLE( VLMAddStreamPanel, wxPanel)
    EVT_BUTTON( Create_Event, VLMAddStreamPanel::OnCreate )
    EVT_BUTTON( Clear_Event, VLMAddStreamPanel::OnClear )
+   EVT_BUTTON( ChooseInput_Event, VLMAddStreamPanel::OnChooseInput )
+   EVT_BUTTON( ChooseOutput_Event, VLMAddStreamPanel::OnChooseOutput )
 END_EVENT_TABLE()
 
 VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
@@ -308,6 +310,8 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
 
     wxFlexGridSizer *upper_sizer = new wxFlexGridSizer( 5,2 );
+    upper_sizer->AddGrowableCol( 1, 1 );
+    upper_sizer->AddGrowableCol( 3, 1 );
 
     upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Name") ) ) );
     name_text = new wxTextCtrl( this, -1, wxU( _("") ), wxDefaultPosition,
@@ -413,6 +417,27 @@ void VLMAddStreamPanel::OnClear( wxCommandEvent &event )
     output_text->SetValue( wxU("") );
 }
 
+void VLMAddStreamPanel::OnChooseInput( wxCommandEvent &event )
+{
+    if( p_open_dialog == NULL )
+        p_open_dialog = new OpenDialog( p_intf, this, -1, -1, OPEN_STREAM );
+
+    if( p_open_dialog && p_open_dialog->ShowModal() == wxID_OK )
+    {
+        input_text->SetValue( p_open_dialog->mrl[0] );
+    }
+}
+
+void VLMAddStreamPanel::OnChooseOutput( wxCommandEvent &event )
+{
+    if( p_sout_dialog == NULL )
+        p_sout_dialog = new SoutDialog( p_intf, this );
+
+    if( p_sout_dialog && p_sout_dialog->ShowModal() == wxID_OK )
+    {
+        output_text->SetValue( (p_sout_dialog->GetOptions())[0] );
+    }
+}
 
 /****************************************************************************
  * VLM Frame implementation

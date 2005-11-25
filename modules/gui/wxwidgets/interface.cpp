@@ -472,7 +472,7 @@ void Interface::CreateOurMenuBar()
     view_menu->Append( FileInfo_Event,
                        wxU(_("Stream and Media &info...\tCtrl-I")) );
     view_menu->Append( VLM_Event,
-                       wxU(_("VLM Control...\tCtrl-I")) );
+                       wxU(_("VLM Control...\tCtrl-V")) );
 
     /* Create the "Auto-generated" menus */
     p_settings_menu = SettingsMenu( p_intf, this );
