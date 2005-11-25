@@ -296,8 +296,8 @@ static int Open( vlc_object_t *p_this )
 
         /* Check for hardware volume support */
         if( waveOutGetDevCaps( (UINT_PTR)p_aout->output.p_sys->h_waveout,
-                               &wocaps, sizeof(wocaps) == MMSYSERR_NOERROR ) &&
-            wocaps.dwSupport == WAVECAPS_VOLUME )
+                               &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR &&
+            wocaps.dwSupport & WAVECAPS_VOLUME )
         {
             DWORD i_dummy;
             if( waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_dummy )
