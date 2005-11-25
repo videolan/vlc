@@ -74,7 +74,6 @@ namespace wxvlc
 
         OpenDialog *p_open_dialog;
         SoutDialog *p_sout_dialog;
-        wxFileDialog *p_file_dialog;
 
         DECLARE_EVENT_TABLE();
     };
@@ -95,9 +94,15 @@ namespace wxvlc
     private:
         VLMWrapper *p_vlm;
         intf_thread_t *p_intf;
+        wxWindow *p_parent;
 
+        wxFileDialog *p_file_dialog;
         wxTimer timer;
         void OnTimer( wxTimerEvent &);
+        void OnClose( wxCommandEvent& );
+        void OnLoad( wxCommandEvent& );
+        void OnSave( wxCommandEvent& );
+
         /** Notebook */
         wxNotebook *p_notebook;
         DECLARE_EVENT_TABLE();
@@ -136,10 +141,10 @@ namespace wxvlc
         virtual ~VLMFrame();
 
         void Update();
+        void OnClose( wxCloseEvent& );
     private:
         VLMPanel *vlm_panel;
         DECLARE_EVENT_TABLE();
-        void OnClose( wxCloseEvent& );
     };
 
     /** This class is the edit dialog for a stream

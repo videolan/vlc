@@ -30,10 +30,16 @@ enum
 {
     Notebook_Event,
     Timer_Event,
+    Close_Event,
+    Load_Event,
+    Save_Event,
 };
 
 BEGIN_EVENT_TABLE( VLMPanel, wxPanel)
    EVT_TIMER( Timer_Event, VLMPanel::OnTimer )
+   EVT_BUTTON( Close_Event, VLMPanel::OnClose )
+   EVT_BUTTON( Load_Event, VLMPanel::OnLoad )
+   EVT_BUTTON( Save_Event, VLMPanel::OnSave )
 END_EVENT_TABLE()
 
 
@@ -42,6 +48,7 @@ VLMPanel::VLMPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ) :
        timer( this, Timer_Event )
 {
     p_intf = _p_intf;
+    p_parent = _p_parent;
 
     p_vlm = new VLMWrapper( p_intf );
     p_vlm->AttachVLM();
@@ -61,6 +68,13 @@ VLMPanel::VLMPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ) :
 #else
     panel_sizer->Add( p_notebook, 1 , wxEXPAND | wxALL, 5 );
 #endif
+
+    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+    button_sizer->Add( new wxButton( this, Close_Event, wxU(_("Close") ) ) );
+    button_sizer->Add( 0, 0, 1 );
+    button_sizer->Add( new wxButton( this, Load_Event, wxU(_("Load") ) ), 0, wxRIGHT, 10 );
+    button_sizer->Add( new wxButton( this, Save_Event, wxU(_("Save") ) ) );
+    panel_sizer->Add( button_sizer, 0 , wxEXPAND | wxALL, 5 );
 
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
@@ -184,6 +198,38 @@ void VLMPanel::Update()
         p_streamp->Update();
     }
     p_vlm->UnlockVLM();
+}
+
+void VLMPanel::OnClose( wxCommandEvent &event )
+{
+    ((VLMFrame*)p_parent)->OnClose( *( new wxCloseEvent() ) );
+}
+
+void VLMPanel::OnLoad( wxCommandEvent &event )
+{
+    p_file_dialog = new wxFileDialog( NULL, wxT(""), wxT(""), wxT(""),
+                                      wxT("*"), wxOPEN | wxMULTIPLE );
+    if( p_file_dialog == NULL ) return;
+
+    p_file_dialog->SetTitle( wxU(_("Load configuration") ) );
+    if( p_file_dialog->ShowModal() == wxID_OK )
+    {
+        vlm_Load( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str() );
+    }
+    Update();
+}
+
+void VLMPanel::OnSave( wxCommandEvent &event )
+{
+    p_file_dialog = new wxFileDialog( NULL, wxT(""), wxT(""), wxT(""),
+                                      wxT("*"), wxSAVE | wxOVERWRITE_PROMPT );
+    if( p_file_dialog == NULL ) return;
+
+    p_file_dialog->SetTitle( wxU(_("Save configuration") ) );
+    if( p_file_dialog->ShowModal() == wxID_OK )
+    {
+        vlm_Save( p_vlm->GetVLM(), p_file_dialog->GetPath().mb_str() );
+    }
 }
 
 /*************************
@@ -444,7 +490,6 @@ void VLMAddStreamPanel::OnChooseOutput( wxCommandEvent &event )
  ****************************************************************************/
 enum
 {
-    Close_Event,
 };
 
 BEGIN_EVENT_TABLE( VLMFrame, wxFrame )
