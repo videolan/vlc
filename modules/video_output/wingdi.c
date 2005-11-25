@@ -1062,7 +1062,7 @@ static long FAR PASCAL WndProc( HWND hWnd, UINT message,
 #ifndef UNDER_CE
     /* Catch the screensaver and the monitor turn-off */
     if( message == WM_SYSCOMMAND &&
-        ( wParam == SC_SCREENSAVE || wParam == SC_MONITORPOWER ) )
+        ( (wParam & 0xFFF0) == SC_SCREENSAVE || (wParam & 0xFFF0) == SC_MONITORPOWER ) )
     {
         //if( p_vout ) msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND screensaver" );
         return 0; /* this stops them from happening */
