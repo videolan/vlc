@@ -97,10 +97,10 @@ dnl kludge because only the debian package provides a ffmpeg-config
     CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
     OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
     OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
-    if test $BUILD = $HOST; then
-    	export PKG_CONFIG_PATH=${topdir}/extras/contrib/bin:$PKG_CONFIG_PATH
-dnl    else
-dnl    	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/bin
+    if test $build = $host; then
+    	export PKG_CONFIG_PATH=${topdir}/extras/contrib/lib/pkgconfig:$PKG_CONFIG_PATH
+    else
+    	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
     fi
     if test -d ${topdir}/extras/contrib/vlc-lib; then
       LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/vlc-lib"
