@@ -1248,7 +1248,9 @@ AC_ARG_WITH(tuning,
 [  --with-tuning=ARCH      enable special tuning for an architecture
                           (default Pentium 2 on IA-32 and 750 on PPC)])
 if test -n "${with_tuning}"; then
-    CFLAGS_TUNING="-mtune=${with_tuning}"
+    if test "${with_tuning}" != "no"; then
+        CFLAGS_TUNING="-mtune=${with_tuning}"
+    fi
 else
     if test "${target_cpu}" = "i686" -o "${target_cpu}" = "i586" -o "${target_cpu}" = "i486" -o "${target_cpu}" = "i386"; then
         CFLAGS_TUNING="-mtune=pentium2"
