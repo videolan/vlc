@@ -295,28 +295,37 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
 
         case WM_VLC_CHANGE_TEXT:
             var_Get( p_event->p_vout, "video-title", &val );
-
             if( !val.psz_string || !*val.psz_string ) /* Default video title */
             {
+                if( val.psz_string ) free( val.psz_string );
+
 #ifdef MODULE_NAME_IS_glwin32
-                SetWindowText( p_event->p_vout->p_sys->hwnd,
-                    _T(VOUT_TITLE) _T(" (OpenGL output)") );
+                val.psz_string = strdup( VOUT_TITLE " (OpenGL output)" );
 #else
-                if( p_event->p_vout->p_sys->b_using_overlay )
-                    SetWindowText( p_event->p_vout->p_sys->hwnd, _T(VOUT_TITLE)
-                        _T(" (hardware YUV overlay DirectX output)") );
-                else if( p_event->p_vout->p_sys->b_hw_yuv )
-                    SetWindowText( p_event->p_vout->p_sys->hwnd, _T(VOUT_TITLE)
-                        _T(" (hardware YUV DirectX output)") );
-                else
-                    SetWindowText( p_event->p_vout->p_sys->hwnd, _T(VOUT_TITLE)
-                        _T(" (software RGB DirectX output)") );
+                if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string = 
+                strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
+                else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string = 
+                strdup( VOUT_TITLE " (hardware YUV DirectX output)" );
+                else val.psz_string = 
+                strdup( VOUT_TITLE " (software RGB DirectX output)" );
 #endif
             }
-            else
+
+#ifdef UNICODE
             {
-                SetWindowText( p_event->p_vout->p_sys->hwnd, val.psz_string );
+                wchar_t *psz_title = malloc( strlen(val.psz_string) * 2 + 2 );
+                mbstowcs( psz_title, val.psz_string, strlen(val.psz_string)*2);
+                psz_title[strlen(val.psz_string)] = 0;
+                free( val.psz_string ); val.psz_string = (char *)psz_title;
             }
+#endif
+
+            SetWindowText( p_event->p_vout->p_sys->hwnd,
+                           (LPCTSTR)val.psz_string );
+            if( p_event->p_vout->p_sys->hfswnd )
+                SetWindowText( p_event->p_vout->p_sys->hfswnd,
+                               (LPCTSTR)val.psz_string );
+            free( val.psz_string );
             break;
 
         default:
