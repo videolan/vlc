@@ -4823,6 +4823,17 @@ then
   build_pic=yes
 fi
 
+dnl
+dnl  Java bindings
+dnl
+AC_ARG_ENABLE(java-bindings,
+  [  --enable-java-bindings    Enable Java bindings (default disabled)])
+AM_CONDITIONAL( BUILD_JAVA, [test "${enable_java_bindings}" = "yes"] )
+if test "${enable_java_bindings}" = "yes"
+then
+  build_pic=yes
+fi
+
 
 dnl
 dnl  test plugins
@@ -5033,6 +5044,7 @@ AC_CONFIG_FILES([
   activex/Makefile
   activex/axvlc.inf
   bindings/Makefile
+  bindings/java/Makefile
   bindings/python/Makefile
   debian/Makefile
   doc/Makefile

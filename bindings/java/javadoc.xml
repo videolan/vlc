@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc">
+<target name="javadoc">
+<javadoc access="public" author="true" classpath="." destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.4" sourcefiles="org/videolan/jvlc/JVLC.java" sourcepath="." splitindex="true" use="true" version="true"/>
+</target>
+</project>

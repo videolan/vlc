@@ -1,0 +1,38 @@
+
+            First of all, this is a *developers* only version
+
+
+Usage
+-----
+
+ In order to use these bindings you have to compile vlc from source. I
+recommend you to take the latest version from videolan svn repository
+by doing:
+
+svn co svn://svn.videolan.org/vlc/trunk vlc-trunk
+
+ bootstrap and configure. At the configure give the command:
+
+./configure --enable-mozilla && make && make install
+
+ to enable compilation of _pic version of libraries. If you give a
+prefix be sure to change the PREFIX variable in the Makefile from
+ /usr/local to your prefix.
+
+ Once you've done with vlc you can run make in jvlc directory. Be sure
+you have gcj, gcjh and if you want to use the SUN Java compiler,
+change the Makefile accordingly. You will probably need to change also 
+
+JINCLUDES
+LIBJINCLUDES
+
+ In the next releases I will automate this process.
+
+ To run JVLC issue:
+
+java -Djava.library.path=. VlcClient
+
+ Be sure your ldconfig can find libjawt.so and libmawt.so or you will
+get linking errors when you run the program.
+
+ Happy playing.
