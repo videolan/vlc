@@ -17,17 +17,14 @@ JCC = gcj -g
 JCH = gcjh -jni
 
 # Compile flags
-CXXFLAGS += `top_builddir=../.. ../../vlc-config --cflags` -I../../ -I ../../include ${JINCLUDES}
-LDFLAGS += -L../../lib -lvlc_pic -fPIC  `top_builddir=../.. ../../vlc-config --libs builtin pic`
+CXXFLAGS += `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include ${JINCLUDES}
+LDFLAGS += -L../../lib -lvlc_pic `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
 
 # Build targets
 all: libjvlc.so VlcClient
 
-# FIXME: -ldbus-1 and -lhal are UGLY
-# Problem is vlc-config --libs builtin does not output what is needed to build
-# vlc. We need to clean up vlc-config first
 libjvlc.so: vlc-glue-jni.o vlc-graphics-jni.o
-	$(CXX) -ldbus-1 -lhal -shared vlc-glue-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) ${LDFLAGS} -o libjvlc.so
+	$(CXX) -shared vlc-glue-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) ${LDFLAGS} -o libjvlc.so
 
 vlc-graphics-jni.o: VlcClient
 	$(CXX) -c vlc-graphics-jni.cc $(CXXFLAGS)

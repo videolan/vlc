@@ -88,7 +88,6 @@ elif test "${TOP_BUILDDIR}" != ""; then
 fi
 includes="${includes}"
 cppflags="${includes}"
-libs="-L@libdir@"
 module=""
 linkage="c"
 
@@ -144,7 +143,7 @@ fi
 #
 while test $# -gt 0; do
   case "$1" in
-  -*=*) optarg=`echo "$1" | sed 's/-_a-zA-Z0-9*=//'` ;;
+  -*=*) optarg=`echo "$1" | sed 's/-[_a-zA-Z0-9\-]*=//'` ;;
   *) optarg= ;;
   esac
 
@@ -211,7 +210,12 @@ while test $# -gt 0; do
       ;;
     external)
       echo_external=yes
-      ldflags="${ldflags} -lvlc"
+      if test "x${echo_pic}" = "xno"
+      then
+        ldflags="${ldflags} -lvlc"
+      else
+        ldflags="${ldflags} -lvlc_pic"
+      fi
       ;;      
     *)
       module="$1"
@@ -226,6 +230,8 @@ while test $# -gt 0; do
 
   shift
 done
+
+libs="-L@libdir@"
 
 #
 #  If a module was requested, use its name
@@ -304,6 +310,17 @@ fi
 if test "${echo_objcflags}" = yes; then
   echo "${cppflags} ${objcflags}"
 fi
+
+# Libs
+# There are 4 possibilities
+#  - We are a plugin or a builtin
+#  - We are building from the outside (external):
+#	- Give full libvlc linkflags + -lvlc(_pic) (in libdir)
+# 	- Link with builtins in libdir
+#  - We are building something from the inside (builtin)
+#       - Link with builtins in place
+#  If you want something shared from the inside (binding),
+#  you need "builtin vlc pic"
 if test "${echo_libs}" = yes; then
   if test "${echo_builtin}" = yes; then
     for module in `echo "${builtins}"`; do
