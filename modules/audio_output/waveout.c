@@ -42,6 +42,10 @@
  *****************************************************************************/
 #ifdef UNDER_CE
 #   define DWORD_PTR DWORD
+#   ifdef waveOutGetDevCaps
+#       undef waveOutGetDevCaps
+        MMRESULT WINAPI waveOutGetDevCaps(UINT, LPWAVEOUTCAPS, UINT);
+#   endif
 #endif
 
 #ifndef WAVE_FORMAT_IEEE_FLOAT
