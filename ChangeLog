@@ -1,4 +1,225 @@
 ------------------------------------------------------------------------
+r13392 | zorglub | 2005-11-26 12:00:05 +0100 (Sat, 26 Nov 2005) | 3 lines
+Changed paths:
+   M /tags/0.8.4/po/sv.po
+
+Update Swedish translation. Contributed by Daniel Nylander. 
+Thanks !
+
+------------------------------------------------------------------------
+r13388 | dionoea | 2005-11-26 01:07:02 +0100 (Sat, 26 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/THANKS
+   M /tags/0.8.4/modules/codec/x264.c
+
+backport [13275]
+
+------------------------------------------------------------------------
+r13384 | gbazin | 2005-11-25 20:22:40 +0100 (Fri, 25 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/video_output/directx/events.c
+
+* modules/video_output/directx: backport of 13382.
+------------------------------------------------------------------------
+r13383 | gbazin | 2005-11-25 20:21:47 +0100 (Fri, 25 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/audio_output/waveout.c
+
+* modules/audio_output/waveout.c: backport of 13381.
+------------------------------------------------------------------------
+r13380 | xtophe | 2005-11-25 18:56:49 +0100 (Fri, 25 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/modules/video_output/directx/events.c
+   M /tags/0.8.4/modules/video_output/wingdi.c
+
+Backport of [13378]
+
+------------------------------------------------------------------------
+r13377 | gbazin | 2005-11-25 09:46:11 +0100 (Fri, 25 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/audio_output/waveout.c
+
+modules/audio_output/waveout.c: backport of 13376.
+------------------------------------------------------------------------
+r13375 | gbazin | 2005-11-25 08:55:31 +0100 (Fri, 25 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/audio_output/directx.c
+
+* modules/audio_output/directx.c: backport of directx audio changes (13374). Needs heavy testing.
+------------------------------------------------------------------------
+r13372 | jpsaman | 2005-11-24 21:27:09 +0100 (Thu, 24 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/video_filter/osdmenu.c
+
+The default refresh rate of osdmenu is 200 ms with a 15s timeout. The update is needed for remote viewing of osdmenu over udp.
+------------------------------------------------------------------------
+r13369 | hartman | 2005-11-24 16:02:11 +0100 (Thu, 24 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/Makefile.am
+   M /tags/0.8.4/THANKS
+   M /tags/0.8.4/extras/MacOSX/Resources/a52.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/aac.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/about_bg.png
+   M /tags/0.8.4/extras/MacOSX/Resources/asf.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/asx.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/avi.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/bin.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/cue.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/dat.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/display.png
+   M /tags/0.8.4/extras/MacOSX/Resources/display_slider.png
+   M /tags/0.8.4/extras/MacOSX/Resources/display_track.png
+   M /tags/0.8.4/extras/MacOSX/Resources/divx.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/dv.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/equalizerdrawer_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/equalizerdrawer_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/fullscreen_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/fullscreen_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/generic.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/m3u.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mov.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mp3.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mp4.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mpeg.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mpeg1.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mpeg2.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mpeg4.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/mpg.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/next_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/next_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/ogg.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/ogm.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/pause.png
+   M /tags/0.8.4/extras/MacOSX/Resources/pause_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/play.png
+   M /tags/0.8.4/extras/MacOSX/Resources/play_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/playlistdrawer_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/playlistdrawer_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/pls.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/previous_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/previous_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/skip_forward_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/skip_forward_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/skip_previous_active.png
+   M /tags/0.8.4/extras/MacOSX/Resources/skip_previous_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/srt.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/stop.png
+   M /tags/0.8.4/extras/MacOSX/Resources/stop_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/sub.icns
+   R /tags/0.8.4/extras/MacOSX/Resources/vlc.icns (from /trunk/extras/MacOSX/Resources/vlc.icns:13341)
+   M /tags/0.8.4/extras/MacOSX/Resources/vob.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/volume_high.png
+   M /tags/0.8.4/extras/MacOSX/Resources/volume_low.png
+   M /tags/0.8.4/extras/MacOSX/Resources/volumeslider_blue.png
+   M /tags/0.8.4/extras/MacOSX/Resources/volumeslider_normal.png
+   M /tags/0.8.4/extras/MacOSX/Resources/volumetrack.png
+   M /tags/0.8.4/extras/MacOSX/Resources/wma.icns
+   M /tags/0.8.4/extras/MacOSX/Resources/wmv.icns
+   M /tags/0.8.4/share/Makefile.am
+   M /tags/0.8.4/share/http/favicon.ico
+   M /tags/0.8.4/share/pda-forwardb16x16.xpm
+   M /tags/0.8.4/share/pda-openb16x16.xpm
+   M /tags/0.8.4/share/pda-pauseb16x16.xpm
+   M /tags/0.8.4/share/pda-playb16x16.xpm
+   M /tags/0.8.4/share/pda-playlistb16x16.xpm
+   M /tags/0.8.4/share/pda-preferencesb16x16.xpm
+   M /tags/0.8.4/share/pda-rewindb16x16.xpm
+   M /tags/0.8.4/share/pda-stopb16x16.xpm
+   D /tags/0.8.4/share/vlc-icons.xcf
+   D /tags/0.8.4/share/vlc.icns
+   A /tags/0.8.4/share/vlc128x128.png (from /trunk/share/vlc128x128.png:13341)
+   M /tags/0.8.4/share/vlc16x16.png
+   M /tags/0.8.4/share/vlc16x16.xpm
+   M /tags/0.8.4/share/vlc32x32.png
+   M /tags/0.8.4/share/vlc32x32.xpm
+   M /tags/0.8.4/share/vlc48x48.ico
+   M /tags/0.8.4/share/vlc48x48.png
+   D /tags/0.8.4/share/vlc48x48new.ico
+   M /tags/0.8.4/share/vlc_win32_rc.rc
+   M /tags/0.8.4/vlc.win32.nsi
+
+* Backport the new VLC icon by Eurodata Computer Club
+
+------------------------------------------------------------------------
+r13366 | dionoea | 2005-11-24 15:14:51 +0100 (Thu, 24 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/po/ja.po
+
+Japanese translation update by Tadashi Jokagi
+
+------------------------------------------------------------------------
+r13364 | md | 2005-11-24 09:10:13 +0100 (Thu, 24 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/modules/video_filter/deinterlace.c
+
+make deinterlace and zoom work together
+
+------------------------------------------------------------------------
+r13354 | hartman | 2005-11-23 21:49:18 +0100 (Wed, 23 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/Makefile.am
+
+* Fix the Mac OS X Resources MAKE_DIST (untested)
+
+------------------------------------------------------------------------
+r13349 | fkuehne | 2005-11-23 20:38:15 +0100 (Wed, 23 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/modules/gui/macosx/output.m
+
+* 10.2 compilation fix
+------------------------------------------------------------------------
+r13335 | hartman | 2005-11-23 14:10:53 +0100 (Wed, 23 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/share/Makefile.am
+   D /tags/0.8.4/share/gnome-vlc16x16.png
+   D /tags/0.8.4/share/gnome-vlc32x32.png
+   D /tags/0.8.4/share/gnome-vlc32x32.xpm
+   D /tags/0.8.4/share/gnome-vlc48x48.png
+   D /tags/0.8.4/share/gvlc16x16.png
+   D /tags/0.8.4/share/gvlc32x32.png
+   D /tags/0.8.4/share/gvlc32x32.xpm
+   D /tags/0.8.4/share/gvlc48x48.ico
+   D /tags/0.8.4/share/gvlc48x48.png
+   D /tags/0.8.4/share/kvlc16x16.png
+   D /tags/0.8.4/share/kvlc32x32.png
+   D /tags/0.8.4/share/kvlc32x32.xpm
+   D /tags/0.8.4/share/kvlc48x48.png
+   D /tags/0.8.4/share/qvlc16x16.png
+   D /tags/0.8.4/share/qvlc32x32.png
+   D /tags/0.8.4/share/qvlc32x32.xpm
+   D /tags/0.8.4/share/qvlc48x48.png
+
+* Lets at the very least remove icons we don't use anymore. Should save some space.
+
+------------------------------------------------------------------------
+r13334 | fkuehne | 2005-11-23 12:48:09 +0100 (Wed, 23 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/po/de.po
+
+* don't try to use & in a string and fix it correctly. sorry for the previous commit
+------------------------------------------------------------------------
+r13331 | fkuehne | 2005-11-22 23:34:08 +0100 (Tue, 22 Nov 2005) | 3 lines
+Changed paths:
+   M /tags/0.8.4/po/de.po
+
+* hopefully fixed the incorrect display of my translation of "Full bass and treble" for Dandruff finally
+
+(the po-files don't need to be updated once again because of this edit)
+------------------------------------------------------------------------
+r13329 | fkuehne | 2005-11-22 22:38:25 +0100 (Tue, 22 Nov 2005) | 1 line
+Changed paths:
+   M /tags/0.8.4/NEWS
+
+* minor grammar fix
+------------------------------------------------------------------------
+r13327 | zorglub | 2005-11-22 22:23:21 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /tags/0.8.4/ChangeLog
+   M /tags/0.8.4/NEWS
+
+NEWS and Changelog update for test3
+
+------------------------------------------------------------------------
 r13326 | gbazin | 2005-11-22 22:22:20 +0100 (Tue, 22 Nov 2005) | 1 line
 Changed paths:
    M /tags/0.8.4/modules/audio_output/directx.c
