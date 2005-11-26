@@ -355,6 +355,9 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
     b_edit = _b_edit;
     b_broadcast = _b_broadcast;
 
+    p_open_dialog = NULL;
+    p_sout_dialog = NULL;
+
     SetAutoLayout( TRUE );
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
