@@ -808,25 +808,34 @@ static char *ppsz_clock_descriptions[] =
 #define POSITION_KEY_TEXT N_("Position")
 #define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position.")
 
-#define JB3SEC_KEY_TEXT N_("Jump 3 seconds backwards")
-#define JB3SEC_KEY_LONGTEXT N_("Select the hotkey to jump 3 seconds backwards.")
-#define JB10SEC_KEY_TEXT N_("Jump 10 seconds backwards")
-#define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds backwards.")
+/* FIXME : jump keys descriptions */
+#define JBEXTRASHORT_KEY_TEXT N_("Jump 'extrashort' seconds backwards")
+#define JBEXTRASHORT_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'extrashort' seconds backwards.")
+#define JBSHORT_KEY_TEXT N_("Jump 'short' seconds backwards")
+#define JBSHORT_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'short' seconds backwards.")
 
-#define JB1MIN_KEY_TEXT N_("Jump 1 minute backwards")
-#define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute backwards.")
-#define JB5MIN_KEY_TEXT N_("Jump 5 minutes backwards")
-#define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes backwards.")
+#define JBMEDIUM_KEY_TEXT N_("Jump 'medium' seconds backwards")
+#define JBMEDIUM_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'medium' seconds backwards.")
+#define JBLONG_KEY_TEXT N_("Jump 'long' seconds backwards")
+#define JBLONG_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'long seconds' backwards.")
 
-#define JF3SEC_KEY_TEXT N_("Jump 3 seconds forward")
-#define JF3SEC_KEY_LONGTEXT N_("Select the hotkey to jump 3 seconds forward.")
-#define JF10SEC_KEY_TEXT N_("Jump 10 seconds forward")
-#define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump 10 seconds forward.")
+#define JFEXTRASHORT_KEY_TEXT N_("Jump 'extrashort' seconds forward")
+#define JFEXTRASHORT_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'extrashort' seconds forward.")
+#define JFSHORT_KEY_TEXT N_("Jump 'short' seconds forward")
+#define JFSHORT_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'short' seconds forward.")
 
-#define JF1MIN_KEY_TEXT N_("Jump 1 minute forward")
-#define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump 1 minute forward.")
-#define JF5MIN_KEY_TEXT N_("Jump 5 minutes forward")
-#define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump 5 minutes forward.")
+#define JFMEDIUM_KEY_TEXT N_("Jump 'medium' seconds forward")
+#define JFMEDIUM_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'medium' seconds forward.")
+#define JFLONG_KEY_TEXT N_("Jump 'long' seconds forward")
+#define JFLONG_KEY_LONGTEXT \
+    N_("Select the hotkey to jump 'long' seconds forward.")
 
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application.")
@@ -1396,14 +1405,14 @@ vlc_module_begin();
 #   define KEY_PREV               KEY_MODIFIER_COMMAND|KEY_LEFT
 #   define KEY_STOP               KEY_MODIFIER_COMMAND|'.'
 #   define KEY_POSITION           't'
-#   define KEY_JUMP_M3SEC         KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_LEFT
-#   define KEY_JUMP_P3SEC         KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_RIGHT
-#   define KEY_JUMP_M10SEC        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT
-#   define KEY_JUMP_P10SEC        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT
-#   define KEY_JUMP_M1MIN         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT
-#   define KEY_JUMP_P1MIN         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_RIGHT
-#   define KEY_JUMP_M5MIN         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_LEFT
-#   define KEY_JUMP_P5MIN         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_JUMP_MEXTRASHORT   KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_LEFT
+#   define KEY_JUMP_PEXTRASHORT   KEY_MODIFIER_COMMAND|KEY_MODIFIER_CTRL|KEY_RIGHT
+#   define KEY_JUMP_MSHORT        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT
+#   define KEY_JUMP_PSHORT        KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_JUMP_MMEDIUM       KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT
+#   define KEY_JUMP_PMEDIUM       KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_RIGHT
+#   define KEY_JUMP_MLONG         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_LEFT
+#   define KEY_JUMP_PLONG         KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_RIGHT
 #   define KEY_NAV_ACTIVATE       KEY_ENTER
 #   define KEY_NAV_UP             KEY_UP
 #   define KEY_NAV_DOWN           KEY_DOWN
@@ -1463,14 +1472,14 @@ vlc_module_begin();
 #   define KEY_PREV               'p'
 #   define KEY_STOP               's'
 #   define KEY_POSITION           't'
-#   define KEY_JUMP_M3SEC         KEY_MODIFIER_SHIFT|KEY_LEFT
-#   define KEY_JUMP_P3SEC         KEY_MODIFIER_SHIFT|KEY_RIGHT
-#   define KEY_JUMP_M10SEC        KEY_MODIFIER_ALT|KEY_LEFT
-#   define KEY_JUMP_P10SEC        KEY_MODIFIER_ALT|KEY_RIGHT
-#   define KEY_JUMP_M1MIN         KEY_MODIFIER_CTRL|KEY_LEFT
-#   define KEY_JUMP_P1MIN         KEY_MODIFIER_CTRL|KEY_RIGHT
-#   define KEY_JUMP_M5MIN         KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_LEFT
-#   define KEY_JUMP_P5MIN         KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_JUMP_MEXTRASHORT   KEY_MODIFIER_SHIFT|KEY_LEFT
+#   define KEY_JUMP_PEXTRASHORT   KEY_MODIFIER_SHIFT|KEY_RIGHT
+#   define KEY_JUMP_MSHORT        KEY_MODIFIER_ALT|KEY_LEFT
+#   define KEY_JUMP_PSHORT        KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_JUMP_MMEDIUM       KEY_MODIFIER_CTRL|KEY_LEFT
+#   define KEY_JUMP_PMEDIUM       KEY_MODIFIER_CTRL|KEY_RIGHT
+#   define KEY_JUMP_MLONG         KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_LEFT
+#   define KEY_JUMP_PLONG         KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_RIGHT
 #   define KEY_NAV_ACTIVATE       KEY_ENTER
 #   define KEY_NAV_UP             KEY_UP
 #   define KEY_NAV_DOWN           KEY_DOWN
@@ -1541,22 +1550,22 @@ vlc_module_begin();
              STOP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-position", KEY_POSITION, NULL, POSITION_KEY_TEXT,
              POSITION_KEY_LONGTEXT, VLC_TRUE );
-    add_key( "key-jump-3sec", KEY_JUMP_M3SEC, NULL, JB3SEC_KEY_TEXT,
-             JB3SEC_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-jump+3sec", KEY_JUMP_P3SEC, NULL, JF3SEC_KEY_TEXT,
-             JF3SEC_KEY_LONGTEXT, VLC_FALSE );             
-    add_key( "key-jump-10sec", KEY_JUMP_M10SEC, NULL, JB10SEC_KEY_TEXT,
-             JB10SEC_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-jump+10sec", KEY_JUMP_P10SEC, NULL, JF10SEC_KEY_TEXT,
-             JF10SEC_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-jump-1min", KEY_JUMP_M1MIN, NULL, JB1MIN_KEY_TEXT,
-             JB1MIN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-jump+1min", KEY_JUMP_P1MIN, NULL, JF1MIN_KEY_TEXT,
-             JF1MIN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-jump-5min", KEY_JUMP_M5MIN, NULL, JB5MIN_KEY_TEXT,
-             JB5MIN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-jump+5min", KEY_JUMP_P5MIN, NULL, JF5MIN_KEY_TEXT,
-             JF5MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-extrashort", KEY_JUMP_MEXTRASHORT, NULL,
+             JBEXTRASHORT_KEY_TEXT, JBEXTRASHORT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+extrashort", KEY_JUMP_PEXTRASHORT, NULL,
+             JFEXTRASHORT_KEY_TEXT, JFEXTRASHORT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-short", KEY_JUMP_MSHORT, NULL, JBSHORT_KEY_TEXT,
+             JBSHORT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+short", KEY_JUMP_PSHORT, NULL, JFSHORT_KEY_TEXT,
+             JFSHORT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-medium", KEY_JUMP_MMEDIUM, NULL, JBMEDIUM_KEY_TEXT,
+             JBMEDIUM_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+medium", KEY_JUMP_PMEDIUM, NULL, JFMEDIUM_KEY_TEXT,
+             JFMEDIUM_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-long", KEY_JUMP_MLONG, NULL, JBLONG_KEY_TEXT,
+             JBLONG_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+long", KEY_JUMP_PLONG, NULL, JFLONG_KEY_TEXT,
+             JFLONG_KEY_LONGTEXT, VLC_FALSE );
 
     add_key( "key-nav-activate", KEY_NAV_ACTIVATE, NULL, NAV_ACTIVATE_KEY_TEXT,
              NAV_ACTIVATE_KEY_LONGTEXT, VLC_TRUE );
@@ -1703,14 +1712,14 @@ static struct hotkey p_hotkeys[] =
     { "key-pause", ACTIONID_PAUSE, 0, 0, 0, 0 },
     { "key-stop", ACTIONID_STOP, 0, 0, 0, 0 },
     { "key-position", ACTIONID_POSITION, 0, 0, 0, 0 },
-    { "key-jump-3sec", ACTIONID_JUMP_BACKWARD_3SEC, 0, 1000000, 0, 0 },
-    { "key-jump+3sec", ACTIONID_JUMP_FORWARD_3SEC, 0, 1000000, 0, 0 },
-    { "key-jump-10sec", ACTIONID_JUMP_BACKWARD_10SEC, 0, 1000000, 0, 0 },
-    { "key-jump+10sec", ACTIONID_JUMP_FORWARD_10SEC, 0, 1000000, 0, 0 },
-    { "key-jump-1min", ACTIONID_JUMP_BACKWARD_1MIN, 0, 1000000, 0, 0 },
-    { "key-jump+1min", ACTIONID_JUMP_FORWARD_1MIN, 0, 1000000, 0, 0 },
-    { "key-jump-5min", ACTIONID_JUMP_BACKWARD_5MIN, 0, 1000000, 0, 0 },
-    { "key-jump+5min", ACTIONID_JUMP_FORWARD_5MIN, 0, 1000000, 0, 0 },
+    { "key-jump-extrashort", ACTIONID_JUMP_BACKWARD_EXTRASHORT, 0, 1000000, 0, 0 },
+    { "key-jump+extrashort", ACTIONID_JUMP_FORWARD_EXTRASHORT, 0, 1000000, 0, 0 },
+    { "key-jump-short", ACTIONID_JUMP_BACKWARD_SHORT, 0, 1000000, 0, 0 },
+    { "key-jump+short", ACTIONID_JUMP_FORWARD_SHORT, 0, 1000000, 0, 0 },
+    { "key-jump-medium", ACTIONID_JUMP_BACKWARD_MEDIUM, 0, 1000000, 0, 0 },
+    { "key-jump+medium", ACTIONID_JUMP_FORWARD_MEDIUM, 0, 1000000, 0, 0 },
+    { "key-jump-long", ACTIONID_JUMP_BACKWARD_LONG, 0, 1000000, 0, 0 },
+    { "key-jump+long", ACTIONID_JUMP_FORWARD_LONG, 0, 1000000, 0, 0 },
     { "key-prev", ACTIONID_PREV, 0, 0, 0, 0 },
     { "key-next", ACTIONID_NEXT, 0, 0, 0, 0 },
     { "key-faster", ACTIONID_FASTER, 0, 0, 0, 0 },

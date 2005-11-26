@@ -1088,14 +1088,14 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "fastforward" ) )
     {
-        val.i_int = config_GetInt( p_intf, "key-jump+3sec" );
+        val.i_int = config_GetInt( p_intf, "key-jump+extrashort" );
         var_Set( p_intf->p_vlc, "key-pressed", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "rewind" ) )
     {
-        val.i_int = config_GetInt( p_intf, "key-jump-3sec" );
+        val.i_int = config_GetInt( p_intf, "key-jump-extrashort" );
         var_Set( p_intf->p_vlc, "key-pressed", val );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
