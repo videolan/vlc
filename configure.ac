@@ -1327,6 +1327,15 @@ AC_ARG_ENABLE(release,
 test "${enable_release}" != "yes" && enable_release="no"
 
 dnl
+dnl  Is the shared libvlc forced ?
+dnl
+build_pic=no
+AC_ARG_ENABLE(shared-libvlc,
+  [  --enable-shared-libvlc  shared libvlc (default disabled EXPERIMENTAL)],
+  ,[shared_libvlc=no])
+
+
+dnl
 dnl Stream output
 dnl
 AC_ARG_ENABLE(sout,
@@ -4594,14 +4603,6 @@ then
   fi
 fi
 
-dnl 
-dnl  Joystick plugin
-dnl
-AC_ARG_ENABLE(joystick,
-  [  --enable-joystick       joystick control (default enabled)])
-if test "${enable_joystick}" = "yes"; then
-  AC_CHECK_HEADER(linux/joystick.h, [VLC_ADD_PLUGINS([joystick])])
-fi
 
 dnl
 dnl corba (ORBit) plugin
@@ -4805,6 +4806,23 @@ AS_IF([test "${MOZILLA_CONFIG}"], [
   fi
 ])
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
+if test "${mozilla}" != "false"
+then
+  build_pic=yes
+fi
+
+dnl
+dnl  Python bindings
+dnl
+AC_ARG_ENABLE(python-bindings,
+  [  --enable-python-bindings    Enable Python bindings (default disabled)])
+dnl TODO: look for python dev headers
+AM_CONDITIONAL( BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"] )
+if test "${enable_python_bindings}" = "yes"
+then
+  build_pic=yes
+fi
+
 
 dnl
 dnl  test plugins
@@ -4918,20 +4936,18 @@ then
 fi]
 AM_CONDITIONAL(HAVE_BUILTINS, ${builtin_support})
 
-AC_ARG_ENABLE(shared-libvlc,
-  [  --enable-shared-libvlc  shared libvlc (default disabled EXPERIMENTAL)],
-  ,[shared_libvlc=no])
-
+dnl
+dnl Pic and shared libvlc stuff
+dnl
 AM_CONDITIONAL(BUILD_SHARED, [test "${shared_libvlc}" != "no"])
+AM_CONDITIONAL(BUILD_PIC, [test "${build_pic}" = "yes" -o "${shared_libvlc}" != "no"] )
 AS_IF([test "${shared_libvlc}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
 ])
 
 pic=no
-AS_IF([test "${shared_libvlc}" != "no"], [pic=pic])
-AS_IF([${mozilla}], [pic=pic])
+AS_IF([test "${shared_libvlc}" != "no" -o "${build_pic}" = "yes"], [pic=pic])
 AS_IF([test "${SYS}" = "mingw32"], [pic=no])
-
 AS_IF([test "${pic}" = "no"], [pic=])
 AC_SUBST(pic)
 
@@ -5016,6 +5032,8 @@ AC_CONFIG_FILES([
   Makefile
   activex/Makefile
   activex/axvlc.inf
+  bindings/Makefile
+  bindings/python/Makefile
   debian/Makefile
   doc/Makefile
   intl/Makefile
@@ -5114,7 +5132,7 @@ dnl for a in `./vlc-config --target plugin` ; do echo $a; done | sed -e 's,modul
 dnl Shortcut to nice compile message
 rm -f compile
 echo '#! /bin/sh' >compile
-echo "PATH=$PATH LANG=C make $* 2>&1| ${srcdir}/extras/make.pl" >>compile
+echo "PATH=$PATH LANG=C make \$\* 2>&1| ${srcdir}/extras/make.pl" >>compile
 chmod a+x compile
 
 printf "

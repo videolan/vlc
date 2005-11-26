@@ -9,10 +9,10 @@ NULL =
 # which have makefiles with distribution information.
 #  - intl should come before modules and . because all the code uses gettext
 #  - modules should come before . because vlc needs the builtins
-#  - . should come before mozilla because the plugin needs libvlc_pic.a
+#  - . should come before mozilla/bindings because the plugin needs libvlc_pic.a
 #  - po should come before . because VLC.app needs the pofiles
 #  - loader should come before modules because some plugins need it
-SUBDIRS = intl loader modules po . mozilla activex share m4 doc
+SUBDIRS = intl loader modules po . mozilla bindings activex share m4 doc
 DIST_SUBDIRS = $(SUBDIRS) debian ipkg lib
 
 EXTRA_DIST = \
@@ -292,13 +292,10 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in
 if HAVE_WIN32
 lib_LIBRARIES = lib/libvlc.a
 else
-if BUILD_SHARED
-lib_LIBRARIES = lib/libvlc_pic.a
-else
 lib_LIBRARIES = lib/libvlc.a
-if BUILD_MOZILLA
+if BUILD_PIC
 lib_LIBRARIES += lib/libvlc_pic.a
-endif
+else
 endif
 endif
 
