@@ -25,6 +25,7 @@
 #include "dialogs/vlm/vlm_wrapper.hpp"
 #include "dialogs/vlm/vlm_stream.hpp"
 #include "dialogs/vlm/vlm_streampanel.hpp"
+#include <wx/statline.h>
 
 enum
 {
@@ -248,6 +249,9 @@ wxPanel * VLMPanel::BroadcastPanel( wxWindow *parent )
 
      broadcasts_sizer->Add( box_sizer, 0, wxEXPAND|wxALL, 5 );
 
+     wxStaticLine *static_line = new wxStaticLine( broadcasts_panel );
+     broadcasts_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
+
      scrolled_broadcasts = new wxScrolledWindow( broadcasts_panel, -1,
                                 wxDefaultPosition, wxDefaultSize,
                                 wxBORDER_NONE | wxVSCROLL );
@@ -355,16 +359,18 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
 
-    wxFlexGridSizer *upper_sizer = new wxFlexGridSizer( 5,2 );
-    upper_sizer->AddGrowableCol( 1, 1 );
-    upper_sizer->AddGrowableCol( 3, 1 );
+    wxFlexGridSizer *upper_sizer = new wxFlexGridSizer( 5, 2 );
+    upper_sizer->AddGrowableCol( 1 );
+    upper_sizer->AddGrowableCol( 3 );
 
-    upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Name") ) ) );
+    upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Name") ) ), 0,
+                                        wxALIGN_CENTER_VERTICAL, 0 );
     name_text = new wxTextCtrl( this, -1, wxU( _("") ), wxDefaultPosition,
                                           wxSize( 150, -1 ) );
     upper_sizer->Add( name_text , 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
-    upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Input") ) ) );
+    upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Input") ) ), 0,
+                                        wxALIGN_CENTER_VERTICAL, 0 );
     input_text = new wxTextCtrl( this, -1, wxU( _("") ) ,
                       wxDefaultPosition, wxSize( 150, -1 ) );
     upper_sizer->Add( input_text , 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
@@ -373,7 +379,8 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
     upper_sizer->Add( 0,0 );
     upper_sizer->Add( 0,0 );
 
-    upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Output") ) ) );
+    upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Output") ) ), 0,
+                                        wxALIGN_CENTER_VERTICAL, 0 );
     output_text = new wxTextCtrl( this, -1, wxU( _("") ) ,
                       wxDefaultPosition, wxSize( 150, -1 ) );
     upper_sizer->Add( output_text, 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );

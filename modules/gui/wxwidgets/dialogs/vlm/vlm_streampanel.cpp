@@ -92,7 +92,7 @@ VLMBroadcastStreamPanel::VLMBroadcastStreamPanel( intf_thread_t* _p_intf,
     box_sizer->Add( p_slider,    1, wxEXPAND | wxALL, 5 );
 
     p_time = new wxStaticText( this, -1, wxU( "0:00:00 / 0:00:00") );
-    box_sizer->Add( p_time  ,    0, wxEXPAND | wxALL, 5 );
+    box_sizer->Add( p_time, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5 );
 
     wxBitmapButton *edit_button = new wxBitmapButton( this, BEdit_Event,
                                     wxBitmap( trash_xpm ) );
