@@ -34,8 +34,8 @@ while(<STDIN>)
      # Info 
      elsif( 
           $line =~ s/^.* (lib.*\.so).*/ LINK    : $1/g ||
-          $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2 -> $1/g ||
-          $line =~ s/^.* (lib.*\.o)\s`.*`(.*);/ COMPILE : $2 -> $1/g ||
+          $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2/g ||
+          $line =~ s/^.* (lib.*\.o)\s`.*`(.*);\ \\/ COMPILE : $2/ ||
           $line =~ s/^[A-z0-9-]*ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*/ ARCHIVE : $1/g ||
           $line =~ s/^[A-z0-9-]*ranlib\s(.*)/ RANLIB  : $1/g ||
           $line =~ s/^Making\sall\sin\s(.*)/MAKE     : $1/g ||
