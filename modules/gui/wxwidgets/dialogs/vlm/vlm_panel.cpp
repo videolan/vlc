@@ -249,7 +249,7 @@ wxPanel * VLMPanel::BroadcastPanel( wxWindow *parent )
 
      broadcasts_sizer->Add( box_sizer, 0, wxEXPAND|wxALL, 5 );
 
-     wxStaticLine *static_line = new wxStaticLine( broadcasts_panel );
+     wxStaticLine *static_line = new wxStaticLine( broadcasts_panel, wxID_ANY );
      broadcasts_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
 
      scrolled_broadcasts = new wxScrolledWindow( broadcasts_panel, -1,
