@@ -2570,7 +2570,7 @@ static void InitDeviceValues( vlc_t *p_vlc )
         return;
     }
     libhal_ctx_set_dbus_connection( ctx, p_connection );
-    if( !libhal_ctx_init( ctx, &error ) )
+    if( libhal_ctx_init( ctx, &error ) )
 #else
     if( ( ctx = hal_initialize( NULL, FALSE ) ) )
 #endif
@@ -2632,7 +2632,7 @@ static void InitDeviceValues( vlc_t *p_vlc )
     }
     else
     {
-        msg_Dbg( p_vlc, "Unable to get HAL device properties" );
+        msg_Warn( p_vlc, "Unable to get HAL device properties" );
     }
 #endif
 }
