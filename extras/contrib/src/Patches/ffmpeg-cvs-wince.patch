@@ -477,22 +477,6 @@ diff -u -r1.11 xvmcvideo.c
  #ifdef USE_FASTMEMCPY
  #include "fastmemcpy.h"
  #endif
-Index: ../ffmpeg/libavcodec/libpostproc/Makefile
-===================================================================
-RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/libpostproc/Makefile,v
-retrieving revision 1.26
-diff -u -r1.26 Makefile
---- ../ffmpeg/libavcodec/libpostproc/Makefile	26 Sep 2005 10:05:13 -0000	1.26
-+++ ../ffmpeg/libavcodec/libpostproc/Makefile	21 Nov 2005 23:02:09 -0000
-@@ -56,7 +56,7 @@
- 	$(AR) rc $@ $(PPOBJS)
- 	$(RANLIB) $@
- 
--install: all
-+installlib: all
- ifeq ($(SHARED_PP),yes)
- ifeq ($(CONFIG_WIN32),yes)
- 	install $(INSTALLSTRIP) -m 755 $(SPPLIBNAME) "$(prefix)"
 Index: ../ffmpeg/libavformat/Makefile
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/Makefile,v
