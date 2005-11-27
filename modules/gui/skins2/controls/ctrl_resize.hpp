@@ -34,9 +34,17 @@
 class CtrlResize: public CtrlFlat
 {
     public:
+        enum Direction_t
+        {
+            kResizeE,   // East
+            kResizeSE,  // South-East
+            kResizeS,   // South
+            kNone       // Reserved for internal use
+        };
+
         CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
                     GenericLayout &rLayout, const UString &rHelp,
-                    VarBool *pVisible );
+                    VarBool *pVisible, Direction_t direction );
         virtual ~CtrlResize() {}
 
         /// Handle an event
@@ -68,6 +76,11 @@ class CtrlResize: public CtrlFlat
         EvtGeneric *m_pEvt;
         /// Position of the click that started the resizing
         int m_xPos, m_yPos;
+        /// Direction of the resizing
+        Direction_t m_direction;
+
+        /// Change the cursor, based on the given direction
+        void changeCursor( Direction_t direction ) const;
 
         /// Callback objects
         DEFINE_CALLBACK( CtrlResize, OutStill )

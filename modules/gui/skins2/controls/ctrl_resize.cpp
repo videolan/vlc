@@ -35,9 +35,9 @@
 
 CtrlResize::CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
                         GenericLayout &rLayout, const UString &rHelp,
-                        VarBool *pVisible ):
+                        VarBool *pVisible, Direction_t direction ):
     CtrlFlat( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_rCtrl( rCtrl ),
-    m_rLayout( rLayout ), m_cmdOutStill( this ),
+    m_rLayout( rLayout ), m_direction( direction ),  m_cmdOutStill( this ),
     m_cmdStillOut( this ),
     m_cmdStillStill( this ),
     m_cmdStillResize( this ),
@@ -103,24 +103,35 @@ void CtrlResize::handleEvent( EvtGeneric &rEvent )
 }
 
 
+void CtrlResize::changeCursor( Direction_t direction ) const
+{
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    if( direction == kResizeSE )
+        pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+    else if( direction == kResizeS )
+        pOsFactory->changeCursor( OSFactory::kResizeNS );
+    else if( direction == kResizeE )
+        pOsFactory->changeCursor( OSFactory::kResizeWE );
+    else if( direction == kNone )
+        pOsFactory->changeCursor( OSFactory::kDefaultArrow );
+}
+
+
 void CtrlResize::CmdOutStill::execute()
 {
-    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
-    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+    m_pParent->changeCursor( m_pParent->m_direction );
 }
 
 
 void CtrlResize::CmdStillOut::execute()
 {
-    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
-    pOsFactory->changeCursor( OSFactory::kDefaultArrow );
+    m_pParent->changeCursor( kNone );
 }
 
 
 void CtrlResize::CmdStillStill::execute()
 {
-    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
-    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+    m_pParent->changeCursor( m_pParent->m_direction );
 }
 
 
@@ -129,8 +140,7 @@ void CtrlResize::CmdStillResize::execute()
     EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
 
     // Set the cursor
-    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
-    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+    m_pParent->changeCursor( m_pParent->m_direction );
 
     m_pParent->m_xPos = pEvtMouse->getXPos();
     m_pParent->m_yPos = pEvtMouse->getYPos();
@@ -145,8 +155,7 @@ void CtrlResize::CmdStillResize::execute()
 void CtrlResize::CmdResizeStill::execute()
 {
     // Set the cursor
-    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
-    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+    m_pParent->changeCursor( m_pParent->m_direction );
 
     m_pParent->releaseMouse();
 }
@@ -157,14 +166,18 @@ void CtrlResize::CmdResizeResize::execute()
     EvtMotion *pEvtMotion = (EvtMotion*)m_pParent->m_pEvt;
 
     // Set the cursor
-    OSFactory *pOsFactory = OSFactory::instance( m_pParent->getIntf() );
-    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+    m_pParent->changeCursor( m_pParent->m_direction );
 
-    int newWidth = pEvtMotion->getXPos() - m_pParent->m_xPos + m_pParent->m_width;
-    int newHeight = pEvtMotion->getYPos() - m_pParent->m_yPos + m_pParent->m_height;
+    int newWidth = m_pParent->m_width;
+    int newHeight = m_pParent->m_height;
+    if( m_pParent->m_direction != kResizeS )
+        newWidth += pEvtMotion->getXPos() - m_pParent->m_xPos;
+    if( m_pParent->m_direction != kResizeE )
+        newHeight += pEvtMotion->getYPos() - m_pParent->m_yPos;
 
     // Create a resize command
-    CmdGeneric *pCmd = new CmdResize( m_pParent->getIntf(), m_pParent->m_rLayout,
+    CmdGeneric *pCmd = new CmdResize( m_pParent->getIntf(),
+                                      m_pParent->m_rLayout,
                                       newWidth, newHeight );
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( m_pParent->getIntf() );
