@@ -62,13 +62,15 @@ static void Close( vlc_object_t * );
     "in case it was untimely closed.")
 
 #define CONTINUOUS_TEXT N_("Continuous stream")
-#define CONTINUOUS_LONGTEXT N_("Enable this option to read a file that is " \
-    "being constantly updated (for example, a JPG file on a server)")
+#define CONTINUOUS_LONGTEXT N_("This allows you to read a file that is " \
+    "being constantly updated (for example, a JPG file on a server)." \
+    "You should not globally enable this option as it will break all other " \
+    "types of HTTP streams." )
 
 vlc_module_begin();
     set_description( _("HTTP input") );
     set_capability( "access2", 0 );
-    set_shortname( _( "HTTP/HTTPS" ) );
+    set_shortname( _( "HTTP(S)" ) );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
