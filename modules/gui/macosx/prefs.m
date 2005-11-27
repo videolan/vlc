@@ -312,6 +312,7 @@ static VLCTreeItem *o_root_item = nil;
                     switch( p_item->i_type )
                     {
                     case CONFIG_CATEGORY:
+			if( p_item->i_value == -1 ) break;
                         o_child_name = [[VLCMain sharedInstance]
                             localizedString: config_CategoryNameGet( p_item->i_value ) ];
                         o_child_title = o_child_name;
@@ -329,6 +330,7 @@ static VLCTreeItem *o_root_item = nil;
                             whithCategory: p_item - p_module->p_config]];
                         break;
                     case CONFIG_SUBCATEGORY:
+			if( p_item->i_value == -1 ) break;
                         o_child_name = [[VLCMain sharedInstance]
                             localizedString: config_CategoryNameGet( p_item->i_value ) ];
                         o_child_title = o_child_name;
