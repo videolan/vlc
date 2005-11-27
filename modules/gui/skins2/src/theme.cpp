@@ -126,14 +126,42 @@ void Theme::saveConfig()
     } \
     return (*it).second.get();
 
+// This macro takes an ID of the form "id1;id2;id3", and returns the object
+// corresponding to the first valid ID. If no ID is valid, it returns NULL.
+// XXX: should we use a template method instead?
+#define FIND_FIRST_OBJECT( mapDataPtr, mapName ) \
+    string rightPart = id; \
+    string::size_type pos; \
+    do \
+    { \
+        pos = rightPart.find( ";" ); \
+        string leftPart = rightPart.substr( 0, pos ); \
+        map<string, mapDataPtr>::const_iterator it = mapName.find( leftPart ); \
+        if( it != mapName.end() ) \
+        { \
+            return (*it).second.get(); \
+            break; \
+        } \
+ \
+        if( pos != string::npos ) \
+        { \
+            rightPart = rightPart.substr( pos, rightPart.size() ); \
+            rightPart = \
+                rightPart.substr( rightPart.find_first_not_of( " \t;" ), \
+                                  rightPart.size() ); \
+        } \
+    } \
+    while( pos != string::npos ); \
+    return NULL;
+
 GenericBitmap *Theme::getBitmapById( const string &id )
 {
-    FIND_OBJECT( GenericBitmapPtr, m_bitmaps );
+    FIND_FIRST_OBJECT( GenericBitmapPtr, m_bitmaps );
 }
 
 GenericFont *Theme::getFontById( const string &id )
 {
-    FIND_OBJECT( GenericFontPtr, m_fonts );
+    FIND_FIRST_OBJECT( GenericFontPtr, m_fonts );
 }
 
 TopWindow *Theme::getWindowById( const string &id )
