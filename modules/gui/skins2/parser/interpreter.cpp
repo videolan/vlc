@@ -171,7 +171,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         string::size_type pos = rightPart.find( ";" );
         while( pos != string::npos )
         {
-            string leftPart = rightPart.substr( 0, rightPart.find( ";" ) );
+            string leftPart = rightPart.substr( 0, pos );
             // Remove any whitespace at the end of the left part, and parse it
             leftPart =
                 leftPart.substr( 0, leftPart.find_last_not_of( " \t" ) + 1 );
