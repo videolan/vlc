@@ -11,3 +11,16 @@
  #ifndef STDC
  extern voidp  malloc OF((uInt size));
  extern void   free   OF((voidpf ptr));
+===================================================================
+--- zlib/zutil.h	2005-11-27 20:05:31.000000000 +0000
++++ zlib/zutil.h	2005-11-27 20:06:16.000000000 +0000
+@@ -36,6 +36,9 @@
+ #else
+ #  ifndef _WIN32_WCE
+ #    include <errno.h>
++#  else
++#    define errno z_errno
++     extern int errno;
+ #  endif
+ #endif
+ 
