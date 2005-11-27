@@ -1,12 +1,40 @@
-diff -ru faad2.old/common/mp4v2/mp4.h faad2/common/mp4v2/mp4.h
---- faad2.old/common/mp4v2/mp4.h	Sun Feb 22 14:04:55 2004
-+++ faad2/common/mp4v2/mp4.h	Sun Feb 22 14:18:41 2004
-@@ -27,6 +27,8 @@
- #include <mpeg4ip.h>
+--- libfaad/bits.h	2005-11-22 23:41:28.000000000 +0000
++++ libfaad/bits.h	2005-11-22 23:40:15.000000000 +0000
+@@ -58,7 +58,7 @@
  
- #include <math.h>   /* to define float HUGE_VAL and/or NAN */
-+/* Meuuh power */
-+#undef NAN
- #ifndef NAN
- #define NAN HUGE_VAL
- #endif
+ #if defined (_WIN32) && !defined(_WIN32_WCE) && !defined(__MINGW32__)
+ #define BSWAP(a) __asm mov eax,a __asm bswap eax __asm mov a, eax
+-#elif defined(LINUX) || defined(DJGPP) || defined(__MINGW32__)
++#elif defined(LINUX) || defined(DJGPP) || (defined(__MINGW32__) && !defined(__MINGWCE__))
+ #define BSWAP(a) __asm__ ( "bswapl %0\n" : "=r" (a) : "0" (a) )
+ #else
+ #define BSWAP(a) \
+Index: libfaad/common.h
+===================================================================
+RCS file: /cvsroot/faac/faad2/libfaad/common.h,v
+retrieving revision 1.66
+diff -u -r1.66 common.h
+--- libfaad/common.h	1 Feb 2005 13:23:35 -0000	1.66
++++ libfaad/common.h	22 Nov 2005 22:46:50 -0000
+@@ -162,7 +162,7 @@
+ 
+ /* END COMPILE TIME DEFINITIONS */
+ 
+-#if defined(_WIN32) && !defined(__MINGW32__)
++#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGWCE__)
+ 
+ #include <stdlib.h>
+ 
+@@ -309,8 +309,11 @@
+   }
+ 
+ 
+-  #if defined(_WIN32) && !defined(__MINGW32__)
++  #if defined(__MINGWCE__)
++  #elif defined(__MINGW32__)
+     #define HAS_LRINTF
++  #elif defined(_WIN32)
++    #define HAS_LRINTF
+     static INLINE int lrintf(float f)
+     {
+         int i;

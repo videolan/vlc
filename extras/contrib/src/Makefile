@@ -86,12 +86,12 @@ endif
 #
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --with-included-opencdk --with-included-libtasn1 --disable-depedency-tracking
-FFMPEGCONF+= --enable-mingw32 --enable-memalign-hack --cpu=x86
+FFMPEGCONF+= --enable-mingw32 --enable-memalign-hack --cpu=x86 --disable-debug
 endif
 
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
-FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-codec=snow --disable-protocols
+FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-codec=snow --disable-codec=vc9 --disable-codec=wmv3 --disable-codec=vorbis --disable-codec=vorbis --disable-codec=dvdsub --disable-codec=dvbsub --disable-protocols
 else
 FFMPEGCONF+= --enable-mp3lame --enable-faac
 endif
@@ -145,7 +145,7 @@ else
 
    ifdef HAVE_WINCE
 
-   all: .dvbpsi .zlib .ffmpeg .ogg .tremor
+   all: .dvbpsi .zlib .ffmpeg .ogg .tremor .faad
    else
 
 # Standard Linux or other UNIX-like systems
@@ -719,9 +719,8 @@ faad2-$(FAAD2_VERSION).tar.bz2:
 
 faad2: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_WIN32
-	(cd faad2;patch -p 0  < ../Patches/faad2-20050513-win32.patch && ./bootstrap)
-endif
+	(cd faad2; patch -p 0  < ../Patches/faad2.patch && ./bootstrap)
+
 .faad: faad2
 	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
 ifndef HAVE_DARWIN
@@ -846,6 +845,7 @@ ifeq ($(HOST),i586-pc-beos)
 endif
 ifdef HAVE_WIN32
 	patch -p 0 < Patches/ffmpeg-cvs-win32.patch
+	patch -p 1 < Patches/ffmpeg-cvs-wince.patch
 endif
 ifdef HAVE_WINCE
 	patch -p 1 < Patches/ffmpeg-cvs-wince.patch

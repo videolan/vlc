@@ -4,7 +4,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/configure,v
 retrieving revision 1.215
 diff -u -r1.215 configure
 --- ../ffmpeg/configure	22 Oct 2005 19:17:39 -0000	1.215
-+++ ../ffmpeg/configure	21 Nov 2005 23:01:53 -0000
++++ ../ffmpeg/configure	27 Nov 2005 16:54:09 -0000
 @@ -26,6 +26,7 @@
  echo "  --enable-xvid            enable XviD support via xvidcore [default=no]"
  echo "  --enable-x264            enable H.264 encoding via x264 [default=no]"
@@ -109,7 +109,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/4xm.c,v
 retrieving revision 1.15
 diff -u -r1.15 4xm.c
 --- ../ffmpeg/libavcodec/4xm.c	24 Apr 2005 17:21:07 -0000	1.15
-+++ ../ffmpeg/libavcodec/4xm.c	21 Nov 2005 23:01:53 -0000
++++ ../ffmpeg/libavcodec/4xm.c	27 Nov 2005 16:54:10 -0000
 @@ -26,9 +26,6 @@
  #include "dsputil.h"
  #include "mpegvideo.h"
@@ -126,7 +126,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/asv1.c,v
 retrieving revision 1.18
 diff -u -r1.18 asv1.c
 --- ../ffmpeg/libavcodec/asv1.c	7 May 2005 19:24:07 -0000	1.18
-+++ ../ffmpeg/libavcodec/asv1.c	21 Nov 2005 23:01:53 -0000
++++ ../ffmpeg/libavcodec/asv1.c	27 Nov 2005 16:54:10 -0000
 @@ -26,9 +26,6 @@
  #include "dsputil.h"
  #include "mpegvideo.h"
@@ -143,7 +143,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/cabac.h,v
 retrieving revision 1.11
 diff -u -r1.11 cabac.h
 --- ../ffmpeg/libavcodec/cabac.h	29 May 2005 18:18:13 -0000	1.11
-+++ ../ffmpeg/libavcodec/cabac.h	21 Nov 2005 23:01:54 -0000
++++ ../ffmpeg/libavcodec/cabac.h	27 Nov 2005 16:54:10 -0000
 @@ -24,9 +24,6 @@
   */
  
@@ -160,7 +160,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/dv.c,v
 retrieving revision 1.65
 diff -u -r1.65 dv.c
 --- ../ffmpeg/libavcodec/dv.c	2 Sep 2005 08:30:26 -0000	1.65
-+++ ../ffmpeg/libavcodec/dv.c	21 Nov 2005 23:01:54 -0000
++++ ../ffmpeg/libavcodec/dv.c	27 Nov 2005 16:54:11 -0000
 @@ -34,9 +34,6 @@
  #include "simple_idct.h"
  #include "dvdata.h"
@@ -177,7 +177,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/dvdsubenc.c,v
 retrieving revision 1.1
 diff -u -r1.1 dvdsubenc.c
 --- ../ffmpeg/libavcodec/dvdsubenc.c	14 Nov 2005 22:17:29 -0000	1.1
-+++ ../ffmpeg/libavcodec/dvdsubenc.c	21 Nov 2005 23:01:54 -0000
++++ ../ffmpeg/libavcodec/dvdsubenc.c	27 Nov 2005 16:54:11 -0000
 @@ -18,9 +18,6 @@
   */
  #include "avcodec.h"
@@ -194,7 +194,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/flac.c,v
 retrieving revision 1.19
 diff -u -r1.19 flac.c
 --- ../ffmpeg/libavcodec/flac.c	5 Sep 2005 09:28:46 -0000	1.19
-+++ ../ffmpeg/libavcodec/flac.c	21 Nov 2005 23:01:54 -0000
++++ ../ffmpeg/libavcodec/flac.c	27 Nov 2005 16:54:12 -0000
 @@ -37,9 +37,6 @@
  #include "bitstream.h"
  #include "golomb.h"
@@ -211,7 +211,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/h263.c,v
 retrieving revision 1.291
 diff -u -r1.291 h263.c
 --- ../ffmpeg/libavcodec/h263.c	19 Sep 2005 12:03:51 -0000	1.291
-+++ ../ffmpeg/libavcodec/h263.c	21 Nov 2005 23:01:56 -0000
++++ ../ffmpeg/libavcodec/h263.c	27 Nov 2005 16:54:15 -0000
 @@ -39,9 +39,6 @@
  #include "h263data.h"
  #include "mpeg4data.h"
@@ -228,7 +228,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/h264.c,v
 retrieving revision 1.166
 diff -u -r1.166 h264.c
 --- ../ffmpeg/libavcodec/h264.c	10 Nov 2005 04:40:49 -0000	1.166
-+++ ../ffmpeg/libavcodec/h264.c	21 Nov 2005 23:01:59 -0000
++++ ../ffmpeg/libavcodec/h264.c	27 Nov 2005 16:54:20 -0000
 @@ -33,9 +33,6 @@
  
  #include "cabac.h"
@@ -245,7 +245,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mdec.c,v
 retrieving revision 1.15
 diff -u -r1.15 mdec.c
 --- ../ffmpeg/libavcodec/mdec.c	13 Aug 2005 21:34:24 -0000	1.15
-+++ ../ffmpeg/libavcodec/mdec.c	21 Nov 2005 23:01:59 -0000
++++ ../ffmpeg/libavcodec/mdec.c	27 Nov 2005 16:54:21 -0000
 @@ -29,9 +29,6 @@
  #include "dsputil.h"
  #include "mpegvideo.h"
@@ -262,7 +262,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mjpeg.c,v
 retrieving revision 1.114
 diff -u -r1.114 mjpeg.c
 --- ../ffmpeg/libavcodec/mjpeg.c	18 Sep 2005 21:21:01 -0000	1.114
-+++ ../ffmpeg/libavcodec/mjpeg.c	21 Nov 2005 23:02:00 -0000
++++ ../ffmpeg/libavcodec/mjpeg.c	27 Nov 2005 16:54:22 -0000
 @@ -28,9 +28,6 @@
   * MJPEG encoder and decoder.
   */
@@ -279,7 +279,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/motion_est.c,v
 retrieving revision 1.110
 diff -u -r1.110 motion_est.c
 --- ../ffmpeg/libavcodec/motion_est.c	26 Aug 2005 19:05:44 -0000	1.110
-+++ ../ffmpeg/libavcodec/motion_est.c	21 Nov 2005 23:02:01 -0000
++++ ../ffmpeg/libavcodec/motion_est.c	27 Nov 2005 16:54:23 -0000
 @@ -33,9 +33,6 @@
  #include "dsputil.h"
  #include "mpegvideo.h"
@@ -296,7 +296,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mpeg12.c,v
 retrieving revision 1.243
 diff -u -r1.243 mpeg12.c
 --- ../ffmpeg/libavcodec/mpeg12.c	20 Nov 2005 23:09:05 -0000	1.243
-+++ ../ffmpeg/libavcodec/mpeg12.c	21 Nov 2005 23:02:02 -0000
++++ ../ffmpeg/libavcodec/mpeg12.c	27 Nov 2005 16:54:25 -0000
 @@ -30,9 +30,6 @@
  
  #include "mpeg12data.h"
@@ -313,7 +313,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/mpegvideo.c,v
 retrieving revision 1.489
 diff -u -r1.489 mpegvideo.c
 --- ../ffmpeg/libavcodec/mpegvideo.c	5 Nov 2005 00:16:03 -0000	1.489
-+++ ../ffmpeg/libavcodec/mpegvideo.c	21 Nov 2005 23:02:04 -0000
++++ ../ffmpeg/libavcodec/mpegvideo.c	27 Nov 2005 16:54:29 -0000
 @@ -35,9 +35,6 @@
  #include "fastmemcpy.h"
  #endif
@@ -330,7 +330,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/oggvorbis.c,v
 retrieving revision 1.24
 diff -u -r1.24 oggvorbis.c
 --- ../ffmpeg/libavcodec/oggvorbis.c	21 Sep 2005 23:09:16 -0000	1.24
-+++ ../ffmpeg/libavcodec/oggvorbis.c	21 Nov 2005 23:02:04 -0000
++++ ../ffmpeg/libavcodec/oggvorbis.c	27 Nov 2005 16:54:29 -0000
 @@ -8,9 +8,6 @@
  
  #include "avcodec.h"
@@ -347,7 +347,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/qdm2.c,v
 retrieving revision 1.2
 diff -u -r1.2 qdm2.c
 --- ../ffmpeg/libavcodec/qdm2.c	19 Oct 2005 22:27:34 -0000	1.2
-+++ ../ffmpeg/libavcodec/qdm2.c	21 Nov 2005 23:02:05 -0000
++++ ../ffmpeg/libavcodec/qdm2.c	27 Nov 2005 16:54:31 -0000
 @@ -46,9 +46,6 @@
  
  #include "qdm2data.h"
@@ -364,7 +364,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/ratecontrol.c,v
 retrieving revision 1.49
 diff -u -r1.49 ratecontrol.c
 --- ../ffmpeg/libavcodec/ratecontrol.c	30 Apr 2005 21:43:57 -0000	1.49
-+++ ../ffmpeg/libavcodec/ratecontrol.c	21 Nov 2005 23:02:05 -0000
++++ ../ffmpeg/libavcodec/ratecontrol.c	27 Nov 2005 16:54:32 -0000
 @@ -27,9 +27,6 @@
  #include "dsputil.h"
  #include "mpegvideo.h"
@@ -375,13 +375,37 @@ diff -u -r1.49 ratecontrol.c
  #ifndef M_E
  #define M_E 2.718281828
  #endif
+Index: ../ffmpeg/libavcodec/shorten.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/shorten.c,v
+retrieving revision 1.1
+diff -u -r1.1 shorten.c
+--- ../ffmpeg/libavcodec/shorten.c	26 Feb 2005 03:36:03 -0000	1.1
++++ ../ffmpeg/libavcodec/shorten.c	27 Nov 2005 16:54:32 -0000
+@@ -24,7 +24,6 @@
+  *
+  */
+ 
+-#define DEBUG
+ #include <limits.h>
+ #include "avcodec.h"
+ #include "bitstream.h"
+@@ -153,7 +152,7 @@
+             break;
+         default:
+             av_log(s->avctx, AV_LOG_ERROR, "unknown audio type");
+-            abort();
++            av_abort();
+     }
+ 
+     for (chan = 0; chan < s->channels; chan++)
 Index: ../ffmpeg/libavcodec/snow.c
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/snow.c,v
 retrieving revision 1.63
 diff -u -r1.63 snow.c
 --- ../ffmpeg/libavcodec/snow.c	21 Sep 2005 23:09:16 -0000	1.63
-+++ ../ffmpeg/libavcodec/snow.c	21 Nov 2005 23:02:06 -0000
++++ ../ffmpeg/libavcodec/snow.c	27 Nov 2005 16:54:38 -0000
 @@ -25,9 +25,6 @@
  
  #include "mpegvideo.h"
@@ -398,7 +422,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/svq1.c,v
 retrieving revision 1.58
 diff -u -r1.58 svq1.c
 --- ../ffmpeg/libavcodec/svq1.c	5 Sep 2005 10:26:10 -0000	1.58
-+++ ../ffmpeg/libavcodec/svq1.c	21 Nov 2005 23:02:07 -0000
++++ ../ffmpeg/libavcodec/svq1.c	27 Nov 2005 16:54:38 -0000
 @@ -45,9 +45,6 @@
  #include "mpegvideo.h"
  #include "bswap.h"
@@ -415,7 +439,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/vc9.c,v
 retrieving revision 1.24
 diff -u -r1.24 vc9.c
 --- ../ffmpeg/libavcodec/vc9.c	21 Sep 2005 23:09:16 -0000	1.24
-+++ ../ffmpeg/libavcodec/vc9.c	21 Nov 2005 23:02:08 -0000
++++ ../ffmpeg/libavcodec/vc9.c	27 Nov 2005 16:54:38 -0000
 @@ -33,9 +33,6 @@
  #include "mpegvideo.h"
  #include "vc9data.h"
@@ -432,7 +456,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/vcr1.c,v
 retrieving revision 1.8
 diff -u -r1.8 vcr1.c
 --- ../ffmpeg/libavcodec/vcr1.c	24 Feb 2005 19:08:50 -0000	1.8
-+++ ../ffmpeg/libavcodec/vcr1.c	21 Nov 2005 23:02:08 -0000
++++ ../ffmpeg/libavcodec/vcr1.c	27 Nov 2005 16:54:38 -0000
 @@ -25,9 +25,6 @@
  #include "avcodec.h"
  #include "mpegvideo.h"
@@ -449,7 +473,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/vorbis.c,v
 retrieving revision 1.11
 diff -u -r1.11 vorbis.c
 --- ../ffmpeg/libavcodec/vorbis.c	30 May 2005 22:02:00 -0000	1.11
-+++ ../ffmpeg/libavcodec/vorbis.c	21 Nov 2005 23:02:08 -0000
++++ ../ffmpeg/libavcodec/vorbis.c	27 Nov 2005 16:54:44 -0000
 @@ -38,9 +38,6 @@
  #define AV_DEBUG(...)
  #endif
@@ -466,7 +490,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/xvmcvideo.c,v
 retrieving revision 1.11
 diff -u -r1.11 xvmcvideo.c
 --- ../ffmpeg/libavcodec/xvmcvideo.c	24 Apr 2005 17:21:10 -0000	1.11
-+++ ../ffmpeg/libavcodec/xvmcvideo.c	21 Nov 2005 23:02:08 -0000
++++ ../ffmpeg/libavcodec/xvmcvideo.c	27 Nov 2005 16:54:44 -0000
 @@ -24,9 +24,6 @@
  #include "dsputil.h"
  #include "mpegvideo.h"
@@ -483,7 +507,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/Makefile,v
 retrieving revision 1.102
 diff -u -r1.102 Makefile
 --- ../ffmpeg/libavformat/Makefile	7 Nov 2005 01:32:29 -0000	1.102
-+++ ../ffmpeg/libavformat/Makefile	21 Nov 2005 23:02:09 -0000
++++ ../ffmpeg/libavformat/Makefile	27 Nov 2005 16:54:47 -0000
 @@ -11,13 +11,20 @@
  OBJS= utils.o cutils.o os_support.o allformats.o
  PPOBJS=
@@ -549,7 +573,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/allformats.c,v
 retrieving revision 1.50
 diff -u -r1.50 allformats.c
 --- ../ffmpeg/libavformat/allformats.c	23 Sep 2005 00:25:41 -0000	1.50
-+++ ../ffmpeg/libavformat/allformats.c	21 Nov 2005 23:02:09 -0000
++++ ../ffmpeg/libavformat/allformats.c	27 Nov 2005 16:54:47 -0000
 @@ -88,7 +88,10 @@
      libogg_init();
  #endif
@@ -581,7 +605,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/asf-enc.c,v
 retrieving revision 1.73
 diff -u -r1.73 asf-enc.c
 --- ../ffmpeg/libavformat/asf-enc.c	23 Sep 2005 00:25:41 -0000	1.73
-+++ ../ffmpeg/libavformat/asf-enc.c	21 Nov 2005 23:02:09 -0000
++++ ../ffmpeg/libavformat/asf-enc.c	27 Nov 2005 16:54:47 -0000
 @@ -20,9 +20,6 @@
  #include "avi.h"
  #include "asf.h"
@@ -598,7 +622,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/asf.c,v
 retrieving revision 1.86
 diff -u -r1.86 asf.c
 --- ../ffmpeg/libavformat/asf.c	26 Oct 2005 12:15:09 -0000	1.86
-+++ ../ffmpeg/libavformat/asf.c	21 Nov 2005 23:02:09 -0000
++++ ../ffmpeg/libavformat/asf.c	27 Nov 2005 16:54:50 -0000
 @@ -21,9 +21,6 @@
  #include "mpegaudio.h"
  #include "asf.h"
@@ -615,7 +639,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/avidec.c,v
 retrieving revision 1.76
 diff -u -r1.76 avidec.c
 --- ../ffmpeg/libavformat/avidec.c	6 Sep 2005 21:25:35 -0000	1.76
-+++ ../ffmpeg/libavformat/avidec.c	21 Nov 2005 23:02:09 -0000
++++ ../ffmpeg/libavformat/avidec.c	27 Nov 2005 16:54:50 -0000
 @@ -20,9 +20,6 @@
  #include "avi.h"
  #include "dv.h"
@@ -632,7 +656,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/flvenc.c,v
 retrieving revision 1.19
 diff -u -r1.19 flvenc.c
 --- ../ffmpeg/libavformat/flvenc.c	12 Nov 2005 20:01:23 -0000	1.19
-+++ ../ffmpeg/libavformat/flvenc.c	21 Nov 2005 23:02:09 -0000
++++ ../ffmpeg/libavformat/flvenc.c	27 Nov 2005 16:54:50 -0000
 @@ -18,9 +18,6 @@
   */
  #include "avformat.h"
@@ -649,7 +673,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/movenc.c,v
 retrieving revision 1.44
 diff -u -r1.44 movenc.c
 --- ../ffmpeg/libavformat/movenc.c	6 Sep 2005 21:25:35 -0000	1.44
-+++ ../ffmpeg/libavformat/movenc.c	21 Nov 2005 23:02:10 -0000
++++ ../ffmpeg/libavformat/movenc.c	27 Nov 2005 16:54:56 -0000
 @@ -21,9 +21,6 @@
  #include "avi.h"
  #include "avio.h"
@@ -666,7 +690,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/mpeg.c,v
 retrieving revision 1.89
 diff -u -r1.89 mpeg.c
 --- ../ffmpeg/libavformat/mpeg.c	23 Sep 2005 00:25:41 -0000	1.89
-+++ ../ffmpeg/libavformat/mpeg.c	21 Nov 2005 23:02:11 -0000
++++ ../ffmpeg/libavformat/mpeg.c	27 Nov 2005 16:54:58 -0000
 @@ -22,9 +22,6 @@
  #define MAX_PAYLOAD_SIZE 4096
  //#define DEBUG_SEEK
@@ -683,7 +707,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/nut.c,v
 retrieving revision 1.56
 diff -u -r1.56 nut.c
 --- ../ffmpeg/libavformat/nut.c	23 Sep 2005 00:25:41 -0000	1.56
-+++ ../ffmpeg/libavformat/nut.c	21 Nov 2005 23:02:11 -0000
++++ ../ffmpeg/libavformat/nut.c	27 Nov 2005 16:55:00 -0000
 @@ -35,9 +35,6 @@
  #include "mpegaudio.h"
  #include "avi.h"
@@ -700,7 +724,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/ogg.c,v
 retrieving revision 1.26
 diff -u -r1.26 ogg.c
 --- ../ffmpeg/libavformat/ogg.c	23 Sep 2005 00:25:41 -0000	1.26
-+++ ../ffmpeg/libavformat/ogg.c	21 Nov 2005 23:02:11 -0000
++++ ../ffmpeg/libavformat/ogg.c	27 Nov 2005 16:55:00 -0000
 @@ -12,9 +12,6 @@
  
  #include "avformat.h"
@@ -717,7 +741,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/os_support.c,v
 retrieving revision 1.4
 diff -u -r1.4 os_support.c
 --- ../ffmpeg/libavformat/os_support.c	9 Nov 2004 17:27:33 -0000	1.4
-+++ ../ffmpeg/libavformat/os_support.c	21 Nov 2005 23:02:11 -0000
++++ ../ffmpeg/libavformat/os_support.c	27 Nov 2005 16:55:00 -0000
 @@ -18,7 +18,8 @@
   */
  #include "config.h"
@@ -758,7 +782,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/swf.c,v
 retrieving revision 1.29
 diff -u -r1.29 swf.c
 --- ../ffmpeg/libavformat/swf.c	23 Sep 2005 00:25:41 -0000	1.29
-+++ ../ffmpeg/libavformat/swf.c	21 Nov 2005 23:02:12 -0000
++++ ../ffmpeg/libavformat/swf.c	27 Nov 2005 16:55:00 -0000
 @@ -54,9 +54,6 @@
  #define VIDEO_ID 0
  #define SHAPE_ID  1
@@ -775,7 +799,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/utils.c,v
 retrieving revision 1.168
 diff -u -r1.168 utils.c
 --- ../ffmpeg/libavformat/utils.c	4 Nov 2005 23:50:11 -0000	1.168
-+++ ../ffmpeg/libavformat/utils.c	21 Nov 2005 23:02:13 -0000
++++ ../ffmpeg/libavformat/utils.c	27 Nov 2005 16:55:02 -0000
 @@ -18,9 +18,6 @@
   */
  #include "avformat.h"
@@ -808,7 +832,7 @@ RCS file: /cvsroot/ffmpeg/ffmpeg/libavutil/common.h,v
 retrieving revision 1.153
 diff -u -r1.153 common.h
 --- ../ffmpeg/libavutil/common.h	19 Sep 2005 23:26:47 -0000	1.153
-+++ ../ffmpeg/libavutil/common.h	21 Nov 2005 23:02:13 -0000
++++ ../ffmpeg/libavutil/common.h	27 Nov 2005 16:55:02 -0000
 @@ -172,6 +172,11 @@
  
  #        define snprintf _snprintf
@@ -821,3 +845,13 @@ diff -u -r1.153 common.h
  #    endif
  
  /* CONFIG_WIN32 end */
+@@ -253,6 +258,9 @@
+ #        endif
+ 
+ #    endif /* !CONFIG_WIN32 */
++#    ifdef CONFIG_WINCE
++#            define abort()
++#    endif
+ 
+ #    define av_abort()      do { av_log(NULL, AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
+ 
