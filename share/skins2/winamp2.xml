@@ -345,7 +345,7 @@
                 </Playlist>
                 <Button x="14" y="86" up="pl_add_up" down="pl_add_down" over="pl_add_up" action="playlist.add()" lefttop="leftbottom" rightbottom="leftbottom" />
                 <Button x="43" y="86" up="pl_sub_up" down="pl_sub_down" over="pl_sub_up" action="playlist.del()" lefttop="leftbottom" rightbottom="leftbottom" />
-                <Text font="text_font" x="186" y="101" width="35" text="$t" visible="not vlc.isStopped" lefttop="rightbottom" scrolling="none" alignment="right" />
+                <Text font="text_font" x="186" y="101" width="35" text="$t" visible="not vlc.isStopped" lefttop="rightbottom" rightbottom="rightbottom" scrolling="none" alignment="right" />
                 <Button x="131" y="101" up="pl_previous" down="pl_previous" over="pl_previous" action="playlist.previous()" lefttop="rightbottom" />
                 <Button x="140" y="101" up="pl_play" down="pl_play" over="pl_play" action="vlc.play()" lefttop="rightbottom" />
                 <Button x="149" y="101" up="pl_pause" down="pl_pause" over="pl_pause" action="vlc.pause()" lefttop="rightbottom" />
