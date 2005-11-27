@@ -70,7 +70,19 @@ void CtrlImage::handleEvent( EvtGeneric &rEvent )
 
 bool CtrlImage::mouseOver( int x, int y ) const
 {
-    return m_pImage->hit( x, y );
+    if( m_resizeMethod == kMosaic &&
+        x >= 0 && x < getPosition()->getWidth() &&
+        y >= 0 && y < getPosition()->getHeight() )
+    {
+        // In mosaic mode, convert the coordinates to make them fit to the
+        // size of the original image
+        return m_pImage->hit( x % m_pImage->getWidth(),
+                              y % m_pImage->getHeight() );
+    }
+    else
+    {
+        return m_pImage->hit( x, y );
+    }
 }
 
 
