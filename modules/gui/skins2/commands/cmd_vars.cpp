@@ -65,3 +65,9 @@ void CmdSetEqBands::execute()
     m_rEqBands.set( m_value );
 }
 
+
+void CmdSetEqPreamp::execute()
+{
+    // Change the preamp variable
+    m_rPreamp.set( m_value, false );
+}

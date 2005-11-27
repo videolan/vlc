@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Olivier Teuliï¿½e <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,6 +98,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
     REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
+    REGISTER_VAR( m_cVarEqPreamp, EqualizerPreamp, "equalizer.preamp" )
 #undef REGISTER_VAR
     m_cVarStreamName = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
@@ -304,9 +305,11 @@ void VlcProc::refreshAudio()
     {
         if( pAout != m_pAout )
         {
-            // Register the equalizer callback
+            // Register the equalizer callbacks
             if( !var_AddCallback( pAout, "equalizer-bands",
-                                 onEqBandsChange, this ) )
+                                  onEqBandsChange, this ) &&
+                !var_AddCallback( pAout, "equalizer-preamp",
+                                  onEqPreampChange, this ) )
             {
                 m_pAout = pAout;
                 //char * psz_bands = var_GetString( p_aout, "equalizer-bands" );
@@ -561,6 +564,23 @@ int VlcProc::onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
     CmdSetEqBands *pCmd = new CmdSetEqBands( pThis->getIntf(),
                                              pThis->m_varEqBands,
                                              newVal.psz_string );
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+
+    return VLC_SUCCESS;
+}
+
+
+int VlcProc::onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
+                               vlc_value_t oldVal, vlc_value_t newVal,
+                               void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+    EqualizerPreamp *pVarPreamp = (EqualizerPreamp*)(pThis->m_cVarEqPreamp.get());
+
+    // Post a set preamp command
+    CmdSetEqPreamp *pCmd = new CmdSetEqPreamp( pThis->getIntf(), *pVarPreamp,
+                                              (newVal.f_float + 20.0) / 40.0 );
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
 

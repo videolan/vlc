@@ -56,4 +56,17 @@ class EqualizerBands: public SkinObject, public Observer<VarPercent>
 };
 
 
+/// Variable for equalizer preamp
+class EqualizerPreamp: public VarPercent
+{
+    public:
+        EqualizerPreamp( intf_thread_t *pIntf );
+        virtual ~EqualizerPreamp() {}
+
+        virtual void set( float percentage, bool updateVLC );
+
+        void set( float percentage ) { set( percentage, true ); }
+};
+
+
 #endif

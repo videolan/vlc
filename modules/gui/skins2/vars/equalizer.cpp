@@ -96,7 +96,7 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand )
             ss << " " << val;
         }
 
-        aout_instance_t *pAout= (aout_instance_t *)vlc_object_find( getIntf(),
+        aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
         char *bands = (char*)ss.str().c_str();
         config_PutPsz( getIntf(), "equalizer-bands", bands );
@@ -109,3 +109,31 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand )
     }
 }
 
+
+EqualizerPreamp::EqualizerPreamp( intf_thread_t *pIntf ): VarPercent( pIntf )
+{
+    // Initial value
+    VarPercent::set( 0.8 );
+}
+
+
+void EqualizerPreamp::set( float percentage, bool updateVLC )
+{
+    VarPercent::set( percentage );
+
+    // Avoid infinite loop
+    if( updateVLC )
+    {
+        float val = 40 * percentage - 20;
+
+        aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
+                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        config_PutFloat( getIntf(), "equalizer-preamp", val );
+        if( pAout )
+        {
+            // Update the audio output
+            var_SetFloat( pAout, "equalizer-preamp", val );
+            vlc_object_release( pAout );
+        }
+    }
+}

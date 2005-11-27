@@ -248,34 +248,37 @@
                 <Button x="254" y="3" up="eq_switch_up" down="eq_switch_down" over="eq_switch_up" action="equalizer_window.setLayout(eq_small_layout)" tooltiptext="Switch" />
                 <Button x="264" y="3" up="eq_close_up" down="eq_close_down" over="eq_close_up" action="equalizer_window.hide()" tooltiptext="Close the window" />
                 <Checkbox x="15" y="18" up1="eq_notok_up" down1="eq_notok_down" up2="eq_ok_up" down2="eq_ok_down" state="equalizer.isEnabled" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable equalizer" tooltiptext2="Disable equalizer" />
-                <Slider value="equalizer.band(0)" x="78" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+               <Slider value="equalizer.preamp" x="21" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(1)" x="96" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(0)" x="78" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(2)" x="114" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(1)" x="96" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(3)" x="132" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(2)" x="114" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(4)" x="150" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(3)" x="132" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(5)" x="168" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(4)" x="150" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(6)" x="186" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(5)" x="168" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(7)" x="204" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(6)" x="186" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(8)" x="222" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(7)" x="204" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
-                <Slider value="equalizer.band(9)" x="240" y="37" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                <Slider value="equalizer.band(8)" x="222" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
+                    <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
+                </Slider>
+                <Slider value="equalizer.band(9)" x="240" y="39" up="eq_slider_up" down="eq_slider_down" points="(6,55),(6,7)" thickness="6" tooltiptext="">
                     <SliderBackground image="eq_slider_bg" nbhoriz="14" nbvert="2" padhoriz="1" padvert="1" />
                 </Slider>
             </Group>

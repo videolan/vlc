@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Olivier Teuliï¿½e <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "../utils/var_percent.hpp"
 #include <string>
 
-/// Variable for VLC strem time
+/// Variable for VLC stream time
 class StreamTime: public VarPercent
 {
     public:

@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *          Olivier Teuliï¿½e <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,8 +119,9 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarSeekable;
         /// Variable for the vout
         VarBox m_varVoutSize;
-        /// Equalizer variable
+        /// Equalizer variables
         EqualizerBands m_varEqBands;
+        VariablePtr m_cVarEqPreamp;
         VariablePtr m_cVarEqualizer;
 
         /// Set of handles of vout windows
@@ -194,6 +195,11 @@ class VlcProc: public SkinObject
         static int onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
                                     vlc_value_t oldVal, vlc_value_t newVal,
                                     void *pParam );
+
+        /// Callback for equalizer-preamp variable
+        static int onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
+                                     vlc_value_t oldVal, vlc_value_t newVal,
+                                     void *pParam );
 };
 
 

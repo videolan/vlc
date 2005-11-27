@@ -28,6 +28,7 @@
 #include "../utils/ustring.hpp"
 
 class EqualizerBands;
+class EqualizerPreamp;
 class VarText;
 
 /// Command to notify the playlist of a change
@@ -76,6 +77,29 @@ class CmdSetText: public CmdGeneric
         VarText &m_rText;
         /// Value to set
         const UString m_value;
+};
+
+
+/// Command to set the equalizer preamp
+class CmdSetEqPreamp: public CmdGeneric
+{
+    public:
+        CmdSetEqPreamp( intf_thread_t *pIntf, EqualizerPreamp &rPreamp,
+                       float value ):
+            CmdGeneric( pIntf ), m_rPreamp( rPreamp ), m_value( value ) {}
+        virtual ~CmdSetEqPreamp() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "set equalizer preamp"; }
+
+    private:
+        /// Preamp variable to set
+        EqualizerPreamp &m_rPreamp;
+        /// Value to set
+        float m_value;
 };
 
 
