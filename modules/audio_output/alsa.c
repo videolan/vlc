@@ -407,7 +407,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
     }
-    else
+    else if( val.i_int != AOUT_VAR_SPDIF )
     {
         /* This should not happen ! */
         msg_Err( p_aout, "internal: can't find audio-device (%i)", val.i_int );
