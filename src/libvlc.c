@@ -2556,9 +2556,21 @@ static void InitDeviceValues( vlc_t *p_vlc )
     char **devices;
     char *block_dev;
     dbus_bool_t b_dvd;
+    DBusConnection *p_connection;
+    DBusError       error;
 
 #ifdef HAVE_HAL_1
-    if( ( ctx = libhal_ctx_init_direct( NULL ) ) )
+    ctx =  libhal_ctx_new();
+    if( !ctx ) return;
+    dbus_error_init( &error );
+    p_connection = dbus_bus_get ( DBUS_BUS_SYSTEM, &error );
+    if( dbus_error_is_set( &error ) )
+    {
+        dbus_error_free( &error );
+        return;
+    }
+    libhal_ctx_set_dbus_connection( ctx, p_connection );
+    if( !libhal_ctx_init( ctx, &error ) )
 #else
     if( ( ctx = hal_initialize( NULL, FALSE ) ) )
 #endif
@@ -2617,6 +2629,10 @@ static void InitDeviceValues( vlc_t *p_vlc )
 #else
         hal_shutdown( ctx );
 #endif
+    }
+    else
+    {
+        msg_Dbg( p_vlc, "Unable to get HAL device properties" );
     }
 #endif
 }

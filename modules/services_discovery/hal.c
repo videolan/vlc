@@ -104,6 +104,7 @@ static int Open( vlc_object_t *p_this )
     playlist_view_t     *p_view;
 
     DBusError           dbus_error;
+    DBusConnection      *p_connection;
 
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
@@ -111,13 +112,30 @@ static int Open( vlc_object_t *p_this )
     dbus_error_init( &dbus_error );
 
 #ifdef HAVE_HAL_1
-    if( !( p_sys->p_ctx = libhal_ctx_init_direct( &dbus_error ) ) )
+    p_sys->p_ctx = libhal_ctx_new();
+    if( !p_sys->p_ctx )
+    {
+        msg_Err( p_sd, "Unable to create HAL context") ;
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    p_connection = dbus_bus_get( DBUS_BUS_SYSTEM, &dbus_error );
+    if( dbus_error_is_set( &dbus_error ) )
+    {
+        msg_Err( p_sd, "Unable to connect to DBUS: %s", dbus_error.message );
+        dbus_error_free( &dbus_error );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    libhal_ctx_set_dbus_connection( p_sys->p_ctx, p_connection );
+    if( !libhal_ctx_init( p_sys->p_ctx, &dbus_error ) )
 #else
-    if( !( p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
+    if( !(p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
 #endif
     {
-        free( p_sys );
         msg_Err( p_sd, "hal not available : %s", dbus_error.message );
+        dbus_error_free( &dbus_error );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
