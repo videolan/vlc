@@ -304,7 +304,7 @@
                 <Image x="175" y="0" image="pl_small_middle" action="move" />
                 <Image x="200" y="0" image="pl_small_middle" action="move" lefttop="lefttop" rightbottom="righttop" />
                 <Image x="225" y="0" image="pl_small_right_focus" action="move" lefttop="righttop" rightbottom="righttop" />
-                <Image x="250" y="3" image="pl_small_resize" action="resizeSE" lefttop="righttop" rightbottom="righttop" />
+                <Image x="250" y="3" image="pl_small_resize" action="resizeE" lefttop="righttop" rightbottom="righttop" />
                 <Button x="254" y="3" up="pl_small_switch_up" down="pl_switch_down" over="pl_small_switch_up" action="playlist_window.setLayout(pl_big_layout)" tooltiptext="Switch" lefttop="righttop" rightbottom="righttop" />
                 <Button x="264" y="3" up="pl_small_close_up" down="pl_close_down" over="pl_small_close_up" action="playlist_window.hide()" tooltiptext="Close the window" lefttop="righttop" rightbottom="righttop" />
                 <Text font="text_font" x="4" y="4" width="250" text="$N" />
