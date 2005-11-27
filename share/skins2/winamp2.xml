@@ -83,8 +83,11 @@
     </Bitmap>
     <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0001" >
        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
+       <SubBitmap id="time_bg_2" x="0" y="0" width="248" height="2" />
        <SubBitmap id="time_up" x="248" y="0" width="29" height="10" />
+       <SubBitmap id="time_up_2" x="248" y="0" width="29" height="2" />
        <SubBitmap id="time_down" x="278" y="0" width="29" height="10" />
+       <SubBitmap id="time_down_2" x="278" y="0" width="29" height="2" />
     </Bitmap>
     <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0001" >
        <SubBitmap id="menu_up" x="0" y="0" width="9" height="9" />
@@ -137,13 +140,13 @@
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0001">
        <SubBitmap id="volume_bg" x="0" y="0" width="68" height="418" />
-       <SubBitmap id="volume_bg" x="0" y="0" width="65" height="418" />
+       <SubBitmap id="volume_bg_2" x="0" y="0" width="65" height="418" />
        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
     <Font id="playlist_font" file="FreeSansBold.ttf" size="11" />
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits" />
-    <BitmapFont id="digits_font" file="numbers.bmp" type="digits" />
+    <BitmapFont id="digits_font_2" file="numbers.bmp" type="digits" />
     <BitmapFont id="text_font" file="text.bmp" type="text" />
 
     <Window id="main_window" x="100" y="100">
@@ -188,13 +191,13 @@
                 <Image x="26" y="29" image="pause_icon" visible="vlc.isPaused" />
                 <Image x="26" y="29" image="stop_icon" visible="vlc.isStopped" />
                 <Image x="0" y="0" image="title_focus" action="move" />
-                <Text font="digits_font" x="30" y="26" width="72" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
+                <Text font="digits_font;digits_font_2" x="30" y="26" width="72" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
                 <Text font="text_font" x="111" y="27" width="155" text="$N" />
                 <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" tooltiptext="Volume: $V%">
-                    <SliderBackground image="volume_bg" nbvert="28" padvert="2" />
+                    <SliderBackground image="volume_bg;volume_bg_2" nbvert="28" padvert="2" />
                 </Slider>
                 <Image x="16" y="72" image="time_bg" visible="not vlc.isStopped" />
-                <Slider value="time" x="30" y="77" up="time_up" down="time_down" points="(0,0),(218,0)" thickness="5" tooltiptext="Time: $T" visible="not vlc.isStopped" />
+                <Slider value="time" x="30" y="77" up="time_up;time_up_2" down="time_down;time_down_2" points="(0,0),(218,0)" thickness="5" tooltiptext="Time: $T" visible="not vlc.isStopped" />
                 <Button x="6" y="3" up="menu_up" down="menu_down" over="menu_up" action="dialogs.popup()" tooltiptext="Popup menu" />
                 <Button x="244" y="3" up="minimize_up" down="minimize_down" over="minimize_up" action="vlc.minimize()" tooltiptext="Minimize" />
                 <Button x="254" y="3" up="switch_up" down="switch_down" over="switch_up" action="main_window.setLayout(small_layout)" tooltiptext="Switch" />
