@@ -369,6 +369,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
             {
             case CONFIG_CATEGORY:
                 config_data = new ConfigTreeData;
+                if( p_item->i_value == -1 )   break; // Don't display it
                 config_data->psz_name = strdup( config_CategoryNameGet(
                                                             p_item->i_value ) );
                 psz_help = config_CategoryHelpGet( p_item->i_value );
@@ -408,6 +409,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
                 break;
             case CONFIG_SUBCATEGORY:
+                if( p_item->i_value == -1 ) break; // Don't display it
                 if( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
                     p_item->i_value == SUBCAT_AUDIO_GENERAL )
                 {

@@ -94,30 +94,11 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 #define BOOKMARK_LONGTEXT N_( \
     "This option allows you to define playlist bookmarks.")
 
-#define JIEXTRASHORT_TEXT N_("Extra short jump key interval")
-#define JIEXTRASHORT_LONGTEXT N_("Extra short jump key interval in seconds")
-#define JISHORT_TEXT N_("Short jump key interval")
-#define JISHORT_LONGTEXT N_("Short jump key interval in seconds")
-#define JIMEDIUM_TEXT N_("Medium jump key interval")
-#define JIMEDIUM_LONGTEXT N_("Medium jump key interval in seconds")
-#define JILONG_TEXT N_("Long jump key interval")
-#define JILONG_LONGTEXT N_("Long jump key interval in seconds")
-
 vlc_module_begin();
     set_shortname( _("Hotkeys") );
     set_description( _("Hotkeys management interface") );
     set_category( CAT_INTERFACE );
 //    set_subcategory( SUBCAT_INTERFACE_GENERAL );
-
-    /* jump key user defined time intervals */
-    add_integer( "key-jump-extrashort-interval", 3, NULL, JIEXTRASHORT_TEXT,
-                JIEXTRASHORT_LONGTEXT, VLC_FALSE );
-    add_integer( "key-jump-short-interval", 10, NULL, JISHORT_TEXT,
-                JISHORT_LONGTEXT, VLC_FALSE );
-    add_integer( "key-jump-medium-interval", 60, NULL, JIMEDIUM_TEXT,
-                JIMEDIUM_LONGTEXT, VLC_FALSE );
-    add_integer( "key-jump-long-interval", 300, NULL, JILONG_TEXT,
-                JILONG_LONGTEXT, VLC_FALSE );
 
     add_string( "bookmark1", NULL, NULL,
                 BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE );
@@ -418,7 +399,7 @@ static void Run( intf_thread_t *p_intf )
             else if( i_action == ACTIONID_JUMP_BACKWARD_EXTRASHORT && b_seekable )
             {
 #define SET_TIME( a, b ) \
-    i_interval = config_GetInt( p_input, "key-jump-" a "-interval" ); \
+    i_interval = config_GetInt( p_input, a "-jump-size" ); \
     if( i_interval > 0 ) { \
         val.i_time = ( (mtime_t)(i_interval * b) * 1000000L \
                        * ((mtime_t)(1 << i_times))); \

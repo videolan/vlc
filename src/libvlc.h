@@ -808,34 +808,45 @@ static char *ppsz_clock_descriptions[] =
 #define POSITION_KEY_TEXT N_("Position")
 #define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position.")
 
-/* FIXME : jump keys descriptions */
-#define JBEXTRASHORT_KEY_TEXT N_("Jump 'extrashort' seconds backwards")
+#define JBEXTRASHORT_KEY_TEXT N_("Very short backwards jump")
 #define JBEXTRASHORT_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'extrashort' seconds backwards.")
-#define JBSHORT_KEY_TEXT N_("Jump 'short' seconds backwards")
+    N_("Select the hotkey to make a very short backwards jump.")
+#define JBSHORT_KEY_TEXT N_("Short backwards jump")
 #define JBSHORT_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'short' seconds backwards.")
+    N_("Select the hotkey to make a short backwards jump.")
 
-#define JBMEDIUM_KEY_TEXT N_("Jump 'medium' seconds backwards")
+#define JBMEDIUM_KEY_TEXT N_("Medium backwards jump")
 #define JBMEDIUM_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'medium' seconds backwards.")
-#define JBLONG_KEY_TEXT N_("Jump 'long' seconds backwards")
+    N_("Select the hotkey to make a medium backwards jump.")
+#define JBLONG_KEY_TEXT N_("Long backwards jump")
 #define JBLONG_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'long seconds' backwards.")
+    N_("Select the hotkey to make a long backwards jump.")
 
-#define JFEXTRASHORT_KEY_TEXT N_("Jump 'extrashort' seconds forward")
+#define JFEXTRASHORT_KEY_TEXT N_("Very short forward jump")
 #define JFEXTRASHORT_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'extrashort' seconds forward.")
-#define JFSHORT_KEY_TEXT N_("Jump 'short' seconds forward")
+    N_("Select the hotkey to make a very short forward jump.")
+#define JFSHORT_KEY_TEXT N_("Short forward jump")
 #define JFSHORT_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'short' seconds forward.")
+    N_("Select the hotkey to make a short forward jump.")
 
-#define JFMEDIUM_KEY_TEXT N_("Jump 'medium' seconds forward")
+#define JFMEDIUM_KEY_TEXT N_("Medium forward jump")
 #define JFMEDIUM_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'medium' seconds forward.")
-#define JFLONG_KEY_TEXT N_("Jump 'long' seconds forward")
+    N_("Select the hotkey to make a medium forward jump.")
+#define JFLONG_KEY_TEXT N_("Long forward jump")
 #define JFLONG_KEY_LONGTEXT \
-    N_("Select the hotkey to jump 'long' seconds forward.")
+    N_("Select the hotkey to make a long forward jump.")
+
+#define JIEXTRASHORT_TEXT N_("Very short jump size")
+#define JIEXTRASHORT_LONGTEXT N_("Very short jump \"size\", in seconds")
+#define JISHORT_TEXT N_("Short jump size")
+#define JISHORT_LONGTEXT N_("Short jump \"size\", in seconds")
+#define JIMEDIUM_TEXT N_("Medium jump size")
+#define JIMEDIUM_LONGTEXT N_("Medium jump \"size\", in seconds")
+#define JILONG_TEXT N_("Long jump size")
+#define JILONG_LONGTEXT N_("Long jump \"size\", in seconds")
+
+
+
 
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application.")
@@ -1566,7 +1577,6 @@ vlc_module_begin();
              JBLONG_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump+long", KEY_JUMP_PLONG, NULL, JFLONG_KEY_TEXT,
              JFLONG_KEY_LONGTEXT, VLC_FALSE );
-
     add_key( "key-nav-activate", KEY_NAV_ACTIVATE, NULL, NAV_ACTIVATE_KEY_TEXT,
              NAV_ACTIVATE_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-nav-up", KEY_NAV_UP, NULL, NAV_UP_KEY_TEXT,
@@ -1588,7 +1598,6 @@ vlc_module_begin();
              CHAPTER_PREV_LONGTEXT, VLC_TRUE );
     add_key( "key-chapter-next", KEY_CHAPTER_NEXT, NULL, CHAPTER_NEXT_TEXT,
              CHAPTER_NEXT_LONGTEXT, VLC_TRUE );
-                          
     add_key( "key-quit", KEY_QUIT, NULL, QUIT_KEY_TEXT,
              QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", KEY_VOL_UP, NULL, VOL_UP_KEY_TEXT,
@@ -1614,8 +1623,25 @@ vlc_module_begin();
     add_key( "key-intf-hide", KEY_INTF_HIDE, NULL,
              INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, VLC_TRUE );             
     add_key( "key-snapshot", KEY_SNAPSHOT, NULL,
-             SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, VLC_TRUE );
+        SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-history-back", KEY_HISTORY_BACK, NULL, HISTORY_BACK_TEXT,
+             HISTORY_BACK_LONGTEXT, VLC_TRUE );
+    add_key( "key-history-forward", KEY_HISTORY_FORWARD, NULL,
+             HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
+    add_key( "key-record", KEY_RECORD, NULL,
+             RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, VLC_TRUE );
+    add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
+                                    JIEXTRASHORT_LONGTEXT, VLC_FALSE );
+    add_integer( "short-jump-size", 10, NULL, JISHORT_TEXT,
+                                    JISHORT_LONGTEXT, VLC_FALSE );
+    add_integer( "medium-jump-size", 60, NULL, JIMEDIUM_TEXT,
+                                    JIMEDIUM_LONGTEXT, VLC_FALSE );
+    add_integer( "long-jump-size", 300, NULL, JILONG_TEXT,
+                                    JILONG_LONGTEXT, VLC_FALSE );
 
+    /* HACK so these don't get displayed */
+    set_category( -1 );
+    set_subcategory( -1 );
     add_key( "key-set-bookmark1", KEY_SET_BOOKMARK1, NULL,
              SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-set-bookmark2", KEY_SET_BOOKMARK2, NULL,
@@ -1656,12 +1682,6 @@ vlc_module_begin();
              PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark10", KEY_PLAY_BOOKMARK10, NULL,
              PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
-    add_key( "key-history-back", KEY_HISTORY_BACK, NULL, HISTORY_BACK_TEXT,
-             HISTORY_BACK_LONGTEXT, VLC_TRUE );
-    add_key( "key-history-forward", KEY_HISTORY_FORWARD, NULL,
-             HISTORY_FORWARD_TEXT, HISTORY_FORWARD_LONGTEXT, VLC_TRUE );
-    add_key( "key-record", KEY_RECORD, NULL,
-             RECORD_KEY_TEXT, RECORD_KEY_LONGTEXT, VLC_TRUE );
 
     /* Usage (mainly useful for cmd line stuff) */
     /* add_usage_hint( PLAYLIST_USAGE ); */
