@@ -72,9 +72,10 @@
        <SubBitmap id="pl_small_switch_up" x="128" y="45" width="9" height="9" />
        <SubBitmap id="pl_small_close_up" x="138" y="45" width="9" height="9" />
        <SubBitmap id="pl_small_resize" x="25" y="3" width="9" height="8" />
-       <SubBitmap id="pl_add_up" x="14" y="80" width="22" height="18" />
-       <SubBitmap id="pl_sub_up" x="43" y="80" width="22" height="18" />
-       <SubBitmap id="pl_file_down" x="23" y="149" width="22" height="18" />
+       <SubBitmap id="pl_add_up" x="0" y="149" width="22" height="18" />
+       <SubBitmap id="pl_add_down" x="23" y="149" width="22" height="18" />
+       <SubBitmap id="pl_rem_up" x="54" y="149" width="22" height="18" />
+       <SubBitmap id="pl_rem_down" x="77" y="149" width="22" height="18" />
     </Bitmap>
     <Bitmap id="playpaus" file="playpaus.bmp" alphacolor="#FF0001">
         <SubBitmap id="play_icon" x="0" y="0" width="9" height="9" />
@@ -339,8 +340,8 @@
                 <Playlist id="playlist" x="10" y="20" width="240" height="58" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#dfdfff" playcolor="#ffffff" bgcolor1="#000000" bgcolor2="#000000" selcolor="#404040" >
                     <Slider id="playlist_slider" x="264" y="28" lefttop="righttop" rightbottom="rightbottom" up="pl_slider_up" down="pl_slider_down" points="(0,40),(0,0)" />
                 </Playlist>
-                <Button x="14" y="86" up="pl_add_up" down="pl_file_down" over="pl_add_up" action="playlist.add()" lefttop="leftbottom" rightbottom="leftbottom" />
-                <Button x="43" y="86" up="pl_sub_up" down="pl_file_down" over="pl_sub_up" action="playlist.del()" lefttop="leftbottom" rightbottom="leftbottom" />
+                <Button x="14" y="86" up="pl_add_up" down="pl_add_down" over="pl_add_up" action="playlist.add()" lefttop="leftbottom" rightbottom="leftbottom" />
+                <Button x="43" y="86" up="pl_rem_up" down="pl_rem_down" over="pl_rem_up" action="playlist.del()" lefttop="leftbottom" rightbottom="leftbottom" />
                 <Text font="text_font" x="186" y="101" width="35" text="$t" visible="not vlc.isStopped" lefttop="rightbottom" scrolling="none" alignment="right" />
                 <Button x="131" y="101" up="pl_previous" down="pl_previous" over="pl_previous" action="playlist.previous()" lefttop="rightbottom" />
                 <Button x="140" y="101" up="pl_play" down="pl_play" over="pl_play" action="vlc.play()" lefttop="rightbottom" />
