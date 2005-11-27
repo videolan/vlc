@@ -32,13 +32,13 @@
 class EvtSpecial: public EvtGeneric
 {
     public:
-        typedef enum
+        enum ActionType_t
         {
             kShow,
             kHide,
             kEnable,
             kDisable
-        } ActionType_t;
+        };
 
         EvtSpecial( intf_thread_t *pIntf, ActionType_t action ):
             EvtGeneric( pIntf ), m_action( action ) {}

@@ -32,11 +32,11 @@
 class EvtScroll: public EvtInput
 {
     public:
-        typedef enum
+        enum Direction_t
         {
             kUp,
             kDown
-        } Direction_t;
+        };
 
         EvtScroll( intf_thread_t *pIntf, int xPos, int yPos,
                    Direction_t direction, int mod = kModNone ):

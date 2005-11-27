@@ -38,12 +38,12 @@ class Bezier: public SkinObject
     public:
         /// Values to indicate which coordinate(s) must be checked to consider
         /// that two points are distinct
-        typedef enum
+        enum Flag_t
         {
             kCoordsBoth,    // x or y must be different (default)
             kCoordsX,       // only x is different
             kCoordsY        // only y is different
-        } Flag_t;
+        };
 
         Bezier( intf_thread_t *p_intf,
                 const vector<float> &pAbscissas,

@@ -37,11 +37,11 @@ class CtrlImage: public CtrlFlat
 {
     public:
         /// Resize methods
-        typedef enum
+        enum resize_t
         {
             kMosaic,  // Repeat the base image in a mosaic
             kScale    // Scale the base image
-        } resize_t;
+        };
 
         // Create an image with the given bitmap (which is NOT copied)
         CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,

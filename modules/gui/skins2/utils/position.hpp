@@ -68,7 +68,7 @@ class Position
 {
     public:
         /// Type for reference edge/corner
-        typedef enum
+        enum Ref_t
         {
             /// Coordinates are relative to the upper left corner
             kLeftTop,
@@ -78,7 +78,7 @@ class Position
             kLeftBottom,
             /// Coordinates are relative to the lower right corner
             kRightBottom
-        } Ref_t;
+        };
 
         /// Create a new position relative to the given box
         Position( int left, int top, int right, int bottom, const Box &rBox,

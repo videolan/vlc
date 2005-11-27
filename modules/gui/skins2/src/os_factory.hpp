@@ -44,14 +44,14 @@ class OSTimer;
 class OSFactory: public SkinObject
 {
     public:
-        typedef enum
+        enum CursorType_t
         {
             kDefaultArrow,
             kResizeNS,
             kResizeWE,
             kResizeNWSE,
             kResizeNESW
-        } CursorType_t;
+        };
 
         /// Initialization method overloaded in derived classes.
         /// It must return false if the init failed.

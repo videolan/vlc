@@ -32,19 +32,19 @@
 class EvtMouse: public EvtInput
 {
     public:
-        typedef enum
+        enum ButtonType_t
         {
             kLeft,
             kMiddle,
             kRight
-        } ButtonType_t;
+        };
 
-        typedef enum
+        enum ActionType_t
         {
             kDown,
             kUp,
             kDblClick
-        } ActionType_t;
+        };
 
         EvtMouse( intf_thread_t *pIntf, int xPos, int yPos, ButtonType_t button,
                   ActionType_t action, int mod = kModNone ):

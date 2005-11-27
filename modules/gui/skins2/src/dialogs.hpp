@@ -97,12 +97,12 @@ class Dialogs: public SkinObject
         typedef void DlgCallback( intf_dialog_args_t *pArg );
 
         /// Possible flags for the open/save dialog
-        typedef enum
+        enum flags_t
         {
             kOPEN     = 0x01,
             kSAVE     = 0x02,
             kMULTIPLE = 0x04
-        } flags_t;
+        };
 
         /// Initialization method
         bool init();

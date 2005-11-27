@@ -32,11 +32,11 @@
 class EvtKey: public EvtInput
 {
     public:
-        typedef enum
+        enum ActionType_t
         {
             kDown,
             kUp
-        } ActionType_t;
+        };
 
         EvtKey( intf_thread_t *pIntf, int key, ActionType_t action,
                 int mod = kModNone ):
