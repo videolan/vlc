@@ -238,6 +238,7 @@ static int OpenVideo( vlc_object_t *p_this )
     var_Create( p_vout, "directx-3buffering", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -303,6 +304,30 @@ static int OpenVideo( vlc_object_t *p_this )
     var_AddCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
     var_Get( p_vout, "directx-wallpaper", &val );
     var_Set( p_vout, "directx-wallpaper", val );
+
+    /* disable screensaver by temporarily changing system settings */
+    p_vout->p_sys->i_spi_lowpowertimeout = 0;
+    p_vout->p_sys->i_spi_powerofftimeout = 0;
+    p_vout->p_sys->i_spi_screensavetimeout = 0;
+    var_Get( p_vout, "disable-screensaver", &val);
+    if( val.b_bool ) {
+	msg_Dbg(p_vout, "disabling screen saver");
+	SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT,
+	    0, &(p_vout->p_sys->i_spi_lowpowertimeout), 0);
+	if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
+	    SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT, 0, NULL, 0);
+	}
+	SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0,
+	    &(p_vout->p_sys->i_spi_powerofftimeout), 0);
+	if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
+	    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 0, NULL, 0);
+	}
+	SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0,
+	    &(p_vout->p_sys->i_spi_screensavetimeout), 0);
+	if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
+	    SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT, 0, NULL, 0);
+	}
+    }
 
     return VLC_SUCCESS;
 
@@ -468,6 +493,20 @@ static void CloseVideo( vlc_object_t *p_this )
 
     /* Make sure the wallpaper is restored */
     SwitchWallpaperMode( p_vout, VLC_FALSE );
+
+    /* restore screensaver system settings */
+    if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
+	SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,
+	    p_vout->p_sys->i_spi_lowpowertimeout, NULL, 0);
+    }
+    if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
+	SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,
+	    p_vout->p_sys->i_spi_powerofftimeout, NULL, 0);
+    }
+    if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
+	SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT,
+	    p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
+    }
 
     if( p_vout->p_sys )
     {
