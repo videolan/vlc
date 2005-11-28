@@ -4,7 +4,7 @@
  * Copyright (C) 2001 the VideoLAN team
  * $Id$
  *
- * Authors: Loïc Minier <lool@videolan.org>
+ * Authors: LoÃ¯c Minier <lool@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -232,14 +232,12 @@ static void Run( intf_thread_t *p_intf )
             }
             if( p_playlist->status.i_status == PLAYLIST_STOPPED )
             {
-                psz_display = (char *)malloc( sizeof(char )*strlen(_("Stop")));
-                sprintf( psz_display,_("Stop") );
+                psz_display = strdup(_("Stop"));
                 vlc_object_release( p_playlist );
             }
             else if( p_playlist->status.i_status == PLAYLIST_PAUSED )
             {
-                psz_display = (char *)malloc( sizeof(char )*strlen(_("Pause")));
-                sprintf( psz_display,_("Pause") );
+                psz_display = strdup(_("Pause"));
                 vlc_object_release( p_playlist );
             }
             else
