@@ -461,6 +461,13 @@ void Builder::addImage( const BuilderData::Image &rData )
         return;
     }
 
+    CmdGeneric *pCommand = parseAction( rData.m_action2Id );
+    if( pCommand == NULL )
+    {
+        msg_Err( getIntf(), "Invalid action: %s", rData.m_action2Id.c_str() );
+        return;
+    }
+
     // Get the visibility variable
     // XXX check when it is null
     Interpreter *pInterpreter = Interpreter::instance( getIntf() );
@@ -468,8 +475,8 @@ void Builder::addImage( const BuilderData::Image &rData )
 
     CtrlImage::resize_t resizeMethod =
         (rData.m_resize == "scale" ? CtrlImage::kScale : CtrlImage::kMosaic);
-    CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp, resizeMethod,
-        UString( getIntf(), rData.m_help.c_str() ), pVisible );
+    CtrlImage *pImage = new CtrlImage( getIntf(), *pBmp, *pCommand,
+        resizeMethod, UString( getIntf(), rData.m_help.c_str() ), pVisible );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,

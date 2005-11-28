@@ -213,14 +213,15 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         CheckDefault( "lefttop", "lefttop" );
         CheckDefault( "rightbottom", "lefttop" );
         CheckDefault( "action", "none" );
+        CheckDefault( "action2", "none" );
         CheckDefault( "resize", "mosaic" );
         CheckDefault( "help", "" );
 
         const BuilderData::Image imageData( uniqueId( attr["id"] ),
                 atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
                 attr["lefttop"], attr["rightbottom"], attr["visible"],
-                attr["image"], attr["action"], attr["resize"], attr["help"],
-                m_curLayer, m_curWindowId, m_curLayoutId );
+                attr["image"], attr["action"], attr["action2"], attr["resize"],
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_pData->m_listImage.push_back( imageData );
     }

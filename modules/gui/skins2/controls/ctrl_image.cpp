@@ -32,10 +32,10 @@
 
 
 CtrlImage::CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
-                      resize_t resizeMethod, const UString &rHelp,
-                      VarBool *pVisible ):
+                      CmdGeneric &rCommand, resize_t resizeMethod,
+                      const UString &rHelp, VarBool *pVisible ):
     CtrlFlat( pIntf, rHelp, pVisible ), m_rBitmap( rBitmap ),
-    m_resizeMethod( resizeMethod )
+    m_rCommand( rCommand ), m_resizeMethod( resizeMethod )
 {
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
     // Create an initial unscaled image in the buffer
@@ -64,7 +64,10 @@ void CtrlImage::handleEvent( EvtGeneric &rEvent )
         CmdDlgHidePopupMenu cmd( getIntf() );
         cmd.execute();
     }
-
+    else if( rEvent.getAsString() == "mouse:left:dblclick:none" )
+    {
+        m_rCommand.execute();
+    }
 }
 
 
@@ -97,8 +100,8 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
         if( m_resizeMethod == kScale )
         {
             // Use scaling method
-            if(  width != m_pImage->getWidth() ||
-                 height != m_pImage->getHeight() )
+            if( width != m_pImage->getWidth() ||
+                height != m_pImage->getHeight() )
             {
                 OSFactory *pOsFactory = OSFactory::instance( getIntf() );
                 // Rescale the image with the actual size of the control

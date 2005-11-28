@@ -96,6 +96,7 @@
         rightbottom CDATA   "lefttop"
         image       CDATA   #REQUIRED
         action      CDATA   "none"
+        action      CDATA   "none2"
         resize      CDATA   "mosaic"
         help        CDATA   ""
     >

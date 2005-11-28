@@ -217,8 +217,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Image
     {
-        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & bmpId, const string & actionId, const string & resize, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_resize( resize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, const string & visible, const string & bmpId, const string & actionId, const string & action2Id, const string & resize, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_action2Id( action2Id ), m_resize( resize ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         string m_id;
         int m_xPos;
@@ -228,6 +228,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         string m_visible;
         string m_bmpId;
         string m_actionId;
+        string m_action2Id;
         string m_resize;
         string m_help;
         int m_layer;
