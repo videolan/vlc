@@ -52,7 +52,6 @@ Interfaces:
  * wxWidgets
     - Rename wxWindows interface in wxWidgets.
     - All the --wxwin-* options are now --wx-*
-    - VLC update checker
     - Support for RTP streaming in Stream Ouput dialog
     - Now require wx2.6 with Unicode support
  * Skins2
@@ -72,9 +71,11 @@ Mac OS X port:
 
 Windows port:
 * Fixed bandwidth problems of HTTP streaming
+* Fixed audio problems with DirectX audio output
 
 Translations:
  The following languages were added:
+ * Galician
  * Korean
  * Romanian
  * Simplified Chinese
