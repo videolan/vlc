@@ -121,7 +121,6 @@ src/misc/threads.c
 src/misc/tls.c
 src/misc/unicode.c
 src/misc/variables.c
-src/misc/version.c
 src/misc/vlm.c
 src/misc/win32_specific.c
 src/misc/xml.c
