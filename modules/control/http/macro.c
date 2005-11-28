@@ -150,7 +150,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
     }
 #define PRINT( str ) \
     ALLOC( strlen( str ) + 1 ); \
-    *pp_dst += sprintf( *pp_dst, str );
+    *pp_dst += sprintf( *pp_dst, "%s", str );
 
 #define PRINTS( str, s ) \
     ALLOC( strlen( str ) + strlen( s ) + 1 ); \
