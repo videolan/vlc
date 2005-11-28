@@ -68,6 +68,8 @@ endif
 # For libebml/libmatroska. Grrr.
 ifneq ($(AR),)
 HOSTCC2=$(HOSTCC) AR="$(AR) rcvu"
+else
+HOSTCC2=$(HOSTCC)
 endif
 
 ifneq ($(BUILD),$(HOST))
@@ -820,7 +822,7 @@ endif
 
 .matroska: libmatroska .ebml
 ifdef HAVE_WIN32
-	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC2) CPPFLAGS=$(CFLAGS) libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC2))
+	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC2) SHARED=no EBML_DLL=no libmatroska.a && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC2))
 else
 	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libmatroska.a
