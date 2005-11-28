@@ -17,18 +17,18 @@ class VLCPlayerFrame  extends Frame {
         pauseButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
 
-//	jPanel = new javax.swing.JPanel();
         jvcc  = new JVLCCanvas();
+	jvcc.setSize( 100, 100 );
  	jvlc = jvcc.getJVLCObject();
-//	jPanel.add( jvcc );
-	add( jvcc );
 
 	// FIXME: Does not work with GridBagLayout
-	setLayout(new java.awt.GridLayout(3,2));
+	setLayout(new java.awt.GridBagLayout());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-//        add( jPanel , gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        add( jvcc , gridBagConstraints);
 
 
         fullScreenButton.setText("FullScreen");

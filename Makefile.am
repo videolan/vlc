@@ -1107,7 +1107,7 @@ update-po:
 	  echo "" ; \
 	  echo "# main sources" ; \
 	  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
-	    | grep -v '\(vlc_symbols\|misc/modules_\)' \
+	    | grep -v '\(vlc_symbols\|misc/modules_\|src/misc/version.c\)' \
 	    | sort ; \
 	  echo "" ; \
 	  echo "# modules" ; \
