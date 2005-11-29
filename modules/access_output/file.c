@@ -131,6 +131,9 @@ static int Open( vlc_object_t *p_this )
     }
     if( !strcmp( p_access->psz_name, "-" ) )
     {
+#if defined(WIN32)
+        setmode (STDOUT_FILENO, O_BINARY);
+#endif
         p_access->p_sys->i_handle = STDOUT_FILENO;
         msg_Dbg( p_access, "using stdout" );
     }
