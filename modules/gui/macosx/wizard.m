@@ -134,11 +134,11 @@ static VLCWizard *_o_sharedInstance = nil;
         _NS("DivX third version (useable with MPEG TS, MPEG1, ASF and OGG)"), \
         @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", @"NO", @"NO", @"NO", \
         @"NO", @"NO", nil];
-    o_h263 = [NSArray arrayWithObjects: @"H.263", @"H263", \
+    o_h263 = [NSArray arrayWithObjects: @"H.263", @"h263", \
         _NS("H263 is a video codec optimized for videoconference " \
         "(low rates, useable with MPEG TS)"), @"MUX_TS", @"NO", @"NO", @"NO", \
         @"NO", @"NO", @"NO", @"NO", @"NO", nil];
-    o_h264 = [NSArray arrayWithObjects: @"H.264", @"H264", \
+    o_h264 = [NSArray arrayWithObjects: @"H.264", @"h264", \
         _NS("H264 is a new video codec (useable with MPEG TS and MP4)"), \
         @"MUX_TS", @"MUX_MP4", @"NO", @"NO", @"NO", @"NO", @"NO", @"NO", \
         @"NO", nil];
