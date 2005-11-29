@@ -845,9 +845,6 @@ static char *ppsz_clock_descriptions[] =
 #define JILONG_TEXT N_("Long jump size")
 #define JILONG_LONGTEXT N_("Long jump \"size\", in seconds")
 
-
-
-
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application.")
 #define NAV_UP_KEY_TEXT N_("Navigate up")
@@ -916,6 +913,12 @@ static char *ppsz_clock_descriptions[] =
 #define AUDIO_TRACK_KEY_LONGTEXT N_("Cycle through the available audio tracks(languages)")
 #define SUBTITLE_TRACK_KEY_TEXT N_("Cycle subtitle track")
 #define SUBTITLE_TRACK_KEY_LONGTEXT N_("Cycle through the available subtitle tracks")
+#define ASPECT_RATIO_KEY_TEXT N_("Cycle source aspect ratio")
+#define ASPECT_RATIO_KEY_LONGTEXT N_("Cycle through a predefined list of source aspect ratios")
+#define CROP_KEY_TEXT N_("Cycle video crop")
+#define CROP_KEY_LONGTEXT N_("Cycle through a predefined list of crop formats")
+#define DEINTERLACE_KEY_TEXT N_("Cycle deinterlace modes")
+#define DEINTERLACE_KEY_LONGTEXT N_("Cycle through all the deinterlace modes")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
 #define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows")
 #define INTF_HIDE_KEY_TEXT N_("Hide interface")
@@ -1439,6 +1442,9 @@ vlc_module_begin();
 #   define KEY_AUDIODELAY_DOWN    'f'
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
+#   define KEY_ASPECT_RATIO       'a'
+#   define KEY_CROP               'c'
+#   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          'I'
 #   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
@@ -1507,6 +1513,9 @@ vlc_module_begin();
 
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
+#   define KEY_ASPECT_RATIO       'a'
+#   define KEY_CROP               'c'
+#   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          'I'
 #   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
@@ -1618,10 +1627,16 @@ vlc_module_begin();
              AUDIO_TRACK_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK, NULL,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-aspect-ratio", KEY_ASPECT_RATIO, NULL,
+             ASPECT_RATIO_KEY_TEXT, ASPECT_RATIO_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-crop", KEY_CROP, NULL,
+             CROP_KEY_TEXT, CROP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-deinterlace", KEY_DEINTERLACE, NULL,
+             DEINTERLACE_KEY_TEXT, DEINTERLACE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-intf-show", KEY_INTF_SHOW, NULL,
              INTF_SHOW_KEY_TEXT, INTF_SHOW_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-intf-hide", KEY_INTF_HIDE, NULL,
-             INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, VLC_TRUE );             
+             INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-snapshot", KEY_SNAPSHOT, NULL,
         SNAP_KEY_TEXT, SNAP_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-history-back", KEY_HISTORY_BACK, NULL, HISTORY_BACK_TEXT,
@@ -1754,6 +1769,9 @@ static struct hotkey p_hotkeys[] =
     { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, 0, 0, 0, 0 },
     { "key-audio-track", ACTIONID_AUDIO_TRACK, 0, 0, 0, 0 },
     { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0, 0, 0, 0 },
+    { "key-aspect-ratio", ACTIONID_ASPECT_RATIO, 0, 0, 0, 0 },
+    { "key-crop", ACTIONID_CROP, 0, 0, 0, 0 },
+    { "key-deinterlace", ACTIONID_DEINTERLACE, 0, 0, 0, 0 },
     { "key-intf-show", ACTIONID_INTF_SHOW, 0, 0, 0, 0 },
     { "key-intf-hide", ACTIONID_INTF_HIDE, 0, 0, 0, 0 },
     { "key-snapshot", ACTIONID_SNAPSHOT, 0, 0, 0, 0 },

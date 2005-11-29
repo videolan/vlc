@@ -523,6 +523,84 @@ static void Run( intf_thread_t *p_intf )
                                  _("Subtitle track: %s"),
                                  list2.p_list->p_values[i].psz_string );
             }
+            else if( i_action == ACTIONID_ASPECT_RATIO )
+            {
+                vlc_value_t val={0}, val_list, text_list;
+                var_Get( p_vout, "aspect-ratio", &val );
+                if( var_Change( p_vout, "aspect-ratio", VLC_VAR_GETLIST,
+                                &val_list, &text_list ) >= 0 )
+                {
+                    int i;
+                    for( i = 0; i < val_list.p_list->i_count; i++ )
+                    {
+                        if( !strcmp( val_list.p_list->p_values[i].psz_string,
+                                     val.psz_string ) )
+                        {
+                            i++;
+                            break;
+                        }
+                    }
+                    if( i == val_list.p_list->i_count ) i = 0;
+                    var_SetString( p_vout, "aspect-ratio",
+                                   val_list.p_list->p_values[i].psz_string );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Aspect ratio: %s"),
+                                     text_list.p_list->p_values[i].psz_string );
+                }
+                free( val.psz_string );
+            }
+            else if( i_action == ACTIONID_CROP )
+            {
+                vlc_value_t val={0}, val_list, text_list;
+                var_Get( p_vout, "crop", &val );
+                if( var_Change( p_vout, "crop", VLC_VAR_GETLIST,
+                                &val_list, &text_list ) >= 0 )
+                {
+                    int i;
+                    for( i = 0; i < val_list.p_list->i_count; i++ )
+                    {
+                        if( !strcmp( val_list.p_list->p_values[i].psz_string,
+                                     val.psz_string ) )
+                        {
+                            i++;
+                            break;
+                        }
+                    }
+                    if( i == val_list.p_list->i_count ) i = 0;
+                    var_SetString( p_vout, "crop",
+                                   val_list.p_list->p_values[i].psz_string );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Crop: %s"),
+                                     text_list.p_list->p_values[i].psz_string );
+                }
+                free( val.psz_string );
+            }
+            else if( i_action == ACTIONID_DEINTERLACE )
+            {
+                vlc_value_t val={0}, val_list, text_list;
+                var_Get( p_vout, "deinterlace", &val );
+                if( var_Change( p_vout, "deinterlace", VLC_VAR_GETLIST,
+                                &val_list, &text_list ) >= 0 )
+                {
+                    int i;
+                    for( i = 0; i < val_list.p_list->i_count; i++ )
+                    {
+                        if( !strcmp( val_list.p_list->p_values[i].psz_string,
+                                     val.psz_string ) )
+                        {
+                            i++;
+                            break;
+                        }
+                    }
+                    if( i == val_list.p_list->i_count ) i = 0;
+                    var_SetString( p_vout, "deinterlace",
+                                   val_list.p_list->p_values[i].psz_string );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Deinterlace mode: %s"),
+                                     text_list.p_list->p_values[i].psz_string );
+                }
+                free( val.psz_string );
+            }
             else if( i_action == ACTIONID_NEXT )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,

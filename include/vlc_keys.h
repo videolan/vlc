@@ -253,3 +253,6 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_SNAPSHOT              64
 #define ACTIONID_RECORD                65
 #define ACTIONID_DISC_MENU             66
+#define ACTIONID_ASPECT_RATIO          67
+#define ACTIONID_CROP                  68
+#define ACTIONID_DEINTERLACE           69
