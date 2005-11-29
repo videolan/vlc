@@ -111,6 +111,11 @@ struct vout_sys_t
     HGLRC hGLRC;
 #endif
 
+    /* screensaver system settings to be restored when vout is closed */
+    UINT i_spi_lowpowertimeout;
+    UINT i_spi_powerofftimeout;
+    UINT i_spi_screensavetimeout;
+
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
