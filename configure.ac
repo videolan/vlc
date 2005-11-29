@@ -4521,43 +4521,6 @@ then
 fi
 
 dnl
-dnl  SLP access plugin
-dnl
-AC_ARG_ENABLE(slp,
-  [  --enable-slp            SLP service discovery support (default disabled)])
-if test "${enable_slp}" = "yes"
-then
-  AC_ARG_WITH(slp,
-  [    --with-slp=PATH       libslp headers and libraries])
-  if test -z "${with_slp}"
-  then
-    AC_CHECK_HEADERS(slp.h, have_slp="true", have_slp="false")
-    if test "${have_slp}" = "true"
-    then
-      VLC_ADD_PLUGINS([slp])
-      VLC_ADD_LDFLAGS([slp],[-lslp])
-      VLC_ADD_LDFLAGS([stream_out_standard],[-lslp])
-    fi
-  else
-    AC_MSG_CHECKING(for slp headers in ${with_slp})
-    if test -f ${with_slp}/slp.h
-    then
-      dnl  Use ${with_slp}/libslp/slp.h
-      AC_MSG_RESULT(yes)
-      VLC_ADD_PLUGINS([slp])
-      VLC_ADD_LDFLAGS([slp],[-L${with_slp} -lslp])
-      VLC_ADD_LDFLAGS([stream_out_standard],[-L${with_slp} -lslp])
-      VLC_ADD_CPPFLAGS([slp],[-I${with_slp}])
-      AC_DEFINE(HAVE_SLP_H)
-    else
-      dnl  No libslp could be found, sorry
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${with_slp}/slp.h])
-    fi
-  fi
-fi
-
-dnl
 dnl DAAP access plugin and services discovery 
 dnl
 AC_ARG_ENABLE(daap,

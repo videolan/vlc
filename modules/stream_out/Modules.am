@@ -1,8 +1,6 @@
 SOURCES_stream_out_dummy = dummy.c
 SOURCES_stream_out_description = description.c
-SOURCES_stream_out_standard = standard.c \
-                              announce.c \
-                              announce.h
+SOURCES_stream_out_standard = standard.c
 SOURCES_stream_out_transcode = transcode.c
 SOURCES_stream_out_duplicate = duplicate.c
 SOURCES_stream_out_es = es.c

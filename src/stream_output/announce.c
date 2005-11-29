@@ -194,7 +194,7 @@ void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
 /**
  * Create and initialize an announcement method structure
  *
- * \param i_type METHOD_TYPE_SAP or METHOD_TYPE_SLP
+ * \param i_type METHOD_TYPE_SAP
  * \return a new announce_method structure
  */
 announce_method_t * sout_AnnounceMethodCreate( int i_type )
@@ -286,11 +286,6 @@ int announce_Register( announce_handler_t *p_announce,
         /* this will set p_session->p_sap for later deletion */
         msg_Dbg( p_announce, "adding SAP session");
         p_announce->p_sap->pf_add( p_announce->p_sap, p_session );
-    }
-    else if( p_method->i_type == METHOD_TYPE_SLP )
-    {
-        msg_Dbg( p_announce, "SLP unsupported at the moment" );
-        return VLC_EGENERIC;
     }
     else
     {

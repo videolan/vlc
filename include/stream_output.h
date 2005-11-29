@@ -257,7 +257,6 @@ struct session_descriptor_t
 };
 
 #define METHOD_TYPE_SAP 1
-#define METHOD_TYPE_SLP 2
 
 struct announce_method_t
 {

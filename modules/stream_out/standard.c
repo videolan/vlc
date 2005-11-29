@@ -34,7 +34,6 @@
 #    include <unistd.h>
 #endif
 
-#include "announce.h"
 #include "network.h"
 
 /*****************************************************************************
@@ -59,7 +58,7 @@
 
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \
-    "Name of the session that will be announced with SAP or SLP" )
+    "Name of the session that will be announced with SAP" )
 
 #define GROUP_TEXT N_("Session groupname")
 #define GROUP_LONGTEXT N_( \
@@ -67,9 +66,6 @@
 
 #define SAP_TEXT N_("SAP announcing")
 #define SAP_LONGTEXT N_("Announce this session with SAP")
-
-#define SLP_TEXT N_("SLP announcing")
-#define SLP_LONGTEXT N_("Announce this session with SLP")
 
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
@@ -101,8 +97,6 @@ vlc_module_begin();
                                         VLC_TRUE );
     add_suppressed_bool( SOUT_CFG_PREFIX "sap-ipv6" );
 
-    add_bool( SOUT_CFG_PREFIX "slp", 0, NULL, SLP_TEXT, SLP_LONGTEXT, VLC_TRUE );
-
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -112,7 +106,7 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "access", "mux", "url", "dst",
-    "sap", "name", "group", "slp", NULL
+    "sap", "name", "group",  NULL
 };
 
 #define DEFAULT_PORT 1234
@@ -124,7 +118,6 @@ static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 struct sout_stream_sys_t
 {
     sout_mux_t           *p_mux;
-    slp_session_t        *p_slp;
     session_descriptor_t *p_session;
 };
 
@@ -135,7 +128,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
-    slp_session_t       *p_slp = NULL;
 
     char *psz_mux;
     char *psz_access;
@@ -384,46 +376,11 @@ static int Open( vlc_object_t *p_this )
         free( p_method );
     }
 
-    /* *** Register with slp *** */
-#ifdef HAVE_SLP_H
-    var_Get( p_stream, SOUT_CFG_PREFIX "slp", &val );
-    if( val.b_bool &&
-        ( strstr( psz_access, "udp" ) || strstr( psz_access ,  "rtp" ) ) )
-    {
-        int i_ret;
-
-        msg_Info( p_this, "SLP Enabled");
-        var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
-        if( *val.psz_string )
-        {
-            i_ret = sout_SLPReg( p_sout, psz_url, val.psz_string );
-        }
-        else
-        {
-            i_ret = sout_SLPReg( p_sout, psz_url, psz_url );
-        }
-
-        if( i_ret )
-        {
-           msg_Warn( p_sout, "SLP Registering failed");
-        }
-        else
-        {
-            p_slp = malloc(sizeof(slp_session_t));
-            p_slp->psz_url = strdup( psz_url );
-            p_slp->psz_name =
-                strdup( *val.psz_string ? val.psz_string : psz_url );
-        }
-        free( val.psz_string );
-    }
-#endif
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
 
     p_stream->p_sys->p_mux = p_mux;
-    p_stream->p_sys->p_slp = p_slp;
 
     if( psz_access ) free( psz_access );
     if( psz_mux ) free( psz_mux );
@@ -447,16 +404,6 @@ static void Close( vlc_object_t * p_this )
         sout_AnnounceUnRegister( p_stream->p_sout, p_sys->p_session );
         sout_AnnounceSessionDestroy( p_sys->p_session );
     }
-
-#ifdef HAVE_SLP_H
-    if( p_sys->p_slp )
-    {
-            sout_SLPDereg( (sout_instance_t *)p_this,
-                        p_sys->p_slp->psz_url,
-                        p_sys->p_slp->psz_name);
-            free( p_sys->p_slp);
-    }
-#endif
 
 
     sout_MuxDelete( p_sys->p_mux );
