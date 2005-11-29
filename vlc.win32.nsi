@@ -387,7 +387,7 @@ Section /o "ActiveX plugin" SEC04
 SectionEnd
 
 Section "Context Menus" SEC05
-  SectionIn 1 2 3
+  SectionIn 2 3
   !insertmacro MacroAllExtensions AddContextMenu
   !insertmacro AddContextMenu "Folder"
 SectionEnd
