@@ -10155,7 +10155,7 @@ msgstr "Faire un don"
 
 #: modules/gui/macosx/intf.m:557
 msgid "Online Forum"
-msgstr "Foru"
+msgstr "Forum en ligne"
 
 #: modules/gui/macosx/intf.m:567 modules/gui/wxwidgets/dialogs/wizard.cpp:80
 msgid "Error"
