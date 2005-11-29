@@ -1295,7 +1295,6 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                     // no need to check any more media types 
                                     i = piCount;
                                 }
-                                else FreeMediaType( *p_mt );
                             }
                             else if( p_mt->majortype == MEDIATYPE_Audio
                                     && p_mt->formattype == FORMAT_WaveFormatEx )
