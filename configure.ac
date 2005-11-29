@@ -677,6 +677,7 @@ AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS(linux/version.h)
+AC_CHECK_HEADERS(syslog.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 AC_HEADER_TIME
