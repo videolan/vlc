@@ -500,9 +500,9 @@ Index: common/i386/mc-a2.asm
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  DEVNULL=$DEVNULL
---- Makefile.old	2005-11-23 17:25:15.953125000 +0000
-+++ Makefile	2005-11-23 17:38:09.796875000 +0000
-@@ -62,8 +62,8 @@
+--- Makefile	(révision 380)
++++ Makefile	(copie de travail)
+@@ -63,8 +63,8 @@
  default: $(DEP) x264$(EXE)
  
  libx264.a: .depend $(OBJS) $(OBJASM)
@@ -513,7 +513,14 @@ Index: common/i386/mc-a2.asm
  
  x264$(EXE): libx264.a x264.o matroska.o
  	$(CC) -o $@ x264.o matroska.o libx264.a $(LDFLAGS)
-@@ -106,8 +106,8 @@
+@@ -128,14 +128,14 @@
+ distclean: clean
+ 	rm -f config.mak vfw/build/cygwin/config.mak x264.pc
+ 
+-install: x264
++install: x264$(EXE)
+ 	install -d $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
+ 	install -d $(DESTDIR)$(libdir) $(DESTDIR)$(libdir)/pkgconfig
  	install -m 644 x264.h $(DESTDIR)$(includedir)
  	install -m 644 libx264.a $(DESTDIR)$(libdir)
  	install -m 644 x264.pc $(DESTDIR)$(libdir)/pkgconfig
@@ -522,5 +529,5 @@ Index: common/i386/mc-a2.asm
 +	install x264$(EXE) $(DESTDIR)$(bindir)
 +	$(RANLIB) $(DESTDIR)$(libdir)/libx264.a
  
- .PHONY: uninstall
  uninstall:
+ 	rm -f $(DESTDIR)$(includedir)/x264.h $(DESTDIR)$(libdir)/libx264.a
