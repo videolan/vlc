@@ -1270,9 +1270,28 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
             break;
+
         case( VLC_FOURCC( 'r', 'a', 'w', ' ' ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 'a', 'r', 'a', 'w' );
+
+            /* Buggy files workaround */
+            if( p_sample->data.p_sample_soun && (p_track->i_timescale !=
+                p_sample->data.p_sample_soun->i_sampleratehi) )
+            {
+                MP4_Box_data_sample_soun_t *p_soun =
+                    p_sample->data.p_sample_soun;
+
+                msg_Warn( p_demux, "i_timescale ("I64Fu") != i_sampleratehi "
+                          "(%u), making both equal (report any problem).",
+                          p_track->i_timescale, p_soun->i_sampleratehi );
+
+                if( p_soun->i_sampleratehi )
+                    p_track->i_timescale = p_soun->i_sampleratehi;
+                else
+                    p_soun->i_sampleratehi = p_track->i_timescale;
+            }
             break;
+
         case( VLC_FOURCC( 's', '2', '6', '3' ) ):
             p_track->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '3' );
             break;
@@ -1844,33 +1863,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                     p_track->fmt.psz_description =
                         strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
                     break;
-            }
-        }
-    }
-
-    /* Fix i_timescale for AUDIO_ES with i_qt_version == 0 */
-    if( p_track->fmt.i_cat == AUDIO_ES &&
-        p_track->fmt.i_codec != VLC_FOURCC( 'm','p','4','a' ) )
-    {
-        MP4_Box_t *p_sample;
-
-        p_sample = MP4_BoxGet(  p_track->p_stsd, "[0]" );
-        if( p_sample && p_sample->data.p_sample_soun)
-        {
-            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
-            if( p_soun->i_qt_version == 0 &&
-                p_track->i_timescale != p_soun->i_sampleratehi )
-            {
-                msg_Warn( p_demux,
-                          "i_timescale ("I64Fu") != i_sampleratehi (%u) with "
-                          "qt_version == 0\n"
-                          "Making both equal. (report any problem)",
-                          p_track->i_timescale, p_soun->i_sampleratehi );
-
-                if( p_soun->i_sampleratehi )
-                    p_track->i_timescale = p_soun->i_sampleratehi;
-                else
-                    p_soun->i_sampleratehi = p_track->i_timescale;
             }
         }
     }
