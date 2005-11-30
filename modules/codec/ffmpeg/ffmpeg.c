@@ -900,6 +900,11 @@ static struct
       VIDEO_ES, "PAM Image" },
 #endif
 
+#if LIBAVCODEC_BUILD > ((50<<16)+(1<<8)+0)
+    { VLC_FOURCC('b','m','p',' '), CODEC_ID_BMP,
+      VIDEO_ES, "BMP Image" },
+#endif
+
     /*
      *  Audio Codecs
      */
