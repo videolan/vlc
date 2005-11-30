@@ -68,12 +68,14 @@ struct access_sys_t
 
     /* CA management */
     int i_ca_handle;
+    int i_ca_type;
     int i_nb_slots;
     vlc_bool_t pb_active_slot[MAX_CI_SLOTS];
     vlc_bool_t pb_tc_has_data[MAX_CI_SLOTS];
     en50221_session_t p_sessions[MAX_SESSIONS];
     mtime_t i_ca_timeout, i_ca_next_event, i_frontend_timeout;
     dvbpsi_pmt_t *pp_selected_programs[MAX_PROGRAMS];
+    int i_selected_programs;
 
     /* */
     int i_read_once;
@@ -106,6 +108,7 @@ int  E_(CAMPoll)( access_t * );
 int  E_(CAMSet)( access_t *, dvbpsi_pmt_t * );
 void E_(CAMClose)( access_t * );
 
+int E_(en50221_Init)( access_t * );
 int E_(en50221_Poll)( access_t * );
 int E_(en50221_SetCAPMT)( access_t *, dvbpsi_pmt_t * );
 void E_(en50221_End)( access_t * );

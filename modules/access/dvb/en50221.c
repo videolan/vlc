@@ -62,6 +62,8 @@
 #include "dvb.h"
 
 #undef DEBUG_TPDU
+#define HLCI_WAIT_CAM_READY 0
+#define CAM_PROG_MAX MAX_PROGRAMS
 
 static void ResourceManagerOpen( access_t * p_access, int i_session_id );
 static void ApplicationInformationOpen( access_t * p_access, int i_session_id );
@@ -661,8 +663,10 @@ static uint8_t *APDUGetLength( uint8_t *p_apdu, int *pi_size )
 static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
                      uint8_t *p_data, int i_size )
 {
+    access_sys_t *p_sys = p_access->p_sys;
     uint8_t *p_apdu = malloc( i_size + 12 );
     uint8_t *p = p_apdu;
+    ca_msg_t ca_msg;
     int i_ret;
 
     *p++ = (i_tag >> 16);
@@ -671,8 +675,32 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
     p = SetLength( p, i_size );
     if ( i_size )
         memcpy( p, p_data, i_size );
-
-    i_ret = SPDUSend( p_access, i_session_id, p_apdu, i_size + p - p_apdu );
+    if( p_sys->i_ca_type == CA_CI_LINK )
+    {
+        i_ret = SPDUSend( p_access, i_session_id, p_apdu, i_size + p - p_apdu );
+    }
+    else
+    {
+        if( i_size + p - p_apdu >256 )
+        {
+            msg_Err( p_access, "CAM: apdu overflow" );
+            i_ret = VLC_EGENERIC;
+        }
+        else
+        {
+            char *psz_hex;
+            ca_msg.length = i_size + p - p_apdu;
+            if( i_size == 0 ) ca_msg.length=3;
+            psz_hex = (char*)malloc( ca_msg.length*3 + 1);
+            memcpy( ca_msg.msg, p_apdu, i_size + p - p_apdu );
+            i_ret = ioctl(p_sys->i_ca_handle, CA_SEND_MSG, &ca_msg );
+            if( i_ret < 0 )
+            {
+                msg_Err( p_access, "Error sending to CAM: %s", strerror(errno) );
+                i_ret = VLC_EGENERIC;
+            }
+        }
+    }
     free( p_apdu );
     return i_ret;
 }
@@ -796,6 +824,8 @@ typedef struct
 static vlc_bool_t CheckSystemID( system_ids_t *p_ids, uint16_t i_id )
 {
     int i = 0;
+    if( !p_ids ) return VLC_TRUE;
+
     while ( p_ids->pi_system_ids[i] )
     {
         if ( p_ids->pi_system_ids[i] == i_id )
@@ -896,6 +926,7 @@ static uint8_t *CAPMTHeader( system_ids_t *p_ids, uint8_t i_list_mgt,
                     p_data[i] = 0x9;
                     p_data[i + 1] = p_dr->i_length;
                     memcpy( &p_data[i + 2], p_dr->p_data, p_dr->i_length );
+//                    p_data[i+4] &= 0x1f;
                     i += p_dr->i_length + 2;
                 }
             }
@@ -1047,6 +1078,20 @@ static void CAPMTAdd( access_t * p_access, int i_session_id,
     uint8_t *p_capmt;
     int i_capmt_size;
 
+    if( p_access->p_sys->i_selected_programs >= CAM_PROG_MAX )
+    {
+        msg_Warn( p_access, "Not adding CAPMT for SID %d, too many programs",
+                  p_pmt->i_program_number );
+        return;
+    }
+    p_access->p_sys->i_selected_programs++;
+    if( p_access->p_sys->i_selected_programs == 1 )
+    {
+        CAPMTFirst( p_access, i_session_id, p_pmt );
+        return;
+    }
+        
+    
     msg_Dbg( p_access, "adding CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
@@ -1087,6 +1132,7 @@ static void CAPMTDelete( access_t * p_access, int i_session_id,
     uint8_t *p_capmt;
     int i_capmt_size;
 
+    p_access->p_sys->i_selected_programs++;
     msg_Dbg( p_access, "deleting CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
@@ -1113,7 +1159,6 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
     {
     case AOT_CA_INFO:
     {
-        vlc_bool_t b_inited = VLC_FALSE;
         int i;
         int l = 0;
         uint8_t *d = APDUGetLength( p_apdu, &l );
@@ -1131,13 +1176,8 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
         {
             if ( p_sys->pp_selected_programs[i] != NULL )
             {
-                if ( b_inited )
-                    CAPMTAdd( p_access, i_session_id,
-                              p_sys->pp_selected_programs[i] );
-                else
-                    CAPMTFirst( p_access, i_session_id,
-                                p_sys->pp_selected_programs[i] );
-                b_inited = VLC_TRUE;
+                CAPMTAdd( p_access, i_session_id,
+                          p_sys->pp_selected_programs[i] );
             }
         }
         break;
@@ -1507,6 +1547,69 @@ static int InitSlot( access_t * p_access, int i_slot )
 /*
  * External entry points
  */
+/*****************************************************************************
+ * en50221_Init : Initialize the CAM for en50221
+ *****************************************************************************/
+int E_(en50221_Init)( access_t * p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+
+    if( p_sys->i_ca_type != CA_CI ) /* Link level init is done in Poll() */
+    {
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        /* Allocate a dummy sessions */
+        p_sys->p_sessions[ 0 ].i_resource_id = RI_CONDITIONAL_ACCESS_SUPPORT;
+
+        /* Get application info to find out which cam we are using and make
+           sure everything is ready to play */
+        ca_msg_t ca_msg;
+        ca_msg.length=3;
+        ca_msg.msg[0] = ( AOT_APPLICATION_INFO & 0xFF0000 ) >> 16;
+        ca_msg.msg[1] = ( AOT_APPLICATION_INFO & 0x00FF00 ) >> 8;
+        ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
+        memset( &ca_msg.msg[3], 0, 253 );
+        APDUSend( p_access, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
+        if ( ioctl( p_sys->i_ca_handle, CA_GET_MSG, &ca_msg ) < 0 )
+        {
+            msg_Err( p_access, "CAM: failed getting message" );
+            return VLC_EGENERIC;
+        }
+#if HLCI_WAIT_CAM_READY
+        while( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
+        {
+            if( p_access->b_die ) return VLC_EGENERIC;
+            msleep(1);
+            msg_Dbg( p_access, "CAM: please wait" );
+            APDUSend( p_access, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
+            ca_msg.length=3;
+            ca_msg.msg[0] = ( AOT_APPLICATION_INFO & 0xFF0000 ) >> 16;
+            ca_msg.msg[1] = ( AOT_APPLICATION_INFO & 0x00FF00 ) >> 8;
+            ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
+            memset( &ca_msg.msg[3], 0, 253 );
+            if ( ioctl( p_sys->i_ca_handle, CA_GET_MSG, &ca_msg ) < 0 )
+            {
+                msg_Err( p_access, "CAM: failed getting message" );
+                return VLC_EGENERIC;
+            }
+            msg_Dbg( p_access, "CAM: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
+        }
+#else
+        if( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
+        {
+            msg_Err( p_access, "CAM returns garbage as application info!" );
+            return VLC_EGENERIC;
+        }
+#endif
+        msg_Dbg( p_access, "found CAM %s using id 0x%x", &ca_msg.msg[12],
+                 (ca_msg.msg[8]<<8)|ca_msg.msg[9] );
+        return VLC_SUCCESS;
+        
+    }
+}
 
 /*****************************************************************************
  * en50221_Poll : Poll the CAM for TPDUs
@@ -1642,7 +1745,7 @@ int E_(en50221_SetCAPMT)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
                 p_pmt = p_sys->pp_selected_programs[i];
                 p_sys->pp_selected_programs[i] = NULL;
             }
-            else
+            else if( p_pmt != p_sys->pp_selected_programs[i] )
             {
                 dvbpsi_DeletePMT( p_sys->pp_selected_programs[i] );
                 p_sys->pp_selected_programs[i] = p_pmt;

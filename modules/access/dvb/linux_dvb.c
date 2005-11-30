@@ -74,6 +74,8 @@ struct frontend_t
 
 #define FRONTEND_LOCK_TIMEOUT 10000000 /* 10 s */
 
+#define RESET_CAM_SLOTS 1 /* Do we want to reset cam upon opening */
+
 /* Local prototypes */
 static int FrontendInfo( access_t * );
 static int FrontendSetQPSK( access_t * );
@@ -1210,6 +1212,7 @@ int E_(CAMOpen)( access_t *p_access )
     char ca[128];
     int i_adapter, i_device, i_slot;
     ca_caps_t caps;
+    struct ca_slot_info info;
 
     i_adapter = var_GetInteger( p_access, "dvb-adapter" );
     i_device = var_GetInteger( p_access, "dvb-device" );
@@ -1219,6 +1222,7 @@ int E_(CAMOpen)( access_t *p_access )
         msg_Err( p_access, "snprintf() truncated string for CA" );
         ca[sizeof(ca) - 1] = '\0';
     }
+    memset( &caps, 0, sizeof( ca_caps_t ));
 
     msg_Dbg( p_access, "Opening device %s", ca );
     if( (p_sys->i_ca_handle = open(ca, O_RDWR | O_NONBLOCK)) < 0 )
@@ -1268,17 +1272,33 @@ int E_(CAMOpen)( access_t *p_access )
         return VLC_EGENERIC;
     }
 
-    if ( !(caps.slot_type & CA_CI_LINK) )
+    p_sys->i_ca_type = caps.slot_type;
+    if( caps.slot_type != CA_CI_LINK &&
+        caps.slot_type != CA_CI )
     {
-        msg_Err( p_access, "CAMInit: no compatible CAM module" );
+        msg_Err( p_access, "CAMInit: incompatible CAM module" );
         close( p_sys->i_ca_handle );
         p_sys->i_ca_handle = 0;
         return VLC_EGENERIC;
     }
-
+    if( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &info ) < 0 )
+    {
+        msg_Err( p_access, "CAMInit: Couldn't get slot info" );
+        close( p_sys->i_ca_handle );
+        p_sys->i_ca_handle = 0;
+        return VLC_EGENERIC;
+    }
+    if( info.flags == 0 )
+    {
+        msg_Err( p_access, "CAMInit: No CAM inserted" );
+        close( p_sys->i_ca_handle );
+        p_sys->i_ca_handle = 0;
+        return VLC_EGENERIC;
+    }
+    
     p_sys->i_nb_slots = caps.slot_num;
     memset( p_sys->pb_active_slot, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
-
+#if(RESET_CAM_SLOTS)
     for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
     {
         if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
@@ -1286,12 +1306,13 @@ int E_(CAMOpen)( access_t *p_access )
             msg_Err( p_access, "CAMInit: couldn't reset slot %d", i_slot );
         }
     }
+#endif
 
     p_sys->i_ca_timeout = 100000;
     /* Wait a bit otherwise it doesn't initialize properly... */
     msleep( 1000000 );
 
-    return VLC_SUCCESS;
+    return E_(en50221_Init)( p_access );
 }
 
 /*****************************************************************************
@@ -1300,13 +1321,27 @@ int E_(CAMOpen)( access_t *p_access )
 int E_(CAMPoll)( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    int i_ret = VLC_EGENERIC;
 
     if ( p_sys->i_ca_handle == 0 )
     {
         return VLC_EGENERIC;
     }
 
-    return E_(en50221_Poll)( p_access );
+    switch( p_sys->i_ca_type )
+    {
+    case CA_CI_LINK:
+        i_ret = E_(en50221_Poll)( p_access );
+        break;
+    case CA_CI:
+        i_ret = VLC_SUCCESS;
+        break;
+    default:
+        msg_Err( p_access, "CAMPoll: This should not happen" );
+        break;
+    }
+
+    return i_ret;
 }
 
 /*****************************************************************************
