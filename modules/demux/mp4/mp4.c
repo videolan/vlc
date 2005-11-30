@@ -1848,8 +1848,9 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         }
     }
 
-    /* fxi i_timescale for AUDIO_ES with i_qt_version == 0 */
-    if( p_track->fmt.i_cat == AUDIO_ES ) //&& p_track->i_sample_size == 1 )
+    /* Fix i_timescale for AUDIO_ES with i_qt_version == 0 */
+    if( p_track->fmt.i_cat == AUDIO_ES &&
+        p_track->fmt.i_codec != VLC_FOURCC( 'm','p','4','a' ) )
     {
         MP4_Box_t *p_sample;
 
