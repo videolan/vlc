@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-11-28 17:14+0100\n"
+"POT-Creation-Date: 2005-11-30 19:46+0000\n"
 "PO-Revision-Date: 2005-11-11 15:49+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -36,7 +36,7 @@ msgstr "Klicka på \"Advancerade Inställninar\" för att se alla valmöjligheter"
 msgid "General"
 msgstr "Allmänt"
 
-#: include/vlc_config_cat.h:39 src/libvlc.h:1348 modules/misc/dummy/dummy.c:67
+#: include/vlc_config_cat.h:39 src/libvlc.h:1351 modules/misc/dummy/dummy.c:67
 msgid "Interface"
 msgstr "Gränssnitt"
 
@@ -60,12 +60,12 @@ msgstr "Inställningar för kontrollgränssnitt"
 msgid "Hotkeys settings"
 msgstr "Inställningar för snabbknappar"
 
-#: include/vlc_config_cat.h:51 src/input/es_out.c:1546 src/libvlc.h:984
+#: include/vlc_config_cat.h:51 src/input/es_out.c:1546 src/libvlc.h:987
 #: modules/gui/beos/InterfaceWindow.cpp:280 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:505 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/wizard.m:404
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:855
-#: modules/gui/wxwidgets/extrapanel.cpp:180 modules/stream_out/transcode.c:214
+#: modules/gui/wxwidgets/extrapanel.cpp:181 modules/stream_out/transcode.c:214
 msgid "Audio"
 msgstr "Ljud"
 
@@ -103,8 +103,8 @@ msgstr "Utmatningsmoduler"
 msgid "These are general settings for audio output modules."
 msgstr ""
 
-#: include/vlc_config_cat.h:68 src/libvlc.h:1279 src/libvlc.h:1317
-#: src/libvlc.h:1359 modules/gui/wxwidgets/menus.cpp:311
+#: include/vlc_config_cat.h:68 src/libvlc.h:1282 src/libvlc.h:1320
+#: src/libvlc.h:1362 modules/gui/wxwidgets/menus.cpp:311
 #: modules/stream_out/transcode.c:243
 msgid "Miscellaneous"
 msgstr "Allmänt"
@@ -113,11 +113,11 @@ msgstr "Allmänt"
 msgid "Miscellaneous audio settings and modules"
 msgstr "Blandade ljudinställningar och moduler"
 
-#: include/vlc_config_cat.h:72 src/input/es_out.c:1568 src/libvlc.h:1019
+#: include/vlc_config_cat.h:72 src/input/es_out.c:1568 src/libvlc.h:1022
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:518
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/wizard.m:405
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:816
-#: modules/gui/wxwidgets/extrapanel.cpp:178 modules/misc/dummy/dummy.c:97
+#: modules/gui/wxwidgets/extrapanel.cpp:179 modules/misc/dummy/dummy.c:97
 #: modules/stream_out/transcode.c:174
 msgid "Video"
 msgstr "Video"
@@ -235,7 +235,7 @@ msgstr "Inställningar för ljud+video och övriga avkodare och omkodare."
 msgid "General input settings. Use with care."
 msgstr "Avancerade inmatningsinställningar. Använd försiktigt."
 
-#: include/vlc_config_cat.h:126 src/libvlc.h:1227
+#: include/vlc_config_cat.h:126 src/libvlc.h:1230
 #: modules/gui/wxwidgets/dialogs/open.cpp:448
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:152
 msgid "Stream output"
@@ -330,7 +330,7 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLC's genomförande av Video On Demand"
 
-#: include/vlc_config_cat.h:172 src/libvlc.h:1329
+#: include/vlc_config_cat.h:172 src/libvlc.h:1332
 #: modules/demux/playlist/playlist.c:48 modules/demux/playlist/playlist.c:49
 #: modules/gui/beos/InterfaceWindow.cpp:230
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:450
@@ -367,7 +367,7 @@ msgstr ""
 "Service upphittnings moduler är moduler som automatiskt lägger till förmål "
 "till spellistan"
 
-#: include/vlc_config_cat.h:180 src/libvlc.h:1191
+#: include/vlc_config_cat.h:180 src/libvlc.h:1194
 #: modules/gui/macosx/prefs.m:124
 msgid "Advanced"
 msgstr "Advancerad"
@@ -652,12 +652,12 @@ msgstr "Spektrum"
 
 #: src/audio_output/input.c:123 modules/audio_filter/equalizer.c:66
 #: modules/gui/macosx/equalizer.m:140 modules/gui/macosx/equalizer.m:154
-#: modules/gui/macosx/intf.m:541 modules/gui/wxwidgets/extrapanel.cpp:179
+#: modules/gui/macosx/intf.m:541 modules/gui/wxwidgets/extrapanel.cpp:180
 msgid "Equalizer"
 msgstr ""
 
 #: src/audio_output/input.c:145 src/libvlc.h:173
-#: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:392
+#: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:393
 msgid "Audio filters"
 msgstr "Ljudfilter"
 
@@ -1087,7 +1087,7 @@ msgid ""
 "various related options."
 msgstr ""
 
-#: src/libvlc.h:51 src/libvlc.h:1349
+#: src/libvlc.h:51 src/libvlc.h:1352
 msgid "Interface module"
 msgstr "Gränssnittsmodul"
 
@@ -1097,7 +1097,7 @@ msgid ""
 "The default behavior is to automatically select the best module available."
 msgstr ""
 
-#: src/libvlc.h:57 src/libvlc.h:1354 modules/control/ntservice.c:53
+#: src/libvlc.h:57 src/libvlc.h:1357 modules/control/ntservice.c:53
 msgid "Extra interface modules"
 msgstr "Extra gränssnittsmoduler"
 
@@ -1693,8 +1693,8 @@ msgstr "Standard"
 #: src/libvlc.h:337 modules/gui/macosx/equalizer.m:144
 #: modules/gui/macosx/extended.m:106 modules/gui/macosx/wizard.m:378
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:624
-#: modules/gui/wxwidgets/extrapanel.cpp:218
-#: modules/gui/wxwidgets/extrapanel.cpp:467
+#: modules/gui/wxwidgets/extrapanel.cpp:219
+#: modules/gui/wxwidgets/extrapanel.cpp:468
 msgid "Enable"
 msgstr "Aktivera"
 
@@ -1860,7 +1860,7 @@ msgid ""
 "over the movie. Try several positions."
 msgstr ""
 
-#: src/libvlc.h:422 src/libvlc.h:1081 src/misc/iso-639_def.h:143
+#: src/libvlc.h:422 src/libvlc.h:1084 src/misc/iso-639_def.h:143
 #: modules/stream_out/transcode.c:239
 msgid "On Screen Display"
 msgstr "On Screen Display"
@@ -2574,7 +2574,7 @@ msgstr "Spela bara"
 msgid "Select the hotkey to use to play."
 msgstr ""
 
-#: src/libvlc.h:798 modules/control/hotkeys.c:563
+#: src/libvlc.h:798 modules/control/hotkeys.c:641
 #: modules/gui/macosx/controls.m:558 modules/gui/macosx/intf.m:488
 msgid "Faster"
 msgstr "Snabbare"
@@ -2583,7 +2583,7 @@ msgstr "Snabbare"
 msgid "Select the hotkey to use for fast forward playback."
 msgstr ""
 
-#: src/libvlc.h:800 modules/control/hotkeys.c:570
+#: src/libvlc.h:800 modules/control/hotkeys.c:648
 #: modules/gui/macosx/controls.m:559 modules/gui/macosx/intf.m:489
 msgid "Slower"
 msgstr "Slow Motion"
@@ -2592,7 +2592,7 @@ msgstr "Slow Motion"
 msgid "Select the hotkey to use for slow motion playback."
 msgstr ""
 
-#: src/libvlc.h:802 modules/control/hotkeys.c:532
+#: src/libvlc.h:802 modules/control/hotkeys.c:610
 #: modules/gui/macosx/controls.m:579 modules/gui/macosx/intf.m:446
 #: modules/gui/macosx/intf.m:491 modules/gui/macosx/intf.m:562
 #: modules/gui/macosx/wizard.m:306 modules/gui/macosx/wizard.m:348
@@ -2605,7 +2605,7 @@ msgstr "Nästa objekt"
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 
-#: src/libvlc.h:804 modules/control/hotkeys.c:543
+#: src/libvlc.h:804 modules/control/hotkeys.c:621
 #: modules/gui/macosx/controls.m:578 modules/gui/macosx/intf.m:441
 #: modules/gui/macosx/intf.m:490 modules/gui/macosx/intf.m:563
 #: modules/gui/wxwidgets/interface.cpp:1549
@@ -2739,307 +2739,333 @@ msgstr "Typsnitt storlek"
 msgid "Long jump \"size\", in seconds"
 msgstr ""
 
-#: src/libvlc.h:851 modules/control/hotkeys.c:275
+#: src/libvlc.h:848 modules/control/hotkeys.c:275
 #: modules/gui/beos/InterfaceWindow.cpp:274
 msgid "Quit"
 msgstr "Avsluta VLC"
 
-#: src/libvlc.h:852
+#: src/libvlc.h:849
 msgid "Select the hotkey to quit the application."
 msgstr ""
 
-#: src/libvlc.h:853
+#: src/libvlc.h:850
 msgid "Navigate up"
 msgstr "Navigera upp"
 
-#: src/libvlc.h:854
+#: src/libvlc.h:851
 msgid "Select the key to move the selector up in DVD menus."
 msgstr ""
 
-#: src/libvlc.h:855
+#: src/libvlc.h:852
 msgid "Navigate down"
 msgstr "Navigera ned"
 
-#: src/libvlc.h:856
+#: src/libvlc.h:853
 msgid "Select the key to move the selector down in DVD menus."
 msgstr ""
 
-#: src/libvlc.h:857
+#: src/libvlc.h:854
 msgid "Navigate left"
 msgstr "Navigera vänster"
 
-#: src/libvlc.h:858
+#: src/libvlc.h:855
 msgid "Select the key to move the selector left in DVD menus."
 msgstr ""
 
-#: src/libvlc.h:859
+#: src/libvlc.h:856
 msgid "Navigate right"
 msgstr "Navigera höger"
 
-#: src/libvlc.h:860
+#: src/libvlc.h:857
 msgid "Select the key to move the selector right in DVD menus."
 msgstr ""
 
-#: src/libvlc.h:861
+#: src/libvlc.h:858
 msgid "Activate"
 msgstr "Aktivera"
 
-#: src/libvlc.h:862
+#: src/libvlc.h:859
 msgid "Select the key to activate selected item in DVD menus."
 msgstr ""
 
-#: src/libvlc.h:863
+#: src/libvlc.h:860
 #, fuzzy
 msgid "Go to the DVD menu"
 msgstr "Använd DVD-menyer"
 
-#: src/libvlc.h:864
+#: src/libvlc.h:861
 msgid "Select the key to take you to the DVD menu"
 msgstr ""
 
-#: src/libvlc.h:865
+#: src/libvlc.h:862
 msgid "Select previous DVD title"
 msgstr "Välj föregående DVD-titel"
 
-#: src/libvlc.h:866
+#: src/libvlc.h:863
 msgid "Select the key to choose the previous title from the DVD"
 msgstr ""
 
-#: src/libvlc.h:867
+#: src/libvlc.h:864
 msgid "Select next DVD title"
 msgstr "Välj nästa DVD-titel"
 
-#: src/libvlc.h:868
+#: src/libvlc.h:865
 msgid "Select the key to choose the next title from the DVD"
 msgstr ""
 
-#: src/libvlc.h:869 src/libvlc.h:871
+#: src/libvlc.h:866 src/libvlc.h:868
 msgid "Select prev DVD chapter"
 msgstr "Välj föreg DVD-kapitel"
 
-#: src/libvlc.h:870
+#: src/libvlc.h:867
 msgid "Select the key to choose the previous chapter from the DVD"
 msgstr ""
 
-#: src/libvlc.h:872
+#: src/libvlc.h:869
 msgid "Select the key to choose the next chapter from the DVD"
 msgstr ""
 
-#: src/libvlc.h:873
+#: src/libvlc.h:870
 msgid "Volume up"
 msgstr "Volym upp"
 
-#: src/libvlc.h:874
+#: src/libvlc.h:871
 msgid "Select the key to increase audio volume."
 msgstr ""
 
-#: src/libvlc.h:875
+#: src/libvlc.h:872
 msgid "Volume down"
 msgstr "Volym ned"
 
-#: src/libvlc.h:876
+#: src/libvlc.h:873
 msgid "Select the key to decrease audio volume."
 msgstr ""
 
-#: src/libvlc.h:877 modules/gui/macosx/controls.m:613
+#: src/libvlc.h:874 modules/gui/macosx/controls.m:613
 #: modules/gui/macosx/intf.m:508 modules/gui/macosx/intf.m:564
 msgid "Mute"
 msgstr "Stäng av ljudet"
 
-#: src/libvlc.h:878
+#: src/libvlc.h:875
 msgid "Select the key to turn off audio volume."
 msgstr ""
 
-#: src/libvlc.h:879
+#: src/libvlc.h:876
 msgid "Subtitle delay up"
 msgstr "Undertextfördröjning mer"
 
-#: src/libvlc.h:880
+#: src/libvlc.h:877
 msgid "Select the key to increase the subtitle delay."
 msgstr ""
 
-#: src/libvlc.h:881
+#: src/libvlc.h:878
 msgid "Subtitle delay down"
 msgstr "Undertextfördröjning mindre"
 
-#: src/libvlc.h:882
+#: src/libvlc.h:879
 msgid "Select the key to decrease the subtitle delay."
 msgstr ""
 
-#: src/libvlc.h:883
+#: src/libvlc.h:880
 msgid "Audio delay up"
 msgstr "Ljudfördröjning mer"
 
-#: src/libvlc.h:884
+#: src/libvlc.h:881
 msgid "Select the key to increase the audio delay."
 msgstr ""
 
-#: src/libvlc.h:885
+#: src/libvlc.h:882
 msgid "Audio delay down"
 msgstr "Ljudfördröjning mindre"
 
-#: src/libvlc.h:886
+#: src/libvlc.h:883
 msgid "Select the key to decrease the audio delay."
 msgstr ""
 
-#: src/libvlc.h:887
+#: src/libvlc.h:884
 msgid "Play playlist bookmark 1"
 msgstr "Spela spellistebokmärke 1"
 
-#: src/libvlc.h:888
+#: src/libvlc.h:885
 msgid "Play playlist bookmark 2"
 msgstr "Spela spellistebokmärke 2"
 
-#: src/libvlc.h:889
+#: src/libvlc.h:886
 msgid "Play playlist bookmark 3"
 msgstr "Spela spellistebokmärke 3"
 
-#: src/libvlc.h:890
+#: src/libvlc.h:887
 msgid "Play playlist bookmark 4"
 msgstr "Spela spellistebokmärke 4"
 
-#: src/libvlc.h:891
+#: src/libvlc.h:888
 msgid "Play playlist bookmark 5"
 msgstr "Spela spellistebokmärke 5"
 
-#: src/libvlc.h:892
+#: src/libvlc.h:889
 msgid "Play playlist bookmark 6"
 msgstr "Spela spellistebokmärke 6"
 
-#: src/libvlc.h:893
+#: src/libvlc.h:890
 msgid "Play playlist bookmark 7"
 msgstr "Spela spellistebokmärke 7"
 
-#: src/libvlc.h:894
+#: src/libvlc.h:891
 msgid "Play playlist bookmark 8"
 msgstr "Spela spellistebokmärke 8"
 
-#: src/libvlc.h:895
+#: src/libvlc.h:892
 msgid "Play playlist bookmark 9"
 msgstr "Spela spellistebokmärke 9"
 
-#: src/libvlc.h:896
+#: src/libvlc.h:893
 msgid "Play playlist bookmark 10"
 msgstr "Spela spellistebokmärke 10"
 
-#: src/libvlc.h:897
+#: src/libvlc.h:894
 msgid "Select the key to play this bookmark."
 msgstr ""
 
-#: src/libvlc.h:898
+#: src/libvlc.h:895
 msgid "Set playlist bookmark 1"
 msgstr "Sätt spellistebokmärke 1"
 
-#: src/libvlc.h:899
+#: src/libvlc.h:896
 msgid "Set playlist bookmark 2"
 msgstr "Sätt spellistebokmärke 2"
 
-#: src/libvlc.h:900
+#: src/libvlc.h:897
 msgid "Set playlist bookmark 3"
 msgstr "Sätt spellistebokmärke 3"
 
-#: src/libvlc.h:901
+#: src/libvlc.h:898
 msgid "Set playlist bookmark 4"
 msgstr "Sätt spellistebokmärke 4"
 
-#: src/libvlc.h:902
+#: src/libvlc.h:899
 msgid "Set playlist bookmark 5"
 msgstr "Sätt spellistebokmärke 5"
 
-#: src/libvlc.h:903
+#: src/libvlc.h:900
 msgid "Set playlist bookmark 6"
 msgstr "Sätt spellistebokmärke 6"
 
-#: src/libvlc.h:904
+#: src/libvlc.h:901
 msgid "Set playlist bookmark 7"
 msgstr "Sätt spellistebokmärke 7"
 
-#: src/libvlc.h:905
+#: src/libvlc.h:902
 msgid "Set playlist bookmark 8"
 msgstr "Sätt spellistebokmärke 8"
 
-#: src/libvlc.h:906
+#: src/libvlc.h:903
 msgid "Set playlist bookmark 9"
 msgstr "Sätt spellistebokmärke 9"
 
-#: src/libvlc.h:907
+#: src/libvlc.h:904
 msgid "Set playlist bookmark 10"
 msgstr "Sätt spellistebokmärke 10"
 
-#: src/libvlc.h:908
+#: src/libvlc.h:905
 msgid "Select the key to set this playlist bookmark."
 msgstr ""
 
-#: src/libvlc.h:910
+#: src/libvlc.h:907
 msgid "Go back in browsing history"
 msgstr ""
 
-#: src/libvlc.h:911
+#: src/libvlc.h:908
 msgid ""
 "Select the key to go back (to the previous media item) in the browsing "
 "history."
 msgstr ""
 
-#: src/libvlc.h:912
+#: src/libvlc.h:909
 msgid "Go forward in browsing history"
 msgstr ""
 
-#: src/libvlc.h:913
+#: src/libvlc.h:910
 msgid ""
 "Select the key to go forward (to the next media item) in the browsing "
 "history."
 msgstr ""
 
-#: src/libvlc.h:915
+#: src/libvlc.h:912
 msgid "Cycle audio track"
 msgstr ""
 
-#: src/libvlc.h:916
+#: src/libvlc.h:913
 msgid "Cycle through the available audio tracks(languages)"
 msgstr ""
 
-#: src/libvlc.h:917
+#: src/libvlc.h:914
 msgid "Cycle subtitle track"
 msgstr ""
 
-#: src/libvlc.h:918
+#: src/libvlc.h:915
 msgid "Cycle through the available subtitle tracks"
 msgstr ""
 
+#: src/libvlc.h:916
+msgid "Cycle source aspect ratio"
+msgstr ""
+
+#: src/libvlc.h:917
+msgid "Cycle through a predefined list of source aspect ratios"
+msgstr ""
+
+#: src/libvlc.h:918
+#, fuzzy
+msgid "Cycle video crop"
+msgstr "Videoinställningar"
+
 #: src/libvlc.h:919
+msgid "Cycle through a predefined list of crop formats"
+msgstr ""
+
+#: src/libvlc.h:920
+#, fuzzy
+msgid "Cycle deinterlace modes"
+msgstr "Extra gränssnittsmoduler"
+
+#: src/libvlc.h:921
+msgid "Cycle through all the deinterlace modes"
+msgstr ""
+
+#: src/libvlc.h:922
 msgid "Show interface"
 msgstr "Visa gränssnitt"
 
-#: src/libvlc.h:920
+#: src/libvlc.h:923
 msgid "Raise the interface above all other windows"
 msgstr ""
 
-#: src/libvlc.h:921
+#: src/libvlc.h:924
 msgid "Hide interface"
 msgstr "Göm gränssnitt"
 
-#: src/libvlc.h:922
+#: src/libvlc.h:925
 msgid "Lower the interface below all other windows"
 msgstr ""
 
-#: src/libvlc.h:923
+#: src/libvlc.h:926
 msgid "Take video snapshot"
 msgstr ""
 
-#: src/libvlc.h:924
+#: src/libvlc.h:927
 msgid "Takes a video snapshot and writes it to disk."
 msgstr ""
 
-#: src/libvlc.h:926 modules/access_filter/record.c:50
+#: src/libvlc.h:929 modules/access_filter/record.c:50
 #: modules/access_filter/record.c:51
 msgid "Record"
 msgstr "Inspelning"
 
-#: src/libvlc.h:927
+#: src/libvlc.h:930
 msgid "Record access filter start/stop."
 msgstr ""
 
-#: src/libvlc.h:931
+#: src/libvlc.h:934
 #, c-format
 msgid ""
 "Usage: %s [options] [playlistitems] ...\n"
@@ -3077,128 +3103,128 @@ msgid ""
 "  vlc:quit                       Special item to quit VLC\n"
 msgstr ""
 
-#: src/libvlc.h:1039 src/video_output/vout_intf.c:337
+#: src/libvlc.h:1042 src/video_output/vout_intf.c:337
 #: modules/gui/macosx/controls.m:288 modules/gui/macosx/controls.m:622
 #: modules/gui/macosx/intf.m:525 modules/video_output/snapshot.c:75
 msgid "Snapshot"
 msgstr "Skärmbild"
 
-#: src/libvlc.h:1046
+#: src/libvlc.h:1049
 msgid "Window properties"
 msgstr "Fönsteregenskaper"
 
-#: src/libvlc.h:1082
+#: src/libvlc.h:1085
 msgid "Subpictures"
 msgstr "Underbilder"
 
-#: src/libvlc.h:1085 modules/codec/subsdec.c:92 modules/demux/subtitle.c:61
+#: src/libvlc.h:1088 modules/codec/subsdec.c:92 modules/demux/subtitle.c:61
 #: modules/gui/beos/InterfaceWindow.cpp:277
 msgid "Subtitles"
 msgstr "Undertext"
 
-#: src/libvlc.h:1102
+#: src/libvlc.h:1105
 msgid "Overlays"
 msgstr ""
 
-#: src/libvlc.h:1110
+#: src/libvlc.h:1113
 msgid "Track settings"
 msgstr "Spårinställningar"
 
-#: src/libvlc.h:1128
+#: src/libvlc.h:1131
 msgid "Playback control"
 msgstr ""
 
-#: src/libvlc.h:1143
+#: src/libvlc.h:1146
 msgid "Default devices"
 msgstr "Standardenheter"
 
-#: src/libvlc.h:1152
+#: src/libvlc.h:1155
 msgid "Network settings"
 msgstr "Nätverksinställningar"
 
-#: src/libvlc.h:1164
+#: src/libvlc.h:1167
 msgid "Socks proxy"
 msgstr "Socks proxy"
 
-#: src/libvlc.h:1173
+#: src/libvlc.h:1176
 msgid "Metadata"
 msgstr "Metadata"
 
-#: src/libvlc.h:1200
+#: src/libvlc.h:1203
 msgid "Decoders"
 msgstr "Avkodare"
 
-#: src/libvlc.h:1207 modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:375
+#: src/libvlc.h:1210 modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:375
 msgid "Input"
 msgstr ""
 
-#: src/libvlc.h:1263
+#: src/libvlc.h:1266
 msgid "CPU"
 msgstr "CPU"
 
-#: src/libvlc.h:1278
+#: src/libvlc.h:1281
 msgid "Special modules"
 msgstr "Specialmoduler"
 
-#: src/libvlc.h:1284
+#: src/libvlc.h:1287
 msgid "Plugins"
 msgstr "Insticksprogram"
 
-#: src/libvlc.h:1290
+#: src/libvlc.h:1293
 msgid "Performance options"
 msgstr "Prestandainställningar"
 
-#: src/libvlc.h:1378
+#: src/libvlc.h:1381
 msgid "Hot keys"
 msgstr "Snabbknappar"
 
-#: src/libvlc.h:1689
+#: src/libvlc.h:1704
 msgid "main program"
 msgstr "huvudprogram"
 
-#: src/libvlc.h:1696
+#: src/libvlc.h:1711
 msgid "print help for VLC (can be combined with --advanced)"
 msgstr "skriv ut hjälp för VLC (kan kombineras med --advanced)"
 
-#: src/libvlc.h:1698
+#: src/libvlc.h:1713
 msgid ""
 "print help for VLC and all it's modules (can be combined with --advanced)"
 msgstr ""
 "skriv ut hjälp för VLC och alla dess moduler (kan kombineras med --advanced)"
 
-#: src/libvlc.h:1700
+#: src/libvlc.h:1715
 msgid "print help for the advanced options"
 msgstr "skriv ut hjälp för de avancerade inställningarna"
 
-#: src/libvlc.h:1702
+#: src/libvlc.h:1717
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc.h:1704
+#: src/libvlc.h:1719
 msgid "print a list of available modules"
 msgstr "skriv ut en lista av tillgängliga moduler"
 
-#: src/libvlc.h:1706
+#: src/libvlc.h:1721
 msgid "print help on a specific module (can be combined with --advanced)"
 msgstr ""
 
-#: src/libvlc.h:1708
+#: src/libvlc.h:1723
 msgid "save the current command line options in the config"
 msgstr ""
 
-#: src/libvlc.h:1710
+#: src/libvlc.h:1725
 msgid "reset the current config to the default values"
 msgstr ""
 
-#: src/libvlc.h:1712
+#: src/libvlc.h:1727
 msgid "use alternate config file"
 msgstr "använd alternativ konfigurationsfil"
 
-#: src/libvlc.h:1714
+#: src/libvlc.h:1729
 msgid "resets the current plugins cache"
 msgstr ""
 
-#: src/libvlc.h:1716
+#: src/libvlc.h:1731
 msgid "print version information"
 msgstr "skriv ut versionsinformation"
 
@@ -5294,7 +5320,7 @@ msgid "Audio Channel to use, if there are several audio input"
 msgstr ""
 
 #: modules/access/v4l/v4l.c:108 modules/gui/macosx/extended.m:107
-#: modules/gui/wxwidgets/extrapanel.cpp:236
+#: modules/gui/wxwidgets/extrapanel.cpp:237
 msgid "Brightness"
 msgstr "Ljusstyrka"
 
@@ -5303,7 +5329,7 @@ msgid "Set the Brightness of the video input"
 msgstr ""
 
 #: modules/access/v4l/v4l.c:111 modules/gui/macosx/extended.m:110
-#: modules/gui/wxwidgets/extrapanel.cpp:226
+#: modules/gui/wxwidgets/extrapanel.cpp:227
 msgid "Hue"
 msgstr ""
 
@@ -5320,7 +5346,7 @@ msgid "Set the Color of the video input"
 msgstr ""
 
 #: modules/access/v4l/v4l.c:117 modules/gui/macosx/extended.m:108
-#: modules/gui/wxwidgets/extrapanel.cpp:231
+#: modules/gui/wxwidgets/extrapanel.cpp:232
 msgid "Contrast"
 msgstr "Kontrast"
 
@@ -7257,6 +7283,21 @@ msgstr "Undertextspår: %s"
 msgid "N/A"
 msgstr "N/A"
 
+#: modules/control/hotkeys.c:547
+#, fuzzy, c-format
+msgid "Aspect ratio: %s"
+msgstr "Bildformat"
+
+#: modules/control/hotkeys.c:573
+#, fuzzy, c-format
+msgid "Crop: %s"
+msgstr "Kompilator: %s\n"
+
+#: modules/control/hotkeys.c:599
+#, fuzzy, c-format
+msgid "Deinterlace mode: %s"
+msgstr "Gränssnittsmodul"
+
 #: modules/control/http/http.c:34 modules/misc/rtsp.c:46
 msgid "Host address"
 msgstr "Värdaddress"
@@ -8993,7 +9034,7 @@ msgstr ""
 msgid "Step Backward"
 msgstr ""
 
-#: modules/gui/macosx/equalizer.m:141 modules/gui/wxwidgets/extrapanel.cpp:473
+#: modules/gui/macosx/equalizer.m:141 modules/gui/wxwidgets/extrapanel.cpp:474
 msgid "2 Pass"
 msgstr ""
 
@@ -9013,15 +9054,15 @@ msgstr ""
 msgid "Preamp"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:79 modules/gui/wxwidgets/extrapanel.cpp:1214
+#: modules/gui/macosx/extended.m:79 modules/gui/wxwidgets/extrapanel.cpp:1215
 msgid "Extended controls"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:302
+#: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:303
 msgid "Video filters"
 msgstr "Videofilter"
 
-#: modules/gui/macosx/extended.m:84 modules/gui/wxwidgets/extrapanel.cpp:206
+#: modules/gui/macosx/extended.m:84 modules/gui/wxwidgets/extrapanel.cpp:207
 msgid "Adjust Image"
 msgstr "Justera bild"
 
@@ -9084,7 +9125,7 @@ msgstr ""
 msgid "Rotates or flips the image"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:98 modules/gui/wxwidgets/extrapanel.cpp:403
+#: modules/gui/macosx/extended.m:98 modules/gui/wxwidgets/extrapanel.cpp:404
 msgid "Volume normalization"
 msgstr ""
 
@@ -9093,29 +9134,29 @@ msgid ""
 "This filters prevents the audio output power from going over a defined value."
 msgstr ""
 
-#: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:398
+#: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:399
 msgid "Headphone virtualization"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:102 modules/gui/wxwidgets/extrapanel.cpp:399
+#: modules/gui/macosx/extended.m:102 modules/gui/wxwidgets/extrapanel.cpp:400
 msgid ""
 "This filter gives the feeling of a 5.1 speaker set when using a headphone."
 msgstr ""
 
-#: modules/gui/macosx/extended.m:104 modules/gui/wxwidgets/extrapanel.cpp:408
+#: modules/gui/macosx/extended.m:104 modules/gui/wxwidgets/extrapanel.cpp:409
 msgid "Maximum level"
 msgstr "Max nivå"
 
-#: modules/gui/macosx/extended.m:105 modules/gui/wxwidgets/extrapanel.cpp:223
-#: modules/gui/wxwidgets/extrapanel.cpp:483
+#: modules/gui/macosx/extended.m:105 modules/gui/wxwidgets/extrapanel.cpp:224
+#: modules/gui/wxwidgets/extrapanel.cpp:484
 msgid "Restore Defaults"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:109 modules/gui/wxwidgets/extrapanel.cpp:246
+#: modules/gui/macosx/extended.m:109 modules/gui/wxwidgets/extrapanel.cpp:247
 msgid "Gamma"
 msgstr "Gamma"
 
-#: modules/gui/macosx/extended.m:111 modules/gui/wxwidgets/extrapanel.cpp:241
+#: modules/gui/macosx/extended.m:111 modules/gui/wxwidgets/extrapanel.cpp:242
 msgid "Saturation"
 msgstr ""
 
@@ -9125,11 +9166,11 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:606
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:499
-#: modules/gui/wxwidgets/extrapanel.cpp:1011
+#: modules/gui/wxwidgets/extrapanel.cpp:1012
 msgid "More information"
 msgstr "Mer information"
 
-#: modules/gui/macosx/extended.m:607 modules/gui/wxwidgets/extrapanel.cpp:1001
+#: modules/gui/macosx/extended.m:607 modules/gui/wxwidgets/extrapanel.cpp:1002
 msgid ""
 "Select the video effects filters to apply. You must restart the stream for "
 "these settings to take effect.\n"
@@ -11444,30 +11485,38 @@ msgid ""
 "The higher the value is, the more correlated their movement will be."
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:272
+#: modules/gui/wxwidgets/extrapanel.cpp:156 modules/video_filter/magnify.c:60
+msgid "Magnify"
+msgstr ""
+
+#: modules/gui/wxwidgets/extrapanel.cpp:156
+msgid "Magnifies part of the image"
+msgstr ""
+
+#: modules/gui/wxwidgets/extrapanel.cpp:273
 msgid "Video Options"
 msgstr "Videoinställningar"
 
-#: modules/gui/wxwidgets/extrapanel.cpp:286
+#: modules/gui/wxwidgets/extrapanel.cpp:287
 msgid "Aspect Ratio"
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:319
+#: modules/gui/wxwidgets/extrapanel.cpp:320
 msgid "More info"
 msgstr "Mer info"
 
-#: modules/gui/wxwidgets/extrapanel.cpp:404
+#: modules/gui/wxwidgets/extrapanel.cpp:405
 msgid ""
 "This filter prevents the audio output power from going over a defined value."
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:468
+#: modules/gui/wxwidgets/extrapanel.cpp:469
 msgid ""
 "Enable the equalizer. You can either manually change the bands or use a "
 "preset (Audio Menu->Equalizer)."
 msgstr ""
 
-#: modules/gui/wxwidgets/extrapanel.cpp:475
+#: modules/gui/wxwidgets/extrapanel.cpp:476
 msgid ""
 "If you enable this setting, the equalizer filter will be applied twice. The "
 "effect will be sharper."
@@ -12070,33 +12119,39 @@ msgstr "GnuTLS TLS krypteringslager"
 msgid "Gtk+ GUI helper"
 msgstr ""
 
-#: modules/misc/logger.c:95
+#: modules/misc/logger.c:107
 msgid "Text"
 msgstr "Text"
 
-#: modules/misc/logger.c:97
+#: modules/misc/logger.c:113
 msgid "Log format"
 msgstr "Loggformat"
 
-#: modules/misc/logger.c:98
+#: modules/misc/logger.c:115
+msgid ""
+"Specify the log format. Available choices are \"text\" (default), \"html\", "
+"and \"syslog\"."
+msgstr ""
+
+#: modules/misc/logger.c:117
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
 msgstr ""
 
-#: modules/misc/logger.c:103
+#: modules/misc/logger.c:123
 msgid "Logging"
 msgstr "Loggning"
 
-#: modules/misc/logger.c:104
+#: modules/misc/logger.c:124
 msgid "File logging"
 msgstr "Filloggning"
 
-#: modules/misc/logger.c:106
+#: modules/misc/logger.c:126
 msgid "Log filename"
 msgstr "Loggfilnamn"
 
-#: modules/misc/logger.c:106
+#: modules/misc/logger.c:126
 msgid "Specify the log filename."
 msgstr "Ange loggfilnamn."
 
@@ -12786,11 +12841,11 @@ msgstr ""
 msgid "Duplicate stream output"
 msgstr ""
 
-#: modules/stream_out/es.c:37 modules/stream_out/standard.c:43
+#: modules/stream_out/es.c:37 modules/stream_out/standard.c:42
 msgid "Output access method"
 msgstr ""
 
-#: modules/stream_out/es.c:39 modules/stream_out/standard.c:45
+#: modules/stream_out/es.c:39 modules/stream_out/standard.c:44
 msgid ""
 "Allows you to specify the output access method used for the streaming output."
 msgstr ""
@@ -12815,7 +12870,7 @@ msgid ""
 "output."
 msgstr ""
 
-#: modules/stream_out/es.c:50 modules/stream_out/standard.c:47
+#: modules/stream_out/es.c:50 modules/stream_out/standard.c:46
 msgid "Output muxer"
 msgstr ""
 
@@ -12908,7 +12963,7 @@ msgstr ""
 msgid "Muxer"
 msgstr ""
 
-#: modules/stream_out/rtp.c:57 modules/stream_out/standard.c:60
+#: modules/stream_out/rtp.c:57 modules/stream_out/standard.c:59
 msgid "Session name"
 msgstr "Sessionsnamn"
 
@@ -12970,65 +13025,57 @@ msgstr ""
 msgid "RTP stream output"
 msgstr ""
 
-#: modules/stream_out/standard.c:49
+#: modules/stream_out/standard.c:48
 msgid ""
 "Allows you to specify the output muxer method used for the streaming output."
 msgstr ""
 
-#: modules/stream_out/standard.c:51
+#: modules/stream_out/standard.c:50
 msgid "Output URL (deprecated)"
 msgstr ""
 
-#: modules/stream_out/standard.c:53
+#: modules/stream_out/standard.c:52
 msgid ""
 "Allows you to specify the output URL used for the streaming output."
 "Deprecated, use dst instead."
 msgstr ""
 
-#: modules/stream_out/standard.c:56
+#: modules/stream_out/standard.c:55
 #, fuzzy
 msgid "Output destination"
 msgstr "Mål"
 
-#: modules/stream_out/standard.c:58
+#: modules/stream_out/standard.c:57
 #, fuzzy
 msgid ""
 "Allows you to specify the output destination used for the streaming output."
 msgstr "Låter dig ange \"description\" metadata för en inmatning."
 
-#: modules/stream_out/standard.c:62
-msgid "Name of the session that will be announced with SAP or SLP"
+#: modules/stream_out/standard.c:61
+msgid "Name of the session that will be announced with SAP"
 msgstr ""
 
-#: modules/stream_out/standard.c:64
+#: modules/stream_out/standard.c:63
 msgid "Session groupname"
 msgstr ""
 
-#: modules/stream_out/standard.c:66
+#: modules/stream_out/standard.c:65
 msgid "Name of the group that will be announced for the session"
 msgstr ""
 
-#: modules/stream_out/standard.c:68
+#: modules/stream_out/standard.c:67
 msgid "SAP announcing"
 msgstr ""
 
-#: modules/stream_out/standard.c:69
+#: modules/stream_out/standard.c:68
 msgid "Announce this session with SAP"
 msgstr ""
 
-#: modules/stream_out/standard.c:71
-msgid "SLP announcing"
-msgstr ""
-
-#: modules/stream_out/standard.c:72
-msgid "Announce this session with SLP"
-msgstr ""
-
-#: modules/stream_out/standard.c:80
+#: modules/stream_out/standard.c:76
 msgid "Standard"
 msgstr "Standard"
 
-#: modules/stream_out/standard.c:81
+#: modules/stream_out/standard.c:77
 msgid "Standard stream output"
 msgstr ""
 
@@ -13583,10 +13630,6 @@ msgstr ""
 msgid "Magnify/Zoom interactive video filter"
 msgstr ""
 
-#: modules/video_filter/magnify.c:60
-msgid "Magnify"
-msgstr ""
-
 #: modules/video_filter/marq.c:76
 msgid "Marquee text"
 msgstr ""
@@ -14117,7 +14160,7 @@ msgstr ""
 msgid "DirectX video output"
 msgstr ""
 
-#: modules/video_output/directx/directx.c:301
+#: modules/video_output/directx/directx.c:302
 msgid "Wallpaper"
 msgstr ""
 

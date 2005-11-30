@@ -827,8 +827,6 @@ modules/services_discovery/podcast.c
 modules/services_discovery/sap.c
 modules/services_discovery/shout.c
 modules/services_discovery/upnp.cpp
-modules/stream_out/announce.c
-modules/stream_out/announce.h
 modules/stream_out/bridge.c
 modules/stream_out/description.c
 modules/stream_out/display.c
