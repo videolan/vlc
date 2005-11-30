@@ -102,7 +102,7 @@ public:
 };
 
 BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
-   EVT_PAINT(VLCVolCtrl::OnPaint)
+    EVT_PAINT(VLCVolCtrl::OnPaint)
 
     /* Mouse events */
     EVT_LEFT_UP(VLCVolCtrl::OnChange)
@@ -139,21 +139,15 @@ enum
 
     Prefs_Event,
     Extended_Event,
-//    Undock_Event,
     Bookmarks_Event,
     Skins_Event,
 
-    SliderScroll_Event,
     StopStream_Event,
     PlayStream_Event,
     PrevStream_Event,
     NextStream_Event,
     SlowStream_Event,
     FastStream_Event,
-
-    DiscMenu_Event,
-    DiscPrev_Event,
-    DiscNext_Event,
 
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
@@ -180,7 +174,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU_OPEN(Interface::OnMenuOpen)
 
     EVT_MENU( Extended_Event, Interface::OnExtended )
-//    EVT_MENU( Undock_Event, Interface::OnUndock )
 
     EVT_MENU( Bookmarks_Event, Interface::OnShowDialog)
 
@@ -206,20 +199,9 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(SlowStream_Event, Interface::OnSlowStream)
     EVT_MENU(FastStream_Event, Interface::OnFastStream)
 
-    /* Disc Buttons events */
-    EVT_BUTTON(DiscMenu_Event, Interface::OnDiscMenu)
-    EVT_BUTTON(DiscPrev_Event, Interface::OnDiscPrev)
-    EVT_BUTTON(DiscNext_Event, Interface::OnDiscNext)
-
-    /* Slider events */
-    EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
-
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
     EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
-
-    EVT_TIMER(ID_CONTROLS_TIMER, Interface::OnControlsTimer)
-    EVT_TIMER(ID_SLIDER_TIMER, Interface::OnSliderTimer)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -231,43 +213,36 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    i_old_playing_status = PAUSE_S;
     b_extra = VLC_FALSE;
-//    b_undock = VLC_FALSE;
-
-
-    extra_window = NULL;
+    extra_frame = 0;
 
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
 
-    /* Create a sizer for the main frame */
-    frame_sizer = new wxBoxSizer( wxVERTICAL );
-    SetSizer( frame_sizer );
+    /* Create a main panel that will fill in the interface window */
+    main_sizer = new wxBoxSizer( wxVERTICAL );
+    SetSizer( main_sizer );
+    main_panel = new wxPanel( this );
+    main_sizer->Add( main_panel, 1, wxEXPAND );
+    main_panel->SetFocus();
 
-    /* Create a dummy widget that can get the keyboard focus */
-    wxWindow *p_dummy = new wxWindow( this, 0, wxDefaultPosition,
-                                      wxSize(0,0) );
 #if defined(__WXGTK20__) && wxCHECK_VERSION(2,5,6)
     /* As ugly as your butt! Please remove when wxWidgets 2.6 fixed their
      * Accelerators bug. */
-    p_dummy->m_imData = 0;
+    main_panel->m_imData = 0;
     m_imData = 0;
 #endif
-    p_dummy->SetFocus();
-    frame_sizer->Add( p_dummy, 0, 0 );
+
+    /* Create a sizer for the main frame */
+    panel_sizer = new wxBoxSizer( wxVERTICAL );
+    main_panel->SetSizer( panel_sizer );
 
 #ifdef wxHAS_TASK_BAR_ICON
     /* Systray integration */
     p_systray = NULL;
-    if ( config_GetInt( p_intf, "wx-systray" ) )
+    if( config_GetInt( p_intf, "wx-systray" ) )
     {
-        p_systray = new Systray(this, p_intf);
-        p_systray->SetIcon( wxIcon( vlc16x16_xpm ), wxT("VLC media player") );
-        if ( (! p_systray->IsOk()) || (! p_systray->IsIconInstalled()) )
-        {
-            msg_Warn(p_intf, "Cannot set systray icon, weird things may happen");
-        }
+        p_systray = new Systray( this, p_intf );
     }
 #endif
 
@@ -276,11 +251,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     /* Creation of the tool bar */
     CreateOurToolBar();
-
-    /* Create the extra panel */
-    extra_frame = new ExtraPanel( p_intf, this );
-    frame_sizer->Add( extra_frame, 0, wxEXPAND , 0 );
-    frame_sizer->Hide( extra_frame );
 
     /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
@@ -294,21 +264,19 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     video_window = 0;
     if( config_GetInt( p_intf, "wx-embed" ) )
     {
-        video_window = CreateVideoWindow( p_intf, this );
-        frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND, 0 );
+        video_window = CreateVideoWindow( p_intf, main_panel );
+        panel_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND, 0 );
     }
 
-    /* Creation of the slider sub-window */
-    CreateOurSlider();
-    frame_sizer->Add( slider_frame, 0, wxEXPAND , 0 );
-    frame_sizer->Hide( slider_frame );
-
-    /* Make sure we've got the right background colour */
-    SetBackgroundColour( slider_frame->GetBackgroundColour() );
+    /* Creation of the input manager panel */
+    input_manager = new InputManager( p_intf, this, main_panel );
+    panel_sizer->Add( input_manager, 0, wxEXPAND , 0 );
 
     /* Layout everything */
-    frame_sizer->Layout();
-    frame_sizer->Fit(this);
+    panel_sizer->Layout();
+    panel_sizer->Fit( main_panel );
+    main_sizer->Layout();
+    main_sizer->Fit( this );
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the main interface */
@@ -317,60 +285,31 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     SetupHotkeys();
 
-    m_controls_timer.SetOwner(this, ID_CONTROLS_TIMER);
-    m_slider_timer.SetOwner(this, ID_SLIDER_TIMER);
-
     /* Start timer */
     timer = new Timer( p_intf, this );
 
-    /* */
+    /* Restore previous position / settings */
     WindowSettings *ws = p_intf->p_sys->p_window_settings;
     wxPoint p;
-    wxSize  s;
-    bool    b_shown;
+    wxSize s;
+    bool b_shown;
 
     ws->SetScreen( wxSystemSettings::GetMetric( wxSYS_SCREEN_X ),
                    wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
 
-    if( ws->GetSettings( WindowSettings::ID_MAIN, b_shown, p, s ) )
-        Move( p );
+    if( ws->GetSettings( WindowSettings::ID_MAIN, b_shown, p, s ) ) Move( p );
 
-    /* Set minimum window size to prevent user from glitching it */
-    wxSize  s2;
+    /* Get minimum window size to prevent user from glitching it */
     s = GetSize();
-
-    /* save smallest possible default minimum size */
-    default_size = GetSize();
-
-    /* save slider size for height only for MinSizing */
-    slider_size = slider_sizer->GetSize();
-
-    /* and save extended gui size for MinSize scheme */
-    s2 = extra_frame->GetSize();
-    s2.SetWidth( s2.GetWidth() +
-                2 * wxSystemSettings::GetMetric( wxSYS_FRAMESIZE_X ) );
-    extended_size = s2;
-
-    /* Set initial minimum window size */
-    if( config_GetInt( p_intf, "wx-embed" ) )
-    {
-        s2 = video_window->GetSize();
-        s.SetHeight( s.GetHeight() - s2.GetHeight() );
-    }
-    if( config_GetInt( p_intf, "wx-extended" ) )
-    {
-        s.SetWidth( extended_size.GetWidth() );
-        s.SetHeight( s.GetHeight() + extended_size.GetHeight() );
-    }
-#if (wxCHECK_VERSION(2,5,4))
-    SetMinSize( s );
-#else
-    frame_sizer->SetMinSize( s );
-#endif
+    if( video_window && video_window->IsShown() )
+        s.SetHeight( s.GetHeight() - video_window->GetSize().GetHeight() );
+    main_min_size = s;
 
     /* Show extended GUI if requested */
-    if( ( b_extra = config_GetInt( p_intf, "wx-extended" ) ) )
-        frame_sizer->Show( extra_frame );
+    wxCommandEvent dummy;
+    if( config_GetInt( p_intf, "wx-extended" ) ) OnExtended( dummy );
+
+    SetIntfMinSize();
 }
 
 Interface::~Interface()
@@ -414,12 +353,10 @@ void Interface::OnControlEvent( wxCommandEvent& event )
     switch( event.GetId() )
     {
     case 0:
+        if( p_intf->p_sys->b_video_autosize )
         {
-          if( p_intf->p_sys->b_video_autosize )
-          {
-        frame_sizer->Layout();
-        frame_sizer->Fit(this);
-          }
+            main_sizer->Layout();
+            main_sizer->Fit(this);
         }
         break;
 
@@ -536,7 +473,7 @@ void Interface::CreateOurMenuBar()
 #endif
 /* End patch by zcot */
 
-    frame_sizer->SetMinSize( i_size, -1 );
+    panel_sizer->SetMinSize( i_size, -1 );
 
     /* Intercept all menu events in our custom event handler */
     PushEventHandler( new MenuEvtHandler( p_intf, this ) );
@@ -616,53 +553,6 @@ void Interface::CreateOurToolBar()
     /* Associate drop targets with the toolbar */
     toolbar->SetDropTarget( new DragAndDrop( p_intf ) );
 #endif
-}
-
-void Interface::CreateOurSlider()
-{
-    /* Create a new frame and sizer containing the slider */
-    slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
-    slider_frame->SetAutoLayout( TRUE );
-    slider_sizer = new wxBoxSizer( wxHORIZONTAL );
-    //slider_sizer->SetMinSize( -1, 50 );
-
-    /* Create slider */
-    slider = new wxSlider( slider_frame, SliderScroll_Event, 0, 0,
-                           SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
-
-    /* Add Disc Buttons */
-    disc_frame = new wxPanel( slider_frame, -1, wxDefaultPosition,
-                              wxDefaultSize );
-    disc_frame->SetAutoLayout( TRUE );
-    disc_sizer = new wxBoxSizer( wxHORIZONTAL );
-
-    disc_menu_button = new wxBitmapButton( disc_frame, DiscMenu_Event,
-                                           wxBitmap( playlist_xpm ) );
-    disc_prev_button = new wxBitmapButton( disc_frame, DiscPrev_Event,
-                                           wxBitmap( prev_xpm ) );
-    disc_next_button = new wxBitmapButton( disc_frame, DiscNext_Event,
-                                           wxBitmap( next_xpm ) );
-
-    disc_sizer->Add( disc_menu_button, 1, wxEXPAND | wxLEFT | wxRIGHT, 1 );
-    disc_sizer->Add( disc_prev_button, 1, wxEXPAND | wxLEFT | wxRIGHT, 1 );
-    disc_sizer->Add( disc_next_button, 1, wxEXPAND | wxLEFT | wxRIGHT, 1 );
-
-    disc_frame->SetSizer( disc_sizer );
-    disc_sizer->Layout();
-
-    /* Add everything to the frame */
-    slider_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
-    slider_sizer->Add( disc_frame, 0, wxALL, 2 );
-    slider_frame->SetSizer( slider_sizer );
-
-    disc_frame->Hide();
-    slider_sizer->Hide( disc_frame );
-
-    slider_sizer->Layout();
-    slider_sizer->Fit( slider_frame );
-
-    /* Hide the slider by default */
-    slider_frame->Hide();
 }
 
 static int ConvertHotkeyModifiers( int i_hotkey )
@@ -758,118 +648,27 @@ void Interface::SetupHotkeys()
     delete [] p_entries;
 }
 
-void Interface::HideSlider( bool layout )
+void Interface::SetIntfMinSize()
 {
-    ShowSlider( false, layout );
-}
+    wxSize ms = main_min_size;
 
-void Interface::ShowSlider( bool show, bool layout )
-{
-    if( show )
+    if( extra_frame && extra_frame->IsShown() )
     {
-        //prevent the hide timers from hiding it now
-        m_slider_timer.Stop();
-        m_controls_timer.Stop();
+        ms.SetHeight( ms.GetHeight() + ext_min_size.GetHeight() );
+        if( ext_min_size.GetWidth() > ms.GetWidth() )
+            ms.SetWidth( ext_min_size.GetWidth() );
+    }
 
-        //prevent continuous layout
-        if( slider_frame->IsShown() ) return;
-        
-        wxSize ms = GetMinSize();
-        ms.SetHeight( ms.GetHeight() + slider_size.GetHeight() );
 #if ( wxCHECK_VERSION( 2,5,4 ) )
-        SetMinSize( ms );
+    SetMinSize( ms );
 #else
-        frame_sizer->SetMinSize( ms );
+    main_sizer->SetMinSize( ms );
 #endif
-    }
-    else
-    {
-        //prevent continuous layout
-        if( !slider_frame->IsShown() ) return;
-        
-        wxSize ms = GetMinSize();
-        ms.SetHeight( ms.GetHeight() - slider_size.GetHeight() );
-#if ( wxCHECK_VERSION( 2,5,4 ) )
-        SetMinSize( ms );
-#else
-        frame_sizer->SetMinSize( ms );
-#endif
-    }
-
-    if( layout && p_intf->p_sys->b_video_autosize )
-        UpdateVideoWindow( p_intf, video_window );
-
-    slider_frame->Show( show );
-    frame_sizer->Show( slider_frame, show );
-
-    if( layout )
-    {
-        frame_sizer->Layout();
-        if( p_intf->p_sys->b_video_autosize ) frame_sizer->Fit( this );
-    }
-}
-
-void Interface::HideDiscFrame( bool layout )
-{
-    ShowDiscFrame( false, layout );
-}
-
-void Interface::ShowDiscFrame( bool show, bool layout )
-{
-    if( show )
-    {
-        //prevent the hide timer from hiding it now
-        m_controls_timer.Stop();
-
-        //prevent continuous layout
-        if( disc_frame->IsShown() ) return;
-    }
-    else
-    {
-        //prevent continuous layout
-        if( !disc_frame->IsShown() ) return;
-    }
-
-    if( layout && p_intf->p_sys->b_video_autosize )
-        UpdateVideoWindow( p_intf, video_window );
-
-    disc_frame->Show( show );
-    slider_sizer->Show( disc_frame, show );
-
-    if( layout )
-    {
-        slider_sizer->Layout();
-        if( p_intf->p_sys->b_video_autosize )
-            slider_sizer->Fit( slider_frame );
-    }
 }
 
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
-void Interface::OnControlsTimer( wxTimerEvent& WXUNUSED(event) )
-{
-    if( p_intf->p_sys->b_video_autosize )
-        UpdateVideoWindow( p_intf, video_window );
-
-    /* Hide slider and Disc Buttons */
-    //postpone layout, we'll do it ourselves
-    HideDiscFrame( false );
-    HideSlider( false );
-
-    slider_sizer->Layout();
-    if( p_intf->p_sys->b_video_autosize )
-    {
-        slider_sizer->Fit( slider_frame );
-        frame_sizer->Fit( this );
-    }
-}
-
-void Interface::OnSliderTimer( wxTimerEvent& WXUNUSED(event) )
-{
-    HideSlider();
-}
-
 void Interface::OnMenuOpen( wxMenuEvent& event )
 {
 #if defined( __WXMSW__ )
@@ -884,11 +683,6 @@ void Interface::OnMenuOpen( wxMenuEvent& event )
         p_settings_menu->AppendCheckItem( Extended_Event,
             wxU(_("Extended &GUI\tCtrl-G") ) );
         if( b_extra ) p_settings_menu->Check( Extended_Event, TRUE );
-#if 0
-        p_settings_menu->AppendCheckItem( Undock_Event,
-            wxU(_("&Undock Ext. GUI") ) );
-        if( b_undock ) p_settings_menu->Check( Undock_Event, TRUE );
-#endif
         p_settings_menu->Append( Bookmarks_Event,
                                  wxU(_("&Bookmarks...\tCtrl-B") ) );
         p_settings_menu->Append( Prefs_Event,
@@ -1028,38 +822,23 @@ void Interface::OnShowDialog( wxCommandEvent& event )
     }
 }
 
-void Interface::OnExtended(wxCommandEvent& event)
+void Interface::OnExtended( wxCommandEvent& WXUNUSED(event) )
 {
-    b_extra = (b_extra == VLC_TRUE ? VLC_FALSE : VLC_TRUE );
+    if( !extra_frame )
+    {
+        /* Create the extra panel */
+        extra_frame = new ExtraPanel( p_intf, main_panel );
+        panel_sizer->Add( extra_frame, 0, wxEXPAND , 0 );
+        ext_min_size = extra_frame->GetBestSize();
+    }
 
-    if( b_extra == VLC_FALSE )
-    {
-        extra_frame->Hide();
-        frame_sizer->Hide( extra_frame );
-        wxSize ms = GetMinSize();
-        ms.SetHeight( ms.GetHeight() - extended_size.GetHeight() );
-        ms.SetWidth( default_size.GetWidth() );
-#if ( wxCHECK_VERSION( 2,5,4 ) )
-        SetMinSize( ms );
-#else
-        frame_sizer->SetMinSize( ms );
-#endif
-    }
-    else
-    {
-        extra_frame->Show();
-        frame_sizer->Show( extra_frame );
-        wxSize ms = GetMinSize();
-        ms.SetHeight( ms.GetHeight() + extended_size.GetHeight() );
-        ms.SetWidth( extended_size.GetWidth() );
-#if ( wxCHECK_VERSION( 2,5,4 ) )
-        SetMinSize( ms );
-#else
-        frame_sizer->SetMinSize( ms );
-#endif
-    }
-    frame_sizer->Layout();
-    frame_sizer->Fit(this);
+    b_extra = !b_extra;
+
+    panel_sizer->Show( extra_frame, b_extra );
+
+    SetIntfMinSize();
+    main_sizer->Layout();
+    main_sizer->Fit( this );
 }
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
@@ -1086,13 +865,12 @@ void Interface::PlayStream()
         {
             /* No stream was playing, start one */
             playlist_Play( p_playlist );
-            TogglePlayButton( PLAYING_S );
             vlc_object_release( p_playlist );
+            input_manager->Update();
             return;
         }
 
         var_Get( p_input, "state", &state );
-
         if( state.i_int != PAUSE_S )
         {
             /* A stream is being played, pause it */
@@ -1105,9 +883,9 @@ void Interface::PlayStream()
         }
         var_Set( p_input, "state", state );
 
-        TogglePlayButton( state.i_int );
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );
+        input_manager->Update();
     }
     else
     {
@@ -1132,57 +910,8 @@ void Interface::StopStream()
     }
 
     playlist_Stop( p_playlist );
-    TogglePlayButton( PAUSE_S );
     vlc_object_release( p_playlist );
-}
-
-void Interface::OnSliderUpdate( wxScrollEvent& event )
-{
-    vlc_mutex_lock( &p_intf->change_lock );
-
-#ifdef WIN32
-    if( event.GetEventType() == wxEVT_SCROLL_THUMBRELEASE
-        || event.GetEventType() == wxEVT_SCROLL_ENDSCROLL )
-    {
-#endif
-        if( p_intf->p_sys->i_slider_pos != event.GetPosition()
-            && p_intf->p_sys->p_input )
-        {
-            vlc_value_t pos;
-            pos.f_float = (float)event.GetPosition() / (float)SLIDER_MAX_POS;
-
-            var_Set( p_intf->p_sys->p_input, "position", pos );
-        }
-
-#ifdef WIN32
-        p_intf->p_sys->b_slider_free = VLC_TRUE;
-    }
-    else
-    {
-        p_intf->p_sys->b_slider_free = VLC_FALSE;
-
-        if( p_intf->p_sys->p_input )
-        {
-            /* Update stream date */
-            char psz_time[ MSTRTIME_MAX_SIZE ], psz_total[ MSTRTIME_MAX_SIZE ];
-            mtime_t i_seconds;
-
-            i_seconds = var_GetTime( p_intf->p_sys->p_input, "length" ) /
-                        I64C(1000000 );
-            secstotimestr( psz_total, i_seconds );
-
-            i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) /
-                        I64C(1000000 );
-            secstotimestr( psz_time, i_seconds );
-
-            statusbar->SetStatusText( wxU(psz_time) + wxString(wxT(" / ") ) +
-                                      wxU(psz_total), 0 );
-        }
-    }
-#endif
-
-#undef WIN32
-    vlc_mutex_unlock( &p_intf->change_lock );
+    input_manager->Update();
 }
 
 void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
@@ -1252,9 +981,6 @@ void Interface::OnFastStream( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::TogglePlayButton( int i_playing_status )
 {
-    if( i_playing_status == i_old_playing_status )
-        return;
-
     wxToolBarToolBase *p_tool = (wxToolBarToolBase *)
         GetToolBar()->GetToolClientData( PlayStream_Event );
     if( !p_tool ) return;
@@ -1275,56 +1001,6 @@ void Interface::TogglePlayButton( int i_playing_status )
     GetToolBar()->Realize();
     GetToolBar()->ToggleTool( PlayStream_Event, true );
     GetToolBar()->ToggleTool( PlayStream_Event, false );
-
-    i_old_playing_status = i_playing_status;
-}
-
-void Interface::OnDiscMenu( wxCommandEvent& WXUNUSED(event) )
-{
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
-    if( p_input )
-    {
-        vlc_value_t val; val.i_int = 2;
-
-        var_Set( p_input, "title  0", val);
-        vlc_object_release( p_input );
-    }
-}
-
-void Interface::OnDiscPrev( wxCommandEvent& WXUNUSED(event) )
-{
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
-    if( p_input )
-    {
-        int i_type = var_Type( p_input, "prev-chapter" );
-        vlc_value_t val; val.b_bool = VLC_TRUE;
-
-        var_Set( p_input, ( i_type & VLC_VAR_TYPE ) != 0 ?
-                 "prev-chapter" : "prev-title", val );
-
-        vlc_object_release( p_input );
-    }
-}
-
-void Interface::OnDiscNext( wxCommandEvent& WXUNUSED(event) )
-{
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
-    if( p_input )
-    {
-        int i_type = var_Type( p_input, "next-chapter" );
-        vlc_value_t val; val.b_bool = VLC_TRUE;
-
-        var_Set( p_input, ( i_type & VLC_VAR_TYPE ) != 0 ?
-                 "next-chapter" : "next-title", val );
-
-        vlc_object_release( p_input );
-    }
 }
 
 #if wxUSE_DRAG_AND_DROP
@@ -1494,6 +1170,12 @@ Systray::Systray( Interface *_p_main_interface, intf_thread_t *_p_intf )
 {
     p_main_interface = _p_main_interface;
     p_intf = _p_intf;
+
+    SetIcon( wxIcon( vlc16x16_xpm ), wxT("VLC media player") );
+    if( !IsOk() || !IsIconInstalled() )
+    {
+        msg_Warn(p_intf, "cannot set systray icon, weird things may happen");
+    }
 }
 
 /* Event handlers */

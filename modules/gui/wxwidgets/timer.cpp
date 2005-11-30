@@ -25,7 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include "timer.hpp"
-#include "main_slider_manager.hpp"
+#include "input_manager.hpp"
 #include "interface.hpp"
 #include "vlc_meta.h"
 
@@ -45,11 +45,6 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
     b_init = 0;
-
-    msm = new MainSliderManager( p_intf, p_main_interface );
-
-    i_old_playing_status = PAUSE_S;
-    i_old_rate = INPUT_RATE_DEFAULT;
 
     /* Register callback for the intf-popupmenu variable */
     playlist_t *p_playlist =
@@ -77,8 +72,6 @@ Timer::~Timer()
         var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
-
-    delete msm;
 }
 
 /*****************************************************************************
@@ -104,61 +97,12 @@ void Timer::Notify()
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* Call update */
-    msm->Update();
+    p_main_interface->input_manager->Update();
 
-    vlc_value_t val;
-    input_thread_t *p_input = p_intf->p_sys->p_input;
-    if( p_intf->p_sys->p_input )
+    if( p_main_interface->input_manager->IsPlaying() )
     {
-        if( !p_intf->p_sys->p_input->b_die )
-        {
-            /* Take care of the volume, etc... */
-            p_main_interface->Update();
-
-            /* Manage Playing status */
-            var_Get( p_input, "state", &val );
-            if( i_old_playing_status != val.i_int )
-            {
-                if( val.i_int == PAUSE_S )
-                {
-                    p_main_interface->TogglePlayButton( PAUSE_S );
-                }
-                else
-                {
-                    p_main_interface->TogglePlayButton( PLAYING_S );
-                }
-#ifdef wxHAS_TASK_BAR_ICON
-                if( p_main_interface->p_systray )
-                {
-                    if( val.i_int == PAUSE_S )
-                    {
-                        p_main_interface->p_systray->UpdateTooltip( wxU(p_intf->p_sys->p_input->input.p_item->psz_name) + wxString(wxT(" - ")) + wxU(_("Paused")));
-                    }
-                    else
-                    {
-                        p_main_interface->p_systray->UpdateTooltip( wxU(p_intf->p_sys->p_input->input.p_item->psz_name) + wxString(wxT(" - ")) + wxU(_("Playing")));
-                    }
-                }
-#endif
-                i_old_playing_status = val.i_int;
-            }
-
-            /* Manage Speed status */
-            var_Get( p_input, "rate", &val );
-            if( i_old_rate != val.i_int )
-            {
-                p_main_interface->statusbar->SetStatusText(
-                    wxString::Format(wxT("x%.2f"),
-                    (float)INPUT_RATE_DEFAULT / val.i_int ), 1 );
-                i_old_rate = val.i_int;
-            }
-        }
-    }
-    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
-    {
-        p_intf->p_sys->b_playing = 0;
-        p_main_interface->TogglePlayButton( PAUSE_S );
-        i_old_playing_status = PAUSE_S;
+        /* Take care of the volume, etc... */
+        p_main_interface->Update();
     }
 
     /* Show the interface, if requested */

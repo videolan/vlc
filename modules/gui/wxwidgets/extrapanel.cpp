@@ -150,7 +150,6 @@ static const struct filter vfilters[] =
     { "clone", N_("Image clone"), N_("Creates several clones of the image") },
     { "distort", N_("Distortion"), N_("Adds distorsion effects") },
     { "invert", N_("Image inversion") , N_("Inverts the image colors") },
-    { "crop", N_("Image cropping"), N_("Crops the image") },
     { "motionblur", N_("Blurring"), N_("Creates a motion blurring on the image") },
     { "transform",  N_("Transformation"), N_("Rotates or flips the image") },
     { "magnify",  N_("Magnify"), N_("Magnifies part of the image") },
@@ -311,7 +310,7 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     {
         wxCheckBox *box = new wxCheckBox( panel, Filter0_Event + i,
                                           wxU( _( vfilters[i].psz_name ) ) );
-        t_col_sizer->Add( box, 0, wxALL, 4 );
+        t_col_sizer->Add( box, 0, wxALL, 2 );
         box->SetToolTip( wxU( _( vfilters[i].psz_help ) ) );
     }
 
@@ -1215,13 +1214,11 @@ ExtraWindow::ExtraWindow( intf_thread_t *_p_intf, wxWindow *p_parent,
        wxFrame( p_parent, -1, wxU(_("Extended controls")), wxDefaultPosition,
                  wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
-        fprintf(stderr,"Creating extrawindow\n");
     p_intf = _p_intf;
     SetIcon( *p_intf->p_sys->p_icon );
 
     wxBoxSizer *window_sizer = new wxBoxSizer( wxVERTICAL );
     SetSizer( window_sizer );
-//    panel = new ExtraPanel(  p_intf, this );//_extra_panel;
 
     panel = _extra_panel;
     window_sizer->Add( panel );

@@ -2,7 +2,7 @@
  * wxwidgets.hpp: Common headers for the wxwidges interface
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12502 2005-09-09 19:38:01Z gbazin $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -136,11 +136,6 @@ struct intf_sys_t
 
     /* The input thread */
     input_thread_t *    p_input;
-
-    /* The slider */
-    int                 i_slider_pos;                     /* slider position */
-    int                 i_slider_oldpos;                /* previous position */
-    vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* The messages window */
     msg_subscription_t* p_sub;                  /* message bank subscription */

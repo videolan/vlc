@@ -8,8 +8,7 @@ SOURCES_wxwidgets = \
 	menus.cpp \
 	timer.cpp \
 	video.cpp \
-	slider_manager.cpp \
-	main_slider_manager.cpp \
+	input_manager.cpp \
 	dialogs.cpp \
 	dialogs/open.cpp \
 	dialogs/streamout.cpp \
@@ -41,8 +40,7 @@ EXTRA_DIST += \
 	extrapanel.hpp \
 	timer.hpp \
 	video.hpp \
-	slider_manager.hpp \
-	main_slider_manager.hpp \
+	input_manager.hpp \
 	dialogs/fileinfo.hpp \
 	dialogs/preferences.hpp \
 	dialogs/wizard.hpp \

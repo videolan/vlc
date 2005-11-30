@@ -2,7 +2,7 @@
  * vlm_slider_manager.hpp: Header for slider_manager
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12502 2005-09-09 19:38:01Z gbazin $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -24,7 +24,7 @@
 #ifndef _VLM_SLIDER_MANAGER_H_
 #define _VLM_SLIDER_MANAGER_H_
 
-#include "slider_manager.hpp"
+#include "wxwidgets.hpp"
 
 namespace wxvlc
 {
@@ -32,7 +32,7 @@ namespace wxvlc
     /**
      * This class manages a slider corresponding to the main input
      */
-    class VLMSliderManager: public SliderManager
+    class VLMSliderManager
     {
     public:
         VLMSliderManager( intf_thread_t *, VLMBroadcastStreamPanel * );
@@ -40,6 +40,7 @@ namespace wxvlc
 
         wxString time_string;
 
+        void Update();
         void ProcessUpdate( wxScrollEvent & );
 
     protected:
@@ -56,6 +57,11 @@ namespace wxvlc
         virtual void ShowSlider();
 
         VLMBroadcastStreamPanel * p_sp;
+
+        intf_thread_t * p_intf;
+        input_thread_t *p_input;
+        wxSlider *slider;            ///< Slider for this input
+        int i_slider_pos;            ///< Current slider position
     };
 };
 

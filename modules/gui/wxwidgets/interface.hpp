@@ -2,7 +2,7 @@
  * interface.hpp: Main interface headers
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12670 2005-09-25 11:16:31Z zorglub $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -25,11 +25,11 @@
 #define _WXVLC_INTERFACE_H_
 
 #include "wxwidgets.hpp"
+#include "input_manager.hpp"
 
 #include <wx/dnd.h>
 #include <wx/accel.h>
 #include <wx/taskbar.h>
-//#include "vlc_keys.h"
 
 
 namespace wxvlc
@@ -91,30 +91,17 @@ namespace wxvlc
         void PrevStream();
         void NextStream();
 
-        wxBoxSizer  *frame_sizer;
+        wxBoxSizer  *main_sizer;
+
+        wxPanel     *main_panel;
+        wxBoxSizer  *panel_sizer;
+
         wxStatusBar *statusbar;
 
-        void HideSlider(bool layout = true);
-        void ShowSlider(bool show = true, bool layout = true);
+        InputManager *input_manager;
 
-        wxSlider    *slider;
-        wxWindow    *slider_frame;
-        wxBoxSizer  *slider_sizer;
+        vlc_bool_t  b_extra;
         wxPanel     *extra_frame;
-
-        void HideDiscFrame(bool layout = true);
-        void ShowDiscFrame(bool show = true, bool layout = true);
-
-        wxPanel         *disc_frame;
-        wxBoxSizer      *disc_sizer;
-        wxBitmapButton  *disc_menu_button;
-        wxBitmapButton  *disc_prev_button;
-        wxBitmapButton  *disc_next_button;
-
-        wxFrame    *extra_window;
-
-        vlc_bool_t b_extra;
-        vlc_bool_t b_undock;
 
         wxControl  *volctrl;
 
@@ -122,21 +109,18 @@ namespace wxvlc
         Systray     *p_systray;
     #endif
 
-        wxTimer m_controls_timer;
-        wxTimer m_slider_timer;
+        wxWindow *video_window;
 
     private:
         void SetupHotkeys();
         void CreateOurMenuBar();
         void CreateOurToolBar();
         void CreateOurExtendedPanel();
-        void CreateOurSlider();
         void Open( int i_access_method );
 
-        /* Event handlers (these functions should _not_ be virtual) */
-        void OnControlsTimer(wxTimerEvent& WXUNUSED(event));
-        void OnSliderTimer(wxTimerEvent& WXUNUSED(event));
+        void SetIntfMinSize();
 
+        /* Event handlers (these functions should _not_ be virtual) */
         void OnExit( wxCommandEvent& event );
         void OnAbout( wxCommandEvent& event );
 
@@ -148,21 +132,15 @@ namespace wxvlc
         void OnOpenSat( wxCommandEvent& event );
 
         void OnExtended( wxCommandEvent& event );
-        //void OnUndock( wxCommandEvent& event );
 
         void OnBookmarks( wxCommandEvent& event );
         void OnShowDialog( wxCommandEvent& event );
         void OnPlayStream( wxCommandEvent& event );
         void OnStopStream( wxCommandEvent& event );
-        void OnSliderUpdate( wxScrollEvent& event );
         void OnPrevStream( wxCommandEvent& event );
         void OnNextStream( wxCommandEvent& event );
         void OnSlowStream( wxCommandEvent& event );
         void OnFastStream( wxCommandEvent& event );
-
-        void OnDiscMenu( wxCommandEvent& event );
-        void OnDiscPrev( wxCommandEvent& event );
-        void OnDiscNext( wxCommandEvent& event );
 
         void OnMenuOpen( wxMenuEvent& event );
 
@@ -178,8 +156,6 @@ namespace wxvlc
         Timer *timer;
         intf_thread_t *p_intf;
 
-        wxWindow *video_window;
-
         int i_old_playing_status;
 
         /* For auto-generated menus */
@@ -188,10 +164,9 @@ namespace wxvlc
         wxMenu *p_video_menu;
         wxMenu *p_navig_menu;
 
-        /* utility dimensions */
-        wxSize default_size;
-        wxSize extended_size;
-        wxSize slider_size;
+        /* Utility dimensions */
+        wxSize main_min_size;
+        wxSize ext_min_size;
     };
 
 
@@ -247,12 +222,10 @@ namespace wxvlc
     };
 };
 
-/// \todo Move this to class
 void PopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );
 wxMenu *SettingsMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
 wxMenu *AudioMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
 wxMenu *VideoMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
 wxMenu *NavigMenu( intf_thread_t *, wxWindow *, wxMenu * = NULL );
-
 
 #endif

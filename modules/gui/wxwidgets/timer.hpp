@@ -2,7 +2,7 @@
  * timer.hpp: Timer headers
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12502 2005-09-09 19:38:01Z gbazin $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -25,7 +25,7 @@
 
 namespace wxvlc
 {
-    class MainSliderManager;
+    class InputManager;
     class Interface;
 
     class Timer: public wxTimer
@@ -38,16 +38,13 @@ namespace wxvlc
         virtual void Notify();
 
     private:
-        //use wxWindow::IsShown instead
-        //vlc_bool_t b_slider_shown;
-        //vlc_bool_t b_disc_shown;
         intf_thread_t *p_intf;
         Interface *p_main_interface;
         vlc_bool_t b_init;
         int i_old_playing_status;
         int i_old_rate;
 
-        MainSliderManager *msm;
+        InputManager *msm;
     };
 
 }

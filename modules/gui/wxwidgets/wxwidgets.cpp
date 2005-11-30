@@ -180,8 +180,6 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
-    p_intf->p_sys->b_slider_free = 1;
-    p_intf->p_sys->i_slider_pos = p_intf->p_sys->i_slider_oldpos = 0;
 
     p_intf->p_sys->p_popup_menu = NULL;
     p_intf->p_sys->p_video_window = NULL;

@@ -2,7 +2,7 @@
  * vlm_slider_manager.cpp : Manage an input slider for a VLM stream
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
- * $Id: timer.cpp 11981 2005-08-03 15:03:23Z xtophe $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -32,11 +32,13 @@
  * Constructor.
  *****************************************************************************/
 VLMSliderManager::VLMSliderManager( intf_thread_t *_p_intf,
-                                    VLMBroadcastStreamPanel *_p_sp ) :
-        SliderManager( _p_intf )
+                                    VLMBroadcastStreamPanel *_p_sp )
 {
+    p_intf = _p_intf;
+    p_input = NULL;
+
     p_sp = _p_sp;
-    _slider = p_sp->p_slider;
+    slider = p_sp->p_slider;
 
     b_slider_free = VLC_TRUE;
     time_string = wxU( "0:00:00 / 0:00:00");
@@ -47,9 +49,75 @@ VLMSliderManager::~VLMSliderManager()
 }
 
 /*****************************************************************************
+ * Public methods.
+ *****************************************************************************/
+void VLMSliderManager::Update()
+{
+    /* Update the input */
+    if( p_input == NULL )
+    {
+        UpdateInput();
+
+        if( p_input )
+        {
+            slider->SetValue( 0 );
+            UpdateButtons( VLC_TRUE );
+        }
+    }
+    else if( p_input->b_dead )
+    {
+        HideSlider();
+        UpdateButtons( VLC_FALSE );
+
+        vlc_object_release( p_input );
+        p_input = NULL;
+    }
+
+    if( p_input && !p_input->b_die )
+    {
+        vlc_value_t pos;
+
+        /* Really manage the slider */
+        var_Get( p_input, "position", &pos );
+
+        if( pos.f_float > 0.0 && ! IsShown() ) ShowSlider();
+        else if( pos.f_float <= 0.0 ) HideSlider();
+
+        if( IsPlaying() && IsShown() )
+        {
+            /* Update the slider if the user isn't dragging it. */
+            if( IsFree() )
+            {
+                char psz_time[ MSTRTIME_MAX_SIZE ];
+                char psz_total[ MSTRTIME_MAX_SIZE ];
+                vlc_value_t time;
+                mtime_t i_seconds;
+
+                /* Update the value */
+                if( pos.f_float >= 0.0 )
+                {
+                    i_slider_pos = (int)(SLIDER_MAX_POS * pos.f_float);
+
+                    slider->SetValue( i_slider_pos );
+
+                    var_Get( p_input, "time", &time );
+                    i_seconds = time.i_time / 1000000;
+                    secstotimestr ( psz_time, i_seconds );
+
+                    var_Get( p_input, "length",  &time );
+                    i_seconds = time.i_time / 1000000;
+                    secstotimestr ( psz_total, i_seconds );
+
+                    UpdateTime( psz_time, psz_total );
+                }
+            }
+        }
+    }
+}
+
+/*****************************************************************************
  * Private methods.
  *****************************************************************************/
-
 void VLMSliderManager::UpdateInput()
 {
     if( p_sp->GetStream()->p_media->i_instance == 0 )
@@ -75,18 +143,18 @@ void VLMSliderManager::UpdateButtons( vlc_bool_t b_play )
 
 vlc_bool_t VLMSliderManager::IsShown()
 {
-    return _slider->IsEnabled();
+    return slider->IsEnabled();
 }
 
 void VLMSliderManager::ShowSlider()
 {
-    _slider->Enable();
+    slider->Enable();
 }
 
 void VLMSliderManager::HideSlider()
 {
-    _slider->SetValue( 0 );
-    _slider->Disable();
+    slider->SetValue( 0 );
+    slider->Disable();
     UpdateTime( "0:00:00", "0:00:00" );
 }
 
