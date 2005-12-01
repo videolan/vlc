@@ -222,7 +222,8 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Create a main panel that will fill in the interface window */
     main_sizer = new wxBoxSizer( wxVERTICAL );
     SetSizer( main_sizer );
-    main_panel = new wxPanel( this );
+    main_panel = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize,
+                              wxCLIP_CHILDREN );
     main_sizer->Add( main_panel, 1, wxEXPAND );
     main_panel->SetFocus();
 
@@ -260,6 +261,11 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     statusbar->SetStatusWidths( 3, i_status_width );
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
+    /* Get minimum window size to prevent user from glitching it */
+    panel_sizer->Layout(); panel_sizer->Fit( main_panel );
+    main_sizer->Layout(); main_sizer->Fit( this );
+    main_min_size = GetSize();
+
     /* Video window */
     video_window = 0;
     if( config_GetInt( p_intf, "wx-embed" ) )
@@ -273,10 +279,8 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     panel_sizer->Add( input_manager, 0, wxEXPAND , 0 );
 
     /* Layout everything */
-    panel_sizer->Layout();
-    panel_sizer->Fit( main_panel );
-    main_sizer->Layout();
-    main_sizer->Fit( this );
+    panel_sizer->Layout(); panel_sizer->Fit( main_panel );
+    main_sizer->Layout(); main_sizer->Fit( this );
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the main interface */
@@ -298,12 +302,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
                    wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
 
     if( ws->GetSettings( WindowSettings::ID_MAIN, b_shown, p, s ) ) Move( p );
-
-    /* Get minimum window size to prevent user from glitching it */
-    s = GetSize();
-    if( video_window && video_window->IsShown() )
-        s.SetHeight( s.GetHeight() - video_window->GetSize().GetHeight() );
-    main_min_size = s;
 
     /* Show extended GUI if requested */
     wxCommandEvent dummy;
@@ -353,11 +351,8 @@ void Interface::OnControlEvent( wxCommandEvent& event )
     switch( event.GetId() )
     {
     case 0:
-        if( p_intf->p_sys->b_video_autosize )
-        {
-            main_sizer->Layout();
-            main_sizer->Fit(this);
-        }
+        main_sizer->Layout();
+        main_sizer->Fit( this );
         break;
 
     case 1:
@@ -659,11 +654,7 @@ void Interface::SetIntfMinSize()
             ms.SetWidth( ext_min_size.GetWidth() );
     }
 
-#if ( wxCHECK_VERSION( 2,5,4 ) )
-    SetMinSize( ms );
-#else
-    main_sizer->SetMinSize( ms );
-#endif
+    SetSizeHints( ms );
 }
 
 /*****************************************************************************
@@ -824,6 +815,8 @@ void Interface::OnShowDialog( wxCommandEvent& event )
 
 void Interface::OnExtended( wxCommandEvent& WXUNUSED(event) )
 {
+    UpdateVideoWindow( p_intf, video_window );
+
     if( !extra_frame )
     {
         /* Create the extra panel */
@@ -833,7 +826,6 @@ void Interface::OnExtended( wxCommandEvent& WXUNUSED(event) )
     }
 
     b_extra = !b_extra;
-
     panel_sizer->Show( extra_frame, b_extra );
 
     SetIntfMinSize();
@@ -999,6 +991,14 @@ void Interface::TogglePlayButton( int i_playing_status )
     }
 
     GetToolBar()->Realize();
+
+#if defined( __WXMSW__ )
+    /* Needed to work around a bug in wxToolBar::Realize() */
+    GetToolBar()->SetSize( GetSize().GetWidth(),
+                           GetToolBar()->GetSize().GetHeight() );
+    GetToolBar()->Update();
+#endif
+
     GetToolBar()->ToggleTool( PlayStream_Event, true );
     GetToolBar()->ToggleTool( PlayStream_Event, false );
 }

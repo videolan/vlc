@@ -71,6 +71,7 @@ InputManager::InputManager( intf_thread_t *_p_intf, Interface *_p_main_intf,
     i_old_playing_status = STATUS_STOP;
     i_old_rate = INPUT_RATE_DEFAULT;
     b_slider_free = VLC_TRUE;
+    i_input_hide_delay = 0;
 
     /* Create slider */
     slider = new wxSlider( this, SliderScroll_Event, 0, 0, SLIDER_MAX_POS );
@@ -280,10 +281,15 @@ void InputManager::Update()
         {
             slider->SetValue( 0 );
         }
-        else
+        else if( !i_input_hide_delay )
+        {
+            i_input_hide_delay = mdate() + 200000;
+        }
+        else if( i_input_hide_delay < mdate() )
         {
             if( disc_frame->IsShown() ) HideDiscFrame();
             if( slider->IsShown() ) HideSlider();
+            i_input_hide_delay = 0;
         }
     }
     else if( p_input->b_dead )
@@ -291,6 +297,10 @@ void InputManager::Update()
         UpdateButtons( VLC_FALSE );
         vlc_object_release( p_input );
         p_input = NULL;
+    }
+    else
+    {
+        i_input_hide_delay = 0;
     }
 
     if( p_input && !p_input->b_die )
@@ -416,8 +426,7 @@ void InputManager::ShowSlider( bool show )
 {
     if( !!show == !!slider->IsShown() ) return;
 
-    if( p_intf->p_sys->b_video_autosize )
-        UpdateVideoWindow( p_intf, p_main_intf->video_window );
+    UpdateVideoWindow( p_intf, p_main_intf->video_window );
 
     sizer->Show( slider, show );
     sizer->Layout();
@@ -430,8 +439,7 @@ void InputManager::ShowDiscFrame( bool show )
 {
     if( !!show == !!disc_frame->IsShown() ) return;
 
-    if( p_intf->p_sys->b_video_autosize )
-        UpdateVideoWindow( p_intf, p_main_intf->video_window );
+    UpdateVideoWindow( p_intf, p_main_intf->video_window );
 
     sizer->Show( disc_frame, show );
     sizer->Layout();

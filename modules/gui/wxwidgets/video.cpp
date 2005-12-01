@@ -70,7 +70,9 @@ wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
 
 void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window )
 {
-#if (wxCHECK_VERSION(2,5,0))
+#if (wxCHECK_VERSION(2,5,3))
+    if( !p_intf->p_sys->b_video_autosize ) return;
+
     if( p_window && mdate() - ((VideoWindow *)p_window)->i_creation_date < 2000000 )
         return; /* Hack to prevent saving coordinates if window is not yet
                  * properly created. Yuck :( */
@@ -84,15 +86,16 @@ void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window )
  * Constructor.
  *****************************************************************************/
 VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
-    wxWindow( _p_parent, -1 )
+  wxWindow( _p_parent, -1, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN )
 {
     /* Initializations */
     p_intf = _p_intf;
     p_parent = _p_parent;
+    p_child_window = 0;
 
     vlc_mutex_init( p_intf, &lock );
 
-    b_auto_size = config_GetInt( p_intf, "wx-autosize" );
+    b_auto_size = p_intf->p_sys->b_video_autosize;
 
     p_vout = NULL;
     i_creation_date = 0;
@@ -118,15 +121,18 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, wxWindow *_p_parent ):
         SetSize( child_size );
     }
 
-    p_child_window = new wxWindow( this, -1, wxDefaultPosition, child_size );
+#ifdef __WXGTK__
+    p_child_window = new wxWindow( this, -1, wxDefaultPosition, child_size,
+                                   wxCLIP_CHILDREN );
+#endif
 
     if( !b_auto_size )
     {
         SetBackgroundColour( *wxBLACK );
-        p_child_window->SetBackgroundColour( *wxBLACK );
+        if( p_child_window ) p_child_window->SetBackgroundColour( *wxBLACK );
     }
 
-    p_child_window->Show();
+    if( p_child_window ) p_child_window->Show();
     Show();
     b_shown = VLC_TRUE;
 
@@ -333,8 +339,8 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
             unsigned int *pi_width  = va_arg( args, unsigned int * );
             unsigned int *pi_height = va_arg( args, unsigned int * );
 
-	    *pi_width = GetSize().GetWidth();
-	    *pi_height = GetSize().GetHeight();
+            *pi_width = GetSize().GetWidth();
+            *pi_height = GetSize().GetHeight();
             i_ret = VLC_SUCCESS;
         }
         break;

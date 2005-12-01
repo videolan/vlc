@@ -84,6 +84,7 @@ namespace wxvlc
         int i_old_playing_status;    ///< Previous playing status
         int i_old_rate;              ///< Previous playing rate
 
+        mtime_t i_input_hide_delay;  ///< Allows delaying slider hidding
     };
 };
 
