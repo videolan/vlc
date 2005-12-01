@@ -158,6 +158,7 @@ struct aout_sys_t
     UInt32                      i_stream_index;
     AudioStreamBasicDescription stream_format;
     UInt32                      b_dev_alive;
+    pid_t                       i_hog_pid;
 
     vlc_bool_t                  b_revert_sfmt;
     AudioStreamBasicDescription sfmt_revert;
@@ -253,6 +254,7 @@ static int Open( vlc_object_t * p_this )
 
     p_aout->output.p_sys = p_sys;
     p_aout->output.pf_play = Play;
+    p_sys->i_hog_pid = -1;
 
     vlc_mutex_init( p_aout, &p_sys->lock );
 
@@ -281,7 +283,6 @@ static int Open( vlc_object_t * p_this )
 
     /* get starting channel for the selected stream */
     p_option = &p_sys->p_options[p_sys->i_sel_opt];
-
     i_param_size = sizeof( UInt32 ); 
     err = AudioStreamGetProperty( p_option->i_sid, 0, 
                                   kAudioStreamPropertyStartingChannel,
@@ -337,34 +338,34 @@ static int Open( vlc_object_t * p_this )
         free( (void *)p_sys );
         return( VLC_EGENERIC );
     }
-
+    
     msg_Dbg( p_aout, "device bufframe size: [%ld]", p_sys->i_bufframe_size );
     msg_Dbg( p_aout, "device buffer index: [%ld]", p_sys->i_stream_index );
 
-    /* If we do AC3 over SPDIF, set buffer size to one AC3 frame */
-    if( ( p_sys->stream_format.mFormatID == kAudioFormat60958AC3 ||
-          p_sys->stream_format.mFormatID == 'IAC3' ) &&
-        p_sys->i_bufframe_size != A52_FRAME_NB )
-    {
-        p_sys->i_bufframe_size = A52_FRAME_NB;
-        i_param_size = sizeof( p_sys->i_bufframe_size );
-        err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
-                                      kAudioDevicePropertyBufferFrameSize,
-                                      i_param_size, &p_sys->i_bufframe_size );
-        if( err != noErr )
-        {
-            msg_Err( p_aout, "failed to set bufframe size (%ld): [%4.4s]", 
-                     p_sys->i_bufframe_size, (char *)&err );
-            FreeDevice( p_aout );
-            FreeHardwareInfo( p_aout );
-            vlc_mutex_destroy( &p_sys->lock );
-            free( (void *)p_sys );
-            return( VLC_EGENERIC );
-        }
+	/* If we do AC3 over SPDIF, set buffer size to one AC3 frame */
+	if( ( p_sys->stream_format.mFormatID == kAudioFormat60958AC3 ||
+			p_sys->stream_format.mFormatID == 'IAC3' ) &&
+		p_sys->i_bufframe_size != A52_FRAME_NB )
+	{   
+		p_sys->i_bufframe_size = A52_FRAME_NB;
+		i_param_size = sizeof( p_sys->i_bufframe_size );
+		err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
+									  kAudioDevicePropertyBufferFrameSize,
+									  i_param_size, &p_sys->i_bufframe_size );
+		if( err != noErr )
+		{
+			msg_Err( p_aout, "failed to set bufframe size (%ld): [%4.4s]", 
+					 p_sys->i_bufframe_size, (char *)&err );
+			FreeDevice( p_aout );
+			FreeHardwareInfo( p_aout );
+			vlc_mutex_destroy( &p_sys->lock );
+			free( (void *)p_sys );
+			return( VLC_EGENERIC );
+		}
 
-        msg_Dbg( p_aout, "device bufframe size set to: [%ld]", 
-                 p_sys->i_bufframe_size );
-    }
+		msg_Dbg( p_aout, "device bufframe size set to: [%ld]", 
+			 p_sys->i_bufframe_size );
+	}
 
     switch( p_sys->stream_format.mFormatID )
     {
@@ -420,7 +421,10 @@ static int Open( vlc_object_t * p_this )
 
     case 'IAC3':
     case kAudioFormat60958AC3:
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        if( p_sys->stream_format.mFormatFlags & kAudioFormatFlagIsBigEndian )
+            p_aout->output.output.i_format = VLC_FOURCC('s','p','d','b');
+        else
+            p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
         p_aout->output.i_nb_samples = p_aout->output.output.i_frame_length;
@@ -584,35 +588,30 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
                             void * threadGlobals )
 {
     aout_buffer_t * p_buffer;
-    AudioTimeStamp  host_time;
     mtime_t         current_date;
 
     aout_instance_t * p_aout = (aout_instance_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    host_time.mFlags = kAudioTimeStampHostTimeValid;
-    AudioDeviceTranslateTime( inDevice, inOutputTime, &host_time );
-
 #if 1
     p_sys->clock_diff = - (mtime_t)
-        AudioConvertHostTimeToNanos( AudioGetCurrentHostTime() ) / 1000; 
+        AudioConvertHostTimeToNanos( inNow->mHostTime ) / 1000; 
     p_sys->clock_diff += mdate();
 #endif
 
     current_date = p_sys->clock_diff +
-                   AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
+                   AudioConvertHostTimeToNanos( inOutputTime->mHostTime ) / 1000;
 
-#define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i'))
+#define B_SPDI (p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') || p_aout->output.output.i_format == VLC_FOURCC('s','p','d','b') )
     p_buffer = aout_OutputNextBuffer( p_aout, current_date, B_SPDI );
 #undef B_SPDI
 
-#define BUFFER outOutputData->mBuffers[ p_sys->i_stream_index ]
+#define BUFFER outOutputData->mBuffers[p_sys->i_stream_index]
     if( p_buffer != NULL )
     {
         /* move data into output data buffer */
         p_aout->p_vlc->pf_memcpy( BUFFER.mData,
                                   p_buffer->p_buffer, p_buffer->i_nb_bytes );
-
         aout_BufferFree( p_buffer );
     }
     else
@@ -993,7 +992,6 @@ static int InitStreamInfo( UInt32 i_dev, aout_instance_t * p_aout,
         msg_Err( p_aout, "GetStreamID(%ld, %ld) failed", i_dev, i_idx );
         return( VLC_EGENERIC );
     }
-
     err = AudioStreamGetPropertyInfo( i_sid, 0,
                                       kAudioStreamPropertyPhysicalFormats,
                                       &i_param_size, NULL );
@@ -1214,6 +1212,81 @@ static int InitDevice( aout_instance_t * p_aout )
 
         vlc_mutex_lock( &w.lock );
 
+		/* If we do AC3 over SPDIF, take hog mode and non mixable mode */
+		if( P_STREAMS[i_stream].mFormatID == kAudioFormat60958AC3 ||
+			P_STREAMS[i_stream].mFormatID == 'IAC3' )
+		{
+			UInt32 b_mix;
+
+			i_param_size = sizeof( p_sys->i_hog_pid );
+			err = AudioDeviceGetProperty( p_dev->devid, 0, FALSE, kAudioDevicePropertyHogMode,
+											&i_param_size, &p_sys->i_hog_pid );
+			if( !err )
+			{
+				msg_Dbg( p_aout, "Current status of hog mode: pid=%d vlc pid=%d\n", (int)p_sys->i_hog_pid, (int)getpid() );
+				if( p_sys->i_hog_pid != getpid() ) {
+					p_sys->i_hog_pid = getpid() ;
+					err = AudioDeviceSetProperty( p_dev->devid, 0, 0, FALSE,
+												 kAudioDevicePropertyHogMode, i_param_size, &p_sys->i_hog_pid );
+					if( !err )
+					{
+						msg_Dbg( p_aout, "Successfully set hog mode - new pid=%d!\n", (int)p_sys->i_hog_pid );
+
+						err = AudioDeviceGetProperty( p_dev->devid, 0, FALSE,
+													kAudioDevicePropertyHogMode, &i_param_size, &p_sys->i_hog_pid );
+						if( !err )
+						{
+							msg_Dbg( p_aout, "Checking new status of hog mode: pid=%d vlc pid=%d\n",
+								(int)p_sys->i_hog_pid, (int)getpid() );
+						}
+					}
+				}
+			}
+			
+			if( err != noErr )
+			{
+				msg_Err( p_aout, "failed to set hogmode: : [%4.4s]", (char *)&err );
+				FreeDevice( p_aout );
+				FreeHardwareInfo( p_aout );
+				vlc_mutex_destroy( &p_sys->lock );
+				free( (void *)p_sys );
+				return( VLC_EGENERIC );
+			}
+			/*
+			i_param_size = sizeof( b_mix );
+			err = AudioDeviceGetProperty( p_dev->devid, 0, FALSE, kAudioDevicePropertySupportsMixing,
+											&i_param_size, &b_mix );
+											
+			if( !err )
+			{
+				msg_Dbg( p_aout, "Current status of mix mode: %i\n", (int)b_mix );
+				b_mix = 0;
+				err = AudioDeviceSetProperty( p_dev->devid, 0, 0, FALSE,
+									kAudioDevicePropertySupportsMixing, i_param_size, &b_mix );
+				if( !err )
+				{
+					msg_Dbg( p_aout, "Successfully set mix mode - new mix=%d!\n", (int)b_mix );
+
+					err = AudioDeviceGetProperty( p_dev->devid, 0, FALSE,
+												kAudioDevicePropertySupportsMixing, &i_param_size, &b_mix );
+					if( !err )
+					{
+						msg_Dbg( p_aout, "Checking new status of mix mode: %d\n", (int)b_mix );
+					}
+				}
+			}
+			
+			if( err != noErr )
+			{
+				msg_Err( p_aout, "failed to set mixmode: : [%4.4s]", (char *)&err );
+				FreeDevice( p_aout );
+				FreeHardwareInfo( p_aout );
+				vlc_mutex_destroy( &p_sys->lock );
+				free( (void *)p_sys );
+				return( VLC_EGENERIC );
+			}*/
+		}
+
         msg_Dbg( p_aout, STREAM_FORMAT_MSG( "setting format",
                                             P_STREAMS[i_stream] ) );
 
@@ -1325,6 +1398,29 @@ static void FreeDevice( aout_instance_t * p_aout )
                 msg_Err( p_aout, "AudioStreamSetProperty revert format failed: [%4.4s]",
                          (char *)&err );
             }
+        }
+		
+		if( (int)p_sys->i_hog_pid != -1 )
+        {
+			/*UInt32 b_mix = 1;
+			err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
+                                             kAudioDevicePropertySupportsMixing, sizeof(b_mix), &b_mix );
+			
+			if( err != noErr )
+            {
+                msg_Err( p_aout, "Resetting mix mode failed: [%4.4s]",
+                         (char *)&err );
+            }
+			*/
+            p_sys->i_hog_pid = (pid_t) -1;
+            err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
+                                             kAudioDevicePropertyHogMode, sizeof(p_sys->i_hog_pid), &p_sys->i_hog_pid );
+            
+            if( err != noErr )
+            {
+                msg_Err( p_aout, "Releasing hog mode failed: [%4.4s]",
+                         (char *)&err );
+            } 
         }
     }
 
@@ -1440,8 +1536,9 @@ static OSStatus StreamListener( AudioStreamID inStream,
                                 void * inClientData )
 {
     OSStatus err = noErr;
-
     struct { vlc_mutex_t lock; vlc_cond_t cond; } * w = inClientData;
+    aout_instance_t * p_aout = (aout_instance_t *)inClientData;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     switch( inPropertyID )
     {
@@ -1454,7 +1551,6 @@ static OSStatus StreamListener( AudioStreamID inStream,
         default:
             break;
     }
-
     return( err );
 }
 

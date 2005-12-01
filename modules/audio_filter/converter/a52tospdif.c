@@ -110,9 +110,9 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('a','5','2',' ')
-          || p_filter->output.i_format != VLC_FOURCC('s','p','d','b')
-          || p_filter->output.i_format != VLC_FOURCC('s','p','d','i') )
+    if ( p_filter->input.i_format != VLC_FOURCC('a','5','2',' ') ||
+         ( p_filter->output.i_format != VLC_FOURCC('s','p','d','b') &&
+           p_filter->output.i_format != VLC_FOURCC('s','p','d','i') ) )
     {
         return -1;
     }
@@ -132,7 +132,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* AC3 is natively big endian. Most SPDIF devices have the native endianness of
      * the computersystem. On MAc OS X however, little endian devices are also common.
      */
-    uint32_t syncword, crc1, fscod, frmsizecod, bsid, bsmod, frame_size;
+    uint32_t i_syncword, i_crc1, i_fscod, i_frmsizecod, i_bsid, i_bsmod, i_frame_size;
     static const uint8_t p_sync_le[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
     static const uint8_t p_sync_be[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };
 #ifndef HAVE_SWAB
@@ -143,34 +143,34 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     byte_t * p_out = p_out_buf->p_buffer;
 
     /* AC3 header decode */
-    syncword = p_in[0] | (p_in[1] << 8);
-    crc1 = p_in[2] | (p_in[3] << 8);
-    fscod = (p_in[4] >> 6) & 0x3;
-    frmsizecod = p_in[4] & 0x3f;
-    bsid = (p_in[5] >> 3) & 0x1f;
-    bsmod = p_in[5] & 0x7;
-    frame_size = frmsizecod_tbl[frmsizecod].frm_size[fscod];
+    i_syncword = p_in[0] | (p_in[1] << 8);
+    i_crc1 = p_in[2] | (p_in[3] << 8);
+    i_fscod = (p_in[4] >> 6) & 0x3;
+    i_frmsizecod = p_in[4] & 0x3f;
+    i_bsid = (p_in[5] >> 3) & 0x1f;
+    i_bsmod = p_in[5] & 0x7;
+    i_frame_size = frmsizecod_tbl[i_frmsizecod].frm_size[i_fscod];
     
     /* Copy the S/PDIF headers. */
     if( p_filter->output.i_format == VLC_FOURCC('s','p','d','b') )
     {
         p_filter->p_vlc->pf_memcpy( p_out, p_sync_be, 6 );
-        p_out[4] = bsmod;
-        p_out[6] = ((frame_size ) >> 4) & 0xff;
-        p_out[7] = (frame_size << 4) & 0xff;
-        p_filter->p_vlc->pf_memcpy( &p_out[8], p_in, frame_size * 2 );
+        p_out[4] = i_bsmod;
+        p_out[6] = ((i_frame_size ) >> 4) & 0xff;
+        p_out[7] = (i_frame_size << 4) & 0xff;
+        p_filter->p_vlc->pf_memcpy( &p_out[8], p_in, i_frame_size * 2 );
     }
     else
     {
-        memcpy( p_out, p_sync_le, 6 );
-        p_out[5] = bsmod;
-        p_out[6] = (frame_size << 4) & 0xff;
-        p_out[7] = ((frame_size ) >> 4) & 0xff;
+        p_filter->p_vlc->pf_memcpy( p_out, p_sync_le, 6 );
+        p_out[5] = i_bsmod;
+        p_out[6] = (i_frame_size << 4) & 0xff;
+        p_out[7] = ((i_frame_size ) >> 4) & 0xff;
 #ifdef HAVE_SWAB
-        swab( p_in, &p_out[8], frame_size * 2 );
+        swab( p_in, &p_out[8], i_frame_size * 2 );
 #else
         p_tmp = &p_out[8];
-        for( i = frame_size; i-- ; )
+        for( i = i_frame_size; i-- ; )
         {
             p_tmp[0] = p_in[1];
             p_tmp[1] = p_in[0];
