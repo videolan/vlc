@@ -1056,6 +1056,7 @@ ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/goom.patch
 endif
 ifdef HAVE_WIN32
+	(cd $@; dos2unix configure.in)
 	patch -p 0 <Patches/goom2k4-0-win32.patch
 endif
 
