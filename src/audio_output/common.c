@@ -142,6 +142,7 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
         break;
 
     case VLC_FOURCC('s','p','d','i'):
+    case VLC_FOURCC('s','p','d','b'): /* Big endian spdif output */
     case VLC_FOURCC('a','5','2',' '):
     case VLC_FOURCC('d','t','s',' '):
     case VLC_FOURCC('m','p','g','a'):

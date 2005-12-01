@@ -41,14 +41,17 @@
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','b')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','b')
 #   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','b')
+#   define AOUT_FMT_SPDIF_NE VLC_FOURCC('s','p','d','b')
 #else
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','l')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','l')
 #   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','l')
+#   define AOUT_FMT_SPDIF_NE VLC_FOURCC('s','p','d','i')
 #endif
 
 #define AOUT_FMT_NON_LINEAR( p_format )                                    \
     ( ((p_format)->i_format == VLC_FOURCC('s','p','d','i'))                \
+       || ((p_format)->i_format == VLC_FOURCC('s','p','d','b'))            \
        || ((p_format)->i_format == VLC_FOURCC('a','5','2',' '))            \
        || ((p_format)->i_format == VLC_FOURCC('d','t','s',' ')) )
 
