@@ -222,7 +222,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Create a main panel that will fill in the interface window */
     main_sizer = new wxBoxSizer( wxVERTICAL );
     SetSizer( main_sizer );
-    main_panel = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize,
+    main_panel = new wxPanel( this, -1, wxPoint(0,0), wxSize(0,0),
                               wxCLIP_CHILDREN );
     main_sizer->Add( main_panel, 1, wxEXPAND );
     main_panel->SetFocus();
@@ -262,9 +262,11 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
     /* Get minimum window size to prevent user from glitching it */
+    main_panel->SetSizeHints( wxSize(-1,0) );
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
     main_min_size = GetSize();
+    main_panel->SetSizeHints( wxSize(-1,-1) );
 
     /* Video window */
     video_window = 0;
@@ -279,8 +281,10 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     panel_sizer->Add( input_manager, 0, wxEXPAND , 0 );
 
     /* Layout everything */
+    main_panel->SetSizeHints( wxSize(-1,0) );
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
+    main_panel->SetSizeHints( wxSize(-1,-1) );
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the main interface */
