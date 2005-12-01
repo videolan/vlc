@@ -182,10 +182,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             p_out[7] = (( i_length ) >> 5 ) & 0xFF;
         }
 
-        if( (p_in[0] == 0x1f || p_in[0] == 0x7f) && p_filter->output.i_format == VLC_FOURCC('s','p','d','i') )
+        if( ( (p_in[0] == 0x1F || p_in[0] == 0x7F) && p_filter->output.i_format == VLC_FOURCC('s','p','d','i') ) ||
+            ( (p_in[0] == 0xFF || p_in[0] == 0xFE) && p_filter->output.i_format == VLC_FOURCC('s','p','d','b') ) )
         {
             /* We are dealing with a big endian bitstream and a little endian output
-             * Convert to little endian */
+             * or a little endian bitstream and a big endian output.
+             * Byteswap the stream */
 #ifdef HAVE_SWAB
             swab( p_in, p_out + 8, i_length );
 #else
@@ -201,15 +203,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             }
 #endif
         }
-        else if( (p_in[0] == 0x1f || p_in[0] == 0x7f) ||
-                  p_filter->output.i_format == VLC_FOURCC('s','p','d','i') )
-        {
-	    /* Big endian stream on Big endian output || little endian stream on little endian output */
-            p_filter->p_vlc->pf_memcpy( p_out + 8, p_in, i_length );
-        }
         else
         {
-            msg_Err( p_filter, "Little endian DTS stream on big endian output not supported" );
             p_filter->p_vlc->pf_memcpy( p_out + 8, p_in, i_length );
         }
 
