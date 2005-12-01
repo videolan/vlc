@@ -217,7 +217,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect3 id="Font">
   <title>Font</title>
-  <para>Declares a font to be used in a Text or Playlist.</para>
+  <para>Declares a font to be used in a <link linkend="Text">Text</link> or <link linkend="Playlist">Playlist</link>.</para>
   <sect4 id="fontid">
     <title>id</title>
     <para>Identifiant of the font that will be used with controls.</para>
@@ -428,7 +428,7 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="imageaction">
     <title>action</title>
-    <para>Action triggered by a click on the control. Possible values are "move", to move the window, or "resizeSE" (SE as in South-East ; other directions will be added in the future) to resize the window in the corresponding direction.</para>
+    <para>Action triggered by a click on the control. Possible values are 'move', to move the window, 'resizeE', to resize horizontally, 'resizeS' to resize vertically, and 'resizeSE' to resize both horizontally and vertically. Mnemonics: S, E and SE stand for South, East, and South-East. The 'resizeS' and 'resizeE' actions are available since VLC 0.8.5 only.</para>
     <para>Default value: none</para>
   </sect4>
 </sect3>
@@ -529,12 +529,12 @@ difficulty to understand how VLC skins work.</para>
     <para>Identifiant of a <link linkend="Font">Font</link> or <link linkend="BitmapFont">BitmapFont</link> (beware that any character not present in the <link linkend="BitmapFont">BitmapFont</link> will be printed as a space, so will be invisible).</para>
     <para><emphasis>Required.</emphasis></para>
   </sect4>
-  <sect4 id="text">
+  <sect4 id="texttext">
     <title>text</title>
-    <para>Text to display. See <link linkend="textvars">Text variables</link>.</para>
+    <para>Text to display. See also <link linkend="textvars">Text variables</link>.</para>
     <para>Default value: </para>
   </sect4>
-  <sect4 id="color">
+  <sect4 id="textcolor">
     <title>color</title>
     <para>Color of the text, using the #RRGGBB format.</para>
     <para>Default value: #000000</para>
@@ -543,6 +543,16 @@ difficulty to understand how VLC skins work.</para>
     <title>width</title>
     <para>Width of the text in pixels. If set to "0", the width is automatically calculated to fit with the current text.<!--XXX: Probably false...--></para>
     <para>Default value: 0</para>
+  </sect4>
+  <sect4 id="textalignment">
+    <title>alignment</title>
+    <para>Alignment of the text inside the control. Possible values are 'left', 'center' and 'right'. The 'width' and 'center' alignments are computed using the width of the control (as given by the <link linkend="textwidth">width</link> attribute). Available since VLC 0.8.5.</para>
+    <para>Default value: left</para>
+  </sect4>
+  <sect4 id="textscrolling">
+    <title>scrolling</title>
+    <para>Scrolling behaviour of the text (only when it doesn't fit in the <link linkend="textwidth">width</link> of the control). Possible values are 'auto', 'manual' and 'none'. If this attribute is set to 'auto', the text automatically starts scrolling. The user can drag the text, and click on it to start/stop the scrolling. If this attribute is set to 'manual', the text only scrolls when dragged by the user. If this attribute is set to 'none', no scrolling is possible at all. Available since VLC 0.8.5.</para>
+    <para>Default value: auto</para>
   </sect4>
 </sect3>
 
@@ -603,12 +613,12 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="minangle">
     <title>minangle</title>
-    <para>Minimum angle of the rotation, corresponging to 0%.</para>
+    <para>Minimum angle of the rotation, corresponding to 0%.</para>
     <para>Default value: 0</para>
   </sect4>
   <sect4 id="maxangle">
     <title>maxangle</title>
-    <para>Maximum angle of the rotation, corresponging to 100%.</para>
+    <para>Maximum angle of the rotation, corresponding to 100%.</para>
     <para>Default value: 360</para>
   </sect4>
   <sect4 id="radialslidervalue">
@@ -832,7 +842,7 @@ difficulty to understand how VLC skins work.</para>
 <sect1 id="textvars">
 <title>Text variables</title>
 
-<para>When specifying the <link linkend="text">text</link> attribute of the <link linkend="Text">Text</link> control or any tooltip attribute, you can insert escape sequences which will be expanded dynamically. An escape sequence always starts with the '$' character, followed by one or more predefined letters. Here is the list of accepted escape sequences:</para>
+<para>When specifying the <link linkend="texttext">text</link> attribute of the <link linkend="Text">Text</link> control or any tooltip attribute, you can insert escape sequences which will be expanded dynamically. An escape sequence always starts with the '$' character, followed by one or more predefined letters. Here is the list of accepted escape sequences:</para>
 
 <itemizedlist>
   <listitem><para>
