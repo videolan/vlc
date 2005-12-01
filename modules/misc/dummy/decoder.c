@@ -107,6 +107,8 @@ int E_(OpenDecoder) ( vlc_object_t *p_this )
         DecodeBlock;
     p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
+    p_dec->pf_decode_sub = (subpicture_t *(*)(decoder_t *, block_t **))
+        DecodeBlock;
 
     return VLC_SUCCESS;
 }
