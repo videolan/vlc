@@ -271,3 +271,12 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
  #endif /* _MSC_VER */
  
  /*
+--- libdvdnav/misc/dvdnav-config.in	2003-04-27 02:26:17.000000000 +0100
++++ libdvdnav.new/misc/dvdnav-config.in	2005-12-02 09:29:48.265625000 +0000
+@@ -76,5 +76,5 @@
+ fi
+ 
+ if test "$echo_libs" = "yes"; then
+-      echo -L@libdir@ -ldvdnav @THREAD_LIBS@
++      echo -L@libdir@ -ldvdnav -ldvdread @THREAD_LIBS@
+ fi      
