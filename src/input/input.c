@@ -1058,11 +1058,6 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
 
     }
 
-    /* Trigger intf update for this item */
-    /* Playlist has a callback on this variable and will forward
-     * it to intf */
-    var_SetInteger( p_input, "item-change", p_input->input.p_item->i_id );
-
     /* initialization is complete */
     p_input->i_state = PLAYING_S;
 

@@ -47,9 +47,6 @@ static void RunPreparse( playlist_preparse_t * );
 static playlist_item_t * NextItem  ( playlist_t * );
 static int PlayItem  ( playlist_t *, playlist_item_t * );
 
-static int ItemChange( vlc_object_t *, const char *,
-                       vlc_value_t, vlc_value_t, void * );
-
 int playlist_vaControl( playlist_t * p_playlist, int i_query, va_list args );
 
 void playlist_PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
@@ -1154,9 +1151,6 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     p_playlist->p_input = input_CreateThread( p_playlist, &p_item->input );
 
-    var_AddCallback( p_playlist->p_input, "item-change",
-                         ItemChange, p_playlist );
-
     val.i_int = p_item->input.i_id;
     /* unlock the playlist to set the var...mmm */
     vlc_mutex_unlock( &p_playlist->object_lock);
@@ -1165,20 +1159,4 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     return VLC_SUCCESS;
 
-}
-
-/* Forward item change from input */
-static int ItemChange( vlc_object_t *p_obj, const char *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *param )
-{
-    playlist_t *p_playlist = (playlist_t *)param;
-
-    //p_playlist->b_need_update = VLC_TRUE;
-    var_SetInteger( p_playlist, "item-change", newval.i_int );
-
-    /* Update view */
-    /* FIXME: Make that automatic */
-//    playlist_ViewUpdate( p_playlist, VIEW_S_AUTHOR );
-
-    return VLC_SUCCESS;
 }
