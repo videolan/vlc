@@ -280,3 +280,125 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
 -      echo -L@libdir@ -ldvdnav @THREAD_LIBS@
 +      echo -L@libdir@ -ldvdnav -ldvdread @THREAD_LIBS@
  fi      
+--- libdvdnav/configure.ac	2005-02-11 12:33:19.000000000 +0000
++++ libdvdnav.new/configure.ac	2005-12-02 15:23:13.921875000 +0000
+@@ -138,7 +138,7 @@
+     THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
+     CFLAGS="$THREAD_CFLAGS $CFLAGS"
+     ;;
+-  *mingw32* | *cygwin*)
++  *mingw32* | *cygwin* | *beos*)
+     ;;
+   *)
+     AC_CHECK_LIB(pthread, pthread_create,
+@@ -149,26 +149,63 @@
+ AC_SUBST(THREAD_LIBS)
+ AC_SUBST(THREAD_CFLAGS)
+ 
++link_dvdcss=no
++dvdcss_path=""
+ dnl ---------------------------------------------
+-dnl dynamic linker
++dnl dvdcss checking
+ dnl ---------------------------------------------
+-case $host in
+-  *mingw32*)
+-    CFLAGS="-idirafter \$(top_srcdir)/msvc/include $CFLAGS"
+-    LDFLAGS="-no-undefined $LDFLAGS"
+-    ;;
+-  *cygwin*)
+-    LDFLAGS="-no-undefined $LDFLAGS"
+-    ;;
+-  *)
+-    AC_CHECK_LIB(c, dlopen,
+-	         DYNAMIC_LD_LIBS="",
+-	         AC_CHECK_LIB(dl, dlopen,
+-             	              DYNAMIC_LD_LIBS="-ldl",
+-	                      AC_MSG_ERROR(dynamic linker needed)))
+-    AC_SUBST(DYNAMIC_LD_LIBS)
+-    ;;
+-esac
++AC_ARG_WITH( [libdvdcss],
++    [ --with-libdvdcss[=PATH]    force linking against libdvdcss],
++    [if test x"$withval" != xno; then
++       link_dvdcss=yes
++     fi
++     if test x"$withval" != xyes; then
++       dvdcss_path=$withval
++     fi])
++
++if test x"$link_dvdcss" != xyes; then
++dnl dlopen libdvdcss
++  AC_CHECK_FUNC( dlopen,
++    [DL_LIBS="" ].
++    AC_CHECK_LIB( dl, dlopen,
++      [DL_LIBS=-ld ],
++      AC_MSG_ERROR(You need libdl (dlopen))
++    )
++  )
++else
++dnl link with libdvdcss
++  if test -z "$dvdcss_path"; then
++    AC_CHECK_LIB(dvdcss, dvdcss_interface_2,
++      [ CSS_LIBS=-ldvdcss ],
++      AC_MSG_ERROR(You need libdvdcss.so.2 or later)
++    )
++    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
++      [ ],
++      AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
++    )
++  else
++    saved_CFLAGS=$CFLAGS
++    CFLAGS="$CFLAGS -L$dvdcss_path/lib"
++    AC_CHECK_LIB(dvdcss, dvdcss_interface_2,
++      [ CSS_LIBS="-L$dvdcss_path/lib -R$dvdcss_path/lib -ldvdcss"
++        CSS_CFLAGS=-I$dvdcss_path/include ],
++      AC_MSG_ERROR(You need libdvdcss.so.2 or later)
++    )
++    CFLAGS=$saved_CFLAGS
++    dnl -w added to shutup GCC3.1's cpp warning about -I/usr/local
++    saved_CPPFLAGS=$CPPFLAGS
++    CPPFLAGS="-w $CPPFLAGS -I$dvdcss_path/include"
++    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
++      [ ],
++      AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
++    )
++    CPPFLAGS=$saved_CPPFLAGS
++  fi
++fi
++
++AC_SUBST(DL_LIBS)
++AC_SUBST(CSS_LIBS)
++AC_SUBST(CSS_CFLAGS)
+ 
+ dnl ---------------------------------------------
+ dnl cflags
+--- libdvdnav/src/dvdnav_internal.h	2005-02-11 12:25:11.000000000 +0000
++++ libdvdnav.new/src/dvdnav_internal.h	2005-12-02 15:29:35.250000000 +0000
+@@ -59,6 +59,15 @@
+ #include <io.h> /* read() */
+ #define lseek64 _lseeki64
+ 
++#elif defined(__BEOS__)
++
++#include <OS.h>
++typedef sem_id pthread_mutex_t;
++#define pthread_mutex_init(a, b) (*a) = create_sem( 1,"" )
++#define pthread_mutex_lock(a)    acquire_sem( *a )
++#define pthread_mutex_unlock(a)  release_sem( *a )
++#define pthread_mutex_destroy(a) delete_sem( *a )
++
+ #else
+ 
+ #include <pthread.h>
+--- libdvdnav/examples/Makefile.am	2004-01-11 21:43:12.000000000 +0000
++++ libdvdnav.new/examples/Makefile.am	2005-12-02 15:24:58.671875000 +0000
+@@ -7,7 +7,7 @@
+ noinst_PROGRAMS = menus
+ 
+ menus_SOURCES = menus.c
+-menus_LDFLAGS = -L$(top_srcdir)/src/
++menus_LDFLAGS = -L$(top_srcdir)/src/ $(CSS_LIBS)
+ menus_LDADD   = $(DVDNAV_LIB)
+ 
+ $(DVDNAV_LIB):

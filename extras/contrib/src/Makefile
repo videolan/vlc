@@ -961,9 +961,9 @@ libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 
 .dvdnav: libdvdnav .dvdcss
 ifdef HAVE_WIN32	
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -Dssize_t=long -DHAVE_DVDCSS_DVDCSS_H" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -Dssize_t=long" && make && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t -DHAVE_DVDCSS_DVDCSS_H" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
