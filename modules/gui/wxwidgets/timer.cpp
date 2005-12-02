@@ -98,12 +98,7 @@ void Timer::Notify()
 
     /* Call update */
     p_main_interface->input_manager->Update();
-
-    if( p_main_interface->input_manager->IsPlaying() )
-    {
-        /* Take care of the volume, etc... */
-        p_main_interface->Update();
-    }
+    p_main_interface->Update();
 
     /* Show the interface, if requested */
     if( p_intf->p_sys->b_intf_show )

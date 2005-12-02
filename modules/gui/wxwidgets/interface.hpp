@@ -100,9 +100,6 @@ namespace wxvlc
 
         InputManager *input_manager;
 
-        vlc_bool_t  b_extra;
-        wxPanel     *extra_frame;
-
         wxControl  *volctrl;
 
     #ifdef wxHAS_TASK_BAR_ICON
@@ -132,6 +129,7 @@ namespace wxvlc
         void OnOpenSat( wxCommandEvent& event );
 
         void OnExtended( wxCommandEvent& event );
+        void OnSmallPlaylist( wxCommandEvent& event );
 
         void OnBookmarks( wxCommandEvent& event );
         void OnShowDialog( wxCommandEvent& event );
@@ -164,8 +162,17 @@ namespace wxvlc
         wxMenu *p_video_menu;
         wxMenu *p_navig_menu;
 
+        /* Extended panel */
+        vlc_bool_t  b_extra;
+        wxPanel     *extra_frame;
+
+        /* Playlist panel */
+        vlc_bool_t  b_playlist_manager;
+        wxPanel     *playlist_manager;
+
         /* Utility dimensions */
         wxSize main_min_size;
+        wxSize playlist_min_size;
         wxSize ext_min_size;
     };
 

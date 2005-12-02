@@ -25,6 +25,7 @@
  * Preamble
  *****************************************************************************/
 #include "interface.hpp"
+#include "playlist_manager.hpp"
 #include "extrapanel.hpp"
 #include "timer.hpp"
 #include "video.hpp"
@@ -45,6 +46,7 @@
 #include "bitmaps/slow.xpm"
 #include "bitmaps/fast.xpm"
 #include "bitmaps/playlist.xpm"
+#include "bitmaps/playlist_small.xpm"
 #include "bitmaps/speaker.xpm"
 #include "bitmaps/speaker_mute.xpm"
 
@@ -134,6 +136,7 @@ enum
     Wizard_Event,
 
     Playlist_Event,
+    PlaylistSmall_Event,
     Logs_Event,
     FileInfo_Event,
 
@@ -167,6 +170,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(VLM_Event, Interface::OnShowDialog)
 
     EVT_MENU(Playlist_Event, Interface::OnShowDialog)
+    EVT_MENU(PlaylistSmall_Event, Interface::OnSmallPlaylist)
     EVT_MENU(Logs_Event, Interface::OnShowDialog)
     EVT_MENU(FileInfo_Event, Interface::OnShowDialog)
     EVT_MENU(Prefs_Event, Interface::OnShowDialog)
@@ -215,6 +219,8 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     p_intf = _p_intf;
     b_extra = VLC_FALSE;
     extra_frame = 0;
+    b_playlist_manager = VLC_FALSE;
+    playlist_manager = 0;
 
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
@@ -348,6 +354,8 @@ void Interface::Update()
 {
     /* Misc updates */
     ((VLCVolCtrl *)volctrl)->UpdateVolume();
+
+    if( playlist_manager ) playlist_manager->Update();
 }
 
 void Interface::OnControlEvent( wxCommandEvent& event )
@@ -490,6 +498,7 @@ void Interface::CreateOurToolBar()
 #define HELP_PLAY N_("Play")
 #define HELP_PAUSE N_("Pause")
 #define HELP_PLO N_("Playlist")
+#define HELP_SPLO N_("Small playlist")
 #define HELP_PLP N_("Previous playlist item")
 #define HELP_PLN N_("Next playlist item")
 #define HELP_SLOW N_("Play slower")
@@ -533,15 +542,15 @@ void Interface::CreateOurToolBar()
     toolbar->AddSeparator();
     toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( playlist_xpm ),
                       wxU(_(HELP_PLO)) );
+    toolbar->AddTool( PlaylistSmall_Event, wxT(""),
+                      wxBitmap( playlist_small_xpm ), wxU(_(HELP_SPLO)) );
     }
 
-#if !( (wxMAJOR_VERSION <= 2) && (wxMINOR_VERSION <= 6) && (wxRELEASE_NUMBER < 2) )
     wxControl *p_dummy_ctrl =
         new wxControl( toolbar, -1, wxDefaultPosition,
-                       wxSize(35, 16 ), wxBORDER_NONE );
+                       wxSize(16, 16 ), wxBORDER_NONE );
 
     toolbar->AddControl( p_dummy_ctrl );
-#endif
 
     volctrl = new VLCVolCtrl( p_intf, toolbar );
     toolbar->AddControl( volctrl );
@@ -656,6 +665,13 @@ void Interface::SetIntfMinSize()
         ms.SetHeight( ms.GetHeight() + ext_min_size.GetHeight() );
         if( ext_min_size.GetWidth() > ms.GetWidth() )
             ms.SetWidth( ext_min_size.GetWidth() );
+    }
+
+    if( playlist_manager && playlist_manager->IsShown() )
+    {
+        ms.SetHeight( ms.GetHeight() + playlist_min_size.GetHeight() );
+        if( playlist_min_size.GetWidth() > ms.GetWidth() )
+            ms.SetWidth( playlist_min_size.GetWidth() );
     }
 
     SetSizeHints( ms );
@@ -831,6 +847,26 @@ void Interface::OnExtended( wxCommandEvent& WXUNUSED(event) )
 
     b_extra = !b_extra;
     panel_sizer->Show( extra_frame, b_extra );
+
+    SetIntfMinSize();
+    main_sizer->Layout();
+    main_sizer->Fit( this );
+}
+
+void Interface::OnSmallPlaylist( wxCommandEvent& WXUNUSED(event) )
+{
+    UpdateVideoWindow( p_intf, video_window );
+
+    if( !playlist_manager )
+    {
+        /* Create the extra panel */
+        playlist_manager = new PlaylistManager( p_intf, main_panel );
+        panel_sizer->Add( playlist_manager, 0, wxEXPAND , 0 );
+        playlist_min_size = playlist_manager->GetBestSize();
+    }
+
+    b_playlist_manager = !b_playlist_manager;
+    panel_sizer->Show( playlist_manager, b_playlist_manager );
 
     SetIntfMinSize();
     main_sizer->Layout();

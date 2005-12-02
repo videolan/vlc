@@ -9,6 +9,7 @@ SOURCES_wxwidgets = \
 	timer.cpp \
 	video.cpp \
 	input_manager.cpp \
+	playlist_manager.cpp \
 	dialogs.cpp \
 	dialogs/open.cpp \
 	dialogs/streamout.cpp \
@@ -41,6 +42,7 @@ EXTRA_DIST += \
 	timer.hpp \
 	video.hpp \
 	input_manager.hpp \
+	playlist_manager.hpp \
 	dialogs/fileinfo.hpp \
 	dialogs/preferences.hpp \
 	dialogs/wizard.hpp \
@@ -67,6 +69,7 @@ EXTRA_DIST += \
 	bitmaps/next.xpm \
 	bitmaps/pause.xpm \
 	bitmaps/playlist.xpm \
+	bitmaps/playlist_small.xpm \
 	bitmaps/play.xpm \
 	bitmaps/prev.xpm \
 	bitmaps/repeat.xpm \
