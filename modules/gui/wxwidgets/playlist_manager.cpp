@@ -94,7 +94,7 @@ public:
  * Constructor.
  *****************************************************************************/
 PlaylistManager::PlaylistManager( intf_thread_t *_p_intf, wxWindow *p_parent ):
-    wxPanel( p_parent, -1, wxDefaultPosition, wxSize(500,300) )
+    wxPanel( p_parent, -1, wxDefaultPosition, wxSize(0,0) )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -123,6 +123,9 @@ PlaylistManager::PlaylistManager( intf_thread_t *_p_intf, wxWindow *p_parent ):
     sizer = new wxBoxSizer( wxHORIZONTAL );
     SetSizer( sizer );
     sizer->Add( treectrl, 1, wxEXPAND );
+    treectrl->SetSizeHints( wxSize(500, 150) );
+    sizer->Layout();
+    sizer->Fit( this );
 
     /* Create image list */
     wxImageList *p_images = new wxImageList( 16 , 16, TRUE );

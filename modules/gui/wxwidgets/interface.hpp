@@ -30,6 +30,7 @@
 #include <wx/dnd.h>
 #include <wx/accel.h>
 #include <wx/taskbar.h>
+#include <wx/splitter.h>
 
 
 namespace wxvlc
@@ -91,7 +92,8 @@ namespace wxvlc
         void PrevStream();
         void NextStream();
 
-        wxBoxSizer  *main_sizer;
+        wxBoxSizer       *main_sizer;
+        wxSplitterWindow *splitter;
 
         wxPanel     *main_panel;
         wxBoxSizer  *panel_sizer;

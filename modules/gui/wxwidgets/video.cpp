@@ -70,7 +70,7 @@ wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
 
 void UpdateVideoWindow( intf_thread_t *p_intf, wxWindow *p_window )
 {
-#if (wxCHECK_VERSION(2,5,3))
+#if wxCHECK_VERSION(2,5,3)
     if( !p_intf->p_sys->b_video_autosize ) return;
 
     if( p_window && mdate() - ((VideoWindow *)p_window)->i_creation_date < 2000000 )

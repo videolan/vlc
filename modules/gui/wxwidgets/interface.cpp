@@ -225,12 +225,18 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
 
-    /* Create a main panel that will fill in the interface window */
+    /* Create a splitter window that will fill in the interface window.
+     * We need a splitter bar in order to make the embedded playlist
+     * resizable. */
+    splitter = new wxSplitterWindow( this, -1, wxDefaultPosition, wxSize(0,0),
+                                     wxCLIP_CHILDREN|wxSP_3DSASH );
     main_sizer = new wxBoxSizer( wxVERTICAL );
+    main_sizer->Add( splitter, 1, wxEXPAND );
     SetSizer( main_sizer );
-    main_panel = new wxPanel( this, -1, wxPoint(0,0), wxSize(0,0),
+
+    /* Create a main panel that will fill in the interface window */
+    main_panel = new wxPanel( splitter, -1, wxPoint(0,0), wxSize(0,0),
                               wxCLIP_CHILDREN );
-    main_sizer->Add( main_panel, 1, wxEXPAND );
     main_panel->SetFocus();
 
 #if defined(__WXGTK20__) && wxCHECK_VERSION(2,5,6)
@@ -243,6 +249,12 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Create a sizer for the main frame */
     panel_sizer = new wxBoxSizer( wxVERTICAL );
     main_panel->SetSizer( panel_sizer );
+
+    /* Put this in the splitter */
+    splitter->Initialize( main_panel );
+#if wxCHECK_VERSION(2,6,0)
+    splitter->SetSashGravity( 1.0 );
+#endif
 
 #ifdef wxHAS_TASK_BAR_ICON
     /* Systray integration */
@@ -262,17 +274,17 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
      * displayed here. */
-    int i_status_width[3] = {-6, -2, -9};
+    int i_status_width[3] = {100, 40, -1};
     statusbar = CreateStatusBar( 3 );                            /* 2 fields */
     statusbar->SetStatusWidths( 3, i_status_width );
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
     /* Get minimum window size to prevent user from glitching it */
-    main_panel->SetSizeHints( wxSize(-1,0) );
+    splitter->SetSizeHints( wxSize(-1,0) );
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
     main_min_size = GetSize();
-    main_panel->SetSizeHints( wxSize(-1,-1) );
+    splitter->SetSizeHints( wxSize(-1,-1) );
 
     /* Video window */
     video_window = 0;
@@ -287,10 +299,10 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     panel_sizer->Add( input_manager, 0, wxEXPAND , 0 );
 
     /* Layout everything */
-    main_panel->SetSizeHints( wxSize(-1,0) );
+    splitter->SetSizeHints( wxSize(-1,0) );
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
-    main_panel->SetSizeHints( wxSize(-1,-1) );
+    splitter->SetSizeHints( wxSize(-1,-1) );
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the main interface */
@@ -860,13 +872,17 @@ void Interface::OnSmallPlaylist( wxCommandEvent& WXUNUSED(event) )
     if( !playlist_manager )
     {
         /* Create the extra panel */
-        playlist_manager = new PlaylistManager( p_intf, main_panel );
-        panel_sizer->Add( playlist_manager, 0, wxEXPAND , 0 );
+        playlist_manager = new PlaylistManager( p_intf, splitter );
         playlist_min_size = playlist_manager->GetBestSize();
     }
 
     b_playlist_manager = !b_playlist_manager;
-    panel_sizer->Show( playlist_manager, b_playlist_manager );
+
+    if( b_playlist_manager )
+        splitter->SplitHorizontally( main_panel, playlist_manager,
+                                     -playlist_min_size.GetHeight() );
+    else
+        splitter->Unsplit( playlist_manager );
 
     SetIntfMinSize();
     main_sizer->Layout();
