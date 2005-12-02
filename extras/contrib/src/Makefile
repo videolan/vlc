@@ -110,7 +110,7 @@ ifdef HAVE_DARWIN_OS
  all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
+	.dvdcss .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .libmpcdec .expat .clinkcc .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
@@ -122,14 +122,14 @@ else
    all: .perl .autoconf .automake .libtool .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdread .dvdnav .dvbpsi .aclocal
+	.dvdnav .dvbpsi .aclocal
   else
 # Cross compiling: we already have the Linux tools, only build the
 # libraries now
    all: .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .twolame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdread .dvdnav .dvbpsi .aclocal
+	.dvdnav .dvbpsi .aclocal
   endif
  else
 
@@ -140,7 +140,7 @@ else
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .libmpcdec \
-	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
+	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio
   else
@@ -156,7 +156,7 @@ else
 	.FLAC .speex .faad .faac .lame .ebml .dts .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
 	.png .gpg-error .gcrypt .gnutls .libmpcdec\
-	.gnutls .dvdread .dvdnav .dvbpsi .wxwidgets .dirac \
+	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal 
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
    endif
@@ -956,18 +956,14 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_WIN32
-	(cd $@; patch -p 0 < ../Patches/libdvdnav-20050211-win32.patch)
-else
 	patch -p 0 < Patches/dvdnav.patch
-endif
 	(cd $@; ./autogen.sh noconfig)
 
-.dvdnav: libdvdnav .dvdread
+.dvdnav: libdvdnav .dvdcss
 ifdef HAVE_WIN32	
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) --disable-builtin-dvdread CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -DNDEBUG -Dssize_t=long" && make  && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS) -Dssize_t=long -DHAVE_DVDCSS_DVDCSS_H" && make && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t -DHAVE_DVDCSS_DVDCSS_H" && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
