@@ -708,11 +708,11 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_CELL_CHANGE" );
         msg_Dbg( p_demux, "     - cellN=%d", event->cellN );
         msg_Dbg( p_demux, "     - pgN=%d", event->pgN );
-        msg_Dbg( p_demux, "     - cell_length=%lld", event->cell_length );
-        msg_Dbg( p_demux, "     - pg_length=%lld", event->pg_length );
-        msg_Dbg( p_demux, "     - pgc_length=%lld", event->pgc_length );
-        msg_Dbg( p_demux, "     - cell_start=%lld", event->cell_start );
-        msg_Dbg( p_demux, "     - pg_start=%lld", event->pg_start );
+        msg_Dbg( p_demux, "     - cell_length="I64Fd, event->cell_length );
+        msg_Dbg( p_demux, "     - pg_length="I64Fd, event->pg_length );
+        msg_Dbg( p_demux, "     - pgc_length="I64Fd, event->pgc_length );
+        msg_Dbg( p_demux, "     - cell_start="I64Fd, event->cell_start );
+        msg_Dbg( p_demux, "     - pg_start="I64Fd, event->pg_start );
 
         /* Store the lenght in time of the current PGC */
         p_sys->i_pgc_length = event->pgc_length / 90 * 1000;
