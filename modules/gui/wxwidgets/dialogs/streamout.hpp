@@ -2,7 +2,7 @@
  * streamout.hpp: Stream output dialog
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12670 2005-09-25 11:16:31Z zorglub $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -25,6 +25,7 @@
 #define _WXVLC_STREAMOUT_H_
 
 #include "wxwidgets.hpp"
+#include <wx/spinctrl.h>
 
 namespace wxvlc
 {

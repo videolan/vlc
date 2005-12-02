@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vector>
+#include <wx/spinctrl.h>
 
 class ConfigControl: public wxPanel
 {

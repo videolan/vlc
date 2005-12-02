@@ -280,11 +280,11 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
     /* Get minimum window size to prevent user from glitching it */
-    splitter->SetSizeHints( wxSize(-1,0) );
+    splitter->SetSizeHints( -1, 0 );
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
     main_min_size = GetSize();
-    splitter->SetSizeHints( wxSize(-1,-1) );
+    splitter->SetSizeHints( -1, -1 );
 
     /* Video window */
     video_window = 0;
@@ -299,10 +299,10 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     panel_sizer->Add( input_manager, 0, wxEXPAND , 0 );
 
     /* Layout everything */
-    splitter->SetSizeHints( wxSize(-1,0) );
+    splitter->SetSizeHints( -1, 0 );
     panel_sizer->Layout(); panel_sizer->Fit( main_panel );
     main_sizer->Layout(); main_sizer->Fit( this );
-    splitter->SetSizeHints( wxSize(-1,-1) );
+    splitter->SetSizeHints( -1, -1 );
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the main interface */
@@ -686,7 +686,7 @@ void Interface::SetIntfMinSize()
             ms.SetWidth( playlist_min_size.GetWidth() );
     }
 
-    SetSizeHints( ms );
+    SetSizeHints( ms.GetWidth(), ms.GetHeight() );
 }
 
 /*****************************************************************************

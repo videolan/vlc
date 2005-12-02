@@ -2,7 +2,7 @@
  * subtitles.hpp: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12502 2005-09-09 19:38:01Z gbazin $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -25,7 +25,7 @@
 #define _WXVLC_SUBTITLES_H_
 
 #include "wxwidgets.hpp"
-
+#include <wx/spinctrl.h>
 
 namespace wxvlc
 {
