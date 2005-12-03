@@ -721,11 +721,11 @@ faad2-$(FAAD2_VERSION).tar.bz2:
 
 faad2: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	(cd faad2; patch -p 0  < ../Patches/faad2.patch && ./bootstrap)
+	(cd $@; patch -p 0  < ../Patches/faad2.patch && ./bootstrap)
 
 .faad: faad2
 	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
-ifndef HAVE_DARWIN
+ifndef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
 endif
 	touch $@
