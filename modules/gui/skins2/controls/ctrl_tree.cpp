@@ -403,10 +403,11 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             else
             {
                 // Unselect any previously selected item
-                for( it = m_rTree.begin(); it != m_rTree.end();
-                     it = m_rTree.getNextVisibleItem( it ) )
+                VarTree::Iterator it2;
+                for( it2 = m_rTree.begin(); it2 != m_rTree.end();
+                     it2 = m_rTree.getNextVisibleItem( it2 ) )
                 {
-                    it->m_selected = false;
+                    it2->m_selected = false;
                 }
                 // Select the new item
                 if( it != m_rTree.end() )
@@ -427,7 +428,6 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                m_rTree.action( &*it );
             }
         }
-
         // Redraw the control
         makeImage();
         notifyLayout();
