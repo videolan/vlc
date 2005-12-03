@@ -114,7 +114,7 @@ endif
 ifdef HAVE_DARWIN_OS
  all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
-	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg .openslp \
+	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
 	.dvdcss .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .libmpcdec .expat .clinkcc .aclocal
@@ -879,25 +879,6 @@ endif
 CLEAN_FILE += .ffmpeg
 CLEAN_PKG += ffmpeg ffmpeg.cvs
 DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
-
-# ***************************************************************************
-# openslp
-# ***************************************************************************
-
-openslp-$(OPENSLP_VERSION).tar.gz:
-	$(WGET) $(OPENSLP_URL)
-
-openslp: openslp-$(OPENSLP_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p 0 < Patches/openslp.patch
-
-.openslp: openslp
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make SUBDIRS="common libslpattr slpd libslp slptool" && make install SUBDIRS="common libslpattr slpd libslp slptool")
-	touch $@
-
-CLEAN_FILE += .openslp
-CLEAN_PKG += openslp
-DISTCLEAN_PKG += openslp-$(OPENSLP_VERSION).tar.gz
 
 # ***************************************************************************
 # libdvdcss
