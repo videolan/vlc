@@ -70,7 +70,6 @@
 
     IBOutlet id o_misc_lbl;
     IBOutlet id o_sap_chkbox;
-    IBOutlet id o_slp_chkbox;
     IBOutlet id o_channel_name;
     IBOutlet id o_channel_name_lbl;
 

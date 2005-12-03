@@ -179,7 +179,6 @@
 
     [o_misc_lbl setTitle: _NS("Stream Announcing")];
     [o_sap_chkbox setTitle: _NS("SAP announce")];
-    [o_slp_chkbox setTitle: _NS("SLP announce")];
     [o_rtsp_chkbox setTitle: _NS("RTSP announce")];
     [o_http_chkbox setTitle:_NS("HTTP announce")];
     [o_file_chkbox setTitle:_NS("Export SDP as file")];
@@ -221,7 +220,6 @@
     o_mode = [[o_method selectedCell] title];
 
     [o_sap_chkbox setEnabled: NO];
-    [o_slp_chkbox setEnabled: NO];
     [o_http_chkbox setEnabled: NO];
     [o_rtsp_chkbox setEnabled: NO];
     [o_file_chkbox setEnabled: NO];
@@ -306,7 +304,6 @@
             [[o_mux_selector itemAtIndex: 7] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
             [o_sap_chkbox setEnabled: YES];
-            [o_slp_chkbox setEnabled: YES];
             [o_channel_name setEnabled: YES];
         }
         else if( [o_mode isEqualToString: @"RTP"] )
@@ -325,7 +322,6 @@
             [[o_mux_selector itemAtIndex: 8] setEnabled: YES];
             [o_mux_selector selectItemAtIndex: 8];
             [o_sap_chkbox setEnabled: YES];
-            [o_slp_chkbox setEnabled: NO];
             [o_rtsp_chkbox setEnabled: YES];
             [o_http_chkbox setEnabled: YES];
             [o_file_chkbox setEnabled: YES];
@@ -413,14 +409,6 @@
                         @",sap,name=%@", [o_channel_name stringValue]];
                 else
                     [o_announce appendFormat:@",sap"];
-            }
-            if( [o_slp_chkbox state] == NSOnState )
-            {
-               if ( ![[o_channel_name stringValue] isEqualToString: @""] )
-                    [o_announce appendFormat:@
-                            "slp,name=%@",[o_channel_name stringValue]];
-                else
-                    [o_announce appendString: @",slp"];
             }
         }
         if ( ![o_mode isEqualToString: @"RTP"] )
@@ -634,8 +622,8 @@
 {
     NSString *o_mode;
     o_mode = [[o_stream_type selectedCell] title];
-    [o_channel_name setEnabled: [o_sap_chkbox state] || [o_slp_chkbox state]
-                || [o_mode isEqualToString: @"RTP"]];
+    [o_channel_name setEnabled: [o_sap_chkbox state] ||
+                [o_mode isEqualToString: @"RTP"]];
 
     if ([o_mode isEqualToString: @"RTP"])
     {

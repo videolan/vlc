@@ -363,7 +363,6 @@
                 "o_sap_chkbox" = id; 
                 "o_sdp_url" = id; 
                 "o_sdp_url_lbl" = id; 
-                "o_slp_chkbox" = id; 
                 "o_stream_address" = id; 
                 "o_stream_address_lbl" = id; 
                 "o_stream_port" = id; 
