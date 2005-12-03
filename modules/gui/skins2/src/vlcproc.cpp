@@ -351,9 +351,9 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
     playlist_t *p_playlist = (playlist_t*)pObj;
     pThis->updateStreamName(p_playlist);
 
-    // Create a playlist notify command
+    // Create a playlist notify command (for old style playlist)
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
-    // Create a playtree notify command
+    // Create a playtree notify command (for new style playtree)
     CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
 
     // Push the command in the asynchronous command queue
@@ -424,15 +424,16 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     playlist_t *p_playlist = (playlist_t*)pObj;
     pThis->updateStreamName(p_playlist);
 
-    // Create a playlist notify command
+    // Create a playlist notify command (old style playlist)
     // TODO: selective update
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
-    // Create a playtree notify command
-    CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
-
-    // Push the command in the asynchronous command queue
     pQueue->push( CmdGenericPtr( pCmd ) );
-    pQueue->push( CmdGenericPtr( pCmdTree ) );
+    // Create two playtree notify commands: one for old item, one for new
+    CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
+                                                         oldVal.i_int );
+    pQueue->push( CmdGenericPtr( pCmdTree ) , true );
+    pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(), newVal.i_int );
+    pQueue->push( CmdGenericPtr( pCmdTree ) , true );
 
     return VLC_SUCCESS;
 }
