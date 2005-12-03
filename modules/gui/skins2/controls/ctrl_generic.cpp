@@ -80,8 +80,7 @@ void CtrlGeneric::notifyLayout( int width, int height,
 }
 
 
-void CtrlGeneric::notifyLayoutMaxSize( const OSGraphics *pImg1,
-                                       const OSGraphics *pImg2 )
+void CtrlGeneric::notifyLayoutMaxSize( const Box *pImg1, const Box *pImg2 )
 {
     if( pImg1 == NULL )
     {

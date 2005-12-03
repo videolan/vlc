@@ -27,8 +27,10 @@
 #include "file_bitmap.hpp"
 
 FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-                        string fileName, uint32_t aColor ):
-    GenericBitmap( pIntf ), m_width( 0 ), m_height( 0 ), m_pData( NULL )
+                        string fileName, uint32_t aColor, int nbFrames,
+                        int fps ):
+    GenericBitmap( pIntf, nbFrames, fps ), m_width( 0 ), m_height( 0 ),
+    m_pData( NULL )
 {
     video_format_t fmt_in = {0}, fmt_out = {0};
     picture_t *pPic;

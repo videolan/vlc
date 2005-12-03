@@ -146,7 +146,8 @@ void Builder::addBitmap( const BuilderData::Bitmap &rData )
 {
     GenericBitmap *pBmp =
         new FileBitmap( getIntf(), m_pImageHandler,
-                        getFilePath( rData.m_fileName ), rData.m_alphaColor );
+                        getFilePath( rData.m_fileName ), rData.m_alphaColor,
+                        rData.m_nbFrames, rData.m_fps );
     if( !pBmp->getData() )
     {
         // Invalid bitmap
@@ -171,7 +172,8 @@ void Builder::addSubBitmap( const BuilderData::SubBitmap &rData )
 
     // Copy a region of the parent bitmap to the new one
     BitmapImpl *pBmp =
-        new BitmapImpl( getIntf(), rData.m_width, rData.m_height );
+        new BitmapImpl( getIntf(), rData.m_width, rData.m_height,
+                        rData.m_nbFrames, rData.m_fps );
     bool res = pBmp->drawBitmap( *pParentBmp, rData.m_x, rData.m_y, 0, 0,
                                  rData.m_width, rData.m_height );
     if( !res )

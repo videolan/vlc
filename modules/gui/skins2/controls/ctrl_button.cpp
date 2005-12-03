@@ -37,24 +37,12 @@ CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
                         VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rCommand( rCommand ), m_tooltip( rTooltip ),
-    m_cmdUpOverDownOver( this ), m_cmdDownOverUpOver( this ),
-    m_cmdDownOverDown( this ), m_cmdDownDownOver( this ),
-    m_cmdUpOverUp( this ), m_cmdUpUpOver( this ),
-    m_cmdDownUp( this ), m_cmdUpHidden( this ),
-    m_cmdHiddenUp( this )
+    m_imgUp( pIntf, rBmpUp ), m_imgOver( pIntf, rBmpOver ),
+    m_imgDown( pIntf, rBmpDown ), m_pImg( NULL ), m_cmdUpOverDownOver( this ),
+    m_cmdDownOverUpOver( this ), m_cmdDownOverDown( this ),
+    m_cmdDownDownOver( this ), m_cmdUpOverUp( this ), m_cmdUpUpOver( this ),
+    m_cmdDownUp( this ), m_cmdUpHidden( this ), m_cmdHiddenUp( this )
 {
-    // Build the images of the button
-    OSFactory *pOsFactory = OSFactory::instance( pIntf );
-    m_pImgUp = pOsFactory->createOSGraphics( rBmpUp.getWidth(),
-                                             rBmpUp.getHeight() );
-    m_pImgUp->drawBitmap( rBmpUp, 0, 0 );
-    m_pImgDown = pOsFactory->createOSGraphics( rBmpDown.getWidth(),
-                                               rBmpDown.getHeight() );
-    m_pImgDown->drawBitmap( rBmpDown, 0, 0 );
-    m_pImgOver = pOsFactory->createOSGraphics( rBmpOver.getWidth(),
-                                               rBmpOver.getHeight() );
-    m_pImgOver->drawBitmap( rBmpOver, 0, 0 );
-
     // States
     m_fsm.addState( "up" );
     m_fsm.addState( "down" );
@@ -84,15 +72,12 @@ CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
 
     // Initial state
     m_fsm.setState( "up" );
-    m_pImg = m_pImgUp;
+    setImage( &m_imgUp );
 }
 
 
 CtrlButton::~CtrlButton()
 {
-    SKINS_DELETE( m_pImgUp );
-    SKINS_DELETE( m_pImgDown );
-    SKINS_DELETE( m_pImgOver );
 }
 
 
@@ -120,26 +105,49 @@ void CtrlButton::draw( OSGraphics &rImage, int xDest, int yDest )
     if( m_pImg )
     {
         // Draw the current image
-        rImage.drawGraphics( *m_pImg, 0, 0, xDest, yDest );
+        m_pImg->draw( rImage, xDest, yDest );
     }
+}
+
+
+void CtrlButton::setImage( AnimBitmap *pImg )
+{
+    AnimBitmap *pOldImg = m_pImg;
+    m_pImg = pImg;
+
+    if( pOldImg )
+    {
+        pOldImg->stopAnim();
+        pOldImg->delObserver( this );
+    }
+
+    if( pImg )
+    {
+        pImg->startAnim();
+        pImg->addObserver( this );
+    }
+
+    notifyLayoutMaxSize( pOldImg, pImg );
+}
+
+
+void CtrlButton::onUpdate( Subject<AnimBitmap> &rBitmap )
+{
+    notifyLayout();
 }
 
 
 void CtrlButton::CmdUpOverDownOver::execute()
 {
     m_pParent->captureMouse();
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgDown;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgDown );
 }
 
 
 void CtrlButton::CmdDownOverUpOver::execute()
 {
     m_pParent->releaseMouse();
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgUp;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgUp );
     // Execute the command associated to this button
     m_pParent->m_rCommand.execute();
 }
@@ -147,33 +155,25 @@ void CtrlButton::CmdDownOverUpOver::execute()
 
 void CtrlButton::CmdDownOverDown::execute()
 {
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgUp;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgUp );
 }
 
 
 void CtrlButton::CmdDownDownOver::execute()
 {
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgDown;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgDown );
 }
 
 
 void CtrlButton::CmdUpUpOver::execute()
 {
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgOver;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgOver );
 }
 
 
 void CtrlButton::CmdUpOverUp::execute()
 {
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgUp;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgUp );
 }
 
 
@@ -185,16 +185,12 @@ void CtrlButton::CmdDownUp::execute()
 
 void CtrlButton::CmdUpHidden::execute()
 {
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = NULL;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( NULL );
 }
 
 
 void CtrlButton::CmdHiddenUp::execute()
 {
-    const OSGraphics *pOldImg = m_pParent->m_pImg;
-    m_pParent->m_pImg = m_pParent->m_pImgUp;
-    m_pParent->notifyLayoutMaxSize( pOldImg, m_pParent->m_pImg );
+    m_pParent->setImage( &m_pParent->m_imgUp );
 }
 

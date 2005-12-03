@@ -91,6 +91,8 @@ SOURCES_skins2 = \
 	\
 	src/anchor.cpp \
 	src/anchor.hpp \
+	src/anim_bitmap.cpp \
+	src/anim_bitmap.hpp \
 	src/bitmap_font.cpp \
 	src/bitmap_font.hpp \
 	src/dialogs.cpp \

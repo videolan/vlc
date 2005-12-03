@@ -27,26 +27,33 @@
 
 #include "skin_common.hpp"
 #include "../utils/pointer.hpp"
+#include "../utils/position.hpp"
 
 
 /// Generic interface for bitmaps
-class GenericBitmap: public SkinObject
+class GenericBitmap: public SkinObject, public Box
 {
     public:
         virtual ~GenericBitmap() {}
-
-        /// Get the width of the bitmap
-        virtual int getWidth() const = 0;
-
-        /// Get the heighth of the bitmap
-        virtual int getHeight() const = 0;
 
         /// Get a linear buffer containing the image data.
         /// Each pixel is stored in 4 bytes in the order B,G,R,A
         virtual uint8_t *getData() const = 0;
 
+        /// Get the number of frames in the bitmap
+        int getNbFrames() const { return m_nbFrames; }
+
+        /// Get the number of frames per second (for animated bitmaps)
+        int getFrameRate() const { return m_frameRate; }
+
     protected:
-        GenericBitmap( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
+        GenericBitmap( intf_thread_t *pIntf, int nbFrames = 1, int fps = 0);
+
+    private:
+        /// Number of frames
+        int m_nbFrames;
+        /// Frame rate
+        int m_frameRate;
 };
 
 
@@ -55,7 +62,8 @@ class BitmapImpl: public GenericBitmap
 {
     public:
         /// Create an empty bitmap of the given size
-        BitmapImpl( intf_thread_t *pIntf, int width, int height );
+        BitmapImpl( intf_thread_t *pIntf, int width, int height,
+                    int nbFrames = 1, int fps = 0 );
         ~BitmapImpl();
 
         /// Get the width of the bitmap

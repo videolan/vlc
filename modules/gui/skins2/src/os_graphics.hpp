@@ -26,6 +26,7 @@
 #define OS_GRAPHICS_HPP
 
 #include "skin_common.hpp"
+#include "../utils/position.hpp"
 #include "../utils/pointer.hpp"
 
 class GenericBitmap;
@@ -33,7 +34,7 @@ class OSWindow;
 
 
 /// OS specific graphics class
-class OSGraphics: public SkinObject
+class OSGraphics: public SkinObject, public Box
 {
     public:
         virtual ~OSGraphics() {}
@@ -71,10 +72,6 @@ class OSGraphics: public SkinObject
 
         /// Tell whether the pixel at the given position is visible
         virtual bool hit( int x, int y ) const = 0;
-
-        /// Getters
-        virtual int getWidth() const = 0;
-        virtual int getHeight() const = 0;
 
     protected:
         OSGraphics( intf_thread_t *pIntf ): SkinObject( pIntf ) {}

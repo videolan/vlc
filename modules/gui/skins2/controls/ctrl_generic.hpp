@@ -31,6 +31,7 @@
 #include "../utils/observer.hpp"
 #include "../commands/cmd_generic.hpp"
 
+class Box;
 class EvtGeneric;
 class OSGraphics;
 class GenericLayout;
@@ -94,8 +95,8 @@ class CtrlGeneric: public SkinObject, public Observer<VarBool>
 
         /// Same as notifyLayout(), but takes optional images as parameters.
         /// The maximum size(s) of the images will be used for repainting.
-        void notifyLayoutMaxSize( const OSGraphics *pImg1 = NULL,
-                                  const OSGraphics *pImg2 = NULL );
+        void notifyLayoutMaxSize( const Box *pImg1 = NULL,
+                                  const Box *pImg2 = NULL );
 
         /// Ask the layout to capture the mouse
         virtual void captureMouse() const;

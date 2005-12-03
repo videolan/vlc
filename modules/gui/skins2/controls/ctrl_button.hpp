@@ -27,14 +27,14 @@
 
 #include "ctrl_generic.hpp"
 #include "../utils/fsm.hpp"
+#include "../src/anim_bitmap.hpp"
 
 class GenericBitmap;
-class OSGraphics;
 class CmdGeneric;
 
 
 /// Base class for button controls
-class CtrlButton: public CtrlGeneric
+class CtrlButton: public CtrlGeneric, public Observer<AnimBitmap>
 {
     public:
         /// Create a button with 3 images
@@ -69,9 +69,9 @@ class CtrlButton: public CtrlGeneric
         /// Tooltip text
         const UString m_tooltip;
         /// Images of the button in the different states
-        OSGraphics *m_pImgUp, *m_pImgOver, *m_pImgDown;
+        AnimBitmap m_imgUp, m_imgOver, m_imgDown;
         /// Current image
-        OSGraphics *m_pImg;
+        AnimBitmap *m_pImg;
 
         /// Callback objects
         DEFINE_CALLBACK( CtrlButton, UpOverDownOver )
@@ -83,6 +83,12 @@ class CtrlButton: public CtrlGeneric
         DEFINE_CALLBACK( CtrlButton, DownUp )
         DEFINE_CALLBACK( CtrlButton, UpHidden )
         DEFINE_CALLBACK( CtrlButton, HiddenUp )
+
+        /// Change the current image
+        void setImage( AnimBitmap *pImg );
+
+        /// Method called when an animated bitmap changes
+        virtual void onUpdate( Subject<AnimBitmap> &rBitmap );
 };
 
 

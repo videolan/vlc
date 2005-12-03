@@ -56,12 +56,14 @@ m_tooltipfont( tooltipfont ), m_magnet( magnet ), m_alpha( alpha ), m_moveAlpha(
     /// Type definition
     struct Bitmap
     {
-        Bitmap( const string & id, const string & fileName, uint32_t alphaColor ):
-m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
+        Bitmap( const string & id, const string & fileName, uint32_t alphaColor, int nbFrames, int fps ):
+m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ), m_nbFrames( nbFrames ), m_fps( fps ) {}
 
         string m_id;
         string m_fileName;
         uint32_t m_alphaColor;
+        int m_nbFrames;
+        int m_fps;
     };
     /// List
     list<Bitmap> m_listBitmap;
@@ -69,8 +71,8 @@ m_id( id ), m_fileName( fileName ), m_alphaColor( alphaColor ) {}
     /// Type definition
     struct SubBitmap
     {
-        SubBitmap( const string & id, const string & parent, int x, int y, int width, int height ):
-m_id( id ), m_parent( parent ), m_x( x ), m_y( y ), m_width( width ), m_height( height ) {}
+        SubBitmap( const string & id, const string & parent, int x, int y, int width, int height, int nbFrames, int fps ):
+m_id( id ), m_parent( parent ), m_x( x ), m_y( y ), m_width( width ), m_height( height ), m_nbFrames( nbFrames ), m_fps( fps ) {}
 
         string m_id;
         string m_parent;
@@ -78,6 +80,8 @@ m_id( id ), m_parent( parent ), m_x( x ), m_y( y ), m_width( width ), m_height( 
         int m_y;
         int m_width;
         int m_height;
+        int m_nbFrames;
+        int m_fps;
     };
     /// List
     list<SubBitmap> m_listSubBitmap;
