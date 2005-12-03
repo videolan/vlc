@@ -58,7 +58,7 @@ Playtree::~Playtree()
 void Playtree::delSelected()
 {
     Iterator it;
-    for (it = begin(); it != end() ; it++ )
+    for (it = begin(); it != end() ; it = getNextVisibleItem( it ) )
     {
         if( (*it).m_selected )
         {
@@ -77,6 +77,7 @@ void Playtree::delSelected()
             }
         }
     }
+    buildTree();
     notify();
 }
 
