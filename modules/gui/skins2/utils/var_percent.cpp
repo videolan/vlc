@@ -43,7 +43,7 @@ void VarPercent::set( float percentage )
     if( m_value != percentage )
     {
         m_value = percentage;
-        notify();
+        notify( NULL );
     }
 }
 

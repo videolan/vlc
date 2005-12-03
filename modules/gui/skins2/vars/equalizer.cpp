@@ -77,7 +77,7 @@ VariablePtr EqualizerBands::getBand( int band )
 }
 
 
-void EqualizerBands::onUpdate( Subject<VarPercent> &rBand )
+void EqualizerBands::onUpdate( Subject<VarPercent,void*> &rBand, void *arg )
 {
     // Make sure we are not called from set()
     if (!m_isUpdating)

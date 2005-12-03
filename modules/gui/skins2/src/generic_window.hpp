@@ -41,7 +41,7 @@ class WindowManager;
 
 
 /// Generic window class
-class GenericWindow: public SkinObject, public Observer<VarBool>
+class GenericWindow: public SkinObject, public Observer<VarBool, void*>
 {
     private:
         friend class WindowManager;
@@ -120,7 +120,7 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         mutable VarBoolImpl m_varVisible;
 
         /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarBool> &rVariable );
+        virtual void onUpdate( Subject<VarBool, void*> &rVariable , void*);
 };
 
 

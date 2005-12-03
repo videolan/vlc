@@ -78,7 +78,7 @@ void Playtree::delSelected()
         }
     }
     buildTree();
-    notify();
+    notify( 1 );
 }
 
 void Playtree::action( VarTree *pItem )
@@ -106,7 +106,7 @@ void Playtree::action( VarTree *pItem )
 void Playtree::onChange()
 {
     buildTree();
-    notify();
+    notify( 1 );
 }
 
 void Playtree::onUpdate( int id )
@@ -125,7 +125,7 @@ void Playtree::onUpdate( int id )
         msg_Warn(getIntf(), "Cannot find node with id %d", id );
     }
     // TODO update only the right node
-    notify();
+    notify( 0 );
 }
 
 void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )

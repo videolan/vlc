@@ -109,7 +109,7 @@ class Position
 
 
 /// Variable implementing the Box interface
-class VarBox: public Variable, public Box, public Subject<VarBox>
+class VarBox: public Variable, public Box, public Subject<VarBox, void*>
 {
     public:
         VarBox( intf_thread_t *pIntf, int width = 0, int height = 0 );

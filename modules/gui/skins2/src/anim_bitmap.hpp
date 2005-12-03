@@ -34,7 +34,8 @@ class OSTimer;
 
 
 /// Animated bitmap
-class AnimBitmap: public SkinObject, public Box, public Subject<AnimBitmap>
+class AnimBitmap: public SkinObject, public Box,
+                  public Subject<AnimBitmap, void*>
 {
     public:
         AnimBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap );

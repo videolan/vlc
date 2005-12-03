@@ -72,14 +72,14 @@ CtrlList::~CtrlList()
 }
 
 
-void CtrlList::onUpdate( Subject<VarList> &rList )
+void CtrlList::onUpdate( Subject<VarList, void*> &rList, void *arg  )
 {
     autoScroll();
     m_pLastSelected = NULL;
 }
 
 
-void CtrlList::onUpdate( Subject<VarPercent> &rPercent )
+void CtrlList::onUpdate( Subject<VarPercent, void*> &rPercent, void *arg  )
 {
     // Get the size of the control
     const Position *pPos = getPosition();

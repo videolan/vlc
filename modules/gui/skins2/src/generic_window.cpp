@@ -122,7 +122,7 @@ void GenericWindow::toggleOnTop( bool onTop ) const
 }
 
 
-void GenericWindow::onUpdate( Subject<VarBool> &rVariable )
+void GenericWindow::onUpdate( Subject<VarBool, void*> &rVariable, void*arg )
 {
     if( m_varVisible.get() )
     {

@@ -60,7 +60,7 @@ VarBoolAndBool::~VarBoolAndBool()
 }
 
 
-void VarBoolAndBool::onUpdate( Subject<VarBool> &rVariable )
+void VarBoolAndBool::onUpdate( Subject<VarBool,void *> &rVariable, void *arg )
 {
     notify();
 }
@@ -82,7 +82,7 @@ VarBoolOrBool::~VarBoolOrBool()
 }
 
 
-void VarBoolOrBool::onUpdate( Subject<VarBool> &rVariable )
+void VarBoolOrBool::onUpdate( Subject<VarBool,void*> &rVariable , void*arg)
 {
     notify();
 }
@@ -101,7 +101,7 @@ VarNotBool::~VarNotBool()
 }
 
 
-void VarNotBool::onUpdate( Subject<VarBool> &rVariable )
+void VarNotBool::onUpdate( Subject<VarBool, void*> &rVariable, void*arg )
 {
     notify();
 }

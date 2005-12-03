@@ -29,7 +29,7 @@
 
 
 /// Variable for graphical equalizer
-class EqualizerBands: public SkinObject, public Observer<VarPercent>
+class EqualizerBands: public SkinObject, public Observer<VarPercent, void*>
 {
     public:
         /// Number of bands
@@ -52,7 +52,7 @@ class EqualizerBands: public SkinObject, public Observer<VarPercent>
         bool m_isUpdating;
 
         /// Callback for band updates
-        virtual void onUpdate( Subject<VarPercent> &rBand );
+        virtual void onUpdate( Subject<VarPercent, void*> &rBand , void *);
 };
 
 

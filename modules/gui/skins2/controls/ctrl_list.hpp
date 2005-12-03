@@ -35,8 +35,8 @@ class GenericBitmap;
 
 
 /// Class for control list
-class CtrlList: public CtrlGeneric, public Observer<VarList>,
-    public Observer<VarPercent>
+class CtrlList: public CtrlGeneric, public Observer<VarList, void*>,
+    public Observer<VarPercent, void *>
 {
     public:
         CtrlList( intf_thread_t *pIntf, VarList &rList,
@@ -88,10 +88,10 @@ class CtrlList: public CtrlGeneric, public Observer<VarList>,
         int m_lastPos;
 
         /// Method called when the list variable is modified
-        virtual void onUpdate( Subject<VarList> &rList );
+        virtual void onUpdate( Subject<VarList, void*> &rList, void* );
 
         /// Method called when the position variable of the list is modified
-        virtual void onUpdate( Subject<VarPercent> &rPercent );
+        virtual void onUpdate( Subject<VarPercent, void*> &rPercent, void*  );
 
         /// Called when the position is set
         virtual void onPositionChange();

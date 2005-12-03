@@ -159,7 +159,8 @@ void CtrlSliderCursor::draw( OSGraphics &rImage, int xDest, int yDest )
 }
 
 
-void CtrlSliderCursor::onUpdate( Subject<VarPercent> &rVariable )
+void CtrlSliderCursor::onUpdate( Subject<VarPercent,void*> &rVariable,
+                                 void *arg  )
 {
     // The position has changed
     refreshLayout();
@@ -425,7 +426,7 @@ void CtrlSliderBg::associateCursor( CtrlSliderCursor &rCursor )
 }
 
 
-void CtrlSliderBg::onUpdate( Subject<VarPercent> &rVariable )
+void CtrlSliderBg::onUpdate( Subject<VarPercent, void*> &rVariable, void*arg )
 {
     m_position = (int)( m_rVariable.get() * (m_nbHoriz * m_nbVert - 1) );
     notifyLayout( m_bgWidth, m_bgHeight );

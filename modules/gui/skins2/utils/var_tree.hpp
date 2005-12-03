@@ -2,7 +2,7 @@
  * var_tree.hpp
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: var_bool.hpp 9934 2005-02-15 13:55:08Z courmisch $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
@@ -32,7 +32,7 @@
 #include "var_percent.hpp"
 
 /// Tree variable
-class VarTree: public Variable, public Subject<VarTree>
+class VarTree: public Variable, public Subject<VarTree, int>
 {
     public:
         VarTree( intf_thread_t *pIntf );

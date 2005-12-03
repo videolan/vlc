@@ -30,7 +30,7 @@
 class VoutWindow;
 
 /// Control video
-class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
+class CtrlVideo: public CtrlGeneric, public Observer<VarBox, void*>
 {
     public:
         CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
@@ -56,7 +56,7 @@ class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
         virtual string getType() const { return "video"; }
 
         /// Method called when the vout size is updated
-        virtual void onUpdate( Subject<VarBox> &rVoutSize );
+        virtual void onUpdate( Subject<VarBox,void*> &rVoutSize, void* );
 
     private:
         /// Vout window

@@ -36,7 +36,7 @@ class VarPercent;
 
 
 /// Radial slider
-class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
+class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent, void*>
 {
     public:
         /// Create a radial slider with the given image, which must be
@@ -86,7 +86,7 @@ class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
         DEFINE_CALLBACK( CtrlRadialSlider, Move )
 
         /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarPercent> &rVariable );
+        virtual void onUpdate( Subject<VarPercent,void*> &rVariable, void* );
 
         /// Change the position of the cursor, with the given position of
         /// the mouse (relative to the layout). Is blocking is true, the

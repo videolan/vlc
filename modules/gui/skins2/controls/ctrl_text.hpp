@@ -38,7 +38,7 @@ class VarText;
 
 
 /// Class for control text
-class CtrlText: public CtrlGeneric, public Observer<VarText>
+class CtrlText: public CtrlGeneric, public Observer<VarText, void*>
 {
     public:
         enum Align_t
@@ -122,7 +122,7 @@ class CtrlText: public CtrlGeneric, public Observer<VarText>
         DEFINE_CALLBACK( CtrlText, UpdateText );
 
         /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarText> &rVariable );
+        virtual void onUpdate( Subject<VarText,void*> &rVariable, void* );
 
         /// Display the text on the control
         void displayText( const UString &rText );

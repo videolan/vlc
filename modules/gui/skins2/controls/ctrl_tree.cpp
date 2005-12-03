@@ -130,13 +130,14 @@ int CtrlTree::maxItems()
 }
 
 
-void CtrlTree::onUpdate( Subject<VarTree> &rTree )
+void CtrlTree::onUpdate( Subject<VarTree, int> &rTree,  int arg )
 {
+    fprintf( stderr, "Doing update type %i\n", arg );
     autoScroll();
     m_pLastSelected = NULL;
 }
 
-void CtrlTree::onUpdate( Subject<VarPercent> &rPercent )
+void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
 {
     // Determine what is the first item to display
     VarTree::Iterator it = m_rTree.begin();

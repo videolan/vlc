@@ -32,8 +32,9 @@
 
 
 /// String variable
-class VarText: public Variable, public Subject<VarText>,
-               public Observer<VarPercent>, public Observer< VarText >
+class VarText: public Variable, public Subject<VarText, void*>,
+               public Observer<VarPercent, void*>,
+               public Observer< VarText,void*>
 {
     public:
         // Set substVars to true to replace "$X" variables in the text
@@ -48,8 +49,8 @@ class VarText: public Variable, public Subject<VarText>,
         virtual const UString get() const;
 
         /// Methods called when an observed variable is modified
-        virtual void onUpdate( Subject<VarPercent> &rVariable );
-        virtual void onUpdate( Subject<VarText> &rVariable );
+        virtual void onUpdate( Subject<VarPercent, void*> &rVariable, void* );
+        virtual void onUpdate( Subject<VarText, void*> &rVariable, void* );
 
     private:
         /// Variable type
