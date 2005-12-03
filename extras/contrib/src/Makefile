@@ -83,7 +83,7 @@ HOSTCONF=--host=$(HOST) --build=$(BUILD)
 FFMPEGCONF=--cross-prefix=$(HOST)-
 X264CONF=--crosscompile=$(HOST)
 else
-   ifneq $(CC,)
+   ifneq ($(CC),)
       FFMPEGCONF=--cc="$(CC)"
    endif
 endif
