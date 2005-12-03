@@ -65,6 +65,11 @@ ifneq ($(AR),)
 HOSTCC+= AR="$(AR)"
 endif
 
+# Define ranlib on non-cross compilation setups
+ifeq ($(RANLIB),)
+RANLIB=ranlib
+endif
+
 # For libebml/libmatroska. Grrr.
 ifneq ($(AR),)
 HOSTCC2=$(HOSTCC) AR="$(AR) rcvu"
