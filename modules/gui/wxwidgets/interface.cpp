@@ -36,6 +36,8 @@
 #include <vlc/aout.h>
 #include "charset.h"
 
+#include <wx/splitter.h>
+
 /* include the toolbar graphics */
 #include "bitmaps/play.xpm"
 #include "bitmaps/pause.xpm"
@@ -108,6 +110,46 @@ BEGIN_EVENT_TABLE(VLCVolCtrl, wxControl)
 
     /* Mouse events */
     EVT_LEFT_UP(VLCVolCtrl::OnChange)
+END_EVENT_TABLE()
+
+class Splitter : public wxSplitterWindow
+{
+public:
+    Splitter( wxWindow *p_parent, intf_thread_t *_p_intf )
+      : wxSplitterWindow( p_parent, -1, wxDefaultPosition, wxSize(0,0),
+                          wxCLIP_CHILDREN|wxSP_3DSASH ),
+        p_intf(_p_intf), i_sash_position(150) {}
+    virtual ~Splitter() {};
+
+    virtual bool Split( wxWindow* window1, wxWindow* window2 )
+    {
+        return wxSplitterWindow::SplitHorizontally( window1, window2,
+                                                    -i_sash_position );
+    }
+
+private:
+    DECLARE_EVENT_TABLE()
+
+    void OnSize( wxSizeEvent &event )
+    {
+        SetSashPosition( event.GetSize().GetHeight() - i_sash_position );
+        event.Skip();
+    }
+
+    void OnSashPosChanged( wxSplitterEvent &event )
+    {
+        if( !GetSize().GetHeight() ){ event.Skip(); return; }
+        i_sash_position = GetSize().GetHeight() - event.GetSashPosition();
+        event.Skip();
+    }
+
+    intf_thread_t *p_intf;
+    int i_sash_position;
+};
+
+BEGIN_EVENT_TABLE(Splitter, wxSplitterWindow)
+    EVT_SIZE( Splitter::OnSize )
+    EVT_SPLITTER_SASH_POS_CHANGED(-1, Splitter::OnSashPosChanged)
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -228,8 +270,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Create a splitter window that will fill in the interface window.
      * We need a splitter bar in order to make the embedded playlist
      * resizable. */
-    splitter = new wxSplitterWindow( this, -1, wxDefaultPosition, wxSize(0,0),
-                                     wxCLIP_CHILDREN|wxSP_3DSASH );
+    splitter = new Splitter( this, p_intf );
     main_sizer = new wxBoxSizer( wxVERTICAL );
     main_sizer->Add( splitter, 1, wxEXPAND );
     SetSizer( main_sizer );
@@ -252,9 +293,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     /* Put this in the splitter */
     splitter->Initialize( main_panel );
-#if wxCHECK_VERSION(2,6,0)
-    splitter->SetSashGravity( 1.0 );
-#endif
 
 #ifdef wxHAS_TASK_BAR_ICON
     /* Systray integration */
@@ -878,11 +916,8 @@ void Interface::OnSmallPlaylist( wxCommandEvent& WXUNUSED(event) )
 
     b_playlist_manager = !b_playlist_manager;
 
-    if( b_playlist_manager )
-        splitter->SplitHorizontally( main_panel, playlist_manager,
-                                     -playlist_min_size.GetHeight() );
-    else
-        splitter->Unsplit( playlist_manager );
+    if( b_playlist_manager ) splitter->Split( main_panel, playlist_manager );
+    else splitter->Unsplit( playlist_manager );
 
     SetIntfMinSize();
     main_sizer->Layout();
