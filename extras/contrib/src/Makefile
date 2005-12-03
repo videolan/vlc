@@ -1100,7 +1100,7 @@ libdts-$(LIBDTS_VERSION).tar.gz:
 ifeq ($(HOST),i586-pc-beos)
 # libdts 0.0.2 doesn't compile on BeOS
 libdts:
-	svn co svn://svn.videolan.org/libdts/trunk libdts
+	$(SVN) co svn://svn.videolan.org/libdts/trunk libdts
 	(cd $@; ./bootstrap)
 else
 libdts: libdts-$(LIBDTS_VERSION).tar.gz
@@ -1123,9 +1123,9 @@ ifdef SVN
 x264: 
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
 ifdef HAVE_WIN32
-	(cd x264; patch -p 0 <../Patches/x264-svn-win32.patch )
+	(cd x264; patch -p 0 < ../Patches/x264-svn-win32.patch )
 else
-	cd x264 && patch -p 0 < ../Patches/x264_svn.patch
+	patch -p 0 < Patches/x264_svn.patch
 	rm x264/x264.c
 endif
 else
