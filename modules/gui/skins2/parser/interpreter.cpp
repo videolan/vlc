@@ -81,27 +81,10 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
         CmdGenericPtr( new CmdPlaylistRepeat( getIntf(), true ) );
     m_commandMap["playlist.setRepeat(false)"] =
         CmdGenericPtr( new CmdPlaylistRepeat( getIntf(), false ) );
-    REGISTER_CMD( "playtree.load()", CmdDlgPlaytreeLoad )
-    REGISTER_CMD( "playtree.save()", CmdDlgPlaytreeSave )
-    REGISTER_CMD( "playtree.add()", CmdDlgAdd )
     VarTree &rVarTree = VlcProc::instance( getIntf() )->getPlaytreeVar();
     m_commandMap["playtree.del()"] =
         CmdGenericPtr( new CmdPlaytreeDel( getIntf(), rVarTree ) );
-    REGISTER_CMD( "playtree.next()", CmdPlaytreeNext )
-    REGISTER_CMD( "playtree.previous()", CmdPlaytreePrevious )
     REGISTER_CMD( "playtree.sort()", CmdPlaytreeSort )
-    m_commandMap["playtree.setRandom(true)"] =
-        CmdGenericPtr( new CmdPlaytreeRandom( getIntf(), true ) );
-    m_commandMap["playtree.setRandom(false)"] =
-        CmdGenericPtr( new CmdPlaytreeRandom( getIntf(), false ) );
-    m_commandMap["playtree.setLoop(true)"] =
-        CmdGenericPtr( new CmdPlaytreeLoop( getIntf(), true ) );
-    m_commandMap["playtree.setLoop(false)"] =
-        CmdGenericPtr( new CmdPlaytreeLoop( getIntf(), false ) );
-    m_commandMap["playtree.setRepeat(true)"] =
-        CmdGenericPtr( new CmdPlaytreeRepeat( getIntf(), true ) );
-    m_commandMap["playtree.setRepeat(false)"] =
-        CmdGenericPtr( new CmdPlaytreeRepeat( getIntf(), false ) );
     REGISTER_CMD( "vlc.fullscreen()", CmdFullscreen )
     REGISTER_CMD( "vlc.play()", CmdPlay )
     REGISTER_CMD( "vlc.pause()", CmdPause )

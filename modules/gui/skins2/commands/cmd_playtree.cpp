@@ -34,38 +34,3 @@ void CmdPlaytreeSort::execute()
 {
     // TODO
 }
-
-void CmdPlaytreeNext::execute()
-{
-    // TODO
-}
-
-void CmdPlaytreePrevious::execute()
-{
-    // TODO
-}
-
-void CmdPlaytreeRandom::execute()
-{
-    // TODO
-}
-
-void CmdPlaytreeLoop::execute()
-{
-    // TODO
-}
-
-void CmdPlaytreeRepeat::execute()
-{
-    // TODO
-}
-
-void CmdPlaytreeLoad::execute()
-{
-    // TODO
-}
-
-void CmdPlaytreeSave::execute()
-{
-    // TODO
-}

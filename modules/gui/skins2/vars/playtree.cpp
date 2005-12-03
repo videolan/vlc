@@ -57,7 +57,26 @@ Playtree::~Playtree()
 
 void Playtree::delSelected()
 {
-    // TODO
+    Iterator it;
+    for (it = begin(); it != end() ; it++ )
+    {
+        if( (*it).m_selected )
+        {
+            playlist_item_t *p_item = (playlist_item_t *)(it->m_pData);
+            if( p_item->i_children == -1 )
+            {
+                playlist_LockDelete( getIntf()->p_sys->p_playlist,
+                                     p_item->input.i_id );
+            }
+            else
+            {
+                vlc_mutex_lock( &getIntf()->p_sys->p_playlist->object_lock );
+                playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
+                                     VLC_TRUE, VLC_FALSE );
+                vlc_mutex_unlock( &getIntf()->p_sys->p_playlist->object_lock );
+            }
+        }
+    }
     notify();
 }
 
