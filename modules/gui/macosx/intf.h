@@ -93,13 +93,15 @@ struct intf_sys_t
     id o_wizard;                /* VLCWizard      */
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
+    id o_sfilters;              /* VLCsFilters    */
     /*id o_update;                 VLCUpdate      */
     BOOL nib_main_loaded;       /* reference to the main-nib */
     BOOL nib_open_loaded;       /* reference to the open-nib */
     BOOL nib_about_loaded;      /* reference to the about-nib */
     BOOL nib_wizard_loaded;     /* reference to the wizard-nib */
     BOOL nib_extended_loaded;   /* reference to the extended-nib */
-    BOOL nib_bookmarks_loaded;  /* reference to the bookmarks-nib */ 
+    BOOL nib_bookmarks_loaded;  /* reference to the bookmarks-nib */
+    BOOL nib_sfilters_loaded;   /* reference to the sfilters-nib */
     /*BOOL nib_update_loaded;      reference to the update-nib */
 
     IBOutlet id o_window;       /* main window    */
@@ -307,6 +309,7 @@ struct intf_sys_t
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showExtended:(id)sender;
 - (IBAction)showBookmarks:(id)sender;
+- (IBAction)showSFilters:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;

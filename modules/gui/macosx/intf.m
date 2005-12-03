@@ -41,6 +41,7 @@
 #include "wizard.h"
 #include "extended.h"
 #include "bookmarks.h"
+#include "sfilters.h"
 /*#include "update.h"*/
 
 /*****************************************************************************
@@ -303,6 +304,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_wizard = [[VLCWizard alloc] init];
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
+    o_sfilters = nil;
     /*o_update = [[VLCUpdate alloc] init];*/
 
     i_lastShownVolume = -1;
@@ -1521,6 +1523,22 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_extended showPanel];
     } else {
         [o_extended showPanel];
+    }
+}
+
+- (IBAction)showSFilters:(id)sender
+{
+    if ( o_sfilters == nil )
+    {
+        o_sfilters = [[VLCsFilters alloc] init];
+    }
+    if (!nib_sfilters_loaded)
+    {
+        nib_sfilters_loaded = [NSBundle loadNibNamed:@"SFilters" owner:self];
+        [o_sfilters initStrings];
+        [o_sfilters showAsPanel];
+    } else {
+        [o_sfilters showAsPanel];
     }
 }
 

@@ -837,6 +837,7 @@
 				DC7F46ED08A183FC0027DB24,
 				DCE7BD0508A56C8B007B10AE,
 				DCDA5E6508F94518009D93A8,
+				CCF3C64C0923B99D00401862,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -923,6 +924,8 @@
 				DC7F46F108A187F60027DB24,
 				DCE7BD0708A5724D007B10AE,
 				DCE7BD0608A5724D007B10AE,
+				CCF3C6500923B9D100401862,
+				CCF3C6510923B9D100401862,
 			);
 			isa = PBXGroup;
 			name = Classes;
@@ -2166,6 +2169,58 @@
 //A02
 //A03
 //A04
+//CC0
+//CC1
+//CC2
+//CC3
+//CC4
+		CCF3C64A0923B99D00401862 = {
+			children = (
+				CCF3C64B0923B99D00401862,
+			);
+			isa = PBXVariantGroup;
+			name = SFilters.nib;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		CCF3C64B0923B99D00401862 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
+			name = English;
+			path = Resources/English.lproj/SFilters.nib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		CCF3C64C0923B99D00401862 = {
+			fileRef = CCF3C64A0923B99D00401862;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		CCF3C6500923B9D100401862 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = sfilters.h;
+			path = ../../modules/gui/macosx/sfilters.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		CCF3C6510923B9D100401862 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = sfilters.m;
+			path = ../../modules/gui/macosx/sfilters.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+//CC0
+//CC1
+//CC2
+//CC3
+//CC4
 //DC0
 //DC1
 //DC2
@@ -2379,6 +2434,7 @@
 				DCFCCDB7085CE18F001E36AF,
 				DC7F46EB08A183FC0027DB24,
 				DCE7BD0308A56C8B007B10AE,
+				CCF3C64A0923B99D00401862,
 			);
 			isa = PBXGroup;
 			name = nibs;

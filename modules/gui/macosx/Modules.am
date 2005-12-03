@@ -34,5 +34,7 @@ SOURCES_macosx = \
 	extended.m \
 	bookmarks.h \
 	bookmarks.m \
+	sfilters.h \
+	sfilters.m \
 	$(NULL)
 

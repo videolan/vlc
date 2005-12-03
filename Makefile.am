@@ -181,6 +181,9 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/Extended.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/Extended.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/Extended.nib/keyedobjects.nib \
+	extras/MacOSX/Resources/English.lproj/SFilters.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/SFilters.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/SFilters.nib/keyedobjects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/a52.icns \
 	extras/MacOSX/Resources/aac.icns \
@@ -609,6 +612,8 @@ VLC-release.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
+	    sfilters.h \
+	    sfilters.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -723,6 +728,8 @@ VLC.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
+	    sfilters.h \
+	    sfilters.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
