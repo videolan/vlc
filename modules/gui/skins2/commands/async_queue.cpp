@@ -80,13 +80,13 @@ void AsyncQueue::push( const CmdGenericPtr &rcCommand, bool removePrev )
     if( removePrev )
     {
         // Remove the commands of the same type
-        remove( rcCommand.get()->getType() );
+        remove( rcCommand.get()->getType(), rcCommand );
     }
     m_cmdList.push_back( rcCommand );
 }
 
 
-void AsyncQueue::remove( const string &rType )
+void AsyncQueue::remove( const string &rType, const CmdGenericPtr &rcCommand )
 {
     vlc_mutex_lock( &m_lock );
 
@@ -96,10 +96,15 @@ void AsyncQueue::remove( const string &rType )
         // Remove the command if it is of the given type
         if( (*it).get()->getType() == rType )
         {
-            list<CmdGenericPtr>::iterator itNew = it;
-            itNew++;
-            m_cmdList.erase( it );
-            it = itNew;
+            // Maybe the command wants to check if it must really be
+            // removed
+            if( rcCommand.get()->checkRemove( (*it).get() ) == true )
+            {
+                list<CmdGenericPtr>::iterator itNew = it;
+                itNew++;
+                m_cmdList.erase( it );
+                it = itNew;
+            }
         }
     }
 

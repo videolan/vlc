@@ -51,6 +51,18 @@ void CmdPlaytreeUpdate::execute()
     rVar.onUpdate( m_id );
 }
 
+bool CmdPlaytreeUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
+{
+
+    CmdPlaytreeUpdate *pUpdateCommand = (CmdPlaytreeUpdate *)(pQueuedCommand);
+    //CmdPlaytreeUpdate *pUpdateCommand = dynamic_cast<CmdPlaytreeUpdate *>(pQueuedCommand);
+    if( m_id == pUpdateCommand->m_id )
+    {
+        return true;
+    }
+    return false;
+}
+
 
 void CmdSetText::execute()
 {

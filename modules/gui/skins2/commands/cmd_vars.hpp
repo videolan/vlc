@@ -51,6 +51,9 @@ class CmdPlaytreeUpdate: public CmdGeneric
         /// Return the type of the command
         virtual string getType() const { return "playtree update"; }
 
+        /// Only accept removal of command if they concern the same item
+        virtual bool checkRemove( CmdGeneric * ) const;
+
     private:
         /// Playlist item ID
         int m_id;

@@ -406,7 +406,7 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
-    pQueue->push( CmdGenericPtr( pCmdTree ), false );
+    pQueue->push( CmdGenericPtr( pCmdTree ), true );
 
     return VLC_SUCCESS;
 }

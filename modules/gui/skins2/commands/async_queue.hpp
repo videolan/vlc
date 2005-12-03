@@ -49,7 +49,7 @@ class AsyncQueue: public SkinObject
         void push( const CmdGenericPtr &rcCommand, bool removePrev = true );
 
         /// Remove the commands of the given type
-        void remove( const string &rType );
+        void remove( const string &rType , const CmdGenericPtr &rcCommand );
 
         /// Flush the queue and execute the commands
         void flush();

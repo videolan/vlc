@@ -73,6 +73,10 @@ class CmdGeneric: public SkinObject
         /// Return the type of the command
         virtual string getType() const { return ""; }
 
+        /// During queue reductions, check if we really want to remove
+        /// this command.
+        virtual bool checkRemove( CmdGeneric * ) const { return true; }
+
     protected:
         CmdGeneric( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
 };

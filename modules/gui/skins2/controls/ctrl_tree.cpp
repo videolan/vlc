@@ -472,15 +472,18 @@ void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest )
 
 void CtrlTree::autoScroll()
 {
+    fprintf( stderr, "Autoscroll start\n");
     // Find the current playing stream
     int playIndex = 0;
     VarTree::Iterator it;
     for( it = m_rTree.begin(); it != m_rTree.end();
          it = m_rTree.getNextVisibleItem( it ) )
     {
+        fprintf (stderr, "Checking  playindex is %i\n",  playIndex);
         if( it->m_playing ) break;
         playIndex++;
     }
+    fprintf (stderr, "broke playIndex\n");
 
     if( it == m_rTree.end() ) return;
 
@@ -489,23 +492,27 @@ void CtrlTree::autoScroll()
     for( it = m_rTree.begin(); it != m_rTree.end();
          it = m_rTree.getNextVisibleItem( it ) )
     {
+        fprintf (stderr, "Testing, lastPos is %i\n", lastPosIndex );
         if( it == m_lastPos ) break;
         lastPosIndex++;
     }
 
     if( it == m_rTree.end() ) return;
 
+        fprintf( stderr, "I have %i visible\n", maxItems() );
 
     if( it != m_rTree.end()
         && ( playIndex < lastPosIndex
            || playIndex > lastPosIndex + maxItems() ) )
     {
+         fprintf( stderr, "Need to scroll\n");
         // Scroll to have the playing stream visible
         VarPercent &rVarPos = m_rTree.getPositionVar();
         rVarPos.set( 1.0 - (double)playIndex / (double)m_rTree.visibleItems() );
     }
     else
     {
+         fprintf( stderr, "No need to scroll\n");
         makeImage();
         notifyLayout();
     }
