@@ -40,6 +40,13 @@
 #include <AudioToolbox/AudioFormat.h>
 
 #define STREAM_FORMAT_MSG( pre, sfm ) \
+    pre "[%ld][%4.4s][%ld][%ld][%ld][%ld][%ld][%ld]", \
+    (UInt32)sfm.mSampleRate, (char *)&sfm.mFormatID, \
+    sfm.mFormatFlags, sfm.mBytesPerPacket, \
+    sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
+    sfm.mChannelsPerFrame, sfm.mBitsPerChannel
+
+#define STREAM_FORMAT_MSG_FULL( pre, sfm ) \
     pre ":\nsamplerate: [%ld]\nFormatID: [%4.4s]\nFormatFlags: [%ld]\nBypesPerPacket: [%ld]\nFramesPerPacket: [%ld]\nBytesPerFrame: [%ld]\nChannelsPerFrame: [%ld]\nBitsPerChannel[%ld]", \
     (UInt32)sfm.mSampleRate, (char *)&sfm.mFormatID, \
     sfm.mFormatFlags, sfm.mBytesPerPacket, \
@@ -47,6 +54,7 @@
     sfm.mChannelsPerFrame, sfm.mBitsPerChannel
 
 #define BUFSIZE 0xffffff
+#define AOUT_VAR_SPDIF_FLAG 0xf0000000
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -64,26 +72,24 @@ struct aout_sys_t
     Component                   au_component;   /* The Audiocomponent we use */
     AudioUnit                   au_unit;        /* The AudioUnit we use */
     mtime_t                     clock_diff;
-    uint8_t                      p_remainder_buffer[BUFSIZE];
+    uint8_t                     p_remainder_buffer[BUFSIZE];
     uint32_t                    i_read_bytes;
     uint32_t                    i_total_bytes;
-    audio_date_t                end_date_t;
-    
-    
 };
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
 static int      Open                    ( vlc_object_t * );
+int             OpenAnalog              ( aout_instance_t * );
+int             OpenSPDIF               ( aout_instance_t * );
 static void     Close                   ( vlc_object_t * );
 
-static void     Play                    ( aout_instance_t *);
+static void     Play                    ( aout_instance_t * );
+static void     Probe                   ( aout_instance_t * );
 
-static int      Probe                   ( aout_instance_t * );
-static int      DeviceDigitalMode       ( aout_instance_t *, AudioDeviceID );
+int             AudioDeviceSupportsDigital( aout_instance_t *, AudioDeviceID );
 int             AudioDeviceHasOutput    ( AudioDeviceID );
-static int      DigitalInit             ( aout_instance_t * );
 
 static OSStatus RenderCallbackAnalog    ( vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *,
                                           unsigned int, unsigned int, AudioBufferList *);
@@ -104,7 +110,7 @@ vlc_module_begin();
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
     set_callbacks( Open, Close );
-    //add_integer( "coreaudio-dev", -1, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE ); 
+    //add_integer( "macosx-audio-device", -1, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE ); 
 vlc_module_end();
 
 /*****************************************************************************
@@ -113,25 +119,33 @@ vlc_module_end();
 static int Open( vlc_object_t * p_this )
 {
     OSStatus                err = noErr;
-    ComponentDescription    desc;
-    UInt32                  i_param_size,i;
-    struct aout_sys_t       *p_sys;
+    UInt32                  i_param_size = 0, i_hog = 0;
+    struct aout_sys_t       *p_sys = NULL;
+    vlc_bool_t              b_alive = VLC_FALSE;
     vlc_value_t             val;
     aout_instance_t         *p_aout = (aout_instance_t *)p_this;
 
     /* Allocate structure */
-    p_sys = (struct aout_sys_t *)malloc( sizeof( struct aout_sys_t ) );
-    if( p_sys == NULL )
+    p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_aout->output.p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
         return( VLC_ENOMEM );
     }
 
-    memset( p_sys, 0, sizeof( struct aout_sys_t ) );
+    p_sys = p_aout->output.p_sys;
+    p_sys->i_default_dev = 0;
+    p_sys->i_selected_dev = 0;
+    p_sys->i_devices = 0;
+    p_sys->b_supports_digital = VLC_FALSE;
+    p_sys->b_digital = VLC_FALSE;
+    p_sys->au_component = NULL;
+    p_sys->au_unit = NULL;
+    p_sys->clock_diff = (mtime_t) 0;
+    p_sys->i_read_bytes = 0;
+    p_sys->i_total_bytes = 0;
+    memset( p_sys->p_remainder_buffer, 0, sizeof(uint8_t) * BUFSIZE );
 
-    p_sys->b_digital = VLC_FALSE; /* We assume we are not digital */
-
-    p_aout->output.p_sys = p_sys;
     p_aout->output.pf_play = Play;
     
     aout_FormatPrint( p_aout, "VLC is looking for:\n", (audio_sample_format_t *)&p_aout->output.output );
@@ -140,46 +154,91 @@ static int Open( vlc_object_t * p_this )
     if( var_Type( p_aout, "audio-device" ) == 0 )
     {
         Probe( p_aout );
-        /*if( Probe( p_aout ) != VLC_SUCCESS );
-        {
-            msg_Err( p_aout, "Probe failed" );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }*/
     }
-    
+
     /* What device do we want? */
     if( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
-        msg_Err( p_aout, "audio-device var does not exist" );
+        msg_Err( p_aout, "audio-device var does not exist. device probe failed." );
         free( p_sys );
         return( VLC_ENOVAR );
     }
-    p_sys->i_selected_dev = val.i_int;
 
-    /* what is vlc format? if digital, take digital route else AUHAL route */
-    DeviceDigitalMode( p_aout, p_sys->i_selected_dev );
-    /*if( DeviceDigitalMode( p_aout, p_sys->i_selected_dev ) != VLC_SUCCESS );
+    p_sys->i_selected_dev = val.i_int & ~AOUT_VAR_SPDIF_FLAG;
+    p_sys->b_supports_digital = ( val.i_int & AOUT_VAR_SPDIF_FLAG ) ? VLC_TRUE : VLC_FALSE;
+
+    /* Check if the desired device is alive and usable */
+    i_param_size = sizeof( b_alive );
+    err = AudioDeviceGetProperty( p_sys->i_selected_dev, 0, FALSE,
+                                  kAudioDevicePropertyDeviceIsAlive,
+                                  &i_param_size, &b_alive );
+
+    if( err != noErr )
     {
-        msg_Err( p_aout, "DeviceDigitalMode failed" );
+        msg_Err( p_aout, "could not check whether device is alive: %4.4s",
+                 (char *)&err );
+        return VLC_EGENERIC;
+    }
+
+    if( b_alive == VLC_FALSE )
+    {
+        msg_Err( p_aout, "Selected audio device is not alive" ); 
+        var_Destroy( p_aout, "audio-device" );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    */
-    
+
+    i_param_size = sizeof( i_hog );
+    err = AudioDeviceGetProperty( p_sys->i_selected_dev, 0, FALSE,
+                                  kAudioDevicePropertyHogMode,
+                                  &i_param_size, &i_hog );
+
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "could not check whether device is hogged: %4.4s",
+                 (char *)&err );
+        return VLC_EGENERIC;
+    }
+
+    if( i_hog != -1 )
+    {
+        msg_Err( p_aout, "Selected audio device is exclusively in use by another program" );
+        var_Destroy( p_aout, "audio-device" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    /* Check for Digital mode or Analog output mode */
     if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) && p_sys->b_supports_digital )
     {
-        p_sys->b_digital = VLC_TRUE;
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
-        msg_Dbg( p_aout, "we found a digital stream, and we WANT a digital stream" );
+        if( OpenSPDIF( p_aout ) )
+            return VLC_SUCCESS;
     }
-    else if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) && !p_sys->b_supports_digital )
+    else
+    {
+        if( OpenAnalog( p_aout ) )
+            return VLC_SUCCESS;
+    }
+    
+    /* If we reach this, the Open* failed */
+    var_Destroy( p_aout, "audio-device" );
+    free( p_sys );
+    return VLC_EGENERIC;
+}
+
+int OpenAnalog( aout_instance_t *p_aout )
+{
+    struct aout_sys_t       *p_sys = p_aout->output.p_sys;
+    OSStatus                err = noErr;
+    UInt32                  i_param_size = 0, i = 0;
+    ComponentDescription    desc;
+        
+    if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) && !p_sys->b_supports_digital )
     {
         msg_Dbg( p_aout, "we had requested a digital stream, but it's not possible for this device" );
     }
- 
-    /* If analog only start setting up AUHAL */
 
+    /* If analog only start setting up AUHAL */
     /* Lets go find our Component */
     desc.componentType = kAudioUnitType_Output;
     desc.componentSubType = kAudioUnitSubType_HALOutput;
@@ -191,17 +250,14 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->au_component == NULL )
     {
         msg_Err( p_aout, "we cannot find our HAL component" );
-        free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_FALSE;
     }
 
     err = OpenAComponent( p_sys->au_component, &p_sys->au_unit );
     if( err )
     {
-        
         msg_Err( p_aout, "we cannot find our HAL component" );
-        free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_FALSE;
     }
     
     /* Enable IO for the component */
@@ -226,7 +282,7 @@ static int Open( vlc_object_t * p_this )
                                    &DeviceFormat,
                                    &i_param_size ));
                                    
-    msg_Dbg( p_aout, STREAM_FORMAT_MSG( "current format is " , DeviceFormat ) );
+    msg_Dbg( p_aout, STREAM_FORMAT_MSG( "current format is: " , DeviceFormat ) );
 
     /* Get the channel layout */
     AudioChannelLayout *layout;
@@ -473,8 +529,34 @@ static int Open( vlc_object_t * p_this )
     verify_noerr( AudioUnitInitialize(p_sys->au_unit) );
 
     verify_noerr( AudioOutputUnitStart(p_sys->au_unit) );
-    return( VLC_SUCCESS );
+    
+    return VLC_TRUE;
 }
+
+/*****************************************************************************
+ * Setup a encoded digital stream (SPDIF)
+ *****************************************************************************/
+int OpenSPDIF( aout_instance_t * p_aout )
+{
+    OSStatus            err = noErr;
+    UInt32              i, i_param_size;
+    AudioDeviceID       devid_def;
+    AudioDeviceID       *p_devices = NULL;
+    vlc_value_t         val, text;
+
+    struct aout_sys_t   *p_sys = p_aout->output.p_sys;
+
+    /* Start doing the SPDIF setup proces */
+    p_sys->b_digital = VLC_TRUE;
+    p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+    msg_Dbg( p_aout, "we found a digital stream, and we WANT a digital stream" );
+    
+    return VLC_FALSE;
+
+error:
+    return VLC_FALSE;
+}
+
 
 /*****************************************************************************
  * Close: Close HAL AudioUnit
@@ -504,11 +586,11 @@ static void Play( aout_instance_t * p_aout )
 /*****************************************************************************
  * Probe
  *****************************************************************************/
-static int Probe( aout_instance_t * p_aout )
+static void Probe( aout_instance_t * p_aout )
 {
     OSStatus            err = noErr;
-    UInt32              i, i_param_size;
-    AudioDeviceID       devid_def;
+    UInt32              i = 0, i_param_size = 0;
+    AudioDeviceID       devid_def = 0;
     AudioDeviceID       *p_devices = NULL;
     vlc_value_t         val, text;
 
@@ -534,7 +616,7 @@ static int Probe( aout_instance_t * p_aout )
     msg_Dbg( p_aout, "system has [%ld] device(s)", p_sys->i_devices );
 
     /* Allocate DeviceID array */
-    p_devices = (AudioDeviceID *)malloc( i_param_size );
+    p_devices = (AudioDeviceID*)malloc( sizeof(AudioDeviceID) * p_sys->i_devices );
     if( p_devices == NULL )
     {
         msg_Err( p_aout, "out of memory" );
@@ -543,7 +625,7 @@ static int Probe( aout_instance_t * p_aout )
 
     /* Populate DeviceID array */
     err = AudioHardwareGetProperty( kAudioHardwarePropertyDevices,
-                                    &i_param_size, (void *)p_devices );
+                                    &i_param_size, p_devices );
     if( err != noErr )
     {
         msg_Err( p_aout, "could not get the device ID's: [%4.4s]", (char *)&err );
@@ -553,7 +635,7 @@ static int Probe( aout_instance_t * p_aout )
     /* Find the ID of the default Device */
     i_param_size = sizeof( AudioDeviceID );
     err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
-                                    &i_param_size, (void *)&devid_def );
+                                    &i_param_size, &devid_def );
     if( err != noErr )
     {
         msg_Err( p_aout, "could not get default audio device: [%4.4s]", (char *)&err );
@@ -567,29 +649,25 @@ static int Probe( aout_instance_t * p_aout )
     
     for( i = 0; i < p_sys->i_devices; i++ )
     {
-        char psz_devuid[1024];
-        char psz_name[1024];
-        CFStringRef devUID;
+        char *psz_name;
+        i_param_size = 0;
 
-        i_param_size = sizeof psz_name;
+        /* Retrieve the length of the device name */
+        err = AudioDeviceGetPropertyInfo(
+                    p_devices[i], 0, VLC_FALSE,
+                    kAudioDevicePropertyDeviceName,
+                    &i_param_size, NULL);
+        if( err ) goto error;
+
+        /* Retrieve the name of the device */
+        psz_name = (char *)malloc( i_param_size );
         err = AudioDeviceGetProperty(
                     p_devices[i], 0, VLC_FALSE,
                     kAudioDevicePropertyDeviceName,
                     &i_param_size, psz_name);
-        if( err )
-            goto error;
+        if( err ) goto error;
 
-        i_param_size = sizeof(CFStringRef);    
-        err = AudioDeviceGetProperty(
-                    p_devices[i], 0, VLC_FALSE,
-                    kAudioDevicePropertyDeviceUID,
-                    &i_param_size, &devUID);
-        if( err )
-            goto error;
-
-        CFStringGetCString( devUID, psz_devuid, sizeof psz_devuid, CFStringGetSystemEncoding() );
-        msg_Dbg( p_aout, "DevID: %lu  DevName: %s  DevUID: %s", p_devices[i], psz_name, psz_devuid );
-        CFRelease( devUID );
+        msg_Dbg( p_aout, "DevID: %lu  DevName: %s", p_devices[i], psz_name );
 
         if( !AudioDeviceHasOutput( p_devices[i]) )
         {
@@ -597,87 +675,140 @@ static int Probe( aout_instance_t * p_aout )
             continue;
         }
 
-        val.i_int = (int) p_devices[i];
-        text.psz_string = psz_name;
+        val.i_int = (int)p_devices[i];
+        text.psz_string = strdup( psz_name );
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
-        if( devid_def == p_devices[i] )
+        if( p_sys->i_default_dev == p_devices[i] )
         {
             var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
             var_Set( p_aout, "audio-device", val );
         }
+
+        if( AudioDeviceSupportsDigital( p_aout, p_devices[i]) )
+        {
+            val.i_int = (int)p_devices[i] | AOUT_VAR_SPDIF_FLAG;
+            asprintf( &text.psz_string, "%s (Encoded Output)", psz_name );
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
+            if( p_sys->i_default_dev == p_devices[i] && config_GetInt( p_aout, "spdif" ) )
+            {
+                var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+                var_Set( p_aout, "audio-device", val );
+            }
+        }
+        
+        free( psz_name);
     }
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     
     /* attach a Listener so that we are notified of a change in the Device setup */
-    /* err = AudioHardwareAddPropertyListener( kAudioHardwarePropertyDevices,
+    err = AudioHardwareAddPropertyListener( kAudioHardwarePropertyDevices,
                                             HardwareListener, 
                                             (void *)p_aout );
     if( err )
-        goto error;*/
-    
+        goto error;
+
     msg_Dbg( p_aout, "succesful finish of deviceslist" );
     if( p_devices ) free( p_devices );
-    return (VLC_SUCCESS);
+    return;
 
 error:
     var_Destroy( p_aout, "audio-device" );
     if( p_devices ) free( p_devices );
-    return VLC_EGENERIC;
+    return;
 }
 
 /*****************************************************************************
- * DeviceDigitalMode: Check i_dev_id for digital stream support.
+ * AudioDeviceSupportsDigital: Check i_dev_id for digital stream support.
  *****************************************************************************/
-static int DeviceDigitalMode( aout_instance_t *p_aout, AudioDeviceID i_dev_id )
+int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_dev_id )
 {
     OSStatus                    err = noErr;
-    UInt32                      i_param_size;
-    AudioStreamBasicDescription *p_format_list;
-    int                         i, i_formats;
-    struct aout_sys_t           *p_sys = p_aout->output.p_sys;
+    UInt32                      i_param_size = 0;
+    AudioStreamBasicDescription *p_format_list = NULL;
+    AudioStreamID               *p_streams = NULL;
+    int                         i = 0, j = 0; 
+    int                         i_formats = 0, i_streams = 0;
+    vlc_bool_t                  b_return = VLC_FALSE;
     
-    p_sys->b_supports_digital = VLC_FALSE;
-    
+    /* Retrieve all the output streams */
     err = AudioDeviceGetPropertyInfo( i_dev_id, 0, FALSE,
-                                      kAudioDevicePropertyStreamFormats,
+                                      kAudioDevicePropertyStreams,
                                       &i_param_size, NULL );
     if( err != noErr )
     {
-        msg_Err( p_aout, "could not get number of streamsformats: [%4.4s]", (char *)&err );
-        return( VLC_EGENERIC );
+        msg_Err( p_aout, "could not get number of streams: [%4.4s]", (char *)&err );
+        return VLC_FALSE;
     }
     
-    i_formats = i_param_size / sizeof( AudioStreamBasicDescription );
-    p_format_list = (AudioStreamBasicDescription *)malloc( i_param_size );
-    if( p_format_list == NULL )
+    i_streams = i_param_size / sizeof( AudioStreamID );
+    p_streams = (AudioStreamID *)malloc( i_param_size );
+    if( p_streams == NULL )
     {
-        return( VLC_ENOMEM );
+        msg_Err( p_aout, "Out of memory" );
+        return VLC_ENOMEM;
     }
     
     err = AudioDeviceGetProperty( i_dev_id, 0, FALSE,
-                                      kAudioDevicePropertyStreamFormats,
-                                      &i_param_size, (void *)p_format_list );
+                                    kAudioDevicePropertyStreams,
+                                    &i_param_size, p_streams );
+    
     if( err != noErr )
     {
-        msg_Err( p_aout, "could not get the list of formats: [%4.4s]", (char *)&err );
-        return( VLC_EGENERIC );
+        msg_Err( p_aout, "could not get number of streams: [%4.4s]", (char *)&err );
+        return VLC_FALSE;
     }
 
-    for( i = 0; i < i_formats; i++ )
+    for( i = 0; i < i_streams; i++ )
     {
-        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format", p_format_list[i] ) );
-        
-        if( p_format_list[i].mFormatID == 'IAC3' ||
-                  p_format_list[i].mFormatID == kAudioFormat60958AC3 )
+        p_format_list = NULL;
+        i_formats = 0;
+        msg_Dbg( p_aout, "retrieving formats for stream: %#lx", p_streams[i] );
+
+        /* Retrieve all the stream formats supported by each output stream */
+        err = AudioStreamGetPropertyInfo( p_streams[i], 0,
+                                          kAudioDevicePropertyStreamFormats,
+                                          &i_param_size, NULL );
+        if( err != noErr )
         {
-            p_sys->b_supports_digital = VLC_TRUE;
-            msg_Dbg( p_aout, "this device supports a digital stream" );
+            msg_Err( p_aout, "could not get number of streamformats: [%4.4s]", (char *)&err );
             break;
         }
+        
+        i_formats = i_param_size / sizeof( AudioStreamBasicDescription );
+        p_format_list = (AudioStreamBasicDescription *)malloc( i_param_size );
+        if( p_format_list == NULL )
+        {
+            break;
+        }
+        
+        err = AudioStreamGetProperty( p_streams[i], 0,
+                                          kAudioDevicePropertyStreamFormats,
+                                          &i_param_size, p_format_list );
+        if( err != noErr )
+        {
+            msg_Err( p_aout, "could not get the list of streamformats: [%4.4s]", (char *)&err );
+            free( p_format_list);
+            break;
+        }
+
+        for( j = 0; j < i_formats; j++ )
+        {
+            msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format", p_format_list[j] ) );
+            
+            if( p_format_list[j].mFormatID == 'IAC3' ||
+                      p_format_list[j].mFormatID == kAudioFormat60958AC3 )
+            {
+                b_return = VLC_TRUE;
+                msg_Dbg( p_aout, "this device supports a digital stream" );
+                break;
+            }
+        }
+        
+        if( p_format_list ) free( p_format_list );
     }
     
-    free( (void *)p_format_list );
-    return VLC_SUCCESS;
+    if( p_streams ) free( p_streams );
+    return b_return;
 }
 
 /*****************************************************************************
@@ -709,6 +840,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
 
     current_date = p_sys->clock_diff +
                    AudioConvertHostTimeToNanos( host_time.mHostTime ) / 1000;
+                   //- ((mtime_t) 1000000 / p_aout->output.output.i_rate * 31 ); // 31 = Latency in Frames. retrieve somewhere
 
     if( ioData == NULL && ioData->mNumberBuffers < 1 )
     {
@@ -766,28 +898,6 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     return( noErr );     
 }
 
-
-/*****************************************************************************
- * Setup a digital stream
- *****************************************************************************/
-static int DigitalInit( aout_instance_t * p_aout )
-{
-    OSStatus            err = noErr;
-    UInt32              i, i_param_size;
-    AudioDeviceID       devid_def;
-    AudioDeviceID       *p_devices = NULL;
-    vlc_value_t         val, text;
-
-    struct aout_sys_t   *p_sys = p_aout->output.p_sys;
-
-    
-    
-    return (VLC_SUCCESS);
-
-error:
-    return VLC_EGENERIC;
-}
-
 int AudioDeviceHasOutput( AudioDeviceID i_dev_id )
 {
     UInt32			dataSize;
@@ -799,7 +909,6 @@ int AudioDeviceHasOutput( AudioDeviceID i_dev_id )
     return TRUE;
 }
 
-
 /*****************************************************************************
  * HardwareListener: Warns us of changes in the list of registered devices
  *****************************************************************************/
@@ -807,9 +916,7 @@ static OSStatus HardwareListener( AudioHardwarePropertyID inPropertyID,
                                   void * inClientData )
 {
     OSStatus err = noErr;
-
     aout_instance_t     *p_aout = (aout_instance_t *)inClientData;
-    /* struct aout_sys_t   *p_sys = p_aout->output.p_sys; */
 
     switch( inPropertyID )
     {
