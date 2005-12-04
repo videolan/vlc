@@ -122,9 +122,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     // Called when a playlist item is added
-    // TODO: properly handle item-append
     var_AddCallback( pIntf->p_sys->p_playlist, "item-append",
-                     onIntfChange, this );
+                     onItemAppend, this );
     // Called when a playlist item is deleted
     // TODO: properly handle item-deleted
     var_AddCallback( pIntf->p_sys->p_playlist, "item-deleted",
@@ -167,7 +166,7 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-append",
-                     onIntfChange, this );
+                     onItemAppend, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-deleted",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-show",
@@ -410,6 +409,33 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
 
     return VLC_SUCCESS;
 }
+
+int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
+                           vlc_value_t oldVal, vlc_value_t newVal,
+                           void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+
+    playlist_add_t *p_add = (playlist_add_t*)malloc( sizeof(
+                                                playlist_add_t ) ) ;
+
+    memcpy( p_add, newVal.p_address, sizeof( playlist_add_t ) ) ;
+
+    // Create a playlist notify command (for old style playlist)
+    CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+
+    // Create a playtree notify command (for new style playtree)
+    CmdPlaytreeAppend *pCmdTree = new CmdPlaytreeAppend( pThis->getIntf(),
+                                                         p_add );
+
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+    pQueue->push( CmdGenericPtr( pCmdTree ), false );
+
+    return VLC_SUCCESS;
+}
+
 
 
 int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,

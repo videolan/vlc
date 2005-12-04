@@ -33,7 +33,7 @@ class GenericFont;
 class GenericBitmap;
 
 /// Class for control tree
-class CtrlTree: public CtrlGeneric, public Observer<VarTree, int>,
+class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
     public Observer<VarPercent, void*>
 {
     public:
@@ -71,6 +71,16 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, int>,
         /// Get the type of control (custom RTTI)
         virtual string getType() const { return "tree"; }
 
+        /// Make sure an item is visible
+        /// \param item an iterator to a tree item
+        /// \return true if it changed the position
+        bool CtrlTree::ensureVisible( VarTree::Iterator item );
+
+        /// Make sure an item is visible
+        /// \param itemIndex the absolute index in the tree
+        /// \return true if it changed the position
+        bool CtrlTree::ensureVisible( int itemIndex );
+
     private:
         /// Tree associated to the control
         VarTree &m_rTree;
@@ -98,11 +108,12 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, int>,
         VarTree *m_pLastSelected;
         /// Image of the control
         OSGraphics *m_pImage;
-        /// Last position
-        VarTree::Iterator m_lastPos;
+        /// First item in the visible area
+        VarTree::Iterator m_firstPos;
 
         /// Method called when the tree variable is modified
-        virtual void onUpdate( Subject<VarTree, int> &rTree , int);
+        virtual void onUpdate( Subject<VarTree, tree_update*> &rTree ,
+                               tree_update *);
 
         // Method called when the position variable of the tree is modified
         virtual void onUpdate( Subject<VarPercent, void *> &rPercent , void *);

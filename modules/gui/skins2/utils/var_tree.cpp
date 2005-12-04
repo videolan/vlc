@@ -2,7 +2,7 @@
  * var_tree.cpp
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: var_bool.hpp 9934 2005-02-15 13:55:08Z courmisch $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
@@ -28,7 +28,7 @@ const string VarTree::m_type = "tree";
 
 VarTree::VarTree( intf_thread_t *pIntf )
     : Variable( pIntf ), m_id( 0 ), m_selected( false ), m_playing( false ),
-    m_expanded( true ), m_pData( NULL ), m_pParent( NULL )
+    m_expanded( false ), m_pData( NULL ), m_pParent( NULL )
 {
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
@@ -57,7 +57,6 @@ void VarTree::add( int id, const UStringPtr &rcString, bool selected,
 {
     m_children.push_back( VarTree( getIntf(), this, id, rcString, selected,
                                    playing, expanded, pData ) );
-    notify();
 }
 
 void VarTree::delSelected()
@@ -79,7 +78,6 @@ void VarTree::delSelected()
             it++;
         }
     }
-    notify();
 }
 
 void VarTree::clear()

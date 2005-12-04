@@ -31,8 +31,16 @@
 #include "ustring.hpp"
 #include "var_percent.hpp"
 
+/// Description of an update to the tree
+typedef struct tree_update
+{
+     int i_type;
+     int i_parent;
+     int i_id;
+} tree_update;
+
 /// Tree variable
-class VarTree: public Variable, public Subject<VarTree, int>
+class VarTree: public Variable, public Subject<VarTree, tree_update*>
 {
     public:
         VarTree( intf_thread_t *pIntf );

@@ -2,7 +2,7 @@
  * playtree.hpp
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: playlist.hpp 8659 2004-09-07 21:16:49Z gbazin $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
@@ -43,7 +43,10 @@ class Playtree: public VarTree
         void onChange();
 
         /// Function called to notify playlist item update
-        void onUpdate( int id );
+        void onUpdateItem( int id );
+
+        /// Function called to notify playlist item  append
+        void onAppend( playlist_add_t * );
 
     private:
         /// VLC playlist object

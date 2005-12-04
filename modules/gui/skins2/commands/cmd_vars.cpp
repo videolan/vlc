@@ -48,7 +48,7 @@ void CmdPlaytreeUpdate::execute()
 {
     // Notify  the playtree variable
     Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
-    rVar.onUpdate( m_id );
+    rVar.onUpdateItem( m_id );
 }
 
 bool CmdPlaytreeUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
@@ -63,6 +63,13 @@ bool CmdPlaytreeUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
     return false;
 }
 
+
+void CmdPlaytreeAppend::execute()
+{
+    // Notify  the playtree variable
+    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
+    rVar.onAppend( m_pAdd );
+}
 
 void CmdSetText::execute()
 {

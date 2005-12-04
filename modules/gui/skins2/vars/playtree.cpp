@@ -78,7 +78,9 @@ void Playtree::delSelected()
         }
     }
     buildTree();
-    notify( 1 );
+    tree_update descr;
+    descr.i_type = 1;
+    notify( &descr );
 }
 
 void Playtree::action( VarTree *pItem )
@@ -106,10 +108,12 @@ void Playtree::action( VarTree *pItem )
 void Playtree::onChange()
 {
     buildTree();
-    notify( 1 );
+    tree_update descr;
+    descr.i_type = 1;
+    notify( &descr );
 }
 
-void Playtree::onUpdate( int id )
+void Playtree::onUpdateItem( int id )
 {
     Iterator it = findById( id );
     if( it != end() )
@@ -124,8 +128,32 @@ void Playtree::onUpdate( int id )
     {
         msg_Warn(getIntf(), "Cannot find node with id %d", id );
     }
-    // TODO update only the right node
-    notify( 0 );
+    tree_update descr;
+    descr.i_type = 0;
+    notify( &descr );
+}
+
+void Playtree::onAppend( playlist_add_t *p_add )
+{
+    Iterator node = findById( p_add->i_node );
+    if( node != end() )
+    {
+        Iterator item =  findById( p_add->i_item );
+        if( item == end() )
+        {
+            playlist_item_t *p_item = playlist_ItemGetById(
+                                        m_pPlaylist, p_add->i_item );
+            if( !p_item ) return;
+            UString *pName = new UString( getIntf(), p_item->input.psz_name );
+            node->add( p_add->i_item, UStringPtr( pName ),
+                      false,false, false, p_item );
+        }
+    }
+    tree_update descr;
+    descr.i_id = p_add->i_item;
+    descr.i_parent = p_add->i_node;
+    descr.i_type = 2;
+    notify( &descr );
 }
 
 void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
@@ -137,7 +165,7 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
         rTree.add( pNode->pp_children[i]->input.i_id, UStringPtr( pName ),
                      false,
                      m_pPlaylist->status.p_item == pNode->pp_children[i],
-                     true, pNode->pp_children[i] );
+                     false, pNode->pp_children[i] );
         if( pNode->pp_children[i]->i_children )
         {
             buildNode( pNode->pp_children[i], rTree.back() );

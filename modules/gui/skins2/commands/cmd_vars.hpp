@@ -59,6 +59,24 @@ class CmdPlaytreeUpdate: public CmdGeneric
         int m_id;
 };
 
+/// Command to notify the playtree of an item append
+class CmdPlaytreeAppend: public CmdGeneric
+{
+    public:
+        CmdPlaytreeAppend( intf_thread_t *pIntf, playlist_add_t *p_add ) :
+            CmdGeneric( pIntf ), m_pAdd( p_add ) {}
+        virtual ~CmdPlaytreeAppend() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playtree append"; }
+
+    private:
+        playlist_add_t * m_pAdd;
+};
+
 
 /// Command to set a text variable
 class CmdSetText: public CmdGeneric
