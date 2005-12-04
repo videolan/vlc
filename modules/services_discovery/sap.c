@@ -106,6 +106,10 @@ static const char ipv6_scopes[] = "1456789ABCDE";
        "If this option is selected, a SAP caching mechanism will be used. " \
        "This will result in lower SAP startup time, but you could end up " \
         "with items corresponding to legacy streams." )
+#define SAP_TIMESHIFT_TEXT N_("Allow timeshifting")
+#define SAP_TIMESHIFT_LONGTEXT N_( \
+        "Enable timeshifting automatically for streams " \
+        "discovered through SAP announcements." )
 
 /* Callbacks */
     static int  Open ( vlc_object_t * );
@@ -133,6 +137,8 @@ vlc_module_begin();
                SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, VLC_TRUE );
     add_bool( "sap-cache", 0 , NULL,
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, VLC_TRUE );
+    add_bool( "sap-timeshift", 0 , NULL,
+              SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, VLC_TRUE );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
@@ -221,6 +227,7 @@ struct services_discovery_sys_t
     /* Modes */
     vlc_bool_t  b_strict;
     vlc_bool_t  b_parse;
+    vlc_bool_t  b_timeshift;
 
     int i_timeout;
 };
@@ -321,6 +328,10 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_sd, "unable to read on any address" );
         return VLC_EGENERIC;
     }
+
+    /* Cache sap_timeshift value */
+    p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" )
+            ? VLC_TRUE : VLC_FALSE;
 
     /* Create our playlist node */
     p_sys->p_playlist = (playlist_t *)vlc_object_find( p_sd,
@@ -765,8 +776,11 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     char *psz_value;
     sap_announce_t *p_sap = (sap_announce_t *)malloc(
                                         sizeof(sap_announce_t ) );
+    services_discovery_sys_t *p_sys;
     if( p_sap == NULL )
         return NULL;
+
+    p_sys = p_sd->p_sys;
 
     EnsureUTF8( p_sdp->psz_sessionname );
     p_sap->i_last = mdate();
@@ -774,15 +788,17 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->p_sdp = p_sdp;
     p_sap->i_item_id = -1;
 
-    /* Create the playlist item here */
-    p_item = playlist_ItemNew( p_sd, p_sap->p_sdp->psz_uri,
-                               p_sdp->psz_sessionname );
+    /* Create the actual playlist item here */
+    p_item = playlist_ItemNew( p_sd, p_sap->p_sdp->psz_uri, p_sdp->psz_sessionname );
 
     if( !p_item )
     {
         free( p_sap );
         return NULL;
     }
+
+    if( p_sys->b_timeshift )
+        playlist_ItemAddOption( p_item, ":access-filter=timeshift" );
 
     psz_value = GetAttribute( p_sap->p_sdp, "tool" );
     if( psz_value != NULL )
@@ -803,35 +819,35 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         psz_value = GetAttribute( p_sap->p_sdp, "plgroup" );
     }
 
+    /* Find or Create the group playlist non-playable item */
     if( psz_value != NULL )
     {
         EnsureUTF8( psz_value );
 
-        p_child = playlist_ChildSearchName( p_sd->p_sys->p_node, psz_value );
+        p_child = playlist_ChildSearchName( p_sys->p_node, psz_value );
 
         if( p_child == NULL )
         {
-            p_child = playlist_NodeCreate( p_sd->p_sys->p_playlist,
+            p_child = playlist_NodeCreate( p_sys->p_playlist,
                                            VIEW_CATEGORY, psz_value,
-                                           p_sd->p_sys->p_node );
+                                           p_sys->p_node );
             p_child->i_flags &= ~PLAYLIST_SKIP_FLAG;
         }
     }
     else
     {
-        p_child = p_sd->p_sys->p_node;
+        p_child = p_sys->p_node;
     }
 
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
 
-    playlist_NodeAddItem( p_sd->p_sys->p_playlist, p_item, VIEW_CATEGORY,
-                              p_child, PLAYLIST_APPEND, PLAYLIST_END );
+    playlist_NodeAddItem( p_sys->p_playlist, p_item, VIEW_CATEGORY, p_child,
+                          PLAYLIST_APPEND, PLAYLIST_END );
 
     p_sap->i_item_id = p_item->input.i_id;
 
-    TAB_APPEND( p_sd->p_sys->i_announces,
-                p_sd->p_sys->pp_announces, p_sap );
+    TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );
 
     return p_sap;
 }
@@ -982,7 +998,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 
             psz_parse = psz_eof + 1;
             p_sdp->i_media_type = atoi( psz_parse );
-            
+
         }
         else
         {
