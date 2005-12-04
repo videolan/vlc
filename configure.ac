@@ -3562,6 +3562,16 @@ then
 fi
 
 dnl
+dnl Snapshot vout module (with cache)
+dnl
+AC_ARG_ENABLE(snapshot,
+  [  --enable-snapshot       snapshot module (default disabled)])
+if test "${enable_httpd}" = "yes"
+then
+  VLC_ADD_PLUGINS([snapshot])
+fi
+
+dnl
 dnl  Qt Embedded module
 dnl  (disabled by default)
 dnl
