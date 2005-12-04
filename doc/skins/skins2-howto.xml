@@ -647,6 +647,11 @@ difficulty to understand how VLC skins work.</para>
     <para>Initial height of the control, in pixels.<!--XXX: cannot be deduced?--></para>
     <para>Default value: 0</para>
   </sect4>
+  <sect4 id="videoautoresize">
+    <title>autoresize</title>
+    <para>Indicate whether the layout should be automatically resized to fit the dimensions of the played video.</para>
+    <para>Default value: true</para>
+  </sect4>
 </sect3>
 
 <sect3 id="Playlist">

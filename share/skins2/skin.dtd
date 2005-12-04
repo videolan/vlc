@@ -260,6 +260,6 @@
         height      CDATA   "0"
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
-        autoresize  CDATA   "false"
+        autoresize  CDATA   "true"
         help        CDATA   ""
     >
