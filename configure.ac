@@ -3566,7 +3566,7 @@ dnl Snapshot vout module (with cache)
 dnl
 AC_ARG_ENABLE(snapshot,
   [  --enable-snapshot       snapshot module (default disabled)])
-if test "${enable_httpd}" = "yes"
+if test "${enable_snapshot}" = "yes"
 then
   VLC_ADD_PLUGINS([snapshot])
 fi
