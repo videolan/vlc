@@ -212,6 +212,7 @@ void CtrlTree::onPositionChange()
 
 void CtrlTree::handleEvent( EvtGeneric &rEvent )
 {
+    VarTree::Iterator toShow; bool needShow = false;
     if( rEvent.getAsString().find( "key:down" ) != string::npos )
     {
         int key = ((EvtKey&)rEvent).getKey();
@@ -233,9 +234,9 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     if( nextWasSelected )
                     {
                         m_pLastSelected = &*it;
+                        needShow = true; toShow = it;
                     }
                 }
-                ensureVisible( it );
             }
             else if( key == KEY_DOWN )
             {
@@ -249,13 +250,13 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 if( previousWasSelected )
                 {
                     m_pLastSelected = &*it;
+                    needShow = true; toShow = it;
                     previousWasSelected = false;
                 }
                 else
                 {
                     previousWasSelected = ( &*it == m_pLastSelected );
                 }
-                ensureVisible( it );
             }
             else if( key == KEY_RIGHT )
             {
@@ -310,6 +311,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 }
             }
         }
+        if( needShow )
+            ensureVisible( toShow );
 
         // Redraw the control
         makeImage();
@@ -475,7 +478,7 @@ bool CtrlTree::ensureVisible( VarTree::Iterator item )
     for( it = m_rTree.begin(); it != m_rTree.end();
          it = m_rTree.getNextVisibleItem( it ) )
     {
-        if( it == item ) break;
+        if( it->m_id == item->m_id ) break;
         focusItemIndex++;
     }
    return ensureVisible( focusItemIndex );
