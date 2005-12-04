@@ -35,14 +35,10 @@
 
 /* TODO:
     - fix all FIXMEs
-    - if a vout closes and another is opened, the marquee is shown at marq-x /
-      marq-y regardless of the fact whether the user wants it to be positioned
-      fixed or not. This needs fixing in marq.c and a new global config-variable
-      - That will probably happen with logo and time as well.
     - implement initStrings
     - check for memory leaks
     - save the preferences, if requested
-    - fix 10.3 compatibility
+    - fix stupid compilation warning
 */
 
 @implementation VLCsFilters
@@ -211,7 +207,7 @@ static VLCsFilters *_o_sharedInstance = nil;
 
     intf_thread_t * p_intf = VLCIntf;
 
-    /* retrieve the marquee settings from core... */
+    /* retrieve the marquee settings */
     int x = 0;
     int tempInt = config_GetInt( p_intf, "marq-color" );
     while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String], \
@@ -229,12 +225,19 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: \
         config_GetPsz( p_intf, "marq-marquee" )]];
     [o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
-    [o_marq_pos_fix_X_fld setStringValue: [[NSNumber numberWithInt: \
-        config_GetInt( p_intf, "marq-x")] stringValue]];
-    [o_marq_pos_fix_Y_fld setStringValue: [[NSNumber numberWithInt: \
-        config_GetInt( p_intf, "marq-y")] stringValue]];
-    [o_marq_pos_rel_pop selectItemWithTag: \
-        config_GetInt( p_intf, "marq-position" )];
+    x = 0;
+    tempInt = config_GetInt( p_intf, "marq-position" );
+    while( tempInt != [[o_marq_pos_rel_pop itemAtIndex:x] tag] )
+    {
+        x = (x + 1);
+        
+        if( x >= [o_marq_pos_rel_pop numberOfItems] )
+        {
+            x = 0;
+            return;
+        }
+    }
+    [o_marq_pos_rel_pop selectItemAtIndex:x];
     x = 0;
     tempInt = config_GetInt( p_intf, "marq-size" );
     while( [[[o_marq_size_pop itemAtIndex: x] title] intValue] != tempInt )
@@ -249,8 +252,76 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_marq_tmOut_fld setStringValue: [[NSNumber numberWithInt: \
         config_GetInt( p_intf, "marq-timeout" )] stringValue]];
     
-    // FIXME:  retrieve the proper values for logo and time from core, too!
-
+    /* retrieve the time settings */
+    x = 0;
+    tempInt = config_GetInt( p_intf, "time-color" );
+    while( strtol([[[o_colors objectAtIndex:x] objectAtIndex:1] UTF8String], \
+        NULL, 0) != tempInt )
+    {
+        x = (x + 1);
+        
+        if( x >= [o_time_color_pop numberOfItems] )
+        {
+            x = 0;
+            return;
+        }
+    }
+    [o_time_color_pop selectItemAtIndex: x];
+    [o_time_stamp_fld setStringValue: [NSString stringWithUTF8String: \
+        config_GetPsz( p_intf, "time-format" )]];
+    [o_time_opaque_sld setIntValue: config_GetInt( p_intf, "time-opacity")];
+    x = 0;
+    tempInt = config_GetInt( p_intf, "time-size" );
+    while( [[[o_time_size_pop itemAtIndex: x] title] intValue] != tempInt )
+        x = (x + 1);
+        
+        if( x >= [o_time_size_pop numberOfItems] )
+        {
+            x = 0;
+            return;
+        }
+    [o_time_size_pop selectItemAtIndex: x];
+    x = 0;
+    tempInt = config_GetInt( p_intf, "time-position" );
+    while( tempInt != [[o_time_pos_rel_pop itemAtIndex:x] tag] )
+    {
+        x = (x + 1);
+        
+        if( x >= [o_time_pos_rel_pop numberOfItems] )
+        {
+            x = 0;
+            return;
+        }
+    }
+    
+    /* retrieve the logo settings */
+    [o_logo_opaque_sld setIntValue: config_GetInt( p_intf, "logo-transparency")];
+    /* in case that no path has been saved yet */
+    NSString * tempString = [[NSString alloc] initWithUTF8String: \
+        config_GetPsz( p_intf, "logo-file" )];
+    if( [tempString length] == 0 )
+    {
+        [o_logo_image_fld setStringValue: @""];
+    }
+    else
+    {
+        [o_logo_image_fld setStringValue: tempString ];
+    }
+    [tempString release];
+    x = 0;
+    tempInt = config_GetInt( p_intf, "logo-position" );
+    while( tempInt != [[o_logo_pos_rel_pop itemAtIndex:x] tag] )
+    {
+        x = (x + 1);
+        
+        if( x >= [o_logo_pos_rel_pop numberOfItems] )
+        {
+            x = 0;
+            return;
+        }
+    }
+    
+    /* enable the wanted filters */
     char * psz_subfilters;
     psz_subfilters = config_GetPsz( p_intf, "sub-filter" );
     if( psz_subfilters )
@@ -268,7 +339,8 @@ static VLCsFilters *_o_sharedInstance = nil;
 {
     NSOpenPanel * openPanel = [NSOpenPanel openPanel];
     SEL sel = @selector(logo_getFile:returnCode:contextInfo:);
-    [openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow: \
+    [openPanel beginSheetForDirectory:nil file:nil types: [NSArray \
+        arrayWithObjects: @"png", @"PNG", @"'PNGf'", nil] modalForWindow: \
         o_sfilter_win modalDelegate:self didEndSelector:sel contextInfo:nil];
 }
 
@@ -290,9 +362,9 @@ static VLCsFilters *_o_sharedInstance = nil;
     vlc_value_t val;
 
     /* general properties */
-    if( sender == o_time_pos_rel_btn)
+    if( sender == o_sfilter_saveSettings_ckb)
     {
-        o_save_settings = [o_time_pos_rel_btn state]; 
+        o_save_settings = [o_sfilter_saveSettings_ckb state]; 
     }
 
     /* marquee */
@@ -311,26 +383,6 @@ static VLCsFilters *_o_sharedInstance = nil;
             var_Set( p_input->p_libvlc, "marq-marquee", val );
 
         config_PutPsz( p_intf, "marq-marquee", val.psz_string );
-    }
-    
-    else if( sender == o_marq_pos_fix_X_fld && [[sender stringValue] length] > 0 )
-    {
-        val.i_int = [o_marq_pos_fix_X_fld intValue];
-        
-        if( p_input )
-            var_Set( p_input->p_libvlc, "marq-x", val );
-
-        config_PutInt( p_intf, "marq-x", val.i_int );
-    }
-    
-    else if( sender == o_marq_pos_fix_Y_fld && [[sender stringValue] length] > 0 )
-    {
-        val.i_int = [o_marq_pos_fix_Y_fld intValue];
-
-        if( p_input )
-            var_Set( p_input->p_libvlc, "marq-y", val );
-
-        config_PutInt( p_intf, "marq-y", val.i_int );
     }
     
     else if( sender == o_marq_pos_rel_pop )
@@ -440,18 +492,9 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_marq_color_pop setEnabled: [o_marq_enabled_ckb state]];
     [o_marq_marq_fld setEnabled: [o_marq_enabled_ckb state]];
     [o_marq_opaque_sld setEnabled: [o_marq_enabled_ckb state]];
-    [o_marq_pos_fix_btn setEnabled: [o_marq_enabled_ckb state]];
-    [o_marq_pos_rel_btn setEnabled: [o_marq_enabled_ckb state]];
     [o_marq_size_pop setEnabled: [o_marq_enabled_ckb state]];
     [o_marq_tmOut_fld setEnabled: [o_marq_enabled_ckb state]];
-    if( [o_marq_enabled_ckb state] )
-    {
-        [self otherPositionForMarq: nil];
-    } else {
-        [o_marq_pos_fix_X_fld setEnabled: NO];
-        [o_marq_pos_fix_Y_fld setEnabled: NO];
-        [o_marq_pos_rel_pop setEnabled: NO];
-    }
+    [o_marq_pos_rel_pop setEnabled: [o_marq_enabled_ckb state]];
 }
 
 - (void)enableTime
@@ -459,17 +502,8 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_time_color_pop setEnabled: [o_time_enabled_ckb state]];
     [o_time_stamp_fld setEnabled: [o_time_enabled_ckb state]];
     [o_time_opaque_sld setEnabled: [o_time_enabled_ckb state]];
-    [o_time_pos_fix_btn setEnabled: [o_time_enabled_ckb state]];
-    [o_time_pos_rel_btn setEnabled: [o_time_enabled_ckb state]];
     [o_time_size_pop setEnabled: [o_time_enabled_ckb state]];
-    if( [o_time_enabled_ckb state] )
-    {
-        [self otherPositionForTime: nil];
-    } else {
-        [o_time_pos_fix_X_fld setEnabled: NO];
-        [o_time_pos_fix_Y_fld setEnabled: NO];
-        [o_time_pos_rel_pop setEnabled: NO];
-    }
+    [o_time_pos_rel_pop setEnabled: [o_time_enabled_ckb state]];
 }
 
 - (void)enableLogo
@@ -477,64 +511,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_logo_image_btn setEnabled: [o_logo_enabled_ckb state]];
     [o_logo_image_fld setEnabled: [o_logo_enabled_ckb state]];
     [o_logo_opaque_sld setEnabled: [o_logo_enabled_ckb state]];
-    [o_logo_pos_fix_btn setEnabled: [o_logo_enabled_ckb state]];
-    [o_logo_pos_rel_btn setEnabled: [o_logo_enabled_ckb state]];
-    if( [o_logo_enabled_ckb state] )
-    {
-        [self otherPositionForLogo: nil];
-    } else {
-        [o_logo_pos_fix_X_fld setEnabled: NO];
-        [o_logo_pos_fix_Y_fld setEnabled: NO];
-        [o_logo_pos_rel_pop setEnabled: NO];
-    }
-}
-
-- (IBAction)otherPositionForLogo:(id)sender
-{
-    if( [o_logo_pos_fix_btn state] )
-    {
-        [o_logo_pos_fix_X_fld setEnabled: YES];
-        [o_logo_pos_fix_Y_fld setEnabled: YES];
-        [o_logo_pos_rel_pop setEnabled: NO];
-    }
-    else
-    {
-        [o_logo_pos_fix_X_fld setEnabled: NO];
-        [o_logo_pos_fix_Y_fld setEnabled: NO];
-        [o_logo_pos_rel_pop setEnabled: YES];
-    }
-}
-
-- (IBAction)otherPositionForMarq:(id)sender
-{
-    if( [o_marq_pos_fix_btn state] )
-    {
-        [o_marq_pos_fix_X_fld setEnabled: YES];
-        [o_marq_pos_fix_Y_fld setEnabled: YES];
-        [o_marq_pos_rel_pop setEnabled: NO];
-    }
-    else
-    {
-        [o_marq_pos_fix_X_fld setEnabled: NO];
-        [o_marq_pos_fix_Y_fld setEnabled: NO];
-        [o_marq_pos_rel_pop setEnabled: YES];
-    }
-}
-
-- (IBAction)otherPositionForTime:(id)sender
-{
-    if( [o_time_pos_fix_btn state] )
-    {
-        [o_time_pos_fix_X_fld setEnabled: YES];
-        [o_time_pos_fix_Y_fld setEnabled: YES];
-        [o_time_pos_rel_pop setEnabled: NO];
-    }
-    else
-    {
-        [o_time_pos_fix_X_fld setEnabled: NO];
-        [o_time_pos_fix_Y_fld setEnabled: NO];
-        [o_time_pos_rel_pop setEnabled: YES];
-    }
+    [o_logo_pos_rel_pop setEnabled: [o_logo_enabled_ckb state]];
 }
 
 - (void)changeFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add

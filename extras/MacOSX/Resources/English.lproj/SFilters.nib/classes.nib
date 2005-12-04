@@ -2,14 +2,7 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {
-                enableFilter = id; 
-                "logo_selectFile" = id; 
-                otherPositionForLogo = id; 
-                otherPositionForMarq = id; 
-                otherPositionForTime = id; 
-                propertyChanged = id; 
-            }; 
+            ACTIONS = {enableFilter = id; "logo_selectFile" = id; propertyChanged = id; }; 
             CLASS = VLCsFilters; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -19,14 +12,7 @@
                 "o_logo_image_lbl" = id; 
                 "o_logo_opaque_lbl" = id; 
                 "o_logo_opaque_sld" = id; 
-                "o_logo_pos_fix_X_fld" = id; 
-                "o_logo_pos_fix_X_lbl" = id; 
-                "o_logo_pos_fix_Y_fld" = id; 
-                "o_logo_pos_fix_Y_lbl" = id; 
-                "o_logo_pos_fix_btn" = id; 
                 "o_logo_pos_lbl" = id; 
-                "o_logo_pos_matrix" = id; 
-                "o_logo_pos_rel_btn" = id; 
                 "o_logo_pos_rel_pop" = id; 
                 "o_marq_color_lbl" = id; 
                 "o_marq_color_pop" = id; 
@@ -35,14 +21,7 @@
                 "o_marq_marq_lbl" = id; 
                 "o_marq_opaque_lbl" = id; 
                 "o_marq_opaque_sld" = id; 
-                "o_marq_pos_fix_X_fld" = id; 
-                "o_marq_pos_fix_X_lbl" = id; 
-                "o_marq_pos_fix_Y_fld" = id; 
-                "o_marq_pos_fix_Y_lbl" = id; 
-                "o_marq_pos_fix_btn" = id; 
                 "o_marq_pos_lbl" = id; 
-                "o_marq_pos_matrix" = id; 
-                "o_marq_pos_rel_btn" = id; 
                 "o_marq_pos_rel_pop" = id; 
                 "o_marq_size_inPx_lbl" = id; 
                 "o_marq_size_lbl" = id; 
@@ -58,14 +37,7 @@
                 "o_time_enabled_ckb" = id; 
                 "o_time_opaque_lbl" = id; 
                 "o_time_opaque_sld" = id; 
-                "o_time_pos_fix_X_fld" = id; 
-                "o_time_pos_fix_X_lbl" = id; 
-                "o_time_pos_fix_Y_fld" = id; 
-                "o_time_pos_fix_Y_lbl" = id; 
-                "o_time_pos_fix_btn" = id; 
                 "o_time_pos_lbl" = id; 
-                "o_time_pos_matrix" = id; 
-                "o_time_pos_rel_btn" = id; 
                 "o_time_pos_rel_pop" = id; 
                 "o_time_size_inPx_lbl" = id; 
                 "o_time_size_lbl" = id; 

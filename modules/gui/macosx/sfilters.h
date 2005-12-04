@@ -29,6 +29,7 @@
     /* window stuff */
     IBOutlet id o_sfilter_tabView;
     IBOutlet id o_sfilter_win;
+    IBOutlet id o_sfilter_saveSettings_ckb;
 
     /* logo section */
     IBOutlet id o_logo_enabled_ckb;
@@ -37,15 +38,8 @@
     IBOutlet id o_logo_image_lbl;
     IBOutlet id o_logo_opaque_lbl;
     IBOutlet id o_logo_opaque_sld;
-    IBOutlet id o_logo_pos_fix_btn;
-    IBOutlet id o_logo_pos_fix_X_fld;
-    IBOutlet id o_logo_pos_fix_X_lbl;
-    IBOutlet id o_logo_pos_fix_Y_fld;
-    IBOutlet id o_logo_pos_fix_Y_lbl;
     IBOutlet id o_logo_pos_lbl;
-    IBOutlet id o_logo_pos_rel_btn;
     IBOutlet id o_logo_pos_rel_pop;
-    IBOutlet id o_logo_pos_matrix;
     
     /* marquee section */
     IBOutlet id o_marq_enabled_ckb;
@@ -55,13 +49,7 @@
     IBOutlet id o_marq_marq_lbl;
     IBOutlet id o_marq_opaque_lbl;
     IBOutlet id o_marq_opaque_sld;
-    IBOutlet id o_marq_pos_fix_btn;
-    IBOutlet id o_marq_pos_fix_X_fld;
-    IBOutlet id o_marq_pos_fix_X_lbl;
-    IBOutlet id o_marq_pos_fix_Y_fld;
-    IBOutlet id o_marq_pos_fix_Y_lbl;
     IBOutlet id o_marq_pos_lbl;
-    IBOutlet id o_marq_pos_rel_btn;
     IBOutlet id o_marq_pos_rel_pop;
     IBOutlet id o_marq_size_inPx_lbl;
     IBOutlet id o_marq_size_lbl;
@@ -69,7 +57,6 @@
     IBOutlet id o_marq_tmOut_fld;
     IBOutlet id o_marq_tmOut_lbl;
     IBOutlet id o_marq_tmOut_ms_lbl;
-    IBOutlet id o_marq_pos_matrix;
 
     /* time section */
     IBOutlet id o_time_enabled_ckb;
@@ -77,20 +64,13 @@
     IBOutlet id o_time_color_pop;
     IBOutlet id o_time_opaque_lbl;
     IBOutlet id o_time_opaque_sld;
-    IBOutlet id o_time_pos_fix_btn;
-    IBOutlet id o_time_pos_fix_X_fld;
-    IBOutlet id o_time_pos_fix_X_lbl;
-    IBOutlet id o_time_pos_fix_Y_fld;
-    IBOutlet id o_time_pos_fix_Y_lbl;
     IBOutlet id o_time_pos_lbl;
-    IBOutlet id o_time_pos_rel_btn;
     IBOutlet id o_time_pos_rel_pop;
     IBOutlet id o_time_size_inPx_lbl;
     IBOutlet id o_time_size_lbl;
     IBOutlet id o_time_size_pop;
     IBOutlet id o_time_stamp_fld;
     IBOutlet id o_time_stamp_lbl;
-    IBOutlet id o_time_pos_matrix;
     
     BOOL o_config_changed;
     BOOL o_save_settings;
@@ -102,9 +82,6 @@
 - (IBAction)logo_selectFile:(id)sender;
 - (IBAction)propertyChanged:(id)sender;
 - (IBAction)enableFilter:(id)sender;
-- (IBAction)otherPositionForLogo:(id)sender;
-- (IBAction)otherPositionForMarq:(id)sender;
-- (IBAction)otherPositionForTime:(id)sender;
 
 - (void)showAsPanel;
 - (void)initStrings;
