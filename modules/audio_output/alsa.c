@@ -326,8 +326,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_status = (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
-
     /* Choose the IEC device for S/PDIF output:
        if the device is overriden by the user then it will be the one
        otherwise we compute the default device based on the output format. */
@@ -376,7 +374,6 @@ static int Open( vlc_object_t *p_this )
 
     if ( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
-        free( p_sys->p_status );
         free( p_sys );
         free( psz_device );
         return VLC_EGENERIC;
@@ -413,7 +410,6 @@ static int Open( vlc_object_t *p_this )
     {
         /* This should not happen ! */
         msg_Err( p_aout, "internal: can't find audio-device (%i)", val.i_int );
-        free( p_sys->p_status );
         free( p_sys );
         free( psz_device );
         return VLC_EGENERIC;
@@ -431,7 +427,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_iec_device, snd_strerror( i_snd_rc ) );
-            free( p_sys->p_status );
             free( p_sys );
             free( psz_device );
             return VLC_EGENERIC;
@@ -474,7 +469,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_device, snd_strerror( i_snd_rc ) );
-            free( p_sys->p_status );
             free( p_sys );
             free( psz_device );
             return VLC_EGENERIC;
@@ -678,7 +672,6 @@ error:
 #ifdef ALSA_DEBUG
     snd_output_close( p_sys->p_snd_stderr );
 #endif
-    free( p_sys->p_status );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -733,7 +726,6 @@ static void Close( vlc_object_t *p_this )
     snd_output_close( p_sys->p_snd_stderr );
 #endif
 
-    free( p_sys->p_status );
     free( p_sys );
 }
 
@@ -742,6 +734,9 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int ALSAThread( aout_instance_t * p_aout )
 {
+    p_aout->output.p_sys->p_status =
+        (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
+
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_mutex_lock( &p_aout->output.p_sys->lock );
     if( !p_aout->output.p_sys->start_date )
@@ -756,6 +751,7 @@ static int ALSAThread( aout_instance_t * p_aout )
         ALSAFill( p_aout );
     }
 
+    free( p_aout->output.p_sys->p_status );
     return 0;
 }
 
