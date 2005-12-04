@@ -117,14 +117,29 @@ class Splitter : public wxSplitterWindow
 public:
     Splitter( wxWindow *p_parent, intf_thread_t *_p_intf )
       : wxSplitterWindow( p_parent, -1, wxDefaultPosition, wxSize(0,0),
-                          wxCLIP_CHILDREN|wxSP_3DSASH ),
-        p_intf(_p_intf), i_sash_position(150) {}
+                          wxCLIP_CHILDREN | wxSP_3DSASH ),
+        p_intf(_p_intf), i_sash_position(150), i_width(-1)
+    {
+        SetSashSize( 0 );
+    }
+
     virtual ~Splitter() {};
 
     virtual bool Split( wxWindow* window1, wxWindow* window2 )
     {
+        SetSashSize( -1 );
+
+        wxSize size = wxSize( i_width, i_sash_position - GetSashSize() );
+        if( window2->GetSizer() ) window2->GetSizer()->SetMinSize( size );
+
         return wxSplitterWindow::SplitHorizontally( window1, window2,
                                                     -i_sash_position );
+    }
+
+    virtual bool Unsplit( wxWindow* window )
+    {
+        SetSashSize( 0 );
+        return wxSplitterWindow::Unsplit( window );
     }
 
 private:
@@ -132,7 +147,30 @@ private:
 
     void OnSize( wxSizeEvent &event )
     {
-        SetSashPosition( event.GetSize().GetHeight() - i_sash_position );
+        /* If we display video, then resize the video window */
+        if( GetWindow2() &&
+            p_intf->p_sys->p_video_window && p_intf->p_sys->p_video_sizer &&
+            p_intf->p_sys->p_video_sizer->GetMinSize() != wxSize(0,0) )
+        {
+            SetSashPosition( event.GetSize().GetHeight() - i_sash_position );
+        }
+        else if( GetWindow2() && GetWindow1() && GetWindow1()->GetSizer() )
+        {
+            wxSize size = GetWindow1()->GetSizer()->GetMinSize();
+
+            if( event.GetSize().GetHeight() - size.GetHeight() )
+            {
+                SetSashPosition( size.GetHeight() ? size.GetHeight() : 1 );
+                i_sash_position = event.GetSize().GetHeight() -
+                    size.GetHeight();
+                i_width = event.GetSize().GetWidth();
+
+                size = wxSize( i_width, i_sash_position - GetSashSize() );
+                if( GetWindow2()->GetSizer() )
+                    GetWindow2()->GetSizer()->SetMinSize( size );
+            }
+        }
+
         event.Skip();
     }
 
@@ -145,6 +183,7 @@ private:
 
     intf_thread_t *p_intf;
     int i_sash_position;
+    int i_width;
 };
 
 BEGIN_EVENT_TABLE(Splitter, wxSplitterWindow)
@@ -261,7 +300,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     p_intf = _p_intf;
     b_extra = VLC_FALSE;
     extra_frame = 0;
-    b_playlist_manager = VLC_FALSE;
     playlist_manager = 0;
 
     /* Give our interface a nice little icon */
@@ -717,13 +755,6 @@ void Interface::SetIntfMinSize()
             ms.SetWidth( ext_min_size.GetWidth() );
     }
 
-    if( playlist_manager && playlist_manager->IsShown() )
-    {
-        ms.SetHeight( ms.GetHeight() + playlist_min_size.GetHeight() );
-        if( playlist_min_size.GetWidth() > ms.GetWidth() )
-            ms.SetWidth( playlist_min_size.GetWidth() );
-    }
-
     SetSizeHints( ms.GetWidth(), ms.GetHeight() );
 }
 
@@ -911,12 +942,9 @@ void Interface::OnSmallPlaylist( wxCommandEvent& WXUNUSED(event) )
     {
         /* Create the extra panel */
         playlist_manager = new PlaylistManager( p_intf, splitter );
-        playlist_min_size = playlist_manager->GetBestSize();
     }
 
-    b_playlist_manager = !b_playlist_manager;
-
-    if( b_playlist_manager ) splitter->Split( main_panel, playlist_manager );
+    if( !splitter->IsSplit() ) splitter->Split( main_panel, playlist_manager );
     else splitter->Unsplit( playlist_manager );
 
     SetIntfMinSize();

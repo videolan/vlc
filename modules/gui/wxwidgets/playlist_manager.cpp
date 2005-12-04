@@ -123,7 +123,6 @@ PlaylistManager::PlaylistManager( intf_thread_t *_p_intf, wxWindow *p_parent ):
     sizer = new wxBoxSizer( wxHORIZONTAL );
     SetSizer( sizer );
     sizer->Add( treectrl, 1, wxEXPAND );
-    treectrl->SetSizeHints( 500, 150 );
     sizer->Layout();
     sizer->Fit( this );
 

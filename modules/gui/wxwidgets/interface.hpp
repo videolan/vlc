@@ -169,12 +169,10 @@ namespace wxvlc
         wxPanel     *extra_frame;
 
         /* Playlist panel */
-        vlc_bool_t  b_playlist_manager;
         wxPanel     *playlist_manager;
 
         /* Utility dimensions */
         wxSize main_min_size;
-        wxSize playlist_min_size;
         wxSize ext_min_size;
     };
 
