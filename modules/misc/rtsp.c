@@ -111,7 +111,7 @@ struct vod_media_t
 
     /* RTSP server */
     httpd_url_t  *p_rtsp_url;
-    char         *psz_rtsp_control;
+    char         *psz_rtsp_control_v4, *psz_rtsp_control_v6;
     char         *psz_rtsp_path;
 
     int  i_port;
@@ -148,7 +148,6 @@ struct vod_sys_t
 {
     /* RTSP server */
     httpd_host_t *p_rtsp_host;
-    char *psz_host;
     char *psz_path;
     int i_port;
 
@@ -215,7 +214,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_sys->psz_host = strdup( url.psz_host ? url.psz_host : "0.0.0.0" );
     p_sys->psz_path = strdup( url.psz_path ? url.psz_path : "/" );
     p_sys->i_port = url.i_port;
 
@@ -249,8 +247,6 @@ static void Close( vlc_object_t * p_this )
     httpd_HostDelete( p_sys->p_rtsp_host );
 
     /* TODO delete medias */
-
-    free( p_sys->psz_host );
     free( p_sys->psz_path );
     free( p_sys );
 }
@@ -285,8 +281,12 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
 
     msg_Dbg( p_vod, "created rtsp url: %s", p_media->psz_rtsp_path );
 
-    asprintf( &p_media->psz_rtsp_control, "rtsp://%s:%d%s",
-              p_sys->psz_host, p_sys->i_port, p_media->psz_rtsp_path );
+    asprintf( &p_media->psz_rtsp_control_v4,
+               "a=control:rtsp://%%s:%d%s/trackid=%%d\r\n",
+               p_sys->i_port, p_media->psz_rtsp_path );
+    asprintf( &p_media->psz_rtsp_control_v6,
+               "a=control:rtsp://[%%s]:%d%s/trackid=%%d\r\n",
+              p_sys->i_port, p_media->psz_rtsp_path );
 
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_DESCRIBE,
                     RtspCallback, (void*)p_media );
@@ -336,7 +336,8 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     while( p_media->i_rtsp > 0 ) RtspClientDel( p_media, p_media->rtsp[0] );
     httpd_UrlDelete( p_media->p_rtsp_url );
     if( p_media->psz_rtsp_path ) free( p_media->psz_rtsp_path );
-    if( p_media->psz_rtsp_control ) free( p_media->psz_rtsp_control );
+    if( p_media->psz_rtsp_control_v6 ) free( p_media->psz_rtsp_control_v6 );
+    if( p_media->psz_rtsp_control_v4 ) free( p_media->psz_rtsp_control_v4 );
 
     TAB_REMOVE( p_sys->i_media, p_sys->media, p_media );
 
@@ -954,6 +955,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 {
     int i, i_size;
     char *p, *psz_sdp, ip[NI_MAXNUMERICHOST], ipv;
+    const char *psz_control;
 
     if( httpd_ServerIP( cl, ip ) == NULL )
         return NULL;
@@ -976,6 +978,8 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
         sizeof( "c=IN IP4 0.0.0.0\r\n" ) + 20 + 10 +
         sizeof( "a=range:npt=0-1000000000.000\r\n" );
 
+    psz_control = (ipv == '6') ? p_media->psz_rtsp_control_v6
+                               : p_media->psz_rtsp_control_v4;
     for( i = 0; i < p_media->i_es; i++ )
     {
         media_es_t *p_es = p_media->es[i];
@@ -991,10 +995,8 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
             i_size += sizeof( "a=fmtp:* *\r\n" ) +
                 strlen( p_es->psz_fmtp ) + 9;
         }
-
-        i_size += sizeof( "a=control:*/trackid=*\r\n" ) +
-            strlen( p_media->psz_rtsp_control ) + 9;
     }
+    i_size += (strlen( psz_control ) + strlen( ip ) + 9) * p_media->i_es;
 
     p = psz_sdp = malloc( i_size );
     p += sprintf( p, "v=0\r\n" );
@@ -1048,8 +1050,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
                           p_es->psz_fmtp );
         }
 
-        p += sprintf( p, "a=control:%s/trackid=%d\r\n",
-                      p_media->psz_rtsp_control, i );
+        p += sprintf( p, psz_control, ip, i );
     }
 
     return psz_sdp;
