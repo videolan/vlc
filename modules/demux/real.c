@@ -146,18 +146,12 @@ static void Close( vlc_object_t *p_this )
     {
         real_track_t *tk = p_sys->track[i];
 
-        if( tk->p_frame )
-        {
-            block_Release( tk->p_frame );
-        }
+        if( tk->p_frame ) block_Release( tk->p_frame );
+        es_format_Clean( &tk->fmt );
         free( tk );
     }
 
-    if( p_sys->i_track > 0 )
-    {
-        free( p_sys->track );
-    }
-
+    if( p_sys->i_track > 0 ) free( p_sys->track );
     free( p_sys );
 }
 
@@ -218,10 +212,7 @@ static int Demux( demux_t *p_demux )
 
     for( i = 0; i < p_sys->i_track; i++ )
     {
-        if( p_sys->track[i]->i_id == i_id )
-        {
-            tk = p_sys->track[i];
-        }
+        if( p_sys->track[i]->i_id == i_id ) tk = p_sys->track[i];
     }
 
     if( tk == NULL )

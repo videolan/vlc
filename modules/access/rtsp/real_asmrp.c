@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  *
- * $Id: asmrp.c,v 1.8 2004/08/27 18:34:16 miguelfreitas Exp $
+ * $Id$
  *
  * a parser for real's asm rules
  *
@@ -94,6 +94,7 @@ static asmrp_t *asmrp_new () {
 
   p->sym_tab_num = 0;
   p->sym         = ASMRP_SYM_NONE;
+  p->buf         = 0;
 
   return p;
 }
@@ -105,6 +106,7 @@ static void asmrp_dispose (asmrp_t *p) {
   for (i=0; i<p->sym_tab_num; i++) 
     free (p->sym_tab[i].id);
 
+  if (p->buf) free (p->buf);
   free (p);
 }
 

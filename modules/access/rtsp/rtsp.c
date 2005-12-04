@@ -4,7 +4,7 @@
  *****************************************************************************
  * Copyright (C) 2002-2004 the xine project
  * Copyright (C) 2005 VideoLAN
- * $Id: file.c 10310 2005-03-11 22:36:40Z anil $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Adapted from xine which itself adapted it from joschkas real tools.
@@ -239,8 +239,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
           char *buf = malloc( strlen(answer) );
           sscanf( answer, "%*s %s", buf );
           if( rtsp->p_private->server ) free( rtsp->p_private->server );
-          rtsp->p_private->server = strdup( buf );
-          free( buf );
+          rtsp->p_private->server = buf;
       }
       if( !strncasecmp( answer, "Session:", 8 ) )
       {
@@ -433,6 +432,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
             sprintf( rest,"CSeq: %u", seq );
             rtsp_put( rtsp, rest );
             rtsp_put( rtsp, "" );
+            free( rest );
             rtsp->pf_read( rtsp->p_userdata, buffer, size );
         }
         else
@@ -514,6 +514,7 @@ int rtsp_connect( rtsp_client_t *rtsp, const char *psz_mrl,
         if( s->port < 0 || s->port > 65535 ) s->port = 554;
     }
 
+    free( mrl_ptr );
     fprintf( stderr, "got mrl: %s %i %s\n", s->host, s->port, s->path );
 
     s->s = rtsp->pf_connect( rtsp->p_userdata, s->host, s->port );
@@ -561,6 +562,7 @@ void rtsp_close( rtsp_client_t *rtsp )
     if( rtsp->p_private->mrl ) free( rtsp->p_private->mrl );
     if( rtsp->p_private->session ) free( rtsp->p_private->session );
     if( rtsp->p_private->user_agent ) free( rtsp->p_private->user_agent );
+    if( rtsp->p_private->server ) free( rtsp->p_private->server );
     rtsp_free_answers( rtsp );
     rtsp_unschedule_all( rtsp );
     free( rtsp->p_private );

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  *
- * $Id: sdpplin.c,v 1.5 2004/04/23 21:59:04 miguelfreitas Exp $
+ * $Id$
  *
  * sdp/sdpplin parser.
  *
@@ -313,9 +313,10 @@ void sdpplin_free(sdpplin_t *description) {
       if( description->stream[i]->mlti_data ) free( description->stream[i]->mlti_data );
       if( description->stream[i]->rmff_flags ) free( description->stream[i]->rmff_flags );
       if( description->stream[i]->asm_rule_book ) free( description->stream[i]->asm_rule_book );
+      free( description->stream[i] );
     }
   }
-  free( description->stream );
+  if( description->stream_count ) free( description->stream );
 
   if( description->owner ) free( description->owner );
   if( description->session_name ) free( description->session_name );

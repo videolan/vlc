@@ -2,7 +2,7 @@
  * access.c: Real rtsp input
  *****************************************************************************
  * Copyright (C) 2005 VideoLAN
- * $Id: file.c 10310 2005-03-11 22:36:40Z anil $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -220,6 +220,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_header = block_New( p_access, 4096 );
         p_sys->p_header->i_buffer =
             rmff_dump_header( h, p_sys->p_header->p_buffer, 1024 );
+        rmff_free_header( h );
     }
     else
     {
@@ -231,6 +232,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_access, "realrtsp-caching",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
+    if( psz_server ) free( psz_server );
     return VLC_SUCCESS;
 
  error:
