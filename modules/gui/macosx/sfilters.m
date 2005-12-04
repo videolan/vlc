@@ -34,11 +34,9 @@
 #import <vlc/vout.h>
 
 /* TODO:
-    - fix all FIXMEs
-    - implement initStrings
     - check for memory leaks
     - save the preferences, if requested
-    - fix stupid compilation warning
+    - fix stupid compilation warnings
 */
 
 @implementation VLCsFilters
@@ -70,6 +68,46 @@ static VLCsFilters *_o_sharedInstance = nil;
 
 - (void)initStrings
 {
+    [o_sfilter_win setTitle: _NS("Subpicture Filters")];
+    [[o_sfilter_tabView tabViewItemAtIndex: 0] setLabel: _NS("Logo")];
+    [[o_sfilter_tabView tabViewItemAtIndex: 1] setLabel: _NS("Time")];
+    [[o_sfilter_tabView tabViewItemAtIndex: 2] setLabel: _NS("Marquee")];
+    [o_sfilter_saveSettings_ckb setTitle: _NS("Save settings")];
+    [o_logo_image_btn setTitle: _NS("Browse...")];
+    [o_logo_enabled_ckb setTitle: _NS("Enabled")];
+    [o_logo_image_lbl setStringValue: [_NS("Image") \
+        stringByAppendingString: @":"]];
+    [o_logo_pos_lbl setStringValue: [_NS("Position") \
+        stringByAppendingString: @":"]];
+    [o_logo_opaque_lbl setStringValue: [_NS("Opaqueness") \
+        stringByAppendingString: @":"]];
+    [o_time_enabled_ckb setTitle: _NS("Enabled")];
+    [o_time_stamp_lbl setStringValue: [_NS("Timestamp") \
+        stringByAppendingString: @":"]];
+    [o_time_size_lbl setStringValue: [_NS("Size") \
+        stringByAppendingString: @":"]];
+    [o_time_color_lbl setStringValue: [_NS("Color") \
+        stringByAppendingString: @":"]];
+    [o_time_opaque_lbl setStringValue: [_NS("Opaqueness") \
+        stringByAppendingString: @":"]];
+    [o_time_pos_lbl setStringValue: [_NS("Position") \
+        stringByAppendingString: @":"]];
+    [o_time_size_inPx_lbl setStringValue: _NS("(in pixels)")];
+    [o_marq_enabled_ckb setTitle: _NS("Enabled")];
+    [o_marq_color_lbl setStringValue: [_NS("Color") \
+        stringByAppendingString: @":"]];
+    [o_marq_marq_lbl setStringValue: [_NS("Marquee") \
+        stringByAppendingString: @":"]];
+    [o_marq_opaque_lbl setStringValue: [_NS("Opaqueness") \
+        stringByAppendingString: @":"]];
+    [o_marq_tmOut_lbl setStringValue: [_NS("Timeout") \
+        stringByAppendingString: @":"]];
+    [o_marq_tmOut_ms_lbl setStringValue: _NS("ms")];
+    [o_marq_pos_lbl setStringValue: [_NS("Position") \
+        stringByAppendingString: @":"]];
+    [o_marq_size_lbl setStringValue: [_NS("Size") \
+        stringByAppendingString: @":"]];
+    [o_time_color_lbl setStringValue: _NS("(in pixels)")];
 }
 
 - (void)awakeFromNib
@@ -438,8 +476,86 @@ static VLCsFilters *_o_sharedInstance = nil;
     
     /* time */
     
-    /* logo */
+    else if( sender == o_time_stamp_fld )
+    {
+        if( [[o_time_stamp_fld stringValue] length] == 0 )
+        {
+            val.psz_string = "";
+        }
+        else
+        {
+            val.psz_string = [[o_time_stamp_fld stringValue] UTF8String];
+        }
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "time-format", val );
+
+        config_PutPsz( p_intf, "time-format", val.psz_string );
+    }
+
+    else if( sender == o_time_pos_rel_pop )
+    {
+        val.i_int = [[o_time_pos_rel_pop selectedItem] tag];
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "time-position", val );
+
+        config_PutInt( p_intf, "time-position", val.i_int );
+    }
     
+    else if( sender == o_time_color_pop )
+    {
+        val.i_int = strtol( [[[o_colors objectAtIndex: [o_time_color_pop \
+            indexOfSelectedItem]] objectAtIndex: 1] UTF8String], NULL, 0 );
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "time-color", val );
+
+        config_PutInt( p_intf, "time-color", val.i_int );
+    }
+    
+    else if( sender == o_time_opaque_sld )
+    {
+        val.i_int = [o_time_opaque_sld intValue];
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "time-opacity", val );
+
+        config_PutInt( p_intf, "time-opacity", val.i_int );
+    }
+    
+    else if( sender == o_time_size_pop )
+    {
+        val.i_int = [[o_time_size_pop titleOfSelectedItem] intValue];
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "time-size", val );
+
+        config_PutInt( p_intf, "time-size", val.i_int );
+    }
+
+    /* logo */
+    else if( sender == o_logo_opaque_sld )
+    {
+        val.i_int = [o_logo_opaque_sld intValue];
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "logo-transparency", val );
+
+        config_PutInt( p_intf, "logo-transparency", val.i_int );
+    }
+    
+    else if( sender == o_logo_pos_rel_pop )
+    {
+        val.i_int = [[o_logo_pos_rel_pop selectedItem] tag];
+
+        if( p_input )
+            var_Set( p_input->p_libvlc, "logo-position", val );
+
+        config_PutInt( p_intf, "logo-position", val.i_int );
+    }
+
+    /* clean up */
     if ( p_input )
     {
         o_config_changed = YES;
