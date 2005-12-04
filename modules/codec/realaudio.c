@@ -2,7 +2,7 @@
  * realaudio.c: a realaudio decoder that uses the realaudio library/dll
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: quicktime.c 11664 2005-07-09 06:17:09Z courmisch $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ struct decoder_sys_t
 
     /* Frame buffer for data reordering */
     int i_subpacket;
+    mtime_t i_packet_pts;
     int i_frame_size;
     char *p_frame;
     int i_frame;
@@ -237,6 +238,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_frame_size =
         p_dec->fmt_in.audio.i_blockalign * p_sys->i_subpacket_h;
     p_sys->p_frame = malloc( p_sys->i_frame_size );
+    p_sys->i_packet_pts = 0;
     p_sys->i_subpacket = 0;
     p_sys->i_frame = 0;
 
@@ -695,6 +697,17 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
 
     //msg_Err( p_dec, "Decode: "I64Fd", %i", p_block->i_pts, p_block->i_buffer );
+
+    /* Detect missing subpackets */
+    if( p_sys->i_subpacket && p_block->i_pts > 0 &&
+        p_block->i_pts != p_sys->i_packet_pts )
+    {
+        /* All subpackets in a packet should have the same pts so we must
+         * have dropped some. Clear current frame buffer. */
+        p_sys->i_subpacket = 0;
+        msg_Dbg( p_dec, "detected dropped subpackets" );
+    }
+    if( p_block->i_pts > 0 ) p_sys->i_packet_pts = p_block->i_pts;
 
     /* Date management */
     if( /* !p_sys->i_subpacket && */ p_block && p_block->i_pts > 0 &&
