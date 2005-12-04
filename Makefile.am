@@ -249,7 +249,7 @@ EXTRA_DIST += \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/macosx-dmg \
 	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
-	extras/MacOSX/Delete_Preferences.app/Contents/Pkginfo \
+	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
 	extras/MacOSX/Delete_Preferences.app/Contents/MacOS/applet \
 	extras/MacOSX/Delete_Preferences.app/Contents/Resources/description.rtfd/TXT.rtf \
 	extras/MacOSX/Delete_Preferences.app/Contents/Resources/applet.icns \
