@@ -31,7 +31,7 @@
 class X11Popup: public OSPopup
 {
     public:
-        X11Popup( intf_thread_t *pIntf );
+        X11Popup( intf_thread_t *pIntf, X11Display & );
 
         virtual ~X11Popup();
 

@@ -26,7 +26,7 @@
 #include "x11_popup.hpp"
 
 
-X11Popup::X11Popup( intf_thread_t *pIntf )
+X11Popup::X11Popup( intf_thread_t *pIntf, X11Display &rDisplay )
     : OSPopup( pIntf )
 {
     // TODO

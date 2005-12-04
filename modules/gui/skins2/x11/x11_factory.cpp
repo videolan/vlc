@@ -33,6 +33,7 @@
 #include "x11_display.hpp"
 #include "x11_graphics.hpp"
 #include "x11_loop.hpp"
+#include "x11_popup.hpp"
 #include "x11_timer.hpp"
 #include "x11_window.hpp"
 #include "x11_tooltip.hpp"
