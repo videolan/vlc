@@ -5,34 +5,34 @@
 
     <Bitmap id="main" file="main.bmp" alphacolor="#FF0001" />
     <Bitmap id="cbuttons" file="cbuttons.bmp" alphacolor="#FF0001">
-       <SubBitmap id="previous_up" x="0" y="0" width="23" height="18" />
-       <SubBitmap id="previous_down" x="0" y="18" width="23" height="18" />
-       <SubBitmap id="play_up" x="23" y="0" width="23" height="18" />
-       <SubBitmap id="play_down" x="23" y="18" width="23" height="18" />
-       <SubBitmap id="pause_up" x="46" y="0" width="23" height="18" />
-       <SubBitmap id="pause_down" x="46" y="18" width="23" height="18" />
-       <SubBitmap id="stop_up" x="69" y="0" width="23" height="18" />
-       <SubBitmap id="stop_down" x="69" y="18" width="23" height="18" />
-       <SubBitmap id="next_up" x="92" y="0" width="22" height="18" />
-       <SubBitmap id="next_down" x="92" y="18" width="22" height="18" />
-       <SubBitmap id="eject_up" x="114" y="0" width="22" height="16" />
-       <SubBitmap id="eject_down" x="114" y="16" width="22" height="16" />
+        <SubBitmap id="previous_up" x="0" y="0" width="23" height="18" />
+        <SubBitmap id="previous_down" x="0" y="18" width="23" height="18" />
+        <SubBitmap id="play_up" x="23" y="0" width="23" height="18" />
+        <SubBitmap id="play_down" x="23" y="18" width="23" height="18" />
+        <SubBitmap id="pause_up" x="46" y="0" width="23" height="18" />
+        <SubBitmap id="pause_down" x="46" y="18" width="23" height="18" />
+        <SubBitmap id="stop_up" x="69" y="0" width="23" height="18" />
+        <SubBitmap id="stop_down" x="69" y="18" width="23" height="18" />
+        <SubBitmap id="next_up" x="92" y="0" width="22" height="18" />
+        <SubBitmap id="next_down" x="92" y="18" width="22" height="18" />
+        <SubBitmap id="eject_up" x="114" y="0" width="22" height="16" />
+        <SubBitmap id="eject_down" x="114" y="16" width="22" height="16" />
     </Bitmap>
     <Bitmap id="eqmain" file="eqmain.bmp" alphacolor="#FF0001">
-       <SubBitmap id="eq_bg" x="0" y="0" width="275" height="116" />
-       <SubBitmap id="eq_title_focus" x="0" y="134" width="275" height="14" />
-       <SubBitmap id="eq_notok_up" x="10" y="119" width="26" height="12" />
-       <SubBitmap id="eq_notok_down" x="128" y="119" width="26" height="12" />
-       <SubBitmap id="eq_ok_up" x="69" y="119" width="26" height="12" />
-       <SubBitmap id="eq_ok_down" x="187" y="119" width="26" height="12" />
-       <SubBitmap id="eq_switch_up" x="254" y="137" width="9" height="9" />
-       <SubBitmap id="eq_switch_down" x="244" y="137" width="9" height="9" />
-       <SubBitmap id="eq_close_up" x="0" y="116" width="9" height="9" />
-       <SubBitmap id="eq_close_down" x="0" y="125" width="9" height="9" />
-       <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
-       <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
-       <SubBitmap id="eq_slider_bg" x="13" y="164" width="209" height="129" />
-       <SubBitmap id="eq_grid" x="0" y="294" width="113" height="19" />
+        <SubBitmap id="eq_bg" x="0" y="0" width="275" height="116" />
+        <SubBitmap id="eq_title_focus" x="0" y="134" width="275" height="14" />
+        <SubBitmap id="eq_notok_up" x="10" y="119" width="26" height="12" />
+        <SubBitmap id="eq_notok_down" x="128" y="119" width="26" height="12" />
+        <SubBitmap id="eq_ok_up" x="69" y="119" width="26" height="12" />
+        <SubBitmap id="eq_ok_down" x="187" y="119" width="26" height="12" />
+        <SubBitmap id="eq_switch_up" x="254" y="137" width="9" height="9" />
+        <SubBitmap id="eq_switch_down" x="244" y="137" width="9" height="9" />
+        <SubBitmap id="eq_close_up" x="0" y="116" width="9" height="9" />
+        <SubBitmap id="eq_close_down" x="0" y="125" width="9" height="9" />
+        <SubBitmap id="eq_slider_up" x="0" y="164" width="11" height="11" />
+        <SubBitmap id="eq_slider_down" x="0" y="176" width="11" height="11" />
+        <SubBitmap id="eq_slider_bg" x="13" y="164" width="209" height="129" />
+        <SubBitmap id="eq_grid" x="0" y="294" width="113" height="19" />
     </Bitmap>
     <Bitmap id="eq_ex" file="eq_ex.bmp" alphacolor="#FF0001">
         <SubBitmap id="eq_small_focus" x="0" y="0" width="275" height="14" />
@@ -43,39 +43,39 @@
         <SubBitmap id="eq_small_volume_up" x="1" y="30" width="3" height="7" />
     </Bitmap>
     <Bitmap id="pledit" file="pledit.bmp" alphacolor="#FF0001">
-       <SubBitmap id="pl_upleft_focus" x="0" y="0" width="25" height="20" />
-       <SubBitmap id="pl_title_focus" x="26" y="0" width="100" height="20" />
-       <SubBitmap id="pl_up_focus" x="127" y="0" width="25" height="20" />
-       <SubBitmap id="pl_upright_focus" x="153" y="0" width="25" height="20" />
-       <SubBitmap id="pl_down1" x="179" y="0" width="25" height="38" />
-       <SubBitmap id="pl_down2" x="205" y="0" width="75" height="38" />
-       <SubBitmap id="pl_left" x="0" y="42" width="25" height="29" />
-       <SubBitmap id="pl_right" x="26" y="42" width="25" height="29" />
-       <SubBitmap id="pl_slider_up" x="52" y="53" width="8" height="18" />
-       <SubBitmap id="pl_slider_down" x="61" y="53" width="8" height="18" />
-       <SubBitmap id="pl_downleft" x="0" y="72" width="125" height="38" />
-       <SubBitmap id="pl_downright" x="126" y="72" width="150" height="38" />
-       <SubBitmap id="pl_resize" x="256" y="90" width="20" height="20" />
-       <SubBitmap id="pl_switch_up" x="157" y="3" width="9" height="9" />
-       <SubBitmap id="pl_switch_down" x="61" y="42" width="9" height="9" />
-       <SubBitmap id="pl_close_up" x="167" y="3" width="9" height="9" />
-       <SubBitmap id="pl_close_down" x="51" y="42" width="9" height="9" />
-       <SubBitmap id="pl_previous" x="132" y="95" width="8" height="8" />
-       <SubBitmap id="pl_play" x="141" y="95" width="8" height="8" />
-       <SubBitmap id="pl_pause" x="150" y="95" width="8" height="8" />
-       <SubBitmap id="pl_stop" x="159" y="95" width="8" height="8" />
-       <SubBitmap id="pl_forward" x="168" y="95" width="8" height="8" />
-       <SubBitmap id="pl_eject" x="177" y="95" width="8" height="8" />
-       <SubBitmap id="pl_small_left" x="72" y="42" width="25" height="14" />
-       <SubBitmap id="pl_small_middle" x="72" y="57" width="25" height="14" />
-       <SubBitmap id="pl_small_right_focus" x="99" y="42" width="50" height="14" />
-       <SubBitmap id="pl_small_switch_up" x="128" y="45" width="9" height="9" />
-       <SubBitmap id="pl_small_close_up" x="138" y="45" width="9" height="9" />
-       <SubBitmap id="pl_small_resize" x="117" y="42" width="11" height="14" />
-       <SubBitmap id="pl_add_up" x="14" y="80" width="22" height="18" />
-       <SubBitmap id="pl_sub_up" x="43" y="80" width="22" height="18" />
-       <SubBitmap id="pl_add_down" x="23" y="149" width="22" height="18" />
-       <SubBitmap id="pl_sub_down" x="77" y="149" width="22" height="18" />
+        <SubBitmap id="pl_upleft_focus" x="0" y="0" width="25" height="20" />
+        <SubBitmap id="pl_title_focus" x="26" y="0" width="100" height="20" />
+        <SubBitmap id="pl_up_focus" x="127" y="0" width="25" height="20" />
+        <SubBitmap id="pl_upright_focus" x="153" y="0" width="25" height="20" />
+        <SubBitmap id="pl_down1" x="179" y="0" width="25" height="38" />
+        <SubBitmap id="pl_down2" x="205" y="0" width="75" height="38" />
+        <SubBitmap id="pl_left" x="0" y="42" width="25" height="29" />
+        <SubBitmap id="pl_right" x="26" y="42" width="25" height="29" />
+        <SubBitmap id="pl_slider_up" x="52" y="53" width="8" height="18" />
+        <SubBitmap id="pl_slider_down" x="61" y="53" width="8" height="18" />
+        <SubBitmap id="pl_downleft" x="0" y="72" width="125" height="38" />
+        <SubBitmap id="pl_downright" x="126" y="72" width="150" height="38" />
+        <SubBitmap id="pl_resize" x="256" y="90" width="20" height="20" />
+        <SubBitmap id="pl_switch_up" x="157" y="3" width="9" height="9" />
+        <SubBitmap id="pl_switch_down" x="61" y="42" width="9" height="9" />
+        <SubBitmap id="pl_close_up" x="167" y="3" width="9" height="9" />
+        <SubBitmap id="pl_close_down" x="51" y="42" width="9" height="9" />
+        <SubBitmap id="pl_previous" x="132" y="95" width="8" height="8" />
+        <SubBitmap id="pl_play" x="141" y="95" width="8" height="8" />
+        <SubBitmap id="pl_pause" x="150" y="95" width="8" height="8" />
+        <SubBitmap id="pl_stop" x="159" y="95" width="8" height="8" />
+        <SubBitmap id="pl_forward" x="168" y="95" width="8" height="8" />
+        <SubBitmap id="pl_eject" x="177" y="95" width="8" height="8" />
+        <SubBitmap id="pl_small_left" x="72" y="42" width="25" height="14" />
+        <SubBitmap id="pl_small_middle" x="72" y="57" width="25" height="14" />
+        <SubBitmap id="pl_small_right_focus" x="99" y="42" width="50" height="14" />
+        <SubBitmap id="pl_small_switch_up" x="128" y="45" width="9" height="9" />
+        <SubBitmap id="pl_small_close_up" x="138" y="45" width="9" height="9" />
+        <SubBitmap id="pl_small_resize" x="117" y="42" width="11" height="14" />
+        <SubBitmap id="pl_add_up" x="14" y="80" width="22" height="18" />
+        <SubBitmap id="pl_sub_up" x="43" y="80" width="22" height="18" />
+        <SubBitmap id="pl_add_down" x="23" y="149" width="22" height="18" />
+        <SubBitmap id="pl_sub_down" x="77" y="149" width="22" height="18" />
     </Bitmap>
     <Bitmap id="playpaus" file="playpaus.bmp" alphacolor="#FF0001">
         <SubBitmap id="play_icon" x="0" y="0" width="9" height="9" />
@@ -83,67 +83,67 @@
         <SubBitmap id="stop_icon" x="18" y="0" width="9" height="9" />
     </Bitmap>
     <Bitmap id="posbar" file="posbar.bmp" alphacolor="#FF0001" >
-       <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
-       <SubBitmap id="time_bg_2" x="0" y="0" width="248" height="2" />
-       <SubBitmap id="time_up" x="248" y="0" width="29" height="10" />
-       <SubBitmap id="time_up_2" x="248" y="0" width="29" height="2" />
-       <SubBitmap id="time_down" x="278" y="0" width="29" height="10" />
-       <SubBitmap id="time_down_2" x="278" y="0" width="29" height="2" />
+        <SubBitmap id="time_bg" x="0" y="0" width="248" height="10" />
+        <SubBitmap id="time_bg_2" x="0" y="0" width="248" height="2" />
+        <SubBitmap id="time_up" x="248" y="0" width="29" height="10" />
+        <SubBitmap id="time_up_2" x="248" y="0" width="29" height="2" />
+        <SubBitmap id="time_down" x="278" y="0" width="29" height="10" />
+        <SubBitmap id="time_down_2" x="278" y="0" width="29" height="2" />
     </Bitmap>
     <Bitmap id="titlebar" file="titlebar.bmp" alphacolor="#FF0001" >
-       <SubBitmap id="menu_up" x="0" y="0" width="9" height="9" />
-       <SubBitmap id="menu_down" x="0" y="9" width="9" height="9" />
-       <SubBitmap id="minimize_up" x="9" y="0" width="9" height="9" />
-       <SubBitmap id="minimize_down" x="9" y="9" width="9" height="9" />
-       <SubBitmap id="switch_up" x="0" y="18" width="9" height="9" />
-       <SubBitmap id="switch_down" x="9" y="18" width="9" height="9" />
-       <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
-       <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
-       <SubBitmap id="title_focus" x="27" y="0" width="275" height="14" />
-       <SubBitmap id="five_dots" x="304" y="0" width="8" height="43" />
+        <SubBitmap id="menu_up" x="0" y="0" width="9" height="9" />
+        <SubBitmap id="menu_down" x="0" y="9" width="9" height="9" />
+        <SubBitmap id="minimize_up" x="9" y="0" width="9" height="9" />
+        <SubBitmap id="minimize_down" x="9" y="9" width="9" height="9" />
+        <SubBitmap id="switch_up" x="0" y="18" width="9" height="9" />
+        <SubBitmap id="switch_down" x="9" y="18" width="9" height="9" />
+        <SubBitmap id="quit_up" x="18" y="0" width="9" height="9" />
+        <SubBitmap id="quit_down" x="18" y="9" width="9" height="9" />
+        <SubBitmap id="title_focus" x="27" y="0" width="275" height="14" />
+        <SubBitmap id="five_dots" x="304" y="0" width="8" height="43" />
 <!--        <SubBitmap id="dot1_down" x="304" y="46" width="8" height="8" /> -->
 <!--        <SubBitmap id="dot1_up" x="304" y="2" width="8" height="8" /> -->
-       <SubBitmap id="dot2_down" x="312" y="54" width="8" height="8" />
-       <SubBitmap id="dot2_up" x="304" y="10" width="8" height="8" />
+        <SubBitmap id="dot2_down" x="312" y="54" width="8" height="8" />
+        <SubBitmap id="dot2_up" x="304" y="10" width="8" height="8" />
 <!--        <SubBitmap id="dot3_down" x="320" y="62" width="8" height="8" /> -->
 <!--        <SubBitmap id="dot3_up" x="304" y="18" width="8" height="8" /> -->
 <!--        <SubBitmap id="dot4_down" x="328" y="70" width="8" height="8" /> -->
 <!--        <SubBitmap id="dot4_up" x="304" y="26" width="8" height="8" /> -->
 <!--        <SubBitmap id="dot5_down" x="336" y="78" width="8" height="8" /> -->
 <!--        <SubBitmap id="dot5_up" x="304" y="34" width="8" height="8" /> -->
-       <SubBitmap id="small_focus" x="27" y="29" width="275" height="14" />
-       <SubBitmap id="small_previous" x="194" y="32" width="8" height="8" />
-       <SubBitmap id="small_play" x="203" y="32" width="8" height="8" />
-       <SubBitmap id="small_pause" x="212" y="32" width="8" height="8" />
-       <SubBitmap id="small_stop" x="221" y="32" width="8" height="8" />
-       <SubBitmap id="small_forward" x="230" y="32" width="8" height="8" />
-       <SubBitmap id="small_eject" x="239" y="32" width="8" height="8" />
-       <SubBitmap id="small_time_bg" x="0" y="36" width="17" height="7" />
-       <SubBitmap id="small_time_cursor_up" x="17" y="36" width="2" height="7" />
+        <SubBitmap id="small_focus" x="27" y="29" width="275" height="14" />
+        <SubBitmap id="small_previous" x="194" y="32" width="8" height="8" />
+        <SubBitmap id="small_play" x="203" y="32" width="8" height="8" />
+        <SubBitmap id="small_pause" x="212" y="32" width="8" height="8" />
+        <SubBitmap id="small_stop" x="221" y="32" width="8" height="8" />
+        <SubBitmap id="small_forward" x="230" y="32" width="8" height="8" />
+        <SubBitmap id="small_eject" x="239" y="32" width="8" height="8" />
+        <SubBitmap id="small_time_bg" x="0" y="36" width="17" height="7" />
+        <SubBitmap id="small_time_cursor_up" x="17" y="36" width="2" height="7" />
     </Bitmap>
     <Bitmap id="shufrep" file="shufrep.bmp" alphacolor="#FF0001">
-       <SubBitmap id="noloop_up" x="0" y="0" width="28" height="15" />
-       <SubBitmap id="noloop_down" x="0" y="15" width="28" height="15" />
-       <SubBitmap id="loop_up" x="0" y="30" width="28" height="15" />
-       <SubBitmap id="loop_down" x="0" y="45" width="28" height="15" />
-       <SubBitmap id="noshuffle_up" x="28" y="0" width="47" height="15" />
-       <SubBitmap id="noshuffle_down" x="28" y="15" width="47" height="15" />
-       <SubBitmap id="shuffle_up" x="28" y="30" width="47" height="15" />
-       <SubBitmap id="shuffle_down" x="28" y="45" width="47" height="15" />
-       <SubBitmap id="eqoff_up" x="0" y="61" width="23" height="12" />
-       <SubBitmap id="eqon_up" x="0" y="73" width="23" height="12" />
-       <SubBitmap id="ploff_up" x="23" y="61" width="23" height="12" />
-       <SubBitmap id="plon_up" x="23" y="73" width="23" height="12" />
-       <SubBitmap id="eqoff_down" x="46" y="61" width="23" height="12" />
-       <SubBitmap id="eqon_down" x="46" y="73" width="23" height="12" />
-       <SubBitmap id="ploff_down" x="69" y="61" width="23" height="12" />
-       <SubBitmap id="plon_down" x="69" y="73" width="23" height="12" />
+        <SubBitmap id="noloop_up" x="0" y="0" width="28" height="15" />
+        <SubBitmap id="noloop_down" x="0" y="15" width="28" height="15" />
+        <SubBitmap id="loop_up" x="0" y="30" width="28" height="15" />
+        <SubBitmap id="loop_down" x="0" y="45" width="28" height="15" />
+        <SubBitmap id="noshuffle_up" x="28" y="0" width="47" height="15" />
+        <SubBitmap id="noshuffle_down" x="28" y="15" width="47" height="15" />
+        <SubBitmap id="shuffle_up" x="28" y="30" width="47" height="15" />
+        <SubBitmap id="shuffle_down" x="28" y="45" width="47" height="15" />
+        <SubBitmap id="eqoff_up" x="0" y="61" width="23" height="12" />
+        <SubBitmap id="eqon_up" x="0" y="73" width="23" height="12" />
+        <SubBitmap id="ploff_up" x="23" y="61" width="23" height="12" />
+        <SubBitmap id="plon_up" x="23" y="73" width="23" height="12" />
+        <SubBitmap id="eqoff_down" x="46" y="61" width="23" height="12" />
+        <SubBitmap id="eqon_down" x="46" y="73" width="23" height="12" />
+        <SubBitmap id="ploff_down" x="69" y="61" width="23" height="12" />
+        <SubBitmap id="plon_down" x="69" y="73" width="23" height="12" />
     </Bitmap>
     <Bitmap id="volume" file="volume.bmp" alphacolor="#FF0001">
-       <SubBitmap id="volume_bg" x="0" y="0" width="68" height="418" />
-       <SubBitmap id="volume_bg_2" x="0" y="0" width="65" height="418" />
-       <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
-       <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
+        <SubBitmap id="volume_bg" x="0" y="0" width="68" height="418" />
+        <SubBitmap id="volume_bg_2" x="0" y="0" width="65" height="418" />
+        <SubBitmap id="volume_up" x="15" y="422" width="14" height="11" />
+        <SubBitmap id="volume_down" x="0" y="422" width="14" height="11" />
     </Bitmap>
     <Font id="playlist_font" file="FreeSansBold.ttf" size="11" />
     <BitmapFont id="digits_font" file="nums_ex.bmp" type="digits" />
@@ -159,7 +159,7 @@
                 <Anchor x="275" y="14" priority="100" range="15" />
                 <Anchor x="30" y="0" points="(0,0),(245,0)" priority="90" range="15" />
                 <Anchor x="30" y="14" points="(0,0),(245,0)" priority="90" range="15" />
-                <Image x="0" y="0" image="small_focus" action="move" />
+                <Image x="0" y="0" image="small_focus" action="move" action2="main_window.setLayout(big_layout)" />
                 <Text font="text_font" x="122" y="4" width="35" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
                 <Button x="6" y="3" up="menu_up" down="menu_down" over="menu_up" action="dialogs.popup()" tooltiptext="Popup menu" />
                 <Button x="167" y="3" up="small_previous" action="playlist.previous()" />
@@ -186,12 +186,13 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Image x="0" y="0" image="main" action="move" />
+                <Image x="0" y="0" image="main_top_bar" action="move" action2="main_window.setLayout(small_layout)" />
                 <Image x="10" y="22" image="five_dots" />
                 <Checkbox x="10" y="32" up1="dot2_up" down1="dot2_down" up2="dot2_down" down2="dot2_up" state="vlc.isOnTop" action1="vlc.onTop()" action2="vlc.onTop()" tooltiptext1="Toggle Always-On-Top" tooltiptext2="Toggle Always-On-Top" />
                 <Image x="26" y="29" image="play_icon" visible="vlc.isPlaying" />
                 <Image x="26" y="29" image="pause_icon" visible="vlc.isPaused" />
                 <Image x="26" y="29" image="stop_icon" visible="vlc.isStopped" />
-                <Image x="0" y="0" image="title_focus" action="move" />
+                <Image x="0" y="0" image="title_focus" action="move" action2="main_window.setLayout(small_layout)" />
                 <Text font="digits_font;digits_font_2" x="30" y="26" width="72" text="$t" visible="not vlc.isStopped" scrolling="none" alignment="right" />
                 <Text font="text_font" x="111" y="27" width="155" text="$N" />
                 <Slider value="volume" x="107" y="57" up="volume_up" down="volume_down" points="(7,6),(58,6)" tooltiptext="Volume: $V%">
@@ -226,7 +227,7 @@
                 <Anchor x="275" y="14" priority="70" range="15" />
                 <Anchor x="30" y="0" points="(0,0),(245,0)" priority="60" range="15" />
                 <Anchor x="30" y="14" points="(0,0),(245,0)" priority="60" range="15" />
-                <Image x="0" y="0" image="eq_small_focus" action="move" />
+                <Image x="0" y="0" image="eq_small_focus" action="move" action2="equalizer_window.setLayout(eq_big_layout)" />
                 <Button x="254" y="3" up="eq_small_switch_up" down="eq_small_switch_down" over="eq_small_switch_up" action="equalizer_window.setLayout(eq_big_layout)" tooltiptext="Switch" />
                 <Button x="264" y="3" up="eq_small_close_up" down="eq_small_close_down" over="eq_small_close_up" action="equalizer_window.hide()" tooltiptext="Close the window" />
                 <Slider value="volume" x="62" y="4" up="eq_small_volume_up" down="eq_small_volume_up" points="(0,3),(94,3)" thickness="7" tooltiptext="Volume: $V%" />
@@ -243,7 +244,7 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="60" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="60" range="15" />
                 <Image x="0" y="0" image="eq_bg" action="move" />
-                <Image x="0" y="0" image="eq_title_focus" action="move" />
+                <Image x="0" y="0" image="eq_title_focus" action="move" action2="equalizer_window.setLayout(eq_small_layout)" />
                 <Image x="86" y="16" image="eq_grid" action="move" />
                 <Button x="254" y="3" up="eq_switch_up" down="eq_switch_down" over="eq_switch_up" action="equalizer_window.setLayout(eq_small_layout)" tooltiptext="Switch" />
                 <Button x="264" y="3" up="eq_close_up" down="eq_close_down" over="eq_close_up" action="equalizer_window.hide()" tooltiptext="Close the window" />
@@ -294,16 +295,16 @@
                 <Anchor x="275" y="116" priority="30" range="15" />
                 <Anchor x="30" y="0" points="(0,0),(245,0)" priority="20" range="15" />
                 <Anchor x="30" y="116" points="(0,0),(245,0)" priority="20" range="15" />
-                <Image x="0" y="0" image="pl_small_left" action="move" />
-                <Image x="25" y="0" image="pl_small_middle" action="move" />
-                <Image x="50" y="0" image="pl_small_middle" action="move" />
-                <Image x="75" y="0" image="pl_small_middle" action="move" />
-                <Image x="100" y="0" image="pl_small_middle" action="move" />
-                <Image x="125" y="0" image="pl_small_middle" action="move" />
-                <Image x="150" y="0" image="pl_small_middle" action="move" />
-                <Image x="175" y="0" image="pl_small_middle" action="move" />
-                <Image x="200" y="0" image="pl_small_middle" action="move" lefttop="lefttop" rightbottom="righttop" />
-                <Image x="225" y="0" image="pl_small_right_focus" action="move" lefttop="righttop" rightbottom="righttop" />
+                <Image x="0" y="0" image="pl_small_left" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="25" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="50" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="75" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="100" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="125" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="150" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="175" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" />
+                <Image x="200" y="0" image="pl_small_middle" action="move" action2="playlist_window.setLayout(pl_big_layout)" lefttop="lefttop" rightbottom="righttop" />
+                <Image x="225" y="0" image="pl_small_right_focus" action="move" action2="playlist_window.setLayout(pl_big_layout)" lefttop="righttop" rightbottom="righttop" />
                 <Image x="243" y="0" image="pl_small_resize" action="resizeE" lefttop="righttop" rightbottom="righttop" />
                 <Button x="254" y="3" up="pl_small_switch_up" down="pl_switch_down" over="pl_small_switch_up" action="playlist_window.setLayout(pl_big_layout)" tooltiptext="Switch" lefttop="righttop" rightbottom="righttop" />
                 <Button x="264" y="3" up="pl_small_close_up" down="pl_close_down" over="pl_small_close_up" action="playlist_window.hide()" tooltiptext="Close the window" lefttop="righttop" rightbottom="righttop" />
@@ -321,14 +322,14 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="20" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="20" range="15" />
                 <Image x="0" y="0" image="pl_upleft_focus" action="move" />
-                <Image x="25" y="0" image="pl_up_focus" action="move" />
-                <Image x="50" y="0" image="pl_up_focus" action="move" />
-                <Image x="75" y="0" image="pl_up_focus" action="move" />
-                <Image x="87" y="0" image="pl_title_focus" action="move" />
-                <Image x="187" y="0" image="pl_up_focus" action="move" />
-                <Image x="200" y="0" image="pl_up_focus" action="move" />
-                <Image x="225" y="0" image="pl_up_focus" action="move" rightbottom="righttop" />
-                <Image x="250" y="0" image="pl_upright_focus" action="move" lefttop="righttop" rightbottom="righttop" />
+                <Image x="25" y="0" image="pl_up_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" />
+                <Image x="50" y="0" image="pl_up_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" />
+                <Image x="75" y="0" image="pl_up_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" />
+                <Image x="87" y="0" image="pl_title_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" />
+                <Image x="187" y="0" image="pl_up_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" />
+                <Image x="200" y="0" image="pl_up_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" />
+                <Image x="225" y="0" image="pl_up_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" rightbottom="righttop" />
+                <Image x="250" y="0" image="pl_upright_focus" action="move" action2="playlist_window.setLayout(pl_small_layout)" lefttop="righttop" rightbottom="righttop" />
                 <Image x="0" y="20" image="pl_left" action="move" />
                 <Image x="250" y="20" image="pl_right" action="move" lefttop="righttop" rightbottom="righttop" />
                 <Image x="0" y="49" image="pl_left" action="move" rightbottom="leftbottom" />
