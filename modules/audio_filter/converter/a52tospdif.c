@@ -122,6 +122,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
 #endif
     }
+    p_filter->p_vlc->pf_memset( p_out + 8 + i_frame_size * 2, 0,
+                                AOUT_SPDIF_SIZE - i_frame_size * 2 - 8 );
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = AOUT_SPDIF_SIZE;
