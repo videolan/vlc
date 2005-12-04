@@ -215,7 +215,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_sys->psz_host = strdup( url.psz_host );
+    p_sys->psz_host = strdup( url.psz_host ? url.psz_host : "0.0.0.0" );
     p_sys->psz_path = strdup( url.psz_path ? url.psz_path : "/" );
     p_sys->i_port = url.i_port;
 
