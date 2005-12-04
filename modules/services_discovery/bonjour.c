@@ -30,6 +30,10 @@
 #include <vlc/intf.h>
 
 #include <avahi-client/client.h>
+#ifdef HAVE_AVAHI_06
+# include <avahi-client/publish.h>
+# include <avahi-client/lookup.h>
+#endif
 #include <avahi-common/simple-watch.h>
 #include <avahi-common/malloc.h>
 #include <avahi-common/error.h>
@@ -82,7 +86,12 @@ static void client_callback( AvahiClient *c, AvahiClientState state,
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
+#ifdef HAVE_AVAHI_06
+    if( state == AVAHI_CLIENT_FAILURE &&
+        (avahi_client_errno(c) == AVAHI_ERR_DISCONNECTED) )
+#else
     if( state == AVAHI_CLIENT_DISCONNECTED )
+#endif
     {
         msg_Err( p_sd, "avahi client disconnected" );
         avahi_simple_poll_quit( p_sys->simple_poll );
@@ -104,12 +113,19 @@ static void resolve_callback(
     const AvahiAddress *address,
     uint16_t port,
     AvahiStringList *txt,
+#ifdef HAVE_AVAHI_06
+    AvahiLookupResultFlags flags,
+#endif
     void* userdata )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
+#ifdef HAVE_AVAHI_06
+    if( event == AVAHI_RESOLVER_FAILURE )
+#else
     if( event == AVAHI_RESOLVER_TIMEOUT )
+#endif
     {
         msg_Err( p_sd,
                  "failed to resolve service '%s' of type '%s' in domain '%s'",
@@ -186,6 +202,9 @@ static void browse_callback(
     const char *name,
     const char *type,
     const char *domain,
+#ifdef HAVE_AVAHI_06
+    AvahiLookupResultFlags flags,
+#endif
     void* userdata )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
@@ -195,6 +214,9 @@ static void browse_callback(
     {
         if( avahi_service_resolver_new( p_sys->client, interface, protocol,
                                         name, type, domain, AVAHI_PROTO_UNSPEC,
+#ifdef HAVE_AVAHI_06
+                                        0,
+#endif
                                         resolve_callback, userdata ) == NULL )
         {
             msg_Err( p_sd, "failed to resolve service '%s': %s", name,
@@ -246,6 +268,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->client = avahi_client_new( avahi_simple_poll_get(p_sys->simple_poll),
+#ifdef HAVE_AVAHI_06
+                                      0,
+#endif
                                       client_callback, p_sd, &err );
     if( p_sys->client == NULL )
     {
@@ -257,6 +282,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->sb = avahi_service_browser_new( p_sys->client, AVAHI_IF_UNSPEC,
                                            AVAHI_PROTO_UNSPEC,
                                            "_vlc-http._tcp", NULL,
+#ifdef HAVE_AVAHI_06
+                                           0,
+#endif
                                            browse_callback, p_sd );
     if( p_sys->sb == NULL )
     {

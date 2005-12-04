@@ -33,6 +33,10 @@
 #include <vlc/sout.h>
 
 #include <avahi-client/client.h>
+#ifdef HAVE_AVAHI_06
+# include <avahi-client/publish.h>
+# include <avahi-client/lookup.h>
+#endif
 #include <avahi-common/alternative.h>
 #include <avahi-common/simple-watch.h>
 #include <avahi-common/malloc.h>
@@ -114,7 +118,11 @@ static int create_service( bonjour_t *p_sys )
     }
 
     error = avahi_entry_group_add_service( p_sys->group, AVAHI_IF_UNSPEC,
+#ifdef HAVE_AVAHI_06
+                                           AVAHI_PROTO_UNSPEC, 0, p_sys->psz_name,
+#else
                                            AVAHI_PROTO_UNSPEC, p_sys->psz_name,
+#endif
                                            p_sys->psz_stype, NULL, NULL,
                                            p_sys->i_port,
                                            p_sys->psz_txt, NULL );
@@ -155,7 +163,12 @@ static void client_callback( AvahiClient *c,
         if( p_sys->group != NULL )
             avahi_entry_group_reset( p_sys->group );
     }
+#ifdef HAVE_AVAHI_06
+    else if( state == AVAHI_CLIENT_FAILURE &&
+              (avahi_client_errno(c) == AVAHI_ERR_DISCONNECTED) )
+#else
     else if( state == AVAHI_CLIENT_DISCONNECTED )
+#endif
     {
         msg_Err( p_sys->p_log, "avahi client disconnected" );
         avahi_simple_poll_quit( p_sys->simple_poll );
@@ -221,6 +234,9 @@ void *bonjour_start_service( vlc_object_t *p_log, char *psz_stype,
     }
 
     p_sys->client = avahi_client_new( avahi_simple_poll_get(p_sys->simple_poll),
+#ifdef HAVE_AVAHI_06
+                                      0,
+#endif
                                       client_callback, p_sys, &err );
     if( p_sys->client == NULL )
     {

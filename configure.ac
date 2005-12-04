@@ -4542,8 +4542,10 @@ AC_ARG_ENABLE(bonjour,
   [  --enable-bonjour        Bonjour services discovery (default enabled)])
 if test "${enable_bonjour}" != "no"
 then
-  PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.3 avahi-client < 0.6,
-    [AC_DEFINE(HAVE_AVAHI_CLIENT, [], [Define if you have the avahi-client library])
+  PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.3,
+    [PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.6,
+       [AC_DEFINE(HAVE_AVAHI_06, [], [Define if you have avahi-client 0.6 or greater])],)
+      AC_DEFINE(HAVE_AVAHI_CLIENT, [], [Define if you have the avahi-client library])
       VLC_ADD_LDFLAGS([bonjour access_output_http],[$BONJOUR_LIBS])
       VLC_ADD_CFLAGS([bonjour access_output_http],[$BONJOUR_CFLAGS])
       VLC_ADD_PLUGINS([bonjour]) ],
