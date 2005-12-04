@@ -597,6 +597,7 @@ void CtrlTree::makeImage()
         const GenericBitmap *m_pCurBitmap;
         UString *pStr = (UString*)(it->m_cString.get());
         uint32_t color = ( it->m_playing ? m_playColor : m_fgColor );
+
         // Draw the text
         if( pStr != NULL )
         {
@@ -613,16 +614,18 @@ void CtrlTree::makeImage()
 
             if( m_pCurBitmap )
             {
+                // Make sure we are centered on the line
                 int yPos2 = yPos+(i_itemHeight-m_pCurBitmap->getHeight()+1)/2;
+                if( yPos2 >= height )
+                {
+                    delete pText;
+                    break;
+                }
                 m_pImage->drawBitmap( *m_pCurBitmap, 0, 0,
                                       bitmapWidth * (depth - 1 ), yPos2,
                                       m_pCurBitmap->getWidth(),
                                       __MIN( m_pCurBitmap->getHeight(),
                                              height -  yPos2), true );
-            }
-            else
-            {
-                /* it would be nice to draw something */
             }
             yPos += i_itemHeight - pText->getHeight();
             int ySrc = 0;

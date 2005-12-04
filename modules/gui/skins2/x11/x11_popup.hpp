@@ -26,6 +26,7 @@
 
 #include "../src/os_popup.hpp"
 
+class X11Display;
 
 /// X11 implementation of OSPopup
 class X11Popup: public OSPopup
