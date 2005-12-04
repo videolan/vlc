@@ -186,7 +186,6 @@
                 <Anchor x="0" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Anchor x="275" y="30" points="(0,0),(0,86)" priority="90" range="15" />
                 <Image x="0" y="0" image="main" action="move" />
-                <Image x="0" y="0" image="main_top_bar" action="move" action2="main_window.setLayout(small_layout)" />
                 <Image x="10" y="22" image="five_dots" />
                 <Checkbox x="10" y="32" up1="dot2_up" down1="dot2_down" up2="dot2_down" down2="dot2_up" state="vlc.isOnTop" action1="vlc.onTop()" action2="vlc.onTop()" tooltiptext1="Toggle Always-On-Top" tooltiptext2="Toggle Always-On-Top" />
                 <Image x="26" y="29" image="play_icon" visible="vlc.isPlaying" />
