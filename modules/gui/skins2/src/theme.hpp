@@ -25,9 +25,10 @@
 #ifndef THEME_HPP
 #define THEME_HPP
 
-#include "../src/generic_bitmap.hpp"
-#include "../src/generic_font.hpp"
-#include "../src/generic_layout.hpp"
+#include "generic_bitmap.hpp"
+#include "generic_font.hpp"
+#include "generic_layout.hpp"
+#include "popup.hpp"
 #include "../src/window_manager.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../utils/bezier.hpp"
@@ -56,6 +57,7 @@ class Theme: public SkinObject
 
         GenericBitmap *getBitmapById( const string &id );
         GenericFont *getFontById( const string &id );
+        Popup *getPopupById( const string &id );
         TopWindow *getWindowById( const string &id );
         GenericLayout *getLayoutById( const string &id );
         CtrlGeneric *getControlById( const string &id );
@@ -67,6 +69,8 @@ class Theme: public SkinObject
         map<string, GenericBitmapPtr> m_bitmaps;
         /// Store the fonts by ID
         map<string, GenericFontPtr> m_fonts;
+        /// Store the popups by ID
+        map<string, PopupPtr> m_popups;
         /// Store the windows by ID
         map<string, TopWindowPtr> m_windows;
         /// Store the layouts by ID

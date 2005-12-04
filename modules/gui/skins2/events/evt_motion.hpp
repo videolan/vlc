@@ -45,9 +45,11 @@ class EvtMotion: public EvtInput
 
     private:
         /// Coordinates of the mouse (absolute or relative)
-        /// The coordinates are absolute when the event is sent to the
-        /// GenericWindow, but are relative to the window when the event is
-        /// forwarded to the controls
+        /**
+         * The coordinates are absolute when the event is sent to the
+         * GenericWindow, but are relative to the window when the event is
+         * forwarded to the controls
+         */
         int m_xPos, m_yPos;
 };
 

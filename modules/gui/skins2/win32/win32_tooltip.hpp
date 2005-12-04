@@ -38,10 +38,10 @@ class Win32Tooltip: public OSTooltip
 
         virtual ~Win32Tooltip();
 
-        // Show the tooltip
+        /// Show the tooltip
         virtual void show( int left, int top, OSGraphics &rText );
 
-        // Hide the tooltip
+        /// Hide the tooltip
         virtual void hide();
 
     private:

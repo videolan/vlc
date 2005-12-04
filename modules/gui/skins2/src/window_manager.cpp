@@ -33,7 +33,7 @@
 
 
 WindowManager::WindowManager( intf_thread_t *pIntf ):
-    SkinObject( pIntf ), m_magnet( 0 ), m_pTooltip( NULL )
+    SkinObject( pIntf ), m_magnet( 0 ), m_pTooltip( NULL ), m_pPopup( NULL )
 {
     // Create and register a variable for the "on top" status
     VarManager *pVarManager = VarManager::instance( getIntf() );

@@ -34,7 +34,7 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
     SkinObject( pIntf ), m_left( left ), m_top( top ), m_width( 0 ),
     m_height( 0 ), m_varVisible( pIntf )
 {
-   // Get the OSFactory
+    // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
 
     // Get the parent OSWindow, if any

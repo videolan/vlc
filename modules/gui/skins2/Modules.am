@@ -61,13 +61,14 @@ SOURCES_skins2 = \
 	controls/ctrl_video.hpp \
 	\
 	events/evt_enter.hpp \
-	events/evt_generic.hpp \
 	events/evt_focus.hpp \
+	events/evt_generic.hpp \
 	events/evt_input.cpp \
 	events/evt_input.hpp \
 	events/evt_key.cpp \
 	events/evt_key.hpp \
 	events/evt_leave.hpp \
+	events/evt_menu.hpp \
 	events/evt_motion.hpp \
 	events/evt_mouse.cpp \
 	events/evt_mouse.hpp \
@@ -116,9 +117,12 @@ SOURCES_skins2 = \
 	src/os_factory.hpp \
 	src/os_graphics.hpp \
 	src/os_loop.hpp \
+	src/os_popup.hpp \
 	src/os_timer.hpp \
 	src/os_window.hpp \
 	src/os_tooltip.hpp \
+	src/popup.cpp \
+	src/popup.hpp \
 	src/scaled_bitmap.cpp \
 	src/scaled_bitmap.hpp \
 	src/skin_main.cpp \
@@ -183,6 +187,8 @@ SOURCES_skins2 = \
 	win32/win32_graphics.hpp \
 	win32/win32_loop.cpp \
 	win32/win32_loop.hpp \
+	win32/win32_popup.cpp \
+	win32/win32_popup.hpp \
 	win32/win32_timer.cpp \
 	win32/win32_timer.hpp \
 	win32/win32_tooltip.cpp \
@@ -200,6 +206,8 @@ SOURCES_skins2 = \
 	x11/x11_graphics.hpp \
 	x11/x11_loop.cpp \
 	x11/x11_loop.hpp \
+	x11/x11_popup.cpp \
+	x11/x11_popup.hpp \
 	x11/x11_timer.cpp \
 	x11/x11_timer.hpp \
 	x11/x11_window.cpp \
@@ -215,6 +223,8 @@ SOURCES_skins2 = \
 	macosx/macosx_graphics.hpp \
 	macosx/macosx_loop.cpp \
 	macosx/macosx_loop.hpp \
+	macosx/macosx_popup.cpp \
+	macosx/macosx_popup.hpp \
 	macosx/macosx_timer.cpp \
 	macosx/macosx_timer.hpp \
 	macosx/macosx_window.cpp \

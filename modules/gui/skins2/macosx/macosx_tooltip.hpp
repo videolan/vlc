@@ -37,10 +37,10 @@ class MacOSXTooltip: public OSTooltip
 
         virtual ~MacOSXTooltip();
 
-        // Show the tooltip
+        /// Show the tooltip
         virtual void show( int left, int top, OSGraphics &rText );
 
-        // Hide the tooltip
+        /// Hide the tooltip
         virtual void hide();
 
     private:

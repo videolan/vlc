@@ -129,6 +129,36 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_pData->m_listBitmapFont.push_back( font );
     }
 
+    else if( rName == "PopupMenu" )
+    {
+        RequireDefault( "id" );
+
+        m_popupPosList.push_back(0);
+        m_curPopupId = uniqueId( attr["id"] );
+        const BuilderData::PopupMenu popup( m_curPopupId );
+        m_pData->m_listPopupMenu.push_back( popup );
+    }
+
+    else if( rName == "MenuItem" )
+    {
+        RequireDefault( "label" );
+        CheckDefault( "action", "none" );
+
+        const BuilderData::MenuItem item( attr["label"], attr["action"],
+                                          m_popupPosList.back(),
+                                          m_curPopupId );
+        m_pData->m_listMenuItem.push_back( item );
+        m_popupPosList.back()++;
+    }
+
+    else if( rName == "MenuSeparator" )
+    {
+        const BuilderData::MenuSeparator sep( m_popupPosList.back(),
+                                              m_curPopupId );
+        m_pData->m_listMenuSeparator.push_back( sep );
+        m_popupPosList.back()++;
+    }
+
     else if( rName == "Button" )
     {
         RequireDefault( "up" );
@@ -529,6 +559,11 @@ void SkinParser::handleEndElement( const string &rName )
     else if( rName == "Playtree" )
     {
         m_curTreeId = "";
+    }
+    else if( rName == "Popup" )
+    {
+        m_curPopupId = "";
+        m_popupPosList.pop_back();
     }
 }
 

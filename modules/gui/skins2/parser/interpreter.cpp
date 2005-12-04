@@ -216,7 +216,17 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
         }
         else
         {
-            msg_Err( getIntf(), "Unknown window (%s)", windowId.c_str() );
+            // It was maybe the id of a popup
+            Popup *pPopup = pTheme->getPopupById( windowId );
+            if( pPopup )
+            {
+                pCommand = new CmdShowPopup( getIntf(), *pPopup );
+            }
+            else
+            {
+                msg_Err( getIntf(), "Unknown window or popup (%s)",
+                         windowId.c_str() );
+            }
         }
     }
     else if( rAction.find( ".hide()" ) != string::npos )

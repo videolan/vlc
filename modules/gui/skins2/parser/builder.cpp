@@ -33,7 +33,10 @@
 #include "../src/anchor.hpp"
 #include "../src/bitmap_font.hpp"
 #include "../src/ft2_font.hpp"
+#include "../src/generic_layout.hpp"
+#include "../src/popup.hpp"
 #include "../src/theme.hpp"
+#include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_button.hpp"
 #include "../controls/ctrl_checkbox.hpp"
 #include "../controls/ctrl_image.hpp"
@@ -45,6 +48,7 @@
 #include "../controls/ctrl_text.hpp"
 #include "../controls/ctrl_tree.hpp"
 #include "../controls/ctrl_video.hpp"
+#include "../utils/bezier.hpp"
 #include "../utils/position.hpp"
 #include "../utils/var_bool.hpp"
 #include "../utils/var_text.hpp"
@@ -95,6 +99,9 @@ Theme *Builder::build()
     ADD_OBJECTS( BitmapFont );
     ADD_OBJECTS( Font );
     ADD_OBJECTS( Window );
+    // XXX: PopupMenus are created after the windows, so that the Win32Factory
+    // (at least) can give a valid window handle to the OSPopup objects
+    ADD_OBJECTS( PopupMenu );
     ADD_OBJECTS( Layout );
     ADD_OBJECTS( Anchor );
     ADD_OBJECTS( Button );
@@ -106,6 +113,10 @@ Theme *Builder::build()
     ADD_OBJECTS( List );
     ADD_OBJECTS( Tree );
     ADD_OBJECTS( Video );
+    // MenuItems must be created after all the rest, so that the IDs of the
+    // other elements exist and can be parsed in the actions
+    ADD_OBJECTS( MenuItem );
+    ADD_OBJECTS( MenuSeparator );
 
     return m_pTheme;
 }
@@ -258,6 +269,47 @@ void Builder::addFont( const BuilderData::Font &rData )
 }
 
 
+void Builder::addPopupMenu( const BuilderData::PopupMenu &rData )
+{
+    Popup *pPopup = new Popup( getIntf(), m_pTheme->getWindowManager() );
+
+    m_pTheme->m_popups[rData.m_id] = PopupPtr( pPopup );
+}
+
+
+void Builder::addMenuItem( const BuilderData::MenuItem &rData )
+{
+    Popup *pPopup = m_pTheme->getPopupById( rData.m_popupId );
+    if( pPopup == NULL )
+    {
+        msg_Err( getIntf(), "Unknown popup id: %s", rData.m_popupId.c_str() );
+        return;
+    }
+
+    CmdGeneric *pCommand = parseAction( rData.m_action );
+    if( pCommand == NULL )
+    {
+        msg_Err( getIntf(), "Invalid action: %s", rData.m_action.c_str() );
+        return;
+    }
+
+    pPopup->addItem( rData.m_label, *pCommand, rData.m_pos );
+}
+
+
+void Builder::addMenuSeparator( const BuilderData::MenuSeparator &rData )
+{
+    Popup *pPopup = m_pTheme->getPopupById( rData.m_popupId );
+    if( pPopup == NULL )
+    {
+        msg_Err( getIntf(), "Unknown popup id: %s", rData.m_popupId.c_str() );
+        return;
+    }
+
+    pPopup->addSeparator( rData.m_pos );
+}
+
+
 void Builder::addWindow( const BuilderData::Window &rData )
 {
     TopWindow *pWin =
@@ -272,7 +324,7 @@ void Builder::addWindow( const BuilderData::Window &rData )
 
 void Builder::addLayout( const BuilderData::Layout &rData )
 {
-    TopWindow *pWin = m_pTheme->getWindowById(rData.m_windowId);
+    TopWindow *pWin = m_pTheme->getWindowById( rData.m_windowId );
     if( pWin == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -298,7 +350,7 @@ void Builder::addLayout( const BuilderData::Layout &rData )
 
 void Builder::addAnchor( const BuilderData::Anchor &rData )
 {
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -333,7 +385,7 @@ void Builder::addButton( const BuilderData::Button &rData )
     GenericBitmap *pBmpOver = pBmpUp;
     GET_BMP( pBmpOver, rData.m_overId );
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -390,7 +442,7 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     GenericBitmap *pBmpOver2 = pBmpUp2;
     GET_BMP( pBmpOver2, rData.m_over2Id );
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -449,14 +501,14 @@ void Builder::addImage( const BuilderData::Image &rData )
     GenericBitmap *pBmp = NULL;
     GET_BMP( pBmp, rData.m_bmpId );
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
-    TopWindow *pWindow = m_pTheme->getWindowById(rData.m_windowId);
+    TopWindow *pWindow = m_pTheme->getWindowById( rData.m_windowId );
     if( pWindow == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -526,7 +578,7 @@ void Builder::addImage( const BuilderData::Image &rData )
 
 void Builder::addText( const BuilderData::Text &rData )
 {
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -607,7 +659,7 @@ void Builder::addRadialSlider( const BuilderData::RadialSlider &rData )
     GenericBitmap *pSeq = NULL;
     GET_BMP( pSeq, rData.m_sequence );
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -661,7 +713,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
         GET_BMP( pBgImage, rData.m_imageId );
     }
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -737,7 +789,7 @@ void Builder::addList( const BuilderData::List &rData )
     GenericBitmap *pBgBmp = NULL;
     GET_BMP( pBgBmp, rData.m_bgImageId );
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -793,7 +845,7 @@ void Builder::addTree( const BuilderData::Tree &rData )
     GET_BMP( pOpenBmp, rData.m_openImageId );
     GET_BMP( pClosedBmp, rData.m_closedImageId );
 
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
@@ -840,7 +892,7 @@ void Builder::addTree( const BuilderData::Tree &rData )
 
 void Builder::addVideo( const BuilderData::Video &rData )
 {
-    GenericLayout *pLayout = m_pTheme->getLayoutById(rData.m_layoutId);
+    GenericLayout *pLayout = m_pTheme->getLayoutById( rData.m_layoutId );
     if( pLayout == NULL )
     {
         msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );

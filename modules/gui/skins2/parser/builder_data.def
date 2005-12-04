@@ -3,6 +3,9 @@ Bitmap id:string fileName:string alphaColor:uint32_t nbFrames:int fps:int
 SubBitmap id:string parent:string x:int y:int width:int height:int nbFrames:int fps:int
 BitmapFont id:string file:string type:string
 Font id:string fontFile:string size:int
+PopupMenu id:string
+MenuItem label:string action:string pos:int popupId:string
+MenuSeparator pos:int popupId:string
 Window id:string xPos:int yPos:int visible:bool dragDrop:bool playOnDrop:bool
 Layout id:string width:int height:int minWidth:int maxWidth:int minHeight:int maxHeight:int windowId:string
 Anchor xPos:int yPos:int range:int priority:int points:string layoutId:string

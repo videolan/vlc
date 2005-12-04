@@ -164,6 +164,11 @@ GenericFont *Theme::getFontById( const string &id )
     FIND_FIRST_OBJECT( GenericFontPtr, m_fonts );
 }
 
+Popup *Theme::getPopupById( const string &id )
+{
+    FIND_OBJECT( PopupPtr, m_popups );
+}
+
 TopWindow *Theme::getWindowById( const string &id )
 {
     FIND_OBJECT( TopWindowPtr, m_windows );

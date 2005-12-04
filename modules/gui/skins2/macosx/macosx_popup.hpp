@@ -1,11 +1,10 @@
 /*****************************************************************************
- * x11_tooltip.hpp
+ * macosx_popup.hpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
- * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,35 +21,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef X11_TOOLTIP_HPP
-#define X11_TOOLTIP_HPP
+#ifndef MACOSX_POPUP_HPP
+#define MACOSX_POPUP_HPP
 
-#include <X11/Xlib.h>
-
-#include "../src/os_tooltip.hpp"
-
-class X11Display;
+#include "../src/os_popup.hpp"
 
 
-/// X11 implementation of OSTooltip
-class X11Tooltip: public OSTooltip
+/// MacOSX implementation of OSPopup
+class MacOSXPopup: public OSPopup
 {
     public:
-        X11Tooltip( intf_thread_t *pIntf, X11Display &rDisplay );
+        MacOSXPopup( intf_thread_t *pIntf );
 
-        virtual ~X11Tooltip();
+        virtual ~MacOSXPopup();
 
-        /// Show the tooltip
-        virtual void show( int left, int top, OSGraphics &rText );
+        /// Show the popup menu at the given (absolute) corrdinates
+        virtual void show( int xPos, int yPos );
 
-        /// Hide the tooltip
+        /// Hide the popup menu
         virtual void hide();
 
-    private:
-        /// X11 display
-        X11Display &m_rDisplay;
-        /// Window ID
-        Window m_wnd;
+        /// Append a new menu item with the given label to the popup menu
+        virtual void addItem( const string &rLabel, int pos );
+
+        /// Create a dummy menu item to separate sections
+        virtual void addSeparator( int pos );
+
+        /// Return the position of the item identified by the given id
+        virtual int getPosFromId( int id ) const;
 };
 
 

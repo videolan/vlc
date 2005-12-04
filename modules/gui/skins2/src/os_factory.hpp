@@ -37,6 +37,7 @@ class OSGraphics;
 class OSLoop;
 class OSWindow;
 class OSTooltip;
+class OSPopup;
 class OSTimer;
 
 
@@ -53,24 +54,28 @@ class OSFactory: public SkinObject
             kResizeNESW
         };
 
-        /// Initialization method overloaded in derived classes.
-        /// It must return false if the init failed.
+        /**
+         * Initialization method overloaded in derived classes.
+         * It must return false if the init failed.
+         */
         virtual bool init() { return true; }
 
-        /// Get the right instance of OSFactory.
-        /// Returns NULL if initialization of the concrete factory failed.
+        /**
+         * Get the right instance of OSFactory.
+         * Returns NULL if initialization of the concrete factory failed.
+         */
         static OSFactory *instance( intf_thread_t *pIntf );
 
-        /// Delete the instance of OSFactory.
+        /// Delete the instance of OSFactory
         static void destroy( intf_thread_t *pIntf );
 
-        /// Instantiate an object OSGraphics.
+        /// Instantiate an object OSGraphics
         virtual OSGraphics *createOSGraphics( int width, int height ) = 0;
 
-        /// Get the instance of the singleton OSLoop.
+        /// Get the instance of the singleton OSLoop
         virtual OSLoop *getOSLoop() = 0;
 
-        /// Destroy the instance of OSLoop.
+        /// Destroy the instance of OSLoop
         virtual void destroyOSLoop() = 0;
 
         ///
@@ -79,13 +84,16 @@ class OSFactory: public SkinObject
         /// Instantiate an OSTimer with the given command
         virtual OSTimer *createOSTimer( CmdGeneric &rCmd ) = 0;
 
-        /// Instantiate an object OSWindow.
+        /// Instantiate an object OSWindow
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,
                                           bool dragDrop, bool playOnDrop,
                                           OSWindow *pParent ) = 0;
 
-        /// Instantiate an object OSTooltip.
+        /// Instantiate an object OSTooltip
         virtual OSTooltip *createOSTooltip() = 0;
+
+        /// Instantiate an object OSPopup
+        virtual OSPopup *createOSPopup() = 0;
 
         /// Get the directory separator
         virtual const string &getDirSeparator() const = 0;
@@ -110,7 +118,7 @@ class OSFactory: public SkinObject
         virtual void rmDir( const string &rPath ) = 0;
 
    protected:
-        // Protected because it's a singleton.
+        // Protected because it's a singleton
         OSFactory( intf_thread_t* pIntf ): SkinObject( pIntf ) {}
         virtual ~OSFactory() {}
 };

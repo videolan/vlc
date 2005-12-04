@@ -29,6 +29,7 @@
 #include "../src/generic_window.hpp"
 #include "../events/evt_key.hpp"
 #include "../events/evt_leave.hpp"
+#include "../events/evt_menu.hpp"
 #include "../events/evt_motion.hpp"
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_refresh.hpp"
@@ -129,6 +130,12 @@ void Win32Loop::run()
                                 Infos.rcPaint.right - Infos.rcPaint.left + 1,
                                 Infos.rcPaint.bottom - Infos.rcPaint.top + 1 );
                 EndPaint( msg.hwnd, &Infos );
+                win.processEvent( evt );
+                break;
+            }
+            case WM_COMMAND:
+            {
+                EvtMenu evt( getIntf(), LOWORD( msg.wParam ) );
                 win.processEvent( evt );
                 break;
             }

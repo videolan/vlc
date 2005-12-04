@@ -36,6 +36,7 @@
 #include "../events/evt_enter.hpp"
 #include "../events/evt_focus.hpp"
 #include "../events/evt_leave.hpp"
+#include "../events/evt_menu.hpp"
 #include "../events/evt_motion.hpp"
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_key.hpp"
@@ -87,7 +88,21 @@ void TopWindow::processEvent( EvtRefresh &rEvtRefresh )
 
 void TopWindow::processEvent( EvtFocus &rEvtFocus )
 {
-//    fprintf(stderr, rEvtFocus.getAsString().c_str()) ;
+//    fprintf(stderr, rEvtFocus.getAsString().c_str());
+}
+
+
+void TopWindow::processEvent( EvtMenu &rEvtMenu )
+{
+    Popup *pPopup = m_rWindowManager.getActivePopup();
+    // We should never receive a menu event when there is no active popup!
+    if( pPopup == NULL )
+    {
+        msg_Warn( getIntf(), "Unexpected menu event, ignoring" );
+        return;
+    }
+
+    pPopup->handleEvent( rEvtMenu );
 }
 
 

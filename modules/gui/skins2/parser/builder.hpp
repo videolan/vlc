@@ -26,20 +26,18 @@
 #define BUILDER_HPP
 
 #include "builder_data.hpp"
-#include "../src/os_graphics.hpp"
-#include "../src/generic_window.hpp"
-#include "../src/generic_layout.hpp"
-#include "../src/generic_bitmap.hpp"
-#include "../src/generic_font.hpp"
-#include "../commands/cmd_generic.hpp"
-#include "../controls/ctrl_generic.hpp"
-#include "../utils/bezier.hpp"
+#include "../src/skin_common.hpp"
 
 #include <string>
 #include <list>
 #include <map>
 
 class Theme;
+class Bezier;
+class CmdGeneric;
+class GenericFont;
+class Position;
+class Box;
 
 
 /// Class for skin construction
@@ -71,6 +69,9 @@ class Builder: public SkinObject
         void addSubBitmap( const BuilderData::SubBitmap &rData );
         void addBitmapFont( const BuilderData::BitmapFont &rData );
         void addFont( const BuilderData::Font &rData );
+        void addPopupMenu( const BuilderData::PopupMenu &rData );
+        void addMenuItem( const BuilderData::MenuItem &rData );
+        void addMenuSeparator( const BuilderData::MenuSeparator &rData );
         void addWindow( const BuilderData::Window &rData );
         void addLayout( const BuilderData::Layout &rData );
         void addAnchor( const BuilderData::Anchor &rData );
@@ -84,7 +85,7 @@ class Builder: public SkinObject
         void addTree( const BuilderData::Tree &rData );
         void addVideo( const BuilderData::Video &rData );
 
-       /// Compute the position of a control
+        /// Compute the position of a control
         const Position makePosition( const string &rLeftTop,
                                      const string &rRightBottom,
                                      int xPos, int yPos, int width, int height,

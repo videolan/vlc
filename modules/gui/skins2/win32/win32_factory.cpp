@@ -29,6 +29,7 @@
 #include "win32_timer.hpp"
 #include "win32_window.hpp"
 #include "win32_tooltip.hpp"
+#include "win32_popup.hpp"
 #include "win32_loop.hpp"
 #include "../src/theme.hpp"
 
@@ -254,6 +255,23 @@ OSWindow *Win32Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
 OSTooltip *Win32Factory::createOSTooltip()
 {
     return new Win32Tooltip( getIntf(), m_hInst, m_hParentWindow );
+}
+
+
+OSPopup *Win32Factory::createOSPopup()
+{
+    // XXX FIXME: this way of getting the handle really sucks!
+    // In fact, the clean way would be to have in Builder::addPopup() a call
+    // to pPopup->associateToWindow() (to be written)... but the problem is
+    // that there is no way to access the OS-dependent window handle from a
+    // GenericWindow (we cannot eevn access the OSWindow).
+    if( m_windowMap.begin() == m_windowMap.end() )
+    {
+        msg_Err( getIntf(), "No window has been created before the popup!" );
+        return NULL;
+    }
+
+    return new Win32Popup( getIntf(), m_windowMap.begin()->first );
 }
 
 

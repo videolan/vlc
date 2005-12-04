@@ -1,11 +1,10 @@
 /*****************************************************************************
- * x11_tooltip.hpp
+ * x11_popup.cpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
- * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,36 +21,53 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef X11_TOOLTIP_HPP
-#define X11_TOOLTIP_HPP
+#ifdef X11_SKINS
 
-#include <X11/Xlib.h>
-
-#include "../src/os_tooltip.hpp"
-
-class X11Display;
+#include "x11_popup.hpp"
 
 
-/// X11 implementation of OSTooltip
-class X11Tooltip: public OSTooltip
+X11Popup::X11Popup( intf_thread_t *pIntf )
+    : OSPopup( pIntf )
 {
-    public:
-        X11Tooltip( intf_thread_t *pIntf, X11Display &rDisplay );
+    // TODO
+}
 
-        virtual ~X11Tooltip();
 
-        /// Show the tooltip
-        virtual void show( int left, int top, OSGraphics &rText );
+X11Popup::~X11Popup()
+{
+    // TODO
+}
 
-        /// Hide the tooltip
-        virtual void hide();
 
-    private:
-        /// X11 display
-        X11Display &m_rDisplay;
-        /// Window ID
-        Window m_wnd;
-};
+void X11Popup::show( int xPos, int yPos )
+{
+    // TODO
+}
+
+
+void X11Popup::hide()
+{
+    // TODO
+}
+
+
+void X11Popup::addItem( const string &rLabel, int pos )
+{
+    // TODO
+}
+
+
+void X11Popup::addSeparator( int pos )
+{
+    // TODO
+}
+
+
+int X11Popup::getPosFromId( int id ) const
+{
+    // TODO
+}
 
 
 #endif
+

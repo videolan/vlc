@@ -2,7 +2,7 @@
 -->
 
 
-<!ELEMENT Theme (ThemeInfo,(Include|Bitmap|BitmapFont|Font|Window)*)>
+<!ELEMENT Theme (ThemeInfo,(Include|Bitmap|BitmapFont|Font|PopupMenu|Window)*)>
     <!ATTLIST Theme
         version     CDATA   #REQUIRED
         tooltipfont CDATA   "defaultfont"
@@ -46,6 +46,16 @@
         file        CDATA   #REQUIRED
         type        CDATA   "digits"
     >
+<!ELEMENT PopupMenu (MenuItem|MenuSeparator)+>
+    <!ATTLIST PopupMenu
+        id          CDATA   #REQUIRED
+    >
+<!ELEMENT MenuItem EMPTY>
+    <!ATTLIST MenuItem
+        label       CDATA   #REQUIRED
+        action      CDATA   "none"
+    >
+<!ELEMENT MenuSeparator EMPTY>
 <!ELEMENT ThemeInfo EMPTY>
     <!ATTLIST ThemeInfo
         name        CDATA   #IMPLIED

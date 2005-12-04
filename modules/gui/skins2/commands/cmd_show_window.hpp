@@ -26,8 +26,10 @@
 #define CMD_SHOW_WINDOW_HPP
 
 #include "cmd_generic.hpp"
+#include "../src/os_factory.hpp"
 #include "../src/top_window.hpp"
 #include "../src/window_manager.hpp"
+#include "../src/popup.hpp"
 
 
 /// Command to show a window
@@ -94,5 +96,31 @@ class CmdRaiseAll: public CmdGeneric
         /// Reference to the window manager
         WindowManager &m_rWinManager;
 };
+
+
+/// Command to show a popup menu
+class CmdShowPopup: public CmdGeneric
+{
+    public:
+        CmdShowPopup( intf_thread_t *pIntf, Popup &rPopup ):
+            CmdGeneric( pIntf ), m_rPopup( rPopup ) {}
+        virtual ~CmdShowPopup() {}
+
+        /// This method does the real job of the command
+        virtual void execute()
+        {
+            int x, y;
+            OSFactory::instance( getIntf() )->getMousePos( x, y );
+            m_rPopup.show( x, y );
+        }
+
+        /// Return the type of the command
+        virtual string getType() const { return "show popup"; }
+
+    private:
+        /// Reference to the popup
+        Popup &m_rPopup;
+};
+
 
 #endif

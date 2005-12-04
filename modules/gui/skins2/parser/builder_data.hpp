@@ -113,6 +113,43 @@ m_id( id ), m_fontFile( fontFile ), m_size( size ) {}
     list<Font> m_listFont;
 
     /// Type definition
+    struct PopupMenu
+    {
+        PopupMenu( const string & id ):
+m_id( id ) {}
+
+        string m_id;
+    };
+    /// List
+    list<PopupMenu> m_listPopupMenu;
+
+    /// Type definition
+    struct MenuItem
+    {
+        MenuItem( const string & label, const string & action, int pos, const string & popupId ):
+m_label( label ), m_action( action ), m_pos( pos ), m_popupId( popupId ) {}
+
+        string m_label;
+        string m_action;
+        int m_pos;
+        string m_popupId;
+    };
+    /// List
+    list<MenuItem> m_listMenuItem;
+
+    /// Type definition
+    struct MenuSeparator
+    {
+        MenuSeparator( int pos, const string & popupId ):
+m_pos( pos ), m_popupId( popupId ) {}
+
+        int m_pos;
+        string m_popupId;
+    };
+    /// List
+    list<MenuSeparator> m_listMenuSeparator;
+
+    /// Type definition
     struct Window
     {
         Window( const string & id, int xPos, int yPos, bool visible, bool dragDrop, bool playOnDrop ):

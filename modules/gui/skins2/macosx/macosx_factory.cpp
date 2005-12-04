@@ -93,6 +93,12 @@ OSTooltip *MacOSXFactory::createOSTooltip()
 }
 
 
+OSPopup *MacOSXFactory::createOSPopup()
+{
+    return new MacOSXPopup( getIntf() );
+}
+
+
 int MacOSXFactory::getScreenWidth() const
 {
     // TODO

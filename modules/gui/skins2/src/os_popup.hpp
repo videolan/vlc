@@ -1,5 +1,5 @@
 /*****************************************************************************
- * x11_tooltip.hpp
+ * os_popup.hpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
@@ -22,36 +22,38 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef X11_TOOLTIP_HPP
-#define X11_TOOLTIP_HPP
+#ifndef OS_POPUP_HPP
+#define OS_POPUP_HPP
 
-#include <X11/Xlib.h>
+#include "skin_common.hpp"
+#include <string>
 
-#include "../src/os_tooltip.hpp"
-
-class X11Display;
+class OSGraphics;
 
 
-/// X11 implementation of OSTooltip
-class X11Tooltip: public OSTooltip
+/// Base class for OS specific Popup Windows
+class OSPopup: public SkinObject
 {
     public:
-        X11Tooltip( intf_thread_t *pIntf, X11Display &rDisplay );
+        virtual ~OSPopup() {}
 
-        virtual ~X11Tooltip();
+        /// Show the popup menu at the given (absolute) corrdinates
+        virtual void show( int xPos, int yPos ) = 0;
 
-        /// Show the tooltip
-        virtual void show( int left, int top, OSGraphics &rText );
+        /// Hide the popup menu
+        virtual void hide() = 0;
 
-        /// Hide the tooltip
-        virtual void hide();
+        /// Append a new menu item with the given label to the popup menu
+        virtual void addItem( const string &rLabel, int pos ) = 0;
 
-    private:
-        /// X11 display
-        X11Display &m_rDisplay;
-        /// Window ID
-        Window m_wnd;
+        /// Create a dummy menu item to separate sections
+        virtual void addSeparator( int pos ) = 0;
+
+        /// Return the position of the item identified by the given id
+        virtual int getPosFromId( int id ) const = 0;
+
+    protected:
+        OSPopup( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
 };
-
 
 #endif

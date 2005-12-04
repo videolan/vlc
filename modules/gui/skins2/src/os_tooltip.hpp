@@ -36,10 +36,10 @@ class OSTooltip: public SkinObject
     public:
         virtual ~OSTooltip() {}
 
-        // Show the tooltip
+        /// Show the tooltip
         virtual void show( int left, int top, OSGraphics &rText ) = 0;
 
-        // Hide the tooltip
+        /// Hide the tooltip
         virtual void hide() = 0;
 
     protected:

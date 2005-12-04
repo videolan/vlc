@@ -1,11 +1,10 @@
 /*****************************************************************************
- * x11_tooltip.hpp
+ * evt_menu.hpp
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id$
+ * $Id:$
  *
- * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
+ * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,35 +21,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef X11_TOOLTIP_HPP
-#define X11_TOOLTIP_HPP
+#ifndef EVT_MENU_HPP
+#define EVT_MENU_HPP
 
-#include <X11/Xlib.h>
-
-#include "../src/os_tooltip.hpp"
-
-class X11Display;
+#include "evt_generic.hpp"
 
 
-/// X11 implementation of OSTooltip
-class X11Tooltip: public OSTooltip
+/// Mouse move event
+class EvtMenu: public EvtGeneric
 {
     public:
-        X11Tooltip( intf_thread_t *pIntf, X11Display &rDisplay );
+        EvtMenu( intf_thread_t *pIntf, int itemId ):
+            EvtGeneric( pIntf ), m_itemId( itemId ) {}
+        virtual ~EvtMenu() {}
 
-        virtual ~X11Tooltip();
+        /// Return the type of event
+        virtual const string getAsString() const { return "menu"; }
 
-        /// Show the tooltip
-        virtual void show( int left, int top, OSGraphics &rText );
-
-        /// Hide the tooltip
-        virtual void hide();
+        // Getter
+        int getItemId() const { return m_itemId; }
 
     private:
-        /// X11 display
-        X11Display &m_rDisplay;
-        /// Window ID
-        Window m_wnd;
+        /// Coordinates of the mouse (absolute or relative)
+        int m_itemId;
 };
 
 

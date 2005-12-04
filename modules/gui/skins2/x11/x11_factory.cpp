@@ -122,6 +122,12 @@ OSTooltip *X11Factory::createOSTooltip()
 }
 
 
+OSPopup *X11Factory::createOSPopup()
+{
+    return new X11Popup( getIntf(), *m_pDisplay );
+}
+
+
 int X11Factory::getScreenWidth() const
 {
     Display *pDisplay = m_pDisplay->getDisplay();

@@ -50,13 +50,13 @@ class X11Factory: public OSFactory
         /// Initialization method
         virtual bool init();
 
-        /// Instantiate an object OSGraphics.
+        /// Instantiate an object OSGraphics
         virtual OSGraphics *createOSGraphics( int width, int height );
 
-        /// Get the instance of the singleton OSLoop.
+        /// Get the instance of the singleton OSLoop
         virtual OSLoop *getOSLoop();
 
-        /// Destroy the instance of OSLoop.
+        /// Destroy the instance of OSLoop
         virtual void destroyOSLoop();
 
         /// Instantiate an OSTimer with the given command
@@ -70,8 +70,11 @@ class X11Factory: public OSFactory
                                           bool dragDrop, bool playOnDrop,
                                           OSWindow *pParent );
 
-        /// Instantiate an object OSTooltip.
+        /// Instantiate an object OSTooltip
         virtual OSTooltip *createOSTooltip();
+
+        /// Instantiate an object OSPopup
+        virtual OSPopup *createOSPopup();
 
         /// Get the directory separator
         virtual const string &getDirSeparator() const { return m_dirSep; }
