@@ -32,5 +32,14 @@ void CmdPlaytreeDel::execute()
 
 void CmdPlaytreeSort::execute()
 {
-    // TODO
+    // TODO: Choose sort method
+    playlist_t *p_playlist = getIntf()->p_sys->p_playlist;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    playlist_view_t* p_view = playlist_ViewFind( p_playlist, p_playlist->status.i_view );
+    playlist_RecursiveNodeSort( p_playlist, p_view->p_root , SORT_TITLE, ORDER_NORMAL );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    // Ask for rebuild
+    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
+    rVar.onChange();
 }

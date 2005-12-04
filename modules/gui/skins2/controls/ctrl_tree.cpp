@@ -140,6 +140,7 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
     }
     else if ( arg->i_type == 1 ) // Global change or deletion
     {
+        m_firstPos = m_rTree.begin();
         makeImage();
     }
     else if ( arg->i_type == 2 ) // Item-append

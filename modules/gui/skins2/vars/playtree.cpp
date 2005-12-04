@@ -200,6 +200,7 @@ void Playtree::buildTree()
     buildNode( p_view->p_root, *this );
 
     vlc_mutex_unlock( &m_pPlaylist->object_lock );
-    checkParents( NULL );
+//  What is it ?
+//    checkParents( NULL );
 }
 
