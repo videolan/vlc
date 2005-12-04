@@ -358,14 +358,18 @@ static inline char *vlc_b64_encode( char *src )
 }
 
 /* Portable networking layer communication */
-#define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __net_OpenTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
+#define net_ConnectTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
+#define net_OpenTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, __net_ConnectTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
 
 #define net_Accept(a, b, c) __net_Accept(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
+
+#define net_ConnectUDP(a, b, c, d ) __net_ConnectUDP(VLC_OBJECT(a), b, c, d)
+VLC_EXPORT( int, __net_ConnectUDP, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim ) );
 
 #define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server ) );

@@ -69,6 +69,7 @@ int playlist_LockItemToNode (playlist_t *,playlist_item_t *);
 void spu_Destroy (spu_t *);
 int osd_Icon (vlc_object_t *, spu_t *, int, int, int, short);
 char* httpd_ServerIP (httpd_client_t *cl, char *psz_ip);
+int __net_ConnectUDP (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
 int spu_Init (spu_t *);
 void httpd_HostDelete (httpd_host_t *);
 int __aout_VolumeGet (vlc_object_t *, audio_volume_t *);
@@ -180,7 +181,7 @@ int playlist_Enable (playlist_t *, playlist_item_t *);
 playlist_item_t* __playlist_ItemCopy (vlc_object_t *,playlist_item_t*);
 char * vlc_strdup (const char *s);
 playlist_item_t* __playlist_ItemNew (vlc_object_t *,const char *,const char *);
-int __net_OpenTCP (vlc_object_t *p_this, const char *psz_host, int i_port);
+int __net_ConnectTCP (vlc_object_t *p_this, const char *psz_host, int i_port);
 int __var_Get (vlc_object_t *, const char *, vlc_value_t *);
 void tls_ServerDelete (tls_server_t *);
 unsigned int aout_FormatNbChannels (const audio_sample_format_t * p_format);
@@ -513,7 +514,7 @@ struct module_symbols_t
     void (*date_Move_inner) (date_t *, mtime_t);
     mtime_t (*date_Increment_inner) (date_t *, uint32_t);
     void *net_ConvertIPv4_deprecated;
-    int (*__net_OpenTCP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port);
+    int (*__net_ConnectTCP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port);
     int * (*__net_ListenTCP_inner) (vlc_object_t *, const char *, int);
     int (*__net_Accept_inner) (vlc_object_t *, int *, mtime_t);
     int (*__net_OpenUDP_inner) (vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server);
@@ -849,6 +850,7 @@ struct module_symbols_t
     char * (*config_GetUserDir_inner) (void);
     char * (*FromUTF32_inner) (const wchar_t *);
     void (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
+    int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -923,7 +925,7 @@ struct module_symbols_t
 #  define date_Get (p_symbols)->date_Get_inner
 #  define date_Move (p_symbols)->date_Move_inner
 #  define date_Increment (p_symbols)->date_Increment_inner
-#  define __net_OpenTCP (p_symbols)->__net_OpenTCP_inner
+#  define __net_ConnectTCP (p_symbols)->__net_ConnectTCP_inner
 #  define __net_ListenTCP (p_symbols)->__net_ListenTCP_inner
 #  define __net_Accept (p_symbols)->__net_Accept_inner
 #  define __net_OpenUDP (p_symbols)->__net_OpenUDP_inner
@@ -1259,6 +1261,7 @@ struct module_symbols_t
 #  define config_GetUserDir (p_symbols)->config_GetUserDir_inner
 #  define FromUTF32 (p_symbols)->FromUTF32_inner
 #  define __input_Read (p_symbols)->__input_Read_inner
+#  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1336,7 +1339,7 @@ struct module_symbols_t
     ((p_symbols)->date_Get_inner) = date_Get; \
     ((p_symbols)->date_Move_inner) = date_Move; \
     ((p_symbols)->date_Increment_inner) = date_Increment; \
-    ((p_symbols)->__net_OpenTCP_inner) = __net_OpenTCP; \
+    ((p_symbols)->__net_ConnectTCP_inner) = __net_ConnectTCP; \
     ((p_symbols)->__net_ListenTCP_inner) = __net_ListenTCP; \
     ((p_symbols)->__net_Accept_inner) = __net_Accept; \
     ((p_symbols)->__net_OpenUDP_inner) = __net_OpenUDP; \
@@ -1672,6 +1675,7 @@ struct module_symbols_t
     ((p_symbols)->config_GetUserDir_inner) = config_GetUserDir; \
     ((p_symbols)->FromUTF32_inner) = FromUTF32; \
     ((p_symbols)->__input_Read_inner) = __input_Read; \
+    ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
