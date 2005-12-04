@@ -144,11 +144,6 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
 
 void GenericLayout::resize( int width, int height )
 {
-    if( width == m_width && height == m_height )
-    {
-        return;
-    }
-
     // Check boundaries
     if( width < m_minWidth )
     {
@@ -167,6 +162,11 @@ void GenericLayout::resize( int width, int height )
         height = m_maxHeight;
     }
 
+    if( width == m_width && height == m_height )
+    {
+        return;
+    }
+
     // Update the window size
     m_width = width;
     m_height = height;
@@ -183,12 +183,12 @@ void GenericLayout::resize( int width, int height )
     list<LayeredControl>::const_iterator iter;
     for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
     {
-        (*iter).m_pControl->onResize();
-        const Position *pPos = (*iter).m_pControl->getPosition();
-        if( pPos )
+        iter->m_pControl->onResize();
+        const Position *pPos = iter->m_pControl->getPosition();
+        if( pPos && iter->m_pControl->isVisible() )
         {
-            (*iter).m_pControl->draw( *m_pImage, pPos->getLeft(),
-                                      pPos->getTop() );
+            iter->m_pControl->draw( *m_pImage, pPos->getLeft(),
+                                    pPos->getTop() );
         }
     }
 
@@ -223,7 +223,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     {
         CtrlGeneric *pCtrl = (*iter).m_pControl;
         const Position *pPos = pCtrl->getPosition();
-        if( pCtrl->isVisible() && pPos )
+        if( pPos && pCtrl->isVisible() )
         {
             pCtrl->draw( *m_pImage, pPos->getLeft(), pPos->getTop() );
             // Remember the video control (we assume there is at most one video
