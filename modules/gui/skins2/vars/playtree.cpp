@@ -34,6 +34,8 @@ Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
     // Get the VLC playlist object
     m_pPlaylist = pIntf->p_sys->p_playlist;
 
+    i_items_to_append = 0;
+
     // Try to guess the current charset
     char *pCharset;
     vlc_current_charset( &pCharset );
@@ -77,6 +79,7 @@ void Playtree::delSelected()
             }
         }
     }
+    // TODO: Do this better
     buildTree();
     tree_update descr;
     descr.i_type = 1;
@@ -135,6 +138,8 @@ void Playtree::onUpdateItem( int id )
 
 void Playtree::onAppend( playlist_add_t *p_add )
 {
+    i_items_to_append --;
+
     Iterator node = findById( p_add->i_node );
     if( node != end() )
     {
@@ -152,6 +157,7 @@ void Playtree::onAppend( playlist_add_t *p_add )
     tree_update descr;
     descr.i_id = p_add->i_item;
     descr.i_parent = p_add->i_node;
+    descr.b_visible = node->m_expanded;
     descr.i_type = 2;
     notify( &descr );
 }
@@ -177,6 +183,8 @@ void Playtree::buildTree()
 {
     clear();
     vlc_mutex_lock( &m_pPlaylist->object_lock );
+
+    i_items_to_append = 0;
 
     playlist_view_t *p_view;
     p_view = playlist_ViewFind( m_pPlaylist, VIEW_CATEGORY );

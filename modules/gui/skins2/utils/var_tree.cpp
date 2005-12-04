@@ -202,6 +202,26 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
     return it;
 }
 
+VarTree::Iterator VarTree::getNextItem( Iterator it )
+{
+    if( it->size() )
+    {
+        it = it->begin();
+    }
+    else
+    {
+        VarTree::Iterator it_old = it;
+        it++;
+        // Was 'it' the last brother? If so, look for uncles
+        if( it_old->parent() && it_old->parent()->end() == it )
+        {
+            it = it_old->uncle();
+        }
+    }
+    return it;
+}
+
+
 VarTree::Iterator VarTree::findById( int id )
 {
     for (Iterator it = begin(); it != end(); ++it )
@@ -216,3 +236,15 @@ VarTree::Iterator VarTree::findById( int id )
     return end();
 }
 
+
+void VarTree::ensureExpanded( VarTree::Iterator it )
+{
+    /// Don't expand ourselves, only our parents
+    VarTree *current = &(*it);
+    current = current->parent();
+    while( current->parent() != NULL )
+    {
+        current->m_expanded = true;
+        current = current->parent();
+    }
+}

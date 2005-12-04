@@ -37,6 +37,7 @@ typedef struct tree_update
      int i_type;
      int i_parent;
      int i_id;
+     bool b_visible;
 } tree_update;
 
 /// Tree variable
@@ -138,8 +139,14 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         /// Given an iterator to a visible item, return the next visible item
         Iterator getNextVisibleItem( Iterator it );
 
+        /// Given an iterator to an item, return the next item
+        Iterator getNextItem( Iterator it );
+
         /// Find a children node with the given id
         Iterator findById( int id );
+
+        /// Ensure an item is expanded
+        void ensureExpanded( VarTree::Iterator );
 
     private:
         /// List of children

@@ -421,17 +421,18 @@ int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
 
     memcpy( p_add, newVal.p_address, sizeof( playlist_add_t ) ) ;
 
+    CmdGenericPtr ptrTree;
+    CmdPlaytreeAppend *pCmdTree = new CmdPlaytreeAppend( pThis->getIntf(),
+                                                             p_add );
+    ptrTree = CmdGenericPtr( pCmdTree );
+
     // Create a playlist notify command (for old style playlist)
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
-
-    // Create a playtree notify command (for new style playtree)
-    CmdPlaytreeAppend *pCmdTree = new CmdPlaytreeAppend( pThis->getIntf(),
-                                                         p_add );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
-    pQueue->push( CmdGenericPtr( pCmdTree ), false );
+    pQueue->push( ptrTree , false );
 
     return VLC_SUCCESS;
 }

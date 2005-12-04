@@ -147,7 +147,10 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
         /* TODO: Check if the item should be visible. If it is, makeImage
          * Else, do nothing
          */
-        makeImage();
+        if( arg->b_visible == true )
+        {
+            makeImage();
+        }
     }
     notifyLayout();
     m_pLastSelected = NULL;
@@ -232,7 +235,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                         m_pLastSelected = &*it;
                     }
                 }
-                //ensureVisible( it );
+                ensureVisible( it );
             }
             else if( key == KEY_DOWN )
             {
@@ -252,7 +255,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 {
                     previousWasSelected = ( &*it == m_pLastSelected );
                 }
-                //ensureVisible( it );
+                ensureVisible( it );
             }
             else if( key == KEY_RIGHT )
             {
@@ -466,13 +469,16 @@ bool CtrlTree::ensureVisible( VarTree::Iterator item )
     // Find the item to focus
     int focusItemIndex = 0;
     VarTree::Iterator it;
+
+    m_rTree.ensureExpanded( item );
+
     for( it = m_rTree.begin(); it != m_rTree.end();
          it = m_rTree.getNextVisibleItem( it ) )
     {
-        if( it->m_playing ) break;
+        if( it == item ) break;
         focusItemIndex++;
     }
-   return  ensureVisible( focusItemIndex );
+   return ensureVisible( focusItemIndex );
 }
 
 bool CtrlTree::ensureVisible( int focusItemIndex )
@@ -494,7 +500,7 @@ bool CtrlTree::ensureVisible( int focusItemIndex )
         && ( focusItemIndex < firstPosIndex
            || focusItemIndex > firstPosIndex + maxItems() ) )
     {
-        // Scroll to have the playing stream visible
+        // Scroll to have the wanted stream visible
         VarPercent &rVarPos = m_rTree.getPositionVar();
         rVarPos.set( 1.0 - (double)focusItemIndex /
                            (double)m_rTree.visibleItems() );
@@ -508,14 +514,26 @@ void CtrlTree::autoScroll()
     // Find the current playing stream
     int playIndex = 0;
     VarTree::Iterator it;
+
+    for( it = m_rTree.begin(); it != m_rTree.end();
+         it = m_rTree.getNextItem( it ) )
+    {
+        if( it->m_playing )
+        {
+           m_rTree.ensureExpanded( it );
+           break;
+        }
+    }
     for( it = m_rTree.begin(); it != m_rTree.end();
          it = m_rTree.getNextVisibleItem( it ) )
     {
-        if( it->m_playing ) break;
+        if( it->m_playing )
+           break;
         playIndex++;
     }
 
     if( it == m_rTree.end() ) return;
+
 
     ensureVisible( playIndex );
 }
