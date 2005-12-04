@@ -399,7 +399,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
 
     if( size >= 4 )
     {
-        i= rtsp->pf_read( rtsp->p_userdata, buffer, 4 );
+        i = rtsp->pf_read( rtsp->p_userdata, buffer, 4 );
         if( i < 4 ) return i;
 
         if( buffer[0]=='S' && buffer[1]=='E' && buffer[2]=='T' &&
@@ -417,13 +417,13 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
 
                 if( !strncasecmp( rest, "Cseq:", 5 ) )
                     sscanf( rest, "%*s %u", &seq );
-            } while( strlen(rest) != 0 );
-
+            } while( *rest );
             free( rest );
+
             if( seq < 0 )
             {
                 fprintf(stderr, "warning: cseq not recognized!\n");
-                seq=1;
+                seq = 1;
             }
 
             /* lets make the server happy */
@@ -433,7 +433,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
             rtsp_put( rtsp, rest );
             rtsp_put( rtsp, "" );
             free( rest );
-            rtsp->pf_read( rtsp->p_userdata, buffer, size );
+            i = rtsp->pf_read( rtsp->p_userdata, buffer, size );
         }
         else
         {
@@ -441,7 +441,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, char *buffer, unsigned int size )
             i += 4;
         }
     }
-    else i= rtsp->pf_read( rtsp->p_userdata, buffer, size );
+    else i = rtsp->pf_read( rtsp->p_userdata, buffer, size );
 
     //fprintf( stderr, "<< %d of %d bytes\n", i, size );
 
