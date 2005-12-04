@@ -26,6 +26,7 @@
 #include "macosx_factory.hpp"
 #include "macosx_graphics.hpp"
 #include "macosx_loop.hpp"
+#include "macosx_popup.hpp"
 #include "macosx_timer.hpp"
 #include "macosx_window.hpp"
 #include "macosx_tooltip.hpp"
