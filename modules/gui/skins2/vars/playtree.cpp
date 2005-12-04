@@ -54,7 +54,6 @@ Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
 Playtree::~Playtree()
 {
     if( iconvHandle != (vlc_iconv_t) - 1 ) vlc_iconv_close( iconvHandle );
-    // TODO : check that everything is destroyed
 }
 
 void Playtree::delSelected()
@@ -79,7 +78,7 @@ void Playtree::delSelected()
             }
         }
     }
-    // TODO: Do this better
+    /// \todo Do this better (handle item-deleted)
     buildTree();
     tree_update descr;
     descr.i_type = 1;
@@ -188,10 +187,9 @@ void Playtree::buildTree()
 
     playlist_view_t *p_view;
     p_view = playlist_ViewFind( m_pPlaylist, VIEW_CATEGORY );
-    /* TODO : let the user chose the view type */
+    /// \todo let the user chose the view
 
     clear();
-    /* XXX : do we need Playlist::clear() instead of VarTree::clear() ? */
 
     /* Set the root's name */
     UString *pName = new UString( getIntf(), p_view->p_root->input.psz_name );

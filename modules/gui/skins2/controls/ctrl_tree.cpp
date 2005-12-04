@@ -145,9 +145,7 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
     }
     else if ( arg->i_type == 2 ) // Item-append
     {
-        /* TODO: Check if the item should be visible. If it is, makeImage
-         * Else, do nothing
-         */
+        /// \todo Check if the really is really visible in the view (we only check if it in the document)
         if( arg->b_visible == true )
         {
             makeImage();
@@ -184,7 +182,6 @@ void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
 
 void CtrlTree::onResize()
 {
-    // FIXME : shouldn't be the same as the onUpdate function ... but i'm lazy
     // Determine what is the first item to display
     VarTree::Iterator it = m_rTree.begin();
 
@@ -665,9 +662,7 @@ void CtrlTree::makeImage()
         }
         it = m_rTree.getNextVisibleItem( it );
     }
-    /* TODO: Reposition percentage var to accomodate if it's not suitable anymore
-     * (if we expanded a node)
-     */
+    /// \todo Reposition percentage var to accomodate if it's not suitable anymore (if we expanded a node)
 }
 
 VarTree::Iterator CtrlTree::findItemAtPos( int pos )

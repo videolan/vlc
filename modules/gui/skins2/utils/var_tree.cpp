@@ -49,7 +49,7 @@ VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
 
 VarTree::~VarTree()
 {
-// TODO : check that children are deleted
+/// \todo check that children are deleted
 }
 
 void VarTree::add( int id, const UStringPtr &rcString, bool selected,

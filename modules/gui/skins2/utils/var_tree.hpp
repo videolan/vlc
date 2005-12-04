@@ -65,7 +65,7 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         /// Remove all elements from the children's list
         virtual void clear();
 
-        /// FIXME should be private
+        /// \todo Use accessors for these fields ?
         int m_id;
         UStringPtr m_cString;
         bool m_selected;

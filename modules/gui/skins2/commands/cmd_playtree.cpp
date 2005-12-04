@@ -32,7 +32,7 @@ void CmdPlaytreeDel::execute()
 
 void CmdPlaytreeSort::execute()
 {
-    // TODO: Choose sort method
+    /// \todo Choose sort method/order - Need more commands
     playlist_t *p_playlist = getIntf()->p_sys->p_playlist;
     vlc_mutex_lock( &p_playlist->object_lock );
     playlist_view_t* p_view = playlist_ViewFind( p_playlist, p_playlist->status.i_view );
