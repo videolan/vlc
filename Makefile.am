@@ -435,10 +435,12 @@ SOURCES_libvlc_common = \
 	src/osd/osd_parser.c \
 	src/osd/osd_text.c \
 	src/osd/osd_widgets.c \
+	src/network/getaddrinfo.c \
+	src/network/io.c \
+	src/network/tcp.c \
+	src/network/udp.c \
 	src/network/httpd.c \
 	src/network/tls.c \
-	src/network/io.c \
-	src/network/getaddrinfo.c \
 	src/misc/charset.c \
 	src/misc/md5.c \
 	src/misc/mtime.c \
