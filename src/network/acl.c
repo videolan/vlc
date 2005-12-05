@@ -66,7 +66,7 @@ static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
         msg_Err( p_this, "invalid IP address %s", psz_ip );
         return -1;
     }
-    
+
     p_bytes[16] = 0; /* avoids overflowing when i_bytes_match = 16 */
 
     i_family = res->ai_addr->sa_family;
@@ -75,7 +75,7 @@ static int ACL_Resolve( vlc_object_t *p_this, uint8_t *p_bytes,
         case AF_INET:
         {
             struct sockaddr_in *addr;
-                
+
             addr = (struct sockaddr_in *)res->ai_addr;
             memset( p_bytes, 0, 12 );
             memcpy( p_bytes + 12, &addr->sin_addr, 4 );
@@ -203,7 +203,7 @@ vlc_acl_t *__ACL_Create( vlc_object_t *p_this, vlc_bool_t b_allow )
     p_acl->i_size = 0;
     p_acl->p_entries = NULL;
     p_acl->b_allow_default = b_allow;
-    
+
     return p_acl;
 }
 
@@ -264,7 +264,7 @@ void ACL_Destroy( vlc_acl_t *p_acl )
 int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
 {
     FILE *file;
-    
+
     if( p_acl == NULL )
         return -1;
 
@@ -295,6 +295,9 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         /* skips blanks - cannot overflow given '\0' is not space */
         while( isspace( *psz_ip ) )
             psz_ip++;
+
+        if( *psz_ip == '\0' ) /* empty/blank line */
+            continue;
 
         ptr = strchr( psz_ip, '\n' );
         if( ptr == NULL )

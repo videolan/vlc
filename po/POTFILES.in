@@ -122,6 +122,7 @@ src/misc/variables.c
 src/misc/vlm.c
 src/misc/win32_specific.c
 src/misc/xml.c
+src/network/acl.c
 src/network/getaddrinfo.c
 src/network/httpd.c
 src/network/io.c

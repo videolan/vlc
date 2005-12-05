@@ -431,11 +431,11 @@ SOURCES_libvlc_common = \
 	src/stream_output/stream_output.c \
 	src/stream_output/announce.c \
 	src/stream_output/sap.c \
-	src/stream_output/acl.c \
 	src/osd/osd.c \
 	src/osd/osd_parser.c \
 	src/osd/osd_text.c \
 	src/osd/osd_widgets.c \
+	src/network/acl.c \
 	src/network/getaddrinfo.c \
 	src/network/io.c \
 	src/network/tcp.c \
