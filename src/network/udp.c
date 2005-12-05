@@ -49,6 +49,7 @@
 #       undef IP_ADD_MEMBERSHIP
 #       define IP_ADD_MEMBERSHIP 5
 #   endif
+#   define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
 #ifndef SOL_IP
@@ -65,8 +66,10 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
 
-static void net_SetMcastHopLimit( int fd, int family, int hlim )
+static int net_SetMcastHopLimit( vlc_object_t *p_this,
+                                 int fd, int family, int hlim )
 {
+#ifndef SYS_BEOS
     int proto, cmd;
 
     /* There is some confusion in the world whether IP_MULTICAST_TTL 
@@ -88,7 +91,8 @@ static void net_SetMcastHopLimit( int fd, int family, int hlim )
 #endif
 
         default:
-            return;
+            msg_Warn( p_this, "%s", strerror( EAFNOSUPPORT ) );
+            return VLC_EGENERIC;
     }
 
     if( setsockopt( fd, proto, cmd, &hlim, sizeof( hlim ) ) < 0 )
@@ -97,10 +101,52 @@ static void net_SetMcastHopLimit( int fd, int family, int hlim )
         unsigned char buf;
 
         buf = (unsigned char)(( hlim > 255 ) ? 255 : hlim);
-        setsockopt( fd, proto, cmd, &buf, sizeof( buf ) );
+        if( setsockopt( fd, proto, cmd, &buf, sizeof( buf ) ) )
+            return VLC_EGENERIC;
     }
+#endif
+    return VLC_SUCCESS;
 }
 
+
+static int net_SetMcastSource( vlc_object_t *p_this,
+                                int fd, int family, const char *str )
+{
+#ifndef SYS_BEOS
+    switch( family )
+    {
+        case AF_INET:
+        {
+            struct in_addr addr;
+
+            if( inet_pton( AF_INET, str, &addr) <= 0 )
+            {
+                msg_Err( p_this, "Invalid multicast interface %s",
+                         str );
+                return VLC_EGENERIC;
+            }
+
+            if( setsockopt( fd, IPPROTO_IP, IP_MULTICAST_IF, &addr,
+                            sizeof( addr ) ) < 0 )
+            {
+                msg_Dbg( p_this, "Cannot set multicast interface (%s)",
+                         strerror(errno) );
+                return VLC_EGENERIC;
+            }
+            break;
+        }
+
+#ifdef IPV6_MULTICAST_IF
+/* FIXME: TODO */
+#endif
+        default:
+            msg_Warn( p_this, "%s", strerror( EAFNOSUPPORT ) );
+            return VLC_EGENERIC;
+    }
+
+#endif
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
  * __net_ConnectUDP:
@@ -148,6 +194,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
         int fd;
+        char *psz_mif_addr;
 
         fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
                          ptr->ai_protocol );
@@ -166,10 +213,21 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
             i_val = 0x80000;
             setsockopt( fd, SOL_SOCKET, SO_SNDBUF, (void *)&i_val,
                         sizeof( i_val ) );
+
+            /* Allow broadcast sending */
+            i_val = 1;
+            setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST, (void*)&i_val,
+                        sizeof( i_val ) );
         }
 #endif
 
-        net_SetMcastHopLimit( fd, ptr->ai_family, i_hlim );
+        net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
+        psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
+        if( psz_mif_addr != NULL )
+        {
+            net_SetMcastSource( p_this, fd, ptr->ai_family, psz_mif_addr );
+            free( psz_mif_addr );
+        }
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) == 0 )
         {
