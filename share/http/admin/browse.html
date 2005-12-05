@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>VLC media player - Browser</title>
+    <link href="/style.css" title="Default" rel="stylesheet" type="text/css" />
 
     <vlc id="if" param1="'control' url_extract strlen"/>
         <meta http-equiv="refresh" content="0;URL=/admin/browse.html?dir=<vlc id="value" param1="'dir' url_extract" />" />
@@ -18,9 +19,11 @@
         <th align="left" bgcolor="#cccccc">Date</th>
     </tr>
     <p>This page is default disabled for security reasons (change _directory_ into directory to enable it).</p>
+    <vlc id="rpn" param1="counter 0 store" />
     <vlc id="rpn" param1="'dir' url_extract" />
     <vlc id="foreach" param1="file" param2="_directory_" />
-        <tr>
+        <vlc id="rpn" param1="counter counter value 1 + store" />
+        <tr class="<vlc id="if" param1="counter value 2 % 0 =" />line1<vlc id="else" />line2<vlc id="end" />">
             <td>
                 <vlc id="if" param1="file.type value 'directory' strcmp 0 =" />
                     <img src="/icons/dir.gif" alt=[DIR]" border="0" width="20" height="22">
@@ -46,4 +49,3 @@
     <p><vlc id="value" param1="copyright" /> </p>
 </body>
 </html>
-
