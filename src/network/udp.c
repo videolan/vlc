@@ -169,7 +169,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
         }
 #endif
 
-        net_SetMcastHopLimit( i_handle, ptr->ai_family, i_hlim );
+        net_SetMcastHopLimit( fd, ptr->ai_family, i_hlim );
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) == 0 )
         {
