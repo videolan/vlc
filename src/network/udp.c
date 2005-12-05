@@ -165,11 +165,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
         i_port = 1234; /* historical VLC thing */
 
     if( i_hlim < 1 )
-    {
         i_hlim = var_CreateGetInteger( p_this, "ttl" );
-        if( i_hlim < 1 )
-            i_hlim = 1;
-    }
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
@@ -214,7 +210,8 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
         }
 #endif
 
-        net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
+        if( hlim > 0 )
+            net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
         psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
         if( psz_mif_addr != NULL )
         {
