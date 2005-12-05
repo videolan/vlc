@@ -807,6 +807,20 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
         {
             fmt.i_codec = VLC_FOURCC( 'R','V','1','3' );
         }
+        else if( GetDWBE( &p_peek[30] ) == 0x20001000 ||
+                 GetDWBE( &p_peek[30] ) == 0x20100001 ||
+                 GetDWBE( &p_peek[30] ) == 0x20200002 )
+        {
+            fmt.i_codec = VLC_FOURCC( 'R','V','2','0' );
+        }
+        else if( GetDWBE( &p_peek[30] ) == 0x30202002 )
+        {
+            fmt.i_codec = VLC_FOURCC( 'R','V','3','0' );
+        }
+        else if( GetDWBE( &p_peek[30] ) == 0x40000000 )
+        {
+            fmt.i_codec = VLC_FOURCC( 'R','V','4','0' );
+        }
 
         msg_Dbg( p_demux, "    - video %4.4s %dx%d",
                  (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
