@@ -41,8 +41,7 @@
 
 #include "network.h"
 
-#define NETSYNC_PORT_MASTER 9875
-#define NETSYNC_PORT_SLAVE  9876
+#define NETSYNC_PORT 9875
 
 /* Needed for Solaris */
 #ifndef INADDR_NONE
@@ -144,10 +143,10 @@ static void Run( intf_thread_t *p_intf )
         }
     }
 
-    i_socket = net_OpenUDP( p_intf, NULL,
-                   b_master ? NETSYNC_PORT_MASTER : NETSYNC_PORT_SLAVE,
-                   b_master ? NULL : psz_master,
-                   b_master ? 0 : NETSYNC_PORT_MASTER );
+    if( b_master )
+        i_socket = net_OpenUDP( p_intf, NULL, NETSYNC_PORT, NULL, 0 );
+    else
+        i_socket = net_ConnectUDP( p_intf, psz_master, NETSYNC_PORT, 0 );
 
     if( psz_master ) free( psz_master );
 
