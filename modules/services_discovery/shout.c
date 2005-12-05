@@ -57,11 +57,13 @@
     static int  Open ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
+/// \bug Shortdesc too long
 #define LIMIT_TEXT N_("Maximum number of shoutcast servers to be listed")
 #define LIMIT_LONGTEXT LIMIT_TEXT
 
 vlc_module_begin();
     set_shortname( "Shoutcast");
+    /// \bug Correct ?
     set_description( _("Shoutcast radio listings") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
