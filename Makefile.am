@@ -435,9 +435,11 @@ SOURCES_libvlc_common = \
 	src/osd/osd_parser.c \
 	src/osd/osd_text.c \
 	src/osd/osd_widgets.c \
+	src/network/httpd.c \
+	src/network/tls.c \
+	src/network/io.c \
+	src/network/getaddrinfo.c \
 	src/misc/charset.c \
-	src/misc/httpd.c \
-	src/misc/tls.c \
 	src/misc/md5.c \
 	src/misc/mtime.c \
 	src/misc/block.c \
@@ -453,8 +455,6 @@ SOURCES_libvlc_common = \
 	src/misc/objects.c \
 	src/misc/variables.c \
 	src/misc/error.c \
-	src/misc/net.c \
-	src/misc/getaddrinfo.c \
 	src/misc/vlm.c \
 	src/misc/xml.c \
 	src/misc/version.c \
