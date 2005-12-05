@@ -166,16 +166,9 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     if( i_hlim < 1 )
     {
-        vlc_value_t val;
-
-        if( var_Get( p_this, "ttl", &val ) != VLC_SUCCESS )
-        {
-            var_Create( p_this, "ttl", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_Get( p_this, "ttl", &val );
-        }
-        i_hlim = val.i_int;
-
-        if( i_hlim < 1 ) i_hlim = 1;
+        i_hlim = var_CreateGetInteger( p_this, "ttl" );
+        if( i_hlim < 1 )
+            i_hlim = 1;
     }
 
     memset( &hints, 0, sizeof( hints ) );

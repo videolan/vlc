@@ -57,7 +57,6 @@ struct sap_address_t
 {
     char *psz_address;
     char psz_machine[NI_MAXNUMERICHOST];
-    int i_port;
     int i_rfd; /* Read socket */
     int i_wfd; /* Write socket */
 
@@ -370,9 +369,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             return VLC_ENOMEM;
         }
         p_address->psz_address = strdup( psz_addr );
-        p_address->i_port  =  9875;
-        p_address->i_wfd = net_OpenUDP( p_sap, "", 0, psz_addr,
-                                        p_address->i_port );
+        p_address->i_wfd = net_ConnectUDP( p_sap, psz_addr, SAP_PORT, 0 );
         if( p_address->i_wfd != -1 )
         {
             char *ptr;
@@ -389,8 +386,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
         if( p_sap->b_control == VLC_TRUE )
         {
-            p_address->i_rfd = net_OpenUDP( p_sap, psz_addr,
-                                            p_address->i_port, "", 0 );
+            p_address->i_rfd = net_OpenUDP( p_sap, psz_addr, SAP_PORT, "", 0 );
             if( p_address->i_rfd != -1 )
                 net_StopSend( p_address->i_rfd );
             p_address->i_buff = 0;
@@ -558,7 +554,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
         i_ret = net_Write( p_sap, p_session->p_address->i_wfd, NULL,
                            p_session->psz_data,
                            p_session->i_length );
-        if( i_ret != p_session->i_length )
+        if( i_ret != (int)p_session->i_length )
         {
             msg_Warn( p_sap, "SAP send failed on address %s (%i %i)",
                       p_session->p_address->psz_address,
@@ -628,7 +624,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                             psz_group ? "a=x-plgroup:" : "",
                             psz_group ? psz_group : "", psz_group ? "\r\n" : "" ) == -1 )
         return NULL;
-    
+
     msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),
              psz_sdp );
     return psz_sdp;
@@ -679,9 +675,7 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
     }
 #ifdef EXTRA_DEBUG
     msg_Dbg( p_sap,"%s:%i : Rate=%i, Interval = %i s",
-                    p_address->psz_address,p_address->i_port,
-                    i_rate,
-                    p_address->i_interval );
+             p_address->psz_address,SAP_PORT, i_rate, p_address->i_interval );
 #endif
 
     p_address->b_ready = VLC_TRUE;

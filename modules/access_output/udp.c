@@ -180,8 +180,7 @@ static int Open( vlc_object_t *p_this )
     char                *psz_dst_addr;
     int                 i_dst_port;
 
-    module_t            *p_network;
-    network_socket_t    socket_desc;
+    int                 i_handle;
 
     vlc_value_t         val;
 
@@ -249,37 +248,16 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->i_empty_depth = 0;
     vlc_mutex_init( p_access, &p_sys->p_thread->blocks_lock );
 
-    /* FIXME: use net_OpenUDP API */
-    socket_desc.psz_server_addr = psz_dst_addr;
-    socket_desc.i_server_port   = i_dst_port;
-    socket_desc.psz_bind_addr   = "";
-    socket_desc.i_bind_port     = 0;
-    socket_desc.i_handle        = -1;
-    socket_desc.v6only          = 0;
-
     var_Get( p_access, SOUT_CFG_PREFIX "ttl", &val );
-    socket_desc.i_ttl = val.i_int;
-
-    p_sys->p_thread->p_private = (void*)&socket_desc;
-    p_network = module_Need( p_sys->p_thread, "network", "ipv4", VLC_TRUE );
-    if( p_network != NULL )
-        module_Unneed( p_sys->p_thread, p_network );
-
-    if( socket_desc.i_handle == -1 )
+    i_handle = net_ConnectUDP( p_this, psz_dst_addr, i_dst_port, val.i_int );
+    if( i_handle == -1 )
     {
-        p_network = module_Need( p_sys->p_thread, "network", "ipv6", VLC_TRUE );
-        if( p_network != NULL )
-            module_Unneed( p_sys->p_thread, p_network );
-
-        if( socket_desc.i_handle == -1 )
-        {
-            msg_Err( p_access, "failed to open a connection (udp)" );
-            return VLC_EGENERIC;
-        }
+         msg_Err( p_access, "failed to open a connection (udp)" );
+         return VLC_EGENERIC;
     }
 
-    p_sys->p_thread->i_handle = socket_desc.i_handle;
-    net_StopRecv( socket_desc.i_handle );
+    p_sys->p_thread->i_handle = i_handle;
+    net_StopRecv( i_handle );
 
     var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
     p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;
@@ -287,7 +265,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_access, SOUT_CFG_PREFIX "group", &val );
     p_sys->p_thread->i_group = val.i_int;
 
-    p_sys->i_mtu = socket_desc.i_mtu;
+    p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
 
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
                            VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
