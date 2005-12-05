@@ -210,7 +210,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
         }
 #endif
 
-        if( hlim > 0 )
+        if( i_hlim > 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
         psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
         if( psz_mif_addr != NULL )
