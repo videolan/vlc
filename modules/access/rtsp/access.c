@@ -84,7 +84,7 @@ static int RtspConnect( void *p_userdata, char *psz_server, int i_port )
     access_sys_t *p_sys = p_access->p_sys;
 
     /* Open connection */
-    p_sys->fd = net_OpenTCP( p_access, psz_server, i_port );
+    p_sys->fd = net_ConnectTCP( p_access, psz_server, i_port );
     if( p_sys->fd < 0 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", psz_server, i_port );

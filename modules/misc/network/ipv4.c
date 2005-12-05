@@ -444,7 +444,7 @@ static int OpenUDP( vlc_object_t * p_this )
             /* set the time-to-live */
             int i_ttl = p_socket->i_ttl;
             unsigned char ttl;
-            
+
             /* set the multicast interface */
             char * psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
             if( psz_mif_addr )

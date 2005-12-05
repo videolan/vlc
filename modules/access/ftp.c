@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code
- *          Rémi Denis-Courmont <rem # videolan.org> - EPSV support
+ *          RÃ©mi Denis-Courmont <rem # videolan.org> - EPSV support
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ static int Connect( access_t *p_access, access_sys_t *p_sys )
 
     /* *** Open a TCP connection with server *** */
     msg_Dbg( p_access, "waiting for connection..." );
-    p_sys->fd_cmd = fd = net_OpenTCP( p_access, p_sys->url.psz_host,
+    p_sys->fd_cmd = fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
                                       p_sys->url.i_port );
     if( fd < 0 )
     {
@@ -617,7 +617,7 @@ static int ftp_StartStream( access_t *p_access, off_t i_start )
     }
 
     msg_Dbg( p_access, "waiting for data connection..." );
-    p_sys->fd_data = net_OpenTCP( p_access, psz_ip, i_port );
+    p_sys->fd_data = net_ConnectTCP( p_access, psz_ip, i_port );
     if( p_sys->fd_data < 0 )
     {
         msg_Err( p_access, "failed to connect with server" );

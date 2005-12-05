@@ -386,7 +386,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     p_sys->p_packet = NULL;
     E_( GenerateGuid )( &p_sys->guid );
 
-    if( ( p_sys->fd = net_OpenTCP( p_access, p_sys->url.psz_host,
+    if( ( p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
                                             p_sys->url.i_port ) ) < 0 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", p_sys->url.psz_host, p_sys->url.i_port );
@@ -574,7 +574,7 @@ static int Start( access_t *p_access, off_t i_pos )
 
     msg_Dbg( p_access, "starting stream" );
 
-    if( ( p_sys->fd = net_OpenTCP( p_access, p_sys->url.psz_host,
+    if( ( p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
                                             p_sys->url.i_port ) ) < 0 )
     {
         /* should not occur */

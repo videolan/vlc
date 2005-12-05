@@ -110,7 +110,7 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
 
-    p_sys->fd = net_OpenTCP( p_access, psz_dup, atoi( psz_parser ) );
+    p_sys->fd = net_ConnectTCP( p_access, psz_dup, atoi( psz_parser ) );
     free( psz_dup );
 
     if( p_sys->fd < 0 )

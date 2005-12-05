@@ -300,11 +300,10 @@ static int OpenUDP( vlc_object_t * p_this )
 
                 msg_Err( p_this, "failed to join IP multicast group (%s)",
                                                           strerror(errno) );
-            }    
+            }
         }
         else
         {
-        
             struct ipv6_mreq     imr;
             int                  res;
 

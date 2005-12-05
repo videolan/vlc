@@ -763,7 +763,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
 
     /* Open connection */
-    p_sys->fd = net_OpenTCP( p_access, srv.psz_host, srv.i_port );
+    p_sys->fd = net_ConnectTCP( p_access, srv.psz_host, srv.i_port );
     if( p_sys->fd < 0 )
     {
         msg_Err( p_access, "cannot connect to %s:%d", srv.psz_host, srv.i_port );
