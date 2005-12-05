@@ -32,6 +32,8 @@
 
 #include "vlc_playlist.h"
 
+#include "vlc_interaction.h"
+
 #define TITLE_CATEGORY N_( "By category" )
 #define TITLE_SIMPLE   N_( "Manually added" )
 #define TITLE_ALL      N_( "All items, unsorted" )
@@ -194,8 +196,13 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
         return NULL;
     }
 
+    // Preparse
     p_playlist->p_preparse->i_waiting = 0;
     p_playlist->p_preparse->pp_waiting = NULL;
+
+    // Interaction
+    p_playlist->b_manage_interaction = VLC_FALSE;
+    p_playlist->p_interaction = NULL;
 
     vlc_object_attach( p_playlist->p_preparse, p_playlist );
     if( vlc_thread_create( p_playlist->p_preparse, "preparser",
@@ -577,6 +584,11 @@ static void RunThread ( playlist_t *p_playlist )
 
     while( !p_playlist->b_die )
     {
+        if( p_playlist->b_manage_interaction )
+        {
+            intf_InteractionManage( p_playlist );
+        }
+
         vlc_mutex_lock( &p_playlist->object_lock );
 
         /* First, check if we have something to do */

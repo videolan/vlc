@@ -23,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
@@ -63,6 +64,10 @@ struct intf_thread_t
     /** Specific for dialogs providers */
     void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
                                intf_dialog_args_t * );
+
+    /** Interaction stuff */
+    int          i_last_id;
+    int ( *pf_interact ) ( intf_thread_t *, interaction_dialog_t *, vlc_bool_t );
 
     /** Video window callbacks */
     void * ( *pf_request_window ) ( intf_thread_t *, vout_thread_t *,

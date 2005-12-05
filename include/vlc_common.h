@@ -223,7 +223,7 @@ typedef enum {
     PLAYLIST_STOP,      /**< No arg                             res=can fail*/
     PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
     PLAYLIST_GOTO,      /**< arg1=int                           res=can fail */
-    PLAYLIST_VIEWGOTO,      /**< arg1=int                       res=can fail */
+    PLAYLIST_VIEWGOTO   /**< arg1=int                           res=can fail */
 } playlist_command_t;
 
 
@@ -251,6 +251,9 @@ typedef struct intf_sys_t intf_sys_t;
 typedef struct intf_console_t intf_console_t;
 typedef struct intf_msg_t intf_msg_t;
 typedef struct intf_channel_t intf_channel_t;
+typedef struct interaction_t interaction_t;
+typedef struct interaction_dialog_t interaction_dialog_t;
+typedef struct user_widget_t user_widget_t;
 
 /* Input */
 typedef struct input_thread_t input_thread_t;
@@ -338,7 +341,7 @@ typedef struct session_descriptor_t session_descriptor_t;
 typedef struct announce_method_t announce_method_t;
 typedef struct announce_handler_t announce_handler_t;
 typedef struct sap_handler_t sap_handler_t;
-//typedef struct slp_session_t    slp_session_t;
+/* typedef struct slp_session_t    slp_session_t; */
 
 /* Decoders */
 typedef struct decoder_t      decoder_t;

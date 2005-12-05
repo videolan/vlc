@@ -393,6 +393,7 @@ SOURCES_libvlc_common = \
 	src/libvlc.h \
 	src/interface/interface.c \
 	src/interface/intf_eject.c \
+	src/interface/interaction.c \
 	src/playlist/playlist.c \
 	src/playlist/sort.c \
 	src/playlist/loadsave.c \

@@ -29,18 +29,18 @@ while(<STDIN>)
         $line =~ /^test\s\-z\s/ || 
         $line =~ /^Making\sclean\sin\s\./ ||
 	$line =~ /^then\smv/ ||
-        $line =~ /make\s\sall-recursive/ )
+        $line =~ /make\s\sall-recursive/ ||
+        $line =~ s/^[A-z0-9-]*ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*//g ||
+        $line =~ s/^rm\s\-f\s(.*)//g )
      {}
      # Info 
      elsif( 
           $line =~ s/^.* (lib.*\.so).*/ LINK    : $1/g ||
           $line =~ s/^.* (lib.*\.o)\s\.\/(.*)/ COMPILE : $2/g ||
           $line =~ s/^.* (lib.*\.o)\s`.*`(.*);\ \\/ COMPILE : $2/ ||
-          $line =~ s/^[A-z0-9-]*ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*/ ARCHIVE : $1/g ||
           $line =~ s/^[A-z0-9-]*ranlib\s(.*)/ RANLIB  : $1/g ||
           $line =~ s/^Making\sall\sin\s(.*)/MAKE     : $1/g ||
           $line =~ s/^Making\sclean\sin\s(.*)/CLEAN  : $1/g ||
-          $line =~ s/^rm\s\-f\s(.*)/ REMOVE  : $1/g ||
           $line =~ s/.*\-o\s([^\s]*)\s.*/ BUILD   : $1/g)
 
      {
