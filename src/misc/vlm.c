@@ -316,6 +316,7 @@ static char *FindEndCommand( char *psz )
             if( ( *psz_sent == '\'' ) || ( *psz_sent == '\"' ) )
             {
                 psz_sent = FindEndCommand( psz_sent );
+                if( psz_sent == NULL ) return NULL;
             }
             else psz_sent++;
         }
