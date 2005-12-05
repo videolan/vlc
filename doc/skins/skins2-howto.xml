@@ -183,6 +183,17 @@ difficulty to understand how VLC skins work.</para>
     <note><para>If your PNG file specifies a transparency mask, it will be taken into account too.</para></note>
     <para>Default value: #000000</para><!--XXX: should we change it into a less often used color?-->
   </sect4>
+  <sect4 id="nbframes">
+    <title>nbframes</title>
+    <para>This attribute is needed to define animated bitmaps; it is the number of frames (images) contained in your animation. All the different frames are just images laid vertically in the bitmap. Animated GIFs are not supported at the moment. (since VLC 0.8.5)</para>
+    <para>Default value: 1</para>
+  </sect4>
+  <sect4 id="fps">
+    <title>fps</title>
+    <para>Only used in animated bitmaps; it is the number of frames (images) per seconds of the animation. (since VLC 0.8.5)</para>
+    <para>Default value: 0</para>
+  </sect4>
+
 </sect3>
 
 <sect3 id="SubBitmap">
@@ -213,6 +224,16 @@ difficulty to understand how VLC skins work.</para>
     <para>Height of the SubBitmap, in pixels.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect4>
+  <sect4 id="subbitmapnbframes">
+    <title>nbframes</title>
+    <para>Same as in <link linkend="nbframes">Bitmap</link> tag.</para>
+    <para>Default value: 1</para>
+  </sect4>
+  <sect4 id="subbitmapfps">
+    <title>fps</title>
+    <para>Same as in <link linkend="fps">Bitmap</link> tag.</para>
+  </sect4>
+
 </sect3>
 
 <sect3 id="Font">
@@ -587,7 +608,7 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="slidervalue">
     <title>value</title>
-    <para>Variable controlled by the slider. Recognized values are "volume" and "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playlist">Playlist</link> tag does not need to set this attribute).</para>
+    <para>Variable controlled by the slider. This must be a <link linkend="percent">percentage variable</link>, e.g "volume" or "time" (only exception: the <link linkend="Slider">Slider</link> defined inside the <link linkend="Playlist">Playlist</link> tag does not need to set this attribute).</para>
     <para>Default value: none</para>
   </sect4>
   <sect4 id="slidertooltiptext">
@@ -623,7 +644,7 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="radialslidervalue">
     <title>value</title>
-    <para>Variable controlled by the slider. Recognized values are "volume" and "time".</para>
+    <para>Variable controlled by the slider. This must be a <link linkend="percent">percentage variable</link>, e.g "volume" or "time".</para>
     <para>Default value: none</para>
   </sect4>
   <sect4 id="radialslidertooltiptext">
@@ -753,6 +774,12 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
   <listitem><para>
     <emphasis>dialogs.popup()</emphasis>: Show the popup menu, (already available with a right-click on a <link linkend="Image">Image</link> control).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>equalizer.enable()</emphasis>: Enable the equalizer audio filter (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>equalizer.disable()</emphasis>: Disable the equalizer audio filter (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
     <emphasis>vlc.play()</emphasis>: Play the current playlist item.
@@ -887,6 +914,9 @@ difficulty to understand how VLC skins work.</para>
 
 <itemizedlist>
   <listitem><para>
+    <emphasis>equalizer.isEnabled</emphasis>: True if the equalizer audio filter is enabled (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.isPlaying</emphasis>: True when VLC is playing, false otherwise.
   </para></listitem>
   <listitem><para>
@@ -923,6 +953,31 @@ difficulty to understand how VLC skins work.</para>
 
 </sect1>
 
+<sect1 id="percent">
+<title>Percentage variables</title>
+
+<para>Every <link linkend="Slider">slider</link> is associated to a percentage variable, which corresponds to the position of the cursor (between 0 and 100%)</para>
+
+<para>Here is a list of predefined percentage variables:</para>
+
+<itemizedlist>
+  <listitem><para>
+    <emphasis>equalizer.band(n)</emphasis>: Where 'n' is an integer between 0 and 9. When the equalizer audio filter is enabled, this value corresponds to the amplification factor of the n'th frequency band: 0% means -20 dB, and 100% means +20 dB. The frequencies corresponding to the 10 bands are: 60Hz, 170Hz, 310Hz, 600Hz, 1kHz, 3kHz, 6kHz, 12kHz, 14kHz, 16kHz. (Since VLC 0.8.5)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>equalizer.preamp</emphasis>: Preamplification value (if the equalizer audio filter is enabled). A value of 0% means -20 dB, and 100% means +20 dB. (Since VLC 0.8.5)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>time</emphasis>: Position of the stream being played.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>volume</emphasis>: Value of the volume.
+  </para></listitem>
+</itemizedlist>
+
+</sect1>
+
+
 <sect1>
 
 <title>Compression</title>
@@ -933,7 +988,9 @@ difficulty to understand how VLC skins work.</para>
 
 <para>On Linux, creating a .tar.gz archive is rather straight-forward using the 'tar' and 'gzip' commands. On Windows, it can be done using Winzip, UltimateZip, or any other (well, almost) compression software...</para>
 
-<para>It is advised to rename your .tar.gz archive with the .vlt extention, for 2 main reasons:</para>
+<para>Since VLC 0.8.5, it is also possible to archive your skin in a zip file.</para>
+
+<para>It is advised to rename your .tar.gz (or .zip) archive with the .vlt extention, for 2 main reasons:</para>
 
 <itemizedlist>
   <listitem><para>on some systems, the "Change skin" dialog box only displays files which have a .vlt or .xml extention,</para></listitem>
