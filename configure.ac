@@ -2348,69 +2348,151 @@ AC_CHECK_HEADERS(id3tag.h, [
 dnl
 dnl  ffmpeg decoder/demuxer plugin
 dnl
-dnl we try to find ffmpeg using : 1- ffmpeg-config, 2- pkg-config
-dnl 				3- default place, 4- given tree
+dnl we try to find ffmpeg using : 1- given tree 2- ffmpeg-config, 3- pkg-config
+dnl 				4- default place, 
 
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
 if test "${enable_ffmpeg}" != "no"
 then
-dnl Look for a ffmpeg-config (we are on debian )
- 
-   FFMPEG_PATH="${PATH}"
-   AC_ARG_WITH(ffmpeg-config-path,
-     [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
-     [ if test "${with_ffmpeg_config_path}" != "no"
-       then
-         FFMPEG_PATH="${with_ffmpeg_config_path}"
-       fi ])
-   AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
-   if test "${FFMPEG_CONFIG}" != "no"
-   then
-     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
-     AC_CHECK_HEADERS(postproc/postprocess.h)
-     VLC_ADD_PLUGINS([ffmpeg])
-     if test "${enable_sout}" != "no"; then
-         VLC_ADD_PLUGINS([stream_out_switcher])
-     fi
-     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
-     VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
-  
-  else
 
 dnl Those options have to be here because the .pc can be bogus for ffmpeg previous nov 05
 
-	AC_ARG_WITH(ffmpeg-mp3lame,
-      [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
-      [
-        if test "$with_ffmpeg_mp3lame" = "yes";	then
-		VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
-	fi])
+ AC_ARG_WITH(ffmpeg-mp3lame,
+   [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
+   [
+     if test "$with_ffmpeg_mp3lame" = "yes";	then
+     	VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
+     fi])
 
-    AC_ARG_WITH(ffmpeg-faac,
-      [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
-      [
-        if test "$with_ffmpeg_faac" = "yes"; then
-		VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
-	fi])
+ AC_ARG_WITH(ffmpeg-faac,
+   [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
+   [
+     if test "$with_ffmpeg_faac" = "yes"; then
+     	VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
+     fi])
 
-    AC_ARG_WITH(ffmpeg-dts,
-      [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
-      [
-        if test "$with_ffmpeg_dts" = "yes"; then
-                LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
-                AC_CHECK_LIB(dts_pic, dts_free, 
-                  [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
-                  [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
-                LDFLAGS="${LDFLAGS_save}"
-	fi])
+ AC_ARG_WITH(ffmpeg-dts,
+   [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
+   [
+     if test "$with_ffmpeg_dts" = "yes"; then
+             LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+             AC_CHECK_LIB(dts_pic, dts_free, 
+               [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
+               [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
+             LDFLAGS="${LDFLAGS_save}"
+     fi])
 
-    AC_ARG_WITH(ffmpeg-zlib,
-      [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
-      [
-        if test "$with_ffmpeg_zlib" = "yes"; then
+ AC_ARG_WITH(ffmpeg-zlib,
+   [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
+   [
+     if test "$with_ffmpeg_zlib" = "yes"; then
 		VLC_ADD_LDFLAGS([ffmpeg],[-lz])
-	fi])
+     fi])
+
+ dnl
+ dnl test for --with-ffmpeg-tree
+ dnl
+ AC_ARG_WITH(ffmpeg-tree,
+   [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
+
+ if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
+   AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
+   real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
+   if test -z "${real_ffmpeg_tree}"; then
+     dnl  The given directory can't be found
+     AC_MSG_RESULT(no)
+     AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
+   fi
+   if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
+     dnl  The given libavcodec wasn't built
+     AC_MSG_RESULT(no)
+     AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
+   fi
+   if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
+     dnl  The given libavcodec wasn't built with --enable-pp
+     AC_MSG_RESULT(no)
+     AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+   fi
+   dnl  Use a custom libffmpeg
+   AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
+
+   if fgrep -s "CONFIG_ZLIB=yes" "${real_ffmpeg_tree}/config.mak"; then
+     if test "${with_ffmpeg_zlib}" != "yes"; then
+       VLC_ADD_LDFLAGS([ffmpeg],[-lz])
+     fi
+   fi
+   if fgrep -s "CONFIG_MP3LAME=yes" "${real_ffmpeg_tree}/config.mak"; then
+     if test "${with_ffmpeg_mp3lame}" != "yes"; then
+       VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
+     fi
+   fi
+   if fgrep -s "CONFIG_FAAC=yes" "${real_ffmpeg_tree}/config.mak"; then
+     if test "${with_ffmpeg_faac}" != "yes"; then
+       VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
+     fi
+   fi
+   if fgrep -s "CONFIG_DTS=yes" "${real_ffmpeg_tree}/config.mak"; then
+     if test "${with_ffmpeg_dts}" != "yes"; then
+       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+       AC_CHECK_LIB(dts_pic, dts_free, 
+         [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
+         [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
+       LDFLAGS="${LDFLAGS_save}"
+     fi
+   fi
+   if fgrep -s "CONFIG_VORBIS=yes" "${real_ffmpeg_tree}/config.mak"; then
+     VLC_ADD_LDFLAGS([ffmpeg],[-lvorbis -lvorbisenc])
+   fi
+   if fgrep -s "CONFIG_FAAD=yes" "${real_ffmpeg_tree}/config.mak"; then
+     VLC_ADD_LDFLAGS([ffmpeg],[-lfaad])
+   fi
+   if fgrep -s "CONFIG_XVID=yes" "${real_ffmpeg_tree}/config.mak"; then
+     VLC_ADD_LDFLAGS([ffmpeg],[-lxvidcore])
+   fi
+
+   VLC_ADD_BUILTINS([ffmpeg])
+   if test "${enable_sout}" != "no"; then
+     VLC_ADD_BUILTINS([stream_out_switcher])
+   fi
+
+   if test -f "${real_ffmpeg_tree}/libavutil/libavutil.a"; then
+     VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavutil ${real_ffmpeg_tree}/libavutil/libavutil.a])
+     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavutil])
+   fi
+
+   VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
+   VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
+
+   if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
+     AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
+     VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
+     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
+   fi
+else    
+    
+dnl Look for a ffmpeg-config (we are on debian )
+ 
+  FFMPEG_PATH="${PATH}"
+  AC_ARG_WITH(ffmpeg-config-path,
+    [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
+    [ if test "${with_ffmpeg_config_path}" != "no"
+      then
+        FFMPEG_PATH="${with_ffmpeg_config_path}"
+      fi ])
+  AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
+  if test "${FFMPEG_CONFIG}" != "no"
+  then
+    AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+    AC_CHECK_HEADERS(postproc/postprocess.h)
+    VLC_ADD_PLUGINS([ffmpeg])
+    if test "${enable_sout}" != "no"; then
+        VLC_ADD_PLUGINS([stream_out_switcher])
+    fi
+    VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
+    VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
+ 
+ else
 
 dnl Trying with pkg-config
    PKG_CHECK_MODULES(FFMPEG,[libavcodec, libavformat],
@@ -2427,9 +2509,8 @@ dnl Trying with pkg-config
     ],[
      
     dnl
-    dnl test for !(--with-ffmpeg-tree)
+    dnl last chance: at the default place
     dnl
-    if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}"; then
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
@@ -2454,94 +2535,13 @@ dnl Trying with pkg-config
         VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
-    fi
-
-    dnl
-    dnl test for --with-ffmpeg-tree
-    dnl
-    if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
-      AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
-      real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-      if test -z "${real_ffmpeg_tree}"; then
-        dnl  The given directory can't be found
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
-      fi
-      if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-        dnl  The given libavcodec wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
-      fi
-      if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-        dnl  The given libavcodec wasn't built with --enable-pp
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
-      fi
-      dnl  Use a custom libffmpeg
-      AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-
-      if fgrep -s "CONFIG_ZLIB=yes" "${real_ffmpeg_tree}/config.mak"; then
-        if test "${with_ffmpeg_zlib}" != "yes"; then
-          VLC_ADD_LDFLAGS([ffmpeg],[-lz])
-        fi
-      fi
-      if fgrep -s "CONFIG_MP3LAME=yes" "${real_ffmpeg_tree}/config.mak"; then
-        if test "${with_ffmpeg_mp3lame}" != "yes"; then
-          VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
-        fi
-      fi
-      if fgrep -s "CONFIG_FAAC=yes" "${real_ffmpeg_tree}/config.mak"; then
-        if test "${with_ffmpeg_faac}" != "yes"; then
-          VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
-        fi
-      fi
-      if fgrep -s "CONFIG_DTS=yes" "${real_ffmpeg_tree}/config.mak"; then
-        if test "${with_ffmpeg_dts}" != "yes"; then
-          LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
-          AC_CHECK_LIB(dts_pic, dts_free, 
-            [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
-            [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
-          LDFLAGS="${LDFLAGS_save}"
-        fi
-      fi
-      if fgrep -s "CONFIG_VORBIS=yes" "${real_ffmpeg_tree}/config.mak"; then
-        VLC_ADD_LDFLAGS([ffmpeg],[-lvorbis -lvorbisenc])
-      fi
-      if fgrep -s "CONFIG_FAAD=yes" "${real_ffmpeg_tree}/config.mak"; then
-        VLC_ADD_LDFLAGS([ffmpeg],[-lfaad])
-      fi
-      if fgrep -s "CONFIG_XVID=yes" "${real_ffmpeg_tree}/config.mak"; then
-        VLC_ADD_LDFLAGS([ffmpeg],[-lxvidcore])
-      fi
-
-      VLC_ADD_BUILTINS([ffmpeg])
-      if test "${enable_sout}" != "no"; then
-        VLC_ADD_BUILTINS([stream_out_switcher])
-      fi
-
-      if test -f "${real_ffmpeg_tree}/libavutil/libavutil.a"; then
-        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavutil ${real_ffmpeg_tree}/libavutil/libavutil.a])
-        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavutil])
-      fi
-
-      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
-      VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
-
-      if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-        AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
-        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
-        VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
-      fi
-    fi
     ])
-    AC_ARG_WITH(ffmpeg-tree,
-      [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
-
   fi
+ fi 
 fi
 
 dnl
-dnl  ffmpeg decoder/demuxer plugin
+dnl  ffmpegaltivec plugin
 dnl
 AC_ARG_ENABLE(ffmpegaltivec,
 [  --enable-ffmpegaltivec  ffmpegaltivec codec (DO NOT USE)])
