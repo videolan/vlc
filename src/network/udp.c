@@ -42,15 +42,65 @@
 
 #include "network.h"
 
-#ifndef INADDR_ANY
-#   define INADDR_ANY  0x00000000
+#ifdef WIN32
+#   if defined(UNDER_CE)
+#       undef IP_MULTICAST_TTL
+#       define IP_MULTICAST_TTL 3
+#       undef IP_ADD_MEMBERSHIP
+#       define IP_ADD_MEMBERSHIP 5
+#   endif
 #endif
-#ifndef INADDR_NONE
-#   define INADDR_NONE 0xFFFFFFFF
+
+#ifndef SOL_IP
+# define SOL_IP IPPROTO_IP
+#endif
+#ifndef SOL_IPV6
+# define SOL_IPV6 IPPROTO_IPV6
+#endif
+#ifndef IPPROTO_IPV6
+# define IPPROTO_IPV6 41
 #endif
 
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
+
+
+static void net_SetMcastHopLimit( int fd, int family, int hlim )
+{
+    int proto, cmd;
+
+    /* There is some confusion in the world whether IP_MULTICAST_TTL 
+     * takes a byte or an int as an argument.
+     * BSD seems to indicate byte so we are going with that and use
+     * int as a fallback to be safe */
+    switch( family )
+    {
+        case AF_INET:
+            proto = SOL_IP;
+            cmd = IP_MULTICAST_TTL;
+            break;
+
+#ifdef IPV6_MULTICAST_HOPS
+        case AF_INET6:
+            proto = SOL_IPV6;
+            cmd = IPV6_MULTICAST_HOPS;
+            break;
+#endif
+
+        default:
+            return;
+    }
+
+    if( setsockopt( fd, proto, cmd, &hlim, sizeof( hlim ) ) < 0 )
+    {
+        /* BSD compatibility */
+        unsigned char buf;
+
+        buf = (unsigned char)(( hlim > 255 ) ? 255 : hlim);
+        setsockopt( fd, proto, cmd, &buf, sizeof( buf ) );
+    }
+}
+
 
 /*****************************************************************************
  * __net_ConnectUDP:
@@ -59,7 +109,7 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
  * hop limit.
  *****************************************************************************/
 int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
-                      int hlim )
+                      int i_hlim )
 {
     struct addrinfo hints, *res, *ptr;
     int             i_val, i_handle = -1;
@@ -67,6 +117,20 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     if( i_port == 0 )
         i_port = 1234; /* historical VLC thing */
+
+    if( i_hlim < 1 )
+    {
+        vlc_value_t val;
+
+        if( var_Get( p_this, "ttl", &val ) != VLC_SUCCESS )
+        {
+            var_Create( p_this, "ttl", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+            var_Get( p_this, "ttl", &val );
+        }
+        i_hlim = val.i_int;
+
+        if( i_hlim < 1 ) i_hlim = 1;
+    }
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
@@ -94,16 +158,18 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
         {
             int i_val;
 
-            /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
-            * packet loss caused by scheduling problems */
+            /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s)
+             * to avoid packet loss caused by scheduling problems */
             i_val = 0x80000;
-            setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *)&i_val,
+            setsockopt( fd, SOL_SOCKET, SO_RCVBUF, (void *)&i_val,
                         sizeof( i_val ) );
             i_val = 0x80000;
-            setsockopt( i_handle, SOL_SOCKET, SO_SNDBUF, (void *)&i_val,
+            setsockopt( fd, SOL_SOCKET, SO_SNDBUF, (void *)&i_val,
                         sizeof( i_val ) );
         }
 #endif
+
+        net_SetMcastHopLimit( i_handle, ptr->ai_family, i_hlim );
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) == 0 )
         {
