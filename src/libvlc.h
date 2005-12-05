@@ -345,10 +345,15 @@ static char *ppsz_clock_descriptions[] =
     "This is the maximum packet size that can be transmitted " \
     "over network interface. On Ethernet it is usually 1500 bytes.")
 
-#define TTL_TEXT N_("Time To Live")
+#define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
-    "Indicate here the Time To Live of the multicast packets sent by " \
+    "Specify the hop limit (TTL) of the multicast packets sent by " \
     "the stream output.")
+
+#define MIFACE_TEXT N_("Multicast output interface")
+#define MIFACE_LONGTEXT N_( \
+    "Indicate here the multicast output interface. " \
+    "This overrides the routing table.")
 
 #define INPUT_PROGRAM_TEXT N_("Program to select")
 #define INPUT_PROGRAM_LONGTEXT N_( \
@@ -1240,7 +1245,6 @@ vlc_module_begin();
                                 SOUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT,
                                 SOUT_VIDEO_LONGTEXT, VLC_TRUE );
-    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_SOUT_STREAM );
     set_subcategory( SUBCAT_SOUT_MUX );
@@ -1249,6 +1253,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_ACO );
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
+    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
+    add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
+
     set_subcategory( SUBCAT_SOUT_PACKETIZER );
     add_module( "packetizer","packetizer", NULL, NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );

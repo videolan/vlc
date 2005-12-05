@@ -91,11 +91,6 @@ static int OpenUDP( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MIFACE_TEXT N_("Multicast output interface")
-#define MIFACE_LONGTEXT N_( \
-    "Indicate here the multicast output interface. " \
-    "This overrides the routing table.")
-
 vlc_module_begin();
     set_shortname( "IPv4" );
     set_description( _("UDP/IPv4 network abstraction layer") );
@@ -103,7 +98,6 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_GENERAL );
     set_callbacks( OpenUDP, NULL );
-    add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
