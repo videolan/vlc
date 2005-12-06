@@ -117,7 +117,11 @@ class Splitter : public wxSplitterWindow
 public:
     Splitter( wxWindow *p_parent, intf_thread_t *_p_intf )
       : wxSplitterWindow( p_parent, -1, wxDefaultPosition, wxSize(0,0),
+#if defined( __WXMSW__ )
+                          wxCLIP_CHILDREN ),
+#else
                           wxCLIP_CHILDREN | wxSP_3DSASH ),
+#endif
         p_intf(_p_intf), i_sash_position(150), i_width(-1)
     {
         SetSashSize( 0 );
@@ -127,9 +131,8 @@ public:
 
     virtual bool Split( wxWindow* window1, wxWindow* window2 )
     {
-        SetSashSize( -1 );
-
-        wxSize size = wxSize( i_width, i_sash_position - GetSashSize() );
+        SetSashSize( 0 );
+        wxSize size = wxSize( i_width, i_sash_position );
         if( window2->GetSizer() ) window2->GetSizer()->SetMinSize( size );
 
         return wxSplitterWindow::SplitHorizontally( window1, window2,
@@ -152,7 +155,14 @@ private:
             p_intf->p_sys->p_video_window && p_intf->p_sys->p_video_sizer &&
             p_intf->p_sys->p_video_sizer->GetMinSize() != wxSize(0,0) )
         {
+            SetSashSize( -1 );
+
+#if defined( __WXMSW__ )
             SetSashPosition( event.GetSize().GetHeight() - i_sash_position );
+#else
+            SetSashPosition( event.GetSize().GetHeight() -
+                             i_sash_position - GetSashSize() );
+#endif
         }
         else if( GetWindow2() && GetWindow1() && GetWindow1()->GetSizer() )
         {
@@ -160,12 +170,14 @@ private:
 
             if( event.GetSize().GetHeight() - size.GetHeight() )
             {
+                SetSashSize( 0 );
+
                 SetSashPosition( size.GetHeight() ? size.GetHeight() : 1 );
                 i_sash_position = event.GetSize().GetHeight() -
                     size.GetHeight();
                 i_width = event.GetSize().GetWidth();
 
-                size = wxSize( i_width, i_sash_position - GetSashSize() );
+                size = wxSize( i_width, i_sash_position );
                 if( GetWindow2()->GetSizer() )
                     GetWindow2()->GetSizer()->SetMinSize( size );
             }
