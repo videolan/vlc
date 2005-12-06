@@ -907,7 +907,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             msg_Dbg( p_intf, "requested to move playlist item %d to %d",
                      i_pos, i_newpos);
         }
-        else if( !strcmp( s, "volume_set" ) )
+        else if( !strcmp( s, "vlc_volume_set" ) )
         {
             char *psz_vol = E_(SSPop)( st );
             int i_value;
