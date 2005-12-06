@@ -79,6 +79,7 @@
 #include "vlc_error.h"
 
 #include "vlc_interface.h"
+#include "vlc_interaction.h"
 #include "intf_eject.h"
 
 #include "vlc_playlist.h"
