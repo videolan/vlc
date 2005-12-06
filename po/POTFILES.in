@@ -76,8 +76,6 @@ src/audio_output/mixer.c
 src/audio_output/output.c
 src/control/audio_video.c
 src/control/core.c
-src/control/init.c
-src/control/plugin.c
 src/control/util.c
 src/extras/dirent.c
 src/extras/getopt.c
