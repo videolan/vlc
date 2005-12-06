@@ -44,6 +44,9 @@ BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
 
 SUFFIXES = 
 
+DISTCHECK_CONFIGURE_FLAGS = --disable-dvd --disable-mad --disable-libmpeg2 \
+	--disable-ffmpeg --disable-faad --disable-skins2
+
 # Tell aclocal to use -I m4. Wonder if it really works.
 ACLOCAL_AMFLAGS = -I m4
 
