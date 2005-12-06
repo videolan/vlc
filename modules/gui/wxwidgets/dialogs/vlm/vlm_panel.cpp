@@ -2,9 +2,9 @@
  * vlm_panel.cpp: VLM Panel
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
- * $Id: playlist.cpp 12582 2005-09-17 14:15:32Z zorglub $
+ * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/OR MODIFy
  * it under the terms of the GNU General Public License as published by
@@ -368,13 +368,13 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
 
     upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Name") ) ), 0,
                                         wxALIGN_CENTER_VERTICAL, 0 );
-    name_text = new wxTextCtrl( this, -1, wxU( _("") ), wxDefaultPosition,
+    name_text = new wxTextCtrl( this, -1, wxU( "" ), wxDefaultPosition,
                                           wxSize( 150, -1 ) );
     upper_sizer->Add( name_text , 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
 
     upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Input") ) ), 0,
                                         wxALIGN_CENTER_VERTICAL, 0 );
-    input_text = new wxTextCtrl( this, -1, wxU( _("") ) ,
+    input_text = new wxTextCtrl( this, -1, wxU( "" ) ,
                       wxDefaultPosition, wxSize( 150, -1 ) );
     upper_sizer->Add( input_text , 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
     upper_sizer->Add( new wxButton( this, ChooseInput_Event, wxU( _("Choose") )  ) );
@@ -384,7 +384,7 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
 
     upper_sizer->Add( new wxStaticText( this, -1, wxU( _("Output") ) ), 0,
                                         wxALIGN_CENTER_VERTICAL, 0 );
-    output_text = new wxTextCtrl( this, -1, wxU( _("") ) ,
+    output_text = new wxTextCtrl( this, -1, wxU( "" ) ,
                       wxDefaultPosition, wxSize( 150, -1 ) );
     upper_sizer->Add( output_text, 1, wxEXPAND | wxLEFT | wxRIGHT, 5 );
     upper_sizer->Add( new wxButton( this, ChooseOutput_Event,
