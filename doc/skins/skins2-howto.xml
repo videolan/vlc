@@ -110,30 +110,30 @@ difficulty to understand how VLC skins work.</para>
 <sect3 id="Theme">
   <title>Theme</title>
   <para>Main tag, for global attributes</para>
-      <sect4 id="version">
+      <sect4 id="themeversion">
       <title>version</title>
       <para>Version of the DTD used when making the skin, such as "2.0" (you can find the version in the <!--TODO: link-->DTD itself). This number might be used in the future to provide a better backward compatibility with older skins.</para>
       <para><emphasis>Required.</emphasis></para>
     </sect4>
-    <sect4 id="tooltipfont">
+    <sect4 id="themetooltipfont">
       <title>tooltipfont</title>
       <para>Identifiant of a <link linkend="Font">Font</link> or <link linkend="BitmapFont">BitmapFont</link>, used for the tooltips (beware that any character not present in a <link linkend="BitmapFont">BitmapFont</link> will be printed as a space, so will be invisible). The default value uses a font provided with VLC, so you don't need to provide it with your skin.</para>
       <para>Default value: defaultfont</para>
     </sect4>
-    <sect4 id="magnet">
+    <sect4 id="thememagnet">
       <title>magnet</title>
       <para>Allows to select the range of action (in pixels) of magnetism with borders of the screen: when the distance between the border of the screen and an anchor of a window is less than this value, the window will stick to the border. 0 disables magnetism with the screen borders.</para>
       <para>Default value: 15</para>
     </sect4>
-    <sect4 id="alpha">
+    <sect4 id="themealpha">
       <title>alpha</title>
       <para>Sets the alpha transparency of the windows. The value must be between 1 (nearly total transparency) and 255 (total opacity). Low values should be avoided.</para>
 <note><para>This only works if transparency is not disabled in the preferences of the skins2 module.</para></note>
       <para>Default value: 255</para>
     </sect4>
-    <sect4 id="movealpha">
+    <sect4 id="thememovealpha">
       <title>movealpha</title>
-      <para>Sets the alpha transparency of the windows when they are moving. Same range as <link linkend="alpha">alpha</link>.</para>
+      <para>Sets the alpha transparency of the windows when they are moving. Same range as <link linkend="themealpha">alpha</link>.</para>
       <note><para>This only works if transparency is not disabled in the preferences of the skins2 module.</para></note>
       <para>Default value: 255</para>
     </sect4>
@@ -142,22 +142,22 @@ difficulty to understand how VLC skins work.</para>
 <sect3 id="ThemeInfo">
   <title>ThemeInfo</title>
   <para>You can enter here some information about you (but this information is currently unused by VLC...)</para>
-      <sect4 id="name">
+      <sect4 id="themeinfoname">
       <title>name</title>
       <para>Skin name. Not supported yet.</para>
       <para><emphasis>Implied.</emphasis></para>
     </sect4>
-    <sect4 id="author">
+    <sect4 id="themeinfoauthor">
       <title>author</title>
       <para>Author of the skin. Not supported yet.</para>
       <para><emphasis>Implied.</emphasis></para>
     </sect4>
-    <sect4 id="email">
+    <sect4 id="themeinfoemail">
       <title>email</title>
       <para>Email of the author. Not supported yet.</para>
       <para><emphasis>Implied.</emphasis></para>
     </sect4>
-    <sect4 id="webpage">
+    <sect4 id="themeinfowebpage">
       <title>webpage</title>
       <para>Web page in relation with the skin. Not supported yet.</para>
       <para>Default value: http://www.videolan.org/vlc/</para>
@@ -177,18 +177,18 @@ difficulty to understand how VLC skins work.</para>
     <para>Indicates the path and name of the bitmap file used. This path can be absolute (but you should definitely avoid it), or relative to the path of the XML file.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect4>
-  <sect4 id="alphacolor">
+  <sect4 id="bitmapalphacolor">
     <title>alphacolor</title>
     <para>Transparency color of the bitmap. It must be indicated with the following format: "#RRGGBB", where RR stands for the hexadecimal value of the red component, GG for the green one, and BB for the blue one.</para>
     <note><para>If your PNG file specifies a transparency mask, it will be taken into account too.</para></note>
     <para>Default value: #000000</para><!--XXX: should we change it into a less often used color?-->
   </sect4>
-  <sect4 id="nbframes">
+  <sect4 id="bitmapnbframes">
     <title>nbframes</title>
     <para>This attribute is needed to define animated bitmaps; it is the number of frames (images) contained in your animation. All the different frames are just images laid vertically in the bitmap. Animated GIFs are not supported at the moment. (since VLC 0.8.5)</para>
     <para>Default value: 1</para>
   </sect4>
-  <sect4 id="fps">
+  <sect4 id="bitmapfps">
     <title>fps</title>
     <para>Only used in animated bitmaps; it is the number of frames (images) per seconds of the animation. (since VLC 0.8.5)</para>
     <para>Default value: 0</para>
@@ -226,12 +226,12 @@ difficulty to understand how VLC skins work.</para>
   </sect4>
   <sect4 id="subbitmapnbframes">
     <title>nbframes</title>
-    <para>Same as in <link linkend="nbframes">Bitmap</link> tag.</para>
+    <para>Same as in <link linkend="bitmapnbframes">Bitmap</link> tag.</para>
     <para>Default value: 1</para>
   </sect4>
   <sect4 id="subbitmapfps">
     <title>fps</title>
-    <para>Same as in <link linkend="fps">Bitmap</link> tag.</para>
+    <para>Same as in <link linkend="bitmapfps">Bitmap</link> tag.</para>
   </sect4>
 
 </sect3>
@@ -249,7 +249,7 @@ difficulty to understand how VLC skins work.</para>
     <para>This is the file containing a TrueType font.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect4>
-  <sect4 id="size">
+  <sect4 id="fontsize">
     <title>size</title>
     <para>This is the size of the font, in points.</para>
     <para>Default value: 12</para>
@@ -269,7 +269,7 @@ difficulty to understand how VLC skins work.</para>
     <para>This is the file containing a bitmap font, à la Winamp.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect4>
-  <sect4 id="type">
+  <sect4 id="bitmapfonttype">
     <title>type</title>
     <para>Type of font, one of "digits" or "text".</para>
     <para>Default value: digits</para>
@@ -299,14 +299,14 @@ difficulty to understand how VLC skins work.</para>
     <para>Initial top position of the window.</para>
     <para>Default value: 0</para>
   </sect4>
-  <sect4 id="dragdrop">
+  <sect4 id="windowdragdrop">
     <title>dragdrop</title>
     <para>Indicates whether drag and drop of media files is allowed on this window.</para>
     <para>Default value: true</para>
   </sect4>
-  <sect4 id="playondrop">
+  <sect4 id="windowplayondrop">
     <title>playondrop</title>
-    <para>Indicates whether a dropped file is played directly (true) or only enqueued (false). This attribute has no effect if <link linkend="dragdrop">dragdrop</link> is set to "false".</para>
+    <para>Indicates whether a dropped file is played directly (true) or only enqueued (false). This attribute has no effect if <link linkend="windowdragdrop">dragdrop</link> is set to "false".</para>
     <para>Default value: true</para>
   </sect4>
 </sect3>
@@ -363,7 +363,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect3 id="Anchor">
   <title>Anchor</title>
-  <para>Create a "magnetic point" (or curve) in the current window. If an anchor of another window enters in the range of action of this anchor, the 2 anchors will automatically be on the same place, and the windows are "sticked". Each anchor has a priority (<link linkend="priority">priority</link> attribute), and the anchor with the highest priority is the winner, which means that when moving its window all the other anchored windows will move too. To break the effect of 2 anchored windows, you need to move the window whose anchor has the lower priority.</para>
+  <para>Create a "magnetic point" (or curve) in the current window. If an anchor of another window enters in the range of action of this anchor, the 2 anchors will automatically be on the same place, and the windows are "sticked". Each anchor has a priority (<link linkend="anchorpriority">priority</link> attribute), and the anchor with the highest priority is the winner, which means that when moving its window all the other anchored windows will move too. To break the effect of 2 anchored windows, you need to move the window whose anchor has the lower priority.</para>
   <sect4 id="anchorx">
     <title>x</title>
     <para>Is it really necessary to explain ?</para>
@@ -374,7 +374,7 @@ difficulty to understand how VLC skins work.</para>
     <para>...</para>
     <para>Default value: 0</para>
   </sect4>
-  <sect4 id="priority">
+  <sect4 id="anchorpriority">
     <title>priority</title>
     <para>Priority of anchor (see the previous description).</para>
     <para><emphasis>Required.</emphasis></para>
@@ -385,7 +385,7 @@ difficulty to understand how VLC skins work.</para>
     <note><para>You don't need to change this parameter if all you want is a ponctual anchor.</para></note>
     <para>Default value: (0,0)</para>
   </sect4>
-  <sect4 id="range">
+  <sect4 id="anchorrange">
     <title>range</title>
     <para>Range of action of the anchor, in pixels. Default is "10".</para>
     <para>Default value: 10</para>
@@ -442,7 +442,7 @@ difficulty to understand how VLC skins work.</para>
     <para>Identifiant of a <link linkend="Bitmap">Bitmap</link>.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect4>
-  <sect4 id="resize">
+  <sect4 id="imageresize">
     <title>resize</title>
     <para>Since VLC 0.8.2. Specify the behaviour of the image when it is resized. Possible values are 'mosaic' (the image is repeated as many times as necessary to reach the wanted dimensions) and 'scale' (the image is actually rescaled). Beware that the 'scale' behaviour is much slower than the 'mosaic' one, so make sure to use it only when it's really needed.</para>
     <para>Default value: mosaic.</para>
@@ -450,6 +450,11 @@ difficulty to understand how VLC skins work.</para>
   <sect4 id="imageaction">
     <title>action</title>
     <para>Action triggered by a click on the control. Possible values are 'move', to move the window, 'resizeE', to resize horizontally, 'resizeS' to resize vertically, and 'resizeSE' to resize both horizontally and vertically. Mnemonics: S, E and SE stand for South, East, and South-East. The 'resizeS' and 'resizeE' actions are available since VLC 0.8.5 only.</para>
+    <para>Default value: none</para>
+  </sect4>
+  <sect4 id="imageaction2">
+    <title>action2</title>
+    <para>Action triggered by a double-click on the control. See <link linkend="actions">Actions</link> for a list of possible actions. (Since VLC 0.8.5).</para>
     <para>Default value: none</para>
   </sect4>
 </sect3>
@@ -601,7 +606,7 @@ difficulty to understand how VLC skins work.</para>
     <para>Points defining the <link linkend="bezier">Bezier curve</link> followed by the slider cursor.</para>
     <para>Default value: none</para>
   </sect4>
-  <sect4 id="thickness">
+  <sect4 id="sliderthickness">
     <title>thickness</title>
     <para>Thickness of the slider curve. This attribute is used to determine whether the mouse is over the slider (hence whether a mouse click will have an effect on the cursor position).</para>
     <para>Default value: 10</para>
@@ -890,6 +895,9 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>$D</emphasis>: Duration of the stream, when available (the output format is H:MM:SS).
   </para></listitem>
   <listitem><para>
+    <emphasis>$t, $l, $d</emphasis>: Same as $T, $L and $D, except that the hour in the format is displayed only if its value is different from 0. These text variables were needed to support Winamp2 skins, but it is advised to use the uppercase ones. (Since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
     <emphasis>$H</emphasis>: Value of the <link linkend="help">help</link> attribute of the control that is under the mouse. The main use of this escape character is to create a kind of status bar, providing contextual help.</para>
     <note><para>Escape sequences in the help string are also transformed (except $H itself, it would generate an infinite loop!).</para></note>
   </listitem>
@@ -990,10 +998,10 @@ difficulty to understand how VLC skins work.</para>
 
 <para>Since VLC 0.8.5, it is also possible to archive your skin in a zip file.</para>
 
-<para>It is advised to rename your .tar.gz (or .zip) archive with the .vlt extention, for 2 main reasons:</para>
+<para>It is advised to rename your .tar.gz (or .zip) archive with the .vlt extension, for 2 main reasons:</para>
 
 <itemizedlist>
-  <listitem><para>on some systems, the "Change skin" dialog box only displays files which have a .vlt or .xml extention,</para></listitem>
+  <listitem><para>on some systems, the "Change skin" dialog box only displays files which have a .vlt or .xml extension,</para></listitem>
   <listitem><para>in the future, .vlt files could be associated to VLC in such a way that double-clicking a .vlt file would automatically load the skin in VLC.</para></listitem>
 </itemizedlist>
 
