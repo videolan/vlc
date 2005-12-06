@@ -301,7 +301,7 @@ vlc-config.in: vlc-config.in.in
 
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
-DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in
+DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 
 if HAVE_WIN32
 lib_LIBRARIES = lib/libvlc.a
