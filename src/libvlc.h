@@ -870,7 +870,7 @@ static char *ppsz_clock_descriptions[] =
 #define TITLE_NEXT_LONGTEXT N_("Select the key to choose the next title from the DVD")
 #define CHAPTER_PREV_TEXT N_("Select prev DVD chapter")
 #define CHAPTER_PREV_LONGTEXT N_("Select the key to choose the previous chapter from the DVD")
-#define CHAPTER_NEXT_TEXT N_("Select prev DVD chapter")
+#define CHAPTER_NEXT_TEXT N_("Select next DVD chapter")
 #define CHAPTER_NEXT_LONGTEXT N_("Select the key to choose the next chapter from the DVD")
 #define VOL_UP_KEY_TEXT N_("Volume up")
 #define VOL_UP_KEY_LONGTEXT N_("Select the key to increase audio volume.")
