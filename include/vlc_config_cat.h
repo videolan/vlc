@@ -2,7 +2,7 @@
  * vlc_help.h: Help strings
  *****************************************************************************
  * Copyright (C) 2003 the VideoLAN team
- * $Id: vlc_help.h 9171 2004-11-06 11:15:50Z zorglub $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
@@ -196,7 +196,7 @@
 #define CHROMA_HELP N_("These settings affect chroma transformation modules.")
 
 #define PACKETIZER_TITLE  N_("Packetizer modules settings" )
-#define PACKETIZER_HELP N_(" ")
+#define PACKETIZER_HELP " "
 
 #define ENCODER_TITLE N_("Encoders settings")
 #define ENCODER_HELP N_( \
@@ -214,7 +214,7 @@
     "for example by setting the subtitles type or file name.")
 
 #define VIDEO_FILTER2_TITLE N_("Video filters settings")
-#define VIDEO_FILTER2_HELP N_(" ")
+#define VIDEO_FILTER2_HELP " "
 
 /*
  *  A little help for modules with unknown capabilities
