@@ -217,7 +217,6 @@ modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
 modules/access/vcd/vcd.c
 modules/access/vcdx/access.c
-modules/access/vcdx/demux.c
 modules/access/vcdx/info.c
 modules/access/vcdx/info.h
 modules/access/vcdx/intf.c
@@ -342,7 +341,6 @@ modules/codec/x264.c
 modules/control/corba/corba.c
 modules/control/corba/mediacontrol-core.c
 modules/control/corba/mediacontrol-core.h
-modules/control/corba/mediacontrol-init.c
 modules/control/corba/mediacontrol-plugin.c
 modules/control/gestures.c
 modules/control/hotkeys.c
@@ -809,7 +807,6 @@ modules/misc/qte_main.cpp
 modules/misc/rtsp.c
 modules/misc/screensaver.c
 modules/misc/svg.c
-modules/misc/testsuite/playlist.c
 modules/misc/testsuite/test1.c
 modules/misc/testsuite/test2.cpp
 modules/misc/testsuite/test3.m
