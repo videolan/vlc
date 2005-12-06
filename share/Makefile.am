@@ -73,6 +73,7 @@ DIST_skins2 = \
 DIST_http = \
 	http/index.html \
 	http/info.html \
+	http/.hosts \
 	http/admin/index.html \
 	http/admin/browse.html \
 	http/admin/dboxfiles.html \
