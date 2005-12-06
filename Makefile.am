@@ -115,6 +115,7 @@ HEADERS_include = \
 	include/vlc_md5.h \
 	include/vlc_image.h \
 	include/vlc_input.h \
+	include/vlc_interaction.h \
 	include/vlc_interface.h \
 	include/vlc_keys.h \
 	include/vlc_messages.h \
