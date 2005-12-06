@@ -4,7 +4,7 @@
  * Copyright (C) 1999-2004 VideoLAN
  * $Id: vlc_interaction.h 7954 2004-06-07 22:19:12Z fenrir $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,6 +88,9 @@ enum
 #define intf_Interact( a,b ) __intf_Interact( VLC_OBJECT(a), b )
 VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 
-VLC_EXPORT( int,__intf_InteractionManage,( playlist_t *) );
+#if 0
+VLC_NO_EXPORT_YET( int,__intf_InteractionManage,( playlist_t *) );
+#endif
 
 VLC_EXPORT( void, intf_UserFatal,( vlc_object_t*, const char*, const char*, ...));
+

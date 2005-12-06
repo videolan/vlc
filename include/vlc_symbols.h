@@ -416,7 +416,6 @@ int playlist_ItemToNode (playlist_t *,playlist_item_t *);
 void stream_DemuxDelete (stream_t *s);
 aout_input_t * __aout_DecNew (vlc_object_t *, aout_instance_t **, audio_sample_format_t *);
 int playlist_AddExt (playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int);
-int __intf_InteractionManage (playlist_t *);
 void date_Move (date_t *, mtime_t);
 int vlc_closedir (void *);
 void aout_FiltersDestroyPipeline (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters);
@@ -856,7 +855,6 @@ struct module_symbols_t
     int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
     int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
     void (*intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
-    int (*__intf_InteractionManage_inner) (playlist_t *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1270,7 +1268,6 @@ struct module_symbols_t
 #  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
 #  define __intf_Interact (p_symbols)->__intf_Interact_inner
 #  define intf_UserFatal (p_symbols)->intf_UserFatal_inner
-#  define __intf_InteractionManage (p_symbols)->__intf_InteractionManage_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1687,7 +1684,6 @@ struct module_symbols_t
     ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
     ((p_symbols)->__intf_Interact_inner) = __intf_Interact; \
     ((p_symbols)->intf_UserFatal_inner) = intf_UserFatal; \
-    ((p_symbols)->__intf_InteractionManage_inner) = __intf_InteractionManage; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
