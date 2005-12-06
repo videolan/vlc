@@ -242,6 +242,7 @@ static void Close( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
     if( p_sys->p_sps ) block_Release( p_sys->p_sps );
     if( p_sys->p_pps ) block_Release( p_sys->p_pps );
     block_BytestreamRelease( &p_sys->bytestream );
@@ -384,6 +385,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
         }
         p += i_size;
     }
+    block_Release( p_block );
 
     return p_ret;
 }
