@@ -2,7 +2,7 @@
  * util.c : Utility functions for HTTP interface
  *****************************************************************************
  * Copyright (C) 2001-2005 the VideoLAN team
- * $Id: http.c 12225 2005-08-18 10:01:30Z massiot $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -245,7 +245,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             f->p_redir2 = NULL;
             f->file = psz_file;
             f->name = psz_name;
-            f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) ? VLC_TRUE : VLC_FALSE;
+            f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) || strstr( &dir[strlen( psz_root )], ".xml" ) ? VLC_TRUE : VLC_FALSE;
 
             if( !f->name )
             {
@@ -261,7 +261,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
             {
                 f->p_file = httpd_FileNew( p_sys->p_httpd_host,
                                            f->name,
-                                           f->b_html ? p_sys->psz_html_type :
+                                           f->b_html ? ( strstr( &dir[strlen( psz_root )], ".xml" ) ? "text/xml; charset=UTF-8" : p_sys->psz_html_type ) :
                                             NULL,
                                            user, password, p_acl,
                                            E_(HttpCallback), f );
