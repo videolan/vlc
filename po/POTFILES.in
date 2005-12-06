@@ -140,7 +140,6 @@ src/playlist/playlist.c
 src/playlist/services_discovery.c
 src/playlist/sort.c
 src/playlist/view.c
-src/stream_output/acl.c
 src/stream_output/announce.c
 src/stream_output/sap.c
 src/stream_output/stream_output.c
