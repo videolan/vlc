@@ -201,7 +201,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->p_preparse->pp_waiting = NULL;
 
     // Interaction
-    p_playlist->b_manage_interaction = VLC_FALSE;
     p_playlist->p_interaction = NULL;
 
     vlc_object_attach( p_playlist->p_preparse, p_playlist );
@@ -584,7 +583,7 @@ static void RunThread ( playlist_t *p_playlist )
 
     while( !p_playlist->b_die )
     {
-        if( p_playlist->b_manage_interaction )
+        if( p_playlist->p_interaction )
         {
             intf_InteractionManage( p_playlist );
         }
@@ -882,7 +881,8 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     }
 
     /* Repeat and play/stop */
-    if( !p_playlist->request.b_request && b_repeat == VLC_TRUE )
+    if( !p_playlist->request.b_request && b_repeat == VLC_TRUE &&
+         p_playlist->status.p_item )
     {
         msg_Dbg( p_playlist,"repeating item" );
         return p_playlist->status.p_item;
