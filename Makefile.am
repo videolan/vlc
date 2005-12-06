@@ -552,7 +552,7 @@ endif
 install-exec-local:
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
-	  ln -s vlc "$(DESTDIR)$(bindir)/$$i" ; \
+	  ln -sf vlc "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
 	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"
 
