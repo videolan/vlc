@@ -26,7 +26,6 @@
  *   This file contains functions related to user interaction management
  */
 
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -41,9 +40,18 @@
 #include "vlc_interface.h"
 #include "vlc_playlist.h"
 
-static void intf_InteractionInit( playlist_t *p_playlist );
-static int intf_WaitAnswer( intf_thread_t *p_intf, interaction_dialog_t *p_interact );
-static int intf_Send( intf_thread_t *p_intf, interaction_dialog_t *p_interact );
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static void 	       	     intf_InteractionInit( playlist_t *p_playlist );
+static interaction_t *       intf_InteractionGet( vlc_object_t *p_this );
+static void 		     intf_InteractionSearchInterface( interaction_t *
+							      p_interaction );
+static int 		     intf_WaitAnswer( interaction_t *p_interact,
+					      interaction_dialog_t *p_dialog );
+static int 		     intf_Send( interaction_t *p_interact,
+			                interaction_dialog_t *p_dialog );
+static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* , int );
 
 /**
  * Send an interaction element to the user
@@ -53,116 +61,108 @@ static int intf_Send( intf_thread_t *p_intf, interaction_dialog_t *p_interact );
  * \return VLC_SUCCESS or an error code
  */
 int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
-                                    p_interact )
+                                    p_dialog )
 {
-    vlc_list_t  *p_list;
-    int          i_index;
-    intf_thread_t *p_chosen_intf;
 
+    interaction_t *p_interaction = intf_InteractionGet( p_this );
 
-    /* Search a suitable intf */
-    p_list = vlc_list_find( p_this, VLC_OBJECT_INTF, FIND_ANYWHERE );
-    if( !p_list )
+    /* Get an id, if we don't already have one */
+    if( p_dialog->i_id == 0 )
     {
-        msg_Err( p_this, "Unable to create module list" );
-        return VLC_FALSE;
+        p_dialog->i_id = ++p_interaction->i_last_id;
     }
 
-    p_chosen_intf = NULL;
-    for( i_index = 0; i_index < p_list->i_count; i_index ++ )
+    if( p_dialog->i_type == INTERACT_ASK )
     {
-        intf_thread_t *p_intf = (intf_thread_t *)
-                                        p_list->p_values[i_index].p_object;
-        if( p_intf->pf_interact != NULL )
-        {
-            p_chosen_intf = p_intf;
-            break;
-        }
-    }
-    if( !p_chosen_intf )
-    {
-        msg_Dbg( p_this, "No interface suitable for interaction" );
-        return VLC_FALSE;
-    }
-    msg_Dbg( p_this, "found an interface for interaction" );
-
-    /* Find id, if we don't already have one */
-    if( p_interact->i_id == 0 )
-    {
-        p_interact->i_id = ++p_chosen_intf->i_last_id;
-    }
-
-    if( p_interact->i_type == INTERACT_ASK )
-    {
-        return intf_WaitAnswer( p_chosen_intf, p_interact );
+        return intf_WaitAnswer( p_interaction, p_dialog );
     }
     else
     {
-        return intf_Send( p_chosen_intf, p_interact );
+        return intf_Send( p_interaction, p_dialog );
     }
 }
 
-int intf_WaitAnswer( intf_thread_t *p_intf, interaction_dialog_t *p_interact )
+/** 
+ * Destroy the interaction system
+ */
+void intf_InteractionDestroy( interaction_t *p_interaction )
 {
-    // TODO: Add to queue, wait for answer
-    return VLC_SUCCESS;
+    /// \todo Code this, and call it
 }
 
-int intf_Send( intf_thread_t *p_intf, interaction_dialog_t *p_interact )
-{
-    // TODO: Add to queue, return
-    return VLC_SUCCESS;
-}
-
-// The playlist manages the user interaction to avoid creating another thread
+/** 
+ * The main interaction processing loop
+ * This function is called from the playlist loop
+ * 
+ * \param p_playlist the parent playlist
+ * \return nothing
+ */
 void intf_InteractionManage( playlist_t *p_playlist )
 {
-    if( p_playlist->p_interaction == NULL )
+    int i_index;
+    interaction_t *p_interaction;
+
+    p_interaction = p_playlist->p_interaction;
+
+    // Nothing to do
+    if( p_interaction->i_dialogs == 0 ) return;
+
+    vlc_mutex_lock( &p_interaction->object_lock );
+
+    intf_InteractionSearchInterface( p_interaction );
+
+    if( !p_interaction->p_intf )
     {
-        intf_InteractionInit( p_playlist );
+        vlc_mutex_unlock( &p_interaction->object_lock );
+
+        /// \todo Remove all dialogs as we can't display them
+        return;
     }
 
-    vlc_mutex_lock( &p_playlist->p_interaction->object_lock );
+    vlc_object_yield( p_interaction->p_intf );
 
-    /* Todo:
-     *    - Walk the queue
-     *    - If blocking
-     *       - If have answer, signal what is waiting (vlc_cond ? dangerous in case of pb ?)
-     *         And then, if not reusable, destroy
-     *    - If have update, send update
-     */
+    for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
+    {
+        interaction_dialog_t *p_dialog = p_interaction->pp_dialogs[i_index];
+
+        if( p_dialog->b_have_answer )
+        {
+            /// \todo Signal we have an answer
+            // - If have answer, signal what is waiting
+            // (vlc_cond ? dangerous in case of pb ?)
+
+            // Ask interface to hide it
+            p_interaction->p_intf->pf_interact( p_interaction->p_intf,
+                                                p_dialog, INTERACT_HIDE );
+
+        }
+
+        if( p_dialog->b_updated )
+        {
+            p_dialog->b_finished = VLC_FALSE;
+            p_interaction->p_intf->pf_interact( p_interaction->p_intf,
+                                                p_dialog, INTERACT_UPDATE );
+        }
+
+        if( p_dialog->b_finished && !p_dialog->b_reusable )
+        {
+            /// \todo Destroy the dialog
+        }
+        // This is truly a new dialog, send it.
+        p_interaction->p_intf->pf_interact( p_interaction->p_intf,
+                                            p_dialog, INTERACT_NEW );
+    }
+
+    vlc_object_release( p_interaction->p_intf );
 
     vlc_mutex_unlock( &p_playlist->p_interaction->object_lock );
 }
 
-static void intf_InteractionInit( playlist_t *p_playlist )
-{
-    interaction_t *p_interaction;
-    p_interaction = vlc_object_create( VLC_OBJECT( p_playlist ), sizeof( interaction_t ) );
-    if( !p_interaction )
-    {
-        msg_Err( p_playlist,"out of memory" );
-        return;
-    }
 
-    p_interaction->i_dialogs = 0;
-    p_interaction->pp_dialogs = NULL;
-}
-
-/** Helper function to build a progress bar */
-interaction_dialog_t *__intf_ProgressBuild( vlc_object_t *p_this,
-                                          const char *psz_text )
-{
-    interaction_dialog_t *p_new = (interaction_dialog_t *)malloc(
-                                        sizeof( interaction_dialog_t ) );
-
-
-    return p_new;
-}
 
 #define INTERACT_INIT( new )                                            \
-        interaction_dialog_t *new = (interaction_dialog_t*)malloc(          \
-                                        sizeof( interaction_dialog_t ) ); \
+        new = (interaction_dialog_t*)malloc(                            \
+                        sizeof( interaction_dialog_t ) );               \
         new->i_widgets = 0;                                             \
         new->pp_widgets = NULL;                                         \
         new->psz_title = NULL;                                          \
@@ -173,21 +173,182 @@ interaction_dialog_t *__intf_ProgressBuild( vlc_object_t *p_this,
         if( new->psz_title ) free( new->psz_title );                    \
         if( new->psz_description ) free( new->psz_description );
 
-/** Helper function to send a fatal message */
-void intf_UserFatal( vlc_object_t *p_this, const char *psz_title,
-                     const char *psz_format, ... )
+/** Helper function to send a fatal message
+ *  \param p_this     Parent vlc_object
+ *  \param i_id       A predefined ID, 0 if not applicable
+ *  \param psz_title  Title for the dialog
+ *  \param psz_format The message to display
+ *  */
+void __intf_UserFatal( vlc_object_t *p_this, int i_id,
+                       const char *psz_title,
+                       const char *psz_format, ... )
 {
     va_list args;
+    interaction_dialog_t *p_new = NULL;
+    user_widget_t *p_widget = NULL;
 
-    INTERACT_INIT( p_new );
+    if( i_id > 0 )
+    {
+        p_new = intf_InteractionGetById( p_this, i_id );
+    }
+    if( !p_new )
+    {
+        INTERACT_INIT( p_new );
+    }
+
     p_new->i_type = INTERACT_FATAL;
     p_new->psz_title = strdup( psz_title );
 
+    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
+
+    p_widget->i_type = WIDGET_TEXT;
+
     va_start( args, psz_format );
-    vasprintf( &p_new->psz_description, psz_format, args );
+    vasprintf( &p_widget->psz_text, psz_format, args );
     va_end( args );
 
-    intf_Interact( p_this, p_new );
+    INSERT_ELEM ( p_new->pp_widgets,
+                  p_new->i_widgets,
+                  p_new->i_widgets,
+                  p_widget );
 
-    INTERACT_FREE( p_new );
+    intf_Interact( p_this, p_new );
+}
+
+#if 0
+/** Helper function to build a progress bar 
+ * \param p_this   Parent vlc object
+ */
+interaction_dialog_t *__intf_ProgressBuild( vlc_object_t *p_this,
+                                            const char *psz_text )
+{
+    interaction_dialog_t *p_new = (interaction_dialog_t *)malloc(
+                                        sizeof( interaction_dialog_t ) );
+
+
+    return p_new;
+}
+#endif
+
+
+
+/**********************************************************************
+ * The following functions are local
+ **********************************************************************/
+
+/* Get the interaction object. Create it if needed */
+static interaction_t * intf_InteractionGet( vlc_object_t *p_this )
+{
+    playlist_t *p_playlist;
+    interaction_t *p_interaction;
+
+    p_playlist = (playlist_t*) vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+
+    if( !p_playlist )
+    {
+        return NULL;
+    }
+
+    if( p_playlist->p_interaction == NULL )
+    {
+        intf_InteractionInit( p_playlist );
+    }
+
+    p_interaction = p_playlist->p_interaction;
+
+    vlc_object_release( p_playlist );
+
+    return p_interaction;
+}
+
+/* Create the interaction object in the given playlist object */
+static void intf_InteractionInit( playlist_t *p_playlist )
+{
+    interaction_t *p_interaction;
+
+    msg_Dbg( p_playlist, "initializing interaction system" );
+
+    p_interaction = vlc_object_create( VLC_OBJECT( p_playlist ),
+                                       sizeof( interaction_t ) );
+    if( !p_interaction )
+    {
+        msg_Err( p_playlist,"out of memory" );
+        return;
+    }
+
+    p_interaction->i_dialogs = 0;
+    p_interaction->pp_dialogs = NULL;
+    p_interaction->p_intf = NULL;
+    p_interaction->i_last_id = DIALOG_LAST_PREDEFINED + 1;
+
+    vlc_mutex_init( p_interaction , &p_interaction->object_lock );
+
+    p_playlist->p_interaction  = p_interaction;
+}
+
+/* Look for an interface suitable for interaction */
+static void intf_InteractionSearchInterface( interaction_t *p_interaction )
+{
+    vlc_list_t  *p_list;
+    int          i_index;
+
+    p_interaction->p_intf = NULL;
+
+    p_list = vlc_list_find( p_interaction, VLC_OBJECT_INTF, FIND_ANYWHERE );
+    if( !p_list )
+    {
+        msg_Err( p_interaction, "Unable to create module list" );
+        return;
+    }
+
+    for( i_index = 0; i_index < p_list->i_count; i_index ++ )
+    {
+        intf_thread_t *p_intf = (intf_thread_t *)
+                                        p_list->p_values[i_index].p_object;
+        if( p_intf->pf_interact != NULL )
+        {
+            p_interaction->p_intf = p_intf;
+            break;
+        }
+    }
+    vlc_list_release ( p_list );
+}
+
+/* Add a dialog to the queue and wait for answer */
+static int intf_WaitAnswer( interaction_t *p_interact, interaction_dialog_t *p_dialog )
+{
+    // TODO: Add to queue, wait for answer
+    return VLC_SUCCESS;
+}
+
+/* Add a dialog to the queue and return */
+static int intf_Send( interaction_t *p_interact, interaction_dialog_t *p_dialog )
+{
+    vlc_mutex_lock( &p_interact->object_lock );
+
+    /// \todo Check first it does not exist !!!
+    INSERT_ELEM( p_interact->pp_dialogs,
+                 p_interact->i_dialogs,
+                 p_interact->i_dialogs,
+                 p_dialog );
+    vlc_mutex_unlock( &p_interact->object_lock );
+    return VLC_SUCCESS;
+}
+
+/* Find an interaction dialog by its id */
+static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* p_this,
+                                                       int i_id )
+{
+    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    int i;
+
+    for( i = 0 ; i< p_interaction->i_dialogs; i++ )
+    {
+        if( p_interaction->pp_dialogs[i]->i_id == i_id )
+        {
+            return p_interaction->pp_dialogs[i];
+        }
+    }
+    return NULL;
 }

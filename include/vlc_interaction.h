@@ -58,8 +58,34 @@ struct interaction_dialog_t
 
     vlc_bool_t      b_have_answer;      //< Has an answer been given ?
     vlc_bool_t      b_reusable;         //< Do we have to reuse this ?
+    vlc_bool_t      b_updated;          //< Update for this one ?
+    vlc_bool_t      b_finished;         //< Hidden by interface
 
     void *          p_private;          //< Private interface data
+};
+
+/**
+ * Possible interaction types
+ */
+enum
+{
+    INTERACT_PROGRESS,          //< Progress bar
+    INTERACT_WARNING,           //< Warning message ("codec not supported")
+    INTERACT_FATAL,             //< Fatal message ("File not found")
+    INTERACT_FATAL_LIST,        //< List of fatal messages ("File not found")
+    INTERACT_ASK,               //< Full-featured dialog box (password)
+};
+
+/**
+ * Predefined reusable dialogs
+ */
+enum
+{
+    DIALOG_NOACCESS,
+    DIALOG_NOCODEC,
+    DIALOG_NOAUDIO,
+
+    DIALOG_LAST_PREDEFINED,
 };
 
 /**
@@ -72,25 +98,30 @@ struct interaction_t
 
     int                         i_dialogs;      //< Number of dialogs
     interaction_dialog_t      **pp_dialogs;     //< Dialogs
-};
 
+    intf_thread_t              *p_intf;         //< Interface to use
+
+    int                         i_last_id;      //< Last attributed ID
+};
 /**
- * Possible interaction types
+ * Possible actions
  */
 enum
 {
-    INTERACT_PROGRESS,          //< Progress bar
-    INTERACT_WARNING,           //< Warning message ("codec not supported")
-    INTERACT_FATAL,             //< Fatal message ("File not found")
-    INTERACT_ASK,               //< Full-featured dialog box (password)
+    INTERACT_NEW,
+    INTERACT_UPDATE,
+    INTERACT_HIDE
 };
+
+/***************************************************************************
+ * Exported symbols
+ ***************************************************************************/
 
 #define intf_Interact( a,b ) __intf_Interact( VLC_OBJECT(a), b )
 VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 
-#if 0
-VLC_NO_EXPORT_YET( int,__intf_InteractionManage,( playlist_t *) );
-#endif
+#define intf_UserFatal( a,b, c, d, e... ) __intf_UserFatal( a,b,c,d, ## e )
+VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, int, const char*, const char*, ...) );
 
-VLC_EXPORT( void, intf_UserFatal,( vlc_object_t*, const char*, const char*, ...));
-
+VLC_EXPORT( void, intf_InteractionManage,( playlist_t *) );
+VLC_EXPORT( void, intf_InteractionDestroy,( interaction_t *) );

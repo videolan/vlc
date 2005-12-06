@@ -38,6 +38,7 @@
 #include "stream_output.h"
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
+#include "vlc_interaction.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -2094,7 +2095,8 @@ static int InputSourceInit( input_thread_t *p_input,
         if( in->p_access == NULL )
         {
             msg_Err( p_input, "no suitable access module for `%s'", psz_mrl );
-            intf_UserFatal( p_input, "Unable to open '%s'", psz_mrl );
+            intf_UserFatal( VLC_OBJECT( p_input), DIALOG_NOACCESS,
+                            "Unable to open '%s'", psz_mrl );
             goto error;
         }
 

@@ -66,8 +66,7 @@ struct intf_thread_t
                                intf_dialog_args_t * );
 
     /** Interaction stuff */
-    int          i_last_id;
-    int ( *pf_interact ) ( intf_thread_t *, interaction_dialog_t *, vlc_bool_t );
+    int ( *pf_interact ) ( intf_thread_t *, interaction_dialog_t *, int );
 
     /** Video window callbacks */
     void * ( *pf_request_window ) ( intf_thread_t *, vout_thread_t *,

@@ -121,6 +121,7 @@ char* httpd_ClientIP (httpd_client_t *cl, char *psz_ip);
 void httpd_FileDelete (httpd_file_t *);
 module_t * __module_Need (vlc_object_t *, const char *, const char *, vlc_bool_t);
 const char * VLC_Changeset (void);
+void intf_InteractionDestroy (interaction_t *);
 void LocaleFree (const char *);
 void __vlc_object_attach (vlc_object_t *, vlc_object_t *);
 stream_t * __stream_UrlNew (vlc_object_t *p_this, const char *psz_url);
@@ -296,6 +297,7 @@ subpicture_t * spu_CreateSubpicture (spu_t *);
 void httpd_MsgAdd (httpd_message_t *, char *psz_name, char *psz_value, ...);
 int vout_vaControlDefault (vout_thread_t *, int, va_list);
 int playlist_NodeEmpty (playlist_t *, playlist_item_t *, vlc_bool_t);
+void __intf_UserFatal (vlc_object_t*, int, const char*, const char*, ...);
 spu_t * __spu_Create (vlc_object_t *);
 int playlist_NodeRemoveItem (playlist_t *,playlist_item_t*,playlist_item_t *);
 int __net_Accept (vlc_object_t *, int *, mtime_t);
@@ -325,6 +327,7 @@ int playlist_PreparseEnqueue (playlist_t *, input_item_t *);
 aout_buffer_t * aout_FifoPop (aout_instance_t * p_aout, aout_fifo_t * p_fifo);
 int __vout_InitPicture (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect);
 int playlist_LockClear (playlist_t *);
+void intf_InteractionManage (playlist_t *);
 char * mstrtime (char *psz_buffer, mtime_t date);
 void aout_FormatPrepare (audio_sample_format_t * p_format);
 void spu_DisplaySubpicture (spu_t *, subpicture_t *);
@@ -395,7 +398,6 @@ stream_t * __stream_MemoryNew (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i
 void mwait (mtime_t date);
 void __config_ResetAll (vlc_object_t *);
 httpd_redirect_t * httpd_RedirectNew (httpd_host_t *, const char *psz_url_dst, const char *psz_url_src);
-void intf_UserFatal (vlc_object_t*, const char*, const char*, ...);
 playlist_item_t * playlist_LockItemGetById (playlist_t *, int);
 mtime_t date_Get (const date_t *);
 int aout_DecPlay (aout_instance_t *, aout_input_t *, aout_buffer_t *);
@@ -854,7 +856,9 @@ struct module_symbols_t
     void (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
     int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
     int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
-    void (*intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
+    void (*intf_InteractionManage_inner) (playlist_t *);
+    void (*intf_InteractionDestroy_inner) (interaction_t *);
+    void (*__intf_UserFatal_inner) (vlc_object_t*, int, const char*, const char*, ...);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1267,7 +1271,9 @@ struct module_symbols_t
 #  define __input_Read (p_symbols)->__input_Read_inner
 #  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
 #  define __intf_Interact (p_symbols)->__intf_Interact_inner
-#  define intf_UserFatal (p_symbols)->intf_UserFatal_inner
+#  define intf_InteractionManage (p_symbols)->intf_InteractionManage_inner
+#  define intf_InteractionDestroy (p_symbols)->intf_InteractionDestroy_inner
+#  define __intf_UserFatal (p_symbols)->__intf_UserFatal_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1683,7 +1689,9 @@ struct module_symbols_t
     ((p_symbols)->__input_Read_inner) = __input_Read; \
     ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
     ((p_symbols)->__intf_Interact_inner) = __intf_Interact; \
-    ((p_symbols)->intf_UserFatal_inner) = intf_UserFatal; \
+    ((p_symbols)->intf_InteractionManage_inner) = intf_InteractionManage; \
+    ((p_symbols)->intf_InteractionDestroy_inner) = intf_InteractionDestroy; \
+    ((p_symbols)->__intf_UserFatal_inner) = __intf_UserFatal; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */

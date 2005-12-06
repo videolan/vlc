@@ -216,7 +216,6 @@ struct playlist_t
     // The following members are about user interaction
     // The playlist manages the user interaction to avoid creating another
     // thread
-    vlc_bool_t b_manage_interaction;
     interaction_t *p_interaction;
 
     /*@}*/
