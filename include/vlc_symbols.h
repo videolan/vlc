@@ -181,7 +181,6 @@ int playlist_Enable (playlist_t *, playlist_item_t *);
 playlist_item_t* __playlist_ItemCopy (vlc_object_t *,playlist_item_t*);
 char * vlc_strdup (const char *s);
 playlist_item_t* __playlist_ItemNew (vlc_object_t *,const char *,const char *);
-int __net_ConnectTCP (vlc_object_t *p_this, const char *psz_host, int i_port);
 int __var_Get (vlc_object_t *, const char *, vlc_value_t *);
 void tls_ServerDelete (tls_server_t *);
 unsigned int aout_FormatNbChannels (const audio_sample_format_t * p_format);
@@ -221,6 +220,7 @@ void __vlc_object_release (vlc_object_t *);
 int __var_Set (vlc_object_t *, const char *, vlc_value_t);
 void vout_LinkPicture (vout_thread_t *, picture_t *);
 void vout_DestroyPicture (vout_thread_t *, picture_t *);
+int __net_ConnectTCP (vlc_object_t *p_this, const char *psz_host, int i_port);
 int64_t vlc_strtoll (const char *nptr, char **endptr, int base);
 void __osd_MenuHide (vlc_object_t *);
 subpicture_region_t * __spu_MakeRegion (vlc_object_t *, video_format_t *, picture_t *);
@@ -235,6 +235,7 @@ int aout_Restart (aout_instance_t * p_aout);
 void * __vlc_object_create (vlc_object_t *, int);
 int __aout_VolumeInfos (vlc_object_t *, audio_volume_t *);
 const iso639_lang_t * GetLang_2T (const char *);
+int __intf_Interact (vlc_object_t *,interaction_dialog_t *);
 int playlist_NodeAddItem (playlist_t *, playlist_item_t *,int,playlist_item_t *,int , int);
 int __aout_VolumeMute (vlc_object_t *, audio_volume_t *);
 const char * VLC_CompileDomain (void);
@@ -394,6 +395,7 @@ stream_t * __stream_MemoryNew (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i
 void mwait (mtime_t date);
 void __config_ResetAll (vlc_object_t *);
 httpd_redirect_t * httpd_RedirectNew (httpd_host_t *, const char *psz_url_dst, const char *psz_url_src);
+void intf_UserFatal (vlc_object_t*, const char*, const char*, ...);
 playlist_item_t * playlist_LockItemGetById (playlist_t *, int);
 mtime_t date_Get (const date_t *);
 int aout_DecPlay (aout_instance_t *, aout_input_t *, aout_buffer_t *);
@@ -414,6 +416,7 @@ int playlist_ItemToNode (playlist_t *,playlist_item_t *);
 void stream_DemuxDelete (stream_t *s);
 aout_input_t * __aout_DecNew (vlc_object_t *, aout_instance_t **, audio_sample_format_t *);
 int playlist_AddExt (playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int);
+int __intf_InteractionManage (playlist_t *);
 void date_Move (date_t *, mtime_t);
 int vlc_closedir (void *);
 void aout_FiltersDestroyPipeline (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters);
@@ -851,6 +854,9 @@ struct module_symbols_t
     char * (*FromUTF32_inner) (const wchar_t *);
     void (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
     int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
+    int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
+    void (*intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
+    int (*__intf_InteractionManage_inner) (playlist_t *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1262,6 +1268,9 @@ struct module_symbols_t
 #  define FromUTF32 (p_symbols)->FromUTF32_inner
 #  define __input_Read (p_symbols)->__input_Read_inner
 #  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
+#  define __intf_Interact (p_symbols)->__intf_Interact_inner
+#  define intf_UserFatal (p_symbols)->intf_UserFatal_inner
+#  define __intf_InteractionManage (p_symbols)->__intf_InteractionManage_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1676,6 +1685,9 @@ struct module_symbols_t
     ((p_symbols)->FromUTF32_inner) = FromUTF32; \
     ((p_symbols)->__input_Read_inner) = __input_Read; \
     ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
+    ((p_symbols)->__intf_Interact_inner) = __intf_Interact; \
+    ((p_symbols)->intf_UserFatal_inner) = intf_UserFatal; \
+    ((p_symbols)->__intf_InteractionManage_inner) = __intf_InteractionManage; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
