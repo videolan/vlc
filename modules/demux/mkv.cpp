@@ -1041,21 +1041,14 @@ public:
             {
                 delete tracks[i_track]->p_compression_data;
             }
-            if( tracks[i_track]->fmt.psz_description )
-            {
-                free( tracks[i_track]->fmt.psz_description );
-            }
+            es_format_Clean( &tracks[i_track]->fmt );
+            if( tracks[i_track]->p_extra_data )
+                free( tracks[i_track]->p_extra_data );
             if( tracks[i_track]->psz_codec )
-            {
                 free( tracks[i_track]->psz_codec );
-            }
-            if( tracks[i_track]->fmt.psz_language )
-            {
-                free( tracks[i_track]->fmt.psz_language );
-            }
             delete tracks[i_track];
         }
-        
+
         if( psz_writing_application )
         {
             free( psz_writing_application );
@@ -1334,6 +1327,11 @@ public:
             delete opened_segments[i];
         for ( i=0; i<used_segments.size(); i++ )
             delete used_segments[i];
+        if( meta ) vlc_meta_Delete( meta );
+
+        while( titles.size() )
+        { vlc_input_title_Delete( titles.back() ); titles.pop_back();}
+
         vlc_mutex_destroy( &lock_demuxer );
     }
 
