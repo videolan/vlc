@@ -2,7 +2,7 @@
  * rpn.c : RPN evaluator for the HTTP Interface
  *****************************************************************************
  * Copyright (C) 2001-2005 the VideoLAN team
- * $Id: http.c 12225 2005-08-18 10:01:30Z massiot $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -906,6 +906,44 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
             msg_Dbg( p_intf, "requested to move playlist item %d to %d",
                      i_pos, i_newpos);
+        }
+        else if( !strcmp( s, "volume_set" ) )
+        {
+            char *psz_vol = E_(SSPop)( st );
+            int i_value;
+            audio_volume_t i_volume;
+            aout_VolumeGet( p_intf, &i_volume );
+            if( psz_vol[0] == '+' )
+            {
+                i_value = atoi( psz_vol );
+                if( (i_volume + i_value) > AOUT_VOLUME_MAX )
+                    aout_VolumeSet( p_intf, AOUT_VOLUME_MAX );
+                else
+                    aout_VolumeSet( p_intf, i_volume + i_value );
+            }
+            else if( psz_vol[0] == '-' )
+            {
+                i_value = atoi( psz_vol );
+                if( (i_volume + i_value) < AOUT_VOLUME_MIN )
+                    aout_VolumeSet( p_intf, AOUT_VOLUME_MIN );
+                else
+                    aout_VolumeSet( p_intf, i_volume + i_value );
+            }
+            else if( strstr( psz_vol, "%") != NULL )
+            {
+                i_value = atoi( psz_vol );
+                if( i_value < 0 ) i_value = 0;
+                if( i_value > 400 ) i_value = 400;
+                aout_VolumeSet( p_intf, (i_value * (AOUT_VOLUME_MAX - AOUT_VOLUME_MIN))/400+AOUT_VOLUME_MIN);
+            }
+            else
+            {
+                i_value = atoi( psz_vol );
+                if( i_value > AOUT_VOLUME_MAX ) i_value = AOUT_VOLUME_MAX;
+                if( i_value < AOUT_VOLUME_MIN ) i_value = AOUT_VOLUME_MIN;
+                aout_VolumeSet( p_intf, i_value );
+            }
+            aout_VolumeGet( p_intf, &i_volume );
         }
         else
         {
