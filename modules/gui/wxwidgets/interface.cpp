@@ -122,7 +122,8 @@ public:
 #else
                           wxCLIP_CHILDREN | wxSP_3DSASH ),
 #endif
-        p_intf(_p_intf), i_sash_position(150), i_width(-1)
+        p_intf(_p_intf), i_sash_position(150), i_width(-1),
+        b_video(0), i_delay(0)
     {
         SetSashSize( 0 );
     }
@@ -155,6 +156,9 @@ private:
             p_intf->p_sys->p_video_window && p_intf->p_sys->p_video_sizer &&
             p_intf->p_sys->p_video_sizer->GetMinSize() != wxSize(0,0) )
         {
+            if( !b_video ) i_delay = mdate() + 1000000;
+            b_video = VLC_TRUE;
+
             SetSashSize( -1 );
 
 #if defined( __WXMSW__ )
@@ -168,18 +172,25 @@ private:
         {
             wxSize size = GetWindow1()->GetSizer()->GetMinSize();
 
+            if( b_video ) i_delay = mdate() + 1000000;
+            b_video = VLC_FALSE;
+
             if( event.GetSize().GetHeight() - size.GetHeight() )
             {
                 SetSashSize( 0 );
 
                 SetSashPosition( size.GetHeight() ? size.GetHeight() : 1 );
-                i_sash_position = event.GetSize().GetHeight() -
-                    size.GetHeight();
-                i_width = event.GetSize().GetWidth();
 
-                size = wxSize( i_width, i_sash_position );
-                if( GetWindow2()->GetSizer() )
-                    GetWindow2()->GetSizer()->SetMinSize( size );
+                if( i_delay < mdate() )
+                {
+                    i_sash_position = event.GetSize().GetHeight() -
+                        size.GetHeight();
+                    i_width = event.GetSize().GetWidth();
+
+                    size = wxSize( i_width, i_sash_position );
+                    if( GetWindow2()->GetSizer() )
+                        GetWindow2()->GetSizer()->SetMinSize( size );
+                }
             }
         }
 
@@ -189,13 +200,23 @@ private:
     void OnSashPosChanged( wxSplitterEvent &event )
     {
         if( !GetSize().GetHeight() ){ event.Skip(); return; }
-        i_sash_position = GetSize().GetHeight() - event.GetSashPosition();
+
+        if( i_delay < mdate() )
+        {
+            i_sash_position = GetSize().GetHeight() - event.GetSashPosition();
+
+            wxSize size = wxSize( i_width, i_sash_position );
+            if( GetWindow2()->GetSizer() )
+                GetWindow2()->GetSizer()->SetMinSize( size );
+        }
         event.Skip();
     }
 
     intf_thread_t *p_intf;
     int i_sash_position;
     int i_width;
+    vlc_bool_t b_video;
+    mtime_t i_delay;
 };
 
 BEGIN_EVENT_TABLE(Splitter, wxSplitterWindow)
