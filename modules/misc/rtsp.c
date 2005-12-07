@@ -156,7 +156,7 @@ struct vod_sys_t
     vod_media_t **media;
 };
 
-static vod_media_t *MediaNew( vod_t *, char *, input_item_t * );
+static vod_media_t *MediaNew( vod_t *, const char *, input_item_t * );
 static void         MediaDel( vod_t *, vod_media_t * );
 static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
 static void         MediaDelES( vod_t *, vod_media_t *, es_format_t * );
@@ -254,7 +254,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Media handling
  *****************************************************************************/
-static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
+static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
                               input_item_t *p_item )
 {
     vod_sys_t *p_sys = p_vod->p_sys;

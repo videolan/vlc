@@ -133,17 +133,17 @@ struct vlm_t
 #define vlm_New( a ) __vlm_New( VLC_OBJECT(a) )
 VLC_EXPORT( vlm_t *, __vlm_New, ( vlc_object_t * ) );
 VLC_EXPORT( void, vlm_Delete, ( vlm_t * ) );
-VLC_EXPORT( int, vlm_ExecuteCommand, ( vlm_t *, char *, vlm_message_t ** ) );
+VLC_EXPORT( int, vlm_ExecuteCommand, ( vlm_t *, const char *, vlm_message_t ** ) );
 VLC_EXPORT( void, vlm_MessageDelete, ( vlm_message_t * ) );
-VLC_EXPORT( vlm_media_t *, vlm_MediaNew, ( vlm_t *, char *, int ) );
-VLC_EXPORT( void, vlm_MediaDelete, ( vlm_t *, vlm_media_t *, char * ) );
-VLC_EXPORT( int, vlm_MediaSetup, ( vlm_t *, vlm_media_t *, char *, char * ) );
-VLC_EXPORT( int, vlm_MediaControl, ( vlm_t *, vlm_media_t *, char *, char *, char * ) );
-VLC_EXPORT( vlm_schedule_t *, vlm_ScheduleNew, ( vlm_t *, char * ) );
-VLC_EXPORT( void, vlm_ScheduleDelete, ( vlm_t *, vlm_schedule_t *, char * ) );
-VLC_EXPORT( int, vlm_ScheduleSetup, ( vlm_schedule_t *, char *, char * ) );
-VLC_EXPORT( int, vlm_MediaVodControl, ( void *, vod_media_t *, char *, int, va_list ) );
-VLC_EXPORT( int, vlm_Save, ( vlm_t *, char * ) );
-VLC_EXPORT( int, vlm_Load, ( vlm_t *, char * ) );
+VLC_EXPORT( vlm_media_t *, vlm_MediaNew, ( vlm_t *, const char *, int ) );
+VLC_EXPORT( void, vlm_MediaDelete, ( vlm_t *, vlm_media_t *, const char * ) );
+VLC_EXPORT( int, vlm_MediaSetup, ( vlm_t *, vlm_media_t *, const char *, const char * ) );
+VLC_EXPORT( int, vlm_MediaControl, ( vlm_t *, vlm_media_t *, const char *, const char *, const char * ) );
+VLC_EXPORT( vlm_schedule_t *, vlm_ScheduleNew, ( vlm_t *, const char * ) );
+VLC_EXPORT( void, vlm_ScheduleDelete, ( vlm_t *, vlm_schedule_t *, const char * ) );
+VLC_EXPORT( int, vlm_ScheduleSetup, ( vlm_schedule_t *, const char *, const char * ) );
+VLC_EXPORT( int, vlm_MediaVodControl, ( void *, vod_media_t *, const char *, int, va_list ) );
+VLC_EXPORT( int, vlm_Save, ( vlm_t *, const char * ) );
+VLC_EXPORT( int, vlm_Load, ( vlm_t *, const char * ) );
 
 #endif

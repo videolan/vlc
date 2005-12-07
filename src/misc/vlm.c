@@ -53,17 +53,17 @@
 static vlm_message_t *vlm_Show( vlm_t *, vlm_media_t *, vlm_schedule_t *, char * );
 static vlm_message_t *vlm_Help( vlm_t *, char * );
 
-static vlm_media_t *vlm_MediaSearch ( vlm_t *, char * );
-static vlm_media_instance_t *vlm_MediaInstanceSearch( vlm_t *, vlm_media_t *, char * );
+static vlm_media_t *vlm_MediaSearch ( vlm_t *, const char * );
+static vlm_media_instance_t *vlm_MediaInstanceSearch( vlm_t *, vlm_media_t *, const char * );
 
 static vlm_message_t *vlm_MessageNew( char *, const char *, ... );
 static vlm_message_t *vlm_MessageAdd( vlm_message_t *, vlm_message_t * );
 
-static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, char * );
+static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *, const char * );
 
 static char *Save( vlm_t * );
 static int Load( vlm_t *, char * );
-static int ExecuteCommand( vlm_t *, char *, vlm_message_t ** );
+static int ExecuteCommand( vlm_t *, const char *, vlm_message_t ** );
 static int Manage( vlc_object_t * );
 
 /*****************************************************************************
@@ -172,7 +172,7 @@ void vlm_Delete( vlm_t *p_vlm )
 /*****************************************************************************
  * vlm_ExecuteCommand:
  *****************************************************************************/
-int vlm_ExecuteCommand( vlm_t *p_vlm, char *psz_command,
+int vlm_ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                         vlm_message_t **pp_message)
 {
     int i_result;
@@ -187,7 +187,7 @@ int vlm_ExecuteCommand( vlm_t *p_vlm, char *psz_command,
 /*****************************************************************************
  * vlm_Save:
  *****************************************************************************/
-int vlm_Save( vlm_t *p_vlm, char *psz_file )
+int vlm_Save( vlm_t *p_vlm, const char *psz_file )
 {
     FILE *file;
     char *psz_save;
@@ -213,7 +213,7 @@ int vlm_Save( vlm_t *p_vlm, char *psz_file )
 /*****************************************************************************
  * vlm_Load:
  *****************************************************************************/
-int vlm_Load( vlm_t *p_vlm, char *psz_file )
+int vlm_Load( vlm_t *p_vlm, const char *psz_file )
 {
     FILE *file;
     int64_t i_size;
@@ -256,10 +256,8 @@ int vlm_Load( vlm_t *p_vlm, char *psz_file )
 /*****************************************************************************
  * FindEndCommand
  *****************************************************************************/
-static char *FindEndCommand( char *psz )
+static const char *FindEndCommand( const char *psz_sent )
 {
-    char *psz_sent = psz;
-
     switch( *psz_sent )
     {
     case '\"':
@@ -330,12 +328,12 @@ static char *FindEndCommand( char *psz )
  *****************************************************************************
  * Execute a command which ends with '\0' (string)
  *****************************************************************************/
-static int ExecuteCommand( vlm_t *p_vlm, char *psz_command,
+static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                            vlm_message_t **pp_message )
 {
     int i_command = 0;
     char **ppsz_command = NULL;
-    char *psz_cmd = psz_command;
+    const char *psz_cmd = psz_command;
     vlm_message_t *p_message = NULL;
     int i, j;
 
@@ -349,7 +347,7 @@ static int ExecuteCommand( vlm_t *p_vlm, char *psz_command,
         }
         else
         {
-            char *psz_temp;
+            const char *psz_temp;
             int   i_temp;
 
             /* support for comments */
@@ -807,7 +805,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static vlm_media_t *vlm_MediaSearch( vlm_t *vlm, char *psz_name )
+static vlm_media_t *vlm_MediaSearch( vlm_t *vlm, const char *psz_name )
 {
     int i;
 
@@ -826,7 +824,8 @@ static vlm_media_t *vlm_MediaSearch( vlm_t *vlm, char *psz_name )
  * Media handling
  *****************************************************************************/
 static vlm_media_instance_t *
-vlm_MediaInstanceSearch( vlm_t *vlm, vlm_media_t *media, char *psz_name )
+vlm_MediaInstanceSearch( vlm_t *vlm, vlm_media_t *media,
+                         const char *psz_name )
 {
     int i;
 
@@ -843,7 +842,7 @@ vlm_MediaInstanceSearch( vlm_t *vlm, vlm_media_t *media, char *psz_name )
     return NULL;
 }
 
-vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
+vlm_media_t *vlm_MediaNew( vlm_t *vlm, const char *psz_name, int i_type )
 {
     vlm_media_t *media = malloc( sizeof( vlm_media_t ) );
 
@@ -899,7 +898,7 @@ vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
 }
 
 /* for now, simple delete. After, del with options (last arg) */
-void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
+void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, const char *psz_name )
 {
     if( media == NULL ) return;
 
@@ -944,8 +943,8 @@ void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
     free( media );
 }
 
-int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
-                    char *psz_value )
+int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
+                    const char *psz_value )
 {
     if( !psz_cmd) return VLC_EGENERIC;
 
@@ -1133,8 +1132,8 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
     return VLC_SUCCESS;
 }
 
-int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
-                      char *psz_command, char *psz_args )
+int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
+                      const char *psz_command, const char *psz_args )
 {
     vlm_media_instance_t *p_instance;
     int i;
@@ -1270,7 +1269,7 @@ static int64_t vlm_Date()
 #endif
 }
 
-vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
+vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name )
 {
     vlm_schedule_t *p_sched = malloc( sizeof( vlm_schedule_t ) );
 
@@ -1299,7 +1298,7 @@ vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
 
 /* for now, simple delete. After, del with options (last arg) */
 void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_t *sched,
-                         char *psz_name )
+                         const char *psz_name )
 {
     if( sched == NULL ) return;
 
@@ -1311,7 +1310,7 @@ void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_t *sched,
     free( sched );
 }
 
-static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *vlm, char *psz_name )
+static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *vlm, const char *psz_name )
 {
     int i;
 
@@ -1327,8 +1326,8 @@ static vlm_schedule_t *vlm_ScheduleSearch( vlm_t *vlm, char *psz_name )
 }
 
 /* Ok, setup schedule command will be able to support only one (argument value) at a time  */
-int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
-                       char *psz_value )
+int vlm_ScheduleSetup( vlm_schedule_t *schedule, const char *psz_cmd,
+                       const char *psz_value )
 {
     if( !strcmp( psz_cmd, "enabled" ) )
     {
@@ -1342,7 +1341,7 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
     else if( !strcmp( psz_cmd, "date" ) )
     {
         struct tm time;
-        char *p;
+        const char *p;
         time_t date;
 
         time.tm_sec = 0;         /* seconds */
@@ -1368,9 +1367,9 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         }
         else
         {
-            int i,j,k;
+            unsigned i,j,k;
 
-            switch( sscanf( p + 1, "%d:%d:%d", &i, &j, &k ) )
+            switch( sscanf( p + 1, "%u:%u:%u", &i, &j, &k ) )
             {
                 case 1:
                     time.tm_sec = i;
@@ -1387,8 +1386,6 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
                 default:
                     return 1;
             }
-
-            *p = '\0';
 
             switch( sscanf( psz_value, "%d/%d/%d", &i, &j, &k ) )
             {
@@ -1415,10 +1412,10 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
     else if( !strcmp( psz_cmd, "period" ) )
     {
         struct tm time;
-        char *p;
-        char *psz_time = NULL, *psz_date = NULL;
+        const char *p;
+        const char *psz_time = NULL, *psz_date = NULL;
         time_t date;
-        int i,j,k;
+        unsigned i,j,k;
 
         /* First, if date or period are modified, repeat should be equal to -1 */
         schedule->i_repeat = -1;
@@ -1439,8 +1436,6 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         {
             psz_date = psz_value;
             psz_time = p + 1;
-
-            *p = '\0';
         }
         else
         {
@@ -1448,7 +1443,7 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         }
 
 
-        switch( sscanf( psz_time, "%d:%d:%d", &i, &j, &k ) )
+        switch( sscanf( psz_time, "%u:%u:%u", &i, &j, &k ) )
         {
             case 1:
                 time.tm_sec = i;
@@ -1467,7 +1462,7 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         }
         if( psz_date )
         {
-            switch( sscanf( psz_date, "%d/%d/%d", &i, &j, &k ) )
+            switch( sscanf( psz_date, "%u/%u/%u", &i, &j, &k ) )
             {
                 case 1:
                     time.tm_mday = i;
@@ -2221,7 +2216,7 @@ static char *Save( vlm_t *vlm )
  * Manage:
  *****************************************************************************/
 int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
-                         char *psz_id, int i_query, va_list args )
+                         const char *psz_id, int i_query, va_list args )
 {
     vlm_t *vlm = (vlm_t *)p_private;
     int i, i_ret = VLC_EGENERIC;
