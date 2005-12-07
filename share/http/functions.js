@@ -58,19 +58,19 @@ function format_time( s )
 
 function in_play()
 {
-    input = value('input_mrl');
+    input_iesuxx = value('input_mrl');
     if( value('sout_mrl') != '' )
-        input += ' '+value('sout_mrl');
-    url = 'requests/status.xml?command=in_play&input='+escape(input);
+        input_iesuxx += ' '+value('sout_mrl');
+    url = 'requests/status.xml?command=in_play&input='+escape(input_iesuxx);
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
 function in_enqueue()
 {
-    input = value('input_mrl');
+    input_iesuxx = value('input_mrl');
     if( value('sout_mrl') != '' )
-        input += ' '+value('sout_mrl');
-    url = 'requests/status.xml?command=in_enqueue&input='+escape(input);
+        input_iesuxx += ' '+value('sout_mrl');
+    url = 'requests/status.xml?command=in_enqueue&input='+escape(input_iesuxx);
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
@@ -129,19 +129,27 @@ function update_playlist()
     loadXMLDoc( 'requests/playlist.xml', parse_playlist );
 }
 
+function set_text( id, val )
+{
+    elt = document.getElementById( id );
+    while( elt.hasChildNodes() )
+        elt.removeChild( elt.firstChild );
+    elt.appendChild( document.createTextNode( val ) );
+}
+
 function parse_status()
 {
     if( req.readyState == 4 )
     {
         if( req.status == 200 )
         {
-            status = req.responseXML.documentElement;
-            document.getElementById( 'time' ).textContent = format_time( status.getElementsByTagName( 'time' )[0].firstChild.data );
-            document.getElementById( 'length' ).textContent = format_time( status.getElementsByTagName( 'length' )[0].firstChild.data );
-            if( status.getElementsByTagName( 'volume' ).length != 0 )
-            document.getElementById( 'volume' ).textContent = Math.floor(status.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+"%";
-            document.getElementById( 'state' ).textContent = status.getElementsByTagName( 'state' )[0].firstChild.data;
-            if( status.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
+            status_iesuxx = req.responseXML.documentElement;
+            set_text( 'time', format_time( status_iesuxx.getElementsByTagName( 'time' )[0].firstChild.data ) );
+            set_text( 'length', format_time( status_iesuxx.getElementsByTagName( 'length' )[0].firstChild.data ) );
+            if( status_iesuxx.getElementsByTagName( 'volume' ).length != 0 )
+            set_text( 'volume', Math.floor(status_iesuxx.getElementsByTagName( 'volume' )[0].firstChild.data/512)+'%' );
+            set_text( 'state', status_iesuxx.getElementsByTagName( 'state' )[0].firstChild.data );
+            if( status_iesuxx.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
             {
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/pause.png' );
             }
@@ -164,7 +172,7 @@ function parse_playlist()
         if( req.status == 200 )
         {
             answer = req.responseXML.documentElement;
-            playtree = document.getElementById( 'playtree' );
+            playtree_iesuxx = document.getElementById( 'playtree' );
             /* pos = playtree; */
             pos = document.createElement( "div" );
             pos_top = pos;
@@ -211,9 +219,9 @@ function parse_playlist()
                     pos = pos.parentNode;
                 }
             }
-            while( playtree.hasChildNodes() )
-                playtree.removeChild( playtree.firstChild );
-            playtree.appendChild( pos_top );
+            while( playtree_iesuxx.hasChildNodes() )
+                playtree_iesuxx.removeChild( playtree.firstChild );
+            playtree_iesuxx.appendChild( pos_top );
         }
         else
         {
@@ -681,7 +689,7 @@ function parse_browse_dir( )
         if( req.status == 200 )
         {
             answer = req.responseXML.documentElement;
-            browser = document.getElementById( 'browser' );
+            browser_iesuxx = document.getElementById( 'browser' );
             pos = document.createElement( "div" );
             elt = answer.firstChild;
             while( elt )
@@ -711,9 +719,9 @@ function parse_browse_dir( )
                 }
                 elt = elt.nextSibling;
             }
-            while( browser.hasChildNodes() )
-                browser.removeChild( browser.firstChild );
-            browser.appendChild( pos );
+            while( browser_iesuxx.hasChildNodes() )
+                browser_iesuxx.removeChild( browser.firstChild );
+            browser_iesuxx.appendChild( pos );
         }
         else
         {

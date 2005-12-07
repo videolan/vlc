@@ -1,3 +1,5 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  index.html: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
@@ -21,8 +23,6 @@
 <  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -45,7 +45,7 @@
     Browse
   </div>
   <div id="browser">
-    <a href="javascript:browse_dir('~');">Lets browse !</a>
+    <a href="javascript:browse_dir(document.getElementById( 'browse_lastdir' ).value);">Lets browse !</a>
   </div>
   <div class="controls">
     <button id="btn_browse_close" onclick="hide('browse');">
