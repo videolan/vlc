@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<vlc id="if" param1="0"/>
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  status.xml: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
@@ -21,7 +22,7 @@
 <  along with this program; if not, write to the Free Software
 <  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
+<vlc id="end"/>
 <vlc id="if" param1="url_param 1 =" />
   <vlc id="rpn" param1="input 'input' url_extract store" />
   <vlc id="rpn" param1="command 'command' url_extract store" />
@@ -60,6 +61,18 @@
   <vlc id="if" param1="command value 'pl_empty' strcmp 0 =" />
     <vlc id="rpn" param1="playlist_empty" />
   <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_sort' strcmp 0 =" />
+    <vlc id="rpn" param1="" /> <!-- FIXME -->
+  <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_random' strcmp 0 =" />
+    <vlc id="rpn" param1="'random' 'VLC_OBJECT_PLAYLIST' vlc_var_get ! 'random' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
+  <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_loop' strcmp 0 =" />
+    <vlc id="rpn" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get ! 'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
+  <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_repeat' strcmp 0 =" />
+    <vlc id="rpn" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get 1 + 2 % 'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
+  <vlc id="end" />
 
   <!-- misc commands -->
   <vlc id="if" param1="command value 'fullscreen' strcmp 0 =" />
@@ -76,4 +89,7 @@
   <time><vlc id="value" param1="stream_time" /></time>
   <state><vlc id="value" param1="stream_state" /></state>
   <position><vlc id="value" param1="stream_position" /></position>
+  <fullscreen><vlc id="value" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get" /></fullscreen>
+  <loop><vlc id="value" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get"/></loop>
+  <repeat><vlc id="value" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></repeat>
 </root>

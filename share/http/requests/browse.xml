@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<vlc id="if" param1="0"/>
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  status.xml: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
@@ -21,6 +22,7 @@
 <  along with this program; if not, write to the Free Software
 <  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<vlc id="end" />
 
 <root>
 <vlc id="if" param1="url_param 1 =" />

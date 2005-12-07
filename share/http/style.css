@@ -103,18 +103,18 @@ ul#list, ul#list ul {
 	padding-left: 1em;
 }
 
-div.pl_node, a.pl_leaf {
-	padding-left: 20px;
-}
 div.pl_node {
+	padding-left: 20px;
 	font-style: italic;
 }
 a.pl_leaf {
 	font-style: normal;
-	display: block;
 }
 a.pl_leaf:hover {
-	background-color: #ffd;
+	color: #f00;
+}
+img {
+	border: 0px none black;
 }
 
 div#browse {

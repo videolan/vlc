@@ -21,6 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/* global variables */
+
+old_time = 0;
+
+/**********************************************************************
+ * Misc utils
+ *********************************************************************/
+
+/* XMLHttpRequest wrapper */
 function loadXMLDoc( url, callback )
 {
   // branch for native XMLHttpRequest object
@@ -44,6 +53,7 @@ function loadXMLDoc( url, callback )
   }
 }
 
+/* fomat time in second as hh:mm:ss */
 function format_time( s )
 {
     hours = Math.floor(s/3600);
@@ -55,7 +65,135 @@ function format_time( s )
     return hours+":"+minutes+":"+seconds;
 }
 
+/* delete all a tag's children and add a text child node */
+function set_text( id, val )
+{
+    elt = document.getElementById( id );
+    while( elt.hasChildNodes() )
+        elt.removeChild( elt.firstChild );
+    elt.appendChild( document.createTextNode( val ) );
+}
 
+/* set item's 'element' attribute to value */
+function set_css( item, element, value )
+{
+    for( j = 0; j<document.styleSheets.length; j++ )
+    {
+        cssRules = document.styleSheets[j].cssRules;
+        for( i = 0; i<cssRules.length; i++)
+        {
+            if( cssRules[i].selectorText == item )
+            {
+                cssRules[i].style.setProperty( element, value, null );
+                return;
+            }
+        }
+    }
+}
+
+/* get item's 'element' attribute */
+function get_css( item, element )
+{
+    for( j = 0; j<document.styleSheets.length; j++ )
+    {
+        cssRules = document.styleSheets[j].cssRules;
+        for( i = 0; i<cssRules.length; i++)
+        {
+            if( cssRules[i].selectorText == item )
+            {
+                return cssRules[i].style.getPropertyValue( element );
+            }
+        }
+    }
+}
+
+function toggle_show( id )
+{
+    element = document.getElementById( id );
+    if( element.style.display == 'block' || element.style.display == '' )
+    {
+        element.style.display = 'none';
+    }
+    else
+    {
+        element.style.display = 'block';
+    }
+}
+function toggle_show_node( id )
+{
+    element = document.getElementById( 'pl_'+id );
+    img = document.getElementById( 'pl_img_'+id );
+    if( element.style.display == 'block' || element.style.display == '' )
+    {
+        element.style.display = 'none';
+        img.setAttribute( 'src', 'images/plus.png' );
+        img.setAttribute( 'alt', '[+]' );
+    }
+    else
+    {
+        element.style.display = 'block';
+        img.setAttribute( 'src', 'images/minus.png' );
+        img.setAttribute( 'alt', '[-]' );
+    }
+}
+
+function show( id ){ document.getElementById( id ).style.display = 'block'; }
+
+function hide( id ){ document.getElementById( id ).style.display = 'none'; }
+
+function checked( id ){ return document.getElementById( id ).checked; }
+
+function value( id ){ return document.getElementById( id ).value; }
+
+function radio_value( name )
+{
+    radio = document.getElementsByName( name );
+    for( i = 0; i<radio.length; i++ )
+    {
+        if( radio[i].checked )
+        {
+            return radio[i].value;
+        }
+    }
+    return "";
+}
+
+function check_and_replace_int( id, val )
+{
+    var objRegExp = /^\d\d*$/;
+    if( value( id ) != ''
+        && ( !objRegExp.test( value( id ) )
+             || parseInt( value( id ) ) < 1 ) )
+        document.getElementById( id ).value = val;
+}
+
+function addslashes( str ){ return str.replace(/\'/, '\\\''); }
+
+function disable( id ){ document.getElementById( id ).disabled = true; }
+
+function enable( id ){ document.getElementById( id ).disabled = false; }
+
+function button_over( element ){ element.style.border = "1px solid black"; }
+
+function button_out( element ){ element.style.border = "1px none black"; }
+
+/* toggle show help under the buttons */
+function toggle_btn_text()
+{
+    if( get_css( '.btn_text', 'display' ) == 'none' )
+    {
+        set_css( '.btn_text', 'display', 'block' );
+    }
+    else
+    {
+        set_css( '.btn_text', 'display', 'none' );
+    }
+}
+
+/**********************************************************************
+ * Interface actions
+ *********************************************************************/
+/* input actions */
 function in_play()
 {
     input_iesuxx = value('input_mrl');
@@ -74,6 +212,8 @@ function in_enqueue()
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
+
+/* playlist actions */
 function pl_play( id )
 {
     loadXMLDoc( 'requests/status.xml?command=pl_play&id='+id, parse_status );
@@ -108,6 +248,27 @@ function pl_empty()
     loadXMLDoc( 'requests/status.xml?command=pl_empty', parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
+function pl_sort()
+{
+    /* FIXME */
+    loadXMLDoc( 'requests/status.xml?command=pl_sort', parse_status );
+    setTimeout( 'update_playlist()', 1000 );
+}
+function pl_shuffle()
+{
+    loadXMLDoc( 'requests/status.xml?command=pl_random', parse_status );
+    setTimeout( 'update_playlist()', 1000 );
+}
+function pl_loop()
+{
+    loadXMLDoc( 'requests/status.xml?command=pl_loop', parse_status );
+}
+function pl_repeat()
+{
+    loadXMLDoc( 'requests/status.xml?command=pl_repeat', parse_status );
+}
+
+/* misc actions */
 function volume_down()
 {
     loadXMLDoc( 'requests/status.xml?command=volume&val=-20', parse_status );
@@ -129,14 +290,10 @@ function update_playlist()
     loadXMLDoc( 'requests/playlist.xml', parse_playlist );
 }
 
-function set_text( id, val )
-{
-    elt = document.getElementById( id );
-    while( elt.hasChildNodes() )
-        elt.removeChild( elt.firstChild );
-    elt.appendChild( document.createTextNode( val ) );
-}
-
+/**********************************************************************
+ * Parse xml replies to XMLHttpRequests
+ *********************************************************************/
+/* parse request/status.xml */
 function parse_status()
 {
     if( req.readyState == 4 )
@@ -144,7 +301,11 @@ function parse_status()
         if( req.status == 200 )
         {
             status_iesuxx = req.responseXML.documentElement;
-            set_text( 'time', format_time( status_iesuxx.getElementsByTagName( 'time' )[0].firstChild.data ) );
+            new_time = status_iesuxx.getElementsByTagName( 'time' )[0].firstChild.data;
+            if( old_time > new_time )
+                setTimeout('update_playlist()',50);
+            old_time = new_time;
+            set_text( 'time', format_time( new_time ) );
             set_text( 'length', format_time( status_iesuxx.getElementsByTagName( 'length' )[0].firstChild.data ) );
             if( status_iesuxx.getElementsByTagName( 'volume' ).length != 0 )
             set_text( 'volume', Math.floor(status_iesuxx.getElementsByTagName( 'volume' )[0].firstChild.data/512)+'%' );
@@ -165,6 +326,7 @@ function parse_status()
     }
 }
 
+/* parse playlist.xml */
 function parse_playlist()
 {
     if( req.readyState == 4 )
@@ -173,7 +335,6 @@ function parse_playlist()
         {
             answer = req.responseXML.documentElement;
             playtree_iesuxx = document.getElementById( 'playtree' );
-            /* pos = playtree; */
             pos = document.createElement( "div" );
             pos_top = pos;
             elt = answer.firstChild;
@@ -181,14 +342,26 @@ function parse_playlist()
             {
                 if( elt.nodeName == "node" )
                 {
+                    if( pos.hasChildNodes() )
+                        pos.appendChild( document.createElement( "br" ) );
+                    pos.appendChild( document.createElement( 'a' ) );
+                    nda = pos.lastChild;
+                    nda.setAttribute( 'href', 'javascript:toggle_show_node(\''+elt.getAttribute( 'id' )+'\');' );
+                    nda.appendChild( document.createElement( 'img' ) );
+                    ndai = nda.lastChild;
+                    ndai.setAttribute( 'src', 'images/minus.png' );
+                    ndai.setAttribute( 'alt', '[-]' );
+                    ndai.setAttribute( 'id', 'pl_img_'+elt.getAttribute( 'id' ) );
+                    pos.appendChild( document.createTextNode( ' ' + elt.getAttribute( 'name' ) ) );
                     pos.appendChild( document.createElement( "div" ) );
-                    pos.lastChild.setAttribute( 'class', 'pl_node' );
-                    /*pos.lastChild.setAttribute( 'onclick', 'pl_play('+elt.getAttribute( 'id' )+');' );*/
-                    pos.lastChild.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
-                    pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    nd = pos.lastChild;
+                    nd.setAttribute( 'class', 'pl_node' );
+                    nd.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                 }
                 else if( elt.nodeName == "leaf" )
                 {
+                    if( pos.hasChildNodes() )
+                    pos.appendChild( document.createElement( "br" ) );
                     pos.appendChild( document.createElement( "a" ) );
                     pl = pos.lastChild;
                     pl.setAttribute( 'class', 'pl_leaf' );
@@ -202,6 +375,14 @@ function parse_playlist()
                     }
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    pos.appendChild( document.createTextNode( ' ' ) );
+                    pos.appendChild( document.createElement( "a" ) );
+                    del = pos.lastChild;
+                    del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
+                    del.appendChild( document.createElement( "img" ) );
+                    del = del.lastChild;
+                    del.setAttribute( 'src', 'images/delete_small.png' );
+                    del.setAttribute( 'alt', '(delete)' );
                 }
                 if( elt.firstChild )
                 {
@@ -230,146 +411,63 @@ function parse_playlist()
     }
 }
 
-function set_css( item, element, value )
+/* parse browse.xml */
+function parse_browse_dir( )
 {
-    for( j = 0; j<document.styleSheets.length; j++ )
+    if( req.readyState == 4 )
     {
-        cssRules = document.styleSheets[j].cssRules;
-        for( i = 0; i<cssRules.length; i++)
+        if( req.status == 200 )
         {
-            if( cssRules[i].selectorText == item )
+            answer = req.responseXML.documentElement;
+            browser_iesuxx = document.getElementById( 'browser' );
+            pos = document.createElement( "div" );
+            elt = answer.firstChild;
+            while( elt )
             {
-                cssRules[i].style.setProperty( element, value, null );
-                return;
+                if( elt.nodeName == "element" )
+                {
+                    pos.appendChild( document.createElement( "a" ) );
+                    pos.lastChild.setAttribute( 'class', 'browser' );
+                    if( elt.getAttribute( 'type' ) == 'directory' )
+                    {
+                        pos.lastChild.setAttribute( 'href', 'javascript:browse_dir(\''+addslashes(elt.getAttribute( 'path' ))+'\');');
+                    }
+                    else
+                    {
+                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+addslashes(elt.getAttribute( 'path' ))+'\');' );
+                    }
+                    pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    if( elt.getAttribute( 'type' ) == 'directory' )
+                    {
+                        pos.appendChild( document.createTextNode( ' ' ) );
+                        pos.appendChild( document.createElement( "a" ) );
+                        pos.lastChild.setAttribute( 'class', 'browser' );
+                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+addslashes(elt.getAttribute( 'path' ))+'\');');
+                        pos.lastChild.appendChild( document.createTextNode( '(select)' ) );
+                    }
+                    pos.appendChild( document.createElement( "br" ) );
+                }
+                elt = elt.nextSibling;
             }
+            while( browser_iesuxx.hasChildNodes() )
+                browser_iesuxx.removeChild( browser_iesuxx.firstChild );
+            browser_iesuxx.appendChild( pos );
+        }
+        else
+        {
+            /*alert( 'Error! HTTP server replied: ' + req.status );*/
         }
     }
 }
 
-function get_css( item, element )
-{
-    for( j = 0; j<document.styleSheets.length; j++ )
-    {
-        cssRules = document.styleSheets[j].cssRules;
-        for( i = 0; i<cssRules.length; i++)
-        {
-            if( cssRules[i].selectorText == item )
-            {
-                return cssRules[i].style.getPropertyValue( element );
-            }
-        }
-    }
-}
-
-function toggle_btn_text()
-{
-    if( get_css( '.btn_text', 'display' ) == 'none' )
-    {
-        set_css( '.btn_text', 'display', 'block' );
-    }
-    else
-    {
-        set_css( '.btn_text', 'display', 'none' );
-    }
-}
-
-function toggle_show_sout_helper()
-{
-    element = document.getElementById( "sout_helper" );
-        if( element.style.display == 'block' )
-    {
-        element.style.display = 'none';
-        document.getElementById( "sout_helper_toggle" ).value = 'Full sout interface';
-    }
-    else
-    {
-        element.style.display = 'block';
-        document.getElementById( "sout_helper_toggle" ).value = 'Hide sout interface';
-    }
-}
-
-function toggle_show( id )
-{
-    element = document.getElementById( id );
-    if( element.style.display == 'block' || element.style.display == '' )
-    {
-        element.style.display = 'none';
-    }
-    else
-    {
-        element.style.display = 'block';
-    }
-}
-
-function show( id )
-{
-    document.getElementById( id ).style.display = 'block';
-}
-function hide( id )
-{
-    document.getElementById( id ).style.display = 'none';
-}
-
+/**********************************************************************
+ * Input dialog functions
+ *********************************************************************/
 function hide_input( )
 {
     document.getElementById( 'input_file' ).style.display = 'none';
     document.getElementById( 'input_disc' ).style.display = 'none';
     document.getElementById( 'input_network' ).style.display = 'none';
-}
-
-function checked( id )
-{
-    return document.getElementById( id ).checked;
-}
-function value( id )
-{
-    return document.getElementById( id ).value;
-}
-function radio_value( name )
-{
-    radio = document.getElementsByName( name );
-    for( i = 0; i<radio.length; i++ )
-    {
-        if( radio[i].checked )
-        {
-            return radio[i].value;
-        }
-    }
-    return "";
-}
-function disable( id )
-{/* FIXME */
-    return document.getElementById( id ).value;
-}
-
-function check_and_replace_int( id, val )
-{
-    var objRegExp = /^\d\d*$/;
-    if( value( id ) != ''
-        && ( !objRegExp.test( value( id ) )
-             || parseInt( value( id ) ) < 1 ) )
-        document.getElementById( id ).value = val;
-
-}
-
-function disable( id )
-{
-    document.getElementById( id ).disabled = true;
-}
-
-function enable( id )
-{
-    document.getElementById( id ).disabled = false;
-}
-
-function button_over( element )
-{
-    element.style.border = "1px solid black";
-}
-
-function button_out( element )
-{
-    element.style.border = "1px none black";
 }
 
 /* update the input MRL using data from the input file helper */
@@ -482,6 +580,25 @@ function update_input_net()
 
     if( checked( "input_net_timeshift" ) )
         mrl.value += " :access-filter=timeshift";
+}
+
+/**********************************************************************
+ * Sout dialog functions
+ *********************************************************************/
+/* toggle show the full sout interface */
+function toggle_show_sout_helper()
+{
+    element = document.getElementById( "sout_helper" );
+        if( element.style.display == 'block' )
+    {
+        element.style.display = 'none';
+        document.getElementById( "sout_helper_toggle" ).value = 'Full sout interface';
+    }
+    else
+    {
+        element.style.display = 'block';
+        document.getElementById( "sout_helper_toggle" ).value = 'Hide sout interface';
+    }
 }
 
 /* update the sout MRL using data from the sout_helper */
@@ -644,27 +761,16 @@ function reset_sout()
     document.getElementById('sout_mrl').value = value('sout_old_mrl');
 }
 
+/* save sout mrl value */
 function save_sout()
 {
     document.getElementById('sout_old_mrl').value = value('sout_mrl');
 }
 
-function loop_refresh_status()
-{
-    setTimeout( 'loop_refresh_status()', 1000 );
-    update_status();
-}
-function loop_refresh_playlist()
-{
- /*   setTimeout( 'loop_refresh_playlist()', 10000 ); */
-    update_playlist();
-}
-function loop_refresh()
-{
-    setTimeout('loop_refresh_status()',0);
-    setTimeout('loop_refresh_playlist()',0);
-}
-
+/**********************************************************************
+ * Browser dialog functions
+ *********************************************************************/
+/* only browse() should be called directly */
 function browse( dest )
 {
     document.getElementById( 'browse_dest' ).value = dest;
@@ -682,50 +788,23 @@ function browse_path( p )
     hide( 'browse' );
     document.getElementById( document.getElementById( 'browse_dest' ).value ).focus();
 }
-function parse_browse_dir( )
+
+/**********************************************************************
+ * Periodically update stuff in the interface
+ *********************************************************************/
+function loop_refresh_status()
 {
-    if( req.readyState == 4 )
-    {
-        if( req.status == 200 )
-        {
-            answer = req.responseXML.documentElement;
-            browser_iesuxx = document.getElementById( 'browser' );
-            pos = document.createElement( "div" );
-            elt = answer.firstChild;
-            while( elt )
-            {
-                if( elt.nodeName == "element" )
-                {
-                    pos.appendChild( document.createElement( "a" ) );
-                    pos.lastChild.setAttribute( 'class', 'browser' );
-                    if( elt.getAttribute( 'type' ) == 'directory' )
-                    {
-                        pos.lastChild.setAttribute( 'href', 'javascript:browse_dir(\''+elt.getAttribute( 'path' )+'\');');
-                    }
-                    else
-                    {
-                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+elt.getAttribute( 'path' )+'\');' );
-                    }
-                    pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
-                    if( elt.getAttribute( 'type' ) == 'directory' )
-                    {
-                        pos.appendChild( document.createTextNode( ' ' ) );
-                        pos.appendChild( document.createElement( "a" ) );
-                        pos.lastChild.setAttribute( 'class', 'browser' );
-                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+elt.getAttribute( 'path' )+'\');');
-                        pos.lastChild.appendChild( document.createTextNode( '(select)' ) );
-                    }
-                    pos.appendChild( document.createElement( "br" ) );
-                }
-                elt = elt.nextSibling;
-            }
-            while( browser_iesuxx.hasChildNodes() )
-                browser_iesuxx.removeChild( browser_iesuxx.firstChild );
-            browser_iesuxx.appendChild( pos );
-        }
-        else
-        {
-            /*alert( 'Error! HTTP server replied: ' + req.status );*/
-        }
-    }
+    setTimeout( 'loop_refresh_status()', 1000 );
+    update_status();
 }
+function loop_refresh_playlist()
+{
+ /*   setTimeout( 'loop_refresh_playlist()', 10000 ); */
+    update_playlist();
+}
+function loop_refresh()
+{
+    setTimeout('loop_refresh_status()',0);
+    setTimeout('loop_refresh_playlist()',0);
+}
+
