@@ -220,7 +220,7 @@ function parse_playlist()
                 }
             }
             while( playtree_iesuxx.hasChildNodes() )
-                playtree_iesuxx.removeChild( playtree.firstChild );
+                playtree_iesuxx.removeChild( playtree_iesuxx.firstChild );
             playtree_iesuxx.appendChild( pos_top );
         }
         else
@@ -720,7 +720,7 @@ function parse_browse_dir( )
                 elt = elt.nextSibling;
             }
             while( browser_iesuxx.hasChildNodes() )
-                browser_iesuxx.removeChild( browser.firstChild );
+                browser_iesuxx.removeChild( browser_iesuxx.firstChild );
             browser_iesuxx.appendChild( pos );
         }
         else
