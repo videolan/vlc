@@ -3,7 +3,7 @@
 <  playlist.xml: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005 the VideoLAN team
-<  $Id: $
+<  $Id$
 < 
 <  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
 < 
@@ -33,9 +33,9 @@
   <vlc id="end" />
   <vlc id="if" param1="pl.type value 'Node' strcmp" />
     <vlc id="rpn" param1="1 +" />
-    <leaf id="<vlc id="value" param1="pl.index" />" <vlc id="if" param1="pl.current" /> current="current" <vlc id="end" /> uri="<vlc id="value" param1="pl.uri" />" name="<vlc id="value" param1="pl.name" />" />
+    <leaf id="<vlc id="value" param1="pl.index" />" <vlc id="if" param1="pl.current" /> current="current" <vlc id="end" /> uri="<vlc id="value" param1="pl.uri value '&' '&amp;' str_replace" />" name="<vlc id="value" param1="pl.name value '&' '&amp;' str_replace" />" />
   <vlc id="else" />
-    <node id="<vlc id="value" param1="pl.index" />" name="<vlc id="value" param1="pl.name" />" >
+    <node id="<vlc id="value" param1="pl.index" />" name="<vlc id="value" param1="pl.name value '&' '&amp;' str_replace" />" >
     <vlc id="if" param1="first_item value 0 ="/>
       <vlc id="rpn" param1="first_item 1 store" />
     <vlc id="end"/>
