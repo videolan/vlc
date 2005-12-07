@@ -308,7 +308,7 @@ function parse_status()
             set_text( 'time', format_time( new_time ) );
             set_text( 'length', format_time( status_iesuxx.getElementsByTagName( 'length' )[0].firstChild.data ) );
             if( status_iesuxx.getElementsByTagName( 'volume' ).length != 0 )
-            set_text( 'volume', Math.floor(status_iesuxx.getElementsByTagName( 'volume' )[0].firstChild.data/512)+'%' );
+            set_text( 'volume', Math.floor(status_iesuxx.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+'%' );
             set_text( 'state', status_iesuxx.getElementsByTagName( 'state' )[0].firstChild.data );
             if( status_iesuxx.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
             {
