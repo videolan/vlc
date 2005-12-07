@@ -15,6 +15,7 @@ dist_pkgdata_DATA = \
 nobase_dist_pkgdata_DATA = \
 	$(DIST_skins2) \
 	$(DIST_http) \
+	$(DIST_http_old) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
 	$(NULL)
@@ -71,21 +72,55 @@ DIST_skins2 = \
 	$(NULL)
 
 DIST_http = \
-	http/index.html \
-	http/info.html \
-	http/.hosts \
-	http/admin/index.html \
-	http/admin/browse.html \
-	http/admin/dboxfiles.html \
-	http/admin/.access \
-	http/vlm/edit.html \
-	http/vlm/index.html \
-	http/vlm/new.html \
-	http/style.css \
-	http/webcam.html \
 	http/favicon.ico \
-	http/cone_minus.png \
-	http/cone_plus.png \
+	http/functions.js \
+	http/requests/playlist.xml \
+	http/requests/status.xml \
+	http/style.css \
+	http/index.html \
+	http/images/plus.png \
+	http/images/eject.png \
+	http/images/speaker_mute.png \
+	http/images/sort.png \
+	http/images/sout.png \
+	http/images/shuffle.png \
+	http/images/vlc16x16.png \
+	http/images/volume_up.png \
+	http/images/minus.png \
+	http/images/pause.png \
+	http/images/fullscreen.png \
+	http/images/repeat.png \
+	http/images/empty.png \
+	http/images/prev.png \
+	http/images/slow.png \
+	http/images/playlist.png \
+	http/images/next.png \
+	http/images/volume_down.png \
+	http/images/play.png \
+	http/images/delete.png \
+	http/images/speaker.png \
+	http/images/loop.png \
+	http/images/stop.png \
+	http/images/help.png \
+	http/images/playlist_small.png \
+	$(NULL)
+
+DIST_http_old = \
+	http-old/index.html \
+	http-old/info.html \
+	http-old/.hosts \
+	http-old/admin/index.html \
+	http-old/admin/browse.html \
+	http-old/admin/dboxfiles.html \
+	http-old/admin/.access \
+	http-old/vlm/edit.html \
+	http-old/vlm/index.html \
+	http-old/vlm/new.html \
+	http-old/style.css \
+	http-old/webcam.html \
+	http-old/favicon.ico \
+	http-old/cone_minus.png \
+	http-old/cone_plus.png \
 	$(NULL)
 
 DIST_osdmenu_default = \
