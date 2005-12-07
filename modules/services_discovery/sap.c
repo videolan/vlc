@@ -279,7 +279,6 @@ static int Open( vlc_object_t *p_this )
                                 malloc( sizeof( services_discovery_sys_t ) );
 
     playlist_view_t     *p_view;
-    char                *psz_addr;
     vlc_value_t         val;
 
     p_sys->i_timeout = var_CreateGetInteger( p_sd, "sap-timeout" );
@@ -296,37 +295,6 @@ static int Open( vlc_object_t *p_this )
     if( var_CreateGetInteger( p_sd, "sap-cache" ) )
     {
         CacheLoad( p_sd );
-    }
-
-    if( var_CreateGetInteger( p_sd, "sap-ipv4" ) )
-    {
-        InitSocket( p_sd, SAP_V4_GLOBAL_ADDRESS, SAP_PORT );
-        InitSocket( p_sd, SAP_V4_ORG_ADDRESS, SAP_PORT );
-        InitSocket( p_sd, SAP_V4_LOCAL_ADDRESS, SAP_PORT );
-        InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
-    }
-    if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
-    {
-        char psz_address[] = SAP_V6_1"0"SAP_V6_2;
-        const char *c_scope;
-
-        for( c_scope = ipv6_scopes; *c_scope; c_scope++ )
-        {
-            psz_address[sizeof(SAP_V6_1) - 1] = *c_scope;
-            InitSocket( p_sd, psz_address, SAP_PORT );
-        }
-    }
-
-    psz_addr = var_CreateGetString( p_sd, "sap-addr" );
-    if( psz_addr && *psz_addr )
-    {
-        InitSocket( p_sd, psz_addr, SAP_PORT );
-    }
-
-    if( p_sys->i_fd == 0 )
-    {
-        msg_Err( p_sd, "unable to read on any address" );
-        return VLC_EGENERIC;
     }
 
     /* Cache sap_timeshift value */
@@ -507,7 +475,45 @@ static void CloseDemux( vlc_object_t *p_this )
 
 static void Run( services_discovery_t *p_sd )
 {
+    char *psz_addr;
     int i;
+
+    /* Braindead Winsock DNS resolver will get stuck over 2 seconds per failed
+     * DNS queries, even if the DNS server returns an error with milliseconds.
+     * You don't want to know why the bug (as of XP SP2) wasn't fixed since
+     * Winsock 1.1 from Windows 95, if not Windows 3.1.
+     * Anyway, to avoid a 30 seconds delay for failed IPv6 socket creation,
+     * we have to open sockets in Run() rather than Open(). */
+    if( var_CreateGetInteger( p_sd, "sap-ipv4" ) )
+    {
+        InitSocket( p_sd, SAP_V4_GLOBAL_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_ORG_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_LOCAL_ADDRESS, SAP_PORT );
+        InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
+    }
+    if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
+    {
+        char psz_address[] = SAP_V6_1"0"SAP_V6_2;
+        const char *c_scope;
+
+        for( c_scope = ipv6_scopes; *c_scope; c_scope++ )
+        {
+            psz_address[sizeof(SAP_V6_1) - 1] = *c_scope;
+            InitSocket( p_sd, psz_address, SAP_PORT );
+        }
+    }
+
+    psz_addr = var_CreateGetString( p_sd, "sap-addr" );
+    if( psz_addr && *psz_addr )
+    {
+        InitSocket( p_sd, psz_addr, SAP_PORT );
+    }
+
+    if( p_sd->p_sys->i_fd == 0 )
+    {
+        msg_Err( p_sd, "unable to listen on any address" );
+        return;
+    }
 
     /* read SAP packets */
     while( !p_sd->b_die )
@@ -1234,7 +1240,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 static int InitSocket( services_discovery_t *p_sd, char *psz_address,
                        int i_port )
 {
-    int i_fd = net_OpenUDP( p_sd, psz_address, i_port, "", 0 );
+    int i_fd = net_OpenUDP( p_sd, psz_address, i_port, NULL, 0 );
 
     if( i_fd != -1 )
     {
