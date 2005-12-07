@@ -127,13 +127,28 @@ public:
 #else
                           wxCLIP_CHILDREN | wxSP_3DSASH ),
 #endif
-        p_intf(_p_intf), i_sash_position(150), i_width(-1),
-        b_video(0), i_delay(0)
+        p_intf(_p_intf), b_video(0), i_delay(0)
     {
         SetSashSize( 0 );
+
+        wxSize size = wxSize(-1, 150);
+        wxPoint p = wxPoint(0,0);
+        bool b_dummy;
+        WindowSettings *ws = p_intf->p_sys->p_window_settings;
+        ws->GetSettings( WindowSettings::ID_SMALL_PLAYLIST, b_dummy, p, size );
+
+        i_width = size.GetWidth();
+        i_sash_position = size.GetHeight();
+        b_show_on_start = !!p.x;
     }
 
-    virtual ~Splitter() {};
+    virtual ~Splitter()
+    {
+        WindowSettings *ws = p_intf->p_sys->p_window_settings;
+        ws->SetSettings( WindowSettings::ID_SMALL_PLAYLIST, true,
+                         wxPoint(!!GetWindow2(),0),
+                         wxSize(i_width, i_sash_position) );
+    };
 
     virtual bool Split( wxWindow* window1, wxWindow* window2 )
     {
@@ -150,6 +165,8 @@ public:
         SetSashSize( 0 );
         return wxSplitterWindow::Unsplit( window );
     }
+
+    bool ShowOnStart() { return b_show_on_start; }
 
 private:
     DECLARE_EVENT_TABLE()
@@ -222,6 +239,7 @@ private:
     int i_width;
     vlc_bool_t b_video;
     mtime_t i_delay;
+    vlc_bool_t b_show_on_start;
 };
 
 BEGIN_EVENT_TABLE(Splitter, wxSplitterWindow)
@@ -446,6 +464,9 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     if( config_GetInt( p_intf, "wx-extended" ) ) OnExtended( dummy );
 
     SetIntfMinSize();
+
+    /* Show embedded playlist if requested */
+    if( splitter->ShowOnStart() ) OnSmallPlaylist( dummy );
 }
 
 Interface::~Interface()
@@ -1165,10 +1186,8 @@ void Interface::TogglePlayButton( int i_playing_status )
 static int DoInteract( intf_thread_t *, interaction_dialog_t *, int )
 {
     fprintf( stderr, "Doing interaction \n" );
+    return VLC_SUCCESS;
 }
-
-
-
 
 #if wxUSE_DRAG_AND_DROP
 /*****************************************************************************

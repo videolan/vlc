@@ -191,6 +191,7 @@ namespace wxvlc
             ID_FILE_INFO,
             ID_BOOKMARKS,
             ID_VIDEO,
+            ID_SMALL_PLAYLIST,
             ID_MAX,
         };
 
