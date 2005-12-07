@@ -3970,7 +3970,7 @@ AS_IF([test "${CXX}" != "" -a "${enable_cyberlink}" = "yes" || (test "${enable_c
     CPPFLAGS_cyberlink="-I${real_cyberlink_tree}/include"
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_cyberlink}"
     AC_CHECK_HEADERS([cybergarage/upnp/MediaServer.h],
-      [ VLC_ADD_CPPFLAGS([upnp], [${CPPFLAGS_cyberlink}])
+      [ VLC_ADD_CXXFLAGS([upnp], [${CPPFLAGS_cyberlink}])
         VLC_ADD_PLUGINS([upnp]) 
       ],[
         AC_MSG_ERROR([cannot find CyberLink for C++ headers])
