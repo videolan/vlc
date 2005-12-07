@@ -1,0 +1,577 @@
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  index.html: VLC media player web interface
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005 the VideoLAN team
+<  $Id: $
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+  <title>VLC media player - Web Interface</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="functions.js"></script>
+
+</head>
+
+<body onload="loop_refresh();">
+
+<div id="main">
+  <div class="title">
+    VLC media player
+    <button id="btn_toggle_text" onclick="toggle_btn_text();">
+      <img src="images/help.png" alt="Help" />
+      Help
+    </button>
+  </div>
+  <div class="controls">
+    <button id="btn_open" onclick="toggle_show('input');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/eject.png" alt="Open" />
+      <span class="btn_text">Open</span>
+    </button>
+    &nbsp;
+    <button id="btn_stop" onclick="pl_stop();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/stop.png" alt="Stop" />
+      <span class="btn_text">Stop</span>
+    </button>
+    <!--<button id="btn_play" onclick="alert('FIXME');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/play.png" alt="Play" />
+      <span class="btn_text">Play</span>
+    </button>-->
+    <button id="btn_pause" onclick="pl_pause();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/pause.png" alt="Pause" id="btn_pause_img" />
+      <span class="btn_text">Pause</span>
+    </button>
+    &nbsp;
+    <button id="btn_previous" onclick="pl_previous();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/prev.png" alt="Previous" />
+      <span class="btn_text">Previous</span>
+    </button>
+    <button id="btn_next" onclick="pl_next();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/next.png" alt="Next" />
+      <span class="btn_text">Next</span>
+    </button>
+    &nbsp;
+    <button id="btn_sout" onclick="toggle_show('sout');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/sout.png" alt="Stream Output" />
+      <span class="btn_text">Stream Output</span>
+    </button>
+    <button id="btn_playlist" onclick="toggle_show('playlist');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/playlist.png" alt="Playlist" />
+      <span class="btn_text">Playlist</span>
+    </button>
+    &nbsp;
+    <button id="btn_fullscreen" onclick="fullscreen();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/fullscreen.png" alt="Fullscreen" />
+      <span class="btn_text">Fullscreen</span>
+    </button>
+    &nbsp;
+    <button id="btn_volume_down" onclick="volume_down();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/volume_down.png" alt="Decrease Volume" />
+      <span class="btn_text">Decrease Volume</span>
+    </button>
+    <button id="btn_volume_up" onclick="volume_up();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/volume_up.png" alt="Increase Volume" />
+      <span class="btn_text">Increase Volume</span>
+    </button>
+  </div>
+  <div id="status">
+    <span id="state">(?)</span>
+    -
+    Time : <span id="time">(?)</span>/<span id="length">(?)</span>
+    -
+    Volume : <span id="volume">(?)</span>
+  </div>
+</div>
+
+<div id="input" style="display: none">
+  <div class="title">
+    Input
+  </div>
+  <div class="controls">
+    <label for="input_mrl">Input (MRL)</label>
+    <input type="text" name="input_mrl" id="input_mrl" size="60" onkeypress="if( event.keyCode == 13 ) in_play();"/>
+    <input type="button" value="Play" onclick="in_play();" />
+    <input type="button" value="Enqueue" onclick="in_enqueue();" />
+    <br/>
+    <!--<button id="btn_inhide" onclick="hide_input();">
+      Hide
+    </button>-->
+    <button id="btn_file" onclick="hide_input();show('input_file');update_input_file();">
+      File
+    </button>
+    <button id="btn_disc" onclick="hide_input();show('input_disc');update_input_disc();">
+      Disc
+    </button>
+    <button id="btn_network" onclick="hide_input();show('input_network');update_input_net();">
+      Network
+    </button>
+  </div>
+  <div id="input_helper">
+    <div id="input_file" style="display: block">
+      Open File
+      <hr/>
+      <label for="input_file_filename">File name</label>
+      <input type="text" id="input_file_filename" size="60" />
+      <hr/>
+      <input type="checkbox" id="input_sub_options" />
+      <label for="input_sub_options">Subtitle options *TODO/FIXME/FIXHTTPD*</label>
+      <br/>
+      <label for="input_sub_file">Subtitles file</label>
+      <input type="text" id="input_sub_file" size="60" />
+      <br/><!-- TODO -->
+      <label for="input_sub_enc">Subtitles encoding</label>
+      <select id="input_sub_enc">
+        <option></option>
+      </select>
+      <br/>
+      <label for="input_sub_size">Font size</label>
+      <select id="input_sub_size">
+        <option></option>
+      </select>
+      <label for="input_sub_justification">Justification</label>
+      <select id="input_sub_justification">
+        <option></option>
+      </select>
+      <br/>
+      <label for="input_sub_fps">Frames per second</label>
+      <input type="text" id="input_sub_fps" />
+      <label for="input_sub_delay">Delay</label>
+      <input type="text" id="input_sub_delay" />
+    </div>
+    <div id="input_disc" style="display: none">
+      Open Disc
+      <hr/>
+      Disc type :
+      <input type="radio" name="input_disc_type" id="input_disc_dvdmenu" value="dvd" onchange="update_input_disc();" />
+      <label for="input_disc_dvdmenu">DVD (menus)</label>
+      <input type="radio" name="input_disc_type" id="input_disc_dvd" value="dvdsimple" onchange="update_input_disc();" />
+      <label for="input_disc_dvd">DVD</label>
+      <input type="radio" name="input_disc_type" id="input_disc_vcd" value="vcd" onchange="update_input_disc();" />
+      <label for="input_disc_vcd">VCD</label>
+      <input type="radio" name="input_disc_type" id="input_disc_cdda" value="cdda" onchange="update_input_disc();" />
+      <label for="input_disc_cdda">Audio CD</label>
+      <hr/>
+      <table>
+        <tr>
+          <td>
+            <label for="input_disc_dev">Device name</label>
+          </td>
+          <td>
+            <input type="text" id="input_disc_dev" onchange="update_input_disc();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="input_disc_title">Title</label>
+          </td>
+          <td>
+            <input type="text" id="input_disc_title" onchange="update_input_disc();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="input_disc_chapter">Chapter</label>
+          </td>
+          <td>
+            <input type="text" id="input_disc_chapter" onchange="update_input_disc();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="input_disc_subtrack">Subtitles track</label>
+          </td>
+          <td>
+             <input type="text" id="input_disc_subtrack" onchange="update_input_disc();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="input_disc_audiotrack">Audio track</label>
+          </td>
+          <td>
+            <input type="text" id="input_disc_audiotrack" onchange="update_input_disc();" />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="input_network" style="display: none">
+      Open Network
+      <hr/>
+      <table>
+        <tr>
+          <td>
+            <input type="radio" name="input_net_type" id="input_net_udp" value="udp" onchange="update_input_net();" />
+            <label for="input_net_udp">UDP/RTP</label>
+          </td>
+          <td>
+            <label for="input_net_udp_port">Port</label>
+            <input type="text" id="input_net_udp_port" size="6" onchange="update_input_net();" />
+            <input type="checkbox" id="input_net_udp_forceipv6" onchange="update_input_net();" />
+            <label for="input_net_udp_forceipv6">Force IPv6</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="radio" name="input_net_type" id="input_net_udpmcast" value="udpmcast" onchange="update_input_net();" />
+            <label for="input_net_udpmcast">UDP/RTP Multicast</label>
+          </td>
+          <td>
+            <label for="input_net_udpmcast_address">Address</label>
+            <input type="text" id="input_net_udpmcast_address" onchange="update_input_net();" />
+            <label for="input_net_udpmcast_port">Port</label>
+            <input type="text" id="input_net_udpmcast_port" size="6" onchange="update_input_net();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="radio" name="input_net_type" id="input_net_http" value="http" onchange="update_input_net();" />
+            <label for="input_net_http">HTTP/HTTPS/FTP/MMS</label>
+          </td>
+          <td>
+            <label for="input_net_http_url">URL</label>
+            <input type="text" id="input_net_http_url" onchange="update_input_net();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="radio" name="input_net_type" id="input_net_rtsp" value="rtsp" onchange="update_input_net();" />
+            <label for="input_net_rtsp">RTSP</label>
+          </td>
+          <td>
+            <label for="input_net_rtsp_url">URL</label>
+            <input type="text" id="input_net_rtsp_url" value="rtsp://" onchange="update_input_net();" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="input_net_timeshift" onchange="update_input_net();" />
+            <label for="input_net_timeshift">Allow timeshifting</label>
+          </td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="sout" style="display: none">
+  <div class="title">
+    Stream Output
+  </div>
+  <div class="controls">
+    <label for="sout_mrl">Destination (MRL)</label>
+    <input type="text" name="sout_mrl" id="sout_mrl" size="60" />
+    <br/>
+    <input type="submit" value="Save" onclick="save_sout();" />
+    <input type="button" value="Cancel" onclick="reset_sout();"/>
+    <input type="hidden" id="sout_old_mrl" value="" /> <!-- FIXME -->
+    <input type="button" id="sout_helper_toggle" onclick="toggle_show_sout_helper()" value="Full sout interface" />
+  </div>
+  <div id="sout_helper" style="display: none;" >
+    Stream Output Helper
+    <hr/>
+    <div id="sout_method">
+      <table>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_display" onchange="update_sout()"/>
+            <label for="sout_display">Display</label>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_file" onchange="update_sout()"/>
+            <label for="sout_file">File</label>
+          </td>
+          <td>
+            <label for="sout_file_filename">File name</label>
+            <input type="text" id="sout_file_filename" onchange="update_sout()"/>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_http" onchange="update_sout()"/>
+            <label for="sout_http">HTTP</label>
+          </td>
+          <td>
+            <label for="sout_http_addr">Address</label>
+            <input type="text" id="sout_http_addr" onchange="update_sout()"/>
+          </td>
+          <td>
+            <label for="sout_http_port">Port</label>
+            <input type="text" id="sout_http_port" onchange="update_sout()"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_mmsh" onchange="update_sout()"/>
+            <label for="sout_mmsh">MMSH</label>
+          </td>
+          <td>
+            <label for="sout_mmsh_addr">Address</label>
+            <input type="text" id="sout_mmsh_addr" onchange="update_sout()"/>
+          </td>
+          <td>
+            <label for="sout_mmsh_port">Port</label>
+            <input type="text" id="sout_mmsh_port" onchange="update_sout()"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_rtp" onchange="update_sout()"/>
+            <label for="sout_rtp">RTP</label>
+          </td>
+          <td>
+            <label for="sout_rtp_addr">Address</label>
+            <input type="text" id="sout_rtp_addr" onchange="update_sout()"/>
+          </td>
+          <td>
+            <label for="sout_rtp_port">Port</label>
+            <input type="text" id="sout_rtp_port" onchange="update_sout()"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_udp" onchange="update_sout()"/>
+            <label for="sout_udp">UDP</label>
+          </td>
+          <td>
+            <label for="sout_udp_addr">Address</label>
+            <input type="text" id="sout_udp_addr" onchange="update_sout()"/>
+          </td>
+          <td>
+            <label for="sout_udp_port">Port</label>
+            <input type="text" id="sout_udp_port" onchange="update_sout()"/>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr/>
+    <div id="sout_muxh">
+      <input type="radio" name="sout_mux" id="sout_mux_default" value="" onchange="update_sout()" />
+      <label for="sout_mux_default">Default</label>
+      <input type="radio" name="sout_mux" id="sout_mux_ts" value="ts" onchange="update_sout()"/>
+      <label for="sout_mux_ts">MPEG TS</label>
+      <input type="radio" name="sout_mux" id="sout_mux_ps" value="ps" onchange="update_sout()"/>
+      <label for="sout_mux_ps">MPEG PS</label>
+      <input type="radio" name="sout_mux" id="sout_mux_mpeg1" value="mpeg1" onchange="update_sout()"/>
+      <label for="sout_mux_ts">MPEG 1</label>
+      <input type="radio" name="sout_mux" id="sout_mux_ogg" value="ogg" onchange="update_sout()"/>
+      <label for="sout_mux_ts">OGG</label>
+      <br/>
+      <input type="radio" name="sout_mux" id="sout_mux_asf" value="asf" onchange="update_sout()"/>
+      <label for="sout_mux_ts">ASF</label>
+      <input type="radio" name="sout_mux" id="sout_mux_mp4" value="mp4" onchange="update_sout()"/>
+      <label for="sout_mux_ts">MP4</label>
+      <input type="radio" name="sout_mux" id="sout_mux_mov" value="mov" onchange="update_sout()"/>
+      <label for="sout_mux_ts">MOV</label>
+      <input type="radio" name="sout_mux" id="sout_mux_wav" value="wav" onchange="update_sout()"/>
+      <label for="sout_mux_ts">WAV</label>
+      <input type="radio" name="sout_mux" id="sout_mux_raw" value="raw" onchange="update_sout()"/>
+      <label for="sout_mux_ts">Raw</label>
+    </div>
+    <hr/>
+    <div id="sout_transcode">
+      <table>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_vcodec_s" onchange="update_sout()"/>
+            <label for="sout_vcodec_s">Video Codec</label>
+          </td>
+          <td>
+            <select id="sout_vcodec" onchange="update_sout()">
+              <option value="mp1v">mp1v</option>
+              <option value="mp2v">mp2v</option>
+              <option value="mp4v">mp4v</option>
+              <option value="DIV1">DIV1</option>
+              <option value="DIV2">DIV2</option>
+              <option value="DIV3">DIV3</option>
+              <option value="H263">H263</option>
+              <option value="H264">H264</option>
+              <option value="WMV1">WMV1</option>
+              <option value="WMV2">WMV2</option>
+              <option value="MJPG">MJPG</option>
+              <option value="theo">theo</option>
+            </select>
+          </td>
+          <td>
+            <label for="sout_vb">Bitrate (kb/s)</label>
+            <select id="sout_vb" onchange="update_sout()">
+              <option value="4096">4096</option>
+              <option value="3072">3072</option>
+              <option value="2048">2048</option>
+              <option value="1024">1024</option>
+              <option value="768">768</option>
+              <option value="512">512</option>
+              <option value="384">384</option>
+              <option value="256">256</option>
+              <option value="192">192</option>
+              <option value="128">128</option>
+              <option value="96">96</option>
+              <option value="64">64</option>
+              <option value="32">32</option>
+              <option value="16">16</option>
+            </select>
+          </td>
+          <td>
+            <label for="sout_scale">Scale</label>
+            <select id="sout_scale" onchange="update_sout()">
+              <option value="0.25">0.25</option>
+              <option value="0.5">0.5</option>
+              <option value="0.75">0.75</option>
+              <option value="1" selected="selected">1</option>
+              <option value="1.25">1.25</option>
+              <option value="1.5">1.5</option>
+              <option value="1.75">1.75</option>
+              <option value="2">2</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_acodec_s" onchange="update_sout()"/>
+            <label for="sout_acodec_s">Audio Codec</label>
+          </td>
+          <td>
+            <select id="sout_acodec" onchange="update_sout()">
+              <option value="mpga">mpga</option>
+              <option value="mp2a">mp2a</option>
+              <option value="mp3">mp3</option>
+              <option value="mp4a">mp4a</option>
+              <option value="a42">a52</option>
+              <option value="vorb">vorb</option>
+              <option value="flac">flac</option>
+              <option value="spx">spx</option>
+              <option value="s16l">s16l</option>
+              <option value="fl32">fl32</option>
+            </select>
+          </td>
+          <td>
+            <label for="sout_ab">Bitrate (kb/s)</label>
+            <select id="sout_ab" onchange="update_sout()">
+              <option value="512">512</option>
+              <option value="384">384</option>
+              <option value="256">256</option>
+              <option value="192">192</option>
+              <option value="128">128</option>
+              <option value="96">96</option>
+              <option value="64">64</option>
+              <option value="32">32</option>
+              <option value="16">16</option>
+            </select>
+          </td>
+          <td>
+            <label for="sout_channels">Channels</label>
+            <select id="sout_channels" onchange="update_sout()">
+              <option value="">default</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="sout_sub" onchange="update_sout()"/>
+            <label for="sout_sub">Subtitles Codec</label>
+          </td>
+          <td>
+            <select id="sout_scodec" onchange="update_sout()">
+              <option value="dvbs">dvbs</option>
+            </select>
+          </td>
+          <td colspan="2">
+            <input type="checkbox" id="sout_soverlay" onchange="update_sout()"/>
+            <label for="sout_soverlay">Subtitles overlay</label>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr/>
+    <div id="sout_misc">
+      <input type="checkbox" id="sout_sap" onchange="update_sout()"/>
+      <label for="sout_sap">SAP announce</label>
+      <br/>
+      <label for="sout_sap_group">Group name</label>
+      <input type="text" id="sout_sap_group" onchange="update_sout()"/>
+      <label for="sout_sap_name">Channel name</label>
+      <input type="text" id="sout_sap_name" onchange="update_sout()"/>
+      <hr/>
+      <input type="checkbox" id="sout_all" onchange="update_sout()"/>
+      <label for="sout_all">Select all elementary streams</label>
+      <hr/>
+      <label for="sout_ttl">Time-To-Live (TTL)</label>
+      <input type="text" id="sout_ttl" onchange="update_sout()"/>
+    </div>
+  </div>
+</div>
+
+<div id="playlist">
+  <div class="title">
+    Playlist
+  </div>
+  <div class="controls">
+    <button id="btn_delete" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/delete.png" alt="Delete" />
+      <span class="btn_text">Delete</span>
+    </button>
+    <button id="btn_empty" onclick="pl_empty();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/empty.png" alt="Empty" />
+      <span class="btn_text">Empty</span>
+    </button>
+    &nbsp;
+    <button id="btn_sort" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/sort.png" alt="Sort" />
+      <span class="btn_text">Sort</span>
+    </button>
+    &nbsp;
+    <button id="btn_shuffle" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/shuffle.png" alt="Shuffle" />
+      <span class="btn_text">Shuffle</span>
+    </button>
+    <button id="btn_loop" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/loop.png" alt="Loop" />
+      <span class="btn_text">Loop</span>
+    </button>
+    <button id="btn_repeat" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      <img src="images/repeat.png" alt="Repeat" />
+      <span class="btn_text">Repeat</span>
+    </button>
+  </div>
+  <div id="playtree">
+    (?)
+  </div>
+</div>
+
+<div id="footer">
+  <vlc id="value" param1="copyright" />
+</div>
+
+</body>
+
+</html>
