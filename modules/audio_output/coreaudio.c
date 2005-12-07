@@ -303,7 +303,7 @@ static int Open( vlc_object_t * p_this )
     /* Get a description of the stream format */
     i_param_size = sizeof( AudioStreamBasicDescription ); 
     err = AudioDeviceGetProperty( p_sys->devid, i_startingChannel, FALSE, 
-                                  kAudioDevicePropertyStreamFormat,
+                                  kAudioStreamPropertyPhysicalFormat,
                                   &i_param_size, &p_sys->stream_format );
     if( err != noErr )
     {
@@ -593,11 +593,9 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     aout_instance_t * p_aout = (aout_instance_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-#if 1
     p_sys->clock_diff = - (mtime_t)
-        AudioConvertHostTimeToNanos( inNow->mHostTime ) / 1000; 
+        AudioConvertHostTimeToNanos( inOutputTime->mHostTime ) / 1000; 
     p_sys->clock_diff += mdate();
-#endif
 
     current_date = p_sys->clock_diff +
                    AudioConvertHostTimeToNanos( inOutputTime->mHostTime ) / 1000;
@@ -1537,8 +1535,6 @@ static OSStatus StreamListener( AudioStreamID inStream,
 {
     OSStatus err = noErr;
     struct { vlc_mutex_t lock; vlc_cond_t cond; } * w = inClientData;
-    aout_instance_t * p_aout = (aout_instance_t *)inClientData;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     switch( inPropertyID )
     {
