@@ -111,8 +111,6 @@ div.pl_node {
 }
 a.pl_leaf {
 	font-style: normal;
-	color: #00f;
-	text-decoration: underline;
 	display: block;
 }
 a.pl_leaf:hover {
@@ -128,6 +126,7 @@ div#browse {
 	position: absolute;
 	left: 15%;
 	z-index: 1;
+	font-size: 0.8em;
 }
 div#browse div.title {
 	background-color: #008;

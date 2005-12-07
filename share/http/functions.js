@@ -175,7 +175,7 @@ function parse_playlist()
                 {
                     pos.appendChild( document.createElement( "div" ) );
                     pos.lastChild.setAttribute( 'class', 'pl_node' );
-                    pos.lastChild.setAttribute( 'onclick', 'pl_play('+elt.getAttribute( 'id' )+');' );
+                    /*pos.lastChild.setAttribute( 'onclick', 'pl_play('+elt.getAttribute( 'id' )+');' );*/
                     pos.lastChild.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                     pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                 }
