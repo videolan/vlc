@@ -74,6 +74,7 @@ DIST_skins2 = \
 DIST_http = \
 	http/favicon.ico \
 	http/functions.js \
+	http/requests/browse.xml \
 	http/requests/playlist.xml \
 	http/requests/status.xml \
 	http/style.css \

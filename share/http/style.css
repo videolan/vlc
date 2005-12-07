@@ -109,7 +109,7 @@ div.pl_node, a.pl_leaf {
 div.pl_node {
 	font-style: italic;
 }
-a.pl_leaf, a.browser {
+a.pl_leaf {
 	font-style: normal;
 	color: #00f;
 	text-decoration: underline;

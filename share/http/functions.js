@@ -699,6 +699,15 @@ function parse_browse_dir( )
                         pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+elt.getAttribute( 'path' )+'\');' );
                     }
                     pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    if( elt.getAttribute( 'type' ) == 'directory' )
+                    {
+                        pos.appendChild( document.createTextNode( ' ' ) );
+                        pos.appendChild( document.createElement( "a" ) );
+                        pos.lastChild.setAttribute( 'class', 'browser' );
+                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+elt.getAttribute( 'path' )+'\');');
+                        pos.lastChild.appendChild( document.createTextNode( '(select)' ) );
+                    }
+                    pos.appendChild( document.createElement( "br" ) );
                 }
                 elt = elt.nextSibling;
             }
