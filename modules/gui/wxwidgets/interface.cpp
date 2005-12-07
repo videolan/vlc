@@ -63,6 +63,11 @@
 #endif
 
 /*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int DoInteract( intf_thread_t *, interaction_dialog_t *, int );
+
+/*****************************************************************************
  * Local class declarations.
  *****************************************************************************/
 class wxMenuExt: public wxMenu
@@ -334,6 +339,8 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     b_extra = VLC_FALSE;
     extra_frame = 0;
     playlist_manager = 0;
+
+    p_intf->pf_interact = DoInteract;
 
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
@@ -1154,6 +1161,14 @@ void Interface::TogglePlayButton( int i_playing_status )
     GetToolBar()->ToggleTool( PlayStream_Event, true );
     GetToolBar()->ToggleTool( PlayStream_Event, false );
 }
+
+static int DoInteract( intf_thread_t *, interaction_dialog_t *, int )
+{
+    fprintf( stderr, "Doing interaction \n" );
+}
+
+
+
 
 #if wxUSE_DRAG_AND_DROP
 /*****************************************************************************

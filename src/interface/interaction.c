@@ -43,14 +43,14 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void 	       	     intf_InteractionInit( playlist_t *p_playlist );
+static void                  intf_InteractionInit( playlist_t *p_playlist );
 static interaction_t *       intf_InteractionGet( vlc_object_t *p_this );
-static void 		     intf_InteractionSearchInterface( interaction_t *
-							      p_interaction );
-static int 		     intf_WaitAnswer( interaction_t *p_interact,
-					      interaction_dialog_t *p_dialog );
-static int 		     intf_Send( interaction_t *p_interact,
-			                interaction_dialog_t *p_dialog );
+static void                  intf_InteractionSearchInterface( interaction_t *
+                                                          p_interaction );
+static int                   intf_WaitAnswer( interaction_t *p_interact,
+                             interaction_dialog_t *p_dialog );
+static int                   intf_Send( interaction_t *p_interact,
+                             interaction_dialog_t *p_dialog );
 static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* , int );
 
 /**
@@ -82,7 +82,7 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
     }
 }
 
-/** 
+/**
  * Destroy the interaction system
  */
 void intf_InteractionDestroy( interaction_t *p_interaction )
@@ -90,10 +90,10 @@ void intf_InteractionDestroy( interaction_t *p_interaction )
     /// \todo Code this, and call it
 }
 
-/** 
+/**
  * The main interaction processing loop
  * This function is called from the playlist loop
- * 
+ *
  * \param p_playlist the parent playlist
  * \return nothing
  */
@@ -125,32 +125,41 @@ void intf_InteractionManage( playlist_t *p_playlist )
     {
         interaction_dialog_t *p_dialog = p_interaction->pp_dialogs[i_index];
 
-        if( p_dialog->b_have_answer )
+        switch( p_dialog->i_status )
         {
+        case ANSWERED_DIALOG:
             /// \todo Signal we have an answer
             // - If have answer, signal what is waiting
             // (vlc_cond ? dangerous in case of pb ?)
 
             // Ask interface to hide it
+            msg_Dbg( p_interaction, "Hiding dialog %i", p_dialog->i_id );
             p_interaction->p_intf->pf_interact( p_interaction->p_intf,
                                                 p_dialog, INTERACT_HIDE );
-
-        }
-
-        if( p_dialog->b_updated )
-        {
-            p_dialog->b_finished = VLC_FALSE;
+            p_dialog->i_status = HIDING_DIALOG;
+            break;
+        case UPDATED_DIALOG:
             p_interaction->p_intf->pf_interact( p_interaction->p_intf,
                                                 p_dialog, INTERACT_UPDATE );
+            p_dialog->i_status = SENT_DIALOG;
+            msg_Dbg( p_interaction, "Updating dialog %i, %i widgets",
+                                    p_dialog->i_id, p_dialog->i_widgets );
+            break;
+        case HIDDEN_DIALOG:
+            if( !p_dialog->b_reusable )
+            {
+                /// \todo Destroy the dialog
+            }
+            break;
+        case NEW_DIALOG:
+            // This is truly a new dialog, send it.
+            p_interaction->p_intf->pf_interact( p_interaction->p_intf,
+                                                p_dialog, INTERACT_NEW );
+            msg_Dbg( p_interaction, "Creating dialog %i, %i widgets",
+                                        p_dialog->i_id, p_dialog->i_widgets );
+            p_dialog->i_status = SENT_DIALOG;
+            break;
         }
-
-        if( p_dialog->b_finished && !p_dialog->b_reusable )
-        {
-            /// \todo Destroy the dialog
-        }
-        // This is truly a new dialog, send it.
-        p_interaction->p_intf->pf_interact( p_interaction->p_intf,
-                                            p_dialog, INTERACT_NEW );
     }
 
     vlc_object_release( p_interaction->p_intf );
@@ -167,7 +176,8 @@ void intf_InteractionManage( playlist_t *p_playlist )
         new->pp_widgets = NULL;                                         \
         new->psz_title = NULL;                                          \
         new->psz_description = NULL;                                    \
-        new->i_id = 0;
+        new->i_id = 0;                                                  \
+        new->i_status = NEW_DIALOG;
 
 #define INTERACT_FREE( new )                                            \
         if( new->psz_title ) free( new->psz_title );                    \
@@ -194,6 +204,11 @@ void __intf_UserFatal( vlc_object_t *p_this, int i_id,
     if( !p_new )
     {
         INTERACT_INIT( p_new );
+        if( i_id > 0 ) p_new->i_id = i_id ;
+    }
+    else
+    {
+        p_new->i_status = UPDATED_DIALOG;
     }
 
     p_new->i_type = INTERACT_FATAL;
@@ -216,7 +231,7 @@ void __intf_UserFatal( vlc_object_t *p_this, int i_id,
 }
 
 #if 0
-/** Helper function to build a progress bar 
+/** Helper function to build a progress bar
  * \param p_this   Parent vlc object
  */
 interaction_dialog_t *__intf_ProgressBuild( vlc_object_t *p_this,

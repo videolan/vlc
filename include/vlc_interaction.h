@@ -56,12 +56,23 @@ struct interaction_dialog_t
     int             i_widgets;          //< Nu,ber of dialog widgets
     user_widget_t **pp_widgets;         //< Dialog widgets
 
-    vlc_bool_t      b_have_answer;      //< Has an answer been given ?
     vlc_bool_t      b_reusable;         //< Do we have to reuse this ?
-    vlc_bool_t      b_updated;          //< Update for this one ?
-    vlc_bool_t      b_finished;         //< Hidden by interface
 
     void *          p_private;          //< Private interface data
+    int             i_status;           //< Dialog status;
+};
+
+/**
+ * Possible status
+ */
+enum
+{
+    NEW_DIALOG,
+    SENT_DIALOG,
+    UPDATED_DIALOG,
+    ANSWERED_DIALOG,
+    HIDING_DIALOG,
+    HIDDEN_DIALOG,
 };
 
 /**
@@ -81,6 +92,7 @@ enum
  */
 enum
 {
+    DIALOG_FIRST,
     DIALOG_NOACCESS,
     DIALOG_NOCODEC,
     DIALOG_NOAUDIO,
