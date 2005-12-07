@@ -99,6 +99,7 @@ DIST_http = \
 	http/images/volume_down.png \
 	http/images/play.png \
 	http/images/delete.png \
+	http/images/delete_small.png \
 	http/images/speaker.png \
 	http/images/loop.png \
 	http/images/stop.png \
