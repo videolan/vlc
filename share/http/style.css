@@ -2,7 +2,7 @@
  * style.css: VLC media player web interface
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -72,7 +72,7 @@ div#sout_helper hr, div#input_helper hr {
 }
 
 div.title {
-	width: 600px/*576px*/; /* see overflow:hidden several lines 
+	width: 100%/*576px*/; /* see overflow:hidden several lines 
                                 * before for explanation */
 	background: #000 url('images/vlc16x16.png') no-repeat top left;
 	padding-left: 24px;
@@ -85,6 +85,7 @@ div.title button {
 	background-color: #000;
 	color: #fff;
 }
+
 div.controls {
 	width: 100%;
 	padding: 3px 5px;
@@ -108,7 +109,7 @@ div.pl_node, a.pl_leaf {
 div.pl_node {
 	font-style: italic;
 }
-a.pl_leaf {
+a.pl_leaf, a.browser {
 	font-style: normal;
 	color: #00f;
 	text-decoration: underline;
@@ -116,4 +117,21 @@ a.pl_leaf {
 }
 a.pl_leaf:hover {
 	background-color: #ffd;
+}
+
+div#browse {
+	background-color: #fff;
+	width: 70%;
+	overflow: hidden;
+	border: solid #888 1px;
+	margin: 10px auto; /* Center on page - Firefox */
+	position: absolute;
+	left: 15%;
+	z-index: 1;
+}
+div#browse div.title {
+	background-color: #008;
+}
+div#browser {
+	padding: 20px;
 }

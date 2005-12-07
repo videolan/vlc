@@ -3,7 +3,7 @@
 <  status.xml: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005 the VideoLAN team
-<  $Id: $
+<  $Id$
 < 
 <  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
 < 
@@ -67,8 +67,7 @@
   <vlc id="end" />
   <vlc id="if" param1="command value 'volume' strcmp 0 =" />
     <vlc id="rpn" param1="val value vlc_volume_set" />
-    <!-- volume set <vlc id="value" param1="val" />-->
-  <vlc id="end" />
+  <vlc id="end"/>
 
 <vlc id="end" />
 <root>

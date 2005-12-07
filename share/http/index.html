@@ -2,7 +2,7 @@
 <  index.html: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005 the VideoLAN team
-<  $Id: $
+<  $Id$
 < 
 <  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
 < 
@@ -39,6 +39,22 @@
 </head>
 
 <body onload="loop_refresh();">
+
+<div id="browse" style="display: none;">
+  <div class="title">
+    Browse
+  </div>
+  <div id="browser">
+    <a href="javascript:browse_dir('~');">Lets browse !</a>
+  </div>
+  <div class="controls">
+    <button id="btn_browse_close" onclick="hide('browse');">
+      Close
+    </button>
+    <input type="hidden" id="browse_lastdir" value="~" />
+    <input type="hidden" id="browse_dest" value="" />
+  </div>
+</div>
 
 <div id="main">
   <div class="title">
@@ -105,6 +121,8 @@
     Time : <span id="time">(?)</span>/<span id="length">(?)</span>
     -
     Volume : <span id="volume">(?)</span>
+    <br/>
+    <span id="nowplaying">(?)</span>
   </div>
 </div>
 
@@ -136,7 +154,8 @@
       Open File
       <hr/>
       <label for="input_file_filename">File name</label>
-      <input type="text" id="input_file_filename" size="60" />
+      <input type="text" id="input_file_filename" size="60" onchange="update_input_file();" onfocus="update_input_file();"/>
+      <input type="button" id="input_file_browse" value="Browse" onclick="browse( 'input_file_filename' );" />
       <hr/>
       <input type="checkbox" id="input_sub_options" />
       <label for="input_sub_options">Subtitle options *TODO/FIXME/FIXHTTPD*</label>

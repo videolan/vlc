@@ -2,7 +2,7 @@
  * functions.js: VLC media player web interface
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -63,6 +63,7 @@ function in_play()
         input += ' '+value('sout_mrl');
     url = 'requests/status.xml?command=in_play&input='+escape(input);
     loadXMLDoc( url, parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function in_enqueue()
 {
@@ -71,10 +72,12 @@ function in_enqueue()
         input += ' '+value('sout_mrl');
     url = 'requests/status.xml?command=in_enqueue&input='+escape(input);
     loadXMLDoc( url, parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function pl_play( id )
 {
     loadXMLDoc( 'requests/status.xml?command=pl_play&id='+id, parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function pl_pause()
 {
@@ -83,22 +86,27 @@ function pl_pause()
 function pl_stop()
 {
     loadXMLDoc( 'requests/status.xml?command=pl_stop', parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function pl_next()
 {
     loadXMLDoc( 'requests/status.xml?command=pl_next', parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function pl_previous()
 {
     loadXMLDoc( 'requests/status.xml?command=pl_previous', parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function pl_delete( id )
 {
     loadXMLDoc( 'requests/status.xml?command=pl_delete&id='+id, parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function pl_empty()
 {
     loadXMLDoc( 'requests/status.xml?command=pl_empty', parse_status );
+    setTimeout( 'update_playlist()', 1000 );
 }
 function volume_down()
 {
@@ -157,9 +165,9 @@ function parse_playlist()
         {
             answer = req.responseXML.documentElement;
             playtree = document.getElementById( 'playtree' );
-            pos = playtree;
-            while( playtree.hasChildNodes() )
-                playtree.removeChild( playtree.firstChild );
+            /* pos = playtree; */
+            pos = document.createElement( "div" );
+            pos_top = pos;
             elt = answer.firstChild;
             while( elt )
             {
@@ -179,7 +187,11 @@ function parse_playlist()
                     pl.setAttribute( 'href', 'javascript:pl_play('+elt.getAttribute( 'id' )+');' );
                     pl.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                     if( elt.getAttribute( 'current' ) == 'current' )
+                    {
                         pl.setAttribute( 'style', 'font-weight: bold;' );
+                        document.getElementById( 'nowplaying' ).textContent
+                            = elt.getAttribute( 'name' );
+                    }
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                 }
@@ -199,6 +211,9 @@ function parse_playlist()
                     pos = pos.parentNode;
                 }
             }
+            while( playtree.hasChildNodes() )
+                playtree.removeChild( playtree.firstChild );
+            playtree.appendChild( pos_top );
         }
         else
         {
@@ -633,11 +648,67 @@ function loop_refresh_status()
 }
 function loop_refresh_playlist()
 {
-    setTimeout( 'loop_refresh_playlist()', 3000 );
+ /*   setTimeout( 'loop_refresh_playlist()', 10000 ); */
     update_playlist();
 }
 function loop_refresh()
 {
     setTimeout('loop_refresh_status()',0);
     setTimeout('loop_refresh_playlist()',0);
+}
+
+function browse( dest )
+{
+    document.getElementById( 'browse_dest' ).value = dest;
+    browse_dir( document.getElementById( 'browse_lastdir' ).value );
+    show( 'browse' );
+}
+function browse_dir( dir )
+{
+    document.getElementById( 'browse_lastdir' ).value = dir;
+    loadXMLDoc( 'requests/browse.xml?dir='+dir, parse_browse_dir );
+}
+function browse_path( p )
+{
+    document.getElementById( document.getElementById( 'browse_dest' ).value ).value = p;
+    hide( 'browse' );
+    document.getElementById( document.getElementById( 'browse_dest' ).value ).focus();
+}
+function parse_browse_dir( )
+{
+    if( req.readyState == 4 )
+    {
+        if( req.status == 200 )
+        {
+            answer = req.responseXML.documentElement;
+            browser = document.getElementById( 'browser' );
+            pos = document.createElement( "div" );
+            elt = answer.firstChild;
+            while( elt )
+            {
+                if( elt.nodeName == "element" )
+                {
+                    pos.appendChild( document.createElement( "a" ) );
+                    pos.lastChild.setAttribute( 'class', 'browser' );
+                    if( elt.getAttribute( 'type' ) == 'directory' )
+                    {
+                        pos.lastChild.setAttribute( 'href', 'javascript:browse_dir(\''+elt.getAttribute( 'path' )+'\');');
+                    }
+                    else
+                    {
+                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+elt.getAttribute( 'path' )+'\');' );
+                    }
+                    pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                }
+                elt = elt.nextSibling;
+            }
+            while( browser.hasChildNodes() )
+                browser.removeChild( browser.firstChild );
+            browser.appendChild( pos );
+        }
+        else
+        {
+            /*alert( 'Error! HTTP server replied: ' + req.status );*/
+        }
+    }
 }
