@@ -32,6 +32,10 @@
   <link href="style.css" rel="stylesheet" type="text/css" />
   <script type="text/javascript" src="functions.js"></script>
 
+  <!-- in case people had scripts that sent commands to the default
+       index.html page -->
+  <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort,move" />
+
 </head>
 
 <body onload="loop_refresh();">
