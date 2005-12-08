@@ -868,25 +868,18 @@ package-win32-base:
 	sed -i 's%share/osdmenu%osdmenu%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg
 	sed -i 's%/%\\%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg 
 
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/admin"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/vlm"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/images"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/requests"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;:
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
-	cp $(srcdir)/share/http/*.png $(top_builddir)/vlc-${VERSION}/http/
+	cp $(srcdir)/share/http/*.js $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.js ;
 	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
-	cp $(srcdir)/share/http/admin/*.html \
-           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/*.html ;
-	cp $(srcdir)/share/http/admin/dboxfiles.html \
-           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
-	cp $(srcdir)/share/http/admin/.access \
-           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/.access ;
-	cp $(srcdir)/share/http/vlm/*.html \
-           $(top_builddir)/vlc-${VERSION}/http/vlm/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/vlm/*.html ;
+	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
+	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/requests/*.xml ;
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
@@ -972,25 +965,18 @@ package-wince-base:
 	done
 
 
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/admin"
-	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/vlm"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/images"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/requests"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
-	cp $(srcdir)/share/http/*.png $(top_builddir)/vlc-${VERSION}/http/
+	cp $(srcdir)/share/http/*.js $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.js ;
 	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
-	cp $(srcdir)/share/http/admin/*.html \
-           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/*.html ;
-	cp $(srcdir)/share/http/admin/dboxfiles.html \
-           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
-	cp $(srcdir)/share/http/admin/.access \
-           $(top_builddir)/vlc-${VERSION}/http/admin/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/admin/.access ;
-	cp $(srcdir)/share/http/vlm/*.html \
-           $(top_builddir)/vlc-${VERSION}/http/vlm/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/vlm/*.html ;
+	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
+	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/requests/*.xml ;
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
