@@ -223,8 +223,39 @@ Index: common/i386/mc-a2.asm
 +mmx_dw_5:
 +    times 4 dw -5
 +
---- configure	2005-11-28 15:42:12.390625000 +0000
-+++ configure.new	2005-11-28 15:52:48.687500000 +0000
+--- Makefile	(révision 380)
++++ Makefile	(copie de travail)
+@@ -63,8 +63,8 @@
+ default: $(DEP) x264$(EXE)
+ 
+ libx264.a: .depend $(OBJS) $(OBJASM)
+-	ar rc libx264.a $(OBJS) $(OBJASM)
+-	ranlib libx264.a
++	$(AR) rc libx264.a $(OBJS) $(OBJASM)
++	$(RANLIB) libx264.a
+ 
+ x264$(EXE): libx264.a x264.o matroska.o
+ 	$(CC) -o $@ x264.o matroska.o libx264.a $(LDFLAGS)
+@@ -128,14 +128,14 @@
+ distclean: clean
+ 	rm -f config.mak vfw/build/cygwin/config.mak x264.pc
+ 
+-install: x264
++install: x264$(EXE)
+ 	install -d $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
+ 	install -d $(DESTDIR)$(libdir) $(DESTDIR)$(libdir)/pkgconfig
+ 	install -m 644 x264.h $(DESTDIR)$(includedir)
+ 	install -m 644 libx264.a $(DESTDIR)$(libdir)
+ 	install -m 644 x264.pc $(DESTDIR)$(libdir)/pkgconfig
+-	install x264 $(DESTDIR)$(bindir)
+-	ranlib $(DESTDIR)$(libdir)/libx264.a
++	install x264$(EXE) $(DESTDIR)$(bindir)
++	$(RANLIB) $(DESTDIR)$(libdir)/libx264.a
+ 
+ uninstall:
+ 	rm -f $(DESTDIR)$(includedir)/x264.h $(DESTDIR)$(libdir)/libx264.a
+--- configure	(révision 385)
++++ configure	(copie de travail)
 @@ -7,6 +7,7 @@
  echo "available options:"
  echo ""
@@ -233,7 +264,7 @@ Index: common/i386/mc-a2.asm
  echo "  --enable-avis-input      enables avisynth input (win32 only)"
  echo "  --enable-mp4-output      enables mp4 output (using gpac)"
  echo "  --enable-vfw             compiles the VfW frontend"
-@@ -46,31 +47,126 @@
+@@ -58,47 +59,138 @@
  
  EXE=""
  
@@ -262,7 +293,7 @@ Index: common/i386/mc-a2.asm
 +	    prefix="$optarg"
 +	    ;;
 +	--exec-prefix=*)
-+	    exec_prefix="$optarg"
++	    eprefix="$optarg"
 +	    ;;
 +	--bindir=*)
 +	    bindir="$optarg"
@@ -367,23 +398,25 @@ Index: common/i386/mc-a2.asm
      SYS="CYGWIN"
      CFLAGS="$CFLAGS -mno-cygwin"
      LDFLAGS="$LDFLAGS -mno-cygwin"
-@@ -78,13 +174,13 @@
+     ASFLAGS="-f win32 -DPREFIX"
      EXE=".exe"
-     DEVNULL="NUL"
+-    DEVNULL="NUL"
+-    vfw="yes"
      ;;
 -  MINGW*)
 +  mingw*)
      SYS="MINGW"
      ASFLAGS="-f win32 -DPREFIX"
      EXE=".exe"
-     DEVNULL="NUL"
+-    DEVNULL="NUL"
+-    vfw="yes"
      ;;
 -  SunOS)
 +  sunos)
      SYS="SunOS"
      CFLAGS="$CFLAGS -DHAVE_MALLOC_H"
      LDFLAGS="$LDFLAGS -lm"
-@@ -96,9 +192,8 @@
+@@ -110,9 +202,8 @@
      ;;
  esac
  
@@ -394,7 +427,7 @@ Index: common/i386/mc-a2.asm
      ARCH="X86"
      CFLAGS="$CFLAGS -DHAVE_MMXEXT -DHAVE_SSE2"
      ;;
-@@ -108,7 +203,7 @@
+@@ -122,7 +213,7 @@
      AS="yasm"
      ASFLAGS="-f elf -m amd64"
      ;;
@@ -403,7 +436,17 @@ Index: common/i386/mc-a2.asm
      ARCH="PPC"
      if [ $SYS = MACOSX ]
      then
-@@ -156,86 +251,6 @@
+@@ -144,9 +235,6 @@
+   ia64)
+     ARCH="IA64"
+     ;;
+-  alpha)
+-    ARCH="ALPHA"
+-    ;;
+   mips|mipsel)
+     ARCH="MIPS"
+     ;;
+@@ -170,129 +258,6 @@
  
  CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
  
@@ -428,19 +471,16 @@ Index: common/i386/mc-a2.asm
 -            includedir="$optarg"
 -            ;;
 -        --enable-avis-input)
--            if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
--                CFLAGS="$CFLAGS -DAVIS_INPUT"
--                LDFLAGS="$LDFLAGS -lvfw32"
--                avis_input="yes"
--            fi
+-            avis_input="yes"
+-            ;;
+-        --disable-avis-input)
+-            avis_input="no"
 -            ;;
 -        --enable-mp4-output)
--            CFLAGS="$CFLAGS -DMP4_OUTPUT"
--            LDFLAGS="$LDFLAGS -lgpac_static"
--            if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
--                LDFLAGS="$LDFLAGS -lwinmm"
--            fi
 -            mp4_output="yes"
+-            ;;
+-        --disable-mp4-output)
+-            mp4_output="no"
 -            ;;
 -        --extra-asflags=*)
 -            ASFLAGS="$ASFLAGS ${opt#--extra-asflags=}"
@@ -454,15 +494,10 @@ Index: common/i386/mc-a2.asm
 -            VFW_LDFLAGS="${opt#--extra-ldflags=}"
 -            ;;
 -        --enable-pthread)
--            CFLAGS="$CFLAGS -DHAVE_PTHREAD=1"
 -            pthread="yes"
--            case $SYS in
--              MINGW|CYGWIN|BEOS)
--                ;;
--              *)
--                LDFLAGS="$LDFLAGS -lpthread"
--                ;;
--            esac
+-            ;;
+-        --disable-pthread)
+-            pthread="no"
 -            ;;
 -        --enable-debug)
 -            CFLAGS="$CFLAGS -g"
@@ -476,6 +511,9 @@ Index: common/i386/mc-a2.asm
 -        --enable-vfw)
 -            vfw="yes"
 -            ;;
+-        --disable-vfw)
+-            vfw="no"
+-            ;;
 -        --enable-visualize)
 -            LDFLAGS="$LDFLAGS -L/usr/X11R6/lib -lX11"
 -            CFLAGS="$CFLAGS -DVISUALIZE=1"
@@ -487,10 +525,58 @@ Index: common/i386/mc-a2.asm
 -    esac
 -done
 -
- VFWFLAGS=
+-# autodetect options that weren't forced nor disabled
+-
+-if test "$pthread" = "auto" ; then
+-    case $SYS in
+-        MINGW|CYGWIN|BEOS)
+-            pthread="yes"
+-            ;;
+-        *)
+-            pthread="no"
+-            cc_check pthread.h -lpthread && pthread="yes"
+-            ;;
+-    esac
+-fi
+-if test "$pthread" = "yes" ; then
+-    CFLAGS="$CFLAGS -DHAVE_PTHREAD=1"
+-    case $SYS in
+-        MINGW|CYGWIN|BEOS)
+-            ;;
+-        *) LDFLAGS="$LDFLAGS -lpthread"
+-            ;;
+-    esac
+-fi
+-
+-MP4_LDFLAGS="-lgpac_static"
+-if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
+-    MP4_LDFLAGS="$MP4_LDFLAGS -lwinmm"
+-fi
+-if [ "$mp4_output" = "auto" ] ; then
+-    mp4_output="no"
+-    cc_check gpac/isomedia.h "$MP4_LDFLAGS" && mp4_output="yes"
+-fi
+-if [ "$mp4_output" = "yes" ] ; then
+-    CFLAGS="$CFLAGS -DMP4_OUTPUT"
+-    LDFLAGS="$LDFLAGS $MP4_LDFLAGS"
+-fi
+-
+-if [ "$avis_input" = "auto" ] ; then
+-    if [ $SYS = CYGWIN -o $SYS = MINGW ]; then
+-        avis_input="yes"
+-    else
+-        avis_input="no";
+-    fi
+-fi
+-if [ "$avis_input" = "yes" ] ; then
+-    CFLAGS="$CFLAGS -DAVIS_INPUT"
+-    LDFLAGS="$LDFLAGS -lvfw32"
+-fi
+-
  if [ "$debug" != "yes" -a "$gprof" != "yes" ]; then
      CFLAGS="$CFLAGS -s -fomit-frame-pointer"
-@@ -259,6 +274,9 @@
+     LDFLAGS="$LDFLAGS -s"
+@@ -317,6 +282,9 @@
  ASFLAGS=$ASFLAGS
  VFW=$vfw
  EXE=$EXE
@@ -500,34 +586,3 @@ Index: common/i386/mc-a2.asm
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  DEVNULL=$DEVNULL
---- Makefile	(révision 380)
-+++ Makefile	(copie de travail)
-@@ -63,8 +63,8 @@
- default: $(DEP) x264$(EXE)
- 
- libx264.a: .depend $(OBJS) $(OBJASM)
--	ar rc libx264.a $(OBJS) $(OBJASM)
--	ranlib libx264.a
-+	$(AR) rc libx264.a $(OBJS) $(OBJASM)
-+	$(RANLIB) libx264.a
- 
- x264$(EXE): libx264.a x264.o matroska.o
- 	$(CC) -o $@ x264.o matroska.o libx264.a $(LDFLAGS)
-@@ -128,14 +128,14 @@
- distclean: clean
- 	rm -f config.mak vfw/build/cygwin/config.mak x264.pc
- 
--install: x264
-+install: x264$(EXE)
- 	install -d $(DESTDIR)$(bindir) $(DESTDIR)$(includedir)
- 	install -d $(DESTDIR)$(libdir) $(DESTDIR)$(libdir)/pkgconfig
- 	install -m 644 x264.h $(DESTDIR)$(includedir)
- 	install -m 644 libx264.a $(DESTDIR)$(libdir)
- 	install -m 644 x264.pc $(DESTDIR)$(libdir)/pkgconfig
--	install x264 $(DESTDIR)$(bindir)
--	ranlib $(DESTDIR)$(libdir)/libx264.a
-+	install x264$(EXE) $(DESTDIR)$(bindir)
-+	$(RANLIB) $(DESTDIR)$(libdir)/libx264.a
- 
- uninstall:
- 	rm -f $(DESTDIR)$(includedir)/x264.h $(DESTDIR)$(libdir)/libx264.a
