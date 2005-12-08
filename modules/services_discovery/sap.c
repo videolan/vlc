@@ -881,6 +881,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     char *psz_parse;
     char *psz_uri = NULL;
     char *psz_proto = NULL;
+    char psz_source[256];
     int i_port = 0;
 
     /* Parse c= field */
@@ -1032,7 +1033,14 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         i_port = 1234;
     }
 
-    asprintf( &p_sdp->psz_uri, "%s://@%s:%i", psz_proto, psz_uri, i_port );
+    /* handle SSM case */
+    psz_parse = GetAttribute( p_sdp, "source-filter" );
+    psz_source[0] = '\0';
+
+    if( psz_parse ) sscanf( psz_parse, " incl IN IP%*s %*s %255s ", psz_source);
+
+    asprintf( &p_sdp->psz_uri, "%s://%s@%s:%i", psz_proto, psz_source,
+              psz_uri, i_port );
 
     FREE( psz_uri );
     FREE( psz_proto );
