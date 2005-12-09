@@ -2,7 +2,7 @@
  * vlcglue.c: VLC Module
  *****************************************************************************
  * Copyright (C) 1998-2004 the VideoLAN team
- * $Id: vlc.c 12667 2005-09-25 10:19:26Z zorglub $
+ * $Id$
  *
  * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
  *          Clément Stenac <zorglub@videolan.org>
@@ -776,6 +776,12 @@ static PyObject *MediaControl_new(PyTypeObject *type, PyObject *args, PyObject *
         }
         ppsz_args[i_size] = NULL;
         Py_DECREF(py_list);
+    }
+    else
+    {
+        /* No arguments were given. Clear the exception raised
+	 * by PyArg_ParseTuple. */
+        PyErr_Clear();
     }
 
     Py_BEGIN_ALLOW_THREADS
