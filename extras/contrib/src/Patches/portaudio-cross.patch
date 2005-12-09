@@ -1,0 +1,16 @@
+--- portaudio/configure.in	2005-12-01 15:07:26.000000000 +0000
++++ portaudio-new/configure.in	2005-12-09 18:48:43.000000000 +0000
+@@ -75,9 +75,10 @@
+ 
+ dnl sizeof checks: we will need a 16-bit and a 32-bit type
+ 
+-AC_CHECK_SIZEOF(short)
+-AC_CHECK_SIZEOF(int)
+-AC_CHECK_SIZEOF(long)
++dnl don't work if you crosscompile 
++dnl AC_CHECK_SIZEOF(short)
++dnl AC_CHECK_SIZEOF(int)
++dnl AC_CHECK_SIZEOF(long)
+ 
+ dnl extra variables
+ AC_SUBST(OTHER_OBJS)

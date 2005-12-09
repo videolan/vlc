@@ -145,9 +145,9 @@ else
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .libmpcdec \
-	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
+	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac .portaudio\
 	.dx_headers .dshow_headers .aclocal .gecko-win32
-#	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio
+#	.SDL_image  .daap .cddb .cdio .vcdimager .dts 
   else
 
    ifdef HAVE_WINCE
@@ -1283,6 +1283,9 @@ pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz:
 
 portaudio: pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifneq ($(HOST),$(BUILD))
+	(patch -p 0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
+endif
 
 .portaudio: portaudio 
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make  install)
