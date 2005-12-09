@@ -27,8 +27,8 @@
 /* For CORBA */
 #include "MediaControl.h"
 #include "orbit/poa/portableserver-poa-type.h"
-#include "mediacontrol-core.h"
 
+#include <vlc/control.h>
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>

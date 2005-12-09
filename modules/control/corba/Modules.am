@@ -1,6 +1,6 @@
 ## corba module declaration
 
-SOURCES_corba = corba.c mediacontrol-core.c mediacontrol-plugin.c
+SOURCES_corba = corba.c ../../../src/control/plugin.c
 
 nodist_SOURCES_corba = \
 	MediaControl-common.c \
@@ -18,7 +18,6 @@ endif
 CORBAIDLFILE = MediaControl.idl
 
 EXTRA_DIST += $(CORBAIDLFILE)
-EXTRA_DIST += mediacontrol-core.h
 BUILT_SOURCES += $(GENERATEDFILES)
 
 if ENABLE_CORBA
