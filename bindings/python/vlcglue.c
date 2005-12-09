@@ -173,20 +173,20 @@ static PyObject *vlcObject_new(
     return (PyObject *)self;
 }
 
-static PyObject * vlcObject_release( PyObject *self )
+static PyObject * vlcObject_release( PyObject *self, PyObject *args )
 {
     if( VLCSELF->b_released == 0 )
     {
         vlc_object_release( VLCSELF->p_object );
         VLCSELF->b_released = 1;
     }
-    Py_INCREF( Py_None);
+    Py_INCREF( Py_None );
     return Py_None;
 }
 
 static void  vlcObject_dealloc(PyObject *self)
 {
-    vlcObject_release( self );
+    vlcObject_release( self, NULL );
     PyMem_DEL(self);
 }
 
@@ -496,8 +496,7 @@ static PyObject * vlcObject_var_set(PyObject *self,
         return Py_None;
 }
 
-static PyObject * vlcObject_var_list(PyObject *self,
-                PyObject *args)
+static PyObject * vlcObject_var_list(PyObject *self, PyObject *args)
 {
         PyObject *retval;
         int i_size;
@@ -619,8 +618,7 @@ static PyObject * vlcObject_config_set(PyObject *self,
         return Py_None;
 }
 
-static PyObject * vlcObject_children(PyObject *self,
-                PyObject *args)
+static PyObject * vlcObject_children(PyObject *self, PyObject *args)
 {
         PyObject *retval;
         int i_size;
@@ -654,17 +652,17 @@ static PyMethodDef vlcObject_methods[] =
       "config_set(str, value)     Set a configuration option" },
     { "type", vlcObject_var_type, METH_VARARGS,
       "type(str) -> str     Get a variable type" },
-    { "list", vlcObject_var_list, METH_VARARGS,
+    { "list", vlcObject_var_list, METH_NOARGS,
       "list()             List the available variables" },
-    { "children", vlcObject_children, METH_VARARGS,
+    { "children", vlcObject_children, METH_NOARGS,
       "children()             List the children ids" },
     { "find_object", vlcObject_find_object, METH_VARARGS,
       "find_object(str) -> Object     Find the object of a given type.\n\nAvailable types are : aout, decoder, input, httpd, intf, playlist, root, vlc, vout"},
     { "find_id", vlcObject_find_id, METH_VARARGS,
       "find_id(int) -> Object      Find an object by id" },
-    { "info", vlcObject_info, METH_VARARGS,
+    { "info", vlcObject_info, METH_NOARGS,
        "info() -> dict    Return information about the object" },
-    { "release", vlcObject_release, METH_VARARGS,
+    { "release", vlcObject_release, METH_NOARGS,
       "release() ->     Release the VLC Object" },
     { NULL, NULL, 0, NULL },
 };
