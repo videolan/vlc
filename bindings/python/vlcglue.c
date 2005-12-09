@@ -49,11 +49,6 @@ vlcMODINIT_FUNC  initvlc(void)
     PyPosition_Type.tp_new = PyType_GenericNew;
     PyPosition_Type.tp_alloc = PyType_GenericAlloc;
 
-        /*  PyEval_InitThreads(); */
-
-        /* Have a look at
-http://base.bel-epa.com/pyapache/Python/MySQL-python/MySQL-python-0.3.0/_mysqlmodule.c */
-
     m = Py_InitModule3( "vlc", vlc_methods,
                         "VLC media player embedding module.");
  
@@ -853,8 +848,11 @@ static PyObject *MediaControl_start(PyObject *self, PyObject *args)
     PyObject *py_pos;
 
     if( !PyArg_ParseTuple(args, "O", &py_pos ) )
-        return NULL;
-
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear();
+        py_pos = NULL;
+    }
     a_position = position_py_to_c(py_pos);
     if ( !a_position )
         return NULL;
@@ -877,9 +875,14 @@ static PyObject *MediaControl_pause(PyObject *self, PyObject *args)
     PyObject *py_pos;
 
     if( !PyArg_ParseTuple(args, "O", &py_pos ) )
-        return NULL;
-
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear();
+        py_pos = NULL;
+    }
     a_position = position_py_to_c(py_pos);
+    if ( !a_position )
+        return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
@@ -899,9 +902,14 @@ static PyObject * MediaControl_resume(PyObject *self, PyObject *args)
     PyObject *py_pos;
 
     if( !PyArg_ParseTuple(args, "O", &py_pos ) )
-        return NULL;
-
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear();
+        py_pos = NULL;
+    }
     a_position = position_py_to_c(py_pos);
+    if ( !a_position )
+        return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
@@ -921,9 +929,14 @@ static PyObject *MediaControl_stop(PyObject *self, PyObject *args)
     PyObject *py_pos;
 
     if( !PyArg_ParseTuple(args, "O", &py_pos ) )
-        return NULL;
-
+    {
+        /* No argument. Use a default 0 value. */
+        PyErr_Clear();
+        py_pos = NULL;
+    }
     a_position = position_py_to_c(py_pos);
+    if ( !a_position )
+        return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
@@ -1310,7 +1323,15 @@ mediacontrol_Position* position_py_to_c( PyObject * py_position )
         return NULL;
     }
 
-    if (PyObject_IsInstance(py_position, (PyObject*)&PyPosition_Type))
+    if (! py_position)
+    {
+        /* If we give a NULL value, it will be considered as
+           a 0 relative position in mediatime */
+        a_position->origin = mediacontrol_RelativePosition;
+        a_position->key    = mediacontrol_MediaTime;
+        a_position->value  = 0;
+    }
+    else if (PyObject_IsInstance(py_position, (PyObject*)&PyPosition_Type))
     {
         a_position->origin = pos->origin;
         a_position->key    = pos->key;
