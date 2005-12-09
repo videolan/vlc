@@ -208,7 +208,7 @@ case "${target_os}" in
     CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     VLC_ADD_CXXFLAGS([beos],[])
-    VLC_ADD_LDFLAGS([vlc beos],[-lbe])
+    VLC_ADD_LDFLAGS([vlc beos logger],[-lbe])
     VLC_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
 
     dnl Check for BONE
