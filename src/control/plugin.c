@@ -1,4 +1,4 @@
-#include "mediacontrol-core.h"
+#include <vlc/control.h>
 #include <vlc/intf.h>
 
 mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *exception )
@@ -11,16 +11,7 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
 void
 mediacontrol_exit( mediacontrol_Instance *self )
 {
-    /* 
-       vlc_object_release( self->p_playlist );
-    */
-    
     vlc_mutex_lock( &self->p_intf->change_lock );
     self->p_intf->b_die = 1;
     vlc_mutex_unlock( &self->p_intf->change_lock );
-
-    /*
-      vlc_object_release( self->p_intf );
-      vlc_object_release( self->p_vlc );
-    */
 }
