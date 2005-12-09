@@ -2,12 +2,11 @@
 # Building the Python binding
 ###############################################################################
 
-# FIXME
-#ifdef HOMEDRIVE
-#	COMPILERARG = --compiler=mingw32
-#else
-#	COMPILERARG = 
-#endif
+if HAVE_WIN32
+	COMPILERARG = --compiler=mingw32
+else
+	COMPILERARG = 
+endif
 
 if BUILD_PYTHON
 
