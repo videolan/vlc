@@ -1025,6 +1025,12 @@ static struct
       AUDIO_ES, "QDM2" },
 #endif
 
+#if LIBAVCODEC_BUILD >= ((51<<16)+(0<<8)+0)
+    /* COOK */
+    { VLC_FOURCC('c','o','o','k'), CODEC_ID_COOK,
+      AUDIO_ES, "COOK" },
+#endif
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
