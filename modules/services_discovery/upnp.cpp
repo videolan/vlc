@@ -2,7 +2,7 @@
  * upnp.cpp :  UPnP discovery module
  *****************************************************************************
  * Copyright (C) 2004-2005 the VideoLAN team
- * $Id: sap.c 11664 2005-07-09 06:17:09Z courmisch $
+ * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
  * 
@@ -256,28 +256,31 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
         return;
 
     msg_Dbg( p_sd, "title = %s", title );
-    
-    if( !node->isContainerNode() )
+
+    if ( node->isItemNode() ) 
     {
-        msg_Dbg( p_sd, "not a container" );
-        return;
+        ItemNode *iNode = (ItemNode *)node;
+
+	playlist_item_t *p_item;
+	p_item = playlist_ItemNew( p_sd, iNode->getResource(), title );
+    
+	playlist_NodeAddItem( p_sys->p_playlist, p_item, VIEW_CATEGORY,
+			      p_parent, PLAYLIST_APPEND, PLAYLIST_END );
+
+    } else if ( node->isContainerNode() ) 
+    {
+        ContainerNode *conNode = (ContainerNode *)node;
+
+	char* p_name = strdup(title); /* See other comment on strdup */
+	playlist_item_t* p_node = playlist_NodeCreate( p_sys->p_playlist, VIEW_CATEGORY, 
+						       p_name, p_parent );
+	free(p_name);
+
+	unsigned nContentNodes = conNode->getNContentNodes();
+
+	for( unsigned n = 0; n < nContentNodes; n++ )
+	    AddContent( p_node, conNode->getContentNode( n ) );
     }
-
-    ContainerNode *conNode = (ContainerNode *)node;
-    ItemNode *iNode = (ItemNode *)node;
-
-    playlist_item_t *p_item;
-    p_item = playlist_ItemNew( p_sd, iNode->getResource(), title );
-    playlist_NodeAddItem( p_sys->p_playlist, p_item, VIEW_CATEGORY,
-                          p_parent, PLAYLIST_APPEND, PLAYLIST_END );
-
-    /*if( !cnode->hasContainerNodes() )
-        return;*/
-
-    unsigned nContentNodes = conNode->getNContentNodes();
-
-    for( unsigned n = 0; n < nContentNodes; n++ )
-        AddContent( p_item, conNode->getContentNode( n ) );
 }
 
 
@@ -316,10 +319,12 @@ void UPnPHandler::deviceSearchResponseReceived( SSDPPacket *packet )
     packet->getNTS( nts );
     udn = usn.substr( 0, usn.find( "::" ) );
 
+    /* Remove existing root device before adding updated one */
+
     Device *dev = GetDeviceFromUSN( usn );
-    if( packet->isByeBye() )
-        RemoveDevice( dev );
-    else
+    RemoveDevice( dev );
+
+    if( !packet->isByeBye() )
         AddDeviceContent( dev );
 }
 
