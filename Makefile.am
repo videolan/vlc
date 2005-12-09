@@ -471,6 +471,9 @@ SOURCES_libvlc_common = \
 	src/control/audio_video.c \
 	$(NULL)
 
+# These should be distributed, but not compiled
+EXTRA_DIST += src/control/init.c src/control/plugin.c
+
 SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
 	$(OPT_SOURCES_libvlc_beos) \
