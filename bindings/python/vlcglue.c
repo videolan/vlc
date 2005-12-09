@@ -49,6 +49,17 @@ vlcMODINIT_FUNC  initvlc(void)
     PyPosition_Type.tp_new = PyType_GenericNew;
     PyPosition_Type.tp_alloc = PyType_GenericAlloc;
 
+        /*  PyEval_InitThreads(); */
+
+        /* Have a look at
+http://base.bel-epa.com/pyapache/Python/MySQL-python/MySQL-python-0.3.0/_mysqlmodule.c */
+
+    m = Py_InitModule3( "vlc", vlc_methods,
+                        "VLC media player embedding module.");
+ 
+    if (! m)
+      return;
+
     if (PyType_Ready(&PyPosition_Type) < 0)
         return;
     if (PyType_Ready(&MediaControl_Type) < 0)
@@ -58,42 +69,41 @@ vlcMODINIT_FUNC  initvlc(void)
         return;
 #endif
 
-        /*  PyEval_InitThreads(); */
-
-        /* Have a look at
-http://base.bel-epa.com/pyapache/Python/MySQL-python/MySQL-python-0.3.0/_mysqlmodule.c */
-
-    m = Py_InitModule3( "vlc", vlc_methods,
-                        "VLC media player embedding module.");
-
     /* Exceptions */
     MediaControl_InternalException =
             PyErr_NewException("vlc.InternalException", NULL, NULL);
+    Py_INCREF(MediaControl_InternalException);
     PyModule_AddObject(m, "InternalException", MediaControl_InternalException);
 
     MediaControl_PositionKeyNotSupported =
             PyErr_NewException("vlc.PositionKeyNotSupported", NULL, NULL);
+    Py_INCREF(MediaControl_PositionKeyNotSupported);
     PyModule_AddObject(m, "PositionKeyNotSupported",
                     MediaControl_PositionKeyNotSupported);
 
     MediaControl_PositionOriginNotSupported=
             PyErr_NewException("vlc.InvalidPosition", NULL, NULL);
+    Py_INCREF(MediaControl_PositionOriginNotSupported);
     PyModule_AddObject(m, "PositionOriginNotSupported",
                     MediaControl_PositionOriginNotSupported);
 
     MediaControl_InvalidPosition =
             PyErr_NewException("vlc.InvalidPosition", NULL, NULL);
+    Py_INCREF(MediaControl_InvalidPosition);
     PyModule_AddObject(m, "InvalidPosition", MediaControl_InvalidPosition);
 
     MediaControl_PlaylistException =
             PyErr_NewException("vlc.PlaylistException", NULL, NULL);
+    Py_INCREF(MediaControl_PlaylistException);
     PyModule_AddObject(m, "PlaylistException", MediaControl_PlaylistException);
 
     /* Types */
     Py_INCREF(&PyPosition_Type);
     PyModule_AddObject(m, "Position", (PyObject *)&PyPosition_Type);
+
     Py_INCREF(&MediaControl_Type);
     PyModule_AddObject(m, "MediaControl", (PyObject *)&MediaControl_Type);
+
 #ifdef VLCOBJECT_SUPPORT
     Py_INCREF(&vlcObject_Type);
     PyModule_AddObject(m, "Object", (PyObject *)&vlcObject_Type);
@@ -284,10 +294,7 @@ static PyObject * vlcObject_find_id(PyObject *self, PyObject *args)
     int i_id;
 
     if ( !PyArg_ParseTuple(args, "i", &i_id) )
-    {
-        PyErr_SetString(PyExc_StandardError, "Error: no id was given.\n");
-        return Py_None;
-    }
+        return NULL;
 
     p_object = (vlc_object_t*)vlc_current_object(i_id);
 
@@ -314,17 +321,12 @@ static PyObject * vlcObject_var_get(PyObject *self, PyObject *args)
     int i_type;
 
     if ( !PyArg_ParseTuple(args, "s", &psz_name) )
-    {
-        PyErr_SetString(PyExc_StandardError, "Error: no variable name was given.\n");
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
+        return NULL;
 
     if( var_Get( VLCSELF->p_object, psz_name, &value ) != VLC_SUCCESS )
     {
             PyErr_SetString(PyExc_StandardError, "Error: no variable name was given.\n");
-            Py_INCREF(Py_None);
-            return Py_None;
+            return NULL;
     }
 
     i_type = var_Type (VLCSELF->p_object, psz_name);
@@ -384,11 +386,7 @@ static PyObject * vlcObject_var_type(PyObject *self,
         int i_type;
 
         if ( !PyArg_ParseTuple(args, "s", &psz_name))
-        {
-                PyErr_SetString(PyExc_StandardError, "Error: no variable name was given.\n");
-                Py_INCREF(Py_None);
-                return Py_None;
-        }
+            return NULL;
 
         i_type = var_Type(VLCSELF->p_object, psz_name);
 
@@ -454,11 +452,7 @@ static PyObject * vlcObject_var_set(PyObject *self,
         vlc_object_t *p_obj;
 
         if ( !PyArg_ParseTuple(args, "sO", &psz_name, &py_value) )
-        {
-                PyErr_SetString(PyExc_StandardError, "Error: no variable name was given.\n");
-                Py_INCREF(Py_None);
-                return Py_None;
-        }
+            return NULL;
 
         p_obj = VLCSELF->p_object;
         i_type = var_Type(p_obj, psz_name);
@@ -537,11 +531,7 @@ static PyObject * vlcObject_config_get(PyObject *self,
         module_config_t *p_config;
 
         if ( !PyArg_ParseTuple(args, "s", &psz_name) )
-        {
-                PyErr_SetString(PyExc_StandardError, "Error: no config variable name was given.\n");
-                Py_INCREF(Py_None);
-                return Py_None;
-        }
+            return NULL;
 
         p_config = config_FindConfig( VLCSELF->p_object, psz_name );
 
@@ -600,12 +590,7 @@ static PyObject * vlcObject_config_set(PyObject *self,
 
 
         if ( !PyArg_ParseTuple(args, "sO", &psz_name, &py_value) )
-        {
-            PyErr_SetString(PyExc_StandardError,
-                            "Error: no variable name was given.\n");
-            Py_INCREF(Py_None);
-            return Py_None;
-        }
+            return NULL;
 
         p_obj = VLCSELF->p_object;
         p_config = config_FindConfig( p_obj, psz_name );
@@ -780,7 +765,7 @@ static PyObject *MediaControl_new(PyTypeObject *type, PyObject *args, PyObject *
     else
     {
         /* No arguments were given. Clear the exception raised
-	 * by PyArg_ParseTuple. */
+           by PyArg_ParseTuple. */
         PyErr_Clear();
     }
 
