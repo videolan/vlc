@@ -142,6 +142,8 @@ namespace wxvlc
         void OnSlowStream( wxCommandEvent& event );
         void OnFastStream( wxCommandEvent& event );
 
+        void OnInteraction( wxCommandEvent& event );
+
         void OnMenuOpen( wxMenuEvent& event );
 
     #if defined( __WXMSW__ ) || defined( __WXMAC__ )

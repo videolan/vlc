@@ -99,6 +99,7 @@ void intf_InteractionDestroy( interaction_t *p_interaction )
  */
 void intf_InteractionManage( playlist_t *p_playlist )
 {
+    vlc_value_t val;
     int i_index;
     interaction_t *p_interaction;
 
@@ -134,13 +135,15 @@ void intf_InteractionManage( playlist_t *p_playlist )
 
             // Ask interface to hide it
             msg_Dbg( p_interaction, "Hiding dialog %i", p_dialog->i_id );
-            p_interaction->p_intf->pf_interact( p_interaction->p_intf,
-                                                p_dialog, INTERACT_HIDE );
+            p_dialog->i_action = INTERACT_HIDE;
+            val.p_address = p_dialog;
+            var_Set( p_interaction->p_intf, "interaction", val );
             p_dialog->i_status = HIDING_DIALOG;
             break;
         case UPDATED_DIALOG:
-            p_interaction->p_intf->pf_interact( p_interaction->p_intf,
-                                                p_dialog, INTERACT_UPDATE );
+            p_dialog->i_action = INTERACT_UPDATE;
+            val.p_address = p_dialog;
+            var_Set( p_interaction->p_intf, "interaction", val );
             p_dialog->i_status = SENT_DIALOG;
             msg_Dbg( p_interaction, "Updating dialog %i, %i widgets",
                                     p_dialog->i_id, p_dialog->i_widgets );
@@ -153,10 +156,11 @@ void intf_InteractionManage( playlist_t *p_playlist )
             break;
         case NEW_DIALOG:
             // This is truly a new dialog, send it.
-            p_interaction->p_intf->pf_interact( p_interaction->p_intf,
-                                                p_dialog, INTERACT_NEW );
-            msg_Dbg( p_interaction, "Creating dialog %i, %i widgets",
-                                        p_dialog->i_id, p_dialog->i_widgets );
+            p_dialog->i_action = INTERACT_NEW;
+            val.p_address = p_dialog;
+            var_Set( p_interaction->p_intf, "interaction", val );
+            msg_Dbg( p_interaction, "Creating dialog %i to interface %i, %i widgets",
+                                        p_dialog->i_id, p_interaction->p_intf->i_object_id, p_dialog->i_widgets );
             p_dialog->i_status = SENT_DIALOG;
             break;
         }
@@ -321,7 +325,7 @@ static void intf_InteractionSearchInterface( interaction_t *p_interaction )
     {
         intf_thread_t *p_intf = (intf_thread_t *)
                                         p_list->p_values[i_index].p_object;
-        if( p_intf->pf_interact != NULL )
+        if( p_intf->b_interaction )
         {
             p_interaction->p_intf = p_intf;
             break;

@@ -36,6 +36,8 @@
 #include <vlc/aout.h>
 #include "charset.h"
 
+#include <vlc_interaction.h>
+
 #include <wx/splitter.h>
 
 /* include the toolbar graphics */
@@ -65,7 +67,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int DoInteract( intf_thread_t *, interaction_dialog_t *, int );
+static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
+                             vlc_value_t, void *);
 
 /*****************************************************************************
  * Local class declarations.
@@ -296,8 +299,10 @@ enum
     UpdateVLC_Event,
     VLM_Event,
 
-    Iconize_Event
+    Iconize_Event,
 };
+
+DEFINE_LOCAL_EVENT_TYPE( wxEVT_INTERACTION );
 
 BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Menu events */
@@ -343,6 +348,8 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     /* Custom events */
     EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
     EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
+
+    EVT_COMMAND( -1, wxEVT_INTERACTION, Interface::OnInteraction )
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -358,7 +365,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     extra_frame = 0;
     playlist_manager = 0;
 
-    p_intf->pf_interact = DoInteract;
 
     /* Give our interface a nice little icon */
     SetIcon( wxIcon( vlc_xpm ) );
@@ -465,6 +471,12 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     SetIntfMinSize();
 
+    fprintf( stderr, "Adding callback to object %i\n", p_intf->i_object_id );
+
+    var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "interaction", InteractCallback, this );
+    p_intf->b_interaction = VLC_TRUE;
+
     /* Show embedded playlist if requested */
     if( splitter->ShowOnStart() ) OnSmallPlaylist( dummy );
 }
@@ -487,7 +499,11 @@ Interface::~Interface()
     if( p_systray ) delete p_systray;
 #endif
 
+    p_intf->b_interaction = VLC_FALSE;
+    var_DelCallback( p_intf, "interaction", InteractCallback, this );
+
     if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
+
 
     /* Clean up */
     delete timer;
@@ -1183,9 +1199,36 @@ void Interface::TogglePlayButton( int i_playing_status )
     GetToolBar()->ToggleTool( PlayStream_Event, false );
 }
 
-static int DoInteract( intf_thread_t *, interaction_dialog_t *, int )
+void Interface::OnInteraction( wxCommandEvent& event )
 {
-    fprintf( stderr, "Doing interaction \n" );
+    interaction_dialog_t *p_dialog = (interaction_dialog_t *)
+                                        event.GetClientData();
+    if( p_dialog->i_widgets == 0 ) return;
+
+    /// \todo : Code this . This is only test code. No locking, ...
+    wxString message = wxU( p_dialog->pp_widgets[0]->psz_text );
+    REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, 0 );
+    wxMessageBox( message, wxU( p_dialog->psz_title ) );
+    p_dialog->i_status = ANSWERED_DIALOG;
+}
+
+static int InteractCallback( vlc_object_t *p_this,
+                             const char *psz_var, vlc_value_t old_val,
+                             vlc_value_t new_val, void *param )
+{
+    Interface *p_interface = (Interface*)param;
+    interaction_dialog_t *p_dialog = (interaction_dialog_t*)(new_val.p_address);
+
+    /// Not handled
+    if( p_dialog->i_action == INTERACT_HIDE )
+    {
+        p_dialog->i_status = HIDDEN_DIALOG;
+        return;
+    }
+
+    wxCommandEvent event( wxEVT_INTERACTION, -1 );
+    event.SetClientData( new_val.p_address );
+    p_interface->AddPendingEvent( event );
     return VLC_SUCCESS;
 }
 

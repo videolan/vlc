@@ -2096,6 +2096,7 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             msg_Err( p_input, "no suitable access module for `%s'", psz_mrl );
             intf_UserFatal( VLC_OBJECT( p_input), DIALOG_NOACCESS,
+                            "Error opening stream",
                             "Unable to open '%s'", psz_mrl );
             goto error;
         }

@@ -98,8 +98,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;
-    p_intf->pf_interact       = NULL;
     p_intf->b_play = VLC_FALSE;
+    p_intf->b_interaction = VLC_FALSE;
 
     /* Choose the best module */
     p_intf->p_module = module_Need( p_intf, "interface", psz_module, 0 );

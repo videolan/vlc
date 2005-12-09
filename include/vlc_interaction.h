@@ -60,6 +60,8 @@ struct interaction_dialog_t
 
     void *          p_private;          //< Private interface data
     int             i_status;           //< Dialog status;
+
+    int             i_action;           //< Action to perform;
 };
 
 /**
