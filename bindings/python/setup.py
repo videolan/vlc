@@ -15,6 +15,14 @@ def get_vlcconfig():
         vlcconfig="sh %s" % vlcconfig
     return vlcconfig
 
+def get_vlc_version():
+    vlcconfig=get_vlcconfig()
+    if vlcconfig is None:
+        return ""
+    else:
+        version=os.popen('%s --version' % vlcconfig, 'r').readline().strip()
+        return version
+    
 def get_cflags():
     vlcconfig=get_vlcconfig()
     if vlcconfig is None:
@@ -43,14 +51,19 @@ vlclocal = Extension('vlc',
                 )
 
 setup (name = 'MediaControl',
-       version = '0.8.2-1',
+       version = get_vlc_version(),
        scripts = [ 'vlcdebug.py' ],
+       keywords = [ 'vlc', 'video' ],
+       license = "GPL", 
        description = """VLC bindings for python.
 
 This module provides a MediaControl object, which implements an API
 inspired from the OMG Audio/Video Stream 1.0 specification. Moreover,
 the module provides a Object type, which gives a low-level access to
 the vlc objects and their variables.
+
+Documentation can be found on the VLC wiki : 
+http://wiki.videolan.org/index.php/PythonBinding
 
 Example session:
 
