@@ -6,9 +6,6 @@ Changes between 0.8.4 and 0.8.4a:
 Audio output:
  * Fix a52 over spdif in alsa
 
-Encoder:
- * fixed encoding of H.264/H.263 content on OSX when using the wizard
-
 Decoder:
  * Add support for new BMP and Cook (RealAudio G2) decoders in ffmpeg
  * Add support for some non-standard FOURCCs used for H.264/H.263
