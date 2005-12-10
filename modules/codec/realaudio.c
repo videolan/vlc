@@ -79,26 +79,13 @@ struct decoder_sys_t
 {
     audio_date_t end_date;
 
-    /* Frame buffer for data reordering */
-    int i_subpacket;
-    mtime_t i_packet_pts;
-    int i_frame_size;
-    char *p_frame;
-    int i_frame;
-
     /* Output buffer */
-    char *p_out_buffer;
     char *p_out;
     unsigned int i_out;
 
     /* Codec params */
     void *context;
-    int i_subpacket_size;
-    int i_subpacket_h;
     int i_codec_flavor;
-    int i_coded_frame_size;
-    int i_extra;
-    uint8_t *p_extra;
 
     void *dll;
     unsigned long (*raCloseCodec)(void*);
@@ -201,14 +188,17 @@ static int Open( vlc_object_t *p_this )
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
-    if( p_dec->fmt_in.i_extra >= 10 )
+    p_sys->i_codec_flavor = -1;
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','i','p','r') )
     {
-        p_sys->i_subpacket_size = ((short *)(p_dec->fmt_in.p_extra))[0];
-        p_sys->i_subpacket_h = ((short *)(p_dec->fmt_in.p_extra))[1];
-        p_sys->i_codec_flavor = ((short *)(p_dec->fmt_in.p_extra))[2];
-        p_sys->i_coded_frame_size = ((short *)(p_dec->fmt_in.p_extra))[3];
-        p_sys->i_extra = ((short*)(p_dec->fmt_in.p_extra))[4];
-        p_sys->p_extra = p_dec->fmt_in.p_extra + 10;
+        if( p_dec->fmt_in.audio.i_bitspersample > 1531 )
+            p_sys->i_codec_flavor = 3;
+        else if( p_dec->fmt_in.audio.i_bitspersample > 937 )
+            p_sys->i_codec_flavor = 1;
+        else if( p_dec->fmt_in.audio.i_bitspersample > 719 )
+            p_sys->i_codec_flavor = 0;
+        else
+            p_sys->i_codec_flavor = 2;
     }
 
     if( OpenDll( p_dec ) != VLC_SUCCESS )
@@ -235,15 +225,7 @@ static int Open( vlc_object_t *p_this )
 
     p_dec->pf_decode_audio = Decode;
 
-    p_sys->i_frame_size =
-        p_dec->fmt_in.audio.i_blockalign * p_sys->i_subpacket_h;
-    p_sys->p_frame = malloc( p_sys->i_frame_size );
-    p_sys->i_packet_pts = 0;
-    p_sys->i_subpacket = 0;
-    p_sys->i_frame = 0;
-
-    p_sys->p_out_buffer = malloc( 4096 * 10 );
-    p_sys->p_out = 0;
+    p_sys->p_out = malloc( 4096 * 10 );
     p_sys->i_out = 0;
 
     return VLC_SUCCESS;
@@ -257,8 +239,7 @@ static void Close( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
 
     CloseDll( p_dec );
-    if( p_dec->p_sys->p_frame ) free( p_dec->p_sys->p_frame );
-    if( p_dec->p_sys->p_out_buffer ) free( p_dec->p_sys->p_out_buffer );
+    if( p_dec->p_sys->p_out ) free( p_dec->p_sys->p_out );
     free( p_dec->p_sys );
 }
 
@@ -379,9 +360,9 @@ static int OpenNativeDll( decoder_t *p_dec, char *psz_path, char *psz_dll )
         p_dec->fmt_in.audio.i_bitspersample,
         p_dec->fmt_in.audio.i_channels,
         100, /* quality */
-        p_sys->i_subpacket_size,
-        p_sys->i_coded_frame_size,
-        p_sys->i_extra, p_sys->p_extra
+        p_dec->fmt_in.audio.i_blockalign, /* subpacket size */
+        p_dec->fmt_in.audio.i_blockalign, /* coded frame size */
+        p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra
     };
 
     msg_Dbg( p_dec, "opening library '%s'", psz_dll );
@@ -431,26 +412,29 @@ static int OpenNativeDll( decoder_t *p_dec, char *psz_path, char *psz_dll )
         goto error_native;
     }
 
-    i_result = p_sys->raSetFlavor( context, p_sys->i_codec_flavor );
-    if( i_result )
+    if( p_sys->i_codec_flavor >= 0 )
     {
-        msg_Err( p_dec, "decoder flavor setup failed, error code: 0x%x",
-                 i_result );
-        goto error_native;
-    }
+        i_result = p_sys->raSetFlavor( context, p_sys->i_codec_flavor );
+        if( i_result )
+        {
+            msg_Err( p_dec, "decoder flavor setup failed, error code: 0x%x",
+                     i_result );
+            goto error_native;
+        }
 
-    p_prop = p_sys->raGetFlavorProperty( context, p_sys->i_codec_flavor,
-                                         0, &i_prop );
-    msg_Dbg( p_dec, "audio codec: [%d] %s",
-             p_sys->i_codec_flavor, (char *)p_prop );
+        p_prop = p_sys->raGetFlavorProperty( context, p_sys->i_codec_flavor,
+                                             0, &i_prop );
+        msg_Dbg( p_dec, "audio codec: [%d] %s",
+                 p_sys->i_codec_flavor, (char *)p_prop );
 
-    p_prop = p_sys->raGetFlavorProperty( context, p_sys->i_codec_flavor,
-                                         1, &i_prop );
-    if( p_prop )
-    {
-        int i_bps = ((*((int*)p_prop))+4)/8;
-        msg_Dbg( p_dec, "audio bitrate: %5.3f kbit/s (%d bps)",
-                 (*((int*)p_prop))*0.001f, i_bps );
+        p_prop = p_sys->raGetFlavorProperty( context, p_sys->i_codec_flavor,
+                                             1, &i_prop );
+        if( p_prop )
+        {
+            int i_bps = ((*((int*)p_prop))+4)/8;
+            msg_Dbg( p_dec, "audio bitrate: %5.3f kbit/s (%d bps)",
+                     (*((int*)p_prop))*0.001f, i_bps );
+        }
     }
 
     p_sys->context = context;
@@ -481,9 +465,9 @@ static int OpenWin32Dll( decoder_t *p_dec, char *psz_path, char *psz_dll )
         p_dec->fmt_in.audio.i_bitspersample,
         p_dec->fmt_in.audio.i_channels,
         100, /* quality */
-        p_sys->i_subpacket_size,
-        p_sys->i_coded_frame_size,
-        p_sys->i_extra, p_sys->p_extra
+        p_dec->fmt_in.audio.i_blockalign, /* subpacket size */
+        p_dec->fmt_in.audio.i_blockalign, /* coded frame size */
+        p_dec->fmt_in.i_extra, p_dec->fmt_in.p_extra
     };
 
     msg_Dbg( p_dec, "opening win32 dll '%s'", psz_dll );
@@ -540,26 +524,29 @@ static int OpenWin32Dll( decoder_t *p_dec, char *psz_path, char *psz_dll )
         goto error_win32;
     }
 
-    i_result = p_sys->wraSetFlavor( context, p_sys->i_codec_flavor );
-    if( i_result )
+    if( p_sys->i_codec_flavor >= 0 )
     {
-        msg_Err( p_dec, "decoder flavor setup failed, error code: 0x%x",
-                 i_result );
-        goto error_win32;
-    }
+        i_result = p_sys->wraSetFlavor( context, p_sys->i_codec_flavor );
+        if( i_result )
+        {
+            msg_Err( p_dec, "decoder flavor setup failed, error code: 0x%x",
+                     i_result );
+            goto error_win32;
+        }
 
-    p_prop = p_sys->wraGetFlavorProperty( context, p_sys->i_codec_flavor,
-                                          0, &i_prop );
-    msg_Dbg( p_dec, "audio codec: [%d] %s",
-             p_sys->i_codec_flavor, (char *)p_prop );
+        p_prop = p_sys->wraGetFlavorProperty( context, p_sys->i_codec_flavor,
+                                              0, &i_prop );
+        msg_Dbg( p_dec, "audio codec: [%d] %s",
+                 p_sys->i_codec_flavor, (char *)p_prop );
 
-    p_prop = p_sys->wraGetFlavorProperty( context, p_sys->i_codec_flavor,
-                                          1, &i_prop );
-    if( p_prop )
-    {
-        int i_bps = ((*((int*)p_prop))+4)/8;
-        msg_Dbg( p_dec, "audio bitrate: %5.3f kbit/s (%d bps)",
-                 (*((int*)p_prop))*0.001f, i_bps );
+        p_prop = p_sys->wraGetFlavorProperty( context, p_sys->i_codec_flavor,
+                                              1, &i_prop );
+        if( p_prop )
+        {
+            int i_bps = ((*((int*)p_prop))+4)/8;
+            msg_Dbg( p_dec, "audio bitrate: %5.3f kbit/s (%d bps)",
+                     (*((int*)p_prop))*0.001f, i_bps );
+        }
     }
 
     p_sys->context = context;
@@ -619,6 +606,8 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     aout_buffer_t *p_aout_buffer = 0;
+    unsigned int i_result;
+    int i_samples;
     block_t *p_block;
 
 #ifdef LOADER
@@ -635,123 +624,51 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 #endif
 
-    /* Output 1024 samples at a time
-     * (the audio output doesn't like big audio packets) */
-    if( p_sys->i_out )
-    {
-        int i_out;
-        int i_samples = p_sys->i_out * 8 /
-            p_dec->fmt_out.audio.i_bitspersample /
-              p_dec->fmt_out.audio.i_channels;
-
-        i_samples = __MIN( i_samples, 1024 );
-        i_out = i_samples * p_dec->fmt_out.audio.i_bitspersample *
-            p_dec->fmt_out.audio.i_channels / 8;
-
-        p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples );
-        if( p_aout_buffer == NULL ) return NULL;
-        memcpy( p_aout_buffer->p_buffer, p_sys->p_out, i_out );
-
-        p_sys->i_out -= i_out;
-        p_sys->p_out += i_out;
-
-        /* Date management */
-        p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
-        p_aout_buffer->end_date =
-            aout_DateIncrement( &p_sys->end_date, i_samples );
-
-        return p_aout_buffer;
-    }
-
-    /* If we have a full frame ready then we can start decoding */
-    if( p_sys->i_frame )
-    {
-        unsigned int i_result;
-
-        p_sys->p_out = p_sys->p_out_buffer;
-
-        if( p_sys->dll )
-            i_result = p_sys->raDecode( p_sys->context, p_sys->p_frame +
-                                        p_sys->i_frame_size - p_sys->i_frame,
-                                        p_dec->fmt_in.audio.i_blockalign,
-                                        p_sys->p_out, &p_sys->i_out, -1 );
-        else
-            i_result = p_sys->wraDecode( p_sys->context, p_sys->p_frame +
-                                         p_sys->i_frame_size - p_sys->i_frame,
-                                         p_dec->fmt_in.audio.i_blockalign,
-                                         p_sys->p_out, &p_sys->i_out, -1 );
-
-#if 0
-        msg_Err( p_dec, "decoded: %i samples (%i)",
-                 p_sys->i_out * 8 / p_dec->fmt_out.audio.i_bitspersample /
-                 p_dec->fmt_out.audio.i_channels, i_result );
-#endif
-
-        p_sys->i_frame -= p_dec->fmt_in.audio.i_blockalign;
-
-        return Decode( p_dec, pp_block );
-    }
-
-
     if( pp_block == NULL || *pp_block == NULL ) return NULL;
     p_block = *pp_block;
 
-    //msg_Err( p_dec, "Decode: "I64Fd", %i", p_block->i_pts, p_block->i_buffer );
+    if( p_sys->dll )
+        i_result = p_sys->raDecode( p_sys->context, (char *)p_block->p_buffer,
+                                    (unsigned long)p_block->i_buffer,
+                                    p_sys->p_out, &p_sys->i_out, -1 );
+    else
+        i_result = p_sys->wraDecode( p_sys->context, (char *)p_block->p_buffer,
+                                     (unsigned long)p_block->i_buffer,
+                                     p_sys->p_out, &p_sys->i_out, -1 );
 
-    /* Detect missing subpackets */
-    if( p_sys->i_subpacket && p_block->i_pts > 0 &&
-        p_block->i_pts != p_sys->i_packet_pts )
-    {
-        /* All subpackets in a packet should have the same pts so we must
-         * have dropped some. Clear current frame buffer. */
-        p_sys->i_subpacket = 0;
-        msg_Dbg( p_dec, "detected dropped subpackets" );
-    }
-    if( p_block->i_pts > 0 ) p_sys->i_packet_pts = p_block->i_pts;
+#if 0
+    msg_Err( p_dec, "decoded: %i samples (%i)",
+             p_sys->i_out * 8 / p_dec->fmt_out.audio.i_bitspersample /
+             p_dec->fmt_out.audio.i_channels, i_result );
+#endif
 
     /* Date management */
-    if( /* !p_sys->i_subpacket && */ p_block && p_block->i_pts > 0 &&
+    if( p_block->i_pts > 0 &&
         p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
     {
         aout_DateSet( &p_sys->end_date, p_block->i_pts );
     }
 
-#if 0
     if( !aout_DateGet( &p_sys->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         if( p_block ) block_Release( p_block );
         return NULL;
     }
-#endif
 
-    if( p_sys->i_subpacket_size )
+    i_samples = p_sys->i_out * 8 /
+        p_dec->fmt_out.audio.i_bitspersample /p_dec->fmt_out.audio.i_channels;
+
+    p_aout_buffer =
+        p_dec->pf_aout_buffer_new( p_dec, i_samples );
+    if( p_aout_buffer )
     {
-        /* 'cook' way */
-        int sps = p_sys->i_subpacket_size;
-        int w = p_dec->fmt_in.audio.i_blockalign;
-        int h = p_sys->i_subpacket_h;
-        /* int cfs = p_sys->i_coded_frame_size; */
-        int x, y;
+        memcpy( p_aout_buffer->p_buffer, p_sys->p_out, p_sys->i_out );
 
-        w /= sps;
-        y = p_sys->i_subpacket;
-
-        for( x = 0; x < w; x++ )
-        {
-            memcpy( p_sys->p_frame + sps * (h*x+((h+1)/2)*(y&1)+(y>>1)),
-                    p_block->p_buffer, sps );
-            p_block->p_buffer += sps;
-        }
-
-        p_sys->i_subpacket = (p_sys->i_subpacket + 1) % p_sys->i_subpacket_h;
-
-        if( !p_sys->i_subpacket )
-        {
-            /* We have a complete frame */
-            p_sys->i_frame = p_sys->i_frame_size;
-            p_aout_buffer = Decode( p_dec, pp_block );
-        }
+        /* Date management */
+        p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
+        p_aout_buffer->end_date =
+            aout_DateIncrement( &p_sys->end_date, i_samples );
     }
 
     block_Release( p_block );
