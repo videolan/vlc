@@ -10,7 +10,7 @@ Encoder:
  * fixed encoding of H.264/H.263 content on OSX when using the wizard
 
 Decoder:
- * Add support for new BMP and Cook audio decoders in ffmpeg
+ * Add support for new BMP and Cook (RealAudio G2) decoders in ffmpeg
 
 Demux:
  * Fix bug with some HE-AAC audio tracks
