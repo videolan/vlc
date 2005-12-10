@@ -2,4 +2,3 @@ SOURCES_trivial_resampler = trivial.c
 SOURCES_ugly_resampler = ugly.c
 SOURCES_linear_resampler = linear.c
 SOURCES_bandlimited_resampler = bandlimited.c bandlimited.h
-SOURCES_coreaudio_resampler = coreaudio.c
