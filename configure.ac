@@ -3919,14 +3919,14 @@ fi
 dnl
 dnl  CoreAudio plugin
 dnl
-AC_ARG_ENABLE(coreaudio,
-  [  --enable-coreaudio      CoreAudio module (default enabled on MacOS X)])
-if test "${enable_coreaudio}" != "no" &&
-  (test "${SYS}" = "darwin" || test "${enable_coreaudio}" = "yes")
+AC_ARG_ENABLE(macosx-audio,
+  [  --enable-macosx-audio   Mac OS X audio module (default enabled on MacOS X)])
+if test "${enable_macosx-audio}" != "no" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx-audio}" = "yes")
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
-    [ VLC_ADD_BUILTINS([coreaudio auhal])
-      VLC_ADD_LDFLAGS([coreaudio auhal],[-framework CoreAudio -framework AudioUnit -framework AudioToolbox])
+    [ VLC_ADD_BUILTINS([auhal])
+      VLC_ADD_LDFLAGS([auhal],[-framework CoreAudio -framework AudioUnit -framework AudioToolbox])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 

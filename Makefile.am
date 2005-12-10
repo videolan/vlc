@@ -584,8 +584,6 @@ VLC-release.app: vlc
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
-	cp $(srcdir)/modules/audio_output/coreaudio.c \
-	   $(top_builddir)/tmp/modules/audio_output/coreaudio.c
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
 	for i in \
 	    about.h \
@@ -691,8 +689,6 @@ VLC.app: vlc
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
-	cp $(srcdir)/modules/audio_output/coreaudio.c \
-	   $(top_builddir)/tmp/modules/audio_output/coreaudio.c
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
 	for i in \
 	    about.h \
