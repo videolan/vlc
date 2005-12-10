@@ -642,6 +642,8 @@ static struct
       VIDEO_ES, "H263" },
     { VLC_FOURCC('U','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
+    { VLC_FOURCC('M','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "H263" },
 
     /* H263i */
     { VLC_FOURCC('I','2','6','3'), CODEC_ID_H263I,
