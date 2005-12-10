@@ -76,6 +76,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
+static void OverlayDisplay( vout_thread_t *, picture_t * );
 static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 static int  NewPictureVec  ( vout_thread_t *, picture_t *, int );
@@ -311,22 +312,22 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->i_spi_screensavetimeout = 0;
     var_Get( p_vout, "disable-screensaver", &val);
     if( val.b_bool ) {
-	msg_Dbg(p_vout, "disabling screen saver");
-	SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT,
-	    0, &(p_vout->p_sys->i_spi_lowpowertimeout), 0);
-	if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
-	    SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT, 0, NULL, 0);
-	}
-	SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0,
-	    &(p_vout->p_sys->i_spi_powerofftimeout), 0);
-	if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
-	    SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 0, NULL, 0);
-	}
-	SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0,
-	    &(p_vout->p_sys->i_spi_screensavetimeout), 0);
-	if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
-	    SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT, 0, NULL, 0);
-	}
+        msg_Dbg(p_vout, "disabling screen saver");
+        SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT,
+            0, &(p_vout->p_sys->i_spi_lowpowertimeout), 0);
+        if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
+            SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT, 0, NULL, 0);
+        }
+        SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0,
+            &(p_vout->p_sys->i_spi_powerofftimeout), 0);
+        if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
+            SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 0, NULL, 0);
+        }
+        SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0,
+            &(p_vout->p_sys->i_spi_screensavetimeout), 0);
+        if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
+            SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT, 0, NULL, 0);
+        }
     }
 
     return VLC_SUCCESS;
@@ -437,6 +438,11 @@ static int Init( vout_thread_t *p_vout )
         NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
     }
 
+    if( p_vout->p_sys->b_using_overlay )
+    {
+        p_vout->pf_display = OverlayDisplay;
+    }
+
     /* Change the window title bar text */
     PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 
@@ -496,16 +502,16 @@ static void CloseVideo( vlc_object_t *p_this )
 
     /* restore screensaver system settings */
     if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
-	SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,
-	    p_vout->p_sys->i_spi_lowpowertimeout, NULL, 0);
+        SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,
+            p_vout->p_sys->i_spi_lowpowertimeout, NULL, 0);
     }
     if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
-	SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,
-	    p_vout->p_sys->i_spi_powerofftimeout, NULL, 0);
+        SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,
+            p_vout->p_sys->i_spi_powerofftimeout, NULL, 0);
     }
     if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
-	SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT,
-	    p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
+        SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT,
+            p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
     }
 
     if( p_vout->p_sys )
@@ -838,6 +844,23 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+/*
+** this function is only used once when the first picture is received
+** The overlay colorkey replaces black as the background color on the
+** video window; this will cause the overlay surface to be displayed
+*/
+static void OverlayDisplay( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    /* set the colorkey as the backgound brush for the video window */
+    SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
+                  (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
+    InvalidateRect( p_vout->p_sys->hvideownd, NULL, TRUE );
+
+    /* use and restores proper display function for further pictures */
+    p_vout->pf_display = Display;
+    Display(p_vout, p_pic);
+}
+
 /* following functions are local */
 
 /*****************************************************************************
@@ -1083,9 +1106,11 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_rgb_colorkey =
         DirectXFindColorkey( p_vout, &p_vout->p_sys->i_colorkey );
 
-    /* Create the actual brush */
+    /* use black brush as the video background color,
+       if overlay video is used, this will be replaced by the
+       colorkey when the first picture is received */
     SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
-                  (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
+                  (LONG)GetStockObject( BLACK_BRUSH ) );
     InvalidateRect( p_vout->p_sys->hvideownd, NULL, TRUE );
     E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
 
