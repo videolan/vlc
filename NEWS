@@ -1,5 +1,23 @@
 $Id$
 
+Changes between 0.8.4 and 0.8.4a:
+---------------------------------
+
+Audio output:
+ * Fix a52 over spdif in alsa
+
+Decoder:
+ * Add support for new BMP and Cook audio decoders in ffmpeg
+
+Demux:
+ * Fix bug with some HE-AAC audio tracks
+
+Services Discovery:
+ * HAL fixes, should now work with new API
+ * SAP, fix 20 second freeze on windows
+ * UPnP fixes
+ * Avahi 0.6 support
+
 Changes between 0.8.2 and 0.8.4:
 --------------------------------
 
