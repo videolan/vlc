@@ -11,6 +11,7 @@ Encoder:
 
 Decoder:
  * Add support for new BMP and Cook (RealAudio G2) decoders in ffmpeg
+ * Add support for some non-standard FOURCCs used for H.264/H.263
 
 Demux:
  * Fix bug with some HE-AAC audio tracks
@@ -20,6 +21,10 @@ Services Discovery:
  * SAP, fix 20 second freeze on windows
  * UPnP fixes
  * Avahi 0.6 support
+ 
+Interfaces:
+ * Mac OS X
+    - fixed encoding of H.264/H.263 content when using the wizard 
 
 Changes between 0.8.2 and 0.8.4:
 --------------------------------
