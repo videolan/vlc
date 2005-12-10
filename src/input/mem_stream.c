@@ -2,7 +2,7 @@
  * mem_stream.c: stream_t wrapper around memory buffer
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
- * $Id: stream.c 9390 2004-11-22 09:56:48Z fenrir $
+ * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *
@@ -69,6 +69,9 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     s->pf_peek    = Peek;
     s->pf_control = Control;
     s->pf_destroy = Delete;
+
+    s->i_char_width = 1;
+    s->b_little_endian = VLC_FALSE;
     vlc_object_attach( s, p_this );
 
     return s;

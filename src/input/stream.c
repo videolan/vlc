@@ -161,7 +161,7 @@ struct stream_sys_t
     access_t       *p_list_access;
 
     /* Preparse mode ? */
-    vlc_bool_t b_quick;
+    vlc_bool_t      b_quick;
 };
 
 /* Method 1: */
@@ -237,6 +237,10 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     s->pf_destroy = AStreamDestroy;
 
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
+
+    /* UTF16 and UTF32 text file conversion */
+    s->i_char_width = 1;
+    s->b_little_endian = VLC_FALSE;
 
     /* Common field */
     p_sys->p_access = p_access;
@@ -1360,11 +1364,11 @@ static void AStreamPrebufferStream( stream_t *s )
 /**
  * Read from the stream untill first newline.
  * \param s Stream handle to read from
- * \return A null-terminated string. This must be freed,
+ * \return A pointer to the allocated output string. You need to free this when you are done.
  */
 #define STREAM_PROBE_LINE 2048
 #define STREAM_LINE_MAX (2048*100)
-char *stream_ReadLine( stream_t *s )
+char * stream_ReadLine( stream_t *s )
 {
     char *p_line = NULL;
     int i_line = 0, i_read = 0;
@@ -1374,19 +1378,91 @@ char *stream_ReadLine( stream_t *s )
         char *psz_eol;
         uint8_t *p_data;
         int i_data;
+        int64_t i_pos;
 
         /* Probe new data */
         i_data = stream_Peek( s, &p_data, STREAM_PROBE_LINE );
         if( i_data <= 0 ) break; /* No more data */
 
+        /* BOM detection */
+        i_pos = stream_Tell( s );
+        if( i_pos == 0 && i_data > 4 )
+        {
+            int i_bom_size = 0;
+            char *psz_encoding = NULL;
+            
+            if( p_data[0] == 0xEF && p_data[1] == 0xBB && p_data[2] == 0xBF )
+            {
+                psz_encoding = strdup( "UTF-8" );
+                i_bom_size = 3;
+            }
+            else if( p_data[0] == 0x00 && p_data[1] == 0x00 )
+            {
+                if( p_data[2] == 0xFE && p_data[3] == 0xFF )
+                {
+                    psz_encoding = strdup( "UTF-32BE" );
+                    s->i_char_width = 4;
+                    i_bom_size = 4;
+                }
+            }
+            else if( p_data[0] == 0xFF && p_data[1] == 0xFE )
+            {
+                if( p_data[2] == 0x00 && p_data[3] == 0x00 )
+                {
+                    psz_encoding = strdup( "UTF-32LE" );
+                    s->i_char_width = 4;
+                    s->b_little_endian = VLC_TRUE;
+                    i_bom_size = 4;
+                }
+                else
+                {
+                    psz_encoding = strdup( "UTF-16LE" );
+                    s->b_little_endian = VLC_TRUE;
+                    s->i_char_width = 2;
+                    i_bom_size = 2;
+                }
+            }
+            else if( p_data[0] == 0xFE && p_data[1] == 0xFF )
+            {
+                psz_encoding = strdup( "UTF-16BE" );
+                s->i_char_width = 2;
+                i_bom_size = 2;
+            }
+            /* Seek past the offset */
+            stream_Seek( s, i_bom_size );
+            p_data += i_bom_size;
+            i_data -= i_bom_size;
+
+            /* Open the converter if we need it */
+            if( psz_encoding != NULL )
+            {
+                msg_Dbg( s, "%s BOM detected", psz_encoding );
+                s->conv = vlc_iconv_open( "UTF-8", psz_encoding );
+                if( s->conv == (vlc_iconv_t)-1 )
+                {
+                    msg_Err( s, "iconv_open failed" );
+                }
+                if( psz_encoding ) free( psz_encoding );
+            }
+        }
+
+        if( i_data % s->i_char_width )
+        {
+            msg_Warn( s, "the read is not i_char_width compatible");
+        }
+
         /* Check if there is an EOL */
         if( ( psz_eol = memchr( p_data, '\n', i_data ) ) )
         {
+            if( s->b_little_endian == VLC_TRUE && s->i_char_width > 1 )
+            {
+                psz_eol += ( s->i_char_width - 1 );
+            }
             i_data = (psz_eol - (char *)p_data) + 1;
-            p_line = realloc( p_line, i_line + i_data + 1 );
+            p_line = realloc( p_line, i_line + i_data + s->i_char_width ); /* add \0 */
             i_data = stream_Read( s, &p_line[i_line], i_data );
             if( i_data <= 0 ) break; /* Hmmm */
-            i_line += (i_data - 1);
+            i_line += i_data - s->i_char_width; /* skip \n */;
             i_read += i_data;
 
             /* We have our line */
@@ -1394,25 +1470,58 @@ char *stream_ReadLine( stream_t *s )
         }
 
         /* Read data (+1 for easy \0 append) */
-        p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + 1 );
+        p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + s->i_char_width );
         i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
         if( i_data <= 0 ) break; /* Hmmm */
         i_line += i_data;
         i_read += i_data;
     }
 
-    /* Remove trailing LF/CR */
-    while( i_line > 0 && ( p_line[i_line-1] == '\r' ||
-           p_line[i_line-1] == '\n') ) i_line--;
-
     if( i_read > 0 )
     {
-        p_line[i_line] = '\0';
+        int j;
+        for( j = 0; j < s->i_char_width; j++ )
+        {
+            p_line[i_line + j] = '\0';
+        }
+        i_line += s->i_char_width; /* the added \0 */
+        if( s->i_char_width > 1 )
+        {
+            size_t i_in = 0, i_out = 0;
+            char * p_in = NULL;
+            char * p_out = NULL;
+            char * psz_new_line = NULL;
+            
+            /* iconv */
+            psz_new_line = malloc( i_line );
+            
+            i_in = i_out = (size_t)i_line;
+            p_in = p_line;
+            p_out = psz_new_line;
+            
+            if( vlc_iconv( s->conv, &p_in, &i_in, &p_out, &i_out ) == (size_t)-1 )
+            {
+                msg_Err( s, "iconv failed" );
+                msg_Dbg( s, "original: %d, in %d, out %d", i_line, (int)i_in, (int)i_out );
+            }
+            if( p_line ) free( p_line );
+            p_line = psz_new_line;
+            i_line = (size_t)i_line - i_out; /* does not include \0 */
+        }
+
+        /* Remove trailing LF/CR */
+        while( i_line > 0 && ( p_line[i_line-2] == '\r' ||
+            p_line[i_line-2] == '\n') ) i_line--;
+
+        /* Make sure the \0 is there */
+        p_line[i_line-1] = '\0';
+
         return p_line;
     }
 
     /* We failed to read any data, probably EOF */
     if( p_line ) free( p_line );
+    vlc_iconv_close( s->conv );
     return NULL;
 }
 

@@ -72,6 +72,11 @@ struct stream_t
     void     (*pf_destroy)( stream_t *);
 
     stream_sys_t *p_sys;
+
+    /* UTF-16 and UTF-32 file reading */
+    vlc_iconv_t     conv;
+    int             i_char_width;
+    vlc_bool_t      b_little_endian;
 };
 
 /**

@@ -313,6 +313,9 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux,
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;
 
+    s->i_char_width = 1;
+    s->b_little_endian = VLC_FALSE;
+
     s->p_sys = malloc( sizeof( d_stream_sys_t) );
     p_sys = (d_stream_sys_t*)s->p_sys;
 
