@@ -2,7 +2,7 @@
  * core.c: Core functions : init, playlist, stream management
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: vlc.c 10786 2005-04-23 23:19:17Z zorglub $
+ * $Id$
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>
  *
@@ -57,11 +57,19 @@
                        exception->message = strdup(m);
 
 
-mediacontrol_Instance* mediacontrol_new_from_object( vlc_object_t* p_object,
+mediacontrol_Instance* mediacontrol_new_from_object( int vlc_object_id,
                                                      mediacontrol_Exception *exception )
 {
     mediacontrol_Instance* retval;
     vlc_object_t *p_vlc;
+    vlc_object_t *p_object;
+
+    p_object = ( vlc_object_t* )vlc_current_object( vlc_object_id );
+    if( ! p_object )
+    {
+        RAISE( mediacontrol_InternalException, "Unable to find vlc object" );
+        return NULL;
+    }
 
     p_vlc = vlc_object_find( p_object, VLC_OBJECT_ROOT, FIND_PARENT );
     if( ! p_vlc )

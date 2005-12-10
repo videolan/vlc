@@ -2,7 +2,7 @@
  * control.h: global header for mediacontrol
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: vlc.h 10101 2005-03-02 16:47:31Z robux4 $
+ * $Id$
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>
  *
@@ -142,7 +142,7 @@ mediacontrol_Instance *
   mediacontrol_new( char **args, mediacontrol_Exception *exception );
 
 mediacontrol_Instance *
-  mediacontrol_new_from_object( vlc_object_t *p_object,
+  mediacontrol_new_from_object( int vlc_object_id,
                                 mediacontrol_Exception *exception );
 
 mediacontrol_Position *
