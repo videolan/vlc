@@ -1428,19 +1428,26 @@ char * stream_ReadLine( stream_t *s )
                 s->i_char_width = 2;
                 i_bom_size = 2;
             }
-            /* Seek past the offset */
-            stream_Seek( s, i_bom_size );
-            p_data += i_bom_size;
-            i_data -= i_bom_size;
+
+            /* Seek past the BOM */
+            if( i_bom_size )
+            {
+                stream_Seek( s, i_bom_size );
+                p_data += i_bom_size;
+                i_data -= i_bom_size;
+            }
 
             /* Open the converter if we need it */
             if( psz_encoding != NULL )
             {
                 msg_Dbg( s, "%s BOM detected", psz_encoding );
-                s->conv = vlc_iconv_open( "UTF-8", psz_encoding );
-                if( s->conv == (vlc_iconv_t)-1 )
+                if( s->i_char_width > 1 )
                 {
-                    msg_Err( s, "iconv_open failed" );
+                    s->conv = vlc_iconv_open( "UTF-8", psz_encoding );
+                    if( s->conv == (vlc_iconv_t)-1 )
+                    {
+                        msg_Err( s, "iconv_open failed" );
+                    }
                 }
                 if( psz_encoding ) free( psz_encoding );
             }
