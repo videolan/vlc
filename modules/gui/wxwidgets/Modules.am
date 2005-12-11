@@ -12,6 +12,7 @@ SOURCES_wxwidgets = \
 	playlist_manager.cpp \
 	dialogs.cpp \
 	dialogs/open.cpp \
+	dialogs/interaction.cpp \
 	dialogs/streamout.cpp \
 	dialogs/wizard.cpp \
 	dialogs/messages.cpp \
@@ -52,6 +53,7 @@ EXTRA_DIST += \
 	dialogs/vlm/vlm_slider_manager.hpp \
 	dialogs/vlm/vlm_wrapper.hpp \
 	dialogs/playlist.hpp \
+	dialogs/interaction.hpp \
 	dialogs/open.hpp \
 	dialogs/messages.hpp \
 	dialogs/iteminfo.hpp \

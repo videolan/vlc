@@ -471,8 +471,6 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     SetIntfMinSize();
 
-    fprintf( stderr, "Adding callback to object %i\n", p_intf->i_object_id );
-
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = VLC_TRUE;
@@ -1203,13 +1201,13 @@ void Interface::OnInteraction( wxCommandEvent& event )
 {
     interaction_dialog_t *p_dialog = (interaction_dialog_t *)
                                         event.GetClientData();
-    if( p_dialog->i_widgets == 0 ) return;
 
-    /// \todo : Code this . This is only test code. No locking, ...
-    wxString message = wxU( p_dialog->pp_widgets[0]->psz_text );
-    REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, 0 );
-    wxMessageBox( message, wxU( p_dialog->psz_title ) );
-    p_dialog->i_status = ANSWERED_DIALOG;
+    intf_dialog_args_t *p_arg = new intf_dialog_args_t;
+    p_arg->p_dialog = p_dialog;
+    p_arg->p_intf = p_intf;
+
+    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_INTERACTION,
+                                   0, p_arg );
 }
 
 static int InteractCallback( vlc_object_t *p_this,
@@ -1223,7 +1221,7 @@ static int InteractCallback( vlc_object_t *p_this,
     if( p_dialog->i_action == INTERACT_HIDE )
     {
         p_dialog->i_status = HIDDEN_DIALOG;
-        return;
+        return 0;
     }
 
     wxCommandEvent event( wxEVT_INTERACTION, -1 );

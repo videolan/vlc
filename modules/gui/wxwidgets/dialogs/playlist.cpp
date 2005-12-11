@@ -874,7 +874,7 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
 
 void Playlist::DeleteItem( int item_id )
 {
-    playlist_LockDelete( p_playlist, item_id );
+    playlist_Delete( p_playlist, item_id );
 }
 
 void Playlist::DeleteNode( playlist_item_t *p_item )

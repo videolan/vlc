@@ -45,6 +45,7 @@
 #include "dialogs/iteminfo.hpp"
 #include "dialogs/preferences.hpp"
 #include "dialogs/messages.hpp"
+#include "dialogs/interaction.hpp"
 #include "interface.hpp"
 
 /* include the icon graphic */
@@ -64,6 +65,7 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnUpdateVLC( wxCommandEvent& event );
     void OnVLM( wxCommandEvent& event );
+    void OnInteraction( wxCommandEvent& event );
     void OnExit( wxCommandEvent& event );
     void OnPlaylist( wxCommandEvent& event );
     void OnMessages( wxCommandEvent& event );
@@ -146,6 +148,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnUpdateVLC)
     EVT_COMMAND(INTF_DIALOG_VLM, wxEVT_DIALOG,
                 DialogsProvider::OnVLM)
+    EVT_COMMAND( INTF_DIALOG_INTERACTION, wxEVT_DIALOG,
+                DialogsProvider::OnInteraction )
 END_EVENT_TABLE()
 
 wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent )
@@ -529,5 +533,41 @@ void DialogsProvider::OnVLM( wxCommandEvent& WXUNUSED(event) )
     if( p_vlm_dialog )
     {
         p_vlm_dialog->Show( !p_vlm_dialog->IsShown() );
+    }
+}
+
+void DialogsProvider::OnInteraction( wxCommandEvent& event )
+{
+    intf_dialog_args_t *p_arg = (intf_dialog_args_t *)event.GetClientData();
+    interaction_dialog_t *p_dialog;
+    InteractionDialog *p_wxdialog;
+
+    if( p_arg == NULL )
+    {
+        msg_Dbg( p_intf, "OnInteraction() called with NULL arg" );
+        return;
+    }
+    p_dialog = p_arg->p_dialog;
+
+
+    /** \bug We store the interface object for the dialog in the p_private
+     * field of the core dialog object. This is not safe if we change
+     * interface while a dialog is loaded */
+
+    switch( p_dialog->i_action )
+    {
+    case INTERACT_NEW:
+        p_wxdialog = new InteractionDialog( p_intf, this, p_dialog );
+        p_dialog->p_private = (void*)p_wxdialog;
+        p_wxdialog->Show();
+        break;
+    case INTERACT_UPDATE:
+        p_wxdialog = (InteractionDialog*)(p_dialog->p_private);
+        p_wxdialog->Update();
+        break;
+    case INTERACT_HIDE:
+        p_wxdialog = (InteractionDialog*)(p_dialog->p_private);
+        p_wxdialog->Hide();
+        break;
     }
 }
