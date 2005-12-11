@@ -150,7 +150,8 @@ E: babal(at)via.ecp.fr
 C: babal
 D: Win32 network input
 D: Win32 interface
-D: Headphone channel mixer
+D: Headphone channel mixer, Dolby Surround decoder
+D: Audio output core enhancements
 S: France
 
 N: Jean-Marc Dressler

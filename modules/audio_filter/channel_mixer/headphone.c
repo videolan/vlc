@@ -315,12 +315,10 @@ static int Init ( aout_filter_t * p_filter , struct aout_filter_sys_t * p_data
     for ( i = 0 ; i < p_data->i_nb_atomic_operations ; i++ )
     {
         if ( p_data->i_overflow_buffer_size
-                < p_data->p_atomic_operations[i].i_delay * i_nb_channels
-                * sizeof (float) )
+                < p_data->p_atomic_operations[i].i_delay * 2 * sizeof (float) )
         {
             p_data->i_overflow_buffer_size
-                = p_data->p_atomic_operations[i].i_delay * i_nb_channels
-                * sizeof (float);
+                = p_data->p_atomic_operations[i].i_delay * 2 * sizeof (float);
         }
     }
     p_data->p_overflow_buffer = malloc ( p_data->i_overflow_buffer_size );
@@ -402,7 +400,7 @@ static int Create( vlc_object_t *p_this )
     if ( Init( p_filter , p_filter->p_sys
                 , aout_FormatNbChannels ( &p_filter->input )
                 , p_filter->input.i_physical_channels
-                ,  p_filter->input.i_rate ) < 0 )
+                , p_filter->input.i_rate ) < 0 )
     {
         return VLC_EGENERIC;
     }
