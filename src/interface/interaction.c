@@ -52,6 +52,8 @@ static int                   intf_WaitAnswer( interaction_t *p_interact,
 static int                   intf_Send( interaction_t *p_interact,
                              interaction_dialog_t *p_dialog );
 static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* , int );
+static void                  intf_InteractionDialogDestroy(
+                                              interaction_dialog_t *p_dialog );
 
 /**
  * Send an interaction element to the user
@@ -90,7 +92,18 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
  */
 void intf_InteractionDestroy( interaction_t *p_interaction )
 {
-    /// \todo Code this, and call it
+    int i;
+
+    // Remove all dialogs - Interfaces must be able to clean up their data
+
+    for( i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
+    {
+        interaction_dialog_t * p_dialog = p_interaction->pp_dialogs[i];
+        intf_InteractionDialogDestroy( p_dialog );
+        REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
+    }
+
+    vlc_object_destroy( p_interaction );
 }
 
 /**
@@ -121,12 +134,23 @@ void intf_InteractionManage( playlist_t *p_playlist )
         for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
         {
             interaction_dialog_t *p_dialog = p_interaction->pp_dialogs[i_index];
+
+            // Give default answer
             p_dialog->i_return = DIALOG_DEFAULT;
             if( p_dialog->i_flags & DIALOG_OK_CANCEL )
                 p_dialog->i_return = DIALOG_CANCELLED;
             if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
                 p_dialog->i_return = DIALOG_CANCELLED;
-            p_dialog->i_status = ANSWERED_DIALOG;
+
+            // Pretend we have hidden and destroyed it
+            if( p_dialog->i_status == HIDDEN_DIALOG )
+            {
+                p_dialog->i_status = DESTROYED_DIALOG;
+            }
+            else
+            {
+                p_dialog->i_status = HIDING_DIALOG;
+            }
         }
     }
     else
@@ -170,10 +194,14 @@ void intf_InteractionManage( playlist_t *p_playlist )
             }
             break;
         case DESTROYED_DIALOG:
+            msg_Dbg( p_interaction, "Removing dialog %i",
+                                    p_dialog->i_id );
             // Interface has now destroyed it, remove it
-            /// \todo Remove it from the list
-            /// \todo Free data fields
-            free( p_dialog );
+            REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs,
+                         i_index);
+            i_index--;
+            intf_InteractionDialogDestroy( p_dialog );
+            break;
         case NEW_DIALOG:
             // This is truly a new dialog, send it.
             p_dialog->i_action = INTERACT_NEW;
@@ -203,6 +231,7 @@ void intf_InteractionManage( playlist_t *p_playlist )
         new->psz_title = NULL;                                          \
         new->psz_description = NULL;                                    \
         new->i_id = 0;                                                  \
+        new->i_flags = 0;                                               \
         new->i_status = NEW_DIALOG;
 
 #define INTERACT_FREE( new )                                            \
@@ -246,6 +275,7 @@ void __intf_UserFatal( vlc_object_t *p_this,
     p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
 
     p_widget->i_type = WIDGET_TEXT;
+    p_widget->val.psz_string = NULL;
 
     va_start( args, psz_format );
     vasprintf( &p_widget->psz_text, psz_format, args );
@@ -286,6 +316,7 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
     p_widget->i_type = WIDGET_TEXT;
     p_widget->psz_text = strdup( psz_description );
+    p_widget->val.psz_string = NULL;
     INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
                   p_new->i_widgets,  p_widget );
 
@@ -309,7 +340,7 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
 
     i_ret = intf_Interact( p_this, p_new );
 
-    if( i_ret == DIALOG_OK_YES )
+    if( i_ret != DIALOG_CANCELLED )
     {
         *ppsz_login = strdup( p_new->pp_widgets[1]->val.psz_string );
         *ppsz_password = strdup( p_new->pp_widgets[2]->val.psz_string );
@@ -427,6 +458,7 @@ static int intf_WaitAnswer( interaction_t *p_interact, interaction_dialog_t *p_d
     /// \todo Check that the initiating object is not dying
     while( p_dialog->i_status != ANSWERED_DIALOG &&
            p_dialog->i_status != HIDING_DIALOG &&
+           p_dialog->i_status != HIDDEN_DIALOG &&
            !p_dialog->p_parent->b_die )
     {
         msleep( 100000 );
@@ -464,6 +496,8 @@ static int intf_Send( interaction_t *p_interact, interaction_dialog_t *p_dialog 
     }
     else
         p_dialog->i_status = UPDATED_DIALOG;
+    // Pretend we already retrieved the "answer"
+    p_dialog->i_flags |= DIALOG_GOT_ANSWER;
     vlc_mutex_unlock( &p_interact->object_lock );
     return VLC_SUCCESS;
 }
@@ -485,4 +519,24 @@ static interaction_dialog_t *intf_InteractionGetById( vlc_object_t* p_this,
         }
     }
     return NULL;
+}
+
+#define FREE( i ) { if( i ) free( i ); i = NULL; }
+
+static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
+{
+    int i;
+    for( i = p_dialog->i_widgets - 1 ; i >= 0 ; i-- )
+    {
+        user_widget_t *p_widget = p_dialog->pp_widgets[i];
+        FREE( p_widget->psz_text );
+        FREE( p_widget->val.psz_string );
+
+        REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, i );
+        free( p_widget );
+    }
+    FREE( p_dialog->psz_title );
+    FREE( p_dialog->psz_description );
+
+    free( p_dialog );
 }

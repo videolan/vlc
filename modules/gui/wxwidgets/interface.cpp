@@ -1217,13 +1217,6 @@ static int InteractCallback( vlc_object_t *p_this,
     Interface *p_interface = (Interface*)param;
     interaction_dialog_t *p_dialog = (interaction_dialog_t*)(new_val.p_address);
 
-    /// Not handled
-    if( p_dialog->i_action == INTERACT_HIDE )
-    {
-        p_dialog->i_status = HIDDEN_DIALOG;
-        return 0;
-    }
-
     wxCommandEvent event( wxEVT_INTERACTION, -1 );
     event.SetClientData( new_val.p_address );
     p_interface->AddPendingEvent( event );

@@ -118,6 +118,7 @@ void InteractionDialog::Render()
             InputWidget widget;
             widget.control = input;
             widget.val = &p_widget->val;
+            widget.i_type = WIDGET_INPUT_TEXT;
             input_widgets.push_back( widget );
         }
     }
@@ -167,7 +168,8 @@ void InteractionDialog::Finish( int i_ret )
     vector<InputWidget>::iterator it = input_widgets.begin();
     while ( it < input_widgets.end() )
     {
-        (*it).val->psz_string = strdup( (*it).control->GetValue().mb_str() );
+        if( (*it).i_type == WIDGET_INPUT_TEXT )
+            (*it).val->psz_string = strdup( (*it).control->GetValue().mb_str() );
         it++;
     }
     Hide();

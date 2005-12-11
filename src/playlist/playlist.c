@@ -237,6 +237,11 @@ int playlist_Destroy( playlist_t * p_playlist )
                                           p_playlist->pp_sds[0]->psz_module );
     }
 
+    if( p_playlist->p_interaction )
+    {
+        intf_InteractionDestroy( p_playlist->p_interaction );
+    }
+
     vlc_thread_join( p_playlist->p_preparse );
     vlc_thread_join( p_playlist );
 

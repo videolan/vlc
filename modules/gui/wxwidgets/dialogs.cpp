@@ -549,7 +549,6 @@ void DialogsProvider::OnInteraction( wxCommandEvent& event )
     }
     p_dialog = p_arg->p_dialog;
 
-
     /** \bug We store the interface object for the dialog in the p_private
      * field of the core dialog object. This is not safe if we change
      * interface while a dialog is loaded */
@@ -568,6 +567,12 @@ void DialogsProvider::OnInteraction( wxCommandEvent& event )
     case INTERACT_HIDE:
         p_wxdialog = (InteractionDialog*)(p_dialog->p_private);
         p_wxdialog->Hide();
+        p_dialog->i_status = HIDDEN_DIALOG;
+        break;
+    case INTERACT_DESTROY:
+        p_wxdialog = (InteractionDialog*)(p_dialog->p_private);
+        /// \todo
+        p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }
 }

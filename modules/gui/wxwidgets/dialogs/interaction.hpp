@@ -38,6 +38,7 @@ namespace wxvlc
         /// \todo Clean up
         wxTextCtrl *control;
         vlc_value_t *val;
+        int i_type;
     };
 
     class InteractionDialog: public wxFrame
