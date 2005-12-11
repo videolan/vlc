@@ -31,6 +31,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "vlc_interaction.h"
 #include "vlc_playlist.h"
 #include "vlc_meta.h"
 #include "network.h"
@@ -189,6 +190,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
 
+
     /* Parse URI - remove spaces */
     p = psz = strdup( p_access->psz_path );
     while( (p = strchr( p, ' ' )) != NULL )
@@ -266,6 +268,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_reconnect = var_CreateGetBool( p_access, "http-reconnect" );
     p_sys->b_continuous = var_CreateGetBool( p_access, "http-continuous" );
 
+connect:
     /* Connect */
     if( Connect( p_access, 0 ) )
     {
@@ -275,6 +278,31 @@ static int Open( vlc_object_t *p_this )
         if( p_access->b_die ||
             Connect( p_access, 0 ) )
         {
+            goto error;
+        }
+    }
+
+    if( p_sys->i_code == 401 )
+    {
+        char *psz_login = NULL; char *psz_password = NULL;
+        int i_ret;
+        msg_Dbg( p_access, "Authentication failed" );
+        i_ret = intf_UserLoginPassword( p_access, "HTTP authentication",
+                         "Authentication failed", &psz_login, &psz_password );
+        if( i_ret == DIALOG_OK_YES )
+        {
+            msg_Dbg( p_access, "retrying with user=%s, pwd=%s",
+                        psz_login, psz_password );
+            if( psz_login ) p_sys->url.psz_username = strdup( psz_login );
+            if( psz_password ) p_sys->url.psz_password = strdup( psz_password );
+            if( psz_login ) free( psz_login );
+            if( psz_password ) free( psz_password );
+            goto connect;
+        }
+        else
+        {
+            if( psz_login ) free( psz_login );
+            if( psz_password ) free( psz_password );
             goto error;
         }
     }
@@ -988,7 +1016,13 @@ static int Request( access_t *p_access, int64_t i_tell )
     {
         p_sys->b_seekable = VLC_FALSE;
     }
-    if( p_sys->i_code >= 400 )
+    /* Authentication error - We'll have to display the dialog */
+    if( p_sys->i_code == 401 )
+    {
+
+    }
+    /* Other fatal error */
+    else if( p_sys->i_code >= 400 )
     {
         msg_Err( p_access, "error: %s", psz );
         free( psz );
