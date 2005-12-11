@@ -225,7 +225,7 @@ static void Probe( aout_instance_t * p_aout,
                 var_Set( p_aout, "audio-device", val );
             }
         }
-        
+
         /* Close the previously opened device */
         snd_pcm_close( p_sys->p_snd_pcm );
     }
@@ -789,7 +789,7 @@ static void ALSAFill( aout_instance_t * p_aout )
 
             if( i_snd_rc == 0 )
             {
-                msg_Warn( p_aout, "recovered from buffer underrun" );
+                msg_Dbg( p_aout, "recovered from buffer underrun" );
 
                 /* Reget the status */
                 i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
