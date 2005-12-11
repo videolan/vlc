@@ -5,6 +5,7 @@ Changes between 0.8.4 and 0.8.4a:
 
 Audio output:
  * Fix a52 over spdif in alsa
+ * SPDIF output available again in the Mac OS X Audio menu.
 
 Decoder:
  * Add support for new BMP and Cook (RealAudio G2) decoders in ffmpeg
