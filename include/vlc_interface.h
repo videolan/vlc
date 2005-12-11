@@ -92,6 +92,7 @@ struct intf_thread_t
  *****************************************************************************/
 struct intf_dialog_args_t
 {
+    intf_thread_t *p_intf;
     char *psz_title;
 
     char **psz_results;
@@ -104,6 +105,9 @@ struct intf_dialog_args_t
     char *psz_extensions;
     vlc_bool_t b_save;
     vlc_bool_t b_multiple;
+
+    /* Specific to INTF_DIALOG_INTERACTION */
+    interaction_dialog_t *p_dialog;
 };
 
 /*****************************************************************************
@@ -160,6 +164,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_POPUPMENU  20
 
 #define INTF_DIALOG_FILE_GENERIC 30
+#define INTF_DIALOG_INTERACTION 50
 
 #define INTF_DIALOG_UPDATEVLC   90
 #define INTF_DIALOG_VLM   91

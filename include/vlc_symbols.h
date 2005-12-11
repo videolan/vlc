@@ -145,6 +145,7 @@ int playlist_Export (playlist_t *, const char *, const char *);
 demux_t * __demux2_New (vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, stream_t *s, es_out_t *out, vlc_bool_t);
 int __vlc_threads_end (vlc_object_t *);
 int sout_AccessOutRead (sout_access_out_t *, block_t *);
+int __intf_UserLoginPassword (vlc_object_t*, const char*, const char*, char **, char **);
 int demux2_vaControlHelper (stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args);
 int httpd_UrlCatch (httpd_url_t *, int i_msg, httpd_callback_t, httpd_callback_sys_t *);
 void __vlc_object_yield (vlc_object_t *);
@@ -297,7 +298,7 @@ subpicture_t * spu_CreateSubpicture (spu_t *);
 void httpd_MsgAdd (httpd_message_t *, char *psz_name, char *psz_value, ...);
 int vout_vaControlDefault (vout_thread_t *, int, va_list);
 int playlist_NodeEmpty (playlist_t *, playlist_item_t *, vlc_bool_t);
-void __intf_UserFatal (vlc_object_t*, int, const char*, const char*, ...);
+void __intf_UserFatal (vlc_object_t*, const char*, const char*, ...);
 spu_t * __spu_Create (vlc_object_t *);
 int playlist_NodeRemoveItem (playlist_t *,playlist_item_t*,playlist_item_t *);
 int __net_Accept (vlc_object_t *, int *, mtime_t);
@@ -858,7 +859,8 @@ struct module_symbols_t
     int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
     void (*intf_InteractionManage_inner) (playlist_t *);
     void (*intf_InteractionDestroy_inner) (interaction_t *);
-    void (*__intf_UserFatal_inner) (vlc_object_t*, int, const char*, const char*, ...);
+    void (*__intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
+    int (*__intf_UserLoginPassword_inner) (vlc_object_t*, const char*, const char*, char **, char **);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1274,6 +1276,7 @@ struct module_symbols_t
 #  define intf_InteractionManage (p_symbols)->intf_InteractionManage_inner
 #  define intf_InteractionDestroy (p_symbols)->intf_InteractionDestroy_inner
 #  define __intf_UserFatal (p_symbols)->__intf_UserFatal_inner
+#  define __intf_UserLoginPassword (p_symbols)->__intf_UserLoginPassword_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1692,6 +1695,7 @@ struct module_symbols_t
     ((p_symbols)->intf_InteractionManage_inner) = intf_InteractionManage; \
     ((p_symbols)->intf_InteractionDestroy_inner) = intf_InteractionDestroy; \
     ((p_symbols)->__intf_UserFatal_inner) = __intf_UserFatal; \
+    ((p_symbols)->__intf_UserLoginPassword_inner) = __intf_UserLoginPassword; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */

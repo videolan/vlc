@@ -39,7 +39,7 @@ enum
 {
     WIDGET_TEXT,                        //< Text display
     WIDGET_PROGRESS,                    //< A progress bar
-    WIDGET_INPUT                       //< Input (backed up by a variable)
+    WIDGET_INPUT_TEXT                   //< Input (backed up by a variable)
 };
 
 /**
@@ -52,16 +52,39 @@ struct interaction_dialog_t
     char           *psz_title;          //< Title
     char           *psz_description;    //< Descriptor string
 
-    /* For dialogs */
     int             i_widgets;          //< Nu,ber of dialog widgets
     user_widget_t **pp_widgets;         //< Dialog widgets
 
-    vlc_bool_t      b_reusable;         //< Do we have to reuse this ?
-
     void *          p_private;          //< Private interface data
-    int             i_status;           //< Dialog status;
 
+    int             i_status;           //< Dialog status;
     int             i_action;           //< Action to perform;
+    int             i_flags;            //< Misc flags
+    int             i_return;           //< Return status
+
+    interaction_t  *p_interaction;      //< Parent interaction object
+    vlc_object_t   *p_parent;           //< The vlc object that asked
+                                        //for interaction
+};
+
+/**
+ * Possible flags . Reusable and button types
+ */
+#define DIALOG_REUSABLE      0x01
+#define DIALOG_OK_CANCEL     0x02
+#define DIALOG_YES_NO        0x04
+#define DIALOG_YES_NO_CANCEL 0x04
+#define DIALOG_GOT_ANSWER    0x08
+
+/**
+ * Possible return codes
+ */
+enum
+{
+    DIALOG_DEFAULT,
+    DIALOG_OK_YES,
+    DIALOG_NO,
+    DIALOG_CANCELLED
 };
 
 /**
@@ -69,12 +92,13 @@ struct interaction_dialog_t
  */
 enum
 {
-    NEW_DIALOG,
-    SENT_DIALOG,
-    UPDATED_DIALOG,
-    ANSWERED_DIALOG,
-    HIDING_DIALOG,
-    HIDDEN_DIALOG,
+    NEW_DIALOG,                 //< Just created
+    SENT_DIALOG,                //< Sent to interface
+    UPDATED_DIALOG,             //< Update to send
+    ANSWERED_DIALOG,            //< Got "answer"
+    HIDING_DIALOG,              //< Hiding requested
+    HIDDEN_DIALOG,              //< Now hidden. Requesting destruction
+    DESTROYED_DIALOG,           //< Interface has destroyed it
 };
 
 /**
@@ -82,11 +106,9 @@ enum
  */
 enum
 {
-    INTERACT_PROGRESS,          //< Progress bar
-    INTERACT_WARNING,           //< Warning message ("codec not supported")
-    INTERACT_FATAL,             //< Fatal message ("File not found")
-    INTERACT_FATAL_LIST,        //< List of fatal messages ("File not found")
-    INTERACT_ASK,               //< Full-featured dialog box (password)
+    INTERACT_PROGRESS,          //< Progress bar (in the main interface ?)
+    INTERACT_DIALOG_ONEWAY,     //< Dialog box without feedback
+    INTERACT_DIALOG_TWOWAY,     //< Dialog box with feedback
 };
 
 /**
@@ -95,9 +117,7 @@ enum
 enum
 {
     DIALOG_FIRST,
-    DIALOG_NOACCESS,
-    DIALOG_NOCODEC,
-    DIALOG_NOAUDIO,
+    DIALOG_ERRORS,
 
     DIALOG_LAST_PREDEFINED,
 };
@@ -124,7 +144,8 @@ enum
 {
     INTERACT_NEW,
     INTERACT_UPDATE,
-    INTERACT_HIDE
+    INTERACT_HIDE,
+    INTERACT_DESTROY
 };
 
 /***************************************************************************
@@ -134,8 +155,10 @@ enum
 #define intf_Interact( a,b ) __intf_Interact( VLC_OBJECT(a), b )
 VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 
-#define intf_UserFatal( a,b, c, d, e... ) __intf_UserFatal( a,b,c,d, ## e )
-VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, int, const char*, const char*, ...) );
+#define intf_UserFatal( a, c, d, e... ) __intf_UserFatal( a,c,d, ## e )
+VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, const char*, const char*, ...) );
+#define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( a,b,c,d,e)
+VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
 
 VLC_EXPORT( void, intf_InteractionManage,( playlist_t *) );
 VLC_EXPORT( void, intf_InteractionDestroy,( interaction_t *) );
