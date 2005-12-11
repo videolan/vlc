@@ -56,6 +56,7 @@
 #define RAISE( c, m )  exception->code = c; \
                        exception->message = strdup(m);
 
+vlc_t * vlc_current_object( int );
 
 mediacontrol_Instance* mediacontrol_new_from_object( int vlc_object_id,
                                                      mediacontrol_Exception *exception )
