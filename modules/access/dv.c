@@ -2,7 +2,7 @@
  * dv.c: Digital video/Firewire input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2005 M2X
- * $Id: dv.c 12318 2005-08-21 17:46:48Z jpsaman $
+ * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman at m2x dot nl>
  *
@@ -76,7 +76,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "dv-caching", 60000 / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    set_capability( "access2", 50 );
+    set_capability( "access2", 0 );
     add_shortcut( "dv" );
     add_shortcut( "dv1394" );
     add_shortcut( "raw1394" );
@@ -173,6 +173,14 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( p_access, &p_sys->lock );
 
     p_sys->i_node = DiscoverAVC( p_access, &p_sys->i_port, p_sys->i_guid );
+    if( p_sys->i_node < 0 )
+    {
+        msg_Err( p_access, "failed to open a Firewire (IEEE1394) connection" );
+        Close( p_this );
+        free( psz_name );
+        return VLC_EGENERIC;
+    }
+
     p_sys->p_avc1394 = AVCOpen( p_access, p_sys->i_port );
     if( !p_sys->p_avc1394 )
     {
@@ -240,29 +248,32 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    /* stop the event handler */
-    p_sys->p_ev->b_die = VLC_TRUE;
-
-    if( p_sys->p_raw1394)
-        raw1394_stop_iso_rcv( p_sys->p_raw1394, p_sys->i_channel );
-
-    vlc_mutex_destroy( &p_sys->p_ev->lock );
-    vlc_thread_join( p_sys->p_ev );
-
-    /* Cleanup frame data */
-    if( p_sys->p_ev->p_frame )
+    if( p_sys->p_ev )
     {
-        vlc_mutex_lock( &p_sys->p_ev->lock );
-        block_ChainRelease( p_sys->p_ev->p_frame );
-        p_sys->p_ev->p_frame = NULL;
-        p_sys->p_ev->pp_last = &p_sys->p_frame;
-        vlc_mutex_unlock( &p_sys->p_ev->lock );
+        /* stop the event handler */
+        p_sys->p_ev->b_die = VLC_TRUE;
+
+        if( p_sys->p_raw1394 )
+            raw1394_stop_iso_rcv( p_sys->p_raw1394, p_sys->i_channel );
+
+        vlc_mutex_destroy( &p_sys->p_ev->lock );
+        vlc_thread_join( p_sys->p_ev );
+
+        /* Cleanup frame data */
+        if( p_sys->p_ev->p_frame )
+        {
+            vlc_mutex_lock( &p_sys->p_ev->lock );
+            block_ChainRelease( p_sys->p_ev->p_frame );
+            p_sys->p_ev->p_frame = NULL;
+            p_sys->p_ev->pp_last = &p_sys->p_frame;
+            vlc_mutex_unlock( &p_sys->p_ev->lock );
+        }
+        vlc_object_destroy( p_sys->p_ev );
     }
-    vlc_object_destroy( p_sys->p_ev );
 
     if( p_sys->p_frame )
         block_ChainRelease( p_sys->p_frame );
-    if( p_sys->p_raw1394)
+    if( p_sys->p_raw1394 )
         raw1394_destroy_handle( p_sys->p_raw1394 );
 
     AVCClose( p_access );
@@ -520,7 +531,7 @@ static void Raw1394Close( raw1394handle_t handle )
 static int DiscoverAVC( access_t *p_access, int* port, uint64_t guid )
 {
     rom1394_directory rom_dir;
-    raw1394handle_t handle;
+    raw1394handle_t handle = NULL;
     int device = -1;
     int i, j = 0;
     int m = Raw1394GetNumPorts( p_access );
@@ -535,6 +546,9 @@ static int DiscoverAVC( access_t *p_access, int* port, uint64_t guid )
     for( ; j < m && device == -1; j++ )
     {
         handle = Raw1394Open( p_access, j );
+        if( !handle )
+            return -1;
+
         for( i = 0; i < raw1394_get_nodecount( handle ); ++i )
         {
             if( guid != 0 )
