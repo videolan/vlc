@@ -2,7 +2,7 @@
  * audio_video.c: Audio/Video management : volume, snapshot, OSD
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: vlc.c 10786 2005-04-23 23:19:17Z zorglub $
+ * $Id$
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>
  *
@@ -416,7 +416,7 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
         RAISE( mediacontrol_InternalException, "No vlc reference" );
         return 0;
     }
-    value.i_int=visual_id;
+    value.i_int = (int) visual_id;
     ret = var_Set(self->p_vlc, "drawable", value);
     
     return (ret == VLC_SUCCESS);
