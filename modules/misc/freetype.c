@@ -526,34 +526,35 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #if defined(HAVE_FRIBIDI)
     {
         uint32_t *p_fribidi_string;
+        int start_pos, pos = 0;
+        
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
 
-		/* Do bidi conversion line-by-line */
-		int pos = 0;
-		while(pos < i_string_length) 
-		{
-			while(pos < i_string_length) {
-				i_char = psz_unicode[pos];
-				if (i_char != '\r' && i_char != '\n')
-					break;
-				p_fribidi_string[pos] = i_char;
-				++pos;
-			}
-			int start_pos = pos;
-			while(pos < i_string_length) {
-				i_char = psz_unicode[pos];
-				if (i_char == '\r' || i_char == '\n')
-					break;
-				++pos;
-			}
-			if (pos > start_pos)
-			{
-		        FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
-				fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos, pos - start_pos,
-					&base_dir, (FriBidiChar*)p_fribidi_string + start_pos, 0, 0, 0);
-			}
-		}
-		
+        /* Do bidi conversion line-by-line */
+        while(pos < i_string_length)
+        {
+            while(pos < i_string_length) {
+                i_char = psz_unicode[pos];
+                if (i_char != '\r' && i_char != '\n')
+                    break;
+                p_fribidi_string[pos] = i_char;
+                ++pos;
+            }
+            start_pos = pos;
+            while(pos < i_string_length) {
+                i_char = psz_unicode[pos];
+                if (i_char == '\r' || i_char == '\n')
+                    break;
+                ++pos;
+            }
+            if (pos > start_pos)
+            {
+                FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
+                fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos, pos - start_pos,
+                                &base_dir, (FriBidiChar*)p_fribidi_string + start_pos, 0, 0, 0);
+            }
+        }
+
         free( psz_unicode_orig );
         psz_unicode = psz_unicode_orig = p_fribidi_string;
         p_fribidi_string[ i_string_length ] = 0;
