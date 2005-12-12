@@ -37,7 +37,7 @@ def get_ldflags():
         return []
     else:
 	os.environ['top_builddir'] = '../..'
-        ldflags=os.popen('%s --libs vlc builtin' % vlcconfig, 'r').readline().rstrip().split()
+        ldflags=os.popen('%s --libs vlc pic builtin' % vlcconfig, 'r').readline().rstrip().split()
         return ldflags
 
 # To compile in a local vlc tree
@@ -45,7 +45,7 @@ vlclocal = Extension('vlc',
                 sources = ['vlcglue.c',
                            '../../src/control/init.c'],
                 include_dirs = ['../../include', '../../', '/usr/win32/include' ],
-                extra_objects = [ '../../lib/libvlc.a' ],
+                extra_objects = [ '../../lib/libvlc_pic.a' ],
                 extra_compile_args = get_cflags(),
 		extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )
