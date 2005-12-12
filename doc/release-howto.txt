@@ -41,6 +41,7 @@
 
  * Win32 Packages
     make the packages using the nightly builds configure/options/...
+    don't forget to test the installer and uninstaller (the first 0.8.4 uninstaller was broken ... kind of suxxs)
     add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
 
  * OS X packages
