@@ -122,7 +122,7 @@ static int Demux( demux_t *p_demux );
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
 
 
-static int ReadDir( playlist_t *, char *psz_name, int i_mode, int *pi_pos,
+static int ReadDir( playlist_t *, const char *psz_name, int i_mode,
                     playlist_item_t * );
 
 /*****************************************************************************
@@ -280,8 +280,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     }
 
     p_item->input.i_type = ITEM_TYPE_DIRECTORY;
-    if( ReadDir( p_playlist, psz_name , i_mode, &i_pos,
-                 p_item ) != VLC_SUCCESS )
+    if( ReadDir( p_playlist, psz_name , i_mode, p_item ) != VLC_SUCCESS )
     {
     }
 end:
@@ -385,8 +384,7 @@ static int Filter( const struct dirent *foo )
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
 static int ReadDir( playlist_t *p_playlist,
-                    char *psz_name, int i_mode, int *pi_position,
-                    playlist_item_t *p_parent )
+                    const char *psz_name, int i_mode, playlist_item_t *p_parent )
 {
     struct dirent   **pp_dir_content;
     int             i_dir_content, i;
@@ -412,7 +410,7 @@ static int ReadDir( playlist_t *p_playlist,
         {
             int b;
             char *tmp;
-            
+
             while( psz_parser[0] != '\0' && psz_parser[0] == ' ' ) psz_parser++;
             for( b = 0; psz_parser[b] != '\0'; b++ )
             {
@@ -465,8 +463,6 @@ static int ReadDir( playlist_t *p_playlist,
              && S_ISDIR(stat_data.st_mode) && i_mode != MODE_COLLAPSE )
 #elif defined( DT_DIR )
             if( ( p_dir_content->d_type & DT_DIR ) && i_mode != MODE_COLLAPSE )
-#else
-            if( 0 )
 #endif
             {
                 if( i_mode == MODE_NONE )
@@ -494,7 +490,7 @@ static int ReadDir( playlist_t *p_playlist,
                     p_node->input.i_type = ITEM_TYPE_DIRECTORY;
 
                     if( ReadDir( p_playlist, psz_uri , MODE_EXPAND,
-                                 pi_position, p_node ) != VLC_SUCCESS )
+                                 p_node ) != VLC_SUCCESS )
                     {
                         return VLC_EGENERIC;
                     }
