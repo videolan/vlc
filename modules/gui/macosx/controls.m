@@ -203,7 +203,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-jump+10sec" );
+    val.i_int = config_GetInt( p_intf, "key-jump+short" );
     var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
@@ -211,7 +211,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    val.i_int = config_GetInt( p_intf, "key-jump-10sec" );
+    val.i_int = config_GetInt( p_intf, "key-jump-short" );
     var_Set( p_intf->p_vlc, "key-pressed", val );
 }
 
