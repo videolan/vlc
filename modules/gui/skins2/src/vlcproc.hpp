@@ -183,6 +183,11 @@ class VlcProc: public SkinObject
                                  vlc_value_t oldVal, vlc_value_t newVal,
                                  void *pParam );
 
+        /// Callback for interaction variable
+        static int onInteraction( vlc_object_t *pObj, const char *pVariable,
+                                  vlc_value_t oldVal, vlc_value_t newVal,
+                                  void *pParam );
+
         /// Callback to request a vout window
         static void *getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
                                 int *pXHint, int *pYHint,

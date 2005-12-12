@@ -29,6 +29,7 @@
 #include "../src/dialogs.hpp"
 #include "cmd_change_skin.hpp"
 
+#include <vlc_interaction.h>
 
 template<int TYPE = 0> class CmdDialogs;
 
@@ -127,5 +128,36 @@ class CmdDialogs: public CmdGeneric
         virtual string getType() const { return "dialog"; }
 };
 
+class CmdInteraction: public CmdGeneric
+{
+    public:
+        CmdInteraction( intf_thread_t *pIntf, interaction_dialog_t *
+                        p_dialog ): CmdGeneric( pIntf ), m_pDialog( p_dialog )
+        {}
+        virtual ~CmdInteraction() {}
+
+        /// This method does the real job of the command
+        virtual void execute()
+        {
+            if( m_pDialog->i_type == INTERACT_PROGRESS )
+            {
+                 /// \todo Handle progress in the interface
+            }
+            else
+            {
+                /// Get the dialogs provider
+                Dialogs *pDialogs = Dialogs::instance( getIntf() );
+                if( pDialogs == NULL )
+                {
+                    return;
+                }
+                pDialogs->showInteraction( m_pDialog );
+            }
+        }
+
+        virtual string getType() const { return "interaction"; }
+    private:
+        interaction_dialog_t *m_pDialog;
+};
 
 #endif

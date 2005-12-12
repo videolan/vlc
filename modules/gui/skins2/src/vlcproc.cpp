@@ -38,6 +38,7 @@
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_resize.hpp"
 #include "../commands/cmd_vars.hpp"
+#include "../commands/cmd_dialogs.hpp"
 #include "../utils/var_bool.hpp"
 #include <sstream>
 
@@ -139,6 +140,11 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
                      onItemChange, this );
     // Called when our skins2 demux wants us to load a new skin
     var_AddCallback( pIntf, "skin-to-load", onSkinToLoad, this );
+
+    // Called when we have an interaction dialog to display
+    var_Create( pIntf, "interaction", VLC_VAR_ADDRESS );
+    var_AddCallback( pIntf, "interaction", onInteraction, this );
+    pIntf->b_interaction = VLC_TRUE;
 
     // Callbacks for vout requests
     getIntf()->pf_request_window = &getWindow;
@@ -480,6 +486,19 @@ int VlcProc::onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
 
+    return VLC_SUCCESS;
+}
+
+int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
+                            vlc_value_t oldVal, vlc_value_t newVal,
+                            void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+    interaction_dialog_t *p_dialog = (interaction_dialog_t *)(newVal.p_address);
+
+    CmdInteraction *pCmd = new CmdInteraction( pThis->getIntf(), p_dialog );
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd ) );
     return VLC_SUCCESS;
 }
 

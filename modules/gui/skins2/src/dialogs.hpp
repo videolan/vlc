@@ -28,6 +28,7 @@
 #include "skin_common.hpp"
 #include <string>
 
+struct interaction_dialog_t ;
 
 // Dialogs provider
 class Dialogs: public SkinObject
@@ -87,6 +88,9 @@ class Dialogs: public SkinObject
 
         /// Show the popup menu
         void showPopupMenu( bool bShow );
+
+        /// Show an interaction dialog
+        void showInteraction( interaction_dialog_t * );
 
     private:
         // Private because it's a singleton

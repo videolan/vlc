@@ -336,3 +336,18 @@ void Dialogs::showPopupMenu( bool bShow )
     }
 }
 
+void Dialogs::showInteraction( interaction_dialog_t *p_dialog )
+{
+    intf_dialog_args_t *p_arg =
+            (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
+    memset( p_arg, 0, sizeof(intf_dialog_args_t) );
+
+    p_arg->p_dialog = p_dialog;
+    p_arg->p_intf = getIntf();
+
+    if( m_pProvider && m_pProvider->pf_show_dialog )
+    {
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_INTERACTION,
+                                     0, p_arg );
+    }
+}

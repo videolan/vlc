@@ -1206,8 +1206,15 @@ void Interface::OnInteraction( wxCommandEvent& event )
     p_arg->p_dialog = p_dialog;
     p_arg->p_intf = p_intf;
 
-    p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_INTERACTION,
-                                   0, p_arg );
+    if( p_dialog->i_type == INTERACT_PROGRESS )
+    {
+        /// \todo Handle progress in the interface
+    }
+    else
+    {
+        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_INTERACTION,
+                                       0, p_arg );
+    }
 }
 
 static int InteractCallback( vlc_object_t *p_this,
