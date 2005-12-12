@@ -215,7 +215,7 @@ mediacontrol_pause( mediacontrol_Instance *self,
                     const mediacontrol_Position * a_position,
                     mediacontrol_Exception *exception )
 {
-    input_thread_t *p_input = self->p_playlist->p_input;;
+    input_thread_t *p_input = self->p_playlist->p_input;
 
     /* FIXME: use the a_position parameter */
     exception=mediacontrol_exception_init( exception );
