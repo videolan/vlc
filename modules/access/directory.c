@@ -368,6 +368,7 @@ static int Demux( demux_t *p_demux )
 {
     return 0;
 }
+
 /*****************************************************************************
  * DemuxControl:
  *****************************************************************************/
@@ -380,11 +381,12 @@ static int Filter( const struct dirent *foo )
 {
     return VLC_TRUE;
 }
+
 /*****************************************************************************
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
-static int ReadDir( playlist_t *p_playlist,
-                    const char *psz_name, int i_mode, playlist_item_t *p_parent )
+static int ReadDir( playlist_t *p_playlist, const char *psz_name,
+                    int i_mode, playlist_item_t *p_parent )
 {
     struct dirent   **pp_dir_content;
     int             i_dir_content, i;
@@ -465,6 +467,21 @@ static int ReadDir( playlist_t *p_playlist,
             if( ( p_dir_content->d_type & DT_DIR ) && i_mode != MODE_COLLAPSE )
 #endif
             {
+#if defined( S_ISLNK )
+/*
+ * FIXME: there is a ToCToU race condition here; but it is rather tricky^W^W
+ * impossible to fix while keeping some kind of portable code, and maybe even
+ * in a non-portable way.
+ */
+                if( lstat( psz_uri, &stat_data )
+                 || S_ISLNK(stat_data.st_mode) )
+                {
+                    msg_Dbg( p_playlist, "Skipping directory symlink %s",
+                             psz_uri );
+                    free( psz_uri );
+                    continue;
+                }
+#endif
                 if( i_mode == MODE_NONE )
                 {
                     msg_Dbg( p_playlist, "Skipping subdirectory %s", psz_uri );
