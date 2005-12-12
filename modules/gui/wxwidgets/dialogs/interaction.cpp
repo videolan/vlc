@@ -37,19 +37,17 @@
 /* IDs for the controls and the menu commands */
 enum
 {
-     OkYes_Event,
      No_Event,
-     Cancel_Event,
-     Clear_Event,
      NoShow_Event
 };
 
-BEGIN_EVENT_TABLE( InteractionDialog, wxFrame)
+BEGIN_EVENT_TABLE( InteractionDialog, wxFrame )
     EVT_CLOSE( InteractionDialog::OnClose )
-    EVT_BUTTON( OkYes_Event, InteractionDialog::OnOkYes )
-    EVT_BUTTON( Cancel_Event, InteractionDialog::OnCancel)
+    EVT_BUTTON( wxID_OK, InteractionDialog::OnOkYes )
+    EVT_BUTTON( wxID_YES, InteractionDialog::OnOkYes )
+    EVT_BUTTON( wxID_CANCEL, InteractionDialog::OnCancel)
     EVT_BUTTON( No_Event, InteractionDialog::OnNo )
-    EVT_BUTTON( Clear_Event, InteractionDialog::OnClear )
+    EVT_BUTTON( wxID_CLEAR, InteractionDialog::OnClear )
     EVT_CHECKBOX( NoShow_Event, InteractionDialog::OnNoShow )
 END_EVENT_TABLE()
 
@@ -159,20 +157,20 @@ void InteractionDialog::Render()
     if( p_dialog->i_flags & DIALOG_OK_CANCEL )
     {
         wxButton *ok = new wxButton( buttons_panel,
-                                     OkYes_Event, wxU( _("OK") ) );
+                                     wxID_OK, wxU( _("OK") ) );
         wxButton *cancel = new wxButton( buttons_panel,
-                                         Cancel_Event, wxU( _("Cancel") ) );
+                                         wxID_CANCEL, wxU( _("Cancel") ) );
         buttons_sizer->Add( ok, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
         buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         wxButton *yes = new wxButton( buttons_panel,
-                                     OkYes_Event, wxU( _("Yes") ) );
+                                      wxID_YES, wxU( _("Yes") ) );
         wxButton *no = new wxButton( buttons_panel,
-                                     No_Event, wxU( _("No") ) );
+                                     wxID_NO, wxU( _("No") ) );
         wxButton *cancel = new wxButton( buttons_panel,
-                                         Cancel_Event, wxU( _("Cancel") ) );
+                                         wxID_CANCEL, wxU( _("Cancel") ) );
         buttons_sizer->Add( yes, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
         buttons_sizer->Add( no, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
         buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
@@ -183,7 +181,7 @@ void InteractionDialog::Render()
                                          NoShow_Event, wxU( _("Don't show") ) );
         noshow->SetValue( b_noshow );
         wxButton *clear = new wxButton( buttons_panel,
-                                     Clear_Event, wxU( _("Clear") ) );
+                                        wxID_CLEAR, wxU( _("Clear") ) );
         buttons_sizer->Add( noshow, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_LEFT, 5 );
         buttons_sizer->Add( 0, 0, 1 );
         buttons_sizer->Add( clear , 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_RIGHT, 5 );
