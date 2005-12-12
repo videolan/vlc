@@ -28,6 +28,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include <vlc_interaction.h>
+
 #include "vlc_meta.h"
 #include "codecs.h"
 
@@ -197,6 +199,8 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t  *p_demux = (demux_t *)p_this;
     demux_sys_t     *p_sys;
+
+    vlc_bool_t       b_index = VLC_FALSE;
 
     avi_chunk_t         ck_riff;
     avi_chunk_list_t    *p_riff = (avi_chunk_list_t*)&ck_riff;
@@ -509,6 +513,7 @@ static int Open( vlc_object_t * p_this )
 
     if( config_GetInt( p_demux, "avi-index" ) )
     {
+aviindex:
         if( p_sys->b_seekable )
         {
             AVI_IndexCreate( p_demux );
@@ -530,8 +535,29 @@ static int Open( vlc_object_t * p_this )
                           (mtime_t)p_avih->i_microsecperframe /
                           (mtime_t)1000000 )
     {
-        msg_Warn( p_demux, "broken or missing index, 'seek' will be axproximative or will have strange behavour" );
+        msg_Warn( p_demux, "broken or missing index, 'seek' will be axproximative or will have "
+                           "strange behavour" );
+        if( !b_index )
+        {
+            int i_create;
+            i_create = intf_UserYesNo( p_demux, "AVI Index", _("This AVI file is broken. Seeking will not "
+                                       "work correctly.\nDo you want to "
+                                       "try to repair it (this might take a long time) ?" ) );
+            if( i_create == DIALOG_OK_YES )
+            {
+                b_index = VLC_TRUE;
+                msg_Dbg( p_demux, "Fixing AVI index" );
+                goto aviindex;
+            }
+            else if( i_create == DIALOG_CANCELLED )
+            {
+                /* Kill input */
+                p_demux->p_parent->b_die = VLC_TRUE;
+                goto error;
+            }
+        }
     }
+
     /* fix some BeOS MediaKit generated file */
     for( i = 0 ; i < p_sys->i_track; i++ )
     {

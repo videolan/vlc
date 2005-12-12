@@ -139,8 +139,6 @@ void intf_InteractionManage( playlist_t *p_playlist )
             p_dialog->i_return = DIALOG_DEFAULT;
             if( p_dialog->i_flags & DIALOG_OK_CANCEL )
                 p_dialog->i_return = DIALOG_CANCELLED;
-            if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
-                p_dialog->i_return = DIALOG_CANCELLED;
 
             // Pretend we have hidden and destroyed it
             if( p_dialog->i_status == HIDDEN_DIALOG )
