@@ -74,7 +74,8 @@ struct interaction_dialog_t
 #define DIALOG_OK_CANCEL     0x02
 #define DIALOG_YES_NO        0x04
 #define DIALOG_YES_NO_CANCEL 0x04
-#define DIALOG_GOT_ANSWER    0x08
+#define DIALOG_CLEAR_NOSHOW  0x08
+#define DIALOG_GOT_ANSWER    0x10
 
 /**
  * Possible return codes
@@ -159,6 +160,8 @@ VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, const char*, const char*, ...) );
 #define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( a,b,c,d,e)
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
+#define intf_UserYesNo( a, b, c ) __intf_UserYesNo( a,b,c )
+VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*) );
 
 VLC_EXPORT( void, intf_InteractionManage,( playlist_t *) );
 VLC_EXPORT( void, intf_InteractionDestroy,( interaction_t *) );

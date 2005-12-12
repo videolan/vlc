@@ -286,6 +286,8 @@ void __intf_UserFatal( vlc_object_t *p_this,
                   p_new->i_widgets,
                   p_widget );
 
+    p_new->i_flags |= DIALOG_CLEAR_NOSHOW;
+
     intf_Interact( p_this, p_new );
 }
 
@@ -295,7 +297,41 @@ void __intf_UserFatal( vlc_object_t *p_this,
  *  \param psz_description  A description
  *  \param ppsz_login       Returned login
  *  \param ppsz_password    Returned password
- *  \return                 1 if user clicked Cancel, 0 if OK
+ *  \return                 Clicked button code
+ */
+int __intf_UserYesNo( vlc_object_t *p_this,
+                      const char *psz_title,
+                      const char *psz_description )
+{
+    int i_ret;
+    interaction_dialog_t *p_new = NULL;
+    user_widget_t *p_widget = NULL;
+
+    INTERACT_INIT( p_new );
+
+    p_new->i_type = INTERACT_DIALOG_TWOWAY;
+    p_new->psz_title = strdup( psz_title );
+
+    /* Text */
+    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
+    p_widget->i_type = WIDGET_TEXT;
+    p_widget->psz_text = strdup( psz_description );
+    p_widget->val.psz_string = NULL;
+    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
+                  p_new->i_widgets,  p_widget );
+
+    p_new->i_flags = DIALOG_YES_NO_CANCEL;
+
+    i_ret = intf_Interact( p_this, p_new );
+
+    return i_ret;
+}
+
+/** Helper function to ask a yes-no question
+ *  \param p_this           Parent vlc_object
+ *  \param psz_title        Title for the dialog
+ *  \param psz_description  A description
+ *  \return                 Clicked button code
  */
 int __intf_UserLoginPassword( vlc_object_t *p_this,
                               const char *psz_title,
@@ -347,6 +383,10 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     }
     return i_ret;
 }
+
+
+
+
 
 /**********************************************************************
  * The following functions are local

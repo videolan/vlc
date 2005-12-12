@@ -286,7 +286,7 @@ int     VLC_CleanUp( int );
  *
  * This function requests the running threads to finish, waits for their
  * termination, and destroys their structure.
- * Then it will de-init all VLC object initializations. 
+ * Then it will de-init all VLC object initializations.
  *
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success

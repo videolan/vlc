@@ -332,9 +332,9 @@ void intf_InteractionManage (playlist_t *);
 char * mstrtime (char *psz_buffer, mtime_t date);
 void aout_FormatPrepare (audio_sample_format_t * p_format);
 void spu_DisplaySubpicture (spu_t *, subpicture_t *);
+int intf_RunThread (intf_thread_t *);
 int httpd_StreamSend (httpd_stream_t *, uint8_t *p_data, int i_data);
 decoder_t * input_DecoderNew (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
-int intf_RunThread (intf_thread_t *);
 xml_t * __xml_Create (vlc_object_t *);
 msg_subscription_t* __msg_Subscribe (vlc_object_t *);
 const char * VLC_Version (void);
@@ -387,6 +387,7 @@ vlm_schedule_t * vlm_ScheduleNew (vlm_t *, const char *);
 int osd_ShowTextAbsolute (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
 void net_Close (int fd);
 int __vlc_threads_init (vlc_object_t *);
+int __intf_UserYesNo (vlc_object_t*, const char*, const char*);
 void __vout_CopyPicture (vlc_object_t *p_this, picture_t *p_dst, picture_t *p_src);
 void sout_MuxDeleteStream (sout_mux_t *, sout_input_t *);
 char * httpd_MsgGet (httpd_message_t *, char *psz_name);
@@ -861,6 +862,7 @@ struct module_symbols_t
     void (*intf_InteractionDestroy_inner) (interaction_t *);
     void (*__intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
     int (*__intf_UserLoginPassword_inner) (vlc_object_t*, const char*, const char*, char **, char **);
+    int (*__intf_UserYesNo_inner) (vlc_object_t*, const char*, const char*);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1277,6 +1279,7 @@ struct module_symbols_t
 #  define intf_InteractionDestroy (p_symbols)->intf_InteractionDestroy_inner
 #  define __intf_UserFatal (p_symbols)->__intf_UserFatal_inner
 #  define __intf_UserLoginPassword (p_symbols)->__intf_UserLoginPassword_inner
+#  define __intf_UserYesNo (p_symbols)->__intf_UserYesNo_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1696,6 +1699,7 @@ struct module_symbols_t
     ((p_symbols)->intf_InteractionDestroy_inner) = intf_InteractionDestroy; \
     ((p_symbols)->__intf_UserFatal_inner) = __intf_UserFatal; \
     ((p_symbols)->__intf_UserLoginPassword_inner) = __intf_UserLoginPassword; \
+    ((p_symbols)->__intf_UserYesNo_inner) = __intf_UserYesNo; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
