@@ -23,8 +23,7 @@
 
  * Tarballs (Use a clean tree !!!)
   - Use 'make distcheck' to make sure all files are exported
-    correctly (currently fails)
-  - make the VLC tar.gz and tar.bz2 files with `make dist'.
+    correctly
   - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/testing/vlc-X.X.X/
   - generate md5 hashes of these files
@@ -41,7 +40,8 @@
 
  * Win32 Packages
     make the packages using the nightly builds configure/options/...
-    don't forget to test the installer and uninstaller (the first 0.8.4 uninstaller was broken ... kind of suxxs)
+    don't forget to test the installer and uninstaller (the first 0.8.4 uninstaller was broken ...
+    kind of suxxs)
     add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
 
  * OS X packages
