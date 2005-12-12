@@ -57,6 +57,8 @@ namespace wxvlc
         void OnOkYes ( wxCommandEvent& event );
         void OnCancel( wxCommandEvent& event );
         void OnNo    ( wxCommandEvent& event );
+        void OnClear ( wxCommandEvent& event );
+        void OnNoShow( wxCommandEvent& event );
 
         void Render();
         void Finish( int );
@@ -75,6 +77,8 @@ namespace wxvlc
         intf_thread_t *p_intf;
         interaction_dialog_t *p_dialog;
         wxWindow *p_parent;
+
+        bool b_noshow;
     };
 };
 

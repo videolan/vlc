@@ -28,6 +28,8 @@
 
 #include <wx/statline.h>
 
+#define FREE( i ) { if( i ) free( i ); i = NULL; }
+
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -37,7 +39,9 @@ enum
 {
      OkYes_Event,
      No_Event,
-     Cancel_Event
+     Cancel_Event,
+     Clear_Event,
+     NoShow_Event
 };
 
 BEGIN_EVENT_TABLE( InteractionDialog, wxFrame)
@@ -45,6 +49,8 @@ BEGIN_EVENT_TABLE( InteractionDialog, wxFrame)
     EVT_BUTTON( OkYes_Event, InteractionDialog::OnOkYes )
     EVT_BUTTON( Cancel_Event, InteractionDialog::OnCancel)
     EVT_BUTTON( No_Event, InteractionDialog::OnNo )
+    EVT_BUTTON( Clear_Event, InteractionDialog::OnClear )
+    EVT_CHECKBOX( NoShow_Event, InteractionDialog::OnNoShow )
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -69,11 +75,12 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     buttons_panel->SetSizer( buttons_sizer );
 
     main_sizer = new wxBoxSizer( wxVERTICAL );
-    main_sizer->Add( widgets_panel, 0, wxEXPAND | wxALL, 5 );
+    main_sizer->Add( widgets_panel, 1, wxEXPAND | wxALL, 5 );
     main_sizer->Add( new wxStaticLine( this, -1 ), 0, wxEXPAND  );
     main_sizer->Add( buttons_panel, 0, wxEXPAND | wxALL, 5 );
     SetSizer( main_sizer );
 
+    b_noshow = false;
     Render();
 }
 
@@ -84,10 +91,15 @@ InteractionDialog::~InteractionDialog()
 void InteractionDialog::Update( )
 {
     widgets_panel->DestroyChildren();
+    /* FIXME: Needed for the spacer */
+    buttons_sizer->Remove( 1 );buttons_sizer->Remove( 2 );buttons_sizer->Remove( 3 );
     buttons_panel->DestroyChildren();
     input_widgets.clear();
     Render();
-    Show();
+    if( b_noshow == false )
+    {
+        Show();
+    }
 }
 
 /// \todo Dirty - Clean that up
@@ -96,36 +108,52 @@ void InteractionDialog::Render()
     wxStaticText *label;
     wxTextCtrl *input;
 
-    //-------------- Widgets ------------------
-    for( int i = 0 ; i< p_dialog->i_widgets; i++ )
-    {
-        user_widget_t* p_widget = p_dialog->pp_widgets[i];
-        /// \todo Merge cleanly with preferences widgets
-        switch( p_widget->i_type )
-        {
-        case WIDGET_TEXT:
-            label = new wxStaticText( widgets_panel, -1,
-                                      wxU( p_widget->psz_text ) );
-            widgets_sizer->Add( label );
-            break;
-        case WIDGET_INPUT_TEXT:
-            label = new wxStaticText( widgets_panel, -1,
-                                      wxU( p_widget->psz_text ) );
-            input = new wxTextCtrl( widgets_panel, -1 );
-            widgets_sizer->Add( label );
-            widgets_sizer->Add( input );
 
-            InputWidget widget;
-            widget.control = input;
-            widget.val = &p_widget->val;
-            widget.i_type = WIDGET_INPUT_TEXT;
-            input_widgets.push_back( widget );
+    if( p_dialog->i_id == DIALOG_ERRORS )
+    {
+        wxTextCtrl *errors ; // Special case
+        label = new wxStaticText( widgets_panel, -1,
+          wxU( _("The following errors happened. More details might be available "
+                 "in the log file.") ) );
+        errors = new wxTextCtrl( widgets_panel, -1, wxT(""),
+                         wxDefaultPosition, wxDefaultSize,
+                         wxTE_MULTILINE | wxTE_READONLY );
+        for( int i = 0 ; i< p_dialog->i_widgets; i++ )
+        {
+            (*errors) << wxL2U( p_dialog->pp_widgets[i]->psz_text ) << wxU( "\n" ) ;
+        }
+        widgets_sizer->Add( label );
+        widgets_sizer->Add( errors, 0, wxEXPAND|wxALL, 3 );
+    }
+    else
+    {
+        //-------------- Widgets ------------------
+        for( int i = 0 ; i< p_dialog->i_widgets; i++ )
+        {
+            user_widget_t* p_widget = p_dialog->pp_widgets[i];
+            /// \todo Merge cleanly with preferences widgets
+            switch( p_widget->i_type )
+            {
+            case WIDGET_TEXT:
+                label = new wxStaticText( widgets_panel, -1,
+                                           wxU( p_widget->psz_text ) );
+                widgets_sizer->Add( label );
+                break;
+            case WIDGET_INPUT_TEXT:
+                label = new wxStaticText( widgets_panel, -1,
+                                           wxU( p_widget->psz_text ) );
+                input = new wxTextCtrl( widgets_panel, -1 );
+                widgets_sizer->Add( label , 0, 0, 0);
+                widgets_sizer->Add( input, 0, wxEXPAND , 0 );
+
+                InputWidget widget;
+                widget.control = input;
+                widget.val = &p_widget->val;
+                widget.i_type = WIDGET_INPUT_TEXT;
+                input_widgets.push_back( widget );
+            }
         }
     }
-    widgets_sizer->Layout();
-    widgets_panel->SetSizerAndFit( widgets_sizer );
-    main_sizer->Layout();
-    SetSizerAndFit( main_sizer );
 
     //-------------- Buttons ------------------
     if( p_dialog->i_flags & DIALOG_OK_CANCEL )
@@ -134,10 +162,39 @@ void InteractionDialog::Render()
                                      OkYes_Event, wxU( _("OK") ) );
         wxButton *cancel = new wxButton( buttons_panel,
                                          Cancel_Event, wxU( _("Cancel") ) );
-        buttons_sizer->Add( ok, 0, wxEXPAND | wxRIGHT| wxLEFT, 5 );
-        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT, 5 );
+        buttons_sizer->Add( ok, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
+        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
     }
+    else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
+    {
+        wxButton *yes = new wxButton( buttons_panel,
+                                     OkYes_Event, wxU( _("Yes") ) );
+        wxButton *no = new wxButton( buttons_panel,
+                                     No_Event, wxU( _("No") ) );
+        wxButton *cancel = new wxButton( buttons_panel,
+                                         Cancel_Event, wxU( _("Cancel") ) );
+        buttons_sizer->Add( yes, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
+        buttons_sizer->Add( no, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
+        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
+    }
+    else if( p_dialog->i_flags & DIALOG_CLEAR_NOSHOW )
+    {
+        wxCheckBox *noshow = new wxCheckBox( buttons_panel,
+                                         NoShow_Event, wxU( _("Don't show") ) );
+        noshow->SetValue( b_noshow );
+        wxButton *clear = new wxButton( buttons_panel,
+                                     Clear_Event, wxU( _("Clear") ) );
+        buttons_sizer->Add( noshow, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_LEFT, 5 );
+        buttons_sizer->Add( 0, 0, 1 );
+        buttons_sizer->Add( clear , 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_RIGHT, 5 );
 
+    }
+    widgets_sizer->Layout();
+    widgets_panel->SetSizerAndFit( widgets_sizer );
+    buttons_sizer->Layout();
+    buttons_panel->SetSizerAndFit( buttons_sizer );
+    main_sizer->Layout();
+    SetSizerAndFit( main_sizer );
 }
 
 /*****************************************************************************
@@ -163,8 +220,35 @@ void InteractionDialog::OnOkYes( wxCommandEvent& event )
     Finish( DIALOG_OK_YES );
 }
 
+void InteractionDialog::OnClear( wxCommandEvent& event )
+{
+    int i;
+    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    for( i = p_dialog->i_widgets - 1 ; i >= 0 ; i-- )
+    {
+        user_widget_t *p_widget = p_dialog->pp_widgets[i];
+        FREE( p_widget->psz_text );
+        FREE( p_widget->val.psz_string );
+        REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, i );
+        free( p_widget );
+    }
+    widgets_panel->DestroyChildren();
+    /* FIXME: Needed for the spacer */
+    buttons_sizer->Remove( 1 );buttons_sizer->Remove( 2 );buttons_sizer->Remove( 3 );
+    buttons_panel->DestroyChildren();
+    input_widgets.clear();
+    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    Render();
+}
+
+void InteractionDialog::OnNoShow( wxCommandEvent& event )
+{
+     b_noshow = event.IsChecked();
+}
+
 void InteractionDialog::Finish( int i_ret )
 {
+    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     vector<InputWidget>::iterator it = input_widgets.begin();
     while ( it < input_widgets.end() )
     {
@@ -173,8 +257,9 @@ void InteractionDialog::Finish( int i_ret )
         it++;
     }
     Hide();
-    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
     p_dialog->i_status = ANSWERED_DIALOG;
     p_dialog->i_return = i_ret;
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
 }
+
+#undef FREE
