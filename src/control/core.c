@@ -117,20 +117,15 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
 
     if( ! p_input )
     {
-        /*
-           RAISE( mediacontrol_InternalException, "No input thread." );
-           return( NULL );
-        */
-        retval->value = 0;
-        return retval;
+        RAISE( mediacontrol_InternalException, "No input thread." );
+        return NULL;
     }
 
-    if(  an_origin == mediacontrol_RelativePosition
-         || an_origin == mediacontrol_ModuloPosition )
+    if(  an_origin != mediacontrol_AbsolutePosition )
     {
         /* Relative or ModuloPosition make no sense */
-        retval->value = 0;
-        return retval;
+        RAISE( mediacontrol_PositionOriginNotSupported, "Only absolute position is valid." );
+        return NULL;
     }
 
     /* We are asked for an AbsolutePosition. */
