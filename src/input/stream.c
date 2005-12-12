@@ -241,6 +241,7 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     /* UTF16 and UTF32 text file conversion */
     s->i_char_width = 1;
     s->b_little_endian = VLC_FALSE;
+    s->conv = (vlc_iconv_t)(-1);
 
     /* Common field */
     p_sys->p_access = p_access;
@@ -1528,7 +1529,7 @@ char * stream_ReadLine( stream_t *s )
 
     /* We failed to read any data, probably EOF */
     if( p_line ) free( p_line );
-    vlc_iconv_close( s->conv );
+    if( s->conv != (vlc_iconv_t)(-1) ) vlc_iconv_close( s->conv );
     return NULL;
 }
 
