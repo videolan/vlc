@@ -1502,7 +1502,7 @@ dnl dv module: digital video module check for libraw1394
 dnl
 AC_ARG_ENABLE(dv,
 [  --enable-dv             dv input module (default disabled)])
-if test "{enable_dv}" = "yes"
+if test "${enable_dv}" = "yes"
 then
   AC_ARG_WITH(dv-raw1394,
   [    --with-dv-raw1394=PATH   libraw1394 headers and libraries])
