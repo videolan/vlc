@@ -320,7 +320,6 @@ modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
 modules/codec/flac.c
 modules/codec/libmpeg2.c
-modules/codec/libvc1.c
 modules/codec/lpcm.c
 modules/codec/mash.cpp
 modules/codec/mpeg_audio.c
