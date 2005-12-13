@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
@@ -55,6 +56,13 @@
 
 #define BUFSIZE 0xffffff
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
+
+/*
+ * TODO:
+ * - clean up the debug info
+ * - clean up C99'isms
+ * - be better at changing stream setup or devices setup changes while playing.
+ */
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -354,84 +362,103 @@ static int OpenAnalog( aout_instance_t *p_aout )
     msg_Dbg( p_aout, "Layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions );
     
     p_aout->output.output.i_physical_channels = 0;
-    for( i = 0; i < layout->mNumberChannelDescriptions; i++ )
+    int i_original = p_aout->output.output.i_original_channels & AOUT_CHAN_PHYSMASK;
+    
+    if( i_original == AOUT_CHAN_CENTER || layout->mNumberChannelDescriptions < 2 )
     {
-        msg_Dbg( p_aout, "This is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
-
-        switch( layout->mChannelDescriptions[i].mChannelLabel )
+        // We only need Mono or cannot output more
+        p_aout->output.output.i_physical_channels |= AOUT_CHAN_CENTER;
+    }
+    else if( i_original == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) || layout->mNumberChannelDescriptions < 3 )
+    {
+        // We only need Stereo or cannot output more
+        p_aout->output.output.i_physical_channels |= AOUT_CHAN_RIGHT;
+        p_aout->output.output.i_physical_channels |= AOUT_CHAN_LEFT;
+    }
+    else
+    {
+        // We want more then stereo and we can do that
+        for( i = 0; i < layout->mNumberChannelDescriptions; i++ )
         {
-            case kAudioChannelLabel_Left:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_LEFT;
-                continue;
-            case kAudioChannelLabel_Right:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_RIGHT;
-                continue;
-            case kAudioChannelLabel_Center:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_CENTER;
-                continue;
-            case kAudioChannelLabel_LFEScreen:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_LFE;
-                continue;
-            case kAudioChannelLabel_LeftSurround:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARLEFT;
-                continue;
-            case kAudioChannelLabel_RightSurround:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARRIGHT;
-                continue;
-            case kAudioChannelLabel_RearSurroundLeft:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
-                continue;
-            case kAudioChannelLabel_RearSurroundRight:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
-                continue;
-            case kAudioChannelLabel_CenterSurround:
-                p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARCENTER;
-                continue;
-            default:
-                msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
-                if( i == 0 )
-                {
-                    msg_Warn( p_aout, "Probably no channellayout is set. force based on channelcount" );
-                    switch( layout->mNumberChannelDescriptions )
+            msg_Dbg( p_aout, "This is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
+
+            switch( layout->mChannelDescriptions[i].mChannelLabel )
+            {
+                case kAudioChannelLabel_Left:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_LEFT;
+                    continue;
+                case kAudioChannelLabel_Right:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_RIGHT;
+                    continue;
+                case kAudioChannelLabel_Center:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_CENTER;
+                    continue;
+                case kAudioChannelLabel_LFEScreen:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_LFE;
+                    continue;
+                case kAudioChannelLabel_LeftSurround:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARLEFT;
+                    continue;
+                case kAudioChannelLabel_RightSurround:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARRIGHT;
+                    continue;
+                case kAudioChannelLabel_RearSurroundLeft:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
+                    continue;
+                case kAudioChannelLabel_RearSurroundRight:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
+                    continue;
+                case kAudioChannelLabel_CenterSurround:
+                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARCENTER;
+                    continue;
+                default:
+                    msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
+                    if( i == 0 )
                     {
-                        /* We make assumptions based on number of channels here.
-                         * Unfortunatly Apple has provided no 100% method to retrieve the speaker configuration */
-                        case 1:
-                            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
-                            break;
-                        case 4:
-                            p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                                                                        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                            break;
-                        case 6:
-                            p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                                                                        AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
-                                                                        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                            break;
-                        case 7:
-                            p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                                                                        AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
-                                                                        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_REARCENTER;
-                            break;
-                        case 8:
-                            p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-                                                                        AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
-                                                                        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
-                                                                        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                            break;
-                        case 2:
-                        default:
-                            p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                        msg_Warn( p_aout, "Probably no channellayout is set. force based on channelcount" );
+                        switch( layout->mNumberChannelDescriptions )
+                        {
+                            /* We make assumptions based on number of channels here.
+                             * Unfortunatly Apple has provided no 100% method to retrieve the speaker configuration */
+                            case 1:
+                                p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+                                break;
+                            case 4:
+                                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                            AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                                break;
+                            case 6:
+                                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                            AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                            AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+                                break;
+                            case 7:
+                                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                            AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                            AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
+                                                                            AOUT_CHAN_REARCENTER;
+                                break;
+                            case 8:
+                                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                                                                            AOUT_CHAN_CENTER | AOUT_CHAN_LFE |
+                                                                            AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
+                                                                            AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT;
+                                break;
+                            case 2:
+                            default:
+                                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                        }
                     }
-                }
-                break;
+                    break;
+            }
         }
     }
-    free( layout );
+    if( layout ) free( layout );
 
-    msg_Dbg( p_aout, "defined %d physical channels for vlc core", aout_FormatNbChannels( &p_aout->output.output ) );
+    msg_Dbg( p_aout, "we want to output these channels: %#x", p_aout->output.output.i_original_channels);
+    msg_Dbg( p_aout, "selected %d physical channels for device output", aout_FormatNbChannels( &p_aout->output.output ) );
     msg_Dbg( p_aout, "%s", aout_FormatPrintChannels( &p_aout->output.output ));
-    
+
     AudioChannelLayout new_layout;
     memset (&new_layout, 0, sizeof(new_layout));
     switch( aout_FormatNbChannels( &p_aout->output.output ) )
@@ -1050,7 +1077,7 @@ static void Probe( aout_instance_t * p_aout )
                     &i_param_size, psz_name);
         if( err ) goto error;
 
-        msg_Dbg( p_aout, "DevID: %lu  DevName: %s", p_devices[i], psz_name );
+        msg_Dbg( p_aout, "DevID: %#lx  DevName: %s", p_devices[i], psz_name );
 
         if( !AudioDeviceHasOutput( p_devices[i]) )
         {
@@ -1216,7 +1243,7 @@ static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_
 
     for( i = 0; i < i_formats; i++ )
     {
-        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format", p_format_list[i] ) );
+        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format: ", p_format_list[i] ) );
         
         if( p_format_list[i].mFormatID == 'IAC3' ||
                   p_format_list[i].mFormatID == kAudioFormat60958AC3 )
