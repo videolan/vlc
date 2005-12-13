@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-11 00:05+0100\n"
+"POT-Creation-Date: 2005-12-13 21:04+0100\n"
 "PO-Revision-Date: 2005-02-12 12:14+0100\n"
 "Last-Translator: Frank Chao <frank0624@gmail.com>\n"
 "Language-Team: zh_TW\n"
@@ -323,7 +323,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:452
 #: modules/gui/macosx/intf.m:546 modules/gui/pda/pda_interface.c:1264
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:195
-#: modules/gui/wxwidgets/interface.cpp:665
+#: modules/gui/wxwidgets/interface.cpp:663
 msgid "Playlist"
 msgstr "播放清單"
 
@@ -436,7 +436,7 @@ msgstr "尚無可用的說明檔"
 msgid "No help is available for these modules"
 msgstr "本模組尚無可用的說明檔"
 
-#: include/vlc_interface.h:133
+#: include/vlc_interface.h:137
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
@@ -837,6 +837,11 @@ msgstr "串流"
 msgid "Duration"
 msgstr ""
 
+#: src/input/input.c:2099 src/input/input.c:2169
+#, fuzzy
+msgid "Errors"
+msgstr "錯誤"
+
 #: src/input/var.c:115
 msgid "Bookmark"
 msgstr "書籤"
@@ -898,6 +903,15 @@ msgstr "下一個章節"
 #: modules/gui/wxwidgets/input_manager.cpp:215
 msgid "Previous chapter"
 msgstr "上一個章節"
+
+#: src/interface/interaction.c:326
+#, fuzzy
+msgid "Login"
+msgstr "循環"
+
+#: src/interface/interaction.c:334 modules/access_output/http.c:63
+msgid "Password"
+msgstr ""
 
 #: src/interface/interface.c:327
 msgid "Switch interface"
@@ -2507,7 +2521,7 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "選擇熱鍵以切換全螢幕狀態"
 
 #: src/libvlc.h:797 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1456
+#: modules/gui/wxwidgets/interface.cpp:1447
 msgid "Play/Pause"
 msgstr "播放/暫停"
 
@@ -2553,7 +2567,7 @@ msgstr "選擇熱鍵以慢速重播"
 #: modules/gui/macosx/controls.m:579 modules/gui/macosx/intf.m:448
 #: modules/gui/macosx/intf.m:493 modules/gui/macosx/intf.m:564
 #: modules/gui/macosx/wizard.m:306 modules/gui/macosx/wizard.m:348
-#: modules/gui/macosx/wizard.m:1398 modules/gui/wxwidgets/interface.cpp:1461
+#: modules/gui/macosx/wizard.m:1398 modules/gui/wxwidgets/interface.cpp:1452
 #: modules/gui/wxwidgets/menus.cpp:287
 msgid "Next"
 msgstr "下一項"
@@ -2565,7 +2579,7 @@ msgstr "選擇熱鍵以播放清單中的下一個項目"
 #: src/libvlc.h:809 modules/control/hotkeys.c:621
 #: modules/gui/macosx/controls.m:578 modules/gui/macosx/intf.m:443
 #: modules/gui/macosx/intf.m:492 modules/gui/macosx/intf.m:565
-#: modules/gui/wxwidgets/interface.cpp:1460
+#: modules/gui/wxwidgets/interface.cpp:1451
 #: modules/gui/wxwidgets/menus.cpp:286
 msgid "Previous"
 msgstr "上一項"
@@ -2579,8 +2593,8 @@ msgstr "選擇熱鍵以播放清單中的上一個項目"
 #: modules/gui/macosx/intf.m:563 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
-#: modules/gui/wxwidgets/interface.cpp:662
-#: modules/gui/wxwidgets/interface.cpp:1462
+#: modules/gui/wxwidgets/interface.cpp:660
+#: modules/gui/wxwidgets/interface.cpp:1453
 #: modules/gui/wxwidgets/menus.cpp:285 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "停止"
@@ -3914,7 +3928,7 @@ msgstr "採樣率"
 #: modules/access/dv.c:68 modules/access/dvb/access.c:67
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:61
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:48
-#: modules/access/gnomevfs.c:44 modules/access/http.c:51
+#: modules/access/gnomevfs.c:44 modules/access/http.c:52
 #: modules/access/mms/mms.c:46 modules/access/pvr/pvr.c:46
 #: modules/access/screen/screen.c:37 modules/access/smb.c:59
 #: modules/access/tcp.c:37 modules/access/udp.c:42 modules/access/v4l/v4l.c:73
@@ -4736,57 +4750,57 @@ msgstr ""
 msgid "GnomeVFS filesystem file input"
 msgstr "標準檔案系統檔案輸入"
 
-#: modules/access/http.c:45
+#: modules/access/http.c:46
 msgid "HTTP proxy"
 msgstr ""
 
-#: modules/access/http.c:47
+#: modules/access/http.c:48
 msgid ""
 "You can specify an HTTP proxy to use. It must be of the form http://[user[:"
 "pass]@]myproxy.mydomain:myport/ ; if empty, the http_proxy environment "
 "variable will be tried."
 msgstr ""
 
-#: modules/access/http.c:53
+#: modules/access/http.c:54
 msgid ""
 "Allows you to modify the default caching value for http streams. This value "
 "should be set in millisecond units."
 msgstr ""
 
-#: modules/access/http.c:56
+#: modules/access/http.c:57
 msgid "HTTP user agent"
 msgstr ""
 
-#: modules/access/http.c:57
+#: modules/access/http.c:58
 msgid ""
 "Allows you to modify the user agent that will be used for the connection."
 msgstr ""
 
-#: modules/access/http.c:60
+#: modules/access/http.c:61
 msgid "Auto re-connect"
 msgstr "自動重新連接"
 
-#: modules/access/http.c:61
+#: modules/access/http.c:62
 msgid ""
 "Will automatically attempt a re-connection in case it was untimely closed."
 msgstr ""
 
-#: modules/access/http.c:64
+#: modules/access/http.c:65
 msgid "Continuous stream"
 msgstr ""
 
-#: modules/access/http.c:65
+#: modules/access/http.c:66
 msgid ""
 "This allows you to read a file that is being constantly updated (for "
 "example, a JPG file on a server).You should not globally enable this option "
 "as it will break all other types of HTTP streams."
 msgstr ""
 
-#: modules/access/http.c:71
+#: modules/access/http.c:72
 msgid "HTTP input"
 msgstr "HTTP輸入"
 
-#: modules/access/http.c:73
+#: modules/access/http.c:74
 msgid "HTTP(S)"
 msgstr ""
 
@@ -4924,7 +4938,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:96 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:450 modules/gui/wxwidgets/interface.cpp:1328
+#: modules/gui/macosx/intf.m:450 modules/gui/wxwidgets/interface.cpp:1319
 msgid "Volume"
 msgstr ""
 
@@ -5453,10 +5467,6 @@ msgstr ""
 #: modules/access_output/http.c:61
 msgid ""
 "Allows you to give a user name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:63
-msgid "Password"
 msgstr ""
 
 #: modules/access_output/http.c:64
@@ -6718,6 +6728,11 @@ msgstr "Flac音訊封包器"
 #: modules/codec/libmpeg2.c:96
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG I/II視訊解碼器(使用libmpeg2)"
+
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Tarkin解碼器模組"
 
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
@@ -8684,6 +8699,7 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
 #: modules/gui/macosx/wizard.m:347
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:108
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:136
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:80
 #: modules/gui/wxwidgets/dialogs/open.cpp:324
 #: modules/gui/wxwidgets/dialogs/open.cpp:493
@@ -8695,7 +8711,7 @@ msgstr "取消"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:661
+#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:659
 #: modules/gui/wxwidgets/menus.cpp:315
 msgid "Open"
 msgstr "開啟"
@@ -8715,7 +8731,7 @@ msgstr "訊息"
 #: modules/gui/beos/InterfaceWindow.cpp:263
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:439
 #: modules/gui/macosx/open.m:737 modules/gui/macosx/open.m:783
-#: modules/gui/wxwidgets/dialogs.cpp:415
+#: modules/gui/wxwidgets/dialogs.cpp:419
 #: modules/gui/wxwidgets/dialogs/open.cpp:1230
 msgid "Open File"
 msgstr "開啟檔案"
@@ -8769,6 +8785,7 @@ msgstr "視窗"
 #: modules/gui/macosx/wizard.m:1054 modules/gui/macosx/wizard.m:1120
 #: modules/gui/macosx/wizard.m:1674
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:105
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:134
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:77
 #: modules/gui/wxwidgets/dialogs/open.cpp:321
 #: modules/gui/wxwidgets/dialogs/open.cpp:490
@@ -8907,7 +8924,7 @@ msgid "Take Screen Shot"
 msgstr "擷取畫面快照"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:459
-#: modules/gui/wxwidgets/interface.cpp:594
+#: modules/gui/wxwidgets/interface.cpp:592
 msgid "About VLC media player"
 msgstr "關於VLC多媒體播放程式"
 
@@ -9241,8 +9258,8 @@ msgstr "回捲"
 #: modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:267
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:275
-#: modules/gui/wxwidgets/interface.cpp:663
-#: modules/gui/wxwidgets/interface.cpp:1185
+#: modules/gui/wxwidgets/interface.cpp:661
+#: modules/gui/wxwidgets/interface.cpp:1183
 #: modules/gui/wxwidgets/menus.cpp:292 modules/gui/wxwidgets/menus.cpp:306
 msgid "Play"
 msgstr "播放"
@@ -9275,7 +9292,7 @@ msgstr "隱藏其他"
 msgid "Show All"
 msgstr "顯示全部"
 
-#: modules/gui/macosx/intf.m:469 modules/gui/wxwidgets/interface.cpp:1454
+#: modules/gui/macosx/intf.m:469 modules/gui/wxwidgets/interface.cpp:1445
 msgid "Quit VLC"
 msgstr "離開VLC"
 
@@ -9435,8 +9452,8 @@ msgstr "減低音量"
 
 #: modules/gui/macosx/intf.m:1254 modules/gui/macosx/intf.m:1255
 #: modules/gui/macosx/intf.m:1256 modules/gui/pda/pda_interface.c:250
-#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:664
-#: modules/gui/wxwidgets/interface.cpp:1179
+#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:662
+#: modules/gui/wxwidgets/interface.cpp:1177
 #: modules/gui/wxwidgets/menus.cpp:294 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr "暫停"
@@ -11076,21 +11093,21 @@ msgstr ""
 "(WinCE介面)\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:912
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:910
 msgid ""
 "(c) 1996-2005 - the VideoLAN Team\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:913
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:911
 msgid "Compiled by "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:915
+#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:913
 msgid "Compiler: "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:916
+#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:914
 msgid "Based on SVN revision: "
 msgstr ""
 
@@ -11569,7 +11586,7 @@ msgid "Open file"
 msgstr "開啟檔案"
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:101
-#: modules/gui/wxwidgets/interface.cpp:596
+#: modules/gui/wxwidgets/interface.cpp:594
 msgid "Check for updates ..."
 msgstr ""
 
@@ -11798,121 +11815,121 @@ msgstr "上一軌"
 msgid "Next track"
 msgstr "下一軌"
 
-#: modules/gui/wxwidgets/interface.cpp:557
+#: modules/gui/wxwidgets/interface.cpp:555
 msgid "Quick &Open File...\tCtrl-O"
 msgstr "快速開啟檔案...\tCtrl-O"
 
-#: modules/gui/wxwidgets/interface.cpp:560
+#: modules/gui/wxwidgets/interface.cpp:558
 msgid "Open &File...\tCtrl-F"
 msgstr "開啟檔案(&F)...\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:561
+#: modules/gui/wxwidgets/interface.cpp:559
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
 msgstr "開啟檔案(&F)...\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:562
+#: modules/gui/wxwidgets/interface.cpp:560
 msgid "Open &Disc...\tCtrl-D"
 msgstr "開啟光碟(&D)...\tCtrl-D"
 
-#: modules/gui/wxwidgets/interface.cpp:564
+#: modules/gui/wxwidgets/interface.cpp:562
 msgid "Open &Network Stream...\tCtrl-N"
 msgstr "開啟網路串流(&N)...\tCtrl-N"
 
-#: modules/gui/wxwidgets/interface.cpp:566
+#: modules/gui/wxwidgets/interface.cpp:564
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
 msgstr "開啟擷取裝置(&C)...\tCtrl-C"
 
-#: modules/gui/wxwidgets/interface.cpp:569
+#: modules/gui/wxwidgets/interface.cpp:567
 msgid "&Wizard...\tCtrl-W"
 msgstr "精靈(W)...\tCtrl-W"
 
-#: modules/gui/wxwidgets/interface.cpp:572
+#: modules/gui/wxwidgets/interface.cpp:570
 msgid "E&xit\tCtrl-X"
 msgstr "離開(&X)\tCtrl-X"
 
-#: modules/gui/wxwidgets/interface.cpp:578
+#: modules/gui/wxwidgets/interface.cpp:576
 msgid "&Playlist...\tCtrl-P"
 msgstr "播放清單(&P)\tCtrl-P"
 
-#: modules/gui/wxwidgets/interface.cpp:580
+#: modules/gui/wxwidgets/interface.cpp:578
 msgid "&Messages...\tCtrl-M"
 msgstr "訊息(&M)...\tCtrl-M"
 
-#: modules/gui/wxwidgets/interface.cpp:582
+#: modules/gui/wxwidgets/interface.cpp:580
 msgid "Stream and Media &info...\tCtrl-I"
 msgstr "串流及媒體資訊(&I)...\tCtrl-I"
 
-#: modules/gui/wxwidgets/interface.cpp:584
+#: modules/gui/wxwidgets/interface.cpp:582
 msgid "VLM Control...\tCtrl-V"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:600
+#: modules/gui/wxwidgets/interface.cpp:598
 msgid "&File"
 msgstr "檔案(&F)"
 
-#: modules/gui/wxwidgets/interface.cpp:601
+#: modules/gui/wxwidgets/interface.cpp:599
 msgid "&View"
 msgstr "檢視(&V)"
 
-#: modules/gui/wxwidgets/interface.cpp:602
+#: modules/gui/wxwidgets/interface.cpp:600
 msgid "&Settings"
 msgstr "設定(&S)"
 
-#: modules/gui/wxwidgets/interface.cpp:603
+#: modules/gui/wxwidgets/interface.cpp:601
 msgid "&Audio"
 msgstr "音訊(&A)"
 
-#: modules/gui/wxwidgets/interface.cpp:604
+#: modules/gui/wxwidgets/interface.cpp:602
 msgid "&Video"
 msgstr "視訊(&V)"
 
-#: modules/gui/wxwidgets/interface.cpp:605
+#: modules/gui/wxwidgets/interface.cpp:603
 msgid "&Navigation"
 msgstr "導覽(&N)"
 
-#: modules/gui/wxwidgets/interface.cpp:606
+#: modules/gui/wxwidgets/interface.cpp:604
 msgid "&Help"
 msgstr "輔助說明(&H)"
 
-#: modules/gui/wxwidgets/interface.cpp:666
+#: modules/gui/wxwidgets/interface.cpp:664
 #, fuzzy
 msgid "Small playlist"
 msgstr "儲存播放清單"
 
-#: modules/gui/wxwidgets/interface.cpp:667
+#: modules/gui/wxwidgets/interface.cpp:665
 msgid "Previous playlist item"
 msgstr "前一個播放清單項目"
 
-#: modules/gui/wxwidgets/interface.cpp:668
+#: modules/gui/wxwidgets/interface.cpp:666
 msgid "Next playlist item"
 msgstr "下一個播放清單項目"
 
-#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:667
 msgid "Play slower"
 msgstr "慢速播放"
 
-#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:668
 msgid "Play faster"
 msgstr "快速播放"
 
-#: modules/gui/wxwidgets/interface.cpp:853
+#: modules/gui/wxwidgets/interface.cpp:851
 #, fuzzy
 msgid "Extended &GUI\tCtrl-G"
 msgstr "延伸使用者介面(&E)"
 
-#: modules/gui/wxwidgets/interface.cpp:856
+#: modules/gui/wxwidgets/interface.cpp:854
 #, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
 msgstr "書籤(&B)"
 
-#: modules/gui/wxwidgets/interface.cpp:858
+#: modules/gui/wxwidgets/interface.cpp:856
 #, fuzzy
 msgid "Preference&s...\tCtrl-S"
 msgstr "偏好設定..."
 
-#: modules/gui/wxwidgets/interface.cpp:911
+#: modules/gui/wxwidgets/interface.cpp:909
 #, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
@@ -11921,19 +11938,19 @@ msgstr ""
 " (wxWindows介面)\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:922
+#: modules/gui/wxwidgets/interface.cpp:920
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:925
+#: modules/gui/wxwidgets/interface.cpp:923
 #, c-format
 msgid "About %s"
 msgstr "關於 %s"
 
-#: modules/gui/wxwidgets/interface.cpp:1465
+#: modules/gui/wxwidgets/interface.cpp:1456
 #, fuzzy
 msgid "Show/Hide interface"
 msgstr "顯示介面"
@@ -14852,10 +14869,6 @@ msgstr "XOSD介面"
 #, fuzzy
 #~ msgid "Shout"
 #~ msgstr "快照"
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "Tarkin解碼器模組"
 
 #, fuzzy
 #~ msgid "Windows GAPI"

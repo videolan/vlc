@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-12 14:02+0900\n"
+"POT-Creation-Date: 2005-12-13 21:04+0100\n"
 "PO-Revision-Date: 2005-12-12 14:01+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -7113,6 +7113,11 @@ msgstr "字幕・デコーダ・モジュール"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG 1/2ビデオ・デコーダ・モジュール"
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "字幕・デコーダ・モジュール"
+
 #: modules/codec/lpcm.c:82
 #, fuzzy
 msgid "Linear PCM audio decoder"
@@ -9226,6 +9231,7 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
 #: modules/gui/macosx/wizard.m:347
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:108
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:136
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:80
 #: modules/gui/wxwidgets/dialogs/open.cpp:324
 #: modules/gui/wxwidgets/dialogs/open.cpp:493
@@ -9311,6 +9317,7 @@ msgstr "ウィンドウ"
 #: modules/gui/macosx/wizard.m:1054 modules/gui/macosx/wizard.m:1120
 #: modules/gui/macosx/wizard.m:1674
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:105
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:134
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:77
 #: modules/gui/wxwidgets/dialogs/open.cpp:321
 #: modules/gui/wxwidgets/dialogs/open.cpp:490
@@ -15601,10 +15608,6 @@ msgstr "XOSD インターフェース"
 
 #~ msgid "Track "
 #~ msgstr "トラック "
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "字幕・デコーダ・モジュール"
 
 #, fuzzy
 #~ msgid "Stretch Aspect Ratio"

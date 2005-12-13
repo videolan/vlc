@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.3-svn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-11 00:05+0100\n"
+"POT-Creation-Date: 2005-12-13 21:04+0100\n"
 "PO-Revision-Date: 2005-07-12 09:55+0200\n"
 "Last-Translator: Circo Radu Sorin <Circo.RaduSorin@gmail.com>\n"
 "Language-Team: \n"
@@ -362,7 +362,7 @@ msgstr "Implementarea VLC pentru Video On Demand (  Video La Cerere)"
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:452
 #: modules/gui/macosx/intf.m:546 modules/gui/pda/pda_interface.c:1264
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:195
-#: modules/gui/wxwidgets/interface.cpp:665
+#: modules/gui/wxwidgets/interface.cpp:663
 msgid "Playlist"
 msgstr "Lista de redare"
 
@@ -489,7 +489,7 @@ msgstr "Nu exista ajutor"
 msgid "No help is available for these modules"
 msgstr "Nici o sectiune de ajutor nu exista pentru aceste module"
 
-#: include/vlc_interface.h:133
+#: include/vlc_interface.h:137
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
@@ -894,6 +894,10 @@ msgstr "Flux"
 msgid "Duration"
 msgstr "Durata"
 
+#: src/input/input.c:2099 src/input/input.c:2169
+msgid "Errors"
+msgstr ""
+
 #: src/input/var.c:115
 msgid "Bookmark"
 msgstr "Semn de carte"
@@ -955,6 +959,15 @@ msgstr "Urmatorul capitol"
 #: modules/gui/wxwidgets/input_manager.cpp:215
 msgid "Previous chapter"
 msgstr "Capitol anterior"
+
+#: src/interface/interaction.c:326
+#, fuzzy
+msgid "Login"
+msgstr "Georgiana"
+
+#: src/interface/interaction.c:334 modules/access_output/http.c:63
+msgid "Password"
+msgstr "Parola"
 
 #: src/interface/interface.c:327
 msgid "Switch interface"
@@ -2816,7 +2829,7 @@ msgstr ""
 "Selecteaza hotkey folosit pentru a schimba starea afisari pe intregul ecran"
 
 #: src/libvlc.h:797 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1456
+#: modules/gui/wxwidgets/interface.cpp:1447
 msgid "Play/Pause"
 msgstr "Reda/Pauza"
 
@@ -2862,7 +2875,7 @@ msgstr "Selecteaza hotkey folosit pentru redare mai lenta"
 #: modules/gui/macosx/controls.m:579 modules/gui/macosx/intf.m:448
 #: modules/gui/macosx/intf.m:493 modules/gui/macosx/intf.m:564
 #: modules/gui/macosx/wizard.m:306 modules/gui/macosx/wizard.m:348
-#: modules/gui/macosx/wizard.m:1398 modules/gui/wxwidgets/interface.cpp:1461
+#: modules/gui/macosx/wizard.m:1398 modules/gui/wxwidgets/interface.cpp:1452
 #: modules/gui/wxwidgets/menus.cpp:287
 msgid "Next"
 msgstr "Urmatorul"
@@ -2875,7 +2888,7 @@ msgstr ""
 #: src/libvlc.h:809 modules/control/hotkeys.c:621
 #: modules/gui/macosx/controls.m:578 modules/gui/macosx/intf.m:443
 #: modules/gui/macosx/intf.m:492 modules/gui/macosx/intf.m:565
-#: modules/gui/wxwidgets/interface.cpp:1460
+#: modules/gui/wxwidgets/interface.cpp:1451
 #: modules/gui/wxwidgets/menus.cpp:286
 msgid "Previous"
 msgstr "Precedentul"
@@ -2889,8 +2902,8 @@ msgstr "Selecteaza hotkey folosit pentru a reda elementul precedent din lista."
 #: modules/gui/macosx/intf.m:563 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
-#: modules/gui/wxwidgets/interface.cpp:662
-#: modules/gui/wxwidgets/interface.cpp:1462
+#: modules/gui/wxwidgets/interface.cpp:660
+#: modules/gui/wxwidgets/interface.cpp:1453
 #: modules/gui/wxwidgets/menus.cpp:285 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "Stop"
@@ -4266,7 +4279,7 @@ msgstr "Raport de aspect al sursei"
 #: modules/access/dv.c:68 modules/access/dvb/access.c:67
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:61
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:48
-#: modules/access/gnomevfs.c:44 modules/access/http.c:51
+#: modules/access/gnomevfs.c:44 modules/access/http.c:52
 #: modules/access/mms/mms.c:46 modules/access/pvr/pvr.c:46
 #: modules/access/screen/screen.c:37 modules/access/smb.c:59
 #: modules/access/tcp.c:37 modules/access/udp.c:42 modules/access/v4l/v4l.c:73
@@ -5176,11 +5189,11 @@ msgstr ""
 msgid "GnomeVFS filesystem file input"
 msgstr "Directorul da intrare a fisierelor sistem standard"
 
-#: modules/access/http.c:45
+#: modules/access/http.c:46
 msgid "HTTP proxy"
 msgstr "HTTP proxy"
 
-#: modules/access/http.c:47
+#: modules/access/http.c:48
 #, fuzzy
 msgid ""
 "You can specify an HTTP proxy to use. It must be of the form http://[user[:"
@@ -5191,38 +5204,38 @@ msgstr ""
 "proxy.domeniu:port/.Daca nici unul nu e specificat , variabila de mediu "
 "HTTP_PROXY va fi incercata."
 
-#: modules/access/http.c:53
+#: modules/access/http.c:54
 msgid ""
 "Allows you to modify the default caching value for http streams. This value "
 "should be set in millisecond units."
 msgstr ""
 
-#: modules/access/http.c:56
+#: modules/access/http.c:57
 msgid "HTTP user agent"
 msgstr "Agent utilizator HTTP"
 
-#: modules/access/http.c:57
+#: modules/access/http.c:58
 msgid ""
 "Allows you to modify the user agent that will be used for the connection."
 msgstr ""
 "Va permite sa modificati agentul utilizatorului  care va fi folosit pentru "
 "conexiune."
 
-#: modules/access/http.c:60
+#: modules/access/http.c:61
 msgid "Auto re-connect"
 msgstr "Auto reconectare"
 
-#: modules/access/http.c:61
+#: modules/access/http.c:62
 msgid ""
 "Will automatically attempt a re-connection in case it was untimely closed."
 msgstr ""
 "Va incerca automat o reconectare in cazul in care a conexiunea fost inchisa."
 
-#: modules/access/http.c:64
+#: modules/access/http.c:65
 msgid "Continuous stream"
 msgstr "Flux continuu"
 
-#: modules/access/http.c:65
+#: modules/access/http.c:66
 #, fuzzy
 msgid ""
 "This allows you to read a file that is being constantly updated (for "
@@ -5232,11 +5245,11 @@ msgstr ""
 "Activati aceasta optiune pentru a citi un fisier care e modificat constant"
 "( ex. un fisier JPG pe un server)"
 
-#: modules/access/http.c:71
+#: modules/access/http.c:72
 msgid "HTTP input"
 msgstr "Intrare HTTp"
 
-#: modules/access/http.c:73
+#: modules/access/http.c:74
 #, fuzzy
 msgid "HTTP(S)"
 msgstr "HTTP"
@@ -5380,7 +5393,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:96 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:450 modules/gui/wxwidgets/interface.cpp:1328
+#: modules/gui/macosx/intf.m:450 modules/gui/wxwidgets/interface.cpp:1319
 msgid "Volume"
 msgstr "Volum"
 
@@ -5919,10 +5932,6 @@ msgid ""
 msgstr ""
 "Va permite sa dati un nume de utiliazator care va fi cerut pentru accesarea "
 "fluxului."
-
-#: modules/access_output/http.c:63
-msgid "Password"
-msgstr "Parola"
 
 #: modules/access_output/http.c:64
 msgid ""
@@ -7193,6 +7202,11 @@ msgstr ""
 #: modules/codec/libmpeg2.c:96
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr ""
+
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Modul decodor Tarkin"
 
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
@@ -9150,6 +9164,7 @@ msgstr ""
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
 #: modules/gui/macosx/wizard.m:347
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:108
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:136
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:80
 #: modules/gui/wxwidgets/dialogs/open.cpp:324
 #: modules/gui/wxwidgets/dialogs/open.cpp:493
@@ -9161,7 +9176,7 @@ msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:661
+#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:659
 #: modules/gui/wxwidgets/menus.cpp:315
 msgid "Open"
 msgstr ""
@@ -9181,7 +9196,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:263
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:439
 #: modules/gui/macosx/open.m:737 modules/gui/macosx/open.m:783
-#: modules/gui/wxwidgets/dialogs.cpp:415
+#: modules/gui/wxwidgets/dialogs.cpp:419
 #: modules/gui/wxwidgets/dialogs/open.cpp:1230
 msgid "Open File"
 msgstr ""
@@ -9235,6 +9250,7 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:1054 modules/gui/macosx/wizard.m:1120
 #: modules/gui/macosx/wizard.m:1674
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:105
+#: modules/gui/wxwidgets/dialogs/interaction.cpp:134
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:77
 #: modules/gui/wxwidgets/dialogs/open.cpp:321
 #: modules/gui/wxwidgets/dialogs/open.cpp:490
@@ -9373,7 +9389,7 @@ msgid "Take Screen Shot"
 msgstr ""
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:459
-#: modules/gui/wxwidgets/interface.cpp:594
+#: modules/gui/wxwidgets/interface.cpp:592
 msgid "About VLC media player"
 msgstr ""
 
@@ -9707,8 +9723,8 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:267
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:275
-#: modules/gui/wxwidgets/interface.cpp:663
-#: modules/gui/wxwidgets/interface.cpp:1185
+#: modules/gui/wxwidgets/interface.cpp:661
+#: modules/gui/wxwidgets/interface.cpp:1183
 #: modules/gui/wxwidgets/menus.cpp:292 modules/gui/wxwidgets/menus.cpp:306
 msgid "Play"
 msgstr ""
@@ -9741,7 +9757,7 @@ msgstr ""
 msgid "Show All"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:469 modules/gui/wxwidgets/interface.cpp:1454
+#: modules/gui/macosx/intf.m:469 modules/gui/wxwidgets/interface.cpp:1445
 msgid "Quit VLC"
 msgstr ""
 
@@ -9900,8 +9916,8 @@ msgstr "Volum jos"
 
 #: modules/gui/macosx/intf.m:1254 modules/gui/macosx/intf.m:1255
 #: modules/gui/macosx/intf.m:1256 modules/gui/pda/pda_interface.c:250
-#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:664
-#: modules/gui/wxwidgets/interface.cpp:1179
+#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:662
+#: modules/gui/wxwidgets/interface.cpp:1177
 #: modules/gui/wxwidgets/menus.cpp:294 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr ""
@@ -11512,21 +11528,21 @@ msgid ""
 "\n"
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:912
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:910
 msgid ""
 "(c) 1996-2005 - the VideoLAN Team\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:913
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:911
 msgid "Compiled by "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:915
+#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:913
 msgid "Compiler: "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:916
+#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:914
 msgid "Based on SVN revision: "
 msgstr ""
 
@@ -11999,7 +12015,7 @@ msgid "Open file"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:101
-#: modules/gui/wxwidgets/interface.cpp:596
+#: modules/gui/wxwidgets/interface.cpp:594
 msgid "Check for updates ..."
 msgstr ""
 
@@ -12220,135 +12236,135 @@ msgstr ""
 msgid "Next track"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:557
+#: modules/gui/wxwidgets/interface.cpp:555
 msgid "Quick &Open File...\tCtrl-O"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:560
+#: modules/gui/wxwidgets/interface.cpp:558
 msgid "Open &File...\tCtrl-F"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:561
+#: modules/gui/wxwidgets/interface.cpp:559
 msgid "Open Dir&ectory...\tCtrl-E"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:562
+#: modules/gui/wxwidgets/interface.cpp:560
 msgid "Open &Disc...\tCtrl-D"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:564
+#: modules/gui/wxwidgets/interface.cpp:562
 msgid "Open &Network Stream...\tCtrl-N"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:566
+#: modules/gui/wxwidgets/interface.cpp:564
 msgid "Open C&apture Device...\tCtrl-A"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:569
+#: modules/gui/wxwidgets/interface.cpp:567
 msgid "&Wizard...\tCtrl-W"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:572
+#: modules/gui/wxwidgets/interface.cpp:570
 msgid "E&xit\tCtrl-X"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:578
+#: modules/gui/wxwidgets/interface.cpp:576
 msgid "&Playlist...\tCtrl-P"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:580
+#: modules/gui/wxwidgets/interface.cpp:578
 msgid "&Messages...\tCtrl-M"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:582
+#: modules/gui/wxwidgets/interface.cpp:580
 msgid "Stream and Media &info...\tCtrl-I"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:584
+#: modules/gui/wxwidgets/interface.cpp:582
 msgid "VLM Control...\tCtrl-V"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:600
+#: modules/gui/wxwidgets/interface.cpp:598
 msgid "&File"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:601
+#: modules/gui/wxwidgets/interface.cpp:599
 msgid "&View"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:602
+#: modules/gui/wxwidgets/interface.cpp:600
 msgid "&Settings"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:603
+#: modules/gui/wxwidgets/interface.cpp:601
 msgid "&Audio"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:604
+#: modules/gui/wxwidgets/interface.cpp:602
 msgid "&Video"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:605
+#: modules/gui/wxwidgets/interface.cpp:603
 msgid "&Navigation"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:606
+#: modules/gui/wxwidgets/interface.cpp:604
 msgid "&Help"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:666
+#: modules/gui/wxwidgets/interface.cpp:664
 #, fuzzy
 msgid "Small playlist"
 msgstr "lista de redare"
 
-#: modules/gui/wxwidgets/interface.cpp:667
+#: modules/gui/wxwidgets/interface.cpp:665
 msgid "Previous playlist item"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:668
+#: modules/gui/wxwidgets/interface.cpp:666
 msgid "Next playlist item"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:667
 msgid "Play slower"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:668
 msgid "Play faster"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:853
+#: modules/gui/wxwidgets/interface.cpp:851
 msgid "Extended &GUI\tCtrl-G"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:856
+#: modules/gui/wxwidgets/interface.cpp:854
 msgid "&Bookmarks...\tCtrl-B"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:858
+#: modules/gui/wxwidgets/interface.cpp:856
 msgid "Preference&s...\tCtrl-S"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:911
+#: modules/gui/wxwidgets/interface.cpp:909
 #, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
 msgstr "Schimba interfata"
 
-#: modules/gui/wxwidgets/interface.cpp:922
+#: modules/gui/wxwidgets/interface.cpp:920
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:925
+#: modules/gui/wxwidgets/interface.cpp:923
 #, c-format
 msgid "About %s"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:1465
+#: modules/gui/wxwidgets/interface.cpp:1456
 msgid "Show/Hide interface"
 msgstr ""
 
@@ -15263,10 +15279,6 @@ msgstr ""
 
 #~ msgid "Track "
 #~ msgstr "Pista"
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "Modul decodor Tarkin"
 
 #~ msgid "Settings related to the various access filter used by VLC.\n"
 #~ msgstr "Setari legate de variatele filtre de acces folosite de VLC.\n"
