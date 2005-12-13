@@ -1726,10 +1726,12 @@ if test "${enable_dshow}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
   then
+    AC_LANG_PUSH(C++)
       AC_CHECK_HEADERS(dshow.h,
       [ VLC_ADD_PLUGINS([dshow])
         VLC_ADD_CXXFLAGS([dshow],[])
         VLC_ADD_LDFLAGS([dshow],[-lole32 -loleaut32 -luuid]) ])
+    AC_LANG_POP(C++)
   fi
 fi
 
@@ -4691,16 +4693,21 @@ then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
   then
     AC_CHECK_PROGS(MIDL, [midl widl], no)
+    AC_LANG_PUSH(C++)
     AC_CHECK_HEADERS(ole2.h olectl.h,
       [ VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
         VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi]) 
         AC_CHECK_HEADERS(objsafe.h,
-          VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER])
+          VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER]),,
+          [#if HAVE_OLE2_H
+           #   include <ole2.h>
+           #endif]
         )
         activex=:
       ],
       [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
     )
+    AC_LANG_POP(C++)
   fi
 fi
 AC_ARG_VAR(MIDL, [Microsoft IDL compiler (Win32 platform only)])
