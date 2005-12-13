@@ -465,11 +465,13 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
              && S_ISDIR(stat_data.st_mode) && i_mode != MODE_COLLAPSE )
 #elif defined( DT_DIR )
             if( ( p_dir_content->d_type & DT_DIR ) && i_mode != MODE_COLLAPSE )
+#else
+            if( 0 )
 #endif
             {
 #if defined( S_ISLNK )
 /*
- * FIXME: there is a ToCToU race condition here; but it is rather tricky^W^W
+ * FIXME: there is a ToCToU race condition here; but it is rather tricky
  * impossible to fix while keeping some kind of portable code, and maybe even
  * in a non-portable way.
  */
