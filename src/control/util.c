@@ -2,7 +2,7 @@
  * util.c: Utility functions and exceptions management
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * $Id: vlc.c 10786 2005-04-23 23:19:17Z zorglub $
+ * $Id$
  *
  * Authors: Olivier Aubert <olivier.aubert@liris.univ-lyon1.fr>
  *
@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vlc_control.h>
 #include <vlc/control.h>
 
 #include <vlc/intf.h>

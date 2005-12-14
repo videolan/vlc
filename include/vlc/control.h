@@ -28,34 +28,17 @@
 extern "C" {
 # endif
 
-#include <vlc/vlc.h>
-
 #if defined( WIN32 )
 #define WINDOWHANDLE HWND
 #else
 #define WINDOWHANDLE int
 #endif
 
+#include <vlc/control_structures.h>
+
 /************************************************************************
  * Position Object Manipulation
  *************************************************************************/
-typedef enum  {
-  mediacontrol_AbsolutePosition,
-  mediacontrol_RelativePosition,
-  mediacontrol_ModuloPosition
-} mediacontrol_PositionOrigin;
-
-typedef enum {
-  mediacontrol_ByteCount,
-  mediacontrol_SampleCount,
-  mediacontrol_MediaTime
-} mediacontrol_PositionKey;
-
-typedef struct {
-  mediacontrol_PositionOrigin origin;
-  mediacontrol_PositionKey key;
-  long value;
-} mediacontrol_Position;
 
 typedef struct {
   int  width;
@@ -83,12 +66,7 @@ typedef struct {
 #define mediacontrol_PlaylistException          4
 #define mediacontrol_InternalException          5
 
-typedef struct {
-  vlc_object_t  *p_vlc;
-  playlist_t    *p_playlist;
-  intf_thread_t *p_intf;
-  int           vlc_object_id;
-} mediacontrol_Instance;
+typedef mediacontrol_Instance;
 
 /* Cf stream_control.h */
 enum mediacontrol_PlayerStatusList
@@ -110,13 +88,6 @@ typedef struct {
 /**************************************************************************
  *  Helper functions
  ***************************************************************************/
-vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
-                                       mediacontrol_PositionKey from,
-                                       mediacontrol_PositionKey to,
-                                       vlc_int64_t value );
-vlc_int64_t mediacontrol_position2microsecond(
-                                     input_thread_t *p_input,
-                                     const mediacontrol_Position *pos );
 
 mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int datasize );
 

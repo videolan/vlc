@@ -1,3 +1,4 @@
+#include <vlc_control.h>
 #include <vlc/control.h>
 #include <vlc/intf.h>
 

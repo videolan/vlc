@@ -21,6 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vlc_control.h>
+
 #include <vlc/control.h>
 
 #include <vlc/intf.h>
@@ -416,7 +418,7 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
         RAISE( mediacontrol_InternalException, "No vlc reference" );
         return 0;
     }
-    value.i_int = (int) visual_id;
+    value.i_int=visual_id;
     ret = var_Set(self->p_vlc, "drawable", value);
     
     return (ret == VLC_SUCCESS);

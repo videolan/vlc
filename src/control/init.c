@@ -1,4 +1,5 @@
 #define __VLC__
+#include <vlc_control.h>
 #include <vlc/control.h>
 
 mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *exception )

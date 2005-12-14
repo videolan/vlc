@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include <vlc_control.h>
 #include <vlc/control.h>
 
 #include <vlc/intf.h>
@@ -168,6 +169,15 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
 }
 
 /* Starts playing a stream */
+/*
+ * Known issues: since moving in the playlist using playlist_Next
+ * or playlist_Prev implies starting to play items, the a_position
+ * argument will be only honored for the 1st item in the list.
+ * 
+ * XXX:FIXME split moving in the playlist and playing items two
+ * different actions or make playlist_<Next|Prev> accept a time
+ * value to start to play from.
+ */
 void
 mediacontrol_start( mediacontrol_Instance *self,
                     const mediacontrol_Position * a_position,
@@ -185,18 +195,18 @@ mediacontrol_start( mediacontrol_Instance *self,
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->i_size )
     {
-        int i_from;
-
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        int i_from; 
+	char * psz_from = (char *) malloc (20 * sizeof(char));
+	playlist_item_t * p_item = *(p_playlist->pp_items);
 
         i_from = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
+	
+        /* Set start time */
+	snprintf( psz_from, 20, "start-time=%i", i_from);
+	playlist_ItemAddOption( p_item, psz_from);
+	free(psz_from);
 
-	if( p_playlist->status.p_item )
-        {
-            char psz_from[20];
-            snprintf( psz_from, 20, "start-time=%i", i_from);
-            playlist_ItemAddOption( p_playlist->status.p_item, psz_from);
-        }
+        vlc_mutex_unlock( &p_playlist->object_lock );
 
         playlist_Play( p_playlist );
     }
@@ -204,7 +214,6 @@ mediacontrol_start( mediacontrol_Instance *self,
     {
         RAISE( mediacontrol_PlaylistException, "Empty playlist." );
         vlc_mutex_unlock( &p_playlist->object_lock );
-        return;
     }
 
     return;
@@ -284,6 +293,22 @@ mediacontrol_playlist_add_item( mediacontrol_Instance *self,
 
     playlist_Add( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
                   PLAYLIST_END );
+}
+
+void
+mediacontrol_playlist_next_item( mediacontrol_Instance *self,
+				 mediacontrol_Exception *exception )
+{
+    exception=mediacontrol_exception_init( exception );
+    if ( !self->p_playlist )
+    {
+        RAISE( mediacontrol_InternalException, "No playlist" );
+        return;
+    }
+
+    playlist_Next( self->p_playlist );
+
+    return;
 }
 
 void
