@@ -378,7 +378,7 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
 
     if( !p_dialog )
     {
-        vlc_mutex_unlock( &p_intearction->object_lock ) ;
+        vlc_mutex_unlock( &p_interaction->object_lock ) ;
         return;
     }
 
