@@ -191,6 +191,7 @@ static int Open( vlc_object_t * p_this )
             }
 
             if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
+                p_sys->fmt.i_codec == VLC_FOURCC('p','c','m',' ') ||
                 p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
 
             p_sys->b_chan_reorder =
@@ -230,6 +231,7 @@ static int Open( vlc_object_t * p_this )
     case VLC_FOURCC( 'a', 'f', 'l', 't' ):
     case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
     case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+    case VLC_FOURCC( 'p', 'c', 'm', ' ' ):
         FrameInfo_PCM( p_demux, &p_sys->i_frame_size,
                        &p_sys->i_frame_samples );
         break;

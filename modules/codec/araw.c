@@ -174,6 +174,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     {
     /* from wav/avi/asf file */
     case VLC_FOURCC('a','r','a','w'):
+    case VLC_FOURCC('p','c','m',' '):
     case VLC_FOURCC('a','f','l','t'):
     /* _signed_ big endian samples (mov)*/
     case VLC_FOURCC('t','w','o','s'):
@@ -276,7 +277,8 @@ static int DecoderOpen( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'r', 'a', 'w' ) )
+    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'r', 'a', 'w' ) ||
+             p_dec->fmt_in.i_codec == VLC_FOURCC( 'p', 'c', 'm', ' ' ) )
     {
         switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
         {
@@ -352,6 +354,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_sys->p_logtos16  = ulawtos16;
         p_dec->fmt_in.audio.i_bitspersample = 8;
     }
+    else return VLC_EGENERIC;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
