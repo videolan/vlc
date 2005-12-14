@@ -379,7 +379,7 @@ Section /o "Mozilla plugin" SEC03
 
 SectionEnd
 
-Section /o "ActiveX plugin" SEC04
+Section "ActiveX plugin" SEC04
   SectionIn 2 3
   SetOutPath "$INSTDIR"
   File activex\axvlc.dll
