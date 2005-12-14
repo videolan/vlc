@@ -56,6 +56,7 @@
     svn mv svn://svn.videolan.org/vlc/branches/X.X.X svn://svn.videolan.org/vlc/tag/X.X.X
 
  * Move /opt/ftp/pub/videolan/testing/vlc-X.X.X to /opt/ftp/pub/videolan/vlc/X.X.X
+  - Update the "latest" symlink
 
  * Update the website
   - edit the /index.php /vlc/*.php pages
