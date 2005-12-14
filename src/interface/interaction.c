@@ -466,7 +466,11 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
     vlc_mutex_lock( &p_interaction->object_lock );
     p_dialog  =  intf_InteractionGetById( p_this, i_id );
 
-    if( !p_dialog ) return;
+    if( !p_dialog )
+    {
+       vlc_mutex_unlock( &p_interaction->object_lock );
+       return;
+    }
 
     p_dialog->i_status = ANSWERED_DIALOG;
     vlc_mutex_unlock( &p_interaction->object_lock );
