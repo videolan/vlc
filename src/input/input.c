@@ -266,8 +266,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
  * \param p_parent a vlc_object
  * \param p_item an input item
  * \param b_block should we block until read is finished ?
+ * \return the input object id if non blocking, 0 else
  */
-void __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
+int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                    vlc_bool_t b_block )
 {
     input_thread_t *p_input;                        /* thread descriptor */
@@ -279,6 +280,7 @@ void __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
     if( b_block )
     {
         RunAndClean( p_input );
+        return 0;
     }
     else
     {
@@ -291,6 +293,7 @@ void __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
             return;
         }
     }
+    return p_input->i_object_id;
 }
 
 /**

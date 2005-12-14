@@ -2,7 +2,7 @@
  * vlc_input.h:
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
- * $Id: input_ext-intf.h 7954 2004-06-07 22:19:12Z fenrir $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -413,7 +413,7 @@ VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item
 VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
 
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
-VLC_EXPORT( void, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );
+VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, vlc_bool_t ) );
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
