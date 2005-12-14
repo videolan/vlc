@@ -185,13 +185,18 @@ mediacontrol_start( mediacontrol_Instance *self,
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->i_size )
     {
-        vlc_value_t val;
+        int i_from;
 
         vlc_mutex_unlock( &p_playlist->object_lock );
 
-        /* Set start time */
-        val.i_int = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
-        var_Set( p_playlist, "start-time", val );
+        i_from = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
+
+	if( p_playlist->status.p_item )
+        {
+            char psz_from[20];
+            snprintf( psz_from, 20, "start-time=%i", i_from);
+            playlist_ItemAddOption( p_playlist->status.p_item, psz_from);
+        }
 
         playlist_Play( p_playlist );
     }
