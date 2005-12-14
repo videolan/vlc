@@ -144,6 +144,10 @@ struct demux_sys_t
 
     /* meta */
     vlc_meta_t  *meta;
+
+    /* Progress box */
+    mtime_t    last_update;
+    int        i_dialog_id;
 };
 
 static inline off_t __EVEN( off_t i )
@@ -535,14 +539,15 @@ aviindex:
                           (mtime_t)p_avih->i_microsecperframe /
                           (mtime_t)1000000 )
     {
-        msg_Warn( p_demux, "broken or missing index, 'seek' will be axproximative or will have "
-                           "strange behavour" );
+        msg_Warn( p_demux, "broken or missing index, 'seek' will be "
+                           "axproximative or will have strange behaviour" );
         if( !b_index )
         {
             int i_create;
-            i_create = intf_UserYesNo( p_demux, "AVI Index", _("This AVI file is broken. Seeking will not "
-                                       "work correctly.\nDo you want to "
-                                       "try to repair it (this might take a long time) ?" ) );
+            i_create = intf_UserYesNo( p_demux, _("AVI Index") ,
+                        _( "This AVI file is broken. Seeking will not "
+                        "work correctly.\nDo you want to "
+                        "try to repair it (this might take a long time) ?" ) );
             if( i_create == DIALOG_OK_YES )
             {
                 b_index = VLC_TRUE;
@@ -2251,6 +2256,19 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
     stream_Seek( p_demux->s, p_movi->i_chunk_pos + 12 );
     msg_Warn( p_demux, "creating index from LIST-movi, will take time !" );
+
+
+    /* Only show dialog if AVI is > 10MB */
+    p_demux->p_sys->i_dialog_id = -1;
+    if( stream_Size( p_demux->s ) > 10000000 )
+    {
+        p_demux->p_sys->i_dialog_id = intf_UserProgress( p_demux,
+                                        _( "Fixing AVI Index" ),
+                                        _( "Creating AVI Index ..." ),
+                                        0.0 );
+        p_demux->p_sys->last_update = mdate();
+    }
+
     for( ;; )
     {
         avi_packet_t pk;
@@ -2258,6 +2276,18 @@ static void AVI_IndexCreate( demux_t *p_demux )
         if( p_demux->b_die )
         {
             return;
+        }
+
+        /* Don't update dialog too often */
+        if( p_demux->p_sys->i_dialog_id > 0 &&
+            mdate() - p_demux->p_sys->last_update > 100000 )
+        {
+            int64_t i_pos = stream_Tell( p_demux->s )* 100 /
+                            stream_Size( p_demux->s );
+            float f_pos = (float)i_pos;
+            p_demux->p_sys->last_update = mdate();
+            intf_UserProgressUpdate( p_demux, p_demux->p_sys->i_dialog_id,
+                                    _( "Creating AVI Index ..." ), f_pos );
         }
 
         if( AVI_PacketGetHeader( p_demux, &pk ) )
@@ -2317,6 +2347,11 @@ static void AVI_IndexCreate( demux_t *p_demux )
     }
 
 print_stat:
+    if( p_demux->p_sys->i_dialog_id > 0 )
+    {
+        intf_UserHide( p_demux, p_demux->p_sys->i_dialog_id );
+    }
+
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         msg_Dbg( p_demux,
