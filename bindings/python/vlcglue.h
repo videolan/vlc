@@ -2,7 +2,7 @@
  * vlcglue.h: Main header for the Python binding
  *****************************************************************************
  * Copyright (C) 1998-2004 the VideoLAN team
- * $Id: vlc.c 12667 2005-09-25 10:19:26Z zorglub $
+ * $Id$
  *
  * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
  *          Clément Stenac <zorglub@videolan.org>
@@ -31,6 +31,8 @@
 #define __VLC__
 
 #include <stdio.h>
+#include <vlc/vlc.h>
+#include <vlc/control_structures.h>
 #include <vlc/control.h>
 
 #define SELF ((MediaControl*)self)
