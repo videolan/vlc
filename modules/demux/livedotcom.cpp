@@ -86,8 +86,16 @@ vlc_module_begin();
         add_bool( "rtsp-tcp", 0, NULL,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), VLC_TRUE );
+#if LIVEMEDIA_LIBRARY_VERSION_INT > 1130457500
+        add_bool( "rtsp-http", 0, NULL,
+                  N_("Tunnel RTSP and RTP over HTTP"),
+                  N_("Tunnel RTSP and RTP over HTTP"), VLC_TRUE );
+        add_integer( "rtsp-http-port", 80, NULL,
+                  N_("HTTP tunnel port"),
+                  N_("Port to use for tunneling the RTSP/RTP over HTTP"), VLC_TRUE );
+#endif
         add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
-            CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
         add_bool( "rtsp-kasenna", VLC_FALSE, NULL, KASENNA_TEXT,
                   KASENNA_LONGTEXT, VLC_TRUE );
 vlc_module_end();
@@ -263,9 +271,18 @@ static int  Open ( vlc_object_t *p_this )
     {
         char *psz_url;
         char *psz_options;
+#if LIVEMEDIA_LIBRARY_VERSION_INT > 1130457500
+        int i_http_port = 0;
+
+        if( var_CreateGetBool( p_demux, "rtsp-http" ) )
+            i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
 
         if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/,
+              "VLC Media Player", i_http_port ) ) == NULL )
+#else
+        if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/,
               "VLC Media Player" ) ) == NULL )
+#endif
         {
             msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
                      p_sys->env->getResultMsg() );
@@ -885,8 +902,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( p_sys->rtsp && p_sys->i_length > 0 )
             {
-                int i;
-
                 if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time ) )
                 {
                     msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
@@ -896,12 +911,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_pcr_start = 0;
                 p_sys->i_pcr       = 0;
 
-#if 0 /* disabled. probably useless */
-                for( i = 0; i < p_sys->i_track; i++ )
-                {
-                    p_sys->track[i]->i_pts = 0;
-                }
-#endif
                 return VLC_SUCCESS;
             }
             return VLC_SUCCESS;
