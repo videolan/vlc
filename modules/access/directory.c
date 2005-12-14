@@ -574,6 +574,8 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     if( ppsz_extensions ) free( ppsz_extensions );
     if( psz_ignore ) free( psz_ignore );
 
-    free( pp_dir_content );
+    for( i = 0; i < i_dir_content; i++ )
+        if( pp_dir_content[i] ) free( pp_dir_content[i] );
+    if( pp_dir_content ) free( pp_dir_content );
     return VLC_SUCCESS;
 }
