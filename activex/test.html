@@ -11,7 +11,7 @@ MRL:
 <!--
 Insert VideoLAN.VLCPlugin.1 activex control
 -->
-<OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8" codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab"
+<OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8" codebase="http://downloads.videolan.org/pub/videolan/vlc/latest/win32/axvlc.cab#Version=0,8,4,0"
         width="640" height="480" id="vlc" events="True">
 <param name="MRL" value="" />
 <param name="ShowDisplay" value="True" />
@@ -123,7 +123,7 @@ function doUpdate()
 };
 function doGo(targetURL)
 {
-	var options = new Array(":input-repeat=0");
+	var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
 	document.vlc.addTarget(targetURL, options, 4+8, -666);
 };
 function doPlayOrPause()
