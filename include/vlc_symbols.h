@@ -76,6 +76,7 @@ int __aout_VolumeGet (vlc_object_t *, audio_volume_t *);
 void spu_DestroySubpicture (spu_t *, subpicture_t *);
 int aout_CheckChannelReorder (const uint32_t *, const uint32_t *, uint32_t, int, int *);
 void stream_DemuxSend (stream_t *s, block_t *p_block);
+void __intf_UserHide (vlc_object_t *, int);
 int __config_LoadConfigFile (vlc_object_t *, const char *);
 int vlc_asprintf (char **, const char *, ...);
 int __var_Change (vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t *);
@@ -118,6 +119,7 @@ void vout_SynchroDecode (vout_synchro_t *);
 int playlist_Delete (playlist_t *, int);
 void aout_FiltersPlay (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_buffer_t ** pp_input_buffer);
 char* httpd_ClientIP (httpd_client_t *cl, char *psz_ip);
+int __intf_UserProgress (vlc_object_t*, const char*, const char*, float);
 void httpd_FileDelete (httpd_file_t *);
 module_t * __module_Need (vlc_object_t *, const char *, const char *, vlc_bool_t);
 const char * VLC_Changeset (void);
@@ -201,6 +203,7 @@ int sout_AccessOutWrite (sout_access_out_t *, block_t *);
 struct dirent * vlc_readdir_wrapper (void *);
 void config_UnsetCallbacks (module_config_t *);
 void vout_SynchroRelease (vout_synchro_t *);
+void __intf_UserProgressUpdate (vlc_object_t*, int, const char*, float);
 void __msg_Generic (vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5);
 int vlc_closedir_wrapper (void *);
 int playlist_ServicesDiscoveryAdd (playlist_t *, const char *);
@@ -863,6 +866,9 @@ struct module_symbols_t
     void (*__intf_UserFatal_inner) (vlc_object_t*, const char*, const char*, ...);
     int (*__intf_UserLoginPassword_inner) (vlc_object_t*, const char*, const char*, char **, char **);
     int (*__intf_UserYesNo_inner) (vlc_object_t*, const char*, const char*);
+    int (*__intf_UserProgress_inner) (vlc_object_t*, const char*, const char*, float);
+    void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
+    void (*__intf_UserHide_inner) (vlc_object_t *, int);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1280,6 +1286,9 @@ struct module_symbols_t
 #  define __intf_UserFatal (p_symbols)->__intf_UserFatal_inner
 #  define __intf_UserLoginPassword (p_symbols)->__intf_UserLoginPassword_inner
 #  define __intf_UserYesNo (p_symbols)->__intf_UserYesNo_inner
+#  define __intf_UserProgress (p_symbols)->__intf_UserProgress_inner
+#  define __intf_UserProgressUpdate (p_symbols)->__intf_UserProgressUpdate_inner
+#  define __intf_UserHide (p_symbols)->__intf_UserHide_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1700,6 +1709,9 @@ struct module_symbols_t
     ((p_symbols)->__intf_UserFatal_inner) = __intf_UserFatal; \
     ((p_symbols)->__intf_UserLoginPassword_inner) = __intf_UserLoginPassword; \
     ((p_symbols)->__intf_UserYesNo_inner) = __intf_UserYesNo; \
+    ((p_symbols)->__intf_UserProgress_inner) = __intf_UserProgress; \
+    ((p_symbols)->__intf_UserProgressUpdate_inner) = __intf_UserProgressUpdate; \
+    ((p_symbols)->__intf_UserHide_inner) = __intf_UserHide; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */

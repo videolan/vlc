@@ -325,6 +325,71 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     return i_ret;
 }
 
+/** Helper function to make a progressbar box
+ *  \param p_this           Parent vlc_object
+ *  \param psz_title        Title for the dialog
+ *  \param psz_status       Current status
+ *  \param f_position       Current position (0.0->100.0)
+ *  \return                 Dialog id, to give to UserProgressUpdate
+ */
+int __intf_UserProgress( vlc_object_t *p_this,
+                         const char *psz_title,
+                         const char *psz_status,
+                         float f_pos )
+{
+    int i_ret;
+    interaction_dialog_t *p_new = NULL;
+    user_widget_t *p_widget = NULL;
+
+    INTERACT_INIT( p_new );
+
+    p_new->i_type = INTERACT_DIALOG_ONEWAY;
+    p_new->psz_title = strdup( psz_title );
+
+    /* Progress bar */
+    p_widget = (user_widget_t* )malloc( sizeof( user_widget_t ) );
+    p_widget->i_type = WIDGET_PROGRESS;
+    p_widget->psz_text = strdup( psz_status );
+    p_widget->val.f_float = f_pos;
+    INSERT_ELEM ( p_new->pp_widgets, p_new->i_widgets,
+                  p_new->i_widgets,  p_widget );
+
+    i_ret = intf_Interact( p_this, p_new );
+
+    return p_new->i_id;
+}
+/** Update a progress bar
+ *  \param p_this           Parent vlc_object
+ *  \param i_id             Identifier of the dialog
+ *  \param psz_status       New status
+ *  \param f_position       New position (0.0->100.0)
+ *  \return                 nothing
+ */
+void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
+                                const char *psz_status, float f_pos )
+{
+    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_dialog_t *p_dialog;
+
+    if( !p_interaction ) return;
+
+    vlc_mutex_lock( &p_interaction->object_lock );
+    p_dialog  =  intf_InteractionGetById( p_this, i_id );
+
+    if( !p_dialog ) return;
+
+    if( p_dialog->pp_widgets[0]->psz_text )
+        free( p_dialog->pp_widgets[0]->psz_text );
+    p_dialog->pp_widgets[0]->psz_text = strdup( psz_status );
+
+    p_dialog->pp_widgets[0]->val.f_float = f_pos;
+
+    p_dialog->i_status = UPDATED_DIALOG;
+    vlc_mutex_unlock( &p_interaction->object_lock) ;
+}
+
+
+
 /** Helper function to ask a yes-no question
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
@@ -382,7 +447,26 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
     return i_ret;
 }
 
+/** Hide an interaction dialog
+ * \param p_this the parent vlc object
+ * \param i_id the id of the item to hide
+ * \return nothing
+ */
+void __intf_UserHide( vlc_object_t *p_this, int i_id )
+{
+    interaction_t *p_interaction = intf_InteractionGet( p_this );
+    interaction_dialog_t *p_dialog;
 
+    if( !p_interaction ) return;
+
+    vlc_mutex_lock( &p_interaction->object_lock );
+    p_dialog  =  intf_InteractionGetById( p_this, i_id );
+
+    if( !p_dialog ) return;
+
+    p_dialog->i_status = ANSWERED_DIALOG;
+    vlc_mutex_unlock( &p_interaction->object_lock );
+}
 
 
 
@@ -568,7 +652,10 @@ static void intf_InteractionDialogDestroy( interaction_dialog_t *p_dialog )
     {
         user_widget_t *p_widget = p_dialog->pp_widgets[i];
         FREE( p_widget->psz_text );
-        FREE( p_widget->val.psz_string );
+        if( p_widget->i_type == WIDGET_INPUT_TEXT )
+        {
+            FREE( p_widget->val.psz_string );
+        }
 
         REMOVE_ELEM( p_dialog->pp_widgets, p_dialog->i_widgets, i );
         free( p_widget );
