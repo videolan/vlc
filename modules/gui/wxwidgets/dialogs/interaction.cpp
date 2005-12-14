@@ -104,21 +104,23 @@ void InteractionDialog::Update( )
 void InteractionDialog::Render()
 {
     wxStaticText *label;
-    wxTextCtrl *input;
+    wxTextCtrl   *input;
+    wxGauge      *gauge;
 
 
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
         wxTextCtrl *errors ; // Special case
         label = new wxStaticText( widgets_panel, -1,
-          wxU( _("The following errors happened. More details might be available "
-                 "in the log file.") ) );
+          wxU( _("The following errors happened. More details might be "
+                 "available in the Messages window.") ) );
         errors = new wxTextCtrl( widgets_panel, -1, wxT(""),
                          wxDefaultPosition, wxDefaultSize,
                          wxTE_MULTILINE | wxTE_READONLY );
         for( int i = 0 ; i< p_dialog->i_widgets; i++ )
         {
-            (*errors) << wxL2U( p_dialog->pp_widgets[i]->psz_text ) << wxU( "\n" ) ;
+            (*errors) << wxL2U( p_dialog->pp_widgets[i]->psz_text ) <<
+                           wxU( "\n" ) ;
         }
         widgets_sizer->Add( label );
         widgets_sizer->Add( errors, 0, wxEXPAND|wxALL, 3 );
@@ -149,6 +151,14 @@ void InteractionDialog::Render()
                 widget.val = &p_widget->val;
                 widget.i_type = WIDGET_INPUT_TEXT;
                 input_widgets.push_back( widget );
+            case WIDGET_PROGRESS:
+                label = new wxStaticText(widgets_panel, -1,
+                                    wxU( p_widget->psz_text ) );
+                gauge = new wxGauge( widgets_panel, -1, 100,
+                                     wxDefaultPosition, wxDefaultSize );
+                widgets_sizer->Add( label , 0, 0, 0);
+                widgets_sizer->Add( gauge, 0, wxEXPAND , 0 );
+                gauge->SetValue( (int)(p_widget->val.f_float ) );
             }
         }
     }
