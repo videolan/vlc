@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc_interaction.h>
 
 #include <vlc/input.h>
 
@@ -85,8 +86,9 @@ struct services_discovery_sys_t
 {
     /* playlist node */
     playlist_item_t *p_node;
-    input_thread_t *p_input;
-
+    playlist_item_t *p_item;
+    int i_limit;
+    vlc_bool_t b_dialog;
 };
 
 /*****************************************************************************
@@ -110,7 +112,6 @@ static int Open( vlc_object_t *p_this )
     playlist_view_t     *p_view;
     playlist_item_t     *p_item;
 
-    int i_limit;
     char *psz_shoutcast_url;
     char *psz_shoutcast_title;
 
@@ -126,13 +127,13 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    i_limit = config_GetInt( p_this->p_libvlc, "shoutcast-limit" );
+    p_sys->i_limit = config_GetInt( p_this->p_libvlc, "shoutcast-limit" );
     #define SHOUTCAST_BASE_URL "http/shout-b4s://www.shoutcast.com/sbin/xmllister.phtml?service=vlc&no_compress=1&limit="
     psz_shoutcast_url = (char *)malloc( strlen( SHOUTCAST_BASE_URL ) + 20 );
     psz_shoutcast_title = (char *)malloc( 6 + 20 );
 
-    sprintf( psz_shoutcast_url, SHOUTCAST_BASE_URL "%d", i_limit );
-    sprintf( psz_shoutcast_title, "Top %d", i_limit );
+    sprintf( psz_shoutcast_url, SHOUTCAST_BASE_URL "%d", p_sys->i_limit );
+    sprintf( psz_shoutcast_title, "Top %d", p_sys->i_limit );
 
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
@@ -149,10 +150,8 @@ static int Open( vlc_object_t *p_this )
     /* We need to declare the parents of the node as the same of the
      * parent's ones */
     playlist_CopyParents( p_sys->p_node, p_item );
-    
 
-    p_sys->p_input = input_CreateThread( p_playlist, &p_item->input );
-
+    p_sys->p_item = p_item;
     p_sys->p_node->i_flags |= PLAYLIST_RO_FLAG;
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
@@ -171,14 +170,6 @@ static void Close( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     playlist_t *p_playlist =  (playlist_t *) vlc_object_find( p_sd,
                                  VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_sd->p_sys->p_input )
-    {
-        input_StopThread( p_sd->p_sys->p_input );
-        input_DestroyThread( p_sd->p_sys->p_input );
-        vlc_object_detach( p_sd->p_sys->p_input );
-        vlc_object_destroy( p_sd->p_sys->p_input );
-        p_sd->p_sys->p_input = NULL;        
-    }
     if( p_playlist )
     {
         playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE, VLC_TRUE );
@@ -192,16 +183,37 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( services_discovery_t *p_sd )
 {
+    services_discovery_sys_t *p_sys  = p_sd->p_sys;
+    int i_id = input_Read( p_sd, &p_sys->p_item->input, VLC_FALSE );
+    int i_dialog_id;
+
+    i_dialog_id = intf_UserProgress( p_sd, "Shoutcast" , "Connecting...", 0.0 );
+
+    p_sys->b_dialog = VLC_TRUE;
     while( !p_sd->b_die )
     {
-        if( p_sd->p_sys->p_input &&
-            ( p_sd->p_sys->p_input->b_eof || p_sd->p_sys->p_input->b_error ) )
+        input_thread_t *p_input = (input_thread_t *)vlc_object_get( p_sd,
+                                                                    i_id );
+
+        /* The Shoutcast server does not return a content-length so we
+         * can't know where we are. Use the number of inserted items
+         * as a hint */
+        if( p_input != NULL )
         {
-            input_StopThread( p_sd->p_sys->p_input );
-            input_DestroyThread( p_sd->p_sys->p_input );
-            vlc_object_detach( p_sd->p_sys->p_input );
-            vlc_object_destroy( p_sd->p_sys->p_input );
-            p_sd->p_sys->p_input = NULL;
+            int i_state = var_GetInteger( p_input, "state" );
+            if( i_state == PLAYING_S )
+            {
+                float f_pos = (float)(p_sys->p_item->i_children)* 100.0 /
+                              (float)(p_sys->i_limit);
+                intf_UserProgressUpdate( p_sd, i_dialog_id, "Downloading",
+                                         f_pos );
+            }
+            vlc_object_release( p_input );
+        }
+        else if( p_sys->b_dialog )
+        {
+            p_sys->b_dialog  = VLC_FALSE;
+            intf_UserHide( p_sd, i_dialog_id );
         }
         msleep( 100000 );
     }
