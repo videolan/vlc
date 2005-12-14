@@ -905,13 +905,19 @@ endif
 
 package-win32-base-exe:
 # Create package
-	wine C:/Program\ Files/NSIS/makensis.exe \
-             /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
+	if [ -x makensis ]; then \
+	    MAKENSIS=makensis; \
+	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
+	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis"; \
+	elif [ -x wine ]; then \
+	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe"; \
+	else \
+	    echo 'Error: cannot locate makensis tool'; exit 1; \
+	fi; \
+	eval "$$MAKENSIS /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi"
 
-package-win32-base-exe-cygwin:
+package-win32-base-exe-cygwin: package-win32-base-exe
 # Create package
-	C:/Program\ Files/NSIS/makensis.exe \
-             /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
 
 package-win32-base-exe-linux:
 # Create package
