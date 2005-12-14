@@ -131,7 +131,7 @@ static int Demux( demux_t *p_demux )
     int i_type;
 
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                                 FIND_PARENT );
+                                                 FIND_NEXT );
     if( !p_playlist )
     {
         msg_Err( p_demux, "can't find playlist" );

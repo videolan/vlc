@@ -67,7 +67,7 @@ static int Demux( demux_t *p_demux)
     playlist_t *p_playlist;
 
     p_playlist = (playlist_t*)vlc_object_find( p_demux,
-                         VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( !p_playlist )
     {
         msg_Err( p_demux, "cannot attach playlist" );
