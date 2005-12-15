@@ -1,0 +1,98 @@
+;;---------------------------------------------------------------------------
+;;
+;; Emacs-Options for Videolan CodingStyle programming
+;;
+;; paste the following lines in your .emacs file
+;;
+;;---------------------------------------------------------------------------
+
+;; associate c-mode with file extension '.c' or '.h' in vlc trunk tree
+(setq auto-mode-alist
+      (append
+       '((".*vlc-trunk.*/.*\\.[ch]$" . c-mode)
+	  ) auto-mode-alist))
+
+;; define videolan c style settings
+(defconst videolan-c-style
+  '((c-tab-always-indent           . t)
+    (c-comment-only-line-offset    . 4)
+    (c-hanging-braces-alist        . ((substatement-open before after)
+                                      (brace-list-open)))
+    (c-hanging-colons-alist        . ((member-init-intro before)
+                                      (inher-intro)
+                                      (case-label after)
+                                      (label after)
+                                      (access-label after)))
+    (c-cleanup-list                . (scope-operator
+                                      empty-defun-braces
+                                      defun-close-semi))
+    
+    (c-offsets-alist     . ((string . -1000)
+			    (c . c-lineup-C-comments)
+			    (defun-open . 0)
+			    (defun-close . 0)
+			    (defun-block-intro . +)
+			    (class-open . 0)
+			    (class-close . 0)
+			    (inline-open . 0)
+			    (inline-close . 0)
+			    (topmost-intro . 0)
+			    (topmost-intro-cont . 0)
+			    (member-init-intro . +)
+			    (member-init-cont . 0)
+			    (inher-intro . +)
+			    (inher-cont . 0)
+			    (block-open . 0)
+			    (block-close . 0)
+			    (brace-list-open . +)
+			    (brace-list-close . 0)
+			    (brace-list-intro . +)
+			    (brace-list-entry . 0)
+			    (statement . 0)
+			    (statement-cont . +)
+			    (statement-block-intro . +)
+			    (statement-case-intro . +)
+			    (statement-case-open . +)
+			    (substatement . +)
+			    (substatement-open . +)
+			    (case-label . +)
+			    (access-label . -)
+			    (label . -1000)
+			    (do-while-closure . 0)
+			    (else-clause . 0)
+			    (comment-intro . 0)
+			    (arglist-intro . +)
+			    (arglist-cont . 0)
+			    (arglist-cont-nonempty . c-lineup-arglist)
+			    (arglist-close . 0)
+			    (stream-op . +)
+			    (inclass . +)
+			    (cpp-macro . -1000)
+			    (friend . 0)
+			    (objc-method-intro . 0)
+			    (objc-method-args-cont . 0)
+			    (objc-method-call-cont . 0)))
+
+    (c-basic-offset . 4)
+    (c-echo-syntactic-information-p . t)
+    )
+  "Videolan C Programming Style")
+
+;; Customizations for c-mode
+(defun videolan-mode-hook ()
+  ;; add the Videolan c style and set it for the current buffer
+  (local-set-key "\r" 'newline-and-indent)
+  (c-add-style "vlc" videolan-c-style t)
+  (c-set-offset 'member-init-intro '++)
+
+  ;; other customizations
+  (setq tab-width 4
+	;; this will make sure spaces are used instead of tabs
+        indent-tabs-mode nil)
+  ;; we like auto-newline and hungry-delete
+  (c-toggle-auto-newline-state 1)
+  (custom-set-variables
+   '(c-hanging-semi&comma-criteria nil))
+  )
+
+(add-hook 'c-mode-hook 'videolan-mode-hook)
