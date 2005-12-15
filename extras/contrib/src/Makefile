@@ -280,6 +280,7 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 ifdef HAVE_DARWIN_OS
 .libtool:
 	if test -x /usr/bin/glibtoolize; then \
+		mkdir -p $(PREFIX)/bin ; \
 		ln -sf /usr/bin/glibtoolize $(PREFIX)/bin/libtoolize ; \
 	fi
 	if test -f /usr/share/aclocal/libtool.m4; then \
