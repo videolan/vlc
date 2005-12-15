@@ -41,22 +41,22 @@ extern "C" {
  *************************************************************************/
 
 typedef struct {
-  int  width;
-  int  height;
-  long type;
-  vlc_int64_t date;
-  int  size;
-  char *data;
+    int  width;
+    int  height;
+    long type;
+    vlc_int64_t date;
+    int  size;
+    char *data;
 } mediacontrol_RGBPicture;
 
 typedef struct {
-  int size;
-  char **data;
+    int size;
+    char **data;
 } mediacontrol_PlaylistSeq;
 
 typedef struct {
-  int code;
-  char *message;
+    int code;
+    char *message;
 } mediacontrol_Exception;
 
 /* Exception codes */
@@ -116,8 +116,7 @@ mediacontrol_Instance *
   mediacontrol_new_from_object( int vlc_object_id,
                                 mediacontrol_Exception *exception );
 
-mediacontrol_Position *
-  mediacontrol_get_media_position(
+mediacontrol_Position * mediacontrol_get_media_position(
                          mediacontrol_Instance *self,
                          const mediacontrol_PositionOrigin an_origin,
                          const mediacontrol_PositionKey a_key,
@@ -132,7 +131,7 @@ void mediacontrol_start( mediacontrol_Instance *self,
                          mediacontrol_Exception *exception );
 
 void mediacontrol_pause( mediacontrol_Instance *self,
-                         const mediacontrol_Position *a_position, 
+                         const mediacontrol_Position *a_position,
                          mediacontrol_Exception *exception );
 
 void mediacontrol_resume( mediacontrol_Instance *self,
@@ -170,8 +169,8 @@ mediacontrol_RGBPicture **
 
 /* Displays the message string, between "begin" and "end" positions */
 void mediacontrol_display_text( mediacontrol_Instance *self,
-                                const char *message, 
-                                const mediacontrol_Position *begin, 
+                                const char *message,
+                                const mediacontrol_Position *begin,
                                 const mediacontrol_Position *end,
                                 mediacontrol_Exception *exception );
 

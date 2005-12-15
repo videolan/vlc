@@ -31,12 +31,11 @@ extern "C" {
 #include <vlc/vlc.h>
 #include "vlc/control_structures.h"
 
-
 typedef struct {
-  vlc_object_t  *p_vlc;
-  playlist_t    *p_playlist;
-  intf_thread_t *p_intf;
-  int           vlc_object_id;
+    vlc_object_t  *p_vlc;
+    playlist_t    *p_playlist;
+    intf_thread_t *p_intf;
+    int           vlc_object_id;
 } mediacontrol_Instance;
 
 vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
@@ -44,9 +43,8 @@ vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
                                        mediacontrol_PositionKey to,
                                        vlc_int64_t value );
 vlc_int64_t mediacontrol_position2microsecond(
-                                     input_thread_t *p_input,
-                                     const mediacontrol_Position *pos );
-
+    input_thread_t *p_input,
+    const mediacontrol_Position *pos );
 
 # ifdef __cplusplus
 }

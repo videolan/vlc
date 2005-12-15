@@ -25,9 +25,6 @@
 #include <Python.h>
 #include "structmember.h"
 
-/* Undefine the following define to disable low-level vlc Object support */
-#define VLCOBJECT_SUPPORT 0
-
 #define __VLC__
 
 #include <stdio.h>
@@ -44,9 +41,9 @@
 #define MC_TRY exception=mediacontrol_exception_init(exception)
 
 #define MC_EXCEPT  \
-  if (exception->code) { \
+  if( exception->code ) { \
     PyObject *py_exc = MediaControl_InternalException; \
-    switch (exception->code) { \
+    switch( exception->code ) { \
     case mediacontrol_InternalException: \
       py_exc = MediaControl_InternalException; \
       break; \
@@ -63,10 +60,10 @@
       py_exc = MediaControl_PositionOriginNotSupported; \
       break; \
     } \
-    PyErr_SetString(py_exc, exception->message); \
-    mediacontrol_exception_free(exception); \
+    PyErr_SetString( py_exc, exception->message ); \
+    mediacontrol_exception_free( exception ); \
     return NULL; \
-  } else { mediacontrol_exception_free(exception); }
+  } else { mediacontrol_exception_free( exception ); }
 
 PyObject *MediaControl_InternalException;
 PyObject *MediaControl_PositionKeyNotSupported;
@@ -77,9 +74,7 @@ PyObject *MediaControl_PlaylistException;
 /**********************************************************************
  * VLC Object
  **********************************************************************/
-#ifdef VLCOBJECT_SUPPORT
-
-#define VLCSELF ((vlcObject*)self)
+#define VLCSELF ( ( vlcObject* )self )
 
 /**********************************************************************
  * VLCObject Object
@@ -92,8 +87,6 @@ typedef struct
 } vlcObject;
 
 staticforward PyTypeObject vlcObject_Type;
-
-#endif
 
 /**********************************************************************
  * MediaControl Object
@@ -121,5 +114,5 @@ staticforward PyTypeObject PyPosition_Type;
 
 mediacontrol_PositionKey positionKey_py_to_c( PyObject * py_key );
 mediacontrol_PositionOrigin positionOrigin_py_to_c( PyObject * py_origin );
-mediacontrol_Position* position_py_to_c( PyObject * py_position );
-PyPosition* position_c_to_py(mediacontrol_Position *position);
+mediacontrol_Position * position_py_to_c( PyObject * py_position );
+PyPosition * position_c_to_py( mediacontrol_Position * position );

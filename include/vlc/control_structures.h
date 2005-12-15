@@ -29,23 +29,22 @@ extern "C" {
 # endif
 
 typedef enum  {
-  mediacontrol_AbsolutePosition,
-  mediacontrol_RelativePosition,
-  mediacontrol_ModuloPosition
+    mediacontrol_AbsolutePosition,
+    mediacontrol_RelativePosition,
+    mediacontrol_ModuloPosition
 } mediacontrol_PositionOrigin;
 
 typedef enum {
-  mediacontrol_ByteCount,
-  mediacontrol_SampleCount,
-  mediacontrol_MediaTime
+    mediacontrol_ByteCount,
+    mediacontrol_SampleCount,
+    mediacontrol_MediaTime
 } mediacontrol_PositionKey;
 
 typedef struct {
-  mediacontrol_PositionOrigin origin;
-  mediacontrol_PositionKey key;
-  long value;
+    mediacontrol_PositionOrigin origin;
+    mediacontrol_PositionKey key;
+    long value;
 } mediacontrol_Position;
-
 
 # ifdef __cplusplus
 }
