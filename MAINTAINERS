@@ -26,11 +26,9 @@
 * PORTS
 
   - Debian GNU/Linux : [sam]
-  - Mandrake Linux : Yves Duret
-  - BeOS : Eric Petit (Stephan Assmus)
+  - BeOS : [titer]
   - Windows : [gibalou]
   - Mac OS X : [thedj]
-  - QNX RTOS : [jlj]
   - Solaris : [meuuh]
   - *BSD : [meuuh]
   - GNU/Hurd : [sam]
@@ -60,7 +58,7 @@
 * AUDIO OUTPUT
 
   - audio output architecture : [sam] ([meuuh])
-  - ALSA       : [bozo] [bigben]
+  - ALSA       : [bigben]
   - DirectX    : [gibalou]
   - AUHAL      : [thedj]
   - Other      : [sam] ([meuuh])
