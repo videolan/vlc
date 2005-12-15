@@ -8,9 +8,9 @@
 # best knowledge of the code, so that questions and propositions of
 # contributions should be directed to her.
 
-* MISC VLC ARCHITECTURE
+* CORE VLC ARCHITECTURE
 
-  - Makefiles & autoconf : [sam] & [meuuh]
+  - Makefiles & autoconf : [sam] [meuuh] [courmisch]
   - configuration & command-line options : [gibalou]
   - modules, detection, dynamic loading : [sam]
   - objects support, libvlc : [sam]
@@ -19,76 +19,78 @@
   - MMX optimizations : [sam]
   - Altivec optimizations : [meuuh] ([jlj])
 
+* PLAYLIST 
+
+  - core support [zorglub]
+
 * PORTS
 
   - Debian GNU/Linux : [sam]
   - Mandrake Linux : Yves Duret
   - BeOS : Eric Petit (Stephan Assmus)
   - Windows : [gibalou]
-  - Mac OS X : [thedj])
+  - Mac OS X : [thedj]
   - QNX RTOS : [jlj]
   - Solaris : [meuuh]
   - *BSD : [meuuh]
   - GNU/Hurd : [sam]
-  - iPAQ Familiar Linux : [saman] & [marcari] ([meuuh])
+  - iPAQ Familiar Linux : [jpsaman]
   - YOPY/Linupy : [marcari]
   - BSD/OS : Steven M. Schultz
 
 * INTERFACE
 
-  - interface architecture : [sam]
-  - modules gtk, gnome : [sam] ([stef])
-  - modules lirc, dummy, rc, ncurses : [sam]
-  - modules qt, kde : [sigmund]
-  - module xosd : [lool]
-  - module familar : [saman]
+  - interface architecture : [sam] [zorglub]
+  - wxWidgets : [gibalou] [zorglub]
+  - skins2    : [ipkiss] [asmax]
+  - macosx    : [thedj] [bigben] [fkuehne]
+  - lirc, dummy, rc, ncurses : [sam]
+  - corba     : [oaubert]
+  - familiar  : [jpsaman]
+  - http      : [meuuh]
 
 * VIDEO OUTPUT
 
-  - video output architecture : [sam]
-  - modules dummy, fb, ggi, glide, mga, sdl : [sam]
-  - output filters & chroma : [sam]
-  - modules x11, xvideo : [gibalou]
-  - module aa : [sigmund]
-  - module qte : [saman]
+  - Video output architecture : [sam] [gibalou]
+  - dummy, fb, ggi, glide, mga, sdl : [sam]
+  - Filters & chroma : [sam] [gibalou]
+  - X11, Xvideo      : [gibalou]
+  - Directx          : [gibalou]
 
 * AUDIO OUTPUT
 
   - audio output architecture : [sam] ([meuuh])
-  - module ALSA : [bozo]
-  - module aRts : Emmanuel Blindauer
-  - modules dsp, dummy, esd : [sam] ([meuuh])
-  - output filters : [sam] ([meuuh])
+  - ALSA       : [bozo] [bigben]
+  - DirectX    : [gibalou]
+  - AUHAL      : [thedj]
+  - Other      : [sam] ([meuuh])
+  - Filters    : [sam] [babal] [meuuh]
 
 * INPUT
 
-  - input architecture : [meuuh]
-  - demux modules PS, ES, a52_system : [meuuh]
-  - access modules file, udp, http : [meuuh]
-  - demux modules TS, satellite : [jobi]
-  - network modules ipv4, ipv6 : [meuuh]
-  - demux module mpeg_audio (mp3), avi : [fenrir]
-  - DVD module : [stef]
-  - VCD module : [jobi] ([jlj])
+  - input architecture : [meuuh] [fenrir]
+  - Most Demuxers      : [fenrir] [gibalou]
+  - DRMS support       : [jlj] [sam]
+  - DVB access         : [meuuh]
+  - DVD                : [sam]
+  - network layer      : [courmisch]
 
-* DECODERS
+* DECODER
 
-  - decoders architecture : [meuuh] ([henri])
-  - built-in MPEG audio : unmaintained (FIXME)
-  - built-in MPEG video & associated idct+motion : [meuuh]
-  - built-in AC3 & associated plug-ins : Renaud Dartus (soon-to-be scrapped)
-  - mad : [saman] ([meuuh])
-  - ffmpeg : [fenrir]
+  - decoders architecture : [meuuh] [gibalou] ([henri])
+  - ffmpeg : [fenrir] [gibalou]
   - AC3 SPDIF : [stef]
   - A/52 : [gibalou] ([meuuh])
   - SPU : [sam]
-  - Ogg/Vorbis : [gibalou]
+
+* MISC
+
+  - VLM 
+  - HTTPD : [fenrir]
 
 * DOCUMENTATION
 
-  - VLC HOWTO : [jobi]
   - Developer documentation : [sam] ([meuuh])
-  - FAQ : [lool]
 
 
 [bozo] = Arnaud de Bossoreille de Ribou

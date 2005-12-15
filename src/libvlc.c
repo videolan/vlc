@@ -923,9 +923,9 @@ int VLC_CleanUp( int i_object )
     }
 
     /*
-     * Free playlists
+     * Free playlist
      */
-    msg_Dbg( p_vlc, "removing all playlists" );
+    msg_Dbg( p_vlc, "removing playlist handler" );
     while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
                                           FIND_CHILD )) )
     {
@@ -959,14 +959,14 @@ int VLC_CleanUp( int i_object )
     /*
      * Free announce handler(s?)
      */
-    msg_Dbg( p_vlc, "removing announce handler" );
     while( (p_announce = vlc_object_find( p_vlc, VLC_OBJECT_ANNOUNCE,
                                                  FIND_CHILD ) ) )
-   {
+    {
+        msg_Dbg( p_vlc, "removing announce handler" );
         vlc_object_detach( p_announce );
         vlc_object_release( p_announce );
         announce_HandlerDestroy( p_announce );
-   }
+    }
 
     if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
