@@ -689,7 +689,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
         }
         else
-        {  
+        {
             msg_Err( p_this, "no %s module matched \"%s\"",
                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
         }
@@ -728,7 +728,7 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
         p_module->pf_deactivate( p_this );
     }
 
-    msg_Dbg( p_module, "unlocking module \"%s\"", p_module->psz_object_name );
+    msg_Dbg( p_module, "removing module \"%s\"", p_module->psz_object_name );
 
     vlc_object_release( p_module );
 

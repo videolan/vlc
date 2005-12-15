@@ -89,6 +89,8 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
 
 /**
  * Destroy the interaction system
+ * \param The interaction object to destroy
+ * \return nothing
  */
 void intf_InteractionDestroy( interaction_t *p_interaction )
 {
@@ -184,7 +186,7 @@ void intf_InteractionManage( playlist_t *p_playlist )
             if( !(p_dialog->i_flags & DIALOG_REUSABLE) )
             {
                 msg_Dbg( p_interaction, "Destroying dialog %i",
-                                                p_dialog->i_id );
+                                        p_dialog->i_id );
                 p_dialog->i_action = INTERACT_DESTROY;
                 val.p_address = p_dialog;
                 if( p_interaction->p_intf )
@@ -293,8 +295,6 @@ void __intf_UserFatal( vlc_object_t *p_this,
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_description  A description
- *  \param ppsz_login       Returned login
- *  \param ppsz_password    Returned password
  *  \return                 Clicked button code
  */
 int __intf_UserYesNo( vlc_object_t *p_this,
@@ -397,6 +397,8 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_description  A description
+ *  \param ppsz_login       Returned login
+ *  \param ppsz_password    Returned password
  *  \return                 Clicked button code
  */
 int __intf_UserLoginPassword( vlc_object_t *p_this,
@@ -561,7 +563,8 @@ static void intf_InteractionSearchInterface( interaction_t *p_interaction )
 }
 
 /* Add a dialog to the queue and wait for answer */
-static int intf_WaitAnswer( interaction_t *p_interact, interaction_dialog_t *p_dialog )
+static int intf_WaitAnswer( interaction_t *p_interact,
+                            interaction_dialog_t *p_dialog )
 {
     int i;
     vlc_bool_t b_found = VLC_FALSE;
@@ -603,7 +606,8 @@ static int intf_WaitAnswer( interaction_t *p_interact, interaction_dialog_t *p_d
 }
 
 /* Add a dialog to the queue and return */
-static int intf_Send( interaction_t *p_interact, interaction_dialog_t *p_dialog )
+static int intf_Send( interaction_t *p_interact,
+                      interaction_dialog_t *p_dialog )
 {
     int i;
     vlc_bool_t b_found = VLC_FALSE;
