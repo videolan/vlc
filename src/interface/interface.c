@@ -66,7 +66,10 @@ static int AddIntfCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 @interface VLCApplication : NSApplication
 {
+   vlc_t *o_vlc;
 }
+
+- (void)setVLC: (vlc_t *)p_vlc;
 
 @end
 #endif
@@ -157,11 +160,12 @@ int intf_RunThread( intf_thread_t *p_intf )
         }
     }
 
-    if( p_intf->b_block && strncmp( p_intf->p_module->psz_object_name,
+    if( p_intf->b_block && strncmp( p_intf->p_vlc->psz_object_name,
                                     "clivlc", 6) )
     {
         o_pool = [[NSAutoreleasePool alloc] init];
         [VLCApplication sharedApplication];
+        [NSApp setVLC: p_intf->p_vlc];
     }
 
     if( p_intf->b_block &&
@@ -175,6 +179,11 @@ int intf_RunThread( intf_thread_t *p_intf )
     else
     {
         /* Run the interface in a separate thread */
+        if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
+        {
+            msg_Err( p_intf, "You cannot run the MacOS X module as an extrainterface. Please read the README.MacOSX.rtf file");
+            return VLC_EGENERIC;
+        }
         if( vlc_thread_create( p_intf, "interface", RunInterface,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
         {
@@ -446,6 +455,11 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
  *****************************************************************************/
 @implementation VLCApplication 
 
+- (void)setVLC: (vlc_t *) p_vlc
+{
+    o_vlc = p_vlc;
+}
+
 - (void)stop: (id)sender
 {
     NSEvent *o_event;
@@ -465,9 +479,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
 - (void)terminate: (id)sender
 {
-    if( [NSApp isRunning] )
-        [NSApp stop:sender];
-    [super terminate: sender];
+    o_vlc->b_die = VLC_TRUE;
 }
 
 @end

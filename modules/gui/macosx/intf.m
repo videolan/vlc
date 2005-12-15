@@ -806,7 +806,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)manage
 {
-    NSDate * o_sleep_date;
     playlist_t * p_playlist;
 
     /* new thread requires a new pool */
@@ -861,12 +860,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         [self manageVolumeSlider];
 
         vlc_mutex_unlock( &p_intf->change_lock );
-
-        o_sleep_date = [NSDate dateWithTimeIntervalSinceNow: .1];
-        [NSThread sleepUntilDate: o_sleep_date];
+        msleep( 100000 );
     }
-
-    [self terminate];
     [o_pool release];
 }
 
@@ -1434,7 +1429,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     p_intf->b_die = VLC_TRUE;
-    [NSApp stop:NULL];
 }
 
 - (IBAction)clearRecentItems:(id)sender
