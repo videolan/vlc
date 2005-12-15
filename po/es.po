@@ -11198,7 +11198,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:607
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1332
 msgid "Time-To-Live (TTL)"
-msgstr "Hora para Emisión En Directo (TTL): "
+msgstr "Tiempo de vida (TTL): "
 
 #: modules/gui/macosx/wizard.m:427 modules/gui/macosx/wizard.m:453
 #: modules/gui/macosx/wizard.m:1656
