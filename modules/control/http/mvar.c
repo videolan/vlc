@@ -541,8 +541,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
     {
         struct dirent *p_dir_content = pp_dir_content[i];
         mvar_t *f;
-        const char *psz_ext;
-        char *psz_name, *psz_tmp;
+        char *psz_name, *psz_tmp, *psz_ext;
 
         if( !strcmp( p_dir_content->d_name, "." ) )
         {
@@ -573,9 +572,16 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         psz_name = E_(FromUTF8)( p_intf, psz_tmp );
         free( psz_tmp );
 
-        /* put file extension in 'ext' */
+        /* put lower-case file extension in 'ext' */
         psz_ext = strrchr( psz_name, '.' );
-        E_(mvar_AppendNewVar)( f, "ext", psz_ext != NULL ? psz_ext + 1 : "" );
+        psz_tmp = psz_ext = strdup( psz_ext != NULL ? psz_ext + 1 : "" );
+        while ( *psz_tmp != '\0' )
+        {
+            *psz_tmp = tolower( *psz_tmp );
+            psz_tmp++;
+        }
+        E_(mvar_AppendNewVar)( f, "ext", psz_ext );
+        free( psz_ext );
 
 #if defined( WIN32 )
         if( psz_dir[0] == '\0' || (psz_dir[0] == '\\' && psz_dir[1] == '\0') )
