@@ -52,7 +52,7 @@ struct interaction_dialog_t
     char           *psz_title;          //< Title
     char           *psz_description;    //< Descriptor string
 
-    int             i_widgets;          //< Nu,ber of dialog widgets
+    int             i_widgets;          //< Number of dialog widgets
     user_widget_t **pp_widgets;         //< Dialog widgets
 
     void *          p_private;          //< Private interface data
