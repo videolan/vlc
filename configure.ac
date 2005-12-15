@@ -4976,11 +4976,6 @@ AC_DEFINE_UNQUOTED(MODULE_SYMBOL, $module_symbol, [Symbol suffix for module func
 VLC_ENTRY="vlc_entry__${module_symbol}"
 AC_SUBST(VLC_ENTRY)
 
-DATA_PATH="${ac_tool_prefix}/share/vlc"
-AC_SUBST(DATA_PATH)
-PLUGIN_PATH="${ac_tool_prefix}/lib/vlc"
-AC_SUBST(PLUGIN_PATH)
-
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
