@@ -166,7 +166,7 @@ VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*) );
 #define intf_UserProgress( a, b, c, d ) __intf_UserProgress( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float) );
 
-#define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( VLC_OBJCT(a),b,c, d )
+#define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float) );
 
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
