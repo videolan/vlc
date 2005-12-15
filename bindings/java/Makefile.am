@@ -9,8 +9,10 @@ OBJECTS = org/videolan/jvlc/JVLCNoSuchVariableNameException.class org/videolan/j
 JNIHEADERS = org/videolan/jvlc/JVLCNoSuchVariableNameException.h org_videolan_jvlc_JVLCBoolVariable.h org_videolan_jvlc_JVLCFloatVariable.h org_videolan_jvlc_JVLC.h org_videolan_jvlc_JVLCIntVariable.h org_videolan_jvlc_JVLCStringVariable.h org_videolan_jvlc_JVLCTimeVariable.h org_videolan_jvlc_JVLCVariable.h org_videolan_jvlc_JVLCVarValue.h org_videolan_jvlc_JVLCVarVariable.h org_videolan_jvlc_JVLCCanvas.h
 
 # Include some JAVA stuff
+PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
 JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
-LIBJINCLUDES = -L${JAVA_HOME}/jre/lib/i386 -ljawt
+LIBJINCLUDES = -L${JAVA_HOME}/jre/lib/${PROCESSOR_FAMILY} -ljawt
+
 
 # Binaries
 JCC = gcj -g
