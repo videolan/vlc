@@ -100,8 +100,8 @@ cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURC
 #  Gettext, data and plugin location
 #
 cppflags="${cppflags} -DLOCALEDIR=\"@datadir@/locale\""
-cppflags="${cppflags} -DDATA_PATH=\"${prefix}/share/vlc\""
-cppflags="${cppflags} -DPLUGIN_PATH=\"${prefix}/lib/vlc\""
+cppflags="${cppflags} -DDATA_PATH=\"@datadir@/vlc\""
+cppflags="${cppflags} -DPLUGIN_PATH=\"@libdir@/vlc\""
 
 #
 #  Various additional defines
