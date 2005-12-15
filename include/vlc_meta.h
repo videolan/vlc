@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_meta.h
+ * vlc_meta.h: Stream meta-data
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
  * $Id$
@@ -39,11 +39,11 @@
 #define VLC_META_NOW_PLAYING        N_("Now Playing")
 
 #define VLC_META_CDDB_ARTIST        N_("CDDB Artist")
-#define VLC_META_CDDB_CATEGORY      N_("CDDB Category")  
+#define VLC_META_CDDB_CATEGORY      N_("CDDB Category")
 #define VLC_META_CDDB_DISCID        N_("CDDB Disc ID")
 #define VLC_META_CDDB_EXT_DATA      N_("CDDB Extended Data")
 #define VLC_META_CDDB_GENRE         N_("CDDB Genre")
-#define VLC_META_CDDB_YEAR          N_("CDDB Year")      
+#define VLC_META_CDDB_YEAR          N_("CDDB Year")
 #define VLC_META_CDDB_TITLE         N_("CDDB Title")
 
 #define VLC_META_CDTEXT_ARRANGER    N_("CD-Text Arranger")
@@ -55,11 +55,11 @@
 #define VLC_META_CDTEXT_PERFORMER   N_("CD-Text Performer")
 #define VLC_META_CDTEXT_TITLE       N_("CD-Text Title")
 
-#define VLC_META_ISO_APPLICATION_ID N_("ISO-9660 Application ID") 
-#define VLC_META_ISO_PREPARER       N_("ISO-9660 Preparer") 
-#define VLC_META_ISO_PUBLISHER      N_("ISO-9660 Publisher") 
-#define VLC_META_ISO_VOLUME         N_("ISO-9660 Volume") 
-#define VLC_META_ISO_VOLUMESET      N_("ISO-9660 Volume Set") 
+#define VLC_META_ISO_APPLICATION_ID N_("ISO-9660 Application ID")
+#define VLC_META_ISO_PREPARER       N_("ISO-9660 Preparer")
+#define VLC_META_ISO_PUBLISHER      N_("ISO-9660 Publisher")
+#define VLC_META_ISO_VOLUME         N_("ISO-9660 Volume")
+#define VLC_META_ISO_VOLUMESET      N_("ISO-9660 Volume Set")
 
 #define VLC_META_CODEC_NAME         N_("Codec Name")
 #define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")

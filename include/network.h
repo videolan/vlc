@@ -89,7 +89,7 @@ typedef struct
     char *psz_path;
 
     char *psz_option;
-    
+
     char *psz_buffer; /* to be freed */
 } vlc_url_t;
 
@@ -114,7 +114,7 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
     url->i_port       = 0;
     url->psz_path     = NULL;
     url->psz_option   = NULL;
-    
+
     if( psz_url == NULL )
     {
         url->psz_buffer = NULL;
@@ -235,7 +235,7 @@ static inline int isurlsafe( int c )
 }
 
 /*****************************************************************************
- * vlc_UrlEncode: 
+ * vlc_UrlEncode:
  *****************************************************************************
  * perform URL encoding
  * (you do NOT want to do URL decoding - it is not reversible - do NOT do it)
@@ -305,7 +305,8 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
  *****************************************************************************/
 static inline char *vlc_b64_encode( char *src )
 {
-    static const char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    static const char b64[] =
+           "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     size_t len = strlen( src );
 
     char *ret;
@@ -530,7 +531,7 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, const c
                  psz_addr, vlc_gai_strerror( i ) );
         return VLC_FALSE;
     }
-    
+
     if( res->ai_family == AF_INET )
     {
 #if !defined( SYS_BEOS )
@@ -546,7 +547,7 @@ static inline vlc_bool_t net_AddressIsMulticast( vlc_object_t *p_object, const c
         b_multicast = IN6_IS_ADDR_MULTICAST( &v6->sin6_addr );
     }
 #endif
-    
+
     vlc_freeaddrinfo( res );
     return b_multicast;
 }

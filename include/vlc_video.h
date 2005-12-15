@@ -57,7 +57,7 @@ typedef struct plane_t
  */
 struct picture_t
 {
-    /** 
+    /**
      * The properties of the picture
      */
     video_frame_format_t format;

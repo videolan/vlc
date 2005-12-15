@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_objects.h: vlc_object_t definition.
+ * vlc_objects.h: vlc_object_t definition and manipulation methods
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$

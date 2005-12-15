@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_stream.h
+ * vlc_stream.h: Stream (between access and demux) descriptor and methods
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$

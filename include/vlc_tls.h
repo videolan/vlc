@@ -1,5 +1,5 @@
 /*****************************************************************************
- * tls.c
+ * tls.c: TLS wrapper
  *****************************************************************************
  * Copyright (C) 2004-2005 the VideoLAN team
  * $Id$
@@ -46,10 +46,10 @@ struct tls_server_t
     void *p_sys;
 
     void (*pf_delete) ( tls_server_t * );
-    
+
     int (*pf_add_CA) ( tls_server_t *, const char * );
     int (*pf_add_CRL) ( tls_server_t *, const char * );
-    
+
     tls_session_t * (*pf_session_prepare) ( tls_server_t * );
 };
 

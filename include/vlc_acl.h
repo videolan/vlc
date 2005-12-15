@@ -2,6 +2,7 @@
  * vlc_acl.h: interface to the network Access Control List internal API
  *****************************************************************************
  * Copyright (C) 2005 Rémi Denis-Courmont
+ * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>

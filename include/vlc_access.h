@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_access.h
+ * vlc_access.h: Access descriptor, queries and methods
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$
@@ -104,7 +104,7 @@ struct access_t
         int          i_title;    /* idem, start from 0 (could be menu) */
         int          i_seekpoint;/* idem, start from 0 */
 
-        vlc_bool_t   b_prebuffered; /* Read only for input */ 
+        vlc_bool_t   b_prebuffered; /* Read only for input */
     } info;
     access_sys_t *p_sys;
 };

@@ -63,7 +63,7 @@ struct libvlc_t
     /* Arch-specific variables */
 #if !defined( WIN32 )
     vlc_bool_t             b_daemon;
-#endif 
+#endif
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
     char *                 psz_vlcpath;
@@ -117,7 +117,7 @@ struct vlc_t
         const char *psz_action;
         int i_action;
         int i_key;
-        
+
         /* hotkey accounting information */
         mtime_t i_delta_date;/*< minimum delta time between two key presses */
         mtime_t i_last_date; /*< last date key was pressed */

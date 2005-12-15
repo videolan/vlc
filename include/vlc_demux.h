@@ -1,7 +1,7 @@
 /*****************************************************************************
- * vlc_demux.h
+ * vlc_demux.h: Demuxer descriptor, queries and methods
  *****************************************************************************
- * Copyright (C) 1999-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1999-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>

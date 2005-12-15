@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_es_out.h
+ * vlc_es_out.h: es_out (demuxer output) descriptor, queries and methods
  *****************************************************************************
  * Copyright (C) 1999-2004 the VideoLAN team
  * $Id$

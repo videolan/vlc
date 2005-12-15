@@ -1,5 +1,6 @@
 /*****************************************************************************
  * vout_synchro.h: frame-dropping structures
+ * Only used in libmpeg2 decoder at the moment
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
  * $Id$

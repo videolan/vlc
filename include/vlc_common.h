@@ -250,7 +250,6 @@ typedef struct intf_thread_t intf_thread_t;
 typedef struct intf_sys_t intf_sys_t;
 typedef struct intf_console_t intf_console_t;
 typedef struct intf_msg_t intf_msg_t;
-typedef struct intf_channel_t intf_channel_t;
 typedef struct interaction_t interaction_t;
 typedef struct interaction_dialog_t interaction_dialog_t;
 typedef struct user_widget_t user_widget_t;
@@ -259,16 +258,16 @@ typedef struct user_widget_t user_widget_t;
 typedef struct input_thread_t input_thread_t;
 typedef struct input_thread_sys_t input_thread_sys_t;
 typedef struct input_item_t input_item_t;
-typedef struct input_area_t input_area_t;
-typedef struct input_buffers_t input_buffers_t;
-typedef struct input_socket_t input_socket_t;
+typedef struct access_t access_t;
 typedef struct access_sys_t access_sys_t;
+typedef struct stream_t     stream_t;
+typedef struct stream_sys_t stream_sys_t;
+typedef struct demux_t  demux_t;
 typedef struct demux_sys_t demux_sys_t;
+typedef struct es_out_t     es_out_t;
+typedef struct es_out_id_t  es_out_id_t;
+typedef struct es_out_sys_t es_out_sys_t;
 typedef struct es_descriptor_t es_descriptor_t;
-typedef struct es_sys_t es_sys_t;
-typedef struct pgrm_descriptor_t pgrm_descriptor_t;
-typedef struct pgrm_sys_t pgrm_sys_t;
-typedef struct stream_descriptor_t stream_descriptor_t;
 typedef struct seekpoint_t seekpoint_t;
 typedef struct info_t info_t;
 typedef struct info_category_t info_category_t;
@@ -279,15 +278,6 @@ typedef struct video_format_t video_format_t;
 typedef struct subs_format_t subs_format_t;
 typedef struct es_format_t es_format_t;
 typedef struct video_palette_t video_palette_t;
-
-/* NInput */
-typedef struct stream_sys_t stream_sys_t;
-typedef struct stream_t     stream_t;
-typedef struct es_out_t     es_out_t;
-typedef struct es_out_id_t  es_out_id_t;
-typedef struct es_out_sys_t es_out_sys_t;
-typedef struct demux_t  demux_t;
-typedef struct access_t access_t;
 
 /* Audio */
 typedef struct aout_instance_t aout_instance_t;
@@ -310,6 +300,7 @@ typedef struct picture_t picture_t;
 typedef struct picture_sys_t picture_sys_t;
 typedef struct picture_heap_t picture_heap_t;
 
+/* Subpictures */
 typedef struct spu_t spu_t;
 typedef struct subpicture_t subpicture_t;
 typedef struct subpicture_sys_t subpicture_sys_t;
@@ -341,7 +332,6 @@ typedef struct session_descriptor_t session_descriptor_t;
 typedef struct announce_method_t announce_method_t;
 typedef struct announce_handler_t announce_handler_t;
 typedef struct sap_handler_t sap_handler_t;
-/* typedef struct slp_session_t    slp_session_t; */
 
 /* Decoders */
 typedef struct decoder_t      decoder_t;
@@ -355,17 +345,15 @@ typedef struct encoder_sys_t  encoder_sys_t;
 typedef struct filter_t filter_t;
 typedef struct filter_sys_t filter_sys_t;
 
-/* Misc */
-typedef struct data_packet_t data_packet_t;
-typedef struct data_buffer_t data_buffer_t;
-typedef struct stream_ctrl_t stream_ctrl_t;
-typedef struct pes_packet_t pes_packet_t;
+/* Network */
 typedef struct network_socket_t network_socket_t;
 typedef struct virtual_socket_t v_socket_t;
-typedef struct iso639_lang_t iso639_lang_t;
 typedef struct sockaddr sockaddr;
 typedef struct addrinfo addrinfo;
 typedef struct vlc_acl_t vlc_acl_t;
+
+/* Misc */
+typedef struct iso639_lang_t iso639_lang_t;
 
 /* block */
 typedef struct block_t      block_t;

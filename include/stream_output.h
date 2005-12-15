@@ -209,7 +209,7 @@ struct sout_stream_t
 
     /* Subpicture unit */
     spu_t             *p_spu;
-    
+
     /* add, remove a stream */
     sout_stream_id_t *(*pf_add)( sout_stream_t *, es_format_t * );
     int               (*pf_del)( sout_stream_t *, sout_stream_id_t * );
