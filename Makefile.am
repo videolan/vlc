@@ -69,6 +69,7 @@ dist_pkginclude_HEADERS = \
 	include/vlc/input.h \
 	include/vlc/intf.h \
 	include/vlc/control.h \
+	include/vlc/control_structures.h \ 
 	$(NULL)
 
 noinst_HEADERS = $(HEADERS_include)
