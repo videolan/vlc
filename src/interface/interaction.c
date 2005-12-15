@@ -289,7 +289,7 @@ void __intf_UserFatal( vlc_object_t *p_this,
     intf_Interact( p_this, p_new );
 }
 
-/** Helper function to make a login/password box
+/** Helper function to ask a yes-no question
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_description  A description
@@ -358,6 +358,7 @@ int __intf_UserProgress( vlc_object_t *p_this,
 
     return p_new->i_id;
 }
+
 /** Update a progress bar
  *  \param p_this           Parent vlc_object
  *  \param i_id             Identifier of the dialog
@@ -392,9 +393,7 @@ void __intf_UserProgressUpdate( vlc_object_t *p_this, int i_id,
     vlc_mutex_unlock( &p_interaction->object_lock) ;
 }
 
-
-
-/** Helper function to ask a yes-no question
+/** Helper function to make a login/password box
  *  \param p_this           Parent vlc_object
  *  \param psz_title        Title for the dialog
  *  \param psz_description  A description
