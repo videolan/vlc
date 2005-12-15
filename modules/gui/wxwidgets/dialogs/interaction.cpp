@@ -151,6 +151,7 @@ void InteractionDialog::Render()
                 widget.val = &p_widget->val;
                 widget.i_type = WIDGET_INPUT_TEXT;
                 input_widgets.push_back( widget );
+                break;
             case WIDGET_PROGRESS:
                 label = new wxStaticText(widgets_panel, -1,
                                     wxU( p_widget->psz_text ) );
