@@ -77,8 +77,8 @@ static void Close( vlc_object_t * );
     "Allows you to modify the default caching value for UDP streams. This " \
     "value should be set in millisecond units." )
 
-#define TTL_TEXT N_("Time-To-Live")
-#define TTL_LONGTEXT N_("Allows you to define the time to live of the " \
+#define TTL_TEXT N_("Time-To-Live (TTL)")
+#define TTL_LONGTEXT N_("Allows you to define the Time-To-Live of the " \
                         "outgoing stream.")
 
 #define GROUP_TEXT N_("Group packets")

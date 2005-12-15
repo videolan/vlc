@@ -77,9 +77,9 @@
 #define PORT_VIDEO_LONGTEXT N_( \
     "Allows you to specify the default video port used for the RTP streaming." )
 
-#define TTL_TEXT N_("Time-To-Live")
+#define TTL_TEXT N_("Time-To-Live (TTL)")
 #define TTL_LONGTEXT N_( \
-    "Allows you to specify the time to live for the output stream." )
+    "Allows you to specify the Time-To-Live for the output stream." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
