@@ -1,5 +1,5 @@
---- libmpcdec/include/Makefile.am	2005-06-18 23:23:33.000000000 +0100
-+++ libmpcdec/include/Makefile.am	2005-11-02 19:51:19.000000000 +0000
+--- mpcdec/include/Makefile.am	2005-06-18 23:23:33.000000000 +0100
++++ mpcdec/include/Makefile.am	2005-11-02 19:51:19.000000000 +0000
 @@ -4,6 +4,7 @@
  
  nobase_include_HEADERS = \

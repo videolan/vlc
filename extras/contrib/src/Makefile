@@ -117,7 +117,7 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
 	.dvdcss .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-	.glib .libidl .gecko .libmpcdec .expat .clinkcc .aclocal
+	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 else
 
@@ -144,7 +144,7 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
-	.png .gpg-error .gcrypt .gnutls .libmpcdec \
+	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac .portaudio\
 	.dx_headers .dshow_headers .aclocal .gecko-win32
 #	.SDL_image  .daap .cddb .cdio .vcdimager .dts 
@@ -160,7 +160,7 @@ else
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .dts .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame\
-	.png .gpg-error .gcrypt .gnutls .libmpcdec\
+	.png .gpg-error .gcrypt .gnutls .mpcdec\
 	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
 	.aclocal 
 #	.SDL_image  .daap .cddb .cdio .vcdimager 
@@ -1673,23 +1673,26 @@ DISTCLEAN_PKG += SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 libmpcdec-$(MUSE_VERSION).tar.bz2:
 	$(WGET) $(MUSE_URL)
 
-libmpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
+mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
 	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/libmpcdec.patch
 ifdef HAVE_WIN32
 	(cd $@; ./autogen.sh)
 endif
 
-.libmpcdec: libmpcdec
+.mpcdec: mpcdec
 ifdef HAVE_WIN32 
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS=-D_PTRDIFF_T=mpc_int32_t && make && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 endif
+ifdef HAVE_DARWIN_OS
+	$(INSTALL_NAME)
+endif
 	touch $@
 
-CLEAN_FILE += .libmpcdec
-CLEAN_PKG += libmpcdec
+CLEAN_FILE += .mpcdec
+CLEAN_PKG += mpcdec
 DISTCLEAN_PKG += libmpcdec-$(MUSE_VERSION).tar.bz2
 
 # ***************************************************************************
