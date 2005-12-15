@@ -41,7 +41,7 @@ enum
      NoShow_Event
 };
 
-BEGIN_EVENT_TABLE( InteractionDialog, wxFrame )
+BEGIN_EVENT_TABLE( InteractionDialog, wxDialog)
     EVT_CLOSE( InteractionDialog::OnClose )
     EVT_BUTTON( wxID_OK, InteractionDialog::OnOkYes )
     EVT_BUTTON( wxID_YES, InteractionDialog::OnOkYes )
@@ -57,7 +57,7 @@ END_EVENT_TABLE()
 InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
                                       wxWindow *p_parent,
                                       interaction_dialog_t *_p_dialog )
-  : wxFrame( p_parent, -1, wxU( _p_dialog->psz_title ) )
+  : wxDialog( p_parent, -1, wxU( _p_dialog->psz_title ) )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -182,9 +182,12 @@ void InteractionDialog::Render()
                                      wxID_NO, wxU( _("No") ) );
         wxButton *cancel = new wxButton( buttons_panel,
                                          wxID_CANCEL, wxU( _("Cancel") ) );
-        buttons_sizer->Add( yes, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
-        buttons_sizer->Add( no, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
-        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_CENTER, 5 );
+        buttons_sizer->Add( yes, 0, wxEXPAND | wxRIGHT| wxLEFT |
+                                    wxALIGN_CENTER, 5 );
+        buttons_sizer->Add( no, 0, wxEXPAND | wxRIGHT| wxLEFT |
+                                   wxALIGN_CENTER, 5 );
+        buttons_sizer->Add( cancel, 0, wxEXPAND | wxRIGHT| wxLEFT |
+                                       wxALIGN_CENTER, 5 );
     }
     else if( p_dialog->i_flags & DIALOG_CLEAR_NOSHOW )
     {
@@ -243,7 +246,8 @@ void InteractionDialog::OnClear( wxCommandEvent& event )
     }
     widgets_panel->DestroyChildren();
     /* FIXME: Needed for the spacer */
-    buttons_sizer->Remove( 1 );buttons_sizer->Remove( 2 );buttons_sizer->Remove( 3 );
+    buttons_sizer->Remove( 1 );buttons_sizer->Remove( 2 );
+    buttons_sizer->Remove( 3 );
     buttons_panel->DestroyChildren();
     input_widgets.clear();
     vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
@@ -262,7 +266,7 @@ void InteractionDialog::Finish( int i_ret )
     while ( it < input_widgets.end() )
     {
         if( (*it).i_type == WIDGET_INPUT_TEXT )
-            (*it).val->psz_string = strdup( (*it).control->GetValue().mb_str() );
+            (*it).val->psz_string = strdup( (*it).control->GetValue().mb_str());
         it++;
     }
     Hide();

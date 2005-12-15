@@ -41,7 +41,7 @@ namespace wxvlc
         int i_type;
     };
 
-    class InteractionDialog: public wxFrame
+    class InteractionDialog: public wxDialog
     {
     public:
         /* Constructor */
