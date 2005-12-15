@@ -158,15 +158,15 @@ VLC_EXPORT( int,__intf_Interact,( vlc_object_t *,interaction_dialog_t * ) );
 
 #define intf_UserFatal( a, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),c,d, ## e )
 VLC_EXPORT( void, __intf_UserFatal,( vlc_object_t*, const char*, const char*, ...) );
-#define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( a,b,c,d,e)
+#define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
-#define intf_UserYesNo( a, b, c ) __intf_UserYesNo( a,b,c )
+#define intf_UserYesNo( a, b, c ) __intf_UserYesNo( VLC_OBJECT(a),b,c )
 VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*) );
 
-#define intf_UserProgress( a, b, c, d ) __intf_UserProgress( a,b,c, d )
+#define intf_UserProgress( a, b, c, d ) __intf_UserProgress( VLC_OBJECT(a),b,c, d )
 VLC_EXPORT( int, __intf_UserProgress,( vlc_object_t*, const char*, const char*, float) );
 
-#define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( a,b,c, d )
+#define intf_UserProgressUpdate( a, b, c, d ) __intf_UserProgressUpdate( VLC_OBJCT(a),b,c, d )
 VLC_EXPORT( void, __intf_UserProgressUpdate,( vlc_object_t*, int, const char*, float) );
 
 #define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
