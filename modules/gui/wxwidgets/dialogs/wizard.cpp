@@ -1,10 +1,10 @@
 /*****************************************************************************
  * wizard.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004 the VideoLAN team
+ * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1541,7 +1541,6 @@ void WizardDialog::Run()
 {
     if( RunWizard(page1) )
     {
-        int i_size;
         char *psz_opt;
 
         if( i_action == ACTION_TRANSCODE )
@@ -1588,9 +1587,7 @@ void WizardDialog::Run()
             else
                 psz_transcode = "";
 
-            i_size = 73 + strlen(mux) + strlen(address) + strlen(psz_transcode);
-            psz_opt = (char *)malloc( i_size * sizeof(char) );
-            snprintf( psz_opt, i_size, ":sout=#%sstandard{mux=%s,url=%s,"
+            asprintf( &psz_opt, ":sout=#%sstandard{mux=%s,url=%s,"
                       "access=file}", psz_transcode, mux, address );
 
             if( *psz_transcode )
@@ -1598,37 +1595,30 @@ void WizardDialog::Run()
         }
         else
         {
+            char *psz_sap_option = NULL;
+            bool v6;
+
             msg_Dbg( p_intf, "Starting stream of %s to %s using %s, encap %s",
-                               mrl, address, method, mux);
+                               mrl, address, method, mux );
             if( b_sap )
             {
-                char *psz_sap_option = NULL;
                 if( psz_sap_name )
                 {
-                    psz_sap_option = (char *) malloc( strlen( psz_sap_name )
-                                               + 15 );
-                    snprintf( psz_sap_option,strlen( psz_sap_name ) + 15,
-                             "sap,name=\"%s\"",psz_sap_name );
+                    asprintf( &psz_sap_option,
+                              ",sap,name=\"%s\"", psz_sap_name );
                 }
                 else
-                    psz_sap_option = strdup( "sap" );
+                    psz_sap_option = strdup( ",sap" );
 
-                i_size = 40 + strlen(mux) + strlen(address) +
-                              strlen( psz_sap_option);
-                psz_opt = (char *)malloc( i_size * sizeof(char) );
-                snprintf( psz_opt, i_size,
-                          ":sout=#standard{mux=%s,url=%s,access=%s,%s}",
-                          mux, address,method, psz_sap_option);
-                if( psz_sap_option ) free( psz_sap_option );
             }
-            else
-            {
-                i_size = 40 + strlen(mux) + strlen(address);
-                psz_opt = (char *)malloc( i_size * sizeof(char) );
-                snprintf( psz_opt, i_size,
-                          ":sout=#standard{mux=%s,url=%s,access=%s}",
-                          mux, address,method);
-            }
+
+            /* Add brackets automatically for IPv6 if they are missing */
+            v6 = ( address[0] != '[' ) && ( strchr( address, ':' ) != NULL );
+            asprintf( &psz_opt,
+                      ":sout=#standard{mux=%s,url=%s%s%s,access=%s%s}",
+                      mux, v6 ? "[" : "", address, v6 ? "]" : "", method,
+                      psz_sap_option ?: "" );
+            if( psz_sap_option ) free( psz_sap_option );
         }
 
         playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
