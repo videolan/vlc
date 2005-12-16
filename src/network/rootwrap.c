@@ -33,6 +33,7 @@
 
 #include <stdlib.h> /* exit() */
 #include <stdio.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -229,7 +230,7 @@ static void rootprocess (int fd)
 
             setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof (val));
             if (ss.ss_family == AF_INET6)
-                setsockopt (sock, SOL_IPV6, IPV6_V6ONLY, &val, sizeof (val));
+                setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof (val));
 
             if (bind (sock, (struct sockaddr *)&ss, len) == 0)
             {
