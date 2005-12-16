@@ -69,7 +69,7 @@ dist_pkginclude_HEADERS = \
 	include/vlc/input.h \
 	include/vlc/intf.h \
 	include/vlc/control.h \
-	include/vlc/control_structures.h \ 
+	include/vlc/control_structures.h \
 	$(NULL)
 
 noinst_HEADERS = $(HEADERS_include)
@@ -446,6 +446,7 @@ SOURCES_libvlc_common = \
 	src/network/tcp.c \
 	src/network/udp.c \
 	src/network/httpd.c \
+	src/network/rootwrap.c \
 	src/network/tls.c \
 	src/misc/charset.c \
 	src/misc/md5.c \

@@ -45,6 +45,8 @@
 static void SigHandler  ( int i_signal );
 #endif
 
+extern void rootwrap( void );
+
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
@@ -73,6 +75,8 @@ int main( int i_argc, char *ppsz_argv[] )
     }
 #endif
 
+    rootwrap ();
+    
     /* Create a libvlc structure */
     i_ret = VLC_Create();
     if( i_ret < 0 )

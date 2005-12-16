@@ -50,6 +50,8 @@ static int SocksHandshakeTCP( vlc_object_t *,
                               const char *psz_host, int i_port );
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
+extern int rootwrap_bind (int family, int socktype, int protocol,
+                          const struct sockaddr *addr, size_t alen);
 
 /*****************************************************************************
  * __net_ConnectTCP:
@@ -302,13 +304,30 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             msg_Warn( p_this, "cannot bind socket (%i)", WSAGetLastError( ) );
-#else
-            msg_Warn( p_this, "cannot bind socket (%s)", strerror( errno ) );
-#endif
             net_Close( fd );
             continue;
+#else
+            int saved_errno;
+
+            saved_errno = errno;
+            net_Close( fd );
+            fd = rootwrap_bind( ptr->ai_family, ptr->ai_socktype,
+                                ptr->ai_protocol, ptr->ai_addr,
+                                ptr->ai_addrlen );
+            if( fd != -1 )
+            {
+                msg_Dbg( p_this, "got socket %d from rootwrap", fd );
+            }
+            else
+            {
+                msg_Warn( p_this, "cannot bind socket (%s)",
+                          strerror( saved_errno ) );
+                continue;
+            }
+#endif
         }
 
+        msg_Dbg( p_this, "using socket %d from rootwrap", fd );
         /* Listen */
         if( listen( fd, 100 ) == -1 )
         {
