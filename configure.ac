@@ -3121,12 +3121,11 @@ dnl
 AC_ARG_ENABLE(dirac,
 [  --enable-dirac          experimental dirac codec (default disabled)])
 if test "${enable_dirac}" = "yes"; then
-  AC_CHECK_HEADERS(libdirac_decoder/dirac_parser.h, [
-    AC_CHECK_LIB(dirac_decoder, dirac_decoder_init, [
+  PKG_CHECK_MODULES(DIRAC,dirac, [
       VLC_ADD_PLUGINS([dirac])
-      VLC_ADD_LDFLAGS([dirac],[-ldirac_decoder -ldirac_encoder -lstdc++]) ],[
-      AC_MSG_ERROR([libdirac doesn't appear to be installed on you system.])],
-      [-lstdc++])
+      VLC_ADD_CFLAGS([dirac],[$DIRAC_CFLAGS])
+      VLC_ADD_LDFLAGS([dirac],[$DIRAC_LIBS -lstdc++]) ],[
+      AC_MSG_ERROR([libdirac doesn't appear to be installed on you system.])
   ])
 fi
 
