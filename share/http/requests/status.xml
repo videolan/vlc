@@ -76,7 +76,9 @@
 
   <!-- misc commands -->
   <vlc id="if" param1="command value 'fullscreen' strcmp 0 =" />
-    <vlc id="rpn" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get ! 'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_set" />
+    <vlc id="if" param1="'VLC_OBJECT_VOUT' vlc_obj_exists" />
+      <vlc id="rpn" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get ! 'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_set" />
+    <vlc id="end" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'volume' strcmp 0 =" />
     <vlc id="rpn" param1="val value vlc_volume_set" />
@@ -89,7 +91,7 @@
   <time><vlc id="value" param1="stream_time" /></time>
   <state><vlc id="value" param1="stream_state" /></state>
   <position><vlc id="value" param1="stream_position" /></position>
-  <fullscreen><vlc id="value" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get" /></fullscreen>
+  <fullscreen><vlc id="if" param1="'VLC_OBJECT_VOUT' vlc_obj_exists" /><vlc id="value" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get" /><vlc id="end" /></fullscreen>
   <loop><vlc id="value" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get"/></loop>
   <repeat><vlc id="value" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></repeat>
 </root>
