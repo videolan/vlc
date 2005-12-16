@@ -213,7 +213,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* We read the Table Of Content information */
-    if( !p_sys->b_single_track )
+    if( 1 )
     {
         i_ret = GetTracks( p_access, p_sys->b_separate_items,
                            p_playlist, p_item );
