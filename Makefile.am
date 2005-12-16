@@ -33,7 +33,7 @@ EXTRA_DIST = \
 	src/misc/modules_builtin.h.in \
 	$(NULL)
 
-BUILT_SOURCES_distclean = vlc-config
+BUILT_SOURCES_distclean = vlc-config compile
 BUILT_SOURCES_clean = \
 	stamp-api \
 	src/misc/modules_builtin.h \
