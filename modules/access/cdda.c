@@ -100,6 +100,10 @@ static int Open( vlc_object_t *p_this )
     char *psz_name;
     int  i;
 
+    vlc_bool_t b_separate_requested;
+    vlc_bool_t b_play;
+    input_thread_t *p_input;
+
     if( !p_access->psz_path || !*p_access->psz_path )
     {
         /* Only when selected */
@@ -139,36 +143,28 @@ static int Open( vlc_object_t *p_this )
     p_sys->vcddev = vcddev;
     p_sys->b_header = VLC_FALSE;
 
+    b_separate_requested = var_CreateGetBool( p_access, "cdda-separate-tracks" );
+
+    /* We only do separate items if the whole disc is requested - Dirty hack we access
+     * some private data ! */
+    p_input = (input_thread_t *)( p_access->p_parent );
+    if( b_separate_requested && p_input->input.i_title_start == -1 )
+    {
+        p_sys->b_separate_items = VLC_TRUE;
+    }
+
+    if( p_sys->b_separate_items )
+    {
+        /* Let's check if we need to play */
+    }
+
     /* We read the Table Of Content information */
-    p_sys->i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
-                                          p_sys->vcddev, &p_sys->p_sectors );
-    if( p_sys->i_titles < 0 )
+    i_ret = GetTracks( p_access, p_sys->b_separate_items );
+    if( i_ret < 0 )
     {
-        msg_Err( p_access, "unable to count tracks" );
-        goto error;
-    }
-    else if( p_sys->i_titles <= 0 )
-    {
-        msg_Err( p_access, "no audio tracks found" );
         goto error;
     }
 
-    /* Build title table */
-    for( i = 0; i < p_sys->i_titles; i++ )
-    {
-        input_title_t *t = p_sys->title[i] = vlc_input_title_New();
-
-        msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_sectors[i] );
-        msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_sectors[i+1] );
-
-        asprintf( &t->psz_name, _("Track %i"), i + 1 );
-        t->i_size = ( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
-                    (int64_t)CDDA_DATA_SIZE;
-
-        t->i_length = I64C(1000000) * t->i_size / 44100 / 4;
-    }
-
-    p_sys->i_sector = p_sys->p_sectors[0];
     p_access->info.i_size = p_sys->title[0]->i_size;
 
     /* Build a WAV header for the output data */
@@ -397,3 +393,48 @@ static int Control( access_t *p_access, int i_query, va_list args )
     }
     return VLC_SUCCESS;
 }
+
+
+
+
+static int GetTracks( access_t *p_access, vlc_bool_t b_separate )
+{
+    p_sys->i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
+                                          p_sys->vcddev, &p_sys->p_sectors );
+    if( p_sys->i_titles < 0 )
+    {
+        msg_Err( p_access, "unable to count tracks" );
+        return VLC_EGENERIC;;
+    }
+    else if( p_sys->i_titles <= 0 )
+    {
+        msg_Err( p_access, "no audio tracks found" );
+        return VLC_EGENERIC;
+    }
+
+    /* Build title table */
+    for( i = 0; i < p_sys->i_titles; i++ )
+    {
+        if( !b_separate )
+        {
+            input_title_t *t = p_sys->title[i] = vlc_input_title_New();
+
+            msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_sectors[i] );
+            msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_sectors[i+1] );
+
+            asprintf( &t->psz_name, _("Track %i"), i + 1 );
+            t->i_size = ( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
+                        (int64_t)CDDA_DATA_SIZE;
+
+            t->i_length = I64C(1000000) * t->i_size / 44100 / 4;
+        }
+        else
+        {
+            /* Create playlist items */
+        }
+    }
+
+    p_sys->i_sector = p_sys->p_sectors[0];
+
+   return VLC_SUCCESS;
+} 

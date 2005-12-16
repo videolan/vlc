@@ -160,6 +160,8 @@ static int Open( vlc_object_t *p_this )
 
     b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
 
+    fprintf( stderr, "---%s\n", p_access->psz_path );
+
     if( !b_stdin )
     {
         if( psz_name[0] == '~' && psz_name[1] == '/' )
