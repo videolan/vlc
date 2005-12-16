@@ -750,6 +750,21 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             if( b_need_release && p_object != NULL )
                 vlc_object_release( p_object );
         }
+        else if( !strcmp( s, "vlc_object_exists" ) )
+        {
+            char *psz_object = E_(SSPop)( st );
+            vlc_bool_t b_need_release;
+
+            vlc_object_t *p_object = GetVLCObject( p_intf, psz_object,
+                                                   &b_need_release );
+            if( b_need_release && p_object != NULL )
+                vlc_object_release( p_object );
+
+            if( p_object != NULL )
+                E_(SSPush)( st, "1" );
+            else
+                E_(SSPush)( st, "0" );
+        }
         else if( !strcmp( s, "vlc_config_set" ) )
         {
             char *psz_variable = E_(SSPop)( st );
