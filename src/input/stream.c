@@ -27,6 +27,8 @@
 
 #include "input_internal.h"
 
+#undef STREAM_DEBUG
+
 /* TODO:
  *  - tune the 2 methods
  *  - compute cost for seek
@@ -623,7 +625,7 @@ static void AStreamPrebufferBlock( stream_t *s )
             b = b->p_next;
         }
 
-        if( p_access->info.b_prebuffered ) 
+        if( p_access->info.b_prebuffered )
         {
             /* Access has already prebufferred - update stats and exit */
             p_sys->stat.i_bytes = p_sys->block.i_size;
@@ -997,7 +999,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
             return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
     }
 
-#if 0
+#ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamReadStream: %d pos="I64Fd" tk=%d start="I64Fd
              " offset=%d end="I64Fd,
              i_read, p_sys->i_pos, p_sys->stream.i_tk,
@@ -1052,7 +1054,7 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
 
     if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
-#if 0
+#ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamPeekStream: %d pos="I64Fd" tk=%d "
              "start="I64Fd" offset=%d end="I64Fd,
              i_read, p_sys->i_pos, p_sys->stream.i_tk,
@@ -1115,7 +1117,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     int i_new;
     int i;
 
-#if 0
+#ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamSeekStream: to "I64Fd" pos="I64Fd
              "tk=%d start="I64Fd" offset=%d end="I64Fd,
              i_pos, p_sys->i_pos, p_sys->stream.i_tk,
@@ -1129,9 +1131,28 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     if( i_pos >= p_sys->stream.tk[p_sys->stream.i_tk].i_start &&
         i_pos < p_sys->stream.tk[p_sys->stream.i_tk].i_end )
     {
-        //msg_Dbg( s, "AStreamSeekStream: current track" );
+        stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
+#ifdef STREAM_DEBUG
+        msg_Dbg( s, "AStreamSeekStream: current track" );
+#endif
         p_sys->i_pos = i_pos;
-        p_sys->stream.i_offset = i_pos - p_sys->stream.tk[p_sys->stream.i_tk].i_start;
+        p_sys->stream.i_offset = i_pos - tk->i_start;
+
+        /* If there is not enough data left in the track, refill  */
+        /* \todo How to get a correct value for
+         *    - refilling threshold
+         *    - how much to refill
+         */
+        if( (tk->i_end - tk->i_start ) - p_sys->stream.i_offset <
+                                             p_sys->stream.i_read_size )
+        {
+            if( p_sys->stream.i_used < STREAM_READ_ATONCE / 2  )
+            {
+                p_sys->stream.i_used = STREAM_READ_ATONCE / 2 ;
+                if( AStreamRefillStream( s ) )
+                    return VLC_EGENERIC;
+            }
+        }
         return VLC_SUCCESS;
     }
 
@@ -1153,10 +1174,11 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
 
         if( i_pos >= tk->i_start && i_pos <= tk->i_end )
         {
-#if 0
+#ifdef STREAM_DEBUG
             msg_Dbg( s, "AStreamSeekStream: reusing %d start="I64Fd
                      " end="I64Fd, i, tk->i_start, tk->i_end );
 #endif
+
             /* Seek at the end of the buffer */
             if( ASeek( s, tk->i_end ) ) return VLC_EGENERIC;
 
@@ -1240,7 +1262,10 @@ static int AStreamRefillStream( stream_t *s )
 
     if( i_toread <= 0 ) return VLC_EGENERIC; /* EOF */
 
-    /* msg_Dbg( s, "AStreamRefillStream: toread=%d", i_toread ); */
+#ifdef STREAM_DEBUG
+    msg_Dbg( s, "AStreamRefillStream: used=%d toread=%d",
+                 p_sys->stream.i_used, i_toread );
+#endif
 
     i_start = mdate();
     while( i_toread > 0 )
