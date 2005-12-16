@@ -3,10 +3,10 @@ au Syntax c call VlcSyntax()
 au Syntax cpp call VlcSyntax()
 
 function VlcSyntax()
-  " Look for a VideoLAN copyright in the first 10 lines
+  " Look for a VideoLAN copyright in the first 15 lines
   let line=1
   let vlc=0
-  while(line<=10)
+  while(line<=15)
     if matchend(getline(line), "Copyright.*VideoLAN") > -1
       let vlc=1
       break
@@ -113,5 +113,8 @@ function VlcSyntax()
   " don't put trailing spaces! DON'T USE TABS!!!
   syn match cSpaceError display excludenl "\s\+$"
   syn match cSpaceError display "\t"
+
+  " Todo
+  syn keyword cTodo	contained TODO FIXME XXX \todo \bug
 endfun
 
