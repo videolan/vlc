@@ -67,7 +67,7 @@ static uid_t parse_user (const char *name)
 
     pw = getpwnam (name);
     if (pw == NULL)
-        return 0;
+        return (uid_t)(-1);
 
     return pw->pw_uid;
 }
@@ -91,7 +91,7 @@ static uid_t guess_user (void)
     if (name != NULL)
     {
         uid = parse_user (name);
-        if (uid != 0)
+        if (uid != (uid_t)(-1))
             return uid;
     }
 
@@ -100,18 +100,18 @@ static uid_t guess_user (void)
     if (name != NULL)
     {
         uid = parse_user (name);
-        if (uid != 0)
+        if (uid != (uid_t)(-1))
             return uid;
     }
 
     /* Try vlc */
     uid = parse_user ("vlc");
-    if (uid != 0)
+    if (uid != (uid_t)(-1))
         return uid;
 
     /* Try nobody */
     uid = parse_user ("nobody");
-    if (uid != 0)
+    if (uid != (uid_t)(-1))
         return uid;
 
     return 65534;
@@ -286,6 +286,17 @@ void rootwrap (void)
 
     g = guess_gid (u);
     fprintf (stderr, ", using GID %u\n", (unsigned)g);
+
+    if (u == 0)
+    {
+        fputs ("***************************************\n"
+               "* Running VLC as root is discouraged. *\n"
+               "***************************************\n"
+               "\n"
+               " It is potentially dangerous, "
+                "and might not even work properly.", stderr);
+        return;
+    }
 
     /* GID */
     setgid (g);
