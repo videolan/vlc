@@ -1,8 +1,8 @@
 /*****************************************************************************
- * info.h : CD digital audio input information routine headers
+ * access.h : access headers for CD digital audio input module
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
- * $Id: info.h 8606 2004-08-31 18:32:54Z rocky $
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *
@@ -21,26 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*
- Fills out playlist information.
- */
-int      CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
-                            vlc_bool_t b_single_track );
+/*****************************************************************************
+ * Open: open cdda device or image file and initialize structures 
+ * for subsequent operations.
+ *****************************************************************************/
+int  CDDAOpen     ( vlc_object_t * );
 
-/*
- Sets CDDA Meta Information. In the Control routine,
- we handle Meta Information requests and basically copy what we've
- saved here.
- */
-void     CDDAMetaInfo( access_t *p_access, track_t i_track );
-
-/*
- Saves Meta Information about the CD-DA.
-
- Saves information that CDDAMetaInfo uses. Should be called before
- CDDAMetaInfo is called.
- */
-void     CDDAMetaInfoInit( access_t *p_access );
-
-char *CDDAFormatTitle( const access_t *p_access, track_t i_track );
-
+/*****************************************************************************
+ * CDDAClose: closes cdda and frees any resources associded with it.
+ *****************************************************************************/
+void CDDAClose    ( vlc_object_t * );
