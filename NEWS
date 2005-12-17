@@ -1,5 +1,56 @@
 $Id$
 
+Changes between 0.8.4a and 0.8.5:
+---------------------------------
+
+Core support:
+
+Input:
+ * Initial support for RTSP-over-HTTP (to allow NAT traversal)
+ * Linux DV (Digital Video - Firewire) input
+ * Improvements to the Audio CD input
+ * Support for more DVB (satellite) encryption modules
+ * Improved subtitles encoding support
+
+Decoders:
+ * Cook (Real audio) support
+
+Playlist / Services discovery :
+ * Podcast support
+
+Video output 
+ * New video filters : magnify, gradient and edge detection
+
+Interfaces:
+ * System to inform the user and request information 
+    - HTTP authentication
+    - Fatal errors
+    - ...
+ * wxWidgets
+    - VLM (VideoLAN Media Manager) control panel
+ * Skins2 
+    - Support for Winamp 2 skins
+    - Improved playlist handling
+    - Support for popup menus, animated bitmaps, equalizer, ...
+ * OS X
+    - Overlay control panel
+    - 
+ * HTTP
+    - Much improved default interface pages
+
+OS X Port:
+ * 
+
+*Nix port:
+ * Ability to log to syslog
+ * Root wrapper to avoid running VLC as root
+
+Developers:
+ * Java bindings
+
+
+
+
 Changes between 0.8.4 and 0.8.4a:
 ---------------------------------
 
