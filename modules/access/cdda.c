@@ -266,11 +266,15 @@ static int Open( vlc_object_t *p_this )
                           p_playlist->status.i_view, p_playlist->status.p_item,
                           NULL );
     }
+
+    if( p_playlist ) vlc_object_release( p_playlist );
+
     return VLC_SUCCESS;
 
 error:
     ioctl_Close( VLC_OBJECT(p_access), p_sys->vcddev );
     free( p_sys );
+    if( p_playlist ) vlc_object_release( p_playlist );
     return VLC_EGENERIC;
 }
 
