@@ -66,6 +66,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
 
+#if 0
     /* Create the subtitles file textctrl */
     wxBoxSizer *file_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticBox *file_box = new wxStaticBox( panel, -1,
@@ -83,6 +84,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     file_sizer->Add( browse_button, 0, wxALL, 5 );
     file_sizer_sizer->Add( file_sizer, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( file_sizer, 0, wxEXPAND | wxALL, 5 );
+#endif
 
     /* Subtitles encoding */
     encoding_combo = NULL;
@@ -281,11 +283,13 @@ void SubsFileDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 
 void SubsFileDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, wxU(_("Open file")),
+#if 0
+        wxFileDialog dialog( this, wxU(_("Open file")),
                          wxT(""), wxT(""), wxT("*"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {
         file_combo->SetValue( dialog.GetPath() );
     }
+#endif
 }

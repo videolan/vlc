@@ -2,7 +2,7 @@
  * open.hpp: Headers for the Open dialog
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12670 2005-09-25 11:16:31Z zorglub $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -75,6 +75,8 @@ private:
     /* Event handlers for the file page */
     void OnFilePanelChange( wxCommandEvent& event );
     void OnFileBrowse( wxCommandEvent& event );
+    void OnSubFileBrowse( wxCommandEvent& event );
+    void OnSubFileChange( wxCommandEvent& event );
 
     /* Event handlers for the disc page */
     void OnDiscPanelChangeSpin( wxSpinEvent& event );
@@ -118,6 +120,7 @@ private:
 
     /* Controls for the file panel */
     wxComboBox *file_combo;
+    wxComboBox *subfile_combo;
     wxFileDialog *file_dialog;
 
     /* Controls for the disc panel */
@@ -152,6 +155,7 @@ private:
 
     /* Controls for the subtitles file */
     wxButton *subsfile_button;
+    wxButton *subbrowse_button;
     wxCheckBox *subsfile_checkbox;
     SubsFileDialog *subsfile_dialog;
     wxArrayString subsfile_mrl;
