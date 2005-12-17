@@ -310,8 +310,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             p_sys->i_packet_used += i_copy;
             p_access->info.i_pos += i_copy;
         }
-        else if( p_sys->i_packet_length > 0 &&
-                 (int)p_sys->i_packet_used < p_sys->asfh.i_min_data_packet_size )
+        else if( (p_sys->i_packet_length > 0) &&
+                 ((int)p_sys->i_packet_used < p_sys->asfh.i_min_data_packet_size) )
         {
             i_copy = __MIN( p_sys->asfh.i_min_data_packet_size - p_sys->i_packet_used,
                             i_len - i_data );
@@ -327,7 +327,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             chunk_t ck;
             if( GetPacket( p_access, &ck ) )
             {
-                if( ck.i_type == 0x4524 && ck.i_sequence != 0 && p_sys->b_broadcast )
+                if( (ck.i_type == 0x4524) && (ck.i_sequence != 0) &&
+                    (p_sys->b_broadcast) )
                 {
                     char *psz_location = NULL;
 
@@ -389,7 +390,8 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     if( ( p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
                                             p_sys->url.i_port ) ) < 0 )
     {
-        msg_Err( p_access, "cannot connect to %s:%d", p_sys->url.psz_host, p_sys->url.i_port );
+        msg_Err( p_access, "cannot connect to %s:%d", p_sys->url.psz_host,
+                 p_sys->url.i_port );
         goto error;
     }
 
@@ -512,7 +514,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     {
         chunk_t ck;
         if( GetPacket( p_access, &ck ) ||
-            ck.i_type != 0x4824 )
+            (ck.i_type != 0x4824) )
         {
             break;
         }
@@ -550,7 +552,6 @@ static int Describe( access_t  *p_access, char **ppsz_location )
                            var_CreateGetInteger( p_access, "mms-all" ),
                            var_CreateGetInteger( p_access, "audio" ),
                            var_CreateGetInteger( p_access, "video" ) );
-
     return VLC_SUCCESS;
 
 error:
@@ -575,7 +576,7 @@ static int Start( access_t *p_access, off_t i_pos )
     msg_Dbg( p_access, "starting stream" );
 
     if( ( p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
-                                            p_sys->url.i_port ) ) < 0 )
+                                      p_sys->url.i_port ) ) < 0 )
     {
         /* should not occur */
         msg_Err( p_access, "cannot connect to the server" );
@@ -707,22 +708,46 @@ static void Stop( access_t *p_access )
 static int GetPacket( access_t * p_access, chunk_t *p_ck )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    int restsize;
 
     /* chunk_t */
     memset( p_ck, 0, sizeof( chunk_t ) );
 
     /* Read the chunk header */
-    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 12, VLC_TRUE ) < 12 )
+    /* Some headers are short, like 0x4324. Reading 12 bytes will cause us
+     * to lose synchronization with the stream. Just read to the length
+     * (4 bytes), decode and then read up to 8 additional bytes to get the
+     * entire header.
+     */
+    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 4, VLC_TRUE ) < 4 )
     {
-        /* msg_Err( p_access, "cannot read data" ); */
+       msg_Err( p_access, "cannot read data" );
+       return VLC_EGENERIC;
+    }
+    p_ck->i_type = GetWLE( p_sys->buffer);
+    p_ck->i_size = GetWLE( p_sys->buffer + 2);
+
+    restsize = p_ck->i_size;
+    if( restsize > 8 )
+        restsize = 8;
+
+    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer + 4, restsize, VLC_TRUE ) < restsize )
+    {
+        msg_Err( p_access, "cannot read data" );
         return VLC_EGENERIC;
     }
-
-    p_ck->i_type      = GetWLE( p_sys->buffer);
-    p_ck->i_size      = GetWLE( p_sys->buffer + 2);
     p_ck->i_sequence  = GetDWLE( p_sys->buffer + 4);
     p_ck->i_unknown   = GetWLE( p_sys->buffer + 8);
-    p_ck->i_size2     = GetWLE( p_sys->buffer + 10);
+
+    /* Set i_size2 to 8 if this header was short, since a real value won't be
+     * present in the buffer. Using 8 avoid reading additional data for the
+     * packet.
+     */
+    if( restsize < 8 )
+        p_ck->i_size2 = 8;
+    else
+        p_ck->i_size2 = GetWLE( p_sys->buffer + 10);
+
     p_ck->p_data      = p_sys->buffer + 12;
     p_ck->i_data      = p_ck->i_size2 - 8;
 
@@ -739,21 +764,25 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
             return VLC_EGENERIC;
         }
     }
-    else if( p_ck->i_type != 0x4824 && p_ck->i_type != 0x4424 )
+    /* 0x4324 is CHUNK_TYPE_RESET. We can safely ignore it: a new stream will
+     * follow with a sequence of 0 */
+    else if( (p_ck->i_type != 0x4824) && (p_ck->i_type != 0x4424) &&
+             (p_ck->i_type != 0x4324) )
     {
         msg_Err( p_access, "invalid chunk FATAL (0x%x)", p_ck->i_type );
         return VLC_EGENERIC;
     }
 
-    if( p_ck->i_data > 0 &&
-        net_Read( p_access, p_sys->fd, NULL, &p_sys->buffer[12], p_ck->i_data, VLC_TRUE ) < p_ck->i_data )
+    if( (p_ck->i_data > 0) &&
+        (net_Read( p_access, p_sys->fd, NULL, &p_sys->buffer[12],
+                   p_ck->i_data, VLC_TRUE ) < p_ck->i_data) )
     {
         msg_Err( p_access, "cannot read data" );
         return VLC_EGENERIC;
     }
 
-    if( p_sys->i_packet_sequence != 0 &&
-        p_ck->i_sequence != p_sys->i_packet_sequence )
+    if( (p_sys->i_packet_sequence != 0) &&
+        (p_ck->i_sequence != p_sys->i_packet_sequence) )
     {
         msg_Warn( p_access, "packet lost ? (%d != %d)", p_ck->i_sequence, p_sys->i_packet_sequence );
     }
