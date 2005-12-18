@@ -57,6 +57,8 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 
+#define THRES_TEXT N_("Enable brightness threshold")
+#define THRES_LONGTEXT N_("Show black and white pixels with brightness as threshold value")
 #define CONT_TEXT N_("Image contrast (0-2)")
 #define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1")
 #define HUE_TEXT N_("Image hue (0-360)")
@@ -76,11 +78,19 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter", 0 );
 
-    add_float_with_range( "contrast", 1.0, 0.0, 2.0, NULL, CONT_TEXT, CONT_LONGTEXT, VLC_FALSE );
-    add_float_with_range( "brightness", 1.0, 0.0, 2.0, NULL, LUM_TEXT, LUM_LONGTEXT, VLC_FALSE );
-    add_integer_with_range( "hue", 0, 0, 360, NULL, HUE_TEXT, HUE_LONGTEXT, VLC_FALSE );
-    add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL, SAT_TEXT, SAT_LONGTEXT, VLC_FALSE );
-    add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL, GAMMA_TEXT, GAMMA_LONGTEXT, VLC_FALSE );
+    add_float_with_range( "contrast", 1.0, 0.0, 2.0, NULL,
+                          CONT_TEXT, CONT_LONGTEXT, VLC_FALSE );
+    add_float_with_range( "brightness", 1.0, 0.0, 2.0, NULL,
+                           LUM_TEXT, LUM_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "hue", 0, 0, 360, NULL,
+                            HUE_TEXT, HUE_LONGTEXT, VLC_FALSE );
+    add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL,
+                          SAT_TEXT, SAT_LONGTEXT, VLC_FALSE );
+    add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL,
+                          GAMMA_TEXT, GAMMA_LONGTEXT, VLC_FALSE );
+
+    add_bool( "brightness-threshold", 0, NULL,
+              THRES_TEXT, THRES_LONGTEXT, VLC_FALSE );
 
     add_shortcut( "adjust" );
     set_callbacks( Create, Destroy );
@@ -133,12 +143,14 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
-    
+
     var_Create( p_vout, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "saturation", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "gamma", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "brightness-threshold",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
 }
@@ -177,7 +189,6 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "can't open vout, aborting" );
-
         return VLC_EGENERIC;
     }
 
@@ -242,6 +253,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     uint8_t *p_in, *p_in_v, *p_in_end, *p_line_end;
     uint8_t *p_out, *p_out_v;
 
+    vlc_bool_t b_thres;
     double  f_hue;
     double  f_gamma;
     int32_t i_cont, i_lum;
@@ -274,21 +286,46 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     i_sat = (int) (val.f_float * 256 );
     var_Get( p_vout, "gamma", &val );
     f_gamma = 1.0 / val.f_float;
+    var_Get( p_vout, "brightness-threshold", &val );
+    b_thres = (vlc_bool_t) ( val.b_bool );
 
-    /* Contrast is a fast but kludged function, so I put this gap to be
-     * cleaner :) */
-    i_lum += 128 - i_cont / 2;
-
-    /* Fill the gamma lookup table */
-    for( i = 0 ; i < 256 ; i++ )
+    /*
+     * Threshold mode drops out everything about luma, contrast and gamma.
+     */
+    if( b_thres != VLC_TRUE )
     {
-      pi_gamma[ i ] = clip( pow(i / 255.0, f_gamma) * 255.0);
+
+        /* Contrast is a fast but kludged function, so I put this gap to be
+         * cleaner :) */
+        i_lum += 128 - i_cont / 2;
+
+        /* Fill the gamma lookup table */
+        for( i = 0 ; i < 256 ; i++ )
+        {
+          pi_gamma[ i ] = clip( pow(i / 255.0, f_gamma) * 255.0);
+        }
+
+        /* Fill the luma lookup table */
+        for( i = 0 ; i < 256 ; i++ )
+        {
+            pi_luma[ i ] = pi_gamma[clip( i_lum + i_cont * i / 256)];
+        }
     }
-
-    /* Fill the luma lookup table */
-    for( i = 0 ; i < 256 ; i++ )
+    else
     {
-        pi_luma[ i ] = pi_gamma[clip( i_lum + i_cont * i / 256)];
+        /*
+         * We get luma as threshold value: the higher it is, the darker is
+         * the image. Should I reverse this?
+         */
+        for( i = 0 ; i < 256 ; i++ )
+        {
+            pi_luma[ i ] = (i < i_lum) ? 0 : 255;
+        }
+
+        /*
+         * Desaturates image to avoid that strange yellow halo...
+         */
+        i_sat = 0;
     }
 
     /*
