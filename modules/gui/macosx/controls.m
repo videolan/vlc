@@ -7,6 +7,7 @@
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Benjamin Pracht <bigben at videolan doit org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -268,18 +269,31 @@
 
     if( p_vout != NULL )
     {
+        id o_embedded_vout_list = [[VLCMain sharedInstance] getEmbeddedList];
         while ((o_window = [o_enumerator nextObject]))
         {
-            if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            id o_vout_view = nil;
+            /* We have an embedded vout */
+            if( [o_embedded_vout_list windowContainsEmbedded: o_window] )
+            {
+                o_vout_view = [o_embedded_vout_list getViewForWindow: o_window];
+            }
+            /* We have a detached Vout */
+            else if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            {
+                o_vout_view = [o_window getVoutView];
+            }
+
+            if( o_vout_view )
             {
                 if( [o_title isEqualToString: _NS("Half Size") ] )
-                    [o_window scaleWindowWithFactor: 0.5];
+                    [o_vout_view scaleWindowWithFactor: 0.5];
                 else if( [o_title isEqualToString: _NS("Normal Size") ] )
-                    [o_window scaleWindowWithFactor: 1.0];
+                    [o_vout_view scaleWindowWithFactor: 1.0];
                 else if( [o_title isEqualToString: _NS("Double Size") ] )
-                    [o_window scaleWindowWithFactor: 2.0];
+                    [o_vout_view scaleWindowWithFactor: 2.0];
                 else if( [o_title isEqualToString: _NS("Float on Top") ] )
-                    [o_window toggleFloatOnTop];
+                    [o_vout_view toggleFloatOnTop];
                 else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
                 {
                     if( ![o_window isZoomed] )
@@ -287,11 +301,11 @@
                 }
                 else if( [o_title isEqualToString: _NS("Snapshot") ] )
                 {
-                    [o_window snapshot];
+                    [o_vout_view snapshot];
                 }
                 else
                 {
-                    [o_window toggleFullscreen];
+                    [o_vout_view toggleFullscreen];
                 }
                 break;
             }
@@ -470,7 +484,7 @@
                     Value: another_val ofType: i_type];
             [o_lmi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
             [o_lmi setTarget: self];
-            
+
             if( !strcmp( val.psz_string, val_list.p_list->p_values[i].psz_string ) && !( i_type & VLC_VAR_ISCOMMAND ) )
                 [o_lmi setState: TRUE ];
 
@@ -497,7 +511,7 @@
           break;
         }
     }
-    
+
     /* clean up everything */
     if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
     var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
@@ -640,7 +654,9 @@
 
             while( (o_window = [o_enumerator nextObject]))
             {
-                if( [[o_window className] isEqualToString: @"VLCWindow"] )
+                if( [[o_window className] isEqualToString: @"VLCWindow"] ||
+                            [[[VLCMain sharedInstance] getEmbeddedList]
+                            windowContainsEmbedded: o_window])
                 {
                     bEnabled = TRUE;
                     break;

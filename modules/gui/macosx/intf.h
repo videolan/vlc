@@ -79,6 +79,7 @@ struct intf_sys_t
 
     /* The messages window */
     msg_subscription_t * p_sub;
+
 };
 
 /*****************************************************************************
@@ -93,6 +94,7 @@ struct intf_sys_t
     id o_wizard;                /* VLCWizard      */
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
+    id o_embedded_list;         /* VLCEmbeddedList*/
     id o_sfilters;              /* VLCsFilters    */
     /*id o_update;                 VLCUpdate      */
     BOOL nib_main_loaded;       /* reference to the main-nib */
@@ -278,6 +280,7 @@ struct intf_sys_t
 - (id)getInfo;
 - (id)getWizard;
 - (id)getBookmarks;
+- (id)getEmbeddedList;
 - (void)terminate;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;

@@ -57,8 +57,8 @@
 struct vout_sys_t
 {
     NSAutoreleasePool *o_pool;
-    VLCWindow * o_window;
     VLCQTView * o_qtview;
+    VLCVoutView       * o_vout_view;
 
     vlc_bool_t  b_saved_frame;
     vlc_bool_t  b_altivec;
@@ -215,9 +215,9 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     else
     {
         /* Spawn window */
-        p_vout->p_sys->o_window = [[VLCWindow alloc]
-            initWithVout: p_vout view: o_qtview frame: nil];
-        if( !p_vout->p_sys->o_window )
+        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                    subView: o_qtview frame: nil];
+        if( !p_vout->p_sys->o_vout_view )
         {
             return VLC_EGENERIC;
         }
@@ -247,11 +247,11 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
  *****************************************************************************/
 void E_(CloseVideoQT) ( vlc_object_t *p_this )
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init]; 
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     if( !p_vout->p_sys->b_embedded )
-        [p_vout->p_sys->o_window close];
+        [p_vout->p_sys->o_vout_view closeVout];
 
     /* Clean Up Quicktime environment */
     ExitMovies();
@@ -386,7 +386,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
 
-    [p_vout->p_sys->o_window manage];
+    [p_vout->p_sys->o_vout_view manage];
 
     return( 0 );
 }
@@ -463,7 +463,7 @@ static int ControlVideo( vout_thread_t *p_vout, int i_query, va_list args )
     {
         case VOUT_SET_STAY_ON_TOP:
             b_arg = va_arg( args, vlc_bool_t );
-            [p_vout->p_sys->o_window setOnTop: b_arg];
+            [p_vout->p_sys->o_vout_view setOnTop: b_arg];
             return VLC_SUCCESS;
 
         case VOUT_CLOSE:
@@ -488,12 +488,12 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     {
         /* Save window size and position */
         p_vout->p_sys->s_frame.size =
-            [[p_vout->p_sys->o_window contentView] frame].size;
+            [p_vout->p_sys->o_vout_view frame].size;
         p_vout->p_sys->s_frame.origin =
-            [p_vout->p_sys->o_window frame].origin;
+            [[p_vout->p_sys->o_vout_view getWindow] frame].origin;
         p_vout->p_sys->b_saved_frame = VLC_TRUE;
     }
-    [p_vout->p_sys->o_window close];
+    [p_vout->p_sys->o_vout_view closeVout];
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
@@ -503,14 +503,14 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     
     if( p_vout->p_sys->b_saved_frame )
     {
-        p_vout->p_sys->o_window = [[VLCWindow alloc]
-            initWithVout: p_vout view: o_qtview
+        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+            subView: o_qtview
             frame: &p_vout->p_sys->s_frame];
     }
     else
     {
-        p_vout->p_sys->o_window = [[VLCWindow alloc]
-            initWithVout: p_vout view: o_qtview frame: nil];
+        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+            subView: o_qtview frame: nil];
     }
 
     /* Retrieve the QuickDraw port */

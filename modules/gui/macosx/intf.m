@@ -304,6 +304,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_wizard = [[VLCWizard alloc] init];
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
+    o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_sfilters = nil;
     /*o_update = [[VLCUpdate alloc] init];*/
 
@@ -800,6 +801,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     if ( o_bookmarks )
     {
         return o_bookmarks;
+    }
+    return nil;
+}
+
+- (id)getEmbeddedList
+{
+    if( o_embedded_list )
+    {
+        return o_embedded_list;
     }
     return nil;
 }

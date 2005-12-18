@@ -9,6 +9,7 @@
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
+ *          Benjamin Pracht <bigben at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,8 +55,8 @@
 struct vout_sys_t
 {
     NSAutoreleasePool * o_pool;
-    VLCWindow         * o_window;
     VLCGLView         * o_glview;
+    VLCVoutView       * o_vout_view;
     vlc_bool_t          b_saved_frame;
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
@@ -102,13 +103,14 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     [p_vout->p_sys->o_glview autorelease];
 
     /* Spawn the window */
-    p_vout->p_sys->b_got_frame = VLC_FALSE;
-    p_vout->p_sys->o_window = [[VLCWindow alloc] initWithVout: p_vout
-        view: p_vout->p_sys->o_glview frame: nil];
-    if( !p_vout->p_sys->o_window )
+
+    if( !(p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                    subView: p_vout->p_sys->o_glview frame: nil]) )
     {
         return VLC_EGENERIC;
     }
+
+    p_vout->p_sys->b_got_frame = VLC_FALSE;
 
     p_vout->pf_init   = Init;
     p_vout->pf_end    = End;
@@ -127,7 +129,7 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
     /* Close the window */
-    [p_vout->p_sys->o_window close];
+    [p_vout->p_sys->o_vout_view closeVout];
 
     /* Clean up */
     vlc_mutex_destroy( &p_vout->p_sys->lock );
@@ -156,12 +158,12 @@ static int Manage( vout_thread_t * p_vout )
         {
             /* Save window size and position */
             p_vout->p_sys->s_frame.size =
-                [[p_vout->p_sys->o_window contentView] frame].size;
+                [p_vout->p_sys->o_vout_view frame].size;
             p_vout->p_sys->s_frame.origin =
-                [p_vout->p_sys->o_window frame].origin;
+                [[p_vout->p_sys->o_vout_view getWindow ]frame].origin;
             p_vout->p_sys->b_saved_frame = VLC_TRUE;
         }
-        [p_vout->p_sys->o_window close];
+        [p_vout->p_sys->o_vout_view closeVout];
 
         p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
@@ -171,14 +173,15 @@ static int Manage( vout_thread_t * p_vout )
 
         if( p_vout->p_sys->b_saved_frame )
         {
-            p_vout->p_sys->o_window = [[VLCWindow alloc]
-                initWithVout: p_vout view: o_glview
-                frame: &p_vout->p_sys->s_frame];
+            p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                        subView: o_glview
+                        frame: &p_vout->p_sys->s_frame];
         }
         else
         {
-            p_vout->p_sys->o_window = [[VLCWindow alloc]
-                initWithVout: p_vout view: o_glview frame: nil];
+            p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                        subView: o_glview frame: nil];
+
         }
 
         [[o_glview openGLContext] makeCurrentContext];
@@ -188,7 +191,7 @@ static int Manage( vout_thread_t * p_vout )
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
-    [p_vout->p_sys->o_window manage];
+    [p_vout->p_sys->o_vout_view manage];
     return VLC_SUCCESS;
 }
 
@@ -203,7 +206,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     {
         case VOUT_SET_STAY_ON_TOP:
             b_arg = va_arg( args, vlc_bool_t );
-            [p_vout->p_sys->o_window setOnTop: b_arg];
+            [p_vout->p_sys->o_vout_view setOnTop: b_arg];
             return VLC_SUCCESS;
 
         case VOUT_CLOSE:

@@ -34,6 +34,7 @@
             OUTLETS = {"o_btn_fullscreen" = id; "o_main" = id; "o_volumeslider" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = VLCEmbeddedVoutView; LANGUAGE = ObjC; SUPERCLASS = VLCVoutView; }, 
         {
             ACTIONS = {
                 bandSliderUpdated = id; 
@@ -287,7 +288,8 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }
+        {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {CLASS = VLCVoutView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 
 }
