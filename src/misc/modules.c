@@ -2124,17 +2124,11 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
 static char *CacheName( void )
 {
     static char psz_cachename[32];
-    static vlc_bool_t b_initialised = VLC_FALSE;
 
-    if( !b_initialised )
-    {
-        /* Code int size, pointer size and endianness in the filename */
-        int32_t x = 0xbe00001e;
-        sprintf( psz_cachename, "plugins-%.2x%.2x%.2x.dat", sizeof(int),
-                 sizeof(void *), (unsigned int)((unsigned char *)&x)[0] );
-        b_initialised = VLC_TRUE;
-    }
-
+    /* Code int size, pointer size and endianness in the filename */
+    int32_t x = 0xbe00001e;
+    sprintf( psz_cachename, "plugins-%.2x%.2x%.2x.dat", sizeof(int),
+             sizeof(void *), (unsigned int)((unsigned char *)&x)[0] );
     return psz_cachename;
 }
 
