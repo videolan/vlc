@@ -84,6 +84,8 @@ private:
     wxWindow *p_parent;
     vlc_bool_t b_advanced;
 
+    wxPanel *p_current;
+
     wxTreeItemId root_item;
     wxTreeItemId plugins_item;
 };
@@ -605,11 +607,11 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     }
 
     /* Sort all this mess */
-    wxTreeItemIdValue cookie; 
+    wxTreeItemIdValue cookie;
     size_t i_child_index;
     wxTreeItemId capability_item = GetFirstChild( root_item, cookie);
     for( i_child_index = 0;
-         (capability_item.IsOk() && 
+         (capability_item.IsOk() &&
           //(i_child_index < GetChildrenCount( plugins_item, FALSE )));
           (i_child_index < GetChildrenCount( root_item, FALSE )));
          i_child_index++ )
@@ -624,6 +626,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
 
     p_sizer->Add( this, 1, wxEXPAND | wxALL, 0 );
     p_sizer->Layout();
+
+    p_current = NULL;
 
     /* Update Tree Ctrl */
 #ifndef WIN32 /* Workaround a bug in win32 implementation */
@@ -689,6 +693,7 @@ void PrefsTreeCtrl::CleanChanges()
 #else
         p_sizer->Remove( config_data->panel );
 #endif
+        p_current = NULL;
     }
 
     wxTreeItemId category = GetFirstChild( root_item, cookie );
@@ -774,17 +779,15 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
 {
     ConfigTreeData *config_data = NULL;
 
-    if( event.GetOldItem() )
-        config_data = FindModuleConfig( (ConfigTreeData *)GetItemData(
-                                        event.GetOldItem() ) );
-    if( config_data && config_data->panel )
+    if( p_current )
     {
-        config_data->panel->Hide();
+        p_current->Hide();
 #if (wxCHECK_VERSION(2,5,0))
-        p_sizer->Detach( config_data->panel );
+        p_sizer->Detach( p_current  );
 #else
-        p_sizer->Remove( config_data->panel );
+        p_sizer->Remove( p_current );
 #endif
+        p_current = NULL;
     }
 
     /* Don't use event.GetItem() because we also send fake events */
@@ -806,6 +809,8 @@ void PrefsTreeCtrl::OnSelectTreeItem( wxTreeEvent& event )
             config_data->panel->Show();
         }
 
+        p_current = config_data->panel;
+
         p_sizer->Add( config_data->panel, 3, wxEXPAND | wxALL, 0 );
         p_sizer->Layout();
     }
@@ -825,6 +830,7 @@ void PrefsTreeCtrl::OnAdvanced( wxCommandEvent& event )
 #else
         p_sizer->Remove( config_data->panel );
 #endif
+        p_current = NULL;
     }
 
     if( GetSelection() )
