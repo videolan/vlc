@@ -37,7 +37,12 @@ def get_ldflags():
         return []
     else:
 	os.environ['top_builddir'] = '../..'
-        ldflags=os.popen('%s --libs vlc pic builtin' % vlcconfig, 'r').readline().rstrip().split()
+	ldflags = []
+	if os.sys.platform == 'darwin':
+	    ldflags = "-read_only_relocs warning".split()
+        ldflags.extend(os.popen('%s --libs vlc pic builtin' % vlcconfig, 'r').readline().rstrip().split())
+	if os.sys.platform == 'darwin':
+	    ldflags.append('-lstdc++')
         return ldflags
 
 # To compile in a local vlc tree
