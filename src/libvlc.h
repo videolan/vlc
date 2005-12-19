@@ -370,7 +370,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_AUDIOTRACK_TEXT N_("Audio track")
 #define INPUT_AUDIOTRACK_LONGTEXT N_( \
-    "Give the stream number of the audio track you want to use" \
+    "Give the stream number of the audio track you want to use " \
     "(from 0 to n).")
 
 #define INPUT_SUBTRACK_TEXT N_("Subtitles track")
@@ -387,6 +387,14 @@ static char *ppsz_clock_descriptions[] =
 #define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
     "Give the language of the subtitle track you want to use " \
     "(comma separted, two or tree letter country code).")
+
+#define INPUT_AUDIOTRACK_ID_TEXT N_("Audio track ID")
+#define INPUT_AUDIOTRACK_ID_LONGTEXT N_( \
+    "Give the stream ID of the audio track you want to use.")
+
+#define INPUT_SUBTRACK_ID_TEXT N_("Subtitles track ID")
+#define INPUT_SUBTRACK_ID_LONGTEXT N_( \
+    "Give the stream ID of the subtitle track you want to use.")
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be " \
@@ -1132,6 +1140,10 @@ vlc_module_begin();
     add_string( "sub-language", "", NULL,
                  INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT,
                   VLC_FALSE );
+    add_integer( "audio-track-id", -1, NULL, INPUT_AUDIOTRACK_ID_TEXT,
+                 INPUT_AUDIOTRACK_ID_LONGTEXT, VLC_TRUE );
+    add_integer( "sub-track-id", -1, NULL,
+                 INPUT_SUBTRACK_ID_TEXT, INPUT_SUBTRACK_ID_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Playback control" ) , NULL);
     add_integer( "input-repeat", 0, NULL,

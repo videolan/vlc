@@ -2,7 +2,7 @@
  * var.c: object variables for input thread
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
- * $Id: input.c 7955 2004-06-07 22:21:33Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -394,6 +394,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
 
     var_Create( p_input, "audio-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-language", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+
+    var_Create( p_input, "audio-track-id", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-track-id", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |

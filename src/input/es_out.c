@@ -103,8 +103,8 @@ struct es_out_sys_t
     int         i_sub;
 
     /* es to select */
-    int         i_audio_last;
-    int         i_sub_last;
+    int         i_audio_last, i_audio_id;
+    int         i_sub_last, i_sub_id;
     char        **ppsz_audio_language;
     char        **ppsz_sub_language;
 
@@ -193,6 +193,12 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
                      i, p_sys->ppsz_sub_language[i] );
     }
     if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_input, "audio-track-id", &val );
+    p_sys->i_audio_id = val.i_int;
+
+    var_Get( p_input, "sub-track-id", &val );
+    p_sys->i_sub_id = val.i_int;
 
     p_sys->p_es_audio = NULL;
     p_sys->p_es_video = NULL;
@@ -903,6 +909,14 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 
             if( p_sys->i_audio_last >= 0 )
                 i_wanted = p_sys->i_audio_last;
+
+            if( p_sys->i_audio_id >= 0 )
+            {
+                if( es->i_id == p_sys->i_audio_id )
+                    i_wanted = es->i_channel;
+                else
+                    return;
+            }
         }
         else if( i_cat == SPU_ES )
         {
@@ -933,6 +947,14 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
             }
             if( p_sys->i_sub_last >= 0 )
                 i_wanted  = p_sys->i_sub_last;
+
+            if( p_sys->i_sub_id >= 0 )
+            {
+                if( es->i_id == p_sys->i_sub_id )
+                    i_wanted = es->i_channel;
+                else
+                    return;
+            }
         }
         else if( i_cat == VIDEO_ES )
         {
