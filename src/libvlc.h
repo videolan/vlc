@@ -432,6 +432,10 @@ static char *ppsz_clock_descriptions[] =
     "You can use this option to place the subtitles under the movie, " \
     "instead of over the movie. Try several positions.")
 
+#define SPU_TEXT N_("Enable sub-pictures")
+#define SPU_LONGTEXT N_( \
+    "You can completely disable the sub-picture processing.")
+
 #define OSD_TEXT N_("On Screen Display")
 #define OSD_LONGTEXT N_( \
     "VLC can display messages on the video. This is called OSD (On Screen " \
@@ -599,6 +603,11 @@ static char *ppsz_clock_descriptions[] =
 #define SOUT_AUDIO_TEXT N_("Enable audio stream output")
 #define SOUT_AUDIO_LONGTEXT N_( \
     "This allows you to choose if the audio stream should be redirected to " \
+    "the stream output facility when this last one is enabled.")
+
+#define SOUT_SPU_TEXT N_("Enable SPU stream output")
+#define SOUT_SPU_LONGTEXT N_( \
+    "This allows you to choose if the SPU streams should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
 #define SOUT_KEEP_TEXT N_("Keep stream output open" )
@@ -1096,6 +1105,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_section( N_("On Screen Display") , NULL );
     add_category_hint( N_("Subpictures"), SUB_CAT_LONGTEXT , VLC_FALSE );
+
+    add_bool( "spu", 1, NULL, SPU_TEXT, SPU_LONGTEXT, VLC_TRUE );
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Subtitles") , NULL );
@@ -1257,6 +1268,8 @@ vlc_module_begin();
                                 SOUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT,
                                 SOUT_VIDEO_LONGTEXT, VLC_TRUE );
+    add_bool( "sout-spu", 1, NULL, SOUT_SPU_TEXT,
+                                SOUT_SPU_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_SOUT_STREAM );
     set_subcategory( SUBCAT_SOUT_MUX );

@@ -388,6 +388,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     /* Create Object Variables for private use only */
     var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "audio-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Create( p_input, "sub-track", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
@@ -410,6 +411,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "sout-all",   VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sout-spu", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "input-repeat", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );

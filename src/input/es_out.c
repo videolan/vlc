@@ -770,6 +770,17 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
             return;
         }
     }
+    if( es->fmt.i_cat == SPU_ES )
+    {
+        var_Get( p_input, "spu", &val );
+        if( !var_GetBool( p_input, "spu" ) ||
+            ( p_input->p_sout && !var_GetBool( p_input, "sout-spu" ) ) )
+        {
+            msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
+                     es->i_id );
+            return;
+	}
+    }
 
     es->i_preroll_end = -1;
     es->p_dec = input_DecoderNew( p_input, &es->fmt, VLC_FALSE );
