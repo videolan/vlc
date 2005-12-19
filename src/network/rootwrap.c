@@ -39,6 +39,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <sys/uio.h>
 #include <sys/resource.h> /* getrlimit() */
 #include <sys/wait.h>
 #include <sys/un.h>
