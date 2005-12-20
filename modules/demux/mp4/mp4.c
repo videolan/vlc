@@ -1359,6 +1359,10 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 if( p_track->fmt.i_cat == SPU_ES )
                 {
                     p_track->fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
+                    if( p_track->i_width > 0 )
+                        p_track->fmt.subs.spu.i_original_frame_width = p_track->i_width;
+                    if( p_track->i_height > 0 )
+                        p_track->fmt.subs.spu.i_original_frame_height = p_track->i_height;
                     break;
                 }
             /* Fallback */
