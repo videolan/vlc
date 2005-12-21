@@ -171,7 +171,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_total_bytes = 0;
     p_sys->i_hog_pid = -1;
     p_sys->i_stream_id = 0;
-    p_sys->i_stream_index = 0;
+    p_sys->i_stream_index = -1;
     p_sys->b_revert = VLC_FALSE;
     p_sys->b_changed_mixing = VLC_FALSE;
     memset( p_sys->p_remainder_buffer, 0, sizeof(uint8_t) * BUFSIZE );
@@ -671,11 +671,12 @@ static int OpenSPDIF( aout_instance_t * p_aout )
         return VLC_FALSE;
     }
 
-    for( i = 0; i < i_streams; i++ )
+    for( i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
     {
         // Find a stream with a cac3 stream
         AudioStreamBasicDescription *p_format_list = NULL;
         int                         i_formats = 0, j = 0;
+        vlc_bool_t                  b_digital = VLC_FALSE;
         
         /* Retrieve all the stream formats supported by each output stream */
         err = AudioStreamGetPropertyInfo( p_streams[i], 0,
@@ -710,33 +711,64 @@ static int OpenSPDIF( aout_instance_t * p_aout )
             if( p_format_list[j].mFormatID == 'IAC3' ||
                   p_format_list[j].mFormatID == kAudioFormat60958AC3 )
             {
-                // found a cac3 format
-                p_sys->i_stream_id = p_streams[i];
-                p_sys->i_stream_index = i;
-
-                if( p_sys->b_revert == VLC_FALSE )
-                {
-                    i_param_size = sizeof( p_sys->sfmt_revert );
-                    err = AudioStreamGetProperty( p_sys->i_stream_id, 0,
-                                                  kAudioStreamPropertyPhysicalFormat,
-                                                  &i_param_size, 
-                                                  &p_sys->sfmt_revert );
-                    if( err != noErr )
-                    {
-                        msg_Err( p_aout, "could not retrieve the original streamformat: [%4.4s]", (char *)&err );
-                        continue; 
-                    }
-                    p_sys->b_revert = VLC_TRUE;
-                }
-                if( p_format_list[j].mSampleRate == p_sys->sfmt_revert.mSampleRate )
-                {
-                    p_sys->stream_format = p_format_list[j];
-                }
+                b_digital = VLC_TRUE;
+                break;
             }
+        }
+        
+        if( b_digital )
+        {
+            int i_requested_format = -1;
+            int i_current_format = -1;
+            int i_backup_format = -1;
+            // found a cac3 format
+            p_sys->i_stream_id = p_streams[i];
+            p_sys->i_stream_index = i;
+
+            if( p_sys->b_revert == VLC_FALSE )
+            {
+                i_param_size = sizeof( p_sys->sfmt_revert );
+                err = AudioStreamGetProperty( p_sys->i_stream_id, 0,
+                                              kAudioStreamPropertyPhysicalFormat,
+                                              &i_param_size, 
+                                              &p_sys->sfmt_revert );
+                if( err != noErr )
+                {
+                    msg_Err( p_aout, "could not retrieve the original streamformat: [%4.4s]", (char *)&err );
+                    continue; 
+                }
+                p_sys->b_revert = VLC_TRUE;
+            }
+            for( j = 0; j < i_formats; j++ )
+            {
+                if( p_format_list[j].mFormatID == 'IAC3' ||
+                      p_format_list[j].mFormatID == kAudioFormat60958AC3 )
+                {
+                    if( p_format_list[j].mSampleRate == p_aout->output.output.i_rate )
+                    {
+                        i_requested_format = j;
+                        break;
+                    }
+                    else if( p_format_list[j].mSampleRate == p_sys->sfmt_revert.mSampleRate )
+                    {
+                        i_current_format = j;
+                    }
+                    else
+                    {
+                        if( i_backup_format < 0 || p_format_list[j].mSampleRate > p_format_list[i_backup_format].mSampleRate )
+                            i_backup_format = j;
+                    }
+                }
+                    
+            }
+            if( i_requested_format >= 0 )
+                p_sys->stream_format = p_format_list[i_requested_format];
+            else if( i_current_format >= 0 )
+                p_sys->stream_format = p_format_list[i_current_format];
+            else p_sys->stream_format = p_format_list[i_backup_format];
         }
         if( p_format_list ) free( p_format_list );
     }
-    
     if( p_streams ) free( p_streams );
 
     msg_Dbg( p_aout, STREAM_FORMAT_MSG( "original stream format: ", p_sys->sfmt_revert ) );
@@ -775,7 +807,10 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     timeout.tv_sec = now.tv_sec;
     timeout.tv_nsec = (now.tv_usec + 900000) * 1000;
 
-    pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout );
+    if( pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout ) )
+    {
+        msg_Dbg( p_aout, "reached timeout" );
+    }
     vlc_mutex_unlock( &w.lock );
 
     err = AudioStreamRemovePropertyListener( p_sys->i_stream_id, 0,
@@ -917,7 +952,10 @@ static void Close( vlc_object_t * p_this )
             timeout.tv_sec = now.tv_sec;
             timeout.tv_nsec = (now.tv_usec + 900000) * 1000;
 
-            pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout );
+            if( pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout ) == ETIMEDOUT )
+            {
+                msg_Dbg( p_aout, "reached timeout" );
+            }
             vlc_mutex_unlock( &w.lock );
 
             err = AudioStreamRemovePropertyListener( p_sys->i_stream_id, 0,
