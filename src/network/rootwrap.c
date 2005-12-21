@@ -63,71 +63,37 @@ static int clearenv (void)
 #endif*/
 
 /**
- * Converts username to UID.
+ * Tries to find a real non-root user to use
  */
-static uid_t parse_user (const char *name)
-{
-    struct passwd *pw;
-
-    pw = getpwnam (name);
-    if (pw == NULL)
-        return (uid_t)(-1);
-
-    return pw->pw_uid;
-}
-
-
-/**
- * Tries to find a real non-root user ID
- */
-static uid_t guess_user (void)
+static struct passwd *guess_user (void)
 {
     const char *name;
+    struct passwd *pw;
     uid_t uid;
 
     /* Try real UID */
     uid = getuid ();
     if (uid)
-        return uid;
+        if ((pw = getpwuid (uid)) != NULL)
+            return pw;
 
     /* Try sudo */
     name = getenv ("SUDO_USER");
     if (name != NULL)
-    {
-        uid = parse_user (name);
-        if (uid != (uid_t)(-1))
-            return uid;
-    }
+        if ((pw = getpwnam (name)) != NULL)
+            return pw;
 
     /* Try VLC_USER */
     name = getenv ("VLC_USER");
     if (name != NULL)
-    {
-        uid = parse_user (name);
-        if (uid != (uid_t)(-1))
-            return uid;
-    }
+        if ((pw = getpwnam (name)) != NULL)
+            return pw;
 
     /* Try vlc */
-    uid = parse_user ("vlc");
-    if (uid != (uid_t)(-1))
-        return uid;
+    if ((pw = getpwnam ("vlc")) != NULL)
+        return pw;
 
-    return 0;
-}
-
-
-/**
- * Returns the main GID associated with a given UID.
- */
-static gid_t guess_gid (uid_t uid)
-{
-    struct passwd *pw;
-
-    pw = getpwuid (uid);
-    if (pw != NULL)
-        return pw->pw_gid;
-    return 65534;
+    return getpwuid (0);
 }
 
 
@@ -255,8 +221,8 @@ void rootwrap (void)
 {
     struct rlimit lim;
     int fd, pair[2];
+    struct passwd *pw;
     uid_t u;
-    gid_t g;
 
     u = geteuid ();
     /* Are we running with root privileges? */
@@ -280,12 +246,12 @@ void rootwrap (void)
 
     fputs ("Starting VLC root wrapper...", stderr);
 
-    u = guess_user ();
-    fprintf (stderr, " using UID %u", (unsigned)u);
+    pw = guess_user ();
+    if (pw == NULL)
+        return; /* Should we rather print an error and exit ? */
 
-    g = guess_gid (u);
-    fprintf (stderr, ", using GID %u\n", (unsigned)g);
-
+    u = pw->pw_uid,
+    fprintf (stderr, " using UID %u (%s)\n", (unsigned)u, pw->pw_name);
     if (u == 0)
     {
         fputs ("***************************************\n"
@@ -298,8 +264,8 @@ void rootwrap (void)
     }
 
     /* GID */
-    setgid (g);
-    setgroups (0, NULL);
+    initgroups (pw->pw_name, pw->pw_gid);
+    setgid (pw->pw_gid);
 
     if (socketpair (AF_LOCAL, SOCK_STREAM, 0, pair))
     {
