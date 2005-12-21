@@ -113,12 +113,7 @@ static uid_t guess_user (void)
     if (uid != (uid_t)(-1))
         return uid;
 
-    /* Try nobody */
-    uid = parse_user ("nobody");
-    if (uid != (uid_t)(-1))
-        return uid;
-
-    return 65534;
+    return 0;
 }
 
 
