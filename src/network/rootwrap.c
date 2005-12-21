@@ -293,7 +293,7 @@ void rootwrap (void)
                "***************************************\n"
                "\n"
                " It is potentially dangerous, "
-                "and might not even work properly.", stderr);
+                "and might not even work properly.\n", stderr);
         return;
     }
 
