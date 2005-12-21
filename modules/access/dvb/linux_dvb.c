@@ -74,8 +74,6 @@ struct frontend_t
 
 #define FRONTEND_LOCK_TIMEOUT 10000000 /* 10 s */
 
-#define RESET_CAM_SLOTS 1 /* Do we want to reset cam upon opening */
-
 /* Local prototypes */
 static int FrontendInfo( access_t * );
 static int FrontendSetQPSK( access_t * );
@@ -1210,9 +1208,8 @@ int E_(CAMOpen)( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     char ca[128];
-    int i_adapter, i_device, i_slot;
+    int i_adapter, i_device;
     ca_caps_t caps;
-    struct ca_slot_info info;
 
     i_adapter = var_GetInteger( p_access, "dvb-adapter" );
     i_device = var_GetInteger( p_access, "dvb-device" );
@@ -1273,44 +1270,17 @@ int E_(CAMOpen)( access_t *p_access )
     }
 
     p_sys->i_ca_type = caps.slot_type;
-    if( caps.slot_type != CA_CI_LINK &&
-        caps.slot_type != CA_CI )
+    if ( !(caps.slot_type & CA_CI_LINK) &&
+         !(caps.slot_type & CA_CI) )
     {
-        msg_Err( p_access, "CAMInit: incompatible CAM module" );
+        msg_Err( p_access, "CAMInit: incompatible CAM interface" );
         close( p_sys->i_ca_handle );
         p_sys->i_ca_handle = 0;
         return VLC_EGENERIC;
     }
-    if( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &info ) < 0 )
-    {
-        msg_Err( p_access, "CAMInit: Couldn't get slot info" );
-        close( p_sys->i_ca_handle );
-        p_sys->i_ca_handle = 0;
-        return VLC_EGENERIC;
-    }
-    if( info.flags == 0 )
-    {
-        msg_Err( p_access, "CAMInit: No CAM inserted" );
-        close( p_sys->i_ca_handle );
-        p_sys->i_ca_handle = 0;
-        return VLC_EGENERIC;
-    }
-    
+
     p_sys->i_nb_slots = caps.slot_num;
     memset( p_sys->pb_active_slot, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
-#if(RESET_CAM_SLOTS)
-    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
-    {
-        if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
-        {
-            msg_Err( p_access, "CAMInit: couldn't reset slot %d", i_slot );
-        }
-    }
-#endif
-
-    p_sys->i_ca_timeout = 100000;
-    /* Wait a bit otherwise it doesn't initialize properly... */
-    msleep( 1000000 );
 
     return E_(en50221_Init)( p_access );
 }

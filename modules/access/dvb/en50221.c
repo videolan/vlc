@@ -1132,7 +1132,7 @@ static void CAPMTDelete( access_t * p_access, int i_session_id,
     uint8_t *p_capmt;
     int i_capmt_size;
 
-    p_access->p_sys->i_selected_programs++;
+    p_access->p_sys->i_selected_programs--;
     msg_Dbg( p_access, "deleting CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 
@@ -1554,13 +1554,45 @@ int E_(en50221_Init)( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-
-    if( p_sys->i_ca_type != CA_CI ) /* Link level init is done in Poll() */
+    if( p_sys->i_ca_type & CA_CI_LINK )
     {
+        int i_slot;
+        for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+        {
+            if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
+            {
+                msg_Err( p_access, "en50221_Init: couldn't reset slot %d",
+                         i_slot );
+            }
+        }
+
+        p_sys->i_ca_timeout = 100000;
+        /* Wait a bit otherwise it doesn't initialize properly... */
+        msleep( 1000000 );
+
         return VLC_SUCCESS;
     }
     else
     {
+        struct ca_slot_info info;
+
+        /* We don't reset the CAM in that case because it's done by the
+         * ASIC. */
+        if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &info ) < 0 )
+        {
+            msg_Err( p_access, "en50221_Init: couldn't get slot info" );
+            close( p_sys->i_ca_handle );
+            p_sys->i_ca_handle = 0;
+            return VLC_EGENERIC;
+        }
+        if( info.flags == 0 )
+        {
+            msg_Err( p_access, "en50221_Init: no CAM inserted" );
+            close( p_sys->i_ca_handle );
+            p_sys->i_ca_handle = 0;
+            return VLC_EGENERIC;
+        }
+
         /* Allocate a dummy sessions */
         p_sys->p_sessions[ 0 ].i_resource_id = RI_CONDITIONAL_ACCESS_SUPPORT;
 
@@ -1575,9 +1607,10 @@ int E_(en50221_Init)( access_t * p_access )
         APDUSend( p_access, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
         if ( ioctl( p_sys->i_ca_handle, CA_GET_MSG, &ca_msg ) < 0 )
         {
-            msg_Err( p_access, "CAM: failed getting message" );
+            msg_Err( p_access, "en50221_Init: failed getting message" );
             return VLC_EGENERIC;
         }
+
 #if HLCI_WAIT_CAM_READY
         while( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
@@ -1592,10 +1625,10 @@ int E_(en50221_Init)( access_t * p_access )
             memset( &ca_msg.msg[3], 0, 253 );
             if ( ioctl( p_sys->i_ca_handle, CA_GET_MSG, &ca_msg ) < 0 )
             {
-                msg_Err( p_access, "CAM: failed getting message" );
+                msg_Err( p_access, "en50221_Init: failed getting message" );
                 return VLC_EGENERIC;
             }
-            msg_Dbg( p_access, "CAM: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
+            msg_Dbg( p_access, "en50221_Init: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
         }
 #else
         if( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
@@ -1607,7 +1640,6 @@ int E_(en50221_Init)( access_t * p_access )
         msg_Dbg( p_access, "found CAM %s using id 0x%x", &ca_msg.msg[12],
                  (ca_msg.msg[8]<<8)|ca_msg.msg[9] );
         return VLC_SUCCESS;
-        
     }
 }
 
