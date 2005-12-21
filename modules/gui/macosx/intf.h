@@ -95,6 +95,7 @@ struct intf_sys_t
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
     id o_embedded_list;         /* VLCEmbeddedList*/
+    id o_interaction_list;      /* VLCInteractionList*/
     id o_sfilters;              /* VLCsFilters    */
     /*id o_update;                 VLCUpdate      */
     BOOL nib_main_loaded;       /* reference to the main-nib */
@@ -281,6 +282,7 @@ struct intf_sys_t
 - (id)getWizard;
 - (id)getBookmarks;
 - (id)getEmbeddedList;
+- (id)getInteractionList;
 - (void)terminate;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;

@@ -42,6 +42,7 @@
 #include "extended.h"
 #include "bookmarks.h"
 #include "sfilters.h"
+#include "interaction.h"
 /*#include "update.h"*/
 
 /*****************************************************************************
@@ -178,7 +179,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
  * playlistChanged: Callback triggered by the intf-change playlist
  * variable, to let the intf update the playlist.
  *****************************************************************************/
-int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -192,7 +193,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
  * FullscreenChanged: Callback triggered by the fullscreen-change playlist
  * variable, to let the intf update the controller.
  *****************************************************************************/
-int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
+static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -200,6 +201,24 @@ int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * InteractCallback: Callback triggered by the interaction
+ * variable, to let the intf display error and interaction dialogs
+ *****************************************************************************/
+static int InteractCallback( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    VLCMain *interface = (VLCMain *)param;
+    interaction_dialog_t *p_dialog = (interaction_dialog_t *)(new_val.p_address);
+    NSValue *o_value = [NSValue valueWithPointer:p_dialog];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewInteractionEventNotification" object:[interface getInteractionList]
+     userInfo:[NSDictionary dictionaryWithObject:o_value forKey:@"VLCDialogPointer"]];
+    
+    [o_pool release];
+    return VLC_SUCCESS;
+}
 
 static struct
 {
@@ -305,6 +324,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     o_embedded_list = [[VLCEmbeddedList alloc] init];
+    o_interaction_list = [[VLCInteractionList alloc] init];
     o_sfilters = nil;
     /*o_update = [[VLCUpdate alloc] init];*/
 
@@ -432,6 +452,11 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )];
         vlc_object_release( p_playlist );
     }
+    
+    var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "interaction", InteractCallback, self );
+    p_intf->b_interaction = VLC_TRUE;
+    
     nib_main_loaded = TRUE;
 }
 
@@ -810,6 +835,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( o_embedded_list )
     {
         return o_embedded_list;
+    }
+    return nil;
+}
+
+- (id)getInteractionList
+{
+    if( o_interaction_list )
+    {
+        return o_interaction_list;
     }
     return nil;
 }
@@ -1377,6 +1411,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         [o_extended savePrefs];
     }
+    
+    p_intf->b_interaction = VLC_FALSE;
+    var_DelCallback( p_intf, "interaction", InteractCallback, self );
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on -- FK (10/6/05) */
@@ -1397,6 +1434,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( nib_wizard_loaded && o_wizard )
         [o_wizard release];
+        
+    if( o_embedded_list != nil )
+        [o_embedded_list release];
+
+    if( o_interaction_list != nil )
+        [o_interaction_list release];
 
     if( o_img_pause_pressed != nil )
     {

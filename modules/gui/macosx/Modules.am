@@ -7,6 +7,8 @@ SOURCES_macosx = \
 	controls.m \
 	equalizer.m \
 	equalizer.h \
+	interaction.m \
+	interaction.h \
 	intf.m \
 	intf.h \
 	macosx.m \
