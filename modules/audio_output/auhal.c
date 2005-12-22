@@ -783,12 +783,12 @@ static int OpenSPDIF( aout_instance_t * p_aout )
         msg_Err( p_aout, "AudioStreamAddPropertyListener failed: [%4.4s]", (char *)&err );
         return VLC_FALSE;
     }
-
+    
     /* Condition because SetProperty is asynchronious */ 
     vlc_cond_init( p_aout, &w.cond );
     vlc_mutex_init( p_aout, &w.lock );
     vlc_mutex_lock( &w.lock );
-    
+
     /* change the format */
     err = AudioStreamSetProperty( p_sys->i_stream_id, 0, 0,
                                   kAudioStreamPropertyPhysicalFormat,
@@ -797,43 +797,57 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     if( err != noErr )
     {
         msg_Err( p_aout, "could not set the stream format: [%4.4s]", (char *)&err );
-        vlc_mutex_unlock( &w.lock );
-        vlc_mutex_destroy( &w.lock );
-        vlc_cond_destroy( &w.cond );
         return VLC_FALSE;
     }
 
-    gettimeofday( &now, NULL );
-    timeout.tv_sec = now.tv_sec;
-    timeout.tv_nsec = (now.tv_usec + 900000) * 1000;
-
-    if( pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout ) )
+    /* The AudioStreamSetProperty is not only asynchronious (requiring the locks)
+     * it is also not Atomic, in it's behaviour.
+     * Therefore we check 5 times before we really give up.
+     * FIXME: failing isn't actually implemented yet. */
+    for( i = 0; i < 5; i++ )
     {
-        msg_Dbg( p_aout, "reached timeout" );
-    }
-    vlc_mutex_unlock( &w.lock );
+        AudioStreamBasicDescription actual_format;
 
+        gettimeofday( &now, NULL );
+        timeout.tv_sec = now.tv_sec;
+        timeout.tv_nsec = (now.tv_usec + 900000) * 1000;
+
+        if( pthread_cond_timedwait( &w.cond.cond, &w.lock.mutex, &timeout ) )
+        {
+            msg_Dbg( p_aout, "reached timeout" );
+            vlc_mutex_unlock( &w.lock );
+            vlc_mutex_destroy( &w.lock );
+            vlc_cond_destroy( &w.cond );
+        }
+
+        i_param_size = sizeof( AudioStreamBasicDescription );
+        err = AudioStreamGetProperty( p_sys->i_stream_id, 0,
+                                      kAudioStreamPropertyPhysicalFormat,
+                                      &i_param_size, 
+                                      &actual_format );
+
+        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "actual format in use: ", actual_format ) );
+        if( actual_format.mSampleRate == p_sys->stream_format.mSampleRate &&
+            actual_format.mFormatID == p_sys->stream_format.mFormatID &&
+            actual_format.mFramesPerPacket == p_sys->stream_format.mFramesPerPacket )
+        {
+            /* The right format is now active */
+            break;
+        }
+        /* We need to check again */
+        vlc_cond_init( p_aout, &w.cond );
+        vlc_mutex_init( p_aout, &w.lock );
+        vlc_mutex_lock( &w.lock );
+    }
+    
     err = AudioStreamRemovePropertyListener( p_sys->i_stream_id, 0,
-                                        kAudioStreamPropertyPhysicalFormat,
-                                        StreamListener );
+                                            kAudioStreamPropertyPhysicalFormat,
+                                            StreamListener );
     if( err != noErr )
     {
         msg_Err( p_aout, "AudioStreamRemovePropertyListener failed: [%4.4s]", (char *)&err );
-        vlc_mutex_destroy( &w.lock );
-        vlc_cond_destroy( &w.cond );
         return VLC_FALSE;
     }
-
-    vlc_mutex_destroy( &w.lock );
-    vlc_cond_destroy( &w.cond );
-    
-    i_param_size = sizeof( AudioStreamBasicDescription );
-    err = AudioStreamGetProperty( p_sys->i_stream_id, 0,
-                                  kAudioStreamPropertyPhysicalFormat,
-                                  &i_param_size, 
-                                  &p_sys->stream_format );
-
-    msg_Dbg( p_aout, STREAM_FORMAT_MSG( "actual format in use: ", p_sys->stream_format ) );
 
     /* set the format flags */
     if( p_sys->stream_format.mFormatFlags & kAudioFormatFlagIsBigEndian )
