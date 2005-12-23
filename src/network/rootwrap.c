@@ -25,7 +25,7 @@
 # include <config.h>
 #endif
 
-#ifdef HAVE_GETEUID
+#if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
 # define ENABLE_ROOTWRAP 1
 #endif
 
