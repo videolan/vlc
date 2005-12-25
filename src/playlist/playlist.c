@@ -988,6 +988,10 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
                 }
                 p_playlist->request.i_skip = 0;
             }
+            if( !( p_new->i_flags & PLAYLIST_SKIP_FLAG ) )
+            {
+                return NULL;
+            }
         }
         else
         {
