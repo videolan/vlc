@@ -38,5 +38,7 @@ SOURCES_macosx = \
 	bookmarks.m \
 	sfilters.h \
 	sfilters.m \
+	embeddedwindow.h \
+	embeddedwindow.m \
 	$(NULL)
 

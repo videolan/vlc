@@ -356,24 +356,20 @@ static VLCExtended *_o_sharedInstance = nil;
         FIND_ANYWHERE );
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     vout_thread_t *p_real_vout;
-    
+
     val.f_float = [o_sld_opaque floatValue] / 100;
+
 
     if( p_vout != NULL )
     {
-        if( p_vout->i_object_type == VLC_OBJECT_OPENGL )
-        {
-            p_real_vout = (vout_thread_t *) p_vout->p_parent;
-        }
-        else
-        {
-            p_real_vout = p_vout;
-        }
+        p_real_vout = [VLCVoutView getRealVout: p_vout];
         var_Set( p_real_vout, "macosx-opaqueness", val );
-    
+
         while ((o_window = [o_enumerator nextObject]))
         {
-            if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            if( [[o_window className] isEqualToString: @"VLCWindow"] ||
+                [[[VLCMain sharedInstance] getEmbeddedList]
+                                    windowContainsEmbedded: o_window])
             {
                 [o_window setAlphaValue: val.f_float];
             }

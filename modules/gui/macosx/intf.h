@@ -112,6 +112,7 @@ struct intf_sys_t
     IBOutlet id o_scrollfield;  /* info field     */
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
+    IBOutlet id o_embedded_window; /* Embedded Vout Window */
     float f_slider;             /* slider value   */
     float f_slider_old;         /* old slider val */
     IBOutlet id o_volumeslider; /* volume slider  */

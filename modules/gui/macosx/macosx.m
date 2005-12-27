@@ -47,6 +47,10 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define EMBEDDED_TEXT N_("Use embedded video output")
+#define EMBEDDED_LONGTEXT N_("Disable this if you want the video output to " \
+    "be opened in a separate window instead of in the control window.")
+
 #define VDEV_TEXT N_("Video device")
 #define VDEV_LONGTEXT N_("Choose a number corresponding to " \
     "a screen in you video device selection menu and this screen " \
@@ -77,6 +81,8 @@ vlc_module_begin();
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
+    add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
+                     VLC_FALSE );
     add_submodule();
         set_description( _("Quartz video") );
         set_capability( "video output", 100 );

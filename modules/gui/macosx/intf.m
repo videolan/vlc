@@ -43,6 +43,7 @@
 #include "bookmarks.h"
 #include "sfilters.h"
 #include "interaction.h"
+#include "embeddedwindow.h"
 /*#include "update.h"*/
 
 /*****************************************************************************
@@ -449,7 +450,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
 
-        [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )];
+        [o_embedded_window setFullscreen: var_GetBool( p_playlist,
+                                                            "fullscreen" )];
         vlc_object_release( p_playlist );
     }
     
@@ -964,6 +966,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_timeslider setEnabled: b_seekable];
         [o_timefield setStringValue: @"0:00:00"];
 
+        [o_embedded_window setSeekable: b_seekable];
+
         p_intf->p_sys->b_intf_update = VLC_FALSE;
     }
 
@@ -983,7 +987,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                    FIND_ANYWHERE );
         var_Get( p_playlist, "fullscreen", &val );
-        [o_btn_fullscreen setState: val.b_bool];
+        [o_embedded_window setFullscreen: val.b_bool];
         vlc_object_release( p_playlist );
 
         p_intf->p_sys->b_fullscreen_update = VLC_FALSE;
@@ -1020,9 +1024,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 
                 while( ( o_vout_wnd = [o_enum nextObject] ) )
                 {
-                    if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
+                    if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"]
+                        || [[[VLCMain sharedInstance] getEmbeddedList]
+                                            windowContainsEmbedded: o_vout_wnd])
                     {
-                        [o_vout_wnd updateTitle];
+                        [[o_vout_wnd getVoutView] updateTitle];
                     }
                 }
                 vlc_object_release( (vlc_object_t *)p_vout );
@@ -1053,8 +1059,9 @@ static VLCMain *_o_sharedMainInstance = nil;
                             (int) (i_seconds / 60 % 60),
                             (int) (i_seconds % 60)];
             [o_timefield setStringValue: o_time];
+            [o_embedded_window setTime: o_time position: f_updated];
         }
-        
+
         if( p_intf->p_sys->b_volume_update )
         {
             NSString *o_text;
@@ -1075,6 +1082,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         {
             p_intf->p_sys->i_play_status = val.i_int;
             [self playStatusUpdated: p_intf->p_sys->i_play_status];
+            [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         }
     }
     else
@@ -1082,6 +1090,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         p_intf->p_sys->i_play_status = END_S;
         p_intf->p_sys->b_intf_update = VLC_TRUE;
         [self playStatusUpdated: p_intf->p_sys->i_play_status];
+        [o_embedded_window playStatusUpdated: p_intf->p_sys->i_play_status];
         [self setSubmenusEnabled: FALSE];
     }
 
@@ -1368,6 +1377,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                         (int) (i_seconds / 60 % 60),
                         (int) (i_seconds % 60)];
         [o_timefield setStringValue: o_time];
+        [o_embedded_window setTime: o_time position: f_updated];
     }
 #undef p_input
 }

@@ -31,10 +31,29 @@
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_btn_fullscreen" = id; "o_main" = id; "o_volumeslider" = id; }; 
+            OUTLETS = {"o_main" = id; "o_volumeslider" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
+        {
+            CLASS = VLCDetachedEmbeddedVoutView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = VLCEmbeddedVoutView; 
+        }, 
         {CLASS = VLCEmbeddedVoutView; LANGUAGE = ObjC; SUPERCLASS = VLCVoutView; }, 
+        {
+            CLASS = VLCEmbeddedWindow; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_btn_backward" = id; 
+                "o_btn_forward" = id; 
+                "o_btn_fullscreen" = id; 
+                "o_btn_play" = id; 
+                "o_slider" = id; 
+                "o_time" = id; 
+                "o_window" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
         {
             ACTIONS = {
                 bandSliderUpdated = id; 
@@ -122,7 +141,6 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 "o_btn_ff" = id; 
-                "o_btn_fullscreen" = id; 
                 "o_btn_next" = id; 
                 "o_btn_play" = id; 
                 "o_btn_playlist" = id; 
@@ -135,6 +153,7 @@
                 "o_dmi_play" = id; 
                 "o_dmi_previous" = id; 
                 "o_dmi_stop" = id; 
+                "o_embedded_window" = id; 
                 "o_err_btn_dismiss" = id; 
                 "o_err_btn_msgs" = id; 
                 "o_err_bug_lbl" = id; 

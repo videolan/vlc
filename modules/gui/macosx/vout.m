@@ -248,6 +248,51 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_real_vout = NULL;
 }
 
+- (void)updateTitle
+{
+    NSMutableString * o_title = nil, * o_mrl = nil;
+    input_thread_t * p_input;
+
+    if( p_vout == NULL )
+    {
+        return;
+    }
+
+    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+
+    if( p_input == NULL )
+    {
+        return;
+    }
+
+    if( p_input->input.p_item->psz_name != NULL )
+        o_title = [NSMutableString stringWithUTF8String:
+            p_input->input.p_item->psz_name];
+    if( p_input->input.p_item->psz_uri != NULL )
+        o_mrl = [NSMutableString stringWithUTF8String:
+            p_input->input.p_item->psz_uri];
+    if( o_title == nil )
+        o_title = o_mrl;
+
+    if( o_mrl != nil )
+    {
+        if( p_input->input.p_access && !strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
+        {
+            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+            if( prefix_range.location != NSNotFound )
+                [o_mrl deleteCharactersInRange: prefix_range];
+            [o_window setRepresentedFilename: o_mrl];
+        }
+        [o_window setTitle: o_title];
+    }
+    else
+    {
+        [o_window setTitle: [NSString stringWithCString: VOUT_TITLE]];
+    }
+    vlc_object_release( p_input );
+}
+
+
 - (void)setOnTop:(BOOL)b_on_top
 {
     if( b_on_top )
@@ -650,6 +695,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-background", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-embedded", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
 
     /* We only wait for NSApp to initialise if we're not embedded (as in the
@@ -676,7 +722,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         else
         {
             if ( VLCIntf && !(p_vout->b_fullscreen) &&
-                        !(var_GetBool( p_real_vout, "macosx-background" )) )
+                        !(var_GetBool( p_real_vout, "macosx-background" )) &&
+                        var_GetBool( p_vout, "macosx-embedded") )
             {
                 o_return = [[[VLCMain sharedInstance] getEmbeddedList]
                                                             getEmbeddedVout];
@@ -716,6 +763,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     i_time_mouse_last_moved = mdate();
     o_window = [[VLCWindow alloc] initWithVout: p_arg_vout view: self
                                                     frame: s_arg_frame];
+    [self updateTitle];
     [view setFrame: [self frame]];
     [o_window setAcceptsMouseMovedEvents: TRUE];
     return b_return;
@@ -823,6 +871,30 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 @end
 
+@implementation VLCDetachedEmbeddedVoutView
+
+- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
+                     frame: (NSRect *) s_arg_frame
+{
+    BOOL b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame];
+
+    if( b_return )
+    {
+        [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
+        [self updateTitle];
+        [self scaleWindowWithFactor: 1.0];
+        [o_window makeKeyAndOrderFront: self];
+    }
+    return b_return;
+}
+
+- (void)closeVout
+{
+    [o_window orderOut: self];
+    [super closeVout];
+}
+
+@end
 
 /*****************************************************************************
  * VLCWindow implementation
@@ -847,7 +919,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return self;
 }
 
-- (id) initReal: (id) sender
+- (id)initReal: (id) sender
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     NSArray *o_screens = [NSScreen screens];
@@ -943,7 +1015,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         }
     }
 
-    [self updateTitle];
     [self makeKeyAndOrderFront: nil];
     [self setReleasedWhenClosed: YES];
 
@@ -1000,50 +1071,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 }*/
 
 /* This is actually the same as VLCControls::stop. */
-
-- (void)updateTitle /*not modified yey ! */
-{
-    NSMutableString * o_title = NULL, * o_mrl = NULL;
-    input_thread_t * p_input;
-
-    if( p_vout == NULL )
-    {
-        return;
-    }
-
-    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-
-    if( p_input == NULL )
-    {
-        return;
-    }
-
-    if( p_input->input.p_item->psz_name != NULL )
-        o_title = [NSMutableString stringWithUTF8String:
-            p_input->input.p_item->psz_name];
-    if( p_input->input.p_item->psz_uri != NULL )
-        o_mrl = [NSMutableString stringWithUTF8String:
-            p_input->input.p_item->psz_uri];
-    if( o_title == nil )
-        o_title = o_mrl;
-
-    if( o_mrl != nil )
-    {
-        if( p_input->input.p_access && !strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
-        {
-            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
-            if( prefix_range.location != NSNotFound )
-                [o_mrl deleteCharactersInRange: prefix_range];
-            [self setRepresentedFilename: o_mrl];
-        }
-        [self setTitle: o_title];
-    }
-    else
-    {
-        [self setTitle: [NSString stringWithCString: VOUT_TITLE]];
-    }
-    vlc_object_release( p_input );
-}
 
 - (BOOL)windowShouldClose:(id)sender
 {

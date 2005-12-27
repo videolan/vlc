@@ -56,6 +56,7 @@
 - (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
                      frame: (NSRect *) s_arg_frame;
 - (void)closeVout;
+- (void)updateTitle;
 - (void)manage;
 - (void)scaleWindowWithFactor: (float)factor;
 - (void)setOnTop:(BOOL)b_on_top;
@@ -99,6 +100,16 @@
 @end
 
 /*****************************************************************************
+ * VLCDetachedEmbeddedView interface
+ *****************************************************************************/
+
+@interface VLCDetachedEmbeddedVoutView : VLCEmbeddedVoutView
+{
+}
+
+@end
+
+/*****************************************************************************
  * VLCWindow interface
  *****************************************************************************/
 @interface VLCWindow : NSWindow
@@ -119,7 +130,6 @@
 - (void)closeWindow;
 - (id)closeReal: (id) sender;
 - (id)getVoutView;
-- (void)updateTitle;
 
 - (BOOL)windowShouldClose:(id)sender;
 
