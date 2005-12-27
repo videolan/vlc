@@ -1,7 +1,7 @@
 /*****************************************************************************
  * linux_dvb.c : functions to control a DVB card under Linux with v4l2
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2005 the VideoLAN team
  *
  * Authors: Damien Lucas <nitrox@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -59,6 +59,10 @@
 #   include "tables/pmt.h"
 #   include "descriptors/dr.h"
 #   include "psi.h"
+#endif
+
+#ifdef ENABLE_HTTPD
+#   include "vlc_httpd.h"
 #endif
 
 #include "dvb.h"
@@ -268,24 +272,24 @@ void E_(FrontendPoll)( access_t *p_access )
         if( i_ret < 0 )
         {
             if( errno == EWOULDBLOCK )
-                return;
+                return; /* no more events */
 
-            msg_Err( p_access, "reading frontend status failed (%d) %s",
+            msg_Err( p_access, "reading frontend event failed (%d) %s",
                      i_ret, strerror(errno) );
-            continue;
+            return;
         }
 
         i_status = event.status;
         i_diff = i_status ^ p_frontend->i_last_status;
         p_frontend->i_last_status = i_status;
 
-#define IF_UP( x )                                                          \
-    }                                                                       \
-    if ( i_diff & (x) )                                                     \
-    {                                                                       \
-        if ( i_status & (x) )
-
         {
+#define IF_UP( x )                                                          \
+        }                                                                   \
+        if ( i_diff & (x) )                                                 \
+        {                                                                   \
+            if ( i_status & (x) )
+
             IF_UP( FE_HAS_SIGNAL )
                 msg_Dbg( p_access, "frontend has acquired signal" );
             else
@@ -333,8 +337,153 @@ void E_(FrontendPoll)( access_t *p_access )
                 E_(FrontendSet)( p_access );
             }
         }
+#undef IF_UP
     }
 }
+
+#ifdef ENABLE_HTTPD
+/*****************************************************************************
+ * FrontendStatus : Read frontend status
+ *****************************************************************************/
+void E_(FrontendStatus)( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    frontend_t *p_frontend = p_sys->p_frontend;
+    char *p = p_sys->psz_frontend_info = malloc( 10000 );
+    fe_status_t i_status;
+    int i_ret;
+
+    /* Determine type of frontend */
+    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_INFO,
+                        &p_frontend->info )) < 0 )
+    {
+        p += sprintf( p, "ioctl FE_GET_INFO failed (%d) %s\n", i_ret,
+                      strerror(errno) );
+        goto out;
+    }
+
+    /* Print out frontend capabilities. */
+    p += sprintf( p, "<table border=1><tr><th>name</th><td>%s</td></tr>\n",
+                  p_frontend->info.name );
+    switch( p_frontend->info.type )
+    {
+        case FE_QPSK:
+            p += sprintf( p, "<tr><th>type</th><td>QPSK (DVB-S)</td></tr>\n" );
+            break;
+        case FE_QAM:
+            p += sprintf( p, "<tr><th>type</th><td>QAM (DVB-C)</td></tr>\n" );
+            break;
+        case FE_OFDM:
+            p += sprintf( p, "<tr><th>type</th><td>OFDM (DVB-T)</td></tr>\n" );
+            break;
+#if 0 /* DVB_API_VERSION == 3 */
+        case FE_MEMORY:
+            p += sprintf( p, "<tr><th>type</th><td>MEMORY</td></tr>\n" );
+            break;
+        case FE_NET:
+            p += sprintf( p, "<tr><th>type</th><td>NETWORK</td></tr>\n" );
+            break;
+#endif
+        default:
+            p += sprintf( p, "<tr><th>type</th><td>UNKNOWN (%d)</td></tr>\n",
+                          p_frontend->info.type );
+            goto out;
+    }
+#define CHECK_INFO( x )                                                     \
+    p += sprintf( p,                                                        \
+                  "<tr><th>" STRINGIFY(x) "</th><td>%u</td></tr>\n",        \
+                  p_frontend->info.x );
+
+    CHECK_INFO( frequency_min );
+    CHECK_INFO( frequency_max );
+    CHECK_INFO( frequency_stepsize );
+    CHECK_INFO( frequency_tolerance );
+    CHECK_INFO( symbol_rate_min );
+    CHECK_INFO( symbol_rate_max );
+    CHECK_INFO( symbol_rate_tolerance );
+    CHECK_INFO( notifier_delay );
+#undef CHECK_INFO
+
+    p += sprintf( p, "</table><p>Frontend capability list:\n<table border=1>" );
+
+#define CHECK_CAPS( x )                                                     \
+    if ( p_frontend->info.caps & (FE_##x) )                                 \
+        p += sprintf( p, "<tr><td>" STRINGIFY(x) "</td></tr>\n" );
+
+    CHECK_CAPS( IS_STUPID );
+    CHECK_CAPS( CAN_INVERSION_AUTO );
+    CHECK_CAPS( CAN_FEC_1_2 );
+    CHECK_CAPS( CAN_FEC_2_3 );
+    CHECK_CAPS( CAN_FEC_3_4 );
+    CHECK_CAPS( CAN_FEC_4_5 );
+    CHECK_CAPS( CAN_FEC_5_6 );
+    CHECK_CAPS( CAN_FEC_6_7 );
+    CHECK_CAPS( CAN_FEC_7_8 );
+    CHECK_CAPS( CAN_FEC_8_9 );
+    CHECK_CAPS( CAN_FEC_AUTO );
+    CHECK_CAPS( CAN_QPSK );
+    CHECK_CAPS( CAN_QAM_16 );
+    CHECK_CAPS( CAN_QAM_32 );
+    CHECK_CAPS( CAN_QAM_64 );
+    CHECK_CAPS( CAN_QAM_128 );
+    CHECK_CAPS( CAN_QAM_256 );
+    CHECK_CAPS( CAN_QAM_AUTO );
+    CHECK_CAPS( CAN_TRANSMISSION_MODE_AUTO );
+    CHECK_CAPS( CAN_BANDWIDTH_AUTO );
+    CHECK_CAPS( CAN_GUARD_INTERVAL_AUTO );
+    CHECK_CAPS( CAN_HIERARCHY_AUTO );
+    CHECK_CAPS( CAN_MUTE_TS );
+    CHECK_CAPS( CAN_RECOVER );
+    CHECK_CAPS( CAN_CLEAN_SETUP );
+#undef CHECK_CAPS
+
+    p += sprintf( p, "</table><p>Current frontend status:\n<table border=1>" );
+
+    if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_READ_STATUS, &i_status ))
+           < 0 )
+    {
+        p += sprintf( p, "</table>ioctl FE_READ_STATUS failed (%d) %s\n", i_ret,
+                      strerror(errno) );
+        goto out;
+    }
+
+#define CHECK_STATUS( x )                                                   \
+    if ( i_status & (FE_##x) )                                              \
+        p += sprintf( p, "<tr><td>" STRINGIFY(x) "</td></tr>\n" );
+
+    CHECK_STATUS( HAS_SIGNAL );
+    CHECK_STATUS( HAS_CARRIER );
+    CHECK_STATUS( HAS_VITERBI );
+    CHECK_STATUS( HAS_SYNC );
+    CHECK_STATUS( HAS_LOCK );
+    CHECK_STATUS( REINIT );
+#undef CHECK_STATUS
+
+    if ( i_status & FE_HAS_LOCK )
+    {
+        int32_t i_value;
+        p += sprintf( p, "</table><p>Signal status:\n<table border=1>" );
+        if( ioctl( p_sys->i_frontend_handle, FE_READ_BER, &i_value ) >= 0 )
+            p += sprintf( p, "<tr><th>Bit error rate</th><td>%d</td></tr>\n",
+                          i_value );
+        if( ioctl( p_sys->i_frontend_handle, FE_READ_SIGNAL_STRENGTH,
+                   &i_value ) >= 0 )
+            p += sprintf( p, "<tr><th>Signal strength</th><td>%d</td></tr>\n",
+                          i_value );
+        if( ioctl( p_sys->i_frontend_handle, FE_READ_SNR, &i_value ) >= 0 )
+            p += sprintf( p, "<tr><th>SNR</th><td>%d</td></tr>\n",
+                          i_value );
+    }
+    p += sprintf( p, "</table>" );
+
+out:
+    vlc_mutex_lock( &p_sys->httpd_mutex );
+    p_sys->b_request_frontend_info = VLC_FALSE;
+    vlc_cond_signal( &p_sys->httpd_cond );
+    vlc_mutex_unlock( &p_sys->httpd_mutex );
+}
+#endif
+
 /*****************************************************************************
  * FrontendInfo : Return information about given frontend
  *****************************************************************************/
@@ -1242,7 +1391,7 @@ int E_(CAMOpen)( access_t *p_access )
     msg_Dbg( p_access, "CAMInit: CA interface with %d %s", caps.slot_num, 
         caps.slot_num == 1 ? "slot" : "slots" );
     if ( caps.slot_type & CA_CI )
-        msg_Dbg( p_access, "CAMInit: CI high level interface type (not supported)" );
+        msg_Dbg( p_access, "CAMInit: CI high level interface type" );
     if ( caps.slot_type & CA_CI_LINK )
         msg_Dbg( p_access, "CAMInit: CI link layer level interface type" );
     if ( caps.slot_type & CA_CI_PHYS )
@@ -1313,6 +1462,265 @@ int E_(CAMPoll)( access_t * p_access )
 
     return i_ret;
 }
+
+#ifdef ENABLE_HTTPD
+/*****************************************************************************
+ * CAMStatus :
+ *****************************************************************************/
+void E_(CAMStatus)( access_t * p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    char *p;
+    ca_caps_t caps;
+    int i_slot, i;
+
+    if ( p_sys->psz_request != NULL && *p_sys->psz_request )
+    {
+        /* Check if we have an undisplayed MMI message : in that case we ignore
+         * the user input to avoid confusing the CAM. */
+        for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+        {
+            if ( p_sys->pb_slot_mmi_undisplayed[i_slot] == VLC_TRUE )
+            {
+                p_sys->psz_request = NULL;
+                msg_Dbg( p_access,
+                         "ignoring user request because of a new MMI object" );
+                break;
+            }
+        }
+    }
+
+    if ( p_sys->psz_request != NULL && *p_sys->psz_request )
+    {
+        /* We have a mission to accomplish. */
+        en50221_mmi_object_t mmi_object;
+        char *psz_request = p_sys->psz_request;
+        char psz_value[255];
+        int i_slot;
+        vlc_bool_t b_ok = VLC_FALSE;
+
+        p_sys->psz_request = NULL;
+
+        if ( E_(HTTPExtractValue)( psz_request, "slot", psz_value,
+                                   sizeof(psz_value) ) == NULL )
+        {
+            p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
+            goto out;
+        }
+        i_slot = atoi(psz_value);
+
+        if ( E_(HTTPExtractValue)( psz_request, "open", psz_value,
+                                   sizeof(psz_value) ) != NULL )
+        {
+            E_(en50221_OpenMMI)( p_access, i_slot );
+            return;
+        }
+
+        if ( E_(HTTPExtractValue)( psz_request, "close", psz_value,
+                                   sizeof(psz_value) ) != NULL )
+        {
+            E_(en50221_CloseMMI)( p_access, i_slot );
+            return;
+        }
+
+        if ( E_(HTTPExtractValue)( psz_request, "cancel", psz_value,
+                                   sizeof(psz_value) ) == NULL )
+        {
+            b_ok = VLC_TRUE;
+        }
+
+        if ( E_(HTTPExtractValue)( psz_request, "type", psz_value,
+                                   sizeof(psz_value) ) == NULL )
+        {
+            p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
+            goto out;
+        }
+
+        if ( !strcmp( psz_value, "enq" ) )
+        {
+            mmi_object.i_object_type = EN50221_MMI_ANSW;
+            mmi_object.u.answ.b_ok = b_ok;
+            if ( b_ok == VLC_FALSE )
+            {
+                mmi_object.u.answ.psz_answ = strdup("");
+            }
+            else
+            {
+                if ( E_(HTTPExtractValue)( psz_request, "answ", psz_value,
+                                           sizeof(psz_value) ) == NULL )
+                {
+                    p_sys->psz_mmi_info = strdup( "invalid request parameter\n" );
+                    goto out;
+                }
+
+                mmi_object.u.answ.psz_answ = strdup(psz_value);
+            }
+        }
+        else
+        {
+            mmi_object.i_object_type = EN50221_MMI_MENU_ANSW;
+            if ( b_ok == VLC_FALSE )
+            {
+                mmi_object.u.menu_answ.i_choice = 0;
+            }
+            else
+            {
+                if ( E_(HTTPExtractValue)( psz_request, "choice", psz_value,
+                                           sizeof(psz_value) ) == NULL )
+                    mmi_object.u.menu_answ.i_choice = 0;
+                else
+                    mmi_object.u.menu_answ.i_choice = atoi(psz_value);
+            }
+        }
+
+        E_(en50221_SendMMIObject)( p_access, i_slot, &mmi_object );
+        return;
+    }
+
+    /* Check that we have all necessary MMI information. */
+    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    {
+        if ( p_sys->pb_slot_mmi_expected[i_slot] == VLC_TRUE )
+            return;
+    }
+
+    p = p_sys->psz_mmi_info = malloc( 10000 );
+
+    if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0 )
+    {
+        p += sprintf( p, "ioctl CA_GET_CAP failed (%s)\n",
+                      strerror(errno) );
+        goto out;
+    }
+
+    /* Output CA capabilities */
+    p += sprintf( p, "CA interface with %d %s, type:\n<table>", caps.slot_num,
+                  caps.slot_num == 1 ? "slot" : "slots" );
+#define CHECK_CAPS( x, s )                                                  \
+    if ( caps.slot_type & (CA_##x) )                                        \
+        p += sprintf( p, "<tr><td>" s "</td></tr>\n" );
+
+    CHECK_CAPS( CI, "CI high level interface" );
+    CHECK_CAPS( CI_LINK, "CI link layer level interface" );
+    CHECK_CAPS( CI_PHYS, "CI physical layer level interface (not supported)" );
+    CHECK_CAPS( DESCR, "built-in descrambler" );
+    CHECK_CAPS( SC, "simple smartcard interface" );
+#undef CHECK_CAPS
+
+    p += sprintf( p, "</table>%d available %s\n<table>", caps.descr_num,
+        caps.descr_num == 1 ? "descrambler (key)" : "descramblers (keys)" );
+#define CHECK_DESC( x )                                                     \
+    if ( caps.descr_type & (CA_##x) )                                       \
+        p += sprintf( p, "<tr><td>" STRINGIFY(x) "</td></tr>\n" );
+
+    CHECK_DESC( ECD );
+    CHECK_DESC( NDS );
+    CHECK_DESC( DSS );
+#undef CHECK_DESC
+
+    p += sprintf( p, "</table>" );
+
+    for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
+    {
+        ca_slot_info_t sinfo;
+
+        p_sys->pb_slot_mmi_undisplayed[i_slot] = VLC_FALSE;
+        p += sprintf( p, "<p>CA slot #%d: ", i_slot );
+
+        sinfo.num = i_slot;
+        if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
+        {
+            p += sprintf( p, "ioctl CA_GET_SLOT_INFO failed (%s)<br>\n",
+                          strerror(errno) );
+            continue;
+        }
+
+#define CHECK_TYPE( x, s )                                                  \
+        if ( sinfo.type & (CA_##x) )                                        \
+            p += sprintf( p, s );
+
+        CHECK_TYPE( CI, "high level, " );
+        CHECK_TYPE( CI_LINK, "link layer level, " );
+        CHECK_TYPE( CI_PHYS, "physical layer level, " );
+#undef CHECK_TYPE
+
+        if ( sinfo.flags & CA_CI_MODULE_READY )
+        {
+            en50221_mmi_object_t *p_object = E_(en50221_GetMMIObject)( p_access,
+                                                                       i_slot );
+
+            p += sprintf( p, "module present and ready<p>\n" );
+            p += sprintf( p, "<form action=index.html method=get>\n" );
+            p += sprintf( p, "<input type=hidden name=slot value=\"%d\">\n",
+                          i_slot );
+
+            if ( p_object == NULL )
+            {
+                p += sprintf( p, "<input type=submit name=open value=\"Open session\">\n" );
+            }
+            else
+            {
+                switch ( p_object->i_object_type )
+                {
+                case EN50221_MMI_ENQ:
+                    p += sprintf( p, "<input type=hidden name=type value=enq>\n" );
+                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                                  p_object->u.enq.psz_text );
+                    if ( p_object->u.enq.b_blind == VLC_FALSE )
+                        p += sprintf( p, "<tr><td><input type=text name=answ></td></tr>\n" );
+                    else
+                        p += sprintf( p, "<tr><td><input type=password name=answ></td></tr>\n" );
+                    break;
+
+                case EN50221_MMI_MENU:
+                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
+                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                                  p_object->u.menu.psz_title );
+                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
+                                  p_object->u.menu.psz_subtitle );
+                    for ( i = 0; i < p_object->u.menu.i_choices; i++ )
+                        p += sprintf( p, "<input type=radio name=choice value=\"%d\">%s<br>\n", i + 1, p_object->u.menu.ppsz_choices[i] );
+                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
+                                  p_object->u.menu.psz_bottom );
+                    break;
+
+                case EN50221_MMI_LIST:
+                    p += sprintf( p, "<input type=hidden name=type value=menu>\n" );
+                    p += sprintf( p, "<input type=hidden name=choice value=0>\n" );
+                    p += sprintf( p, "<table border=1><tr><th>%s</th></tr>\n",
+                                  p_object->u.menu.psz_title );
+                    p += sprintf( p, "<tr><td>%s</td></tr><tr><td>\n",
+                                  p_object->u.menu.psz_subtitle );
+                    for ( i = 0; i < p_object->u.menu.i_choices; i++ )
+                        p += sprintf( p, "%s<br>\n",
+                                      p_object->u.menu.ppsz_choices[i] );
+                    p += sprintf( p, "</td></tr><tr><td>%s</td></tr>\n",
+                                  p_object->u.menu.psz_bottom );
+                    break;
+
+                default:
+                    p += sprintf( p, "<table><tr><th>Unknown MMI object type</th></tr>\n" );
+                }
+
+                p += sprintf( p, "</table><p><input type=submit name=ok value=\"OK\">\n" );
+                p += sprintf( p, "<input type=submit name=cancel value=\"Cancel\">\n" );
+                p += sprintf( p, "<input type=submit name=close value=\"Close Session\">\n" );
+            }
+            p += sprintf( p, "</form>\n" );
+        }
+        else if ( sinfo.flags & CA_CI_MODULE_PRESENT )
+            p += sprintf( p, "module present, not ready<br>\n" );
+        else
+            p += sprintf( p, "module not present<br>\n" );
+    }
+
+out:
+    vlc_mutex_lock( &p_sys->httpd_mutex );
+    p_sys->b_request_mmi_info = VLC_FALSE;
+    vlc_cond_signal( &p_sys->httpd_cond );
+    vlc_mutex_unlock( &p_sys->httpd_mutex );
+}
+#endif
 
 /*****************************************************************************
  * CAMSet :

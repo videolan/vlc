@@ -2,7 +2,7 @@
  * en50221.c : implementation of the transport, session and applications
  * layers of EN 50 221
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2005 the VideoLAN team
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  * Based on code from libdvbci Copyright (C) 2000 Klaus Schmidinger
@@ -57,6 +57,10 @@
 #   include "tables/pmt.h"
 #   include "descriptors/dr.h"
 #   include "psi.h"
+#endif
+
+#ifdef ENABLE_HTTPD
+#   include "vlc_httpd.h"
 #endif
 
 #include "dvb.h"
@@ -471,6 +475,99 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
     }
 }
 
+#if 0
+/* unused code for the moment - commented out to keep gcc happy */
+/*****************************************************************************
+ * SessionCreate
+ *****************************************************************************/
+static void SessionCreate( access_t * p_access, int i_slot, int i_resource_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    uint8_t p_response[16];
+    uint8_t i_tag;
+    int i_session_id;
+
+    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    {
+        if ( !p_sys->p_sessions[i_session_id - 1].i_resource_id )
+            break;
+    }
+    if ( i_session_id == MAX_SESSIONS )
+    {
+        msg_Err( p_access, "too many sessions !" );
+        return;
+    }
+    p_sys->p_sessions[i_session_id - 1].i_slot = i_slot;
+    p_sys->p_sessions[i_session_id - 1].i_resource_id = i_resource_id;
+    p_sys->p_sessions[i_session_id - 1].pf_close = NULL;
+    p_sys->p_sessions[i_session_id - 1].pf_manage = NULL;
+    p_sys->p_sessions[i_session_id - 1].p_sys = NULL;
+
+    p_response[0] = ST_CREATE_SESSION;
+    p_response[1] = 0x6;
+    p_response[2] = i_resource_id >> 24;
+    p_response[3] = (i_resource_id >> 16) & 0xff;
+    p_response[4] = (i_resource_id >> 8) & 0xff;
+    p_response[5] = i_resource_id & 0xff;
+    p_response[6] = i_session_id >> 8;
+    p_response[7] = i_session_id & 0xff;
+
+    if ( TPDUSend( p_access, i_slot, T_DATA_LAST, p_response, 4 ) !=
+            VLC_SUCCESS )
+    {
+        msg_Err( p_access,
+                 "SessionCreate: couldn't send TPDU on slot %d", i_slot );
+        return;
+    }
+    if ( TPDURecv( p_access, i_slot, &i_tag, NULL, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_access,
+                 "SessionCreate: couldn't recv TPDU on slot %d", i_slot );
+        return;
+    }
+}
+#endif
+
+/*****************************************************************************
+ * SessionCreateResponse
+ *****************************************************************************/
+static void SessionCreateResponse( access_t * p_access, uint8_t i_slot,
+                                   uint8_t *p_spdu, int i_size )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_status = p_spdu[2];
+    int i_resource_id = ResourceIdToInt( &p_spdu[3] );
+    int i_session_id = ((int)p_spdu[7] << 8) | p_spdu[8];
+
+    if ( i_status != SS_OK )
+    {
+        msg_Err( p_access, "SessionCreateResponse: failed to open session %d"
+                 " resource=0x%x status=0x%x", i_session_id, i_resource_id,
+                 i_status );
+        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+        return;
+    }
+
+    switch ( i_resource_id )
+    {
+    case RI_RESOURCE_MANAGER:
+        ResourceManagerOpen( p_access, i_session_id ); break; 
+    case RI_APPLICATION_INFORMATION:
+        ApplicationInformationOpen( p_access, i_session_id ); break; 
+    case RI_CONDITIONAL_ACCESS_SUPPORT:
+        ConditionalAccessOpen( p_access, i_session_id ); break; 
+    case RI_DATE_TIME:
+        DateTimeOpen( p_access, i_session_id ); break; 
+    case RI_MMI:
+        MMIOpen( p_access, i_session_id ); break; 
+
+    case RI_HOST_CONTROL:
+    default:
+        msg_Err( p_access, "unknown resource id (0x%x)", i_resource_id );
+        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+    }
+}
+
 /*****************************************************************************
  * SessionSendClose
  *****************************************************************************/
@@ -561,20 +658,39 @@ static void SPDUHandle( access_t * p_access, uint8_t i_slot,
         SessionOpen( p_access, i_slot, p_spdu, i_size );
         break;
 
+    case ST_CREATE_SESSION_RESPONSE:
+        if ( i_size != 9 || p_spdu[1] != 0x7 )
+            return;
+        SessionCreateResponse( p_access, i_slot, p_spdu, i_size );
+        break;
+
     case ST_CLOSE_SESSION_REQUEST:
+        if ( i_size != 4 || p_spdu[1] != 0x2 )
+            return;
         i_session_id = ((int)p_spdu[2] << 8) | p_spdu[3];
         SessionClose( p_access, i_session_id );
         break;
 
     case ST_CLOSE_SESSION_RESPONSE:
-        i_session_id = ((int)p_spdu[2] << 8) | p_spdu[3];
-        if ( p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
-            p_sys->p_sessions[i_session_id - 1].pf_close( p_access,
-                                                          i_session_id );
-        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+        if ( i_size != 5 || p_spdu[1] != 0x3 )
+            return;
+        i_session_id = ((int)p_spdu[3] << 8) | p_spdu[4];
+        if ( p_spdu[2] )
+        {
+            msg_Err( p_access, "closing a session which is not allocated (%d)",
+                     i_session_id );
+        }
+        else
+        {
+            if ( p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
+                p_sys->p_sessions[i_session_id - 1].pf_close( p_access,
+                                                              i_session_id );
+            p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+        }
         break;
 
     default:
+        msg_Err( p_access, "unexpected tag in SPDUHandle (%x)", p_spdu[0] );
         break;
     }
 }
@@ -675,13 +791,13 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
     p = SetLength( p, i_size );
     if ( i_size )
         memcpy( p, p_data, i_size );
-    if( p_sys->i_ca_type == CA_CI_LINK )
+    if ( p_sys->i_ca_type == CA_CI_LINK )
     {
         i_ret = SPDUSend( p_access, i_session_id, p_apdu, i_size + p - p_apdu );
     }
     else
     {
-        if( i_size + p - p_apdu >256 )
+        if ( i_size + p - p_apdu > 256 )
         {
             msg_Err( p_access, "CAM: apdu overflow" );
             i_ret = VLC_EGENERIC;
@@ -690,11 +806,11 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
         {
             char *psz_hex;
             ca_msg.length = i_size + p - p_apdu;
-            if( i_size == 0 ) ca_msg.length=3;
+            if ( i_size == 0 ) ca_msg.length=3;
             psz_hex = (char*)malloc( ca_msg.length*3 + 1);
             memcpy( ca_msg.msg, p_apdu, i_size + p - p_apdu );
             i_ret = ioctl(p_sys->i_ca_handle, CA_SEND_MSG, &ca_msg );
-            if( i_ret < 0 )
+            if ( i_ret < 0 )
             {
                 msg_Err( p_access, "Error sending to CAM: %s", strerror(errno) );
                 i_ret = VLC_EGENERIC;
@@ -758,6 +874,20 @@ static void ResourceManagerOpen( access_t * p_access, int i_session_id )
 /*
  * Application Information
  */
+
+/*****************************************************************************
+ * ApplicationInformationEnterMenu
+ *****************************************************************************/
+static void ApplicationInformationEnterMenu( access_t * p_access,
+                                             int i_session_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+
+    msg_Dbg( p_access, "Entering MMI menus on session %d", i_session_id );
+    APDUSend( p_access, i_session_id, AOT_ENTER_MENU, NULL, 0 );
+    p_sys->pb_slot_mmi_expected[i_slot] = VLC_TRUE;
+}
 
 /*****************************************************************************
  * ApplicationInformationHandle
@@ -1191,6 +1321,18 @@ static void ConditionalAccessHandle( access_t * p_access, int i_session_id,
 }
 
 /*****************************************************************************
+ * ConditionalAccessClose
+ *****************************************************************************/
+static void ConditionalAccessClose( access_t * p_access, int i_session_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    msg_Dbg( p_access, "closing ConditionalAccess session (%d)", i_session_id );
+
+    free( p_sys->p_sessions[i_session_id - 1].p_sys );
+}
+
+/*****************************************************************************
  * ConditionalAccessOpen
  *****************************************************************************/
 static void ConditionalAccessOpen( access_t * p_access, int i_session_id )
@@ -1200,6 +1342,7 @@ static void ConditionalAccessOpen( access_t * p_access, int i_session_id )
     msg_Dbg( p_access, "opening ConditionalAccess session (%d)", i_session_id );
 
     p_sys->p_sessions[i_session_id - 1].pf_handle = ConditionalAccessHandle;
+    p_sys->p_sessions[i_session_id - 1].pf_close = ConditionalAccessClose;
     p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(system_ids_t));
     memset( p_sys->p_sessions[i_session_id - 1].p_sys, 0,
             sizeof(system_ids_t) );
@@ -1309,6 +1452,18 @@ static void DateTimeManage( access_t * p_access, int i_session_id )
 }
 
 /*****************************************************************************
+ * DateTimeClose
+ *****************************************************************************/
+static void DateTimeClose( access_t * p_access, int i_session_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    msg_Dbg( p_access, "closing DateTime session (%d)", i_session_id );
+
+    free( p_sys->p_sessions[i_session_id - 1].p_sys );
+}
+
+/*****************************************************************************
  * DateTimeOpen
  *****************************************************************************/
 static void DateTimeOpen( access_t * p_access, int i_session_id )
@@ -1319,6 +1474,7 @@ static void DateTimeOpen( access_t * p_access, int i_session_id )
 
     p_sys->p_sessions[i_session_id - 1].pf_handle = DateTimeHandle;
     p_sys->p_sessions[i_session_id - 1].pf_manage = DateTimeManage;
+    p_sys->p_sessions[i_session_id - 1].pf_close = DateTimeClose;
     p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(date_time_t));
     memset( p_sys->p_sessions[i_session_id - 1].p_sys, 0, sizeof(date_time_t) );
 
@@ -1363,6 +1519,63 @@ static void DateTimeOpen( access_t * p_access, int i_session_id )
 #define AI_CANCEL  0x00
 #define AI_ANSWER  0x01
 
+typedef struct
+{
+    en50221_mmi_object_t last_object;
+} mmi_t;
+
+/*****************************************************************************
+ * MMISendObject
+ *****************************************************************************/
+static void MMISendObject( access_t *p_access, int i_session_id,
+                           en50221_mmi_object_t *p_object )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    uint8_t *p_data;
+    int i_size, i_tag;
+
+    switch ( p_object->i_object_type )
+    {
+    case EN50221_MMI_ANSW:
+        i_tag = AOT_ANSW;
+        i_size = 1 + strlen( p_object->u.answ.psz_answ );
+        p_data = malloc( i_size );
+        p_data[0] = (p_object->u.answ.b_ok == VLC_TRUE) ? 0x1 : 0x0;
+        strncpy( &p_data[1], p_object->u.answ.psz_answ, i_size - 1 );
+        break;
+
+    case EN50221_MMI_MENU_ANSW:
+        i_tag = AOT_MENU_ANSW;
+        i_size = 1;
+        p_data = malloc( i_size );
+        p_data[0] = p_object->u.menu_answ.i_choice;
+        break;
+
+    default:
+        msg_Err( p_access, "unknown MMI object %d", p_object->i_object_type );
+        return;
+    }
+
+    APDUSend( p_access, i_session_id, i_tag, p_data, i_size );
+    free( p_data );
+
+    p_sys->pb_slot_mmi_expected[i_slot] = VLC_TRUE;
+}
+
+/*****************************************************************************
+ * MMISendClose
+ *****************************************************************************/
+static void MMISendClose( access_t *p_access, int i_session_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+
+    APDUSend( p_access, i_session_id, AOT_CLOSE_MMI, NULL, 0 );
+
+    p_sys->pb_slot_mmi_expected[i_slot] = VLC_TRUE;
+}
+
 /*****************************************************************************
  * MMIDisplayReply
  *****************************************************************************/
@@ -1381,28 +1594,104 @@ static void MMIDisplayReply( access_t *p_access, int i_session_id )
 /*****************************************************************************
  * MMIGetText
  *****************************************************************************/
-static char *MMIGetText( access_t *p_access, char *psz_text,
-                         uint8_t **pp_apdu, int *pi_size )
+static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
 {
     int i_tag = APDUGetTag( *pp_apdu, *pi_size );
+    char *psz_text;
     int l;
     uint8_t *d;
 
     if ( i_tag != AOT_TEXT_LAST )
     {
         msg_Err( p_access, "unexpected text tag: %06x", i_tag );
-        psz_text[0] = '\0';
         *pi_size = 0;
-        return psz_text;
+        return strdup( "" );
     }
 
     d = APDUGetLength( *pp_apdu, &l );
+    psz_text = malloc( l + 1 );
     strncpy( psz_text, (char *)d, l );
     psz_text[l] = '\0';
 
     *pp_apdu += l + 4;
     *pi_size -= l + 4;
     return psz_text;
+}
+
+/*****************************************************************************
+ * MMIHandleEnq
+ *****************************************************************************/
+static void MMIHandleEnq( access_t *p_access, int i_session_id,
+                          uint8_t *p_apdu, int i_size )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    int l;
+    uint8_t *d = APDUGetLength( p_apdu, &l );
+
+    en50221_MMIFree( &p_mmi->last_object );
+    p_mmi->last_object.i_object_type = EN50221_MMI_ENQ;
+    p_mmi->last_object.u.enq.b_blind = (*d & 0x1) ? VLC_TRUE : VLC_FALSE;
+    d += 2; /* skip answer_text_length because it is not mandatory */
+    l -= 2;
+    p_mmi->last_object.u.enq.psz_text = malloc( l + 1 );
+    strncpy( p_mmi->last_object.u.enq.psz_text, (char *)d, l );
+    p_mmi->last_object.u.enq.psz_text[l] = '\0';
+
+    msg_Dbg( p_access, "MMI enq: %s%s", p_mmi->last_object.u.enq.psz_text,
+             p_mmi->last_object.u.enq.b_blind == VLC_TRUE ? " (blind)" : "" );
+    p_sys->pb_slot_mmi_expected[i_slot] = VLC_FALSE;
+    p_sys->pb_slot_mmi_undisplayed[i_slot] = VLC_TRUE;
+}
+
+/*****************************************************************************
+ * MMIHandleMenu
+ *****************************************************************************/
+static void MMIHandleMenu( access_t *p_access, int i_session_id, int i_tag,
+                           uint8_t *p_apdu, int i_size )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    int l;
+    uint8_t *d = APDUGetLength( p_apdu, &l );
+
+    en50221_MMIFree( &p_mmi->last_object );
+    p_mmi->last_object.i_object_type = (i_tag == AOT_MENU_LAST) ?
+                                       EN50221_MMI_MENU : EN50221_MMI_LIST;
+    p_mmi->last_object.u.menu.i_choices = 0;
+    p_mmi->last_object.u.menu.ppsz_choices = NULL;
+
+    if ( l > 0 )
+    {
+        l--; d++; /* choice_nb */
+
+#define GET_FIELD( x )                                                      \
+        if ( l > 0 )                                                        \
+        {                                                                   \
+            p_mmi->last_object.u.menu.psz_##x                               \
+                            = MMIGetText( p_access, &d, &l );               \
+            msg_Dbg( p_access, "MMI " STRINGIFY( x ) ": %s",                \
+                     p_mmi->last_object.u.menu.psz_##x );                   \
+        }
+
+        GET_FIELD( title );
+        GET_FIELD( subtitle );
+        GET_FIELD( bottom );
+#undef GET_FIELD
+
+        while ( l > 0 )
+        {
+            char *psz_text = MMIGetText( p_access, &d, &l );
+            TAB_APPEND( p_mmi->last_object.u.menu.i_choices,
+                        p_mmi->last_object.u.menu.ppsz_choices,
+                        psz_text );
+            msg_Dbg( p_access, "MMI choice: %s", psz_text );
+        }
+    }
+    p_sys->pb_slot_mmi_expected[i_slot] = VLC_FALSE;
+    p_sys->pb_slot_mmi_undisplayed[i_slot] = VLC_TRUE;
 }
 
 /*****************************************************************************
@@ -1440,38 +1729,17 @@ static void MMIHandle( access_t *p_access, int i_session_id,
         break;
     }
 
+    case AOT_ENQ:
+        MMIHandleEnq( p_access, i_session_id, p_apdu, i_size );
+        break;
+
     case AOT_LIST_LAST:
     case AOT_MENU_LAST:
-    {
-        int l;
-        uint8_t *d = APDUGetLength( p_apdu, &l );
-        char psz_text[255];
-
-        if ( l > 0 )
-        {
-            l--; d++; /* choice_nb */
-
-            if ( l > 0 )
-                msg_Info( p_access, "MMI title: %s",
-                          MMIGetText( p_access, psz_text, &d, &l ) );
-            if ( l > 0 )
-                msg_Info( p_access, "MMI subtitle: %s",
-                          MMIGetText( p_access, psz_text, &d, &l ) );
-            if ( l > 0 )
-                msg_Info( p_access, "MMI bottom: %s",
-                          MMIGetText( p_access, psz_text, &d, &l ) );
-            while ( l > 0 )
-            {
-                msg_Info( p_access, "MMI: %s",
-                          MMIGetText( p_access, psz_text, &d, &l ) );
-            }
-        }
+        MMIHandleMenu( p_access, i_session_id, i_tag, p_apdu, i_size );
         break;
-    }
 
     case AOT_CLOSE_MMI:
         SessionSendClose( p_access, i_session_id );
-        msg_Dbg( p_access, "closing MMI session (%d)", i_session_id );
         break;
 
     default:
@@ -1480,15 +1748,37 @@ static void MMIHandle( access_t *p_access, int i_session_id,
 }
 
 /*****************************************************************************
+ * MMIClose
+ *****************************************************************************/
+static void MMIClose( access_t *p_access, int i_session_id )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+    mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+
+    en50221_MMIFree( &p_mmi->last_object );
+    free( p_sys->p_sessions[i_session_id - 1].p_sys );
+
+    msg_Dbg( p_access, "closing MMI session (%d)", i_session_id );
+    p_sys->pb_slot_mmi_expected[i_slot] = VLC_FALSE;
+    p_sys->pb_slot_mmi_undisplayed[i_slot] = VLC_TRUE;
+}
+
+/*****************************************************************************
  * MMIOpen
  *****************************************************************************/
 static void MMIOpen( access_t *p_access, int i_session_id )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    mmi_t *p_mmi;
 
     msg_Dbg( p_access, "opening MMI session (%d)", i_session_id );
 
     p_sys->p_sessions[i_session_id - 1].pf_handle = MMIHandle;
+    p_sys->p_sessions[i_session_id - 1].pf_close = MMIClose;
+    p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(mmi_t));
+    p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    p_mmi->last_object.i_object_type = EN50221_MMI_NONE;
 }
 
 
@@ -1825,12 +2115,137 @@ int E_(en50221_SetCAPMT)( access_t * p_access, dvbpsi_pmt_t *p_pmt )
 }
 
 /*****************************************************************************
+ * en50221_OpenMMI :
+ *****************************************************************************/
+int E_(en50221_OpenMMI)( access_t * p_access, int i_slot )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if( p_sys->i_ca_type & CA_CI_LINK )
+    {
+        int i_session_id;
+        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        {
+            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
+                  && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+            {
+                msg_Dbg( p_access,
+                         "MMI menu is already opened on slot %d (session=%d)",
+                         i_slot, i_session_id );
+                return VLC_SUCCESS;
+            }
+        }
+
+        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        {
+            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+                    == RI_APPLICATION_INFORMATION
+                  && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+            {
+                ApplicationInformationEnterMenu( p_access, i_session_id );
+                return VLC_SUCCESS;
+            }
+        }
+
+        msg_Err( p_access, "no application information on slot %d", i_slot );
+        return VLC_EGENERIC;
+    }
+    else
+    {
+        msg_Err( p_access, "MMI menu not supported" );
+        return VLC_EGENERIC;
+    }
+}
+
+/*****************************************************************************
+ * en50221_CloseMMI :
+ *****************************************************************************/
+int E_(en50221_CloseMMI)( access_t * p_access, int i_slot )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if( p_sys->i_ca_type & CA_CI_LINK )
+    {
+        int i_session_id;
+        for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+        {
+            if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
+                  && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+            {
+                MMISendClose( p_access, i_session_id );
+                return VLC_SUCCESS;
+            }
+        }
+
+        msg_Warn( p_access, "closing a non-existing MMI session on slot %d",
+                  i_slot );
+        return VLC_EGENERIC;
+    }
+    else
+    {
+        msg_Err( p_access, "MMI menu not supported" );
+        return VLC_EGENERIC;
+    }
+}
+
+/*****************************************************************************
+ * en50221_GetMMIObject :
+ *****************************************************************************/
+en50221_mmi_object_t *E_(en50221_GetMMIObject)( access_t * p_access,
+                                                int i_slot )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_session_id;
+
+    if ( p_sys->pb_slot_mmi_expected[i_slot] == VLC_TRUE )
+        return NULL; /* should not happen */
+
+    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    {
+        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
+              && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+        {
+            mmi_t *p_mmi =
+                (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+            if ( p_mmi == NULL )
+                return NULL; /* should not happen */
+            return &p_mmi->last_object;
+        }
+    }
+
+    return NULL;
+}
+
+
+/*****************************************************************************
+ * en50221_SendMMIObject :
+ *****************************************************************************/
+void E_(en50221_SendMMIObject)( access_t * p_access, int i_slot,
+                                en50221_mmi_object_t *p_object )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i_session_id;
+
+    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    {
+        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id == RI_MMI
+              && p_sys->p_sessions[i_session_id - 1].i_slot == i_slot )
+        {
+            MMISendObject( p_access, i_session_id, p_object );
+            return;
+        }
+    }
+
+    msg_Err( p_access, "SendMMIObject when no MMI session is opened !" );
+}
+
+/*****************************************************************************
  * en50221_End :
  *****************************************************************************/
 void E_(en50221_End)( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i;
+    int i_session_id, i;
 
     for ( i = 0; i < MAX_PROGRAMS; i++ )
     {
@@ -1840,5 +2255,17 @@ void E_(en50221_End)( access_t * p_access )
         }
     }
 
-    /* TODO */
+    for ( i_session_id = 1; i_session_id <= MAX_SESSIONS; i_session_id++ )
+    {
+        if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+              && p_sys->p_sessions[i_session_id - 1].pf_close != NULL )
+        {
+            p_sys->p_sessions[i_session_id - 1].pf_close( p_access,
+                                                          i_session_id );
+        }
+    }
+
+    /* Leave the CAM configured, so that it can be reused in another
+     * program. */
 }
+

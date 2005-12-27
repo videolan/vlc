@@ -1,7 +1,7 @@
 /*****************************************************************************
  * access.c: DVB card input v4l2 only
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2005 the VideoLAN team
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -54,6 +54,10 @@
 #   include "tables/pmt.h"
 #   include "descriptors/dr.h"
 #   include "psi.h"
+#endif
+
+#ifdef ENABLE_HTTPD
+#   include "vlc_httpd.h"
 #endif
 
 #include "dvb.h"
@@ -139,6 +143,40 @@ static void Close( vlc_object_t *p_this );
 #define HIERARCHY_TEXT N_("Terrestrial hierarchy mode")
 #define HIERARCHY_LONGTEXT ""
 
+#define HOST_TEXT N_( "HTTP Host address" )
+#define HOST_LONGTEXT N_( \
+    "To enable the internal HTTP server, set its address and port here." )
+
+#define USER_TEXT N_( "HTTP user name" )
+#define USER_LONGTEXT N_( \
+    "You can set the user name the administrator will use to log into " \
+    "the internal HTTP server." )
+
+#define PASSWORD_TEXT N_( "HTTP password" )
+#define PASSWORD_LONGTEXT N_( \
+    "You can set the password the administrator will use to log into " \
+    "the internal HTTP server." )
+
+#define ACL_TEXT N_( "HTTP ACL" )
+#define ACL_LONGTEXT N_( \
+    "You can set the access control list (equivalent to .hosts) file path, " \
+    "which will limit the range of IPs entitled to log into the internal " \
+    "HTTP server." )
+
+#define CERT_TEXT N_( "Certificate file" )
+#define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
+                          "(enables SSL)" )
+
+#define KEY_TEXT N_( "Private key file" )
+#define KEY_LONGTEXT N_( "HTTP interface x509 PEM private key file" )
+
+#define CA_TEXT N_( "Root CA file" )
+#define CA_LONGTEXT N_( "HTTP interface x509 PEM trusted root CA " \
+                        "certificates file" )
+
+#define CRL_TEXT N_( "CRL file" )
+#define CRL_LONGTEXT N_( "HTTP interface Certificates Revocation List file" )
+
 vlc_module_begin();
     set_shortname( _("DVB") );
     set_description( N_("DVB input with v4l2 support") );
@@ -191,6 +229,26 @@ vlc_module_begin();
                  TRANSMISSION_LONGTEXT, VLC_TRUE );
     add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
                  VLC_TRUE );
+#ifdef ENABLE_HTTPD
+    /* MMI HTTP interface */
+    set_section( N_("HTTP server" ), 0 );
+    add_string( "dvb-http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT,
+                VLC_TRUE );
+    add_string( "dvb-http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
+                VLC_TRUE );
+    add_string( "dvb-http-password", NULL, NULL, PASSWORD_TEXT,
+                PASSWORD_LONGTEXT, VLC_TRUE );
+    add_string( "dvb-http-acl", NULL, NULL, ACL_TEXT, ACL_LONGTEXT,
+                VLC_TRUE );
+    add_string( "dvb-http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT,
+                VLC_TRUE );
+    add_string( "dvb-http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,
+                VLC_TRUE );
+    add_string( "dvb-http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,
+                VLC_TRUE );
+    add_string( "dvb-http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,
+                VLC_TRUE );
+#endif
 
     set_capability( "access2", 0 );
     add_shortcut( "dvb" );
@@ -303,6 +361,10 @@ static int Open( vlc_object_t *p_this )
     else
         p_sys->i_read_once = DVB_READ_ONCE_START;
 
+#ifdef ENABLE_HTTPD
+    E_(HTTPOpen)( p_access );
+#endif
+
     return VLC_SUCCESS;
 }
 
@@ -319,6 +381,10 @@ static void Close( vlc_object_t *p_this )
     E_(DVRClose)( p_access );
     E_(FrontendClose)( p_access );
     E_(CAMClose)( p_access );
+
+#ifdef ENABLE_HTTPD
+    E_(HTTPClose)( p_access );
+#endif
 
     free( p_sys );
 }
@@ -375,6 +441,37 @@ static block_t *Block( access_t *p_access )
         {
             E_(FrontendPoll)( p_access );
         }
+
+#ifdef ENABLE_HTTPD
+        if ( p_sys->i_httpd_timeout && mdate() > p_sys->i_httpd_timeout )
+        {
+            vlc_mutex_lock( &p_sys->httpd_mutex );
+            if ( p_sys->b_request_frontend_info )
+            {
+                msg_Warn( p_access, "frontend timeout for HTTP interface" );
+                p_sys->b_request_frontend_info = VLC_FALSE;
+                p_sys->psz_frontend_info = strdup( "Timeout getting info\n" );
+            }
+            if ( p_sys->b_request_mmi_info )
+            {
+                msg_Warn( p_access, "MMI timeout for HTTP interface" );
+                p_sys->b_request_mmi_info = VLC_FALSE;
+                p_sys->psz_mmi_info = strdup( "Timeout getting info\n" );
+            }
+            vlc_cond_signal( &p_sys->httpd_cond );
+            vlc_mutex_unlock( &p_sys->httpd_mutex );
+        }
+
+        if ( p_sys->b_request_frontend_info )
+        {
+            E_(FrontendStatus)( p_access );
+        }
+
+        if ( p_sys->b_request_mmi_info )
+        {
+            E_(CAMStatus)( p_access );
+        }
+#endif
 
         if ( p_sys->i_frontend_timeout && mdate() > p_sys->i_frontend_timeout )
         {
@@ -577,6 +674,17 @@ static void VarInit( access_t *p_access )
     var_Create( p_access, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-guard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+#ifdef ENABLE_HTTPD
+    var_Create( p_access, "dvb-http-host", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-user", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-password", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-acl", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-intf-cert", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-intf-key", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-intf-ca", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-http-intf-crl", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+#endif
 }
 
 /* */
