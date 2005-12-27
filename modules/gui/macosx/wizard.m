@@ -1019,7 +1019,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
         }
         else if ( [o_userSelections objectForKey:@"stmgMhd"] == @"2" || 
-            [o_userSelections objectForKey:@"stmgMhd"] == @"2" )
+            [o_userSelections objectForKey:@"stmgMhd"] == @"3" )
         {
             /* if UDP is the streaming protocol, only MPEG-TS is available */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
