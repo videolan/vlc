@@ -434,7 +434,9 @@ void E_(FrontendStatus)( access_t *p_access )
     CHECK_CAPS( CAN_HIERARCHY_AUTO );
     CHECK_CAPS( CAN_MUTE_TS );
     CHECK_CAPS( CAN_RECOVER );
+#if 0 /* Disabled because of older distributions */
     CHECK_CAPS( CAN_CLEAN_SETUP );
+#endif
 #undef CHECK_CAPS
 
     p += sprintf( p, "</table><p>Current frontend status:\n<table border=1>" );
