@@ -1,8 +1,8 @@
 /*****************************************************************************
  * embeddedwindow.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
- * $Id: playlistinfo.h 11664 2005-07-09 06:17:09Z courmisch $
+ * Copyright (C) 2002-2005 the VideoLAN team
+ * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org> 
  *
