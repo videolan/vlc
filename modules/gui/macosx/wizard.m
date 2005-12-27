@@ -991,7 +991,8 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
             [o_t5_matrix_encap selectCellAtRow:0 column:0];
         }
-        if ([o_userSelections objectForKey:@"stmgMhd"] == @"1")
+
+        if ( [o_userSelections objectForKey:@"stmgMhd"] == @"1" )
         {
             /* if MMS is the streaming protocol, only ASFH is available */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
@@ -1007,7 +1008,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:YES];
             [o_t5_matrix_encap selectCellAtRow:10 column:0];
         }
-        else if ([o_userSelections objectForKey:@"stmgMhd"] == @"0")
+        else if ( [o_userSelections objectForKey:@"stmgMhd"] == @"0" )
         {
             /* if HTTP is the streaming protocol, disable all unsupported
              * encap-formats, but don't touch the other ones selected above */
@@ -1017,7 +1018,8 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
         }
-        else if ([o_userSelections objectForKey:@"stmgMhd"] >= @"2")
+        else if ( [o_userSelections objectForKey:@"stmgMhd"] == @"2" || 
+            [o_userSelections objectForKey:@"stmgMhd"] == @"2" )
         {
             /* if UDP is the streaming protocol, only MPEG-TS is available */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
