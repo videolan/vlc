@@ -120,10 +120,10 @@ static void Close( vlc_object_t * );
 
 #define ME_TEXT N_("Motion estimation algorithm.")
 #define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
-    " dia - diamond (fastest) \n" \
-    " hex - hexagon (default setting) \n" \
-    " umh - uneven multi-hexagon (better but slower) \n" \
-    " esa - exhaustive search (extremely slow, primarily for testing) " )
+    " - dia: diamond search, radius 1 (fast)\n" \
+    " - hex: hexagonal search, radius 2\n" \
+    " - umh: uneven multi-hexagon search (better but slower)\n" \
+    " - esa: exhaustive search (extremely slow, primarily for testing)\n" )
 
 #define MERANGE_TEXT N_("Motion estimation search range.")
 #define MERANGE_LONGTEXT N_( "Maximum distance to search for motion estimation, "\
@@ -135,12 +135,32 @@ static void Close( vlc_object_t * );
     "it just prevents the stats from being calculated (for speed)." )
 
 #define NO_B_ADAPT_TEXT N_("Disable adaptive B-frames.")
-#define NO_B_ADAPT_LONGTEXT N_( "If this is on, the specified number of consequtive B-frames "\
+#define NO_B_ADAPT_LONGTEXT N_( "If this is on, the specified number of consecutive B-frames "\
     "will always be used, except possibly before an I-frame. " )
 
 #define B_BIAS_TEXT N_("Bias the choice to use B-frames.")
-#define B_BIAS_LONGTEXT N_( "Positive values cause more= B-frames, negative values cause less B-frames. " )
+#define B_BIAS_LONGTEXT N_( "Positive values cause more B-frames, negative values cause less B-frames. " )
 
+#define CRF_TEXT N_("CRF (1-pass Quality-based VBR (nominal QP)).")
+#define CRF_LONGTEXT N_( "CRF (1-pass Quality-based VBR (nominal QP))." )
+
+#define TRELLIS_TEXT N_("Trellis RD quantization.")
+#define TRELLIS_LONGTEXT N_( "Trellis RD quantization. Requires CABAC. \n" \
+     " - 0: disabled\n" \
+     " - 1: enabled only on the final encode of a MB\n" \
+     " - 2: enabled on all mode decisions\n" )
+
+#define MIXED_REFS_TEXT N_("Decide references on a per partition basis.")
+#define MIXED_REFS_LONGTEXT N_( "Decide references on a per partition basis." )
+
+#define B_RDO_TEXT N_("RD based mode decision for B-frames.")
+#define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. Requires subme 6." )
+
+#define NO_FAST_PSKIP_TEXT N_("Disable early SKIP detection on P-frames.")
+#define NO_FAST_PSKIP_LONGTEXT N_( "Disable early SKIP detection on P-frames.")
+
+#define WEIGHTB_TEXT N_("Weighted prediction for B-frames.")
+#define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
 #if X264_BUILD >= 23
 static char *enc_me_list[] =
@@ -227,28 +247,61 @@ vlc_module_begin();
         change_integer_range( 1, 5 );
 #endif
 
-#if X264_BUILD >= 23
-/* r221 */    add_string( SOUT_CFG_PREFIX "me", "hex", NULL, ME_TEXT,
+#if X264_BUILD >= 23 /* r221 */
+    add_string( SOUT_CFG_PREFIX "me", "hex", NULL, ME_TEXT,
                 ME_LONGTEXT, VLC_FALSE );
         change_string_list( enc_me_list, enc_me_list_text, 0 );
 
-/* r221 */    add_integer( SOUT_CFG_PREFIX "merange", 16, NULL, MERANGE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "merange", 16, NULL, MERANGE_TEXT,
                  MERANGE_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, 64 );
 #endif
 
-/* r44 */    add_bool( SOUT_CFG_PREFIX "no-psnr", 0, NULL, NO_PSNR_TEXT,
+#if X264_BUILD >= 0x000a /* r44 */
+    add_bool( SOUT_CFG_PREFIX "no-psnr", 0, NULL, NO_PSNR_TEXT,
               NO_PSNR_LONGTEXT, VLC_FALSE );
+#endif
 
-#if X264_BUILD >= 0x0013
-/* r137 */    add_bool( SOUT_CFG_PREFIX "no-b-adapt", 0, NULL, NO_B_ADAPT_TEXT,
+#if X264_BUILD >= 0x0012 /* r134 */
+    add_bool( SOUT_CFG_PREFIX "weightb", 0, NULL, WEIGHTB_TEXT,
+              WEIGHTB_LONGTEXT, VLC_FALSE );
+#endif
+
+#if X264_BUILD >= 0x0013 /* r137 */
+    add_bool( SOUT_CFG_PREFIX "no-b-adapt", 0, NULL, NO_B_ADAPT_TEXT,
               NO_B_ADAPT_LONGTEXT, VLC_FALSE );
 
-/* r137 */    add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
                  B_BIAS_LONGTEXT, VLC_FALSE );
         change_integer_range( -100, 100 );
 #endif
 
+#if X264_BUILD >= 36 /* r318 */
+    add_bool( SOUT_CFG_PREFIX "mixed-refs", 0, NULL, MIXED_REFS_TEXT,
+              MIXED_REFS_LONGTEXT, VLC_FALSE );
+#endif
+
+#if X264_BUILD >= 37 /* r334 */
+    add_integer( SOUT_CFG_PREFIX "crf", 0, NULL, CRF_TEXT,
+                 CRF_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 51 );
+#endif
+
+#if X264_BUILD >= 39 /* r360 */
+    add_integer( SOUT_CFG_PREFIX "trellis", 0, NULL, TRELLIS_TEXT,
+                 TRELLIS_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 2 );
+#endif
+
+#if X264_BUILD >= 40 /* r368 */
+    add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
+              B_RDO_LONGTEXT, VLC_FALSE );
+#endif
+
+#if X264_BUILD >= 42 /* r384 */
+    add_bool( SOUT_CFG_PREFIX "no-fast-pskip", 0, NULL, NO_FAST_PSKIP_TEXT,
+              NO_FAST_PSKIP_LONGTEXT, VLC_FALSE );
+#endif
 
 vlc_module_end();
 
@@ -256,10 +309,11 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "qp", "qp-min", "qp-max", "cabac", "loopfilter", "analyse",
-    "keyint", "keyint-min", "bframes", "bpyramid", "frameref", "scenecut",
-    "subpel", "me", "merange", "no-psnr", "no-b-adapt", "b-bias", "tolerance", 
-    "vbv-maxrate", "vbv-bufsize", "vbv-init", NULL
+    "analyse", "bframes", "bpyramid", "b-bias", "b-rdo", "cabac",
+    "crf", "frameref", "keyint", "keyint-min", "loopfilter", "me",
+    "merange", "mixed-refs", "no-b-adapt", "no-fast-pskip", "no-psnr",
+    "qp", "qp-min", "qp-max", "scenecut", "subpel", "tolerance",
+    "trellis", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb" , NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -452,6 +506,11 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "no-psnr", &val );
     p_sys->param.analyse.b_psnr = ! val.b_bool;
 
+#if X264_BUILD >= 0x0012
+    var_Get( p_enc, SOUT_CFG_PREFIX "weightb", &val );
+    p_sys->param.analyse.b_weighted_bipred = val.b_bool;
+#endif
+
 #if X264_BUILD >= 0x0013
     var_Get( p_enc, SOUT_CFG_PREFIX "no-b-adapt", &val );
     p_sys->param.b_bframe_adaptive = ! val.b_bool;
@@ -459,6 +518,33 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "b-bias", &val );
     if( val.i_int >= -100 && val.i_int <= 100 )
         p_sys->param.i_bframe_bias = val.i_int;
+#endif
+
+#if X264_BUILD >= 36
+    var_Get( p_enc, SOUT_CFG_PREFIX "mixed-refs", &val );
+    p_sys->param.analyse.b_mixed_references = val.b_bool;
+#endif
+
+#if X264_BUILD >= 37
+    var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val );
+    if( val.i_int >= 0 && val.i_int <= 51 )
+        p_sys->param.rc.i_rf_constant = val.i_int;
+#endif
+
+#if X264_BUILD >= 39
+    var_Get( p_enc, SOUT_CFG_PREFIX "trellis", &val );
+    if( val.i_int >= 0 && val.i_int <= 2 )
+        p_sys->param.analyse.i_trellis = val.i_int;
+#endif  
+
+#if X264_BUILD >= 40
+    var_Get( p_enc, SOUT_CFG_PREFIX "b-rdo", &val );
+    p_sys->param.analyse.b_bframe_rdo = val.b_bool;
+#endif
+
+#if X264_BUILD >= 42
+    var_Get( p_enc, SOUT_CFG_PREFIX "no-fast-pskip", &val );
+    p_sys->param.analyse.b_fast_pskip = ! val.b_bool;
 #endif
 
 #ifndef X264_ANALYSE_BSUB16x16
