@@ -3724,22 +3724,31 @@ AC_ARG_ENABLE(directfb,
   [  --enable-directfb            DirectFB support (default disabled)])
 if test "${enable_directfb}" = "yes"
 then
-  AC_CHECK_HEADER(directfb.h, have_directfb="true",have_directfb="false")
-  if test "${have_directfb}"= "true" -a "${with_directfb}" = "no"
+  if test "${with_directfb}" = "no"
   then
-    VLC_ADD_PLUGINS([directfb])
-    VLC_ADD_LDFLAGS([directfb],[-ldirectfb -lfusion -ldirect -lpthread -lz -ldl])
-    VLC_ADD_CPPFLAGS([directfb],[-I/usr/include/directfb -D_REENTRANT])
+    AC_CHECK_HEADER(directfb.h, have_directfb="true", have_directfb="false")
+    if test "${have_directfb}"= "true"
+    then
+        VLC_ADD_PLUGINS([directfb])
+        VLC_ADD_LDFLAGS([directfb],[-ldirectfb -lfusion -ldirect -lpthread -ljpeg -lz -ldl])
+        VLC_ADD_CPPFLAGS([directfb],[-I/usr/include/directfb -D_REENTRANT])
+    else
+        AC_MSG_ERROR([cannot find /usr/include/directfb headers, make sure directfb is installed on your system or use --disable-directfb])
+    fi
   else
+    CPPFLAGS_save="${CPPFLAGS}"
+    CPPFLAGS="${CPPFLAGS} -I${with_directfb}/include"
+    AC_CHECK_HEADER(directfb.h, have_directfb="true", have_directfb="false")
+    CPPFLAGS="${CPPFLAGS_save}"
     AC_ARG_WITH(directfb,
         [    --with-directfb=PATH       path to directfb],
         [ if test "${with_directfb}" != "no" -a -n "${with_directfb}"
         then
             VLC_ADD_PLUGINS([directfb])
             VLC_ADD_CPPFLAGS([directfb],[-I${with_directfb}/include -D_REENTRANT])
-            VLC_ADD_LDFLAGS([directfb],[-L${with_directfb}/lib])
+            VLC_ADD_LDFLAGS([directfb],[-L${with_directfb}/lib -ldirectfb -lfusion -ldirect -lpthread -ljpeg -lz -ldl])
         fi ],
-        [ AC_MSG_ERROR([cannot find directfb headers]) ])
+        [ AC_MSG_ERROR([cannot find directfb headers in ${with_directfb}/include]) ])
   fi
 fi
 
