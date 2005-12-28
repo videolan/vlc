@@ -3718,6 +3718,32 @@ then
 fi
 
 dnl
+dnl  DirectFB module
+dnl
+AC_ARG_ENABLE(directfb,
+  [  --enable-directfb            DirectFB support (default disabled)])
+if test "${enable_directfb}" = "yes"
+then
+  AC_CHECK_HEADER(directfb.h, have_directfb="true",have_directfb="false")
+  if test "${have_directfb}"= "true" -a "${with_directfb}" = "no"
+  then
+    VLC_ADD_PLUGINS([directfb])
+    VLC_ADD_LDFLAGS([directfb],[-ldirectfb -lfusion -ldirect -lpthread -lz -ldl])
+    VLC_ADD_CPPFLAGS([directfb],[-I/usr/include/directfb -D_REENTRANT])
+  else
+    AC_ARG_WITH(directfb,
+        [    --with-directfb=PATH       path to directfb],
+        [ if test "${with_directfb}" != "no" -a -n "${with_directfb}"
+        then
+            VLC_ADD_PLUGINS([directfb])
+            VLC_ADD_CPPFLAGS([directfb],[-I${with_directfb}/include -D_REENTRANT])
+            VLC_ADD_LDFLAGS([directfb],[-L${with_directfb}/lib])
+        fi ],
+        [ AC_MSG_ERROR([cannot find directfb headers]) ])
+  fi
+fi
+
+dnl
 dnl  GGI module
 dnl
 AC_ARG_ENABLE(ggi,
