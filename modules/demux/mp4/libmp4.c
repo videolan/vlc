@@ -1279,7 +1279,6 @@ static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    unsigned int i;
     int32_t t;
 
     MP4_READBOX_ENTER( MP4_Box_data_sample_text_t );
@@ -1332,9 +1331,6 @@ static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )
 
 static int MP4_ReadBox_sample_tx3g( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    unsigned int i;
-    int32_t t;
-
     MP4_READBOX_ENTER( MP4_Box_data_sample_text_t );
 
     MP4_GET4BYTES( p_box->data.p_sample_text->i_reserved1 );
