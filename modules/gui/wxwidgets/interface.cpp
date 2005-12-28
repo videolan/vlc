@@ -1222,7 +1222,7 @@ static int InteractCallback( vlc_object_t *p_this,
                              vlc_value_t new_val, void *param )
 {
     Interface *p_interface = (Interface*)param;
-    interaction_dialog_t *p_dialog = (interaction_dialog_t*)(new_val.p_address);
+    /*interaction_dialog_t *p_dialog = (interaction_dialog_t*)(new_val.p_address);*/
 
     wxCommandEvent event( wxEVT_INTERACTION, -1 );
     event.SetClientData( new_val.p_address );
