@@ -376,7 +376,8 @@ static void TextPrint( const msg_item_t *p_msg, FILE *p_file )
 #ifdef HAVE_SYSLOG_H
 static void SyslogPrint( const msg_item_t *p_msg )
 {
-    int i_priority;
+    int i_priority = LOG_INFO;
+
     if( p_msg->i_type  == 0 ) i_priority = LOG_INFO;
     if( p_msg->i_type  == 1 ) i_priority = LOG_ERR;
     if( p_msg->i_type  == 2 ) i_priority = LOG_WARNING;
