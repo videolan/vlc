@@ -1432,6 +1432,9 @@ int E_(CAMOpen)( access_t *p_access )
 
     p_sys->i_nb_slots = caps.slot_num;
     memset( p_sys->pb_active_slot, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
+    memset( p_sys->pb_slot_mmi_expected, 0, sizeof(vlc_bool_t) * MAX_CI_SLOTS );
+    memset( p_sys->pb_slot_mmi_undisplayed, 0,
+            sizeof(vlc_bool_t) * MAX_CI_SLOTS );
 
     return E_(en50221_Init)( p_access );
 }

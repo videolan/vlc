@@ -884,7 +884,7 @@ static void ApplicationInformationEnterMenu( access_t * p_access,
     access_sys_t *p_sys = p_access->p_sys;
     int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
 
-    msg_Dbg( p_access, "Entering MMI menus on session %d", i_session_id );
+    msg_Dbg( p_access, "entering MMI menus on session %d", i_session_id );
     APDUSend( p_access, i_session_id, AOT_ENTER_MENU, NULL, 0 );
     p_sys->pb_slot_mmi_expected[i_slot] = VLC_TRUE;
 }
@@ -1824,6 +1824,7 @@ static int InitSlot( access_t * p_access, int i_slot )
             continue;
         }
     }
+
     if ( p_sys->pb_active_slot[i_slot] )
     {
         p_sys->i_ca_timeout = 100000;
@@ -1837,6 +1838,7 @@ static int InitSlot( access_t * p_access, int i_slot )
 /*
  * External entry points
  */
+
 /*****************************************************************************
  * en50221_Init : Initialize the CAM for en50221
  *****************************************************************************/
@@ -1945,28 +1947,65 @@ int E_(en50221_Poll)( access_t * p_access )
     for ( i_slot = 0; i_slot < p_sys->i_nb_slots; i_slot++ )
     {
         uint8_t i_tag;
+        ca_slot_info_t sinfo;
 
-        if ( !p_sys->pb_active_slot[i_slot] )
+        sinfo.num = i_slot;
+        if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
         {
-            ca_slot_info_t sinfo;
-            sinfo.num = i_slot;
-            if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
+            msg_Err( p_access, "en50221_Poll: couldn't get info on slot %d",
+                     i_slot );
+            continue;
+        }
+
+        if ( !(sinfo.flags & CA_CI_MODULE_READY) )
+        {
+            if ( p_sys->pb_active_slot[i_slot] )
             {
-                msg_Err( p_access, "en50221_Poll: couldn't get info on slot %d",
+                msg_Dbg( p_access, "en50221_Poll: slot %d has been removed",
                          i_slot );
-                continue;
+                p_sys->pb_active_slot[i_slot] = VLC_FALSE;
+                p_sys->pb_slot_mmi_expected[i_slot] = VLC_FALSE;
+                p_sys->pb_slot_mmi_undisplayed[i_slot] = VLC_FALSE;
+
+                /* Close all sessions for this slot. */
+                for ( i_session_id = 1; i_session_id <= MAX_SESSIONS;
+                      i_session_id++ )
+                {
+                    if ( p_sys->p_sessions[i_session_id - 1].i_resource_id
+                          && p_sys->p_sessions[i_session_id - 1].i_slot
+                               == i_slot )
+                    {
+                        if ( p_sys->p_sessions[i_session_id - 1].pf_close
+                              != NULL )
+                        {
+                            p_sys->p_sessions[i_session_id - 1].pf_close(
+                                                p_access, i_session_id );
+                        }
+                        p_sys->p_sessions[i_session_id - 1].i_resource_id = 0;
+                    }
+                }
             }
 
-            if ( sinfo.flags & CA_CI_MODULE_READY )
-            {
-                msg_Dbg( p_access, "en50221_Poll: slot %d is active",
-                         i_slot );
-                p_sys->pb_active_slot[i_slot] = VLC_TRUE;
-            }
-            else
-                continue;
-
+            continue;
+        }
+        else if ( !p_sys->pb_active_slot[i_slot] )
+        {
             InitSlot( p_access, i_slot );
+
+            if ( !p_sys->pb_active_slot[i_slot] )
+            {
+                msg_Dbg( p_access, "en50221_Poll: resetting slot %d", i_slot );
+
+                if ( ioctl( p_sys->i_ca_handle, CA_RESET, 1 << i_slot) != 0 )
+                {
+                    msg_Err( p_access, "en50221_Poll: couldn't reset slot %d",
+                             i_slot );
+                }
+                continue;
+            }
+
+            msg_Dbg( p_access, "en50221_Poll: slot %d is active",
+                     i_slot );
         }
 
         if ( !p_sys->pb_tc_has_data[i_slot] )
