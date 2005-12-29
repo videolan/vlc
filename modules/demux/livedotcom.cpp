@@ -1,7 +1,7 @@
 /*****************************************************************************
- * live.cpp : live.com support.
+ * livedotcom.cpp : live.com support.
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2005 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -86,6 +86,9 @@ vlc_module_begin();
         add_bool( "rtsp-tcp", 0, NULL,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), VLC_TRUE );
+        add_integer( "rtp-client-port", -1, NULL,
+                  N_("Client port"),
+                  N_("Port to use for the RTP source of the session"), VLC_TRUE );
 #if LIVEMEDIA_LIBRARY_VERSION_INT > 1130457500
         add_bool( "rtsp-http", 0, NULL,
                   N_("Tunnel RTSP and RTP over HTTP"),
@@ -361,6 +364,11 @@ static int  Open ( vlc_object_t *p_this )
     {
         unsigned int i_buffer = 0;
         Boolean bInit;
+        int i_client_port;
+
+        i_client_port = var_CreateGetInteger( p_demux, "rtp-client-port" );
+        if( i_client_port != -1 )
+            sub->setClientPortNum( i_client_port );
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
