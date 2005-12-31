@@ -879,7 +879,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     }
     else
     {
-        /* Read enought data */
+        /* Read enough data */
         while( p_sys->block.i_start + p_sys->block.i_size < i_pos )
         {
             if( AStreamRefillBlock( s ) )
@@ -1119,7 +1119,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
 
 #ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamSeekStream: to "I64Fd" pos="I64Fd
-             "tk=%d start="I64Fd" offset=%d end="I64Fd,
+             " tk=%d start="I64Fd" offset=%d end="I64Fd,
              i_pos, p_sys->i_pos, p_sys->stream.i_tk,
              p_sys->stream.tk[p_sys->stream.i_tk].i_start,
              p_sys->stream.i_offset,
@@ -1149,8 +1149,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
             if( p_sys->stream.i_used < STREAM_READ_ATONCE / 2  )
             {
                 p_sys->stream.i_used = STREAM_READ_ATONCE / 2 ;
-                if( AStreamRefillStream( s ) )
-                    return VLC_EGENERIC;
+                AStreamRefillStream( s );
             }
         }
         return VLC_SUCCESS;
