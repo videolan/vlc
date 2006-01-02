@@ -270,7 +270,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         p_image->p_enc->fmt_in.video.i_width != p_fmt_in->i_width ||
         p_image->p_enc->fmt_in.video.i_height != p_fmt_in->i_height )
     {
-        picture_t *p_pif;
+        picture_t *p_tmp_pic;
 
         if( p_image->p_filter )
         if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
@@ -309,12 +309,18 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
         pf_release = p_pic->pf_release;
         p_pic->pf_release = PicRelease; /* Small hack */
-        p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+        p_tmp_pic =
+            p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
         p_pic->pf_release = pf_release;
-        p_pic = p_pif;
-    }
 
-    p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_pic );
+        p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_tmp_pic );
+
+        p_image->p_filter->pf_vout_buffer_del( p_image->p_filter, p_tmp_pic );
+    }
+    else
+    {
+        p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_pic );
+    }
 
     if( !p_block )
     {
