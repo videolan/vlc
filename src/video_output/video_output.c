@@ -786,9 +786,12 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ]
                 = display_date;
 
+            /* XXX: config_GetInt is slow, but this kind of frame dropping
+             * should not happen that often. */
             if( !p_picture->b_force &&
                 p_picture != p_last_picture &&
-                display_date < current_date + p_vout->render_time )
+                display_date < current_date + p_vout->render_time &&
+                config_GetInt( p_vout, "skip-frames" ) )
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */
