@@ -68,8 +68,6 @@ vlc_module_begin( );
 
     add_string( "image-out-format", "png", NULL,  FORMAT_TEXT, FORMAT_LONGTEXT,
                                                   VLC_FALSE );
-    add_string( "image-out-format", "jpeg", NULL,  FORMAT_TEXT, FORMAT_LONGTEXT,
-                                                  VLC_FALSE );
         change_string_list( psz_format_list, psz_format_list_text, 0 );
     add_integer( "image-out-ratio", 3 , NULL,  RATIO_TEXT, RATIO_LONGTEXT,
                                                   VLC_FALSE );
