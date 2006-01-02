@@ -1,7 +1,7 @@
 /*****************************************************************************
  * image.c : image video output
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -56,8 +56,8 @@ static void Display   ( vout_thread_t *, picture_t * );
 #define PREFIX_LONGTEXT N_( "Set the prefix of the filename. Output filename "\
                             "will have the form prefixNUMBER.format" )
 
-static char *psz_format_list[] = { "png" };
-static char *psz_format_list_text[] = { "PNG" };
+static char *psz_format_list[] = { "png", "jpeg" };
+static char *psz_format_list_text[] = { "PNG", "JPEG" };
 
 vlc_module_begin( );
     set_shortname( _( "Image file" ) );
@@ -67,6 +67,8 @@ vlc_module_begin( );
     set_capability( "video output", 0 );
 
     add_string( "image-out-format", "png", NULL,  FORMAT_TEXT, FORMAT_LONGTEXT,
+                                                  VLC_FALSE );
+    add_string( "image-out-format", "jpeg", NULL,  FORMAT_TEXT, FORMAT_LONGTEXT,
                                                   VLC_FALSE );
         change_string_list( psz_format_list, psz_format_list_text, 0 );
     add_integer( "image-out-ratio", 3 , NULL,  RATIO_TEXT, RATIO_LONGTEXT,
@@ -81,11 +83,12 @@ vlc_module_end();
  *****************************************************************************/
 struct vout_sys_t
 {
-    char        *psz_prefix;    /* Prefix */
-    int         i_ratio;    /* Image ratio */
+    char        *psz_prefix;          /* Prefix */
+    char        *psz_format;          /* Format */
+    int         i_ratio;         /* Image ratio */
 
-    int         i_current;  /* Current image */
-    int         i_frames;  /* Number of frames */
+    int         i_current;     /* Current image */
+    int         i_frames;   /* Number of frames */
 
     image_handler_t *p_image;
 };
@@ -108,6 +111,8 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_sys->psz_prefix =
             var_CreateGetString( p_this, "image-out-prefix" );
+    p_vout->p_sys->psz_format =
+            var_CreateGetString( p_this, "image-out-format" );
     p_vout->p_sys->i_ratio =
             var_CreateGetInteger( p_this, "image-out-ratio" );
     p_vout->p_sys->i_current = 0;
@@ -204,6 +209,7 @@ static void Destroy( vlc_object_t *p_this )
     /* Destroy structure */
     image_HandlerDelete( p_vout->p_sys->p_image );
     FREE( p_vout->p_sys->psz_prefix );
+    FREE( p_vout->p_sys->psz_format );
     FREE( p_vout->p_sys );
 }
 
@@ -224,22 +230,22 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
     p_vout->p_sys->i_frames++;
-    psz_filename = (char *)malloc( strlen( p_vout->p_sys->psz_prefix ) +
-                                         10 );
+    psz_filename = (char *)malloc( 10 + strlen( p_vout->p_sys->psz_prefix )
+                                      + strlen( p_vout->p_sys->psz_format ) );
 
     fmt_in.i_chroma = p_vout->render.i_chroma;
     fmt_out.i_width = fmt_in.i_width = p_vout->render.i_width;
     fmt_out.i_height = fmt_in.i_height = p_vout->render.i_height;
 
-    p_vout->p_sys->i_current++;
-
     sprintf( psz_filename, "%s%.6i.%s", p_vout->p_sys->psz_prefix,
-                                      p_vout->p_sys->i_current,
-                                      "png" );
-
+                                        p_vout->p_sys->i_current,
+                                        p_vout->p_sys->psz_format );
     image_WriteUrl( p_vout->p_sys->p_image, p_pic,
                     &fmt_in, &fmt_out, psz_filename ) ;
     free( psz_filename );
+
+    p_vout->p_sys->i_current++;
+
     return;
 }
 
