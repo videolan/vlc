@@ -1097,7 +1097,7 @@ msgstr "Coréen"
 
 #: src/libvlc.h:34 src/misc/iso-639_def.h:69
 msgid "Dutch"
-msgstr "Néherlandais"
+msgstr "Néerlandais"
 
 #: src/libvlc.h:34
 msgid "Brazilian Portuguese"
