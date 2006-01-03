@@ -381,7 +381,7 @@ static char *ppsz_clock_descriptions[] =
 #define INPUT_AUDIOTRACK_LANG_TEXT N_("Audio language")
 #define INPUT_AUDIOTRACK_LANG_LONGTEXT N_( \
     "Give the language of the audio track you want to use " \
-    "(comma separted, two or tree letter country code).")
+    "(comma separted, two or three letter country code).")
 
 #define INPUT_SUBTRACK_LANG_TEXT N_("Subtitle language")
 #define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
