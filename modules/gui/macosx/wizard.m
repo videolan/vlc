@@ -252,7 +252,8 @@ static VLCWizard *_o_sharedInstance = nil;
     NSArray * o_mms;
     NSArray * o_udp_uni;
     NSArray * o_udp_multi;
-    NSArray * o_rtp;
+    NSArray * o_rtp_uni;
+    NSArray * o_rtp_multi;
     o_http = [NSArray arrayWithObjects: @"http", @"HTTP", _NS("Enter the local " \
         "addresses you want to listen to. Do not enter anything if you want to " \
         "listen to all adresses or if you don't understand. This is generally " \
@@ -279,11 +280,18 @@ static VLCWizard *_o_sharedInstance = nil;
         "to a dynamic group of computers on a multicast-enabled network. This " \
         "is the most efficient method to stream to several computers, but it " \
         "does not work over Internet."), nil];
-    o_rtp = [NSArray arrayWithObjects: @"rtp", @"RTP", _NS("Enter the " \
+    o_rtp_uni = [NSArray arrayWithObjects: @"rtp", @"RTP-Unicast", _NS("Enter the " \
         "address of the computer to stream to.") , _NS("Use this to stream " \
         "to a single computer."), nil];
+    o_rtp_multi = [NSArray arrayWithObjects: @"rtp", @"RTP-Multicast", _NS("Enter " \
+        "the multicast address to stream to in this field. This must be an IP " \
+        "address between 224.0.0.0 and 239.255.255.255. For a private use, " \
+        "enter an address beginning with 239.255."), _NS("Use this to stream " \
+        "to a dynamic group of computers on a multicast-enabled network. This " \
+        "is the most efficient method to stream to several computers, but it " \
+        "does not work over Internet."), nil];
     o_strmgMthds = [[NSArray alloc] initWithObjects: o_http, o_mms, \
-        o_udp_uni, o_udp_multi, o_rtp, nil];
+        o_udp_uni, o_udp_multi, o_rtp_uni, o_rtp_multi, nil];
 }
 
 - (void)showWizard
@@ -607,10 +615,11 @@ static VLCWizard *_o_sharedInstance = nil;
         [self rebuildCodecMenus];
         
         /* check which streaming method is selected and store it */
-        NSString *o_mode;
-        o_mode = [[o_t3_matrix_stmgMhd selectedCell] title];
-        if( [o_mode isEqualToString: @"HTTP"] )
+        int mode;
+        mode = [[o_t3_matrix_stmgMhd selectedCell] tag];
+        if( mode == 0 )
         {
+            /* HTTP Streaming */
             [o_userSelections setObject:@"0" forKey:@"stmgMhd"];
 
             /* disable all codecs which don't support MPEG PS, MPEG TS, MPEG 1,
@@ -618,8 +627,9 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating"];
             
-        } else if ([o_mode isEqualToString: @"MMS"])
+        } else if ( mode == 1 )
         {
+            /* MMS Streaming */
             [o_userSelections setObject:@"1" forKey:@"stmgMhd"];
             
             /* disable all codecs which don't support ASF / ASFH */
@@ -637,12 +647,10 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_videoCodec removeItemWithTitle:@"MJPEG"];
             [o_t4_pop_videoCodec removeItemWithTitle:@"Theora"];
         } else {
-            if( [o_mode isEqualToString: _NS("UDP Unicast")] )
-            {
-                [o_userSelections setObject:@"2" forKey:@"stmgMhd"];
-            } else {
-                [o_userSelections setObject:@"3" forKey:@"stmgMhd"];
-            }
+            /* RTP/UDP Unicast/Multicast Streaming */
+            
+            [o_userSelections setObject: [[NSNumber numberWithInt: mode] \
+                stringValue] forKey:@"stmgMhd"];
             
             /* disable all codecs which don't support MPEG-TS */
             [o_t4_pop_audioCodec removeItemWithTitle:@"Vorbis"];
@@ -1018,10 +1026,9 @@ static VLCWizard *_o_sharedInstance = nil;
             [[o_t5_matrix_encap cellAtRow:9 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:10 column:0] setEnabled:NO];
         }
-        else if ( [o_userSelections objectForKey:@"stmgMhd"] == @"2" || 
-            [o_userSelections objectForKey:@"stmgMhd"] == @"3" )
+        else if ( [[o_userSelections objectForKey:@"stmgMhd"] intValue] >= 2 )
         {
-            /* if UDP is the streaming protocol, only MPEG-TS is available */
+            /* if UDP/RTP is the streaming protocol, only MPEG-TS is available */
             [[o_t5_matrix_encap cellAtRow:0 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:2 column:0] setEnabled:NO];
             [[o_t5_matrix_encap cellAtRow:3 column:0] setEnabled:NO];
@@ -1221,12 +1228,40 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_partExtract setStringValue: _NS("no")];
     }
 
+    if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"YES"])
+    {
+        [o_t8_fld_trnscdVideo setStringValue: [[[[[_NS("yes") \
+            stringByAppendingString:@": "] stringByAppendingString: \
+            [[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey: \
+            @"trnscdVideoCodec"] intValue]] objectAtIndex:0]] \
+            stringByAppendingString:@" @ "] stringByAppendingString: \
+            [o_userSelections objectForKey:@"trnscdVideoBitrate"]] \
+            stringByAppendingString:@" kb/s"]];
+    }
+    else
+    {
+        [o_t8_fld_trnscdVideo setStringValue: _NS("no")];
+    }
+    if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
+    {
+        [o_t8_fld_trnscdAudio setStringValue: [[[[[_NS("yes") \
+        stringByAppendingString:@": "] stringByAppendingString: \
+        [[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey: \
+        @"trnscdAudioCodec"] intValue]] objectAtIndex:0]] \
+        stringByAppendingString:@" @ "] stringByAppendingString: \
+        [o_userSelections objectForKey:@"trnscdAudioBitrate"]] \
+        stringByAppendingString:@" kb/s"]];
+    }
+    else
+    {
+        [o_t8_fld_trnscdAudio setStringValue: _NS("no")];
+    }
+
+
     if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"strmg"])
     {
-        /* we are streaming; no transcoding allowed atm */
+        /* we are streaming and perhaps also transcoding */
         [o_t8_fld_saveFileTo setStringValue: @"-"];
-        [o_t8_fld_trnscdAudio setStringValue: @"-"];
-        [o_t8_fld_trnscdVideo setStringValue: @"-"];
         [o_t8_fld_strmgMthd setStringValue: [[o_strmgMthds objectAtIndex: \
             [[o_userSelections objectForKey:@"stmgMhd"] intValue]] \
             objectAtIndex:1]];
@@ -1245,30 +1280,6 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_destination setStringValue: @"-"];
         [o_t8_fld_ttl setStringValue: @"-"];
         [o_t8_fld_sap setStringValue: @"-"];
-        if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"YES"])
-        {
-            [o_t8_fld_trnscdVideo setStringValue: [[[[[_NS("yes") \
-                stringByAppendingString:@": "] stringByAppendingString: \
-                [[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey: \
-                @"trnscdVideoCodec"] intValue]] objectAtIndex:0]] \
-                stringByAppendingString:@" @ "] stringByAppendingString: \
-                [o_userSelections objectForKey:@"trnscdVideoBitrate"]] \
-                stringByAppendingString:@" kb/s"]];
-        }else{
-            [o_t8_fld_trnscdVideo setStringValue: _NS("no")];
-        }
-        if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
-        {
-            [o_t8_fld_trnscdAudio setStringValue: [[[[[_NS("yes") \
-            stringByAppendingString:@": "] stringByAppendingString: \
-            [[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey: \
-            @"trnscdAudioCodec"] intValue]] objectAtIndex:0]] \
-            stringByAppendingString:@" @ "] stringByAppendingString: \
-            [o_userSelections objectForKey:@"trnscdAudioBitrate"]] \
-            stringByAppendingString:@" kb/s"]];
-        }else{
-            [o_t8_fld_trnscdAudio setStringValue: _NS("no")];
-        }
         [o_t8_fld_saveFileTo setStringValue: [o_userSelections objectForKey: \
             @"trnscdFilePath"]];
     }
@@ -1532,25 +1543,9 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* change the captions of o_t3_txt_destInfo according to the chosen
      * streaming method */
-    NSNumber * o_mode;
-    o_mode = [[NSNumber alloc] initWithInt:[[o_t3_matrix_stmgMhd selectedCell] tag]];
-    if( [o_mode intValue] == 0 )
-    {
-        /* UDP-Unicast */
-        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
-            objectAtIndex:2]];
-        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
-        objectAtIndex:3]];
-    }
-    else if ( [o_mode intValue] == 1 )
-    {
-        /* UDP-Multicast */
-        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:3] \
-            objectAtIndex:2]];
-        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:3] \
-        objectAtIndex:3]];
-    }
-    else if( [o_mode intValue] == 2 )
+    int mode;
+    mode = [[o_t3_matrix_stmgMhd selectedCell] tag];
+    if( mode == 0 )
     {
         /* HTTP */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:0] \
@@ -1558,7 +1553,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:0] \
             objectAtIndex:3]];
     }
-    else if( [o_mode intValue] == 3 )
+    else if( mode == 1 )
     {
         /* MMS */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:1] \
@@ -1566,15 +1561,38 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:1] \
             objectAtIndex:3]];
     }
-    else if( [o_mode intValue] == 4 )
+    else if( mode == 2 )
     {
-        /* RTP */
+        /* UDP-Unicast */
+        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
+            objectAtIndex:2]];
+        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:2] \
+        objectAtIndex:3]];
+    }
+    else if( mode == 3 )
+    {
+        /* UDP-Multicast */
+        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:3] \
+            objectAtIndex:2]];
+        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:3] \
+        objectAtIndex:3]];
+    }
+    else if( mode == 4 )
+    {
+        /* RTP-Unicast */
         [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:4] \
             objectAtIndex:2]];
         [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:4] \
             objectAtIndex:3]];
     }
-    [o_mode release];
+    else if( mode == 5 )
+    {
+        /* RTP-Multicast */
+        [o_t3_txt_destInfo setStringValue: [[o_strmgMthds objectAtIndex:5] \
+            objectAtIndex:2]];
+        [o_t3_txt_strgMthdInfo setStringValue: [[o_strmgMthds objectAtIndex:5] \
+        objectAtIndex:3]];
+    }
 }
 
 - (IBAction)t4_AudCdcChanged:(id)sender
