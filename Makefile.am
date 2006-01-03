@@ -104,6 +104,7 @@ HEADERS_include = \
 	include/vlc_codec.h \
 	include/vlc_common.h \
 	include/vlc_config.h \
+	include/vlc_control.h \
 	include/vlc_cpu.h \
 	include/vlc_demux.h \
 	include/vlc_error.h \
