@@ -492,7 +492,7 @@ static void MkvTree( demux_t & demuxer, int i_level, char *psz_format, ... )
     psz_foo2[ 4 * i_level ] = '+';
     psz_foo2[ 4 * i_level + 1 ] = ' ';
     strcpy( &psz_foo2[ 4 * i_level + 2 ], psz_format );
-    __msg_GenericVa( VLC_OBJECT(&demuxer), VLC_MSG_DBG, "mkv", psz_foo2, args );
+    __msg_GenericVa( VLC_OBJECT(&demuxer), MSG_QUEUE_NORMAL, VLC_MSG_DBG, "mkv", psz_foo2, args );
     free( psz_foo2 );
     va_end( args );
 }
