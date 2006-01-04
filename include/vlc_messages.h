@@ -111,7 +111,7 @@ struct msg_subscription_t
  *****************************************************************************/
 VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 5, 6 ) );
 VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, int, const char *, const char *, va_list args ) );
-#define msg_GenericVa(a, b, c, d, e),f __msg_GenericVa(VLC_OBJECT(a), b, c, d, e,f)
+#define msg_GenericVa(a, b, c, d, e,f) __msg_GenericVa(VLC_OBJECT(a), b, c, d, e,f)
 VLC_EXPORT( void, __msg_Info,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Err,     ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Warn,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
