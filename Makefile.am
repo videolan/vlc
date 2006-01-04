@@ -36,6 +36,7 @@ EXTRA_DIST = \
 BUILT_SOURCES_distclean = vlc-config compile
 BUILT_SOURCES_clean = \
 	stamp-api \
+	macosx-sdk \
 	src/misc/modules_builtin.h \
 	src/misc/version.c \
 	$(NULL)
@@ -253,7 +254,6 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/vlc.scriptTerminology \
 	extras/MacOSX/Resources/README \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
-	extras/MacOSX/macosx-dmg \
 	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
 	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
 	extras/MacOSX/Delete_Preferences.app/Contents/MacOS/applet \
@@ -1054,23 +1054,28 @@ package-beos:
 	rm -Rf $(srcdir)/tmp ;
 
 package-macosx:
-# Check that tmp isn't in the way
-	@if test -e "$(top_builddir)/tmp"; then \
-	  echo "Error: please remove $(top_builddir)/tmp, it is in the way"; \
-	  false; \
-	else \
-	  echo "OK."; mkdir -p "$(top_builddir)/tmp"; \
+# Check that the temporary location isn't in the way
+	@if test -e "$(top_builddir)/vlc-${VERSION}/"; then \
+	  rm -Rf "$(top_builddir)/vlc-${VERSION}/" ; \
 	fi
 
+	echo "Create package directory: vlc-${VERSION}/";
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/";
+
 # Copy relevant files 
-	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/tmp/VLC.app"
-	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/ && cp -R extras/MacOSX/Delete_Preferences.app $(top_builddir)/tmp/
+	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-${VERSION}/VLC.app"
+	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/vlc-${VERSION}/ && cp -R extras/MacOSX/Delete_Preferences.app $(top_builddir)/vlc-${VERSION}/
 
 # Create disk image 
-	$(srcdir)/extras/MacOSX/macosx-dmg "vlc-${VERSION}" $(top_builddir)/tmp
+	echo "Creating disk image" ;
+	rm -f "$(top_builddir)/vlc-${VERSION}.dmg" ;
+	hdiutil create -srcfolder "$(top_builddir)/vlc-${VERSION}" \
+	  "$(top_builddir)/vlc-${VERSION}.dmg" -format UDZO -quiet ;
+	echo; echo "Disk image creation completed:" ;
+	ls -la "$(top_builddir)/vlc-${VERSION}.dmg" ; echo ;
 
 # Clean up
-	rm -Rf $(top_builddir)/tmp
+	rm -Rf "$(top_builddir)/vlc-${VERSION}" ;
 
 package-translations:
 	@if test -e "$(srcdir)/vlc-translations-${VERSION}"; then \
@@ -1142,6 +1147,12 @@ stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl
 	( cd $(srcdir) && cat $(HEADERS_include) ) | \
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
+
+###############################################################################
+# Enforce Mac OS X deployment target environment variable
+###############################################################################
+macosx-sdk: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl
+	export MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
 
 ###############################################################################
 # Force rule

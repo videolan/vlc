@@ -143,7 +143,8 @@ case "${target_os}" in
     SYS="${target_os}"
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
     ;;
-  darwin*)
+  darwin1.[0123])
+    dnl Mac OS X < 10.3
     SYS=darwin
     CFLAGS_save="${CFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
@@ -153,6 +154,15 @@ case "${target_os}" in
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
     VLC_ADD_CFLAGS([vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-m -Wl,-multiply_defined -Wl,suppress])
+    ;;
+  darwin*)
+    SYS=darwin
+    CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
+    VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
+    VLC_ADD_CFLAGS([libvlc],[-x objective-c])
+    VLC_ADD_CFLAGS([vlc],[-x objective-c])
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
@@ -231,6 +241,20 @@ AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
 AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
+
+dnl
+dnl  Check for Mac OS X SDK settings
+dnl
+AC_ARG_WITH(macosx-sdk,
+   [  --with-macosx-sdk       compile for Mac OS X 10.3 SDK],[],[])
+if test -n "${with_macosx-sdk}"; then
+  CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; CFLAGS="${CFLAGS_save}"
+  CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; CXXFLAGS="${CXXFLAGS_save}"
+  OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; OBJCFLAGS="${OBJCFLAGS_save}"
+  LDFLAGS_save="${LDFLAGS_save} -isysroot /Developer/SDKs/MacOSX10.3.9.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.3.9.sdk"; LDFLAGS="${LDFLAGS_save}"
+  export MACOSX_DEPLOYMENT_TARGET=10.3
+  MACOSX_DEPLOYMENT_TARGET="10.3"
+fi
 
 dnl
 dnl Gettext stuff
@@ -910,15 +934,12 @@ if test "${ac_cv_c_dynamic_no_pic}" != "no"; then
 fi
 
 dnl Check for Darwin plugin linking flags
-AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
+AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
     [ac_cv_ld_darwin],
-    [CFLAGS="${CFLAGS_save} -bundle -undefined error -lcc_dynamic"
+    [CFLAGS="${CFLAGS_save} -bundle -undefined error"
      AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
 if test "${ac_cv_ld_darwin}" != "no"; then
     VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error])
-    AC_CHECK_LIB(cc_dynamic, main,[
-      VLC_ADD_LDFLAGS([plugin],[-lcc_dynamic])
-    ])
 fi
 
 dnl Check for standard plugin linking flags
@@ -1756,7 +1777,7 @@ dnl
 dnl  libdvbpsi ts demux/mux
 dnl
 AC_ARG_ENABLE(dvbpsi,
-[  --enable-dvbpsi         dvbpsi ts mux and demux module (default enabled)])
+  [  --enable-dvbpsi         dvbpsi ts mux and demux module (default enabled)])
 if test "${enable_dvbpsi}" != "no"
 then
   AC_ARG_WITH(dvbpsi,
@@ -1881,7 +1902,7 @@ dnl
 dnl  gnomeVFS access module
 dnl
 AC_ARG_ENABLE(gnomevfs,
-  [  --enable-gnomevfs      GnomeVFS access module (default enabled)])
+  [  --enable-gnomevfs       GnomeVFS access module (default enabled)])
 if test "${enable_gnomevfs}" != "no" -a  "${SYS}" = "linux" 
 then
   PKG_CHECK_MODULES(GNOMEVFS, gnome-vfs-2.0,
@@ -2129,7 +2150,7 @@ AC_ARG_ENABLE(ogg,
 if test "${enable_ogg}" != "no"
 then
   AC_ARG_WITH(ogg-tree,
-  [    --with-ogg-tree=PATH ogg tree for static linking])
+  [    --with-ogg-tree=PATH  ogg tree for static linking])
   if test -n "${with_ogg_tree}"
   then
     AC_MSG_CHECKING(for libogg.a in ${with_ogg_tree})
@@ -2297,7 +2318,7 @@ then
   fi
 
   AC_ARG_WITH(mad-tree,
-    [    --with-mad-tree=PATH  mad tree for static linking],[],[])
+    [    --with-mad-tree=PATH   mad tree for static linking],[],[])
   if test "${with_mad_tree}" != "no" -a -n "${with_mad_tree}"
   then
     real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
@@ -3721,7 +3742,7 @@ dnl
 dnl  DirectFB module
 dnl
 AC_ARG_ENABLE(directfb,
-  [  --enable-directfb            DirectFB support (default disabled)])
+  [  --enable-directfb       DirectFB support (default disabled)])
 if test "${enable_directfb}" = "yes"
 then
   if test "${with_directfb}" = "no"
@@ -3741,7 +3762,7 @@ then
     AC_CHECK_HEADER(directfb.h, have_directfb="true", have_directfb="false")
     CPPFLAGS="${CPPFLAGS_save}"
     AC_ARG_WITH(directfb,
-        [    --with-directfb=PATH       path to directfb],
+        [    --with-directfb=PATH  path to directfb],
         [ if test "${with_directfb}" != "no" -a -n "${with_directfb}"
         then
             VLC_ADD_PLUGINS([directfb])
@@ -4842,7 +4863,7 @@ dnl
 dnl  Java bindings
 dnl
 AC_ARG_ENABLE(java-bindings,
-  [  --enable-java-bindings    Enable Java bindings (default disabled)])
+  [  --enable-java-bindings  Enable Java bindings (default disabled)])
 AM_CONDITIONAL( BUILD_JAVA, [test "${enable_java_bindings}" = "yes"] )
 if test "${enable_java_bindings}" = "yes"
 then
@@ -5042,6 +5063,7 @@ AC_SUBST(XPIDL_INCL)
 AC_SUBST(LIBEXT)
 AC_SUBST(INCLUDES)
 AC_SUBST(ALL_LINGUAS)
+AC_SUBST(MACOSX_DEPLOYMENT_TARGET)
 
 dnl Import substitutions generated by bootstrap
 VLC_SUBSTS
