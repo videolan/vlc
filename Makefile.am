@@ -455,6 +455,7 @@ SOURCES_libvlc_common = \
 	src/misc/block.c \
 	src/misc/modules.c \
 	src/misc/threads.c \
+	src/misc/stats.c \
 	src/misc/unicode.c \
 	src/misc/cpu.c \
 	src/misc/configuration.c \

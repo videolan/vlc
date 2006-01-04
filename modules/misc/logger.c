@@ -262,7 +262,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf , MSG_QUEUE_NORMAL );
     p_intf->pf_run = Run;
 
     return 0;

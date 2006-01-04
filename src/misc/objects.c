@@ -212,6 +212,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof( osd_menu_t );
             psz_type = "osd menu";
             break;
+        case VLC_OBJECT_STATS:
+            i_size = sizeof( stats_handler_t );
+            psz_type = "statistics";
+            break;
         default:
             i_size = i_type > 0
                       ? i_type > (int)sizeof(vlc_object_t)

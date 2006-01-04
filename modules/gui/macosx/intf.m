@@ -75,7 +75,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     [NSThread detachNewThreadSelector:@selector(self) toTarget:[NSString string] withObject:nil];
 
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
     p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
 

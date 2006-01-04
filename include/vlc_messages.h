@@ -45,12 +45,7 @@ typedef struct
     char *  psz_module;
     char *  psz_msg;                                 /**< the message itself */
 
-#if 0
-    mtime_t date;                                     /* date of the message */
-    char *  psz_file;               /* file in which the function was called */
-    char *  psz_function;     /* function from which the function was called */
-    int     i_line;                 /* line at which the function was called */
-#endif
+    mtime_t date;                               /**< Message date */
 } msg_item_t;
 
 /* Message types */
@@ -63,14 +58,25 @@ typedef struct
 /** debug messages */
 #define VLC_MSG_DBG   3
 
+#define MSG_QUEUE_NORMAL 0
+#define MSG_QUEUE_HTTPD_ACCESS 1
+
 /**
  * Store all data requiered by messages interfaces.
  */
 struct msg_bank_t
 {
+    vlc_mutex_t             lock;
+    int                     i_queues;
+    msg_queue_t           **pp_queues;
+};
+
+struct msg_queue_t
+{
+    int                     i_id;
+
     /** Message queue lock */
     vlc_mutex_t             lock;
-    vlc_bool_t              b_configured;
     vlc_bool_t              b_overflow;
 
     /* Message queue */
@@ -103,9 +109,9 @@ struct msg_subscription_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5 ) );
-VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, const char *, const char *, va_list args ) );
-#define msg_GenericVa(a, b, c, d, e) __msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
+VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 5, 6 ) );
+VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, int, const char *, const char *, va_list args ) );
+#define msg_GenericVa(a, b, c, d, e),f __msg_GenericVa(VLC_OBJECT(a), b, c, d, e,f)
 VLC_EXPORT( void, __msg_Info,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Err,     ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( void, __msg_Warn,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
@@ -114,19 +120,19 @@ VLC_EXPORT( void, __msg_Dbg,    ( vlc_object_t *, const char *, ... ) ATTRIBUTE_
 #ifdef HAVE_VARIADIC_MACROS
 
 #   define msg_Info( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_INFO, MODULE_STRING, \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL,VLC_MSG_INFO, MODULE_STRING, \
                      psz_format, ## args )
 
 #   define msg_Err( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_ERR, MODULE_STRING, \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_ERR, MODULE_STRING, \
                      psz_format, ## args )
 
 #   define msg_Warn( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_WARN, MODULE_STRING, \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_WARN, MODULE_STRING, \
                      psz_format, ## args )
 
 #   define msg_Dbg( p_this, psz_format, args... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, MODULE_STRING, \
+      __msg_Generic( VLC_OBJECT(p_this), MSG_QUEUE_NORMAL, VLC_MSG_DBG, MODULE_STRING, \
                      psz_format, ## args )
 
 #elif defined(_MSC_VER) /* To avoid warnings and even errors with c++ files */
@@ -135,7 +141,7 @@ inline void msg_Info( void *p_this, const char *psz_format, ... )
 {
   va_list ap;
   va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_INFO, MODULE_STRING,
+  __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL,VLC_MSG_INFO, MODULE_STRING,
                    psz_format, ap );
   va_end(ap);
 }
@@ -143,7 +149,7 @@ inline void msg_Err( void *p_this, const char *psz_format, ... )
 {
   va_list ap;
   va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_ERR, MODULE_STRING,
+  __msg_GenericVa( ( vlc_object_t *)p_this,MSG_QUEUE_NORMAL, VLC_MSG_ERR, MODULE_STRING,
                    psz_format, ap );
   va_end(ap);
 }
@@ -151,7 +157,7 @@ inline void msg_Warn( void *p_this, const char *psz_format, ... )
 {
   va_list ap;
   va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_WARN, MODULE_STRING,
+  __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL, VLC_MSG_WARN, MODULE_STRING,
                    psz_format, ap );
   va_end(ap);
 }
@@ -159,7 +165,7 @@ inline void msg_Dbg( void *p_this, const char *psz_format, ... )
 {
   va_list ap;
   va_start( ap, psz_format );
-  __msg_GenericVa( ( vlc_object_t *)p_this, VLC_MSG_DBG, MODULE_STRING,
+  __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL, VLC_MSG_DBG, MODULE_STRING,
                    psz_format, ap );
   va_end(ap);
 }
@@ -180,12 +186,64 @@ void __msg_Create  ( vlc_object_t * );
 void __msg_Flush   ( vlc_object_t * );
 void __msg_Destroy ( vlc_object_t * );
 
-#define msg_Subscribe(a) __msg_Subscribe(VLC_OBJECT(a))
+#define msg_Subscribe(a,b) __msg_Subscribe(VLC_OBJECT(a),b)
 #define msg_Unsubscribe(a,b) __msg_Unsubscribe(VLC_OBJECT(a),b)
-VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t * ) );
+VLC_EXPORT( msg_subscription_t*, __msg_Subscribe, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
 
 
 /**
  * @}
  */
+
+/**
+ * \defgroup statistics Statistics
+ *
+ * @{
+ */
+
+enum
+{
+    STATS_LAST,
+    STATS_COUNTER,
+    STATS_MAX,
+    STATS_MIN,
+};
+
+struct counter_sample_t
+{
+    vlc_value_t value;
+    mtime_t     date;
+};
+
+struct counter_t
+{
+    char              * psz_name;
+    int                 i_source_object;
+    int                 i_compute_type;
+    int                 i_type;
+    int                 i_samples;
+    counter_sample_t ** pp_samples;
+};
+
+struct stats_handler_t
+{
+    VLC_COMMON_MEMBERS
+
+    int         i_counters;
+    counter_t **pp_counters;
+};
+
+#define stats_Update( a,b,c) __stats_Update( VLC_OBJECT( a ), b, c )
+VLC_EXPORT( int, __stats_Update, (vlc_object_t*, char *, vlc_value_t) );
+#define stats_Create( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
+VLC_EXPORT( int, __stats_Create, (vlc_object_t*, char *, int, int) );
+
+static inline int __stats_UpdateInteger( vlc_object_t *p_obj, char *psz_name,
+                                         int i )
+{
+    vlc_value_t val;
+    val.i_int = i;
+    return __stats_Update( p_obj, psz_name, val );
+}
+#define stats_UpdateInteger( a,b,c ) __stats_UpdateInteger( VLC_OBJECT(a),b,c )

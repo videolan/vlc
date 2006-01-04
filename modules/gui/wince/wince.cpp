@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     // Suscribe to messages bank
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
 
     // Misc init
     p_intf->p_sys->p_audio_menu = NULL;

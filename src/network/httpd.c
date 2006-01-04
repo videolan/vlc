@@ -2058,6 +2058,8 @@ static void httpd_HostThread( httpd_host_t *host )
 {
     tls_session_t *p_tls = NULL;
 
+    stats_Create( host, "client_connections", VLC_VAR_INTEGER, STATS_COUNTER );
+
     while( !host->b_die )
     {
         struct timeval  timeout;
@@ -2520,6 +2522,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 struct  sockaddr_storage sock;
     
                 fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
+                fprintf ( stderr, "Accepting\n");
                 if( fd >= 0 )
                 {
                     int i_state = 0;
@@ -2554,17 +2557,18 @@ static void httpd_HostThread( httpd_host_t *host )
                                 break;
                         }
                     }
-                    
+
                     if( fd >= 0 )
                     {
                         httpd_client_t *cl;
-    
+                        stats_UpdateInteger( host, "client_connections",
+                                             1 );
                         cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
                         p_tls = NULL;
                         vlc_mutex_lock( &host->lock );
                         TAB_APPEND( host->i_client, host->client, cl );
                         vlc_mutex_unlock( &host->lock );
-    
+
                         if( i_state != 0 )
                             cl->i_state = i_state; // override state for TLS
                     }

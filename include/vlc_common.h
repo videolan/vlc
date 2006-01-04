@@ -205,6 +205,7 @@ typedef struct date_t date_t;
 
 /* Messages */
 typedef struct msg_bank_t msg_bank_t;
+typedef struct msg_queue_t msg_queue_t;
 typedef struct msg_subscription_t msg_subscription_t;
 
 /* Playlist */
@@ -414,6 +415,10 @@ typedef struct vlm_schedule_t vlm_schedule_t;
 
 /* divers */
 typedef struct vlc_meta_t    vlc_meta_t;
+
+typedef struct counter_t     counter_t;
+typedef struct counter_sample_t counter_sample_t;
+typedef struct stats_handler_t stats_handler_t;
 
 
 /*****************************************************************************
