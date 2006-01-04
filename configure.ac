@@ -246,8 +246,8 @@ dnl
 dnl  Check for Mac OS X SDK settings
 dnl
 AC_ARG_WITH(macosx-sdk,
-   [  --with-macosx-sdk       compile for Mac OS X 10.3 SDK],[],[])
-if test "${with_macosx-sdk}" = "yes" ; then
+   [  --with-macosx-sdk       compile for Mac OS X 10.3 SDK],[], with_macosx_sdk=no)
+if test "${with_macosx_sdk}" != "no" ; then
   CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; CFLAGS="${CFLAGS_save}"
   CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; CXXFLAGS="${CXXFLAGS_save}"
   OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; OBJCFLAGS="${OBJCFLAGS_save}"
