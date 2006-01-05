@@ -63,8 +63,6 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
                  p_handler->i_counters,
                  p_counter );
 
-    fprintf (stderr, "Counter created\n");
-    
     return VLC_SUCCESS;
 }
 
@@ -74,13 +72,9 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
 {
     counter_t *p_counter;
 
-    fprintf( stderr, "Updating\n");
-
     /* Get stats handler singleton */
     stats_handler_t *p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
-    
-    fprintf( stderr, "Got handler\n");
 
     /* Look for existing element */
     p_counter = stats_GetCounter( p_handler, p_this->i_object_id,
@@ -90,8 +84,6 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
         vlc_object_release( p_handler );
         return VLC_ENOOBJ;
     }
-
-    fprintf (stderr, "Got counter, updating it\n");
 
     return stats_CounterUpdate( p_handler, p_counter, val );
 }
@@ -158,7 +150,6 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
         }
         break;
     }
-    fprintf (stderr, "Counter value is %i\n", p_counter->pp_samples[0]->value.i_int );
     return VLC_SUCCESS;
 }
 
@@ -167,11 +158,9 @@ static counter_t *stats_GetCounter( stats_handler_t *p_handler, int i_object_id,
                                     char *psz_name )
 {
     int i;
-    fprintf( stderr, "Looking through %i counters\n", p_handler->i_counters );
     for( i = 0; i< p_handler->i_counters; i++ )
     {
         counter_t *p_counter = p_handler->pp_counters[i];
-        fprintf( stderr, "%i - %s\n", p_counter->i_source_object, p_counter->psz_name );
         if( p_counter->i_source_object == i_object_id &&
             !strcmp( p_counter->psz_name, psz_name ) )
         {
@@ -183,11 +172,9 @@ static counter_t *stats_GetCounter( stats_handler_t *p_handler, int i_object_id,
 
 static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this )
 {
-    fprintf (stderr, "Getting handler\n");
     stats_handler_t *p_handler = (stats_handler_t*)
                           vlc_object_find( p_this->p_vlc, VLC_OBJECT_STATS,
                                            FIND_ANYWHERE );
-    fprintf( stderr, "Got it %p\n", p_handler );
     if( !p_handler )
     {
         p_handler = stats_HandlerCreate( p_this );
