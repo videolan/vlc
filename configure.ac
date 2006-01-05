@@ -4778,73 +4778,80 @@ AC_ARG_ENABLE(mozilla,
 AC_ARG_WITH(mozilla-sdk-path,
   [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
 
-if test "${enable_mozilla}" = "yes" -a "${with_mozilla_sdk_path}" = ""
+if test "${enable_mozilla}" = "yes" 
 then
-  AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
-  if test "${MOZILLA_CONFIG}" = "no"
+  if test "${with_mozilla_sdk_path}" = ""
   then
-    AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
-  else
-    if test "${SYS}" != "mingw32"; then
-      LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
-      AC_CHECK_LIB(Xt,XtStrings,
-       [VLC_ADD_LDFLAGS([mozilla],[-L${x_libraries} -lXt -lX11 -lSM -lICE])],
-       [],
-       [[-L${x_libraries} -lX11 -lSM -lICE]
-      ])
-      LDFLAGS="${LDFLAGS_save}"
+    AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
+    if test "${MOZILLA_CONFIG}" = "no"
+    then
+      AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+    else
+      if test "${SYS}" != "mingw32"; then
+        LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
+        AC_CHECK_LIB(Xt,XtStrings,
+         [VLC_ADD_LDFLAGS([mozilla],[-L${x_libraries} -lXt -lX11 -lSM -lICE])],
+         [],
+         [[-L${x_libraries} -lX11 -lSM -lICE]
+        ])
+        LDFLAGS="${LDFLAGS_save}"
+      fi
+      mozilla=:
+      dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
+      VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
+      VLC_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
+      CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
+      AC_CHECK_HEADERS(mozilla-config.h)
+      CPPFLAGS="${CPPFLAGS_save}"
+      XPIDL_INCL="`${MOZILLA_CONFIG} --cflags plugin xpcom java` \
+      `${MOZILLA_CONFIG} --idlflags plugin xpcom java` "
+      xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
     fi
-    mozilla=:
-    dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
-    VLC_ADD_CPPFLAGS([mozilla],[[`${MOZILLA_CONFIG} --cflags plugin xpcom java | sed 's,-I\([^ ]*\)/mozilla/\([^ ]*\),-I\1/\2 -I\1/mozilla/\2,g' | xargs`]])
-    VLC_ADD_LDFLAGS([mozilla],[`${MOZILLA_CONFIG} --libs plugin xpcom`])
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
-    AC_CHECK_HEADERS(mozilla-config.h)
+  else
+    dnl special case for mingw32
+    if test "${SYS}" = "mingw32"
+    then
+      AC_CHECK_TOOL(CYGPATH, cygpath, "")
+      dnl latest gecko sdk does not have an xpcom directory
+      if test -d "${with_mozilla_sdk_path}/xpcom"; then
+          mozilla_sdk_xpcom="/xpcom"
+      fi
+    fi
+  
+    real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
+    CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include"
+    AC_CHECK_HEADERS(mozilla-config.h, [
+      mozilla=:
+      VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -DHAVE_CPP_MODERN_SPECIALIZE_TEMPLATE_SYNTAX -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
+      VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
+      if test "${SYS}" = "mingw32"; then
+        LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
+        dnl latest gecko sdk does not have embedstring
+        if test -d "${real_mozilla_sdk}/embedstring/bin"
+        then
+          VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+        fi
+      fi
+  
+      XPIDL_INCL="-I${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl"
+      xpidl_path="${real_mozilla_sdk}${mozilla_sdk_xpcom}/bin"
+  
+      if test -n "${CYGPATH}"; then
+        real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
+        XPIDL_INCL="${XPIDL_INCL} -I\"${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl\""
+      fi ])
     CPPFLAGS="${CPPFLAGS_save}"
   fi
-
-dnl special case for mingw32
-elif test "${enable_mozilla}" = "yes"
-then
-  if test "${SYS}" = "mingw32"; then
-    AC_CHECK_TOOL(CYGPATH, cygpath, "")
-    mozilla_sdk_xpcom="/xpcom"
-  fi
-
-  real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
-  CPPFLAGS="${CPPFLAGS_save} -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include"
-  AC_CHECK_HEADERS(mozilla-config.h, [
-    mozilla=:
-    VLC_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk} -I${real_mozilla_sdk}/include -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
-    VLC_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -L${real_mozilla_sdk}/lib -lnspr4 -lplds4 -lplc4 -lxpcomglue])
-    if test "${SYS}" = "mingw32"; then
-      VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+  
+  AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
+  if test "${mozilla}" != "false"
+  then
+    build_pic=yes
+    AC_PATH_PROG(XPIDL, xpidl, no, ${xpidl_path} /usr/lib/mozilla)
+    if test "${XPIDL}" = "no"; then
+      AC_MSG_ERROR([Please install the Mozilla development tools, xpidl was not found.])
     fi
-
-    XPIDL_INCL="-I${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl"
-    XPIDL="${real_mozilla_sdk}${mozilla_sdk_xpcom}/bin/xpidl"
-
-    if test -n "${CYGPATH}"; then
-      real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
-      XPIDL_INCL="${XPIDL_INCL} -I\"${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl\""
-    fi ])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
-
-dnl Not necessarily in ${PATH}
-if test -z "${XPIDL}" -o ! -x "${XPIDL}"; then
-  XPIDL="/usr/lib/mozilla/xpidl"
-fi
-AS_IF([test "${MOZILLA_CONFIG}"], [
-  if test -z "${XPIDL_INCL}"; then
-    XPIDL_INCL="`${MOZILLA_CONFIG} --cflags plugin xpcom java` \
-    `${MOZILLA_CONFIG} --idlflags plugin xpcom java` "
   fi
-])
-AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
-if test "${mozilla}" != "false"
-then
-  build_pic=yes
 fi
 
 dnl
