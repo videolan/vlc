@@ -72,6 +72,8 @@ static void CreateMsgQueue( vlc_object_t *p_this, int i_queue );
  */
 void __msg_Create( vlc_object_t *p_this )
 {
+    vlc_mutex_init( p_this, &(p_this->p_libvlc->msg_bank.lock) );
+
     CreateMsgQueue( p_this, MSG_QUEUE_NORMAL );
     CreateMsgQueue( p_this, MSG_QUEUE_HTTPD_ACCESS );
 
@@ -147,6 +149,7 @@ void __msg_Destroy( vlc_object_t *p_this )
         /* Destroy lock */
         vlc_mutex_destroy( &p_queue->lock );
     }
+    vlc_mutex_destroy( &(p_this->p_libvlc->msg_bank.lock) );
 }
 
 /**
