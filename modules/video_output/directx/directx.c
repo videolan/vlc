@@ -851,6 +851,12 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 */
 static void OverlayDisplay( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    /* get initial picture rendered on overlay surface */
+    Display(p_vout, p_pic);
+
+    IDirectDraw_WaitForVerticalBlank(p_vout->p_sys->p_ddobject,
+            DDWAITVB_BLOCKBEGIN, NULL);
+
     /* set the colorkey as the backgound brush for the video window */
     SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
                   (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
@@ -858,7 +864,6 @@ static void OverlayDisplay( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* use and restores proper display function for further pictures */
     p_vout->pf_display = Display;
-    Display(p_vout, p_pic);
 }
 
 /* following functions are local */
