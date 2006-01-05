@@ -141,7 +141,7 @@ void __msg_Destroy( vlc_object_t *p_this )
         FlushMsg( p_queue );
 
 #ifdef UNDER_CE
-        if( i == MSG_STREAM_NORMAL )
+        if( i == MSG_QUEUE_NORMAL )
             CloseHandle( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile );
 #endif
         /* Destroy lock */
