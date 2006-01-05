@@ -524,7 +524,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     }
 
 #ifdef UNDER_CE
-#   define CE_WRITE(str) WriteFile( p_this->p_libvlc->msg_bank.logfile, \
+#   define CE_WRITE(str) WriteFile( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile, \
                                     str, strlen(str), &i_dummy, NULL );
     CE_WRITE( p_item->psz_module );
     CE_WRITE( " " );
@@ -533,7 +533,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     CE_WRITE( ": " );
     CE_WRITE( p_item->psz_msg );
     CE_WRITE( "\r\n" );
-    FlushFileBuffers( p_this->p_libvlc->msg_bank.logfile );
+    FlushFileBuffers( p_this->p_libvlc->msg_bank.pp_queues[MSG_QUEUE_NORMAL]->logfile );
 
 #else
     /* Send the message to stderr */
