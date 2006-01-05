@@ -4843,7 +4843,6 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
   fi
   
-  AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
   if test "${mozilla}" != "false"
   then
     build_pic=yes
@@ -4853,6 +4852,7 @@ then
     fi
   fi
 fi
+AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
 dnl  Python bindings
