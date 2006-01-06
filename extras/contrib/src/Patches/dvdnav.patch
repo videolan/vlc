@@ -271,6 +271,65 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
  #endif /* _MSC_VER */
  
  /*
+@@ -126,24 +130,25 @@
+ }
+ #endif
+ 
++#include <dvdread/dvd_input.h>
++
+ static void dvd_read_name(char *name, const char *device) {
+     /* Because we are compiling with _FILE_OFFSET_BITS=64
+      * all off_t are 64bit.
+      */
+     off_t off;
+-    int fd, i;
++    dvd_input_t fd; int i;
+     uint8_t data[DVD_VIDEO_LB_LEN];
+ 
+     /* Read DVD name */
+-    fd = open(device, O_RDONLY);
++    fd = dvdinput_open(device);
+     if (fd > 0) { 
+-      off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
+-      if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
+-        off = read( fd, data, DVD_VIDEO_LB_LEN ); 
+-        close(fd);
+-        if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
++      off = dvdinput_seek( fd, 16 );
++      if( off == 16 ) {
++        off = dvdinput_read( fd, data, 1, DVDINPUT_NOFLAGS ); 
++        if (off == 1 ) {
+           fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
+-          for(i=25; i < 73; i++ ) {
++          for(i=40; i < 73; i++ ) {
+             if((data[i] == 0)) break;
+             if((data[i] > 32) && (data[i] < 127)) {
+               fprintf(MSG_OUT, "%c", data[i]);
+@@ -151,10 +156,12 @@
+               fprintf(MSG_OUT, " ");
+             }
+           }
+-          strncpy(name, &data[25], 48);
+-          name[48] = 0;
++          strncpy(name, &data[40], 32);
++          i=31;
++          while( (i >= 0) && (name[i] <= ' ')) --i;
++          name[i+1] = '\0';
+           fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
+-          for(i=73; i < 89; i++ ) {
++          for(i=813; i < 829; i++ ) {
+             if((data[i] == 0)) break;
+             if((data[i] > 32) && (data[i] < 127)) {
+               fprintf(MSG_OUT, "%c", data[i]);
+@@ -178,7 +185,7 @@
+       } else {
+         fprintf(MSG_OUT, "libdvdnav: Can't seek to block %u\n", 32 );
+       }
+-      close(fd);
++      dvdinput_close(fd);
+     } else {
+     fprintf(MSG_OUT, "NAME OPEN FAILED\n");
+   }
 --- libdvdnav/misc/dvdnav-config.in	2003-04-27 02:26:17.000000000 +0100
 +++ libdvdnav.new/misc/dvdnav-config.in	2005-12-02 09:29:48.265625000 +0000
 @@ -76,5 +76,5 @@

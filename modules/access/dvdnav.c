@@ -536,6 +536,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = (int64_t)var_GetInteger( p_demux, "dvdnav-caching" ) *1000;
             return VLC_SUCCESS;
 
+        case DEMUX_GET_META:
+        {
+            const char *title_name = NULL;
+
+            dvdnav_get_title_string(p_sys->dvdnav, &title_name);
+            if( (NULL != title_name) && ('\0' != title_name[0]) )
+            {
+                vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+                vlc_meta_t *meta;
+                *pp_meta = meta = vlc_meta_New();
+                vlc_meta_Add( meta, VLC_META_TITLE, title_name );
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        }
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
