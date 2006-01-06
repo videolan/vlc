@@ -607,3 +607,11 @@ the Boston strangler is to the woman home alone.
                   dummy :p
   -- #videolan
 %
+-!- Bond631 [n=548d9042@krishna.via.ecp.fr] has joined #videolan
+<Bond631> hi
+<Bond631> how to activate hotkeys?
+-!- Bond631 [n=548d9042@krishna.via.ecp.fr] has quit [Client Quit]
+<Trax``> I think Bond631 found the hotkey for quit
+
+  -- #videolan
+%
