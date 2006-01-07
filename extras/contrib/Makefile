@@ -1,11 +1,12 @@
 # ***************************************************************************
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
-# Copyright (C) 2003-2005 the VideoLAN team
+# Copyright (C) 2003-2006 the VideoLAN team
 # $Id$
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
+#          Christophe Mutricy <xtophe at videolan dot org>
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +70,7 @@ clean: FORCE
 	@echo "    you can still run 'make clean-bin' manually if needed"
 	$(MAKE) clean-src
 
-package: FORCE
+package-macosx: FORCE
 	@if test -d tmp; then \
 		echo "Move away ./tmp, it's in the way" ; \
 		exit 1 ; \
@@ -82,4 +83,16 @@ package: FORCE
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
 	rm -rf tmp
 
+package-win32: FORCE
+	@if test -d tmp; then \
+		echo "Move away ./tmp, it's in the way" ; \
+		exit 1 ; \
+	fi
+	mkdir -p tmp/usr/win32
+	tar cf - bin sbin include lib share/aclocal* share/autoconf* \
+		share/automake* share/gettext* \
+		| (cd tmp/usr/win32; tar xf -)
+	./change_prefix.sh tmp $(PREFIX) /usr/win32
+	(cd tmp; tar cf - usr/win32/) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-only.tar.bz2
+	rm -rf tmp
 FORCE:
