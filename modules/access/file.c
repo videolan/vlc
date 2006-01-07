@@ -634,6 +634,14 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
                  strerror(errno) );
         return VLC_EGENERIC;
     }
+
+#ifdef HAVE_FCNTL_H
+    /* We'd rather use any available memory for reading ahead
+     * than for caching what we've already seen/heard */
+    fcntl(p_sys->fd, F_RDAHEAD, 1);
+    fcntl(p_sys->fd, F_NOCACHE, 1);
+#endif
+
 #endif
 
     return VLC_SUCCESS;
