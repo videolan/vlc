@@ -635,7 +635,7 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
         return VLC_EGENERIC;
     }
 
-#ifdef HAVE_FCNTL_H
+#if defined(HAVE_FCNTL_H) && defined(F_FDAHEAD) && defined(F_NOCACHE)
     /* We'd rather use any available memory for reading ahead
      * than for caching what we've already seen/heard */
     fcntl(p_sys->fd, F_RDAHEAD, 1);
