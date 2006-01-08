@@ -145,6 +145,7 @@ if [ "$CONFIG_LINUX" = "y" ]; then
    bool 'Esound library support' CONFIG_ESD
    bool 'aRts sound server' CONFIG_ARTS
    bool 'ALSA sound support for Linux' CONFIG_ALSA
+   bool 'JACK Audio Connection Kit support' CONFIG_JACK
 fi
 if [ "$CONFIG_WIN32" = "y" ]; then
    bool 'Win32 waveOut module' CONFIG_WAVEOUT

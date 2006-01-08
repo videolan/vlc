@@ -87,6 +87,7 @@ WITHFFMPEGMP3LAME ffmpeg-mp3lame
 WITHFFMPEGFAAC ffmpeg-faac
 GALAKTOS galaktos
 HTTPD httpd
+JACK jack
 "
 PATHS="
 WITHXML2CONFIGPATH xml2-config-path
@@ -177,6 +178,9 @@ done
 
 check_features $FEATURES
 check_paths $PATHS
+
+#XXX
+echo "--enable-maintainer-mode " >> .cmd
 
 if [ ! -e configure ]
 then
