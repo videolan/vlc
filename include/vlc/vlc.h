@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc.h: global header for vlc
+ * vlc.h: global header for libvlc (old-style)
  *****************************************************************************
  * Copyright (C) 1998-2004 the VideoLAN team
  * $Id$
@@ -25,8 +25,9 @@
  *****************************************************************************/
 
 /**
- * \defgroup libvlc Libvlc
+ * \defgroup libvlc_old Libvlc Old
  * This is libvlc, the base library of the VLC program.
+ * This is the legacy API. Please consider using the new libvlc API
  *
  * @{
  */

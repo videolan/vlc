@@ -96,7 +96,7 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
     {
     case STATS_LAST:
     case STATS_MIN:
-    case STATS_LAST:
+    case STATS_MAX:
         if( p_counter->i_samples > 1)
         {
             msg_Err( p_handler, "LAST counter has several samples !" );
@@ -249,7 +249,7 @@ void stats_ComputeInputStats( input_thread_t *p_input,
 {
     int i;
     /* read_packets and read_bytes are common to all streams */
-    p_stats->i_read_packets = stats_GetInteger( p_input, "read_packets" );
-    p_stats->i_read_bytes = stats_GetInteger( p_input, "read_bytes" );
+    //p_stats->i_read_packets = stats_GetInteger( p_input, "read_packets" );
+    // p_stats->i_read_bytes = stats_GetInteger( p_input, "read_bytes" );
 
 }

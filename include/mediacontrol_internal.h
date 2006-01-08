@@ -21,15 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _VLC_PRIVATE_CONTROL_H
-#define _VLC_PRIVATE_CONTROL_H 1
+#ifndef _VLC_MEDIACONTROL_INTERNAL_H
+#define _VLC_MEDIACONTROL_INTERNAL_H 1
 
 # ifdef __cplusplus
 extern "C" {
 # endif
 
 #include <vlc/vlc.h>
-#include "vlc/control_structures.h"
+#include "vlc/mediacontrol_structures.h"
 
 typedef struct {
     vlc_object_t  *p_vlc;

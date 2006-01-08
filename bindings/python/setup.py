@@ -48,7 +48,7 @@ def get_ldflags():
 # To compile in a local vlc tree
 vlclocal = Extension('vlc',
                 sources = ['vlcglue.c',
-                           '../../src/control/init.c'],
+                           '../../src/control/mediacontrol_init.c'],
                 include_dirs = ['../../include', '../../', '/usr/win32/include' ],
                 extra_objects = [ '../../lib/libvlc_pic.a' ],
                 extra_compile_args = get_cflags(),

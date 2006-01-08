@@ -29,8 +29,8 @@
 
 #include <stdio.h>
 #include <vlc/vlc.h>
-#include <vlc/control_structures.h>
-#include <vlc/control.h>
+#include <vlc/mediacontrol_structures.h>
+#include <vlc/mediacontrol.h>
 
 #define SELF ((MediaControl*)self)
 

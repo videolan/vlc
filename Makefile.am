@@ -63,14 +63,15 @@ pkgincludedir = $(includedir)/vlc
 
 dist_pkginclude_HEADERS = \
 	include/vlc/vlc.h \
+	include/vlc/libvlc.h \
 	include/vlc/aout.h \
 	include/vlc/vout.h \
 	include/vlc/sout.h \
 	include/vlc/decoder.h \
 	include/vlc/input.h \
 	include/vlc/intf.h \
-	include/vlc/control.h \
-	include/vlc/control_structures.h \
+	include/vlc/mediacontrol.h \
+	include/vlc/mediacontrol_structures.h \
 	$(NULL)
 
 noinst_HEADERS = $(HEADERS_include)
@@ -105,7 +106,6 @@ HEADERS_include = \
 	include/vlc_codec.h \
 	include/vlc_common.h \
 	include/vlc_config.h \
-	include/vlc_control.h \
 	include/vlc_cpu.h \
 	include/vlc_demux.h \
 	include/vlc_error.h \
@@ -137,6 +137,8 @@ HEADERS_include = \
 	include/vlc_xml.h \
 	include/vout_synchro.h \
 	include/win32_specific.h \
+	include/libvlc_internal.h \
+	include/mediacontrol_internal.h
 	$(NULL)
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
@@ -471,12 +473,15 @@ SOURCES_libvlc_common = \
 	src/misc/version.c \
 	src/extras/libc.c \
 	src/control/core.c \
-	src/control/util.c \
-	src/control/audio_video.c \
+	src/control/playlist.c \
+	src/control/input.c \
+	src/control/mediacontrol_core.c \
+	src/control/mediacontrol_util.c \
+	src/control/mediacontrol_audio_video.c \
 	$(NULL)
 
 # These should be distributed, but not compiled
-EXTRA_DIST += src/control/init.c src/control/plugin.c
+EXTRA_DIST += src/control/mediacontrol_init.c src/control/mediacontrol_plugin.c
 
 SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \

@@ -34,7 +34,7 @@ extern "C" {
 #define WINDOWHANDLE int
 #endif
 
-#include <vlc/control_structures.h>
+#include <vlc/mediacontrol_structures.h>
 
 /************************************************************************
  * Position Object Manipulation

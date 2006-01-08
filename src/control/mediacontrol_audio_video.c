@@ -21,9 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <vlc_control.h>
+#include <mediacontrol_internal.h>
 
-#include <vlc/control.h>
+#include <vlc/mediacontrol.h>
 
 #include <vlc/intf.h>
 #include <vlc/vout.h>
