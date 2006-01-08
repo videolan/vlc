@@ -264,4 +264,4 @@ struct input_stats_t
     /* Vout */
     int i_displayed_pictures;
     int i_lost_pictures;
-}
+};
