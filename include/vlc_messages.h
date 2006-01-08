@@ -208,6 +208,7 @@ enum
     STATS_COUNTER,
     STATS_MAX,
     STATS_MIN,
+    STATS_DERIVATIVE
 };
 
 struct counter_sample_t
@@ -247,3 +248,20 @@ static inline int __stats_UpdateInteger( vlc_object_t *p_obj, char *psz_name,
     return __stats_Update( p_obj, psz_name, val );
 }
 #define stats_UpdateInteger( a,b,c ) __stats_UpdateInteger( VLC_OBJECT(a),b,c )
+
+
+struct input_stats_t
+{
+    /* Input */
+    int i_read_packets;
+    int i_read_bytes;
+
+    float f_last_bitrate;
+    float f_average_bitrate;
+
+    /* Decoders */
+
+    /* Vout */
+    int i_displayed_pictures;
+    int i_lost_pictures;
+}

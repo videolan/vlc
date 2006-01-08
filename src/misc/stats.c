@@ -95,11 +95,21 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
     switch( p_counter->i_compute_type )
     {
     case STATS_LAST:
+    case STATS_MIN:
+    case STATS_LAST:
         if( p_counter->i_samples > 1)
         {
             msg_Err( p_handler, "LAST counter has several samples !" );
             return VLC_EGENERIC;
         }
+        if( p_counter->i_type != VLC_VAR_FLOAT &&
+            p_counter->i_type != VLC_VAR_INTEGER &&
+            p_counter->i_compute_type != STATS_LAST )
+        {
+            msg_Err( p_handler, "Unable to compute MIN or MAX for this type");
+            return VLC_EGENERIC;
+        }
+
         if( p_counter->i_samples == 0 )
         {
             counter_sample_t *p_new = (counter_sample_t*)malloc(
@@ -111,14 +121,31 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
         }
         if( p_counter->i_samples == 1 )
         {
-            if( p_counter->i_type == VLC_VAR_STRING &&
-                p_counter->pp_samples[0]->value.psz_string )
+            /* Update if : LAST or (MAX and bigger) or (MIN and bigger) */
+            if( p_counter->i_compute_type == STATS_LAST ||
+                ( p_counter->i_compute_type == STATS_MAX &&
+                   ( ( p_counter->i_type == VLC_VAR_INTEGER &&
+                       p_counter->pp_samples[0]->value.i_int > val.i_int ) ||
+                     ( p_counter->i_type == VLC_VAR_FLOAT &&
+                       p_counter->pp_samples[0]->value.f_float > val.f_float )
+                   ) ) ||
+                ( p_counter->i_compute_type == STATS_MIN &&
+                   ( ( p_counter->i_type == VLC_VAR_INTEGER &&
+                       p_counter->pp_samples[0]->value.i_int < val.i_int ) ||
+                     ( p_counter->i_type == VLC_VAR_FLOAT &&
+                       p_counter->pp_samples[0]->value.f_float < val.f_float )
+                   ) ) )
             {
-                free( p_counter->pp_samples[0]->value.psz_string );
+                if( p_counter->i_type == VLC_VAR_STRING &&
+                    p_counter->pp_samples[0]->value.psz_string )
+                {
+                    free( p_counter->pp_samples[0]->value.psz_string );
+                }
+                p_counter->pp_samples[0]->value = val;
             }
-            p_counter->pp_samples[0]->value = val;
         }
         break;
+
     case STATS_COUNTER:
         if( p_counter->i_samples > 1)
         {
@@ -216,3 +243,13 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
     return p_handler;
 }
 
+
+void stats_ComputeInputStats( input_thread_t *p_input,
+                              input_stats_t *p_stats )
+{
+    int i;
+    /* read_packets and read_bytes are common to all streams */
+    p_stats->i_read_packets = stats_GetInteger( p_input, "read_packets" );
+    p_stats->i_read_bytes = stats_GetInteger( p_input, "read_bytes" );
+
+}

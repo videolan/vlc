@@ -902,6 +902,7 @@ int VLC_CleanUp( int i_object )
     vout_thread_t      * p_vout;
     aout_instance_t    * p_aout;
     announce_handler_t * p_announce;
+    stats_handler_t    * p_stats;
     vlc_t *p_vlc = vlc_current_object( i_object );
 
     /* Check that the handle is valid */
@@ -954,6 +955,13 @@ int VLC_CleanUp( int i_object )
         vlc_object_detach( (vlc_object_t *)p_aout );
         vlc_object_release( (vlc_object_t *)p_aout );
         aout_Delete( p_aout );
+    }
+
+    while( ( p_stats = vlc_object_find( p_vlc, VLC_OBJECT_STATS, FIND_CHILD) ))
+    {
+        vlc_object_detach( (vlc_object_t*) p_stats );
+        vlc_object_release( (vlc_object_t *)p_stats );
+        // TODO: Delete it
     }
 
     /*

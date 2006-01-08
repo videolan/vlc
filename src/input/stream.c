@@ -1596,6 +1596,9 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
         return AReadStream( s, p_read, i_read_orig );
     }
 
+    /* Update read bytes in input */
+    stats_UpdateInteger( s->p_parent, "read_bytes", i_read );
+
     return i_read;
 }
 

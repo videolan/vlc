@@ -672,6 +672,9 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
      */
     if( !b_quick )
     {
+        stats_Create( p_input, "read_bytes", VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "input_bitrate", VLC_VAR_FLOAT,
+                                                STATS_DERIVATIVE );
         psz = var_GetString( p_input, "sout" );
         if( *psz && strncasecmp( p_input->input.p_item->psz_uri, "vlc:", 4 ) )
         {

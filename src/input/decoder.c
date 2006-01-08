@@ -384,6 +384,10 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->pf_decode_sub = 0;
     p_dec->pf_packetize = 0;
 
+    stats_Create( p_dec, "decoded_audio", VLC_VAR_INTEGER, STATS_COUNTER );
+    stats_Create( p_dec, "decoded_video", VLC_VAR_INTEGER, STATS_COUNTER );
+    stats_Create( p_dec, "decoded_sub", VLC_VAR_INTEGER, STATS_COUNTER );
+
     /* Initialize the decoder fifo */
     p_dec->p_module = NULL;
 
@@ -621,6 +625,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec,
                                                        &p_packetized_block )) )
                     {
+                        stats_UpdateInteger( p_dec, "decoded_audio", 1 );
                         /* FIXME the best would be to handle the case start_date < preroll < end_date
                          * but that's not easy with non raw audio stream */
                         if( p_dec->p_owner->i_preroll_end > 0 &&
@@ -644,6 +649,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         }
         else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
         {
+            stats_UpdateInteger( p_dec, "decoded_audio", 1 );
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
             {
@@ -689,6 +695,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     while( (p_pic = p_dec->pf_decode_video( p_dec,
                                                        &p_packetized_block )) )
                     {
+                        stats_UpdateInteger( p_dec, "decoded_video", 1 );
                         if( p_dec->p_owner->i_preroll_end > 0 &&
                             p_pic->date < p_dec->p_owner->i_preroll_end )
                         {
@@ -709,6 +716,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         }
         else while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
         {
+            stats_UpdateInteger( p_dec, "decoded_video", 1 );
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_pic->date < p_dec->p_owner->i_preroll_end )
             {
@@ -728,6 +736,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         subpicture_t *p_spu;
         while( (p_spu = p_dec->pf_decode_sub( p_dec, &p_block ) ) )
         {
+            stats_UpdateInteger( p_dec, "decoded_sub", 1 );
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_spu->i_start < p_dec->p_owner->i_preroll_end &&
                 ( p_spu->i_stop <= 0 || p_spu->i_stop <= p_dec->p_owner->i_preroll_end ) )
