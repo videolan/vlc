@@ -90,7 +90,7 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.p_sys = p_sys;
 
     /* Connect to the JACK server */
-    p_sys->p_jack_client = jack_client_new( "VLC Media Player" );
+    p_sys->p_jack_client = jack_client_new( "vlc" );
     if( p_sys->p_jack_client == NULL )
     {
         msg_Err( p_aout, "Failed to connect to JACK server" );
@@ -116,7 +116,7 @@ static int Open( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_channels; i++ )
     {
         char p_name[32];
-        snprintf( p_name, 32, "channel %d", i );
+        snprintf( p_name, 32, "channel_%d", i + 1);
         p_sys->p_jack_port[i] = jack_port_register( p_sys->p_jack_client,
                 p_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 );
 
@@ -187,34 +187,41 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 {
     aout_buffer_t *p_buffer;
     jack_default_audio_sample_t *p_jack_buffer;
-    unsigned int i, j;
+    unsigned int i, j, i_nb_samples = 0;
     aout_instance_t *p_aout = (aout_instance_t*) p_arg;
 
     /* Get the next audio data buffer */
     p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
 
-    if( p_buffer != NULL )
+    if( p_buffer )
     {
-        for( i = 0; i < p_aout->output.p_sys->i_channels; i++ )
-        {
-            /* Get an output buffer from JACK */
-            p_jack_buffer = jack_port_get_buffer(
-                p_aout->output.p_sys->p_jack_port[i], i_frames );
+        i_nb_samples = p_buffer->i_nb_samples;
+    }
 
-            /* Fill the buffer with audio data */
-            for (j = 0; j < p_buffer->i_nb_samples; j++)
-            {
-                p_jack_buffer[j] = ((float*)p_buffer->p_buffer)[2*j+i];
-            }
-            if (p_buffer->i_nb_samples < i_frames)
-            {
-                msg_Warn( p_aout, "Buffer underrun (%d)",
-                          i_frames-p_buffer->i_nb_samples );
-                memset( p_jack_buffer+j, 0, i_frames-p_buffer->i_nb_samples );
-            }
+    for( i = 0; i < p_aout->output.p_sys->i_channels; i++ )
+    {
+        /* Get an output buffer from JACK */
+        p_jack_buffer = jack_port_get_buffer(
+            p_aout->output.p_sys->p_jack_port[i], i_frames );
+
+        /* Fill the buffer with audio data */
+        for( j = 0; j < i_nb_samples; j++ )
+        {
+            p_jack_buffer[j] = ((float*)p_buffer->p_buffer)[2*j+i];
         }
+        if (i_nb_samples < i_frames)
+        {
+            memset( p_jack_buffer + i_nb_samples, 0,
+                    sizeof( jack_default_audio_sample_t ) *
+                    (i_frames - i_nb_samples) );
+        }
+    }
+
+    if( p_buffer )
+    {
         aout_BufferFree( p_buffer );
     }
+
     return 0;
 }
 
