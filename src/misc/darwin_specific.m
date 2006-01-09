@@ -51,6 +51,7 @@ static int FindLanguage( const char * psz_lang )
         "Italian", "it",
         "Japanese", "ja",
         "Korean", "ko",
+	"Georgian", "ka",
         "Dutch", "nl",
         "Brazillian Portuguese", "pt_BR",
         "Romanian", "ro",

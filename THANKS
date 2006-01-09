@@ -8,6 +8,7 @@ Michel Lespinasse <walken at zoy.org> - AC3 decoder, MPEG audio and video decode
 
 The VideoLAN team would like to thank the following contributors:
 
+Alexander Didebulidze <alexander.didebulidze at stusta dot mhn dot de> - Georgian localization
 Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
