@@ -36,8 +36,8 @@ static char *ppsz_language_text[] =
 N_("Catalan"), N_("Danish"), N_("German"), N_("Spanish"), N_("French"),
 N_("Italian"), N_("Japanese"),N_("Georgian"), N_("Korean"),
 N_("Dutch"), N_("Occitan"), N_("Brazilian Portuguese"), N_("Romanian"),
-N_("Russian"), N_("Turkish"), N_("Simplified Chinese"), N_("Chinese
-Traditional") };
+N_("Russian"), N_("Turkish"), N_("Simplified Chinese"),
+N_("Chinese Traditional") };
 
 static char *ppsz_snap_formats[] =
 { "png", "jpg" };
