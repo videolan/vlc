@@ -1,6 +1,6 @@
 ## corba module declaration
 
-SOURCES_corba = corba.c
+SOURCES_corba = corba.c ../../../src/control/mediacontrol_plugin.c
 
 nodist_SOURCES_corba = \
 	MediaControl-common.c \
