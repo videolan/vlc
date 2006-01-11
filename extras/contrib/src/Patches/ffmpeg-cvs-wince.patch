@@ -266,7 +266,7 @@ diff -u -r1.114 mjpeg.c
 @@ -28,9 +28,6 @@
   * MJPEG encoder and decoder.
   */
-  
+
 -//#define DEBUG
 -#include <assert.h>
 -
@@ -535,13 +535,13 @@ diff -u -r1.102 Makefile
  ifeq ($(AMR_NB),yes)
  AMROBJS= amr.o
 @@ -32,8 +39,6 @@
- 
+
  # image formats
  OBJS+= pnm.o yuv.o png.o jpeg.o gifdec.o sgi.o
 -# file I/O
--OBJS+= avio.o aviobuf.o file.o 
- OBJS+= framehook.o 
- 
+-OBJS+= avio.o aviobuf.o file.o
+ OBJS+= framehook.o
+
  ifeq ($(CONFIG_VIDEO4LINUX),yes)
 @@ -62,6 +67,15 @@
  PPOBJS+= beosaudio.o
