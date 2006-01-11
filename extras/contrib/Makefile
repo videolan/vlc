@@ -90,8 +90,15 @@ package-win32: FORCE
 	fi
 	mkdir -p tmp/usr/win32
 	tar cf - bin sbin include lib share/aclocal* share/autoconf* \
-		share/automake* share/gettext* \
+		share/automake* share/gettext* gecko-sdk\
 		| (cd tmp/usr/win32; tar xf -)
+#kludge for live.com
+	mkdir -p tmp/usr/win32/live.com
+	for i in groupsock liveMedia UsageEnvironment BasicUsageEnvironment; do \
+		mkdir -p  tmp/usr/win32/live.com/$$i/include; \
+		cp -r src/live/$$i/include tmp/usr/win32/live.com/$$i/include; \
+		cp src/live/$$i/lib$${i}.a  tmp/usr/win32/live.com/$$i; \
+	done;
 	./change_prefix.sh tmp $(PREFIX) /usr/win32
 	(cd tmp; tar cf - usr/win32/) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-only.tar.bz2
 	rm -rf tmp
