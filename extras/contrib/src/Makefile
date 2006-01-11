@@ -145,9 +145,9 @@ else
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
-	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac .portaudio\
+	.gnutls .dvdnav .dvbpsi .wxwidgets .dirac \
 	.dx_headers .dshow_headers .aclocal .gecko-win32
-#	.SDL_image  .daap .cddb .cdio .vcdimager .dts 
+#	.SDL_image  .daap .cddb .cdio .vcdimager .dts .portaudio 
   else
 
    ifdef HAVE_WINCE
