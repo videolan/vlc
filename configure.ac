@@ -4047,7 +4047,37 @@ AS_IF([test "${CXX}" != "" -a "${enable_cyberlink}" = "yes" || (test "${enable_c
     AC_MSG_CHECKING(for libclink.a in ${with_cyberlink_tree})
     AS_IF([test -f "${real_cyberlink_tree}/lib/unix/libclink.a"], [
       AC_MSG_RESULT(${real_cyberlink_tree}/lib/unix/libclink.a)
-      VLC_ADD_LDFLAGS([upnp], [${real_cyberlink_tree}/lib/unix/libclink.a -lexpat])
+      dnl The mere fact that we have to make such an ugly check sucks
+      AC_MSG_CHECKING(for XML parser to link CyberLink with)
+      LIBS_save="$LIBS"
+      LIBS_cclink="no"
+      for l in "`xml2-config --libs`" -lexpat -lxerces-c; do
+        LIBS="$LIBS_save ${real_cyberlink_tree}/lib/unix/libclink.a -lpthread $l"
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([
+#include <cybergarage/upnp/media/player/MediaPlayer.h>
+using namespace CyberLink;
+
+class testclass : public SearchResponseListener, public MediaPlayer
+{
+    virtual void deviceSearchResponseReceived( SSDPPacket *)
+    {
+    }
+
+    public:
+      testclass (void)
+      {
+        addSearchResponseListener (this);
+	start ();
+      }
+};
+],[testclass l;])],[LIBS_cclink="$l"])
+      done
+      LIBS="${LIBS_save}"
+      dnl should not happen - otherwise this needs fixing - hence FAILURE
+      AS_IF([test "${LIBS_cclink}" == "no"],
+        [AC_MSG_FAILURE([cannot find XML parser for CyberLink])])
+      AC_MSG_RESULT([${LIBS_cclink}])
+      VLC_ADD_LDFLAGS([upnp], [${real_cyberlink_tree}/lib/unix/libclink.a -lpthread ${LIBS_cclink}])
     ], [
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_cyberlink_tree}/lib/unix/libclink.a, make sure you compiled CyberLink for C++ in ${with_cyberlink_tree}])
