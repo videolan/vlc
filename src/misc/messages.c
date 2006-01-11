@@ -343,7 +343,11 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
         }
     }
 
-    if( p_queue == NULL ) return;
+    if( p_queue == NULL )
+    {
+        vlc_mutex_unlock( &p_bank->lock );
+        return;
+    }
 
     vlc_mutex_lock( &p_queue->lock );
 
