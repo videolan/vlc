@@ -28,11 +28,14 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc_block.h>
 
 #include "vlc_video.h"
 #include "video_output.h"
 #include "vlc_image.h"
 #include "vlc_spu.h"
+
+#include <snapshot.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -454,6 +457,94 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     {
         if( format.psz_string ) free( format.psz_string );
         format.psz_string = strdup( "png" );
+    }
+
+    /* Embedded snapshot : if snapshot-path == object:object-id, then
+       create a snapshot_t* and store it in
+       object(object-id)->p_private, then unlock and signal the
+       waiting object.
+     */
+    if( !strncmp( val.psz_string, "object:", 7 ) )
+    {
+        int i_id;
+        vlc_object_t* p_dest;
+        block_t *p_block;
+        snapshot_t *p_snapshot;
+	int i_size;
+
+        /* Destination object-id is following object: */
+        i_id = atoi( &val.psz_string[7] );
+        p_dest = ( vlc_object_t* )vlc_current_object( i_id );
+        if( !p_dest )
+        {
+            msg_Err( p_vout, "Cannot find calling object" );
+            image_HandlerDelete( p_image );
+            return VLC_EGENERIC;
+        }
+        /* Object must be locked. We will unlock it once we get the
+           snapshot and written it to p_private */
+        p_dest->p_private = NULL;
+
+        /* Save the snapshot to a memory zone */
+        fmt_in = p_vout->fmt_in;
+        fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
+	fmt_out.i_width = 320;
+	fmt_out.i_height = 200;
+	fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
+        p_block = ( block_t* ) image_Write( p_image, p_pic, &fmt_in, &fmt_out );
+        if( !p_block ) 
+        {
+            msg_Err( p_vout, "Could not get snapshot" );
+            image_HandlerDelete( p_image );
+            vlc_cond_signal( &p_dest->object_wait );
+            vlc_mutex_unlock( &p_dest->object_lock );
+	    vlc_object_release( p_dest );
+            return VLC_EGENERIC;
+        }
+
+        /* Copy the p_block data to a snapshot structure */
+        /* FIXME: get the timestamp */
+        p_snapshot = ( snapshot_t* ) malloc( sizeof( snapshot_t ) );
+        if( !p_snapshot )
+        {
+            block_Release( p_block );
+            image_HandlerDelete( p_image );
+            vlc_cond_signal( &p_dest->object_wait );
+            vlc_mutex_unlock( &p_dest->object_lock );
+	    vlc_object_release( p_dest );
+            return VLC_ENOMEM;
+        }
+
+	i_size = p_block->i_buffer;
+
+        p_snapshot->i_width = fmt_out.i_width;
+        p_snapshot->i_height = fmt_out.i_height;
+        p_snapshot->i_datasize = i_size;
+        p_snapshot->date = p_block->i_pts; /* FIXME ?? */
+        p_snapshot->p_data = ( char* ) malloc( i_size );
+        if( !p_snapshot->p_data )
+        {
+            block_Release( p_block );
+            free( p_snapshot );
+            image_HandlerDelete( p_image );
+            vlc_cond_signal( &p_dest->object_wait );
+            vlc_mutex_unlock( &p_dest->object_lock );
+	    vlc_object_release( p_dest );
+            return VLC_ENOMEM;
+        }
+	memcpy( p_snapshot->p_data, p_block->p_buffer, p_block->i_buffer );
+
+	p_dest->p_private = p_snapshot;
+
+        block_Release( p_block );
+        
+        /* Unlock the object */
+        vlc_cond_signal( &p_dest->object_wait );
+        vlc_mutex_unlock( &p_dest->object_lock );
+	vlc_object_release( p_dest );
+
+        image_HandlerDelete( p_image );
+	return VLC_SUCCESS;
     }
 
     asprintf( &psz_filename, "%s/vlcsnap-%u.%s", val.psz_string,
