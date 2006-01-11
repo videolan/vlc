@@ -543,27 +543,27 @@ void Builder::addImage( const BuilderData::Image &rData )
     {
         CtrlMove *pMove = new CtrlMove( getIntf(), m_pTheme->getWindowManager(),
              *pImage, *pWindow, UString( getIntf(), rData.m_help.c_str() ),
-             NULL);
+             pVisible );
         pLayout->addControl( pMove, pos, rData.m_layer );
     }
     else if( rData.m_actionId == "resizeS" )
     {
         CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
-                UString( getIntf(), rData.m_help.c_str() ), NULL,
+                UString( getIntf(), rData.m_help.c_str() ), pVisible,
                 CtrlResize::kResizeS );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
     else if( rData.m_actionId == "resizeE" )
     {
         CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
-                UString( getIntf(), rData.m_help.c_str() ), NULL,
+                UString( getIntf(), rData.m_help.c_str() ), pVisible,
                 CtrlResize::kResizeE );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
     else if( rData.m_actionId == "resizeSE" )
     {
         CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
-                UString( getIntf(), rData.m_help.c_str() ), NULL,
+                UString( getIntf(), rData.m_help.c_str() ), pVisible,
                 CtrlResize::kResizeSE );
         pLayout->addControl( pResize, pos, rData.m_layer );
     }
