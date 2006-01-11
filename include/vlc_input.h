@@ -64,6 +64,8 @@ struct input_item_t
 
     vlc_bool_t  b_fixed_name;        /**< Can the interface change the name ?*/
 
+    input_stats_t *p_stats;          /**< Statistics */
+
     vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
 };
 
@@ -91,6 +93,10 @@ static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
     p_i->es = 0;
     p_i->i_type = ITEM_TYPE_UNKNOWN;
     p_i->b_fixed_name = VLC_TRUE;
+
+    p_i->p_stats = (input_stats_t*) malloc( sizeof( input_stats_t ) );
+    vlc_mutex_init( p_o, &p_i->p_stats->lock );
+
     vlc_mutex_init( p_o, &p_i->lock );
 }
 

@@ -618,6 +618,9 @@ static void RunThread ( playlist_t *p_playlist )
         /* If there is an input, check that it doesn't need to die. */
         if( p_playlist->p_input )
         {
+            stats_ComputeInputStats( p_playlist->p_input,
+                                  p_playlist->p_input->input.p_item->p_stats );
+
             /* This input is dead. Remove it ! */
             if( p_playlist->p_input->b_dead )
             {

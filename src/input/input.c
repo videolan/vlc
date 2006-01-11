@@ -150,6 +150,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->input.b_eof = VLC_FALSE;
     p_input->input.i_cr_average = 0;
 
+    stats_ReinitInputStats( p_item->p_stats );
+
     /* No slave */
     p_input->i_slave = 0;
     p_input->slave   = NULL;
@@ -673,8 +675,9 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     if( !b_quick )
     {
         stats_Create( p_input, "read_bytes", VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "read_packets", VLC_VAR_INTEGER, STATS_COUNTER );
         stats_Create( p_input, "input_bitrate", VLC_VAR_FLOAT,
-                                                STATS_DERIVATIVE );
+                               STATS_DERIVATIVE );
         psz = var_GetString( p_input, "sout" );
         if( *psz && strncasecmp( p_input->input.p_item->psz_uri, "vlc:", 4 ) )
         {

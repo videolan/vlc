@@ -1569,6 +1569,9 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     if( !p_sys->i_list )
     {
         i_read = p_access->pf_read( p_access, p_read, i_read );
+        stats_UpdateInteger( s->p_parent->p_parent , "read_bytes", i_read );
+        stats_UpdateInteger( s->p_parent->p_parent , "input_bitrate", i_read );
+        stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 );
         return i_read;
     }
 
@@ -1597,8 +1600,9 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     }
 
     /* Update read bytes in input */
-    stats_UpdateInteger( s->p_parent, "read_bytes", i_read );
-
+    stats_UpdateInteger( s->p_parent->p_parent , "read_bytes", i_read );
+    stats_UpdateInteger( s->p_parent->p_parent , "input_bitrate", i_read );
+    stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 );
     return i_read;
 }
 

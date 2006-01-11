@@ -27,6 +27,7 @@
 #include <stdio.h>                                               /* required */
 
 #include <vlc/vlc.h>
+#include <vlc_input.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -48,6 +49,9 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
 {
     counter_t *p_counter;
     stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    if( !p_handler ) return VLC_ENOMEM;
+
+    vlc_mutex_lock( &p_handler->object_lock );
 
     p_counter = (counter_t*) malloc( sizeof( counter_t ) ) ;
 
@@ -63,6 +67,8 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
                  p_handler->i_counters,
                  p_counter );
 
+    vlc_mutex_unlock( &p_handler->object_lock );
+
     return VLC_SUCCESS;
 }
 
@@ -70,24 +76,106 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
 
 int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
 {
+    int i_ret;
     counter_t *p_counter;
 
     /* Get stats handler singleton */
     stats_handler_t *p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
 
+    vlc_mutex_lock( &p_handler->object_lock );
+
     /* Look for existing element */
     p_counter = stats_GetCounter( p_handler, p_this->i_object_id,
                                   psz_name );
     if( !p_counter )
     {
+        vlc_mutex_unlock( &p_handler->object_lock );
         vlc_object_release( p_handler );
         return VLC_ENOOBJ;
     }
 
-    return stats_CounterUpdate( p_handler, p_counter, val );
+    i_ret = stats_CounterUpdate( p_handler, p_counter, val );
+    vlc_mutex_unlock( &p_handler->object_lock );
+
+    return i_ret;
 }
 
+int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_value_t *val )
+{
+    counter_t *p_counter;
+
+    /* Get stats handler singleton */
+    stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    if( !p_handler ) return VLC_ENOMEM;
+    vlc_mutex_lock( &p_handler->object_lock );
+
+
+    /* Look for existing element */
+    p_counter = stats_GetCounter( p_handler, i_object_id,
+                                  psz_name );
+    if( !p_counter )
+    {
+        vlc_mutex_unlock( &p_handler->object_lock );
+        vlc_object_release( p_handler );
+        return VLC_ENOOBJ;
+    }
+
+    if( p_counter->i_samples == 0 )
+    {
+        vlc_mutex_unlock( &p_handler->object_lock );
+        return VLC_EGENERIC;
+    }
+
+    /* FIXME: Does not work for all types, maybe */
+    *val = p_counter->pp_samples[0]->value;
+    vlc_object_release( p_handler );
+
+    vlc_mutex_unlock( &p_handler->object_lock );
+    return VLC_SUCCESS;;
+}
+
+void stats_ComputeInputStats( input_thread_t *p_input,
+                              input_stats_t *p_stats )
+{
+    vlc_mutex_lock( &p_stats->lock );
+    /* read_packets and read_bytes are common to all streams */
+    stats_GetInteger( p_input, p_input->i_object_id, "read_packets",
+                       &p_stats->i_read_packets );
+    stats_GetInteger( p_input, p_input->i_object_id, "read_bytes",
+                       &p_stats->i_read_bytes );
+    vlc_mutex_unlock( &p_stats->lock );
+}
+
+void stats_ReinitInputStats( input_stats_t *p_stats )
+{
+    p_stats->i_read_packets = p_stats->i_read_bytes =
+        p_stats->f_last_bitrate = p_stats->f_average_bitrate =
+        p_stats->i_displayed_pictures = p_stats->i_lost_pictures = 0;
+}
+
+void stats_DumpInputStats( input_stats_t *p_stats  )
+{
+    vlc_mutex_lock( &p_stats->lock );
+    fprintf( stderr, "Read packets : %i (%i bytes)\n",
+                    p_stats->i_read_packets, p_stats->i_read_bytes );
+    vlc_mutex_unlock( &p_stats->lock );
+}
+
+
+/********************************************************************
+ * Following functions are local
+ ********************************************************************/
+
+/**
+ * Update a statistics counter, according to its type
+ * If needed, perform a bit of computation (derivative, mostly)
+ * This function must be entered with stats handler lock
+ * \param p_handler stats handler singleton
+ * \param p_counter the counter to update
+ * \param val the "new" value
+ * \return an error code
+ */
 static int stats_CounterUpdate( stats_handler_t *p_handler,
                                 counter_t *p_counter,
                                 vlc_value_t val )
@@ -244,12 +332,3 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
 }
 
 
-void stats_ComputeInputStats( input_thread_t *p_input,
-                              input_stats_t *p_stats )
-{
-    int i;
-    /* read_packets and read_bytes are common to all streams */
-    //p_stats->i_read_packets = stats_GetInteger( p_input, "read_packets" );
-    // p_stats->i_read_bytes = stats_GetInteger( p_input, "read_bytes" );
-
-}

@@ -25,6 +25,10 @@
  *****************************************************************************/
 
 #include <stdarg.h>
+
+int vlc_mutex_lock(  vlc_mutex_t * ) ;
+int vlc_mutex_unlock(  vlc_mutex_t * ) ;
+
 /**
  * \defgroup messages Messages
  * This library provides basic functions for threads to interact with user
@@ -239,7 +243,20 @@ struct stats_handler_t
 VLC_EXPORT( int, __stats_Update, (vlc_object_t*, char *, vlc_value_t) );
 #define stats_Create( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
 VLC_EXPORT( int, __stats_Create, (vlc_object_t*, char *, int, int) );
+#define stats_Get( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
+VLC_EXPORT( int, __stats_Get, (vlc_object_t*, int, char *, vlc_value_t*) );
 
+#define stats_GetInteger( a,b,c,d ) __stats_GetInteger( VLC_OBJECT(a), b, c, d )
+static inline int __stats_GetInteger( vlc_object_t *p_obj, int i_id,
+                                      char *psz_name, int *value )
+{
+    vlc_value_t val;
+    int i_ret = __stats_Get( p_obj, i_id, psz_name, &val );
+    *value = val.i_int;
+    return i_ret;
+}
+
+#define stats_UpdateInteger( a,b,c ) __stats_UpdateInteger( VLC_OBJECT(a),b,c )
 static inline int __stats_UpdateInteger( vlc_object_t *p_obj, char *psz_name,
                                          int i )
 {
@@ -247,11 +264,13 @@ static inline int __stats_UpdateInteger( vlc_object_t *p_obj, char *psz_name,
     val.i_int = i;
     return __stats_Update( p_obj, psz_name, val );
 }
-#define stats_UpdateInteger( a,b,c ) __stats_UpdateInteger( VLC_OBJECT(a),b,c )
 
 
 struct input_stats_t
 {
+
+    vlc_mutex_t         lock;
+
     /* Input */
     int i_read_packets;
     int i_read_bytes;
@@ -265,3 +284,7 @@ struct input_stats_t
     int i_displayed_pictures;
     int i_lost_pictures;
 };
+
+VLC_EXPORT( void, stats_ComputeInputStats, (input_thread_t*, input_stats_t*) );
+VLC_EXPORT( void, stats_ReinitInputStats, (input_stats_t *) );
+VLC_EXPORT( void, stats_DumpInputStats, (input_stats_t *) );

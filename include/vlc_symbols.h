@@ -29,6 +29,7 @@ void vlm_MediaDelete (vlm_t *, vlm_media_t *, const char *);
 int __var_Destroy (vlc_object_t *, const char *);
 int playlist_ItemSetDuration (playlist_item_t *, mtime_t);
 void aout_Delete (aout_instance_t *);
+void stats_ComputeInputStats (input_thread_t*, input_stats_t*);
 int playlist_Control (playlist_t *, int, ...);
 vlc_acl_t * __ACL_Create (vlc_object_t *p_this, vlc_bool_t b_allow);
 playlist_item_t * playlist_ItemGetByPos (playlist_t *, int);
@@ -120,6 +121,7 @@ void vout_SynchroDecode (vout_synchro_t *);
 int playlist_Delete (playlist_t *, int);
 void aout_FiltersPlay (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_buffer_t ** pp_input_buffer);
 int __stats_Update (vlc_object_t*, char *, vlc_value_t);
+int __stats_Get (vlc_object_t*, int, char *, vlc_value_t*);
 char* httpd_ClientIP (httpd_client_t *cl, char *psz_ip);
 int __intf_UserProgress (vlc_object_t*, const char*, const char*, float);
 void httpd_FileDelete (httpd_file_t *);
@@ -241,6 +243,7 @@ int osd_ConfigLoader (vlc_object_t *, const char *, osd_menu_t **);
 int aout_Restart (aout_instance_t * p_aout);
 void * __vlc_object_create (vlc_object_t *, int);
 int __aout_VolumeInfos (vlc_object_t *, audio_volume_t *);
+void stats_DumpInputStats (input_stats_t *);
 const iso639_lang_t * GetLang_2T (const char *);
 int __intf_Interact (vlc_object_t *,interaction_dialog_t *);
 int playlist_NodeAddItem (playlist_t *, playlist_item_t *,int,playlist_item_t *,int , int);
@@ -251,6 +254,7 @@ int playlist_LockControl (playlist_t *, int, ...);
 vlc_bool_t vlc_current_charset (char **);
 char * __net_Gets (vlc_object_t *p_this, int fd, v_socket_t *);
 void aout_DateMove (audio_date_t *, mtime_t);
+void stats_ReinitInputStats (input_stats_t *);
 void sout_MuxDelete (sout_mux_t *);
 void vout_InitFormat (video_frame_format_t *, uint32_t, int, int, int);
 void vout_UnlinkPicture (vout_thread_t *, picture_t *);
@@ -873,6 +877,10 @@ struct module_symbols_t
     void (*__intf_UserHide_inner) (vlc_object_t *, int);
     int (*__stats_Create_inner) (vlc_object_t*, char *, int, int);
     int (*__stats_Update_inner) (vlc_object_t*, char *, vlc_value_t);
+    int (*__stats_Get_inner) (vlc_object_t*, int, char *, vlc_value_t*);
+    void (*stats_ComputeInputStats_inner) (input_thread_t*, input_stats_t*);
+    void (*stats_DumpInputStats_inner) (input_stats_t *);
+    void (*stats_ReinitInputStats_inner) (input_stats_t *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1295,6 +1303,10 @@ struct module_symbols_t
 #  define __intf_UserHide (p_symbols)->__intf_UserHide_inner
 #  define __stats_Create (p_symbols)->__stats_Create_inner
 #  define __stats_Update (p_symbols)->__stats_Update_inner
+#  define __stats_Get (p_symbols)->__stats_Get_inner
+#  define stats_ComputeInputStats (p_symbols)->stats_ComputeInputStats_inner
+#  define stats_DumpInputStats (p_symbols)->stats_DumpInputStats_inner
+#  define stats_ReinitInputStats (p_symbols)->stats_ReinitInputStats_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1720,6 +1732,10 @@ struct module_symbols_t
     ((p_symbols)->__intf_UserHide_inner) = __intf_UserHide; \
     ((p_symbols)->__stats_Create_inner) = __stats_Create; \
     ((p_symbols)->__stats_Update_inner) = __stats_Update; \
+    ((p_symbols)->__stats_Get_inner) = __stats_Get; \
+    ((p_symbols)->stats_ComputeInputStats_inner) = stats_ComputeInputStats; \
+    ((p_symbols)->stats_DumpInputStats_inner) = stats_DumpInputStats; \
+    ((p_symbols)->stats_ReinitInputStats_inner) = stats_ReinitInputStats; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
