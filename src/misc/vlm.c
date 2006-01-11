@@ -1947,6 +1947,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
 static int Load( vlm_t *vlm, char *file )
 {
     char *pf = file;
+    int  i_line = 1;
 
     while( *pf != '\0' )
     {
@@ -1967,12 +1968,19 @@ static int Load( vlm_t *vlm, char *file )
 
         if( *pf && ExecuteCommand( vlm, pf, &message ) )
         {
-            if( message ) free( message );
+            if( message )
+            {
+                if( message->psz_value )
+                    msg_Err( vlm, "Load error on line %d: %s: %s",
+                             i_line, message->psz_name, message->psz_value );
+                free( message );
+            }
             return 1;
         }
         if( message ) free( message );
 
         pf += i_end;
+        i_line++;
     }
 
     return 0;
