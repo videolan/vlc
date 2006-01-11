@@ -32,11 +32,7 @@
 
 #include <vlc_osd.h>
 
-#define HAS_SNAPSHOT 1
-
-#ifdef HAS_SNAPSHOT
 #include <snapshot.h>
-#endif
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
@@ -63,200 +59,69 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
                        const mediacontrol_Position * a_position,
                        mediacontrol_Exception *exception )
 {
-    mediacontrol_RGBPicture *retval = NULL;
-    input_thread_t* p_input = self->p_playlist->p_input;
-    vout_thread_t *p_vout = NULL;
-    int i_datasize;
-    snapshot_t **pointer;
-    vlc_value_t val;
-    int i_index;
-    snapshot_t *p_best_snapshot;
-    long searched_date;
-#ifdef HAS_SNAPSHOT
-    int i_cachesize;
-#endif
+    vlc_object_t* p_cache;
+    vout_thread_t* p_vout;
+    mediacontrol_RGBPicture *p_pic = NULL;
+    char path[256];
+    snapshot_t *p_snapshot;
 
     exception=mediacontrol_exception_init( exception );
 
-    /*
-       if( var_Get( self->p_vlc, "snapshot-id", &val ) == VLC_SUCCESS )
-       p_vout = vlc_object_get( self->p_vlc, val.i_int );
-    */
-
-    /* FIXME: if in p_libvlc, we cannot have multiple video outputs */
-    /* Once corrected, search for snapshot-id to modify all instances */
-    if( var_Get( p_input, "snapshot-id", &val ) != VLC_SUCCESS )
+    p_cache = vlc_object_create( self->p_playlist, VLC_OBJECT_GENERIC );
+    if( p_cache == NULL )
     {
-        RAISE( mediacontrol_InternalException, "No snapshot-id in p_input" );
+        msg_Err( self->p_playlist, "out of memory" );
+        RAISE( mediacontrol_InternalException, "Out of memory" );
         return NULL;
     }
-    p_vout = vlc_object_get( self->p_vlc, val.i_int );
 
+    p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
-        RAISE( mediacontrol_InternalException, "No snapshot module" );
+        RAISE( mediacontrol_InternalException, "No video output" );
         return NULL;
     }
+    snprintf( path, 255, "object:%d", p_cache->i_object_id );
+    fprintf( stderr, "snapshot-path: %s\n", path );
+    var_SetString( p_vout, "snapshot-path", path );
+    var_SetString( p_vout, "snapshot-format", "png" );
 
-#ifdef HAS_SNAPSHOT
-    /* We test if the vout is a snapshot module. We cannot test
-       pvout_psz_object_name( which is NULL ). But we can check if
-       there are snapshot-specific variables */
-    if( var_Get( p_vout, "snapshot-datasize", &val ) != VLC_SUCCESS )
+    vlc_mutex_lock( &p_cache->object_lock );
+    vout_Control( p_vout, VOUT_SNAPSHOT );
+
+    vlc_cond_wait( &p_cache->object_wait, &p_cache->object_lock );
+
+    p_snapshot = ( snapshot_t* ) p_cache->p_private;
+    vlc_object_destroy( p_cache );
+    
+    if( p_snapshot )
     {
-        RAISE( mediacontrol_InternalException, "No snapshot module" );
-        vlc_object_release( p_vout );
-        return NULL;
+        p_pic = _mediacontrol_createRGBPicture( p_snapshot->i_width,
+                                                p_snapshot->i_height,
+                                                "PNG",
+                                                p_snapshot->date,
+                                                p_snapshot->p_data,
+                                                p_snapshot->i_datasize );
+        if( !p_pic )
+	  RAISE( mediacontrol_InternalException, "Out of memory" );
+	free( p_snapshot->p_data );
+	free( p_snapshot );
     }
-    i_datasize = val.i_int;
-
-    /* Handle the a_position parameter */
-    if( ! ( a_position->origin == mediacontrol_RelativePosition
-            && a_position->value == 0 ) )
+    else
     {
-        /* The position is not the current one. Go to it. */
-        mediacontrol_set_media_position( self,
-                                         ( mediacontrol_Position* ) a_position,
-                                         exception );
-        if( exception->code )
-        {
-            vlc_object_release( p_vout );
-            return NULL;
-        }
+        RAISE( mediacontrol_InternalException, "Snapshot exception" );
     }
-
-    /* FIXME: We should not go further until we got past the position
-       ( which means that we had the possibility to capture the right
-       picture ). */
-
-    vlc_mutex_lock( &p_vout->picture_lock );
-
-    searched_date = mediacontrol_position2microsecond( p_input,
-                                                       ( mediacontrol_Position * ) a_position );
-
-    var_Get( p_vout, "snapshot-cache-size", &val );
-    i_cachesize = val.i_int  ;
-
-    var_Get( p_vout, "snapshot-list-pointer", &val );
-    pointer = ( snapshot_t ** )val.p_address;
-
-    if( ! pointer )
-    {
-        RAISE( mediacontrol_InternalException, "No available snapshot" );
-
-        vlc_mutex_unlock( &p_vout->picture_lock );
-        vlc_object_release( p_vout );
-        return NULL;
-    }
-
-    /* Find the more appropriate picture, based on date */
-    p_best_snapshot = pointer[0];
-
-    for( i_index = 1 ; i_index < i_cachesize ; i_index++ )
-    {
-        long l_diff = pointer[i_index]->date - searched_date;
-        if( l_diff > 0 && l_diff < abs( p_best_snapshot->date - searched_date ))
-        {
-            /* This one is closer, and _after_ the requested position */
-            p_best_snapshot = pointer[i_index];
-        }
-    }
-
-    /* FIXME: add a test for the case that no picture matched the test
-       ( we have p_best_snapshot == pointer[0] */
-    retval = _mediacontrol_createRGBPicture( p_best_snapshot->i_width,
-                                             p_best_snapshot->i_height,
-                                             p_vout->output.i_chroma,
-                                             p_best_snapshot->date,
-                                             p_best_snapshot->p_data,
-                                             i_datasize );
-
-    vlc_mutex_unlock( &p_vout->picture_lock );
-    vlc_object_release( p_vout );
-
-#endif
-
-    return retval;
+    return p_pic;
 }
 
 mediacontrol_RGBPicture **
 mediacontrol_all_snapshots( mediacontrol_Instance *self,
                             mediacontrol_Exception *exception )
 {
-    mediacontrol_RGBPicture **retval = NULL;
-    vout_thread_t *p_vout = NULL;
-    int i_datasize;
-    int i_cachesize;
-    vlc_value_t val;
-    int i_index;
-#ifdef HAS_SNAPSHOT
-    snapshot_t **pointer;
-#endif
-
     exception=mediacontrol_exception_init( exception );
 
-    if( var_Get( self->p_playlist->p_input, "snapshot-id", &val ) == VLC_SUCCESS )
-        p_vout = vlc_object_get( self->p_vlc, val.i_int );
-
-    if( ! p_vout )
-    {
-        RAISE( mediacontrol_InternalException, "No snapshot module" );
-        return NULL;
-    }
-#ifdef HAS_SNAPSHOT
-    /* We test if the vout is a snapshot module. We cannot test
-       pvout_psz_object_name( which is NULL ). But we can check if
-       there are snapshot-specific variables */
-    if( var_Get( p_vout, "snapshot-datasize", &val ) != VLC_SUCCESS )
-    {
-        RAISE( mediacontrol_InternalException, "No snapshot module" );
-        vlc_object_release( p_vout );
-        return NULL;
-    }
-    i_datasize = val.i_int;
-
-    vlc_mutex_lock( &p_vout->picture_lock );
-
-    var_Get( p_vout, "snapshot-cache-size", &val );
-    i_cachesize = val.i_int  ;
-
-    var_Get( p_vout, "snapshot-list-pointer", &val );
-    pointer = ( snapshot_t ** )val.p_address;
-
-    if( ! pointer )
-    {
-        RAISE( mediacontrol_InternalException, "No available picture" );
-
-        vlc_mutex_unlock( &p_vout->picture_lock );
-        vlc_object_release( p_vout );
-        return NULL;
-    }
-
-    retval = ( mediacontrol_RGBPicture** )malloc( (i_cachesize + 1 ) * sizeof( char* ));
-
-    for( i_index = 0 ; i_index < i_cachesize ; i_index++ )
-    {
-        snapshot_t *p_s = pointer[i_index];
-        mediacontrol_RGBPicture *p_rgb;
-
-        p_rgb = _mediacontrol_createRGBPicture( p_s->i_width,
-                                                p_s->i_height,
-                                                p_vout->output.i_chroma,
-                                                p_s->date,
-                                                p_s->p_data,
-                                                i_datasize );
-
-        retval[i_index] = p_rgb;
-    }
-
-    retval[i_cachesize] = NULL;
-
-    vlc_mutex_unlock( &p_vout->picture_lock );
-    vlc_object_release( p_vout );
-
-#endif
-
-    return retval;
+    RAISE( mediacontrol_InternalException, "Unsupported method" );
+    return NULL;
 }
 
 int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
