@@ -581,6 +581,8 @@ static void RunThread ( playlist_t *p_playlist )
     mtime_t    i_vout_destroyed_date = 0;
     mtime_t    i_sout_destroyed_date = 0;
 
+    int i_loops;
+
     playlist_item_t *p_autodelete_item = NULL;
 
     /* Tell above that we're ready */
@@ -588,6 +590,7 @@ static void RunThread ( playlist_t *p_playlist )
 
     while( !p_playlist->b_die )
     {
+        i_loops++;
         if( p_playlist->p_interaction )
         {
             intf_InteractionManage( p_playlist );
@@ -618,8 +621,13 @@ static void RunThread ( playlist_t *p_playlist )
         /* If there is an input, check that it doesn't need to die. */
         if( p_playlist->p_input )
         {
-            stats_ComputeInputStats( p_playlist->p_input,
+            if( i_loops % 5 == 0 )
+            {
+                stats_ComputeInputStats( p_playlist->p_input,
                                   p_playlist->p_input->input.p_item->p_stats );
+//                stats_DumpInputStats(
+//                             p_playlist->p_input->input.p_item->p_stats );
+            }
 
             /* This input is dead. Remove it ! */
             if( p_playlist->p_input->b_dead )

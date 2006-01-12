@@ -1565,12 +1565,16 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
     int i_read_orig = i_read;
+    int i_total;
 
     if( !p_sys->i_list )
     {
         i_read = p_access->pf_read( p_access, p_read, i_read );
         stats_UpdateInteger( s->p_parent->p_parent , "read_bytes", i_read );
-        stats_UpdateInteger( s->p_parent->p_parent , "input_bitrate", i_read );
+        stats_GetInteger( s, s->p_parent->p_parent->i_object_id,
+                          "read_bytes", &i_total );
+        stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+                          (float)i_total );
         stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 );
         return i_read;
     }
@@ -1601,7 +1605,10 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
 
     /* Update read bytes in input */
     stats_UpdateInteger( s->p_parent->p_parent , "read_bytes", i_read );
-    stats_UpdateInteger( s->p_parent->p_parent , "input_bitrate", i_read );
+    stats_GetInteger( s, s->p_parent->p_parent->i_object_id,
+                      "read_bytes", &i_total );
+    stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+                      (float)i_total );
     stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 );
     return i_read;
 }

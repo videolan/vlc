@@ -145,6 +145,7 @@ int vlc_getnameinfo (const struct sockaddr *, int, char *, int, int *, int);
 int vlm_ExecuteCommand (vlm_t *, const char *, vlm_message_t **);
 char * config_GetUserDir (void);
 httpd_stream_t * httpd_StreamNew (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
+int __stats_CounterGet (vlc_object_t*, int, char *);
 int __config_GetType (vlc_object_t *, const char *);
 void __vlc_thread_ready (vlc_object_t *);
 int playlist_Export (playlist_t *, const char *, const char *);
@@ -881,6 +882,7 @@ struct module_symbols_t
     void (*stats_ComputeInputStats_inner) (input_thread_t*, input_stats_t*);
     void (*stats_DumpInputStats_inner) (input_stats_t *);
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
+    int (*__stats_CounterGet_inner) (vlc_object_t*, int, char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1307,6 +1309,7 @@ struct module_symbols_t
 #  define stats_ComputeInputStats (p_symbols)->stats_ComputeInputStats_inner
 #  define stats_DumpInputStats (p_symbols)->stats_DumpInputStats_inner
 #  define stats_ReinitInputStats (p_symbols)->stats_ReinitInputStats_inner
+#  define __stats_CounterGet (p_symbols)->__stats_CounterGet_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1736,6 +1739,7 @@ struct module_symbols_t
     ((p_symbols)->stats_ComputeInputStats_inner) = stats_ComputeInputStats; \
     ((p_symbols)->stats_DumpInputStats_inner) = stats_DumpInputStats; \
     ((p_symbols)->stats_ReinitInputStats_inner) = stats_ReinitInputStats; \
+    ((p_symbols)->__stats_CounterGet_inner) = __stats_CounterGet; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */

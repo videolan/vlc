@@ -32,7 +32,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static counter_t *stats_GetCounter( stats_handler_t *p_handler, int i_object_id,
+static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
                             char *psz_name );
 static int stats_CounterUpdate( stats_handler_t *p_handler,
                                 counter_t *p_counter,
@@ -44,6 +44,17 @@ static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this );
  * Exported functions
  *****************************************************************************/
 
+/**
+ * Create a statistics counter
+ * \param p_this the object for which to create the counter
+ * \param psz_name the name
+ * \param i_type the type of stored data. One of VLC_VAR_STRING,
+ * VLC_VAR_INTEGER, VLC_VAR_FLOAT
+ * \param i_compute_type the aggregation type. One of STATS_LAST (always
+ * keep the last value), STATS_COUNTER (increment by the passed value),
+ * STATS_MAX (keep the maximum passed value), STATS_MIN, or STATS_DERIVATIVE
+ * (keep a time derivative of the value)
+ */
 int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
                     int i_compute_type )
 {
@@ -62,6 +73,9 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
     p_counter->i_samples = 0;
     p_counter->pp_samples = NULL;
 
+    p_counter->update_interval = 0;
+    p_counter->last_update = 0;
+
     INSERT_ELEM( p_handler->pp_counters,
                  p_handler->i_counters,
                  p_handler->i_counters,
@@ -72,8 +86,12 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
     return VLC_SUCCESS;
 }
 
-
-
+/** Update a counter element with new values
+ * \param p_this the object in which to update
+ * \param psz_name the name
+ * \param val the vlc_value union containing the new value to aggregate. For
+ * more information on how data is aggregated, \see __stats_Create
+ */
 int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
 {
     int i_ret;
@@ -86,8 +104,8 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
     vlc_mutex_lock( &p_handler->object_lock );
 
     /* Look for existing element */
-    p_counter = stats_GetCounter( p_handler, p_this->i_object_id,
-                                  psz_name );
+    p_counter = GetCounter( p_handler, p_this->i_object_id,
+                            psz_name );
     if( !p_counter )
     {
         vlc_mutex_unlock( &p_handler->object_lock );
@@ -101,6 +119,14 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
     return i_ret;
 }
 
+/** Get the aggregated value for a counter
+ * \param p_this an object
+ * \param i_object_id the object id from which we want the data
+ * \param psz_name the name of the couner
+ * \param val a pointer to an initialized vlc_value union. It will contain the
+ * retrieved value
+ * \return an error code
+ */
 int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_value_t *val )
 {
     counter_t *p_counter;
@@ -112,8 +138,8 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
 
 
     /* Look for existing element */
-    p_counter = stats_GetCounter( p_handler, i_object_id,
-                                  psz_name );
+    p_counter = GetCounter( p_handler, i_object_id,
+                            psz_name );
     if( !p_counter )
     {
         vlc_mutex_unlock( &p_handler->object_lock );
@@ -127,13 +153,66 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
         return VLC_EGENERIC;
     }
 
-    /* FIXME: Does not work for all types, maybe */
-    *val = p_counter->pp_samples[0]->value;
+    switch( p_counter->i_compute_type )
+    {
+    case STATS_LAST:
+    case STATS_MIN:
+    case STATS_MAX:
+    case STATS_COUNTER:
+        *val = p_counter->pp_samples[0]->value;
+        break;
+    case STATS_DERIVATIVE:
+       if( p_counter->i_type == VLC_VAR_INTEGER )
+        {
+            float f = ( p_counter->pp_samples[0]->value.i_int -
+                        p_counter->pp_samples[1]->value.i_int ) /
+                    (float)(  p_counter->pp_samples[0]->date -
+                              p_counter->pp_samples[1]->date );
+            val->i_int = (int)f;
+        }
+        else
+        {
+            float f = (float)( p_counter->pp_samples[0]->value.f_float -
+                               p_counter->pp_samples[1]->value.f_float ) /
+                      (float)( p_counter->pp_samples[0]->date -
+                               p_counter->pp_samples[1]->date );
+            val->i_int = (int)f;
+            val->f_float = f;
+        }
+        break;
+    }
     vlc_object_release( p_handler );
 
     vlc_mutex_unlock( &p_handler->object_lock );
     return VLC_SUCCESS;;
 }
+
+/** Get a statistics counter structure. This allows for low-level modifications
+ * \param p_this a parent object
+ * \param i_object_id the object from which to retrieve data
+ * \param psz_name the name
+ * \return the counter, or NULL if not found (or handler not created yet)
+ */
+counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
+                             char *psz_name )
+{
+    counter_t *p_counter;
+
+    /* Get stats handler singleton */
+    stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    if( !p_handler ) return NULL;
+
+    vlc_mutex_lock( &p_handler->object_lock );
+
+    /* Look for existing element */
+    p_counter = GetCounter( p_handler, p_this->i_object_id,
+                            psz_name );
+    vlc_mutex_unlock( &p_handler->object_lock );
+    vlc_object_release( p_handler );
+
+    return p_counter;
+}
+
 
 void stats_ComputeInputStats( input_thread_t *p_input,
                               input_stats_t *p_stats )
@@ -144,21 +223,26 @@ void stats_ComputeInputStats( input_thread_t *p_input,
                        &p_stats->i_read_packets );
     stats_GetInteger( p_input, p_input->i_object_id, "read_bytes",
                        &p_stats->i_read_bytes );
+    stats_GetFloat( p_input, p_input->i_object_id, "input_bitrate",
+                       &p_stats->f_bitrate );
     vlc_mutex_unlock( &p_stats->lock );
 }
 
 void stats_ReinitInputStats( input_stats_t *p_stats )
 {
     p_stats->i_read_packets = p_stats->i_read_bytes =
-        p_stats->f_last_bitrate = p_stats->f_average_bitrate =
+        p_stats->f_bitrate = p_stats->f_average_bitrate =
         p_stats->i_displayed_pictures = p_stats->i_lost_pictures = 0;
 }
 
 void stats_DumpInputStats( input_stats_t *p_stats  )
 {
     vlc_mutex_lock( &p_stats->lock );
-    fprintf( stderr, "Read packets : %i (%i bytes)\n",
-                    p_stats->i_read_packets, p_stats->i_read_bytes );
+    /* f_bitrate is in bytes / microsecond
+     * *1000 => bytes / millisecond => kbytes / seconds */
+    fprintf( stderr, "Read packets : %i (%i bytes) - %f kB/s\n",
+                    p_stats->i_read_packets, p_stats->i_read_bytes,
+                    p_stats->f_bitrate * 1000 );
     vlc_mutex_unlock( &p_stats->lock );
 }
 
@@ -233,7 +317,35 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
             }
         }
         break;
+    case STATS_DERIVATIVE:
+    {
+        counter_sample_t *p_new, *p_old;
+        if( mdate() - p_counter->last_update < p_counter->update_interval )
+        {
+            return VLC_EGENERIC;
+        }
+        p_counter->last_update = mdate();
+        if( p_counter->i_type != VLC_VAR_FLOAT &&
+            p_counter->i_type != VLC_VAR_INTEGER )
+        {
+            msg_Err( p_handler, "Unable to compute DERIVATIVE for this type");
+            return VLC_EGENERIC;
+        }
+        /* Insert the new one at the beginning */
+        p_new = (counter_sample_t*)malloc( sizeof( counter_sample_t ) );
+        p_new->value = val;
+        p_new->date = p_counter->last_update;
+        INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
+                     0, p_new );
 
+        if( p_counter->i_samples == 3 )
+        {
+            p_old = p_counter->pp_samples[2];
+            REMOVE_ELEM( p_counter->pp_samples, p_counter->i_samples, 2 );
+            free( p_old );
+        }
+        break;
+    }
     case STATS_COUNTER:
         if( p_counter->i_samples > 1)
         {
@@ -268,9 +380,8 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
     return VLC_SUCCESS;
 }
 
-
-static counter_t *stats_GetCounter( stats_handler_t *p_handler, int i_object_id,
-                                    char *psz_name )
+static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
+                             char *psz_name )
 {
     int i;
     for( i = 0; i< p_handler->i_counters; i++ )
@@ -284,6 +395,9 @@ static counter_t *stats_GetCounter( stats_handler_t *p_handler, int i_object_id,
     }
     return NULL;
 }
+
+
+
 
 static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this )
 {

@@ -674,10 +674,15 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
      */
     if( !b_quick )
     {
+        counter_t *p_counter;
         stats_Create( p_input, "read_bytes", VLC_VAR_INTEGER, STATS_COUNTER );
         stats_Create( p_input, "read_packets", VLC_VAR_INTEGER, STATS_COUNTER );
         stats_Create( p_input, "input_bitrate", VLC_VAR_FLOAT,
                                STATS_DERIVATIVE );
+        p_counter = stats_CounterGet( p_input, p_input->i_object_id,
+                                      "input_bitrate" );
+        if( p_counter ) p_counter->update_interval = 1000000;
+
         psz = var_GetString( p_input, "sout" );
         if( *psz && strncasecmp( p_input->input.p_item->psz_uri, "vlc:", 4 ) )
         {
