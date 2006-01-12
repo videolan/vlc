@@ -1343,7 +1343,7 @@ vlc_module_begin();
 #endif
 
 #if defined(WIN32)
-    add_bool( "one-instance", 1, NULL, ONEINSTANCE_TEXT,
+    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, VLC_TRUE );
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
