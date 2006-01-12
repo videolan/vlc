@@ -2,7 +2,7 @@
  * vlm_stream.cpp : Implementation of the VLMStream class hierarchy
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
- * $Id: timer.cpp 11981 2005-08-03 15:03:23Z xtophe $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "dialogs/vlm/vlm_stream.hpp"

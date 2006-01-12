@@ -2,7 +2,7 @@
  * updatevlc.hpp: VLC Update checker
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
- * $Id: wxwidgets.h 12670 2005-09-25 11:16:31Z zorglub $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef _WXVLC_UPDATEVLC_H_

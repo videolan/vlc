@@ -2,7 +2,7 @@
  * streamdata.h: streaming/transcoding data
  *****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
- * $Id: wizard.cpp 7826 2004-05-30 14:43:12Z zorglub $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 

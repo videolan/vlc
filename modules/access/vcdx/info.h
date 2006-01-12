@@ -2,7 +2,7 @@
  * info.h : VCD information routine headers
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
- * $Id: info.h 8606 2004-08-31 18:32:54Z rocky $
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VCD_INFO_H

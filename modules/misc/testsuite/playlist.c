@@ -2,7 +2,7 @@
  * playlist.c : Playlist testsuite
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
- * $Id: test4.c 6961 2004-03-05 17:34:23Z sam $
+ * $Id$
  *
  * Authors : Clément Stenac <zorglub@videolan.org>
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /* To run these tests, run vlc with

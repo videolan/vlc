@@ -2,7 +2,7 @@
  * daap.c :  Apple DAAP discovery module
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
- * $Id: sap.c 9569 2004-12-15 22:17:52Z zorglub $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
