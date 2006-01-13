@@ -162,7 +162,14 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
         *val = p_counter->pp_samples[0]->value;
         break;
     case STATS_DERIVATIVE:
-       if( p_counter->i_type == VLC_VAR_INTEGER )
+        /* Not ready yet */
+        if( p_counter->i_samples < 2 )
+        {
+            vlc_mutex_unlock( &p_handler->object_lock );
+            val->i_int = 0; val->f_float = 0.0;
+            return VLC_EGENERIC;
+        }
+        if( p_counter->i_type == VLC_VAR_INTEGER )
         {
             float f = ( p_counter->pp_samples[0]->value.i_int -
                         p_counter->pp_samples[1]->value.i_int ) /
