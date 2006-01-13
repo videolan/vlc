@@ -1,5 +1,6 @@
 SOURCES_vcdx = \
 	access.c \
+	demux.c \
 	intf.c \
 	intf.h \
 	vcd.c \

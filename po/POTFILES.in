@@ -822,7 +822,6 @@ modules/misc/qte_main.cpp
 modules/misc/rtsp.c
 modules/misc/screensaver.c
 modules/misc/svg.c
-modules/misc/testsuite/playlist.c
 modules/misc/testsuite/test1.c
 modules/misc/testsuite/test2.cpp
 modules/misc/testsuite/test3.m
