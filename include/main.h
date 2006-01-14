@@ -60,6 +60,9 @@ struct libvlc_t
     /* The module bank */
     module_bank_t *        p_module_bank;
 
+    /* Do stats ? - We keep this boolean to avoid unneeded lookups */
+    vlc_bool_t             b_stats;
+
     /* Arch-specific variables */
 #if !defined( WIN32 )
     vlc_bool_t             b_daemon;

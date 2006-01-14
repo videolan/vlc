@@ -59,7 +59,13 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
                     int i_compute_type )
 {
     counter_t *p_counter;
-    stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    stats_handler_t *p_handler;
+
+    if( p_this->p_libvlc->b_stats == VLC_FALSE )
+    {
+        return VLC_EGENERIC;
+    }
+    p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
 
     vlc_mutex_lock( &p_handler->object_lock );
@@ -98,7 +104,12 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
     counter_t *p_counter;
 
     /* Get stats handler singleton */
-    stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    stats_handler_t *p_handler;
+    if( p_this->p_libvlc->b_stats == VLC_FALSE )
+    {
+        return VLC_EGENERIC;
+    }
+    p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
 
     vlc_mutex_lock( &p_handler->object_lock );
@@ -132,7 +143,12 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
     counter_t *p_counter;
 
     /* Get stats handler singleton */
-    stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    stats_handler_t *p_handler;
+    if( p_this->p_libvlc->b_stats == VLC_FALSE )
+    {
+        return VLC_EGENERIC;
+    }
+    p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
     vlc_mutex_lock( &p_handler->object_lock );
 
@@ -205,8 +221,12 @@ counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
 {
     counter_t *p_counter;
 
-    /* Get stats handler singleton */
-    stats_handler_t *p_handler = stats_HandlerGet( p_this );
+    stats_handler_t *p_handler;
+    if( p_this->p_libvlc->b_stats == VLC_FALSE )
+    {
+        return NULL;
+    }
+    p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return NULL;
 
     vlc_mutex_lock( &p_handler->object_lock );

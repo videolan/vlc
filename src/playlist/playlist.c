@@ -581,7 +581,7 @@ static void RunThread ( playlist_t *p_playlist )
     mtime_t    i_vout_destroyed_date = 0;
     mtime_t    i_sout_destroyed_date = 0;
 
-    int i_loops;
+    int i_loops = 0;
 
     playlist_item_t *p_autodelete_item = NULL;
 
@@ -625,8 +625,8 @@ static void RunThread ( playlist_t *p_playlist )
             {
                 stats_ComputeInputStats( p_playlist->p_input,
                                   p_playlist->p_input->input.p_item->p_stats );
-//                stats_DumpInputStats(
-//                             p_playlist->p_input->input.p_item->p_stats );
+ //               stats_DumpInputStats(
+ //                            p_playlist->p_input->input.p_item->p_stats );
             }
 
             /* This input is dead. Remove it ! */

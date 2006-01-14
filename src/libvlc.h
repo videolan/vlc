@@ -767,8 +767,12 @@ static char *ppsz_clock_descriptions[] =
     "This option allows you to use a plugins cache which will greatly " \
     "improve the start time of VLC.")
 
-#define DAEMON_TEXT N_("Run as daemon process")
+#define DAEMON_TEXT N_("Collect statistics")
 #define DAEMON_LONGTEXT N_( \
+     "This option allows you to collect miscellaneous statistics.")
+
+#define STATS_TEXT N_("Run as daemon process")
+#define STATS_LONGTEXT N_( \
      "Runs VLC as a background daemon process.")
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
@@ -1358,6 +1362,8 @@ vlc_module_begin();
     set_section( N_("Miscellaneous" ), NULL );
     add_string( "vlm-conf", NULL, NULL, VLM_CONF_TEXT,
                     VLM_CONF_LONGTEXT, VLC_TRUE );
+
+    add_bool ( "stats", VLC_TRUE, NULL, STATS_TEXT, STATS_LONGTEXT, VLC_TRUE );
 
 #if !defined(WIN32)
     add_bool( "daemon", 0, NULL, DAEMON_TEXT, DAEMON_LONGTEXT, VLC_TRUE );

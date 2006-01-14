@@ -680,6 +680,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         p_vlc->pf_memset = memset;
     }
 
+    libvlc.b_stats = config_GetInt( p_vlc, "stats" );
+
     /*
      * Initialize hotkey handling
      */
