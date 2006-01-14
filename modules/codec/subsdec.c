@@ -53,7 +53,7 @@ static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
 static subpicture_t *ParseText     ( decoder_t *, block_t * );
 static void         StripTags      ( char * );
 
-#define DEFAULT_NAME "System Default"
+#define DEFAULT_NAME "Default"
 
 /*****************************************************************************
  * Module descriptor.
@@ -150,11 +150,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         var_Get( p_dec, "subsdec-encoding", &val );
         if( !strcmp( val.psz_string, DEFAULT_NAME ) )
         {
-            char *psz_charset =(char*)malloc( 100 );
-            vlc_current_charset( &psz_charset );
-            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );
-            msg_Dbg( p_dec, "using character encoding: %s", psz_charset );
-            free( psz_charset );
+            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", "ISO-8859-1" );
+            msg_Dbg( p_dec, "using default character encoding: %s", "ISO-8859-1" );
         }
         else if( val.psz_string )
         {
