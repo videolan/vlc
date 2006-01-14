@@ -5,12 +5,12 @@ retrieving revision 1.26
 diff -u -r1.26 Makefile
 --- libavcodec/libpostproc/Makefile	26 Sep 2005 10:05:13 -0000	1.26
 +++ libavcodec/libpostproc/Makefile	31 Oct 2005 20:23:34 -0000
-@@ -56,7 +56,7 @@
+@@ -48,7 +48,7 @@
  	$(AR) rc $@ $(PPOBJS)
  	$(RANLIB) $@
  
 -install: all
 +installlib: all
- ifeq ($(SHARED_PP),yes)
+ ifeq ($(BUILD_SHARED),yes)
  ifeq ($(CONFIG_WIN32),yes)
  	install $(INSTALLSTRIP) -m 755 $(SPPLIBNAME) "$(prefix)"
