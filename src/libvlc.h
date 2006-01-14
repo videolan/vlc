@@ -767,12 +767,12 @@ static char *ppsz_clock_descriptions[] =
     "This option allows you to use a plugins cache which will greatly " \
     "improve the start time of VLC.")
 
-#define DAEMON_TEXT N_("Collect statistics")
-#define DAEMON_LONGTEXT N_( \
+#define STATS_TEXT N_("Collect statistics")
+#define STATS_LONGTEXT N_( \
      "This option allows you to collect miscellaneous statistics.")
 
-#define STATS_TEXT N_("Run as daemon process")
-#define STATS_LONGTEXT N_( \
+#define DAEMON_TEXT N_("Run as daemon process")
+#define DAEMON_LONGTEXT N_( \
      "Runs VLC as a background daemon process.")
 
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
