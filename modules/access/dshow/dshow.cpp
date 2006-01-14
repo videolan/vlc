@@ -206,7 +206,6 @@ typedef struct dshow_stream_t
     es_out_id_t     *p_es;
 
     vlc_bool_t      b_pts;
-
 } dshow_stream_t;
 
 /*****************************************************************************
@@ -282,7 +281,6 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     var_Create( p_this, "dshow-config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
     var_Create( p_this, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-vdev", &val );
     if( val.psz_string ) vdevname = string( val.psz_string );
@@ -325,12 +323,14 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     }
     if( val.psz_string ) free( val.psz_string );
 
+    p_sys->b_chroma = VLC_FALSE;
     var_Create( p_this, "dshow-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-chroma", &val );
     if( val.psz_string && strlen( val.psz_string ) >= 4 )
     {
         i_chroma = VLC_FOURCC( val.psz_string[0], val.psz_string[1],
                                val.psz_string[2], val.psz_string[3] );
+        p_sys->b_chroma = VLC_TRUE;
     }
     if( val.psz_string ) free( val.psz_string );
 
@@ -834,6 +834,85 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 
     size_t mt_count = 0;
     AM_MEDIA_TYPE *mt = NULL;
+
+    /* Only force the chroma setting if it is specified by the user. */
+    if( p_sys->b_chroma )
+    {
+        /* Find out if the pin handles MEDIATYPE_Stream, in which case we
+        * won't add a prefered media type as this doesn't seem to work well
+        * -- to investigate. */
+        vlc_bool_t b_stream_type = VLC_FALSE;
+        for( size_t i = 0; i < media_count; i++ )
+        {
+            if( media_types[i].majortype == MEDIATYPE_Stream )
+            {
+                b_stream_type = VLC_TRUE;
+                break;
+            }
+        }
+
+        if( !b_stream_type && !b_audio )
+        {
+            // Insert prefered video media type
+            AM_MEDIA_TYPE mtr;
+            VIDEOINFOHEADER vh;
+
+            mtr.majortype            = MEDIATYPE_Video;
+            mtr.subtype              = MEDIASUBTYPE_I420;
+            mtr.bFixedSizeSamples    = TRUE;
+            mtr.bTemporalCompression = FALSE;
+            mtr.pUnk                 = NULL;
+            mtr.formattype           = FORMAT_VideoInfo;
+            mtr.cbFormat             = sizeof(vh);
+            mtr.pbFormat             = (BYTE *)&vh;
+
+            memset(&vh, 0, sizeof(vh));
+
+            vh.bmiHeader.biSize   = sizeof(vh.bmiHeader);
+            vh.bmiHeader.biWidth  = p_sys->i_width > 0 ? p_sys->i_width : 320;
+            vh.bmiHeader.biHeight = p_sys->i_height > 0 ? p_sys->i_height : 240;
+            vh.bmiHeader.biPlanes      = 3;
+            vh.bmiHeader.biBitCount    = 12;
+            vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');
+            vh.bmiHeader.biSizeImage   = vh.bmiHeader.biWidth * 12 *
+                vh.bmiHeader.biHeight / 8;
+            mtr.lSampleSize            = vh.bmiHeader.biSizeImage;
+
+            mt_count = 1;
+            mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
+            CopyMediaType(mt, &mtr);
+        }
+        else if( !b_stream_type )
+        {
+            // Insert prefered audio media type
+            AM_MEDIA_TYPE mtr;
+            WAVEFORMATEX wf;
+
+            mtr.majortype            = MEDIATYPE_Audio;
+            mtr.subtype              = MEDIASUBTYPE_PCM;
+            mtr.bFixedSizeSamples    = TRUE;
+            mtr.bTemporalCompression = FALSE;
+            mtr.lSampleSize          = 0;
+            mtr.pUnk                 = NULL;
+            mtr.formattype           = FORMAT_WaveFormatEx;
+            mtr.cbFormat             = sizeof(wf);
+            mtr.pbFormat             = (BYTE *)&wf;
+
+            memset(&wf, 0, sizeof(wf));
+
+            wf.wFormatTag = WAVE_FORMAT_PCM;
+            wf.nChannels = 2;
+            wf.nSamplesPerSec = 44100;
+            wf.wBitsPerSample = 16;
+            wf.nBlockAlign = wf.nSamplesPerSec * wf.wBitsPerSample / 8;
+            wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
+            wf.cbSize = 0;
+
+            mt_count = 1;
+            mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
+            CopyMediaType(mt, &mtr);
+        }
+    }
 
     if( media_count > 0 )
     {

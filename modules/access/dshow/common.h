@@ -90,4 +90,5 @@ struct access_sys_t
     int            i_width;
     int            i_height;
     int            i_chroma;
+    vlc_bool_t     b_chroma; /* Force a specific chroma on the dshow input */
 };
