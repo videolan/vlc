@@ -411,11 +411,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
                 free( p_fixed_name );
-
-                for( a = 0; a < i_dir_content; a++ )
-                    if( pp_dir_content[a] ) free( pp_dir_content[a] );
-                if( pp_dir_content ) free( pp_dir_content );
             }
+            for( a = 0; a < i_dir_content; a++ )
+                if( pp_dir_content[a] ) free( pp_dir_content[a] );
+            if( pp_dir_content ) free( pp_dir_content );
         }
         if( j >= 0 ) free( *subdirs++ );
     }
