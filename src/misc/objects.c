@@ -386,6 +386,8 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     free( p_this->p_vars );
     vlc_mutex_destroy( &p_this->var_lock );
 
+    if( p_this->psz_header ) free( p_this->psz_header );
+
     if( p_this->i_object_type == VLC_OBJECT_ROOT )
     {
         /* We are the root object ... no need to lock. */
