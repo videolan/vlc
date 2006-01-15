@@ -81,10 +81,19 @@ private:
     input_item_t *p_item;
     wxWindow *p_parent;
 
+    wxBoxSizer *panel_sizer;
+    wxFlexGridSizer *sizer;
+
+    wxFlexGridSizer *input_sizer;
+    wxStaticBoxSizer *input_bsizer;
+
     wxStaticText *read_bytes_text;
     wxStaticText *input_bitrate_text;
     wxStaticText *demux_bytes_text;
     wxStaticText *demux_bitrate_text;
+
+    wxFlexGridSizer *video_sizer;
+    wxStaticBoxSizer *video_bsizer;
 
     wxStaticText *video_decoded_text;
     wxStaticText *displayed_text;

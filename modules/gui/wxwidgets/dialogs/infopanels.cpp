@@ -78,8 +78,8 @@ ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
     info_root = info_tree->AddRoot( wxU( "" ) );
 
     sizer->Layout();
-    panel_sizer->Add( sizer, 0, wxEXPAND, 5 );
-    panel_sizer->Add( info_tree, 0, wxEXPAND, 5 );
+    panel_sizer->Add( sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( info_tree, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
 }
@@ -142,28 +142,30 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
 
     SetAutoLayout( TRUE );
 
-    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+    panel_sizer = new wxBoxSizer( wxVERTICAL );
 
-    wxFlexGridSizer *sizer = new wxFlexGridSizer( 2,2,20 );
+    sizer = new wxFlexGridSizer( 2,2,20 );
 
     /* Input */
     wxStaticBox *input_box = new wxStaticBox( this, -1,
                                               wxU( _("Input") ) );
-    wxStaticBoxSizer *input_bsizer = new wxStaticBoxSizer( input_box,
-                                                          wxVERTICAL );
-    wxFlexGridSizer *input_sizer = new wxFlexGridSizer( 2,2, 20 );
+    input_box->SetAutoLayout( TRUE );
+    input_bsizer = new wxStaticBoxSizer( input_box, wxVERTICAL );
+    input_sizer = new wxFlexGridSizer( 2,2, 20 );
 
 #define INPUT_ADD(txt,widget,dflt) \
-    { input_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ) ); \
-      widget = new wxStaticText( this, -1, wxU( dflt ) );                \
-      input_sizer->Add( widget );                                        \
+    { input_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),  \
+                         0, wxEXPAND| wxRIGHT, 5 );                     \
+      widget = new wxStaticText( this, -1, wxU( dflt ) );               \
+      input_sizer->Add( widget, 0, wxEXPAND| wxLEFT, 5  );              \
     }
 
     INPUT_ADD( "Read at media", read_bytes_text, "0" );
     INPUT_ADD( "Input bitrate", input_bitrate_text, "0" );
 
     INPUT_ADD( "Demuxed", demux_bytes_text ,"0");
-    INPUT_ADD( "Stream bitrate", demux_bitrate_text, "0" );
+    /* Hack to get enough size */
+    INPUT_ADD( "Stream bitrate", demux_bitrate_text, "0              " );
 
     input_sizer->Layout();
     input_bsizer->Add( input_sizer, 0, wxALL | wxGROW, 5 );
@@ -173,17 +175,20 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
    /* Vout */
     wxStaticBox *video_box = new wxStaticBox( this, -1,
                                               wxU( _("Video" ) ) );
-    wxStaticBoxSizer *video_bsizer = new wxStaticBoxSizer( video_box,
-                                                           wxVERTICAL );
-    wxFlexGridSizer *video_sizer = new wxFlexGridSizer( 2,3, 20 );
+    video_box->SetAutoLayout( TRUE );
+    video_bsizer = new wxStaticBoxSizer( video_box,
+                                                          wxVERTICAL );
+    video_sizer = new wxFlexGridSizer( 2,3, 20 );
 
 #define VIDEO_ADD(txt,widget,dflt) \
-    { video_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ) ); \
+    { video_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),   \
+                         0, wxEXPAND|wxLEFT , 5  );                      \
       widget = new wxStaticText( this, -1, wxU( dflt ) );                \
-      video_sizer->Add( widget );                                        \
+      video_sizer->Add( widget, 0, wxEXPAND|wxRIGHT, 5 );                \
     }
     VIDEO_ADD( "Decoded blocks", video_decoded_text, "0" );
-    VIDEO_ADD( "Displayed frames", displayed_text, "0" );
+    /* Hack to get enough size */
+    VIDEO_ADD( "Displayed frames", displayed_text, "0                  " );
     VIDEO_ADD( "Lost frames", lost_frames_text, "0" );
 
 
@@ -192,10 +197,10 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     video_bsizer->Layout();
     sizer->Add( video_bsizer , 0, wxALL| wxGROW, 5 );
 
+    sizer->Layout();
     panel_sizer->Add( sizer, 0, wxEXPAND, 5 );
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
-
 }
 
 InputStatsInfoPanel::~InputStatsInfoPanel()
@@ -213,17 +218,24 @@ void InputStatsInfoPanel::Update( input_item_t *p_item )
     formatted.Printf(  wxString( wxT(format) ), ## calc ); \
     widget->SetLabel( formatted );                      \
 }
-    UPDATE( read_bytes_text, "%.0f kB",(float)(p_item->p_stats->i_read_bytes)/1000 );
-    UPDATE( input_bitrate_text, "%.0f kB/s", (float)(p_item->p_stats->f_input_bitrate)*1000 );
-    UPDATE( demux_bytes_text, "%.0f kB", (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
-    UPDATE( demux_bitrate_text, "%.0f kB/s",  (float)(p_item->p_stats->f_demux_bitrate)*1000 );
+    UPDATE( read_bytes_text, "%8.0f kB",(float)(p_item->p_stats->i_read_bytes)/1000 );
+    UPDATE( input_bitrate_text, "%6.0f kB/s", (float)(p_item->p_stats->f_input_bitrate)*1000 );
+    UPDATE( demux_bytes_text, "%8.0f kB", (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+    UPDATE( demux_bitrate_text, "%6.0f kB/s",  (float)(p_item->p_stats->f_demux_bitrate)*1000 );
 
     /* Video */
-    UPDATE( video_decoded_text, "%i", p_item->p_stats->i_decoded_video );
-    UPDATE( displayed_text, "%i", p_item->p_stats->i_displayed_pictures );
-    UPDATE( lost_frames_text, "%i", p_item->p_stats->i_lost_pictures );
+    UPDATE( video_decoded_text, "%5i", p_item->p_stats->i_decoded_video );
+    UPDATE( displayed_text, "%5i", p_item->p_stats->i_displayed_pictures );
+    UPDATE( lost_frames_text, "%5i", p_item->p_stats->i_lost_pictures );
 
     vlc_mutex_unlock( &p_item->p_stats->lock );
+
+    input_sizer->Layout();
+    video_sizer->Layout();
+
+    sizer->Layout();
+    panel_sizer->Layout();
+    SetSizerAndFit( panel_sizer );
 }
 
 void InputStatsInfoPanel::Clear()

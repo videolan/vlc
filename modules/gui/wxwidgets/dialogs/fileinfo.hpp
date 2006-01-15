@@ -54,6 +54,8 @@ namespace wxvlc
 
         ItemInfoPanel *item_info;
         InputStatsInfoPanel *stats_info;
+
+        wxBoxSizer *panel_sizer;
     };
 };
 

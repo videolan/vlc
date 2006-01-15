@@ -63,7 +63,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout( TRUE );
 
-    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+    panel_sizer = new wxBoxSizer( wxVERTICAL );
 
     wxNotebook *notebook = new wxNotebook( this, -1 );
 #if (!wxCHECK_VERSION(2,5,2))
@@ -134,6 +134,8 @@ void FileInfo::Update()
     vlc_object_release(p_input);
     vlc_object_release( p_playlist );
     b_need_update = VLC_FALSE;
+    panel_sizer->Layout();
+
     return;
 }
 
