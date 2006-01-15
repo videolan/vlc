@@ -295,12 +295,18 @@ struct input_stats_t
     /* Input */
     int i_read_packets;
     int i_read_bytes;
+    float f_input_bitrate;
+    float f_average_input_bitrate;
 
-    float f_bitrate;
-
-    float f_average_bitrate;
+    /* Demux */
+    int i_demux_read_packets;
+    int i_demux_read_bytes;
+    float f_demux_bitrate;
+    float f_average_demux_bitrate;
 
     /* Decoders */
+    int i_decoded_audio;
+    int i_decoded_video;
 
     /* Vout */
     int i_displayed_pictures;

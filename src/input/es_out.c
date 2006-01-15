@@ -1021,6 +1021,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     input_thread_t    *p_input = p_sys->p_input;
     es_out_pgrm_t *p_pgrm = es->p_pgrm;
     int64_t i_delay;
+    int i_total;
 
     if( es->fmt.i_cat == AUDIO_ES )
         i_delay = p_sys->i_audio_delay;
@@ -1028,6 +1029,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         i_delay = p_sys->i_spu_delay;
     else
         i_delay = 0;
+
+    stats_UpdateInteger( p_input, "demux_read", p_block->i_buffer );
+    stats_GetInteger( p_input, p_input->i_object_id, "demux_read",
+                       &i_total );
+    stats_UpdateFloat( p_input , "demux_bitrate", (float)i_total );
 
     /* Mark preroll blocks */
     if( es->i_preroll_end >= 0 )

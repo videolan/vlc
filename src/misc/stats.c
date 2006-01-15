@@ -166,6 +166,7 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
     if( p_counter->i_samples == 0 )
     {
         vlc_mutex_unlock( &p_handler->object_lock );
+        val->i_int = val->f_float = 0.0;
         return VLC_EGENERIC;
     }
 
@@ -244,22 +245,57 @@ counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
 void stats_ComputeInputStats( input_thread_t *p_input,
                               input_stats_t *p_stats )
 {
+    vlc_object_t *p_obj;
+    vlc_list_t *p_list;
+    int i_index;
     vlc_mutex_lock( &p_stats->lock );
-    /* read_packets and read_bytes are common to all streams */
+
+    /* Input */
     stats_GetInteger( p_input, p_input->i_object_id, "read_packets",
                        &p_stats->i_read_packets );
     stats_GetInteger( p_input, p_input->i_object_id, "read_bytes",
                        &p_stats->i_read_bytes );
     stats_GetFloat( p_input, p_input->i_object_id, "input_bitrate",
-                       &p_stats->f_bitrate );
+                       &p_stats->f_input_bitrate );
+
+    stats_GetInteger( p_input, p_input->i_object_id, "demux_read",
+                      &p_stats->i_demux_read_bytes );
+    stats_GetFloat( p_input, p_input->i_object_id, "demux_bitrate",
+                      &p_stats->f_demux_bitrate );
+
+    stats_GetInteger( p_input, p_input->i_object_id, "decoded_video",
+                      &p_stats->i_decoded_video );
+    stats_GetInteger( p_input, p_input->i_object_id, "decoded_audio",
+                      &p_stats->i_decoded_audio );
+
+    /* Vouts */
+    p_list = vlc_list_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_list )
+    {
+        p_stats->i_displayed_pictures  = 0 ;
+        p_stats->i_lost_pictures = 0;
+        for( i_index = 0; i_index < p_list->i_count ; i_index ++ )
+        {
+            int i_displayed = 0, i_lost = 0;
+            p_obj = (vlc_object_t *)p_list->p_values[i_index].p_object;
+            stats_GetInteger( p_obj, p_obj->i_object_id, "displayed_pictures",
+                              &i_displayed );
+            stats_GetInteger( p_obj, p_obj->i_object_id, "lost_pictures",
+                              &i_lost );
+            p_stats->i_displayed_pictures += i_displayed;
+            p_stats->i_lost_pictures += i_lost;
+         }
+        vlc_list_release( p_list );
+    }
     vlc_mutex_unlock( &p_stats->lock );
 }
 
 void stats_ReinitInputStats( input_stats_t *p_stats )
 {
     p_stats->i_read_packets = p_stats->i_read_bytes =
-        p_stats->f_bitrate = p_stats->f_average_bitrate =
-        p_stats->i_displayed_pictures = p_stats->i_lost_pictures = 0;
+        p_stats->f_input_bitrate = p_stats->f_average_input_bitrate =
+        p_stats->i_displayed_pictures = p_stats->i_lost_pictures =
+        p_stats->i_decoded_video = p_stats->i_decoded_audio = 0;
 }
 
 void stats_DumpInputStats( input_stats_t *p_stats  )
@@ -267,9 +303,10 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
     vlc_mutex_lock( &p_stats->lock );
     /* f_bitrate is in bytes / microsecond
      * *1000 => bytes / millisecond => kbytes / seconds */
-    fprintf( stderr, "Read packets : %i (%i bytes) - %f kB/s\n",
+    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - Vout : %i/%i\n",
                     p_stats->i_read_packets, p_stats->i_read_bytes,
-                    p_stats->f_bitrate * 1000 );
+                    p_stats->f_input_bitrate * 1000,
+                    p_stats->i_displayed_pictures, p_stats->i_lost_pictures );
     vlc_mutex_unlock( &p_stats->lock );
 }
 
@@ -424,8 +461,6 @@ static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
 }
 
 
-
-
 static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this )
 {
     stats_handler_t *p_handler = (stats_handler_t*)
@@ -471,5 +506,3 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
 
     return p_handler;
 }
-
-

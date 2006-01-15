@@ -30,13 +30,15 @@
 
 namespace wxvlc
 {
+    class ItemInfoPanel;
+    class InputStatsInfoPanel;
     class FileInfo: public wxFrame
     {
     public:
         /* Constructor */
         FileInfo( intf_thread_t *p_intf, wxWindow *p_parent );
         virtual ~FileInfo();
-        void UpdateFileInfo();
+        void Update();
 
         vlc_bool_t b_need_update;
 
@@ -47,9 +49,11 @@ namespace wxvlc
         DECLARE_EVENT_TABLE();
 
         intf_thread_t *p_intf;
-        wxTreeCtrl *fileinfo_tree;
-        wxTreeItemId fileinfo_root;
-        wxString fileinfo_root_label;
+
+        mtime_t last_update;
+
+        ItemInfoPanel *item_info;
+        InputStatsInfoPanel *stats_info;
     };
 };
 

@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "dialogs/fileinfo.hpp"
+#include "dialogs/infopanels.hpp"
 
 /*****************************************************************************
  * Event Table.
@@ -53,35 +54,36 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("Stream and media info")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
-    playlist_t *p_playlist;
+    p_intf = _p_intf;
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                                 VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
 
     /* Initializations */
-    p_intf = _p_intf;
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout( TRUE );
 
-    /* Create a panel to put everything in */
-    wxPanel *panel = new wxPanel( this, -1 );
-    panel->SetAutoLayout( TRUE );
-
-    fileinfo_tree =
-        new wxTreeCtrl( panel, -1, wxDefaultPosition, wxSize( 350, 350 ),
-                        wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxSUNKEN_BORDER );
-
-    fileinfo_root_label = wxT("");
-
-    /* Place everything in sizers */
-    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
-    panel_sizer->Add( fileinfo_tree, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Layout();
-    panel->SetSizerAndFit( panel_sizer );
-    main_sizer->Add( panel, 1, wxEXPAND, 0 );
-    main_sizer->Layout();
-    SetSizerAndFit( main_sizer );
 
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
+    wxNotebook *notebook = new wxNotebook( this, -1 );
+#if (!wxCHECK_VERSION(2,5,2))
+        wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
+#endif
+    item_info = new ItemInfoPanel( p_intf, notebook, false );
+    stats_info = new InputStatsInfoPanel( p_intf, notebook );
+
+    notebook->AddPage( item_info, wxU(_("General") ), true );
+    notebook->AddPage( stats_info, wxU(_("Statistics") ), false );
+
+#if (!wxCHECK_VERSION(2,5,2))
+    panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
+#else
+    panel_sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
+#endif
+
+    panel_sizer->Layout();
+    SetSizerAndFit( panel_sizer );
+
 
     if( p_playlist )
     {
@@ -89,76 +91,49 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
         vlc_object_release( p_playlist );
     }
 
+    last_update = 0L;
     b_need_update = VLC_TRUE;
-    UpdateFileInfo();
+    Update();
 }
 
-void FileInfo::UpdateFileInfo()
+void FileInfo::Update()
 {
+
+    if( mdate() - last_update < 400000L ) return;
+    last_update = mdate();
+
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                                 VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
+    if( !p_playlist ) return;
+
     input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+        (input_thread_t *)vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
+                                           FIND_CHILD );
 
     if( !p_input || p_input->b_dead || !p_input->input.p_item->psz_name )
     {
-        if( fileinfo_root )
-        {
-            fileinfo_root_label = wxT("");
-            fileinfo_tree->DeleteChildren( fileinfo_root );
-        }
-        if (p_input)
+        item_info->Clear();
+        stats_info->Clear();
+        if ( p_input )
         {
             vlc_object_release(p_input);
         }
+        vlc_object_release( p_playlist );
         return;
     }
-
-    if( !fileinfo_root )
-    {
-        /* On linux, the first argument of wxTreeCtrl::AddRoot() can be
-         * retrieved with the GetItemText() method, but it doesn't work on
-         * Windows when the wxTR_HIDE_ROOT style is set. That's why we need to
-         * use the fileinfo_root_label variable... */
-        fileinfo_root =
-            fileinfo_tree->AddRoot( wxL2U(p_input->input.p_item->psz_name) );
-        fileinfo_root_label = wxL2U(p_input->input.p_item->psz_name);
-    }
-    else if( fileinfo_root_label == wxL2U(p_input->input.p_item->psz_name) &&
-             b_need_update == VLC_FALSE )
-    {
-        vlc_object_release(p_input);
-        return;
-    }
-
-    /* We rebuild the tree from scratch */
-    fileinfo_tree->DeleteChildren( fileinfo_root );
-    fileinfo_root_label = wxL2U(p_input->input.p_item->psz_name);
 
     vlc_mutex_lock( &p_input->input.p_item->lock );
-    for( int i = 0; i < p_input->input.p_item->i_categories; i++ )
+    if( b_need_update == VLC_TRUE )
     {
-        info_category_t *p_cat = p_input->input.p_item->pp_categories[i];
-
-        wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
-                                                      wxU(p_cat->psz_name) );
-        for( int j = 0; j < p_cat->i_infos; j++ )
-        {
-            info_t *p_info = p_cat->pp_infos[j];
-
-            if( p_info->psz_value[0] != 0 )
-            /* We only wanna show fields that have an actual value */
-            {
-                fileinfo_tree->AppendItem( cat, (wxString)wxU(p_info->psz_name)
-                                        + wxT(": ") + wxU(p_info->psz_value) );
-            }
-        }
-        fileinfo_tree->Expand( cat );
+        item_info->Update( p_input->input.p_item );
     }
+    stats_info->Update( p_input->input.p_item );
     vlc_mutex_unlock( &p_input->input.p_item->lock );
 
-    b_need_update = VLC_FALSE;
-
     vlc_object_release(p_input);
+    vlc_object_release( p_playlist );
+    b_need_update = VLC_FALSE;
     return;
 }
 

@@ -272,7 +272,7 @@ void DialogsProvider::OnIdle( wxIdleEvent& WXUNUSED(event) )
 
     /* Update the fileinfo windows */
     if( p_fileinfo_dialog )
-        p_fileinfo_dialog->UpdateFileInfo();
+        p_fileinfo_dialog->Update();
 }
 
 void DialogsProvider::OnPlaylist( wxCommandEvent& WXUNUSED(event) )

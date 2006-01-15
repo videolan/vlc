@@ -18,6 +18,7 @@ SOURCES_wxwidgets = \
 	dialogs/messages.cpp \
 	dialogs/playlist.cpp \
 	dialogs/iteminfo.cpp \
+	dialogs/infopanels.cpp \
 	dialogs/preferences.cpp \
 	dialogs/preferences_widgets.cpp \
 	dialogs/preferences_widgets.h \
@@ -57,6 +58,7 @@ EXTRA_DIST += \
 	dialogs/open.hpp \
 	dialogs/messages.hpp \
 	dialogs/iteminfo.hpp \
+	dialogs/infopanels.hpp \
 	dialogs/subtitles.hpp \
 	dialogs/streamout.hpp \
 	dialogs/updatevlc.hpp \

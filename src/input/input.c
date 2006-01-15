@@ -677,7 +677,10 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         counter_t *p_counter;
         stats_Create( p_input, "read_bytes", VLC_VAR_INTEGER, STATS_COUNTER );
         stats_Create( p_input, "read_packets", VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "demux_read", VLC_VAR_INTEGER, STATS_COUNTER );
         stats_Create( p_input, "input_bitrate", VLC_VAR_FLOAT,
+                               STATS_DERIVATIVE );
+        stats_Create( p_input, "demux_bitrate", VLC_VAR_FLOAT,
                                STATS_DERIVATIVE );
         p_counter = stats_CounterGet( p_input, p_input->i_object_id,
                                       "input_bitrate" );
