@@ -200,7 +200,6 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
                                p_counter->pp_samples[1]->value.f_float ) /
                       (float)( p_counter->pp_samples[0]->date -
                                p_counter->pp_samples[1]->date );
-            val->i_int = (int)f;
             val->f_float = f;
         }
         break;
@@ -293,9 +292,11 @@ void stats_ComputeInputStats( input_thread_t *p_input,
 void stats_ReinitInputStats( input_stats_t *p_stats )
 {
     p_stats->i_read_packets = p_stats->i_read_bytes =
-        p_stats->f_input_bitrate = p_stats->f_average_input_bitrate =
-        p_stats->i_displayed_pictures = p_stats->i_lost_pictures =
-        p_stats->i_decoded_video = p_stats->i_decoded_audio = 0;
+    p_stats->f_input_bitrate = p_stats->f_average_input_bitrate =
+    p_stats->i_demux_read_packets = p_stats->i_demux_read_bytes =
+    p_stats->f_demux_bitrate = p_stats->f_average_demux_bitrate =
+    p_stats->i_displayed_pictures = p_stats->i_lost_pictures =
+    p_stats->i_decoded_video = p_stats->i_decoded_audio = 0;
 }
 
 void stats_DumpInputStats( input_stats_t *p_stats  )
@@ -303,9 +304,12 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
     vlc_mutex_lock( &p_stats->lock );
     /* f_bitrate is in bytes / microsecond
      * *1000 => bytes / millisecond => kbytes / seconds */
-    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - Vout : %i/%i\n",
+    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - "
+                     "Demux : %i (%i bytes) - %f kB/s - Vout : %i/%i\n",
                     p_stats->i_read_packets, p_stats->i_read_bytes,
                     p_stats->f_input_bitrate * 1000,
+                    p_stats->i_demux_read_packets, p_stats->i_demux_read_bytes,
+                    p_stats->f_demux_bitrate * 1000,
                     p_stats->i_displayed_pictures, p_stats->i_lost_pictures );
     vlc_mutex_unlock( &p_stats->lock );
 }

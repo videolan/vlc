@@ -685,6 +685,9 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
         p_counter = stats_CounterGet( p_input, p_input->i_object_id,
                                       "input_bitrate" );
         if( p_counter ) p_counter->update_interval = 1000000;
+        p_counter = stats_CounterGet( p_input, p_input->i_object_id,
+                                      "demux_bitrate" );
+        if( p_counter ) p_counter->update_interval = 1000000;
 
         psz = var_GetString( p_input, "sout" );
         if( *psz && strncasecmp( p_input->input.p_item->psz_uri, "vlc:", 4 ) )
