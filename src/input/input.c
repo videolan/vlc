@@ -46,7 +46,8 @@
 static  int Run  ( input_thread_t *p_input );
 static  int RunAndClean  ( input_thread_t *p_input );
 
-static input_thread_t * Create  ( vlc_object_t *, input_item_t *, vlc_bool_t );
+static input_thread_t * Create  ( vlc_object_t *, input_item_t *, char *,
+                                  vlc_bool_t );
 static  int             Init    ( input_thread_t *p_input, vlc_bool_t b_quick );
 static void             Error   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -104,7 +105,7 @@ static vlc_meta_t *InputMetaUser( input_thread_t *p_input );
  * TODO complete this list (?)
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
-                               vlc_bool_t b_quick )
+                               char *psz_header, vlc_bool_t b_quick )
 {
     input_thread_t *p_input;                        /* thread descriptor */
     vlc_value_t val;
@@ -117,6 +118,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+    p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
     p_input->b_eof = VLC_FALSE;
@@ -239,11 +241,19 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
  */
 input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                                       input_item_t *p_item )
+{
+    __input_CreateThread2( p_parent, p_item, NULL );
+}
 
+
+/* Gruik ! */
+input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
+                                       input_item_t *p_item,
+                                       char *psz_header )
 {
     input_thread_t *p_input;                        /* thread descriptor */
 
-    p_input = Create( p_parent, p_item, VLC_FALSE );
+    p_input = Create( p_parent, p_item, psz_header, VLC_FALSE );
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
 
@@ -275,7 +285,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
 {
     input_thread_t *p_input;                        /* thread descriptor */
 
-    p_input = Create( p_parent, p_item, VLC_FALSE );
+    p_input = Create( p_parent, p_item, NULL, VLC_FALSE );
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
 
@@ -311,7 +321,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     input_thread_t *p_input;                        /* thread descriptor */
 
     /* Allocate descriptor */
-    p_input = Create( p_parent, p_item, VLC_TRUE );
+    p_input = Create( p_parent, p_item, NULL, VLC_TRUE );
 
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );

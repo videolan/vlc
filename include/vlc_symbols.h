@@ -21,6 +21,7 @@ char * config_GetHomeDir (void);
 int playlist_ItemDelete (playlist_item_t *);
 osd_state_t * __osd_StateChange (osd_state_t *, const int);
 int vlm_ScheduleSetup (vlm_schedule_t *, const char *, const char *);
+input_thread_t * __input_CreateThread2 (vlc_object_t *, input_item_t *, char *);
 vlc_acl_t * __ACL_Duplicate (vlc_object_t *p_this, const vlc_acl_t *p_acl);
 int osd_Slider (vlc_object_t *, spu_t *, int, int, int, int, short);
 int playlist_ServicesDiscoveryRemove (playlist_t *, const char *);
@@ -883,6 +884,7 @@ struct module_symbols_t
     void (*stats_DumpInputStats_inner) (input_stats_t *);
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
     counter_t* (*__stats_CounterGet_inner) (vlc_object_t*, int, char *);
+    input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1310,6 +1312,7 @@ struct module_symbols_t
 #  define stats_DumpInputStats (p_symbols)->stats_DumpInputStats_inner
 #  define stats_ReinitInputStats (p_symbols)->stats_ReinitInputStats_inner
 #  define __stats_CounterGet (p_symbols)->__stats_CounterGet_inner
+#  define __input_CreateThread2 (p_symbols)->__input_CreateThread2_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1740,6 +1743,7 @@ struct module_symbols_t
     ((p_symbols)->stats_DumpInputStats_inner) = stats_DumpInputStats; \
     ((p_symbols)->stats_ReinitInputStats_inner) = stats_ReinitInputStats; \
     ((p_symbols)->__stats_CounterGet_inner) = __stats_CounterGet; \
+    ((p_symbols)->__input_CreateThread2_inner) = __input_CreateThread2; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */

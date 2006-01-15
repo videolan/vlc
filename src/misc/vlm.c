@@ -1068,6 +1068,7 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
             /* Pre-parse the input */
             input_thread_t *p_input;
             char *psz_output;
+            char *psz_header;
             int i;
 
             vlc_input_item_Clean( &media->item );
@@ -1092,7 +1093,10 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
                     strdup( media->option[i] );
             }
 
-            if( (p_input = input_CreateThread( vlm, &media->item ) ) )
+            asprintf( &psz_header, _("Media: %s"), media->psz_name );
+
+            if( (p_input = input_CreateThread2( vlm, &media->item, psz_header
+                                              ) ) )
             {
                 while( !p_input->b_eof && !p_input->b_error ) msleep( 100000 );
 
@@ -1137,6 +1141,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 {
     vlm_media_instance_t *p_instance;
     int i;
+    char *psz_header;
 
     p_instance = vlm_MediaInstanceSearch( vlm, media, psz_id );
 
@@ -1194,7 +1199,9 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             vlc_object_destroy( p_instance->p_input );
         }
 
-        p_instance->p_input = input_CreateThread( vlm, &p_instance->item );
+        asprintf( &psz_header, _("Media: %s"), media->psz_name );
+        p_instance->p_input = input_CreateThread2( vlm, &p_instance->item,
+                                                   psz_header );
         if( !p_instance->p_input )
         {
             TAB_REMOVE( media->i_instance, media->instance, p_instance );

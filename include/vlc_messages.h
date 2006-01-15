@@ -47,7 +47,8 @@ typedef struct
     int     i_object_id;
     int     i_object_type;
     char *  psz_module;
-    char *  psz_msg;                                 /**< the message itself */
+    char *  psz_msg;                            /**< the message itself */
+    char *  psz_header;                         /**< Additional header */
 
     mtime_t date;                               /**< Message date */
 } msg_item_t;

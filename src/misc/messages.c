@@ -292,9 +292,12 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
                       const char *psz_module,
                       const char *psz_format, va_list _args )
 {
+    int         i_header_size;               /* Size of the additionnal header */
+    vlc_object_t *p_obj;
     msg_bank_t * p_bank = &p_this->p_libvlc->msg_bank;       /* message bank */
     msg_queue_t *p_queue = NULL;
     char *       psz_str = NULL;                 /* formatted message string */
+    char *       psz_header = NULL;
     va_list      args;
     msg_item_t * p_item = NULL;                        /* pointer to message */
     msg_item_t   item;                    /* message in case of a full queue */
@@ -324,6 +327,33 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
         va_end( args );
         fprintf( stderr, "\n" );
         return;
+    }
+
+    i_header_size = 0;
+    p_obj = p_this;
+    while( p_obj != NULL )
+    {
+        char *psz_old = NULL;
+        if( p_obj == NULL ) break;
+        if( p_obj->psz_header )
+        {
+            i_header_size += strlen( p_obj->psz_header ) + 4;
+            if( psz_header )
+            {
+                psz_old = strdup( psz_header );
+                psz_header = (char*)realloc( psz_header, i_header_size );
+                snprintf( psz_header, i_header_size , "[%s] %s",
+                          p_obj->psz_header, psz_old );
+            }
+            else
+            {
+                psz_header = (char *)malloc( i_header_size );
+                snprintf( psz_header, i_header_size, "[%s]",
+                          p_obj->psz_header );
+            }
+        }
+        if( psz_old ) free( psz_old );
+        p_obj = p_obj->p_parent;
     }
 
 #if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
@@ -386,6 +416,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
                 p_item->i_object_type = p_this->i_object_type;
                 p_item->psz_module =    strdup( "message" );
                 p_item->psz_msg =       strdup( "message queue overflowed" );
+                p_item->psz_header =    NULL;
 
                PrintMsg( p_this, p_item );
                /* We print from a dummy item */
@@ -407,6 +438,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
     p_item->i_object_type = p_this->i_object_type;
     p_item->psz_module =    strdup( psz_module );
     p_item->psz_msg =       psz_str;
+    p_item->psz_header =    psz_header;
 
     if( p_queue->i_id == MSG_QUEUE_NORMAL )
         PrintMsg( p_this, p_item );
@@ -546,16 +578,37 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     /* Send the message to stderr */
     if( p_this->p_libvlc->b_color )
     {
-        fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s: %s%s" GRAY "\n",
+        if( p_item->psz_header )
+        {
+            fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s %s%s: %s%s" GRAY
+                              "\n",
+                         p_item->i_object_id, p_item->psz_header,
+                         p_item->psz_module, psz_object,
+                         ppsz_type[i_type], ppsz_color[i_type],
+                         p_item->psz_msg );
+        }
+        else
+        {
+             fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s: %s%s" GRAY "\n",
                          p_item->i_object_id, p_item->psz_module, psz_object,
                          ppsz_type[i_type], ppsz_color[i_type],
                          p_item->psz_msg );
+        }
     }
     else
     {
-        fprintf( stderr, "[%.8i] %s %s%s: %s\n", p_item->i_object_id,
+        if( p_item->psz_header )
+        {
+            fprintf( stderr, "[%.8i] %s %s %s%s: %s\n", p_item->i_object_id,
+                         p_item->psz_header, p_item->psz_module,
+                         psz_object, ppsz_type[i_type], p_item->psz_msg );
+        }
+        else
+        {
+            fprintf( stderr, "[%.8i] %s %s%s: %s\n", p_item->i_object_id,
                          p_item->psz_module, psz_object, ppsz_type[i_type],
                          p_item->psz_msg );
+        }
     }
 
 #   if defined(WIN32)
