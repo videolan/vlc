@@ -55,18 +55,16 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
     for ( i =  p_stats->i_counters - 1 ; i >= 0 ; i-- )
     {
         int j;
-        counter * p_counter = p_stats->pp_counters[i];
+        counter_t * p_counter = p_stats->pp_counters[i];
 
         for( j = p_counter->i_samples -1; j >= 0 ; j-- )
         {
             counter_sample_t *p_sample = p_counter->pp_samples[j];
-            if( p_sample->val.psz_string )
-                free( p_sample->val.psz_string );
             REMOVE_ELEM( p_counter->pp_samples, p_counter->i_samples, j );
             free( p_sample );
         }
         free( p_counter->psz_name );
-        REMOVE_ELEM( p_stats->pp_counters, p_stats->i_counter, i );
+        REMOVE_ELEM( p_stats->pp_counters, p_stats->i_counters, i );
         free( p_counter );
     }
 }
