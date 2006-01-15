@@ -243,6 +243,8 @@ struct stats_handler_t
     counter_t **pp_counters;
 };
 
+VLC_EXPORT( void, stats_HandlerDestroy, (stats_handler_t*) );
+
 #define stats_Update( a,b,c) __stats_Update( VLC_OBJECT( a ), b, c )
 VLC_EXPORT( int, __stats_Update, (vlc_object_t*, char *, vlc_value_t) );
 #define stats_Create( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )

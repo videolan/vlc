@@ -328,6 +328,7 @@ block_t * block_FifoGet (block_fifo_t *);
 mtime_t date_Increment (date_t *, uint32_t);
 int playlist_Add (playlist_t *, const char *, const char *, int, int);
 char * sout_CfgCreate (char **, sout_cfg_t **, char *);
+void stats_HandlerDestroy (stats_handler_t*);
 osd_menu_t * __osd_MenuCreate (vlc_object_t *, const char *);
 void * vlc_opendir (const char *);
 int playlist_NodeRemoveParent (playlist_t *,playlist_item_t*,playlist_item_t *);
@@ -885,6 +886,7 @@ struct module_symbols_t
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
     counter_t* (*__stats_CounterGet_inner) (vlc_object_t*, int, char *);
     input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
+    void (*stats_HandlerDestroy_inner) (stats_handler_t*);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1313,6 +1315,7 @@ struct module_symbols_t
 #  define stats_ReinitInputStats (p_symbols)->stats_ReinitInputStats_inner
 #  define __stats_CounterGet (p_symbols)->__stats_CounterGet_inner
 #  define __input_CreateThread2 (p_symbols)->__input_CreateThread2_inner
+#  define stats_HandlerDestroy (p_symbols)->stats_HandlerDestroy_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1744,6 +1747,7 @@ struct module_symbols_t
     ((p_symbols)->stats_ReinitInputStats_inner) = stats_ReinitInputStats; \
     ((p_symbols)->__stats_CounterGet_inner) = __stats_CounterGet; \
     ((p_symbols)->__input_CreateThread2_inner) = __input_CreateThread2; \
+    ((p_symbols)->stats_HandlerDestroy_inner) = stats_HandlerDestroy; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */

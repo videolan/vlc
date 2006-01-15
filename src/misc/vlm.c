@@ -1106,6 +1106,7 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
                 vlc_object_destroy( p_input );
             }
             free( psz_output );
+            free( psz_header );
 
             if( media->psz_mux )
             {
@@ -1208,6 +1209,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             vlc_input_item_Clean( &p_instance->item );
             if( p_instance->psz_name ) free( p_instance->psz_name );
         }
+        free( psz_header );
 
         return VLC_SUCCESS;
     }

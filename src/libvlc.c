@@ -961,6 +961,7 @@ int VLC_CleanUp( int i_object )
 
     while( ( p_stats = vlc_object_find( p_vlc, VLC_OBJECT_STATS, FIND_CHILD) ))
     {
+        stats_HandlerDestroy( p_stats );
         vlc_object_detach( (vlc_object_t*) p_stats );
         vlc_object_release( (vlc_object_t *)p_stats );
         // TODO: Delete it

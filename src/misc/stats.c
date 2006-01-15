@@ -45,6 +45,33 @@ static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this );
  *****************************************************************************/
 
 /**
+ * Cleanup statistics handler stuff
+ * \param p_stats the handler to clean
+ * \return nothing
+ */
+void stats_HandlerDestroy( stats_handler_t *p_stats )
+{
+    int i;
+    for ( i =  p_stats->i_counters - 1 ; i >= 0 ; i-- )
+    {
+        int j;
+        counter * p_counter = p_stats->pp_counters[i];
+
+        for( j = p_counter->i_samples -1; j >= 0 ; j-- )
+        {
+            counter_sample_t *p_sample = p_counter->pp_samples[j];
+            if( p_sample->val.psz_string )
+                free( p_sample->val.psz_string );
+            REMOVE_ELEM( p_counter->pp_samples, p_counter->i_samples, j );
+            free( p_sample );
+        }
+        free( p_counter->psz_name );
+        REMOVE_ELEM( p_stats->pp_counters, p_stats->i_counter, i );
+        free( p_counter );
+    }
+}
+
+/**
  * Create a statistics counter
  * \param p_this the object for which to create the counter
  * \param psz_name the name
