@@ -295,7 +295,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         home_user = strdup( getenv("HOME") );
         directory = strdup( "/Library/Internet Plug-Ins/VLC Plugin.plugin/"
                             "Contents/MacOS/modules" );
-        plugin_path = malloc( strlen( directory ) + strlen( home_user ) );
+        plugin_path = (char *)malloc( strlen( directory ) + strlen( home_user ) );
         memcpy( plugin_path , home_user , strlen(home_user) );
         memcpy( plugin_path + strlen( home_user ) , directory ,
                 strlen( directory ) );
@@ -534,7 +534,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #if USE_LIBVLC
 
 #ifdef XP_MACOSX
-    value.i_int = ((NP_Port*) (window->window))->port;
+    value.i_int = (int)(((NP_Port*) (window->window))->port);
     VLC_VariableSet( p_plugin->i_vlc, "drawable", value );
 
     valueportx.i_int = ((NP_Port*) (window->window))->portx;
@@ -569,7 +569,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     black_rect.bottom = valueb.i_int - valuey.i_int;
     black_rect.right = valuer.i_int - valuex.i_int;
 
-    SetPort( value.i_int );
+    SetPort( (GrafPtr)value.i_int );
     SetOrigin( valueportx.i_int , valueporty.i_int );
     ForeColor(blackColor);
     PenMode( patCopy );
