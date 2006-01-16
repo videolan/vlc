@@ -93,7 +93,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     p_snapshot = ( snapshot_t* ) p_cache->p_private;
     vlc_object_destroy( p_cache );
-    
+
     if( p_snapshot )
     {
         p_pic = _mediacontrol_createRGBPicture( p_snapshot->i_width,
@@ -103,9 +103,9 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
                                                 p_snapshot->p_data,
                                                 p_snapshot->i_datasize );
         if( !p_pic )
-	  RAISE( mediacontrol_InternalException, "Out of memory" );
-	free( p_snapshot->p_data );
-	free( p_snapshot );
+            RAISE( mediacontrol_InternalException, "Out of memory" );
+        free( p_snapshot->p_data );
+        free( p_snapshot );
     }
     else
     {
@@ -198,7 +198,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         end->origin == mediacontrol_RelativePosition )
     {
         mtime_t i_duration = 0;
-	mtime_t i_now = mdate();
+        mtime_t i_now = mdate();
 
         i_duration = 1000 * mediacontrol_unit_convert( self->p_playlist->p_input,
                                                        end->key,
@@ -224,7 +224,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         /* FIXME */
         /* i_now = input_ClockGetTS( p_input, NULL, 0 ); */
         i_now = mdate();
-        
+
         i_debut = mediacontrol_position2microsecond( p_input,
                                                      ( mediacontrol_Position* ) begin );
         i_debut += i_now;
@@ -266,14 +266,13 @@ mediacontrol_sound_set_volume( mediacontrol_Instance *self,
     if( !self->p_intf )
     {
         RAISE( mediacontrol_InternalException, "No interface module" );
-        return;
     }
-    aout_VolumeSet( self->p_intf,( audio_volume_t )volume );
+    else aout_VolumeSet( self->p_intf,( audio_volume_t )volume );
 }
 
 vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
-		 	            WINDOWHANDLE visual_id,
-			            mediacontrol_Exception *exception )
+                                    WINDOWHANDLE visual_id,
+                                    mediacontrol_Exception *exception )
 {
     vlc_value_t value;
     int ret;
@@ -281,10 +280,10 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
     if( !self->p_vlc )
     {
         RAISE( mediacontrol_InternalException, "No vlc reference" );
-        return 0;
+        return VLC_FALSE;
     }
     value.i_int=visual_id;
     ret = var_Set(self->p_vlc, "drawable", value);
-    
+
     return (ret == VLC_SUCCESS);
 }
