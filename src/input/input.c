@@ -107,7 +107,7 @@ static vlc_meta_t *InputMetaUser( input_thread_t *p_input );
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                                char *psz_header, vlc_bool_t b_quick )
 {
-    input_thread_t *p_input;                        /* thread descriptor */
+    input_thread_t *p_input = NULL;                 /* thread descriptor */
     vlc_value_t val;
     int i;
 
@@ -242,7 +242,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                                       input_item_t *p_item )
 {
-    __input_CreateThread2( p_parent, p_item, NULL );
+    return __input_CreateThread2( p_parent, p_item, NULL );
 }
 
 
@@ -251,7 +251,7 @@ input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
                                        input_item_t *p_item,
                                        char *psz_header )
 {
-    input_thread_t *p_input;                        /* thread descriptor */
+    input_thread_t *p_input = NULL;      /* thread descriptor */
 
     p_input = Create( p_parent, p_item, psz_header, VLC_FALSE );
     /* Now we can attach our new input */
@@ -283,7 +283,7 @@ input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
 int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                    vlc_bool_t b_block )
 {
-    input_thread_t *p_input;                        /* thread descriptor */
+    input_thread_t *p_input = NULL;         /* thread descriptor */
 
     p_input = Create( p_parent, p_item, NULL, VLC_FALSE );
     /* Now we can attach our new input */
@@ -318,7 +318,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
  */
 int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 {
-    input_thread_t *p_input;                        /* thread descriptor */
+    input_thread_t *p_input = NULL;           /* thread descriptor */
 
     /* Allocate descriptor */
     p_input = Create( p_parent, p_item, NULL, VLC_TRUE );
@@ -415,7 +415,6 @@ void input_DestroyThread( input_thread_t *p_input )
  *****************************************************************************/
 static int Run( input_thread_t *p_input )
 {
-
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 
