@@ -52,9 +52,8 @@ if HAVE_DARWIN
 
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
 
-npvlc_DATA = $(noinst_npvlc_DATA)
-noinst_npvlc_DATA = npvlc$(LIBEXT)
-noinst_npvlcdir = $(libdir)
+npvlc_DATA = npvlc$(LIBEXT)
+npvlcdir = $(libdir)
 
 BUNDLE_mozilla = VLC\ Plugin.plugin
 SOURCES_support = support/npmac.cpp
@@ -69,7 +68,7 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	mkdir -p "./$@/Contents/MacOS"
 	cp npvlc.dylib "./$@/Contents/MacOS/$@"
 	mkdir -p ./"$@"/Contents/Resources
-	cp npvlc.rsrc "./$@/Contents/MacOS/$@.rsrc"
+	ditto -rsrcFork npvlc.rsrc "./$@/Contents/MacOS/$@.rsrc"
 	cp $(top_srcdir)/extras/MacOSX/plugin/Info.plist "./$@/Contents/Info.plist"
 	cp $(top_srcdir)/extras/MacOSX/plugin/pbdevelopment.plist "./$@/Contents/pbdevelopment.plist"
 	cp -r $(top_srcdir)/extras/MacOSX/plugin/English.lproj "./$@/Contents/Resources/"
@@ -88,6 +87,7 @@ LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc)
 else
 
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc_pic.a
+
 npvlc_DATA = libvlcplugin$(LIBEXT)
 npvlcdir = $(libdir)/mozilla/plugins
 
