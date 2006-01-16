@@ -4,7 +4,7 @@
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
+ * Authors: Olivier Teuliï¿½e <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ void X11Popup::addSeparator( int pos )
 int X11Popup::getPosFromId( int id ) const
 {
     // TODO
+    return 0;
 }
 
 
