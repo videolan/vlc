@@ -40,7 +40,6 @@ void PrintModuleList( vlc_t *p_vlc, mmap &mods, mcmap &mods2 );
 void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 );
 void PrintOption( char *psz_option, char i_short, char *psz_exlusive,
                    char *psz_text, char *psz_longtext, char *psz_args );
-extern "C"{ vlc_t * vlc_current_object( int i_object );}
 
 int main( int i_argc, char **ppsz_argv )
 {
@@ -49,7 +48,7 @@ int main( int i_argc, char **ppsz_argv )
     /* Create a libvlc structure */
     int i_ret = VLC_Create();
     vlc_t *p_vlc;
-    
+
     if( i_ret < 0 )
     {
         return i_ret;
