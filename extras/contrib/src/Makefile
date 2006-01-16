@@ -115,7 +115,7 @@ ifdef HAVE_DARWIN_OS
  all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
-	.dvdcss .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
+	.dvdcss .dvdnav .dvdread .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
@@ -907,32 +907,41 @@ CLEAN_PKG += libdvdcss
 DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 
 # ***************************************************************************
-# libdvdread
+# libdvdread: We use dvdnav's dvdread
 # ***************************************************************************
 
-libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
-	$(WGET) $(LIBDVDREAD_URL)
+#libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
+#	$(WGET) $(LIBDVDREAD_URL)
 
-libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-	patch  -p 0 < Patches/libdvdread.patch
-ifdef HAVE_WIN32
+#libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+#	$(EXTRACT_BZ2)
+#	patch  -p 0 < Patches/libdvdread.patch
+#ifdef HAVE_WIN32
 #	if automake-1.4 --version >/dev/null 2>&1; then \
 #		echo "Please get rid of your automake 1.4"; \
 #		rm -rf $@ \
 #		exit 1; \
 #	fi
-	(cd libdvdread; patch -p 0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
-endif
+#	(cd libdvdread; patch -p 0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
+#endif
 
-.dvdread: libdvdread .dvdcss
-	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
+#.dvdread: libdvdread .dvdcss
+#	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
+#	$(INSTALL_NAME)
+#	touch $@
+
+#CLEAN_FILE += .dvdread
+#CLEAN_PKG += libdvdread
+#DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+
+# ***************************************************************************
+# dummy dvdread to trigger the INSTALL_NAME script
+# ***************************************************************************
+.dvdread: .dvdnav
 	$(INSTALL_NAME)
-	touch $@
+        touch $@
 
 CLEAN_FILE += .dvdread
-CLEAN_PKG += libdvdread
-DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 # ***************************************************************************
 # libdvdnav
