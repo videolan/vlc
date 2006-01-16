@@ -57,12 +57,10 @@
 #define RAISE( c, m )  exception->code = c; \
                        exception->message = strdup(m);
 
-vlc_t * vlc_current_object( int );
-
 mediacontrol_Instance* mediacontrol_new_from_object( int vlc_object_id,
                                                      mediacontrol_Exception *exception )
 {
-    mediacontrol_Instance* retval;
+    mediacontrol_Instance* retval = NULL;
     vlc_object_t *p_vlc;
     vlc_object_t *p_object;
 
@@ -106,7 +104,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
                                  const mediacontrol_PositionKey a_key,
                                  mediacontrol_Exception *exception )
 {
-    mediacontrol_Position* retval;
+    mediacontrol_Position* retval = NULL;
     vlc_value_t val;
     input_thread_t * p_input = self->p_playlist->p_input;
 
@@ -154,18 +152,16 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
     if( ! p_input )
     {
         RAISE( mediacontrol_InternalException, "No input thread." );
-        return;
     }
-
-    if( !var_GetBool( p_input, "seekable" ) )
+    else if( !var_GetBool( p_input, "seekable" ) )
     {
         RAISE( mediacontrol_InvalidPosition, "Stream not seekable" );
-        return;
     }
-
-    val.i_time = mediacontrol_position2microsecond( p_input, a_position );
-    var_Set( p_input, "time", val );
-    return;
+    else
+    {
+        val.i_time = mediacontrol_position2microsecond( p_input, a_position );
+        var_Set( p_input, "time", val );
+    }
 }
 
 /* Starts playing a stream */
@@ -197,24 +193,27 @@ mediacontrol_start( mediacontrol_Instance *self,
     {
         int i_index;
         int i_from;
-	char * psz_from = ( char * )malloc( 20 * sizeof( char ) );
+        char *psz_from = NULL;
 
-        i_from = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
-	
-        i_index = p_playlist->i_index;
-        if( i_index < 0 )
-        { 
-            /* We know that there is at least 1 element, since i_size != 0 */
-            i_index = 0;
+        psz_from = ( char * )malloc( 20 * sizeof( char ) );
+        if( psz_from )
+        {
+            i_from = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
+
+            i_index = p_playlist->i_index;
+            if( i_index < 0 )
+            {
+                /* We know that there is at least 1 element, since i_size != 0 */
+                i_index = 0;
+            }
+
+            /* Set start time */
+            snprintf( psz_from, 20, "start-time=%i", i_from );
+            playlist_ItemAddOption( p_playlist->pp_items[i_index], psz_from );
+            free( psz_from );
         }
 
-        /* Set start time */
-	snprintf( psz_from, 20, "start-time=%i", i_from );
-	playlist_ItemAddOption( p_playlist->pp_items[i_index], psz_from );
-	free( psz_from );
-
         vlc_mutex_unlock( &p_playlist->object_lock );
-
         playlist_Play( p_playlist );
     }
     else
@@ -222,8 +221,6 @@ mediacontrol_start( mediacontrol_Instance *self,
         RAISE( mediacontrol_PlaylistException, "Empty playlist." );
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
-
-    return;
 }
 
 void
@@ -243,8 +240,6 @@ mediacontrol_pause( mediacontrol_Instance *self,
     {
         RAISE( mediacontrol_InternalException, "No input" );
     }
-
-    return;
 }
 
 void
@@ -276,10 +271,9 @@ mediacontrol_stop( mediacontrol_Instance *self,
     if( !self->p_playlist )
     {
         RAISE( mediacontrol_PlaylistException, "No playlist" );
-        return;
     }
-
-    playlist_Stop( self->p_playlist );
+    else
+        playlist_Stop( self->p_playlist );
 }
 
 /**************************************************************************
@@ -295,27 +289,23 @@ mediacontrol_playlist_add_item( mediacontrol_Instance *self,
     if( !self->p_playlist )
     {
         RAISE( mediacontrol_InternalException, "No playlist" );
-        return;
     }
-
-    playlist_Add( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
-                  PLAYLIST_END );
+    else
+        playlist_Add( self->p_playlist, psz_file, psz_file , PLAYLIST_INSERT,
+                      PLAYLIST_END );
 }
 
 void
 mediacontrol_playlist_next_item( mediacontrol_Instance *self,
-				 mediacontrol_Exception *exception )
+                                 mediacontrol_Exception *exception )
 {
     exception=mediacontrol_exception_init( exception );
     if ( !self->p_playlist )
     {
         RAISE( mediacontrol_InternalException, "No playlist" );
-        return;
     }
-
-    playlist_Next( self->p_playlist );
-
-    return;
+    else
+        playlist_Next( self->p_playlist );
 }
 
 void
@@ -326,19 +316,16 @@ mediacontrol_playlist_clear( mediacontrol_Instance *self,
     if( !self->p_playlist )
     {
         RAISE( mediacontrol_PlaylistException, "No playlist" );
-        return;
     }
-
-    playlist_Clear( self->p_playlist );
-
-    return;
+    else
+        playlist_Clear( self->p_playlist );
 }
 
 mediacontrol_PlaylistSeq *
 mediacontrol_playlist_get_list( mediacontrol_Instance *self,
                                 mediacontrol_Exception *exception )
 {
-    mediacontrol_PlaylistSeq *retval;
+    mediacontrol_PlaylistSeq *retval = NULL;
     int i_index;
     playlist_t * p_playlist = self->p_playlist;
     int i_playlist_size;
@@ -373,7 +360,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
                                      mediacontrol_PositionKey a_key,
                                      mediacontrol_Exception *exception )
 {
-    mediacontrol_StreamInformation *retval;
+    mediacontrol_StreamInformation *retval = NULL;
     input_thread_t *p_input = self->p_playlist->p_input;
     vlc_value_t val;
 
