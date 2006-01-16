@@ -66,7 +66,12 @@ typedef struct {
 #define mediacontrol_PlaylistException          4
 #define mediacontrol_InternalException          5
 
-typedef mediacontrol_Instance;
+typedef struct {
+    vlc_object_t  *p_vlc;
+    playlist_t    *p_playlist;
+    intf_thread_t *p_intf;
+    int           vlc_object_id;
+} mediacontrol_Instance;
 
 /* Cf stream_control.h */
 enum mediacontrol_PlayerStatusList
