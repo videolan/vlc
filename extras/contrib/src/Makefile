@@ -939,7 +939,7 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 .dvdread: .dvdnav
 	$(INSTALL_NAME)
-        touch $@
+	touch $@
 
 CLEAN_FILE += .dvdread
 
