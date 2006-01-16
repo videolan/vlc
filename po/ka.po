@@ -1,23 +1,22 @@
-# translation of vlc.po to
-# translation of ka.po to
-# Georgian translation for vlc
 # Copyright (c) (c) 2005 Canonical Ltd, and Rosetta Contributors 2005
 # This file is distributed under the same license as the vlc package.
 # Alexander Didebulidze <didebuli@in.tum.de>, 2005, 2006.
+# Ubuntu Georgian Translators https://launchpad.net/people/ubuntu-l10n-ka 2005, 2006.
 #
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc\n"
+"Project-Id-Version: VLC SVN 13921\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-01-10 01:21+0100\n"
-"PO-Revision-Date: 2006-01-09 19:47+0100\n"
-"Last-Translator: \n"
-"Language-Team:  <ka@li.org>\n"
+"PO-Revision-Date: 2006-01-16 12:32+0100\n"
+"Last-Translator: Alexander Didebulidze\n"
+"Language-Team: Geogian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10.2\n"
+"Plural-Forms: nplurals=1; plural=0"
+"X-Generator: KBabel 1.11.1\n"
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -147,9 +146,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:89
-#, fuzzy
 msgid "Text rendering"
-msgstr "ტექსტი"
+msgstr ""
 
 #: include/vlc_config_cat.h:91
 msgid ""
@@ -202,37 +200,33 @@ msgid "Video codecs"
 msgstr "ვიდეო-კოდეკები"
 
 #: include/vlc_config_cat.h:114
-#, fuzzy
 msgid "Settings for the video-only decoders and encoders"
-msgstr "პარამეტრები და"
+msgstr ""
 
 #: include/vlc_config_cat.h:116
 msgid "Audio codecs"
 msgstr "აუდიო-კოდეკები"
 
 #: include/vlc_config_cat.h:117
-#, fuzzy
 msgid "Settings for the audio-only decoders and encoders"
-msgstr "პარამეტრები და"
+msgstr ""
 
 #: include/vlc_config_cat.h:119
 msgid "Other codecs"
 msgstr "სხვა კოდეკები"
 
 #: include/vlc_config_cat.h:120
-#, fuzzy
 msgid "Settings for audio+video and miscellaneous decoders and encoders"
-msgstr "პარამეტრები და და"
+msgstr ""
 
 #: include/vlc_config_cat.h:123
-#, fuzzy
 msgid "General input settings. Use with care."
-msgstr "დამატებითი გამოყენება."
+msgstr ""
 
 #: include/vlc_config_cat.h:126 src/libvlc.h:1264
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:152
 msgid "Stream output"
-msgstr "სტრიმის გასავალი"
+msgstr "ნაკადის გასავალი"
 
 #: include/vlc_config_cat.h:128
 msgid ""
@@ -339,7 +333,7 @@ msgstr "დასაკრავი სიის ზოდადი ქცევ
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:233
 #, fuzzy
 msgid "Services discovery"
-msgstr "სერვისი"
+msgstr "სერვისები"
 
 #: include/vlc_config_cat.h:177
 msgid ""
@@ -401,9 +395,8 @@ msgid "Encoders settings"
 msgstr ""
 
 #: include/vlc_config_cat.h:203
-#, fuzzy
 msgid "These are general settings for video/audio/subtitles encoding modules."
-msgstr "ჩვეულებრივი."
+msgstr ""
 
 #: include/vlc_config_cat.h:207
 msgid "Dialog providers settings"
@@ -432,9 +425,8 @@ msgid "No help available"
 msgstr "ვერ ვპოულობ დახმარებას"
 
 #: include/vlc_config_cat.h:224
-#, fuzzy
 msgid "No help is available for these modules"
-msgstr "არა"
+msgstr ""
 
 #: include/vlc_interface.h:137
 msgid ""
@@ -524,7 +516,7 @@ msgstr "CDDB დისკის ID"
 #: include/vlc_meta.h:44
 #, fuzzy
 msgid "CDDB Extended Data"
-msgstr "CDDB მონაცემი"
+msgstr "CDDB გაფართოებული მონაცემი"
 
 #: include/vlc_meta.h:45
 msgid "CDDB Genre"
@@ -539,54 +531,44 @@ msgid "CDDB Title"
 msgstr "CDDB სათაური"
 
 #: include/vlc_meta.h:49
-#, fuzzy
 msgid "CD-Text Arranger"
-msgstr "ტექსტი"
+msgstr ""
 
 #: include/vlc_meta.h:50
-#, fuzzy
 msgid "CD-Text Composer"
-msgstr "ტექსტი"
+msgstr ""
 
 #: include/vlc_meta.h:51
-#, fuzzy
 msgid "CD-Text Disc ID"
-msgstr "ტექსტი დისკი ID"
+msgstr ""
 
 #: include/vlc_meta.h:52
-#, fuzzy
 msgid "CD-Text Genre"
-msgstr "ტექსტი ჟანრი"
+msgstr ""
 
 #: include/vlc_meta.h:53
-#, fuzzy
 msgid "CD-Text Message"
-msgstr "ტექსტი შეტყობინება"
+msgstr ""
 
 #: include/vlc_meta.h:54
-#, fuzzy
 msgid "CD-Text Songwriter"
-msgstr "ტექსტი"
+msgstr ""
 
 #: include/vlc_meta.h:55
-#, fuzzy
 msgid "CD-Text Performer"
-msgstr "ტექსტი"
+msgstr ""
 
 #: include/vlc_meta.h:56
-#, fuzzy
 msgid "CD-Text Title"
-msgstr "ტექსტი სათაური"
+msgstr ""
 
 #: include/vlc_meta.h:58
-#, fuzzy
 msgid "ISO-9660 Application ID"
-msgstr "ISO პროგრამა ID"
+msgstr "ISO-9660 პროგრამის ID"
 
 #: include/vlc_meta.h:59
-#, fuzzy
 msgid "ISO-9660 Preparer"
-msgstr "ISO"
+msgstr ""
 
 #: include/vlc_meta.h:60
 #, fuzzy
@@ -612,13 +594,12 @@ msgid "Codec Description"
 msgstr "კოდეკის აღწერილობა"
 
 #: include/vlc/vlc.h:577
-#, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr "პროგრამა -სკენ საერთო საზოგადო"
+msgstr ""
 
 #: src/audio_output/input.c:80 src/audio_output/input.c:126
 #: src/input/es_out.c:361 src/libvlc.h:343 src/video_output/video_output.c:378
@@ -792,7 +773,7 @@ msgstr "Meta-ინფორმაცია"
 #: src/input/es_out.c:1566
 #, c-format
 msgid "Stream %d"
-msgstr ""
+msgstr "ნაკადი %d"
 
 #: src/input/es_out.c:1568 modules/gui/macosx/wizard.m:417
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:825
@@ -846,7 +827,7 @@ msgstr "დისპლეი"
 
 #: src/input/es_out.c:1617 modules/access/screen/screen.c:41
 msgid "Frame rate"
-msgstr ""
+msgstr "კადრი წამში"
 
 #: src/input/es_out.c:1624
 msgid "Subtitle"
@@ -856,7 +837,7 @@ msgstr "ტიტრები"
 #: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:251
 #: modules/gui/macosx/output.m:391
 msgid "Stream"
-msgstr "სტრიმი"
+msgstr "ნაკადი"
 
 #: src/input/input.c:1930 src/playlist/item.c:366
 #: modules/access/cdda/info.c:325 modules/access/cdda/info.c:393
@@ -865,9 +846,8 @@ msgid "Duration"
 msgstr "ხანგრძლივობა"
 
 #: src/input/input.c:2105 src/input/input.c:2175
-#, fuzzy
 msgid "Errors"
-msgstr "შეცდომა"
+msgstr "შეცდომები"
 
 #: src/input/var.c:115
 msgid "Bookmark"
@@ -916,7 +896,7 @@ msgstr "წინა"
 #: src/input/var.c:284
 #, fuzzy, c-format
 msgid "Title %i"
-msgstr "სათაური"
+msgstr "სათაური i"
 
 #: src/input/var.c:307 src/input/var.c:367
 #, c-format
@@ -936,7 +916,7 @@ msgstr "წინა თავი"
 #: src/interface/interaction.c:430
 #, fuzzy
 msgid "Login"
-msgstr "პროტოკოლირება"
+msgstr "შესვლა"
 
 #: src/interface/interaction.c:438 modules/access_output/http.c:63
 msgid "Password"
@@ -975,12 +955,12 @@ msgstr ""
 #: src/libvlc.c:2254
 #, fuzzy
 msgid " (default enabled)"
-msgstr "ჩართული"
+msgstr "ნაგულისხმევი ჩართული"
 
 #: src/libvlc.c:2255
 #, fuzzy
 msgid " (default disabled)"
-msgstr "გამორთული"
+msgstr "ნაგულისხმევი გამორთული"
 
 #: src/libvlc.c:2437
 #, c-format
@@ -1148,9 +1128,8 @@ msgid "This option turns off all warning and information messages."
 msgstr ""
 
 #: src/libvlc.h:83
-#, fuzzy
 msgid "Default stream"
-msgstr "ნაგულისხმები -სკენ"
+msgstr ""
 
 #: src/libvlc.h:85
 msgid "This option allows you to always open a default stream on start-up."
@@ -1221,9 +1200,8 @@ msgid "This will force a mono audio output."
 msgstr ""
 
 #: src/libvlc.h:124
-#, fuzzy
 msgid "Default audio volume"
-msgstr "ნაგულისხმები -სკენ"
+msgstr ""
 
 #: src/libvlc.h:126
 msgid ""
@@ -1231,18 +1209,16 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:129
-#, fuzzy
 msgid "Audio output saved volume"
-msgstr "აუდიო"
+msgstr ""
 
 #: src/libvlc.h:131
 msgid "This saves the audio output volume when you select mute."
 msgstr ""
 
 #: src/libvlc.h:133
-#, fuzzy
 msgid "Audio output volume step"
-msgstr "აუდიო"
+msgstr ""
 
 #: src/libvlc.h:135
 msgid ""
@@ -1263,7 +1239,7 @@ msgstr ""
 #: src/libvlc.h:144
 #, fuzzy
 msgid "High quality audio resampling"
-msgstr "მაღალი"
+msgstr "მაღალი აუდიო"
 
 #: src/libvlc.h:146
 #, fuzzy
@@ -1271,7 +1247,7 @@ msgid ""
 "This uses a high quality audio resampling algorithm. High quality audio "
 "resampling can be processor intensive so you can disable it and a cheaper "
 "resampling algorithm will be used instead."
-msgstr "მაღალი და."
+msgstr "a აუდიო მაღალი აუდიო და a."
 
 #: src/libvlc.h:151
 #, fuzzy
@@ -1349,9 +1325,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:196
-#, fuzzy
 msgid "Video output module"
-msgstr "ვიდეო"
+msgstr ""
 
 #: src/libvlc.h:198
 msgid ""
@@ -1617,7 +1592,7 @@ msgstr ""
 #: src/libvlc.h:310
 #, fuzzy
 msgid "Monitor pixel aspect ratio"
-msgstr "ნიმუში"
+msgstr "მონიტორი"
 
 #: src/libvlc.h:312
 msgid ""
@@ -1735,7 +1710,7 @@ msgstr ""
 #: src/libvlc.h:364
 #, fuzzy
 msgid "Program to select"
-msgstr "პროგრამები"
+msgstr "პროგრამა -სკენ"
 
 #: src/libvlc.h:366
 msgid ""
@@ -1747,7 +1722,7 @@ msgstr ""
 #: src/libvlc.h:370
 #, fuzzy
 msgid "Programs to select"
-msgstr "პროგრამები"
+msgstr "პროგრამები -სკენ"
 
 #: src/libvlc.h:372
 msgid ""
@@ -1757,9 +1732,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:377 modules/gui/wxwidgets/dialogs/open.cpp:776
-#, fuzzy
 msgid "Audio track"
-msgstr "აუდიო"
+msgstr "აუდიო კვალი"
 
 #: src/libvlc.h:379
 msgid ""
@@ -1777,9 +1751,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:387
-#, fuzzy
 msgid "Audio language"
-msgstr "აუდიოს ენის ამორჩევა"
+msgstr "აუდიოს ენა"
 
 #: src/libvlc.h:389
 msgid ""
@@ -1788,9 +1761,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:392
-#, fuzzy
 msgid "Subtitle language"
-msgstr "ფაილი"
+msgstr "ტიტრების ენა"
 
 #: src/libvlc.h:394
 msgid ""
@@ -1799,18 +1771,16 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:397
-#, fuzzy
 msgid "Audio track ID"
-msgstr "აუდიო"
+msgstr "აუდიო კვალის ID"
 
 #: src/libvlc.h:399
 msgid "Give the stream ID of the audio track you want to use."
 msgstr ""
 
 #: src/libvlc.h:401
-#, fuzzy
 msgid "Subtitles track ID"
-msgstr "ტიტრები"
+msgstr "ტიტრების კვალის ID"
 
 #: src/libvlc.h:403
 msgid "Give the stream ID of the subtitle track you want to use."
@@ -2783,7 +2753,7 @@ msgstr ""
 #: src/libvlc.h:873
 #, fuzzy
 msgid "Long jump size"
-msgstr "შრიფტის სიდიდე"
+msgstr "სიდიდე"
 
 #: src/libvlc.h:874
 msgid "Long jump \"size\", in seconds"
@@ -2841,7 +2811,7 @@ msgstr ""
 #: src/libvlc.h:888
 #, fuzzy
 msgid "Go to the DVD menu"
-msgstr "გამოყენება DVD"
+msgstr "გადადი DVD-ის მენიუში"
 
 #: src/libvlc.h:889
 msgid "Select the key to take you to the DVD menu"
@@ -2874,7 +2844,7 @@ msgstr ""
 #: src/libvlc.h:896
 #, fuzzy
 msgid "Select next DVD chapter"
-msgstr "შემდეგი თავი"
+msgstr "DVD"
 
 #: src/libvlc.h:897
 msgid "Select the key to choose the next chapter from the DVD"
@@ -2947,12 +2917,12 @@ msgstr "დაკვრა სია 1"
 #: src/libvlc.h:913
 #, fuzzy
 msgid "Play playlist bookmark 2"
-msgstr "დაკვრა სია"
+msgstr "დაკვრა სია 2"
 
 #: src/libvlc.h:914
 #, fuzzy
 msgid "Play playlist bookmark 3"
-msgstr "დაკვრა სია"
+msgstr "დაკვრა სია 3"
 
 #: src/libvlc.h:915
 #, fuzzy
@@ -2972,7 +2942,7 @@ msgstr "დაკვრა სია"
 #: src/libvlc.h:918
 #, fuzzy
 msgid "Play playlist bookmark 7"
-msgstr "დაკვრა სია"
+msgstr "დაკვრა სია 7"
 
 #: src/libvlc.h:919
 #, fuzzy
@@ -3001,12 +2971,12 @@ msgstr "სია 1"
 #: src/libvlc.h:924
 #, fuzzy
 msgid "Set playlist bookmark 2"
-msgstr "სია"
+msgstr "სია 2"
 
 #: src/libvlc.h:925
 #, fuzzy
 msgid "Set playlist bookmark 3"
-msgstr "სია"
+msgstr "სია 3"
 
 #: src/libvlc.h:926
 #, fuzzy
@@ -3026,7 +2996,7 @@ msgstr "სია"
 #: src/libvlc.h:929
 #, fuzzy
 msgid "Set playlist bookmark 7"
-msgstr "სია"
+msgstr "სია 7"
 
 #: src/libvlc.h:930
 #, fuzzy
@@ -3306,7 +3276,7 @@ msgstr ""
 #: src/libvlc.h:1769
 #, fuzzy
 msgid "print version information"
-msgstr "აჩვენე ვერსია"
+msgstr "ვერსია"
 
 #: src/misc/configuration.c:1229
 msgid "boolean"
@@ -3970,11 +3940,11 @@ msgstr "საშუალო"
 
 #: src/video_output/video_output.c:386 modules/video_filter/deinterlace.c:112
 msgid "Bob"
-msgstr ""
+msgstr "ბობ (Bob)"
 
 #: src/video_output/video_output.c:388 modules/video_filter/deinterlace.c:112
 msgid "Linear"
-msgstr ""
+msgstr "ლინეარული(Linear)"
 
 #: src/video_output/vout_intf.c:198
 msgid "Zoom"
@@ -3982,19 +3952,19 @@ msgstr "გადიდება"
 
 #: src/video_output/vout_intf.c:210
 msgid "1:4 Quarter"
-msgstr ""
+msgstr "1:4 მეოთხედი"
 
 #: src/video_output/vout_intf.c:212
 msgid "1:2 Half"
-msgstr ""
+msgstr "1:2 ნახევარი"
 
 #: src/video_output/vout_intf.c:214
 msgid "1:1 Original"
-msgstr ""
+msgstr "1:1 ორიგინალი"
 
 #: src/video_output/vout_intf.c:216
 msgid "2:1 Double"
-msgstr ""
+msgstr "2:1 ორმაგი"
 
 #: src/video_output/vout_intf.c:227 modules/video_filter/crop.c:62
 #, fuzzy
@@ -4047,7 +4017,7 @@ msgstr "აუდიო კვალი "
 #: modules/access/cdda.c:485 modules/access/cdda.c:557
 #, fuzzy, c-format
 msgid "Audio CD - Track %i"
-msgstr "აუდიო კვალი"
+msgstr "აუდიო კვალი i"
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:77
 #: modules/codec/x264.c:176
@@ -4423,7 +4393,7 @@ msgstr "ვიდეო"
 msgid ""
 "Force the DirectShow video input to use a specific frame rate(eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
-msgstr "ძალდატანება -სკენ"
+msgstr "ძალდატანება -სკენ a ნაგულისხმევი"
 
 #: modules/access/dshow/dshow.cpp:106
 #, fuzzy
@@ -4640,7 +4610,7 @@ msgstr ""
 #: modules/access/dvb/access.c:146
 #, fuzzy
 msgid "HTTP Host address"
-msgstr "ჰოსტი"
+msgstr "HTTP ჰოსტი"
 
 #: modules/access/dvb/access.c:148
 msgid "To enable the internal HTTP server, set its address and port here."
@@ -4649,7 +4619,7 @@ msgstr ""
 #: modules/access/dvb/access.c:150
 #, fuzzy
 msgid "HTTP user name"
-msgstr "FTP მომხმარებლის სახელი"
+msgstr "HTTP"
 
 #: modules/access/dvb/access.c:152
 msgid ""
@@ -4660,7 +4630,7 @@ msgstr ""
 #: modules/access/dvb/access.c:155
 #, fuzzy
 msgid "HTTP password"
-msgstr "FTP პაროლი"
+msgstr "HTTP პაროლი"
 
 #: modules/access/dvb/access.c:157
 msgid ""
@@ -4671,7 +4641,7 @@ msgstr ""
 #: modules/access/dvb/access.c:160
 #, fuzzy
 msgid "HTTP ACL"
-msgstr "HTTP SSL"
+msgstr "HTTP"
 
 #: modules/access/dvb/access.c:162
 msgid ""
@@ -4693,12 +4663,11 @@ msgstr "HTTP SSL"
 #: modules/control/http/http.c:49
 #, fuzzy
 msgid "Private key file"
-msgstr "პრივატი"
+msgstr "პირადი"
 
 #: modules/access/dvb/access.c:171 modules/control/http/http.c:50
-#, fuzzy
 msgid "HTTP interface x509 PEM private key file"
-msgstr "HTTP"
+msgstr ""
 
 #: modules/access/dvb/access.c:173 modules/access_output/http.c:76
 #: modules/control/http/http.c:51
@@ -4706,9 +4675,8 @@ msgid "Root CA file"
 msgstr ""
 
 #: modules/access/dvb/access.c:174 modules/control/http/http.c:52
-#, fuzzy
 msgid "HTTP interface x509 PEM trusted root CA certificates file"
-msgstr "HTTP"
+msgstr ""
 
 #: modules/access/dvb/access.c:177 modules/access_output/http.c:81
 #: modules/control/http/http.c:54
@@ -4716,9 +4684,8 @@ msgid "CRL file"
 msgstr ""
 
 #: modules/access/dvb/access.c:178
-#, fuzzy
 msgid "HTTP interface Certificates Revocation List file"
-msgstr "HTTP სერთიფიკატები სია"
+msgstr ""
 
 #: modules/access/dvb/access.c:181
 msgid "DVB"
@@ -4729,9 +4696,8 @@ msgid "DVB input with v4l2 support"
 msgstr ""
 
 #: modules/access/dvb/access.c:234
-#, fuzzy
 msgid "HTTP server"
-msgstr "RTSP VoD სერვერი"
+msgstr "HTTP სერვერი"
 
 #: modules/access/dv.c:70 modules/access/file.c:82
 msgid ""
@@ -5018,9 +4984,8 @@ msgid "HTTP input"
 msgstr ""
 
 #: modules/access/http.c:74
-#, fuzzy
 msgid "HTTP(S)"
-msgstr "HTTP"
+msgstr "HTTP(S)"
 
 #: modules/access/mms/mms.c:48
 msgid ""
@@ -5224,23 +5189,20 @@ msgid "PVR video device"
 msgstr ""
 
 #: modules/access/pvr/pvr.c:54
-#, fuzzy
 msgid "Radio device"
-msgstr "აუდიო მოწყობილობა"
+msgstr "რადიო მოწყობილობა"
 
 #: modules/access/pvr/pvr.c:55
-#, fuzzy
 msgid "PVR radio device"
-msgstr "ვიდეო მოწყობილობა"
+msgstr "PVR რადიო მოწყობილობა"
 
 #: modules/access/pvr/pvr.c:57 modules/access/v4l/v4l.c:96
 msgid "Norm"
 msgstr "ნორმა"
 
 #: modules/access/pvr/pvr.c:58 modules/access/v4l/v4l.c:98
-#, fuzzy
 msgid "Defines the norm of the stream (Automatic, SECAM, PAL, or NTSC)"
-msgstr "ავტომატური SECAM PAL ან NTSC"
+msgstr ""
 
 #: modules/access/pvr/pvr.c:61 modules/access/v4l/v4l.c:102
 msgid "Width"
@@ -5271,9 +5233,8 @@ msgid "Framerate to capture, if applicable (-1 for autodetect)"
 msgstr ""
 
 #: modules/access/pvr/pvr.c:76
-#, fuzzy
 msgid "Key interval"
-msgstr "გასაღები"
+msgstr ""
 
 #: modules/access/pvr/pvr.c:77
 msgid "Interval between keyframes (-1 for autodetect)"
@@ -5509,7 +5470,7 @@ msgstr "აუდიო არხი"
 #: modules/access/v4l/v4l.c:101
 #, fuzzy
 msgid "Audio Channel to use, if there are several audio input"
-msgstr "აუდიო არხი -სკენ"
+msgstr "აუდიო არხი -სკენ აუდიო"
 
 #: modules/access/v4l/v4l.c:108 modules/gui/macosx/extended.m:107
 #: modules/gui/wxwidgets/extrapanel.cpp:236
@@ -5639,9 +5600,8 @@ msgid "Segment"
 msgstr ""
 
 #: modules/access/vcdx/access.c:533
-#, fuzzy
 msgid "LID"
-msgstr "ID"
+msgstr "LID"
 
 #: modules/access/vcdx/info.c:90
 msgid "VCD Format"
@@ -5743,7 +5703,7 @@ msgstr "ვიდეო VCD"
 #: modules/access/vcdx/vcd.c:97
 #, fuzzy
 msgid "vcdx://[device-or-file][@{P,S,T}num]"
-msgstr "ან S"
+msgstr "S"
 
 #: modules/access/vcdx/vcd.c:111 modules/access/vcdx/vcd.c:112
 msgid "Number of CD blocks to get in a single read."
@@ -5774,14 +5734,14 @@ msgstr ""
 #: modules/access/vcdx/vcd.c:129
 #, fuzzy
 msgid "Show extended VCD info?"
-msgstr "ჩვენება VCD?"
+msgstr "VCD?"
 
 #: modules/access/vcdx/vcd.c:130
 #, fuzzy
 msgid ""
 "Show the maximum amount of information under Stream and Media Info. Shows "
 "for example playback control navigation."
-msgstr "ჩვენება და ინფორმაცია."
+msgstr "სტრიმი და ინფორმაცია."
 
 #: modules/access/vcdx/vcd.c:137
 msgid "Format to use in the playlist's \"author\" field."
@@ -5830,7 +5790,7 @@ msgstr ""
 #: modules/audio_filter/channel_mixer/headphone.c:66
 #, fuzzy
 msgid "No decoding of Dolby Surround"
-msgstr "Dolby Surround"
+msgstr "არა"
 
 #: modules/audio_filter/channel_mixer/headphone.c:68
 msgid ""
@@ -5974,7 +5934,7 @@ msgstr ""
 #: modules/audio_filter/equalizer.c:59
 #, fuzzy
 msgid "Filter twice the audio"
-msgstr "ფილტრი"
+msgstr "ფილტრი აუდიო"
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Global gain"
@@ -6287,7 +6247,7 @@ msgstr ""
 #: modules/audio_output/jack.c:66
 #, fuzzy
 msgid "JACK audio output"
-msgstr "ALSA აუდიო გასავალი"
+msgstr "აუდიო"
 
 #: modules/audio_output/oss.c:101
 msgid "Try to work around buggy OSS drivers"
@@ -6343,7 +6303,7 @@ msgstr ""
 #: modules/codec/araw.c:52
 #, fuzzy
 msgid "Raw audio encoder"
-msgstr "დაუმუშავებელი"
+msgstr "დაუმუშავებელი აუდიო"
 
 #: modules/codec/cinepak.c:38
 msgid "Cinepak video decoder"
@@ -6483,7 +6443,7 @@ msgstr "ფონი"
 #: modules/codec/fake.c:58
 #, fuzzy
 msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
-msgstr "ნაგულისხმები პიქსელი."
+msgstr "ნაგულისხმევი პიქსელი."
 
 #: modules/codec/fake.c:59 modules/stream_out/transcode.c:64
 #, fuzzy
@@ -6523,9 +6483,8 @@ msgid "Non-key"
 msgstr "არა"
 
 #: modules/codec/ffmpeg/ffmpeg.c:75
-#, fuzzy
 msgid "All"
-msgstr "Alt"
+msgstr "ყველა"
 
 #: modules/codec/ffmpeg/ffmpeg.c:78
 msgid "rd"
@@ -7063,7 +7022,7 @@ msgstr ""
 
 #: modules/codec/theora.c:99
 msgid "Theora video decoder"
-msgstr ""
+msgstr "Theora ვიდეო დეკოდერი"
 
 #: modules/codec/theora.c:105
 msgid "Theora video packetizer"
@@ -7071,11 +7030,11 @@ msgstr ""
 
 #: modules/codec/theora.c:111
 msgid "Theora video encoder"
-msgstr ""
+msgstr "Theora ვიდეო ენკოდერი"
 
 #: modules/codec/theora.c:512
 msgid "Theora comment"
-msgstr ""
+msgstr "Theora კომენტარი"
 
 #: modules/codec/twolame.c:52
 msgid ""
@@ -7084,14 +7043,13 @@ msgid ""
 msgstr ""
 
 #: modules/codec/twolame.c:55
-#, fuzzy
 msgid "Stereo mode"
 msgstr "სტერეო მოდუსი"
 
 #: modules/codec/twolame.c:56
 #, fuzzy
 msgid "Select how stereo streams will be handled"
-msgstr "-სკენ."
+msgstr "სტერეო"
 
 #: modules/codec/twolame.c:57
 msgid "VBR mode"
@@ -7110,9 +7068,8 @@ msgid "Integer from -1 (no model) to 4."
 msgstr ""
 
 #: modules/codec/twolame.c:66
-#, fuzzy
 msgid "Dual mono"
-msgstr "მონო"
+msgstr "ორმაგი მონო"
 
 #: modules/codec/twolame.c:66
 #, fuzzy
@@ -7153,7 +7110,7 @@ msgstr ""
 
 #: modules/codec/vorbis.c:173
 msgid "Vorbis audio decoder"
-msgstr ""
+msgstr "Vorbis აუდიო დეკოდერი"
 
 #: modules/codec/vorbis.c:184
 msgid "Vorbis audio packetizer"
@@ -7161,11 +7118,11 @@ msgstr ""
 
 #: modules/codec/vorbis.c:191
 msgid "Vorbis audio encoder"
-msgstr ""
+msgstr "Vorbis აუდიო ენკოდერი"
 
 #: modules/codec/vorbis.c:618
 msgid "Vorbis comment"
-msgstr ""
+msgstr "Vorbis კომენტარი"
 
 #: modules/codec/x264.c:42
 msgid "Quantizer parameter"
@@ -7252,7 +7209,7 @@ msgstr ""
 #: modules/codec/x264.c:77
 #, fuzzy
 msgid "Sets the initial buffer occupancy as a fraction of the buffer size."
-msgstr "სიდიდე."
+msgstr "a სიდიდე."
 
 #: modules/codec/x264.c:80
 #, fuzzy
@@ -7439,9 +7396,8 @@ msgid "umh"
 msgstr ""
 
 #: modules/codec/x264.c:169
-#, fuzzy
 msgid "esa"
-msgstr "დიახ"
+msgstr ""
 
 #: modules/codec/x264.c:175
 msgid "all"
@@ -7478,7 +7434,7 @@ msgstr ""
 #: modules/control/gestures.c:79
 #, fuzzy
 msgid "Amount of movement required for a mouse gesture to be recorded."
-msgstr "-სკენ."
+msgstr "a -სკენ."
 
 #: modules/control/gestures.c:82
 msgid "Trigger button"
@@ -7509,12 +7465,12 @@ msgstr "დასაკვრელი სია 1"
 #: modules/control/hotkeys.c:85
 #, fuzzy
 msgid "Playlist bookmark 2"
-msgstr "დასაკვრელი სია"
+msgstr "დასაკვრელი სია 2"
 
 #: modules/control/hotkeys.c:86
 #, fuzzy
 msgid "Playlist bookmark 3"
-msgstr "დასაკვრელი სია"
+msgstr "დასაკვრელი სია 3"
 
 #: modules/control/hotkeys.c:87
 #, fuzzy
@@ -7534,7 +7490,7 @@ msgstr "დასაკვრელი სია"
 #: modules/control/hotkeys.c:90
 #, fuzzy
 msgid "Playlist bookmark 7"
-msgstr "დასაკვრელი სია"
+msgstr "დასაკვრელი სია 7"
 
 #: modules/control/hotkeys.c:91
 #, fuzzy
@@ -7613,7 +7569,7 @@ msgstr ""
 #: modules/control/http/http.c:41
 #, fuzzy
 msgid "Charset declared in Content-Type header (default UTF-8)."
-msgstr "ტიპი."
+msgstr "ტიპი ნაგულისხმევი."
 
 #: modules/control/http/http.c:42
 msgid "Handlers"
@@ -7704,9 +7660,8 @@ msgid "This allows you to change the display name of the Service."
 msgstr "-სკენ სერვისი."
 
 #: modules/control/ntservice.c:48
-#, fuzzy
 msgid "Configuration options"
-msgstr "კონფიგურაცია"
+msgstr "კონფიგურაციის ოფციები"
 
 #: modules/control/ntservice.c:50
 msgid ""
@@ -7742,7 +7697,7 @@ msgstr "ჩვენება"
 #, fuzzy
 msgid ""
 "Show the current position in seconds within the stream from time to time."
-msgstr "ჩვენება წამი -სკენ."
+msgstr "წამი -სკენ."
 
 #: modules/control/rc.c:155
 msgid "Fake TTY"
@@ -7751,21 +7706,19 @@ msgstr ""
 #: modules/control/rc.c:156
 #, fuzzy
 msgid "Force the rc module to use stdin as if it was a TTY."
-msgstr "ძალდატანება -სკენ."
+msgstr "ძალდატანება -სკენ a."
 
 #: modules/control/rc.c:158
 msgid "UNIX socket command input"
 msgstr ""
 
 #: modules/control/rc.c:159
-#, fuzzy
 msgid "Accept commands over a Unix socket rather than stdin."
-msgstr "მიიღე Unix."
+msgstr ""
 
 #: modules/control/rc.c:162
-#, fuzzy
 msgid "TCP command input"
-msgstr "TCP"
+msgstr ""
 
 #: modules/control/rc.c:163
 msgid ""
@@ -7774,9 +7727,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/rc.c:167 modules/misc/dummy/dummy.c:49
-#, fuzzy
 msgid "Do not open a DOS command box interface"
-msgstr "DOS"
+msgstr ""
 
 #: modules/control/rc.c:169
 msgid ""
@@ -7953,18 +7905,16 @@ msgid "| marq-position #. . .  .relative position control"
 msgstr ""
 
 #: modules/control/rc.c:915
-#, fuzzy
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
-msgstr "RGB"
+msgstr ""
 
 #: modules/control/rc.c:916
 msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr ""
 
 #: modules/control/rc.c:917
-#, fuzzy
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
-msgstr "მწ. შორის"
+msgstr ""
 
 #: modules/control/rc.c:918
 #, fuzzy
@@ -8057,12 +8007,12 @@ msgstr ""
 #: modules/control/rc.c:942
 #, fuzzy
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
-msgstr "auto სტაციონარული"
+msgstr "auto"
 
 #: modules/control/rc.c:943
 #, fuzzy
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
-msgstr "ხაზი ხაზი"
+msgstr "ხაზი რიცხვი ხაზი"
 
 #: modules/control/rc.c:944
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
@@ -8123,32 +8073,31 @@ msgstr "ინტერფეისი"
 #: modules/control/telnet.c:79
 #, fuzzy
 msgid "Telnet Interface host"
-msgstr "ტელნეტი ინტერფეისი"
+msgstr "Telnet ინტერფეისი"
 
 #: modules/control/telnet.c:80
 #, fuzzy
 msgid "Default to listen on all network interfaces"
-msgstr "ნაგულისხმები -სკენ"
+msgstr "ნაგულისხმევი -სკენ"
 
 #: modules/control/telnet.c:81
-#, fuzzy
 msgid "Telnet Interface port"
-msgstr "ტელნეტი ინტერფეისი"
+msgstr "Telnet ინტერფეისის პორტი"
 
 #: modules/control/telnet.c:82
 #, fuzzy
 msgid "Default to 4212"
-msgstr "ნაგულისხმები -სკენ"
+msgstr "ნაგულისხმევი -სკენ"
 
 #: modules/control/telnet.c:84
 #, fuzzy
 msgid "Telnet Interface password"
-msgstr "ტელნეტი ინტერფეისი"
+msgstr "Telnet ინტერფეისი"
 
 #: modules/control/telnet.c:85
 #, fuzzy
 msgid "Default to admin"
-msgstr "ნაგულისხმები -სკენ"
+msgstr "ნაგულისხმევი -სკენ"
 
 #: modules/control/telnet.c:98
 msgid "VLM remote control interface"
@@ -8187,7 +8136,7 @@ msgstr "ძალდატანება"
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)"
-msgstr "AVI."
+msgstr "a AVI AVI"
 
 #: modules/demux/avi/avi.c:55
 #, fuzzy
@@ -8195,9 +8144,8 @@ msgid "AVI demuxer"
 msgstr "AVI"
 
 #: modules/demux/avi/avi.c:547
-#, fuzzy
 msgid "AVI Index"
-msgstr "AVI"
+msgstr "AVI ინდექსი"
 
 #: modules/demux/avi/avi.c:548
 msgid ""
@@ -8221,7 +8169,7 @@ msgstr "ფაილის სახელი"
 #: modules/demux/demuxdump.c:39
 #, fuzzy
 msgid "Specify a file name to which the raw stream will be dumped."
-msgstr "-სკენ."
+msgstr "a -სკენ."
 
 #: modules/demux/demuxdump.c:40 modules/demux/ts.c:113
 msgid "Append"
@@ -8270,7 +8218,7 @@ msgstr "RTSP RTP და"
 #: modules/demux/livedotcom.cpp:87 modules/demux/livedotcom.cpp:88
 #, fuzzy
 msgid "Use RTP over RTSP (TCP)"
-msgstr "გამოყენება RTP RTSP TCP"
+msgstr "RTP RTSP TCP"
 
 #: modules/demux/livedotcom.cpp:90
 #, fuzzy
@@ -8362,7 +8310,7 @@ msgstr "ფიქტიური"
 #: modules/demux/mkv.cpp:418
 #, fuzzy
 msgid "Read and discard unknown EBML elements (not good for broken files)."
-msgstr "წაკითხვა და უცნობი."
+msgstr "წაკითხული და უცნობი."
 
 #: modules/demux/mkv.cpp:3153
 msgid "---  DVD Menu"
@@ -8560,7 +8508,7 @@ msgstr "სია"
 #: modules/demux/playlist/podcast.c:290
 #, fuzzy
 msgid "Podcast Link"
-msgstr "პოზიცია"
+msgstr "ლინკი"
 
 #: modules/demux/playlist/podcast.c:299
 #, fuzzy
@@ -8570,7 +8518,7 @@ msgstr "საავტორო უფლებები"
 #: modules/demux/playlist/podcast.c:308
 #, fuzzy
 msgid "Podcast Category"
-msgstr "CDDB კატეგორია"
+msgstr "კატეგორია"
 
 #: modules/demux/playlist/podcast.c:317 modules/demux/playlist/podcast.c:405
 msgid "Podcast Keywords"
@@ -8589,7 +8537,7 @@ msgstr "ჯამური"
 #: modules/demux/playlist/podcast.c:373
 #, fuzzy
 msgid "Podcast Publication Date"
-msgstr "მოდულაციის ტიპი"
+msgstr "თარიღი"
 
 #: modules/demux/playlist/podcast.c:381
 #, fuzzy
@@ -8727,7 +8675,7 @@ msgstr "სიდიდე"
 msgid ""
 "Tweak the buffer size for reading and writing an integer number of packets."
 "Specify the size of the buffer here and not the number of packets."
-msgstr "სიდიდე და სიდიდე და."
+msgstr "სიდიდე და რიცხვი სიდიდე და რიცხვი."
 
 #: modules/demux/ts.c:124
 msgid "MPEG Transport Stream demuxer"
@@ -9052,7 +9000,7 @@ msgstr ""
 #: modules/gui/beos/BeOS.cpp:52
 #, fuzzy
 msgid "Use DVD Menus"
-msgstr "გამოყენება DVD"
+msgstr "DVD"
 
 #: modules/gui/beos/BeOS.cpp:54
 msgid "BeOS standard API interface"
@@ -9132,14 +9080,12 @@ msgid "Next Title"
 msgstr "შემდეგი სათაური"
 
 #: modules/gui/beos/InterfaceWindow.cpp:295
-#, fuzzy
 msgid "Go to Title"
-msgstr "გადასვლა -სკენ სათაური"
+msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:299
-#, fuzzy
 msgid "Go to Chapter"
-msgstr "გადასვლა -სკენ თავი"
+msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:302
 msgid "Speed"
@@ -9177,7 +9123,7 @@ msgstr "გახსენი ფაილები"
 #: modules/gui/beos/InterfaceWindow.cpp:410
 #, fuzzy
 msgid "VLC media player: Open Subtitle File"
-msgstr "გახსენი ფაილი"
+msgstr "გახსენი ტიტრები ფაილი"
 
 #: modules/gui/beos/MediaControlView.cpp:68
 msgid "Drop files to play"
@@ -9207,24 +9153,23 @@ msgid "Select All"
 msgstr "ყველას მონიშვნა"
 
 #: modules/gui/beos/PlayListWindow.cpp:106
-#, fuzzy
 msgid "Select None"
-msgstr "არა"
+msgstr ""
 
 #: modules/gui/beos/PlayListWindow.cpp:111
 #, fuzzy
 msgid "Sort Reverse"
-msgstr "დახარისხება"
+msgstr "სორტირება"
 
 #: modules/gui/beos/PlayListWindow.cpp:114
 #, fuzzy
 msgid "Sort by Name"
-msgstr "დახარისხება სახელი"
+msgstr "სორტირება სახელი"
 
 #: modules/gui/beos/PlayListWindow.cpp:118
 #, fuzzy
 msgid "Sort by Path"
-msgstr "დახარისხება გეზი"
+msgstr "სორტირება გეზი"
 
 #: modules/gui/beos/PlayListWindow.cpp:122
 msgid "Randomize"
@@ -9239,7 +9184,7 @@ msgstr "წაშლა"
 #: modules/gui/beos/PlayListWindow.cpp:130
 #, fuzzy
 msgid "Remove All"
-msgstr "წაშალე ყველა"
+msgstr "წაშლა ყველა"
 
 #: modules/gui/beos/PlayListWindow.cpp:135
 #, fuzzy
@@ -9280,7 +9225,7 @@ msgstr "ნაგულისხმები"
 #: modules/gui/beos/VideoOutput.cpp:1044
 #, fuzzy
 msgid "Show Interface"
-msgstr "ჩვენება ინტერფეისი"
+msgstr "ინტერფეისი"
 
 #: modules/gui/beos/VideoOutput.cpp:1048
 msgid "50%"
@@ -9384,7 +9329,7 @@ msgstr "არა"
 #, fuzzy
 msgid ""
 "No input found. The stream must be playing or paused for bookmarks to work."
-msgstr "არა ან -სკენ."
+msgstr "არა -სკენ."
 
 #: modules/gui/macosx/bookmarks.m:241
 #, fuzzy
@@ -9392,11 +9337,10 @@ msgid "Input has changed"
 msgstr "შესავალი"
 
 #: modules/gui/macosx/bookmarks.m:242
-#, fuzzy
 msgid ""
 "Input has changed, unable to save bookmark. Use \"Pause\" while editing "
 "bookmarks to keep the same input."
-msgstr "შესავალი -სკენ გამოყენება -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/wizard.m:1063
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:348
@@ -9415,9 +9359,8 @@ msgid "No input found"
 msgstr "არა"
 
 #: modules/gui/macosx/bookmarks.m:302
-#, fuzzy
 msgid "The stream must be playing or paused for bookmarks to work."
-msgstr "ან -სკენ"
+msgstr ""
 
 #: modules/gui/macosx/controls.m:127
 #, fuzzy
@@ -9427,7 +9370,7 @@ msgstr "შემთხვევითი ჩართ."
 #: modules/gui/macosx/controls.m:131
 #, fuzzy
 msgid "Random Off"
-msgstr "შემთხვევითი გათიშული"
+msgstr "შემთხვევითი გათიშ."
 
 #: modules/gui/macosx/controls.m:159 modules/gui/macosx/controls.m:604
 #: modules/gui/macosx/intf.m:523 modules/gui/macosx/playlist.m:518
@@ -9441,7 +9384,7 @@ msgstr "ერთი"
 #: modules/gui/macosx/playlist.m:1211
 #, fuzzy
 msgid "Repeat Off"
-msgstr "გათიშული"
+msgstr "გათიშ."
 
 #: modules/gui/macosx/controls.m:191 modules/gui/macosx/controls.m:611
 #: modules/gui/macosx/intf.m:524 modules/gui/macosx/playlist.m:519
@@ -9502,7 +9445,7 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:43 modules/gui/macosx/intf.m:475
 #, fuzzy
 msgid "Fast Forward"
-msgstr "სწრაფად წინ"
+msgstr "სწრაფად"
 
 #: modules/gui/macosx/embeddedwindow.m:45
 #: modules/gui/macosx/embeddedwindow.m:72 modules/gui/macosx/intf.m:473
@@ -9708,7 +9651,7 @@ msgstr "პარამეტრები..."
 #: modules/gui/macosx/intf.m:493
 #, fuzzy
 msgid "Services"
-msgstr "სერვისი"
+msgstr "სერვისები"
 
 #: modules/gui/macosx/intf.m:494
 #, fuzzy
@@ -9723,7 +9666,7 @@ msgstr "დამალვა"
 #: modules/gui/macosx/intf.m:496
 #, fuzzy
 msgid "Show All"
-msgstr "ჩვენება ყველა"
+msgstr "ყველა"
 
 #: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1452
 #, fuzzy
@@ -9731,38 +9674,33 @@ msgid "Quit VLC"
 msgstr "გამოსვლა"
 
 #: modules/gui/macosx/intf.m:499
-#, fuzzy
 msgid "1:File"
-msgstr "ფაილი"
+msgstr "1:ფაილი"
 
 #: modules/gui/macosx/intf.m:500
-#, fuzzy
 msgid "Open File..."
 msgstr "ფაილის გახსნა..."
 
 #: modules/gui/macosx/intf.m:501
-#, fuzzy
 msgid "Quick Open File..."
-msgstr "გახსენი ფაილი."
+msgstr "სწრაფი ფაილის გახსნა..."
 
 #: modules/gui/macosx/intf.m:502
 msgid "Open Disc..."
 msgstr "გახსენი დისკი..."
 
 #: modules/gui/macosx/intf.m:503
-#, fuzzy
 msgid "Open Network..."
-msgstr "გახსენი ქსელი."
+msgstr "გახსენი ქსელიდან..."
 
 #: modules/gui/macosx/intf.m:504
 #, fuzzy
 msgid "Open Recent"
-msgstr "ბოლო გახსნილები"
+msgstr "გახსენი"
 
 #: modules/gui/macosx/intf.m:505 modules/gui/macosx/intf.m:1864
-#, fuzzy
 msgid "Clear Menu"
-msgstr "გაწმენდა მენიუ"
+msgstr "გაწმინდე მენიუ"
 
 #: modules/gui/macosx/intf.m:506
 #, fuzzy
@@ -9823,9 +9761,8 @@ msgid "Info"
 msgstr "ინფორმაცია"
 
 #: modules/gui/macosx/intf.m:578
-#, fuzzy
 msgid "Bring All to Front"
-msgstr "ყველა -სკენ წინა"
+msgstr ""
 
 #: modules/gui/macosx/intf.m:580
 msgid "Help"
@@ -9838,7 +9775,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:582
 #, fuzzy
 msgid "Online Documentation"
-msgstr "ხაზზე"
+msgstr "ხაზზე დოკუმენტაცია"
 
 #: modules/gui/macosx/intf.m:583
 msgid "Report a Bug"
@@ -9893,9 +9830,8 @@ msgid "Volume: %d%%"
 msgstr "ხმის რეგულაცია"
 
 #: modules/gui/macosx/intf.m:1731
-#, fuzzy
 msgid "No CrashLog found"
-msgstr "არა"
+msgstr ""
 
 #: modules/gui/macosx/intf.m:1731
 msgid "You haven't experienced any heavy crashes yet."
@@ -9921,14 +9857,14 @@ msgstr "ვიდეო მოწყობილობა"
 msgid ""
 "Choose a number corresponding to a screen in you video device selection menu "
 "and this screen will be used by default as the screen for 'fullscreen'."
-msgstr "არჩევა -სკენ და."
+msgstr "არჩევა a რიცხვი -სკენ a და ნაგულისხმევი."
 
 #: modules/gui/macosx/macosx.m:61
 #, fuzzy
 msgid ""
 "Set the transparency of the video output. 1 is non-transparent (default) 0 "
 "is fully transparent."
-msgstr "გამჭირვალობა."
+msgstr "გამჭირვალობა ნაგულისხმევი."
 
 #: modules/gui/macosx/macosx.m:64
 msgid "Stretch video to fill window"
@@ -9945,23 +9881,20 @@ msgid "Fill fullscreen"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:70
-#, fuzzy
 msgid ""
 "In fullscreen mode, crop the picture if necessary in order to fill the "
 "screen without black borders (OpenGL only)."
-msgstr "-სკენ OpenGL."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:74
-#, fuzzy
 msgid "Use as Desktop Background"
-msgstr "გამოყენება სამუშაო მაგიდა ფონი"
+msgstr "გამოიყენე სამუშაო მაგიდის ფონად"
 
 #: modules/gui/macosx/macosx.m:75
-#, fuzzy
 msgid ""
 "Use the video as the Desktop Background of the Finder. Desktop icons cannot "
 "be interacted with in this mode."
-msgstr "გამოყენება სამუშაო მაგიდა ფონი სამუშაო მაგიდა."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:79
 msgid "Mac OS X interface"
@@ -10002,9 +9935,8 @@ msgid "Device name"
 msgstr "მოწყობილობის სახელი"
 
 #: modules/gui/macosx/open.m:171
-#, fuzzy
 msgid "Use DVD menus"
-msgstr "გამოყენება DVD"
+msgstr "გამოიყენე DVD მენიუები"
 
 #: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:478
 msgid "VIDEO_TS folder"
@@ -10019,7 +9951,6 @@ msgstr "DVD"
 #: modules/gui/macosx/output.m:147 modules/gui/wxwidgets/dialogs/open.cpp:827
 #: modules/gui/wxwidgets/dialogs/open.cpp:854
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:532 modules/stream_out/rtp.c:70
-#, fuzzy
 msgid "Port"
 msgstr "პორტი"
 
@@ -10037,20 +9968,17 @@ msgstr "UDP RTP მრავალმისამართიანი"
 
 #: modules/gui/macosx/open.m:185 modules/gui/macosx/open.m:656
 #: modules/gui/macosx/open.m:717
-#, fuzzy
 msgid "HTTP/FTP/MMS/RTSP"
-msgstr "HTTP FTP MMS RTSP"
+msgstr "HTTP/FTP/MMS/RTSP"
 
 #: modules/gui/macosx/open.m:186 modules/gui/wxwidgets/dialogs/open.cpp:820
 #: modules/services_discovery/sap.c:109
-#, fuzzy
 msgid "Allow timeshifting"
-msgstr "დაუშვი"
+msgstr ""
 
 #: modules/gui/macosx/open.m:240
-#, fuzzy
 msgid "Load subtitles file:"
-msgstr "ჩატვირთვა:"
+msgstr "სუბტიტრების ჩატვირთვა:"
 
 #: modules/gui/macosx/open.m:241 modules/gui/macosx/output.m:137
 #: modules/gui/wxwidgets/dialogs/open.cpp:436
@@ -10071,9 +9999,8 @@ msgstr ""
 
 #: modules/gui/macosx/open.m:248
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:97
-#, fuzzy
 msgid "Subtitles encoding"
-msgstr "ტიტრები"
+msgstr "ტიტრების კოდირება"
 
 #: modules/gui/macosx/open.m:250 modules/misc/freetype.c:96
 #: modules/misc/win32text.c:67
@@ -10081,25 +10008,22 @@ msgid "Font size"
 msgstr "შრიფტის სიდიდე"
 
 #: modules/gui/macosx/open.m:255
-#, fuzzy
 msgid "Font Properties"
-msgstr "შრიფტი პარამეტრები"
+msgstr "შრიფტის პარამეტრები"
 
 #: modules/gui/macosx/open.m:256
-#, fuzzy
 msgid "Subtitle File"
-msgstr "ფაილი"
+msgstr "ტიტრების ფაილი"
 
 #: modules/gui/macosx/open.m:530 modules/gui/macosx/open.m:582
 #: modules/gui/macosx/open.m:590 modules/gui/macosx/open.m:598
-#, fuzzy, objc-format
+#, objc-format
 msgid "No %@s found"
-msgstr "არა"
+msgstr ""
 
 #: modules/gui/macosx/open.m:633
-#, fuzzy
 msgid "Open VIDEO_TS Directory"
-msgstr "გახსენი TS დირექტორია"
+msgstr "გახსენი VIDEO_TS დირექტორია"
 
 #: modules/gui/macosx/output.m:136
 #, fuzzy
@@ -10171,21 +10095,18 @@ msgid "Export SDP as file"
 msgstr "ექსპორტი"
 
 #: modules/gui/macosx/output.m:186
-#, fuzzy
 msgid "Channel Name"
 msgstr "არხის სახელი"
 
 #: modules/gui/macosx/output.m:187
-#, fuzzy
 msgid "SDP URL"
-msgstr "URL"
+msgstr "SDP URL"
 
 #: modules/gui/macosx/output.m:525
 msgid "Save File"
 msgstr "ფაილის შენახვა"
 
 #: modules/gui/macosx/playlistinfo.m:53 modules/gui/macosx/playlist.m:504
-#, fuzzy
 msgid "Properties"
 msgstr "პარამეტრები"
 
@@ -10220,17 +10141,16 @@ msgstr ""
 #: modules/gui/macosx/playlist.m:506
 #, fuzzy
 msgid "Sort Node by Name"
-msgstr "დახარისხება სახელი"
+msgstr "სორტირება სახელი"
 
 #: modules/gui/macosx/playlist.m:507
 #, fuzzy
 msgid "Sort Node by Author"
-msgstr "დახარისხება ავტორი"
+msgstr "სორტირება ავტორი"
 
 #: modules/gui/macosx/playlist.m:510 modules/gui/macosx/playlist.m:1518
-#, fuzzy
 msgid "No items in the playlist"
-msgstr "არა სია"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:514
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:315
@@ -10245,21 +10165,20 @@ msgstr "ძებნა დასაკვრელი სია"
 #: modules/gui/macosx/playlist.m:517
 #, fuzzy
 msgid "Standard Play"
-msgstr "სტანდარტული დაკვრა"
+msgstr "დაკვრა"
 
 #: modules/gui/macosx/playlist.m:765
 msgid "Save Playlist"
 msgstr "შეინახე სია"
 
 #: modules/gui/macosx/playlist.m:1512
-#, fuzzy, c-format
+#, c-format
 msgid "%i items in the playlist"
-msgstr "სია"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:1522
-#, fuzzy
 msgid "1 item in the playlist"
-msgstr "არა სია"
+msgstr ""
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:210
@@ -10274,7 +10193,6 @@ msgid "Reset Preferences"
 msgstr "განულება პარამეტრები"
 
 #: modules/gui/macosx/prefs.m:143
-#, fuzzy
 msgid "Continue"
 msgstr "გაგრძელება"
 
@@ -10295,7 +10213,6 @@ msgid "Select a directory"
 msgstr ""
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#, fuzzy
 msgid "Select a file"
 msgstr "ფაილის არჩევა"
 
@@ -10306,7 +10223,7 @@ msgstr ""
 #: modules/gui/macosx/sfilters.m:71
 #, fuzzy
 msgid "Subpicture Filters"
-msgstr "ფაილი"
+msgstr "ფილტრები"
 
 #: modules/gui/macosx/sfilters.m:72
 msgid "Logo"
@@ -10318,26 +10235,24 @@ msgid "Marquee"
 msgstr ""
 
 #: modules/gui/macosx/sfilters.m:75
-#, fuzzy
 msgid "Save settings"
-msgstr "ვიდეო პარამეტრები"
+msgstr "პარამეტრების შენახვა"
 
 #: modules/gui/macosx/sfilters.m:77 modules/gui/macosx/sfilters.m:84
 #: modules/gui/macosx/sfilters.m:96
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:402
 #, fuzzy
 msgid "Enabled"
-msgstr "ჩართე აუდიო"
+msgstr "აქტიური"
 
 #: modules/gui/macosx/sfilters.m:78
-#, fuzzy
 msgid "Image"
 msgstr "სურათი"
 
 #: modules/gui/macosx/sfilters.m:85
 #, fuzzy
 msgid "Timestamp"
-msgstr "დრო"
+msgstr "დროის შტამპი"
 
 #: modules/gui/macosx/sfilters.m:87 modules/gui/macosx/sfilters.m:108
 #: modules/gui/pda/pda.c:232
@@ -10347,17 +10262,16 @@ msgstr "ზომა"
 #: modules/gui/macosx/sfilters.m:95 modules/gui/macosx/sfilters.m:110
 #, fuzzy
 msgid "(in pixels)"
-msgstr "სიგანე პიქსელი"
+msgstr "პიქსელი"
 
 #: modules/gui/macosx/sfilters.m:103
 #, fuzzy
 msgid "Timeout"
-msgstr "დრო"
+msgstr "დაყოვნების დრო"
 
 #: modules/gui/macosx/sfilters.m:105
-#, fuzzy
 msgid "ms"
-msgstr "mms"
+msgstr ""
 
 #: modules/gui/macosx/sfilters.m:136 modules/misc/freetype.c:108
 #: modules/misc/win32text.c:79 modules/video_filter/marq.c:52
@@ -10456,173 +10370,143 @@ msgid "Aqua"
 msgstr ""
 
 #: modules/gui/macosx/sfilters.m:191
-#, fuzzy
 msgid "Center-Center"
-msgstr "ცენტრში"
+msgstr "ცენტრში-ცენტრში"
 
 #: modules/gui/macosx/sfilters.m:192
-#, fuzzy
 msgid "Left-Center"
-msgstr "ცენტრში"
+msgstr "მარცხნივ-ცენტრში"
 
 #: modules/gui/macosx/sfilters.m:193
-#, fuzzy
 msgid "Right-Center"
-msgstr "ცენტრში"
+msgstr "მარჯვნივ-ცენტრში"
 
 #: modules/gui/macosx/sfilters.m:194
-#, fuzzy
 msgid "Center-Top"
-msgstr "ცენტრში"
+msgstr "ცენტრში-ზემოთ"
 
 #: modules/gui/macosx/sfilters.m:195
-#, fuzzy
 msgid "Left-Top"
-msgstr "მარცხენა"
+msgstr "მარცხნივ ზემოთ"
 
 #: modules/gui/macosx/sfilters.m:196
-#, fuzzy
 msgid "Right-Top"
-msgstr "მარჯვენა"
+msgstr "მარჯვნივ ზემოთ"
 
 #: modules/gui/macosx/sfilters.m:197
 #, fuzzy
 msgid "Center-Bottom"
-msgstr "ქვემოთ"
+msgstr "ცენტრში ქვემოთ"
 
 #: modules/gui/macosx/sfilters.m:198
-#, fuzzy
 msgid "Left-Bottom"
-msgstr "ქვემოთ"
+msgstr "მარცხნივ ქვემოთ"
 
 #: modules/gui/macosx/sfilters.m:199
-#, fuzzy
 msgid "Right-Bottom"
-msgstr "ქვემოთ"
+msgstr "მარჯვნივ ქვემოთ"
 
 #: modules/gui/macosx/wizard.m:114
-#, fuzzy
 msgid "MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-msgstr "ვიდეო PS TS MPEG1 OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:118
-#, fuzzy
 msgid "MPEG-2 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
-msgstr "ვიდეო PS TS MPEG1 OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:122
-#, fuzzy
 msgid ""
 "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MP4, OGG and "
 "RAW)"
-msgstr "ვიდეო PS TS MPEG1 ASF MP4 OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:126 modules/gui/wxwidgets/streamdata.cpp:43
-#, fuzzy
 msgid "DivX first version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "ვერსია TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:130 modules/gui/wxwidgets/streamdata.cpp:47
-#, fuzzy
 msgid "DivX second version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "წამი ვერსია TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:134 modules/gui/wxwidgets/streamdata.cpp:50
-#, fuzzy
 msgid "DivX third version (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "ვერსია TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:138 modules/gui/wxwidgets/streamdata.cpp:53
-#, fuzzy
 msgid ""
 "H263 is a video codec optimized for videoconference (low rates, useable with "
 "MPEG TS)"
-msgstr "H263 TS"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:142
-#, fuzzy
 msgid "H264 is a new video codec (useable with MPEG TS and MP4)"
-msgstr "TS და MP4"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:146
-#, fuzzy
 msgid "WMV (Windows Media Video) 1 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "ფანჯრები ვიდეო TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:150
-#, fuzzy
 msgid "WMV (Windows Media Video) 2 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "ფანჯრები ვიდეო TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:154 modules/gui/wxwidgets/streamdata.cpp:70
-#, fuzzy
 msgid ""
 "MJPEG consists of a series of JPEG pictures (useable with MPEG TS, MPEG1, "
 "ASF and OGG)"
-msgstr "TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:158 modules/gui/wxwidgets/streamdata.cpp:73
-#, fuzzy
 msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
-msgstr "ჩვეულებრივი TS"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:161 modules/gui/macosx/wizard.m:212
 #: modules/gui/wxwidgets/streamdata.cpp:76
 #: modules/gui/wxwidgets/streamdata.cpp:113
-#, fuzzy
 msgid "Dummy codec (do not transcode, useable with all encapsulation formats)"
-msgstr "ფიქტიური"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:180 modules/gui/wxwidgets/streamdata.cpp:84
-#, fuzzy
 msgid ""
 "The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, MPEG1, "
 "ASF, OGG and RAW)"
-msgstr "PS TS MPEG1 ASF OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:184 modules/gui/wxwidgets/streamdata.cpp:88
-#, fuzzy
 msgid ""
 "MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
-msgstr "აუდიო PS TS MPEG1 ASF OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:188 modules/gui/wxwidgets/streamdata.cpp:92
-#, fuzzy
 msgid "Audio format for MPEG4 (useable with MPEG TS and MPEG4)"
-msgstr "აუდიო MPEG4 TS და MPEG4"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:191 modules/gui/wxwidgets/streamdata.cpp:95
-#, fuzzy
 msgid ""
 "DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
-msgstr "DVD PS TS MPEG1 ASF OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:195 modules/gui/wxwidgets/streamdata.cpp:99
-#, fuzzy
 msgid "Vorbis is a free audio codec (useable with OGG)"
-msgstr "OGG"
+msgstr "Vorbis არის თავისუფალი აუდიო კოდეკი (შესაძლებელია OGG-ში გამოყენება)"
 
 #: modules/gui/macosx/wizard.m:198 modules/gui/wxwidgets/streamdata.cpp:101
-#, fuzzy
 msgid "FLAC is a lossless audio codec (useable with OGG and RAW)"
-msgstr "OGG და RAW"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:202 modules/gui/wxwidgets/streamdata.cpp:104
-#, fuzzy
 msgid "A free audio codec dedicated to compression of voice (useable with OGG)"
-msgstr "A -სკენ OGG"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:206 modules/gui/macosx/wizard.m:209
 #: modules/gui/wxwidgets/streamdata.cpp:107
 #: modules/gui/wxwidgets/streamdata.cpp:110
-#, fuzzy
 msgid "Uncompressed audio samples (useable with WAV)"
-msgstr "WAV"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:234 modules/gui/wxwidgets/streamdata.cpp:148
-#, fuzzy
 msgid "MPEG Program Stream"
-msgstr "პროგრამა"
+msgstr "MPEG პროგრამული ნაკადი(PS)"
 
 #: modules/gui/macosx/wizard.m:236 modules/gui/wxwidgets/streamdata.cpp:149
 msgid "MPEG Transport Stream"
@@ -10633,20 +10517,18 @@ msgid "MPEG 1 Format"
 msgstr "MPEG·1 ფორმატი"
 
 #: modules/gui/macosx/wizard.m:257 modules/gui/wxwidgets/streamdata.cpp:137
-#, fuzzy
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
 "you want to listen to all adresses or if you don't understand. This is "
 "generally the best thing to do. Other computers can then access the stream "
 "at http://yourip:8080 by default."
-msgstr "-სკენ -სკენ -სკენ -სკენ ან -სკენ სხვაhttp://yourip."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:261 modules/gui/wxwidgets/streamdata.cpp:134
-#, fuzzy
 msgid ""
 "Use this to stream to several computers. This method is less efficient, as "
 "the server needs to send the stream several times."
-msgstr "გამოყენება -სკენ -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:264
 msgid ""
@@ -10657,25 +10539,22 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:268
-#, fuzzy
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's softwares. "
 "Note that only a small part of the MMS protocol is supported (MMS "
 "encapsulated in HTTP)."
-msgstr "გამოყენება -სკენ -სკენ MMS შენიშვნა MMS MMS HTTP."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:273 modules/gui/macosx/wizard.m:283
 #: modules/gui/macosx/wizard.m:400 modules/gui/wxwidgets/streamdata.cpp:123
-#, fuzzy
 msgid "Enter the address of the computer to stream to."
-msgstr "-სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:274 modules/gui/macosx/wizard.m:284
 #: modules/gui/macosx/wizard.m:404 modules/gui/wxwidgets/streamdata.cpp:122
-#, fuzzy
 msgid "Use this to stream to a single computer."
-msgstr "გამოყენება -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:276 modules/gui/macosx/wizard.m:286
 msgid ""
@@ -10686,12 +10565,11 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:279 modules/gui/macosx/wizard.m:289
 #: modules/gui/wxwidgets/streamdata.cpp:126
-#, fuzzy
 msgid ""
 "Use this to stream to a dynamic group of computers on a multicast-enabled "
 "network. This is the most efficient method to stream to several computers, "
 "but it does not work over Internet."
-msgstr "გამოყენება -სკენ -სკენ ჯგუფი ჩართული -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:354
 msgid "Back"
@@ -10702,9 +10580,8 @@ msgstr "უკან"
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:81
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:84
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1400
-#, fuzzy
 msgid "Streaming/Transcoding Wizard"
-msgstr "ნაკადი"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:361 modules/gui/wxwidgets/dialogs/wizard.cpp:85
 msgid "This wizard helps you to stream, transcode or save a stream."
@@ -10730,15 +10607,13 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:374
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:100
-#, fuzzy
 msgid "Choose input"
-msgstr "არჩევა"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:375
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:101
-#, fuzzy
 msgid "Choose here your input stream."
-msgstr "არჩევა."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:377 modules/gui/macosx/wizard.m:553
 #: modules/gui/macosx/wizard.m:1515
@@ -10758,23 +10633,20 @@ msgstr "აირჩიეთ..."
 
 #: modules/gui/macosx/wizard.m:385 modules/gui/macosx/wizard.m:459
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:618
-#, fuzzy
 msgid "Partial Extract"
-msgstr "ამოღება"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:387
-#, fuzzy
 msgid ""
 "Use this to read only a part of the stream. You must be able to control the "
 "incoming stream (for example, a file or a disc, but not an UDP network "
 "stream.) Enter the starting and ending times (in seconds)."
-msgstr "გამოყენება -სკენ -სკენ ან UDP და წამი."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:391
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:629
-#, fuzzy
 msgid "From"
-msgstr "სგან"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:392
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:634
@@ -10874,9 +10746,8 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:435 modules/gui/macosx/wizard.m:461
 #: modules/gui/macosx/wizard.m:1676
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1340
-#, fuzzy
 msgid "SAP Announce"
-msgstr "SAP"
+msgstr "SAP ანონსი"
 
 #: modules/gui/macosx/wizard.m:437 modules/gui/macosx/wizard.m:446
 #: modules/gui/macosx/wizard.m:471 modules/gui/macosx/wizard.m:1693
@@ -10906,7 +10777,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:452
-#, fuzzy
 msgid "Summary"
 msgstr "ჯამური"
 
@@ -10915,9 +10785,8 @@ msgid "Encap. format"
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:457
-#, fuzzy
 msgid "Input stream"
-msgstr "შესავალი"
+msgstr "შესავალი ნაკადი"
 
 #: modules/gui/macosx/wizard.m:463
 #, fuzzy
@@ -10925,9 +10794,8 @@ msgid "Save file to"
 msgstr "შენახვა -სკენ"
 
 #: modules/gui/macosx/wizard.m:604
-#, fuzzy
 msgid "No input selected"
-msgstr "არა"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:606
 msgid ""
@@ -10994,25 +10862,22 @@ msgstr ""
 #: modules/video_chroma/i420_ymga.c:51 modules/video_chroma/i420_yuy2.c:75
 #: modules/video_chroma/i420_yuy2.c:78 modules/video_chroma/i420_yuy2.c:86
 #: modules/video_chroma/i422_yuy2.c:63 modules/video_chroma/i422_yuy2.c:66
-#, fuzzy
 msgid " to "
-msgstr "მდე"
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:1467
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:88
-#, fuzzy
 msgid "Use this to stream on a network."
-msgstr "გამოყენება -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:1479
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:95
-#, fuzzy
 msgid ""
 "Use this to save a stream to a file. You have the possibility to reencode "
 "the stream. You can save whatever VLC can read.\n"
 "Please notice that VLC is not very suited for file to file transcoding. You "
 "should use its transcoding features to save network streams, for example."
-msgstr "გამოყენება -სკენ -სკენ -სკენ -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:1612
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:128
@@ -11026,16 +10891,14 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1662
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:159
-#, fuzzy
 msgid ""
 "Define the TTL (Time-To-Live) of the stream. This parameter is the maximum "
 "number of routers your stream can go through. If you don't know what it "
 "means, or if you want to stream on your local network only, leave this "
 "setting to 1."
-msgstr "დრო ვის ან -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:1677
-#, fuzzy
 msgid ""
 "When streaming using UDP, you can announce your streams using the SAP/SDP "
 "announcing protocol. This way, the clients won't have to type in the "
@@ -11043,7 +10906,7 @@ msgid ""
 "extra interface.\n"
 "If you want to give a name to your stream, enter it here, else, a default "
 "name will be used."
-msgstr "UDP SAP -სკენ ტიპი სია SAP -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/macosx/wizard.m:1695
 msgid ""
@@ -11077,9 +10940,8 @@ msgid "Automatically play a file when selected in the file selection list"
 msgstr ""
 
 #: modules/gui/pda/pda.c:66
-#, fuzzy
 msgid "PDA Linux Gtk2+ interface"
-msgstr "ლინუქსი"
+msgstr ""
 
 #: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:498
@@ -11103,9 +10965,8 @@ msgid "Index"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:286 modules/gui/pda/pda_interface.c:287
-#, fuzzy
 msgid "Forward"
-msgstr "წინ"
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:308
 msgid "00:00:00"
@@ -11113,9 +10974,8 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:361 modules/gui/pda/pda_interface.c:543
 #: modules/gui/pda/pda_interface.c:869 modules/gui/pda/pda_interface.c:1216
-#, fuzzy
 msgid "Add to Playlist"
-msgstr "ჩამატება -სკენ დასაკვრელი სია"
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:384
 msgid "MRL:"
@@ -11496,12 +11356,11 @@ msgid "Preference"
 msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1333
-#, fuzzy
 msgid ""
 "VLC media player is an MPEG, MPEG 2, MP3 and DivX player that accepts input "
 "from local or network sources and is licensed under the GPL (http://www.gnu."
 "org/copyleft/gpl.html)."
-msgstr "და ან და GPLhttp://www.gnu.org/copyleft/gpl.html."
+msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1341
 #, fuzzy
@@ -11520,12 +11379,12 @@ msgstr ""
 #: modules/gui/qnx/qnx.c:44
 #, fuzzy
 msgid "QNX RTOS video and audio output"
-msgstr "და"
+msgstr "და აუდიო"
 
 #: modules/gui/skins2/src/dialogs.cpp:223
 #, fuzzy
 msgid "Open a skin file"
-msgstr "გახსენი"
+msgstr "გახსენი a"
 
 #: modules/gui/skins2/src/dialogs.cpp:224
 msgid "Skin files (*.vlt;*.wsz)|*.vlt;*.wsz|Skin files (*.xml)|*.xml"
@@ -11533,20 +11392,17 @@ msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:231
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:936
-#, fuzzy
 msgid "Open playlist"
-msgstr "გახსენი სია"
+msgstr "გახსენი დასაკრავი სია"
 
 #: modules/gui/skins2/src/dialogs.cpp:232
-#, fuzzy
 msgid "All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"
-msgstr "ყველა"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:239
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:920
-#, fuzzy
 msgid "Save playlist"
-msgstr "შეინახე სია"
+msgstr "შეინახე დასაკრავი სია"
 
 #: modules/gui/skins2/src/dialogs.cpp:239
 msgid "M3U file|*.m3u"
@@ -11569,16 +11425,14 @@ msgid "Config of last used skin."
 msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:347
-#, fuzzy
 msgid "Enable transparency effects"
-msgstr "გამჭირვალობა"
+msgstr "ჩართე გამჭირვალობის ეფექტები"
 
 #: modules/gui/skins2/src/skin_main.cpp:348
-#, fuzzy
 msgid ""
 "You can disable all transparency effects if you want. This is mainly useful "
 "when moving windows does not behave correctly."
-msgstr "გამჭირვალობა."
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:365
 msgid "Skins"
@@ -11675,25 +11529,22 @@ msgid "WinCE dialogs provider"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
-#, fuzzy
 msgid "Edit bookmark"
-msgstr "რედაქტირება"
+msgstr "სანიშნეს რედაქტირება"
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:347
 msgid "You must select two bookmarks"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:357
-#, fuzzy
 msgid "The stream must be playing or paused for bookmarks to work"
-msgstr "ან -სკენ"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:449
-#, fuzzy
 msgid ""
 "Input has changed, unable to save bookmark. Use \"pause\" while editing "
 "bookmarks to keep the same input."
-msgstr "შესავალი -სკენ გამოყენება -სკენ."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:452
 #, fuzzy
@@ -11701,9 +11552,8 @@ msgid "Input has changed "
 msgstr "შესავალი "
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:53
-#, fuzzy
 msgid "Stream and media info"
-msgstr "და"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:115
 msgid ""
@@ -11712,14 +11562,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:180
-#, fuzzy
 msgid "Yes"
 msgstr "დიახ"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:182
-#, fuzzy
 msgid "No"
-msgstr "ნორმა"
+msgstr "არა"
 
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:195
 msgid "Don't show"
@@ -11765,14 +11613,12 @@ msgid "Open..."
 msgstr "გახსნა..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:430
-#, fuzzy
 msgid "Stream/Save"
-msgstr "სტრიმი"
+msgstr "ნაკადი/შენახვა"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:431
-#, fuzzy
 msgid "Use VLC as a server of streams"
-msgstr "გამოყენება"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:457
 msgid "Caching"
@@ -11781,7 +11627,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/open.cpp:458
 #, fuzzy
 msgid "Change the default caching value (in milliseconds)"
-msgstr "შეცვლა"
+msgstr "შეცვლა ნაგულისხმევი"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:471
 msgid "Customize:"
@@ -11795,29 +11641,24 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:638
-#, fuzzy
 msgid "Use a subtitles file"
-msgstr "ჩატვირთვა:"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:639
-#, fuzzy
 msgid "Use an external subtitles file."
-msgstr "ჩატვირთვა:"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:643
-#, fuzzy
 msgid "Advanced Settings..."
-msgstr "დამატებითი ოფციები..."
+msgstr "დამატებითი პარამეტრები..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:659
-#, fuzzy
 msgid "File:"
-msgstr "ფაილი"
+msgstr "ფაილი:"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:696
-#, fuzzy
 msgid "DVD (menus)"
-msgstr "DVD"
+msgstr "DVD (მენიუთი)"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:702
 msgid "Disc type"
@@ -11829,7 +11670,6 @@ msgid "Probe Disc(s)"
 msgstr "დისკი"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:710
-#, fuzzy
 msgid ""
 "Probe for a DVD, VCD or audio CD. First try the Device name entered for the "
 "selected Disc type (DVD, DVD Menu, VCD, audio CD). If that doesn't find "
@@ -11837,8 +11677,6 @@ msgid ""
 "looking for CD-ROMs or DVD drives. The Disc type, Device name, and some "
 "parameter ranges are set based on media we find."
 msgstr ""
-"DVD VCD ან მოწყობილობა დისკი ტიპი DVD DVD მენიუ VCD დისკი ტიპი ან DVD დისკი "
-"ტიპი მოწყობილობა და."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:803
 msgid "HTTP/HTTPS/FTP/MMS"
@@ -11849,16 +11687,14 @@ msgid "RTSP"
 msgstr "RTSP"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:924
-#, fuzzy
 msgid "Name of DVD device to read from."
-msgstr "სახელი DVD -სკენ."
+msgstr "წამკითხველი DVD მოწყობილობის სახელი"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:955
-#, fuzzy
 msgid ""
 "Name of CD-ROM device to read Video CD from. If this field is left empty, we "
 "will scan for a CD-ROM with a VCD in it."
-msgstr "სახელი -სკენ ვიდეო VCD."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:964
 msgid "Name of CD-ROM device to read Video CD from."
@@ -11875,14 +11711,12 @@ msgid "Name of CD-ROM device to read audio CD from."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1279
-#, fuzzy
 msgid "Open subtitles file"
-msgstr "ტიტრები"
+msgstr "გახსენი ტიტრების ფაილი"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1656
-#, fuzzy
 msgid "Title number."
-msgstr "სათაური."
+msgstr "სათაურის ნომერი."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1658
 msgid ""
@@ -11892,9 +11726,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1661
-#, fuzzy
 msgid "Audio track number. DVD's can have up to 8 audio tracks numbered 0..7."
-msgstr "აუდიო DVD -სკენ."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1682
 msgid "Playback control (PBC) usually starts with number 1."
@@ -11905,9 +11738,8 @@ msgid "The first entry (the beginning of the first MPEG track) is 0."
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1693
-#, fuzzy
 msgid "Track number."
-msgstr "კვალი."
+msgstr "კვალის ნომერი."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1699
 msgid ""
@@ -11916,10 +11748,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1701
-#, fuzzy
 msgid ""
 "Audio track number. VCD's can have up to 2 audio tracks numbered 0 or 1. "
-msgstr "აუდიო VCD -სკენ ან "
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1713
 msgid ""
@@ -11936,9 +11767,8 @@ msgid "Shuffle"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:229
-#, fuzzy
 msgid "&Simple Add File..."
-msgstr "მარტივი ჩამატება ფაილი."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:230
 #, fuzzy
@@ -11961,12 +11791,12 @@ msgstr "შენახვა დასაკვრელი სია."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:239
 msgid "&Close"
-msgstr "და&კეტვა"
+msgstr "და&ხურვა"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:243
 #, fuzzy
 msgid "Sort by &title"
-msgstr "დახარისხება"
+msgstr "სორტირება"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:244
 msgid "&Reverse sort by title"
@@ -12007,7 +11837,7 @@ msgstr "დაკვრა"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:270
 #, fuzzy
 msgid "Sort this branch"
-msgstr "დახარისხება"
+msgstr "სორტირება"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:350
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:783
@@ -12021,13 +11851,13 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:800
 #, fuzzy, c-format
 msgid "%i items in playlist (%i not shown)"
-msgstr "სია"
+msgstr "i სია i"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:593
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:807
 #, fuzzy, c-format
 msgid "%i items in playlist"
-msgstr "სია"
+msgstr "i სია"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:902
 msgid "M3U file"
@@ -12111,18 +11941,16 @@ msgid "RTP"
 msgstr "RTP"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:579
-#, fuzzy
 msgid "Miscellaneous options"
-msgstr "სხვადასხვა"
+msgstr "სხვადასხვა ოფციები"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:593
 msgid "Group name"
 msgstr "ჯგუფის სახელი"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:600
-#, fuzzy
 msgid "Channel name"
-msgstr "არხი"
+msgstr "არხის სახელი"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:625
 msgid "Select all elementary streams"
@@ -12141,9 +11969,8 @@ msgid "Audio codec"
 msgstr "აუდიო კოდეკი"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:886
-#, fuzzy
 msgid "Subtitles codec"
-msgstr "ტიტრები"
+msgstr "ტიტრების კოდეკი"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:895
 #, fuzzy
@@ -12151,35 +11978,30 @@ msgid "Subtitles overlay"
 msgstr "ტიტრები"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:1009
-#, fuzzy
 msgid "Save file"
-msgstr "შენახვა"
+msgstr "ფაილის შენახვა"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:55
 msgid "Subtitle options"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
-#, fuzzy
 msgid "Subtitles file"
-msgstr "ტიტრები"
+msgstr "ტიტრების ფაილი"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-#, fuzzy
 msgid "Subtitles options"
-msgstr "ტიტრები"
+msgstr "ტიტრების ოფციები"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:211
-#, fuzzy
 msgid ""
 "Override frames per second. It will only work with MicroDVD and SubRIP "
 "subtitles."
-msgstr "კადრები წამი და."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:218
 #: modules/stream_out/bridge.c:40 modules/stream_out/display.c:41
 #: modules/video_filter/mosaic.c:109
-#, fuzzy
 msgid "Delay"
 msgstr "დაყოვნება"
 
@@ -12188,7 +12010,6 @@ msgid "Set subtitle delay (in 1/10s)"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:287
-#, fuzzy
 msgid "Open file"
 msgstr "ფაილის გახსნა"
 
@@ -12222,7 +12043,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:592
 #, fuzzy
 msgid "Choose a mirror"
-msgstr "არჩევა"
+msgstr "არჩევა a"
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:640
 msgid "Save file ..."
@@ -12243,12 +12064,11 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:215
 #, fuzzy
 msgid "Load configuration"
-msgstr "კონფიგურაცია"
+msgstr "ჩატვირთვა"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:229
-#, fuzzy
 msgid "Save configuration"
-msgstr "ნავიგაცია"
+msgstr "კონფიგურაციის შენახვა"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:245
 msgid "New broadcast"
@@ -12261,38 +12081,32 @@ msgid "Choose"
 msgstr "არჩევა"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:385
-#, fuzzy
 msgid "Output"
-msgstr "URL"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:397
-#, fuzzy
 msgid "Create"
-msgstr "ცენტრში"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:407
 msgid "Loop"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:510
-#, fuzzy
 msgid "VLM configuration"
-msgstr "კონფიგურაცია"
+msgstr "VLM კონფიგურაცია"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:544
-#, fuzzy
 msgid "VLM stream"
-msgstr "შესავალი"
+msgstr "VLM ნაკადი"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:90
-#, fuzzy
 msgid "Use this to re-encode a stream and save it to a file."
-msgstr "გამოყენება -სკენ და -სკენ."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:93
-#, fuzzy
 msgid "Use this to stream on a network"
-msgstr "გამოყენება -სკენ"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
 msgid "You must choose a stream"
@@ -12303,13 +12117,12 @@ msgid "Uh Oh! Unable to find playlist !"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:109
-#, fuzzy
 msgid ""
 "Use this to read only a part of the stream. You must be able to control the "
 "incoming stream (for example, a file or a disc, but not a RTP/UDP network "
 "stream.)\n"
 "Enter the starting and ending times (in seconds)."
-msgstr "გამოყენება -სკენ -სკენ ან UDP და წამი."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:136
 msgid "This does not appear to be a valid multicast address"
@@ -12335,7 +12148,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:164
-#, fuzzy
 msgid ""
 "When streaming using RTP, you can announce your streams using the SAP/SDP "
 "announcing protocol. This way, the clients won't have to type in the "
@@ -12343,12 +12155,11 @@ msgid ""
 "extra interface.\n"
 "If you want to give a name to your stream, enter it here, else, a default "
 "name will be used"
-msgstr "UDP SAP -სკენ ტიპი სია SAP -სკენ -სკენ."
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1283
-#, fuzzy
 msgid "Save to file"
-msgstr "შენახვა"
+msgstr "შეინახე ფაილში"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:42
 msgid ""
@@ -12361,9 +12172,8 @@ msgid "Magnify"
 msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:155
-#, fuzzy
 msgid "Magnifies part of the image"
-msgstr "ან"
+msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:272
 msgid "Video Options"
@@ -12383,11 +12193,10 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:468
-#, fuzzy
 msgid ""
 "Enable the equalizer. You can either manually change the bands or use a "
 "preset (Audio Menu->Equalizer)."
-msgstr "ან აუდიო მენიუ ეკვალაიზერი."
+msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:475
 msgid ""
@@ -12401,12 +12210,10 @@ msgid "Stopped"
 msgstr "გაჩერებულია"
 
 #: modules/gui/wxwidgets/input_manager.cpp:200
-#, fuzzy
 msgid "Paused"
 msgstr "დაპაუზებულია"
 
 #: modules/gui/wxwidgets/input_manager.cpp:200
-#, fuzzy
 msgid "Playing"
 msgstr "ვუკრავ"
 
@@ -12417,7 +12224,7 @@ msgstr "მენიუ"
 #: modules/gui/wxwidgets/input_manager.cpp:217
 #, fuzzy
 msgid "Previous track"
-msgstr "წინა"
+msgstr "წინა კვალი"
 
 #: modules/gui/wxwidgets/input_manager.cpp:218
 #, fuzzy
@@ -12447,7 +12254,7 @@ msgstr "გახსენი დისკი"
 #: modules/gui/wxwidgets/interface.cpp:562
 #, fuzzy
 msgid "Open &Network Stream...\tCtrl-N"
-msgstr "გახსენი ქსელი &N"
+msgstr "გახსენი ქსელი სტრიმი &N"
 
 #: modules/gui/wxwidgets/interface.cpp:564
 #, fuzzy
@@ -12510,7 +12317,7 @@ msgstr "&დახმარება"
 #: modules/gui/wxwidgets/interface.cpp:664
 #, fuzzy
 msgid "Small playlist"
-msgstr "შეინახე სია"
+msgstr "პატარა სია"
 
 #: modules/gui/wxwidgets/interface.cpp:665
 #, fuzzy
@@ -12537,14 +12344,12 @@ msgid "Extended &GUI\tCtrl-G"
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:854
-#, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
-msgstr "სანიშნე"
+msgstr "&სანიშნეები...\tCtrl-B"
 
 #: modules/gui/wxwidgets/interface.cpp:856
-#, fuzzy
 msgid "Preference&s...\tCtrl-S"
-msgstr "პარამეტრები &S"
+msgstr "&პარამეტრები...\tCtrl-S"
 
 #: modules/gui/wxwidgets/interface.cpp:909
 msgid ""
@@ -12588,9 +12393,8 @@ msgid "Open &Disc..."
 msgstr "გახსენი &დისკი..."
 
 #: modules/gui/wxwidgets/menus.cpp:136
-#, fuzzy
 msgid "Open &Network Stream..."
-msgstr "გახსენი ქსელი."
+msgstr "გახსენი ნაკადი &ქსელიდან..."
 
 #: modules/gui/wxwidgets/menus.cpp:137
 #, fuzzy
@@ -12625,26 +12429,22 @@ msgid "MPEG-2 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
 msgstr "ვიდეო PS TS MPEG1 OGG და RAW"
 
 #: modules/gui/wxwidgets/streamdata.cpp:39
-#, fuzzy
 msgid ""
 "MPEG-4 Video codec (useable with MPEG PS, MPEG TS, MPEG1, ASF, MPEG4, OGG "
 "and RAW)"
-msgstr "ვიდეო PS TS MPEG1 ASF MPEG4 OGG და RAW"
+msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:56
-#, fuzzy
 msgid "H264 is a new video codec (useable with MPEG TS and MPEG4)"
-msgstr "TS და MPEG4"
+msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:59
-#, fuzzy
 msgid "WMV (Windows Media Video) 7 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "ფანჯრები ვიდეო TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:62
-#, fuzzy
 msgid "WMV (Windows Media Video) 8 (useable with MPEG TS, MPEG1, ASF and OGG)"
-msgstr "ფანჯრები ვიდეო TS MPEG1 ASF და OGG"
+msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:66
 #, fuzzy
@@ -12654,12 +12454,12 @@ msgstr "ფანჯრები ვიდეო TS MPEG1 ASF და OGG"
 #: modules/gui/wxwidgets/streamdata.cpp:122
 #, fuzzy
 msgid "RTP Unicast"
-msgstr "UDP"
+msgstr "RTP"
 
 #: modules/gui/wxwidgets/streamdata.cpp:125
 #, fuzzy
 msgid "RTP Multicast"
-msgstr "UDP RTP მრავალმისამართიანი"
+msgstr "RTP მრავალმისამართიანი"
 
 #: modules/gui/wxwidgets/streamdata.cpp:129
 msgid ""
@@ -12669,14 +12469,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:89
-#, fuzzy
 msgid "Show bookmarks dialog"
-msgstr "ჩვენება"
+msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:90
-#, fuzzy
 msgid "Show bookmarks dialog when the interface starts."
-msgstr "ჩვენება."
+msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:92
 #: modules/gui/wxwidgets/wxwidgets.cpp:93
@@ -12697,7 +12495,7 @@ msgstr ""
 #: modules/gui/wxwidgets/wxwidgets.cpp:97
 #, fuzzy
 msgid "Use minimal interface, no toolbar, few menus"
-msgstr "გამოყენება არა"
+msgstr "არა"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:98
 #, fuzzy
@@ -12733,7 +12531,7 @@ msgstr "ფიქტიური"
 msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
-msgstr "ძალდატანება -სკენ -სკენ."
+msgstr "ძალდატანება -სკენ a -სკენ."
 
 #: modules/misc/dummy/dummy.c:43
 #, fuzzy
@@ -12752,7 +12550,7 @@ msgid ""
 "By default the dummy interface plugin will start a DOS command box. Enabling "
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
-msgstr "DOS -სკენ და არა."
+msgstr "ნაგულისხმევი a DOS -სკენ და არა."
 
 #: modules/misc/dummy/dummy.c:59
 #, fuzzy
@@ -12792,7 +12590,7 @@ msgstr "ფიქტიური"
 #: modules/misc/dummy/dummy.c:89
 #, fuzzy
 msgid "Dummy audio output function"
-msgstr "ფიქტიური"
+msgstr "ფიქტიური აუდიო"
 
 #: modules/misc/dummy/dummy.c:93
 #, fuzzy
@@ -12812,26 +12610,22 @@ msgstr "ფიქტიური"
 #: modules/misc/freetype.c:83 modules/misc/win32text.c:54
 #: modules/video_filter/marq.c:126 modules/video_filter/rss.c:164
 #: modules/visualization/xosd.c:73
-#, fuzzy
 msgid "Font"
 msgstr "შრიფტი"
 
 #: modules/misc/freetype.c:84 modules/misc/win32text.c:55
-#, fuzzy
 msgid "Font filename"
-msgstr "შრიფტი"
+msgstr "შრიფტის ფაილის სახელი"
 
 #: modules/misc/freetype.c:85 modules/misc/win32text.c:56
-#, fuzzy
 msgid "Font size in pixels"
-msgstr "შრიფტი სიდიდე პიქსელი"
+msgstr "შრიფტის ზომა პიქსელებში"
 
 #: modules/misc/freetype.c:86 modules/misc/win32text.c:57
-#, fuzzy
 msgid ""
 "The size of the fonts used by the osd module. If set to something different "
 "than 0 this option will override the relative font size "
-msgstr "სიდიდე -სკენ სიდიდე "
+msgstr ""
 
 #: modules/misc/freetype.c:89 modules/misc/win32text.c:60
 msgid "Opacity, 0..255"
@@ -12840,27 +12634,24 @@ msgstr ""
 #: modules/misc/freetype.c:90 modules/misc/win32text.c:61
 #: modules/video_filter/marq.c:87 modules/video_filter/rss.c:125
 #: modules/video_filter/time.c:78
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of overlay text. 0 = transparent, 255 "
 "= totally opaque. "
-msgstr "გამჭირვალობა "
+msgstr ""
 
 #: modules/misc/freetype.c:92 modules/misc/win32text.c:63
 #: modules/video_filter/marq.c:93 modules/video_filter/rss.c:131
 #: modules/video_filter/time.c:84
-#, fuzzy
 msgid "Text Default Color"
-msgstr "ტექსტი ნაგულისხმები ფერი"
+msgstr ""
 
 #: modules/misc/freetype.c:93 modules/misc/win32text.c:64
 #: modules/video_filter/marq.c:94 modules/video_filter/rss.c:132
 #: modules/video_filter/time.c:85
-#, fuzzy
 msgid ""
 "The color of overlay text. 1 byte for each color, hexadecimal. #000000 = all "
 "colors off, 0xFF0000 = just Red, 0xFFFFFF = all color on [White]"
-msgstr "byte თეთრი"
+msgstr ""
 
 #: modules/misc/freetype.c:97 modules/misc/win32text.c:68
 #, fuzzy
@@ -12905,13 +12696,13 @@ msgstr ""
 #: modules/misc/gnutls.c:71
 #, fuzzy
 msgid "Expiration time for resumed TLS sessions"
-msgstr "ვადის გასვლა TLS"
+msgstr "ვადის გასვლა"
 
 #: modules/misc/gnutls.c:73
 #, fuzzy
 msgid ""
 "Defines the delay before resumed TLS sessions will be expired (in seconds)."
-msgstr "TLS წამი."
+msgstr "წამი."
 
 #: modules/misc/gnutls.c:76
 #, fuzzy
@@ -12927,7 +12718,7 @@ msgstr ""
 #: modules/misc/gnutls.c:81
 #, fuzzy
 msgid "Check TLS/SSL server certificate validity"
-msgstr "შემოწმება TLS SSL"
+msgstr "შემოწმება SSL"
 
 #: modules/misc/gnutls.c:83
 msgid ""
@@ -12938,7 +12729,7 @@ msgstr ""
 #: modules/misc/gnutls.c:86
 #, fuzzy
 msgid "Check TLS/SSL server hostname in certificate"
-msgstr "შემოწმება TLS SSL"
+msgstr "შემოწმება SSL"
 
 #: modules/misc/gnutls.c:88
 msgid "Ensures that server hostname in certificate match requested host name."
@@ -12966,14 +12757,14 @@ msgstr ""
 msgid ""
 "Specify the log format. Available choices are \"text\" (default), \"html\", "
 "and \"syslog\"."
-msgstr "მისაწვდომია და."
+msgstr "მისაწვდომია ნაგულისხმევი და."
 
 #: modules/misc/logger.c:117
 #, fuzzy
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
-msgstr "მისაწვდომია და."
+msgstr "მისაწვდომია ნაგულისხმევი და."
 
 #: modules/misc/logger.c:123
 #, fuzzy
@@ -13022,9 +12813,8 @@ msgid "MSN Title format string. {0} artist, {1} title, {2} album"
 msgstr ""
 
 #: modules/misc/msn.c:70
-#, fuzzy
 msgid "MSN"
-msgstr "MMS"
+msgstr "MSN"
 
 #: modules/misc/msn.c:71
 msgid "MSN Title Plugin"
@@ -13033,7 +12823,7 @@ msgstr ""
 #: modules/misc/msn.c:194
 #, fuzzy
 msgid "(no title)"
-msgstr "უსახელო"
+msgstr "არა"
 
 #: modules/misc/msn.c:195
 msgid "(no artist)"
@@ -13073,7 +12863,7 @@ msgstr "სერვერი"
 msgid ""
 "Use this option to run as standalone Qt/Embedded GUI Server. This option is "
 "equivalent to the -qws option from normal Qt."
-msgstr "გამოყენება -სკენ სერვერი -სკენ."
+msgstr "-სკენ სერვერი -სკენ."
 
 #: modules/misc/qte_main.cpp:72
 msgid "Qt Embedded GUI helper"
@@ -13084,14 +12874,11 @@ msgid "video"
 msgstr ""
 
 #: modules/misc/rtsp.c:48
-#, fuzzy
 msgid ""
 "You can set the address, port and path the rtsp interface will bind to.\n"
 "Syntax is address:port/path. Default is to bind to any address on port 554, "
 "with no path."
 msgstr ""
-"და -სკენ\n"
-" ნაგულისხმები -სკენ -სკენ არა."
 
 #: modules/misc/rtsp.c:52
 msgid "RTSP VoD"
@@ -13102,19 +12889,17 @@ msgid "RTSP VoD server"
 msgstr "RTSP VoD სერვერი"
 
 #: modules/misc/screensaver.c:44
-#, fuzzy
 msgid "X Screensaver disabler"
-msgstr "ეკრანმზოგი"
+msgstr ""
 
 #: modules/misc/svg.c:57
 msgid "SVG template file"
 msgstr ""
 
 #: modules/misc/svg.c:58
-#, fuzzy
 msgid ""
 "Location of a file holding a SVG template for automatic string conversion"
-msgstr "ადგილმდებარეობა"
+msgstr ""
 
 #: modules/misc/testsuite/playlist.c:94
 #, fuzzy
@@ -13157,7 +12942,6 @@ msgid ""
 msgstr ""
 
 #: modules/mux/asf.c:57
-#, fuzzy
 msgid "Comment"
 msgstr "კომენტარი"
 
@@ -13170,22 +12954,18 @@ msgid "Allows you to define the \"rating\" that will be put in ASF comments."
 msgstr ""
 
 #: modules/mux/asf.c:63
-#, fuzzy
 msgid "Packet Size"
-msgstr "ზომა"
+msgstr "პაკეტის ზომა"
 
 #: modules/mux/asf.c:64
-#, fuzzy
 msgid "The ASF packet size -- default is 4096 bytes"
-msgstr "ASF სიდიდე bytes"
+msgstr ""
 
 #: modules/mux/asf.c:67
-#, fuzzy
 msgid "ASF muxer"
-msgstr "ASF"
+msgstr ""
 
 #: modules/mux/asf.c:540
-#, fuzzy
 msgid "Unknown Video"
 msgstr "უცნობი ვიდეო"
 
@@ -13218,9 +12998,8 @@ msgid "MP4/MOV muxer"
 msgstr "MP4 MOV"
 
 #: modules/mux/mpeg/ps.c:45 modules/mux/mpeg/ts.c:131
-#, fuzzy
 msgid "DTS delay (ms)"
-msgstr "მწ. შორის"
+msgstr ""
 
 #: modules/mux/mpeg/ps.c:46
 msgid ""
@@ -13242,9 +13021,8 @@ msgid ""
 msgstr "სიდიდე PS."
 
 #: modules/mux/mpeg/ps.c:61
-#, fuzzy
 msgid "PS muxer"
-msgstr "PS"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:83
 msgid "Video PID"
@@ -13255,65 +13033,56 @@ msgstr "ვიდეო PID"
 msgid ""
 "Assigns a fixed PID to the video stream. The PCR PID will automatically be "
 "the video."
-msgstr "სტაციონარული PID -სკენ PID."
+msgstr "a PID -სკენ PID."
 
 #: modules/mux/mpeg/ts.c:86
 msgid "Audio PID"
 msgstr "აუდიო PID"
 
 #: modules/mux/mpeg/ts.c:87
-#, fuzzy
 msgid "Assigns a fixed PID to the audio stream."
-msgstr "სტაციონარული PID -სკენ."
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:88
-#, fuzzy
 msgid "SPU PID"
-msgstr "PID"
+msgstr "SPU PID"
 
 #: modules/mux/mpeg/ts.c:89
-#, fuzzy
 msgid "Assigns a fixed PID to the SPU."
-msgstr "სტაციონარული PID -სკენ."
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:90
-#, fuzzy
 msgid "PMT PID"
-msgstr "PID"
+msgstr "PMT PID"
 
 #: modules/mux/mpeg/ts.c:91
-#, fuzzy
 msgid "Assigns a fixed PID to the PMT"
-msgstr "სტაციონარული PID -სკენ"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:92
 msgid "TS ID"
 msgstr "TS ID"
 
 #: modules/mux/mpeg/ts.c:93
-#, fuzzy
 msgid "Assigns a fixed Transport Stream ID."
-msgstr "სტაციონარული ID."
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:94
-#, fuzzy
 msgid "NET ID"
-msgstr "ID"
+msgstr "NET ID"
 
 #: modules/mux/mpeg/ts.c:95
-#, fuzzy
 msgid "Assigns a fixed Network ID (for SDT table)"
-msgstr "სტაციონარული ქსელი ID"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:96
-#, fuzzy
 msgid "PMT Program numbers (requires --sout-ts-es-id-pid)"
-msgstr "პროგრამა"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:97
 #, fuzzy
 msgid "Assigns a program number to each PMT"
-msgstr "პროგრამა -სკენ"
+msgstr "a პროგრამა რიცხვი -სკენ"
 
 #: modules/mux/mpeg/ts.c:98
 msgid "Mux PMT (requires --sout-ts-es-id-pid)"
@@ -13332,47 +13101,40 @@ msgid "Defines the descriptors of each SDT"
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:104
-#, fuzzy
 msgid "Set PID to id of ES"
-msgstr "PID -სკენ"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:105
-#, fuzzy
 msgid "set PID to id of es"
-msgstr "PID -სკენ"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:107
-#, fuzzy
 msgid "Shaping delay (ms)"
-msgstr "მწ. შორის"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:108
-#, fuzzy
 msgid ""
 "If enabled, the TS muxer will cut the stream in slices of the given "
 "duration, and ensure a constant bitrate between the two boundaries. This "
 "avoids having huge bitrate peaks for reference frames, in particular."
-msgstr "ჩართული TS და კადრები."
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:112
-#, fuzzy
 msgid "Use keyframes"
-msgstr "გამოყენება"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:113
-#, fuzzy
 msgid ""
 "If enabled, and shaping is specified, the TS muxer will place the boundaries "
 "at the end of I pictures. In that case, the shaping duration given by the "
 "user is a worse case used when no reference frame is available. This "
 "enhances the efficiency of the shaping algorithm, since I frames are usually "
 "the biggest frames in the stream."
-msgstr "ჩართული და TS I არა I კადრები კადრები."
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:120
-#, fuzzy
 msgid "PCR delay (ms)"
-msgstr "მწ. შორის"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:121
 msgid ""
@@ -13385,9 +13147,8 @@ msgid "Minimum B (deprecated)"
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:129
-#, fuzzy
 msgid "This setting is deprecated and not used anymore"
-msgstr "და"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Maximum B (deprecated)"
@@ -13417,44 +13178,38 @@ msgid "Crypt video using CSA"
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:142
-#, fuzzy
 msgid "CSA Key"
-msgstr "გასაღები"
+msgstr "CSA გასაღები"
 
 #: modules/mux/mpeg/ts.c:143
-#, fuzzy
 msgid ""
 "Defines the CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
-msgstr "char bytes."
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:146
-#, fuzzy
 msgid "Packet size in bytes to encrypt"
-msgstr "სიდიდე bytes -სკენ"
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:147
-#, fuzzy
 msgid ""
 "Specify the size of the TS packet to encrypt. The encryption routines "
 "subtract the TS-header from the value before encrypting. "
-msgstr "სიდიდე TS -სკენ TS "
+msgstr ""
 
 #: modules/mux/mpeg/ts.c:160
-#, fuzzy
 msgid "TS muxer (libdvbpsi)"
-msgstr "TS"
+msgstr ""
 
 #: modules/mux/mpjpeg.c:32
 msgid "Multipart separator string"
 msgstr ""
 
 #: modules/mux/mpjpeg.c:33
-#, fuzzy
 msgid ""
 "Multipart strings like MPJPEG use a separator string between content pieces. "
 "You can select this string. Default is --myboundary"
-msgstr "ნაგულისხმები"
+msgstr ""
 
 #: modules/mux/mpjpeg.c:50
 msgid "Multipart jpeg muxer"
@@ -13465,9 +13220,8 @@ msgid "Ogg/ogm muxer"
 msgstr ""
 
 #: modules/mux/wav.c:42
-#, fuzzy
 msgid "WAV muxer"
-msgstr "WAV"
+msgstr ""
 
 #: modules/packetizer/copy.c:43
 #, fuzzy
@@ -13481,7 +13235,7 @@ msgstr ""
 #: modules/packetizer/mpeg4audio.c:118
 #, fuzzy
 msgid "MPEG4 audio packetizer"
-msgstr "MPEG4"
+msgstr "MPEG4 აუდიო"
 
 #: modules/packetizer/mpeg4video.c:47
 #, fuzzy
@@ -13523,7 +13277,6 @@ msgid "HAL device detection"
 msgstr ""
 
 #: modules/services_discovery/hal.c:153
-#, fuzzy
 msgid "Devices"
 msgstr "მოწყობილობები"
 
@@ -13625,7 +13378,7 @@ msgstr "SAP."
 #: modules/services_discovery/sap.c:104
 #, fuzzy
 msgid "Use SAP cache"
-msgstr "გამოყენება SAP"
+msgstr "SAP"
 
 #: modules/services_discovery/sap.c:106
 msgid ""
@@ -13655,7 +13408,6 @@ msgid "Session Announcements (SAP)"
 msgstr ""
 
 #: modules/services_discovery/sap.c:812 modules/services_discovery/sap.c:817
-#, fuzzy
 msgid "Session"
 msgstr "სესია"
 
@@ -13664,7 +13416,6 @@ msgid "Tool"
 msgstr ""
 
 #: modules/services_discovery/sap.c:818
-#, fuzzy
 msgid "User"
 msgstr "მომხმარებელი"
 
@@ -13683,7 +13434,7 @@ msgstr ""
 #: modules/services_discovery/upnp.cpp:58
 #, fuzzy
 msgid "Universal Plug'n'Play discovery"
-msgstr "დაკვრა"
+msgstr "უნივერსალური n დაკვრა"
 
 #: modules/stream_out/bridge.c:38
 msgid "Specify an identifier integer for this elementary stream"
@@ -13980,7 +13731,7 @@ msgstr ""
 #: modules/stream_out/standard.c:61
 #, fuzzy
 msgid "Name of the session that will be announced with SAP"
-msgstr "სახელი SAP ან"
+msgstr "სახელი SAP"
 
 #: modules/stream_out/standard.c:63
 #, fuzzy
@@ -14049,7 +13800,6 @@ msgid "UDP port to listen to for commands."
 msgstr "UDP -სკენ -სკენ."
 
 #: modules/stream_out/switcher.c:93
-#, fuzzy
 msgid "Command"
 msgstr "ბრძანება"
 
@@ -14076,14 +13826,13 @@ msgid "Fixed quantizer scale to use."
 msgstr ""
 
 #: modules/stream_out/switcher.c:102
-#, fuzzy
 msgid "Mute audio"
-msgstr "გააჩუმე"
+msgstr "გააჩუმე აუდიო"
 
 #: modules/stream_out/switcher.c:104
 #, fuzzy
 msgid "Mute audio when command is not 0."
-msgstr "გააჩუმე."
+msgstr "გააჩუმე აუდიო."
 
 #: modules/stream_out/switcher.c:107
 msgid "MPEG2 video switcher stream output"
@@ -14217,7 +13966,7 @@ msgstr ""
 #: modules/stream_out/transcode.c:104
 #, fuzzy
 msgid "Destination audio codec"
-msgstr "ნიშნულება"
+msgstr "ნიშნულება აუდიო"
 
 #: modules/stream_out/transcode.c:106
 msgid ""
@@ -14324,7 +14073,7 @@ msgstr ""
 msgid ""
 "This option will drop/duplicate video frames to synchronise the video track "
 "on the audio track."
-msgstr "კადრები -სკენ."
+msgstr "კადრები -სკენ აუდიო."
 
 #: modules/stream_out/transcode.c:153
 msgid ""
@@ -14383,7 +14132,7 @@ msgstr "სურათი"
 #: modules/video_filter/adjust.c:63
 #, fuzzy
 msgid "Set the image contrast, between 0 and 2. Defaults to 1"
-msgstr "და ნაგულისხმები -სკენ 1"
+msgstr "და -სკენ 1"
 
 #: modules/video_filter/adjust.c:64
 #, fuzzy
@@ -14393,7 +14142,7 @@ msgstr "სურათი"
 #: modules/video_filter/adjust.c:65
 #, fuzzy
 msgid "Set the image hue, between 0 and 360. Defaults to 0"
-msgstr "და ნაგულისხმები -სკენ"
+msgstr "და -სკენ"
 
 #: modules/video_filter/adjust.c:66
 #, fuzzy
@@ -14403,7 +14152,7 @@ msgstr "სურათი"
 #: modules/video_filter/adjust.c:67
 #, fuzzy
 msgid "Set the image saturation, between 0 and 3. Defaults to 1"
-msgstr "და ნაგულისხმები -სკენ 1"
+msgstr "და -სკენ 1"
 
 #: modules/video_filter/adjust.c:68
 #, fuzzy
@@ -14413,7 +14162,7 @@ msgstr "სურათი"
 #: modules/video_filter/adjust.c:69
 #, fuzzy
 msgid "Set the image brightness, between 0 and 2. Defaults to 1"
-msgstr "და ნაგულისხმები -სკენ 1"
+msgstr "და -სკენ 1"
 
 #: modules/video_filter/adjust.c:70
 #, fuzzy
@@ -14423,7 +14172,7 @@ msgstr "სურათი"
 #: modules/video_filter/adjust.c:71
 #, fuzzy
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1"
-msgstr "და ნაგულისხმები -სკენ 1"
+msgstr "და -სკენ 1"
 
 #: modules/video_filter/adjust.c:75
 #, fuzzy
@@ -14514,9 +14263,8 @@ msgid "Distort mode"
 msgstr ""
 
 #: modules/video_filter/distort.c:65
-#, fuzzy
 msgid "Distort mode, one of \"wave\", \"ripple\", \"gradient\" and \"edge\""
-msgstr "და"
+msgstr ""
 
 #: modules/video_filter/distort.c:67
 msgid "Gradient image type"
@@ -14598,9 +14346,8 @@ msgid ""
 msgstr "გამჭირვალობა გამჭირვალობა -სკენ."
 
 #: modules/video_filter/logo.c:77
-#, fuzzy
 msgid "Logo position"
-msgstr "ლოგო"
+msgstr "ლოგოს პოზიცია"
 
 #: modules/video_filter/logo.c:79
 msgid ""
@@ -14664,7 +14411,7 @@ msgstr ""
 msgid ""
 "Defines the time the marquee must remain displayed, in milliseconds. Default "
 "value is 0 (remain forever)."
-msgstr "ნაგულისხმები."
+msgstr "ნაგულისხმევი."
 
 #: modules/video_filter/marq.c:86 modules/video_filter/rss.c:124
 #: modules/video_filter/time.c:77
@@ -14675,7 +14422,7 @@ msgstr ""
 #: modules/video_filter/time.c:80
 #, fuzzy
 msgid "Font size, pixels"
-msgstr "შრიფტი სიდიდე პიქსელი"
+msgstr "სიდიდე პიქსელი"
 
 #: modules/video_filter/marq.c:90 modules/video_filter/rss.c:128
 #: modules/video_filter/time.c:81
@@ -14710,37 +14457,32 @@ msgstr ""
 #: modules/video_filter/mosaic.c:88
 #, fuzzy
 msgid "Alpha blending (0 -> 255). Default is 255"
-msgstr "ნაგულისხმები"
+msgstr "ნაგულისხმევი"
 
 #: modules/video_filter/mosaic.c:90
-#, fuzzy
 msgid "Height in pixels"
-msgstr "სიმაღლე პიქსელი"
+msgstr "სიმაღლე პიქსელებში"
 
 #: modules/video_filter/mosaic.c:91
-#, fuzzy
 msgid "Width in pixels"
-msgstr "სიგანე პიქსელი"
+msgstr "სიგანე პიქსელებში"
 
 #: modules/video_filter/mosaic.c:92
-#, fuzzy
 msgid "Top left corner x coordinate"
-msgstr "ზემოთ x"
+msgstr ""
 
 #: modules/video_filter/mosaic.c:93
-#, fuzzy
 msgid "Top left corner y coordinate"
-msgstr "ზემოთ"
+msgstr ""
 
 #: modules/video_filter/mosaic.c:94
-#, fuzzy
 msgid "Vertical border width in pixels"
-msgstr "ვერტიკალური პიქსელი"
+msgstr ""
 
 #: modules/video_filter/mosaic.c:95
 #, fuzzy
 msgid "Horizontal border width in pixels"
-msgstr "ჰორიზონტალური პიქსელი"
+msgstr "პიქსელი"
 
 #: modules/video_filter/mosaic.c:96
 msgid "Mosaic alignment"
@@ -14755,7 +14497,7 @@ msgstr ""
 msgid ""
 "Positioning method. auto: automatically choose the best number of rows and "
 "columns. fixed: use the user-defined number of rows and columns."
-msgstr "auto ხაზი და სვეტი სტაციონარული ხაზი და სვეტი."
+msgstr "auto რიცხვი ხაზი და სვეტი რიცხვი ხაზი და სვეტი."
 
 #: modules/video_filter/mosaic.c:102 modules/video_filter/wall.c:57
 #, fuzzy
@@ -14779,7 +14521,7 @@ msgstr "სიდიდე"
 #: modules/video_filter/mosaic.c:107
 #, fuzzy
 msgid "Order as a comma separated list of picture-id(s)"
-msgstr "თანრიგი"
+msgstr "წესრიგი a"
 
 #: modules/video_filter/mosaic.c:110
 #, fuzzy
@@ -14836,7 +14578,7 @@ msgstr "ისტორია"
 #: modules/video_filter/motiondetect.c:57
 #, fuzzy
 msgid "History parameter, number of frames used for detection"
-msgstr "ისტორია კადრები"
+msgstr "ისტორია რიცხვი კადრები"
 
 #: modules/video_filter/motiondetect.c:60
 msgid "Motion detect video filter"
@@ -14897,7 +14639,7 @@ msgid ""
 "OSD menu pictures get a default timeout of 15 seconds added to their "
 "remaining time. This will ensure that they are at least the specified time "
 "visible."
-msgstr "წამი -სკენ ხილული."
+msgstr "a ნაგულისხმევი წამი -სკენ ხილული."
 
 #: modules/video_filter/osdmenu.c:69
 #, fuzzy
@@ -14911,7 +14653,7 @@ msgid ""
 "for environments that experience transmissions errors. Be careful with this "
 "option because encoding OSD menu pictures is very computing intensive. The "
 "range is 0 - 1000 ms."
-msgstr "განახლება მწ. შორის."
+msgstr "განახლება მწ. შორის ნაგულისხმევი მწ. შორის."
 
 #: modules/video_filter/osdmenu.c:117
 #, fuzzy
@@ -15142,7 +14884,7 @@ msgstr ""
 #: modules/video_output/directx/directx.c:112
 #, fuzzy
 msgid "Use hardware YUV->RGB conversions"
-msgstr "გამოყენება RGB"
+msgstr "RGB"
 
 #: modules/video_output/directx/directx.c:114
 msgid ""
@@ -15207,9 +14949,8 @@ msgstr ""
 
 #: modules/video_output/directx/glwin32.c:65 modules/video_output/opengl.c:135
 #: modules/video_output/x11/glx.c:115
-#, fuzzy
 msgid "OpenGL video output"
-msgstr "OpenGL"
+msgstr "OpenGL ვიდეო გასავალი"
 
 #: modules/video_output/fb.c:67
 msgid "Framebuffer device"
@@ -15222,9 +14963,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/fb.c:78
-#, fuzzy
 msgid "GNU/Linux console framebuffer video output"
-msgstr "ლინუქსი"
+msgstr ""
 
 #: modules/video_output/ggi.c:56 modules/video_output/x11/glx.c:101
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
@@ -15356,12 +15096,12 @@ msgstr ""
 #: modules/video_output/snapshot.c:69
 #, fuzzy
 msgid "cache size (number of images)"
-msgstr "სიდიდე"
+msgstr "სიდიდე რიცხვი"
 
 #: modules/video_output/snapshot.c:70
 #, fuzzy
 msgid "Set the cache size (number of images to keep)."
-msgstr "სიდიდე -სკენ."
+msgstr "სიდიდე რიცხვი -სკენ."
 
 #: modules/video_output/snapshot.c:74
 msgid "snapshot module"
@@ -15434,7 +15174,7 @@ msgstr "გამოყენება"
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 #, fuzzy
 msgid "Use shared memory to communicate between VLC and the X server."
-msgstr "გამოყენება -სკენ და."
+msgstr "-სკენ და."
 
 #: modules/video_output/x11/x11.c:61
 msgid "choose the screen to be used for fullscreen mode."
@@ -15453,7 +15193,7 @@ msgstr ""
 msgid ""
 "Force the XVideo renderer to use a specific chroma format instead of trying "
 "to improve performances by using the most efficient one."
-msgstr "ძალდატანება -სკენ -სკენ."
+msgstr "ძალდატანება -სკენ a -სკენ."
 
 #: modules/video_output/x11/xvideo.c:92
 msgid "XVideo extension video output"
@@ -15606,7 +15346,7 @@ msgstr ""
 #: modules/visualization/visual/visual.c:95
 #, fuzzy
 msgid "Additions or subtractions of pixels on the peak width."
-msgstr "ან პიქსელი."
+msgstr "პიქსელი."
 
 #: modules/visualization/visual/visual.c:97
 msgid "V-plane color"
@@ -15654,7 +15394,7 @@ msgstr "ვერტიკალური"
 #: modules/visualization/xosd.c:68
 #, fuzzy
 msgid "Vertical offset in pixels of the displayed text"
-msgstr "ვერტიკალური პიქსელი"
+msgstr "პიქსელი"
 
 #: modules/visualization/xosd.c:70
 msgid "Shadow offset"
@@ -15672,11 +15412,3 @@ msgstr ""
 #: modules/visualization/xosd.c:82
 msgid "XOSD interface"
 msgstr "XOSD ინტერფეისი"
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "ვიდეო ფილტრის მოდული"
-
-#, fuzzy
-#~ msgid "Force options for separate subtitle files."
-#~ msgstr "ძალდატანება."
