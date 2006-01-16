@@ -285,6 +285,7 @@ int __var_DelCallback (vlc_object_t *, const char *, vlc_callback_t, void *);
 void __vlc_object_detach (vlc_object_t *);
 int aout_FindAndRestart (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
 int sout_InputSendBuffer (sout_packetizer_input_t *, block_t*);
+vlc_t * vlc_current_object (int);
 int __config_SaveConfigFile (vlc_object_t *, const char *);
 int ACL_Check (vlc_acl_t *p_acl, const char *psz_ip);
 void aout_DecDeleteBuffer (aout_instance_t *, aout_input_t *, aout_buffer_t *);
@@ -885,8 +886,10 @@ struct module_symbols_t
     void (*stats_DumpInputStats_inner) (input_stats_t *);
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
     counter_t* (*__stats_CounterGet_inner) (vlc_object_t*, int, char *);
+    void *__stats_CounterGet_deprecated;
     input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
     void (*stats_HandlerDestroy_inner) (stats_handler_t*);
+    vlc_t * (*vlc_current_object_inner) (int);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1316,6 +1319,7 @@ struct module_symbols_t
 #  define __stats_CounterGet (p_symbols)->__stats_CounterGet_inner
 #  define __input_CreateThread2 (p_symbols)->__input_CreateThread2_inner
 #  define stats_HandlerDestroy (p_symbols)->stats_HandlerDestroy_inner
+#  define vlc_current_object (p_symbols)->vlc_current_object_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1748,7 +1752,9 @@ struct module_symbols_t
     ((p_symbols)->__stats_CounterGet_inner) = __stats_CounterGet; \
     ((p_symbols)->__input_CreateThread2_inner) = __input_CreateThread2; \
     ((p_symbols)->stats_HandlerDestroy_inner) = stats_HandlerDestroy; \
+    ((p_symbols)->vlc_current_object_inner) = vlc_current_object; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
+    (p_symbols)->__stats_CounterGet_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
 # endif /* HAVE_SHARED_LIBVLC */
