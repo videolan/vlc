@@ -470,7 +470,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         vlc_object_t* p_dest;
         block_t *p_block;
         snapshot_t *p_snapshot;
-	int i_size;
+        int i_size;
 
         /* Destination object-id is following object: */
         i_id = atoi( &val.psz_string[7] );
@@ -488,9 +488,9 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         /* Save the snapshot to a memory zone */
         fmt_in = p_vout->fmt_in;
         fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
-	fmt_out.i_width = 320;
-	fmt_out.i_height = 200;
-	fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
+        fmt_out.i_width = 320;
+        fmt_out.i_height = 200;
+        fmt_out.i_chroma = VLC_FOURCC( 'p','n','g',' ' );
         p_block = ( block_t* ) image_Write( p_image, p_pic, &fmt_in, &fmt_out );
         if( !p_block ) 
         {
@@ -498,7 +498,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             image_HandlerDelete( p_image );
             vlc_cond_signal( &p_dest->object_wait );
             vlc_mutex_unlock( &p_dest->object_lock );
-	    vlc_object_release( p_dest );
+            vlc_object_release( p_dest );
             return VLC_EGENERIC;
         }
 
@@ -511,11 +511,11 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             image_HandlerDelete( p_image );
             vlc_cond_signal( &p_dest->object_wait );
             vlc_mutex_unlock( &p_dest->object_lock );
-	    vlc_object_release( p_dest );
+            vlc_object_release( p_dest );
             return VLC_ENOMEM;
         }
 
-	i_size = p_block->i_buffer;
+        i_size = p_block->i_buffer;
 
         p_snapshot->i_width = fmt_out.i_width;
         p_snapshot->i_height = fmt_out.i_height;
