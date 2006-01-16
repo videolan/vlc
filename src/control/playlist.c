@@ -4,7 +4,7 @@
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
     {
         libvlc_exception_raise( p_exception, "No active input" );
         vlc_mutex_unlock( &p_instance->p_playlist->object_lock );
-        return;
+        return NULL;
     }
     p_input = (libvlc_input_t *)malloc( sizeof( libvlc_input_t ) );
 
