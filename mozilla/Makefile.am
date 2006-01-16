@@ -26,6 +26,8 @@ DIST_misc = \
 	vlcintf.idl \
 	$(NULL)
 
+if BUILD_MOZILLA
+
 # Under Win32, Mozilla plugins need to be named NP******.DLL, but under Unix
 # the common naming scheme is lib******plugin.so. Also, we need npwin.cpp
 # under Win32 and npunix.c under Unix.
@@ -59,6 +61,15 @@ BUNDLE_mozilla = VLC\ Plugin.plugin
 SOURCES_support = support/npmac.cpp
 SOURCES_rsrc = vlc.r
 
+CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c -F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) -I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings -O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 -DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g -include mozilla-config.h
+
+DATA_npvlc_rsrc = $(noinst_npvlc_rsrc_DATA)
+noinst_npvlc_rsrc_DATA = npvlc.rsrc
+noinst_npvlc_rsrcdir = $(libdir)
+npvlc.rsrc: $(srcdir)/vlc.r
+	/Developer/Tools/Rez /Developer/Headers/FlatCarbon/Types.r $< -o $@
+LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc) -dylib `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
+
 DATA_bundle = $(noinst_bundle_DATA)
 noinst_bundle_DATA = VLC\ Plugin.plugin
 noinst_bundledir = $(libdir)
@@ -75,15 +86,6 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	(cd $(top_builddir)/VLC.app/Contents/MacOS/; tar cf - modules)| \
 	(cd "./$@/Contents/MacOS"; tar xf -)
 
-CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c -F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) -I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings -O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 -DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g -include mozilla-config.h
-
-DATA_npvlc_rsrc = $(noinst_npvlc_rsrc_DATA)
-noinst_npvlc_rsrc_DATA = npvlc.rsrc
-noinst_npvlc_rsrcdir = $(libdir)
-npvlc.rsrc: $(srcdir)/vlc.r
-	/Developer/Tools/Rez /Developer/Headers/FlatCarbon/Types.r $< -o $@
-LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc) -dylib `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
-
 else
 
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc_pic.a
@@ -96,9 +98,6 @@ SOURCES_support = support/npunix.c
 LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
 
 endif
-endif
-
-if BUILD_MOZILLA
 
 noinst_LIBRARIES_mozilla = libnpvlc.a
 
@@ -112,7 +111,7 @@ libnpvlc_a_DEPENDENCIES = $(DATA_npvlc_rc)
 BUILT_SOURCES_mozilla = vlcintf.h
 $(SOURCES_mozilla): vlcintf.h
 
-npvlc$(LIBEXT): $(libnpvlc_a_OBJECTS) \
+$(npvlc_DATA): $(libnpvlc_a_OBJECTS) \
 	              $(libnpvlc_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(libnpvlc_a_OBJECTS) $(DATA_npvlc_rc) \
 	 $(LDFLAGS_npvlc)
@@ -127,7 +126,6 @@ vlcintf.h: vlcintf.idl
 	$(XPIDL) $(XPIDL_INCL) \
 	  -m header -o vlcintf $(srcdir)/vlcintf.idl
 
-
 endif
 
 ###############################################################################
@@ -135,7 +133,7 @@ endif
 ###############################################################################
 clean-local: clean-stamp clean-bundle
 
-clean-bundle::
+clean-bundle:
 	rm -rf ./VLC\ Plugin.plugin
 
 clean-stamp:
