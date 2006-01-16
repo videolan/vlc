@@ -53,6 +53,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "realrtsp" );
     add_shortcut( "rtsp" );
+    add_shortcut( "pnm" );
 vlc_module_end();
 
 
