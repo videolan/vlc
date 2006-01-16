@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2005 the VideoLAN team
  * $Id: vlc.h 13701 2005-12-12 17:58:56Z zorglub $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ void libvlc_exception_init( libvlc_exception_t *p_exception );
  * \return 0 if no exception raised, 1 else
  */
 int libvlc_exception_raised( libvlc_exception_t *p_exception );
+void libvlc_exception_raise( libvlc_exception_t *p_exception, char *psz_message );
 
 /**
  * Get exception message
