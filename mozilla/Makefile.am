@@ -98,6 +98,7 @@ SOURCES_support = support/npunix.c
 LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
 
 endif
+endif
 
 noinst_LIBRARIES_mozilla = libnpvlc.a
 
