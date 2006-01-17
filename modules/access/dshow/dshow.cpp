@@ -832,92 +832,11 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
                         p_sys->i_width, p_sys->i_height,
                         0, 0, 0, media_types, MAX_MEDIA_TYPES );
 
-    size_t mt_count = 0;
     AM_MEDIA_TYPE *mt = NULL;
-
-    /* Only force the chroma setting if it is specified by the user. */
-    if( p_sys->b_chroma )
-    {
-        /* Find out if the pin handles MEDIATYPE_Stream, in which case we
-        * won't add a prefered media type as this doesn't seem to work well
-        * -- to investigate. */
-        vlc_bool_t b_stream_type = VLC_FALSE;
-        for( size_t i = 0; i < media_count; i++ )
-        {
-            if( media_types[i].majortype == MEDIATYPE_Stream )
-            {
-                b_stream_type = VLC_TRUE;
-                break;
-            }
-        }
-
-        if( !b_stream_type && !b_audio )
-        {
-            // Insert prefered video media type
-            AM_MEDIA_TYPE mtr;
-            VIDEOINFOHEADER vh;
-
-            mtr.majortype            = MEDIATYPE_Video;
-            mtr.subtype              = MEDIASUBTYPE_I420;
-            mtr.bFixedSizeSamples    = TRUE;
-            mtr.bTemporalCompression = FALSE;
-            mtr.pUnk                 = NULL;
-            mtr.formattype           = FORMAT_VideoInfo;
-            mtr.cbFormat             = sizeof(vh);
-            mtr.pbFormat             = (BYTE *)&vh;
-
-            memset(&vh, 0, sizeof(vh));
-
-            vh.bmiHeader.biSize   = sizeof(vh.bmiHeader);
-            vh.bmiHeader.biWidth  = p_sys->i_width > 0 ? p_sys->i_width : 320;
-            vh.bmiHeader.biHeight = p_sys->i_height > 0 ? p_sys->i_height : 240;
-            vh.bmiHeader.biPlanes      = 3;
-            vh.bmiHeader.biBitCount    = 12;
-            vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');
-            vh.bmiHeader.biSizeImage   = vh.bmiHeader.biWidth * 12 *
-                vh.bmiHeader.biHeight / 8;
-            mtr.lSampleSize            = vh.bmiHeader.biSizeImage;
-
-            mt_count = 1;
-            mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
-            CopyMediaType(mt, &mtr);
-        }
-        else if( !b_stream_type )
-        {
-            // Insert prefered audio media type
-            AM_MEDIA_TYPE mtr;
-            WAVEFORMATEX wf;
-
-            mtr.majortype            = MEDIATYPE_Audio;
-            mtr.subtype              = MEDIASUBTYPE_PCM;
-            mtr.bFixedSizeSamples    = TRUE;
-            mtr.bTemporalCompression = FALSE;
-            mtr.lSampleSize          = 0;
-            mtr.pUnk                 = NULL;
-            mtr.formattype           = FORMAT_WaveFormatEx;
-            mtr.cbFormat             = sizeof(wf);
-            mtr.pbFormat             = (BYTE *)&wf;
-
-            memset(&wf, 0, sizeof(wf));
-
-            wf.wFormatTag = WAVE_FORMAT_PCM;
-            wf.nChannels = 2;
-            wf.nSamplesPerSec = 44100;
-            wf.wBitsPerSample = 16;
-            wf.nBlockAlign = wf.nSamplesPerSec * wf.wBitsPerSample / 8;
-            wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
-            wf.cbSize = 0;
-
-            mt_count = 1;
-            mt = (AM_MEDIA_TYPE *)malloc( sizeof(AM_MEDIA_TYPE)*mt_count );
-            CopyMediaType(mt, &mtr);
-        }
-    }
 
     if( media_count > 0 )
     {
-        mt = (AM_MEDIA_TYPE *)realloc( mt, sizeof(AM_MEDIA_TYPE) *
-                                       (mt_count + media_count) );
+        mt = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE) * media_count);
 
         // Order and copy returned media types according to arbitrary
         // fourcc priority
@@ -938,20 +857,25 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
             }
             if( slot_copy != c )
             {
-                mt[c+mt_count] = media_types[slot_copy];
+                mt[c] = media_types[slot_copy];
                 media_types[slot_copy] = media_types[c];
             }
             else
             {
-                mt[c+mt_count] = media_types[c];
+                mt[c] = media_types[c];
             }
         }
-        mt_count += media_count;
+    }
+    else {
+        /* capture device */
+        msg_Err( p_this, "capture device '%s' does not support required parameters !", devicename.c_str() );
+        p_device_filter->Release();
+        return VLC_EGENERIC;
     }
 
     /* Create and add our capture filter */
     CaptureFilter *p_capture_filter =
-        new CaptureFilter( p_this, p_sys, mt, mt_count );
+        new CaptureFilter( p_this, p_sys, mt, media_count );
     p_sys->p_graph->AddFilter( p_capture_filter, 0 );
 
     /* Add the device filter to the graph (seems necessary with VfW before
@@ -1221,15 +1145,19 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 BYTE *pSCC= (BYTE *)CoTaskMemAlloc(piSize);
                 if( NULL != pSCC )
                 {
+                    int i_priority = -1;
                     for( int i=0; i<piCount; ++i )
                     {
                         if( SUCCEEDED(pSC->GetStreamCaps(i, &p_mt, pSCC)) )
                         {
                             int i_current_fourcc = GetFourCCFromMediaType( *p_mt );
+                            int i_current_priority = GetFourCCPriority(i_current_fourcc);
 
-                            if( !i_current_fourcc || (i_fourcc && (i_current_fourcc != i_fourcc)) )
+                            if( !i_current_fourcc
+                             || (i_fourcc && (i_current_fourcc != i_fourcc))
+                             || (i_priority > i_current_priority) )
                             {
-                                // incompatible or unrecognized chroma, try next media type
+                                // incompatible or unwanted chroma, try next media type
                                 FreeMediaType( *p_mt );
                                 CoTaskMemFree( (PVOID)p_mt );
                                 continue;
@@ -1295,9 +1223,10 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                 // select this format as default
                                 if( SUCCEEDED( pSC->SetFormat(p_mt) ) )
                                 {
-                                    msg_Dbg( p_this, "EnumDeviceCaps: input pin video format configured");
-                                    // no need to check any more media types 
-                                    i = piCount;
+                                    i_priority = i_current_priority;
+                                    if( i_fourcc )
+                                        // no need to check any more media types 
+                                        i = piCount;
                                 }
                             }
                             else if( p_mt->majortype == MEDIATYPE_Audio
@@ -1351,9 +1280,10 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                 // select this format as default
                                 if( SUCCEEDED( pSC->SetFormat(p_mt) ) )
                                 {
-                                    msg_Dbg( p_this, "EnumDeviceCaps: input pin default format configured");
-                                    // no need to check any more media types 
-                                    i = piCount;
+                                    i_priority = i_current_priority;
+                                    if( i_fourcc )
+                                        // no need to check any more media types 
+                                        i = piCount;
                                 }
                             }
                             FreeMediaType( *p_mt );
@@ -1361,6 +1291,8 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                         }
                     }
                     CoTaskMemFree( (LPVOID)pSCC );
+                    if( i_priority >= 0 )
+                        msg_Dbg( p_this, "EnumDeviceCaps: input pin default format configured");
                 }
             }
             pSC->Release();
@@ -1375,7 +1307,6 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
             p_output_pin->Release();
             continue;
         }
-
 
         while( p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
         {
