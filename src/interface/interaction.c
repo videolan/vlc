@@ -1,8 +1,8 @@
 /*****************************************************************************
  * interaction.c: User interaction functions
  *****************************************************************************
- * Copyright (C) 1998-2004 VideoLAN
- * $Id: interface.c 10147 2005-03-05 17:18:30Z gbazin $
+ * Copyright (C) 2005-2006 VideoLAN
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *

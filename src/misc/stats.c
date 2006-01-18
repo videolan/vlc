@@ -1,8 +1,8 @@
 /*****************************************************************************
  * stats.c: Statistics handling
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
- * $Id: messages.c 12729 2005-10-02 08:00:06Z courmisch $
+ * Copyright (C) 2006 the VideoLAN team
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
