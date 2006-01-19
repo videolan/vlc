@@ -234,6 +234,7 @@ static int Open( vlc_object_t * p_this )
         /* This is not a fatal error. Some drivers simply don't support this property */
         msg_Warn( p_aout, "could not check whether device is hogged: %4.4s",
                  (char *)&err );
+        p_sys->i_hog_pid = -1;
     }
 
     if( p_sys->i_hog_pid != -1 && p_sys->i_hog_pid != getpid() )
