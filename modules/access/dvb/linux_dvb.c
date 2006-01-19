@@ -459,6 +459,8 @@ void E_(FrontendStatus)( access_t *p_access )
     CHECK_STATUS( HAS_SYNC );
     CHECK_STATUS( HAS_LOCK );
     CHECK_STATUS( REINIT );
+    if( i_status == 0 )
+        p += sprintf( p, "<tr><td>Tuning failed</td></tr>\n" );
 #undef CHECK_STATUS
 
     if ( i_status & FE_HAS_LOCK )
