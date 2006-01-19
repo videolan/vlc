@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
 dnl $Id$
 
-AC_INIT(vlc,0.8.5-svn)
+AC_INIT(vlc,0.8.5-xtophe)
 VERSION_MAJOR="0"
 VERSION_MINOR="8"
 VERSION_REVISION="5"
@@ -17,7 +17,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.8.5-svn)
+AM_INIT_AUTOMAKE(vlc,0.8.5-xtophe)
 AM_CONFIG_HEADER(config.h)
 
 dnl HA! HA!
@@ -738,13 +738,8 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
-dnl Default X headers and libraries
-if test "${x_includes}" = "NONE"; then
-  x_includes="/usr/X11R6/include"
-fi
-if test "${x_libraries}" = "NONE"; then
-  x_libraries="/usr/X11R6/lib"
-fi
+dnl Find where are the X headers and libraries
+AC_PATH_X()
 
 dnl it seems that autoconf do the pkg-config detection only for the first PKG_CHECK_MODULES in the configure.ac ( which is logical) but in our case it is nested in a if so it was not working if you're not on linux or have disable hal.
 
