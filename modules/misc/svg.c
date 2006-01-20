@@ -27,9 +27,17 @@
 #include <stdlib.h>                                      /* malloc( ), free( ) */
 #include <string.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#    include <unistd.h>
+#elif defined( WIN32 ) && !defined( UNDER_CE )
+#   include <io.h>
+#endif
 
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
@@ -111,7 +119,7 @@ struct filter_sys_t
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t *)p_this;
+    filter_t *p_filter = ( filter_t * )p_this;
     filter_sys_t *p_sys;
 
     /* Allocate structure */
@@ -144,7 +152,7 @@ static int Create( vlc_object_t *p_this )
 
 static byte_t *svg_GetTemplate( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t *)p_this;
+    filter_t *p_filter = ( filter_t * )p_this;
     char *psz_filename;
     char *psz_template;
     FILE *file;
@@ -178,7 +186,7 @@ static byte_t *svg_GetTemplate( vlc_object_t *p_this )
             }
             else
             {
-                msg_Dbg( p_this, "Reading %ld bytes from template %s\n", (long)s.st_size, psz_filename );
+                msg_Dbg( p_this, "Reading %ld bytes from template %s\n", ( long )s.st_size, psz_filename );
 
                 psz_template = malloc( s.st_size + 42 );
                 if( !psz_template )
@@ -212,7 +220,7 @@ static byte_t *svg_GetTemplate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t *)p_this;
+    filter_t *p_filter = ( filter_t * )p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->psz_template );
@@ -251,8 +259,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     i_height = gdk_pixbuf_get_height( p_svg->p_rendition );
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    memset( &fmt, 0, sizeof( video_format_t ) );
+    fmt.i_chroma = VLC_FOURCC( 'Y','U','V','A' );
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
@@ -281,7 +289,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     memset( p_u, 0x80, i_u_pitch * p_region->fmt.i_height );
     memset( p_v, 0x80, i_u_pitch * p_region->fmt.i_height );
 
-    p_pic = &(p_region->picture);
+    p_pic = &p_region->picture;
 
     /* Copy the data */
 
@@ -449,7 +457,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
     p_svg->i_width = p_sys->i_width;
     p_svg->i_height = p_sys->i_height;
-    p_svg->i_chroma = VLC_FOURCC('Y','U','V','A');
+    p_svg->i_chroma = VLC_FOURCC( 'Y','U','V','A' );
 
     /* Render the SVG.
        The input data is stored in the p_string structure,
