@@ -741,6 +741,12 @@ fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 dnl Find where are the X headers and libraries
 AC_PATH_X()
 
+dnl The rest of configure doesn't work if x_includes is null.
+dnl Cleaner way to do it welcomes
+if test -z ${x_includes} ;then
+	x_includes="/usr/includes"
+fi
+
 dnl it seems that autoconf do the pkg-config detection only for the first PKG_CHECK_MODULES in the configure.ac ( which is logical) but in our case it is nested in a if so it was not working if you're not on linux or have disable hal.
 
 PKG_PROG_PKG_CONFIG()
