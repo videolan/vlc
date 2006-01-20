@@ -4,7 +4,7 @@
 
 noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
 	                                     
-MOSTLYCLEANFILES = $(LIBRARIES_mozilla)
+MOSTLYCLEANFILES = $(LIBRARIES_mozilla) $(npvlc_DATA) $(DATA_npvlc_rsrc) $(vlcintf_xpt_DATA)
 EXTRA_DIST = $(SOURCES_mozilla) $(DIST_rsrc) $(DIST_misc)
 BUILT_SOURCES = $(BUILT_SOURCES_mozilla)
 
@@ -67,7 +67,7 @@ DATA_npvlc_rsrc = $(noinst_npvlc_rsrc_DATA)
 noinst_npvlc_rsrc_DATA = npvlc.rsrc
 noinst_npvlc_rsrcdir = $(libdir)
 npvlc.rsrc: $(srcdir)/vlc.r
-	/Developer/Tools/Rez /Developer/Headers/FlatCarbon/Types.r $< -o $@
+	/Developer/Tools/Rez -useDF /Developer/Headers/FlatCarbon/Types.r $< -o $@
 LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc) -dylib `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
 
 DATA_bundle = $(noinst_bundle_DATA)
@@ -77,12 +77,11 @@ noinst_bundledir = $(libdir)
 VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	rm -rf "$@"
 	mkdir -p "./$@/Contents/MacOS"
-	cp npvlc.dylib "./$@/Contents/MacOS/$@"
+	cp npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
 	mkdir -p ./"$@"/Contents/Resources
-	ditto -rsrcFork npvlc.rsrc "./$@/Contents/MacOS/$@.rsrc"
-	cp $(top_srcdir)/extras/MacOSX/plugin/Info.plist "./$@/Contents/Info.plist"
-	cp $(top_srcdir)/extras/MacOSX/plugin/pbdevelopment.plist "./$@/Contents/pbdevelopment.plist"
+	cp npvlc.rsrc "./$@/Contents/Resources/VLC Plugin.rsrc"
 	cp -r $(top_srcdir)/extras/MacOSX/plugin/English.lproj "./$@/Contents/Resources/"
+	cp $(top_srcdir)/extras/MacOSX/plugin/Info.plist "./$@/Contents/Info.plist"
 	(cd $(top_builddir)/VLC.app/Contents/MacOS/; tar cf - modules)| \
 	(cd "./$@/Contents/MacOS"; tar xf -)
 
