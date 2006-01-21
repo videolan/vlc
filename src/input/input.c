@@ -683,6 +683,7 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
      */
     if( !b_quick )
     {
+        /* Prepare statistics */
         counter_t *p_counter;
         stats_Create( p_input, "read_bytes", VLC_VAR_INTEGER, STATS_COUNTER );
         stats_Create( p_input, "read_packets", VLC_VAR_INTEGER, STATS_COUNTER );
@@ -698,6 +699,10 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
                                       "demux_bitrate" );
         if( p_counter ) p_counter->update_interval = 1000000;
 
+        stats_Create( p_input, "played_abuffers", VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "lost_abuffers", VLC_VAR_INTEGER, STATS_COUNTER );
+
+        /* handle sout */
         psz = var_GetString( p_input, "sout" );
         if( *psz && strncasecmp( p_input->input.p_item->psz_uri, "vlc:", 4 ) )
         {

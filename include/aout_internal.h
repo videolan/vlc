@@ -150,6 +150,9 @@ struct aout_input_t
      * third-party. */
     vlc_mutex_t             lock;
 
+    /* The input thread that spawned this input */
+    input_thread_t         *p_input_thread;
+
     audio_sample_format_t   input;
     aout_alloc_t            input_alloc;
 

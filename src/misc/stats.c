@@ -138,7 +138,6 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
     if( !p_handler ) return VLC_ENOMEM;
 
     vlc_mutex_lock( &p_handler->object_lock );
-
     /* Look for existing element */
     p_counter = GetCounter( p_handler, p_this->i_object_id,
                             psz_name );
@@ -176,7 +175,6 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
     p_handler = stats_HandlerGet( p_this );
     if( !p_handler ) return VLC_ENOMEM;
     vlc_mutex_lock( &p_handler->object_lock );
-
 
     /* Look for existing element */
     p_counter = GetCounter( p_handler, i_object_id,
@@ -292,6 +290,12 @@ void stats_ComputeInputStats( input_thread_t *p_input,
     stats_GetInteger( p_input, p_input->i_object_id, "decoded_audio",
                       &p_stats->i_decoded_audio );
 
+    /* Aout - We store in p_input because aout is shared */
+    stats_GetInteger( p_input, p_input->i_object_id, "played_abuffers",
+                      &p_stats->i_played_abuffers );
+    stats_GetInteger( p_input, p_input->i_object_id, "lost_abuffers",
+                      &p_stats->i_lost_abuffers );
+
     /* Vouts */
     p_list = vlc_list_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
     if( p_list )
@@ -311,6 +315,7 @@ void stats_ComputeInputStats( input_thread_t *p_input,
          }
         vlc_list_release( p_list );
     }
+
     vlc_mutex_unlock( &p_stats->lock );
 }
 
@@ -321,6 +326,7 @@ void stats_ReinitInputStats( input_stats_t *p_stats )
     p_stats->i_demux_read_packets = p_stats->i_demux_read_bytes =
     p_stats->f_demux_bitrate = p_stats->f_average_demux_bitrate =
     p_stats->i_displayed_pictures = p_stats->i_lost_pictures =
+    p_stats->i_played_abuffers = p_stats->i_lost_abuffers =
     p_stats->i_decoded_video = p_stats->i_decoded_audio = 0;
 }
 
@@ -329,13 +335,14 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
     vlc_mutex_lock( &p_stats->lock );
     /* f_bitrate is in bytes / microsecond
      * *1000 => bytes / millisecond => kbytes / seconds */
-    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - "
-                     "Demux : %i (%i bytes) - %f kB/s - Vout : %i/%i\n",
+    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - Demux : %i (%i bytes) - %f kB/s\n"
+                     " - Vout : %i/%i - Aout : %i/%i\n",
                     p_stats->i_read_packets, p_stats->i_read_bytes,
                     p_stats->f_input_bitrate * 1000,
                     p_stats->i_demux_read_packets, p_stats->i_demux_read_bytes,
                     p_stats->f_demux_bitrate * 1000,
-                    p_stats->i_displayed_pictures, p_stats->i_lost_pictures );
+                    p_stats->i_displayed_pictures, p_stats->i_lost_pictures,
+                    p_stats->i_played_abuffers, p_stats->i_lost_abuffers );
     vlc_mutex_unlock( &p_stats->lock );
 }
 
@@ -477,7 +484,7 @@ static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
                              char *psz_name )
 {
     int i;
-    for( i = 0; i< p_handler->i_counters; i++ )
+   for( i = 0; i< p_handler->i_counters; i++ )
     {
         counter_t *p_counter = p_handler->pp_counters[i];
         if( p_counter->i_source_object == i_object_id &&

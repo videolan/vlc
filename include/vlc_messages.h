@@ -314,6 +314,10 @@ struct input_stats_t
     /* Vout */
     int i_displayed_pictures;
     int i_lost_pictures;
+
+    /* Aout */
+    int i_played_abuffers;
+    int i_lost_abuffers;
 };
 
 VLC_EXPORT( void, stats_ComputeInputStats, (input_thread_t*, input_stats_t*) );

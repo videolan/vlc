@@ -140,6 +140,11 @@ static int MixBuffer( aout_instance_t * p_aout )
                           "trashing", mdate() - p_buffer->start_date );
                 p_buffer = aout_FifoPop( p_aout, p_fifo );
                 aout_BufferFree( p_buffer );
+                if( p_input->p_input_thread )
+                {
+//                    stats_UpdateInteger( p_input->p_input_thread,
+//                                         "lost_abuffers", 1 );
+                }
                 p_buffer = p_fifo->p_first;
                 p_input->p_first_byte_to_mix = NULL;
             }
@@ -197,6 +202,11 @@ static int MixBuffer( aout_instance_t * p_aout )
             msg_Warn( p_aout, "the mixer got a packet in the past ("I64Fd")",
                       start_date - p_buffer->end_date );
             aout_BufferFree( p_buffer );
+            if( p_input->p_input_thread )
+            {
+//                stats_UpdateInteger( p_input->p_input_thread,
+//                                     "lost_abuffers", 1 );
+            }
             p_fifo->p_first = p_buffer = p_next;
             p_input->p_first_byte_to_mix = NULL;
         }

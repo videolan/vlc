@@ -86,7 +86,6 @@ private:
 
     wxFlexGridSizer *input_sizer;
     wxStaticBoxSizer *input_bsizer;
-
     wxStaticText *read_bytes_text;
     wxStaticText *input_bitrate_text;
     wxStaticText *demux_bytes_text;
@@ -94,10 +93,15 @@ private:
 
     wxFlexGridSizer *video_sizer;
     wxStaticBoxSizer *video_bsizer;
-
     wxStaticText *video_decoded_text;
     wxStaticText *displayed_text;
     wxStaticText *lost_frames_text;
+
+    wxFlexGridSizer *audio_sizer;
+    wxStaticBoxSizer *audio_bsizer;
+    wxStaticText *audio_decoded_text;
+    wxStaticText *played_abuffers_text;
+    wxStaticText *lost_abuffers_text;
 };
 };
 #endif

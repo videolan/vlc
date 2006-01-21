@@ -134,12 +134,14 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     {
         p_input->i_pts_delay = p_input_thread->i_pts_delay;
         p_input->i_pts_delay += p_input->i_desync;
+        p_input->p_input_thread = p_input_thread;
         vlc_object_release( p_input_thread );
     }
     else
     {
         p_input->i_pts_delay = DEFAULT_PTS_DELAY;
         p_input->i_pts_delay += p_input->i_desync;
+        p_input->p_input_thread = NULL;
     }
 
     return p_input;
@@ -308,6 +310,10 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         msg_Warn( p_aout, "received buffer in the future ("I64Fd")",
                   p_buffer->start_date - mdate());
+        if( p_input->p_input_thread )
+        {
+            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1 );
+        }
         aout_BufferFree( p_buffer );
         return -1;
     }
@@ -358,6 +364,11 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Run the mixer if it is able to run. */
     vlc_mutex_lock( &p_aout->mixer_lock );
     aout_MixerRun( p_aout );
+    if( p_input->p_input_thread )
+    {
+        stats_UpdateInteger( p_input->p_input_thread,
+                            "played_abuffers", 1 );
+    }
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
     return 0;

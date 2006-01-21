@@ -445,6 +445,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
         }
         start_date = 0;
+        if( p_input->p_input_thread )
+        {
+            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1 );
+        }
     }
 
     if ( p_buffer->start_date < mdate() + AOUT_MIN_PREPARE_TIME )
@@ -453,6 +457,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * can't present it anyway, so drop the buffer. */
         msg_Warn( p_aout, "PTS is out of range ("I64Fd"), dropping buffer",
                   mdate() - p_buffer->start_date );
+        if( p_input->p_input_thread )
+        {
+            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1 );
+        }
         aout_BufferFree( p_buffer );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
         if ( p_input->i_nb_resamplers != 0 )
@@ -490,6 +498,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "audio drift is too big ("I64Fd"), dropping buffer",
                   start_date - p_buffer->start_date );
         aout_BufferFree( p_buffer );
+        if( p_input->p_input_thread )
+        {
+            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1 );
+        }
         return 0;
     }
 

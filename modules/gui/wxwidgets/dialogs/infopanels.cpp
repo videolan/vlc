@@ -197,6 +197,31 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     video_bsizer->Layout();
     sizer->Add( video_bsizer , 0, wxALL| wxGROW, 5 );
 
+   /* Aout */
+    wxStaticBox *audio_box = new wxStaticBox( this, -1,
+                                              wxU( _("Audio" ) ) );
+    audio_box->SetAutoLayout( TRUE );
+    audio_bsizer = new wxStaticBoxSizer( audio_box, wxVERTICAL );
+    audio_sizer = new wxFlexGridSizer( 2,3, 20 );
+
+#define AUDIO_ADD(txt,widget,dflt) \
+    { audio_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),   \
+                         0, wxEXPAND|wxLEFT , 5  );                      \
+      widget = new wxStaticText( this, -1, wxU( dflt ) );                \
+      audio_sizer->Add( widget, 0, wxEXPAND|wxRIGHT, 5 );                \
+    }
+    AUDIO_ADD( "Decoded blocks", audio_decoded_text, "0" );
+    /* Hack to get enough size */
+    AUDIO_ADD( "Played buffers", played_abuffers_text,
+                                 "0                  " );
+    AUDIO_ADD( "Lost buffers", lost_abuffers_text, "0" );
+
+
+    audio_sizer->Layout();
+    audio_bsizer->Add( audio_sizer, 0, wxALL | wxGROW, 5 );
+    audio_bsizer->Layout();
+    sizer->Add( audio_bsizer , 0, wxALL| wxGROW, 5 );
+
     sizer->Layout();
     panel_sizer->Add( sizer, 0, wxEXPAND, 5 );
     panel_sizer->Layout();
@@ -227,6 +252,10 @@ void InputStatsInfoPanel::Update( input_item_t *p_item )
     UPDATE( video_decoded_text, "%5i", p_item->p_stats->i_decoded_video );
     UPDATE( displayed_text, "%5i", p_item->p_stats->i_displayed_pictures );
     UPDATE( lost_frames_text, "%5i", p_item->p_stats->i_lost_pictures );
+
+    UPDATE( audio_decoded_text, "%5i", p_item->p_stats->i_decoded_audio );
+    UPDATE( played_abuffers_text, "%5i", p_item->p_stats->i_played_abuffers );
+    UPDATE( lost_abuffers_text, "%5i", p_item->p_stats->i_lost_abuffers );
 
     vlc_mutex_unlock( &p_item->p_stats->lock );
 

@@ -625,7 +625,7 @@ static void RunThread ( playlist_t *p_playlist )
             {
                 stats_ComputeInputStats( p_playlist->p_input,
                                   p_playlist->p_input->input.p_item->p_stats );
-//               stats_DumpInputStats(
+//                stats_DumpInputStats(
 //                            p_playlist->p_input->input.p_item->p_stats );
             }
 
