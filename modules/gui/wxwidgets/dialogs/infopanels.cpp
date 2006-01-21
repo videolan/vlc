@@ -220,6 +220,7 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     audio_sizer->Layout();
     audio_bsizer->Add( audio_sizer, 0, wxALL | wxGROW, 5 );
     audio_bsizer->Layout();
+    sizer->Add( NULL , 0, wxALL| wxGROW, 5 );
     sizer->Add( audio_bsizer , 0, wxALL| wxGROW, 5 );
 
     sizer->Layout();
