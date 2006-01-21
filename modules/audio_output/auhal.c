@@ -292,130 +292,145 @@ static int OpenAnalog( aout_instance_t *p_aout )
     }
 
     err = OpenAComponent( p_sys->au_component, &p_sys->au_unit );
-    if( err )
+    if( err != noErr )
     {
         msg_Warn( p_aout, "we cannot open our HAL component" );
         return VLC_FALSE;
     }
     
     /* Set the device we will use for this output unit */
-    verify_noerr( AudioUnitSetProperty( p_sys->au_unit,
+    err = AudioUnitSetProperty( p_sys->au_unit,
                          kAudioOutputUnitProperty_CurrentDevice,
                          kAudioUnitScope_Global,
                          0,
                          &p_sys->i_selected_dev,
-                         sizeof( AudioDeviceID )));
+                         sizeof( AudioDeviceID ));
+                         
+    if( err != noErr )
+    {
+        msg_Warn( p_aout, "we cannot select the audio device" );
+        return VLC_FALSE;
+    }
                          
     /* Get the current format */
     i_param_size = sizeof(AudioStreamBasicDescription);
 
-    verify_noerr( AudioUnitGetProperty( p_sys->au_unit,
+    err = AudioUnitGetProperty( p_sys->au_unit,
                                    kAudioUnitProperty_StreamFormat,
                                    kAudioUnitScope_Input,
                                    0,
                                    &DeviceFormat,
-                                   &i_param_size ));
+                                   &i_param_size );
                                    
-    msg_Dbg( p_aout, STREAM_FORMAT_MSG( "current format is: ", DeviceFormat ) );
+    if( err != noErr ) return VLC_FALSE;
+    else msg_Dbg( p_aout, STREAM_FORMAT_MSG( "current format is: ", DeviceFormat ) );
 
     /* Get the channel layout of the device side of the unit (vlc -> unit -> device) */
-    verify_noerr( AudioUnitGetPropertyInfo( p_sys->au_unit,
+    err = AudioUnitGetPropertyInfo( p_sys->au_unit,
                                    kAudioDevicePropertyPreferredChannelLayout,
                                    kAudioUnitScope_Output,
                                    0,
                                    &i_param_size,
-                                   NULL ));
+                                   NULL );
 
-    layout = (AudioChannelLayout *)malloc( i_param_size);
+    if( err == noErr )
+    {
+        layout = (AudioChannelLayout *)malloc( i_param_size);
 
-    verify_noerr( AudioUnitGetProperty( p_sys->au_unit,
-                                   kAudioDevicePropertyPreferredChannelLayout,
-                                   kAudioUnitScope_Output,
-                                   0,
-                                   layout,
-                                   &i_param_size ));
-                                   
-    /* We need to "fill out" the ChannelLayout, because there are multiple ways that it can be set */
-    if( layout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
-    {
-        /* bitmap defined channellayout */
-        verify_noerr( AudioFormatGetProperty( kAudioFormatProperty_ChannelLayoutForBitmap,
-                                sizeof( UInt32), &layout->mChannelBitmap,
-                                &i_param_size,
-                                layout ));
-    }
-    else if( layout->mChannelLayoutTag != kAudioChannelLayoutTag_UseChannelDescriptions )
-    {
-        /* layouttags defined channellayout */
-        verify_noerr( AudioFormatGetProperty( kAudioFormatProperty_ChannelLayoutForTag,
-                                sizeof( AudioChannelLayoutTag ), &layout->mChannelLayoutTag,
-                                &i_param_size,
-                                layout ));
-    }
+        verify_noerr( AudioUnitGetProperty( p_sys->au_unit,
+                                       kAudioDevicePropertyPreferredChannelLayout,
+                                       kAudioUnitScope_Output,
+                                       0,
+                                       layout,
+                                       &i_param_size ));
+                                       
+        /* We need to "fill out" the ChannelLayout, because there are multiple ways that it can be set */
+        if( layout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
+        {
+            /* bitmap defined channellayout */
+            verify_noerr( AudioFormatGetProperty( kAudioFormatProperty_ChannelLayoutForBitmap,
+                                    sizeof( UInt32), &layout->mChannelBitmap,
+                                    &i_param_size,
+                                    layout ));
+        }
+        else if( layout->mChannelLayoutTag != kAudioChannelLayoutTag_UseChannelDescriptions )
+        {
+            /* layouttags defined channellayout */
+            verify_noerr( AudioFormatGetProperty( kAudioFormatProperty_ChannelLayoutForTag,
+                                    sizeof( AudioChannelLayoutTag ), &layout->mChannelLayoutTag,
+                                    &i_param_size,
+                                    layout ));
+        } 
 
-    msg_Dbg( p_aout, "layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions );
-    
-    /* Initialize the VLC core channel count */
-    p_aout->output.output.i_physical_channels = 0;
-    i_original = p_aout->output.output.i_original_channels & AOUT_CHAN_PHYSMASK;
-    
-    if( i_original == AOUT_CHAN_CENTER || layout->mNumberChannelDescriptions < 2 )
-    {
-        /* We only need Mono or cannot output more than 1 channel */
-        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
-    }
-    else if( i_original == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) || layout->mNumberChannelDescriptions < 3 )
-    {
-        /* We only need Stereo or cannot output more than 2 channels */
-        p_aout->output.output.i_physical_channels = AOUT_CHAN_RIGHT | AOUT_CHAN_LEFT;
+        msg_Dbg( p_aout, "layout of AUHAL has %d channels" , (int)layout->mNumberChannelDescriptions );
+        
+        /* Initialize the VLC core channel count */
+        p_aout->output.output.i_physical_channels = 0;
+        i_original = p_aout->output.output.i_original_channels & AOUT_CHAN_PHYSMASK;
+        
+        if( i_original == AOUT_CHAN_CENTER || layout->mNumberChannelDescriptions < 2 )
+        {
+            /* We only need Mono or cannot output more than 1 channel */
+            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+        }
+        else if( i_original == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) || layout->mNumberChannelDescriptions < 3 )
+        {
+            /* We only need Stereo or cannot output more than 2 channels */
+            p_aout->output.output.i_physical_channels = AOUT_CHAN_RIGHT | AOUT_CHAN_LEFT;
+        }
+        else
+        {
+            /* We want more than stereo and we can do that */
+            for( i = 0; i < layout->mNumberChannelDescriptions; i++ )
+            {
+                msg_Dbg( p_aout, "this is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
+
+                switch( layout->mChannelDescriptions[i].mChannelLabel )
+                {
+                    case kAudioChannelLabel_Left:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_LEFT;
+                        continue;
+                    case kAudioChannelLabel_Right:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_RIGHT;
+                        continue;
+                    case kAudioChannelLabel_Center:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_CENTER;
+                        continue;
+                    case kAudioChannelLabel_LFEScreen:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_LFE;
+                        continue;
+                    case kAudioChannelLabel_LeftSurround:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARLEFT;
+                        continue;
+                    case kAudioChannelLabel_RightSurround:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARRIGHT;
+                        continue;
+                    case kAudioChannelLabel_RearSurroundLeft:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
+                        continue;
+                    case kAudioChannelLabel_RearSurroundRight:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
+                        continue;
+                    case kAudioChannelLabel_CenterSurround:
+                        p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARCENTER;
+                        continue;
+                    default:
+                        msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
+                }
+            }
+            if( p_aout->output.output.i_physical_channels == 0 )
+            {
+                p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                msg_Err( p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode." );
+            }
+        }
+        if( layout ) free( layout );
     }
     else
     {
-        /* We want more than stereo and we can do that */
-        for( i = 0; i < layout->mNumberChannelDescriptions; i++ )
-        {
-            msg_Dbg( p_aout, "this is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
-
-            switch( layout->mChannelDescriptions[i].mChannelLabel )
-            {
-                case kAudioChannelLabel_Left:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_LEFT;
-                    continue;
-                case kAudioChannelLabel_Right:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_RIGHT;
-                    continue;
-                case kAudioChannelLabel_Center:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_CENTER;
-                    continue;
-                case kAudioChannelLabel_LFEScreen:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_LFE;
-                    continue;
-                case kAudioChannelLabel_LeftSurround:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARLEFT;
-                    continue;
-                case kAudioChannelLabel_RightSurround:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARRIGHT;
-                    continue;
-                case kAudioChannelLabel_RearSurroundLeft:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLELEFT;
-                    continue;
-                case kAudioChannelLabel_RearSurroundRight:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_MIDDLERIGHT;
-                    continue;
-                case kAudioChannelLabel_CenterSurround:
-                    p_aout->output.output.i_physical_channels |= AOUT_CHAN_REARCENTER;
-                    continue;
-                default:
-                    msg_Warn( p_aout, "Unrecognized channel form provided by driver: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
-            }
-        }
-        if( p_aout->output.output.i_physical_channels == 0 )
-        {
-            p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-            msg_Err( p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode." );
-        }
+        msg_Warn( p_aout, "this driver does not support kAudioDevicePropertyPreferredChannelLayout. BAD DRIVER AUTHOR !!!" );
+        p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
-    if( layout ) free( layout );
 
     msg_Dbg( p_aout, "selected %d physical channels for device output", aout_FormatNbChannels( &p_aout->output.output ) );
     msg_Dbg( p_aout, "VLC will output: %s", aout_FormatPrintChannels( &p_aout->output.output ));
