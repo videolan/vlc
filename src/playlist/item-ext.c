@@ -243,6 +243,11 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         p_playlist->status.i_status = PLAYLIST_RUNNING;
     }
 
+    if( i_mode & PLAYLIST_PREPARSE )
+    {
+        playlist_PreparseEnqueue( p_playlist, &p_item->input );
+    }
+
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     if( b_end == VLC_FALSE )
@@ -362,6 +367,10 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
             input_StopThread( p_playlist->p_input );
         }
         p_playlist->status.i_status = PLAYLIST_RUNNING;
+    }
+    if( i_mode & PLAYLIST_PREPARSE )
+    {
+        playlist_PreparseEnqueue( p_playlist, &p_item->input );
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );

@@ -1200,7 +1200,8 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             }
         }
 
-        playlist_AddItem( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_AddItem( p_playlist, p_item, PLAYLIST_APPEND|PLAYLIST_PREPARSE,
+                          PLAYLIST_END );
 
         if( b_start )
         {

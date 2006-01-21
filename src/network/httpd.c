@@ -2553,7 +2553,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             case 1: /* missing input - most likely */
                                 i_state = HTTPD_CLIENT_TLS_HS_IN;
                                 break;
-    
+
                             case 2: /* missing output */
                                 i_state = HTTPD_CLIENT_TLS_HS_OUT;
                                 break;
@@ -2563,8 +2563,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     if( fd >= 0 )
                     {
                         httpd_client_t *cl;
-                        stats_UpdateInteger( host, "client_connections",
-                                             1 );
+                        stats_UpdateInteger( host, "client_connections", 1 );
                         stats_UpdateInteger( host, "active_connections", 1 );
                         cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
                         p_tls = NULL;
