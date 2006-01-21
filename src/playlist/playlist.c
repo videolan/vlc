@@ -198,7 +198,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 
     // Preparse
     p_playlist->p_preparse->i_waiting = 0;
-    p_playlist->p_preparse->pp_waiting = NULL;
+    p_playlist->p_preparse->pi_waiting = NULL;
 
     // Interaction
     p_playlist->p_interaction = NULL;
@@ -486,10 +486,10 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
                               input_item_t *p_item )
 {
     vlc_mutex_lock( &p_playlist->p_preparse->object_lock );
-    INSERT_ELEM( p_playlist->p_preparse->pp_waiting,
+    INSERT_ELEM( p_playlist->p_preparse->pi_waiting,
                  p_playlist->p_preparse->i_waiting,
                  p_playlist->p_preparse->i_waiting,
-                 p_item );
+                 p_item->i_id );
     vlc_mutex_unlock( &p_playlist->p_preparse->object_lock );
     return VLC_SUCCESS;
 }
@@ -501,10 +501,10 @@ void playlist_PreparseEnqueueItemSub( playlist_t *p_playlist,
     int i;
     if( p_item->i_children == -1 )
     {
-        INSERT_ELEM( p_playlist->p_preparse->pp_waiting,
+        INSERT_ELEM( p_playlist->p_preparse->pi_waiting,
                      p_playlist->p_preparse->i_waiting,
                      p_playlist->p_preparse->i_waiting,
-                     &(p_item->input) );
+                     (p_item->input.i_id) );
     }
     else
     {
@@ -842,11 +842,22 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
 
         if( p_obj->i_waiting > 0 )
         {
-            input_item_t *p_current = p_obj->pp_waiting[0];
-            REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
+            int i_current_id = p_obj->pi_waiting[0];
+            playlist_item_t *p_current;
+            REMOVE_ELEM( p_obj->pi_waiting, p_obj->i_waiting, 0 );
             vlc_mutex_unlock( &p_obj->object_lock );
-            input_Preparse( p_playlist, p_current );
-            var_SetInteger( p_playlist, "item-change", p_current->i_id );
+            vlc_mutex_lock( &p_playlist->object_lock );
+
+            p_current = playlist_ItemGetById( p_playlist, i_current_id );
+            if( p_current )
+            {
+                input_Preparse( p_playlist, &p_current->input );
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                var_SetInteger( p_playlist, "item-change",
+                                p_current->input.i_id );
+            }
+            else
+                vlc_mutex_unlock( &p_playlist->object_lock );
             vlc_mutex_lock( &p_obj->object_lock );
         }
         b_sleep = ( p_obj->i_waiting == 0 );

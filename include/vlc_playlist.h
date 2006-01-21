@@ -136,7 +136,7 @@ struct playlist_preparse_t
     VLC_COMMON_MEMBERS
     vlc_mutex_t     lock;
     int             i_waiting;
-    input_item_t  **pp_waiting;
+    int            *pi_waiting;
 };
 
 

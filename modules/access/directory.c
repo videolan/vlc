@@ -558,7 +558,8 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 playlist_NodeAddItem( p_playlist,p_item,
                                       p_parent->pp_parents[0]->i_view,
                                       p_parent,
-                                      PLAYLIST_APPEND, PLAYLIST_END );
+                                      PLAYLIST_APPEND | PLAYLIST_PREPARSE,
+                                      PLAYLIST_END );
 
                 playlist_CopyParents( p_parent, p_item );
             }
