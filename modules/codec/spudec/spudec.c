@@ -1,10 +1,10 @@
 /*****************************************************************************
  * spudec.c : SPU decoder thread
  *****************************************************************************
- * Copyright (C) 2000-2001 the VideoLAN team
+ * Copyright (C) 2000-2001, 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -119,7 +119,11 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_block ) block_ChainRelease( p_sys->p_block );
+    if( p_sys->p_block )
+    {
+        block_ChainRelease( p_sys->p_block );
+    }
+
     free( p_sys );
 }
 
@@ -130,28 +134,30 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_spu_block;
+    subpicture_t  *p_spu;
 
-    if( (p_spu_block = Reassemble( p_dec, pp_block )) )
+    p_spu_block = Reassemble( p_dec, pp_block );
+
+    if( ! p_spu_block )
     {
-        subpicture_t *p_spu;
-
-        p_sys->i_spu = block_ChainExtract( p_spu_block, p_sys->buffer, 65536 );
-        p_sys->i_pts = p_spu_block->i_pts;
-        block_ChainRelease( p_spu_block );
-
-        /* Parse and decode */
-        p_spu = E_(ParsePacket)( p_dec );
-
-        /* reinit context */
-        p_sys->i_spu_size = 0;
-        p_sys->i_rle_size = 0;
-        p_sys->i_spu      = 0;
-        p_sys->p_block    = NULL;
-
-        return p_spu;
+        return NULL;
     }
 
-    return NULL;
+    /* FIXME: what the, we shouldn’t need to allocate 64k of buffer --sam. */
+    p_sys->i_spu = block_ChainExtract( p_spu_block, p_sys->buffer, 65536 );
+    p_sys->i_pts = p_spu_block->i_pts;
+    block_ChainRelease( p_spu_block );
+
+    /* Parse and decode */
+    p_spu = E_(ParsePacket)( p_dec );
+
+    /* reinit context */
+    p_sys->i_spu_size = 0;
+    p_sys->i_rle_size = 0;
+    p_sys->i_spu      = 0;
+    p_sys->p_block    = NULL;
+
+    return p_spu;
 }
 
 /*****************************************************************************
@@ -162,21 +168,21 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_spu = Reassemble( p_dec, pp_block );
 
-    if( p_spu )
+    if( ! p_spu )
     {
-        p_spu->i_dts = p_spu->i_pts;
-        p_spu->i_length = 0;
-
-        /* reinit context */
-        p_sys->i_spu_size = 0;
-        p_sys->i_rle_size = 0;
-        p_sys->i_spu      = 0;
-        p_sys->p_block    = NULL;
-
-        return block_ChainGather( p_spu );
+        return NULL;
     }
 
-    return NULL;
+    p_spu->i_dts = p_spu->i_pts;
+    p_spu->i_length = 0;
+
+    /* reinit context */
+    p_sys->i_spu_size = 0;
+    p_sys->i_rle_size = 0;
+    p_sys->i_spu      = 0;
+    p_sys->p_block    = NULL;
+
+    return block_ChainGather( p_spu );
 }
 
 /*****************************************************************************

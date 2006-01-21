@@ -1,10 +1,10 @@
 /*****************************************************************************
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
- * Copyright (C) 1999, 2000 the VideoLAN team
+ * Copyright (C) 1999, 2000, 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ struct decoder_sys_t
     int b_packetizer;
 
     mtime_t i_pts;
-    int i_spu_size;
-    int i_rle_size;
-    int i_spu;
+    unsigned int i_spu_size;
+    unsigned int i_rle_size;
+    unsigned int i_spu;
 
     block_t *p_block;
 
-    /* We will never overflow more than 11 bytes if I'm right */
-    uint8_t buffer[65536 + 20 ];
+    /* We will never overflow */
+    uint8_t buffer[65536];
 };
 
 typedef struct subpicture_data_t
