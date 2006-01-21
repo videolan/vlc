@@ -114,7 +114,7 @@ struct decoder_sys_t
 #endif /* LOADER */
 
     HMODULE qtml;
-    HINSTANCE qtime_qts;
+    HINSTANCE qts;
     OSErr (*InitializeQTML)             ( long flags );
     OSErr (*TerminateQTML)              ( void );
 #endif /* SYS_DARWIN */
@@ -777,7 +777,7 @@ static int OpenVideo( decoder_t *p_dec )
                                           &p_sys->OutBufferRect,
                                           0, 0, 0,
                                           p_sys->plane,
-                                          p_dec->fmt_in.video.i_width * 2 );
+                                          (long)p_dec->fmt_in.video.i_width * 2 );
 
     msg_Dbg( p_dec, "NewGWorldFromPtr returned:%ld\n",
              65536 - ( i_result&0xffff ) );
@@ -800,12 +800,11 @@ static int OpenVideo( decoder_t *p_dec )
     msg_Dbg( p_dec, "quicktime_video: ImageCodecPreDecompress cres=0x%X\n",
              (int)cres );
 
-    p_dec->fmt_out.i_codec = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC( 'Y', 'U', 'Y', '2' ));
     p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
     p_dec->fmt_out.video.i_height= p_dec->fmt_in.video.i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->fmt_in.video.i_width / p_dec->fmt_in.video.i_height;
-
-
+    
     vlc_mutex_unlock( lockval.p_address );
     return VLC_SUCCESS;
 
