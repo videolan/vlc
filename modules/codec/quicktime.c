@@ -111,9 +111,10 @@ struct decoder_sys_t
 #ifndef SYS_DARWIN
 #ifdef LOADER
     ldt_fs_t    *ldt_fs;
-
 #endif /* LOADER */
+
     HMODULE qtml;
+    HINSTANCE qtime_qts;
     OSErr (*InitializeQTML)             ( long flags );
     OSErr (*TerminateQTML)              ( void );
 #endif /* SYS_DARWIN */
@@ -136,7 +137,7 @@ struct decoder_sys_t
     SoundConverter      myConverter;
     SoundComponentData  InputFormatInfo, OutputFormatInfo;
 
-    long            FramesToGet;
+    unsigned long   FramesToGet;
     unsigned int    InFrameSize;
     unsigned int    OutFrameSize;
 
@@ -306,19 +307,18 @@ static void Close( vlc_object_t *p_this )
         i_error = p_sys->SoundConverterClose( p_sys->myConverter );
         msg_Dbg( p_dec, "SoundConverterClose => %d", i_error );
 
-        free( p_sys->p_buffer );
+        if( p_sys->p_buffer ) free( p_sys->p_buffer );
     }
     else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
-        free( p_sys->plane );
+        if( p_sys->plane)  free( p_sys->plane );
     }
 
 #ifndef SYS_DARWIN
     FreeLibrary( p_sys->qtml );
+    FreeLibrary( p_sys->qts );
     msg_Dbg( p_dec, "FreeLibrary ok." );
-#endif
-
-#ifdef SYS_DARWIN
+#else
     ExitMovies();
 #endif
 
@@ -561,7 +561,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         if( p_sys->i_buffer > p_sys->InFrameSize )
         {
             int i_frames = p_sys->i_buffer / p_sys->InFrameSize;
-            long i_out_frames, i_out_bytes;
+            unsigned long i_out_frames, i_out_bytes;
 
             var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
             vlc_mutex_lock( lockval.p_address );
@@ -710,7 +710,7 @@ static int OpenVideo( decoder_t *p_dec )
 
     memset( &icap, 0, sizeof( ImageSubCodecDecompressCapabilities ) );
     cres =  p_sys->ImageCodecInitialize( p_sys->ci, &icap );
-/*    msg_Dbg( p_dec->p_fifo, "ImageCodecInitialize->%p  size=%d (%d)\n",cres,icap.recordSize,icap.decompressRecordSize); */
+    msg_Dbg( p_dec, "ImageCodecInitialize->0x%X size=%ld (%ld)\n",(int)cres,icap.recordSize,icap.decompressRecordSize);
 
     memset( &cinfo, 0, sizeof( CodecInfo ) );
     cres =  p_sys->ImageCodecGetCodecInfo( p_sys->ci, &cinfo );
@@ -753,12 +753,13 @@ static int OpenVideo( decoder_t *p_dec )
     }
 
     msg_Dbg( p_dec, "idSize=%ld ver=%d rev=%d vendor=%ld tempQ=%d "
-             "spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d frameCount=%d clutID=%d",
+             "spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d depth=%d frameCount=%d clutID=%d",
              id->idSize, id->version, id->revisionLevel, id->vendor,
              (int)id->temporalQuality, (int)id->spatialQuality,
              id->width, id->height,
              (int)id->hRes, (int)id->vRes,
              (int)id->dataSize,
+             id->depth,
              id->frameCount,
              id->clutID );
 
@@ -826,6 +827,7 @@ exit_error:
 static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    vlc_value_t   lockval;
     block_t       *p_block;
     picture_t     *p_pic;
     mtime_t       i_pts;
@@ -852,8 +854,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
     p_block = *pp_block;
-    *pp_block = NULL;
 
+    if( !p_block->i_buffer )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+    
     i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
 
     if( i_pts < mdate() )
@@ -864,6 +871,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         p_sys->i_late = 0;
     }
+    msg_Dbg( p_dec, "bufsize: %d",p_block->i_buffer);
 
     if( p_sys->i_late > 10 )
     {
@@ -871,19 +879,17 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         return NULL;
     }
+    
+    var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
+    vlc_mutex_lock( lockval.p_address );
 
     if( ( p_pic = p_dec->pf_vout_buffer_new( p_dec ) ) )
     {
-        vlc_value_t     lockval;
-
-        p_sys->decpar.data                  = p_block->p_buffer;
+        p_sys->decpar.data                  = (Ptr)p_block->p_buffer;
         p_sys->decpar.bufferSize            = p_block->i_buffer;
         (**p_sys->framedescHandle).dataSize = p_block->i_buffer;
 
-        var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
-        vlc_mutex_lock( lockval.p_address );
         cres = p_sys->ImageCodecBandDecompress( p_sys->ci, &p_sys->decpar );
-        vlc_mutex_unlock( lockval.p_address );
 
         ++p_sys->decpar.frameNumber;
 
@@ -898,8 +904,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_dec->fmt_in.video.i_width * p_dec->fmt_in.video.i_height * 2 );
         p_pic->date = i_pts;
     }
-    block_Release( p_block );
+    else 
+    
+    vlc_mutex_unlock( lockval.p_address );
 
+    block_Release( p_block );
     return p_pic;
 }
 #endif /* !WIN32 */
@@ -925,6 +934,12 @@ static int QTAudioInit( decoder_t *p_dec )
     p_sys->ldt_fs = Setup_LDT_Keeper();
 #endif /* LOADER */
 
+    p_sys->qts = LoadLibraryA( "QuickTime.qts" );
+    if( p_sys->qts == NULL )
+    {
+        msg_Dbg( p_dec, "failed loading QuickTime.qts" );
+        return VLC_EGENERIC;
+    }
     p_sys->qtml = LoadLibraryA( "qtmlClient.dll" );
     if( p_sys->qtml == NULL )
     {
@@ -988,6 +1003,13 @@ static int QTVideoInit( decoder_t *p_dec )
 #ifdef LOADER
     p_sys->ldt_fs = Setup_LDT_Keeper();
 #endif /* LOADER */
+    p_sys->qts = LoadLibraryA( "QuickTime.qts" );
+    if( p_sys->qts == NULL )
+    {
+        msg_Dbg( p_dec, "failed loading QuickTime.qts" );
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( p_dec, "QuickTime.qts loaded" );
     p_sys->qtml = LoadLibraryA( "qtmlClient.dll" );
     if( p_sys->qtml == NULL )
     {
