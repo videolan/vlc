@@ -64,6 +64,7 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
     memset( p_item, 0, sizeof( playlist_item_t ) );
 
     vlc_input_item_Init( p_obj, &p_item->input );
+    p_item->input.b_fixed_name = VLC_FALSE;
 
     p_item->input.psz_uri = strdup( psz_uri );
 
