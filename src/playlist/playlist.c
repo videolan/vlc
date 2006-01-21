@@ -851,10 +851,25 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
             p_current = playlist_ItemGetById( p_playlist, i_current_id );
             if( p_current )
             {
-                input_Preparse( p_playlist, &p_current->input );
+                vlc_bool_t b_preparsed = VLC_FALSE;
+                if( strncmp( p_current->input.psz_uri, "http:", 5 ) &&
+                    strncmp( p_current->input.psz_uri, "rtsp:", 5 ) &&
+                    strncmp( p_current->input.psz_uri, "udp:", 4 ) &&
+                    strncmp( p_current->input.psz_uri, "mms:", 4 ) &&
+                    strncmp( p_current->input.psz_uri, "cdda:", 4 ) &&
+                    strncmp( p_current->input.psz_uri, "dvd:", 4 ) &&
+                    strncmp( p_current->input.psz_uri, "v4l:", 4 ) &&
+                    strncmp( p_current->input.psz_uri, "dshow:", 6 ) )
+                {
+                    b_preparsed = VLC_TRUE;
+                    input_Preparse( p_playlist, &p_current->input );
+                }
                 vlc_mutex_unlock( &p_playlist->object_lock );
-                var_SetInteger( p_playlist, "item-change",
-                                p_current->input.i_id );
+                if( b_preparsed )
+                {
+                    var_SetInteger( p_playlist, "item-change",
+                                    p_current->input.i_id );
+                }
             }
             else
                 vlc_mutex_unlock( &p_playlist->object_lock );
