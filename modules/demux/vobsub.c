@@ -582,7 +582,11 @@ static int ParseVobSubIDX( demux_t *p_demux )
             {
                 subtitle_t *current_sub;
 
-                if( line[count-3] == '-' ) i_sign = -1;
+                if( line[count-3] == '-' )
+                {
+                    i_sign = -1;
+                    h = -h;
+                }
                 i_start = (int64_t) ( h * 3600*1000 +
                             m * 60*1000 +
                             s * 1000 +
@@ -612,7 +616,11 @@ static int ParseVobSubIDX( demux_t *p_demux )
             if( sscanf( line, "delay: %d%n:%d:%d:%d",
                         &h, &count, &m, &s, &ms ) >= 4 )
             {
-                if( line[count-3] == '-' ) i_sign = -1;
+                if( line[count-3] == '-' )
+                {
+                    i_sign = -1;
+                    h = -h;
+                }
                 i_gap = (int64_t) ( h * 3600*1000 +
                             m * 60*1000 +
                             s * 1000 +
