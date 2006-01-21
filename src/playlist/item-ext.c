@@ -243,7 +243,8 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         p_playlist->status.i_status = PLAYLIST_RUNNING;
     }
 
-    if( i_mode & PLAYLIST_PREPARSE )
+    if( i_mode & PLAYLIST_PREPARSE &&
+        var_CreateGetBool( p_playlist, "auto-preparse" ) )
     {
         playlist_PreparseEnqueue( p_playlist, &p_item->input );
     }
@@ -368,7 +369,8 @@ int playlist_NodeAddItem( playlist_t *p_playlist, playlist_item_t *p_item,
         }
         p_playlist->status.i_status = PLAYLIST_RUNNING;
     }
-    if( i_mode & PLAYLIST_PREPARSE )
+    if( i_mode & PLAYLIST_PREPARSE &&
+        var_CreateGetBool( p_playlist, "auto-preparse" ) )
     {
         playlist_PreparseEnqueue( p_playlist, &p_item->input );
     }

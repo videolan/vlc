@@ -687,6 +687,11 @@ static char *ppsz_clock_descriptions[] =
      "These options define the behavior of the playlist. Some " \
      "of them can be overridden in the playlist dialog box." )
 
+#define PREPARSE_TEXT N_( "Automatically preparse files")
+#define PREPARSE_LONGTEXT N_( \
+    "This option enables automatic preparsing of files added to the playlist " \
+    "(to retrieve some metadata)." )
+
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
      "Specifies the services discovery modules to load, separated by " \
@@ -1383,6 +1388,8 @@ vlc_module_begin();
     add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, VLC_FALSE );
 
     add_string( "open", "", NULL, OPEN_TEXT, OPEN_LONGTEXT, VLC_FALSE );
+
+    add_bool( "auto-preparse", VLC_TRUE, NULL, PREPARSE_TEXT, PREPARSE_LONGTEXT, VLC_FALSE );
 
     set_subcategory( SUBCAT_PLAYLIST_SD );
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
