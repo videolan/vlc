@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface.cpp : wxWidgets plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2005 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -1255,12 +1255,49 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
+#ifdef wxUSE_UNICODE
+        /*
+         * FIXME: this is yet another awful and ugly bug-to-bug work-around
+         * for the painfully broken and brain-dead wxWidgets character
+         * encoding internals. Maybe, one day the wxWidgets team will find out
+         * and we will have to remove (phew) this kludge or autodetect whether
+         * to trigger it (damn).
+         *
+         * In Unicode mode, wxWidgets will encode file names in the locale
+         * encoding with each **bytes** (rather than characters) represented
+         * by a 32 bits unsigned integer. If you are lucky enough to be using
+         * ISO-8859-1 as your local character encoding, that lame encoding
+         * scheme happens to be identical to UTF-32 with your arch native
+         * byte-endianess. If you are using anything else, including not only
+         * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
+         * non-western encoding, it obviously fails.
+         */
+        unsigned len = 1;
+        const wxChar *stupid = filenames[i];
+
+        for (const wxChar *braindead = stupid; *braindead; braindead++)
+            len++;
+        char *psz_local = (char *)malloc (len);
+        do
+            psz_local[len] = (char)stupid[len];
+        while (len--);
+
+        fprintf (stderr, "local = \"%s\"\n", psz_local);
+        char *psz_utf8 = FromLocale( psz_local );
+        fprintf (stderr, "utf8 = \"%s\"\n", psz_utf8);
+#else
         char *psz_utf8 = wxFromLocale( filenames[i] );
+#endif
 
         playlist_Add( p_playlist, psz_utf8, psz_utf8,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
                       PLAYLIST_END );
+#ifdef wxUSE_UNICODE
+        LocaleFree( psz_utf8 );
+        free( psz_local );
+#else
         wxLocaleFree( psz_utf8 );
+#endif
     }
 
     vlc_object_release( p_playlist );
