@@ -87,6 +87,7 @@ struct module_t
      */
     char *psz_shortname;                                      /* Module name */
     char *psz_longname;                           /* Module descriptive name */
+    char *psz_help;                /* Long help string for "special" modules */
 
     /*
      * Variables set by the module to tell us what it can do
