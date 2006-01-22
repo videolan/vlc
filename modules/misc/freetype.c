@@ -99,6 +99,18 @@ static int SetFontSize( filter_t *, int );
 static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
 static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
+#define YUVP_TEXT N_("Use yuvp renderer")
+#define YUVP_LONGTEXT N_("Render into paletized YUV. Needed to encode into dvbsubs")
+#define EFFECT_TEXT N_("Font Effect")
+#define EFFECT_LONGTEXT N_("Select effects to apply to rendered text")
+
+#define EFFECT_BACKGROUND  1 
+#define EFFECT_OUTLINE     2
+#define EFFECT_OUTLINE_FAT 3
+
+static int   pi_effects[] = { 1, 2, 3 };
+static char *ppsz_effects_text[] = { N_("Background"),N_("Outline"),
+                                     N_("Fat Outline") };
 static int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080, 
@@ -133,7 +145,12 @@ vlc_module_begin();
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
+    add_integer( "freetype-effect", 2, NULL, EFFECT_TEXT,
+                 EFFECT_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_effects, ppsz_effects_text, 0 );
 
+    add_bool( "freetype-yuvp", 0, NULL, YUVP_TEXT,
+              YUVP_LONGTEXT, VLC_TRUE );
     set_capability( "text renderer", 100 );
     add_shortcut( "text" );
     set_callbacks( Create, Destroy );
@@ -172,6 +189,7 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
+    int            i_effect;
 
     int            i_default_font_size;
     int            i_display_height;
@@ -210,13 +228,16 @@ static int Create( vlc_object_t *p_this )
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-opacity",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "freetype-effect",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "freetype-opacity", &val );
     p_sys->i_font_opacity = __MAX( __MIN( val.i_int, 255 ), 0 );
     var_Create( p_filter, "freetype-color",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "freetype-color", &val );
     p_sys->i_font_color = __MAX( __MIN( val.i_int, 0xFFFFFF ), 0 );
-
+    p_sys->i_effect = var_GetInteger( p_filter, "freetype-effect" );
+    
     /* Look what method was requested */
     var_Get( p_filter, "freetype-font", &val );
     psz_fontfile = val.psz_string;
@@ -435,6 +456,215 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         memset( p_top, 0, fmt.i_width );
     }
 
+    return VLC_SUCCESS;
+}
+
+static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_region, int xoffset, int yoffset )
+{
+    uint8_t *p_dst = p_region->picture.A_PIXELS;
+    int i_pitch = p_region->picture.A_PITCH;
+    int x,y;
+
+    for( ; p_line != NULL; p_line = p_line->p_next )
+    {
+        int i_glyph_tmax=0, i = 0;
+        int i_bitmap_offset, i_offset, i_align_offset = 0;
+        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        {
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+            i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
+        }
+
+        if( p_line->i_width < i_width )
+        {
+            if( p_region->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            {
+                i_align_offset = i_width - p_line->i_width;
+            }
+            else if( p_region->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            {
+                i_align_offset = ( i_width - p_line->i_width ) / 2;
+            }
+        }
+
+        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        {
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+
+            i_offset = ( p_line->p_glyph_pos[ i ].y +
+                i_glyph_tmax - p_glyph->top + 3 + yoffset ) *
+                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 3 +
+                i_align_offset +xoffset;
+
+            for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
+            {
+                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
+                {
+                    if( p_glyph->bitmap.buffer[i_bitmap_offset] )
+                        if( p_dst[i_offset+x] <
+                            ((int)p_glyph->bitmap.buffer[i_bitmap_offset]) )
+                            p_dst[i_offset+x] =
+                                ((int)p_glyph->bitmap.buffer[i_bitmap_offset]);
+                }
+                i_offset += i_pitch;
+            }
+        }
+    }
+    
+}
+
+/*****************************************************************************
+ * Render: place string in picture
+ *****************************************************************************
+ * This function merges the previously rendered freetype glyphs into a picture
+ *****************************************************************************/
+static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
+                   line_desc_t *p_line, int i_width, int i_height )
+{
+    static uint8_t pi_gamma[16] =
+        {0x00, 0x52, 0x84, 0x96, 0xb8, 0xca, 0xdc, 0xee, 0xff,
+          0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+
+    uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
+    video_format_t fmt;
+    int i, x, y, i_pitch;
+    uint8_t i_y; /* YUV values, derived from incoming RGB */
+    int8_t i_u, i_v;
+    subpicture_region_t *p_region_tmp;
+
+    /* Create a new subpicture region */
+    memset( &fmt, 0, sizeof(video_format_t) );
+    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt.i_aspect = 0;
+    fmt.i_width = fmt.i_visible_width = i_width + 6;
+    fmt.i_height = fmt.i_visible_height = i_height + 6;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    p_region_tmp = spu_CreateRegion( p_filter, &fmt );
+    if( !p_region_tmp )
+    {
+        msg_Err( p_filter, "cannot allocate SPU region" );
+        return VLC_EGENERIC;
+    }
+
+    p_region->fmt = p_region_tmp->fmt;
+    p_region->picture = p_region_tmp->picture;
+    free( p_region_tmp );
+
+    /* Calculate text color components */
+    i_y = (uint8_t)(( 66 * p_line->i_red  + 129 * p_line->i_green +
+                      25 * p_line->i_blue + 128) >> 8) +  16;
+    i_u = (int8_t)(( -38 * p_line->i_red  -  74 * p_line->i_green +
+                     112 * p_line->i_blue + 128) >> 8) + 128;
+    i_v = (int8_t)(( 112 * p_line->i_red  -  94 * p_line->i_green -
+                      18 * p_line->i_blue + 128) >> 8) + 128;
+
+    p_dst_y = p_region->picture.Y_PIXELS;
+    p_dst_u = p_region->picture.U_PIXELS;
+    p_dst_v = p_region->picture.V_PIXELS;
+    p_dst_a = p_region->picture.A_PIXELS;
+    i_pitch = p_region->picture.A_PITCH;
+
+    /* Initialize the region pixels */
+    if( p_filter->p_sys->i_effect != EFFECT_BACKGROUND )
+    {
+        memset( p_dst_y, 0x00, i_pitch * p_region->fmt.i_height );
+        memset( p_dst_u, 0x80, i_pitch * p_region->fmt.i_height );
+        memset( p_dst_v, 0x80, i_pitch * p_region->fmt.i_height );
+        memset( p_dst_a, 0, i_pitch * p_region->fmt.i_height );
+    }
+    else
+    {
+        memset( p_dst_y, 0x0, i_pitch * p_region->fmt.i_height );
+        memset( p_dst_u, 0x80, i_pitch * p_region->fmt.i_height );
+        memset( p_dst_v, 0x80, i_pitch * p_region->fmt.i_height );
+        memset( p_dst_a, 0x80, i_pitch * p_region->fmt.i_height );
+    }
+    if( p_filter->p_sys->i_effect == EFFECT_OUTLINE ||
+        p_filter->p_sys->i_effect == EFFECT_OUTLINE_FAT )
+    {
+        DrawBlack( p_line, i_width, p_region,  0,  0);
+        DrawBlack( p_line, i_width, p_region, -1,  0);
+        DrawBlack( p_line, i_width, p_region,  0, -1);
+        DrawBlack( p_line, i_width, p_region,  1,  0);
+        DrawBlack( p_line, i_width, p_region,  0,  1);
+    }
+    
+    if( p_filter->p_sys->i_effect == EFFECT_OUTLINE_FAT )
+    {
+        DrawBlack( p_line, i_width, p_region, -1, -1);
+        DrawBlack( p_line, i_width, p_region, -1,  1);
+        DrawBlack( p_line, i_width, p_region,  1, -1);
+        DrawBlack( p_line, i_width, p_region,  1,  1);
+
+        DrawBlack( p_line, i_width, p_region, -2,  0);
+        DrawBlack( p_line, i_width, p_region,  0, -2);
+        DrawBlack( p_line, i_width, p_region,  2,  0);
+        DrawBlack( p_line, i_width, p_region,  0,  2);
+
+        DrawBlack( p_line, i_width, p_region, -2, -2);
+        DrawBlack( p_line, i_width, p_region, -2,  2);
+        DrawBlack( p_line, i_width, p_region,  2, -2);
+        DrawBlack( p_line, i_width, p_region,  2,  2);
+
+        DrawBlack( p_line, i_width, p_region, -3,  0);
+        DrawBlack( p_line, i_width, p_region,  0, -3);
+        DrawBlack( p_line, i_width, p_region,  3,  0);
+        DrawBlack( p_line, i_width, p_region,  0,  3);
+    }
+
+    for( ; p_line != NULL; p_line = p_line->p_next )
+    {
+        int i_glyph_tmax = 0;
+        int i_bitmap_offset, i_offset, i_align_offset = 0;
+        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        {
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+            i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
+        }
+
+        if( p_line->i_width < i_width )
+        {
+            if( p_region->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            {
+                i_align_offset = i_width - p_line->i_width;
+            }
+            else if( p_region->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            {
+                i_align_offset = ( i_width - p_line->i_width ) / 2;
+            }
+        }
+
+        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        {
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+
+            i_offset = ( p_line->p_glyph_pos[ i ].y +
+                i_glyph_tmax - p_glyph->top + 3 ) *
+                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 3 +
+                i_align_offset;
+
+            for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
+            {
+                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
+                {
+                    if( p_glyph->bitmap.buffer[i_bitmap_offset] )
+                    {
+                        p_dst_y[i_offset+x] =
+                            ((p_dst_y[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) + i_y * ((int)p_glyph->bitmap.buffer[i_bitmap_offset]))>>8;
+
+//                        p_dst_u[i_offset+x] =
+//                            ((p_dst_u[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) + i_u * ((int)p_glyph->bitmap.buffer[i_bitmap_offset]))>>8;
+                        
+//                        p_dst_v[i_offset+x] =
+//                         ((p_dst_v[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) + i_v * ((int)p_glyph->bitmap.buffer[i_bitmap_offset]))>>8;
+                        if( p_filter->p_sys->i_effect == EFFECT_BACKGROUND )
+                            p_dst_a[i_offset+x] = 0xff;
+                    }
+                }
+                i_offset += i_pitch;
+            }
+        }
+    }
     return VLC_SUCCESS;
 }
 
@@ -701,7 +931,10 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
 
-    Render( p_filter, p_region_out, p_lines, result.x, result.y );
+    if( config_GetInt( p_filter, "freetype-yuvp" ) )
+        Render( p_filter, p_region_out, p_lines, result.x, result.y );
+    else
+        RenderYUVA( p_filter, p_region_out, p_lines, result.x, result.y );
 
     if( psz_unicode_orig ) free( psz_unicode_orig );
     FreeLines( p_lines );
