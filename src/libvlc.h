@@ -264,6 +264,13 @@ static char *ppsz_align_descriptions[] =
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
+#define FILE_LOG_TEXT N_( "Log to file" )
+#define FILE_LOG_LONGTEXT N_( "Log all VLC messages to a text file. Use the "\
+    "logfile option to set the file name." )
+
+#define SYSLOG_TEXT N_( "Log to syslog" )
+#define SYSLOG_LONGTEXT N_( "Log all VLC messages to syslog." )
+
 #define VIDEO_DECO_TEXT N_("Window decorations")
 #define VIDEO_DECO_LONGTEXT N_( \
     "If this option is disabled, VLC will avoid creating window caption, " \
@@ -1075,6 +1082,13 @@ vlc_module_begin();
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
     add_bool( "disable-screensaver", VLC_TRUE, NULL, SS_TEXT, SS_LONGTEXT,
               VLC_TRUE );
+
+    add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
+              VLC_TRUE );
+#if HAVE_SYSLOG_H
+    add_bool ( "syslog", VLC_FALSE, NULL, SYSLOG_TEXT, SYSLOG_LONGTEXT,
+               VLC_TRUE );
+#endif
 
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,

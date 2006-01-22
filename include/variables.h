@@ -163,6 +163,9 @@ VLC_EXPORT( int, __var_Type, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
 VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
+#define var_OptionParse(a,b) __var_OptionParse( VLC_OBJECT( a ) , b )
+VLC_EXPORT( void, __var_OptionParse, ( vlc_object_t *, const char * ) );
+
 /**
  * __var_Create() with automatic casting.
  */

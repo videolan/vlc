@@ -64,8 +64,6 @@ static int  UpdateMeta( input_thread_t *, vlc_bool_t );
 
 static void UpdateItemLength( input_thread_t *, int64_t i_length, vlc_bool_t );
 
-static void ParseOption( input_thread_t *p_input, const char *psz_option );
-
 static void DecodeUrl( char * );
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
@@ -166,7 +164,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_mutex_lock( &p_item->lock );
     for( i = 0; i < p_item->i_options; i++ )
     {
-        ParseOption( p_input, p_item->ppsz_options[i] );
+        var_OptionParse( p_input, p_item->ppsz_options[i] );
     }
     vlc_mutex_unlock( &p_item->lock );
 
@@ -2409,138 +2407,6 @@ static void DecodeUrl( char *psz )
     }
     if( psz ) *psz++  ='\0';
     if( dup ) free( dup );
-}
-
-/*****************************************************************************
- * ParseOption: parses the options for the input
- *****************************************************************************
- * This function parses the input (config) options and creates their associated
- * object variables.
- * Options are of the form "[no[-]]foo[=bar]" where foo is the option name and
- * bar is the value of the option.
- *****************************************************************************/
-static void ParseOption( input_thread_t *p_input, const char *psz_option )
-{
-    char *psz_name = (char *)psz_option;
-    char *psz_value = strchr( psz_option, '=' );
-    int  i_name_len, i_type;
-    vlc_bool_t b_isno = VLC_FALSE;
-    vlc_value_t val;
-
-    if( psz_value ) i_name_len = psz_value - psz_option;
-    else i_name_len = strlen( psz_option );
-
-    /* It's too much of an hassle to remove the ':' when we parse
-     * the cmd line :) */
-    if( i_name_len && *psz_name == ':' )
-    {
-        psz_name++;
-        i_name_len--;
-    }
-
-    if( i_name_len == 0 ) return;
-
-    psz_name = strndup( psz_name, i_name_len );
-    if( psz_value ) psz_value++;
-
-    /* FIXME: :programs should be handled generically */
-    if( !strcmp( psz_name, "programs" ) )
-        i_type = VLC_VAR_LIST;
-    else
-        i_type = config_GetType( p_input, psz_name );
-
-    if( !i_type && !psz_value )
-    {
-        /* check for "no-foo" or "nofoo" */
-        if( !strncmp( psz_name, "no-", 3 ) )
-        {
-            memmove( psz_name, psz_name + 3, strlen(psz_name) + 1 - 3 );
-        }
-        else if( !strncmp( psz_name, "no", 2 ) )
-        {
-            memmove( psz_name, psz_name + 2, strlen(psz_name) + 1 - 2 );
-        }
-        else goto cleanup;           /* Option doesn't exist */
-
-        b_isno = VLC_TRUE;
-        i_type = config_GetType( p_input, psz_name );
-
-        if( !i_type ) goto cleanup;  /* Option doesn't exist */
-    }
-    else if( !i_type ) goto cleanup; /* Option doesn't exist */
-
-    if( ( i_type != VLC_VAR_BOOL ) &&
-        ( !psz_value || !*psz_value ) ) goto cleanup; /* Invalid value */
-
-    /* Create the variable in the input object.
-     * Children of the input object will be able to retreive this value
-     * thanks to the inheritance property of the object variables. */
-    var_Create( p_input, psz_name, i_type );
-
-    switch( i_type )
-    {
-    case VLC_VAR_BOOL:
-        val.b_bool = !b_isno;
-        break;
-
-    case VLC_VAR_INTEGER:
-        val.i_int = strtol( psz_value, NULL, 0 );
-        break;
-
-    case VLC_VAR_FLOAT:
-        val.f_float = atof( psz_value );
-        break;
-
-    case VLC_VAR_STRING:
-    case VLC_VAR_MODULE:
-    case VLC_VAR_FILE:
-    case VLC_VAR_DIRECTORY:
-        val.psz_string = psz_value;
-        break;
-
-    case VLC_VAR_LIST:
-    {
-        char *psz_orig, *psz_var;
-        vlc_list_t *p_list = malloc(sizeof(vlc_list_t));
-        val.p_list = p_list;
-        p_list->i_count = 0;
-
-        psz_var = psz_orig = strdup(psz_value);
-        while( psz_var && *psz_var )
-        {
-            char *psz_item = psz_var;
-            vlc_value_t val2;
-            while( *psz_var && *psz_var != ',' ) psz_var++;
-            if( *psz_var == ',' )
-            {
-                *psz_var = '\0';
-                psz_var++;
-            }
-            val2.i_int = strtol( psz_item, NULL, 0 );
-            INSERT_ELEM( p_list->p_values, p_list->i_count,
-                         p_list->i_count, val2 );
-            /* p_list->i_count is incremented twice by INSERT_ELEM */
-            p_list->i_count--;
-            INSERT_ELEM( p_list->pi_types, p_list->i_count,
-                         p_list->i_count, VLC_VAR_INTEGER );
-        }
-        if( psz_orig ) free( psz_orig );
-        break;
-    }
-
-    default:
-        goto cleanup;
-        break;
-    }
-
-    var_Set( p_input, psz_name, val );
-
-    msg_Dbg( p_input, "set input option: %s to %s", psz_name,
-             psz_value ? psz_value : ( val.b_bool ? "true" : "false") );
-
-  cleanup:
-    if( psz_name ) free( psz_name );
-    return;
 }
 
 /*****************************************************************************

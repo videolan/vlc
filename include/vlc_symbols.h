@@ -55,6 +55,7 @@ int __vout_AllocatePicture (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_c
 playlist_item_t * playlist_NodeCreate (playlist_t *,int,char *, playlist_item_t * p_parent);
 void * vlc_readdir (void *);
 int sout_AnnounceRegister (sout_instance_t *,session_descriptor_t*, announce_method_t*);
+void __var_OptionParse (vlc_object_t *, const char *);
 int osd_ShowTextRelative (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t);
 void * __vlc_object_get (vlc_object_t *, int);
 void vout_SynchroTrash (vout_synchro_t *);
@@ -279,7 +280,7 @@ int __vlc_thread_set_priority (vlc_object_t *, char *, int, int);
 int ACL_LoadFile (vlc_acl_t *p_acl, const char *path);
 void input_StopThread (input_thread_t *);
 int __input_Read (vlc_object_t *, input_item_t *, vlc_bool_t);
-intf_thread_t * __intf_Create (vlc_object_t *, const char *);
+intf_thread_t * __intf_Create (vlc_object_t *, const char *, int, char **);
 void aout_ChannelReorder (uint8_t *, int, int, const int *, int);
 int __var_DelCallback (vlc_object_t *, const char *, vlc_callback_t, void *);
 void __vlc_object_detach (vlc_object_t *);
@@ -675,7 +676,7 @@ struct module_symbols_t
     decoder_t * (*input_DecoderNew_inner) (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
     void (*input_DecoderDelete_inner) (decoder_t *);
     void (*input_DecoderDecode_inner) (decoder_t *, block_t *);
-    intf_thread_t * (*__intf_Create_inner) (vlc_object_t *, const char *);
+    intf_thread_t * (*__intf_Create_inner) (vlc_object_t *, const char *, int, char **);
     int (*intf_RunThread_inner) (intf_thread_t *);
     void (*intf_StopThread_inner) (intf_thread_t *);
     void (*intf_Destroy_inner) (intf_thread_t *);
@@ -890,6 +891,7 @@ struct module_symbols_t
     input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
     void (*stats_HandlerDestroy_inner) (stats_handler_t*);
     vlc_t * (*vlc_current_object_inner) (int);
+    void (*__var_OptionParse_inner) (vlc_object_t *, const char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1320,6 +1322,7 @@ struct module_symbols_t
 #  define __input_CreateThread2 (p_symbols)->__input_CreateThread2_inner
 #  define stats_HandlerDestroy (p_symbols)->stats_HandlerDestroy_inner
 #  define vlc_current_object (p_symbols)->vlc_current_object_inner
+#  define __var_OptionParse (p_symbols)->__var_OptionParse_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1753,6 +1756,7 @@ struct module_symbols_t
     ((p_symbols)->__input_CreateThread2_inner) = __input_CreateThread2; \
     ((p_symbols)->stats_HandlerDestroy_inner) = stats_HandlerDestroy; \
     ((p_symbols)->vlc_current_object_inner) = vlc_current_object; \
+    ((p_symbols)->__var_OptionParse_inner) = __var_OptionParse; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
 

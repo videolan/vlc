@@ -92,6 +92,10 @@ static vlc_t *    p_static_vlc;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int AddIntfInternal( int i_object, char const *psz_module,
+                             vlc_bool_t b_block, vlc_bool_t b_play,
+                             int i_options, char **ppsz_options );
+
 static void LocaleInit( void );
 static void LocaleDeinit( void );
 static void SetLanguage   ( char const * );
@@ -772,6 +776,16 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 #endif
 
+    if( config_GetInt( p_vlc, "file-logging" ) == 1 )
+    {
+        VLC_AddIntf( 0, "logger", VLC_FALSE, VLC_FALSE );
+    }
+    if( config_GetInt( p_vlc, "syslog" ) == 1 )
+    {
+        char *psz_logmode = "logmode=syslog";
+        AddIntfInternal( 0, "logger", VLC_FALSE, VLC_FALSE, 1, &psz_logmode );
+    }
+
     /*
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
      */
@@ -824,54 +838,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 int VLC_AddIntf( int i_object, char const *psz_module,
                  vlc_bool_t b_block, vlc_bool_t b_play )
 {
-    int i_err;
-    intf_thread_t *p_intf;
-    vlc_t *p_vlc = vlc_current_object( i_object );
-
-    if( !p_vlc )
-    {
-        return VLC_ENOOBJ;
-    }
-
-#ifndef WIN32
-    if( p_vlc->p_libvlc->b_daemon && b_block && !psz_module )
-    {
-        /* Daemon mode hack.
-         * We prefer the dummy interface if none is specified. */
-        char *psz_interface = config_GetPsz( p_vlc, "intf" );
-        if( !psz_interface || !*psz_interface ) psz_module = "dummy";
-        if( psz_interface ) free( psz_interface );
-    }
-#endif
-
-    /* Try to create the interface */
-    p_intf = intf_Create( p_vlc, psz_module ? psz_module : "$intf" );
-
-    if( p_intf == NULL )
-    {
-        msg_Err( p_vlc, "interface \"%s\" initialization failed", psz_module );
-        if( i_object ) vlc_object_release( p_vlc );
-        return VLC_EGENERIC;
-    }
-
-    /* Interface doesn't handle play on start so do it ourselves */
-    if( !p_intf->b_play && b_play ) VLC_Play( i_object );
-
-    /* Try to run the interface */
-    p_intf->b_play = b_play;
-    p_intf->b_block = b_block;
-    i_err = intf_RunThread( p_intf );
-    if( i_err )
-    {
-        vlc_object_detach( p_intf );
-        intf_Destroy( p_intf );
-        if( i_object ) vlc_object_release( p_vlc );
-        return i_err;
-    }
-
-    if( i_object ) vlc_object_release( p_vlc );
-    return VLC_SUCCESS;
+    return AddIntfInternal( i_object, psz_module, b_block, b_play, 0, NULL );
 }
+
 
 /*****************************************************************************
  * VLC_Die: ask vlc to die.
@@ -1912,6 +1881,66 @@ int VLC_FullScreen( int i_object )
 }
 
 /* following functions are local */
+
+
+static int  AddIntfInternal( int i_object, char const *psz_module,
+                             vlc_bool_t b_block, vlc_bool_t b_play,
+                             int i_options, char **ppsz_options )
+{
+    int i_err,i;
+    intf_thread_t *p_intf;
+    vlc_t *p_vlc = vlc_current_object( i_object );
+
+    if( !p_vlc )
+    {
+        return VLC_ENOOBJ;
+    }
+
+#ifndef WIN32
+    if( p_vlc->p_libvlc->b_daemon && b_block && !psz_module )
+    {
+        /* Daemon mode hack.
+         * We prefer the dummy interface if none is specified. */
+        char *psz_interface = config_GetPsz( p_vlc, "intf" );
+        if( !psz_interface || !*psz_interface ) psz_module = "dummy";
+        if( psz_interface ) free( psz_interface );
+    }
+#endif
+
+    /* Try to create the interface */
+    p_intf = intf_Create( p_vlc, psz_module ? psz_module : "$intf",
+                          i_options, ppsz_options );
+
+    if( p_intf == NULL )
+    {
+        msg_Err( p_vlc, "interface \"%s\" initialization failed", psz_module );
+        if( i_object ) vlc_object_release( p_vlc );
+        return VLC_EGENERIC;
+    }
+
+    /* Interface doesn't handle play on start so do it ourselves */
+    if( !p_intf->b_play && b_play ) VLC_Play( i_object );
+
+    /* Try to run the interface */
+    p_intf->b_play = b_play;
+    p_intf->b_block = b_block;
+    i_err = intf_RunThread( p_intf );
+    if( i_err )
+    {
+        vlc_object_detach( p_intf );
+        intf_Destroy( p_intf );
+        if( i_object ) vlc_object_release( p_vlc );
+        return i_err;
+    }
+
+    for( i = 0  ; i< i_options ; i++ )
+    {
+        
+    }
+
+    if( i_object ) vlc_object_release( p_vlc );
+    return VLC_SUCCESS;
+};
 
 static void LocaleInit( void )
 {

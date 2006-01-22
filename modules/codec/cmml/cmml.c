@@ -128,7 +128,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     vlc_object_release( p_input );
 
     /* initialise the CMML responder interface */
-    p_sys->p_intf = intf_Create( p_dec, "cmml" );
+    p_sys->p_intf = intf_Create( p_dec, "cmml", 0, NULL );
     p_sys->p_intf->b_block = VLC_FALSE;
     intf_RunThread( p_sys->p_intf );
 

@@ -1670,7 +1670,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
     {
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
-    }    
+    }
     p_this->p_vlc->b_die = VLC_TRUE;
     return VLC_SUCCESS;
 }
@@ -1680,7 +1680,7 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_newintf = NULL;
 
-    p_newintf = intf_Create( p_this->p_vlc, newval.psz_string );
+    p_newintf = intf_Create( p_this->p_vlc, newval.psz_string, 0, NULL );
     if( p_newintf )
     {
         p_newintf->b_block = VLC_FALSE;

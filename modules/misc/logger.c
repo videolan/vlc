@@ -118,12 +118,11 @@ static char *mode_list_text[] = { N_("Text"), "HTML"
 #endif
 
 vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_shortname( N_( "Logging" ) );
     set_description( _("File logging") );
 
-    add_file( "logfile", NULL, NULL, N_("Log filename"), N_("Specify the log filename."), VLC_FALSE );
+    add_file( "logfile", NULL, NULL,
+             N_("Log filename"), N_("Specify the log filename."), VLC_FALSE );
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,
                 VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
@@ -151,7 +150,7 @@ static int Open( vlc_object_t *p_this )
         return -1;
     }
 
-    psz_mode = config_GetPsz( p_intf, "logmode" );
+    psz_mode = var_CreateGetString( p_intf, "logmode" );
     if( psz_mode )
     {
         if( !strcmp( psz_mode, "text" ) )

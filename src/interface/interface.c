@@ -82,14 +82,19 @@ static int AddIntfCallback( vlc_object_t *, char const *,
  *****************************************************************************/
 /**
  * Create the interface, and prepare it for main loop.
+ * You can give some additional options to be used for interface initialization
  *
  * \param p_this the calling vlc_object_t
  * \param psz_module a prefered interface module
+ * \param i_options number additional options
+ * \param ppsz_options additional option strings
  * \return a pointer to the created interface thread, NULL on error
  */
-intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
+intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
+                              int i_options, char **ppsz_options  )
 {
     intf_thread_t * p_intf;
+    int i;
 
     /* Allocate structure */
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
@@ -103,6 +108,11 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     p_intf->pf_control_window = NULL;
     p_intf->b_play = VLC_FALSE;
     p_intf->b_interaction = VLC_FALSE;
+
+    for( i = 0 ; i< i_options; i++ )
+    {
+        var_OptionParse( p_intf, ppsz_options[i] );
+    }
 
     /* Choose the best module */
     p_intf->p_module = module_Need( p_intf, "interface", psz_module, 0 );
@@ -120,8 +130,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 
     /* Initialize mutexes */
     vlc_mutex_init( p_intf, &p_intf->change_lock );
-
-    msg_Dbg( p_intf, "interface initialized" );
 
     /* Attach interface to its parent object */
     vlc_object_attach( p_intf, p_this );
@@ -428,7 +436,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Try to create the interface */
     sprintf( psz_intf, "%s,none", newval.psz_string );
-    p_intf = intf_Create( p_this->p_vlc, psz_intf );
+    p_intf = intf_Create( p_this->p_vlc, psz_intf, 0, NULL );
     free( psz_intf );
     if( p_intf == NULL )
     {
