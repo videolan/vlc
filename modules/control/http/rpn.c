@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rpn.c : RPN evaluator for the HTTP Interface
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -959,6 +959,55 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 aout_VolumeSet( p_intf, i_value );
             }
             aout_VolumeGet( p_intf, &i_volume );
+        }
+        else if( !strcmp( s, "vlm_command" ) || !strcmp( s, "vlm_cmd" ) )
+        {
+            char *psz_elt;
+            char *psz_cmd = strdup( "" );
+            char *psz_error;
+            vlm_message_t *vlm_answer;
+
+            /* make sure that we have a vlm object */
+            if( p_intf->p_sys->p_vlm == NULL )
+                p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+
+            /* vlm command uses the ';' delimiter
+             * (else we can't know when to stop) */
+            while( strcmp( psz_elt = E_(SSPop)( st ), "" )
+                   && strcmp( psz_elt, ";" ) )
+            {
+                printf( "\npsz_elt : %s", psz_elt );
+                char *psz_buf =
+                    (char *)malloc( strlen( psz_cmd ) + strlen( psz_elt ) + 2 );
+                sprintf( psz_buf, "%s %s", psz_cmd, psz_elt );
+                free( psz_cmd );
+                free( psz_elt );
+                psz_cmd = psz_buf;
+            }
+
+            printf( "\nVLM command : %s\n\n", psz_cmd );
+
+            vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz_cmd, &vlm_answer );
+
+            if( vlm_answer->psz_value == NULL )
+            {
+                psz_error = strdup( "" );
+            }
+            else
+            {
+                psz_error = malloc( strlen(vlm_answer->psz_name) +
+                                    strlen(vlm_answer->psz_value) +
+                                    strlen( " : ") + 1 );
+                sprintf( psz_error , "%s : %s" , vlm_answer->psz_name,
+                                                 vlm_answer->psz_value );
+            }
+
+            E_(mvar_AppendNewVar)( vars, "vlm_error", psz_error );
+            vlm_MessageDelete( vlm_answer );
+
+            free( psz_cmd );
+            free( psz_error );
         }
         else
         {
