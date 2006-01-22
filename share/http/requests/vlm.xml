@@ -41,7 +41,7 @@
       </options>
       <instances>
         <vlc id="foreach" param1="inst" param2="el.instances" />
-          <option><vlc id="value" param1="inst"/></option>
+          <instance><vlc id="value" param1="inst"/></instance>
         <vlc id="end" />
       </instances>
     </broadcast>
