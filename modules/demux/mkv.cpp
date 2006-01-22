@@ -2421,6 +2421,12 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's', 's', 'a', ' ' );
             tracks[i_track]->fmt.subs.psz_encoding = strdup( "UTF-8" );
+            if( tracks[i_track]->i_extra_data ) 
+            {
+                tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
+                tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
+                memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
+            }
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "S_VOBSUB" ) )
         {
