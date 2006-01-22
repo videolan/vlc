@@ -985,8 +985,8 @@ package-wince-base:
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
-	cp $(srcdir)/share/http/*.js $(top_builddir)/vlc-${VERSION}/http/ ;
-	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.js ;
+	cp $(srcdir)/share/http/js/*.js $(top_builddir)/vlc-${VERSION}/http/js/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/js/*.js ;
 	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
