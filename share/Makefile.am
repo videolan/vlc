@@ -72,16 +72,31 @@ DIST_skins2 = \
 	$(NULL)
 
 DIST_http = \
+	http/js/functions.js \
+	http/js/mosaic.js \
+	http/js/vlm.js \
 	http/favicon.ico \
-	http/functions.js \
+	http/dialogs/vlm \
+	http/dialogs/main \
+	http/dialogs/sout \
+	http/dialogs/input \
+	http/dialogs/browse \
+	http/dialogs/footer \
+	http/dialogs/mosaic \
+	http/dialogs/.hosts \
+	http/dialogs/playlist \
+	http/requests/vlm_cmd.xml \
 	http/requests/browse.xml \
 	http/requests/playlist.xml \
+	http/requests/vlm.xml \
 	http/requests/status.xml \
 	http/style.css \
 	http/index.html \
+	http/vlm.html \
 	http/images/plus.png \
 	http/images/eject.png \
 	http/images/speaker_mute.png \
+	http/images/delete_small.png \
 	http/images/sort.png \
 	http/images/sout.png \
 	http/images/shuffle.png \
@@ -99,12 +114,12 @@ DIST_http = \
 	http/images/volume_down.png \
 	http/images/play.png \
 	http/images/delete.png \
-	http/images/delete_small.png \
 	http/images/speaker.png \
 	http/images/loop.png \
 	http/images/stop.png \
 	http/images/help.png \
 	http/images/playlist_small.png \
+	http/mosaic.html \
 	$(NULL)
 
 DIST_http_old = \
