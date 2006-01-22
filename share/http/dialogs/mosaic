@@ -1,0 +1,47 @@
+<vlc id="if" param1="0" />
+vim:syntax=html
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  mosaic: VLC media player web interface - mosaic wizard
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+This dialog needs the following dialogs to be fully functional: input and
+sout.
+<vlc id="end" />
+
+<div id="mosaic" class="dialog" >
+  <div class="title">
+    VLC media player - Mosaic wizard
+    <button id="btn_toggle_text" onclick="toggle_btn_text();">
+      <img src="images/help.png" alt="Help" />
+      Help
+    </button>
+  </div>
+  <div class="controls">
+    <label for="mosaic_rows">Rows:</label> <input type="text" id="mosaic_rows" value="" onchange="mosaic_size_change();" />
+    <label for="mosaic_cols">Columns:</label> <input type="text" id="mosaic_cols" value="" onchange="mosaic_size_change();" />
+    <br/>
+    <label for="mosaic_input_name">Name:</label> <input type="text" id="mosaic_input_name" value="" />
+    <label for="mosaic_input">Input:</label> <input type="text" id="mosaic_input" value="" /> <input type="button" value="Add to input list" onclick="mosaic_add_input();" />
+  </div>
+  <div  id="mosaic_list" class="popup" style="display: none">Select a stream:<br/></div>
+  <div id="mosaic_layout"></div>
+</div>

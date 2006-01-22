@@ -1,0 +1,117 @@
+<vlc id="if" param1="0" />
+vim:syntax=html
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  vlm: VLC media player web interface - VLM controler
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+< 
+<  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+< 
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+< 
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+< 
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+This dialog needs the following dialogs to be fully functional: input,
+sout and vlmelements .
+<vlc id="end" />
+
+<div id="vlm" class="dialog" >
+  <div class="title">
+    VLC media player - VLM interface
+    <button id="btn_toggle_text" onclick="toggle_btn_text();">
+      <img src="images/help.png" alt="Help" />
+      Help
+    </button>
+  </div>
+  <div class="controls">
+    <label for="vlm_command">VLM command:</label>
+    <input type="text" id="vlm_command" size="60" />
+    <input type="button" value="Send" onclick="vlm_send();" />
+    <br />
+    <button id="btn_broadcast" onclick="hide_vlm_add();show('vlm_add_broadcast');update_vlm_add_broadcast();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      Broadcast
+    </button>
+    <button id="btn_vod" onclick="hide_vlm_add();show('vlm_add_vod');update_vlm_add_vod();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      Video on Demand
+    </button>
+    <button id="btn_schedule" onclick="hide_vlm_add();show('vlm_add_schedule');update_vlm_add_schedule();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      Schedule
+    </button>
+  </div>
+  <div id="vlm_helper" class="helper" >
+    <div id="vlm_add_broadcast" style="display: block">
+      New broadcast element
+      <hr />
+      <label for="vlm_broadcast_name">Name</label>
+      <input type="text" id="vlm_broadcast_name" size="20" onchange="update_vlm_add_broadcast();" />
+      <input type="checkbox" id="vlm_broadcast_enabled" onchange="update_vlm_add_broadcast();" />
+      <label for="vlm_broadcast_enabled">Enable</label>
+      <input type="checkbox" id="vlm_broadcast_loop" onchange="update_vlm_add_broadcast();" />
+      <label for="vlm_broadcast_loop">Loop</label>
+      <br/>
+      <label for="vlm_broadcast_input">Input</label>
+      <input type="text" id="vlm_broadcast_input" size="60" onchange="update_vlm_add_broadcast();" />
+      <input type="button" value="Edit" onclick="vlm_input_edit('vlm_broadcast_input');" />
+      <br/>
+      <label for="vlm_broadcast_output">Output</label>
+      <input type="text" id="vlm_broadcast_output" size="60" onchange="update_vlm_add_broadcast();" />
+      <input type="button" value="Edit" onclick="vlm_output_edit('vlm_broadcast_output');" />
+      <br/>
+    </div>
+    <div id="vlm_add_vod" style="display: none">
+      New video on demand element
+      <hr />
+      <label for="vlm_vod_name">Name</label>
+      <input type="text" id="vlm_vod_name" size="20" onchange="update_vlm_add_vod();" />
+      <input type="checkbox" id="vlm_vod_enabled" onchange="update_vlm_add_vod();" />
+      <label for="vlm_vod_enabled">Enable</label>
+      <br/>
+      <label for="vlm_vod_input">Input</label>
+      <input type="text" id="vlm_vod_input" size="60" onchange="update_vlm_add_vod();" />
+      <input type="button" value="Edit" onclick="vlm_input_edit('vlm_vod_input');" />
+      <br/>
+      <label for="vlm_vod_output">Output (leave empty unless you want to transcode)</label>
+      <input type="text" id="vlm_vod_output" size="60" onchange="update_vlm_add_vod();" />
+      <input type="button" value="Edit" onclick="vlm_output_edit('vlm_vod_output');" />
+      <br/>
+    </div>
+    <div id="vlm_add_schedule" style="display: none">
+      New schedule
+      <hr />
+      TODO
+    </div>
+  </div>
+</div>
+
+<div id="vlm_broadcast" class="dialog" >
+  <div class="title">
+    Broadcast Elements
+  </div>
+  <div class="vlm_broadcast_list"></div>
+</div>
+
+<div id="vlm_vod" class="dialog" >
+  <div class="title">
+    Video on Demand Elements
+  </div>
+  <div class="vlm_vod_list"></div>
+</div>
+
+<div id="vlm_schedule" class="dialog" >
+  <div class="title">
+    Schedule Elements
+  </div>
+  <div class="vlm_schedule_list"></div>
+</div>

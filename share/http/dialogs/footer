@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<vlc id="if" param1="0"/>
+<vlc id="if" param1="0" />
+vim:syntax=html
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
-<  status.xml: VLC media player web interface
+<  footer: VLC media player web interface - VLC copyright footer
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005-2006 the VideoLAN team
 <  $Id$
@@ -20,17 +20,16 @@
 < 
 <  You should have received a copy of the GNU General Public License
 <  along with this program; if not, write to the Free Software
-<  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+This dialog needs the following dialogs to be fully functional: <none>
 <vlc id="end" />
 
-<root>
-<vlc id="if" param1="url_param 1 =" />
-  <vlc id="rpn" param1="'dir' url_extract" />
-  <vlc id="foreach" param1="file" param2="directory" />
-    <vlc id="if" param1="file.basename value '.' 1 strncmp 0 != file.basename value '..' 2 strncmp 0 = |" />
-      <element type="<vlc id="value" param1="file.type" />" size="<vlc id="value" param1="file.size" />" date="<vlc id="value" param1="file.size" />" path="<vlc id="value" param1="file.name" />" name="<vlc id="value" param1="file.basename" />" />  
-    <vlc id="end" />
-  <vlc id="end" />
-<vlc id="end" />
-</root>
+<div id="footer" class="dialog" >
+  <a href="/">main VLC interface</a> -
+  <a href="/vlm.html">VLM interface</a> -
+  <a href="http://www.videolan.org">videolan.org</a>
+  <br />
+  <vlc id="value" param1="copyright" />
+</div>

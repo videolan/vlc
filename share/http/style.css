@@ -1,7 +1,7 @@
 /*****************************************************************************
  * style.css: VLC media player web interface
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -34,7 +34,7 @@ div {
 	text-align: left;
 }
 
-div#main, div#playlist, div#input, div#sout, div#footer {
+div.dialog {
 	width: 600px;
 	background: #fff;
 	border: solid #000 1px;
@@ -63,11 +63,11 @@ input {
 	background-color: #fff;
 }
 
-div#sout_helper, div#input_helper {
+div.helper {
 	margin: 10px;
 	border: solid #ccc 2px;
 }
-div#sout_helper hr, div#input_helper hr {
+div.helper hr {
 	border: solid #ccc 1px;
 }
 
@@ -91,7 +91,7 @@ div.controls {
 	padding: 3px 5px;
 }
 div.controls button {
-	border: 1px none #000;
+	border: 1px solid #fff;
 	padding: 0px;
 	background-color: #fff;
 }
@@ -117,20 +117,46 @@ img {
 	border: 0px none black;
 }
 
-div#browse {
+div.popup {
 	background-color: #fff;
-	width: 70%;
 	overflow: hidden;
 	border: solid #888 1px;
 	margin: 10px auto; /* Center on page - Firefox */
 	position: absolute;
-	left: 15%;
 	z-index: 1;
 	font-size: 0.8em;
+}
+div#browse {
+	width: 70%;
+	left: 15%;
 }
 div#browse div.title {
 	background-color: #008;
 }
 div#browser {
 	padding: 20px;
+}
+
+div#mosaic_list {
+	width: 50%;
+	left: 25%;
+}
+
+div#mosaic_layout {
+	border: 1px solid #000;
+	background-color: #ddf;
+	display: block;
+	margin: 1em;
+	padding: 0.3em 0.6em;
+}
+div.mosaic_row {
+	padding: 0.6em 0em;
+}
+
+.mosaic_element {
+	display: inline;
+	border: 1px solid #000;
+	margin: 0em 0.3em;
+	padding: 0.3em 0.3em;
+	background-color: #dfd;
 }

@@ -1,7 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<vlc id="if" param1="0"/>
 <!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
-<  index.html: VLC media player web interface
+<  vlm_cmd.xml: VLC media player web interface
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005-2006 the VideoLAN team
 <  $Id$
@@ -22,31 +22,12 @@
 <  along with this program; if not, write to the Free Software
 <  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<vlc id="end"/>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<vlc id="if" param1="url_param 1 =" />
+  <vlc id="rpn" param1="; 'command' url_extract vlm_cmd" />
+<vlc id="end" />
 
-<head>
-
-  <title>VLC media player - Web Interface</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <link href="style.css" rel="stylesheet" type="text/css" />
-  <script type="text/javascript" src="js/functions.js"></script>
-
-  <!-- in case people had scripts that sent commands to the default
-       index.html page -->
-  <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort,move" />
-
-</head>
-
-<body onload="loop_refresh();">
-
-<vlc id="include" param1="dialogs/browse" />
-<vlc id="include" param1="dialogs/main" />
-<vlc id="include" param1="dialogs/input" />
-<vlc id="include" param1="dialogs/sout" />
-<vlc id="include" param1="dialogs/playlist" />
-<vlc id="include" param1="dialogs/footer" />
-
-</body>
-
-</html>
+<vlm>
+  <error><vlc id="value" param1="vlm_error" /></error>
+</vlm>

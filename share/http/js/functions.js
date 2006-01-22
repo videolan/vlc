@@ -1,7 +1,7 @@
 /*****************************************************************************
  * functions.js: VLC media player web interface
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
 /* global variables */
@@ -167,15 +167,15 @@ function check_and_replace_int( id, val )
         document.getElementById( id ).value = val;
 }
 
-function addslashes( str ){ return str.replace(/\'/, '\\\''); }
+function addslashes( str ){ return str.replace(/\'/g, '\\\''); }
 
 function disable( id ){ document.getElementById( id ).disabled = true; }
 
 function enable( id ){ document.getElementById( id ).disabled = false; }
 
-function button_over( element ){ element.style.border = "1px solid black"; }
+function button_over( element ){ element.style.border = "1px solid #000"; }
 
-function button_out( element ){ element.style.border = "1px none black"; }
+function button_out( element ){ element.style.border = "1px solid #fff"; }
 
 /* toggle show help under the buttons */
 function toggle_btn_text()
@@ -344,17 +344,17 @@ function parse_playlist()
                 {
                     if( pos.hasChildNodes() )
                         pos.appendChild( document.createElement( "br" ) );
-                    pos.appendChild( document.createElement( 'a' ) );
-                    nda = pos.lastChild;
+                    nda = document.createElement( 'a' );
+                    pos.appendChild( nda );
                     nda.setAttribute( 'href', 'javascript:toggle_show_node(\''+elt.getAttribute( 'id' )+'\');' );
-                    nda.appendChild( document.createElement( 'img' ) );
-                    ndai = nda.lastChild;
+                    ndai = document.createElement( 'img' );
+                    nda.appendChild( ndai );
                     ndai.setAttribute( 'src', 'images/minus.png' );
                     ndai.setAttribute( 'alt', '[-]' );
                     ndai.setAttribute( 'id', 'pl_img_'+elt.getAttribute( 'id' ) );
                     pos.appendChild( document.createTextNode( ' ' + elt.getAttribute( 'name' ) ) );
-                    pos.appendChild( document.createElement( "div" ) );
-                    nd = pos.lastChild;
+                    nd = document.createElement( "div" );
+                    pos.appendChild( nd );
                     nd.setAttribute( 'class', 'pl_node' );
                     nd.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                 }
@@ -362,8 +362,8 @@ function parse_playlist()
                 {
                     if( pos.hasChildNodes() )
                     pos.appendChild( document.createElement( "br" ) );
-                    pos.appendChild( document.createElement( "a" ) );
-                    pl = pos.lastChild;
+                    pl = document.createElement( "a" );
+                    pos.appendChild( pl );
                     pl.setAttribute( 'class', 'pl_leaf' );
                     pl.setAttribute( 'href', 'javascript:pl_play('+elt.getAttribute( 'id' )+');' );
                     pl.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
@@ -376,8 +376,8 @@ function parse_playlist()
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     pos.appendChild( document.createTextNode( ' ' ) );
-                    pos.appendChild( document.createElement( "a" ) );
-                    del = pos.lastChild;
+                    del = document.createElement( "a" );
+                    pos.appendChild( del );
                     del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
                     del.appendChild( document.createElement( "img" ) );
                     del = del.lastChild;
