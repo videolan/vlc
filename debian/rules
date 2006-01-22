@@ -69,6 +69,10 @@ vlc_confflags += \
 	--enable-ncurses \
 	--enable-smb \
 	--disable-gnomevfs \
+	--enable-bonjour \
+	--enable-mpc \
+	--enable-vcd \
+	--enable-vcdx \
 	$(NULL)
 
 # These ones are currently shipped with VLC
