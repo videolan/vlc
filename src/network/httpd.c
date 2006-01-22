@@ -1228,8 +1228,6 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_value_t lockval;
     int i;
 
-    msg_Dbg( host, "httpd_HostDelete" );
-
     var_Get( httpd->p_libvlc, "httpd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
@@ -1243,12 +1241,10 @@ void httpd_HostDelete( httpd_host_t *host )
     }
     TAB_REMOVE( httpd->i_host, httpd->host, host );
 
-    msg_Dbg( host, "httpd_HostDelete: host removed from http" );
-
     host->b_die = 1;
     vlc_thread_join( host );
 
-    msg_Dbg( host, "httpd_HostDelete: host thread joined" );
+    msg_Dbg( host, "HTTP host removed" );
 
     for( i = 0; i < host->i_url; i++ )
     {
@@ -1277,7 +1273,7 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
-        msg_Info( httpd, "httpd doesn't reference any host, deleting" );
+        msg_Dbg( httpd, "no host left, stopping httpd" );
         vlc_object_detach( httpd );
         vlc_object_destroy( httpd );
     }
