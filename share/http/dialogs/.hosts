@@ -1,0 +1,4 @@
+# The files in this directory shouldn't be accessed by http.
+# They are included in other HTML pages.
+# Hence this .hosts to allow nobody.
+
