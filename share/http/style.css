@@ -96,11 +96,14 @@ div.controls button {
 	background-color: #fff;
 }
 
-ul#list, ul#list ul {
-	list-style-type: none;
-	padding-top: 0px;
-	margin-top: 0px;
-	padding-left: 1em;
+div.list {
+	padding: 1em;
+}
+div.list_element {
+	padding-bottom: 0.3em;
+}
+div.list_element ul {
+	margin: 0px;
 }
 
 div.pl_node {

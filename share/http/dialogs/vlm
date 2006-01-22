@@ -40,6 +40,8 @@ sout and vlmelements .
     <input type="text" id="vlm_command" size="60" />
     <input type="button" value="Send" onclick="vlm_send();" />
     <br />
+    <span id="vlm_error"></span>
+    <br />
     <button id="btn_broadcast" onclick="hide_vlm_add();show('vlm_add_broadcast');update_vlm_add_broadcast();" onmouseover="button_over(this);" onmouseout="button_out(this);">
       Broadcast
     </button>
@@ -99,19 +101,19 @@ sout and vlmelements .
   <div class="title">
     Broadcast Elements
   </div>
-  <div class="vlm_broadcast_list"></div>
+  <div id="vlm_broadcast_list" class="list"></div>
 </div>
 
 <div id="vlm_vod" class="dialog" >
   <div class="title">
     Video on Demand Elements
   </div>
-  <div class="vlm_vod_list"></div>
+  <div id="vlm_vod_list" class="list"></div>
 </div>
 
 <div id="vlm_schedule" class="dialog" >
   <div class="title">
     Schedule Elements
   </div>
-  <div class="vlm_schedule_list"></div>
+  <div id="vlm_schedule_list" class="list"></div>
 </div>
