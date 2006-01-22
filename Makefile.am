@@ -878,12 +878,16 @@ package-win32-base:
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/images"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/requests"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/js"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/dialogs"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
 	cp $(srcdir)/share/http/js/*.js $(top_builddir)/vlc-${VERSION}/http/js/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/js/*.js ;
+	cp $(srcdir)/share/http/dialogs/* $(top_builddir)/vlc-${VERSION}/http/dialogs/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/dialogs/* ;
 	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
@@ -981,12 +985,16 @@ package-wince-base:
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/images"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/requests"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/js"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/dialogs"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
 	cp $(srcdir)/share/http/js/*.js $(top_builddir)/vlc-${VERSION}/http/js/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/js/*.js ;
+	cp $(srcdir)/share/http/dialogs/* $(top_builddir)/vlc-${VERSION}/http/dialogs/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/dialogs/* ;
 	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
