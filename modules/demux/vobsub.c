@@ -602,7 +602,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 current_sub->i_vobsub_location = i_location;
             }
         }
-        else if( !strncmp( line, "delay:", 6 ) )
+        else if( !strncmp( line, "Delay:", 6 ) )
         {
             /*
              * delay: [sign]hh:mm:ss:mss
@@ -613,7 +613,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
 
             vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
 
-            if( sscanf( line, "delay: %d%n:%d:%d:%d",
+            if( sscanf( line, "Delay: %d%n:%d:%d:%d",
                         &h, &count, &m, &s, &ms ) >= 4 )
             {
                 if( line[count-3] == '-' )
