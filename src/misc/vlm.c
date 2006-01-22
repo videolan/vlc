@@ -1833,12 +1833,6 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
                             vlm_MessageNew( "enabled", s->b_enabled ?
                                             "yes" : "no" ) );
 
-            if( !s->b_enabled ) return msg;
-
-
-            vlm_MessageAdd( msg_schedule,
-                            vlm_MessageNew( "enabled", "yes" ) );
-
             /* calculate next date */
             i_time = vlm_Date();
             i_next_date = s->i_date;
