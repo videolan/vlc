@@ -977,7 +977,6 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             while( strcmp( psz_elt = E_(SSPop)( st ), "" )
                    && strcmp( psz_elt, ";" ) )
             {
-                printf( "\npsz_elt : %s", psz_elt );
                 char *psz_buf =
                     (char *)malloc( strlen( psz_cmd ) + strlen( psz_elt ) + 2 );
                 sprintf( psz_buf, "%s %s", psz_cmd, psz_elt );
@@ -986,8 +985,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 psz_cmd = psz_buf;
             }
 
-            printf( "\nVLM command : %s\n\n", psz_cmd );
-
+            msg_Dbg( p_intf, "executing vlm command: %s", psz_cmd );
             vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz_cmd, &vlm_answer );
 
             if( vlm_answer->psz_value == NULL )
