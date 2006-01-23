@@ -102,7 +102,7 @@ vlc_module_begin();
 
     add_integer( ENC_CFG_PREFIX "x", -1, NULL, ENC_POSX_TEXT, ENC_POSX_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "y", -1, NULL, ENC_POSY_TEXT, ENC_POSY_LONGTEXT, VLC_FALSE );
-    add_integer( ENC_CFG_PREFIX "timeout", 15, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );
+    add_integer( ENC_CFG_PREFIX "timeout", 15, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT, VLC_FALSE );    
 vlc_module_end();
 
 static const char *ppsz_enc_options[] = { NULL };
@@ -230,7 +230,7 @@ struct decoder_sys_t
 #define DVBSUB_OT_BASIC_CHAR            0x01
 #define DVBSUB_OT_COMPOSITE_STRING      0x02
 /* Pixel DATA TYPES */
-/* According to EN 300-743, table 9 */
+/* According to EN 300-743, table 9 */ 
 #define DVBSUB_DT_2BP_CODE_STRING       0x10
 #define DVBSUB_DT_4BP_CODE_STRING       0x11
 #define DVBSUB_DT_8BP_CODE_STRING       0x12
@@ -279,7 +279,7 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
-    p_sys->i_pts          = (mtime_t) 0;
+    p_sys->i_pts          = (mtime_t) 0;    
     p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
     p_sys->i_ancillary_id = p_dec->fmt_in.subs.dvb.i_id >> 16;
 
@@ -328,7 +328,7 @@ static void Close( vlc_object_t *p_this )
 
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "x" );
     var_Destroy( p_this, DVBSUB_CFG_PREFIX "y" );
-    var_Destroy( p_this, DVBSUB_CFG_PREFIX "position" );
+    var_Destroy( p_this, DVBSUB_CFG_PREFIX "position" );    
 
     free_all( p_dec );
     free( p_sys );
@@ -1387,10 +1387,7 @@ static subpicture_t *render( decoder_t *p_dec )
         /* Create new SPU region */
         memset( &fmt, 0, sizeof(video_format_t) );
         fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
-        /* FIXME -> subtitles will be squished when using VOUT_ASPECT_FACTOR
-           and they won't be placed correctly when using 0 and the video's
-           aspect ratio is different than the vout's aspect ratio */
-        fmt.i_aspect = VOUT_ASPECT_FACTOR;
+        fmt.i_aspect = 0; /* 0 means use aspect ratio of background video */
         fmt.i_width = fmt.i_visible_width = p_region->i_width;
         fmt.i_height = fmt.i_visible_height = p_region->i_height;
         fmt.i_x_offset = fmt.i_y_offset = 0;
@@ -1556,7 +1553,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-/* FIXME: this routine is a hack to convert VLC_FOURCC('Y','U','V','A')
+/* FIXME: this routine is a hack to convert VLC_FOURCC('Y','U','V','A') 
  *        into VLC_FOURCC('Y','U','V','P')
  */
 static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
@@ -1904,7 +1901,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         }
 
         if( ( p_sys->p_regions[i_regions].i_width <
-              (int)p_region->fmt.i_visible_width ) ||
+              (int)p_region->fmt.i_visible_width ) || 
             ( p_sys->p_regions[i_regions].i_width >
               (int)p_region->fmt.i_visible_width ) )
         {
