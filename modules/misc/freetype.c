@@ -527,9 +527,8 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
     video_format_t fmt;
-    int i, x, y, i_pitch;
-    uint8_t i_y; /* YUV values, derived from incoming RGB */
-    int8_t i_u, i_v;
+    int i, x, y, i_pitch, i_alpha;
+    uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
     subpicture_region_t *p_region_tmp;
 
     /* Create a new subpicture region */
@@ -551,12 +550,13 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     free( p_region_tmp );
 
     /* Calculate text color components */
-    i_y = (uint8_t)(( 66 * p_line->i_red  + 129 * p_line->i_green +
-                      25 * p_line->i_blue + 128) >> 8) +  16;
-    i_u = (int8_t)(( -38 * p_line->i_red  -  74 * p_line->i_green +
-                     112 * p_line->i_blue + 128) >> 8) + 128;
-    i_v = (int8_t)(( 112 * p_line->i_red  -  94 * p_line->i_green -
-                      18 * p_line->i_blue + 128) >> 8) + 128;
+    i_y = (uint8_t)__MIN(abs( 2104 * p_line->i_red  + 4130 * p_line->i_green +
+                      802 * p_line->i_blue + 4096 + 131072 ) >> 13, 235);
+    i_u = (uint8_t)__MIN(abs( -1214 * p_line->i_red  + -2384 * p_line->i_green +
+                     3598 * p_line->i_blue + 4096 + 1048576) >> 13, 240);
+    i_v = (uint8_t)__MIN(abs( 3598 * p_line->i_red + -3013 * p_line->i_green +
+                      -585 * p_line->i_blue + 4096 + 1048576) >> 13, 240);
+    i_alpha = p_line->i_alpha;
 
     p_dst_y = p_region->picture.Y_PIXELS;
     p_dst_u = p_region->picture.U_PIXELS;
@@ -649,14 +649,12 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                 {
                     if( p_glyph->bitmap.buffer[i_bitmap_offset] )
                     {
-                        p_dst_y[i_offset+x] =
-                            ((p_dst_y[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) + i_y * ((int)p_glyph->bitmap.buffer[i_bitmap_offset]))>>8;
+                        p_dst_y[i_offset+x] = ((p_dst_y[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) +
+                                              i_y * ((int)p_glyph->bitmap.buffer[i_bitmap_offset])) >> 8;
 
-//                        p_dst_u[i_offset+x] =
-//                            ((p_dst_u[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) + i_u * ((int)p_glyph->bitmap.buffer[i_bitmap_offset]))>>8;
+                        p_dst_u[i_offset+x] = i_u;
+                        p_dst_v[i_offset+x] = i_v;
                         
-//                        p_dst_v[i_offset+x] =
-//                         ((p_dst_v[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) + i_v * ((int)p_glyph->bitmap.buffer[i_bitmap_offset]))>>8;
                         if( p_filter->p_sys->i_effect == EFFECT_BACKGROUND )
                             p_dst_a[i_offset+x] = 0xff;
                     }
@@ -665,6 +663,11 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
             }
         }
     }
+    
+    /* Apply the alpha setting */
+    for( i = 0; i < fmt.i_height * i_pitch; i++ )
+        p_dst_a[i] = p_dst_a[i] * (255 - i_alpha) / 255;
+
     return VLC_SUCCESS;
 }
 
