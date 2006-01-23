@@ -82,6 +82,9 @@ static void Close( vlc_object_t * );
 #define CRL_LONGTEXT N_( "Path to the x509 PEM Certificates Revocation List " \
                          "file that will be HTTP/SSL stream output. Leave " \
                          "empty if you don't have one." )
+#define BONJOUR_TEXT N_( "Advertise with Bonjour")
+#define BONJOUR_LONGTEXT N_( "Advertise the stream with the Bonjour protocol" )
+
 
 vlc_module_begin();
     set_description( _("HTTP stream output") );
@@ -106,6 +109,8 @@ vlc_module_begin();
                 CA_TEXT, CA_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
                 CRL_TEXT, CRL_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "bonjour", VLC_FALSE, NULL,
+              BONJOUR_TEXT, BONJOUR_LONGTEXT,VLC_TRUE);
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -316,19 +321,21 @@ static int Open( vlc_object_t *p_this )
                         DIRECTORY_SEPARATOR );
     if( psz_name != NULL ) psz_name++;
     else psz_name = p_playlist->status.p_item->input.psz_uri;
-
-    p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
-                                              "_vlc-http._tcp",
-                                              psz_name, i_bind_port, psz_txt );
-    free( (void *)psz_txt );
-    if( p_sys->p_bonjour == NULL )
+    
+    if( config_GetInt(p_this, SOUT_CFG_PREFIX "bonjour") )
     {
-        vlc_object_release( p_playlist );
-        httpd_HostDelete( p_sys->p_httpd_host );
-        free( (void *)p_sys );
-        return VLC_EGENERIC;
+        p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
+                                                  "_vlc-http._tcp",
+                                                  psz_name, i_bind_port, psz_txt );
+        free( (void *)psz_txt );
+        if( p_sys->p_bonjour == NULL )
+        {
+            vlc_object_release( p_playlist );
+            httpd_HostDelete( p_sys->p_httpd_host );
+            free( (void *)p_sys );
+            return VLC_EGENERIC;
+        }
     }
-
     vlc_object_release( p_playlist );
 #endif
 
@@ -356,7 +363,8 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
 
 #ifdef HAVE_AVAHI_CLIENT
-    bonjour_stop_service( p_sys->p_bonjour );
+    if( config_GetInt(p_this, SOUT_CFG_PREFIX "bonjour") )
+        bonjour_stop_service( p_sys->p_bonjour );
 #endif
 
     /* update p_sout->i_out_pace_nocontrol */
