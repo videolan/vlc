@@ -36,8 +36,9 @@ function vlm_input_edit( dest )
 
 function vlm_input_change()
 {
-    hide( 'input' );
     document.getElementById( value( 'input_dest' ) ).value = value( 'input_mrl' );
+    hide( 'input' );
+    document.getElementById( value( 'input_dest' ) ).focus();
 }
 
 function vlm_output_edit( dest )
@@ -48,8 +49,9 @@ function vlm_output_edit( dest )
 
 function vlm_output_change()
 {
-    hide( 'sout' );
     document.getElementById( value( 'sout_dest' ) ).value = value( 'sout_mrl' ).substr(6); /* substr <-> remove :sout= */
+    hide( 'sout' );
+    document.getElementById( value( 'sout_dest' ) ).focus();
 }
 
 function hide_vlm_add()
@@ -57,6 +59,74 @@ function hide_vlm_add()
     document.getElementById( 'vlm_add_broadcast' ).style.display = 'none';
     document.getElementById( 'vlm_add_vod' ).style.display = 'none';
     document.getElementById( 'vlm_add_schedule' ).style.display = 'none';
+}
+
+function toggle_schedule_date()
+{
+    if( checked( 'vlm_schedule_now' ) )
+    {
+        disable( 'vlm_schedule_year' );
+        disable( 'vlm_schedule_month' );
+        disable( 'vlm_schedule_day' );
+        disable( 'vlm_schedule_hour' );
+        disable( 'vlm_schedule_minute' );
+        disable( 'vlm_schedule_second' );
+    }
+    else
+    {
+        enable( 'vlm_schedule_year' );
+        enable( 'vlm_schedule_month' );
+        enable( 'vlm_schedule_day' );
+        enable( 'vlm_schedule_hour' );
+        enable( 'vlm_schedule_minute' );
+        enable( 'vlm_schedule_second' );
+    }
+}
+
+function toggle_schedule_repeat()
+{
+    if( checked( 'vlm_schedule_repeat' ) )
+    {
+        enable( 'vlm_schedule_period_year' );
+        enable( 'vlm_schedule_period_month' );
+        enable( 'vlm_schedule_period_day' );
+        enable( 'vlm_schedule_period_hour' );
+        enable( 'vlm_schedule_period_minute' );
+        enable( 'vlm_schedule_period_second' );
+        enable( 'vlm_schedule_repeat_times' );
+    }
+    else
+    {
+        disable( 'vlm_schedule_period_year' );
+        disable( 'vlm_schedule_period_month' );
+        disable( 'vlm_schedule_period_day' );
+        disable( 'vlm_schedule_period_hour' );
+        disable( 'vlm_schedule_period_minute' );
+        disable( 'vlm_schedule_period_second' );
+        disable( 'vlm_schedule_repeat_times' );
+    }
+}
+
+function vlm_schedule_type_change( name )
+{
+    act = document.getElementById( 'vlm_elt_' + name + '_action' ).value;
+    itemname = document.getElementById( 'vlm_elt_' + name + '_name' );
+    opt = document.getElementById( 'vlm_elt_' + name + '_opt' );
+    if( act == "play" || act == "pause" || act == "stop" )
+    {
+        itemname.style.display = "";
+        opt.style.display = "none";
+    }
+    else if( act == "seek" )
+    {
+        itemname.style.display = "";
+        opt.style.display = "";
+    }
+    else
+    {
+        itemname.style.display = "none";
+        opt.style.display = "";
+    }
 }
 
 function update_vlm_add_broadcast()
@@ -126,6 +196,54 @@ function update_vlm_add_vod()
 
 function update_vlm_add_schedule()
 {
+    cmd = document.getElementById( 'vlm_command' );
+
+    check_and_replace_int( 'vlm_schedule_year', '0000' );
+    check_and_replace_int( 'vlm_schedule_month', '00' );
+    check_and_replace_int( 'vlm_schedule_day', '00' );
+    check_and_replace_int( 'vlm_schedule_hour', '00' );
+    check_and_replace_int( 'vlm_schedule_minute', '00' );
+    check_and_replace_int( 'vlm_schedule_second', '00' );
+    check_and_replace_int( 'vlm_schedule_period_year', '0000' );
+    check_and_replace_int( 'vlm_schedule_period_month', '00' );
+    check_and_replace_int( 'vlm_schedule_period_day', '00' );
+    check_and_replace_int( 'vlm_schedule_period_hour', '00' );
+    check_and_replace_int( 'vlm_schedule_period_minute', '00' );
+    check_and_replace_int( 'vlm_schedule_period_second', '00' );
+
+    if( value( 'vlm_schedule_name' ) )
+    {
+        cmd.value = "new " + addunderscores( value( 'vlm_schedule_name' ) ) + " schedule";
+
+        if( checked( 'vlm_schedule_enabled' ) )
+        {
+            cmd.value += " enabled";
+        }
+
+        if( checked( 'vlm_schedule_now' ) )
+        {
+            cmd.value += " date now";
+        }
+        else
+        {
+            cmd.value += " date " + value( 'vlm_schedule_year' ) + "/" + value( 'vlm_schedule_month' ) + "/" + value( 'vlm_schedule_day' ) + '-' + value( 'vlm_schedule_hour' ) + ':' + value( 'vlm_schedule_minute' ) + ':' + value( 'vlm_schedule_second' );
+        }
+
+        if( checked( 'vlm_schedule_repeat' ) )
+        {
+            cmd.value += " period " + value( 'vlm_schedule_period_year' ) + "/" + value( 'vlm_schedule_period_month' ) + "/" + value( 'vlm_schedule_period_day' ) + '-' + value( 'vlm_schedule_period_hour' ) + ':' + value( 'vlm_schedule_period_minute' ) + ':' + value( 'vlm_schedule_period_second' );
+
+            if( value( 'vlm_schedule_repeat_times' ) != 0 )
+            {
+                cmd.value += " repeat " + (value( 'vlm_schedule_repeat_times' ) - 1 );
+            }
+        }
+            
+    }
+    else
+    {
+        cmd.value = "";
+    }
 }
 
 function clear_vlm_add()
@@ -140,6 +258,22 @@ function clear_children( elt )
     if( elt )
         while( elt.hasChildNodes() )
             elt.removeChild( elt.firstChild );
+}
+
+function create_button( caption, action )
+{
+    link = document.createElement( "input" );
+    link.setAttribute( 'type', 'button' );
+    link.setAttribute( 'onclick', action );
+    link.setAttribute( 'value', caption );
+    return link;
+}
+function create_option( caption, value )
+{
+    opt = document.createElement( 'option' );
+    opt.setAttribute( 'value', value );
+    opt.appendChild( document.createTextNode( caption ) );
+    return opt;
 }
 
 function parse_vlm_cmd()
@@ -163,11 +297,7 @@ function parse_vlm_cmd()
                 vlme.style.color = "#0f0";
                 clear_vlm_add();
             }
-            link = document.createElement( "input" );
-            link.setAttribute( 'type', 'button' );
-            link.setAttribute( 'onclick', 'clear_children( document.getElementById( "vlm_error" ) );' );
-            link.setAttribute( 'value', 'clear' );
-            vlme.appendChild( link );
+            vlme.appendChild( create_button( 'clear', 'clear_children( document.getElementById( "vlm_error" ) );' ) );
 
             vlm_get_elements();
         }
@@ -249,34 +379,18 @@ function parse_vlm_elements()
                         if( elt.getAttribute( 'enabled' ) == 'yes' )
                         {
                             nb.appendChild( document.createTextNode( " " ) );
-                            link = document.createElement( 'input' );
-                            link.setAttribute( 'type', 'button' );
-                            link.setAttribute( 'onclick', 'vlm_play("'+elt.getAttribute('name')+'");' );
-                            link.setAttribute( 'value', 'Play' );
-                            nb.appendChild( link );
+                            nb.appendChild( create_button( 'Play', 'vlm_play("'+elt.getAttribute('name')+'");' ) );
                         }
 
                         nb.appendChild( document.createTextNode( " " ) );
-                        link = document.createElement( 'input' );
-                        link.setAttribute( 'type', 'button' );
-                        link.setAttribute( 'onclick', 'vlm_pause("'+elt.getAttribute('name')+'");' );
-                        link.setAttribute( 'value', 'Pause' );
-                        nb.appendChild( link );
+                        nb.appendChild( create_button( 'Pause', 'vlm_pause("'+elt.getAttribute('name')+'");' ) );
 
                         nb.appendChild( document.createTextNode( " " ) );
-                        link = document.createElement( 'input' );
-                        link.setAttribute( 'type', 'button' );
-                        link.setAttribute( 'onclick', 'vlm_stop("'+elt.getAttribute('name')+'");' );
-                        link.setAttribute( 'value', 'Stop' );
-                        nb.appendChild( link );
+                        nb.appendChild( create_button( 'Stop', 'vlm_stop("'+elt.getAttribute('name')+'");' ) );
                     }
                     
                     nb.appendChild( document.createTextNode( " " ) );
-                    link = document.createElement( 'input' );
-                    link.setAttribute( 'type', 'button' );
-                    link.setAttribute( 'onclick', 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' );
-                    link.setAttribute( 'value', "Delete" );
-                    nb.appendChild( link );
+                    nb.appendChild( create_button( 'Delete', 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' ) );
 
                     list = document.createElement( "ul" );
                     /* begin input list */
@@ -285,11 +399,7 @@ function parse_vlm_elements()
                     {
                         item = document.createElement( "li" );
                         item.appendChild( document.createTextNode( "Input: " + inputs[i].firstChild.data + " " ) );
-                        link = document.createElement( "input" );
-                        link.setAttribute( 'type', 'button' );
-                        link.setAttribute( 'onclick', 'vlm_delete_input("' + elt.getAttribute( 'name' ) + '", '+(i+1)+' );' );
-                        link.setAttribute( 'value', "Delete" );
-                        item.appendChild( link );
+                        item.appendChild( create_button( "Delete", 'vlm_delete_input("' + elt.getAttribute( 'name' ) + '", '+(i+1)+' );' ) );
                         list.appendChild( item );
                     }
 
@@ -301,17 +411,9 @@ function parse_vlm_elements()
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_input' );
                     item.appendChild( text );
                     item.appendChild( document.createTextNode( ' ' ) );
-                    edit = document.createElement( "input" );
-                    edit.setAttribute( 'type', 'button' );
-                    edit.setAttribute( 'value', 'Edit' );
-                    edit.setAttribute( 'onclick', 'vlm_input_edit("vlm_elt_'+elt.getAttribute('name')+'_input");');
-                    item.appendChild( edit );
+                    item.appendChild( create_button( 'Edit', 'vlm_input_edit("vlm_elt_'+elt.getAttribute('name')+'_input");') );
                     item.appendChild( document.createTextNode( ' ' ) );
-                    link = document.createElement( "input" );
-                    link.setAttribute( 'type', 'button' );
-                    link.setAttribute( 'onclick', 'vlm_add_input("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_input").value );' );
-                    link.setAttribute( 'value', 'Add input' );
-                    item.appendChild( link );
+                    item.appendChild( create_button( 'Add input', 'vlm_add_input("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_input").value );' ) );
                     
                     list.appendChild( item );
                     /* end of input list */
@@ -336,18 +438,10 @@ function parse_vlm_elements()
 
                     item.appendChild( document.createTextNode( ' ' ) );
 
-                    edit = document.createElement( "input" );
-                    edit.setAttribute( 'type', 'button' );
-                    edit.setAttribute( 'value', 'Edit' );
-                    edit.setAttribute( 'onclick', 'vlm_output_edit("vlm_elt_'+elt.getAttribute('name')+'_output");');
-                    item.appendChild( edit );
-                    list.appendChild( item );
+                    item.appendChild( create_button( 'Edit', 'vlm_output_edit("vlm_elt_'+elt.getAttribute('name')+'_output");' ) );
                     item.appendChild( document.createTextNode( ' ' ) );
-                    link = document.createElement( "input" );
-                    link.setAttribute( 'type', 'button' );
-                    link.setAttribute( 'onclick', 'vlm_output("'+elt.getAttribute( 'name' )+ '",document.getElementById("vlm_elt_'+elt.getAttribute( 'name' )+'_output").value);' );
-                    link.setAttribute( 'value', 'Change output' );
-                    item.appendChild( link );
+                    item.appendChild( create_button( 'Change output', 'vlm_output("'+elt.getAttribute( 'name' )+ '",document.getElementById("vlm_elt_'+elt.getAttribute( 'name' )+'_output").value);' ) );
+                    list.appendChild( item );
                     /* end of output */
 
                     /* begin options list */
@@ -368,11 +462,7 @@ function parse_vlm_elements()
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_option' );
                     item.appendChild( text );
                     item.appendChild( document.createTextNode( ' ' ) );
-                    link = document.createElement( "input" );
-                    link.setAttribute( 'type', 'button' );
-                    link.setAttribute( 'onclick', 'vlm_option("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_option").value );' );
-                    link.setAttribute( 'value', 'Add option' );
-                    item.appendChild( link );
+                    item.appendChild( create_button( 'Add option', 'vlm_option("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_option").value );' ) );
                     
                     list.appendChild( item );
                     /* end of options */
@@ -382,6 +472,100 @@ function parse_vlm_elements()
                 }
                 else if( elt.nodeName == "schedule" )
                 {
+                    nb = document.createElement( 'div' );
+                    nb.setAttribute( 'class', 'list_element' );
+                    vlms.appendChild( nb );
+
+                    nbname = document.createElement( 'b' );
+                    nbname.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    nb.appendChild( nbname );
+                    
+                    link = document.createElement( 'input' );
+                    link.setAttribute( 'type', 'button' );
+                    if( elt.getAttribute( 'enabled' ) == 'yes' )
+                    {
+                        nb.appendChild( document.createTextNode( " enabled " ) );
+                        link.setAttribute( 'onclick', 'vlm_disable("'+elt.getAttribute( 'name' ) + '");' );
+                        link.setAttribute( 'value', "Disable" );
+                    }
+                    else
+                    {
+                        nb.appendChild( document.createTextNode( " disabled " ) );
+                        link.setAttribute( 'onclick', 'vlm_enable("'+elt.getAttribute( 'name' ) + '");' );
+                        link.setAttribute( 'value', "Enable" );
+                    }
+                    nb.appendChild( link );
+
+                    nb.appendChild( document.createTextNode( " " ) );
+                    nb.appendChild( create_button( "Delete", 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' ) );
+
+                    list = document.createElement( 'ul' );
+
+                    item = document.createElement( 'li' );
+                    item.appendChild( document.createTextNode( "Date: " + elt.getAttribute( 'date' ) ) );
+                    list.appendChild( item );
+
+                    item = document.createElement( 'li' );
+                    item.appendChild( document.createTextNode( "Period (in seconds): " + elt.getAttribute( 'period' ) ) );
+                    list.appendChild( item );
+                    
+                    item = document.createElement( 'li' );
+                    if( elt.getAttribute( 'repeat' ) == -1 )
+                    {
+                        item.appendChild( document.createTextNode( "Number of repeats left: for ever" ) );
+                    }
+                    else
+                    {
+                        item.appendChild( document.createTextNode( "Number of repeats left: " + elt.getAttribute( 'repeat' ) ) );
+                    }
+                    list.appendChild( item );
+                    
+                    commands = elt.getElementsByTagName( 'command' );
+                    for( i = 0; i < commands.length; i++ )
+                    {
+                        item = document.createElement( "li" );
+                        item.appendChild( document.createTextNode( "Command: " + commands[i].firstChild.data + " " ) );
+                        list.appendChild( item );
+                    }
+                    
+                    item = document.createElement( 'li' );
+                    sel = document.createElement( 'select' );
+                    sel.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_action' );
+                    sel.setAttribute( 'onchange', 'vlm_schedule_type_change("'+elt.getAttribute('name')+'");');
+                    sel.appendChild( create_option( 'play', 'play' ) );
+                    sel.appendChild( create_option( 'pause', 'pause' ) );
+                    sel.appendChild( create_option( 'stop', 'stop' ) );
+                    sel.appendChild( create_option( 'seek', 'seek' ) );
+                    sel.appendChild( create_option( '(other)', '' ) );
+                    item.appendChild( sel );
+
+                    item.appendChild( document.createTextNode( " " ) );
+                    text = document.createElement( 'input' );
+                    text.setAttribute( 'type', 'text' );
+                    text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_name' );
+                    text.setAttribute( 'size', '10' );
+                    text.setAttribute( 'value', '(name)' );
+                    text.setAttribute( 'onfocus', 'if( this.value == "(name)" ) this.value = "";' );
+                    text.setAttribute( 'onblur', 'if( this.value == "" ) this.value = "(name)";' );
+                    item.appendChild( text );
+
+                    item.appendChild( document.createTextNode( " " ) );
+                    text = document.createElement( 'input' );
+                    text.setAttribute( 'type', 'text' );
+                    text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_opt' );
+                    text.setAttribute( 'size', '30' );
+                    text.setAttribute( 'value', '(options)' );
+                    text.setAttribute( 'onfocus', 'if( this.value == "(options)" ) this.value = "";' );
+                    text.setAttribute( 'onblur', 'if( this.value == "" ) this.value = "(options)";' );
+                    item.appendChild( text );
+                    item.appendChild( document.createTextNode( " " ) );
+                    item.appendChild( create_button( "Append command", 'vlm_schedule_append("' + elt.getAttribute( 'name' ) + '");') );
+                    
+                    list.appendChild( item );
+
+                    nb.appendChild( list );
+                    vlm_schedule_type_change( elt.getAttribute('name') );
+                    
                 }
                 elt = elt.nextSibling;
             }
@@ -473,6 +657,25 @@ function vlm_option( name, option )
     vlm_cmd( value( 'vlm_command' ) );
 }
 
+function vlm_schedule_append( name )
+{
+    act = document.getElementById( 'vlm_elt_' + name + '_action' ).value;
+    document.getElementById( 'vlm_command' ).value = "setup " + name + " append ";
+    itemname = document.getElementById( 'vlm_elt_' + name + '_name' ).value;
+    if( itemname == "(name)" ) itemname = "";
+    opt = document.getElementById( 'vlm_elt_' + name + '_opt' ).value;
+    if( opt == "(options)" ) opt = "";
+        
+    if( act == '' )
+    {
+        document.getElementById( 'vlm_command' ).value += opt;
+    }
+    else
+    {
+        document.getElementById( 'vlm_command' ).value += 'control ' + itemname + " " + act + " " + opt;
+    }
+    vlm_cmd( value( 'vlm_command' ) );
+}
 function vlm_send( )
 {
     vlm_cmd( value( 'vlm_command' ) );

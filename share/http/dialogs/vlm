@@ -64,11 +64,11 @@ sout and vlmelements .
       <label for="vlm_broadcast_loop">Loop</label>
       <br/>
       <label for="vlm_broadcast_input">Input</label>
-      <input type="text" id="vlm_broadcast_input" size="60" onchange="update_vlm_add_broadcast();" />
+      <input type="text" id="vlm_broadcast_input" size="60" onblur="update_vlm_add_broadcast();" />
       <input type="button" value="Edit" onclick="vlm_input_edit('vlm_broadcast_input');" />
       <br/>
       <label for="vlm_broadcast_output">Output</label>
-      <input type="text" id="vlm_broadcast_output" size="60" onchange="update_vlm_add_broadcast();" />
+      <input type="text" id="vlm_broadcast_output" size="60" onblur="update_vlm_add_broadcast();" />
       <input type="button" value="Edit" onclick="vlm_output_edit('vlm_broadcast_output');" />
       <br/>
     </div>
@@ -81,18 +81,58 @@ sout and vlmelements .
       <label for="vlm_vod_enabled">Enable</label>
       <br/>
       <label for="vlm_vod_input">Input</label>
-      <input type="text" id="vlm_vod_input" size="60" onchange="update_vlm_add_vod();" />
+      <input type="text" id="vlm_vod_input" size="60" onblur="update_vlm_add_vod();" />
       <input type="button" value="Edit" onclick="vlm_input_edit('vlm_vod_input');" />
       <br/>
       <label for="vlm_vod_output">Output (leave empty unless you want to transcode)</label>
-      <input type="text" id="vlm_vod_output" size="60" onchange="update_vlm_add_vod();" />
+      <input type="text" id="vlm_vod_output" size="60" onblur="update_vlm_add_vod();" />
       <input type="button" value="Edit" onclick="vlm_output_edit('vlm_vod_output');" />
       <br/>
     </div>
     <div id="vlm_add_schedule" style="display: none">
       New schedule
       <hr />
-      TODO
+      <label for="vlm_schedule_name">Name</label>
+      <input type="text" id="vlm_schedule_name" size="20" onchange="update_vlm_add_schedule();" />
+      <input type="checkbox" id="vlm_schedule_enabled" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_enabled">Enable</label>
+      <br />
+      Schedule date:
+      <input type="checkbox" id="vlm_schedule_now" onchange="toggle_schedule_date();update_vlm_add_schedule();" />
+      <label for="vlm_schedule_now">Now</label>
+      <br/>
+      <label for="vlm_schedule_year">Year:</label>
+      <input type="text" id="vlm_schedule_year" value="1970" size="4" maxlength="4" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_month">Month:</label>
+      <input type="text" id="vlm_schedule_month" value="01" size="2" maxlength="2" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_day">Day:</label>
+      <input type="text" id="vlm_schedule_day" value="01" size="2" maxlength="2" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_hour">Hour:</label>
+      <input type="text" id="vlm_schedule_hour" value="00" size="2" maxlength="2" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_minute">Minute:</label>
+      <input type="text" id="vlm_schedule_minute" value="59" size="2" maxlength="2" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_second">Second:</label>
+      <input type="text" id="vlm_schedule_second" value="59" size="2" maxlength="2" onchange="update_vlm_add_schedule();" />
+      <br/>
+      Schedule period:<br/>
+      <input type="checkbox" id="vlm_schedule_repeat" onchange="toggle_schedule_repeat();update_vlm_add_schedule();" />
+      <label for="vlm_schedule_repeat">Repeat</label>
+      <br />
+      <label for="vlm_schedule_period_year">Year:</label>
+      <input type="text" id="vlm_schedule_period_year" value="0" size="4" disabled="disabled" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_period_month">Month:</label>
+      <input type="text" id="vlm_schedule_period_month" value="0" size="2" disabled="disabled" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_period_day">Day:</label>
+      <input type="text" id="vlm_schedule_period_day" value="0" size="2" disabled="disabled" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_period_hour">Hour:</label>
+      <input type="text" id="vlm_schedule_period_hour" value="0" size="2" disabled="disabled" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_period_minute">Minute:</label>
+      <input type="text" id="vlm_schedule_period_minute" value="0" size="4" disabled="disabled" onchange="update_vlm_add_schedule();" />
+      <label for="vlm_schedule_period_second">Second:</label>
+      <input type="text" id="vlm_schedule_period_second" value="0" size="4" disabled="disabled" onchange="update_vlm_add_schedule();" />
+      <br />
+      <label for="vlm_schedule_repeat_times">Number of repetitions (use 0 to repeat endlessly):</label>
+      <input type="text" id="vlm_schedule_repeat_times" size="8" disabled="disabled" value="0" onchange="update_vlm_add_schedule();" />
     </div>
   </div>
 </div>

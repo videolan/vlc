@@ -784,9 +784,9 @@ function browse_dir( dir )
 }
 function browse_path( p )
 {
-    document.getElementById( document.getElementById( 'browse_dest' ).value ).value = p;
+    document.getElementById( value( 'browse_dest' ) ).value = p;
     hide( 'browse' );
-    document.getElementById( document.getElementById( 'browse_dest' ).value ).focus();
+    document.getElementById( value( 'browse_dest' ) ).focus();
 }
 
 /**********************************************************************
