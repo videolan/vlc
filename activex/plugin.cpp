@@ -546,7 +546,7 @@ HRESULT VLCPlugin::onLoad(void)
         ** is the URL of the page the plugin is embedded into. Hence, if the MRL
         ** is a relative URL, we should end up with an absolute URL
         */
-        IOleClientSite *pClientSite;
+        LPOLECLIENTSITE pClientSite;
         if( SUCCEEDED(vlcOleObject->GetClientSite(&pClientSite)) && (NULL != pClientSite) )
         {
             IBindCtx *pBC = 0;
@@ -776,7 +776,7 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     SetWindowLongPtr(_videownd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
     if( getVisible() )
-        ShowWindow(_inplacewnd, SW_SHOWNORMAL);
+        ShowWindow(_inplacewnd, SW_SHOW);
 
     /* set internal video width and height */
     vlc_value_t val;
@@ -813,10 +813,15 @@ HRESULT VLCPlugin::onInPlaceDeactivate(void)
 
 void VLCPlugin::setVisible(BOOL fVisible)
 {
-    _b_visible = fVisible;
-    if( isInPlaceActive() )
-        ShowWindow(_inplacewnd, fVisible ? SW_SHOWNORMAL : SW_HIDE);
-    firePropChangedEvent(DISPID_Visible);
+    if( fVisible != _b_visible )
+    {
+        _b_visible = fVisible;
+        if( isInPlaceActive() )
+        {
+            ShowWindow(_inplacewnd, fVisible ? SW_SHOW : SW_HIDE);
+        }
+        firePropChangedEvent(DISPID_Visible);
+    }
 };
 
 void VLCPlugin::setFocus(BOOL fFocus)

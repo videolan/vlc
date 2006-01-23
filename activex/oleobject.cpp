@@ -163,8 +163,8 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
             p_inPlaceSite->Release();
         }
 
-        pActiveSite->ShowObject();
-        _p_instance->setVisible(TRUE);
+        if( _p_instance->getVisible() )
+            pActiveSite->ShowObject();
 
         if( NULL != lpMsg )
         {

@@ -371,6 +371,7 @@ STDMETHODIMP VLCControl::setVariable(BSTR name, VARIANT value)
                     hr = VariantChangeType(&arg, &value, 0, VT_BSTR);
                     if( SUCCEEDED(hr) )
                     {
+                        i_type = VLC_VAR_STRING;
                         val.psz_string = CStrFromBSTR(codePage, V_BSTR(&arg));
                         VariantClear(&arg);
                     }
