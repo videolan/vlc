@@ -786,6 +786,16 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         AddIntfInternal( 0, "logger", VLC_FALSE, VLC_FALSE, 1, &psz_logmode );
     }
 
+    if( config_GetInt( p_vlc, "show-intf" ) == 1 )
+    {
+        VLC_AddIntf( 0, "showintf", VLC_FALSE, VLC_FALSE );
+    }
+
+    if( config_GetInt( p_vlc, "network-synchronisation") == 1 )
+    {
+        VLC_AddIntf( 0, "netsync", VLC_FALSE, VLC_FALSE );
+    }
+
     /*
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
      */

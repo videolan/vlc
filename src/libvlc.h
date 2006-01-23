@@ -100,6 +100,11 @@ static char *ppsz_snap_formats[] =
     "show all the available options, including those that most users should " \
     "never touch.")
 
+#define SHOWINTF_TEXT N_("Show interface with mouse")
+#define SHOWINTF_LONGTEXT N_( \
+    "If this enabled, the interface will be shown when you move the mouse to "\
+    "the edge of the screen in fullscreen mode." )
+
 #define AOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the audio " \
     "subsystem, and to add audio filters which can be used for " \
@@ -344,6 +349,11 @@ static char *ppsz_align_descriptions[] =
 #define CLOCK_SYNCHRO_LONGTEXT N_( \
     "Allows you to enable/disable the input clock synchronisation for " \
     "real-time sources.")
+
+#define NETSYNC_TEXT N_("Network synchronisation" )
+#define NETSYNC_LONGTEXT N_( "This allows you to remotely " \
+        "synchronise clocks for server and client. The detailed settings " \
+        "are available in Advanced / Others / Network Sync" )
 
 static int pi_clock_values[] = { -1, 0, 1 };
 static char *ppsz_clock_descriptions[] =
@@ -1256,6 +1266,9 @@ vlc_module_begin();
                  CLOCK_SYNCHRO_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_clock_values, ppsz_clock_descriptions, 0 );
 
+    add_bool( "network-synchronisation", VLC_FALSE, NULL, NETSYNC_TEXT,
+              NETSYNC_LONGTEXT, VLC_TRUE );
+
 /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
     add_string( "codec", NULL, NULL, CODEC_TEXT,
@@ -1414,12 +1427,11 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT , VLC_FALSE );
-    set_section ( N_("Interface module" ), NULL );
+    set_section ( N_("Interfaces" ), NULL );
     add_module_cat( "intf", SUBCAT_INTERFACE_GENERAL, NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, VLC_FALSE );
         change_short('I');
 
-    set_section ( N_("Extra interface modules" ),  NULL );
     add_module_list_cat( "extraintf", SUBCAT_INTERFACE_GENERAL,
                          NULL, NULL, EXTRAINTF_TEXT,
                          EXTRAINTF_LONGTEXT, VLC_FALSE );
@@ -1436,6 +1448,9 @@ vlc_module_begin();
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
+
+    add_bool( "show-intf", VLC_FALSE, NULL, SHOWINTF_TEXT, SHOWINTF_LONGTEXT,
+              VLC_FALSE );
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,

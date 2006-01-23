@@ -65,10 +65,10 @@ static mtime_t GetClockRef( intf_thread_t *, mtime_t );
   "the master client used for the network synchronisation." )
 
 vlc_module_begin();
-    set_shortname( _("Netsync"));
+    set_shortname( _("Network Sync"));
     set_description( _("Network synchronisation") );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+    set_category( CAT_ADVANCED );
+    set_subcategory( SUBCAT_ADVANCED_MISC );
 
     add_bool( "netsync-master", 0, NULL,
               NETSYNC_TEXT, NETSYNC_LONGTEXT, VLC_TRUE );
@@ -95,8 +95,6 @@ static void Run( intf_thread_t *p_intf );
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-
-    msg_Info( p_intf, "Using the netsync interface module..." );
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
