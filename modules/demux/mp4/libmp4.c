@@ -225,7 +225,7 @@ int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
 /*****************************************************************************
  * MP4_NextBox : Go to the next box
  *****************************************************************************
- * if p_box == NULL, go to the next box in witch we are( at the begining ).
+ * if p_box == NULL, go to the next box in which we are( at the begining ).
  *****************************************************************************/
 static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -248,6 +248,7 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
         if( p_box->i_size + p_box->i_pos >=
             p_box->p_father->i_size + p_box->p_father->i_pos )
         {
+            msg_Dbg( p_stream, "out of bound child" );
             return 0; /* out of bound */
         }
     }
@@ -582,30 +583,33 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( i_reserved );
     MP4_GET4BYTES( i_reserved );
     MP4_GET4BYTES( i_reserved );
+    p_box->data.p_hdlr->psz_name = NULL;
 
-    p_box->data.p_hdlr->psz_name = calloc( sizeof( char ), i_read + 1 );
-
-    /* Yes, I love .mp4 :( */
-    if( p_box->data.p_hdlr->i_predefined == VLC_FOURCC( 'm', 'h', 'l', 'r' ) )
+    if( i_read > 0 )
     {
-        uint8_t i_len;
-        int i_copy;
+        p_box->data.p_hdlr->psz_name = calloc( sizeof( char ), i_read + 1 );
 
-        MP4_GET1BYTE( i_len );
-        i_copy = __MIN( i_read, i_len );
+        /* Yes, I love .mp4 :( */
+        if( p_box->data.p_hdlr->i_predefined == VLC_FOURCC( 'm', 'h', 'l', 'r' ) )
+        {
+            uint8_t i_len;
+            int i_copy;
 
-        memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_copy );
-        p_box->data.p_hdlr->psz_name[i_copy] = '\0';
+            MP4_GET1BYTE( i_len );
+            i_copy = __MIN( i_read, i_len );
+
+            memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_copy );
+            p_box->data.p_hdlr->psz_name[i_copy] = '\0';
+        }
+        else
+        {
+            memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_read );
+            p_box->data.p_hdlr->psz_name[i_read] = '\0';
+        }
     }
-    else
-    {
-        memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_read );
-        p_box->data.p_hdlr->psz_name[i_read] = '\0';
-    }
-
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"hdlr\" hanler type %4.4s name %s",
+    msg_Dbg( p_stream, "read box: \"hdlr\" handler type %4.4s name %s",
                        (char*)&p_box->data.p_hdlr->i_handler_type,
                        p_box->data.p_hdlr->psz_name );
 
