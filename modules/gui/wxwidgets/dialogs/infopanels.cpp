@@ -197,6 +197,27 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     video_bsizer->Layout();
     sizer->Add( video_bsizer , 0, wxALL| wxGROW, 5 );
 
+    /* Sout */
+    wxStaticBox *sout_box = new wxStaticBox( this, -1,
+                                              wxU( _("Streaming" ) ) );
+    sout_box->SetAutoLayout( TRUE );
+    sout_bsizer = new wxStaticBoxSizer( sout_box, wxVERTICAL );
+    sout_sizer = new wxFlexGridSizer( 2,3, 20 );
+
+#define SOUT_ADD(txt,widget,dflt) \
+    { sout_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),    \
+                         0, wxEXPAND|wxLEFT|wxALIGN_LEFT , 5  );         \
+      widget = new wxStaticText( this, -1, wxU( dflt ) );                \
+      sout_sizer->Add( widget, 0, wxEXPAND|wxRIGHT|wxALIGN_RIGHT, 5 );   \
+    }
+    SOUT_ADD( "Sent packets", sout_sent_packets_text, "0" );
+    SOUT_ADD( "Sent bytes", sout_sent_bytes_text, "0          " );
+    SOUT_ADD( "Send rate", sout_send_bitrate_text, "0        " );
+    sout_sizer->Layout();
+    sout_bsizer->Add( sout_sizer, 0, wxALL | wxGROW, 5 );
+    sout_bsizer->Layout();
+    sizer->Add( sout_bsizer , 0, wxALL| wxGROW, 5 );
+
    /* Aout */
     wxStaticBox *audio_box = new wxStaticBox( this, -1,
                                               wxU( _("Audio" ) ) );
@@ -215,12 +236,9 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     AUDIO_ADD( "Played buffers", played_abuffers_text,
                                  "0                  " );
     AUDIO_ADD( "Lost buffers", lost_abuffers_text, "0" );
-
-
     audio_sizer->Layout();
     audio_bsizer->Add( audio_sizer, 0, wxALL | wxGROW, 5 );
     audio_bsizer->Layout();
-    sizer->AddSpacer( 0 );
     sizer->Add( audio_bsizer , 0, wxALL| wxGROW, 5 );
 
     sizer->Layout();
@@ -254,6 +272,14 @@ void InputStatsInfoPanel::Update( input_item_t *p_item )
     UPDATE( displayed_text, "%5i", p_item->p_stats->i_displayed_pictures );
     UPDATE( lost_frames_text, "%5i", p_item->p_stats->i_lost_pictures );
 
+    /* Sout */
+    UPDATE( sout_sent_packets_text, "%5i", p_item->p_stats->i_sent_packets );
+    UPDATE( sout_sent_bytes_text, "%8.0f kB",
+            (float)(p_item->p_stats->i_sent_bytes)/1000 );
+    UPDATE( sout_send_bitrate_text, "%6.0f kB/S",
+            (float)(p_item->p_stats->f_send_bitrate)*1000 );
+
+    /* Audio*/
     UPDATE( audio_decoded_text, "%5i", p_item->p_stats->i_decoded_audio );
     UPDATE( played_abuffers_text, "%5i", p_item->p_stats->i_played_abuffers );
     UPDATE( lost_abuffers_text, "%5i", p_item->p_stats->i_lost_abuffers );

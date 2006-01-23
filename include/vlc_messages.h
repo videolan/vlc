@@ -315,6 +315,11 @@ struct input_stats_t
     int i_displayed_pictures;
     int i_lost_pictures;
 
+    /* Sout */
+    int i_sent_packets;
+    int i_sent_bytes;
+    float f_send_bitrate;
+
     /* Aout */
     int i_played_abuffers;
     int i_lost_abuffers;

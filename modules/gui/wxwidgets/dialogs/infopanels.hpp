@@ -97,6 +97,12 @@ private:
     wxStaticText *displayed_text;
     wxStaticText *lost_frames_text;
 
+    wxFlexGridSizer *sout_sizer;
+    wxStaticBoxSizer *sout_bsizer;
+    wxStaticText *sout_sent_packets_text;
+    wxStaticText *sout_sent_bytes_text;
+    wxStaticText *sout_send_bitrate_text;
+
     wxFlexGridSizer *audio_sizer;
     wxStaticBoxSizer *audio_bsizer;
     wxStaticText *audio_decoded_text;
