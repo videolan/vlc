@@ -389,7 +389,7 @@ SectionEnd
 Section "Context Menus" SEC05
   SectionIn 2 3
   !insertmacro MacroAllExtensions AddContextMenu
-  !insertmacro AddContextMenu "Folder"
+  !insertmacro AddContextMenu "Directory"
 SectionEnd
 
 SectionGroup "File type associations" SEC06
@@ -476,7 +476,7 @@ Section "Uninstall" SEC91
 
   !insertmacro MacroAllExtensions DeleteContextMenu
   !insertmacro MacroAllExtensions UnRegisterExtensionSection
-  !insertmacro DeleteContextMenu "Folder"
+  !insertmacro DeleteContextMenu "Directory"
 
   UnRegDLL "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
