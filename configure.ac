@@ -739,13 +739,7 @@ AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Find where are the X headers and libraries
-AC_PATH_X()
-
-dnl The rest of configure doesn't work if x_includes is null.
-dnl Cleaner way to do it welcomes
-if test -z ${x_includes} ;then
-	x_includes="/usr/includes"
-fi
+AC_PATH_XTRA()
 
 dnl it seems that autoconf do the pkg-config detection only for the first PKG_CHECK_MODULES in the configure.ac ( which is logical) but in our case it is nested in a if so it was not working if you're not on linux or have disable hal.
 
@@ -2104,11 +2098,11 @@ if test "${enable_screen}" != "no"; then
     VLC_ADD_CXXFLAGS([screen],[])
     VLC_ADD_LDFLAGS([screen],[-lbe])
   else
-    CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+    CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
     AC_CHECK_HEADERS(X11/Xlib.h, [
       VLC_ADD_PLUGINS([screen])
-      VLC_ADD_LDFLAGS([screen],[-L${x_libraries} -lX11 -lXext])
-      VLC_ADD_CPPFLAGS([screen],[-I${x_includes}])
+      VLC_ADD_LDFLAGS([screen],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+      VLC_ADD_CPPFLAGS([screen],[${X_CFLAGS}])
     ])
     CPPFLAGS="${CPPFLAGS_save}"
   fi
@@ -3151,6 +3145,33 @@ if test "${enable_dirac}" = "yes"; then
   ])
 fi
 
+dnl  libvc1 decoder plugin
+dnl
+AC_ARG_ENABLE(libvc1,
+[  --enable-libvc1         VC-1 codec (default disabled)])
+if test "${enable_libvc1}" = "yes"
+then
+  AC_ARG_WITH(libvc1-tree,
+  [    --with-libvc1-tree=PATH libvc1 tree for static linking])
+  if test -n "${with_libvc1_tree}"
+  then
+    AC_MSG_CHECKING(for vc1dec.o in ${with_libvc1_tree})
+    real_libvc1_tree="`cd ${with_libvc1_tree} 2>/dev/null && pwd`"
+    if test -f "${real_libvc1_tree}/src/.libs/vc1dec.o"
+    then
+      VLC_ADD_BUILTINS([libvc1])
+      VLC_ADD_CPPFLAGS([libvc1],[-I${real_libvc1_tree}/src])
+      VLC_ADD_LDFLAGS([libvc1],[${real_libvc1_tree}/src/.libs/libvc1.a])
+      AC_MSG_RESULT(yes)
+    else
+      dnl  The given libvc1 tree wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_libvc1_tree}/src/.libs/vc1dec.o,
+                    make sure you compiled libvc1 in ${with_libvc1_tree}])
+    fi
+  fi
+fi
+
 dnl
 dnl  PNG decoder module
 dnl
@@ -3240,7 +3261,7 @@ AC_ARG_WITH(,[Video plugins:])
 
 dnl Check for DPMS
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
     AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
     AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
@@ -3265,11 +3286,11 @@ AC_ARG_ENABLE(x11,
 if test "${enable_x11}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_x11}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     VLC_ADD_PLUGINS([x11])
-    VLC_ADD_LDFLAGS([x11],[-L${x_libraries} -lX11 -lXext])
-    VLC_ADD_CPPFLAGS([x11],[-I${x_includes}])
+    VLC_ADD_LDFLAGS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+    VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
@@ -3283,25 +3304,25 @@ AC_ARG_ENABLE(xvideo,
 if test "${enable_xvideo}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_xvideo}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
-    CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
+    CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
     AC_CHECK_LIB(Xv,XvPutImage,[
       # If libXv.so is available, xvideo can be a plugin. Otherwise, we
       # test for libXv_pic.
       if test -f /usr/X11R6/lib/libXv.so -o -f "${x_libraries}"/libXv.so; then
         VLC_ADD_PLUGINS([xvideo])
-        VLC_ADD_CPPFLAGS([xvideo],[-I${x_includes}])
-        VLC_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv])
+        VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
+        VLC_ADD_LDFLAGS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
       else
         AC_CHECK_LIB(Xv_pic,XvPutImage,[
           VLC_ADD_PLUGINS([xvideo])
-          VLC_ADD_CPPFLAGS([xvideo],[-I${x_includes}])
-          VLC_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv_pic])
+          VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
+          VLC_ADD_LDFLAGS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv_pic])
         ],[
           VLC_ADD_BUILTINS([xvideo])
-          VLC_ADD_LDFLAGS([xvideo],[-L${x_libraries} -lX11 -lXext -lXv])
-          VLC_ADD_CPPFLAGS([xvideo],[-I${x_includes}])
+          VLC_ADD_LDFLAGS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
+          VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
         ])
       fi
     ])
@@ -3319,12 +3340,12 @@ AC_ARG_ENABLE(glx,
 if test "${enable_glx}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_glx}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     AC_CHECK_HEADERS(GL/glx.h, [
       VLC_ADD_PLUGINS([glx])
-      VLC_ADD_LDFLAGS([glx],[-L${x_libraries} -lX11 -lXext -lGL -lGLU])
-      VLC_ADD_CPPFLAGS([glx],[-I${x_includes}])
+      VLC_ADD_LDFLAGS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
+      VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
   ]) ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
@@ -3336,8 +3357,8 @@ if test "${enable_xvideo}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_xvideo}" = "yes"); then
   ac_cv_have_xinerama="no"
-  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
-  CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
+  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
+  CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
   AC_CHECK_HEADERS(X11/extensions/Xinerama.h,[
     AC_CHECK_LIB(Xinerama_pic, XineramaQueryExtension,[
       VLC_ADD_LDFLAGS([xvideo],[-lXinerama_pic])
@@ -3372,7 +3393,7 @@ if test "${enable_opengl}" != "no" &&
     AC_CHECK_HEADERS(GL/gl.h, [
       VLC_ADD_PLUGINS([opengl])
       if test "${SYS}" != "mingw32"; then
-        VLC_ADD_LDFLAGS([opengl],[-L${x_libraries} -lGL -lGLU])
+        VLC_ADD_LDFLAGS([opengl],[${X_LIBS} -lGL -lGLU])
       else
         VLC_ADD_LDFLAGS([opengl],[-lopengl32])
       fi
@@ -4133,9 +4154,9 @@ if test "${enable_skins2}" = "yes" ||
   else if test "${skins2_missing_lib}" = "no"; then
     VLC_ADD_PLUGINS([skins2])
     ALIASES="${ALIASES} svlc"
-    VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -DX11_SKINS])
+    VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11])
+    VLC_ADD_LDFLAGS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lX11])
   fi fi
 fi
 
@@ -4569,7 +4590,7 @@ then
   AC_CHECK_HEADERS(GL/gl.h, [
     VLC_ADD_PLUGINS([galaktos])
     if test "${SYS}" != "mingw32"; then
-      VLC_ADD_LDFLAGS([galaktos],[-L${x_libraries} -lGL -lGLU])
+      VLC_ADD_LDFLAGS([galaktos],[${X_LIBS} -lGL -lGLU])
     else
       VLC_ADD_LDFLAGS([galaktos],[-lopengl32])
     fi
@@ -4831,11 +4852,11 @@ then
       AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
     else
       if test "${SYS}" != "mingw32"; then
-        LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
+        LDFLAGS="${LDFLAGS_save} ${X_LIBS} ${X_PRE_LIBS}"
         AC_CHECK_LIB(Xt,XtStrings,
-         [VLC_ADD_LDFLAGS([mozilla],[-L${x_libraries} -lXt -lX11 -lSM -lICE])],
+         [VLC_ADD_LDFLAGS([mozilla],[${X_LIBS} ${X_PRE_LIBS} -lXt -lX11 -lSM -lICE])],
          [],
-         [[-L${x_libraries} -lX11 -lSM -lICE]
+         [[${X_LIBS} ${X_PRE_LIBS} -lX11 -lSM -lICE]
         ])
         LDFLAGS="${LDFLAGS_save}"
       fi
