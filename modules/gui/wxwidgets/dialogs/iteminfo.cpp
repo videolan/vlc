@@ -145,7 +145,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
     info_tree = new wxTreeCtrl( info_panel, -1, wxDefaultPosition,
                                 wxSize(220,200),
                                 wxSUNKEN_BORDER |wxTR_HAS_BUTTONS |
-                                wxTR_HIDE_ROOT );
+                                wxTR_HIDE_ROOT | wxTR_HAS_VARIABLE_ROW_HEIGHT );
 
     sizer->Layout();
     box_sizer->Add( sizer, 0, wxEXPAND, 5 );
