@@ -4903,7 +4903,7 @@ dnl
 AC_ARG_ENABLE(python-bindings,
   [  --enable-python-bindings    Enable Python bindings (default disabled)])
 dnl TODO: look for python dev headers
-AM_CONDITIONAL( BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"] )
+AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
 if test "${enable_python_bindings}" = "yes"
 then
   build_pic=yes
@@ -4914,7 +4914,7 @@ dnl  Java bindings
 dnl
 AC_ARG_ENABLE(java-bindings,
   [  --enable-java-bindings  Enable Java bindings (default disabled)])
-AM_CONDITIONAL( BUILD_JAVA, [test "${enable_java_bindings}" = "yes"] )
+AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
 if test "${enable_java_bindings}" = "yes"
 then
   build_pic=yes

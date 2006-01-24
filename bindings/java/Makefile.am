@@ -10,8 +10,8 @@ JNIHEADERS = org/videolan/jvlc/JVLCNoSuchVariableNameException.h org_videolan_jv
 
 # Include some JAVA stuff
 PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/'`
-JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux
-LIBJINCLUDES = -L${JAVA_HOME}/jre/lib/${PROCESSOR_FAMILY} -ljawt
+JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+LIBJINCLUDES = -L$(JAVA_HOME)/jre/lib/$(PROCESSOR_FAMILY) -ljawt
 
 
 # Binaries
@@ -19,20 +19,20 @@ JCC = gcj -g
 JCH = gcjh -jni
 
 # Compile flags
-CXXFLAGS += `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include ${JINCLUDES}
-LDFLAGS += -L../../lib -lvlc_pic `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
+JAVACXXFLAGS = `top_builddir=../.. ../../vlc-config --cflags pic` -I../../ -I ../../include $(JINCLUDES)
+JAVALDFLAGS = -L../../lib -lvlc_pic `top_builddir=../.. ../../vlc-config --libs builtin vlc pic`
 
 # Build targets
 all: libjvlc.so VlcClient
 
 libjvlc.so: vlc-glue-jni.o vlc-graphics-jni.o
-	$(CXX) -shared vlc-glue-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) ${LDFLAGS} -o libjvlc.so
+	$(CXX) -shared vlc-glue-jni.o vlc-graphics-jni.o $(LIBJINCLUDES) $(LDFLAGS) $(JAVALDFLAGS) -o libjvlc.so
 
 vlc-graphics-jni.o: VlcClient
-	$(CXX) -c vlc-graphics-jni.cc $(CXXFLAGS)
+	$(CXX) -c vlc-graphics-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
 
 vlc-glue-jni.o: VlcClient
-	$(CXX) -c vlc-glue-jni.cc $(CXXFLAGS)
+	$(CXX) -c vlc-glue-jni.cc $(CXXFLAGS) $(JAVACXXFLAGS)
 
 VlcClient: $(OBJECTS)
 	$(JCC) -C VlcClient.java

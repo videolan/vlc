@@ -307,13 +307,11 @@ MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
 DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 
+lib_LIBRARIES = lib/libvlc.a $(lib_PICLIBRARIES)
 if HAVE_WIN32
-lib_LIBRARIES = lib/libvlc.a
 else
-lib_LIBRARIES = lib/libvlc.a
 if BUILD_PIC
-lib_LIBRARIES += lib/libvlc_pic.a
-else
+lib_PICLIBRARIES = lib/libvlc_pic.a
 endif
 endif
 
