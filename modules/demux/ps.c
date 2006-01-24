@@ -70,6 +70,7 @@ struct demux_sys_t
     int         i_mux_rate;
 
     vlc_bool_t  b_lost_sync;
+    vlc_bool_t  b_have_pack;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -110,6 +111,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mux_rate = 0;
     p_sys->i_scr      = -1;
     p_sys->b_lost_sync = VLC_FALSE;
+    p_sys->b_have_pack = VLC_FALSE;
 
     ps_psm_init( &p_sys->psm );
     ps_track_init( p_sys->tk );
@@ -204,6 +206,7 @@ static int Demux( demux_t *p_demux )
     case 0x1ba:
         if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_scr, &i_mux_rate ) )
         {
+            if( !p_sys->b_have_pack ) p_sys->b_have_pack = VLC_TRUE;
             /* done later on to work around bad vcd/svcd streams */
             /* es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr ); */
             if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
@@ -239,6 +242,7 @@ static int Demux( demux_t *p_demux )
     default:
         if( (i_id = ps_pkt_id( p_pkt )) >= 0xc0 )
         {
+            vlc_bool_t b_new = VLC_FALSE;
             ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
 
             if( !tk->b_seen )
@@ -246,6 +250,7 @@ static int Demux( demux_t *p_demux )
                 if( !ps_track_fill( tk, &p_sys->psm, i_id ) )
                 {
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
+                    b_new = VLC_TRUE;
                 }
                 else
                 {
@@ -271,6 +276,13 @@ static int Demux( demux_t *p_demux )
             if( tk->b_seen && tk->es &&
                 !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
             {
+                if( !b_new && !p_sys->b_have_pack && tk->fmt.i_cat == AUDIO_ES && p_pkt->i_pts > 0 )
+                {
+                    /* A hack to sync the A/V on PES files. */
+                    msg_Dbg( p_demux, "force SCR: %lld", p_pkt->i_pts );
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_pkt->i_pts );
+                }
+
                 es_out_Send( p_demux->out, tk->es, p_pkt );
             }
             else
