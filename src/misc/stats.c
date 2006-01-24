@@ -33,7 +33,7 @@
  * Local prototypes
  *****************************************************************************/
 static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
-                            char *psz_name );
+                              const char *psz_name );
 static int stats_CounterUpdate( stats_handler_t *p_handler,
                                 counter_t *p_counter,
                                 vlc_value_t val );
@@ -80,7 +80,7 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
  * STATS_MAX (keep the maximum passed value), STATS_MIN, or STATS_DERIVATIVE
  * (keep a time derivative of the value)
  */
-int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
+int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
                     int i_compute_type )
 {
     counter_t *p_counter;
@@ -123,7 +123,8 @@ int __stats_Create( vlc_object_t *p_this, char *psz_name, int i_type,
  * \param val the vlc_value union containing the new value to aggregate. For
  * more information on how data is aggregated, \see __stats_Create
  */
-int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
+int __stats_Update( vlc_object_t *p_this, const char *psz_name,
+                    vlc_value_t val )
 {
     int i_ret;
     counter_t *p_counter;
@@ -162,7 +163,8 @@ int __stats_Update( vlc_object_t *p_this, char *psz_name, vlc_value_t val )
  * retrieved value
  * \return an error code
  */
-int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_value_t *val )
+int __stats_Get( vlc_object_t *p_this, int i_object_id,
+                 const char *psz_name, vlc_value_t *val )
 {
     counter_t *p_counter;
 
@@ -241,7 +243,7 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id, char *psz_name, vlc_valu
  * \return the counter, or NULL if not found (or handler not created yet)
  */
 counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
-                             char *psz_name )
+                               const char *psz_name )
 {
     counter_t *p_counter;
 
@@ -328,6 +330,7 @@ void stats_ComputeInputStats( input_thread_t *p_input,
     vlc_mutex_unlock( &p_stats->lock );
 }
 
+
 void stats_ReinitInputStats( input_stats_t *p_stats )
 {
     p_stats->i_read_packets = p_stats->i_read_bytes =
@@ -356,6 +359,121 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
                     p_stats->i_played_abuffers, p_stats->i_lost_abuffers,
                     p_stats->f_send_bitrate );
     vlc_mutex_unlock( &p_stats->lock );
+}
+
+void __stats_ComputeGlobalStats( vlc_object_t *p_obj,
+                                global_stats_t *p_stats )
+{
+    vlc_list_t *p_list;
+    int i_index;
+    vlc_mutex_lock( &p_stats->lock );
+
+    p_list = vlc_list_find( p_obj, VLC_OBJECT_INPUT, FIND_CHILD );
+    if( p_list )
+    {
+        for( i_index = 0; i_index < p_list->i_count ; i_index ++ )
+        {
+            float f_in = 0, f_out = 0;
+            p_obj = (vlc_object_t *)p_list->p_values[i_index].p_object;
+            stats_GetFloat( p_obj, p_obj->i_object_id, "input_bitrate",
+                            &f_in );
+            stats_GetFloat( p_obj, p_obj->i_object_id, "sout_send_bitrate",
+                            &f_out );
+            p_stats->f_input_bitrate += f_in;
+            p_stats->f_output_bitrate += f_out;
+        }
+        vlc_list_release( p_list );
+    }
+
+    vlc_mutex_unlock( &p_stats->lock );
+}
+
+void stats_ReinitGlobalStats( global_stats_t *p_stats )
+{
+    p_stats->f_input_bitrate = p_stats->f_output_bitrate = 0.0;
+}
+
+
+void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name )
+{
+    counter_t *p_counter = stats_CounterGet( p_obj,
+                                             p_obj->p_vlc->i_object_id,
+                                             psz_name );
+    if( !p_counter )
+    {
+        counter_sample_t *p_sample;
+        stats_Create( p_obj->p_vlc, psz_name, VLC_VAR_TIME, STATS_TIMER );
+        p_counter = stats_CounterGet( p_obj,  p_obj->p_vlc->i_object_id,
+                                      psz_name );
+        if( !p_counter ) return;
+        /* 1st sample : if started: start_date, else last_time, b_started */
+        p_sample = (counter_sample_t *)malloc( sizeof( counter_sample_t ) );
+        INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
+                     p_counter->i_samples, p_sample );
+        p_sample->date = 0; p_sample->value.b_bool = 0;
+        /* 2nd sample : global_time, i_samples */
+        p_sample = (counter_sample_t *)malloc( sizeof( counter_sample_t ) );
+        INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
+                     p_counter->i_samples, p_sample );
+        p_sample->date = 0; p_sample->value.i_int = 0;
+    }
+    if( p_counter->pp_samples[0]->value.b_bool == VLC_TRUE )
+    {
+        msg_Warn( p_obj, "timer %s was already started !", psz_name );
+        return;
+    }
+    p_counter->pp_samples[0]->value.b_bool = VLC_TRUE;
+    p_counter->pp_samples[0]->date = mdate();
+}
+
+void __stats_TimerStop( vlc_object_t *p_obj, const char *psz_name )
+{
+    counter_t *p_counter = stats_CounterGet( p_obj,
+                                              p_obj->p_vlc->i_object_id,
+                                             psz_name );
+    if( !p_counter || p_counter->i_samples != 2 )
+    {
+        msg_Err( p_obj, "timer %s does not exist", psz_name );
+        return;
+    }
+    p_counter->pp_samples[0]->value.b_bool = VLC_FALSE;
+    p_counter->pp_samples[1]->value.i_int += 1;
+    p_counter->pp_samples[0]->date = mdate() - p_counter->pp_samples[0]->date;
+    p_counter->pp_samples[1]->date += p_counter->pp_samples[0]->date;
+}
+
+void __stats_TimerDump( vlc_object_t *p_obj, const char *psz_name )
+{
+    mtime_t last, total;
+    int i_total;
+    counter_t *p_counter = stats_CounterGet( p_obj,
+                                             p_obj->p_vlc->i_object_id,
+                                             psz_name );
+    if( !p_counter || p_counter->i_samples != 2 )
+    {
+        msg_Err( p_obj, "timer %s does not exist", psz_name );
+        return;
+    }
+    i_total = p_counter->pp_samples[1]->value.i_int;
+    total = p_counter->pp_samples[1]->date;
+    if( p_counter->pp_samples[0]->value.b_bool == VLC_TRUE )
+    {
+        last = mdate() - p_counter->pp_samples[0]->date;
+        i_total += 1;
+        total += last;
+    }
+    else
+    {
+        last = p_counter->pp_samples[0]->date;
+    }
+    msg_Dbg( p_obj, "TIMER %s : %.3f ms - Total %.3f ms / %i intvls (Avg %.3f ms)",
+             psz_name, (float)last/1000, (float)total/1000, i_total,
+             (float)(total)/(1000*(float)i_total ) );
+}
+
+void __stats_TimersDumpAll( vlc_object_t *p_obj )
+{
+
 }
 
 
@@ -493,7 +611,7 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
 }
 
 static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
-                             char *psz_name )
+                              const char *psz_name )
 {
     int i;
    for( i = 0; i< p_handler->i_counters; i++ )

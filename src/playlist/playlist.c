@@ -907,7 +907,6 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     /* Calculate time needed */
     int64_t start = mdate();
 #endif
-
     /* Handle quickly a few special cases */
 
     /* No items to play */
@@ -1181,6 +1180,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     {
         msg_Info( p_playlist, "nothing to play" );
     }
+
     return p_new;
 }
 

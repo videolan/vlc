@@ -65,7 +65,7 @@ int playlist_ItemSetName (playlist_item_t *,  char *);
 void __osd_MenuShow (vlc_object_t *);
 httpd_url_t * httpd_UrlNewUnique (httpd_host_t *, const char *psz_url, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
 void httpd_ClientModeStream (httpd_client_t *cl);
-int __stats_Create (vlc_object_t*, char *, int, int);
+int __stats_Create (vlc_object_t*, const char *, int, int);
 void httpd_RedirectDelete (httpd_redirect_t *);
 void __sout_CfgParse (vlc_object_t *, char *psz_prefix, const char **ppsz_options, sout_cfg_t *);
 vlm_media_t * vlm_MediaNew (vlm_t *, const char *, int);
@@ -122,8 +122,8 @@ void vlm_MessageDelete (vlm_message_t *);
 void vout_SynchroDecode (vout_synchro_t *);
 int playlist_Delete (playlist_t *, int);
 void aout_FiltersPlay (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_buffer_t ** pp_input_buffer);
-int __stats_Update (vlc_object_t*, char *, vlc_value_t);
-int __stats_Get (vlc_object_t*, int, char *, vlc_value_t*);
+int __stats_Update (vlc_object_t*, const char *, vlc_value_t);
+int __stats_Get (vlc_object_t*, int, const char *, vlc_value_t*);
 char* httpd_ClientIP (httpd_client_t *cl, char *psz_ip);
 int __intf_UserProgress (vlc_object_t*, const char*, const char*, float);
 void httpd_FileDelete (httpd_file_t *);
@@ -136,6 +136,7 @@ stream_t * __stream_UrlNew (vlc_object_t *p_this, const char *psz_url);
 sout_mux_t * sout_MuxNew (sout_instance_t*, char *, sout_access_out_t *);
 stream_t * __stream_DemuxNew (vlc_object_t *p_obj, char *psz_demux, es_out_t *out);
 int vout_ShowTextRelative (vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t);
+void __stats_TimerDump (vlc_object_t*, const char *);
 int block_FifoPut (block_fifo_t *, block_t *);
 int playlist_ItemAddParent (playlist_item_t *, int,playlist_item_t *);
 int __var_Create (vlc_object_t *, const char *, int);
@@ -147,7 +148,7 @@ int vlc_getnameinfo (const struct sockaddr *, int, char *, int, int *, int);
 int vlm_ExecuteCommand (vlm_t *, const char *, vlm_message_t **);
 char * config_GetUserDir (void);
 httpd_stream_t * httpd_StreamNew (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl);
-counter_t* __stats_CounterGet (vlc_object_t*, int, char *);
+counter_t* __stats_CounterGet (vlc_object_t*, int, const char *);
 int __config_GetType (vlc_object_t *, const char *);
 void __vlc_thread_ready (vlc_object_t *);
 int playlist_Export (playlist_t *, const char *, const char *);
@@ -201,6 +202,7 @@ int vlm_Save (vlm_t *, const char *);
 int ACL_AddNet (vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow);
 void AddMD5 (struct md5_s *, const uint8_t *, uint32_t);
 void config_Duplicate (module_t *, module_config_t *);
+void __stats_TimerStart (vlc_object_t*, const char *);
 block_t * __block_New (vlc_object_t *, int);
 void xml_Delete (xml_t *);
 void __msg_Warn (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
@@ -214,6 +216,7 @@ void __intf_UserProgressUpdate (vlc_object_t*, int, const char*, float);
 void __msg_Generic (vlc_object_t *, int, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 5, 6);
 int vlc_closedir_wrapper (void *);
 int playlist_ServicesDiscoveryAdd (playlist_t *, const char *);
+void __stats_ComputeGlobalStats (vlc_object_t*,global_stats_t*);
 char * vlc_strndup (const char *s, size_t n);
 void vout_PlacePicture (vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
 float __config_GetFloat (vlc_object_t *, const char *);
@@ -370,6 +373,7 @@ subpicture_t * spu_SortSubpictures (spu_t *, mtime_t);
 playlist_item_t * playlist_LockItemGetByInput (playlist_t *,input_item_t *);
 int __net_vaPrintf (vlc_object_t *p_this, int fd, v_socket_t *, const char *psz_fmt, va_list args);
 int vlm_MediaControl (vlm_t *, vlm_media_t *, const char *, const char *, const char *);
+void __stats_TimersDumpAll (vlc_object_t*);
 vlc_bool_t vout_SynchroChoose (vout_synchro_t *, int, int, vlc_bool_t);
 int playlist_RecursiveNodeSort (playlist_t *, playlist_item_t *,int, int);
 int64_t vlc_atoll (const char *nptr);
@@ -410,6 +414,7 @@ void aout_FormatsPrint (aout_instance_t * p_aout, const char * psz_text, const a
 char * FromUTF32 (const wchar_t *);
 void __vout_OSDMessage (vlc_object_t *, int, char *, ...);
 void intf_StopThread (intf_thread_t *);
+void __stats_TimerStop (vlc_object_t*, const char *);
 stream_t * __stream_MemoryNew (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, vlc_bool_t i_preserve_memory);
 void mwait (mtime_t date);
 void __config_ResetAll (vlc_object_t *);
@@ -880,18 +885,24 @@ struct module_symbols_t
     int (*__intf_UserProgress_inner) (vlc_object_t*, const char*, const char*, float);
     void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
     void (*__intf_UserHide_inner) (vlc_object_t *, int);
-    int (*__stats_Create_inner) (vlc_object_t*, char *, int, int);
-    int (*__stats_Update_inner) (vlc_object_t*, char *, vlc_value_t);
-    int (*__stats_Get_inner) (vlc_object_t*, int, char *, vlc_value_t*);
+    int (*__stats_Create_inner) (vlc_object_t*, const char *, int, int);
+    int (*__stats_Update_inner) (vlc_object_t*, const char *, vlc_value_t);
+    int (*__stats_Get_inner) (vlc_object_t*, int, const char *, vlc_value_t*);
     void (*stats_ComputeInputStats_inner) (input_thread_t*, input_stats_t*);
     void (*stats_DumpInputStats_inner) (input_stats_t *);
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
-    counter_t* (*__stats_CounterGet_inner) (vlc_object_t*, int, char *);
+    counter_t* (*__stats_CounterGet_inner) (vlc_object_t*, int, const char *);
     void *__stats_CounterGet_deprecated;
     input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
     void (*stats_HandlerDestroy_inner) (stats_handler_t*);
     vlc_t * (*vlc_current_object_inner) (int);
     void (*__var_OptionParse_inner) (vlc_object_t *, const char *);
+    void *__stats_TimerDumpAll_deprecated;
+    void (*__stats_TimerDump_inner) (vlc_object_t*, const char *);
+    void (*__stats_TimerStart_inner) (vlc_object_t*, const char *);
+    void (*__stats_ComputeGlobalStats_inner) (vlc_object_t*,global_stats_t*);
+    void (*__stats_TimerStop_inner) (vlc_object_t*, const char *);
+    void (*__stats_TimersDumpAll_inner) (vlc_object_t*);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1323,6 +1334,11 @@ struct module_symbols_t
 #  define stats_HandlerDestroy (p_symbols)->stats_HandlerDestroy_inner
 #  define vlc_current_object (p_symbols)->vlc_current_object_inner
 #  define __var_OptionParse (p_symbols)->__var_OptionParse_inner
+#  define __stats_TimerDump (p_symbols)->__stats_TimerDump_inner
+#  define __stats_TimerStart (p_symbols)->__stats_TimerStart_inner
+#  define __stats_ComputeGlobalStats (p_symbols)->__stats_ComputeGlobalStats_inner
+#  define __stats_TimerStop (p_symbols)->__stats_TimerStop_inner
+#  define __stats_TimersDumpAll (p_symbols)->__stats_TimersDumpAll_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1757,8 +1773,14 @@ struct module_symbols_t
     ((p_symbols)->stats_HandlerDestroy_inner) = stats_HandlerDestroy; \
     ((p_symbols)->vlc_current_object_inner) = vlc_current_object; \
     ((p_symbols)->__var_OptionParse_inner) = __var_OptionParse; \
+    ((p_symbols)->__stats_TimerDump_inner) = __stats_TimerDump; \
+    ((p_symbols)->__stats_TimerStart_inner) = __stats_TimerStart; \
+    ((p_symbols)->__stats_ComputeGlobalStats_inner) = __stats_ComputeGlobalStats; \
+    ((p_symbols)->__stats_TimerStop_inner) = __stats_TimerStop; \
+    ((p_symbols)->__stats_TimersDumpAll_inner) = __stats_TimersDumpAll; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
+    (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
 
 #  endif /* __PLUGIN__ */
 # endif /* HAVE_SHARED_LIBVLC */
