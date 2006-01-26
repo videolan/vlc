@@ -331,6 +331,7 @@ static void Close( vlc_object_t * p_this )
 
     net_Close( p_sys->p_thread->i_handle );
 
+    vlc_object_destroy( p_sys->p_thread );
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol--;
 
