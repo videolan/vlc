@@ -1203,7 +1203,7 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
      [# OS X/PPC test (gcc 3.x)
       CFLAGS="${CFLAGS_save} -faltivec"
       AC_TRY_COMPILE([],
-        [vec_ld(0, (unsigned char *)0);],
+        [vec_ld(1 * sizeof(vector float), (unsigned char *)0);],
         [ac_cv_c_altivec="-faltivec"],
         dnl Below this are the Linux tests
         [# Linux/PPC test (gcc 4.x)
