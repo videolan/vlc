@@ -1,0 +1,37 @@
+diff -puriN flac/configure flac-patched/configure
+--- flac/configure	2006-01-26 22:42:40.000000000 +0100
++++ flac-patched/configure	2006-01-26 22:36:50.000000000 +0100
+@@ -8702,6 +8702,7 @@ fi
+ 
+ case "$host" in
+ 	i386-*-openbsd3.[0-3]) OBJ_FORMAT=aoutb ;;
++	i*86-apple-darwin*) OBJ_FORMAT=macho ;;
+ 	*) OBJ_FORMAT=elf ;;
+ esac
+ 
+diff -puriN flac/configure.in flac-patched/configure.in
+--- flac/configure.in	2006-01-26 22:42:36.000000000 +0100
++++ flac-patched/configure.in	2006-01-26 22:36:50.000000000 +0100
+@@ -52,6 +52,7 @@ AM_CONDITIONAL(FLaC__CPU_PPC, test x$cpu
+ AM_CONDITIONAL(FLaC__CPU_SPARC, test x$cpu_sparc = xtrue)
+ case "$host" in
+ 	i386-*-openbsd3.[[0-3]]) OBJ_FORMAT=aoutb ;;
++	i*86-apple-darwin*) OBJ_FORMAT=macho ;;
+ 	*) OBJ_FORMAT=elf ;;
+ esac
+ AC_SUBST(OBJ_FORMAT)
+diff -puriN flac/src/libFLAC/ia32/nasm.h flac-patched/src/libFLAC/ia32/nasm.h
+--- flac/src/libFLAC/ia32/nasm.h	2005-01-25 05:14:22.000000000 +0100
++++ flac-patched/src/libFLAC/ia32/nasm.h	2006-01-26 22:38:54.000000000 +0100
+@@ -45,6 +45,11 @@
+ 	%idefine code_section section .text
+ 	%idefine data_section section .data
+ 	%idefine bss_section  section .bss
++%elifdef OBJ_FORMAT_macho
++	%define FLAC__PUBLIC_NEEDS_UNDERSCORE
++	%idefine code_section section .text
++	%idefine data_section section .data
++	%idefine bss_section  section .bss
+ %elifdef OBJ_FORMAT_elf
+ 	%idefine code_section section .text align=16
+ 	%idefine data_section section .data align=32

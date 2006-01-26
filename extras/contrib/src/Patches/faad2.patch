@@ -31,7 +31,7 @@ diff -u -r1.66 common.h
  
 -  #if defined(_WIN32) && !defined(__MINGW32__)
 +  #if defined(__MINGWCE__)
-+  #elif defined(__MINGW32__)
++  #elif defined(__MINGW32__) || defined(__APPLE__)
      #define HAS_LRINTF
 +  #elif defined(_WIN32)
 +    #define HAS_LRINTF

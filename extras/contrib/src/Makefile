@@ -107,18 +107,25 @@ ifdef HAVE_BEOS
 FFMPEGCONF+= --cpu=x86
 endif
 
+ifeq ($(HOST),i686-apple-darwin8)
+FFMPEGCONF += --enable-memalign-hack
+endif
+
 # ***************************************************************************
 # Standard rules
 # ***************************************************************************
 
 ifdef HAVE_DARWIN_OS
  all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
-	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .x264 .theora \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
-	.dvdcss .dvdnav .dvdread .dvbpsi .live .goom2k4 .caca .mod \
+	.dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
+ifneq ($(HOST),i686-apple-darwin8)
+ all: .x264 .goom2k4
+endif
 else
 
  ifdef HAVE_BEOS
@@ -674,6 +681,9 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_DARWIN_OS
+	patch -p 0 < Patches/flac-mactel.patch
+endif
 ifneq ($(HOST),$(BUILD))
 	(patch -p 0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
@@ -861,6 +871,9 @@ endif
 ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/ffmpeg-cvs-osx.patch
 endif
+ifeq ($(HOST),i686-apple-darwin8)
+	(cd $@;patch -p 0 < ../Patches/ffmpeg-cvs-mactel.patch)
+endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
@@ -953,6 +966,7 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/dvdnav.patch
+	patch -p 0 < Patches/libdvdnav-mactel.patch
 	(cd $@; ./autogen.sh noconfig)
 
 .dvdnav: libdvdnav .dvdcss
@@ -1121,8 +1135,12 @@ x264:
 ifdef HAVE_WIN32
 	(cd x264; patch -p 0 < ../Patches/x264-svn-win32.patch )
 else
+ifdef HAVE_DARWIN_OS
+	(cd x264;patch -p 0 < ../Patches/x264-mactel-ugly.patch)
+else
 	patch -p 0 < Patches/x264_svn.patch
 	rm x264/x264.c
+endif
 endif
 else
 x264-$(X264_VERSION).tar.gz:

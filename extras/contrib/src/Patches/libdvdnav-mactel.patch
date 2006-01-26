@@ -1,0 +1,16 @@
+diff -puriN libdvdnav-orig/src/dvdread/bswap.h libdvdnav/src/dvdread/bswap.h
+--- libdvdnav-orig/src/dvdread/bswap.h	2006-01-26 23:26:43.000000000 +0100
++++ libdvdnav/src/dvdread/bswap.h	2006-01-26 23:27:57.000000000 +0100
+@@ -59,6 +59,12 @@
+ #define B2N_32(x) x = be32toh(x)
+ #define B2N_64(x) x = be64toh(x)
+ 
++#elif defined(__APPLE__)
++#include <libkern/OSByteOrder.h>
++#define B2N_16(x) x = OSSwapBigToHostConstInt16(x)
++#define B2N_32(x) x = OSSwapBigToHostConstInt32(x)
++#define B2N_64(x) x = OSSwapBigToHostConstInt64(x)
++
+ /* This is a slow but portable implementation, it has multiple evaluation 
+  * problems so beware.
+  * Old FreeBSD's and Solaris don't have <byteswap.h> or any other such 
