@@ -63,7 +63,7 @@ case $HOST in
 	    EXTRA_CPPFLAGS=" -no-cpp-precomp"
 	    echo "PATH = /bin:/usr/bin" >> config.mak
 	;;
-    powerpc-apple-darwin8)
+    powerpc-apple-darwin8|i686-apple-darwin8)
 # Mac OS X 10.4
 # Makefile cross compiling is only supported with gcc-4.0
 # ENVP defines the oldest environment on which the program will be able to run
