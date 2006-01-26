@@ -205,7 +205,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             /* Allow broadcast sending */
             i_val = 1;
-            setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST, (void*)&i_val,
+            setsockopt( fd, SOL_SOCKET, SO_BROADCAST, (void*)&i_val,
                         sizeof( i_val ) );
         }
 #endif
