@@ -293,7 +293,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                 __asm__( MMX_INIT_16
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-                __asm__( ".align 8"
+                __asm__( ".p2align 3"
                          MMX_YUV_MUL
                          MMX_YUV_ADD
                          MMX_UNPACK_15
@@ -322,7 +322,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                 __asm__( MMX_INIT_16
                          : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-                __asm__( ".align 8"
+                __asm__( ".p2align 3"
                          MMX_YUV_MUL
                          MMX_YUV_ADD
                          MMX_UNPACK_16
@@ -373,7 +373,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                 INTRINSICS_YUV_ADD
                 INTRINSICS_UNPACK_15
 #   else
-                __asm__( ".align 8"
+                __asm__( ".p2align 3"
                          MMX_YUV_MUL
                          MMX_YUV_ADD
                          MMX_UNPACK_15
@@ -388,7 +388,7 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                 INTRINSICS_UNPACK_16
 #   else
                 /* 16bpp 5/6/5 */
-                __asm__( ".align 8"
+                __asm__( ".p2align 3"
                          MMX_YUV_MUL
                          MMX_YUV_ADD
                          MMX_UNPACK_16
@@ -509,7 +509,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
             __asm__( MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-            __asm__( ".align 8"
+            __asm__( ".p2align 3"
                      MMX_YUV_MUL
                      MMX_YUV_ADD
                      MMX_UNPACK_32
@@ -552,7 +552,7 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
             __asm__( MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
 
-            __asm__( ".align 8"
+            __asm__( ".p2align 3"
                      MMX_YUV_MUL
                      MMX_YUV_ADD
                      MMX_UNPACK_32

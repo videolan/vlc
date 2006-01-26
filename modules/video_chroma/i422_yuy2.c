@@ -159,7 +159,7 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
             C_YUV422_YUYV( p_line, p_y, p_u, p_v );
 #else
-            __asm__( ".align 8" MMX_YUV422_YUYV
+            __asm__( ".p2align 3" MMX_YUV422_YUYV
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;
@@ -191,7 +191,7 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
             C_YUV422_YVYU( p_line, p_y, p_u, p_v );
 #else
-            __asm__( ".align 8" MMX_YUV422_YVYU
+            __asm__( ".p2align 3" MMX_YUV422_YVYU
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;
@@ -223,7 +223,7 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
 #else
-            __asm__( ".align 8" MMX_YUV422_UYVY
+            __asm__( ".p2align 3" MMX_YUV422_UYVY
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;
@@ -267,7 +267,7 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
             C_YUV422_UYVY( p_line, p_y, p_u, p_v );
 #else
-            __asm__( ".align 8" MMX_YUV422_UYVY
+            __asm__( ".p2align 3" MMX_YUV422_UYVY
                      : : "r" (p_line), "r" (p_y), "r" (p_u), "r" (p_v) ); 
 
             p_line += 16; p_y += 8; p_u += 4; p_v += 4;

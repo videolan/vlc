@@ -26,7 +26,7 @@
 #define MMX_CALL(MMX_INSTRUCTIONS)                                          \
     do {                                                                    \
     __asm__ __volatile__(                                                   \
-        ".align 8 \n\t"                                                     \
+        ".p2align 3 \n\t"                                                   \
         MMX_INSTRUCTIONS                                                    \
         :                                                                   \
         : "r" (p_line1),  "r" (p_line2),  "r" (p_y1),  "r" (p_y2),          \

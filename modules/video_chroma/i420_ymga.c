@@ -124,7 +124,7 @@ static void I420_YMGA( vout_thread_t *p_vout, picture_t *p_source,
         *p_uv++ = *p_u++; *p_uv++ = *p_v++; *p_uv++ = *p_u++; *p_uv++ = *p_v++;
         *p_uv++ = *p_u++; *p_uv++ = *p_v++; *p_uv++ = *p_u++; *p_uv++ = *p_v++;
 #else
-        __asm__( ".align 32 \n\
+        __asm__( ".p2align 5 \n\
         movd       (%0), %%mm0  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0     \n\
         movd      4(%0), %%mm2  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0     \n\
         movd      8(%0), %%mm4  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0     \n\
