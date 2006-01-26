@@ -495,6 +495,8 @@ static void FlushMsg ( msg_queue_t *p_queue )
             free( p_queue->msg[i_index].psz_msg );
         if( p_queue->msg[i_index].psz_module )
             free( p_queue->msg[i_index].psz_module );
+        if( p_queue->msg[i_index].psz_header )
+            free( p_queue->msg[i_index].psz_header );
     }
 
     /* Update the new start value */

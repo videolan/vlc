@@ -119,6 +119,7 @@ static inline void vlc_input_item_Clean( input_item_t *p_i )
 {
     if( p_i->psz_name ) free( p_i->psz_name );
     if( p_i->psz_uri ) free( p_i->psz_uri );
+    if( p_i->p_stats ) free( p_i->p_stats );
     p_i->psz_name = 0;
     p_i->psz_uri = 0;
 
