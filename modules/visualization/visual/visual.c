@@ -82,8 +82,8 @@
 #define RADIUS_LONGTEXT N_( \
         "Defines radius size in pixels, of base of bands(beginning)." )
 
-#define SECT_TEXT N_( "Spectral sections" )
-#define SECT_LONGTEXT N_( \
+#define SSECT_TEXT N_( "Spectral sections" )
+#define SSECT_LONGTEXT N_( \
         "Determines how many sections of spectrum will exist." )
 
 #define PEAK_HEIGHT_TEXT N_( "Peak height" )
@@ -134,7 +134,7 @@ vlc_module_begin();
     add_integer("spect-radius", 42, NULL,
              RADIUS_TEXT, RADIUS_LONGTEXT, VLC_TRUE );
     add_integer("spect-sections", 3, NULL,
-             SECT_TEXT, SECT_LONGTEXT, VLC_TRUE );
+             SSECT_TEXT, SSECT_LONGTEXT, VLC_TRUE );
     add_integer("spect-color", 80, NULL,
              COLOR1_TEXT, COLOR1_LONGTEXT, VLC_TRUE );
     add_bool("spect-show-bands", VLC_TRUE, NULL,
