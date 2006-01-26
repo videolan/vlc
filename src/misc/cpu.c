@@ -33,7 +33,7 @@
 #   include <setjmp.h>                                    /* longjmp, setjmp */
 #endif
 
-#ifdef SYS_DARWIN
+#if defined(SYS_DARWIN) && (defined(__ppc__) || defined(__ppc64__))
 #include <sys/sysctl.h>
 #endif
 
@@ -66,7 +66,7 @@ uint32_t CPUCapabilities( void )
 {
     volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
-#if defined( SYS_DARWIN )
+#if defined(SYS_DARWIN) && (defined(__ppc__) || defined(__ppc64__))
     int selectors[2] = { CTL_HW, HW_VECTORUNIT };
     int i_has_altivec = 0;
     size_t i_length = sizeof( i_has_altivec );
