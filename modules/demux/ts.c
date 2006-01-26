@@ -806,11 +806,12 @@ static void Close( vlc_object_t *p_this )
             fclose( p_sys->p_file );
             p_sys->p_file = NULL;
         }
-        free( p_sys->psz_file );
-        p_sys->psz_file = NULL;
 
         free( p_sys->buffer );
     }
+
+    free( p_sys->psz_file );
+    p_sys->psz_file = NULL;
 
     free( p_sys );
 }
