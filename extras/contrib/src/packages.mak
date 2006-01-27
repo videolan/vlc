@@ -160,3 +160,4 @@ CLINKCC_VERSION=171
 CLINKCC_URL=$(SF)/clinkcc/clinkcc$(CLINKCC_VERSION).tar.gz
 EXPAT_VERSION=1.95.8
 EXPAT_URL=$(SF)/expat/expat-$(EXPAT_VERSION).tar.gz
+NASM_CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/nasm

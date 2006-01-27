@@ -119,12 +119,12 @@ ifdef HAVE_DARWIN_OS
  all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
-	.dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
+	.dvdcss .dvdnav .dvdread .dvbpsi .live .x264 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 ifneq ($(HOST),i686-apple-darwin8)
- all: .x264 .goom2k4
+all: .goom2k4
 endif
 else
 
@@ -1152,7 +1152,11 @@ else
 endif
 endif
 
+ifeq ($(HOST),i686-apple-darwin8)
+.x264: .nasm x264
+else
 .x264: x264
+endif
 	(cd $<; ./configure $(X264CONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
@@ -1805,6 +1809,22 @@ endif
 CLEAN_FILE += .clinkcc
 CLEAN_PKG += clinkcc
 DISTCLEAN_PKG += clinkcc-$(CLINKCC_VERSION).tar.gz
+
+# ***************************************************************************
+# NASM assembler
+# ***************************************************************************
+
+nasm:
+	echo $(NASM_CVSROOT) A > ./nasm.cvs
+	CVS_PASSFILE=./nasm.cvs cvs -z3 -d $(NASM_CVSROOT) co nasm
+	(cd $@ && autoconf && autoheader)
+
+.nasm: nasm
+	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .nasm
+CLEAN_PKG += nasm nasm.cvs
 
 # ***************************************************************************
 # Copy aclocal files
