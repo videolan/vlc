@@ -494,7 +494,7 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         {
             string about = (string)"VLC media player " PACKAGE_VERSION +
                 _("\n(WinCE interface)\n\n") +
-                _("(c) 1996-2005 - the VideoLAN Team\n\n") +
+                _("(c) 1996-2006 - the VideoLAN Team\n\n") +
                 _("Compiled by ") + VLC_CompileBy() + "@" +
                 VLC_CompileHost() + "." + VLC_CompileDomain() + ".\n" +
                 _("Compiler: ") + VLC_Compiler() + ".\n" +
