@@ -51,6 +51,9 @@ sout and vlmelements .
     <button id="btn_schedule" onclick="hide_vlm_add();show('vlm_add_schedule');update_vlm_add_schedule();" onmouseover="button_over(this);" onmouseout="button_out(this);">
       Schedule
     </button>
+    <button id="btn_other" onclick="hide_vlm_add();show('vlm_add_other');update_vlm_add_other();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+      Other
+    </button>
   </div>
   <div id="vlm_helper" class="helper" >
     <div id="vlm_add_broadcast" style="display: block">
@@ -133,6 +136,12 @@ sout and vlmelements .
       <br />
       <label for="vlm_schedule_repeat_times">Number of repetitions (use 0 to repeat endlessly):</label>
       <input type="text" id="vlm_schedule_repeat_times" size="8" disabled="disabled" value="0" onchange="update_vlm_add_schedule();" />
+    </div>
+    <div id="vlm_add_other" style="display: none">
+      <input type="button" id="btn_import" onclick="vlm_batch(document.getElementById('vlm_batch_text').value);" value="Send command batch" />
+      <input type="button" id="btn_export" onclick="document.location.assign('vlm_export.html');" value="Export VLM commands (new page)" />
+      <br/>
+      <textarea cols="70" rows="20" id="vlm_batch_text">#paste your VLM commands here</textarea>
     </div>
   </div>
 </div>

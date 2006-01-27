@@ -59,6 +59,7 @@ function hide_vlm_add()
     document.getElementById( 'vlm_add_broadcast' ).style.display = 'none';
     document.getElementById( 'vlm_add_vod' ).style.display = 'none';
     document.getElementById( 'vlm_add_schedule' ).style.display = 'none';
+    document.getElementById( 'vlm_add_other' ).style.display = 'none';
 }
 
 function toggle_schedule_date()
@@ -244,6 +245,12 @@ function update_vlm_add_schedule()
     {
         cmd.value = "";
     }
+}
+
+function update_vlm_add_other()
+{
+    cmd = document.getElementById( 'vlm_command' );
+    cmd.value = "";
 }
 
 function clear_vlm_add()
@@ -655,6 +662,17 @@ function vlm_option( name, option )
 {
     document.getElementById( 'vlm_command' ).value = "setup "+name+" option "+option;
     vlm_cmd( value( 'vlm_command' ) );
+}
+
+function vlm_batch( batch )
+{
+    var i;
+    var commands = batch.split( '\n' );
+    for( i = 0; i < commands.length; i++ )
+    {
+        document.getElementById( 'vlm_command' ).value = commands[i];
+        vlm_cmd( value( 'vlm_command' ) );
+    }
 }
 
 function vlm_schedule_append( name )
