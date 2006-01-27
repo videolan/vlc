@@ -116,6 +116,7 @@ E: dionoea@videolan.org
 C: dionoea
 D: Video Filters: mosaic, gradient and edge detection, magnify, rss
 D: Podcast demux
+D: HTTP interface pages
 S: France
 
 N: Renaud Dartus

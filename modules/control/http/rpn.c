@@ -1002,6 +1002,9 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             }
 
             E_(mvar_AppendNewVar)( vars, "vlm_error", psz_error );
+            /* this is kind of a duplicate but we need to have the message
+             * without the command name for the "export" command */
+            E_(mvar_AppendNewVar)( vars, "vlm_value", vlm_answer->psz_value );
             vlm_MessageDelete( vlm_answer );
 
             free( psz_cmd );
