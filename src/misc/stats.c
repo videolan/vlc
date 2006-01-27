@@ -40,6 +40,8 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
 static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this );
 static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this );
 
+static void TimerDump( vlc_object_t *p_this, counter_t *p_counter, vlc_bool_t);
+
 /*****************************************************************************
  * Exported functions
  *****************************************************************************/
@@ -444,36 +446,28 @@ void __stats_TimerStop( vlc_object_t *p_obj, const char *psz_name )
 
 void __stats_TimerDump( vlc_object_t *p_obj, const char *psz_name )
 {
-    mtime_t last, total;
-    int i_total;
     counter_t *p_counter = stats_CounterGet( p_obj,
                                              p_obj->p_vlc->i_object_id,
                                              psz_name );
-    if( !p_counter || p_counter->i_samples != 2 )
-    {
-        msg_Err( p_obj, "timer %s does not exist", psz_name );
-        return;
-    }
-    i_total = p_counter->pp_samples[1]->value.i_int;
-    total = p_counter->pp_samples[1]->date;
-    if( p_counter->pp_samples[0]->value.b_bool == VLC_TRUE )
-    {
-        last = mdate() - p_counter->pp_samples[0]->date;
-        i_total += 1;
-        total += last;
-    }
-    else
-    {
-        last = p_counter->pp_samples[0]->date;
-    }
-    msg_Dbg( p_obj, "TIMER %s : %.3f ms - Total %.3f ms / %i intvls (Avg %.3f ms)",
-             psz_name, (float)last/1000, (float)total/1000, i_total,
-             (float)(total)/(1000*(float)i_total ) );
+    TimerDump( p_obj, p_counter, VLC_TRUE );
 }
+
 
 void __stats_TimersDumpAll( vlc_object_t *p_obj )
 {
+    int i;
+    stats_handler_t *p_handler = stats_HandlerGet( p_obj );
+    if( !p_handler ) return;
 
+    vlc_mutex_lock( &p_handler->object_lock );
+    for ( i = 0 ; i< p_handler->i_counters; i++ )
+    {
+        if( p_handler->pp_counters[i]->i_compute_type == STATS_TIMER )
+        {
+            TimerDump( p_obj, p_handler->pp_counters[i], VLC_FALSE );
+        }
+    }
+    vlc_mutex_unlock( &p_handler->object_lock );
 }
 
 
@@ -671,4 +665,42 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
     vlc_object_attach( p_handler, p_this->p_vlc );
 
     return p_handler;
+}
+
+static void TimerDump( vlc_object_t *p_obj, counter_t *p_counter,
+                       vlc_bool_t b_total )
+{
+    mtime_t last, total;
+    int i_total;
+    if( !p_counter || p_counter->i_samples != 2 )
+    {
+        msg_Err( p_obj, "timer %s does not exist", p_counter->psz_name );
+        return;
+    }
+    i_total = p_counter->pp_samples[1]->value.i_int;
+    total = p_counter->pp_samples[1]->date;
+    if( p_counter->pp_samples[0]->value.b_bool == VLC_TRUE )
+    {
+        last = mdate() - p_counter->pp_samples[0]->date;
+        i_total += 1;
+        total += last;
+    }
+    else
+    {
+        last = p_counter->pp_samples[0]->date;
+    }
+    if( b_total )
+    {
+        msg_Dbg( p_obj,
+             "TIMER %s : %.3f ms - Total %.3f ms / %i intvls (Avg %.3f ms)",
+             p_counter->psz_name, (float)last/1000, (float)total/1000, i_total,
+             (float)(total)/(1000*(float)i_total ) );
+    }
+    else
+    {
+        msg_Dbg( p_obj,
+             "TIMER %s : Total %.3f ms / %i intvls (Avg %.3f ms)",
+             p_counter->psz_name, (float)total/1000, i_total,
+             (float)(total)/(1000*(float)i_total ) );
+    }
 }
