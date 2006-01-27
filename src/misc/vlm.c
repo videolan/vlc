@@ -617,6 +617,18 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
         }
     }
 
+    else if( !strcmp(ppsz_command[0], "export" ) )
+    {
+        char *psz_buf;
+
+        if( i_command != 1 ) goto syntax_error;
+
+        p_message = vlm_MessageNew( "export", psz_buf = Save( p_vlm ) );
+        free( psz_buf );
+
+        goto success;
+    }
+
     else if( !strcmp(ppsz_command[0], "load") )
     {
         if( i_command != 2 ) goto syntax_error;
@@ -1911,6 +1923,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "del (name)|all|media|schedule" );
         MessageAddChild( "control (name) [instance_name] (command)" );
         MessageAddChild( "save (config_file)" );
+        MessageAddChild( "export" );
         MessageAddChild( "load (config_file)" );
 
         message_child = MessageAdd( "Media Proprieties Syntax:" );
@@ -1992,9 +2005,12 @@ static int Load( vlm_t *vlm, char *file )
 static char *Save( vlm_t *vlm )
 {
     char *save = NULL;
+    char psz_header[] = "\n"
+                        "# VLC media player VLM command batch\n"
+                        "# http://www.videolan.org/vlc/\n\n" ;
     char *p;
     int i,j;
-    int i_length = 0;
+    int i_length = strlen( psz_header );
 
     for( i = 0; i < vlm->i_media; i++ )
     {
@@ -2095,6 +2111,8 @@ static char *Save( vlm_t *vlm )
 
     p = save = malloc( i_length );
     *save = '\0';
+
+    p += sprintf( p, "%s", psz_header );
 
     /* finally we can write in it */
     for( i = 0; i < vlm->i_media; i++ )
