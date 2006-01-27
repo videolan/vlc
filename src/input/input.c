@@ -320,6 +320,8 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 
     /* Allocate descriptor */
     p_input = Create( p_parent, p_item, NULL, VLC_TRUE );
+    p_input->i_flags |= OBJECT_FLAGS_NODBG;
+    p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );

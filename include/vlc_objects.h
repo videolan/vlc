@@ -71,6 +71,11 @@
 
 #define FIND_STRICT         0x0010
 
+/* Object flags */
+#define OBJECT_FLAGS_NODBG       0x0001
+#define OBJECT_FLAGS_QUIET       0x0002
+#define OBJECT_FLAGS_NOINTERACT  0x0004
+
 /*****************************************************************************
  * The vlc_object_t type. Yes, it's that simple :-)
  *****************************************************************************/

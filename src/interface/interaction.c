@@ -73,6 +73,11 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
         p_dialog->i_id = ++p_interaction->i_last_id;
     }
 
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+    {
+       return;
+    }
+
     p_dialog->p_interaction = p_interaction;
     p_dialog->p_parent = p_this;
 
@@ -165,7 +170,6 @@ void intf_InteractionManage( playlist_t *p_playlist )
         {
         case ANSWERED_DIALOG:
             // Ask interface to hide it
-            msg_Dbg( p_interaction, "Hiding dialog %i", p_dialog->i_id );
             p_dialog->i_action = INTERACT_HIDE;
             val.p_address = p_dialog;
             if( p_interaction->p_intf )
@@ -178,15 +182,11 @@ void intf_InteractionManage( playlist_t *p_playlist )
             if( p_interaction->p_intf )
                 var_Set( p_interaction->p_intf, "interaction", val );
             p_dialog->i_status = SENT_DIALOG;
-            msg_Dbg( p_interaction, "Updating dialog %i, %i widgets",
-                                    p_dialog->i_id, p_dialog->i_widgets );
             break;
         case HIDDEN_DIALOG:
             if( !(p_dialog->i_flags & DIALOG_GOT_ANSWER) ) break;
             if( !(p_dialog->i_flags & DIALOG_REUSABLE) )
             {
-                msg_Dbg( p_interaction, "Destroying dialog %i",
-                                        p_dialog->i_id );
                 p_dialog->i_action = INTERACT_DESTROY;
                 val.p_address = p_dialog;
                 if( p_interaction->p_intf )
@@ -194,8 +194,6 @@ void intf_InteractionManage( playlist_t *p_playlist )
             }
             break;
         case DESTROYED_DIALOG:
-            msg_Dbg( p_interaction, "Removing dialog %i",
-                                    p_dialog->i_id );
             // Interface has now destroyed it, remove it
             REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs,
                          i_index);

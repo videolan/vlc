@@ -250,6 +250,14 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     p_new->psz_header = NULL;
 
+    p_new->i_flags = 0;
+    if( p_this->i_flags & OBJECT_FLAGS_NODBG )
+        p_new->i_flags |= OBJECT_FLAGS_NODBG;
+    if( p_this->i_flags & OBJECT_FLAGS_QUIET )
+        p_new->i_flags |= OBJECT_FLAGS_QUIET;
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+        p_new->i_flags |= OBJECT_FLAGS_NOINTERACT;
+
     p_new->i_vars = 0;
     p_new->p_vars = (variable_t *)malloc( 16 * sizeof( variable_t ) );
 

@@ -307,6 +307,13 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
 #endif
     int i;
 
+    if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
+        (p_this->i_flags & OBJECT_FLAGS_NODBG &&
+         i_type == VLC_MSG_DBG ) )
+    {
+        return;
+    }
+
     /*
      * Convert message to string
      */

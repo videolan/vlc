@@ -474,6 +474,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
                                                                             \
     /* Messages header */                                                   \
     char *psz_header;                                                       \
+    int  i_flags;                                                           \
                                                                             \
     /* Thread properties, if any */                                         \
     vlc_bool_t   b_thread;                                                  \
