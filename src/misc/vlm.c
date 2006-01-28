@@ -1327,7 +1327,12 @@ void vlm_ScheduleDelete( vlm_t *vlm, vlm_schedule_t *sched,
 
     if( vlm->i_schedule == 0 && vlm->schedule ) free( vlm->schedule );
     free( sched->psz_name );
-    while( sched->i_command-- ) free( sched->command[sched->i_command] );
+    while( sched->i_command )
+    {
+        char *psz_cmd = sched->command[0];
+        TAB_REMOVE( sched->i_command, sched->command, psz_cmd );
+        free( psz_cmd );
+    }
     free( sched );
 }
 
@@ -2317,6 +2322,8 @@ static int Manage( vlc_object_t* p_object )
 
     while( !vlm->b_die )
     {
+        char **ppsz_scheduled_commands = NULL;
+        int    i_scheduled_commands = 0;
         vlc_mutex_lock( &vlm->lock );
 
         /* destroy the inputs that wants to die, and launch the next input */
@@ -2390,16 +2397,25 @@ static int Manage( vlc_object_t* p_object )
                 {
                     for( j = 0; j < vlm->schedule[i]->i_command; j++ )
                     {
-                        vlm_message_t *message = NULL;
-
-                        ExecuteCommand( vlm, vlm->schedule[i]->command[j],
-                                        &message );
-
-                        /* for now, drop the message */
-                        free( message );
+                        TAB_APPEND( i_scheduled_commands,
+                                    ppsz_scheduled_commands,
+                                    strdup(vlm->schedule[i]->command[j] ) );
                     }
                 }
             }
+        }
+        while( i_scheduled_commands )
+        {
+            vlm_message_t *message = NULL;
+            char *psz_command = ppsz_scheduled_commands[0];
+            ExecuteCommand( vlm, psz_command,&message );
+
+            /* for now, drop the message */
+            free( message );
+            TAB_REMOVE( i_scheduled_commands,
+                        ppsz_scheduled_commands,
+                        psz_command );
+            free( psz_command );
         }
 
         i_lastcheck = i_time;
