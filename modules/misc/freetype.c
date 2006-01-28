@@ -531,6 +531,9 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
     subpicture_region_t *p_region_tmp;
 
+    if( i_width == 0 || i_height == 0 )
+        return VLC_SUCCESS;
+
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
