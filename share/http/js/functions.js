@@ -23,7 +23,7 @@
 
 /* global variables */
 
-old_time = 0;
+var old_time = 0;
 
 /**********************************************************************
  * Misc utils
@@ -56,9 +56,9 @@ function loadXMLDoc( url, callback )
 /* fomat time in second as hh:mm:ss */
 function format_time( s )
 {
-    hours = Math.floor(s/3600);
-    minutes = Math.floor((s/60)%60);
-    seconds = s%60;
+    var hours = Math.floor(s/3600);
+    var minutes = Math.floor((s/60)%60);
+    var seconds = s%60;
     if( hours < 10 ) hours = "0"+hours;
     if( minutes < 10 ) minutes = "0"+minutes;
     if( seconds < 10 ) seconds = "0"+seconds;
@@ -68,7 +68,7 @@ function format_time( s )
 /* delete all a tag's children and add a text child node */
 function set_text( id, val )
 {
-    elt = document.getElementById( id );
+    var elt = document.getElementById( id );
     while( elt.hasChildNodes() )
         elt.removeChild( elt.firstChild );
     elt.appendChild( document.createTextNode( val ) );
@@ -77,10 +77,10 @@ function set_text( id, val )
 /* set item's 'element' attribute to value */
 function set_css( item, element, value )
 {
-    for( j = 0; j<document.styleSheets.length; j++ )
+    for( var j = 0; j < document.styleSheets.length; j++ )
     {
         cssRules = document.styleSheets[j].cssRules;
-        for( i = 0; i<cssRules.length; i++)
+        for( var i = 0; i < cssRules.length; i++)
         {
             if( cssRules[i].selectorText == item )
             {
@@ -94,10 +94,10 @@ function set_css( item, element, value )
 /* get item's 'element' attribute */
 function get_css( item, element )
 {
-    for( j = 0; j<document.styleSheets.length; j++ )
+    for( var j = 0; j < document.styleSheets.length; j++ )
     {
         cssRules = document.styleSheets[j].cssRules;
-        for( i = 0; i<cssRules.length; i++)
+        for( var i = 0; i < cssRules.length; i++)
         {
             if( cssRules[i].selectorText == item )
             {
@@ -109,7 +109,7 @@ function get_css( item, element )
 
 function toggle_show( id )
 {
-    element = document.getElementById( id );
+    var element = document.getElementById( id );
     if( element.style.display == 'block' || element.style.display == '' )
     {
         element.style.display = 'none';
@@ -121,8 +121,8 @@ function toggle_show( id )
 }
 function toggle_show_node( id )
 {
-    element = document.getElementById( 'pl_'+id );
-    img = document.getElementById( 'pl_img_'+id );
+    var element = document.getElementById( 'pl_'+id );
+    var img = document.getElementById( 'pl_img_'+id );
     if( element.style.display == 'block' || element.style.display == '' )
     {
         element.style.display = 'none';
@@ -147,8 +147,8 @@ function value( id ){ return document.getElementById( id ).value; }
 
 function radio_value( name )
 {
-    radio = document.getElementsByName( name );
-    for( i = 0; i<radio.length; i++ )
+    var radio = document.getElementsByName( name );
+    for( var i = 0; i < radio.length; i++ )
     {
         if( radio[i].checked )
         {
@@ -196,19 +196,19 @@ function toggle_btn_text()
 /* input actions */
 function in_play()
 {
-    input_iesuxx = value('input_mrl');
+    var input = value('input_mrl');
     if( value('sout_mrl') != '' )
-        input_iesuxx += ' '+value('sout_mrl');
-    url = 'requests/status.xml?command=in_play&input='+escape(input_iesuxx);
+        input += ' '+value('sout_mrl');
+    var url = 'requests/status.xml?command=in_play&input='+escape( input );
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
 function in_enqueue()
 {
-    input_iesuxx = value('input_mrl');
+    var input = value('input_mrl');
     if( value('sout_mrl') != '' )
-        input_iesuxx += ' '+value('sout_mrl');
-    url = 'requests/status.xml?command=in_enqueue&input='+escape(input_iesuxx);
+        input += ' '+value('sout_mrl');
+    var url = 'requests/status.xml?command=in_enqueue&input='+escape( input );
     loadXMLDoc( url, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
@@ -300,17 +300,17 @@ function parse_status()
     {
         if( req.status == 200 )
         {
-            status_iesuxx = req.responseXML.documentElement;
-            new_time = status_iesuxx.getElementsByTagName( 'time' )[0].firstChild.data;
+            var status = req.responseXML.documentElement;
+            var new_time = status.getElementsByTagName( 'time' )[0].firstChild.data;
             if( old_time > new_time )
                 setTimeout('update_playlist()',50);
             old_time = new_time;
             set_text( 'time', format_time( new_time ) );
-            set_text( 'length', format_time( status_iesuxx.getElementsByTagName( 'length' )[0].firstChild.data ) );
-            if( status_iesuxx.getElementsByTagName( 'volume' ).length != 0 )
-            set_text( 'volume', Math.floor(status_iesuxx.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+'%' );
-            set_text( 'state', status_iesuxx.getElementsByTagName( 'state' )[0].firstChild.data );
-            if( status_iesuxx.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
+            set_text( 'length', format_time( status.getElementsByTagName( 'length' )[0].firstChild.data ) );
+            if( status.getElementsByTagName( 'volume' ).length != 0 )
+                set_text( 'volume', Math.floor(status.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+'%' );
+            set_text( 'state', status.getElementsByTagName( 'state' )[0].firstChild.data );
+            if( status.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
             {
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/pause.png' );
             }
@@ -333,27 +333,27 @@ function parse_playlist()
     {
         if( req.status == 200 )
         {
-            answer = req.responseXML.documentElement;
-            playtree_iesuxx = document.getElementById( 'playtree' );
-            pos = document.createElement( "div" );
-            pos_top = pos;
-            elt = answer.firstChild;
+            var answer = req.responseXML.documentElement;
+            var playtree = document.getElementById( 'playtree' );
+            var pos = document.createElement( "div" );
+            var pos_top = pos;
+            var elt = answer.firstChild;
             while( elt )
             {
                 if( elt.nodeName == "node" )
                 {
                     if( pos.hasChildNodes() )
                         pos.appendChild( document.createElement( "br" ) );
-                    nda = document.createElement( 'a' );
+                    var nda = document.createElement( 'a' );
                     pos.appendChild( nda );
                     nda.setAttribute( 'href', 'javascript:toggle_show_node(\''+elt.getAttribute( 'id' )+'\');' );
-                    ndai = document.createElement( 'img' );
+                    var ndai = document.createElement( 'img' );
                     nda.appendChild( ndai );
                     ndai.setAttribute( 'src', 'images/minus.png' );
                     ndai.setAttribute( 'alt', '[-]' );
                     ndai.setAttribute( 'id', 'pl_img_'+elt.getAttribute( 'id' ) );
                     pos.appendChild( document.createTextNode( ' ' + elt.getAttribute( 'name' ) ) );
-                    nd = document.createElement( "div" );
+                    var nd = document.createElement( "div" );
                     pos.appendChild( nd );
                     nd.setAttribute( 'class', 'pl_node' );
                     nd.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
@@ -362,7 +362,7 @@ function parse_playlist()
                 {
                     if( pos.hasChildNodes() )
                     pos.appendChild( document.createElement( "br" ) );
-                    pl = document.createElement( "a" );
+                    var pl = document.createElement( "a" );
                     pos.appendChild( pl );
                     pl.setAttribute( 'class', 'pl_leaf' );
                     pl.setAttribute( 'href', 'javascript:pl_play('+elt.getAttribute( 'id' )+');' );
@@ -376,7 +376,7 @@ function parse_playlist()
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     pos.appendChild( document.createTextNode( ' ' ) );
-                    del = document.createElement( "a" );
+                    var del = document.createElement( "a" );
                     pos.appendChild( del );
                     del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
                     del.appendChild( document.createElement( "img" ) );
@@ -400,9 +400,9 @@ function parse_playlist()
                     pos = pos.parentNode;
                 }
             }
-            while( playtree_iesuxx.hasChildNodes() )
-                playtree_iesuxx.removeChild( playtree_iesuxx.firstChild );
-            playtree_iesuxx.appendChild( pos_top );
+            while( playtree.hasChildNodes() )
+                playtree.removeChild( playtree.firstChild );
+            playtree.appendChild( pos_top );
         }
         else
         {
@@ -418,10 +418,10 @@ function parse_browse_dir( )
     {
         if( req.status == 200 )
         {
-            answer = req.responseXML.documentElement;
-            browser_iesuxx = document.getElementById( 'browser' );
-            pos = document.createElement( "div" );
-            elt = answer.firstChild;
+            var answer = req.responseXML.documentElement;
+            var browser = document.getElementById( 'browser' );
+            var pos = document.createElement( "div" );
+            var elt = answer.firstChild;
             while( elt )
             {
                 if( elt.nodeName == "element" )
@@ -449,9 +449,9 @@ function parse_browse_dir( )
                 }
                 elt = elt.nextSibling;
             }
-            while( browser_iesuxx.hasChildNodes() )
-                browser_iesuxx.removeChild( browser_iesuxx.firstChild );
-            browser_iesuxx.appendChild( pos );
+            while( browser.hasChildNodes() )
+                browser.removeChild( browser.firstChild );
+            browser.appendChild( pos );
         }
         else
         {
@@ -474,7 +474,7 @@ function hide_input( )
 /* FIXME ... subs support */
 function update_input_file()
 {
-    mrl = document.getElementById( 'input_mrl' );
+    var mrl = document.getElementById( 'input_mrl' );
 
     mrl.value = value( 'input_file_filename' );
 }
@@ -482,19 +482,19 @@ function update_input_file()
 /* update the input MRL using data from the input disc helper */
 function update_input_disc()
 {
-    mrl = document.getElementById( 'input_mrl' );
-    type = radio_value( "input_disc_type" );
-    device = value( "input_disc_dev" );
+    var mrl = document.getElementById( 'input_mrl' );
+    var type = radio_value( "input_disc_type" );
+    var device = value( "input_disc_dev" );
 
     check_and_replace_int( 'input_disc_title', 0 );
     check_and_replace_int( 'input_disc_chapter', 0 );
     check_and_replace_int( 'input_disc_subtrack', '' );
     check_and_replace_int( 'input_disc_audiotrack', 0 );
 
-    title = value( 'input_disc_title' );
-    chapter = value( 'input_disc_chapter' );
-    subs = value( 'input_disc_subtrack' );
-    audio = value( 'input_disc_audiotrack' );
+    var title = value( 'input_disc_title' );
+    var chapter = value( 'input_disc_chapter' );
+    var subs = value( 'input_disc_subtrack' );
+    var audio = value( 'input_disc_audiotrack' );
 
     mrl.value = "";
 
@@ -537,8 +537,8 @@ function update_input_disc()
 /* update the input MRL using data from the input network helper */
 function update_input_net()
 {
-    mrl = document.getElementById( 'input_mrl' );
-    type = radio_value( "input_net_type" );
+    var mrl = document.getElementById( 'input_mrl' );
+    var type = radio_value( "input_net_type" );
     
     check_and_replace_int( 'input_net_udp_port', 1234 );
     check_and_replace_int( 'input_net_udpmcast_port', 1234 );
@@ -561,7 +561,7 @@ function update_input_net()
     }
     else if( type == "http" )
     {
-        url = value( 'input_net_http_url' );
+        var url = value( 'input_net_http_url' );
         if( url.substring(0,7) != "http://"
             && url.substring(0,8) != "https://"
             && url.substring(0,6) != "ftp://"
@@ -572,7 +572,7 @@ function update_input_net()
     }
     else if( type == "rtsp" )
     {
-        url = value( 'input_net_rtsp_url' );
+        var url = value( 'input_net_rtsp_url' );
         if( url.substring(0,7) != "rtsp://" )
             mrl.value += "rtsp://";
         mrl.value += url;
@@ -588,8 +588,8 @@ function update_input_net()
 /* toggle show the full sout interface */
 function toggle_show_sout_helper()
 {
-    element = document.getElementById( "sout_helper" );
-        if( element.style.display == 'block' )
+    var element = document.getElementById( "sout_helper" );
+    if( element.style.display == 'block' )
     {
         element.style.display = 'none';
         document.getElementById( "sout_helper_toggle" ).value = 'Full sout interface';
@@ -604,7 +604,7 @@ function toggle_show_sout_helper()
 /* update the sout MRL using data from the sout_helper */
 function update_sout()
 {
-    mrl = document.getElementById( 'sout_mrl' );
+    var mrl = document.getElementById( 'sout_mrl' );
     mrl.value = "";
 
     check_and_replace_int( 'sout_http_port', 8080 );
@@ -624,13 +624,13 @@ function update_sout()
         enable( 'sout_sub' );
     }
 
-    transcode =  checked( 'sout_vcodec_s' ) || checked( 'sout_acodec_s' )
-                 || checked( 'sout_sub' ) || checked( 'sout_soverlay' );
+    var transcode =  checked( 'sout_vcodec_s' ) || checked( 'sout_acodec_s' )
+                  || checked( 'sout_sub' )      || checked( 'sout_soverlay' );
 
     if( transcode )
     {
         mrl.value += ":sout=#transcode{";
-        alot = false; /* alot == at least one transcode */
+        var alot = false; /* alot == at least one transcode */
         if( checked( 'sout_vcodec_s' ) )
         {
             mrl.value += "vcodec="+value( 'sout_vcodec' )+",vb="+value( 'sout_vb' )+",scale="+value( 'sout_scale' );
@@ -659,9 +659,9 @@ function update_sout()
         mrl.value += "}";
     }
 
-    output = checked( 'sout_display' ) + checked( 'sout_file' )
-             + checked( 'sout_http' ) + checked( 'sout_mmsh' )
-             + checked( 'sout_rtp' )  + checked( 'sout_udp' );
+    var output = checked( 'sout_display' ) + checked( 'sout_file' )
+               + checked( 'sout_http' )    + checked( 'sout_mmsh' )
+               + checked( 'sout_rtp' )     + checked( 'sout_udp' );
 
     if( output )
     {
@@ -669,9 +669,9 @@ function update_sout()
             mrl.value += ":";
         else
             mrl.value += ":sout=#";
-        aloo = false; /* aloo == at least one output */
-        mux = radio_value( 'sout_mux' );
-        ttl = parseInt( value( 'sout_ttl' ) );
+        var aloo = false; /* aloo == at least one output */
+        var mux = radio_value( 'sout_mux' );
+        var ttl = parseInt( value( 'sout_ttl' ) );
         if( output > 1 ) mrl.value += "duplicate{";
         if( checked( 'sout_display' ) )
         {
@@ -799,12 +799,12 @@ function loop_refresh_status()
 }
 function loop_refresh_playlist()
 {
- /*   setTimeout( 'loop_refresh_playlist()', 10000 ); */
+    /* setTimeout( 'loop_refresh_playlist()', 10000 ); */
     update_playlist();
 }
 function loop_refresh()
 {
-    setTimeout('loop_refresh_status()',0);
-    setTimeout('loop_refresh_playlist()',0);
+    setTimeout( 'loop_refresh_status()', 1 );
+    setTimeout( 'loop_refresh_playlist()', 1 );
 }
 

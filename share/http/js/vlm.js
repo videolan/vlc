@@ -110,9 +110,9 @@ function toggle_schedule_repeat()
 
 function vlm_schedule_type_change( name )
 {
-    act = document.getElementById( 'vlm_elt_' + name + '_action' ).value;
-    itemname = document.getElementById( 'vlm_elt_' + name + '_name' );
-    opt = document.getElementById( 'vlm_elt_' + name + '_opt' );
+    var act = document.getElementById( 'vlm_elt_' + name + '_action' ).value;
+    var itemname = document.getElementById( 'vlm_elt_' + name + '_name' );
+    var opt = document.getElementById( 'vlm_elt_' + name + '_opt' );
     if( act == "play" || act == "pause" || act == "stop" )
     {
         itemname.style.display = "";
@@ -132,7 +132,7 @@ function vlm_schedule_type_change( name )
 
 function update_vlm_add_broadcast()
 {
-    cmd = document.getElementById( 'vlm_command' );
+    var cmd = document.getElementById( 'vlm_command' );
 
     if( value( 'vlm_broadcast_name' ) )
     {
@@ -167,7 +167,7 @@ function update_vlm_add_broadcast()
 
 function update_vlm_add_vod()
 {
-    cmd = document.getElementById( 'vlm_command' );
+    var cmd = document.getElementById( 'vlm_command' );
 
     if( value( 'vlm_vod_name' ) )
     {
@@ -197,7 +197,7 @@ function update_vlm_add_vod()
 
 function update_vlm_add_schedule()
 {
-    cmd = document.getElementById( 'vlm_command' );
+    var cmd = document.getElementById( 'vlm_command' );
 
     check_and_replace_int( 'vlm_schedule_year', '0000' );
     check_and_replace_int( 'vlm_schedule_month', '00' );
@@ -249,7 +249,7 @@ function update_vlm_add_schedule()
 
 function update_vlm_add_other()
 {
-    cmd = document.getElementById( 'vlm_command' );
+    var cmd = document.getElementById( 'vlm_command' );
     cmd.value = "";
 }
 
@@ -269,7 +269,7 @@ function clear_children( elt )
 
 function create_button( caption, action )
 {
-    link = document.createElement( "input" );
+    var link = document.createElement( "input" );
     link.setAttribute( 'type', 'button' );
     link.setAttribute( 'onclick', action );
     link.setAttribute( 'value', caption );
@@ -277,7 +277,7 @@ function create_button( caption, action )
 }
 function create_option( caption, value )
 {
-    opt = document.createElement( 'option' );
+    var opt = document.createElement( 'option' );
     opt.setAttribute( 'value', value );
     opt.appendChild( document.createTextNode( caption ) );
     return opt;
@@ -289,9 +289,9 @@ function parse_vlm_cmd()
     {
         if( req.status == 200 )
         {
-            vlm_answer = req.responseXML.documentElement;
-            error_tag = vlm_answer.getElementsByTagName( 'error' )[0];
-            vlme = document.getElementById( 'vlm_error' );
+            var vlm_answer = req.responseXML.documentElement;
+            var error_tag = vlm_answer.getElementsByTagName( 'error' )[0];
+            var vlme = document.getElementById( 'vlm_error' );
             clear_children( vlme );
             if( error_tag.hasChildNodes() )
             {
@@ -317,9 +317,9 @@ function parse_vlm_elements()
     {
         if( req.status == 200 )
         {
-            vlmb = document.getElementById( 'vlm_broadcast_list' );
-            vlmv = document.getElementById( 'vlm_vod_list' );
-            vlms = document.getElementById( 'vlm_schedule_list' );
+            var vlmb = document.getElementById( 'vlm_broadcast_list' );
+            var vlmv = document.getElementById( 'vlm_vod_list' );
+            var vlms = document.getElementById( 'vlm_schedule_list' );
 
             clear_children( vlmb );
             clear_children( vlmv );
@@ -327,13 +327,13 @@ function parse_vlm_elements()
 
             answer = req.responseXML.documentElement;
 
-            elt = answer.firstChild;
+            var elt = answer.firstChild;
 
             while( elt )
             {
                 if( elt.nodeName == "broadcast" || elt.nodeName == "vod" )
                 {
-                    nb = document.createElement( 'div' );
+                    var nb = document.createElement( 'div' );
                     nb.setAttribute( 'class', 'list_element' );
                     if( elt.nodeName == "broadcast" )
                     {
@@ -343,11 +343,11 @@ function parse_vlm_elements()
                     {
                         vlmv.appendChild( nb );
                     }
-                    nbname = document.createElement( 'b' );
+                    var nbname = document.createElement( 'b' );
                     nbname.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     nb.appendChild( nbname );
                     
-                    link = document.createElement( 'input' );
+                    var link = document.createElement( 'input' );
                     link.setAttribute( 'type', 'button' );
                     if( elt.getAttribute( 'enabled' ) == 'yes' )
                     {
@@ -399,20 +399,20 @@ function parse_vlm_elements()
                     nb.appendChild( document.createTextNode( " " ) );
                     nb.appendChild( create_button( 'Delete', 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' ) );
 
-                    list = document.createElement( "ul" );
+                    var list = document.createElement( "ul" );
                     /* begin input list */
-                    inputs = elt.getElementsByTagName( 'input' );
+                    var inputs = elt.getElementsByTagName( 'input' );
                     for( i = 0; i < inputs.length; i++ )
                     {
-                        item = document.createElement( "li" );
+                        var item = document.createElement( "li" );
                         item.appendChild( document.createTextNode( "Input: " + inputs[i].firstChild.data + " " ) );
                         item.appendChild( create_button( "Delete", 'vlm_delete_input("' + elt.getAttribute( 'name' ) + '", '+(i+1)+' );' ) );
                         list.appendChild( item );
                     }
 
                     /* Add input */
-                    item = document.createElement( "li" );
-                    text = document.createElement( "input" );
+                    var item = document.createElement( "li" );
+                    var text = document.createElement( "input" );
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'size', '40' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_input' );
@@ -426,7 +426,7 @@ function parse_vlm_elements()
                     /* end of input list */
                     
                     /* output */
-                    item = document.createElement( "li" );
+                    var item = document.createElement( "li" );
                     outputelt = elt.getElementsByTagName( 'output' )[0];
                     if( outputelt.hasChildNodes() )
                     {
@@ -437,7 +437,7 @@ function parse_vlm_elements()
                         output = "";
                     }
                     item.appendChild( document.createTextNode( 'Output: ' ) );
-                    text = document.createElement( "input" );
+                    var text = document.createElement( "input" );
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_output' );
                     text.setAttribute( 'value', output );
@@ -452,18 +452,18 @@ function parse_vlm_elements()
                     /* end of output */
 
                     /* begin options list */
-                    options = elt.getElementsByTagName( 'option' );
+                    var options = elt.getElementsByTagName( 'option' );
                     for( i = 0; i < options.length; i++ )
                     {
-                        item = document.createElement( "li" );
+                        var item = document.createElement( "li" );
                         item.appendChild( document.createTextNode( "Option: " + options[i].firstChild.data ) );
                         list.appendChild( item );
                     }
 
                     /* Add option */
-                    item = document.createElement( "li" );
+                    var item = document.createElement( "li" );
                     item.appendChild( document.createTextNode( ' ' ) );
-                    text = document.createElement( "input" );
+                    var text = document.createElement( "input" );
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'size', '40' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_option' );
@@ -479,15 +479,15 @@ function parse_vlm_elements()
                 }
                 else if( elt.nodeName == "schedule" )
                 {
-                    nb = document.createElement( 'div' );
+                    var nb = document.createElement( 'div' );
                     nb.setAttribute( 'class', 'list_element' );
                     vlms.appendChild( nb );
 
-                    nbname = document.createElement( 'b' );
+                    var nbname = document.createElement( 'b' );
                     nbname.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     nb.appendChild( nbname );
                     
-                    link = document.createElement( 'input' );
+                    var link = document.createElement( 'input' );
                     link.setAttribute( 'type', 'button' );
                     if( elt.getAttribute( 'enabled' ) == 'yes' )
                     {
@@ -506,17 +506,17 @@ function parse_vlm_elements()
                     nb.appendChild( document.createTextNode( " " ) );
                     nb.appendChild( create_button( "Delete", 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' ) );
 
-                    list = document.createElement( 'ul' );
+                    var list = document.createElement( 'ul' );
 
-                    item = document.createElement( 'li' );
+                    var item = document.createElement( 'li' );
                     item.appendChild( document.createTextNode( "Date: " + elt.getAttribute( 'date' ) ) );
                     list.appendChild( item );
 
-                    item = document.createElement( 'li' );
+                    var item = document.createElement( 'li' );
                     item.appendChild( document.createTextNode( "Period (in seconds): " + elt.getAttribute( 'period' ) ) );
                     list.appendChild( item );
                     
-                    item = document.createElement( 'li' );
+                    var item = document.createElement( 'li' );
                     if( elt.getAttribute( 'repeat' ) == -1 )
                     {
                         item.appendChild( document.createTextNode( "Number of repeats left: for ever" ) );
@@ -527,16 +527,16 @@ function parse_vlm_elements()
                     }
                     list.appendChild( item );
                     
-                    commands = elt.getElementsByTagName( 'command' );
+                    var commands = elt.getElementsByTagName( 'command' );
                     for( i = 0; i < commands.length; i++ )
                     {
-                        item = document.createElement( "li" );
+                        var item = document.createElement( "li" );
                         item.appendChild( document.createTextNode( "Command: " + commands[i].firstChild.data + " " ) );
                         list.appendChild( item );
                     }
                     
-                    item = document.createElement( 'li' );
-                    sel = document.createElement( 'select' );
+                    var item = document.createElement( 'li' );
+                    var sel = document.createElement( 'select' );
                     sel.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_action' );
                     sel.setAttribute( 'onchange', 'vlm_schedule_type_change("'+elt.getAttribute('name')+'");');
                     sel.appendChild( create_option( 'play', 'play' ) );
@@ -547,7 +547,7 @@ function parse_vlm_elements()
                     item.appendChild( sel );
 
                     item.appendChild( document.createTextNode( " " ) );
-                    text = document.createElement( 'input' );
+                    var text = document.createElement( 'input' );
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_name' );
                     text.setAttribute( 'size', '10' );
@@ -677,11 +677,13 @@ function vlm_batch( batch )
 
 function vlm_schedule_append( name )
 {
-    act = document.getElementById( 'vlm_elt_' + name + '_action' ).value;
+    var act = document.getElementById( 'vlm_elt_' + name + '_action' ).value;
     document.getElementById( 'vlm_command' ).value = "setup " + name + " append ";
-    itemname = document.getElementById( 'vlm_elt_' + name + '_name' ).value;
+
+    var itemname = document.getElementById( 'vlm_elt_' + name + '_name' ).value;
     if( itemname == "(name)" ) itemname = "";
-    opt = document.getElementById( 'vlm_elt_' + name + '_opt' ).value;
+
+    var opt = document.getElementById( 'vlm_elt_' + name + '_opt' ).value;
     if( opt == "(options)" ) opt = "";
         
     if( act == '' )
