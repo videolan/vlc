@@ -1,5 +1,7 @@
+# Create the exchange file
+touch rrd
 
-# First, create the RRD file
+# Create the RRD file
 rrdtool create vlc.rrd --step 1 "DS:in:GAUGE:10:0:30000" "DS:demux:GAUGE:10:0:30000" "DS:out:GAUGE:10:0:30000" "RRA:AVERAGE:0,5:1:86400"
 
 # Start "listening" the RRD file
