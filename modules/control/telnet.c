@@ -193,6 +193,8 @@ static int Open( vlc_object_t *p_this )
                 == NULL )
     {
         msg_Err( p_intf, "cannot listen for telnet" );
+        vlc_UrlClean(&url);
+        free( psz_address );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
@@ -205,6 +207,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->mediatheque = mediatheque;
     p_intf->pf_run = Run;
 
+    vlc_UrlClean(&url);
     free( psz_address );
     return VLC_SUCCESS;
 }
