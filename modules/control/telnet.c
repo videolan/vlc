@@ -205,6 +205,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->mediatheque = mediatheque;
     p_intf->pf_run = Run;
 
+    free( psz_address );
     return VLC_SUCCESS;
 }
 
