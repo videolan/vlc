@@ -113,14 +113,11 @@ void FileInfo::Update()
     {
         item_info->Clear();
         stats_info->Clear();
-        if ( p_input )
-        {
-            vlc_object_release(p_input);
-        }
         vlc_object_release( p_playlist );
         return;
     }
 
+    vlc_object_yield( p_input );
     vlc_mutex_lock( &p_input->input.p_item->lock );
     if( b_need_update == VLC_TRUE )
     {
