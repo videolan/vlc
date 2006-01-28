@@ -1,0 +1,12 @@
+
+# First, create the RRD file
+rrdtool create vlc.rrd --step 1 "DS:in:GAUGE:10:0:30000" "DS:demux:GAUGE:10:0:30000" "DS:out:GAUGE:10:0:30000" "RRA:AVERAGE:0,5:1:86400"
+
+# Start "listening" the RRD file
+tail -f rrd |while read in;do;echo $in;rrdtool update vlc.rrd `echo $in`;done
+
+# Start vlc
+vlc normal_vlc_stuff --extraintf logger --rrd-file rrd
+
+# Graph the last 5 minutes (300 seconds)
+rrdtool graph vlc.png --start -300 "DEF:inp=vlc.rrd:in:AVERAGE" "DEF:dem=vlc.rrd:demux:AVERAGE" "DEF:out=vlc.rrd:out:AVERAGE" "LINE2:dem#00FF00:Demux bitrate" "LINE2:inp#0000FF:Input bitrate" "LINE2:out#FF0000:Output bitrate"

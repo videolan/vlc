@@ -77,6 +77,8 @@
 struct intf_sys_t
 {
     int i_mode;
+    FILE *p_rrd;
+    mtime_t last_update;
 
     FILE *    p_file; /* The log file */
     msg_subscription_t *p_sub;
@@ -95,6 +97,8 @@ static void HtmlPrint         ( const msg_item_t *, FILE * );
 #ifdef HAVE_SYSLOG_H
 static void SyslogPrint       ( const msg_item_t *);
 #endif
+
+static void DoRRD( intf_thread_t *p_intf );
 
 /*****************************************************************************
  * Module descriptor
@@ -127,6 +131,9 @@ vlc_module_begin();
                 VLC_FALSE );
         change_string_list( mode_list, mode_list_text, 0 );
 
+    add_string( "rrd-file", NULL, NULL, N_("RRD output file") ,
+                    N_("Output data for RRDTool in this file" ), VLC_TRUE );
+
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -137,7 +144,7 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    char *psz_mode, *psz_file;
+    char *psz_mode, *psz_file, *psz_rrd_file;
 
     CONSOLE_INTRO_MSG;
     msg_Info( p_intf, "Using logger..." );
@@ -261,6 +268,15 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
+    p_intf->p_sys->last_update = 0;
+    p_intf->p_sys->p_rrd = NULL;
+
+    psz_rrd_file = config_GetPsz( p_intf, "rrd-file" );
+    if( psz_rrd_file && *psz_rrd_file )
+    {
+        p_intf->p_sys->p_rrd = fopen( psz_rrd_file, "w" );
+    }
+
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf , MSG_QUEUE_NORMAL );
     p_intf->pf_run = Run;
 
@@ -315,6 +331,9 @@ static void Run( intf_thread_t *p_intf )
     {
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                     p_intf->p_sys->i_mode );
+
+        if( p_intf->p_sys->p_rrd )
+            DoRRD( p_intf );
 
         msleep( INTF_IDLE_SLEEP );
     }
@@ -400,3 +419,24 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
     LOG_STRING( "</font>\n", p_file );
 }
 
+static void DoRRD( intf_thread_t *p_intf )
+{
+    playlist_t *p_playlist;
+    float f_input_bitrate;
+    if( mdate() - p_intf->p_sys->last_update < 1000000 )
+        return;
+    p_intf->p_sys->last_update = mdate();
+
+    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+    if( p_playlist && p_playlist->p_stats )
+    {
+        fprintf( p_intf->p_sys->p_rrd, I64Fi":%f:%f:%f\n",
+                   p_intf->p_sys->last_update/1000000,
+                   (float)(p_playlist->p_stats->f_input_bitrate)*1000,
+                   (float)(p_playlist->p_stats->f_demux_bitrate)*1000,
+                   (float)(p_playlist->p_stats->f_output_bitrate)*1000 );
+        fflush( p_intf->p_sys->p_rrd );
+        vlc_object_release( p_playlist );
+    }
+}
