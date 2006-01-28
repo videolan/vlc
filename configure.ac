@@ -87,8 +87,6 @@ AC_ARG_WITH(contrib,
 
   if test -d ${topdir}/extras/contrib/lib; then
     export PATH=${topdir}/extras/contrib/bin:$PATH
-dnl kludge because only the debian package provides a ffmpeg-config
-    with_ffmpeg_config_path=${topdir}/extras/contrib/bin	
     CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
     CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
     CFLAGS="${CFLAGS} -I${topdir}/extras/contrib/include"
@@ -97,7 +95,7 @@ dnl kludge because only the debian package provides a ffmpeg-config
     CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
     OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
     OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
-    if test $build = $host; then
+    if test $build = $host -o $PKG_CONFIG_LIBDIR; then
     	export PKG_CONFIG_PATH=${topdir}/extras/contrib/lib/pkgconfig:$PKG_CONFIG_PATH
     else
     	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
@@ -108,8 +106,18 @@ dnl kludge because only the debian package provides a ffmpeg-config
     fi
     LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
-    with_livedotcom_tree=${topdir}/extras/contrib/src/live
-    with_goom_tree=${topdir}/extras/contrib/src/goom
+
+dnl kludge because only the debian package provides a ffmpeg-config
+    if test -z $with_ffmpeg_config_path; then 
+       with_ffmpeg_config_path=${topdir}/extras/contrib/bin;
+    fi
+    if test -z $with_livedotcom_tree; then
+       with_livedotcom_tree=${topdir}/extras/contrib/src/live
+    fi
+    if test -z $with_goom_tree; then
+      with_goom_tree=${topdir}/extras/contrib/src/goom
+    fi
+
     if test ".`uname -s`" = ".Darwin"; then
       export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
       export DYLD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$DYLD_LIBRARY_PATH
