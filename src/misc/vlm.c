@@ -1658,16 +1658,32 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
         {
             vlm_media_instance_t *p_instance = media->instance[i];
             vlc_value_t val;
+            vlm_message_t *msg_instance;
+            char *psz_tmp;
 
             if( !p_instance->p_input ) val.i_int = END_S;
             else var_Get( p_instance->p_input, "state", &val );
 
-            vlm_MessageAdd( msg_child,
-                vlm_MessageNew( p_instance->psz_name ?
-                                p_instance->psz_name : "default",
+            msg_instance = vlm_MessageNew( p_instance->psz_name ?
+                                p_instance->psz_name : "default", NULL );
+            vlm_MessageAdd( msg_instance, vlm_MessageNew( "state",
                                 val.i_int == PLAYING_S ? "playing" :
                                 val.i_int == PAUSE_S ? "paused" :
                                 "stopped" ) );
+#define APPEND_INPUT_INFO( a, format, type ) \
+            asprintf( &psz_tmp, format, \
+                      var_Get ## type( p_instance->p_input, a ) ); \
+            vlm_MessageAdd( msg_instance, vlm_MessageNew( a, psz_tmp ) ); \
+            free( psz_tmp );
+            APPEND_INPUT_INFO( "position", "%f", Float );
+            APPEND_INPUT_INFO( "time", "%d", Integer );
+            APPEND_INPUT_INFO( "length", "%d", Integer );
+            APPEND_INPUT_INFO( "rate", "%d", Integer );
+            APPEND_INPUT_INFO( "title", "%d", Integer );
+            APPEND_INPUT_INFO( "chapter", "%d", Integer );
+            APPEND_INPUT_INFO( "seekable", "%d", Bool );
+#undef APPEND_INPUT_INFO
+            vlm_MessageAdd( msg_child, msg_instance );
         }
 
         return msg;
