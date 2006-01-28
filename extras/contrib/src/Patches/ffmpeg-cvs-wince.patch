@@ -1,108 +1,3 @@
-Index: ../ffmpeg/configure
-===================================================================
-RCS file: /cvsroot/ffmpeg/ffmpeg/configure,v
-retrieving revision 1.215
-diff -u -r1.215 configure
---- ../ffmpeg/configure	22 Oct 2005 19:17:39 -0000	1.215
-+++ ../ffmpeg/configure	27 Nov 2005 16:54:09 -0000
-@@ -26,6 +26,7 @@
- echo "  --enable-xvid            enable XviD support via xvidcore [default=no]"
- echo "  --enable-x264            enable H.264 encoding via x264 [default=no]"
- echo "  --enable-mingw32         enable MinGW native/cross Windows compile"
-+echo "  --enable-mingwce         enable MinGW native/cross WinCE compile"
- echo "  --enable-a52             enable GPLed A52 support [default=no]"
- echo "  --enable-a52bin          open liba52.so.0 at runtime [default=no]"
- echo "  --enable-dts             enable GPLed DTS support [default=no]"
-@@ -74,6 +75,7 @@
- echo "  --disable-opts           disable compiler optimizations"
- echo "  --disable-mpegaudio-hp   faster (but less accurate)"
- echo "                           MPEG audio decoding [default=no]"
-+echo "  --disable-protocols      disable I/O protocols support [default=no]"
- echo "  --disable-ffserver       disable ffserver build"
- echo "  --disable-ffplay         disable ffplay build"
- echo "  --enable-small           optimize for size instead of speed"
-@@ -199,6 +201,7 @@
- pp="no"
- shared_pp="no"
- mingw32="no"
-+mingwce="no"
- cygwin="no"
- os2="no"
- lshared="no"
-@@ -218,6 +221,7 @@
- SHFLAGS=-shared
- netserver="no"
- need_inet_aton="no"
-+protocols="yes"
- ffserver="yes"
- ffplay="yes"
- LIBOBJFLAGS=""
-@@ -534,6 +538,8 @@
-   ;;
-   --enable-mingw32) mingw32="yes"
-   ;;
-+  --enable-mingwce) mingwce="yes"
-+  ;;
-   --enable-shared) lshared="yes"
-   ;;
-   --disable-debug) debug="no"
-@@ -542,6 +548,8 @@
-   ;;
-   --disable-mpegaudio-hp) mpegaudio_hp="no"
-   ;;
-+  --disable-protocols) protocols="no"
-+  ;;
-   --disable-ffserver) ffserver="no"
-   ;;
-   --disable-ffplay) ffplay="no"
-@@ -847,7 +855,7 @@
- $cc -o $TMPE $TMPC 2> /dev/null || mmi="no"
- fi
- 
--if test "$mingw32" = "yes" ; then
-+if test "$mingw32" = "yes" -o "$mingwce" = "yes"; then
-     v4l="no"
-     bktr="no"
-     audio_oss="no"
-@@ -855,6 +863,9 @@
-     dc1394="no"
-     ffserver="no"
-     network="no"
-+if test "$mingw32" = "yes"; then
-+    protocols="no"
-+fi
-     SLIBPREF=""
-     SLIBSUF=".dll"
-     EXESUF=".exe"
-@@ -1621,6 +1632,16 @@
-   echo "#endif" >> $TMPH
- fi
- 
-+if test "$mingwce" = "yes" ; then
-+  echo "#define CONFIG_WIN32 1" >> $TMPH
-+  echo "CONFIG_WIN32=yes" >> config.mak
-+  echo "#define CONFIG_WINCE 1" >> $TMPH
-+  echo "CONFIG_WINCE=yes" >> config.mak
-+  echo "#ifndef __MINGW32__" >> $TMPH
-+  echo "#define __MINGW32__ 1" >> $TMPH
-+  echo "#endif" >> $TMPH
-+fi
-+
- if test "$os2" = "yes" ; then
-   echo "#define CONFIG_OS2 1" >> $TMPH
-   echo "CONFIG_OS2=yes" >> config.mak
-@@ -1671,6 +1692,11 @@
-   echo "#define SIMPLE_IDCT 1" >> $TMPH
- fi
- 
-+if test "$protocols" = "yes" ; then
-+  echo "#define CONFIG_PROTOCOLS 1" >> $TMPH
-+  echo "CONFIG_PROTOCOLS=yes" >> config.mak
-+fi
-+
- if test "$ffserver" = "yes" ; then
-   echo "#define CONFIG_FFSERVER 1" >> $TMPH
-   echo "CONFIG_FFSERVER=yes" >> config.mak
 Index: ../ffmpeg/libavcodec/4xm.c
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/4xm.c,v
@@ -144,7 +39,7 @@ retrieving revision 1.11
 diff -u -r1.11 cabac.h
 --- ../ffmpeg/libavcodec/cabac.h	29 May 2005 18:18:13 -0000	1.11
 +++ ../ffmpeg/libavcodec/cabac.h	27 Nov 2005 16:54:10 -0000
-@@ -24,9 +24,6 @@
+@@ -26,9 +26,6 @@
   */
  
  
@@ -505,100 +400,59 @@ Index: ../ffmpeg/libavformat/Makefile
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/Makefile,v
 retrieving revision 1.102
-diff -u -r1.102 Makefile
---- ../ffmpeg/libavformat/Makefile	7 Nov 2005 01:32:29 -0000	1.102
-+++ ../ffmpeg/libavformat/Makefile	27 Nov 2005 16:54:47 -0000
-@@ -11,13 +11,20 @@
- OBJS= utils.o cutils.o os_support.o allformats.o
+retrieving revision 1.111
+diff -u -r1.111 Makefile
+--- Makefile    26 Jan 2006 23:42:29 -0000      1.111
++++ Makefile    28 Jan 2006 21:44:10 -0000
+@@ -12,8 +12,8 @@
  PPOBJS=
- 
--# mux and demuxes
+  
+ # demuxers
 -OBJS+=mpeg.o mpegts.o mpegtsenc.o ffm.o crc.o img.o img2.o raw.o rm.o \
 -      avienc.o avidec.o wav.o mmf.o swf.o au.o gif.o mov.o mpjpeg.o dv.o \
--      yuv4mpeg.o 4xm.o flvenc.o flvdec.o movenc.o psxstr.o idroq.o ipmovie.o \
-+# demuxes
-+OBJS+=mpeg.o mpegts.o img.o img2.o raw.o rm.o \
++OBJS+=mpeg.o mpegts.o ffm.o img.o img2.o raw.o rm.o \
 +      avidec.o wav.o mmf.o swf.o au.o gif.o mov.o mpjpeg.o dv.o \
-+      yuv4mpeg.o 4xm.o flvdec.o psxstr.o idroq.o ipmovie.o \
+       yuv4mpeg.o 4xm.o flvdec.o psxstr.o idroq.o ipmovie.o \
        nut.o wc3movie.o mp3.o westwood.o segafilm.o idcin.o flic.o \
--      sierravmd.o matroska.o sol.o electronicarts.o nsvdec.o asf.o asf-enc.o \
-+      sierravmd.o matroska.o sol.o electronicarts.o nsvdec.o asf.o \
-       ogg2.o oggparsevorbis.o oggparsetheora.o oggparseflac.o daud.o
-+
-+# muxers
-+ifeq ($(CONFIG_MUXERS),yes)
+       sierravmd.o matroska.o sol.o electronicarts.o nsvdec.o asf.o \
+@@ -21,7 +21,7 @@
+ 
+ # muxers
+ ifeq ($(CONFIG_MUXERS),yes)
+-OBJS+= flvenc.o movenc.o asf-enc.o
 +OBJS+= mpegtsenc.o crc.o avienc.o flvenc.o movenc.o asf-enc.o
-+endif
-+
-+
- AMROBJS=
- ifeq ($(AMR_NB),yes)
- AMROBJS= amr.o
-@@ -32,8 +39,6 @@
+ endif
 
- # image formats
- OBJS+= pnm.o yuv.o png.o jpeg.o gifdec.o sgi.o
--# file I/O
--OBJS+= avio.o aviobuf.o file.o
- OBJS+= framehook.o
 
- ifeq ($(CONFIG_VIDEO4LINUX),yes)
-@@ -62,6 +67,15 @@
+@@ -67,6 +67,10 @@
  PPOBJS+= beosaudio.o
  endif
- 
+
 +ifeq ($(CONFIG_FFSERVER),yes)
-+OBJS+= ffm.o
++OBJS+=ffm.o
 +endif
 +
-+# protocols I/O
-+OBJS+= avio.o aviobuf.o
-+
-+ifeq ($(CONFIG_PROTOCOLS),yes)
-+OBJS+= file.o
- ifeq ($(CONFIG_NETWORK),yes)
- OBJS+= udp.o tcp.o http.o rtsp.o rtp.o rtpproto.o
- # BeOS and Darwin network stuff
-@@ -69,6 +83,7 @@
- OBJS+= barpainet.o
- endif
- endif
-+endif
- 
- ifeq ($(CONFIG_LIBOGG),yes)
- OBJS+= ogg.o
+ # protocols I/O
+ OBJS+= avio.o aviobuf.o
+
 Index: ../ffmpeg/libavformat/allformats.c
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/allformats.c,v
-retrieving revision 1.50
-diff -u -r1.50 allformats.c
---- ../ffmpeg/libavformat/allformats.c	23 Sep 2005 00:25:41 -0000	1.50
-+++ ../ffmpeg/libavformat/allformats.c	27 Nov 2005 16:54:47 -0000
+retrieving revision 1.53
+diff -u -r1.53 allformats.c
+--- allformats.c        21 Jan 2006 18:36:32 -0000      1.53
++++ allformats.c        28 Jan 2006 21:57:13 -0000
 @@ -88,7 +88,10 @@
      libogg_init();
  #endif
- 
+
 +#if defined(CONFIG_FFSERVER)
      ffm_init();
 +#endif
-+
++    
  #if defined(CONFIG_VIDEO4LINUX) || defined(CONFIG_BKTR)
      video_grab_init();
  #endif
-@@ -130,6 +133,7 @@
- //    av_register_image_format(&sgi_image_format); heap corruption, dont enable
- #endif //CONFIG_MUXERS
- 
-+#ifdef CONFIG_PROTOCOLS
-     /* file protocols */
-     register_protocol(&file_protocol);
-     register_protocol(&pipe_protocol);
-@@ -141,4 +145,5 @@
-     register_protocol(&tcp_protocol);
-     register_protocol(&http_protocol);
- #endif
-+#endif
- }
 Index: ../ffmpeg/libavformat/asf-enc.c
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/asf-enc.c,v
@@ -735,47 +589,6 @@ diff -u -r1.26 ogg.c
  #define DECODER_BUFFER_SIZE 4096
  
  
-Index: ../ffmpeg/libavformat/os_support.c
-===================================================================
-RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/os_support.c,v
-retrieving revision 1.4
-diff -u -r1.4 os_support.c
---- ../ffmpeg/libavformat/os_support.c	9 Nov 2004 17:27:33 -0000	1.4
-+++ ../ffmpeg/libavformat/os_support.c	27 Nov 2005 16:55:00 -0000
-@@ -18,7 +18,8 @@
-  */
- #include "config.h"
- #include "avformat.h"
--#ifdef CONFIG_WIN32
-+#if defined(CONFIG_WINCE)
-+#elif defined(CONFIG_WIN32)
- #include <sys/types.h>
- #include <sys/timeb.h>
- #elif defined(CONFIG_OS2)
-@@ -36,7 +37,9 @@
-  */
- int64_t av_gettime(void)
- {
--#ifdef CONFIG_WIN32
-+#if defined(CONFIG_WINCE)
-+    return timeGetTime() * int64_t_C(1000);
-+#elif defined(CONFIG_WIN32)
-     struct timeb tb;
-     _ftime(&tb);
-     return ((int64_t)tb.time * int64_t_C(1000) + (int64_t)tb.millitm) * int64_t_C(1000);
-@@ -47,6 +50,7 @@
- #endif
- }
- 
-+#if !defined(CONFIG_WINCE)
- #if !defined(HAVE_LOCALTIME_R)
- struct tm *localtime_r(const time_t *t, struct tm *tp)
- {
-@@ -59,3 +63,4 @@
-     return tp;
- }
- #endif /* !defined(HAVE_LOCALTIME_R) */
-+#endif /* !defined(CONFIG_WINCE) */
 Index: ../ffmpeg/libavformat/swf.c
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/swf.c,v
@@ -810,48 +623,3 @@ diff -u -r1.168 utils.c
  /**
   * @file libavformat/utils.c
   * Various utility functions for using ffmpeg library.
-@@ -2734,6 +2731,7 @@
-  *  S+[.m...]
-  * @endcode
-  */
-+#ifndef CONFIG_WINCE
- int64_t parse_date(const char *datestr, int duration)
- {
-     const char *p;
-@@ -2841,6 +2839,7 @@
-     }
-     return negative ? -t : t;
- }
-+#endif /* CONFIG_WINCE */
- 
- /**
-  * Attempts to find a specific tag in a URL.
-Index: ../ffmpeg/libavutil/common.h
-===================================================================
-RCS file: /cvsroot/ffmpeg/ffmpeg/libavutil/common.h,v
-retrieving revision 1.153
-diff -u -r1.153 common.h
---- ../ffmpeg/libavutil/common.h	19 Sep 2005 23:26:47 -0000	1.153
-+++ ../ffmpeg/libavutil/common.h	27 Nov 2005 16:55:02 -0000
-@@ -172,6 +172,11 @@
- 
- #        define snprintf _snprintf
- #        define vsnprintf _vsnprintf
-+
-+#        ifdef CONFIG_WINCE
-+#            define perror(a)
-+#        endif
-+
- #    endif
- 
- /* CONFIG_WIN32 end */
-@@ -253,6 +258,9 @@
- #        endif
- 
- #    endif /* !CONFIG_WIN32 */
-+#    ifdef CONFIG_WINCE
-+#            define abort()
-+#    endif
- 
- #    define av_abort()      do { av_log(NULL, AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
- 
