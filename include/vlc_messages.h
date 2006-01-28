@@ -344,6 +344,7 @@ struct global_stats_t
     vlc_mutex_t lock;
 
     float f_input_bitrate;
+    float f_demux_bitrate;
     float f_output_bitrate;
 
     int i_http_clients;

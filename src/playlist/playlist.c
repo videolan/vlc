@@ -173,9 +173,11 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->request.b_request = VLC_FALSE;
     p_playlist->status.i_status = PLAYLIST_STOPPED;
 
-
     p_playlist->i_sort = SORT_ID;
     p_playlist->i_order = ORDER_NORMAL;
+
+    p_playlist->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
+    vlc_mutex_init( p_playlist, &p_playlist->p_stats->lock );
 
     /* Finally, launch the thread ! */
     if( vlc_thread_create( p_playlist, "playlist", RunThread,
@@ -596,6 +598,11 @@ static void RunThread ( playlist_t *p_playlist )
             stats_TimerStart( p_playlist, "Interaction thread" );
             intf_InteractionManage( p_playlist );
             stats_TimerStop( p_playlist, "Interaction thread" );
+        }
+
+        if( i_loops %5 == 0 && p_playlist->p_stats )
+        {
+            stats_ComputeGlobalStats( p_playlist, p_playlist->p_stats );
         }
 
         vlc_mutex_lock( &p_playlist->object_lock );

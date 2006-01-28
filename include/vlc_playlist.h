@@ -218,6 +218,8 @@ struct playlist_t
     // thread
     interaction_t *p_interaction;
 
+    global_stats_t *p_stats;
+
     /*@}*/
 };
 

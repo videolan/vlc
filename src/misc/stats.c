@@ -370,20 +370,25 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj,
     int i_index;
     vlc_mutex_lock( &p_stats->lock );
 
-    p_list = vlc_list_find( p_obj, VLC_OBJECT_INPUT, FIND_CHILD );
+    p_list = vlc_list_find( p_obj, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_list )
     {
+        float f_total_in = 0, f_total_out = 0,f_total_demux = 0;
         for( i_index = 0; i_index < p_list->i_count ; i_index ++ )
         {
-            float f_in = 0, f_out = 0;
+            float f_in = 0, f_out = 0, f_demux = 0;
             p_obj = (vlc_object_t *)p_list->p_values[i_index].p_object;
             stats_GetFloat( p_obj, p_obj->i_object_id, "input_bitrate",
                             &f_in );
             stats_GetFloat( p_obj, p_obj->i_object_id, "sout_send_bitrate",
                             &f_out );
-            p_stats->f_input_bitrate += f_in;
-            p_stats->f_output_bitrate += f_out;
+            stats_GetFloat( p_obj, p_obj->i_object_id, "demux_bitrate",
+                            &f_demux );
+            f_total_in += f_in; f_total_out += f_out;f_total_demux += f_demux;
         }
+        p_stats->f_input_bitrate = f_total_in;
+        p_stats->f_output_bitrate = f_total_out;
+        p_stats->f_demux_bitrate = f_total_demux;
         vlc_list_release( p_list );
     }
 
