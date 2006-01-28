@@ -817,7 +817,7 @@ remove_distdir_woody = \
 # XXX: this rule is probably only useful to you if you have exactly
 # the same setup as me. Contact sam@zoy.org if you need to use it.
 #
-package-win32-base:
+package-win32-base-debug:
 # Check that tmp isn't in the way
 	@if test -e "$(top_builddir)/vlc-${VERSION}"; then \
 	  echo "Error: please remove $(top_builddir)/vlc-${VERSION}, it is in the way"; \
@@ -842,9 +842,6 @@ package-win32-base:
 	    $(INSTALL) "$(top_builddir)/$$i$(LIBEXT)" \
             "$(top_builddir)/vlc-${VERSION}/plugins/" ; \
 	  fi ; done
-
-	for i in "" $(top_builddir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
-	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
 	mkdir $(top_builddir)/vlc-${VERSION}/locale
 	for i in $(ALL_LINGUAS); do \
@@ -926,6 +923,11 @@ endif
 	if [ -x rebase ]; then \
 		find $(top_builddir)/vlc-${VERSION} -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
+
+package-win32-base: package-win32-base-debug
+	for i in "" $(top_builddir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
+	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
+
 
 package-win32-base-exe:
 # Create package
