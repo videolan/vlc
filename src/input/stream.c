@@ -1629,11 +1629,22 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     access_t *p_access = p_sys->p_access;
     block_t *p_block;
     vlc_bool_t b_eof;
+    int i_read, i_total;
 
     if( !p_sys->i_list )
     {
         p_block = p_access->pf_block( p_access );
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
+        if( p_block )
+        {
+            stats_UpdateInteger( s->p_parent->p_parent, "read_bytes",
+                                 p_block->i_buffer );
+            stats_GetInteger( s, s->p_parent->p_parent->i_object_id,
+                              "read_bytes", &i_total );
+            stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+                              (float)i_total );
+            stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 );
+        }
         return p_block;
     }
 
@@ -1660,6 +1671,16 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
 
         /* We have to read some data */
         return AReadBlock( s, pb_eof );
+    }
+    if( p_block )
+    {
+        stats_UpdateInteger( s->p_parent->p_parent, "read_bytes",
+                             p_block->i_buffer );
+        stats_GetInteger( s, s->p_parent->p_parent->i_object_id,
+                          "read_bytes", &i_total );
+        stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+                          (float)i_total );
+        stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 );
     }
 
     return p_block;
