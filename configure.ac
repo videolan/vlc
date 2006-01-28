@@ -189,7 +189,7 @@ case "${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
-        VLC_ADD_LDFLAGS([vcdx cddax],[-lwinmm])
+        VLC_ADD_LDFLAGS([cdda vcdx cddax],[-lwinmm])
         VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard stream_out_rtp vod_rtsp telnet netsync],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
@@ -391,7 +391,7 @@ fi
 
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LDFLAGS([vlc ipv4 cddax],-lsocket)
+    VLC_ADD_LDFLAGS([vlc ipv4 cdda cddax],-lsocket)
   ])
 ])
 
@@ -403,7 +403,7 @@ AC_CHECK_FUNCS(send,,[
 
 AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,[
-    VLC_ADD_LDFLAGS([cddax ipv4 vlc],[-lnsl])
+    VLC_ADD_LDFLAGS([cdda cddax ipv4 vlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
       VLC_ADD_LDFLAGS([ipv4 access_mms],[-lbind])
@@ -2048,6 +2048,17 @@ then
     VLC_ADD_PLUGINS([vcd cdda])
     VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-framework IOKit -framework CoreFoundation])
     VLC_ADD_LDFLAGS([vcdx cddax],[-liconv])
+  fi
+
+  if test "$enable_libcddb" != "no"; then
+    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
+      HAVE_LIBCDDB=yes 
+      AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
+      VLC_ADD_LDFLAGS([cdda],[$LIBCDDB_LIBS])
+      VLC_ADD_CFLAGS([cdda],[$LIBCDDB_CFLAGS])
+      ],:
+      [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
+      HAVE_LIBCDDB=no])
   fi
 fi
 

@@ -47,6 +47,8 @@
 #include <wx/dynarray.h>
 #include <wx/imaglist.h>
 
+#include <vlc_meta.h>
+
 #define HELP_SHUFFLE N_( "Shuffle" )
 #define HELP_LOOP N_( "Repeat All" )
 #define HELP_REPEAT N_( "Repeat One" )
@@ -493,7 +495,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     wxString duration = wxU( "" );
     char *psz_author = vlc_input_item_GetInfo( &p_item->input,
                                                      _("Meta-information"),
-                                                     _("Artist"));
+                                                     VLC_META_ARTIST );
     if( !psz_author )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
