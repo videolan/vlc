@@ -107,9 +107,7 @@ void FileInfo::Update()
                                                  FIND_ANYWHERE );
     if( !p_playlist ) return;
 
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( p_playlist, VLC_OBJECT_INPUT,
-                                           FIND_CHILD );
+    input_thread_t *p_input = p_playlist->p_input ;
 
     if( !p_input || p_input->b_dead || !p_input->input.p_item->psz_name )
     {

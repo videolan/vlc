@@ -15,7 +15,6 @@ dist_pkgdata_DATA = \
 nobase_dist_pkgdata_DATA = \
 	$(DIST_skins2) \
 	$(DIST_http) \
-	$(DIST_http_old) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
 	$(NULL)
@@ -120,24 +119,22 @@ DIST_http = \
 	http/images/help.png \
 	http/images/playlist_small.png \
 	http/mosaic.html \
-	$(NULL)
-
-DIST_http_old = \
-	http-old/index.html \
-	http-old/info.html \
-	http-old/.hosts \
-	http-old/admin/index.html \
-	http-old/admin/browse.html \
-	http-old/admin/dboxfiles.html \
-	http-old/admin/.access \
-	http-old/vlm/edit.html \
-	http-old/vlm/index.html \
-	http-old/vlm/new.html \
-	http-old/style.css \
-	http-old/webcam.html \
-	http-old/favicon.ico \
-	http-old/cone_minus.png \
-	http-old/cone_plus.png \
+	http/old/index.html \
+	http/old/.hosts \
+	http/old/info.html \
+	http/old/webcam.html \
+	http/old/style.css \
+	http/old/cone_plus.png \
+	http/old/cone_minus.png \
+	http/old/favicon.ico \
+	http/old/admin/browse.html \
+	http/old/admin/dboxfiles.html \
+	http/old/admin/index.html \
+	http/old/admin/.access \
+	http/old/vlm/edit.html \
+	http/old/vlm/index.html \
+	http/old/vlm/new.html \
+	http/old/vlm/show.html \
 	$(NULL)
 
 DIST_osdmenu_default = \

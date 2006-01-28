@@ -878,6 +878,9 @@ package-win32-base:
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/requests"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/js"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/dialogs"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old/vlm"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old/admin"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
@@ -890,6 +893,16 @@ package-win32-base:
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/requests/*.xml ;
+
+	cp $(srcdir)/share/http/old/*.html $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/*.html ;
+	cp $(srcdir)/share/http/old/*.ico $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/*.css $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/*.png $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/vlm/*.html $(top_builddir)/vlc-${VERSION}/http/old/vlm/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/vlm/*.html ;
+	cp $(srcdir)/share/http/old/admin/*.html $(top_builddir)/vlc-${VERSION}/http/old/admin/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/admin/*.html ;
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
@@ -985,6 +998,9 @@ package-wince-base:
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/requests"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/js"
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/dialogs"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old/vlm"
+	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old/admin"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
@@ -997,6 +1013,16 @@ package-wince-base:
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/requests/*.xml ;
+
+	cp $(srcdir)/share/http/old/*.html $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/*.html ;
+	cp $(srcdir)/share/http/old/*.ico $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/*.css $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/*.png $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/vlm/*.html $(top_builddir)/vlc-${VERSION}/http/old/vlm/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/vlm/*.html ;
+	cp $(srcdir)/share/http/old/admin/*.html $(top_builddir)/vlc-${VERSION}/http/old/admin/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/admin/*.html ;
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
