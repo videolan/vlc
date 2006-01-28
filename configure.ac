@@ -2047,7 +2047,7 @@ then
   then
     VLC_ADD_PLUGINS([vcd cdda])
     VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-framework IOKit -framework CoreFoundation])
-    VLC_ADD_LDFLAGS([vcdx cddax],[-liconv])
+    VLC_ADD_LDFLAGS([vcdx cddax cdda],[-liconv])
   fi
 
   if test "$enable_libcddb" != "no"; then
