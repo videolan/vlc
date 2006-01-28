@@ -609,6 +609,7 @@ static int intf_Send( interaction_t *p_interact,
 {
     int i;
     vlc_bool_t b_found = VLC_FALSE;
+    if( p_interact == NULL ) return VLC_ENOOBJ;
     vlc_mutex_lock( &p_interact->object_lock );
 
     for( i = 0 ; i< p_interact->i_dialogs; i++ )
