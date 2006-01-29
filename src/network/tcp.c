@@ -327,7 +327,6 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 #endif
         }
 
-        msg_Dbg( p_this, "using socket %d from rootwrap", fd );
         /* Listen */
         if( listen( fd, 100 ) == -1 )
         {
