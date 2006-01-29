@@ -4,7 +4,7 @@
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
- * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,22 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance,
     }
     playlist_Play( p_instance->p_playlist );
 }
+
+void libvlc_playlist_stop( libvlc_instance_t *p_instance,
+                           libvlc_exception_t *p_exception )
+{
+    if( playlist_Stop( p_instance->p_playlist ) != VLC_SUCCESS )
+    {
+        libvlc_exception_raise( p_exception, "Empty playlist" );
+    }
+}
+
+void libvlc_playlist_clear( libvlc_instance_t *p_instance,
+                           libvlc_exception_t *p_exception )
+{
+    playlist_Clear( p_instance->p_playlist );
+}
+
 
 libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
                                             libvlc_exception_t *p_exception )

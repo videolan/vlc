@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2005 the VideoLAN team
  * $Id: vlc.h 13701 2005-12-12 17:58:56Z zorglub $
  *
- * Authors: Clï¿½ent Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,6 +129,38 @@ void libvlc_destroy( libvlc_instance_t *);
  */
 void libvlc_playlist_play( libvlc_instance_t*, int, char **,
                            libvlc_exception_t * );
+
+/**
+ * Stop playing
+ * \param p_instance the instance to stop
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_stop( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Remove all playlist ites
+ * \param p_instance the instance
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_clear( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Go to next playlist item
+ * \param p_instance the instance
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_next( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Go to Previous playlist item
+ * \param p_instance the instance
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_prev( libvlc_instance_t *, libvlc_exception_t * );
+
+
+
+
 
 typedef struct libvlc_input_t libvlc_input_t;
 

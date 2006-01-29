@@ -54,7 +54,8 @@ inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
 {
     if( p_exception == NULL ) return;
     p_exception->b_raised = 1;
-    p_exception->psz_message = strdup( psz_message );
+    if( psz_message )
+        p_exception->psz_message = strdup( psz_message );
 }
 
 
