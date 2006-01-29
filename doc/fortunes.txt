@@ -620,3 +620,8 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+-!- tumu [n=tumu@GYKMDCCCXXIX.dsl.saunalahti.fi] has quit ["~"]
+* Dnumgis notes that tumu must be one of very few with dsl in their sauna
+
+  -- #videolan
+%
