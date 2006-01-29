@@ -1,6 +1,6 @@
 NULL =
 
-EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts)
+EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts) $(DIST_skins2_default) $(DIST_skins2_playtree)
 
 pkgdatadir = $(datadir)/vlc
 
@@ -62,6 +62,7 @@ DIST_icons128 = \
 
 DIST_skins2 = \
 	skins2/default.vlt \
+	skins2/playtree.vlt \
 	\
 	skins2/fonts/FreeSans.ttf \
 	skins2/fonts/FreeSansBold.ttf \
@@ -69,6 +70,165 @@ DIST_skins2 = \
 	skins2/skin.catalog \
 	skins2/winamp2.xml \
 	$(NULL)
+
+DIST_skins2_default = \
+	skins2/default/add_item_onclick.png \
+	skins2/default/add_item.png \
+	skins2/default/body.png \
+	skins2/default/close_mouseover.png \
+	skins2/default/close_onclick.png \
+	skins2/default/close.png \
+	skins2/default/delete_item_onclick.png \
+	skins2/default/delete_item.png \
+	skins2/default/disabled.png \
+	skins2/default/fast_disabled.png \
+	skins2/default/fast_onclick.png \
+	skins2/default/fast.png \
+	skins2/default/FreeSansBold.ttf \
+	skins2/default/next_disabled.png \
+	skins2/default/next_onclick.png \
+	skins2/default/next.png \
+	skins2/default/pause_onclick.png \
+	skins2/default/pause.png \
+	skins2/default/playlist_body1.png \
+	skins2/default/playlist_body2.png \
+	skins2/default/playlist_body3.png \
+	skins2/default/playlist_body4.png \
+	skins2/default/playlist_body6.png \
+	skins2/default/playlist_body7.png \
+	skins2/default/playlist_body8.png \
+	skins2/default/playlist_body9.png \
+	skins2/default/playlist_button2.png \
+	skins2/default/playlist_button_onclick2.png \
+	skins2/default/playlist_button_onclick.png \
+	skins2/default/playlist_button.png \
+	skins2/default/playlist.png \
+	skins2/default/play_onclick.png \
+	skins2/default/play.png \
+	skins2/default/preferences_onclick.png \
+	skins2/default/preferences.png \
+	skins2/default/previous_disabled.png \
+	skins2/default/previous_onclick.png \
+	skins2/default/previous.png \
+	skins2/default/reduce_disabled.png \
+	skins2/default/reduce_mouseover.png \
+	skins2/default/reduce_onclick.png \
+	skins2/default/reduce.png \
+	skins2/default/resize.png \
+	skins2/default/rev_disabled.png \
+	skins2/default/rev_onclick.png \
+	skins2/default/rev.png \
+	skins2/default/slider2.png \
+	skins2/default/slider_onclick.png \
+	skins2/default/slider_playlist.png \
+	skins2/default/slider.png \
+	skins2/default/slider_volume_onclick.png \
+	skins2/default/slider_volume.png \
+	skins2/default/slow_disabled.png \
+	skins2/default/slow_onclick.png \
+	skins2/default/slow.png \
+	skins2/default/sort_onclick.png \
+	skins2/default/sort.png \
+	skins2/default/stop_disabled.png \
+	skins2/default/stop_onclick.png \
+	skins2/default/stop.png \
+	skins2/default/.svn \
+	skins2/default/theme.xml \
+	skins2/default/volume.png \
+	skins2/default/vout2.png \
+	skins2/default/vout_body1.png \
+	skins2/default/vout_body.png \
+	skins2/default/vout_bottom_left.png \
+	skins2/default/vout_bottom.png \
+	skins2/default/vout_bottom_right.png \
+	skins2/default/vout_left.png \
+	skins2/default/vout_onclick.png \
+	skins2/default/vout.png \
+	skins2/default/vout_right.png \
+	skins2/default/vout_top_left.png \
+	skins2/default/vout_top.png \
+	skins2/default/vout_top_right.png
+
+DIST_skins2_playtree = \
+        skins2/playtree/add_item_onclick.png \
+        skins2/playtree/add_item.png \
+        skins2/playtree/body.png \
+        skins2/playtree/closed.png \
+        skins2/playtree/close_mouseover.png \
+        skins2/playtree/close_onclick.png \
+        skins2/playtree/close.png \
+        skins2/playtree/delete_item_onclick.png \
+        skins2/playtree/delete_item.png \
+        skins2/playtree/disabled.png \
+        skins2/playtree/fast_disabled.png \
+        skins2/playtree/fast_onclick.png \
+        skins2/playtree/fast.png \
+        skins2/playtree/FreeSansBold.ttf \
+        skins2/playtree/item.png \
+        skins2/playtree/next_disabled.png \
+        skins2/playtree/next_onclick.png \
+        skins2/playtree/next.png \
+        skins2/playtree/open.png \
+        skins2/playtree/pause_onclick.png \
+        skins2/playtree/pause.png \
+        skins2/playtree/playlist_body1.png \
+        skins2/playtree/playlist_body2.png \
+        skins2/playtree/playlist_body3.png \
+        skins2/playtree/playlist_body4.png \
+        skins2/playtree/playlist_body6.png \
+        skins2/playtree/playlist_body7.png \
+        skins2/playtree/playlist_body8.png \
+        skins2/playtree/playlist_body9.png \
+        skins2/playtree/playlist_button2.png \
+        skins2/playtree/playlist_button_onclick2.png \
+        skins2/playtree/playlist_button_onclick.png \
+        skins2/playtree/playlist_button.png \
+        skins2/playtree/playlist.png \
+        skins2/playtree/play_onclick.png \
+        skins2/playtree/play.png \
+        skins2/playtree/preferences_onclick.png \
+        skins2/playtree/preferences.png \
+        skins2/playtree/previous_disabled.png \
+        skins2/playtree/previous_onclick.png \
+        skins2/playtree/previous.png \
+        skins2/playtree/reduce_disabled.png \
+        skins2/playtree/reduce_mouseover.png \
+        skins2/playtree/reduce_onclick.png \
+        skins2/playtree/reduce.png \
+        skins2/playtree/resize.png \
+        skins2/playtree/rev_disabled.png \
+        skins2/playtree/rev_onclick.png \
+        skins2/playtree/rev.png \
+        skins2/playtree/slider2.png \
+        skins2/playtree/slider_onclick.png \
+        skins2/playtree/slider_playlist.png \
+        skins2/playtree/slider.png \
+        skins2/playtree/slider_volume_onclick.png \
+        skins2/playtree/slider_volume.png \
+        skins2/playtree/slow_disabled.png \
+        skins2/playtree/slow_onclick.png \
+        skins2/playtree/slow.png \
+        skins2/playtree/sort_onclick.png \
+        skins2/playtree/sort.png \
+        skins2/playtree/stop_disabled.png \
+        skins2/playtree/stop_onclick.png \
+        skins2/playtree/stop.png \
+        skins2/playtree/.svn \
+        skins2/playtree/theme.xml \
+        skins2/playtree/volume.png \
+        skins2/playtree/vout2.png \
+        skins2/playtree/vout_body1.png \
+        skins2/playtree/vout_body.png \
+        skins2/playtree/vout_bottom_left.png \
+        skins2/playtree/vout_bottom.png \
+        skins2/playtree/vout_bottom_right.png \
+        skins2/playtree/vout_left.png \
+        skins2/playtree/vout_onclick.png \
+        skins2/playtree/vout.png \
+        skins2/playtree/vout_right.png \
+        skins2/playtree/vout_top_left.png \
+        skins2/playtree/vout_top.png \
+        skins2/playtree/vout_top_right.png
 
 DIST_http = \
 	http/js/functions.js \
@@ -201,3 +361,7 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/unselect/barroff.png \
 	$(NULL)
 
+skins2/playtree.vlt: $(DIST_skins2_playtree:%=$(srcdir)/%)
+	cd $(srcdir)/share/skins2 && tar cfz $(distdir)/share/skins2/playtree.vlt $(distdire)/share/skins2/playtree/*png $(distdir)/share/skins2/playtree/*xml playtree/*ttf
+skins2/default.vlt: $(DIST_skins2_default:%=$(srcdir)/%)
+	cd $(srcdir)/share/skins2 && tar cfz $(distdir)/share/skins2/default.vlt $(distdir)/share/skins2/default/*png $(distdire)/share/skins2/default/*xml default/*ttf
