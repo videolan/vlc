@@ -362,6 +362,6 @@ DIST_osdmenu_dvd = \
 	$(NULL)
 
 skins2/playtree.vlt: $(DIST_skins2_playtree:%=$(srcdir)/%)
-	cd $(srcdir)/share/skins2 && tar cfz $(distdir)/share/skins2/playtree.vlt $(distdire)/share/skins2/playtree/*png $(distdir)/share/skins2/playtree/*xml playtree/*ttf
+	 start=$$PWD && cd $$start/$(srcdir)/skins2 && tar cfz $$start/$(top_builddir)/share/skins2/playtree.vlt playtree/*png playtree/*xml playtree/*ttf
 skins2/default.vlt: $(DIST_skins2_default:%=$(srcdir)/%)
-	cd $(srcdir)/share/skins2 && tar cfz $(distdir)/share/skins2/default.vlt $(distdir)/share/skins2/default/*png $(distdire)/share/skins2/default/*xml default/*ttf
+	 start=$$PWD && cd $$start/$(srcdir)/skins2 && tar cfz $$start/$(top_builddir)/share/skins2/default.vlt default/*png default/*xml default/*ttf
