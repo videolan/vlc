@@ -562,9 +562,10 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
         GetCDDBInfo( p_access, p_sys->i_titles, p_sys->p_sectors );
         if( p_sys->p_disc )
         {
-            if( p_sys->p_disc->title )
+            if( cddb_disc_get_title( p_sys->p_disc ) )
             {
-                asprintf( &psz_name, "%s", p_sys->p_disc->title );
+                asprintf( &psz_name, "%s", cddb_disc_get_title( p_sys->p_disc )
+                         );
                 vlc_mutex_lock( &p_playlist->object_lock );
                 playlist_ItemSetName( p_parent, psz_name );
                 vlc_mutex_unlock( &p_playlist->object_lock );
@@ -620,14 +621,16 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
                 cddb_track_t *t = cddb_disc_get_track( p_sys->p_disc, i );
                 if( t!= NULL )
                 {
-                    if( t->title != NULL )
+                    if( cddb_track_get_title( t )  != NULL )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
                                             _("Meta-information"),
-                                            VLC_META_TITLE, t->title );
+                                            VLC_META_TITLE,
+                                            cddb_track_get_title( t ) );
                         if( p_item->input.psz_name )
                             free( p_item->input.psz_name );
-                        asprintf( &p_item->input.psz_name, "%s", t->title );
+                        asprintf( &p_item->input.psz_name, "%s",
+                                  cddb_track_get_title( t ) );
                     }
                     psz_result = cddb_track_get_artist( t );
                     if( psz_result )
