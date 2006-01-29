@@ -1282,9 +1282,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
             psz_local[len] = (char)stupid[len];
         while (len--);
 
-        fprintf (stderr, "local = \"%s\"\n", psz_local);
         char *psz_utf8 = FromLocale( psz_local );
-        fprintf (stderr, "utf8 = \"%s\"\n", psz_utf8);
 #else
         char *psz_utf8 = wxFromLocale( filenames[i] );
 #endif
