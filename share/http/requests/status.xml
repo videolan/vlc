@@ -83,6 +83,9 @@
   <vlc id="if" param1="command value 'volume' strcmp 0 =" />
     <vlc id="rpn" param1="val value vlc_volume_set" />
   <vlc id="end"/>
+  <vlc id="if" param1="command value 'seek' strcmp 0 =" />
+    <vlc id="rpn" param1="val value vlc_seek" />
+  <vlc id="end"/>
 
 <vlc id="end" />
 <root>

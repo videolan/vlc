@@ -36,52 +36,52 @@ sout and playlist .
     </button>
   </div>
   <div class="controls">
-    <button id="btn_open" onclick="toggle_show('input');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_open" onclick="toggle_show('input');" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Open" >
       <img src="images/eject.png" alt="Open" />
       <span class="btn_text">Open</span>
     </button>
     &nbsp;
-    <button id="btn_stop" onclick="pl_stop();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_stop" onclick="pl_stop();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Stop" >
       <img src="images/stop.png" alt="Stop" />
       <span class="btn_text">Stop</span>
     </button>
-    <!--<button id="btn_play" onclick="alert('FIXME');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <!--<button id="btn_play" onclick="alert('FIXME');" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Play" >
       <img src="images/play.png" alt="Play" />
       <span class="btn_text">Play</span>
     </button>-->
-    <button id="btn_pause" onclick="pl_pause();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_pause" onclick="pl_pause();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Pause" >
       <img src="images/pause.png" alt="Pause" id="btn_pause_img" />
       <span class="btn_text">Pause</span>
     </button>
     &nbsp;
-    <button id="btn_previous" onclick="pl_previous();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_previous" onclick="pl_previous();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Previous" >
       <img src="images/prev.png" alt="Previous" />
       <span class="btn_text">Previous</span>
     </button>
-    <button id="btn_next" onclick="pl_next();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_next" onclick="pl_next();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Next" >
       <img src="images/next.png" alt="Next" />
       <span class="btn_text">Next</span>
     </button>
     &nbsp;
-    <button id="btn_sout" onclick="toggle_show('sout');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_sout" onclick="toggle_show('sout');" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Stream Output" >
       <img src="images/sout.png" alt="Stream Output" />
       <span class="btn_text">Stream Output</span>
     </button>
-    <button id="btn_playlist" onclick="toggle_show('playlist');" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_playlist" onclick="toggle_show('playlist');" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Playlist" >
       <img src="images/playlist.png" alt="Playlist" />
       <span class="btn_text">Playlist</span>
     </button>
     &nbsp;
-    <button id="btn_fullscreen" onclick="fullscreen();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_fullscreen" onclick="fullscreen();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Fullscreen" >
       <img src="images/fullscreen.png" alt="Fullscreen" />
       <span class="btn_text">Fullscreen</span>
     </button>
     &nbsp;
-    <button id="btn_volume_down" onclick="volume_down();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_volume_down" onclick="volume_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease Volume" >
       <img src="images/volume_down.png" alt="Decrease Volume" />
       <span class="btn_text">Decrease Volume</span>
     </button>
-    <button id="btn_volume_up" onclick="volume_up();" onmouseover="button_over(this);" onmouseout="button_out(this);">
+    <button id="btn_volume_up" onclick="volume_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase Volume" >
       <img src="images/volume_up.png" alt="Increase Volume" />
       <span class="btn_text">Increase Volume</span>
     </button>
@@ -92,6 +92,9 @@ sout and playlist .
     Time : <span id="time">(?)</span>/<span id="length">(?)</span>
     -
     Volume : <span id="volume">(?)</span>
+    <br/>
+    <!-- progress bar -->
+    <img src="images/slider_left.png" alt="slider left" /><span id="progressbar" style="background-image: url( 'images/slider_bar.png' ); width: 408px; height:16px; position:absolute;" onclick="slider_seek( event, this );" onmousemove="slider_move( event, this );"><img src="images/slider_point.png" alt="slider point" style="position:relative; left:0px;" id="main_slider_point" onmousedown="slider_down( event, this );" onmouseup="slider_up( event, this.parentNode );" onmouseout="slider_up( event, this.parentNode );"/></span><img src="images/slider_right.png" alt="slider right" style="position:relative;left:408px;" />
     <br/>
     <span id="nowplaying">(?)</span>
   </div>

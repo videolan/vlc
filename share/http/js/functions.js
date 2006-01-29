@@ -26,6 +26,54 @@
 var old_time = 0;
 
 /**********************************************************************
+ * Slider functions
+ *********************************************************************/
+ 
+var slider_mouse_down = 0;
+var slider_dx = 0;
+
+/* findPosX() from http://www.quirksmode.rg/js/indpos.html */
+function findPosX(obj)
+{
+    var curleft = 0;
+    if (obj.offsetParent)
+    {
+        while (obj.offsetParent)
+        {
+            curleft += obj.offsetLeft
+            obj = obj.offsetParent;
+        }
+    }
+    else if (obj.x)
+        curleft += obj.x;
+    return curleft;
+}
+
+function slider_seek( e, bar )
+{
+    seek(Math.floor(( e.clientX + document.body.scrollLeft - findPosX( bar )) / 4)+"%25");
+}
+function slider_down( e, point )
+{
+    slider_mouse_down = 1;
+    slider_dx = e.clientX - findPosX( point );
+}
+function slider_up( e, bar )
+{
+    slider_mouse_down = 0;
+    /* slider_seek( e, bar ); */
+}
+function slider_move( e, bar )
+{
+    if( slider_mouse_down == 1 )
+    {
+        var slider_position  = Math.floor( e.clientX - slider_dx + document.body.scrollLeft - findPosX( bar ));
+        document.getElementById( 'main_slider_point' ).style.left = slider_position+"px";
+        slider_seek( e, bar );
+    }
+}
+
+/**********************************************************************
  * Misc utils
  *********************************************************************/
 
@@ -277,6 +325,10 @@ function volume_up()
 {
     loadXMLDoc( 'requests/status.xml?command=volume&val=%2B20', parse_status );
 }
+function seek( pos )
+{
+    loadXMLDoc( 'requests/status.xml?command=seek&val='+pos, parse_status );
+}
 function fullscreen()
 {
     loadXMLDoc( 'requests/status.xml?command=fullscreen', parse_status );
@@ -302,21 +354,41 @@ function parse_status()
         {
             var status = req.responseXML.documentElement;
             var new_time = status.getElementsByTagName( 'time' )[0].firstChild.data;
+            var length = status.getElementsByTagName( 'length' )[0].firstChild.data;
+            var slider_position;
+            if( length < 100 )
+            {
+                slider_position = ( status.getElementsByTagName( 'position' )[0]
+                           .firstChild.data * 4 ) + "px";
+            }
+            else
+            {
+                /* this is more precise if length > 100 */
+                slider_position = Math.floor( ( new_time * 400 ) / length ) + "px";
+            }
             if( old_time > new_time )
                 setTimeout('update_playlist()',50);
             old_time = new_time;
             set_text( 'time', format_time( new_time ) );
-            set_text( 'length', format_time( status.getElementsByTagName( 'length' )[0].firstChild.data ) );
+            set_text( 'length', format_time( length ) );
             if( status.getElementsByTagName( 'volume' ).length != 0 )
                 set_text( 'volume', Math.floor(status.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+'%' );
             set_text( 'state', status.getElementsByTagName( 'state' )[0].firstChild.data );
+            if( slider_mouse_down == 0 )
+            {
+                document.getElementById( 'main_slider_point' ).style.left = slider_position;
+            }
             if( status.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
             {
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/pause.png' );
+                document.getElementById( 'btn_pause_img' ).setAttribute( 'alt', 'Pause' );
+                document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Pause' );
             }
             else
             {
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/play.png' );
+                document.getElementById( 'btn_pause_img' ).setAttribute( 'alt', 'Play' );
+                document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Play' );
             }
         }
         else
