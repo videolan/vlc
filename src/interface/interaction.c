@@ -75,7 +75,7 @@ int  __intf_Interact( vlc_object_t *p_this, interaction_dialog_t *
 
     if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
     {
-       return;
+       return VLC_EGENERIC;
     }
 
     p_dialog->p_interaction = p_interaction;

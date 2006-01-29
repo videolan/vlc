@@ -27,7 +27,7 @@
 #include <stdio.h>                                               /* required */
 
 #include <vlc/vlc.h>
-#include <vlc_input.h>
+#include <vlc/input.h>
 
 /*****************************************************************************
  * Local prototypes
