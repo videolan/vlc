@@ -274,7 +274,7 @@ static void Run( intf_thread_t *p_intf )
             cl->fd = fd;
             cl->buffer_write = NULL;
             cl->p_buffer_write = cl->buffer_write;
-            Write_message( cl, NULL, "Password:\xff\xfb\x01", WRITE_MODE_PWD );
+            Write_message( cl, NULL, "Password: \xff\xfb\x01", WRITE_MODE_PWD );
 
             TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
         }
@@ -417,7 +417,8 @@ static void Run( intf_thread_t *p_intf )
                 else
                 {
                     /* wrong password */
-                    Write_message( cl, NULL, "\r\nWrong password. ",
+                    Write_message( cl, NULL,
+                                   "\r\nWrong password.\r\nPassword: ",
                                    WRITE_MODE_PWD );
                 }
             }
