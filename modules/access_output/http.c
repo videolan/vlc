@@ -304,6 +304,7 @@ static int Open( vlc_object_t *p_this )
         if( p_playlist == NULL )
         {
             msg_Err( p_access, "unable to find playlist" );
+            httpd_StreamDelete( p_sys->p_httpd_stream );
             httpd_HostDelete( p_sys->p_httpd_host );
             free( (void *)p_sys );
             return VLC_EGENERIC;
@@ -324,6 +325,7 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->p_bonjour == NULL )
         {
             vlc_object_release( p_playlist );
+            httpd_StreamDelete( p_sys->p_httpd_stream );
             httpd_HostDelete( p_sys->p_httpd_host );
             free( (void *)p_sys );
             return VLC_EGENERIC;
