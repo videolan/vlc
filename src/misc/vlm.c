@@ -1664,8 +1664,8 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
             if( !p_instance->p_input ) val.i_int = END_S;
             else var_Get( p_instance->p_input, "state", &val );
 
-            msg_instance = vlm_MessageNew( p_instance->psz_name ?
-                                p_instance->psz_name : "default", NULL );
+            msg_instance = vlm_MessageNew( "instance" , NULL );
+            vlm_MessageAdd( msg_instance, vlm_MessageNew( "name" , p_instance->psz_name ? p_instance->psz_name : "default" ) );
             vlm_MessageAdd( msg_instance, vlm_MessageNew( "state",
                                 val.i_int == PLAYING_S ? "playing" :
                                 val.i_int == PAUSE_S ? "paused" :

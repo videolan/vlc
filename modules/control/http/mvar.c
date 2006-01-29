@@ -644,6 +644,43 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
     return s;
 }
 
+void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, vlc_bool_t b_name );
+void E_(mvar_VlmSetNewLoop)( char *name, vlm_t *vlm, mvar_t *s, vlm_message_t *el, vlc_bool_t b_name )
+{
+    /* Over name */
+    mvar_t        *set;
+    int k;
+
+    /* Add a node with name and info */
+    set = E_(mvar_New)( name, "set" );
+    if( b_name == VLC_TRUE )
+    {
+        E_(mvar_AppendNewVar)( set, "name", el->psz_name );
+    }
+
+    for( k = 0; k < el->i_child; k++ )
+    {
+        vlm_message_t *ch = el->child[k];
+        if( ch->i_child > 0 )
+        {
+            E_(mvar_VlmSetNewLoop)( ch->psz_name, vlm, set, ch, VLC_FALSE );
+        }
+        else
+        {
+            if( ch->psz_value )
+            {
+                E_(mvar_AppendNewVar)( set, ch->psz_name, ch->psz_value );
+            }
+            else
+            {
+                E_(mvar_AppendNewVar)( set, el->psz_name, ch->psz_name );
+            }
+        }
+    }
+
+    E_(mvar_AppendVar)( s, set );
+}
+
 mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm )
 {
     mvar_t        *s = E_(mvar_New)( name, "set" );
@@ -668,49 +705,16 @@ mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm )
             /* Over name */
             vlm_message_t *el = ch->child[j];
             vlm_message_t *inf, *desc;
-            mvar_t        *set;
             char          psz[500];
-            int k;
 
             sprintf( psz, "show %s", el->psz_name );
             if( vlm_ExecuteCommand( vlm, psz, &inf ) )
                 continue;
             desc = inf->child[0];
 
-            /* Add a node with name and info */
-            set = E_(mvar_New)( name, "set" );
-            E_(mvar_AppendNewVar)( set, "name", el->psz_name );
+            E_(mvar_VlmSetNewLoop)( el->psz_name, vlm, s, desc, VLC_TRUE );
 
-            for( k = 0; k < desc->i_child; k++ )
-            {
-                vlm_message_t *ch = desc->child[k];
-                if( ch->i_child > 0 )
-                {
-                    int c;
-                    mvar_t *n = E_(mvar_New)( ch->psz_name, "set" );
-
-                    for( c = 0; c < ch->i_child; c++ )
-                    {
-                        if( ch->child[c]->psz_value )
-                        {
-                            E_(mvar_AppendNewVar)( n, ch->child[c]->psz_name, ch->child[c]->psz_value );
-                        }
-                        else
-                        {
-                            mvar_t *in = E_(mvar_New)( ch->psz_name, ch->child[c]->psz_name );
-                            E_(mvar_AppendVar)( n, in );
-                        }
-                    }
-                    E_(mvar_AppendVar)( set, n );
-                }
-                else
-                {
-                    E_(mvar_AppendNewVar)( set, ch->psz_name, ch->psz_value );
-                }
-            }
             vlm_MessageDelete( inf );
-
-            E_(mvar_AppendVar)( s, set );
         }
     }
     vlm_MessageDelete( msg );
