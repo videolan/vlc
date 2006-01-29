@@ -41,7 +41,7 @@
       </options>
       <instances>
         <vlc id="foreach" param1="inst" param2="el.instances" />
-          <instance><vlc id="value" param1="inst"/></instance>
+          <instance name="<vlc id="value" param1="inst.name"/>" state="<vlc id="value" param1="inst.state"/>" position="<vlc id="value" param1="inst.position"/>" time="<vlc id="value" param1="inst.time"/>" length="<vlc id="value" param1="inst.length"/>" rate="<vlc id="value" param1="inst.rate"/>" title="<vlc id="value" param1="inst.title"/>" chapter="<vlc id="value" param1="inst.chapter"/>" seekable="<vlc id="value" param1="inst.seekable"/>" playlistindex="<vlc id="value" param1="inst.playlistindex"/>" />
         <vlc id="end" />
       </instances>
     </broadcast>
@@ -61,7 +61,7 @@
         </options>
       <instances>
         <vlc id="foreach" param1="inst" param2="el.instances" />
-          <instance><vlc id="value" param1="inst"/></instance>
+          <instance name="<vlc id="value" param1="inst.name"/>" state="<vlc id="value" param1="inst.state"/>" position="<vlc id="value" param1="inst.position"/>" time="<vlc id="value" param1="inst.time"/>" length="<vlc id="value" param1="inst.length"/>" rate="<vlc id="value" param1="inst.rate"/>" title="<vlc id="value" param1="inst.title"/>" chapter="<vlc id="value" param1="inst.chapter"/>" seekable="<vlc id="value" param1="inst.seekable"/>" playlistindex="<vlc id="value" param1="inst.playlistindex"/>" />
         <vlc id="end" />
       </instances>
       </vod>

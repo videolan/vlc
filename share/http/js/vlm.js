@@ -400,18 +400,11 @@ function parse_vlm_elements()
                     nb.appendChild( create_button( 'Delete', 'vlm_delete("'+elt.getAttribute( 'name' ) + '");' ) );
 
                     var list = document.createElement( "ul" );
-                    /* begin input list */
-                    var inputs = elt.getElementsByTagName( 'input' );
-                    for( i = 0; i < inputs.length; i++ )
-                    {
-                        var item = document.createElement( "li" );
-                        item.appendChild( document.createTextNode( "Input: " + inputs[i].firstChild.data + " " ) );
-                        item.appendChild( create_button( "Delete", 'vlm_delete_input("' + elt.getAttribute( 'name' ) + '", '+(i+1)+' );' ) );
-                        list.appendChild( item );
-                    }
 
-                    /* Add input */
+                    /* begin input list */
                     var item = document.createElement( "li" );
+                    list.appendChild( item );
+                    item.appendChild( document.createTextNode( "Inputs: " ) );
                     var text = document.createElement( "input" );
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'size', '40' );
@@ -422,7 +415,20 @@ function parse_vlm_elements()
                     item.appendChild( document.createTextNode( ' ' ) );
                     item.appendChild( create_button( 'Add input', 'vlm_add_input("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_input").value );' ) );
                     
-                    list.appendChild( item );
+                    var inputs = elt.getElementsByTagName( 'input' );
+                    if( inputs.length > 0 )
+                    {
+                        var ilist = document.createElement( "ol" );
+                        ilist.setAttribute( 'start', '0' );
+                        item.appendChild( ilist );
+                        for( i = 0; i < inputs.length; i++ )
+                        {
+                            var item = document.createElement( "li" );
+                            item.appendChild( document.createTextNode( inputs[i].firstChild.data + " " ) );
+                            item.appendChild( create_button( "Delete", 'vlm_delete_input("' + elt.getAttribute( 'name' ) + '", '+(i+1)+' );' ) );
+                            ilist.appendChild( item );
+                        }
+                    }
                     /* end of input list */
                     
                     /* output */
@@ -452,17 +458,10 @@ function parse_vlm_elements()
                     /* end of output */
 
                     /* begin options list */
-                    var options = elt.getElementsByTagName( 'option' );
-                    for( i = 0; i < options.length; i++ )
-                    {
-                        var item = document.createElement( "li" );
-                        item.appendChild( document.createTextNode( "Option: " + options[i].firstChild.data ) );
-                        list.appendChild( item );
-                    }
-
-                    /* Add option */
                     var item = document.createElement( "li" );
-                    item.appendChild( document.createTextNode( ' ' ) );
+                    list.appendChild( item );
+                    item.appendChild( document.createTextNode( "Options: " ) );
+                    /* Add option */
                     var text = document.createElement( "input" );
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'size', '40' );
@@ -471,8 +470,47 @@ function parse_vlm_elements()
                     item.appendChild( document.createTextNode( ' ' ) );
                     item.appendChild( create_button( 'Add option', 'vlm_option("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_option").value );' ) );
                     
-                    list.appendChild( item );
+                    var options = elt.getElementsByTagName( 'option' );
+                    if( options.length > 0 )
+                    {
+                        var olist = document.createElement( "ul" );
+                        item.appendChild( olist );
+                        for( i = 0; i < options.length; i++ )
+                        {
+                            var item = document.createElement( "li" );
+                            item.appendChild( document.createTextNode( options[i].firstChild.data ) );
+                            olist.appendChild( item );
+                        }
+                    }
                     /* end of options */
+
+                    /* Instances list */
+                    var instances = elt.getElementsByTagName( 'instance' );
+                    if( instances.length > 0 )
+                    {
+                        var item = document.createElement("li");
+                        var ilist = document.createElement("ul");
+                        list.appendChild( item );
+                        item.appendChild(document.createTextNode("Instances:")); 
+                        item.appendChild( ilist );
+                        for( i = 0; i < instances.length; i++ )
+                        {
+                            var iname = instances[i].getAttribute( 'name' );
+                            var istate = instances[i].getAttribute( 'state' );
+                            var iposition = Number( instances[i].getAttribute( 'position' ) * 100);
+                            var itime = Math.floor( instances[i].getAttribute( 'time' ) / 1000000);
+                            var ilength = Math.floor( instances[i].getAttribute( 'length' ) / 1000000);
+                            var irate = instances[i].getAttribute( 'rate' );
+                            var ititle = instances[i].getAttribute( 'title' );
+                            var ichapter = instances[i].getAttribute( 'chapter' );
+                            var iseekable = instances[i].getAttribute( 'seekable' );
+                            
+                            var item = document.createElement( "li" );
+                            item.appendChild( document.createTextNode( iname + ": " + istate + " " + (iposition.toFixed(2)) + "%" + " " + format_time( itime ) + "/" + format_time( ilength ) ) );
+                            ilist.appendChild( item );
+                        }
+                    }
+                    /* end of instances list */
                     
                     nb.appendChild( list );
                     
