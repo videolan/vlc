@@ -185,6 +185,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Create a few object variables we'll need later on */
     var_Create( p_vout, "snapshot-path", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "snapshot-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "snapshot-preview", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -568,33 +569,41 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
     free( psz_filename );
 
-    /* Inject a subpicture with the snapshot */
-    memset( &fmt_out, 0, sizeof(fmt_out) );
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    p_pif = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
-    image_HandlerDelete( p_image );
-    if( !p_pif ) return VLC_EGENERIC;
-
-    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
-    if( p_subpic == NULL )
+    if( var_GetBool( p_vout, "snapshot-preview" ) )
     {
-         p_pif->pf_release( p_pif );
-         return VLC_EGENERIC;
+        /* Inject a subpicture with the snapshot */
+        memset( &fmt_out, 0, sizeof(fmt_out) );
+        fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+        p_pif = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
+        image_HandlerDelete( p_image );
+        if( !p_pif ) return VLC_EGENERIC;
+
+        p_subpic = spu_CreateSubpicture( p_vout->p_spu );
+        if( p_subpic == NULL )
+        {
+             p_pif->pf_release( p_pif );
+             return VLC_EGENERIC;
+        }
+
+        p_subpic->i_channel = 0;
+        p_subpic->i_start = mdate();
+        p_subpic->i_stop = mdate() + 4000000;
+        p_subpic->b_ephemer = VLC_TRUE;
+        p_subpic->b_fade = VLC_TRUE;
+        p_subpic->i_original_picture_width = p_vout->render.i_width * 4;
+        p_subpic->i_original_picture_height = p_vout->render.i_height * 4;
+
+        p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
+        vout_CopyPicture( p_image->p_parent, &p_subpic->p_region->picture,
+                          p_pif );
+        p_pif->pf_release( p_pif );
+
+        spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
     }
-
-    p_subpic->i_channel = 0;
-    p_subpic->i_start = mdate();
-    p_subpic->i_stop = mdate() + 4000000;
-    p_subpic->b_ephemer = VLC_TRUE;
-    p_subpic->b_fade = VLC_TRUE;
-    p_subpic->i_original_picture_width = p_vout->render.i_width * 4;
-    p_subpic->i_original_picture_height = p_vout->render.i_height * 4;
-
-    p_subpic->p_region = spu_CreateRegion( p_vout->p_spu, &fmt_out );
-    vout_CopyPicture( p_image->p_parent, &p_subpic->p_region->picture, p_pif );
-    p_pif->pf_release( p_pif );
-
-    spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
+    else
+    {
+        image_HandlerDelete( p_image );
+    }
 
     return VLC_SUCCESS;
 }

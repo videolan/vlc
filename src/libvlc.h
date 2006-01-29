@@ -297,6 +297,11 @@ static char *ppsz_align_descriptions[] =
     "Allows you to specify the image format in which the video snapshots will " \
     "be stored.")
 
+#define SNAP_PREVIEW_TEXT N_("Display video snapshot preview")
+#define SNAP_PREVIEW_LONGTEXT N_( \
+    "Enable / disable displaying the snapshot preview in the screen's to " \
+    " left corner.")
+
 #define CROP_TEXT N_("Video cropping")
 #define CROP_LONGTEXT N_( \
     "This will force the cropping of the source video. " \
@@ -1106,6 +1111,8 @@ vlc_module_begin();
     add_string( "snapshot-format", "png", NULL, SNAP_FORMAT_TEXT,
                    SNAP_FORMAT_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_snap_formats, NULL, 0 );
+    add_bool( "snapshot-preview", VLC_TRUE, NULL, SNAP_PREVIEW_TEXT,
+              SNAP_PREVIEW_LONGTEXT, VLC_FALSE );
 
     set_section( N_("Window properties" ), NULL );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
