@@ -318,7 +318,8 @@ static int Open( vlc_object_t *p_this )
         asprintf( &psz_txt, "path=%s", psz_file_name );
 
         p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
-                                                  "_vlc-http._tcp",
+                                    strcmp( p_access->psz_access, "https" )
+                                       ? "_vlc-http._tcp" : "_vlc-https._tcp",
                                                   psz_name, i_bind_port, psz_txt );
         free( (void *)psz_txt );
 
