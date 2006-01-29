@@ -40,6 +40,7 @@ ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
                               bool _b_modifiable ):
     wxPanel( _p_parent, -1 )
 {
+    int flags= wxTE_PROCESS_ENTER;
     /* Initializations */
     p_intf = _p_intf;
     p_parent = _p_parent;
@@ -49,26 +50,29 @@ ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
 
-    wxFlexGridSizer *sizer = new wxFlexGridSizer(2,3,20);
+    wxFlexGridSizer *sizer = new wxFlexGridSizer(2,8,20);
+    sizer->AddGrowableCol(1);
+
+    if( !b_modifiable )
+        flags |= wxTE_READONLY;
+
     /* URI Textbox */
     wxStaticText *uri_static =
            new wxStaticText( this, -1, wxU(_("URI")) );
-    sizer->Add( uri_static, 0 , wxALL , 5 );
+    sizer->Add( uri_static, 0 , wxALL , 0 );
 
     uri_text = new wxTextCtrl( this, -1,
-            wxU(""), wxDefaultPosition, wxSize( 300, -1 ),
-            wxTE_PROCESS_ENTER );
-    sizer->Add( uri_text, 1 ,  wxALL , 5 );
+            wxU(""), wxDefaultPosition, wxSize( 300, -1 ), flags );
+    sizer->Add( uri_text, 1 ,  wxALL|wxEXPAND , 0 );
 
     /* Name Textbox */
     wxStaticText *name_static =
            new wxStaticText(  this, -1, wxU(_("Name")) );
-    sizer->Add( name_static, 0 , wxALL , 5  );
+    sizer->Add( name_static, 0 , wxALL , 0  );
 
     name_text = new wxTextCtrl( this, -1,
-            wxU(""), wxDefaultPosition, wxSize( 300, -1 ),
-            wxTE_PROCESS_ENTER );
-    sizer->Add( name_text, 1 , wxALL , 5 );
+            wxU(""), wxDefaultPosition, wxSize( 300, -1 ), flags );
+    sizer->Add( name_text, 1 , wxALL|wxEXPAND , 0 );
 
     /* Treeview */
     info_tree = new wxTreeCtrl( this, -1, wxDefaultPosition,
@@ -78,7 +82,7 @@ ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
     info_root = info_tree->AddRoot( wxU( "" ) );
 
     sizer->Layout();
-    panel_sizer->Add( sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( sizer, 0, wxEXPAND | wxALL, 15 );
     panel_sizer->Add( info_tree, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
@@ -111,6 +115,16 @@ void ItemInfoPanel::Update( input_item_t *p_item )
 
         info_tree->Expand( cat );
     }
+}
+
+char* ItemInfoPanel::GetURI( )
+{
+    return  strdup( uri_text->GetLineText(0).mb_str() );
+}
+
+char* ItemInfoPanel::GetName( )
+{
+    return  strdup( name_text->GetLineText(0).mb_str() );
 }
 
 void ItemInfoPanel::Clear()

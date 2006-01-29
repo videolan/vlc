@@ -40,6 +40,10 @@ public:
     void Update( input_item_t *);
     void Clear();
 
+
+    char* GetURI();
+    char* GetName();
+
     void OnOk();
     void OnCancel();
 

@@ -25,7 +25,7 @@
 #define _WXVLC_ITEMINFO_H_
 
 #include "wxwidgets.hpp"
-
+#include "dialogs/infopanels.hpp"
 #include <wx/treectrl.h>
 
 namespace wxvlc
@@ -41,7 +41,6 @@ public:
     wxArrayString GetOptions();
 
 private:
-    wxPanel *InfoPanel( wxWindow* parent );
     wxPanel *GroupPanel( wxWindow* parent );
 
     /* Event handlers (these functions should _not_ be virtual) */
@@ -58,7 +57,7 @@ private:
 
     /* Controls for the iteminfo dialog box */
     wxPanel *info_subpanel;
-    wxPanel *info_panel;
+    ItemInfoPanel *info_panel;
 
     wxPanel *group_subpanel;
     wxPanel *group_panel;
