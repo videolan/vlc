@@ -1,7 +1,7 @@
 NULL =
 
-EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts) $(DIST_skins2_default) $(DIST_skins2_playtree)
-SUFFIXES = .tar.gz .png .ttf .xml
+EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts) \
+	$(skins2_default_vlt_FILES) $(skins2_playtree_vlt_FILES)
 
 pkgdatadir = $(datadir)/vlc
 
@@ -19,6 +19,11 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd) \
 	$(NULL)
+
+nobase_pkgdata_DATA = skins2/default.vlt skins2/playtree.vlt
+
+skins2/default.vlt: $(skins2_default_vlt_FILES)
+skins2/playtree.vlt: $(skins2_playtree_vlt_FILES)
 
 DIST_fonts = \
 	$(NULL)
@@ -69,7 +74,7 @@ DIST_skins2 = \
 	skins2/winamp2.xml \
 	$(NULL)
 
-DIST_skins2_default = \
+skins2_default_vlt_FILES = \
 	skins2/default/add_item_onclick.png \
 	skins2/default/add_item.png \
 	skins2/default/body.png \
@@ -130,7 +135,6 @@ DIST_skins2_default = \
 	skins2/default/stop_disabled.png \
 	skins2/default/stop_onclick.png \
 	skins2/default/stop.png \
-	skins2/default/.svn \
 	skins2/default/theme.xml \
 	skins2/default/volume.png \
 	skins2/default/vout2.png \
@@ -147,7 +151,7 @@ DIST_skins2_default = \
 	skins2/default/vout_top.png \
 	skins2/default/vout_top_right.png
 
-DIST_skins2_playtree = \
+skins2_playtree_vlt_FILES = \
         skins2/playtree/add_item_onclick.png \
         skins2/playtree/add_item.png \
         skins2/playtree/body.png \
@@ -211,7 +215,6 @@ DIST_skins2_playtree = \
         skins2/playtree/stop_disabled.png \
         skins2/playtree/stop_onclick.png \
         skins2/playtree/stop.png \
-        skins2/playtree/.svn \
         skins2/playtree/theme.xml \
         skins2/playtree/volume.png \
         skins2/playtree/vout2.png \
@@ -359,7 +362,7 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/unselect/barroff.png \
 	$(NULL)
 
-skins2/playtree.vlt: $(DIST_skins2_playtree:%=$(srcdir)/%)
-	 start=$$PWD && cd $$start/$(srcdir)/skins2 && tar cfz $$start/$(top_builddir)/share/skins2/playtree.vlt playtree/*png playtree/*xml playtree/*ttf
-skins2/default.vlt: $(DIST_skins2_default:%=$(srcdir)/%)
-	 start=$$PWD && cd $$start/$(srcdir)/skins2 && tar cfz $$start/$(top_builddir)/share/skins2/default.vlt default/*png default/*xml default/*ttf
+skins2/%.vlt:
+	mkdir -p skins2
+	tar cvvzf $@ --exclude .svn -C $(srcdir)/skins2 $*/
+
