@@ -25,6 +25,8 @@ nobase_pkgdata_DATA = skins2/default.vlt skins2/playtree.vlt
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 skins2/playtree.vlt: $(skins2_playtree_vlt_FILES)
 
+MOSTLYCLEANFILES = $(nobase_pkgdata_DATA)
+
 DIST_fonts = \
 	$(NULL)
 
