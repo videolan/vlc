@@ -162,4 +162,4 @@ EXPAT_VERSION=1.95.8
 EXPAT_URL=$(SF)/expat/expat-$(EXPAT_VERSION).tar.gz
 NASM_CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/nasm
 NASM_VERSION=0.98.40-20060130
-NASM_URL=$(VIDEOLAN)/testing/contrig/nasm-0.98.40-20060130.tar.bz2
+NASM_URL=$(VIDEOLAN)/testing/contrib/nasm-0.98.40-20060130.tar.bz2
