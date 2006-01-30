@@ -1,13 +1,14 @@
 /*****************************************************************************
  * libvlc.c: main libvlc source
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@videolan.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Rémi Denis-Courmont <rem # videolan : org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +42,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                                /* free() */
+#include <assert.h>
 
 #ifndef WIN32
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
@@ -2708,10 +2710,10 @@ char *FromLocale( const char *locale )
          * to non-const.
          */
         inb = strlen( locale );
-        outb = inb * 6 + 1;
-
         /* FIXME: I'm not sure about the value for the multiplication
          * (for western people, multiplication by 3 (Latin9) is sufficient) */
+        outb = inb * 6 + 1;
+
         optr = output = calloc( outb , 1);
 
         vlc_mutex_lock( &libvlc.from_locale_lock );
@@ -2720,14 +2722,19 @@ char *FromLocale( const char *locale )
         while( vlc_iconv( libvlc.from_locale, &iptr, &inb, &optr, &outb )
                                                                == (size_t)-1 )
         {
-            *optr = '?';
-            optr++;
+            *optr++ = '?';
+            outb--;
             iptr++;
+            inb--;
             vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &libvlc.from_locale_lock );
 
-        return realloc( output, strlen( output ) + 1 );
+        assert (inb == 0);
+        assert (*iptr == '\0');
+        assert (*optr == '\0');
+        assert (strlen( output ) == (size_t)(optr - output));
+        return realloc( output, optr - output + 1 );
     }
     return (char *)locale;
 }
@@ -2761,14 +2768,19 @@ char *ToLocale( const char *utf8 )
         while( vlc_iconv( libvlc.to_locale, &iptr, &inb, &optr, &outb )
                                                                == (size_t)-1 )
         {
-            *optr = '?'; /* should not happen, and yes, it sucks */
-            optr++;
+            *optr++ = '?'; /* should not happen, and yes, it sucks */
+            outb--;
             iptr++;
+            inb--;
             vlc_iconv( libvlc.to_locale, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &libvlc.to_locale_lock );
 
-        return realloc( output, strlen( output ) + 1 );
+        assert (inb == 0);
+        assert (*iptr == '\0');
+        assert (*optr == '\0');
+        assert (strlen( output ) == (size_t)(optr - output));
+        return realloc( output, optr - output + 1 );
     }
     return (char *)utf8;
 }
