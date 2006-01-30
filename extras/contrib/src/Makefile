@@ -1153,7 +1153,7 @@ endif
 endif
 
 ifeq ($(HOST),i686-apple-darwin8)
-.x264: .nasm x264
+.x264: x264 .nasm
 else
 .x264: x264
 endif
