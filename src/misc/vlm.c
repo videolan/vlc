@@ -125,7 +125,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
             if( vlm_ExecuteCommand( p_vlm, psz_buffer, &p_message ) ){
                 msg_Warn( p_this, "error while loading the vlm conf file" );
             }
-            free(p_message);
+            vlm_MessageDelete(p_message);
             free(psz_buffer);
         }
    }
@@ -2013,11 +2013,11 @@ static int Load( vlm_t *vlm, char *file )
                 if( message->psz_value )
                     msg_Err( vlm, "Load error on line %d: %s: %s",
                              i_line, message->psz_name, message->psz_value );
-                free( message );
+                vlm_MessageDelete( message );
             }
             return 1;
         }
-        if( message ) free( message );
+        if( message ) vlm_MessageDelete( message );
 
         pf += i_end;
         i_line++;
@@ -2430,7 +2430,7 @@ static int Manage( vlc_object_t* p_object )
             ExecuteCommand( vlm, psz_command,&message );
 
             /* for now, drop the message */
-            free( message );
+            vlm_MessageDelete( message );
             TAB_REMOVE( i_scheduled_commands,
                         ppsz_scheduled_commands,
                         psz_command );
