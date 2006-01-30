@@ -1,6 +1,7 @@
 NULL =
 
 EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts) $(DIST_skins2_default) $(DIST_skins2_playtree)
+SUFFIXES = .tar.gz .png .ttf .xml
 
 pkgdatadir = $(datadir)/vlc
 
@@ -61,9 +62,6 @@ DIST_icons128 = \
 	$(NULL)
 
 DIST_skins2 = \
-	skins2/default.vlt \
-	skins2/playtree.vlt \
-	\
 	skins2/fonts/FreeSans.ttf \
 	skins2/fonts/FreeSansBold.ttf \
 	skins2/skin.dtd \
