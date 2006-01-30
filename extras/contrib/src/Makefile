@@ -1814,10 +1814,16 @@ DISTCLEAN_PKG += clinkcc-$(CLINKCC_VERSION).tar.gz
 # NASM assembler
 # ***************************************************************************
 
-nasm:
-	echo $(NASM_CVSROOT) A > ./nasm.cvs
-	CVS_PASSFILE=./nasm.cvs cvs -z3 -d $(NASM_CVSROOT) co nasm
-	(cd $@ && autoconf && autoheader)
+nasm-$(NASM_VERSION).tar.bz2:
+	$(WGET) $(NASM_URL)
+
+nasm: nasm-$(NASM_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+#nasm:
+#	echo $(NASM_CVSROOT) A > ./nasm.cvs
+#	CVS_PASSFILE=./nasm.cvs cvs -z3 -d $(NASM_CVSROOT) co nasm
+#	(cd $@ && autoconf && autoheader)
 
 .nasm: nasm
 	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) && make && make install)
@@ -1825,6 +1831,7 @@ nasm:
 
 CLEAN_FILE += .nasm
 CLEAN_PKG += nasm nasm.cvs
+DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.bz2
 
 # ***************************************************************************
 # Copy aclocal files
