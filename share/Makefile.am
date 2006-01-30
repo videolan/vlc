@@ -279,6 +279,7 @@ DIST_http = \
 	http/images/stop.png \
 	http/images/help.png \
 	http/images/playlist_small.png \
+	http/images/info.png \
 	http/mosaic.html \
 	http/old/index.html \
 	http/old/.hosts \
