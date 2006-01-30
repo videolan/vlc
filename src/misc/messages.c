@@ -383,6 +383,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
     if( p_queue == NULL )
     {
         vlc_mutex_unlock( &p_bank->lock );
+        if( psz_str ) free( psz_str );
+        if( psz_header ) free( psz_header );
         return;
     }
 
@@ -456,6 +458,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
             free( p_item->psz_module );
         if( p_item->psz_msg )
             free( p_item->psz_msg );
+        if( p_item->psz_header )
+            free( p_item->psz_header );
     }
 
     vlc_mutex_unlock ( &p_queue->lock );
