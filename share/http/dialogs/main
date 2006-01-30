@@ -71,6 +71,10 @@ sout and playlist .
       <img src="images/playlist.png" alt="Playlist" />
       <span class="btn_text">Playlist</span>
     </button>
+    <button id="btn_info" onclick="toggle_show('info');" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Info" >
+      <img src="images/info.png" alt="Info" />
+      <span class="btn_text">Info</span>
+    </button>
     &nbsp;
     <button id="btn_fullscreen" onclick="fullscreen();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Fullscreen" >
       <img src="images/fullscreen.png" alt="Fullscreen" />
@@ -97,5 +101,16 @@ sout and playlist .
     <img src="images/slider_left.png" alt="slider left" /><span id="progressbar" style="background-image: url( 'images/slider_bar.png' ); width: 408px; height:16px; position:absolute;" onclick="slider_seek( event, this );" onmousemove="slider_move( event, this );"><img src="images/slider_point.png" alt="slider point" style="position:relative; left:0px;" id="main_slider_point" onmousedown="slider_down( event, this );" onmouseup="slider_up( event, this.parentNode );" onmouseout="slider_up( event, this.parentNode );"/></span><img src="images/slider_right.png" alt="slider right" style="position:relative;left:408px;" />
     <br/>
     <span id="nowplaying">(?)</span>
+  </div>
+</div>
+
+<div id="info" class="dialog" style="display: none;" >
+  <div class="title">
+    Stream and media info
+    <button id="btn_info_hide" onclick="hide( 'info' );">
+      Hide
+    </button>
+  </div>
+  <div id="infotree">
   </div>
 </div>

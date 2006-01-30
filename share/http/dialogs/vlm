@@ -39,7 +39,7 @@ sout and vlmelements .
   </div>
   <div class="controls">
     <label for="vlm_command">VLM command:</label>
-    <input type="text" id="vlm_command" size="60" />
+    <input type="text" id="vlm_command" size="60" onkeypress="if( event.keyCode == 13 ) vlm_send();" />
     <input type="button" value="Send" onclick="vlm_send();" />
     <br />
     <span id="vlm_error"></span>

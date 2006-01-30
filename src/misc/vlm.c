@@ -1683,7 +1683,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
             APPEND_INPUT_INFO( "chapter", "%d", Integer );
             APPEND_INPUT_INFO( "seekable", "%d", Bool );
 #undef APPEND_INPUT_INFO
-            asprintf( &psz_tmp, "%d", p_instance->i_index );
+            asprintf( &psz_tmp, "%d", p_instance->i_index + 1 );
             vlm_MessageAdd( msg_instance, vlm_MessageNew( "playlistindex", psz_tmp ) );
             free( psz_tmp );
             vlm_MessageAdd( msg_child, msg_instance );

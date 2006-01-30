@@ -238,6 +238,13 @@ function toggle_btn_text()
     }
 }
 
+function clear_children( elt )
+{   
+    if( elt )
+        while( elt.hasChildNodes() )
+            elt.removeChild( elt.firstChild );
+}
+
 /**********************************************************************
  * Interface actions
  *********************************************************************/
@@ -390,6 +397,36 @@ function parse_status()
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'alt', 'Play' );
                 document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Play' );
             }
+
+            var tree = document.createElement( "ul" );
+            var categories = status.getElementsByTagName( 'category' );
+            var i;
+            for( i = 0; i < categories.length; i++ )
+            {
+                var item = document.createElement( "li" );
+                item.appendChild( document.createTextNode( categories[i].getAttribute( 'name' ) ) );
+                var subtree = document.createElement( "dl" );
+                var infos = categories[i].getElementsByTagName( 'info' );
+                var j;
+                for( j = 0; j < infos.length; j++ )
+                {
+                    var subitem = document.createElement( "dt" );
+                    subitem.appendChild( document.createTextNode( infos[j].getAttribute( 'name' ) ) );
+                    subtree.appendChild( subitem );
+                    if( infos[j].hasChildNodes() )
+                    {
+                        var subitem = document.createElement( "dd" );
+                        subitem.appendChild( document.createTextNode( infos[j].firstChild.data ) );
+                        subtree.appendChild( subitem );
+                    }
+                }
+                item.appendChild( subtree );
+                tree.appendChild( item );
+            }
+            var infotree = document.getElementById('infotree' );
+            clear_children( infotree );
+            infotree.appendChild( tree );
+            
         }
         else
         {

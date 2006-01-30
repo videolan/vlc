@@ -260,13 +260,6 @@ function clear_vlm_add()
     document.getElementById( 'vlm_vod_name' ).value = "";
 }
 
-function clear_children( elt )
-{
-    if( elt )
-        while( elt.hasChildNodes() )
-            elt.removeChild( elt.firstChild );
-}
-
 function create_button( caption, action )
 {
     var link = document.createElement( "input" );
@@ -409,6 +402,7 @@ function parse_vlm_elements()
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'size', '40' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_input' );
+                    text.setAttribute( 'onkeypress', 'if( event.keyCode == 13 ) vlm_add_input("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_input").value );' );
                     item.appendChild( text );
                     item.appendChild( document.createTextNode( ' ' ) );
                     item.appendChild( create_button( 'Edit', 'vlm_input_edit("vlm_elt_'+elt.getAttribute('name')+'_input");') );
@@ -419,7 +413,7 @@ function parse_vlm_elements()
                     if( inputs.length > 0 )
                     {
                         var ilist = document.createElement( "ol" );
-                        ilist.setAttribute( 'start', '0' );
+                        ilist.setAttribute( 'start', '1' );
                         item.appendChild( ilist );
                         for( i = 0; i < inputs.length; i++ )
                         {
@@ -447,6 +441,7 @@ function parse_vlm_elements()
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_output' );
                     text.setAttribute( 'value', output );
+                    text.setAttribute( 'onkeypress', 'if( event.keyCode == 13 )  vlm_output("'+elt.getAttribute( 'name' )+ '",document.getElementById("vlm_elt_'+elt.getAttribute( 'name' )+'_output").value);' );
                     item.appendChild( text );
 
                     item.appendChild( document.createTextNode( ' ' ) );
@@ -466,6 +461,7 @@ function parse_vlm_elements()
                     text.setAttribute( 'type', 'text' );
                     text.setAttribute( 'size', '40' );
                     text.setAttribute( 'id', 'vlm_elt_'+elt.getAttribute('name')+'_option' );
+                    text.setAttribute( 'onkeypress', 'if( event.keyCode == 13 ) vlm_option("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_option").value );' );
                     item.appendChild( text );
                     item.appendChild( document.createTextNode( ' ' ) );
                     item.appendChild( create_button( 'Add option', 'vlm_option("'+elt.getAttribute('name')+'",document.getElementById("vlm_elt_'+elt.getAttribute('name')+'_option").value );' ) );

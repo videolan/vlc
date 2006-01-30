@@ -97,4 +97,13 @@
   <fullscreen><vlc id="if" param1="'VLC_OBJECT_VOUT' vlc_obj_exists" /><vlc id="value" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get" /><vlc id="end" /></fullscreen>
   <loop><vlc id="value" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get"/></loop>
   <repeat><vlc id="value" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></repeat>
+  <information>
+    <vlc id="foreach" param1="inf" param2="information" />
+      <category name="<vlc id="value" param1="inf.name" />">
+        <vlc id="foreach" param1="subinf" param2="inf.info" />
+          <info name="<vlc id="value" param1="subinf.name" />"><vlc id="value" param1="subinf.value" /></info>
+        <vlc id="end" />
+      </category>
+    <vlc id="end" />
+  </information>
 </root>

@@ -106,6 +106,22 @@ div.list_element ul {
 	margin: 0px;
 }
 
+div#infotree ul {
+	padding: 0.4em;
+	margin: 0em;
+}
+div#infotree li {
+	font-weight: bold;
+	font-size: 0.8em;
+}
+div#infotree dl {
+	font-weight: normal;
+	padding: 0em 1em;
+}
+div#infotree dt {
+	text-decoration: underline;
+}
+
 div.pl_node {
 	padding-left: 20px;
 	font-style: italic;
