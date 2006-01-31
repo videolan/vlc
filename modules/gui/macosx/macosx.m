@@ -83,6 +83,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
                      VLC_FALSE );
+#if defined( __ppc__ ) || defined (__ppc64__)
     add_submodule();
         set_description( _("Quartz video") );
         set_capability( "video output", 100 );
@@ -99,6 +100,7 @@ vlc_module_begin();
                   VLC_TRUE );
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                      VLC_FALSE );
+#endif
     add_submodule();
         set_description( "Mac OS X OpenGL" );
         set_capability( "opengl provider", 100 );
