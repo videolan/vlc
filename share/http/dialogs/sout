@@ -45,9 +45,9 @@ Note that the sout chain is used and sent to VLC by the input dialog
     <vlc id="end" />
     <input type="button" value="Cancel" onclick="reset_sout();"/>
     <input type="hidden" id="sout_old_mrl" value="" /> <!-- FIXME -->
-    <input type="button" id="sout_helper_toggle" onclick="toggle_show_sout_helper()" value="Full sout interface" />
+    <input type="button" id="sout_helper_toggle" onclick="toggle_show_sout_helper()" value="Hide sout interface" />
   </div>
-  <div id="sout_helper" class="helper" style="display: none;" >
+  <div id="sout_helper" class="helper">
     Stream Output Helper
     <hr/>
     <div id="sout_method">
