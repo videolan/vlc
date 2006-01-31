@@ -122,8 +122,17 @@
         }                                                                     \
         if( p_config )                                                        \
         {                                                                     \
+            int i;                                                            \
             p_config[ ++i_config ] = config_end;                              \
             config_Duplicate( p_module, p_config );                           \
+            for( i = 0; i < i_config; i++ )                                   \
+            {                                                                 \
+                if( p_config[ i ].i_action )                                  \
+                {                                                             \
+                    free( p_config[ i ].ppf_action );                         \
+                    free( p_config[ i ].ppsz_action_text );                   \
+                }                                                             \
+            }                                                                 \
             free( p_config );                                                 \
         }                                                                     \
         else config_Duplicate( p_module, &config_end );                       \
