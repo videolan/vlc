@@ -901,7 +901,6 @@ vlm_media_t *vlm_MediaNew( vlm_t *vlm, const char *psz_name, int i_type )
     media->i_instance = 0;
     media->instance = NULL;
 
-    media->item.psz_uri = strdup( psz_name );
     vlc_input_item_Init( VLC_OBJECT(vlm), &media->item );
 
     TAB_APPEND( vlm->i_media, vlm->media, media );
