@@ -32,6 +32,7 @@ This dialog needs the following dialogs to be fully functional: <none>
   </div>
   <div id="browser">
     <a href="javascript:browse_dir(document.getElementById( 'browse_lastdir' ).value);">Click here to browse</a>
+    ( or <a href="javascript:browse_dir('');">here</a> if it doesn't work )
   </div>
   <div class="controls">
     <button id="btn_browse_close" onclick="hide('browse');">

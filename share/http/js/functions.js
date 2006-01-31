@@ -216,6 +216,7 @@ function check_and_replace_int( id, val )
 }
 
 function addslashes( str ){ return str.replace(/\'/g, '\\\''); }
+function escapebackslashes( str ){ return str.replace(/\\/g, '\\\\'); }
 
 function disable( id ){ document.getElementById( id ).disabled = true; }
 
@@ -360,18 +361,39 @@ function parse_status()
         if( req.status == 200 )
         {
             var status = req.responseXML.documentElement;
-            var new_time = status.getElementsByTagName( 'time' )[0].firstChild.data;
-            var length = status.getElementsByTagName( 'length' )[0].firstChild.data;
-            var slider_position;
-            if( length < 100 )
+            var timetag = status.getElementsByTagName( 'time' );
+            if( timetag.length > 0 )
             {
-                slider_position = ( status.getElementsByTagName( 'position' )[0]
-                           .firstChild.data * 4 ) + "px";
+                var new_time = timetag[0].firstChild.data;
             }
             else
             {
+                new_time = old_time;
+            }
+            var lengthtag = status.getElementsByTagName( 'length' );
+            var length;
+            if( lengthtag.length > 0 )
+            {
+                length = lengthtag[0].firstChild.data;
+            }
+            else
+            {
+                length = 0;
+            }
+            var slider_position;
+            positiontag = status.getElementsByTagName( 'position' );
+            if( length < 100 && positiontag.length > 0 )
+            {
+                slider_position = ( positiontag[0].firstChild.data * 4 ) + "px";
+            }
+            else if( length > 0 )
+            {
                 /* this is more precise if length > 100 */
                 slider_position = Math.floor( ( new_time * 400 ) / length ) + "px";
+            }
+            else
+            {
+                slider_position = 0;
             }
             if( old_time > new_time )
                 setTimeout('update_playlist()',50);
@@ -380,12 +402,21 @@ function parse_status()
             set_text( 'length', format_time( length ) );
             if( status.getElementsByTagName( 'volume' ).length != 0 )
                 set_text( 'volume', Math.floor(status.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+'%' );
-            set_text( 'state', status.getElementsByTagName( 'state' )[0].firstChild.data );
+            var statetag = status.getElementsByTagName( 'state' );
+            if( statetag.length > 0 )
+            {
+            	set_text( 'state', statetag[0].firstChild.data );
+            }
+            else
+            {
+                set_text( 'state', '(?)' );
+            }
             if( slider_mouse_down == 0 )
             {
                 document.getElementById( 'main_slider_point' ).style.left = slider_position;
             }
-            if( status.getElementsByTagName( 'state' )[0].firstChild.data == "playing" )
+            var statustag = status.getElementsByTagName( 'state' );
+            if( statustag.length > 0 ? statustag[0].firstChild.data == "playing" : 0 )
             {
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/pause.png' );
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'alt', 'Pause' );
@@ -454,44 +485,47 @@ function parse_playlist()
                     if( pos.hasChildNodes() )
                         pos.appendChild( document.createElement( "br" ) );
                     var nda = document.createElement( 'a' );
-                    pos.appendChild( nda );
                     nda.setAttribute( 'href', 'javascript:toggle_show_node(\''+elt.getAttribute( 'id' )+'\');' );
                     var ndai = document.createElement( 'img' );
-                    nda.appendChild( ndai );
                     ndai.setAttribute( 'src', 'images/minus.png' );
                     ndai.setAttribute( 'alt', '[-]' );
                     ndai.setAttribute( 'id', 'pl_img_'+elt.getAttribute( 'id' ) );
+                    nda.appendChild( ndai );
+                    pos.appendChild( nda );
                     pos.appendChild( document.createTextNode( ' ' + elt.getAttribute( 'name' ) ) );
                     var nd = document.createElement( "div" );
-                    pos.appendChild( nd );
                     nd.setAttribute( 'class', 'pl_node' );
                     nd.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
+                    pos.appendChild( nd );
                 }
                 else if( elt.nodeName == "leaf" )
                 {
                     if( pos.hasChildNodes() )
                     pos.appendChild( document.createElement( "br" ) );
                     var pl = document.createElement( "a" );
-                    pos.appendChild( pl );
                     pl.setAttribute( 'class', 'pl_leaf' );
                     pl.setAttribute( 'href', 'javascript:pl_play('+elt.getAttribute( 'id' )+');' );
                     pl.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
                     if( elt.getAttribute( 'current' ) == 'current' )
                     {
                         pl.setAttribute( 'style', 'font-weight: bold;' );
-                        document.getElementById( 'nowplaying' ).textContent
-                            = elt.getAttribute( 'name' );
+                        var nowplaying = document.getElementById( 'nowplaying' );
+                        clear_children( nowplaying );
+                        nowplaying.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                        pl.appendChild( document.createTextNode( '* '));
                     }
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    pos.appendChild( pl );
                     pos.appendChild( document.createTextNode( ' ' ) );
+
                     var del = document.createElement( "a" );
-                    pos.appendChild( del );
                     del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
-                    del.appendChild( document.createElement( "img" ) );
-                    del = del.lastChild;
-                    del.setAttribute( 'src', 'images/delete_small.png' );
-                    del.setAttribute( 'alt', '(delete)' );
+                      var delimg = document.createElement( "img" );
+                      delimg.setAttribute( 'src', 'images/delete_small.png' );
+                      delimg.setAttribute( 'alt', '(delete)' );
+                    del.appendChild( delimg );
+                    pos.appendChild( del );
                 }
                 if( elt.firstChild )
                 {
@@ -505,12 +539,17 @@ function parse_playlist()
                 }
                 else
                 {
+                    while( ! elt.parentNode.nextSibling )
+                    {
+                        elt = elt.parentNode;
+                        if( ! elt.parentNode ) break;
+                    }
+                    if( ! elt.parentNode ) break;
                     elt = elt.parentNode.nextSibling;
                     pos = pos.parentNode;
                 }
             }
-            while( playtree.hasChildNodes() )
-                playtree.removeChild( playtree.firstChild );
+            clear_children( playtree );
             playtree.appendChild( pos_top );
         }
         else
@@ -528,6 +567,7 @@ function parse_browse_dir( )
         if( req.status == 200 )
         {
             var answer = req.responseXML.documentElement;
+            if( !answer ) return;
             var browser = document.getElementById( 'browser' );
             var pos = document.createElement( "div" );
             var elt = answer.firstChild;
@@ -535,31 +575,32 @@ function parse_browse_dir( )
             {
                 if( elt.nodeName == "element" )
                 {
-                    pos.appendChild( document.createElement( "a" ) );
-                    pos.lastChild.setAttribute( 'class', 'browser' );
+                    var item = document.createElement( "a" );
+                    item.setAttribute( 'class', 'browser' );
                     if( elt.getAttribute( 'type' ) == 'directory' )
                     {
-                        pos.lastChild.setAttribute( 'href', 'javascript:browse_dir(\''+addslashes(elt.getAttribute( 'path' ))+'\');');
+                        item.setAttribute( 'href', 'javascript:browse_dir(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');');
                     }
                     else
                     {
-                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+addslashes(elt.getAttribute( 'path' ))+'\');' );
+                        item.setAttribute( 'href', 'javascript:browse_path(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');' );
                     }
-                    pos.lastChild.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    item.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    pos.appendChild( item );
                     if( elt.getAttribute( 'type' ) == 'directory' )
                     {
                         pos.appendChild( document.createTextNode( ' ' ) );
-                        pos.appendChild( document.createElement( "a" ) );
-                        pos.lastChild.setAttribute( 'class', 'browser' );
-                        pos.lastChild.setAttribute( 'href', 'javascript:browse_path(\''+addslashes(elt.getAttribute( 'path' ))+'\');');
-                        pos.lastChild.appendChild( document.createTextNode( '(select)' ) );
+                        var item = document.createElement( "a" );
+                        item.setAttribute( 'class', 'browser' );
+                        item.setAttribute( 'href', 'javascript:browse_path(\''+escapebackslashes(addslashes(elt.getAttribute( 'path' )))+'\');');
+                        item.appendChild( document.createTextNode( '(select)' ) );
+                        pos.appendChild( item );
                     }
                     pos.appendChild( document.createElement( "br" ) );
                 }
                 elt = elt.nextSibling;
             }
-            while( browser.hasChildNodes() )
-                browser.removeChild( browser.firstChild );
+            clear_children( browser );
             browser.appendChild( pos );
         }
         else
@@ -883,6 +924,7 @@ function save_sout()
 function browse( dest )
 {
     document.getElementById( 'browse_dest' ).value = dest;
+    document.getElementById( 'browse_lastdir' ).value;
     browse_dir( document.getElementById( 'browse_lastdir' ).value );
     show( 'browse' );
 }
