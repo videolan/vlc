@@ -161,7 +161,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         i_accel |= MPEG2_ACCEL_X86_MMXEXT;
     }
 
-#elif defined( __powerpc__ ) || defined( SYS_DARWIN )
+#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC )
     {
         i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
