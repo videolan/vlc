@@ -237,6 +237,23 @@ DIST_http = \
 	http/js/functions.js \
 	http/js/mosaic.js \
 	http/js/vlm.js \
+	http/old/vlm/edit.html \
+	http/old/vlm/index.html \
+	http/old/vlm/show.html \
+	http/old/vlm/new.html \
+	http/old/webcam.html \
+	http/old/favicon.ico \
+	http/old/admin/dboxfiles.html \
+	http/old/admin/.access \
+	http/old/admin/index.html \
+	http/old/admin/browse.html \
+	http/old/style.css \
+	http/old/index.html \
+	http/old/cone_minus.png \
+	http/old/cone_plus.png \
+	http/old/.hosts \
+	http/old/info.html \
+	http/vlm_export.html \
 	http/favicon.ico \
 	http/dialogs/vlm \
 	http/dialogs/main \
@@ -264,11 +281,16 @@ DIST_http = \
 	http/images/shuffle.png \
 	http/images/vlc16x16.png \
 	http/images/volume_up.png \
+	http/images/refresh.png \
+	http/images/slider_left.png \
+	http/images/slider_point.png \
 	http/images/minus.png \
 	http/images/pause.png \
 	http/images/fullscreen.png \
 	http/images/repeat.png \
+	http/images/slider_bar.png \
 	http/images/empty.png \
+	http/images/slider_right.png \
 	http/images/prev.png \
 	http/images/slow.png \
 	http/images/playlist.png \
@@ -277,28 +299,13 @@ DIST_http = \
 	http/images/play.png \
 	http/images/delete.png \
 	http/images/speaker.png \
+	http/images/info.png \
 	http/images/loop.png \
 	http/images/stop.png \
 	http/images/help.png \
 	http/images/playlist_small.png \
-	http/images/info.png \
+	http/.hosts \
 	http/mosaic.html \
-	http/old/index.html \
-	http/old/.hosts \
-	http/old/info.html \
-	http/old/webcam.html \
-	http/old/style.css \
-	http/old/cone_plus.png \
-	http/old/cone_minus.png \
-	http/old/favicon.ico \
-	http/old/admin/browse.html \
-	http/old/admin/dboxfiles.html \
-	http/old/admin/index.html \
-	http/old/admin/.access \
-	http/old/vlm/edit.html \
-	http/old/vlm/index.html \
-	http/old/vlm/new.html \
-	http/old/vlm/show.html \
 	$(NULL)
 
 DIST_osdmenu_default = \
