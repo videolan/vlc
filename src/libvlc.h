@@ -1353,7 +1353,7 @@ vlc_module_begin();
     add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, VLC_TRUE );
     add_bool( "sse2", 1, NULL, SSE2_TEXT, SSE2_LONGTEXT, VLC_TRUE );
 #endif
-#if defined( __powerpc__ ) || defined( SYS_DARWIN )
+#if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_TRUE );
 #endif
 

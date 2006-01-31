@@ -645,7 +645,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     if( !config_GetInt( p_vlc, "sse2" ) )
         libvlc.i_cpu &= ~CPU_CAPABILITY_SSE2;
 #endif
-#if defined( __powerpc__ ) || defined( SYS_DARWIN )
+#if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     if( !config_GetInt( p_vlc, "altivec" ) )
         libvlc.i_cpu &= ~CPU_CAPABILITY_ALTIVEC;
 #endif
