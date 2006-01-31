@@ -401,7 +401,12 @@ static void SyslogPrint( const msg_item_t *p_msg )
     if( p_msg->i_type  == 2 ) i_priority = LOG_WARNING;
     if( p_msg->i_type  == 3 ) i_priority = LOG_DEBUG;
 
-    syslog( i_priority, "%s %s", p_msg->psz_module, p_msg->psz_msg );
+    if( p_msg->psz_header )
+        syslog( i_priority, "%s %s: %s", p_msg->psz_header,
+                p_msg->psz_module, p_msg->psz_msg );
+    else
+        syslog( i_priority, "%s: %s", p_msg->psz_module, p_msg->psz_msg );
+        
 }
 #endif
 
