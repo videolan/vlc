@@ -443,13 +443,12 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                    psz_head + 4 );
     }
     else
-#else
+#endif
     {
         inet_pton( AF_INET, /* can't fail */
                    p_sap_session->p_address->psz_machine,
                    psz_head + 4 );
     }
-#endif
 
     memcpy( psz_head + (b_ipv6 ? 20 : 8), "application/sdp", 15 );
 
