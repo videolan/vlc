@@ -4,8 +4,8 @@
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Clément Stenac <zorglub@videolan.org>
+ * Authors: Olivier TeuliÃ¨re <ipkiss@via.ecp.fr>
+ *          ClÃ©ment Stenac <zorglub@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/OR MODIFy

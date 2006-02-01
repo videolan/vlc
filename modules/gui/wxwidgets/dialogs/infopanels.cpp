@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2004 the VideoLAN team
  * $Id: iteminfo.cpp 13905 2006-01-12 23:10:04Z dionoea $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

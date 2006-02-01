@@ -393,7 +393,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         else
         {
-            /* Interleave the *$£%ù samples. */
+            /* Interleave the *$Â£%Ã¹ samples. */
             Interleave( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                         p_samples, p_sys->i_nb_channels, p_sys->pi_chan_table);
         }

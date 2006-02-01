@@ -4,7 +4,7 @@
  * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify

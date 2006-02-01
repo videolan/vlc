@@ -4,7 +4,7 @@
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
- * Authors: Mohammed Adnène Trojette     <adn@via.ecp.fr>
+ * Authors: Mohammed AdnÃ¨ne Trojette     <adn@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

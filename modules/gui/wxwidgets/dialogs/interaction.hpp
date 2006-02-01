@@ -4,7 +4,7 @@
  * Copyright (C) 1999-2005 the VideoLAN team
  * $Id: bookmarks.hpp 13444 2005-11-28 23:33:48Z dionoea $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2004 the VideoLAN team
  * $Id$
  *
- * Author: Stéphane Borel <stef@via.ecp.fr>
+ * Author: StÃ©phane Borel <stef@via.ecp.fr>
  *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify

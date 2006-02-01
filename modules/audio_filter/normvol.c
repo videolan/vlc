@@ -4,7 +4,7 @@
  * Copyright (C) 2001 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ static int Open( vlc_object_t *p_this )
         p_in += i_channels;
     }
 
-    /* sum now contains for each channel the sigma(value²) */
+    /* sum now contains for each channel the sigma(valueÂ²) */
     for( i_chan = 0; i_chan < i_channels; i_chan++ )
     {
         /* Shift our lastbuff */
@@ -189,7 +189,7 @@ static int Open( vlc_object_t *p_this )
                         &p_sys->p_last[i_chan * p_sys->i_nb + 1],
                  (p_sys->i_nb-1) * sizeof( float ) );
 
-        /* Insert the new average : sqrt(sigma(value²)) */
+        /* Insert the new average : sqrt(sigma(valueÂ²)) */
         p_sys->p_last[ i_chan * p_sys->i_nb + p_sys->i_nb - 1] =
                 sqrt( pf_sum[i_chan] );
 

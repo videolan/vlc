@@ -4,7 +4,7 @@
  * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@via.ecp.fr>
+ * Authors: ClÃ©ment Stenac <zorglub@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -48,7 +48,7 @@
  * T            : Picture period, T = 1/frame_rate.
  * tau[I,P,B]   : Mean time to decode an [I,P,B] picture.
  * tauYUV       : Mean time to render a picture (given by the video_output).
- * tau´[I,P,B] = 2 * tau[I,P,B] + tauYUV
+ * tauÂ´[I,P,B] = 2 * tau[I,P,B] + tauYUV
  *              : Mean time + typical difference (estimated to tau/2, that
  *                needs to be confirmed) + render time.
  * DELTA        : A given error margin.
@@ -66,23 +66,23 @@
  * Otherwise :
  * We can decode an I picture if we simply have enough time to decode it
  * before displaying :
- *      t0 - t > tau´I + DELTA
+ *      t0 - t > tauÂ´I + DELTA
  *
  * 5. Decoding of a P picture
  *    =======================
  * On fast machines, we decode all P's.
  * Otherwise :
  * First criterion : have time to decode it.
- *      t2 - t > tau´P + DELTA
+ *      t2 - t > tauÂ´P + DELTA
  *
  * Second criterion : it shouldn't prevent us from displaying the forthcoming
  * I picture, which is more important.
- *      t12 - t > tau´P + tau´I + DELTA
+ *      t12 - t > tauÂ´P + tauÂ´I + DELTA
  *
  * 6. Decoding of a B picture
  *    =======================
  * On fast machines, we decode all B's. Otherwise :
- *      t1 - t > tau´B + DELTA
+ *      t1 - t > tauÂ´B + DELTA
  * Since the next displayed I or P is already decoded, we don't have to
  * worry about it.
  *

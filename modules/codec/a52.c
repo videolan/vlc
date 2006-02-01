@@ -4,7 +4,7 @@
  * Copyright (C) 2001-2002 the VideoLAN team
  * $Id$
  *
- * Authors: Stéphane Borel <stef@via.ecp.fr>
+ * Authors: StÃ©phane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
  *

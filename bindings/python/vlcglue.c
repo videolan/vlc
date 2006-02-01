@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
- *          Clément Stenac <zorglub@videolan.org>
+ *          ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
