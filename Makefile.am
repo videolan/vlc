@@ -932,15 +932,15 @@ package-win32-base: package-win32-base-debug
 package-win32-base-exe:
 # Create package
 	if makensis -VERSION >/dev/null 2>&1; then \
-	    MAKENSIS=makensis; \
+	    MAKENSIS="makensis -DVERSION=${VERSION}"; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
-	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis"; \
+	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis /DVERSION=${VERSION}"; \
 	elif wine --version >dev/null 2>&1; then \
-	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe"; \
+	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe /DVERSION=${VERSION}"; \
 	else \
 	    echo 'Error: cannot locate makensis tool'; exit 1; \
 	fi; \
-	eval "$$MAKENSIS /DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi"
+	eval "$$MAKENSIS $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi"
 
 package-win32-base-exe-cygwin: package-win32-base-exe
 # Create package
