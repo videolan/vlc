@@ -2035,11 +2035,23 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_drms_box && p_drms_box->data.p_sample_soun->p_drms )
     {
-        if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
-                       p_box->i_type, p_peek, i_read ) )
+        int i_ret = drms_init( p_drms_box->data.p_sample_soun->p_drms,
+                               p_box->i_type, p_peek, i_read );
+        if( i_ret )
         {
-            msg_Err( p_stream, "drms_init( %4.4s ) failed",
-                     (char *)&p_box->i_type );
+            char *psz_error;
+
+            switch( i_ret )
+            {
+                case -1: psz_error = "unimplemented"; break;
+                case -2: psz_error = "invalid argument"; break;
+                case -3: psz_error = "could not get user key"; break;
+                case -4: psz_error = "invalid user key"; break;
+                default: psz_error = "unknown error"; break;
+            }
+
+            msg_Err( p_stream, "drms_init(%4.4s) failed (%s)",
+                     (char *)&p_box->i_type, psz_error );
 
             drms_free( p_drms_box->data.p_sample_soun->p_drms );
             p_drms_box->data.p_sample_soun->p_drms = NULL;

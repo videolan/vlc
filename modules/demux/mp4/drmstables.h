@@ -1,7 +1,7 @@
 /*****************************************************************************
  * drmstables.h : AES/Rijndael block cipher and miscellaneous tables
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004, 2006 the VideoLAN team
  * $Id$
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -21,6 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/*****************************************************************************
+ * p_aes_table, p_aes_encrypt, p_aes_itable, p_aes_decrypt: AES tables
+ *****************************************************************************
+ * The following tables and macros are used for the AES (Rijndael) cypher.
+ *****************************************************************************/
 #define AES_ROR( x, n ) (((x) << (32-(n))) | ((x) >> (n)))
 
 #define AES_XOR_ROR( p_table, p_tmp ) \
@@ -178,6 +183,12 @@ static uint32_t const p_aes_decrypt[ 256 ] =
     0x55000000, 0x21000000, 0x0c000000, 0x7d000000
 };
 
+/*****************************************************************************
+ * p_shuffle_xor, p_shuffle_sub, p_shuffle_add: iTMS drms v1
+ *****************************************************************************
+ * The following tables are used for the first version of the iTMS drms key
+ * scrambling algorithm.
+ *****************************************************************************/
 static uint16_t const p_shuffle_xor[ 256 ] =
 {
     0x00d1, 0x0315, 0x1a32, 0x19ec, 0x1bbb, 0x1d6f, 0x14fe, 0x0e9e,

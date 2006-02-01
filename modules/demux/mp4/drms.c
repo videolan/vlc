@@ -63,7 +63,7 @@
 #   include <limits.h>
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #   include <mach/mach.h>
 #   include <IOKit/IOKitLib.h>
 #   include <CoreFoundation/CFNumber.h>
@@ -284,6 +284,13 @@ void drms_decrypt( void *_p_drms, uint32_t *p_buffer, uint32_t i_bytes )
 
 /*****************************************************************************
  * drms_init: initialise a DRMS structure
+ *****************************************************************************
+ * Return values:
+ *  0: success
+ * -1: unimplemented
+ * -2: invalid argument
+ * -3: failed to get user key
+ * -4: invalid user key
  *****************************************************************************/
 int drms_init( void *_p_drms, uint32_t i_type,
                uint8_t *p_info, uint32_t i_len )
@@ -296,7 +303,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
         case FOURCC_user:
             if( i_len < sizeof(p_drms->i_user) )
             {
-                i_ret = -1;
+                i_ret = -2;
                 break;
             }
 
@@ -306,7 +313,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
         case FOURCC_key:
             if( i_len < sizeof(p_drms->i_key) )
             {
-                i_ret = -1;
+                i_ret = -2;
                 break;
             }
 
@@ -316,7 +323,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
         case FOURCC_iviv:
             if( i_len < sizeof(p_drms->p_key) )
             {
-                i_ret = -1;
+                i_ret = -2;
                 break;
             }
 
@@ -328,7 +335,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
 
             if( p_drms->p_name == NULL )
             {
-                i_ret = -1;
+                i_ret = -2;
             }
             break;
 
@@ -339,7 +346,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
 
             if( i_len < 64 )
             {
-                i_ret = -1;
+                i_ret = -2;
                 break;
             }
 
@@ -358,7 +365,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             {
                 if( GetUserKey( p_drms, p_drms->p_key ) )
                 {
-                    i_ret = -1;
+                    i_ret = -3;
                     break;
                 }
             }
@@ -372,7 +379,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
 
             if( p_priv[ 0 ] != 0x6e757469 ) /* itun */
             {
-                i_ret = -1;
+                i_ret = -4;
                 break;
             }
 
@@ -1956,7 +1963,7 @@ static int GetiPodID( int64_t *p_ipod_id )
         return 0;
     }
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     CFTypeRef value;
     mach_port_t port;
     io_object_t device;
@@ -2049,7 +2056,7 @@ static int GetiPodID( int64_t *p_ipod_id )
                             break;
                         }
                     }
-                }
+               }
 
                 if( !i_ret ) break;
             }
