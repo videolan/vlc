@@ -450,8 +450,8 @@ diff -u -r1.53 allformats.c
      ffm_init();
 +#endif
 +    
- #if defined(CONFIG_VIDEO4LINUX) || defined(CONFIG_BKTR)
-     video_grab_init();
+ #if defined(CONFIG_VIDEO4LINUX2)
+     v4l2_init();
  #endif
 Index: ../ffmpeg/libavformat/asf-enc.c
 ===================================================================

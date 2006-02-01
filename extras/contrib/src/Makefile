@@ -98,7 +98,7 @@ endif
 
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
-FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-protocols
+FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-codec=snow --disable-codec=vc9 --disable-codec=wmv3 --disable-codec=vorbis --disable-codec=dvdsub --disable-codec=dvbsub --disable-protocols
 else
 FFMPEGCONF+= --enable-mp3lame --enable-faac
 endif
