@@ -2729,11 +2729,12 @@ char *FromLocale( const char *locale )
             vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &libvlc.from_locale_lock );
-
+#ifdef HAVE_ASSERT
         assert (inb == 0);
         assert (*iptr == '\0');
         assert (*optr == '\0');
         assert (strlen( output ) == (size_t)(optr - output));
+#endif
         return realloc( output, optr - output + 1 );
     }
     return (char *)locale;
@@ -2776,11 +2777,13 @@ char *ToLocale( const char *utf8 )
         }
         vlc_mutex_unlock( &libvlc.to_locale_lock );
 
+#ifdef HAVE_ASSERT
         assert (inb == 0);
         assert (*iptr == '\0');
         assert (*optr == '\0');
         assert (strlen( output ) == (size_t)(optr - output));
-        return realloc( output, optr - output + 1 );
+#endif
+	return realloc( output, optr - output + 1 );
     }
     return (char *)utf8;
 }

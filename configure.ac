@@ -373,7 +373,7 @@ CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcd
 dnl Check for system libs needed
 need_libc=false
 
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork bsearch)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork bsearch assert)
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof)
