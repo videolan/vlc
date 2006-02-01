@@ -1,12 +1,12 @@
 /*****************************************************************************
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
- *          Clément Stenac <zorglub@via.ecp.fr>
+ *          ClÃ©ment Stenac <zorglub@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -217,12 +217,17 @@ static void XMLSpecialChars ( char *str )
     {
         if( *src == '&' )
         {
-            if( !strncasecmp( src, "&#xe0;", 6 ) ) *dst++ = 'à';
-            else if( !strncasecmp( src, "&#xee;", 6 ) ) *dst++ = 'î';
+            /* FIXME:
+             * - should probably accept any sequence, rather than only those
+             *   commonly found in French.
+             * - output may have to be UTF-8 encoded (cannot assume Latin-1)
+             */
+            if( !strncasecmp( src, "&#xe0;", 6 ) ) *dst++ = '\xe0';
+            else if( !strncasecmp( src, "&#xee;", 6 ) ) *dst++ = '\xee';
             else if( !strncasecmp( src, "&apos;", 6 ) ) *dst++ = '\'';
-            else if( !strncasecmp( src, "&#xe8;", 6 ) ) *dst++ = 'è';
-            else if( !strncasecmp( src, "&#xe9;", 6 ) ) *dst++ = 'é';
-            else if( !strncasecmp( src, "&#xea;", 6 ) ) *dst++ = 'ê';
+            else if( !strncasecmp( src, "&#xe8;", 6 ) ) *dst++ = '\xe8';
+            else if( !strncasecmp( src, "&#xe9;", 6 ) ) *dst++ = '\xe9';
+            else if( !strncasecmp( src, "&#xea;", 6 ) ) *dst++ = '\xea';
             else
             {
                 *dst++ = '?';
