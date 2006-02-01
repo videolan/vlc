@@ -920,7 +920,7 @@ if BUILD_ACTIVEX
 	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
 endif
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
-	if [ -x rebase ]; then \
+	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
 		find $(top_builddir)/vlc-${VERSION} -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
 
@@ -931,11 +931,11 @@ package-win32-base: package-win32-base-debug
 
 package-win32-base-exe:
 # Create package
-	if [ -x makensis ]; then \
+	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS=makensis; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
 	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis"; \
-	elif [ -x wine ]; then \
+	elif wine --version >dev/null 2>&1; then \
 	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe"; \
 	else \
 	    echo 'Error: cannot locate makensis tool'; exit 1; \
@@ -1045,7 +1045,7 @@ if BUILD_ACTIVEX
 	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
 endif
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
-	if [ -x rebase ]; then \
+	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
 		find $(top_builddir)/vlc-${VERSION} -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
 
