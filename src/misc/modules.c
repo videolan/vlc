@@ -763,7 +763,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     {
         if( !(*ppsz_path)[0] ) continue;
 
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) || defined( WIN32 )
+#if defined( SYS_BEOS ) || defined( __APPLE__ ) || defined( WIN32 )
 
         /* Handle relative as well as absolute paths */
 #ifdef WIN32

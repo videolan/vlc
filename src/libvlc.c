@@ -250,7 +250,7 @@ int VLC_Create( void )
 
     /* Initialize mutexes */
     vlc_mutex_init( p_vlc, &p_vlc->config_lock );
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     vlc_mutex_init( p_vlc, &p_vlc->quicktime_lock );
     vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 #endif
@@ -2013,7 +2013,7 @@ static void SetLanguage ( char const *psz_lang )
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
     char *          psz_path;
-#if defined( SYS_DARWIN ) || defined ( WIN32 ) || defined( SYS_BEOS )
+#if defined( __APPLE__ ) || defined ( WIN32 ) || defined( SYS_BEOS )
     char            psz_tmp[1024];
 #endif
 
@@ -2026,7 +2026,7 @@ static void SetLanguage ( char const *psz_lang )
     }
     else if( psz_lang )
     {
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
         /* I need that under Darwin, please check it doesn't disturb
          * other platforms. --Meuuh */
         setenv( "LANG", psz_lang, 1 );
@@ -2050,7 +2050,7 @@ static void SetLanguage ( char const *psz_lang )
     }
 
     /* Specify where to find the locales for current domain */
-#if !defined( SYS_DARWIN ) && !defined( WIN32 ) && !defined( SYS_BEOS )
+#if !defined( __APPLE__ ) && !defined( WIN32 ) && !defined( SYS_BEOS )
     psz_path = LOCALEDIR;
 #else
     snprintf( psz_tmp, sizeof(psz_tmp), "%s/%s", libvlc.psz_vlcpath,

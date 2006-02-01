@@ -376,7 +376,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         val.psz_string = 0;
     }
 
-#if defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if defined(__APPLE__) || defined(SYS_BEOS)
     if( !val.psz_string && p_vout->p_vlc->psz_homedir )
     {
         asprintf( &val.psz_string, "%s/Desktop",

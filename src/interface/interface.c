@@ -45,9 +45,9 @@
 #include "vlc_video.h"
 #include "video_output.h"
 
-#ifdef SYS_DARWIN
-#    include "Cocoa/Cocoa.h"
-#endif /* SYS_DARWIN */
+#ifdef __APPLE__
+#    include <Cocoa/Cocoa.h>
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -60,7 +60,7 @@ static int SwitchIntfCallback( vlc_object_t *, char const *,
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 /*****************************************************************************
  * VLCApplication interface
  *****************************************************************************/
@@ -153,7 +153,7 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
  */
 int intf_RunThread( intf_thread_t *p_intf )
 {
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     NSAutoreleasePool * o_pool;
 
     if( p_intf->b_block )
@@ -308,7 +308,7 @@ static void Manager( intf_thread_t *p_intf )
         if( p_intf->p_vlc->b_die )
         {
             p_intf->b_die = VLC_TRUE;
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     if( strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) )
     {
         [NSApp stop: NULL];
@@ -457,7 +457,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 /*****************************************************************************
  * VLCApplication implementation 
  *****************************************************************************/

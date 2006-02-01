@@ -43,7 +43,7 @@
 # include <windows.h>
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #   include <errno.h>
 #   include <string.h>
 #endif
@@ -238,7 +238,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 {
     const char *psz_codeset;
 
-#if !(defined WIN32 || defined OS2 || defined SYS_DARWIN)
+#if !(defined WIN32 || defined OS2 || defined __APPLE__)
 
 # if HAVE_LANGINFO_CODESET
     /* Most systems support nl_langinfo( CODESET ) nowadays.  */
@@ -254,7 +254,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
      * (like SunOS 4 or DJGPP) have only the C locale.  Therefore we don't
      * use setlocale here; it would return "C" when it doesn't support the
      * locale name the user has set. Darwin's setlocale is broken. */
-#  if HAVE_SETLOCALE && !SYS_DARWIN
+#  if HAVE_SETLOCALE && !__APPLE__
     psz_locale = setlocale( LC_ALL, NULL );
 #  endif
     if( psz_locale == NULL || psz_locale[0] == '\0' )
@@ -274,7 +274,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     psz_codeset =  buf;
 # endif /* HAVE_LANGINFO_CODESET */
 
-#elif defined SYS_DARWIN
+#elif defined __APPLE__
 
     /* Darwin is always using UTF-8 internally. */
     psz_codeset = "UTF-8";
@@ -345,7 +345,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
 
 char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
 {
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     if ( p_this->p_libvlc->iconv_macosx != (vlc_iconv_t)-1 )
     {
         const char *psz_in = psz_string;

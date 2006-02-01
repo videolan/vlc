@@ -302,7 +302,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
     msg_item_t * p_item = NULL;                        /* pointer to message */
     msg_item_t   item;                    /* message in case of a full queue */
 
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
     int          i_size = strlen(psz_format) + INTF_MAX_MSG_SIZE;
 #endif
     int i;
@@ -317,7 +317,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
     /*
      * Convert message to string
      */
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined( SYS_BEOS )
+#if defined(HAVE_VASPRINTF) && !defined(__APPLE__) && !defined( SYS_BEOS )
     vlc_va_copy( args, _args );
     vasprintf( &psz_str, psz_format, args );
     va_end( args );
@@ -363,7 +363,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
         p_obj = p_obj->p_parent;
     }
 
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
     vlc_va_copy( args, _args );
     vsnprintf( psz_str, i_size, psz_format, args );
     va_end( args );

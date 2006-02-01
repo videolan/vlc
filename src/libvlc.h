@@ -145,7 +145,7 @@ static char *ppsz_snap_formats[] =
     "You can force the audio output frequency here. Common values are " \
     "-1 (default), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
 
-#if !defined( SYS_DARWIN )
+#if !defined( __APPLE__ )
 #define AOUT_RESAMP_TEXT N_("High quality audio resampling")
 #define AOUT_RESAMP_LONGTEXT N_( \
     "This uses a high quality audio resampling algorithm. High quality "\
@@ -1054,7 +1054,7 @@ vlc_module_begin();
                             VOLUME_STEP_LONGTEXT, VLC_TRUE );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, VLC_TRUE );
-#if !defined( SYS_DARWIN )
+#if !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
@@ -1090,7 +1090,7 @@ vlc_module_begin();
               SKIP_FRAMES_LONGTEXT, VLC_TRUE );
     add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, VLC_TRUE );
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
@@ -1375,7 +1375,7 @@ vlc_module_begin();
     add_bool( "minimize-threads", 0, NULL, MINIMIZE_THREADS_TEXT,
               MINIMIZE_THREADS_LONGTEXT, VLC_TRUE );
 
-#if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#if !defined(__APPLE__) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", VLC_FALSE, NULL, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, VLC_TRUE );
 #endif
@@ -1467,7 +1467,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS );
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , VLC_FALSE );
 
-#if defined(SYS_DARWIN)
+#if defined(__APPLE__)
 /* Don't use the following combo's */
 
 /*  copy                          KEY_MODIFIER_COMMAND|'c'

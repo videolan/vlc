@@ -33,7 +33,7 @@
 #   include <setjmp.h>                                    /* longjmp, setjmp */
 #endif
 
-#if defined(SYS_DARWIN) && (defined(__ppc__) || defined(__ppc64__))
+#if defined(__APPLE__) && (defined(__ppc__) || defined(__ppc64__))
 #include <sys/sysctl.h>
 #endif
 
@@ -66,7 +66,7 @@ uint32_t CPUCapabilities( void )
 {
     volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
-#if defined(SYS_DARWIN) && (defined(__ppc__) || defined(__ppc64__))
+#if defined(__APPLE__) && (defined(__ppc__) || defined(__ppc64__))
     int selectors[2] = { CTL_HW, HW_VECTORUNIT };
     int i_has_altivec = 0;
     size_t i_length = sizeof( i_has_altivec );
@@ -267,7 +267,7 @@ uint32_t CPUCapabilities( void )
 #   endif
     return i_capabilities;
 
-#elif defined( __powerpc__ )
+#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
 
 #   ifdef CAN_COMPILE_ALTIVEC && defined( HAVE_SIGNAL_H )
     void (*pf_sigill) (int) = signal( SIGILL, SigHandler );

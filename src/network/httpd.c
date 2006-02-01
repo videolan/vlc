@@ -1465,7 +1465,7 @@ void httpd_MsgAdd( httpd_message_t *msg, char *name, char *psz_value, ... )
     char *value = NULL;
 
     va_start( args, psz_value );
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
+#if defined(HAVE_VASPRINTF) && !defined(__APPLE__) && !defined(SYS_BEOS)
     vasprintf( &value, psz_value, args );
 #else
     {

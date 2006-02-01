@@ -43,7 +43,7 @@
 #include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 #include "vlc_playlist.h"
 
-#if defined( SYS_DARWIN )
+#if defined( __APPLE__ )
 #include "darwin_specific.h"
 #endif
 

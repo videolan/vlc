@@ -101,7 +101,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     int i_ret = VLC_SUCCESS;
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     FILE *p_eject;
     char *psz_disk;
     char sz_cmd[32];

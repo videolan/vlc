@@ -182,7 +182,7 @@ char * vlc_strcasestr( const char *psz_big, const char *psz_little )
 /*****************************************************************************
  * vasprintf:
  *****************************************************************************/
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
 {
     /* Guess we need no more than 100 bytes. */
@@ -228,7 +228,7 @@ int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
 /*****************************************************************************
  * asprintf:
  *****************************************************************************/
-#if !defined(HAVE_ASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if !defined(HAVE_ASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 int vlc_asprintf( char **strp, const char *fmt, ... )
 {
     va_list args;
