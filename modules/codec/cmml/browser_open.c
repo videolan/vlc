@@ -31,7 +31,7 @@
 
 int browser_Open( const char *psz_url )
 {
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     char *psz_open_commandline;
 
     psz_open_commandline = strdup( "/usr/bin/open " );

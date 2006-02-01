@@ -41,7 +41,7 @@
 #define MODE_HTML 1
 #define MODE_SYSLOG 2
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #define LOG_DIR "Library/Logs/"
 #endif
 
@@ -193,7 +193,7 @@ static int Open( vlc_object_t *p_this )
         psz_file = config_GetPsz( p_intf, "logfile" );
         if( !psz_file )
         {
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
             char *psz_homedir = p_this->p_vlc->psz_homedir;
 
             if( !psz_homedir )

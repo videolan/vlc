@@ -1958,7 +1958,7 @@ static int InitDisplay( vout_thread_t *p_vout )
 
     if( config_GetInt( p_vout, MODULE_STRING "-shm" ) )
     {
-#   ifdef SYS_DARWIN
+#   ifdef __APPLE__
         /* FIXME: As of 2001-03-16, XFree4 for MacOS X does not support Xshm */
 #   else
         p_vout->p_sys->b_shm =

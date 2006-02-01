@@ -47,7 +47,7 @@
 
 #if defined( SYS_BSDI )
 #   include <dvd.h>
-#elif defined ( SYS_DARWIN )
+#elif defined ( __APPLE__ )
 #   include <CoreFoundation/CFBase.h>
 #   include <IOKit/IOKitLib.h>
 #   include <IOKit/storage/IOCDTypes.h>
@@ -221,7 +221,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
          *  vcd device mode
          */
 
-#if defined( SYS_DARWIN )
+#if defined( __APPLE__ )
 
         CDTOC *pTOC;
         int i_descriptors;
@@ -581,7 +581,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
          *  vcd device mode
          */
 
-#if defined( SYS_DARWIN )
+#if defined( __APPLE__ )
         dk_cd_read_t cd_read;
 
         memset( &cd_read, 0, sizeof(cd_read) );
@@ -953,7 +953,7 @@ static void CloseVCDImage( vlc_object_t * p_this, vcddev_t *p_vcddev )
         free( p_vcddev->p_sectors );
 }
 
-#if defined( SYS_DARWIN )
+#if defined( __APPLE__ )
 /****************************************************************************
  * darwin_getTOC: get the TOC
  ****************************************************************************/
@@ -1098,7 +1098,7 @@ static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors )
 
     return( i_tracks );
 }
-#endif /* SYS_DARWIN */
+#endif /* __APPLE__ */
 
 #if defined( WIN32 )
 /*****************************************************************************

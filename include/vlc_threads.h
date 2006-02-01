@@ -69,7 +69,7 @@
  *****************************************************************************/
 
 /* Thread priorities */
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #   define VLC_THREAD_PRIORITY_LOW (-47)
 #   define VLC_THREAD_PRIORITY_INPUT 37
 #   define VLC_THREAD_PRIORITY_AUDIO 37

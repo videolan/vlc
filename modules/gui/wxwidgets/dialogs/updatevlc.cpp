@@ -39,7 +39,7 @@
 #   define UPDATE_VLC_OS "windows"
 #   define UPDATE_VLC_ARCH "i386"
 #else
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #   define UPDATE_VLC_OS "macosx"
 #   define UPDATE_VLC_ARCH "ppc"
 #else

@@ -28,7 +28,7 @@
 
 #if defined( SYS_BEOS )
 #   include "beos_specific.h"
-#elif defined( SYS_DARWIN )
+#elif defined( __APPLE__ )
 #   include "darwin_specific.h"
 #elif defined( WIN32 ) || defined( UNDER_CE )
 #   include "win32_specific.h"

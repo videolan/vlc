@@ -33,7 +33,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 
@@ -133,7 +133,7 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_description( _("OpenGL video output") );
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     set_capability( "video output", 200 );
 #else
     set_capability( "video output", 20 );
@@ -187,7 +187,7 @@ static int CreateVout( vlc_object_t *p_this )
     var_Create( p_vout, "opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     p_sys->i_index = 0;
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     p_sys->i_tex_width  = p_vout->fmt_in.i_width;
     p_sys->i_tex_height = p_vout->fmt_in.i_height;
 #else
@@ -268,7 +268,7 @@ static int Init( vout_thread_t *p_vout )
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
-#if defined( SYS_DARWIN ) || (VLCGL_FORMAT == YCBCR_MESA)
+#if defined( __APPLE__ ) || (VLCGL_FORMAT == YCBCR_MESA)
     p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
     i_pixel_pitch = 2;
 
@@ -478,7 +478,7 @@ static int Manage( vout_thread_t *p_vout )
     i_ret = p_sys->p_vout->pf_manage( p_sys->p_vout );
     p_vout->i_changes = p_sys->p_vout->i_changes;
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     if( p_sys->p_vout->pf_lock &&
         p_sys->p_vout->pf_lock( p_sys->p_vout ) )
     {
@@ -558,7 +558,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     int i_new_index;
     i_new_index = ( p_sys->i_index + 1 ) & 1;
 
@@ -608,7 +608,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* glTexCoord works differently with GL_TEXTURE_2D and
        GL_TEXTURE_RECTANGLE_EXT */
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     f_x = (float)p_vout->fmt_out.i_x_offset;
     f_y = (float)p_vout->fmt_out.i_y_offset;
     f_width = (float)p_vout->fmt_out.i_x_offset +
@@ -749,7 +749,7 @@ static int InitTextures( vout_thread_t *p_vout )
 
         glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
         /* Tell the driver not to make a copy of the texture but to use
            our buffer */
         glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );

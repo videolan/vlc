@@ -48,7 +48,7 @@
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #define DEFAULT_FONT "/System/Library/Fonts/LucidaGrande.dfont"
 #elif defined( SYS_BEOS )
 #define DEFAULT_FONT "/boot/beos/etc/fonts/ttfonts/Swiss721.ttf"
@@ -248,7 +248,7 @@ static int Create( vlc_object_t *p_this )
 #ifdef WIN32
         GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
-#elif SYS_DARWIN
+#elif __APPLE__
         strcpy( psz_fontfile, DEFAULT_FONT );
 #else
         msg_Err( p_filter, "user didn't specify a font" );

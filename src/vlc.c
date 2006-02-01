@@ -54,7 +54,7 @@ int main( int i_argc, char *ppsz_argv[] )
 {
     int i_ret;
 
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
     /* This clutters OSX GUI error logs */
     fprintf( stderr, "VLC media player %s\n", VLC_Version() );
 #endif

@@ -47,7 +47,7 @@
 /* The configuration file and directory */
 #ifdef SYS_BEOS
 #  define CONFIG_DIR                    "config/settings/VideoLAN Client"
-#elif SYS_DARWIN
+#elif __APPLE__
 #  define CONFIG_DIR                    "Library/Preferences/VLC"
 #elif defined( WIN32 ) || defined( UNDER_CE )
 #  define CONFIG_DIR                    "vlc"

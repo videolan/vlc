@@ -796,14 +796,14 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_strdup NULL
 #endif
 
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if !defined(HAVE_VASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 #   define vasprintf vlc_vasprintf
     VLC_EXPORT( int, vlc_vasprintf, (char **, const char *, va_list ) );
 #elif !defined(__PLUGIN__)
 #   define vlc_vasprintf NULL
 #endif
 
-#if !defined(HAVE_ASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if !defined(HAVE_ASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 #   define asprintf vlc_asprintf
     VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) );
 #elif !defined(__PLUGIN__)

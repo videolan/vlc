@@ -106,7 +106,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#if !defined( SYS_DARWIN )
+#if !defined( __APPLE__ )
     if( !config_GetInt( p_this, "hq-resampling" ) )
     {
         return VLC_EGENERIC;

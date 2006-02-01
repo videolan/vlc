@@ -31,11 +31,11 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
-#if !defined (SYS_DARWIN) && !defined(WIN32)
+#if !defined (__APPLE__) && !defined(WIN32)
 # define LOADER 1
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
 #include <QuickTime/QuickTimeComponents.h>
 #include <QuickTime/Movies.h>
 #include <QuickTime/ImageCodec.h>
@@ -83,7 +83,7 @@ static picture_t     *DecodeVideo( decoder_t *, block_t ** );
 #define FCC( a, b , c, d ) \
     ((uint32_t)( ((a)<<24)|((b)<<16)|((c)<<8)|(d)))
 
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
 typedef struct OpaqueSoundConverter*    SoundConverter;
 #ifndef LOADER
 typedef long                            OSType;
@@ -103,12 +103,12 @@ typedef struct SoundComponentData {
     long                            reserved;
 } SoundComponentData;
 
-#endif /* SYS_DARWIN */
+#endif /* __APPLE__ */
 
 struct decoder_sys_t
 {
     /* library */
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
 #ifdef LOADER
     ldt_fs_t    *ldt_fs;
 #endif /* LOADER */
@@ -117,7 +117,7 @@ struct decoder_sys_t
     HINSTANCE qts;
     OSErr (*InitializeQTML)             ( long flags );
     OSErr (*TerminateQTML)              ( void );
-#endif /* SYS_DARWIN */
+#endif /* __APPLE__ */
 
     /* Audio */
     int (*SoundConverterOpen)           ( const SoundComponentData *,
@@ -288,7 +288,7 @@ static void Close( vlc_object_t *p_this )
     /* get lock, avoid segfault */
     var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     /* on OS X QT is not threadsafe */
     vlc_mutex_lock( &p_dec->p_vlc->quicktime_lock );
 #endif
@@ -314,7 +314,7 @@ static void Close( vlc_object_t *p_this )
         if( p_sys->plane)  free( p_sys->plane );
     }
 
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
     FreeLibrary( p_sys->qtml );
     FreeLibrary( p_sys->qts );
     msg_Dbg( p_dec, "FreeLibrary ok." );
@@ -330,7 +330,7 @@ static void Close( vlc_object_t *p_this )
 #endif
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     vlc_mutex_unlock( &p_dec->p_vlc->quicktime_lock );
 #endif
     vlc_mutex_unlock( lockval.p_address );
@@ -362,12 +362,12 @@ static int OpenAudio( decoder_t *p_dec )
     /* get lock, avoid segfault */
     var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     /* on OS X QT is not threadsafe */
     vlc_mutex_lock( &p_dec->p_vlc->quicktime_lock );
 #endif
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     EnterMovies();
 #endif
 
@@ -377,7 +377,7 @@ static int OpenAudio( decoder_t *p_dec )
         goto exit_error;
     }
 
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
     if( ( i_error = p_sys->InitializeQTML( 6 + 16 ) ) )
     {
         msg_Dbg( p_dec, "error on InitializeQTML = %d", i_error );
@@ -476,7 +476,7 @@ static int OpenAudio( decoder_t *p_dec )
     p_sys->i_out = 0;
     p_sys->i_out_frames = 0;
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     vlc_mutex_unlock( &p_dec->p_vlc->quicktime_lock );
 #endif
     vlc_mutex_unlock( lockval.p_address );
@@ -487,7 +487,7 @@ exit_error:
 #ifdef LOADER
     Restore_LDT_Keeper( p_sys->ldt_fs );
 #endif
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     vlc_mutex_unlock( &p_dec->p_vlc->quicktime_lock );
 #endif
     vlc_mutex_unlock( lockval.p_address );
@@ -672,7 +672,7 @@ static int OpenVideo( decoder_t *p_dec )
     var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     EnterMovies();
 #endif
 
@@ -682,7 +682,7 @@ static int OpenVideo( decoder_t *p_dec )
         goto exit_error;
     }
 
-#ifndef SYS_DARWIN
+#ifndef __APPLE__
     if( ( i_result = p_sys->InitializeQTML( 6 + 16 ) ) )
     {
         msg_Dbg( p_dec, "error on InitializeQTML = %d", (int)i_result );
@@ -919,7 +919,7 @@ static int QTAudioInit( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     p_sys->SoundConverterOpen       = (void*)SoundConverterOpen;
     p_sys->SoundConverterClose      = (void*)SoundConverterClose;
     p_sys->SoundConverterSetInfo    = (void*)SoundConverterSetInfo;
@@ -974,7 +974,7 @@ static int QTAudioInit( decoder_t *p_dec )
     }
 
     msg_Dbg( p_dec, "Standard init done" );
-#endif /* else SYS_DARWIN */
+#endif /* else __APPLE__ */
 
     return VLC_SUCCESS;
 }
@@ -987,7 +987,7 @@ static int QTVideoInit( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     p_sys->FindNextComponent        = (void*)FindNextComponent;
     p_sys->OpenComponent            = (void*)OpenComponent;
     p_sys->ImageCodecInitialize     = (void*)ImageCodecInitialize;
@@ -1047,7 +1047,7 @@ static int QTVideoInit( decoder_t *p_dec )
         msg_Err( p_dec, "failed getting proc address" );
         return VLC_EGENERIC;
     }
-#endif /* SYS_DARWIN */
+#endif /* __APPLE__ */
 
     return VLC_SUCCESS;
 }

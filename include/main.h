@@ -70,7 +70,7 @@ struct libvlc_t
 #if defined( SYS_BEOS )
     vlc_object_t *         p_appthread;
     char *                 psz_vlcpath;
-#elif defined( SYS_DARWIN )
+#elif defined( __APPLE__ )
     char *                 psz_vlcpath;
     vlc_iconv_t            iconv_macosx; /* for HFS+ file names */
     vlc_mutex_t            iconv_lock;
@@ -110,7 +110,7 @@ struct vlc_t
 
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
-#ifdef SYS_DARWIN
+#ifdef __APPLE__
     vlc_mutex_t            quicktime_lock;          /* QT is not thread safe on OSX */
 #endif
 

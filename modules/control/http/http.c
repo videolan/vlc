@@ -83,7 +83,7 @@ static void Run          ( intf_thread_t *p_intf );
 /*****************************************************************************
  * Local functions
  *****************************************************************************/
-#if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && !defined(WIN32)
+#if !defined(__APPLE__) && !defined(SYS_BEOS) && !defined(WIN32)
 static int DirectoryCheck( char *psz_dir )
 {
     DIR           *p_dir;
@@ -271,7 +271,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_files  = 0;
     p_sys->pp_files = NULL;
 
-#if defined(SYS_DARWIN) || defined(SYS_BEOS) || defined(WIN32)
+#if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     if ( ( psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
     {
         char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;

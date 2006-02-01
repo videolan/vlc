@@ -66,7 +66,7 @@ struct vcddev_s
 /*****************************************************************************
  * Platform specifics
  *****************************************************************************/
-#if defined( SYS_DARWIN )
+#if defined( __APPLE__ )
 #define darwin_freeTOC( p ) free( (void*)p )
 #define CD_MIN_TRACK_NO 01
 #define CD_MAX_TRACK_NO 99
@@ -204,7 +204,7 @@ struct SRB_ExecSCSICmd
 static int    OpenVCDImage( vlc_object_t *, const char *, struct vcddev_s * );
 static void   CloseVCDImage( vlc_object_t *, struct vcddev_s * );
 
-#if defined( SYS_DARWIN )
+#if defined( __APPLE__ )
 static CDTOC *darwin_getTOC( vlc_object_t *, const struct vcddev_s * );
 static int    darwin_getNumberOfDescriptors( CDTOC * );
 static int    darwin_getNumberOfTracks( CDTOC *, int );

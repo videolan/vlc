@@ -4618,7 +4618,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
             msg_Dbg( &sys.demuxer, "|   |   + family=%d", *(uint32*)uid->GetBuffer() );
         }
-#if defined( HAVE_GMTIME_R ) && !defined( SYS_DARWIN )
+#if defined( HAVE_GMTIME_R ) && !defined( __APPLE__ )
         else if( MKV_IS_ID( l, KaxDateUTC ) )
         {
             KaxDateUTC &date = *(KaxDateUTC*)l;
