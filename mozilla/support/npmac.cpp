@@ -17,7 +17,7 @@
 
 //
 // A4Stuff.h contains the definition of EnterCodeResource and 
-// EnterCodeResource, used for setting up the code resource’s
+// EnterCodeResource, used for setting up the code resource‚Äôs
 // globals for 68K (analagous to the function SetCurrentA5
 // defined by the toolbox).
 //
@@ -183,9 +183,9 @@ static void* SetupTVtoFPGlue(TTVtoFPGlue* functionGlue, void* tvp)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 #if !TARGET_API_MAC_CARBON
-QDGlobals*		gQDPtr;				// Pointer to Netscape’s QuickDraw globals
+QDGlobals*		gQDPtr;				// Pointer to Netscape‚Äôs QuickDraw globals
 #endif
-short			gResFile;			// Refnum of the plugin’s resource file
+short			gResFile;			// Refnum of the plugin‚Äôs resource file
 NPNetscapeFuncs	gNetscapeFuncs;		// Function table for procs in Netscape called by plugin
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -567,7 +567,7 @@ void SetUpQD(void)
 #endif	
 
 	//
-	// Memorize the plugin’s resource file 
+	// Memorize the plugin‚Äôs resource file 
 	// refnum for later use.
 	//
 	gResFile = CurResFile();
@@ -614,7 +614,7 @@ void SetUpQD(void)
 		//
 		// Now that we know the app name and FSSpec, we can call GetDiskFragment
 		// to get a connID to use in a subsequent call to FindSymbol (it will also
-		// return the address of “main” in app, which we ignore).  If GetDiskFragment 
+		// return the address of ‚Äúmain‚Äù in app, which we ignore).  If GetDiskFragment 
 		// returns an error, we assume the app must be 68K.
 		//
 		Ptr mainAddr; 	
@@ -627,7 +627,7 @@ void SetUpQD(void)
 	{
 		//
 		// The app is a PPC code fragment, so call FindSymbol
-		// to get the exported “qd” symbol so we can access its
+		// to get the exported ‚Äúqd‚Äù symbol so we can access its
 		// QuickDraw globals.
 		//
 		CFragSymbolClass symClass;
@@ -685,11 +685,11 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
 		err = NPERR_INVALID_FUNCTABLE_ERROR;
 	
 	//
-	// Check the “major” version passed in Netscape’s function table.
-	// We won’t load if the major version is newer than what we expect.
+	// Check the ‚Äúmajor‚Äù version passed in Netscape‚Äôs function table.
+	// We won‚Äôt load if the major version is newer than what we expect.
 	// Also check that the function tables passed in are big enough for
 	// all the functions we need (they could be bigger, if Netscape added
-	// new APIs, but that’s OK with us -- we’ll just ignore them).
+	// new APIs, but that‚Äôs OK with us -- we‚Äôll just ignore them).
 	//
 	if (err == NPERR_NO_ERROR)
 	{
@@ -701,7 +701,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
 	if (err == NPERR_NO_ERROR)
 	{
 		//
-		// Copy all the fields of Netscape’s function table into our
+		// Copy all the fields of Netscape‚Äôs function table into our
 		// copy so we can call back into Netscape later.  Note that
 		// we need to copy the fields one by one, rather than assigning
 		// the whole structure, because the Netscape function table
