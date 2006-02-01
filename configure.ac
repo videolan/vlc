@@ -1343,6 +1343,9 @@ dnl
 AC_ARG_ENABLE(debug,
 [  --enable-debug          debug mode (default disabled)])
 test "${enable_debug}" != "yes" && enable_debug="no"
+AH_TEMPLATE(NDEBUG,
+            [Define to 1 if debug code should NOT be compiled])
+AS_IF([test "x${enable_debug}" == "xno"], [AC_DEFINE(NDEBUG)])
 
 dnl
 dnl  Enable release-specific flags
