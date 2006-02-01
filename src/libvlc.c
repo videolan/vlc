@@ -42,7 +42,11 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                                /* free() */
-#include <assert.h>
+#ifdef HAVE_ASSERT
+# include <assert.h>
+#else
+# define assert( c ) ((void)0)
+#endif
 
 #ifndef WIN32
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
@@ -2728,13 +2732,12 @@ char *FromLocale( const char *locale )
             inb--;
             vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
         }
-        vlc_mutex_unlock( &libvlc.from_locale_lock );
-#ifdef HAVE_ASSERT
+	vlc_mutex_unlock( &libvlc.from_locale_lock );
+
         assert (inb == 0);
         assert (*iptr == '\0');
         assert (*optr == '\0');
         assert (strlen( output ) == (size_t)(optr - output));
-#endif
         return realloc( output, optr - output + 1 );
     }
     return (char *)locale;
@@ -2777,12 +2780,10 @@ char *ToLocale( const char *utf8 )
         }
         vlc_mutex_unlock( &libvlc.to_locale_lock );
 
-#ifdef HAVE_ASSERT
         assert (inb == 0);
         assert (*iptr == '\0');
         assert (*optr == '\0');
         assert (strlen( output ) == (size_t)(optr - output));
-#endif
 	return realloc( output, optr - output + 1 );
     }
     return (char *)utf8;
