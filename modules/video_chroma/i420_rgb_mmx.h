@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
- *          Gaël Hendryckx <jimmy@via.ecp.fr>
+ *          GaÃ«l Hendryckx <jimmy@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify

@@ -4,7 +4,7 @@
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix KÃ¼hne <fkuehne@users.sf.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 /*****************************************************************************
  * Note: this code is partially based upon ../wxwidgets/wizard.cpp and
- *         ../wxwidgets/streamdata.h; both written by Clément Stenac.
+ *         ../wxwidgets/streamdata.h; both written by ClÃ©ment Stenac.
  *****************************************************************************/
 
 

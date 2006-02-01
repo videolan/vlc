@@ -4,7 +4,7 @@
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix KÃ¼hne <fkuehne@users.sf.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 /*****************************************************************************
  * Note: 
  * the code used to bind with VLC's modules is heavily based upon 
- * ../wxwidgets/extrapanel.cpp, written by Clément Stenac.
+ * ../wxwidgets/extrapanel.cpp, written by ClÃ©ment Stenac.
  * the code used to insert/remove the views was inspired by intf.m, 
  * written by Derk-Jan Hartman and Benjamin Pracht. 
  * (all 3 are members of the VideoLAN team) 

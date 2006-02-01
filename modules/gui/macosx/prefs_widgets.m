@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
- *          Jérôme Decoodt <djc at videolan.org>
+ *          JÃ©rÃ´me Decoodt <djc at videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

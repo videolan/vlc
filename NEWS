@@ -120,7 +120,7 @@ Stream output:
  * Fixed MTU handling to avoid IP fragments
  
 Interfaces:
-- new cone icon by Richard ¯iestad (Eurodata, retron.info)
+- new cone icon by Richard Â¯iestad (Eurodata, retron.info)
  * Mac OS X
     - New streaming and transcoding wizard
     - New extended controls panel
