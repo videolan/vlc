@@ -605,7 +605,7 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
  * call the external handler and parse vlc macros if Content-Type is HTML
  ****************************************************************************/
 int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
-                          httpd_handler_t *p_handler, uint8_t *_p_url,
+                          httpd_handler_t *p_handler, char *_p_url,
                           uint8_t *_p_request, int i_type,
                           uint8_t *_p_in, int i_in,
                           char *psz_remote_addr, char *psz_remote_host,

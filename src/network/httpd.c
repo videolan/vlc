@@ -623,7 +623,7 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
 
     if( query->i_type == HTTPD_MSG_HEAD )
     {
-        char *p = answer->p_body;
+        char *p = (char *)answer->p_body;
         while ( (p = strchr( p, '\r' )) != NULL )
         {
             if( p[1] && p[1] == '\n' && p[2] && p[2] == '\r'
@@ -635,20 +635,20 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
         if( p != NULL )
         {
             p[4] = '\0';
-            answer->i_body = strlen(answer->p_body) + 1;
+            answer->i_body = strlen((char*)answer->p_body) + 1;
             answer->p_body = realloc( answer->p_body, answer->i_body );
         }
     }
 
-    if( strncmp( answer->p_body, "HTTP/1.", 7 ) )
+    if( strncmp( (char *)answer->p_body, "HTTP/1.", 7 ) )
     {
         int i_status, i_headers;
         char *psz_headers, *psz_new, *psz_status;
-        char psz_code[12];
-        if( !strncmp( answer->p_body, "Status: ", 8 ) )
+
+        if( !strncmp( (char *)answer->p_body, "Status: ", 8 ) )
         {
             /* Apache-style */
-            i_status = strtol( &answer->p_body[8], &psz_headers, 0 );
+            i_status = strtol( (char *)&answer->p_body[8], &psz_headers, 0 );
             if( *psz_headers ) psz_headers++;
             if( *psz_headers ) psz_headers++;
             i_headers = answer->i_body - (psz_headers - (char *)answer->p_body);
@@ -656,7 +656,7 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
         else
         {
             i_status = 200;
-            psz_headers = answer->p_body;
+            psz_headers = (char *)answer->p_body;
             i_headers = answer->i_body;
         }
         switch( i_status )
@@ -668,17 +668,18 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
             psz_status = "Unauthorized";
             break;
         default:
+            if( (i_status < 0) || (i_status > 999) )
+                i_status = 500;
             psz_status = "Undefined";
             break;
         }
-        snprintf( psz_code, sizeof(psz_code), "%d", i_status );
-        answer->i_body = sizeof("HTTP/1.0  \r\n") + strlen(psz_code)
-                           + strlen(psz_status) + i_headers - 1;
-        psz_new = malloc( answer->i_body + 1);
-        sprintf( psz_new, "HTTP/1.0 %s %s\r\n", psz_code, psz_status );
+        answer->i_body = sizeof("HTTP/1.0 xxx \r\n")
+                        + strlen(psz_status) + i_headers - 1;
+        psz_new = (char *)malloc( answer->i_body + 1);
+        sprintf( psz_new, "HTTP/1.0 %03d %s\r\n", i_status, psz_status );
         memcpy( &psz_new[strlen(psz_new)], psz_headers, i_headers );
         free( answer->p_body );
-        answer->p_body = psz_new;
+        answer->p_body = (uint8_t *)psz_new;
     }
 
     return VLC_SUCCESS;
