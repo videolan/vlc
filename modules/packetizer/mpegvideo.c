@@ -121,7 +121,7 @@ struct decoder_sys_t
 
     /* Number of pictures since last sequence header */
     int i_seq_old;
-    
+
     /* Sync behaviour */
     vlc_bool_t  b_sync_on_intra_frame;
     vlc_bool_t  b_discontinuity;
@@ -190,7 +190,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_sync_on_intra_frame = var_CreateGetBool( p_dec, "packetizer-mpegvideo-sync-iframe" );
     if( p_sys->b_sync_on_intra_frame )
         msg_Dbg( p_dec, "syncing happens on intraframe now." );
-        
+
     return VLC_SUCCESS;
 }
 
@@ -216,7 +216,7 @@ static void Close( vlc_object_t *p_this )
     {
         block_ChainRelease( p_sys->p_frame );
     }
-    
+
     var_Destroy( p_dec, "packetizer-mpegvideo-sync-iframe" );
 
     free( p_sys );
@@ -240,7 +240,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_state = STATE_NOSYNC;
         p_sys->b_discontinuity = VLC_TRUE;
         if( p_sys->p_frame )
-            block_ChainRelease( p_sys->p_frame );        
+            block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = VLC_FALSE;
@@ -328,11 +328,13 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 }
                 else
                 {
+                    msg_Dbg( p_dec, "waiting on Intra frame" );
                     p_sys->i_state = STATE_NOSYNC;
+                    block_Release( p_pic );
                     break;
                 }
             }
-            
+
             /* We've just started the stream, wait for the first PTS.
              * We discard here so we can still get the sequence header. */
             if( p_sys->i_dts <= 0 && p_sys->i_pts <= 0 &&
