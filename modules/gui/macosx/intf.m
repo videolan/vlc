@@ -897,6 +897,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             p_intf->p_sys->b_intf_update = VLC_TRUE;
             p_intf->p_sys->i_play_status = END_S;
             [self setScrollField: _NS("VLC media player") stopAfter:-1];
+            msg_Dbg( p_intf, "input has stopped, refreshing interface" );
             vlc_object_release( p_input );
             p_input = NULL;
         }
@@ -1015,8 +1016,8 @@ static VLCMain *_o_sharedMainInstance = nil;
                     p_playlist->status.p_item->input.psz_name];
             [self setScrollField: o_temp stopAfter:-1];
 
-            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                    FIND_ANYWHERE );
+            p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT,
+                                                    FIND_PARENT );
             if( p_vout != NULL )
             {
                 id o_vout_wnd;
@@ -1026,8 +1027,9 @@ static VLCMain *_o_sharedMainInstance = nil;
                 {
                     if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"]
                         || [[[VLCMain sharedInstance] getEmbeddedList]
-                                            windowContainsEmbedded: o_vout_wnd])
+                                            windowContainsEmbedded: o_vout_wnd] )
                     {
+                        msg_Dbg( p_intf, "updateTitle call getVoutView" );
                         [[o_vout_wnd getVoutView] updateTitle];
                     }
                 }

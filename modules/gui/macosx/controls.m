@@ -281,6 +281,7 @@
             /* We have a detached Vout */
             else if( [[o_window className] isEqualToString: @"VLCWindow"] )
             {
+                msg_Dbg( VLCIntf, "detached vout controls.m call getVoutView" );
                 o_vout_view = [o_window getVoutView];
             }
 

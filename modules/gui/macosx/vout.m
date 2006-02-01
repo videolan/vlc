@@ -111,7 +111,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (BOOL)windowContainsEmbedded: (id)o_window
 {
-    return ([self getViewForWindow: o_window] == nil ? NO : YES);
+    if( ![[o_window className] isEqualToString: @"VLCWindow"] )
+    {
+        NSLog( @"We were not given a VLCWindow" );
+    }
+    return ([self getViewForWindow: o_window] == nil ? NO : YES );
 }
 
 - (id)getViewForWindow: (id)o_window
