@@ -271,7 +271,7 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             case SB_BOTTOM       : newvalue = 0; break;
             case SB_TOP          : newvalue = config_data->panel->maxvalue; break;
             case SB_LINEDOWN     : newvalue += 10; break;
-            case SB_PAGEDOWN     : newvalue += rc.bottom - rc.top - 25; break; // faux ! une page c'est la longueur réelle de notebook
+            case SB_PAGEDOWN     : newvalue += rc.bottom - rc.top - 25; break; // wrong! one page is notebook actual length
             case SB_LINEUP       : newvalue -= 10; break;
             case SB_PAGEUP       : newvalue -= rc.bottom - rc.top - 25; break;
             case SB_THUMBPOSITION:
