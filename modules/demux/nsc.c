@@ -274,13 +274,13 @@ static int DemuxOpen( vlc_object_t * p_this )
 
     if ( i_size > 0 )
     {
-        while ( i_size && strncasecmp( p_peek, "NSC Format Version=",
+        while ( i_size && strncasecmp( (char *)p_peek, "NSC Format Version=",
                                        (int) sizeof("NSC Format Version=") - 1 ) )
         {
             p_peek++;
             i_size--;
         }
-        if ( !strncasecmp( p_peek, "NSC Format Version=",
+        if ( !strncasecmp( (char *)p_peek, "NSC Format Version=",
                            (int) sizeof("NSC Format Version=") -1 ) )
         {
             p_demux->pf_demux = Demux;
