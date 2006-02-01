@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-15" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <appendix> <title> Project history </title>
 
   <sect1> <title> VIA and the Network2000 project </title>
@@ -95,7 +95,7 @@ In late 2000, <ulink url="mailto:massiot@via.ecp.fr"> Christophe Massiot
 </ulink> with the support of his company,
 <ulink url="http://www.idealx.com/"> IDEALX</ulink>, rewrote major
 parts of the input to allow modularization and advanced navigation, and <ulink
-url="mailto:stef@via.ecp.fr"> Stéphane Borel </ulink> worked on a
+url="mailto:stef@via.ecp.fr"> StÃ©phane Borel </ulink> worked on a
 fully-featured DVD plug-in for VLC.
     </para>
 

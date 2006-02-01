@@ -3,7 +3,7 @@
 <xsl:import href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/xhtml/chunk.xsl"/>
 
 <xsl:variable name="toc.section.depth">1</xsl:variable>
-<xsl:param name="chunker.output.encoding" select="'iso-8859-15'"/>
+<xsl:param name="chunker.output.encoding" select="'UTF-8'"/>
 <xsl:param name="chunk.section.depth" select="0"/>
 <xsl:param name="html.stylesheet" select="'../screen.css'"/>
 

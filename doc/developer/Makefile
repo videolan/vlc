@@ -1,5 +1,5 @@
 # Makefile for VideoLAN Doc
-#  Clément Stenac
+#  ClÃ©ment Stenac
 #  Anil Daoud
 
 XSLTPROC=xsltproc
