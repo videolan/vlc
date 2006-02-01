@@ -20,6 +20,15 @@ dnl them. And we need the comma otherwize automake will choke on it.
 AM_INIT_AUTOMAKE(vlc,0.8.5-svn)
 AM_CONFIG_HEADER(config.h)
 
+dnl Too many people are not aware of maintainer mode:
+dnl If you want to use it, you definitely know what you are doing, so
+dnl you can specify "--disable-maintainer-mode". But if you want the default
+dnl automake behavior, you've likely never heard of maintainer mode, so we
+dnl can't expect you to enable it manually.
+
+AS_IF([test "x${enable_maintainer_mode}" != "xno"],
+	[enable_maintainer_mode="yes"])
+
 dnl HA! HA!
 AM_MAINTAINER_MODE
 
