@@ -710,13 +710,15 @@ static int OpenVideo( decoder_t *p_dec )
 
     memset( &icap, 0, sizeof( ImageSubCodecDecompressCapabilities ) );
     cres =  p_sys->ImageCodecInitialize( p_sys->ci, &icap );
-    msg_Dbg( p_dec, "ImageCodecInitialize->0x%X size=%ld (%ld)\n",(int)cres,icap.recordSize,icap.decompressRecordSize);
+    msg_Dbg( p_dec, "ImageCodecInitialize->0x%X size=%d (%d)\n",
+             (int)cres, icap.recordSize, icap.decompressRecordSize);
 
     memset( &cinfo, 0, sizeof( CodecInfo ) );
     cres =  p_sys->ImageCodecGetCodecInfo( p_sys->ci, &cinfo );
     msg_Dbg( p_dec,
-             "Flags: compr: 0x%lx  decomp: 0x%lx format: 0x%lx\n",
-             cinfo.compressFlags, cinfo.decompressFlags, cinfo.formatFlags );
+             "Flags: compr: 0x%x  decomp: 0x%x format: 0x%x\n",
+             cinfo.compressFlags,
+             cinfo.decompressFlags, cinfo.formatFlags );
     msg_Dbg( p_dec, "quicktime_video: Codec name: %.*s\n",
              ((unsigned char*)&cinfo.typeName)[0],
              ((unsigned char*)&cinfo.typeName)+1 );
@@ -752,7 +754,7 @@ static int OpenVideo( decoder_t *p_dec )
         memcpy( ((char*)&id->clutID) + 2, p_vide + 70, i_vide - 70 );
     }
 
-    msg_Dbg( p_dec, "idSize=%ld ver=%d rev=%d vendor=%ld tempQ=%d "
+    msg_Dbg( p_dec, "idSize=%d ver=%d rev=%d vendor=%d tempQ=%d "
              "spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d depth=%d frameCount=%d clutID=%d",
              id->idSize, id->version, id->revisionLevel, id->vendor,
              (int)id->temporalQuality, (int)id->spatialQuality,
