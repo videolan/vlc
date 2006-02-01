@@ -4,7 +4,7 @@
  * Copyright (C) 2004 the VideoLAN team
  * $Id$
  *
- * Authors: Jérôme Decoodt <djc@videolan.org>
+ * Authors: J√©r√¥me Decoodt <djc@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
