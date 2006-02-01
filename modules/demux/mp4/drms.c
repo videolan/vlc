@@ -289,8 +289,10 @@ void drms_decrypt( void *_p_drms, uint32_t *p_buffer, uint32_t i_bytes )
  *  0: success
  * -1: unimplemented
  * -2: invalid argument
- * -3: failed to get user key
- * -4: invalid user key
+ * -3: could not get system key
+ * -4: could not get SCI data
+ * -5: no user key found in SCI data
+ * -6: invalid user key
  *****************************************************************************/
 int drms_init( void *_p_drms, uint32_t i_type,
                uint8_t *p_info, uint32_t i_len )
@@ -363,9 +365,9 @@ int drms_init( void *_p_drms, uint32_t i_type,
             }
             else
             {
-                if( GetUserKey( p_drms, p_drms->p_key ) )
+                i_ret = GetUserKey( p_drms, p_drms->p_key );
+                if( i_ret )
                 {
-                    i_ret = -3;
                     break;
                 }
             }
@@ -379,7 +381,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
 
             if( p_priv[ 0 ] != 0x6e757469 ) /* itun */
             {
-                i_ret = -4;
+                i_ret = -6;
                 break;
             }
 
@@ -1638,9 +1640,9 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     uint32_t *p_sci0, *p_sci1, *p_buffer;
     uint32_t p_sci_key[ 4 ];
     char *psz_ipod;
-    int i_ret = -1;
+    int i_ret = -5;
 
-    if( !ReadUserKey( p_drms, p_user_key ) )
+    if( ReadUserKey( p_drms, p_user_key ) == 0 )
     {
         REVERSE( p_user_key, 4 );
         return 0;
@@ -1650,12 +1652,12 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 
     if( GetSystemKey( p_sys_key, psz_ipod ? VLC_TRUE : VLC_FALSE ) )
     {
-        return -1;
+        return -3;
     }
 
     if( GetSCIData( psz_ipod, &p_sci_data, &i_sci_size ) )
     {
-        return -1;
+        return -4;
     }
 
     /* Phase 1: unscramble the SCI data using the system key and shuffle

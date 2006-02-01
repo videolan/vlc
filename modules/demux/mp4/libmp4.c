@@ -2045,8 +2045,10 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
             {
                 case -1: psz_error = "unimplemented"; break;
                 case -2: psz_error = "invalid argument"; break;
-                case -3: psz_error = "could not get user key"; break;
-                case -4: psz_error = "invalid user key"; break;
+                case -3: psz_error = "could not get system key"; break;
+                case -4: psz_error = "could not get SCI data"; break;
+                case -5: psz_error = "no user key found in SCI data"; break;
+                case -6: psz_error = "invalid user key"; break;
                 default: psz_error = "unknown error"; break;
             }
 
