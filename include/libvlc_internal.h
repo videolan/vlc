@@ -5,7 +5,7 @@
  * Copyright (C) 2005 the VideoLAN team
  * $Id: control_structures.h 13752 2005-12-15 10:14:42Z oaubert $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -4,7 +4,7 @@
  * Copyright (C) 2003 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify

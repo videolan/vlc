@@ -43,10 +43,10 @@
  * this can't easily be done with the C preprocessor, thus a few ugly hacks.
  */
 
-/* I can't believe I need to do this to change « foo » to « "foo" » */
+/* I can't believe I need to do this to change Â« foo Â» to Â« "foo" Â» */
 #define STRINGIFY( z )   UGLY_KLUDGE( z )
 #define UGLY_KLUDGE( z ) #z
-/* And I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
+/* And I need to do _this_ to change Â« foo bar Â» to Â« module_foo_bar Â» ! */
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
 #define CRUDE_HACK( y, z )  y##__##z
 

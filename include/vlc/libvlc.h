@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2005 the VideoLAN team
  * $Id: vlc.h 13701 2005-12-12 17:58:56Z zorglub $
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
