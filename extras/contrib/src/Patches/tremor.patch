@@ -92,3 +92,17 @@ Index: Makefile.am
  
  example:
  	-ln -fs . vorbis
+Index: configure.in
+===================================================================
+--- orig/configure.in	2006-02-01 12:56:54.000000000 +0100
++++ configure.in	2006-02-01 13:02:36.000000000 +0100
+@@ -54,8 +54,7 @@ else
+ 
+         case $host in 
+         arm-*-*)
+-                DEBUG="-g -Wall -D__NO_MATH_INLINES -fsigned-char 
+--D_ARM_ASSEM_"
++                DEBUG="-g -Wall -D__NO_MATH_INLINES -fsigned-char -D_ARM_ASSEM_"
+                 CFLAGS="-O2 -D_ARM_ASSEM_ -fsigned-char"
+                 PROFILE="-W -pg -g -O2 -D_ARM_ASSEM_ -fsigned-char -fno-inline-functions";;
+ 
