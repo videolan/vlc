@@ -40,6 +40,10 @@
 #   include <limits.h>  
 #endif
 
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
 #include <ctype.h>
 
 /**
@@ -314,10 +318,16 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
     else
     {
-        /* FIXME: we should check the CWD here */
-        /* f_fname = strdup( psz_fname ); */
-        if( psz_fname_original ) free( psz_fname_original );
-        return NULL;
+        /* Get the current working directory */
+#ifdef HAVE_UNISTD_H
+        f_dir = getcwd( NULL, 0 );
+#endif
+        if( f_dir == NULL )
+        {
+            if( psz_fname_original ) free( psz_fname_original );
+            return NULL;
+        }
+        f_fname = strdup( psz_fname );
     }
 
     i_fname_len = strlen( f_fname );
@@ -396,27 +406,35 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 if( i_prio >= fuzzy.i_int )
                 {
                     FILE *f;
-                    char *tmpresult;
+                    char *psz_UTF8_path;
+                    char *psz_locale_path;
 
-                    asprintf( &tmpresult, "%s%s", j < 0 ? f_dir : *subdirs, p_fixed_name );
+                    asprintf( &psz_UTF8_path, "%s%s", j < 0 ? f_dir : *subdirs, p_fixed_name );
+                    psz_locale_path = ToLocale( psz_UTF8_path );
                     msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
-                    if( ( f = fopen( tmpresult, "rt" ) ) )
+                    if( ( f = fopen( psz_locale_path, "rt" ) ) )
                     {
                         fclose( f );
+                        LocaleFree( psz_locale_path );
                         result[i_sub_count].priority = i_prio;
-                        result[i_sub_count].psz_fname = tmpresult;
+                        result[i_sub_count].psz_fname = psz_UTF8_path;
                         result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
                         i_sub_count++;
-                    } else free( tmpresult );
+                    }
+                    else
+                    {
+                        if( psz_UTF8_path ) free( psz_UTF8_path );
+                        LocaleFree( psz_locale_path );
+                    }
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
-                free( p_fixed_name );
+                if( p_fixed_name ) free( p_fixed_name );
             }
             for( a = 0; a < i_dir_content; a++ )
                 if( pp_dir_content[a] ) free( pp_dir_content[a] );
             if( pp_dir_content ) free( pp_dir_content );
         }
-        if( j >= 0 ) free( *subdirs++ );
+        if( j >= 0 ) if( *subdirs ) free( *subdirs++ );
     }
 
     if( tmp_subdirs )   free( tmp_subdirs );
