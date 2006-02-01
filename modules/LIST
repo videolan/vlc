@@ -306,7 +306,7 @@ $Id$
 
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  
- * mpgv: MPEG-I/II Vidéo demuxer
+ * mpgv: MPEG-I/II Video demuxer
 
  * mux_asf: ASF muxer
 
@@ -485,7 +485,7 @@ $Id$
  * time: Overlays the current time
 
  * transform: filter for horizontal and vertical image flips and
-                     90° rotations.
+                     90Â° rotations.
 
  * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library.
 

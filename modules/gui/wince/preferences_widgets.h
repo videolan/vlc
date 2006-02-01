@@ -30,8 +30,9 @@ public:
 
     virtual int GetIntValue() {return 0;}
     virtual float GetFloatValue() {return 0;}
-    virtual char *GetPszValue() {return GetName();} // faux retourne nom associé à parent
-        // mettre dans constructeur et dans private le nom du panel associé à HWND
+    virtual char *GetPszValue() {return GetName();}
+    // FIXME returns name corresponding to parent
+    // put the panel name corresponding to HWND into the constructor and make it private
 
     char *GetName();
     int GetType();
