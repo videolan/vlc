@@ -30,7 +30,7 @@ Bruno Vella <allevb at tin.it> - Italian localization
 Carlo Calabrò <murray at via.ecp.fr> - Italian localization
 Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
 Chris Clepper - OpenGL fix
-Christian Henz - UPnP service discovery fixes
+Christian Henz - libupnp service discovery plugin, CyberLink UPnP fixes
 Christof Baumgaertner - dbox web intf
 Christophe Mutricy <xtophe at nxtelevision dot com> - many fixes (preferences, M3U, ...)
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec

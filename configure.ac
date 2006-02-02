@@ -4092,8 +4092,8 @@ AS_IF([test "${CXX}" != "" -a "${enable_cyberlink}" = "yes" || (test "${enable_c
     CPPFLAGS_cyberlink="-I${real_cyberlink_tree}/include"
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_cyberlink}"
     AC_CHECK_HEADERS([cybergarage/upnp/MediaServer.h],
-      [ VLC_ADD_CXXFLAGS([upnp], [${CPPFLAGS_cyberlink}])
-        VLC_ADD_PLUGINS([upnp]) 
+      [ VLC_ADD_CXXFLAGS([upnp_cc], [${CPPFLAGS_cyberlink}])
+        VLC_ADD_PLUGINS([upnp_cc]) 
       ],[
         AC_MSG_ERROR([cannot find CyberLink for C++ headers])
       ])
@@ -4130,7 +4130,7 @@ class testclass : public SearchResponseListener, public MediaPlayer
       AS_IF([test "${LIBS_cclink}" == "no"],
         [AC_MSG_FAILURE([cannot find XML parser for CyberLink])])
       AC_MSG_RESULT([${LIBS_cclink}])
-      VLC_ADD_LDFLAGS([upnp], [${real_cyberlink_tree}/lib/unix/libclink.a -lpthread ${LIBS_cclink}])
+      VLC_ADD_LDFLAGS([upnp_cc], [${real_cyberlink_tree}/lib/unix/libclink.a -lpthread ${LIBS_cclink}])
     ], [
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_cyberlink_tree}/lib/unix/libclink.a, make sure you compiled CyberLink for C++ in ${with_cyberlink_tree}])
@@ -4139,6 +4139,30 @@ class testclass : public SearchResponseListener, public MediaPlayer
     AC_LANG_POP([C++])
   ])
 ])
+
+dnl
+dnl UPnP Plugin (Intel SDK)
+dnl
+AC_ARG_ENABLE(upnp,
+  [  --enable-upnp           Intel UPnP SDK (default auto)])
+
+VLC_ADD_CXXFLAGS([upnp_intel], [ ])
+AS_IF([test "x${enable_upnp}" != "xno"], [
+  AC_CHECK_LIB([upnp], [UpnpInit], [has_upnp="yes"], [has_upnp="no"], [-lpthread])
+  AS_IF([test "x${enable_upnp}" != "x" && test "${has_upnp}" == "no"], [
+    AC_MSG_ERROR([cannot find Intel UPnP SDK (libupnp)])
+  ])
+  AS_IF([test "${has_upnp}" == "yes"], [
+    VLC_ADD_LDFLAGS([upnp_intel], [-lupnp])
+  ])
+], [
+  has_upnp="no"
+])
+
+AS_IF([test "${has_upnp}" == "yes"], [
+  VLC_ADD_PLUGINS([upnp_intel])
+])
+
 
 dnl
 dnl  Interface plugins
