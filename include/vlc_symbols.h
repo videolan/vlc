@@ -84,6 +84,7 @@ void __intf_UserHide (vlc_object_t *, int);
 int __config_LoadConfigFile (vlc_object_t *, const char *);
 int vlc_asprintf (char **, const char *, ...);
 int __var_Change (vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t *);
+update_iterator_t * update_iterator_New (update_t *);
 int playlist_Disable (playlist_t *, playlist_item_t *);
 char * vlc_input_item_GetInfo (input_item_t *p_i, const char *psz_cat,const char *psz_name);
 int vout_VarCallback (vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void *);
@@ -91,6 +92,7 @@ session_descriptor_t* sout_AnnounceSessionCreate (void);
 void __osd_Volume (vlc_object_t *);
 int vlc_vasprintf (char **, const char *, va_list);
 int playlist_Sort (playlist_t *, int, int);
+void update_Check (update_t *, vlc_bool_t);
 int aout_DecDelete (aout_instance_t *, aout_input_t *);
 int vlc_strcasecmp (const char *s1, const char *s2);
 sout_packetizer_input_t * sout_InputNew (sout_instance_t *, es_format_t *);
@@ -136,6 +138,7 @@ stream_t * __stream_UrlNew (vlc_object_t *p_this, const char *psz_url);
 sout_mux_t * sout_MuxNew (sout_instance_t*, char *, sout_access_out_t *);
 stream_t * __stream_DemuxNew (vlc_object_t *p_obj, char *psz_demux, es_out_t *out);
 int vout_ShowTextRelative (vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t);
+unsigned int update_iterator_Action (update_iterator_t *, int);
 void __stats_TimerDump (vlc_object_t*, const char *);
 int block_FifoPut (block_fifo_t *, block_t *);
 int playlist_ItemAddParent (playlist_item_t *, int,playlist_item_t *);
@@ -161,6 +164,7 @@ int httpd_UrlCatch (httpd_url_t *, int i_msg, httpd_callback_t, httpd_callback_s
 void __vlc_object_yield (vlc_object_t *);
 const char * VLC_CompileBy (void);
 playlist_item_t * playlist_LockItemGetByPos (playlist_t *, int);
+void update_Delete (update_t *);
 input_thread_t * __input_CreateThread (vlc_object_t *, input_item_t *);
 const char * DecodeLanguage (uint16_t);
 int __aout_VolumeSet (vlc_object_t *, audio_volume_t);
@@ -220,6 +224,7 @@ void __stats_ComputeGlobalStats (vlc_object_t*,global_stats_t*);
 char * vlc_strndup (const char *s, size_t n);
 void vout_PlacePicture (vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
 float __config_GetFloat (vlc_object_t *, const char *);
+void update_iterator_Delete (update_iterator_t *);
 playlist_item_t * playlist_ItemGetById (playlist_t *, int);
 const char * vlc_gai_strerror (int);
 void net_ListenClose (int *fd);
@@ -345,6 +350,7 @@ int playlist_PreparseEnqueue (playlist_t *, input_item_t *);
 aout_buffer_t * aout_FifoPop (aout_instance_t * p_aout, aout_fifo_t * p_fifo);
 int __vout_InitPicture (vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect);
 int playlist_LockClear (playlist_t *);
+unsigned int update_iterator_ChooseMirrorAndFile (update_iterator_t *, int, int, int);
 void intf_InteractionManage (playlist_t *);
 char * mstrtime (char *psz_buffer, mtime_t date);
 void aout_FormatPrepare (audio_sample_format_t * p_format);
@@ -356,6 +362,7 @@ xml_t * __xml_Create (vlc_object_t *);
 msg_subscription_t* __msg_Subscribe (vlc_object_t *, int);
 const char * VLC_Version (void);
 session_descriptor_t* sout_AnnounceRegisterSDP (sout_instance_t *,const char *, const char *, announce_method_t*);
+update_t * __update_New (vlc_object_t *);
 char * stream_ReadLine (stream_t *);
 int playlist_PreparseEnqueueItem (playlist_t *, playlist_item_t *);
 void __osd_MenuPrev (vlc_object_t *);
@@ -364,6 +371,7 @@ module_t * config_FindModule (vlc_object_t *, const char *);
 void aout_VolumeSoftInit (aout_instance_t *);
 void block_FifoRelease (block_fifo_t *);
 void block_FifoEmpty (block_fifo_t *);
+void update_download (update_iterator_t *, char *);
 int playlist_ItemAddOption (playlist_item_t *, const char *);
 void aout_VolumeNoneInit (aout_instance_t *);
 void aout_DateInit (audio_date_t *, uint32_t);
@@ -903,6 +911,14 @@ struct module_symbols_t
     void (*__stats_ComputeGlobalStats_inner) (vlc_object_t*,global_stats_t*);
     void (*__stats_TimerStop_inner) (vlc_object_t*, const char *);
     void (*__stats_TimersDumpAll_inner) (vlc_object_t*);
+    update_iterator_t * (*update_iterator_New_inner) (update_t *);
+    void (*update_Check_inner) (update_t *, vlc_bool_t);
+    unsigned int (*update_iterator_Action_inner) (update_iterator_t *, int);
+    void (*update_Delete_inner) (update_t *);
+    void (*update_iterator_Delete_inner) (update_iterator_t *);
+    unsigned int (*update_iterator_ChooseMirrorAndFile_inner) (update_iterator_t *, int, int, int);
+    update_t * (*__update_New_inner) (vlc_object_t *);
+    void (*update_download_inner) (update_iterator_t *, char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1339,6 +1355,14 @@ struct module_symbols_t
 #  define __stats_ComputeGlobalStats (p_symbols)->__stats_ComputeGlobalStats_inner
 #  define __stats_TimerStop (p_symbols)->__stats_TimerStop_inner
 #  define __stats_TimersDumpAll (p_symbols)->__stats_TimersDumpAll_inner
+#  define update_iterator_New (p_symbols)->update_iterator_New_inner
+#  define update_Check (p_symbols)->update_Check_inner
+#  define update_iterator_Action (p_symbols)->update_iterator_Action_inner
+#  define update_Delete (p_symbols)->update_Delete_inner
+#  define update_iterator_Delete (p_symbols)->update_iterator_Delete_inner
+#  define update_iterator_ChooseMirrorAndFile (p_symbols)->update_iterator_ChooseMirrorAndFile_inner
+#  define __update_New (p_symbols)->__update_New_inner
+#  define update_download (p_symbols)->update_download_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1778,6 +1802,14 @@ struct module_symbols_t
     ((p_symbols)->__stats_ComputeGlobalStats_inner) = __stats_ComputeGlobalStats; \
     ((p_symbols)->__stats_TimerStop_inner) = __stats_TimerStop; \
     ((p_symbols)->__stats_TimersDumpAll_inner) = __stats_TimersDumpAll; \
+    ((p_symbols)->update_iterator_New_inner) = update_iterator_New; \
+    ((p_symbols)->update_Check_inner) = update_Check; \
+    ((p_symbols)->update_iterator_Action_inner) = update_iterator_Action; \
+    ((p_symbols)->update_Delete_inner) = update_Delete; \
+    ((p_symbols)->update_iterator_Delete_inner) = update_iterator_Delete; \
+    ((p_symbols)->update_iterator_ChooseMirrorAndFile_inner) = update_iterator_ChooseMirrorAndFile; \
+    ((p_symbols)->__update_New_inner) = __update_New; \
+    ((p_symbols)->update_download_inner) = update_download; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

@@ -39,6 +39,7 @@
 #include <vlc/vout.h>
 #include <vlc_video.h>
 #include <vlc_osd.h>
+#include <vlc_update.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -95,6 +96,7 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Menu         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static void checkUpdates( intf_thread_t *p_intf, char *psz_arg );
 
 /* Status Callbacks */
 static int TimeOffsetChanged( vlc_object_t *, char const *,
@@ -350,7 +352,7 @@ static void Deactivate( vlc_object_t *p_this )
 #endif
         free( p_intf->p_sys->psz_unix_path );
     }
-    vlc_mutex_destroy( &p_intf->p_sys->status_lock );    
+    vlc_mutex_destroy( &p_intf->p_sys->status_lock );
     free( p_intf->p_sys );
 }
 
@@ -459,7 +461,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
 
     /* OSD menu commands */
     var_Create( p_intf, "menu", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "menu", Menu, NULL ); 
+    var_AddCallback( p_intf, "menu", Menu, NULL );
 
     /* DVD commands */
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
@@ -793,6 +795,10 @@ static void Run( intf_thread_t *p_intf )
 
             Help( p_intf, b_longhelp );
         }
+        else if( !strcmp( psz_cmd, "check-updates" ) )
+        {
+            checkUpdates( p_intf, psz_arg );
+        }
         else switch( psz_cmd[0] )
         {
         case 'f':
@@ -943,6 +949,9 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
         msg_rc(_("| mosaic-rows #. . . . . . . . . . .number of rows"));
         msg_rc(_("| mosaic-cols #. . . . . . . . . . .number of cols"));
         msg_rc(_("| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
+        msg_rc(  "| ");
+        msg_rc(_("| check-updates [newer] [equal] [older]\n"
+                 "|               [undef] [info] [source] [binary] [plugin]"));
         msg_rc(  "| ");
     }
     msg_rc(_("| help . . . . . . . . . . . . . this help message"));
@@ -1245,7 +1254,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_playlist->p_input )
         {
             vlc_value_t val;
- 
+
             var_Get( p_playlist->p_input, "rate", &val );
             if( val.i_int != INPUT_RATE_DEFAULT )
             {
@@ -1260,10 +1269,10 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
-            playlist_Goto( p_playlist, val.i_int); 
+            playlist_Goto( p_playlist, val.i_int);
         }
     }
     else if( !strcmp( psz_cmd, "stop" ) )
@@ -1387,7 +1396,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             val.psz_string = newval.psz_string;
             var_Set( p_input->p_libvlc, "marq-marquee", val );
         }
-        else 
+        else
         {
                 val.psz_string = "";
                 var_Set( p_input->p_libvlc, "marq-marquee", val);
@@ -1395,7 +1404,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-x" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "marq-x", val );
@@ -1403,7 +1412,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-y" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "marq-y", val );
@@ -1411,7 +1420,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-position" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "marq-position", val );
@@ -1419,7 +1428,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-color" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
             var_Set( p_input->p_libvlc, "marq-color", val );
@@ -1427,7 +1436,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-opacity" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
             var_Set( p_input->p_libvlc, "marq-opacity", val );
@@ -1435,7 +1444,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-size" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "marq-size", val );
@@ -1443,7 +1452,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "marq-timeout" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input, "marq-timeout", val );
@@ -1552,7 +1561,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
             val.psz_string = newval.psz_string;
             var_Set( p_input->p_libvlc, "time-format", val );
         }
-        else 
+        else
         {
             val.psz_string = "";
             var_Set( p_input->p_libvlc, "time-format", val);
@@ -1560,7 +1569,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "time-x" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "time-x", val );
@@ -1568,7 +1577,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "time-y" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "time-y", val );
@@ -1576,7 +1585,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "time-position" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "time-position", val );
@@ -1584,7 +1593,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "time-color" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
             var_Set( p_input->p_libvlc, "time-color", val );
@@ -1592,7 +1601,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "time-opacity" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
             var_Set( p_input->p_libvlc, "time-opacity", val );
@@ -1600,7 +1609,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "time-size" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "time-size", val );
@@ -1616,7 +1625,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "logo-x" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "logo-x", val );
@@ -1624,7 +1633,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "logo-y" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "logo-y", val );
@@ -1632,7 +1641,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "logo-position" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = atoi( newval.psz_string );
             var_Set( p_input->p_libvlc, "logo-position", val );
@@ -1640,7 +1649,7 @@ static int Other( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "logo-transparency" ) )
     {
-        if( strlen( newval.psz_string ) > 0) 
+        if( strlen( newval.psz_string ) > 0)
         {
             val.i_int = strtol( newval.psz_string, NULL, 0 );
             var_Set( p_input->p_libvlc, "logo-transparency", val );
@@ -2149,4 +2158,121 @@ static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
     free( psz_orig );
 
     return p_item;
+}
+
+/*****************************************************************************
+ * checkUpdates : check for updates
+ ****************************************************************************/
+static void checkUpdates( intf_thread_t *p_intf, char *psz_arg )
+{
+    update_iterator_t *p_uit;
+    update_t *p_u = update_New( p_intf );
+    if( p_u == NULL ) return;
+    p_uit = update_iterator_New( p_u );
+    if( p_uit )
+    {
+        int s = 0, t = 0;
+
+        if( strstr( psz_arg, "newer" ) )
+            s |= UPDATE_RELEASE_STATUS_NEWER;
+        if( strstr( psz_arg, "equal" ) )
+            s |= UPDATE_RELEASE_STATUS_EQUAL;
+        if( strstr( psz_arg, "older" ) )
+            s |= UPDATE_RELEASE_STATUS_OLDER;
+        if( s ) p_uit->i_rs = s;
+        else p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
+
+        if( strstr( psz_arg, "undef" ) )
+            t |= UPDATE_FILE_TYPE_UNDEF;
+        if( strstr( psz_arg, "info" ) )
+            t |= UPDATE_FILE_TYPE_INFO;
+        if( strstr( psz_arg, "source" ) )
+            t |= UPDATE_FILE_TYPE_SOURCE;
+        if( strstr( psz_arg, "binary" ) )
+            t |= UPDATE_FILE_TYPE_BINARY;
+        if( strstr( psz_arg, "plugin" ) )
+            t |= UPDATE_FILE_TYPE_PLUGIN;
+        if( t ) p_uit->i_t = t;
+
+        update_Check( p_u, VLC_FALSE );
+        update_iterator_Action( p_uit, UPDATE_MIRROR );
+        msg_rc( "\nUsing mirror: %s (%s) [%s]",
+                p_uit->mirror.psz_name,
+                p_uit->mirror.psz_location,
+                p_uit->mirror.psz_type );
+        while( (s = update_iterator_Action( p_uit, UPDATE_FILE )) != UPDATE_FAIL )
+        {
+            char *psz_tmp;
+            if( s & UPDATE_RELEASE )
+            {
+                switch( p_uit->release.i_status )
+                {
+                    case UPDATE_RELEASE_STATUS_OLDER:
+                        psz_tmp = strdup( "older" );
+                        break;
+                    case UPDATE_RELEASE_STATUS_EQUAL:
+                        psz_tmp = strdup( "equal" );
+                        break;
+                    case UPDATE_RELEASE_STATUS_NEWER:
+                        psz_tmp = strdup( "newer" );
+                        break;
+                    default:
+                        psz_tmp = strdup( "?!?" );
+                        break;
+                }
+                msg_rc( "\n+----[ VLC %s %s (%s) ] ",
+                        p_uit->release.psz_version,
+                        p_uit->release.psz_svn_revision,
+                        psz_tmp );
+                free( psz_tmp );
+            }
+            switch( p_uit->file.i_type )
+            {
+                case UPDATE_FILE_TYPE_UNDEF:
+                    psz_tmp = strdup( "undef" );
+                    break;
+                case UPDATE_FILE_TYPE_INFO:
+                    psz_tmp = strdup( "info" );
+                    break;
+                case UPDATE_FILE_TYPE_SOURCE:
+                    psz_tmp = strdup( "source" );
+                    break;
+                case UPDATE_FILE_TYPE_BINARY:
+                    psz_tmp = strdup( "binary" );
+                    break;
+                case UPDATE_FILE_TYPE_PLUGIN:
+                    psz_tmp = strdup( "plugin" );
+                    break;
+                default:
+                    psz_tmp = strdup( "?!?" );
+                    break;
+            }
+            msg_rc( "| %s (%s)", p_uit->file.psz_description, psz_tmp );
+            free( psz_tmp );
+            if( p_uit->file.l_size )
+            {
+                if( p_uit->file.l_size > 1024 * 1024 * 1024 )
+                    asprintf( &psz_tmp, "(%ld GB)",
+                              p_uit->file.l_size / (1024*1024*1024) );
+                if( p_uit->file.l_size > 1024 * 1024 )
+                    asprintf( &psz_tmp, "(%ld MB)",
+                              p_uit->file.l_size / (1024*1024) );
+                else if( p_uit->file.l_size > 1024 )
+                    asprintf( &psz_tmp, "(%ld kB)",
+                              p_uit->file.l_size / 1024 );
+                else
+                    asprintf( &psz_tmp, "(%ld B)", p_uit->file.l_size );
+            }
+            else
+            {
+                psz_tmp = strdup( "" );
+            }
+            msg_rc( "| %s %s", p_uit->file.psz_url, psz_tmp );
+            msg_rc( "+----" );
+            free( psz_tmp );
+        }
+        msg_rc( "" );
+        update_iterator_Delete( p_uit );
+    }
+    update_Delete( p_u );
 }

@@ -131,6 +131,7 @@ HEADERS_include = \
 	include/vlc_symbols.h \
 	include/vlc_threads_funcs.h \
 	include/vlc_threads.h \
+	include/vlc_update.h \
 	include/vlc_video.h \
 	include/vlc_vlm.h \
 	include/vlc_vod.h \
@@ -466,6 +467,7 @@ SOURCES_libvlc_common = \
 	src/misc/objects.c \
 	src/misc/variables.c \
 	src/misc/error.c \
+	src/misc/update.c \
 	src/misc/vlm.c \
 	src/misc/xml.c \
 	src/misc/version.c \
