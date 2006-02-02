@@ -26,6 +26,12 @@
 
 #include <vlc/vlc.h>
 
+/**
+ * \defgroup update Update
+ *
+ * @{
+ */
+
 #define UPDATE_FILE_TYPE_ALL    (~0)
 #define UPDATE_FILE_TYPE_NONE   0
 
@@ -60,11 +66,11 @@
  */
 struct update_file_t
 {
-    int i_type;             //< File type
-    char* psz_md5;          //< MD5 hash
-    long int l_size;        //< File size in bytes
-    char* psz_url;          //< Relative (to a mirror) or absolute url
-    char* psz_description;  //< Plain text description
+    int i_type;             ///< File type
+    char* psz_md5;          ///< MD5 hash
+    long int l_size;        ///< File size in bytes
+    char* psz_url;          ///< Relative (to a mirror) or absolute url
+    char* psz_description;  ///< Plain text description
 };
 
 /**
@@ -72,19 +78,19 @@ struct update_file_t
  */
 struct update_release_t
 {
-    char* psz_major;        //< Version major string
-    char* psz_minor;        //< Version minor string
-    char* psz_revision;     //< Version revision string
-    char* psz_extra;        //< Version extra string
+    char* psz_major;        ///< Version major string
+    char* psz_minor;        ///< Version minor string
+    char* psz_revision;     ///< Version revision string
+    char* psz_extra;        ///< Version extra string
 
-    char* psz_svn_revision; //< SVN revision
+    char* psz_svn_revision; ///< SVN revision
 
-    int i_type;             //< Release type
+    int i_type;             ///< Release type
 
-    int i_status;           //< Release status compared to current VLC version
+    int i_status;           ///< Release status compared to current VLC version
 
-    struct update_file_t* p_files; //< Files list
-    int i_files;            //< Number of files in the files list
+    struct update_file_t* p_files; ///< Files list
+    int i_files;            ///< Number of files in the files list
 };
 
 /**
@@ -92,11 +98,11 @@ struct update_release_t
  */
 struct update_mirror_t
 {
-    char *psz_name;         //< Mirror name
-    char *psz_location;     //< Mirror geographical location
-    char *psz_type;         //< Mirror type (FTP, HTTP, ...)
+    char *psz_name;         ///< Mirror name
+    char *psz_location;     ///< Mirror geographical location
+    char *psz_type;         ///< Mirror type (FTP, HTTP, ...)
 
-    char *psz_base_url;     //< Mirror base url
+    char *psz_base_url;     ///< Mirror base url
 
 };
 
@@ -109,13 +115,13 @@ struct update_t
 
     vlc_mutex_t lock;
 
-    struct update_release_t *p_releases;    //< Releases (version) list
-    int i_releases;                         //< Number of releases
-    vlc_bool_t b_releases;                  //< True if we have a releases list
+    struct update_release_t *p_releases;    ///< Releases (version) list
+    int i_releases;                         ///< Number of releases
+    vlc_bool_t b_releases;                  ///< True if we have a releases list
 
-    struct update_mirror_t *p_mirrors;      //< Mirrors list
-    int i_mirrors;                          //< Number of mirrors
-    vlc_bool_t b_mirrors;                   //< True if we have a mirrors list
+    struct update_mirror_t *p_mirrors;      ///< Mirrors list
+    int i_mirrors;                          ///< Number of mirrors
+    vlc_bool_t b_mirrors;                   ///< True if we have a mirrors list
 };
 
 /**
@@ -123,37 +129,37 @@ struct update_t
  */
 struct update_iterator_t
 {
-    update_t *p_u;  //< Pointer to VLC update object
+    update_t *p_u;  ///< Pointer to VLC update object
 
-    int i_r;        //< Position in the releases list
-    int i_f;        //< Position in the release's files list
-    int i_m;        //< Position in the mirrors list
+    int i_r;        ///< Position in the releases list
+    int i_f;        ///< Position in the release's files list
+    int i_m;        ///< Position in the mirrors list
 
-    int i_t;        //< File type bitmask
-    int i_rs;       //< Release status bitmask
-    int i_rt;       //< Release type bitmask
+    int i_t;        ///< File type bitmask
+    int i_rs;       ///< Release status bitmask
+    int i_rt;       ///< Release type bitmask
 
     struct
     {
-        int i_type;             //< Type
-        char* psz_md5;          //< MD5 hash
-        long int l_size;        //< Size in bytes
-        char* psz_url;          //< Absolute URL
-        char* psz_description;  //< Description
-    } file;         //< Local 'copy' of the current file's information
+        int i_type;             ///< Type
+        char* psz_md5;          ///< MD5 hash
+        long int l_size;        ///< Size in bytes
+        char* psz_url;          ///< Absolute URL
+        char* psz_description;  ///< Description
+    } file;         ///< Local 'copy' of the current file's information
     struct
     {
-        char *psz_version;      //< Version string
-        char *psz_svn_revision; //< SVN revision
-        int i_status;           //< Status
-        int i_type;             //< Type
-    } release;      //< Local 'copy' of the current release's information
+        char *psz_version;      ///< Version string
+        char *psz_svn_revision; ///< SVN revision
+        int i_status;           ///< Status
+        int i_type;             ///< Type
+    } release;      ///< Local 'copy' of the current release's information
     struct
     {
-        char *psz_name;         //< Name
-        char *psz_location;     //< Geographical location
-        char *psz_type;         //< Type (HTTP, FTP, ...)
-    } mirror;       //< Local 'copy' of the current mirror's information
+        char *psz_name;         ///< Name
+        char *psz_location;     ///< Geographical location
+        char *psz_type;         ///< Type (HTTP, FTP, ...)
+    } mirror;       ///< Local 'copy' of the current mirror's information
 };
 
 #define update_New( a ) __update_New( VLC_OBJECT( a ) )
@@ -167,5 +173,9 @@ VLC_EXPORT( void, update_iterator_Delete, ( update_iterator_t * ) );
 VLC_EXPORT( unsigned int, update_iterator_Action, ( update_iterator_t *, int ) );
 VLC_EXPORT( unsigned int, update_iterator_ChooseMirrorAndFile, ( update_iterator_t *, int, int, int ) );
 VLC_EXPORT( void, update_download, ( update_iterator_t *, char * ) );
+
+/**
+ * @}
+ */
 
 #endif

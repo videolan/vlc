@@ -33,11 +33,6 @@
 #include "bitmaps/update_info.xpm"
 #include "bitmaps/update_source.xpm"
 
-#include "vlc_block.h"
-#include "vlc_stream.h"
-
-#define UPDATE_VLC_DOWNLOAD_BUFFER_SIZE 2048
-
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -130,10 +125,6 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
         list->AssignImageList( images, wxIMAGE_LIST_SMALL );
         while( update_iterator_Action( p_uit, UPDATE_FILE ) != UPDATE_FAIL )
         {
-            /*wxButton *update_button =
-                new wxButton( this, Download_Event,
-                      wxU(p_uit->file.psz_description) );
-            main_sizer->Add( update_button, 0, wxALIGN_CENTER );*/
             int i_image;
             switch( p_uit->file.i_type )
             {
@@ -160,7 +151,7 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
         }
 
         main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable updates and related downloads:\n(Double click on a file to download it)\n" ) ) ) );
-        main_sizer->Add( list/*, 0, wxEXPAND */);
+        main_sizer->Add( list );
         SetSizerAndFit( main_sizer );
         Layout();
         update_iterator_Delete( p_uit );
@@ -185,7 +176,7 @@ void UpdateVLC::OnChooseItem( wxListEvent& event )
         }
         wxString url = wxU( p_uit->file.psz_url );
         wxFileDialog *filedialog =
-                    new wxFileDialog( this, wxU(_("Save file ...")),
+                    new wxFileDialog( this, wxU(_("Save file...")),
                         wxT(""), url.AfterLast( '/' ), wxT("*.*"),
                         wxSAVE | wxOVERWRITE_PROMPT );
         if( filedialog->ShowModal() == wxID_OK )

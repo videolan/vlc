@@ -26,8 +26,8 @@
  */
 struct user_widget_t
 {
-    int             i_type;             //< Type identifier;
-    char           *psz_text;           //< Free text
+    int             i_type;             ///< Type identifier;
+    char           *psz_text;           ///< Free text
 
     vlc_value_t     val;
 };
@@ -37,9 +37,9 @@ struct user_widget_t
  */
 enum
 {
-    WIDGET_TEXT,                        //< Text display
-    WIDGET_PROGRESS,                    //< A progress bar
-    WIDGET_INPUT_TEXT                   //< Input (backed up by a variable)
+    WIDGET_TEXT,                        ///< Text display
+    WIDGET_PROGRESS,                    ///< A progress bar
+    WIDGET_INPUT_TEXT                   ///< Input (backed up by a variable)
 };
 
 /**
@@ -47,23 +47,23 @@ enum
  */
 struct interaction_dialog_t
 {
-    int             i_id;               //< Unique ID
-    int             i_type;             //< Type identifier
-    char           *psz_title;          //< Title
-    char           *psz_description;    //< Descriptor string
+    int             i_id;               ///< Unique ID
+    int             i_type;             ///< Type identifier
+    char           *psz_title;          ///< Title
+    char           *psz_description;    ///< Descriptor string
 
-    int             i_widgets;          //< Number of dialog widgets
-    user_widget_t **pp_widgets;         //< Dialog widgets
+    int             i_widgets;          ///< Number of dialog widgets
+    user_widget_t **pp_widgets;         ///< Dialog widgets
 
-    void *          p_private;          //< Private interface data
+    void *          p_private;          ///< Private interface data
 
-    int             i_status;           //< Dialog status;
-    int             i_action;           //< Action to perform;
-    int             i_flags;            //< Misc flags
-    int             i_return;           //< Return status
+    int             i_status;           ///< Dialog status;
+    int             i_action;           ///< Action to perform;
+    int             i_flags;            ///< Misc flags
+    int             i_return;           ///< Return status
 
-    interaction_t  *p_interaction;      //< Parent interaction object
-    vlc_object_t   *p_parent;           //< The vlc object that asked
+    interaction_t  *p_interaction;      ///< Parent interaction object
+    vlc_object_t   *p_parent;           ///< The vlc object that asked
                                         //for interaction
 };
 
@@ -93,13 +93,13 @@ enum
  */
 enum
 {
-    NEW_DIALOG,                 //< Just created
-    SENT_DIALOG,                //< Sent to interface
-    UPDATED_DIALOG,             //< Update to send
-    ANSWERED_DIALOG,            //< Got "answer"
-    HIDING_DIALOG,              //< Hiding requested
-    HIDDEN_DIALOG,              //< Now hidden. Requesting destruction
-    DESTROYED_DIALOG,           //< Interface has destroyed it
+    NEW_DIALOG,                 ///< Just created
+    SENT_DIALOG,                ///< Sent to interface
+    UPDATED_DIALOG,             ///< Update to send
+    ANSWERED_DIALOG,            ///< Got "answer"
+    HIDING_DIALOG,              ///< Hiding requested
+    HIDDEN_DIALOG,              ///< Now hidden. Requesting destruction
+    DESTROYED_DIALOG,           ///< Interface has destroyed it
 };
 
 /**
@@ -107,9 +107,9 @@ enum
  */
 enum
 {
-    INTERACT_PROGRESS,          //< Progress bar (in the main interface ?)
-    INTERACT_DIALOG_ONEWAY,     //< Dialog box without feedback
-    INTERACT_DIALOG_TWOWAY,     //< Dialog box with feedback
+    INTERACT_PROGRESS,          ///< Progress bar (in the main interface ?)
+    INTERACT_DIALOG_ONEWAY,     ///< Dialog box without feedback
+    INTERACT_DIALOG_TWOWAY,     ///< Dialog box with feedback
 };
 
 /**
@@ -131,12 +131,12 @@ struct interaction_t
 {
     VLC_COMMON_MEMBERS
 
-    int                         i_dialogs;      //< Number of dialogs
-    interaction_dialog_t      **pp_dialogs;     //< Dialogs
+    int                         i_dialogs;      ///< Number of dialogs
+    interaction_dialog_t      **pp_dialogs;     ///< Dialogs
 
-    intf_thread_t              *p_intf;         //< Interface to use
+    intf_thread_t              *p_intf;         ///< Interface to use
 
-    int                         i_last_id;      //< Last attributed ID
+    int                         i_last_id;      ///< Last attributed ID
 };
 /**
  * Possible actions
