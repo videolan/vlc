@@ -626,6 +626,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     }
     if( psz_now_playing )
     {
+        if( p_pgrm->psz_now_playing ) free( p_pgrm->psz_now_playing );
         p_pgrm->psz_now_playing = strdup(psz_now_playing);
 
         if( p_sys->p_pgrm == p_pgrm )
