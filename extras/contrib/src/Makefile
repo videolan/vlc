@@ -952,6 +952,7 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 .dvdread: .dvdnav
 	$(INSTALL_NAME)
+	(install_name_tool -change $(PREFIX)/lib/libdvdread.0.dylib @executable_path/lib/vlc_libdvdread.dylib $(PREFIX)/vlc-lib/libdvdnav.dylib)
 	touch $@
 
 CLEAN_FILE += .dvdread
