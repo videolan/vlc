@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include "updatevlc.hpp"
-#include <wx/listctrl.h>
 #include <wx/imaglist.h>
 #include <wx/thread.h>
 

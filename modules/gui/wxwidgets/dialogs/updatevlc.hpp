@@ -28,6 +28,7 @@
 
 #include "wxwidgets.hpp"
 #include <wx/treectrl.h>
+#include <wx/listctrl.h>
 
 class wxTreeCtrl;
 
