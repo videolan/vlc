@@ -319,6 +319,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     else
     {
         /* Get the current working directory */
+        int dirlen;
 #ifdef HAVE_UNISTD_H
         f_dir = getcwd( NULL, 0 );
 #endif
@@ -327,6 +328,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             if( psz_fname_original ) free( psz_fname_original );
             return NULL;
         }
+        dirlen = strlen( f_dir );
+        f_dir = (char *)realloc(f_dir, dirlen +2 );
+        f_dir[dirlen] = DIRECTORY_SEPARATOR;
+        f_dir[dirlen+1] = '\0';
         f_fname = strdup( psz_fname );
     }
 
@@ -416,6 +421,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     {
                         fclose( f );
                         LocaleFree( psz_locale_path );
+                    msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
                         result[i_sub_count].priority = i_prio;
                         result[i_sub_count].psz_fname = psz_UTF8_path;
                         result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
@@ -423,6 +429,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     }
                     else
                     {
+                        msg_Dbg( p_this, "fopen failed" );
                         if( psz_UTF8_path ) free( psz_UTF8_path );
                         LocaleFree( psz_locale_path );
                     }
