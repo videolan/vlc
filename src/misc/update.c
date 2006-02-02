@@ -1240,6 +1240,11 @@ void update_download_for_real( download_thread_t *p_this )
 
     vlc_thread_ready( p_this );
 
+    asprintf( &psz_status, "%s\nDownloading... %.1f%% done",
+              p_this->psz_status, 0.0 );
+    i_progress = intf_UserProgress( p_vlc, "Downloading...",
+                                    psz_status, 0.0 );
+
     p_stream = stream_UrlNew( p_vlc, psz_src );
     if( !p_stream )
     {
@@ -1255,20 +1260,16 @@ void update_download_for_real( download_thread_t *p_this )
         }
         else
         {
+            int i_read;
 
             i_size = (int)(stream_Size(p_stream)/(1<<10));
             p_buffer = (void *)malloc( 1<<10 );
 
-            asprintf( &psz_status, "%s\nDownloading... %.1f%% done",
-                      p_this->psz_status, 0.0 );
-            i_progress = intf_UserProgress( p_vlc, "Downloading...",
-                                            psz_status, 0.0 );
-
-            while( stream_Read( p_stream, p_buffer, 1<<10 ) )
+            while( ( i_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
             {
                 float f_progress;
 
-                fwrite( p_buffer, 1<<10, 1, p_file );
+                fwrite( p_buffer, i_read, 1, p_file );
 
                 i_done++;
                 free( psz_status );
@@ -1280,10 +1281,14 @@ void update_download_for_real( download_thread_t *p_this )
             }
 
             free( p_buffer );
-            free( psz_status );
             fclose( p_file );
             stream_Delete( p_stream );
 
+            free( psz_status );
+            asprintf( &psz_status, "%s\nDone (100.00%%)",
+                       p_this->psz_status );
+            intf_UserProgressUpdate( p_vlc, i_progress, psz_status, 100.0 );
+            free( psz_status );
         }
     }
 
