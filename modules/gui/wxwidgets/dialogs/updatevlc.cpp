@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include "updatevlc.hpp"
 #include <wx/imaglist.h>
-#include <wx/thread.h>
 
 #include "bitmaps/update_ascii.xpm"
 #include "bitmaps/update_binary.xpm"
@@ -168,26 +167,6 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
     }
 }
 
-class DownloadThread : public wxThread
-{
-    public:
-    DownloadThread( update_iterator_t *p_uit, char *psz_dest )
-        :p_uit( p_uit ),psz_dest( psz_dest )
-    {
-            Create();
-            Run();
-    };
-    ExitCode Entry()
-    {
-        update_download( p_uit, psz_dest );
-        update_iterator_Delete( p_uit );
-        LocaleFree( psz_dest );
-        return 0;
-    };
-    update_iterator_t *p_uit;
-    char *psz_dest;
-};
-
 void UpdateVLC::OnChooseItem( wxListEvent& event )
 {
     update_iterator_t *p_uit = update_iterator_New( p_u );
@@ -213,14 +192,10 @@ void UpdateVLC::OnChooseItem( wxListEvent& event )
         {
             char *psz_dest = ToLocale( filedialog->GetPath().mb_str() );
 
-            /* Launch the download process in a new thread so it doesn't
-             * block the interface */
-            new DownloadThread( p_uit, psz_dest );
+            update_download( p_uit, psz_dest );
+            LocaleFree( psz_dest );
         }
-        else
-        {
-            update_iterator_Delete( p_uit );
-        }
+        update_iterator_Delete( p_uit );
         delete filedialog;
     }
 }

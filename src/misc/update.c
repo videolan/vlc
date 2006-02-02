@@ -1181,7 +1181,20 @@ unsigned int update_iterator_Action( update_iterator_t *p_uit, int i_action )
 }
 
 /**
- * Download the file selected by the update iterator
+ * Object to launch download thread in a different object
+ */
+typedef struct {
+    VLC_COMMON_MEMBERS
+    char *psz_dest;     //< Download destination
+    char *psz_src;      //< Download source
+    char *psz_status;   //< Download status displayed in progress dialog
+} download_thread_t;
+
+void update_download_for_real( download_thread_t *p_this );
+
+/**
+ * Download the file selected by the update iterator. This function will
+ * launch the download in a new thread (downloads can be long)
  *
  * \param p_uit update iterator
  * \param psz_dest destination file path
@@ -1189,9 +1202,32 @@ unsigned int update_iterator_Action( update_iterator_t *p_uit, int i_action )
  */
 void update_download( update_iterator_t *p_uit, char *psz_dest )
 {
-    char *psz_src = p_uit->file.psz_url;
+    download_thread_t *p_dt =
+        vlc_object_create( p_uit->p_u->p_vlc, sizeof( download_thread_t ) );
+
+    p_dt->psz_dest = strdup( psz_dest );
+    p_dt->psz_src = strdup( p_uit->file.psz_url );
+    asprintf( &p_dt->psz_status, "%s - %s (%s)\nSource: %s\nDestination: %s",
+              p_uit->file.psz_description, p_uit->release.psz_version,
+              p_uit->release.psz_svn_revision, p_uit->file.psz_url,
+              psz_dest);
+
+    vlc_thread_create( p_dt, "download thread", update_download_for_real,
+                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
+}
+
+/**
+ * The true download function.
+ *
+ * \param p_this the download_thread_t object
+ * \return nothing
+ */
+void update_download_for_real( download_thread_t *p_this )
+{
+    char *psz_dest = p_this->psz_dest;
+    char *psz_src = p_this->psz_src;
     stream_t *p_stream;
-    vlc_t *p_vlc = p_uit->p_u->p_vlc;
+    vlc_t *p_vlc = p_this->p_vlc;
 
     FILE *p_file = NULL;
     void *p_buffer;
@@ -1202,55 +1238,62 @@ void update_download( update_iterator_t *p_uit, char *psz_dest )
     int i_size;
     int i_done = 0;
 
+    vlc_thread_ready( p_this );
+
     p_stream = stream_UrlNew( p_vlc, psz_src );
     if( !p_stream )
     {
         msg_Err( p_vlc, "Failed to open %s for reading", psz_src );
-        return;
     }
-
-    p_file = fopen( psz_dest, "w" );
-    if( !p_file )
+    else
     {
-        msg_Err( p_vlc, "Failed to open %s for writing", psz_dest );
-        return;
+
+        p_file = fopen( psz_dest, "w" );
+        if( !p_file )
+        {
+            msg_Err( p_vlc, "Failed to open %s for writing", psz_dest );
+        }
+        else
+        {
+
+            i_size = (int)(stream_Size(p_stream)/(1<<10));
+            p_buffer = (void *)malloc( 1<<10 );
+
+            asprintf( &psz_status, "%s\nDownloading... %.1f%% done",
+                      p_this->psz_status, 0.0 );
+            i_progress = intf_UserProgress( p_vlc, "Downloading...",
+                                            psz_status, 0.0 );
+
+            while( stream_Read( p_stream, p_buffer, 1<<10 ) )
+            {
+                float f_progress;
+
+                fwrite( p_buffer, 1<<10, 1, p_file );
+
+                i_done++;
+                free( psz_status );
+                f_progress = 100.0*(float)i_done/(float)i_size;
+                asprintf( &psz_status, "%s\nDownloading... %.1f%% done",
+                           p_this->psz_status, f_progress );
+                intf_UserProgressUpdate( p_vlc, i_progress,
+                                         psz_status, f_progress );
+            }
+
+            free( p_buffer );
+            free( psz_status );
+            fclose( p_file );
+            stream_Delete( p_stream );
+
+        }
     }
 
-    i_size = (int)(stream_Size(p_stream)/(1<<10));
-    p_buffer = (void *)malloc( 1<<10 );
+    free( p_this->psz_dest );
+    free( p_this->psz_src );
+    free( p_this->psz_status );
 
-    asprintf( &psz_status,
-              "%s - %s (%s)\n"
-              "Source: %s\n"
-              "Destination: %s\n"
-              "Downloading... %.1f%% done",
-              p_uit->file.psz_description, p_uit->release.psz_version,
-              p_uit->release.psz_svn_revision, p_uit->file.psz_url,
-              psz_dest, 0.0 );
-    i_progress = intf_UserProgress( p_vlc, "Downloading...", psz_status, 0.0 );
+#ifdef WIN32
+    CloseHandle( p_this->thread_id );
+#endif
 
-    while( stream_Read( p_stream, p_buffer, 1<<10 ) )
-    {
-        float f_progress;
-
-        fwrite( p_buffer, 1<<10, 1, p_file );
-
-        i_done++;
-        free( psz_status );
-        f_progress = 100.0*(float)i_done/(float)i_size;
-        asprintf( &psz_status,
-                  "%s - %s (%s)\n"
-                  "Source: %s\n"
-                  "Destination: %s\n"
-                  "Downloading... %.1f%% done",
-                  p_uit->file.psz_description, p_uit->release.psz_version,
-                  p_uit->release.psz_svn_revision, p_uit->file.psz_url,
-                  psz_dest, f_progress );
-        intf_UserProgressUpdate( p_vlc, i_progress, psz_status, f_progress );
-    }
-
-    free( p_buffer );
-    free( psz_status );
-    fclose( p_file );
-    stream_Delete( p_stream );
+    vlc_object_destroy( p_this );
 }
