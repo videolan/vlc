@@ -36,7 +36,6 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>                                              /* tolower() */
-#include <unistd.h>
 
 #include <vlc/vlc.h>
 
