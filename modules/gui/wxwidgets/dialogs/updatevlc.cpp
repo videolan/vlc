@@ -176,7 +176,7 @@ class DownloadThread : public wxThread
     {
             Create();
             Run();
-    }
+    };
     ExitCode Entry()
     {
         update_download( p_uit, psz_dest );
