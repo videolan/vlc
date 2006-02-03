@@ -1635,7 +1635,7 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     {
         p_block = p_access->pf_block( p_access );
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
-        if( p_block )
+        if( p_block && p_access->p_libvlc->b_stats )
         {
             stats_UpdateInteger( s->p_parent->p_parent, "read_bytes",
                                  p_block->i_buffer );

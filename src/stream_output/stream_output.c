@@ -367,17 +367,23 @@ int sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
 int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 {
     int i_total;
-    /* Access_out -> sout_instance -> input_thread_t */
-    input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_access,
-                                        VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input )
+    if( p_access->p_libvlc->b_stats )
     {
-        stats_UpdateInteger( p_input, "sout_sent_packets", 1 );
-        stats_UpdateInteger( p_input, "sout_sent_bytes", p_buffer->i_buffer );
-        stats_GetInteger( p_input, p_access->p_parent->p_parent->i_object_id,
-                          "sout_sent_bytes", &i_total );
-        stats_UpdateFloat( p_input, "sout_send_bitrate", (float)i_total );
-        vlc_object_release( p_input );
+        /* Access_out -> sout_instance -> input_thread_t */
+        input_thread_t *p_input = 
+	    (input_thread_t *)vlc_object_find( p_access, VLC_OBJECT_INPUT, 
+                                               FIND_PARENT );
+        if( p_input )
+        {
+            stats_UpdateInteger( p_input, "sout_sent_packets", 1 );
+            stats_UpdateInteger( p_input, "sout_sent_bytes", 
+                                 p_buffer->i_buffer );
+            stats_GetInteger( p_input, 
+                              p_access->p_parent->p_parent->i_object_id,
+                              "sout_sent_bytes", &i_total );
+            stats_UpdateFloat( p_input, "sout_send_bitrate", (float)i_total );
+            vlc_object_release( p_input );
+        }
     }
     return p_access->pf_write( p_access, p_buffer );
 }
