@@ -308,6 +308,7 @@ int playlist_ItemAdd (playlist_t *, playlist_item_t *, int, int);
 aout_buffer_t * aout_OutputNextBuffer (aout_instance_t *, mtime_t, vlc_bool_t);
 int playlist_LockReplace (playlist_t *,playlist_item_t *, input_item_t*);
 int __intf_Eject (vlc_object_t *, const char *);
+void vlc_HashInsert (hashtable_entry_t **, int *, int, const char *, void *);
 int input_Control (input_thread_t *, int i_query, ...);
 int __aout_VolumeUp (vlc_object_t *, int, audio_volume_t *);
 void osd_Message (spu_t *, int, char *, ...);
@@ -316,6 +317,7 @@ void __osd_MenuUp (vlc_object_t *);
 int __aout_VolumeDown (vlc_object_t *, int, audio_volume_t *);
 sout_instance_t * __sout_NewInstance (vlc_object_t *, char *);
 subpicture_t * spu_CreateSubpicture (spu_t *);
+int vlc_HashLookup (hashtable_entry_t *, int, int, const char *);
 void httpd_MsgAdd (httpd_message_t *, char *psz_name, char *psz_value, ...);
 int vout_vaControlDefault (vout_thread_t *, int, va_list);
 int playlist_NodeEmpty (playlist_t *, playlist_item_t *, vlc_bool_t);
@@ -359,6 +361,7 @@ int intf_RunThread (intf_thread_t *);
 int httpd_StreamSend (httpd_stream_t *, uint8_t *p_data, int i_data);
 decoder_t * input_DecoderNew (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
 xml_t * __xml_Create (vlc_object_t *);
+void* vlc_HashRetrieve (hashtable_entry_t*, int, int, const char *);
 msg_subscription_t* __msg_Subscribe (vlc_object_t *, int);
 const char * VLC_Version (void);
 session_descriptor_t* sout_AnnounceRegisterSDP (sout_instance_t *,const char *, const char *, announce_method_t*);
@@ -919,6 +922,9 @@ struct module_symbols_t
     unsigned int (*update_iterator_ChooseMirrorAndFile_inner) (update_iterator_t *, int, int, int);
     update_t * (*__update_New_inner) (vlc_object_t *);
     void (*update_download_inner) (update_iterator_t *, char *);
+    void (*vlc_HashInsert_inner) (hashtable_entry_t **, int *, int, const char *, void *);
+    int (*vlc_HashLookup_inner) (hashtable_entry_t *, int, int, const char *);
+    void* (*vlc_HashRetrieve_inner) (hashtable_entry_t*, int, int, const char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1363,6 +1369,9 @@ struct module_symbols_t
 #  define update_iterator_ChooseMirrorAndFile (p_symbols)->update_iterator_ChooseMirrorAndFile_inner
 #  define __update_New (p_symbols)->__update_New_inner
 #  define update_download (p_symbols)->update_download_inner
+#  define vlc_HashInsert (p_symbols)->vlc_HashInsert_inner
+#  define vlc_HashLookup (p_symbols)->vlc_HashLookup_inner
+#  define vlc_HashRetrieve (p_symbols)->vlc_HashRetrieve_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1810,6 +1819,9 @@ struct module_symbols_t
     ((p_symbols)->update_iterator_ChooseMirrorAndFile_inner) = update_iterator_ChooseMirrorAndFile; \
     ((p_symbols)->__update_New_inner) = __update_New; \
     ((p_symbols)->update_download_inner) = update_download; \
+    ((p_symbols)->vlc_HashInsert_inner) = vlc_HashInsert; \
+    ((p_symbols)->vlc_HashLookup_inner) = vlc_HashLookup; \
+    ((p_symbols)->vlc_HashRetrieve_inner) = vlc_HashRetrieve; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

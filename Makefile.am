@@ -470,6 +470,7 @@ SOURCES_libvlc_common = \
 	src/misc/update.c \
 	src/misc/vlm.c \
 	src/misc/xml.c \
+	src/misc/hashtables.c \
 	src/misc/version.c \
 	src/extras/libc.c \
 	src/control/core.c \

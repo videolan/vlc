@@ -243,8 +243,8 @@ struct stats_handler_t
 {
     VLC_COMMON_MEMBERS
 
-    int         i_counters;
-    counter_t **pp_counters;
+    int                 i_counters;
+    hashtable_entry_t * p_counters;
 };
 
 VLC_EXPORT( void, stats_HandlerDestroy, (stats_handler_t*) );

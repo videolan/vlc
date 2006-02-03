@@ -202,6 +202,7 @@ typedef struct libvlc_t libvlc_t;
 typedef struct vlc_t vlc_t;
 typedef struct variable_t variable_t;
 typedef struct date_t date_t;
+typedef struct hashtable_entry_t hashtable_entry_t;
 
 /* Messages */
 typedef struct msg_bank_t msg_bank_t;
@@ -641,6 +642,20 @@ static int64_t GCD( int64_t a, int64_t b )
             }                                   \
         }                                       \
     }
+
+/* Hash tables handling */
+struct hashtable_entry_t
+{
+    int       i_id;
+    char     *psz_name;
+    uint64_t  i_hash;
+    void     *p_data;
+};
+
+VLC_EXPORT( void, vlc_HashInsert, (hashtable_entry_t **, int *, int, const char *, void *));
+VLC_EXPORT( void*, vlc_HashRetrieve, (hashtable_entry_t*, int, int, const char *) );
+VLC_EXPORT( int, vlc_HashLookup, (hashtable_entry_t *, int, int, const char *) );
+
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that

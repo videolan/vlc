@@ -57,7 +57,8 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
     for ( i =  p_stats->i_counters - 1 ; i >= 0 ; i-- )
     {
         int j;
-        counter_t * p_counter = p_stats->pp_counters[i];
+        hashtable_entry_t p_entry = p_stats->p_counters[i];
+        counter_t * p_counter = p_entry.p_data;
 
         for( j = p_counter->i_samples -1; j >= 0 ; j-- )
         {
@@ -66,7 +67,8 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
             free( p_sample );
         }
         free( p_counter->psz_name );
-        REMOVE_ELEM( p_stats->pp_counters, p_stats->i_counters, i );
+        free( p_entry.psz_name );
+        REMOVE_ELEM( p_stats->p_counters, p_stats->i_counters, i );
         free( p_counter );
     }
 }
@@ -109,10 +111,8 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
     p_counter->update_interval = 0;
     p_counter->last_update = 0;
 
-    INSERT_ELEM( p_handler->pp_counters,
-                 p_handler->i_counters,
-                 p_handler->i_counters,
-                 p_counter );
+    vlc_HashInsert( &p_handler->p_counters, &p_handler->i_counters, p_this->i_object_id,
+                    psz_name, p_counter );
 
     vlc_mutex_unlock( &p_handler->object_lock );
 
@@ -467,9 +467,10 @@ void __stats_TimersDumpAll( vlc_object_t *p_obj )
     vlc_mutex_lock( &p_handler->object_lock );
     for ( i = 0 ; i< p_handler->i_counters; i++ )
     {
-        if( p_handler->pp_counters[i]->i_compute_type == STATS_TIMER )
+        counter_t * p_counter = (counter_t *)(p_handler->p_counters[i].p_data);
+        if( p_counter->i_compute_type == STATS_TIMER )
         {
-            TimerDump( p_obj, p_handler->pp_counters[i], VLC_FALSE );
+            TimerDump( p_obj, p_counter, VLC_FALSE );
         }
     }
     vlc_mutex_unlock( &p_handler->object_lock );
@@ -613,16 +614,8 @@ static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
                               const char *psz_name )
 {
     int i;
-   for( i = 0; i< p_handler->i_counters; i++ )
-    {
-        counter_t *p_counter = p_handler->pp_counters[i];
-        if( p_counter->i_source_object == i_object_id &&
-            !strcmp( p_counter->psz_name, psz_name ) )
-        {
-            return p_counter;
-        }
-    }
-    return NULL;
+    return (counter_t *)vlc_HashRetrieve( p_handler->p_counters, p_handler->i_counters,
+                                          i_object_id, psz_name );
 }
 
 
@@ -664,7 +657,7 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
         return NULL;
     }
     p_handler->i_counters = 0;
-    p_handler->pp_counters = NULL;
+    p_handler->p_counters = (hashtable_entry_t *) malloc( 5 * sizeof( variable_t ) );
 
     /// \bug is it p_vlc or p_libvlc ?
     vlc_object_attach( p_handler, p_this->p_vlc );
