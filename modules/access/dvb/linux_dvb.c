@@ -312,7 +312,7 @@ void E_(FrontendPoll)( access_t *p_access )
 
             IF_UP( FE_HAS_LOCK )
             {
-                int32_t i_value;
+                int32_t i_value = 0;
                 msg_Dbg( p_access, "frontend has acquired lock" );
                 p_sys->i_frontend_timeout = 0;
 
