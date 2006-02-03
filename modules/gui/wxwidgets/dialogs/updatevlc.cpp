@@ -181,10 +181,7 @@ void UpdateVLC::OnChooseItem( wxListEvent& event )
                         wxSAVE | wxOVERWRITE_PROMPT );
         if( filedialog->ShowModal() == wxID_OK )
         {
-            char *psz_dest = ToLocale( filedialog->GetPath().mb_str() );
-
-            update_download( p_uit, psz_dest );
-            LocaleFree( psz_dest );
+            update_download( p_uit, filedialog->GetPath().mb_str() );
         }
         update_iterator_Delete( p_uit );
         delete filedialog;
