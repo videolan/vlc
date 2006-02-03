@@ -67,7 +67,20 @@ void libvlc_exception_init( libvlc_exception_t *p_exception );
  * \return 0 if no exception raised, 1 else
  */
 int libvlc_exception_raised( libvlc_exception_t *p_exception );
+
+/**
+ * Raise an exception
+ * \param p_exception the exception to raise
+ * \param psz_message the exception message
+ */
 void libvlc_exception_raise( libvlc_exception_t *p_exception, char *psz_message );
+
+/**
+ * Clear an exception object so it can be reused.
+ * The exception object must be initialized
+ * \param p_exception the exception to clear
+ */
+void libvlc_exception_clear( libvlc_exception_t * );
 
 /**
  * Get exception message
@@ -123,11 +136,13 @@ void libvlc_destroy( libvlc_instance_t *);
  * Start playing. You can give some additionnal playlist item options
  * that will be added to the item before playing it.
  * \param p_instance the instance
+ * \param i_id the item to play. If this is a negative number, the next
+ * item will be selected. Else, the item with the given ID will be played
  * \param i_options the number of options to add to the item
  * \param ppsz_options the options to add to the item
  * \param p_exception an initialized exception
  */
-void libvlc_playlist_play( libvlc_instance_t*, int, char **,
+void libvlc_playlist_play( libvlc_instance_t*, int, int, char **,
                            libvlc_exception_t * );
 
 /**
@@ -158,6 +173,29 @@ void libvlc_playlist_next( libvlc_instance_t *, libvlc_exception_t * );
  */
 void libvlc_playlist_prev( libvlc_instance_t *, libvlc_exception_t * );
 
+/**
+ * Add an item at the end of the playlist
+ * If you need more advanced options, \see libvlc_playlist_add_extended
+ * \param p_instance the instance
+ * \param psz_uri the URI to open, using VLC format
+ * \param psz_name a name that you might want to give or NULL
+ * \return the identifier of the new item
+ */
+int libvlc_playlist_add( libvlc_instance_t *, const char *, const char *,
+                         libvlc_exception_t * );
+
+/**
+ * Add an item at the end of the playlist, with additional input options
+ * \param p_instance the instance
+ * \param psz_uri the URI to open, using VLC format
+ * \param psz_name a name that you might want to give or NULL
+ * \param i_options the number of options to add
+ * \param ppsz_options strings representing the options to add
+ * \return the identifier of the new item
+ */
+int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
+                                  const char *, int, const char **,
+                                  libvlc_exception_t * );
 
 
 

@@ -10,3 +10,6 @@ class NativeLibvlcTestCase( unittest.TestCase ):
     def testStartup( self ):
         """Checks creation/destroy of libvlc"""
     	native_libvlc_test.create_destroy()
+    def testPlaylist( self ):
+        """Checks basic playlist interaction"""
+    	native_libvlc_test.playlist_test()

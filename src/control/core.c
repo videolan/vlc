@@ -35,6 +35,13 @@ inline void libvlc_exception_init( libvlc_exception_t *p_exception )
     p_exception->psz_message = NULL;
 }
 
+void libvlc_exception_clear( libvlc_exception_t *p_exception )
+{
+    if( p_exception->psz_message )
+        free( p_exception->psz_message );
+    p_exception->b_raised = 0;
+}
+
 inline int libvlc_exception_raised( libvlc_exception_t *p_exception )
 {
     return p_exception->b_raised;
@@ -57,7 +64,6 @@ inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
     if( psz_message )
         p_exception->psz_message = strdup( psz_message );
 }
-
 
 libvlc_instance_t * libvlc_new( int argc, char **argv,
                                 libvlc_exception_t *p_exception )
