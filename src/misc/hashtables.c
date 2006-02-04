@@ -78,8 +78,7 @@ static int FindSlot( hashtable_entry_t *p_array, int i_count, uint64_t i_hash )
 {
     int i_middle;
 
-
-    if( i_hash <= p_array[0].i_hash )
+    if( i_count == 0 || i_hash <= p_array[0].i_hash )
     {
         return 0;
     }
