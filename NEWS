@@ -4,6 +4,7 @@ Changes between 0.8.4a and 0.8.5-svn (not yet released):
 --------------------------------------------------------
 
 Core support:
+ * Statistics collection (bitrates, packets, connections, ...)
 
 Input:
  * Initial support for RTSP-over-HTTP (to allow NAT traversal)
@@ -49,10 +50,8 @@ OS X Port:
  * Root wrapper to avoid running VLC as root
 
 Developers:
+ * New libvlc API (not finished yet)
  * Java bindings
-
-
-
 
 Changes between 0.8.4 and 0.8.4a:
 ---------------------------------

@@ -218,7 +218,7 @@ static uint64_t HashString( const char *psz_string, int i_id )
         i_hash ^= i_hash >> 8;
     }
 
-    i_hash += ( i_id << 32 );
+    i_hash += ( (uint64_t)i_id << 32 );
 
     return i_hash;
 }

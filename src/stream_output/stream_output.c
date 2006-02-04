@@ -381,14 +381,11 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
                                                FIND_PARENT );
         if( p_input )
         {
-            stats_UpdateInteger( p_input, "sout_sent_packets", 10 );
+            stats_UpdateInteger( p_input, "sout_sent_packets", 10, NULL );
             stats_UpdateInteger( p_input, "sout_sent_bytes",
-                                 p_access->i_sent_bytes );
-            stats_GetInteger( p_input,
-                              p_access->p_parent->p_parent->i_object_id,
-                              "sout_sent_bytes", &i_total );
-            stats_UpdateFloat( p_input, "sout_send_bitrate", (float)i_total );
-
+                                 p_access->i_sent_bytes, &i_total );
+            stats_UpdateFloat( p_input, "sout_send_bitrate", (float)i_total,
+                               NULL );
             p_access->i_sent_bytes = 0;
             vlc_object_release( p_input );
         }

@@ -1033,10 +1033,9 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
     if( p_input->p_libvlc->b_stats )
     {
-        stats_UpdateInteger( p_input, "demux_read", p_block->i_buffer );
-        stats_GetInteger( p_input, p_input->i_object_id, "demux_read",
-                          &i_total );
-        stats_UpdateFloat( p_input , "demux_bitrate", (float)i_total );
+        stats_UpdateInteger( p_input, "demux_read", p_block->i_buffer,
+                             &i_total );
+        stats_UpdateFloat( p_input , "demux_bitrate", (float)i_total, NULL );
     }
 
     /* Mark preroll blocks */

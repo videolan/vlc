@@ -124,7 +124,7 @@ void vlm_MessageDelete (vlm_message_t *);
 void vout_SynchroDecode (vout_synchro_t *);
 int playlist_Delete (playlist_t *, int);
 void aout_FiltersPlay (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters, aout_buffer_t ** pp_input_buffer);
-int __stats_Update (vlc_object_t*, const char *, vlc_value_t);
+int __stats_Update (vlc_object_t*, const char *, vlc_value_t, vlc_value_t *);
 int __stats_Get (vlc_object_t*, int, const char *, vlc_value_t*);
 char* httpd_ClientIP (httpd_client_t *cl, char *psz_ip);
 int __intf_UserProgress (vlc_object_t*, const char*, const char*, float);
@@ -897,7 +897,7 @@ struct module_symbols_t
     void (*__intf_UserProgressUpdate_inner) (vlc_object_t*, int, const char*, float);
     void (*__intf_UserHide_inner) (vlc_object_t *, int);
     int (*__stats_Create_inner) (vlc_object_t*, const char *, int, int);
-    int (*__stats_Update_inner) (vlc_object_t*, const char *, vlc_value_t);
+    int (*__stats_Update_inner) (vlc_object_t*, const char *, vlc_value_t, vlc_value_t *);
     int (*__stats_Get_inner) (vlc_object_t*, int, const char *, vlc_value_t*);
     void (*stats_ComputeInputStats_inner) (input_thread_t*, input_stats_t*);
     void (*stats_DumpInputStats_inner) (input_stats_t *);

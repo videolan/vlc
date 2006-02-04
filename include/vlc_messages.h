@@ -249,8 +249,8 @@ struct stats_handler_t
 
 VLC_EXPORT( void, stats_HandlerDestroy, (stats_handler_t*) );
 
-#define stats_Update( a,b,c) __stats_Update( VLC_OBJECT( a ), b, c )
-VLC_EXPORT( int, __stats_Update, (vlc_object_t*, const char *, vlc_value_t) );
+#define stats_Update( a,b,c, d) __stats_Update( VLC_OBJECT( a ), b, c, d )
+VLC_EXPORT( int, __stats_Update, (vlc_object_t*, const char *, vlc_value_t, vlc_value_t *) );
 #define stats_Create( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
 VLC_EXPORT( int, __stats_Create, (vlc_object_t*, const char *, int, int) );
 #define stats_Get( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
@@ -277,21 +277,31 @@ static inline int __stats_GetFloat( vlc_object_t *p_obj, int i_id,
     *value = val.f_float;
     return i_ret;
 }
-#define stats_UpdateInteger( a,b,c ) __stats_UpdateInteger( VLC_OBJECT(a),b,c )
+#define stats_UpdateInteger( a,b,c,d ) __stats_UpdateInteger( VLC_OBJECT(a),b,c,d )
 static inline int __stats_UpdateInteger( vlc_object_t *p_obj,
-                                         const char *psz_name, int i )
+                                         const char *psz_name, int i, int *pi_new )
 {
+    int i_ret;
     vlc_value_t val;
+    vlc_value_t new_val;
     val.i_int = i;
-    return __stats_Update( p_obj, psz_name, val );
+    i_ret = __stats_Update( p_obj, psz_name, val , &new_val );
+    if( pi_new )
+        *pi_new = new_val.i_int;
+    return i_ret;
 }
-#define stats_UpdateFloat( a,b,c ) __stats_UpdateFloat( VLC_OBJECT(a),b,c )
+#define stats_UpdateFloat( a,b,c,d ) __stats_UpdateFloat( VLC_OBJECT(a),b,c,d )
 static inline int __stats_UpdateFloat( vlc_object_t *p_obj,
-                                       const char *psz_name, float f )
+                                       const char *psz_name, float f, float *pf_new )
 {
     vlc_value_t val;
+    int i_ret;
+    vlc_value_t new_val;
     val.f_float = f;
-    return __stats_Update( p_obj, psz_name, val );
+    i_ret =  __stats_Update( p_obj, psz_name, val, &new_val );
+    if( pf_new )
+        *pf_new = new_val.f_float;
+    return i_ret;
 }
 
 /******************

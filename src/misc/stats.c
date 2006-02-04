@@ -36,7 +36,7 @@ static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
                               const char *psz_name );
 static int stats_CounterUpdate( stats_handler_t *p_handler,
                                 counter_t *p_counter,
-                                vlc_value_t val );
+                                vlc_value_t val, vlc_value_t * );
 static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this );
 static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this );
 
@@ -126,7 +126,7 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
  * more information on how data is aggregated, \see __stats_Create
  */
 int __stats_Update( vlc_object_t *p_this, const char *psz_name,
-                    vlc_value_t val )
+                    vlc_value_t val, vlc_value_t *val_new )
 {
     int i_ret;
     counter_t *p_counter;
@@ -151,7 +151,7 @@ int __stats_Update( vlc_object_t *p_this, const char *psz_name,
         return VLC_ENOOBJ;
     }
 
-    i_ret = stats_CounterUpdate( p_handler, p_counter, val );
+    i_ret = stats_CounterUpdate( p_handler, p_counter, val, val_new );
     vlc_mutex_unlock( &p_handler->object_lock );
 
     return i_ret;
@@ -492,7 +492,7 @@ void __stats_TimersDumpAll( vlc_object_t *p_obj )
  */
 static int stats_CounterUpdate( stats_handler_t *p_handler,
                                 counter_t *p_counter,
-                                vlc_value_t val )
+                                vlc_value_t val, vlc_value_t *new_val )
 {
     switch( p_counter->i_compute_type )
     {
@@ -544,6 +544,7 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
                     free( p_counter->pp_samples[0]->value.psz_string );
                 }
                 p_counter->pp_samples[0]->value = val;
+                *new_val = p_counter->pp_samples[0]->value;
             }
         }
         break;
@@ -596,9 +597,14 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
             switch( p_counter->i_type )
             {
             case VLC_VAR_INTEGER:
-            case VLC_VAR_FLOAT:
                 p_counter->pp_samples[0]->value.i_int += val.i_int;
+                if( new_val )
+                    new_val->i_int = p_counter->pp_samples[0]->value.i_int;
                 break;
+            case VLC_VAR_FLOAT:
+                p_counter->pp_samples[0]->value.f_float += val.f_float;
+                if( new_val )
+                    new_val->f_float = p_counter->pp_samples[0]->value.f_float;
             default:
                 msg_Err( p_handler, "Trying to increment invalid variable %s",
                          p_counter->psz_name );
@@ -621,9 +627,7 @@ static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
 
 static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this )
 {
-    stats_handler_t *p_handler = (stats_handler_t*)
-                          vlc_object_find( p_this->p_vlc, VLC_OBJECT_STATS,
-                                           FIND_ANYWHERE );
+    stats_handler_t *p_handler = p_this->p_libvlc->p_stats;
     if( !p_handler )
     {
         p_handler = stats_HandlerCreate( p_this );
@@ -631,8 +635,8 @@ static stats_handler_t *stats_HandlerGet( vlc_object_t *p_this )
         {
             return NULL;
         }
-        vlc_object_yield( p_handler );
     }
+    vlc_object_yield( p_handler );
     return p_handler;
 }
 
@@ -657,10 +661,12 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
         return NULL;
     }
     p_handler->i_counters = 0;
-    p_handler->p_counters = (hashtable_entry_t *) malloc( 5 * sizeof( variable_t ) );
+    p_handler->p_counters = (hashtable_entry_t *) malloc( 4 * sizeof( variable_t ) );
 
     /// \bug is it p_vlc or p_libvlc ?
     vlc_object_attach( p_handler, p_this->p_vlc );
+
+    p_this->p_libvlc->p_stats = p_handler;
 
     return p_handler;
 }
