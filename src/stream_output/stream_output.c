@@ -309,6 +309,10 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     p_access->pf_read    = NULL;
     p_access->pf_write   = NULL;
     p_access->p_module   = NULL;
+
+    p_access->i_writes = 0;
+    p_access->i_sent_bytes = 0;
+
     vlc_object_attach( p_access, p_sout );
 
     p_access->p_module   =
@@ -367,21 +371,25 @@ int sout_AccessOutRead( sout_access_out_t *p_access, block_t *p_buffer )
 int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 {
     int i_total;
-    if( p_access->p_libvlc->b_stats )
+    p_access->i_writes++;
+    p_access->i_sent_bytes += p_buffer->i_buffer;
+    if( p_access->p_libvlc->b_stats && p_access->i_writes % 10 == 0 )
     {
         /* Access_out -> sout_instance -> input_thread_t */
-        input_thread_t *p_input = 
-	    (input_thread_t *)vlc_object_find( p_access, VLC_OBJECT_INPUT, 
+        input_thread_t *p_input =
+            (input_thread_t *)vlc_object_find( p_access, VLC_OBJECT_INPUT,
                                                FIND_PARENT );
         if( p_input )
         {
-            stats_UpdateInteger( p_input, "sout_sent_packets", 1 );
-            stats_UpdateInteger( p_input, "sout_sent_bytes", 
-                                 p_buffer->i_buffer );
-            stats_GetInteger( p_input, 
+            stats_UpdateInteger( p_input, "sout_sent_packets", 10 );
+            stats_UpdateInteger( p_input, "sout_sent_bytes",
+                                 p_access->i_sent_bytes );
+            stats_GetInteger( p_input,
                               p_access->p_parent->p_parent->i_object_id,
                               "sout_sent_bytes", &i_total );
             stats_UpdateFloat( p_input, "sout_send_bitrate", (float)i_total );
+
+            p_access->i_sent_bytes = 0;
             vlc_object_release( p_input );
         }
     }

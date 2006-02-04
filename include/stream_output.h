@@ -106,6 +106,10 @@ struct sout_access_out_t
     char                    *psz_access;
     sout_cfg_t              *p_cfg;
 
+    int                      i_writes;
+    int64_t                  i_sent_bytes;      ///< This is a "local" counter that is reset each
+                                                // time it is transferred to stats
+
     char                    *psz_name;
     sout_access_out_sys_t   *p_sys;
     int                     (*pf_seek)( sout_access_out_t *, off_t );
