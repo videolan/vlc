@@ -1328,7 +1328,8 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
-        stats_UpdateInteger( p_stream->p_parent->p_parent, "decoded_audio", 1, NULL );
+        stats_UpdateInteger( p_stream->p_parent->p_parent, STATS_DECODED_AUDIO,
+                             1, NULL );
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
@@ -1731,7 +1732,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = 0;
-        stats_UpdateInteger( p_stream->p_parent->p_parent, "decoded_video", 1, NULL );
+        stats_UpdateInteger( p_stream->p_parent->p_parent, STATS_DECODED_VIDEO,
+                              1, NULL );
 
         if( p_stream->p_sout->i_out_pace_nocontrol && p_sys->b_hurry_up )
         {

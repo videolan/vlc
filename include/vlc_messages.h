@@ -228,10 +228,11 @@ struct counter_sample_t
 
 struct counter_t
 {
+    /* The list is *NOT* sorted at the moment, it could be ... */
+    uint64_t            i_index;
     char              * psz_name;
-    int                 i_source_object;
-    int                 i_compute_type;
     int                 i_type;
+    int                 i_compute_type;
     int                 i_samples;
     counter_sample_t ** pp_samples;
 
@@ -239,66 +240,93 @@ struct counter_t
     mtime_t             last_update;
 };
 
+enum
+{
+    STATS_INPUT_BITRATE,
+    STATS_READ_BYTES,
+    STATS_READ_PACKETS,
+    STATS_DEMUX_READ,
+    STATS_DEMUX_BITRATE,
+    STATS_PLAYED_ABUFFERS,
+    STATS_LOST_ABUFFERS,
+    STATS_DECODED_AUDIO,
+    STATS_DECODED_VIDEO,
+    STATS_DECODED_SUB,
+    STATS_CLIENT_CONNECTIONS,
+    STATS_ACTIVE_CONNECTIONS,
+    STATS_SOUT_SENT_PACKETS,
+    STATS_SOUT_SENT_BYTES,
+    STATS_SOUT_SEND_BITRATE,
+    STATS_DISPLAYED_PICTURES,
+    STATS_LOST_PICTURES,
+
+    STATS_TIMER_PLAYLIST_WALK,
+    STATS_TIMER_INTERACTION,
+    STATS_TIMER_PREPARSE
+};
+
 struct stats_handler_t
 {
     VLC_COMMON_MEMBERS
 
     int                 i_counters;
-    hashtable_entry_t * p_counters;
+    counter_t         **pp_counters;
 };
 
 VLC_EXPORT( void, stats_HandlerDestroy, (stats_handler_t*) );
 
 #define stats_Update( a,b,c, d) __stats_Update( VLC_OBJECT( a ), b, c, d )
-VLC_EXPORT( int, __stats_Update, (vlc_object_t*, const char *, vlc_value_t, vlc_value_t *) );
-#define stats_Create( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( int, __stats_Create, (vlc_object_t*, const char *, int, int) );
+VLC_EXPORT( int, __stats_Update, (vlc_object_t*, unsigned int, vlc_value_t, vlc_value_t *) );
+#define stats_Create( a,b,c,d,e ) __stats_Create( VLC_OBJECT(a), b, c, d,e )
+VLC_EXPORT( int, __stats_Create, (vlc_object_t*, const char *, unsigned int, int, int) );
 #define stats_Get( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( int, __stats_Get, (vlc_object_t*, int, const char *, vlc_value_t*) );
+VLC_EXPORT( int, __stats_Get, (vlc_object_t*, int, unsigned int, vlc_value_t*) );
 #define stats_CounterGet( a,b,c) __stats_CounterGet( VLC_OBJECT(a), b, c )
-VLC_EXPORT( counter_t*, __stats_CounterGet, (vlc_object_t*, int, const char * ) );
+VLC_EXPORT( counter_t*, __stats_CounterGet, (vlc_object_t*, int, unsigned int ) );
 
 #define stats_GetInteger( a,b,c,d ) __stats_GetInteger( VLC_OBJECT(a), b, c, d )
 static inline int __stats_GetInteger( vlc_object_t *p_obj, int i_id,
-                                      const char *psz_name, int *value )
+                                      unsigned int i_counter, int *value )
 {
     vlc_value_t val;
-    int i_ret = __stats_Get( p_obj, i_id, psz_name, &val );
+    int i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
     *value = val.i_int;
     return i_ret;
 }
 
 #define stats_GetFloat(a,b,c,d ) __stats_GetFloat( VLC_OBJECT(a), b, c, d )
 static inline int __stats_GetFloat( vlc_object_t *p_obj, int i_id,
-                                    const char *psz_name, float *value )
+                                    unsigned int i_counter, float *value )
 {
     vlc_value_t val;
-    int i_ret = __stats_Get( p_obj, i_id, psz_name, &val );
+    int i_ret = __stats_Get( p_obj, i_id, i_counter, &val );
     *value = val.f_float;
     return i_ret;
 }
 #define stats_UpdateInteger( a,b,c,d ) __stats_UpdateInteger( VLC_OBJECT(a),b,c,d )
 static inline int __stats_UpdateInteger( vlc_object_t *p_obj,
-                                         const char *psz_name, int i, int *pi_new )
+                                         unsigned int i_counter, int i,
+                                         int *pi_new )
 {
     int i_ret;
     vlc_value_t val;
     vlc_value_t new_val;
     val.i_int = i;
-    i_ret = __stats_Update( p_obj, psz_name, val , &new_val );
+    i_ret = __stats_Update( p_obj, i_counter, val , &new_val );
     if( pi_new )
         *pi_new = new_val.i_int;
     return i_ret;
 }
 #define stats_UpdateFloat( a,b,c,d ) __stats_UpdateFloat( VLC_OBJECT(a),b,c,d )
 static inline int __stats_UpdateFloat( vlc_object_t *p_obj,
-                                       const char *psz_name, float f, float *pf_new )
+                                       unsigned int i_counter, float f,
+                                       float *pf_new )
 {
     vlc_value_t val;
     int i_ret;
     vlc_value_t new_val;
     val.f_float = f;
-    i_ret =  __stats_Update( p_obj, psz_name, val, &new_val );
+    i_ret =  __stats_Update( p_obj, i_counter, val, &new_val );
     if( pf_new )
         *pf_new = new_val.f_float;
     return i_ret;
@@ -368,7 +396,7 @@ VLC_EXPORT( void, __stats_ComputeGlobalStats, (vlc_object_t*,global_stats_t*));
  * Timing
  ********/
 #ifdef DEBUG
-#define stats_TimerStart(a,b) __stats_TimerStart( VLC_OBJECT(a), b )
+#define stats_TimerStart(a,b,c) __stats_TimerStart( VLC_OBJECT(a), b,c )
 #define stats_TimerStop(a,b) __stats_TimerStop( VLC_OBJECT(a), b )
 #define stats_TimerDump(a,b) __stats_TimerDump( VLC_OBJECT(a), b )
 #define stats_TimersDumpAll(a) __stats_TimersDumpAll( VLC_OBJECT(a) )
@@ -378,7 +406,7 @@ VLC_EXPORT( void, __stats_ComputeGlobalStats, (vlc_object_t*,global_stats_t*));
 #define stats_TimerDump(a,b) {}
 #define stats_TimersDumpAll(a) {}
 #endif
-VLC_EXPORT( void,__stats_TimerStart, (vlc_object_t*, const char *) );
-VLC_EXPORT( void,__stats_TimerStop, (vlc_object_t*, const char *) );
-VLC_EXPORT( void,__stats_TimerDump, (vlc_object_t*, const char *) );
+VLC_EXPORT( void,__stats_TimerStart, (vlc_object_t*, const char *, unsigned int ) );
+VLC_EXPORT( void,__stats_TimerStop, (vlc_object_t*, unsigned int) );
+VLC_EXPORT( void,__stats_TimerDump, (vlc_object_t*, unsigned int) );
 VLC_EXPORT( void,__stats_TimersDumpAll, (vlc_object_t*) );

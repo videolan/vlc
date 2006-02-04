@@ -447,7 +447,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1,
+            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
                                  NULL );
         }
     }
@@ -460,7 +460,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   mdate() - p_buffer->start_date );
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1,
+            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
                                  NULL );
         }
         aout_BufferFree( p_buffer );
@@ -502,7 +502,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         aout_BufferFree( p_buffer );
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1,
+            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
                                  NULL );
         }
         return 0;

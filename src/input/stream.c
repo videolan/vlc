@@ -1580,11 +1580,12 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     if( !p_sys->i_list )
     {
         i_read = p_access->pf_read( p_access, p_read, i_read );
-        stats_UpdateInteger( s->p_parent->p_parent , "read_bytes", i_read,
+        stats_UpdateInteger( s->p_parent->p_parent , STATS_READ_BYTES, i_read,
                              &i_total );
-        stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+        stats_UpdateFloat( s->p_parent->p_parent , STATS_INPUT_BITRATE,
                            (float)i_total, NULL );
-        stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1, NULL );
+        stats_UpdateInteger( s->p_parent->p_parent , STATS_READ_PACKETS, 1,
+                             NULL );
         return i_read;
     }
 
@@ -1613,11 +1614,11 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
     }
 
     /* Update read bytes in input */
-    stats_UpdateInteger( s->p_parent->p_parent , "read_bytes", i_read,
+    stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_BYTES, i_read,
                          &i_total );
-    stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+    stats_UpdateFloat( s->p_parent->p_parent ,  STATS_INPUT_BITRATE,
                       (float)i_total, NULL );
-    stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1, NULL );
+    stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_PACKETS, 1, NULL );
     return i_read;
 }
 
@@ -1635,11 +1636,11 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
         if( p_block && p_access->p_libvlc->b_stats )
         {
-            stats_UpdateInteger( s->p_parent->p_parent, "read_bytes",
+            stats_UpdateInteger( s->p_parent->p_parent,  STATS_READ_BYTES,
                                  p_block->i_buffer, &i_total );
-            stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+            stats_UpdateFloat( s->p_parent->p_parent ,  STATS_INPUT_BITRATE,
                               (float)i_total, NULL );
-            stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1, NULL );
+            stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_PACKETS, 1, NULL );
         }
         return p_block;
     }
@@ -1670,11 +1671,12 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
     }
     if( p_block )
     {
-        stats_UpdateInteger( s->p_parent->p_parent, "read_bytes",
+        stats_UpdateInteger( s->p_parent->p_parent,  STATS_READ_BYTES,
                              p_block->i_buffer, &i_total );
-        stats_UpdateFloat( s->p_parent->p_parent , "input_bitrate",
+        stats_UpdateFloat( s->p_parent->p_parent ,  STATS_INPUT_BITRATE,
                           (float)i_total, NULL );
-        stats_UpdateInteger( s->p_parent->p_parent , "read_packets", 1 , NULL);
+        stats_UpdateInteger( s->p_parent->p_parent ,  STATS_READ_PACKETS,
+                             1 , NULL);
     }
 
     return p_block;

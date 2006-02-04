@@ -33,7 +33,7 @@
  * Local prototypes
  *****************************************************************************/
 static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
-                              const char *psz_name );
+                              unsigned int i_counter );
 static int stats_CounterUpdate( stats_handler_t *p_handler,
                                 counter_t *p_counter,
                                 vlc_value_t val, vlc_value_t * );
@@ -57,8 +57,7 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
     for ( i =  p_stats->i_counters - 1 ; i >= 0 ; i-- )
     {
         int j;
-        hashtable_entry_t p_entry = p_stats->p_counters[i];
-        counter_t * p_counter = p_entry.p_data;
+        counter_t *p_counter = p_stats->pp_counters[i];
 
         for( j = p_counter->i_samples -1; j >= 0 ; j-- )
         {
@@ -67,8 +66,7 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
             free( p_sample );
         }
         free( p_counter->psz_name );
-        free( p_entry.psz_name );
-        REMOVE_ELEM( p_stats->p_counters, p_stats->i_counters, i );
+        REMOVE_ELEM( p_stats->pp_counters, p_stats->i_counters, i );
         free( p_counter );
     }
 }
@@ -84,8 +82,8 @@ void stats_HandlerDestroy( stats_handler_t *p_stats )
  * STATS_MAX (keep the maximum passed value), STATS_MIN, or STATS_DERIVATIVE
  * (keep a time derivative of the value)
  */
-int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
-                    int i_compute_type )
+int __stats_Create( vlc_object_t *p_this, const char *psz_name, unsigned int i_id,
+                    int i_type, int i_compute_type )
 {
     counter_t *p_counter;
     stats_handler_t *p_handler;
@@ -102,7 +100,7 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
     p_counter = (counter_t*) malloc( sizeof( counter_t ) ) ;
 
     p_counter->psz_name = strdup( psz_name );
-    p_counter->i_source_object = p_this->i_object_id;
+    p_counter->i_index = ((uint64_t)p_this->i_object_id << 32 ) + i_id;
     p_counter->i_compute_type = i_compute_type;
     p_counter->i_type = i_type;
     p_counter->i_samples = 0;
@@ -111,8 +109,8 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
     p_counter->update_interval = 0;
     p_counter->last_update = 0;
 
-    vlc_HashInsert( &p_handler->p_counters, &p_handler->i_counters, p_this->i_object_id,
-                    psz_name, p_counter );
+    INSERT_ELEM( p_handler->pp_counters, p_handler->i_counters,
+                 p_handler->i_counters, p_counter );
 
     vlc_mutex_unlock( &p_handler->object_lock );
 
@@ -125,7 +123,7 @@ int __stats_Create( vlc_object_t *p_this, const char *psz_name, int i_type,
  * \param val the vlc_value union containing the new value to aggregate. For
  * more information on how data is aggregated, \see __stats_Create
  */
-int __stats_Update( vlc_object_t *p_this, const char *psz_name,
+int __stats_Update( vlc_object_t *p_this, unsigned int i_counter,
                     vlc_value_t val, vlc_value_t *val_new )
 {
     int i_ret;
@@ -142,8 +140,7 @@ int __stats_Update( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_handler->object_lock );
     /* Look for existing element */
-    p_counter = GetCounter( p_handler, p_this->i_object_id,
-                            psz_name );
+    p_counter = GetCounter( p_handler, p_this->i_object_id, i_counter );
     if( !p_counter )
     {
         vlc_mutex_unlock( &p_handler->object_lock );
@@ -166,7 +163,7 @@ int __stats_Update( vlc_object_t *p_this, const char *psz_name,
  * \return an error code
  */
 int __stats_Get( vlc_object_t *p_this, int i_object_id,
-                 const char *psz_name, vlc_value_t *val )
+                 unsigned int i_counter, vlc_value_t *val )
 {
     counter_t *p_counter;
 
@@ -181,8 +178,7 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id,
     vlc_mutex_lock( &p_handler->object_lock );
 
     /* Look for existing element */
-    p_counter = GetCounter( p_handler, i_object_id,
-                            psz_name );
+    p_counter = GetCounter( p_handler, i_object_id, i_counter );
     if( !p_counter )
     {
         vlc_mutex_unlock( &p_handler->object_lock );
@@ -245,7 +241,7 @@ int __stats_Get( vlc_object_t *p_this, int i_object_id,
  * \return the counter, or NULL if not found (or handler not created yet)
  */
 counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
-                               const char *psz_name )
+                               unsigned int i_counter )
 {
     counter_t *p_counter;
 
@@ -260,8 +256,7 @@ counter_t *__stats_CounterGet( vlc_object_t *p_this, int i_object_id,
     vlc_mutex_lock( &p_handler->object_lock );
 
     /* Look for existing element */
-    p_counter = GetCounter( p_handler, i_object_id,
-                            psz_name );
+    p_counter = GetCounter( p_handler, i_object_id, i_counter );
     vlc_mutex_unlock( &p_handler->object_lock );
     vlc_object_release( p_handler );
 
@@ -278,35 +273,35 @@ void stats_ComputeInputStats( input_thread_t *p_input,
     vlc_mutex_lock( &p_stats->lock );
 
     /* Input */
-    stats_GetInteger( p_input, p_input->i_object_id, "read_packets",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_READ_PACKETS,
                        &p_stats->i_read_packets );
-    stats_GetInteger( p_input, p_input->i_object_id, "read_bytes",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_READ_BYTES,
                        &p_stats->i_read_bytes );
-    stats_GetFloat( p_input, p_input->i_object_id, "input_bitrate",
+    stats_GetFloat( p_input, p_input->i_object_id, STATS_INPUT_BITRATE,
                        &p_stats->f_input_bitrate );
 
-    stats_GetInteger( p_input, p_input->i_object_id, "demux_read",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_DEMUX_READ,
                       &p_stats->i_demux_read_bytes );
-    stats_GetFloat( p_input, p_input->i_object_id, "demux_bitrate",
+    stats_GetFloat( p_input, p_input->i_object_id, STATS_DEMUX_BITRATE,
                       &p_stats->f_demux_bitrate );
 
-    stats_GetInteger( p_input, p_input->i_object_id, "decoded_video",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_DECODED_VIDEO,
                       &p_stats->i_decoded_video );
-    stats_GetInteger( p_input, p_input->i_object_id, "decoded_audio",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_DECODED_AUDIO,
                       &p_stats->i_decoded_audio );
 
     /* Sout */
-    stats_GetInteger( p_input, p_input->i_object_id, "sout_sent_packets",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_SOUT_SENT_PACKETS,
                       &p_stats->i_sent_packets );
-    stats_GetInteger( p_input, p_input->i_object_id, "sout_sent_bytes",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_SOUT_SENT_BYTES,
                       &p_stats->i_sent_bytes );
-    stats_GetFloat  ( p_input, p_input->i_object_id, "sout_send_bitrate",
+    stats_GetFloat  ( p_input, p_input->i_object_id, STATS_SOUT_SEND_BITRATE,
                       &p_stats->f_send_bitrate );
 
     /* Aout - We store in p_input because aout is shared */
-    stats_GetInteger( p_input, p_input->i_object_id, "played_abuffers",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_PLAYED_ABUFFERS,
                       &p_stats->i_played_abuffers );
-    stats_GetInteger( p_input, p_input->i_object_id, "lost_abuffers",
+    stats_GetInteger( p_input, p_input->i_object_id, STATS_LOST_ABUFFERS,
                       &p_stats->i_lost_abuffers );
 
     /* Vouts - FIXME: Store all in input */
@@ -319,9 +314,10 @@ void stats_ComputeInputStats( input_thread_t *p_input,
         {
             int i_displayed = 0, i_lost = 0;
             p_obj = (vlc_object_t *)p_list->p_values[i_index].p_object;
-            stats_GetInteger( p_obj, p_obj->i_object_id, "displayed_pictures",
+            stats_GetInteger( p_obj, p_obj->i_object_id,
+                              STATS_DISPLAYED_PICTURES,
                               &i_displayed );
-            stats_GetInteger( p_obj, p_obj->i_object_id, "lost_pictures",
+            stats_GetInteger( p_obj, p_obj->i_object_id, STATS_LOST_PICTURES,
                               &i_lost );
             p_stats->i_displayed_pictures += i_displayed;
             p_stats->i_lost_pictures += i_lost;
@@ -351,8 +347,9 @@ void stats_DumpInputStats( input_stats_t *p_stats  )
     vlc_mutex_lock( &p_stats->lock );
     /* f_bitrate is in bytes / microsecond
      * *1000 => bytes / millisecond => kbytes / seconds */
-    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - Demux : %i (%i bytes) - %f kB/s\n"
-                     " - Vout : %i/%i - Aout : %i/%i - Vout : %f\n",
+    fprintf( stderr, "Input : %i (%i bytes) - %f kB/s - "
+                     "Demux : %i (%i bytes) - %f kB/s\n"
+                     " - Vout : %i/%i - Aout : %i/%i - Sout : %f\n",
                     p_stats->i_read_packets, p_stats->i_read_bytes,
                     p_stats->f_input_bitrate * 1000,
                     p_stats->i_demux_read_packets, p_stats->i_demux_read_bytes,
@@ -378,11 +375,11 @@ void __stats_ComputeGlobalStats( vlc_object_t *p_obj,
         {
             float f_in = 0, f_out = 0, f_demux = 0;
             p_obj = (vlc_object_t *)p_list->p_values[i_index].p_object;
-            stats_GetFloat( p_obj, p_obj->i_object_id, "input_bitrate",
+            stats_GetFloat( p_obj, p_obj->i_object_id, STATS_INPUT_BITRATE,
                             &f_in );
-            stats_GetFloat( p_obj, p_obj->i_object_id, "sout_send_bitrate",
+            stats_GetFloat( p_obj, p_obj->i_object_id, STATS_SOUT_SEND_BITRATE,
                             &f_out );
-            stats_GetFloat( p_obj, p_obj->i_object_id, "demux_bitrate",
+            stats_GetFloat( p_obj, p_obj->i_object_id, STATS_DEMUX_BITRATE,
                             &f_demux );
             f_total_in += f_in; f_total_out += f_out;f_total_demux += f_demux;
         }
@@ -401,17 +398,17 @@ void stats_ReinitGlobalStats( global_stats_t *p_stats )
 }
 
 
-void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name )
+void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
+                         unsigned int i_id )
 {
     counter_t *p_counter = stats_CounterGet( p_obj,
-                                             p_obj->p_vlc->i_object_id,
-                                             psz_name );
+                                             p_obj->p_vlc->i_object_id, i_id );
     if( !p_counter )
     {
         counter_sample_t *p_sample;
-        stats_Create( p_obj->p_vlc, psz_name, VLC_VAR_TIME, STATS_TIMER );
+        stats_Create( p_obj->p_vlc, psz_name, i_id, VLC_VAR_TIME, STATS_TIMER );
         p_counter = stats_CounterGet( p_obj,  p_obj->p_vlc->i_object_id,
-                                      psz_name );
+                                      i_id );
         if( !p_counter ) return;
         /* 1st sample : if started: start_date, else last_time, b_started */
         p_sample = (counter_sample_t *)malloc( sizeof( counter_sample_t ) );
@@ -433,14 +430,14 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name )
     p_counter->pp_samples[0]->date = mdate();
 }
 
-void __stats_TimerStop( vlc_object_t *p_obj, const char *psz_name )
+void __stats_TimerStop( vlc_object_t *p_obj, unsigned int i_id )
 {
     counter_t *p_counter = stats_CounterGet( p_obj,
-                                              p_obj->p_vlc->i_object_id,
-                                             psz_name );
+                                             p_obj->p_vlc->i_object_id,
+                                             i_id );
     if( !p_counter || p_counter->i_samples != 2 )
     {
-        msg_Err( p_obj, "timer %s does not exist", psz_name );
+        msg_Err( p_obj, "timer does not exist" );
         return;
     }
     p_counter->pp_samples[0]->value.b_bool = VLC_FALSE;
@@ -449,11 +446,11 @@ void __stats_TimerStop( vlc_object_t *p_obj, const char *psz_name )
     p_counter->pp_samples[1]->date += p_counter->pp_samples[0]->date;
 }
 
-void __stats_TimerDump( vlc_object_t *p_obj, const char *psz_name )
+void __stats_TimerDump( vlc_object_t *p_obj, unsigned int i_id )
 {
     counter_t *p_counter = stats_CounterGet( p_obj,
                                              p_obj->p_vlc->i_object_id,
-                                             psz_name );
+                                             i_id );
     TimerDump( p_obj, p_counter, VLC_TRUE );
 }
 
@@ -467,7 +464,7 @@ void __stats_TimersDumpAll( vlc_object_t *p_obj )
     vlc_mutex_lock( &p_handler->object_lock );
     for ( i = 0 ; i< p_handler->i_counters; i++ )
     {
-        counter_t * p_counter = (counter_t *)(p_handler->p_counters[i].p_data);
+        counter_t * p_counter = p_handler->pp_counters[i];
         if( p_counter->i_compute_type == STATS_TIMER )
         {
             TimerDump( p_obj, p_counter, VLC_FALSE );
@@ -617,11 +614,16 @@ static int stats_CounterUpdate( stats_handler_t *p_handler,
 }
 
 static counter_t *GetCounter( stats_handler_t *p_handler, int i_object_id,
-                              const char *psz_name )
+                              unsigned int i_counter )
 {
     int i;
-    return (counter_t *)vlc_HashRetrieve( p_handler->p_counters, p_handler->i_counters,
-                                          i_object_id, psz_name );
+    uint64_t i_index = ((uint64_t) i_object_id << 32 ) + i_counter;
+    for (i = 0 ; i < p_handler->i_counters ; i++ )
+    {
+         if( i_index == p_handler->pp_counters[i]->i_index )
+             return p_handler->pp_counters[i];
+    }
+    return NULL;
 }
 
 
@@ -661,7 +663,7 @@ static stats_handler_t* stats_HandlerCreate( vlc_object_t *p_this )
         return NULL;
     }
     p_handler->i_counters = 0;
-    p_handler->p_counters = (hashtable_entry_t *) malloc( 4 * sizeof( variable_t ) );
+    p_handler->pp_counters = NULL;
 
     /// \bug is it p_vlc or p_libvlc ?
     vlc_object_attach( p_handler, p_this->p_vlc );

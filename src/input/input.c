@@ -685,22 +685,28 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
     {
         /* Prepare statistics */
         counter_t *p_counter;
-        stats_Create( p_input, "read_bytes", VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "read_packets", VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "demux_read", VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "input_bitrate", VLC_VAR_FLOAT,
-                               STATS_DERIVATIVE );
-        stats_Create( p_input, "demux_bitrate", VLC_VAR_FLOAT,
-                               STATS_DERIVATIVE );
+        stats_Create( p_input, "read_bytes", STATS_READ_BYTES,
+                      VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "read_packets", STATS_READ_PACKETS,
+                      VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "demux_read", STATS_DEMUX_READ,
+                      VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "input_bitrate", STATS_INPUT_BITRATE,
+                      VLC_VAR_FLOAT, STATS_DERIVATIVE );
+        stats_Create( p_input, "demux_bitrate", STATS_DEMUX_BITRATE,
+                      VLC_VAR_FLOAT,  STATS_DERIVATIVE );
+
         p_counter = stats_CounterGet( p_input, p_input->i_object_id,
-                                      "input_bitrate" );
+                                      STATS_INPUT_BITRATE );
         if( p_counter ) p_counter->update_interval = 1000000;
         p_counter = stats_CounterGet( p_input, p_input->i_object_id,
-                                      "demux_bitrate" );
+                                      STATS_DEMUX_BITRATE );
         if( p_counter ) p_counter->update_interval = 1000000;
 
-        stats_Create( p_input, "played_abuffers", VLC_VAR_INTEGER, STATS_COUNTER );
-        stats_Create( p_input, "lost_abuffers", VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "played_abuffers", STATS_PLAYED_ABUFFERS,
+                      VLC_VAR_INTEGER, STATS_COUNTER );
+        stats_Create( p_input, "lost_abuffers", STATS_LOST_ABUFFERS,
+                      VLC_VAR_INTEGER, STATS_COUNTER );
 
         /* handle sout */
         psz = var_GetString( p_input, "sout" );

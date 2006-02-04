@@ -598,9 +598,10 @@ static void RunThread ( playlist_t *p_playlist )
         i_loops++;
         if( p_playlist->p_interaction )
         {
-            stats_TimerStart( p_playlist, "Interaction thread" );
+            stats_TimerStart( p_playlist, "Interaction thread",
+                              STATS_TIMER_INTERACTION );
             intf_InteractionManage( p_playlist );
-            stats_TimerStop( p_playlist, "Interaction thread" );
+            stats_TimerStop( p_playlist, STATS_TIMER_INTERACTION );
         }
 
         if( i_loops %5 == 0 && p_playlist->p_stats )
@@ -712,9 +713,10 @@ static void RunThread ( playlist_t *p_playlist )
         {
             /* Start another input.
              * Get the next item to play */
-            stats_TimerStart( p_playlist, "Playlist walk" );
+            stats_TimerStart( p_playlist, "Playlist walk",
+                              STATS_TIMER_PLAYLIST_WALK );
             p_item = NextItem( p_playlist );
-            stats_TimerStop( p_playlist, "Playlist walk" );
+            stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_WALK );
 
             /* We must stop */
             if( p_item == NULL )
@@ -876,9 +878,10 @@ static void RunPreparse ( playlist_preparse_t *p_obj )
                     strncmp( p_current->input.psz_uri, "dshow:", 6 ) )
                 {
                     b_preparsed = VLC_TRUE;
-                    stats_TimerStart( p_playlist, "Preparse run" );
+                    stats_TimerStart( p_playlist, "Preparse run",
+                                      STATS_TIMER_PREPARSE );
                     input_Preparse( p_playlist, &p_current->input );
-                    stats_TimerStop( p_playlist, "Preparse run" );
+                    stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
                 }
                 vlc_mutex_unlock( &p_playlist->object_lock );
                 if( b_preparsed )

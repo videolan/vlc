@@ -2055,8 +2055,10 @@ static void httpd_HostThread( httpd_host_t *host )
 {
     tls_session_t *p_tls = NULL;
 
-    stats_Create( host, "client_connections", VLC_VAR_INTEGER, STATS_COUNTER );
-    stats_Create( host, "active_connections", VLC_VAR_INTEGER, STATS_COUNTER );
+    stats_Create( host, "client_connections", STATS_CLIENT_CONNECTIONS,
+                  VLC_VAR_INTEGER, STATS_COUNTER );
+    stats_Create( host, "active_connections", STATS_ACTIVE_CONNECTIONS,
+                  VLC_VAR_INTEGER, STATS_COUNTER );
 
     while( !host->b_die )
     {
@@ -2106,7 +2108,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     cl->i_activity_date+cl->i_activity_timeout < mdate()) ) ) )
             {
                 httpd_ClientClean( cl );
-                stats_UpdateInteger( host, "active_connections", -1, NULL );
+                stats_UpdateInteger( host, STATS_ACTIVE_CONNECTIONS, -1, NULL );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
                 i_client--;
@@ -2560,9 +2562,9 @@ static void httpd_HostThread( httpd_host_t *host )
                     if( fd >= 0 )
                     {
                         httpd_client_t *cl;
-                        stats_UpdateInteger( host, "client_connections", 1,
-                                             NULL );
-                        stats_UpdateInteger( host, "active_connections", 1,
+                        stats_UpdateInteger( host, STATS_CLIENT_CONNECTIONS,
+                                             1, NULL );
+                        stats_UpdateInteger( host, STATS_ACTIVE_CONNECTIONS, 1,
                                              NULL );
                         cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
                         p_tls = NULL;

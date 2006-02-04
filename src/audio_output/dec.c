@@ -312,7 +312,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   p_buffer->start_date - mdate());
         if( p_input->p_input_thread )
         {
-            stats_UpdateInteger( p_input->p_input_thread, "lost_abuffers", 1,
+            stats_UpdateInteger( p_input->p_input_thread, STATS_LOST_ABUFFERS, 1,
                                  NULL );
         }
         aout_BufferFree( p_buffer );
@@ -368,7 +368,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if( p_input->p_input_thread )
     {
         stats_UpdateInteger( p_input->p_input_thread,
-                            "played_abuffers", 1, NULL );
+                             STATS_PLAYED_ABUFFERS, 1, NULL );
     }
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
