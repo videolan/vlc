@@ -1218,6 +1218,26 @@ void update_download( update_iterator_t *p_uit, char *psz_dest )
 }
 
 /**
+ * Convert a long int size in bytes to a string
+ *
+ * \param l_size the size in bytes
+ * \return the size as a string
+ */
+char *size_str( long int l_size )
+{
+    char *psz_tmp;
+    if( l_size>> 30 )
+        asprintf( &psz_tmp, "%.1f GB", (float)l_size/(1<<30) );
+    if( l_size >> 20 )
+        asprintf( &psz_tmp, "%.1f MB", (float)l_size/(1<<20) );
+    else if( l_size >> 10 )
+        asprintf( &psz_tmp, "%.1f kB", (float)l_size/(1<<10) );
+    else
+        asprintf( &psz_tmp, "%ld B", l_size );
+    return psz_tmp;
+}
+
+/**
  * The true download function.
  *
  * \param p_this the download_thread_t object
@@ -1236,12 +1256,11 @@ void update_download_for_real( download_thread_t *p_this )
     char *psz_status;
 
     int i_progress;
-    int i_size;
-    int i_done = 0;
+    long int l_size, l_done = 0;
 
     vlc_thread_ready( p_this );
 
-    asprintf( &psz_status, "%s\nDownloading... %.1f%% done",
+    asprintf( &psz_status, "%s\nDownloading... 0.0/? %.1f%% done",
               p_this->psz_status, 0.0 );
     i_progress = intf_UserProgress( p_vlc, "Downloading...",
                                     psz_status, 0.0 );
@@ -1250,6 +1269,9 @@ void update_download_for_real( download_thread_t *p_this )
     if( !p_stream )
     {
         msg_Err( p_vlc, "Failed to open %s for reading", psz_src );
+        intf_UserFatal( p_vlc, "Downloading...",
+                        "Failed to open %s for reading", psz_src );
+        intf_UserHide( p_vlc, i_progress );
     }
     else
     {
@@ -1258,25 +1280,33 @@ void update_download_for_real( download_thread_t *p_this )
         if( !p_file )
         {
             msg_Err( p_vlc, "Failed to open %s for writing", psz_dest );
+            intf_UserFatal( p_vlc, "Downloading...",
+                            "Failed to open %s for writing", psz_dest );
+            intf_UserHide( p_vlc, i_progress );
         }
         else
         {
-            int i_read;
+            long int l_read;
+            char *psz_s1; char *psz_s2;
 
-            i_size = (int)(stream_Size(p_stream)/(1<<10));
+            l_size = stream_Size(p_stream);
             p_buffer = (void *)malloc( 1<<10 );
 
-            while( ( i_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
+            while( ( l_read = stream_Read( p_stream, p_buffer, 1<<10 ) ) )
             {
                 float f_progress;
 
-                fwrite( p_buffer, i_read, 1, p_file );
+                fwrite( p_buffer, l_read, 1, p_file );
 
-                i_done++;
+                l_done += l_read;
                 free( psz_status );
-                f_progress = 100.0*(float)i_done/(float)i_size;
-                asprintf( &psz_status, "%s\nDownloading... %.1f%% done",
-                           p_this->psz_status, f_progress );
+                f_progress = 100.0*(float)l_done/(float)l_size;
+                psz_s1 = size_str( l_done );
+                psz_s2 = size_str( l_size );
+                asprintf( &psz_status, "%s\nDownloading... %s/%s (%.1f%%) done",
+                           p_this->psz_status, psz_s1, psz_s2, f_progress );
+                free( psz_s1 ); free( psz_s2 );
+
                 intf_UserProgressUpdate( p_vlc, i_progress,
                                          psz_status, f_progress );
             }
@@ -1286,8 +1316,10 @@ void update_download_for_real( download_thread_t *p_this )
             stream_Delete( p_stream );
 
             free( psz_status );
-            asprintf( &psz_status, "%s\nDone (100.00%%)",
-                       p_this->psz_status );
+            psz_s2 = size_str( l_size );
+            asprintf( &psz_status, "%s\nDone %s (100.00%%)",
+                       p_this->psz_status, psz_s2 );
+            free( psz_s2 );
             intf_UserProgressUpdate( p_vlc, i_progress, psz_status, 100.0 );
             free( psz_status );
         }
