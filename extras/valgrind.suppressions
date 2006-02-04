@@ -1,0 +1,714 @@
+#############################################################################
+# Valgrind suppressions file for VLC
+#
+# Some of these errors are legitimate and should not be ignored forever ...
+# A good part of the suppressed leaks is not a real problem as it is memory
+# that anyway needs to be allocated for the full run
+#############################################################################
+
+#############################################
+#             Invalid reads
+#############################################
+
+## Iconv
+{
+   Iconv1
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   fun:iconv_open
+   fun:vlc_iconv_open
+}
+{
+   Iconv2
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   fun:iconv_open
+   fun:vlc_iconv_open
+}
+{
+   Iconv3
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlsym
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   fun:iconv_open
+   fun:vlc_iconv_open
+   fun:LocaleInit
+   fun:VLC_Init
+   fun:main
+}
+
+
+## Get home dir
+{
+   GetDirAddr1
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/libnss_compat-2.3.5.so
+   fun:_nss_compat_getpwuid_r
+}
+{
+   GetDirAddr2
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/libnss_compat-2.3.5.so
+   fun:_nss_compat_getpwuid_r
+}
+
+
+## Allocate plugin
+{
+   AllocatePluginAddr1
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+{
+   AllocatePluginAddr1
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+{
+   AllocatePluginAddr2
+   Memcheck:Addr4
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+
+
+#############################################
+#             Uninitialized memory 
+#############################################
+
+## Get Homedir
+{
+   GetDirCond1
+   Memcheck:Cond
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/libc-2.3.5.so
+   fun:__nss_passwd_lookup
+   fun:getpwuid_r
+   fun:getpwuid
+   fun:GetDir
+   fun:config_GetHomeDir
+   fun:VLC_Init
+}
+
+{
+   GetDirCond2
+   Memcheck:Cond
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   fun:__nss_lookup_function
+   obj:/lib/tls/libc-2.3.5.so
+   fun:__nss_passwd_lookup
+   fun:getpwuid_r
+   fun:getpwuid
+   fun:GetDir
+}
+
+## Iconv
+{
+   IconvCond1
+   Memcheck:Cond
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:__libc_dlopen_mode
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   fun:iconv_open
+   fun:vlc_iconv_open
+   fun:LocaleInit
+   fun:VLC_Init
+}
+
+## AllocatePlugin
+{
+   AllocatePluginCond2
+   Memcheck:Cond
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+{
+   AllocatePluginCond1
+   Memcheck:Cond
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+
+
+#############################################
+#             Memory leaks 
+#############################################
+
+## Plugins cache
+{
+   PluginsCache5
+   Memcheck:Leak
+   fun:malloc
+   fun:__vlc_object_create
+   fun:CacheLoad
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
+{
+   PluginsCache4
+   Memcheck:Leak
+   fun:malloc
+   fun:realloc
+   fun:__vlc_object_attach
+   fun:CacheLoad
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
+{
+   PluginsCache3
+   Memcheck:Leak
+   fun:realloc
+   fun:__vlc_object_attach
+   fun:CacheLoad
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
+{
+   PluginsCache2
+   Memcheck:Leak
+   fun:malloc
+   fun:CacheLoad
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
+{
+   PluginsCache1
+   Memcheck:Leak
+   fun:malloc
+   fun:CacheLoadConfig
+   fun:CacheLoad
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
+
+## Plugins loading 
+{
+   LoadPlugins4
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+{
+   LoadPlugins3
+   Memcheck:Leak
+   fun:malloc
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+{
+   LoadPlugins2
+   Memcheck:Leak
+   fun:malloc
+   fun:__vlc_object_create
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
+## Get home dir
+{
+   GetDir3
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/tls/libc-2.3.5.so
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getpwuid_r
+   fun:getpwuid
+   fun:GetDir
+   fun:config_GetHomeDir
+   fun:VLC_Init
+   fun:main
+}
+{
+   GetDir2
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getpwuid_r
+   fun:getpwuid
+   fun:GetDir
+   fun:config_GetHomeDir
+   fun:VLC_Init
+   fun:main
+}
+{
+   GetDir1
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getpwuid_r
+   fun:getpwuid
+   fun:GetDir
+   fun:config_GetHomeDir
+   fun:VLC_Init
+   fun:main
+}
+
+
+## Configuration parsing
+
+{
+  config_Duplicate2
+  Memcheck:Leak
+  fun:malloc
+  fun:config_Duplicate
+  fun:vlc_entry__main
+  fun:AllocateBuiltinModule
+}
+{
+   config_Duplicate1
+   Memcheck:Leak
+   fun:malloc
+   fun:config_Duplicate
+}
+
+## Plugins allocation / dynamic loading
+{
+   AllocatePlugin20
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+{
+   AllocatePlugin19
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+
+{
+   AllocatePlugin18
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin17
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin16
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+
+{
+   AllocatePlugin15
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin14
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin13
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+{
+   AllocatePlugin12
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+}
+
+{
+   AllocatePlugin11
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:LoadModule
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin10
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:AllocatePlugin
+}
+
+{
+   AllocatePlugin9
+   Memcheck:Leak
+   fun:malloc
+   fun:realloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+}
+
+{
+  AllocatePlugin8
+  Memcheck:Leak
+  fun:malloc
+  fun:__var_Create
+  fun:vlc_entry__0_8_4
+  fun:AllocatePlugin
+}
+{
+  AllocatePlugin7
+  Memcheck:Leak
+  fun:calloc
+  obj:/lib/tls/libdl-2.3.5.so
+  fun:dlopen
+  fun:AllocatePlugin
+}
+{
+  AllocatePlugin6
+  Memcheck:Leak
+  fun:malloc
+  fun:realloc
+  fun:vlc_entry__0_8_4
+  fun:AllocatePlugin
+}
+{
+  AllocatePlugin5
+  Memcheck:Leak
+  fun:malloc
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/tls/libc-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  fun:_dl_open
+  obj:/lib/tls/libdl-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/tls/libdl-2.3.5.so
+  fun:dlopen
+  fun:AllocatePlugin
+}
+{ 
+  AllocatePlugin4
+  Memcheck:Leak
+  fun:malloc
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/tls/libc-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  fun:_dl_open
+  obj:/lib/tls/libdl-2.3.5.so
+  obj:/lib/ld-2.3.5.so
+  obj:/lib/tls/libdl-2.3.5.so
+  fun:dlopen
+  fun:AllocatePlugin
+}
+{
+  AllocatePlugin3
+  Memcheck:Leak
+  fun:malloc
+  fun:AllocatePluginDir
+}
+{
+   AllocatePlugin2
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin1
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:AllocatePlugin
+}
+{
+   AllocatePlugin0
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libc-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   fun:_dl_open
+   obj:/lib/tls/libdl-2.3.5.so
+   obj:/lib/ld-2.3.5.so
+   obj:/lib/tls/libdl-2.3.5.so
+   fun:dlopen
+   fun:AllocatePlugin
+   fun:AllocatePluginDir
+   fun:AllocatePluginDir
+   fun:__module_LoadPlugins
+   fun:VLC_Init
+   fun:main
+}
+
