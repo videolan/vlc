@@ -93,4 +93,9 @@ EXTRA_DIST += \
 	bitmaps/type_playlist.xpm \
 	bitmaps/type_unknown.xpm \
 	bitmaps/type_vfile.xpm \
+	bitmaps/update_ascii.xpm \
+	bitmaps/update_binary.xpm \
+	bitmaps/update_document.xpm \
+	bitmaps/update_info.xpm \
+	bitmaps/update_source.xpm \
 	bitmaps/video.xpm
