@@ -269,12 +269,12 @@ static int Init( vout_thread_t *p_vout )
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
 /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
-#if defined( __ppc__ ) || defined( __ppc64__ ) || (VLCGL_FORMAT == YCBCR_MESA)
+#if ( defined( WORDS_BIGENDIAN ) && VLCGL_FORMAT == GL_YCBCR_422_APPLE ) || (VLCGL_FORMAT == YCBCR_MESA)
     p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
     i_pixel_pitch = 2;
 
 #elif (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
-    p_vout->output.i_chroma = VLC_FOURCC('Y','4','2','2');
+    p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
     i_pixel_pitch = 2;
 
 #elif VLCGL_FORMAT == GL_RGB
