@@ -133,7 +133,7 @@ void __msg_Flush( vlc_object_t *p_this )
 void __msg_Destroy( vlc_object_t *p_this )
 {
     int i;
-    for( i =  0 ; i < p_this->p_libvlc->msg_bank.i_queues; i++ )
+    for( i = p_this->p_libvlc->msg_bank.i_queues -1 ; i >= 0;  i-- )
     {
         msg_queue_t *p_queue = p_this->p_libvlc->msg_bank.pp_queues[i];
         if( p_queue->i_sub )
@@ -148,6 +148,9 @@ void __msg_Destroy( vlc_object_t *p_this )
 #endif
         /* Destroy lock */
         vlc_mutex_destroy( &p_queue->lock );
+        REMOVE_ELEM( p_this->p_libvlc->msg_bank.pp_queues,
+                     p_this->p_libvlc->msg_bank.i_queues, i );
+        free( p_queue );
     }
     vlc_mutex_destroy( &(p_this->p_libvlc->msg_bank.lock) );
 }
