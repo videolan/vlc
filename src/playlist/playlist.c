@@ -271,6 +271,9 @@ int playlist_Destroy( playlist_t * p_playlist )
         free( p_view );
     }
 
+    if( p_playlist->p_stats )
+        free( p_playlist->p_stats );
+
     vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_destroy( p_playlist->p_preparse );
     vlc_object_destroy( p_playlist );
