@@ -261,6 +261,12 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     vod_media_t *p_media = malloc( sizeof(vod_media_t) );
     int i;
 
+    if( !p_media )
+    {
+        msg_Err( p_vod, "not enough memory" );
+        return NULL;
+    }
+
     memset( p_media, 0, sizeof(vod_media_t) );
     p_media->es = 0;
     p_media->psz_mux = 0;
@@ -276,7 +282,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
         msg_Err( p_vod, "cannot create http url (%s)", p_media->psz_rtsp_path);
         free( p_media->psz_rtsp_path );
         free( p_media );
-        return 0;
+        return NULL;
     }
 
     msg_Dbg( p_vod, "created rtsp url: %s", p_media->psz_rtsp_path );
@@ -619,7 +625,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
-    fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
+    msg_Info( p_vod, "RtspCallback query: type=%d\n", query->i_type );
 
     answer->i_proto   = HTTPD_PROTO_RTSP;
     answer->i_version = query->i_version;
@@ -637,7 +643,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_status = 200;
                 answer->psz_status = strdup( "OK" );
                 httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
-    
+
                 answer->p_body = (uint8_t *)psz_sdp;
                 answer->i_body = strlen( psz_sdp );
             }
@@ -772,7 +778,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
-    fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
+    msg_Info( p_vod, "RtspCallback query: type=%d\n", query->i_type );
 
     answer->i_proto   = HTTPD_PROTO_RTSP;
     answer->i_version = query->i_version;
@@ -782,7 +788,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     {
     case HTTPD_MSG_SETUP:
         psz_transport = httpd_MsgGet( query, "Transport" );
-        fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
+        msg_Dbg( p_vod, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
 
         if( strstr( psz_transport, "unicast" ) &&
             strstr( psz_transport, "client_port=" ) )
@@ -802,7 +808,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 break;
             }
 
-            fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n",
+            msg_Dbg( p_vod, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n",
                      ip, i_port );
 
             psz_session = httpd_MsgGet( query, "Session" );
