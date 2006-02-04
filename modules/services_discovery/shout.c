@@ -203,7 +203,7 @@ static void Run( services_discovery_t *p_sd )
             int i_state = var_GetInteger( p_input, "state" );
             if( i_state == PLAYING_S )
             {
-                float f_pos = (float)(p_sys->p_item->i_children)* 100.0 /
+                float f_pos = (float)(p_sys->p_item->i_children)* 2 *100.0 /
                               (float)(p_sys->i_limit);
                 intf_UserProgressUpdate( p_sd, i_dialog_id, "Downloading",
                                          f_pos );
@@ -215,6 +215,6 @@ static void Run( services_discovery_t *p_sd )
             p_sys->b_dialog  = VLC_FALSE;
             intf_UserHide( p_sd, i_dialog_id );
         }
-        msleep( 100000 );
+        msleep( 10000 );
     }
 }

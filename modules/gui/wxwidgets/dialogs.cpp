@@ -564,11 +564,13 @@ void DialogsProvider::OnInteraction( wxCommandEvent& event )
         break;
     case INTERACT_UPDATE:
         p_wxdialog = (InteractionDialog*)(p_dialog->p_private);
-        p_wxdialog->Update();
+        if( p_wxdialog)
+            p_wxdialog->Update();
         break;
     case INTERACT_HIDE:
         p_wxdialog = (InteractionDialog*)(p_dialog->p_private);
-        p_wxdialog->Hide();
+        if( p_wxdialog )
+            p_wxdialog->Hide();
         p_dialog->i_status = HIDDEN_DIALOG;
         break;
     case INTERACT_DESTROY:
