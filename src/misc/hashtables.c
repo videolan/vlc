@@ -136,8 +136,9 @@ int vlc_HashLookup( hashtable_entry_t *p_array, int i_count,
         return -1;
     }
 
-    /* Hash found, entry found */
-    if( !strcmp( psz_name, p_array[i_pos].psz_name ) )
+    /* Hash found, let's check it looks like the entry
+     * We don't check the whole entry, this could lead to bad surprises :( */
+    if( psz_name[0] == p_array[i].psz_name[0] )
     {
         return i_pos;
     }
