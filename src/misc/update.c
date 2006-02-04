@@ -398,9 +398,10 @@ void GetFilesList( update_t *p_update, vlc_bool_t b_force )
     struct update_release_t *p_release = NULL;
     struct update_release_t tmp_release = {0};
     struct update_file_t tmp_file = {0};
-    tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
 
     vlc_bool_t b_os = VLC_FALSE, b_arch = VLC_FALSE;
+
+    tmp_release.i_type = UPDATE_RELEASE_TYPE_STABLE;
 
     vlc_mutex_lock( &p_update->lock );
 
