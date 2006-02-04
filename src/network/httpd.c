@@ -65,144 +65,6 @@
 #define HTTPD_CL_BUFSIZE 10000
 #endif
 
-#if 0
-typedef struct httpd_t          httpd_t;
-
-typedef struct httpd_host_t     httpd_host_t;
-typedef struct httpd_url_t      httpd_url_t;
-typedef struct httpd_client_t   httpd_client_t;
-
-enum
-{
-    HTTPD_MSG_NONE,
-
-    /* answer */
-    HTTPD_MSG_ANSWER,
-
-    /* channel communication */
-    HTTPD_MSG_CHANNEL,
-
-    /* http request */
-    HTTPD_MSG_GET,
-    HTTPD_MSG_HEAD,
-    HTTPD_MSG_POST,
-
-    /* rtsp request */
-    HTTPD_MSG_OPTIONS,
-    HTTPD_MSG_DESCRIBE,
-    HTTPD_MSG_SETUP,
-    HTTPD_MSG_PLAY,
-    HTTPD_MSG_PAUSE,
-    HTTPD_MSG_TEARDOWN,
-
-    /* just to track the count of MSG */
-    HTTPD_MSG_MAX
-};
-
-enum
-{
-    HTTPD_PROTO_NONE,
-    HTTPD_PROTO_HTTP,
-    HTTPD_PROTO_RTSP,
-};
-
-typedef struct
-{
-    httpd_client_t *cl; /* NULL if not throught a connection e vlc internal */
-
-    int     i_type;
-    int     i_proto;
-    int     i_version;
-
-    /* for an answer */
-    int     i_status;
-    char    *psz_status;
-
-    /* for a query */
-    char    *psz_url;
-    char    *psz_args;  /* FIXME find a clean way to handle GET(psz_args) and POST(body) through the same code */
-
-    /* for rtp over rtsp */
-    int     i_channel;
-
-    /* options */
-    int     i_name;
-    char    **name;
-    int     i_value;
-    char    **value;
-
-    /* body */
-    int64_t i_body_offset;
-    int     i_body;
-    uint8_t *p_body;
-
-} httpd_message_t;
-
-typedef struct httpd_callback_sys_t httpd_callback_sys_t;
-/* answer could be null, int this case no answer is requested */
-typedef int (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, httpd_message_t *query );
-
-
-/* create a new host */
-httpd_host_t *httpd_HostNew( vlc_object_t *, char *psz_host, int i_port );
-/* delete a host */
-void          httpd_HostDelete( httpd_host_t * );
-
-/* register a new url */
-httpd_url_t *httpd_UrlNew( httpd_host_t *, char *psz_url );
-/* register callback on a url */
-int          httpd_UrlCatch( httpd_url_t *, int i_msg,
-                             httpd_callback_t, httpd_callback_sys_t * );
-/* delete an url */
-void         httpd_UrlDelete( httpd_url_t * );
-
-
-void httpd_ClientModeStream( httpd_client_t *cl );
-void httpd_ClientModeBidir( httpd_client_t *cl );
-static void httpd_ClientClean( httpd_client_t *cl );
-
-/* High level */
-typedef struct httpd_file_t     httpd_file_t;
-typedef struct httpd_file_sys_t httpd_file_sys_t;
-typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
-httpd_file_t *httpd_FileNew( httpd_host_t *,
-                             char *psz_url, char *psz_mime,
-                             char *psz_user, char *psz_password,
-                             httpd_file_callback_t pf_fill,
-                             httpd_file_sys_t *p_sys );
-void         httpd_FileDelete( httpd_file_t * );
-
-typedef struct httpd_redirect_t httpd_redirect_t;
-httpd_redirect_t *httpd_RedirectNew( httpd_host_t *, char *psz_url_dst, char *psz_url_src );
-void              httpd_RedirectDelete( httpd_redirect_t * );
-
-#if 0
-typedef struct httpd_stream_t httpd_stream_t;
-httpd_stream_t *httpd_StreamNew( httpd_host_t * );
-int             httpd_StreamHeader( httpd_stream_t *, uint8_t *p_data, int i_data );
-int             httpd_StreamSend( httpd_stream_t *, uint8_t *p_data, int i_data );
-void            httpd_StreamDelete( httpd_stream_t * );
-#endif
-
-/* Msg functions facilities */
-void         httpd_MsgInit( httpd_message_t * );
-void         httpd_MsgAdd( httpd_message_t *, char *psz_name, char *psz_value, ... );
-/* return "" if not found. The string is not allocated */
-char        *httpd_MsgGet( httpd_message_t *, char *psz_name );
-void         httpd_MsgClean( httpd_message_t * );
-#endif
-
-#if 0
-struct httpd_t
-{
-    VLC_COMMON_MEMBERS
-
-    /* vlc_mutex_t  lock; */
-    int          i_host;
-    httpd_host_t **host;
-};
-#endif
-
 static void httpd_ClientClean( httpd_client_t *cl );
 
 /* each host run in his own thread */
@@ -231,7 +93,7 @@ struct httpd_host_t
 
     int            i_client;
     httpd_client_t **client;
-    
+
     /* TLS data */
     tls_server_t *p_tls;
 };
@@ -270,6 +132,7 @@ enum
     HTTPD_CLIENT_TLS_HS_IN,
     HTTPD_CLIENT_TLS_HS_OUT
 };
+
 /* mode */
 enum
 {
@@ -303,7 +166,7 @@ struct httpd_client_t
     /* */
     httpd_message_t query;  /* client -> httpd */
     httpd_message_t answer; /* httpd -> client */
-    
+
     /* TLS data */
     tls_session_t *p_tls;
 };
@@ -416,6 +279,7 @@ static struct
     /* end */
     { NULL,     NULL }
 };
+
 static const char *httpd_MimeFromUrl( const char *psz_url )
 {
 
@@ -451,7 +315,6 @@ struct httpd_file_t
     httpd_file_sys_t      *p_sys;
 
 };
-
 
 static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, httpd_message_t *answer, httpd_message_t *query )
 {
@@ -511,7 +374,6 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
 
     return VLC_SUCCESS;
 }
-
 
 httpd_file_t *httpd_FileNew( httpd_host_t *host,
                              const char *psz_url, const char *psz_mime,
@@ -836,6 +698,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
     {
         return VLC_SUCCESS;
     }
+
     if( answer->i_body_offset > 0 )
     {
         int64_t i_write;
@@ -1058,7 +921,6 @@ void httpd_StreamDelete( httpd_stream_t *stream )
     if( stream->p_buffer ) free( stream->p_buffer );
     free( stream );
 }
-
 
 /*****************************************************************************
  * Low level
@@ -1352,7 +1214,6 @@ int httpd_UrlCatch( httpd_url_t *url, int i_msg, httpd_callback_t cb,
     return VLC_SUCCESS;
 }
 
-
 /* delete an url */
 void httpd_UrlDelete( httpd_url_t *url )
 {
@@ -1460,6 +1321,7 @@ char *httpd_MsgGet( httpd_message_t *msg, char *name )
     }
     return "";
 }
+
 void httpd_MsgAdd( httpd_message_t *msg, char *name, char *psz_value, ... )
 {
     va_list args;
@@ -1556,18 +1418,16 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
     return cl;
 }
 
-
 static int httpd_NetRecv( httpd_client_t *cl, uint8_t *p, int i_len )
 {
     tls_session_t *p_tls;
-    
+
     p_tls = cl->p_tls;
     if( p_tls != NULL)
         return tls_Recv( p_tls, p, i_len );
 
     return recv( cl->fd, p, i_len, 0 );
 }
-
 
 static int httpd_NetSend( httpd_client_t *cl, const uint8_t *p, int i_len )
 {
@@ -1579,7 +1439,6 @@ static int httpd_NetSend( httpd_client_t *cl, const uint8_t *p, int i_len )
 
     return send( cl->fd, p, i_len, 0 );
 }
-
 
 static void httpd_ClientRecv( httpd_client_t *cl )
 {
@@ -2521,23 +2380,23 @@ static void httpd_HostThread( httpd_host_t *host )
             {
                 socklen_t i_sock_size = sizeof( struct sockaddr_storage );
                 struct  sockaddr_storage sock;
-    
+
                 fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
                 fprintf ( stderr, "Accepting\n");
                 if( fd >= 0 )
                 {
                     int i_state = 0;
-    
+
                     /* set this new socket non-block */
-    #if defined( WIN32 ) || defined( UNDER_CE )
+#if defined( WIN32 ) || defined( UNDER_CE )
                     {
                         unsigned long i_dummy = 1;
                         ioctlsocket( fd, FIONBIO, &i_dummy );
                     }
-    #else
+#else
                     fcntl( fd, F_SETFL, O_NONBLOCK );
-    #endif
-    
+#endif
+
                     if( p_tls != NULL)
                     {
                         switch ( tls_ServerSessionHandshake( p_tls, fd ) )
@@ -2548,7 +2407,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                 fd = -1;
                                 p_tls = NULL;
                                 break;
-    
+
                             case 1: /* missing input - most likely */
                                 i_state = HTTPD_CLIENT_TLS_HS_IN;
                                 break;
