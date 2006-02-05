@@ -85,6 +85,7 @@ static int OpenFilter( vlc_object_t *p_this )
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('Y','U','Y','2') &&
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('Y','V','1','2') &&
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('U','Y','V','Y') &&
+          p_filter->fmt_out.video.i_chroma != VLC_FOURCC('Y','V','Y','U') &&
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R','V','1','6') &&
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R','V','2','4') &&
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R','V','3','2') ) )
@@ -140,7 +141,8 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') &&
         ( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') ||
-          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') ) )
+          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') ||
+          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','Y','U') ) )
     {
         BlendYUVPacked( p_filter, p_dst, p_dst_orig, p_src,
                    i_x_offset, i_y_offset, i_width, i_height, i_alpha );
@@ -171,7 +173,8 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
     }
     if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') &&
         ( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') ||
-          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') ) )
+          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') ||
+          p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','Y','U') ) )
     {
         BlendPalYUVPacked( p_filter, p_dst, p_dst_orig, p_src,
                       i_x_offset, i_y_offset, i_width, i_height, i_alpha );
@@ -514,17 +517,25 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
     uint8_t *p_trans;
     int i_x, i_y, i_pix_pitch, i_trans;
     vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
-    int i_u_offset, i_v_offset;
+    int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
 
     if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
     {
+        i_l_offset = 0;
         i_u_offset = 1;
         i_v_offset = 3;
     }
     else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') )
     {
+        i_l_offset = 1;
         i_u_offset = 0;
         i_v_offset = 2;
+    }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','Y','U') )
+    {
+        i_l_offset = 0;
+        i_u_offset = 3;
+        i_v_offset = 1;
     }
 
     i_pix_pitch = 2;
@@ -577,7 +588,7 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
             else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
-                p_dst[i_x * 2]     = p_src2_y[i_x];
+                p_dst[i_x * 2 + i_l_offset]     = p_src2_y[i_x];
 
                 if( b_even )
                 {
@@ -588,8 +599,8 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
             else
             {
                 /* Blending */
-                p_dst[i_x * 2]     = ( (uint16_t)p_src2_y[i_x] * i_trans +
-                    (uint16_t)p_src1[i_x * 2] * (MAX_TRANS - i_trans) )
+                p_dst[i_x * 2 + i_l_offset]     = ( (uint16_t)p_src2_y[i_x] * i_trans +
+                    (uint16_t)p_src1[i_x * 2 + i_l_offset] * (MAX_TRANS - i_trans) )
                     >> TRANS_BITS;
 
                 if( b_even )
@@ -727,17 +738,25 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
     uint8_t *p_src1, *p_src2, *p_dst;
     int i_x, i_y, i_pix_pitch, i_trans;
     vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
-    int i_u_offset, i_v_offset;
+    int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
 
     if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
     {
+        i_l_offset = 0;
         i_u_offset = 1;
         i_v_offset = 3;
     }
     else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') )
     {
+        i_l_offset = 1;
         i_u_offset = 0;
         i_v_offset = 2;
+    }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','Y','U') )
+    {
+        i_l_offset = 0;
+        i_u_offset = 3;
+        i_v_offset = 1;
     }
 
     i_pix_pitch = 2;
@@ -777,7 +796,7 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
             else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
-                p_dst[i_x * 2]     = p_pal[p_src2[i_x]][0];
+                p_dst[i_x * 2 + i_l_offset]     = p_pal[p_src2[i_x]][0];
 
                 if( b_even )
                 {
@@ -788,8 +807,8 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
             else
             {
                 /* Blending */
-                p_dst[i_x * 2]     = ( (uint16_t)p_pal[p_src2[i_x]][0] *
-                    i_trans + (uint16_t)p_src1[i_x * 2] *
+                p_dst[i_x * 2 + i_l_offset]     = ( (uint16_t)p_pal[p_src2[i_x]][0] *
+                    i_trans + (uint16_t)p_src1[i_x * 2 + i_l_offset] *
                     (MAX_TRANS - i_trans) ) >> TRANS_BITS;
 
                 if( b_even )
