@@ -968,6 +968,7 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
         vlc_value_t val;
         vlc_bool_t b_yes = VLC_TRUE;
         vlc_bool_t b_once = VLC_FALSE;
+        module_config_t *p_conf;
 
         if( cfg->psz_name == NULL || *cfg->psz_name == '\0' )
         {
@@ -1006,6 +1007,42 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
 
         /* create name */
         asprintf( &psz_name, "%s%s", psz_prefix, b_once ? &ppsz_options[i][1] : ppsz_options[i] );
+
+
+        /* Check if the option is deprecated */
+
+        p_conf = config_FindConfig( p_this, psz_name );
+
+        /* This is basically cut and paste from src/misc/configuration.c
+         * with slight changes */
+        if( p_conf && p_conf->psz_current )
+        {
+            if( !strcmp( p_conf->psz_current, "SUPPRESSED" ) )
+            {
+                msg_Err( p_this, "Option %s is no longer used.",
+                         p_conf->psz_name );
+                goto next;
+            }
+            else if( p_conf->b_strict )
+            {
+                msg_Err( p_this, "Option %s is deprecated. Use %s instead.",
+                         p_conf->psz_name, p_conf->psz_current );
+                /* TODO: this should return an error and end option parsing
+                 * ... but doing this would change the VLC API and all the
+                 * modules so i'll do it later */
+                goto next;
+            }
+            else
+            {
+                msg_Warn( p_this, "Option %s is deprecated. You should use "
+                        "%s instead.", p_conf->psz_name, p_conf->psz_current );
+                i_type = config_GetType( p_this, psz_name );
+                free( psz_name );
+                psz_name = strdup( p_conf->psz_current );
+                var_Create( p_this, psz_name, i_type | VLC_VAR_DOINHERIT );
+            }
+        }
+        /* </Check if the option is deprecated> */
 
         /* get the type of the variable */
         i_type = config_GetType( p_this, psz_name );
