@@ -85,10 +85,9 @@ vlc_module_begin();
                 ACCESS_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_FALSE );
-    add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
-                URL_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
                 DST_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "url", VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT, NAME_LONGTEXT,
@@ -155,13 +154,6 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
     psz_url = *val.psz_string ? val.psz_string : NULL;
     if( !*val.psz_string ) free( val.psz_string );
-    if( !psz_url )
-    {
-        /* XXX dst take preference over url (url will be removed later) */
-        var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
-        psz_url = *val.psz_string ? val.psz_string : NULL;
-        if( !*val.psz_string ) free( val.psz_string );
-    }
 
     p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
     p_stream->p_sys->p_session = NULL;
