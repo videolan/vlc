@@ -46,6 +46,7 @@ BEGIN_EVENT_TABLE( InteractionDialog, wxDialog)
     EVT_BUTTON( wxID_OK, InteractionDialog::OnOkYes )
     EVT_BUTTON( wxID_YES, InteractionDialog::OnOkYes )
     EVT_BUTTON( wxID_CANCEL, InteractionDialog::OnCancel)
+    EVT_BUTTON( wxID_CLOSE, InteractionDialog::OnCancel)
     EVT_BUTTON( wxID_NO, InteractionDialog::OnNo )
     EVT_BUTTON( wxID_CLEAR, InteractionDialog::OnClear )
     EVT_CHECKBOX( NoShow_Event, InteractionDialog::OnNoShow )
@@ -192,14 +193,19 @@ void InteractionDialog::Render()
     else if( p_dialog->i_flags & DIALOG_CLEAR_NOSHOW )
     {
         wxCheckBox *noshow = new wxCheckBox( buttons_panel,
-                                         NoShow_Event, wxU( _("Don't show") ) );
+                      NoShow_Event, wxU( _("Don't show further errors") ) );
         noshow->SetValue( b_noshow );
         wxButton *clear = new wxButton( buttons_panel,
                                         wxID_CLEAR, wxU( _("Clear") ) );
-        buttons_sizer->Add( noshow, 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_LEFT, 5 );
+        wxButton *close = new wxButton( buttons_panel, wxID_CLOSE,
+                                         wxU( _("Close") ) );
+        buttons_sizer->Add( noshow, 0, wxEXPAND | wxRIGHT|
+                                       wxLEFT | wxALIGN_LEFT, 5 );
         buttons_sizer->Add( 0, 0, 1 );
-        buttons_sizer->Add( clear , 0, wxEXPAND | wxRIGHT| wxLEFT | wxALIGN_RIGHT, 5 );
-
+        buttons_sizer->Add( clear , 0, wxEXPAND | wxRIGHT|
+                                       wxLEFT | wxALIGN_RIGHT, 5 );
+        buttons_sizer->Add( close , 0, wxEXPAND | wxRIGHT|
+                                       wxLEFT | wxALIGN_RIGHT, 5 );
     }
     widgets_sizer->Layout();
     widgets_panel->SetSizerAndFit( widgets_sizer );
