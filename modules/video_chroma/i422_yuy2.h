@@ -49,10 +49,10 @@ movq      %%mm0, 8(%0)  # Store high YUYV                                 \n\
 
 #define MMX_YUV422_UYVY "                                                 \n\
 movq       (%1), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movd       (%2), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd       (%3), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-punpcklbw %%mm2, %%mm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-movq      %%mm1, %%mm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movd       (%2), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%3), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
+movq      %%mm1, %%mm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 punpcklbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
 movq      %%mm2, (%0)   # Store low UYVY                                  \n\
 punpckhbw %%mm0, %%mm1  #                     y7 v3 y6 u3 y5 v2 y4 u2     \n\
