@@ -70,6 +70,8 @@ namespace wxvlc
         intf_thread_t *p_intf;
         VLMWrapper *p_vlm;
 
+        wxWindow *p_parent;
+
         vlc_bool_t b_edit, b_broadcast;
 
         OpenDialog *p_open_dialog;

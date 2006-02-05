@@ -63,7 +63,9 @@ VLMPanel::VLMPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ) :
     wxNotebookSizer *notebook_sizer = new wxNotebookSizer( p_notebook );
 #endif
     p_notebook->AddPage( BroadcastPanel( p_notebook ), wxU( _("Broadcasts") ) );
+#if 0
     p_notebook->AddPage( VODPanel( p_notebook ), wxU( _("VOD") ) );
+#endif
 #if (!wxCHECK_VERSION(2,5,0))
     panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
 #else
@@ -351,6 +353,7 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
                 wxPanel( _p_parent, -1, wxDefaultPosition, wxDefaultSize )
 {
     p_intf = _p_intf;
+    p_parent = _p_parent;
     p_vlm = _p_vlm;
     b_edit = _b_edit;
     b_broadcast = _b_broadcast;
@@ -393,12 +396,6 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
     panel_sizer->Add( upper_sizer, 0, wxEXPAND | wxALL, 5 );
 
     wxBoxSizer *lower_sizer = new wxBoxSizer( wxHORIZONTAL );
-    lower_sizer->Add( new wxButton( this, Create_Event,
-                          wxU( _( b_edit ? "Edit" : "Create" ) ) ),
-                      0 , wxEXPAND | wxALL , 5 );
-    lower_sizer->Add( new wxButton( this, Clear_Event, wxU( _( "Clear" )  ) ),
-                      0 , wxEXPAND | wxALL , 5 );
-
     enabled_checkbox = new wxCheckBox( this, -1, wxU( _("Enabled" ) ) );
     enabled_checkbox->SetValue( true );
     lower_sizer->Add( enabled_checkbox,  1 , wxEXPAND | wxALL , 5 );
@@ -407,6 +404,17 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
         loop_checkbox = new wxCheckBox( this, -1, wxU( _("Loop" ) ) );
         lower_sizer->Add( loop_checkbox,  1 , wxEXPAND | wxALL , 5 );
     }
+
+    if( !b_edit )
+    {
+        lower_sizer->Add( new wxButton( this, Clear_Event,
+                          wxU( _( "Clear" )  ) ),
+                         0 , wxEXPAND | wxALL , 5 );
+    }
+    lower_sizer->Add( new wxButton( this, Create_Event,
+                          wxU( _( b_edit ? "OK" : "Create" ) ) ),
+                      0 , wxEXPAND | wxALL , 5 );
+
 
     panel_sizer->Add( lower_sizer, 0 , wxEXPAND| wxALL, 5 );
     panel_sizer->Layout();
@@ -464,6 +472,8 @@ void VLMAddStreamPanel::OnCreate( wxCommandEvent &event )
     LocaleFree( psz_output);
     if( !b_edit )
         OnClear( event );
+    if( b_edit )
+        p_parent->Hide();
 }
 
 void VLMAddStreamPanel::OnClear( wxCommandEvent &event )
