@@ -316,10 +316,8 @@ void InputManager::Update()
         var_Get( p_input, "position", &pos );
         var_Get( p_input, "length", &len );
 
-        if( len.i_time > 0 && pos.f_float >= 0 &&
-            !slider->IsShown() ) ShowSlider();
-        else if( len.i_time < 0 && pos.f_float <= 0 &&
-                 slider->IsShown() ) HideSlider();
+        if( pos.f_float > 0 && !slider->IsShown() ) ShowSlider();
+        else if(  pos.f_float <= 0 &&  slider->IsShown() ) HideSlider();
 
         /* Update the slider if the user isn't dragging it. */
         if( slider->IsShown() && b_slider_free )
