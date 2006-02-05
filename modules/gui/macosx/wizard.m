@@ -1341,7 +1341,7 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         /* we are just transcoding and dumping the stuff to a file */
         [o_opts_string appendFormat: \
-            @":sout=#%s%sstandard{mux=%s,url=%s,access=file}", [o_duplicateCmd \
+            @":sout=#%s%sstandard{mux=%s,dst=%s,access=file}", [o_duplicateCmd \
             UTF8String], [o_trnscdCmd UTF8String], [[[o_encapFormats \
             objectAtIndex: [[o_userSelections objectForKey:@"encapFormat"] \
             intValue]] objectAtIndex:0] UTF8String], [[o_userSelections \
@@ -1362,7 +1362,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     objectForKey:@"sapText"] UTF8String]];
             }
             [o_opts_string appendFormat: \
-                @":sout=#%s%sstandard{mux=%s,url=%s,access=%s,%s}", \
+                @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s,%s}", \
                 [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
                 [[[o_encapFormats objectAtIndex: [[o_userSelections \
                 objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
@@ -1373,7 +1373,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             /* no SAP, just streaming */
             [o_opts_string appendFormat: \
-                @":sout=#%s%sstandard{mux=%s,url=%s,access=%s}", \
+                @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s}", \
                 [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
                 [[[o_encapFormats objectAtIndex: [[o_userSelections \
                 objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \

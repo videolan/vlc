@@ -33,7 +33,7 @@
  *
  * vlc v4l:/dev/video:input=2:norm=pal:size=192x144 \
  * --sout '#transcode{vcodec=theora,vb=300,acodec=vorb,ab=96}\
- * :std{access=shout,mux=ogg,url=localhost:8005}'
+ * :std{access=shout,mux=ogg,dst=localhost:8005}'
  *
  *****************************************************************************/
 

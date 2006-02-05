@@ -1114,7 +1114,7 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
     if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
     i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "mux=%s,", (char*)p_std_muxer);
     if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
-    i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "url=%s", (char*)p_std_url);
+    i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "dst=%s", (char*)p_std_url);
     if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
 
     if (strncasecmp( (const char*)p_std_access, "udp", 3)==0)

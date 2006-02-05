@@ -1587,7 +1587,7 @@ void WizardDialog::Run()
             else
                 psz_transcode = "";
 
-            asprintf( &psz_opt, ":sout=#%sstandard{mux=%s,url=%s,"
+            asprintf( &psz_opt, ":sout=#%sstandard{mux=%s,dst=%s,"
                       "access=file}", psz_transcode, mux, address );
 
             if( *psz_transcode )
@@ -1615,7 +1615,7 @@ void WizardDialog::Run()
             /* Add brackets automatically for IPv6 if they are missing */
             v6 = ( address[0] != '[' ) && ( strchr( address, ':' ) != NULL );
             asprintf( &psz_opt,
-                      ":sout=#standard{mux=%s,url=%s%s%s,access=%s%s}",
+                      ":sout=#standard{mux=%s,dst=%s%s%s,access=%s%s}",
                       mux, v6 ? "[" : "", address, v6 ? "]" : "", method,
                       psz_sap_option ?: "" );
             if( psz_sap_option ) free( psz_sap_option );

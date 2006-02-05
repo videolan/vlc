@@ -27,36 +27,36 @@
 
 /**
  * \file
- * The OSD menu core creates the OSD menu structure in memory. It parses a 
- * configuration file that defines all elements that are part of the menu. The 
- * core also handles all actions and menu structure updates on behalf of video 
+ * The OSD menu core creates the OSD menu structure in memory. It parses a
+ * configuration file that defines all elements that are part of the menu. The
+ * core also handles all actions and menu structure updates on behalf of video
  * subpicture filters.
  *
  * The file modules/video_filters/osdmenu.c implements a subpicture filter that
- * specifies the final information on positioning of the current state image. 
+ * specifies the final information on positioning of the current state image.
  * A subpicture filter is called each time a video picture has to be rendered, it
  * also gives a start and end date to the subpicture. The subpicture can be streamed
  * if used inside a transcoding command. For example:
  *
  *  vlc dvdsimple:///dev/dvd --extraintf rc
- *  --sout='#transcode{osd}:std{access=udp,mux=ts,url=dest_ipaddr}'
+ *  --sout='#transcode{osd}:std{access=udp,mux=ts,dst=dest_ipaddr}'
  *  --osdmenu-file=share/osdmenu/dvd.cfg
  *
- * Each OSD menu element, called "action", defines a hotkey action. Each action 
- * can have several states (unselect, select, pressed). Each state has an image 
- * that represents the state visually. The commands "menu right", "menu left", 
+ * Each OSD menu element, called "action", defines a hotkey action. Each action
+ * can have several states (unselect, select, pressed). Each state has an image
+ * that represents the state visually. The commands "menu right", "menu left",
  * "menu up" and "menu down" are used to navigate through the OSD menu structure.
  * The commands "menu on" or "menu show" and "menu off" or "menu hide" respectively
  * show and hide the OSD menu subpictures.
  *
  * There is one special element called "range". A range is an arbritary range
  * of state images that can be browsed using "menu up" and "menu down" commands
- * on the rc interface. 
- *  
- * The OSD menu configuration file uses a very simple syntax and basic parser. 
+ * on the rc interface.
+ *
+ * The OSD menu configuration file uses a very simple syntax and basic parser.
  * A configuration file has the ".cfg". An example is "share/osdmenu/dvd256.cfg".
  */
-  
+
 #ifndef _VLC_OSD_H
 #define _VLC_OSD_H 1
 
@@ -73,7 +73,7 @@ extern "C" {
  * BNF formal representation below:
  *
  * The keywords FILENAME and PATHNAME represent the filename and pathname specification
- * that is valid for the Operating System VLC is compiled for. 
+ * that is valid for the Operating System VLC is compiled for.
  *
  * The hotkey actions that are supported by VLC are documented in the file src/libvlc. The
  * file include/vlc_keys.h defines some hotkey internals.
@@ -84,7 +84,7 @@ extern "C" {
  * DIR = 'dir' WS OSDMENU_PATH '\n'
  * STATE = [ 'unselect' | 'select' | 'pressed' ]
  * HOTKEY_ACTION = 'key-' [ 'a' .. 'z', 'A' .. 'Z', '-' ]+
- * 
+ *
  * ACTION_TYPE        = 'type' 'volume' '\n'
  * ACTION_BLOCK_START = 'action' WS HOTKEY_ACTION WS '('POS','POS')' '\n'
  * ACTION_BLOCK_END   = 'end' '\n'
@@ -97,7 +97,7 @@ extern "C" {
  * ACTION_BLOCK = ACTION_BLOCK_START [WS ACTION_TYPE*] [ [WS ACTION_STATE]+3 | [WS ACTION_BLOCK_RANGE]+1 ] ACTION_BLOCK_END
  * CONFIG_FILE_CONTENTS = DIR [ACTION_BLOCK]+
  *
- */ 
+ */
 
 /**
  * OSD menu position and picture type defines
@@ -129,7 +129,7 @@ struct text_style_t
     vlc_bool_t b_underline;
 };
 static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FALSE, VLC_FALSE };
- 
+
 /**
  * OSD menu button states
  *
@@ -155,15 +155,15 @@ struct osd_state_t
     osd_state_t *p_next;    /*< pointer to next state */
     osd_state_t *p_prev;    /*< pointer to previous state */
     picture_t   *p_pic;     /*< picture of state */
-    
+
     char        *psz_state; /*< state name */
-    int          i_state;   /*< state index */ 
+    int          i_state;   /*< state index */
 };
 
-/** 
+/**
  * OSD Button object
  *
- * An OSD Button has different states. Each state has an image for display. 
+ * An OSD Button has different states. Each state has an image for display.
  */
 struct osd_button_t
 {
@@ -171,30 +171,30 @@ struct osd_button_t
     osd_button_t *p_prev;   /*< pointer to previous button */
     osd_button_t *p_up;     /*< pointer to up button */
     osd_button_t *p_down;   /*< pointer to down button */
-    
+
     osd_state_t *p_current_state; /*< pointer to current state image */
     osd_state_t *p_states; /*< doubly linked list of states */
     picture_t   *p_feedback; /*< feedback picture */
-        
+
     char    *psz_name;     /*< name of button */
-    
+
     /* These member should probably be a struct hotkey */
     char    *psz_action;      /*< hotkey action name on button*/
     char    *psz_action_down; /*< hotkey action name on range buttons for command "menu down" */
     /* end of hotkey specifics */
-    
+
     int     i_x;            /*< x-position of button visible state image */
-    int     i_y;            /*< y-position of button visible state image */ 
-    
-    /* range style button */    
+    int     i_y;            /*< y-position of button visible state image */
+
+    /* range style button */
     vlc_bool_t   b_range;    /*< button should be interpreted as range */
     int          i_ranges;   /*< number of states */
 };
 
-/** 
+/**
  * OSD Menu State object
  *
- * Represents the current state as displayed. 
+ * Represents the current state as displayed.
  */
 /* Represent the menu state */
 struct osd_menu_state_t
@@ -202,14 +202,14 @@ struct osd_menu_state_t
     int     i_x;        /*< x position of spu region */
     int     i_y;        /*< y position of spu region */
     int     i_width;    /*< width of spu region */
-    int     i_height;   /*< height of spu region */    
-    
+    int     i_height;   /*< height of spu region */
+
     picture_t    *p_pic;  /*< pointer to picture to display */
     osd_button_t *p_visible; /*< shortcut to visible button */
-    
+
     vlc_bool_t b_menu_visible; /*< menu currently visible? */
     vlc_bool_t b_update;       /*< update OSD Menu when VLC_TRUE */
-    
+
     /* quick hack to volume state. */
     osd_button_t *p_volume; /*< pointer to volume range object. */
 };
@@ -224,16 +224,16 @@ struct osd_menu_state_t
 struct osd_menu_t
 {
     VLC_COMMON_MEMBERS
-    
-    int     i_x;        /*< x-position of OSD Menu on the video screen */ 
-    int     i_y;        /*< y-position of OSD Menu on the video screen */ 
-    int     i_width;    /*< width of OSD Menu on the video screen */ 
-    int     i_height;   /*< height of OSD Menu on the video screen */ 
-    
+
+    int     i_x;        /*< x-position of OSD Menu on the video screen */
+    int     i_y;        /*< y-position of OSD Menu on the video screen */
+    int     i_width;    /*< width of OSD Menu on the video screen */
+    int     i_height;   /*< height of OSD Menu on the video screen */
+
     char             *psz_path;  /*< directory where OSD menu images are stored */
     osd_button_t     *p_button;  /*< doubly linked list of buttons */
     osd_menu_state_t *p_state;   /*< current state of OSD menu */
-        
+
     /* quick link in the linked list. */
     osd_button_t  *p_last_button; /*< pointer to last button in the list */
 };
@@ -257,11 +257,11 @@ VLC_EXPORT( void, __osd_MenuDelete, ( vlc_object_t *, osd_menu_t * ) );
 /**
  * Change state on an osd_button_t.
  *
- * This function selects the specified state and returns a pointer to it. The 
- * following states are currently supported: 
+ * This function selects the specified state and returns a pointer to it. The
+ * following states are currently supported:
  * \see OSD_BUTTON_UNSELECT
- * \see OSD_BUTTON_SELECT   
- * \see OSD_BUTTON_PRESSED  
+ * \see OSD_BUTTON_SELECT
+ * \see OSD_BUTTON_PRESSED
  */
 VLC_EXPORT( osd_state_t *, __osd_StateChange, ( osd_state_t *, const int ) );
 
@@ -272,11 +272,11 @@ VLC_EXPORT( osd_state_t *, __osd_StateChange, ( osd_state_t *, const int ) );
 /**
  * Show the OSD menu.
  *
- * Show the OSD menu on the video output or mux it into the stream. 
- * Every change to the OSD menu will now be visible in the output. An output 
+ * Show the OSD menu on the video output or mux it into the stream.
+ * Every change to the OSD menu will now be visible in the output. An output
  * can be a video output window or a stream (\see stream output)
  */
-VLC_EXPORT( void, __osd_MenuShow, ( vlc_object_t * ) ); 
+VLC_EXPORT( void, __osd_MenuShow, ( vlc_object_t * ) );
 
 /**
  * Hide the OSD menu.
@@ -289,7 +289,7 @@ VLC_EXPORT( void, __osd_MenuHide, ( vlc_object_t * ) );
  * Activate the action of this OSD menu item.
  *
  * The rc interface command "menu select" triggers the sending of an hotkey action
- * to the hotkey interface. The hotkey that belongs to the current highlighted 
+ * to the hotkey interface. The hotkey that belongs to the current highlighted
  * OSD menu item will be used.
  */
 VLC_EXPORT( void, __osd_MenuActivate,   ( vlc_object_t * ) );
@@ -305,7 +305,7 @@ VLC_EXPORT( void, __osd_MenuActivate,   ( vlc_object_t * ) );
  * Note: The actual position on screen of the menu item is determined by the the
  * OSD menu configuration file.
  */
-VLC_EXPORT( void, __osd_MenuNext, ( vlc_object_t * ) ); 
+VLC_EXPORT( void, __osd_MenuNext, ( vlc_object_t * ) );
 
 /**
  * Previous OSD menu item
@@ -319,7 +319,7 @@ VLC_EXPORT( void, __osd_MenuPrev, ( vlc_object_t * ) );
 /**
  * OSD menu item above
  *
- * Select the OSD menu item above the current item to be highlighted. 
+ * Select the OSD menu item above the current item to be highlighted.
  * Note: The actual position on screen of the menu item is determined by the the
  * OSD menu configuration file.
  */
@@ -366,7 +366,7 @@ static inline const osd_menu_state_t *osd_GetMenuState( osd_menu_t *p_osd )
 static inline vlc_bool_t osd_GetKeyPressed( osd_menu_t *p_osd )
 {
     return( p_osd->p_state->b_update );
-}       
+}
 
 /**
  * Set the key pressed to a value.
@@ -376,9 +376,9 @@ static inline vlc_bool_t osd_GetKeyPressed( osd_menu_t *p_osd )
 static inline void osd_SetKeyPressed( vlc_object_t *p_this, int i_value )
 {
     vlc_value_t val;
-    
-    val.i_int = i_value;    
-    var_Set( p_this, "key-pressed", val );            
+
+    val.i_int = i_value;
+    var_Set( p_this, "key-pressed", val );
 }
 
 /**
@@ -389,8 +389,8 @@ static inline void osd_SetKeyPressed( vlc_object_t *p_this, int i_value )
 static inline void osd_SetMenuVisible( osd_menu_t *p_osd, vlc_bool_t b_value )
 {
     vlc_value_t val;
-    
-    val.b_bool = p_osd->p_state->b_menu_visible = b_value; 
+
+    val.b_bool = p_osd->p_state->b_menu_visible = b_value;
     var_Set( p_osd, "osd-menu-visible", val );
 }
 
@@ -405,7 +405,7 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
 
     val.b_bool = p_osd->p_state->b_update = b_value;
     var_Set( p_osd, "osd-menu-update", val );
-} 
+}
 
 /**
  * Textual feedback
@@ -413,7 +413,7 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
  * Functions that provide the textual feedback on the OSD. They are shown on hotkey commands. The feedback
  * is also part of the osd_button_t object. The types are declared in the include file
  * include/vlc_osd.h
- * @see vlc_osd.h 
+ * @see vlc_osd.h
  */
 VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
 VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
@@ -425,7 +425,7 @@ VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) );
  * Functions that provide the default OSD feedback images on hotkey commands. These feedback
  * images are also part of the osd_button_t object. The types are declared in the include file
  * include/vlc_osd.h
- * @see vlc_osd.h 
+ * @see vlc_osd.h
  */
 VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, short ) );
 VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, short ) );

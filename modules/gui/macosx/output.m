@@ -384,7 +384,7 @@
         else
         {
                 [o_mrl_string appendFormat:
-                        @"std{access=file,mux=%@,url=\"%@\"}",
+                        @"std{access=file,mux=%@,dst=\"%@\"}",
                         o_mux_string, [o_file_field stringValue]];
         }
     }
@@ -442,7 +442,7 @@
             }
             
             [o_mrl_string appendFormat:
-                        @"std{access=%@,mux=%@,url=%@%@}",
+                        @"std{access=%@,mux=%@,dst=%@%@}",
                         o_mode, o_mux_string, o_finalStreamAddress, o_announce];
         }
         else

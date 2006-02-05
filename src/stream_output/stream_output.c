@@ -1180,12 +1180,12 @@ static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
     if( config_GetInt( p_this, "sout-display" ) )
     {
         p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\","
-                      "access=\"%s\",url=\"%s\"}}",
+                      "access=\"%s\",dst=\"%s\"}}",
                       mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
     else
     {
-        p += sprintf( p, "std{mux=\"%s\",access=\"%s\",url=\"%s\"}",
+        p += sprintf( p, "std{mux=\"%s\",access=\"%s\",dst=\"%s\"}",
                       mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
 

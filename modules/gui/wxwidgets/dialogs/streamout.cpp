@@ -330,14 +330,14 @@ void SoutDialog::UpdateMRL()
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
         dup_opts += wxT("dst=std{access=file,mux=");
-        dup_opts += encapsulation + wxT(",url=\"");
+        dup_opts += encapsulation + wxT(",dst=\"");
         dup_opts += file_combo->GetValue() + wxT("\"}");
     }
     if( access_checkboxes[HTTP_ACCESS_OUT]->IsChecked() )
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
         dup_opts += wxT("dst=std{access=http,mux=");
-        dup_opts += encapsulation + wxT(",url=");
+        dup_opts += encapsulation + wxT(",dst=");
         dup_opts += net_addrs[HTTP_ACCESS_OUT]->GetLineText(0);
         dup_opts += wxString::Format( wxT(":%d"),
                                       net_ports[HTTP_ACCESS_OUT]->GetValue() );
@@ -349,7 +349,7 @@ void SoutDialog::UpdateMRL()
         dup_opts += wxT("dst=std{access=mmsh,mux=");
         dup_opts += encapsulation;
         if( i_encapsulation_type == ASF_ENCAPSULATION ) dup_opts += wxT("h");
-        dup_opts += wxT(",url=");
+        dup_opts += wxT(",dst=");
         dup_opts += net_addrs[MMSH_ACCESS_OUT]->GetLineText(0);
         dup_opts += wxString::Format( wxT(":%d"),
                                       net_ports[MMSH_ACCESS_OUT]->GetValue() );
@@ -359,7 +359,7 @@ void SoutDialog::UpdateMRL()
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
         dup_opts += wxT("dst=std{access=rtp,mux=");
-        dup_opts += encapsulation + wxT(",url=");
+        dup_opts += encapsulation + wxT(",dst=");
 
         wxString rtp_addr = net_addrs[RTP_ACCESS_OUT]->GetLineText(0);
         if ((rtp_addr[0u] != '[') && (rtp_addr.Find(':') != -1))
@@ -398,7 +398,7 @@ void SoutDialog::UpdateMRL()
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
         dup_opts += wxT("dst=std{access=udp,mux=");
-        dup_opts += encapsulation + wxT(",url=");
+        dup_opts += encapsulation + wxT(",dst=");
 
         wxString udp_addr = net_addrs[UDP_ACCESS_OUT]->GetLineText(0);
         if ((udp_addr[0u] != '[') && (udp_addr.Find(':') != -1))
