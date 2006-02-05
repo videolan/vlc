@@ -354,15 +354,20 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     for( j = -1; (j == -1) || ( (j >= 0) && (subdirs != NULL) && (*subdirs != NULL) );
          j++)
     {
+        char *psz_locale_dir;
+
         pp_dir_content = NULL;
         i_dir_content = 0;
 
         if( j < 0 && f_dir == NULL )
             continue;
 
-        /* parse psz_src dir */  
-        if( ( i_dir_content = scandir( j < 0 ? f_dir : *subdirs, &pp_dir_content, Filter,
-                                NULL ) ) != -1 )
+        /* parse psz_src dir */
+        psz_locale_dir = ToLocale( j < 0 ? f_dir : *subdirs );
+        i_dir_content = scandir( psz_locale_dir, &pp_dir_content, Filter, NULL );
+        LocaleFree( psz_locale_dir );
+
+        if( i_dir_content != -1 )
         {
             int a;
 
