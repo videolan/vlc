@@ -75,7 +75,8 @@ This value must be even.
 
 * Command (1 byte) 
 
-  >>6: 1 shift command, (cmd>>4)&3 is the direction (0=top, 1=left, 2 = right, 3 >>= bottom)
+if cmd>>6 == 1 then a shift command and (cmd>>4)&3 is the
+direction. 0=top, 1=left, 2 = right, 3 = bottom
 
 * Odd-field data offset (2 bytes) 
 
@@ -94,7 +95,7 @@ overlayed on top of.
 The image is encoded using two bits per pixel that select a palette
 entry except that value 0 starts a limited run-length encoding for
 color 0. When 0 is seen, the next two bits encode one less than
-thenumber of pixels, so we can encode run lengths from 1 to 4. These
+the number of pixels, so we can encode run lengths from 1 to 4. These
 get filled with the color in palette entry 0.
 
 The encoding of each line is padded to a whole number of bytes. The
