@@ -1036,10 +1036,8 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
             {
                 msg_Warn( p_this, "Option %s is deprecated. You should use "
                         "%s instead.", p_conf->psz_name, p_conf->psz_current );
-                i_type = config_GetType( p_this, psz_name );
                 free( psz_name );
                 psz_name = strdup( p_conf->psz_current );
-                var_Create( p_this, psz_name, i_type | VLC_VAR_DOINHERIT );
             }
         }
         /* </Check if the option is deprecated> */
