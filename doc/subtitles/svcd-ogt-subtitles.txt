@@ -1,68 +1,118 @@
 $Id$
-The following information is culled from information from 
-Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
-by Rocky Bernstein. 
 
-If you have any corrections or additions to make, please send them
-to rocky@panix.com.
+The following information is culled from information from Julio
+Sanchez Fernandez [1] by Rocky Bernstein.
 
-SVCD subtitles are transported in private streams with id 0x70 (AC3
-has 0,x80+, CVD subs 0+)
+SVCD subtitles (Philips Overlay Graphics Text or OGT) are transported
+in an MPEG private stream with stream id 0x70. AC3 subtitle stream
+numbers start at 0,x80 and go to 0,x87. (CVD subtitle stream numbers
+start at stream ID 0 and go to 3.)
 
 All numbers are in big-endian and the image is interlaced with a
-resolution of 720x480 (ntsc) or 720x576 (pal)
+resolution of 720x480 for NTSC streams or 720x576 for PAL streams.
 
-Data packets start with a 4 byte sequence number (Stream number(1),
-Packet number(1*), Subtitle number (2)) (*) this starts at 0, the last
-packet of a subtitle has the 7th bit set (the subtitle can be broken
-up into several packets when it is multiplexed into the mpeg stream)
+Data packets start with a 4-byte header:
 
-Subtitle Header (size in bytes):
+    * Stream number (1 byte). Only bits 0-3 are used as there can only
+      be up to 8 subtitles.
 
-Packet length (2) (the assembled subtitle, with stripped sequence
-numbers) Option byte (1) normally set to 0x2e, bit 3 indicates that a
-field with the display-time of the subtitle is present.  what the
-other bits does is unknown.
+    * Packet number(1 byte). The first packet starts at 0; the last
+      packet of a subtitle has the 7th bit set. A subtitle can be
+      broken up into several packets when it is multiplexed into the
+      MPEG stream.
 
-Time to display the sub (4) in 1/90000'th of a second (only present if
-bit 3 above is set)
-Xpos (2)
-Ypos (2)
-Width (2*)
-Height (2*)
-* should be even
+    * Subtitle image number (2 bytes).
 
-This only implies HOW LONG the subtitle will be shown, not when. That
-is given by the PTS in the PES header.
+    * Length of the rest of the packet (described in the next section). 
 
-Uknown Byte(1) 
+================
+SUBTITLE PACKETS
+================
 
-4 Palette Entries formated like:
-Y (1)
-U (1)
-V (1)
-Transparency(1)    (0 = transparent)
+The information below comes immediately after the packet header in the
+same packet.
 
-Command (1) 
->>6: 1 shift command, (cmd>>4)&3 is the direction (0=top, 1=left, 2 = right, 3 
->>= bottom)
+* Packet length (2 bytes) 
 
-Odd-field data offset (2)
+The assembled subtitle, with stripped sequence numbers
 
-Then image data follows, and is formatted like this:
-2 bit codes are used so 01 means 1 pixel of color 1,
-10 means color 2 etc.
+* Option byte (1 byte) 
 
-Lines are padded to complete bytes, field 0 is padded to an even byte
-length and finally subtitles are padded to a multiple of 4 bytes
-(always atleast 1 zero byte at the end)
+This is normally set to 0x2e; bit 3 indicates that a field with the
+display-time of the subtitle is present. What the other bits do is not
+known.
+
+* Time to display the subtitle (4 bytes) 
+
+This in 1/90000'th of a second. This is only present if bit 3 above is
+set. This value specifies how long the subtitle will be shown, not
+when. When the subtitle is to be shown is specified in the PTS in the
+PES header.
+
+* X position (2 bytes) 
+
+* Y position (2 bytes) 
+
+* Width (2 bytes)
+
+This value must be even.
+
+* Height (2 bytes)
+
+This value must be even.
+
+* Unknown (1 byte) 
+
+* 4 Color Palette Entries (16 bytes)
+
+* A pallette entry has the following format:
+
+    * Y (1 byte)
+    * U (1 byte)
+    * V (1 byte)
+    * Transparency (1 byte). A 0 value means totally transparent and
+      255 totally opaque.
+
+* Command (1 byte) 
+
+  >>6: 1 shift command, (cmd>>4)&3 is the direction (0=top, 1=left, 2 = right, 3 >>= bottom)
+
+* Odd-field data offset (2 bytes) 
+
+Image data is stored interlaced with the even lines first. This offset
+specifies where the first odd-line image data starts.
+
+IMAGE DATA
+
+Then subtitle image data follows the above control information. Image
+lines are interlaced. That is line 0 is comes first, then line 2, then
+line 4. After all of the even lines, comes line 1, then line 3,
+etc.. The subtitle aspect ratio is not to be scaled. It is independent
+of the aspect ratio of the underlying image which it is to be
+overlayed on top of.
+
+The image is encoded using two bits per pixel that select a palette
+entry except that value 0 starts a limited run-length encoding for
+color 0. When 0 is seen, the next two bits encode one less than
+thenumber of pixels, so we can encode run lengths from 1 to 4. These
+get filled with the color in palette entry 0.
+
+The encoding of each line is padded to a whole number of bytes. The
+first field is padded to an even byte length and the complete subtitle
+is padded to a 4-byte multiple that always include one zero byte at
+the end.
+
+================
+SUBTITLING TOOLS
+================
 
 Philips SVCD tools can create SVCD subtitles, but it only works under
-NT4, (and not that easy to find anymore.. dvd.da.ru, doom9.net or
-similar perhaps?), it can create good subtitled svcds and just open
-them in your favorite hex editor ^_^
+NT4. It is not that easy to find anymore. (dvd.da.ru, doom9.net or
+similar perhaps?). It can create good subtitled SVCDs. Subtitles are
+created in a text editor. Another tool is called submux. Last version
+I tried doesn't do renumber presentation time stamps properly, but
+many media players (now) can tolerate this.
 
-The subs you get from tools like "I-author" are not real SVCD
-subtitles, they are CVD sub and I don't know anything else about them
-except for that they look similar to dvd subs but the RLE encoding and
-command format is different.
+The subtitles you get from tools like "I-author" are not SVCD
+subtitles, they are CVD subtitles. They look similar to DVD subtitles,
+but the run-length encoding (RLE) and command format are different.
