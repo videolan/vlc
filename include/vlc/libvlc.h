@@ -229,6 +229,10 @@ vlc_int64_t libvlc_input_get_length( libvlc_input_t *, libvlc_exception_t *);
 vlc_int64_t libvlc_input_get_time( libvlc_input_t *, libvlc_exception_t *);
 float libvlc_input_get_position( libvlc_input_t *, libvlc_exception_t *);
 
+
+void libvlc_toggle_fullscreen( libvlc_input_t *, libvlc_exception_t * );
+
+
 /** @} */
 
 

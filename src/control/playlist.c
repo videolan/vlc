@@ -37,7 +37,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
         libvlc_exception_raise( p_exception, "Empty playlist" );
         return;
     }
-    if( i_id >= 0 )
+    if( i_id > 0 )
     {
         /* Always use the current view when using libvlc */
         playlist_view_t *p_view;

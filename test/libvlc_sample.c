@@ -20,7 +20,9 @@ int main(int argc, char **argv)
         return 0; 
     }
 
-    libvlc_playlist_play( p_instance1, 0,NULL, NULL );
+    fprintf (stderr, "Playing\n");
+    libvlc_playlist_play( p_instance1, 0, 0,NULL, NULL );
+    fprintf (stderr, "Playback started\n");
 
     while( 1 )
     {
@@ -39,10 +41,16 @@ int main(int argc, char **argv)
         {
             b_started = 1;
         }
-        
-        fprintf( stderr, "Length %lli - Time %lli\n", 
+
+        libvlc_toggle_fullscreen( p_input, &exception );
+        if( libvlc_exception_raised( &exception ) )
+        {
+            fprintf( stderr, "EX : %s\n", libvlc_exception_get_message( &exception ) );
+        }
+        fprintf( stderr, "Length %lli - Time %lli - Full screen %i\n", 
                               libvlc_input_get_length( p_input, NULL ),
-                              libvlc_input_get_time( p_input, NULL ) );
+                              libvlc_input_get_time( p_input, NULL ), 
+                              libvlc_get_fullscreen( p_input, NULL ) );
         libvlc_input_free( p_input );
     }
 

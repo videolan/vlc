@@ -476,6 +476,7 @@ SOURCES_libvlc_common = \
 	src/control/core.c \
 	src/control/playlist.c \
 	src/control/input.c \
+	src/control/video.c \
 	src/control/mediacontrol_core.c \
 	src/control/mediacontrol_util.c \
 	src/control/mediacontrol_audio_video.c \
