@@ -398,13 +398,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
-        if( p_line->i_width < i_width )
+        if( p_region->p_style && p_line->i_width < i_width )
         {
-            if( p_region->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            if( p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( p_region->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            else if( p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -475,13 +475,13 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
-        if( p_line->i_width < i_width )
+        if( p_region->p_style && p_line->i_width < i_width )
         {
-            if( p_region->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            if( p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( p_region->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            else if( p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -625,13 +625,13 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
-        if( p_line->i_width < i_width )
+        if( p_region->p_style && p_line->i_width < i_width )
         {
-            if( p_region->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            if( p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( p_region->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            else if( p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -668,7 +668,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     }
     
     /* Apply the alpha setting */
-    for( i = 0; i < fmt.i_height * i_pitch; i++ )
+    for( i = 0; i < (int)fmt.i_height * i_pitch; i++ )
         p_dst_a[i] = p_dst_a[i] * (255 - i_alpha) / 255;
 
     return VLC_SUCCESS;
@@ -702,13 +702,21 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
-    i_font_color = __MAX( __MIN( p_region_in->i_text_color, 0xFFFFFF ), 0 );
+    if( p_region_in->p_style )
+    {
+        i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
+        i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
+        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 );
+    }
+    else
+    {
+        i_font_color = p_sys->i_font_color;
+        i_font_alpha = 255 - p_sys->i_font_opacity;
+        i_font_size  = p_sys->i_default_font_size;
+    }
+
     if( i_font_color == 0xFFFFFF ) i_font_color = p_sys->i_font_color;
-
-    i_font_alpha = __MAX( __MIN( p_region_in->i_text_alpha, 255 ), 0 );
     if( !i_font_alpha ) i_font_alpha = 255 - p_sys->i_font_opacity;
-
-    i_font_size  = __MAX( __MIN( p_region_in->i_text_size, 255 ), 0 );
     SetFontSize( p_filter, i_font_size );
 
     i_red   = ( i_font_color & 0x00FF0000 ) >> 16;
@@ -752,7 +760,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( i_in_bytes )
         {
             msg_Warn( p_filter, "failed to convert string to unicode (%s), "
-                      "bytes left %d", strerror(errno), i_in_bytes );
+                      "bytes left %d", strerror(errno), (int)i_in_bytes );
             goto error;
         }
         *(uint32_t*)p_out_buffer = 0;
@@ -799,7 +807,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Calculate relative glyph positions and a bounding box for the
      * entire string */
-    if( !(p_line = NewLine( psz_string )) )
+    if( !(p_line = NewLine( (byte_t *)psz_string )) )
     {
         msg_Err( p_filter, "out of memory" );
         goto error;
@@ -823,7 +831,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( i_char == '\n' )
         {
             psz_line_start = psz_unicode;
-            if( !(p_next = NewLine( psz_string )) )
+            if( !(p_next = NewLine( (byte_t *)psz_string )) )
             {
                 msg_Err( p_filter, "out of memory" );
                 goto error;
@@ -890,7 +898,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         {
             p_line->pp_glyphs[ i ] = NULL;
             FreeLine( p_line );
-            p_line = NewLine( psz_string );
+            p_line = NewLine( (byte_t *)psz_string );
             if( p_prev ) p_prev->p_next = p_line;
             else p_lines = p_line;
 
@@ -989,7 +997,7 @@ static line_desc_t *NewLine( byte_t *psz_string )
 
     /* We don't use CountUtf8Characters() here because we are not acutally
      * sure the string is utf8. Better be safe than sorry. */
-    i_count = strlen( psz_string );
+    i_count = strlen( (char *)psz_string );
 
     p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph) * ( i_count + 1 ) );
     if( p_line->pp_glyphs == NULL )

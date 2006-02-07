@@ -209,10 +209,7 @@ struct subpicture_region_t
     int             i_y;                             /**< position of region */
 
     char            *psz_text;       /**< text string comprising this region */
-    int             i_text_color;     /**< text color (RGB native endianess) */
-    int             i_text_alpha;                     /**< text transparency */
-    int             i_text_size;                              /**< text size */
-    int             i_text_align;         /**< horizontal alignment hint for */
+    text_style_t    *p_style;  /* a description of the text style formatting */
 
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_t *p_cache;       /**< modified version of this region */

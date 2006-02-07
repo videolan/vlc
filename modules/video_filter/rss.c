@@ -91,7 +91,7 @@ struct filter_sys_t
 
     char *psz_marquee;    /* marquee string */
 
-    int  i_font_color, i_font_opacity, i_font_size; /* font control */
+    text_style_t *p_style; /* font control */
 
     mtime_t last_date;
 
@@ -212,13 +212,15 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, "rss-ttl" ) );
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length );
 
+    p_sys->p_style = malloc( sizeof( text_style_t ));
+    memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ));
+
     p_sys->i_xoff = var_CreateGetInteger( p_filter, "rss-x" );
     p_sys->i_yoff = var_CreateGetInteger( p_filter, "rss-y" );
     p_sys->i_pos = var_CreateGetInteger( p_filter, "rss-position" );
-    var_Create( p_filter, "rss-opacity", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    p_sys->i_font_opacity = var_CreateGetInteger( p_filter, "rss-opacity" );
-    p_sys->i_font_color = var_CreateGetInteger( p_filter, "rss-color" );
-    p_sys->i_font_size = var_CreateGetInteger( p_filter, "rss-size" );
+    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter, "rss-opacity" );
+    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, "rss-color" );
+    p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, "rss-size" );
 
     if( FetchRSS( p_filter ) )
     {
@@ -258,6 +260,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     vlc_mutex_lock( &p_sys->lock );
 
+    if( p_sys->p_style ) free( p_sys->p_style );
     if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
     free( p_sys->psz_urls );
     FreeRSS( p_filter );
@@ -383,9 +386,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = VLC_TRUE;
     }
     p_spu->i_height = 1;
-    p_spu->p_region->i_text_color = p_sys->i_font_color;
-    p_spu->p_region->i_text_alpha = 255 - p_sys->i_font_opacity;
-    p_spu->p_region->i_text_size = p_sys->i_font_size;
+    p_spu->p_region->p_style = p_sys->p_style;
 
     vlc_mutex_unlock( &p_sys->lock );
     return p_spu;

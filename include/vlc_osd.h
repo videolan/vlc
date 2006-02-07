@@ -39,7 +39,7 @@
  * if used inside a transcoding command. For example:
  *
  *  vlc dvdsimple:///dev/dvd --extraintf rc
- *  --sout='#transcode{osd}:std{access=udp,mux=ts,dst=dest_ipaddr}'
+ *  --sout='#transcode{osd}:std{access=udp,mux=ts,url=dest_ipaddr}'
  *  --osdmenu-file=share/osdmenu/dvd.cfg
  *
  * Each OSD menu element, called "action", defines a hotkey action. Each action
@@ -117,18 +117,47 @@ extern "C" {
 #define OSD_MUTE_ICON 4
 
 /**
- * Text style information.
- * This struct is currently ignored
+ * Text style
+ *
+ * A text style is used to specify the formatting of text.
+ * A font renderer can use the supplied information to render the text specified.
  */
 struct text_style_t
 {
-    int i_size;
-    uint32_t i_color;
-    vlc_bool_t b_italic;
-    vlc_bool_t b_bold;
-    vlc_bool_t b_underline;
+    char *     psz_fontname;                                /**< The name of the font */
+    int        i_font_size;                              /**< The font size in pixels */
+    int        i_font_color;  /**< The color of the text 0xRRGGBB (native endianness) */
+    int        i_font_alpha;                        /**< The transparency of the text.
+                                         0x00 is fully opaque, 0xFF fully transparent */
+    int        i_style_flags;                             /**< Formatting style flags */
+    int        i_outline_color;                /**< The color of the outline 0xRRGGBB */
+    int        i_outline_alpha;                  /**< The transparency of the outline.
+                                         0x00 is fully opaque, 0xFF fully transparent */
+    int        i_shadow_color;                  /**< The color of the shadow 0xRRGGBB */
+    int        i_shadow_alpha;                    /**< The transparency of the shadow.
+                                         0x00 is fully opaque, 0xFF fully transparent */
+    int        i_background_color;          /**< The color of the background 0xRRGGBB */
+    int        i_background_alpha;            /**< The transparency of the background.
+                                         0x00 is fully opaque, 0xFF fully transparent */
+    int        i_outline_width;               /**< The width of the outline in pixels */
+    int        i_shadow_width;                 /**< The width of the shadow in pixels */
+    int        i_spacing;                  /**< The spaceing between glyphs in pixels */
+    int        i_text_align;                      /**< An alignment hint for the text */
 };
-static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FALSE, VLC_FALSE };
+
+/* Style flags for \ref text_style_t */
+#define STYLE_BOLD        1
+#define STYLE_ITALIC      2
+#define STYLE_OUTLINE     4
+#define STYLE_SHADOW      8
+#define STYLE_BACKGROUND  16
+#define STYLE_UNDERLINE   32
+#define STYLE_STRIKEOUT   64
+
+static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE_OUTLINE,
+                0x000000, 0xff, 0x000000, 0xff, 0xffffff, 0x80, 1, 0, -1, 0 };
+
+
 
 /**
  * OSD menu button states

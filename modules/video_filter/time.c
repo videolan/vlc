@@ -60,10 +60,10 @@ static char *ppsz_color_descriptions[] = { N_("Default"), N_("Black"),
  *****************************************************************************/
 struct filter_sys_t
 {
-    int i_xoff, i_yoff;  /* offsets for the display string in the video window */
-    char *psz_format;    /* time format string */
-    int i_pos;  /* permit relative positioning (top, bottom, left, right, center) */
-    int  i_font_color, i_font_opacity, i_font_size; /* font control */
+    int         i_xoff, i_yoff; /* offsets for the display string in the video window */
+    char        *psz_format;    /* time format string */
+    int         i_pos;          /* permit relative positioning (top, bottom, left, right, center) */
+    text_style_t *p_style;      /* font control */
 
     time_t last_time;
 };
@@ -145,14 +145,17 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOOBJ;
     }
 
+    p_sys->p_style = malloc( sizeof( text_style_t ) );
+    memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
+
     p_sys->i_xoff = var_CreateGetInteger( p_input->p_libvlc , "time-x" );
     p_sys->i_yoff = var_CreateGetInteger( p_input->p_libvlc , "time-y" );
     p_sys->psz_format = var_CreateGetString( p_input->p_libvlc, "time-format" );
     p_sys->i_pos = var_CreateGetInteger( p_input->p_libvlc , "time-position" );
-    var_Create( p_input->p_libvlc, "time-opacity", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    p_sys->i_font_opacity = var_CreateGetInteger( p_input->p_libvlc , "time-opacity" );
-    p_sys->i_font_color = var_CreateGetInteger( p_input->p_libvlc , "time-color" );
-    p_sys->i_font_size = var_CreateGetInteger( p_input->p_libvlc , "time-size" );
+    
+    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_input->p_libvlc , "time-opacity" );
+    p_sys->p_style->i_font_color = var_CreateGetInteger( p_input->p_libvlc , "time-color" );
+    p_sys->p_style->i_font_size = var_CreateGetInteger( p_input->p_libvlc , "time-size" );
    
     var_AddCallback( p_input->p_libvlc, "time-x", TimeCallback, p_sys );
     var_AddCallback( p_input->p_libvlc, "time-y", TimeCallback, p_sys );
@@ -179,6 +182,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_object_t *p_input;
 
+    if( p_sys->p_style ) free( p_sys->p_style );
     if( p_sys->psz_format ) free( p_sys->psz_format );
     free( p_sys );
     /* Delete the time variables */
@@ -268,14 +272,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
     else
     {   /*  set to an absolute xy, referenced to upper left corner */
-	    p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
         p_spu->i_x = p_sys->i_xoff;
         p_spu->i_y = p_sys->i_yoff;
         p_spu->b_absolute = VLC_TRUE;
     }
-    p_spu->p_region->i_text_color = p_sys->i_font_color;
-    p_spu->p_region->i_text_alpha = 255 - p_sys->i_font_opacity;
-    p_spu->p_region->i_text_size = p_sys->i_font_size;
+    p_spu->p_region->p_style = p_sys->p_style;
 
     return p_spu;
 }
@@ -303,15 +305,15 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strncmp( psz_var, "time-color", 8 ) )  /* "time-c" */ 
     {
-        p_sys->i_font_color = newval.i_int;
+        p_sys->p_style->i_font_color = newval.i_int;
     }
     else if ( !strncmp( psz_var, "time-opacity", 8 ) ) /* "time-o" */ 
     {
-        p_sys->i_font_opacity = newval.i_int;
+        p_sys->p_style->i_font_alpha = 255 - newval.i_int;
     }
     else if ( !strncmp( psz_var, "time-size", 6 ) )
     {
-        p_sys->i_font_size = newval.i_int;
+        p_sys->p_style->i_font_size = newval.i_int;
     }
     else if ( !strncmp( psz_var, "time-position", 8 ) )
     /* willing to accept a match against time-pos */

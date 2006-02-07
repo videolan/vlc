@@ -821,15 +821,11 @@ static int DisplayAnchor( intf_thread_t *p_intf,
     {
         text_style_t *p_style = NULL;
 
-        text_style_t blue_with_underline = default_text_style;
-        blue_with_underline.b_underline = VLC_TRUE;
-        blue_with_underline.i_color = 0x22ff22;
-
         if( psz_anchor_url )
         {
             /* Should display subtitle underlined and in blue, but it looks
              * like VLC doesn't implement any text styles yet.  D'oh! */
-            p_style = &blue_with_underline;
+            // p_style = &blue_with_underline;
 
         }
 
@@ -837,7 +833,7 @@ static int DisplayAnchor( intf_thread_t *p_intf,
          * coordinates.  Need to look at the subpicture display system to
          * work out why. */
         if ( vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                psz_anchor_description, p_style, OSD_ALIGN_BOTTOM,
+                psz_anchor_description, NULL, OSD_ALIGN_BOTTOM,
                 i_margin_h, i_margin_v, i_now, 0 ) == VLC_SUCCESS )
         {
             /* Displayed successfully */

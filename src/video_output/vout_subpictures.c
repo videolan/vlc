@@ -256,7 +256,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     p_region->p_cache = 0;
     p_region->fmt = *p_fmt;
     p_region->psz_text = 0;
-    p_region->i_text_color = 0xFFFFFF;
+    p_region->p_style = NULL;
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
         p_fmt->p_palette = p_region->fmt.p_palette =
@@ -299,7 +299,7 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
     p_region->p_cache = 0;
     p_region->fmt = *p_fmt;
     p_region->psz_text = 0;
-    p_region->i_text_color = 0xFFFFFF;
+    p_region->p_style = NULL;
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
         p_fmt->p_palette = p_region->fmt.p_palette =
@@ -324,7 +324,6 @@ void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
     if( p_region->picture.pf_release )
         p_region->picture.pf_release( &p_region->picture );
     if( p_region->fmt.p_palette ) free( p_region->fmt.p_palette );
-    if( p_region->psz_text ) free( p_region->psz_text );
     if( p_region->p_cache ) __spu_DestroyRegion( p_this, p_region->p_cache );
     free( p_region );
 }
@@ -591,8 +590,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             {
                 if( p_spu->p_text && p_spu->p_text->p_module &&
                     p_spu->p_text->pf_render_text )
-                {
-                    p_region->i_text_align = p_subpic->i_flags & 0x3;
+                {/*
+                    if( p_region->p_style )
+                        p_region->p_style->i_text_align = p_subpic->i_flags & 0x3; */
                     p_spu->p_text->pf_render_text( p_spu->p_text,
                                                    p_region, p_region ); 
                 }
