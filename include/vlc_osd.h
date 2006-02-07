@@ -39,7 +39,7 @@
  * if used inside a transcoding command. For example:
  *
  *  vlc dvdsimple:///dev/dvd --extraintf rc
- *  --sout='#transcode{osd}:std{access=udp,mux=ts,url=dest_ipaddr}'
+ *  --sout='#transcode{osd}:std{access=udp,mux=ts,dst=dest_ipaddr}'
  *  --osdmenu-file=share/osdmenu/dvd.cfg
  *
  * Each OSD menu element, called "action", defines a hotkey action. Each action
