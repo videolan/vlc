@@ -324,7 +324,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         i_font_color = p_sys->i_font_color;
         i_font_alpha = 255 - p_sys->i_font_opacity;
-        i_font_size = p_sys->i_default_fontsize;
+        i_font_size = p_sys->i_default_font_size;
     }
 
     SetFont( p_filter, i_font_size );
