@@ -238,6 +238,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    vlc_object_attach( p_sys->p_thread, p_access );
     p_sys->p_thread->p_sout = p_access->p_sout;
     p_sys->p_thread->b_die  = 0;
     p_sys->p_thread->b_error= 0;
@@ -321,6 +322,7 @@ static void Close( vlc_object_t * p_this )
 
     net_Close( p_sys->p_thread->i_handle );
 
+    vlc_object_detach( p_sys->p_thread );
     vlc_object_destroy( p_sys->p_thread );
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol--;
@@ -516,10 +518,13 @@ static void ThreadWrite( vlc_object_t *p_this )
 #if 0
         if( (i++ % 1000)==0 ) {
           int i = 0;
+          int j = 0;
           block_t *p_tmp = p_thread->p_empty_blocks->p_first;
           while( p_tmp ) { p_tmp = p_tmp->p_next; i++;}
-	  msg_Err( p_thread, "fifo depth: %d, empty blocks: %d/%d",
-                   p_thread->p_fifo->i_depth, p_thread->p_empty_blocks->i_depth,i );
+          p_tmp = p_thread->p_fifo->p_first;
+          while( p_tmp ) { p_tmp = p_tmp->p_next; j++;}
+	  msg_Err( p_thread, "fifo depth: %d/%d, empty blocks: %d/%d",
+                   p_thread->p_fifo->i_depth, j,p_thread->p_empty_blocks->i_depth,i );
 	}
 #endif
         p_pk = block_FifoGet( p_thread->p_fifo );
