@@ -114,7 +114,7 @@
         NSLog( @"serious issue" );
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
-    NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : "desc"];
+    NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
     
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout != NULL )
@@ -150,6 +150,8 @@
         for( i = 0; i < p_dialog->i_widgets; i++ )
         {
             NSLog( @"widget: %@", [NSString stringWithUTF8String: p_dialog->pp_widgets[i]->psz_text] );
+            o_description = [o_description stringByAppendingString:
+                                [NSString stringWithUTF8String: p_dialog->pp_widgets[i]->psz_text]];
         }
         if( p_dialog->i_flags & DIALOG_OK_CANCEL )
         {
