@@ -1168,7 +1168,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         return -1;
     }
 
-    fprintf( file, "###\n###  " COPYRIGHT_MESSAGE "\n###\n\n" );
+    fprintf( file, "###\n###  " COPYRIGHT_MESSAGE "\n###\n\n"
+       "###\n### lines begining with a '#' character are comments\n###\n\n" );
 
     /* Look for the selected module, if NULL then save everything */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
@@ -1553,7 +1554,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 {
                     if( !strcmp(p_conf->psz_current,"SUPPRESSED") )
                     {
-                       if( !b_ignore_errors ) 
+                        if( !b_ignore_errors )
                         {
                             fprintf(stderr,
                                     "Warning: option --%s is no longer used.\n",
