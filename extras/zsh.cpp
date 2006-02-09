@@ -210,7 +210,6 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
         while( range.first != range.second )
         {
             list = list.append( " " );
-            printf("%s",range.first->second.c_str());
             list = list.append( range.first->second );
             ++range.first;
         }
