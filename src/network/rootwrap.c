@@ -194,9 +194,10 @@ static void rootprocess (int fd)
             const int val = 1;
 
             setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof (val));
+#ifdef AF_INET6
             if (ss.ss_family == AF_INET6)
                 setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof (val));
-
+#endif
             if (bind (sock, (struct sockaddr *)&ss, len) == 0)
             {
                 send_fd (fd, sock);
