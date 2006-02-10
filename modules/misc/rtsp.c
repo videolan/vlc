@@ -623,6 +623,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     vod_media_t *p_media = (vod_media_t*)p_args;
     vod_t *p_vod = p_media->p_vod;
     char *psz_transport = NULL;
+    char *psz_playnow = NULL; /* support option: x-playNow */
     char *psz_session = NULL;
     rtsp_client_t *p_rtsp;
 
@@ -638,6 +639,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     {
         case HTTPD_MSG_SETUP:
         {
+            psz_playnow = httpd_MsgGet( query, "x-playNow" );
             psz_transport = httpd_MsgGet( query, "Transport" );
             msg_Dbg( p_vod, "HTTPD_MSG_SETUP: transport=%s", psz_transport );
 
@@ -680,6 +682,9 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         break;
                     }
                 }
+
+                if( psz_playnow ) /* support option: x-playNow */
+                    goto rtsp_play_now;
 
                 answer->i_status = 200;
                 answer->psz_status = strdup( "OK" );
@@ -724,6 +729,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         }
 
         case HTTPD_MSG_PLAY:
+
+rtsp_play_now: /* This avoids code duplications although it is ugly. */
         {
             char *psz_output, ip[NI_MAXNUMERICHOST];
             int i, i_port_audio = 0, i_port_video = 0;
