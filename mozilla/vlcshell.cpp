@@ -90,7 +90,7 @@
 ******************************************************************************/
 #ifdef XP_UNIX
 #   define VOUT_PLUGINS "xvideo,x11,dummy"
-#   define AOUT_PLUGINS "alsa,oss,dummy"
+#   define AOUT_PLUGINS "esd,arts,alsa,oss,dummy"
 
 static unsigned int i_previous_height = 100000;
 static unsigned int i_previous_width = 100000;
