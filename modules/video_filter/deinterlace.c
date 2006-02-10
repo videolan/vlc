@@ -580,7 +580,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                           p_pic->p[i_plane].i_pitch );
 
-                p_out += p_pic->p[i_plane].i_pitch;
+                p_out += p_outpic->p[i_plane].i_pitch;
                 p_in += 2 * p_pic->p[i_plane].i_pitch;
             }
             break;
@@ -595,10 +595,10 @@ static void RenderDiscard( vout_thread_t *p_vout,
                 {
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                     p_in += i_increment;
                 }
             }
@@ -608,7 +608,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
                 {
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                     p_in += i_increment;
                 }
             }
@@ -649,7 +649,7 @@ static void RenderBob( vout_thread_t *p_vout,
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
                     p_in += p_pic->p[i_plane].i_pitch;
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                 }
 
                 p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
@@ -659,13 +659,13 @@ static void RenderBob( vout_thread_t *p_vout,
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
 
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
 
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
 
                     p_in += 2 * p_pic->p[i_plane].i_pitch;
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                 }
 
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
@@ -675,7 +675,7 @@ static void RenderBob( vout_thread_t *p_vout,
                 if( i_field == 0 )
                 {
                     p_in += p_pic->p[i_plane].i_pitch;
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
                 }
@@ -688,7 +688,7 @@ static void RenderBob( vout_thread_t *p_vout,
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
                     p_in += p_pic->p[i_plane].i_pitch;
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                 }
 
                 p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
@@ -700,13 +700,13 @@ static void RenderBob( vout_thread_t *p_vout,
                         p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                                   p_pic->p[i_plane].i_pitch );
 
-                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_out += p_outpic->p[i_plane].i_pitch;
 
                         p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                                   p_pic->p[i_plane].i_pitch );
 
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
-                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_out += p_outpic->p[i_plane].i_pitch;
                     }
                 }
                 else
@@ -716,7 +716,7 @@ static void RenderBob( vout_thread_t *p_vout,
                         p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                                   p_pic->p[i_plane].i_pitch );
 
-                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_out += p_outpic->p[i_plane].i_pitch;
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
                     }
                 }
@@ -728,7 +728,7 @@ static void RenderBob( vout_thread_t *p_vout,
                 if( i_field == 0 )
                 {
                     p_in += p_pic->p[i_plane].i_pitch;
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                     p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                               p_pic->p[i_plane].i_pitch );
                 }
@@ -764,7 +764,7 @@ static void RenderLinear( vout_thread_t *p_vout,
             p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                       p_pic->p[i_plane].i_pitch );
             p_in += p_pic->p[i_plane].i_pitch;
-            p_out += p_pic->p[i_plane].i_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch;
         }
 
         p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
@@ -774,13 +774,13 @@ static void RenderLinear( vout_thread_t *p_vout,
             p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                       p_pic->p[i_plane].i_pitch );
 
-            p_out += p_pic->p[i_plane].i_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch;
 
             Merge( p_out, p_in, p_in + 2 * p_pic->p[i_plane].i_pitch,
                    p_pic->p[i_plane].i_pitch );
 
             p_in += 2 * p_pic->p[i_plane].i_pitch;
-            p_out += p_pic->p[i_plane].i_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch;
         }
 
         p_vout->p_vlc->pf_memcpy( p_out, p_in,
@@ -790,7 +790,7 @@ static void RenderLinear( vout_thread_t *p_vout,
         if( i_field == 0 )
         {
             p_in += p_pic->p[i_plane].i_pitch;
-            p_out += p_pic->p[i_plane].i_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch;
             p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                       p_pic->p[i_plane].i_pitch );
         }
@@ -820,7 +820,7 @@ static void RenderMean( vout_thread_t *p_vout,
             Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
                    p_pic->p[i_plane].i_pitch );
 
-            p_out += p_pic->p[i_plane].i_pitch;
+            p_out += p_outpic->p[i_plane].i_pitch;
             p_in += 2 * p_pic->p[i_plane].i_pitch;
         }
     }
@@ -851,7 +851,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                 /* First line: simple copy */
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                           p_pic->p[i_plane].i_pitch );
-                p_out += p_pic->p[i_plane].i_pitch;
+                p_out += p_outpic->p[i_plane].i_pitch;
 
                 /* Remaining lines: mean value */
                 for( ; p_out < p_out_end ; )
@@ -859,7 +859,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                     Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
                            p_pic->p[i_plane].i_pitch );
 
-                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_outpic->p[i_plane].i_pitch;
                     p_in += p_pic->p[i_plane].i_pitch;
                 }
                 break;
@@ -868,7 +868,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                 /* First line: simple copy */
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
                                           p_pic->p[i_plane].i_pitch );
-                p_out += p_pic->p[i_plane].i_pitch;
+                p_out += p_outpic->p[i_plane].i_pitch;
 
                 /* Remaining lines: mean value */
                 if( i_plane == Y_PLANE )
@@ -878,7 +878,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                         Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
                                p_pic->p[i_plane].i_pitch );
 
-                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_out += p_outpic->p[i_plane].i_pitch;
                         p_in += p_pic->p[i_plane].i_pitch;
                     }
                 }
@@ -890,7 +890,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                         Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
                                p_pic->p[i_plane].i_pitch );
 
-                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_out += p_outpic->p[i_plane].i_pitch;
                         p_in += 2*p_pic->p[i_plane].i_pitch;
                     }
                 }
