@@ -48,6 +48,7 @@ static void Close( vlc_object_t * );
     "You can set the address, port and path the rtsp interface will bind to." \
     "\nSyntax is address:port/path. Default is to bind to any address "\
     "on port 554, with no path." )
+
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
     set_description( _("RTSP VoD server") );
@@ -294,6 +295,8 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
                "a=control:rtsp://[%%s]:%d%s/trackid=%%d\r\n",
               p_sys->i_port, p_media->psz_rtsp_path );
 
+    httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_SETUP,
+                    RtspCallback, (void*)p_media );
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_DESCRIBE,
                     RtspCallback, (void*)p_media );
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_PLAY,
@@ -372,103 +375,102 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 
     switch( p_fmt->i_codec )
     {
-    case VLC_FOURCC( 's', '1', '6', 'b' ):
-        if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
-        {
-            p_es->i_payload_type = 11;
-        }
-        else if( p_fmt->audio.i_channels == 2 && p_fmt->audio.i_rate == 44100 )
-        {
-            p_es->i_payload_type = 10;
-        }
-        else
-        {
+        case VLC_FOURCC( 's', '1', '6', 'b' ):
+            if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
+            {
+                p_es->i_payload_type = 11;
+            }
+            else if( p_fmt->audio.i_channels == 2 && p_fmt->audio.i_rate == 44100 )
+            {
+                p_es->i_payload_type = 10;
+            }
+            else
+            {
+                p_es->i_payload_type = p_media->i_payload_type++;
+            }
+            p_es->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
+            sprintf( p_es->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
+                    p_fmt->audio.i_channels );
+            break;
+        case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             p_es->i_payload_type = p_media->i_payload_type++;
-        }
+            p_es->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
+            sprintf( p_es->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
+                    p_fmt->audio.i_channels );
+            break;
+        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+            p_es->i_payload_type = 14;
+            p_es->psz_rtpmap = strdup( "MPA/90000" );
+            break;
+        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+            p_es->i_payload_type = 32;
+            p_es->psz_rtpmap = strdup( "MPV/90000" );
+            break;
+        case VLC_FOURCC( 'a', '5', '2', ' ' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( "ac3/90000" );
+            break;
+        case VLC_FOURCC( 'H', '2', '6', '3' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( "H263-1998/90000" );
+            break;
+        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( "MP4V-ES/90000" );
+            if( p_fmt->i_extra > 0 )
+            {
+                char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
+                p_es->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
+                sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
+                sprintf( p_es->psz_fmtp,
+                        "profile-level-id=3; config=%s;", p_hexa );
+                free( p_hexa );
+            }
+            break;
+        case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
+            sprintf( p_es->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
+            if( p_fmt->i_extra > 0 )
+            {
+                char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
+                p_es->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
+                sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
+                sprintf( p_es->psz_fmtp,
+                        "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
+                        "config=%s; SizeLength=13;IndexLength=3; "
+                        "IndexDeltaLength=3; Profile=1;", p_hexa );
+                free( p_hexa );
+            }
+            break;
+        case VLC_FOURCC( 'm', 'p', '2', 't' ):
+            p_media->psz_mux = "ts";
+            p_es->i_payload_type = 33;
+            p_es->psz_rtpmap = strdup( "MP2T/90000" );
+            break;
+        case VLC_FOURCC( 'm', 'p', '2', 'p' ):
+            p_media->psz_mux = "ps";
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( "MP2P/90000" );
+            break;
+        case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
+                                    "AMR/8000/2" : "AMR/8000" );
+            p_es->psz_fmtp = strdup( "octet-align=1" );
+            break;
+        case VLC_FOURCC( 's', 'a', 'w', 'b' ):
+            p_es->i_payload_type = p_media->i_payload_type++;
+            p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
+                                    "AMR-WB/16000/2" : "AMR-WB/16000" );
+            p_es->psz_fmtp = strdup( "octet-align=1" );
+            break;
 
-        p_es->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
-        sprintf( p_es->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
-                 p_fmt->audio.i_channels );
-        break;
-    case VLC_FOURCC( 'u', '8', ' ', ' ' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
-        sprintf( p_es->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
-                 p_fmt->audio.i_channels );
-        break;
-    case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-        p_es->i_payload_type = 14;
-        p_es->psz_rtpmap = strdup( "MPA/90000" );
-        break;
-    case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-        p_es->i_payload_type = 32;
-        p_es->psz_rtpmap = strdup( "MPV/90000" );
-        break;
-    case VLC_FOURCC( 'a', '5', '2', ' ' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = strdup( "ac3/90000" );
-        break;
-    case VLC_FOURCC( 'H', '2', '6', '3' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = strdup( "H263-1998/90000" );
-        break;
-    case VLC_FOURCC( 'm', 'p', '4', 'v' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = strdup( "MP4V-ES/90000" );
-        if( p_fmt->i_extra > 0 )
-        {
-            char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
-            p_es->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
-            sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
-            sprintf( p_es->psz_fmtp,
-                     "profile-level-id=3; config=%s;", p_hexa );
-            free( p_hexa );
-        }
-        break;
-    case VLC_FOURCC( 'm', 'p', '4', 'a' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
-        sprintf( p_es->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
-        if( p_fmt->i_extra > 0 )
-        {
-            char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
-            p_es->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
-            sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
-            sprintf( p_es->psz_fmtp,
-                     "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
-                     "config=%s; SizeLength=13;IndexLength=3; "
-                     "IndexDeltaLength=3; Profile=1;", p_hexa );
-            free( p_hexa );
-        }
-        break;
-    case VLC_FOURCC( 'm', 'p', '2', 't' ):
-        p_media->psz_mux = "ts";
-        p_es->i_payload_type = 33;
-        p_es->psz_rtpmap = strdup( "MP2T/90000" );
-        break;
-    case VLC_FOURCC( 'm', 'p', '2', 'p' ):
-        p_media->psz_mux = "ps";
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = strdup( "MP2P/90000" );
-        break;
-    case VLC_FOURCC( 's', 'a', 'm', 'r' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
-                                   "AMR/8000/2" : "AMR/8000" );
-        p_es->psz_fmtp = strdup( "octet-align=1" );
-        break; 
-    case VLC_FOURCC( 's', 'a', 'w', 'b' ):
-        p_es->i_payload_type = p_media->i_payload_type++;
-        p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
-                                   "AMR-WB/16000/2" : "AMR-WB/16000" );
-        p_es->psz_fmtp = strdup( "octet-align=1" );
-        break; 
-
-    default:
-        msg_Err( p_vod, "cannot add this stream (unsupported "
-                 "codec: %4.4s)", (char*)&p_fmt->i_codec );
-        free( p_es );
-        return VLC_EGENERIC;
+        default:
+            msg_Err( p_vod, "cannot add this stream (unsupported "
+                    "codec: %4.4s)", (char*)&p_fmt->i_codec );
+            free( p_es );
+            return VLC_EGENERIC;
     }
 
     p_es->p_rtsp_url =
@@ -620,12 +622,13 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 {
     vod_media_t *p_media = (vod_media_t*)p_args;
     vod_t *p_vod = p_media->p_vod;
+    char *psz_transport = NULL;
     char *psz_session = NULL;
     rtsp_client_t *p_rtsp;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
-    msg_Info( p_vod, "RtspCallback query: type=%d\n", query->i_type );
+    msg_Info( p_vod, "RtspCallback query: type=%d", query->i_type );
 
     answer->i_proto   = HTTPD_PROTO_RTSP;
     answer->i_version = query->i_version;
@@ -633,6 +636,69 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     switch( query->i_type )
     {
+        case HTTPD_MSG_SETUP:
+        {
+            psz_transport = httpd_MsgGet( query, "Transport" );
+            msg_Dbg( p_vod, "HTTPD_MSG_SETUP: transport=%s", psz_transport );
+
+            if( strstr( psz_transport, "unicast" ) &&
+                strstr( psz_transport, "client_port=" ) )
+            {
+                rtsp_client_t *p_rtsp;
+                char ip[NI_MAXNUMERICHOST];
+                int i_port = atoi( strstr( psz_transport, "client_port=" ) +
+                                strlen("client_port=") );
+
+                if( httpd_ClientIP( cl, ip ) == NULL )
+                {
+                    answer->i_status = 500;
+                    answer->psz_status = strdup( "Internal server error" );
+                    answer->i_body = 0;
+                    answer->p_body = NULL;
+                    break;
+                }
+
+                msg_Dbg( p_vod, "HTTPD_MSG_SETUP: unicast ip=%s port=%d",
+                        ip, i_port );
+
+                psz_session = httpd_MsgGet( query, "Session" );
+                if( !psz_session || !*psz_session )
+                {
+                    asprintf( &psz_session, "%d", rand() );
+                    p_rtsp = RtspClientNew( p_media, psz_session );
+                }
+                else
+                {
+                    p_rtsp = RtspClientGet( p_media, psz_session );
+                    if( !p_rtsp )
+                    {
+                        /* FIXME right error code */
+                        answer->i_status = 454;
+                        answer->psz_status = strdup( "Unknown session id" );
+                        answer->i_body = 0;
+                        answer->p_body = NULL;
+                        break;
+                    }
+                }
+
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+
+                httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
+                            i_port, i_port + 1 );
+            }
+            else /* TODO  strstr( psz_transport, "interleaved" ) ) */
+            {
+                answer->i_status = 461;
+                answer->psz_status = strdup( "Unsupported Transport" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+            }
+            break;
+        }
+
         case HTTPD_MSG_DESCRIBE:
         {
             char *psz_sdp =
@@ -771,14 +837,15 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     vod_media_t *p_media = p_es->p_media;
     vod_t *p_vod = p_media->p_vod;
     rtsp_client_t *p_rtsp = NULL;
-    char *psz_session = NULL;
     char *psz_transport = NULL;
+    char *psz_playnow = NULL; /* support option: x-playNow */
+    char *psz_session = NULL;
     char *psz_position = NULL;
     int i;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
-    msg_Info( p_vod, "RtspCallback query: type=%d\n", query->i_type );
+    msg_Info( p_vod, "RtspCallback query: type=%d", query->i_type );
 
     answer->i_proto   = HTTPD_PROTO_RTSP;
     answer->i_version = query->i_version;
@@ -786,74 +853,78 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     switch( query->i_type )
     {
-    case HTTPD_MSG_SETUP:
-        psz_transport = httpd_MsgGet( query, "Transport" );
-        msg_Dbg( p_vod, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
+        case HTTPD_MSG_SETUP:
+            psz_playnow = httpd_MsgGet( query, "x-playNow" );
+            psz_transport = httpd_MsgGet( query, "Transport" );
 
-        if( strstr( psz_transport, "unicast" ) &&
-            strstr( psz_transport, "client_port=" ) )
-        {
-            rtsp_client_t *p_rtsp;
-            rtsp_client_es_t *p_rtsp_es;
-            char ip[NI_MAXNUMERICHOST];
-            int i_port = atoi( strstr( psz_transport, "client_port=" ) +
-                               strlen("client_port=") );
+            msg_Dbg( p_vod, "HTTPD_MSG_SETUP: transport=%s", psz_transport );
 
-            if( httpd_ClientIP( cl, ip ) == NULL )
+            if( strstr( psz_transport, "unicast" ) &&
+                strstr( psz_transport, "client_port=" ) )
             {
-                answer->i_status = 500;
-                answer->psz_status = strdup( "Internal server error" );
-                answer->i_body = 0;
-                answer->p_body = NULL;
-                break;
-            }
+                rtsp_client_t *p_rtsp;
+                rtsp_client_es_t *p_rtsp_es;
+                char ip[NI_MAXNUMERICHOST];
+                int i_port = atoi( strstr( psz_transport, "client_port=" ) +
+                                strlen("client_port=") );
 
-            msg_Dbg( p_vod, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n",
-                     ip, i_port );
-
-            psz_session = httpd_MsgGet( query, "Session" );
-            if( !psz_session || !*psz_session )
-            {
-                asprintf( &psz_session, "%d", rand() );
-                p_rtsp = RtspClientNew( p_media, psz_session );
-            }
-            else
-            {
-                p_rtsp = RtspClientGet( p_media, psz_session );
-                if( !p_rtsp )
+                if( httpd_ClientIP( cl, ip ) == NULL )
                 {
-                    /* FIXME right error code */
-                    answer->i_status = 454;
-                    answer->psz_status = strdup( "Unknown session id" );
+                    answer->i_status = 500;
+                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
-                    free( ip );
                     break;
                 }
+
+                msg_Dbg( p_vod, "HTTPD_MSG_SETUP: unicast ip=%s port=%d",
+                        ip, i_port );
+
+                psz_session = httpd_MsgGet( query, "Session" );
+                if( !psz_session || !*psz_session )
+                {
+                    asprintf( &psz_session, "%d", rand() );
+                    p_rtsp = RtspClientNew( p_media, psz_session );
+                }
+                else
+                {
+                    p_rtsp = RtspClientGet( p_media, psz_session );
+                    if( !p_rtsp )
+                    {
+                        /* FIXME right error code */
+                        answer->i_status = 454;
+                        answer->psz_status = strdup( "Unknown session id" );
+                        answer->i_body = 0;
+                        answer->p_body = NULL;
+                        break;
+                    }
+                }
+
+                p_rtsp_es = malloc( sizeof(rtsp_client_es_t) );
+                p_rtsp_es->i_port = i_port;
+                p_rtsp_es->psz_ip = strdup( ip );
+                p_rtsp_es->p_media_es = p_es;
+                TAB_APPEND( p_rtsp->i_es, p_rtsp->es, p_rtsp_es );
+
+                if( psz_playnow ) /* support option: x-playNow */
+                    goto rtsp_play_now;
+
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+
+                httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
+                            i_port, i_port + 1 );
             }
-
-            p_rtsp_es = malloc( sizeof(rtsp_client_es_t) );
-            p_rtsp_es->i_port = i_port;
-            p_rtsp_es->psz_ip = strdup( ip );
-            p_rtsp_es->p_media_es = p_es;
-            TAB_APPEND( p_rtsp->i_es, p_rtsp->es, p_rtsp_es );
-
-            answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
-            answer->i_body = 0;
-            answer->p_body = NULL;
-
-            httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
-                          i_port, i_port + 1 );
-        }
-        else /* TODO  strstr( psz_transport, "interleaved" ) ) */
-        {
-            answer->i_status = 461;
-            answer->psz_status = strdup( "Unsupported Transport" );
-            answer->i_body = 0;
-            answer->p_body = NULL;
-        }
-        break;
+            else /* TODO  strstr( psz_transport, "interleaved" ) ) */
+            {
+                answer->i_status = 461;
+                answer->psz_status = strdup( "Unsupported Transport" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+            }
+            break;
 
         case HTTPD_MSG_TEARDOWN:
             answer->i_status = 200;
@@ -886,6 +957,9 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             break;
 
         case HTTPD_MSG_PLAY:
+/* This avoids code duplications although it is ugly. */
+rtsp_play_now:
+
             /* This is kind of a kludge. Should we only support Aggregate
              * Operations ? */
             psz_session = httpd_MsgGet( query, "Session" );
@@ -946,9 +1020,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
-    {
         httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
-    }
 
     return VLC_SUCCESS;
 }
