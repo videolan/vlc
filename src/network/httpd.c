@@ -1036,7 +1036,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         msg_Err( p_this, "cannot create socket(s) for HTTP host" );
         goto error;
     }
-       
+
     host->i_port = i_port;
     host->psz_hostname = psz_host;
 
@@ -1257,15 +1257,15 @@ void httpd_MsgInit( httpd_message_t *msg )
     msg->i_status   = 0;
     msg->psz_status = NULL;
 
-    msg->psz_url = NULL;
-    msg->psz_args = NULL;
+    msg->psz_url    = NULL;
+    msg->psz_args   = NULL;
 
-    msg->i_channel = -1;
+    msg->i_channel  = -1;
 
-    msg->i_name = 0;
-    msg->name   = NULL;
-    msg->i_value= 0;
-    msg->value  = NULL;
+    msg->i_name     = 0;
+    msg->name       = NULL;
+    msg->i_value    = 0;
+    msg->value      = NULL;
 
     msg->i_body_offset = 0;
     msg->i_body        = 0;
@@ -1406,6 +1406,9 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
                                         tls_session_t *p_tls )
 {
     httpd_client_t *cl = malloc( sizeof( httpd_client_t ) );
+
+    if( !cl ) return NULL;
+
     cl->i_ref   = 0;
     cl->fd      = fd;
     memcpy( &cl->sock, sock, sizeof( cl->sock ) );
@@ -1745,8 +1748,8 @@ static void httpd_ClientRecv( httpd_client_t *cl )
     if( cl->query.i_proto == HTTPD_PROTO_RTSP )
         cl->i_activity_timeout = 0;
 
-    /* Debugging only */
-    /*if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
+#if 0 /* Debugging only */
+    if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
     {
         int i;
 
@@ -1769,9 +1772,9 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             fprintf( stderr, "  - option name='%s' value='%s'\n",
                      cl->query.name[i], cl->query.value[i] );
         }
-    }*/
+    }
+#endif
 }
-
 
 static void httpd_ClientSend( httpd_client_t *cl )
 {
@@ -1994,7 +1997,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 httpd_MsgInit( answer );
 
                 /* Handle what we received */
-                if( cl->i_mode != HTTPD_CLIENT_BIDIR &&
+                if( (cl->i_mode != HTTPD_CLIENT_BIDIR) &&
                     (i_msg == HTTPD_MSG_ANSWER || i_msg == HTTPD_MSG_CHANNEL) )
                 {
                     /* we can only receive request from client when not
@@ -2146,6 +2149,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                     {
                                         strcpy( auth, "" );
                                     }
+
                                     if( strcmp( id, auth ) )
                                     {
                                         httpd_MsgAdd( answer, "WWW-Authenticate", "Basic realm=\"%s\"", url->psz_user );
@@ -2180,6 +2184,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             }
                         }
                     }
+
                     if( answer )
                     {
                         uint8_t *p;
@@ -2358,7 +2363,7 @@ static void httpd_HostThread( httpd_host_t *host )
         i_ret = select( i_handle_max + 1,
                         &fds_read, &fds_write, NULL, &timeout );
 
-        if( i_ret == -1 && errno != EINTR )
+        if( (i_ret == -1) && (errno != EINTR) )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             msg_Warn( host, "cannot select sockets (%d)", WSAGetLastError( ) );
@@ -2382,7 +2387,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 struct  sockaddr_storage sock;
 
                 fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
-                fprintf ( stderr, "Accepting\n");
+                msg_Info( host, "Accepting" );
                 if( fd >= 0 )
                 {
                     int i_state = 0;
@@ -2481,42 +2486,71 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *a, char *b, int c,
                                 tls_server_t *d )
 {
     msg_Err( a, "HTTP daemon support is disabled" );
-    return 0;
+    return NULL;
 }
+
 httpd_host_t *httpd_HostNew( vlc_object_t *a, char *b, int c )
 {
     msg_Err( a, "HTTP daemon support is disabled" );
-    return 0;
+    return NULL;
 }
+
 void httpd_HostDelete( httpd_host_t *a )
 {
 }
+
 httpd_url_t *httpd_UrlNew( httpd_host_t *host, char *psz_url,
                            char *psz_user, char *psz_password,
                            const vlc_acl_t *p_acl )
 {
     return NULL;
 }
+
 httpd_url_t *httpd_UrlNewUnique( httpd_host_t *host, char *psz_url,
                                  char *psz_user, char *psz_password,
                                  const vlc_acl_t *p_acl )
 {
     return NULL;
 }
+
 int httpd_UrlCatch( httpd_url_t *a, int b, httpd_callback_t c,
-                    httpd_callback_sys_t *d ){ return 0; }
-void httpd_UrlDelete( httpd_url_t *a ){}
+                    httpd_callback_sys_t *d )
+{
+    return 0;
+}
 
-char* httpd_ClientIP( httpd_client_t *cl, char *psz_ip ) { return NULL; }
-char* httpd_ServerIP( httpd_client_t *cl, char *psz_ip ) { return NULL; }
+void httpd_UrlDelete( httpd_url_t *a )
+{
+}
 
-void httpd_ClientModeStream( httpd_client_t *a ){}
-void httpd_ClientModeBidir( httpd_client_t *a ){}
+char* httpd_ClientIP( httpd_client_t *cl, char *psz_ip )
+{
+    return NULL;
+}
 
-void httpd_FileDelete( httpd_file_t *a ){}
+char* httpd_ServerIP( httpd_client_t *cl, char *psz_ip )
+{
+    return NULL;
+}
+
+void httpd_ClientModeStream( httpd_client_t *a )
+{
+}
+
+void httpd_ClientModeBidir( httpd_client_t *a )
+{
+}
+
+void httpd_FileDelete( httpd_file_t *a )
+{
+}
+
 httpd_file_t *httpd_FileNew( httpd_host_t *a, char *b, char *c, char *d,
                              char *e, httpd_file_callback_t f,
-                             httpd_file_sys_t *g ){ return 0; }
+                             httpd_file_sys_t *g )
+{
+    return NULL;
+}
 
 httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
                                    const char *psz_user,
@@ -2527,21 +2561,56 @@ httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
 {
     return NULL;
 }
-void httpd_HandlerDelete( httpd_handler_t *handler ) {}
 
-void httpd_RedirectDelete( httpd_redirect_t *a ){}
+void httpd_HandlerDelete( httpd_handler_t *handler )
+{
+}
+
+void httpd_RedirectDelete( httpd_redirect_t *a )
+{
+}
+
 httpd_redirect_t *httpd_RedirectNew( httpd_host_t *a,
-                                     char *b, char *c ){ return 0; }
+                                     char *b, char *c )
+{
+    return NULL;
+}
 
-void httpd_StreamDelete( httpd_stream_t *a ){}
-int  httpd_StreamHeader( httpd_stream_t *a, uint8_t *b, int c ){ return 0; }
-int  httpd_StreamSend  ( httpd_stream_t *a, uint8_t *b, int c ){ return 0; }
+void httpd_StreamDelete( httpd_stream_t *a )
+{
+}
+
+int httpd_StreamHeader( httpd_stream_t *a, uint8_t *b, int c )
+{
+    return 0;
+}
+
+int httpd_StreamSend ( httpd_stream_t *a, uint8_t *b, int c )
+{
+    return 0;
+}
+
 httpd_stream_t *httpd_StreamNew( httpd_host_t *a, char *b, char *c,
-                                 char *d, char *e ){ return 0; }
+                                 char *d, char *e )
+{
+    return NULL;
+}
 
-void httpd_MsgInit ( httpd_message_t *a ){}
-void httpd_MsgAdd  ( httpd_message_t *a, char *b, char *c, ... ){}
-char *httpd_MsgGet ( httpd_message_t *a, char *b ){ return 0; }
-void httpd_MsgClean( httpd_message_t *a ){}
+void httpd_MsgInit ( httpd_message_t *a )
+{
+}
+
+void httpd_MsgAdd  ( httpd_message_t *a, char *b, char *c, ... )
+{
+}
+
+char *httpd_MsgGet ( httpd_message_t *a, char *b )
+{
+    return NULL;
+}
+
+void httpd_MsgClean( httpd_message_t *a )
+{
+}
 
 #endif /* ENABLE_HTTPD */
