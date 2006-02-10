@@ -199,7 +199,7 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
 static int  Open ( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
+    demux_sys_t *p_sys = NULL;
 
     MediaSubsessionIterator *iter;
     MediaSubsession *sub;
@@ -232,6 +232,8 @@ static int  Open ( vlc_object_t *p_this )
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
     p_demux->p_sys     = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
+    if( !p_sys ) return VLC_ENOMEM;
+
     p_sys->p_sdp = NULL;
     p_sys->scheduler = NULL;
     p_sys->env = NULL;
