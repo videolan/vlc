@@ -132,7 +132,7 @@ struct vod_media_t
     int        i_es;
     media_es_t **es;
     char       *psz_mux;
-    int        b_raw;
+    vlc_bool_t  b_raw;
 
     /* RTSP client */
     int           i_rtsp;
@@ -273,6 +273,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     p_media->es = 0;
     p_media->psz_mux = 0;
     p_media->rtsp = 0;
+    p_media->b_raw = VLC_FALSE;
 
     asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
     p_media->p_rtsp_url =
@@ -631,11 +632,13 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
-    msg_Info( p_vod, "RtspCallback query: type=%d", query->i_type );
+    msg_Dbg( p_vod, "RtspCallback query: type=%d", query->i_type );
 
     answer->i_proto   = HTTPD_PROTO_RTSP;
     answer->i_version = query->i_version;
     answer->i_type    = HTTPD_MSG_ANSWER;
+    answer->i_body    = 0;
+    answer->p_body      = NULL;
 
     switch( query->i_type )
     {
@@ -656,8 +659,9 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( strstr( psz_transport, "MP2T/H2221/UDP" ) ||
                     strstr( psz_transport, "RAW/RAW/UDP" ) )
                 {
-                    p_media->b_raw = 1;
+                    p_media->b_raw = VLC_TRUE;
                 }
+
                 if( httpd_ClientIP( cl, ip ) == NULL )
                 {
                     answer->i_status = 500;
@@ -668,7 +672,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 }
 
                 msg_Dbg( p_vod, "HTTPD_MSG_SETUP: unicast ip=%s port=%d",
-                        ip, i_port );
+                         ip, i_port );
 
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session || !*psz_session )
@@ -695,8 +699,22 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_body = 0;
                 answer->p_body = NULL;
 
-                httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
-                            i_port, i_port + 1 );
+                if( p_media->b_raw )
+                {
+                    if( strstr( psz_transport, "MP2T/H2221/UDP" ) )
+                    {
+                        httpd_MsgAdd( answer, "Transport", "MP2T/H2221/UDP;client_port=%d-%d",
+                                      i_port, i_port + 1 );
+                    }
+                    else if( strstr( psz_transport, "RAW/RAW/UDP" ) )
+                    {
+                        httpd_MsgAdd( answer, "Transport", "RAW/RAW/UDP;client_port=%d-%d",
+                                      i_port, i_port + 1 );
+                    }
+                }
+                else
+                    httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
+                                  i_port, i_port + 1 );
             }
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
@@ -705,6 +723,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
+
             if( !psz_playnow )
                 break;
         }
@@ -715,10 +734,13 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             int i, i_port_audio = 0, i_port_video = 0;
 
             /* for now only multicast so easy */
-            answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
-            answer->i_body = 0;
-            answer->p_body = NULL;
+            if( !psz_playnow )
+            {
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+            }
 
             if( !psz_session )
                 psz_session = httpd_MsgGet( query, "Session" );
@@ -864,11 +886,13 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
-    msg_Info( p_vod, "RtspCallback query: type=%d", query->i_type );
+    msg_Dbg( p_vod, "RtspCallback query: type=%d", query->i_type );
 
     answer->i_proto   = HTTPD_PROTO_RTSP;
     answer->i_version = query->i_version;
     answer->i_type    = HTTPD_MSG_ANSWER;
+    answer->i_body    = 0;
+    answer->p_body      = NULL;
 
     switch( query->i_type )
     {
@@ -930,8 +954,24 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_body = 0;
                 answer->p_body = NULL;
 
-                httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
-                            i_port, i_port + 1 );
+                if( p_media->b_raw )
+                {
+                    if( strstr( psz_transport, "MP2T/H2221/UDP" ) )
+                    {
+                        httpd_MsgAdd( answer, "Transport", "MP2T/H2221/UDP;client_port=%d-%d",
+                                      i_port, i_port + 1 );
+                    }
+                    else if( strstr( psz_transport, "RAW/RAW/UDP" ) )
+                    {
+                        httpd_MsgAdd( answer, "Transport", "RAW/RAW/UDP;client_port=%d-%d",
+                                      i_port, i_port + 1 );
+                    }
+                }
+                else
+                {
+                    httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
+                                  i_port, i_port + 1 );
+                }
             }
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
@@ -940,6 +980,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
+
             if( !psz_playnow )
                 break;
 
@@ -968,10 +1009,13 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 }
             }
 
-            answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
-            answer->i_body = 0;
-            answer->p_body = NULL;
+            if( !psz_playnow )
+            {
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+            }
             break;
 
         case HTTPD_MSG_TEARDOWN:
