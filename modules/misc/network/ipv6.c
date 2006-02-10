@@ -255,7 +255,6 @@ static int OpenUDP( vlc_object_t * p_this )
     }
 
     /* Join the multicast group if the socket is a multicast address */
-#if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
     if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
     {
         if(*psz_server_addr)
@@ -310,19 +309,12 @@ static int OpenUDP( vlc_object_t * p_this )
             } 
         }
     }
-#else
-    msg_Warn( p_this, "Multicast IPv6 is not supported on your OS" );
-#endif
-
 
     if( *psz_server_addr )
     {
         int ttl = p_socket->i_ttl;
-        if( ttl < 1 )
-        {
+        if( ttl <= 0 )
             ttl = config_GetInt( p_this, "ttl" );
-        }
-        if( ttl < 1 ) ttl = 1;
 
         /* Build socket for remote connection */
         if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
@@ -342,7 +334,7 @@ static int OpenUDP( vlc_object_t * p_this )
         }
 
         /* Set the time-to-live */
-        if( ttl > 1 )
+        if( ttl > 0 )
         {
 #if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
             if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )

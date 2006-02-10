@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -437,7 +437,6 @@ static int OpenUDP( vlc_object_t * p_this )
         {
             /* set the time-to-live */
             int i_ttl = p_socket->i_ttl;
-            unsigned char ttl;
 
             /* set the multicast interface */
             char * psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
@@ -456,35 +455,30 @@ static int OpenUDP( vlc_object_t * p_this )
                 }
             }
 
-            if( i_ttl < 1 )
-            {
-                if( var_Get( p_this, "ttl", &val ) != VLC_SUCCESS )
-                {
-                    var_Create( p_this, "ttl",
-                                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-                    var_Get( p_this, "ttl", &val );
-                }
-                i_ttl = val.i_int;
-            }
-            if( i_ttl < 1 ) i_ttl = 1;
-            ttl = (unsigned char) i_ttl;
+            if( i_ttl <= 0 )
+                i_ttl = config_GetInt( p_this, "ttl" );
 
-            /* There is some confusion in the world whether IP_MULTICAST_TTL 
-             * takes a byte or an int as an argument.
-             * BSD seems to indicate byte so we are going with that and use
-             * int as a fallback to be safe */
-            if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
-                            &ttl, sizeof( ttl ) ) < 0 )
+            if( i_ttl > 0 )
             {
-                msg_Dbg( p_this, "failed to set ttl (%s). Let's try it "
-                         "the integer way.", strerror(errno) );
+                unsigned char ttl = (unsigned char) i_ttl;
+
+                /* There is some confusion in the world whether IP_MULTICAST_TTL 
+                * takes a byte or an int as an argument.
+                * BSD seems to indicate byte so we are going with that and use
+                * int as a fallback to be safe */
                 if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
-                                &i_ttl, sizeof( i_ttl ) ) <0 )
+                                &ttl, sizeof( ttl ) ) < 0 )
                 {
-                    msg_Err( p_this, "failed to set ttl (%s)",
-                             strerror(errno) );
-                    close( i_handle );
-                    return 0;
+                    msg_Dbg( p_this, "failed to set ttl (%s). Let's try it "
+                            "the integer way.", strerror(errno) );
+                    if( setsockopt( i_handle, IPPROTO_IP, IP_MULTICAST_TTL,
+                                    &i_ttl, sizeof( i_ttl ) ) <0 )
+                    {
+                        msg_Err( p_this, "failed to set ttl (%s)",
+                                strerror(errno) );
+                        close( i_handle );
+                        return 0;
+                    }
                 }
             }
         }
