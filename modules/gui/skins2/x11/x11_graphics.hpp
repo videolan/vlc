@@ -98,10 +98,10 @@ class X11Graphics: public OSGraphics
         GC m_gc;
 
         /// Add an horizontal segment in a region
-        void X11Graphics::addHSegmentInRegion( Region &rMask, int xStart,
+        void addHSegmentInRegion( Region &rMask, int xStart,
                                                int xEnd, int y );
         /// Add a vertical segment in a region
-        void X11Graphics::addVSegmentInRegion( Region &rMask, int yStart,
+        void addVSegmentInRegion( Region &rMask, int yStart,
                                                int yEnd, int x );
 };
 

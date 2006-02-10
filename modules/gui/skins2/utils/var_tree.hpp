@@ -97,7 +97,7 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
 
         /// Parent node
         VarTree *parent() { return m_pParent; }
-        void VarTree::checkParents( VarTree *pParent );
+        void checkParents( VarTree *pParent );
 
         Iterator uncle();
 

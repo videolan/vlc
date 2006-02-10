@@ -74,12 +74,12 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
         /// Make sure an item is visible
         /// \param item an iterator to a tree item
         /// \return true if it changed the position
-        bool CtrlTree::ensureVisible( VarTree::Iterator item );
+        bool ensureVisible( VarTree::Iterator item );
 
         /// Make sure an item is visible
         /// \param itemIndex the absolute index in the tree
         /// \return true if it changed the position
-        bool CtrlTree::ensureVisible( int itemIndex );
+        bool ensureVisible( int itemIndex );
 
     private:
         /// Tree associated to the control
