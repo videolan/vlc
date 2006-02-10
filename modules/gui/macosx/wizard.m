@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wizard.m: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
@@ -73,7 +73,6 @@ static VLCWizard *_o_sharedInstance = nil;
 {
     /* some minor cleanup */
     [o_t2_tbl_plst setEnabled:NO];
-    [o_wizardhelp_window setExcludedFromWindowsMenu:YES];
     o_userSelections = [[NSMutableDictionary alloc] init];
     [o_btn_backward setEnabled:NO];
 
@@ -470,9 +469,6 @@ static VLCWizard *_o_sharedInstance = nil;
         stringByAppendingString: @":"]];
     [o_t8_txt_local setStringValue: [_NS("Local playback") \
         stringByAppendingString: @":"]];
-
-    /* wizard help window */
-    [o_wh_btn_okay setTitle: _NS("OK")];
 }
 
 - (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to \
@@ -1154,20 +1150,20 @@ static VLCWizard *_o_sharedInstance = nil;
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"] isEqualToString:@""] )
             {
-                playlist_ItemAddOption( p_item, [[@"start-time=" \
-                    stringByAppendingString: [o_userSelections \
-                    objectForKey:@"partExtractFrom"]] UTF8String] );
+                playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
+                    @"start-time=%@", [o_userSelections objectForKey: \
+                    @"partExtractFrom"]] UTF8String] );
             }
 
             if(! [[o_userSelections objectForKey:@"partExtractTo"] isEqualToString:@""] )
             {
-                playlist_ItemAddOption( p_item, [[@"stop-time=" \
-                    stringByAppendingString: [o_userSelections objectForKey: \
+                playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
+                    @"stop-time=%@", [o_userSelections objectForKey: \
                     @"partExtractTo"]] UTF8String] );
             }
 
-            playlist_ItemAddOption( p_item, [[@"ttl=" stringByAppendingString: \
-                [o_userSelections objectForKey:@"ttl"]] UTF8String] );
+            playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
+                @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] UTF8String] );
 
             playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
             
@@ -1218,25 +1214,21 @@ static VLCWizard *_o_sharedInstance = nil;
 
     if ([[o_userSelections objectForKey:@"partExtract"] isEqualToString: @"YES"])
     {
-        [o_t8_fld_partExtract setStringValue: [[[[[_NS("yes") \
-            stringByAppendingString:@" - "] stringByAppendingString: \
-            _NS("from ")] stringByAppendingString: [o_userSelections \
-            objectForKey:@"partExtractFrom"]] stringByAppendingString: \
-            _NS(" to ")] stringByAppendingString: [o_userSelections \
-            objectForKey:@"partExtractTo"]]];
+        [o_t8_fld_partExtract setStringValue: [NSString stringWithFormat: 
+            _NS("yes: from %@ to %@ secs"), 
+            [o_userSelections objectForKey:@"partExtractFrom"],
+            [o_userSelections objectForKey:@"partExtractTo"]]];
     } else {
         [o_t8_fld_partExtract setStringValue: _NS("no")];
     }
 
     if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"YES"])
     {
-        [o_t8_fld_trnscdVideo setStringValue: [[[[[_NS("yes") \
-            stringByAppendingString:@": "] stringByAppendingString: \
+        [o_t8_fld_trnscdVideo setStringValue: [NSString stringWithFormat:
+            _NS("yes: %@ @ %@ kb/s"),
             [[o_videoCodecs objectAtIndex:[[o_userSelections objectForKey: \
-            @"trnscdVideoCodec"] intValue]] objectAtIndex:0]] \
-            stringByAppendingString:@" @ "] stringByAppendingString: \
-            [o_userSelections objectForKey:@"trnscdVideoBitrate"]] \
-            stringByAppendingString:@" kb/s"]];
+            @"trnscdVideoCodec"] intValue]] objectAtIndex:0],
+            [o_userSelections objectForKey:@"trnscdVideoBitrate"]]];
     }
     else
     {
@@ -1244,13 +1236,11 @@ static VLCWizard *_o_sharedInstance = nil;
     }
     if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
     {
-        [o_t8_fld_trnscdAudio setStringValue: [[[[[_NS("yes") \
-        stringByAppendingString:@": "] stringByAppendingString: \
-        [[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey: \
-        @"trnscdAudioCodec"] intValue]] objectAtIndex:0]] \
-        stringByAppendingString:@" @ "] stringByAppendingString: \
-        [o_userSelections objectForKey:@"trnscdAudioBitrate"]] \
-        stringByAppendingString:@" kb/s"]];
+        [o_t8_fld_trnscdAudio setStringValue: [NSString stringWithFormat:
+            _NS("yes: %@ @ %@ kb/s"),
+            [[o_audioCodecs objectAtIndex:[[o_userSelections objectForKey: \
+                @"trnscdAudioCodec"] intValue]] objectAtIndex:0],
+            [o_userSelections objectForKey:@"trnscdAudioBitrate"]]];
     }
     else
     {
@@ -1270,7 +1260,9 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_ttl setStringValue: [o_userSelections objectForKey:@"ttl"]];
         if ([[o_userSelections objectForKey:@"sap"] isEqualToString: @"YES"])
         {
-            [o_t8_fld_sap setStringValue: [[_NS("yes") stringByAppendingString:@": "] stringByAppendingString:[o_userSelections objectForKey:@"sapText"]]];
+            [o_t8_fld_sap setStringValue: 
+                [_NS("yes") stringByAppendingFormat: @": \"%@\"",
+                    [o_userSelections objectForKey:@"sapText"]]];
         }else{
             [o_t8_fld_sap setStringValue: _NS("no")];
         }
@@ -1462,30 +1454,21 @@ static VLCWizard *_o_sharedInstance = nil;
 - (IBAction)t1_mrInfo_streaming:(id)sender
 {
     /* show a sheet for the help */
-    /* since NSAlert does not exist on OSX < 10.3, we use our own implementation */
-    [o_wh_txt_title setStringValue: _NS("Stream to network")];
-    [o_wh_txt_text setStringValue: _NS("Use this to stream on a network.")];
-    [NSApp beginSheet: o_wizardhelp_window
-            modalForWindow: o_wizard_window
-            modalDelegate: o_wizardhelp_window
-            didEndSelector: nil
-            contextInfo: nil];
+    NSBeginInformationalAlertSheet(_NS("Stream to network"), \
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+        _NS("Use this to stream on a network."));
 }
 
 - (IBAction)t1_mrInfo_transcode:(id)sender
 {
     /* show a sheet for the help */
-    [o_wh_txt_title setStringValue: _NS("Transcode/Save to file")];
-    [o_wh_txt_text setStringValue: _NS("Use this to save a stream to a file. You "\
+    NSBeginInformationalAlertSheet(_NS("Transcode/Save to file"), \
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+        _NS("Use this to save a stream to a file. You "\
         "have the possibility to reencode the stream. You can save whatever "\
         "VLC can read.\nPlease notice that VLC is not very suited " \
         "for file to file transcoding. You should use its transcoding " \
-        "features to save network streams, for example.")];
-    [NSApp beginSheet: o_wizardhelp_window
-            modalForWindow: o_wizard_window
-            modalDelegate: o_wizardhelp_window
-            didEndSelector: nil
-            contextInfo: nil];
+        "features to save network streams, for example."));
 }
 
 - (IBAction)t2_addNewStream:(id)sender
@@ -1658,33 +1641,25 @@ static VLCWizard *_o_sharedInstance = nil;
 - (IBAction)t6_mrInfo_ttl:(id)sender
 {
     /* show a sheet for the help */
-    [o_wh_txt_title setStringValue: _NS("Time-To-Live (TTL)")];
-    [o_wh_txt_text setStringValue: _NS("Define the TTL (Time-To-Live) of the stream. "\
-            "This parameter is the maximum number of routers your stream can go " \
-            "through. If you don't know what it means, or if you want to stream on " \
-            "your local network only, leave this setting to 1.")];
-    [NSApp beginSheet: o_wizardhelp_window
-            modalForWindow: o_wizard_window
-            modalDelegate: o_wizardhelp_window
-            didEndSelector: nil
-            contextInfo: nil];
+    NSBeginInformationalAlertSheet(_NS("Time-To-Live (TTL)"), \
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+        _NS("Define the TTL (Time-To-Live) of the stream. "\
+            "This parameter is the maximum number of routers your stream can " \
+            "go through. If you don't know what it means, or if you want to " \
+            "stream on your local network only, leave this setting to 1."));
 }
 
 - (IBAction)t6_mrInfo_sap:(id)sender
 {
     /* show a sheet for the help */
-    [o_wh_txt_title setStringValue: _NS("SAP Announce")];
-    [o_wh_txt_text setStringValue: _NS("When streaming using UDP, you can " \
+    NSBeginInformationalAlertSheet(_NS("SAP Announce"), \
+        _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+        _NS("When streaming using UDP, you can " \
         "announce your streams using the SAP/SDP announcing protocol. This " \
         "way, the clients won't have to type in the multicast address, it " \
-        "will appear in their playlist if they enable the SAP extra interface.\n" \
-        "If you want to give a name to your stream, enter it here, " \
-        "else, a default name will be used.")];
-    [NSApp beginSheet: o_wizardhelp_window
-            modalForWindow: o_wizard_window
-            modalDelegate: o_wizardhelp_window
-            didEndSelector: nil
-            contextInfo: nil];
+        "will appear in their playlist if they enable the SAP extra " \
+        "interface.\nIf you want to give a name to your stream, enter it " \
+        "here, else, a default name will be used."));
 }
 
 - (IBAction)t67_mrInfo_local:(id)sender
@@ -1728,13 +1703,6 @@ static VLCWizard *_o_sharedInstance = nil;
         /* output returned path to text-field */
         [o_t7_fld_filePath setStringValue:[sheet filename]];
     }
-}
-
-- (IBAction)wh_closeSheet:(id)sender
-{
-    /* close the help sheet */
-    [NSApp endSheet:o_wizardhelp_window];
-    [o_wizardhelp_window close];
 }
 
 @end

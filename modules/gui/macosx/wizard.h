@@ -35,10 +35,6 @@
     IBOutlet id o_btn_forward;
     IBOutlet id o_tab_pageHolder;
     IBOutlet id o_wizard_window;
-    IBOutlet id o_wizardhelp_window;
-    IBOutlet id o_wh_txt_title;
-    IBOutlet id o_wh_txt_text;
-    IBOutlet id o_wh_btn_okay;
     IBOutlet id o_playlist_wizard;
     
     /* page one ("Hello") */
@@ -170,7 +166,6 @@
 - (IBAction)t6_mrInfo_sap:(id)sender;
 - (IBAction)t67_mrInfo_local:(id)sender;
 - (IBAction)t7_selectTrnscdDestFile:(id)sender;
-- (IBAction)wh_closeSheet:(id)sender;
 
 + (VLCWizard *)sharedInstance;
 

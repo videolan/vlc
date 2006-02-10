@@ -33,7 +33,6 @@
                 "t6_mrInfo_sap" = id; 
                 "t6_mrInfo_ttl" = id; 
                 "t7_selectTrnscdDestFile" = id; 
-                "wh_closeSheet" = id; 
             }; 
             CLASS = VLCWizard; 
             LANGUAGE = ObjC; 
@@ -131,11 +130,7 @@
                 "o_t8_txt_trnscdVideo" = id; 
                 "o_t8_txt_ttl" = id; 
                 "o_tab_pageHolder" = id; 
-                "o_wh_btn_okay" = id; 
-                "o_wh_txt_text" = id; 
-                "o_wh_txt_title" = id; 
                 "o_wizard_window" = id; 
-                "o_wizardhelp_window" = id; 
             }; 
             SUPERCLASS = NSObject; 
         }
