@@ -724,7 +724,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->p_body = NULL;
             }
 
-            if( !psz_playnow )
+            if( !psz_playnow || !*psz_playnow )
                 break;
         }
 
@@ -981,7 +981,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->p_body = NULL;
             }
 
-            if( !psz_playnow )
+            if( !psz_playnow || !*psz_playnow )
                 break;
 
         case HTTPD_MSG_PLAY:
