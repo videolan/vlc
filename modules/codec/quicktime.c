@@ -66,8 +66,6 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_callbacks( Open, Close );
 
-    /* create a mutex */
-    var_Create( p_module->p_libvlc, "qt_mutex", VLC_VAR_MUTEX );
 vlc_module_end();
 
 
@@ -224,6 +222,9 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
+    /* create a mutex */
+    var_Create( p_this->p_libvlc, "qt_mutex", VLC_VAR_MUTEX );
+    
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
@@ -288,10 +289,6 @@ static void Close( vlc_object_t *p_this )
     /* get lock, avoid segfault */
     var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-#ifdef __APPLE__
-    /* on OS X QT is not threadsafe */
-    vlc_mutex_lock( &p_dec->p_vlc->quicktime_lock );
-#endif
 
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
@@ -311,7 +308,7 @@ static void Close( vlc_object_t *p_this )
     }
     else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
-        if( p_sys->plane)  free( p_sys->plane );
+        if( p_sys->plane) free( p_sys->plane );
     }
 
 #ifndef __APPLE__
@@ -330,12 +327,10 @@ static void Close( vlc_object_t *p_this )
 #endif
 #endif
 
-#ifdef __APPLE__
-    vlc_mutex_unlock( &p_dec->p_vlc->quicktime_lock );
-#endif
     vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_dec->p_libvlc, "qt_mutex" );
 
-    free( p_sys );
+    if( p_sys ) free( p_sys );
 }
 
 /*****************************************************************************
@@ -362,10 +357,6 @@ static int OpenAudio( decoder_t *p_dec )
     /* get lock, avoid segfault */
     var_Get( p_dec->p_libvlc, "qt_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
-#ifdef __APPLE__
-    /* on OS X QT is not threadsafe */
-    vlc_mutex_lock( &p_dec->p_vlc->quicktime_lock );
-#endif
 
 #ifdef __APPLE__
     EnterMovies();
@@ -476,9 +467,6 @@ static int OpenAudio( decoder_t *p_dec )
     p_sys->i_out = 0;
     p_sys->i_out_frames = 0;
 
-#ifdef __APPLE__
-    vlc_mutex_unlock( &p_dec->p_vlc->quicktime_lock );
-#endif
     vlc_mutex_unlock( lockval.p_address );
     return VLC_SUCCESS;
 
@@ -486,9 +474,6 @@ exit_error:
 
 #ifdef LOADER
     Restore_LDT_Keeper( p_sys->ldt_fs );
-#endif
-#ifdef __APPLE__
-    vlc_mutex_unlock( &p_dec->p_vlc->quicktime_lock );
 #endif
     vlc_mutex_unlock( lockval.p_address );
 
@@ -711,14 +696,15 @@ static int OpenVideo( decoder_t *p_dec )
     memset( &icap, 0, sizeof( ImageSubCodecDecompressCapabilities ) );
     cres =  p_sys->ImageCodecInitialize( p_sys->ci, &icap );
     msg_Dbg( p_dec, "ImageCodecInitialize->0x%X size=%d (%d)\n",
-             (int)cres, icap.recordSize, icap.decompressRecordSize);
+             (int)cres, (int)icap.recordSize, (int)icap.decompressRecordSize);
 
     memset( &cinfo, 0, sizeof( CodecInfo ) );
     cres =  p_sys->ImageCodecGetCodecInfo( p_sys->ci, &cinfo );
     msg_Dbg( p_dec,
-             "Flags: compr: 0x%x  decomp: 0x%x format: 0x%x\n",
-             cinfo.compressFlags,
-             cinfo.decompressFlags, cinfo.formatFlags );
+             "Flags: compr: 0x%x decomp: 0x%x format: 0x%x\n",
+             (unsigned int)cinfo.compressFlags,
+             (unsigned int)cinfo.decompressFlags,
+             (unsigned int)cinfo.formatFlags );
     msg_Dbg( p_dec, "quicktime_video: Codec name: %.*s\n",
              ((unsigned char*)&cinfo.typeName)[0],
              ((unsigned char*)&cinfo.typeName)+1 );
@@ -756,17 +742,16 @@ static int OpenVideo( decoder_t *p_dec )
 
     msg_Dbg( p_dec, "idSize=%d ver=%d rev=%d vendor=%d tempQ=%d "
              "spaQ=%d w=%d h=%d dpi=%d%d dataSize=%d depth=%d frameCount=%d clutID=%d",
-             id->idSize, id->version, id->revisionLevel, id->vendor,
+             (int)id->idSize, id->version, id->revisionLevel, (int)id->vendor,
              (int)id->temporalQuality, (int)id->spatialQuality,
-             id->width, id->height,
+             (int)id->width, (int)id->height,
              (int)id->hRes, (int)id->vRes,
              (int)id->dataSize,
              id->depth,
              id->frameCount,
              id->clutID );
 
-    p_sys->framedescHandle =
-        (ImageDescriptionHandle) p_sys->NewHandleClear( id->idSize );
+    p_sys->framedescHandle = (ImageDescriptionHandle) NewHandleClear( id->idSize );
     memcpy( *p_sys->framedescHandle, id, id->idSize );
 
     p_sys->plane = malloc( p_dec->fmt_in.video.i_width * p_dec->fmt_in.video.i_height * 3 );
@@ -779,7 +764,7 @@ static int OpenVideo( decoder_t *p_dec )
                                           &p_sys->OutBufferRect,
                                           0, 0, 0,
                                           p_sys->plane,
-                                          (long)p_dec->fmt_in.video.i_width * 2 );
+                                          p_dec->fmt_in.video.i_width * 2 );
 
     msg_Dbg( p_dec, "NewGWorldFromPtr returned:%ld\n",
              65536 - ( i_result&0xffff ) );
@@ -855,12 +840,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
     p_block = *pp_block;
-
-    if( !p_block->i_buffer )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
+    *pp_block = NULL;
     
     i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
 
@@ -872,7 +852,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         p_sys->i_late = 0;
     }
-    msg_Dbg( p_dec, "bufsize: %d",p_block->i_buffer);
+    msg_Dbg( p_dec, "bufsize: %d", p_block->i_buffer);
 
     if( p_sys->i_late > 10 )
     {
@@ -905,7 +885,6 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_dec->fmt_in.video.i_width * p_dec->fmt_in.video.i_height * 2 );
         p_pic->date = i_pts;
     }
-    else 
     
     vlc_mutex_unlock( lockval.p_address );
 
