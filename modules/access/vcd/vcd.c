@@ -168,8 +168,8 @@ static int Open( vlc_object_t *p_this )
     {
         input_title_t *t = p_sys->title[i] = vlc_input_title_New();
 
-        fprintf( stderr, "title[%d] start=%d\n", i, p_sys->p_sectors[1+i] );
-        fprintf( stderr, "title[%d] end=%d\n", i, p_sys->p_sectors[i+2] );
+        msg_Dbg( p_access, "title[%d] start=%d\n", i, p_sys->p_sectors[1+i] );
+        msg_Dbg( p_access, "title[%d] end=%d\n", i, p_sys->p_sectors[i+2] );
 
         t->i_size = ( p_sys->p_sectors[i+2] - p_sys->p_sectors[i+1] ) *
                     (int64_t)VCD_DATA_SIZE;
