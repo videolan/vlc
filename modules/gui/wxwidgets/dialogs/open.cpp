@@ -31,7 +31,7 @@
 
 #include "charset.h"
 
-//#undef HAVE_LIBCDIO // Disable-cruft
+#undef HAVE_LIBCDIO // Disable broken code
 
 #ifdef HAVE_LIBCDIO
 #include <cdio/cdio.h>
