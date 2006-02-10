@@ -216,6 +216,12 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         int key = ((EvtKey&)rEvent).getKey();
         VarTree::Iterator it;
         bool previousWasSelected = false;
+
+        /* Delete the selection */
+        if( key == KEY_DELETE )
+        {
+            m_rTree.delSelected();
+        }
         for( it = m_rTree.begin(); it != m_rTree.end();
              it = m_rTree.getNextVisibleItem( it ) )
         {

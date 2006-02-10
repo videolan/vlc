@@ -121,8 +121,8 @@
       <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resizeSE"/>
 
       <Button x="374" y="12" lefttop="righttop" rightbottom="righttop" up="add_item" down="add_item_onclick" over="add_item" action="playlist.add()" tooltiptext="Add item"/>
-      <Button x="374" y="40" up="delete_item" lefttop="righttop" rightbottom="righttop" down="delete_item_onclick" over="delete_item" action="playlist.del()" tooltiptext="Del item"/>
-      <Button x="374" y="68" up="sort_button" lefttop="righttop" rightbottom="righttop" down="sort_button_onclick" over="sort_button" action="playlist.sort()" tooltiptext="Sort the playlist"/>
+      <Button x="374" y="40" up="delete_item" lefttop="righttop" rightbottom="righttop" down="delete_item_onclick" over="delete_item" action="playtree.del()" tooltiptext="Del item"/>
+      <Button x="374" y="68" up="sort_button" lefttop="righttop" rightbottom="righttop" down="sort_button_onclick" over="sort_button" action="playtree.sort()" tooltiptext="Sort the playlist"/>
   <!-- <Checkbox x="374" y="96" up1="vout_button" lefttop="righttop" rightbottom="righttop" down1="vout_button_onclick" up2="vout_button2" down2="vout_button_onclick2" state="vout_window.isVisible" action1="vout_window.show()" action2="vout_window.hide()" tooltiptext1="Show Video Window" tooltiptext2="Hide Video Window"/> -->
       <Playtree id="playlist" x="17" y="15" width="333" height="204" lefttop="lefttop" rightbottom="rightbottom" font="playlist_font" fgcolor="#000000" playcolor="#ff0000" bgcolor1="#ffffff" bgcolor2="#e0e0ff" selcolor="#4e8bc7" openimage="open_triangle" closedimage="closed_triangle">
         <Slider id="playlist_slider" x="358" y="25" lefttop="righttop" rightbottom="rightbottom" up="slider_volume" down="slider_volume_onclick" points="(0,185),(0,0)"/>
