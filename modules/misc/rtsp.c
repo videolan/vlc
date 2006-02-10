@@ -132,6 +132,7 @@ struct vod_media_t
     int        i_es;
     media_es_t **es;
     char       *psz_mux;
+    int        b_raw;
 
     /* RTSP client */
     int           i_rtsp;
@@ -626,6 +627,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     char *psz_playnow = NULL; /* support option: x-playNow */
     char *psz_session = NULL;
     rtsp_client_t *p_rtsp;
+    int i_port = 0;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
 
@@ -648,9 +650,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 rtsp_client_t *p_rtsp;
                 char ip[NI_MAXNUMERICHOST];
-                int i_port = atoi( strstr( psz_transport, "client_port=" ) +
+                i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                 strlen("client_port=") );
 
+                if( strstr( psz_transport, "MP2T/H2221/UDP" ) ||
+                    strstr( psz_transport, "RAW/RAW/UDP" ) )
+                {
+                    p_media->b_raw = 1;
+                }
                 if( httpd_ClientIP( cl, ip ) == NULL )
                 {
                     answer->i_status = 500;
@@ -683,9 +690,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     }
                 }
 
-                if( psz_playnow ) /* support option: x-playNow */
-                    goto rtsp_play_now;
-
                 answer->i_status = 200;
                 answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
@@ -701,36 +705,11 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
-            break;
-        }
-
-        case HTTPD_MSG_DESCRIBE:
-        {
-            char *psz_sdp =
-                SDPGenerate( p_media, cl );
-
-            if( psz_sdp != NULL )
-            {
-                answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
-                httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
-
-                answer->p_body = (uint8_t *)psz_sdp;
-                answer->i_body = strlen( psz_sdp );
-            }
-            else
-            {
-                answer->i_status = 500;
-                answer->psz_status = strdup( "Internal server error" );
-                answer->p_body = NULL;
-                answer->i_body = 0;
-            }
-            break;
+            if( !psz_playnow )
+                break;
         }
 
         case HTTPD_MSG_PLAY:
-
-rtsp_play_now: /* This avoids code duplications although it is ugly. */
         {
             char *psz_output, ip[NI_MAXNUMERICHOST];
             int i, i_port_audio = 0, i_port_video = 0;
@@ -741,7 +720,8 @@ rtsp_play_now: /* This avoids code duplications although it is ugly. */
             answer->i_body = 0;
             answer->p_body = NULL;
 
-            psz_session = httpd_MsgGet( query, "Session" );
+            if( !psz_session )
+                psz_session = httpd_MsgGet( query, "Session" );
             msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
 
             p_rtsp = RtspClientGet( p_media, psz_session );
@@ -771,8 +751,16 @@ rtsp_play_now: /* This avoids code duplications although it is ugly. */
 
             if( p_media->psz_mux )
             {
-                asprintf( &psz_output, "rtp{dst=%s,port=%i,mux=%s}",
-                          ip, i_port_video, p_media->psz_mux );
+                if( p_media->b_raw )
+                {
+                    asprintf( &psz_output, "std{access=udp,dst=%s:%i,mux=%s}",
+                              ip, i_port, p_media->psz_mux );
+                }
+                else
+                {
+                    asprintf( &psz_output, "rtp{dst=%s,port=%i,mux=%s}",
+                              ip, i_port_video, p_media->psz_mux );
+                }
             }
             else
             {
@@ -783,6 +771,30 @@ rtsp_play_now: /* This avoids code duplications although it is ugly. */
             vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PLAY,
                               psz_output );
             free( psz_output );
+            break;
+        }
+
+        case HTTPD_MSG_DESCRIBE:
+        {
+            char *psz_sdp =
+                SDPGenerate( p_media, cl );
+
+            if( psz_sdp != NULL )
+            {
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
+
+                answer->p_body = (uint8_t *)psz_sdp;
+                answer->i_body = strlen( psz_sdp );
+            }
+            else
+            {
+                answer->i_status = 500;
+                answer->psz_status = strdup( "Internal server error" );
+                answer->p_body = NULL;
+                answer->i_body = 0;
+            }
             break;
         }
 
@@ -913,9 +925,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 p_rtsp_es->p_media_es = p_es;
                 TAB_APPEND( p_rtsp->i_es, p_rtsp->es, p_rtsp_es );
 
-                if( psz_playnow ) /* support option: x-playNow */
-                    goto rtsp_play_now;
-
                 answer->i_status = 200;
                 answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
@@ -931,6 +940,38 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
+            if( !psz_playnow )
+                break;
+
+        case HTTPD_MSG_PLAY:
+            /* This is kind of a kludge. Should we only support Aggregate
+             * Operations ? */
+            psz_session = httpd_MsgGet( query, "Session" );
+            msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
+
+            p_rtsp = RtspClientGet( p_media, psz_session );
+
+            psz_position = httpd_MsgGet( query, "Range" );
+            if( psz_position ) psz_position = strstr( psz_position, "npt=" );
+            if( psz_position )
+            {
+                float f_pos;
+
+                msg_Dbg( p_vod, "seeking request: %s", psz_position );
+
+                psz_position += 4;
+                if( sscanf( psz_position, "%f", &f_pos ) == 1 )
+                {
+                    f_pos /= ((float)(p_media->i_length/1000))/1000 / 100;
+                    vod_MediaControl( p_vod, p_media, psz_session,
+                                      VOD_MEDIA_SEEK, (double)f_pos );
+                }
+            }
+
+            answer->i_status = 200;
+            answer->psz_status = strdup( "OK" );
+            answer->i_body = 0;
+            answer->p_body = NULL;
             break;
 
         case HTTPD_MSG_TEARDOWN:
@@ -961,40 +1002,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                                   VOD_MEDIA_STOP );
                 RtspClientDel( p_media, p_rtsp );
             }
-            break;
-
-        case HTTPD_MSG_PLAY:
-/* This avoids code duplications although it is ugly. */
-rtsp_play_now:
-
-            /* This is kind of a kludge. Should we only support Aggregate
-             * Operations ? */
-            psz_session = httpd_MsgGet( query, "Session" );
-            msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
-
-            p_rtsp = RtspClientGet( p_media, psz_session );
-
-            psz_position = httpd_MsgGet( query, "Range" );
-            if( psz_position ) psz_position = strstr( psz_position, "npt=" );
-            if( psz_position )
-            {
-                float f_pos;
-
-                msg_Dbg( p_vod, "seeking request: %s", psz_position );
-
-                psz_position += 4;
-                if( sscanf( psz_position, "%f", &f_pos ) == 1 )
-                {
-                    f_pos /= ((float)(p_media->i_length/1000))/1000 / 100;
-                    vod_MediaControl( p_vod, p_media, psz_session,
-                                      VOD_MEDIA_SEEK, (double)f_pos );
-                }
-            }
-
-            answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
-            answer->i_body = 0;
-            answer->p_body = NULL;
             break;
 
         case HTTPD_MSG_PAUSE:
