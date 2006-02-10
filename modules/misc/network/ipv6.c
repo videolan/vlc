@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
@@ -252,18 +252,6 @@ static int OpenUDP( vlc_object_t * p_this )
         msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
         close( i_handle );
         return 0;
-    }
-
-    /* Allow broadcast reception if we bound on in6addr_any */
-    if( !*psz_bind_addr )
-    {
-        i_opt = 1;
-        if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
-                        (void*) &i_opt, sizeof( i_opt ) ) == -1 )
-        {
-            msg_Warn( p_this, "IPv6 warning: cannot configure socket "
-                              "(SO_BROADCAST: %s)", strerror(errno) );
-        }
     }
 
     /* Join the multicast group if the socket is a multicast address */
