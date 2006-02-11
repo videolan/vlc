@@ -111,6 +111,9 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
         /// First item in the visible area
         VarTree::Iterator m_firstPos;
 
+        /// Don't move if the position variable is updated
+        bool m_dontMove;
+
         /// Method called when the tree variable is modified
         virtual void onUpdate( Subject<VarTree, tree_update*> &rTree ,
                                tree_update *);

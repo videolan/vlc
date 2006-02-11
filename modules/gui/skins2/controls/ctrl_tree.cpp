@@ -61,7 +61,7 @@ CtrlTree::CtrlTree( intf_thread_t *pIntf,
     m_pOpenBitmap( pOpenBitmap ), m_pClosedBitmap( pClosedBitmap ),
     m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ),
     m_bgColor2( bgColor2 ), m_selColor( selColor ),
-    m_pLastSelected( NULL ), m_pImage( NULL )
+    m_pLastSelected( NULL ), m_pImage( NULL ), m_dontMove( false )
 {
     // Observe the tree and position variables
     m_rTree.addObserver( this );
@@ -164,6 +164,8 @@ void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
     // Determine what is the first item to display
     VarTree::Iterator it = m_rTree.begin();
 
+    if( m_dontMove ) return;
+
     int excessItems = m_rTree.visibleItems() - maxItems();
 
     if( excessItems > 0)
@@ -214,6 +216,7 @@ void CtrlTree::onPositionChange()
 
 void CtrlTree::handleEvent( EvtGeneric &rEvent )
 {
+    bool bChangedPosition = false;
     VarTree::Iterator toShow; bool needShow = false;
     if( rEvent.getAsString().find( "key:down" ) != string::npos )
     {
@@ -229,7 +232,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         else if( key == KEY_PAGEDOWN )
         {
             it = m_firstPos;
-            int i = maxItems()*1.5;
+            int i = (int)(maxItems()*1.5);
             while( i >= 0 )
             {
                 VarTree::Iterator it_old = it;
@@ -333,6 +336,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     else
                     {
                         it->m_expanded = true;
+                        bChangedPosition = true;
                     }
                 }
             }
@@ -344,6 +348,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     if( it->m_expanded && it->size() )
                     {
                         it->m_expanded = false;
+                        bChangedPosition = true;
                     }
                     else
                     {
@@ -453,6 +458,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             {
                 // Fold/unfold the item
                 it->m_expanded = !it->m_expanded;
+                bChangedPosition = true;
             }
             else
             {
@@ -502,6 +508,30 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             percentage -= step;
         }
         m_rTree.getPositionVar().set( percentage );
+    }
+
+    /* We changed the nodes, let's fix teh position var */
+    if( bChangedPosition )
+    {
+        VarTree::Iterator it;
+        int i = 0;
+        int iFirst = 0;
+        for( it = m_rTree.begin(); it != m_rTree.end();
+             it = m_rTree.getNextVisibleItem( it ) )
+        {
+            i++;
+            if( it == m_firstPos )
+            {
+                iFirst = i;
+                break;
+            }
+        }
+        iFirst += maxItems();
+        if( iFirst >= m_rTree.visibleItems() ) iFirst = m_rTree.visibleItems();
+        float f_new = (float)iFirst / (float)m_rTree.visibleItems();
+        m_dontMove = true;
+        m_rTree.getPositionVar().set( 1.0 - f_new );
+        m_dontMove = false;
     }
 }
 
@@ -718,7 +748,6 @@ void CtrlTree::makeImage()
         }
         it = m_rTree.getNextVisibleItem( it );
     }
-    /// \todo Reposition percentage var to accomodate if it's not suitable anymore (if we expanded a node)
 }
 
 VarTree::Iterator CtrlTree::findItemAtPos( int pos )
