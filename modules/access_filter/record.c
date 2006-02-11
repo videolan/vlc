@@ -304,6 +304,7 @@ static void Notify( access_t *p_access, vlc_bool_t b_dump )
     vout_thread_t *p_vout;
 
     p_vout = vlc_object_find( p_access, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    if( !p_vout ) return;
 
     if( p_vout != p_sys->p_vout )
     {
