@@ -387,10 +387,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
+            if( p_demux->info.i_title >= 0 && p_demux->info.i_title < p_sys->i_titles )
             {
-                *pi64 = (int64_t)1000000 * DVD_VIDEO_LB_LEN *
-                        p_sys->i_title_offset / 50 / p_sys->i_mux_rate;
+                *pi64 = (int64_t) dvdtime_to_time( &p_sys->p_cur_pgc->playback_time, 0 ) / 
+                        p_sys->i_title_blocks * p_sys->i_title_offset;
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
@@ -398,10 +398,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
+            if( p_demux->info.i_title >= 0 && p_demux->info.i_title < p_sys->i_titles )
             {
-                *pi64 = (int64_t)1000000 * DVD_VIDEO_LB_LEN *
-                        p_sys->i_title_blocks / 50 / p_sys->i_mux_rate;
+                *pi64 = (int64_t)dvdtime_to_time( &p_sys->p_cur_pgc->playback_time, 0 );
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
