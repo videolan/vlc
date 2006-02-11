@@ -37,7 +37,7 @@ enum
 
 BEGIN_EVENT_TABLE(Messages, wxFrame)
     /* Button events */
-    EVT_BUTTON(wxID_OK, Messages::OnButtonClose)
+    EVT_BUTTON(wxID_CLOSE, Messages::OnButtonClose)
     EVT_BUTTON(wxID_CLEAR, Messages::OnClear)
     EVT_BUTTON(wxID_SAVEAS, Messages::OnSaveLog)
 
@@ -74,18 +74,15 @@ Messages::Messages( intf_thread_t *_p_intf, wxWindow *p_parent ):
     dbg_attr = new wxTextAttr( *wxBLACK );
 
     /* Create the OK button */
-    wxButton *ok_button = new wxButton( messages_panel, wxID_OK,
-                                        wxU(_("Close")));
+    wxButton *ok_button = new wxButton( messages_panel, wxID_CLOSE);
     ok_button->SetDefault();
 
     /* Create the Clear button */
-    wxButton *clear_button = new wxButton( messages_panel, wxID_CLEAR,
-                                           wxU(_("Clear")));
+    wxButton *clear_button = new wxButton( messages_panel, wxID_CLEAR );
     clear_button->SetDefault();
 
     /* Create the Save Log button */
-    wxButton *save_log_button = new wxButton( messages_panel, wxID_SAVEAS,
-                                              wxU(_("Save As...")));
+    wxButton *save_log_button = new wxButton( messages_panel, wxID_SAVEAS );
     save_log_button->SetDefault();
 
     /* Place everything in sizers */

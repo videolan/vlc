@@ -38,9 +38,9 @@ enum
 
 BEGIN_EVENT_TABLE( VLMPanel, wxPanel)
    EVT_TIMER( Timer_Event, VLMPanel::OnTimer )
-   EVT_BUTTON( Close_Event, VLMPanel::OnClose )
+   EVT_BUTTON( wxID_CLOSE, VLMPanel::OnClose )
    EVT_BUTTON( Load_Event, VLMPanel::OnLoad )
-   EVT_BUTTON( Save_Event, VLMPanel::OnSave )
+   EVT_BUTTON( wxID_SAVE, VLMPanel::OnSave )
 END_EVENT_TABLE()
 
 
@@ -73,10 +73,10 @@ VLMPanel::VLMPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ) :
 #endif
 
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( new wxButton( this, Close_Event, wxU(_("Close") ) ) );
+    button_sizer->Add( new wxButton( this, wxID_CLOSE ));
     button_sizer->Add( 0, 0, 1 );
     button_sizer->Add( new wxButton( this, Load_Event, wxU(_("Load") ) ), 0, wxRIGHT, 10 );
-    button_sizer->Add( new wxButton( this, Save_Event, wxU(_("Save") ) ) );
+    button_sizer->Add( new wxButton( this, wxID_SAVE ));
     panel_sizer->Add( button_sizer, 0 , wxEXPAND | wxALL, 5 );
 
     panel_sizer->Layout();
@@ -407,8 +407,7 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
 
     if( !b_edit )
     {
-        lower_sizer->Add( new wxButton( this, Clear_Event,
-                          wxU( _( "Clear" )  ) ),
+        lower_sizer->Add( new wxButton( this, wxID_CLEAR ),
                          0 , wxEXPAND | wxALL , 5 );
     }
     lower_sizer->Add( new wxButton( this, Create_Event,

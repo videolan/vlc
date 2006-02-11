@@ -52,9 +52,9 @@ DEFINE_LOCAL_EVENT_TYPE( wxEVT_BOOKMARKS );
 BEGIN_EVENT_TABLE(BookmarksDialog, wxFrame)
     /* Hide the window when the user closes the window */
     EVT_CLOSE(BookmarksDialog::OnClose )
-    EVT_BUTTON( ButtonAdd_Event, BookmarksDialog::OnAdd )
-    EVT_BUTTON( ButtonDel_Event, BookmarksDialog::OnDel )
-    EVT_BUTTON( ButtonClear_Event, BookmarksDialog::OnClear )
+    EVT_BUTTON( wxID_ADD, BookmarksDialog::OnAdd )
+    EVT_BUTTON( wxID_DELETE, BookmarksDialog::OnDel )
+    EVT_BUTTON( wxID_CLEAR, BookmarksDialog::OnClear )
     EVT_BUTTON( ButtonExtract_Event, BookmarksDialog::OnExtract )
     EVT_BUTTON( ButtonEdit_Event, BookmarksDialog::OnEdit )
 
@@ -102,10 +102,10 @@ BookmarkEditDialog::BookmarkEditDialog( intf_thread_t *_p_intf,
     sizer->Add( bytes_text, 0, wxEXPAND|wxRIGHT, 5);
 
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    wxButton *ok_button = new wxButton( this, wxID_OK, wxU(_("OK") ) );
+    wxButton *ok_button = new wxButton( this, wxID_OK );
     ok_button->SetDefault();
     button_sizer->Add( ok_button );
-    button_sizer->Add( new wxButton( this, wxID_CANCEL, wxU(_("Cancel") ) ) );
+    button_sizer->Add( new wxButton( this, wxID_CANCEL ) );
 
     panel_sizer->Add( sizer, 0, wxEXPAND | wxTOP|wxBOTTOM, 5 );
     panel_sizer->Add( button_sizer, 0, wxEXPAND | wxBOTTOM, 5 );
@@ -156,11 +156,11 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
     wxPanel *panel = new wxPanel( main_panel, -1 );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     wxButton *button_add =
-        new wxButton( panel, ButtonAdd_Event, wxU(_("Add")) );
+        new wxButton( panel, wxID_ADD );
     wxButton *button_del =
-        new wxButton( panel, ButtonDel_Event, wxU(_("Remove")) );
+        new wxButton( panel, wxID_DELETE );
     wxButton *button_clear =
-        new wxButton( panel, ButtonClear_Event, wxU(_("Clear")) );
+        new wxButton( panel, wxID_CLEAR );
     wxButton *button_edit =
         new wxButton( panel, ButtonEdit_Event, wxU(_("Edit")) );
     wxButton *button_extract =
