@@ -183,7 +183,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             char *psz_charset =(char*)malloc( 100 );  
 #ifdef __APPLE__
             /* Most subtitles are not in UTF-8, which is the default on Mac OS X */
-            psz_charset = "ISO-8859-1";
+            sprintf( psz_charset, "ISO-8859-1" );
 #else
             vlc_current_charset( &psz_charset );
 #endif
@@ -424,7 +424,7 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
     i_text = 0;
     while( psz_buffer_sub[0] != '\0' )
     {
-        if( psz_buffer_sub[0] == '\\' && psz_buffer_sub[0] == 'n' )
+        if( psz_buffer_sub[0] == '\\' && psz_buffer_sub[1] == 'n' )
         {
             psz_new_subtitle[i_text] = ' ';
             i_text++;
