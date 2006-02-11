@@ -426,15 +426,15 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                         fclose( f );
                     msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
                         result[i_sub_count].priority = i_prio;
-                        result[i_sub_count].psz_fname = psz_UTF8_path;
+                        result[i_sub_count].psz_fname = psz_path;
                         result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
                         i_sub_count++;
                     }
                     else
                     {
                         msg_Dbg( p_this, "fopen failed" );
-                        if( psz_UTF8_path ) free( psz_UTF8_path );
-                        LocaleFree( psz_locale_path );
+                        if( psz_path ) free( psz_path );
+                        LocaleFree( psz_path );
                     }
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
