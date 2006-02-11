@@ -453,6 +453,7 @@ void stream_DemuxDelete (stream_t *s);
 aout_input_t * __aout_DecNew (vlc_object_t *, aout_instance_t **, audio_sample_format_t *);
 int playlist_AddExt (playlist_t *, const char *, const char *, int, int, mtime_t, const char **,int);
 void date_Move (date_t *, mtime_t);
+int vlc_closedir (void *);
 void aout_FiltersDestroyPipeline (aout_instance_t * p_aout, aout_filter_t ** pp_filters, int i_nb_filters);
 void * __vlc_object_find (vlc_object_t *, int, int);
 const char * utf8_readdir (void *dir);
@@ -643,6 +644,7 @@ struct module_symbols_t
     char * (*vlc_strcasestr_inner) (const char *s1, const char *s2);
     void * (*vlc_opendir_inner) (const char *);
     void * (*vlc_readdir_inner) (void *);
+    int (*vlc_closedir_inner) (void *);
     vlc_bool_t (*vlc_ureduce_inner) (unsigned *, unsigned *, uint64_t, uint64_t, uint64_t);
     char ** (*vlc_parse_cmdline_inner) (const char *, int *);
     char * (*vlc_wraptext_inner) (const char *, int, vlc_bool_t);
@@ -1094,6 +1096,7 @@ struct module_symbols_t
 #  define vlc_strcasestr (p_symbols)->vlc_strcasestr_inner
 #  define vlc_opendir (p_symbols)->vlc_opendir_inner
 #  define vlc_readdir (p_symbols)->vlc_readdir_inner
+#  define vlc_closedir (p_symbols)->vlc_closedir_inner
 #  define vlc_ureduce (p_symbols)->vlc_ureduce_inner
 #  define vlc_parse_cmdline (p_symbols)->vlc_parse_cmdline_inner
 #  define vlc_wraptext (p_symbols)->vlc_wraptext_inner
@@ -1546,6 +1549,7 @@ struct module_symbols_t
     ((p_symbols)->vlc_strcasestr_inner) = vlc_strcasestr; \
     ((p_symbols)->vlc_opendir_inner) = vlc_opendir; \
     ((p_symbols)->vlc_readdir_inner) = vlc_readdir; \
+    ((p_symbols)->vlc_closedir_inner) = vlc_closedir; \
     ((p_symbols)->vlc_ureduce_inner) = vlc_ureduce; \
     ((p_symbols)->vlc_parse_cmdline_inner) = vlc_parse_cmdline; \
     ((p_symbols)->vlc_wraptext_inner) = vlc_wraptext; \
