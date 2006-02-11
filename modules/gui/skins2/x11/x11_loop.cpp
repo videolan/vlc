@@ -77,6 +77,8 @@ X11Loop::X11Loop( intf_thread_t *pIntf, X11Display &rDisplay ):
     keysymToVlcKey[XK_End] = KEY_END;
     keysymToVlcKey[XK_Prior] = KEY_PAGEUP;
     keysymToVlcKey[XK_Next] = KEY_PAGEDOWN;
+    keysymToVlcKey[XK_Delete] = KEY_DELETE;
+    keysymToVlcKey[XK_Insert] = KEY_INSERT;
 }
 
 
