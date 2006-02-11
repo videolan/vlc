@@ -74,6 +74,11 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define BACKGROUND_TEXT N_("Use as Desktop Background")
 #define BACKGROUND_LONGTEXT N_("Use the video as the Desktop Background " \
         "of the Finder. Desktop icons cannot be interacted with in this mode." )
+        
+#define WIZARD_OPTIONS_SAVING_TEXT N_("Keep wizard selections")
+#define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Keeps the selections in the " \
+        "wizard for one session of VLC, so you do not need to choose them " \
+        "over and over again for similar purposes.") 
 
 vlc_module_begin();
     set_description( _("Mac OS X interface") );
@@ -83,6 +88,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_bool( "macosx-embedded", 1, NULL, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
                      VLC_FALSE );
+    add_bool( "macosx-wizard-keep", 1, NULL, WIZARD_OPTIONS_SAVING_TEXT,
+                WIZARD_OPTIONS_SAVING_LONGTEXT, VLC_TRUE );
 
     add_submodule();
         set_description( _("Quartz video") );

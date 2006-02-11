@@ -35,6 +35,7 @@
 #import "intf.h"
 #import "network.h"
 #import "playlist.h"
+#import <vlc/intf.h>
 
 /*****************************************************************************
  * VLCWizard implementation
@@ -296,8 +297,6 @@ static VLCWizard *_o_sharedInstance = nil;
 - (void)showWizard
 {
     /* just present the window to the user */
-    [o_tab_pageHolder selectFirstTabViewItem:self];
-
     [o_wizard_window center];
     [o_wizard_window displayIfNeeded];
     [o_wizard_window makeKeyAndOrderFront:nil];
@@ -305,12 +304,21 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (void)resetWizard
 {
-    /* reset the wizard-window to its default values */
+    /* get the current state of our setting to keep the selections or not */
+    keepSettingsOrNot = (BOOL *)config_GetInt( VLCIntf, "macosx-wizard-keep" );
 
+    /* go to the front page and clean up a bit */
     [o_userSelections removeAllObjects];
+    [o_btn_forward setTitle: _NS("Next")];
+    [o_tab_pageHolder selectFirstTabViewItem:self];
+
+    
+    if( keepSettingsOrNot )
+        return;
+    
+    /* reset the wizard-window to its default values if wanted */
     [o_t1_matrix_strmgOrTrnscd selectCellAtRow:0 column:0];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setState: NSOffState];
-    [o_btn_forward setTitle: _NS("Next")];
 
     /* "Input" */
     [o_t2_fld_pathToNewStrm setStringValue: @""];
