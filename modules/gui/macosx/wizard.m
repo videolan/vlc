@@ -525,16 +525,13 @@ static VLCWizard *_o_sharedInstance = nil;
         o_mode = [[o_t1_matrix_strmgOrTrnscd selectedCell] title];
         if( [o_mode isEqualToString: _NS("Stream to network")] )
         {
-            /* we will be streaming -- we can't allow multiple selections */
+            /* we will be streaming */
             [o_userSelections setObject:@"strmg" forKey:@"trnscdOrStrmg"];
-            [o_t2_tbl_plst setAllowsMultipleSelection: NO];
         }
         else
         {
-            /* we will just do some transcoding, so we can allow multiple
-             * selections in our playlist */
+            /* we will just do some transcoding */
             [o_userSelections setObject:@"trnscd" forKey:@"trnscdOrStrmg"];
-            [o_t2_tbl_plst setAllowsMultipleSelection: YES];
         }
         [o_btn_backward setEnabled:YES];
         [o_tab_pageHolder selectTabViewItemAtIndex:1];
