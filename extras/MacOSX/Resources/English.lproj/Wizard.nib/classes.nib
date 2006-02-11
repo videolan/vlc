@@ -102,6 +102,7 @@
                 "o_t7_fld_filePath" = id; 
                 "o_t7_text" = id; 
                 "o_t7_title" = id; 
+                "o_t7_txt_note_saveFolderTo" = id; 
                 "o_t7_txt_saveFileTo" = id; 
                 "o_t8_fld_destination" = id; 
                 "o_t8_fld_encapFormat" = id; 

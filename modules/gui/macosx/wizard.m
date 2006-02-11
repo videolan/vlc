@@ -452,6 +452,9 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
     [o_t7_ckb_local setTitle: _NS("Local playback")];
     [o_t7_btn_mrInfo_local setTitle: _NS("More Info")];
+    [o_t7_txt_note_saveFolderTo setStringValue: _NS("Note that your input " \
+        "files will keep their original names when being saved in the folder " \
+        "you selected. Existing files may be overwritten.")];
 
     /* page eight ("Summary") */
     [o_t8_txt_text setStringValue: _NS("This page lists all your selections. " \
@@ -522,9 +525,16 @@ static VLCWizard *_o_sharedInstance = nil;
         o_mode = [[o_t1_matrix_strmgOrTrnscd selectedCell] title];
         if( [o_mode isEqualToString: _NS("Stream to network")] )
         {
+            /* we will be streaming -- we can't allow multiple selections */
             [o_userSelections setObject:@"strmg" forKey:@"trnscdOrStrmg"];
-        }else{
+            [o_t2_tbl_plst setAllowsMultipleSelection: NO];
+        }
+        else
+        {
+            /* we will just do some transcoding, so we can allow multiple
+             * selections in our playlist */
             [o_userSelections setObject:@"trnscd" forKey:@"trnscdOrStrmg"];
+            [o_t2_tbl_plst setAllowsMultipleSelection: YES];
         }
         [o_btn_backward setEnabled:YES];
         [o_tab_pageHolder selectTabViewItemAtIndex:1];
@@ -564,24 +574,40 @@ static VLCWizard *_o_sharedInstance = nil;
             }
             else
             {
-                [o_userSelections setObject:[o_t2_fld_pathToNewStrm stringValue] \
-                    forKey:@"pathToStrm"];
+                [o_userSelections setObject:[NSArray arrayWithObject:
+                    [o_t2_fld_pathToNewStrm stringValue]] forKey:@"pathToStrm"];
             }
         }
         else
         {
-            if ([o_t2_tbl_plst selectedRow] != -1)
+            if ([o_t2_tbl_plst numberOfSelectedRows] > 0)
             {
-                playlist_item_t *p_item =
-                                    [o_playlist_wizard selectedPlaylistItem];
-                if( p_item->i_children <= 0 )
+                int x = 0;
+                int y = [[o_t2_tbl_plst selectedRowIndexes] count];
+                NSMutableArray * tempArray = [[NSMutableArray alloc] init];
+                while( x != y )
                 {
-                    [o_userSelections setObject: [NSString stringWithFormat:
-                        @"%s", p_item->input.psz_uri] forKey:@"pathToStrm"];
+                    playlist_item_t *p_item = 
+                        [[o_t2_tbl_plst itemAtRow: 
+                            [[o_t2_tbl_plst selectedRowIndexes] 
+                            indexGreaterThanOrEqualToIndex: x]] pointerValue];
+
+                    if( p_item->i_children <= 0 )
+                    {
+                        [tempArray addObject: [NSString stringWithUTF8String:
+                        p_item->input.psz_uri]];
+                        stop = NO;
+                    }
+                    else
+                        stop = YES;
+                    x += 1;
                 }
-                else
-                stop = YES;
-            } else {
+                [o_userSelections setObject:[NSArray arrayWithArray: tempArray]
+                    forKey:@"pathToStrm"];
+                [tempArray release];
+            }
+            else
+            {
                 /* set a flag that no item is selected */
                 stop = YES;
             }
@@ -1056,7 +1082,7 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 anythingEnabled = YES;
             }
-            x = (x + 1);
+            x += 1;
         }
         if (anythingEnabled == YES)
         {
@@ -1087,6 +1113,20 @@ static VLCWizard *_o_sharedInstance = nil;
         }else{
             /* we are just transcoding */
             [o_tab_pageHolder selectTabViewItemAtIndex:6];
+            /* in case that we are processing multiple items, let the user
+             * select a folder instead of a localtion for a single item */
+            if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+            {
+                [o_t7_txt_saveFileTo setStringValue: 
+                    _NS("Select the folder to save to")];
+                [o_t7_txt_note_saveFolderTo setHidden: NO];
+            }
+            else
+            {
+                [o_t7_txt_saveFileTo setStringValue: 
+                    _NS("Select the file to save to")];
+                [o_t7_txt_note_saveFolderTo setHidden: YES];
+            }
         }
     }
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
@@ -1129,15 +1169,50 @@ static VLCWizard *_o_sharedInstance = nil;
         /* check whether the path != "" and store it */
         if( [[o_t7_fld_filePath stringValue] isEqualToString: @""] )
         {
-            /* complain to the user that "" is no valid path */
-            NSBeginInformationalAlertSheet(_NS("No file selected"), _NS("OK"), \
-                @"", @"", o_wizard_window, nil, nil, nil, nil, _NS("You you " \
-                "need to select a file, you want to save to.\n\nEnter either " \
-                "a valid path or choose a location through the button's " \
-                "dialog-box."));
+            /* complain to the user that "" is no valid path for a folder/file */
+            if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+                NSBeginInformationalAlertSheet(_NS("No folder selected"), \
+                    _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+                    [NSString stringWithFormat: @"%@\n\n%@", _NS("You you " \
+                    "need to select a folder, you want to save your files to."),
+                    _NS("Enter either a valid path or choose a location " \
+                    "through the button's dialog-box.")]);
+            else
+                NSBeginInformationalAlertSheet(_NS("No file selected"), \
+                    _NS("OK"), @"", @"", o_wizard_window, nil, nil, nil, nil, \
+                    [NSString stringWithFormat: @"%@\n\n%@", _NS("You you " \
+                    "need to select a file, you want to save to."), 
+                    _NS("Enter either a valid path or choose a location " \
+                    "through the button's dialog-box.")]);
         } else {
-            [o_userSelections setObject:[o_t7_fld_filePath stringValue] forKey: \
-                @"trnscdFilePath"];
+            if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+            {
+                NSMutableArray * tempArray = [[NSMutableArray alloc] init];
+                NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
+                    [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
+                    objectAtIndex:0];
+                if( theEncapFormat == @"ps" )
+                    theEncapFormat = @"mpg";
+                int x = 0;
+                int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
+                while( x != y )
+                {
+                    [tempArray addObject:[NSString stringWithFormat: @"%@%@.%@",
+                        [o_t7_fld_filePath stringValue],
+                        [[NSFileManager defaultManager] displayNameAtPath:
+                        [[o_userSelections objectForKey:@"pathToStrm"]
+                        objectAtIndex: x]],theEncapFormat]];
+                    x += 1;
+                }
+                [o_userSelections setObject: [NSArray arrayWithArray:tempArray]
+                    forKey: @"trnscdFilePath"];
+                [tempArray release];
+            }
+            else
+            {
+                [o_userSelections setObject: [NSArray arrayWithObject: \
+                    [o_t7_fld_filePath stringValue]] forKey: @"trnscdFilePath"];
+            }
 
             /* go to "Summary" */
             [self showSummary];
@@ -1152,29 +1227,50 @@ static VLCWizard *_o_sharedInstance = nil;
                             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE);
         if( p_playlist )
         {
-            playlist_item_t *p_item = playlist_ItemNew( p_playlist, [[o_userSelections \
-                objectForKey:@"pathToStrm"] UTF8String], _("Streaming/Transcoding Wizard") );
-            playlist_ItemAddOption( p_item, [[o_userSelections objectForKey:@"opts"] UTF8String]);
-
-            if(! [[o_userSelections objectForKey:@"partExtractFrom"] isEqualToString:@""] )
+            int x = 0;
+            int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
+            while( x != y )
             {
+                /* we need a temp. variable here to work-around a GCC4-bug */
+                NSString *tempString = [NSString stringWithFormat: \
+                    @"%@ (%i/%i)", _NS("Streaming/Transcoding Wizard"), \
+                    ( x + 1 ), y];
+                playlist_item_t *p_item = playlist_ItemNew( p_playlist, \
+                    [[[o_userSelections objectForKey:@"pathToStrm"] \
+                    objectAtIndex:x] UTF8String], \
+                    [tempString UTF8String] );
+                playlist_ItemAddOption( p_item, [[[o_userSelections \
+                    objectForKey:@"opts"] objectAtIndex: x] UTF8String]);
+
+                if(! [[o_userSelections objectForKey:@"partExtractFrom"] \
+                    isEqualToString:@""] )
+                {
+                    playlist_ItemAddOption( p_item, [[NSString \
+                        stringWithFormat: @"start-time=%@", [o_userSelections \
+                        objectForKey: @"partExtractFrom"]] UTF8String] );
+                }
+
+                if(! [[o_userSelections objectForKey:@"partExtractTo"] \
+                    isEqualToString:@""] )
+                {
+                    playlist_ItemAddOption( p_item, [[NSString \
+                        stringWithFormat: @"stop-time=%@", [o_userSelections \
+                        objectForKey: @"partExtractTo"]] UTF8String] );
+                }
+
                 playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
-                    @"start-time=%@", [o_userSelections objectForKey: \
-                    @"partExtractFrom"]] UTF8String] );
+                    @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] \
+                    UTF8String] );
+
+                playlist_AddItem( p_playlist, p_item, PLAYLIST_STOP, PLAYLIST_END );
+                
+                if( x == 0 )
+                    /* play the first item and add the others afterwards */ 
+                    playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
+
+                x += 1;
             }
 
-            if(! [[o_userSelections objectForKey:@"partExtractTo"] isEqualToString:@""] )
-            {
-                playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
-                    @"stop-time=%@", [o_userSelections objectForKey: \
-                    @"partExtractTo"]] UTF8String] );
-            }
-
-            playlist_ItemAddOption( p_item, [[NSString stringWithFormat: \
-                @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] UTF8String] );
-
-            playlist_AddItem( p_playlist, p_item, PLAYLIST_GO, PLAYLIST_END );
-            
             playlist_ViewUpdate( p_playlist, VIEW_CATEGORY );
 
             vlc_object_release(p_playlist);
@@ -1189,6 +1285,8 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (void)rebuildCodecMenus
 {
+    int savePreviousSel = 0;
+    savePreviousSel = [o_t4_pop_videoCodec indexOfSelectedItem];
     [o_t4_pop_videoCodec removeAllItems];
     unsigned int x;
     x = 0;
@@ -1196,22 +1294,36 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         [o_t4_pop_videoCodec addItemWithTitle:[[o_videoCodecs objectAtIndex:x] \
             objectAtIndex:0]];
-        x = (x + 1);
+        x += 1;
     }
+    if( keepSettingsOrNot && savePreviousSel >= 0 )
+        [o_t4_pop_videoCodec selectItemAtIndex: savePreviousSel];
+
+    savePreviousSel = [o_t4_pop_audioCodec indexOfSelectedItem];
     [o_t4_pop_audioCodec removeAllItems];
     x = 0;
     while (x != [o_audioCodecs count])
     {
         [o_t4_pop_audioCodec addItemWithTitle:[[o_audioCodecs objectAtIndex:x] \
             objectAtIndex:0]];
-        x = (x + 1);
+        x += 1;
     }
+    if( keepSettingsOrNot && savePreviousSel >= 0 )
+        [o_t4_pop_audioCodec selectItemAtIndex: savePreviousSel];
 }
 
 - (void)showSummary
 {
     [o_btn_forward setTitle: _NS("Finish")];
-    [o_t8_fld_inptStream setStringValue:[o_userSelections objectForKey:@"pathToStrm"]];
+    /* if we will transcode multiple items, just give their number; otherwise
+     * print the URI of the single item */
+    if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+        [o_t8_fld_inptStream setStringValue: [NSString stringWithFormat:
+            _NS("%i items"), 
+            [[o_userSelections objectForKey:@"pathToStrm"] count]]];
+    else
+        [o_t8_fld_inptStream setStringValue: 
+            [[o_userSelections objectForKey:@"pathToStrm"] objectAtIndex: 0]];
     
     if ([[o_userSelections objectForKey:@"localPb"] isEqualToString: @"YES"])
     {
@@ -1287,7 +1399,8 @@ static VLCWizard *_o_sharedInstance = nil;
         [[o_userSelections objectForKey:@"encapFormat"] intValue]] objectAtIndex:1]];
 
     [self createOpts];
-    [o_t8_fld_mrl setStringValue: [o_userSelections objectForKey:@"opts"]];
+    [o_t8_fld_mrl setStringValue: [[o_userSelections objectForKey:@"opts"]
+        objectAtIndex: 0]];
 
     [o_tab_pageHolder selectTabViewItemAtIndex:7];
 }
@@ -1297,101 +1410,120 @@ static VLCWizard *_o_sharedInstance = nil;
     NSMutableString * o_opts_string = [NSMutableString stringWithString:@""];
     NSMutableString *o_trnscdCmd = [NSMutableString stringWithString:@""];
     NSMutableString *o_duplicateCmd = [NSMutableString stringWithString:@""];
+    int x = 0;
+    int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
+    NSMutableArray * tempArray = [[NSMutableArray alloc] init];
     
-    /* check whether we transcode the audio and/or the video and compose a
-     * string reflecting the settings, if needed */
-    if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"YES"])
+    /* loop to create an opt-string for each item we're processing */
+    while( x != y )
     {
-        [o_trnscdCmd appendString: @"transcode{"];
-        [o_trnscdCmd appendFormat: @"vcodec=%s,vb=%i", [[[o_videoCodecs \
-            objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] \
-            intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections \
-            objectForKey:@"trnscdVideoBitrate"] intValue]];
+        /* check whether we transcode the audio and/or the video and compose a
+         * string reflecting the settings, if needed */
+        if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"YES"])
+        {
+            [o_trnscdCmd appendString: @"transcode{"];
+            [o_trnscdCmd appendFormat: @"vcodec=%s,vb=%i", [[[o_videoCodecs \
+                objectAtIndex:[[o_userSelections objectForKey:@"trnscdVideoCodec"] \
+                intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections \
+                objectForKey:@"trnscdVideoBitrate"] intValue]];
+            if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
+            {
+                [o_trnscdCmd appendString: @","];
+            }
+            else
+            {
+                [o_trnscdCmd appendString: @"}:"];
+            }
+        }
+    
+        /* check whether the user requested local playback. if yes, prepare the
+         * string, if not, let it empty */
+        if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
+        {
+            [o_duplicateCmd appendString: @"duplicate{dst=display,dst=\""];
+        }
+    
         if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
         {
-            [o_trnscdCmd appendString: @","];
-        } 
+            if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"NO"])
+            {
+                /* in case we transcode the audio only, add this */
+                [o_trnscdCmd appendString: @"transcode{"];
+            }
+            [o_trnscdCmd appendFormat: @"acodec=%s,ab=%i}:", [[[o_audioCodecs \
+                objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] \
+                intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections \
+                objectForKey:@"trnscdAudioBitrate"] intValue]];
+        }
+    
+        if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"trnscd"])
+        {
+            /* we are just transcoding and dumping the stuff to a file */
+            [o_opts_string appendFormat: \
+                @":sout=#%s%sstandard{mux=%s,dst=%s,access=file}", [o_duplicateCmd \
+                UTF8String], [o_trnscdCmd UTF8String], [[[o_encapFormats \
+                objectAtIndex: [[o_userSelections objectForKey:@"encapFormat"] \
+                intValue]] objectAtIndex:0] UTF8String], [[[o_userSelections \
+                objectForKey: @"trnscdFilePath"] objectAtIndex: x] UTF8String]];
+        }
         else
         {
-            [o_trnscdCmd appendString: @"}:"];
-        }
-    }
-    
-    /* check whether the user requested local playback. if yes, prepare the
-     * string, if not, let it empty */
-    if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
-    {
-        [o_duplicateCmd appendString: @"duplicate{dst=display,dst=\""];
-    }
-    
-    if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
-    {
-        if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"NO"])
-        {
-            /* in case we transcode the audio only, add this */
-            [o_trnscdCmd appendString: @"transcode{"];
-        }
-        [o_trnscdCmd appendFormat: @"acodec=%s,ab=%i}:", [[[o_audioCodecs \
-            objectAtIndex:[[o_userSelections objectForKey:@"trnscdAudioCodec"] \
-            intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections \
-            objectForKey:@"trnscdAudioBitrate"] intValue]];
-    }
-    
-    if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"trnscd"])
-    {
-        /* we are just transcoding and dumping the stuff to a file */
-        [o_opts_string appendFormat: \
-            @":sout=#%s%sstandard{mux=%s,dst=%s,access=file}", [o_duplicateCmd \
-            UTF8String], [o_trnscdCmd UTF8String], [[[o_encapFormats \
-            objectAtIndex: [[o_userSelections objectForKey:@"encapFormat"] \
-            intValue]] objectAtIndex:0] UTF8String], [[o_userSelections \
-            objectForKey: @"trnscdFilePath"] UTF8String]];
 
-    } else {
-
-        /* we are streaming */
-        if ([[o_userSelections objectForKey:@"sap"] isEqualToString:@"YES"])
-        {
-            /* SAP-Announcement is requested */
-            NSMutableString *o_sap_option = [NSMutableString stringWithString:@""];
-            if([[o_userSelections objectForKey:@"sapText"] isEqualToString:@""])
+            /* we are streaming */
+            if ([[o_userSelections objectForKey:@"sap"] isEqualToString:@"YES"])
             {
-                [o_sap_option appendString: @"sap"];
-            } else {
-                [o_sap_option appendFormat: @"sap,name=\"%s\"",[[o_userSelections \
-                    objectForKey:@"sapText"] UTF8String]];
+                /* SAP-Announcement is requested */
+                NSMutableString *o_sap_option = [NSMutableString stringWithString:@""];
+                if([[o_userSelections objectForKey:@"sapText"] isEqualToString:@""])
+                {
+                    [o_sap_option appendString: @"sap"];
+                }
+                else
+                {
+                    [o_sap_option appendFormat: @"sap,name=\"%s\"", \
+                        [[o_userSelections objectForKey:@"sapText"] UTF8String]];
+                }
+                [o_opts_string appendFormat: \
+                    @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s,%s}", \
+                    [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
+                    [[[o_encapFormats objectAtIndex: [[o_userSelections \
+                    objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
+                    UTF8String], [[o_userSelections objectForKey: @"stmgDest"] \
+                    UTF8String], [[[o_strmgMthds objectAtIndex: [[o_userSelections \
+                    objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] \
+                    UTF8String], [o_sap_option UTF8String]];
             }
-            [o_opts_string appendFormat: \
-                @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s,%s}", \
-                [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
-                [[[o_encapFormats objectAtIndex: [[o_userSelections \
-                objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
-                UTF8String], [[o_userSelections objectForKey: @"stmgDest"] \
-                UTF8String], [[[o_strmgMthds objectAtIndex: [[o_userSelections \
-                objectForKey: @"stmgMhd"] intValue]] objectAtIndex:0] \
-                UTF8String], [o_sap_option UTF8String]];
-        } else {
-            /* no SAP, just streaming */
-            [o_opts_string appendFormat: \
-                @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s}", \
-                [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
-                [[[o_encapFormats objectAtIndex: [[o_userSelections \
-                objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
-                UTF8String], [[o_userSelections objectForKey: \
-                @"stmgDest"] UTF8String], [[[o_strmgMthds objectAtIndex: \
-                [[o_userSelections objectForKey: @"stmgMhd"] intValue]] \
-                objectAtIndex:0] UTF8String]];
+            else
+            {
+                /* no SAP, just streaming */
+                [o_opts_string appendFormat: \
+                    @":sout=#%s%sstandard{mux=%s,dst=%s,access=%s}", \
+                    [o_duplicateCmd UTF8String], [o_trnscdCmd UTF8String], \
+                    [[[o_encapFormats objectAtIndex: [[o_userSelections \
+                    objectForKey: @"encapFormat"] intValue]] objectAtIndex:0] \
+                    UTF8String], [[o_userSelections objectForKey: \
+                    @"stmgDest"] UTF8String], [[[o_strmgMthds objectAtIndex: \
+                    [[o_userSelections objectForKey: @"stmgMhd"] intValue]] \
+                    objectAtIndex:0] UTF8String]];
+            }
         }
-    }
 
-    /* check whether the user requested local playback. if yes, close the
-     * string with an additional bracket */
-    if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
-    {
-        [o_opts_string appendString: @"\"}"];
-    }
+        /* check whether the user requested local playback. if yes, close the
+         * string with an additional bracket */
+        if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
+        {
+            [o_opts_string appendString: @"\"}"];
+        }
 
-    [o_userSelections setObject:o_opts_string forKey:@"opts"];
+        [tempArray addObject: o_opts_string];
+
+        o_opts_string = [NSMutableString stringWithString:@""];
+        o_trnscdCmd = [NSMutableString stringWithString:@""];
+        o_duplicateCmd = [NSMutableString stringWithString:@""];
+        x += 1;
+    }
+    [o_userSelections setObject:[NSArray arrayWithArray: tempArray] forKey:@"opts"];
+    [tempArray release];
 }
 
 - (IBAction)prevTab:(id)sender
@@ -1682,35 +1814,59 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (IBAction)t7_selectTrnscdDestFile:(id)sender
 {
-    /* provide a save-to-dialogue, so the user can choose a location for his/her new file */
-    NSSavePanel * savePanel = [NSSavePanel savePanel];
+    /* provide a save-to-dialogue, so the user can choose a location for 
+     * his/her new file. We take a modified NSOpenPanel to select a folder
+     * and a plain NSSavePanel to save a single file. */
+
     SEL sel = @selector(t7_getTrnscdDestFile:returnCode:contextInfo:);
-    NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
+    
+    if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+    {
+        NSOpenPanel * saveFolderPanel = [[NSOpenPanel alloc] init];
+        
+        [saveFolderPanel setCanChooseDirectories: YES];
+        [saveFolderPanel setCanChooseFiles: NO];
+        [saveFolderPanel setCanSelectHiddenExtension: NO];
+        [saveFolderPanel setCanCreateDirectories: YES];
+        [saveFolderPanel beginSheetForDirectory:nil file:nil modalForWindow: \
+        o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
+    }
+    else
+    {
+        NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
+
+        /* don't use ".ps" as suffix, since the OSX Finder confuses our 
+         * creations with PostScript-files and wants to open them with 
+         * Preview.app */
+        NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
         [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
         objectAtIndex:0];
-    
-    /* don't use ".ps" as suffix, since the OSX Finder confuses our creations 
-     * with PostScript-files and wants to open them with Preview.app */
-    if (theEncapFormat != @"ps")
-    {
-        [savePanel setRequiredFileType: theEncapFormat];
-    } else {
-        [savePanel setRequiredFileType: @"mpg"];
-    }
-    
-    [savePanel setCanSelectHiddenExtension:YES];
-    [savePanel beginSheetForDirectory:nil file:nil modalForWindow: \
+        if( theEncapFormat != @"ps" )
+            [saveFilePanel setRequiredFileType: theEncapFormat];
+        else
+            [saveFilePanel setRequiredFileType: @"mpg"];
+
+        [saveFilePanel setCanSelectHiddenExtension: YES];
+        [saveFilePanel setCanCreateDirectories: YES];
+        [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow: \
         o_wizard_window modalDelegate:self didEndSelector:sel contextInfo:nil];
+    }
 }
 
-- (void)t7_getTrnscdDestFile: (NSSavePanel *)sheet returnCode: \
+- (void)t7_getTrnscdDestFile: (NSOpenPanel *)sheet returnCode: \
     (int)returnCode contextInfo: (void *)contextInfo
 {
     if (returnCode == NSOKButton)
     {
-        /* output returned path to text-field */
-        [o_t7_fld_filePath setStringValue:[sheet filename]];
+        /* output returned path to text-field, add a / to the end if the user
+         * selected a folder */
+        if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
+            [o_t7_fld_filePath setStringValue: [NSString stringWithFormat: \
+                @"%@/", [sheet filename]]];
+        else
+            [o_t7_fld_filePath setStringValue:[sheet filename]];
     }
+    [sheet release];
 }
 
 @end
