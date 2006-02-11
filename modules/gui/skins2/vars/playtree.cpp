@@ -118,6 +118,8 @@ void Playtree::onChange()
 void Playtree::onUpdateItem( int id )
 {
     Iterator it = findById( id );
+    tree_update descr;
+    descr.b_active_item = false;
     if( it != end() )
     {
         // Update the item
@@ -125,12 +127,12 @@ void Playtree::onUpdateItem( int id )
         UString *pName = new UString( getIntf(), pNode->input.psz_name );
         it->m_cString = UStringPtr( pName );
         it->m_playing = m_pPlaylist->status.p_item == pNode;
+        if( it->m_playing ) descr.b_active_item = true;
     }
     else
     {
         msg_Warn(getIntf(), "Cannot find node with id %d", id );
     }
-    tree_update descr;
     descr.i_type = 0;
     notify( &descr );
 }

@@ -135,7 +135,8 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
 {
     if( arg->i_type == 0 ) // Item update
     {
-        autoScroll();
+        if( arg->b_active_item && arg->b_visible )
+            autoScroll();
         makeImage();
     }
     /// \todo handle delete in a more clever way
@@ -222,6 +223,52 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         {
             m_rTree.delSelected();
         }
+        else if( key == KEY_PAGEDOWN )
+        {
+            it = m_firstPos;
+            int i = maxItems()*1.5;
+            while( i >= 0 )
+            {
+                VarTree::Iterator it_old = it;
+                it = m_rTree.getNextVisibleItem( it );
+                /* End is already visible, dont' scroll */
+                if( it == m_rTree.end() )
+                {
+                    it = it_old;
+                    break;
+                }
+                needShow = true;
+                i--;
+            }
+            if( needShow )
+            {
+                ensureVisible( it );
+                makeImage();
+                notifyLayout();
+                return;
+            }
+        }
+        else if (key == KEY_PAGEUP )
+        {
+            it = m_firstPos;
+            int i = maxItems();
+            while( i >= maxItems()/2 )
+            {
+                it = m_rTree.getPrevVisibleItem( it );
+                /* End is already visible, dont' scroll */
+                if( it == m_rTree.begin() )
+                {
+                    break;
+                }
+                i--;
+            }
+            ensureVisible( it );
+            makeImage();
+            notifyLayout();
+            return;
+        }
+
+
         for( it = m_rTree.begin(); it != m_rTree.end();
              it = m_rTree.getNextVisibleItem( it ) )
         {

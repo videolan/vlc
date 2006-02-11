@@ -37,6 +37,7 @@ typedef struct tree_update
      int i_type;
      int i_parent;
      int i_id;
+     bool b_active_item;
      bool b_visible;
 } tree_update;
 
@@ -99,7 +100,8 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         VarTree *parent() { return m_pParent; }
         void checkParents( VarTree *pParent );
 
-        Iterator uncle();
+        Iterator next_uncle();
+        Iterator prev_uncle();
 
         /// Get root node
         VarTree *root()
@@ -138,6 +140,9 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
 
         /// Given an iterator to a visible item, return the next visible item
         Iterator getNextVisibleItem( Iterator it );
+
+        /// Given an it to a visible item, return the previous visible item
+        Iterator getPrevVisibleItem( Iterator it );
 
         /// Given an iterator to an item, return the next item
         Iterator getNextItem( Iterator it );

@@ -107,7 +107,7 @@ VarTree::ConstIterator VarTree::operator[]( int n ) const
 
 /* find iterator to next ancestor
  * ... which means parent++ or grandparent++ or grandgrandparent++ ... */
-VarTree::Iterator VarTree::uncle()
+VarTree::Iterator VarTree::next_uncle()
 {
     VarTree *p_parent = parent();
     if( p_parent != NULL )
@@ -138,6 +138,39 @@ VarTree::Iterator VarTree::uncle()
     /* if we didn't return before, it means that we've reached the end */
     return root()->end();
 }
+
+VarTree::Iterator VarTree::prev_uncle()
+{
+    VarTree *p_parent = parent();
+    if( p_parent != NULL )
+    {
+        VarTree *p_grandparent = p_parent->parent();
+        while( p_grandparent != NULL )
+        {
+            Iterator it = p_grandparent->end();
+            while( it != p_grandparent->begin() && &(*it) != p_parent ) it--;
+            if( it != p_grandparent->begin() )
+            {
+                it--;
+                if( it != p_grandparent->begin() )
+                {
+                    return it;
+                }
+            }
+            if( p_grandparent->parent() )
+            {
+                p_parent = p_grandparent;
+                p_grandparent = p_parent->parent();
+            }
+            else
+                p_grandparent = NULL;
+        }
+    }
+
+    /* if we didn't return before, it means that we've reached the end */
+    return root()->begin();
+}
+
 
 void VarTree::checkParents( VarTree *pParent )
 {
@@ -196,8 +229,33 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
         // Was 'it' the last brother? If so, look for uncles
         if( it_old->parent() && it_old->parent()->end() == it )
         {
-            it = it_old->uncle();
+            it = it_old->next_uncle();
         }
+    }
+    return it;
+}
+
+VarTree::Iterator VarTree::getPrevVisibleItem( Iterator it )
+{
+    VarTree::Iterator it_old = it;
+    if( it == root()->begin() || it == ++(root()->begin()) ) return it;
+    if( it->parent() )
+    {
+    }
+    /* Was it the first child of its parent ? */
+    if( it->parent() && it == it->parent()->begin() )
+    {
+        /* Yes, get previous uncle */
+        it = it_old->prev_uncle();
+   }
+    else
+        it--;
+
+    /* We have found an expanded uncle, take its last child */
+    while( it != root()->begin() && it->size() && it->m_expanded )
+    {
+            it = it->end();
+            it--;
     }
     return it;
 }
@@ -215,7 +273,7 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
         // Was 'it' the last brother? If so, look for uncles
         if( it_old->parent() && it_old->parent()->end() == it )
         {
-            it = it_old->uncle();
+            it = it_old->next_uncle();
         }
     }
     return it;
