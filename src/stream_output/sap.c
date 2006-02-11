@@ -369,7 +369,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             return VLC_ENOMEM;
         }
         p_address->psz_address = strdup( psz_addr );
-        p_address->i_wfd = net_ConnectUDP( p_sap, psz_addr, SAP_PORT, 0 );
+        p_address->i_wfd = net_ConnectUDP( p_sap, psz_addr, SAP_PORT, 255 );
         if( p_address->i_wfd != -1 )
         {
             char *ptr;
