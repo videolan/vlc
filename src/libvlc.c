@@ -112,7 +112,7 @@ static void ListModules   ( vlc_t * );
 static void Version       ( void );
 
 #ifdef WIN32
-static void ShowConsole   ( void );
+static void ShowConsole   ( vlc_bool_t );
 static void PauseConsole  ( void );
 #endif
 static int  ConsoleWidth  ( void );
@@ -587,7 +587,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_FALSE ) )
     {
 #ifdef WIN32
-        ShowConsole();
+        ShowConsole( VLC_FALSE );
         /* Pause the console because it's destroyed when we exit */
         fprintf( stderr, "The command line options couldn't be loaded, check "
                  "that they are valid.\n" );
@@ -2119,7 +2119,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 static void Help( vlc_t *p_this, char const *psz_help_name )
 {
 #ifdef WIN32
-    ShowConsole();
+    ShowConsole( VLC_TRUE );
 #endif
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
@@ -2442,7 +2442,7 @@ static void ListModules( vlc_t *p_this )
     memset( psz_spaces, ' ', 22 );
 
 #ifdef WIN32
-    ShowConsole();
+    ShowConsole( VLC_TRUE );
 #endif
 
     /* List all modules */
@@ -2482,7 +2482,7 @@ static void ListModules( vlc_t *p_this )
 static void Version( void )
 {
 #ifdef WIN32
-    ShowConsole();
+    ShowConsole( VLC_TRUE );
 #endif
 
     fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
@@ -2505,7 +2505,7 @@ static void Version( void )
  * This function is useful only on Win32.
  *****************************************************************************/
 #ifdef WIN32 /*  */
-static void ShowConsole( void )
+static void ShowConsole( vlc_bool_t b_dofile )
 {
 #   ifndef UNDER_CE
     FILE *f_help;
@@ -2517,7 +2517,7 @@ static void ShowConsole( void )
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
 
-    if( (f_help = fopen( "vlc-help.txt", "wt" )) )
+    if( b_dofile && (f_help = fopen( "vlc-help.txt", "wt" )) )
     {
         fclose( f_help );
         freopen( "vlc-help.txt", "wt", stdout );
