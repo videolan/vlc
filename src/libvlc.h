@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc.h: main libvlc header
  *****************************************************************************
- * Copyright (C) 1998-2005 VideoLAN (Centrale Réseaux) and its contributors
+ * Copyright (C) 1998-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -366,7 +366,7 @@ static char *ppsz_clock_descriptions[] =
 
 #define SERVER_PORT_TEXT N_("UDP port")
 #define SERVER_PORT_LONGTEXT N_( \
-    "This is the port used for UDP streams. By default, we chose 1234.")
+    "This is the port used for UDP streams. 1234 by default.")
 
 #define MTU_TEXT N_("MTU of the network interface")
 #define MTU_LONGTEXT N_( \
@@ -378,9 +378,14 @@ static char *ppsz_clock_descriptions[] =
     "Specify the hop limit (TTL) of the multicast packets sent by " \
     "the stream output.")
 
-#define MIFACE_TEXT N_("Multicast output interface")
+#define MIFACE_TEXT N_("IPv6 multicast output interface")
 #define MIFACE_LONGTEXT N_( \
     "Indicate here the multicast output interface. " \
+    "This overrides the routing table.")
+
+#define MIFACE_ADDR_TEXT N_("IPv4 multicast output interface address")
+#define MIFACE_ADDR_LONGTEXT N_( \
+    "Specify the IPv4 address of the networking interface. " \
     "This overrides the routing table.")
 
 #define INPUT_PROGRAM_TEXT N_("Program to select")
@@ -1328,7 +1333,8 @@ vlc_module_begin();
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
     add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
-    add_string( "miface-addr", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
+    add_string( "miface", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
+    add_string( "miface-addr", NULL, NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, VLC_TRUE );
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER );
     add_module( "packetizer","packetizer", NULL, NULL,

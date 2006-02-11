@@ -34,23 +34,17 @@
 
 #include <errno.h>
 
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #ifdef WIN32
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#   define if_nametoindex( str ) atoi( str )
+#else
+#   include <sys/types.h>
+#   include <unistd.h>
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
 #   include <netinet/in.h>
+#   include <net/if.h>
 #endif
 
 #include "network.h"
@@ -312,9 +306,7 @@ static int OpenUDP( vlc_object_t * p_this )
 
     if( *psz_server_addr )
     {
-        int ttl = p_socket->i_ttl;
-        if( ttl <= 0 )
-            ttl = config_GetInt( p_this, "ttl" );
+        int ttl;
 
         /* Build socket for remote connection */
         if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
@@ -334,9 +326,12 @@ static int OpenUDP( vlc_object_t * p_this )
         }
 
         /* Set the time-to-live */
+        ttl = p_socket->i_ttl;
+        if( ttl <= 0 )
+            ttl = config_GetInt( p_this, "ttl" );
+
         if( ttl > 0 )
         {
-#if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
             if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
             {
                 if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
@@ -347,13 +342,42 @@ static int OpenUDP( vlc_object_t * p_this )
                 }
             }
             else
-#endif
             {
                 if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
                                 (void *)&ttl, sizeof( ttl ) ) < 0 )
                 {
                     msg_Err( p_this, "failed to set unicast ttl (%s)",
                               strerror(errno) );
+                }
+            }
+        }
+
+        /* Set multicast output interface */
+        if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
+        {
+            char *psz_mif = config_GetPsz( p_this, "miface" );
+            if( psz_mif != NULL )
+            {
+                int intf = if_nametoindex( psz_mif );
+                free( psz_mif  );
+
+                if( intf != 0 )
+                {
+                    if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_MULTICAST_IF,
+                        &intf, sizeof( intf ) ) < 0 )
+                    {
+                        msg_Err( p_this, "%s as multicast interface: %s",
+                                 psz_mif, strerror(errno) );
+                        close( i_handle );
+                        return 0;
+                    }
+                }
+                else
+                {
+                    msg_Err( p_this, "%s: bad IPv6 interface spefication",
+                             psz_mif );
+                    close( i_handle );
+                    return 0;
                 }
             }
         }

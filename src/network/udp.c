@@ -1,7 +1,7 @@
 /*****************************************************************************
  * udp.c:
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
@@ -30,14 +30,8 @@
 
 #include <errno.h>
 
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
 #endif
 
 #include "network.h"
@@ -50,6 +44,10 @@
 #       define IP_ADD_MEMBERSHIP 5
 #   endif
 #   define EAFNOSUPPORT WSAEAFNOSUPPORT
+#   define if_nametoindex( str ) atoi( str )
+#else
+#   include <unistd.h>
+#   include <net/if.h>
 #endif
 
 #ifndef SOL_IP
@@ -109,42 +107,60 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
 }
 
 
-static int net_SetMcastSource( vlc_object_t *p_this,
-                                int fd, int family, const char *str )
+static int net_SetMcastIface( vlc_object_t *p_this,
+                              int fd, int family, const char *str )
 {
-#ifndef SYS_BEOS
     switch( family )
     {
+#ifndef SYS_BEOS
         case AF_INET:
         {
             struct in_addr addr;
 
             if( inet_pton( AF_INET, str, &addr) <= 0 )
             {
-                msg_Err( p_this, "Invalid multicast interface %s",
-                         str );
+                msg_Err( p_this, "Invalid multicast interface %s", str );
                 return VLC_EGENERIC;
             }
 
-            if( setsockopt( fd, IPPROTO_IP, IP_MULTICAST_IF, &addr,
+            if( setsockopt( fd, SOL_IP, IP_MULTICAST_IF, &addr,
                             sizeof( addr ) ) < 0 )
             {
-                msg_Dbg( p_this, "Cannot set multicast interface (%s)",
+                msg_Err( p_this, "Cannot use %s as multicast interface: %s",
                          strerror(errno) );
                 return VLC_EGENERIC;
             }
             break;
         }
+#endif /* SYS_BEOS */
 
 #ifdef IPV6_MULTICAST_IF
-/* FIXME: TODO */
+        case AF_INET6:
+        {
+            int scope = if_nametoindex( str );
+
+            if( scope == 0 )
+            {
+                msg_Err( p_this, "Invalid multicast interface %s", str );
+                return VLC_EGENERIC;
+            }
+
+            if( setsockopt( fd, SOL_IPV6, IPV6_MULTICAST_IF,
+                            &scope, sizeof( scope ) ) < 0 )
+            {
+                msg_Err( p_this, "Cannot use %s as multicast interface: %s",
+                         str, strerror( errno ) );
+                return VLC_EGENERIC;
+            }
+            break;
+        }
 #endif
+
         default:
             msg_Warn( p_this, "%s", strerror( EAFNOSUPPORT ) );
             return VLC_EGENERIC;
     }
 
-#endif
     return VLC_SUCCESS;
 }
 
@@ -183,7 +199,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
         int fd;
-        char *psz_mif_addr;
+        char *psz_mif;
 
         fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
                          ptr->ai_protocol );
@@ -212,11 +228,12 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         if( i_hlim > 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
-        psz_mif_addr = config_GetPsz( p_this, "miface-addr" );
-        if( psz_mif_addr != NULL )
+        psz_mif = config_GetPsz( p_this, (ptr->ai_family != AF_INET)
+                                            ? "miface" : "miface-addr" );
+        if( psz_mif != NULL )
         {
-            net_SetMcastSource( p_this, fd, ptr->ai_family, psz_mif_addr );
-            free( psz_mif_addr );
+            net_SetMcastIface( p_this, fd, ptr->ai_family, psz_mif );
+            free( psz_mif );
         }
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) == 0 )
