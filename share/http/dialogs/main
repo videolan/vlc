@@ -30,7 +30,7 @@ sout and playlist .
 <div id="main" class="dialog" >
   <div class="title">
     VLC media player
-    <button id="btn_toggle_text" onclick="toggle_btn_text();">
+    <button id="btn_toggle_text" onclick="toggle_btn_text();" title="Help" >
       <img src="images/help.png" alt="Help" />
       Help
     </button>
