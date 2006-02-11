@@ -26,6 +26,23 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include "charset.h"
+#include <stdio.h>
+
+/*****************************************************************************
+ * vlc_fopen: Calls fopen() after conversion of file name to OS locale
+ *****************************************************************************/
+FILE *vlc_fopen( const char *filename, const char *mode )
+{
+    const char *local_name = ToLocale( filename );
+
+    if( local_name != NULL )
+    {
+        FILE *stream = fopen( local_name, mode );
+        LocaleFree( local_name );
+        return stream;
+    }
+    return NULL;
+}
 
 /*****************************************************************************
  * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks

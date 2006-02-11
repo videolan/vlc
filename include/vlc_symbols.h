@@ -361,6 +361,7 @@ int intf_RunThread (intf_thread_t *);
 int httpd_StreamSend (httpd_stream_t *, uint8_t *p_data, int i_data);
 decoder_t * input_DecoderNew (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
 xml_t * __xml_Create (vlc_object_t *);
+FILE * vlc_fopen (const char *filename, const char *mode);
 void* vlc_HashRetrieve (hashtable_entry_t*, int, int, const char *);
 msg_subscription_t* __msg_Subscribe (vlc_object_t *, int);
 const char * VLC_Version (void);
@@ -925,6 +926,7 @@ struct module_symbols_t
     void (*vlc_HashInsert_inner) (hashtable_entry_t **, int *, int, const char *, void *);
     int (*vlc_HashLookup_inner) (hashtable_entry_t *, int, int, const char *);
     void* (*vlc_HashRetrieve_inner) (hashtable_entry_t*, int, int, const char *);
+    FILE * (*vlc_fopen_inner) (const char *filename, const char *mode);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1372,6 +1374,7 @@ struct module_symbols_t
 #  define vlc_HashInsert (p_symbols)->vlc_HashInsert_inner
 #  define vlc_HashLookup (p_symbols)->vlc_HashLookup_inner
 #  define vlc_HashRetrieve (p_symbols)->vlc_HashRetrieve_inner
+#  define vlc_fopen (p_symbols)->vlc_fopen_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1822,6 +1825,7 @@ struct module_symbols_t
     ((p_symbols)->vlc_HashInsert_inner) = vlc_HashInsert; \
     ((p_symbols)->vlc_HashLookup_inner) = vlc_HashLookup; \
     ((p_symbols)->vlc_HashRetrieve_inner) = vlc_HashRetrieve; \
+    ((p_symbols)->vlc_fopen_inner) = vlc_fopen; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
