@@ -1547,9 +1547,24 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
     if( id->p_encoder->fmt_out.video.i_width <= 0 &&
         id->p_encoder->fmt_out.video.i_height <= 0 && p_sys->f_scale )
     {
-        /* Apply the scaling */
+        /* Apply the scaling and round at the nearest 16. Don't allow 0 size */
         id->p_encoder->fmt_out.video.i_width = i_width * p_sys->f_scale;
+        if( id->p_encoder->fmt_out.video.i_width % 16 <= 7 &&
+            id->p_encoder->fmt_out.video.i_width >= 16 )
+            id->p_encoder->fmt_out.video.i_width -=
+                    id->p_encoder->fmt_out.video.i_width % 16;
+        else
+            id->p_encoder->fmt_out.video.i_width +=
+                    16 - id->p_encoder->fmt_out.video.i_width % 16;
+
         id->p_encoder->fmt_out.video.i_height = i_height * p_sys->f_scale;
+        if( id->p_encoder->fmt_out.video.i_height % 16 <= 7 &&
+            id->p_encoder->fmt_out.video.i_height >= 16 )
+            id->p_encoder->fmt_out.video.i_height -=
+                    id->p_encoder->fmt_out.video.i_height % 16;
+        else
+            id->p_encoder->fmt_out.video.i_height +=
+                    16 - id->p_encoder->fmt_out.video.i_height % 16;
     }
     else if( id->p_encoder->fmt_out.video.i_width > 0 &&
              id->p_encoder->fmt_out.video.i_height <= 0 )
