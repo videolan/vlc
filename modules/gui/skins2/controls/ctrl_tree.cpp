@@ -135,9 +135,12 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
 {
     if( arg->i_type == 0 ) // Item update
     {
-        if( arg->b_active_item && arg->b_visible )
+        if( arg->b_active_item )
+        {
             autoScroll();
-        makeImage();
+            ///\todo We should make image if we are visible in the view
+            makeImage();
+        }
     }
     /// \todo handle delete in a more clever way
     else if ( arg->i_type == 1 ) // Global change or deletion
