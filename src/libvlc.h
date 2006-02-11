@@ -376,7 +376,7 @@ static char *ppsz_clock_descriptions[] =
 #define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
     "Specify the hop limit (TTL) of the multicast packets sent by " \
-    "the stream output.")
+    "the stream output (0 = use operating system built-in default).")
 
 #define MIFACE_TEXT N_("IPv6 multicast output interface")
 #define MIFACE_LONGTEXT N_( \
@@ -1332,7 +1332,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_SOUT_ACO );
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
-    add_integer( "ttl", 1, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
+    add_integer( "ttl", 0, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
     add_string( "miface", NULL, NULL, MIFACE_TEXT, MIFACE_LONGTEXT, VLC_TRUE );
     add_string( "miface-addr", NULL, NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, VLC_TRUE );
 
