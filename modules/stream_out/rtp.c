@@ -355,7 +355,18 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "ttl", &val );
-    if( ( val.i_int > 255 ) || ( val.i_int < 0 ) )
+    if( val.i_int == 0 )
+    {
+        /* Normally, we should let the default hop limit up to the core,
+         * but we have to know it to build our SDP properly, which is why
+         * we ask the core. FIXME: broken when neither sout-rtp-ttl nor
+         * ttl are set. */
+        val.i_int = config_getInt( p_stream, "ttl" );
+    }
+    if( p_sys->i_ttl > 255 ) p_sys->i_ttl = 255;
+    /* must not exceed 999 once formatted */
+
+    if( p_sys->i_ttl < 0 )
     {
         msg_Err( p_stream, "illegal TTL %d", val.i_int );
         free( p_sys );
@@ -499,8 +510,7 @@ static int Open( vlc_object_t *p_this )
            RTP packets need to get the correct src IP address  */
         if( net_AddressIsMulticast( (vlc_object_t *)p_stream, p_sys->psz_destination ) )
         {
-            snprintf( psz_ttl, sizeof( psz_ttl ), "/%d", p_sys->i_ttl ? 
-                p_sys->i_ttl : config_GetInt( p_sout, "ttl" ) );
+            snprintf( psz_ttl, sizeof( psz_ttl ), "/%d", p_sys->i_ttl );
             psz_ttl[sizeof( psz_ttl ) - 1] = '\0';
         }
         else
@@ -804,8 +814,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
     if( net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ) )
     {
         /* Add the ttl if it is a multicast address */
-        p += sprintf( p, "/%d\r\n", p_sys->i_ttl ? p_sys->i_ttl :
-                config_GetInt( p_sout, "ttl" ) );
+        p += sprintf( p, "/%d\r\n", p_sys->i_ttl );
     }
     else
     {
@@ -1658,8 +1667,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                 httpd_MsgAdd( answer, "Transport",
                               "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
                               id->psz_destination, id->i_port,id->i_port+1,
-                              p_sys->i_ttl ? p_sys->i_ttl : 
-                              config_GetInt( p_sout, "ttl" ) );
+                              p_sys->i_ttl );
             }
             else if( strstr( psz_transport, "unicast" ) && strstr( psz_transport, "client_port=" ) )
             {
