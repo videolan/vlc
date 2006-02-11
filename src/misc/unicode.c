@@ -26,12 +26,15 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include "charset.h"
+
 #include <stdio.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 /*****************************************************************************
- * vlc_fopen: Calls fopen() after conversion of file name to OS locale
+ * utf8_fopen: Calls fopen() after conversion of file name to OS locale
  *****************************************************************************/
-FILE *vlc_fopen( const char *filename, const char *mode )
+FILE *utf8_fopen( const char *filename, const char *mode )
 {
 #if !defined WIN32 /*|| !defined UNICODE*/
     const char *local_name = ToLocale( filename );
@@ -54,6 +57,31 @@ FILE *vlc_fopen( const char *filename, const char *mode )
     return _wfopen( wpath, wmode );
 #endif
 }
+
+void *utf8_opendir( const char *dirname )
+{
+    const char *local_name = ToLocale( dirname );
+
+    if( local_name != NULL )
+    {
+        DIR *dir = opendir( local_name );
+        LocaleFree( local_name );
+        return dir;
+    }
+    return NULL;
+}
+
+const char *utf8_readdir( void *dir )
+{
+    struct dirent *ent;
+
+    ent = readdir( (DIR *)dir );
+    if( ent == NULL )
+        return NULL;
+
+    return FromLocale( ent->d_name );
+}
+
 
 /*****************************************************************************
  * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks
