@@ -66,6 +66,8 @@ Win32Loop::Win32Loop( intf_thread_t *pIntf ): OSLoop( pIntf )
     virtKeyToVlcKey[VK_RIGHT] = KEY_RIGHT;
     virtKeyToVlcKey[VK_UP] = KEY_UP;
     virtKeyToVlcKey[VK_DOWN] = KEY_DOWN;
+    virtKeyToVlcKey[VK_INSERT] = KEY_INSERT;
+    virtKeyToVlcKey[VK_DELETE] = KEY_DELETE;
     virtKeyToVlcKey[VK_HOME] = KEY_HOME;
     virtKeyToVlcKey[VK_END] = KEY_END;
     virtKeyToVlcKey[VK_PRIOR] = KEY_PAGEUP;
