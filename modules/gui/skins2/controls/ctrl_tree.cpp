@@ -138,6 +138,7 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
         autoScroll();
         makeImage();
     }
+    /// \todo handle delete in a more clever way
     else if ( arg->i_type == 1 ) // Global change or deletion
     {
         m_firstPos = m_rTree.begin();
@@ -145,14 +146,13 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
     }
     else if ( arg->i_type == 2 ) // Item-append
     {
-        /// \todo Check if the really is really visible in the view (we only check if it in the document)
+        /// \todo Check if the item is really visible in the view (we only check if it in the document)
         if( arg->b_visible == true )
         {
             makeImage();
         }
     }
     notifyLayout();
-    m_pLastSelected = NULL;
 }
 
 void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
