@@ -127,7 +127,7 @@ static int net_SetMcastIface( vlc_object_t *p_this,
                             sizeof( addr ) ) < 0 )
             {
                 msg_Err( p_this, "Cannot use %s as multicast interface: %s",
-                         strerror(errno) );
+                         str, strerror(errno) );
                 return VLC_EGENERIC;
             }
             break;
