@@ -1975,8 +1975,7 @@ static void LocaleInit( void )
          * Western Europeans are being favored for historical reasons.
          */
         psz_conv = strcmp( psz_charset, "ASCII" )
-            ? psz_charset
-            : "ISO-8859-15";
+            ? psz_charset : "CP1252";
 
         vlc_mutex_init( p_libvlc, &libvlc.from_locale_lock );
         vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
