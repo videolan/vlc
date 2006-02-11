@@ -416,16 +416,14 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 if( i_prio >= fuzzy.i_int )
                 {
                     FILE *f;
-                    char *psz_UTF8_path;
-                    char *psz_locale_path;
+                    char *psz_path;
 
-                    asprintf( &psz_UTF8_path, "%s%s", j < 0 ? f_dir : *subdirs, p_fixed_name );
-                    psz_locale_path = ToLocale( psz_UTF8_path );
+                    asprintf( &psz_path, "%s%s", j < 0 ? f_dir : *subdirs, p_fixed_name );
                     msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
-                    if( ( f = fopen( psz_locale_path, "rt" ) ) )
+		    /* FIXME: a portable wrapper for stat() or access() would be more suited */
+                    if( ( f = vlc_fopen( psz_path, "rt" ) ) )
                     {
                         fclose( f );
-                        LocaleFree( psz_locale_path );
                     msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
                         result[i_sub_count].priority = i_prio;
                         result[i_sub_count].psz_fname = psz_UTF8_path;
