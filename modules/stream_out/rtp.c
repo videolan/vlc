@@ -361,7 +361,7 @@ static int Open( vlc_object_t *p_this )
          * but we have to know it to build our SDP properly, which is why
          * we ask the core. FIXME: broken when neither sout-rtp-ttl nor
          * ttl are set. */
-        val.i_int = config_getInt( p_stream, "ttl" );
+        val.i_int = config_GetInt( p_stream, "ttl" );
     }
     if( p_sys->i_ttl > 255 ) p_sys->i_ttl = 255;
     /* must not exceed 999 once formatted */
@@ -454,6 +454,7 @@ static int Open( vlc_object_t *p_this )
         url[sizeof( url ) - 1] = '\0';
         /* FIXME: we should check that url is a numerical address, otherwise
          * the SDP will be quite broken (regardless of the IP protocol version)
+         * Also it might be IPv6 with no ':' if it is a DNS name.
          */
         ipv = ( strchr( p_sys->psz_destination, ':' ) != NULL ) ? '6' : '4';
 
@@ -814,7 +815,8 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
     if( net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ) )
     {
         /* Add the ttl if it is a multicast address */
-        p += sprintf( p, "/%d\r\n", p_sys->i_ttl );
+        /* FIXME: 1 is not a correct default value in the case of IPv6 */
+        p += sprintf( p, "/%d\r\n", p_sys->i_ttl ?: 1 );
     }
     else
     {
@@ -942,7 +944,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         char url[NI_MAXHOST + 8];
 
         /* first try to create the access out */
-        if( p_sys->i_ttl > 0 )
+        if( p_sys->i_ttl )
         {
             snprintf( access, sizeof( access ), "udp{raw,ttl=%d}",
                       p_sys->i_ttl );
@@ -1712,7 +1714,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                 }
 
                 /* first try to create the access out */
-                if( p_sys->i_ttl > 0 )
+                if( p_sys->i_ttl )
                     snprintf( psz_access, sizeof( psz_access ),
                               "udp{raw,ttl=%d}", p_sys->i_ttl );
                 else
