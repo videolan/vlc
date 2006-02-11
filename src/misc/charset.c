@@ -64,7 +64,7 @@ typedef struct VLCCharsetAlias
  * a lot of basic aliases (check it first by iconv -l).
  *
  */
-#if defined WIN32 || defined OS2 || !HAVE_LANGINFO_CODESET
+#if (defined OS2 || !HAVE_LANGINFO_CODESET) && !defined WIN32
 static const char* vlc_encoding_from_language( const char *l )
 {
     /* check for language (and perhaps country) codes */
@@ -202,7 +202,7 @@ static const char* vlc_charset_aliases( const char *psz_name )
 }
 
 /* Returns charset from "language_COUNTRY.charset@modifier" string */
-#if defined WIN32 || defined OS2 || !HAVE_LANGINFO_CODESET
+#if (defined OS2 || !HAVE_LANGINFO_CODESET) && !defined WIN32
 static void vlc_encoding_from_locale( char *psz_locale, char *psz_charset )
 {
     char *psz_dot = strchr( psz_locale, '.' );
