@@ -592,8 +592,16 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
 
                 if( b_even )
                 {
-                    p_dst[i_x * 2 + i_u_offset] = p_src2_u[i_x];
-                    p_dst[i_x * 2 + i_v_offset] = p_src2_v[i_x];
+                    if( p_trans[i_x+1] > 0xaa )
+                    {
+                        p_dst[i_x * 2 + i_u_offset] = (p_src2_u[i_x]+p_src2_u[i_x+1])>>1;
+                        p_dst[i_x * 2 + i_v_offset] = (p_src2_v[i_x]+p_src2_v[i_x+1])>>1;
+                    }
+                    else
+                    {
+                        p_dst[i_x * 2 + i_u_offset] = p_src2_u[i_x];
+                        p_dst[i_x * 2 + i_v_offset] = p_src2_v[i_x];
+                    }
                 }
             }
             else
@@ -605,10 +613,22 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
 
                 if( b_even )
                 {
-                    p_dst[i_x * 2 + i_u_offset] = ( (uint16_t)p_src2_u[i_x] * i_trans +
+                    uint16_t i_u = 0;
+                    uint16_t i_v = 0;
+                    if( p_trans[i_x+1] > 0xaa )
+                    {
+                        i_u = (p_src2_u[i_x]+p_src2_u[i_x+1])>>1;
+                        i_v = (p_src2_v[i_x]+p_src2_v[i_x+1])>>1;
+                    }
+                    else 
+                    {
+                        i_u = p_src2_u[i_x];
+                        i_v = p_src2_v[i_x];
+                    }
+                    p_dst[i_x * 2 + i_u_offset] = ( (uint16_t)i_u * i_trans +
                         (uint16_t)p_src1[i_x * 2 + i_u_offset] * (MAX_TRANS - i_trans) )
                         >> TRANS_BITS;
-                    p_dst[i_x * 2 + i_v_offset] = ( (uint16_t)p_src2_v[i_x] * i_trans +
+                    p_dst[i_x * 2 + i_v_offset] = ( (uint16_t)i_v * i_trans +
                         (uint16_t)p_src1[i_x * 2 + i_v_offset] * (MAX_TRANS - i_trans) )
                         >> TRANS_BITS;
                 }
@@ -800,8 +820,16 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
 
                 if( b_even )
                 {
-                    p_dst[i_x * 2 + i_u_offset] = p_pal[p_src2[i_x]][1];
-                    p_dst[i_x * 2 + i_v_offset] = p_pal[p_src2[i_x]][2];
+                    if( p_trans[i_x+1] > 0xaa )
+                    {
+                        p_dst[i_x * 2 + i_u_offset] = (p_pal[p_src2[i_x]][1] + p_pal[p_src2[i_x+1]][1]) >> 1;
+                        p_dst[i_x * 2 + i_v_offset] = (p_pal[p_src2[i_x]][2] + p_pal[p_src2[i_x+1]][2]) >> 1;
+                    }
+                    else
+                    {
+                        p_dst[i_x * 2 + i_u_offset] = p_pal[p_src2[i_x]][1];
+                        p_dst[i_x * 2 + i_v_offset] = p_pal[p_src2[i_x]][2];
+                    }
                 }
             }
             else
@@ -813,10 +841,23 @@ static void BlendPalYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
 
                 if( b_even )
                 {
-                    p_dst[i_x * 2 + i_u_offset] = ( (uint16_t)p_pal[p_src2[i_x]][1] *
+                    uint16_t i_u = 0;
+                    uint16_t i_v = 0;
+                    if( p_trans[i_x+1] > 0xaa )
+                    {
+                        i_u = (p_pal[p_src2[i_x]][1] + p_pal[p_src2[i_x+1]][1]) >> 1;
+                        i_v = (p_pal[p_src2[i_x]][2] + p_pal[p_src2[i_x+1]][2]) >> 1;
+                    }
+                    else 
+                    {
+                        i_u = p_pal[p_src2[i_x]][1];
+                        i_v = p_pal[p_src2[i_x]][2];
+                    }
+
+                    p_dst[i_x * 2 + i_u_offset] = ( (uint16_t)i_u *
                         i_trans + (uint16_t)p_src1[i_x * 2 + i_u_offset] *
                         (MAX_TRANS - i_trans) ) >> TRANS_BITS;
-                    p_dst[i_x * 2 + i_v_offset] = ( (uint16_t)p_pal[p_src2[i_x]][2] *
+                    p_dst[i_x * 2 + i_v_offset] = ( (uint16_t)i_v *
                         i_trans + (uint16_t)p_src1[i_x * 2 + i_v_offset] *
                         (MAX_TRANS - i_trans) ) >> TRANS_BITS;
                 }
