@@ -189,12 +189,9 @@ static const char* vlc_charset_aliases( const char *psz_name )
     VLCCharsetAlias aliases[] = {{NULL, NULL}};
 #endif
 
-    if( aliases )
-    {
-        for (a = aliases; a->psz_alias; a++)
-            if (strcasecmp (a->psz_alias, psz_name) == 0)
-                return a->psz_name;
-    }
+    for (a = aliases; a->psz_alias; a++)
+        if (strcasecmp (a->psz_alias, psz_name) == 0)
+            return a->psz_name;
 
     /* we return original name beacuse iconv() probably will know
      * something better about name if we don't know it :-) */
