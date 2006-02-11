@@ -165,19 +165,28 @@ static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
 static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 {
     xml_reader_t *p_reader;
-    char *p_buffer;
+    char *p_buffer, *p_new;
     int i_size, i_pos = 0, i_buffer = 2048;
     XTag *p_root;
 
     /* Open and read file */
     p_buffer = malloc( i_buffer );
-    if( p_buffer == NULL ) return NULL;
+    if( p_buffer == NULL ) {
+        msg_Err( p_xml, "ENOMEM: alloc buffer" );
+        return NULL;
+    }
 
     while( ( i_size = stream_Read( s, &p_buffer[i_pos], 2048 ) ) == 2048 )
     {
         i_pos += i_size;
         i_buffer += i_size;
-        p_buffer = realloc( p_buffer, i_buffer );
+        p_new = realloc( p_buffer, i_buffer );
+        if (!p_new) {
+            msg_Err( p_xml, "ENOMEM: realloc buffer" );
+            free( p_buffer );
+            return NULL;
+        }
+        p_buffer = p_new;
     }
     p_buffer[ i_pos + i_size ] = 0; /* 0 terminated string */
 
@@ -367,6 +376,7 @@ static void xlist_free( XList *list )
 #define X_SLASH       1<<6
 #define X_QMARK       1<<7
 #define X_DASH        1<<8
+#define X_EMARK       1<<9
 
 static int xtag_cin( char c, int char_class )
 {
@@ -377,8 +387,9 @@ static int xtag_cin( char c, int char_class )
     if( char_class & X_SQUOTE )     if( c == '\'' ) return VLC_TRUE;
     if( char_class & X_EQUAL )      if( c == '=' ) return VLC_TRUE;
     if( char_class & X_SLASH )      if( c == '/' ) return VLC_TRUE;
-    if( char_class & X_QMARK )      if( c == '!' ) return VLC_TRUE;
+    if( char_class & X_QMARK )      if( c == '?' ) return VLC_TRUE;
     if( char_class & X_DASH  )      if( c == '-' ) return VLC_TRUE;
+    if( char_class & X_EMARK )      if( c == '!' ) return VLC_TRUE;
 
     return VLC_FALSE;
 }
@@ -548,12 +559,59 @@ static XTag *xtag_parse_tag( XTagParser *parser )
     char *name;
     char *pcdata;
     char *s;
+	 int xi;
 
     if( !parser->valid ) return NULL;
 
-#if 0 /* Do we really want all the whitespace pcdata ? */
-    xtag_skip_whitespace( parser );
-#endif
+    s = parser->start;
+
+    /* if this starts a comment tag, skip until end */
+    if( (parser->end - parser->start) > 7 &&
+		  xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_EMARK ) &&
+        xtag_cin( s[2], X_DASH ) && xtag_cin( s[3], X_DASH ) )
+    {
+        parser->start = s = &s[4];
+        while( (xi = xtag_index( parser, X_DASH )) >= 0 )
+        {
+            parser->start = s = &s[xi+1];
+            if( xtag_cin( s[0], X_DASH ) && xtag_cin( s[1], X_CLOSETAG ) )
+            {
+                parser->start = &s[2];
+                xtag_skip_whitespace( parser );
+                return xtag_parse_tag( parser );
+            }
+        }
+        return NULL;
+    }
+
+    /* ignore processing instructions '<?' ... '?>' */
+    if( (parser->end - parser->start) > 4 &&
+		  xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_QMARK ) )
+    {
+        parser->start = s = &s[2];
+        while ((xi = xtag_index( parser, X_QMARK )) >= 0) {
+            if (xtag_cin( s[xi+1], X_CLOSETAG )) {
+                parser->start = &s[xi+2];
+                xtag_skip_whitespace( parser );
+                return xtag_parse_tag( parser );
+            }
+        }
+        return NULL;
+    }
+
+    /* ignore doctype  '<!DOCTYPE' ... '>' */
+    if ( (parser->end - parser->start) > 8 &&
+			!strncmp( s, "<!DOCTYPE", 9 ) ) {
+        xi = xtag_index( parser, X_CLOSETAG );
+        if ( xi > 0 ) {
+            parser->start = s = &s[xi+1];
+            xtag_skip_whitespace( parser );
+            return xtag_parse_tag( parser );
+        }
+        else {
+            return NULL;
+        }
+    }
 
     if( (pcdata = xtag_slurp_to( parser, X_OPENTAG, X_NONE )) != NULL )
     {
@@ -568,44 +626,34 @@ static XTag *xtag_parse_tag( XTagParser *parser )
         return tag;
     }
 
-    s = parser->start;
-
     /* if this starts a close tag, return NULL and let the parent take it */
     if( xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_SLASH ) )
         return NULL;
 
-    /* if this starts a comment tag, skip until end */
-    if( xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_QMARK ) &&
-        xtag_cin( s[2], X_DASH ) && xtag_cin( s[3], X_DASH ) )
-    {
-        int xi;
-
-        parser->start = s = &s[4];
-
-        while( (xi = xtag_index( parser, X_DASH )) >= 0 )
-        {
-            parser->start = s = &s[xi+1];
-
-            if( xtag_cin( s[0], X_DASH ) && xtag_cin( s[1], X_CLOSETAG ) )
-            {
-                parser->start = &s[2];
-                xtag_skip_whitespace( parser );
-                return xtag_parse_tag( parser );
+    /* parse CDATA content */
+    if ( (parser->end - parser->start) > 8 && 
+			!strncmp( s, "<![CDATA[", 9 ) ) {
+        parser->start = s = &s[9];
+        while (parser->end - s > 2) {
+            if (strncmp( s, "]]>", 3 ) == 0) {
+                if ( !(tag = malloc( sizeof(*tag))) ) return NULL;
+                if ( !(pcdata = malloc( sizeof(char)*(s - parser->start + 1))) ) return NULL;
+                strncpy( pcdata, parser->start, s - parser->start );
+                pcdata[s - parser->start]='\0';
+                parser->start = s = &s[3];
+                tag->name = NULL;
+                tag->pcdata = pcdata;
+                tag->parent = parser->current_tag;
+                tag->attributes = NULL;
+                tag->children = NULL;
+                tag->current_child = NULL;
+                return tag;
+            }
+            else {
+                s++;
             }
         }
-
         return NULL;
-    }
-
-    /* FIXME: if this starts a DOCTYPE tag, skip until end */
-    if( xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_QMARK ) )
-    {
-        int xi = xtag_index( parser, X_CLOSETAG );
-        if( xi <= 0 ) return NULL;
-
-        parser->start = &s[xi+1];
-        xtag_skip_whitespace( parser );
-        return xtag_parse_tag( parser );
     }
 
     if( !xtag_assert_and_pass( parser, X_OPENTAG ) ) return NULL;
@@ -670,12 +718,13 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 
         xtag_skip_whitespace( parser );
         xtag_assert_and_pass( parser, X_CLOSETAG );
-
+        xtag_skip_whitespace( parser );
     }
     else
     {
         xtag_assert_and_pass( parser, X_SLASH );
         xtag_assert_and_pass( parser, X_CLOSETAG );
+        xtag_skip_whitespace( parser );
     }
 
     return tag;
