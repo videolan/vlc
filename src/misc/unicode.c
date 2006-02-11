@@ -33,6 +33,7 @@
  *****************************************************************************/
 FILE *vlc_fopen( const char *filename, const char *mode )
 {
+#if !defined WIN32 /*|| !defined UNICODE*/
     const char *local_name = ToLocale( filename );
 
     if( local_name != NULL )
@@ -42,6 +43,16 @@ FILE *vlc_fopen( const char *filename, const char *mode )
         return stream;
     }
     return NULL;
+#else
+    wchar_t wpath[MAX_PATH];
+    wchar_t wmode[4];
+
+   if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH - 1)
+    || !MultiByteToWideChar( CP_ACP, 0, mode, -1, wmode, 3 ) )
+        return NULL;
+
+    return _wfopen( wpath, wmode );
+#endif
 }
 
 /*****************************************************************************
