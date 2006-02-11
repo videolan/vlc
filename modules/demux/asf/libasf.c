@@ -673,17 +673,27 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     asf_object_content_description_t *p_cd =
         (asf_object_content_description_t *)p_obj;
     uint8_t *p_peek, *p_data;
-    int i_peek;
-    int i_len, i_title, i_author, i_copyright, i_description, i_rating;
+    int i_peek, i_title, i_author, i_copyright, i_description, i_rating;
+    vlc_iconv_t cd = (vlc_iconv_t)-1;
+    char *ib = NULL;
+    char *ob = NULL;
+    size_t i_ibl, i_obl, i_len;
 
+    cd = vlc_iconv_open("UTF-8", "UTF-16LE");
+    if ( cd == (vlc_iconv_t)-1 ) {
+        msg_Err( s, "vlc_iconv_open failed" );
+        return VLC_EGENERIC;
+    }
+
+/* FIXME i_size*3 is the worst case. */
 #define GETSTRINGW( psz_str, i_size ) \
-   psz_str = calloc( i_size/2 + 1, sizeof( char ) ); \
-   for( i_len = 0; i_len < i_size/2; i_len++ ) \
-   { \
-       psz_str[i_len] = GetWLE( p_data + 2*i_len ); \
-   } \
-   psz_str[i_size/2] = '\0'; \
-   p_data += i_size;
+    psz_str = (char *)calloc( i_size*3+1, sizeof( char ) ); \
+    ib = (char *)p_data; \
+    ob = psz_str; \
+    i_ibl = i_size; \
+    i_obl = i_size*3; \
+    i_len = vlc_iconv(cd, &ib, &i_ibl, &ob, &i_obl); \
+    p_data += i_size;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_cd->i_object_size ) ) < 34 )
     {
@@ -714,6 +724,8 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
              p_cd->psz_description,
              p_cd->psz_rating );
 #endif
+
+    vlc_iconv_close(cd);
     return VLC_SUCCESS;
 }
 
