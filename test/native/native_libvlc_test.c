@@ -46,24 +46,37 @@ static PyObject *playlist_test( PyObject *self, PyObject *args )
 {
     libvlc_instance_t *p_instance;
     char *argv[] = { "vlc", "--quiet" };
-    int i_id;
+    int i_id, i_playing, i_items;
 
     libvlc_exception_t exception;
     libvlc_exception_init( &exception );
 
     p_instance = libvlc_new( 2, argv, &exception );
 
+    /* Initial status */
     libvlc_playlist_play( p_instance, 0, 0, argv, &exception );
-
     ASSERT( libvlc_exception_raised( &exception ), 
             "Playlist empty and exception not raised" );
+    i_playing  = libvlc_playlist_isplaying( p_instance, &exception  );
+    ASSERT_EXCEPTION;
+    ASSERT( i_playing == 0, "Playlist shouldn't be running" );
+    i_items = libvlc_playlist_items_count( p_instance, &exception );
+    ASSERT_EXCEPTION;
+    ASSERT( i_items == 0, "Playlist should be empty" );
 
+    /* Add 1 item */
     libvlc_exception_clear( &exception );
     i_id = libvlc_playlist_add( p_instance, "test" , NULL , &exception );
-
     ASSERT_EXCEPTION;
-
     ASSERT( i_id > 0 , "Returned identifier is <= 0" );
+    i_items = libvlc_playlist_items_count( p_instance, &exception );
+    ASSERT_EXCEPTION;
+    ASSERT( i_items == 1, "Playlist should have 1 item" );
+    i_playing  = libvlc_playlist_isplaying( p_instance, &exception  );
+    ASSERT_EXCEPTION;
+    ASSERT( i_playing == 0, "Playlist shouldn't be running" );
+
+    /* */ 
     
     Py_INCREF( Py_None );
     return Py_None;

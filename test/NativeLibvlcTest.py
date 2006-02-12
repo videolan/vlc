@@ -5,11 +5,11 @@ import native_libvlc_test
 
 class NativeLibvlcTestCase( unittest.TestCase ):
     def testException( self ):
-        """Checks libvlc_exception"""
+        """[LibVLC] Checks libvlc_exception"""
     	native_libvlc_test.exception_test()
     def testStartup( self ):
-        """Checks creation/destroy of libvlc"""
+        """[LibVLC] Checks creation/destroy of libvlc"""
     	native_libvlc_test.create_destroy()
     def testPlaylist( self ):
-        """Checks basic playlist interaction"""
+        """[LibVLC] Checks basic playlist interaction"""
     	native_libvlc_test.playlist_test()

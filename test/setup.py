@@ -39,11 +39,21 @@ def get_ldflags():
 
 # To compile in a local vlc tree
 native_libvlc_test = Extension( 'native_libvlc_test',
-                sources = ['native_libvlc/native_libvlc_test.c'],
+                sources = ['native/libvlc.c'],
                 include_dirs = ['../include', '../', '/usr/win32/include' ],
                 extra_objects = [ '../lib/libvlc_pic.a' ],
                 extra_compile_args = get_cflags(),
        		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )
 
+native_stats_test = Extension( 'native_stats_test',
+                sources = ['native/stats.c'],
+                include_dirs = ['../include', '../', '/usr/win32/include' ],
+                extra_objects = [ '../lib/libvlc_pic.a' ],
+                extra_compile_args = get_cflags(),
+       		    extra_link_args = [ '-L../..' ]  + get_ldflags(),
+                )
+
+
 setup( name = 'native_libvlc_test' ,version = '1242', ext_modules = [ native_libvlc_test ] )
+setup( name = 'native_stats_test' ,version = '1242', ext_modules = [ native_stats_test ] )
