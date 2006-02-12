@@ -45,7 +45,6 @@ VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
     m_deleted( false ), m_readonly( readonly ),
     m_pData( pData ), m_pParent( pParent )
 {
-    fprintf( stderr, "Expanded is %i - RO %i\n", m_expanded, m_readonly );
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
     getPositionVar().set( 1.0 );
