@@ -17,6 +17,9 @@ static PyObject *exception_test( PyObject *self, PyObject *args )
      ASSERT( libvlc_exception_get_message( &exception), "No Message" );
      ASSERT( libvlc_exception_raised( &exception), "Exception not raised" );
 
+     libvlc_exception_clear( &exception );
+     ASSERT( !libvlc_exception_raised( &exception ), "Exception not cleared" );
+
      Py_INCREF( Py_None );
      return Py_None;
 }
@@ -52,11 +55,15 @@ static PyObject *playlist_test( PyObject *self, PyObject *args )
     libvlc_exception_init( &exception );
 
     p_instance = libvlc_new( 2, argv, &exception );
+    ASSERT_EXCEPTION;
 
     /* Initial status */
     libvlc_playlist_play( p_instance, 0, 0, argv, &exception );
     ASSERT( libvlc_exception_raised( &exception ), 
             "Playlist empty and exception not raised" );
+
+    libvlc_exception_clear( &exception );
+
     i_playing  = libvlc_playlist_isplaying( p_instance, &exception  );
     ASSERT_EXCEPTION;
     ASSERT( i_playing == 0, "Playlist shouldn't be running" );
