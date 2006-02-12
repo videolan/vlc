@@ -101,7 +101,7 @@ difficulty to understand how VLC skins work.</para>
 
 <para>XML is a markup language, like HTML. It won't be explained here any further, please use Google if you don't know what XML is. You'll see, it is rather easy to understand.</para>
 
-<para>The XML file used for the VLC skins follows a predefined DTD. You can find this DTD <link linkend="http://trac.videolan.org/vlc/file/trunk/share/skins2/skin.dtd">in VLC SVN</link>, and its reading is strongly advised, since it contains the default values used for the parameters. A skin that does not follow the DTD with which VLC was compiled won't be loaded by VLC (and it might even crash it...).</para>
+<para>The XML file used for the VLC skins follows a predefined DTD. You can find this DTD <ulink url="http://trac.videolan.org/vlc/file/trunk/share/skins2/skin.dtd">in VLC SVN</ulink>, and its reading is strongly advised, since it contains the default values used for the parameters. A skin that does not follow the DTD with which VLC was compiled won't be loaded by VLC (and it might even crash it...).</para>
 
 <para>For a better undestanding of what follows, you should have a look at the DTD <!--(the last version is available on <ulink url="FIXME">TODO</ulink>) -->and/or at an example of valid XML skin<!-- TODO: link to the current DTD -->.</para>
 
