@@ -790,7 +790,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     /* Acquire config file lock */
     vlc_mutex_lock( &p_this->p_vlc->config_lock );
 
-    file = fopen( psz_filename, "rt" );
+    file = utf8_fopen( psz_filename, "rt" );
     if( !file )
     {
         msg_Warn( p_this, "config file %s does not exist yet", psz_filename );
@@ -951,45 +951,16 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 /*****************************************************************************
  * config_CreateDir: Create configuration directory if it doesn't exist.
  *****************************************************************************/
-int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
+int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
 {
     if( !psz_dirname && !*psz_dirname ) return -1;
 
-#if defined( UNDER_CE )
-    {
-        wchar_t psz_new[ MAX_PATH ];
-        char psz_mod[MAX_PATH];
-        int i = 0;
-
-        /* Convert '/' into '\' */
-        while( *psz_dirname )
-        {
-            if( *psz_dirname == '/' ) psz_mod[i] = '\\';
-            else psz_mod[i] = *psz_dirname;
-            psz_dirname++;
-            i++;
-        }
-        psz_mod[i] = 0;
-
-        MultiByteToWideChar( CP_ACP, 0, psz_mod, -1, psz_new, MAX_PATH );
-        if( CreateDirectory( psz_new, NULL ) )
-        {
-            msg_Err( p_this, "could not create %s", psz_mod );
-        }
-    }
-
-#else
-#   if defined( WIN32 )
-    if( mkdir( psz_dirname ) && errno != EEXIST )
-#   else
-    if( mkdir( psz_dirname, 0755 ) && errno != EEXIST )
-#   endif
+    if( utf8_mkdir( psz_dirname ) && ( errno != EEXIST ) )
     {
         msg_Err( p_this, "could not create %s (%s)",
                  psz_dirname, strerror(errno) );
+        return -1;
     }
-
-#endif
 
     return 0;
 }
@@ -1070,7 +1041,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     msg_Dbg( p_this, "opening config file %s", psz_filename );
 
-    file = fopen( psz_filename, "rt" );
+    file = utf8_fopen( psz_filename, "rt" );
     if( !file )
     {
         msg_Warn( p_this, "config file %s does not exist yet", psz_filename );
@@ -1158,7 +1129,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
      * Save module config in file
      */
 
-    file = fopen( psz_filename, "wt" );
+    file = utf8_fopen( psz_filename, "wt" );
     if( !file )
     {
         msg_Warn( p_this, "could not open config file %s for writing",

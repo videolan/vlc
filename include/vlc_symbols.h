@@ -110,6 +110,7 @@ int __config_LoadCmdLine (vlc_object_t *, int *, char *[], vlc_bool_t);
 void __config_PutInt (vlc_object_t *, const char *, int);
 vlm_t * __vlm_New (vlc_object_t *);
 int __input_Preparse (vlc_object_t *, input_item_t *);
+int utf8_mkdir (const char *filename);
 int vlc_input_item_AddInfo (input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ...);
 void __msg_Unsubscribe (vlc_object_t *, msg_subscription_t *);
 void aout_DateSet (audio_date_t *, mtime_t);
@@ -437,8 +438,8 @@ void __config_ResetAll (vlc_object_t *);
 httpd_redirect_t * httpd_RedirectNew (httpd_host_t *, const char *psz_url_dst, const char *psz_url_src);
 playlist_item_t * playlist_LockItemGetById (playlist_t *, int);
 mtime_t date_Get (const date_t *);
-int aout_DecPlay (aout_instance_t *, aout_input_t *, aout_buffer_t *);
 int input_vaControl (input_thread_t *, int i_query, va_list);
+int aout_DecPlay (aout_instance_t *, aout_input_t *, aout_buffer_t *);
 mtime_t aout_FifoFirstDate (aout_instance_t *, aout_fifo_t *);
 vout_synchro_t * __vout_SynchroInit (vlc_object_t *, int);
 int vlc_alphasort (const struct dirent **a, const struct dirent **b);
@@ -937,6 +938,7 @@ struct module_symbols_t
     int (*utf8_stat_inner) (const char *filename, void *buf);
     int (*utf8_lstat_inner) (const char *filename, void *buf);
     char * (*FromLocaleDup_inner) (const char *);
+    int (*utf8_mkdir_inner) (const char *filename);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1390,6 +1392,7 @@ struct module_symbols_t
 #  define utf8_stat (p_symbols)->utf8_stat_inner
 #  define utf8_lstat (p_symbols)->utf8_lstat_inner
 #  define FromLocaleDup (p_symbols)->FromLocaleDup_inner
+#  define utf8_mkdir (p_symbols)->utf8_mkdir_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1846,6 +1849,7 @@ struct module_symbols_t
     ((p_symbols)->utf8_stat_inner) = utf8_stat; \
     ((p_symbols)->utf8_lstat_inner) = utf8_lstat; \
     ((p_symbols)->FromLocaleDup_inner) = FromLocaleDup; \
+    ((p_symbols)->utf8_mkdir_inner) = utf8_mkdir; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

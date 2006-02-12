@@ -208,7 +208,7 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 #define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
 
 /* internal only */
-int config_CreateDir( vlc_object_t *, char * );
+int config_CreateDir( vlc_object_t *, const char * );
 int config_AutoSaveConfigFile( vlc_object_t * );
 
 /*****************************************************************************

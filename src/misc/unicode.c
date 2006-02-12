@@ -308,6 +308,62 @@ FILE *utf8_fopen( const char *filename, const char *mode )
 #endif
 }
 
+/*****************************************************************************
+ * utf8_mkdir: Calls mkdir() after conversion of file name to OS locale
+ *****************************************************************************/
+int utf8_mkdir( const char *dirname )
+{
+#if defined( UNDER_CE ) || defined( WIN32 )
+    wchar_t wname[MAX_PATH];
+    char mod[MAX_PATH];
+    int i;
+
+    /* Convert '/' into '\' */
+    for( i = 0; *dirname; i++ )
+    {
+        if( i == MAX_PATH )
+            return -1; /* overflow */
+
+        if( *dirname == '/' )
+            mod[i] = '\\';
+        else
+            mod[i] = *dirname;
+        dirname++;
+
+    }
+    mod[i] = 0;
+
+    if( MultiByteToWideChar( CP_UTF8, 0, mod, -1, wname, MAX_PATH ) == 0 )
+    {
+        errno = ENOENT;
+        return -1;
+    }
+
+    if( CreateDirectoryW( wname, NULL ) == 0 )
+    {
+        if( GetLastError( ) == ERROR_ALREADY_EXISTS )
+            errno = EEXIST;
+        errno = ENOENT;
+        return -1;
+    }
+    return 0;
+#else
+    char *locname = ToLocale( dirname );
+    int res;
+
+    if( locname == NULL )
+    {
+        errno = ENOENT;
+        return -1;
+    }
+    res = mkdir( locname, 0755 );
+
+    LocaleFree( locname );
+    return res;
+#endif
+}
+
+
 void *utf8_opendir( const char *dirname )
 {
     const char *local_name = ToLocale( dirname );
