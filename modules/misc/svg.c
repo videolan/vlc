@@ -166,7 +166,7 @@ static byte_t *svg_GetTemplate( vlc_object_t *p_this )
     else
     {
         /* Read the template */
-        file = fopen( psz_filename, "rt" );
+        file = utf8_fopen( psz_filename, "rt" );
         if( !file )
         {
             msg_Warn( p_this, "SVG template file %s does not exist.", psz_filename );
@@ -177,7 +177,7 @@ static byte_t *svg_GetTemplate( vlc_object_t *p_this )
             struct stat s;
             int i_ret;
 
-            i_ret = lstat( psz_filename, &s );
+            i_ret = utf8_stat( psz_filename, &s );
             if( i_ret )
             {
                 /* Problem accessing file information. Should not
@@ -185,8 +185,15 @@ static byte_t *svg_GetTemplate( vlc_object_t *p_this )
                 psz_template = NULL;
             }
             else
+            if( ((signed)s.st_size) < 0 )
             {
-                msg_Dbg( p_this, "Reading %ld bytes from template %s\n", ( long )s.st_size, psz_filename );
+                msg_Err( p_this, "SVG template too big" );
+                psz_template = NULL;
+            }
+            else
+            {
+                msg_Dbg( p_this, "Reading %ld bytes from template %s",
+                         (unsigned long)s.st_size, psz_filename );
 
                 psz_template = malloc( s.st_size + 42 );
                 if( !psz_template )
