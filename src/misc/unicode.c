@@ -200,13 +200,13 @@ char *FromLocale( const char *locale )
 char *FromLocaleDup( const char *locale )
 {
 #if defined (ASSUME_UTF8)
-	return strdup( locale );
+    return strdup( locale );
 #else
 # ifdef USE_ICONV
-	if (from_locale.hd == (vlc_iconv_t)(-1))
-		return strdup( locale );
+    if (from_locale.hd == (vlc_iconv_t)(-1))
+        return strdup( locale );
 # endif
-	return FromLocale( locale );
+    return FromLocale( locale );
 #endif
 }
 
