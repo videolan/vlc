@@ -2561,7 +2561,7 @@ dnl Trying with pkg-config
      dnl newer ffmpeg have a separate libpostproc
      PKG_CHECK_MODULES(POSPROC, libpostproc,[
        VLC_ADD_LDFLAGS([ffmpeg],[${POSTPROC_LIBS}]) 
-       ])
+       ],[ true ])
     ],[
      
     dnl
