@@ -4982,13 +4982,13 @@ fi
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl
-dnl  Python bindings
+dnl  Mediacontrol Python bindings
 dnl
-AC_ARG_ENABLE(python-bindings,
-  [  --enable-python-bindings    Enable Python bindings (default disabled)])
+AC_ARG_ENABLE(mediacontrol-python-bindings,
+  [  --enable-mediacontrol-python-bindings    Enable Python bindings for MediaControl (default disabled)])
 dnl TODO: look for python dev headers
-AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_python_bindings}" = "yes"])
-if test "${enable_python_bindings}" = "yes"
+AM_CONDITIONAL(BUILD_PYTHON, [test "${enable_mediacontrol_python_bindings}" = "yes"])
+if test "${enable_mediacontrol_python_bindings}" = "yes"
 then
   build_pic=yes
 fi
@@ -5211,7 +5211,7 @@ AC_CONFIG_FILES([
   activex/axvlc.inf
   bindings/Makefile
   bindings/java/Makefile
-  bindings/python/Makefile
+  bindings/mediacontrol-python/Makefile
   debian/Makefile
   doc/Makefile
   intl/Makefile
