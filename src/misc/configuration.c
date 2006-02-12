@@ -23,6 +23,7 @@
 
 #include <vlc/vlc.h>
 #include "vlc_keys.h"
+#include "charset.h"
 
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
@@ -1713,7 +1714,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
  *****************************************************************************/
 static char *GetDir( vlc_bool_t b_appdata )
 {
-    char *p_tmp, *p_homedir = NULL;
+    char *psz_localhome = NULL;
 
 #if defined(HAVE_GETPWUID)
     struct passwd *p_pw = NULL;
@@ -1745,21 +1746,18 @@ static char *GetDir( vlc_bool_t b_appdata )
                                                   _T("SHGetFolderPathA") );
         if ( SHGetFolderPath != NULL )
         {
-            p_homedir = (char *)malloc( MAX_PATH );
-            if( !p_homedir ) return NULL;
+            char psz_ACPhome[MAX_PATH];
 
             /* get the "Application Data" folder for the current user */
             if( S_OK == SHGetFolderPath( NULL,
                                          (b_appdata ? CSIDL_APPDATA :
                                            CSIDL_PROFILE) | CSIDL_FLAG_CREATE,
                                          NULL, SHGFP_TYPE_CURRENT,
-                                         p_homedir ) )
+                                         psz_ACPhome ) )
             {
                 FreeLibrary( shfolder_dll );
-                return p_homedir;
+                return FromLocaleDup( psz_ACPhome );
             }
-            free( p_homedir );
-            p_homedir = NULL;
         }
         FreeLibrary( shfolder_dll );
     }
@@ -1775,11 +1773,10 @@ static char *GetDir( vlc_bool_t b_appdata )
     /* get the "Application Data" folder for the current user */
     if( SHGetSpecialFolderPath( NULL, p_whomedir, CSIDL_APPDATA, 1 ) )
     {
-        p_homedir = (char *)malloc( MAX_PATH );
-        if( !p_homedir ) return NULL;
+        char psz_ACPhome[2 * MAX_PATH];
 
-        sprintf( p_homedir, "%ls", p_whomedir );
-        return p_homedir;
+        sprintf( psz_ACPhome, "%ls", p_whomedir );
+        return FromLocaleDup( p_ACPhome );
     }
 #endif
 
@@ -1787,24 +1784,20 @@ static char *GetDir( vlc_bool_t b_appdata )
     if( ( p_pw = getpwuid( getuid() ) ) == NULL )
 #endif
     {
-        if( ( p_tmp = getenv( "HOME" ) ) == NULL )
+        psz_localhome = getenv( "HOME" );
+        if( psz_localhome == NULL )
         {
-            if( ( p_tmp = getenv( "TMP" ) ) == NULL )
-            {
-                p_tmp = "/tmp";
-            }
+            psz_localhome = getenv( "TMP" );
+            if( psz_localhome == NULL )
+                psz_localhome = "/tmp";
         }
-
-        p_homedir = strdup( p_tmp );
     }
 #if defined(HAVE_GETPWUID)
     else
-    {
-        p_homedir = strdup( p_pw->pw_dir );
-    }
+        psz_localhome = p_pw->pw_dir;
 #endif
 
-    return p_homedir;
+    return FromLocaleDup( psz_localhome );
 }
 
 char *config_GetHomeDir( void )
