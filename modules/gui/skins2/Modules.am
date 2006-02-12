@@ -6,6 +6,8 @@ SOURCES_skins2 = \
 	commands/cmd_audio.cpp \
 	commands/cmd_audio.hpp \
 	commands/cmd_dummy.hpp \
+	commands/cmd_dvd.cpp \
+	commands/cmd_dvd.hpp \
 	commands/cmd_generic.hpp \
 	commands/cmd_change_skin.cpp \
 	commands/cmd_change_skin.hpp \

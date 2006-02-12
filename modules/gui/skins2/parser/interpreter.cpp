@@ -30,6 +30,7 @@
 #include "../commands/cmd_playtree.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_dummy.hpp"
+#include "../commands/cmd_dvd.hpp"
 #include "../commands/cmd_layout.hpp"
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_minimize.hpp"
@@ -60,6 +61,11 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "dialogs.fileInfo()", CmdDlgFileInfo )
     REGISTER_CMD( "dialogs.streamingWizard()", CmdDlgStreamingWizard )
     REGISTER_CMD( "dialogs.popup()", CmdDlgShowPopupMenu )
+    REGISTER_CMD( "dvd.nextTitle()", CmdDvdNextTitle )
+    REGISTER_CMD( "dvd.previousTitle()", CmdDvdPreviousTitle )
+    REGISTER_CMD( "dvd.nextChapter()", CmdDvdNextChapter )
+    REGISTER_CMD( "dvd.previousChapter()", CmdDvdPreviousChapter )
+    REGISTER_CMD( "dvd.rootMenu()", CmdDvdRootMenu )
     REGISTER_CMD( "playlist.load()", CmdDlgPlaylistLoad )
     REGISTER_CMD( "playlist.save()", CmdDlgPlaylistSave )
     REGISTER_CMD( "playlist.add()", CmdDlgAdd )
@@ -401,6 +407,7 @@ VarList *Interpreter::getVarList( const string &rName, Theme *pTheme )
     VarList *pVar = (VarList*)pVarManager->getVar( rName, "list" );
     return pVar;
 }
+
 
 VarTree *Interpreter::getVarTree( const string &rName, Theme *pTheme )
 {
