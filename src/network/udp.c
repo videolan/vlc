@@ -47,7 +47,9 @@
 #   define if_nametoindex( str ) atoi( str )
 #else
 #   include <unistd.h>
-#   include <net/if.h>
+#   ifdef HAVE_NET_IF_H
+#       include <net/if.h>
+#   endif
 #endif
 
 #ifndef SOL_IP
