@@ -856,10 +856,8 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
 	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
-	(cd $@;patch -p 0 <../Patches/ffmpeg-cvs.patch) 
 ifeq ($(HOST),i586-pc-beos)
-	patch -p 0 < Patches/ffmpeg-beos.patch.cvs
-	(cd $@; ./bootstrap)
+	(cd $@; patch -p 0 < ../Patches/ffmpeg-cvs-beos.patch)
 endif
 ifdef HAVE_WIN32
 	patch -p 0 < Patches/ffmpeg-cvs-win32.patch
@@ -887,7 +885,7 @@ ifdef HAVE_WINCE
 else
 .ffmpeg: ffmpeg .faac .lame
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && for dir in libavcodec/libpostproc libavcodec libavformat libavutil; do make -C $$dir && make -C $$dir installlib; done)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay && make install-libs install-headers)
 	touch $@
 
 CLEAN_FILE += .ffmpeg

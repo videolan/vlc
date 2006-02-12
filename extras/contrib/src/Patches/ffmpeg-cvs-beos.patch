@@ -1,0 +1,44 @@
+Index: configure
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/configure,v
+retrieving revision 1.248
+diff -u -r1.248 configure
+--- configure	11 Feb 2006 20:37:12 -0000	1.248
++++ configure	12 Feb 2006 15:57:44 -0000
+@@ -634,6 +634,18 @@
+   esac
+ done
+ 
++if [ "$cross_prefix" = "i586-pc-beos-" ]; then
++  CFLAGS="$CFLAGS -DPIC -fomit-frame-pointer -fno-expensive-optimizations"
++  SHFLAGS=-nostart
++  audio_oss="no"
++  v4l="no"
++  v4l2="no"
++  dv1394="no"
++  netserver="yes"
++  need_inet_aton="yes"
++  extralibs="-lnet"
++fi
++
+ # we need to build at least one lib type
+ if test "$lstatic" = "no" && test "$lshared" = "no" ; then
+     cat <<EOF
+Index: libavformat/movenc.c
+===================================================================
+RCS file: /cvsroot/ffmpeg/ffmpeg/libavformat/movenc.c,v
+retrieving revision 1.52
+diff -u -r1.52 movenc.c
+--- libavformat/movenc.c	11 Feb 2006 18:27:57 -0000	1.52
++++ libavformat/movenc.c	12 Feb 2006 15:57:44 -0000
+@@ -25,6 +25,10 @@
+ #undef NDEBUG
+ #include <assert.h>
+ 
++#ifndef UINT32_MAX
++#define UINT32_MAX 4294967295U
++#endif
++
+ #define MOV_INDEX_CLUSTER_SIZE 16384
+ #define globalTimescale 1000
+ 
