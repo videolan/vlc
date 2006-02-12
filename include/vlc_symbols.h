@@ -223,6 +223,7 @@ void __intf_UserProgressUpdate (vlc_object_t*, int, const char*, float);
 void __msg_Generic (vlc_object_t *, int, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 5, 6);
 int vlc_closedir_wrapper (void *);
 int playlist_ServicesDiscoveryAdd (playlist_t *, const char *);
+char * FromLocaleDup (const char *);
 void __stats_ComputeGlobalStats (vlc_object_t*,global_stats_t*);
 char * vlc_strndup (const char *s, size_t n);
 void vout_PlacePicture (vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int *);
@@ -935,6 +936,7 @@ struct module_symbols_t
     const char * (*utf8_readdir_inner) (void *dir);
     int (*utf8_stat_inner) (const char *filename, void *buf);
     int (*utf8_lstat_inner) (const char *filename, void *buf);
+    char * (*FromLocaleDup_inner) (const char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1387,6 +1389,7 @@ struct module_symbols_t
 #  define utf8_readdir (p_symbols)->utf8_readdir_inner
 #  define utf8_stat (p_symbols)->utf8_stat_inner
 #  define utf8_lstat (p_symbols)->utf8_lstat_inner
+#  define FromLocaleDup (p_symbols)->FromLocaleDup_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1842,6 +1845,7 @@ struct module_symbols_t
     ((p_symbols)->utf8_readdir_inner) = utf8_readdir; \
     ((p_symbols)->utf8_stat_inner) = utf8_stat; \
     ((p_symbols)->utf8_lstat_inner) = utf8_lstat; \
+    ((p_symbols)->FromLocaleDup_inner) = FromLocaleDup; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
