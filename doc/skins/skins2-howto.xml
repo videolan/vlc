@@ -862,6 +862,21 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>playlist.save()</emphasis>: Save the current playlist (since VLC 0.8.0).
   </para></listitem>
   <listitem><para>
+    <emphasis>dvd.nextTitle()</emphasis>: Go to the next title of the DVD (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>dvd.previousTitle()</emphasis>: Go to the previous title of the DVD (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>dvd.nextChapter()</emphasis>: Go to the next chapter of the DVD (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>dvd.previousTitle()</emphasis>: Go to the previous chapter of the DVD (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>dvd.rootMenu()</emphasis>: Go to the root menu of the DVD (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
     <emphasis>WindowID.show()</emphasis>: Show the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'.
   </para></listitem>
   <listitem><para>
