@@ -42,11 +42,6 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                                /* free() */
-#ifdef HAVE_ASSERT
-# include <assert.h>
-#else
-# define assert( c ) ((void)0)
-#endif
 
 #ifndef WIN32
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
@@ -102,8 +97,8 @@ static int AddIntfInternal( int i_object, char const *psz_module,
                              vlc_bool_t b_block, vlc_bool_t b_play,
                              int i_options, char **ppsz_options );
 
-static void LocaleInit( void );
-static void LocaleDeinit( void );
+void LocaleInit( vlc_object_t * );
+void LocaleDeinit( void );
 static void SetLanguage   ( char const * );
 static int  GetFilenames  ( vlc_t *, int, char *[] );
 static void Help          ( vlc_t *, char const *psz_help_name );
@@ -235,9 +230,6 @@ int VLC_Create( void )
         libvlc.p_module_bank = NULL;
 
         libvlc.b_ready = VLC_TRUE;
-
-        /* UTF-8 convertor are initialized after the locale */
-        libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)(-1);
     }
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc, "libvlc" );
@@ -329,7 +321,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * Global iconv, must be done after setlocale()
      * so that vlc_current_charset() works.
      */
-    LocaleInit();
+    LocaleInit( (vlc_object_t *)p_vlc );
 
     /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
@@ -478,8 +470,13 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
         /* Reset the default domain */
         SetLanguage( psz_language );
-        LocaleDeinit();
-        LocaleInit();
+
+        /* Should not be needed (otherwise, fixes should rather be
+         * attempted on vlc_current_charset().
+         * Also, if the locale charset is overriden, anything that has been
+         * translated until now would have to be retranslated. */
+        /*LocaleDeinit();
+        LocaleInit( (vlc_object_t *)p_vlc );*/
 
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
@@ -1962,47 +1959,6 @@ static int  AddIntfInternal( int i_object, char const *psz_module,
     return VLC_SUCCESS;
 };
 
-static void LocaleInit( void )
-{
-    char *psz_charset;
-
-    if( !vlc_current_charset( &psz_charset ) )
-    {
-        char *psz_conv = psz_charset;
-
-        /*
-         * Still allow non-ASCII characters when the locale is not set.
-         * Western Europeans are being favored for historical reasons.
-         */
-        psz_conv = strcmp( psz_charset, "ASCII" )
-            ? psz_charset : "CP1252";
-
-        vlc_mutex_init( p_libvlc, &libvlc.from_locale_lock );
-        vlc_mutex_init( p_libvlc, &libvlc.to_locale_lock );
-        libvlc.from_locale = vlc_iconv_open( "UTF-8", psz_charset );
-        libvlc.to_locale = vlc_iconv_open( psz_charset, "UTF-8" );
-        if( !libvlc.to_locale )
-        {
-            /* Not sure it is the right thing to do, but at least it
-             doesn't make vlc crash with msvc ! */
-            libvlc.to_locale = (vlc_iconv_t)(-1);
-        }
-    }
-    else
-        libvlc.from_locale = libvlc.to_locale = (vlc_iconv_t)(-1);
-    free( psz_charset );
-}
-
-static void LocaleDeinit( void )
-{
-    if( libvlc.to_locale != (vlc_iconv_t)(-1) )
-    {
-        vlc_mutex_destroy( &libvlc.from_locale_lock );
-        vlc_mutex_destroy( &libvlc.to_locale_lock );
-        vlc_iconv_close( libvlc.from_locale );
-        vlc_iconv_close( libvlc.to_locale );
-    }
-}
 
 /*****************************************************************************
  * SetLanguage: set the interface language.
@@ -2050,7 +2006,7 @@ static void SetLanguage ( char const *psz_lang )
         /* many code paths assume that float numbers are formatted according
          * to the US standard (ie. with dot as decimal point), so we keep
          * C for LC_NUMERIC. */
-        setlocale(LC_NUMERIC, "C" );
+        setlocale( LC_NUMERIC, "C" );
     }
 
     /* Specify where to find the locales for current domain */
@@ -2694,103 +2650,4 @@ static void InitDeviceValues( vlc_t *p_vlc )
         msg_Warn( p_vlc, "Unable to get HAL device properties" );
     }
 #endif
-}
-
-/*****************************************************************************
- * FromLocale: converts a locale string to UTF-8
- *****************************************************************************/
-char *FromLocale( const char *locale )
-{
-    if( locale == NULL )
-        return NULL;
-
-    if( libvlc.from_locale != (vlc_iconv_t)(-1) )
-    {
-        char *iptr = (char *)locale, *output, *optr;
-        size_t inb, outb;
-
-        /*
-         * We are not allowed to modify the locale pointer, even if we cast it
-         * to non-const.
-         */
-        inb = strlen( locale );
-        /* FIXME: I'm not sure about the value for the multiplication
-         * (for western people, multiplication by 3 (Latin9) is sufficient) */
-        outb = inb * 6 + 1;
-
-        optr = output = calloc( outb , 1);
-
-        vlc_mutex_lock( &libvlc.from_locale_lock );
-        vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
-
-        while( vlc_iconv( libvlc.from_locale, &iptr, &inb, &optr, &outb )
-                                                               == (size_t)-1 )
-        {
-            *optr++ = '?';
-            outb--;
-            iptr++;
-            inb--;
-            vlc_iconv( libvlc.from_locale, NULL, NULL, NULL, NULL );
-        }
-	vlc_mutex_unlock( &libvlc.from_locale_lock );
-
-        assert (inb == 0);
-        assert (*iptr == '\0');
-        assert (*optr == '\0');
-        assert (strlen( output ) == (size_t)(optr - output));
-        return realloc( output, optr - output + 1 );
-    }
-    return (char *)locale;
-}
-
-/*****************************************************************************
- * ToLocale: converts an UTF-8 string to locale
- *****************************************************************************/
-char *ToLocale( const char *utf8 )
-{
-    if( utf8 == NULL )
-        return NULL;
-
-    if( libvlc.to_locale != (vlc_iconv_t)(-1) )
-    {
-        char *iptr = (char *)utf8, *output, *optr;
-        size_t inb, outb;
-
-        /*
-         * We are not allowed to modify the locale pointer, even if we cast it
-         * to non-const.
-         */
-        inb = strlen( utf8 );
-        /* FIXME: I'm not sure about the value for the multiplication
-         * (for western people, multiplication is not needed) */
-        outb = inb * 2 + 1;
-
-        optr = output = calloc( outb, 1 );
-        vlc_mutex_lock( &libvlc.to_locale_lock );
-        vlc_iconv( libvlc.to_locale, NULL, NULL, NULL, NULL );
-
-        while( vlc_iconv( libvlc.to_locale, &iptr, &inb, &optr, &outb )
-                                                               == (size_t)-1 )
-        {
-            *optr++ = '?'; /* should not happen, and yes, it sucks */
-            outb--;
-            iptr++;
-            inb--;
-            vlc_iconv( libvlc.to_locale, NULL, NULL, NULL, NULL );
-        }
-        vlc_mutex_unlock( &libvlc.to_locale_lock );
-
-        assert (inb == 0);
-        assert (*iptr == '\0');
-        assert (*optr == '\0');
-        assert (strlen( output ) == (size_t)(optr - output));
-	return realloc( output, optr - output + 1 );
-    }
-    return (char *)utf8;
-}
-
-void LocaleFree( const char *str )
-{
-    if( ( str != NULL ) && ( libvlc.to_locale != (vlc_iconv_t)(-1) ) )
-        free( (char *)str );
 }

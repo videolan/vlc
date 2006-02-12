@@ -27,9 +27,233 @@
 #include <vlc/vlc.h>
 #include "charset.h"
 
+#ifdef HAVE_ASSERT
+# include <assert.h>
+#else
+# define assert( c ) ((void)0)
+#endif
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
+
+#ifdef __APPLE__
+/* Define this if the OS always use UTF-8 internally */
+# define ASSUME_UTF8 1
+#endif
+
+#if !(defined (WIN32) && defined (ASSUME_UTF8))
+# define USE_ICONV 1
+#endif
+
+#if defined (USE_ICONV) && !defined (HAVE_ICONV)
+# error No UTF8 charset conversion implemented on this platform!
+#endif
+
+
+
+#ifdef USE_ICONV
+static struct {
+    vlc_iconv_t hd;
+    vlc_mutex_t lock;
+} from_locale, to_locale;
+#endif
+
+void LocaleInit( vlc_object_t *p_this )
+{
+#ifdef USE_ICONV
+    char *psz_charset;
+
+    if( vlc_current_charset( &psz_charset ) )
+        /* UTF-8 */
+        from_locale.hd = to_locale.hd = (vlc_iconv_t)(-1);
+    else
+    {
+        /* not UTF-8 */
+        char *psz_conv = psz_charset;
+
+        /*
+         * Still allow non-ASCII characters when the locale is not set.
+         * Western Europeans are being favored for historical reasons.
+         */
+        psz_conv = strcmp( psz_charset, "ASCII" )
+                ? psz_charset : "ISO-8859-1";
+
+        vlc_mutex_init( p_this, &from_locale.lock );
+        vlc_mutex_init( p_this, &to_locale.lock );
+        from_locale.hd = vlc_iconv_open( "UTF-8", psz_charset );
+        to_locale.hd = vlc_iconv_open( psz_charset, "UTF-8" );
+    }
+
+    free( psz_charset );
+
+    assert( (from_locale.hd == (vlc_iconv_t)(-1))
+            == (to_locale.hd == (vlc_iconv_t)(-1)) );
+#else
+    (void)p_this;
+#endif
+}
+
+void LocaleDeinit( void )
+{
+#ifdef USE_ICONV
+    if( to_locale.hd != (vlc_iconv_t)(-1) )
+    {
+        vlc_iconv_close( to_locale.hd );
+        vlc_mutex_destroy( &to_locale.lock );
+    }
+
+    if( from_locale.hd != (vlc_iconv_t)(-1) )
+    {
+        vlc_iconv_close( from_locale.hd );
+        vlc_mutex_destroy( &from_locale.lock );
+    }
+#endif
+}
+
+#ifdef WIN32
+static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
+{
+    char *out;
+    int ilen = strlen( string ), olen = (4 / sizeof (wchar_t)) * ilen + 1;
+    wchar_t wide[olen];
+
+    ilen = MultiByteToWideChar( fromCP, 0, string, ilen + 1, wide, olen );
+    if( ilen == 0 )
+        return NULL;
+
+    olen = 4 * ilen + 1;
+    out = malloc( olen );
+
+    olen = WideCharToMultiByte( toCP, 0, wide, ilen, out, olen, NULL, NULL );
+    if( olen == 0 )
+    {
+        free( out );
+        return NULL;
+    }
+    return realloc( out, olen );
+}
+#endif
+
+/*****************************************************************************
+ * FromLocale: converts a locale string to UTF-8
+ *****************************************************************************/
+char *FromLocale( const char *locale )
+{
+    if( locale == NULL )
+        return NULL;
+
+#ifndef WIN32
+# ifdef USE_ICONV
+    if( from_locale.hd != (vlc_iconv_t)(-1) )
+    {
+        char *iptr = (char *)locale, *output, *optr;
+        size_t inb, outb;
+
+        /*
+         * We are not allowed to modify the locale pointer, even if we cast it
+         * to non-const.
+         */
+        inb = strlen( locale );
+        /* FIXME: I'm not sure about the value for the multiplication
+         * (for western people, multiplication by 3 (Latin9) is needed).
+         * While UTF-8 could reach 6 bytes, no existing code point exceeds
+         * 4 bytes. */
+        outb = inb * 4 + 1;
+
+        optr = output = malloc( outb );
+
+        vlc_mutex_lock( &from_locale.lock );
+        vlc_iconv( from_locale.hd, NULL, NULL, NULL, NULL );
+
+        while( vlc_iconv( from_locale.hd, &iptr, &inb, &optr, &outb )
+               == (size_t)-1 )
+        {
+            *optr++ = '?';
+            outb--;
+            iptr++;
+            inb--;
+            vlc_iconv( from_locale.hd, NULL, NULL, NULL, NULL );
+        }
+        vlc_mutex_unlock( &from_locale.lock );
+
+        assert (inb == 0);
+        assert (*iptr == '\0');
+        assert (*optr == '\0');
+        assert (strlen( output ) == (size_t)(optr - output));
+        return realloc( output, optr - output + 1 );
+    }
+# endif /* USE_ICONV */
+    return (char *)locale;
+#else /* WIN32 */
+    return MB2MB( locale, CP_ACP, CP_UTF8 );
+#endif
+}
+
+/*****************************************************************************
+ * ToLocale: converts an UTF-8 string to locale
+ *****************************************************************************/
+char *ToLocale( const char *utf8 )
+{
+    if( utf8 == NULL )
+        return NULL;
+
+#ifndef WIN32
+# ifdef USE_ICONV
+    if( to_locale.hd != (vlc_iconv_t)(-1) )
+    {
+        char *iptr = (char *)utf8, *output, *optr;
+        size_t inb, outb;
+
+        /*
+        * We are not allowed to modify the locale pointer, even if we cast it
+        * to non-const.
+        */
+        inb = strlen( utf8 );
+        /* FIXME: I'm not sure about the value for the multiplication
+        * (for western people, multiplication is not needed) */
+        outb = inb * 2 + 1;
+
+        optr = output = malloc( outb );
+        vlc_mutex_lock( &to_locale.lock );
+        vlc_iconv( to_locale.hd, NULL, NULL, NULL, NULL );
+
+        while( vlc_iconv( to_locale.hd, &iptr, &inb, &optr, &outb )
+               == (size_t)-1 )
+        {
+            *optr++ = '?'; /* should not happen, and yes, it sucks */
+            outb--;
+            iptr++;
+            inb--;
+            vlc_iconv( to_locale.hd, NULL, NULL, NULL, NULL );
+        }
+        vlc_mutex_unlock( &to_locale.lock );
+
+        assert (inb == 0);
+        assert (*iptr == '\0');
+        assert (*optr == '\0');
+        assert (strlen( output ) == (size_t)(optr - output));
+        return realloc( output, optr - output + 1 );
+    }
+# endif /* USE_ICONV */
+    return (char *)utf8;
+#else /* WIN32 */
+    return MB2MB( utf8, CP_UTF8, CP_ACP );
+#endif
+}
+
+void LocaleFree( const char *str )
+{
+#ifdef USE_ICONV
+    if( to_locale.hd == (vlc_iconv_t)(-1) )
+        return;
+#endif
+
+#ifndef ASSUME_UTF8
+    if( str != NULL )
+        free( (char *)str );
+#endif
+}
 
 /*****************************************************************************
  * utf8_fopen: Calls fopen() after conversion of file name to OS locale
