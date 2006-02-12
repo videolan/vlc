@@ -2576,10 +2576,11 @@ dnl Trying with pkg-config
         VLC_ADD_LDFLAGS([ffmpeg],[-lavutil])
         LDAVUTIL="-lavutil"])
 
+      AC_CHECK_LIB(postproc, pp_postprocess, [
+        VLC_ADD_LDFLAGS([ffmpeg],[-lpostproc])])
+
       AC_CHECK_LIB(avcodec, avcodec_init, [
         VLC_ADD_BUILTINS([ffmpeg])
-
-
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
         if test "${enable_sout}" != "no"; then
             VLC_ADD_BUILTINS([stream_out_switcher])
