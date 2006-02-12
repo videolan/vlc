@@ -240,8 +240,9 @@ void VlcProc::manage()
    // Update the input
     if( getIntf()->p_sys->p_input == NULL )
     {
-        getIntf()->p_sys->p_input = (input_thread_t *)vlc_object_find(
-            getIntf(), VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        getIntf()->p_sys->p_input = getIntf()->p_sys->p_playlist->p_input;
+        if( getIntf()->p_sys->p_input )
+            vlc_object_yield( getIntf()->p_sys->p_input );
     }
     else if( getIntf()->p_sys->p_input->b_dead )
     {

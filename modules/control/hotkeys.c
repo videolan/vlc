@@ -206,8 +206,15 @@ static void Run( intf_thread_t *p_intf )
         /* Update the input */
         if( p_intf->p_sys->p_input == NULL )
         {
-            p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                      FIND_ANYWHERE );
+            p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            if( p_playlist )
+            {
+                p_intf->p_sys->p_input = p_playlist->p_input;
+                if( p_intf->p_sys->p_input )
+                    vlc_object_yield( p_intf->p_sys->p_input );
+                vlc_object_release( p_playlist );
+            }
         }
         else if( p_intf->p_sys->p_input->b_dead )
         {
