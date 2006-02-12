@@ -2459,9 +2459,13 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
      AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
    fi
    if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-     dnl  The given libavcodec wasn't built with --enable-pp
-     AC_MSG_RESULT(no)
-     AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+     if test -f "${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a"; then
+       VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec/libpostproc ${real_ffmpeg_tree}/libavcodec/libpostproc/libpostproc.a])	
+     else
+       dnl  The given libavcodec wasn't built with --enable-pp
+       AC_MSG_RESULT(no)
+       AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+     fi
    fi
    dnl  Use a custom libffmpeg
    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
@@ -2554,7 +2558,10 @@ dnl Trying with pkg-config
      fi
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LDFLAGS([ffmpeg],[${FFMPEG_LIBS}])
-
+     dnl newer ffmpeg have a separate libpostproc
+     PKG_CHECK_MODULES(POSPROC, libpostproc,[
+       VLC_ADD_LDFLAGS([ffmpeg],[${POSTPROC_LIBS}]) 
+       ])
     ],[
      
     dnl
