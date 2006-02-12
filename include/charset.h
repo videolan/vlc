@@ -35,6 +35,8 @@ VLC_EXPORT( char *, ToLocale, ( const char * ) );
 VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) );
 VLC_EXPORT( void *, utf8_opendir, ( const char *dirname ) );
 VLC_EXPORT( const char *, utf8_readdir, ( void *dir ) );
+VLC_EXPORT( int, utf8_stat, ( const char *filename, void *buf ) );
+VLC_EXPORT( int, utf8_lstat, ( const char *filename, void *buf ) );
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( char *, FromUTF32, ( const wchar_t * ) );
 VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) );

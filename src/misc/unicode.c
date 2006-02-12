@@ -1,7 +1,7 @@
 /*****************************************************************************
  * unicode.c: UTF8 <-> locale functions
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
@@ -34,8 +34,15 @@
 #endif
 
 #include <stdio.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <dirent.h>
+#ifdef HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+#ifndef HAVE_LSTAT
+# define lstat( a, b ) stat(a, b)
+#endif
 
 #ifdef __APPLE__
 /* Define this if the OS always use UTF-8 internally */
@@ -190,6 +197,20 @@ char *FromLocale( const char *locale )
 #endif
 }
 
+char *FromLocaleDup( const char *locale )
+{
+#if defined (ASSUME_UTF8)
+	return strdup( locale );
+#else
+# ifdef USE_ICONV
+	if (from_locale.hd == (vlc_iconv_t)(-1))
+		return strdup( locale );
+# endif
+	return FromLocale( locale );
+#endif
+}
+
+
 /*****************************************************************************
  * ToLocale: converts an UTF-8 string to locale
  *****************************************************************************/
@@ -269,14 +290,19 @@ FILE *utf8_fopen( const char *filename, const char *mode )
         LocaleFree( local_name );
         return stream;
     }
+    else
+        errno = ENOENT;
     return NULL;
 #else
     wchar_t wpath[MAX_PATH];
     wchar_t wmode[4];
 
-   if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH - 1)
-    || !MultiByteToWideChar( CP_ACP, 0, mode, -1, wmode, 3 ) )
+    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH - 1)
+     || !MultiByteToWideChar( CP_ACP, 0, mode, -1, wmode, 3 ) )
+    {
+        errno = ENOENT;
         return NULL;
+    }
 
     return _wfopen( wpath, wmode );
 #endif
@@ -292,6 +318,8 @@ void *utf8_opendir( const char *dirname )
         LocaleFree( local_name );
         return dir;
     }
+    else
+        errno = ENOENT;
     return NULL;
 }
 
@@ -306,6 +334,35 @@ const char *utf8_readdir( void *dir )
     return FromLocale( ent->d_name );
 }
 
+
+static int utf8_statEx( const char *filename, void *buf,
+                        vlc_bool_t deref )
+{
+#ifdef HAVE_SYS_STAT_H
+    const char *local_name = ToLocale( filename );
+
+    if( local_name != NULL )
+    {
+        int res = deref ? stat( local_name, (struct stat *)buf )
+                       : lstat( local_name, (struct stat *)buf );
+        LocaleFree( local_name );
+        return res;
+    }
+    errno = ENOENT;
+#endif
+    return -1;
+}
+
+
+int utf8_stat( const char *filename, void *buf)
+{
+    return utf8_statEx( filename, buf, VLC_TRUE );
+}
+
+int utf8_lstat( const char *filename, void *buf)
+{
+    return utf8_statEx( filename, buf, VLC_FALSE );
+}
 
 /*****************************************************************************
  * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks

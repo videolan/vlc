@@ -37,6 +37,7 @@ playlist_item_t * playlist_ItemGetByPos (playlist_t *, int);
 int playlist_Clear (playlist_t *);
 vout_thread_t * __vout_Create (vlc_object_t *, video_format_t *);
 void aout_FormatPrint (aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format);
+int utf8_stat (const char *filename, void *buf);
 void vlm_ScheduleDelete (vlm_t *, vlm_schedule_t *, const char *);
 void osd_ConfigUnload (vlc_object_t *, osd_menu_t **);
 void input_DecoderDelete (decoder_t *);
@@ -44,6 +45,7 @@ void __msg_Info (vlc_object_t *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3);
 int playlist_ViewDump (playlist_t *, playlist_view_t *);
 int __net_Select (vlc_object_t *p_this, int *pi_fd, v_socket_t **, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait);
 aout_instance_t * __aout_New (vlc_object_t *);
+int utf8_lstat (const char *filename, void *buf);
 const char * VLC_Compiler (void);
 void vout_DatePicture (vout_thread_t *, picture_t *, mtime_t);
 int __var_Type (vlc_object_t *, const char *);
@@ -360,8 +362,8 @@ char * mstrtime (char *psz_buffer, mtime_t date);
 void aout_FormatPrepare (audio_sample_format_t * p_format);
 void spu_DisplaySubpicture (spu_t *, subpicture_t *);
 int intf_RunThread (intf_thread_t *);
-int httpd_StreamSend (httpd_stream_t *, uint8_t *p_data, int i_data);
 decoder_t * input_DecoderNew (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
+int httpd_StreamSend (httpd_stream_t *, uint8_t *p_data, int i_data);
 xml_t * __xml_Create (vlc_object_t *);
 void* vlc_HashRetrieve (hashtable_entry_t*, int, int, const char *);
 msg_subscription_t* __msg_Subscribe (vlc_object_t *, int);
@@ -931,6 +933,8 @@ struct module_symbols_t
     void * (*utf8_opendir_inner) (const char *dirname);
     FILE * (*utf8_fopen_inner) (const char *filename, const char *mode);
     const char * (*utf8_readdir_inner) (void *dir);
+    int (*utf8_stat_inner) (const char *filename, void *buf);
+    int (*utf8_lstat_inner) (const char *filename, void *buf);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1381,6 +1385,8 @@ struct module_symbols_t
 #  define utf8_opendir (p_symbols)->utf8_opendir_inner
 #  define utf8_fopen (p_symbols)->utf8_fopen_inner
 #  define utf8_readdir (p_symbols)->utf8_readdir_inner
+#  define utf8_stat (p_symbols)->utf8_stat_inner
+#  define utf8_lstat (p_symbols)->utf8_lstat_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1834,6 +1840,8 @@ struct module_symbols_t
     ((p_symbols)->utf8_opendir_inner) = utf8_opendir; \
     ((p_symbols)->utf8_fopen_inner) = utf8_fopen; \
     ((p_symbols)->utf8_readdir_inner) = utf8_readdir; \
+    ((p_symbols)->utf8_stat_inner) = utf8_stat; \
+    ((p_symbols)->utf8_lstat_inner) = utf8_lstat; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
