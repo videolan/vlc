@@ -90,6 +90,24 @@ void libvlc_playlist_clear( libvlc_instance_t *p_instance,
     playlist_Clear( p_instance->p_playlist );
 }
 
+void libvlc_playlist_next( libvlc_instance_t *p_instance,
+                           libvlc_exception_t *p_exception )
+{
+    if( playlist_Next( p_instance->p_playlist ) != VLC_SUCCESS )
+    {
+        libvlc_exception_raise( p_exception, "Empty playlist" );
+    }
+}
+
+void libvlc_playlist_prev( libvlc_instance_t *p_instance,
+                           libvlc_exception_t *p_exception )
+{
+    if( playlist_Prev( p_instance->p_playlist ) != VLC_SUCCESS )
+    {
+        libvlc_exception_raise( p_exception, "Empty playlist" );
+    }
+}
+
 int libvlc_playlist_add( libvlc_instance_t *p_instance, const char *psz_uri,
                          const char *psz_name, libvlc_exception_t *p_exception )
 {
@@ -107,7 +125,27 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                             i_options );
 }
 
+int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
+                               libvlc_exception_t *p_exception )
+{
+    if( !p_instance->p_playlist )
+    {
+        libvlc_exception_raise( p_exception, "No playlist" );
+        return 0;
+    }
+    return playlist_IsPlaying( p_instance->p_playlist );
+}
 
+int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
+                                 libvlc_exception_t *p_exception )
+{
+    if( !p_instance->p_playlist )
+    {
+        libvlc_exception_raise( p_exception, "No playlist" );
+        return 0;
+    }
+    return p_instance->p_playlist->i_size;
+}
 
 libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
                                             libvlc_exception_t *p_exception )
