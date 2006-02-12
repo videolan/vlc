@@ -390,6 +390,10 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
+
+#if defined (MODULE_NAME_IS_i420_yuy2_mmx)
+    __asm__ __volatile__("emms" :: );
+#endif
 }
 
 /*****************************************************************************

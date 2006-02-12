@@ -1107,7 +1107,7 @@ SSE_MODULES=""
 ALTIVEC_MODULES="memcpyaltivec i420_yuy2_altivec"
 #ALTIVEC_MODULES="${ALTIVEC_MODULES} idctaltivec motionaltivec"
 
-if test "${enable_gprof}" != "yes" -a "${SYS}" != "darwin"
+if test "${enable_gprof}" != "yes"
 then
   MMX_MODULES="${MMX_MODULES} i420_yuy2_mmx"
 fi
