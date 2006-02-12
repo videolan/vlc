@@ -173,6 +173,12 @@ class VlcProc: public SkinObject
                                  vlc_value_t oldVal, vlc_value_t newVal,
                                  void *pParam );
 
+        /// Callback for item-change variable
+        static int onItemDelete( vlc_object_t *pObj, const char *pVariable,
+                                 vlc_value_t oldVal, vlc_value_t newVal,
+                                 void *pParam );
+
+
         /// Callback for playlist-current variable
         static int onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
                                      vlc_value_t oldVal, vlc_value_t newVal,

@@ -128,7 +128,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when a playlist item is deleted
     // TODO: properly handle item-deleted
     var_AddCallback( pIntf->p_sys->p_playlist, "item-deleted",
-                     onIntfChange, this );
+                     onItemDelete, this );
     // Called when the "interface shower" wants us to show the skin
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-show",
                      onIntfShow, this );
@@ -174,7 +174,7 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-append",
                      onItemAppend, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-deleted",
-                     onIntfChange, this );
+                     onItemDelete, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-show",
                      onIntfShow, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-current",
@@ -442,6 +442,31 @@ int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
 
     return VLC_SUCCESS;
 }
+
+int VlcProc::onItemDelete( vlc_object_t *pObj, const char *pVariable,
+                           vlc_value_t oldVal, vlc_value_t newVal,
+                           void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+
+    int i_id = newVal.i_int;
+
+    CmdGenericPtr ptrTree;
+    CmdPlaytreeDelete *pCmdTree = new CmdPlaytreeDelete( pThis->getIntf(),
+                                                         i_id);
+    ptrTree = CmdGenericPtr( pCmdTree );
+
+    // Create a playlist notify command (for old style playlist)
+    CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+    pQueue->push( ptrTree , false );
+
+    return VLC_SUCCESS;
+}
+
 
 
 

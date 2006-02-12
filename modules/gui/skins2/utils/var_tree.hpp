@@ -49,7 +49,7 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
 
         VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
                  const UStringPtr &rcString, bool selected, bool playing,
-                 bool expanded, void *pData );
+                 bool expanded,bool readonly, void *pData );
 
         virtual ~VarTree();
 
@@ -58,7 +58,8 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
 
         /// Add a pointer on string in the children's list
         virtual void add( int id, const UStringPtr &rcString, bool selected,
-                          bool playing, bool expanded, void *pData );
+                          bool playing, bool expanded, bool readonly,
+                          void *pData );
 
         /// Remove the selected item from the children's list
         virtual void delSelected();
@@ -72,7 +73,10 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         bool m_selected;
         bool m_playing;
         bool m_expanded;
+        bool m_deleted;
         void *m_pData;
+
+        inline bool isReadonly() { return m_readonly; };
 
         /// Get the number of children
         int size() const { return m_children.size(); }
@@ -100,6 +104,9 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         VarTree *parent() { return m_pParent; }
         void checkParents( VarTree *pParent );
 
+        /// Get next sibling
+        Iterator getNextSibling( Iterator );
+
         Iterator next_uncle();
         Iterator prev_uncle();
 
@@ -120,6 +127,11 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
             while( ( parent = parent->parent() ) != NULL )
                 depth++;
             return depth;
+        }
+
+        void removeChild( VarTree::Iterator item )
+        {
+            m_children.erase( item );
         }
 
         /// Execute the action associated to this item
@@ -159,6 +171,8 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
 
         /// Pointer to parent node
         VarTree *m_pParent;
+
+        bool m_readonly;
 
         /// Variable type
         static const string m_type;

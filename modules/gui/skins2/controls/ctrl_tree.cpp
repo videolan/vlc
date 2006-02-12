@@ -150,7 +150,22 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
     }
     else if ( arg->i_type == 2 ) // Item-append
     {
-        /// \todo Check if the item is really visible in the view (we only check if it in the document)
+        /// \todo Check if the item is really visible in the view
+        // (we only check if it in the document)
+        if( arg->b_visible == true )
+        {
+            makeImage();
+        }
+    }
+    else if( arg->i_type == 3 ) // item-del
+    {
+        /* Make sure firstPos and lastSelected are still valid */
+        while( m_firstPos->m_deleted && m_firstPos != m_rTree.root()->begin() )
+        {
+            m_firstPos = m_rTree.getPrevVisibleItem( m_firstPos );
+        }
+        if( m_firstPos->m_deleted ) m_firstPos = m_rTree.root()->begin();
+
         if( arg->b_visible == true )
         {
             makeImage();
@@ -453,27 +468,30 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                  string::npos )
         {
             it = findItemAtPos(yPos);
-            if( it->size() && xPos > (it->depth() - 1) * itemImageWidth()
-                && xPos < it->depth() * itemImageWidth() )
+            if( it != m_rTree.end() )
             {
-                // Fold/unfold the item
-                it->m_expanded = !it->m_expanded;
-                bChangedPosition = true;
-            }
-            else
-            {
-                // Unselect any previously selected item
-                VarTree::Iterator it2;
-                for( it2 = m_rTree.begin(); it2 != m_rTree.end();
-                     it2 = m_rTree.getNextVisibleItem( it2 ) )
+                if( it->size() && xPos > (it->depth() - 1) * itemImageWidth()
+                    && xPos < it->depth() * itemImageWidth() )
                 {
-                    it2->m_selected = false;
+                    // Fold/unfold the item
+                    it->m_expanded = !it->m_expanded;
+                    bChangedPosition = true;
                 }
-                // Select the new item
-                if( it != m_rTree.end() )
+                else
                 {
-                    it->m_selected = true;
-                    m_pLastSelected = &*it;
+                    // Unselect any previously selected item
+                    VarTree::Iterator it2;
+                    for( it2 = m_rTree.begin(); it2 != m_rTree.end();
+                         it2 = m_rTree.getNextVisibleItem( it2 ) )
+                    {
+                        it2->m_selected = false;
+                    }
+                    // Select the new item
+                    if( it != m_rTree.end() )
+                    {
+                        it->m_selected = true;
+                        m_pLastSelected = &*it;
+                    }
                 }
             }
         }
@@ -666,7 +684,10 @@ void CtrlTree::makeImage()
                     m_pImage->fillRect( 0, yPos, width, rectHeight,
                                         m_selColor );
                 }
-                it = m_rTree.getNextVisibleItem( it );
+                do
+                {
+                    it = m_rTree.getNextVisibleItem( it );
+                } while( it->m_deleted );
             }
         }
     }
@@ -683,7 +704,10 @@ void CtrlTree::makeImage()
             {
                 uint32_t color = ( it->m_selected ? m_selColor : bgColor );
                 m_pImage->fillRect( 0, yPos, width, rectHeight, color );
-                it = m_rTree.getNextVisibleItem( it );
+                do
+                {
+                    it = m_rTree.getNextVisibleItem( it );
+                } while( it->m_deleted );
             }
             else
             {
@@ -746,7 +770,9 @@ void CtrlTree::makeImage()
             yPos += (pText->getHeight() - ySrc );
             delete pText;
         }
+        do {
         it = m_rTree.getNextVisibleItem( it );
+        } while( it->m_deleted );
     }
 }
 

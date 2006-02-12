@@ -77,6 +77,26 @@ class CmdPlaytreeAppend: public CmdGeneric
         playlist_add_t * m_pAdd;
 };
 
+/// Command to notify the playtree of an item deletion
+class CmdPlaytreeDelete: public CmdGeneric
+{
+    public:
+        CmdPlaytreeDelete( intf_thread_t *pIntf, int i_id ) :
+            CmdGeneric( pIntf ), m_id( i_id ) {}
+        virtual ~CmdPlaytreeDelete() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playtree append"; }
+
+    private:
+        int m_id;
+};
+
+
+
 
 /// Command to set a text variable
 class CmdSetText: public CmdGeneric

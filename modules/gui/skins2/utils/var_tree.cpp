@@ -28,7 +28,8 @@ const string VarTree::m_type = "tree";
 
 VarTree::VarTree( intf_thread_t *pIntf )
     : Variable( pIntf ), m_id( 0 ), m_selected( false ), m_playing( false ),
-    m_expanded( false ), m_pData( NULL ), m_pParent( NULL )
+    m_expanded( false ), m_deleted( false ), m_readonly( false),
+    m_pData( NULL ), m_pParent( NULL )
 {
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
@@ -37,11 +38,14 @@ VarTree::VarTree( intf_thread_t *pIntf )
 
 VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
                   const UStringPtr &rcString, bool selected, bool playing,
-                  bool expanded, void *pData )
+                  bool expanded, bool readonly,
+                  void *pData )
     : Variable( pIntf ), m_id( id ), m_cString( rcString ),
     m_selected( selected ), m_playing( playing ), m_expanded( expanded ),
+    m_deleted( false ), m_readonly( readonly ),
     m_pData( pData ), m_pParent( pParent )
 {
+    fprintf( stderr, "Expanded is %i - RO %i\n", m_expanded, m_readonly );
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
     getPositionVar().set( 1.0 );
@@ -53,10 +57,12 @@ VarTree::~VarTree()
 }
 
 void VarTree::add( int id, const UStringPtr &rcString, bool selected,
-                   bool playing, bool expanded, void *pData )
+                   bool playing, bool expanded, bool readonly,
+                   void *pData )
 {
     m_children.push_back( VarTree( getIntf(), this, id, rcString, selected,
-                                   playing, expanded, pData ) );
+                                   playing, expanded, readonly,
+                                   pData ) );
 }
 
 void VarTree::delSelected()
@@ -103,6 +109,22 @@ VarTree::ConstIterator VarTree::operator[]( int n ) const
          i < n && it != end();
          it++, i++ );
     return it;
+}
+
+VarTree::Iterator VarTree::getNextSibling( VarTree::Iterator current )
+{
+    VarTree *p_parent = current->parent();
+    if( p_parent  && current != p_parent->end() )
+    {
+        Iterator it = current->parent()->begin();
+        while( it != p_parent->end() && it != current ) it++;
+        if( it != p_parent->end() )
+        {
+            it++;
+        }
+        return root()->end();
+    }
+    return root()->end();
 }
 
 /* find iterator to next ancestor

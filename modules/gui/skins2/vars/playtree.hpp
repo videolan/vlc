@@ -48,6 +48,9 @@ class Playtree: public VarTree
         /// Function called to notify playlist item  append
         void onAppend( playlist_add_t * );
 
+        /// Function called to notify playlist item delete
+        void onDelete( int );
+
         /// Items waiting to be appended
         int i_items_to_append;
 

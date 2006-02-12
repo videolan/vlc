@@ -71,6 +71,13 @@ void CmdPlaytreeAppend::execute()
     rVar.onAppend( m_pAdd );
 }
 
+void CmdPlaytreeDelete::execute()
+{
+    // Notify  the playtree variable
+    Playtree &rVar = VlcProc::instance( getIntf() )->getPlaytreeVar();
+    rVar.onDelete( m_id );
+}
+
 void CmdSetText::execute()
 {
     // Change the text variable

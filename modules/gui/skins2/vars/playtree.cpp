@@ -58,31 +58,49 @@ Playtree::~Playtree()
 
 void Playtree::delSelected()
 {
-    Iterator it;
-    for (it = begin(); it != end() ; it = getNextVisibleItem( it ) )
+    Iterator it = begin();
+    vlc_mutex_lock( &getIntf()->p_sys->p_playlist->object_lock );
+    for( it = begin(); it != end(); it = getNextVisibleItem( it ) )
     {
-        if( (*it).m_selected )
+        if( (*it).m_selected && !(*it).isReadonly() )
         {
-            playlist_item_t *p_item = (playlist_item_t *)(it->m_pData);
-            if( p_item->i_children == -1 )
-            {
-                playlist_LockDelete( getIntf()->p_sys->p_playlist,
-                                     p_item->input.i_id );
-            }
-            else
-            {
-                vlc_mutex_lock( &getIntf()->p_sys->p_playlist->object_lock );
-                playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
-                                     VLC_TRUE, VLC_FALSE );
-                vlc_mutex_unlock( &getIntf()->p_sys->p_playlist->object_lock );
-            }
+            (*it).m_deleted = true;
         }
     }
     /// \todo Do this better (handle item-deleted)
-    buildTree();
     tree_update descr;
-    descr.i_type = 1;
+    descr.i_type = 3;
     notify( &descr );
+    it = begin();
+    while( it != end() )
+    {
+        if( (*it).m_deleted )
+        {
+            VarTree::Iterator it2;
+            playlist_item_t *p_item = (playlist_item_t *)(it->m_pData);
+            if( p_item->i_children == -1 )
+            {
+                playlist_Delete( getIntf()->p_sys->p_playlist,
+                                     p_item->input.i_id );
+                it2 = getNextVisibleItem( it ) ;
+                it->parent()->removeChild( it );
+                it = it2;
+            }
+            else
+            {
+                playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
+                                     VLC_TRUE, VLC_FALSE );
+                it2 = getNextSibling( it );
+                it->parent()->removeChild( it );
+                it = it2;
+            }
+        }
+        else
+        {
+            it = getNextVisibleItem( it );
+        }
+    }
+    vlc_mutex_unlock( &getIntf()->p_sys->p_playlist->object_lock );
 }
 
 void Playtree::action( VarTree *pItem )
@@ -137,6 +155,23 @@ void Playtree::onUpdateItem( int id )
     notify( &descr );
 }
 
+/// \todo keep a list of "recently removed" to avoid looking up if we
+//  already removed it
+void Playtree::onDelete( int i_id )
+{
+    tree_update descr;
+    descr.i_id = i_id;
+    descr.i_type = 3;
+    Iterator item = findById( i_id ) ;
+    if( item != end() )
+    {
+        if( item->parent() )
+            item->parent()->removeChild( item );
+        descr.b_visible = item->parent() ? true : item->parent()->m_expanded;
+        notify( &descr );
+    }
+}
+
 void Playtree::onAppend( playlist_add_t *p_add )
 {
     i_items_to_append --;
@@ -152,7 +187,8 @@ void Playtree::onAppend( playlist_add_t *p_add )
             if( !p_item ) return;
             UString *pName = new UString( getIntf(), p_item->input.psz_name );
             node->add( p_add->i_item, UStringPtr( pName ),
-                      false,false, false, p_item );
+                      false,false, false, p_item->i_flags & PLAYLIST_RO_FLAG,
+                      p_item );
         }
     }
     tree_update descr;
@@ -172,7 +208,8 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
         rTree.add( pNode->pp_children[i]->input.i_id, UStringPtr( pName ),
                      false,
                      m_pPlaylist->status.p_item == pNode->pp_children[i],
-                     false, pNode->pp_children[i] );
+                     false, pNode->pp_children[i]->i_flags & PLAYLIST_RO_FLAG,
+                     pNode->pp_children[i] );
         if( pNode->pp_children[i]->i_children )
         {
             buildNode( pNode->pp_children[i], rTree.back() );
