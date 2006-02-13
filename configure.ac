@@ -2559,7 +2559,7 @@ dnl Trying with pkg-config
      VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[${FFMPEG_CFLAGS}])
      VLC_ADD_LDFLAGS([ffmpeg],[${FFMPEG_LIBS}])
      dnl newer ffmpeg have a separate libpostproc
-     PKG_CHECK_MODULES(POSPROC, libpostproc,[
+     PKG_CHECK_MODULES(POSTPROC, libpostproc,[
        VLC_ADD_LDFLAGS([ffmpeg],[${POSTPROC_LIBS}]) 
        ],[ true ])
     ],[
