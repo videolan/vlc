@@ -44,6 +44,7 @@
 #ifndef HAVE_LSTAT
 # define lstat( a, b ) stat(a, b)
 #endif
+
 #ifdef __APPLE__
 /* Define this if the OS always use UTF-8 internally */
 # define ASSUME_UTF8 1
@@ -51,7 +52,6 @@
 
 #if !(defined (WIN32) || defined (UNDER_CE) || defined (ASSUME_UTF8))
 # define USE_ICONV 1
-#error use iconv 1
 #endif
 
 #if defined (USE_ICONV) && !defined (HAVE_ICONV)
