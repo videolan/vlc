@@ -43,6 +43,7 @@
 
 #include "vlc_vlm.h"
 #include "vlc_vod.h"
+#include "charset.h"
 
 #define FREE( p ) \
         if( p ) { free( p ); (p) = NULL; }
@@ -194,7 +195,7 @@ int vlm_Save( vlm_t *p_vlm, const char *psz_file )
 
     if( !p_vlm || !psz_file ) return 1;
 
-    file = fopen( psz_file, "wt" );
+    file = utf8_fopen( psz_file, "wt" );
     if( file == NULL ) return 1;
 
     psz_save = Save( p_vlm );
@@ -221,7 +222,7 @@ int vlm_Load( vlm_t *p_vlm, const char *psz_file )
 
     if( !p_vlm || !psz_file ) return 1;
 
-    file = fopen( psz_file, "r" );
+    file = utf8_fopen( psz_file, "r" );
     if( file == NULL ) return 1;
 
     if( fseek( file, 0, SEEK_END) != 0 )

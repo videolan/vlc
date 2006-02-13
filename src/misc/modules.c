@@ -1625,7 +1625,7 @@ static void CacheLoad( vlc_object_t *p_this )
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
-    file = fopen( psz_filename, "rb" );
+    file = utf8_fopen( psz_filename, "rb" );
     if( !file )
     {
         msg_Warn( p_this, "could not open plugins cache file %s for reading",
@@ -1947,7 +1947,7 @@ static void CacheSave( vlc_object_t *p_this )
 
     strcat( psz_filename, "/CACHEDIR.TAG" );
 
-    file = fopen( psz_filename, "wb" );
+    file = utf8_fopen( psz_filename, "wb" );
     if( file )
     {
         fwrite( psz_tag, 1, strlen(psz_tag), file );
@@ -1959,7 +1959,7 @@ static void CacheSave( vlc_object_t *p_this )
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
-    file = fopen( psz_filename, "wb" );
+    file = utf8_fopen( psz_filename, "wb" );
     if( !file )
     {
         msg_Warn( p_this, "could not open plugins cache file %s for writing",

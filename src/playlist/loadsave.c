@@ -31,6 +31,7 @@
 #include <vlc/input.h>
 
 #include "vlc_playlist.h"
+#include "charset.h"
 
 #define PLAYLIST_FILE_HEADER  "# vlc playlist file version 0.5"
 
@@ -126,7 +127,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
         msg_Err( p_playlist, "out of memory");
         return VLC_ENOMEM;
     }
-    p_export->p_file = fopen( psz_filename, "wt" );
+    p_export->p_file = utf8_fopen( psz_filename, "wt" );
     if( !p_export->p_file )
     {
         msg_Err( p_playlist , "could not create playlist file %s"

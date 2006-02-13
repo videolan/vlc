@@ -34,6 +34,7 @@
 #include <vlc/decoder.h>
 #include <vlc_filter.h>
 #include <vlc_image.h>
+#include <charset.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
                              video_format_t *, video_format_t * );
@@ -206,7 +207,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     FILE *file;
     int i_size;
 
-    file = fopen( psz_url, "rb" );
+    file = utf8_fopen( psz_url, "rb" );
     if( !file )
     {
         msg_Dbg( p_image->p_parent, "could not open file %s for reading",
@@ -344,7 +345,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
         p_fmt_out->i_chroma = Ext2Fourcc( psz_url );
     }
 
-    file = fopen( psz_url, "wb" );
+    file = utf8_fopen( psz_url, "wb" );
     if( !file )
     {
         msg_Dbg( p_image->p_parent, "could not open file %s for writing",

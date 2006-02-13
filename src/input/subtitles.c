@@ -420,11 +420,11 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
                     asprintf( &psz_path, "%s%s", j < 0 ? f_dir : *subdirs, p_fixed_name );
                     msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
-		    /* FIXME: a portable wrapper for stat() or access() would be more suited */
+                    /* FIXME: a portable wrapper for stat() or access() would be more suited */
                     if( ( f = utf8_fopen( psz_path, "rt" ) ) )
                     {
                         fclose( f );
-                    msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
+                        msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", p_fixed_name, i_prio );
                         result[i_sub_count].priority = i_prio;
                         result[i_sub_count].psz_fname = psz_path;
                         result[i_sub_count].psz_ext = strdup(tmp_fname_ext);

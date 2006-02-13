@@ -45,6 +45,7 @@
 #include "vlc_stream.h"
 #include "vlc_xml.h"
 #include "vlc_interaction.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Misc defines
@@ -1276,7 +1277,7 @@ void update_download_for_real( download_thread_t *p_this )
     else
     {
 
-        p_file = fopen( psz_dest, "w" );
+        p_file = utf8_fopen( psz_dest, "w" );
         if( !p_file )
         {
             msg_Err( p_vlc, "Failed to open %s for writing", psz_dest );

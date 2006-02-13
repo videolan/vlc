@@ -34,6 +34,7 @@
 #include <errno.h>
 
 #include "network.h"
+#include "charset.h"
 
 /* FIXME: rwlock on acl, but libvlc doesn't implement rwlock */
 typedef struct vlc_acl_entry_t
@@ -268,7 +269,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
     if( p_acl == NULL )
         return -1;
 
-    file = fopen( psz_path, "r" );
+    file = utf8_fopen( psz_path, "r" );
     if( file == NULL )
         return -1;
 
