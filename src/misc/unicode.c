@@ -49,7 +49,7 @@
 # define ASSUME_UTF8 1
 #endif
 
-#if !(defined (WIN32) && defined (ASSUME_UTF8))
+#if !(defined (WIN32) && defined (UNDER_CE) && defined (ASSUME_UTF8))
 # define USE_ICONV 1
 #endif
 
@@ -118,7 +118,7 @@ void LocaleDeinit( void )
 #endif
 }
 
-#ifdef WIN32
+#if defined (WIN32) || defined (UNDER_CE)
 static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
 {
     char *out;
@@ -150,7 +150,7 @@ char *FromLocale( const char *locale )
     if( locale == NULL )
         return NULL;
 
-#ifndef WIN32
+#if !(defined WIN32 || defined (UNDER_CE))
 # ifdef USE_ICONV
     if( from_locale.hd != (vlc_iconv_t)(-1) )
     {
@@ -219,7 +219,7 @@ char *ToLocale( const char *utf8 )
     if( utf8 == NULL )
         return NULL;
 
-#ifndef WIN32
+#if !(defined (WIN32) || defined (UNDER_CE))
 # ifdef USE_ICONV
     if( to_locale.hd != (vlc_iconv_t)(-1) )
     {
@@ -281,7 +281,7 @@ void LocaleFree( const char *str )
  *****************************************************************************/
 FILE *utf8_fopen( const char *filename, const char *mode )
 {
-#if !defined WIN32 /*|| !defined UNICODE*/
+#if !(defined (WIN32) || defined (UNDER_CE))
     const char *local_name = ToLocale( filename );
 
     if( local_name != NULL )
@@ -313,7 +313,7 @@ FILE *utf8_fopen( const char *filename, const char *mode )
  *****************************************************************************/
 int utf8_mkdir( const char *dirname )
 {
-#if defined( UNDER_CE ) || defined( WIN32 )
+#if defined (UNDER_CE) || defined (WIN32)
     wchar_t wname[MAX_PATH];
     char mod[MAX_PATH];
     int i;
