@@ -58,7 +58,6 @@ struct vout_sys_t
     VLCGLView         * o_glview;
     VLCVoutView       * o_vout_view;
     vlc_bool_t          b_saved_frame;
-    vlc_bool_t          b_accelerated;
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
     vlc_mutex_t         lock;
@@ -80,6 +79,13 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
 
+    if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
+    {
+        msg_Warn( p_vout, "no hardware acceleration" );
+        return( 1 );
+    }
+    msg_Dbg( p_vout, "display is Quartz Extreme accelerated" );
+
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
@@ -89,10 +95,6 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    p_vout->p_sys->b_accelerated  = CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay );
-    if( p_vout->p_sys->b_accelerated )
-        msg_Dbg( p_vout, "display is Quartz Extreme accelerated" );
-
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
     vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
@@ -101,6 +103,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     [p_vout->p_sys->o_glview autorelease];
 
     /* Spawn the window */
+
     if( !(p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
                     subView: p_vout->p_sys->o_glview frame: nil]) )
     {
@@ -238,8 +241,9 @@ static void Unlock( vout_thread_t * p_vout )
 
 - (id) initWithVout: (vout_thread_t *) vout
 {
-    NSOpenGLPixelFormat * fmt;
-    NSOpenGLPixelFormatAttribute attribs_accel[] =
+    p_vout = vout;
+
+    NSOpenGLPixelFormatAttribute attribs[] =
     {
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
@@ -249,21 +253,9 @@ static void Unlock( vout_thread_t * p_vout )
         NSOpenGLPFAWindow,
         0
     };
-    NSOpenGLPixelFormatAttribute attribs[] =
-    {
-        NSOpenGLPFANoRecovery,
-        NSOpenGLPFAColorSize, 24,
-        NSOpenGLPFAAlphaSize, 8,
-        NSOpenGLPFADepthSize, 24,
-        NSOpenGLPFAWindow,
-        0
-    };
 
-    p_vout = vout;
-
-    if( p_vout->p_sys->b_accelerated )
-        fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs_accel];
-    else  fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs];
+    NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
+        initWithAttributes: attribs];
 
     if( !fmt )
     {
