@@ -179,7 +179,7 @@ static int Open ( vlc_object_t *p_this )
 
     psz_vobname = strdup( p_demux->psz_path );
     i_len = strlen( psz_vobname );
-    memcpy( psz_vobname + i_len - 4, ".sub" );
+    memcpy( psz_vobname + i_len - 4, ".sub", 4 );
 
     /* open file */
     p_sys->p_vobsub_file = utf8_fopen( psz_vobname, "rb" );
