@@ -1801,10 +1801,10 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
                      strlen( p_tmp ) ) );
 
             psz_path = FromLocale( p_tmp );
-            strncpy( psz_tmp, sizeof( psz_tmp ) - 1, psz_path );
-            psz_tmp[sizeof( psz_tmp ) - 1] = '\0';
+            strncpy( p_tmp, psz_path, sizeof( p_tmp ) - 1 );
+            p_tmp[sizeof( p_tmp ) - 1] = '\0';
             LocaleFree( psz_path );
-            psz_path = psz_tmp;
+            psz_path = p_tmp;
         }
 
         if( shfolder_dll != NULL )
