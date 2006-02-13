@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tls.c
  *****************************************************************************
- * Copyright (C) 2004-2005 Rémi Denis-Courmont
+ * Copyright (C) 2004-2006 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
@@ -48,6 +48,7 @@
 
 
 #include "vlc_tls.h"
+#include "charset.h"
 
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>
@@ -336,7 +337,7 @@ gnutls_HandshakeAndValidate( tls_session_t *p_session )
         }
 
         gnutls_x509_crt_deinit( cert );
-        
+
         msg_Dbg( p_session, "x509 hostname verified" );
         return 0;
     }
@@ -416,7 +417,7 @@ is_regular( const char *psz_filename )
 #ifdef HAVE_SYS_STAT_H
     struct stat st;
 
-    return ( stat( psz_filename, &st ) == 0 )
+    return ( utf8_stat( psz_filename, &st ) == 0 )
         && S_ISREG( st.st_mode );
 #else
     return 1;
@@ -430,13 +431,12 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
                          vlc_bool_t private )
 {
     DIR* dir;
-    struct dirent *p_ent;
-    int i_len;
+    const char *psz_dirent;
 
     if( *psz_dirname == '\0' )
         psz_dirname = ".";
 
-    dir = opendir( psz_dirname );
+    dir = utf8_opendir( psz_dirname );
     if( dir == NULL )
     {
         msg_Warn( p_this, "Cannot open directory (%s) : %s", psz_dirname,
@@ -444,32 +444,32 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
         return VLC_EGENERIC;
     }
 
-    i_len = strlen( psz_dirname ) + 2;
-
-    while( ( p_ent = readdir( dir ) ) != NULL )
+    while( ( psz_dirent = utf8_readdir( dir ) ) != NULL )
     {
         char *psz_filename;
-
-        psz_filename = (char *)malloc( i_len + strlen( p_ent->d_name ) );
-        if( psz_filename == NULL )
+        int check = asprintf( &psz_filename, "%s/%s", psz_dirname,
+                              psz_dirent );
+        LocaleFree( psz_dirent );
+        if( check == -1 )
         {
             closedir( dir );
             return VLC_ENOMEM;
         }
 
-        sprintf( psz_filename, "%s/%s", psz_dirname, p_ent->d_name );
         /* we neglect the race condition here - not security sensitive */
         if( is_regular( psz_filename ) )
         {
             int i;
+            char *psz_localname = ToLocale( psz_filename );
 
             i = (private)
-                ? gnutls_certificate_set_x509_key_file( cred, psz_filename,
+                ? gnutls_certificate_set_x509_key_file( cred, psz_localname,
                                                         psz_filename,
                                                         GNUTLS_X509_FMT_PEM )
-                : gnutls_certificate_set_x509_trust_file( cred, psz_filename,
+                : gnutls_certificate_set_x509_trust_file( cred, psz_localname,
                                                           GNUTLS_X509_FMT_PEM
                                                           );
+            LocaleFree( psz_localname );
             if( i < 0 )
             {
                 msg_Warn( p_this, "Cannot add x509 certificate (%s) : %s",
@@ -503,7 +503,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     p_sys = (tls_client_sys_t *)malloc( sizeof(struct tls_client_sys_t) );
     if( p_sys == NULL )
         return NULL;
-   
+
     p_session = (struct tls_session_t *)vlc_object_create ( p_tls, sizeof(struct tls_session_t) );
     if( p_session == NULL )
     {
@@ -535,18 +535,14 @@ gnutls_ClientCreate( tls_t *p_tls )
     {
         /* FIXME: support for changing path/using multiple paths */
         char *psz_path;
-        const char *psz_homedir;
 
-        psz_homedir = p_tls->p_vlc->psz_homedir;
-        psz_path = (char *)malloc( strlen( psz_homedir )
-                                   + sizeof( CONFIG_DIR ) + 12 );
-        if( psz_path == NULL )
+        if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/certs",
+                      p_tls->p_vlc->psz_homedir ) == -1 )
         {
             gnutls_certificate_free_credentials( p_sys->x509_cred );
             goto error;
         }
 
-        sprintf( psz_path, "%s/"CONFIG_DIR"/ssl/certs", psz_homedir );
         gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
                                  psz_path, VLC_FALSE );
 
@@ -559,18 +555,14 @@ gnutls_ClientCreate( tls_t *p_tls )
     {
         /* FIXME: support for changing path/using multiple paths */
         char *psz_path;
-        const char *psz_homedir;
 
-        psz_homedir = p_tls->p_vlc->psz_homedir;
-        psz_path = (char *)malloc( strlen( psz_homedir )
-                                   + sizeof( CONFIG_DIR ) + 14 );
-        if( psz_path == NULL )
+        if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/private",
+                      p_tls->p_vlc->psz_homedir ) == -1 )
         {
             gnutls_certificate_free_credentials( p_sys->x509_cred );
             goto error;
         }
 
-        sprintf( psz_path, "%s/"CONFIG_DIR"/ssl/private", psz_homedir );
         gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
                                  psz_path, VLC_TRUE );
 
@@ -744,7 +736,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session = vlc_object_create( p_server, sizeof (struct tls_session_t) );
     if( p_session == NULL )
         return NULL;
-    
+
     p_session->p_sys = malloc( sizeof(struct tls_session_sys_t) );
     if( p_session->p_sys == NULL )
     {
@@ -850,14 +842,17 @@ gnutls_ServerDelete( tls_server_t *p_server )
 static int
 gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
 {
-    int val;
     tls_server_sys_t *p_sys;
+    char *psz_local_path;
+    int val;
 
     p_sys = (tls_server_sys_t *)(p_server->p_sys);
 
+    psz_local_path = ToLocale( psz_ca_path );
     val = gnutls_certificate_set_x509_trust_file( p_sys->x509_cred,
-                                                  psz_ca_path,
+                                                  psz_local_path,
                                                   GNUTLS_X509_FMT_PEM );
+    LocaleFree( psz_local_path );
     if( val < 0 )
     {
         msg_Err( p_server, "Cannot add trusted CA (%s) : %s", psz_ca_path,
@@ -883,11 +878,13 @@ static int
 gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
 {
     int val;
+    char *psz_local_path = ToLocale( psz_crl_path );
 
     val = gnutls_certificate_set_x509_crl_file( ((tls_server_sys_t *)
                                                 (p_server->p_sys))->x509_cred,
-                                                psz_crl_path,
+                                                psz_local_path,
                                                 GNUTLS_X509_FMT_PEM );
+    LocaleFree( psz_crl_path );
     if( val < 0 )
     {
         msg_Err( p_server, "Cannot add CRL (%s) : %s", psz_crl_path,
@@ -897,7 +894,7 @@ gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
     msg_Dbg( p_server, "%d CRL added (%s)", val, psz_crl_path );
     return VLC_SUCCESS;
 }
-    
+
 
 /*****************************************************************************
  * tls_ServerCreate:
@@ -911,6 +908,7 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
 {
     tls_server_t *p_server;
     tls_server_sys_t *p_sys;
+    char *psz_local_key, *psz_local_cert;
     int val;
 
     msg_Dbg( p_tls, "Creating TLS server" );
@@ -960,9 +958,13 @@ gnutls_ServerCreate( tls_t *p_tls, const char *psz_cert_path,
         goto error;
     }
 
+    psz_local_cert = ToLocale( psz_cert_path );
+    psz_local_key = ToLocale( psz_key_path );
     val = gnutls_certificate_set_x509_key_file( p_sys->x509_cred,
-                                                psz_cert_path, psz_key_path,
+                                                psz_local_cert, psz_local_key,
                                                 GNUTLS_X509_FMT_PEM );
+    LocaleFree( psz_cert_path );
+    LocaleFree( psz_key_path );
     if( val < 0 )
     {
         msg_Err( p_server, "Cannot set certificate chain or private key : %s",
