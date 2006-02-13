@@ -100,6 +100,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
     REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
     REGISTER_VAR( m_cVarEqPreamp, EqualizerPreamp, "equalizer.preamp" )
+    REGISTER_VAR( m_cVarDvdActive, VarBoolImpl, "dvd.isActive" )
 #undef REGISTER_VAR
     m_cVarStreamName = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
@@ -233,6 +234,7 @@ void VlcProc::manage()
     VarBoolImpl *pVarRandom = (VarBoolImpl*)m_cVarRandom.get();
     VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
     VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
+    VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
 
     // Refresh audio variables
     refreshAudio();
@@ -268,6 +270,12 @@ void VlcProc::manage()
         pVarPaused->set( status == PLAYLIST_PAUSED );
 
         pVarSeekable->set( pos.f_float != 0.0 );
+
+        // Refresh DVD detection
+        vlc_value_t chapters_count;
+        var_Change( pInput, "chapter", VLC_VAR_CHOICESCOUNT,
+                    &chapters_count, NULL );
+        pVarDvdActive->set( chapters_count.i_int > 0 );
     }
     else
     {
@@ -275,6 +283,7 @@ void VlcProc::manage()
         pVarPaused->set( false );
         pVarStopped->set( true );
         pVarSeekable->set( false );
+        pVarDvdActive->set( false );
         pTime->set( 0, false );
     }
 

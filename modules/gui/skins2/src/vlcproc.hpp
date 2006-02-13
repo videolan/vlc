@@ -123,6 +123,8 @@ class VlcProc: public SkinObject
         EqualizerBands m_varEqBands;
         VariablePtr m_cVarEqPreamp;
         VariablePtr m_cVarEqualizer;
+        /// Variable for DVD detection
+        VariablePtr m_cVarDvdActive;
 
         /// Set of handles of vout windows
         /**

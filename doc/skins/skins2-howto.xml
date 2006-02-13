@@ -861,7 +861,7 @@ difficulty to understand how VLC skins work.</para>
   <listitem><para>
     <emphasis>playlist.save()</emphasis>: Save the current playlist (since VLC 0.8.0).
   </para></listitem>
-  <listitem><para>
+  <listitem id="dvdactions"><para>
     <emphasis>dvd.nextTitle()</emphasis>: Go to the next title of the DVD (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
@@ -965,6 +965,9 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
   <listitem><para>
     <emphasis>playlist.isRepeat</emphasis>: True when the current playlist item is being repeated, false otherwise (since VLC 0.8.0).
+  </para></listitem>
+  <listitem><para>
+          <emphasis>dvd.isActive</emphasis>: True when a DVD is currently playing. This variable can be used to display buttons associated to the <link linkend="dvdactions">dvd.* actions</link> only when needed (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
     <emphasis>window_name.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "window_name" is visible, false otherwise.
