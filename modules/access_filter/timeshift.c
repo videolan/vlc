@@ -554,7 +554,7 @@ static char *GetTmpFilePath( access_t *p_access )
                 strcpy( psz_local_dir, "C:" );
         }
 
-        psz_dir = FromLocaleDup( MAX_PATH + 1 );
+        psz_dir = FromLocaleDup( psz_local_dir );
 
         /* remove last \\ if any */
         if( psz_dir[strlen(psz_dir)-1] == '\\' )
