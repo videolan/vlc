@@ -45,7 +45,7 @@
 # define ASSUME_UTF8 1
 #endif
 
-#if !(defined (WIN32) && defined (UNDER_CE) && defined (ASSUME_UTF8))
+#if !(defined (WIN32) || defined (UNDER_CE) || defined (ASSUME_UTF8))
 # define USE_ICONV 1
 #endif
 
