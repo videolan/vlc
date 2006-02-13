@@ -1747,7 +1747,7 @@ static char *GetDir( vlc_bool_t b_appdata )
         char psz_ACPhome[2 * MAX_PATH];
 
         sprintf( psz_ACPhome, "%ls", p_whomedir );
-        return FromLocaleDup( p_ACPhome );
+        return FromLocaleDup( psz_ACPhome );
     }
 #endif
 
