@@ -164,11 +164,9 @@ static int Open( vlc_object_t *p_this )
     {
         if( psz_name[0] == '~' && psz_name[1] == '/' )
         {
-            psz = malloc( strlen(p_access->p_vlc->psz_homedir)
-                           + strlen(psz_name) );
             /* This is incomplete : we should also support the ~cmassiot/
              * syntax. */
-            sprintf( psz, "%s/%s", p_access->p_vlc->psz_homedir, psz_name + 2 );
+            asprintf( &psz, "%s/%s", p_access->p_vlc->psz_homedir, psz_name + 2 );
             free( psz_name );
             psz_name = psz;
         }
@@ -186,15 +184,12 @@ static int Open( vlc_object_t *p_this )
 #endif
 
 #ifdef HAVE_SYS_STAT_H
-        psz = ToLocale( psz_name );
-        if( stat( psz, &stat_info ) )
+        if( utf8_stat( psz_name, &stat_info ) )
         {
             msg_Warn( p_access, "%s: %s", psz_name, strerror( errno ) );
-            LocaleFree( psz );
             free( psz_name );
             return VLC_EGENERIC;
         }
-        LocaleFree( psz );
 #endif
     }
 
@@ -607,13 +602,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
 static int _OpenFile( access_t * p_access, const char * psz_name )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    const char *psz_localname;
-
-    psz_localname = ToLocale( psz_name );
 
 #ifdef UNDER_CE
-    p_sys->fd = fopen( psz_localname, "rb" );
-    LocaleFree( psz_localname );
+    p_sys->fd = utf8_fopen( psz_name, "rb" );
     if ( !p_sys->fd )
     {
         msg_Err( p_access, "cannot open file %s", psz_name );
@@ -625,6 +616,12 @@ static int _OpenFile( access_t * p_access, const char * psz_name )
     p_access->info.i_update |= INPUT_UPDATE_SIZE;
     fseek( p_sys->fd, 0, SEEK_SET );
 #else
+    const char *psz_localname = ToLocale( psz_name );
+    if( psz_localname == NULL )
+    {
+        msg_Err( p_access, "incorrect file name %s", psz_name );
+        return VLC_EGENERIC;
+    }
 
     p_sys->fd = open( psz_localname, O_NONBLOCK /*| O_LARGEFILE*/ );
     LocaleFree( psz_localname );

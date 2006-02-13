@@ -91,13 +91,13 @@ static int DirectoryCheck( char *psz_dir )
 #ifdef HAVE_SYS_STAT_H
     struct stat   stat_info;
 
-    if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
+    if( utf8_stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
     {
         return VLC_EGENERIC;
     }
 #endif
 
-    if( ( p_dir = opendir( psz_dir ) ) == NULL )
+    if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
     {
         return VLC_EGENERIC;
     }
@@ -571,6 +571,7 @@ int  E_(HttpCallback)( httpd_file_sys_t *p_args,
     char **pp_data = (char **)_pp_data;
     FILE *f;
 
+    /* FIXME: do we need character encoding translation here ? */
     if( ( f = fopen( p_args->file, "r" ) ) == NULL )
     {
         Callback404( p_args, pp_data, pi_data );

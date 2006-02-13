@@ -156,7 +156,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_aout->output.p_sys->p_file = fopen( psz_name, "wb" );
+    p_aout->output.p_sys->p_file = utf8_fopen( psz_name, "wb" );
     free( psz_name );
     if ( p_aout->output.p_sys->p_file == NULL )
     {

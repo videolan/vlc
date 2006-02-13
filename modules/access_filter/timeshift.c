@@ -375,7 +375,7 @@ static int WriteBlockToFile( access_t *p_access, block_t *p_block )
 
         sprintf( p_sys->psz_filename, "%s%i.dat",
                  p_sys->psz_filename_base, p_sys->i_files );
-        file = fopen( p_sys->psz_filename, "w+b" );
+        file = utf8_fopen( p_sys->psz_filename, "w+b" );
 
         if( !file && p_sys->i_files < 2 )
         {

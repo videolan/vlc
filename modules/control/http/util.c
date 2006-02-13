@@ -109,7 +109,6 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
     struct stat   stat_info;
 #endif
     DIR           *p_dir;
-    struct dirent *p_dir_content;
     vlc_acl_t     *p_acl;
     FILE          *file;
 
@@ -127,13 +126,13 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 #endif
 
 #ifdef HAVE_SYS_STAT_H
-    if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
+    if( utf8_stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
     {
         return VLC_EGENERIC;
     }
 #endif
 
-    if( ( p_dir = opendir( psz_dir ) ) == NULL )
+    if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
     {
         msg_Err( p_intf, "cannot open dir (%s)", psz_dir );
         return VLC_EGENERIC;
@@ -149,7 +148,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
     msg_Dbg( p_intf, "dir=%s", psz_dir );
 
     sprintf( dir, "%s%c.access", psz_dir, sep );
-    if( ( file = fopen( dir, "r" ) ) != NULL )
+    if( ( file = utf8_fopen( dir, "r" ) ) != NULL )
     {
         char line[1024];
         int  i_size;
@@ -192,17 +191,20 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     for( ;; )
     {
+        char *psz_filename;
         /* parse psz_src dir */
-        if( ( p_dir_content = readdir( p_dir ) ) == NULL )
+        if( ( psz_filename = utf8_readdir( p_dir ) ) == NULL )
         {
             break;
         }
 
-        if( ( p_dir_content->d_name[0] == '.' )
-         || ( i_dirlen + strlen( p_dir_content->d_name ) > MAX_DIR_SIZE ) )
+        if( ( psz_filename[0] == '.' )
+         || ( i_dirlen + strlen( psz_filename ) > MAX_DIR_SIZE ) )
             continue;
 
-        sprintf( dir, "%s%c%s", psz_dir, sep, p_dir_content->d_name );
+        sprintf( dir, "%s%c%s", psz_dir, sep, psz_filename );
+        LocaleFree( psz_filename );
+
         if( E_(ParseDirectory)( p_intf, psz_root, dir ) )
         {
             httpd_file_sys_t *f = NULL;

@@ -1580,7 +1580,7 @@ static int WriteUserKey( void *_p_drms, uint32_t *p_user_key )
         snprintf( psz_path, PATH_MAX - 1, "%s/" DRMS_DIRNAME "/%08X.%03d",
                   p_drms->psz_homedir, p_drms->i_user, p_drms->i_key );
 
-        file = fopen( psz_path, "wb" );
+        file = utf8_fopen( psz_path, "wb" );
         if( file != NULL )
         {
             i_ret = fwrite( p_user_key, sizeof(uint32_t),
@@ -1608,7 +1608,7 @@ static int ReadUserKey( void *_p_drms, uint32_t *p_user_key )
               "%s/" DRMS_DIRNAME "/%08X.%03d", p_drms->psz_homedir,
               p_drms->i_user, p_drms->i_key );
 
-    file = fopen( psz_path, "rb" );
+    file = utf8_fopen( psz_path, "rb" );
     if( file != NULL )
     {
         i_ret = fread( p_user_key, sizeof(uint32_t),
@@ -1773,7 +1773,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
 {
     FILE *file;
     char *psz_path = NULL;
-    char p_tmp[ PATH_MAX ];
+    char p_tmp[ 4 * PATH_MAX ];
     int i_ret = -1;
 
     if( psz_ipod == NULL )
@@ -1799,7 +1799,12 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
             strncat( p_tmp, p_filename, min( strlen( p_filename ),
                      (sizeof(p_tmp)/sizeof(p_tmp[0]) - 1) -
                      strlen( p_tmp ) ) );
-            psz_path = p_tmp;
+
+            psz_path = FromLocale( p_tmp );
+            strncpy( psz_tmp, sizeof( psz_tmp ) - 1, psz_path );
+            psz_tmp[sizeof( psz_tmp ) - 1] = '\0';
+            LocaleFree( psz_path );
+            psz_path = psz_tmp;
         }
 
         if( shfolder_dll != NULL )
@@ -1828,7 +1833,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
         return -1;
     }
 
-    file = fopen( psz_path, "rb" );
+    file = utf8_fopen( psz_path, "rb" );
     if( file != NULL )
     {
         struct stat st;

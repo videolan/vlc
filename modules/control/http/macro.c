@@ -883,6 +883,8 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                         strcpy( psz_file, m.param1 );
                     }
 
+                    /* We hereby assume that psz_file is in the
+                     * local character encoding */
                     if( ( f = fopen( psz_file, "r" ) ) == NULL )
                     {
                         msg_Warn( p_args->p_intf,

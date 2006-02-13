@@ -158,7 +158,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Parse description file and allocate areas */
-    p_file = fopen( psz_descfilename, "r" );
+    p_file = utf8_fopen( psz_descfilename, "r" );
     if( !p_file )
     {
         msg_Err( p_this, "Failed to open descritpion file %s",

@@ -831,6 +831,8 @@ static void Run( intf_thread_t *p_intf )
     /* We write the IOR in a file. */
     {
         FILE* fp;
+        /* no need for Unicode transliteration as long as VLC_IOR_FILE
+          is pure ASCII */
         fp = fopen( VLC_IOR_FILE, "w" );
         if( fp == NULL )
         {
@@ -843,7 +845,7 @@ static void Run( intf_thread_t *p_intf )
             msg_Warn( p_intf, "IOR written to %s", VLC_IOR_FILE );
         }
     }
-  
+
     root_poa_manager = PortableServer_POA__get_the_POAManager( root_poa, ev );
     handle_exception( "Exception during POAManager resolution" );
 

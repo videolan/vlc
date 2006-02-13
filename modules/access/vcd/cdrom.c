@@ -858,7 +858,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
 
     /* Open the cue file and try to parse it */
     msg_Dbg( p_this,"trying .cue file: %s", psz_cuefile );
-    cuefile = fopen( psz_cuefile, "rt" );
+    cuefile = utf8_fopen( psz_cuefile, "rt" );
     if( cuefile && fscanf( cuefile, "FILE %c", line ) &&
         fgets( line, 1024, cuefile ) )
     {
