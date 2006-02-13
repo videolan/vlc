@@ -1,7 +1,7 @@
 /*****************************************************************************
  * record.c
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
@@ -357,7 +357,7 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
     if( !p_sys->f )
     {
         input_thread_t *p_input;
-        char *psz_name = NULL;
+        char *psz_name = NULL, *psz;
         time_t t = time(NULL);
         struct tm l;
 
@@ -402,6 +402,23 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
                   p_sys->psz_ext );
 
         free( psz_name );
+
+        /* Remove all forbidden characters (except (back)slashes) */
+        for( psz = p_sys->psz_file; *psz; psz++ )
+        {
+            unsigned char c = (unsigned char)*psz;
+
+            /* Even if many OS accept non printable characters, we remove
+             * them to avoid confusing users */
+            if( ( c < 32 ) || ( c == 127 ) )
+                *psz = '_';
+#if defined (WIN32) || defined (UNDER_CE)
+            /* Windows has a lot of forbidden characters, even if it has
+             * fewer than DOS. */
+            if( strchr( "\"*:<>?|", c ) != NULL )
+                *psz = '_';
+#endif
+        }
 
         msg_Dbg( p_access, "dump in file '%s'", p_sys->psz_file );
 
