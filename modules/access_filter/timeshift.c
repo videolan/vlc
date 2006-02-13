@@ -535,35 +535,38 @@ static char *GetTmpFilePath( access_t *p_access )
     char *psz_dir = var_GetString( p_access, "timeshift-dir" );
     char *psz_filename_base;
 
-    if( psz_dir && !*psz_dir )
+    if( ( psz_dir != NULL ) && ( psz_dir[0] == '\0' ) )
     {
         free( psz_dir );
-        psz_dir = 0;
+        psz_dir = NULL;
     }
 
-    if( !psz_dir )
+    if( psz_dir == NULL )
     {
 #ifdef WIN32
+        char psz_local_dir[MAX_PATH];
         int i_size;
 
-        psz_dir = malloc( MAX_PATH + 1 );
-        i_size = GetTempPath( MAX_PATH, psz_dir );
+        i_size = GetTempPath( MAX_PATH, psz_local_dir );
         if( i_size <= 0 || i_size > MAX_PATH )
         {
-            if( !getcwd( psz_dir, MAX_PATH ) ) strcpy( psz_dir, "c:" );
+            if( !getcwd( psz_local_dir, MAX_PATH ) )
+                strcpy( psz_local_dir, "C:" );
         }
+
+        psz_dir = FromLocaleDup( MAX_PATH + 1 );
 
         /* remove last \\ if any */
         if( psz_dir[strlen(psz_dir)-1] == '\\' )
             psz_dir[strlen(psz_dir)-1] = '\0';
 #else
-
         psz_dir = strdup( "/tmp" );
 #endif
     }
 
     asprintf( &psz_filename_base, "%s/vlc-timeshift-%d-%d-",
               psz_dir, getpid(), p_access->i_object_id );
+    free( psz_dir );
 
     return psz_filename_base;
 }
