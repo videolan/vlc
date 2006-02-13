@@ -419,8 +419,8 @@ diff -u -r1.111 Makefile
  
  # muxers
  ifeq ($(CONFIG_MUXERS),yes)
--OBJS+= flvenc.o movenc.o asf-enc.o
-+OBJS+= mpegtsenc.o crc.o avienc.o flvenc.o movenc.o asf-enc.o
+-OBJS+= flvenc.o movenc.o asf-enc.o adtsenc.o
++OBJS+= mpegtsenc.o crc.o avienc.o flvenc.o movenc.o asf-enc.o adtsenc.o
  endif
 
 
@@ -496,6 +496,7 @@ diff -u -r1.76 avidec.c
 +++ ../ffmpeg/libavformat/avidec.c	27 Nov 2005 16:54:50 -0000
 @@ -20,9 +20,6 @@
  #include "avi.h"
+ :q
  #include "dv.h"
  
 -#undef NDEBUG
