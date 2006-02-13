@@ -585,7 +585,7 @@ static int UnpackFromFile( sout_stream_t *p_stream, const char *psz_file,
                            picture_t *p_pic )
 {
     int i, j;
-    FILE *p_file = fopen( psz_file, "r" );
+    FILE *p_file = utf8_fopen( psz_file, "r" );
 
     if ( p_file == NULL )
     {

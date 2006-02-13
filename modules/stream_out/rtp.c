@@ -1354,7 +1354,7 @@ static int FileSetup( sout_stream_t *p_stream )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     FILE            *f;
 
-    if( ( f = fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
+    if( ( f = utf8_fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
     {
         msg_Err( p_stream, "cannot open file '%s' (%s)",
                  p_sys->psz_sdp_file, strerror(errno) );

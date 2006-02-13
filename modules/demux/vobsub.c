@@ -177,21 +177,20 @@ static int Open ( vlc_object_t *p_this )
         }
     }
 
-    psz_vobname = ToLocale( p_demux->psz_path );
+    psz_vobname = strdup( p_demux->psz_path );
     i_len = strlen( psz_vobname );
-
-    strcpy( psz_vobname + i_len - 4, ".sub" );
+    memcpy( psz_vobname + i_len - 4, ".sub" );
 
     /* open file */
-    if( !( p_sys->p_vobsub_file = fopen( psz_vobname, "rb" ) ) )
+    p_sys->p_vobsub_file = utf8_fopen( psz_vobname, "rb" );
+    free( psz_vobname );
+    if( p_sys->p_vobsub_file == NULL )
     {
         msg_Err( p_demux, "couldn't open .sub Vobsub file: %s",
                  psz_vobname );
         free( p_sys );
-        LocaleFree( psz_vobname );
         return VLC_EGENERIC;
     }
-    LocaleFree( psz_vobname );
 
     return VLC_SUCCESS;
 }
