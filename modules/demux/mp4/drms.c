@@ -752,7 +752,7 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
 
     static uint32_t i_secret = 0;
 
-    static uint32_t p_secret1[] =
+    static uint32_t p_secret3[] =
     {
         0xAAAAAAAA, 0x01757700, 0x00554580, 0x01724500, 0x00424580,
         0x01427700, 0x00000080, 0xC1D59D01, 0x80144981, 0x815C8901,
@@ -763,17 +763,17 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
         0x00000080, 0x55555555
     };
 
-    static char p_secret2[] =
+    static char p_secret4[] =
         "pbclevtug (p) Nccyr Pbzchgre, Vap.  Nyy Evtugf Erfreirq.";
 
     if( i_secret == 0 )
     {
-        REVERSE( p_secret1, sizeof(p_secret1)/sizeof(p_secret1[ 0 ]) );
-        for( ; p_secret2[ i_secret ] != '\0'; i_secret++ )
+        REVERSE( p_secret3, sizeof(p_secret3)/sizeof(p_secret3[ 0 ]) );
+        for( ; p_secret4[ i_secret ] != '\0'; i_secret++ )
         {
 #define ROT13(c) (((c)>='A'&&(c)<='Z')?(((c)-'A'+13)%26)+'A':\
                   ((c)>='a'&&(c)<='z')?(((c)-'a'+13)%26)+'a':c)
-            p_secret2[ i_secret ] = ROT13(p_secret2[ i_secret ]);
+            p_secret4[ i_secret ] = ROT13(p_secret4[ i_secret ]);
         }
         i_secret++; /* include zero terminator */
     }
@@ -826,8 +826,8 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     AddMD5( &md5, (uint8_t *)p_big_bordel, 64 );
     if( p_shuffle->i_version == 0x01000300 )
     {
-        AddMD5( &md5, (uint8_t *)p_secret1, sizeof(p_secret1) );
-        AddMD5( &md5, (uint8_t *)p_secret2, i_secret );
+        AddMD5( &md5, (uint8_t *)p_secret3, sizeof(p_secret3) );
+        AddMD5( &md5, (uint8_t *)p_secret4, i_secret );
     }
     EndMD5( &md5 );
 
@@ -1505,8 +1505,8 @@ static void TinyShuffle8( uint32_t * p_bordel )
  *****************************************************************************/
 static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
 {
-    static char const p_secret1[ 8 ] = "YuaFlafu";
-    static char const p_secret2[ 8 ] = "zPif98ga";
+    static char const p_secret5[ 8 ] = "YuaFlafu";
+    static char const p_secret6[ 8 ] = "zPif98ga";
     struct md5_s md5;
     int64_t i_ipod_id;
     uint32_t p_system_hash[ 4 ];
@@ -1521,14 +1521,14 @@ static int GetSystemKey( uint32_t *p_sys_key, vlc_bool_t b_ipod )
     /* Combine our system info hash with additional secret data. The resulting
      * MD5 hash will be our system key. */
     InitMD5( &md5 );
-    AddMD5( &md5, p_secret1, 8 );
+    AddMD5( &md5, p_secret5, 8 );
 
     if( !b_ipod )
     {
         AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
         AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
         AddMD5( &md5, (uint8_t *)p_system_hash, 6 );
-        AddMD5( &md5, p_secret2, 8 );
+        AddMD5( &md5, p_secret6, 8 );
     }
     else
     {
@@ -1628,7 +1628,7 @@ static int ReadUserKey( void *_p_drms, uint32_t *p_user_key )
  *****************************************************************************/
 static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 {
-    static char const p_secret[] = "mUfnpognadfgf873";
+    static char const p_secret7[] = "mUfnpognadfgf873";
     struct drms_s *p_drms = (struct drms_s *)_p_drms;
     struct aes_s aes;
     struct shuffle_s shuffle;
@@ -1674,7 +1674,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     REVERSE( p_sci_data, 1 );
     InitShuffle( &shuffle, p_sys_key, p_sci_data[ 0 ] );
 
-    memcpy( p_sci_key, p_secret, 16 );
+    memcpy( p_sci_key, p_secret7, 16 );
     REVERSE( p_sci_key, 4 );
 
     while( i_blocks-- )
@@ -1699,9 +1699,8 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 
     if( i_remaining >= 4 )
     {
-        i_remaining /= 4;
-        REVERSE( p_buffer, i_remaining );
-        DoShuffle( &shuffle, p_buffer, i_remaining );
+        REVERSE( p_buffer, i_remaining / 4 );
+        DoShuffle( &shuffle, p_buffer, i_remaining / 4 );
     }
 
     /* Phase 2: look for the user key in the generated data. I must admit I
