@@ -1,3 +1,4 @@
 SOURCES_equalizer = equalizer.c equalizer_presets.h
 SOURCES_normvol = normvol.c
 SOURCES_audio_format = format.c
+SOURCES_param_eq = param_eq.c
