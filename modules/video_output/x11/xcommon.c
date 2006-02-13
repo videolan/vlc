@@ -1,7 +1,7 @@
 /*****************************************************************************
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
- * Copyright (C) 1998-2001 the VideoLAN team
+ * Copyright (C) 1998-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -74,6 +74,10 @@
 
 #ifdef HAVE_XINERAMA
 #   include <X11/extensions/Xinerama.h>
+#endif
+
+#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
+#   include <X11/extensions/xf86vmode.h>
 #endif
 
 #include "xcommon.h"
@@ -1568,12 +1572,39 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         {
             /* The window wasn't necessarily created at the requested size */
             p_vout->p_sys->p_win->i_x = p_vout->p_sys->p_win->i_y = 0;
-            p_vout->p_sys->p_win->i_width =
-                DisplayWidth( p_vout->p_sys->p_display,
-                              p_vout->p_sys->i_screen );
-            p_vout->p_sys->p_win->i_height =
-                DisplayHeight( p_vout->p_sys->p_display,
-                               p_vout->p_sys->i_screen );
+
+#ifdef HAVE_XF86VIDMODE
+            XF86VidModeModeLine mode;
+            int i_dummy;
+
+            if( XF86VidModeGetModeLine( p_vout->p_sys->p_display,
+                                        p_vout->p_sys->i_screen, &i_dummy,
+                                        &mode ) )
+            {
+                p_vout->p_sys->p_win->i_width = mode.hdisplay;
+                p_vout->p_sys->p_win->i_height = mode.vdisplay;
+
+                /* move cursor to the middle of the window to prevent
+                 * unwanted display move if the display is smaller than the
+                 * full desktop */
+                XWarpPointer( p_vout->p_sys->p_display, None,
+                              p_vout->p_sys->p_win->base_window, 0, 0, 0, 0,
+                              mode.hdisplay / 2 , mode.vdisplay / 2 );
+                /* force desktop view to upper left corner */
+                XF86VidModeSetViewPort( p_vout->p_sys->p_display,
+                                        p_vout->p_sys->i_screen, 0, 0 );
+            }
+            else
+#endif
+            {
+                p_vout->p_sys->p_win->i_width =
+                    DisplayWidth( p_vout->p_sys->p_display,
+                                p_vout->p_sys->i_screen );
+                p_vout->p_sys->p_win->i_height =
+                    DisplayHeight( p_vout->p_sys->p_display,
+                                p_vout->p_sys->i_screen );
+            }
+
         }
 
         XMoveResizeWindow( p_vout->p_sys->p_display,

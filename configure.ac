@@ -3389,12 +3389,12 @@ if test "${enable_glx}" != "no" &&
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
-dnl
-dnl  Check for the Xinerama extension
-dnl
 if test "${enable_xvideo}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_xvideo}" = "yes"); then
+dnl
+dnl  Check for the Xinerama extension
+dnl
   ac_cv_have_xinerama="no"
   CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
   CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
@@ -3418,6 +3418,38 @@ if test "${enable_xvideo}" != "no" &&
   fi
   CFLAGS="${CFLAGS_save}"
   CPPFLAGS="${CPPFLAGS_save}"
+
+dnl
+dnl  Check for XF86VidMode extension
+dnl
+  ac_cv_have_xf86vidmode="no"
+  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
+  CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
+  AC_CHECK_HEADERS(X11/extensions/xf86vmode.h,[
+    AC_CHECK_LIB(Xxf86vm_pic, XF86VidModeGetViewPort,[
+      VLC_ADD_LDFLAGS([xvideo],[-lXxf86vm_pic])
+      VLC_ADD_LDFLAGS([x11],[-lXxf86vm_pic])
+      VLC_ADD_LDFLAGS([glx],[-lXxf86vm_pic])
+      ac_cv_have_xf86vidmode="yes"
+    ],[
+      AC_CHECK_LIB(Xxf86vm, XF86VidModeGetViewPort,[
+        VLC_ADD_LDFLAGS([xvideo],[-lXxf86vm])
+        VLC_ADD_LDFLAGS([x11],[-lXxf86vm])
+        VLC_ADD_LDFLAGS([glx],[-lXxf86vm])
+        ac_cv_have_xf86vidmode="yes"
+      ])
+    ])
+  ],[true],
+[#ifdef HAVE_X11_XLIB_H
+# include <X11/Xlib.h>
+#endif]
+   )
+  AS_IF([test "${ac_cv_have_xf86vidmode}" = "yes"],
+    [AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define this if you have libXxf86vm installed])
+  ])
+  CFLAGS="${CFLAGS_save}"
+  CPPFLAGS="${CPPFLAGS_save}"
+
 fi
 
 dnl
