@@ -172,7 +172,7 @@ struct intf_sys_t
     vlc_bool_t      b_need_update;              /* for playlist view */
 };
 
-static void DrawBox( WINDOW *win, int y, int x, int h, int w, char *title );
+static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title );
 static void DrawLine( WINDOW *win, int y, int x, int w );
 static void DrawEmptyLine( WINDOW *win, int y, int x, int w );
 
@@ -244,7 +244,7 @@ static int Open( vlc_object_t *p_this )
 
     if( val.psz_string && *val.psz_string )
     {
-        p_sys->psz_current_dir = strdup( val.psz_string);
+        p_sys->psz_current_dir = strdup( val.psz_string );
         free( val.psz_string );
     }
     else
@@ -399,6 +399,21 @@ static void Run( intf_thread_t *p_intf )
 }
 
 /* following functions are local */
+
+static inline const char *KeyToUTF8( int i_key )
+{
+    char local[2] = { (char)i_key, 0 };
+    return FromLocaleDup( local );
+}
+
+static inline int RemoveLastUTF8Entity( char *psz, int len )
+{
+    while( len && ( (psz[--len] & 0xc0) == 0x80 ) );
+                       /* UTF8 continuation byte */
+
+    psz[len] = '\0';
+    return len;
+}
 
 static int HandleKey( intf_thread_t *p_intf, int i_key )
 {
@@ -696,18 +711,19 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_PLAYLIST;
                 return 1;
             case KEY_BACKSPACE:
-                if( i_chain_len > 0 )
-                {
-                    p_sys->psz_search_chain[ i_chain_len - 1 ] = '\0';
-                }
+                RemoveLastUTF8Entity( p_sys->psz_search_chain, i_chain_len );
                 break;
             default:
-                if( i_chain_len < SEARCH_CHAIN_SIZE )
+            {
+                const char *psz_utf8 = KeyToUTF8( i_key );
+
+                if( i_chain_len + strlen( psz_utf8 ) < SEARCH_CHAIN_SIZE )
                 {
-                    p_sys->psz_search_chain[ i_chain_len++ ] = i_key;
-                    p_sys->psz_search_chain[ i_chain_len ] = 0;
+                    strcpy( p_sys->psz_search_chain + i_chain_len, psz_utf8 );
                 }
+                LocaleFree( psz_utf8 );
                 break;
+            }
         }
         if( p_sys->psz_old_search )
         {
@@ -742,18 +758,20 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_PLAYLIST;
                 return 1;
             case KEY_BACKSPACE:
-                if( i_chain_len > 0 )
-                {
-                    p_sys->psz_open_chain[ i_chain_len - 1 ] = '\0';
-                }
+                RemoveLastUTF8Entity( p_sys->psz_open_chain, i_chain_len );
                 break;
             default:
-                if( i_chain_len < OPEN_CHAIN_SIZE )
+            {
+                const char *psz_utf8 = KeyToUTF8( i_key );
+
+                if( i_chain_len + strlen( psz_utf8 ) < OPEN_CHAIN_SIZE )
                 {
-                    p_sys->psz_open_chain[ i_chain_len++ ] = i_key;
-                    p_sys->psz_open_chain[ i_chain_len ] = 0;
+                    strcpy( p_sys->psz_open_chain + i_chain_len, psz_utf8 );
+                    i_chain_len += strlen( psz_utf8 );
                 }
+                LocaleFree( psz_utf8 );
                 break;
+            }
         }
         return 1;
     }
@@ -1077,6 +1095,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     {
         if( ( i_len = strlen( p_buf ) ) > w )
         {
+            char *psz_local;
             int i_cut = i_len - w;
             int x1 = i_len/2 - i_cut/2;
             int x2 = x1 + i_cut;
@@ -1092,11 +1111,15 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
                 p_buf[w/2  ] = '.';
                 p_buf[w/2+1] = '.';
             }
-            mvprintw( y, x, "%s", p_buf );
+            psz_local = ToLocale( p_buf );
+            mvprintw( y, x, "%s", psz_local );
+            LocaleFree( p_buf );
         }
         else
         {
-            mvprintw( y, x, "%s", p_buf );
+            char *psz_local = ToLocale( p_buf );
+            mvprintw( y, x, "%s", psz_local );
+            LocaleFree( p_buf );
             mvhline( y, x + i_len, ' ', w - i_len );
         }
     }
@@ -1849,13 +1872,14 @@ static void ReadDir( intf_thread_t *p_intf )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     DIR *                       p_current_dir;
-    struct dirent *             p_dir_content;
     int i;
 
     if( p_sys->psz_current_dir && *p_sys->psz_current_dir )
     {
+        const char *psz_entry;
+
         /* Open the dir */
-        p_current_dir = opendir( p_sys->psz_current_dir );
+        p_current_dir = utf8_opendir( p_sys->psz_current_dir );
 
         if( p_current_dir == NULL )
         {
@@ -1881,31 +1905,30 @@ static void ReadDir( intf_thread_t *p_intf )
         p_sys->i_dir_entries = 0;
 
         /* get the first directory entry */
-        p_dir_content = readdir( p_current_dir );
+        psz_entry = utf8_readdir( p_current_dir );
 
         /* while we still have entries in the directory */
-        while( p_dir_content != NULL )
+        while( psz_entry != NULL )
         {
 #if defined( S_ISDIR )
             struct stat stat_data;
 #endif
             struct dir_entry_t *p_dir_entry;
             int i_size_entry = strlen( p_sys->psz_current_dir ) +
-                               strlen( p_dir_content->d_name ) + 2;
+                               strlen( psz_entry ) + 2;
             char *psz_uri;
 
             if( p_sys->b_show_hidden_files == VLC_FALSE && 
-                ( strlen( p_dir_content->d_name ) &&
-                  p_dir_content->d_name[0] == '.' ) &&
-                strcmp( p_dir_content->d_name, ".." ) )
+                ( strlen( psz_entry ) && psz_entry[0] == '.' ) &&
+                strcmp( psz_entry, ".." ) )
             {
-                p_dir_content = readdir( p_current_dir );
+                LocaleFree( psz_entry );
+                psz_entry = utf8_readdir( p_current_dir );
                 continue;
-            } 
+            }
 
             psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
-            sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir,
-                     p_dir_content->d_name );
+            sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, psz_entry );
 
             if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
             {
@@ -1914,30 +1937,31 @@ static void ReadDir( intf_thread_t *p_intf )
             }
 
 #if defined( S_ISDIR )
-            stat( psz_uri, &stat_data );
+            utf8_stat( psz_uri, &stat_data );
             if( S_ISDIR(stat_data.st_mode) )
-#elif defined( DT_DIR )
-            if( p_dir_content->d_type & DT_DIR )
+/*#elif defined( DT_DIR )
+            if( p_dir_content->d_type & DT_DIR )*/
 #else
             if( 0 )
 #endif
             {
-                p_dir_entry->psz_path = strdup( p_dir_content->d_name );
+                p_dir_entry->psz_path = strdup( psz_entry );
                 p_dir_entry->b_file = VLC_FALSE;
                 INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
                      p_sys->i_dir_entries, p_dir_entry );
             }
             else
             {
-                p_dir_entry->psz_path = strdup( p_dir_content->d_name );
+                p_dir_entry->psz_path = strdup( psz_entry );
                 p_dir_entry->b_file = VLC_TRUE;
                 INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
                      p_sys->i_dir_entries, p_dir_entry );
             }
 
             free( psz_uri );
+            LocaleFree( psz_entry );
             /* Read next entry */
-            p_dir_content = readdir( p_current_dir );
+            psz_entry = utf8_readdir( p_current_dir );
         }
 
         /* Sort */
@@ -1981,7 +2005,7 @@ static void PlayPause( intf_thread_t *p_intf )
 /****************************************************************************
  *
  ****************************************************************************/
-static void DrawBox( WINDOW *win, int y, int x, int h, int w, char *title )
+static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title )
 {
     int i;
     int i_len;
