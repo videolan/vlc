@@ -27,11 +27,7 @@
 #include <vlc/vlc.h>
 #include "charset.h"
 
-#ifdef HAVE_ASSERT
-# include <assert.h>
-#else
-# define assert( c ) ((void)0)
-#endif
+#include <assert.h>
 
 #include <stdio.h>
 #include <errno.h>
@@ -183,6 +179,7 @@ char *FromLocale( const char *locale )
             vlc_iconv( from_locale.hd, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &from_locale.lock );
+        *optr = '\0';
 
         assert (inb == 0);
         assert (*iptr == '\0');
@@ -249,6 +246,7 @@ char *ToLocale( const char *utf8 )
             vlc_iconv( to_locale.hd, NULL, NULL, NULL, NULL );
         }
         vlc_mutex_unlock( &to_locale.lock );
+        *optr = '\0';
 
         assert (inb == 0);
         assert (*iptr == '\0');
