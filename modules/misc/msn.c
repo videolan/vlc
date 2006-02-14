@@ -173,23 +173,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     /* Playing something ... */
-    for( i = 0; i < p_input->input.p_item->i_categories; i++ )
-    {
-        info_category_t *p_cat = p_input->input.p_item->pp_categories[i];
-        for( j = 0; j < p_cat->i_infos; j++ )
-        {
-            info_t *p_info = p_cat->pp_infos[j];
-
-            if( !strcmp( p_info->psz_name, VLC_META_ARTIST ) )
-            {
-                psz_artist = strdup( p_info->psz_value );
-            }
-            else if( !strcmp( p_info->psz_name, "Album/movie/show title" ) )
-            {
-                psz_album = strdup( p_info->psz_value );
-            }
-        }
-    }
+    psz_artist = vlc_input_item_GetInfo( p_input->input.p_item,
+                                         _("Meta-information"),
+                                         VLC_META_ARTIST);
+    psz_album = vlc_input_item_GetInfo( p_input->input.p_item,
+                                         _("Meta-information"),
+                                         _("Album/movie/show title" ) );
     psz_title = strdup( p_input->input.p_item->psz_name );
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
     if( psz_artist == NULL ) psz_artist = strdup( N_("(no artist)") );
