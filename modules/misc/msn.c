@@ -196,6 +196,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_album );
 
     SendToMSN( psz_tmp );
+    vlc_object_release( p_input );
 
     return VLC_SUCCESS;
 }

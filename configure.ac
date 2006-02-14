@@ -1424,6 +1424,17 @@ then
 fi
 
 dnl
+dnl Growl notification plugin
+dnl
+AC_ARG_ENABLE(growl,
+  [  --enable-growl         growl notification plugin (default enabled)])
+AS_IF([test "${enable_growl}" != "no"], [
+    VLC_ADD_PLUGINS([growl])
+  ]
+)
+
+
+dnl
 dnl TLS/SSL
 dnl
 AC_ARG_ENABLE(gnutls,
