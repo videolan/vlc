@@ -2,7 +2,7 @@
  * param_eq.c:
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id: equalizer.c 13905 2006-01-12 23:10:04Z dionoea $
+ * $Id$
  *
  * Authors: Antti Huovilainen
  *          Sigmund A. Helberg <dnumgis@videolan.org>
