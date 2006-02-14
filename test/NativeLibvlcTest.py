@@ -13,3 +13,6 @@ class NativeLibvlcTestCase( unittest.TestCase ):
     def testPlaylist( self ):
         """[LibVLC] Checks basic playlist interaction"""
     	native_libvlc_test.playlist_test()
+    def testVLM( self ):
+        """[LibVLC] Checks VLM wrapper"""
+    	native_libvlc_test.vlm_test()

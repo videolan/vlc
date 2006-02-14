@@ -95,6 +95,9 @@ static PyObject *vlm_test( PyObject *self, PyObject *args )
     char *argv[] = { "vlc", "--quiet" };
     libvlc_exception_t exception;
     libvlc_exception_init( &exception );
+
+    p_instance = libvlc_new( 2, argv, &exception );
+    ASSERT_NOEXCEPTION;
    
     libvlc_vlm_set_enabled( p_instance, "test", 1, &exception );
     ASSERT_EXCEPTION;
