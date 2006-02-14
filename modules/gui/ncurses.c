@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -39,6 +39,7 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
+#include "charset.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -160,6 +161,7 @@ struct intf_sys_t
     int             i_before_search;
 
     char            *psz_open_chain;
+    char             psz_partial_keys[7];
 
     char            *psz_current_dir;
     int             i_dir_entries;
@@ -201,6 +203,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_plnode = NULL;
     p_sys->i_box_bidx = 0;
     p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
+    memset( p_sys->psz_partial_keys, 0, sizeof( p_sys->psz_partial_keys ) );
 
     /* Initialize the curses library */
     p_sys->w = initscr();
@@ -400,10 +403,41 @@ static void Run( intf_thread_t *p_intf )
 
 /* following functions are local */
 
-static inline const char *KeyToUTF8( int i_key )
+static char *KeyToUTF8( int i_key, char *psz_part )
 {
-    char local[2] = { (char)i_key, 0 };
-    return FromLocaleDup( local );
+    char *psz_utf8, *psz;
+    int len = strlen( psz_part );
+    if( len == 6 )
+    {
+        /* overflow error - should not happen */
+        memset( psz_part, 0, 6 );
+        return NULL;
+    }
+
+    psz_part[len] = (char)i_key;
+
+    psz_utf8 = FromLocaleDup( psz_part );
+
+    /* Ugly check for incomplete bytes sequences
+     * (in case of non-UTF8 multibyte local encoding) */
+    for( psz = psz_utf8; *psz; psz++ )
+        if( ( *psz == '?' ) && ( *psz_utf8 != '?' ) )
+        {
+            /* incomplete bytes sequence detected
+             * (VLC core inserted dummy question marks) */
+            free( psz_utf8 );
+            return NULL;
+        }
+
+    /* Check for incomplete UTF8 bytes sequence */
+    if( EnsureUTF8( psz_utf8 ) == NULL )
+    {
+        free( psz_utf8 );
+        return NULL;
+    }
+
+    memset( psz_part, 0, 6 );
+    return psz_utf8;
 }
 
 static inline int RemoveLastUTF8Entity( char *psz, int len )
@@ -715,13 +749,17 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 break;
             default:
             {
-                const char *psz_utf8 = KeyToUTF8( i_key );
+                char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
 
-                if( i_chain_len + strlen( psz_utf8 ) < SEARCH_CHAIN_SIZE )
+                if( psz_utf8 != NULL )
                 {
-                    strcpy( p_sys->psz_search_chain + i_chain_len, psz_utf8 );
+                    if( i_chain_len + strlen( psz_utf8 ) < SEARCH_CHAIN_SIZE )
+                    {
+                        strcpy( p_sys->psz_search_chain + i_chain_len,
+                                psz_utf8 );
+                    }
+                    free( psz_utf8 );
                 }
-                LocaleFree( psz_utf8 );
                 break;
             }
         }
@@ -762,14 +800,17 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 break;
             default:
             {
-                const char *psz_utf8 = KeyToUTF8( i_key );
+                char *psz_utf8 = KeyToUTF8( i_key, p_sys->psz_partial_keys );
 
-                if( i_chain_len + strlen( psz_utf8 ) < OPEN_CHAIN_SIZE )
+                if( psz_utf8 != NULL )
                 {
-                    strcpy( p_sys->psz_open_chain + i_chain_len, psz_utf8 );
-                    i_chain_len += strlen( psz_utf8 );
+                    if( i_chain_len + strlen( psz_utf8 ) < OPEN_CHAIN_SIZE )
+                    {
+                        strcpy( p_sys->psz_open_chain + i_chain_len,
+                                psz_utf8 );
+                    }
+                    free( psz_utf8 );
                 }
-                LocaleFree( psz_utf8 );
                 break;
             }
         }
