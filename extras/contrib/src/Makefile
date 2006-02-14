@@ -856,6 +856,7 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
 	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
+	(cd $@; patch -p 0 < ../Patches/ffmpeg-cvs.patch)
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p 0 < ../Patches/ffmpeg-cvs-beos.patch)
 endif
