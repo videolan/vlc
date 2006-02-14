@@ -54,7 +54,6 @@
 static vlm_message_t *vlm_Show( vlm_t *, vlm_media_t *, vlm_schedule_t *, char * );
 static vlm_message_t *vlm_Help( vlm_t *, char * );
 
-static vlm_media_t *vlm_MediaSearch ( vlm_t *, const char * );
 static vlm_media_instance_t *vlm_MediaInstanceSearch( vlm_t *, vlm_media_t *, const char * );
 
 static vlm_message_t *vlm_MessageNew( char *, const char *, ... );
@@ -818,7 +817,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static vlm_media_t *vlm_MediaSearch( vlm_t *vlm, const char *psz_name )
+vlm_media_t *vlm_MediaSearch( vlm_t *vlm, const char *psz_name )
 {
     int i;
 

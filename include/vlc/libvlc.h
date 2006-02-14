@@ -73,7 +73,7 @@ int libvlc_exception_raised( libvlc_exception_t *p_exception );
  * \param p_exception the exception to raise
  * \param psz_message the exception message
  */
-void libvlc_exception_raise( libvlc_exception_t *p_exception, char *psz_message );
+void libvlc_exception_raise( libvlc_exception_t *p_exception, char *psz_format, ... );
 
 /**
  * Clear an exception object so it can be reused.
@@ -146,6 +146,33 @@ void libvlc_playlist_play( libvlc_instance_t*, int, int, char **,
                            libvlc_exception_t * );
 
 /**
+ * Pause a running playlist, resume if it was stopped
+ * \param p_instance the instance to pause
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_pause( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Checks if the playlist is running
+ * \param p_instance the instance
+ * \param p_exception an initialized exception
+ * \return 0 if the playlist is stopped or paused, 1 if it is running
+ */
+int libvlc_playlist_isplaying( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Get the number of items in the playlist
+ * \param p_instance the instance
+ * \param p_exception an initialized exception
+ * \return the number of items
+ */
+int libvlc_playlist_items_count( libvlc_instance_t *, libvlc_exception_t * );
+
+
+
+
+
+/**
  * Stop playing
  * \param p_instance the instance to stop
  * \param p_exception an initialized exception
@@ -153,7 +180,21 @@ void libvlc_playlist_play( libvlc_instance_t*, int, int, char **,
 void libvlc_playlist_stop( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
- * Remove all playlist ites
+ * Go to next playlist item (starts playback if it was stopped)
+ * \param p_instance the instance to use
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_next( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Go to previous playlist item (starts playback if it was stopped)
+ * \param p_instance the instance to use
+ * \param p_exception an initialized exception
+ */
+void libvlc_playlist_prev( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Remove all playlist items
  * \param p_instance the instance
  * \param p_exception an initialized exception
  */
@@ -199,10 +240,13 @@ int libvlc_playlist_add_extended( libvlc_instance_t *, const char *,
 
 
 
-
 typedef struct libvlc_input_t libvlc_input_t;
 
-///\todo document me
+/* Get the input that is currently being played by the playlist
+ * \param p_instance the instance to use
+ * \param p_exception an initialized excecption
+ * \return an input object
+ */
 libvlc_input_t *libvlc_playlist_get_input( libvlc_instance_t *,
                                            libvlc_exception_t * );
 
@@ -230,15 +274,99 @@ vlc_int64_t libvlc_input_get_time( libvlc_input_t *, libvlc_exception_t *);
 float libvlc_input_get_position( libvlc_input_t *, libvlc_exception_t *);
 
 
+/** @} */
+
+/** defgroup libvlc_video Video
+ * \ingroup libvlc
+ * LibVLC Video handling
+ * @{
+ */
+
+/**
+ * Toggle fullscreen status on video output
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ */
 void libvlc_toggle_fullscreen( libvlc_input_t *, libvlc_exception_t * );
+
+/**
+ * Enable or disable fullscreen on a video output
+ * \param p_input the input
+ * \param b_fullscreen boolean for fullscreen status
+ * \param p_exception an initialized exception
+ */
+void libvlc_set_fullscreen( libvlc_input_t *, int, libvlc_exception_t * );
+
+/**
+ * Get current fullscreen status
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ * \return the fullscreen status (boolean)
+ */
+int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t * );
+
+/** @}
+ * defgroup libvlc_vlm VLM
+ * \ingroup libvlc
+ * LibVLC VLM handling
+ * @{
+ */
+
+
+/**
+ * Add a broadcast, with one input
+ * \param p_instance the instance
+ * \param psz_name the name of the new broadcast
+ * \param psz_input the input MRL
+ * \param psz_output the output MRL (the parameter to the "sout" variable)
+ * \param i_options number of additional options
+ * \param ppsz_options additional options
+ * \param b_enabled boolean for enabling the new broadcast
+ * \param b_loop Should this broadcast be played in loop ?
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_add_broadcast( libvlc_instance_t *, char *, char *, char* ,
+                               int, char **, int, int, libvlc_exception_t * );
+
+/**
+ * Delete a media (vod or broadcast)
+ * \param p_instance the instance
+ * \param psz_name the media to delete
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_del_media( libvlc_instance_t *, char *, libvlc_exception_t * );
+
+/**
+ * Enable or disable a media (vod or broadcast)
+ * \param p_instance the instance
+ * \param psz_name the media to work on
+ * \param b_enabled the new status
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_set_enabled( libvlc_instance_t *, char *, int,
+                             libvlc_exception_t *);
+
+/**
+ * Edit the parameters of a media. This will delete all existing inputs and
+ * add the specified one.
+ * \param p_instance the instance
+ * \param psz_name the name of the new broadcast
+ * \param psz_input the input MRL
+ * \param psz_output the output MRL (the parameter to the "sout" variable)
+ * \param i_options number of additional options
+ * \param ppsz_options additional options
+ * \param b_enabled boolean for enabling the new broadcast
+ * \param b_loop Should this broadcast be played in loop ?
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_change_media( libvlc_instance_t *, char *, char *, char* ,
+                              int, char **, int, int, libvlc_exception_t * );
 
 
 /** @} */
-
-
 
 # ifdef __cplusplus
 }
 # endif
 
-#endif /* <vlc/vlc_control.h> */
+#endif /* <vlc/libvlc.h> */

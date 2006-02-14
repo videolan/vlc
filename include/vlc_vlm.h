@@ -139,6 +139,7 @@ VLC_EXPORT( vlm_media_t *, vlm_MediaNew, ( vlm_t *, const char *, int ) );
 VLC_EXPORT( void, vlm_MediaDelete, ( vlm_t *, vlm_media_t *, const char * ) );
 VLC_EXPORT( int, vlm_MediaSetup, ( vlm_t *, vlm_media_t *, const char *, const char * ) );
 VLC_EXPORT( int, vlm_MediaControl, ( vlm_t *, vlm_media_t *, const char *, const char *, const char * ) );
+VLC_EXPORT( vlm_media_t* , vlm_MediaSearch,( vlm_t *, const char *) );
 VLC_EXPORT( vlm_schedule_t *, vlm_ScheduleNew, ( vlm_t *, const char * ) );
 VLC_EXPORT( void, vlm_ScheduleDelete, ( vlm_t *, vlm_schedule_t *, const char * ) );
 VLC_EXPORT( int, vlm_ScheduleSetup, ( vlm_schedule_t *, const char *, const char * ) );

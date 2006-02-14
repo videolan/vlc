@@ -362,6 +362,7 @@ unsigned int update_iterator_ChooseMirrorAndFile (update_iterator_t *, int, int,
 void intf_InteractionManage (playlist_t *);
 char * mstrtime (char *psz_buffer, mtime_t date);
 void aout_FormatPrepare (audio_sample_format_t * p_format);
+vlm_media_t* vlm_MediaSearch (vlm_t *, const char *);
 void spu_DisplaySubpicture (spu_t *, subpicture_t *);
 int intf_RunThread (intf_thread_t *);
 decoder_t * input_DecoderNew (input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder);
@@ -939,6 +940,7 @@ struct module_symbols_t
     int (*utf8_lstat_inner) (const char *filename, void *buf);
     char * (*FromLocaleDup_inner) (const char *);
     int (*utf8_mkdir_inner) (const char *filename);
+    vlm_media_t* (*vlm_MediaSearch_inner) (vlm_t *, const char *);
 };
 #  if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -1393,6 +1395,7 @@ struct module_symbols_t
 #  define utf8_lstat (p_symbols)->utf8_lstat_inner
 #  define FromLocaleDup (p_symbols)->FromLocaleDup_inner
 #  define utf8_mkdir (p_symbols)->utf8_mkdir_inner
+#  define vlm_MediaSearch (p_symbols)->vlm_MediaSearch_inner
 #  elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1850,6 +1853,7 @@ struct module_symbols_t
     ((p_symbols)->utf8_lstat_inner) = utf8_lstat; \
     ((p_symbols)->FromLocaleDup_inner) = FromLocaleDup; \
     ((p_symbols)->utf8_mkdir_inner) = utf8_mkdir; \
+    ((p_symbols)->vlm_MediaSearch_inner) = vlm_MediaSearch; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

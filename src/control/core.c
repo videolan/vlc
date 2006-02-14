@@ -20,7 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+#include <stdarg.h>
 #include <libvlc_internal.h>
 #include <vlc/libvlc.h>
 
@@ -58,8 +58,14 @@ inline char* libvlc_exception_get_message( libvlc_exception_t *p_exception )
 }
 
 inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
-                                    char *psz_message )
+                                    char *psz_format, ... )
 {
+    va_list args;
+    char *psz_message;
+    va_start( args, psz_message );
+    vasprintf( &psz_message, psz_format, args );
+    va_end( args );
+
     if( p_exception == NULL ) return;
     p_exception->b_raised = 1;
     if( psz_message )
@@ -97,6 +103,7 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     p_new->p_vlc = p_vlc;
     p_new->p_playlist = (playlist_t *)vlc_object_find( p_new->p_vlc,
                                 VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    p_new->p_vlm = NULL;
 
     if( !p_new->p_playlist )
     {

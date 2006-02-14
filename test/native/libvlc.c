@@ -55,7 +55,7 @@ static PyObject *playlist_test( PyObject *self, PyObject *args )
     libvlc_exception_init( &exception );
 
     p_instance = libvlc_new( 2, argv, &exception );
-    ASSERT_EXCEPTION;
+    ASSERT_NOEXCEPTION;
 
     /* Initial status */
     libvlc_playlist_play( p_instance, 0, 0, argv, &exception );
@@ -65,22 +65,22 @@ static PyObject *playlist_test( PyObject *self, PyObject *args )
     libvlc_exception_clear( &exception );
 
     i_playing  = libvlc_playlist_isplaying( p_instance, &exception  );
-    ASSERT_EXCEPTION;
+    ASSERT_NOEXCEPTION;
     ASSERT( i_playing == 0, "Playlist shouldn't be running" );
     i_items = libvlc_playlist_items_count( p_instance, &exception );
-    ASSERT_EXCEPTION;
+    ASSERT_NOEXCEPTION;
     ASSERT( i_items == 0, "Playlist should be empty" );
 
     /* Add 1 item */
     libvlc_exception_clear( &exception );
     i_id = libvlc_playlist_add( p_instance, "test" , NULL , &exception );
-    ASSERT_EXCEPTION;
+    ASSERT_NOEXCEPTION;
     ASSERT( i_id > 0 , "Returned identifier is <= 0" );
     i_items = libvlc_playlist_items_count( p_instance, &exception );
-    ASSERT_EXCEPTION;
+    ASSERT_NOEXCEPTION;
     ASSERT( i_items == 1, "Playlist should have 1 item" );
     i_playing  = libvlc_playlist_isplaying( p_instance, &exception  );
-    ASSERT_EXCEPTION;
+    ASSERT_NOEXCEPTION;
     ASSERT( i_playing == 0, "Playlist shouldn't be running" );
 
     /* */ 
@@ -89,10 +89,26 @@ static PyObject *playlist_test( PyObject *self, PyObject *args )
     return Py_None;
 }
 
+static PyObject *vlm_test( PyObject *self, PyObject *args )
+{
+    libvlc_instance_t *p_instance;
+    char *argv[] = { "vlc", "--quiet" };
+    libvlc_exception_t exception;
+    libvlc_exception_init( &exception );
+   
+    libvlc_vlm_set_enabled( p_instance, "test", 1, &exception );
+    ASSERT_EXCEPTION;
+    libvlc_exception_clear( &exception );
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
 static PyMethodDef native_libvlc_test_methods[] = {
    DEF_METHOD( create_destroy, "Create and destroy" )
    DEF_METHOD( exception_test, "Test Exception handling" )
    DEF_METHOD( playlist_test, "Test Playlist interaction" )
+   DEF_METHOD( vlm_test, "Test VLM" )
    { NULL, NULL, 0, NULL }
 };
 

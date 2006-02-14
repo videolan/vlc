@@ -35,6 +35,7 @@ struct libvlc_instance_t
 {
     vlc_t *p_vlc;
     playlist_t *p_playlist;
+    vlm_t      *p_vlm;
     int    i_vlc_id;
 };
 
