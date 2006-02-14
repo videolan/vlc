@@ -123,23 +123,23 @@ void LocaleDeinit( void )
 static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
 {
     char *out;
-    int ilen = strlen( string ), olen = (4 / sizeof (wchar_t)) * ilen + 1;
-    wchar_t wide[olen];
+    wchar_t *wide;
+    int len;
 
-    ilen = MultiByteToWideChar( fromCP, 0, string, ilen + 1, wide, olen );
-    if( ilen == 0 )
+    len = MultiByteToWideChar( fromCP, 0, string, -1, NULL, 0 );
+    assert( len > 0 );
+    wide = (wchar_t *)malloc (len * sizeof (wchar_t));
+    if( wide == NULL )
         return NULL;
 
-    olen = 4 * ilen + 1;
-    out = malloc( olen );
+    MultiByteToWideChar( fromCP, 0, string, -1, wide, len );
+    len = WideCharToMultiByte( toCP, 0, wide, -1, NULL, 0, NULL, NULL );
+    assert( len > 0 );
+    out = malloc( len );
 
-    olen = WideCharToMultiByte( toCP, 0, wide, ilen, out, olen, NULL, NULL );
-    if( olen == 0 )
-    {
-        free( out );
-        return NULL;
-    }
-    return realloc( out, olen );
+    WideCharToMultiByte( toCP, 0, wide, -1, out, len, NULL, NULL );
+    free( wide );
+    return out;
 }
 #endif
 
