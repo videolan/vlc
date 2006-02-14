@@ -699,6 +699,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-background", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-black", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-embedded", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
 
@@ -934,7 +935,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     b_init_ok = VLC_FALSE;
 
     p_fullscreen_state = NULL;
-
+    b_fullscreen = VLC_FALSE;
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
 
@@ -943,6 +944,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     {
          /* No preference specified. Use the main screen */
         o_screen = [NSScreen mainScreen];
+        i_device = [o_screens indexOfObject: o_screen];
         if( o_screen == [o_screens objectAtIndex: 0] )
             b_menubar_screen = VLC_TRUE;
     }
@@ -955,6 +957,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( p_vout->b_fullscreen )
     {
+        CGDisplayFadeReservationToken token;
+        b_fullscreen = VLC_TRUE;
         NSRect screen_rect = [o_screen frame];
         screen_rect.origin.x = screen_rect.origin.y = 0;
 
@@ -964,10 +968,53 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               backing: NSBackingStoreBuffered
               defer: YES screen: o_screen];
 
+        if( var_GetBool( p_vout, "macosx-black" ) )
+        {
+            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+            CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, true );
+            CGReleaseDisplayFadeReservation( token );
+            int i;
+            for( i = 0 ; i < [o_screens count]; i++)
+            {
+                struct
+                {
+                    CGDirectDisplayID displayID;
+                    CGGammaValue redMin, redMax, redGamma,
+                                 greenMin, greenMax, greenGamma,
+                                 blueMin, blueMax, blueGamma;
+                } dispSettings;
+                CGDisplayCount dspyCnt;
+                CGPoint gPoint;
+
+                if( i == i_device ) continue;
+
+                screen_rect = [[o_screens objectAtIndex: i] frame];
+
+                gPoint.x = screen_rect.origin.x;
+                gPoint.y = screen_rect.origin.y;
+                CGGetDisplaysWithPoint( gPoint, 1, &(dispSettings.displayID), &dspyCnt);
+                CGGetDisplayTransferByFormula(
+                    dispSettings.displayID,
+                    &dispSettings.redMin, &dispSettings.redMax, &dispSettings.redGamma,
+                    &dispSettings.greenMin, &dispSettings.greenMax, &dispSettings.greenGamma,
+                    &dispSettings.blueMin, &dispSettings.blueMax, &dispSettings.blueGamma );
+                CGSetDisplayTransferByFormula(
+                    dispSettings.displayID,
+                    dispSettings.redMin,   0, dispSettings.redGamma,
+                    dispSettings.greenMin, 0, dispSettings.greenGamma,
+                    dispSettings.blueMin,  0, dispSettings.blueGamma );
+            }
+        }
         if( b_menubar_screen )
         {
             BeginFullScreen( &p_fullscreen_state, NULL, 0, 0,
                              NULL, NULL, fullScreenAllowEvents );
+        }
+        if( var_GetBool( p_vout, "macosx-black" ) )
+        {
+            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+            CGDisplayFade( token, 2, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
+            CGReleaseDisplayFadeReservation( token);
         }
     }
     else if( var_GetBool( p_real_vout, "macosx-background" ) )
@@ -1050,11 +1097,20 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id) closeReal: (id) sender
 {
-    [super close];
-    if( p_fullscreen_state )
+    if( b_fullscreen == VLC_TRUE )
     {
-        EndFullScreen( p_fullscreen_state, 0 );
+        if( p_vout->b_fullscreen )
+            EndFullScreen( p_fullscreen_state, 0 );
+        if( var_GetBool( p_vout, "macosx-black" ) )
+        {
+            CGDisplayFadeReservationToken token;
+            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+            CGDisplayFade( token, 2, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
+            CGReleaseDisplayFadeReservation( token);
+            CGDisplayRestoreColorSyncSettings();
+        }
     }
+    [super close];
     return NULL;
 }
 

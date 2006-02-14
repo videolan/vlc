@@ -70,7 +70,10 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define FILL_LONGTEXT N_("In fullscreen mode, crop the picture if " \
         "necessary in order to fill the screen without black " \
         "borders (OpenGL only)." )
-        
+
+#define BLACK_TEXT N_("Black screens in fullscreen")
+#define BLACK_LONGTEXT N_("In fullscreen mode, black non-video screens." )
+
 #define BACKGROUND_TEXT N_("Use as Desktop Background")
 #define BACKGROUND_LONGTEXT N_("Use the video as the Desktop Background " \
         "of the Finder. Desktop icons cannot be interacted with in this mode." )
@@ -104,6 +107,8 @@ vlc_module_begin();
                      VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                 OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
+        add_bool( "macosx-black", 0, NULL, BLACK_TEXT, BLACK_LONGTEXT,
+                  VLC_TRUE );
         add_bool( "macosx-fill", 0, NULL, FILL_TEXT, FILL_LONGTEXT,
                   VLC_TRUE );
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
