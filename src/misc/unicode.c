@@ -428,6 +428,7 @@ int utf8_lstat( const char *filename, void *buf)
  *****************************************************************************
  * Not Todo : convert Latin1 to UTF-8 on the flu
  * It is not possible given UTF-8 needs more space
+ * Returns str if it was valid UTF-8, NULL if not.
  *****************************************************************************/
 #define isutf8cont( c ) (((c) >= 0x80) && ((c) <= 0xBF)) 
 char *EnsureUTF8( char *str )
@@ -451,7 +452,10 @@ char *EnsureUTF8( char *str )
             if( isutf8cont( c ) )
                 ptr += 2; /* OK */
             else
+            {
                 *ptr++ = '?'; /* invalid */
+                str = NULL;
+            }
         }
         else
         /* 3 bytes */
@@ -464,10 +468,16 @@ char *EnsureUTF8( char *str )
                 if( isutf8cont( c ) )
                     ptr += 3; /* OK */
                 else
+                {
                     *ptr++ = '?';
+                    str = NULL;
+                }
             }
             else
+            {
                 *ptr++ = '?';
+                str = NULL;
+            }
         }
         else
         if( ( ( c >= 0xE1 ) && ( c <= 0xEC ) ) || ( c == 0xEC )
@@ -480,10 +490,16 @@ char *EnsureUTF8( char *str )
                 if( isutf8cont( c ) )
                     ptr += 3; /* OK */
                 else
+                {
                     *ptr++ = '?';
+                    str = NULL;
+                }
             }
             else
+            {
                 *ptr++ = '?';
+                str = NULL;
+            }
         }
         else
         if( c == 0xED )
@@ -495,10 +511,16 @@ char *EnsureUTF8( char *str )
                 if( isutf8cont( c ) )
                     ptr += 3; /* OK */
                 else
+                {
                     *ptr++ = '?';
+                    str = NULL;
+                }
             }
             else
+            {
                 *ptr++ = '?';
+                str = NULL;
+            }
         }
         else
         /* 4 bytes */
@@ -514,13 +536,22 @@ char *EnsureUTF8( char *str )
                     if( isutf8cont( c ) )
                         ptr += 4; /* OK */
                     else
+                    {
                         *ptr++ = '?';
+                        str = NULL;
+                    }
                 }
                 else
+                {
                     *ptr++ = '?';
+                    str = NULL;
+                }
             }
             else
+            {
                 *ptr++ = '?';
+                str = NULL;
+            }
         }
         else
         if( ( c >= 0xF1 ) && ( c <= 0xF3 ) )
@@ -535,13 +566,22 @@ char *EnsureUTF8( char *str )
                     if( isutf8cont( c ) )
                         ptr += 4; /* OK */
                     else
+                    {
                         *ptr++ = '?';
+                        str = NULL;
+                    }
                 }
                 else
+                {
                     *ptr++ = '?';
+                    str = NULL;
+                }
             }
             else
+            {
                 *ptr++ = '?';
+                str = NULL;
+            }
         }
         else
         if( c == 0xF4 )
@@ -556,16 +596,28 @@ char *EnsureUTF8( char *str )
                     if( isutf8cont( c ) )
                         ptr += 4; /* OK */
                     else
+                    {
                         *ptr++ = '?';
+                        str = NULL;
+                    }
                 }
                 else
+                {
                     *ptr++ = '?';
+                    str = NULL;
+                }
             }
             else
+            {
                 *ptr++ = '?';
+                str = NULL;
+            }
         }
         else
+        {
             *ptr++ = '?';
+            str = NULL;
+        }
     }
 
     return str;
