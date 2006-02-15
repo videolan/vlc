@@ -30,9 +30,8 @@
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
+
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
@@ -83,13 +82,13 @@ struct svg_rendition_t
     int            i_height;
     int            i_chroma;
     /** The SVG source associated with this subpicture */
-    byte_t        *psz_text;
+    char           *psz_text;
     /* The rendered SVG, as a GdkPixbuf */
     GdkPixbuf      *p_rendition;
 };
 
 static int Render( filter_t *, subpicture_region_t *, svg_rendition_t *, int, int);
-static byte_t *svg_GetTemplate ();
+static char *svg_GetTemplate ();
 static void svg_set_size( filter_t *p_filter, int width, int height );
 static void svg_SizeCallback  ( int *width, int *height, gpointer data );
 static void svg_RenderPicture ( filter_t *p_filter,
@@ -105,7 +104,7 @@ static void FreeString( svg_rendition_t * );
 struct filter_sys_t
 {
     /* The SVG template used to convert strings */
-    byte_t        *psz_template;
+    char          *psz_template;
     /* Default size for rendering. Initialized to the output size. */
     int            i_width;
     int            i_height;
@@ -150,7 +149,7 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static byte_t *svg_GetTemplate( vlc_object_t *p_this )
+static char *svg_GetTemplate( vlc_object_t *p_this )
 {
     filter_t *p_filter = ( filter_t * )p_this;
     char *psz_filename;
@@ -397,7 +396,7 @@ static void svg_RenderPicture( filter_t *p_filter,
     rsvg_handle_set_size_callback( p_handle, svg_SizeCallback, p_filter, NULL );
 
     rsvg_handle_write( p_handle,
-                       p_svg->psz_text, strlen( p_svg->psz_text ) + 1,
+                       ( guchar* )p_svg->psz_text, strlen( p_svg->psz_text ) + 1,
                        &error );
     if( error != NULL )
     {
@@ -450,7 +449,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         /* Data is text. Convert to SVG */
         int length;
-        byte_t* psz_template = p_sys->psz_template;
+        char* psz_template = p_sys->psz_template;
         length = strlen( psz_string ) + strlen( psz_template ) + 42;
         p_svg->psz_text = malloc( length + 1 );
         if( !p_svg->psz_text )
