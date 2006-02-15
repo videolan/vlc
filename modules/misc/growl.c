@@ -179,7 +179,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
 #define insertstrlen( psz ) \
 { \
-    uint16_t i_size = htons(strlen( psz )); \
+    uint16_t i_size = strlen( psz ); \
     psz_encoded[i++] = (i_size>>8)&0xFF; \
     psz_encoded[i++] = i_size&0xFF; \
 }
@@ -235,7 +235,7 @@ static int NotifyToGrowl( vlc_object_t *p_this, char *psz_type,
     memset( psz_encoded, 0, sizeof(psz_encoded) );
     psz_encoded[i++] = GROWL_PROTOCOL_VERSION;
     psz_encoded[i++] = GROWL_TYPE_NOTIFICATION;
-    flags = htons(0);
+    flags = 0;
     psz_encoded[i++] = (flags>>8)&0xFF;
     psz_encoded[i++] = flags&0xFF;
     insertstrlen(psz_type);
@@ -274,7 +274,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
 
     for( i = 0 ; i < 4 ; i++ )
     {
-        md5.p_digest[i] = htonl(md5.p_digest[i]);
+        md5.p_digest[i] = md5.p_digest[i];
         p_data[i_offset++] =  md5.p_digest[i]     &0xFF;
         p_data[i_offset++] = (md5.p_digest[i]>> 8)&0xFF;
         p_data[i_offset++] = (md5.p_digest[i]>>16)&0xFF;
