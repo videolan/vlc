@@ -1,6 +1,14 @@
 from distutils.core import setup, Extension
 import os
 
+if os.sys.platform in ('win32', 'darwin'):
+    # Do not use PIC version on win32 and Mac OS X
+    vlclib='../../lib/libvlc.a'
+    picflag=''
+else:
+    vlclib='../../lib/libvlc_pic.a'
+    picflag='pic'
+
 def get_vlcconfig():
     vlcconfig=None
     for n in ( 'vlc-config',
@@ -40,7 +48,9 @@ def get_ldflags():
 	ldflags = []
 	if os.sys.platform == 'darwin':
 	    ldflags = "-read_only_relocs warning".split()
-        ldflags.extend(os.popen('%s --libs vlc pic builtin' % vlcconfig, 'r').readline().rstrip().split())
+        ldflags.extend(os.popen('%s --libs vlc %s builtin' % (vlcconfig,
+							      picflag), 
+				'r').readline().rstrip().split())
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
         return ldflags
@@ -50,7 +60,7 @@ vlclocal = Extension('vlc',
                 sources = ['vlcglue.c',
                            '../../src/control/mediacontrol_init.c'],
                 include_dirs = ['../../include', '../../', '/usr/win32/include' ],
-                extra_objects = [ '../../lib/libvlc_pic.a' ],
+                extra_objects = [ vlclib ],
                 extra_compile_args = get_cflags(),
 		extra_link_args = [ '-L../..' ]  + get_ldflags(),
                 )
