@@ -93,10 +93,6 @@ static int Open( vlc_object_t *p_this )
         return -1;
     }
 
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                FIND_ANYWHERE );
-
-
     p_intf->p_sys->psz_format = config_GetPsz( p_intf, "msn-format" );
     if( !p_intf->p_sys->psz_format )
     {
@@ -105,12 +101,15 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_intf, "using format: %s", p_intf->p_sys->psz_format );
 
+    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+
     if( !p_playlist )
     {
         msg_Err( p_intf, "could not find playlist object" );
         free( p_intf->p_sys->psz_format );
         free( p_intf->p_sys );
-        return -1;
+        return VLC_ENOOBJ;
     }
 
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
@@ -118,7 +117,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -127,10 +126,18 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find(
+                      p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     /* clear the MSN stuff ... else it looks like we're still playing
      * something although VLC (or the MSN plugin) is closed */
     SendToMSN( "\\0Music\\01\\0\\0\\0\\0\\0\\0\\0" );
+
+    if( p_playlist )
+    {
+        var_DellCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    }
+
 
     /* Destroy structure */
     free( p_intf->p_sys->psz_format );
@@ -152,33 +159,42 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-
+    playlist_t *p_playlist;
     char psz_tmp[MSN_MAX_LENGTH];
     char *psz_title = NULL;
     char *psz_artist = NULL;
     char *psz_album = NULL;
+    input_thread_t *p_input;
 
     int i,j;
 
     if( !p_intf->p_sys ) return VLC_SUCCESS;
 
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
-    if( !p_input || p_input->b_dead || !p_input->input.p_item->psz_name )
+     p_playlist = (playlist_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                                 FIND_ANYWHERE );
+
+     if( !p_playlist ) return VLC_EGENERIC;
+
+     p_input = p_playlist->p_input;
+     vlc_object_release( p_playlist );
+     if( !p_input ) return VLC_SUCCESS;
+     vlc_object_yield( p_input );
+
+    if( p_input->b_dead || !p_input->input.p_item->psz_name )
     {
         /* Not playing anything ... */
         SendToMSN( "\\0Music\\01\\0\\0\\0\\0\\0\\0\\0" );
+        vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
 
     /* Playing something ... */
     psz_artist = vlc_input_item_GetInfo( p_input->input.p_item,
                                          _("Meta-information"),
-                                         VLC_META_ARTIST);
+                                         _(VLC_META_ARTIST) );
     psz_album = vlc_input_item_GetInfo( p_input->input.p_item,
                                          _("Meta-information"),
-                                         _("Album/movie/show title" ) );
+                                         _("Album/movie/show title"  ) );
     psz_title = strdup( p_input->input.p_item->psz_name );
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
     if( psz_artist == NULL ) psz_artist = strdup( N_("(no artist)") );
