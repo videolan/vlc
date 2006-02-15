@@ -123,10 +123,7 @@ static void Close( vlc_object_t *p_this )
     {
         var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
         vlc_object_release( p_playlist );
-        return VLC_EGENERIC;
     }
-
-
 }
 
 /*****************************************************************************
