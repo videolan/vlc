@@ -56,14 +56,16 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
  * have MSN 7 or newer) to "advertise" what you are playing in VLC.
  * You need to enable the "What I'm Listening To" option in MSN.
  *****************************************************************************/
-#define PORT_TEXT N_("Growl UDP port")
-#define PORT_LONGTEXT N_("Growl UPD port on the server.")
 #define SERVER_DEFAULT "127.0.0.1"
 #define SERVER_TEXT N_("Growl server")
 #define SERVER_LONGTEXT N_("Growl server receiving notifications.")
 #define PASS_DEFAULT ""
 #define PASS_TEXT N_("Growl password")
 #define PASS_LONGTEXT N_("Growl password on the server.")
+#define PORT_TEXT N_("Growl UDP port")
+#define PORT_LONGTEXT N_("Growl UPD port on the server.")
+#define TTL_TEXT N_("Growl TTL")
+#define TTL_LONGTEXT N_("Growl TTL.")
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
@@ -71,12 +73,14 @@ vlc_module_begin();
     set_shortname( N_( "growl" ) );
     set_description( _("Growl Notification Plugin") );
 
-    add_integer( "growl-port", 9887, NULL,
-                PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
     add_string( "growl-server", SERVER_DEFAULT, NULL,
                 SERVER_TEXT, SERVER_LONGTEXT, VLC_FALSE );
     add_string( "growl-password", PASS_DEFAULT, NULL,
                 PASS_TEXT, PASS_LONGTEXT, VLC_FALSE );
+    add_integer( "growl-port", 9887, NULL,
+                PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
+    add_integer( "growl-ttl", 12, NULL,
+                TTL_TEXT, TTL_LONGTEXT, VLC_TRUE );
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
@@ -260,6 +264,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     char *psz_password = config_GetPsz( p_intf, "growl-password" );
     char *psz_server = config_GetPsz( p_intf, "growl-server" );
     int i_port = config_GetInt( p_intf, "growl-port" );
+    int i_ttl = config_GetInt( p_intf, "growl-ttl" );
     strcpy( (char*)(p_data+i_offset), psz_password );
     i = i_offset + strlen(psz_password);
 
@@ -276,7 +281,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
         p_data[i_offset++] = (md5.p_digest[i]>>24)&0xFF;
     }
 
-    i_handle = net_ConnectUDP( p_this, psz_server, i_port, 0 );
+    i_handle = net_ConnectUDP( p_this, psz_server, i_port, i_ttl );
     if( i_handle == -1 )
     {
          msg_Err( p_this, "failed to open a connection (udp)" );
