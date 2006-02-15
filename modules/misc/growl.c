@@ -276,7 +276,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
         p_data[i_offset++] = (md5.p_digest[i]>>24)&0xFF;
     }
 
-    i_handle = net_ConnectUDP( p_this, psz_server, i_port, 42 /*TTL*/ );
+    i_handle = net_ConnectUDP( p_this, psz_server, i_port, 0 );
     if( i_handle == -1 )
     {
          msg_Err( p_this, "failed to open a connection (udp)" );
