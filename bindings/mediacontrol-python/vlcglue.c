@@ -168,6 +168,11 @@ static PyObject
     {
         /* Try to initialize */
         i_id = VLC_Create();
+	if( i_id < 0 ) 
+        {
+            PyErr_SetString( PyExc_StandardError, "Unable to create a VLC instance." );
+            return NULL;            
+        }
         p_object = ( vlc_object_t* )vlc_current_object( i_id );
     }
 
