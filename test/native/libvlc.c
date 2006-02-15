@@ -93,15 +93,55 @@ static PyObject *vlm_test( PyObject *self, PyObject *args )
 {
     libvlc_instance_t *p_instance;
     char *argv[] = { "vlc", "--quiet" };
+    char *ppsz_empty[] = {};
     libvlc_exception_t exception;
     libvlc_exception_init( &exception );
 
     p_instance = libvlc_new( 2, argv, &exception );
     ASSERT_NOEXCEPTION;
-   
+  
+    /* Test that working on unexisting streams fail */
     libvlc_vlm_set_enabled( p_instance, "test", 1, &exception );
     ASSERT_EXCEPTION;
     libvlc_exception_clear( &exception );
+    libvlc_vlm_set_input( p_instance, "test", "input", &exception );
+    ASSERT_EXCEPTION;
+    libvlc_exception_clear( &exception );
+    libvlc_vlm_del_media( p_instance, "test", &exception );
+    ASSERT_EXCEPTION;
+    libvlc_exception_clear( &exception );
+
+    /*******  Broadcast *******/
+    /* Now create a media */
+    libvlc_vlm_add_broadcast( p_instance, "test", "input_test", "output_test",
+                              0, ppsz_empty, 1, 1, &exception );
+    ASSERT_NOEXCEPTION;
+    libvlc_exception_clear( &exception );
+
+    /* Change its parameters */
+    libvlc_vlm_set_enabled( p_instance, "test", 0, &exception );
+    ASSERT_NOEXCEPTION;
+    libvlc_exception_clear( &exception );
+    libvlc_vlm_set_output( p_instance, "test", "output_test2", &exception );
+    ASSERT_NOEXCEPTION;
+    libvlc_exception_clear( &exception );
+
+    /* Check the parameters */
+    fprintf( stderr, "The code for this is not written yet\n");
+
+    /* Control it a bit */
+    fprintf( stderr, "The code for this is not written yet\n");
+
+    /* Try to delete it */
+    libvlc_vlm_del_media( p_instance, "test", &exception );
+    ASSERT_NOEXCEPTION;
+    libvlc_exception_clear( &exception );
+
+    libvlc_vlm_del_media( p_instance, "test", &exception );
+    ASSERT_EXCEPTION;
+    libvlc_exception_clear( &exception );
+
+    /*******  VOD *******/
 
     Py_INCREF( Py_None );
     return Py_None;

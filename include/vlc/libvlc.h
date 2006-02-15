@@ -347,6 +347,42 @@ void libvlc_vlm_set_enabled( libvlc_instance_t *, char *, int,
                              libvlc_exception_t *);
 
 /**
+ * Set the output for a media
+ * \param p_instance the instance
+ * \param psz_name the media to work on
+ * \param psz_output the output MRL (the parameter to the "sout" variable)
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_set_output( libvlc_instance_t *, char *, char*,
+                            libvlc_exception_t *);
+
+/**
+ * Set a media's input MRL. This will delete all existing inputs and
+ * add the specified one.
+ * \param p_instance the instance
+ * \param psz_name the media to work on
+ * \param psz_input the input MRL
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_set_input( libvlc_instance_t *, char *, char*,
+                           libvlc_exception_t *);
+
+
+
+/**
+ * Set output for a media
+ * \param p_instance the instance
+ * \param psz_name the media to work on
+ * \param b_loop the new status
+ * \param p_exception an initialized exception
+ */
+void libvlc_vlm_set_loop( libvlc_instance_t *, char *, int,
+                          libvlc_exception_t *);
+
+
+
+
+/**
  * Edit the parameters of a media. This will delete all existing inputs and
  * add the specified one.
  * \param p_instance the instance
