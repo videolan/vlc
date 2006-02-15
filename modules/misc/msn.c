@@ -135,7 +135,7 @@ static void Close( vlc_object_t *p_this )
 
     if( p_playlist )
     {
-        var_DellCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+        var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     }
 
 
