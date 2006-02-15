@@ -1358,7 +1358,7 @@ position_py_to_c( PyObject * py_position )
     {
         a_position->origin = pos->origin;
         a_position->key    = pos->key;
-        a_position->value  = pos->value;
+        a_position->value  = ntohll(pos->value);
     }
     else
     {

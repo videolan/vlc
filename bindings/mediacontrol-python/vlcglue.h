@@ -107,7 +107,7 @@ typedef struct
     PyObject_HEAD
     int origin;
     int key;
-    long long value;
+    PY_LONG_LONG value;
 } PyPosition;
 
 staticforward PyTypeObject PyPosition_Type;
@@ -116,3 +116,11 @@ mediacontrol_PositionKey positionKey_py_to_c( PyObject * py_key );
 mediacontrol_PositionOrigin positionOrigin_py_to_c( PyObject * py_origin );
 mediacontrol_Position * position_py_to_c( PyObject * py_position );
 PyPosition * position_c_to_py( mediacontrol_Position * position );
+
+/* Long long conversion on Mac os X/ppc */
+#if defined (__ppc__) || defined(__ppc64__)
+#define ntohll(x) ((long long) x >> 64)
+#else
+#define ntohll(x) (x)
+#endif
+
