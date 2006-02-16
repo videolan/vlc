@@ -281,19 +281,19 @@ typedef struct {
 } ATTRIBUTE_PACKED hl_gi_t;
 
 
-/** 
- * Button Color Information Table 
+/**
+ * Button Color Information Table
  * Each entry beeing a 32bit word that contains the color indexs and alpha
  * values to use.  They are all represented by 4 bit number and stored
  * like this [Ci3, Ci2, Ci1, Ci0, A3, A2, A1, A0].   The actual palette
  * that the indexes reference is in the PGC.
- * @TODO split the uint32_t into a struct
+ * \todo split the uint32_t into a struct
  */
 typedef struct {
   uint32_t btn_coli[3][2];  /**< [button color number-1][select:0/action:1] */
 } ATTRIBUTE_PACKED btn_colit_t;
 
-/** 
+/**
  * Button Information
  *
  * NOTE: I've had to change the structure from the disk layout to get
