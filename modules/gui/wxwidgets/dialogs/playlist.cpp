@@ -62,9 +62,9 @@ static int PlaylistNext( vlc_object_t *, const char *,
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
-                      vlc_value_t oval, vlc_value_t nval, void *param );
+                         vlc_value_t oval, vlc_value_t nval, void *param );
 static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
-                      vlc_value_t oval, vlc_value_t nval, void *param );
+                        vlc_value_t oval, vlc_value_t nval, void *param );
 
 /*****************************************************************************
  * Event Table.
@@ -494,8 +494,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     wxString msg;
     wxString duration = wxU( "" );
     char *psz_author = vlc_input_item_GetInfo( &p_item->input,
-                                                     _("Meta-information"),
-                                                     VLC_META_ARTIST );
+                                               _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
     if( !psz_author )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
@@ -519,7 +518,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     else
     {
         msg = wxString(wxU( psz_author )) + wxT(" - ") +
-                    wxString(wxU(p_item->input.psz_name)) + duration;
+              wxString(wxU(p_item->input.psz_name)) + duration;
     }
     free( psz_author );
     treectrl->SetItemText( item , msg );

@@ -42,6 +42,7 @@
 
 #include <wx/dynarray.h>
 #include <wx/imaglist.h>
+#include "vlc_meta.h"
 
 namespace wxvlc {
 /* Callback prototype */
@@ -291,7 +292,7 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     wxString duration = wxU( "" );
     char *psz_author =
         vlc_input_item_GetInfo( &p_item->input,
-                                _("Meta-information"), _("Artist"));
+                                _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
     if( !psz_author )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );

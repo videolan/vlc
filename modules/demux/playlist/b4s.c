@@ -321,7 +321,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_now )
                     {
                         vlc_input_item_AddInfo( &(p_item->input),
-                                                _("Meta-information"),
+                                                _(VLC_META_INFO_CAT),
                                                 _( VLC_META_NOW_PLAYING ),
                                                 "%s",
                                                 psz_now );
@@ -329,7 +329,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_genre )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _("Meta-information"),
+                                                _(VLC_META_INFO_CAT),
                                                 _( VLC_META_GENRE ),
                                                 "%s",
                                                 psz_genre );
@@ -337,7 +337,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_listeners )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _("Meta-information"),
+                                                _(VLC_META_INFO_CAT),
                                                 _( "Listeners" ),
                                                 "%s",
                                                 psz_listeners );
@@ -345,7 +345,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_bitrate )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _("Meta-information"),
+                                                _(VLC_META_INFO_CAT),
                                                 _( "Bitrate" ),
                                                 "%s",
                                                 psz_bitrate );

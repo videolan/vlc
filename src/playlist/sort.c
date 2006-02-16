@@ -187,10 +187,10 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             {
                 char *psz_a = vlc_input_item_GetInfo(
                                  &pp_items[i]->input,
-                                 _( "Meta-information"), _("Artist") );
+                                 _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
                 char *psz_b = vlc_input_item_GetInfo(
                                  &pp_items[i_small]->input,
-                                 _( "Meta-information"), _("Artist") );
+                                 _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
                 if( pp_items[i]->i_children == -1 &&
                     pp_items[i_small]->i_children >= 0 )
                 {
@@ -230,10 +230,10 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 	    {
                 char *psz_a = vlc_input_item_GetInfo(
                                  &pp_items[i]->input,
-                                 _( "Meta-information"), _("Album/movie/show title") );
+                                 _(VLC_META_INFO_CAT), _(VLC_META_COLLECTION) );
                 char *psz_b = vlc_input_item_GetInfo(
                                  &pp_items[i_small]->input,
-                                 _( "Meta-information"), _("Album/movie/show title") );
+                                 _(VLC_META_INFO_CAT), _(VLC_META_COLLECTION) );
                 if( pp_items[i]->i_children == -1 &&
                     pp_items[i_small]->i_children >= 0 )
                 {
@@ -325,17 +325,17 @@ int playlist_NodeGroup( playlist_t * p_playlist , int i_view,
         else if ( i_mode == SORT_AUTHOR )
         {
             psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
-                            _("Meta-information"), _( "Artist" ) );
+                            _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
         }
         else if ( i_mode == SORT_ALBUM )
         {
             psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
-                            _("Meta-information"), _( "Album/movie/show title" ) );
+                            _(VLC_META_INFO_CAT), _(VLC_META_COLLECTION) );
         }
         else if ( i_mode == SORT_GENRE )
         {
             psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
-                            _("Meta-information"), _( "Genre" ) );
+                            _(VLC_META_INFO_CAT), _(VLC_META_GENRE) );
         }
 
         if( psz_search && !strcmp( psz_search, "" ) )

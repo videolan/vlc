@@ -206,8 +206,8 @@ static int Demux( demux_t *p_demux )
             }
             p_item->input.i_duration = i_duration;
             if ( psz_artist && *psz_artist )
-                vlc_input_item_AddInfo( &p_item->input, _("Meta-information"),
-                                        _("Artist"), "%s", psz_artist );
+                vlc_input_item_AddInfo( &p_item->input, _(VLC_META_INFO_CAT),
+                                        _(VLC_META_ARTIST), "%s", psz_artist );
             playlist_NodeAddItem( p_playlist, p_item,
                                   p_current->pp_parents[0]->i_view,
                                   p_current, PLAYLIST_APPEND,

@@ -25,11 +25,14 @@
 #define _VLC_META_H 1
 
 /* VLC meta name */
+#define VLC_META_INFO_CAT           N_("Meta-information")
 #define VLC_META_TITLE              N_("Title")
 #define VLC_META_AUTHOR             N_("Author")
 #define VLC_META_ARTIST             N_("Artist")
 #define VLC_META_GENRE              N_("Genre")
 #define VLC_META_COPYRIGHT          N_("Copyright")
+#define VLC_META_COLLECTION         N_("Album/movie/show title")
+#define VLC_META_SEQ_NUM            N_("Track number/position in set")
 #define VLC_META_DESCRIPTION        N_("Description")
 #define VLC_META_RATING             N_("Rating")
 #define VLC_META_DATE               N_("Date")

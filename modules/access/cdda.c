@@ -508,7 +508,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
                                         p_access->info.i_title+1 );
              pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
              *pp_meta = vlc_meta_New();
-             vlc_meta_Add( *pp_meta, VLC_META_TITLE, psz_title );
+             vlc_meta_Add( *pp_meta, _(VLC_META_TITLE), psz_title );
              free( psz_title );
              break;
 
@@ -593,7 +593,7 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
         }
         else
         {
-            char *psz_uri; int i_size, i_length;
+            char *psz_uri;
             int i_path_len = p_access->psz_path ? strlen( p_access->psz_path )
                                                 : 0;
             char *psz_opt;
@@ -624,8 +624,8 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
                     if( cddb_track_get_title( t )  != NULL )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                            _("Meta-information"),
-                                            VLC_META_TITLE,
+                                            _(VLC_META_INFO_CAT),
+                                            _(VLC_META_TITLE),
                                             cddb_track_get_title( t ) );
                         if( p_item->input.psz_name )
                             free( p_item->input.psz_name );
@@ -636,8 +636,8 @@ static int GetTracks( access_t *p_access, vlc_bool_t b_separate,
                     if( psz_result )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                            _("Meta-information"),
-                                            VLC_META_ARTIST, psz_result );
+                                            _(VLC_META_INFO_CAT),
+                                            _(VLC_META_ARTIST), psz_result );
                     }
                 }
             }

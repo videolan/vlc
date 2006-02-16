@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc_meta.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 
@@ -65,7 +66,7 @@ int Export_M3U( vlc_object_t *p_this )
         {
             char *psz_artist =
                 vlc_input_item_GetInfo( &p_playlist->pp_items[i]->input,
-                                        _("Meta-information"), _("Artist") );
+                                        _(VLC_META_INFO_CAT), _(VLC_META_ARTIST) );
             if( psz_artist && *psz_artist )
             {
                 /* write EXTINF with artist */

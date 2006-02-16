@@ -223,8 +223,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     }
 
     /* Remove 'Now playing' info as it is probably outdated */
-    input_Control( p_input, INPUT_DEL_INFO, _("Meta-information"),
-                    VLC_META_NOW_PLAYING );
+    input_Control( p_input, INPUT_DEL_INFO, _(VLC_META_INFO_CAT),
+                   VLC_META_NOW_PLAYING );     /* ? Don't translate as it might has been copied ? */
 
     return p_input;
 }
@@ -1896,15 +1896,15 @@ static int  UpdateMeta( input_thread_t *p_input, vlc_bool_t b_quick )
             msg_Dbg( p_input, "  - '%s' = '%s'",
                      _(p_meta->name[i]), p_meta->value[i] );
 
-        if( !strcmp(p_meta->name[i], VLC_META_TITLE) && p_meta->value[i] &&
+        if( !strcmp(p_meta->name[i], _(VLC_META_TITLE)) && p_meta->value[i] &&
             !p_input->input.p_item->b_fixed_name )
             input_Control( p_input, INPUT_SET_NAME, p_meta->value[i] );
 
-        if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
+        if( !strcmp( p_meta->name[i], _(VLC_META_AUTHOR) ) )
             input_Control( p_input, INPUT_ADD_INFO, _("General"),
-                           _("Author"), p_meta->value[i] );
+                           _(VLC_META_AUTHOR), p_meta->value[i] );
 
-        input_Control( p_input, INPUT_ADD_INFO, _("Meta-information"),
+        input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT),
                       _(p_meta->name[i]), "%s", p_meta->value[i] );
     }
 
@@ -2362,7 +2362,7 @@ static vlc_meta_t *InputMetaUser( input_thread_t *p_input )
 #define GET_META( c, s ) \
     var_Get( p_input, (s), &val );  \
     if( *val.psz_string )       \
-        vlc_meta_Add( p_meta, c, val.psz_string ); \
+        vlc_meta_Add( p_meta, _(c), val.psz_string ); \
     free( val.psz_string )
 
     GET_META( VLC_META_TITLE, "meta-title" );
