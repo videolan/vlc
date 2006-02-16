@@ -155,16 +155,17 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_track; i++ )
     {
         real_track_t *tk = p_sys->track[i];
+        int j = tk->i_subpackets;
 
         if( tk->p_frame ) block_Release( tk->p_frame );
         es_format_Clean( &tk->fmt );
 
-        while(  tk->i_subpackets-- )
+        while(  j-- )
         {
-            if( tk->p_subpackets[tk->i_subpackets] )
-                block_Release( tk->p_subpackets[tk->i_subpackets] );
-            if( !tk->i_subpackets ) free( tk->p_subpackets );
+            if( tk->p_subpackets[ j ] )
+                block_Release( tk->p_subpackets[ j ] );
         }
+        if( !tk->i_subpackets ) free( tk->p_subpackets );
 
         free( tk );
     }
@@ -904,6 +905,10 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
                  (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
 
         tk = malloc( sizeof( real_track_t ) );
+        tk->i_out_subpacket = 0;
+        tk->i_subpacket = 0;
+        tk->i_subpackets = 0;
+        tk->p_subpackets = NULL;
         tk->i_id = i_num;
         tk->fmt = fmt;
         tk->i_frame = 0;
