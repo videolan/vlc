@@ -23,3 +23,17 @@ or INSTALL.win32 for more details on that.
 
 Happy hacking.
 --Meuuh 2003-11-15
+
+
+The following patches have already been sent to the upstream developers:
+
+ffmpeg-cvs-mactel.patch - split in 5 and sent to ffmpeg-devel@mplayerhq.hu
+ o patch-ffmpeg-0b.diff
+ o patch-ffmpeg-darwin-support.diff
+ o patch-ffmpeg-inline-asm-macros.diff
+ o patch-ffmpeg-nop.diff
+ o patch-ffmpeg-p2align.diff
+flac-mactel.patch - sent to flac-dev@lists.sourceforge.net
+libdvdnav-mactel.patch - sent to dvd-devel@lists.sourceforge.net
+mpeg2dec.patch - committed upstream, will be in the 0.4.1 release
+
