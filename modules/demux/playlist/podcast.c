@@ -286,7 +286,7 @@ static int Demux( demux_t *p_demux )
                          && !strcmp( psz_elname, "link" ) )
                 {
                     vlc_input_item_AddInfo( &(p_current->input),
-                                            _(VLC_META_INFO_CAT),
+                                            _( "Podcast Info" ),
                                             _( "Podcast Link" ),
                                             "%s",
                                             psz_text );
@@ -295,7 +295,7 @@ static int Demux( demux_t *p_demux )
                          && !strcmp( psz_elname, "copyright" ) )
                 {
                     vlc_input_item_AddInfo( &(p_current->input),
-                                            _(VLC_META_INFO_CAT),
+                                            _( "Podcast Info" ),
                                             _( "Podcast Copyright" ),
                                             "%s",
                                             psz_text );
@@ -304,7 +304,7 @@ static int Demux( demux_t *p_demux )
                          && !strcmp( psz_elname, "itunes:category" ) )
                 {
                     vlc_input_item_AddInfo( &(p_current->input),
-                                            _(VLC_META_INFO_CAT),
+                                            _( "Podcast Info" ),
                                             _( "Podcast Category" ),
                                             "%s",
                                             psz_text );
@@ -313,7 +313,7 @@ static int Demux( demux_t *p_demux )
                          && !strcmp( psz_elname, "itunes:keywords" ) )
                 {
                     vlc_input_item_AddInfo( &(p_current->input),
-                                            _(VLC_META_INFO_CAT),
+                                            _( "Podcast Info" ),
                                             _( "Podcast Keywords" ),
                                             "%s",
                                             psz_text );
@@ -322,7 +322,7 @@ static int Demux( demux_t *p_demux )
                          && !strcmp( psz_elname, "itunes:subtitle" ) )
                 {
                     vlc_input_item_AddInfo( &(p_current->input),
-                                            _(VLC_META_INFO_CAT),
+                                            _( "Podcast Info" ),
                                             _( "Podcast Subtitle" ),
                                             "%s",
                                             psz_text );
@@ -332,7 +332,7 @@ static int Demux( demux_t *p_demux )
                             ||!strcmp( psz_elname, "description" ) ) )
                 { /* <description> isn't standard iTunes podcast stuff */
                     vlc_input_item_AddInfo( &(p_current->input),
-                                            _(VLC_META_INFO_CAT),
+                                            _( "Podcast Info" ),
                                             _( "Podcast Summary" ),
                                             "%s",
                                             psz_text );
@@ -369,7 +369,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_date )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Publication Date" ),
                                                 "%s",
                                                 psz_item_date );
@@ -377,7 +377,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_author )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Author" ),
                                                 "%s",
                                                 psz_item_author );
@@ -385,7 +385,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_category )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Subcategory" ),
                                                 "%s",
                                                 psz_item_category );
@@ -393,7 +393,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_duration )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Duration" ),
                                                 "%s",
                                                 psz_item_duration );
@@ -401,7 +401,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_keywords )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Keywords" ),
                                                 "%s",
                                                 psz_item_keywords );
@@ -409,7 +409,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_subtitle )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Subtitle" ),
                                                 "%s",
                                                 psz_item_subtitle );
@@ -417,7 +417,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_summary )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Summary" ),
                                                 "%s",
                                                 psz_item_summary );
@@ -425,7 +425,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_size )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Size" ),
                                                 "%s bytes",
                                                 psz_item_size );
@@ -433,7 +433,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_item_type )
                     {
                         vlc_input_item_AddInfo( &p_item->input,
-                                                _(VLC_META_INFO_CAT),
+                                                _( "Podcast Info" ),
                                                 _( "Podcast Type" ),
                                                 "%s",
                                                 psz_item_type );
