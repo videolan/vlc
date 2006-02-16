@@ -105,6 +105,10 @@
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
+    
+    /* "add node" button and menu entry */
+    IBOutlet id o_mi_addNode;
+    IBOutlet id o_btn_addNode;
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification;
@@ -127,6 +131,8 @@
 - (IBAction)sortNodeByName:(id)sender;
 - (IBAction)sortNodeByAuthor:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
+
+- (IBAction)addNode:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position inView:(int)i_view enqueue:(BOOL)b_enqueue;

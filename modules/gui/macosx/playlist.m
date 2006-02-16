@@ -517,6 +517,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_loop_popup itemAtIndex:0] setTitle: _NS("Standard Play")];
     [[o_loop_popup itemAtIndex:1] setTitle: _NS("Repeat One")];
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
+    [o_mi_addNode setTitle: _NS("Add Folder to Playlist")];
 }
 
 - (void)playlistUpdated
@@ -1491,6 +1492,28 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         [cell setFont: [NSFont systemFontOfSize: 0]];
     }
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)addNode:(id)sender
+{
+    /* simply adds a new node to the end of the playlist */
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+    if( !p_playlist )
+    {
+        msg_Err( VLCIntf, "Uh Oh! Unable to find playlist!" );
+        return;
+    }
+
+    playlist_item_t * p_item = playlist_NodeCreate( p_playlist, VIEW_CATEGORY, 
+        _("Empty Folder"), p_playlist->p_general );
+
+    if(! p_item )
+        msg_Warn( VLCIntf, "node creation failed, fix VLC!" );
+    
+    playlist_ViewUpdate( p_playlist, VIEW_CATEGORY );
+    
     vlc_object_release( p_playlist );
 }
 
