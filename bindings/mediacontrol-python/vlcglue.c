@@ -755,7 +755,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
             return NULL;
         }
         i_size = PySequence_Size( py_list );
-        ppsz_args = malloc( i_size + 1 );
+        ppsz_args = malloc( ( i_size + 1 ) * sizeof( char * ) );
         if( ! ppsz_args )
         {
             PyErr_SetString( PyExc_MemoryError, "Out of memory" );
