@@ -139,42 +139,6 @@ Index: common/i386/dct-a.asm
 +x264_mmx_2121:     dw  2,  1,  2,  1 
 +x264_mmx_p2n2p1p1: dw  2, -2,  1,  1
 +
-Index: common/i386/pixel-sse2.asm
-===================================================================
---- common/i386/pixel-sse2.asm	(revision 346)
-+++ common/i386/pixel-sse2.asm	(working copy)
-@@ -36,15 +36,6 @@
- %endmacro
- 
- 
--%ifdef FORMAT_COFF
--SECTION .rodata data
--%else
--SECTION .rodata data align=16
--%endif
--
--pd_0000ffff: times 4 dd 0x0000ffff
--
--
- SECTION .text
- 
- 
-@@ -531,3 +522,15 @@
- 
-     SATD_END
- 
-+;=============================================================================
-+; Local Data (Read Only)
-+;=============================================================================
-+%ifdef FORMAT_COFF
-+SECTION .rodata data
-+%else
-+SECTION .rodata data align=16
-+%endif
-+
-+pd_0000ffff: times 4 dd 0x0000ffff
-+
-+
 Index: common/i386/mc-a2.asm
 ===================================================================
 --- common/i386/mc-a2.asm	(revision 346)
@@ -264,7 +228,7 @@ Index: common/i386/mc-a2.asm
  echo "  --enable-avis-input      enables avisynth input (win32 only)"
  echo "  --enable-mp4-output      enables mp4 output (using gpac)"
  echo "  --enable-vfw             compiles the VfW frontend"
-@@ -58,47 +59,138 @@
+@@ -58,47 +59,143 @@
  
  EXE=""
  
@@ -349,6 +313,11 @@ Index: common/i386/mc-a2.asm
 +            CFLAGS="$CFLAGS -pg"
 +            LDFLAGS="$LDFLAGS -pg"
 +            gprof="yes"
++            ;;
++	 --enable-pic)
++            CFLAGS="$CFLAGS -fPIC"
++            ASFLAGS="$ASFLAGS -D__PIC__"
++            pic="yes"
 +            ;;
 +        --enable-vfw)
 +            vfw="yes"
@@ -446,10 +415,10 @@ Index: common/i386/mc-a2.asm
    mips|mipsel)
      ARCH="MIPS"
      ;;
-@@ -170,129 +258,6 @@
- 
+@@ -180,134 +273,6 @@
+
  CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
- 
+
 -# parse options
 -
 -for opt do
@@ -508,6 +477,11 @@ Index: common/i386/mc-a2.asm
 -            LDFLAGS="$LDFLAGS -pg"
 -            gprof="yes"
 -            ;;
+-        --enable-pic)
+-            CFLAGS="$CFLAGS -fPIC"
+-            ASFLAGS="$ASFLAGS -D__PIC__"
+-            pic="yes"
+-            ;;
 -        --enable-vfw)
 -            vfw="yes"
 -            ;;
@@ -557,7 +531,7 @@ Index: common/i386/mc-a2.asm
 -    cc_check gpac/isomedia.h "$MP4_LDFLAGS" && mp4_output="yes"
 -fi
 -if [ "$mp4_output" = "yes" ] ; then
--    CFLAGS="$CFLAGS -DMP4_OUTPUT"
+-    echo "#define MP4_OUTPUT" >> config.h
 -    LDFLAGS="$LDFLAGS $MP4_LDFLAGS"
 -fi
 -
@@ -569,7 +543,7 @@ Index: common/i386/mc-a2.asm
 -    fi
 -fi
 -if [ "$avis_input" = "yes" ] ; then
--    CFLAGS="$CFLAGS -DAVIS_INPUT"
+-    echo "#define AVIS_INPUT" >> config.h
 -    LDFLAGS="$LDFLAGS -lvfw32"
 -fi
 -
