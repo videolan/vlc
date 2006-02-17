@@ -83,7 +83,8 @@ typedef struct aout_alloc_t
 #define aout_BufferFree( p_buffer )                                         \
     if ( (p_buffer)->i_alloc_type == AOUT_ALLOC_HEAP )                      \
     {                                                                       \
-        free( p_buffer );                                                   \
+        if( p_buffer ) free( p_buffer );                                    \
+        p_buffer = NULL;                                                    \
     }
 
 /*****************************************************************************
