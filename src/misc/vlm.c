@@ -2458,6 +2458,7 @@ void vlm_Delete( vlm_t *a ){}
 int vlm_ExecuteCommand( vlm_t *a, char *b, vlm_message_t **c ){ return -1; }
 void vlm_MessageDelete( vlm_message_t *a ){}
 vlm_media_t *vlm_MediaNew( vlm_t *a, char *b, int c ){ return NULL; }
+vlm_media_t *vlm_MediaSearch (vlm_t *a, const char *b ) { return NULL; }
 void vlm_MediaDelete( vlm_t *a, vlm_media_t *b, char *c ){}
 int vlm_MediaSetup( vlm_t *a, vlm_media_t *b, char *c, char *d ){ return -1; }
 int vlm_MediaControl( vlm_t *a, vlm_media_t *b, char *c, char *d, char *e )
