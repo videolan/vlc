@@ -20,7 +20,7 @@ Playlist / Services discovery :
  * Podcast support
 
 Video output 
- * New video filters : magnify, gradient and edge detection
+ * New video filters : magnify, gradient, edge detection and bluescreen
  * Logo video filter : can now loop through multiple images
 
 Interfaces:
