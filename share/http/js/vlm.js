@@ -500,9 +500,10 @@ function parse_vlm_elements()
                             var ititle = instances[i].getAttribute( 'title' );
                             var ichapter = instances[i].getAttribute( 'chapter' );
                             var iseekable = instances[i].getAttribute( 'seekable' );
+                            var iplaylistindex = instances[i].getAttribute( 'playlistindex' );
                             
                             var item = document.createElement( "li" );
-                            item.appendChild( document.createTextNode( iname + ": " + istate + " " + (iposition.toFixed(2)) + "%" + " " + format_time( itime ) + "/" + format_time( ilength ) ) );
+                            item.appendChild( document.createTextNode( iname + ": " + istate + " (" + iplaylistindex + ") " + (iposition.toFixed(2)) + "%" + " " + format_time( itime ) + "/" + format_time( ilength ) ) );
                             ilist.appendChild( item );
                         }
                     }
