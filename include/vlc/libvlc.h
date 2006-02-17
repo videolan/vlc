@@ -90,9 +90,7 @@ void libvlc_exception_clear( libvlc_exception_t * );
  */
 char* libvlc_exception_get_message( libvlc_exception_t *p_exception );
 
-
-
-/** @} */
+/**@} */
 
 /*****************************************************************************
  * Core handling
@@ -167,10 +165,6 @@ int libvlc_playlist_isplaying( libvlc_instance_t *, libvlc_exception_t * );
  * \return the number of items
  */
 int libvlc_playlist_items_count( libvlc_instance_t *, libvlc_exception_t * );
-
-
-
-
 
 /**
  * Stop playing
@@ -305,7 +299,9 @@ void libvlc_set_fullscreen( libvlc_input_t *, int, libvlc_exception_t * );
  */
 int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t * );
 
-/** @}
+/** @} */
+
+/**
  * defgroup libvlc_vlm VLM
  * \ingroup libvlc
  * LibVLC VLM handling
@@ -399,6 +395,7 @@ void libvlc_vlm_change_media( libvlc_instance_t *, char *, char *, char* ,
                               int, char **, int, int, libvlc_exception_t * );
 
 
+/** @} */
 /** @} */
 
 # ifdef __cplusplus

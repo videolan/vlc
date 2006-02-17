@@ -30,14 +30,18 @@
 
 void InitVLM( libvlc_instance_t *p_instance )
 {
+#ifdef ENABLE_VLM
     if( p_instance->p_vlm ) return;
     p_instance->p_vlm = vlm_New( p_instance->p_vlc );
+#else
+    p_instance->p_vlm = NULL;
+#endif
 }
 
 #define CHECK_VLM { if( !p_instance->p_vlm ) InitVLM( p_instance ); \
                     if( !p_instance->p_vlm ) {\
-                      libvlc_exception_raise( p_exception, \
-                                         "Unable to create VLM" ); return; } }
+                  libvlc_exception_raise( p_exception, \
+                  "Unable to create VLM. It might be disabled." ); return; } }
 
 #define GET_MEDIA { p_media = vlm_MediaSearch( p_instance->p_vlm, psz_name );\
                    if( !p_media ) \
@@ -74,6 +78,7 @@ void libvlc_vlm_del_media( libvlc_instance_t *p_instance, char *psz_name,
     char *psz_message;
     vlm_message_t *answer;
     CHECK_VLM;
+#ifdef ENABLE_VLM
     asprintf( &psz_message, "del %s", psz_name );
     vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
     if( answer->psz_value )
@@ -82,6 +87,7 @@ void libvlc_vlm_del_media( libvlc_instance_t *p_instance, char *psz_name,
                                 psz_name );
     }
     free( psz_message);
+#endif
 }
 
 void libvlc_vlm_set_enabled( libvlc_instance_t *p_instance, char *psz_name,
@@ -89,9 +95,11 @@ void libvlc_vlm_set_enabled( libvlc_instance_t *p_instance, char *psz_name,
 {
     vlm_media_t *p_media;
     CHECK_VLM;
+#ifdef ENABLE_VLM
     GET_MEDIA;
     if( b_enabled != 0 ) b_enabled = 1;
     p_media->b_enabled = b_enabled;
+#endif
 }
 
 void libvlc_vlm_set_loop( libvlc_instance_t *p_instance, char *psz_name,
@@ -99,9 +107,11 @@ void libvlc_vlm_set_loop( libvlc_instance_t *p_instance, char *psz_name,
 {
     vlm_media_t *p_media;
     CHECK_VLM;
+#ifdef ENABLE_VLM
     GET_MEDIA;
     if( b_loop != 0 ) b_loop = 1;
     p_media->b_loop = b_loop;
+#endif
 }
 
 void libvlc_vlm_set_output( libvlc_instance_t *p_instance, char *psz_name,
@@ -110,13 +120,18 @@ void libvlc_vlm_set_output( libvlc_instance_t *p_instance, char *psz_name,
     vlm_media_t *p_media;
     int i_ret;
     CHECK_VLM;
+#ifdef ENABLE_VLM
     GET_MEDIA;
 
     vlc_mutex_lock( &p_instance->p_vlm->lock );
     i_ret = vlm_MediaSetup( p_instance->p_vlm, p_media, "output", psz_output );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to set output" ); return;}
+    {
+         libvlc_exception_raise( p_exception, "Unable to set output" );
+         vlc_mutex_unlock( &p_instance->p_vlm->lock );return;
+    }
     vlc_mutex_unlock( &p_instance->p_vlm->lock );
+#endif
 }
 
 void libvlc_vlm_set_input( libvlc_instance_t *p_instance, char *psz_name,
@@ -125,18 +140,24 @@ void libvlc_vlm_set_input( libvlc_instance_t *p_instance, char *psz_name,
     vlm_media_t *p_media;
     int i_ret;
     CHECK_VLM;
-    GET_MEDIA;
-
+#ifdef ENABLE_VLM
     vlc_mutex_lock( &p_instance->p_vlm->lock );
+    GET_MEDIA;
 
     vlm_MediaSetup( p_instance->p_vlm, p_media, "inputdel", "all" );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to change input" ); return;}
+    {
+         libvlc_exception_raise( p_exception, "Unable to change input" );
+         vlc_mutex_unlock( &p_instance->p_vlm->lock );return;
+    }
     vlm_MediaSetup( p_instance->p_vlm, p_media, "input", psz_input );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to change input" ); return;}
-
+    {
+        libvlc_exception_raise( p_exception, "Unable to change input" );
+        vlc_mutex_unlock( &p_instance->p_vlm->lock );return;
+    }
     vlc_mutex_unlock( &p_instance->p_vlm->lock );
+#endif
 }
 
 void libvlc_vlm_add_input( libvlc_instance_t *p_instance, char *psz_name,
@@ -145,18 +166,20 @@ void libvlc_vlm_add_input( libvlc_instance_t *p_instance, char *psz_name,
     vlm_media_t *p_media;
     int i_ret;
     CHECK_VLM;
-    GET_MEDIA;
-
+#ifdef ENABLE_VLM
     vlc_mutex_lock( &p_instance->p_vlm->lock );
+    GET_MEDIA;
 
     vlm_MediaSetup( p_instance->p_vlm, p_media, "input", psz_input );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to change input" ); return;}
+    {
+         libvlc_exception_raise( p_exception, "Unable to change input" );
+         vlc_mutex_unlock( &p_instance->p_vlm->lock ); return;
+    }
 
     vlc_mutex_unlock( &p_instance->p_vlm->lock );
+#endif
 }
-
-
 
 
 void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
@@ -167,25 +190,41 @@ void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
     vlm_media_t *p_media;
     int i_ret;
     CHECK_VLM;
+#ifdef ENABLE_VLM
+    vlc_mutex_lock( &p_instance->p_vlm->lock );
     GET_MEDIA;
     if( b_enabled != 0 ) b_enabled = 1;
     if( b_loop != 0 ) b_loop = 1;
 
-    vlc_mutex_lock( &p_instance->p_vlm->lock );
     i_ret = vlm_MediaSetup( p_instance->p_vlm, p_media, "output", psz_output );
-    if( i_ret ) libvlc_exception_raise( p_exception, "Unable to set output" );
+    if( i_ret )
+    {
+        libvlc_exception_raise( p_exception, "Unable to set output" );
+        vlc_mutex_unlock( &p_instance->p_vlm->lock );
+        return;
+    }
     p_media->b_enabled = b_enabled;
     p_media->b_loop = b_loop;
 
     i_ret = vlm_MediaSetup( p_instance->p_vlm, p_media, "output", psz_output );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to set output" ); return;}
+    {
+        libvlc_exception_raise( p_exception, "Unable to set output" );
+        vlc_mutex_unlock( &p_instance->p_vlm->lock ); return;
+    }
     vlm_MediaSetup( p_instance->p_vlm, p_media, "inputdel", "all" );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to change input" ); return;}
+    {
+        libvlc_exception_raise( p_exception, "Unable to change input" );
+        vlc_mutex_unlock( &p_instance->p_vlm->lock ); return;
+    }
     vlm_MediaSetup( p_instance->p_vlm, p_media, "input", psz_input );
     if( i_ret )
-    { libvlc_exception_raise( p_exception, "Unable to change input" ); return;}
+    {
+        libvlc_exception_raise( p_exception, "Unable to change input" );
+        vlc_mutex_unlock( &p_instance->p_vlm->lock );return;
+    }
 
     vlc_mutex_unlock( &p_instance->p_vlm->lock );
+#endif
 }
