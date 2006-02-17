@@ -562,7 +562,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     playlist_add_t *p_add = (playlist_add_t *)malloc(sizeof( playlist_add_t));
     memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
 
-    if( p_playlist->i_items_to_append++ > 50 )
+    if( ++p_playlist->i_items_to_append >= 50 )
     {
         /* Too many items waiting to be added, it will be quicker to rebuild
          * the whole playlist */
