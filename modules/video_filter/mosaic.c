@@ -75,6 +75,9 @@ struct filter_sys_t
     int i_vborder, i_hborder; /* border width/height between miniatures */
     int i_alpha; /* subfilter alpha blending */
 
+    vlc_bool_t b_bs; /* Bluescreen vars */
+    int i_bsu, i_bsv, i_bsut, i_bsvt;
+
     char **ppsz_order; /* list of picture-id */
     int i_order_length;
 
@@ -110,6 +113,12 @@ struct filter_sys_t
 #define DELAY_LONGTEXT N_("Pictures coming from the picture video outputs " \
         "will be delayed accordingly (in milliseconds). For high " \
         "values you will need to raise file-caching and others.")
+
+#define BLUESCREEN_TEXT N_("Enable bluescreen (aka greenscreen or chroma key) video background replacing")
+#define BLUESCREENU_TEXT N_("Bluescreen chroma key U (0-255)")
+#define BLUESCREENV_TEXT N_("Bluescreen chroma key V (0-255)")
+#define BLUESCREENUTOL_TEXT N_("Bluescreen chroma key U tolerance")
+#define BLUESCREENVTOL_TEXT N_("Bluescreen chroma key V tolerance")
 
 static int pi_pos_values[] = { 0, 1 };
 static char * ppsz_pos_descriptions[] =
@@ -149,6 +158,17 @@ vlc_module_begin();
 
     add_integer( "mosaic-delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
+
+    add_bool( "mosaic-bs", 0, NULL, BLUESCREEN_TEXT,
+              BLUESCREEN_TEXT, VLC_FALSE );
+    add_integer( "mosaic-bsu", 120, NULL, BLUESCREENU_TEXT,
+                 BLUESCREENU_TEXT, VLC_FALSE );
+    add_integer( "mosaic-bsv", 90, NULL, BLUESCREENV_TEXT,
+                 BLUESCREENV_TEXT, VLC_FALSE );
+    add_integer( "mosaic-bsut", 17, NULL, BLUESCREENUTOL_TEXT,
+                 BLUESCREENUTOL_TEXT, VLC_FALSE );
+    add_integer( "mosaic-bsvt", 17, NULL, BLUESCREENVTOL_TEXT,
+                 BLUESCREENVTOL_TEXT, VLC_FALSE );
 
     var_Create( p_module->p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();
@@ -238,7 +258,7 @@ static int CreateFilter( vlc_object_t *p_this )
         char *psz_end = NULL;
         i_index = 0;
         do
-        { 
+        {
             psz_end = strchr( psz_order, ',' );
             i_index++;
             p_sys->ppsz_order = realloc( p_sys->ppsz_order,
@@ -248,6 +268,22 @@ static int CreateFilter( vlc_object_t *p_this )
             psz_order = psz_end+1;
         } while( NULL !=  psz_end );
         p_sys->i_order_length = i_index;
+    }
+
+    /* Bluescreen specific stuff */
+    GET_VAR( bsu, 0x00, 0xff );
+    GET_VAR( bsv, 0x00, 0xff );
+    GET_VAR( bsut, 0x00, 0xff );
+    GET_VAR( bsvt, 0x00, 0xff );
+    p_sys->b_bs = var_CreateGetBool( p_filter, "mosaic-bs" );
+    var_Destroy( p_filter, "mosaic-bs" );
+    var_Create( p_libvlc, "mosaic-bs", VLC_VAR_INTEGER );
+    var_SetBool( p_libvlc, "mosaic-bs", p_sys->b_bs );
+    var_AddCallback( p_libvlc, "mosaic-bs", MosaicCallback, p_sys );
+    if( p_sys->b_bs && p_sys->b_keep )
+    {
+        msg_Warn( p_filter, "mosaic-keep-picture needs to be disabled for"
+                            " bluescreen to work" );
     }
 
     vlc_mutex_unlock( &p_sys->lock );
@@ -293,6 +329,12 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_libvlc, "mosaic-rows" );
     var_Destroy( p_libvlc, "mosaic-cols" );
     var_Destroy( p_libvlc, "mosaic-keep-aspect-ratio" );
+
+    var_Destroy( p_libvlc, "mosaic-bsu" );
+    var_Destroy( p_libvlc, "mosaic-bsv" );
+    var_Destroy( p_libvlc, "mosaic-bsut" );
+    var_Destroy( p_libvlc, "mosaic-bsvt" );
+    var_Destroy( p_libvlc, "mosaic-bs" );
 
     if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
     vlc_mutex_unlock( &p_sys->lock );
@@ -487,6 +529,37 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                 msg_Warn( p_filter,
                            "image resizing and chroma conversion failed" );
                 continue;
+            }
+
+            /* Bluescreen stuff */
+            if( p_sys->b_bs )
+            {
+                int i;
+                uint8_t *p_a = p_converted->p[ A_PLANE ].p_pixels;
+                uint8_t *p_u = p_converted->p[ U_PLANE ].p_pixels;
+                uint8_t *p_v = p_converted->p[ V_PLANE ].p_pixels;
+                int i_lines = p_converted->p[ A_PLANE ].i_lines;
+                int i_pitch = p_converted->p[ A_PLANE ].i_pitch;
+                uint8_t umin, umax, vmin, vmax;
+                umin = p_sys->i_bsu - p_sys->i_bsut >= 0x00 ?
+                       p_sys->i_bsu - p_sys->i_bsut : 0x00;
+                umax = p_sys->i_bsu + p_sys->i_bsut <= 0xff ?
+                       p_sys->i_bsu + p_sys->i_bsut : 0xff;
+                vmin = p_sys->i_bsv - p_sys->i_bsvt >= 0x00 ?
+                       p_sys->i_bsv - p_sys->i_bsvt : 0x00;
+                vmax = p_sys->i_bsv + p_sys->i_bsvt <= 0xff ?
+                       p_sys->i_bsv + p_sys->i_bsvt : 0xff;
+
+                for( i = 0; i < i_lines*i_pitch; i++ )
+                {
+                    if(    p_u[i] < umax
+                        && p_u[i] > umin
+                        && p_v[i] < vmax
+                        && p_v[i] > vmin )
+                    {
+                        p_a[i] = 0x00;
+                    }
+                }
             }
         }
         else

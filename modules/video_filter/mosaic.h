@@ -51,7 +51,7 @@ static bridge_t *__GetBridge( vlc_object_t *p_object )
     else
     {
         p_bridge = val.p_address;
-    }    
+    }
 
     return p_bridge;
 }
