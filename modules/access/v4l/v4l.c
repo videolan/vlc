@@ -900,7 +900,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         msg_Dbg( p_demux, "invalid channel, falling back on channel 0" );
         p_sys->i_channel = 0;
     }
-    if( p_sys->i_audio >= p_sys->vid_cap.audios )
+    if( p_sys->vid_cap.audios && p_sys->i_audio >= p_sys->vid_cap.audios )
     {
         msg_Dbg( p_demux, "invalid audio, falling back with no audio" );
         p_sys->i_audio = -1;
