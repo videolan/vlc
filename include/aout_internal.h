@@ -34,6 +34,10 @@ typedef struct aout_alloc_t
 #define AOUT_ALLOC_STACK    1
 #define AOUT_ALLOC_HEAP     2
 
+#if defined( __APPLE__ ) || defined( SYS_BSD )
+#undef HAVE_ALLOCA
+#endif
+
 #ifdef HAVE_ALLOCA
 #   define ALLOCA_TEST( p_alloc, p_new_buffer )                             \
         if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_STACK )                  \

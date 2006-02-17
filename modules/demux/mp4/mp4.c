@@ -406,7 +406,13 @@ static int Open( vlc_object_t * p_this )
                     else
                     {
                         /* msg dbg relative ? */
-                        char *psz_absolute = alloca( strlen( p_demux->psz_access ) + 3 + strlen( p_demux->psz_path ) + strlen( psz_ref ) + 1);
+                        int i_path_size = strlen( p_demux->psz_access ) + 3 +
+                                         strlen( p_demux->psz_path ) + strlen( psz_ref ) + 1;
+#ifdef HAVE_ALLOCA
+                        char *psz_absolute = alloca( i_path_size );
+#else
+                        char *psz_absolute = (char *)malloc( i_path_size );
+#endif
                         char *end = strrchr( p_demux->psz_path, '/' );
 
                         if( end )
@@ -439,6 +445,9 @@ static int Open( vlc_object_t * p_this )
                                 b_play = VLC_TRUE;
                             }
                         }
+#ifndef HAVE_ALLOCA
+                        free( psz_absolute );
+#endif
                     }
                 }
                 else
