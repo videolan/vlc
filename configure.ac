@@ -159,6 +159,14 @@ case "${target_os}" in
   *bsd*)
     SYS="${target_os}"
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
+    case "${target_os}" in
+      freebsd*)
+        CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include"
+        CPPFLAGS="${CPPFLAGS}"
+        LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib"
+        LDFLAGS="${LDLFAGS_save}"
+        ;;
+    esac
     ;;
   darwin1.[0123])
     dnl Mac OS X < 10.3
