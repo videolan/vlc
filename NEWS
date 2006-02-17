@@ -21,6 +21,7 @@ Playlist / Services discovery :
 
 Video output 
  * New video filters : magnify, gradient and edge detection
+ * Logo video filter : can now loop through multiple images
 
 Interfaces:
  * System to inform the user and request information 
@@ -37,7 +38,8 @@ Interfaces:
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
  * HTTP
-    - Much improved default interface pages
+    - New default interface pages for VLC and VLM
+    - A bunch of new RPN functions
 
 Windows Port:
  * MSN messenger "Now playing" support
