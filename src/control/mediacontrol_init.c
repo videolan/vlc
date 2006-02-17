@@ -18,7 +18,7 @@ mediacontrol_Instance* mediacontrol_new( char** args, mediacontrol_Exception *ex
             i_count++;
     }
 
-    ppsz_argv = malloc( i_count + 2 );
+    ppsz_argv = malloc( ( i_count + 2 ) * sizeof( char * ) ) ;
     if( ! ppsz_argv )
     {
         exception->code = mediacontrol_InternalException;
