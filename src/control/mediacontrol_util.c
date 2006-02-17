@@ -212,7 +212,7 @@ mediacontrol_RGBPicture__alloc( int datasize )
         return NULL;
 
     pic->size = datasize;
-    pic->data = ( char* )malloc( datasize );
+    pic->data = ( char* )malloc( datasize * sizeof( char ) );
     return pic;
 }
 
