@@ -82,7 +82,6 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         return NULL;
     }
     snprintf( path, 255, "object:%d", p_cache->i_object_id );
-    fprintf( stderr, "snapshot-path: %s\n", path );
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
 
