@@ -399,6 +399,33 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
  * functions
  ***************************************************************************/
 
+
+/****************************************************************************
+ * remove all ' ' '\t' '\n' '\r' characters from the begining and end of the
+ * string.
+ ***************************************************************************/
+char *removeWhiteChars( char *psz_src )
+{
+    char *psz_src2 = strdup( psz_src );
+    char *psz_clean = strdup( psz_src2 );
+    char *psz_clean2;
+    int i;
+    while( ( *psz_clean == ' ' || *psz_clean == '\t'
+           || *psz_clean == '\n' || *psz_clean == '\r' )
+           && *psz_clean != '\0' )
+    {
+        psz_clean++;
+    }
+    i = strlen( psz_clean );
+    while( --i > 0 &&
+         ( psz_clean[i] == ' ' || psz_clean[i] == '\t'
+        || psz_clean[i] == '\n' || psz_clean[i] == '\r' ) );
+    psz_clean[i+1] = '\0';
+    psz_clean2 = strdup( psz_clean );
+    free( psz_src2 );
+    return psz_clean2;
+}
+
 /****************************************************************************
  * FetchRSS
  ***************************************************************************/
@@ -537,8 +564,14 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         return 1;
                     }
+                    else
+                    {
+                        char *psz_clean;
+                        psz_clean = removeWhiteChars( psz_eltvalue );
+                        free( psz_eltvalue ); psz_eltvalue = psz_clean;
+                    }
 #                   ifdef RSS_DEBUG
-                    msg_Dbg( p_filter, "  text : %s", psz_eltvalue );
+                    msg_Dbg( p_filter, "  text : <%s>", psz_eltvalue );
 #                   endif
                     if( i_is_item == VLC_FALSE )
                     {
