@@ -702,8 +702,8 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key,
                          uint32_t i_version )
 {
     char p_secret1[] = "Tv!*";
-    static char const p_secret2[] = "v8rhvsaAvOKMFfUH%798=[;."
-                                    "f8677680a634ba87fnOIf)(*";
+    static char const p_secret2[] = "____v8rhvsaAvOKM____FfUH%798=[;."
+                                    "____f8677680a634____ba87fnOIf)(*";
     unsigned int i;
 
     p_shuffle->i_version = i_version;
@@ -728,10 +728,10 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key,
     }
 
     /* Fill p_bordel with completely meaningless initial values. */
+    memcpy( p_shuffle->p_bordel, p_secret2, 64 );
     for( i = 0; i < 4; i++ )
     {
         p_shuffle->p_bordel[ 4 * i ] = U32_AT(p_sys_key + i);
-        memcpy( p_shuffle->p_bordel + 4 * i + 1, p_secret2 + 12 * i, 12 );
         REVERSE( p_shuffle->p_bordel + 4 * i + 1, 3 );
     }
 }
