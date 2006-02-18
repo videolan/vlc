@@ -41,9 +41,9 @@
 #   include <sys/timeb.h>                                         /* ftime() */
 #endif
 
-#include "vlc_vlm.h"
-#include "vlc_vod.h"
-#include "charset.h"
+#include <vlc_vlm.h>
+#include <vlc_vod.h>
+#include <charset.h>
 
 #define FREE( p ) \
         if( p ) { free( p ); (p) = NULL; }
@@ -771,7 +771,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                 }
                 else
                 {
-                    if( i + 1 >= i_command &&
+                    if( ( (i + 1) >= i_command ) &&
                         !strcmp(ppsz_command[0], "new") )
                     {
                         vlm_MediaDelete( p_vlm, p_media, NULL );
@@ -780,7 +780,7 @@ static int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                                             "Wrong properties syntax" );
                         goto error;
                     }
-                    else if( i + 1 >= i_command )
+                    else if( (i + 1) >= i_command )
                     {
                         p_message =
                             vlm_MessageNew( ppsz_command[0],
@@ -1169,7 +1169,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             vlc_input_item_Init( VLC_OBJECT(vlm), &p_instance->item );
             p_instance->p_input = NULL;
 
-            if( media->psz_output != NULL || media->psz_vod_output != NULL )
+            if( ( media->psz_output != NULL ) || ( media->psz_vod_output != NULL ) )
             {
                 p_instance->item.ppsz_options = malloc( sizeof( char* ) );
                 asprintf( &p_instance->item.ppsz_options[0], "sout=%s%s%s",
@@ -1194,7 +1194,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             TAB_APPEND( media->i_instance, media->instance, p_instance );
         }
 
-        if( psz_args && sscanf(psz_args, "%d", &i) == 1 && i < media->i_input )
+        if( ( psz_args && sscanf(psz_args, "%d", &i) == 1 ) && ( i < media->i_input ) )
         {
             p_instance->i_index = i;
         }
@@ -1386,7 +1386,9 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, const char *psz_cmd,
         {
             schedule->i_date = 0;
         }
-        else if( p == NULL && sscanf( psz_value, "%d:%d:%d", &time.tm_hour, &time.tm_min, &time.tm_sec ) != 3 ) /* it must be a hour:minutes:seconds */
+        else if( (p == NULL) && sscanf( psz_value, "%d:%d:%d", &time.tm_hour,
+                                        &time.tm_min, &time.tm_sec ) != 3 )
+                                        /* it must be a hour:minutes:seconds */
         {
             return 1;
         }
@@ -1466,7 +1468,6 @@ int vlm_ScheduleSetup( vlm_schedule_t *schedule, const char *psz_cmd,
         {
             psz_time = psz_value;
         }
-
 
         switch( sscanf( psz_time, "%u:%u:%u", &i, &j, &k ) )
         {
@@ -1905,7 +1906,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
         return msg;
     }
 
-    else if( psz_filter == NULL && media == NULL && schedule == NULL )
+    else if( ( psz_filter == NULL ) && ( media == NULL ) && ( schedule == NULL ) )
     {
         vlm_message_t *show1 = vlm_Show( vlm, NULL, NULL, "media" );
         vlm_message_t *show2 = vlm_Show( vlm, NULL, NULL, "schedule" );
