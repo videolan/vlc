@@ -509,7 +509,6 @@ static void ThreadWrite( vlc_object_t *p_this )
     char strerror_buf[WINSOCK_STRERROR_SIZE];
 # define strerror( x ) winsock_strerror( strerror_buf )
 #endif
-    int i = 0;
 
     while( !p_thread->b_die )
     {
