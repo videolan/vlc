@@ -440,7 +440,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /*****************************************************************************
  * Plug-in stuff
  *****************************************************************************/
-#ifndef __PLUGIN__
+#if !defined (__PLUGIN__) || defined (HAVE_SHARED_LIBVLC)
 #   define VLC_EXPORT( type, name, args ) type name args
 #else
 #   define VLC_EXPORT( type, name, args ) struct _u_n_u_s_e_d_
@@ -1130,7 +1130,9 @@ VLC_EXPORT( const char *, VLC_Error, ( int ) );
 /*****************************************************************************
  * Additional vlc stuff
  *****************************************************************************/
-#include "vlc_symbols.h"
+#ifndef HAVE_SHARED_LIBVLC
+#   include "vlc_symbols.h"
+#endif
 #include "os_specific.h"
 #include "vlc_messages.h"
 #include "variables.h"
