@@ -72,11 +72,11 @@ extern "C" {
  * The configuration file syntax is very basic and so is its parser. See the
  * BNF formal representation below:
  *
- * The keywords FILENAME and PATHNAME represent the filename and pathname specification
- * that is valid for the Operating System VLC is compiled for.
+ * The keywords FILENAME and PATHNAME represent the filename and pathname
+ * specification that is valid for the Operating System VLC is compiled for.
  *
- * The hotkey actions that are supported by VLC are documented in the file src/libvlc. The
- * file include/vlc_keys.h defines some hotkey internals.
+ * The hotkey actions that are supported by VLC are documented in the file
+ * src/libvlc. The file include/vlc_keys.h defines some hotkey internals.
  *
  * CONFIG_FILE = FILENAME '.cfg'
  * WS = [ ' ' | '\t' ]+
@@ -120,29 +120,35 @@ extern "C" {
  * Text style
  *
  * A text style is used to specify the formatting of text.
- * A font renderer can use the supplied information to render the text specified.
+ * A font renderer can use the supplied information to render the
+ * text specified.
  */
 struct text_style_t
 {
-    char *     psz_fontname;                                /**< The name of the font */
-    int        i_font_size;                              /**< The font size in pixels */
-    int        i_font_color;  /**< The color of the text 0xRRGGBB (native endianness) */
-    int        i_font_alpha;                        /**< The transparency of the text.
-                                         0x00 is fully opaque, 0xFF fully transparent */
-    int        i_style_flags;                             /**< Formatting style flags */
-    int        i_outline_color;                /**< The color of the outline 0xRRGGBB */
-    int        i_outline_alpha;                  /**< The transparency of the outline.
-                                         0x00 is fully opaque, 0xFF fully transparent */
-    int        i_shadow_color;                  /**< The color of the shadow 0xRRGGBB */
-    int        i_shadow_alpha;                    /**< The transparency of the shadow.
-                                         0x00 is fully opaque, 0xFF fully transparent */
-    int        i_background_color;          /**< The color of the background 0xRRGGBB */
-    int        i_background_alpha;            /**< The transparency of the background.
-                                         0x00 is fully opaque, 0xFF fully transparent */
-    int        i_outline_width;               /**< The width of the outline in pixels */
-    int        i_shadow_width;                 /**< The width of the shadow in pixels */
-    int        i_spacing;                  /**< The spaceing between glyphs in pixels */
-    int        i_text_align;                      /**< An alignment hint for the text */
+    char *     psz_fontname;      /**< The name of the font */
+    int        i_font_size;       /**< The font size in pixels */
+    int        i_font_color;      /**< The color of the text 0xRRGGBB
+                                       (native endianness) */
+    int        i_font_alpha;      /**< The transparency of the text.
+                                       0x00 is fully opaque,
+                                       0xFF fully transparent */
+    int        i_style_flags;     /**< Formatting style flags */
+    int        i_outline_color;   /**< The color of the outline 0xRRGGBB */
+    int        i_outline_alpha;   /**< The transparency of the outline.
+                                       0x00 is fully opaque,
+                                       0xFF fully transparent */
+    int        i_shadow_color;    /**< The color of the shadow 0xRRGGBB */
+    int        i_shadow_alpha;    /**< The transparency of the shadow.
+                                        0x00 is fully opaque,
+                                        0xFF fully transparent */
+    int        i_background_color;/**< The color of the background 0xRRGGBB */
+    int        i_background_alpha;/**< The transparency of the background.
+                                       0x00 is fully opaque,
+                                       0xFF fully transparent */
+    int        i_outline_width;   /**< The width of the outline in pixels */
+    int        i_shadow_width;    /**< The width of the shadow in pixels */
+    int        i_spacing;         /**< The spaceing between glyphs in pixels */
+    int        i_text_align;      /**< An alignment hint for the text */
 };
 
 /* Style flags for \ref text_style_t */
@@ -176,8 +182,9 @@ static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE
 /**
  * OSD State object
  *
- * The OSD state object holds the state and associated images for a particular state
- * on the screen. The picture is displayed when this state is the active state.
+ * The OSD state object holds the state and associated images for a
+ * particular state on the screen. The picture is displayed when this
+ * state is the active state.
  */
 struct osd_state_t
 {
@@ -209,7 +216,8 @@ struct osd_button_t
 
     /* These member should probably be a struct hotkey */
     char    *psz_action;      /*< hotkey action name on button*/
-    char    *psz_action_down; /*< hotkey action name on range buttons for command "menu down" */
+    char    *psz_action_down; /*< hotkey action name on range buttons
+                                  for command "menu down" */
     /* end of hotkey specifics */
 
     int     i_x;            /*< x-position of button visible state image */
@@ -270,16 +278,18 @@ struct osd_menu_t
 /**
  * Initialize an osd_menu_t object
  *
- * This functions has to be called before any call to other osd_menu_t* functions.
- * It creates the osd_menu object and holds a pointer to it during its lifetime.
+ * This functions has to be called before any call to other osd_menu_t*
+ * functions. It creates the osd_menu object and holds a pointer to it
+ * during its lifetime.
  */
 VLC_EXPORT( osd_menu_t *, __osd_MenuCreate, ( vlc_object_t *, const char * ) );
 
 /**
  * Delete the osd_menu_t object
  *
- * This functions has to be called to release the associated module and memory
- * for the osdmenu. After return of this function the pointer to osd_menu_t* is invalid.
+ * This functions has to be called to release the associated module and
+ * memory for the osdmenu. After return of this function the pointer to
+ * osd_menu_t* is invalid.
  */
 VLC_EXPORT( void, __osd_MenuDelete, ( vlc_object_t *, osd_menu_t * ) );
 
@@ -317,9 +327,9 @@ VLC_EXPORT( void, __osd_MenuHide, ( vlc_object_t * ) );
 /**
  * Activate the action of this OSD menu item.
  *
- * The rc interface command "menu select" triggers the sending of an hotkey action
- * to the hotkey interface. The hotkey that belongs to the current highlighted
- * OSD menu item will be used.
+ * The rc interface command "menu select" triggers the sending of an
+ * hotkey action to the hotkey interface. The hotkey that belongs to
+ * the current highlighted OSD menu item will be used.
  */
 VLC_EXPORT( void, __osd_MenuActivate,   ( vlc_object_t * ) );
 
@@ -331,8 +341,8 @@ VLC_EXPORT( void, __osd_MenuActivate,   ( vlc_object_t * ) );
  * Next OSD menu item
  *
  * Select the next OSD menu item to be highlighted.
- * Note: The actual position on screen of the menu item is determined by the the
- * OSD menu configuration file.
+ * Note: The actual position on screen of the menu item is determined by
+ * the OSD menu configuration file.
  */
 VLC_EXPORT( void, __osd_MenuNext, ( vlc_object_t * ) );
 
@@ -340,8 +350,8 @@ VLC_EXPORT( void, __osd_MenuNext, ( vlc_object_t * ) );
  * Previous OSD menu item
  *
  * Select the previous OSD menu item to be highlighted.
- * Note: The actual position on screen of the menu item is determined by the the
- * OSD menu configuration file.
+ * Note: The actual position on screen of the menu item is determined by
+ * the OSD menu configuration file.
  */
 VLC_EXPORT( void, __osd_MenuPrev, ( vlc_object_t * ) );
 
@@ -349,8 +359,8 @@ VLC_EXPORT( void, __osd_MenuPrev, ( vlc_object_t * ) );
  * OSD menu item above
  *
  * Select the OSD menu item above the current item to be highlighted.
- * Note: The actual position on screen of the menu item is determined by the the
- * OSD menu configuration file.
+ * Note: The actual position on screen of the menu item is determined by
+ * the OSD menu configuration file.
  */
 VLC_EXPORT( void, __osd_MenuUp,   ( vlc_object_t * ) );
 
@@ -358,8 +368,8 @@ VLC_EXPORT( void, __osd_MenuUp,   ( vlc_object_t * ) );
  * OSD menu item below
  *
  * Select the next OSD menu item below the current item to be highlighted.
- * Note: The actual position on screen of the menu item is determined by the the
- * OSD menu configuration file.
+ * Note: The actual position on screen of the menu item is determined by
+ * the OSD menu configuration file.
  */
 VLC_EXPORT( void, __osd_MenuDown, ( vlc_object_t * ) );
 
@@ -413,7 +423,8 @@ static inline void osd_SetKeyPressed( vlc_object_t *p_this, int i_value )
 /**
  * Update the OSD Menu visibility flag.
  *
- * VLC_TRUE means OSD Menu should be shown. VLC_FALSE means OSD Menu should not be shown.
+ * VLC_TRUE means OSD Menu should be shown. VLC_FALSE means OSD Menu
+ * should not be shown.
  */
 static inline void osd_SetMenuVisible( osd_menu_t *p_osd, vlc_bool_t b_value )
 {
@@ -426,7 +437,8 @@ static inline void osd_SetMenuVisible( osd_menu_t *p_osd, vlc_bool_t b_value )
 /**
  * Update the OSD Menu update flag
  *
- * If the OSD Menu should be updated then set the update flag to VLC_TRUE, else to VLC_FALSE.
+ * If the OSD Menu should be updated then set the update flag to
+ * VLC_TRUE, else to VLC_FALSE.
  */
 static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
 {
@@ -439,9 +451,9 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, vlc_bool_t b_value )
 /**
  * Textual feedback
  *
- * Functions that provide the textual feedback on the OSD. They are shown on hotkey commands. The feedback
- * is also part of the osd_button_t object. The types are declared in the include file
- * include/vlc_osd.h
+ * Functions that provide the textual feedback on the OSD. They are shown
+ * on hotkey commands. The feedback is also part of the osd_button_t
+ * object. The types are declared in the include file include/vlc_osd.h
  * @see vlc_osd.h
  */
 VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
@@ -451,9 +463,9 @@ VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) );
 /**
  * Default feedback images
  *
- * Functions that provide the default OSD feedback images on hotkey commands. These feedback
- * images are also part of the osd_button_t object. The types are declared in the include file
- * include/vlc_osd.h
+ * Functions that provide the default OSD feedback images on hotkey
+ * commands. These feedback images are also part of the osd_button_t
+ * object. The types are declared in the include file include/vlc_osd.h
  * @see vlc_osd.h
  */
 VLC_EXPORT( int, osd_Slider, ( vlc_object_t *, spu_t *, int, int, int, int, short ) );
@@ -462,8 +474,8 @@ VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, short ) );
 /**
  * Loading and parse the OSD Configuration file
  *
- * These functions load/unload the OSD menu configuration file and create/destroy the
- * themable OSD menu structure on the OSD object.
+ * These functions load/unload the OSD menu configuration file and
+ * create/destroy the themable OSD menu structure on the OSD object.
  */
 VLC_EXPORT( int,  osd_ConfigLoader, ( vlc_object_t *, const char *, osd_menu_t ** ) );
 VLC_EXPORT( void, osd_ConfigUnload, ( vlc_object_t *, osd_menu_t ** ) );
