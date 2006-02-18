@@ -156,7 +156,7 @@ static char *ppsz_pos_descriptions[] =
  *****************************************************************************/
 vlc_module_begin();
     set_capability( "sub filter", 0 );
-    set_shortname( "RSS" );
+    set_shortname( "RSS / Atom" );
     set_callbacks( CreateFilter, DestroyFilter );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
