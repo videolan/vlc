@@ -1542,7 +1542,7 @@ static void MMISendObject( access_t *p_access, int i_session_id,
         i_size = 1 + strlen( p_object->u.answ.psz_answ );
         p_data = malloc( i_size );
         p_data[0] = (p_object->u.answ.b_ok == VLC_TRUE) ? 0x1 : 0x0;
-        strncpy( &p_data[1], p_object->u.answ.psz_answ, i_size - 1 );
+        strncpy( (char *)&p_data[1], p_object->u.answ.psz_answ, i_size - 1 );
         break;
 
     case EN50221_MMI_MENU_ANSW:
