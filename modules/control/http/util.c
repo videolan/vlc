@@ -191,7 +191,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     for( ;; )
     {
-        char *psz_filename;
+        const char *psz_filename;
         /* parse psz_src dir */
         if( ( psz_filename = utf8_readdir( p_dir ) ) == NULL )
         {
@@ -354,12 +354,12 @@ char *E_(FromUTF8)( intf_thread_t *p_intf, char *psz_utf8 )
             if( p[0] == 0xe2 && p[1] == 0x80 && p[2] == 0x99 )
             {
                 *p = '\'';
-                memmove( &p[1], &p[3], strlen(&p[3]) + 1 );
+                memmove( &p[1], &p[3], strlen((char *)&p[3]) + 1 );
             }
             if( p[0] == 0xe2 && p[1] == 0x80 && p[2] == 0x9a )
             {
                 *p = '"';
-                memmove( &p[1], &p[3], strlen(&p[3]) + 1 );
+                memmove( &p[1], &p[3], strlen((char *)&p[3]) + 1 );
             }
             p++;
         }
