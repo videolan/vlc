@@ -34,6 +34,7 @@
 #include <vlc/decoder.h>
 #include <vlc_filter.h>
 #include <vlc_image.h>
+#include <vlc_stream.h>
 #include <charset.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
@@ -205,23 +206,47 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     block_t *p_block;
     picture_t *p_pic;
     FILE *file;
+    stream_t *p_stream = NULL;
     int i_size;
 
     file = utf8_fopen( psz_url, "rb" );
-    if( !file )
+    if( file )
     {
-        msg_Dbg( p_image->p_parent, "could not open file %s for reading",
-                 psz_url );
-        return NULL;
+        fseek( file, 0, SEEK_END );
+        i_size = ftell( file );
+        fseek( file, 0, SEEK_SET );
+    }
+    else
+    {
+        /*msg_Dbg( p_image->p_parent, "could not open file %s for reading",
+                 psz_url );*/
+        /* if file couldn't be opened, try to open the url with the stream
+        * functions. Any url can be thus be opened. */
+        p_stream = stream_UrlNew( p_image->p_parent, psz_url );
+        if( !p_stream )
+        {
+            msg_Dbg( p_image->p_parent, "could not open %s for reading",
+                     psz_url );
+            return NULL;
+        }
+        else
+        {
+            i_size = stream_Size( p_stream );
+        }
     }
 
-    fseek( file, 0, SEEK_END );
-    i_size = ftell( file );
-    fseek( file, 0, SEEK_SET );
-
     p_block = block_New( p_image->p_parent, i_size );
-    fread( p_block->p_buffer, sizeof(char), i_size, file );
-    fclose( file );
+
+    if( file )
+    {
+        fread( p_block->p_buffer, sizeof(char), i_size, file );
+        fclose( file );
+    }
+    else
+    {
+        stream_Read( p_stream, p_block->p_buffer, i_size );
+        stream_Delete( p_stream );
+    }
 
     if( !p_fmt_in->i_chroma )
     {
