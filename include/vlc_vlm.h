@@ -78,7 +78,6 @@ struct vlm_media_t
 
 };
 
-
 struct vlm_schedule_t
 {
     /* names "schedule" is reserved */
