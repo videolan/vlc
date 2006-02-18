@@ -2446,6 +2446,27 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
              LDFLAGS="${LDFLAGS_save}"
      fi])
 
+ AC_ARG_WITH(ffmpeg-vorbis,
+   [    --with-ffmpeg-vorbis    specify if ffmpeg has been compiled with vorbis support],
+   [
+     if test "$with_ffmpeg_vorbis" = "yes"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-lvorbisenc -lvorbis])
+     fi])
+
+ AC_ARG_WITH(ffmpeg-theora,
+   [    --with-ffmpeg-theora    specify if ffmpeg has been compiled with theora support],
+   [
+     if test "$with_ffmpeg_theora" = "yes"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-ltheora])
+     fi])
+
+ AC_ARG_WITH(ffmpeg-ogg,
+   [    --with-ffmpeg-ogg    specify if ffmpeg has been compiled with ogg support],
+   [
+     if test "$with_ffmpeg_ogg" = "yes"; then
+        VLC_ADD_LDFLAGS([ffmpeg],[-logg])
+     fi])
+
  AC_ARG_WITH(ffmpeg-zlib,
    [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
    [
