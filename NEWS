@@ -35,6 +35,7 @@ Interfaces:
     - Improved playlist handling
     - Support for popup menus, animated bitmaps, equalizer, ...
  * OS X
+    - new Update-Checker
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
  * HTTP
