@@ -162,7 +162,7 @@ case "${target_os}" in
     case "${target_os}" in
       freebsd*)
         CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include"
-        CPPFLAGS="${CPPFLAGS}"
+        CPPFLAGS="${CPPFLAGS_save}"
         LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib"
         LDFLAGS="${LDLFAGS_save}"
         ;;
