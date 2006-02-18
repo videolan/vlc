@@ -1,5 +1,5 @@
 /*****************************************************************************
- * rss.c : rss feed display video plugin for vlc
+ * rss.c : rss/atom feed display video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003-2006 the VideoLAN team
  * $Id$
@@ -113,12 +113,12 @@ struct filter_sys_t
     int i_cur_char;
 };
 
-#define MSG_TEXT N_("RSS feed URLs")
-#define MSG_LONGTEXT N_("RSS feed '|' (pipe) seperated URLs")
-#define SPEED_TEXT N_("RSS feed speed")
-#define SPEED_LONGTEXT N_("RSS feed speed (bigger is slower)")
-#define LENGTH_TEXT N_("RSS feed max number of chars displayed")
-#define LENGTH_LONGTEXT N_("RSS feed max number of chars displayed")
+#define MSG_TEXT N_("RSS/Atom feed URLs")
+#define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) seperated URLs")
+#define SPEED_TEXT N_("RSS/Atom feed speed")
+#define SPEED_LONGTEXT N_("RSS/Atom feed speed (bigger is slower)")
+#define LENGTH_TEXT N_("RSS/Atom feed max number of chars displayed")
+#define LENGTH_LONGTEXT N_("RSS/Atom feed max number of chars displayed")
 #define TTL_TEXT N_("Number of seconds between each forced refresh of the feeds")
 #define TTL_LONGTEXT N_("Number of seconds between each forced refresh of the feeds. If 0, the feeds will never be updated.")
 #define IMAGE_TEXT N_("Display feed images if available")
@@ -185,8 +185,9 @@ vlc_module_begin();
     add_integer( "rss-ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_FALSE );
     add_bool( "rss-images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, VLC_FALSE );
 
-    set_description( _("RSS feed display") );
+    set_description( _("RSS and Atom feed display") );
     add_shortcut( "rss" );
+    add_shortcut( "atom" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -653,10 +654,12 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         return 1;
                     }
+#                   define RSS_DEBUG
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element name : %s", psz_eltname );
 #                   endif
-                    if( !strcmp( psz_eltname, "item" ) )
+                    if( !strcmp( psz_eltname, "item" )
+                     || !strcmp( psz_eltname, "entry" ) )
                     {
                         b_is_item = VLC_TRUE;
                         p_feed->i_items++;
@@ -686,7 +689,8 @@ static int FetchRSS( filter_t *p_filter)
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element end : %s", psz_eltname );
 #                   endif
-                    if( !strcmp( psz_eltname, "item" ) )
+                    if( !strcmp( psz_eltname, "item" )
+                     || !strcmp( psz_eltname, "entry" ) )
                     {
                         b_is_item = VLC_FALSE;
                         i_item++;
@@ -700,6 +704,7 @@ static int FetchRSS( filter_t *p_filter)
                     break;
 
                 case XML_READER_TEXT:
+                    if( !psz_eltname ) break;
                     psz_eltvalue = xml_ReaderValue( p_xml_reader );
                     if( !psz_eltvalue )
                     {
@@ -761,7 +766,8 @@ static int FetchRSS( filter_t *p_filter)
                         {
                             p_feed->psz_link = psz_eltvalue;
                         }
-                        else if( !strcmp( psz_eltname, "description" ) )
+                        else if( !strcmp( psz_eltname, "description" )
+                              || !strcmp( psz_eltname, "subtitle" ) )
                         {
                             p_feed->psz_description = psz_eltvalue;
                         }
