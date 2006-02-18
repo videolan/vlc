@@ -291,12 +291,7 @@ if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
   INCLUDES="${INCLUDES} -I\$(top_builddir)/intl"
 else
-  AC_CHECK_FUNCS(textdomain,,[
-    AC_CHECK_LIB(intl,textdomain,
-      VLC_ADD_LDFLAGS([vlc],[${LIBINTL}]),,
-      ${LIBINTL}
-    )
-  ])
+  VLC_ADD_LDFLAGS([vlc],[${LIBINTL}])
 fi
 AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
 XGETTEXT="${XGETTEXT} --keyword=_NS --keyword=_ANS"
