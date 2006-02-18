@@ -20,8 +20,9 @@ Playlist / Services discovery :
  * Podcast support
 
 Video output 
- * New video filters : magnify, gradient, edge detection and bluescreen
- * Logo video filter : can now loop through multiple images
+ * New video filters: magnify, gradient, edge detection and bluescreen
+ * Logo video filter: can now loop through multiple images
+ * RSS video filter: display feed images. Support for Atom feeds.
 
 Interfaces:
  * System to inform the user and request information 
