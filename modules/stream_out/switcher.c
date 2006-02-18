@@ -33,6 +33,7 @@
 #include <vlc/vout.h>
 
 #include "network.h"
+#include "charset.h"
 
 #define HAVE_MMX
 #ifdef HAVE_FFMPEG_AVCODEC_H

@@ -32,6 +32,7 @@
 
 #include "vlc_keys.h"
 #include <vlc_osd.h>
+#include "charset.h"
 #include <errno.h>
 #include <time.h>
 

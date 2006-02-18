@@ -29,6 +29,7 @@
 
 #include "vlc_image.h"
 #include "vlc_filter.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Local prototypes

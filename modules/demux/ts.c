@@ -33,6 +33,7 @@
 
 #include "iso_lang.h"
 #include "network.h"
+#include "charset.h"
 
 #include "../mux/mpeg/csa.h"
 

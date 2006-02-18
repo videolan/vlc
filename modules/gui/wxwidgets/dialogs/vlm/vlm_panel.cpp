@@ -27,6 +27,8 @@
 #include "dialogs/vlm/vlm_streampanel.hpp"
 #include <wx/statline.h>
 
+#include "charset.h"
+
 enum
 {
     Notebook_Event,

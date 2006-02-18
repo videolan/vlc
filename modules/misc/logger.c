@@ -36,6 +36,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include "charset.h"
 
 #define MODE_TEXT 0
 #define MODE_HTML 1

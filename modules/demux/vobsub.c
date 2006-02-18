@@ -32,6 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include "vlc_video.h"
+#include "charset.h"
 
 #include "ps.h"
 

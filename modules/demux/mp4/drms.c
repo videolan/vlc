@@ -34,6 +34,7 @@
 #   include <vlc/vlc.h>
 #   include <vlc_md5.h>
 #   include "libmp4.h"
+#   include "charset.h"
 #else
 #   include "drmsvl.h"
 #endif

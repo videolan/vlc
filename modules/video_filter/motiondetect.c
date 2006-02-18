@@ -32,6 +32,7 @@
 #include <vlc/intf.h>
 
 #include "filter_common.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Local prototypes

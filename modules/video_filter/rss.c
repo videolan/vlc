@@ -37,6 +37,7 @@
 #include "vlc_block.h"
 #include "vlc_stream.h"
 #include "vlc_xml.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Local prototypes

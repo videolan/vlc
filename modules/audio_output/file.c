@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+#include "charset.h"
 
 #include "aout_internal.h"
 #include "codecs.h"

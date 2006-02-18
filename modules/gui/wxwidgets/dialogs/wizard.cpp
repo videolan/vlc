@@ -31,6 +31,7 @@
 #include <wx/listctrl.h>
 #include <wx/statline.h>
 #include <network.h>
+#include <charset.h>
 
 class wizHelloPage;
 class wizInputPage;

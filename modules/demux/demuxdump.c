@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include "charset.h"
 
 /*****************************************************************************
  * Module descriptor

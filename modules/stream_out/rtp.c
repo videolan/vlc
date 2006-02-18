@@ -34,6 +34,7 @@
 
 #include "vlc_httpd.h"
 #include "network.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Module descriptor

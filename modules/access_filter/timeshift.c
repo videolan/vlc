@@ -31,6 +31,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include "charset.h"
+
 #include <unistd.h>
 
 /*****************************************************************************
