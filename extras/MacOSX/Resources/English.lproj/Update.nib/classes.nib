@@ -1,0 +1,21 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {download = id; okay = id; }; 
+            CLASS = VLCUpdate; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_bar_checking" = id; 
+                "o_btn_DownloadNow" = id; 
+                "o_btn_okay" = id; 
+                "o_fld_currentVersionAndSize" = id; 
+                "o_fld_releaseNote" = id; 
+                "o_fld_status" = id; 
+                "o_update_window" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

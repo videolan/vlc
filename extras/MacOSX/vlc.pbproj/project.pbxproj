@@ -72,6 +72,7 @@
 		C2F2A707095AE51700018C74 /* play_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A703095AE51600018C74 /* play_embedded_blue.png */; };
 		C2F2A708095AE51700018C74 /* skip_forward_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */; };
 		C2F2A709095AE51700018C74 /* skip_previous_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */; };
+		CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
 		CCF3C64C0923B99D00401862 /* SFilters.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF3C64A0923B99D00401862 /* SFilters.nib */; };
 		DC7F46ED08A183FC0027DB24 /* Extended.nib in Resources */ = {isa = PBXBuildFile; fileRef = DC7F46EB08A183FC0027DB24 /* Extended.nib */; };
 		DCA00AA9075F948800E6BF46 /* About.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCA00AA7075F948800E6BF46 /* About.nib */; };
@@ -868,7 +869,6 @@
 		8E9CC7B1046EFD700059A3A7 /* THANKS */ = {isa = PBXFileReference; fileEncoding = 12; lastKnownFileType = text; name = THANKS; path = ../../THANKS; sourceTree = SOURCE_ROOT; };
 		8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text; name = vlc.scriptSuite; path = Resources/vlc.scriptSuite; sourceTree = SOURCE_ROOT; };
 		8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = vlc.scriptTerminology; path = Resources/vlc.scriptTerminology; sourceTree = SOURCE_ROOT; };
-		8ED6C27A03E2EB1C0059A3A7 /* coreaudio.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = coreaudio.c; path = ../../modules/audio_output/coreaudio.c; sourceTree = SOURCE_ROOT; };
 		8ED6C27B03E2EB1C0059A3A7 /* controls.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = controls.m; path = ../../modules/gui/macosx/controls.m; sourceTree = SOURCE_ROOT; };
 		8ED6C27C03E2EB1C0059A3A7 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../modules/gui/macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		8ED6C27D03E2EB1C0059A3A7 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../modules/gui/macosx/intf.m; sourceTree = SOURCE_ROOT; };
@@ -897,6 +897,11 @@
 		C2F2A703095AE51600018C74 /* play_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = play_embedded_blue.png; path = Resources/play_embedded_blue.png; sourceTree = "<group>"; };
 		C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_forward_embedded_blue.png; path = Resources/skip_forward_embedded_blue.png; sourceTree = "<group>"; };
 		C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_previous_embedded_blue.png; path = Resources/skip_previous_embedded_blue.png; sourceTree = "<group>"; };
+		CC26BF2B09A7A05000E94D62 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Update.nib; sourceTree = "<group>"; };
+		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
+		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
+		CC26BF3309A7A0A300E94D62 /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../modules/gui/macosx/interaction.h; sourceTree = SOURCE_ROOT; };
+		CC26BF3409A7A0A300E94D62 /* interaction.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = interaction.m; path = ../../modules/gui/macosx/interaction.m; sourceTree = SOURCE_ROOT; };
 		CCF3C64B0923B99D00401862 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SFilters.nib; sourceTree = "<group>"; };
 		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
 		CCF3C6510923B9D100401862 /* sfilters.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = sfilters.m; path = ../../modules/gui/macosx/sfilters.m; sourceTree = SOURCE_ROOT; };
@@ -981,6 +986,8 @@
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
 				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
+				CC26BF3309A7A0A300E94D62 /* interaction.h */,
+				CC26BF3409A7A0A300E94D62 /* interaction.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,
 				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,
@@ -1003,7 +1010,6 @@
 				8E55FB800459B0FD00FB3317 /* output.m */,
 				2A16E03F06C4F08700C87B09 /* equalizer.h */,
 				2A16E04006C4F08700C87B09 /* equalizer.m */,
-				8ED6C27A03E2EB1C0059A3A7 /* coreaudio.c */,
 				8ED6C28703E2EB1C0059A3A7 /* vout.h */,
 				8ED6C28803E2EB1C0059A3A7 /* vout.m */,
 				8E9CA1A506D7DEE800B7186C /* voutgl.m */,
@@ -1016,6 +1022,8 @@
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
 				CCF3C6500923B9D100401862 /* sfilters.h */,
 				CCF3C6510923B9D100401862 /* sfilters.m */,
+				CC26BF3109A7A08C00E94D62 /* update.h */,
+				CC26BF3209A7A08C00E94D62 /* update.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -1135,6 +1143,7 @@
 				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
 				CCF3C64A0923B99D00401862 /* SFilters.nib */,
+				CC26BF2A09A7A05000E94D62 /* Update.nib */,
 			);
 			name = nibs;
 			sourceTree = "<group>";
@@ -1247,6 +1256,7 @@
 				C2F2A707095AE51700018C74 /* play_embedded_blue.png in Resources */,
 				C2F2A708095AE51700018C74 /* skip_forward_embedded_blue.png in Resources */,
 				C2F2A709095AE51700018C74 /* skip_previous_embedded_blue.png in Resources */,
+				CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1263,6 +1273,14 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		CC26BF2A09A7A05000E94D62 /* Update.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC26BF2B09A7A05000E94D62 /* English */,
+			);
+			name = Update.nib;
+			sourceTree = "<group>";
+		};
 		CCF3C64A0923B99D00401862 /* SFilters.nib */ = {
 			isa = PBXVariantGroup;
 			children = (

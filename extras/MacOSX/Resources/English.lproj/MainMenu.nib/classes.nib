@@ -113,6 +113,7 @@
         }, 
         {
             ACTIONS = {
+                checkForUpdate = id; 
                 clearRecentItems = id; 
                 closeError = id; 
                 intfOpenDisc = id; 
@@ -171,6 +172,7 @@
                 "o_mi_bwd" = id; 
                 "o_mi_channels" = id; 
                 "o_mi_chapter" = id; 
+                "o_mi_checkForUpdate" = id; 
                 "o_mi_clear" = id; 
                 "o_mi_close_window" = id; 
                 "o_mi_controller" = id; 
