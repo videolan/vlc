@@ -1,10 +1,10 @@
 /*****************************************************************************
  * rss.c : rss feed display video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright (C) 2003-2006 the VideoLAN team
  * $Id$
  *
- * Authors: Antoine Cellerier <dionoea@videolan.org>
+ * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -355,14 +355,38 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
+    /* Generate the string that will be displayed. This string is supposed to
+       be p_sys->i_length characters long. */
     i_item = p_sys->i_cur_item;
     i_feed = p_sys->i_cur_feed;
-    snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s", p_sys->p_feeds[i_feed].psz_title, p_sys->p_feeds[i_feed].p_items[i_item].psz_title+p_sys->i_cur_char );
+    snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s",
+              p_sys->p_feeds[i_feed].psz_title,
+              p_sys->p_feeds[i_feed].p_items[i_item].psz_title
+              +p_sys->i_cur_char );
+
     while( strlen( p_sys->psz_marquee ) < (unsigned int)p_sys->i_length )
     {
         i_item++;
         if( i_item == p_sys->p_feeds[i_feed].i_items ) break;
-        snprintf( strchr( p_sys->psz_marquee, 0 ), p_sys->i_length - strlen( p_sys->psz_marquee ), " - %s", p_sys->p_feeds[i_feed].p_items[i_item].psz_title );
+        snprintf( strchr( p_sys->psz_marquee, 0 ),
+                  p_sys->i_length - strlen( p_sys->psz_marquee ),
+                  " - %s",
+                  p_sys->p_feeds[i_feed].p_items[i_item].psz_title );
+    }
+    /* Calls to snprintf might split multibyte UTF8 chars ...
+     * which freetype doesn't like. */
+    {
+        char *a = strdup( p_sys->psz_marquee );
+        char *a2 = a;
+        char *b = p_sys->psz_marquee;
+        EnsureUTF8( p_sys->psz_marquee );
+        /* we want to use ' ' instead of '?' for erroneous chars */
+        while( *b != '\0' )
+        {
+            if( *b != *a ) *b = ' ';
+            b++;a++;
+        }
+        free( a2 );
     }
 
     p_spu->p_region->psz_text = strdup(p_sys->psz_marquee);
