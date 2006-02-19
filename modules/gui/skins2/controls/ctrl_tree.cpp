@@ -646,6 +646,8 @@ void CtrlTree::autoScroll()
 
 void CtrlTree::makeImage()
 {
+    stats_TimerStart( getIntf(), "[Skins] Playlist image",
+                      STATS_TIMER_SKINS_PLAYTREE_IMAGE );
     if( m_pImage )
     {
         delete m_pImage;
@@ -655,6 +657,7 @@ void CtrlTree::makeImage()
     const Position *pPos = getPosition();
     if( !pPos )
     {
+        stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
         return;
     }
     int width = pPos->getWidth();
@@ -734,6 +737,7 @@ void CtrlTree::makeImage()
             GenericBitmap *pText = m_rFont.drawString( *pStr, color, width - bitmapWidth * depth );
             if( !pText )
             {
+                stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
                 return;
             }
             if( it->size() )
@@ -774,6 +778,7 @@ void CtrlTree::makeImage()
         it = m_rTree.getNextVisibleItem( it );
         } while( it->m_deleted );
     }
+    stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
 }
 
 VarTree::Iterator CtrlTree::findItemAtPos( int pos )
