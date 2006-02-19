@@ -5291,7 +5291,6 @@ AC_CONFIG_FILES([
   doc/Makefile
   intl/Makefile
   ipkg/Makefile
-  lib/Makefile
   loader/Makefile
   modules/Makefile
   mozilla/Makefile
