@@ -27,9 +27,11 @@ DIST_misc = \
 	$(NULL)
 
 if BUILD_SHARED
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc$(LIBEXT)
+LIBRARIES_libvlc_pic = $(top_builddir)/src/libvlc$(LIBEXT)
+LIBRARIES_libvlc_nopic = $(top_builddir)/src/libvlc$(LIBEXT)
 else
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc.a
+LIBRARIES_libvlc_pic = $(top_builddir)/src/libvlc_pic.a
+LIBRARIES_libvlc_nopic = $(top_builddir)/src/libvlc.a
 endif
 
 if BUILD_MOZILLA
@@ -39,6 +41,7 @@ if BUILD_MOZILLA
 # under Win32 and npunix.c under Unix.
 if HAVE_WIN32
 
+LIBRARIES_libvlc = $(LIBRARIES_libvlc_nopic)
 
 npvlc_DATA = npvlc$(LIBEXT)
 npvlcdir = $(libdir)
@@ -56,6 +59,8 @@ LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc) `$(VLC_CONFIG) --libs mozilla vlc bu
 
 else
 if HAVE_DARWIN
+
+LIBRARIES_libvlc = $(LIBRARIES_libvlc_nopic)
 
 npvlc_DATA = npvlc$(LIBEXT)
 npvlcdir = $(libdir)
@@ -89,6 +94,8 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	(cd "./$@/Contents/MacOS"; tar xf -)
 
 else
+
+LIBRARIES_libvlc = $(LIBRARIES_libvlc_pic)
 
 npvlc_DATA = libvlcplugin$(LIBEXT)
 npvlcdir = $(libdir)/mozilla/plugins
