@@ -220,12 +220,14 @@ endif
 
 if BUILD_SHARED
 LIB_libvlc = src/libvlc$(LIBEXT)
+LIB_libvlc_config = vlc
 #-Wl,-rpath $(libdir)
 else
 LIB_libvlc = src/libvlc.a
+LIB_libvlc_config = vlc builtin
 endif
 
-vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` $(vlc_WORKAROUNDLDFLAGS)
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs $(LIB_vlc_config)` $(vlc_WORKAROUNDLDFLAGS)
 vlc_LDADD = $(LIB_libvlc) $(DATA_win32_rc) $(INCLUDED_LIBINTL)
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
@@ -235,7 +237,7 @@ DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	@rm -f vlc$(EXEEXT)
-	@case `$(VLC_CONFIG) --linkage vlc` in \
+	@case `$(VLC_CONFIG) --linkage $(LIB_libvlc_config)` in \
 	  c++) cmd="$(CXXLINK)" ;; \
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
