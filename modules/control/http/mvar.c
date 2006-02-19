@@ -335,8 +335,8 @@ mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
             char *psz_name = E_(FromUTF8)( p_intf, p_info->psz_name );
             char *psz_value = E_(FromUTF8)( p_intf, p_info->psz_value );
 
-            msg_Dbg( p_input, "adding info name=%s value=%s",
-                     psz_name, psz_value );
+            /* msg_Dbg( p_input, "adding info name=%s value=%s",
+                     psz_name, psz_value ); */
             E_(mvar_AppendNewVar)( info, "name",  psz_name );
             E_(mvar_AppendNewVar)( info, "value", psz_value );
             free( psz_name );
