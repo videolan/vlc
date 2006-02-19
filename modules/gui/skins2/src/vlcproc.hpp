@@ -117,7 +117,8 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarStopped;
         VariablePtr m_cVarPaused;
         VariablePtr m_cVarSeekable;
-        /// Variable for the vout
+        /// Variables related to the vout
+        VariablePtr m_cVarFullscreen;
         VarBox m_varVoutSize;
         /// Equalizer variables
         EqualizerBands m_varEqBands;

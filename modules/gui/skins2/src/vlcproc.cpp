@@ -101,6 +101,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarEqualizer, VarBoolImpl, "equalizer.isEnabled" )
     REGISTER_VAR( m_cVarEqPreamp, EqualizerPreamp, "equalizer.preamp" )
     REGISTER_VAR( m_cVarDvdActive, VarBoolImpl, "dvd.isActive" )
+    REGISTER_VAR( m_cVarFullscreen, VarBoolImpl, "vlc.isFullscreen" )
 #undef REGISTER_VAR
     m_cVarStreamName = VariablePtr( new VarText( getIntf(), false ) );
     pVarManager->registerVar( m_cVarStreamName, "streamName" );
@@ -235,11 +236,12 @@ void VlcProc::manage()
     VarBoolImpl *pVarLoop = (VarBoolImpl*)m_cVarLoop.get();
     VarBoolImpl *pVarRepeat = (VarBoolImpl*)m_cVarRepeat.get();
     VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
+    VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
 
     // Refresh audio variables
     refreshAudio();
 
-   // Update the input
+    // Update the input
     if( getIntf()->p_sys->p_input == NULL )
     {
         getIntf()->p_sys->p_input = getIntf()->p_sys->p_playlist->p_input;
@@ -276,6 +278,15 @@ void VlcProc::manage()
         var_Change( pInput, "chapter", VLC_VAR_CHOICESCOUNT,
                     &chapters_count, NULL );
         pVarDvdActive->set( chapters_count.i_int > 0 );
+
+        // Refresh fullscreen status
+        vout_thread_t *pVout = (vout_thread_t *)vlc_object_find( pInput,
+                VLC_OBJECT_VOUT, FIND_CHILD );
+        if( pVout )
+        {
+            pVarFullscreen->set( pVout->b_fullscreen );
+            vlc_object_release( pVout );
+        }
     }
     else
     {
@@ -285,6 +296,7 @@ void VlcProc::manage()
         pVarSeekable->set( false );
         pVarDvdActive->set( false );
         pTime->set( 0, false );
+        pVarFullscreen->set( false );
     }
 
     // Refresh the random variable
@@ -299,6 +311,8 @@ void VlcProc::manage()
     // Refresh the repeat variable
     var_Get( getIntf()->p_sys->p_playlist, "repeat", &val );
     pVarRepeat->set( val.b_bool != 0 );
+
+
 }
 
 
