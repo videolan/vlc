@@ -1,10 +1,11 @@
 /*****************************************************************************
  * interaction.h: Mac OS X interaction dialogs
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id: vout.h 13803 2005-12-18 18:54:28Z bigben $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
+ *          Felix KŸhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,6 +115,9 @@
     if( !p_dialog )
         msg_Err( p_intf, "serious issue (p_dialog == nil)" );
 
+    if( !nib_interact_loaded )
+        nib_interact_loaded = [NSBundle loadNibNamed:@"Interaction" owner:self];
+
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
     NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
     
@@ -151,21 +155,36 @@
         for( i = 0; i < p_dialog->i_widgets; i++ )
         {
             msg_Dbg( p_intf, "widget: %s", p_dialog->pp_widgets[i]->psz_text );
-            o_description = [o_description stringByAppendingString:
-                                [NSString stringWithUTF8String: p_dialog->pp_widgets[i]->psz_text]];
+            o_description = [o_description stringByAppendingString: \
+                [NSString stringWithUTF8String: \
+                    p_dialog->pp_widgets[i]->psz_text]];
         }
         if( p_dialog->i_flags & DIALOG_OK_CANCEL )
         {
-            NSBeginInformationalAlertSheet( o_title, @"OK" , @"Cancel", nil, o_window, self,
-                @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, o_description );
+            NSBeginInformationalAlertSheet( o_title, @"OK" , @"Cancel", nil, \
+                o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
+                NULL, nil, o_description );
         }
         else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
-            NSBeginInformationalAlertSheet( o_title, @"Yes", @"Cancel", @"No", o_window, self,
-                @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, o_description );
+            NSBeginInformationalAlertSheet( o_title, @"Yes", @"Cancel", @"No", \
+                o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
+                NULL, nil, o_description );
+        }
+        else if( p_dialog->i_type & WIDGET_PROGRESS )
+        {
+            [o_prog_title setStringValue: o_title];
+            [o_prog_description setStringValue: o_description];
+            [o_prog_bar setUsesThreadedAnimation: YES];
+            [o_prog_bar setDoubleValue: 0];
+            [NSApp beginSheet: o_prog_win modalForWindow: o_window \
+                modalDelegate: self didEndSelector: \
+                nil \
+                contextInfo: nil];
+            [o_prog_win makeKeyWindow];
         }
         else
-            msg_Dbg( p_intf, "requested dialog type not implemented yet" );
+            msg_Warn( p_intf, "requested dialog type not implemented yet" );
     }
 }
 
@@ -195,12 +214,25 @@
 
 -(void)updateDialog
 {
-    msg_Dbg( p_intf, "update event" );
+    int i = 0;
+    for( i = 0 ; i< p_dialog->i_widgets; i++ )
+    {
+        /*msg_Dbg( p_intf, "update event, current value %i for index %i",
+        (int)(p_dialog->pp_widgets[i]->val.f_float), i);*/
+        if( p_dialog->i_type & WIDGET_PROGRESS )
+            [o_prog_bar setDoubleValue: \
+                (double)(p_dialog->pp_widgets[i]->val.f_float)];
+    }
 }
 
 -(void)hideDialog
 {
     msg_Dbg( p_intf, "hide event" );
+    if( p_dialog->i_type & WIDGET_PROGRESS )
+    {
+        [NSApp endSheet: o_prog_win];
+        [o_prog_win close];
+    }
 }
 
 -(void)destroyDialog
@@ -208,9 +240,14 @@
     msg_Dbg( p_intf, "destroy event" );
 }
 
--(void)dealloc
+- (IBAction)cancelAndClose:(id)sender
 {
-    [super dealloc];
+    /* tell the core that the dialog was cancelled */
+    vlc_mutex_lock( &p_dialog->p_interaction->object_lock );
+    p_dialog->i_return = DIALOG_CANCELLED;
+    p_dialog->i_status = ANSWERED_DIALOG;
+    vlc_mutex_unlock( &p_dialog->p_interaction->object_lock );
+    msg_Dbg( p_intf, "dialog cancelled" );
 }
 
 @end

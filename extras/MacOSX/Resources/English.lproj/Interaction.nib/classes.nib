@@ -1,0 +1,20 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {cancelAndClose = id; }; 
+            CLASS = VLCInteraction; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_prog_bar" = id; 
+                "o_prog_cancel_btn" = id; 
+                "o_prog_description" = id; 
+                "o_prog_title" = id; 
+                "o_prog_win" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = VLCInteractionList; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

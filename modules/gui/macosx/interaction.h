@@ -5,6 +5,7 @@
  * $Id: vout.h 13803 2005-12-18 18:54:28Z bigben $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
+ *          Felix KŸhne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +28,22 @@
 /*****************************************************************************
  * VLCInteraction interface
  *****************************************************************************/
+
 @interface VLCInteraction : NSObject
 {
-    interaction_dialog_t    *p_dialog;
+    /* progress widget */
+    IBOutlet id o_prog_bar;
+    IBOutlet id o_prog_cancel_btn;
+    IBOutlet id o_prog_description;
+    IBOutlet id o_prog_title;
+    IBOutlet id o_prog_win;
+
+    interaction_dialog_t * p_dialog;
     intf_thread_t * p_intf;
+    BOOL nib_interact_loaded;
 }
+
+- (IBAction)cancelAndClose:(id)sender;
 
 -(id)initDialog: (interaction_dialog_t *)_p_dialog;
 -(void)runDialog;

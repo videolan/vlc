@@ -317,7 +317,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     } else {
         _o_sharedMainInstance = [super init];
     }
-    
+
     o_about = [[VLAboutBox alloc] init];
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
@@ -458,7 +458,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
     p_intf->b_interaction = VLC_TRUE;
-    
+
     nib_main_loaded = TRUE;
 }
 
