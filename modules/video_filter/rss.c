@@ -22,6 +22,11 @@
  *****************************************************************************/
 
 /*****************************************************************************
+ * Atom : http://www.ietf.org/rfc/rfc4287.txt
+ * RSS : http://www.rssboard.org/rss-specification
+ *****************************************************************************/
+
+/*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
@@ -559,7 +564,7 @@ char *removeWhiteChars( char *psz_src )
 }
 
 /****************************************************************************
- * FetchRSS
+ * FetchRSS (or Atom) feeds
  ***************************************************************************/
 static int FetchRSS( filter_t *p_filter)
 {
@@ -617,7 +622,7 @@ static int FetchRSS( filter_t *p_filter)
         p_feed->i_items = 0;
         p_feed->p_items = NULL;
 
-        msg_Dbg( p_filter, "Opening %s RSS feed ...", psz_feed );
+        msg_Dbg( p_filter, "Opening %s RSS/Atom feed ...", psz_feed );
 
         p_stream = stream_UrlNew( p_filter, psz_feed );
         if( !p_stream )
@@ -656,12 +661,11 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         return 1;
                     }
-#                   define RSS_DEBUG
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element name : %s", psz_eltname );
 #                   endif
-                    if( !strcmp( psz_eltname, "item" )
-                     || !strcmp( psz_eltname, "entry" ) )
+                    if( !strcmp( psz_eltname, "item" ) /* rss */
+                     || !strcmp( psz_eltname, "entry" ) ) /* atom */
                     {
                         b_is_item = VLC_TRUE;
                         p_feed->i_items++;
@@ -671,9 +675,61 @@ static int FetchRSS( filter_t *p_filter)
                                                                      = NULL;
                         p_feed->p_items[p_feed->i_items-1].psz_link = NULL;
                     }
-                    else if( !strcmp( psz_eltname, "image" ) )
+                    else if( !strcmp( psz_eltname, "image" ) ) /* rss */
                     {
                         b_is_image = VLC_TRUE;
+                    }
+                    else if( !strcmp( psz_eltname, "link" ) ) /* atom */
+                    {
+                        char *psz_href = NULL;
+                        char *psz_rel = NULL;
+                        while( xml_ReaderNextAttr( p_xml_reader )
+                               == VLC_SUCCESS )
+                        {
+                            char *psz_name = xml_ReaderName( p_xml_reader );
+                            char *psz_value = xml_ReaderValue( p_xml_reader );
+                            if( !strcmp( psz_name, "rel" ) )
+                            {
+                                psz_rel = psz_value;
+                            }
+                            else if( !strcmp( psz_name, "href" ) )
+                            {
+                                psz_href = psz_value;
+                            }
+                            else
+                            {
+                                free( psz_value );
+                            }
+                            free( psz_name );
+                        }
+                        if( psz_rel && psz_href )
+                        {
+                            if( !strcmp( psz_rel, "alternate" )
+                                && b_is_item == VLC_FALSE
+                                && b_is_image == VLC_FALSE
+                                && !p_feed->psz_link )
+                            {
+                                p_feed->psz_link = psz_href;
+                            }
+                            /* this isn't in the rfc but i found some ... */
+                            else if( ( !strcmp( psz_rel, "logo" )
+                                    || !strcmp( psz_rel, "icon" ) )
+                                    && b_is_item == VLC_FALSE
+                                    && b_is_image == VLC_FALSE
+                                    && !p_feed->psz_image )
+                            {
+                                p_feed->psz_image = psz_href;
+                            }
+                            else
+                            {
+                                free( psz_href );
+                            }
+                        }
+                        else
+                        {
+                            if( psz_href ) free( psz_href );
+                        }
+                        if( psz_rel ) free( psz_rel );
                     }
                     break;
 
@@ -691,13 +747,13 @@ static int FetchRSS( filter_t *p_filter)
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element end : %s", psz_eltname );
 #                   endif
-                    if( !strcmp( psz_eltname, "item" )
-                     || !strcmp( psz_eltname, "entry" ) )
+                    if( !strcmp( psz_eltname, "item" ) /* rss */
+                     || !strcmp( psz_eltname, "entry" ) ) /* atom */
                     {
                         b_is_item = VLC_FALSE;
                         i_item++;
                     }
-                    else if( !strcmp( psz_eltname, "image" ) )
+                    else if( !strcmp( psz_eltname, "image" ) ) /* rss */
                     {
                         b_is_image = VLC_FALSE;
                     }
@@ -725,15 +781,19 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         struct rss_item_t *p_item;
                         p_item = p_feed->p_items+i_item;
-                        if( !strcmp( psz_eltname, "title" ) )
+                        if( !strcmp( psz_eltname, "title" ) /* rss/atom */
+                            && !p_item->psz_title )
                         {
                             p_item->psz_title = psz_eltvalue;
                         }
-                        else if( !strcmp( psz_eltname, "link" ) )
+                        else if( !strcmp( psz_eltname, "link" ) /* rss */
+                                 && !p_item->psz_link )
                         {
                             p_item->psz_link = psz_eltvalue;
                         }
-                        else if( !strcmp( psz_eltname, "description" ) )
+                        else if((!strcmp( psz_eltname, "description" ) /* rss */
+                              || !strcmp( psz_eltname, "summary" ) ) /* atom */
+                              && !p_item->psz_description )
                         {
                             p_item->psz_description = psz_eltvalue;
                         }
@@ -745,12 +805,10 @@ static int FetchRSS( filter_t *p_filter)
                     }
                     else if( b_is_image == VLC_TRUE )
                     {
-                        if( !strcmp( psz_eltname, "url" ) )
+                        if( !strcmp( psz_eltname, "url" ) /* rss */
+                            && !p_feed->psz_image )
                         {
                             p_feed->psz_image = psz_eltvalue;
-                            if( p_sys->b_images == VLC_TRUE )
-                                p_feed->p_pic = LoadImage( p_filter,
-                                                           p_feed->psz_image );
                         }
                         else
                         {
@@ -760,18 +818,27 @@ static int FetchRSS( filter_t *p_filter)
                     }
                     else
                     {
-                        if( !strcmp( psz_eltname, "title" ) )
+                        if( !strcmp( psz_eltname, "title" ) /* rss/atom */
+                            && !p_feed->psz_title )
                         {
                             p_feed->psz_title = psz_eltvalue;
                         }
-                        else if( !strcmp( psz_eltname, "link" ) )
+                        else if( !strcmp( psz_eltname, "link" ) /* rss */
+                                 && !p_feed->psz_link )
                         {
                             p_feed->psz_link = psz_eltvalue;
                         }
-                        else if( !strcmp( psz_eltname, "description" )
-                              || !strcmp( psz_eltname, "subtitle" ) )
+                        else if((!strcmp( psz_eltname, "description" ) /* rss */
+                              || !strcmp( psz_eltname, "subtitle" ) ) /* atom */
+                              && !p_feed->psz_description )
                         {
                             p_feed->psz_description = psz_eltvalue;
+                        }
+                        else if( ( !strcmp( psz_eltname, "logo" ) /* atom */
+                              || !strcmp( psz_eltname, "icon" ) ) /* atom */
+                              && !p_feed->psz_image )
+                        {
+                            p_feed->psz_image = psz_eltvalue;
                         }
                         else
                         {
@@ -783,9 +850,15 @@ static int FetchRSS( filter_t *p_filter)
             }
         }
 
+        if( p_sys->b_images == VLC_TRUE
+            && p_feed->psz_image && !p_feed->p_pic )
+        {
+            p_feed->p_pic = LoadImage( p_filter, p_feed->psz_image );
+        }
+
         if( p_xml_reader && p_xml ) xml_ReaderDelete( p_xml, p_xml_reader );
         if( p_stream ) stream_Delete( p_stream );
-        msg_Dbg( p_filter, "Done with %s RSS feed.", psz_feed );
+        msg_Dbg( p_filter, "Done with %s RSS/Atom feed.", psz_feed );
     }
     free( psz_buffer_2 );
     if( p_xml ) xml_Delete( p_xml );
