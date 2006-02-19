@@ -5,6 +5,8 @@
 NULL =
 SUBDIRS =
 
+LIBINTL = @LIBINTL@
+
 EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
 BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
@@ -110,20 +112,6 @@ misc/modules.c: misc/modules_builtin.h
 misc/version.c: FORCE
 	$(TOOLBOX) --update-version
 
-# These dependencies are mandatory
-$(SOURCES_libvlc): $(LIB_intl)
-
-###############################################################################
-# Optional libintl - FIXME, bad dependencies
-###############################################################################
-
-../intl/libintl.a: FORCE
-	cd $(top_builddir)/intl && $(MAKE) $(AM_MAKEFLAGS)
-
-if BUILD_INTL
-LIB_intl = ../intl/libintl.a
-endif
-
 ###############################################################################
 # Building libvlc
 ###############################################################################
@@ -147,11 +135,13 @@ libvlc_a_SOURCES = $(SOURCES_libvlc)
 libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
+libvlc_a_LIBADD = $(LIBINTL)
 
 libvlc_pic_a_SOURCES = $(SOURCES_libvlc)
 libvlc_pic_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
 libvlc_pic_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
 libvlc_pic_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
+libvlc_pic_a_LIBADD = $(LIBINTL)
 
 if HAVE_BEOS
 OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
