@@ -1371,8 +1371,7 @@ dnl  Is the shared libvlc forced ?
 dnl
 build_pic=no
 AC_ARG_ENABLE(shared-libvlc,
-  [  --enable-shared-libvlc  shared libvlc (default disabled EXPERIMENTAL)],
-  ,[shared_libvlc=no])
+  [  --enable-shared-libvlc  shared libvlc (default disabled EXPERIMENTAL)])
 
 
 dnl
@@ -5195,6 +5194,7 @@ AM_CONDITIONAL(HAVE_BUILTINS, ${builtin_support})
 dnl
 dnl Pic and shared libvlc stuff
 dnl
+AS_IF([test "x${shared_libvlc}" = "x"], [shared_libvlc=no])
 AM_CONDITIONAL(BUILD_SHARED, [test "${shared_libvlc}" != "no"])
 AM_CONDITIONAL(BUILD_PIC, [test "${build_pic}" = "yes" -o "${shared_libvlc}" != "no"] )
 AS_IF([test "${shared_libvlc}" != "no"], [
