@@ -441,7 +441,11 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * Plug-in stuff
  *****************************************************************************/
 #if !defined (__PLUGIN__) || defined (HAVE_SHARED_LIBVLC)
-#   define VLC_EXPORT( type, name, args ) type name args
+#   ifdef __cplusplus
+#      define VLC_EXPORT( type, name, args ) extern "C" type name args
+#   else
+#      define VLC_EXPORT( type, name, args ) type name args
+#   endif
 #else
 #   define VLC_EXPORT( type, name, args ) struct _u_n_u_s_e_d_
     extern module_symbols_t* p_symbols;
