@@ -3,10 +3,10 @@ import os
 
 if os.sys.platform in ('win32', 'darwin'):
     # Do not use PIC version on win32 and Mac OS X
-    vlclib='../../lib/libvlc.a'
+    vlclib='../../src/libvlc.a'
     picflag=''
 else:
-    vlclib='../../lib/libvlc_pic.a'
+    vlclib='../../src/libvlc_pic.a'
     picflag='pic'
 
 def get_vlcconfig():

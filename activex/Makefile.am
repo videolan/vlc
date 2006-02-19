@@ -59,7 +59,7 @@ DIST_misc = \
     test.html \
     $(NULL)
 
-LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc.a
 
 if BUILD_ACTIVEX
 

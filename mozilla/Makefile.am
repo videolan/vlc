@@ -26,6 +26,8 @@ DIST_misc = \
 	vlcintf.idl \
 	$(NULL)
 
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc.a
+
 if BUILD_MOZILLA
 
 # Under Win32, Mozilla plugins need to be named NP******.DLL, but under Unix
@@ -33,7 +35,6 @@ if BUILD_MOZILLA
 # under Win32 and npunix.c under Unix.
 if HAVE_WIN32
 
-LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
 
 npvlc_DATA = npvlc$(LIBEXT)
 npvlcdir = $(libdir)
@@ -51,8 +52,6 @@ LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc) `$(VLC_CONFIG) --libs mozilla vlc bu
 
 else
 if HAVE_DARWIN
-
-LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
 
 npvlc_DATA = npvlc$(LIBEXT)
 npvlcdir = $(libdir)
@@ -86,8 +85,6 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	(cd "./$@/Contents/MacOS"; tar xf -)
 
 else
-
-LIBRARIES_libvlc = $(top_builddir)/lib/libvlc_pic.a
 
 npvlc_DATA = libvlcplugin$(LIBEXT)
 npvlcdir = $(libdir)/mozilla/plugins
