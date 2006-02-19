@@ -144,7 +144,7 @@ HEADERS_include = \
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
 	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
-	touch src/misc/modules_builtin.h
+	touch $@
 
 src/misc/modules.c: src/misc/modules_builtin.h
 
@@ -301,8 +301,8 @@ dist-hook:
 
 bin_SCRIPTS = vlc-config
 vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
-	$(SHELL) ./config.status --file=vlc-config
-	chmod 0755 vlc-config
+	$(SHELL) ./config.status --file=$@
+	chmod 0755 $@
 
 vlc-config.in: vlc-config.in.in
 	./config.status --recheck
