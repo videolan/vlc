@@ -543,6 +543,10 @@ package-win32-base-debug:
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
 	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
 	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
+if BUILD_SHARED
+	cp "src/libvlc$(LIBEXT)" "vlc-${VERSION}/"
+	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
+endif
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
@@ -694,6 +698,10 @@ package-wince-base:
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
 	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
 	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
+if BUILD_SHARED
+	cp "src/libvlc$(LIBEXT)" "vlc-${VERSION}/"
+	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
+endif
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
