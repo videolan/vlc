@@ -26,7 +26,11 @@ DIST_misc = \
 	vlcintf.idl \
 	$(NULL)
 
+if BUILD_SHARED
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc$(LIBEXT)
+else
 LIBRARIES_libvlc = $(top_builddir)/src/libvlc.a
+endif
 
 if BUILD_MOZILLA
 
