@@ -552,7 +552,7 @@ then
   if test -z "${builddir}"; then
     builddir="`sed -ne 's/^top_builddir *= *//p' < Makefile`"
   fi
-  BUILTINS=`sed -ne 's/.*builtins *= *" *\([^"]*\)".*/\1/p' vlc-config`
+  BUILTINS=`sed -ne 's/.*builtins *= *" *\([^"]*\)".*/\1/p' ${builddir}/vlc-config`
 
   file="${builddir}/src/misc/modules_builtin.h"
 

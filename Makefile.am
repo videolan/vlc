@@ -12,7 +12,7 @@ NULL =
 #  - . should come before mozilla/bindings because the plugin needs libvlc_pic.a
 #  - po should come before . because VLC.app needs the pofiles
 #  - loader should come before modules because some plugins need it
-SUBDIRS = intl loader modules po . mozilla bindings activex share m4 doc
+SUBDIRS = intl loader src modules po . mozilla bindings activex share m4 doc
 DIST_SUBDIRS = $(SUBDIRS) debian ipkg lib
 
 EXTRA_DIST = \
@@ -23,23 +23,16 @@ EXTRA_DIST = \
 	MAINTAINERS \
 	README.MacOSX.rtf \
 	bootstrap \
-	src/extras/COPYING \
 	toolbox \
 	vlc-api.pl \
 	vlc-config.in.in \
 	vlc.spec \
 	vlc.spec.mdk \
 	vlc.win32.nsi \
-	src/misc/modules_builtin.h.in \
 	$(NULL)
 
 BUILT_SOURCES_distclean = vlc-config compile
-BUILT_SOURCES_clean = \
-	stamp-api \
-	macosx-sdk \
-	src/misc/modules_builtin.h \
-	src/misc/version.c \
-	$(NULL)
+BUILT_SOURCES_clean = macosx-sdk
 
 BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
 
@@ -54,116 +47,6 @@ ACLOCAL_AMFLAGS = -I m4
 # XXX: these flags could be set in configure.ac, but we set them here
 # because old versions of automake don't support them in configure.ac.
 AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
-
-###############################################################################
-# Headers
-###############################################################################
-
-pkgincludedir = $(includedir)/vlc
-
-dist_pkginclude_HEADERS = \
-	include/vlc/vlc.h \
-	include/vlc/libvlc.h \
-	include/vlc/aout.h \
-	include/vlc/vout.h \
-	include/vlc/sout.h \
-	include/vlc/decoder.h \
-	include/vlc/input.h \
-	include/vlc/intf.h \
-	include/vlc/mediacontrol.h \
-	include/vlc/mediacontrol_structures.h \
-	$(NULL)
-
-noinst_HEADERS = $(HEADERS_include)
-noinst_DATA = $(DATA_noinst_beos) $(DATA_noinst_libvlc)
-
-HEADERS_include = \
-	include/aout_internal.h \
-	include/audio_output.h \
-	include/beos_specific.h \
-	include/charset.h \
-	include/codecs.h \
-	include/configuration.h \
-	include/darwin_specific.h \
-	include/intf_eject.h \
-	include/iso_lang.h \
-	include/main.h \
-	include/mmx.h \
-	include/modules.h \
-	include/modules_inner.h \
-	include/mtime.h \
-	include/network.h \
-	include/os_specific.h \
-	include/snapshot.h \
-	include/stream_output.h \
-	include/variables.h \
-	include/video_output.h \
-	include/vlc_access.h \
-	include/vlc_acl.h \
-	include/vlc_bits.h \
-	include/vlc_block.h \
-	include/vlc_block_helper.h \
-	include/vlc_codec.h \
-	include/vlc_common.h \
-	include/vlc_config.h \
-	include/vlc_cpu.h \
-	include/vlc_demux.h \
-	include/vlc_error.h \
-	include/vlc_es.h \
-	include/vlc_es_out.h \
-	include/vlc_filter.h \
-	include/vlc_config_cat.h \
-	include/vlc_httpd.h \
-	include/vlc_tls.h \
-	include/vlc_md5.h \
-	include/vlc_image.h \
-	include/vlc_input.h \
-	include/vlc_interaction.h \
-	include/vlc_interface.h \
-	include/vlc_keys.h \
-	include/vlc_messages.h \
-	include/vlc_meta.h \
-	include/vlc_objects.h \
-	include/vlc_osd.h \
-	include/vlc_playlist.h \
-	include/vlc_spu.h \
-	include/vlc_stream.h \
-	include/vlc_symbols.h \
-	include/vlc_threads_funcs.h \
-	include/vlc_threads.h \
-	include/vlc_update.h \
-	include/vlc_video.h \
-	include/vlc_vlm.h \
-	include/vlc_vod.h \
-	include/vlc_xml.h \
-	include/vout_synchro.h \
-	include/win32_specific.h \
-	include/libvlc_internal.h \
-	include/mediacontrol_internal.h
-	$(NULL)
-
-src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in vlc-config
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
-	touch $@
-
-src/misc/modules.c: src/misc/modules_builtin.h
-
-src/misc/version.c: FORCE
-	srcdir=$(srcdir) $(srcdir)/toolbox --update-version
-
-# These dependencies are mandatory
-$(SOURCES_libvlc): $(LIB_intl)
-
-###############################################################################
-# Optional libintl - FIXME, bad dependencies
-###############################################################################
-
-intl/libintl.a: FORCE
-	cd $(top_builddir)/intl && $(MAKE) $(AM_MAKEFLAGS)
-
-if BUILD_INTL
-LIB_intl = intl/libintl.a
-endif
 
 ###############################################################################
 # MacOS X project
@@ -307,196 +190,8 @@ vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
 vlc-config.in: vlc-config.in.in
 	./config.status --recheck
 
-MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 CLEANFILES = $(BUILT_SOURCES_clean) stamp-builtin
 DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
-
-lib_LIBRARIES = lib/libvlc.a $(lib_PICLIBRARIES)
-if HAVE_WIN32
-else
-if BUILD_PIC
-lib_PICLIBRARIES = lib/libvlc_pic.a
-endif
-endif
-
-lib_libvlc_a_SOURCES = $(SOURCES_libvlc)
-lib_libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-lib_libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
-lib_libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-
-lib_libvlc_pic_a_SOURCES = $(SOURCES_libvlc)
-lib_libvlc_pic_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
-lib_libvlc_pic_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
-lib_libvlc_pic_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
-
-if HAVE_BEOS
-OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
-endif
-if HAVE_DARWIN
-OPT_SOURCES_libvlc_darwin = $(SOURCES_libvlc_darwin)
-endif
-if HAVE_WIN32
-OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
-endif
-if HAVE_WINCE
-OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
-endif
-if BUILD_DIRENT
-OPT_SOURCES_libvlc_dirent = $(SOURCES_libvlc_dirent)
-endif
-if BUILD_GETOPT
-OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
-endif
-
-# Build libvlc as a shared library
-if BUILD_SHARED
-DATA_noinst_libvlc = libvlc$(LIBEXT)
-if HAVE_WIN32
-OBJECTS_libvlc_so = $(lib_libvlc_a_OBJECTS)
-else
-OBJECTS_libvlc_so = $(lib_libvlc_pic_a_OBJECTS)
-endif
-endif
-
-libvlc$(LIBEXT): $(OBJECTS_libvlc_so)
-	@ldfl="`$(VLC_CONFIG) --libs plugin vlc $(pic) builtin`" ; \
-	case `$(VLC_CONFIG) --linkage vlc` in \
-	  c++)  ld="$(CXXLINK)" ;; \
-	  objc) ld="$(OBJCLINK)" ;; \
-	  c|*)  ld="$(LINK)" ;; \
-	esac ; \
-	echo $$ld $(OBJECTS_libvlc_so) $$ldfl ; \
-	$$ld $(OBJECTS_libvlc_so) $$ldfl
-
-EXTRA_DIST += \
-	$(SOURCES_libvlc_beos) \
-	$(SOURCES_libvlc_darwin) \
-	$(SOURCES_libvlc_win32) \
-	$(SOURCES_libvlc_dirent) \
-	$(SOURCES_libvlc_getopt) \
-	$(NULL)
-
-SOURCES_libvlc_beos = \
-	src/misc/beos_specific.cpp \
-	$(NULL)
-
-SOURCES_libvlc_darwin = \
-	src/misc/darwin_specific.m \
-	$(NULL)
-
-SOURCES_libvlc_win32 = \
-	src/misc/win32_specific.c \
-	$(NULL)
-
-SOURCES_libvlc_dirent = \
-	src/extras/dirent.c \
-	$(NULL)
-
-SOURCES_libvlc_getopt = \
-	src/extras/getopt.c \
-	src/extras/getopt.h \
-	src/extras/getopt1.c \
-	$(NULL)
-
-SOURCES_libvlc_common = \
-	src/libvlc.c \
-	src/libvlc.h \
-	src/interface/interface.c \
-	src/interface/intf_eject.c \
-	src/interface/interaction.c \
-	src/playlist/playlist.c \
-	src/playlist/sort.c \
-	src/playlist/loadsave.c \
-	src/playlist/view.c \
-	src/playlist/item.c \
-	src/playlist/item-ext.c \
-	src/playlist/services_discovery.c \
-	src/input/access.c \
-	src/input/clock.c \
-	src/input/control.c \
-	src/input/decoder.c \
-	src/input/demux.c \
-	src/input/es_out.c \
-	src/input/input.c \
-	src/input/input_internal.h \
-	src/input/stream.c \
-	src/input/mem_stream.c \
-	src/input/subtitles.c \
-	src/input/var.c \
-	src/video_output/video_output.c \
-	src/video_output/vout_pictures.c \
-	src/video_output/vout_pictures.h \
-	src/video_output/video_text.c \
-	src/video_output/video_widgets.c \
-	src/video_output/vout_subpictures.c \
-	src/video_output/vout_synchro.c \
-	src/video_output/vout_intf.c \
-	src/audio_output/common.c \
-	src/audio_output/dec.c \
-	src/audio_output/filters.c \
-	src/audio_output/input.c \
-	src/audio_output/mixer.c \
-	src/audio_output/output.c \
-	src/audio_output/intf.c \
-	src/stream_output/stream_output.c \
-	src/stream_output/announce.c \
-	src/stream_output/sap.c \
-	src/osd/osd.c \
-	src/osd/osd_parser.c \
-	src/osd/osd_text.c \
-	src/osd/osd_widgets.c \
-	src/network/acl.c \
-	src/network/getaddrinfo.c \
-	src/network/io.c \
-	src/network/tcp.c \
-	src/network/udp.c \
-	src/network/httpd.c \
-	src/network/rootwrap.c \
-	src/network/tls.c \
-	src/misc/charset.c \
-	src/misc/md5.c \
-	src/misc/mtime.c \
-	src/misc/block.c \
-	src/misc/modules.c \
-	src/misc/threads.c \
-	src/misc/stats.c \
-	src/misc/unicode.c \
-	src/misc/cpu.c \
-	src/misc/configuration.c \
-	src/misc/image.c \
-	src/misc/iso_lang.c \
-	src/misc/iso-639_def.h \
-	src/misc/messages.c \
-	src/misc/objects.c \
-	src/misc/variables.c \
-	src/misc/error.c \
-	src/misc/update.c \
-	src/misc/vlm.c \
-	src/misc/xml.c \
-	src/misc/hashtables.c \
-	src/misc/version.c \
-	src/extras/libc.c \
-	src/control/core.c \
-	src/control/playlist.c \
-	src/control/vlm.c \
-	src/control/input.c \
-	src/control/video.c \
-	src/control/mediacontrol_core.c \
-	src/control/mediacontrol_util.c \
-	src/control/mediacontrol_audio_video.c \
-	$(NULL)
-
-# These should be distributed, but not compiled
-EXTRA_DIST += src/control/mediacontrol_init.c src/control/mediacontrol_plugin.c
-
-SOURCES_libvlc = \
-	$(SOURCES_libvlc_common) \
-	$(OPT_SOURCES_libvlc_beos) \
-	$(OPT_SOURCES_libvlc_darwin) \
-	$(OPT_SOURCES_libvlc_win32) \
-	$(OPT_SOURCES_libvlc_dirent) \
-	$(OPT_SOURCES_libvlc_getopt) \
-	$(NULL)
 
 ###############################################################################
 # Building vlc
@@ -505,6 +200,8 @@ SOURCES_libvlc = \
 bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
+# Ugly kludge so that automake defines $(CXXLINK)
+EXTRA_vlc_SOURCES = extras/zsh.cpp
 
 # Work around a bug in the arm-wince-pe linker
 if HAVE_WINCE
@@ -512,22 +209,19 @@ vlc_WORKAROUNDLDFLAGS = $(LIB_libvlc)
 endif
 
 if BUILD_SHARED
-### libvlc.so cannot be created into lib/
-LIB_libvlc = libvlc$(LIBEXT)
-LDFLAGS_libvlc =
+LIB_libvlc = src/libvlc$(LIBEXT)
 #-Wl,-rpath $(libdir)
 else
-LIB_libvlc = lib/libvlc.a
-LDFLAGS_libvlc = `$(VLC_CONFIG) --libs vlc builtin` 
+LIB_libvlc = src/libvlc.a
 endif
 
-vlc_LDFLAGS = $(LDFLAGS_libvlc) $(vlc_WORKAROUNDLDFLAGS)
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin` $(vlc_WORKAROUNDLDFLAGS)
 vlc_LDADD = $(LIB_libvlc) $(DATA_win32_rc) $(LIB_intl)
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc) $(LIB_intl)
+DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	@rm -f vlc$(EXEEXT)
@@ -572,14 +266,12 @@ install-exec-local:
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \
 	  ln -sf vlc "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
-	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"
 
 # the opposite of install-{data,exec}-local
 uninstall-local:
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" ; \
 	fi ; done
-	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
 
 if HAVE_DARWIN
 # Create the MacOS X app
@@ -1190,11 +882,6 @@ stamp-builtin: FORCE
 	  fi; \
 	done
 	@if test ! -f $@; then printf "" > $@; fi
-
-stamp-api: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl
-	( cd $(srcdir) && cat $(HEADERS_include) ) | \
-	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
-	touch stamp-api
 
 ###############################################################################
 # Enforce Mac OS X deployment target environment variable

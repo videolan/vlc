@@ -208,7 +208,7 @@ EXTRA_LIBRARIES = ${extra_libs}
 include Modules.am
 
 if BUILD_SHARED
-LIBVLC = \$(top_builddir)/libvlc\$(LIBEXT)
+LIBVLC = \$(top_builddir)/src/libvlc\$(LIBEXT)
 if HAVE_WIN32
 LIBADD = \$(LIBVLC)
 endif
