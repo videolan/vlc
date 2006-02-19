@@ -131,6 +131,7 @@ C: asmax
 D: Audio output
 D: skins module (X11 port)
 D: skins2 module (core and X11 port)
+D: JACK audio output
 S: France
 
 N: Rémi Denis-Courmont
