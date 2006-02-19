@@ -300,11 +300,11 @@ SOURCES_libvlc_common = \
 	misc/hashtables.c \
 	misc/version.c \
 	extras/libc.c \
-	control/core.c \
-	control/control_playlist.c \
-	control/control_vlm.c \
-	control/control_input.c \
-	control/video.c \
+	control/libvlc_core.c \
+	control/libvlc_playlist.c \
+	control/libvlc_vlm.c \
+	control/libvlc_input.c \
+	control/libvlc_video.c \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c \

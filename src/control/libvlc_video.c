@@ -70,14 +70,13 @@ void libvlc_set_fullscreen( libvlc_input_t *p_input, int b_fullscreen,
     /* GetVout will raise the exception for us */
     if( !p_vout1 )
     {
-        fprintf( stderr, "No vout\n");
         return;
     }
 
     if( b_fullscreen ) val.b_bool = VLC_TRUE;
     else               val.b_bool = VLC_FALSE;
 
-    var_Set( p_vout1, "fullscreen", val );
+    i_ret = var_Set( p_vout1, "fullscreen", val );
     if( i_ret )
         libvlc_exception_raise( p_e,
                         "Unexpected error while setting fullscreen value" );

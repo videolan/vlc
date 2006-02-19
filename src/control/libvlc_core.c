@@ -61,8 +61,7 @@ inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
                                     char *psz_format, ... )
 {
     va_list args;
-    char *psz_message;
-    va_start( args, p_exception->psz_message );
+    va_start( args, psz_format );
     vasprintf( &p_exception->psz_message, psz_format, args );
     va_end( args );
 
