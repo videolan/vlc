@@ -111,6 +111,29 @@ misc/version.c: FORCE
 	$(TOOLBOX) --update-version
 
 ###############################################################################
+# Building builtin modules
+###############################################################################
+#
+# As long as we use builtins with a shared libvlc, we must build them before
+# we build libvlc. Maybe one day, libvlc will handle multiple modules per
+# shared object, which will make builtins fairly redumdant. Until then, we
+# need this workaround.
+
+builtins:
+if BUILD_SHARED
+	@if test "$(pic)" = "pic"; then ext="_pic.a"; else ext=".a"; fi ; \
+	for c in `$(VLC_CONFIG) --libs builtin`; do \
+		case $$c in \
+			../modules/*.a) echo $$c ;; \
+		esac ; \
+	done | \
+	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2/g' | \
+	while read cmd; do echo $$cmd$$ext; eval "($$cmd$$ext)" || exit $$? ; done
+endif
+
+.PHONY: builtins
+
+###############################################################################
 # Building libvlc
 ###############################################################################
 
@@ -168,9 +191,9 @@ OBJECTS_libvlc_so = $(libvlc_pic_a_OBJECTS)
 endif
 endif
 
-libvlc$(LIBEXT): $(OBJECTS_libvlc_so)
-	@ldfl="`$(VLC_CONFIG) --libs plugin vlc $(pic)` $(INCLUDED_LIBINTL)" ; \
-	case `$(VLC_CONFIG) --linkage vlc` in \
+libvlc$(LIBEXT): $(OBJECTS_libvlc_so) builtins
+	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin $(pic)` $(INCLUDED_LIBINTL)" ; \
+	case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++)  ld="$(CXXLINK)" ;; \
 	  objc) ld="$(OBJCLINK)" ;; \
 	  c|*)  ld="$(LINK)" ;; \
