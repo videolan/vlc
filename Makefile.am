@@ -13,7 +13,7 @@ NULL =
 #  - po should come before . because VLC.app needs the pofiles
 #  - loader should come before modules because some plugins need it
 SUBDIRS = intl loader src modules po . mozilla bindings activex share m4 doc
-DIST_SUBDIRS = $(SUBDIRS) debian ipkg lib
+DIST_SUBDIRS = $(SUBDIRS) debian ipkg
 
 EXTRA_DIST = \
 	HACKING \
