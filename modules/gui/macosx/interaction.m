@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include "intf.h"
-#import <interaction.h>
+#import "interaction.h"
 
 /*****************************************************************************
  * VLCInteractionList implementation
@@ -101,6 +101,7 @@
 
 -(id)initDialog: (interaction_dialog_t *)_p_dialog
 {
+    p_intf = VLCIntf;
     [super init];
     p_dialog = _p_dialog;
     return self;
@@ -111,7 +112,7 @@
     int i = 0;
     id o_window = NULL;
     if( !p_dialog )
-        NSLog( @"serious issue" );
+        msg_Err( p_intf, "serious issue (p_dialog == nil)" );
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
     NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
@@ -136,20 +137,20 @@
         o_window = [NSApp mainWindow];
     }
     
-    NSLog( @"Title: %@", o_title );
-    NSLog( @"Description: %@", o_description );
+    msg_Dbg( p_intf, "Title: %s", [o_title UTF8String] );
+    msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
     if( p_dialog->i_id == DIALOG_ERRORS )
     {
         for( i = 0; i < p_dialog->i_widgets; i++ )
         {
-            NSLog( @"Error: %@", [NSString stringWithUTF8String: p_dialog->pp_widgets[i]->psz_text] );
+            msg_Err( p_intf, "Error: %s", p_dialog->pp_widgets[i]->psz_text );
         }
     }
     else
     {
         for( i = 0; i < p_dialog->i_widgets; i++ )
         {
-            NSLog( @"widget: %@", [NSString stringWithUTF8String: p_dialog->pp_widgets[i]->psz_text] );
+            msg_Dbg( p_intf, "widget: %s", p_dialog->pp_widgets[i]->psz_text );
             o_description = [o_description stringByAppendingString:
                                 [NSString stringWithUTF8String: p_dialog->pp_widgets[i]->psz_text]];
         }
@@ -160,11 +161,11 @@
         }
         else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
-            NSBeginInformationalAlertSheet( o_title, @"Yes" , @"No", @"Cancel", o_window, self,
+            NSBeginInformationalAlertSheet( o_title, @"Yes", @"Cancel", @"No", o_window, self,
                 @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, o_description );
         }
         else
-            NSLog( @"not implemented yet" );
+            msg_Dbg( p_intf, "requested dialog type not implemented yet" );
     }
 }
 
@@ -194,17 +195,17 @@
 
 -(void)updateDialog
 {
-    NSLog( @"update event" );
+    msg_Dbg( p_intf, "update event" );
 }
 
 -(void)hideDialog
 {
-    NSLog( @"hide event" );
+    msg_Dbg( p_intf, "hide event" );
 }
 
 -(void)destroyDialog
 {
-    NSLog( @"destroy event" );
+    msg_Dbg( p_intf, "destroy event" );
 }
 
 -(void)dealloc
