@@ -5196,15 +5196,15 @@ AM_CONDITIONAL(HAVE_BUILTINS, ${builtin_support})
 dnl
 dnl Pic and shared libvlc stuff
 dnl
-AS_IF([test "x${shared_libvlc}" = "x"], [shared_libvlc=no])
-AM_CONDITIONAL(BUILD_SHARED, [test "${shared_libvlc}" != "no"])
-AM_CONDITIONAL(BUILD_PIC, [test "${build_pic}" = "yes" -o "${shared_libvlc}" != "no"] )
-AS_IF([test "${shared_libvlc}" != "no"], [
+AS_IF([test "x${enable_shared_libvlc}" = "x"], [enable_shared_libvlc=no])
+AM_CONDITIONAL(BUILD_SHARED, [test "${enable_shared_libvlc}" != "no"])
+AM_CONDITIONAL(BUILD_PIC, [test "${build_pic}" = "yes" -o "${enable_shared_libvlc}" != "no"] )
+AS_IF([test "${enable_shared_libvlc}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
 ])
 
 pic=no
-AS_IF([test "${shared_libvlc}" != "no" -o "${build_pic}" = "yes"], [pic=pic])
+AS_IF([test "${enable_shared_libvlc}" != "no" -o "${build_pic}" = "yes"], [pic=pic])
 AS_IF([test "${SYS}" = "mingw32"], [pic=no])
 AS_IF([test "${pic}" = "no"], [pic=])
 AC_SUBST(pic)
