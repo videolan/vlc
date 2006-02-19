@@ -216,7 +216,7 @@ LIB_libvlc = src/libvlc.a
 endif
 
 vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin` $(vlc_WORKAROUNDLDFLAGS)
-vlc_LDADD = $(LIB_libvlc) $(DATA_win32_rc) $(LIB_intl)
+vlc_LDADD = $(LIB_libvlc) $(DATA_win32_rc) $(INCLUDED_LIBINTL)
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
