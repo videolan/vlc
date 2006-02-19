@@ -481,6 +481,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
  * functions
  ***************************************************************************/
 
+#undef LoadImage /* do not conflict with Win32 API */
+
 /****************************************************************************
  * download and resize image located at psz_url
  ***************************************************************************/
