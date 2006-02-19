@@ -197,6 +197,16 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 # Building vlc
 ###############################################################################
 
+.PHONY: libvlc
+
+# Shortcut for developpers to rebuild the core (libvlc + vlc)
+# Don't use it if you don't know what it is about.
+# Don't complain if it doesn't work. -- Courmisch
+core: libvlc vlc$(EXEEXT)
+
+libvlc:
+	cd src && $(MAKE) all
+
 bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
