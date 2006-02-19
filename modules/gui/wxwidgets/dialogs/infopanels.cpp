@@ -25,17 +25,19 @@
 #include <wx/combobox.h>
 #include <wx/statline.h>
 
+#include <vlc_meta.h>
+
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
 #endif
 
 /*****************************************************************************
- * General info panel
+ * General info (URI, name, metadata)
  *****************************************************************************/
-BEGIN_EVENT_TABLE( ItemInfoPanel, wxPanel )
+BEGIN_EVENT_TABLE( MetaDataPanel, wxPanel )
 END_EVENT_TABLE()
 
-ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
+MetaDataPanel::MetaDataPanel( intf_thread_t *_p_intf,
                               wxWindow* _p_parent,
                               bool _b_modifiable ):
     wxPanel( _p_parent, -1 )
@@ -73,6 +75,118 @@ ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
     name_text = new wxTextCtrl( this, -1,
             wxU(""), wxDefaultPosition, wxSize( 300, -1 ), flags );
     sizer->Add( name_text, 1 , wxALL|wxEXPAND , 0 );
+    sizer->Layout();
+
+    /* Metadata */
+    wxFlexGridSizer *meta_sizer = new wxFlexGridSizer(2,11,20);
+    meta_sizer->AddGrowableCol(1);
+
+#define ADD_META( string, widget ) {                                        \
+        meta_sizer->Add( new wxStaticText( this, -1, wxU(_(string) ) ),1,   \
+                         wxTOP|wxRIGHT|wxLEFT|wxEXPAND, 0 );                \
+        widget = new wxStaticText( this, -1, wxU( "" ) );                   \
+        meta_sizer->Add( widget, 1, wxTOP|wxRIGHT|wxLEFT|wxEXPAND, 0 ); }
+
+    ADD_META( VLC_META_ARTIST, artist_text );
+    ADD_META( VLC_META_GENRE, genre_text );
+    ADD_META( VLC_META_COPYRIGHT, copyright_text );
+    ADD_META( VLC_META_COLLECTION, collection_text );
+    ADD_META( VLC_META_SEQ_NUM, seqnum_text );
+    ADD_META( VLC_META_DESCRIPTION, description_text );
+    ADD_META( VLC_META_RATING, rating_text );
+    ADD_META( VLC_META_DATE, date_text );
+    ADD_META( VLC_META_LANGUAGE, language_text );
+    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
+    ADD_META( VLC_META_PUBLISHER, publisher_text );
+
+    meta_sizer->Layout();
+
+    panel_sizer->Add( sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( meta_sizer, 0, wxEXPAND | wxALL, 5 );
+    panel_sizer->Layout();
+    SetSizerAndFit( panel_sizer );
+}
+
+MetaDataPanel::~MetaDataPanel()
+{
+}
+
+void MetaDataPanel::Update( input_item_t *p_item )
+{
+    /* Rebuild the tree */
+    Clear();
+
+    uri_text->SetValue( wxU( p_item->psz_uri ) );
+    name_text->SetValue( wxU( p_item->psz_name ) );
+
+#define UPDATE_META( meta, widget ) {                                       \
+    char *psz_meta = vlc_input_item_GetInfo( p_item, _(VLC_META_INFO_CAT),  \
+                                            _(meta) );                      \
+    if( psz_meta != NULL )                                                  \
+    {                                                                       \
+        widget->SetLabel( wxU( psz_meta ) );                                \
+    }                                                                       \
+    }
+
+    UPDATE_META( VLC_META_ARTIST, artist_text );
+    UPDATE_META( VLC_META_GENRE, genre_text );
+    UPDATE_META( VLC_META_COPYRIGHT, copyright_text );
+    UPDATE_META( VLC_META_COLLECTION, collection_text );
+    UPDATE_META( VLC_META_SEQ_NUM, seqnum_text );
+    UPDATE_META( VLC_META_DESCRIPTION, description_text );
+    UPDATE_META( VLC_META_RATING, rating_text );
+    UPDATE_META( VLC_META_DATE, date_text );
+    UPDATE_META( VLC_META_LANGUAGE, language_text );
+    UPDATE_META( VLC_META_NOW_PLAYING, nowplaying_text );
+    UPDATE_META( VLC_META_PUBLISHER, publisher_text );
+
+#undef UPDATE_META
+}
+
+char* MetaDataPanel::GetURI( )
+{
+    return  strdup( uri_text->GetLineText(0).mb_str() );
+}
+
+char* MetaDataPanel::GetName( )
+{
+    return  strdup( name_text->GetLineText(0).mb_str() );
+}
+
+void MetaDataPanel::Clear()
+{
+}
+
+void MetaDataPanel::OnOk( )
+{
+}
+
+void MetaDataPanel::OnCancel( )
+{
+}
+
+
+/*****************************************************************************
+ * General info panel
+ *****************************************************************************/
+BEGIN_EVENT_TABLE( AdvancedInfoPanel, wxPanel )
+END_EVENT_TABLE()
+
+AdvancedInfoPanel::AdvancedInfoPanel( intf_thread_t *_p_intf,
+                                      wxWindow* _p_parent ):
+    wxPanel( _p_parent, -1 )
+{
+    int flags= wxTE_PROCESS_ENTER;
+    /* Initializations */
+    p_intf = _p_intf;
+    p_parent = _p_parent;
+
+    SetAutoLayout( TRUE );
+
+    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+
+    wxFlexGridSizer *sizer = new wxFlexGridSizer(2,8,20);
+    sizer->AddGrowableCol(1);
 
     /* Treeview */
     info_tree = new wxTreeCtrl( this, -1, wxDefaultPosition,
@@ -81,24 +195,19 @@ ItemInfoPanel::ItemInfoPanel( intf_thread_t *_p_intf,
                                 wxTR_HIDE_ROOT );
     info_root = info_tree->AddRoot( wxU( "" ) );
 
-    sizer->Layout();
-    panel_sizer->Add( sizer, 0, wxEXPAND | wxALL, 15 );
     panel_sizer->Add( info_tree, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
 }
 
-ItemInfoPanel::~ItemInfoPanel()
+AdvancedInfoPanel::~AdvancedInfoPanel()
 {
 }
 
-void ItemInfoPanel::Update( input_item_t *p_item )
+void AdvancedInfoPanel::Update( input_item_t *p_item )
 {
     /* Rebuild the tree */
     Clear();
-
-    uri_text->SetValue( wxU( p_item->psz_uri ) );
-    name_text->SetValue( wxU( p_item->psz_name ) );
 
     for( int i = 0; i< p_item->i_categories ; i++)
     {
@@ -117,26 +226,16 @@ void ItemInfoPanel::Update( input_item_t *p_item )
     }
 }
 
-char* ItemInfoPanel::GetURI( )
-{
-    return  strdup( uri_text->GetLineText(0).mb_str() );
-}
-
-char* ItemInfoPanel::GetName( )
-{
-    return  strdup( name_text->GetLineText(0).mb_str() );
-}
-
-void ItemInfoPanel::Clear()
+void AdvancedInfoPanel::Clear()
 {
     info_tree->DeleteChildren( info_root );
 }
 
-void ItemInfoPanel::OnOk( )
+void AdvancedInfoPanel::OnOk( )
 {
 }
 
-void ItemInfoPanel::OnCancel( )
+void AdvancedInfoPanel::OnCancel( )
 {
 }
 

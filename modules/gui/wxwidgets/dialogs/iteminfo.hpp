@@ -57,7 +57,7 @@ private:
 
     /* Controls for the iteminfo dialog box */
     wxPanel *info_subpanel;
-    ItemInfoPanel *info_panel;
+    MetaDataPanel *info_panel;
 
     wxPanel *group_subpanel;
     wxPanel *group_panel;

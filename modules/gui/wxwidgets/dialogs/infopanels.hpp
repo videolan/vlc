@@ -30,12 +30,57 @@
 
 namespace wxvlc
 {
-class ItemInfoPanel: public wxPanel
+class MetaDataPanel: public wxPanel
 {
 public:
     /* Constructor */
-    ItemInfoPanel( intf_thread_t *p_intf, wxWindow *p_parent, bool );
-    virtual ~ItemInfoPanel();
+    MetaDataPanel( intf_thread_t *p_intf, wxWindow *p_parent, bool );
+    virtual ~MetaDataPanel();
+
+    void Update( input_item_t *);
+    void Clear();
+
+    char* GetURI();
+    char* GetName();
+
+    void OnOk();
+    void OnCancel();
+
+private:
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    input_item_t *p_item;
+    wxWindow *p_parent;
+
+    wxTextCtrl *uri_text;
+    wxTextCtrl *name_text;
+    wxStaticText *uri_label;
+    wxStaticText *name_label;
+
+    wxStaticText *artist_text;
+    wxStaticText *genre_text;
+    wxStaticText *copyright_text;
+    wxStaticText *collection_text;
+    wxStaticText *seqnum_text;
+    wxStaticText *description_text;
+    wxStaticText *rating_text;
+    wxStaticText *date_text;
+    wxStaticText *setting_text;
+    wxStaticText *language_text;
+    wxStaticText *nowplaying_text;
+    wxStaticText *publisher_text;
+
+    bool b_modifiable;
+};
+
+
+class AdvancedInfoPanel: public wxPanel
+{
+public:
+    /* Constructor */
+    AdvancedInfoPanel( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~AdvancedInfoPanel();
 
     void Update( input_item_t *);
     void Clear();

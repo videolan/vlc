@@ -69,7 +69,7 @@ ItemInfoDialog::ItemInfoDialog( intf_thread_t *_p_intf,
     panel->SetAutoLayout( TRUE );
 
     /* Create the standard info panel */
-    info_panel = new ItemInfoPanel(p_intf, panel, true );
+    info_panel = new MetaDataPanel(p_intf, panel, true );
     info_panel->Update( &(p_item->input) );
     /* Separation */
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );

@@ -30,7 +30,8 @@
 
 namespace wxvlc
 {
-    class ItemInfoPanel;
+    class MetaDataPanel;
+    class AdvancedInfoPanel;
     class InputStatsInfoPanel;
     class FileInfo: public wxFrame
     {
@@ -52,7 +53,8 @@ namespace wxvlc
 
         mtime_t last_update;
 
-        ItemInfoPanel *item_info;
+        MetaDataPanel *item_info;
+        AdvancedInfoPanel *advanced_info;
         InputStatsInfoPanel *stats_info;
 
         wxBoxSizer *panel_sizer;

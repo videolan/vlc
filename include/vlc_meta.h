@@ -40,6 +40,7 @@
 #define VLC_META_URL                N_("URL")
 #define VLC_META_LANGUAGE           N_("Language")
 #define VLC_META_NOW_PLAYING        N_("Now Playing")
+#define VLC_META_PUBLISHER          N_("Publisher")
 
 #define VLC_META_CDDB_ARTIST        N_("CDDB Artist")
 #define VLC_META_CDDB_CATEGORY      N_("CDDB Category")

@@ -69,10 +69,12 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
 #if (!wxCHECK_VERSION(2,5,2))
         wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
 #endif
-    item_info = new ItemInfoPanel( p_intf, notebook, false );
+    item_info = new MetaDataPanel( p_intf, notebook, false );
+    advanced_info = new AdvancedInfoPanel( p_intf, notebook );
     stats_info = new InputStatsInfoPanel( p_intf, notebook );
 
     notebook->AddPage( item_info, wxU(_("General") ), true );
+    notebook->AddPage( advanced_info, wxU(_("Advanced information") ), false );
     notebook->AddPage( stats_info, wxU(_("Statistics") ), false );
 
 #if (!wxCHECK_VERSION(2,5,2))
@@ -83,7 +85,6 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
-
 
     if( p_playlist )
     {
@@ -112,6 +113,7 @@ void FileInfo::Update()
     if( !p_input || p_input->b_dead || !p_input->input.p_item->psz_name )
     {
         item_info->Clear();
+        advanced_info->Clear();
         stats_info->Clear();
         vlc_object_release( p_playlist );
         return;
@@ -121,7 +123,10 @@ void FileInfo::Update()
     vlc_mutex_lock( &p_input->input.p_item->lock );
     if( b_need_update == VLC_TRUE )
     {
+        vlc_mutex_unlock( &p_input->input.p_item->lock  );
         item_info->Update( p_input->input.p_item );
+        vlc_mutex_lock( &p_input->input.p_item->lock  );
+        advanced_info->Update( p_input->input.p_item );
     }
     stats_info->Update( p_input->input.p_item );
     vlc_mutex_unlock( &p_input->input.p_item->lock );

@@ -107,6 +107,26 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
                 vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
                               VLC_META_ARTIST, psz_temp );
             }
+            else if( !strcmp(p_frame->id, ID3_FRAME_YEAR ) )
+            {
+                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
+                              VLC_META_DATE, psz_temp );
+            }
+            else if( !strcmp(p_frame->id, ID3_FRAME_COMMENT ) )
+            {
+                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
+                              VLC_META_DESCRIPTION, psz_temp );
+            }
+            else if( strstr( (char*)p_frame->description, "Copyright" ) )
+            {
+                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
+                              VLC_META_COPYRIGHT, psz_temp );
+            }
+            else if( strstr( (char*)p_frame->description, "Publisher" ) )
+            {
+                vlc_meta_Add( (vlc_meta_t *)p_demux->p_private,
+                              VLC_META_PUBLISHER, psz_temp );
+            }
             else
             {
                 /* Unknown meta info */
