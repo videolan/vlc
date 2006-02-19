@@ -2,10 +2,10 @@
  * interaction.h: Mac OS X interaction dialogs
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * $Id: vout.h 13803 2005-12-18 18:54:28Z bigben $
+ * $Id $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
- *          Felix KŸhne <fkuehne at videolan dot org>
+ *          Felix KÃ¼hne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@
         }
         else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
-            NSBeginInformationalAlertSheet( o_title, @"Yes", @"Cancel", @"No", \
+            NSBeginInformationalAlertSheet( o_title, @"Yes", @"No", @"Cancel", \
                 o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
                 NULL, nil, o_description );
         }
