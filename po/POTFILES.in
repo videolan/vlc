@@ -72,21 +72,23 @@ include/vlc_vod.h
 include/vlc_xml.h
 include/vout_synchro.h
 include/win32_specific.h
+src/audio_output/ainput.c
 src/audio_output/common.c
 src/audio_output/dec.c
 src/audio_output/filters.c
-src/audio_output/ainput.c
 src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
 src/control/libvlc_core.c
 src/control/libvlc_input.c
+src/control/libvlc_playlist.c
+src/control/libvlc_video.c
+src/control/libvlc_vlm.c
 src/control/mediacontrol_audio_video.c
 src/control/mediacontrol_core.c
 src/control/mediacontrol_init.c
 src/control/mediacontrol_plugin.c
 src/control/mediacontrol_util.c
-src/control/libvlc_playlist.c
 src/extras/dirent.c
 src/extras/getopt.c
 src/extras/getopt.h
@@ -116,6 +118,7 @@ src/misc/configuration.c
 src/misc/cpu.c
 src/misc/darwin_specific.m
 src/misc/error.c
+src/misc/hashtables.c
 src/misc/image.c
 src/misc/iso-639_def.h
 src/misc/iso_lang.c
@@ -274,6 +277,7 @@ modules/audio_filter/equalizer.c
 modules/audio_filter/equalizer_presets.h
 modules/audio_filter/format.c
 modules/audio_filter/normvol.c
+modules/audio_filter/param_eq.c
 modules/audio_filter/resampler/bandlimited.c
 modules/audio_filter/resampler/bandlimited.h
 modules/audio_filter/resampler/linear.c
@@ -482,6 +486,8 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/sfilters.h
 modules/gui/macosx/sfilters.m
+modules/gui/macosx/update.h
+modules/gui/macosx/update.m
 modules/gui/macosx/vout.h
 modules/gui/macosx/vout.m
 modules/gui/macosx/voutgl.m
@@ -510,6 +516,8 @@ modules/gui/skins2/commands/cmd_change_skin.cpp
 modules/gui/skins2/commands/cmd_change_skin.hpp
 modules/gui/skins2/commands/cmd_dialogs.hpp
 modules/gui/skins2/commands/cmd_dummy.hpp
+modules/gui/skins2/commands/cmd_dvd.cpp
+modules/gui/skins2/commands/cmd_dvd.hpp
 modules/gui/skins2/commands/cmd_fullscreen.cpp
 modules/gui/skins2/commands/cmd_fullscreen.hpp
 modules/gui/skins2/commands/cmd_generic.hpp
@@ -811,6 +819,7 @@ modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
 modules/misc/freetype.c
 modules/misc/gnutls.c
+modules/misc/growl.c
 modules/misc/gtk_main.c
 modules/misc/logger.c
 modules/misc/memcpy/fastmemcpy.h
@@ -939,6 +948,7 @@ modules/video_output/glide.c
 modules/video_output/hd1000v.cpp
 modules/video_output/image.c
 modules/video_output/mga.c
+modules/video_output/my_image.c
 modules/video_output/opengl.c
 modules/video_output/qte/qte.cpp
 modules/video_output/qte/qte.h
