@@ -206,7 +206,6 @@ static void   CloseVCDImage( vlc_object_t *, struct vcddev_s * );
 
 #if defined( __APPLE__ )
 static CDTOC *darwin_getTOC( vlc_object_t *, const struct vcddev_s * );
-static int    darwin_getNumberOfDescriptors( CDTOC * );
 static int    darwin_getNumberOfTracks( CDTOC *, int );
 
 #elif defined( WIN32 )

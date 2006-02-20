@@ -233,7 +233,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             return 0;
         }
 
-        i_descriptors = darwin_getNumberOfDescriptors( pTOC );
+        i_descriptors = CDTOCGetDescriptorCount( pTOC );
         i_tracks = darwin_getNumberOfTracks( pTOC, i_descriptors );
 
         if( pp_sectors )
@@ -252,7 +252,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
             pTrackDescriptors = pTOC->descriptors;
 
-            for( i_tracks = 0, i = 0; i <= i_descriptors; i++ )
+            for( i_tracks = 0, i = 0; i < i_descriptors; i++ )
             {
                 track = pTrackDescriptors[i].point;
 
@@ -1057,37 +1057,17 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
 }
 
 /****************************************************************************
- * darwin_getNumberOfDescriptors: get number of descriptors in TOC 
- ****************************************************************************/
-static int darwin_getNumberOfDescriptors( CDTOC *pTOC )
-{
-    int i_descriptors;
-
-    /* get TOC length */
-    i_descriptors = pTOC->length;
-
-    /* remove the first and last session */
-    i_descriptors -= ( sizeof(pTOC->sessionFirst) +
-                       sizeof(pTOC->sessionLast) );
-
-    /* divide the length by the size of a single descriptor */
-    i_descriptors /= sizeof(CDTOCDescriptor);
-
-    return( i_descriptors );
-}
-
-/****************************************************************************
  * darwin_getNumberOfTracks: get number of tracks in TOC 
  ****************************************************************************/
 static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors )
 {
     u_char track;
     int i, i_tracks = 0; 
-    CDTOCDescriptor *pTrackDescriptors;
+    CDTOCDescriptor *pTrackDescriptors = NULL;
 
-    pTrackDescriptors = pTOC->descriptors;
+    pTrackDescriptors = (CDTOCDescriptor *)pTOC->descriptors;
 
-    for( i = i_descriptors; i >= 0; i-- )
+    for( i = i_descriptors; i > 0; i-- )
     {
         track = pTrackDescriptors[i].point;
 
