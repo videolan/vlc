@@ -241,7 +241,7 @@ endif
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
-	@case `$(VLC_CONFIG) --linkage $(vlc_config)` in \
+	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++) cmd="$(CXXLINK)" ;; \
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
