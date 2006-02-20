@@ -200,6 +200,10 @@ libvlc$(LIBEXT): $(OBJECTS_libvlc_so) builtins
 	esac ; \
 	echo $$ld $(OBJECTS_libvlc_so) $$ldfl ; \
 	$$ld $(OBJECTS_libvlc_so) $$ldfl
+# It sucks big time, but we have to do that to link vlc properly
+# on non-PIC OSes, otherwise ld will favor builtins-less libvlc.a over
+# libvlc$(LIBEXT)
+	rm -f libvlc.a
 
 EXTRA_DIST += \
 	$(SOURCES_libvlc_beos) \
