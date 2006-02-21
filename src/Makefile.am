@@ -119,8 +119,10 @@ misc/version.c: FORCE
 # shared object, which will make builtins fairly redumdant. Until then, we
 # need this workaround.
 
-builtins:
 if BUILD_SHARED
+do_builtins = builtins
+
+builtins:
 	@if test "$(pic)" = "pic"; then ext="_pic.a"; else ext=".a"; fi ; \
 	for c in `$(VLC_CONFIG) --libs builtin`; do \
 		case $$c in \
@@ -129,9 +131,9 @@ if BUILD_SHARED
 	done | \
 	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2/g' | \
 	while read cmd; do echo $$cmd$$ext; eval "($$cmd$$ext)" || exit $$? ; done
-endif
 
 .PHONY: builtins
+endif
 
 ###############################################################################
 # Building libvlc
@@ -191,7 +193,7 @@ OBJECTS_libvlc_so = $(libvlc_pic_a_OBJECTS)
 endif
 endif
 
-libvlc$(LIBEXT): $(OBJECTS_libvlc_so) builtins
+libvlc$(LIBEXT): $(OBJECTS_libvlc_so) $(do_builtins)
 	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin $(pic)` $(INCLUDED_LIBINTL)" ; \
 	case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++)  ld="$(CXXLINK)" ;; \
