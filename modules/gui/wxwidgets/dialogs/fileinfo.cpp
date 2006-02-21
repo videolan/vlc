@@ -83,7 +83,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     panel_sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
 #endif
 
-    panel_sizer->Add( new wxButton( this, wxID_CLOSE, wxU(_("Close") )) ,
+    panel_sizer->Add( new wxButton( this, wxID_CLOSE ) ,
                       0, wxALL|wxALIGN_RIGHT, 5 );
 
     panel_sizer->Layout();
