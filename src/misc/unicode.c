@@ -51,15 +51,16 @@
 # define ASSUME_UTF8 1
 #endif
 
-#if !(defined (WIN32) || defined (UNDER_CE) || defined (ASSUME_UTF8))
-# define USE_ICONV 1
+#ifndef ASSUME_UTF8
+# if defined (HAVE_ICONV)
+/* libiconv is more powerful than Win32 API (it has translit) */
+#  define USE_ICONV 1
+# elif defined (WIN32) || defined (UNDER_CE)
+#  define USE_MB2MB 1
+# else
+#  error No UTF8 charset conversion implemented on this platform!
+# endif
 #endif
-
-#if defined (USE_ICONV) && !defined (HAVE_ICONV)
-# error No UTF8 charset conversion implemented on this platform!
-#endif
-
-
 
 #ifdef USE_ICONV
 static struct {
@@ -126,7 +127,7 @@ void LocaleDeinit( void )
 #endif
 }
 
-#if defined (WIN32) || defined (UNDER_CE)
+#ifdef USE_MB2MB
 static char *MB2MB( const char *string, UINT fromCP, UINT toCP )
 {
     char *out;
@@ -158,7 +159,7 @@ char *FromLocale( const char *locale )
     if( locale == NULL )
         return NULL;
 
-#if !(defined WIN32 || defined (UNDER_CE))
+#ifndef USE_MB2MB
 # ifdef USE_ICONV
     if( from_locale.hd != (vlc_iconv_t)(-1) )
     {
@@ -201,7 +202,7 @@ char *FromLocale( const char *locale )
     }
 # endif /* USE_ICONV */
     return (char *)locale;
-#else /* WIN32 */
+#else /* MB2MB */
     return MB2MB( locale, CP_ACP, CP_UTF8 );
 #endif
 }
@@ -228,7 +229,7 @@ char *ToLocale( const char *utf8 )
     if( utf8 == NULL )
         return NULL;
 
-#if !(defined (WIN32) || defined (UNDER_CE))
+#ifndef USE_MB2MB
 # ifdef USE_ICONV
     if( to_locale.hd != (vlc_iconv_t)(-1) )
     {
@@ -268,7 +269,7 @@ char *ToLocale( const char *utf8 )
     }
 # endif /* USE_ICONV */
     return (char *)utf8;
-#else /* WIN32 */
+#else /* MB2MB */
     return MB2MB( utf8, CP_UTF8, CP_ACP );
 #endif
 }
@@ -329,6 +330,10 @@ FILE *utf8_fopen( const char *filename, const char *mode )
     }
     wpath[MAX_PATH] = L'\0';
 
+    /*
+     * fopen() cannot open files with non-“ANSI” characters on Windows.
+     * We use _wfopen() instead. Same thing for mkdir() and stat().
+     */
     return _wfopen( wpath, wmode );
 #endif
 }
