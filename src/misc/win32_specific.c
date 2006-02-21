@@ -60,11 +60,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     else psz_path[0] = '\0';
 
 #else
-    if( ppsz_argv[0] )
-    {
-        GetFullPathName( ppsz_argv[0], MAX_PATH, psz_path, &psz_vlc );
-    }
-    else if( !GetModuleFileName( NULL, psz_path, MAX_PATH ) )
+    if( !GetModuleFileName( NULL, psz_path, MAX_PATH ) )
     {
         psz_path[0] = '\0';
     }
