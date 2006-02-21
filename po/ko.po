@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ko\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-20 21:55+0100\n"
+"POT-Creation-Date: 2006-02-21 09:47+0100\n"
 "PO-Revision-Date: 2005-09-07 06:05+0900\n"
 "Last-Translator: Han HoJoong <0demon0@paran.com>\n"
 "Language-Team: Korean Linux User Group\n"
@@ -877,7 +877,7 @@ msgstr "자막"
 
 #: src/input/input.c:1918 src/input/input.c:1922
 #: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:251
-#: modules/gui/macosx/output.m:392
+#: modules/gui/macosx/output.m:391
 msgid "Stream"
 msgstr "스트림"
 
@@ -5367,7 +5367,7 @@ msgstr "표준적인 파일 시스템의 파일을 읽는다"
 #: modules/gui/beos/MediaControlView.cpp:1232
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
-#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:370
+#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:366
 #: modules/gui/wxwidgets/dialogs/open.cpp:501
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
@@ -7136,7 +7136,6 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr "AAC 오디오 디코더 (libfaad2)"
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:63
-#: modules/video_output/my_image.c:63
 #, fuzzy
 msgid "Image file"
 msgstr "사이즈"
@@ -7654,11 +7653,6 @@ msgstr "자막·디코더·모듈"
 #, fuzzy
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG 1/2비디오·디코더·모듈"
-
-#: modules/codec/libvc1.c:54
-#, fuzzy
-msgid "VC-1 decoder module"
-msgstr "자막·디코더·모듈"
 
 #: modules/codec/lpcm.c:82
 #, fuzzy
@@ -9902,7 +9896,6 @@ msgid "Open files from all sub-folders as well?"
 msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/bookmarks.m:107
-#: modules/gui/macosx/interaction.m:121 modules/gui/macosx/interaction.m:123
 #: modules/gui/macosx/open.m:158 modules/gui/macosx/playlistinfo.m:58
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
 #: modules/gui/macosx/wizard.m:362
@@ -9978,15 +9971,14 @@ msgstr "윈도우"
 #: modules/gui/beos/InterfaceWindow.cpp:398 modules/gui/macosx/bookmarks.m:106
 #: modules/gui/macosx/bookmarks.m:233 modules/gui/macosx/bookmarks.m:241
 #: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/bookmarks.m:301
-#: modules/gui/macosx/extended.m:602 modules/gui/macosx/interaction.m:122
-#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:254
-#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:57
-#: modules/gui/macosx/update.m:84 modules/gui/macosx/wizard.m:632
-#: modules/gui/macosx/wizard.m:698 modules/gui/macosx/wizard.m:1090
-#: modules/gui/macosx/wizard.m:1172 modules/gui/macosx/wizard.m:1179
-#: modules/gui/macosx/wizard.m:1595 modules/gui/macosx/wizard.m:1603
-#: modules/gui/macosx/wizard.m:1782 modules/gui/macosx/wizard.m:1793
-#: modules/gui/macosx/wizard.m:1806
+#: modules/gui/macosx/extended.m:602 modules/gui/macosx/open.m:157
+#: modules/gui/macosx/open.m:254 modules/gui/macosx/output.m:138
+#: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/update.m:84
+#: modules/gui/macosx/wizard.m:632 modules/gui/macosx/wizard.m:698
+#: modules/gui/macosx/wizard.m:1090 modules/gui/macosx/wizard.m:1172
+#: modules/gui/macosx/wizard.m:1179 modules/gui/macosx/wizard.m:1595
+#: modules/gui/macosx/wizard.m:1603 modules/gui/macosx/wizard.m:1782
+#: modules/gui/macosx/wizard.m:1793 modules/gui/macosx/wizard.m:1806
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
 msgid "OK"
 msgstr "OK"
@@ -10075,7 +10067,7 @@ msgstr "이름"
 msgid "Apply"
 msgstr "적용"
 
-#: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:527
+#: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:767 modules/gui/macosx/prefs.m:121
 msgid "Save"
 msgstr "보존"
@@ -10948,17 +10940,17 @@ msgstr "스트림 출력"
 msgid "SAP announce"
 msgstr "SAP 아나운스"
 
-#: modules/gui/macosx/output.m:182 modules/gui/macosx/output.m:636
+#: modules/gui/macosx/output.m:182 modules/gui/macosx/output.m:635
 #, fuzzy
 msgid "RTSP announce"
 msgstr "SAP 아나운스"
 
-#: modules/gui/macosx/output.m:183 modules/gui/macosx/output.m:642
+#: modules/gui/macosx/output.m:183 modules/gui/macosx/output.m:641
 #, fuzzy
 msgid "HTTP announce"
 msgstr "SAP 아나운스"
 
-#: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:648
+#: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:647
 msgid "Export SDP as file"
 msgstr ""
 
@@ -10971,7 +10963,7 @@ msgstr "채널명"
 msgid "SDP URL"
 msgstr "SDP"
 
-#: modules/gui/macosx/output.m:526
+#: modules/gui/macosx/output.m:525
 msgid "Save File"
 msgstr "파일의 보존"
 
@@ -11306,7 +11298,7 @@ msgid "Right-Bottom"
 msgstr "하"
 
 #: modules/gui/macosx/update.m:82
-msgid "Check for Update"
+msgid "Check for update"
 msgstr ""
 
 #: modules/gui/macosx/update.m:83
@@ -16166,38 +16158,38 @@ msgstr "풀 스크린 출력"
 msgid "HD1000 video output"
 msgstr "HD1000 오디오 출력"
 
-#: modules/video_output/image.c:48 modules/video_output/my_image.c:48
+#: modules/video_output/image.c:48
 #, fuzzy
 msgid "Image format"
 msgstr "로그 포맷"
 
-#: modules/video_output/image.c:49 modules/video_output/my_image.c:49
+#: modules/video_output/image.c:49
 #, fuzzy
 msgid "Set the format of the output image."
 msgstr "스트림을 안내한다"
 
-#: modules/video_output/image.c:51 modules/video_output/my_image.c:51
+#: modules/video_output/image.c:51
 msgid "Recording ratio"
 msgstr ""
 
-#: modules/video_output/image.c:52 modules/video_output/my_image.c:52
+#: modules/video_output/image.c:52
 msgid ""
 "Set the ratio of images that are recorded. 3 means that one image out of "
 "three is recorded."
 msgstr ""
 
-#: modules/video_output/image.c:55 modules/video_output/my_image.c:55
+#: modules/video_output/image.c:55
 #, fuzzy
 msgid "Filename prefix"
 msgstr "파일명"
 
-#: modules/video_output/image.c:56 modules/video_output/my_image.c:56
+#: modules/video_output/image.c:56
 msgid ""
 "Set the prefix of the filename. Output filename will have the form "
 "prefixNUMBER.format"
 msgstr ""
 
-#: modules/video_output/image.c:64 modules/video_output/my_image.c:64
+#: modules/video_output/image.c:64
 #, fuzzy
 msgid "Image video output"
 msgstr "X11 비디오 출력"
@@ -16624,6 +16616,10 @@ msgstr "xods 출력으로 텍스트 출력을 위해서(때문에) 사용되는 
 #, fuzzy
 msgid "XOSD interface"
 msgstr "네트워크·인터페이스"
+
+#, fuzzy
+#~ msgid "VC-1 decoder module"
+#~ msgstr "자막·디코더·모듈"
 
 #, fuzzy
 #~ msgid "Yes"

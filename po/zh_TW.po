@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-20 21:55+0100\n"
+"POT-Creation-Date: 2006-02-21 09:47+0100\n"
 "PO-Revision-Date: 2005-02-12 12:14+0100\n"
 "Last-Translator: Frank Chao <frank0624@gmail.com>\n"
 "Language-Team: zh_TW\n"
@@ -818,7 +818,7 @@ msgstr "字幕"
 
 #: src/input/input.c:1918 src/input/input.c:1922
 #: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:251
-#: modules/gui/macosx/output.m:392
+#: modules/gui/macosx/output.m:391
 msgid "Stream"
 msgstr "串流"
 
@@ -4921,7 +4921,7 @@ msgstr "標準檔案系統檔案輸入"
 #: modules/gui/beos/MediaControlView.cpp:1232
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
-#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:370
+#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:366
 #: modules/gui/wxwidgets/dialogs/open.cpp:501
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
@@ -6528,7 +6528,6 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr "AAC音訊解碼器(使用libfaad2)"
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:63
-#: modules/video_output/my_image.c:63
 #, fuzzy
 msgid "Image file"
 msgstr "影像複製"
@@ -7011,11 +7010,6 @@ msgstr "Flac音訊封包器"
 #: modules/codec/libmpeg2.c:96
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG I/II視訊解碼器(使用libmpeg2)"
-
-#: modules/codec/libvc1.c:54
-#, fuzzy
-msgid "VC-1 decoder module"
-msgstr "Tarkin解碼器模組"
 
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
@@ -9072,7 +9066,6 @@ msgid "Open files from all sub-folders as well?"
 msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/bookmarks.m:107
-#: modules/gui/macosx/interaction.m:121 modules/gui/macosx/interaction.m:123
 #: modules/gui/macosx/open.m:158 modules/gui/macosx/playlistinfo.m:58
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
 #: modules/gui/macosx/wizard.m:362
@@ -9148,15 +9141,14 @@ msgstr "視窗"
 #: modules/gui/beos/InterfaceWindow.cpp:398 modules/gui/macosx/bookmarks.m:106
 #: modules/gui/macosx/bookmarks.m:233 modules/gui/macosx/bookmarks.m:241
 #: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/bookmarks.m:301
-#: modules/gui/macosx/extended.m:602 modules/gui/macosx/interaction.m:122
-#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:254
-#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:57
-#: modules/gui/macosx/update.m:84 modules/gui/macosx/wizard.m:632
-#: modules/gui/macosx/wizard.m:698 modules/gui/macosx/wizard.m:1090
-#: modules/gui/macosx/wizard.m:1172 modules/gui/macosx/wizard.m:1179
-#: modules/gui/macosx/wizard.m:1595 modules/gui/macosx/wizard.m:1603
-#: modules/gui/macosx/wizard.m:1782 modules/gui/macosx/wizard.m:1793
-#: modules/gui/macosx/wizard.m:1806
+#: modules/gui/macosx/extended.m:602 modules/gui/macosx/open.m:157
+#: modules/gui/macosx/open.m:254 modules/gui/macosx/output.m:138
+#: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/update.m:84
+#: modules/gui/macosx/wizard.m:632 modules/gui/macosx/wizard.m:698
+#: modules/gui/macosx/wizard.m:1090 modules/gui/macosx/wizard.m:1172
+#: modules/gui/macosx/wizard.m:1179 modules/gui/macosx/wizard.m:1595
+#: modules/gui/macosx/wizard.m:1603 modules/gui/macosx/wizard.m:1782
+#: modules/gui/macosx/wizard.m:1793 modules/gui/macosx/wizard.m:1806
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
 msgid "OK"
 msgstr "確定"
@@ -9242,7 +9234,7 @@ msgstr "名稱"
 msgid "Apply"
 msgstr "套用"
 
-#: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:527
+#: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:767 modules/gui/macosx/prefs.m:121
 msgid "Save"
 msgstr "儲存"
@@ -10081,15 +10073,15 @@ msgstr ""
 msgid "SAP announce"
 msgstr ""
 
-#: modules/gui/macosx/output.m:182 modules/gui/macosx/output.m:636
+#: modules/gui/macosx/output.m:182 modules/gui/macosx/output.m:635
 msgid "RTSP announce"
 msgstr ""
 
-#: modules/gui/macosx/output.m:183 modules/gui/macosx/output.m:642
+#: modules/gui/macosx/output.m:183 modules/gui/macosx/output.m:641
 msgid "HTTP announce"
 msgstr ""
 
-#: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:648
+#: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:647
 msgid "Export SDP as file"
 msgstr ""
 
@@ -10101,7 +10093,7 @@ msgstr "頻道名稱"
 msgid "SDP URL"
 msgstr ""
 
-#: modules/gui/macosx/output.m:526
+#: modules/gui/macosx/output.m:525
 msgid "Save File"
 msgstr "儲存檔案"
 
@@ -10426,7 +10418,7 @@ msgid "Right-Bottom"
 msgstr "底部"
 
 #: modules/gui/macosx/update.m:82
-msgid "Check for Update"
+msgid "Check for update"
 msgstr ""
 
 #: modules/gui/macosx/update.m:83
@@ -15030,35 +15022,35 @@ msgstr "3dfx Glide視訊輸出"
 msgid "HD1000 video output"
 msgstr "HD1000視訊輸出"
 
-#: modules/video_output/image.c:48 modules/video_output/my_image.c:48
+#: modules/video_output/image.c:48
 msgid "Image format"
 msgstr "影像格式"
 
-#: modules/video_output/image.c:49 modules/video_output/my_image.c:49
+#: modules/video_output/image.c:49
 msgid "Set the format of the output image."
 msgstr "設定輸出影像格式"
 
-#: modules/video_output/image.c:51 modules/video_output/my_image.c:51
+#: modules/video_output/image.c:51
 msgid "Recording ratio"
 msgstr "錄製比率"
 
-#: modules/video_output/image.c:52 modules/video_output/my_image.c:52
+#: modules/video_output/image.c:52
 msgid ""
 "Set the ratio of images that are recorded. 3 means that one image out of "
 "three is recorded."
 msgstr ""
 
-#: modules/video_output/image.c:55 modules/video_output/my_image.c:55
+#: modules/video_output/image.c:55
 msgid "Filename prefix"
 msgstr "檔案名稱修正"
 
-#: modules/video_output/image.c:56 modules/video_output/my_image.c:56
+#: modules/video_output/image.c:56
 msgid ""
 "Set the prefix of the filename. Output filename will have the form "
 "prefixNUMBER.format"
 msgstr ""
 
-#: modules/video_output/image.c:64 modules/video_output/my_image.c:64
+#: modules/video_output/image.c:64
 msgid "Image video output"
 msgstr "影像視訊輸出"
 
@@ -15440,6 +15432,10 @@ msgstr ""
 #: modules/visualization/xosd.c:82
 msgid "XOSD interface"
 msgstr "XOSD介面"
+
+#, fuzzy
+#~ msgid "VC-1 decoder module"
+#~ msgstr "Tarkin解碼器模組"
 
 #~ msgid "Save As..."
 #~ msgstr "另存新擋..."

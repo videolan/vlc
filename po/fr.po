@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-20 21:55+0100\n"
+"POT-Creation-Date: 2006-02-21 09:47+0100\n"
 "PO-Revision-Date: 2005-06-25 01:49+0200\n"
 "Last-Translator: Clément Stenac <zorglub@videolan.org>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -880,7 +880,7 @@ msgstr "Sous-titres"
 
 #: src/input/input.c:1918 src/input/input.c:1922
 #: modules/gui/macosx/output.m:143 modules/gui/macosx/output.m:251
-#: modules/gui/macosx/output.m:392
+#: modules/gui/macosx/output.m:391
 msgid "Stream"
 msgstr "Flux"
 
@@ -5471,7 +5471,7 @@ msgstr "Lecture d’un fichier"
 #: modules/gui/beos/MediaControlView.cpp:1232
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/open.m:371 modules/gui/macosx/output.m:142
-#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:370
+#: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:366
 #: modules/gui/wxwidgets/dialogs/open.cpp:501
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
@@ -7204,7 +7204,6 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr "Décodeur audio AAC (utilisant libfaad2)"
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:63
-#: modules/video_output/my_image.c:63
 msgid "Image file"
 msgstr "Fichier d’image"
 
@@ -7757,10 +7756,6 @@ msgstr "Empaqueteur audio Flac"
 #: modules/codec/libmpeg2.c:96
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "Décodeur vidéo MPEG I/II (utilisant libmpeg2)"
-
-#: modules/codec/libvc1.c:54
-msgid "VC-1 decoder module"
-msgstr "Décodeur VC1"
 
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
@@ -9890,7 +9885,6 @@ msgid "Open files from all sub-folders as well?"
 msgstr "Ouvrir aussi les fichiers des sous-répertoires ?"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/bookmarks.m:107
-#: modules/gui/macosx/interaction.m:121 modules/gui/macosx/interaction.m:123
 #: modules/gui/macosx/open.m:158 modules/gui/macosx/playlistinfo.m:58
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
 #: modules/gui/macosx/wizard.m:362
@@ -9966,15 +9960,14 @@ msgstr "Fenêtre"
 #: modules/gui/beos/InterfaceWindow.cpp:398 modules/gui/macosx/bookmarks.m:106
 #: modules/gui/macosx/bookmarks.m:233 modules/gui/macosx/bookmarks.m:241
 #: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/bookmarks.m:301
-#: modules/gui/macosx/extended.m:602 modules/gui/macosx/interaction.m:122
-#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:254
-#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:57
-#: modules/gui/macosx/update.m:84 modules/gui/macosx/wizard.m:632
-#: modules/gui/macosx/wizard.m:698 modules/gui/macosx/wizard.m:1090
-#: modules/gui/macosx/wizard.m:1172 modules/gui/macosx/wizard.m:1179
-#: modules/gui/macosx/wizard.m:1595 modules/gui/macosx/wizard.m:1603
-#: modules/gui/macosx/wizard.m:1782 modules/gui/macosx/wizard.m:1793
-#: modules/gui/macosx/wizard.m:1806
+#: modules/gui/macosx/extended.m:602 modules/gui/macosx/open.m:157
+#: modules/gui/macosx/open.m:254 modules/gui/macosx/output.m:138
+#: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/update.m:84
+#: modules/gui/macosx/wizard.m:632 modules/gui/macosx/wizard.m:698
+#: modules/gui/macosx/wizard.m:1090 modules/gui/macosx/wizard.m:1172
+#: modules/gui/macosx/wizard.m:1179 modules/gui/macosx/wizard.m:1595
+#: modules/gui/macosx/wizard.m:1603 modules/gui/macosx/wizard.m:1782
+#: modules/gui/macosx/wizard.m:1793 modules/gui/macosx/wizard.m:1806
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
 msgid "OK"
 msgstr "Ok"
@@ -10060,7 +10053,7 @@ msgstr "Nom"
 msgid "Apply"
 msgstr "Appliquer"
 
-#: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:527
+#: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:767 modules/gui/macosx/prefs.m:121
 msgid "Save"
 msgstr "Enregistrer"
@@ -10924,15 +10917,15 @@ msgstr "Annonce des flux"
 msgid "SAP announce"
 msgstr "Annonce SAP"
 
-#: modules/gui/macosx/output.m:182 modules/gui/macosx/output.m:636
+#: modules/gui/macosx/output.m:182 modules/gui/macosx/output.m:635
 msgid "RTSP announce"
 msgstr "Annonce RTSP"
 
-#: modules/gui/macosx/output.m:183 modules/gui/macosx/output.m:642
+#: modules/gui/macosx/output.m:183 modules/gui/macosx/output.m:641
 msgid "HTTP announce"
 msgstr "Annonce HTTP"
 
-#: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:648
+#: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:647
 msgid "Export SDP as file"
 msgstr "Exporter un fichier SDP"
 
@@ -10944,7 +10937,7 @@ msgstr "Nom du canal"
 msgid "SDP URL"
 msgstr "URL du SDP"
 
-#: modules/gui/macosx/output.m:526
+#: modules/gui/macosx/output.m:525
 msgid "Save File"
 msgstr "Enregistrer le fichier"
 
@@ -11265,7 +11258,7 @@ msgstr "Bas"
 
 #: modules/gui/macosx/update.m:82
 #, fuzzy
-msgid "Check for Update"
+msgid "Check for update"
 msgstr "Chercher des mises à jour..."
 
 #: modules/gui/macosx/update.m:83
@@ -16208,19 +16201,19 @@ msgstr "Sortie vidéo 3dfx Glide"
 msgid "HD1000 video output"
 msgstr "Sortie audio HD1000"
 
-#: modules/video_output/image.c:48 modules/video_output/my_image.c:48
+#: modules/video_output/image.c:48
 msgid "Image format"
 msgstr "Format de l’image"
 
-#: modules/video_output/image.c:49 modules/video_output/my_image.c:49
+#: modules/video_output/image.c:49
 msgid "Set the format of the output image."
 msgstr "Réglez le format de l’image en sortie."
 
-#: modules/video_output/image.c:51 modules/video_output/my_image.c:51
+#: modules/video_output/image.c:51
 msgid "Recording ratio"
 msgstr "Ratio d’enregistrement"
 
-#: modules/video_output/image.c:52 modules/video_output/my_image.c:52
+#: modules/video_output/image.c:52
 msgid ""
 "Set the ratio of images that are recorded. 3 means that one image out of "
 "three is recorded."
@@ -16228,11 +16221,11 @@ msgstr ""
 "Configurer le quota d’images enregistrées. 3 signifie qu’un tiers des images "
 "sont enregistrées."
 
-#: modules/video_output/image.c:55 modules/video_output/my_image.c:55
+#: modules/video_output/image.c:55
 msgid "Filename prefix"
 msgstr "Préfixe du nom de fichier"
 
-#: modules/video_output/image.c:56 modules/video_output/my_image.c:56
+#: modules/video_output/image.c:56
 msgid ""
 "Set the prefix of the filename. Output filename will have the form "
 "prefixNUMBER.format"
@@ -16240,7 +16233,7 @@ msgstr ""
 "Configure le préfixe du nom de fichier. Le fichier résultant aura un nom de "
 "la forme préfixeNOMBRE.format"
 
-#: modules/video_output/image.c:64 modules/video_output/my_image.c:64
+#: modules/video_output/image.c:64
 msgid "Image video output"
 msgstr "Sortie vidéo Image"
 
@@ -16644,6 +16637,9 @@ msgstr "Police utilisée pour afficher le texte dans la sortie xosd"
 #: modules/visualization/xosd.c:82
 msgid "XOSD interface"
 msgstr "Interface XOSD"
+
+#~ msgid "VC-1 decoder module"
+#~ msgstr "Décodeur VC1"
 
 #~ msgid "from "
 #~ msgstr "De "

@@ -948,7 +948,6 @@ modules/video_output/glide.c
 modules/video_output/hd1000v.cpp
 modules/video_output/image.c
 modules/video_output/mga.c
-modules/video_output/my_image.c
 modules/video_output/opengl.c
 modules/video_output/qte/qte.cpp
 modules/video_output/qte/qte.h
