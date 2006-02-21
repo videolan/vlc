@@ -155,8 +155,9 @@ static VLCWizard *_o_sharedInstance = nil;
         " MPEG1, ASF and OGG)"), @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", \
         @"NO", @"NO", @"NO", @"NO", @"NO", nil];
     o_theo = [NSArray arrayWithObjects: @"Theora", @"theo", \
-        _NS("Theora is a free general-purpose codec (useable with MPEG TS)"), \
-        @"MUX_TS", @"NO", @"NO", @"NO", @"NO", @"NO", @"NO", @"NO", @"NO", nil];
+        _NS("Theora is a free general-purpose codec (useable with MPEG TS " \
+        "and OGG)"), @"MUX_TS", @"MUX_OGG", @"NO", @"NO", @"NO", @"NO", @"NO", \
+        @"NO", @"NO", nil];
     o_dummyVid = [NSArray arrayWithObjects: @"Dummy", @"dummy", \
         _NS("Dummy codec (do not transcode, useable with all encapsulation " \
         "formats)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_MP4", \
