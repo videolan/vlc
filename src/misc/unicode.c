@@ -79,19 +79,25 @@ void LocaleInit( vlc_object_t *p_this )
     else
     {
         /* not UTF-8 */
-        char *psz_conv = psz_charset;
+        char psz_buf[strlen( psz_charset ) + sizeof( "//translist" )];
+        const char *psz_conv;
 
         /*
          * Still allow non-ASCII characters when the locale is not set.
          * Western Europeans are being favored for historical reasons.
          */
-        psz_conv = strcmp( psz_charset, "ASCII" )
-                ? psz_charset : "ISO-8859-1";
+        if( strcmp( psz_charset, "ASCII" ) )
+        {
+            sprintf( psz_buf, "%s//translit", psz_charset );
+            psz_conv = psz_buf;
+        }
+        else
+            psz_conv = "ISO-8859-1//translit";
 
         vlc_mutex_init( p_this, &from_locale.lock );
         vlc_mutex_init( p_this, &to_locale.lock );
-        from_locale.hd = vlc_iconv_open( "UTF-8", psz_charset );
-        to_locale.hd = vlc_iconv_open( psz_charset, "UTF-8" );
+        from_locale.hd = vlc_iconv_open( "UTF-8", psz_conv );
+        to_locale.hd = vlc_iconv_open( psz_conv, "UTF-8" );
     }
 
     free( psz_charset );
@@ -457,7 +463,7 @@ int utf8_lstat( const char *filename, void *buf)
 /*****************************************************************************
  * utf8_*printf: *printf with conversion from UTF-8 to local encoding
  *****************************************************************************/
-int utf8_vasprintf( char **str, const char *fmt, va_list ap )
+static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
 {
 	char *utf8;
 	int res = vasprintf( &utf8, fmt, ap );
@@ -469,7 +475,7 @@ int utf8_vasprintf( char **str, const char *fmt, va_list ap )
 	return res;
 }
 
-int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
+static int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
 	char *str;
 	int res = utf8_vasprintf( &str, fmt, ap );
