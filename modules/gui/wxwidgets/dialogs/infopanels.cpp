@@ -122,10 +122,11 @@ void MetaDataPanel::Update( input_item_t *p_item )
 #define UPDATE_META( meta, widget ) {                                       \
     char *psz_meta = vlc_input_item_GetInfo( p_item, _(VLC_META_INFO_CAT),  \
                                             _(meta) );                      \
-    if( psz_meta != NULL )                                                  \
+    if( psz_meta != NULL && *psz_meta)                                      \
     {                                                                       \
         widget->SetLabel( wxU( psz_meta ) );                                \
     }                                                                       \
+    else { widget->SetLabel( wxU( "-" ) ); }                                \
     }
 
     UPDATE_META( VLC_META_ARTIST, artist_text );

@@ -40,7 +40,7 @@ enum
 
 BEGIN_EVENT_TABLE(FileInfo, wxFrame)
     /* Button events */
-    EVT_BUTTON(wxID_OK, FileInfo::OnButtonClose)
+    EVT_BUTTON(wxID_CLOSE, FileInfo::OnButtonClose)
 
     /* Hide the window when the user closes the window */
     EVT_CLOSE(FileInfo::OnClose)
@@ -82,6 +82,9 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
 #else
     panel_sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
 #endif
+
+    panel_sizer->Add( new wxButton( this, wxID_CLOSE, wxU(_("Close") )) ,
+                      0, wxALL|wxALIGN_RIGHT, 5 );
 
     panel_sizer->Layout();
     SetSizerAndFit( panel_sizer );
