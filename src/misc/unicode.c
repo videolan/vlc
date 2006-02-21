@@ -79,7 +79,7 @@ void LocaleInit( vlc_object_t *p_this )
     else
     {
         /* not UTF-8 */
-        char psz_buf[strlen( psz_charset ) + sizeof( "//translist" )];
+        char psz_buf[strlen( psz_charset ) + sizeof( "//translit" )];
         const char *psz_conv;
 
         /*
