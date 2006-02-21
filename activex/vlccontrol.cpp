@@ -632,12 +632,12 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
             // marshall options into an array of C strings
             if( VT_VARIANT == vType )
             {
-                *cOptions = (char **)CoTaskMemAlloc(sizeof(char *)*(uBound-lBound));
+                *cOptions = (char **)CoTaskMemAlloc(sizeof(char *)*(uBound-lBound+1));
                 if( NULL == *cOptions )
                     return E_OUTOFMEMORY;
 
-                ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound));
-                for(pos=lBound; SUCCEEDED(hr) && (pos<=uBound); ++pos )
+                ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound+1));
+                for(pos=lBound; (pos<=uBound) && SUCCEEDED(hr); ++pos )
                 {
                     VARIANT option;
                     hr = SafeArrayGetElement(array, &pos, &option);
@@ -659,12 +659,12 @@ static HRESULT createTargetOptions(int codePage, VARIANT *options, char ***cOpti
             }
             else if( VT_BSTR == vType )
             {
-                *cOptions = (char **)CoTaskMemAlloc(sizeof(char *)*(uBound-lBound));
+                *cOptions = (char **)CoTaskMemAlloc(sizeof(char *)*(uBound-lBound+1));
                 if( NULL == *cOptions )
                     return E_OUTOFMEMORY;
 
-                ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound));
-                for(pos=lBound; (pos<uBound) && SUCCEEDED(hr); ++pos )
+                ZeroMemory(*cOptions, sizeof(char *)*(uBound-lBound+1));
+                for(pos=lBound; (pos<=uBound) && SUCCEEDED(hr); ++pos )
                 {
                     BSTR option;
                     hr = SafeArrayGetElement(array, &pos, &option);
