@@ -72,7 +72,7 @@ const struct codec vcodecs_array[] =
        {MUX_TS , MUX_MPEG , MUX_ASF , MUX_OGG , -1 , -1,-1,-1,-1 } },
     { "Theora" , "theo", N_("Theora is a free general-purpose codec (useable " \
         "with MPEG TS)"),
-       {MUX_TS, -1,-1,-1,-1,-1,-1,-1,-1} },
+       {MUX_TS, MUX_OGG,-1,-1,-1,-1,-1,-1,-1} },
     { "Dummy", "dummy", N_("Dummy codec (do not transcode, useable with all " \
         "encapsulation formats)") ,
       {MUX_PS,MUX_TS,MUX_MPEG,MUX_ASF,MUX_MP4,MUX_OGG,MUX_WAV,MUX_RAW,MUX_MOV}},
