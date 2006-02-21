@@ -27,8 +27,8 @@ DIST_misc = \
 	$(NULL)
 
 if BUILD_SHARED
-LIBRARIES_libvlc_pic = $(top_builddir)/src/libvlc$(LIBEXT)
-LIBRARIES_libvlc_nopic = $(top_builddir)/src/libvlc$(LIBEXT)
+LIBRARIES_libvlc_pic = -Wl,-rpath '$(libdir)' -L$(top_builddir)/src -lvlc
+LIBRARIES_libvlc_nopic = $(LIBRARIES_libvlc_pic)
 else
 LIBRARIES_libvlc_pic = $(top_builddir)/src/libvlc_pic.a
 LIBRARIES_libvlc_nopic = $(top_builddir)/src/libvlc.a
