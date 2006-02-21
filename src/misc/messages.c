@@ -45,6 +45,7 @@
 #endif
 
 #include "vlc_interface.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Local macros
@@ -333,9 +334,10 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
         fprintf( stderr, "main warning: can't store message (%s): ",
                  strerror(errno) );
         vlc_va_copy( args, _args );
+        /* We should use utf8_vfprintf - but it calls malloc()... */
         vfprintf( stderr, psz_format, args );
         va_end( args );
-        fprintf( stderr, "\n" );
+        fputs( "\n", stderr );
         return;
     }
 
@@ -596,7 +598,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     {
         if( p_item->psz_header )
         {
-            fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s %s%s: %s%s" GRAY
+            utf8_fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s %s%s: %s%s" GRAY
                               "\n",
                          p_item->i_object_id, p_item->psz_header,
                          p_item->psz_module, psz_object,
@@ -605,7 +607,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
         }
         else
         {
-             fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s: %s%s" GRAY "\n",
+             utf8_fprintf( stderr, "[" GREEN "%.8i" GRAY "] %s %s%s: %s%s" GRAY "\n",
                          p_item->i_object_id, p_item->psz_module, psz_object,
                          ppsz_type[i_type], ppsz_color[i_type],
                          p_item->psz_msg );
@@ -615,13 +617,13 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     {
         if( p_item->psz_header )
         {
-            fprintf( stderr, "[%.8i] %s %s %s%s: %s\n", p_item->i_object_id,
+            utf8_fprintf( stderr, "[%.8i] %s %s %s%s: %s\n", p_item->i_object_id,
                          p_item->psz_header, p_item->psz_module,
                          psz_object, ppsz_type[i_type], p_item->psz_msg );
         }
         else
         {
-            fprintf( stderr, "[%.8i] %s %s%s: %s\n", p_item->i_object_id,
+            utf8_fprintf( stderr, "[%.8i] %s %s%s: %s\n", p_item->i_object_id,
                          p_item->psz_module, psz_object, ppsz_type[i_type],
                          p_item->psz_msg );
         }

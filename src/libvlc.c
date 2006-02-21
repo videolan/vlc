@@ -2080,13 +2080,13 @@ static void Help( vlc_t *p_this, char const *psz_help_name )
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
-        fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
+        utf8_fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
         Usage( p_this, "help" );
         Usage( p_this, "main" );
     }
     else if( psz_help_name && !strcmp( psz_help_name, "longhelp" ) )
     {
-        fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
+        utf8_fprintf( stdout, VLC_USAGE, p_this->psz_object_name );
         Usage( p_this, NULL );
     }
     else if( psz_help_name )
@@ -2177,7 +2177,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
 
         /* Print name of module */
         if( strcmp( "main", p_parser->psz_object_name ) )
-        fprintf( stdout, "\n %s\n", p_parser->psz_longname );
+        utf8_fprintf( stdout, "\n %s\n", p_parser->psz_longname );
 
         b_help_module = !strcmp( "help", p_parser->psz_object_name );
 
@@ -2207,7 +2207,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             case CONFIG_HINT_CATEGORY:
             case CONFIG_HINT_USAGE:
                 if( !strcmp( "main", p_parser->psz_object_name ) )
-                fprintf( stdout, "\n %s\n", p_item->psz_text );
+                utf8_fprintf( stdout, "\n %s\n", p_item->psz_text );
                 break;
 
             case CONFIG_ITEM_STRING:
@@ -2301,13 +2301,13 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
 
             if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
             {
-                fprintf( stdout, psz_format, psz_short, p_item->psz_name,
+                utf8_fprintf( stdout, psz_format, psz_short, p_item->psz_name,
                          psz_prefix, p_item->psz_name, psz_bra, psz_type,
                          psz_ket, psz_spaces );
             }
             else
             {
-                fprintf( stdout, psz_format, psz_short, p_item->psz_name,
+                utf8_fprintf( stdout, psz_format, psz_short, p_item->psz_name,
                          "", "", psz_bra, psz_type, psz_ket, psz_spaces );
             }
 
@@ -2327,7 +2327,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                 /* If the remaining text fits in a line, print it. */
                 if( i_end <= (size_t)i_width )
                 {
-                    fprintf( stdout, "%s\n", psz_text );
+                    utf8_fprintf( stdout, "%s\n", psz_text );
                     break;
                 }
 
@@ -2355,14 +2355,14 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                 {
                     char c = psz_text[i_width];
                     psz_text[i_width] = '\0';
-                    fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
                     psz_text += i_width;
                     psz_text[0] = c;
                 }
                 else
                 {
                     psz_word[-1] = '\0';
-                    fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
                     psz_text = psz_word;
                 }
             }
@@ -2372,7 +2372,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                 sprintf( psz_buffer, "%s%s", p_item->psz_longtext, psz_suf );
                 b_description = VLC_FALSE;
                 psz_spaces = psz_spaces_longtext;
-                fprintf( stdout, "%s", psz_spaces );
+                utf8_fprintf( stdout, "%s", psz_spaces );
                 goto description;
             }
         }
@@ -2417,7 +2417,7 @@ static void ListModules( vlc_t *p_this )
         if( i < 0 ) i = 0;
         psz_spaces[i] = 0;
 
-        fprintf( stdout, "  %s%s %s\n", p_parser->psz_object_name,
+        utf8_fprintf( stdout, "  %s%s %s\n", p_parser->psz_object_name,
                          psz_spaces, p_parser->psz_longname );
 
         psz_spaces[i] = ' ';
@@ -2441,14 +2441,14 @@ static void Version( void )
     ShowConsole( VLC_TRUE );
 #endif
 
-    fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
-    fprintf( stdout, _("Compiled by %s@%s.%s\n"),
+    utf8_fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
+    utf8_fprintf( stdout, _("Compiled by %s@%s.%s\n"),
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
-    fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
+    utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
     if( strcmp( VLC_Changeset(), "exported" ) )
-        fprintf( stdout, _("Based upon svn changeset [%s]\n"),
+        utf8_fprintf( stdout, _("Based upon svn changeset [%s]\n"),
                  VLC_Changeset() );
-    fprintf( stdout, LICENSE_MSG );
+    utf8_fprintf( stdout, LICENSE_MSG );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     PauseConsole();
@@ -2477,7 +2477,7 @@ static void ShowConsole( vlc_bool_t b_dofile )
     {
         fclose( f_help );
         freopen( "vlc-help.txt", "wt", stdout );
-        fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
+        utf8_fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
     }
 
     else freopen( "CONOUT$", "w", stdout );
@@ -2498,7 +2498,7 @@ static void PauseConsole( void )
 
     if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
 
-    fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
+    utf8_fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
     getchar();
     fclose( stdout );
 
