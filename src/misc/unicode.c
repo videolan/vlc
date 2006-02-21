@@ -30,6 +30,7 @@
 #include <assert.h>
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <errno.h>
 #include <sys/types.h>
 #ifdef HAVE_DIRENT_H
@@ -266,6 +267,19 @@ char *ToLocale( const char *utf8 )
 #endif
 }
 
+char *ToLocaleDup( const char *utf8 )
+{
+#if defined (ASSUME_UTF8)
+    return strdup( utf8 );
+#else
+# ifdef USE_ICONV
+    if (to_locale.hd == (vlc_iconv_t)(-1))
+        return strdup( utf8 );
+# endif
+    return ToLocale( utf8 );
+#endif
+}
+
 void LocaleFree( const char *str )
 {
 #ifdef USE_ICONV
@@ -438,6 +452,44 @@ int utf8_stat( const char *filename, void *buf)
 int utf8_lstat( const char *filename, void *buf)
 {
     return utf8_statEx( filename, buf, VLC_FALSE );
+}
+
+/*****************************************************************************
+ * utf8_*printf: *printf with conversion from UTF-8 to local encoding
+ *****************************************************************************/
+int utf8_vasprintf( char **str, const char *fmt, va_list ap )
+{
+	char *utf8;
+	int res = vasprintf( &utf8, fmt, ap );
+	if( res == -1 )
+		return -1;
+
+	*str = ToLocaleDup( utf8 );
+	free( utf8 );
+	return res;
+}
+
+int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
+{
+	char *str;
+	int res = utf8_vasprintf( &str, fmt, ap );
+	if( res == -1 )
+		return -1;
+
+	fputs( str, stream );
+	free( str );
+	return res;
+}
+
+int utf8_fprintf( FILE *stream, const char *fmt, ... )
+{
+	va_list ap;
+	int res;
+
+	va_start( ap, fmt );
+	res = utf8_vfprintf( stream, fmt, ap );
+	va_end( ap );
+	return res;
 }
 
 /*****************************************************************************
