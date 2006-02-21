@@ -251,7 +251,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	eval $$cmd
 
 if HAVE_BEOS
-DATA_noinst_beos = vlc-bundle
+noinst_DATA = vlc-bundle
 vlc-bundle: vlc
 	rm -Rf $(top_builddir)/vlc-bundle ; mkdir -p $(top_builddir)/vlc-bundle
 	cp $(top_builddir)/vlc $(top_builddir)/vlc-bundle/
