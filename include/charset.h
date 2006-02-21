@@ -41,6 +41,10 @@ VLC_EXPORT( int, utf8_stat, ( const char *filename, void *buf ) );
 VLC_EXPORT( int, utf8_lstat, ( const char *filename, void *buf ) );
 VLC_EXPORT( int, utf8_mkdir, ( const char *filename ) );
 
+#ifndef __PLUGIN__
+int utf8_fprintf( FILE *, const char *, ... );
+#endif
+
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( char *, FromUTF32, ( const wchar_t * ) );
 VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) );
