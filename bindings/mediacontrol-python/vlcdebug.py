@@ -8,6 +8,10 @@ class VLCObject(object):
         object.__setattr__(self, '_o', vlc.Object(id))
 
     def find(self, typ):
+	"""Returns a VLCObject for the given child.
+
+	See vlc.Object.find_object.__doc__ for the different values of typ.
+	"""
         t=self._o.find_object(typ)
         if t is not None:
             return VLCObject(t.info()['object-id'])
@@ -15,13 +19,16 @@ class VLCObject(object):
             return None
 
     def __str__(self):
+	"""Returns a string representation of the object.
+	"""
         i=self._o.info()
         return "VLCObject %d (%s) : %s" % (i['object-id'],
                                            i['object-type'],
                                            i['object-name'])
 
     def tree(self, prefix=" "):
-        """Displays the children as a tree."""
+        """Displays all children as a tree of VLCObject
+	"""
         print prefix, self
         for i in self._o.children():
             t=VLCObject(i)
@@ -29,8 +36,10 @@ class VLCObject(object):
         return
 
     def __getattribute__(self, attr):
-        #print "Getting %s" % attr
+	"""Converts attribute access to access to variables.
+	"""
         if attr == '__members__':
+	    # Return the list of variables
             o=object.__getattribute__(self, '_o')
             l=dir(o)
             l.extend([ n.replace('-','_') for n in o.list() ])
@@ -48,19 +57,20 @@ class VLCObject(object):
                     raise e
 
     def __setattr__(self, name, value):
+	"""Handle attribute assignment.
+	"""
         n=name.replace('_', '-')
         if n in self._o.list():
             self._o.set(n, value)
         else:
             object.__setattr__(self, name, value)
 
-#mc=vlc.MediaControl()
-#mc.playlist_add_item('/tmp/k.mpg')
-#mc.start(0)
-
-def test():
+def test(f='/tmp/k.mpg'):
     global mc,o
     mc=vlc.MediaControl()
-    mc.playlist_add_item('/tmp/k.mpg')
+    mc.playlist_add_item(f)
     mc.start(0)
+    mc.pause(0)
     o=VLCObject(0)
+    v=o.find('vout')
+
