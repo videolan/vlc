@@ -2,6 +2,7 @@
 # Building the Python binding
 ###############################################################################
 
+
 if HAVE_WIN32
 	COMPILERARG = --compiler=mingw32
 else
@@ -11,10 +12,12 @@ endif
 if BUILD_PYTHON
 
 all:
-	python setup.py build $(COMPILERARG)
+	srcdir="$(srcdir)" top_builddir="$(top_builddir)" python "$(srcdir)/setup.py" build $(COMPILERARG) "--build-base=$(top_builddir)/bindings/mediacontrol-python" "--build-temp=$(top_builddir)/bindings/mediacontrol-python"
 
+# FIXME: python setup.py install does not have any option to install from a different build directory
+# so this will not work in a separate builddir
 install:
-	python setup.py install
+	python $(srcdir)/setup.py install
 
 clean:
 	$(RM) -rf build

@@ -1,18 +1,38 @@
 from distutils.core import setup, Extension
 import os
 
+# Get build variables (buildir, srcdir)
+try:
+    top_builddir=os.environ['top_builddir']
+except KeyError:
+    # Note: do not initialize here, so that we get
+    # a correct default value if the env. var is
+    # defined but empty
+    top_builddir=None
+if not top_builddir:
+    top_builddir = os.path.join( '..', '..' )
+    os.environ['top_builddir'] = top_builddir
+
+try:
+    srcdir=os.environ['srcdir']
+except KeyError:
+    # Note: same as above
+    srcdir=None
+if not srcdir:
+    srcdir = '.'
+
 if os.sys.platform in ('win32', 'darwin'):
     # Do not use PIC version on win32 and Mac OS X
-    vlclib='../../src/libvlc.a'
+    vlclib=os.path.join( top_builddir, 'src', 'libvlc.a' )
     picflag=''
 else:
-    vlclib='../../src/libvlc_pic.a'
+    vlclib=os.path.join( top_builddir, 'src', 'libvlc_pic.a' )
     picflag='pic'
 
 def get_vlcconfig():
     vlcconfig=None
     for n in ( 'vlc-config',
-               os.path.sep.join( ('..', '..', 'vlc-config' ))):
+               os.path.join( top_builddir, 'vlc-config' )):
         if os.path.exists(n):
             vlcconfig=n
             break
@@ -44,7 +64,6 @@ def get_ldflags():
     if vlcconfig is None:
         return []
     else:
-	os.environ['top_builddir'] = '../..'
 	ldflags = []
 	if os.sys.platform == 'darwin':
 	    ldflags = "-read_only_relocs warning".split()
@@ -57,17 +76,20 @@ def get_ldflags():
 
 # To compile in a local vlc tree
 vlclocal = Extension('vlc',
-                sources = ['vlcglue.c',
-                           '../../src/control/mediacontrol_init.c'],
-                include_dirs = ['../../include', '../../', '/usr/win32/include' ],
+                sources = [ os.path.join( srcdir, 'vlcglue.c'),
+                            os.path.join( srcdir, '../../src/control/mediacontrol_init.c')],
+                include_dirs = [ top_builddir,
+		                 os.path.join( srcdir, '../../include'),
+		                 os.path.join( srcdir, '../../', '/usr/win32/include') ],
+
                 extra_objects = [ vlclib ],
                 extra_compile_args = get_cflags(),
-		extra_link_args = [ '-L../..' ]  + get_ldflags(),
+		extra_link_args = [ '-L' + top_builddir ]  + get_ldflags(),
                 )
 
 setup (name = 'MediaControl',
        version = get_vlc_version(),
-       scripts = [ 'vlcdebug.py' ],
+       scripts = [ os.path.join( srcdir, 'vlcdebug.py') ],
        keywords = [ 'vlc', 'video' ],
        license = "GPL", 
        description = """VLC bindings for python.
