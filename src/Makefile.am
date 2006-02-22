@@ -188,6 +188,7 @@ if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT)
 if HAVE_WIN32
 OBJECTS_libvlc_so = $(libvlc_a_OBJECTS)
+LDFLAGS_libvlc_so = -Wl,--out-implib,$(top_builddir)/lib/libvlc-dll.a
 else
 OBJECTS_libvlc_so = $(libvlc_pic_a_OBJECTS)
 endif
@@ -200,8 +201,8 @@ libvlc$(LIBEXT): $(OBJECTS_libvlc_so) $(do_builtins)
 	  objc) ld="$(OBJCLINK)" ;; \
 	  c|*)  ld="$(LINK)" ;; \
 	esac ; \
-	echo $$ld $(OBJECTS_libvlc_so) $$ldfl ; \
-	$$ld $(OBJECTS_libvlc_so) $$ldfl
+	echo $$ld $(OBJECTS_libvlc_so) $(LDFLAGS_libvlc_so) $$ldfl; \
+	$$ld $(OBJECTS_libvlc_so) $(LDFLAGS_libvlc_so) $$ldfl
 # It sucks big time, but we have to do that to link vlc properly
 # on non-PIC OSes, otherwise ld will favor builtins-less libvlc.a over
 # libvlc$(LIBEXT)
