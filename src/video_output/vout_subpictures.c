@@ -527,13 +527,19 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
 
-        if( p_subpic->i_original_picture_width &&
-            p_subpic->i_original_picture_height )
+        if( p_subpic->i_original_picture_height > 0 &&
+            p_subpic->i_original_picture_width  > 0 )
         {
             i_scale_width = i_scale_width * p_fmt->i_width /
                              p_subpic->i_original_picture_width;
             i_scale_height = i_scale_height * p_fmt->i_height /
                              p_subpic->i_original_picture_height;
+        }
+        else if( p_subpic->i_original_picture_height > 0 )
+        {
+            i_scale_height = i_scale_height * p_fmt->i_height /
+                             p_subpic->i_original_picture_height;
+            i_scale_width = i_scale_height * i_scale_height / p_fmt->i_height; 
         }
 
         /* Set default subpicture aspect ratio */

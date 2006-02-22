@@ -376,6 +376,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
         p_spu->b_ephemer = (p_block->i_length == 0);
         p_spu->b_absolute = VLC_FALSE;
+        p_spu->i_original_picture_width = p_sys->i_original_width;
+        p_spu->i_original_picture_height = p_sys->i_original_height;
         if( psz_subtitle ) free( psz_subtitle );
     }
     return p_spu;
@@ -559,9 +561,9 @@ static void ParseSSAHeader( decoder_t *p_dec )
         
         if( psz_parser[0] == '!' || psz_parser[0] == ';' ) /* comment */;
         else if( sscanf( psz_parser, "PlayResX: %d", &temp ) == 1 )
-            p_sys->i_original_width = temp;
+            p_sys->i_original_width = ( temp > 0 ) ? temp : -1;
         else if( sscanf( psz_parser, "PlayResY: %d", &temp ) == 1 )
-            p_sys->i_original_height = temp;
+            p_sys->i_original_height = ( temp > 0 ) ? temp : -1;
         else if( sscanf( psz_parser, "Script Type: %8192s", buffer_text ) == 1 )
         {
             if( !strcasecmp( buffer_text, "V4.00+" ) ) p_sys->b_ass = VLC_TRUE;
