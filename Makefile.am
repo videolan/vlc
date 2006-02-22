@@ -230,12 +230,12 @@ vlc_LDADD = $(DATA_win32_rc) $(INCLUDED_LIBINTL)
 DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc)
 
 if BUILD_SHARED
+vlc_LDFLAGS += `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
 if HAVE_WIN32
-vlc_LDFLAGS += `$(VLC_CONFIG) --libs vlc` -L$(top_builddir)/src -lvlc-dll
+LIB_libvlc = src/libvlc.dll.a
 else
-vlc_LDFLAGS += `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -Lsrc -lvlc
-endif
 LIB_libvlc = src/libvlc$(LIBEXT)
+endif
 else
 vlc_LDFLAGS += `$(VLC_CONFIG) --libs vlc builtin`
 vlc_LDADD += $(LIB_libvlc)

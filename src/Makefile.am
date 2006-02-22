@@ -188,7 +188,7 @@ if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT)
 if HAVE_WIN32
 OBJECTS_libvlc_so = $(libvlc_a_OBJECTS)
-LDFLAGS_libvlc_so = -Wl,--out-implib,$(top_builddir)/lib/libvlc-dll.a
+LDFLAGS_libvlc_so = -Wl,--out-implib,$(top_builddir)/src/libvlc.dll.a
 else
 OBJECTS_libvlc_so = $(libvlc_pic_a_OBJECTS)
 endif

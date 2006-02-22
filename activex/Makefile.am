@@ -60,7 +60,7 @@ DIST_misc = \
     $(NULL)
 
 if BUILD_SHARED
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc-dll.a
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
 else
 LIBRARIES_libvlc = $(top_builddir)/src/libvlc.a
 endif
