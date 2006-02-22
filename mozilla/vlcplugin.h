@@ -100,6 +100,7 @@ private:
     "video/quicktime:mov,qt:QuickTime video;" \
     /* Ogg */ \
     "application/x-ogg:ogg:Ogg stream;" \
+    "application/ogg:ogg:Ogg stream;" \
     /* explicit plugin call */ \
     "application/x-vlc-plugin::VLC plugin;" \
     /* windows media */ \
