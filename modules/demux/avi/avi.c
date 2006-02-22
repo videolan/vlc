@@ -503,6 +503,8 @@ static int Open( vlc_object_t * p_this )
         }
         if( p_strn )
         {
+            /* The charset of p_strn is undefined */
+            EnsureUTF8( p_strn->p_str );
             fmt.psz_description = strdup( p_strn->p_str );
         }
         tk->p_es = es_out_Add( p_demux->out, &fmt );
