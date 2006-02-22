@@ -89,7 +89,7 @@ vlclocal = Extension('vlc',
 
 setup (name = 'MediaControl',
        version = get_vlc_version(),
-       scripts = [ os.path.join( srcdir, 'vlcdebug.py') ],
+       scripts = [ os.path.join( srcdir, 'vlcwrapper.py') ],
        keywords = [ 'vlc', 'video' ],
        license = "GPL", 
        description = """VLC bindings for python.
