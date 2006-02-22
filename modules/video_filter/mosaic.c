@@ -534,12 +534,13 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             /* Bluescreen stuff */
             if( p_sys->b_bs )
             {
-                int i;
-                uint8_t *p_a = p_converted->p[ A_PLANE ].p_pixels;
-                uint8_t *p_u = p_converted->p[ U_PLANE ].p_pixels;
-                uint8_t *p_v = p_converted->p[ V_PLANE ].p_pixels;
+                int i,j;
                 int i_lines = p_converted->p[ A_PLANE ].i_lines;
                 int i_pitch = p_converted->p[ A_PLANE ].i_pitch;
+                uint8_t *p_a = p_converted->p[ A_PLANE ].p_pixels;
+                uint8_t *p_at = malloc( i_lines * i_pitch * sizeof( uint8_t ) );
+                uint8_t *p_u = p_converted->p[ U_PLANE ].p_pixels;
+                uint8_t *p_v = p_converted->p[ V_PLANE ].p_pixels;
                 uint8_t umin, umax, vmin, vmax;
                 umin = p_sys->i_bsu - p_sys->i_bsut >= 0x00 ?
                        p_sys->i_bsu - p_sys->i_bsut : 0x00;
@@ -557,7 +558,54 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                         && p_v[i] < vmax
                         && p_v[i] > vmin )
                     {
-                        p_a[i] = 0x00;
+                        p_at[i] = 0x00;
+                    }
+                    else
+                    {
+                        p_at[i] = 0xff;
+                    }
+                }
+                /* Gaussian convolution to make it look cleaner */
+                memset( p_a, 0, 2 * i_pitch );
+                for( i = 2; i < i_lines - 2; i++ )
+                {
+                    p_a[i*i_pitch] = 0x00;
+                    p_a[i*i_pitch+1] = 0x00;
+                    for( j = 2; j < i_pitch - 2; j ++ )
+                    {
+                        p_a[i*i_pitch+j] = (uint8_t)((
+                          /* 2 rows up */
+                            ( p_at[(i-2)*i_pitch+j-2]<<1 )
+                          + ( p_at[(i-2)*i_pitch+j-1]<<2 )
+                          + ( p_at[(i-2)*i_pitch+j]<<2 )
+                          + ( p_at[(i-2)*i_pitch+j+1]<<2 )
+                          + ( p_at[(i-2)*i_pitch+j+2]<<1 )
+                          /* 1 row up */
+                          + ( p_at[(i-1)*i_pitch+j-1]<<3 )
+                          + ( p_at[(i-1)*i_pitch+j-2]<<2 )
+                          + ( p_at[(i-1)*i_pitch+j]*12 )
+                          + ( p_at[(i-1)*i_pitch+j+1]<<3 )
+                          + ( p_at[(i-1)*i_pitch+j+2]<<2 )
+                          /* */
+                          + ( p_at[i*i_pitch+j-2]<<2 )
+                          + ( p_at[i*i_pitch+j-1]*12 )
+                          + ( p_at[i*i_pitch+j]<<4 )
+                          + ( p_at[i*i_pitch+j+1]*12 )
+                          + ( p_at[i*i_pitch+j+2]<<2 )
+                          /* 1 row down */
+                          + ( p_at[(i+1)*i_pitch+j-2]<<2 )
+                          + ( p_at[(i+1)*i_pitch+j-1]<<3 )
+                          + ( p_at[(i+1)*i_pitch+j]*12 )
+                          + ( p_at[(i+1)*i_pitch+j+1]<<3 )
+                          + ( p_at[(i+1)*i_pitch+j+2]<<2 )
+                          /* 2 rows down */
+                          + ( p_at[(i+2)*i_pitch+j-2]<<1 )
+                          + ( p_at[(i+2)*i_pitch+j-1]<<2 )
+                          + ( p_at[(i+2)*i_pitch+j]<<2 )
+                          + ( p_at[(i+2)*i_pitch+j+1]<<2 )
+                          + ( p_at[(i+2)*i_pitch+j+2]<<1 )
+                          )/152);
+                          if( p_a[i*i_pitch+j] < 0xbf ) p_a[i*i_pitch+j] = 0x00;
                     }
                 }
             }

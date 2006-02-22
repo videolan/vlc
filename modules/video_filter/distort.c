@@ -520,8 +520,8 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
               + ( p_inpix[(y-2)*i_src_pitch+x+1]<<2 )
               + ( p_inpix[(y-2)*i_src_pitch+x+2]<<1 )
               /* 1 row up */
-              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
               + ( p_inpix[(y-1)*i_src_pitch+x-2]<<2 )
+              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
               + ( p_inpix[(y-1)*i_src_pitch+x]*12 )
               + ( p_inpix[(y-1)*i_src_pitch+x+1]<<3 )
               + ( p_inpix[(y-1)*i_src_pitch+x+2]<<2 )
@@ -687,8 +687,8 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
               + ( p_inpix[(y-2)*i_src_pitch+x+1]<<2 )
               + ( p_inpix[(y-2)*i_src_pitch+x+2]<<1 )
               /* 1 row up */
-              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
               + ( p_inpix[(y-1)*i_src_pitch+x-2]<<2 )
+              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
               + ( p_inpix[(y-1)*i_src_pitch+x]*12 )
               + ( p_inpix[(y-1)*i_src_pitch+x+1]<<3 )
               + ( p_inpix[(y-1)*i_src_pitch+x+2]<<2 )
