@@ -608,6 +608,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                           if( p_a[i*i_pitch+j] < 0xbf ) p_a[i*i_pitch+j] = 0x00;
                     }
                 }
+                free( p_at );
             }
         }
         else
