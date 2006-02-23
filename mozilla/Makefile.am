@@ -3,8 +3,7 @@
 ###############################################################################
 
 noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
-noinst_LTLIBRARIES = $(noinst_LTLIBRARIES_mozilla)
-	                                     
+
 MOSTLYCLEANFILES = $(npvlc_DATA) $(vlcintf_xpt_DATA)
 CLEANFILES = stamp-pic $(BUILT_SOURCES)
 EXTRA_DIST = $(DIST_sources) vlcintf.idl npvlc_rc.rc vlc.r
