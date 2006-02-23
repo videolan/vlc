@@ -222,8 +222,8 @@ vlc_WORKAROUNDLDFLAGS = $(LIB_libvlc)
 endif
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-vlc_LDFLAGS = $(LDFLAGS_libvlc) $(vlc_WORKAROUNDLDFLAGS)
-vlc_LDADD = $(DATA_win32_rc) $(INCLUDED_LIBINTL)
+vlc_LDFLAGS = $(LDFLAGS_libvlc) $(vlc_WORKAROUNDLDFLAGS) $(INCLUDED_LIBINTL)
+vlc_LDADD = $(DATA_win32_rc)
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
@@ -250,7 +250,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
 	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS) $(LIBS)" ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)" ; \
 	echo $$cmd ; \
 	eval $$cmd
 
