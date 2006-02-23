@@ -67,18 +67,18 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     exception=mediacontrol_exception_init( exception );
 
-    p_cache = vlc_object_create( self->p_playlist, VLC_OBJECT_GENERIC );
-    if( p_cache == NULL )
-    {
-        msg_Err( self->p_playlist, "out of memory" );
-        RAISE( mediacontrol_InternalException, "Out of memory" );
-        return NULL;
-    }
-
     p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
     {
         RAISE( mediacontrol_InternalException, "No video output" );
+        return NULL;
+    }
+    p_cache = vlc_object_create( self->p_playlist, VLC_OBJECT_GENERIC );
+    if( p_cache == NULL )
+    {
+        vlc_object_release( p_vout );
+        msg_Err( self->p_playlist, "out of memory" );
+        RAISE( mediacontrol_InternalException, "Out of memory" );
         return NULL;
     }
     snprintf( path, 255, "object:%d", p_cache->i_object_id );
@@ -87,8 +87,8 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     vlc_mutex_lock( &p_cache->object_lock );
     vout_Control( p_vout, VOUT_SNAPSHOT );
-
     vlc_cond_wait( &p_cache->object_wait, &p_cache->object_lock );
+    vlc_object_release( p_vout );
 
     p_snapshot = ( snapshot_t* ) p_cache->p_private;
     vlc_object_destroy( p_cache );
