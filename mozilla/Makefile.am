@@ -3,29 +3,22 @@
 ###############################################################################
 
 noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
+noinst_LTLIBRARIES = $(noinst_LTLIBRARIES_mozilla)
 	                                     
-MOSTLYCLEANFILES = $(LIBRARIES_mozilla) $(npvlc_DATA) $(DATA_npvlc_rsrc) $(vlcintf_xpt_DATA)
-CLEANFILES = stamp-pic VLC\ Plugin.plugin
-EXTRA_DIST = $(SOURCES_mozilla) $(DIST_rsrc) $(DIST_misc)
-BUILT_SOURCES = $(BUILT_SOURCES_mozilla)
+MOSTLYCLEANFILES = $(npvlc_DATA) $(vlcintf_xpt_DATA)
+CLEANFILES = stamp-pic $(BUILT_SOURCES)
+EXTRA_DIST = $(DIST_sources) vlcintf.idl npvlc_rc.rc vlc.r
 
-SOURCES_mozilla = \
+SOURCES_mozilla_common = \
 	vlcshell.cpp \
 	vlcplugin.cpp \
 	vlcplugin.h \
 	vlcpeer.cpp \
 	vlcpeer.h \
-	support/classinfo.h \
-	$(SOURCES_support) \
-	$(NULL)
+	support/classinfo.h
 
-DIST_rsrc = \
-	$(SOURCES_rsrc) \
-	$(NULL)
-
-DIST_misc = \
-	vlcintf.idl \
-	$(NULL)
+DIST_sources = $(SOURCES_mozilla_common) \
+	support/npwin.cpp support/npmac.cpp support/npunix.cpp
 
 if BUILD_SHARED
 LIBRARIES_libvlc_pic = -Wl,-rpath '$(libdir)' -L$(top_builddir)/src -lvlc
@@ -43,45 +36,42 @@ if BUILD_MOZILLA
 if HAVE_WIN32
 
 LIBRARIES_libvlc = $(LIBRARIES_libvlc_nopic)
-
-npvlc_DATA = npvlc$(LIBEXT)
+npvlc = npvlc$(LIBEXT)
 npvlcdir = $(libdir)
+noinst_DATA = npvlc_rc.$(OBJEXT)
 
 SOURCES_support = support/npwin.cpp
-SOURCES_rsrc = npvlc_rc.rc
 CPPFLAGS_mozilla_EXTRA = -DXP_WIN -DXP_WIN32
+LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc)
 
 DATA_npvlc_rc = $(noinst_npvlc_rc_DATA)
-noinst_npvlc_rc_DATA = npvlc_rc.$(OBJEXT)
-noinst_npvlc_rcdir = $(libdir)
 npvlc_rc.$(OBJEXT): npvlc_rc.rc
-	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
-LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin`
+	$(WINDRES) -DVERSION=$(VERSION) \
+		-DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` \
+		--include-dir $(srcdir) -i $< -o $@
 
 else
 if HAVE_DARWIN
 
 LIBRARIES_libvlc = $(LIBRARIES_libvlc_nopic)
-
-npvlc_DATA = npvlc$(LIBEXT)
+npvlc = npvlc$(LIBEXT)
 npvlcdir = $(libdir)
+noinst_DATA = npvlc.rsrc VLC\ Plugin.plugin
+MOSTLYCLEANFILES += npvlc.rsrc
+CLEANFILES += VLC\ Plugin.plugin
 
-BUNDLE_mozilla = VLC\ Plugin.plugin
 SOURCES_support = support/npmac.cpp
-SOURCES_rsrc = vlc.r
+CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
+	-F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) \
+	-I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings \
+	-O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 \
+	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g \
+	-include mozilla-config.h
+LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress \
+	$(LIBRARIES_libvlc) -dylib
 
-CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c -F/System/Library/Frameworks/CoreFoundation.framework $(moz_CFLAGS) -I/Developer/Headers/FlatCarbon -arch ppc -fno-common -fpascal-strings -O0 -Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 -DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 -g -include mozilla-config.h
-
-DATA_npvlc_rsrc = $(noinst_npvlc_rsrc_DATA)
-noinst_npvlc_rsrc_DATA = npvlc.rsrc
-noinst_npvlc_rsrcdir = $(libdir)
 npvlc.rsrc: $(srcdir)/vlc.r
 	/Developer/Tools/Rez -useDF /Developer/Headers/FlatCarbon/Types.r $< -o $@
-LDFLAGS_npvlc = -arch ppc -bundle -read_only_relocs suppress $(LIBRARIES_libvlc) -dylib `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
-
-DATA_bundle = $(noinst_bundle_DATA)
-noinst_bundle_DATA = VLC\ Plugin.plugin
-noinst_bundledir = $(libdir)
 
 VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 	rm -rf "$@"
@@ -97,35 +87,49 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 else
 
 LIBRARIES_libvlc = $(LIBRARIES_libvlc_pic)
-
-npvlc_DATA = libvlcplugin$(LIBEXT)
+npvlc = libvlcplugin$(LIBEXT)
 npvlcdir = $(libdir)/mozilla/plugins
-
 SOURCES_support = support/npunix.c
+noinst_DATA =
 
-LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
-
+LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc)
 endif
 endif
 
 noinst_LIBRARIES_mozilla = libnpvlc.a
 
-libnpvlc_a_SOURCES = $(SOURCES_mozilla)
+$(SOURCES_mozilla): vlcintf.h
+
+BUILT_SOURCES = vlcintf.h
+vlcintf_xpt_DATA = vlcintf.xpt
+
+if USE_LIBTOOL
+# FIXME: name is incorrect on Win32 & Darwin
+npvlc_LTLIBRARIES = libvlcplugin.la
+else
+npvlc_DATA = $(npvlc)
+EXTRA_LIBRARIES = libnpvlc.a
+endif
+endif
+
+libvlcplugin_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
+libvlcplugin_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla`
+libvlcplugin_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla`
+libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -shrext $(LIBEXT)
+libvlcplugin_la_LIBADD = ../src/libvlc.la
+
+libnpvlc_a_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 libnpvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla $(pic)` \
 	             $(CPPFLAGS_mozilla_EXTRA)
 libnpvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla $(pic)` \
 	               $(CPPFLAGS_mozilla_EXTRA)
+LDFLAGS_libnpvlc = $(LDFLAGS_npvlc) `$(VLC_CONFIG) --libs mozilla vlc builtin $(pic)`
 libnpvlc_a_DEPENDENCIES = $(DATA_npvlc_rc)
 
-BUILT_SOURCES_mozilla = vlcintf.h
-$(SOURCES_mozilla): vlcintf.h
-
-$(npvlc_DATA): $(libnpvlc_a_OBJECTS) \
-	              $(libnpvlc_a_DEPENDENCIES) stamp-pic
+$(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(libnpvlc_a_OBJECTS) $(DATA_npvlc_rc) \
-	 $(LDFLAGS_npvlc)
+	 $(LDFLAGS_libnpvlc)
 
-vlcintf_xpt_DATA = vlcintf.xpt
 vlcintf_xptdir = $(libdir)/mozilla/components
 vlcintf.xpt: vlcintf.idl
 	$(XPIDL) $(XPIDL_INCL) \
@@ -134,8 +138,6 @@ vlcintf.xpt: vlcintf.idl
 vlcintf.h: vlcintf.idl
 	$(XPIDL) $(XPIDL_INCL) \
 	  -m header -o vlcintf $(srcdir)/vlcintf.idl
-
-endif
 
 ###############################################################################
 # Stamp rules
