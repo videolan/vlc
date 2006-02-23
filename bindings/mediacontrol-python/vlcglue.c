@@ -1079,6 +1079,8 @@ MediaControl_snapshot( PyObject *self, PyObject *args )
                           Py_BuildValue( "i", p_retval->type ) );
     PyDict_SetItemString( py_obj, "data",
                           Py_BuildValue( "s#", p_retval->data, p_retval->size ) );
+    PyDict_SetItemString( py_obj, "date",
+                          Py_BuildValue( "L", p_retval->date ) );
 
     return py_obj;
 }
