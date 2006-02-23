@@ -1,5 +1,4 @@
 dnl Autoconf settings for vlc
-dnl $Id$
 
 AC_INIT(vlc,0.8.5-svn)
 VERSION_MAJOR="0"
@@ -74,9 +73,15 @@ AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
 
-dnl Sam, if you think I didn't see that... --Meuuh
-dnl AM_PROG_LIBTOOL
-AC_PROG_INSTALL
+AC_DISABLE_STATIC
+AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+
+AC_ARG_ENABLE(libtool,
+    [  --enable-libtool        use libtool (default disabled, EXPERIMENTAL)],
+    [],[enable_libtool="no"])
+AM_CONDITIONAL(USE_LIBTOOL, [test "${enable_libtool}" != "no"])
 
 dnl Check for compiler properties
 AC_C_CONST
@@ -290,7 +295,11 @@ AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
   INCLUDES="${INCLUDES} -I\$(top_builddir)/intl"
-  INCLUDED_LIBINTL="${LIBINTL}"
+  AS_IF([test "${enable_libtool}" != "no"], [
+    INCLUDED_LIBINTL="${LTLIBINTL}"
+  ],[
+    INCLUDED_LIBINTL="${LIBINTL}"
+  ])
 else
   VLC_ADD_LDFLAGS([vlc],[${LIBINTL}])
   INCLUDED_LIBINTL=
@@ -306,7 +315,11 @@ AS_IF([test "$am_cv_func_iconv" != "yes"],
 	[AC_MSG_ERROR([libiconv is needed for VLC to work properly])])
 fi
 VLC_ADD_CFLAGS([vlc],[${INCICONV}])
-VLC_ADD_LDFLAGS([vlc],[${LIBICONV}])
+AS_IF([test "${enable_libtool}" != "no"], [
+  VLC_ADD_LDFLAGS([vlc],[${LIBICONV}])
+],[
+  VLC_ADD_LDFLAGS([vlc],[${LTLIBICONV}])
+])
 
 dnl Check for the need to include the mingwex lib for mingw32
 if test "${SYS}" = "mingw32"
@@ -365,6 +378,7 @@ VLC_LIBRARY_SUFFIX
 VLC_SYMBOL_PREFIX
 AC_SUBST(SYMPREF)
 
+AS_IF([test "${enable_libtool}" = "no"], [
 case "${SYS}" in
   mingw32|cygwin)
     VLC_ADD_CFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
@@ -380,6 +394,7 @@ case "${SYS}" in
     VLC_ADD_LDFLAGS([plugin mozilla],[-fpic -fPIC])
     ;;
 esac
+])
 
 dnl The -DSYS_FOO flag
 CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"; CPPFLAGS="${CPPFLAGS_save}"
@@ -945,10 +960,10 @@ AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
     [ac_cv_c_dynamic_no_pic],
     [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
      AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
-if test "${ac_cv_c_dynamic_no_pic}" != "no"; then
+AS_IF([test "${enable_libtool}" = "no" && test "${ac_cv_c_dynamic_no_pic}" != "no"], [
     VLC_ADD_CFLAGS([builtin],[-mdynamic-no-pic])
     VLC_ADD_CFLAGS([libvlc],[-mdynamic-no-pic])
-fi
+])
 
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
@@ -1374,7 +1389,9 @@ dnl
 build_pic=no
 AC_ARG_ENABLE(shared-libvlc,
   [  --enable-shared-libvlc  shared libvlc (default disabled EXPERIMENTAL)])
-
+AS_IF([test "${enable_libtool}" != "no" && test "${enable_shared_libvlc}"], [
+  AC_MSG_ERROR([--enable-shared-libvlc and --enable-libtool are mutually exclusive])
+])
 
 dnl
 dnl Stream output

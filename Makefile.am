@@ -221,27 +221,32 @@ if HAVE_WINCE
 vlc_WORKAROUNDLDFLAGS = $(LIB_libvlc)
 endif
 
-vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-vlc_LDFLAGS = $(LDFLAGS_libvlc) $(vlc_WORKAROUNDLDFLAGS) $(INCLUDED_LIBINTL)
-vlc_LDADD = $(DATA_win32_rc)
-
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
 DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc)
 
+vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+if USE_LIBTOOL
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc`
+LIB_libvlc = src/libvlc.la
+LIBVLC = $(LIB_libvlc)
+else
 if BUILD_SHARED
-vlc_LDFLAGS += `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
+vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
 if HAVE_WIN32
 LIB_libvlc = src/libvlc.dll.a
 else
 LIB_libvlc = src/libvlc$(LIBEXT)
 endif
+LIBVLC =
 else
-vlc_LDFLAGS += `$(VLC_CONFIG) --libs vlc builtin`
-vlc_LDADD += $(LIB_libvlc)
+vlc_LDFLAGS = $(vlc_WORKAROUNDLFDLAGS) `$(VLC_CONFIG) --libs vlc builtin`
 LIB_libvlc = src/libvlc.a
+LIBVLC = $(LIB_libvlc)
 DEPENDENCIES_vlc += stamp-builtin
 endif
+endif
+vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(INCLUDED_LIBINTL)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
@@ -280,7 +285,7 @@ vlc-bundle: vlc
 	find $(top_builddir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
 
-# Install the symlinks and shared libvlc
+# Install the symlinks
 install-exec-local:
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
 	  rm -f "$(DESTDIR)$(bindir)/$$i" && \

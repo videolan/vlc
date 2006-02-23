@@ -3,7 +3,7 @@
 ##  bootstrap file for the VLC media player
 ##  $Id$
 ##
-## Copyright (C) 2005 the VideoLAN team
+## Copyright (C) 2005-2006 the VideoLAN team
 ##
 ##  Initial author: Sam Hocevar <sam@zoy.org>
 
@@ -80,7 +80,21 @@ fi
 
 if test "${amvers}" = "none"; then
   set +x
-  echo "you need automake version 1.5 or later"
+  echo "$0: you need automake version 1.5 or later"
+  exit 1
+fi
+
+# Check for libtool
+libtoolize="no"
+if glibtoolize --version >/dev/null 2>&1; then
+  libtoolize="glibtoolize"
+elif libtoolize --version >/dev/null 2>&1; then
+  libtoolize="libtoolize"
+fi
+
+if test "$libtoolize" = "no"; then
+  set +x
+  echo "$0: you need libtool"
   exit 1
 fi
 
@@ -180,10 +194,11 @@ do
   subdirs="`sed -ne 's,'modules/${dir}'/\([^/]*\)/Makefile,\1,p' configure.ac | xargs`"
   mods="`sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < "${modf}" | xargs`"
   extra_libs=""
+  extra_ltlibs=""
   for mod in $mods
   do
-    extra_libs="${extra_libs} lib${mod}_plugin.a"
-    extra_libs="${extra_libs} lib${mod}.a lib${mod}_pic.a"
+    extra_libs="${extra_libs} lib${mod}_plugin.a lib${mod}.a lib${mod}_pic.a"
+    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la lib${mod}.la"
   done
   rm -f "${makf}" && cat > "${makf}" << EOF
 
@@ -194,9 +209,7 @@ basedir = ${basedir}
 mods = ${mods}
 
 NULL =
-libvlc_LIBRARIES =
-noinst_LIBRARIES =
-noinst_HEADERS =
+libvlc_LTLIBRARIES =
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 SUBDIRS = ${subdirs}
@@ -205,7 +218,11 @@ SUFFIXES = _plugin\$(LIBEXT) _plugin.a
 libvlcdir = \$(libdir)/vlc/\$(basedir)
 
 EXTRA_LIBRARIES = ${extra_libs}
+EXTRA_LTLIBRARIES = ${extra_ltlibs}
+
 include Modules.am
+
+LTLIBVLC = \$(top_builddir)/src/libvlc.la
 
 if BUILD_SHARED
 LIBVLC = \$(top_builddir)/src/libvlc\$(LIBEXT)
@@ -224,12 +241,20 @@ all: all-modules
 
 # Find out which modules were enabled and tell make to build them
 all-modules:
+if USE_LIBTOOL
+	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
+	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin.la;; esac; done; fi; \\
+	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.la;; esac; done; fi; \\
+	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
+	test -z "\$\$fail"
+else
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
 	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; fi; \\
 	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.a;; esac; done; fi; \\
 	if test "\$(pic)" = "pic"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_pic.a;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
+endif
 
 # Build a plugin with the adequate linker and linker's flags
 _plugin.a_plugin\$(LIBEXT):
@@ -254,6 +279,13 @@ mostlyclean-local:
 ### automake creates libvlcdir after running install-*-local
 ### so we have to create it ourselves first
 install-exec-local: all-modules
+if USE_LIBTOOL
+	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
+	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install ; \
+	fi
+else
 	mkdir -p -- "\$(DESTDIR)\$(libvlcdir)"
 	@z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	for mod in \$(mods); do \
@@ -284,8 +316,16 @@ if BUILD_MOZILLA
 	  esac; \
 	done
 endif
+endif
 
 uninstall-local:
+if USE_LIBTOOL
+	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
+	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall ; \
+	fi
+else
 	@z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	for mod in \$(mods); do \
 	  case "\$\$z " \
@@ -314,6 +354,7 @@ if BUILD_MOZILLA
 	      ;; \
 	  esac; \
 	done
+endif
 endif
 
 EOF
@@ -349,15 +390,23 @@ EOF
     fi
     cat >> "${makf}" << EOF
 lib${mod}_plugin_a_SOURCES = \$(SOURCES_${mod})
+lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_plugin_a_SOURCES = \$(nodist_SOURCES_${mod})
+nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
 lib${mod}_plugin_a_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
 lib${mod}_plugin_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
 lib${mod}_plugin_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
+lib${mod}_plugin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
+lib${mod}_plugin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
+lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
+lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
+	-rpath '\$(libvlcdir)' -module -shrext \$(LIBEXT)
+lib${mod}_plugin_la_LIBADD = \$(LTLIBVLC)
 
 lib${mod}_pic_a_SOURCES = \$(SOURCES_${mod})
 EOF
@@ -370,16 +419,22 @@ lib${mod}_pic_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin pic ${mod}\`
 lib${mod}_pic_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin pic ${mod}\`
 lib${mod}_pic_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin pic ${mod}\`
 
-lib${mod}_a_SOURCES = ${PRIVATE}\$(SOURCES_${mod})
+lib${mod}_a_SOURCES = \$(SOURCES_${mod})
+lib${mod}_la_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_a_SOURCES = ${PRIVATE}\$(nodist_SOURCES_${mod})
+nodist_lib${mod}_la_SOURCES = ${PRIVATE}\$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
 lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
+lib${mod}_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
+lib${mod}_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
+lib${mod}_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
+lib${mod}_la_LDFLAGS = \`\$(VLC_CONFIG) --libs ${mod}\` -static
 
 EOF
   done
@@ -434,6 +489,13 @@ if [ "$GETTEXT" != "yes" ]; then
   test -d intl || mkdir intl
   printf "" > intl/Makefile.am
   printf "" > ABOUT-NLS
+fi
+
+# Libtoolize directory
+${libtoolize} --copy --force
+if test -f "ltmain.sh"; then
+  echo "$0: working around a minor libtool issue"
+  mv ltmain.sh autotools/
 fi
 
 # Do the rest

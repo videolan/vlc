@@ -10,7 +10,7 @@ EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
 DISTCLEANFILES = stamp-api
 CLEANFILES = misc/modules_builtin.h misc/version.c
-MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
+MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
 
@@ -119,10 +119,19 @@ misc/version.c: FORCE
 # shared object, which will make builtins fairly redumdant. Until then, we
 # need this workaround.
 
+stamp-builtins:
+if USE_LIBTOOL
+	@for c in `$(VLC_CONFIG) --libs builtin`; do \
+		case $$c in \
+        		../modules/*.a) echo $$c ;; \
+		esac ; \
+	done | \
+	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2/g' | \
+	while read cmd; do echo $$cmd$$ext; eval "($$cmd$$ext)" || exit $$? ; done
+	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2.la/g' | \
+	while read cmd; do echo $$cmd; eval "($$cmd)" || exit $$? ; done
+endif
 if BUILD_SHARED
-do_builtins = builtins
-
-builtins:
 	@if test "$(pic)" = "pic"; then ext="_pic.a"; else ext=".a"; fi ; \
 	for c in `$(VLC_CONFIG) --libs builtin`; do \
 		case $$c in \
@@ -131,9 +140,8 @@ builtins:
 	done | \
 	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2/g' | \
 	while read cmd; do echo $$cmd$$ext; eval "($$cmd$$ext)" || exit $$? ; done
-
-.PHONY: builtins
 endif
+	touch $@
 
 ###############################################################################
 # Building libvlc
@@ -164,6 +172,15 @@ libvlc_pic_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc pic`
 libvlc_pic_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc pic`
 libvlc_pic_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc pic`
 
+libvlc_la_SOURCES = $(SOURCES_libvlc)
+libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
+libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\.a /.la /g'` \
+		-avoid-version -no-undefined
+libvlc_la_DEPENDENCIES = stamp-builtins
+
+
 if HAVE_BEOS
 OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
 endif
@@ -184,6 +201,9 @@ OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
 endif
 
 # Build libvlc as a shared library
+if USE_LIBTOOL
+lib_LTLIBRARIES = libvlc.la
+endif
 if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT)
 if HAVE_WIN32
@@ -194,7 +214,7 @@ OBJECTS_libvlc_so = $(libvlc_pic_a_OBJECTS)
 endif
 endif
 
-libvlc$(LIBEXT): $(OBJECTS_libvlc_so) $(do_builtins)
+libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin $(pic)` $(INCLUDED_LIBINTL)" ; \
 	case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++)  ld="$(CXXLINK)" ;; \
@@ -339,13 +359,15 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_getopt) \
 	$(NULL)
 
-# Install the symlinks and shared libvlc
+if !USE_LIBTOOL
+# Install shared libvlc
 install-exec-local:
 	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"
 
 # the opposite of install-{data,exec}-local
 uninstall-local:
 	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
+endif
 
 ###############################################################################
 # Stamp rules
