@@ -5,6 +5,7 @@
 noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
 	                                     
 MOSTLYCLEANFILES = $(LIBRARIES_mozilla) $(npvlc_DATA) $(DATA_npvlc_rsrc) $(vlcintf_xpt_DATA)
+CLEANFILES = stamp-pic VLC\ Plugin.plugin
 EXTRA_DIST = $(SOURCES_mozilla) $(DIST_rsrc) $(DIST_misc)
 BUILT_SOURCES = $(BUILT_SOURCES_mozilla)
 
@@ -139,15 +140,7 @@ endif
 ###############################################################################
 # Stamp rules
 ###############################################################################
-clean-local: clean-stamp clean-bundle
-
-clean-bundle:
-	rm -rf ./VLC\ Plugin.plugin
-
-clean-stamp:
-	rm -f stamp-pic
-
-stamp-pic: FORCE
+stamp-pic:
 	@for dep in "" `$(VLC_CONFIG) --target builtin $(pic)`; do \
 	  if test "$${dep}" -nt "$(LIBRARIES_mozilla)"; then \
 	    rm -f $@; \
@@ -159,4 +152,4 @@ stamp-pic: FORCE
 ###############################################################################
 # Force rule
 ###############################################################################
-FORCE:
+.PHONY: stamp-pic
