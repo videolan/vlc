@@ -322,7 +322,7 @@ InputStatsInfoPanel::InputStatsInfoPanel( intf_thread_t *_p_intf,
     { sout_sizer->Add ( new wxStaticText( this, -1, wxU(_( txt ) ) ),    \
                          0, wxEXPAND|wxLEFT|wxALIGN_LEFT , 5  );         \
       widget = new wxStaticText( this, -1, wxU( dflt ) );                \
-      sout_sizer->Add( widget, 0, wxEXPAND|wxRIGHT|wxALIGN_RIGHT, 5 );   \
+      sout_sizer->Add( widget, 0, wxEXPAND|wxRIGHT|wxALIGN_LEFT, 5 );   \
     }
     SOUT_ADD( "Sent packets", sout_sent_packets_text, "0" );
     SOUT_ADD( "Sent bytes", sout_sent_bytes_text, "0          " );
@@ -376,10 +376,10 @@ void InputStatsInfoPanel::Update( input_item_t *p_item )
     formatted.Printf(  wxString( wxT(format) ), ## calc ); \
     widget->SetLabel( formatted );                      \
 }
-    UPDATE( read_bytes_text, "%8.0f kB",(float)(p_item->p_stats->i_read_bytes)/1000 );
-    UPDATE( input_bitrate_text, "%6.0f kB/s", (float)(p_item->p_stats->f_input_bitrate)*1000 );
-    UPDATE( demux_bytes_text, "%8.0f kB", (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
-    UPDATE( demux_bitrate_text, "%6.0f kB/s",  (float)(p_item->p_stats->f_demux_bitrate)*1000 );
+    UPDATE( read_bytes_text, "%8.0f kb",(float)(p_item->p_stats->i_read_bytes*8)/1000 );
+    UPDATE( input_bitrate_text, "%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000 );
+    UPDATE( demux_bytes_text, "%8.0f kb", (float)(p_item->p_stats->i_demux_read_bytes*8)/1000 );
+    UPDATE( demux_bitrate_text, "%6.0f kb/s",  (float)(p_item->p_stats->f_demux_bitrate)*8000 );
 
     /* Video */
     UPDATE( video_decoded_text, "%5i", p_item->p_stats->i_decoded_video );
@@ -388,10 +388,10 @@ void InputStatsInfoPanel::Update( input_item_t *p_item )
 
     /* Sout */
     UPDATE( sout_sent_packets_text, "%5i", p_item->p_stats->i_sent_packets );
-    UPDATE( sout_sent_bytes_text, "%8.0f kB",
-            (float)(p_item->p_stats->i_sent_bytes)/1000 );
-    UPDATE( sout_send_bitrate_text, "%6.0f kB/S",
-            (float)(p_item->p_stats->f_send_bitrate)*1000 );
+    UPDATE( sout_sent_bytes_text, "%8.0f kb",
+            (float)(p_item->p_stats->i_sent_bytes*8)/1000 );
+    UPDATE( sout_send_bitrate_text, "%6.0f kb/s",
+            (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
 
     /* Audio*/
     UPDATE( audio_decoded_text, "%5i", p_item->p_stats->i_decoded_audio );
