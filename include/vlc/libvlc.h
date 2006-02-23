@@ -308,6 +308,50 @@ int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t * );
  * @{
  */
 
+/** defgroup libvlc_audio Audio
+ * \ingroup libvlc
+ * LibVLC Audio handling
+ * @{
+ */
+
+/**
+ * Get current mute status
+ * \param p_instance libvlc instance
+ * \param p_exception an initialized exception
+ * \return the mute status (boolean)
+ */
+vlc_bool_t libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Set mute status
+ * \param p_instance libvlc instance
+ * \param status If status is VLC_TRUE then mute, otherwise unmute
+ * \param p_exception an initialized exception
+ * \return void
+ */
+void libvlc_audio_set_mute( libvlc_instance_t *, vlc_bool_t , libvlc_exception_t * );
+
+
+/**
+ * Get current audio level
+ * \param p_instance libvlc instance
+ * \param p_exception an initialized exception
+ * \return the audio level (int)
+ */
+int libvlc_audio_volume_get( libvlc_instance_t *, libvlc_exception_t * );
+
+
+/**
+ * Set current audio level
+ * \param p_instance libvlc instance
+ * \param i_volume the volume (int)
+ * \param p_exception an initialized exception
+ * \return void
+ */
+void libvlc_audio_volume_set( libvlc_instance_t *, int , libvlc_exception_t *);
+    
+/** @} */
+
 
 /**
  * Add a broadcast, with one input
