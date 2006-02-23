@@ -126,8 +126,6 @@ if USE_LIBTOOL
         		../modules/*.a) echo $$c ;; \
 		esac ; \
 	done | \
-	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2/g' | \
-	while read cmd; do echo $$cmd$$ext; eval "($$cmd$$ext)" || exit $$? ; done
 	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2.la/g' | \
 	while read cmd; do echo $$cmd; eval "($$cmd)" || exit $$? ; done
 endif
@@ -146,21 +144,6 @@ endif
 ###############################################################################
 # Building libvlc
 ###############################################################################
-
-LIBRARIES_nopic = libvlc.a
-LIBRARIES_pic = libvlc_pic.a
-if HAVE_WIN32
-lib_LIBRARIES = $(LIBRARIES_nopic)
-else
-if BUILD_SHARED
-lib_LIBRARIES = $(LIBRARIES_pic)
-else
-lib_LIBRARIES = $(LIBRARIES_nopic)
-if BUILD_PIC
-lib_LIBRARIES += $(LIBRARIES_pic)
-endif
-endif
-endif
 
 libvlc_a_SOURCES = $(SOURCES_libvlc)
 libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
@@ -203,7 +186,23 @@ endif
 # Build libvlc as a shared library
 if USE_LIBTOOL
 lib_LTLIBRARIES = libvlc.la
+else
+LIBRARIES_nopic = libvlc.a
+LIBRARIES_pic = libvlc_pic.a
+if HAVE_WIN32
+lib_LIBRARIES = $(LIBRARIES_nopic)
+else
+if BUILD_SHARED
+lib_LIBRARIES = $(LIBRARIES_pic)
+else
+lib_LIBRARIES = $(LIBRARIES_nopic)
+if BUILD_PIC
+lib_LIBRARIES += $(LIBRARIES_pic)
 endif
+endif
+endif
+endif
+
 if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT)
 if HAVE_WIN32
