@@ -82,7 +82,8 @@ axvlc$(LIBEXT): $(libaxvlc_a_OBJECTS) \
 	              $(libaxvlc_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(libaxvlc_a_OBJECTS) $(DATA_axvlc_rc) \
 	-Wl,--enable-stdcall-fixup $(srcdir)/axvlc.def \
-	  $(LIBRARIES_libvlc) -shared $(LDFLAGS_activex) $(LIBRARIES_libvlc) 
+	  $(LIBRARIES_libvlc) -shared $(LDFLAGS_activex) $(LIBRARIES_libvlc) \
+	  $(INCLUDED_LIBINTL)
 
 
 DATA_axvlc_tlb = $(axvlc_tlb_DATA)
