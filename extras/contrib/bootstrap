@@ -68,13 +68,14 @@ case $HOST in
 # Makefile cross compiling is only supported with gcc-4.0
 # ENVP defines the oldest environment on which the program will be able to run
 # SDK 10.2.8 requires gcc-3.3 (so we cannot use that SDK)
+            SDK_TARGET=10.3
+            echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
-            echo "ENVP = MACOSX_DEPLOYMENT_TARGET=10.3" >> config.mak
-	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.0.sdk" >> config.mak
+            echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
+	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
 #	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
-	    EXTRA_CPPFLAGS=" -no-cpp-precomp"
 #	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
-	    echo "PATH = /bin:/usr/bin" >> config.mak
+	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         ;;
     i586-pc-beos)
             echo "HAVE_BEOS = 1" >> config.mak

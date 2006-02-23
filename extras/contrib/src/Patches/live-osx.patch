@@ -1,0 +1,36 @@
+diff -ruN live.orig/Makefile.tail live/Makefile.tail
+--- live.orig/Makefile.tail	2006-02-15 23:14:39.000000000 +0100
++++ live/Makefile.tail	2006-02-22 21:53:14.000000000 +0100
+@@ -15,8 +15,7 @@
+ ALL =	$(LIVEMEDIA_LIB) \
+ 	$(GROUPSOCK_LIB) \
+ 	$(USAGE_ENVIRONMENT_LIB) \
+-	$(BASIC_USAGE_ENVIRONMENT_LIB) \
+-	$(TESTPROGS_APP)
++	$(BASIC_USAGE_ENVIRONMENT_LIB)
+ all:	$(ALL)
+ 
+ 
+diff -ruN live.orig/config.macosx live/config.macosx
+--- live.orig/config.macosx	2006-02-15 23:14:39.000000000 +0100
++++ live/config.macosx	2006-02-22 21:53:01.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t
++COMPILE_OPTS =		$(INCLUDES) -I. EXTRA_CFLAGS -DBSD=1 -O -DSOCKLEN_T=socklen_t -DUSE_LOCALE
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+@@ -7,10 +7,10 @@
+ CPLUSPLUS_FLAGS =	$(COMPILE_OPTS) -Wall
+ OBJ =			o
+ LINK =			c++ -o 
+-LINK_OPTS =		-L.
++LINK_OPTS =		-L. EXTRA_LDFLAGS
+ CONSOLE_LINK_OPTS =	$(LINK_OPTS)
+-LIBRARY_LINK =		ld -o 
+-LIBRARY_LINK_OPTS =	$(LINK_OPTS) -r 
++LIBRARY_LINK =		ar cru 
++LIBRARY_LINK_OPTS =
+ LIB_SUFFIX =			a
+ LIBS_FOR_CONSOLE_APPLICATION =
+ LIBS_FOR_GUI_APPLICATION =

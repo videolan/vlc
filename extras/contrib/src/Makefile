@@ -36,6 +36,7 @@ include ./packages.mak
 export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
 export PKG_CONFIG_PATH
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
+export MACOSX_DEPLOYMENT_TARGET = $(SDK_TARGET)
 export LIBRARY_PATH := $(PREFIX)/lib:$(LIBRARY_PATH)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
@@ -116,12 +117,14 @@ endif
 # ***************************************************************************
 
 ifdef HAVE_DARWIN_OS
- all: .autoconf .automake .libtool .iconv .intl .pkgcfg .freetype .fribidi \
+ all: .autoconf .automake .libtool .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .x264 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
 	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal
+# .FLAC .expat .clinkcc don't work with SDK yet
+# .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 ifneq ($(HOST),i686-apple-darwin8)
 all: .goom2k4
@@ -341,6 +344,7 @@ pkgconfig-$(PKGCFG_VERSION).tar.gz:
 
 pkgconfig: pkgconfig-$(PKGCFG_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -d pkgconfig/glib-1.2.8 -p 1 < Patches/glib.patch
 
 .pkgcfg: pkgconfig
 	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
@@ -359,9 +363,6 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/gettext-osx.patch
-endif
 
 .intl: gettext .iconv
 ifdef HAVE_WIN32
@@ -405,14 +406,16 @@ ifdef HAVE_DARWIN_OS
 	patch -p 0 < Patches/libiconv.patch
 endif
 
-.iconv: libiconv
 ifdef HAVE_DARWIN_OS
+.iconv:
+	touch $@
 	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 else
+.iconv: libiconv
 	(cd libiconv; CPPFLAGS="-Dssize_t=long" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
-endif
 	$(INSTALL_NAME)
 	touch $@
+endif
 
 CLEAN_FILE += .iconv
 CLEAN_PKG += libiconv
@@ -562,9 +565,11 @@ libogg-$(OGG_VERSION).tar.gz:
 libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/ogg.patch
+	patch -p 0 < Patches/libogg-1.1.patch
 ifdef HAVE_WINCE
 	patch -p 0 < Patches/libogg-wince.patch
 endif
+	(cd $@; autoconf)
 
 .ogg: libogg
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make install)
@@ -591,6 +596,8 @@ libvorbis-$(VORBIS_VERSION).tar.gz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/libvorbis-1.1.patch
+	(cd $@; autoconf)
 
 .vorbis: libvorbis .ogg
 # FIXME: shared libs disabled for now because of linking errors
@@ -643,6 +650,7 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/theora.patch
+	(cd $@; autoconf)
 
 .theora: libtheora .ogg
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-sdltest --disable-oggtest --disable-vorbistest && make && make install)
@@ -692,7 +700,7 @@ endif
 ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest --disable-asm-optimizations && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -861,13 +869,9 @@ ifeq ($(HOST),i586-pc-beos)
 endif
 ifdef HAVE_WIN32
 	patch -p 0 < Patches/ffmpeg-cvs-win32.patch
-	patch -p 1 < Patches/ffmpeg-cvs-wince.patch
 endif
 ifdef HAVE_WINCE
 	patch -p 1 < Patches/ffmpeg-cvs-wince.patch
-endif
-ifdef HAVE_DARWIN_OS
-	patch -p 0 < Patches/ffmpeg-cvs-osx.patch
 endif
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $@;patch -p 0 < ../Patches/ffmpeg-cvs-mactel.patch)
@@ -1011,16 +1015,20 @@ live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
 	patch -p 0 < Patches/livedotcom-win32.patch
-	patch -p 0 < Patches/livedotcom-osx.patch
+	patch -p 0 < Patches/live-osx.patch
 
 .live: live
-ifeq ($(HOST),ppc-darwin)
-	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
+ifeq ($(HOST),powerpc-apple-darwin8)
+	(cd $<; mv config.macosx config.macosx.orig)
+	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' < config.macosx.orig > config.macosx)
+	(cd $<; ./genMakefiles macosx && make)
 else
-ifdef HAVE_WIN32
+ifeq ($(HOST),powerpc-apple-darwin*)
+	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
+elif defined( HAVE_WIN32 )
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
-	(cd $<; ./genMakefiles macosx && make )
+	(cd $<;./genMakefiles linux && make )
 endif
 endif
 	touch $@
@@ -1156,7 +1164,7 @@ ifeq ($(HOST),i686-apple-darwin8)
 else
 .x264: x264
 endif
-	(cd $<; ./configure $(X264CONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 	touch $@
 
 CLEAN_FILE += .x264
@@ -1378,10 +1386,12 @@ libpng-$(PNG_VERSION).tar.bz2:
 
 libpng: libpng-$(PNG_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	cat Patches/libpng.patch | sed s,PREFIX,$(PREFIX), | patch -p0
 ifdef HAVE_WIN32
 	(cd $@; cat ../Patches/libpng-1.2.5-win32.patch | sed s,££PREFIX££,$(PREFIX), | patch -p0)
+else
+	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
+
 .png: libpng 
 ifdef HAVE_DARWIN_OS
 	(cd $<; cp scripts/makefile.macosx Makefile && make && make install)
@@ -1428,7 +1438,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .gpg-error: libgpg-error
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1513,6 +1523,7 @@ glib-$(GLIB_VERSION).tar.gz:
 
 glib: glib-$(GLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/glib.patch
 
 .glib: glib
 	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install)

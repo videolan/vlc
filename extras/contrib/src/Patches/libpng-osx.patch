@@ -1,21 +1,23 @@
-diff -ruN libpng.orig/scripts/makefile.macosx libpng/scripts/makefile.macosx
---- libpng.orig/scripts/makefile.macosx	Thu Oct  3 13:32:34 2002
-+++ libpng/scripts/makefile.macosx	Thu Apr  7 01:00:51 2005
+diff -ruN libpng-1.2.5/scripts/makefile.macosx libpng/scripts/makefile.macosx
+--- libpng-1.2.5/scripts/makefile.macosx	2002-10-03 13:32:34.000000000 +0200
++++ libpng/scripts/makefile.macosx	2006-02-22 22:05:47.000000000 +0100
 @@ -6,7 +6,7 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
  # where make install puts libpng.a and png.h
 -prefix=/usr/local
-+prefix=PREFIX
++prefix=??PREFIX??
  
  # Where the zlib library and include files are located
  #ZLIBLIB=/usr/local/lib
-@@ -21,7 +21,7 @@
+@@ -20,8 +20,8 @@
+ PNGMIN = 1.2.5
  PNGVER = $(PNGMAJ).$(PNGMIN)
  
- CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
+-CFLAGS=-fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
 -LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz -current_version $(PNGVER)
-+LDFLAGS=-L. -L$(ZLIBLIB) -lpng -lz
++CFLAGS=??EXTRA_CFLAGS?? -fno-common -I$(ZLIBINC) -O # -g -DPNG_DEBUG=5
++LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng -lz
  
  LIBNAME=libpng12
  SHAREDLIB_POSTFIX=dylib
