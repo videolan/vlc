@@ -878,8 +878,9 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
         sprintf( psz_path, "%s\\%s", psz_dir, finddata.cFileName );
 #endif
 
-        /* Skip ".", ".." and anything starting with "." */
-        if( !*finddata.cFileName || *finddata.cFileName == '.' )
+        /* Skip ".", ".." */
+        if( !*finddata.cFileName || !strcmp( finddata.cFileName, "." )
+         || !strcmp( finddata.cFileName, ".." ) )
         {
             if( !FindNextFile( handle, &finddata ) ) break;
             continue;
@@ -943,8 +944,9 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
         unsigned int i_len;
         int i_stat;
 
-        /* Skip ".", ".." and anything starting with "." */
-        if( !*file->d_name || *file->d_name == '.' )
+        /* Skip ".", ".." */
+        if( !*file->d_name || !strcmp( file->d_name, "." )
+         || !strcmp( file->d_name, ".." ) )
         {
             continue;
         }
