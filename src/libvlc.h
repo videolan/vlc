@@ -50,13 +50,13 @@ static char *ppsz_snap_formats[] =
  *****************************************************************************/
 
 #define INTF_CAT_LONGTEXT N_( \
-    "These options allow you to configure the interfaces used by VLC.\n" \
+    "These options allow you to configure the interfaces used by VLC. " \
     "You can select the main interface, additional " \
     "interface modules, and define various related options." )
 
 #define INTF_TEXT N_("Interface module")
 #define INTF_LONGTEXT N_( \
-    "This option allows you to select the interface used by VLC.\n" \
+    "This option allows you to select the interface used by VLC. " \
     "The default behavior is to automatically select the best module " \
     "available.")
 
@@ -108,7 +108,7 @@ static char *ppsz_snap_formats[] =
 #define AOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the audio " \
     "subsystem, and to add audio filters which can be used for " \
-    "post processing or visual effects (spectrum analyzer, etc.).\n" \
+    "post processing or visual effects (spectrum analyzer, etc.). " \
     "Enable these filters here, and configure them in the \"audio filters\" " \
     "modules section.")
 
@@ -390,14 +390,14 @@ static char *ppsz_clock_descriptions[] =
 
 #define INPUT_PROGRAM_TEXT N_("Program to select")
 #define INPUT_PROGRAM_LONGTEXT N_( \
-    "Choose the program to select by giving its Service ID.\n" \
+    "Choose the program to select by giving its Service ID. " \
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example)." )
 
 #define INPUT_PROGRAMS_TEXT N_("Programs to select")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
     "Choose the programs to select by giving a comma-separated list of " \
-    "SIDs.\n" \
+    "SIDs. " \
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example)." )
 
@@ -672,7 +672,7 @@ static char *ppsz_clock_descriptions[] =
     "this lets you set the fixed interval between SAP announcements" )
 
 #define CPU_CAT_LONGTEXT N_( \
-    "These options allow you to enable special CPU optimizations.\n" \
+    "These options allow you to enable special CPU optimizations. " \
     "You should always leave all these enabled." )
 
 #define FPU_TEXT N_("Enable FPU support")
@@ -825,7 +825,7 @@ static char *ppsz_clock_descriptions[] =
 #define HPRIORITY_LONGTEXT N_( \
     "Increasing the priority of the process will very likely improve your " \
     "playing experience as it allows VLC not to be disturbed by other " \
-    "applications that could otherwise take too much processor time.\n" \
+    "applications that could otherwise take too much processor time. " \
     "However be advised that in certain circumstances (bugs) VLC could take " \
     "all the processor time and render the whole system unresponsive which " \
     "might require a reboot of your machine.")
