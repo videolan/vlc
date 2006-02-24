@@ -15,14 +15,14 @@ diff -ur scripts/makefile.cygwin scripts/makefile.cygwin
  ifndef prefix
 -prefix=/usr
 -$(warning You haven't specified a 'prefix=' location. Defaulting to "/usr")
-+prefix=££PREFIX££
++prefix=??PREFIX??
  endif
  
  # Where the zlib library and include files are located
 -ZLIBLIB= /usr/lib
 -ZLIBINC=
-+ZLIBLIB= ££PREFIX££/lib
-+ZLIBINC= ££PREFIX££/include
++ZLIBLIB= ??PREFIX??/lib
++ZLIBINC= ??PREFIX??/include
  #ZLIBLIB=../zlib
  #ZLIBINC=../zlib
  
