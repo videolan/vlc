@@ -7,7 +7,7 @@
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Eric Petit <titer@m0k.org>
-#          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Felix KÃ¼hne <fkuehne@users.sourceforge.net>
 #          Christophe Mutricy <xtophe@nxtelevision.com>
 #          Gildas Bazin <gbazin at videolan dot org>
 #
@@ -1387,7 +1387,7 @@ libpng-$(PNG_VERSION).tar.bz2:
 libpng: libpng-$(PNG_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
-	(cd $@; cat ../Patches/libpng-1.2.5-win32.patch | sed s,££PREFIX££,$(PREFIX), | patch -p0)
+	(cd $@; cat ../Patches/libpng-1.2.5-win32.patch | sed s,Â£Â£PREFIXÂ£Â£,$(PREFIX), | patch -p0)
 else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
@@ -1438,7 +1438,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .gpg-error: libgpg-error
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
+	(cd $<; ./autogen.sh && libtoolize --force && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
