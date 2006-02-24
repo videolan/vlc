@@ -39,6 +39,7 @@
 #define DISTORT_MODE_RIPPLE   2
 #define DISTORT_MODE_GRADIENT 3
 #define DISTORT_MODE_EDGE     4
+#define DISTORT_MODE_HOUGH    5
 
 /*****************************************************************************
  * Local prototypes
@@ -54,6 +55,7 @@ static void DistortWave    ( vout_thread_t *, picture_t *, picture_t * );
 static void DistortRipple  ( vout_thread_t *, picture_t *, picture_t * );
 static void DistortGradient( vout_thread_t *, picture_t *, picture_t * );
 static void DistortEdge    ( vout_thread_t *, picture_t *, picture_t * );
+static void DistortHough   ( vout_thread_t *, picture_t *, picture_t * );
 
 static int  SendEvents   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -70,8 +72,8 @@ static int  SendEvents   ( vlc_object_t *, char const *,
 #define CARTOON_TEXT N_("Apply cartoon effect")
 #define CARTOON_LONGTEXT N_("Apply cartoon effect. Used by \"gradient\" and \"edge\".")
 
-static char *mode_list[] = { "wave", "ripple", "gradient", "edge" };
-static char *mode_list_text[] = { N_("Wave"), N_("Ripple"), N_("gradient"),  N_("Edge") };
+static char *mode_list[] = { "wave", "ripple", "gradient", "edge", "hough" };
+static char *mode_list_text[] = { N_("Wave"), N_("Ripple"), N_("gradient"),  N_("Edge"), N_("Hough") };
 
 vlc_module_begin();
     set_description( _("Distort video filter") );
@@ -111,6 +113,8 @@ struct vout_sys_t
     /* For the gradient mode */
     int i_gradient_type;
     vlc_bool_t b_cartoon;
+
+    int *p_pre_hough;
 };
 
 /*****************************************************************************
@@ -174,6 +178,10 @@ static int Create( vlc_object_t *p_this )
         {
             p_vout->p_sys->i_mode = DISTORT_MODE_EDGE;
         }
+        else if( !strcmp( psz_method, "hough" ) )
+        {
+            p_vout->p_sys->i_mode = DISTORT_MODE_HOUGH;
+        }
         else
         {
             msg_Err( p_vout, "no valid distort mode provided, "
@@ -187,6 +195,8 @@ static int Create( vlc_object_t *p_this )
         config_GetInt( p_vout, "distort-gradient-type" );
     p_vout->p_sys->b_cartoon =
         config_GetInt( p_vout, "distort-cartoon" );
+
+    p_vout->p_sys->p_pre_hough = NULL;
 
     return VLC_SUCCESS;
 }
@@ -267,6 +277,9 @@ static void Destroy( vlc_object_t *p_this )
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );
 
+    if(p_vout->p_sys->p_pre_hough)
+        free(p_vout->p_sys->p_pre_hough);
+
     free( p_vout->p_sys );
 }
 
@@ -310,6 +323,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         case DISTORT_MODE_GRADIENT:
             DistortGradient( p_vout, p_pic, p_outpic );
+            break;
+        case DISTORT_MODE_HOUGH:
+            DistortHough( p_vout, p_pic, p_outpic );
             break;
 
         default:
@@ -814,6 +830,174 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
     if( p_grad ) free( p_grad );
     if( p_theta) free( p_theta );
 }
+
+/*****************************************************************************
+ * DistortHough
+ *****************************************************************************/
+#define p_pre_hough p_vout->p_sys->p_pre_hough
+static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
+                                                  picture_t *p_outpic )
+{
+    int x, y, i;
+    int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
+    int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
+    int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
+    int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
+
+    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
+
+    int i_diag = sqrt( i_num_lines * i_num_lines +
+                        i_src_visible * i_src_visible);
+    int i_max, i_phi_max, i_rho, i_rho_max;
+    int i_nb_steps = 90;
+    double d_step = M_PI / i_nb_steps;
+    double d_sin;
+    double d_cos;
+    uint32_t *p_smooth;
+    int *p_hough = malloc( i_diag * i_nb_steps * sizeof(int) );
+    if( ! p_hough ) return;
+    p_smooth = (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+    if( !p_smooth ) return;
+
+    if( ! p_pre_hough )
+    {
+        msg_Dbg(p_vout, "Starting precalculation");
+        p_pre_hough = malloc( i_num_lines * i_src_visible * i_nb_steps * sizeof(int) );
+        if( ! p_pre_hough ) return;
+        for( i = 0 ; i < i_nb_steps ; i++)
+        {
+            d_sin = sin(d_step * i);
+            d_cos = cos(d_step * i);
+            for( y = 0 ; y < i_num_lines ; y++ )
+                for( x = 0 ; x < i_src_visible ; x++ )
+                {
+                    p_pre_hough[(i*i_num_lines+y)*i_src_visible + x] =
+                        ceil(x*d_sin + y*d_cos);
+                }
+        }
+        msg_Dbg(p_vout, "Precalculation done");
+    }
+
+    memset( p_hough, 0, i_diag * i_nb_steps * sizeof(int) );
+//    memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+//        p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
+//    memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
+//        p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+    memcpy( p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
+        p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
+    memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
+        p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
+    memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
+        p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+
+    /* Gaussian convolution ( sigma == 1.4 )
+
+     |  2  4  5  4  2  |   |  2  4  4  4  2 |
+     |  4  9 12  9  4  |   |  4  8 12  8  4 |
+     |  5 12 15 12  5  | ~ |  4 12 16 12  4 |
+     |  4  9 12  9  4  |   |  4  8 12  8  4 |
+     |  2  4  5  4  2  |   |  2  4  4  4  2 | */
+
+    for( y = 2; y < i_num_lines - 2; y++ )
+    {
+        for( x = 2; x < i_src_visible - 2; x++ )
+        {
+            p_smooth[y*i_src_visible+x] = (uint32_t)((
+              /* 2 rows up */
+                ( p_inpix[(y-2)*i_src_pitch+x-2]<<1 )
+              + ( p_inpix[(y-2)*i_src_pitch+x-1]<<2 )
+              + ( p_inpix[(y-2)*i_src_pitch+x]<<2 )
+              + ( p_inpix[(y-2)*i_src_pitch+x+1]<<2 )
+              + ( p_inpix[(y-2)*i_src_pitch+x+2]<<1 )
+              /* 1 row up */
+              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
+              + ( p_inpix[(y-1)*i_src_pitch+x-2]<<2 )
+              + ( p_inpix[(y-1)*i_src_pitch+x]*12 )
+              + ( p_inpix[(y-1)*i_src_pitch+x+1]<<3 )
+              + ( p_inpix[(y-1)*i_src_pitch+x+2]<<2 )
+              /* */
+              + ( p_inpix[y*i_src_pitch+x-2]<<2 )
+              + ( p_inpix[y*i_src_pitch+x-1]*12 )
+              + ( p_inpix[y*i_src_pitch+x]<<4 )
+              + ( p_inpix[y*i_src_pitch+x+1]*12 )
+              + ( p_inpix[y*i_src_pitch+x+2]<<2 )
+              /* 1 row down */
+              + ( p_inpix[(y+1)*i_src_pitch+x-2]<<2 )
+              + ( p_inpix[(y+1)*i_src_pitch+x-1]<<3 )
+              + ( p_inpix[(y+1)*i_src_pitch+x]*12 )
+              + ( p_inpix[(y+1)*i_src_pitch+x+1]<<3 )
+              + ( p_inpix[(y+1)*i_src_pitch+x+2]<<2 )
+              /* 2 rows down */
+              + ( p_inpix[(y+2)*i_src_pitch+x-2]<<1 )
+              + ( p_inpix[(y+2)*i_src_pitch+x-1]<<2 )
+              + ( p_inpix[(y+2)*i_src_pitch+x]<<2 )
+              + ( p_inpix[(y+2)*i_src_pitch+x+1]<<2 )
+              + ( p_inpix[(y+2)*i_src_pitch+x+2]<<1 )
+              ) >> 7) /* 115 */;
+        }
+    }
+
+    /* Sobel gradient
+
+     | -1 0 1 |     |  1  2  1 |
+     | -2 0 2 | and |  0  0  0 |
+     | -1 0 1 |     | -1 -2 -1 | */
+
+    i_max = 0;
+    i_rho_max = 0;
+    i_phi_max = 0;
+    for( y = 4; y < i_num_lines - 4; y++ )
+    {
+        for( x = 4; x < i_src_visible - 4; x++ )
+        {
+            uint32_t a =
+            (
+              abs(
+                ((p_smooth[(y-1)*i_src_visible+x] - p_smooth[(y+1)*i_src_visible+x])<<1)
+               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x-1])
+               + (p_smooth[(y-1)*i_src_visible+x+1] - p_smooth[(y+1)*i_src_visible+x+1])
+              )
+            +
+              abs(
+                ((p_smooth[y*i_src_visible+x-1] - p_smooth[y*i_src_visible+x+1])<<1)
+               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y-1)*i_src_visible+x+1])
+               + (p_smooth[(y+1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x+1])
+              )
+            );
+            if( a>>8 )
+            {
+                for( i = 0 ; i < i_nb_steps ; i ++ )
+                {
+                    i_rho = p_pre_hough[(i*i_num_lines+y)*i_src_visible + x];
+                    if( p_hough[i_rho + i_diag/2 + i * i_diag]++ > i_max )
+                    {
+                        i_max = p_hough[i_rho + i_diag/2 + i * i_diag];
+                        i_rho_max = i_rho;
+                        i_phi_max = i;
+                    }
+                }
+            }
+        }
+    }
+
+    d_sin = sin(i_phi_max*d_step);
+    d_cos = cos(i_phi_max*d_step);
+    if( d_cos != 0 )
+    {
+        for( x = 0 ; x < i_src_visible ; x++ )
+        {
+            y = (i_rho_max - x * d_sin) / d_cos;
+            if( y >= 0 && y < i_num_lines )
+                p_outpix[y*i_dst_pitch+x] = 255;
+        }
+    }
+
+    if( p_hough ) free( p_hough );
+    if( p_smooth ) free( p_smooth );
+}
+#undef p_pre_hough
+
 /*****************************************************************************
  * SendEvents: forward mouse and keyboard events to the parent p_vout
  *****************************************************************************/
