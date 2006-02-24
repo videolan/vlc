@@ -663,7 +663,7 @@ package-win32-base: package-win32-base-debug
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
 
-package-win32-base-exe:
+package-win32-base-exe: package-win32-base
 # Create package
 	if makensis -VERSION >/dev/null 2>&1; then \
 	    MAKENSIS="makensis -DVERSION=${VERSION}"; \
@@ -683,7 +683,7 @@ package-win32-base-exe-linux:
 # Create package
 	makensis -DVERSION=${VERSION} $(top_builddir)/vlc-${VERSION}/vlc.win32.nsi
 
-package-win32-base-zip:
+package-win32-base-zip: package-win32-base
 # Create package 
 	zip -r vlc-${VERSION}-win32.zip vlc-${VERSION}
 
@@ -695,11 +695,11 @@ package-win32-exe-linux: package-win32-base package-win32-base-exe-linux
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
-package-win32-zip: package-win32-base package-win32-base-zip
+package-win32-zip: package-win32-base-zip
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
-package-win32: package-win32-base package-win32-base-exe package-win32-base-zip
+package-win32: package-win32-base-exe package-win32-base-zip
 # Clean up
 	rm -Rf $(top_builddir)/vlc-${VERSION}
 
