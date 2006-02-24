@@ -32,6 +32,8 @@ while(<STDIN>)
         $line =~ /make\s\sall-recursive/ ||
         $line =~ /[A-z0-9-]*ar\s[A-z0-9]*\s([A-z0-9\-_\/\.]*)\s.*/ ||
         $line =~ /^[A-z0-9-]*ranlib\s[A-z0-9-_]*plugin(.*)/ ||
+        $line =~ /^touch.*/ ||
+        $line =~ /^srcdir=.*/ ||
         $line =~ /^.* (lib[A-z0-9-_]*plugin.so).*/ || 
         $line =~ s/^rm\s\-f\s(.*)//g )
      {}
