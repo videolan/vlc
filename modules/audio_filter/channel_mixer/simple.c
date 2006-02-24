@@ -68,9 +68,15 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    /* Only conversion to Stereo right now */
+    /* Only conversion to Stereo and 4.0 right now */
     if( p_filter->output.i_physical_channels !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) ) return -1;
+        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) 
+        && p_filter->output.i_physical_channels !=
+        ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+        AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT) )
+        {
+            return -1;
+        }
 
     /* Only from 7/7.1/5/5.1 */
     if( (p_filter->input.i_physical_channels & ~AOUT_CHAN_LFE) !=
@@ -105,28 +111,68 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
 
-    if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
-    for( i = p_in_buf->i_nb_samples; i--; )
+    if( p_filter->output.i_physical_channels ==
+                            (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
-        *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 4 + p_src[4] / 4;
-        p_dest++;
-        *p_dest = p_src[6] + 0.5 * p_src[1] + p_src[3] / 4 + p_src[5] / 4;
-        p_dest++;
+        if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
+        for( i = p_in_buf->i_nb_samples; i--; )
+        {
+            *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 4 + p_src[4] / 4;
+            p_dest++;
+            *p_dest = p_src[6] + 0.5 * p_src[1] + p_src[3] / 4 + p_src[5] / 4;
+            p_dest++;
 
-        p_src += 7;
+            p_src += 7;
 
-        if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+            if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+        }
+        else
+        for( i = p_in_buf->i_nb_samples; i--; )
+        {
+            *p_dest = p_src[4] + 0.5 * p_src[0] + 0.33 * p_src[2];
+            p_dest++;
+            *p_dest = p_src[4] + 0.5 * p_src[1] + 0.33 * p_src[3];
+            p_dest++;
+
+            p_src += 5;
+
+            if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+        }
     }
     else
-    for( i = p_in_buf->i_nb_samples; i--; )
     {
-        *p_dest = p_src[4] + 0.5 * p_src[0] + 0.33 * p_src[2];
-        p_dest++;
-        *p_dest = p_src[4] + 0.5 * p_src[1] + 0.33 * p_src[3];
-        p_dest++;
+        if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
+        for( i = p_in_buf->i_nb_samples; i--; )
+        {
+            *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 6;
+            p_dest++;
+            *p_dest = p_src[6] + 0.5 * p_src[1] + p_src[3] / 6;
+            p_dest++;
+            *p_dest = p_src[2] / 6 +  p_src[4];
+            p_dest++;
+            *p_dest = p_src[3] / 6 +  p_src[5];
+            p_dest++;
 
-        p_src += 5;
+            p_src += 7;
 
-        if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+            if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+        }
+        else
+        for( i = p_in_buf->i_nb_samples; i--; )
+        {
+            *p_dest = p_src[4] + 0.5 * p_src[0];
+            p_dest++;
+            *p_dest = p_src[4] + 0.5 * p_src[1];
+            p_dest++;
+            *p_dest = p_src[2];
+            p_dest++;
+            *p_dest = p_src[3];
+            p_dest++;
+
+            p_src += 5;
+
+            if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
+        }
+
     }
 }
