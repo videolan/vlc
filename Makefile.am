@@ -200,16 +200,6 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 # Building vlc
 ###############################################################################
 
-.PHONY: libvlc
-
-# Shortcut for developpers to rebuild the core (libvlc + vlc)
-# Don't use it if you don't know what it is about.
-# Don't complain if it doesn't work. -- Courmisch
-core: libvlc vlc$(EXEEXT)
-
-libvlc:
-	cd src && $(MAKE) all
-
 bin_PROGRAMS = vlc
 
 vlc_SOURCES = src/vlc.c
@@ -218,35 +208,47 @@ EXTRA_vlc_SOURCES = extras/zsh.cpp
 
 # Work around a bug in the arm-wince-pe linker
 if HAVE_WINCE
-vlc_WORKAROUNDLDFLAGS = $(LIB_libvlc)
+vlc_WORKAROUNDLDFLAGS = $(LIBVLC)
 endif
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = $(LIB_libvlc) $(DATA_win32_rc)
+DEPENDENCIES_vlc = src/$(LIB_libvlc) $(DATA_win32_rc)
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 if USE_LIBTOOL
 vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc`
-LIB_libvlc = src/libvlc.la
-LIBVLC = $(LIB_libvlc)
+LIB_libvlc = libvlc.la
+LIBVLC = src/$(LIB_libvlc)
 else
 if BUILD_SHARED
 vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
 if HAVE_WIN32
-LIB_libvlc = src/libvlc.dll.a
+LIB_libvlc = libvlc.dll.a
 else
-LIB_libvlc = src/libvlc$(LIBEXT)
+LIB_libvlc = libvlc$(LIBEXT)
 endif
 LIBVLC =
 else
 vlc_LDFLAGS = $(vlc_WORKAROUNDLFDLAGS) `$(VLC_CONFIG) --libs vlc builtin`
-LIB_libvlc = src/libvlc.a
-LIBVLC = $(LIB_libvlc)
+LIB_libvlc = libvlc.a
+LIBVLC = src/$(LIB_libvlc)
 DEPENDENCIES_vlc += stamp-builtin
 endif
 endif
 vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(INCLUDED_LIBINTL)
+
+# Shortcut for developpers to rebuild the core (libvlc + vlc)
+# Don't use it if you don't know what it is about.
+# Don't complain if it doesn't work. -- Courmisch
+core:
+	rm -f src/$(LIB_libvlc)
+	$(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
+
+.PHONY: core
+
+src/$(LIB_libvlc):
+	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
