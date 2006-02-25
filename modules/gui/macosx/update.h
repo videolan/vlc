@@ -34,11 +34,11 @@
     IBOutlet id o_fld_status;
     IBOutlet id o_update_window;
     IBOutlet id o_bar_checking;
-    IBOutlet id o_lbl_checkForUpdate;
 
     NSString * o_hashOfOurBinary;
     NSString * o_urlOfBinary;
     update_t * p_u;
+    intf_thread_t * p_intf;
 }
 
 - (IBAction)download:(id)sender;

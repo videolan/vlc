@@ -61,6 +61,9 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    /* get up */
+    p_intf = VLCIntf;
+
     /* clean the interface */
     [o_fld_releaseNote setString: @""];
     
@@ -73,13 +76,14 @@ static VLCUpdate *_o_sharedInstance = nil;
         [o_hashOfOurBinary release];
     if( o_urlOfBinary )
         [o_urlOfBinary release];
+
     [super dealloc];
 }
 
 - (void)initStrings
 {
     /* translate strings to the user's language */
-    [o_update_window setTitle: _NS("Check for update")];
+    [o_update_window setTitle: _NS("Check for Update")];
     [o_btn_DownloadNow setTitle: _NS("Download now")];
     [o_btn_okay setTitle: _NS("OK")];
 }
@@ -98,7 +102,6 @@ static VLCUpdate *_o_sharedInstance = nil;
     [o_bar_checking startAnimation: self];
     [self checkForUpdate];
     [o_bar_checking stopAnimation: self];
-    [o_lbl_checkForUpdate setHidden: YES];
 }
 
 - (IBAction)download:(id)sender
@@ -137,11 +140,15 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)checkForUpdate
 {
-    p_u = update_New( VLCIntf );
+    p_u = update_New( p_intf );
     update_Check( p_u, VLC_FALSE );
     update_iterator_t *p_uit = update_iterator_New( p_u );
     BOOL releaseChecked = NO;
     int x = 0;
+    NSString * pathToReleaseNote;
+    pathToReleaseNote = [[NSString stringWithString: \
+        @"~/Library/Caches/vlc_releasenote_temp.txt"] \
+        stringByExpandingTildeInPath];
     
     if( p_uit )
     {
@@ -161,16 +168,21 @@ static VLCUpdate *_o_sharedInstance = nil;
                     [o_fld_releaseNote setString: \
                         [NSString stringWithUTF8String: \
                         (p_uit->file.psz_description)]];
+                    /* download our release note
+                     * We will read the temp file after this loop */
+                    update_download( p_uit, (char *)[pathToReleaseNote UTF8String] );
                 }
                 else if( p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
                 {
-                    msg_Dbg( VLCIntf, "binary found, version = %s" \
-                        ", hash=%s", p_uit->release.psz_version, \
-                        p_uit->file.psz_md5 );
+                    msg_Dbg( p_intf, "binary found, version = %s" \
+                        ", hash=%s, size=%i", p_uit->release.psz_version, \
+                        p_uit->file.psz_md5, (int)((p_uit->file.l_size \
+                        / 1024) / 1024) );
                     [o_fld_currentVersionAndSize setStringValue: \
                         [NSString stringWithFormat: \
                         @"The current release is %s (%i MB to download).", \
-                        p_uit->release.psz_version, p_uit->file.l_size]];
+                        p_uit->release.psz_version, ((p_uit->file.l_size \
+                        / 1024) / 1024)]];
                         
                     if( o_urlOfBinary )
                         [o_urlOfBinary release];
@@ -194,9 +206,9 @@ static VLCUpdate *_o_sharedInstance = nil;
                     [o_fld_status setStringValue: _NS("Your version of VLC " \
                         "is outdated.")];
                     [o_btn_DownloadNow setEnabled: YES];
-                    msg_Dbg( VLCIntf, "this version of VLC is outdated" );
+                    msg_Dbg( p_intf, "this version of VLC is outdated" );
                     /* put the mirror information */
-                    msg_Dbg( VLCIntf, "used mirror: %s, %s [%s]", \
+                    msg_Dbg( p_intf, "used mirror: %s, %s [%s]", \
                             p_uit->mirror.psz_name, p_uit->mirror.psz_location,\
                             p_uit->mirror.psz_type );
                     /* make sure that we perform this check only once */
@@ -207,13 +219,45 @@ static VLCUpdate *_o_sharedInstance = nil;
                     [o_fld_status setStringValue: _NS("Your version of VLC " \
                         "is up-to-date.")];
                     [o_btn_DownloadNow setEnabled: NO];
-                    msg_Dbg( VLCIntf, "current version is up-to-date" );
+                    msg_Dbg( p_intf, "current version is up-to-date" );
                     releaseChecked = YES;
                 }
             }
             x += 1;
         }
+
         update_iterator_Delete( p_uit );
+        
+        /* wait for our download, since it is done by another thread
+         * this does usually take 300000 to 500000 ms */
+        int i = 0;
+        while( [[NSFileManager defaultManager] fileExistsAtPath: pathToReleaseNote] == NO )
+        {
+            msleep( 100000 );
+            i += 1;
+            if( i == 600 )
+            {
+                /* if this takes more than 1 min, exit */
+                msg_Warn( p_intf, "download took more than a minute, exiting" );
+                return;
+            }
+        }
+        msg_Dbg( p_intf, "waited %i ms for the release notes", (i * 100000) );
+        msleep( 500000 );
+
+        /* let's open our cached release note and display it
+         * we can't use NSString stringWithContentsOfFile:encoding:error: 
+         * since it is Tiger only */
+        NSString * releaseNote = [[NSString alloc] initWithData: \
+            [NSData dataWithContentsOfFile: pathToReleaseNote] \
+            encoding: NSISOLatin1StringEncoding];
+        if( releaseNote )
+            [o_fld_releaseNote setString: releaseNote];
+
+        /* delete the file since it isn't needed anymore */
+        BOOL myBOOL = NO;
+        myBOOL = [[NSFileManager defaultManager] removeFileAtPath: \
+            pathToReleaseNote handler: nil];
     }
 }
 
@@ -240,7 +284,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     }*/
     
     /* delete the following afterwards */
-    msg_Dbg( VLCIntf, "url is %s, using default browser for download", \
+    msg_Dbg( p_intf, "url is %s, using default browser for download", \
         [o_urlOfBinary UTF8String] );
         
     NSURL * o_url = [NSURL URLWithString: o_urlOfBinary];
