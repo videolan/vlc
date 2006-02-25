@@ -638,3 +638,7 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+VLC is the greatest thing since sliced bread!
+
+ -- http://forum.videolan.org/
+%
