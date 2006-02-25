@@ -2,7 +2,7 @@
  * interaction.h: Mac OS X interaction dialogs
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * $Id $
+ * $Id:$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Felix Kühne <fkuehne at videolan dot org>
@@ -116,7 +116,11 @@
         msg_Err( p_intf, "serious issue (p_dialog == nil)" );
 
     if( !nib_interact_loaded )
+    {
         nib_interact_loaded = [NSBundle loadNibNamed:@"Interaction" owner:self];
+        [o_prog_cancel_btn setTitle: _NS("Cancel")];
+        [o_prog_bar setUsesThreadedAnimation: YES];
+    }
 
     NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : "title"];
     NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
@@ -161,26 +165,26 @@
         }
         if( p_dialog->i_flags & DIALOG_OK_CANCEL )
         {
+            msg_Dbg( p_intf, "requested flag: DIALOG_OK_CANCEL" );
             NSBeginInformationalAlertSheet( o_title, @"OK" , @"Cancel", nil, \
                 o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
                 NULL, nil, o_description );
         }
         else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
         {
+            msg_Dbg( p_intf, "requested flag: DIALOG_YES_NO_CANCEL" );
             NSBeginInformationalAlertSheet( o_title, @"Yes", @"No", @"Cancel", \
                 o_window, self,@selector(sheetDidEnd: returnCode: contextInfo:),\
                 NULL, nil, o_description );
         }
         else if( p_dialog->i_type & WIDGET_PROGRESS )
         {
+            msg_Dbg( p_intf, "requested type: WIDGET_PROGRESS" );
             [o_prog_title setStringValue: o_title];
             [o_prog_description setStringValue: o_description];
-            [o_prog_bar setUsesThreadedAnimation: YES];
             [o_prog_bar setDoubleValue: 0];
             [NSApp beginSheet: o_prog_win modalForWindow: o_window \
-                modalDelegate: self didEndSelector: \
-                nil \
-                contextInfo: nil];
+                modalDelegate: self didEndSelector: nil contextInfo: nil];
             [o_prog_win makeKeyWindow];
         }
         else
@@ -217,11 +221,19 @@
     int i = 0;
     for( i = 0 ; i< p_dialog->i_widgets; i++ )
     {
-        /*msg_Dbg( p_intf, "update event, current value %i for index %i",
-        (int)(p_dialog->pp_widgets[i]->val.f_float), i);*/
         if( p_dialog->i_type & WIDGET_PROGRESS )
+        {
             [o_prog_bar setDoubleValue: \
                 (double)(p_dialog->pp_widgets[i]->val.f_float)];
+            if( [o_prog_bar doubleValue] == 100.0 )
+            {
+                /* we are done, let's hide */
+                [self hideDialog];
+                return;
+            }
+            [o_prog_description setStringValue: [NSString stringWithUTF8String:\
+                p_dialog->pp_widgets[i]->val.psz_string]];
+        }
     }
 }
 
