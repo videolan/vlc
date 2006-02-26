@@ -32,6 +32,15 @@
 
     IBOutlet id o_btn_fullscreen;
     IBOutlet id o_volumeslider;
+
+    IBOutlet id o_specificTime_cancel_btn;
+    IBOutlet id o_specificTime_enter_fld;
+    IBOutlet id o_specificTime_goTo_lbl;
+    IBOutlet id o_specificTime_ok_btn;
+    IBOutlet id o_specificTime_win;
+    IBOutlet id o_specificTime_sec_lbl;
+    IBOutlet id o_specificTime_stepper;
+    IBOutlet id o_specificTime_mi;
 }
 
 - (IBAction)play:(id)sender;
@@ -67,6 +76,8 @@
 - (IBAction)toggleVar:(id)sender;
 - (int)toggleVarThread:(id)_o_data;
 
+- (IBAction)goToSpecificTime:(id)sender;
+
 @end
 
 /*****************************************************************************
@@ -90,3 +101,15 @@
 - (int)type;
 
 @end
+
+/*****************************************************************************
+ * VLCTimeField interface 
+ *****************************************************************************
+ * we need the implementation to catch our click-event in the controller window
+ *****************************************************************************/
+
+@interface VLCTimeField : NSTextField
+{
+}
+@end
+

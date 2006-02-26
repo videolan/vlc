@@ -12,6 +12,7 @@
                 backward = id; 
                 faster = id; 
                 forward = id; 
+                goToSpecificTime = id; 
                 loop = id; 
                 mute = id; 
                 next = id; 
@@ -31,7 +32,18 @@
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_main" = id; "o_volumeslider" = id; }; 
+            OUTLETS = {
+                "o_main" = id; 
+                "o_specificTime_cancel_btn" = id; 
+                "o_specificTime_enter_fld" = id; 
+                "o_specificTime_goTo_lbl" = id; 
+                "o_specificTime_mi" = id; 
+                "o_specificTime_ok_btn" = id; 
+                "o_specificTime_sec_lbl" = id; 
+                "o_specificTime_stepper" = id; 
+                "o_specificTime_win" = id; 
+                "o_volumeslider" = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -313,6 +325,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = VLCPlaylistView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {CLASS = VLCTimeField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {CLASS = VLCVoutView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
     ); 
     IBVersion = 1; 

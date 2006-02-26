@@ -42,6 +42,15 @@
  *****************************************************************************/
 @implementation VLCControls
 
+- (void)awakeFromNib
+{
+    [o_specificTime_mi setTitle: _NS("Go To Position")];
+    [o_specificTime_cancel_btn setTitle: _NS("Cancel")];
+    [o_specificTime_ok_btn setTitle: _NS("OK")];
+    [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
+    [o_specificTime_goTo_lbl setStringValue: _NS("Go to specific position")];
+}
+
 - (IBAction)play:(id)sender
 {
     vlc_value_t val;
@@ -550,6 +559,49 @@
     return VLC_EGENERIC;
 }
 
+- (IBAction)goToSpecificTime:(id)sender
+{
+    if( sender == o_specificTime_cancel_btn )
+    {
+        [NSApp endSheet: o_specificTime_win];
+        [o_specificTime_win close];
+    }
+    else if( sender == o_specificTime_ok_btn )
+    {
+        input_thread_t * p_input = (input_thread_t *)vlc_object_find( VLCIntf, \
+            VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        if( p_input )
+        {
+            input_Control( p_input, INPUT_SET_TIME, \
+                (int64_t)([o_specificTime_enter_fld intValue] * 1000000));
+            vlc_object_release( p_input );
+        }
+    
+        [NSApp endSheet: o_specificTime_win];
+        [o_specificTime_win close];
+    }
+    else
+    {
+        input_thread_t * p_input = (input_thread_t *)vlc_object_find( VLCIntf, \
+            VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        if( p_input )
+        {
+            /* we can obviously only do that if an input is available */
+            vlc_value_t pos, length;
+            var_Get( p_input, "time", &pos );
+            [o_specificTime_enter_fld setIntValue: (pos.i_time / 1000000)];
+            var_Get( p_input, "length", &length );
+            [o_specificTime_stepper setMaxValue: (length.i_time / 1000000)];
+
+            [NSApp beginSheet: o_specificTime_win modalForWindow: \
+                [NSApp mainWindow] modalDelegate: self didEndSelector: nil \
+                contextInfo: nil];
+            [o_specificTime_win makeKeyWindow];
+            vlc_object_release( p_input );
+        }
+    }
+}
+
 @end
 
 @implementation VLCControls (NSMenuValidation)
@@ -732,4 +784,19 @@
     return i_type;
 }
 
+@end
+
+
+/*****************************************************************************
+ * VLCTimeField implementation 
+ *****************************************************************************
+ * we need this to catch our click-event in the controller window
+ *****************************************************************************/
+
+@implementation VLCTimeField
+- (void)mouseDown: (NSEvent *)ourEvent
+{
+    if( [ourEvent clickCount] > 1 )
+        [[[VLCMain sharedInstance] getControls] goToSpecificTime: nil];
+}
 @end
