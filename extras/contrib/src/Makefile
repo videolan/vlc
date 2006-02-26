@@ -1,7 +1,7 @@
 # ***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003 - 2005 the VideoLAN team
+# Copyright (C) 2003 - 2006 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -407,7 +407,7 @@ ifdef HAVE_DARWIN_OS
 endif
 
 ifdef HAVE_DARWIN_OS
-.iconv:
+.iconv: libiconv
 	touch $@
 	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 else
