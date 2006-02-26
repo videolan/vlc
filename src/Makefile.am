@@ -119,7 +119,7 @@ misc/version.c: FORCE
 # shared object, which will make builtins fairly redumdant. Until then, we
 # need this workaround.
 
-stamp-builtins:
+stamp-builtins: Makefile ../vlc-config ../config.status
 if USE_LIBTOOL
 	@for c in `$(VLC_CONFIG) --libs builtin`; do \
 		case $$c in \
