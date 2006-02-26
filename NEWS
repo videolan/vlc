@@ -39,7 +39,9 @@ Interfaces:
     - Improved playlist handling
     - Support for popup menus, animated bitmaps, equalizer, ...
  * OS X
+    - Embedded Video output
     - new Update-Checker
+    - new Go-To-Specific-Time feature
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
  * HTTP
@@ -50,7 +52,8 @@ Windows Port:
  * MSN messenger "Now playing" support
 
 OS X Port:
- * 
+ * Mac-Intel compatibility
+ * enhanced support of various audio output devices 
 
 *Nix port:
  * Ability to log to syslog
