@@ -338,7 +338,7 @@ void libvlc_audio_set_mute( libvlc_instance_t *, vlc_bool_t , libvlc_exception_t
  * \param p_exception an initialized exception
  * \return the audio level (int)
  */
-int libvlc_audio_volume_get( libvlc_instance_t *, libvlc_exception_t * );
+int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exception_t * );
 
 
 /**
@@ -348,8 +348,8 @@ int libvlc_audio_volume_get( libvlc_instance_t *, libvlc_exception_t * );
  * \param p_exception an initialized exception
  * \return void
  */
-void libvlc_audio_volume_set( libvlc_instance_t *, int , libvlc_exception_t *);
-    
+void libvlc_audio_set_volume( libvlc_instance_t *, int , libvlc_exception_t *);
+
 /** @} */
 
 
