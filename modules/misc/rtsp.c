@@ -49,6 +49,10 @@ static void Close( vlc_object_t * );
     "\nSyntax is address:port/path. Default is to bind to any address "\
     "on port 554, with no path." )
 
+#define THROTLE_TEXT N_( "Maximum number of connections" )
+#define THROTLE_LONGTEXT N_( "Limit the number of connections " \
+    "to a maximum. (0 = unlimited, N = maximum clients)" )
+
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
     set_description( _("RTSP VoD server") );
@@ -58,6 +62,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "rtsp" );
     add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
+    add_integer( "rtsp-throtle", 0, NULL, THROTLE_TEXT, THROTLE_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -112,7 +117,8 @@ struct vod_media_t
 
     /* RTSP server */
     httpd_url_t  *p_rtsp_url;
-    char         *psz_rtsp_control_v4, *psz_rtsp_control_v6;
+    char         *psz_rtsp_control_v4;
+    char         *psz_rtsp_control_v6;
     char         *psz_rtsp_path;
 
     int  i_port;
@@ -152,6 +158,8 @@ struct vod_sys_t
     httpd_host_t *p_rtsp_host;
     char *psz_path;
     int i_port;
+    int i_throtle;
+    int i_connections;
 
     /* List of media */
     int i_media;
@@ -207,6 +215,11 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys ) goto error;
     p_sys->p_rtsp_host = 0;
 
+    var_Create( p_this, "rtsp-throtle", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    p_sys->i_throtle = var_GetInteger( p_this, "rtsp-throtle" );
+    msg_Dbg( p_this, "Allowing up to %d connections", p_sys->i_throtle );
+    p_sys->i_connections = 0;
+
     p_sys->p_rtsp_host =
         httpd_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
     if( !p_sys->p_rtsp_host )
@@ -220,7 +233,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_port = url.i_port;
 
     vlc_UrlClean( &url );
-    p_sys->media = 0;
+    p_sys->media = NULL;
     p_sys->i_media = 0;
 
     p_vod->pf_media_new = MediaNew;
@@ -230,11 +243,11 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 
- error:
-
+error:
     if( p_sys && p_sys->p_rtsp_host ) httpd_HostDelete( p_sys->p_rtsp_host );
     if( p_sys ) free( p_sys );
     vlc_UrlClean( &url );
+
     return VLC_EGENERIC;
 }
 
@@ -247,6 +260,7 @@ static void Close( vlc_object_t * p_this )
     vod_sys_t *p_sys = p_vod->p_sys;
 
     httpd_HostDelete( p_sys->p_rtsp_host );
+    var_Destroy( p_this, "rtsp-throtle" );
 
     /* TODO delete medias */
     free( p_sys->psz_path );
@@ -575,13 +589,17 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
 static rtsp_client_t *RtspClientNew( vod_media_t *p_media, char *psz_session )
 {
     rtsp_client_t *p_rtsp = malloc( sizeof(rtsp_client_t) );
+
+    if( !p_rtsp ) return NULL;
     memset( p_rtsp, 0, sizeof(rtsp_client_t) );
     p_rtsp->es = 0;
 
     p_rtsp->psz_session = psz_session;
     TAB_APPEND( p_media->i_rtsp, p_media->rtsp, p_rtsp );
 
-    msg_Dbg( p_media->p_vod, "new session: %s", psz_session );
+    p_media->p_vod->p_sys->i_connections++;
+    msg_Dbg( p_media->p_vod, "new session: %s, connections: %d",
+             psz_session, p_media->p_vod->p_sys->i_throtle );
 
     return p_rtsp;
 }
@@ -603,7 +621,9 @@ static rtsp_client_t *RtspClientGet( vod_media_t *p_media, char *psz_session )
 
 static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 {
-    msg_Dbg( p_media->p_vod, "closing session: %s", p_rtsp->psz_session );
+    p_media->p_vod->p_sys->i_connections--;
+    msg_Dbg( p_media->p_vod, "closing session: %s, connections: %d",
+             p_rtsp->psz_session, p_media->p_vod->p_sys->i_throtle );
 
     while( p_rtsp->i_es-- )
     {
@@ -677,6 +697,15 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session || !*psz_session )
                 {
+                    if( ( p_vod->p_sys->i_throtle > 0 ) &&
+                        ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throtle ) )
+                    {
+                        answer->i_status = 500; // FIXME: GET THE RIGHT ERROR STATUS
+                        answer->psz_status = strdup( "Too many connections" );
+                        answer->i_body = 0;
+                        answer->p_body = NULL;
+                        break;
+                    }
                     asprintf( &psz_session, "%d", rand() );
                     p_rtsp = RtspClientNew( p_media, psz_session );
                 }
@@ -926,6 +955,15 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session || !*psz_session )
                 {
+                    if( ( p_vod->p_sys->i_throtle > 0 ) &&
+                        ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throtle ) )
+                    {
+                        answer->i_status = 500; // FIXME: GET THE RIGHT ERROR STATUS
+                        answer->psz_status = strdup( "Too many connections" );
+                        answer->i_body = 0;
+                        answer->p_body = NULL;
+                        break;
+                    }
                     asprintf( &psz_session, "%d", rand() );
                     p_rtsp = RtspClientNew( p_media, psz_session );
                 }
