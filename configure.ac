@@ -1388,7 +1388,7 @@ dnl  Is the shared libvlc forced ?
 dnl
 build_pic=no
 AC_ARG_ENABLE(shared-libvlc,
-  [  --enable-shared-libvlc  shared libvlc (default disabled EXPERIMENTAL)])
+  [  --enable-shared-libvlc  Win32 libvlc.dll build (default disabled)])
 AS_IF([test "${enable_libtool}" != "no" && test "${enable_shared_libvlc}"], [
   AC_MSG_ERROR([--enable-shared-libvlc and --enable-libtool are mutually exclusive])
 ])

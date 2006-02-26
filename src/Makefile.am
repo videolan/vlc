@@ -187,30 +187,15 @@ endif
 if USE_LIBTOOL
 lib_LTLIBRARIES = libvlc.la
 else
-LIBRARIES_nopic = libvlc.a
-LIBRARIES_pic = libvlc_pic.a
-if HAVE_WIN32
-lib_LIBRARIES = $(LIBRARIES_nopic)
-else
-if BUILD_SHARED
-lib_LIBRARIES = $(LIBRARIES_pic)
-else
-lib_LIBRARIES = $(LIBRARIES_nopic)
+lib_LIBRARIES = libvlc.a
 if BUILD_PIC
-lib_LIBRARIES += $(LIBRARIES_pic)
-endif
-endif
+lib_LIBRARIES += libvlc_pic.a
 endif
 endif
 
+if HAVE_WIN32
 if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT)
-if HAVE_WIN32
-OBJECTS_libvlc_so = $(libvlc_a_OBJECTS)
-LDFLAGS_libvlc_so = -Wl,--out-implib,$(top_builddir)/src/libvlc.dll.a
-else
-OBJECTS_libvlc_so = $(libvlc_pic_a_OBJECTS)
-endif
 endif
 
 libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
@@ -221,11 +206,13 @@ libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 	  c|*)  ld="$(LINK)" ;; \
 	esac ; \
 	echo $$ld $(OBJECTS_libvlc_so) $(LDFLAGS_libvlc_so) $$ldfl; \
-	$$ld $(OBJECTS_libvlc_so) $(LDFLAGS_libvlc_so) $$ldfl
+	$$ld $(libvlc_a_OBJECTS) \
+		-Wl,--out-implib,$(top_builddir)/src/libvlc.dll.a $$ldfl
 # It sucks big time, but we have to do that to link vlc properly
 # on non-PIC OSes, otherwise ld will favor builtins-less libvlc.a over
 # libvlc$(LIBEXT)
 	rm -f libvlc.a
+endif
 
 EXTRA_DIST += \
 	$(SOURCES_libvlc_beos) \

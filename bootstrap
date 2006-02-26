@@ -226,15 +226,7 @@ LTLIBVLC = \$(top_builddir)/src/libvlc.la
 
 if BUILD_SHARED
 LIBVLC = \$(top_builddir)/src/libvlc\$(LIBEXT)
-if HAVE_WIN32
 LIBADD = \$(LIBVLC)
-endif
-if HAVE_WINCE
-LIBADD = \$(LIBVLC)
-endif
-if HAVE_DARWIN
-LIBADD = \$(LIBVLC)
-endif
 endif
 
 all: all-modules
