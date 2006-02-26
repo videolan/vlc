@@ -1,7 +1,7 @@
 /*****************************************************************************
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 the VideoLAN team
+ * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -34,12 +34,9 @@
 #include <vlc/vout.h>
 
 #include "filter_common.h"
+#include "vlc_image.h"
 
-#define DISTORT_MODE_WAVE     1
-#define DISTORT_MODE_RIPPLE   2
-#define DISTORT_MODE_GRADIENT 3
-#define DISTORT_MODE_EDGE     4
-#define DISTORT_MODE_HOUGH    5
+enum { WAVE, RIPPLE, GRADIENT, EDGE, HOUGH, PSYCHEDELIC };
 
 /*****************************************************************************
  * Local prototypes
@@ -56,6 +53,7 @@ static void DistortRipple  ( vout_thread_t *, picture_t *, picture_t * );
 static void DistortGradient( vout_thread_t *, picture_t *, picture_t * );
 static void DistortEdge    ( vout_thread_t *, picture_t *, picture_t * );
 static void DistortHough   ( vout_thread_t *, picture_t *, picture_t * );
+static void DistortPsychedelic( vout_thread_t *, picture_t *, picture_t * );
 
 static int  SendEvents   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -64,7 +62,7 @@ static int  SendEvents   ( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define MODE_TEXT N_("Distort mode")
-#define MODE_LONGTEXT N_("Distort mode, one of \"wave\", \"ripple\", \"gradient\" and \"edge\"")
+#define MODE_LONGTEXT N_("Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" and \"psychedelic\"")
 
 #define GRADIENT_TEXT N_("Gradient image type")
 #define GRADIENT_LONGTEXT N_("Gradient image type (0 or 1)")
@@ -72,8 +70,10 @@ static int  SendEvents   ( vlc_object_t *, char const *,
 #define CARTOON_TEXT N_("Apply cartoon effect")
 #define CARTOON_LONGTEXT N_("Apply cartoon effect. Used by \"gradient\" and \"edge\".")
 
-static char *mode_list[] = { "wave", "ripple", "gradient", "edge", "hough" };
-static char *mode_list_text[] = { N_("Wave"), N_("Ripple"), N_("gradient"),  N_("Edge"), N_("Hough") };
+static char *mode_list[] = { "wave", "ripple", "gradient", "edge", "hough",
+                             "psychedelic" };
+static char *mode_list_text[] = { N_("Wave"), N_("Ripple"), N_("Gradient"),
+                                  N_("Edge"), N_("Hough"), N_("Psychedelic") };
 
 vlc_module_begin();
     set_description( _("Distort video filter") );
@@ -114,6 +114,13 @@ struct vout_sys_t
     int i_gradient_type;
     vlc_bool_t b_cartoon;
 
+    /* For pyschedelic mode */
+    image_handler_t *p_image;
+    unsigned int x, y, scale;
+    int xinc, yinc, scaleinc;
+    uint8_t u,v;
+
+    /* For hough mode */
     int *p_pre_hough;
 };
 
@@ -151,42 +158,54 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_control = Control;
 
     p_vout->p_sys->i_mode = 0;
+    p_vout->p_sys->p_pre_hough = NULL;
 
     if( !(psz_method = psz_method_tmp
           = config_GetPsz( p_vout, "distort-mode" )) )
     {
         msg_Err( p_vout, "configuration variable %s empty, using 'wave'",
                          "distort-mode" );
-        p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
+        p_vout->p_sys->i_mode = WAVE;
     }
     else
     {
-
         if( !strcmp( psz_method, "wave" ) )
         {
-            p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
+            p_vout->p_sys->i_mode = WAVE;
         }
         else if( !strcmp( psz_method, "ripple" ) )
         {
-            p_vout->p_sys->i_mode = DISTORT_MODE_RIPPLE;
+            p_vout->p_sys->i_mode = RIPPLE;
         }
         else if( !strcmp( psz_method, "gradient" ) )
         {
-            p_vout->p_sys->i_mode = DISTORT_MODE_GRADIENT;
+            p_vout->p_sys->i_mode = GRADIENT;
         }
         else if( !strcmp( psz_method, "edge" ) )
         {
-            p_vout->p_sys->i_mode = DISTORT_MODE_EDGE;
+            p_vout->p_sys->i_mode = EDGE;
         }
         else if( !strcmp( psz_method, "hough" ) )
         {
-            p_vout->p_sys->i_mode = DISTORT_MODE_HOUGH;
+            p_vout->p_sys->i_mode = HOUGH;
+        }
+        else if( !strcmp( psz_method, "psychedelic" ) )
+        {
+            p_vout->p_sys->i_mode = PSYCHEDELIC;
+            p_vout->p_sys->x = 10;
+            p_vout->p_sys->y = 10;
+            p_vout->p_sys->scale = 1;
+            p_vout->p_sys->xinc = 1;
+            p_vout->p_sys->yinc = 1;
+            p_vout->p_sys->scaleinc = 1;
+            p_vout->p_sys->u = 0;
+            p_vout->p_sys->v = 0;
         }
         else
         {
             msg_Err( p_vout, "no valid distort mode provided, "
                              "using wave" );
-            p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
+            p_vout->p_sys->i_mode = WAVE;
         }
     }
     free( psz_method_tmp );
@@ -195,8 +214,6 @@ static int Create( vlc_object_t *p_this )
         config_GetInt( p_vout, "distort-gradient-type" );
     p_vout->p_sys->b_cartoon =
         config_GetInt( p_vout, "distort-cartoon" );
-
-    p_vout->p_sys->p_pre_hough = NULL;
 
     return VLC_SUCCESS;
 }
@@ -241,6 +258,8 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->f_angle = 0.0;
     p_vout->p_sys->last_date = 0;
 
+    p_vout->p_sys->p_image = NULL;
+
     return VLC_SUCCESS;
 }
 
@@ -280,6 +299,9 @@ static void Destroy( vlc_object_t *p_this )
     if(p_vout->p_sys->p_pre_hough)
         free(p_vout->p_sys->p_pre_hough);
 
+    if( p_vout->p_sys->p_image )
+        image_HandlerDelete( p_vout->p_sys->p_image );
+
     free( p_vout->p_sys );
 }
 
@@ -309,23 +331,28 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( p_vout->p_sys->i_mode )
     {
-        case DISTORT_MODE_WAVE:
+        case WAVE:
             DistortWave( p_vout, p_pic, p_outpic );
             break;
 
-        case DISTORT_MODE_RIPPLE:
+        case RIPPLE:
             DistortRipple( p_vout, p_pic, p_outpic );
             break;
 
-        case DISTORT_MODE_EDGE:
+        case EDGE:
             DistortEdge( p_vout, p_pic, p_outpic );
             break;
 
-        case DISTORT_MODE_GRADIENT:
+        case GRADIENT:
             DistortGradient( p_vout, p_pic, p_outpic );
             break;
-        case DISTORT_MODE_HOUGH:
+
+        case HOUGH:
             DistortHough( p_vout, p_pic, p_outpic );
+            break;
+
+        case PSYCHEDELIC:
+            DistortPsychedelic( p_vout, p_pic, p_outpic );
             break;
 
         default:
@@ -483,47 +510,24 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
 }
 
 /*****************************************************************************
- * DistortGradient: Sobel
+ * Gaussian Convolution
+ *****************************************************************************
+ *    Gaussian convolution ( sigma == 1.4 )
+ *
+ *    |  2  4  5  4  2  |   |  2  4  4  4  2 |
+ *    |  4  9 12  9  4  |   |  4  8 12  8  4 |
+ *    |  5 12 15 12  5  | ~ |  4 12 16 12  4 |
+ *    |  4  9 12  9  4  |   |  4  8 12  8  4 |
+ *    |  2  4  5  4  2  |   |  2  4  4  4  2 |
  *****************************************************************************/
-static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
-                                                  picture_t *p_outpic )
+static void GaussianConvolution( picture_t *p_inpic, uint32_t *p_smooth )
 {
-    int x, y;
+    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
     int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
-    int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
     int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
-    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
-    uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
-
-    uint32_t *p_smooth = (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
-    
-    if( !p_smooth ) return;
-
-    if( p_vout->p_sys->b_cartoon )
-    {
-        memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
-            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
-            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
-    }
-    else
-    {
-        memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
-            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
-            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
-    }
-
-    /* Gaussian convolution ( sigma == 1.4 )
-
-     |  2  4  5  4  2  |   |  2  4  4  4  2 |
-     |  4  9 12  9  4  |   |  4  8 12  8  4 |
-     |  5 12 15 12  5  | ~ |  4 12 16 12  4 |
-     |  4  9 12  9  4  |   |  4  8 12  8  4 |
-     |  2  4  5  4  2  |   |  2  4  4  4  2 | */
-
+    int x,y;
     for( y = 2; y < i_num_lines - 2; y++ )
     {
         for( x = 2; x < i_src_visible - 2; x++ )
@@ -562,6 +566,45 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
               ) >> 7 /* 115 */;
         }
     }
+}
+
+/*****************************************************************************
+ * DistortGradient: Sobel
+ *****************************************************************************/
+static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
+                                                  picture_t *p_outpic )
+{
+    int x, y;
+    int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
+    int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
+    int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
+    int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
+
+    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
+
+    uint32_t *p_smooth = (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+
+    if( !p_smooth ) return;
+
+    if( p_vout->p_sys->b_cartoon )
+    {
+        p_vout->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
+            p_inpic->p[U_PLANE].p_pixels,
+            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
+        p_vout->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
+            p_inpic->p[V_PLANE].p_pixels,
+            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+    }
+    else
+    {
+        p_vout->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+            p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
+        p_vout->p_vlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
+            p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
+    }
+
+    GaussianConvolution( p_inpic, p_smooth );
 
     /* Sobel gradient
 
@@ -576,15 +619,21 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
             uint32_t a =
             (
               abs(
-                ((p_smooth[(y-1)*i_src_visible+x] - p_smooth[(y+1)*i_src_visible+x])<<1)
-               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x-1])
-               + (p_smooth[(y-1)*i_src_visible+x+1] - p_smooth[(y+1)*i_src_visible+x+1])
+                ( ( p_smooth[(y-1)*i_src_visible+x]
+                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
+               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                   - p_smooth[(y+1)*i_src_visible+x-1] )
+               + ( p_smooth[(y-1)*i_src_visible+x+1]
+                   - p_smooth[(y+1)*i_src_visible+x+1] )
               )
             +
               abs(
-                ((p_smooth[y*i_src_visible+x-1] - p_smooth[y*i_src_visible+x+1])<<1)
-               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y-1)*i_src_visible+x+1])
-               + (p_smooth[(y+1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x+1])
+                ( ( p_smooth[y*i_src_visible+x-1]
+                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
+               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                   - p_smooth[(y-1)*i_src_visible+x+1] )
+               + ( p_smooth[(y+1)*i_src_visible+x-1]
+                   - p_smooth[(y+1)*i_src_visible+x+1] )
               )
             );
             if( p_vout->p_sys->i_gradient_type )
@@ -628,7 +677,7 @@ static void DistortGradient( vout_thread_t *p_vout, picture_t *p_inpic,
             }
         }
     }
-    
+
     if( p_smooth ) free( p_smooth );
 }
 
@@ -660,75 +709,32 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
     uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
-    uint32_t *p_smooth = malloc( i_num_lines * i_src_visible *sizeof(uint32_t) );
-    uint32_t *p_grad = malloc( i_num_lines * i_src_visible *sizeof(uint32_t) );
-    uint8_t *p_theta = malloc( i_num_lines * i_src_visible *sizeof(uint8_t) );
-    
+    uint32_t *p_smooth = malloc( i_num_lines*i_src_visible * sizeof(uint32_t) );
+    uint32_t *p_grad = malloc( i_num_lines*i_src_visible *sizeof(uint32_t) );
+    uint8_t *p_theta = malloc( i_num_lines*i_src_visible *sizeof(uint8_t) );
+
     if( !p_smooth || !p_grad || !p_theta ) return;
-    
+
     if( p_vout->p_sys->b_cartoon )
     {
-        memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
+        p_vout->p_vlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
+            p_inpic->p[U_PLANE].p_pixels,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-        memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
+        p_vout->p_vlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
+            p_inpic->p[V_PLANE].p_pixels,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
     else
     {
-        memset( p_outpic->p[Y_PLANE].p_pixels, 0xff,
+        p_vout->p_vlc->pf_memset( p_outpic->p[Y_PLANE].p_pixels, 0xff,
               p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-        memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
+        p_vout->p_vlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
             p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
         memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
             p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
     }
 
-    /* Gaussian convolution ( sigma == 1.4 )
-
-     |  2  4  5  4  2  |   |  2  4  4  4  2 |
-     |  4  9 12  9  4  |   |  4  8 12  8  4 |
-     |  5 12 15 12  5  | ~ |  4 12 16 12  4 |
-     |  4  9 12  9  4  |   |  4  8 12  8  4 |
-     |  2  4  5  4  2  |   |  2  4  4  4  2 | */
-
-    for( y = 2; y < i_num_lines - 2; y++ )
-    {
-        for( x = 2; x < i_src_visible - 2; x++ )
-        {
-            p_smooth[y*i_src_visible+x] = (uint32_t)((
-              /* 2 rows up */
-                ( p_inpix[(y-2)*i_src_pitch+x-2]<<1 )
-              + ( p_inpix[(y-2)*i_src_pitch+x-1]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x+1]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x+2]<<1 )
-              /* 1 row up */
-              + ( p_inpix[(y-1)*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
-              + ( p_inpix[(y-1)*i_src_pitch+x]*12 )
-              + ( p_inpix[(y-1)*i_src_pitch+x+1]<<3 )
-              + ( p_inpix[(y-1)*i_src_pitch+x+2]<<2 )
-              /* */
-              + ( p_inpix[y*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[y*i_src_pitch+x-1]*12 )
-              + ( p_inpix[y*i_src_pitch+x]<<4 )
-              + ( p_inpix[y*i_src_pitch+x+1]*12 )
-              + ( p_inpix[y*i_src_pitch+x+2]<<2 )
-              /* 1 row down */
-              + ( p_inpix[(y+1)*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[(y+1)*i_src_pitch+x-1]<<3 )
-              + ( p_inpix[(y+1)*i_src_pitch+x]*12 )
-              + ( p_inpix[(y+1)*i_src_pitch+x+1]<<3 )
-              + ( p_inpix[(y+1)*i_src_pitch+x+2]<<2 )
-              /* 2 rows down */
-              + ( p_inpix[(y+2)*i_src_pitch+x-2]<<1 )
-              + ( p_inpix[(y+2)*i_src_pitch+x-1]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x+1]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x+2]<<1 )
-              ) >> 7) /* 115 */;
-        }
-    }
+    GaussianConvolution( p_inpic, p_smooth );
 
     /* Sobel gradient
 
@@ -740,17 +746,24 @@ static void DistortEdge( vout_thread_t *p_vout, picture_t *p_inpic,
     {
         for( x = 1; x < i_src_visible - 1; x++ )
         {
-        
-            int gradx =
-                ((p_smooth[(y-1)*i_src_visible+x] - p_smooth[(y+1)*i_src_visible+x])<<1)
-               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x-1])
-               + (p_smooth[(y-1)*i_src_visible+x+1] - p_smooth[(y+1)*i_src_visible+x+1]);
-            int grady =
-                ((p_smooth[y*i_src_visible+x-1] - p_smooth[y*i_src_visible+x+1])<<1)
-               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y-1)*i_src_visible+x+1])
-               + (p_smooth[(y+1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x+1]);
 
-            p_grad[y*i_src_visible+x] = (uint32_t) (abs( gradx ) + abs( grady ));
+            int gradx =
+                ( ( p_smooth[(y-1)*i_src_visible+x]
+                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
+               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                   - p_smooth[(y+1)*i_src_visible+x-1] )
+               + ( p_smooth[(y-1)*i_src_visible+x+1]
+                   - p_smooth[(y+1)*i_src_visible+x+1] );
+            int grady =
+                ( ( p_smooth[y*i_src_visible+x-1]
+                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
+               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                   - p_smooth[(y-1)*i_src_visible+x+1] )
+               + ( p_smooth[(y+1)*i_src_visible+x-1]
+                   - p_smooth[(y+1)*i_src_visible+x+1] );
+
+            p_grad[y*i_src_visible+x] = (uint32_t)(abs( gradx ) + abs( grady ));
+
             /* tan( 22.5 ) = 0,414213562 .. * 128 = 53
              * tan( 26,565051177 ) = 0.5
              * tan( 45 + 22.5 ) = 2,414213562 .. * 128 = 309
@@ -839,12 +852,10 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
                                                   picture_t *p_outpic )
 {
     int x, y, i;
-    int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
     int i_src_visible = p_inpic->p[Y_PLANE].i_visible_pitch;
     int i_dst_pitch = p_outpic->p[Y_PLANE].i_pitch;
     int i_num_lines = p_inpic->p[Y_PLANE].i_visible_lines;
 
-    uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     uint8_t *p_outpix = p_outpic->p[Y_PLANE].p_pixels;
 
     int i_diag = sqrt( i_num_lines * i_num_lines +
@@ -857,13 +868,13 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
     uint32_t *p_smooth;
     int *p_hough = malloc( i_diag * i_nb_steps * sizeof(int) );
     if( ! p_hough ) return;
-    p_smooth = (uint32_t *)malloc( i_num_lines * i_src_visible * sizeof(uint32_t));
+    p_smooth = (uint32_t *)malloc( i_num_lines*i_src_visible*sizeof(uint32_t));
     if( !p_smooth ) return;
 
     if( ! p_pre_hough )
     {
         msg_Dbg(p_vout, "Starting precalculation");
-        p_pre_hough = malloc( i_num_lines * i_src_visible * i_nb_steps * sizeof(int) );
+        p_pre_hough = malloc( i_num_lines*i_src_visible*i_nb_steps*sizeof(int));
         if( ! p_pre_hough ) return;
         for( i = 0 ; i < i_nb_steps ; i++)
         {
@@ -880,63 +891,18 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
     }
 
     memset( p_hough, 0, i_diag * i_nb_steps * sizeof(int) );
-//    memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
-//        p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-//    memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
-//        p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
-    memcpy( p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
+
+    p_vout->p_vlc->pf_memcpy(
+        p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
         p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
-    memcpy( p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
+    p_vout->p_vlc->pf_memcpy(
+        p_outpic->p[U_PLANE].p_pixels, p_inpic->p[U_PLANE].p_pixels,
         p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-    memcpy( p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
+    p_vout->p_vlc->pf_memcpy(
+        p_outpic->p[V_PLANE].p_pixels, p_inpic->p[V_PLANE].p_pixels,
         p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
 
-    /* Gaussian convolution ( sigma == 1.4 )
-
-     |  2  4  5  4  2  |   |  2  4  4  4  2 |
-     |  4  9 12  9  4  |   |  4  8 12  8  4 |
-     |  5 12 15 12  5  | ~ |  4 12 16 12  4 |
-     |  4  9 12  9  4  |   |  4  8 12  8  4 |
-     |  2  4  5  4  2  |   |  2  4  4  4  2 | */
-
-    for( y = 2; y < i_num_lines - 2; y++ )
-    {
-        for( x = 2; x < i_src_visible - 2; x++ )
-        {
-            p_smooth[y*i_src_visible+x] = (uint32_t)((
-              /* 2 rows up */
-                ( p_inpix[(y-2)*i_src_pitch+x-2]<<1 )
-              + ( p_inpix[(y-2)*i_src_pitch+x-1]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x+1]<<2 )
-              + ( p_inpix[(y-2)*i_src_pitch+x+2]<<1 )
-              /* 1 row up */
-              + ( p_inpix[(y-1)*i_src_pitch+x-1]<<3 )
-              + ( p_inpix[(y-1)*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[(y-1)*i_src_pitch+x]*12 )
-              + ( p_inpix[(y-1)*i_src_pitch+x+1]<<3 )
-              + ( p_inpix[(y-1)*i_src_pitch+x+2]<<2 )
-              /* */
-              + ( p_inpix[y*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[y*i_src_pitch+x-1]*12 )
-              + ( p_inpix[y*i_src_pitch+x]<<4 )
-              + ( p_inpix[y*i_src_pitch+x+1]*12 )
-              + ( p_inpix[y*i_src_pitch+x+2]<<2 )
-              /* 1 row down */
-              + ( p_inpix[(y+1)*i_src_pitch+x-2]<<2 )
-              + ( p_inpix[(y+1)*i_src_pitch+x-1]<<3 )
-              + ( p_inpix[(y+1)*i_src_pitch+x]*12 )
-              + ( p_inpix[(y+1)*i_src_pitch+x+1]<<3 )
-              + ( p_inpix[(y+1)*i_src_pitch+x+2]<<2 )
-              /* 2 rows down */
-              + ( p_inpix[(y+2)*i_src_pitch+x-2]<<1 )
-              + ( p_inpix[(y+2)*i_src_pitch+x-1]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x+1]<<2 )
-              + ( p_inpix[(y+2)*i_src_pitch+x+2]<<1 )
-              ) >> 7) /* 115 */;
-        }
-    }
+    GaussianConvolution( p_inpic, p_smooth );
 
     /* Sobel gradient
 
@@ -954,15 +920,21 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
             uint32_t a =
             (
               abs(
-                ((p_smooth[(y-1)*i_src_visible+x] - p_smooth[(y+1)*i_src_visible+x])<<1)
-               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x-1])
-               + (p_smooth[(y-1)*i_src_visible+x+1] - p_smooth[(y+1)*i_src_visible+x+1])
+                ( ( p_smooth[(y-1)*i_src_visible+x]
+                    - p_smooth[(y+1)*i_src_visible+x] ) <<1 )
+               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                   - p_smooth[(y+1)*i_src_visible+x-1] )
+               + ( p_smooth[(y-1)*i_src_visible+x+1]
+                   - p_smooth[(y+1)*i_src_visible+x+1] )
               )
             +
               abs(
-                ((p_smooth[y*i_src_visible+x-1] - p_smooth[y*i_src_visible+x+1])<<1)
-               + (p_smooth[(y-1)*i_src_visible+x-1] - p_smooth[(y-1)*i_src_visible+x+1])
-               + (p_smooth[(y+1)*i_src_visible+x-1] - p_smooth[(y+1)*i_src_visible+x+1])
+                ( ( p_smooth[y*i_src_visible+x-1]
+                    - p_smooth[y*i_src_visible+x+1] ) <<1 )
+               + ( p_smooth[(y-1)*i_src_visible+x-1]
+                   - p_smooth[(y-1)*i_src_visible+x+1] )
+               + ( p_smooth[(y+1)*i_src_visible+x-1]
+                   - p_smooth[(y+1)*i_src_visible+x+1] )
               )
             );
             if( a>>8 )
@@ -997,6 +969,113 @@ static void DistortHough( vout_thread_t *p_vout, picture_t *p_inpic,
     if( p_smooth ) free( p_smooth );
 }
 #undef p_pre_hough
+
+/*****************************************************************************
+ * DistortPsychedelic
+ *****************************************************************************/
+static void DistortPsychedelic( vout_thread_t *p_vout, picture_t *p_inpic,
+                                                  picture_t *p_outpic )
+{
+    unsigned int w, h;
+    int x,y;
+    uint8_t u,v;
+
+    video_format_t fmt_out = {0};
+    picture_t *p_converted;
+
+    if( !p_vout->p_sys->p_image )
+        p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
+
+    /* chrominance */
+    u = p_vout->p_sys->u;
+    v = p_vout->p_sys->v;
+    for( y = 0; y<p_outpic->p[U_PLANE].i_lines; y++)
+    {
+        memset( p_outpic->p[U_PLANE].p_pixels+y*p_outpic->p[U_PLANE].i_pitch,
+                u, p_outpic->p[U_PLANE].i_pitch );
+        memset( p_outpic->p[V_PLANE].p_pixels+y*p_outpic->p[V_PLANE].i_pitch,
+                v, p_outpic->p[V_PLANE].i_pitch );
+        if( v == 0 && u != 0 )
+            u --;
+        else if( u == 0xff )
+            v --;
+        else if( v == 0xff )
+            u ++;
+        else if( u == 0 )
+            v ++;
+    }
+
+    /* luminance */
+    p_vout->p_vlc->pf_memcpy(
+                p_outpic->p[Y_PLANE].p_pixels, p_inpic->p[Y_PLANE].p_pixels,
+                p_outpic->p[Y_PLANE].i_lines * p_outpic->p[Y_PLANE].i_pitch );
+
+
+    /* image visualization */
+    fmt_out = p_vout->fmt_out;
+    fmt_out.i_width = p_vout->render.i_width*p_vout->p_sys->scale/150;
+    fmt_out.i_height = p_vout->render.i_height*p_vout->p_sys->scale/150;
+    p_converted = image_Convert( p_vout->p_sys->p_image, p_inpic,
+                                 &(p_inpic->format), &fmt_out );
+
+#define copyimage( plane, b ) \
+    for( y=0; y<p_converted->p[plane].i_visible_lines; y++) { \
+    for( x=0; x<p_converted->p[plane].i_visible_pitch; x++) { \
+        int nx, ny; \
+        if( p_vout->p_sys->yinc == 1 ) \
+            ny= y; \
+        else \
+            ny = p_converted->p[plane].i_visible_lines-y; \
+        if( p_vout->p_sys->xinc == 1 ) \
+            nx = x; \
+        else \
+            nx = p_converted->p[plane].i_visible_pitch-x; \
+        p_outpic->p[plane].p_pixels[(p_vout->p_sys->x*b+nx)+(ny+p_vout->p_sys->y*b)*p_outpic->p[plane].i_pitch ] = p_converted->p[plane].p_pixels[y*p_converted->p[plane].i_pitch+x]; \
+    } }
+    copyimage( Y_PLANE, 2 );
+    copyimage( U_PLANE, 1 );
+    copyimage( V_PLANE, 1 );
+#undef copyimage
+
+    p_converted->pf_release( p_converted );
+
+    p_vout->p_sys->x += p_vout->p_sys->xinc;
+    p_vout->p_sys->y += p_vout->p_sys->yinc;
+
+    p_vout->p_sys->scale += p_vout->p_sys->scaleinc;
+    if( p_vout->p_sys->scale >= 50 ) p_vout->p_sys->scaleinc = -1;
+    if( p_vout->p_sys->scale <= 1 ) p_vout->p_sys->scaleinc = 1;
+
+    w = p_vout->render.i_width*p_vout->p_sys->scale/150;
+    h = p_vout->render.i_height*p_vout->p_sys->scale/150;
+    if( p_vout->p_sys->x*2 + w >= p_vout->render.i_width )
+        p_vout->p_sys->xinc = -1;
+    if( p_vout->p_sys->x <= 0 )
+        p_vout->p_sys->xinc = 1;
+
+    if( p_vout->p_sys->x*2 + w >= p_vout->render.i_width )
+        p_vout->p_sys->x = (p_vout->render.i_width-w)/2;
+    if( p_vout->p_sys->y*2 + h >= p_vout->render.i_height )
+        p_vout->p_sys->y = (p_vout->render.i_height-h)/2;
+
+    if( p_vout->p_sys->y*2 + h >= p_vout->render.i_height )
+        p_vout->p_sys->yinc = -1;
+    if( p_vout->p_sys->y <= 0 )
+        p_vout->p_sys->yinc = 1;
+
+    for( y = 0; y< 16; y++ )
+    {
+        if( p_vout->p_sys->v == 0 && p_vout->p_sys->u != 0 )
+            p_vout->p_sys->u -= 1;
+        else if( p_vout->p_sys->u == 0xff )
+            p_vout->p_sys->v -= 1;
+        else if( p_vout->p_sys->v == 0xff )
+            p_vout->p_sys->u += 1;
+        else if( p_vout->p_sys->u == 0 )
+            p_vout->p_sys->v += 1;
+    }
+}
+
 
 /*****************************************************************************
  * SendEvents: forward mouse and keyboard events to the parent p_vout
