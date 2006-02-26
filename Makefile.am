@@ -202,7 +202,7 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 
 bin_PROGRAMS = vlc
 
-vlc_SOURCES = src/vlc.c
+vlc_SOURCES = vlc.c
 # Ugly kludge so that automake defines $(CXXLINK)
 EXTRA_vlc_SOURCES = extras/zsh.cpp
 
