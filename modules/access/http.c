@@ -35,6 +35,7 @@
 #include "vlc_playlist.h"
 #include "vlc_meta.h"
 #include "network.h"
+#include "vlc_url.h"
 #include "vlc_tls.h"
 
 /*****************************************************************************

@@ -52,6 +52,7 @@
 
 #include "vlc_error.h"
 #include "network.h"
+#include "vlc_url.h"
 
 #if defined(AF_UNIX) && !defined(AF_LOCAL)
 #    define AF_LOCAL AF_UNIX

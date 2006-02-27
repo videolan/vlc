@@ -30,11 +30,8 @@
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
 
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#endif
-
 #include "network.h"
+#include "vlc_url.h"
 
 /*****************************************************************************
  * Module descriptor

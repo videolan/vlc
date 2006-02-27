@@ -36,6 +36,7 @@
 #include "vlc_httpd.h"
 #include "vlc_vod.h"
 #include "network.h"
+#include "vlc_url.h"
 
 /*****************************************************************************
  * Module descriptor

@@ -32,6 +32,7 @@
 #include "vlc_playlist.h"
 
 #include "network.h"
+#include "vlc_url.h"
 #include "asf.h"
 #include "buffer.h"
 

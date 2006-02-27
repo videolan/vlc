@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "http.h"
+#include "vlc_url.h"
 
 static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
                                    const char *psz_object,
