@@ -2,7 +2,7 @@
 
 ########################################################################
 # VLC demo command line generator
-# $Id:$
+# $Id$
 ########################################################################
 
 #TODO: change on Max OS X
@@ -28,6 +28,7 @@ gradient()
 setup a input $input
 setup a output #duplicate{dst=mosaic-bridge,select=video}
 control a play" > "`pwd`/demo.vlm"
+  echo "VLM batch file saved to `pwd`/demo.vlm"
   echo -e "\n$VLC --sub-filter mosaic:marq:logo --mosaic-width 120 --mosaic-height 90 --mosaic-cols 1 --mosaic-rows 1 --marq-position 8 --marq-size 30 --marq-color 65280 --marq-marquee \"VLC - Gradient video filter\" --logo-file $logofile --vout-filter distort --distort-mode gradient --extraintf telnet --telnet-host localhost --vlm-conf `pwd`/demo.vlm $input"
 }
 
@@ -42,7 +43,8 @@ mosaic()
 setup a input $vid
 setup a output #duplicate{dst=mosaic-bridge,select=video}
 control a play" > "`pwd`/demo.vlm"
-  echo -e "\n$VLC --sub-filter mosaic --mosaic-height 90 --mosaic-width 120 --mosaic-rows 1 --mosaic-cols 1 --mosaic-alpha 150 --extraintf telnet --telnet-host localhost --vlm-conf `pwd`/demo.vlm $bg"
+  echo "VLM batch file saved to `pwd`/demo.vlm"
+  echo -e "\n$VLC --sub-filter mosaic:marq --marq-marque \"VLC - mosaic\" --marq-position 6 --mosaic-width 120 --mosaic-height 90 --mosaic-rows 1 --mosaic-cols 1 --mosaic-alpha 150 --extraintf telnet --telnet-host localhost --vlm-conf `pwd`/demo.vlm $bg"
 }
 
 cat << EOF
