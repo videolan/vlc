@@ -84,6 +84,8 @@ axvlc$(LIBEXT): $(libaxvlc_a_OBJECTS) \
 	-Wl,--enable-stdcall-fixup $(srcdir)/axvlc.def \
 	  $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LDFLAGS_activex) \
 	  $(INCLUDED_LIBINTL)
+# Cygwin work-around
+	@if test -f "$@.exe"; then mv "$@.exe" "$@"; fi
 
 
 DATA_axvlc_tlb = $(axvlc_tlb_DATA)

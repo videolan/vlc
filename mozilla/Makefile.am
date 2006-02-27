@@ -128,6 +128,8 @@ libnpvlc_a_DEPENDENCIES = $(DATA_npvlc_rc)
 $(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(libnpvlc_a_OBJECTS) $(DATA_npvlc_rc) \
 	 $(LDFLAGS_libnpvlc)
+# Cygwin work-around
+	@if test -f "$@.exe"; then mv "$@.exe" "$@"; fi
 
 vlcintf_xptdir = $(libdir)/mozilla/components
 vlcintf.xpt: vlcintf.idl

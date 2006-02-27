@@ -212,6 +212,8 @@ libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 # on non-PIC OSes, otherwise ld will favor builtins-less libvlc.a over
 # libvlc$(LIBEXT)
 	rm -f libvlc.a
+# Cygwin work-around
+	@if test -f "$@.exe"; then mv "$@.exe" "$@"; fi
 endif
 
 EXTRA_DIST += \

@@ -259,6 +259,10 @@ _plugin.a_plugin\$(LIBEXT):
 	esac ; \
 	echo \$\$ld \$< \$\$ldfl ; \
 	\$\$ld \$< \$\$ldfl
+#ifneq (,\$(findstring cygwin,\$(host)))
+#	mv "$@.exe" "$@"
+#endif
+	@if test -f "$@.exe"; then mv "$@.exe" $@; fi
 
 if MAINTAINER_MODE
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
