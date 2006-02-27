@@ -353,7 +353,7 @@ gnutls_BeginHandshake( tls_session_t *p_session, int fd,
 
     p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
-    gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
+    gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)(unsigned long)fd);
 
     if( psz_hostname != NULL )
     {
