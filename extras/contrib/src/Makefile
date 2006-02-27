@@ -407,9 +407,8 @@ ifdef HAVE_DARWIN_OS
 endif
 
 ifdef HAVE_DARWIN_OS
-.iconv: libiconv
+.iconv:
 	touch $@
-	(cd libiconv; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 else
 .iconv: libiconv
 	(cd libiconv; CPPFLAGS="-Dssize_t=long" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
