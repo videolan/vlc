@@ -33,7 +33,7 @@
 #include <stdio.h>
 
 #include "charset.h"
-#include "network.h"
+#include "vlc_url.h"
 
 /*****************************************************************************
  * Module descriptor
