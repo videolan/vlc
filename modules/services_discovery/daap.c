@@ -29,7 +29,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#include "network.h"
+#include "vlc_url.h"
 
 #include <vlc/input.h>
 
