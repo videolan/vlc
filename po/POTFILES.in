@@ -79,6 +79,7 @@ src/audio_output/filters.c
 src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
+src/control/libvlc_audio.c
 src/control/libvlc_core.c
 src/control/libvlc_input.c
 src/control/libvlc_playlist.c
@@ -165,7 +166,6 @@ src/video_output/vout_pictures.c
 src/video_output/vout_pictures.h
 src/video_output/vout_subpictures.c
 src/video_output/vout_synchro.c
-src/vlc.c
 
 # modules
 modules/access/cdda.c

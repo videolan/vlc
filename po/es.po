@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-21 09:47+0100\n"
+"POT-Creation-Date: 2006-02-27 11:04+0100\n"
 "PO-Revision-Date: 2005-06-19 06:49+0100\n"
 "Last-Translator: \n"
 "Language-Team: Spanish-English\n"
@@ -71,8 +71,8 @@ msgstr "Opciones de teclas rápidas"
 #: include/vlc_config_cat.h:51 src/input/es_out.c:1588 src/libvlc.h:1051
 #: modules/gui/beos/InterfaceWindow.cpp:280 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:535 modules/gui/macosx/output.m:170
-#: modules/gui/macosx/wizard.m:419
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
+#: modules/gui/macosx/wizard.m:420
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:337
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:856
 #: modules/gui/wxwidgets/extrapanel.cpp:180 modules/stream_out/transcode.c:214
 msgid "Audio"
@@ -113,7 +113,7 @@ msgid "These are general settings for audio output modules."
 msgstr "Éstas son opciones generales para módulos de salida de audio"
 
 #: include/vlc_config_cat.h:68 src/libvlc.h:1369 src/libvlc.h:1407
-#: src/libvlc.h:1452 modules/gui/wxwidgets/menus.cpp:311
+#: src/libvlc.h:1452 modules/gui/wxwidgets/menus.cpp:313
 #: modules/stream_out/transcode.c:243
 msgid "Miscellaneous"
 msgstr "Miscelánea"
@@ -124,8 +124,8 @@ msgstr "Opciones varias de audio y módulos"
 
 #: include/vlc_config_cat.h:72 src/input/es_out.c:1610 src/libvlc.h:1086
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:548
-#: modules/gui/macosx/output.m:160 modules/gui/macosx/wizard.m:420
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
+#: modules/gui/macosx/output.m:160 modules/gui/macosx/wizard.m:421
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:291
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:817
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/misc/dummy/dummy.c:97
 #: modules/stream_out/transcode.c:174
@@ -509,14 +509,14 @@ msgstr "Meta-información"
 #: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:53
 #: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:530
 #: modules/gui/macosx/intf.m:531 modules/gui/macosx/open.m:168
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/wizard.m:389
+#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/wizard.m:390
 #: modules/gui/wxwidgets/dialogs/open.cpp:756
 #: modules/gui/wxwidgets/dialogs/open.cpp:1652 modules/mux/asf.c:48
 msgid "Title"
 msgstr "Título"
 
 #: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:133
-#: modules/gui/macosx/playlistinfo.m:56 modules/gui/macosx/wizard.m:391
+#: modules/gui/macosx/playlistinfo.m:56 modules/gui/macosx/wizard.m:392
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:51
 msgid "Author"
 msgstr "Autor"
@@ -815,7 +815,7 @@ msgstr "Programa"
 msgid "Stream %d"
 msgstr "Volcado %d"
 
-#: src/input/es_out.c:1577 modules/gui/macosx/wizard.m:424
+#: src/input/es_out.c:1577 modules/gui/macosx/wizard.m:425
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:826
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:866
 msgid "Codec"
@@ -967,8 +967,8 @@ msgstr "Cambiar interfaz"
 msgid "Add Interface"
 msgstr "Añadir Interfaz"
 
-#: src/libvlc.c:327 src/libvlc.c:482 src/misc/modules.c:1680
-#: src/misc/modules.c:1984
+#: src/libvlc.c:327 src/libvlc.c:482 src/misc/modules.c:1682
+#: src/misc/modules.c:1986
 msgid "C"
 msgstr "es"
 
@@ -1017,14 +1017,12 @@ msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
 #: src/libvlc.c:2480
-#, c-format
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
 #: src/libvlc.c:2501
-#, c-format
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1116,10 +1114,11 @@ msgid "Chinese Traditional"
 msgstr "Chino Tradicional"
 
 #: src/libvlc.h:53
+#, fuzzy
 msgid ""
-"These options allow you to configure the interfaces used by VLC.\n"
-"You can select the main interface, additional interface modules, and define "
-"various related options."
+"These options allow you to configure the interfaces used by VLC. You can "
+"select the main interface, additional interface modules, and define various "
+"related options."
 msgstr ""
 "Estas opciones te permiten configurar las interfaces usadas por VLC.\n"
 "Puedes elegir la interfaz principal, módulos de interfaz adicionales, y "
@@ -1130,9 +1129,10 @@ msgid "Interface module"
 msgstr "Módulo de interfaz"
 
 #: src/libvlc.h:59
+#, fuzzy
 msgid ""
-"This option allows you to select the interface used by VLC.\n"
-"The default behavior is to automatically select the best module available."
+"This option allows you to select the interface used by VLC. The default "
+"behavior is to automatically select the best module available."
 msgstr ""
 "Esta opción te permite elegir la interfaz usada por VLC.\n"
 "El comportamiento por defecto es elegir automaticamente el mejor módulo "
@@ -1236,12 +1236,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:109
+#, fuzzy
 msgid ""
 "These options allow you to modify the behavior of the audio subsystem, and "
 "to add audio filters which can be used for post processing or visual effects "
-"(spectrum analyzer, etc.).\n"
-"Enable these filters here, and configure them in the \"audio filters\" "
-"modules section."
+"(spectrum analyzer, etc.). Enable these filters here, and configure them in "
+"the \"audio filters\" modules section."
 msgstr ""
 "Estas opciones permiten modificar el comportamiento del subsistema de audio, "
 "y añadir filtros de audio que pueden usarse para postproceso o efectos "
@@ -1846,7 +1846,7 @@ msgid "Default"
 msgstr "Por Defecto"
 
 #: src/libvlc.h:365 modules/gui/macosx/equalizer.m:144
-#: modules/gui/macosx/extended.m:106 modules/gui/macosx/wizard.m:393
+#: modules/gui/macosx/extended.m:106 modules/gui/macosx/wizard.m:394
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:625
 #: modules/gui/wxwidgets/extrapanel.cpp:218
 #: modules/gui/wxwidgets/extrapanel.cpp:467
@@ -1920,10 +1920,10 @@ msgid "Program to select"
 msgstr "Programas"
 
 #: src/libvlc.h:393
+#, fuzzy
 msgid ""
-"Choose the program to select by giving its Service ID.\n"
-"Only use this option if you want to read a multi-program stream (like DVB "
-"streams for example)."
+"Choose the program to select by giving its Service ID. Only use this option "
+"if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
 "Elige el programa a seleccionar dando su ID de Servicio.\n"
 "Sólo usa esta opción si deseas leer un volcado multi-programa (como volcados "
@@ -1935,10 +1935,11 @@ msgid "Programs to select"
 msgstr "Programas"
 
 #: src/libvlc.h:399
+#, fuzzy
 msgid ""
-"Choose the programs to select by giving a comma-separated list of SIDs.\n"
-"Only use this option if you want to read a multi-program stream (like DVB "
-"streams for example)."
+"Choose the programs to select by giving a comma-separated list of SIDs. Only "
+"use this option if you want to read a multi-program stream (like DVB streams "
+"for example)."
 msgstr ""
 "Elige los programas a seleccionar dando una lista de SIDs separados por "
 "comas.\n"
@@ -2544,9 +2545,10 @@ msgstr ""
 "intervalo fijo entre anuncios de SAP"
 
 #: src/libvlc.h:675
+#, fuzzy
 msgid ""
-"These options allow you to enable special CPU optimizations.\n"
-"You should always leave all these enabled."
+"These options allow you to enable special CPU optimizations. You should "
+"always leave all these enabled."
 msgstr ""
 "Estas opciones te permiten habilitar optimizaciones especiales de CPU.\n"
 "Deberías dejarlas siempre habilitadas."
@@ -2882,13 +2884,14 @@ msgid "Increase the priority of the process"
 msgstr "Aumentar la prioridad del proceso"
 
 #: src/libvlc.h:826
+#, fuzzy
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
-"could otherwise take too much processor time.\n"
-"However be advised that in certain circumstances (bugs) VLC could take all "
-"the processor time and render the whole system unresponsive which might "
-"require a reboot of your machine."
+"could otherwise take too much processor time. However be advised that in "
+"certain circumstances (bugs) VLC could take all the processor time and "
+"render the whole system unresponsive which might require a reboot of your "
+"machine."
 msgstr ""
 "Aumentar la prioridad del proceso mejorará tu experiencia de reproducción "
 "pues permite a VLC no ser molestado por otras aplicaciones que de otro modo "
@@ -2939,8 +2942,8 @@ msgstr ""
 
 #: src/libvlc.h:854 src/video_output/vout_intf.c:331
 #: modules/gui/beos/VideoOutput.cpp:1057 modules/gui/macosx/applescript.m:121
-#: modules/gui/macosx/controls.m:321 modules/gui/macosx/controls.m:638
-#: modules/gui/macosx/controls.m:668 modules/gui/macosx/embeddedwindow.m:44
+#: modules/gui/macosx/controls.m:330 modules/gui/macosx/controls.m:690
+#: modules/gui/macosx/controls.m:720 modules/gui/macosx/embeddedwindow.m:44
 #: modules/gui/macosx/intf.m:477 modules/gui/macosx/intf.m:553
 msgid "Fullscreen"
 msgstr "Pantalla completa"
@@ -2975,7 +2978,7 @@ msgid "Select the hotkey to use to play."
 msgstr "Elige tecla a usar para reproducir."
 
 #: src/libvlc.h:862 modules/control/hotkeys.c:648
-#: modules/gui/macosx/controls.m:573 modules/gui/macosx/intf.m:518
+#: modules/gui/macosx/controls.m:625 modules/gui/macosx/intf.m:518
 msgid "Faster"
 msgstr "Más Rápido"
 
@@ -2984,7 +2987,7 @@ msgid "Select the hotkey to use for fast forward playback."
 msgstr "Elige tecla a usar para reproducción acelerada."
 
 #: src/libvlc.h:864 modules/control/hotkeys.c:655
-#: modules/gui/macosx/controls.m:574 modules/gui/macosx/intf.m:519
+#: modules/gui/macosx/controls.m:626 modules/gui/macosx/intf.m:519
 msgid "Slower"
 msgstr "Más Lento"
 
@@ -2993,11 +2996,11 @@ msgid "Select the hotkey to use for slow motion playback."
 msgstr "Elige tecla a usar para reproducción frenada."
 
 #: src/libvlc.h:866 modules/control/hotkeys.c:617
-#: modules/gui/macosx/controls.m:594 modules/gui/macosx/intf.m:476
+#: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:476
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:592
-#: modules/gui/macosx/wizard.m:312 modules/gui/macosx/wizard.m:363
-#: modules/gui/macosx/wizard.m:1540 modules/gui/wxwidgets/interface.cpp:1494
-#: modules/gui/wxwidgets/menus.cpp:287
+#: modules/gui/macosx/wizard.m:313 modules/gui/macosx/wizard.m:364
+#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1494
+#: modules/gui/wxwidgets/menus.cpp:289
 msgid "Next"
 msgstr "Siguiente"
 
@@ -3007,10 +3010,10 @@ msgstr ""
 "Elige tecla a usar para pasar al objeto siguiente en lista de reproducción."
 
 #: src/libvlc.h:868 modules/control/hotkeys.c:628
-#: modules/gui/macosx/controls.m:593 modules/gui/macosx/intf.m:471
+#: modules/gui/macosx/controls.m:645 modules/gui/macosx/intf.m:471
 #: modules/gui/macosx/intf.m:520 modules/gui/macosx/intf.m:593
 #: modules/gui/wxwidgets/interface.cpp:1493
-#: modules/gui/wxwidgets/menus.cpp:286
+#: modules/gui/wxwidgets/menus.cpp:288
 msgid "Previous"
 msgstr "Previo"
 
@@ -3019,14 +3022,14 @@ msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
 "Elige tecla a usar para pasar al objeto previo en la lista de reproducción."
 
-#: src/libvlc.h:870 modules/gui/macosx/controls.m:585
+#: src/libvlc.h:870 modules/gui/macosx/controls.m:637
 #: modules/gui/macosx/intf.m:474 modules/gui/macosx/intf.m:517
 #: modules/gui/macosx/intf.m:591 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
 #: modules/gui/wxwidgets/interface.cpp:660
 #: modules/gui/wxwidgets/interface.cpp:1495
-#: modules/gui/wxwidgets/menus.cpp:285 modules/visualization/xosd.c:235
+#: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "Parar"
 
@@ -3270,7 +3273,7 @@ msgstr "Bajar volumen"
 msgid "Select the key to decrease audio volume."
 msgstr "Elige tecla para bajar el volumen"
 
-#: src/libvlc.h:938 modules/gui/macosx/controls.m:628
+#: src/libvlc.h:938 modules/gui/macosx/controls.m:680
 #: modules/gui/macosx/intf.m:538 modules/gui/macosx/intf.m:594
 msgid "Mute"
 msgstr "Mudo"
@@ -3573,7 +3576,7 @@ msgstr ""
 "  vlc:quit                  Objeto especial para quitar VLC\n"
 
 #: src/libvlc.h:1113 src/video_output/vout_intf.c:343
-#: modules/gui/macosx/controls.m:303 modules/gui/macosx/controls.m:637
+#: modules/gui/macosx/controls.m:312 modules/gui/macosx/controls.m:689
 #: modules/gui/macosx/intf.m:555 modules/video_output/snapshot.c:75
 msgid "Snapshot"
 msgstr "Captura de pantalla"
@@ -3624,7 +3627,7 @@ msgstr "Metadata"
 msgid "Decoders"
 msgstr "Decodificadores"
 
-#: src/libvlc.h:1292 modules/gui/wxwidgets/dialogs/infopanels.cpp:264
+#: src/libvlc.h:1292 modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:380
 msgid "Input"
 msgstr "Entrada"
@@ -6305,8 +6308,8 @@ msgstr ""
 msgid "libshout (icecast) output"
 msgstr ""
 
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:440
-#: modules/gui/macosx/wizard.m:1781
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:441
+#: modules/gui/macosx/wizard.m:1782
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:606
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1333 modules/stream_out/rtp.c:81
 msgid "Time-To-Live (TTL)"
@@ -8967,22 +8970,22 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr "Demuxer AVI"
 
-#: modules/demux/avi/avi.c:547
+#: modules/demux/avi/avi.c:549
 #, fuzzy
 msgid "AVI Index"
 msgstr "Índice"
 
-#: modules/demux/avi/avi.c:548
+#: modules/demux/avi/avi.c:550
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2266
+#: modules/demux/avi/avi.c:2268
 msgid "Fixing AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2267 modules/demux/avi/avi.c:2290
+#: modules/demux/avi/avi.c:2269 modules/demux/avi/avi.c:2292
 msgid "Creating AVI Index ..."
 msgstr ""
 
@@ -9744,7 +9747,7 @@ msgstr "Cabaret"
 msgid "New wave"
 msgstr "Nueva ola"
 
-#: modules/demux/util/id3genres.h:95
+#: modules/demux/util/id3genres.h:95 modules/video_filter/distort.c:76
 msgid "Psychedelic"
 msgstr "Psicodélica"
 
@@ -9829,16 +9832,17 @@ msgid "Open files from all sub-folders as well?"
 msgstr "¿Abrir también archivos de todas las subcarpetas?"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/bookmarks.m:107
+#: modules/gui/macosx/controls.m:48 modules/gui/macosx/interaction.m:121
 #: modules/gui/macosx/open.m:158 modules/gui/macosx/playlistinfo.m:58
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
-#: modules/gui/macosx/wizard.m:362
+#: modules/gui/macosx/wizard.m:363
 msgid "Cancel"
 msgstr "Cancelar"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
 #: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:659
-#: modules/gui/wxwidgets/menus.cpp:315
+#: modules/gui/wxwidgets/menus.cpp:317
 msgid "Open"
 msgstr "Abrir"
 
@@ -9904,14 +9908,15 @@ msgstr "Ventana"
 #: modules/gui/beos/InterfaceWindow.cpp:398 modules/gui/macosx/bookmarks.m:106
 #: modules/gui/macosx/bookmarks.m:233 modules/gui/macosx/bookmarks.m:241
 #: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/bookmarks.m:301
-#: modules/gui/macosx/extended.m:602 modules/gui/macosx/open.m:157
-#: modules/gui/macosx/open.m:254 modules/gui/macosx/output.m:138
-#: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/update.m:84
-#: modules/gui/macosx/wizard.m:632 modules/gui/macosx/wizard.m:698
-#: modules/gui/macosx/wizard.m:1090 modules/gui/macosx/wizard.m:1172
-#: modules/gui/macosx/wizard.m:1179 modules/gui/macosx/wizard.m:1595
-#: modules/gui/macosx/wizard.m:1603 modules/gui/macosx/wizard.m:1782
-#: modules/gui/macosx/wizard.m:1793 modules/gui/macosx/wizard.m:1806
+#: modules/gui/macosx/controls.m:49 modules/gui/macosx/extended.m:602
+#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:254
+#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:57
+#: modules/gui/macosx/update.m:88 modules/gui/macosx/wizard.m:633
+#: modules/gui/macosx/wizard.m:699 modules/gui/macosx/wizard.m:1091
+#: modules/gui/macosx/wizard.m:1173 modules/gui/macosx/wizard.m:1180
+#: modules/gui/macosx/wizard.m:1596 modules/gui/macosx/wizard.m:1604
+#: modules/gui/macosx/wizard.m:1783 modules/gui/macosx/wizard.m:1794
+#: modules/gui/macosx/wizard.m:1807
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
 msgid "OK"
 msgstr "OK"
@@ -10117,7 +10122,7 @@ msgstr ""
 "La entrada ha cambiado, incapaz de salvar favorito. Usa \"pausa\" mientras "
 "editas favoritos para mantener la misma entrada."
 
-#: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/wizard.m:1090
+#: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/wizard.m:1091
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:348
 msgid "Invalid selection"
 msgstr "Selección no válida"
@@ -10137,68 +10142,83 @@ msgstr "Entrada no hallada"
 msgid "The stream must be playing or paused for bookmarks to work."
 msgstr "El volcado debe ejecutarse o estar pausado para que funcione favoritos"
 
-#: modules/gui/macosx/controls.m:127
+#: modules/gui/macosx/controls.m:47
+#, fuzzy
+msgid "Go To Position"
+msgstr "Posición de logo"
+
+#: modules/gui/macosx/controls.m:50
+#, fuzzy
+msgid "sec."
+msgstr "secam"
+
+#: modules/gui/macosx/controls.m:51
+#, fuzzy
+msgid "Go to specific position"
+msgstr "Ir directamente al punto especificado"
+
+#: modules/gui/macosx/controls.m:136
 msgid "Random On"
 msgstr "Aleatorio Sí"
 
-#: modules/gui/macosx/controls.m:131
+#: modules/gui/macosx/controls.m:140
 msgid "Random Off"
 msgstr "Aleatorio No"
 
-#: modules/gui/macosx/controls.m:159 modules/gui/macosx/controls.m:605
+#: modules/gui/macosx/controls.m:168 modules/gui/macosx/controls.m:657
 #: modules/gui/macosx/intf.m:523 modules/gui/macosx/playlist.m:518
 #: modules/gui/macosx/playlist.m:1193
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:54
 msgid "Repeat One"
 msgstr "Repetir Uno"
 
-#: modules/gui/macosx/controls.m:163 modules/gui/macosx/controls.m:195
+#: modules/gui/macosx/controls.m:172 modules/gui/macosx/controls.m:204
 #: modules/gui/macosx/playlist.m:1212
 msgid "Repeat Off"
 msgstr "Repetir No"
 
-#: modules/gui/macosx/controls.m:191 modules/gui/macosx/controls.m:612
+#: modules/gui/macosx/controls.m:200 modules/gui/macosx/controls.m:664
 #: modules/gui/macosx/intf.m:524 modules/gui/macosx/playlist.m:519
 #: modules/gui/macosx/playlist.m:1201
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:53
 msgid "Repeat All"
 msgstr "Repetir Todo"
 
-#: modules/gui/macosx/controls.m:290 modules/gui/macosx/controls.m:633
+#: modules/gui/macosx/controls.m:299 modules/gui/macosx/controls.m:685
 #: modules/gui/macosx/intf.m:549
 msgid "Half Size"
 msgstr "Mitad de Tamaño"
 
-#: modules/gui/macosx/controls.m:292 modules/gui/macosx/controls.m:634
+#: modules/gui/macosx/controls.m:301 modules/gui/macosx/controls.m:686
 #: modules/gui/macosx/intf.m:550
 msgid "Normal Size"
 msgstr "Tamaño Normal"
 
-#: modules/gui/macosx/controls.m:294 modules/gui/macosx/controls.m:635
+#: modules/gui/macosx/controls.m:303 modules/gui/macosx/controls.m:687
 #: modules/gui/macosx/intf.m:551
 msgid "Double Size"
 msgstr "Tamaño Doble"
 
-#: modules/gui/macosx/controls.m:296 modules/gui/macosx/controls.m:639
-#: modules/gui/macosx/controls.m:650 modules/gui/macosx/intf.m:554
+#: modules/gui/macosx/controls.m:305 modules/gui/macosx/controls.m:691
+#: modules/gui/macosx/controls.m:702 modules/gui/macosx/intf.m:554
 msgid "Float on Top"
 msgstr "Flotar sobre Todo"
 
-#: modules/gui/macosx/controls.m:298 modules/gui/macosx/controls.m:636
+#: modules/gui/macosx/controls.m:307 modules/gui/macosx/controls.m:688
 #: modules/gui/macosx/intf.m:552
 msgid "Fit to Screen"
 msgstr "Ajustar a Pantalla"
 
-#: modules/gui/macosx/controls.m:598 modules/gui/macosx/intf.m:522
+#: modules/gui/macosx/controls.m:650 modules/gui/macosx/intf.m:522
 #: modules/gui/macosx/playlist.m:512
 msgid "Random"
 msgstr "Aleatorio"
 
-#: modules/gui/macosx/controls.m:619 modules/gui/macosx/intf.m:525
+#: modules/gui/macosx/controls.m:671 modules/gui/macosx/intf.m:525
 msgid "Step Forward"
 msgstr "Paso Adelante"
 
-#: modules/gui/macosx/controls.m:620 modules/gui/macosx/intf.m:526
+#: modules/gui/macosx/controls.m:672 modules/gui/macosx/intf.m:526
 msgid "Step Backward"
 msgstr "Paso Atrás"
 
@@ -10221,7 +10241,7 @@ msgstr "Avance Rápido"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:277
 #: modules/gui/wxwidgets/interface.cpp:661
 #: modules/gui/wxwidgets/interface.cpp:1183
-#: modules/gui/wxwidgets/menus.cpp:292 modules/gui/wxwidgets/menus.cpp:306
+#: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
 msgid "Play"
 msgstr "Reproducir"
 
@@ -10230,7 +10250,7 @@ msgstr "Reproducir"
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
 #: modules/gui/wxwidgets/interface.cpp:662
 #: modules/gui/wxwidgets/interface.cpp:1177
-#: modules/gui/wxwidgets/menus.cpp:294 modules/visualization/xosd.c:240
+#: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr "Pausa"
 
@@ -10271,10 +10291,10 @@ msgstr "Filtros de Vídeo"
 msgid "Adjust Image"
 msgstr "Ajustar Imagen"
 
-#: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:370
-#: modules/gui/macosx/wizard.m:371 modules/gui/macosx/wizard.m:441
-#: modules/gui/macosx/wizard.m:443 modules/gui/macosx/wizard.m:445
-#: modules/gui/macosx/wizard.m:454
+#: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:371
+#: modules/gui/macosx/wizard.m:372 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:444 modules/gui/macosx/wizard.m:446
+#: modules/gui/macosx/wizard.m:455
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:471
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:478
 msgid "More Info"
@@ -10289,7 +10309,7 @@ msgid "Creates a motion blurring on the image"
 msgstr "Crea un movimiento borroso en la imagen"
 
 #: modules/gui/macosx/extended.m:88 modules/gui/wxwidgets/extrapanel.cpp:151
-#: modules/video_filter/distort.c:78
+#: modules/video_filter/distort.c:80
 msgid "Distortion"
 msgstr "Distorsión"
 
@@ -10849,7 +10869,7 @@ msgid "Transcode options"
 msgstr "Opciones de transcodificación"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
-#: modules/gui/macosx/wizard.m:423
+#: modules/gui/macosx/wizard.m:424
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:773
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:848
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:840
@@ -11215,23 +11235,23 @@ msgstr "Abajo"
 msgid "Right-Bottom"
 msgstr "Abajo"
 
-#: modules/gui/macosx/update.m:82
-msgid "Check for update"
+#: modules/gui/macosx/update.m:86
+msgid "Check for Update"
 msgstr ""
 
-#: modules/gui/macosx/update.m:83
+#: modules/gui/macosx/update.m:87
 msgid "Download now"
 msgstr ""
 
-#: modules/gui/macosx/update.m:90
+#: modules/gui/macosx/update.m:94
 msgid "Checking for Update..."
 msgstr ""
 
-#: modules/gui/macosx/update.m:194
+#: modules/gui/macosx/update.m:206
 msgid "Your version of VLC is outdated."
 msgstr ""
 
-#: modules/gui/macosx/update.m:207
+#: modules/gui/macosx/update.m:219
 msgid "Your version of VLC is up-to-date."
 msgstr ""
 
@@ -11289,72 +11309,72 @@ msgid ""
 "ASF and OGG)"
 msgstr "MJPEG consiste en una serie de imágenes JPEG"
 
-#: modules/gui/macosx/wizard.m:158 modules/gui/wxwidgets/streamdata.cpp:73
+#: modules/gui/macosx/wizard.m:158
 #, fuzzy
-msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
+msgid "Theora is a free general-purpose codec (useable with MPEG TS and OGG)"
 msgstr "Theora es un códec libre de propósito general"
 
-#: modules/gui/macosx/wizard.m:161 modules/gui/macosx/wizard.m:212
+#: modules/gui/macosx/wizard.m:162 modules/gui/macosx/wizard.m:213
 #: modules/gui/wxwidgets/streamdata.cpp:76
 #: modules/gui/wxwidgets/streamdata.cpp:113
 msgid "Dummy codec (do not transcode, useable with all encapsulation formats)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:180 modules/gui/wxwidgets/streamdata.cpp:84
+#: modules/gui/macosx/wizard.m:181 modules/gui/wxwidgets/streamdata.cpp:84
 msgid ""
 "The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, MPEG1, "
 "ASF, OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:184 modules/gui/wxwidgets/streamdata.cpp:88
+#: modules/gui/macosx/wizard.m:185 modules/gui/wxwidgets/streamdata.cpp:88
 msgid ""
 "MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:188 modules/gui/wxwidgets/streamdata.cpp:92
+#: modules/gui/macosx/wizard.m:189 modules/gui/wxwidgets/streamdata.cpp:92
 msgid "Audio format for MPEG4 (useable with MPEG TS and MPEG4)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:191 modules/gui/wxwidgets/streamdata.cpp:95
+#: modules/gui/macosx/wizard.m:192 modules/gui/wxwidgets/streamdata.cpp:95
 msgid ""
 "DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:195 modules/gui/wxwidgets/streamdata.cpp:99
+#: modules/gui/macosx/wizard.m:196 modules/gui/wxwidgets/streamdata.cpp:99
 #, fuzzy
 msgid "Vorbis is a free audio codec (useable with OGG)"
 msgstr "Vorbis es un códec de audio libre"
 
-#: modules/gui/macosx/wizard.m:198 modules/gui/wxwidgets/streamdata.cpp:101
+#: modules/gui/macosx/wizard.m:199 modules/gui/wxwidgets/streamdata.cpp:101
 #, fuzzy
 msgid "FLAC is a lossless audio codec (useable with OGG and RAW)"
 msgstr "FLAC es un códec de audio sin pérdidas"
 
-#: modules/gui/macosx/wizard.m:202 modules/gui/wxwidgets/streamdata.cpp:104
+#: modules/gui/macosx/wizard.m:203 modules/gui/wxwidgets/streamdata.cpp:104
 #, fuzzy
 msgid "A free audio codec dedicated to compression of voice (useable with OGG)"
 msgstr "Un códec de audio libre dedicado a comprimir la voz"
 
-#: modules/gui/macosx/wizard.m:206 modules/gui/macosx/wizard.m:209
+#: modules/gui/macosx/wizard.m:207 modules/gui/macosx/wizard.m:210
 #: modules/gui/wxwidgets/streamdata.cpp:107
 #: modules/gui/wxwidgets/streamdata.cpp:110
 #, fuzzy
 msgid "Uncompressed audio samples (useable with WAV)"
 msgstr "Muestras de audio no comprimido"
 
-#: modules/gui/macosx/wizard.m:234 modules/gui/wxwidgets/streamdata.cpp:148
+#: modules/gui/macosx/wizard.m:235 modules/gui/wxwidgets/streamdata.cpp:148
 msgid "MPEG Program Stream"
 msgstr "Volcado de Programa MPEG"
 
-#: modules/gui/macosx/wizard.m:236 modules/gui/wxwidgets/streamdata.cpp:149
+#: modules/gui/macosx/wizard.m:237 modules/gui/wxwidgets/streamdata.cpp:149
 msgid "MPEG Transport Stream"
 msgstr "Volcado de Transporte MPEG"
 
-#: modules/gui/macosx/wizard.m:238 modules/gui/wxwidgets/streamdata.cpp:150
+#: modules/gui/macosx/wizard.m:239 modules/gui/wxwidgets/streamdata.cpp:150
 msgid "MPEG 1 Format"
 msgstr "Formato MPEG 1"
 
-#: modules/gui/macosx/wizard.m:257 modules/gui/wxwidgets/streamdata.cpp:137
+#: modules/gui/macosx/wizard.m:258 modules/gui/wxwidgets/streamdata.cpp:137
 #, fuzzy
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
@@ -11367,7 +11387,7 @@ msgstr ""
 "lo mejor que hacer. Así otras máquinas podrán acceder al volcado por http://"
 "tuip:8080 por defecto"
 
-#: modules/gui/macosx/wizard.m:261 modules/gui/wxwidgets/streamdata.cpp:134
+#: modules/gui/macosx/wizard.m:262 modules/gui/wxwidgets/streamdata.cpp:134
 #, fuzzy
 msgid ""
 "Use this to stream to several computers. This method is less efficient, as "
@@ -11376,7 +11396,7 @@ msgstr ""
 "Usa esto para volcar a varios PCs. Este método es menos eficiente, pues el "
 "servidor necesita enviar varias veces el volcado."
 
-#: modules/gui/macosx/wizard.m:264
+#: modules/gui/macosx/wizard.m:265
 #, fuzzy
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
@@ -11389,7 +11409,7 @@ msgstr ""
 "lo mejor que hacer. Así otras máquinas podrán acceder al volcado por http://"
 "tuip:8080 por defecto"
 
-#: modules/gui/macosx/wizard.m:268
+#: modules/gui/macosx/wizard.m:269
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's softwares. "
@@ -11397,19 +11417,19 @@ msgid ""
 "encapsulated in HTTP)."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:273 modules/gui/macosx/wizard.m:283
-#: modules/gui/macosx/wizard.m:407 modules/gui/wxwidgets/streamdata.cpp:123
+#: modules/gui/macosx/wizard.m:274 modules/gui/macosx/wizard.m:284
+#: modules/gui/macosx/wizard.m:408 modules/gui/wxwidgets/streamdata.cpp:123
 #, fuzzy
 msgid "Enter the address of the computer to stream to."
 msgstr "Pon la dirección del PC al que volcar"
 
-#: modules/gui/macosx/wizard.m:274 modules/gui/macosx/wizard.m:284
-#: modules/gui/macosx/wizard.m:411 modules/gui/wxwidgets/streamdata.cpp:122
+#: modules/gui/macosx/wizard.m:275 modules/gui/macosx/wizard.m:285
+#: modules/gui/macosx/wizard.m:412 modules/gui/wxwidgets/streamdata.cpp:122
 #, fuzzy
 msgid "Use this to stream to a single computer."
 msgstr "Usa esto para volcar a un PC"
 
-#: modules/gui/macosx/wizard.m:276 modules/gui/macosx/wizard.m:286
+#: modules/gui/macosx/wizard.m:277 modules/gui/macosx/wizard.m:287
 #, fuzzy
 msgid ""
 "Enter the multicast address to stream to in this field. This must be an IP "
@@ -11420,7 +11440,7 @@ msgstr ""
 "dirección IP entre 224.0.0.0 y 239.255.255.255 Para un uso privado, pon una "
 "dirección que comience con 239.255."
 
-#: modules/gui/macosx/wizard.m:279 modules/gui/macosx/wizard.m:289
+#: modules/gui/macosx/wizard.m:280 modules/gui/macosx/wizard.m:290
 #: modules/gui/wxwidgets/streamdata.cpp:126
 msgid ""
 "Use this to stream to a dynamic group of computers on a multicast-enabled "
@@ -11431,24 +11451,24 @@ msgstr ""
 "multiemisión. Este es el método más eficiente para volcar a varios PCs, per "
 "no funciona en Internet."
 
-#: modules/gui/macosx/wizard.m:361
+#: modules/gui/macosx/wizard.m:362
 msgid "Back"
 msgstr "Atrás"
 
-#: modules/gui/macosx/wizard.m:364 modules/gui/macosx/wizard.m:367
-#: modules/gui/macosx/wizard.m:1233
+#: modules/gui/macosx/wizard.m:365 modules/gui/macosx/wizard.m:368
+#: modules/gui/macosx/wizard.m:1234
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:82
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:85
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1401
 msgid "Streaming/Transcoding Wizard"
 msgstr "Asistente de Volcado/Transcodificación"
 
-#: modules/gui/macosx/wizard.m:368 modules/gui/wxwidgets/dialogs/wizard.cpp:86
+#: modules/gui/macosx/wizard.m:369 modules/gui/wxwidgets/dialogs/wizard.cpp:86
 #, fuzzy
 msgid "This wizard helps you to stream, transcode or save a stream."
 msgstr "Este asistente te ayuda a volcar, transcodificar o salvar un volcado"
 
-#: modules/gui/macosx/wizard.m:372 modules/gui/wxwidgets/dialogs/wizard.cpp:92
+#: modules/gui/macosx/wizard.m:373 modules/gui/wxwidgets/dialogs/wizard.cpp:92
 #, fuzzy
 msgid ""
 "This wizard only gives access to a small subset of VLC's streaming and "
@@ -11459,50 +11479,50 @@ msgstr ""
 "volcado y transcodificado de VLC. Usa los diálogos Abrir y Salida de Volcado "
 "para obtenerlas todas"
 
-#: modules/gui/macosx/wizard.m:375 modules/gui/macosx/wizard.m:526
-#: modules/gui/macosx/wizard.m:1594
+#: modules/gui/macosx/wizard.m:376 modules/gui/macosx/wizard.m:527
+#: modules/gui/macosx/wizard.m:1595
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:88
 msgid "Stream to network"
 msgstr "Volcado a red"
 
-#: modules/gui/macosx/wizard.m:377 modules/gui/macosx/wizard.m:1602
+#: modules/gui/macosx/wizard.m:378 modules/gui/macosx/wizard.m:1603
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:90
 msgid "Transcode/Save to file"
 msgstr "Transcodificar/Salvar a archivo"
 
-#: modules/gui/macosx/wizard.m:381
+#: modules/gui/macosx/wizard.m:382
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:101
 msgid "Choose input"
 msgstr "Elige entrada"
 
-#: modules/gui/macosx/wizard.m:382
+#: modules/gui/macosx/wizard.m:383
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:102
 #, fuzzy
 msgid "Choose here your input stream."
 msgstr "Elige aquí tu volcado de entrada"
 
-#: modules/gui/macosx/wizard.m:384 modules/gui/macosx/wizard.m:564
-#: modules/gui/macosx/wizard.m:1635
+#: modules/gui/macosx/wizard.m:385 modules/gui/macosx/wizard.m:565
+#: modules/gui/macosx/wizard.m:1636
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:104
 msgid "Select a stream"
 msgstr "Elige un volcado"
 
-#: modules/gui/macosx/wizard.m:386
+#: modules/gui/macosx/wizard.m:387
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:105
 msgid "Existing playlist item"
 msgstr "Objeto de lista de reproducción existente"
 
-#: modules/gui/macosx/wizard.m:387 modules/gui/macosx/wizard.m:452
+#: modules/gui/macosx/wizard.m:388 modules/gui/macosx/wizard.m:453
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:567
 msgid "Choose..."
 msgstr "Elige..."
 
-#: modules/gui/macosx/wizard.m:392 modules/gui/macosx/wizard.m:469
+#: modules/gui/macosx/wizard.m:393 modules/gui/macosx/wizard.m:470
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:619
 msgid "Partial Extract"
 msgstr "Extracto Parcial"
 
-#: modules/gui/macosx/wizard.m:394
+#: modules/gui/macosx/wizard.m:395
 #, fuzzy
 msgid ""
 "Use this to read only a part of the stream. You must be able to control the "
@@ -11514,53 +11534,53 @@ msgstr ""
 "de red UDP.)\n"
 "Pon los tiempos inicial y final (en segundos)"
 
-#: modules/gui/macosx/wizard.m:398
+#: modules/gui/macosx/wizard.m:399
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:630
 msgid "From"
 msgstr "Desde"
 
-#: modules/gui/macosx/wizard.m:399
+#: modules/gui/macosx/wizard.m:400
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:635
 msgid "To"
 msgstr "A"
 
-#: modules/gui/macosx/wizard.m:402
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:315
+#: modules/gui/macosx/wizard.m:403
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:316
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:133
 #: modules/video_filter/deinterlace.c:131
 msgid "Streaming"
 msgstr "Volcado"
 
-#: modules/gui/macosx/wizard.m:403
+#: modules/gui/macosx/wizard.m:404
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
 msgid "In this page, you will select how your input stream will be sent."
 msgstr "En esta página, elegirás cómo se enviará tu volcado de entrada."
 
-#: modules/gui/macosx/wizard.m:405 modules/gui/macosx/wizard.m:463
+#: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:464
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1046 modules/stream_out/rtp.c:45
 msgid "Destination"
 msgstr "Destino"
 
-#: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:475
+#: modules/gui/macosx/wizard.m:407 modules/gui/macosx/wizard.m:476
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1032
 msgid "Streaming method"
 msgstr "Método de volcado"
 
-#: modules/gui/macosx/wizard.m:409
+#: modules/gui/macosx/wizard.m:410
 msgid "UDP Unicast"
 msgstr "Uniemisión UDP"
 
-#: modules/gui/macosx/wizard.m:410
+#: modules/gui/macosx/wizard.m:411
 msgid "UDP Multicast"
 msgstr "Multiemisión UDP"
 
-#: modules/gui/macosx/wizard.m:415 modules/gui/pda/pda_interface.c:1221
+#: modules/gui/macosx/wizard.m:416 modules/gui/pda/pda_interface.c:1221
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:119
 #: modules/stream_out/transcode.c:167
 msgid "Transcode"
 msgstr "Transcodificar"
 
-#: modules/gui/macosx/wizard.m:416
+#: modules/gui/macosx/wizard.m:417
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:120
 #, fuzzy
 msgid ""
@@ -11572,34 +11592,34 @@ msgstr ""
 "rellena esta página. (Si sólo deseas cambiar el formato contenedor, ve a la "
 "página siguiente)."
 
-#: modules/gui/macosx/wizard.m:421 modules/gui/macosx/wizard.m:477
+#: modules/gui/macosx/wizard.m:422 modules/gui/macosx/wizard.m:478
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:862
 msgid "Transcode audio"
 msgstr "Audio de transcodificación"
 
-#: modules/gui/macosx/wizard.m:422 modules/gui/macosx/wizard.m:479
+#: modules/gui/macosx/wizard.m:423 modules/gui/macosx/wizard.m:480
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:823
 msgid "Transcode video"
 msgstr "Transcodificar vídeo"
 
-#: modules/gui/macosx/wizard.m:425 modules/gui/macosx/wizard.m:1737
+#: modules/gui/macosx/wizard.m:426 modules/gui/macosx/wizard.m:1738
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:127
 #, fuzzy
 msgid "If your stream has audio and you want to transcode it, enable this."
 msgstr "Si tu volcado tiene audio y deseas transcodificarlo, habilita ésto"
 
-#: modules/gui/macosx/wizard.m:427 modules/gui/macosx/wizard.m:1754
+#: modules/gui/macosx/wizard.m:428 modules/gui/macosx/wizard.m:1755
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:122
 #, fuzzy
 msgid "If your stream has video and you want to transcode it, enable this."
 msgstr "Si tu volcado tiene vídeo y deseas transcodificarlo, habilita ésto"
 
-#: modules/gui/macosx/wizard.m:431
+#: modules/gui/macosx/wizard.m:432
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:142
 msgid "Encapsulation format"
 msgstr "Formato de encapsulamiento"
 
-#: modules/gui/macosx/wizard.m:432
+#: modules/gui/macosx/wizard.m:433
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:143
 msgid ""
 "In this page, you will select how the stream will be encapsulated. Depending "
@@ -11608,36 +11628,36 @@ msgstr ""
 "En esta página, elegirás cómo se enapsulará el volcado. Dependiendo de las "
 "elecciones que hagas, no serán disponibles todos los formatos."
 
-#: modules/gui/macosx/wizard.m:437
+#: modules/gui/macosx/wizard.m:438
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:156
 msgid "Additional streaming options"
 msgstr "Opciones de volcado adicionales"
 
-#: modules/gui/macosx/wizard.m:438
+#: modules/gui/macosx/wizard.m:439
 #, fuzzy
 msgid ""
 "In this page, you will define a few additional parameters for your stream."
 msgstr ""
 "En esta página, definirás unos pocos parámetros adicionales para tu volcado"
 
-#: modules/gui/macosx/wizard.m:442 modules/gui/macosx/wizard.m:471
-#: modules/gui/macosx/wizard.m:1792
+#: modules/gui/macosx/wizard.m:443 modules/gui/macosx/wizard.m:472
+#: modules/gui/macosx/wizard.m:1793
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1341
 msgid "SAP Announce"
 msgstr "Anuncio SAP"
 
-#: modules/gui/macosx/wizard.m:444 modules/gui/macosx/wizard.m:453
-#: modules/gui/macosx/wizard.m:481 modules/gui/macosx/wizard.m:1805
+#: modules/gui/macosx/wizard.m:445 modules/gui/macosx/wizard.m:454
+#: modules/gui/macosx/wizard.m:482 modules/gui/macosx/wizard.m:1806
 #, fuzzy
 msgid "Local playback"
 msgstr "Para reproducción"
 
-#: modules/gui/macosx/wizard.m:448
+#: modules/gui/macosx/wizard.m:449
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
 msgid "Additional transcode options"
 msgstr "Opciones de transcodificación adicionales"
 
-#: modules/gui/macosx/wizard.m:449
+#: modules/gui/macosx/wizard.m:450
 #, fuzzy
 msgid ""
 "In this page, you will define a few additional parameters for your "
@@ -11646,49 +11666,49 @@ msgstr ""
 "En esta página, definirás unos pocos parámetros adicionales para tu "
 "transcodificación"
 
-#: modules/gui/macosx/wizard.m:451 modules/gui/macosx/wizard.m:1124
+#: modules/gui/macosx/wizard.m:452 modules/gui/macosx/wizard.m:1125
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1265
 msgid "Select the file to save to"
 msgstr "Elige archivo al que salvar"
 
-#: modules/gui/macosx/wizard.m:455
+#: modules/gui/macosx/wizard.m:456
 msgid ""
 "Note that your input files will keep their original names when being saved "
 "in the folder you selected. Existing files may be overwritten."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:460
+#: modules/gui/macosx/wizard.m:461
 msgid ""
 "This page lists all your selections. Click \"Finish\" to start your "
 "streaming or transcoding."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:462
+#: modules/gui/macosx/wizard.m:463
 #, fuzzy
 msgid "Summary"
 msgstr "Dummy"
 
-#: modules/gui/macosx/wizard.m:465
+#: modules/gui/macosx/wizard.m:466
 #, fuzzy
 msgid "Encap. format"
 msgstr "Formato de encapsulamiento"
 
-#: modules/gui/macosx/wizard.m:467
+#: modules/gui/macosx/wizard.m:468
 #, fuzzy
 msgid "Input stream"
 msgstr "Volcado Sout"
 
-#: modules/gui/macosx/wizard.m:473
+#: modules/gui/macosx/wizard.m:474
 #, fuzzy
 msgid "Save file to"
 msgstr "Salvar archivo"
 
-#: modules/gui/macosx/wizard.m:631
+#: modules/gui/macosx/wizard.m:632
 #, fuzzy
 msgid "No input selected"
 msgstr "Entrada no hallada"
 
-#: modules/gui/macosx/wizard.m:633
+#: modules/gui/macosx/wizard.m:634
 msgid ""
 "You have selected neither a new stream nor a valid playlist item. VLC is "
 "unable to guess, which input you want use.\n"
@@ -11696,12 +11716,12 @@ msgid ""
 "Choose one before going to the next page."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:697
+#: modules/gui/macosx/wizard.m:698
 #, fuzzy
 msgid "No valid destination"
 msgstr "Destino"
 
-#: modules/gui/macosx/wizard.m:699
+#: modules/gui/macosx/wizard.m:700
 msgid ""
 "You need to enter a valid destination you want to stream to. Enter either a "
 "Unicast-IP or a Multicast-IP.\n"
@@ -11710,7 +11730,7 @@ msgid ""
 "and the help texts in this window."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1091
+#: modules/gui/macosx/wizard.m:1092
 msgid ""
 "Your chosen codecs are not compatible with each other. For example: you "
 "cannot mix uncompressed audio with any video codec.\n"
@@ -11718,74 +11738,74 @@ msgid ""
 "Correct your selection and try again."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1118
+#: modules/gui/macosx/wizard.m:1119
 #, fuzzy
 msgid "Select the folder to save to"
 msgstr "Elige archivo al que salvar"
 
-#: modules/gui/macosx/wizard.m:1171
+#: modules/gui/macosx/wizard.m:1172
 #, fuzzy
 msgid "No folder selected"
 msgstr "Entrada no hallada"
 
-#: modules/gui/macosx/wizard.m:1173
+#: modules/gui/macosx/wizard.m:1174
 msgid "You you need to select a folder, you want to save your files to."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1175 modules/gui/macosx/wizard.m:1182
+#: modules/gui/macosx/wizard.m:1176 modules/gui/macosx/wizard.m:1183
 msgid ""
 "Enter either a valid path or choose a location through the button's dialog-"
 "box."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1178
+#: modules/gui/macosx/wizard.m:1179
 msgid "No file selected"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1180
+#: modules/gui/macosx/wizard.m:1181
 #, fuzzy
 msgid "You you need to select a file, you want to save to."
 msgstr "Debes elegir un archivo al que salvar"
 
-#: modules/gui/macosx/wizard.m:1314
+#: modules/gui/macosx/wizard.m:1315
 #, fuzzy
 msgid "Finish"
 msgstr "Finés"
 
-#: modules/gui/macosx/wizard.m:1319
+#: modules/gui/macosx/wizard.m:1320
 #, fuzzy, c-format
 msgid "%i items"
 msgstr "&Ver objetos"
 
-#: modules/gui/macosx/wizard.m:1327 modules/gui/macosx/wizard.m:1381
+#: modules/gui/macosx/wizard.m:1328 modules/gui/macosx/wizard.m:1382
 #, fuzzy
 msgid "yes"
 msgstr "Bytes"
 
-#: modules/gui/macosx/wizard.m:1329 modules/gui/macosx/wizard.m:1339
-#: modules/gui/macosx/wizard.m:1352 modules/gui/macosx/wizard.m:1364
-#: modules/gui/macosx/wizard.m:1384
+#: modules/gui/macosx/wizard.m:1330 modules/gui/macosx/wizard.m:1340
+#: modules/gui/macosx/wizard.m:1353 modules/gui/macosx/wizard.m:1365
+#: modules/gui/macosx/wizard.m:1385
 #, fuzzy
 msgid "no"
 msgstr "ninguno"
 
-#: modules/gui/macosx/wizard.m:1335
+#: modules/gui/macosx/wizard.m:1336
 #, objc-format
 msgid "yes: from %@ to %@ secs"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1345 modules/gui/macosx/wizard.m:1357
+#: modules/gui/macosx/wizard.m:1346 modules/gui/macosx/wizard.m:1358
 #, objc-format
 msgid "yes: %@ @ %@ kb/s"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1596
+#: modules/gui/macosx/wizard.m:1597
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:89
 #, fuzzy
 msgid "Use this to stream on a network."
 msgstr "Usa esto para volcar sobre una red"
 
-#: modules/gui/macosx/wizard.m:1604
+#: modules/gui/macosx/wizard.m:1605
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:96
 #, fuzzy
 msgid ""
@@ -11800,19 +11820,19 @@ msgstr ""
 "archivo. Deberías usar sus capacidades transcodificadoras para guardar "
 "volcados de red, por ejemplo"
 
-#: modules/gui/macosx/wizard.m:1732
+#: modules/gui/macosx/wizard.m:1733
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:129
 #, fuzzy
 msgid "Select your audio codec. Click one to get more information."
 msgstr "Elige tu códec de audio. Pulsa uno para obtener más información"
 
-#: modules/gui/macosx/wizard.m:1749
+#: modules/gui/macosx/wizard.m:1750
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:124
 #, fuzzy
 msgid "Select your video codec. Click one to get more information."
 msgstr "Elige tu códec de vídeo. Pulsa uno para obtener más información"
 
-#: modules/gui/macosx/wizard.m:1783
+#: modules/gui/macosx/wizard.m:1784
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:160
 msgid ""
 "Define the TTL (Time-To-Live) of the stream. This parameter is the maximum "
@@ -11825,7 +11845,7 @@ msgstr ""
 "no sabes qué significa, o si deseas volcar sólo en tu red local, deja esto a "
 "1."
 
-#: modules/gui/macosx/wizard.m:1794
+#: modules/gui/macosx/wizard.m:1795
 #, fuzzy
 msgid ""
 "When streaming using UDP, you can announce your streams using the SAP/SDP "
@@ -11842,7 +11862,7 @@ msgstr ""
 "Si deseas dar un nombre a tu volcado, ponlo aquí, si no, se usará un nombre "
 "por defecto"
 
-#: modules/gui/macosx/wizard.m:1807
+#: modules/gui/macosx/wizard.m:1808
 msgid ""
 "When this option is enabled, the stream will be both played and transcoded/"
 "streamed.\n"
@@ -13365,7 +13385,7 @@ msgstr "&Mensajes..."
 msgid "&Preferences..."
 msgstr "&Preferencias..."
 
-#: modules/gui/wxwidgets/menus.cpp:565 modules/gui/wxwidgets/menus.cpp:592
+#: modules/gui/wxwidgets/menus.cpp:569 modules/gui/wxwidgets/menus.cpp:596
 msgid "Empty"
 msgstr "Vacío"
 
@@ -13399,6 +13419,11 @@ msgstr ""
 #: modules/gui/wxwidgets/streamdata.cpp:66
 msgid "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
 msgstr ""
+
+#: modules/gui/wxwidgets/streamdata.cpp:73
+#, fuzzy
+msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
+msgstr "Theora es un códec libre de propósito general"
 
 #: modules/gui/wxwidgets/streamdata.cpp:122
 #, fuzzy
@@ -13924,11 +13949,22 @@ msgstr ""
 "host local en puerto 554, sin ruta. Usa 0.0.0.0 para unir a todas las "
 "direcciones."
 
+#: modules/misc/rtsp.c:52
+#, fuzzy
+msgid "Maximum number of connections"
+msgstr "Número de clones"
+
 #: modules/misc/rtsp.c:53
+msgid ""
+"Limit the number of connections to a maximum. (0 = unlimited, N = maximum "
+"clients)"
+msgstr ""
+
+#: modules/misc/rtsp.c:57
 msgid "RTSP VoD"
 msgstr "RTSP VoD"
 
-#: modules/misc/rtsp.c:54
+#: modules/misc/rtsp.c:58
 msgid "RTSP VoD server"
 msgstr "Servidor VoD RTSP"
 
@@ -15346,7 +15382,9 @@ msgstr "Modo de distorsión"
 
 #: modules/video_filter/distort.c:65
 #, fuzzy
-msgid "Distort mode, one of \"wave\", \"ripple\", \"gradient\" and \"edge\""
+msgid ""
+"Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" "
+"and \"psychedelic\""
 msgstr "Modo de distorsión, uno de \"onda\" y \"rizo\""
 
 #: modules/video_filter/distort.c:67
@@ -15367,24 +15405,29 @@ msgstr "Elige efecto"
 msgid "Apply cartoon effect. Used by \"gradient\" and \"edge\"."
 msgstr ""
 
-#: modules/video_filter/distort.c:74
+#: modules/video_filter/distort.c:75
 msgid "Wave"
 msgstr "Onda"
 
-#: modules/video_filter/distort.c:74
+#: modules/video_filter/distort.c:75
 msgid "Ripple"
 msgstr "Rizo"
 
-#: modules/video_filter/distort.c:74
-msgid "gradient"
-msgstr ""
+#: modules/video_filter/distort.c:75
+#, fuzzy
+msgid "Gradient"
+msgstr "Verde"
 
-#: modules/video_filter/distort.c:74
+#: modules/video_filter/distort.c:76
 #, fuzzy
 msgid "Edge"
 msgstr "Puente"
 
-#: modules/video_filter/distort.c:77
+#: modules/video_filter/distort.c:76
+msgid "Hough"
+msgstr ""
+
+#: modules/video_filter/distort.c:79
 msgid "Distort video filter"
 msgstr "Filtro de vídeo para distorsionar"
 
@@ -17129,9 +17172,6 @@ msgstr "interfaz XOSD"
 
 #~ msgid "_Jump..."
 #~ msgstr "Saltar...: _J"
-
-#~ msgid "Got directly so specified point"
-#~ msgstr "Ir directamente al punto especificado"
 
 #~ msgid "Switch program"
 #~ msgstr "Cambiar programa"

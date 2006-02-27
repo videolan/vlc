@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-21 09:47+0100\n"
+"POT-Creation-Date: 2006-02-27 11:04+0100\n"
 "PO-Revision-Date: 2005-12-12 14:01+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -74,8 +74,8 @@ msgstr "ホットキー設定"
 #: include/vlc_config_cat.h:51 src/input/es_out.c:1588 src/libvlc.h:1051
 #: modules/gui/beos/InterfaceWindow.cpp:280 modules/gui/macosx/extended.m:81
 #: modules/gui/macosx/intf.m:535 modules/gui/macosx/output.m:170
-#: modules/gui/macosx/wizard.m:419
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
+#: modules/gui/macosx/wizard.m:420
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:337
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:856
 #: modules/gui/wxwidgets/extrapanel.cpp:180 modules/stream_out/transcode.c:214
 msgid "Audio"
@@ -116,7 +116,7 @@ msgid "These are general settings for audio output modules."
 msgstr "これらはオーディオ出力モジュールの一般設定です"
 
 #: include/vlc_config_cat.h:68 src/libvlc.h:1369 src/libvlc.h:1407
-#: src/libvlc.h:1452 modules/gui/wxwidgets/menus.cpp:311
+#: src/libvlc.h:1452 modules/gui/wxwidgets/menus.cpp:313
 #: modules/stream_out/transcode.c:243
 msgid "Miscellaneous"
 msgstr "その他"
@@ -127,8 +127,8 @@ msgstr "その他のオーディオとモジュールの設定"
 
 #: include/vlc_config_cat.h:72 src/input/es_out.c:1610 src/libvlc.h:1086
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:548
-#: modules/gui/macosx/output.m:160 modules/gui/macosx/wizard.m:420
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
+#: modules/gui/macosx/output.m:160 modules/gui/macosx/wizard.m:421
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:291
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:817
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/misc/dummy/dummy.c:97
 #: modules/stream_out/transcode.c:174
@@ -485,14 +485,14 @@ msgstr "メタ情報"
 #: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:53
 #: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:530
 #: modules/gui/macosx/intf.m:531 modules/gui/macosx/open.m:168
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/wizard.m:389
+#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/wizard.m:390
 #: modules/gui/wxwidgets/dialogs/open.cpp:756
 #: modules/gui/wxwidgets/dialogs/open.cpp:1652 modules/mux/asf.c:48
 msgid "Title"
 msgstr "タイトル"
 
 #: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:133
-#: modules/gui/macosx/playlistinfo.m:56 modules/gui/macosx/wizard.m:391
+#: modules/gui/macosx/playlistinfo.m:56 modules/gui/macosx/wizard.m:392
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:51
 msgid "Author"
 msgstr "作成者"
@@ -794,7 +794,7 @@ msgstr "プログラム"
 msgid "Stream %d"
 msgstr "ストリーム %d"
 
-#: src/input/es_out.c:1577 modules/gui/macosx/wizard.m:424
+#: src/input/es_out.c:1577 modules/gui/macosx/wizard.m:425
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:826
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:866
 msgid "Codec"
@@ -946,8 +946,8 @@ msgstr "インターフェースを切り替え"
 msgid "Add Interface"
 msgstr "インタフェースを追加"
 
-#: src/libvlc.c:327 src/libvlc.c:482 src/misc/modules.c:1680
-#: src/misc/modules.c:1984
+#: src/libvlc.c:327 src/libvlc.c:482 src/misc/modules.c:1682
+#: src/misc/modules.c:1986
 msgid "C"
 msgstr "ja"
 
@@ -996,14 +996,12 @@ msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
 #: src/libvlc.c:2480
-#, c-format
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
 #: src/libvlc.c:2501
-#, c-format
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1101,9 +1099,9 @@ msgstr ""
 #: src/libvlc.h:53
 #, fuzzy
 msgid ""
-"These options allow you to configure the interfaces used by VLC.\n"
-"You can select the main interface, additional interface modules, and define "
-"various related options."
+"These options allow you to configure the interfaces used by VLC. You can "
+"select the main interface, additional interface modules, and define various "
+"related options."
 msgstr ""
 "使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが"
 "選択されます。"
@@ -1115,8 +1113,8 @@ msgstr "インタフェースモジュール"
 #: src/libvlc.h:59
 #, fuzzy
 msgid ""
-"This option allows you to select the interface used by VLC.\n"
-"The default behavior is to automatically select the best module available."
+"This option allows you to select the interface used by VLC. The default "
+"behavior is to automatically select the best module available."
 msgstr ""
 "使用するインタフェースが選択可能です。デフォルトで自動的に最適なモジュールが"
 "選択されます。"
@@ -1220,9 +1218,8 @@ msgstr ""
 msgid ""
 "These options allow you to modify the behavior of the audio subsystem, and "
 "to add audio filters which can be used for post processing or visual effects "
-"(spectrum analyzer, etc.).\n"
-"Enable these filters here, and configure them in the \"audio filters\" "
-"modules section."
+"(spectrum analyzer, etc.). Enable these filters here, and configure them in "
+"the \"audio filters\" modules section."
 msgstr ""
 
 #: src/libvlc.h:115
@@ -1795,7 +1792,7 @@ msgid "Default"
 msgstr "デフォルト"
 
 #: src/libvlc.h:365 modules/gui/macosx/equalizer.m:144
-#: modules/gui/macosx/extended.m:106 modules/gui/macosx/wizard.m:393
+#: modules/gui/macosx/extended.m:106 modules/gui/macosx/wizard.m:394
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:625
 #: modules/gui/wxwidgets/extrapanel.cpp:218
 #: modules/gui/wxwidgets/extrapanel.cpp:467
@@ -1863,9 +1860,8 @@ msgstr "デコードのプログラム"
 
 #: src/libvlc.h:393
 msgid ""
-"Choose the program to select by giving its Service ID.\n"
-"Only use this option if you want to read a multi-program stream (like DVB "
-"streams for example)."
+"Choose the program to select by giving its Service ID. Only use this option "
+"if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
 
 #: src/libvlc.h:397
@@ -1875,9 +1871,9 @@ msgstr "デコードのプログラム"
 
 #: src/libvlc.h:399
 msgid ""
-"Choose the programs to select by giving a comma-separated list of SIDs.\n"
-"Only use this option if you want to read a multi-program stream (like DVB "
-"streams for example)."
+"Choose the programs to select by giving a comma-separated list of SIDs. Only "
+"use this option if you want to read a multi-program stream (like DVB streams "
+"for example)."
 msgstr ""
 
 #: src/libvlc.h:404 modules/gui/wxwidgets/dialogs/open.cpp:775
@@ -2433,8 +2429,8 @@ msgstr ""
 
 #: src/libvlc.h:675
 msgid ""
-"These options allow you to enable special CPU optimizations.\n"
-"You should always leave all these enabled."
+"These options allow you to enable special CPU optimizations. You should "
+"always leave all these enabled."
 msgstr ""
 
 #: src/libvlc.h:678
@@ -2752,10 +2748,10 @@ msgstr "プロセスの優先度を増やす"
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
-"could otherwise take too much processor time.\n"
-"However be advised that in certain circumstances (bugs) VLC could take all "
-"the processor time and render the whole system unresponsive which might "
-"require a reboot of your machine."
+"could otherwise take too much processor time. However be advised that in "
+"certain circumstances (bugs) VLC could take all the processor time and "
+"render the whole system unresponsive which might require a reboot of your "
+"machine."
 msgstr ""
 
 #: src/libvlc.h:833
@@ -2796,8 +2792,8 @@ msgstr ""
 
 #: src/libvlc.h:854 src/video_output/vout_intf.c:331
 #: modules/gui/beos/VideoOutput.cpp:1057 modules/gui/macosx/applescript.m:121
-#: modules/gui/macosx/controls.m:321 modules/gui/macosx/controls.m:638
-#: modules/gui/macosx/controls.m:668 modules/gui/macosx/embeddedwindow.m:44
+#: modules/gui/macosx/controls.m:330 modules/gui/macosx/controls.m:690
+#: modules/gui/macosx/controls.m:720 modules/gui/macosx/embeddedwindow.m:44
 #: modules/gui/macosx/intf.m:477 modules/gui/macosx/intf.m:553
 msgid "Fullscreen"
 msgstr "全画面化"
@@ -2832,7 +2828,7 @@ msgid "Select the hotkey to use to play."
 msgstr "再生に使うホットキーを選択"
 
 #: src/libvlc.h:862 modules/control/hotkeys.c:648
-#: modules/gui/macosx/controls.m:573 modules/gui/macosx/intf.m:518
+#: modules/gui/macosx/controls.m:625 modules/gui/macosx/intf.m:518
 msgid "Faster"
 msgstr "早送り"
 
@@ -2841,7 +2837,7 @@ msgid "Select the hotkey to use for fast forward playback."
 msgstr "早送りに使うホットキーを選択"
 
 #: src/libvlc.h:864 modules/control/hotkeys.c:655
-#: modules/gui/macosx/controls.m:574 modules/gui/macosx/intf.m:519
+#: modules/gui/macosx/controls.m:626 modules/gui/macosx/intf.m:519
 msgid "Slower"
 msgstr "スロー"
 
@@ -2850,11 +2846,11 @@ msgid "Select the hotkey to use for slow motion playback."
 msgstr "スローモーションに使うホットキーを選択"
 
 #: src/libvlc.h:866 modules/control/hotkeys.c:617
-#: modules/gui/macosx/controls.m:594 modules/gui/macosx/intf.m:476
+#: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:476
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:592
-#: modules/gui/macosx/wizard.m:312 modules/gui/macosx/wizard.m:363
-#: modules/gui/macosx/wizard.m:1540 modules/gui/wxwidgets/interface.cpp:1494
-#: modules/gui/wxwidgets/menus.cpp:287
+#: modules/gui/macosx/wizard.m:313 modules/gui/macosx/wizard.m:364
+#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1494
+#: modules/gui/wxwidgets/menus.cpp:289
 msgid "Next"
 msgstr "次"
 
@@ -2863,10 +2859,10 @@ msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 
 #: src/libvlc.h:868 modules/control/hotkeys.c:628
-#: modules/gui/macosx/controls.m:593 modules/gui/macosx/intf.m:471
+#: modules/gui/macosx/controls.m:645 modules/gui/macosx/intf.m:471
 #: modules/gui/macosx/intf.m:520 modules/gui/macosx/intf.m:593
 #: modules/gui/wxwidgets/interface.cpp:1493
-#: modules/gui/wxwidgets/menus.cpp:286
+#: modules/gui/wxwidgets/menus.cpp:288
 msgid "Previous"
 msgstr "前"
 
@@ -2874,14 +2870,14 @@ msgstr "前"
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
 
-#: src/libvlc.h:870 modules/gui/macosx/controls.m:585
+#: src/libvlc.h:870 modules/gui/macosx/controls.m:637
 #: modules/gui/macosx/intf.m:474 modules/gui/macosx/intf.m:517
 #: modules/gui/macosx/intf.m:591 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
 #: modules/gui/wxwidgets/interface.cpp:660
 #: modules/gui/wxwidgets/interface.cpp:1495
-#: modules/gui/wxwidgets/menus.cpp:285 modules/visualization/xosd.c:235
+#: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "停止"
 
@@ -3124,7 +3120,7 @@ msgstr "ボリュームを下げる"
 msgid "Select the key to decrease audio volume."
 msgstr ""
 
-#: src/libvlc.h:938 modules/gui/macosx/controls.m:628
+#: src/libvlc.h:938 modules/gui/macosx/controls.m:680
 #: modules/gui/macosx/intf.m:538 modules/gui/macosx/intf.m:594
 msgid "Mute"
 msgstr "ミュートする"
@@ -3416,7 +3412,7 @@ msgstr ""
 "  vlc:quit                       VLC を終了\n"
 
 #: src/libvlc.h:1113 src/video_output/vout_intf.c:343
-#: modules/gui/macosx/controls.m:303 modules/gui/macosx/controls.m:637
+#: modules/gui/macosx/controls.m:312 modules/gui/macosx/controls.m:689
 #: modules/gui/macosx/intf.m:555 modules/video_output/snapshot.c:75
 msgid "Snapshot"
 msgstr "スナップショット"
@@ -3467,7 +3463,7 @@ msgstr "メタデータ"
 msgid "Decoders"
 msgstr "デコーダ"
 
-#: src/libvlc.h:1292 modules/gui/wxwidgets/dialogs/infopanels.cpp:264
+#: src/libvlc.h:1292 modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:380
 msgid "Input"
 msgstr "入力"
@@ -6106,8 +6102,8 @@ msgstr ""
 msgid "libshout (icecast) output"
 msgstr ""
 
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:440
-#: modules/gui/macosx/wizard.m:1781
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:441
+#: modules/gui/macosx/wizard.m:1782
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:606
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1333 modules/stream_out/rtp.c:81
 msgid "Time-To-Live (TTL)"
@@ -8721,22 +8717,22 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr ""
 
-#: modules/demux/avi/avi.c:547
+#: modules/demux/avi/avi.c:549
 #, fuzzy
 msgid "AVI Index"
 msgstr "インデックス"
 
-#: modules/demux/avi/avi.c:548
+#: modules/demux/avi/avi.c:550
 msgid ""
 "This AVI file is broken. Seeking will not work correctly.\n"
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2266
+#: modules/demux/avi/avi.c:2268
 msgid "Fixing AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2267 modules/demux/avi/avi.c:2290
+#: modules/demux/avi/avi.c:2269 modules/demux/avi/avi.c:2292
 msgid "Creating AVI Index ..."
 msgstr ""
 
@@ -9516,7 +9512,7 @@ msgstr ""
 msgid "New wave"
 msgstr "ニューウェーブ"
 
-#: modules/demux/util/id3genres.h:95
+#: modules/demux/util/id3genres.h:95 modules/video_filter/distort.c:76
 msgid "Psychedelic"
 msgstr "サイケデリック"
 
@@ -9608,16 +9604,17 @@ msgid "Open files from all sub-folders as well?"
 msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/bookmarks.m:107
+#: modules/gui/macosx/controls.m:48 modules/gui/macosx/interaction.m:121
 #: modules/gui/macosx/open.m:158 modules/gui/macosx/playlistinfo.m:58
 #: modules/gui/macosx/prefs.m:122 modules/gui/macosx/prefs.m:142
-#: modules/gui/macosx/wizard.m:362
+#: modules/gui/macosx/wizard.m:363
 msgid "Cancel"
 msgstr "取り消し"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
 #: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:659
-#: modules/gui/wxwidgets/menus.cpp:315
+#: modules/gui/wxwidgets/menus.cpp:317
 msgid "Open"
 msgstr "開く"
 
@@ -9683,14 +9680,15 @@ msgstr "ウィンドウ"
 #: modules/gui/beos/InterfaceWindow.cpp:398 modules/gui/macosx/bookmarks.m:106
 #: modules/gui/macosx/bookmarks.m:233 modules/gui/macosx/bookmarks.m:241
 #: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/bookmarks.m:301
-#: modules/gui/macosx/extended.m:602 modules/gui/macosx/open.m:157
-#: modules/gui/macosx/open.m:254 modules/gui/macosx/output.m:138
-#: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/update.m:84
-#: modules/gui/macosx/wizard.m:632 modules/gui/macosx/wizard.m:698
-#: modules/gui/macosx/wizard.m:1090 modules/gui/macosx/wizard.m:1172
-#: modules/gui/macosx/wizard.m:1179 modules/gui/macosx/wizard.m:1595
-#: modules/gui/macosx/wizard.m:1603 modules/gui/macosx/wizard.m:1782
-#: modules/gui/macosx/wizard.m:1793 modules/gui/macosx/wizard.m:1806
+#: modules/gui/macosx/controls.m:49 modules/gui/macosx/extended.m:602
+#: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:254
+#: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:57
+#: modules/gui/macosx/update.m:88 modules/gui/macosx/wizard.m:633
+#: modules/gui/macosx/wizard.m:699 modules/gui/macosx/wizard.m:1091
+#: modules/gui/macosx/wizard.m:1173 modules/gui/macosx/wizard.m:1180
+#: modules/gui/macosx/wizard.m:1596 modules/gui/macosx/wizard.m:1604
+#: modules/gui/macosx/wizard.m:1783 modules/gui/macosx/wizard.m:1794
+#: modules/gui/macosx/wizard.m:1807
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
 msgid "OK"
 msgstr "OK"
@@ -9895,7 +9893,7 @@ msgid ""
 "bookmarks to keep the same input."
 msgstr ""
 
-#: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/wizard.m:1090
+#: modules/gui/macosx/bookmarks.m:291 modules/gui/macosx/wizard.m:1091
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:348
 #, fuzzy
 msgid "Invalid selection"
@@ -9916,69 +9914,84 @@ msgstr "%@s は見つかりません"
 msgid "The stream must be playing or paused for bookmarks to work."
 msgstr ""
 
-#: modules/gui/macosx/controls.m:127
+#: modules/gui/macosx/controls.m:47
+#, fuzzy
+msgid "Go To Position"
+msgstr "ロゴの位置"
+
+#: modules/gui/macosx/controls.m:50
+#, fuzzy
+msgid "sec."
+msgstr "SECAM"
+
+#: modules/gui/macosx/controls.m:51
+#, fuzzy
+msgid "Go to specific position"
+msgstr "特定位置を直接指定"
+
+#: modules/gui/macosx/controls.m:136
 msgid "Random On"
 msgstr "ランダムオン"
 
-#: modules/gui/macosx/controls.m:131
+#: modules/gui/macosx/controls.m:140
 msgid "Random Off"
 msgstr "ランダムオフ"
 
-#: modules/gui/macosx/controls.m:159 modules/gui/macosx/controls.m:605
+#: modules/gui/macosx/controls.m:168 modules/gui/macosx/controls.m:657
 #: modules/gui/macosx/intf.m:523 modules/gui/macosx/playlist.m:518
 #: modules/gui/macosx/playlist.m:1193
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:54
 msgid "Repeat One"
 msgstr "1 回繰り返す"
 
-#: modules/gui/macosx/controls.m:163 modules/gui/macosx/controls.m:195
+#: modules/gui/macosx/controls.m:172 modules/gui/macosx/controls.m:204
 #: modules/gui/macosx/playlist.m:1212
 msgid "Repeat Off"
 msgstr "繰り返しオフ"
 
-#: modules/gui/macosx/controls.m:191 modules/gui/macosx/controls.m:612
+#: modules/gui/macosx/controls.m:200 modules/gui/macosx/controls.m:664
 #: modules/gui/macosx/intf.m:524 modules/gui/macosx/playlist.m:519
 #: modules/gui/macosx/playlist.m:1201
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:53
 msgid "Repeat All"
 msgstr "すべて繰り返す"
 
-#: modules/gui/macosx/controls.m:290 modules/gui/macosx/controls.m:633
+#: modules/gui/macosx/controls.m:299 modules/gui/macosx/controls.m:685
 #: modules/gui/macosx/intf.m:549
 msgid "Half Size"
 msgstr "1/2 サイズ"
 
-#: modules/gui/macosx/controls.m:292 modules/gui/macosx/controls.m:634
+#: modules/gui/macosx/controls.m:301 modules/gui/macosx/controls.m:686
 #: modules/gui/macosx/intf.m:550
 msgid "Normal Size"
 msgstr "通常サイズ"
 
-#: modules/gui/macosx/controls.m:294 modules/gui/macosx/controls.m:635
+#: modules/gui/macosx/controls.m:303 modules/gui/macosx/controls.m:687
 #: modules/gui/macosx/intf.m:551
 msgid "Double Size"
 msgstr "2倍サイズ"
 
-#: modules/gui/macosx/controls.m:296 modules/gui/macosx/controls.m:639
-#: modules/gui/macosx/controls.m:650 modules/gui/macosx/intf.m:554
+#: modules/gui/macosx/controls.m:305 modules/gui/macosx/controls.m:691
+#: modules/gui/macosx/controls.m:702 modules/gui/macosx/intf.m:554
 msgid "Float on Top"
 msgstr "常に前面"
 
-#: modules/gui/macosx/controls.m:298 modules/gui/macosx/controls.m:636
+#: modules/gui/macosx/controls.m:307 modules/gui/macosx/controls.m:688
 #: modules/gui/macosx/intf.m:552
 msgid "Fit to Screen"
 msgstr "画面にあわせる"
 
-#: modules/gui/macosx/controls.m:598 modules/gui/macosx/intf.m:522
+#: modules/gui/macosx/controls.m:650 modules/gui/macosx/intf.m:522
 #: modules/gui/macosx/playlist.m:512
 msgid "Random"
 msgstr "ランダム"
 
-#: modules/gui/macosx/controls.m:619 modules/gui/macosx/intf.m:525
+#: modules/gui/macosx/controls.m:671 modules/gui/macosx/intf.m:525
 #, fuzzy
 msgid "Step Forward"
 msgstr "転送"
 
-#: modules/gui/macosx/controls.m:620 modules/gui/macosx/intf.m:526
+#: modules/gui/macosx/controls.m:672 modules/gui/macosx/intf.m:526
 #, fuzzy
 msgid "Step Backward"
 msgstr "逆転再生"
@@ -10003,7 +10016,7 @@ msgstr "転送"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:277
 #: modules/gui/wxwidgets/interface.cpp:661
 #: modules/gui/wxwidgets/interface.cpp:1183
-#: modules/gui/wxwidgets/menus.cpp:292 modules/gui/wxwidgets/menus.cpp:306
+#: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
 msgid "Play"
 msgstr "再生"
 
@@ -10012,7 +10025,7 @@ msgstr "再生"
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
 #: modules/gui/wxwidgets/interface.cpp:662
 #: modules/gui/wxwidgets/interface.cpp:1177
-#: modules/gui/wxwidgets/menus.cpp:294 modules/visualization/xosd.c:240
+#: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr "一時停止"
 
@@ -10052,10 +10065,10 @@ msgstr "ビデオタイトル"
 msgid "Adjust Image"
 msgstr "画像調整"
 
-#: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:370
-#: modules/gui/macosx/wizard.m:371 modules/gui/macosx/wizard.m:441
-#: modules/gui/macosx/wizard.m:443 modules/gui/macosx/wizard.m:445
-#: modules/gui/macosx/wizard.m:454
+#: modules/gui/macosx/extended.m:85 modules/gui/macosx/wizard.m:371
+#: modules/gui/macosx/wizard.m:372 modules/gui/macosx/wizard.m:442
+#: modules/gui/macosx/wizard.m:444 modules/gui/macosx/wizard.m:446
+#: modules/gui/macosx/wizard.m:455
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:471
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:478
 #, fuzzy
@@ -10071,7 +10084,7 @@ msgid "Creates a motion blurring on the image"
 msgstr ""
 
 #: modules/gui/macosx/extended.m:88 modules/gui/wxwidgets/extrapanel.cpp:151
-#: modules/video_filter/distort.c:78
+#: modules/video_filter/distort.c:80
 #, fuzzy
 msgid "Distortion"
 msgstr "湾曲モード"
@@ -10626,7 +10639,7 @@ msgid "Transcode options"
 msgstr "ストリームの一時停止"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
-#: modules/gui/macosx/wizard.m:423
+#: modules/gui/macosx/wizard.m:424
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:773
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:848
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:840
@@ -10992,24 +11005,24 @@ msgstr "下"
 msgid "Right-Bottom"
 msgstr "下"
 
-#: modules/gui/macosx/update.m:82
-msgid "Check for update"
+#: modules/gui/macosx/update.m:86
+msgid "Check for Update"
 msgstr ""
 
-#: modules/gui/macosx/update.m:83
+#: modules/gui/macosx/update.m:87
 #, fuzzy
 msgid "Download now"
 msgstr "ダウンロード中..."
 
-#: modules/gui/macosx/update.m:90
+#: modules/gui/macosx/update.m:94
 msgid "Checking for Update..."
 msgstr ""
 
-#: modules/gui/macosx/update.m:194
+#: modules/gui/macosx/update.m:206
 msgid "Your version of VLC is outdated."
 msgstr ""
 
-#: modules/gui/macosx/update.m:207
+#: modules/gui/macosx/update.m:219
 msgid "Your version of VLC is up-to-date."
 msgstr ""
 
@@ -11064,71 +11077,72 @@ msgid ""
 "ASF and OGG)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:158 modules/gui/wxwidgets/streamdata.cpp:73
-msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
-msgstr ""
+#: modules/gui/macosx/wizard.m:158
+#, fuzzy
+msgid "Theora is a free general-purpose codec (useable with MPEG TS and OGG)"
+msgstr "送信先のアスペクト・レシオ"
 
-#: modules/gui/macosx/wizard.m:161 modules/gui/macosx/wizard.m:212
+#: modules/gui/macosx/wizard.m:162 modules/gui/macosx/wizard.m:213
 #: modules/gui/wxwidgets/streamdata.cpp:76
 #: modules/gui/wxwidgets/streamdata.cpp:113
 msgid "Dummy codec (do not transcode, useable with all encapsulation formats)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:180 modules/gui/wxwidgets/streamdata.cpp:84
+#: modules/gui/macosx/wizard.m:181 modules/gui/wxwidgets/streamdata.cpp:84
 msgid ""
 "The standard MPEG audio (1/2) format (useable with MPEG PS, MPEG TS, MPEG1, "
 "ASF, OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:184 modules/gui/wxwidgets/streamdata.cpp:88
+#: modules/gui/macosx/wizard.m:185 modules/gui/wxwidgets/streamdata.cpp:88
 msgid ""
 "MPEG Audio Layer 3 (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:188 modules/gui/wxwidgets/streamdata.cpp:92
+#: modules/gui/macosx/wizard.m:189 modules/gui/wxwidgets/streamdata.cpp:92
 msgid "Audio format for MPEG4 (useable with MPEG TS and MPEG4)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:191 modules/gui/wxwidgets/streamdata.cpp:95
+#: modules/gui/macosx/wizard.m:192 modules/gui/wxwidgets/streamdata.cpp:95
 msgid ""
 "DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:195 modules/gui/wxwidgets/streamdata.cpp:99
+#: modules/gui/macosx/wizard.m:196 modules/gui/wxwidgets/streamdata.cpp:99
 #, fuzzy
 msgid "Vorbis is a free audio codec (useable with OGG)"
 msgstr "Vorbis オーディオデコーダー"
 
-#: modules/gui/macosx/wizard.m:198 modules/gui/wxwidgets/streamdata.cpp:101
+#: modules/gui/macosx/wizard.m:199 modules/gui/wxwidgets/streamdata.cpp:101
 msgid "FLAC is a lossless audio codec (useable with OGG and RAW)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:202 modules/gui/wxwidgets/streamdata.cpp:104
+#: modules/gui/macosx/wizard.m:203 modules/gui/wxwidgets/streamdata.cpp:104
 msgid "A free audio codec dedicated to compression of voice (useable with OGG)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:206 modules/gui/macosx/wizard.m:209
+#: modules/gui/macosx/wizard.m:207 modules/gui/macosx/wizard.m:210
 #: modules/gui/wxwidgets/streamdata.cpp:107
 #: modules/gui/wxwidgets/streamdata.cpp:110
 msgid "Uncompressed audio samples (useable with WAV)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:234 modules/gui/wxwidgets/streamdata.cpp:148
+#: modules/gui/macosx/wizard.m:235 modules/gui/wxwidgets/streamdata.cpp:148
 #, fuzzy
 msgid "MPEG Program Stream"
 msgstr "ISO 13818-1 MPEGプログラム・ストリーム入力"
 
-#: modules/gui/macosx/wizard.m:236 modules/gui/wxwidgets/streamdata.cpp:149
+#: modules/gui/macosx/wizard.m:237 modules/gui/wxwidgets/streamdata.cpp:149
 #, fuzzy
 msgid "MPEG Transport Stream"
 msgstr "ストリームの再生"
 
-#: modules/gui/macosx/wizard.m:238 modules/gui/wxwidgets/streamdata.cpp:150
+#: modules/gui/macosx/wizard.m:239 modules/gui/wxwidgets/streamdata.cpp:150
 #, fuzzy
 msgid "MPEG 1 Format"
 msgstr "VCD フォーマット"
 
-#: modules/gui/macosx/wizard.m:257 modules/gui/wxwidgets/streamdata.cpp:137
+#: modules/gui/macosx/wizard.m:258 modules/gui/wxwidgets/streamdata.cpp:137
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
 "you want to listen to all adresses or if you don't understand. This is "
@@ -11136,13 +11150,13 @@ msgid ""
 "at http://yourip:8080 by default."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:261 modules/gui/wxwidgets/streamdata.cpp:134
+#: modules/gui/macosx/wizard.m:262 modules/gui/wxwidgets/streamdata.cpp:134
 msgid ""
 "Use this to stream to several computers. This method is less efficient, as "
 "the server needs to send the stream several times."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:264
+#: modules/gui/macosx/wizard.m:265
 msgid ""
 "Enter the local addresses you want to listen to. Do not enter anything if "
 "you want to listen to all adresses or if you don't understand. This is "
@@ -11150,7 +11164,7 @@ msgid ""
 "at mms://yourip:8080 by default."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:268
+#: modules/gui/macosx/wizard.m:269
 msgid ""
 "Use this to stream to several computers using the Microsoft MMS protocol. "
 "This protocol is used as transport method by many Microsoft's softwares. "
@@ -11158,25 +11172,25 @@ msgid ""
 "encapsulated in HTTP)."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:273 modules/gui/macosx/wizard.m:283
-#: modules/gui/macosx/wizard.m:407 modules/gui/wxwidgets/streamdata.cpp:123
+#: modules/gui/macosx/wizard.m:274 modules/gui/macosx/wizard.m:284
+#: modules/gui/macosx/wizard.m:408 modules/gui/wxwidgets/streamdata.cpp:123
 msgid "Enter the address of the computer to stream to."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:274 modules/gui/macosx/wizard.m:284
-#: modules/gui/macosx/wizard.m:411 modules/gui/wxwidgets/streamdata.cpp:122
+#: modules/gui/macosx/wizard.m:275 modules/gui/macosx/wizard.m:285
+#: modules/gui/macosx/wizard.m:412 modules/gui/wxwidgets/streamdata.cpp:122
 #, fuzzy
 msgid "Use this to stream to a single computer."
 msgstr "ネットワークを開く"
 
-#: modules/gui/macosx/wizard.m:276 modules/gui/macosx/wizard.m:286
+#: modules/gui/macosx/wizard.m:277 modules/gui/macosx/wizard.m:287
 msgid ""
 "Enter the multicast address to stream to in this field. This must be an IP "
 "address between 224.0.0.0 and 239.255.255.255. For a private use, enter an "
 "address beginning with 239.255."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:279 modules/gui/macosx/wizard.m:289
+#: modules/gui/macosx/wizard.m:280 modules/gui/macosx/wizard.m:290
 #: modules/gui/wxwidgets/streamdata.cpp:126
 msgid ""
 "Use this to stream to a dynamic group of computers on a multicast-enabled "
@@ -11184,12 +11198,12 @@ msgid ""
 "but it does not work over Internet."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:361
+#: modules/gui/macosx/wizard.m:362
 msgid "Back"
 msgstr "逆転"
 
-#: modules/gui/macosx/wizard.m:364 modules/gui/macosx/wizard.m:367
-#: modules/gui/macosx/wizard.m:1233
+#: modules/gui/macosx/wizard.m:365 modules/gui/macosx/wizard.m:368
+#: modules/gui/macosx/wizard.m:1234
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:82
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:85
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1401
@@ -11197,120 +11211,120 @@ msgstr "逆転"
 msgid "Streaming/Transcoding Wizard"
 msgstr "ストリームの情報..."
 
-#: modules/gui/macosx/wizard.m:368 modules/gui/wxwidgets/dialogs/wizard.cpp:86
+#: modules/gui/macosx/wizard.m:369 modules/gui/wxwidgets/dialogs/wizard.cpp:86
 #, fuzzy
 msgid "This wizard helps you to stream, transcode or save a stream."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
-#: modules/gui/macosx/wizard.m:372 modules/gui/wxwidgets/dialogs/wizard.cpp:92
+#: modules/gui/macosx/wizard.m:373 modules/gui/wxwidgets/dialogs/wizard.cpp:92
 msgid ""
 "This wizard only gives access to a small subset of VLC's streaming and "
 "transcoding capabilities. Use the Open and Stream Output dialogs to get all "
 "of them."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:375 modules/gui/macosx/wizard.m:526
-#: modules/gui/macosx/wizard.m:1594
+#: modules/gui/macosx/wizard.m:376 modules/gui/macosx/wizard.m:527
+#: modules/gui/macosx/wizard.m:1595
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:88
 #, fuzzy
 msgid "Stream to network"
 msgstr "ネットワークを開く"
 
-#: modules/gui/macosx/wizard.m:377 modules/gui/macosx/wizard.m:1602
+#: modules/gui/macosx/wizard.m:378 modules/gui/macosx/wizard.m:1603
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:90
 #, fuzzy
 msgid "Transcode/Save to file"
 msgstr "キャンセル"
 
-#: modules/gui/macosx/wizard.m:381
+#: modules/gui/macosx/wizard.m:382
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:101
 msgid "Choose input"
 msgstr "入力の選択"
 
-#: modules/gui/macosx/wizard.m:382
+#: modules/gui/macosx/wizard.m:383
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:102
 msgid "Choose here your input stream."
 msgstr "入力ストリームをここで選択してください。"
 
-#: modules/gui/macosx/wizard.m:384 modules/gui/macosx/wizard.m:564
-#: modules/gui/macosx/wizard.m:1635
+#: modules/gui/macosx/wizard.m:385 modules/gui/macosx/wizard.m:565
+#: modules/gui/macosx/wizard.m:1636
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:104
 msgid "Select a stream"
 msgstr "ストリームを選択する"
 
-#: modules/gui/macosx/wizard.m:386
+#: modules/gui/macosx/wizard.m:387
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:105
 msgid "Existing playlist item"
 msgstr "存在する再生一覧の項目"
 
-#: modules/gui/macosx/wizard.m:387 modules/gui/macosx/wizard.m:452
+#: modules/gui/macosx/wizard.m:388 modules/gui/macosx/wizard.m:453
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:567
 msgid "Choose..."
 msgstr "選択..."
 
-#: modules/gui/macosx/wizard.m:392 modules/gui/macosx/wizard.m:469
+#: modules/gui/macosx/wizard.m:393 modules/gui/macosx/wizard.m:470
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:619
 msgid "Partial Extract"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:394
+#: modules/gui/macosx/wizard.m:395
 msgid ""
 "Use this to read only a part of the stream. You must be able to control the "
 "incoming stream (for example, a file or a disc, but not an UDP network "
 "stream.) Enter the starting and ending times (in seconds)."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:398
+#: modules/gui/macosx/wizard.m:399
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:630
 msgid "From"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:399
+#: modules/gui/macosx/wizard.m:400
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:635
 #, fuzzy
 msgid "To"
 msgstr "上"
 
-#: modules/gui/macosx/wizard.m:402
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:315
+#: modules/gui/macosx/wizard.m:403
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:316
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:133
 #: modules/video_filter/deinterlace.c:131
 msgid "Streaming"
 msgstr "すとリー民具"
 
-#: modules/gui/macosx/wizard.m:403
+#: modules/gui/macosx/wizard.m:404
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
 msgid "In this page, you will select how your input stream will be sent."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:405 modules/gui/macosx/wizard.m:463
+#: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:464
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1046 modules/stream_out/rtp.c:45
 #, fuzzy
 msgid "Destination"
 msgstr "送信先のアスペクト・レシオ"
 
-#: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:475
+#: modules/gui/macosx/wizard.m:407 modules/gui/macosx/wizard.m:476
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1032
 #, fuzzy
 msgid "Streaming method"
 msgstr "ストリームの停止"
 
-#: modules/gui/macosx/wizard.m:409
+#: modules/gui/macosx/wizard.m:410
 msgid "UDP Unicast"
 msgstr "UDP ユニキャスト"
 
-#: modules/gui/macosx/wizard.m:410
+#: modules/gui/macosx/wizard.m:411
 msgid "UDP Multicast"
 msgstr "UDP マルチキャスト"
 
-#: modules/gui/macosx/wizard.m:415 modules/gui/pda/pda_interface.c:1221
+#: modules/gui/macosx/wizard.m:416 modules/gui/pda/pda_interface.c:1221
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:119
 #: modules/stream_out/transcode.c:167
 #, fuzzy
 msgid "Transcode"
 msgstr "キャンセル"
 
-#: modules/gui/macosx/wizard.m:416
+#: modules/gui/macosx/wizard.m:417
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:120
 msgid ""
 "If you want to change the compression format of the audio or video tracks, "
@@ -11318,115 +11332,115 @@ msgid ""
 "to next page.)"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:421 modules/gui/macosx/wizard.m:477
+#: modules/gui/macosx/wizard.m:422 modules/gui/macosx/wizard.m:478
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:862
 #, fuzzy
 msgid "Transcode audio"
 msgstr "ストリームの一時停止"
 
-#: modules/gui/macosx/wizard.m:422 modules/gui/macosx/wizard.m:479
+#: modules/gui/macosx/wizard.m:423 modules/gui/macosx/wizard.m:480
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:823
 #, fuzzy
 msgid "Transcode video"
 msgstr "ストリームの一時停止"
 
-#: modules/gui/macosx/wizard.m:425 modules/gui/macosx/wizard.m:1737
+#: modules/gui/macosx/wizard.m:426 modules/gui/macosx/wizard.m:1738
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:127
 msgid "If your stream has audio and you want to transcode it, enable this."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:427 modules/gui/macosx/wizard.m:1754
+#: modules/gui/macosx/wizard.m:428 modules/gui/macosx/wizard.m:1755
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:122
 msgid "If your stream has video and you want to transcode it, enable this."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:431
+#: modules/gui/macosx/wizard.m:432
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:142
 #, fuzzy
 msgid "Encapsulation format"
 msgstr "出力フォーマット"
 
-#: modules/gui/macosx/wizard.m:432
+#: modules/gui/macosx/wizard.m:433
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:143
 msgid ""
 "In this page, you will select how the stream will be encapsulated. Depending "
 "on the choices you made, all formats won't be available."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:437
+#: modules/gui/macosx/wizard.m:438
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:156
 msgid "Additional streaming options"
 msgstr "追加ストリーミングオプション"
 
-#: modules/gui/macosx/wizard.m:438
+#: modules/gui/macosx/wizard.m:439
 msgid ""
 "In this page, you will define a few additional parameters for your stream."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:442 modules/gui/macosx/wizard.m:471
-#: modules/gui/macosx/wizard.m:1792
+#: modules/gui/macosx/wizard.m:443 modules/gui/macosx/wizard.m:472
+#: modules/gui/macosx/wizard.m:1793
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1341
 msgid "SAP Announce"
 msgstr "SAP アナウンス"
 
-#: modules/gui/macosx/wizard.m:444 modules/gui/macosx/wizard.m:453
-#: modules/gui/macosx/wizard.m:481 modules/gui/macosx/wizard.m:1805
+#: modules/gui/macosx/wizard.m:445 modules/gui/macosx/wizard.m:454
+#: modules/gui/macosx/wizard.m:482 modules/gui/macosx/wizard.m:1806
 msgid "Local playback"
 msgstr "ローカル再生"
 
-#: modules/gui/macosx/wizard.m:448
+#: modules/gui/macosx/wizard.m:449
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
 #, fuzzy
 msgid "Additional transcode options"
 msgstr "ストリームの一時停止"
 
-#: modules/gui/macosx/wizard.m:449
+#: modules/gui/macosx/wizard.m:450
 msgid ""
 "In this page, you will define a few additional parameters for your "
 "transcoding."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:451 modules/gui/macosx/wizard.m:1124
+#: modules/gui/macosx/wizard.m:452 modules/gui/macosx/wizard.m:1125
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1265
 #, fuzzy
 msgid "Select the file to save to"
 msgstr "再生に使うホットキーを選択"
 
-#: modules/gui/macosx/wizard.m:455
+#: modules/gui/macosx/wizard.m:456
 msgid ""
 "Note that your input files will keep their original names when being saved "
 "in the folder you selected. Existing files may be overwritten."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:460
+#: modules/gui/macosx/wizard.m:461
 msgid ""
 "This page lists all your selections. Click \"Finish\" to start your "
 "streaming or transcoding."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:462
+#: modules/gui/macosx/wizard.m:463
 msgid "Summary"
 msgstr "要約"
 
-#: modules/gui/macosx/wizard.m:465
+#: modules/gui/macosx/wizard.m:466
 #, fuzzy
 msgid "Encap. format"
 msgstr "出力フォーマット"
 
-#: modules/gui/macosx/wizard.m:467
+#: modules/gui/macosx/wizard.m:468
 msgid "Input stream"
 msgstr "ストリーム入力"
 
-#: modules/gui/macosx/wizard.m:473
+#: modules/gui/macosx/wizard.m:474
 #, fuzzy
 msgid "Save file to"
 msgstr "ファイルの保存"
 
-#: modules/gui/macosx/wizard.m:631
+#: modules/gui/macosx/wizard.m:632
 msgid "No input selected"
 msgstr "入力は選択されていません"
 
-#: modules/gui/macosx/wizard.m:633
+#: modules/gui/macosx/wizard.m:634
 msgid ""
 "You have selected neither a new stream nor a valid playlist item. VLC is "
 "unable to guess, which input you want use.\n"
@@ -11434,12 +11448,12 @@ msgid ""
 "Choose one before going to the next page."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:697
+#: modules/gui/macosx/wizard.m:698
 #, fuzzy
 msgid "No valid destination"
 msgstr "送信先のアスペクト・レシオ"
 
-#: modules/gui/macosx/wizard.m:699
+#: modules/gui/macosx/wizard.m:700
 msgid ""
 "You need to enter a valid destination you want to stream to. Enter either a "
 "Unicast-IP or a Multicast-IP.\n"
@@ -11448,7 +11462,7 @@ msgid ""
 "and the help texts in this window."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1091
+#: modules/gui/macosx/wizard.m:1092
 msgid ""
 "Your chosen codecs are not compatible with each other. For example: you "
 "cannot mix uncompressed audio with any video codec.\n"
@@ -11456,71 +11470,71 @@ msgid ""
 "Correct your selection and try again."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1118
+#: modules/gui/macosx/wizard.m:1119
 #, fuzzy
 msgid "Select the folder to save to"
 msgstr "再生に使うホットキーを選択"
 
-#: modules/gui/macosx/wizard.m:1171
+#: modules/gui/macosx/wizard.m:1172
 #, fuzzy
 msgid "No folder selected"
 msgstr "ファイルは選択されていません"
 
-#: modules/gui/macosx/wizard.m:1173
+#: modules/gui/macosx/wizard.m:1174
 msgid "You you need to select a folder, you want to save your files to."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1175 modules/gui/macosx/wizard.m:1182
+#: modules/gui/macosx/wizard.m:1176 modules/gui/macosx/wizard.m:1183
 msgid ""
 "Enter either a valid path or choose a location through the button's dialog-"
 "box."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1178
+#: modules/gui/macosx/wizard.m:1179
 msgid "No file selected"
 msgstr "ファイルは選択されていません"
 
-#: modules/gui/macosx/wizard.m:1180
+#: modules/gui/macosx/wizard.m:1181
 #, fuzzy
 msgid "You you need to select a file, you want to save to."
 msgstr "ストリームの出力先の選択"
 
-#: modules/gui/macosx/wizard.m:1314
+#: modules/gui/macosx/wizard.m:1315
 msgid "Finish"
 msgstr "終了"
 
-#: modules/gui/macosx/wizard.m:1319
+#: modules/gui/macosx/wizard.m:1320
 #, fuzzy, c-format
 msgid "%i items"
 msgstr "ビデオタイトル"
 
-#: modules/gui/macosx/wizard.m:1327 modules/gui/macosx/wizard.m:1381
+#: modules/gui/macosx/wizard.m:1328 modules/gui/macosx/wizard.m:1382
 msgid "yes"
 msgstr "はい"
 
-#: modules/gui/macosx/wizard.m:1329 modules/gui/macosx/wizard.m:1339
-#: modules/gui/macosx/wizard.m:1352 modules/gui/macosx/wizard.m:1364
-#: modules/gui/macosx/wizard.m:1384
+#: modules/gui/macosx/wizard.m:1330 modules/gui/macosx/wizard.m:1340
+#: modules/gui/macosx/wizard.m:1353 modules/gui/macosx/wizard.m:1365
+#: modules/gui/macosx/wizard.m:1385
 msgid "no"
 msgstr "いいえ"
 
-#: modules/gui/macosx/wizard.m:1335
+#: modules/gui/macosx/wizard.m:1336
 #, objc-format
 msgid "yes: from %@ to %@ secs"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1345 modules/gui/macosx/wizard.m:1357
+#: modules/gui/macosx/wizard.m:1346 modules/gui/macosx/wizard.m:1358
 #, objc-format
 msgid "yes: %@ @ %@ kb/s"
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1596
+#: modules/gui/macosx/wizard.m:1597
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:89
 #, fuzzy
 msgid "Use this to stream on a network."
 msgstr "ネットワークを開く"
 
-#: modules/gui/macosx/wizard.m:1604
+#: modules/gui/macosx/wizard.m:1605
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:96
 msgid ""
 "Use this to save a stream to a file. You have the possibility to reencode "
@@ -11529,17 +11543,17 @@ msgid ""
 "should use its transcoding features to save network streams, for example."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1732
+#: modules/gui/macosx/wizard.m:1733
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:129
 msgid "Select your audio codec. Click one to get more information."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1749
+#: modules/gui/macosx/wizard.m:1750
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:124
 msgid "Select your video codec. Click one to get more information."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1783
+#: modules/gui/macosx/wizard.m:1784
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:160
 msgid ""
 "Define the TTL (Time-To-Live) of the stream. This parameter is the maximum "
@@ -11548,7 +11562,7 @@ msgid ""
 "setting to 1."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1794
+#: modules/gui/macosx/wizard.m:1795
 msgid ""
 "When streaming using UDP, you can announce your streams using the SAP/SDP "
 "announcing protocol. This way, the clients won't have to type in the "
@@ -11558,7 +11572,7 @@ msgid ""
 "name will be used."
 msgstr ""
 
-#: modules/gui/macosx/wizard.m:1807
+#: modules/gui/macosx/wizard.m:1808
 msgid ""
 "When this option is enabled, the stream will be both played and transcoded/"
 "streamed.\n"
@@ -13051,7 +13065,7 @@ msgstr "メッセージ(&M)..."
 msgid "&Preferences..."
 msgstr "設定(&P)..."
 
-#: modules/gui/wxwidgets/menus.cpp:565 modules/gui/wxwidgets/menus.cpp:592
+#: modules/gui/wxwidgets/menus.cpp:569 modules/gui/wxwidgets/menus.cpp:596
 msgid "Empty"
 msgstr "空"
 
@@ -13084,6 +13098,10 @@ msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:66
 msgid "WMV (Windows Media Video) 9 (useable with MPEG TS, MPEG1, ASF and OGG)"
+msgstr ""
+
+#: modules/gui/wxwidgets/streamdata.cpp:73
+msgid "Theora is a free general-purpose codec (useable with MPEG TS)"
 msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:122
@@ -13578,11 +13596,22 @@ msgid ""
 "with no path."
 msgstr ""
 
+#: modules/misc/rtsp.c:52
+#, fuzzy
+msgid "Maximum number of connections"
+msgstr "クローンの数"
+
 #: modules/misc/rtsp.c:53
+msgid ""
+"Limit the number of connections to a maximum. (0 = unlimited, N = maximum "
+"clients)"
+msgstr ""
+
+#: modules/misc/rtsp.c:57
 msgid "RTSP VoD"
 msgstr "RTSP VoD"
 
-#: modules/misc/rtsp.c:54
+#: modules/misc/rtsp.c:58
 msgid "RTSP VoD server"
 msgstr "RTSP VoD サーバー"
 
@@ -14960,7 +14989,9 @@ msgstr "湾曲モード"
 
 #: modules/video_filter/distort.c:65
 #, fuzzy
-msgid "Distort mode, one of \"wave\", \"ripple\", \"gradient\" and \"edge\""
+msgid ""
+"Distort mode, one of \"wave\", \"ripple\", \"gradient\", \"edge\", \"hough\" "
+"and \"psychedelic\""
 msgstr "湾曲モード(\"wave\", \"ripple\")"
 
 #: modules/video_filter/distort.c:67
@@ -14980,25 +15011,30 @@ msgstr "次のチャプターを選択"
 msgid "Apply cartoon effect. Used by \"gradient\" and \"edge\"."
 msgstr ""
 
-#: modules/video_filter/distort.c:74
+#: modules/video_filter/distort.c:75
 msgid "Wave"
 msgstr "波形"
 
-#: modules/video_filter/distort.c:74
+#: modules/video_filter/distort.c:75
 #, fuzzy
 msgid "Ripple"
 msgstr "ファイル"
 
-#: modules/video_filter/distort.c:74
-msgid "gradient"
-msgstr ""
+#: modules/video_filter/distort.c:75
+#, fuzzy
+msgid "Gradient"
+msgstr "緑"
 
-#: modules/video_filter/distort.c:74
+#: modules/video_filter/distort.c:76
 #, fuzzy
 msgid "Edge"
 msgstr "ブライトネス"
 
-#: modules/video_filter/distort.c:77
+#: modules/video_filter/distort.c:76
+msgid "Hough"
+msgstr ""
+
+#: modules/video_filter/distort.c:79
 #, fuzzy
 msgid "Distort video filter"
 msgstr "ビデオ逆転モジュール"
@@ -16601,9 +16637,6 @@ msgstr "XOSD インターフェース"
 
 #~ msgid "_Jump..."
 #~ msgstr "ジャンプ(_J)..."
-
-#~ msgid "Got directly so specified point"
-#~ msgstr "特定位置を直接指定"
 
 #~ msgid "Switch program"
 #~ msgstr "プログラムの切替え"
