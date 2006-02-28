@@ -94,7 +94,7 @@ struct demux_sys_t
     int64_t     i_length;
 
     text_t      txt;
-    FILE        *p_vobsub_file;
+    stream_t    *p_vobsub_stream;
     
     /* all tracks */
     int            i_tracks;
@@ -147,7 +147,7 @@ static int Open ( vlc_object_t *p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_length = 0;
-    p_sys->p_vobsub_file = NULL;
+    p_sys->p_vobsub_stream = NULL;
     p_sys->i_tracks = 0;
     p_sys->track = (vobsub_track_t *)malloc( sizeof( vobsub_track_t ) );
     p_sys->i_original_frame_width = -1;
@@ -183,15 +183,16 @@ static int Open ( vlc_object_t *p_this )
     memcpy( psz_vobname + i_len - 4, ".sub", 4 );
 
     /* open file */
-    p_sys->p_vobsub_file = utf8_fopen( psz_vobname, "rb" );
-    free( psz_vobname );
-    if( p_sys->p_vobsub_file == NULL )
+    p_sys->p_vobsub_stream = stream_UrlNew( p_demux, psz_vobname );
+    if( p_sys->p_vobsub_stream == NULL )
     {
         msg_Err( p_demux, "couldn't open .sub Vobsub file: %s",
                  psz_vobname );
+        free( psz_vobname );
         free( p_sys );
         return VLC_EGENERIC;
     }
+    free( psz_vobname );
 
     return VLC_SUCCESS;
 }
@@ -212,8 +213,8 @@ static void Close( vlc_object_t *p_this )
     }
     if( p_sys->track ) free( p_sys->track );
     
-    if( p_sys->p_vobsub_file )
-        fclose( p_sys->p_vobsub_file );
+    if( p_sys->p_vobsub_stream )
+        stream_Delete( p_sys->p_vobsub_stream );
 
     free( p_sys );
 }
@@ -362,10 +363,10 @@ static int Demux( demux_t *p_demux )
             if( i_size <= 0 ) i_size = 65535;   /* Invalid or EOF */
 
             /* Seek at the right place */
-            if( fseek( p_sys->p_vobsub_file, i_pos, SEEK_SET ) )
+            if( stream_Seek( p_sys->p_vobsub_stream, i_pos ) )
             {
                 msg_Warn( p_demux,
-                          "cannot seek at right vobsub location %d", i_pos );
+                          "cannot seek in the VobSub to the correct time %d", i_pos );
                 tk.i_current_subtitle++;
                 continue;
             }
@@ -378,8 +379,7 @@ static int Demux( demux_t *p_demux )
             }
 
             /* read data */
-            p_block->i_buffer = fread( p_block->p_buffer, 1, i_size,
-                                       p_sys->p_vobsub_file );
+            p_block->i_buffer = stream_Read( p_sys->p_vobsub_stream, p_block->p_buffer, i_size );
             if( p_block->i_buffer <= 6 )
             {
                 block_Release( p_block );
