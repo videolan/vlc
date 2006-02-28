@@ -715,7 +715,8 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
-    vout_Control( p_vout, VOUT_SET_SIZE, 0, 0 );
+    vout_Control( p_vout, VOUT_SET_SIZE, p_vout->i_window_width, 
+                  p_vout->i_window_height );
     return VLC_SUCCESS;
 }
 
