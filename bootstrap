@@ -272,20 +272,13 @@ if MAINTAINER_MODE
 endif
 
 mostlyclean-local:
+if USE_LIBTOOL
+	-rm -f *.la
+else
 	-rm -f *.a *\$(LIBEXT)
+endif
 
 clean-local: \$(clean_modules)
-if USE_LIBTOOL
-	@if test -z "\$(libvlc_LTLIBRARIES)\$(noinst_LTLIBRARIES)"; then \
-	  l=\$\$(\$(VLC_CONFIG) --list plugin); \
-	  p=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
-	  l=\$\$(\$(VLC_CONFIG) --list builtin); \
-	  s=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_builtin.la" ;; esac; done\` ; \
-	  test -z "\$\$p\$\$s" || \
-  	    \$(MAKE) \$(AM_MAKEFLAGS) \
-	      libvlc_LTLIBRARIES="\$\$p" noinst_LTLIBRARIES="\$\$s" clean ; \
-	fi
-endif
 
 ### automake creates libvlcdir after running install-*-local
 ### so we have to create it ourselves first
