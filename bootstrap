@@ -198,7 +198,7 @@ do
   for mod in $mods
   do
     extra_libs="${extra_libs} lib${mod}_plugin.a lib${mod}.a lib${mod}_pic.a"
-    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la lib${mod}.la"
+    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la lib${mod}_builtin.la"
   done
   rm -f "${makf}" && cat > "${makf}" << EOF
 
@@ -238,7 +238,7 @@ all-modules:
 if USE_LIBTOOL
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
 	if test "\$(plugin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin.la;; esac; done; fi; \\
-	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.la;; esac; done; fi; \\
+	if test "\$(builtin)" != "no"; then z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_builtin.la;; esac; done; fi; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
 else
@@ -280,7 +280,7 @@ if USE_LIBTOOL
 	  l=\$\$(\$(VLC_CONFIG) --list plugin); \
 	  p=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  l=\$\$(\$(VLC_CONFIG) --list builtin); \
-	  s=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}.la" ;; esac; done\` ; \
+	  s=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_builtin.la" ;; esac; done\` ; \
 	  test -z "\$\$p\$\$s" || \
   	    \$(MAKE) \$(AM_MAKEFLAGS) \
 	      libvlc_LTLIBRARIES="\$\$p" noinst_LTLIBRARIES="\$\$s" clean ; \
@@ -434,21 +434,21 @@ lib${mod}_pic_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin pic ${mod}\`
 lib${mod}_pic_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin pic ${mod}\`
 
 lib${mod}_a_SOURCES = \$(SOURCES_${mod})
-lib${mod}_la_SOURCES = \$(SOURCES_${mod})
+lib${mod}_builtin_la_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_a_SOURCES = \$(nodist_SOURCES_${mod})
-nodist_lib${mod}_la_SOURCES = \$(nodist_SOURCES_${mod})
+nodist_lib${mod}_builtin_la_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
 lib${mod}_a_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
 lib${mod}_a_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
 lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
-lib${mod}_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\`
-lib${mod}_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\`
-lib${mod}_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
-lib${mod}_la_LDFLAGS = \`\$(VLC_CONFIG) --libs ${mod}\` -static
+lib${mod}_builtin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\` -static
+lib${mod}_builtin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\` -static
+lib${mod}_builtin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\` -static
+lib${mod}_builtin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs ${mod}\` -static
 
 EOF
   done

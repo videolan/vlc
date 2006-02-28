@@ -126,7 +126,7 @@ if USE_LIBTOOL
         		../modules/*.a) echo $$c ;; \
 		esac ; \
 	done | \
-	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2.la/g' | \
+	sed -e 's/^\(.*\)\/\([^\/]*\)\.a$$/cd \1 \&\& $(MAKE) \2_builtin.la/g' | \
 	while read cmd; do echo $$cmd; eval "($$cmd)" || exit $$? ; done
 endif
 if BUILD_SHARED
@@ -159,7 +159,7 @@ libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\.a /.la /g'` \
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\.a /_builtin.la /g'` \
 		-avoid-version -no-undefined
 libvlc_la_DEPENDENCIES = stamp-builtins
 
