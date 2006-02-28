@@ -210,6 +210,7 @@ mods = ${mods}
 
 NULL =
 libvlc_LTLIBRARIES =
+noinst_LTLIBRARIES =
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
 clean_modules =
@@ -275,13 +276,14 @@ mostlyclean-local:
 
 clean-local: \$(clean_modules)
 if USE_LIBTOOL
-	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
+	@if test -z "\$(libvlc_LTLIBRARIES)\$(noinst_LTLIBRARIES)"; then \
 	  l=\$\$(\$(VLC_CONFIG) --list plugin); \
 	  p=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  l=\$\$(\$(VLC_CONFIG) --list builtin); \
 	  s=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}.la" ;; esac; done\` ; \
 	  test -z "\$\$p\$\$s" || \
-  	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$p\$\$s" clean ; \
+  	    \$(MAKE) \$(AM_MAKEFLAGS) \
+	      libvlc_LTLIBRARIES="\$\$p" noinst_LTLIBRARIES="\$\$s" clean ; \
 	fi
 endif
 
@@ -418,6 +420,7 @@ lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
 lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
 	-rpath '\$(libvlcdir)' -module -shrext \$(LIBEXT)
 lib${mod}_plugin_la_LIBADD = \$(LTLIBVLC)
+lib${mod}_plugin_la_DEPENDENCIES = \$(LTLIBVLC)
 
 lib${mod}_pic_a_SOURCES = \$(SOURCES_${mod})
 EOF
