@@ -317,8 +317,20 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             if ((ipv4 & 0xfffc0000) == 0xefc00000)
                 ipv4 =  0xefc3ffff;
             else
+            if ((ipv4 & 0xff000000) == 0xef000000)
+                ipv4 = 0;
+            else
             /* other addresses => 224.2.127.254 */
                 ipv4 = 0xe0027ffe;
+
+            if( ipv4 == 0 )
+            {
+                msg_Err( p_sap, "Out-of-scope multicast address "
+                        "not supported by SAP: %s", p_session->psz_uri );
+                vlc_mutex_unlock( &p_sap->object_lock );
+                vlc_freeaddrinfo( res );
+                return VLC_EGENERIC;
+            }
 
             ((struct sockaddr_in *)&addr)->sin_addr.s_addr = htonl( ipv4 );
             break;
