@@ -215,40 +215,42 @@ int vlm_Save( vlm_t *p_vlm, const char *psz_file )
  *****************************************************************************/
 int vlm_Load( vlm_t *p_vlm, const char *psz_file )
 {
-    FILE *file;
+    stream_t *p_stream;
     int64_t i_size;
     char *psz_buffer;
 
     if( !p_vlm || !psz_file ) return 1;
 
-    file = utf8_fopen( psz_file, "r" );
-    if( file == NULL ) return 1;
+    p_stream = stream_UrlNew( p_vlm, psz_file );
+    if( p_stream == NULL ) return 1;
 
-    if( fseek( file, 0, SEEK_END) != 0 )
+    if( stream_Seek( p_stream, 0 ) != 0 )
     {
-        fclose( file );
+        stream_Delete( p_stream );
         return 2;
     }
 
-    i_size = ftell( file );
-    fseek( file, 0, SEEK_SET );
+    i_size = stream_Size( p_stream );
+
     psz_buffer = malloc( i_size + 1 );
     if( !psz_buffer )
     {
-        fclose( file );
+        stream_Delete( p_stream );
         return 2;
     }
-    fread( psz_buffer, 1, i_size, file );
+
+    stream_Read( p_stream, psz_buffer, i_size );
     psz_buffer[ i_size ] = '\0';
+
+    stream_Delete( p_stream );
+
     if( Load( p_vlm, psz_buffer ) )
     {
-        fclose( file );
         free( psz_buffer );
         return 3;
     }
 
     free( psz_buffer );
-    fclose( file );
 
     return 0;
 }
