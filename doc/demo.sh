@@ -6,7 +6,11 @@
 ########################################################################
 
 #TODO: change on Max OS X
-VLC="./vlc --quiet --color "
+if test ".`uname -s`" = ".Darwin"; then
+  VLC="./VLC.app/Contents/MacOS/VLC --quiet --color "
+else
+  VLC="./vlc --quiet --color "
+fi
 CMD=""
 
 pyschedelic()
