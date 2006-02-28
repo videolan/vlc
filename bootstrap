@@ -262,7 +262,7 @@ _plugin.a_plugin\$(LIBEXT):
 #ifneq (,\$(findstring cygwin,\$(host)))
 #	mv "$@.exe" "$@"
 #endif
-	@if test -f "$@.exe"; then mv "$@.exe" $@; fi
+	@if test -f "$@.exe"; then mv "$@.exe" "$@"; fi
 
 if MAINTAINER_MODE
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
