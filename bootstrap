@@ -212,6 +212,7 @@ NULL =
 libvlc_LTLIBRARIES =
 EXTRA_DIST = Modules.am
 BUILT_SOURCES =
+clean_modules =
 SUBDIRS = ${subdirs}
 SUFFIXES = _plugin\$(LIBEXT) _plugin.a
 
@@ -271,6 +272,18 @@ endif
 
 mostlyclean-local:
 	-rm -f *.a *\$(LIBEXT)
+
+clean-local: \$(clean_modules)
+if USE_LIBTOOL
+	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
+	  l=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  p=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  l=\$\$(\$(VLC_CONFIG) --list builtin); \
+	  s=\`for mod in \$(mods); do case "\$\$l " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}.la" ;; esac; done\` ; \
+	  test -z "\$\$p\$\$s" || \
+  	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$p\$\$s" clean ; \
+	fi
+endif
 
 ### automake creates libvlcdir after running install-*-local
 ### so we have to create it ourselves first
@@ -376,7 +389,7 @@ EOF
 
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
-clean-local: clean-${mod}
+clean_modules += clean-${mod}
 clean-${mod}:
 	-test -z "\$(nodist_SOURCES_${mod})" || rm -f \$(nodist_SOURCES_${mod})
 
@@ -421,8 +434,8 @@ lib${mod}_a_SOURCES = \$(SOURCES_${mod})
 lib${mod}_la_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
-nodist_lib${mod}_a_SOURCES = ${PRIVATE}\$(nodist_SOURCES_${mod})
-nodist_lib${mod}_la_SOURCES = ${PRIVATE}\$(nodist_SOURCES_${mod})
+nodist_lib${mod}_a_SOURCES = \$(nodist_SOURCES_${mod})
+nodist_lib${mod}_la_SOURCES = \$(nodist_SOURCES_${mod})
 EOF
     fi
     cat >> "${makf}" << EOF
