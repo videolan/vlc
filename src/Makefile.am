@@ -213,7 +213,7 @@ libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 # libvlc$(LIBEXT)
 	rm -f libvlc.a
 # Cygwin work-around
-	@if test -f "$@.exe"; then mv "$@.exe" "$@"; fi
+	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
 endif
 
 EXTRA_DIST += \

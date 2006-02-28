@@ -85,7 +85,7 @@ axvlc$(LIBEXT): $(libaxvlc_a_OBJECTS) \
 	  $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LDFLAGS_activex) \
 	  $(INCLUDED_LIBINTL)
 # Cygwin work-around
-	@if test -f "$@.exe"; then mv "$@.exe" "$@"; fi
+	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
 
 
 DATA_axvlc_tlb = $(axvlc_tlb_DATA)
