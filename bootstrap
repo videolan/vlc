@@ -260,9 +260,9 @@ _plugin.a_plugin\$(LIBEXT):
 	echo \$\$ld \$< \$\$ldfl ; \
 	\$\$ld \$< \$\$ldfl
 #ifneq (,\$(findstring cygwin,\$(host)))
-#	mv -f "$@.exe" "$@"
+#	mv -f "\$@.exe" "\$@"
 #endif
-	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
+	@if test -f "\$@.exe"; then mv -f "\$@.exe" "\$@"; fi
 
 if MAINTAINER_MODE
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
