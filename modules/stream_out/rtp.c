@@ -276,8 +276,10 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
-    sout_stream_sys_t   *p_sys;
+    sout_stream_sys_t   *p_sys = NULL;
+    sout_cfg_t          *p_cfg = NULL;
     vlc_value_t         val;
+    vlc_bool_t          b_rtsp = VLC_FALSE;
 
     sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
 
@@ -315,33 +317,30 @@ static int Open( vlc_object_t *p_this )
         else
            p_sys->psz_session_name = strdup( "NONE" );
     }
+    
+    for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
+    {
+        if( !strcmp( p_cfg->psz_name, "sdp" ) )
+        {
+            if( p_cfg->psz_value && !strncasecmp( p_cfg->psz_value, "rtsp", 4 ) )
+            {
+                b_rtsp = VLC_TRUE;
+                break;
+            }
+        }
+    }
+    if( !b_rtsp )
+    {
+        vlc_value_t val2;
+        var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val2 );
+        if( !strncasecmp( val2.psz_string, "rtsp", 4 ) )
+            b_rtsp = VLC_TRUE;
+        free( val2.psz_string );
+    }
 
     if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
     {
-        sout_cfg_t *p_cfg;
-        vlc_bool_t b_ok = VLC_FALSE;
-
-        for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
-        {
-            if( !strcmp( p_cfg->psz_name, "sdp" ) )
-            {
-                if( p_cfg->psz_value && !strncasecmp( p_cfg->psz_value, "rtsp", 4 ) )
-                {
-                    b_ok = VLC_TRUE;
-                    break;
-                }
-            }
-        }
-        if( !b_ok )
-        {
-            vlc_value_t val2;
-            var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val2 );
-            if( !strncasecmp( val2.psz_string, "rtsp", 4 ) )
-                b_ok = VLC_TRUE;
-            free( val2.psz_string );
-        }
-
-        if( !b_ok )
+        if( !b_rtsp )
         {
             msg_Err( p_stream, "missing destination and not in rtsp mode" );
             free( p_sys );
@@ -413,7 +412,13 @@ static int Open( vlc_object_t *p_this )
         sout_access_out_t *p_grab;
         char *psz_rtpmap, url[NI_MAXHOST + 8], access[17], psz_ttl[5], ipv;
 
-        if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
+        if( b_rtsp )
+        {
+            msg_Err( p_stream, "muxing is not supported in RTSP mode" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        else if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
         {
             msg_Err( p_stream, "rtp needs a destination when muxing" );
             free( p_sys );
@@ -543,7 +548,7 @@ static int Open( vlc_object_t *p_this )
                   ipv, p_sys->psz_destination, psz_ttl,
                   p_sys->i_port, p_sys->i_payload_type,
                   p_sys->i_payload_type, psz_rtpmap );
-        fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
+        msg_Dbg( p_stream, "sdp=%s", p_sys->psz_sdp );
 
         /* create the rtp context */
         p_sys->ssrc[0] = rand()&0xff;
@@ -642,8 +647,6 @@ static void Close( vlc_object_t * p_this )
     {
         httpd_HostDelete( p_sys->p_rtsp_host );
     }
-#if 0
-    /* why? is this disabled? */
     if( p_sys->psz_session_name )
     {
         free( p_sys->psz_session_name );
@@ -664,10 +667,10 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->psz_session_email );
         p_sys->psz_session_email = NULL;
     }
-#endif
     if( p_sys->psz_sdp )
     {
         free( p_sys->psz_sdp );
+        p_sys->psz_sdp = NULL;
     }
     free( p_sys );
 }
@@ -685,7 +688,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     {
         if( p_sys->p_httpd_file )
         {
-            msg_Err( p_stream, "You can used sdp=http:// only once" );
+            msg_Err( p_stream, "You can use sdp=http:// only once" );
             return;
         }
 
@@ -698,7 +701,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     {
         if( p_sys->p_rtsp_url )
         {
-            msg_Err( p_stream, "You can used sdp=rtsp:// only once" );
+            msg_Err( p_stream, "You can use sdp=rtsp:// only once" );
             return;
         }
 
@@ -718,7 +721,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     {
         if( p_sys->b_export_sdp_file )
         {
-            msg_Err( p_stream, "You can used sdp=file:// only once" );
+            msg_Err( p_stream, "You can use sdp=file:// only once" );
             return;
         }
         p_sys->b_export_sdp_file = VLC_TRUE;
@@ -792,6 +795,10 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
             i_size += strlen( "a=control:*/trackid=*\r\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
         }
     }
+    if( p_sys->p_mux )
+    {
+        i_size += strlen( "m=video %d RTP/AVP %d\r\n" ) +10 +10;
+    }
 
     ipv = ( strchr( psz_destination, ':' ) != NULL ) ? '6' : '4';
 
@@ -857,6 +864,11 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             p += sprintf( p, "a=control:%s/trackid=%d\r\n", p_sys->psz_rtsp_control, i );
         }
+    }
+    if( p_sys->p_mux )
+    {
+       p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
+                 p_sys->i_port, p_sys->i_payload_type );
     }
 
     return psz_sdp;
@@ -1123,7 +1135,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         char psz_urlc[strlen( p_sys->psz_rtsp_control ) + 1 + 10];
 
         sprintf( psz_urlc, "%s/trackid=%d", p_sys->psz_rtsp_path, p_sys->i_es );
-        fprintf( stderr, "rtsp: adding %s\n", psz_urlc );
+        msg_Dbg( p_stream, "rtsp: adding %s\n", psz_urlc );
         id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
 
         if( id->p_rtsp_url )
@@ -1149,7 +1161,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     p_sys->i_sdp_version++;
 
-    fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
+    msg_Dbg( p_stream, "sdp=%s", p_sys->psz_sdp );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap ) SapSetup( p_stream );
@@ -1471,7 +1483,7 @@ static int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    fprintf( stderr, "rtsp setup: %s : %d / %s\n", url->psz_host, url->i_port, url->psz_path );
+    msg_Dbg( p_stream, "rtsp setup: %s : %d / %s\n", url->psz_host, url->i_port, url->psz_path );
 
     p_sys->p_rtsp_host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host, url->i_port > 0 ? url->i_port : 554 );
     if( p_sys->p_rtsp_host == NULL )
@@ -1510,7 +1522,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     {
         return VLC_SUCCESS;
     }
-    fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
+    //fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
 
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
@@ -1615,7 +1627,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
         default:
             return VLC_EGENERIC;
     }
-    httpd_MsgAdd( answer, "Server", "VLC Server" );
+    httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     httpd_MsgAdd( answer, "Cseq", "%d", atoi( httpd_MsgGet( query, "Cseq" ) ) );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
@@ -1641,7 +1653,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
     {
         return VLC_SUCCESS;
     }
-    fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
+    //fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
 
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
@@ -1653,11 +1665,11 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
         {
             char *psz_transport = httpd_MsgGet( query, "Transport" );
 
-            fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
+            //fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
 
             if( strstr( psz_transport, "multicast" ) && id->psz_destination )
             {
-                fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
+                //fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
                 answer->i_status = 200;
                 answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
@@ -1691,8 +1703,7 @@ static int  RtspCallbackId( httpd_callback_sys_t *p_args,
                     break;
                 }
 
-                fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n",
-                         ip, i_port );
+                //fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n", ip, i_port );
 
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( *psz_session == 0 )
