@@ -36,4 +36,5 @@ EXTRA_DIST = \
 	strings.txt \
 	translations.txt \
 	win32/Cross-Compile-Howto.txt \
+	demo.sh \
 	$(NULL)
