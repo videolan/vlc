@@ -461,8 +461,7 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
         wxString path = p_dir_dialog->GetPath();
         char *psz_utf8 = wxFromLocale( path );
         playlist_Add( p_playlist, psz_utf8, psz_utf8,
-                      PLAYLIST_APPEND | (event.GetInt() ? PLAYLIST_GO : 0) |
-                      (event.GetInt() ? 0 : PLAYLIST_PREPARSE ),
+                      PLAYLIST_APPEND | (event.GetInt() ? PLAYLIST_GO : 0),
                       PLAYLIST_END );
         wxLocaleFree( psz_utf8 );
     }
