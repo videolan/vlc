@@ -286,12 +286,12 @@ int __net_OpenUDP( vlc_object_t *p_this, const char *psz_bind, int i_bind,
     network_socket_t sock;
     module_t         *p_network = NULL;
 
-    if( ( psz_server != NULL ) && ( psz_server[0] == '\0' ) )
+/*    if( ( psz_server != NULL ) && ( psz_server[0] == '\0' ) )
         msg_Warn( p_this, "calling net_OpenUDP with an explicit destination "
                   "is obsolete - use net_ConnectUDP instead" );
     if( i_server != 0 )
         msg_Warn( p_this, "calling net_OpenUDP with an explicit destination "
-                  "port is obsolete - use __net_ConnectUDP instead" );
+                  "port is obsolete - use __net_ConnectUDP instead" );*/
 
     if( psz_server == NULL ) psz_server = "";
     if( psz_bind == NULL ) psz_bind = "";
