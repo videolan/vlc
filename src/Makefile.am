@@ -7,9 +7,9 @@ SUBDIRS =
 
 EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
-BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
+BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES) misc/version.c
 DISTCLEANFILES = stamp-api
-CLEANFILES = misc/modules_builtin.h misc/version.c
+CLEANFILES = misc/modules_builtin.h stamp-version
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
@@ -107,8 +107,14 @@ misc/modules_builtin.h: Makefile misc/modules_builtin.h.in ../vlc-config
 
 misc/modules.c: misc/modules_builtin.h
 
-misc/version.c: FORCE
+misc/version.c:
 	$(TOOLBOX) --update-version
+
+stamp-version: misc/version.c
+	$(TOOLBOX) --update-version
+	touch $@
+
+.PHONY: stamp-version
 
 ###############################################################################
 # Building builtin modules
@@ -365,7 +371,3 @@ stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
 
-###############################################################################
-# Force rule
-###############################################################################
-FORCE:
