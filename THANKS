@@ -44,6 +44,7 @@ David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Nylander <info@danielnylander at se> - Swedish translation
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
+Dennis van Amerongen <Dennis dot vanAmerongen at nob dot nl> - x264 options unification
 DirektX <direktx at freemail.hu> - Hungarian translation
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
 Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
