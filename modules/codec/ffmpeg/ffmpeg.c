@@ -701,8 +701,12 @@ static struct
       VIDEO_ES, "DV Video" },
     { VLC_FOURCC('d','v','c',' '), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','c','p'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video PAL" },
     { VLC_FOURCC('d','v','p',' '), CODEC_ID_DVVIDEO,
-      VIDEO_ES, "DV Video" },
+      VIDEO_ES, "DV Video Pro" },
+    { VLC_FOURCC('d','v','p','p'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video Pro PAL" },
     { VLC_FOURCC('C','D','V','C'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
 
