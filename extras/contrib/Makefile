@@ -100,6 +100,8 @@ package-win32: FORCE
 		cp src/live/$$i/lib$${i}.a  tmp/usr/win32/live.com/$$i; \
 	done;
 	./change_prefix.sh tmp $(PREFIX) /usr/win32
+#	Klugy kludge	
+	(cd tmp/usr/win32/bin; rm -f *.exe; chmod u+x *)
 	(cd tmp; tar cf - usr/win32/) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-only.tar.bz2
 	rm -rf tmp
 FORCE:
