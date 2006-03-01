@@ -163,13 +163,13 @@ cddb_end: ;
   }                                                                     \
 
 #define add_cddb_meta(FIELD, VLC_META)			                \
-  add_meta_val(VLC_META, p_cdda->cddb.disc->FIELD);
+  add_meta_val(VLC_META, cddb_disc_get_##FIELD(p_cdda->cddb.disc));
 
 #define add_cddb_meta_fmt(FIELD, FORMAT_SPEC, VLC_META)                 \
   {                                                                     \
     char psz_buf[100];                                                  \
     snprintf( psz_buf, sizeof(psz_buf)-1, FORMAT_SPEC,                  \
-              p_cdda->cddb.disc->FIELD );                               \
+              cddb_disc_get_##FIELD(p_cdda->cddb.disc));                               \
     psz_buf[sizeof(psz_buf)-1] = '\0';                                  \
     add_meta_val(VLC_META, psz_buf);					\
   }
@@ -195,13 +195,13 @@ cddb_end: ;
    under category "Disc" if the string is not null or the null string.
  */
 #define add_cddb_disc_info_str(TITLE, FIELD)                    \
-  add_info_str("Disc", TITLE, p_cdda->cddb.disc->FIELD)
+  add_info_str("Disc", TITLE, cddb_disc_get_##FIELD(p_cdda->cddb.disc))
 
 /* Adds a CDDB numeric-valued entry to the stream and media information
    under category "Disc" if the string is not null or the null string.
  */
 #define add_cddb_disc_info_val(TITLE, FMT, FIELD)               \
-  add_info_val("Disc", TITLE, FMT, p_cdda->cddb.disc->FIELD)
+  add_info_val("Disc", TITLE, FMT, cddb_disc_get_##FIELD(p_cdda->cddb.disc))
 
 /* Adds a CD-Text string-valued entry to the stream and media information
    under category "Disc" if the string is not null or the null string.
@@ -283,11 +283,12 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
         if( CDIO_INVALID_TRACK == i_track )
 	{
 
-	    psz_meta_title  = p_cdda->cddb.disc->title;
-	    psz_meta_artist = p_cdda->cddb.disc->artist;
-	    if ( p_cdda->cddb.disc->genre && strlen(p_cdda->cddb.disc->genre) )
+	    psz_meta_title  = (char *)cddb_disc_get_title(p_cdda->cddb.disc);
+	    psz_meta_artist = (char *)cddb_disc_get_artist(p_cdda->cddb.disc);
+	    if ( cddb_disc_get_genre(p_cdda->cddb.disc) && 
+		     strlen(cddb_disc_get_genre(p_cdda->cddb.disc)) )
 	        add_cddb_meta(genre, VLC_META_GENRE);
-	    if ( 0 != p_cdda->cddb.disc->year )
+	    if ( 0 != cddb_disc_get_year(p_cdda->cddb.disc))
 	        add_cddb_meta_fmt(year, "%d", VLC_META_DATE );
 	}
 	else
@@ -295,13 +296,13 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 	  cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i_track-1);
 	  if (t != NULL )
 	  {
-	      if( t->title != NULL && ! p_cdda->b_nav_mode )
+	      if( cddb_track_get_title(t) != NULL && ! p_cdda->b_nav_mode )
 	      {
-		  add_meta_val( VLC_META_TITLE, t->title );
+		  add_meta_val( VLC_META_TITLE, cddb_track_get_title(t) );
 	      }
-	      if( t->artist != NULL )
+	      if( cddb_track_get_artist(t) != NULL )
 	      {
-		add_meta_val( VLC_META_ARTIST, t->artist );
+		add_meta_val( VLC_META_ARTIST, cddb_track_get_artist(t) );
 	      }
 	  }
 	}
@@ -339,14 +340,14 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
         if (p_cdda->b_cddb_enabled && p_cdda->cddb.disc)
         {
           add_cddb_disc_info_str("Artist (CDDB)", artist);
-	  if ( CDDB_CAT_INVALID != p_cdda->cddb.disc->category )
+	  if ( CDDB_CAT_INVALID != cddb_disc_get_category(p_cdda->cddb.disc) )
 	    add_info_str("Disc", "Category (CDDB)",
-			 CDDB_CATEGORY[p_cdda->cddb.disc->category]);
+			 CDDB_CATEGORY[cddb_disc_get_category(p_cdda->cddb.disc)]);
           add_cddb_disc_info_val("Disc ID (CDDB)", "%x", discid);
           add_cddb_disc_info_str("Extended Data (CDDB)", ext_data);
 	  add_cddb_disc_info_str("Genre (CDDB)",  genre);
           add_cddb_disc_info_str("Title (CDDB)",  title);
-	  if ( 0 != p_cdda->cddb.disc->year ) 
+	  if ( 0 != cddb_disc_get_year(p_cdda->cddb.disc) ) 
 	    add_cddb_disc_info_val("Year (CDDB)", "%d", year);
 
         }
@@ -423,10 +424,12 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 	      cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i);
 	      if (t != NULL)
 		{
-		  add_info_str(psz_track, "Artist (CDDB)", t->artist);
-		  add_info_str(psz_track, "Title (CDDB)",  t->title);
+		  add_info_str(psz_track, "Artist (CDDB)", 
+			       cddb_track_get_artist(t));
+		  add_info_str(psz_track, "Title (CDDB)",  
+			       cddb_track_get_title(t));
 		  add_info_str(psz_track, "Extended Data (CDDB)",
-			       t->ext_data);
+			       cddb_track_get_ext_data(t));
 		}
 	    }
 #endif /*HAVE_LIBCDDB*/
@@ -566,41 +569,41 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                     && p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER])
                   psz = p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER];
                 if (want_cddb_info(p_cdda, psz))
-                  psz = p_cdda->cddb.disc->artist;
+                  psz = (char *)cddb_disc_get_artist(p_cdda->cddb.disc);
                 goto format_str;
             case 'A':
                 if (p_cdda->p_cdtext[0]
                     && p_cdda->p_cdtext[0]->field[CDTEXT_TITLE])
                   psz = p_cdda->p_cdtext[0]->field[CDTEXT_TITLE];
 		if (want_cddb_info(p_cdda, psz))
-		  psz =  p_cdda->cddb.disc->title;
+		  psz =  (char *)cddb_disc_get_title(p_cdda->cddb.disc);
                 goto format_str;
             case 'C':
                 if (!p_cdda->b_cddb_enabled) goto not_special;
                 if (p_cdda->cddb.disc)
-                    add_format_str_info(
-                                  CDDB_CATEGORY[p_cdda->cddb.disc->category]);
+                    add_format_str_info(CDDB_CATEGORY[cddb_disc_get_category(p_cdda->cddb.disc)]);
                 break;
             case 'G':
                 if (p_cdda->p_cdtext[0]
                     && p_cdda->p_cdtext[0]->field[CDTEXT_GENRE])
                   psz = p_cdda->p_cdtext[0]->field[CDTEXT_GENRE];
                 if (want_cddb_info(p_cdda, psz))
-                  psz = p_cdda->cddb.disc->genre;
+                  psz = (char *)cddb_disc_get_genre(p_cdda->cddb.disc);
                 goto format_str;
             case 'I':
                 if (p_cdda->p_cdtext[0]
                     && p_cdda->p_cdtext[0]->field[CDTEXT_DISCID])
                   psz = p_cdda->p_cdtext[0]->field[CDTEXT_DISCID];
                 if (want_cddb_info(p_cdda, psz)) {
-                     add_format_num_info(p_cdda->cddb.disc->discid, "%x");
+                     add_format_num_info(cddb_disc_get_discid(p_cdda->cddb.disc), "%x");
                 } else if (psz)
                      add_format_str_info(psz);
                 break;
             case 'Y':
                 if (!p_cdda->b_cddb_enabled) goto not_special;
                 if (p_cdda->cddb.disc)
-                    add_format_num_info(p_cdda->cddb.disc->year, "%5d");
+                    add_format_num_info(cddb_disc_get_year(p_cdda->cddb.disc), 
+					"%5d");
                 break;
             case 't':
                 if ( CDIO_INVALID_TRACK == i_track ) break;
@@ -608,8 +611,8 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                 {
                     cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
                                                         i_track-1);
-                    if (t != NULL && t->title != NULL) {
-                      add_format_str_info(t->title);
+                    if (t != NULL && cddb_track_get_title(t) != NULL) {
+                      add_format_str_info(cddb_track_get_title(t));
                     } else {
                       add_format_str_info(psz_mrl);
                     }
@@ -631,8 +634,8 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
 		  {
 		    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
 							i_track-1);
-		    if (t != NULL && t->artist != NULL)
-		      psz = t->artist;
+		    if (t != NULL && cddb_track_get_artist(t) != NULL)
+		      psz = (char *)cddb_track_get_artist(t);
 		  }
 		goto format_str;
             case 'e':
@@ -644,8 +647,8 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                 {
                     cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
                                                         i_track-1);
-                    if (t != NULL && t->ext_data != NULL)
-                        psz = t->ext_data;
+                    if (t != NULL && cddb_track_get_ext_data(t) != NULL)
+                        psz = (char *)cddb_track_get_ext_data(t);
                 } 
 		goto format_str;
                 break;
@@ -884,15 +887,15 @@ int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
 
         if (t)
         {
-            if (t->artist)
+            if (cddb_track_get_artist(t))
                 add_playlist_track_info_str("Artist (CDDB)",
-                                             t->artist);
-            if (t->title)
+                                             cddb_track_get_artist(t));
+            if (cddb_track_get_title(t))
                 add_playlist_track_info_str("Title (CDDB)",
-                                            t->title);
-            if (t->ext_data)
+                                            cddb_track_get_title(t));
+            if (cddb_track_get_ext_data(t))
                 add_playlist_track_info_str("Extended information (CDDB)",
-                                            t->ext_data);
+                                            cddb_track_get_ext_data(t));
         }
     }
 #endif /*HAVE_LIBCDDB*/
