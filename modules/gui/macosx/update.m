@@ -72,8 +72,6 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    if( o_hashOfOurBinary )
-        [o_hashOfOurBinary release];
     if( o_urlOfBinary )
         [o_urlOfBinary release];
 
@@ -144,9 +142,9 @@ static VLCUpdate *_o_sharedInstance = nil;
     BOOL releaseChecked = NO;
     int x = 0;
     NSString * pathToReleaseNote;
-    pathToReleaseNote = [[NSString stringWithString: \
-        @"~/Library/Caches/vlc_releasenote_temp.txt"] \
-        stringByExpandingTildeInPath];
+    pathToReleaseNote = [NSString stringWithFormat: \
+        @"/tmp/vlc_releasenote_%@.tmp", [[NSCalendarDate calendarDate] \
+        descriptionWithCalendarFormat: @"%m-%d-%y--%I.%M.%S.%F"]];
     
     if( p_uit )
     {
@@ -172,13 +170,13 @@ static VLCUpdate *_o_sharedInstance = nil;
                 }
                 else if( p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
                 {
-                    msg_Dbg( p_intf, "binary found, version = %s" \
-                        ", hash=%s, size=%i MB", p_uit->release.psz_version, \
-                        p_uit->file.psz_md5, \
+                    msg_Dbg( p_intf, "binary found, version = %s, " \
+                        "url=%s, size=%i MB", p_uit->release.psz_version, \
+                        p_uit->file.psz_url, \
                         (int)((p_uit->file.l_size / 1024) / 1024) );
-                    [o_fld_currentVersionAndSize setStringValue: \
-                        [NSString stringWithFormat: \
-                        @"The current release is %s (%i MB to download).", \
+                    [o_fld_currentVersionAndSize setStringValue: [NSString \
+                        stringWithFormat: \
+                        _NS("The current release is %s (%i MB to download)."), \
                         p_uit->release.psz_version, ((p_uit->file.l_size \
                         / 1024) / 1024)]];
                         
@@ -186,15 +184,6 @@ static VLCUpdate *_o_sharedInstance = nil;
                         [o_urlOfBinary release];
                     o_urlOfBinary = [[NSString alloc] initWithUTF8String: \
                         p_uit->file.psz_url];
-
-                    /* save the hash of our file, if available */
-                    if( p_uit->file.psz_md5 )
-                    {
-                        if( o_hashOfOurBinary )
-                            [o_hashOfOurBinary release];
-                        o_hashOfOurBinary = [[NSString alloc] \
-                            initWithUTF8String: p_uit->file.psz_md5];
-                    }
                 }
                 if( p_uit->release.i_status == UPDATE_RELEASE_STATUS_NEWER &&
                     !releaseChecked )
@@ -272,6 +261,11 @@ static VLCUpdate *_o_sharedInstance = nil;
                 p_uit->release.i_status == UPDATE_RELEASE_STATUS_NEWER &&
                 p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
             {
+                /* put the mirror information */
+                msg_Dbg( p_intf, "used mirror: %s, %s [%s]", \
+                    p_uit->mirror.psz_name, p_uit->mirror.psz_location, \
+                    p_uit->mirror.psz_type );
+
                 /* that's our binary */
                 update_download( p_uit, (char *)[path UTF8String] );
             }

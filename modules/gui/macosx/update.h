@@ -35,7 +35,6 @@
     IBOutlet id o_update_window;
     IBOutlet id o_bar_checking;
 
-    NSString * o_hashOfOurBinary;
     NSString * o_urlOfBinary;
     update_t * p_u;
     intf_thread_t * p_intf;
