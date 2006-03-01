@@ -1192,12 +1192,11 @@ DISTCLEAN_PKG += libmodplug-$(MODPLUG_VERSION).tar.gz
 # libcddb
 # ***************************************************************************
 
-libcddb-$(CDDB_VERSION).tar.gz:
+libcddb-$(CDDB_VERSION).tar.bz2:
 	$(WGET) $(CDDB_URL)
 
-libcddb: libcddb-$(CDDB_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p 0 < Patches/libcddb.patch
+libcddb: libcddb-$(CDDB_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 
 .cddb: libcddb
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
