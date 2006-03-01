@@ -135,10 +135,13 @@ vlc_module_begin();
     add_bool( "wx-autosize", 1, NULL,
               SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
     add_deprecated( "wxwin-autosize", VLC_FALSE); /*Deprecated since 0.8.4*/
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wx-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
     add_deprecated( "wxwin-systray", VLC_FALSE); /*Deprecated since 0.8.4*/
+#endif
 #endif
     add_string( "wx-config-last", NULL, NULL,
                 "last config", "last config", VLC_TRUE );

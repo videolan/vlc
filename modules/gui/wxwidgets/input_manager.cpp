@@ -171,12 +171,15 @@ void InputManager::UpdateButtons( vlc_bool_t b_play )
         p_main_intf->statusbar->SetStatusText( wxT(""), 0 );
         p_main_intf->statusbar->SetStatusText( wxT(""), 2 );
 
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
         if( p_main_intf->p_systray )
         {
             p_main_intf->p_systray->UpdateTooltip(
                 wxString(wxT("VLC media player - ")) + wxU(_("Stopped")) );
         }
+#endif
 #endif
 
         return;
@@ -192,6 +195,8 @@ void InputManager::UpdateButtons( vlc_bool_t b_play )
         p_main_intf->TogglePlayButton( val.i_int == STATUS_PAUSE ?
                                        PAUSE_S : PLAYING_S );
 
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
         if( p_main_intf->p_systray )
         {
@@ -199,6 +204,7 @@ void InputManager::UpdateButtons( vlc_bool_t b_play )
                 wxU(p_input->input.p_item->psz_name) + wxString(wxT(" - ")) +
                 (val.i_int == PAUSE_S ? wxU(_("Paused")) : wxU(_("Playing"))));
         }
+#endif
 #endif
     }
 }

@@ -396,6 +396,8 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Put this in the splitter */
     splitter->Initialize( main_panel );
 
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
     /* Systray integration */
     p_systray = NULL;
@@ -403,6 +405,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     {
         p_systray = new Systray( this, p_intf );
     }
+#endif
 #endif
 
     /* Creation of the menu bar */
@@ -493,8 +496,11 @@ Interface::~Interface()
 
     if( video_window ) delete video_window;
 
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
     if( p_systray ) delete p_systray;
+#endif
 #endif
 
     p_intf->b_interaction = VLC_FALSE;

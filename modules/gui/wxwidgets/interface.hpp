@@ -54,6 +54,8 @@ namespace wxvlc
 #endif
 
     /* Systray integration */
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
    class Systray: public wxTaskBarIcon
    {
@@ -75,6 +77,7 @@ namespace wxvlc
         intf_thread_t *p_intf;
         DECLARE_EVENT_TABLE()
     };
+#endif
 #endif
 
     /* Main Interface */
@@ -104,8 +107,11 @@ namespace wxvlc
 
         wxControl  *volctrl;
 
+    /* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+    #ifndef __APPLE__
     #ifdef wxHAS_TASK_BAR_ICON
         Systray     *p_systray;
+    #endif
     #endif
 
         wxWindow *video_window;
