@@ -3459,12 +3459,14 @@ if test "${enable_glx}" != "no" &&
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
-if test "${enable_xvideo}" != "no" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_xvideo}" = "yes"); then
 dnl
 dnl  Check for the Xinerama extension
 dnl
+AC_ARG_ENABLE(xinerama,
+  [  --enable-xinerama       Xinerama support (default enabled)])
+if test "${enable_xvideo}" != "no" && test "${enable_xinerama}" != "no" &&
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_xvideo}" = "yes"); then
   ac_cv_have_xinerama="no"
   CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
   CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
