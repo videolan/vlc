@@ -475,15 +475,32 @@ AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
      #endif], [struct sockaddr_storage addr;],
      ac_cv_struct_sockaddr_storage=yes,
      ac_cv_struct_sockaddr_storage=no)])
-if test $ac_cv_struct_sockaddr_storage = no; then
+AS_IF([test "${ac_cv_struct_sockaddr_storage}" = no], [
   AC_DEFINE(sockaddr_storage, sockaddr)
   AC_DEFINE(ss_family, sa_family)
-fi
+])
 
 dnl getaddrinfo, getnameinfo and gai_strerror check
-dnl  -lresolv is NOT needed on Solaris
+dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
-AC_CHECK_FUNCS([getaddrinfo getnameinfo gai_strerror])
+LIBS_save="${LIBS}"
+AC_CHECK_FUNCS([getaddrinfo], [
+  LIBS_gai="${LIBS}"
+], [
+  LIBS="${LIBS} -lnsl -lsocket"
+  AC_CHECK_FUNCS([getaddrinfo], [
+    LIBS_gai="${LIBS}"
+  ], [
+    LIBS_gai="${LIBS_save}"
+  ])
+])
+
+dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
+dnl are
+LIBS="${LIBS_gai}"
+AC_CHECK_FUNCS([getnameinfo gai_strerror])
+LIBS="${LIBS_save}"
+
 AH_TEMPLATE(HAVE_ADDRINFO, [Define to `1' if <netdb.h> defines struct addrinfo.])
 AC_CHECK_TYPES([struct addrinfo],[AC_DEFINE(HAVE_ADDRINFO)],,
 [#include <sys/types.h>
