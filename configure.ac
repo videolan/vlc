@@ -428,7 +428,7 @@ fi
 
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LDFLAGS([vlc ipv4 cdda cddax],-lsocket)
+    VLC_ADD_LDFLAGS([vlc ipv4 ipv6 cdda cddax],-lsocket)
   ])
 ])
 
@@ -440,7 +440,7 @@ AC_CHECK_FUNCS(send,,[
 
 AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,[
-    VLC_ADD_LDFLAGS([cdda cddax ipv4 vlc],[-lnsl])
+    VLC_ADD_LDFLAGS([cdda cddax ipv4 ipv6 vlc],[-lnsl])
   ],[
     AC_CHECK_LIB(bind,gethostbyname,[
       VLC_ADD_LDFLAGS([ipv4 access_mms],[-lbind])
