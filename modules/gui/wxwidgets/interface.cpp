@@ -1410,6 +1410,8 @@ void VLCVolCtrl::UpdateVolume()
  * Systray class.
  *****************************************************************************/
 
+/* wxCocoa pretends to support this, but at least 2.6.x doesn't */
+#ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
 
 BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
@@ -1503,4 +1505,5 @@ void Systray::UpdateTooltip( const wxChar* tooltip )
 {
     SetIcon( wxIcon( vlc16x16_xpm ), tooltip );
 }
+#endif
 #endif
