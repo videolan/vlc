@@ -1,7 +1,7 @@
 /*****************************************************************************
  * x264.c: h264 video encoder
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -39,130 +39,192 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define QP_TEXT N_("Quantizer parameter")
-#define QP_LONGTEXT N_( \
-    "This selects the quantizer to use (1 to 51). Lower values result in " \
-    "better fidelity, but higher bitrates. 26 is a good default value." )
+/* Frame-type options */
 
-#define QPMIN_TEXT N_("Minimum quantizer parameter")
-#define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
-    "range." )
+#define KEYINT_TEXT N_("Maximum GOP size")
+#define KEYINT_LONGTEXT N_( "Sets maximum interval between IDR-frames." \
+    "Larger values save bits, thus improve quality for a given bitrate at " \
+    "the cost of seeking precision." )
 
-#define QPMAX_TEXT N_("Maximum quantizer parameter")
-#define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
+#define MIN_KEYINT_TEXT N_("Minimum GOP size")
+#define MIN_KEYINT_LONGTEXT N_( "Sets minimum interval between IDR-frames. " \
+    "In H.264, I-frames do not necessarily bound a closed GOP because it is " \
+    "allowable for a P-frame to be predicted from more frames than just the " \
+    "one frame before it (also see frameref). Therefore, I-frames are not " \
+    "necessarily seekable. IDR-Frames restrict subsequent P-frames from " \
+    "referring to any frame prior to the IDR-Frame. \n" \
+    "If scenecuts appear within this interval, they are still encoded as " \
+    "I-frames, but do not start a new GOP." )
 
-#define CABAC_TEXT N_("Enable CABAC")
-#define CABAC_LONGTEXT N_( "Enable CABAC (Context-Adaptive Binary Arithmetic "\
+#define SCENE_TEXT N_("How aggressively to insert extra I-frames (-1 to 100)")
+#define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how aggressively to " \
+    "insert extra I-frames. With small values of scenecut, the codec often has " \
+    "to force an I-frame when it would exceed keyint. Good values of scenecut " \
+    "may find a better location for the I-frame. Large values use more I-frames " \
+    "than necessary, thus wasting bits. -1 disables scene-cut detection, so " \
+    "I-frames are be inserted only every other keyint frames, which probably " \
+    "leads to ugly encoding artifacts." )
+
+#define BFRAMES_TEXT N_("Number of B-frames between I and P (1 to 16)")
+#define BFRAMES_LONGTEXT N_( "Number of consecutive B-frames between I and " \
+    "P-frames." )
+
+#define B_ADAPT_TEXT N_("Adaptive B-frame decision")
+#define B_ADAPT_LONGTEXT N_( "If this is on, the specified number of " \
+    "consecutive B-frames will always be used, except possibly before an I-frame. " )
+
+#define B_BIAS_TEXT N_("Influences how often B-frames are used")
+#define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
+    "cause more B-frames, negative values cause less B-frames. " )
+
+#define BPYRAMID_TEXT N_("Keep some B-frames as references")
+#define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
+    "predicting other frames. Keeps the middle of 2+ consecutive B-frames " \
+    "as a reference, and reorders frame appropriately." )
+
+#define CABAC_TEXT N_("CABAC")
+#define CABAC_LONGTEXT N_( "CABAC (Context-Adaptive Binary Arithmetic "\
     "Coding). Slightly slows down encoding and decoding, but should save " \
     "10-15% bitrate." )
 
-#define LOOPF_TEXT N_("Enable loop filter")
-#define LOOPF_LONGTEXT N_( "Use deblocking loop filter (increases quality).")
+#define REF_TEXT N_("Number of reference frames (1 to 16)")
+#define REF_LONGTEXT N_( "Number of previous frames used as predictors. " \
+    "This is effective in Anime, but seems to make little difference in " \
+    "live-action source material. Some decoders are unable to deal with " \
+    "large frameref values." )
 
-#define ANALYSE_TEXT N_("Analyse mode")
-#define ANALYSE_LONGTEXT N_( "This selects the analysing mode.")
+#define NF_TEXT N_("No loop filter (enabling turns off the deblocking loop filter)")
+#define NF_LONGTEXT N_( "Deblocking loop filter (increases quality).")
 
-#define TOLERANCE_TEXT N_("Bitrate tolerance")
-#define TOLERANCE_LONGTEXT N_( "Sets the allowed variance in average " \
+/* Ratecontrol */
+
+#define QP_TEXT N_("Set QP (0=lossless) (0 to 51)")
+#define QP_LONGTEXT N_( "This selects the quantizer to use. " \
+    "Lower values result in better fidelity, but higher bitrates. 26 is a " \
+    "good default value." )
+
+#define CRF_TEXT N_("Quality-based VBR (nominal QP) (0 to 51)")
+#define CRF_LONGTEXT N_( "1-pass Quality-based VBR." )
+
+#define QPMIN_TEXT N_("Set min QP")
+#define QPMIN_LONGTEXT N_( "Minimum quantizer, 15/35 seems to be a useful " \
+    "range." )
+
+#define QPMAX_TEXT N_("Set max QP")
+#define QPMAX_LONGTEXT N_( "Maximum quantizer parameter." )
+
+#define QPSTEP_TEXT N_("Set max QP step")
+#define QPSTEP_LONGTEXT N_( "Max QP step between frames.")
+
+#define RATETOL_TEXT N_("Allowed variance of average bitrate")
+#define RATETOL_LONGTEXT N_( "Sets the allowed variance in average. " \
     "bitrate.")
 
-#define VBV_MAXRATE_TEXT N_("Maximum local bitrate")
+#define VBV_MAXRATE_TEXT N_("Max local bitrate")
 #define VBV_MAXRATE_LONGTEXT N_( "Sets a maximum local bitrate in kbits/s.")
 
-#define VBV_BUFSIZE_TEXT N_("Averaging period for the maximum local bitrate")
+#define VBV_BUFSIZE_TEXT N_("Size of VBV buffer")
 #define VBV_BUFSIZE_LONGTEXT N_( "Sets an averaging period for the maximum " \
-    "local bitrate, in kbits/s.")
+    "local bitrate in kbits/s.")
 
-#define VBV_INIT_TEXT N_("Initial buffer occupancy")
+#define VBV_INIT_TEXT N_("Initial VBV buffer occupancy")
 #define VBV_INIT_LONGTEXT N_( "Sets the initial buffer occupancy as a " \
     "fraction of the buffer size.")
 
-#define KEYINT_TEXT N_("Sets maximum interval between IDR-frames")
-#define KEYINT_LONGTEXT N_( "Larger values save bits, thus improve quality "\
-    "for a given bitrate, at the cost of seeking precision." )
+#define IPRATIO_TEXT N_("QP factor between I and P")
+#define IPRATIO_LONGTEXT N_( "QP factor between I and P.")
 
-#define KEYINT_MIN_TEXT N_("Sets minimum interval between IDR-frames")
-#define KEYINT_MIN_LONGTEXT N_("In H.264, I-Frames do not necessarily bound " \
-    "a closed GOP because it is allowable for a P-frame to be predicted from "\
-    "more frames than just the one frame before it (also see frameref). " \
-    "Therefore, I-frames are not necessarily seekable. " \
-    "IDR-Frames restrict subsequent P-frames from referring to any frame " \
-    "prior to the IDR-Frame. \n" \
-    "If scenecuts appear within this interval, they are still encoded as " \
-    "I-frames, but do not start a new GOP. Default value is keyint * 0.4." )
+#define PBRATIO_TEXT N_("QP factor between P and B")
+#define PBRATIO_LONGTEXT N_( "QP factor between P and B.")
 
-#define BFRAMES_TEXT N_("B frames")
-#define BFRAMES_LONGTEXT N_( "Number of consecutive B-Frames between I and " \
-    "P-frames." )
+#define CHROMA_QP_OFFSET_TEXT N_("QP difference between chroma and luma")
+#define CHROMA_QP_OFFSET_LONGTEXT N_( "QP difference between chroma and luma.")
 
-#define BPYRAMID_TEXT N_("B pyramid")
-#define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
-    "predicting other frames." )
+#define QCOMP_TEXT N_("QP curve compression (0.0=CBR to 1.0=QCP)")
+#define QCOMP_LONGTEXT N_( "QP curve compression.")
 
-#define FRAMEREF_TEXT N_("Number of previous frames used as predictors.")
-#define FRAMEREF_LONGTEXT N_( "This is effective in Anime, but seems to " \
-    "make little difference in live-action source material. Some decoders " \
-    "are unable to deal with large frameref values." )
+#define CPLXBLUR_TEXT N_("Reduce fluctuations in QP (before curve compression)")
+#define CPLXBLUR_LONGTEXT N_( "Temporally blur complexity.")
 
-#define SCENE_TEXT N_("Scene-cut detection.")
-#define SCENE_LONGTEXT N_( "Controls how aggressively to insert extra " \
-    "I-frames. With small values of scenecut, the codec often has to force " \
-    "an I-frame when it would exceed keyint. " \
-    "Good values of scenecut may find a better location for the I-frame. " \
-    "Large values use more I-frames than necessary, thus wasting bits. " \
-    "-1 disables scene-cut detection, so I-frames are be inserted only every "\
-    "other keyint frames, which probably leads to ugly encoding artifacts." )
+#define QBLUR_TEXT N_("Reduce fluctuations in QP (after curve compression)")
+#define QBLUR_LONGTEXT N_( "Temporally blur quants.")
 
-#define SUBPEL_TEXT N_("Sub-pixel refinement quality.")
-#define SUBPEL_LONGTEXT N_( "This parameter controls quality versus speed " \
-    "tradeoffs involved in the motion estimation decision process " \
-    "(lower = quicker and higher = better quality)." )
+/* Analysis */
 
-#define ME_TEXT N_("Motion estimation algorithm.")
+#define ANALYSE_TEXT N_("Partitions to consider")
+#define ANALYSE_LONGTEXT N_( "Partitions to consider in analyse mode: \n" \
+    " - none  : \n" \
+    " - fast  : i4x4\n" \
+    " - normal: i4x4,p8x8,(i8x8)\n" \
+    " - slow  : i4x4,p8x8,(i8x8),b8x8\n" \
+    " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n" \
+    "(p4x4 requires p8x8. i8x8 requires 8x8dct).")
+
+#define DIRECT_PRED_TEXT N_("Direct MV prediction mode")
+#define DIRECT_PRED_LONGTEXT N_( "Direct MV prediction mode. ")
+     
+#define WEIGHTB_TEXT N_("Weighted prediction for B-frames")
+#define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
+
+#define ME_TEXT N_("Integer pixel motion estimation method")
 #define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
     " - dia: diamond search, radius 1 (fast)\n" \
     " - hex: hexagonal search, radius 2\n" \
     " - umh: uneven multi-hexagon search (better but slower)\n" \
     " - esa: exhaustive search (extremely slow, primarily for testing)\n" )
 
-#define MERANGE_TEXT N_("Motion estimation search range.")
+#define MERANGE_TEXT N_("Maximum motion vector search range (0 to 64)")
 #define MERANGE_LONGTEXT N_( "Maximum distance to search for motion estimation, "\
     "measured from predicted position(s). Default of 16 is good for most footage, "\
     "high motion sequences may benefit from settings between 24-32." )
 
-#define NO_PSNR_TEXT N_("Disable PSNR calculation.")
-#define NO_PSNR_LONGTEXT N_( "This has no effect on actual encoding quality, "\
-    "it just prevents the stats from being calculated (for speed)." )
+#define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
+    "quality (1 to 6)")
+#define SUBME_LONGTEXT N_( "This parameter controls quality versus speed " \
+    "tradeoffs involved in the motion estimation decision process " \
+    "(lower = quicker and higher = better quality)." )
 
-#define NO_B_ADAPT_TEXT N_("Disable adaptive B-frames.")
-#define NO_B_ADAPT_LONGTEXT N_( "If this is on, the specified number of consecutive B-frames "\
-    "will always be used, except possibly before an I-frame. " )
+#define B_RDO_TEXT N_("RD based mode decision for B-frames. Requires subme 6")
+#define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. " )
 
-#define B_BIAS_TEXT N_("Bias the choice to use B-frames.")
-#define B_BIAS_LONGTEXT N_( "Positive values cause more B-frames, negative values cause less B-frames. " )
+#define MIXED_REFS_TEXT N_("Decide references on a per partition basis")
+#define MIXED_REFS_LONGTEXT N_( "Allows each 8x8 or 16x8 partition to independently " \
+     "select a reference frame, as opposed to only one ref per macroblock." )
 
-#define CRF_TEXT N_("CRF (1-pass Quality-based VBR (nominal QP)).")
-#define CRF_LONGTEXT N_( "CRF (1-pass Quality-based VBR (nominal QP))." )
+#define CHROMA_ME_TEXT N_("Ignore chroma in motion estimation")
+#define CHROMA_ME_LONGTEXT N_( "Chroma ME for subpel and mode decision in P-frames.")
 
-#define TRELLIS_TEXT N_("Trellis RD quantization.")
-#define TRELLIS_LONGTEXT N_( "Trellis RD quantization. Requires CABAC. \n" \
+#define BIME_TEXT N_("Jointly optimize both MVs in B-frames")
+#define BIME_LONGTEXT N_( "Joint bidirectional motion refinement.")
+
+#define TRANSFORM_8X8DCT_TEXT N_("Adaptive spatial transform size")
+#define TRANSFORM_8X8DCT_LONGTEXT N_( "SATD-based decision for 8x8 transform in inter-MBs.")
+
+#define TRELLIS_TEXT N_("Trellis RD quantization (0,1,2). Requires CABAC")
+#define TRELLIS_LONGTEXT N_( "Trellis RD quantization: \n" \
      " - 0: disabled\n" \
      " - 1: enabled only on the final encode of a MB\n" \
      " - 2: enabled on all mode decisions\n" )
 
-#define MIXED_REFS_TEXT N_("Decide references on a per partition basis.")
-#define MIXED_REFS_LONGTEXT N_( "Decide references on a per partition basis." )
+#define FAST_PSKIP_TEXT N_("Early SKIP detection on P-frames")
+#define FAST_PSKIP_LONGTEXT N_( "Early SKIP detection on P-frames.")
 
-#define B_RDO_TEXT N_("RD based mode decision for B-frames.")
-#define B_RDO_LONGTEXT N_( "RD based mode decision for B-frames. Requires subme 6." )
+#define NR_TEXT N_("Noise reduction")
+#define NR_LONGTEXT N_( "Dct-domain noise reduction. Adaptive pseudo-deadzone.")
 
-#define NO_FAST_PSKIP_TEXT N_("Disable early SKIP detection on P-frames.")
-#define NO_FAST_PSKIP_LONGTEXT N_( "Disable early SKIP detection on P-frames.")
+/* Input/Output */
 
-#define WEIGHTB_TEXT N_("Weighted prediction for B-frames.")
-#define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
+#define ASM_TEXT N_("CPU optimizations")
+#define ASM_LONGTEXT N_( "CPU optimizations.")
 
-#if X264_BUILD >= 23
+#define PSNR_TEXT N_("PSNR calculation")
+#define PSNR_LONGTEXT N_( "This has no effect on actual encoding quality, "\
+    "it just prevents the stats from being calculated (for speed)." )
+
+#define VERBOSE_TEXT N_("Print stats for each frame")
+#define VERBOSE_LONGTEXT N_( "Print stats for each frame.")
+
+#if X264_BUILD >= 24
 static char *enc_me_list[] =
   { "", "dia", "hex", "umh", "esa" };
 static char *enc_me_list_text[] =
@@ -170,40 +232,93 @@ static char *enc_me_list_text[] =
 #endif
 
 static char *enc_analyse_list[] =
-  { "", "all", "normal", "fast", "none" };
+  { "", "none", "fast", "normal", "slow", "all" };
 static char *enc_analyse_list_text[] =
-  { N_("default"), N_("all"), N_("slow"), N_("normal"),
-    N_("fast"), N_("none") };
+  { N_("default"), N_("none"), N_("fast"), N_("normal"),
+    N_("slow"), N_("all") };
+
+static char *direct_pred_list[] =
+  { "", "none", "spatial", "temporal" };
+static char *direct_pred_list_text[] =
+  { N_("default"), N_("none"), N_("spatial"), N_("temporal") };
 
 vlc_module_begin();
-    set_description( _("H264 encoder (using x264 library)"));
+    set_description( _("H.264/MPEG4 AVC encoder (using x264 library)"));
     set_capability( "encoder", 200 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
+    
+/* Frame-type options */
 
-    add_integer( SOUT_CFG_PREFIX "qp", 0, NULL, QP_TEXT, QP_LONGTEXT,
-                 VLC_FALSE );
-        change_integer_range( 0, 51 );
-    add_integer( SOUT_CFG_PREFIX "qp-min", 10, NULL, QPMIN_TEXT,
-                 QPMIN_LONGTEXT, VLC_FALSE );
-        change_integer_range( 0, 51 );
-    add_integer( SOUT_CFG_PREFIX "qp-max", 51, NULL, QPMAX_TEXT,
-                 QPMAX_LONGTEXT, VLC_FALSE );
-        change_integer_range( 0, 51 );
+    add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
+                 KEYINT_LONGTEXT, VLC_FALSE );
+
+    add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
+                 MIN_KEYINT_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "keyint-min", VLC_FALSE ); /* Deprecated since 0.8.5 */
+
+    add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
+                 SCENE_LONGTEXT, VLC_FALSE );
+        change_integer_range( -1, 100 );
+
+    add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
+                 BFRAMES_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 16 );
+
+#if X264_BUILD >= 0x0013 /* r137 */
+    add_bool( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
+              B_ADAPT_LONGTEXT, VLC_FALSE );
+
+    add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
+                 B_BIAS_LONGTEXT, VLC_FALSE );
+        change_integer_range( -100, 100 );
+#endif
+
+    add_bool( SOUT_CFG_PREFIX "bpyramid", 0, NULL, BPYRAMID_TEXT,
+              BPYRAMID_LONGTEXT, VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, CABAC_TEXT, CABAC_LONGTEXT,
               VLC_FALSE );
 
-    add_bool( SOUT_CFG_PREFIX "loopfilter", 1, NULL, LOOPF_TEXT,
-              LOOPF_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "ref", 1, NULL, REF_TEXT,
+                 REF_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "frameref", VLC_FALSE ); /* Deprecated since 0.8.5 */
+        change_integer_range( 1, 16 );
 
-    add_string( SOUT_CFG_PREFIX "analyse", "", NULL, ANALYSE_TEXT,
-                ANALYSE_LONGTEXT, VLC_FALSE );
-        change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
+    add_bool( SOUT_CFG_PREFIX "nf", 0, NULL, NF_TEXT,
+              NF_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "loopfilter", VLC_FALSE ); /* Deprecated since 0.8.5 */
 
-    add_float( SOUT_CFG_PREFIX "tolerance", 1.0, NULL, TOLERANCE_TEXT,
-               TOLERANCE_LONGTEXT, VLC_FALSE );
+/* Ratecontrol */
+
+    add_integer( SOUT_CFG_PREFIX "qp", 26, NULL, QP_TEXT, QP_LONGTEXT,
+                 VLC_FALSE );
+        change_integer_range( 0, 51 ); /* QP 0 -> lossless encoding */
+
+#if X264_BUILD >= 37 /* r334 */
+    add_integer( SOUT_CFG_PREFIX "crf", 0, NULL, CRF_TEXT,
+                 CRF_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 51 );
+#endif
+
+    add_integer( SOUT_CFG_PREFIX "qpmin", 10, NULL, QPMIN_TEXT,
+                 QPMIN_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "qp-min", VLC_FALSE ); /* Deprecated since 0.8.5 */
+        change_integer_range( 0, 51 );
+
+    add_integer( SOUT_CFG_PREFIX "qpmax", 51, NULL, QPMAX_TEXT,
+                 QPMAX_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "qp-max", VLC_FALSE ); /* Deprecated since 0.8.5 */
+        change_integer_range( 0, 51 );
+
+    add_integer( SOUT_CFG_PREFIX "qpstep", 4, NULL, QPSTEP_TEXT,
+                 QPSTEP_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 51 );
+
+    add_float( SOUT_CFG_PREFIX "ratetol", 1.0, NULL, RATETOL_TEXT,
+               RATETOL_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "tolerance", VLC_FALSE ); /* Deprecated since 0.8.5 */
         change_float_range( 0, 100 );
 
     add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
@@ -216,38 +331,45 @@ vlc_module_begin();
                VBV_INIT_LONGTEXT, VLC_FALSE );
         change_float_range( 0, 1 );
 
-    add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
-                 KEYINT_LONGTEXT, VLC_FALSE );
+    add_float( SOUT_CFG_PREFIX "ipratio", 1.40, NULL, IPRATIO_TEXT,
+               IPRATIO_LONGTEXT, VLC_FALSE );
+        change_float_range( 0, 100 );
 
-    add_integer( SOUT_CFG_PREFIX "keyint-min", 0, NULL, KEYINT_MIN_TEXT,
-                 KEYINT_MIN_LONGTEXT, VLC_FALSE );
+    add_float( SOUT_CFG_PREFIX "pbratio", 1.30, NULL, PBRATIO_TEXT,
+               PBRATIO_LONGTEXT, VLC_FALSE );
+        change_float_range( 0, 100 );
 
-    add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
-                 BFRAMES_LONGTEXT, VLC_FALSE );
-        change_integer_range( 0, 16 );
-
-    add_bool( SOUT_CFG_PREFIX "bpyramid", 0, NULL, BPYRAMID_TEXT,
-              BPYRAMID_LONGTEXT, VLC_FALSE );
-
-    add_integer( SOUT_CFG_PREFIX "frameref", 1, NULL, FRAMEREF_TEXT,
-                 FRAMEREF_LONGTEXT, VLC_FALSE );
-        change_integer_range( 1, 15 );
-
-    add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
-                 SCENE_LONGTEXT, VLC_FALSE );
-        change_integer_range( -1, 100 );
-
-#if X264_BUILD >= 30
-    add_integer( SOUT_CFG_PREFIX "subpel", 6, NULL, SUBPEL_TEXT,
-                 SUBPEL_LONGTEXT, VLC_FALSE );
-        change_integer_range( 1, 6 );
-#else
-    add_integer( SOUT_CFG_PREFIX "subpel", 5, NULL, SUBPEL_TEXT,
-                 SUBPEL_LONGTEXT, VLC_FALSE );
-        change_integer_range( 1, 5 );
+#if X264_BUILD >= 23 /* r190 */
+    add_integer( SOUT_CFG_PREFIX "chroma-qp-offset", 0, NULL, CHROMA_QP_OFFSET_TEXT,
+                 CHROMA_QP_OFFSET_LONGTEXT, VLC_FALSE );
 #endif
 
-#if X264_BUILD >= 23 /* r221 */
+    add_float( SOUT_CFG_PREFIX "qcomp", 0.60, NULL, QCOMP_TEXT,
+               QCOMP_LONGTEXT, VLC_FALSE );
+        change_float_range( 0, 1 );
+
+    add_float( SOUT_CFG_PREFIX "cplxblur", 20.0, NULL, CPLXBLUR_TEXT,
+               CPLXBLUR_LONGTEXT, VLC_FALSE );
+
+    add_float( SOUT_CFG_PREFIX "qblur", 0.5, NULL, QBLUR_TEXT,
+               QBLUR_LONGTEXT, VLC_FALSE );
+
+/* Analysis */
+
+    add_string( SOUT_CFG_PREFIX "analyse", "all", NULL, ANALYSE_TEXT,
+                ANALYSE_LONGTEXT, VLC_FALSE );
+        change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
+
+    add_string( SOUT_CFG_PREFIX "direct", "temporal", NULL, DIRECT_PRED_TEXT,
+                DIRECT_PRED_LONGTEXT, VLC_FALSE );
+        change_string_list( direct_pred_list, direct_pred_list_text, 0 );
+
+#if X264_BUILD >= 0x0012 /* r134 */
+    add_bool( SOUT_CFG_PREFIX "weightb", 0, NULL, WEIGHTB_TEXT,
+              WEIGHTB_LONGTEXT, VLC_FALSE );
+#endif
+
+#if X264_BUILD >= 24 /* r221 */
     add_string( SOUT_CFG_PREFIX "me", "hex", NULL, ME_TEXT,
                 ME_LONGTEXT, VLC_FALSE );
         change_string_list( enc_me_list, enc_me_list_text, 0 );
@@ -257,23 +379,18 @@ vlc_module_begin();
         change_integer_range( 1, 64 );
 #endif
 
-#if X264_BUILD >= 0x000a /* r44 */
-    add_bool( SOUT_CFG_PREFIX "no-psnr", 0, NULL, NO_PSNR_TEXT,
-              NO_PSNR_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
+                 SUBME_LONGTEXT, VLC_FALSE );
+        add_deprecated( SOUT_CFG_PREFIX "subpel", VLC_FALSE ); /* Deprecated since 0.8.5 */
+#if X264_BUILD >= 30 /* r262 */
+        change_integer_range( 1, 6 );
+#else
+        change_integer_range( 1, 5 );
 #endif
 
-#if X264_BUILD >= 0x0012 /* r134 */
-    add_bool( SOUT_CFG_PREFIX "weightb", 0, NULL, WEIGHTB_TEXT,
-              WEIGHTB_LONGTEXT, VLC_FALSE );
-#endif
-
-#if X264_BUILD >= 0x0013 /* r137 */
-    add_bool( SOUT_CFG_PREFIX "no-b-adapt", 0, NULL, NO_B_ADAPT_TEXT,
-              NO_B_ADAPT_LONGTEXT, VLC_FALSE );
-
-    add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
-                 B_BIAS_LONGTEXT, VLC_FALSE );
-        change_integer_range( -100, 100 );
+#if X264_BUILD >= 41 /* r368 */
+    add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
+              B_RDO_LONGTEXT, VLC_FALSE );
 #endif
 
 #if X264_BUILD >= 36 /* r318 */
@@ -281,10 +398,19 @@ vlc_module_begin();
               MIXED_REFS_LONGTEXT, VLC_FALSE );
 #endif
 
-#if X264_BUILD >= 37 /* r334 */
-    add_integer( SOUT_CFG_PREFIX "crf", 0, NULL, CRF_TEXT,
-                 CRF_LONGTEXT, VLC_FALSE );
-        change_integer_range( 0, 51 );
+#if X264_BUILD >= 23 /* r171 */
+    add_bool( SOUT_CFG_PREFIX "chroma-me", 1, NULL, CHROMA_ME_TEXT,
+              CHROMA_ME_LONGTEXT, VLC_FALSE );
+#endif
+
+#if X264_BUILD >= 43 /* r390 */
+    add_bool( SOUT_CFG_PREFIX "bime", 0, NULL, BIME_TEXT,
+              BIME_LONGTEXT, VLC_FALSE );
+#endif
+
+#if X264_BUILD >= 30 /* r251 */
+    add_bool( SOUT_CFG_PREFIX "8x8dct", 0, NULL, TRANSFORM_8X8DCT_TEXT,
+              TRANSFORM_8X8DCT_LONGTEXT, VLC_FALSE );
 #endif
 
 #if X264_BUILD >= 39 /* r360 */
@@ -293,14 +419,28 @@ vlc_module_begin();
         change_integer_range( 0, 2 );
 #endif
 
-#if X264_BUILD >= 40 /* r368 */
-    add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
-              B_RDO_LONGTEXT, VLC_FALSE );
+#if X264_BUILD >= 42 /* r384 */
+    add_bool( SOUT_CFG_PREFIX "fast-pskip", 1, NULL, FAST_PSKIP_TEXT,
+              FAST_PSKIP_LONGTEXT, VLC_FALSE );
 #endif
 
-#if X264_BUILD >= 42 /* r384 */
-    add_bool( SOUT_CFG_PREFIX "no-fast-pskip", 0, NULL, NO_FAST_PSKIP_TEXT,
-              NO_FAST_PSKIP_LONGTEXT, VLC_FALSE );
+#if X264_BUILD >= 44 /* r398 */
+    add_integer( SOUT_CFG_PREFIX "nr", 0, NULL, NR_TEXT,
+                 NR_LONGTEXT, VLC_FALSE );
+#endif
+
+/* Input/Output */
+
+    add_bool( SOUT_CFG_PREFIX "asm", 1, NULL, ASM_TEXT,
+              ASM_LONGTEXT, VLC_FALSE );
+
+    /* x264 psnr = 1 (default). disable PSNR calculation for speed. */
+    add_bool( SOUT_CFG_PREFIX "psnr", 0, NULL, PSNR_TEXT,
+              PSNR_LONGTEXT, VLC_FALSE );
+
+#if X264_BUILD >= 0x000e /* r81 */
+    add_bool( SOUT_CFG_PREFIX "verbose", 0, NULL, VERBOSE_TEXT,
+              VERBOSE_LONGTEXT, VLC_FALSE );
 #endif
 
 vlc_module_end();
@@ -309,11 +449,14 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "analyse", "bframes", "bpyramid", "b-bias", "b-rdo", "cabac",
-    "crf", "frameref", "keyint", "keyint-min", "loopfilter", "me",
-    "merange", "mixed-refs", "no-b-adapt", "no-fast-pskip", "no-psnr",
-    "qp", "qp-min", "qp-max", "scenecut", "subpel", "tolerance",
-    "trellis", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb" , NULL
+    "8x8dct", "analyse", "asm", "bframes", "bime", "bpyramid", "b-adapt",
+    "b-bias", "b-rdo", "cabac", "chroma-me", "chroma-qp-offset", "cplxblur",
+    "crf", "direct", "fast-pskip", "frameref", "ipratio", "keyint",
+    "keyint-min", "loopfilter", "me", "merange", "min-keyint", "mixed-refs",
+    "nf", "nr", "pbratio", "psnr", "qblur", "qp", "qcomp", "qpstep",
+    "qpmax", "qpmin", "qp-max", "qp-min", "ratetol", "ref", "scenecut",
+    "subme", "subpel", "tolerance", "trellis", "verbose", "vbv-bufsize",
+    "vbv-init", "vbv-maxrate", "weightb" , NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -383,17 +526,26 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.i_height = p_sys->param.i_height >> 4 << 4;
 #endif
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "qp-min", &val );
-    if( val.i_int >= 1 && val.i_int <= 51 ) i_qmin = val.i_int;
-    var_Get( p_enc, SOUT_CFG_PREFIX "qp-max", &val );
-    if( val.i_int >= 1 && val.i_int <= 51 ) i_qmax = val.i_int;
+    /* average bitrate specified by transcode vb */
+    p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
 
+    /* cbr = 1 overrides qp or crf and sets an average bitrate
+       but maxrate = average bitrate is needed for "real" CBR */
+    if( p_sys->param.rc.i_bitrate > 0 ) p_sys->param.rc.b_cbr = 1;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "qpstep", &val );
+    if( val.i_int >= 0 && val.i_int <= 51 ) p_sys->param.rc.i_qp_step = val.i_int;
+    var_Get( p_enc, SOUT_CFG_PREFIX "qpmin", &val );
+    if( val.i_int >= 0 && val.i_int <= 51 ) i_qmin = val.i_int;
+    var_Get( p_enc, SOUT_CFG_PREFIX "qpmax", &val );
+    if( val.i_int >= 0 && val.i_int <= 51 ) i_qmax = val.i_int;
+    
     var_Get( p_enc, SOUT_CFG_PREFIX "qp", &val );
-    if( val.i_int >= 1 && val.i_int <= 51 )
+    if( val.i_int >= 0 && val.i_int <= 51 )
     {
         if( i_qmin > val.i_int ) i_qmin = val.i_int;
         if( i_qmax < val.i_int ) i_qmax = val.i_int;
-
+        
 #if X264_BUILD >= 0x000a
         p_sys->param.rc.i_qp_constant = val.i_int;
         p_sys->param.rc.i_qp_min = i_qmin;
@@ -402,49 +554,67 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_qp_constant = val.i_int;
 #endif
     }
-    else
-    {
-        /* No QP -> constant bitrate */
-#if X264_BUILD >= 0x000a
-        p_sys->param.rc.b_cbr = 1;
-        p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
 
 #if X264_BUILD >= 24
-        var_Get( p_enc, SOUT_CFG_PREFIX "tolerance", &val );
-        p_sys->param.rc.f_rate_tolerance = val.f_float;
+    var_Get( p_enc, SOUT_CFG_PREFIX "ratetol", &val );
+    p_sys->param.rc.f_rate_tolerance = val.f_float;
 
-        var_Get( p_enc, SOUT_CFG_PREFIX "vbv-maxrate", &val );
-        p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
+    var_Get( p_enc, SOUT_CFG_PREFIX "vbv-init", &val );
+    p_sys->param.rc.f_vbv_buffer_init = val.f_float;
 
-        var_Get( p_enc, SOUT_CFG_PREFIX "vbv-bufsize", &val );
-        p_sys->param.rc.i_vbv_buffer_size = val.i_int;
-        if( !val.i_int )
-            p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate;
+    var_Get( p_enc, SOUT_CFG_PREFIX "vbv-bufsize", &val );
+    p_sys->param.rc.i_vbv_buffer_size = val.i_int;
 
-        var_Get( p_enc, SOUT_CFG_PREFIX "vbv-init", &val );
-        p_sys->param.rc.f_vbv_buffer_init = val.f_float;
+    /* x264 vbv-bufsize = 0 (default). if not provided set period
+       in seconds for local maximum bitrate (cache/bufsize) based
+       on average bitrate. */
+    if( !val.i_int )
+        p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate * 2;
+ 
+    /* max bitrate = average bitrate -> CBR */
+    var_Get( p_enc, SOUT_CFG_PREFIX "vbv-maxrate", &val );
+    p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
+
 #else
-        p_sys->param.rc.i_rc_buffer_size = p_sys->param.rc.i_bitrate;
-        p_sys->param.rc.i_rc_init_buffer = p_sys->param.rc.i_bitrate / 4;
+    p_sys->param.rc.i_rc_buffer_size = p_sys->param.rc.i_bitrate;
+    p_sys->param.rc.i_rc_init_buffer = p_sys->param.rc.i_bitrate / 4;
 #endif
-#endif
-    }
 
     var_Get( p_enc, SOUT_CFG_PREFIX "cabac", &val );
     p_sys->param.b_cabac = val.b_bool;
+    
+    /* disable deblocking when nf (no loop filter) is enabled */
+    var_Get( p_enc, SOUT_CFG_PREFIX "nf", &val );
+    p_sys->param.b_deblocking_filter = !val.b_bool;
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "loopfilter", &val );
-    p_sys->param.b_deblocking_filter = val.b_bool;
+    var_Get( p_enc, SOUT_CFG_PREFIX "ipratio", &val );
+    p_sys->param.rc.f_ip_factor = val.f_float;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "pbratio", &val );
+    p_sys->param.rc.f_pb_factor = val.f_float;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "qcomp", &val );
+    p_sys->param.rc.f_qcompress = val.f_float;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "cplxblur", &val );
+    p_sys->param.rc.f_complexity_blur = val.f_float;
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "qblur", &val );
+    p_sys->param.rc.f_qblur = val.f_float;
+
+#if X264_BUILD >= 0x000e
+    var_Get( p_enc, SOUT_CFG_PREFIX "verbose", &val );
+    if( val.b_bool ) p_sys->param.i_log_level = X264_LOG_DEBUG;
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "keyint", &val );
 #if X264_BUILD >= 0x000e
     if( val.i_int > 0 ) p_sys->param.i_keyint_max = val.i_int;
-    if( val.i_int > 0 ) p_sys->param.i_keyint_min = val.i_int * 0.4;
 #else
     if( val.i_int > 0 ) p_sys->param.i_iframe = val.i_int;
 #endif
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "keyint-min", &val );
+    var_Get( p_enc, SOUT_CFG_PREFIX "min-keyint", &val );
 #if X264_BUILD >= 0x000e
     if( val.i_int > 0 ) p_sys->param.i_keyint_min = val.i_int;
 #else
@@ -452,14 +622,15 @@ static int  Open ( vlc_object_t *p_this )
 #endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "bframes", &val );
-    if( val.i_int >= 0 && val.i_int <= 16 ) p_sys->param.i_bframe = val.i_int;
+    if( val.i_int >= 0 && val.i_int <= 16 )
+        p_sys->param.i_bframe = val.i_int;
 
 #if X264_BUILD >= 22
     var_Get( p_enc, SOUT_CFG_PREFIX "bpyramid", &val );
     p_sys->param.b_bframe_pyramid = val.b_bool;
 #endif
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "frameref", &val );
+    var_Get( p_enc, SOUT_CFG_PREFIX "ref", &val );
     if( val.i_int > 0 && val.i_int <= 15 )
         p_sys->param.i_frame_reference = val.i_int;
 
@@ -469,17 +640,16 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_scenecut_threshold = val.i_int;
 #endif
 
-#if X264_BUILD >= 22
-    var_Get( p_enc, SOUT_CFG_PREFIX "subpel", &val );
 #if X264_BUILD >= 30
+    var_Get( p_enc, SOUT_CFG_PREFIX "subme", &val );
     if( val.i_int >= 1 && val.i_int <= 6 )
+        p_sys->param.analyse.i_subpel_refine = val.i_int;
 #else
     if( val.i_int >= 1 && val.i_int <= 5 )
-#endif
         p_sys->param.analyse.i_subpel_refine = val.i_int;
 #endif
 
-#if X264_BUILD >= 23
+#if X264_BUILD >= 24
     var_Get( p_enc, SOUT_CFG_PREFIX "me", &val );
     if( !strcmp( val.psz_string, "dia" ) )
     {
@@ -500,11 +670,27 @@ static int  Open ( vlc_object_t *p_this )
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "merange", &val );
-    if( val.i_int >= 1 && val.i_int <= 64 ) p_sys->param.analyse.i_me_range = val.i_int;
+    if( val.i_int >= 1 && val.i_int <= 64 )
+        p_sys->param.analyse.i_me_range = val.i_int;
 #endif
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "no-psnr", &val );
-    p_sys->param.analyse.b_psnr = ! val.b_bool;
+    var_Get( p_enc, SOUT_CFG_PREFIX "direct", &val );
+    if( !strcmp( val.psz_string, "none" ) )
+    {
+        p_sys->param.analyse.i_direct_mv_pred = X264_DIRECT_PRED_NONE;
+    }
+    else if( !strcmp( val.psz_string, "spatial" ) )
+    {
+        p_sys->param.analyse.i_direct_mv_pred = X264_DIRECT_PRED_SPATIAL;
+    }
+    else if( !strcmp( val.psz_string, "temporal" ) )
+    {
+        p_sys->param.analyse.i_direct_mv_pred = X264_DIRECT_PRED_TEMPORAL;
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "psnr", &val );
+    p_sys->param.analyse.b_psnr = val.b_bool;
 
 #if X264_BUILD >= 0x0012
     var_Get( p_enc, SOUT_CFG_PREFIX "weightb", &val );
@@ -512,12 +698,19 @@ static int  Open ( vlc_object_t *p_this )
 #endif
 
 #if X264_BUILD >= 0x0013
-    var_Get( p_enc, SOUT_CFG_PREFIX "no-b-adapt", &val );
-    p_sys->param.b_bframe_adaptive = ! val.b_bool;
+    var_Get( p_enc, SOUT_CFG_PREFIX "b-adapt", &val );
+    p_sys->param.b_bframe_adaptive = val.b_bool;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "b-bias", &val );
     if( val.i_int >= -100 && val.i_int <= 100 )
         p_sys->param.i_bframe_bias = val.i_int;
+#endif
+
+#if X264_BUILD >= 23
+    var_Get( p_enc, SOUT_CFG_PREFIX "chroma-me", &val );
+    p_sys->param.analyse.b_chroma_me = val.b_bool;
+    var_Get( p_enc, SOUT_CFG_PREFIX "chroma-qp-offset", &val );
+    p_sys->param.analyse.i_chroma_qp_offset = val.i_int;
 #endif
 
 #if X264_BUILD >= 36
@@ -526,8 +719,8 @@ static int  Open ( vlc_object_t *p_this )
 #endif
 
 #if X264_BUILD >= 37
-    var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val );
-    if( val.i_int >= 0 && val.i_int <= 51 )
+    var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val ); 
+    if( val.i_int >= 0 && val.i_int <= 51 ) /* crf != 0 overrides qp */
         p_sys->param.rc.i_rf_constant = val.i_int;
 #endif
 
@@ -535,17 +728,30 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "trellis", &val );
     if( val.i_int >= 0 && val.i_int <= 2 )
         p_sys->param.analyse.i_trellis = val.i_int;
-#endif  
+#endif
 
-#if X264_BUILD >= 40
+#if X264_BUILD >= 41
     var_Get( p_enc, SOUT_CFG_PREFIX "b-rdo", &val );
     p_sys->param.analyse.b_bframe_rdo = val.b_bool;
 #endif
 
 #if X264_BUILD >= 42
-    var_Get( p_enc, SOUT_CFG_PREFIX "no-fast-pskip", &val );
-    p_sys->param.analyse.b_fast_pskip = ! val.b_bool;
+    var_Get( p_enc, SOUT_CFG_PREFIX "fast-pskip", &val );
+    p_sys->param.analyse.b_fast_pskip = val.b_bool;
 #endif
+
+#if X264_BUILD >= 43
+    var_Get( p_enc, SOUT_CFG_PREFIX "bime", &val );
+    p_sys->param.analyse.b_bidir_me = val.b_bool;
+#endif
+
+#if X264_BUILD >= 44
+    var_Get( p_enc, SOUT_CFG_PREFIX "nr", &val );
+    p_sys->param.analyse.i_noise_reduction = val.i_int;
+#endif
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "asm", &val );
+    if( !val.b_bool ) p_sys->param.cpu = 0;
 
 #ifndef X264_ANALYSE_BSUB16x16
 #   define X264_ANALYSE_BSUB16x16 0
@@ -562,27 +768,39 @@ static int  Open ( vlc_object_t *p_this )
     else if( !strcmp( val.psz_string, "normal" ) )
     {
         p_sys->param.analyse.inter =
-            X264_ANALYSE_I4x4 | X264_ANALYSE_PSUB16x16;
+            X264_ANALYSE_I4x4 |
+            X264_ANALYSE_PSUB16x16;
+#ifdef X264_ANALYSE_I8x8
+        p_sys->param.analyse.inter |= X264_ANALYSE_I8x8;
+#endif
     }
     else if( !strcmp( val.psz_string, "slow" ) )
     {
         p_sys->param.analyse.inter =
             X264_ANALYSE_I4x4 |
-            X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8 |
+            X264_ANALYSE_PSUB16x16 |
             X264_ANALYSE_BSUB16x16;
+#ifdef X264_ANALYSE_I8x8
+        p_sys->param.analyse.inter |= X264_ANALYSE_I8x8;
+#endif
     }
     else if( !strcmp( val.psz_string, "all" ) )
     {
         p_sys->param.analyse.inter =
             X264_ANALYSE_I4x4 |
-            X264_ANALYSE_PSUB16x16 | X264_ANALYSE_PSUB8x8 |
-            X264_ANALYSE_BSUB16x16;
+            X264_ANALYSE_PSUB16x16 |
+            X264_ANALYSE_BSUB16x16 |
+            X264_ANALYSE_PSUB8x8;
 #ifdef X264_ANALYSE_I8x8
         p_sys->param.analyse.inter |= X264_ANALYSE_I8x8;
-        p_sys->param.analyse.b_transform_8x8 = 1;
 #endif
     }
     if( val.psz_string ) free( val.psz_string );
+
+#if X264_BUILD >= 30
+    var_Get( p_enc, SOUT_CFG_PREFIX "8x8dct", &val );
+    p_sys->param.analyse.b_transform_8x8 = val.b_bool;
+#endif
 
     if( p_enc->fmt_in.video.i_aspect > 0 )
     {
