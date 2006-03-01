@@ -76,8 +76,6 @@ static VLCUpdate *_o_sharedInstance = nil;
         [o_hashOfOurBinary release];
     if( o_urlOfBinary )
         [o_urlOfBinary release];
-    if( o_indexOfOurBinary )
-        [o_indexOfOurBinary release];
 
     [super dealloc];
 }
@@ -175,10 +173,9 @@ static VLCUpdate *_o_sharedInstance = nil;
                 else if( p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
                 {
                     msg_Dbg( p_intf, "binary found, version = %s" \
-                        ", hash=%s, size=%i MB, position in release file list=%i",\
-                        p_uit->release.psz_version, p_uit->file.psz_md5, \
-                        (int)((p_uit->file.l_size / 1024) / 1024), \
-                        p_uit->i_f);
+                        ", hash=%s, size=%i MB", p_uit->release.psz_version, \
+                        p_uit->file.psz_md5, \
+                        (int)((p_uit->file.l_size / 1024) / 1024) );
                     [o_fld_currentVersionAndSize setStringValue: \
                         [NSString stringWithFormat: \
                         @"The current release is %s (%i MB to download).", \
@@ -197,14 +194,6 @@ static VLCUpdate *_o_sharedInstance = nil;
                             [o_hashOfOurBinary release];
                         o_hashOfOurBinary = [[NSString alloc] \
                             initWithUTF8String: p_uit->file.psz_md5];
-                    }
-                    
-                    if( p_uit->i_f )
-                    {
-                        if( o_indexOfOurBinary )
-                            [o_indexOfOurBinary release];
-                        o_indexOfOurBinary = [[NSNumber alloc] \
-                            initWithInt: p_uit->i_f];
                     }
                 }
                 if( p_uit->release.i_status == UPDATE_RELEASE_STATUS_NEWER &&
