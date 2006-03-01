@@ -303,7 +303,7 @@ static int OpenUDP( vlc_object_t * p_this )
             } 
         }
     }
-
+    else
     if( *psz_server_addr )
     {
         int ttl;
