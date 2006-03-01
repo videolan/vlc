@@ -62,10 +62,10 @@ int screen_InitCapture( demux_t *p_demux )
     p_sys->p_data = p_data =
         (screen_data_t *)malloc( sizeof( screen_data_t ) );
 
-    p_data->gConnection = NULL;
+    p_data->gConnection = nil;
     p_data->gMainDevice = NULL;
     p_data->gDevicePix = NULL;
-    p_data->gDeviceState = NULL;
+    p_data->gDeviceState = nil;
     p_data->LocalBufferGW = NULL;
     p_data->LocalBufferPix = NULL;
 
@@ -92,7 +92,7 @@ int screen_InitCapture( demux_t *p_demux )
         i_offset = 4;
         break;
     default:
-        msg_Err( p_demux, "unknown screen depth: %d", CGDisplaySamplesPerPixel(p_data->displayID) * CGDisplayBitsPerSample(p_data->displayID) );
+        msg_Err( p_demux, "unknown screen depth: %d", (int)(CGDisplaySamplesPerPixel(p_data->displayID) * CGDisplayBitsPerSample(p_data->displayID)) );
         return VLC_EGENERIC;
     }
 
