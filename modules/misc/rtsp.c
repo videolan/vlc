@@ -306,10 +306,10 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     msg_Dbg( p_vod, "created rtsp url: %s", p_media->psz_rtsp_path );
 
     asprintf( &p_media->psz_rtsp_control_v4,
-               "a=control:rtsp://%%s:%d%s/trackid=%%d\r\n",
+               "a=control:rtsp://%%s:%d%s/trackID=%%d\r\n",
                p_sys->i_port, p_media->psz_rtsp_path );
     asprintf( &p_media->psz_rtsp_control_v6,
-               "a=control:rtsp://[%%s]:%d%s/trackid=%%d\r\n",
+               "a=control:rtsp://[%%s]:%d%s/trackID=%%d\r\n",
               p_sys->i_port, p_media->psz_rtsp_path );
 
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_SETUP,
@@ -386,7 +386,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     p_media->psz_mux = NULL;
 
     /* TODO: update SDP, etc... */
-    asprintf( &psz_urlc, "%s/trackid=%d",
+    asprintf( &psz_urlc, "%s/trackID=%d",
               p_media->psz_rtsp_path, p_media->i_es );
     msg_Dbg( p_vod, "  - ES %4.4s (%s)", (char *)&p_fmt->i_codec, psz_urlc );
 

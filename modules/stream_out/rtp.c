@@ -792,7 +792,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         }
         if( b_rtsp )
         {
-            i_size += strlen( "a=control:*/trackid=*\r\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
+            i_size += strlen( "a=control:*/trackID=*\r\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
         }
     }
     if( p_sys->p_mux )
@@ -862,7 +862,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         }
         if( b_rtsp )
         {
-            p += sprintf( p, "a=control:%s/trackid=%d\r\n", p_sys->psz_rtsp_control, i );
+            p += sprintf( p, "a=control:trackID=%d\r\n", i );
         }
     }
     if( p_sys->p_mux )
@@ -1134,7 +1134,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         char psz_urlc[strlen( p_sys->psz_rtsp_control ) + 1 + 10];
 
-        sprintf( psz_urlc, "%s/trackid=%d", p_sys->psz_rtsp_path, p_sys->i_es );
+        sprintf( psz_urlc, "%s/trackID=%d", p_sys->psz_rtsp_path, p_sys->i_es );
         msg_Dbg( p_stream, "rtsp: adding %s\n", psz_urlc );
         id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
 
