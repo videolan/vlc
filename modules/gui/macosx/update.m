@@ -76,6 +76,8 @@ static VLCUpdate *_o_sharedInstance = nil;
         [o_hashOfOurBinary release];
     if( o_urlOfBinary )
         [o_urlOfBinary release];
+    if( o_indexOfOurBinary )
+        [o_indexOfOurBinary release];
 
     [super dealloc];
 }
@@ -106,19 +108,17 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (IBAction)download:(id)sender
 {
-    /* enable the following once full notification support is available
-    * provide a save dialogue *
+    /* provide a save dialogue */
     SEL sel = @selector(getLocationForSaving:returnCode:contextInfo:);
     NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
     
     [saveFilePanel setRequiredFileType: @"dmg"];
     [saveFilePanel setCanSelectHiddenExtension: YES];
     [saveFilePanel setCanCreateDirectories: YES];
-    [saveFilePanel beginSheetForDirectory:nil file:nil modalForWindow: \
-        o_update_window modalDelegate:self didEndSelector:sel contextInfo:nil];*/
-
-    /* delete this afterwards */
-    [self performDownload: @""];
+    [saveFilePanel beginSheetForDirectory:nil file: \
+        [[o_urlOfBinary componentsSeparatedByString:@"/"] lastObject] \
+        modalForWindow: o_update_window modalDelegate:self didEndSelector:sel \
+        contextInfo:nil];
 }
 
 - (void)getLocationForSaving: (NSSavePanel *)sheet returnCode: \
@@ -175,9 +175,10 @@ static VLCUpdate *_o_sharedInstance = nil;
                 else if( p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
                 {
                     msg_Dbg( p_intf, "binary found, version = %s" \
-                        ", hash=%s, size=%i", p_uit->release.psz_version, \
-                        p_uit->file.psz_md5, (int)((p_uit->file.l_size \
-                        / 1024) / 1024) );
+                        ", hash=%s, size=%i MB, position in release file list=%i",\
+                        p_uit->release.psz_version, p_uit->file.psz_md5, \
+                        (int)((p_uit->file.l_size / 1024) / 1024), \
+                        p_uit->i_f);
                     [o_fld_currentVersionAndSize setStringValue: \
                         [NSString stringWithFormat: \
                         @"The current release is %s (%i MB to download).", \
@@ -196,6 +197,14 @@ static VLCUpdate *_o_sharedInstance = nil;
                             [o_hashOfOurBinary release];
                         o_hashOfOurBinary = [[NSString alloc] \
                             initWithUTF8String: p_uit->file.psz_md5];
+                    }
+                    
+                    if( p_uit->i_f )
+                    {
+                        if( o_indexOfOurBinary )
+                            [o_indexOfOurBinary release];
+                        o_indexOfOurBinary = [[NSNumber alloc] \
+                            initWithInt: p_uit->i_f];
                     }
                 }
                 if( p_uit->release.i_status == UPDATE_RELEASE_STATUS_NEWER &&
@@ -263,34 +272,25 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)performDownload:(NSString *)path
 {
-    /* enable this once notifications are completely available on OSX 
     update_iterator_t *p_uit = update_iterator_New( p_u );
     if( p_uit )
     {
         update_iterator_Action( p_uit, UPDATE_MIRROR );
-        
-        int i_count = 0;
-        while( update_iterator_Action( p_uit, UPDATE_FILE ) != UPDATE_FAIL )
+
+        while( update_iterator_Action( p_uit, UPDATE_FILE) != UPDATE_FAIL )
         {
-            if( p_uit->file.psz_url == [o_hashOfOurBinary UTF8String] )
-                break;
-            i_count += 1;
+            if( p_uit->release.i_type == UPDATE_RELEASE_TYPE_STABLE &&
+                p_uit->release.i_status == UPDATE_RELEASE_STATUS_NEWER &&
+                p_uit->file.i_type == UPDATE_FILE_TYPE_BINARY )
+            {
+                /* that's our binary */
+                update_download( p_uit, (char *)[path UTF8String] );
+            }
         }
         
-        
-        update_download( p_uit, (char *)[path UTF8String] );
-        
         update_iterator_Delete( p_uit );
-    }*/
-    
-    /* delete the following afterwards */
-    msg_Dbg( p_intf, "url is %s, using default browser for download", \
-        [o_urlOfBinary UTF8String] );
-        
-    NSURL * o_url = [NSURL URLWithString: o_urlOfBinary];
+    }
 
-    [[NSWorkspace sharedWorkspace] openURL: o_url];
-    
     [o_update_window close];
 }
 

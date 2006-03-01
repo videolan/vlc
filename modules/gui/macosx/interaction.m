@@ -2,7 +2,7 @@
  * interaction.h: Mac OS X interaction dialogs
  *****************************************************************************
  * Copyright (C) 2005-2006 the VideoLAN team
- * $Id:$
+ * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Felix Kühne <fkuehne at videolan dot org>
@@ -225,14 +225,13 @@
         {
             [o_prog_bar setDoubleValue: \
                 (double)(p_dialog->pp_widgets[i]->val.f_float)];
+
             if( [o_prog_bar doubleValue] == 100.0 )
             {
                 /* we are done, let's hide */
                 [self hideDialog];
                 return;
             }
-            [o_prog_description setStringValue: [NSString stringWithUTF8String:\
-                p_dialog->pp_widgets[i]->val.psz_string]];
         }
     }
 }

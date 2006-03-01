@@ -37,6 +37,7 @@
 
     NSString * o_hashOfOurBinary;
     NSString * o_urlOfBinary;
+    NSNumber * o_indexOfOurBinary;
     update_t * p_u;
     intf_thread_t * p_intf;
 }
