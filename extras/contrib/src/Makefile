@@ -253,8 +253,7 @@ perl-$(PERL_VERSION).tar.gz:
 
 perl: perl-$(PERL_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	mv perl/hints/beos.sh perl/hints/beos.sh.orig
-	sed 's%prefix="/boot/home/config"%prefix="$(PREFIX)"%' < perl/hints/beos.sh.orig > perl/hints/beos.sh
+	sed -i.orig 's%prefix="/boot/home/config"%prefix="$(PREFIX)"%'  perl/hints/beos.sh
 
 .perl: perl
 	(cd $<; ./Configure -d -e && make && make install && ln -sf perl5/$(PERL_VERSION)/BePC-beos/CORE/libperl.so $(PREFIX)/lib/libperl.so)
@@ -373,7 +372,7 @@ endif
 ifeq ($(BUILD),i586-pc-beos)
 # The ugliest kludge ever - so libtool correctly links shared libraries
 # on BeOS. Sorry, I just can't figure out how libtool works
-	( cd $< && for f in `find . -name libtool`; do mv $$f $$f.orig; sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' < $$f.orig > $$f; chmod +x $$f; rm $$f.orig; done )
+	( cd $< && for f in `find . -name libtool`; do  sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' -i  $$f; chmod +x $$f; done )
 endif
 ifneq ($(HOST),$(BUILD))
 # We'll use the installed gettext and only need to cross-compile libintl
@@ -384,7 +383,7 @@ else
 endif
 # Work around another non-sense of autoconf.
 ifdef HAVE_WIN32
-	(cd ../include; sed -i.bak '283 c #if !1' libintl.h)
+	(cd ../include; sed -i.orig '283 c #if !1' libintl.h)
 endif
 	$(INSTALL_NAME)
 	touch $@
@@ -1018,8 +1017,7 @@ live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 
 .live: live
 ifeq ($(HOST),powerpc-apple-darwin8)
-	(cd $<; mv config.macosx config.macosx.orig)
-	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' < config.macosx.orig > config.macosx)
+	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
 else
 ifeq ($(HOST),powerpc-apple-darwin*)
