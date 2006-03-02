@@ -91,6 +91,7 @@ HEADERS_include = \
 	../include/vlc_threads_funcs.h \
 	../include/vlc_threads.h \
 	../include/vlc_update.h \
+	../include/vlc_url.h \
 	../include/vlc_video.h \
 	../include/vlc_vlm.h \
 	../include/vlc_vod.h \
