@@ -34,6 +34,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/sout.h>
+#include "charset.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -101,28 +102,22 @@ static int Open( vlc_object_t *p_this )
 
     sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    if( !( p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
-    {
-        msg_Err( p_access, "out of memory" );
-        return( VLC_EGENERIC );
-    }
-
     if( !p_access->psz_name )
     {
         msg_Err( p_access, "no file name specified" );
         return VLC_EGENERIC;
     }
+
+    if( !( p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
+    {
+        return( VLC_ENOMEM );
+    }
+
     i_flags = O_RDWR|O_CREAT|O_LARGEFILE;
 
     var_Get( p_access, SOUT_CFG_PREFIX "append", &val );
-    if( val.b_bool )
-    {
-        i_flags |= O_APPEND;
-    }
-    else
-    {
-        i_flags |= O_TRUNC;
-    }
+    i_flags |= val.b_bool ? O_APPEND : O_TRUNC;
+
     if( !strcmp( p_access->psz_name, "-" ) )
     {
 #if defined(WIN32)
@@ -131,12 +126,20 @@ static int Open( vlc_object_t *p_this )
         p_access->p_sys->i_handle = STDOUT_FILENO;
         msg_Dbg( p_access, "using stdout" );
     }
-    else if( ( p_access->p_sys->i_handle =
-               open( p_access->psz_name, i_flags, 0666 ) ) == -1 )
+    else
     {
-        msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
-        free( p_access->p_sys );
-        return( VLC_EGENERIC );
+        const char *psz_localname = ToLocale( p_access->psz_name );
+        int fd = open( psz_localname, i_flags, 0666 );
+        LocaleFree( psz_localname );
+
+        if( fd == -1 )
+        {
+            msg_Err( p_access, "cannot open `%s' (%s)", p_access->psz_name,
+                     strerror( errno ) );
+            free( p_access->p_sys );
+            return( VLC_EGENERIC );
+        }
+        p_access->p_sys->i_handle = fd;
     }
 
     p_access->pf_write = Write;
