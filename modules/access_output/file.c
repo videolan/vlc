@@ -42,12 +42,6 @@
 #endif
 
 /* For those platforms that don't use these */
-#ifndef S_IRGRP
-#   define S_IRGRP 0
-#endif
-#ifndef S_IROTH
-#   define S_IROTH 0
-#endif
 #ifndef STDOUT_FILENO
 #   define STDOUT_FILENO 1
 #endif
@@ -138,8 +132,7 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_access, "using stdout" );
     }
     else if( ( p_access->p_sys->i_handle =
-               open( p_access->psz_name, i_flags,
-                     S_IWRITE | S_IREAD | S_IRGRP | S_IROTH ) ) == -1 )
+               open( p_access->psz_name, i_flags, 0666 ) ) == -1 )
     {
         msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
         free( p_access->p_sys );
