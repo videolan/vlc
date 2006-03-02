@@ -102,17 +102,6 @@ struct httpd_message_t
 
 };
 
-/* I keep the definition here, easier than looking at vlc_common.h
-
- * answer could be null, int this case no answer is requested
-typedef int (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, httpd_message_t *query );
-typedef struct httpd_callback_sys_t httpd_callback_sys_t;
-
-typedef struct httpd_file_t     httpd_file_t;
-typedef struct httpd_file_sys_t httpd_file_sys_t;
-typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
-*/
-
 /* create a new host */
 VLC_EXPORT( httpd_host_t *, httpd_HostNew, ( vlc_object_t *, const char *psz_host, int i_port ) );
 VLC_EXPORT( httpd_host_t *, httpd_TLSHostNew, ( vlc_object_t *, const char *, int, const char *, const char *, const char *, const char * ) );
