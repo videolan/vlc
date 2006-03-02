@@ -1519,6 +1519,9 @@ if test "${enable_livedotcom}" = "yes"; then
     AC_LANG_PUSH(C++)
     CPPFLAGS_save="${CPPFLAGS}"
     CPPFLAGS_livedotcom="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
+    if test "${SYS}" = "solaris"; then
+      CPPFLAGS_livedotcom="${CPPFLAGS_livedotcom} -DSOLARIS"
+    fi
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_livedotcom}"
     AC_CHECK_HEADERS(liveMedia.hh, [
       VLC_ADD_CXXFLAGS([livedotcom], [${CPPFLAGS_livedotcom}])
@@ -1567,6 +1570,9 @@ if test "${enable_livedotcom}" = "yes"; then
       VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/groupsock/include])
       VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/liveMedia/include])
       VLC_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/UsageEnvironment/include ])
+      if test "${SYS}" = "solaris"; then
+        VLC_ADD_CXXFLAGS([livedotcom],[-DSOLARIS])
+      fi
     else
       dnl  The given live.com wasn't built
       AC_MSG_RESULT(no)
