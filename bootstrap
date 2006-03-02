@@ -441,7 +441,7 @@ lib${mod}_a_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\`
 lib${mod}_builtin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags builtin ${mod}\` -static
 lib${mod}_builtin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags builtin ${mod}\` -static
 lib${mod}_builtin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags builtin ${mod}\` -static
-lib${mod}_builtin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs ${mod}\` -static
+lib${mod}_builtin_la_LDFLAGS = -static
 
 EOF
   done

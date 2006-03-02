@@ -165,7 +165,7 @@ libvlc_la_SOURCES = $(SOURCES_libvlc)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags vlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags vlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\.a /_builtin.la /g'` \
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs vlc builtin|sed -e 's/\(modules\/[^ ]*\)\.a /\1_builtin.la /g'` \
 		-avoid-version -no-undefined
 libvlc_la_DEPENDENCIES = stamp-builtins
 
