@@ -47,15 +47,8 @@
 #   include <winsock.h>
 #elif defined( WIN32 )
 #   include <winsock2.h>
-#   include <ws2tcpip.h>
 #else
-#   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
-/* FIXME: should not be needed */
-#   include <netinet/in.h>
-#   ifdef HAVE_ARPA_INET_H
-#       include <arpa/inet.h>                    /* inet_ntoa(), inet_aton() */
-#   endif
 #endif
 
 #if defined( WIN32 )
@@ -440,7 +433,7 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
 {
     httpd_handler_t *handler = (httpd_handler_t*)p_sys;
     uint8_t *psz_args = query->psz_args;
-    char psz_remote_addr[100];
+    char psz_remote_addr[NI_MAXNUMERICHOST];
 
     if( answer == NULL || query == NULL )
     {
@@ -453,30 +446,8 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
     answer->i_status = 0;
     answer->psz_status = NULL;
 
-    switch( cl->sock.ss_family )
-    {
-#ifdef HAVE_INET_PTON
-    case AF_INET:
-        inet_ntop( cl->sock.ss_family,
-                   &((struct sockaddr_in *)&cl->sock)->sin_addr,
-                   psz_remote_addr, sizeof(psz_remote_addr) );
-        break;
-    case AF_INET6:
-        inet_ntop( cl->sock.ss_family,
-                   &((struct sockaddr_in6 *)&cl->sock)->sin6_addr,
-                   psz_remote_addr, sizeof(psz_remote_addr) );
-        break;
-#else
-    case AF_INET:
-    {
-        char *psz_tmp = inet_ntoa( ((struct sockaddr_in *)&cl->sock)->sin_addr );
-        strncpy( psz_remote_addr, psz_tmp, sizeof(psz_remote_addr) );
-        break;
-    }
-#endif
-    default:
-        psz_remote_addr[0] = '\0';
-    }
+    if( httpd_ClientIP( cl, psz_remote_addr ) == NULL )
+        *psz_remote_addr = '\0';
 
     handler->pf_fill( handler->p_sys, handler, query->psz_url, psz_args,
                       query->i_type, query->p_body, query->i_body,
@@ -1371,12 +1342,12 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
     cl->i_mode   = HTTPD_CLIENT_BIDIR;
 }
 
-char* httpd_ClientIP( httpd_client_t *cl, char *psz_ip )
+char* httpd_ClientIP( const httpd_client_t *cl, char *psz_ip )
 {
     return net_GetPeerAddress( cl->fd, psz_ip, NULL ) ? NULL : psz_ip;
 }
 
-char* httpd_ServerIP( httpd_client_t *cl, char *psz_ip )
+char* httpd_ServerIP( const httpd_client_t *cl, char *psz_ip )
 {
     return net_GetSockAddress( cl->fd, psz_ip, NULL ) ? NULL : psz_ip;
 }

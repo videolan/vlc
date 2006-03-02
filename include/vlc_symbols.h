@@ -204,7 +204,7 @@ struct module_symbols_t
     void (*httpd_UrlDelete_inner) (httpd_url_t *);
     void (*httpd_ClientModeStream_inner) (httpd_client_t *cl);
     void (*httpd_ClientModeBidir_inner) (httpd_client_t *cl);
-    char* (*httpd_ClientIP_inner) (httpd_client_t *cl, char *psz_ip);
+    char* (*httpd_ClientIP_inner) (const httpd_client_t *cl, char *psz_ip);
     httpd_file_t * (*httpd_FileNew_inner) (httpd_host_t *, const char *psz_url, const char *psz_mime, const char *psz_user, const char *psz_password, const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill, httpd_file_sys_t *);
     void (*httpd_FileDelete_inner) (httpd_file_t *);
     httpd_redirect_t * (*httpd_RedirectNew_inner) (httpd_host_t *, const char *psz_url_dst, const char *psz_url_src);
@@ -385,7 +385,7 @@ struct module_symbols_t
     int (*ACL_LoadFile_inner) (vlc_acl_t *p_acl, const char *path);
     int (*ACL_AddNet_inner) (vlc_acl_t *p_acl, const char *psz_ip, int i_len, vlc_bool_t b_allow);
     void (*ACL_Destroy_inner) (vlc_acl_t *p_acl);
-    char* (*httpd_ServerIP_inner) (httpd_client_t *cl, char *psz_ip);
+    char* (*httpd_ServerIP_inner) (const httpd_client_t *cl, char *psz_ip);
     char * (*FromLocale_inner) (const char *);
     void (*LocaleFree_inner) (const char *);
     char * (*ToLocale_inner) (const char *);
