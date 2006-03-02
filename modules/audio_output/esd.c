@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* write(), close() */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
