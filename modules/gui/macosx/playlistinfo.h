@@ -40,6 +40,29 @@
     IBOutlet id o_btn_delete_group;
     IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
+    
+    IBOutlet id o_tab_view;
+
+    IBOutlet id o_collection_lbl;
+    IBOutlet id o_collection_txt;
+    IBOutlet id o_copyright_lbl;
+    IBOutlet id o_copyright_txt;
+    IBOutlet id o_date_lbl;
+    IBOutlet id o_date_txt;
+    IBOutlet id o_description_lbl;
+    IBOutlet id o_description_txt;
+    IBOutlet id o_genre_lbl;
+    IBOutlet id o_genre_txt;
+    IBOutlet id o_language_lbl;
+    IBOutlet id o_language_txt;
+    IBOutlet id o_nowPlaying_lbl;
+    IBOutlet id o_nowPlaying_txt;
+    IBOutlet id o_publisher_lbl;
+    IBOutlet id o_publisher_txt;
+    IBOutlet id o_rating_lbl;
+    IBOutlet id o_rating_txt;
+    IBOutlet id o_seqNum_lbl;
+    IBOutlet id o_seqNum_txt;
 
     playlist_item_t * p_item;
 }
@@ -51,6 +74,8 @@
 - (IBAction)infoOk:(id)sender;
 - (playlist_item_t *)getItem;
 - (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
+
+- (void)setMeta: (char *)meta forLabel: (id)theItem;
 
 @end
 

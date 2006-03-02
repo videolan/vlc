@@ -56,6 +56,23 @@
     [o_author_lbl setStringValue: _NS("Author")];
     [o_btn_ok setTitle: _NS("OK")];
     [o_btn_cancel setTitle: _NS("Cancel")];
+    
+    [[o_tab_view tabViewItemAtIndex: 0] setLabel: _NS("General")];
+    [[o_tab_view tabViewItemAtIndex: 1] setLabel: _NS("Advanced Information")];
+    [[o_tab_view tabViewItemAtIndex: 2] setLabel: _NS("Statistics")];
+    [o_tab_view selectTabViewItemAtIndex: 0];
+
+    /* constants defined in vlc_meta.h */
+    [o_genre_lbl setStringValue: _NS(VLC_META_GENRE)];
+    [o_copyright_lbl setStringValue: _NS(VLC_META_COPYRIGHT)];
+    [o_collection_lbl setStringValue: _NS(VLC_META_COLLECTION)];
+    [o_seqNum_lbl setStringValue: _NS(VLC_META_SEQ_NUM)];
+    [o_description_lbl setStringValue: _NS(VLC_META_DESCRIPTION)];
+    [o_rating_lbl setStringValue: _NS(VLC_META_RATING)];
+    [o_date_lbl setStringValue: _NS(VLC_META_DATE)];
+    [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];
+    [o_nowPlaying_lbl setStringValue: _NS(VLC_META_NOW_PLAYING)];
+    [o_publisher_lbl setStringValue: _NS(VLC_META_PUBLISHER)];
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender
@@ -123,10 +140,33 @@
         free( psz_temp );
     }
 
+    /* fill the other fields */
+    [self setMeta: VLC_META_GENRE forLabel: o_genre_txt];
+    [self setMeta: VLC_META_COPYRIGHT forLabel: o_copyright_txt];
+    [self setMeta: VLC_META_COLLECTION forLabel: o_collection_txt];
+    [self setMeta: VLC_META_SEQ_NUM forLabel: o_seqNum_txt];
+    [self setMeta: VLC_META_DESCRIPTION forLabel: o_description_txt];
+    [self setMeta: VLC_META_RATING forLabel: o_rating_txt];
+    [self setMeta: VLC_META_DATE forLabel: o_date_txt];
+    [self setMeta: VLC_META_LANGUAGE forLabel: o_language_txt];
+    [self setMeta: VLC_META_NOW_PLAYING forLabel: o_nowPlaying_txt];
+    [self setMeta: VLC_META_PUBLISHER forLabel: o_publisher_txt];
+
+    /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
 
     [o_info_window makeKeyAndOrderFront: sender];
+}
+
+- (void)setMeta: (char *)meta forLabel: (id)theItem
+{
+    char *psz_meta = vlc_input_item_GetInfo( &p_item->input, \
+        _(VLC_META_INFO_CAT), _(meta) );
+    if( psz_meta != NULL && *psz_meta)
+        [theItem setStringValue: [NSString stringWithUTF8String: psz_meta]];
+    else
+        [theItem setStringValue: @"-"];
 }
 
 - (IBAction)infoCancel:(id)sender
