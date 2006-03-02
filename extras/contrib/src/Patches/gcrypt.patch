@@ -9,3 +9,14 @@
          ac_cv_sys_symbol_underscore=yes
          ;;
      *)
+--- libgcrypt/Makefile.am.orig	2006-03-02 16:46:35.000000000 +0100
++++ libgcrypt/Makefile.am	2006-03-02 16:47:19.000000000 +0100
+@@ -21,7 +21,7 @@
+ AUTOMAKE_OPTIONS = dist-bzip2
+ 
+ DIST_SUBDIRS = mpi cipher src doc tests w32-dll
+-SUBDIRS = mpi cipher src doc tests
++SUBDIRS = mpi cipher src 
+ EXTRA_DIST = BUGS autogen.sh README.apichanges README.SVN
+ DISTCLEANFILES = 
+ 
