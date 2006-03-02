@@ -744,12 +744,14 @@ static void WaveOutThread( notification_thread_t *p_notif )
             if( (p_waveheader[i].dwFlags & WHDR_DONE) &&
                 p_waveheader[i].dwUser )
             {
+                aout_buffer_t *p_buffer =
+                        (aout_buffer_t *)(p_waveheader[i].dwUser);
                 /* Unprepare and free the buffers which has just been played */
                 waveOutUnprepareHeader( p_sys->h_waveout, &p_waveheader[i],
                                         sizeof(WAVEHDR) );
 
                 if( p_waveheader[i].dwUser != 1 )
-                    aout_BufferFree( (aout_buffer_t *)p_waveheader[i].dwUser );
+                    aout_BufferFree( p_buffer );
 
                 p_waveheader[i].dwUser = 0;
             }
