@@ -99,7 +99,7 @@ static vlc_mutex_t    structure_lock;
 void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 {
     vlc_object_t * p_new;
-    char *         psz_type;
+    const char   * psz_type;
     size_t         i_size;
 
     switch( i_type )
@@ -217,10 +217,8 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             psz_type = "statistics";
             break;
         default:
-            i_size = i_type > 0
-                      ? i_type > (int)sizeof(vlc_object_t)
-                         ? i_type : (int)sizeof(vlc_object_t)
-                      : (int)sizeof(vlc_object_t);
+            i_size = i_type > (int)sizeof(vlc_object_t)
+                         ? i_type : (int)sizeof(vlc_object_t);
             i_type = VLC_OBJECT_GENERIC;
             psz_type = "generic";
             break;

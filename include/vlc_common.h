@@ -478,7 +478,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /**@{*/                                                                     \
     int   i_object_id;                                                      \
     int   i_object_type;                                                    \
-    char *psz_object_type;                                                  \
+    const char *psz_object_type;                                            \
     char *psz_object_name;                                                  \
                                                                             \
     /* Messages header */                                                   \
