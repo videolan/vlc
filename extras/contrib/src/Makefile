@@ -1022,10 +1022,12 @@ ifeq ($(HOST),powerpc-apple-darwin8)
 else
 ifeq ($(HOST),powerpc-apple-darwin*)
 	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
-elif defined( HAVE_WIN32 )
+else
+ifdef HAVE_WIN32 
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
 	(cd $<;./genMakefiles linux && make )
+endif
 endif
 endif
 	touch $@
