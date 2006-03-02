@@ -429,6 +429,7 @@ fi
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
     VLC_ADD_LDFLAGS([vlc ipv4 ipv6 cdda cddax],-lsocket)
+    LIBS_socket="-lsocket"
   ])
 ])
 
@@ -484,16 +485,8 @@ dnl getaddrinfo, getnameinfo and gai_strerror check
 dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
 LIBS_save="${LIBS}"
-AC_CHECK_FUNCS([getaddrinfo], [
-  LIBS_gai="${LIBS}"
-], [
-  LIBS="${LIBS} -lnsl -lsocket"
-  AC_CHECK_FUNCS([getaddrinfo], [
-    LIBS_gai="${LIBS}"
-  ], [
-    LIBS_gai="${LIBS_save}"
-  ])
-])
+AH_TEMPLATE(HAVE_GETADDRINFO, [Define to 1 if you have the `getaddrinfo' function.])
+AC_SEARCH_LIBS([getaddrinfo], [-lnsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${LIBS_socket}])
 
 dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
 dnl are
@@ -501,7 +494,7 @@ LIBS="${LIBS_gai}"
 AC_CHECK_FUNCS([getnameinfo gai_strerror])
 LIBS="${LIBS_save}"
 
-AH_TEMPLATE(HAVE_ADDRINFO, [Define to `1' if <netdb.h> defines struct addrinfo.])
+AH_TEMPLATE(HAVE_ADDRINFO, [Define to 1 if <netdb.h> defines `struct addrinfo'.])
 AC_CHECK_TYPES([struct addrinfo],[AC_DEFINE(HAVE_ADDRINFO)],,
 [#include <sys/types.h>
 #if defined( WIN32 ) || defined( UNDER_CE )
