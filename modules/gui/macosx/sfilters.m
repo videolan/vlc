@@ -414,7 +414,7 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
         else
         {
-            val.psz_string = [[o_marq_marq_fld stringValue] UTF8String];
+            val.psz_string = (char *)[[o_marq_marq_fld stringValue] UTF8String];
         }
 
         if( p_input )
@@ -484,7 +484,7 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
         else
         {
-            val.psz_string = [[o_time_stamp_fld stringValue] UTF8String];
+            val.psz_string = (char *)[[o_time_stamp_fld stringValue] UTF8String];
         }
 
         if( p_input )

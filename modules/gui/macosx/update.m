@@ -143,8 +143,9 @@ static VLCUpdate *_o_sharedInstance = nil;
     int x = 0;
     NSString * pathToReleaseNote;
     pathToReleaseNote = [NSString stringWithFormat: \
-        @"/tmp/vlc_releasenote_%@.tmp", [[NSCalendarDate calendarDate] \
-        descriptionWithCalendarFormat: @"%m-%d-%y--%I.%M.%S.%F"]];
+        @"/tmp/vlc_releasenote_%d.tmp", mdate()]; /*[[NSCalendarDate calendarDate] \
+        descriptionWithCalendarFormat: @"%m-%d-%y--%I.%M.%S.%F"]];*/
+    NSLog( pathToReleaseNote );
     
     if( p_uit )
     {
