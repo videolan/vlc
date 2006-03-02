@@ -1,14 +1,3 @@
---- libgcrypt/configure.old	2005-01-05 13:53:24.000000000 +0000
-+++ libgcrypt/configure	2005-11-24 12:28:28.703125000 +0000
-@@ -25685,7 +25685,7 @@
- #
- tmp_do_check="no"
- case "${target}" in
--    i386-emx-os2 | i345686-pc-os2*emx | i386-pc-msdosdjgpp)
-+    i386-emx-os2 | i345686-pc-os2*emx | i386-pc-msdosdjgpp | *mingw32*)
-         ac_cv_sys_symbol_underscore=yes
-         ;;
-     *)
 --- libgcrypt/Makefile.am.orig	2006-03-02 16:46:35.000000000 +0100
 +++ libgcrypt/Makefile.am	2006-03-02 16:47:19.000000000 +0100
 @@ -21,7 +21,7 @@
