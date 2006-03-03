@@ -25,7 +25,7 @@ diff -ruN live.orig/config.macosx live/config.macosx
  OBJ =			o
  LINK =			c++ -o 
 -LINK_OPTS =		-L.
-+LINK_OPTS =		-L. EXTRA_LDFLAGS
++LINK_OPTS =		-L. EXTRA_LDFLAGS 
  CONSOLE_LINK_OPTS =	$(LINK_OPTS)
 -LIBRARY_LINK =		ld -o 
 -LIBRARY_LINK_OPTS =	$(LINK_OPTS) -r 

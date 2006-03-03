@@ -1017,17 +1017,17 @@ live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	patch -p 0 < Patches/live-osx.patch
 
 .live: live
-ifeq ($(HOST),powerpc-apple-darwin8)
-	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
-	(cd $<; ./genMakefiles macosx && make)
-else
-ifeq ($(HOST),powerpc-apple-darwin*)
-	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
-else
 ifdef HAVE_WIN32 
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
-	(cd $<;./genMakefiles linux && make )
+ifeq ($(HOST),ppc-darwin)
+	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
+else
+ifdef HAVE_DARWIN_OS
+	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
+	(cd $<; ./genMakefiles macosx && make)
+else
+	(cd $<;./genMakefiles linux && make $(HOSTCC))
 endif
 endif
 endif
