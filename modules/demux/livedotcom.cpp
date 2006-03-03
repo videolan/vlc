@@ -1,5 +1,5 @@
 /*****************************************************************************
- * livedotcom.cpp : live.com support.
+ * livedotcom.cpp : LIVE555 Streaming Media support.
  *****************************************************************************
  * Copyright (C) 2003-2005 the VideoLAN team
  * $Id$
@@ -509,6 +509,12 @@ static int  Open ( vlc_object_t *p_this )
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
                     delete[] p_extra;
                 }
+
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1141257600
+		/* Because the "faad" decoder does not handle the LATM data length field
+		   at the start of each returned LATM frame, tell the RTP source to omit it. */
+		((MPEG4LATMAudioRTPSource*)sub->rtpSource())->omitLATMDataLengthField();
+#endif
             }
             else if( !strcmp( sub->codecName(), "MPEG4-GENERIC" ) )
             {
