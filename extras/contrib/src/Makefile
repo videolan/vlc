@@ -1437,7 +1437,10 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .gpg-error: libgpg-error
-	(cd $<; ./autogen.sh && libtoolize --force && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
+ifeq ($(HOST),i686-apple-darwin8)
+        (cd $<; ./autogen.sh)
+endif
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1458,9 +1461,12 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 else
-	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+ifeq ($(HOST),i686-apple-darwin8)
+        (cd $<; ./autogen.sh)
+endif
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
