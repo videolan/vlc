@@ -486,7 +486,7 @@ dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
 LIBS_save="${LIBS}"
 AH_TEMPLATE(HAVE_GETADDRINFO, [Define to 1 if you have the `getaddrinfo' function.])
-AC_SEARCH_LIBS([getaddrinfo], [-lnsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${LIBS_socket}])
+AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${LIBS_socket}])
 
 dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
 dnl are
@@ -2192,9 +2192,7 @@ dnl  ipv6 plugin - not for QNX yet
 dnl
 have_ipv6=no
 AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
-  AC_CHECK_LIB(resolv,inet_pton,
-    [have_ipv6=yes
-     VLC_ADD_LDFLAGS([ipv6 vlc],[-lresolv])])
+  AC_CHECK_LIB(nsl,inet_pton, [have_ipv6=yes])
 ])
 
 AS_IF([test "${have_ipv6}" = "yes"], [
