@@ -51,7 +51,7 @@
 {
     [o_info_window setExcludedFromWindowsMenu: TRUE];
 
-    [o_info_window setTitle: _NS("Properties")];
+    [o_info_window setTitle: _NS("Information")];
     [o_uri_lbl setStringValue: _NS("URI")];
     [o_title_lbl setStringValue: _NS("Title")];
     [o_author_lbl setStringValue: _NS("Author")];

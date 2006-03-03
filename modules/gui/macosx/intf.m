@@ -572,7 +572,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_extended setTitle: _NS("Extended Controls")];
     [o_mi_bookmarks setTitle: _NS("Bookmarks")];
     [o_mi_playlist setTitle: _NS("Playlist")];
-    [o_mi_info setTitle: _NS("Info")];
+    [o_mi_info setTitle: _NS("Information")];
     [o_mi_messages setTitle: _NS("Messages")];
 
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
@@ -603,7 +603,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_err_btn_dismiss setTitle: _NS("Dismiss")];
     [o_err_ckbk_surpress setTitle: _NS("Suppress further errors")];
 
-    [o_info_window setTitle: _NS("Info")];
+    [o_info_window setTitle: _NS("Information")];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
