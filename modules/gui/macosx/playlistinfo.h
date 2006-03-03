@@ -97,6 +97,7 @@
     IBOutlet id o_video_decoded_txt;
 
     playlist_item_t * p_item;
+    NSTimer * o_statUpdateTimer;
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender;
@@ -108,10 +109,7 @@
 - (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
 
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
-- (void)updateStatistics;
-/*- (void)setIntStat: (int)value forLabel: (id)theItem withFormat: (NSString *)format;
-- (void)setFloatStat: (float)value forLabel: (id)theItem withFormat: (NSString *)format;
-*/
+- (void)updateStatistics: (NSTimer*)theTimer;
 @end
 
 @interface VLCInfoTreeItem : NSObject
