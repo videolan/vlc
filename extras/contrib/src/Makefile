@@ -1441,7 +1441,7 @@ ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; ./autogen.sh)
 endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
-	$(INSTALL_NAME)
+#	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .gpg-error
