@@ -1438,7 +1438,7 @@ libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
 
 .gpg-error: libgpg-error
 ifeq ($(HOST),i686-apple-darwin8)
-        (cd $<; ./autogen.sh)
+	(cd $<; ./autogen.sh)
 endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
 	$(INSTALL_NAME)
@@ -1464,7 +1464,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 else
 ifeq ($(HOST),i686-apple-darwin8)
-        (cd $<; ./autogen.sh)
+	(cd $<; ./autogen.sh)
 endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 endif
