@@ -701,7 +701,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( ( p_vod->p_sys->i_throtle_users > 0 ) &&
                         ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throtle_users ) )
                     {
-                        answer->i_status = 500; // FIXME: GET THE RIGHT ERROR STATUS
+                        answer->i_status = 503;
                         answer->psz_status = strdup( "Too many connections" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
@@ -715,7 +715,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     p_rtsp = RtspClientGet( p_media, psz_session );
                     if( !p_rtsp )
                     {
-                        /* FIXME right error code */
                         answer->i_status = 454;
                         answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
@@ -959,7 +958,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( ( p_vod->p_sys->i_throtle_users > 0 ) &&
                         ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throtle_users ) )
                     {
-                        answer->i_status = 500; // FIXME: GET THE RIGHT ERROR STATUS
+                        answer->i_status = 503;
                         answer->psz_status = strdup( "Too many connections" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
@@ -973,7 +972,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     p_rtsp = RtspClientGet( p_media, psz_session );
                     if( !p_rtsp )
                     {
-                        /* FIXME right error code */
                         answer->i_status = 454;
                         answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
