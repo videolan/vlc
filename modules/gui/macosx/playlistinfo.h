@@ -1,10 +1,11 @@
 /*****************************************************************************
  * playlistinfo.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
- * Authors: Benjamin Pracht <bigben at videolan dot org> 
+ * Authors: Benjamin Pracht <bigben at videolan dot org>
+ *          Felix Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +65,37 @@
     IBOutlet id o_seqNum_lbl;
     IBOutlet id o_seqNum_txt;
 
+    IBOutlet id o_audio_box;
+    IBOutlet id o_audio_decoded_lbl;
+    IBOutlet id o_audio_decoded_txt;
+    IBOutlet id o_demux_bitrate_lbl;
+    IBOutlet id o_demux_bitrate_txt;
+    IBOutlet id o_demux_bytes_lbl;
+    IBOutlet id o_demux_bytes_txt;
+    IBOutlet id o_displayed_lbl;
+    IBOutlet id o_displayed_txt;
+    IBOutlet id o_input_bitrate_lbl;
+    IBOutlet id o_input_bitrate_txt;
+    IBOutlet id o_input_box;
+    IBOutlet id o_lost_abuffers_lbl;
+    IBOutlet id o_lost_abuffers_txt;
+    IBOutlet id o_lost_frames_lbl;
+    IBOutlet id o_lost_frames_txt;
+    IBOutlet id o_played_abuffers_lbl;
+    IBOutlet id o_played_abuffers_txt;
+    IBOutlet id o_read_bytes_lbl;
+    IBOutlet id o_read_bytes_txt;
+    IBOutlet id o_sent_bitrate_lbl;
+    IBOutlet id o_sent_bitrate_txt;
+    IBOutlet id o_sent_bytes_lbl;
+    IBOutlet id o_sent_bytes_txt;
+    IBOutlet id o_sent_packets_lbl;
+    IBOutlet id o_sent_packets_txt;
+    IBOutlet id o_sout_box;
+    IBOutlet id o_video_box;
+    IBOutlet id o_video_decoded_lbl;
+    IBOutlet id o_video_decoded_txt;
+
     playlist_item_t * p_item;
 }
 
@@ -76,7 +108,10 @@
 - (BOOL)isItemInPlaylist:(playlist_item_t *)p_item;
 
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
-
+- (void)updateStatistics;
+/*- (void)setIntStat: (int)value forLabel: (id)theItem withFormat: (NSString *)format;
+- (void)setFloatStat: (float)value forLabel: (id)theItem withFormat: (NSString *)format;
+*/
 @end
 
 @interface VLCInfoTreeItem : NSObject

@@ -1,10 +1,11 @@
 /*****************************************************************************
  r playlistinfo.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
+ *          Felix Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,6 +74,28 @@
     [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];
     [o_nowPlaying_lbl setStringValue: _NS(VLC_META_NOW_PLAYING)];
     [o_publisher_lbl setStringValue: _NS(VLC_META_PUBLISHER)];
+    
+    /* statistics */
+    [o_input_box setTitle: _NS("Input")];
+    [o_read_bytes_lbl setStringValue: _NS("Read at media")];
+    [o_input_bitrate_lbl setStringValue: _NS("Input bitrate")];
+    [o_demux_bytes_lbl setStringValue: _NS("Demuxed")];
+    [o_demux_bitrate_lbl setStringValue: _NS("Stream bitrate")];
+    
+    [o_video_box setTitle: _NS("Video")];
+    [o_video_decoded_lbl setStringValue: _NS("Decoded blocks")];
+    [o_displayed_lbl setStringValue: _NS("Displayed frames")];
+    [o_lost_frames_lbl setStringValue: _NS("Lost frames")];
+    
+    [o_sout_box setTitle: _NS("Streaming")];
+    [o_sent_packets_lbl setStringValue: _NS("Sent packets")];
+    [o_sent_bytes_lbl setStringValue: _NS("Sent bytes")];
+    [o_sent_bitrate_lbl setStringValue: _NS("Send rate")];
+    
+    [o_audio_box setTitle: _NS("Audio")];
+    [o_audio_decoded_lbl setStringValue: _NS("Decoded blocks")];
+    [o_played_abuffers_lbl setStringValue: _NS("Played buffers")];
+    [o_lost_abuffers_lbl setStringValue: _NS("Lost buffers")];
 }
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender
@@ -155,6 +178,8 @@
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
+    
+    [self updateStatistics];
 
     [o_info_window makeKeyAndOrderFront: sender];
 }
@@ -167,6 +192,47 @@
         [theItem setStringValue: [NSString stringWithUTF8String: psz_meta]];
     else
         [theItem setStringValue: @"-"];
+}
+
+- (void)updateStatistics
+{
+    vlc_mutex_lock( &p_item->input.p_stats->lock );
+
+    /* input */
+    [o_read_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB", \
+        (float)(p_item->input.p_stats->i_read_bytes)/1000]];
+    [o_input_bitrate_txt setStringValue: [NSString stringWithFormat: @"%6.0f kb/s", \
+        (float)(p_item->input.p_stats->f_input_bitrate)/1000]];
+    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB",\
+        (float)(p_item->input.p_stats->i_demux_read_bytes)/1000]];
+    [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat: @"%6.0f kb/s", \
+        (float)(p_item->input.p_stats->f_demux_bitrate)/1000]];
+
+    /* Video */
+    [o_video_decoded_txt setStringValue: [NSString stringWithFormat: @"%8.0f kB", \
+        p_item->input.p_stats->i_decoded_video]];
+    [o_displayed_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        p_item->input.p_stats->i_displayed_pictures]];
+    [o_lost_frames_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        p_item->input.p_stats->i_lost_pictures]];
+
+    /* Sout */
+    [o_sent_packets_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        p_item->input.p_stats->i_sent_packets]];
+    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%6.0f kB", \
+        (float)(p_item->input.p_stats->i_sent_bytes)/1000]];
+    [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat: @"%6.0f kb/s", \
+        (float)(p_item->input.p_stats->f_send_bitrate*8)*1000]];
+
+    /* Audio */
+    [o_audio_decoded_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        p_item->input.p_stats->i_decoded_audio]];
+    [o_played_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        p_item->input.p_stats->i_played_abuffers]];
+    [o_lost_abuffers_txt setStringValue: [NSString stringWithFormat: @"%5i", \
+        p_item->input.p_stats->i_lost_abuffers]];
+
+    vlc_mutex_unlock( &p_item->input.p_stats->lock );
 }
 
 - (IBAction)infoCancel:(id)sender
