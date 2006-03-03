@@ -973,7 +973,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, true );
             CGReleaseDisplayFadeReservation( token );
-            int i;
+            unsigned int i;
             for( i = 0 ; i < [o_screens count]; i++)
             {
                 struct
@@ -986,7 +986,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                 CGDisplayCount dspyCnt;
                 CGPoint gPoint;
 
-                if( i == i_device ) continue;
+                if( i == (unsigned int)i_device ) continue;
 
                 screen_rect = [[o_screens objectAtIndex: i] frame];
 
