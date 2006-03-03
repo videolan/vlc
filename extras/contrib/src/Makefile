@@ -1461,7 +1461,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 .gcrypt: libgcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
 else
 ifeq ($(HOST),i686-apple-darwin8)
 	(cd $<; ./autogen.sh)
