@@ -356,6 +356,12 @@ VLC-release.app: vlc
 	    bookmarks.m \
 	    sfilters.h \
 	    sfilters.m \
+	    update.h \
+	    update.m \
+	    interaction.h \
+	    interaction.m \
+	    embeddedwindow.h \
+	    embeddedwindow.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
@@ -461,6 +467,12 @@ VLC.app: vlc
 	    bookmarks.m \
 	    sfilters.h \
 	    sfilters.m \
+	    update.h \
+	    update.m \
+	    interaction.h \
+	    interaction.m \
+	    embeddedwindow.h \
+	    embeddedwindow.m \
 	    vout.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
