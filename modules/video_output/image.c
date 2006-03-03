@@ -56,6 +56,9 @@ static void Display   ( vout_thread_t *, picture_t * );
 #define PREFIX_LONGTEXT N_( "Set the prefix of the filename. Output filename "\
                             "will have the form prefixNUMBER.format" )
 
+#define REPLACE_TEXT N_( "Always write to the same file" )
+#define REPLACE_LONGTEXT N_( "Always write to the same file" )
+
 static char *psz_format_list[] = { "png", "jpeg" };
 static char *psz_format_list_text[] = { "PNG", "JPEG" };
 
@@ -72,7 +75,9 @@ vlc_module_begin( );
     add_integer( "image-out-ratio", 3 , NULL,  RATIO_TEXT, RATIO_LONGTEXT,
                                                   VLC_FALSE );
     add_string( "image-out-prefix", "img", NULL, PREFIX_TEXT, PREFIX_LONGTEXT,
-                                                 VLC_FALSE );
+                                                  VLC_FALSE );
+    add_bool( "image-out-replace", 0, NULL, REPLACE_TEXT, REPLACE_LONGTEXT,
+                                                  VLC_FALSE );
     set_callbacks( Create, Destroy );
 vlc_module_end();
 
@@ -87,6 +92,8 @@ struct vout_sys_t
 
     int         i_current;     /* Current image */
     int         i_frames;   /* Number of frames */
+
+    vlc_bool_t  b_replace;
 
     image_handler_t *p_image;
 };
@@ -113,6 +120,8 @@ static int Create( vlc_object_t *p_this )
             var_CreateGetString( p_this, "image-out-format" );
     p_vout->p_sys->i_ratio =
             var_CreateGetInteger( p_this, "image-out-ratio" );
+    p_vout->p_sys->b_replace =
+            var_CreateGetBool( p_this, "image-out-replace" );
     p_vout->p_sys->i_current = 0;
     p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
 
@@ -235,9 +244,17 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     fmt_out.i_width = fmt_in.i_width = p_vout->render.i_width;
     fmt_out.i_height = fmt_in.i_height = p_vout->render.i_height;
 
-    sprintf( psz_filename, "%s%.6i.%s", p_vout->p_sys->psz_prefix,
-                                        p_vout->p_sys->i_current,
-                                        p_vout->p_sys->psz_format );
+    if( p_vout->p_sys->b_replace )
+    {
+        sprintf( psz_filename, "%s.%s", p_vout->p_sys->psz_prefix,
+                                            p_vout->p_sys->psz_format );
+    }
+    else
+    {
+        sprintf( psz_filename, "%s%.6i.%s", p_vout->p_sys->psz_prefix,
+                                            p_vout->p_sys->i_current,
+                                            p_vout->p_sys->psz_format );
+    }
     image_WriteUrl( p_vout->p_sys->p_image, p_pic,
                     &fmt_in, &fmt_out, psz_filename ) ;
     free( psz_filename );
