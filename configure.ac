@@ -1466,39 +1466,6 @@ AS_IF([test "${enable_growl}" != "no"], [
 
 
 dnl
-dnl TLS/SSL
-dnl
-AC_ARG_ENABLE(gnutls,
-  [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
-AS_IF([test "${enable_gnutls}" != "no"], [
-
-  gcrypt_LIBS="-lgpg-error"
-  AS_IF([test "${SYS}" = "mingw32"],
-    [gcrypt_LIBS="${gcrypt_LIBS} -lws2_32"
-     VLC_ADD_LDFLAGS([gnutls],[-lws2_32])]
-  )
-
-  gnutls_LIBS="-lgcrypt -lz ${gcrypt_LIBS}"
-
-  AC_CHECK_HEADER(gcrypt.h,
-    [AC_CHECK_LIB(gcrypt, gcry_control,
-      [AC_CHECK_HEADER(gnutls/gnutls.h,
-        [AC_CHECK_LIB(gnutls, gnutls_certificate_verify_peers2,
-	  [have_gnutls="yes"],[old_gnutls="yes"], ${gnutls_LIBS})])],,
-     ${gcrypt_LIBS})])
-
-  AS_IF([test "${have_gnutls}" = "yes"], [
-    VLC_ADD_PLUGINS([gnutls])
-    VLC_ADD_LDFLAGS([gnutls], [-lgnutls ${gnutls_LIBS}])
-  ], [
-    AS_IF([test "${enable_gnutls}" = "yes"], [
-      AC_MSG_ERROR([gnutls not present or too old (version 1.0.17 required)])]
-    )]
-  )]
-)
-
-
-dnl
 dnl  Input plugins
 dnl
 
@@ -4896,6 +4863,63 @@ fi
 AM_CONDITIONAL(ENABLE_CORBA, test "$enablecorba" = "true")
 
 AC_ARG_WITH(,[Misc options:])
+
+dnl
+dnl TLS/SSL
+dnl
+AC_ARG_ENABLE(gnutls,
+  [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
+AC_ARG_WITH(x509-ca-bunble,
+  [  --with-x509-ca-bundle   x509 PEM certificate bundle path (no default)])
+
+AS_IF([test "${enable_gnutls}" != "no"], [
+  gcrypt_LIBS="-lgpg-error"
+  AS_IF([test "${SYS}" = "mingw32"], [
+    gcrypt_LIBS="${gcrypt_LIBS} -lws2_32"
+    VLC_ADD_LDFLAGS([gnutls],[-lws2_32])
+  ])
+
+  gnutls_LIBS="-lgcrypt -lz ${gcrypt_LIBS}"
+
+  AC_CHECK_HEADER(gcrypt.h, [
+    AC_CHECK_LIB(gcrypt, gcry_control, [
+      AC_CHECK_HEADER(gnutls/gnutls.h, [
+        AC_CHECK_LIB(gnutls, gnutls_certificate_verify_peers2,
+          [have_gnutls="yes"],[old_gnutls="yes"],[${gnutls_LIBS}])
+      ])
+    ],,[${gcrypt_LIBS}])
+  ])
+
+  AS_IF([test "${have_gnutls}" = "yes"], [
+    VLC_ADD_PLUGINS([gnutls])
+    VLC_ADD_LDFLAGS([gnutls], [-lgnutls ${gnutls_LIBS}])
+
+    AC_MSG_CHECKING([for root CA certificates path])
+    AS_IF([test -z "${with_x509_ca_bundle}"], [
+      AC_MSG_RESULT([not specified])
+      AC_MSG_WARN([No root CA certificates for gnutls])
+      AS_IF([test "${enable_gnutls}"], [
+	AC_MSG_ERROR([Use --with-x509-ca-bundle=... (or --without-x509-ca-bundle though gnutls won't work properly).])
+      ])
+    ], [
+      AS_IF([test "${with_x509_ca_bundle}" != "no"], [
+        AC_MSG_RESULT([${with_x509_ca_bundle}])
+	AC_CHECK_FILE([${with_x509_ca_bundle}],,[
+	  AC_MSG_WARN([${with_x509_ca_bundle} does not exist (are you cross-compiling?)])
+	])
+        AC_DEFINE_UNQUOTED(X509_CA_BUNDLE, ["${with_x509_ca_bundle}"],
+          [Define to the path of the host's root CA PEM certificates bundle file])
+      ], [
+        AC_MSG_RESULT([none])
+      ])
+    ])
+  ], [
+    AS_IF([test "${enable_gnutls}" = "yes"], [
+      AC_MSG_ERROR([gnutls not present or too old (version 1.0.17 required)])
+    ])
+  ])
+])
+
 
 dnl
 dnl  Endianness check, AC_C_BIGENDIAN doesn't work if we are cross-compiling

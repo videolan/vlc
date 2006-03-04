@@ -88,12 +88,6 @@ static void Close( vlc_object_t * );
 #define CHECK_HOSTNAME_LONGTEXT N_( \
     "Ensures that server hostname in certificate match requested host name." )
 
-#if defined (WIN32) || defined (UNDER_CE)
-# undef HOST_CA_PATH
-#else
-# define HOST_CA_PATH "/etc/ssl/certs/ca-certificates.crt"
-#endif
-
 vlc_module_begin();
     set_shortname( "GnuTLS" );
     set_description( _("GnuTLS TLS encryption layer") );
@@ -600,9 +594,9 @@ gnutls_ClientCreate( tls_t *p_tls )
 
         gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
                                  psz_path, VLC_FALSE );
-#ifdef HOST_CA_PATH
+#ifdef X509_CA_BUNDLE
         gnutls_Addx509File( (vlc_object_t *)p_session, p_sys->x509_cred,
-                            HOST_CA_PATH, VLC_FALSE );
+                            X509_CA_BUNDLE, VLC_FALSE );
 #endif
 
         free( psz_path );
