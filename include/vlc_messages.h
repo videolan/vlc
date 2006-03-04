@@ -281,7 +281,7 @@ VLC_EXPORT( void, stats_HandlerDestroy, (stats_handler_t*) );
 VLC_EXPORT( int, __stats_Update, (vlc_object_t*, unsigned int, vlc_value_t, vlc_value_t *) );
 #define stats_Create( a,b,c,d,e ) __stats_Create( VLC_OBJECT(a), b, c, d,e )
 VLC_EXPORT( int, __stats_Create, (vlc_object_t*, const char *, unsigned int, int, int) );
-#define stats_Get( a,b,c,d ) __stats_Create( VLC_OBJECT(a), b, c, d )
+#define stats_Get( a,b,c,d ) __stats_Get( VLC_OBJECT(a), b, c, d )
 VLC_EXPORT( int, __stats_Get, (vlc_object_t*, int, unsigned int, vlc_value_t*) );
 #define stats_CounterGet( a,b,c) __stats_CounterGet( VLC_OBJECT(a), b, c )
 VLC_EXPORT( counter_t*, __stats_CounterGet, (vlc_object_t*, int, unsigned int ) );
@@ -339,7 +339,6 @@ static inline int __stats_UpdateFloat( vlc_object_t *p_obj,
  ******************/
 struct input_stats_t
 {
-
     vlc_mutex_t         lock;
 
     /* Input */
