@@ -1,7 +1,7 @@
 /*****************************************************************************
  * httpd.c
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -26,6 +26,8 @@
 #include <vlc/vlc.h>
 
 #ifdef ENABLE_HTTPD
+
+#include <assert.h>
 
 #include "vlc_httpd.h"
 #include "network.h"
@@ -293,6 +295,88 @@ static const char *httpd_MimeFromUrl( const char *psz_url )
     }
     return "application/octet-stream";
 }
+
+#if 0
+typedef struct
+{
+    int i_code;
+    const char *psz_reason;
+} http_status_info;
+
+static const http_status_info http_reason[] =
+{
+  /*{ 100, "Continue" },
+    { 101, "Switching Protocols" },*/
+    { 200, "OK" }/*,
+    { 201, "Created" },
+    { 202, "Accepted" },
+    { 203, "Non-Authoritative Information" },
+    { 204, "No Content" },
+    { 205, "Reset Content" },
+    { 206, "Partial Content" },
+    { 250, "Low on Storage Space" },
+    { 300, "Multiple Choices" }*/,
+    { 301, "Moved Permanently" }/*,
+    { 302, "Moved Temporarily" }, - aka "Found"
+    { 303, "See Other" },
+    { 304, "Not Modified" },
+    { 305, "Use Proxy" },
+    { 307, "Temporary Redirect" },
+    { 400, "Bad Request" }*/,
+    { 401, "Unauthorized" }/*,
+    { 402, "Payment Required" }*/,
+    { 403, "Forbidden" },
+    { 404, "Not Found" }/*,
+    { 405, "Method Not Allowed" },
+    { 406, "Not Acceptable" },
+    { 407, "Proxy Authentication Required" },
+    { 408, "Request Time-out" },
+    { 409, "Conflict" },
+    { 410, "Gone" },
+    { 411, "Length Required" },
+    { 412, "Precondition Failed" },
+    { 413, "Request Entity Too Large" },
+    { 414, "Request-URI Too Large" },
+    { 415, "Unsupported Media Type" },
+    { 416, "Requested range not satisfiable" },
+    { 417, "Expectation Failed" },
+    { 451, "Parameter Not Understood" },
+    { 452, "Conference Not Found" },
+    { 453, "Not Enough Bandwidth" }*/,
+    { 454, "Session Not Found" }/*,
+    { 455, "Method Not Valid in This State" },
+    { 456, "Header Field Not Valid for Resource" },
+    { 457, "Invalid Range" },
+    { 458, "Parameter Is Read-Only" },
+    { 459, "Aggregate operation not allowed" },
+    { 460, "Only aggregate operation allowed" }*/,
+    { 461, "Unsupported transport" }/*,
+    { 462, "Destination unreachable" }*/,
+    { 500, "Internal Server Error" },
+    { 501, "Not Implemented" }/*,
+    { 502, "Bad Gateway" }*/,
+    { 503, "Service Unavailable" }/*,
+    { 504, "Gateway Time-out" },
+    { 505, "Protocol version not supported" }*/,
+    {   0, NULL }
+};
+
+static const char *psz_fallback_reason[] =
+{ "Continue", "OK", "Found", "Client Error", "Server Error" };
+
+static const char *httpd_ReasonFromCode( int i_code )
+{
+    const http_status_info *p;
+
+    for (p = http_reason; p->i_code < i_code; p++);
+
+    if( p->i_code == i_code )
+        return p->psz_reason;
+
+    assert( ( i_code >= 100 ) && ( i_code <= 599 ) );
+    return psz_fallback_reason[(i_code / 100) - 1];
+}
+#endif
 
 /*****************************************************************************
  * High Level Functions: httpd_file_t
@@ -568,7 +652,6 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
                                    httpd_message_t *query )
 {
     httpd_redirect_t *rdir = (httpd_redirect_t*)p_sys;
-    uint8_t *p;
 
     if( answer == NULL || query == NULL )
     {
@@ -580,8 +663,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     answer->i_status = 301;
     answer->psz_status = strdup( "Moved Permanently" );
 
-    p = answer->p_body = malloc( 1000 + strlen( rdir->psz_dst ) );
-    p += sprintf( (char *)p,
+    answer->i_body = asprintf( (char **)&answer->p_body,
         "<?xml version=\"1.0\" encoding=\"ascii\" ?>\n"
         "<!DOCTYPE html PUBLIC \"-//W3C//DTD  XHTML 1.0 Strict//EN\" "
         "\"http://www.w3.org/TR/xhtml10/DTD/xhtml10strict.dtd\">\n"
@@ -590,14 +672,13 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
         "<title>Redirection</title>\n"
         "</head>\n"
         "<body>\n"
-        "<h1>You should be " 
+        "<h1>You should be "
         "<a href=\"%s\">redirected</a></h1>\n"
         "<hr />\n"
         "<p><a href=\"http://www.videolan.org\">VideoLAN</a>\n</p>"
         "<hr />\n"
         "</body>\n"
         "</html>\n", rdir->psz_dst );
-    answer->i_body = p - answer->p_body;
 
     /* XXX check if it's ok or we need to set an absolute url */
     httpd_MsgAdd( answer, "Location",  "%s", rdir->psz_dst );
@@ -689,8 +770,10 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             stream->i_buffer_pos )
         {
             /* this client isn't fast enough */
+#if 0
             fprintf( stderr, "fixing i_body_offset (old=%lld new=%lld)\n",
                      answer->i_body_offset, stream->i_buffer_last_pos );
+#endif
             answer->i_body_offset = stream->i_buffer_last_pos;
         }
 
