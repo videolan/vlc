@@ -411,24 +411,11 @@ gnutls_ClientDelete( tls_session_t *p_session )
     gnutls_certificate_free_credentials( x509_cred );
 }
 
-inline int
-is_regular( const char *psz_filename )
-{
-#ifdef HAVE_SYS_STAT_H
-    struct stat st;
-
-    return ( utf8_stat( psz_filename, &st ) == 0 )
-        && S_ISREG( st.st_mode );
-#else
-    return 1;
-#endif
-}
-
 static int
 gnutls_Addx509Directory( vlc_object_t *p_this,
                          gnutls_certificate_credentials cred,
                          const char *psz_dirname,
-                         vlc_bool_t private )
+                         vlc_bool_t b_priv )
 {
     DIR* dir;
     const char *psz_dirent;
@@ -443,37 +430,60 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
                   strerror( errno ) );
         return VLC_EGENERIC;
     }
+#ifdef S_ISLNK
+    else
+    {
+        struct stat st1, st2;
+        int fd = dirfd( dir );
+
+        /*
+         * Gets stats for the directory path, checks that it is not a
+         * symbolic link (to avoid possibly infinite recursion), and verifies
+         * that the inode is still the same, to avoid TOCTOU race condition.
+         */
+        if( fstat( fd, &st1 ) || utf8_lstat( psz_dirname, &st2 )
+         || S_ISLNK( st2.st_mode ) || ( st1.st_ino != st2.st_ino ) )
+        {
+            closedir( dir );
+            return VLC_EGENERIC;
+        }
+    }
+#endif
 
     while( ( psz_dirent = utf8_readdir( dir ) ) != NULL )
     {
+        struct stat st;
         char *psz_filename;
         int check = asprintf( &psz_filename, "%s/%s", psz_dirname,
                               psz_dirent );
         LocaleFree( psz_dirent );
         if( check == -1 )
-        {
-            closedir( dir );
-            return VLC_ENOMEM;
-        }
+            continue;
 
-        /* we neglect the race condition here - not security sensitive */
-        if( is_regular( psz_filename ) )
+        if( utf8_stat( psz_filename, &st ) == 0 )
         {
-            int i;
-            char *psz_localname = ToLocale( psz_filename );
-
-            i = (private)
-                ? gnutls_certificate_set_x509_key_file( cred, psz_localname,
-                                                        psz_filename,
-                                                        GNUTLS_X509_FMT_PEM )
-                : gnutls_certificate_set_x509_trust_file( cred, psz_localname,
-                                                          GNUTLS_X509_FMT_PEM
-                                                          );
-            LocaleFree( psz_localname );
-            if( i < 0 )
+            if( S_ISREG( st.st_mode ) )
             {
-                msg_Warn( p_this, "Cannot add x509 certificate (%s) : %s",
-                          psz_filename, gnutls_strerror( i ) );
+                char *psz_localname = ToLocale( psz_filename );
+                int i = b_priv
+                    ? gnutls_certificate_set_x509_key_file( cred,
+                        psz_localname,  psz_localname, GNUTLS_X509_FMT_PEM )
+                    : gnutls_certificate_set_x509_trust_file( cred,
+                            psz_localname, GNUTLS_X509_FMT_PEM );
+                LocaleFree( psz_localname );
+
+                if( i < 0 )
+                {
+                    msg_Warn( p_this, "Cannot add x509 certificate (%s) : %s",
+                            psz_filename, gnutls_strerror( i ) );
+                }
+            }
+            else if( S_ISDIR( st.st_mode ) )
+            {
+                msg_Dbg( p_this,
+                         "Looking recursively for x509 certificates in %s",
+                         psz_filename );
+                gnutls_Addx509Directory( p_this, cred, psz_filename, b_priv);
             }
         }
         free( psz_filename );
