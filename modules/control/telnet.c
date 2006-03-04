@@ -193,7 +193,7 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Info( p_intf, 
               "Telnet interface started on interface %s %d",
-	      url.psz_host, url.i_port );
+              url.psz_host, url.i_port );
 
     p_intf->p_sys->i_clients   = 0;
     p_intf->p_sys->clients     = NULL;
@@ -493,11 +493,12 @@ static char *MessageToString( vlm_message_t *message, int i_level )
     else if( !i_level && !message->i_child && !message->psz_value  )
     {
         /* A command is successful. Don't write anything */
-        return strdup( STRING_CR STRING_TAIL );
+        return strdup( /*STRING_CR*/ STRING_TAIL );
     }
 
     i_message += strlen( message->psz_name ) + i_level * sizeof( "    " ) + 1;
-    psz_message = malloc( i_message ); *psz_message = 0;
+    psz_message = malloc( i_message );
+    *psz_message = 0;
     for( i = 0; i < i_level; i++ ) strcat( psz_message, "    " );
     strcat( psz_message, message->psz_name );
 
