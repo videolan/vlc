@@ -42,6 +42,7 @@ namespace wxvlc
         void Update();
 
         vlc_bool_t b_need_update;
+        bool b_stats;
 
     private:
         void OnButtonClose( wxCommandEvent& event );
@@ -58,7 +59,6 @@ namespace wxvlc
         InputStatsInfoPanel *stats_info;
 
         wxBoxSizer *panel_sizer;
-        bool b_stats;
     };
 };
 
