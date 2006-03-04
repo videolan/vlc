@@ -96,6 +96,7 @@ enum
     PopupSort_Event,
     PopupDel_Event,
     PopupInfo_Event,
+    PopupAddNode_Event,
 
     SearchText_Event,
     Search_Event,
@@ -153,6 +154,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_MENU( PopupSort_Event, Playlist::OnPopupSort)
     EVT_MENU( PopupDel_Event, Playlist::OnPopupDel)
     EVT_MENU( PopupInfo_Event, Playlist::OnPopupInfo)
+    EVT_MENU( PopupAddNode_Event, Playlist::OnPopupAddNode)
 
     /* Tree control events */
     EVT_TREE_ITEM_ACTIVATED( TreeCtrl_Event, Playlist::OnActivateItem )
@@ -274,6 +276,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     node_popup->Append( PopupSort_Event, wxU(_("Sort this branch")) );
     node_popup->Append( PopupDel_Event, wxU(_("Delete")) );
     node_popup->Append( PopupInfo_Event, wxU(_("Info")) );
+    node_popup->Append( PopupAddNode_Event, wxU(_("Add node")) );
 
     item_popup = new wxMenu;
     item_popup->Append( PopupPlay_Event, wxU(_("Play")) );
@@ -1495,6 +1498,31 @@ void Playlist::OnPopupInfo( wxCommandEvent& event )
         delete iteminfo_dialog;
     }
     UnlockPlaylist( p_intf->p_sys, p_playlist );
+}
+
+void Playlist::OnPopupAddNode( wxCommandEvent& event )
+{
+    wxTextEntryDialog text( NULL, wxU(_( "Please enter node name" )),
+        wxU(_( "Add node" )), wxU(_( "New node" )) );
+    if( text.ShowModal() != wxID_OK ) return;
+
+    char *psz_name = wxFromLocale( text.GetValue() );
+
+    LockPlaylist( p_intf->p_sys, p_playlist );
+
+    PlaylistItem *p_wxitem;
+    playlist_item_t *p_item;
+
+    p_wxitem = (PlaylistItem *)treectrl->GetItemData( i_wx_popup_item );
+
+    p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id );
+
+    playlist_NodeCreate( p_playlist, 0, psz_name, p_item );
+
+    UnlockPlaylist( p_intf->p_sys, p_playlist );
+    Rebuild( VLC_TRUE );
+
+    wxLocaleFree( psz_name );
 }
 
 

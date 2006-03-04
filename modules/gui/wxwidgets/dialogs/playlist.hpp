@@ -132,6 +132,7 @@ private:
     void OnPopupDel( wxCommandEvent& event );
     void OnPopupEna( wxCommandEvent& event );
     void OnPopupInfo( wxCommandEvent& event );
+    void OnPopupAddNode( wxCommandEvent& event );
     void Rebuild( vlc_bool_t );
 
     void Preparse();
