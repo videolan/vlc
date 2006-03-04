@@ -179,11 +179,11 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     mrl_sizer->Add( mrl_combo, 1, wxALL | wxALIGN_CENTER, 5 );
     mrl_sizer_sizer->Add( mrl_sizer, 1, wxEXPAND | wxALL, 5 );
 
-    /* Create the output encapsulation panel */
-    encapsulation_panel = EncapsulationPanel( panel );
-
     /* Create the access output panel */
     access_panel = AccessPanel( panel );
+
+    /* Create the output encapsulation panel */
+    encapsulation_panel = EncapsulationPanel( panel );
 
     /* Create the transcoding panel */
     transcoding_panel = TranscodingPanel( panel );
@@ -602,10 +602,15 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
                                     wxT(""), wxDefaultPosition,
                                     wxSize( 100, -1 ), wxTE_PROCESS_ENTER);
 
-    wxStaticText *ttl_label = new wxStaticText( misc_subpanels[TTL_MISC_SOUT], -1,
-                        wxU(_("Time-To-Live (TTL)")) );
-    ttl_spin = new wxSpinCtrl( misc_subpanels[TTL_MISC_SOUT], -1, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-                   0, 1, 255, config_GetInt( p_intf, "ttl" ) );
+    sout_all_checkbox = new wxCheckBox( misc_subpanels[TTL_MISC_SOUT],
+                    SoutAll_Event, wxU(_("Select all elementary streams")) );
+
+    wxStaticText *ttl_label = new wxStaticText( misc_subpanels[TTL_MISC_SOUT],
+                                                -1,
+                                                wxU(_("Time-To-Live (TTL)")) );
+    ttl_spin = new wxSpinCtrl( misc_subpanels[TTL_MISC_SOUT], -1,
+                               wxEmptyString, wxDefaultPosition, wxDefaultSize,
+                               0, 1, 255, config_GetInt( p_intf, "ttl" ) );
 
     subpanel_sizer->Add( sap_checkbox, 0,
                          wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
@@ -620,9 +625,7 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
     subpanel_sizer->Add( subpanel_sub_sizer, 1, wxEXPAND |
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    sout_all_checkbox = new wxCheckBox( misc_subpanels[TTL_MISC_SOUT],
-                    SoutAll_Event, wxU(_("Select all elementary streams")) );
-    subpanel2_sizer->Add( sout_all_checkbox, 1,
+   subpanel2_sizer->Add( sout_all_checkbox, 1,
                       wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxLEFT, 5 );
     subpanel2_sizer->Add( ttl_label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel2_sizer->Add( ttl_spin, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
