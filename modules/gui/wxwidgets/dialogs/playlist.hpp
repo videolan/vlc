@@ -27,6 +27,7 @@
 #include "wxwidgets.hpp"
 
 #include <wx/treectrl.h>
+#include <wx/dnd.h>
 
 #define MODE_NONE 0
 #define MODE_GROUP 1
@@ -44,6 +45,9 @@ class ExportPlaylist;
 
 /* Playlist */
 class Playlist: public wxFrame
+#if wxUSE_DRAG_AND_DROP
+, public wxFileDropTarget
+#endif
 {
 public:
     /* Constructor */
@@ -57,6 +61,10 @@ public:
 
     bool b_need_update;
     int  i_items_to_append;
+#if wxUSE_DRAG_AND_DROP
+    virtual bool OnDropFiles( wxCoord x, wxCoord y,
+                              const wxArrayString& filenames );
+#endif
 
 private:
     void RemoveItem( int );

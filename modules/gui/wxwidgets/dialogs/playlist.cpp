@@ -374,7 +374,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
-    SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
+    SetDropTarget( this );
 #endif
 
     i_saved_id = -1;
@@ -1222,8 +1222,95 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
 
     UnlockPlaylist( p_intf->p_sys, p_playlist );
 
+    /* FIXME: having this Rebuild() is dirty */
     Rebuild( VLC_TRUE );
 }
+
+#if wxUSE_DRAG_AND_DROP
+/********************************************************************
+ * File Drag And Drop handling
+ ********************************************************************/
+bool Playlist::OnDropFiles( wxCoord x, wxCoord y,
+                               const wxArrayString& filenames )
+{
+    int i_pos = 0;
+    playlist_item_t *p_dest;
+
+    LockPlaylist( p_intf->p_sys, p_playlist );
+
+    /* find the destination node and position in that node */
+    const wxPoint p( x, y );
+    int flags = 0;
+    wxTreeItemId item = treectrl->HitTest( p, flags );
+
+    if( flags & wxTREE_HITTEST_NOWHERE )
+    {
+        /* We were droped below the last item so we append to the
+         * general node */
+        p_dest = p_playlist->p_general;
+        i_pos = PLAYLIST_END;
+    }
+    else
+    {
+        /* We were droped on an item */
+        if( !item.IsOk() )
+        {
+            printf("Arf ....\n" );
+            UnlockPlaylist( p_intf->p_sys, p_playlist );
+            return FALSE;
+        }
+
+        PlaylistItem *p_plitem =
+            (PlaylistItem *)treectrl->GetItemData( item );
+        p_dest = playlist_ItemGetById(p_playlist, p_plitem->i_id );
+
+        if( p_dest->i_children == -1 )
+        {
+            /* This is a leaf. Append right after it
+             * We thus need to find the parrent node and the position of the
+             * leaf in it's children list */
+            wxTreeItemId parent = treectrl->GetItemParent( item );
+            PlaylistItem *p_parent =
+                (PlaylistItem *)treectrl->GetItemData( parent );
+            if( !p_parent )
+            {
+                UnlockPlaylist( p_intf->p_sys, p_playlist );
+                return FALSE;
+            }
+            playlist_item_t *p_node =
+                playlist_ItemGetById( p_playlist, p_parent->i_id );
+            if( !p_node )
+            {
+                UnlockPlaylist( p_intf->p_sys, p_playlist );
+                return FALSE;
+            }
+            for( i_pos = 0; i_pos < p_node->i_children; i_pos++ )
+            {
+                if( p_node->pp_children[i_pos] == p_dest ) break;
+            }
+            p_dest = p_node;
+        }
+    }
+
+    UnlockPlaylist( p_intf->p_sys, p_playlist );
+
+    /* Put the items in the playlist node */
+    for( size_t i = 0; i < filenames.GetCount(); i++ )
+    {
+        char *psz_utf8 = wxFromLocale( filenames[i] );
+        playlist_item_t *p_item =
+            playlist_ItemNew( p_playlist, psz_utf8, psz_utf8 );
+        playlist_NodeAddItem( p_playlist, p_item, i_current_view,
+                              p_dest, PLAYLIST_PREPARSE, i_pos );
+        wxLocaleFree( psz_utf8 );
+    }
+
+    /* FIXME: having this Rebuild() is dirty */
+    Rebuild( VLC_TRUE );
+
+    return TRUE;
+}
+#endif
 
 /**********************************************************************
  * Menu
