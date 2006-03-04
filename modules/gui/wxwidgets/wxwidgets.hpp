@@ -95,6 +95,43 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 #   define wxLocaleFree(string) LocaleFree(string)
 #endif
 
+/* From Locale functions to use for File Drop targets ... go figure */
+#ifdef wxUSE_UNICODE
+inline const char *wxDnDFromLocale( const wxChar *stupid )
+{
+    /*
+     * FIXME: this is yet another awful and ugly bug-to-bug work-around
+     * for the painfully broken and brain-dead wxWidgets character
+     * encoding internals. Maybe, one day the wxWidgets team will find out
+     * and we will have to remove (phew) this kludge or autodetect whether
+     * to trigger it (damn).
+     *
+     * In Unicode mode, wxWidgets will encode file names in the locale
+     * encoding with each **bytes** (rather than characters) represented
+     * by a 32 bits unsigned integer. If you are lucky enough to be using
+     * ISO-8859-1 as your local character encoding, that lame encoding
+     * scheme happens to be identical to UTF-32 with your arch native
+     * byte-endianess. If you are using anything else, including not only
+     * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
+     * non-western encoding, it obviously fails.
+     */
+    const wxChar *braindead;
+    for (braindead = stupid; *braindead; braindead++);
+
+    size_t i = (braindead - stupid);
+    char *psz_local = (char *)malloc( i + 1 );
+    do
+        psz_local[i] = (char)stupid[i];
+    while (i--);
+
+    const char *psz_utf8 = FromLocale( psz_local );
+    free( psz_local );
+    return psz_utf8;
+}
+#else
+#   define wxDnDFromLocale( string ) wxFromLocale( string )
+#endif
+#define wxDnDLocaleFree(string) LocaleFree( string )
 
 #define WRAPCOUNT 80
 

@@ -45,9 +45,6 @@ class ExportPlaylist;
 
 /* Playlist */
 class Playlist: public wxFrame
-#if wxUSE_DRAG_AND_DROP
-, public wxFileDropTarget
-#endif
 {
 public:
     /* Constructor */
@@ -61,10 +58,8 @@ public:
 
     bool b_need_update;
     int  i_items_to_append;
-#if wxUSE_DRAG_AND_DROP
-    virtual bool OnDropFiles( wxCoord x, wxCoord y,
-                              const wxArrayString& filenames );
-#endif
+
+    int GetCurrentView( ){ return i_current_view; };
 
 private:
     void RemoveItem( int );
@@ -141,7 +136,9 @@ private:
     void OnPopupEna( wxCommandEvent& event );
     void OnPopupInfo( wxCommandEvent& event );
     void OnPopupAddNode( wxCommandEvent& event );
+protected:
     void Rebuild( vlc_bool_t );
+private:
 
     void Preparse();
 
@@ -160,9 +157,10 @@ private:
     wxTreeItemId saved_tree_item;
     int i_saved_id;
 
+protected:
     playlist_t *p_playlist;
 
-
+private:
     /* Custom events */
     void OnPlaylistEvent( wxCommandEvent& event );
 
@@ -175,14 +173,29 @@ private:
 
     int i_update_counter;
 
-    intf_thread_t *p_intf;
-    wxTreeCtrl *treectrl;
-    int i_current_view;
     vlc_bool_t b_changed_view;
     char **pp_sds;
 
+protected:
+    intf_thread_t *p_intf;
+    wxTreeCtrl *treectrl;
+    int i_current_view;
 
+friend class PlaylistFileDropTarget;
 };
+
+#if wxUSE_DRAG_AND_DROP
+/* Playlist file drop target */
+class PlaylistFileDropTarget: public wxFileDropTarget
+{
+public:
+    PlaylistFileDropTarget( Playlist * );
+    virtual bool OnDropFiles( wxCoord x, wxCoord y,
+                              const wxArrayString& filenames );
+private:
+    Playlist *p;
+};
+#endif
 
 } // end of wxvlc namespace
 
