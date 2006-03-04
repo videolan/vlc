@@ -58,7 +58,7 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
                                                  VLC_OBJECT_PLAYLIST,
                                                  FIND_ANYWHERE );
-    bool b_stats = config_GetInt(p_intf, "stats");
+    b_stats = config_GetInt(p_intf, "stats");
     /* Initializations */
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout( TRUE );
@@ -104,7 +104,6 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 void FileInfo::Update()
 {
-
     if( mdate() - last_update < 400000L ) return;
     last_update = mdate();
 
