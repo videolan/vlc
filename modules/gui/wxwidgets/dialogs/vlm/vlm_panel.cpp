@@ -502,7 +502,9 @@ void VLMAddStreamPanel::OnChooseOutput( wxCommandEvent &event )
 
     if( p_sout_dialog && p_sout_dialog->ShowModal() == wxID_OK )
     {
-        output_text->SetValue( (p_sout_dialog->GetOptions())[0] );
+        wxString sout = (p_sout_dialog->GetOptions())[0] ;
+        sout = sout.AfterFirst( '=' );
+        output_text->SetValue( sout );
     }
 }
 
