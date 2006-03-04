@@ -1,11 +1,13 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id$
 ##
 ## Copyright (C) 2005-2006 the VideoLAN team
 ##
-##  Initial author: Sam Hocevar <sam@zoy.org>
+##  Authors: Sam Hocevar <sam@zoy.org>
+##           Rémi Denis-Courmont <rem # videolan # org>
+##
+## Muahaha! no annoying dollar I dee dollar that causes rebuild at commit
 
 if test "$#" != "0"; then
   echo "Usage: $0"
@@ -413,7 +415,6 @@ lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
 lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
 	-rpath '\$(libvlcdir)' -module -shrext \$(LIBEXT)
 lib${mod}_plugin_la_LIBADD = \$(LTLIBVLC)
-lib${mod}_plugin_la_DEPENDENCIES = \$(LTLIBVLC)
 
 lib${mod}_pic_a_SOURCES = \$(SOURCES_${mod})
 EOF
