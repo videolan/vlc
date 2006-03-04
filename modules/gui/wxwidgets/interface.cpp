@@ -1278,17 +1278,17 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
          * UTF-8 but also Windows-1252(!) and ISO-8859-15(!) or any
          * non-western encoding, it obviously fails.
          */
-        unsigned len = 1;
         const wxChar *stupid = filenames[i];
 
-        for (const wxChar *braindead = stupid; *braindead; braindead++)
-            len++;
-        char *psz_local = (char *)malloc (len);
-        do
-            psz_local[len] = (char)stupid[len];
-        while (len--);
+        for (const wxChar *braindead = stupid; *braindead; braindead++);
 
-        char *psz_utf8 = FromLocale( psz_local );
+        size_t i = (braindead - stupid);
+        char *psz_local = (char *)malloc( i + 1 );
+        do
+            psz_local[i] = (char)stupid[i];
+        while (i--);
+
+        const char *psz_utf8 = FromLocale( psz_local );
 #else
         char *psz_utf8 = wxFromLocale( filenames[i] );
 #endif
