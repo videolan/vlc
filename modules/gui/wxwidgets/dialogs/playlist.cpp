@@ -1626,7 +1626,7 @@ void Playlist::OnPopupAddNode( wxCommandEvent& event )
 
     p_item = playlist_ItemGetById( p_playlist, p_wxitem->i_id );
 
-    playlist_NodeCreate( p_playlist, 0, psz_name, p_item );
+    playlist_NodeCreate( p_playlist, i_current_view, psz_name, p_item );
 
     UnlockPlaylist( p_intf->p_sys, p_playlist );
     Rebuild( VLC_TRUE );
