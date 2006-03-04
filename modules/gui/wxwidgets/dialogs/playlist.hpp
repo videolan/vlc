@@ -115,6 +115,10 @@ private:
     void OnKeyDown( wxTreeEvent& event );
     void OnNewGroup( wxCommandEvent& event );
 
+    void OnDragItemBegin( wxTreeEvent& event );
+    void OnDragItemEnd( wxTreeEvent& event );
+    wxTreeItemId draged_tree_item;
+
     /* Popup  */
     wxMenu *item_popup;
     wxMenu *node_popup;

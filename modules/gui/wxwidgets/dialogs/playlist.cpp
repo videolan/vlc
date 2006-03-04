@@ -157,6 +157,8 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     /* Tree control events */
     EVT_TREE_ITEM_ACTIVATED( TreeCtrl_Event, Playlist::OnActivateItem )
     EVT_TREE_KEY_DOWN( -1, Playlist::OnKeyDown )
+    EVT_TREE_BEGIN_DRAG( TreeCtrl_Event, Playlist::OnDragItemBegin )
+    EVT_TREE_END_DRAG( TreeCtrl_Event, Playlist::OnDragItemEnd )
 
     EVT_CONTEXT_MENU( Playlist::OnPopup )
 
@@ -1137,6 +1139,65 @@ void Playlist::OnKeyDown( wxTreeEvent& event )
 void Playlist::OnEnDis( wxCommandEvent& event )
 {
     msg_Warn( p_intf, "not implemented" );
+}
+
+void Playlist::OnDragItemBegin( wxTreeEvent& event )
+{
+    event.Allow();
+    draged_tree_item = event.GetItem();
+}
+
+void Playlist::OnDragItemEnd( wxTreeEvent& event )
+{
+    wxTreeItemId dest_tree_item = event.GetItem();
+
+    /* check that we're not trying to move a node into one of it's children */
+    wxTreeItemId parent = dest_tree_item;
+    while( parent != treectrl->GetRootItem() )
+    {
+        if( draged_tree_item == parent ) return;
+        parent = treectrl->GetItemParent( parent );
+    }
+
+    if( draged_tree_item != dest_tree_item )
+    {
+        LockPlaylist( p_intf->p_sys, p_playlist );
+
+        PlaylistItem *p_wxdrageditem =
+            (PlaylistItem *)treectrl->GetItemData( draged_tree_item );
+        PlaylistItem *p_wxdestitem =
+            (PlaylistItem *)treectrl->GetItemData( dest_tree_item );
+
+        playlist_item_t *p_drageditem =
+            playlist_ItemGetById(p_playlist, p_wxdrageditem->i_id );
+        playlist_item_t *p_destitem =
+            playlist_ItemGetById(p_playlist, p_wxdestitem->i_id );
+
+        if( p_destitem->i_children == -1 )
+        /* this is a leaf */
+        {
+            parent = treectrl->GetItemParent( dest_tree_item );
+            PlaylistItem *p_parent =
+                (PlaylistItem *)treectrl->GetItemData( parent );
+            playlist_item_t *p_destitem2 =
+                playlist_ItemGetById( p_playlist, p_parent->i_id );
+            int i;
+            for( i = 0; i < p_destitem2->i_children; i++ )
+            {
+                if( p_destitem2->pp_children[i] == p_destitem ) break;
+            }
+            playlist_TreeMove( p_playlist, p_drageditem, p_destitem2,
+                               i, i_current_view );
+        }
+        else
+        /* this is a node */
+        {
+            playlist_TreeMove( p_playlist, p_drageditem, p_destitem,
+                               0, i_current_view );
+        }
+        UnlockPlaylist( p_intf->p_sys, p_playlist );
+        Rebuild( VLC_TRUE );
+    }
 }
 
 /**********************************************************************
