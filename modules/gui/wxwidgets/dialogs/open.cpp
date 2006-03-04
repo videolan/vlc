@@ -726,6 +726,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
 
 #ifdef WIN32
     char psz_default_device[3] = {0};
+    char *psz_forced;
 
     /* find the drive_name for the first cdrom drive,
      * which is probably "D:" and put the drive_name into
@@ -742,8 +743,10 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
         }
     }
 
+    psz_forced = config_GetPsz( p_intf, "dvd" );
 
-    if( strlen(psz_default_device) > 0 )
+    if( strlen(psz_default_device) > 0 &&
+        ( !psz_forced || psz_forced && !*psz_forced ) )
     {
         if(disc_device)
             disc_device->SetValue( wxL2U(psz_default_device) );
