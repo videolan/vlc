@@ -288,7 +288,7 @@ if USE_LIBTOOL
 	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
-  	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install ; \
+  	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install || exit \$\$? ; \
 	fi
 else
 	mkdir -p -- "\$(DESTDIR)\$(libvlcdir)"
@@ -329,7 +329,7 @@ if USE_LIBTOOL
 	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
-	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall ; \
+	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall || exit \$\$?; \
 	fi
 else
 	@z=\$\$(\$(VLC_CONFIG) --list plugin); \
