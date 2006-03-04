@@ -141,6 +141,10 @@
 
 - (void)initPanel:(id)sender
 {
+    /* check whether our item is valid, because we would crash if not */
+    if(! [self isItemInPlaylist: p_item] )
+        return;
+
     char *psz_temp;
     vlc_mutex_lock( &p_item->input.lock );
 
@@ -185,7 +189,7 @@
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
-    
+
     [self updateStatistics: nil];
 
     [o_info_window makeKeyAndOrderFront: sender];
