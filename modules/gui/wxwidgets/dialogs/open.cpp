@@ -563,8 +563,8 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( ok_button, 0, wxALL, 5 );
     button_sizer->Add( cancel_button, 0, wxALL, 5 );
+    button_sizer->Add( ok_button, 0, wxALL, 5 );
     button_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
@@ -575,7 +575,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 #endif
     panel_sizer->Add( adv_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
+    panel_sizer->Add( button_sizer, 0, wxALIGN_RIGHT | wxALL, 5 );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
     main_sizer->Add( panel, 1, wxGROW, 0 );
@@ -1047,8 +1047,12 @@ void OpenDialog::UpdateMRL( int i_access_method )
                 mrltemp = wxT("http://");
 
             mrltemp += net_addrs[2]->GetLineText(0);
-
-            caching_name = wxT("http-caching");
+            if( ! mrltemp.Left(4).CmpNoCase(wxT("http")) )
+                caching_name = wxT("http-caching");
+            else if( ! mrltemp.Left(3).CmpNoCase(wxT("mms")) )
+                caching_name = wxT("mms-caching");
+            else
+                caching_name= wxT("ftp-caching");
             break;
 
         case 3:
