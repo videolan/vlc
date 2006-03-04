@@ -893,7 +893,6 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     struct item_parent_t *p_parent;
 
     /* Detach from the parent */
-    printf("detaching from parent(s)\n");
     for( i = 0 ; i< p_item->i_parents; i++ )
     {
         if( p_item->pp_parents[i]->i_view == i_view )
@@ -912,7 +911,6 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     }
 
     /* Attach to new parent */
-    printf("attaching to new parent...\n");
     INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
 
     p_parent = malloc( sizeof( struct item_parent_t ) );
