@@ -1154,6 +1154,8 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
 {
     wxTreeItemId dest_tree_item = event.GetItem();
 
+    if( !dest_tree_item.IsOk() ) return;
+
     /* check that we're not trying to move a node into one of it's children */
     wxTreeItemId parent = dest_tree_item;
     while( parent != treectrl->GetRootItem() )
@@ -1162,45 +1164,64 @@ void Playlist::OnDragItemEnd( wxTreeEvent& event )
         parent = treectrl->GetItemParent( parent );
     }
 
-    if( draged_tree_item != dest_tree_item )
+    LockPlaylist( p_intf->p_sys, p_playlist );
+
+    PlaylistItem *p_wxdrageditem =
+        (PlaylistItem *)treectrl->GetItemData( draged_tree_item );
+    PlaylistItem *p_wxdestitem =
+        (PlaylistItem *)treectrl->GetItemData( dest_tree_item );
+    if( !p_wxdrageditem || !p_wxdestitem )
     {
-        LockPlaylist( p_intf->p_sys, p_playlist );
-
-        PlaylistItem *p_wxdrageditem =
-            (PlaylistItem *)treectrl->GetItemData( draged_tree_item );
-        PlaylistItem *p_wxdestitem =
-            (PlaylistItem *)treectrl->GetItemData( dest_tree_item );
-
-        playlist_item_t *p_drageditem =
-            playlist_ItemGetById(p_playlist, p_wxdrageditem->i_id );
-        playlist_item_t *p_destitem =
-            playlist_ItemGetById(p_playlist, p_wxdestitem->i_id );
-
-        if( p_destitem->i_children == -1 )
-        /* this is a leaf */
-        {
-            parent = treectrl->GetItemParent( dest_tree_item );
-            PlaylistItem *p_parent =
-                (PlaylistItem *)treectrl->GetItemData( parent );
-            playlist_item_t *p_destitem2 =
-                playlist_ItemGetById( p_playlist, p_parent->i_id );
-            int i;
-            for( i = 0; i < p_destitem2->i_children; i++ )
-            {
-                if( p_destitem2->pp_children[i] == p_destitem ) break;
-            }
-            playlist_TreeMove( p_playlist, p_drageditem, p_destitem2,
-                               i, i_current_view );
-        }
-        else
-        /* this is a node */
-        {
-            playlist_TreeMove( p_playlist, p_drageditem, p_destitem,
-                               0, i_current_view );
-        }
         UnlockPlaylist( p_intf->p_sys, p_playlist );
-        Rebuild( VLC_TRUE );
+        return;
     }
+
+    playlist_item_t *p_drageditem =
+        playlist_ItemGetById(p_playlist, p_wxdrageditem->i_id );
+    playlist_item_t *p_destitem =
+        playlist_ItemGetById(p_playlist, p_wxdestitem->i_id );
+    if( !p_drageditem || !p_destitem )
+    {
+        UnlockPlaylist( p_intf->p_sys, p_playlist );
+        return;
+    }
+
+    if( p_destitem->i_children == -1 )
+    /* this is a leaf */
+    {
+        parent = treectrl->GetItemParent( dest_tree_item );
+        PlaylistItem *p_parent =
+            (PlaylistItem *)treectrl->GetItemData( parent );
+        if( !p_parent )
+        {
+            UnlockPlaylist( p_intf->p_sys, p_playlist );
+            return;
+        }
+        playlist_item_t *p_destitem2 =
+            playlist_ItemGetById( p_playlist, p_parent->i_id );
+        if( !p_destitem2 )
+        {
+            UnlockPlaylist( p_intf->p_sys, p_playlist );
+            return;
+        }
+        int i;
+        for( i = 0; i < p_destitem2->i_children; i++ )
+        {
+            if( p_destitem2->pp_children[i] == p_destitem ) break;
+        }
+        playlist_TreeMove( p_playlist, p_drageditem, p_destitem2,
+                           i, i_current_view );
+    }
+    else
+    /* this is a node */
+    {
+        playlist_TreeMove( p_playlist, p_drageditem, p_destitem,
+                           0, i_current_view );
+    }
+
+    UnlockPlaylist( p_intf->p_sys, p_playlist );
+
+    Rebuild( VLC_TRUE );
 }
 
 /**********************************************************************

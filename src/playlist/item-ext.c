@@ -878,6 +878,8 @@ int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos )
 /**
  * Moves an item
  *
+ * This function must be entered with the playlist lock
+ *
  * \param p_playlist the playlist
  * \param p_item the item to move
  * \param p_node the new parent of the item
@@ -907,6 +909,7 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
             p_detach->i_serial++;
             free( p_item->pp_parents[i] );
             REMOVE_ELEM( p_item->pp_parents, p_item->i_parents, i );
+            break;
         }
     }
 
