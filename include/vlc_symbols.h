@@ -475,6 +475,7 @@ struct module_symbols_t
     char * (*FromLocaleDup_inner) (const char *);
     int (*utf8_mkdir_inner) (const char *filename);
     vlm_media_t* (*vlm_MediaSearch_inner) (vlm_t *, const char *);
+    int (*playlist_TreeMove_inner) (playlist_t *, playlist_item_t *, playlist_item_t *, int, int);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -930,6 +931,7 @@ struct module_symbols_t
 #  define FromLocaleDup (p_symbols)->FromLocaleDup_inner
 #  define utf8_mkdir (p_symbols)->utf8_mkdir_inner
 #  define vlm_MediaSearch (p_symbols)->vlm_MediaSearch_inner
+#  define playlist_TreeMove (p_symbols)->playlist_TreeMove_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1388,6 +1390,7 @@ struct module_symbols_t
     ((p_symbols)->FromLocaleDup_inner) = FromLocaleDup; \
     ((p_symbols)->utf8_mkdir_inner) = utf8_mkdir; \
     ((p_symbols)->vlm_MediaSearch_inner) = vlm_MediaSearch; \
+    ((p_symbols)->playlist_TreeMove_inner) = playlist_TreeMove; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \

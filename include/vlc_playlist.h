@@ -364,6 +364,7 @@ VLC_EXPORT( int, playlist_ItemAddOption, (playlist_item_t *, const char *) );
 #define playlist_SortGroup(p, i) playlist_Sort( p, SORT_GROUP, i)
 VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int, int) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
+VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int, int ) );
 VLC_EXPORT( int,  playlist_NodeGroup, ( playlist_t *, int,playlist_item_t *,playlist_item_t **,int, int, int ) );
 VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );

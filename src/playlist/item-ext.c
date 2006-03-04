@@ -890,36 +890,39 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
 {
     int i;
     playlist_item_t *p_detach = NULL;
-#if 0
-    if( i_view == ALL_VIEWS )
-    {
-        for( i = 0 ; i < p_playlist->i_views; i++ )
-        {
-            playlist_TreeMove( p_playlist, p_item, p_node, i_newpos,
-                               p_playlist->pp_views[i] );
-        }
-    }
-#endif
+    struct item_parent_t *p_parent;
 
-    /* Find the parent */
+    /* Detach from the parent */
+    printf("detaching from parent(s)\n");
     for( i = 0 ; i< p_item->i_parents; i++ )
     {
         if( p_item->pp_parents[i]->i_view == i_view )
         {
+            int j;
             p_detach = p_item->pp_parents[i]->p_parent;
-            break;
+            for( j = 0; j < p_detach->i_children; j++ )
+            {
+                if( p_detach->pp_children[j] == p_item ) break;
+            }
+            REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, j );
+            p_detach->i_serial++;
+            free( p_item->pp_parents[i] );
+            REMOVE_ELEM( p_item->pp_parents, p_item->i_parents, i );
         }
     }
-    if( p_detach == NULL )
-    {
-        msg_Err( p_playlist, "item not found in view %i", i_view );
-        return VLC_EGENERIC;
-    }
-
-    /* Detach from the parent */
-//    playlist_NodeDetach( p_detach, p_item );
 
     /* Attach to new parent */
+    printf("attaching to new parent...\n");
+    INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+
+    p_parent = malloc( sizeof( struct item_parent_t ) );
+    p_parent->p_parent = p_node;
+    p_parent->i_view = i_view;
+
+    INSERT_ELEM( p_item->pp_parents, p_item->i_parents, p_item->i_parents,
+                 p_parent );
+    p_node->i_serial++;
+    p_item->i_serial++;
 
     return VLC_SUCCESS;
 }
