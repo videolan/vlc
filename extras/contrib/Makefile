@@ -89,7 +89,8 @@ package-win32: FORCE
 		exit 1 ; \
 	fi
 	mkdir -p tmp/usr/win32
-	tar cf - bin sbin include lib share/aclocal* share/autoconf* \
+	tar cf - --dereference bin sbin include lib share/aclocal*\
+		share/autoconf* \
 		share/automake* share/gettext* gecko-sdk\
 		| (cd tmp/usr/win32; tar xf -)
 #kludge for live.com
