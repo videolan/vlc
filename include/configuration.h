@@ -181,6 +181,7 @@ VLC_EXPORT( void,   __config_PutPsz,   (vlc_object_t *, const char *, const char
 VLC_EXPORT( int,    __config_LoadCmdLine,  ( vlc_object_t *, int *, char *[], vlc_bool_t ) );
 VLC_EXPORT( char *,   config_GetHomeDir,     ( void ) );
 VLC_EXPORT( char *,   config_GetUserDir,     ( void ) );
+VLC_EXPORT( const char *, config_GetDataDir, ( const vlc_object_t * ) );
 VLC_EXPORT( int,    __config_LoadConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
