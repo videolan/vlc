@@ -498,6 +498,7 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
 }
 #endif
 
+#ifndef HAVE_SHARED_LIBVLC
 /*****************************************************************************
  * dgettext: gettext for plugins.
  *****************************************************************************/
@@ -510,6 +511,7 @@ char *vlc_dgettext( const char *package, const char *msgid )
     return (char *)msgid;
 #endif
 }
+#endif
 
 /*****************************************************************************
  * count_utf8_string: returns the number of characters in the string.

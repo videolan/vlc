@@ -1099,7 +1099,9 @@ VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char **pp_a
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
+#ifndef HAVE_SHARED_LIBVLC
 VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
+#endif
 
 #if defined( ENABLE_NLS ) && \
      (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main)||\
@@ -1113,7 +1115,11 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #       include <libintl.h>
 #   endif
 #   undef _
-#   define _(String) vlc_dgettext (PACKAGE_NAME, String)
+#   ifdef HAVE_SHARED_LIBVLC
+#       define _(String) dgettext (PACKAGE_NAME, String)
+#   else
+#       define _(String) vlc_dgettext(PACKAGE_NAME, String)
+#   endif
 #   define N_(String) ((char*)(String))
 #else
 #   define _(String) ((char*)(String))
