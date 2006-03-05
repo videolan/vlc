@@ -115,7 +115,8 @@
 {
     if( [o_info_window isVisible] )
     {
-        [o_statUpdateTimer invalidate];
+        if( o_statUpdateTimer )
+            [o_statUpdateTimer invalidate];
         [o_info_window orderOut: sender];
     }
     else
@@ -129,11 +130,16 @@
             p_item = p_playlist->status.p_item;
             vlc_object_release( p_playlist );
         }
-        o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1 \
-            target: self selector: @selector(updateStatistics:) \
-            userInfo: nil repeats: YES]; 
-        [o_statUpdateTimer fire];
-        [o_statUpdateTimer retain];
+
+        BOOL b_stats = config_GetInt(VLCIntf, "stats");
+        if( b_stats )
+        {
+            o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1 \
+                target: self selector: @selector(updateStatistics:) \
+                userInfo: nil repeats: YES]; 
+            [o_statUpdateTimer fire];
+            [o_statUpdateTimer retain];
+        }
 
         [self initPanel:sender];
     }
@@ -190,7 +196,16 @@
     [[VLCInfoTreeItem rootItem] refresh];
     [o_outline_view reloadData];
 
-    [self updateStatistics: nil];
+    BOOL b_stats = config_GetInt(VLCIntf, "stats");
+    if(! b_stats )
+    {
+        if( [o_tab_view numberOfTabViewItems] > 2 )
+            [o_tab_view removeTabViewItem: [o_tab_view tabViewItemAtIndex: 2]];
+    }
+    else
+    {
+        [self updateStatistics: nil];
+    }
 
     [o_info_window makeKeyAndOrderFront: sender];
 }
