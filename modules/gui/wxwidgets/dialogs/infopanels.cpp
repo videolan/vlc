@@ -177,7 +177,6 @@ AdvancedInfoPanel::AdvancedInfoPanel( intf_thread_t *_p_intf,
                                       wxWindow* _p_parent ):
     wxPanel( _p_parent, -1 )
 {
-    int flags= wxTE_PROCESS_ENTER;
     /* Initializations */
     p_intf = _p_intf;
     p_parent = _p_parent;

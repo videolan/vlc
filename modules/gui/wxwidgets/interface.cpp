@@ -1261,7 +1261,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
-        char *psz_utf8 = wxDnDFromLocale( filenames[i] );
+        const char *psz_utf8 = wxDnDFromLocale( filenames[i] );
 
         playlist_Add( p_playlist, psz_utf8, psz_utf8,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
