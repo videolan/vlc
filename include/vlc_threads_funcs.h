@@ -64,7 +64,7 @@ VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, char *, int ) );
 #define vlc_mutex_lock( P_MUTEX )                                           \
     __vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 
-static inline int __vlc_mutex_lock( char * psz_file, int i_line,
+static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
                                     vlc_mutex_t * p_mutex )
 {
     int i_result;
@@ -136,7 +136,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
 #define vlc_mutex_unlock( P_MUTEX )                                         \
     __vlc_mutex_unlock( __FILE__, __LINE__, P_MUTEX )
 
-static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
+static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
                                       vlc_mutex_t *p_mutex )
 {
     int i_result;
@@ -222,7 +222,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
 #define vlc_cond_signal( P_COND )                                           \
     __vlc_cond_signal( __FILE__, __LINE__, P_COND )
 
-static inline int __vlc_cond_signal( char * psz_file, int i_line,
+static inline int __vlc_cond_signal( const char * psz_file, int i_line,
                                      vlc_cond_t *p_condvar )
 {
     int i_result;
@@ -352,7 +352,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
 #define vlc_cond_wait( P_COND, P_MUTEX )                                     \
     __vlc_cond_wait( __FILE__, __LINE__, P_COND, P_MUTEX  )
 
-static inline int __vlc_cond_wait( char * psz_file, int i_line,
+static inline int __vlc_cond_wait( const char * psz_file, int i_line,
                                    vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
 {
     int i_result;
