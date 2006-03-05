@@ -114,10 +114,6 @@ AC_ARG_WITH(contrib,
     else
     	export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
     fi
-    if test -d ${topdir}/extras/contrib/vlc-lib; then
-      LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/vlc-lib"
-      LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/vlc-lib"
-    fi
     LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
     LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
 
@@ -4655,6 +4651,8 @@ AC_ARG_ENABLE(opie,
 dnl
 dnl  MacOS X module
 dnl
+ORIGCFLAGS=$CFLAGS
+CFLAGS="$CFLAGS -x objective-c"
 AC_ARG_ENABLE(macosx,
   [  --enable-macosx         MacOS X support (default enabled on MacOS X)],
   [if test "${enable_macosx}" = "yes"
@@ -4666,6 +4664,7 @@ AC_ARG_ENABLE(macosx,
      VLC_ADD_BUILTINS([macosx])
      VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL])
    )])
+CFLAGS=$ORIGCFLAGS
 
 dnl
 dnl  QNX RTOS module
@@ -5044,6 +5043,7 @@ then
       CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mozilla}"
       AC_CHECK_HEADERS(mozilla-config.h)
       CPPFLAGS="${CPPFLAGS_save}"
+      MOZILLA_SDK_PATH="`${MOZILLA_CONFIG} --prefix`"
       XPIDL_INCL="`${MOZILLA_CONFIG} --cflags plugin xpcom java` \
       `${MOZILLA_CONFIG} --idlflags plugin xpcom java` "
       xpidl_path="`${MOZILLA_CONFIG} --prefix`/bin"
@@ -5074,6 +5074,7 @@ then
         fi
       fi
   
+      MOZILLA_SDK_PATH="${real_mozilla_sdk}"
       XPIDL_INCL="-I${real_mozilla_sdk}${mozilla_sdk_xpcom}/idl"
       xpidl_path="${real_mozilla_sdk}${mozilla_sdk_xpcom}/bin"
   
@@ -5308,6 +5309,7 @@ AC_SUBST(ALIASES)
 AC_SUBST(ASM)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
+AC_SUBST(MOZILLA_SDK_PATH)
 AC_SUBST(XPIDL)
 AC_SUBST(XPIDL_INCL)
 AC_SUBST(LIBEXT)

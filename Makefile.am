@@ -394,7 +394,7 @@ VLC-release.app: vlc
 	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/lib ; \
 	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
+	    $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/lib/`basename $${i}` ; \
 	  done ; \
 	fi
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share
@@ -505,7 +505,7 @@ VLC.app: vlc
 	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
 	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    ln -sfn `pwd`/$${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
+	    ln -sfn `pwd`/$${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/`basename $${i}` ; \
 	  done ; \
 	fi
 	ln -sfn `pwd`/share $(top_builddir)/VLC.app/Contents/MacOS/

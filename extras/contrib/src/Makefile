@@ -36,6 +36,9 @@ include ./packages.mak
 export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
 export PKG_CONFIG_PATH
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
+# following is required for configure scripts that check dyld libraries
+# by building and running a test app 
+export DYLD_FALLBACK_LIBRARY_PATH = $(PREFIX)/vlc-lib
 export MACOSX_DEPLOYMENT_TARGET = $(SDK_TARGET)
 export LIBRARY_PATH := $(PREFIX)/lib:$(LIBRARY_PATH)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
@@ -122,7 +125,7 @@ ifdef HAVE_DARWIN_OS
 	.FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
 	.dvdcss .dvdnav .dvdread .dvbpsi .live .x264 .caca .mod \
 	.png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager .SDL_image \
-	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal
+	.glib .libidl .gecko .mpcdec .expat .clinkcc .aclocal .dirac_encoder .dirac_decoder 
 # .FLAC .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
@@ -210,25 +213,35 @@ endef
 #	touch $@
 
 ifdef HAVE_DARWIN_OS
-define INSTALL_NAME_LIB
-	install_name_tool \
-		-change $(PREFIX)/lib/$(shell cd $(PREFIX)/lib; ls | grep "lib$(INSTALL_LIB).[0-9]*.dylib") \
-		@executable_path/lib/vlc_lib$(INSTALL_LIB).dylib \
-		$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).dylib ;
-endef
+# the original libtoto.dylib is copied from contrib/lib to vlc-lib as
+# vlc_libtoto.dylib. a soft link to this library is created in contrib/lib
+# using the orginal dylib name. if libtoto.la also exists, the library named
+# in dlname is also changed to a soft-link to vlc-lib in order to support
+# libtool. to satisfy VLC.app dyld search, vlc_libtoto.dylib dyld id is changed
+# to @executable_path/lib/vlc_libtoto.dylib 
 
 define INSTALL_NAME
 	if which install_name_tool >/dev/null; then \
 		mkdir -p $(PREFIX)/vlc-lib ; \
-		cp $(PREFIX)/lib/lib$(patsubst .%,%,$@).dylib \
-			$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).dylib ; \
+		libname='lib$(patsubst .%,%,$@)' ; \
+		dlname="$$libname.dylib" ; \
+		cp $(PREFIX)/lib/$$dlname \
+			$(PREFIX)/vlc-lib/vlc_$$dlname ; \
+		rm $(PREFIX)/lib/$$dlname ; \
+		ln -s $(PREFIX)/vlc-lib/vlc_$$dlname \
+			$(PREFIX)/lib/$$dlname ; \
+		if [ -f $(PREFIX)/lib/$$libname.la ]; then \
+			eval ltname=`sed -n 's/dlname=//p' $(PREFIX)/lib/$$libname.la`; \
+			rm $(PREFIX)/lib/$$ltname ; \
+			ln -s $(PREFIX)/vlc-lib/vlc_$$dlname \
+				$(PREFIX)/lib/$$ltname ; \
+		fi ; \
 		install_name_tool \
-			-id @executable_path/lib/vlc_lib$(patsubst .%,%,$@).dylib \
-			$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).dylib ; \
-		$(foreach INSTALL_LIB,$(patsubst .%,%,$(filter .%,$^)), \
-			$(INSTALL_NAME_LIB)) \
+			-id @executable_path/lib/vlc_$$dlname \
+			$(PREFIX)/vlc-lib/vlc_$$dlname ; \
 	fi
 endef
+
 endif
 
 ifeq ($(HOST),i586-pc-beos)
@@ -953,7 +966,7 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 .dvdread: .dvdnav
 	$(INSTALL_NAME)
-	(install_name_tool -change $(PREFIX)/lib/libdvdread.0.dylib @executable_path/lib/vlc_libdvdread.dylib $(PREFIX)/vlc-lib/libdvdnav.dylib)
+	(install_name_tool -change $(PREFIX)/lib/libdvdread.0.dylib @executable_path/lib/vlc_libdvdread.dylib $(PREFIX)/vlc-lib/vlc_libdvdnav.dylib)
 	touch $@
 
 CLEAN_FILE += .dvdread
@@ -1484,7 +1497,6 @@ gnutls-$(GNUTLS_VERSION).tar.bz2:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	(cd gnutls/gl ;ln -s alloca_.h alloca.h)
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
@@ -1754,6 +1766,14 @@ endif
 
 .dirac: dirac
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make && DOC_DIR="" make install)
+	touch $@
+
+# for MacOS X, dirac is split into two libraries, which needs be installed using two targets
+.dirac_encoder: .dirac
+	$(INSTALL_NAME)
+	touch $@
+
+.dirac_decoder: .dirac
 	$(INSTALL_NAME)
 	touch $@
 
