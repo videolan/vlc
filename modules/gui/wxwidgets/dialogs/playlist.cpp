@@ -27,7 +27,6 @@
  *****************************************************************************/
 #include "dialogs/playlist.hpp"
 #include "dialogs/iteminfo.hpp"
-#include "interface.hpp" // Needed for D&D - TODO: Split
 
 #include "bitmaps/shuffle.xpm"
 #include "bitmaps/repeat.xpm"
