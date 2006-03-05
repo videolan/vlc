@@ -45,7 +45,7 @@ class Playtree: public VarTree
         /// Function called to notify playlist item update
         void onUpdateItem( int id );
 
-        /// Function called to notify playlist item  append
+        /// Function called to notify playlist item append
         void onAppend( playlist_add_t * );
 
         /// Function called to notify playlist item delete

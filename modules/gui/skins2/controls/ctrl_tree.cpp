@@ -329,6 +329,13 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 {
                     previousWasSelected = ( &*it == m_pLastSelected );
                 }
+
+                // Fix last tree item selection
+                if( m_rTree.getNextVisibleItem( it ) == m_rTree.end()
+                 && &*it == m_pLastSelected )
+                {
+                    (*it).m_selected = true;
+                }
             }
             else if( key == KEY_RIGHT )
             {
