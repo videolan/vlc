@@ -5,13 +5,17 @@ Changes between 0.8.4a and 0.8.5-svn (not yet released):
 
 Core support:
  * Statistics collection (bitrates, packets, connections, ...)
+ * Support for downloading update
 
 Input:
  * Initial support for RTSP-over-HTTP (to allow NAT traversal)
  * Linux DV (Digital Video - Firewire) input
  * Improvements to the Audio CD input
+     - Separate playlist entries for the tracks 
+     - Support for CDDB 
  * Support for more DVB (satellite) encryption modules
  * Improved subtitles encoding support
+ * Improved support for playing MP4 files from the Web
 
 Decoders:
  * Cook (Real audio) support
@@ -23,9 +27,16 @@ Audio output:
  * New JACK audio output
 
 Video output:
- * New video filters: magnify, gradient, edge detection and bluescreen
+ * New video filters: 
+    - magnify : allows you to zoom on part of the image
+    - gradient and edge detection : "cartoon-like" effect
+    - bluescreen : overlay a video transparently on another one
  * Logo video filter: can now loop through multiple images
  * RSS video filter: display feed images. Support for Atom feeds.
+ * Improvements to the subtitles rendering
+
+Stream output:
+ * Initial support for throttling users on VOD streams
 
 Interfaces:
  * System to inform the user and request information 
@@ -34,13 +45,14 @@ Interfaces:
     - ...
  * wxWidgets
     - VLM (VideoLAN Media Manager) control panel
+    - Improve the media information panel (show statistics, metadata, ...)
+    - Drag & Drop support in the playlist
  * Skins2 
     - Support for Winamp 2 skins
     - Improved playlist handling
     - Support for popup menus, animated bitmaps, equalizer, ...
  * OS X
     - Embedded Video output
-    - new Update-Checker
     - new Go-To-Specific-Time feature
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
@@ -53,7 +65,8 @@ Windows Port:
 
 OS X Port:
  * Mac-Intel compatibility
- * enhanced support of various audio output devices 
+ * Enhanced support of various audio output devices 
+ * Growl "Now playing" support
 
 *Nix port:
  * Ability to log to syslog
@@ -62,6 +75,7 @@ OS X Port:
 Developers:
  * New libvlc API (not finished yet)
  * Java bindings
+ * A bit more automatic testing
 
 Changes between 0.8.4 and 0.8.4a:
 ---------------------------------
