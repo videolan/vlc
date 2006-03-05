@@ -30,6 +30,10 @@
 #include <string.h>                                              /* strdup() */
 #include <errno.h>                                                  /* errno */
 
+#ifdef HAVE_LIMITS_H
+#   include <limits.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>                                          /* getuid() */
 #endif
