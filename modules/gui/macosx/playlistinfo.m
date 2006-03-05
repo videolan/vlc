@@ -98,10 +98,19 @@
     [o_lost_abuffers_lbl setStringValue: _NS("Lost buffers")];
 }
 
+- (void)dealloc
+{
+    /* make that it is released in any case */
+    if ( o_statUpdateTimer )
+        [o_statUpdateTimer release];
+    [super dealloc];
+}
+
 - (IBAction)togglePlaylistInfoPanel:(id)sender
 {
     if( [o_info_window isVisible] )
     {
+        [self windowShouldClose: nil];
         [o_info_window orderOut: sender];
     }
     else
@@ -115,8 +124,7 @@
 {
     if( [o_info_window isVisible] )
     {
-        if( o_statUpdateTimer )
-            [o_statUpdateTimer invalidate];
+        [self windowShouldClose: nil];
         [o_info_window orderOut: sender];
     }
     else
@@ -268,6 +276,7 @@
 
 - (IBAction)infoCancel:(id)sender
 {
+    [self windowShouldClose: nil];
     [o_info_window orderOut: self];
 }
 
@@ -292,6 +301,7 @@
         var_Set( p_playlist, "intf-change", val );
     }
     vlc_object_release( p_playlist );
+    [self windowShouldClose: nil];
     [o_info_window orderOut: self];
 }
 
@@ -322,6 +332,16 @@
     }
     vlc_object_release( p_playlist );
     return NO;
+}
+
+- (BOOL)windowShouldClose:(id)sender
+{
+    if( o_statUpdateTimer )
+    {
+        [o_statUpdateTimer invalidate];
+        [o_statUpdateTimer release];
+    }
+    return YES;
 }
 
 @end
