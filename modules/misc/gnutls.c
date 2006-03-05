@@ -529,6 +529,9 @@ gnutls_Addx509File( vlc_object_t *p_this,
             return gnutls_Addx509Directory( p_this, cred, psz_path, b_priv);
         }
     }
+    else
+        msg_Warn( p_this, "Cannot add x509 credentials (%s): %s",
+                  psz_path, strerror( errno ) );
     return VLC_EGENERIC;
 }
 
@@ -586,20 +589,20 @@ gnutls_ClientCreate( tls_t *p_tls )
         char *psz_path;
 
         if( asprintf( &psz_path, "%s/"CONFIG_DIR"/ssl/certs",
-                      p_tls->p_vlc->psz_homedir ) == -1 )
+                      p_tls->p_vlc->psz_homedir ) != -1 )
         {
-            gnutls_certificate_free_credentials( p_sys->x509_cred );
-            goto error;
+            gnutls_Addx509Directory( (vlc_object_t *)p_session,
+                                     p_sys->x509_cred, psz_path, VLC_FALSE );
+            free( psz_path );
         }
 
-        gnutls_Addx509Directory( (vlc_object_t *)p_session, p_sys->x509_cred,
-                                 psz_path, VLC_FALSE );
-#ifdef X509_CA_BUNDLE
-        gnutls_Addx509File( (vlc_object_t *)p_session, p_sys->x509_cred,
-                            X509_CA_BUNDLE, VLC_FALSE );
-#endif
-
-        free( psz_path );
+        if( asprintf( &psz_path, "%s/ca-certificates.crt",
+            config_GetDataDir ( (vlc_object_t *)p_session) ) != -1 )
+        {
+            gnutls_Addx509File( (vlc_object_t *)p_session,
+                                p_sys->x509_cred, psz_path, VLC_FALSE );
+            free( psz_path );
+        }
         p_session->pf_handshake2 = gnutls_HandshakeAndValidate;
     }
     else
