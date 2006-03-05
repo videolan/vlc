@@ -4869,8 +4869,6 @@ dnl TLS/SSL
 dnl
 AC_ARG_ENABLE(gnutls,
   [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
-AC_ARG_WITH(x509-ca-bunble,
-  [  --with-x509-ca-bundle   x509 PEM certificate bundle path (no default)])
 
 AS_IF([test "${enable_gnutls}" != "no"], [
   gcrypt_LIBS="-lgpg-error"
@@ -4893,26 +4891,6 @@ AS_IF([test "${enable_gnutls}" != "no"], [
   AS_IF([test "${have_gnutls}" = "yes"], [
     VLC_ADD_PLUGINS([gnutls])
     VLC_ADD_LDFLAGS([gnutls], [-lgnutls ${gnutls_LIBS}])
-
-    AC_MSG_CHECKING([for root CA certificates path])
-    AS_IF([test -z "${with_x509_ca_bundle}"], [
-      AC_MSG_RESULT([not specified])
-      AC_MSG_WARN([No root CA certificates for gnutls])
-      AS_IF([test "${enable_gnutls}"], [
-	AC_MSG_ERROR([Use --with-x509-ca-bundle=... (or --without-x509-ca-bundle though gnutls won't work properly).])
-      ])
-    ], [
-      AS_IF([test "${with_x509_ca_bundle}" != "no"], [
-        AC_MSG_RESULT([${with_x509_ca_bundle}])
-	AC_CHECK_FILE([${with_x509_ca_bundle}],,[
-	  AC_MSG_WARN([${with_x509_ca_bundle} does not exist (are you cross-compiling?)])
-	])
-        AC_DEFINE_UNQUOTED(X509_CA_BUNDLE, ["${with_x509_ca_bundle}"],
-          [Define to the path of the host's root CA PEM certificates bundle file])
-      ], [
-        AC_MSG_RESULT([none])
-      ])
-    ])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
       AC_MSG_ERROR([gnutls not present or too old (version 1.0.17 required)])
