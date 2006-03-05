@@ -3,9 +3,6 @@
   Release HOWTO
   -------------
 
- * Have an ECP guy send a mail to ingesys at cti dot ecp dot fr warning them of
-   the forecoming traffic (should ideally be done at least a few hours before release) 
-
  * Tests : compilation, regression tests ...
 
  * Changes on the svn repository
