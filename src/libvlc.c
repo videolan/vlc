@@ -2024,7 +2024,6 @@ static void SetLanguage ( char const *psz_lang )
     }
 
     /* Set the default domain */
-    textdomain( PACKAGE_NAME );
     bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
 #endif
 }
