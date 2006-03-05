@@ -131,6 +131,9 @@ dnl kludge because only the debian package provides a ffmpeg-config
     if test -z $with_goom_tree; then
       with_goom_tree=${topdir}/extras/contrib/src/goom
     fi
+    if test -z $with_mozilla_sdk_path; then
+       with_mozilla_sdk_path=${topdir}/extras/contrib/gecko-sdk
+    fi
 
     if test ".`uname -s`" = ".Darwin"; then
       export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
