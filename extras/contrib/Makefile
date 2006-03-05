@@ -97,7 +97,7 @@ package-win32: FORCE
 	mkdir -p tmp/usr/win32/live.com
 	for i in groupsock liveMedia UsageEnvironment BasicUsageEnvironment; do \
 		mkdir -p  tmp/usr/win32/live.com/$$i/include; \
-		cp -r src/live/$$i/include tmp/usr/win32/live.com/$$i/include; \
+		cp -r src/live/$$i/include tmp/usr/win32/live.com/$$i; \
 		cp src/live/$$i/lib$${i}.a  tmp/usr/win32/live.com/$$i; \
 	done;
 	./change_prefix.sh tmp $(PREFIX) /usr/win32
