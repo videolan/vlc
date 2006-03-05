@@ -375,6 +375,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
     SetDropTarget( new PlaylistFileDropTarget( this ) );
+    menubar->SetDropTarget( new PlaylistFileDropTarget( this ) );
+    toolbar->SetDropTarget( new PlaylistFileDropTarget( this ) );
 #endif
 
     i_saved_id = -1;
@@ -1242,10 +1244,9 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
 
     /* find the destination node and position in that node */
     const wxPoint pt( x, y );
-    int flags = 0;
-    wxTreeItemId item = p->treectrl->HitTest( pt, flags );
+    wxTreeItemId item = p->treectrl->HitTest( pt );
 
-    if( flags & wxTREE_HITTEST_NOWHERE )
+    if( !item.IsOk() )
     {
         /* We were droped below the last item so we append to the
          * general node */
@@ -1254,14 +1255,6 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
     }
     else
     {
-        /* We were droped on an item */
-        if( !item.IsOk() )
-        {
-            printf("Arf ....\n" );
-            UnlockPlaylist( p->p_intf->p_sys, p->p_playlist );
-            return FALSE;
-        }
-
         PlaylistItem *p_plitem =
             (PlaylistItem *)p->treectrl->GetItemData( item );
         p_dest = playlist_ItemGetById( p->p_playlist, p_plitem->i_id );
