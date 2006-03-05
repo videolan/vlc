@@ -242,7 +242,21 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         /* Delete the selection */
         if( key == KEY_DELETE )
         {
+            /* Find first non selected item before m_pLastSelected */
+            VarTree::Iterator it_sel = m_rTree.begin();
+            for( it = m_rTree.begin(); it != m_rTree.end();
+                   it = m_rTree.getNextVisibleItem( it ) )
+            {
+                if( &*it == m_pLastSelected ) break;
+                if( !it->m_selected ) it_sel = it;
+            }
+
+            /* Delete selected stuff */
             m_rTree.delSelected();
+
+            /* Select it_sel */
+            it_sel->m_selected = true;
+            m_pLastSelected = &*it_sel;
         }
         else if( key == KEY_PAGEDOWN )
         {
