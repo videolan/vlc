@@ -239,12 +239,18 @@ gnutls_ContinueHandshake( tls_session_t *p_session)
     p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
      /* TODO: handle fatal error */
+#ifdef WIN32
+    WSASetLastError( 0 );
+#endif
     val = gnutls_handshake( p_sys->session );
     if( ( val == GNUTLS_E_AGAIN ) || ( val == GNUTLS_E_INTERRUPTED ) )
         return 1 + gnutls_record_get_direction( p_sys->session );
 
     if( val < 0 )
     {
+#ifdef WIN32
+        msg_Dbg( p_session, "Winsock error %d", WSAGetLastError( ) );
+#endif
         msg_Err( p_session, "TLS handshake failed: %s",
                  gnutls_strerror( val ) );
         p_session->pf_close( p_session );
