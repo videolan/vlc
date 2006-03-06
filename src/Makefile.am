@@ -7,9 +7,9 @@ SUBDIRS =
 
 EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
-BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES) misc/version.c
+BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
 DISTCLEANFILES = stamp-api
-CLEANFILES = misc/modules_builtin.h stamp-version
+CLEANFILES = misc/modules_builtin.h stamp-version misc/version.c
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
