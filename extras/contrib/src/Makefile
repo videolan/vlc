@@ -113,6 +113,7 @@ endif
 
 ifeq ($(HOST),i686-apple-darwin8)
 FFMPEGCONF += --enable-memalign-hack
+X264CONF += --enable-pic
 endif
 
 # ***************************************************************************
