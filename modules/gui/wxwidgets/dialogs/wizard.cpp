@@ -434,7 +434,7 @@ static void pageHeader( wxWindow *window, wxBoxSizer *sizer,
     wtitle->SetFont(font);
     sizer->Add( wtitle, 0, wxALL, 5 );
     sizer->Add( new wxStaticText( window, -1,
-                wxU( vlc_wraptext( psz_text , TEXTWIDTH, false ) ) ),
+                wxU( vlc_wraptext( psz_text , TEXTWIDTH ) ) ),
                         0, wxALL, 5 );
 }
 
@@ -484,7 +484,7 @@ wizHelloPage::wizHelloPage( wxWizard *parent) : wxWizardPageSimple(parent)
                         wxBOTTOM, 5 );
 
         mainSizer->Add( new wxStaticText(this, -1,
-                        wxU( vlc_wraptext(HELLO_NOTICE , TEXTWIDTH , false ))),
+                        wxU( vlc_wraptext(HELLO_NOTICE , TEXTWIDTH ))),
                         0, wxALL, 5 );
 
         SetSizer(mainSizer);
@@ -846,7 +846,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
 
     /* Line 3 : text */
     video_text = new wxStaticText( this, -1,
-                     wxU( vlc_wraptext( TR_VIDEO_TEXT, TEXTWIDTH, false) ) );
+                     wxU( vlc_wraptext( TR_VIDEO_TEXT, TEXTWIDTH ) ) );
     /* Fill the main video sizer */
     video_sizer->Add( video_sizer1 , 0, wxEXPAND , 5 );
     video_sizer->Add( video_text, 0, wxLEFT|wxTOP , 5 );
@@ -885,7 +885,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
 
     /* Line 3 : text */
     audio_text = new wxStaticText( this, -1,
-                     wxU( vlc_wraptext( TR_AUDIO_TEXT, TEXTWIDTH, false) ) );
+                     wxU( vlc_wraptext( TR_AUDIO_TEXT, TEXTWIDTH ) ) );
 
     audio_sizer->Add(audio_sizer1, 0, wxEXPAND, 5);
     audio_sizer->Add( audio_text, 0, wxLEFT | wxTOP, 5 );
@@ -925,7 +925,7 @@ void wizTranscodeCodecPage::OnVideoCodecChange(wxCommandEvent& event)
 {
     struct codec *c = (struct codec*)
              (video_combo->GetClientData(video_combo->GetSelection()));
-    video_text->SetLabel( wxU( vlc_wraptext(c->psz_descr, TEXTWIDTH, false) ) );
+    video_text->SetLabel( wxU( vlc_wraptext(c->psz_descr, TEXTWIDTH ) ) );
     i_video_codec = video_combo->GetSelection();
     vcodec = strdup(c->psz_codec);
 }
@@ -934,7 +934,7 @@ void wizTranscodeCodecPage::OnAudioCodecChange(wxCommandEvent& event)
 {
     struct codec *c = (struct codec*)
              (audio_combo->GetClientData(audio_combo->GetSelection()));
-    audio_text->SetLabel( wxU( vlc_wraptext(c->psz_descr, TEXTWIDTH, false) ) );
+    audio_text->SetLabel( wxU( vlc_wraptext(c->psz_descr, TEXTWIDTH ) ) );
     i_audio_codec = audio_combo->GetSelection();
     acodec = strdup(c->psz_codec);
 
@@ -1050,8 +1050,7 @@ wizStreamingMethodPage::wizStreamingMethodPage( intf_thread_t *p_this, wxWizard 
 
     /* Big kludge, we take the longest text to get the size */
     address_text = new wxStaticText(this, -1,
-               wxU( vlc_wraptext(methods_array[2].psz_address,
-                                 TEXTWIDTH, false ) ),
+               wxU( vlc_wraptext(methods_array[2].psz_address, TEXTWIDTH ) ),
                wxDefaultPosition, wxDefaultSize );
 
     address_txtctrl = new wxTextCtrl( this, -1, wxU(""), wxDefaultPosition,
@@ -1063,7 +1062,7 @@ wizStreamingMethodPage::wizStreamingMethodPage( intf_thread_t *p_this, wxWizard 
     /* Set the minimum size */
     address_sizer->SetMinSize( address_sizer->GetSize() );
     address_text->SetLabel( wxU(
-     vlc_wraptext( _(methods_array[0].psz_address), TEXTWIDTH, false)));
+     vlc_wraptext( _(methods_array[0].psz_address), TEXTWIDTH )));
 
     mainSizer->Add( method_sizer, 0, wxALL | wxEXPAND, 5 );
     mainSizer->Add( address_sizer, 0, wxALL | wxEXPAND, 5 );
@@ -1128,7 +1127,7 @@ void wizStreamingMethodPage::OnMethodChange( wxCommandEvent& event )
 {
     i_method = event.GetId() - MethodRadio0_Event;
     address_text->SetLabel( wxU(
-     vlc_wraptext( _(methods_array[i_method].psz_address), TEXTWIDTH, false)));
+     vlc_wraptext( _(methods_array[i_method].psz_address), TEXTWIDTH )));
     address_sizer->Layout();
     mainSizer->Layout();
 }

@@ -376,8 +376,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 psz_help = config_CategoryHelpGet( p_item->i_value );
                 if( psz_help )
                 {
-                    config_data->psz_help = wraptext( strdup( psz_help ),
-                                                      72 , 1 );
+                    config_data->psz_help = wraptext( strdup( psz_help ), 72 );
                 }
                 else
                 {
@@ -425,8 +424,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     char *psz_help = config_CategoryHelpGet( p_item->i_value );
                     if( psz_help )
                     {
-                        cd->psz_help = wraptext( strdup( psz_help ),72 ,
-                                                 1 );
+                        cd->psz_help = wraptext( strdup( psz_help ), 72 );
                     }
                     else
                     {
@@ -442,8 +440,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 psz_help = config_CategoryHelpGet( p_item->i_value );
                 if( psz_help )
                 {
-                    config_data->psz_help = wraptext( strdup( psz_help ) ,
-                                                      72 , 1 );
+                    config_data->psz_help = wraptext( strdup( psz_help ), 72 );
                 }
                 else
                 {

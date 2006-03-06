@@ -531,17 +531,14 @@ static int count_utf8_string( const char *psz_string )
  * wraptext: inserts \n at convenient places to wrap the text.
  *           Returns the modified string in a new buffer.
  *****************************************************************************/
-char *vlc_wraptext( const char *psz_text, int i_line, vlc_bool_t b_utf8 )
+char *vlc_wraptext( const char *psz_text, int i_line )
 {
     int i_len;
     char *psz_line, *psz_new_text;
 
     psz_line = psz_new_text = strdup( psz_text );
 
-    if( b_utf8 )
-        i_len = count_utf8_string( psz_text );
-    else
-        i_len = strlen( psz_text );
+    i_len = count_utf8_string( psz_text );
 
     while( i_len > i_line )
     {
@@ -550,10 +547,7 @@ char *vlc_wraptext( const char *psz_text, int i_line, vlc_bool_t b_utf8 )
         int i_count = 0;
         while( i_count <= i_line && *psz_parser != '\n' )
         {
-            if( b_utf8 )
-            {
-                while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser++;
-            }
+            while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser++;
             psz_parser++;
             i_count++;
         }
@@ -567,10 +561,7 @@ char *vlc_wraptext( const char *psz_text, int i_line, vlc_bool_t b_utf8 )
         /* Find the furthest space. */
         while( psz_parser > psz_line && *psz_parser != ' ' )
         {
-            if( b_utf8 )
-            {
-                while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser--;
-            }
+            while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser--;
             psz_parser--;
             i_count--;
         }
@@ -585,10 +576,7 @@ char *vlc_wraptext( const char *psz_text, int i_line, vlc_bool_t b_utf8 )
         /* Wrapping has failed. Find the first space or newline */
         while( i_count < i_len && *psz_parser != ' ' && *psz_parser != '\n' )
         {
-            if( b_utf8 )
-            {
-                while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser++;
-            }
+            while( *((unsigned char *)psz_parser) >= 0x80UL ) psz_parser++;
             psz_parser++;
             i_count++;
         }

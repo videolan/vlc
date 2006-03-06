@@ -1069,7 +1069,7 @@ VLC_EXPORT( char **, vlc_parse_cmdline, ( const char *, int * ) );
 
 /* vlc_wraptext (defined in src/extras/libc.c) */
 #define wraptext vlc_wraptext
-VLC_EXPORT( char *, vlc_wraptext, ( const char *, int, vlc_bool_t ) );
+VLC_EXPORT( char *, vlc_wraptext, ( const char *, int ) );
 
 /* iconv wrappers (defined in src/extras/libc.c) */
 typedef void *vlc_iconv_t;
