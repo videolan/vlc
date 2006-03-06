@@ -38,7 +38,7 @@ export PKG_CONFIG_PATH
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
 # following is required for configure scripts that check dyld libraries
 # by building and running a test app 
-export DYLD_FALLBACK_LIBRARY_PATH = $(PREFIX)/vlc-lib
+export DYLD_LIBRARY_PATH := $(DYLD_LIBRARY_PATH):$(PREFIX)/vlc-lib
 export MACOSX_DEPLOYMENT_TARGET = $(SDK_TARGET)
 export LIBRARY_PATH := $(PREFIX)/lib:$(LIBRARY_PATH)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
