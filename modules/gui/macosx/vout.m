@@ -935,7 +935,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     b_init_ok = VLC_FALSE;
 
     p_fullscreen_state = NULL;
-    b_fullscreen = VLC_FALSE;
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
 
@@ -958,7 +957,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( p_vout->b_fullscreen )
     {
         CGDisplayFadeReservationToken token;
-        b_fullscreen = VLC_TRUE;
         NSRect screen_rect = [o_screen frame];
         screen_rect.origin.x = screen_rect.origin.y = 0;
 
@@ -1013,7 +1011,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         if( var_GetBool( p_vout, "macosx-black" ) )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-            CGDisplayFade( token, 2, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
+            CGDisplayFade( token, 2 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
             CGReleaseDisplayFadeReservation( token);
         }
     }
@@ -1097,18 +1095,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id) closeReal: (id) sender
 {
-    if( b_fullscreen == VLC_TRUE )
+    if( p_fullscreen_state )
+        EndFullScreen( p_fullscreen_state, 0 );
+    if( var_GetBool( p_vout, "macosx-black" ) )
     {
-        if( p_vout->b_fullscreen )
-            EndFullScreen( p_fullscreen_state, 0 );
-        if( var_GetBool( p_vout, "macosx-black" ) )
-        {
-            CGDisplayFadeReservationToken token;
-            CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-            CGDisplayFade( token, 2, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
-            CGReleaseDisplayFadeReservation( token);
-            CGDisplayRestoreColorSyncSettings();
-        }
+        CGDisplayFadeReservationToken token;
+        CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
+        CGDisplayFade( token, 2, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
+        CGReleaseDisplayFadeReservation( token);
+        CGDisplayRestoreColorSyncSettings();
     }
     [super close];
     return NULL;

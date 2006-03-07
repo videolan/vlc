@@ -120,7 +120,6 @@
 
     vout_thread_t * p_real_vout;
     Ptr             p_fullscreen_state;
-    vlc_bool_t      b_fullscreen;
     vlc_bool_t      b_init_ok;
 }
 
