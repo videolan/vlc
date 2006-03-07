@@ -2123,7 +2123,11 @@ static int InputSourceInit( input_thread_t *p_input,
             if( psz_dup ) free( psz_dup );
             psz_dup = strdup( psz_mrl );
             psz_access = "";
-            psz_demux = "";
+            if( psz_forced_demux && *psz_forced_demux )
+            {
+                psz_demux = psz_forced_demux;
+            }
+            else psz_demux = "";
             psz_path = psz_dup;
 
             in->p_access = access2_New( p_input,
