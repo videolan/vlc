@@ -1606,6 +1606,7 @@ gecko-sdk-win32: gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip gli
 	mv gecko-sdk ..
 	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d ../gecko-sdk/bin
 	unzip glib-19990228.zip glib-1.2.dll -d ../gecko-sdk/bin
+	chmod a+x ../gecko-sdk/bin/*
 
 .gecko-win32: gecko-sdk-win32
 	touch $@
