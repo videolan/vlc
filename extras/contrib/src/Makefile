@@ -1591,25 +1591,21 @@ DISTCLEAN_PKG += gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 # Gecko SDK win32
 # ***************************************************************************
 
-gecko-sdk-i586-pc-msvc-1.7.5.zip:
+gecko-sdk-i586-pc-msvc-1.8b1.zip:
 	$(WGET) $(GECKO_SDK_WIN32_URL)
 
 libIDL-0.6.3-win32-bin.zip:
 	$(WGET) $(LIBIDL_WIN32_BIN_URL)
 
-vc71-glib-1.2.10-bin.zip:
-	$(WGET) $(VC71_GLIB_WIN32_BIN_URL)
+glib-19990228.zip:
+	$(WGET) $(GLIB_WIN32_BIN_URL)
 
-gecko-sdk-win32: gecko-sdk-i586-pc-msvc-1.7.5.zip libIDL-0.6.3-win32-bin.zip vc71-glib-1.2.10-bin.zip
-	unzip  gecko-sdk-i586-pc-msvc-1.7.5.zip
+gecko-sdk-win32: gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
+	unzip gecko-sdk-i586-pc-msvc-1.8b1.zip
 	rm -rf ../gecko-sdk
 	mv gecko-sdk ..
-	unzip libIDL-0.6.3-win32-bin.zip
-	unzip vc71-glib-1.2.10-bin.zip
-	mv libIDL-0.6.3-win32-bin/libIDL-0.6.dll ../gecko-sdk/bin
-	rm -rf libIDL-0.6.3-win32-bin
-	mv vc71/bin/glib-1.2.dll ../gecko-sdk/bin
-	rm -rf vc71
+	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d ../gecko-sdk/bin
+	unzip glib-19990228.zip glib-1.2.dll -d ../gecko-sdk/bin
 
 .gecko-win32: gecko-sdk-win32
 	touch $@
