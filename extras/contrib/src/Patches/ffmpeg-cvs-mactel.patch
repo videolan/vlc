@@ -1,6 +1,3 @@
-? foo.diff
-? libavcodec/a.out
-? libavcodec/i386/fdct_mmx.S
 Index: libavcodec/i386/dsputil_mmx.c
 ===================================================================
 RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/i386/dsputil_mmx.c,v
@@ -615,35 +612,3 @@ diff -u -r1.16 simple_idct_mmx.c
  
  
  #endif
-Index: libavcodec/libpostproc/mangle.h
-===================================================================
-RCS file: /cvsroot/ffmpeg/ffmpeg/libavcodec/libpostproc/mangle.h,v
-retrieving revision 1.3
-diff -u -r1.3 mangle.h
---- libavcodec/libpostproc/mangle.h	18 Dec 2004 03:07:15 -0000	1.3
-+++ libavcodec/libpostproc/mangle.h	26 Jan 2006 22:02:55 -0000
-@@ -19,6 +19,8 @@
- #else
- #if defined(ARCH_X86_64) && defined(PIC)
- #define MANGLE(a) #a"(%%rip)"
-+#elif defined(CONFIG_DARWIN)
-+#define MANGLE(a) "_" #a
- #else
- #define MANGLE(a) #a
- #endif
-Index: libavutil/common.h
-===================================================================
-RCS file: /cvsroot/ffmpeg/ffmpeg/libavutil/common.h,v
-retrieving revision 1.160
-diff -u -r1.160 common.h
---- libavutil/common.h	22 Jan 2006 18:34:17 -0000	1.160
-+++ libavutil/common.h	26 Jan 2006 22:02:55 -0000
-@@ -260,6 +260,8 @@
- #    else
- #        if defined(ARCH_X86_64) && defined(PIC)
- #            define MANGLE(a) #a"(%%rip)"
-+#        elif defined(CONFIG_DARWIN)
-+#            define MANGLE(a) "_" #a
- #        else
- #            define MANGLE(a) #a
- #        endif
