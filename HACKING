@@ -85,4 +85,6 @@ Look at other modules for guidelines on how to add build and linkage options.
 After changing configure.ac you will always need to rerun bootstrap and 
 configure.
 
+VLC keeps a cache of its module (in ~/.vlc/cache on Linux), so you'll have to delete it. (or use vlc --reset-plugins-cache)
+Then use vlc -vvv --color --list to check that your plugin is seen by VLC.
 
