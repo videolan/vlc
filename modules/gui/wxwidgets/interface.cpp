@@ -1261,13 +1261,14 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
-        const char *psz_utf8 = wxDnDFromLocale( filenames[i] );
+        char *psz_local = NULL;
+        const char *psz_utf8 = wxDnDFromLocale( filenames[i], psz_local );
 
         playlist_Add( p_playlist, psz_utf8, psz_utf8,
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
                       PLAYLIST_END );
 
-        wxDnDLocaleFree( psz_utf8 );
+        wxDnDLocaleFree( psz_utf8, psz_local );
     }
 
     vlc_object_release( p_playlist );
