@@ -98,7 +98,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 /* From Locale functions to use for File Drop targets ... go figure */
 #ifdef wxUSE_UNICODE
-inline const char *wxDnDFromLocale( const wxChar *stupid, char *psz_local )
+static inline char *wxDnDFromLocale( const wxChar *stupid )
 {
     /*
      * FIXME: this is yet another awful and ugly bug-to-bug work-around
@@ -120,21 +120,19 @@ inline const char *wxDnDFromLocale( const wxChar *stupid, char *psz_local )
     for (braindead = stupid; *braindead; braindead++);
 
     size_t i = (braindead - stupid);
-    psz_local = (char *)malloc( i + 1 );
+    char *psz_local = (char *)malloc( i + 1 );
     do
         psz_local[i] = (char)stupid[i];
     while (i--);
 
-    const char *psz_utf8 = FromLocale( psz_local );
+    char *psz_utf8 = FromLocaleDup( psz_local );
+    free( psz_local );
     return psz_utf8;
 }
+#   define wxDnDLocaleFree( string ) free( string )
 #else
-#   define wxDnDFromLocale( string, a ) wxFromLocale( string )
-#endif
-#ifdef wxUSE_UNICODE
-#   define wxDnDLocaleFree( string, a ) LocaleFree( string ); free( a )
-#else
-#   define wxDnDLocaleFree( string, a ) wxLocaleFree( string )
+#   define wxDnDFromLocale( string ) wxFromLocale( string )
+#   define wxDnDLocaleFree( string ) wxLocaleFree( string )
 #endif
 
 #define WRAPCOUNT 80

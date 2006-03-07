@@ -1292,13 +1292,12 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
     /* Put the items in the playlist node */
     for( size_t i = 0; i < filenames.GetCount(); i++ )
     {
-        char *psz_local = NULL;
-        const char *psz_utf8 = wxDnDFromLocale( filenames[i], psz_local );
+        const char *psz_utf8 = wxDnDFromLocale( filenames[i] );
         playlist_item_t *p_item =
             playlist_ItemNew( p->p_playlist, psz_utf8, psz_utf8 );
         playlist_NodeAddItem( p->p_playlist, p_item, p->i_current_view,
                               p_dest, PLAYLIST_PREPARSE, i_pos );
-        wxDnDLocaleFree( psz_utf8, psz_local );
+        wxDnDLocaleFree( psz_utf8 );
     }
 
     /* FIXME: having this Rebuild() is dirty */
