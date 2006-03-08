@@ -528,7 +528,11 @@ VLMFrame::VLMFrame( intf_thread_t *_p_intf, wxWindow *_p_parent ) :
     wxBoxSizer *main_sizer = new wxBoxSizer( wxHORIZONTAL );
     vlm_panel = new VLMPanel( _p_intf, this );
 
+#if defined(WIN32)
+    main_sizer->Add( vlm_panel, 1, wxGROW, 0 );
+#else
     main_sizer->Add( vlm_panel, 1, wxEXPAND | wxALL, 5 );
+#endif
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 }

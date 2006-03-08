@@ -63,9 +63,14 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout( TRUE );
 
+    /* Create a panel to put everything in */
+    wxPanel *panel = new wxPanel( this, -1 );
+    panel->SetAutoLayout( TRUE );
+
+    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer = new wxBoxSizer( wxVERTICAL );
 
-    wxNotebook *notebook = new wxNotebook( this, -1 );
+    wxNotebook *notebook = new wxNotebook( panel, -1 );
 #if (!wxCHECK_VERSION(2,5,2))
         wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
 #endif
@@ -85,11 +90,14 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
     panel_sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
 #endif
 
-    panel_sizer->Add( new wxButton( this, wxID_CLOSE ) ,
+    panel_sizer->Add( new wxButton( panel, wxID_CLOSE ) ,
                       0, wxALL|wxALIGN_RIGHT, 5 );
 
     panel_sizer->Layout();
-    SetSizerAndFit( panel_sizer );
+    panel->SetSizerAndFit( panel_sizer );
+    main_sizer->Add( panel, 1, wxGROW, 0 );
+    main_sizer->Layout();
+    SetSizerAndFit( main_sizer );
 
     if( p_playlist )
     {
