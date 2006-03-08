@@ -53,7 +53,7 @@ VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) 
 extern double i18n_strtod( const char *, char ** );
 extern double i18n_atof( const char * );
 extern double us_strtod( const char *, char ** );
-extern double us_atof( const char * );
+VLC_EXPORT( double, us_atof, ( const char * ) );
 
 # ifdef __cplusplus
 }
