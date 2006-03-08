@@ -346,7 +346,7 @@ int64_t vlc_atoll( const char *nptr )
 /*****************************************************************************
  * lldiv: returns quotient and remainder
  *****************************************************************************/
-#if !defined( HAVE_LLDIV )
+#if !defined(HAVE_LLDIV) || defined(SYS_BEOS)
 lldiv_t vlc_lldiv( long long numer, long long denom )
 {
     lldiv_t d;
