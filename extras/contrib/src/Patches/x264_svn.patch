@@ -11,15 +11,6 @@ Index: x264/Makefile
  
  libx264.a: .depend $(OBJS) $(OBJASM)
  	ar rc libx264.a $(OBJS) $(OBJASM)
-@@ -82,7 +82,7 @@
- .depend: config.mak config.h
- 	rm -f .depend
- # Hacky - because gcc 2.9x doesn't have -MT
--	$(foreach SRC, $(SRCS) x264.c matroska.c, ( echo -n "`dirname $(SRC)`/" && $(CC) $(CFLAGS) $(SRC) -MM -g0 ) 1>> .depend;)
-+	$(foreach SRC, $(SRCS), (echo -n "`dirname $(SRC)`/" && $(CC) $(CFLAGS) $(SRC) -MM -g0 ) 1>> .depend;)
- 
- config.h: $(wildcard .svn/entries */.svn/entries */*/.svn/entries)
- 	./version.sh
 @@ -128,13 +128,12 @@
  distclean: clean
  	rm -f config.mak vfw/build/cygwin/config.mak x264.pc
