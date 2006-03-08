@@ -25,7 +25,12 @@
 #define MUXERS_NUMBER 9
 
 // Do not count dummy here !
+#ifdef WIN32
+#define VCODECS_NUMBER 13
+#else
 #define VCODECS_NUMBER 12
+#endif
+
 #define ACODECS_NUMBER 9
 
 #define MUX_PS          0
