@@ -364,10 +364,10 @@ static int Open( vlc_object_t *p_this )
          * ttl are set. */
         val.i_int = config_GetInt( p_stream, "ttl" );
     }
-    if( p_sys->i_ttl > 255 ) p_sys->i_ttl = 255;
+    if( val.i_int > 255 ) val.i_int = 255;
     /* must not exceed 999 once formatted */
 
-    if( p_sys->i_ttl < 0 )
+    if( val.i_int < 0 )
     {
         msg_Err( p_stream, "illegal TTL %d", val.i_int );
         free( p_sys );
