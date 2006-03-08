@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rtsp.c: rtsp VoD server module
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,6 +37,7 @@
 #include "vlc_vod.h"
 #include "vlc_url.h"
 #include "network.h"
+#include "charset.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -1033,16 +1034,19 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( psz_position ) psz_position = strstr( psz_position, "npt=" );
             if( psz_position )
             {
-                float f_pos;
+                double f_pos;
+                char *end;
 
                 msg_Dbg( p_vod, "seeking request: %s", psz_position );
 
                 psz_position += 4;
-                if( sscanf( psz_position, "%f", &f_pos ) == 1 )
+                /* FIXME: npt= is not necessarily formatted as a float */
+                f_pos = us_strtod( psz_position, &end );
+                if( end > psz_position )
                 {
-                    f_pos /= ((float)(p_media->i_length/1000))/1000 / 100;
+                    f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
                     vod_MediaControl( p_vod, p_media, psz_session,
-                                      VOD_MEDIA_SEEK, (double)f_pos );
+                                      VOD_MEDIA_SEEK, f_pos );
                 }
             }
 
@@ -1190,8 +1194,11 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     p += sprintf( p, "c=IN IP%c %s\r\n", ipv, ipv == '6' ? "::" : "0.0.0.0" );
 
     if( p_media->i_length > 0 )
-    p += sprintf( p, "a=range:npt=0-%.3f\r\n",
-                  ((float)(p_media->i_length/1000))/1000 );
+    {
+        lldiv_t d = lldiv( p_media->i_length / 1000, 1000 );
+        p += sprintf( p, "a=range:npt=0-"I64Fd".%03u\r\n", d.quot,
+                      (unsigned)d.rem );
+    }
 
     for( i = 0; i < p_media->i_es; i++ )
     {
