@@ -27,15 +27,44 @@
 
 int main (void)
 {
+    const char dot9[] = "999999.999999";
+    const char comma9[] = "999999,999999";
+    const char sharp9[] = "999999#999999";
+    char *end;
+
     assert (i18n_atof("0") == 0.);
     assert (i18n_atof("1") == 1.);
     assert (i18n_atof("1.") == 1.);
     assert (i18n_atof("1,") == 1.);
     assert (i18n_atof("1#") == 1.);
-    assert (i18n_atof("999999.999999") == 999999.999999);
-    assert (i18n_atof("999999,999999") == 999999.999999);
-    assert (i18n_atof("999999#999999") == 999999.);
-
+    assert (i18n_atof(dot9) == 999999.999999);
+    assert (i18n_atof(comma9) == 999999.999999);
+    assert (i18n_atof(sharp9) == 999999.);
     assert (i18n_atof("invalid") == 0.);
+
+    assert (us_atof("0") == 0.);
+    assert (us_atof("1") == 1.);
+    assert (us_atof("1.") == 1.);
+    assert (us_atof("1,") == 1.);
+    assert (us_atof("1#") == 1.);
+    assert (us_atof(dot9) == 999999.999999);
+    assert (us_atof(comma9) == 999999.);
+    assert (us_atof(sharp9) == 999999.);
+    assert (us_atof("invalid") == 0.);
+
+    assert ((i18n_strtod(dot9, &end ) == 999999.999999)
+            && (*end == '\0'));
+    assert ((i18n_strtod(comma9, &end ) == 999999.999999)
+            && (*end == '\0'));
+    assert ((i18n_strtod(sharp9, &end ) == 999999.)
+            && (*end == '#'));
+
+    assert ((us_strtod(dot9, &end ) == 999999.999999)
+            && (*end == '\0'));
+    assert ((us_strtod(comma9, &end ) == 999999.)
+            && (*end == ','));
+    assert ((us_strtod(sharp9, &end ) == 999999.)
+            && (*end == '#'));
+
     return 0;
 }

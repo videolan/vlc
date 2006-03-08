@@ -380,25 +380,72 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
  * dot (which is the american default), and comma (which is used in France,
  * the country with the most VLC developers, among others).
  *
+ * i18n_strtod() has the same prototype as ANSI C strtod() but it accepts
+ * either decimal separator when deserializing the string to a float number,
+ * independant of the local computer setting.
+ */
+double i18n_strtod( const char *str, char **end )
+{
+    char *end_buf, e;
+    double d;
+
+    if( end == NULL )
+        end = &end_buf;
+    d = strtod( str, end );
+
+    e = **end;
+    if(( e == ',' ) || ( e == '.' ))
+    {
+        char dup[strlen( str ) + 1];
+        strcpy( dup, str );
+
+        if( dup == NULL )
+            return d;
+
+        dup[*end - str] = ( e == ',' ) ? '.' : ',';
+        d = strtod( dup, end );
+    }
+    return d;
+}
+
+/**
  * i18n_atof() has the same prototype as ANSI C atof() but it accepts
  * either decimal separator when deserializing the string to a float number,
  * independant of the local computer setting.
  */
 double i18n_atof( const char *str )
 {
-    char *end;
-    double d = strtod( str, &end );
+    return i18n_strtod( str, NULL );
+}
 
-    if(( *end == ',' ) || ( *end == '.' ))
-    {
-        char *dup = strdup( str );
 
-        if( dup == NULL )
-            return d;
+/**
+ * us_strtod() has the same prototype as ANSI C strtod() but it expects
+ * a dot as decimal separator regardless of the system locale.
+ */
+double us_strtod( const char *str, char **end )
+{
+    char dup[strlen( str ) + 1], *ptr;
+    double d;
+    strcpy( dup, str );
 
-        dup[end - str] = ( *end == ',' ) ? '.' : ',';
-        d = strtod( dup, &end );
-        free( dup );
-    }
+    ptr = strchr( dup, ',' );
+    if( ptr != NULL )
+        *ptr = '\0';
+
+    d = strtod( dup, &ptr );
+    if( end != NULL )
+        *end = (char *)&str[ptr - dup];
+
     return d;
 }
+
+/**
+ * us_atof() has the same prototype as ANSI C atof() but it expects a dot
+ * as decimal separator, regardless of the system locale.
+ */
+double us_atof( const char *str )
+{
+    return us_strtod( str, NULL );
+}
+
