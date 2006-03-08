@@ -1,11 +1,14 @@
 /*****************************************************************************
- * charset.c: Determine a canonical name for the current locale's character
- *            encoding.
+ * charset.c: Locale's character encoding stuff.
  *****************************************************************************
- * Copyright (C) 2003-2005 the VideoLAN team
+ * See also unicode.c for Unicode to locale conversion helpers.
+ *
+ * Copyright (C) 2003-2006 the VideoLAN team
  * $Id$
  *
- * Author: Derk-Jan Hartman <thedj at users.sf.net>
+ * Authors: Derk-Jan Hartman <thedj at users.sf.net>
+ *          Christophe Massiot
+ *          Rémi Denis-Courmont
  *
  * vlc_current_charset() an adaption of mp_locale_charset():
  *
@@ -370,4 +373,32 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
 #endif
 
     return strdup( psz_string );
+}
+
+/**
+ * There are two decimal separators in the computer world-wide locales:
+ * dot (which is the american default), and comma (which is used in France,
+ * the country with the most VLC developers, among others).
+ *
+ * i18n_atof() has the same prototype as ANSI C atof() but it accepts
+ * either decimal separator when deserializing the string to a float number,
+ * independant of the local computer setting.
+ */
+double i18n_atof( const char *str )
+{
+    char *end;
+    double d = strtod( str, &end );
+
+    if(( *end == ',' ) || ( *end == '.' ))
+    {
+        char *dup = strdup( str );
+
+        if( dup == NULL )
+            return d;
+
+        dup[end - str] = ( *end == ',' ) ? '.' : ',';
+        d = strtod( dup, &end );
+        free( dup );
+    }
+    return d;
 }

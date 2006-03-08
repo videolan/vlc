@@ -372,3 +372,17 @@ stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
 	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
 	touch stamp-api
 
+###############################################################################
+# Unit/regression test
+###############################################################################
+if USE_LIBTOOL
+check_PROGRAMS = test_i18n_atof
+TESTS = $(check_PROGRAMS)
+
+CFLAGS_tests = `$(VLC_CONFIG) --cflags vlc`
+
+test_i18n_atof_SOURCES = test/i18n_atof.c
+test_i18n_atof_LDADD = libvlc.la
+test_i18n_atof_CFLAGS = $(CFLAGS_tests)
+endif
+

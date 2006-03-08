@@ -49,6 +49,7 @@ VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( char *, FromUTF32, ( const wchar_t * ) );
 VLC_EXPORT( char *, __vlc_fix_readdir_charset, ( vlc_object_t *, const char * ) );
 #define vlc_fix_readdir_charset(a,b) __vlc_fix_readdir_charset(VLC_OBJECT(a),b)
+extern double i18n_atof( const char * );
 
 # ifdef __cplusplus
 }
