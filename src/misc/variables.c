@@ -1,7 +1,7 @@
 /*****************************************************************************
  * variables.c: routines for object variables handling
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -926,10 +926,9 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
  * \param psz_option the option to parse
  * \return nothing
  */
-void __var_OptionParse( vlc_object_t *p_obj,const char *psz_option )
+void __var_OptionParse( vlc_object_t *p_obj, const char *psz_option )
 {
-    char *psz_name = (char *)psz_option;
-    char *psz_value = strchr( psz_option, '=' );
+    char *psz_name, *psz_value = strchr( psz_option, '=' );
     int  i_name_len, i_type;
     vlc_bool_t b_isno = VLC_FALSE;
     vlc_value_t val;
@@ -939,15 +938,15 @@ void __var_OptionParse( vlc_object_t *p_obj,const char *psz_option )
 
     /* It's too much of an hassle to remove the ':' when we parse
      * the cmd line :) */
-    if( i_name_len && *psz_name == ':' )
+    if( i_name_len && *psz_option == ':' )
     {
-        psz_name++;
+        psz_option++;
         i_name_len--;
     }
 
     if( i_name_len == 0 ) return;
 
-    psz_name = strndup( psz_name, i_name_len );
+    psz_name = strndup( psz_option, i_name_len );
     if( psz_value ) psz_value++;
 
     /* FIXME: :programs should be handled generically */
@@ -1252,7 +1251,7 @@ static int LookupInner( variable_t *p_vars, int i_count, uint32_t i_hash )
  * This function checks p_val's value against p_var's limitations such as
  * minimal and maximal value, step, in-list position, and modifies p_val if
  * necessary.
- *****************************************************************************/
+ ****************************************************************************/
 static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 {
     /* Check that our variable is in the list */
