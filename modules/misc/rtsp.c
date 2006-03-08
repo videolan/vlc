@@ -1133,6 +1133,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     int i, i_size;
     char *p, *psz_sdp, ip[NI_MAXNUMERICHOST], ipv;
     const char *psz_control;
+    lldiv_t d;
 
     if( httpd_ServerIP( cl, ip ) == NULL )
         return NULL;
@@ -1195,7 +1196,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 
     if( p_media->i_length > 0 )
     {
-        lldiv_t d = lldiv( p_media->i_length / 1000, 1000 );
+        d = lldiv( p_media->i_length / 1000, 1000 );
         p += sprintf( p, "a=range:npt=0-"I64Fd".%03u\r\n", d.quot,
                       (unsigned)d.rem );
     }
