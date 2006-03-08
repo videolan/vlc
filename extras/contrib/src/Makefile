@@ -1498,6 +1498,7 @@ gnutls-$(GNUTLS_VERSION).tar.bz2:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	patch -p0 < Patches/gnutls-win32.patch
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
