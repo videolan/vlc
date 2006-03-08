@@ -344,6 +344,19 @@ int64_t vlc_atoll( const char *nptr )
 #endif
 
 /*****************************************************************************
+ * lldiv: returns quotient and remainder
+ *****************************************************************************/
+#if !defined( HAVE_LLDIV )
+lldiv_t vlc_lldiv( long long numer, long long denom )
+{
+    lldiv_t d;
+    d.quot = numer / denom;
+    d.rem  = numer % denom;
+    return d;
+}
+#endif
+
+/*****************************************************************************
  * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters
  * when called with an empty argument or just '\'
  *****************************************************************************/

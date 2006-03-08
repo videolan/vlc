@@ -873,6 +873,17 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_strtoll NULL
 #endif
 
+#ifndef HAVE_LLDIV
+    typedef struct {
+        long long quot; /* Quotient. */
+        long long rem;  /* Remainder. */
+    } lldiv_t;
+#   define lldiv vlc_lldiv
+    VLC_EXPORT( lldiv_t, vlc_lldiv, ( long long numer, long long denom ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_lldiv NULL
+#endif
+
 #ifndef HAVE_SCANDIR
 #   define scandir vlc_scandir
 #   define alphasort vlc_alphasort
