@@ -126,6 +126,9 @@ vlc_module_begin();
     set_shortname( N_( "Logging" ) );
     set_description( _("File logging") );
 
+    set_category( CAT_ADVANCED );
+    set_subcategory( SUBCAT_ADVANCED_MISC );
+
     add_file( "logfile", NULL, NULL,
              N_("Log filename"), N_("Specify the log filename."), VLC_FALSE );
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,

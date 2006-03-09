@@ -1103,13 +1103,6 @@ vlc_module_begin();
     add_bool( "disable-screensaver", VLC_TRUE, NULL, SS_TEXT, SS_LONGTEXT,
               VLC_TRUE );
 
-    add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
-              VLC_TRUE );
-#if HAVE_SYSLOG_H
-    add_bool ( "syslog", VLC_FALSE, NULL, SYSLOG_TEXT, SYSLOG_LONGTEXT,
-               VLC_TRUE );
-#endif
-
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,
                    SNAP_PATH_LONGTEXT, VLC_FALSE );
@@ -1455,7 +1448,15 @@ vlc_module_begin();
         change_short('v');
     add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
         change_short('q');
-    add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
+
+    add_bool( "file-logging", VLC_FALSE, NULL, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
+              VLC_TRUE );
+#if HAVE_SYSLOG_H
+    add_bool ( "syslog", VLC_FALSE, NULL, SYSLOG_TEXT, SYSLOG_LONGTEXT,
+               VLC_TRUE );
+#endif
+
+add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
                 VLC_FALSE );
         change_string_list( ppsz_language, ppsz_language_text, 0 );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
