@@ -966,7 +966,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               backing: NSBackingStoreBuffered
               defer: YES screen: o_screen];
 
-        if( var_GetBool( p_vout, "macosx-black" ) )
+        if( var_GetBool( p_real_vout, "macosx-black" ) )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, true );
@@ -1008,7 +1008,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             BeginFullScreen( &p_fullscreen_state, NULL, 0, 0,
                              NULL, NULL, fullScreenAllowEvents );
         }
-        if( var_GetBool( p_vout, "macosx-black" ) )
+        if( var_GetBool( p_real_vout, "macosx-black" ) )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 2 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
