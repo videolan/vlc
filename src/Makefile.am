@@ -205,6 +205,8 @@ if BUILD_SHARED
 DATA_noinst_libvlc = libvlc$(LIBEXT)
 endif
 
+libvlc.dll.a: libvlc$(LIBEXT)
+
 libvlc$(LIBEXT): $(OBJECTS_libvlc_so) stamp-builtins
 	@ldfl="`$(VLC_CONFIG) --libs plugin vlc builtin $(pic)` $(INCLUDED_LIBINTL)" ; \
 	case `$(VLC_CONFIG) --linkage vlc builtin` in \
