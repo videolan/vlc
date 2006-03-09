@@ -120,14 +120,12 @@ static inline char *wxDnDFromLocale( const wxChar *stupid )
     for (braindead = stupid; *braindead; braindead++);
 
     size_t i = (braindead - stupid);
-    char *psz_local = (char *)malloc( i + 1 );
+    char psz_local[i + 1];
     do
         psz_local[i] = (char)stupid[i];
     while (i--);
 
-    char *psz_utf8 = FromLocaleDup( psz_local );
-    free( psz_local );
-    return psz_utf8;
+    return FromLocaleDup( psz_local );
 }
 #   define wxDnDLocaleFree( string ) free( string )
 #else
