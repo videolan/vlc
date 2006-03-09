@@ -38,6 +38,8 @@
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   define ENETUNREACH WSAENETUNREACH
+#   define net_errno (WSAGetLastError())
+extern const char *net_strerror( int val );
 #else
 #   if HAVE_SYS_SOCKET_H
 #      include <sys/socket.h>
@@ -51,6 +53,8 @@
 #      include <net/netdb.h>
 #   endif
 #   include <netdb.h>
+#   define net_errno errno
+#   define net_strerror strerror
 #endif
 
 # ifdef __cplusplus

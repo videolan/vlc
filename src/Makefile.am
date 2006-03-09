@@ -305,6 +305,7 @@ SOURCES_libvlc_common = \
 	network/acl.c \
 	network/getaddrinfo.c \
 	network/io.c \
+	network/net_error.c \
 	network/tcp.c \
 	network/udp.c \
 	network/httpd.c \
