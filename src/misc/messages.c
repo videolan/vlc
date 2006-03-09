@@ -296,9 +296,9 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
                       const char *psz_module,
                       const char *psz_format, va_list _args )
 {
-    int         i_header_size;               /* Size of the additionnal header */
+    int         i_header_size;             /* Size of the additionnal header */
     vlc_object_t *p_obj;
-    msg_bank_t * p_bank = &p_this->p_libvlc->msg_bank;       /* message bank */
+    msg_bank_t  *p_bank;                                     /* message bank */
     msg_queue_t *p_queue = NULL;
     char *       psz_str = NULL;                 /* formatted message string */
     char *       psz_header = NULL;
@@ -311,12 +311,14 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue_id, int i_type,
 #endif
     int i;
 
-    if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
+    if( p_this == NULL || p_this->i_flags & OBJECT_FLAGS_QUIET ||
         (p_this->i_flags & OBJECT_FLAGS_NODBG &&
          i_type == VLC_MSG_DBG ) )
     {
         return;
     }
+
+    p_bank = &p_this->p_libvlc->msg_bank;
 
     /*
      * Convert message to string
