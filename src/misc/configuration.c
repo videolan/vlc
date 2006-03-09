@@ -894,7 +894,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     case CONFIG_ITEM_FLOAT:
                         if( !*psz_option_value )
                             break;                    /* ignore empty option */
-                        p_item->f_value = (float)atof( psz_option_value);
+                        p_item->f_value = (float)i18n_atof( psz_option_value);
                         p_item->f_value_saved = p_item->f_value;
 #if 0
                         msg_Dbg( p_this, "option \"%s\", value %f",
