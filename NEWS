@@ -5,7 +5,7 @@ Changes between 0.8.4a and 0.8.5-svn (not yet released):
 
 Core support:
  * Statistics collection (bitrates, packets, connections, ...)
- * Support for downloading update
+ * Support for downloading updates
 
 Input:
  * Initial support for RTSP-over-HTTP (to allow NAT traversal)
@@ -20,7 +20,7 @@ Input:
 Decoders:
  * Cook (Real audio) support
 
-Playlist / Services discovery :
+Playlist / Services discovery:
  * Podcast support
 
 Audio output:
@@ -28,9 +28,9 @@ Audio output:
 
 Video output:
  * New video filters: 
-    - magnify : allows you to zoom on part of the image
-    - gradient and edge detection : "cartoon-like" effect
-    - bluescreen : overlay a video transparently on another one
+    - magnify: allows you to zoom on part of the image
+    - gradient and edge detection: "cartoon-like" effect
+    - bluescreen: overlay a video transparently on another one
  * Logo video filter: can now loop through multiple images
  * RSS video filter: display feed images. Support for Atom feeds.
  * Improvements to the subtitles rendering
@@ -45,7 +45,7 @@ Interfaces:
     - ...
  * wxWidgets
     - VLM (VideoLAN Media Manager) control panel
-    - Improve the media information panel (show statistics, metadata, ...)
+    - Improved media information panel (shows statistics, metadata, ...)
     - Drag & Drop support in the playlist
  * Skins2 
     - Support for Winamp 2 skins
@@ -54,6 +54,7 @@ Interfaces:
  * OS X
     - Embedded Video output
     - new Go-To-Specific-Time feature
+    - Improved media information panel (shows statistics, metadata, ...)
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
  * HTTP
