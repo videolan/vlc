@@ -2,6 +2,7 @@
  * tcp.c:
  *****************************************************************************
  * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2005-2006 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
@@ -41,6 +42,14 @@
 #endif
 
 #include "network.h"
+#if defined (WIN32) || defined (UNDER_CE)
+#   undef EINPROGRESS
+#   define EINPROGRESS WSAEWOULDBLOCK
+#   undef EINTR
+#   define EINTR WSAEINTR
+#   undef ETIMEDOUT
+#   define ETIMEDOUT WSAETIMEDOUT
+#endif
 
 static int SocksNegociate( vlc_object_t *, int fd, int i_socks_version,
                            char *psz_socks_user, char *psz_socks_passwd );
@@ -63,8 +72,8 @@ int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
     struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
     char            *psz_socks;
-    int             i_realport, i_val, i_handle = -1;
-    vlc_bool_t      b_unreach = VLC_FALSE;
+    int             i_realport, i_val, i_handle = -1, i_saved_errno = 0;
+    unsigned        u_errstep = 0;
 
     if( i_port == 0 )
         i_port = 80; /* historical VLC thing */
@@ -104,14 +113,20 @@ int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         return -1;
     }
 
-    for( ptr = res; (ptr != NULL) && (i_handle == -1); ptr = ptr->ai_next )
+    for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
-        int fd;
-
-        fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
-                         ptr->ai_protocol );
+        int fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
+                             ptr->ai_protocol );
         if( fd == -1 )
+        {
+            if( u_errstep <= 0 )
+            {
+                u_errstep = 1;
+                i_saved_errno = net_errno;
+            }
+            msg_Dbg( p_this, "socket error: %s", strerror( net_errno ) );
             continue;
+        }
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
@@ -120,29 +135,16 @@ int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             struct timeval tv;
             vlc_value_t timeout;
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-            if( WSAGetLastError() != WSAEWOULDBLOCK )
+            if( net_errno != EINPROGRESS )
             {
-                if( WSAGetLastError () == WSAENETUNREACH )
-                    b_unreach = VLC_TRUE;
-                else
-                    msg_Warn( p_this, "connection to %s port %d failed (%d)",
-                              psz_host, i_port, WSAGetLastError( ) );
-                net_Close( fd );
-                continue;
+                if( u_errstep <= 1 )
+                {
+                    u_errstep = 2;
+                    i_saved_errno = net_errno;
+                }
+                msg_Dbg( p_this, "connect error: %s", strerror( net_errno ) );
+                goto next_ai;
             }
-#else
-            if( errno != EINPROGRESS )
-            {
-                if( errno == ENETUNREACH )
-                    b_unreach = VLC_TRUE;
-                else
-                    msg_Warn( p_this, "connection to %s port %d : %s", psz_host,
-                              i_port, strerror( errno ) );
-                net_Close( fd );
-                continue;
-            }
-#endif
 
             var_Create( p_this, "ipv4-timeout",
                         VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -155,9 +157,10 @@ int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             d = div( timeout.i_int, 100 );
 
             msg_Dbg( p_this, "connection in progress" );
-            do
+            for (;;)
             {
                 fd_set fds;
+                int i_ret;
 
                 if( p_this->b_die )
                 {
@@ -172,71 +175,67 @@ int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
                 FD_ZERO( &fds );
                 FD_SET( fd, &fds );
 
-                /* We'll wait 0.1 second if nothing happens */
+                /*
+                 * We'll wait 0.1 second if nothing happens
+                 * NOTE:
+                 * time out will be shortened if we catch a signal (EINTR)
+                 */
                 tv.tv_sec = 0;
                 tv.tv_usec = (d.quot > 0) ? 100000 : (1000 * d.rem);
 
-                i_val = select( fd + 1, NULL, &fds, NULL, &tv );
+                i_ret = select( fd + 1, NULL, &fds, NULL, &tv );
+                if( i_ret == 1 )
+                    break;
+
+                if( ( i_ret == -1 ) && ( net_errno != EINTR ) )
+                {
+                    msg_Warn( p_this, "select error: %s",
+                              strerror( net_errno ) );
+                    goto next_ai;
+                }
 
                 if( d.quot <= 0 )
                 {
-                    msg_Dbg( p_this, "connection timed out" );
-                    net_Close( fd );
-                    fd = -1;
-                    break;
+                    msg_Dbg( p_this, "select timed out" );
+                    if( u_errstep <= 2 )
+                    {
+                        u_errstep = 3;
+                        i_saved_errno = ETIMEDOUT;
+                    }
+                    goto next_ai;
                 }
 
                 d.quot--;
-            }
-            while( ( i_val == 0 ) || ( ( i_val < 0 ) &&
-#if defined( WIN32 ) || defined( UNDER_CE )
-                            ( WSAGetLastError() == WSAEWOULDBLOCK )
-#else
-                            ( errno == EINTR )
-#endif
-                     ) );
-
-            if( fd == -1 )
-                continue; /* timeout */
-
-            if( i_val < 0 )
-            {
-                msg_Warn( p_this, "connection aborted (select failed)" );
-                net_Close( fd );
-                continue;
             }
 
 #if !defined( SYS_BEOS ) && !defined( UNDER_CE )
             if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
                             &i_val_size ) == -1 || i_val != 0 )
             {
-                if( i_val == ENETUNREACH )
-                    b_unreach = VLC_TRUE;
-                else
-                {
-#ifdef WIN32
-                    msg_Warn( p_this, "connection to %s port %d failed (%d)",
-                              psz_host, i_port, WSAGetLastError( ) );
-#else
-                    msg_Warn( p_this, "connection to %s port %d : %s", psz_host,
-                              i_port, strerror( i_val ) );
-#endif
-                }
-                net_Close( fd );
-                continue;
+                u_errstep = 4;
+                i_saved_errno = i_val;
+                msg_Dbg( p_this, "connect error (via getsockopt): %s",
+                         net_strerror( i_val ) );
+                goto next_ai;
             }
 #endif
         }
+
         i_handle = fd; /* success! */
+        break;
+
+next_ai: /* failure */
+        net_Close( fd );
+        continue;
     }
 
     vlc_freeaddrinfo( res );
 
     if( i_handle == -1 )
     {
-        if( b_unreach )
-            msg_Err( p_this, "Host %s port %d is unreachable", psz_host,
-                     i_port );
+        msg_Err( p_this, "Connection to %s port %d failed: %s", psz_host,
+                 i_port, net_strerror( i_saved_errno ) );
+        free( psz_socks );
         return -1;
     }
 
@@ -302,15 +301,11 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         /* Bind the socket */
         if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Warn( p_this, "cannot bind socket (%i)", WSAGetLastError( ) );
-            net_Close( fd );
-            continue;
-#else
             int saved_errno;
 
             saved_errno = errno;
             net_Close( fd );
+#if !defined(WIN32) && !defined(UNDER_CE)
             fd = rootwrap_bind( ptr->ai_family, ptr->ai_socktype,
                                 ptr->ai_protocol, ptr->ai_addr,
                                 ptr->ai_addrlen );
@@ -319,24 +314,19 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
                 msg_Dbg( p_this, "got socket %d from rootwrap", fd );
             }
             else
+#endif
             {
                 msg_Warn( p_this, "cannot bind socket (%s)",
                           strerror( saved_errno ) );
                 continue;
             }
-#endif
         }
 
         /* Listen */
         if( listen( fd, 100 ) == -1 )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "cannot bring socket in listening mode (%i)",
-                     WSAGetLastError());
-#else
             msg_Err( p_this, "cannot bring the socket in listening mode (%s)",
-                     strerror( errno ) );
-#endif
+                     net_strerror( net_errno ) );
             net_Close( fd );
             continue;
         }
@@ -398,7 +388,7 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
         timeout.tv_usec = b_block ? 500000 : i_wait;
 
         i_val = select( i_val + 1, &fds_r, NULL, &fds_e, &timeout );
-        if( ( ( i_val < 0 ) && ( errno == EINTR ) ) || i_val == 0 )
+        if( ( ( i_val < 0 ) && ( net_errno == EINTR ) ) || i_val == 0 )
         {
             if( b_block )
                 continue;
@@ -407,11 +397,8 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
         }
         else if( i_val < 0 )
         {
-#if defined(WIN32) || defined(UNDER_CE)
-            msg_Err( p_this, "network select error (%i)", WSAGetLastError() );
-#else
-            msg_Err( p_this, "network select error (%s)", strerror( errno ) );
-#endif
+            msg_Err( p_this, "network select error (%s)",
+                     net_strerror( net_errno ) );
             return -1;
         }
 
@@ -424,13 +411,8 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 
             i_val = accept( i_fd, NULL, 0 );
             if( i_val < 0 )
-            {
-#if defined(WIN32) || defined(UNDER_CE)
-                msg_Err( p_this, "accept failed (%i)", WSAGetLastError() );
-#else
-                msg_Err( p_this, "accept failed (%s)", strerror( errno ) );
-#endif
-            }
+                msg_Err( p_this, "accept failed (%s)",
+                         net_strerror( net_errno ) );
             else
             {
                 /*
