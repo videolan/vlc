@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sfilter.m: MacOS X Subpicture filters dialogue
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2006 the VideoLAN team
  * $Id:$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
@@ -36,7 +36,6 @@
 /* TODO:
     - check for memory leaks
     - save the preferences, if requested
-    - fix stupid compilation warnings
 */
 
 @implementation VLCsFilters
@@ -242,6 +241,14 @@ static VLCsFilters *_o_sharedInstance = nil;
     /* called from intf.m */
     [o_sfilter_win displayIfNeeded];
     [o_sfilter_win makeKeyAndOrderFront:nil];
+
+    /* show a warning until the panel is removed for 0.8.5
+     * This isn't to be localised */
+    NSBeginCriticalAlertSheet( @"Implementation incomplete", @"OK", \
+        @"", @"", o_sfilter_win, nil, nil, nil, nil, @"The panel " \
+        "you just opened is not implemented completely and contains " \
+        "various limitations and certain bugs. Be warned.\n\nIt isn't going " \
+        "to be included within the final build of VLC 0.8.5." );
 
     intf_thread_t * p_intf = VLCIntf;
 
