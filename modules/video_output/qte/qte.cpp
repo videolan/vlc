@@ -4,8 +4,8 @@
  * Copyright (C) 1998-2003 the VideoLAN team
  * $Id$
  *
- * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
- *          Jean-Paul Saman <jpsaman@wxs.nl>
+ * Authors: Gerald Hansink <gerald.hansink@ordina.nl>
+ *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

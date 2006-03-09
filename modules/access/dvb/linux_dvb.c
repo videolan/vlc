@@ -5,7 +5,7 @@
  *
  * Authors: Damien Lucas <nitrox@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
- *          Jean-Paul Saman <jpsaman@wxs.nl>
+ *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *          Christopher Ross <chris@tebibyte.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *

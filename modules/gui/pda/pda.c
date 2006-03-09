@@ -4,7 +4,7 @@
  * Copyright (C) 2002 the VideoLAN team
  * $Id$
  *
- * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
+ * Authors: Jean-Paul Saman <jpsaman  _at_ videolan _dot_ org>
  *          Marc Ariberti <marcari@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify

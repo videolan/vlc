@@ -6,7 +6,7 @@
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
- *          Jean-Paul Saman <jpsaman@wxs.nl>
+ *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

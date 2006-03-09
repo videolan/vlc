@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2005 the VideoLAN team
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
- *          Jean-Paul Saman <jpsaman@saman>
+ *          Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *          Christopher Ross <chris@tebibyte.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
