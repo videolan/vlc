@@ -1,0 +1,303 @@
+------------------------------------------------------------------------
+r13743 | xtophe | 2005-12-14 23:57:31 +0100 (Wed, 14 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+small remark
+
+------------------------------------------------------------------------
+r13705 | zorglub | 2005-12-12 19:14:23 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+Minor changes to release howto
+
+------------------------------------------------------------------------
+r13692 | dionoea | 2005-12-12 01:09:40 +0100 (Mon, 12 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+add note about testing the win32 installer *and* uninstaller
+
+------------------------------------------------------------------------
+r13603 | ipkiss | 2005-12-06 21:12:34 +0100 (Tue, 06 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+ * doc/skins/skins2-howto.xml: A few fixes and additions.
+
+------------------------------------------------------------------------
+r13577 | asmax | 2005-12-05 22:40:46 +0100 (Mon, 05 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+* several updates: animations, percent vars, equalizer...
+
+------------------------------------------------------------------------
+r13536 | ipkiss | 2005-12-04 17:54:17 +0100 (Sun, 04 Dec 2005) | 3 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/share/skins2/skin.dtd
+
+ * share/skins2/skin.dtd: Video.autoresize defaults to true
+ * doc/skins/skins2-howto.xml: Added documentation for this attribute
+
+------------------------------------------------------------------------
+r13487 | ipkiss | 2005-12-01 23:30:39 +0100 (Thu, 01 Dec 2005) | 3 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+ * doc/skins/skins2-howto.xml: Documented the new attributes of the Text
+   control, and fixed a few details
+
+------------------------------------------------------------------------
+r13320 | zorglub | 2005-11-22 11:33:45 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+One more update to release howto
+
+------------------------------------------------------------------------
+r13315 | zorglub | 2005-11-22 11:02:46 +0100 (Tue, 22 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+Update release howto
+
+------------------------------------------------------------------------
+r13310 | xtophe | 2005-11-21 20:59:32 +0100 (Mon, 21 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+release-howto: add a few notes about contribs
+
+------------------------------------------------------------------------
+r13309 | dionoea | 2005-11-21 20:47:45 +0100 (Mon, 21 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/release-howto.txt
+
+translated release howto to english (and updated some stuff)
+
+------------------------------------------------------------------------
+r13303 | zcot | 2005-11-21 04:15:46 +0100 (Mon, 21 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/developer/configure.ac
+   M /trunk/doc/intf-cdda.txt
+   M /trunk/doc/intf-vcd.txt
+   M /trunk/doc/subtitles/cvd-subtitles.txt
+   M /trunk/doc/subtitles/svcd-ogt-subtitles.txt
+   M /trunk/modules/gui/skins2/commands/cmd_minimize.cpp
+   M /trunk/modules/gui/skins2/commands/cmd_minimize.hpp
+   M /trunk/modules/gui/skins2/commands/cmd_playtree.cpp
+   M /trunk/modules/gui/skins2/commands/cmd_playtree.hpp
+   M /trunk/modules/gui/wxwidgets/interface.cpp
+   M /trunk/modules/gui/wxwidgets/interface.hpp
+
+implement some minimum size of wx interface at all times. closes ticket #360.
+
+------------------------------------------------------------------------
+r13152 | ipkiss | 2005-11-07 23:10:17 +0100 (Mon, 07 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+ * doc/skins/skins2-howto: document the SubBitmap tag
+
+------------------------------------------------------------------------
+r13126 | dionoea | 2005-11-03 21:03:41 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/fortunes.txt
+
+...
+
+------------------------------------------------------------------------
+r12604 | massiot | 2005-09-19 14:32:57 +0200 (Mon, 19 Sep 2005) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/doc/fortunes.txt
+   M /trunk/modules/mux/mpeg/ts.c
+
+ * modules/mux/mpeg/ts.c: Detect older versions of libdvbpsi.
+
+------------------------------------------------------------------------
+r12547 | massiot | 2005-09-14 01:55:44 +0200 (Wed, 14 Sep 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/fortunes.txt
+
+Fortuuuuune.
+
+------------------------------------------------------------------------
+r12546 | massiot | 2005-09-14 00:33:49 +0200 (Wed, 14 Sep 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/fortunes.txt
+
+Fortuuuuune.
+
+------------------------------------------------------------------------
+r12537 | massiot | 2005-09-13 16:45:46 +0200 (Tue, 13 Sep 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/fortunes.txt
+
+Fortuuuune
+
+------------------------------------------------------------------------
+r12513 | massiot | 2005-09-11 14:06:39 +0200 (Sun, 11 Sep 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/fortunes.txt
+
+fortuuuuune
+
+------------------------------------------------------------------------
+r12256 | zorglub | 2005-08-19 01:05:36 +0200 (Fri, 19 Aug 2005) | 4 lines
+Changed paths:
+   M /trunk/doc/Doxyfile
+   M /trunk/modules/control/http/http.h
+   M /trunk/modules/control/http/macro.c
+   M /trunk/modules/control/http/util.c
+
+Fix consistency of some function names
+Improve documentation
+Enable build of modules documentation
+
+------------------------------------------------------------------------
+r12056 | ipkiss | 2005-08-07 12:56:07 +0200 (Sun, 07 Aug 2005) | 4 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/commands/cmd_dialogs.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+   M /trunk/modules/gui/skins2/src/dialogs.cpp
+   M /trunk/modules/gui/skins2/src/dialogs.hpp
+   M /trunk/modules/gui/skins2/src/generic_layout.cpp
+   M /trunk/modules/gui/wxwidgets/menus.cpp
+
+ * wxwidgets/menus.cpp: Added "Open Directory" in the wx popup menu
+ * skins2: Added dialogs.directory() and dialogs.streamingWizard() actions
+ * doc/skins/skins2-howto.xml: Updated the doc accordingly
+
+------------------------------------------------------------------------
+r11788 | rocky | 2005-07-19 02:28:19 +0200 (Tue, 19 Jul 2005) | 5 lines
+Changed paths:
+   M /trunk/config.in
+   M /trunk/doc/Configure.help
+
+doc/Configure.help: document libcdio, cddax, cdda, vcd, and vcdx
+
+config.in: a typo in the CONFIG_ name.
+
+
+------------------------------------------------------------------------
+r11458 | zorglub | 2005-06-18 12:31:42 +0200 (Sat, 18 Jun 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/strings.txt
+   M /trunk/doc/translations.txt
+
+Deprecate old docs
+
+------------------------------------------------------------------------
+r11009 | ipkiss | 2005-05-14 16:39:05 +0200 (Sat, 14 May 2005) | 4 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/controls/ctrl_list.cpp
+   M /trunk/modules/gui/skins2/controls/ctrl_list.hpp
+   M /trunk/modules/gui/skins2/parser/builder.cpp
+   M /trunk/modules/gui/skins2/parser/builder_data.def
+   M /trunk/modules/gui/skins2/parser/builder_data.hpp
+   M /trunk/modules/gui/skins2/parser/skin_parser.cpp
+   M /trunk/share/skins2/skin.dtd
+
+ * skins2: New Playlist.bgimage attribute, to specify a background image for
+   the Playlist control. If no image is specified (default behaviour), the
+   background is filled like before, with the bgcolor1 and bgcolor2 attributes.
+
+------------------------------------------------------------------------
+r11005 | ipkiss | 2005-05-14 13:14:22 +0200 (Sat, 14 May 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+ * doc/skins/skins2-howto.xml: Always check what you write in the doc...
+
+------------------------------------------------------------------------
+r11004 | ipkiss | 2005-05-14 12:38:26 +0200 (Sat, 14 May 2005) | 3 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+ * doc/skins/skins2-howto.xml: document the 'resize' attribute of the Image
+   control
+
+------------------------------------------------------------------------
+r10860 | ipkiss | 2005-05-01 13:15:42 +0200 (Sun, 01 May 2005) | 3 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+ * doc/skins/skins2-howto.xml: Added the playlist.sort() action, which was
+   missing in the doc
+
+------------------------------------------------------------------------
+r10771 | ipkiss | 2005-04-23 00:35:51 +0200 (Sat, 23 Apr 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+Updated skins2 doc.
+
+------------------------------------------------------------------------
+r10401 | ipkiss | 2005-03-21 20:24:06 +0100 (Mon, 21 Mar 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+   M /trunk/modules/gui/skins2/commands/cmd_input.cpp
+   M /trunk/modules/gui/skins2/commands/cmd_input.hpp
+   M /trunk/modules/gui/skins2/parser/interpreter.cpp
+
+ * skins2: added vlc.volumeUp() and vlc.volumeDown() actions
+
+------------------------------------------------------------------------
+r10387 | sam | 2005-03-19 09:34:30 +0100 (Sat, 19 Mar 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/vlc.1
+
+  * doc/vlc.1: spelling
+
+------------------------------------------------------------------------
+r10315 | massiot | 2005-03-12 15:31:10 +0100 (Sat, 12 Mar 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/fortunes.txt
+
+fortuuuuune
+
+------------------------------------------------------------------------
+r10134 | yoann | 2005-03-04 13:55:48 +0100 (Fri, 04 Mar 2005) | 2 lines
+Changed paths:
+   M /trunk/doc/vlm.txt
+   M /trunk/src/misc/vlm.c
+
+* update VLM help about inputdel
+
+------------------------------------------------------------------------
+r10077 | hartman | 2005-03-01 10:28:37 +0100 (Tue, 01 Mar 2005) | 4 lines
+Changed paths:
+   M /trunk/NEWS
+   M /trunk/doc/lirc/example.lircrc
+   M /trunk/modules/control/lirc.c
+
+* simplified the lirc code to listen for key-* strings which we can directly use to trigger hotkeys.
+* updated the example.lircrc with new required strings
+* added a notice to NEWS about changed lirc syntax.
+
+------------------------------------------------------------------------
+r9933 | dionoea | 2005-02-14 22:41:21 +0100 (Mon, 14 Feb 2005) | 5 lines
+Changed paths:
+   M /trunk/doc/vlc.1
+
+ * small man page update. It'd be nice to the http://videolan.org/doc
+  url somewhere but i don't know where man page conventions would put
+  that.
+
+
+------------------------------------------------------------------------
+r9746 | sam | 2005-01-15 05:41:24 +0100 (Sat, 15 Jan 2005) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   A /trunk/doc/ChangeLog-2004
+   M /trunk/doc/Makefile.am
+
+  * Moved 2004 changelog to doc/.
+
+------------------------------------------------------------------------
