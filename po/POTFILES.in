@@ -860,9 +860,6 @@ modules/mux/mpeg/ps.c
 modules/mux/mpeg/ts.c
 modules/mux/mpjpeg.c
 modules/mux/ogg.c
-modules/mux/rtp/rtcp.c
-modules/mux/rtp/rtcp.h
-modules/mux/rtp/rtp.h
 modules/mux/wav.c
 modules/packetizer/copy.c
 modules/packetizer/h264.c
