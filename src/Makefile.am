@@ -2,6 +2,8 @@
 # Automake targets and declarations
 ###############################################################################
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 NULL =
 SUBDIRS =
 
@@ -291,7 +293,7 @@ SOURCES_libvlc_common = \
 	audio_output/common.c \
 	audio_output/dec.c \
 	audio_output/filters.c \
-	audio_output/ainput.c \
+	audio_output/input.c \
 	audio_output/mixer.c \
 	audio_output/output.c \
 	audio_output/intf.c \
@@ -334,12 +336,12 @@ SOURCES_libvlc_common = \
 	misc/hashtables.c \
 	misc/version.c \
 	extras/libc.c \
-	control/libvlc_core.c \
-	control/libvlc_playlist.c \
-	control/libvlc_vlm.c \
-	control/libvlc_input.c \
-	control/libvlc_video.c \
-	control/libvlc_audio.c \
+	control/core.c \
+	control/playlist.c \
+	control/vlm.c \
+	control/input.c \
+	control/video.c \
+	control/audio.c \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c \
