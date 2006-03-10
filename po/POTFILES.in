@@ -73,24 +73,24 @@ include/vlc/vout.h
 include/vlc_xml.h
 include/vout_synchro.h
 include/win32_specific.h
-src/audio_output/ainput.c
 src/audio_output/common.c
 src/audio_output/dec.c
 src/audio_output/filters.c
+src/audio_output/input.c
 src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
-src/control/libvlc_audio.c
-src/control/libvlc_core.c
-src/control/libvlc_input.c
-src/control/libvlc_playlist.c
-src/control/libvlc_video.c
-src/control/libvlc_vlm.c
+src/control/audio.c
+src/control/core.c
+src/control/input.c
 src/control/mediacontrol_audio_video.c
 src/control/mediacontrol_core.c
 src/control/mediacontrol_init.c
 src/control/mediacontrol_plugin.c
 src/control/mediacontrol_util.c
+src/control/playlist.c
+src/control/video.c
+src/control/vlm.c
 src/extras/dirent.c
 src/extras/getopt1.c
 src/extras/getopt.c
@@ -138,10 +138,10 @@ src/misc/vlm.c
 src/misc/win32_specific.c
 src/misc/xml.c
 src/network/acl.c
+src/network/error.c
 src/network/getaddrinfo.c
 src/network/httpd.c
 src/network/io.c
-src/network/net_error.c
 src/network/rootwrap.c
 src/network/tcp.c
 src/network/tls.c
@@ -169,6 +169,7 @@ src/video_output/vout_pictures.c
 src/video_output/vout_pictures.h
 src/video_output/vout_subpictures.c
 src/video_output/vout_synchro.c
+src/vlc.c
 
 # modules
 modules/access/cdda/access.c

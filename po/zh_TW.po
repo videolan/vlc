@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-10 13:41+0100\n"
+"POT-Creation-Date: 2006-03-10 18:34+0100\n"
 "PO-Revision-Date: 2005-02-12 12:14+0100\n"
 "Last-Translator: Frank Chao <frank0624@gmail.com>\n"
 "Language-Team: zh_TW\n"
@@ -85,12 +85,12 @@ msgstr "濾波器"
 msgid "Audio filters are used to postprocess the audio stream"
 msgstr ""
 
-#: include/vlc_config_cat.h:61 src/audio_output/ainput.c:78
+#: include/vlc_config_cat.h:61 src/audio_output/input.c:78
 #: modules/gui/macosx/intf.m:545 modules/gui/macosx/intf.m:546
 msgid "Visualizations"
 msgstr "視覺效果"
 
-#: include/vlc_config_cat.h:63 src/audio_output/ainput.c:152
+#: include/vlc_config_cat.h:63 src/audio_output/input.c:152
 msgid "Audio visualizations"
 msgstr "音訊視覺效果"
 
@@ -614,32 +614,32 @@ msgid ""
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 
-#: src/audio_output/ainput.c:80 src/audio_output/ainput.c:126
+#: src/audio_output/input.c:80 src/audio_output/input.c:126
 #: src/input/es_out.c:361 src/libvlc.h:365 src/video_output/video_output.c:379
 #: modules/codec/ffmpeg/postprocess.c:94
 msgid "Disable"
 msgstr "關閉"
 
-#: src/audio_output/ainput.c:82 modules/visualization/visual/visual.c:129
+#: src/audio_output/input.c:82 modules/visualization/visual/visual.c:129
 #, fuzzy
 msgid "Spectrometer"
 msgstr "頻譜"
 
-#: src/audio_output/ainput.c:84
+#: src/audio_output/input.c:84
 msgid "Scope"
 msgstr "示波器"
 
-#: src/audio_output/ainput.c:86
+#: src/audio_output/input.c:86
 msgid "Spectrum"
 msgstr "頻譜"
 
-#: src/audio_output/ainput.c:123 modules/audio_filter/equalizer.c:66
+#: src/audio_output/input.c:123 modules/audio_filter/equalizer.c:66
 #: modules/gui/macosx/equalizer.m:140 modules/gui/macosx/equalizer.m:154
 #: modules/gui/macosx/intf.m:571 modules/gui/wxwidgets/extrapanel.cpp:179
 msgid "Equalizer"
 msgstr "等化器"
 
-#: src/audio_output/ainput.c:145 src/libvlc.h:184
+#: src/audio_output/input.c:145 src/libvlc.h:184
 #: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:392
 msgid "Audio filters"
 msgstr "音訊濾波器"
