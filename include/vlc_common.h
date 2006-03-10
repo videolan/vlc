@@ -873,7 +873,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_strtoll NULL
 #endif
 
-#if !defined(HAVE_LLDIV) || defined(SYS_BEOS)
+#if defined(SYS_BEOS)
     typedef struct {
         long long quot; /* Quotient. */
         long long rem;  /* Remainder. */
