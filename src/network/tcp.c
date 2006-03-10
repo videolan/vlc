@@ -296,14 +296,17 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
         fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
                          ptr->ai_protocol );
         if( fd == -1 )
+        {
+            msg_Dbg( p_this, "socket error: %s", net_strerror( net_errno ) );
             continue;
+        }
 
         /* Bind the socket */
         if( bind( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
             int saved_errno;
 
-            saved_errno = errno;
+            saved_errno = net_errno;
             net_Close( fd );
 #if !defined(WIN32) && !defined(UNDER_CE)
             fd = rootwrap_bind( ptr->ai_family, ptr->ai_socktype,
@@ -316,8 +319,8 @@ int *__net_ListenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
             else
 #endif
             {
-                msg_Warn( p_this, "cannot bind socket (%s)",
-                          strerror( saved_errno ) );
+                msg_Err( p_this, "cannot bind socket (%s)",
+                         net_strerror( saved_errno ) );
                 continue;
             }
         }
