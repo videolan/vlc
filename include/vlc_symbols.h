@@ -479,6 +479,7 @@ struct module_symbols_t
     const char * (*config_GetDataDir_inner) (const vlc_object_t *);
     double (*us_atof_inner) (const char *);
     double (*us_strtod_inner) (const char *, char **);
+    lldiv_t (*vlc_lldiv_inner) (long long numer, long long denom);
 };
 # if defined (__PLUGIN__)
 #  define aout_FiltersCreatePipeline (p_symbols)->aout_FiltersCreatePipeline_inner
@@ -938,6 +939,7 @@ struct module_symbols_t
 #  define config_GetDataDir (p_symbols)->config_GetDataDir_inner
 #  define us_atof (p_symbols)->us_atof_inner
 #  define us_strtod (p_symbols)->us_strtod_inner
+#  define vlc_lldiv (p_symbols)->vlc_lldiv_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -1400,6 +1402,7 @@ struct module_symbols_t
     ((p_symbols)->config_GetDataDir_inner) = config_GetDataDir; \
     ((p_symbols)->us_atof_inner) = us_atof; \
     ((p_symbols)->us_strtod_inner) = us_strtod; \
+    ((p_symbols)->vlc_lldiv_inner) = vlc_lldiv; \
     (p_symbols)->net_ConvertIPv4_deprecated = NULL; \
     (p_symbols)->__stats_CounterGet_deprecated = NULL; \
     (p_symbols)->__stats_TimerDumpAll_deprecated = NULL; \
