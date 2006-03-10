@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ftp.c: FTP input module
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2006 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr> - original code
@@ -264,12 +264,12 @@ static int Open( vlc_object_t *p_this )
         p_sys->fd_cmd = -1;
         *p_sys->sz_epsv_ip = '\0';
 
+        msg_Info( p_access, "FTP Extended passive mode disabled" );
+
         if( ( p_sys->fd_cmd = Connect( p_access, p_sys ) ) < 0 )
            goto exit_error;
-
-        msg_Info( p_access, "FTP Extended passive mode disabled" );
     }
-    
+
     /* binary mode */
     if( ftp_SendCommand( p_access, "TYPE I" ) < 0 ||
         ftp_ReadCommand( p_access, &i_answer, NULL ) != 2 )
