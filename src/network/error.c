@@ -1,5 +1,5 @@
 /*****************************************************************************
- * net_error.c: Network error handling
+ * error.c: Network error handling
  *****************************************************************************
  * Copyright (C) 2006 Rémi Denis-Courmont
  * $Id$
