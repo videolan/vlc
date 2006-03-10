@@ -40,6 +40,9 @@ SUFFIXES =
 
 DISTCHECK_CONFIGURE_FLAGS = --disable-dvd --disable-mad --disable-libmpeg2 \
 	--disable-ffmpeg --disable-faad --disable-skins2
+if USE_LIBTOOL
+DISTCHECK_CONFIGURE_FLAGS += --enable-libtool
+endif
 
 # Tell aclocal to use -I m4. Wonder if it really works.
 ACLOCAL_AMFLAGS = -I m4
@@ -225,6 +228,8 @@ endif
 # old automake-1.5 bug (automake/279).
 DEPENDENCIES_vlc = src/$(LIB_libvlc) $(DATA_win32_rc)
 
+vlc_LDADD = $(DATA_win32_rc) $(LIBVLC)
+
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 if USE_LIBTOOL
 vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc`
@@ -245,8 +250,8 @@ LIB_libvlc = libvlc.a
 LIBVLC = src/$(LIB_libvlc)
 DEPENDENCIES_vlc += stamp-builtin
 endif
+vlc_LDADD += $(INCLUDED_LIBINTL)
 endif
-vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(INCLUDED_LIBINTL)
 
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.
