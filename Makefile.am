@@ -153,8 +153,18 @@ EXTRA_DIST += \
 	extras/MacOSX/Delete_Preferences.app/Contents/Resources/applet.icns \
 	extras/MacOSX/Delete_Preferences.app/Contents/Resources/applet.rsrc \
 	extras/MacOSX/Delete_Preferences.app/Contents/Resources/Scripts/main.scpt \
+	$(NULL)
+
+###############################################################################
+# Various utilities ( editor syntax files, ... )
+##############################################################################
+EXTRA_DIST += \
 	extras/Makefile \
 	extras/zsh.cpp \
+	extras/emacs.init \
+	extras/vlc.vim \
+	extras/make.pl \
+	extras/valgrind.suppressions \
 	$(NULL)
 
 ###############################################################################
