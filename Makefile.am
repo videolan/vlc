@@ -46,7 +46,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 # XXX: these flags could be set in configure.ac, but we set them here
 # because old versions of automake don't support them in configure.ac.
-AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
+AUTOMAKE_OPTIONS = dist-bzip2
 
 ###############################################################################
 # MacOS X project
@@ -212,7 +212,7 @@ DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
 
 bin_PROGRAMS = vlc
 
-vlc_SOURCES = vlc.c
+vlc_SOURCES = src/vlc.c
 # Ugly kludge so that automake defines $(CXXLINK)
 EXTRA_vlc_SOURCES = extras/zsh.cpp
 
