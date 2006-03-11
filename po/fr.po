@@ -330,7 +330,7 @@ msgid ""
 "for each sout stream module here."
 msgstr ""
 "Les modules de flux de sortie vous permettent de bâtir une chaîne de "
-"traiment pour le flux de sortie. Merci de bien vouloir lire le « Streaming "
+"traitement pour le flux de sortie. Merci de bien vouloir lire le « Streaming "
 "Howto » pour plus de détails. Vous pouvez configurer les options par défaut "
 "pour chaque module de flux de sortie ici."
 
@@ -12981,7 +12981,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:990
 msgid "Name of CD-ROM device to read audio CD from."
-msgstr "No du périphérique de CD-ROM où se trouve le CD Audio"
+msgstr "Nom du périphérique de CD-ROM où se trouve le CD Audio"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1293
 #, fuzzy
@@ -14254,7 +14254,7 @@ msgid ""
 "with no path."
 msgstr ""
 "Vous pouvez configurer l'adresse, le port et l'emplacement sur lequel "
-"l'interface RTSP écoutera..\n"
+"l'interface RTSP écoutera...\n"
 " La syntaxe est adresse:port/emplacement. Le comportement par défaut est "
 "d'écouter sur l'hôte local (localhost) sur le port 554, sans emplacement."
 
@@ -14870,7 +14870,7 @@ msgid ""
 msgstr ""
 "Les images provenant des sorties vidéo seront différées en conséquence (en "
 "milisecondes, >= 100 ms). Pour utiliser des valeurs élevées, augmenter le "
-"chache de fichier et les autres caches."
+"cache de fichier et les autres caches."
 
 #: modules/stream_out/bridge.c:45
 msgid "ID Offset"
@@ -15580,7 +15580,7 @@ msgstr "Contraste (0-2)"
 
 #: modules/video_filter/adjust.c:63
 msgid "Set the image contrast, between 0 and 2. Defaults to 1"
-msgstr "Fixe le contraste de l’image, entre 0 et 2. A priori 1"
+msgstr "Fixe le contraste de l’image, entre 0 et 2. 1 par défaut"
 
 #: modules/video_filter/adjust.c:64
 msgid "Image hue (0-360)"
@@ -15923,7 +15923,7 @@ msgstr "Niveau alpha"
 
 #: modules/video_filter/mosaic.c:91
 msgid "Alpha blending (0 -> 255). Default is 255"
-msgstr "Niveau alpha (de 0 à 255). La valeur par défault est 255"
+msgstr "Niveau alpha (de 0 à 255). La valeur par défaut est 255"
 
 #: modules/video_filter/mosaic.c:93
 msgid "Height in pixels"
@@ -16269,8 +16269,8 @@ msgid ""
 "Time format string (%Y = year, %m = month, %d = day, %H = hour, %M = minute, "
 "%S = second"
 msgstr ""
-"Format de l’heure (%Y = an, %m = mois, %d = jour, %H = heure, %M  =minute, %"
-"S = seconde)"
+"Format de l’heure (%Y = an, %m = mois, %d = jour, %H = heure, %M  = minute,"
+"%S = seconde)"
 
 #: modules/video_filter/time.c:88
 msgid "Time position"
@@ -16346,7 +16346,7 @@ msgstr "Fenêtres activées"
 
 #: modules/video_filter/wall.c:62
 msgid "Comma separated list of active windows, defaults to all"
-msgstr "liste de fenêtres actives, séparées par des virgules. Défault = toutes"
+msgstr "Liste de fenêtres actives, séparées par des virgules. Défaut = toutes"
 
 #: modules/video_filter/wall.c:65
 msgid "Element aspect ratio"
@@ -16419,7 +16419,7 @@ msgid ""
 "better video quality (no flickering)."
 msgstr ""
 "Essayer d’utiliser le triple tampon avec YUV. Ceci améliore beaucoup la "
-"qualité de la vidéo. (pas de scintellement)."
+"qualité de la vidéo (pas de scintillement)."
 
 #: modules/video_output/directx/directx.c:129
 msgid "Name of desired display device"
@@ -17318,8 +17318,8 @@ msgstr "Interface XOSD"
 #~ "and the empty string for the default of IANA."
 #~ msgstr ""
 #~ "Cette chaîne est une liste séparée par des virgules d’autorités de "
-#~ "nommage à rechercher. Utilisze « * » pour tout et une chaîne vide pour le "
-#~ "defaut (IANA)."
+#~ "nommage à rechercher. Utilisez « * » pour tout et une chaîne vide pour le "
+#~ "défaut (IANA)."
 
 #~ msgid "SLP LDAP filter"
 #~ msgstr "Filtre LDAP SLP"
@@ -17333,7 +17333,7 @@ msgstr "Interface XOSD"
 #~ "réponses."
 
 #~ msgid "Language requested in SLP requests"
-#~ msgstr "Language demandé dans les requêtes SLP"
+#~ msgstr "Langage demandé dans les requêtes SLP"
 
 #~ msgid ""
 #~ "RFC 1766 Language tag for the natural language locale of requests, leave "
