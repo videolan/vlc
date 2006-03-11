@@ -21,7 +21,7 @@ Decoders:
  * Cook (Real audio) support
 
 Playlist / Services discovery:
- * XSPF playlist support
+ * XSPF playlist support [ not included in 0.8.5-test1 ]
  * Podcast support
 
 Audio output:
