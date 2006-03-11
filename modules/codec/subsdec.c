@@ -181,12 +181,19 @@ static int OpenDecoder( vlc_object_t *p_this )
         if( !strcmp( val.psz_string, DEFAULT_NAME ) )
         {
             char *psz_charset;
-#ifdef __APPLE__
-            /* Most subtitles are not in UTF-8, which is the default on Mac OS X */
-            psz_charset = strdup( "ISO-8859-1" );
-#else
-            vlc_current_charset( &psz_charset );
-#endif
+
+            if( vlc_current_charset( &psz_charset ) )
+            {
+                /*
+                 * Most subtitles are not in UTF-8.
+                 * FIXME: This is western-centric. We should use a fallback
+                 * charset depending on the locale language instead.
+                 */
+                if( psz_charset != NULL)
+                    free( psz_charset );
+                psz_charset = strdup( "CP1252" );
+            }
+
             if( psz_charset == NULL )
             {
                 free( p_sys );
