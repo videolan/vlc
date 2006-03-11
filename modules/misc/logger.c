@@ -440,11 +440,18 @@ static void DoRRD( intf_thread_t *p_intf )
                                                 FIND_ANYWHERE );
     if( p_playlist && p_playlist->p_stats )
     {
-        fprintf( p_intf->p_sys->p_rrd, I64Fi":%f:%f:%f\n",
+        lldiv_t din = lldiv( p_playlist->p_stats->f_input_bitrate * 1000000,
+                             1000 );
+        lldiv_t ddm = lldiv( p_playlist->p_stats->f_demux_bitrate * 1000000,
+                             1000 );
+        lldiv_t dout = lldiv( p_playlist->p_stats->f_output_bitrate * 1000000,
+                             1000 );
+        fprintf( p_intf->p_sys->p_rrd,
+                   I64Fi":"I64Fd".%03u:"I64Fd".%03u:"I64Fd".%03u\n",
                    p_intf->p_sys->last_update/1000000,
-                   (float)(p_playlist->p_stats->f_input_bitrate)*1000,
-                   (float)(p_playlist->p_stats->f_demux_bitrate)*1000,
-                   (float)(p_playlist->p_stats->f_output_bitrate)*1000 );
+                   din.quot, (unsigned int)din.rem,
+                   ddm.quot, (unsigned int)ddm.rem,
+                   dout.quot, (unsigned int)dout.rem );
         fflush( p_intf->p_sys->p_rrd );
         vlc_object_release( p_playlist );
     }
