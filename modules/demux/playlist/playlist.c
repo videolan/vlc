@@ -84,6 +84,11 @@ vlc_module_begin();
         add_shortcut( "podcast" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_podcast), E_(Close_podcast) );
+    add_submodule();
+        set_description( _("XSPF playlist import") );
+        add_shortcut( "xspf-open" );
+        set_capability( "demux2", 10 );
+        set_callbacks( E_(xspf_import_Activate), NULL );
 vlc_module_end();
 
 

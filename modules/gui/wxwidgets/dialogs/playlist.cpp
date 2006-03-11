@@ -908,7 +908,9 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
         char *psz_desc;
         char *psz_filter;
         char *psz_module;
-    } formats[] = {{ _("M3U file"), "*.m3u", "export-m3u" }};
+    } formats[] = {{ _("M3U file"), "*.m3u", "export-m3u" },
+                   { _("XSPF playlist"), "*.xspf", "export-xspf"}
+    };
 
     wxString filter = wxT("");
 
@@ -943,7 +945,7 @@ void Playlist::OnSave( wxCommandEvent& WXUNUSED(event) )
 void Playlist::OnOpen( wxCommandEvent& WXUNUSED(event) )
 {
     wxFileDialog dialog( this, wxU(_("Open playlist")), wxT(""), wxT(""),
-        wxT("All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"), wxOPEN );
+        wxT("All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|XSPF playlist|*.xspf|M3U files|*.m3u"), wxOPEN );
 
     if( dialog.ShowModal() == wxID_OK )
     {

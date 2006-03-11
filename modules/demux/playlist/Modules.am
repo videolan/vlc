@@ -1,8 +1,14 @@
-SOURCES_playlist = playlist.c \
-		   playlist.h \
-		   old.c \
-		   m3u.c \
-                   b4s.c \
-		   pls.c \
-		   dvb.c \
-		   podcast.c 
+SOURCES_playlist = \
+	playlist.c \
+	playlist.h \
+	old.c \
+	m3u.c \
+	b4s.c \
+	pls.c \
+	dvb.c \
+	podcast.c \
+	xspf.c \
+	xspf.h \
+	$(NULL)
+
+

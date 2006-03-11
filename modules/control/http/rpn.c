@@ -420,44 +420,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         {
             char *psz_src = E_(SSPop)( st );
             char *psz_dest;
-            char *str = psz_src;
 
-            p = psz_dest = malloc( strlen( str ) * 6 + 1 );
-
-            while( *str != '\0' )
-            {
-                if( *str == '&' )
-                {
-                    strcpy( p, "&amp;" );
-                    p += 5;
-                }
-                else if( *str == '\"' )
-                {
-                    strcpy( p, "&quot;" );
-                    p += 6;
-                }
-                else if( *str == '\'' )
-                {
-                    strcpy( p, "&#039;" );
-                    p += 6;
-                }
-                else if( *str == '<' )
-                {
-                    strcpy( p, "&lt;" );
-                    p += 4;
-                }
-                else if( *str == '>' )
-                {
-                    strcpy( p, "&gt;" );
-                    p += 4;
-                }
-                else
-                {
-                    *p++ = *str;
-                }
-                str++;
-            }
-            *p = '\0';
+            psz_dest = convert_xml_special_chars( psz_src );
 
             E_(SSPush)( st, psz_dest );
             free( psz_src );

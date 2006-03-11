@@ -229,14 +229,16 @@ void Dialogs::showChangeSkin()
 void Dialogs::showPlaylistLoad()
 {
     showFileGeneric( _("Open playlist"),
-                     _("All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"),
+                     _("All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|"
+                       "M3U files|*.m3u|"
+                       "XSPF playlist|*.xspf"),
                      showPlaylistLoadCB, kOPEN );
 }
 
 
 void Dialogs::showPlaylistSave()
 {
-    showFileGeneric( _("Save playlist"), _("M3U file|*.m3u"),
+    showFileGeneric( _("Save playlist"), _("M3U file|*.m3u|XSPF playlist|*.xspf"),
                      showPlaylistSaveCB, kSAVE );
 }
 

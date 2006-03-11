@@ -403,6 +403,9 @@ connect:
         /* Grrrr! detect ultravox server and force NSV demuxer */
         p_access->psz_demux = strdup( "nsv" );
     }
+    else if( p_sys->psz_mime &&
+             !strcasecmp( p_sys->psz_mime, "application/xspf+xml" ) )
+        p_access->psz_demux = strdup( "xspf-open" );
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
 

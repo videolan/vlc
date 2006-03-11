@@ -89,6 +89,7 @@ HEADERS_include = \
 	../include/vlc_playlist.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
+	../include/vlc_strings.h \
 	../include/vlc_symbols.h \
 	../include/vlc_threads_funcs.h \
 	../include/vlc_threads.h \
@@ -321,6 +322,7 @@ SOURCES_libvlc_common = \
 	misc/modules.c \
 	misc/threads.c \
 	misc/stats.c \
+	misc/strings.c \
 	misc/unicode.c \
 	misc/cpu.c \
 	misc/configuration.c \

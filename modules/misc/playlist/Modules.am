@@ -1,3 +1,7 @@
-SOURCES_export = export.c \
-		 m3u.c    \
-		 old.c
+SOURCES_export = \
+	export.c \
+	m3u.c \
+	xspf.c \
+	xspf.h \
+	old.c \
+	$(NULL)

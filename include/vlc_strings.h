@@ -1,10 +1,10 @@
 /*****************************************************************************
- * playlist.h:  Playlist import module common functions
+ * vlc_strings.h: String functions
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
+ * Authors: Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,29 +21,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-char *E_(ProcessMRL)( char *, char * );
-char *E_(FindPrefix)( demux_t * );
+#ifndef _VLC_STRINGS_H
+#define _VLC_STRINGS_H 1
 
-vlc_bool_t E_(FindItem)( demux_t *, playlist_t *, playlist_item_t **);
+#include <vlc/vlc.h>
 
-int E_(Import_Old) ( vlc_object_t * );
+/**
+ * \defgroup strings Strings
+ * @{
+ */
 
-int E_(Import_Native) ( vlc_object_t * );
-void E_(Close_Native) ( vlc_object_t * );
+VLC_EXPORT( char *, decode_encoded_URI_duplicate, ( const char *psz ) );
+VLC_EXPORT( void, decode_encoded_URI, ( char *psz ) );
 
-int E_(Import_M3U) ( vlc_object_t * );
-void E_(Close_M3U) ( vlc_object_t * );
+VLC_EXPORT( void, resolve_xml_special_chars, ( char *psz_value ) );
+VLC_EXPORT( char *, convert_xml_special_chars, ( const char *psz_content ) );
 
-int E_(Import_PLS) ( vlc_object_t * );
-void E_(Close_PLS) ( vlc_object_t * );
+/**
+ * @}
+ */
 
-int E_(Import_B4S) ( vlc_object_t * );
-void E_(Close_B4S) ( vlc_object_t * );
-
-int E_(Import_DVB) ( vlc_object_t * );
-void E_(Close_DVB) ( vlc_object_t * );
-
-int E_(Import_podcast) ( vlc_object_t * );
-void E_(Close_podcast) ( vlc_object_t * );
-
-int E_(xspf_import_Activate) ( vlc_object_t * );
+#endif

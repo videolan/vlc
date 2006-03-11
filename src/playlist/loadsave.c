@@ -127,6 +127,9 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
         msg_Err( p_playlist, "out of memory");
         return VLC_ENOMEM;
     }
+    p_export->psz_filename = NULL;
+    if ( psz_filename )
+        p_export->psz_filename = strdup( psz_filename );
     p_export->p_file = utf8_fopen( psz_filename, "wt" );
     if( !p_export->p_file )
     {
@@ -149,8 +152,12 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     }
     module_Unneed( p_playlist , p_module );
 
+    /* Clean up */
     fclose( p_export->p_file );
-
+    if ( p_export->psz_filename )
+        free( p_export->psz_filename );
+    free ( p_export );
+    p_playlist->p_private = NULL;
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     return VLC_SUCCESS;

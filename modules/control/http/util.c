@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "http.h"
+#include "vlc_strings.h"
 
 /****************************************************************************
  * File and directory functions
@@ -747,38 +748,7 @@ char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
 
 void E_(DecodeEncodedURI)( char *psz )
 {
-    char *dup = strdup( psz );
-    char *p = dup;
-
-    while( *p )
-    {
-        if( *p == '%' )
-        {
-            char val[3];
-            p++;
-            if( !*p )
-            {
-                break;
-            }
-
-            val[0] = *p++;
-            val[1] = *p++;
-            val[2] = '\0';
-
-            *psz++ = strtol( val, NULL, 16 );
-        }
-        else if( *p == '+' )
-        {
-            *psz++ = ' ';
-            p++;
-        }
-        else
-        {
-            *psz++ = *p++;
-        }
-    }
-    *psz++ = '\0';
-    free( dup );
+    decode_encoded_URI( psz );
 }
 
 /* Since the resulting string is smaller we can work in place, so it is
