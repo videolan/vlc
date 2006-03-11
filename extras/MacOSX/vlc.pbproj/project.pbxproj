@@ -72,6 +72,7 @@
 		C2F2A707095AE51700018C74 /* play_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A703095AE51600018C74 /* play_embedded_blue.png */; };
 		C2F2A708095AE51700018C74 /* skip_forward_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */; };
 		C2F2A709095AE51700018C74 /* skip_previous_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */; };
+		CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */; };
 		CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
 		CCF3C64C0923B99D00401862 /* SFilters.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF3C64A0923B99D00401862 /* SFilters.nib */; };
 		DC7F46ED08A183FC0027DB24 /* Extended.nib in Resources */ = {isa = PBXBuildFile; fileRef = DC7F46EB08A183FC0027DB24 /* Extended.nib */; };
@@ -716,7 +717,7 @@
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VLC media player 0.8.5-test1, Copyright (c) 1996-2005 VideoLAN.</string>
+	<string>VLC media player 0.8.5-test1, Copyright (c) 1996-2006 the VideoLAN team.</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -830,7 +831,7 @@
 		8E445F9B04728A700059A3A7 /* wma.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = wma.icns; path = Resources/wma.icns; sourceTree = SOURCE_ROOT; };
 		8E445F9C04728A700059A3A7 /* wmv.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = wmv.icns; path = Resources/wmv.icns; sourceTree = SOURCE_ROOT; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
-		8E49720106417F6800370C9F /* playlistinfo.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = playlistinfo.m; path = ../../modules/gui/macosx/playlistinfo.m; sourceTree = SOURCE_ROOT; };
+		8E49720106417F6800370C9F /* playlistinfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlistinfo.m; path = ../../modules/gui/macosx/playlistinfo.m; sourceTree = SOURCE_ROOT; };
 		8E55FB7F0459B0FD00FB3317 /* output.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = output.h; path = ../../modules/gui/macosx/output.h; sourceTree = SOURCE_ROOT; };
 		8E55FB800459B0FD00FB3317 /* output.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = output.m; path = ../../modules/gui/macosx/output.m; sourceTree = SOURCE_ROOT; };
 		8E6BC6F6041643860059A3A7 /* applescript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = applescript.h; path = ../../modules/gui/macosx/applescript.h; sourceTree = SOURCE_ROOT; };
@@ -897,11 +898,12 @@
 		C2F2A703095AE51600018C74 /* play_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = play_embedded_blue.png; path = Resources/play_embedded_blue.png; sourceTree = "<group>"; };
 		C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_forward_embedded_blue.png; path = Resources/skip_forward_embedded_blue.png; sourceTree = "<group>"; };
 		C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_previous_embedded_blue.png; path = Resources/skip_previous_embedded_blue.png; sourceTree = "<group>"; };
+		CC1B4B4C09A8CF9E0078AD2E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Interaction.nib; sourceTree = "<group>"; };
+		CC1B4C1409A8EC690078AD2E /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../modules/gui/macosx/interaction.h; sourceTree = "<group>"; };
+		CC1B4C1509A8EC690078AD2E /* interaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = interaction.m; path = ../../modules/gui/macosx/interaction.m; sourceTree = "<group>"; };
 		CC26BF2B09A7A05000E94D62 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Update.nib; sourceTree = "<group>"; };
 		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
 		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
-		CC26BF3309A7A0A300E94D62 /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../modules/gui/macosx/interaction.h; sourceTree = SOURCE_ROOT; };
-		CC26BF3409A7A0A300E94D62 /* interaction.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = interaction.m; path = ../../modules/gui/macosx/interaction.m; sourceTree = SOURCE_ROOT; };
 		CCF3C64B0923B99D00401862 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SFilters.nib; sourceTree = "<group>"; };
 		CCF3C6500923B9D100401862 /* sfilters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sfilters.h; path = ../../modules/gui/macosx/sfilters.h; sourceTree = SOURCE_ROOT; };
 		CCF3C6510923B9D100401862 /* sfilters.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = sfilters.m; path = ../../modules/gui/macosx/sfilters.m; sourceTree = SOURCE_ROOT; };
@@ -986,8 +988,8 @@
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
 				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
-				CC26BF3309A7A0A300E94D62 /* interaction.h */,
-				CC26BF3409A7A0A300E94D62 /* interaction.m */,
+				CC1B4C1409A8EC690078AD2E /* interaction.h */,
+				CC1B4C1509A8EC690078AD2E /* interaction.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,
 				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,
@@ -1144,6 +1146,7 @@
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
 				CCF3C64A0923B99D00401862 /* SFilters.nib */,
 				CC26BF2A09A7A05000E94D62 /* Update.nib */,
+				CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */,
 			);
 			name = nibs;
 			sourceTree = "<group>";
@@ -1257,6 +1260,7 @@
 				C2F2A708095AE51700018C74 /* skip_forward_embedded_blue.png in Resources */,
 				C2F2A709095AE51700018C74 /* skip_previous_embedded_blue.png in Resources */,
 				CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */,
+				CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1273,6 +1277,14 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC1B4B4C09A8CF9E0078AD2E /* English */,
+			);
+			name = Interaction.nib;
+			sourceTree = "<group>";
+		};
 		CC26BF2A09A7A05000E94D62 /* Update.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
