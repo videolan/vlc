@@ -894,6 +894,8 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     playlist_item_t *p_detach = NULL;
     struct item_parent_t *p_parent;
 
+    if( p_node->i_children == -1 ) return VLC_EGENERIC;
+
     /* Detach from the parent */
     for( i = 0 ; i< p_item->i_parents; i++ )
     {
