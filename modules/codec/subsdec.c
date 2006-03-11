@@ -154,9 +154,9 @@ static int OpenDecoder( vlc_object_t *p_this )
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
-    
+
     /* init of p_sys */
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
@@ -180,13 +180,19 @@ static int OpenDecoder( vlc_object_t *p_this )
         var_Get( p_dec, "subsdec-encoding", &val );
         if( !strcmp( val.psz_string, DEFAULT_NAME ) )
         {
-            char *psz_charset =(char*)malloc( 100 );  
+            char *psz_charset;
 #ifdef __APPLE__
             /* Most subtitles are not in UTF-8, which is the default on Mac OS X */
-            sprintf( psz_charset, "ISO-8859-1" );
+            psz_charset = strdup( "ISO-8859-1" );
 #else
             vlc_current_charset( &psz_charset );
 #endif
+            if( psz_charset == NULL )
+            {
+                free( p_sys );
+                return VLC_ENOMEM;
+            }
+
             p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );  
             msg_Dbg( p_dec, "using default character encoding: %s", psz_charset );  
             free( psz_charset );
@@ -206,7 +212,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
         if( val.psz_string ) free( val.psz_string );
     }
-    
+
     var_Create( p_dec, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "subsdec-align", &val );
     p_sys->i_align = val.i_int;
