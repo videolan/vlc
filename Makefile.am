@@ -145,6 +145,14 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/volumeslider_normal.png \
 	extras/MacOSX/Resources/volumetrack.png \
 	extras/MacOSX/Resources/about_bg.png \
+	extras/MacOSX/Resources/skip_forward_active_embedded.png \
+	extras/MacOSX/Resources/play_embedded.png \
+	extras/MacOSX/Resources/pause_embedded.png \
+	extras/MacOSX/Resources/skip_previous_active_embedded.png \
+	extras/MacOSX/Resources/pause_embedded_blue.png \
+	extras/MacOSX/Resources/play_embedded_blue.png \
+	extras/MacOSX/Resources/skip_forward_embedded_blue.png \
+	extras/MacOSX/Resources/skip_previous_embedded_blue.png \
 	extras/MacOSX/Resources/vlc.scriptSuite \
 	extras/MacOSX/Resources/vlc.scriptTerminology \
 	extras/MacOSX/Resources/README \
