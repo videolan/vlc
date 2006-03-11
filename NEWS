@@ -31,7 +31,7 @@ Video output:
  * New video filters: 
     - magnify: allows you to zoom on part of the image
     - gradient and edge detection: "cartoon-like" effect
-    - bluescreen: overlay a video transparently on another one
+    - bluescreen: overlay parts of a video transparently on another one
  * Logo video filter: can now loop through multiple images
  * RSS video filter: display feed images. Support for Atom feeds.
  * Improvements to the subtitles rendering
