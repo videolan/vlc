@@ -1136,6 +1136,17 @@ void Playlist::OnKeyDown( wxTreeEvent& event )
         /* We send a dummy event */
         OnDeleteSelection( event );
     }
+    /* Work around wxWin32 bug */
+    else if( keycode == WXK_RETURN )
+    {
+        wxArrayTreeItemIds items;
+        if( treectrl->GetSelections( items ) > 0 )
+        {
+            wxTreeEvent event;
+            event.SetItem( items.Item( 0 ) );
+            OnActivateItem( event );
+        }
+    }
     else
     {
         event.Skip();
