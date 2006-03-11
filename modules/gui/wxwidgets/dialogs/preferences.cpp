@@ -200,11 +200,14 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
     /* Separation */
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
+#if 0
     /* Create the buttons */
     wxButton *ok_button = new wxButton( panel, wxID_OK );
     ok_button->SetDefault();
-    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
+#endif
     wxButton *save_button = new wxButton( panel, wxID_SAVE );
+    save_button->SetDefault();
+    wxButton *cancel_button = new wxButton( panel, wxID_CANCEL );
     wxButton *reset_button = new wxButton( panel, ResetAll_Event,
                                            wxU(_("Reset All")) );
 
@@ -222,9 +225,11 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
+#if 0
     button_sizer->Add( ok_button, 0, wxALL, 5 );
-    button_sizer->Add( cancel_button, 0, wxALL, 5 );
+#endif
     button_sizer->Add( save_button, 0, wxALL, 5 );
+    button_sizer->Add( cancel_button, 0, wxALL, 5 );
     button_sizer->Add( reset_button, 0, wxALL, 5 );
     button_sizer->Add( dummy_panel, 1, wxALL, 5 );
     button_sizer->Add( advanced_checkbox, 0, wxALL | wxALIGN_RIGHT |
