@@ -39,7 +39,7 @@ Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
 Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
-Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements. Meta information core fixes
+Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements. Meta information core fixes. XSPF playlist support
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Nylander <info@danielnylander at se> - Swedish translation
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
