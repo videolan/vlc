@@ -211,7 +211,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->i_state = STATE_NOSYNC;
     p_sys->b_stream_info = VLC_FALSE;
-
+    p_sys->p_block=NULL;
     p_sys->bytestream = block_BytestreamInit( p_dec );
 
 #ifdef USE_LIBFLAC
