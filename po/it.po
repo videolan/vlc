@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-10 18:34+0100\n"
+"POT-Creation-Date: 2006-03-11 22:27+0000\n"
 "PO-Revision-Date: 2004-05-02 17:45+0200\n"
 "Last-Translator: Carlo Calabrò\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -354,7 +354,8 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:480
 #: modules/gui/macosx/intf.m:574 modules/gui/pda/pda_interface.c:1264
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:202
-#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:672
+#: modules/gui/wxwidgets/interface.cpp:683
 msgid "Playlist"
 msgstr "Playlist"
 
@@ -492,7 +493,7 @@ msgstr ""
 msgid "Meta-information"
 msgstr "Metainformazioni"
 
-#: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:53
+#: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:55
 #: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:530
 #: modules/gui/macosx/intf.m:531 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/playlistinfo.m:56 modules/gui/macosx/wizard.m:390
@@ -977,15 +978,15 @@ msgstr "it"
 msgid "Help options"
 msgstr "Impostazioni guida"
 
-#: src/libvlc.c:2219 src/misc/configuration.c:1242
+#: src/libvlc.c:2219 src/misc/configuration.c:1248
 msgid "string"
 msgstr "stringa"
 
-#: src/libvlc.c:2236 src/misc/configuration.c:1206
+#: src/libvlc.c:2236 src/misc/configuration.c:1212
 msgid "integer"
 msgstr "intero"
 
-#: src/libvlc.c:2254 src/misc/configuration.c:1231
+#: src/libvlc.c:2254 src/misc/configuration.c:1237
 msgid "float"
 msgstr "virgola mobile"
 
@@ -2966,7 +2967,7 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "Scelta del tasto di passaggio a schermo intero"
 
 #: src/libvlc.h:856 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1463
+#: modules/gui/wxwidgets/interface.cpp:1479
 msgid "Play/Pause"
 msgstr "Play/Pausa"
 
@@ -2992,6 +2993,7 @@ msgstr "Scelta del tasto per eseguire"
 
 #: src/libvlc.h:862 modules/control/hotkeys.c:648
 #: modules/gui/macosx/controls.m:625 modules/gui/macosx/intf.m:518
+#: modules/gui/wxwidgets/interface.cpp:688
 msgid "Faster"
 msgstr "Più veloce"
 
@@ -3001,6 +3003,7 @@ msgstr "Scelta del tasto per eseguire più rapidamente."
 
 #: src/libvlc.h:864 modules/control/hotkeys.c:655
 #: modules/gui/macosx/controls.m:626 modules/gui/macosx/intf.m:519
+#: modules/gui/wxwidgets/interface.cpp:687
 msgid "Slower"
 msgstr "Più lento"
 
@@ -3012,7 +3015,8 @@ msgstr "Scelta del tasto per eseguire più lentamente."
 #: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:476
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:592
 #: modules/gui/macosx/wizard.m:313 modules/gui/macosx/wizard.m:364
-#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1468
+#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:686
+#: modules/gui/wxwidgets/interface.cpp:1484
 #: modules/gui/wxwidgets/menus.cpp:289
 msgid "Next"
 msgstr "Successivo"
@@ -3024,7 +3028,8 @@ msgstr "Scelta del tasto per passare all'elemento successivo della playlist."
 #: src/libvlc.h:868 modules/control/hotkeys.c:628
 #: modules/gui/macosx/controls.m:645 modules/gui/macosx/intf.m:471
 #: modules/gui/macosx/intf.m:520 modules/gui/macosx/intf.m:593
-#: modules/gui/wxwidgets/interface.cpp:1467
+#: modules/gui/wxwidgets/interface.cpp:685
+#: modules/gui/wxwidgets/interface.cpp:1483
 #: modules/gui/wxwidgets/menus.cpp:288
 msgid "Previous"
 msgstr "Precedente"
@@ -3038,8 +3043,9 @@ msgstr "Scelta del tasto per passare all'elemento precedente della playlist."
 #: modules/gui/macosx/intf.m:591 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
-#: modules/gui/wxwidgets/interface.cpp:666
-#: modules/gui/wxwidgets/interface.cpp:1469
+#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:680
+#: modules/gui/wxwidgets/interface.cpp:1485
 #: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "Interrompi"
@@ -3588,7 +3594,7 @@ msgstr "Proprietà della periferica"
 msgid "Subpictures"
 msgstr "Immagini"
 
-#: src/libvlc.h:1156 modules/codec/subsdec.c:115 modules/demux/subtitle.c:61
+#: src/libvlc.h:1156 modules/codec/subsdec.c:115 modules/demux/subtitle.c:63
 #: modules/gui/beos/InterfaceWindow.cpp:277
 msgid "Subtitles"
 msgstr "Sottotitoli"
@@ -3718,11 +3724,11 @@ msgstr "azzera la memoria dei plugin"
 msgid "print version information"
 msgstr "mostra informazioni sulla versione"
 
-#: src/misc/configuration.c:1206
+#: src/misc/configuration.c:1212
 msgid "boolean"
 msgstr "booleana"
 
-#: src/misc/configuration.c:1217
+#: src/misc/configuration.c:1223
 msgid "key"
 msgstr "tasto"
 
@@ -4330,7 +4336,7 @@ msgstr "Zhuang"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: src/misc/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:962
+#: src/misc/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:967
 msgid "Unknown"
 msgstr "Sconosciuto"
 
@@ -4827,7 +4833,7 @@ msgid "Standard filesystem directory input"
 msgstr "Ingresso predefinito di una directory"
 
 #: modules/access/dshow/dshow.cpp:72 modules/access/dshow/dshow.cpp:74
-#: modules/codec/ffmpeg/ffmpeg.c:75 modules/demux/mpc.c:53
+#: modules/codec/ffmpeg/ffmpeg.c:75 modules/demux/mpc.c:55
 #: modules/video_output/opengl.c:129
 msgid "None"
 msgstr "Nessuno"
@@ -5899,7 +5905,7 @@ msgstr ""
 "audio della scheda."
 
 #: modules/access/pvr/pvr.c:96 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1333
+#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1349
 msgid "Volume"
 msgstr "Volume"
 
@@ -6271,7 +6277,7 @@ msgstr "PBC LID"
 msgid "VCD Format"
 msgstr "Formato VCD"
 
-#: modules/access/vcdx/info.c:91 modules/demux/mpc.c:53
+#: modules/access/vcdx/info.c:91 modules/demux/mpc.c:55
 msgid "Album"
 msgstr "Album"
 
@@ -7519,7 +7525,7 @@ msgstr ""
 "immagini I e P)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:219 modules/codec/x264.c:212
-#: modules/demux/mod.c:54
+#: modules/demux/mod.c:71
 msgid "Noise reduction"
 msgstr "Riduzione del rumore"
 
@@ -7718,6 +7724,11 @@ msgstr "Incapsulazione audio flac"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "Decodifica video MPEG I/II (usa libmpeg2)"
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "modulo decodifica flac"
+
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
 msgstr "Decodifica audio PCM lineare"
@@ -7825,7 +7836,7 @@ msgstr ""
 msgid "Text subtitles decoder"
 msgstr "Decodifica sottotitoli"
 
-#: modules/codec/subsdec.c:322
+#: modules/codec/subsdec.c:335
 msgid ""
 "Failed to convert subtitle encoding.\n"
 "Try manually setting a character-encoding before you open the file."
@@ -9175,7 +9186,7 @@ msgstr "Forza la creazione dell'indice"
 #, fuzzy
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
-"incomplete (not seekable)"
+"incomplete (not seekable)."
 msgstr "Crea un indice del file AVI per spostarsi in modo più affidabile."
 
 #: modules/demux/avi/avi.c:55
@@ -9193,36 +9204,39 @@ msgid ""
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2268
+#: modules/demux/avi/avi.c:2269
 msgid "Fixing AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2269 modules/demux/avi/avi.c:2292
+#: modules/demux/avi/avi.c:2270 modules/demux/avi/avi.c:2293
 msgid "Creating AVI Index ..."
 msgstr ""
 
-#: modules/demux/demuxdump.c:38 modules/demux/ts.c:111
-msgid "Filename of dump"
-msgstr "File di dump"
+#: modules/demux/demuxdump.c:38
+#, fuzzy
+msgid "Dump filename"
+msgstr "nome file rapporto"
 
 #: modules/demux/demuxdump.c:40
-msgid "Specify a file name to which the raw stream will be dumped."
+#, fuzzy
+msgid "Name of the file to which the raw stream will be dumped."
 msgstr "Specificare un nome di file in cui scrivere la sorgente byte per byte."
 
-#: modules/demux/demuxdump.c:41 modules/demux/ts.c:114
-msgid "Append"
-msgstr "Aggiungi"
+#: modules/demux/demuxdump.c:41
+#, fuzzy
+msgid "Append to existing file"
+msgstr "Aggiungi al file"
 
-#: modules/demux/demuxdump.c:43 modules/demux/ts.c:116
-msgid ""
-"If the file exists and this option is selected, the existing file will not "
-"be overwritten."
+#: modules/demux/demuxdump.c:43
+#, fuzzy
+msgid "If the file already exists, it will not be overwritten."
 msgstr ""
 "Se il file esiste e l'opzione è selezionata, non sovrascrive ma aggiunge al "
 "file esistente."
 
-#: modules/demux/demuxdump.c:53
-msgid "Filedump demuxer"
+#: modules/demux/demuxdump.c:52
+#, fuzzy
+msgid "File dumpper"
 msgstr "Demuxer dei file di dump"
 
 #: modules/demux/dts.c:40
@@ -9288,14 +9302,13 @@ msgstr "Fotogrammi al secondo"
 
 #: modules/demux/mjpeg.c:44
 msgid ""
-"Allows you to set the desired frame rate when playing from files, use 0 for "
-"live."
+"This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
+"is the default value) for a live stream (from the camera)."
 msgstr ""
-"Permette di tasso di fotogrammi al secondo quando si riprodue da file. "
-"Utilizzare il valore 0 per tempo reale."
 
-#: modules/demux/mjpeg.c:49
-msgid "JPEG camera demuxer"
+#: modules/demux/mjpeg.c:50
+#, fuzzy
+msgid "M-JPEG camera demuxer"
 msgstr "Demuxer camera JPEG"
 
 #: modules/demux/mkv.cpp:394
@@ -9381,89 +9394,120 @@ msgstr "Applicazione Muxing"
 msgid "Writing application"
 msgstr "Applicazione scrittura"
 
+#: modules/demux/mod.c:47
+msgid "Enable noise reduction algorithm"
+msgstr ""
+
+#: modules/demux/mod.c:48
+#, fuzzy
+msgid "Enable reverberation"
+msgstr "Abilita audio"
+
 #: modules/demux/mod.c:49
+#, fuzzy
+msgid "Reverberation level (from 0 to 100, default value is 0)."
+msgstr "Livelo di riverbero (0-100, predefinito a 0)."
+
+#: modules/demux/mod.c:51
+#, fuzzy
+msgid "Reverberation delay, in ms. Usual values are from to 40 to 200ms."
+msgstr "Ritardo del riverbero in millisecondi (in genere tra 40 e 200)."
+
+#: modules/demux/mod.c:53
+#, fuzzy
+msgid "Enable megabass mode"
+msgstr "Abilita picchi"
+
+#: modules/demux/mod.c:54
+#, fuzzy
+msgid "Megabass mode level (from 0 to 100, default value is 0)."
+msgstr "Livello Mega Bass (0-100, predefinito a 0)."
+
+#: modules/demux/mod.c:56
+msgid ""
+"Megabass mode cutoff frequency, in Hz.This is the maximum frequency for "
+"which the megabass effect applies. Valid values are from 10 to 100 Hz"
+msgstr ""
+
+#: modules/demux/mod.c:59
+#, fuzzy
+msgid "Surround effect level (from 0 to 100, default value is 0)."
+msgstr "Livello Surround (0-100, predefinito a 0)"
+
+#: modules/demux/mod.c:61
+#, fuzzy
+msgid "Surround delay, in ms. Usual values are from 5 to 40 ms"
+msgstr "Ritardo Surround in millisecondi (in genere da 5 a 40)."
+
+#: modules/demux/mod.c:66
 msgid "MOD demuxer (libmodplug)"
 msgstr "Demuxer MOD (libmodplug)"
 
-#: modules/demux/mod.c:56
+#: modules/demux/mod.c:74
 msgid "Reverb"
 msgstr "Riverbero"
 
-#: modules/demux/mod.c:57
-msgid "Reverb level (0-100)"
+#: modules/demux/mod.c:77
+#, fuzzy
+msgid "Reverberation level"
 msgstr "Livello di riverbero (0-100)"
 
-#: modules/demux/mod.c:57
-msgid "Reverb level (0-100 defaults to 0)"
-msgstr "Livelo di riverbero (0-100, predefinito a 0)."
-
-#: modules/demux/mod.c:58
-msgid "Reverb delay (ms)"
+#: modules/demux/mod.c:79
+#, fuzzy
+msgid "Reverberation delay"
 msgstr "Ritardo del riverbero (ms)"
 
-#: modules/demux/mod.c:58
-msgid "Reverb delay in ms (usually 40-200ms)"
-msgstr "Ritardo del riverbero in millisecondi (in genere tra 40 e 200)."
-
-#: modules/demux/mod.c:60
+#: modules/demux/mod.c:81
 msgid "Mega bass"
 msgstr "Mega Bass"
 
-#: modules/demux/mod.c:61
-msgid "Mega bass level (0-100)"
+#: modules/demux/mod.c:84
+#, fuzzy
+msgid "Mega bass level"
 msgstr "Livello Mega Bass (0-100)"
 
-#: modules/demux/mod.c:61
-msgid "Mega bass level (0-100 defaults to 0)"
-msgstr "Livello Mega Bass (0-100, predefinito a 0)."
-
-#: modules/demux/mod.c:62
-msgid "Mega bass cut off (Hz)"
+#: modules/demux/mod.c:86
+#, fuzzy
+msgid "Mega bass cutoff"
 msgstr "Frequenza di cut off del Mega Bass (Hz)"
 
-#: modules/demux/mod.c:62
-msgid "Mega bass cut off (10-100Hz)"
-msgstr "Frequenza di cut off del Mega Bass (10-100Hz)"
-
-#: modules/demux/mod.c:64
+#: modules/demux/mod.c:88
 msgid "Surround"
 msgstr "Surround"
 
-#: modules/demux/mod.c:65
-msgid "Surround level (0-100)"
+#: modules/demux/mod.c:91
+#, fuzzy
+msgid "Surround level"
 msgstr "Livello Surround (0-100)"
 
-#: modules/demux/mod.c:65
-msgid "Surround level (0-100 defaults to 0)"
-msgstr "Livello Surround (0-100, predefinito a 0)"
-
-#: modules/demux/mod.c:66
+#: modules/demux/mod.c:93
 msgid "Surround delay (ms)"
 msgstr "Ritardo Surround (ms)"
-
-#: modules/demux/mod.c:66
-msgid "Surround delay in ms (usually 5-40ms)"
-msgstr "Ritardo Surround in millisecondi (in genere da 5 a 40)."
 
 #: modules/demux/mp4/mp4.c:51
 msgid "MP4 stream demuxer"
 msgstr "Demuxer sorgenti MP4"
 
-#: modules/demux/mpc.c:46 modules/demux/mpc.c:47
+#: modules/demux/mpc.c:46
 #, fuzzy
 msgid "Replay Gain type"
 msgstr "Play e stop"
 
-#: modules/demux/mpc.c:57
+#: modules/demux/mpc.c:47
+msgid ""
+"Musepack can have a title-specific replay gain (volume control) or an album-"
+"specific one. Choose which type you want to use"
+msgstr ""
+
+#: modules/demux/mpc.c:59
 #, fuzzy
-msgid "MPC demuxer"
+msgid "MusePack demuxer"
 msgstr "Demuxer mp4"
 
 #: modules/demux/mpeg/h264.c:40
 #, fuzzy
-msgid "Allows you to set the desired frame rate."
-msgstr ""
-"Permette di specificare quante immagini acquisire al secondo (frame rate)."
+msgid "Desired frame rate for the H264 stream."
+msgstr "Bitrate medio della sorgente"
 
 #: modules/demux/mpeg/h264.c:47
 msgid "H264 video demuxer"
@@ -9478,8 +9522,9 @@ msgid "MPEG-4 video demuxer"
 msgstr "Demuxer video MPEG-4"
 
 #: modules/demux/mpeg/mpga.c:46
-msgid "MPEG-I/II audio demuxer"
-msgstr "Demuxer audio MPEG I/II"
+#, fuzzy
+msgid "MPEG audio / MP3 demuxer"
+msgstr "Demuxer audio MPEG-4"
 
 #: modules/demux/mpeg/mpgv.c:42
 msgid "MPEG-I/II video demuxer"
@@ -9499,9 +9544,10 @@ msgstr "Demuxer NullSoft"
 msgid "Nuv demuxer"
 msgstr "Demuxer AU"
 
-#: modules/demux/ogg.c:43
-msgid "Ogg stream demuxer"
-msgstr "Demuxer sorgenti OGG"
+#: modules/demux/ogg.c:44
+#, fuzzy
+msgid "OGG demuxer"
+msgstr "Demuxer AAC"
 
 #: modules/demux/playlist/b4s.c:341
 #, fuzzy
@@ -9514,7 +9560,7 @@ msgid "Auto start"
 msgstr "Informazioni autore"
 
 #: modules/demux/playlist/playlist.c:37
-msgid "Automatically start the playlist when it's loaded.\n"
+msgid "Automatically start playing the playlist content once it's loaded.\n"
 msgstr ""
 
 #: modules/demux/playlist/playlist.c:55
@@ -9542,8 +9588,8 @@ msgstr "Importa playlist PLS"
 
 #: modules/demux/playlist/playlist.c:83
 #, fuzzy
-msgid "Podcast playlist import"
-msgstr "Importa playlist PLS"
+msgid "Podcast parser"
+msgstr "Categoria (CDDB)"
 
 #: modules/demux/playlist/podcast.c:289 modules/demux/playlist/podcast.c:298
 #: modules/demux/playlist/podcast.c:307 modules/demux/playlist/podcast.c:316
@@ -9615,36 +9661,44 @@ msgid "Podcast Type"
 msgstr ""
 
 #: modules/demux/ps.c:47 modules/demux/ps.c:55
-msgid "PS demuxer"
+#, fuzzy
+msgid "MPEG-PS demuxer"
 msgstr "Demuxer PS"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
 msgstr "Demuxer PVA"
 
-#: modules/demux/rawdv.c:39
-msgid "raw DV demuxer"
-msgstr "Demuxer DV semplice"
+#: modules/demux/rawdv.c:40
+msgid "DV (Digital Video) demuxer"
+msgstr ""
 
 #: modules/demux/real.c:39
 msgid "Real demuxer"
 msgstr "Demuxer Real"
 
 #: modules/demux/sgimb.c:113
-msgid "Kasenna MediaBase metademux"
+#, fuzzy
+msgid "Kasenna MediaBase parser"
 msgstr "Metademux Kasenna MediBase"
 
-#: modules/demux/subtitle.c:62
-msgid "Text subtitles demux"
-msgstr "Demux testo sottotitoli"
+#: modules/demux/subtitle.c:64
+#, fuzzy
+msgid "Text subtitles parser"
+msgstr "Decodifica sottotitoli"
 
-#: modules/demux/subtitle.c:67 modules/gui/wxwidgets/dialogs/subtitles.cpp:202
+#: modules/demux/subtitle.c:69 modules/gui/wxwidgets/dialogs/subtitles.cpp:202
 msgid "Frames per second"
 msgstr "Fotogrammi al secondo"
 
-#: modules/demux/subtitle.c:70
+#: modules/demux/subtitle.c:72
 #, fuzzy
 msgid "Subtitles delay"
+msgstr "Aumenta ritardo sottotitoli"
+
+#: modules/demux/subtitle.c:74
+#, fuzzy
+msgid "Subtitles format"
 msgstr "Aumenta ritardo sottotitoli"
 
 #: modules/demux/ts.c:83
@@ -9709,10 +9763,26 @@ msgid ""
 "subtract the TS-header from the value before decrypting. "
 msgstr ""
 
+#: modules/demux/ts.c:111
+msgid "Filename of dump"
+msgstr "File di dump"
+
 #: modules/demux/ts.c:112
 #, fuzzy
 msgid "Specify a filename where to dump the TS in"
 msgstr "Specificare un nome di file in cui scrivere la sorgente byte per byte."
+
+#: modules/demux/ts.c:114
+msgid "Append"
+msgstr "Aggiungi"
+
+#: modules/demux/ts.c:116
+msgid ""
+"If the file exists and this option is selected, the existing file will not "
+"be overwritten."
+msgstr ""
+"Se il file esiste e l'opzione è selezionata, non sovrascrive ma aggiunge al "
+"file esistente."
 
 #: modules/demux/ts.c:119
 #, fuzzy
@@ -10024,11 +10094,13 @@ msgid "Hard rock"
 msgstr "Hard rock"
 
 #: modules/demux/util/id3tag.c:50
-msgid "ID3 tag parser using libid3tag"
-msgstr "Interprete tag id3 (usa libid3tag)"
+#, fuzzy
+msgid "ID3 tags parser"
+msgstr "Interprete DTS"
 
 #: modules/demux/vobsub.c:48
-msgid "Vobsub subtitles demux"
+#, fuzzy
+msgid "Vobsub subtitles parser"
 msgstr "Demux sottotitoli Vobsub"
 
 #: modules/demux/voc.c:42
@@ -10067,8 +10139,8 @@ msgstr "Annulla"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:665
-#: modules/gui/wxwidgets/menus.cpp:317
+#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:668
+#: modules/gui/wxwidgets/interface.cpp:679 modules/gui/wxwidgets/menus.cpp:317
 msgid "Open"
 msgstr "Apri"
 
@@ -10270,7 +10342,7 @@ msgid "Take Screen Shot"
 msgstr "Screenshot"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:487
-#: modules/gui/wxwidgets/interface.cpp:598
+#: modules/gui/wxwidgets/interface.cpp:601
 msgid "About VLC media player"
 msgstr "Info su VLC media player"
 
@@ -10467,8 +10539,9 @@ msgstr "Avanti veloce"
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:274
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:283
-#: modules/gui/wxwidgets/interface.cpp:667
-#: modules/gui/wxwidgets/interface.cpp:1189
+#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:681
+#: modules/gui/wxwidgets/interface.cpp:1205
 #: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
 msgid "Play"
 msgstr "Play"
@@ -10476,8 +10549,9 @@ msgstr "Play"
 #: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1304
 #: modules/gui/macosx/intf.m:1305 modules/gui/macosx/intf.m:1306
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
-#: modules/gui/wxwidgets/interface.cpp:668
-#: modules/gui/wxwidgets/interface.cpp:1183
+#: modules/gui/wxwidgets/interface.cpp:671
+#: modules/gui/wxwidgets/interface.cpp:682
+#: modules/gui/wxwidgets/interface.cpp:1199
 #: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr "Pausa"
@@ -10688,7 +10762,7 @@ msgstr "Nascondi Altre"
 msgid "Show All"
 msgstr "Mostra Tutte"
 
-#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1461
+#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1477
 msgid "Quit VLC"
 msgstr "Esci da VLC"
 
@@ -11307,12 +11381,12 @@ msgid "1 item in the playlist"
 msgstr "%i elementi nella playlist"
 
 #: modules/gui/macosx/prefs.m:123
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:209
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:212
 msgid "Reset All"
 msgstr "Azzera Tutto"
 
 #: modules/gui/macosx/prefs.m:142
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:290
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:295
 msgid "Reset Preferences"
 msgstr "Azzera Preferenze"
 
@@ -11321,7 +11395,7 @@ msgid "Continue"
 msgstr "Prosegui"
 
 #: modules/gui/macosx/prefs.m:145
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:288
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:293
 msgid ""
 "Beware this will reset your VLC media player preferences.\n"
 "Are you sure you want to continue?"
@@ -12742,7 +12816,7 @@ msgstr ""
 " (interfaccia wxWindows)\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:916
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:932
 #, fuzzy
 msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
@@ -12751,17 +12825,17 @@ msgstr ""
 "(c) 1996-2004 - l'équipe VideoLAN\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:917
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:933
 #, fuzzy
 msgid "Compiled by "
 msgstr "Commedia"
 
-#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:919
+#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:935
 #, fuzzy
 msgid "Compiler: "
 msgstr "Errore: %s\n"
 
-#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:920
+#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:936
 msgid "Based on SVN revision: "
 msgstr ""
 
@@ -12869,7 +12943,7 @@ msgstr "Elimina Errori Successivi"
 msgid "Playlist item info"
 msgstr "Informazioni elemento playlist"
 
-#: modules/gui/wxwidgets/dialogs/messages.cpp:203
+#: modules/gui/wxwidgets/dialogs/messages.cpp:205
 msgid "Save Messages As..."
 msgstr "Salva Messaggi con Nome..."
 
@@ -12880,7 +12954,7 @@ msgstr "Opzioni Avanzate..."
 #: modules/gui/wxwidgets/dialogs/open.cpp:264
 #: modules/gui/wxwidgets/dialogs/open.cpp:275
 #: modules/gui/wxwidgets/dialogs/open.cpp:420
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:213
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:216
 msgid "Advanced options"
 msgstr "Opzioni Avanzate"
 
@@ -13124,7 +13198,7 @@ msgid "Sort this branch"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1610
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1621
 #, fuzzy
 msgid "Add node"
 msgstr "Codifica audio"
@@ -13160,31 +13234,31 @@ msgstr "La Playlist è vuota"
 msgid "Can't save"
 msgstr "Non è possibile registrare"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1400 modules/misc/freetype.c:100
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1411 modules/misc/freetype.c:100
 #: modules/misc/win32text.c:71
 msgid "Normal"
 msgstr "Normale"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1402
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1413
 #, fuzzy
 msgid "Sorted by artist"
 msgstr "Ordine per autore"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1404
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1415
 #, fuzzy
 msgid "Sorted by Album"
 msgstr "Ordina per Nome"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1609
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1620
 msgid "Please enter node name"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1610
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1621
 #, fuzzy
 msgid "New node"
 msgstr "New Age"
 
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:1011
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:1016
 msgid ""
 "Some options are available but hidden. Check \"Advanced options\" to see "
 "them."
@@ -13555,125 +13629,126 @@ msgstr "Capitolo Precedente"
 msgid "Next track"
 msgstr "Traccia video"
 
-#: modules/gui/wxwidgets/interface.cpp:561
+#: modules/gui/wxwidgets/interface.cpp:564
 msgid "Quick &Open File...\tCtrl-O"
 msgstr "&Apri File (semplice)...\tCtrl-O"
 
-#: modules/gui/wxwidgets/interface.cpp:564
+#: modules/gui/wxwidgets/interface.cpp:567
 msgid "Open &File...\tCtrl-F"
 msgstr "Apri &File...\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:565
+#: modules/gui/wxwidgets/interface.cpp:568
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
 msgstr "Apri &File...\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:566
+#: modules/gui/wxwidgets/interface.cpp:569
 msgid "Open &Disc...\tCtrl-D"
 msgstr "Apri &Disco...\tCtrl-D"
 
-#: modules/gui/wxwidgets/interface.cpp:568
+#: modules/gui/wxwidgets/interface.cpp:571
 msgid "Open &Network Stream...\tCtrl-N"
 msgstr "Apri Sorgente di &Rete...\tCtrl-N"
 
-#: modules/gui/wxwidgets/interface.cpp:570
+#: modules/gui/wxwidgets/interface.cpp:573
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
 msgstr "Apri &Periferica di Acquisizione...\tCtrl-C"
 
-#: modules/gui/wxwidgets/interface.cpp:573
+#: modules/gui/wxwidgets/interface.cpp:576
 msgid "&Wizard...\tCtrl-W"
 msgstr "&Wizard...\tCtrl-W"
 
-#: modules/gui/wxwidgets/interface.cpp:576
+#: modules/gui/wxwidgets/interface.cpp:579
 msgid "E&xit\tCtrl-X"
 msgstr "&Uscita\tCtrl-X"
 
-#: modules/gui/wxwidgets/interface.cpp:582
+#: modules/gui/wxwidgets/interface.cpp:585
 msgid "&Playlist...\tCtrl-P"
 msgstr "&Playlist...\tCtrl-P"
 
-#: modules/gui/wxwidgets/interface.cpp:584
+#: modules/gui/wxwidgets/interface.cpp:587
 msgid "&Messages...\tCtrl-M"
 msgstr "&Messaggi...\tCtrl-M"
 
-#: modules/gui/wxwidgets/interface.cpp:586
+#: modules/gui/wxwidgets/interface.cpp:589
 msgid "Stream and Media &info...\tCtrl-I"
 msgstr "Info Media e Stream...\tCtrl-I"
 
-#: modules/gui/wxwidgets/interface.cpp:588
+#: modules/gui/wxwidgets/interface.cpp:591
 msgid "VLM Control...\tCtrl-V"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:600
+#: modules/gui/wxwidgets/interface.cpp:603
 msgid "Check for updates ..."
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:604
+#: modules/gui/wxwidgets/interface.cpp:607
 msgid "&File"
 msgstr "&File"
 
-#: modules/gui/wxwidgets/interface.cpp:605
+#: modules/gui/wxwidgets/interface.cpp:608
 msgid "&View"
 msgstr "&Visualizza"
 
-#: modules/gui/wxwidgets/interface.cpp:606
+#: modules/gui/wxwidgets/interface.cpp:609
 msgid "&Settings"
 msgstr "Impo&stazioni"
 
-#: modules/gui/wxwidgets/interface.cpp:607
+#: modules/gui/wxwidgets/interface.cpp:610
 msgid "&Audio"
 msgstr "&Audio"
 
-#: modules/gui/wxwidgets/interface.cpp:608
+#: modules/gui/wxwidgets/interface.cpp:611
 msgid "&Video"
 msgstr "&Video"
 
-#: modules/gui/wxwidgets/interface.cpp:609
+#: modules/gui/wxwidgets/interface.cpp:612
 msgid "&Navigation"
 msgstr "&Navigazione"
 
-#: modules/gui/wxwidgets/interface.cpp:610
+#: modules/gui/wxwidgets/interface.cpp:613
 msgid "&Help"
 msgstr "&Aiuto"
 
-#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:673
+#: modules/gui/wxwidgets/interface.cpp:684
 #, fuzzy
 msgid "Small playlist"
 msgstr "Registra playlist"
 
-#: modules/gui/wxwidgets/interface.cpp:671
+#: modules/gui/wxwidgets/interface.cpp:674
 msgid "Previous playlist item"
 msgstr "Elemento playlist precedente"
 
-#: modules/gui/wxwidgets/interface.cpp:672
+#: modules/gui/wxwidgets/interface.cpp:675
 msgid "Next playlist item"
 msgstr "Elemento playlist successivo"
 
-#: modules/gui/wxwidgets/interface.cpp:673
+#: modules/gui/wxwidgets/interface.cpp:676
 msgid "Play slower"
 msgstr "Riproduci lentamente"
 
-#: modules/gui/wxwidgets/interface.cpp:674
+#: modules/gui/wxwidgets/interface.cpp:677
 msgid "Play faster"
 msgstr "Riproduci velocemente"
 
-#: modules/gui/wxwidgets/interface.cpp:857
+#: modules/gui/wxwidgets/interface.cpp:873
 #, fuzzy
 msgid "Extended &GUI\tCtrl-G"
 msgstr "Interfaccia estesa"
 
-#: modules/gui/wxwidgets/interface.cpp:860
+#: modules/gui/wxwidgets/interface.cpp:876
 #, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
 msgstr "Segnali&bri..."
 
-#: modules/gui/wxwidgets/interface.cpp:862
+#: modules/gui/wxwidgets/interface.cpp:878
 #, fuzzy
 msgid "Preference&s...\tCtrl-S"
 msgstr "Preferenze..."
 
-#: modules/gui/wxwidgets/interface.cpp:915
+#: modules/gui/wxwidgets/interface.cpp:931
 #, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
@@ -13682,7 +13757,7 @@ msgstr ""
 " (interfaccia wxWindows)\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:926
+#: modules/gui/wxwidgets/interface.cpp:942
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
@@ -13692,12 +13767,12 @@ msgstr ""
 "http://www.videolan.org/\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:929
+#: modules/gui/wxwidgets/interface.cpp:945
 #, c-format
 msgid "About %s"
 msgstr "Info su %s"
 
-#: modules/gui/wxwidgets/interface.cpp:1472
+#: modules/gui/wxwidgets/interface.cpp:1488
 #, fuzzy
 msgid "Show/Hide interface"
 msgstr "Mostra Interfaccia"
@@ -13844,12 +13919,22 @@ msgstr ""
 msgid "Show systray icon"
 msgstr "Mostra posizione sorgente"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:110
+#: modules/gui/wxwidgets/wxwidgets.cpp:102
+#, fuzzy
+msgid "Show labels in toolbar"
+msgstr "Mostra testo sui pulsanti della barra degli strumenti."
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:103
+#, fuzzy
+msgid "Show labels below the icons in the toolbar."
+msgstr "Mostra testo sotto le icone della barra degli strumenti."
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:112
 #, fuzzy
 msgid "wxWidgets interface module"
 msgstr "Modulo interfaccia wxWidgets"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:152
+#: modules/gui/wxwidgets/wxwidgets.cpp:155
 #, fuzzy
 msgid "wxWidgets dialogs provider"
 msgstr "Fornitore dialoghi wxWidgets"
@@ -17013,6 +17098,40 @@ msgstr "Tipo di carattere utilizzato per visualizzare i testi nell'uscita xosd"
 msgid "XOSD interface"
 msgstr "Interfaccia XOSD"
 
+#~ msgid ""
+#~ "Allows you to set the desired frame rate when playing from files, use 0 "
+#~ "for live."
+#~ msgstr ""
+#~ "Permette di tasso di fotogrammi al secondo quando si riprodue da file. "
+#~ "Utilizzare il valore 0 per tempo reale."
+
+#~ msgid "Mega bass cut off (10-100Hz)"
+#~ msgstr "Frequenza di cut off del Mega Bass (10-100Hz)"
+
+#, fuzzy
+#~ msgid "Allows you to set the desired frame rate."
+#~ msgstr ""
+#~ "Permette di specificare quante immagini acquisire al secondo (frame rate)."
+
+#~ msgid "MPEG-I/II audio demuxer"
+#~ msgstr "Demuxer audio MPEG I/II"
+
+#~ msgid "Ogg stream demuxer"
+#~ msgstr "Demuxer sorgenti OGG"
+
+#, fuzzy
+#~ msgid "Podcast playlist import"
+#~ msgstr "Importa playlist PLS"
+
+#~ msgid "raw DV demuxer"
+#~ msgstr "Demuxer DV semplice"
+
+#~ msgid "Text subtitles demux"
+#~ msgstr "Demux testo sottotitoli"
+
+#~ msgid "ID3 tag parser using libid3tag"
+#~ msgstr "Interprete tag id3 (usa libid3tag)"
+
 #, fuzzy
 #~ msgid "Quantizer parameter"
 #~ msgstr "Valori predefiniti equalizzatore"
@@ -17055,10 +17174,6 @@ msgstr "Interfaccia XOSD"
 
 #~ msgid "Properties"
 #~ msgstr "Proprietà"
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "modulo decodifica flac"
 
 #, fuzzy
 #~ msgid "from "
@@ -17442,12 +17557,6 @@ msgstr "Interfaccia XOSD"
 
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr "Mostra suggerimenti sulle opzioni di configurazione."
-
-#~ msgid "Show text on toolbar buttons"
-#~ msgstr "Mostra testo sui pulsanti della barra degli strumenti."
-
-#~ msgid "Show the text below icons on the toolbar."
-#~ msgstr "Mostra testo sotto le icone della barra degli strumenti."
 
 #~ msgid "Maximum height for the configuration windows"
 #~ msgstr "Altezza massima delle finestre di configurazione"
@@ -19201,9 +19310,6 @@ msgstr "Interfaccia XOSD"
 #~ msgid "Usually 0 is for mono and 1 for stereo"
 #~ msgstr "In generale, 0 per mono e 1 per stereo"
 
-#~ msgid "The average bitrate of the stream"
-#~ msgstr "Bitrate medio della sorgente"
-
 #~ msgid "The maximum bitrate of the stream"
 #~ msgstr "Bitrate massimo della sorgente"
 
@@ -19396,9 +19502,6 @@ msgstr "Interfaccia XOSD"
 
 #~ msgid "Fonts"
 #~ msgstr "Caratteri"
-
-#~ msgid "log filename"
-#~ msgstr "nome file rapporto"
 
 #~ msgid "Using the logger interface plugin..."
 #~ msgstr "Modulo di interfaccia rapporti in uso..."

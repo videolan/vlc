@@ -341,6 +341,7 @@ modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
 modules/codec/flac.c
 modules/codec/libmpeg2.c
+modules/codec/libvc1.c
 modules/codec/lpcm.c
 modules/codec/mash.cpp
 modules/codec/mpeg_audio.c
@@ -860,6 +861,9 @@ modules/mux/mpeg/ps.c
 modules/mux/mpeg/ts.c
 modules/mux/mpjpeg.c
 modules/mux/ogg.c
+modules/mux/rtp/rtcp.c
+modules/mux/rtp/rtcp.h
+modules/mux/rtp/rtp.h
 modules/mux/wav.c
 modules/packetizer/copy.c
 modules/packetizer/h264.c

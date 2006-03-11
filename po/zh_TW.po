@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-10 18:34+0100\n"
+"POT-Creation-Date: 2006-03-11 22:27+0000\n"
 "PO-Revision-Date: 2005-02-12 12:14+0100\n"
 "Last-Translator: Frank Chao <frank0624@gmail.com>\n"
 "Language-Team: zh_TW\n"
@@ -319,7 +319,8 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:480
 #: modules/gui/macosx/intf.m:574 modules/gui/pda/pda_interface.c:1264
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:202
-#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:672
+#: modules/gui/wxwidgets/interface.cpp:683
 msgid "Playlist"
 msgstr "播放清單"
 
@@ -446,7 +447,7 @@ msgstr ""
 msgid "Meta-information"
 msgstr ""
 
-#: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:53
+#: include/vlc_meta.h:29 src/input/var.c:136 modules/demux/mpc.c:55
 #: modules/gui/beos/MediaControlView.cpp:1233 modules/gui/macosx/intf.m:530
 #: modules/gui/macosx/intf.m:531 modules/gui/macosx/open.m:168
 #: modules/gui/macosx/playlistinfo.m:56 modules/gui/macosx/wizard.m:390
@@ -924,15 +925,15 @@ msgstr ""
 msgid "Help options"
 msgstr "說明選項"
 
-#: src/libvlc.c:2219 src/misc/configuration.c:1242
+#: src/libvlc.c:2219 src/misc/configuration.c:1248
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:2236 src/misc/configuration.c:1206
+#: src/libvlc.c:2236 src/misc/configuration.c:1212
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:2254 src/misc/configuration.c:1231
+#: src/libvlc.c:2254 src/misc/configuration.c:1237
 msgid "float"
 msgstr ""
 
@@ -2640,7 +2641,7 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "選擇熱鍵以切換全螢幕狀態"
 
 #: src/libvlc.h:856 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1463
+#: modules/gui/wxwidgets/interface.cpp:1479
 msgid "Play/Pause"
 msgstr "播放/暫停"
 
@@ -2666,6 +2667,7 @@ msgstr "選擇熱鍵以播放"
 
 #: src/libvlc.h:862 modules/control/hotkeys.c:648
 #: modules/gui/macosx/controls.m:625 modules/gui/macosx/intf.m:518
+#: modules/gui/wxwidgets/interface.cpp:688
 msgid "Faster"
 msgstr "加快"
 
@@ -2675,6 +2677,7 @@ msgstr "選擇熱鍵以快速重播"
 
 #: src/libvlc.h:864 modules/control/hotkeys.c:655
 #: modules/gui/macosx/controls.m:626 modules/gui/macosx/intf.m:519
+#: modules/gui/wxwidgets/interface.cpp:687
 msgid "Slower"
 msgstr "放慢"
 
@@ -2686,7 +2689,8 @@ msgstr "選擇熱鍵以慢速重播"
 #: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:476
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:592
 #: modules/gui/macosx/wizard.m:313 modules/gui/macosx/wizard.m:364
-#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1468
+#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:686
+#: modules/gui/wxwidgets/interface.cpp:1484
 #: modules/gui/wxwidgets/menus.cpp:289
 msgid "Next"
 msgstr "下一項"
@@ -2698,7 +2702,8 @@ msgstr "選擇熱鍵以播放清單中的下一個項目"
 #: src/libvlc.h:868 modules/control/hotkeys.c:628
 #: modules/gui/macosx/controls.m:645 modules/gui/macosx/intf.m:471
 #: modules/gui/macosx/intf.m:520 modules/gui/macosx/intf.m:593
-#: modules/gui/wxwidgets/interface.cpp:1467
+#: modules/gui/wxwidgets/interface.cpp:685
+#: modules/gui/wxwidgets/interface.cpp:1483
 #: modules/gui/wxwidgets/menus.cpp:288
 msgid "Previous"
 msgstr "上一項"
@@ -2712,8 +2717,9 @@ msgstr "選擇熱鍵以播放清單中的上一個項目"
 #: modules/gui/macosx/intf.m:591 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
-#: modules/gui/wxwidgets/interface.cpp:666
-#: modules/gui/wxwidgets/interface.cpp:1469
+#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:680
+#: modules/gui/wxwidgets/interface.cpp:1485
 #: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "停止"
@@ -3234,7 +3240,7 @@ msgstr "字型設定"
 msgid "Subpictures"
 msgstr "字幕"
 
-#: src/libvlc.h:1156 modules/codec/subsdec.c:115 modules/demux/subtitle.c:61
+#: src/libvlc.h:1156 modules/codec/subsdec.c:115 modules/demux/subtitle.c:63
 #: modules/gui/beos/InterfaceWindow.cpp:277
 msgid "Subtitles"
 msgstr "字幕"
@@ -3356,11 +3362,11 @@ msgstr "重置目前外掛快取"
 msgid "print version information"
 msgstr ""
 
-#: src/misc/configuration.c:1206
+#: src/misc/configuration.c:1212
 msgid "boolean"
 msgstr ""
 
-#: src/misc/configuration.c:1217
+#: src/misc/configuration.c:1223
 msgid "key"
 msgstr ""
 
@@ -3968,7 +3974,7 @@ msgstr ""
 msgid "Zulu"
 msgstr ""
 
-#: src/misc/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:962
+#: src/misc/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:967
 msgid "Unknown"
 msgstr "未知"
 
@@ -4398,7 +4404,7 @@ msgid "Standard filesystem directory input"
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:72 modules/access/dshow/dshow.cpp:74
-#: modules/codec/ffmpeg/ffmpeg.c:75 modules/demux/mpc.c:53
+#: modules/codec/ffmpeg/ffmpeg.c:75 modules/demux/mpc.c:55
 #: modules/video_output/opengl.c:129
 msgid "None"
 msgstr ""
@@ -5366,7 +5372,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:96 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1333
+#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1349
 msgid "Volume"
 msgstr ""
 
@@ -5691,7 +5697,7 @@ msgstr ""
 msgid "VCD Format"
 msgstr "VCD格式"
 
-#: modules/access/vcdx/info.c:91 modules/demux/mpc.c:53
+#: modules/access/vcdx/info.c:91 modules/demux/mpc.c:55
 msgid "Album"
 msgstr ""
 
@@ -6838,7 +6844,7 @@ msgid ""
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:219 modules/codec/x264.c:212
-#: modules/demux/mod.c:54
+#: modules/demux/mod.c:71
 msgid "Noise reduction"
 msgstr ""
 
@@ -7011,6 +7017,11 @@ msgstr "Flac音訊封包器"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG I/II視訊解碼器(使用libmpeg2)"
 
+#: modules/codec/libvc1.c:54
+#, fuzzy
+msgid "VC-1 decoder module"
+msgstr "Tarkin解碼器模組"
+
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
 msgstr "線性PCM音訊解碼器"
@@ -7117,7 +7128,7 @@ msgstr ""
 msgid "Text subtitles decoder"
 msgstr "字體字幕解碼器"
 
-#: modules/codec/subsdec.c:322
+#: modules/codec/subsdec.c:335
 msgid ""
 "Failed to convert subtitle encoding.\n"
 "Try manually setting a character-encoding before you open the file."
@@ -8353,7 +8364,7 @@ msgstr ""
 #: modules/demux/avi/avi.c:47
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
-"incomplete (not seekable)"
+"incomplete (not seekable)."
 msgstr ""
 
 #: modules/demux/avi/avi.c:55
@@ -8371,35 +8382,36 @@ msgid ""
 "Do you want to try to repair it (this might take a long time) ?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2268
+#: modules/demux/avi/avi.c:2269
 msgid "Fixing AVI Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2269 modules/demux/avi/avi.c:2292
+#: modules/demux/avi/avi.c:2270 modules/demux/avi/avi.c:2293
 msgid "Creating AVI Index ..."
 msgstr ""
 
-#: modules/demux/demuxdump.c:38 modules/demux/ts.c:111
-msgid "Filename of dump"
-msgstr ""
+#: modules/demux/demuxdump.c:38
+#, fuzzy
+msgid "Dump filename"
+msgstr "記錄檔檔名"
 
 #: modules/demux/demuxdump.c:40
-msgid "Specify a file name to which the raw stream will be dumped."
+msgid "Name of the file to which the raw stream will be dumped."
 msgstr ""
 
-#: modules/demux/demuxdump.c:41 modules/demux/ts.c:114
-msgid "Append"
+#: modules/demux/demuxdump.c:41
+#, fuzzy
+msgid "Append to existing file"
+msgstr "開啟面板檔案"
+
+#: modules/demux/demuxdump.c:43
+msgid "If the file already exists, it will not be overwritten."
 msgstr ""
 
-#: modules/demux/demuxdump.c:43 modules/demux/ts.c:116
-msgid ""
-"If the file exists and this option is selected, the existing file will not "
-"be overwritten."
-msgstr ""
-
-#: modules/demux/demuxdump.c:53
-msgid "Filedump demuxer"
-msgstr ""
+#: modules/demux/demuxdump.c:52
+#, fuzzy
+msgid "File dumpper"
+msgstr "調節器數量"
 
 #: modules/demux/dts.c:40
 msgid "Raw DTS demuxer"
@@ -8464,13 +8476,14 @@ msgstr ""
 
 #: modules/demux/mjpeg.c:44
 msgid ""
-"Allows you to set the desired frame rate when playing from files, use 0 for "
-"live."
+"This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
+"is the default value) for a live stream (from the camera)."
 msgstr ""
 
-#: modules/demux/mjpeg.c:49
-msgid "JPEG camera demuxer"
-msgstr ""
+#: modules/demux/mjpeg.c:50
+#, fuzzy
+msgid "M-JPEG camera demuxer"
+msgstr "MPEG-4音訊解多工器"
 
 #: modules/demux/mkv.cpp:394
 msgid "Matroska stream demuxer"
@@ -8552,88 +8565,114 @@ msgstr ""
 msgid "Writing application"
 msgstr ""
 
+#: modules/demux/mod.c:47
+msgid "Enable noise reduction algorithm"
+msgstr ""
+
+#: modules/demux/mod.c:48
+#, fuzzy
+msgid "Enable reverberation"
+msgstr "啟動音訊"
+
 #: modules/demux/mod.c:49
+#, fuzzy
+msgid "Reverberation level (from 0 to 100, default value is 0)."
+msgstr "環繞等級(0-100，預設為0)"
+
+#: modules/demux/mod.c:51
+msgid "Reverberation delay, in ms. Usual values are from to 40 to 200ms."
+msgstr ""
+
+#: modules/demux/mod.c:53
+#, fuzzy
+msgid "Enable megabass mode"
+msgstr "開啟峰值"
+
+#: modules/demux/mod.c:54
+msgid "Megabass mode level (from 0 to 100, default value is 0)."
+msgstr ""
+
+#: modules/demux/mod.c:56
+msgid ""
+"Megabass mode cutoff frequency, in Hz.This is the maximum frequency for "
+"which the megabass effect applies. Valid values are from 10 to 100 Hz"
+msgstr ""
+
+#: modules/demux/mod.c:59
+#, fuzzy
+msgid "Surround effect level (from 0 to 100, default value is 0)."
+msgstr "環繞等級(0-100，預設為0)"
+
+#: modules/demux/mod.c:61
+#, fuzzy
+msgid "Surround delay, in ms. Usual values are from 5 to 40 ms"
+msgstr "環繞延遲(ms，同常為5-40ms)"
+
+#: modules/demux/mod.c:66
 msgid "MOD demuxer (libmodplug)"
 msgstr "MOD解多工器(libmodplug)"
 
-#: modules/demux/mod.c:56
+#: modules/demux/mod.c:74
 msgid "Reverb"
 msgstr ""
 
-#: modules/demux/mod.c:57
-msgid "Reverb level (0-100)"
+#: modules/demux/mod.c:77
+msgid "Reverberation level"
 msgstr ""
 
-#: modules/demux/mod.c:57
-msgid "Reverb level (0-100 defaults to 0)"
+#: modules/demux/mod.c:79
+msgid "Reverberation delay"
 msgstr ""
 
-#: modules/demux/mod.c:58
-msgid "Reverb delay (ms)"
-msgstr ""
-
-#: modules/demux/mod.c:58
-msgid "Reverb delay in ms (usually 40-200ms)"
-msgstr ""
-
-#: modules/demux/mod.c:60
+#: modules/demux/mod.c:81
 msgid "Mega bass"
 msgstr ""
 
-#: modules/demux/mod.c:61
-msgid "Mega bass level (0-100)"
+#: modules/demux/mod.c:84
+#, fuzzy
+msgid "Mega bass level"
+msgstr "最大等級"
+
+#: modules/demux/mod.c:86
+msgid "Mega bass cutoff"
 msgstr ""
 
-#: modules/demux/mod.c:61
-msgid "Mega bass level (0-100 defaults to 0)"
-msgstr ""
-
-#: modules/demux/mod.c:62
-msgid "Mega bass cut off (Hz)"
-msgstr ""
-
-#: modules/demux/mod.c:62
-msgid "Mega bass cut off (10-100Hz)"
-msgstr ""
-
-#: modules/demux/mod.c:64
+#: modules/demux/mod.c:88
 msgid "Surround"
 msgstr "環繞"
 
-#: modules/demux/mod.c:65
-msgid "Surround level (0-100)"
+#: modules/demux/mod.c:91
+#, fuzzy
+msgid "Surround level"
 msgstr "環繞等級(0-100)"
 
-#: modules/demux/mod.c:65
-msgid "Surround level (0-100 defaults to 0)"
-msgstr "環繞等級(0-100，預設為0)"
-
-#: modules/demux/mod.c:66
+#: modules/demux/mod.c:93
 msgid "Surround delay (ms)"
 msgstr "環繞延遲(ms)"
-
-#: modules/demux/mod.c:66
-msgid "Surround delay in ms (usually 5-40ms)"
-msgstr "環繞延遲(ms，同常為5-40ms)"
 
 #: modules/demux/mp4/mp4.c:51
 msgid "MP4 stream demuxer"
 msgstr "MP4串流解多工器"
 
-#: modules/demux/mpc.c:46 modules/demux/mpc.c:47
+#: modules/demux/mpc.c:46
 #, fuzzy
 msgid "Replay Gain type"
 msgstr "播放和停止"
 
-#: modules/demux/mpc.c:57
+#: modules/demux/mpc.c:47
+msgid ""
+"Musepack can have a title-specific replay gain (volume control) or an album-"
+"specific one. Choose which type you want to use"
+msgstr ""
+
+#: modules/demux/mpc.c:59
 #, fuzzy
-msgid "MPC demuxer"
+msgid "MusePack demuxer"
 msgstr "PS解多工器"
 
 #: modules/demux/mpeg/h264.c:40
-#, fuzzy
-msgid "Allows you to set the desired frame rate."
-msgstr "允許你指定串流輸出的多工器"
+msgid "Desired frame rate for the H264 stream."
+msgstr ""
 
 #: modules/demux/mpeg/h264.c:47
 msgid "H264 video demuxer"
@@ -8648,8 +8687,9 @@ msgid "MPEG-4 video demuxer"
 msgstr "MPEG-4視訊解多工器"
 
 #: modules/demux/mpeg/mpga.c:46
-msgid "MPEG-I/II audio demuxer"
-msgstr "MPEG-I/II音訊解多工器"
+#, fuzzy
+msgid "MPEG audio / MP3 demuxer"
+msgstr "MPEG-4音訊解多工器"
 
 #: modules/demux/mpeg/mpgv.c:42
 msgid "MPEG-I/II video demuxer"
@@ -8668,9 +8708,10 @@ msgstr "NullSoft解多工器"
 msgid "Nuv demuxer"
 msgstr "AU解多工器"
 
-#: modules/demux/ogg.c:43
-msgid "Ogg stream demuxer"
-msgstr "Ogg串流解多工器"
+#: modules/demux/ogg.c:44
+#, fuzzy
+msgid "OGG demuxer"
+msgstr "AAC解多工器"
 
 #: modules/demux/playlist/b4s.c:341
 #, fuzzy
@@ -8683,7 +8724,7 @@ msgid "Auto start"
 msgstr "製作人"
 
 #: modules/demux/playlist/playlist.c:37
-msgid "Automatically start the playlist when it's loaded.\n"
+msgid "Automatically start playing the playlist content once it's loaded.\n"
 msgstr ""
 
 #: modules/demux/playlist/playlist.c:55
@@ -8710,8 +8751,8 @@ msgstr "PLS播放清單匯入"
 
 #: modules/demux/playlist/playlist.c:83
 #, fuzzy
-msgid "Podcast playlist import"
-msgstr "PLS播放清單匯入"
+msgid "Podcast parser"
+msgstr "CDDB分類"
 
 #: modules/demux/playlist/podcast.c:289 modules/demux/playlist/podcast.c:298
 #: modules/demux/playlist/podcast.c:307 modules/demux/playlist/podcast.c:316
@@ -8783,15 +8824,16 @@ msgid "Podcast Type"
 msgstr ""
 
 #: modules/demux/ps.c:47 modules/demux/ps.c:55
-msgid "PS demuxer"
+#, fuzzy
+msgid "MPEG-PS demuxer"
 msgstr "PS解多工器"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
 msgstr "PVA解多工器"
 
-#: modules/demux/rawdv.c:39
-msgid "raw DV demuxer"
+#: modules/demux/rawdv.c:40
+msgid "DV (Digital Video) demuxer"
 msgstr ""
 
 #: modules/demux/real.c:39
@@ -8799,19 +8841,25 @@ msgid "Real demuxer"
 msgstr "Real解多工器"
 
 #: modules/demux/sgimb.c:113
-msgid "Kasenna MediaBase metademux"
+msgid "Kasenna MediaBase parser"
 msgstr ""
 
-#: modules/demux/subtitle.c:62
-msgid "Text subtitles demux"
-msgstr "文字字幕解多工"
+#: modules/demux/subtitle.c:64
+#, fuzzy
+msgid "Text subtitles parser"
+msgstr "字體字幕解碼器"
 
-#: modules/demux/subtitle.c:67 modules/gui/wxwidgets/dialogs/subtitles.cpp:202
+#: modules/demux/subtitle.c:69 modules/gui/wxwidgets/dialogs/subtitles.cpp:202
 msgid "Frames per second"
 msgstr ""
 
-#: modules/demux/subtitle.c:70
+#: modules/demux/subtitle.c:72
 msgid "Subtitles delay"
+msgstr "字幕延遲"
+
+#: modules/demux/subtitle.c:74
+#, fuzzy
+msgid "Subtitles format"
 msgstr "字幕延遲"
 
 #: modules/demux/ts.c:83
@@ -8872,8 +8920,22 @@ msgid ""
 "subtract the TS-header from the value before decrypting. "
 msgstr ""
 
+#: modules/demux/ts.c:111
+msgid "Filename of dump"
+msgstr ""
+
 #: modules/demux/ts.c:112
 msgid "Specify a filename where to dump the TS in"
+msgstr ""
+
+#: modules/demux/ts.c:114
+msgid "Append"
+msgstr ""
+
+#: modules/demux/ts.c:116
+msgid ""
+"If the file exists and this option is selected, the existing file will not "
+"be overwritten."
 msgstr ""
 
 #: modules/demux/ts.c:119
@@ -9185,11 +9247,13 @@ msgid "Hard rock"
 msgstr ""
 
 #: modules/demux/util/id3tag.c:50
-msgid "ID3 tag parser using libid3tag"
-msgstr "ID3標籤解析器(使用libid3tag)"
+#, fuzzy
+msgid "ID3 tags parser"
+msgstr "DTS解析器"
 
 #: modules/demux/vobsub.c:48
-msgid "Vobsub subtitles demux"
+#, fuzzy
+msgid "Vobsub subtitles parser"
 msgstr "Vobsub字幕解多工"
 
 #: modules/demux/voc.c:42
@@ -9228,8 +9292,8 @@ msgstr "取消"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:665
-#: modules/gui/wxwidgets/menus.cpp:317
+#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:668
+#: modules/gui/wxwidgets/interface.cpp:679 modules/gui/wxwidgets/menus.cpp:317
 msgid "Open"
 msgstr "開啟"
 
@@ -9431,7 +9495,7 @@ msgid "Take Screen Shot"
 msgstr "擷取畫面快照"
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:487
-#: modules/gui/wxwidgets/interface.cpp:598
+#: modules/gui/wxwidgets/interface.cpp:601
 msgid "About VLC media player"
 msgstr "關於VLC多媒體播放程式"
 
@@ -9620,8 +9684,9 @@ msgstr "快速向前"
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:274
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:283
-#: modules/gui/wxwidgets/interface.cpp:667
-#: modules/gui/wxwidgets/interface.cpp:1189
+#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:681
+#: modules/gui/wxwidgets/interface.cpp:1205
 #: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
 msgid "Play"
 msgstr "播放"
@@ -9629,8 +9694,9 @@ msgstr "播放"
 #: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1304
 #: modules/gui/macosx/intf.m:1305 modules/gui/macosx/intf.m:1306
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
-#: modules/gui/wxwidgets/interface.cpp:668
-#: modules/gui/wxwidgets/interface.cpp:1183
+#: modules/gui/wxwidgets/interface.cpp:671
+#: modules/gui/wxwidgets/interface.cpp:682
+#: modules/gui/wxwidgets/interface.cpp:1199
 #: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr "暫停"
@@ -9823,7 +9889,7 @@ msgstr "隱藏其他"
 msgid "Show All"
 msgstr "顯示全部"
 
-#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1461
+#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1477
 msgid "Quit VLC"
 msgstr "離開VLC"
 
@@ -10423,12 +10489,12 @@ msgid "1 item in the playlist"
 msgstr "播放清單中有 1 個項目"
 
 #: modules/gui/macosx/prefs.m:123
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:209
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:212
 msgid "Reset All"
 msgstr "全部重置"
 
 #: modules/gui/macosx/prefs.m:142
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:290
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:295
 msgid "Reset Preferences"
 msgstr "重設偏好設定"
 
@@ -10437,7 +10503,7 @@ msgid "Continue"
 msgstr "繼續"
 
 #: modules/gui/macosx/prefs.m:145
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:288
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:293
 msgid ""
 "Beware this will reset your VLC media player preferences.\n"
 "Are you sure you want to continue?"
@@ -11767,21 +11833,21 @@ msgstr ""
 "(WinCE介面)\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:916
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:932
 msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:917
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:933
 msgid "Compiled by "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:919
+#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:935
 msgid "Compiler: "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:920
+#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:936
 msgid "Based on SVN revision: "
 msgstr ""
 
@@ -11875,7 +11941,7 @@ msgstr ""
 msgid "Playlist item info"
 msgstr "播放清單項目資訊"
 
-#: modules/gui/wxwidgets/dialogs/messages.cpp:203
+#: modules/gui/wxwidgets/dialogs/messages.cpp:205
 msgid "Save Messages As..."
 msgstr "另存訊息..."
 
@@ -11886,7 +11952,7 @@ msgstr "進階選項..."
 #: modules/gui/wxwidgets/dialogs/open.cpp:264
 #: modules/gui/wxwidgets/dialogs/open.cpp:275
 #: modules/gui/wxwidgets/dialogs/open.cpp:420
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:213
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:216
 msgid "Advanced options"
 msgstr "進階選項"
 
@@ -12123,7 +12189,7 @@ msgid "Sort this branch"
 msgstr "排序該分支"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1610
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1621
 #, fuzzy
 msgid "Add node"
 msgstr "音訊編碼器"
@@ -12158,30 +12224,30 @@ msgstr "逼放清單是空的"
 msgid "Can't save"
 msgstr "無法儲存"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1400 modules/misc/freetype.c:100
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1411 modules/misc/freetype.c:100
 #: modules/misc/win32text.c:71
 msgid "Normal"
 msgstr "正常"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1402
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1413
 #, fuzzy
 msgid "Sorted by artist"
 msgstr "依製作人排序"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1404
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1415
 #, fuzzy
 msgid "Sorted by Album"
 msgstr "依名稱排序"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1609
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1620
 msgid "Please enter node name"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1610
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1621
 msgid "New node"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:1011
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:1016
 msgid ""
 "Some options are available but hidden. Check \"Advanced options\" to see "
 "them."
@@ -12517,125 +12583,126 @@ msgstr "上一軌"
 msgid "Next track"
 msgstr "下一軌"
 
-#: modules/gui/wxwidgets/interface.cpp:561
+#: modules/gui/wxwidgets/interface.cpp:564
 msgid "Quick &Open File...\tCtrl-O"
 msgstr "快速開啟檔案...\tCtrl-O"
 
-#: modules/gui/wxwidgets/interface.cpp:564
+#: modules/gui/wxwidgets/interface.cpp:567
 msgid "Open &File...\tCtrl-F"
 msgstr "開啟檔案(&F)...\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:565
+#: modules/gui/wxwidgets/interface.cpp:568
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
 msgstr "開啟檔案(&F)...\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:566
+#: modules/gui/wxwidgets/interface.cpp:569
 msgid "Open &Disc...\tCtrl-D"
 msgstr "開啟光碟(&D)...\tCtrl-D"
 
-#: modules/gui/wxwidgets/interface.cpp:568
+#: modules/gui/wxwidgets/interface.cpp:571
 msgid "Open &Network Stream...\tCtrl-N"
 msgstr "開啟網路串流(&N)...\tCtrl-N"
 
-#: modules/gui/wxwidgets/interface.cpp:570
+#: modules/gui/wxwidgets/interface.cpp:573
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
 msgstr "開啟擷取裝置(&C)...\tCtrl-C"
 
-#: modules/gui/wxwidgets/interface.cpp:573
+#: modules/gui/wxwidgets/interface.cpp:576
 msgid "&Wizard...\tCtrl-W"
 msgstr "精靈(W)...\tCtrl-W"
 
-#: modules/gui/wxwidgets/interface.cpp:576
+#: modules/gui/wxwidgets/interface.cpp:579
 msgid "E&xit\tCtrl-X"
 msgstr "離開(&X)\tCtrl-X"
 
-#: modules/gui/wxwidgets/interface.cpp:582
+#: modules/gui/wxwidgets/interface.cpp:585
 msgid "&Playlist...\tCtrl-P"
 msgstr "播放清單(&P)\tCtrl-P"
 
-#: modules/gui/wxwidgets/interface.cpp:584
+#: modules/gui/wxwidgets/interface.cpp:587
 msgid "&Messages...\tCtrl-M"
 msgstr "訊息(&M)...\tCtrl-M"
 
-#: modules/gui/wxwidgets/interface.cpp:586
+#: modules/gui/wxwidgets/interface.cpp:589
 msgid "Stream and Media &info...\tCtrl-I"
 msgstr "串流及媒體資訊(&I)...\tCtrl-I"
 
-#: modules/gui/wxwidgets/interface.cpp:588
+#: modules/gui/wxwidgets/interface.cpp:591
 msgid "VLM Control...\tCtrl-V"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:600
+#: modules/gui/wxwidgets/interface.cpp:603
 msgid "Check for updates ..."
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:604
+#: modules/gui/wxwidgets/interface.cpp:607
 msgid "&File"
 msgstr "檔案(&F)"
 
-#: modules/gui/wxwidgets/interface.cpp:605
+#: modules/gui/wxwidgets/interface.cpp:608
 msgid "&View"
 msgstr "檢視(&V)"
 
-#: modules/gui/wxwidgets/interface.cpp:606
+#: modules/gui/wxwidgets/interface.cpp:609
 msgid "&Settings"
 msgstr "設定(&S)"
 
-#: modules/gui/wxwidgets/interface.cpp:607
+#: modules/gui/wxwidgets/interface.cpp:610
 msgid "&Audio"
 msgstr "音訊(&A)"
 
-#: modules/gui/wxwidgets/interface.cpp:608
+#: modules/gui/wxwidgets/interface.cpp:611
 msgid "&Video"
 msgstr "視訊(&V)"
 
-#: modules/gui/wxwidgets/interface.cpp:609
+#: modules/gui/wxwidgets/interface.cpp:612
 msgid "&Navigation"
 msgstr "導覽(&N)"
 
-#: modules/gui/wxwidgets/interface.cpp:610
+#: modules/gui/wxwidgets/interface.cpp:613
 msgid "&Help"
 msgstr "輔助說明(&H)"
 
-#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:673
+#: modules/gui/wxwidgets/interface.cpp:684
 #, fuzzy
 msgid "Small playlist"
 msgstr "儲存播放清單"
 
-#: modules/gui/wxwidgets/interface.cpp:671
+#: modules/gui/wxwidgets/interface.cpp:674
 msgid "Previous playlist item"
 msgstr "前一個播放清單項目"
 
-#: modules/gui/wxwidgets/interface.cpp:672
+#: modules/gui/wxwidgets/interface.cpp:675
 msgid "Next playlist item"
 msgstr "下一個播放清單項目"
 
-#: modules/gui/wxwidgets/interface.cpp:673
+#: modules/gui/wxwidgets/interface.cpp:676
 msgid "Play slower"
 msgstr "慢速播放"
 
-#: modules/gui/wxwidgets/interface.cpp:674
+#: modules/gui/wxwidgets/interface.cpp:677
 msgid "Play faster"
 msgstr "快速播放"
 
-#: modules/gui/wxwidgets/interface.cpp:857
+#: modules/gui/wxwidgets/interface.cpp:873
 #, fuzzy
 msgid "Extended &GUI\tCtrl-G"
 msgstr "延伸使用者介面(&E)"
 
-#: modules/gui/wxwidgets/interface.cpp:860
+#: modules/gui/wxwidgets/interface.cpp:876
 #, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
 msgstr "書籤(&B)"
 
-#: modules/gui/wxwidgets/interface.cpp:862
+#: modules/gui/wxwidgets/interface.cpp:878
 #, fuzzy
 msgid "Preference&s...\tCtrl-S"
 msgstr "偏好設定..."
 
-#: modules/gui/wxwidgets/interface.cpp:915
+#: modules/gui/wxwidgets/interface.cpp:931
 #, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
@@ -12644,19 +12711,19 @@ msgstr ""
 " (wxWindows介面)\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:926
+#: modules/gui/wxwidgets/interface.cpp:942
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:929
+#: modules/gui/wxwidgets/interface.cpp:945
 #, c-format
 msgid "About %s"
 msgstr "關於 %s"
 
-#: modules/gui/wxwidgets/interface.cpp:1472
+#: modules/gui/wxwidgets/interface.cpp:1488
 #, fuzzy
 msgid "Show/Hide interface"
 msgstr "顯示介面"
@@ -12795,12 +12862,22 @@ msgstr ""
 msgid "Show systray icon"
 msgstr "顯示串流位置"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:110
+#: modules/gui/wxwidgets/wxwidgets.cpp:102
+#, fuzzy
+msgid "Show labels in toolbar"
+msgstr "顯示工具列按鈕文字"
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:103
+#, fuzzy
+msgid "Show labels below the icons in the toolbar."
+msgstr "在工具列圖示的下方顯示文字"
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:112
 #, fuzzy
 msgid "wxWidgets interface module"
 msgstr "wxWindows介面模組"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:152
+#: modules/gui/wxwidgets/wxwidgets.cpp:155
 msgid "wxWidgets dialogs provider"
 msgstr ""
 
@@ -15711,6 +15788,26 @@ msgstr ""
 msgid "XOSD interface"
 msgstr "XOSD介面"
 
+#, fuzzy
+#~ msgid "Allows you to set the desired frame rate."
+#~ msgstr "允許你指定串流輸出的多工器"
+
+#~ msgid "MPEG-I/II audio demuxer"
+#~ msgstr "MPEG-I/II音訊解多工器"
+
+#~ msgid "Ogg stream demuxer"
+#~ msgstr "Ogg串流解多工器"
+
+#, fuzzy
+#~ msgid "Podcast playlist import"
+#~ msgstr "PLS播放清單匯入"
+
+#~ msgid "Text subtitles demux"
+#~ msgstr "文字字幕解多工"
+
+#~ msgid "ID3 tag parser using libid3tag"
+#~ msgstr "ID3標籤解析器(使用libid3tag)"
+
 #~ msgid "Enable CABAC"
 #~ msgstr "啟用CABAC"
 
@@ -15719,10 +15816,6 @@ msgstr "XOSD介面"
 
 #~ msgid "Analyse mode"
 #~ msgstr "分析模式"
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "Tarkin解碼器模組"
 
 #~ msgid "Save As..."
 #~ msgstr "另存新擋..."
@@ -15895,12 +15988,6 @@ msgstr "XOSD介面"
 
 #~ msgid "Show tooltips for configuration options."
 #~ msgstr "顯示組態選項的工具提示"
-
-#~ msgid "Show text on toolbar buttons"
-#~ msgstr "顯示工具列按鈕文字"
-
-#~ msgid "Show the text below icons on the toolbar."
-#~ msgstr "在工具列圖示的下方顯示文字"
 
 #~ msgid "Interface default search path"
 #~ msgstr "介面預設搜尋路徑"
