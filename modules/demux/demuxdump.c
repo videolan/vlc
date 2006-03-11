@@ -35,13 +35,12 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FILE_TEXT N_("Filename of dump")
+#define FILE_TEXT N_("Dump filename")
 #define FILE_LONGTEXT N_( \
-    "Specify a file name to which the raw stream will be dumped." )
-#define APPEND_TEXT N_("Append")
+    "Name of the file to which the raw stream will be dumped." )
+#define APPEND_TEXT N_("Append to existing file")
 #define APPEND_LONGTEXT N_( \
-    "If the file exists and this option is selected, the existing file " \
-    "will not be overwritten." )
+    "If the file already exists, it will not be overwritten." )
 
 static int  Open( vlc_object_t * );
 static void Close ( vlc_object_t * );
@@ -50,7 +49,7 @@ vlc_module_begin();
     set_shortname("Dump");
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( _("Filedump demuxer") );
+    set_description( _("File dumpper") );
     set_capability( "demux2", 0 );
     add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );

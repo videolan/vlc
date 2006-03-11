@@ -44,7 +44,9 @@
  * Module descriptor
  *****************************************************************************/
 #define REPLAYGAIN_TYPE_TEXT N_("Replay Gain type" )
-#define REPLAYGAIN_TYPE_LONGTEXT N_( "Replay Gain type" )
+#define REPLAYGAIN_TYPE_LONGTEXT N_( "Musepack can have a title-specific " \
+              "replay gain (volume control) or an album-specific one. "  \
+              "Choose which type you want to use" )
 
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
@@ -54,7 +56,7 @@ static char *ppsz_replaygain_type[] = { N_("None"), N_("Title"), N_("Album") };
 
 vlc_module_begin();
     set_shortname( "MPC" );
-    set_description( _("MPC demuxer") );
+    set_description( _("MusePack demuxer") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability( "demux2", 145 );

@@ -36,7 +36,8 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("raw DV demuxer") );
+    set_shortname( "DV" );
+    set_description( _("DV (Digital Video) demuxer") );
     set_capability( "demux2", 2 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );

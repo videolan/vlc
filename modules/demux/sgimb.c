@@ -110,7 +110,7 @@ static int  Activate  ( vlc_object_t * );
 static void Deactivate( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Kasenna MediaBase metademux") );
+    set_description( _("Kasenna MediaBase parser") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability( "demux2", 170 );

@@ -44,13 +44,15 @@ static int  Open ( vlc_object_t *p_this );
 static void Close( vlc_object_t *p_this );
 
 #define SUB_DELAY_LONGTEXT \
-    "Delay subtitles (in 1/10s)"
+    "Apply a delay to all subtitles (in 1/10s, eg 100 means 10s)."
 #define SUB_FPS_LONGTEXT \
-    "Override frames per second. " \
-    "It will only work with MicroDVD subtitles."
+    "Override the normal frames per second settings. " \
+    "This will only work with MicroDVD and SubRIP (SRT) subtitles."
 #define SUB_TYPE_LONGTEXT \
-    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
-    "\"sami\", \"dvdsubtitle\" (auto for autodetection, it should always work)."
+    "Force the subtiles format. Valid values are : \"microdvd\", \"subrip\"," \
+    "\"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
+    "\"sami\", \"dvdsubtitle\" and \"auto\" (meaning autodetection, this " \
+    "should always work)."
 static char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
@@ -59,7 +61,7 @@ static char *ppsz_sub_type[] =
 
 vlc_module_begin();
     set_shortname( _("Subtitles"));
-    set_description( _("Text subtitles demux") );
+    set_description( _("Text subtitles parser") );
     set_capability( "demux2", 0 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
@@ -69,7 +71,7 @@ vlc_module_begin();
     add_integer( "sub-delay", 0, NULL,
                N_("Subtitles delay"),
                SUB_DELAY_LONGTEXT, VLC_TRUE );
-    add_string( "sub-type", "auto", NULL, "Subtitles fileformat",
+    add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
                 SUB_TYPE_LONGTEXT, VLC_TRUE );
         change_string_list( ppsz_sub_type, 0, 0 );
     set_callbacks( Open, Close );

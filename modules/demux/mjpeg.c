@@ -41,12 +41,13 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define FPS_TEXT N_("Frames per Second")
-#define FPS_LONGTEXT N_("Allows you to set the desired frame rate when " \
-    "playing from files, use 0 for live.")
+#define FPS_LONGTEXT N_("This is the desired frame rate when " \
+    "playing MJPEG from a file. Use 0 (this is the default value) for a " \
+    "live stream (from the camera).")
 
 vlc_module_begin();
     set_shortname( "MJPEG");
-    set_description( _("JPEG camera demuxer") );
+    set_description( _("M-JPEG camera demuxer") );
     set_capability( "demux2", 5 );
     set_callbacks( Open, Close );
     set_category( CAT_INPUT );

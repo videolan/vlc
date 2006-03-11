@@ -45,7 +45,7 @@
 #define INDEX_TEXT N_("Force index creation")
 #define INDEX_LONGTEXT N_( \
     "Recreate a index for the AVI file. Use this if your AVI file is damaged "\
-    "or incomplete (not seekable)" )
+    "or incomplete (not seekable)." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -1167,8 +1167,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             int64_t i_pos;
 
             /* use i_percent to create a true i_date */
-            msg_Warn( p_demux, "mmh, seeking without index at %d%%"
-                      " work only for interleaved file", i_percent );
+            msg_Warn( p_demux, "seeking without index at %d%%"
+                      " only works for interleaved files", i_percent );
             if( i_percent >= 100 )
             {
                 msg_Warn( p_demux, "cannot seek so far !" );
@@ -2170,7 +2170,8 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
 
         if( !p_indx )
         {
-            msg_Warn( p_demux, "cannot find indx (misdetect/broken OpenDML file?)" );
+            msg_Warn( p_demux, "cannot find indx (misdetect/broken OpenDML "
+                               "file?)" );
             continue;
         }
 

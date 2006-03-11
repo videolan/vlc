@@ -44,6 +44,23 @@
 static int  Open    ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
+#define NOISE_LONGTEXT N_("Enable noise reduction algorithm")
+#define REVERB_LONGTEXT N_("Enable reverberation" )
+#define REVERB_LEVEL_LONGTEXT N_( "Reverberation level (from 0 " \
+                "to 100, default value is 0)." )
+#define REVERB_DELAY_LONGTEXT N_("Reverberation delay, in ms." \
+                " Usual values are from to 40 to 200ms." )
+#define MEGABASS_LONGTEXT N_( "Enable megabass mode" )
+#define MEGABASS_LEVEL_LONGTEXT N_("Megabass mode level (from 0 to 100, " \
+                "default value is 0)." )
+#define MEGABASS_RANGE_LONGTEXT N_("Megabass mode cutoff frequency, in Hz." \
+                "This is the maximum frequency for which the megabass " \
+                "effect applies. Valid values are from 10 to 100 Hz" )
+#define SURROUND_LEVEL_LONGTEXT N_( "Surround effect level (from 0 to 100, " \
+                "default value is 0)." )
+#define SURROUND_DELAY_LONGTEXT N_("Surround delay, in ms. Usual values are " \
+                "from 5 to 40 ms" )
+
 vlc_module_begin();
     set_shortname( "MOD");
     set_description( _("MOD demuxer (libmodplug)" ) );
@@ -51,19 +68,29 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
 
-    add_bool( "mod-noisereduction", VLC_TRUE, NULL, N_("Noise reduction"), N_("Noise reduction"), VLC_FALSE );
+    add_bool( "mod-noisereduction", VLC_TRUE, NULL, N_("Noise reduction"),
+              NOISE_LONGTEXT, VLC_FALSE );
 
-    add_bool( "mod-reverb", VLC_FALSE, NULL, N_("Reverb"), N_("Reverb"), VLC_FALSE );
-    add_integer_with_range( "mod-reverb-level", 0, 0, 100, NULL, N_("Reverb level (0-100)"), N_("Reverb level (0-100 defaults to 0)"), VLC_FALSE );
-    add_integer_with_range( "mod-reverb-delay", 40, 0, 1000, NULL, N_("Reverb delay (ms)"), N_("Reverb delay in ms (usually 40-200ms)"), VLC_FALSE );
+    add_bool( "mod-reverb", VLC_FALSE, NULL, N_("Reverb"),
+              REVERB_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "mod-reverb-level", 0, 0, 100, NULL,
+             N_("Reverberation level"), REVERB_LEVEL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( "mod-reverb-delay", 40, 0, 1000, NULL,
+             N_("Reverberation delay"), REVERB_DELAY_LONGTEXT, VLC_TRUE );
 
-    add_bool( "mod-megabass", VLC_FALSE, NULL, N_("Mega bass"), N_("Mega bass"), VLC_FALSE );
-    add_integer_with_range( "mod-megabass-level", 0, 0, 100, NULL, N_("Mega bass level (0-100)"), N_("Mega bass level (0-100 defaults to 0)"), VLC_FALSE );
-    add_integer_with_range( "mod-megabass-range", 10, 10, 100, NULL, N_("Mega bass cut off (Hz)"), N_("Mega bass cut off (10-100Hz)"), VLC_FALSE );
+    add_bool( "mod-megabass", VLC_FALSE, NULL, N_("Mega bass"),
+                    MEGABASS_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "mod-megabass-level", 0, 0, 100, NULL,
+              N_("Mega bass level"), MEGABASS_LEVEL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( "mod-megabass-range", 10, 10, 100, NULL,
+              N_("Mega bass cutoff"), MEGABASS_RANGE_LONGTEXT, VLC_TRUE );
 
-    add_bool( "mod-surround", VLC_FALSE, NULL, N_("Surround"), N_("Surround"), VLC_FALSE );
-    add_integer_with_range( "mod-surround-level", 0, 0, 100, NULL, N_("Surround level (0-100)"), N_("Surround level (0-100 defaults to 0)"), VLC_FALSE );
-    add_integer_with_range( "mod-surround-delay", 5, 0, 1000, NULL, N_("Surround delay (ms)"), N_("Surround delay in ms (usually 5-40ms)"), VLC_FALSE );
+    add_bool( "mod-surround", VLC_FALSE, NULL, N_("Surround"), N_("Surround"),
+               VLC_FALSE );
+    add_integer_with_range( "mod-surround-level", 0, 0, 100, NULL,
+              N_("Surround level"), SURROUND_LEVEL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( "mod-surround-delay", 5, 0, 1000, NULL,
+              N_("Surround delay (ms)"), SURROUND_DELAY_LONGTEXT, VLC_TRUE );
 
     set_callbacks( Open, Close );
     add_shortcut( "mod" );

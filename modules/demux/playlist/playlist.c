@@ -34,16 +34,16 @@
  * Module descriptor
  *****************************************************************************/
 #define AUTOSTART_TEXT N_( "Auto start" )
-#define AUTOSTART_LONGTEXT N_( "Automatically start the playlist when " \
-    "it's loaded.\n" )
+#define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
+                "content once it's loaded.\n" )
 
 vlc_module_begin();
     add_shortcut( "playlist" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
 
-    add_bool( "playlist-autostart", 1, NULL, AUTOSTART_TEXT, AUTOSTART_LONGTEXT,
-              VLC_FALSE );
+    add_bool( "playlist-autostart", 1, NULL,
+              AUTOSTART_TEXT, AUTOSTART_LONGTEXT, VLC_FALSE );
 
     set_shortname( _("Playlist") );
     set_description( _("Playlist") );
@@ -80,7 +80,7 @@ vlc_module_begin();
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_DVB), E_(Close_DVB) );
     add_submodule();
-        set_description( _("Podcast playlist import") );
+        set_description( _("Podcast parser") );
         add_shortcut( "podcast" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_podcast), E_(Close_podcast) );

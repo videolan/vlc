@@ -44,7 +44,7 @@ static int  OpenAlt( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("PS demuxer") );
+    set_description( _("MPEG-PS demuxer") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability( "demux2", 1 );
@@ -52,7 +52,7 @@ vlc_module_begin();
     add_shortcut( "ps" );
 
     add_submodule();
-    set_description( _("PS demuxer") );
+    set_description( _("MPEG-PS demuxer") );
     set_capability( "demux2", 9 );
     set_callbacks( OpenAlt, Close );
 vlc_module_end();

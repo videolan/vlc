@@ -37,7 +37,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define FPS_TEXT N_("Frames per Second")
-#define FPS_LONGTEXT N_("Allows you to set the desired frame rate.")
+#define FPS_LONGTEXT N_("Desired frame rate for the H264 stream.")
 
 
 vlc_module_begin();
