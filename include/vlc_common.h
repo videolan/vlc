@@ -1110,7 +1110,7 @@ VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char **pp_a
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#ifndef HAVE_SHARED_LIBVLC
+#if defined (WIN32) || !defined (HAVE_SHARED_LIBVLC)
 VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #endif
 
@@ -1126,10 +1126,10 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #       include <libintl.h>
 #   endif
 #   undef _
-#   ifdef HAVE_SHARED_LIBVLC
-#       define _(String) dgettext (PACKAGE_NAME, String)
+#   if defined (WIN32) || !defined (HAVE_SHARED_LIBVLC)
+#       define _(String) vlc_dgettext (PACKAGE_NAME, String)
 #   else
-#       define _(String) vlc_dgettext(PACKAGE_NAME, String)
+#       define _(String) dgettext(PACKAGE_NAME, String)
 #   endif
 #   define N_(String) ((char*)(String))
 #else
