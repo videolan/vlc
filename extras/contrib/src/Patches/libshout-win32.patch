@@ -1,0 +1,13 @@
+diff -u libshout/include/shout/shout.h.in libshout-new/include/shout/shout.h.in
+--- libshout/include/shout/shout.h.in	2004-10-30 02:23:15.000000000 +0100
++++ libshout-new/include/shout/shout.h.in	2006-03-12 21:06:13.000000000 +0000
+@@ -22,9 +22,6 @@
+ #define __LIBSHOUT_SHOUT_H__
+ 
+ #include <sys/types.h>
+-#ifdef WIN32
+-#include <os.h>
+-#endif
+ 
+ #define SHOUTERR_SUCCESS	(0)
+ #define SHOUTERR_INSANE		(-1)

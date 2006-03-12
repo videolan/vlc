@@ -155,7 +155,7 @@ else
   ifdef HAVE_WIN32
 
    all: .iconv .intl .freetype .fribidi .zlib \
-	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .shout .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml  .matroska .ffmpeg .dvdcss \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
@@ -682,9 +682,12 @@ libshout-$(SHOUT_VERSION).tar.gz:
 
 libshout: libshout-$(SHOUT_VERSION).tar.gz
 	$(EXTRACT_GZ)
-
+ifdef HAVE_WIN32
+	patch -p0 < Patches/libshout-win32.patch
+endif
+  
 .shout: libshout .theora .ogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd include make && make install && cd ../src && make && make install )
 	$(INSTALL_NAME)
 	touch $@
 
