@@ -48,6 +48,12 @@ namespace wxvlc
 
         DECLARE_EVENT_TABLE();
 
+        wxPanel *panel;
+        wxBoxSizer *main_sizer;
+        wxBoxSizer *panel_sizer;
+
+        wxButton *update_button;
+
         intf_thread_t *p_intf;
         update_t *p_u;
     };

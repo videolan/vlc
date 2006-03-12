@@ -71,12 +71,21 @@ UpdateVLC::UpdateVLC( intf_thread_t *_p_intf, wxWindow *p_parent ):
     SetIcon( *p_intf->p_sys->p_icon );
     SetAutoLayout( TRUE );
 
-    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
-    wxButton *update_button =
-        new wxButton( this, CheckForUpdate_Event,
-                      wxU(_("Check for updates now !")) );
-    main_sizer->Add( update_button );
-    SetSizerAndFit( main_sizer );
+    panel = new wxPanel( this, -1 );
+    panel->SetAutoLayout( TRUE );
+
+    main_sizer = new wxBoxSizer( wxVERTICAL );
+    panel_sizer = new wxBoxSizer( wxVERTICAL );
+
+    update_button =  new wxButton( panel, CheckForUpdate_Event,
+                      wxU(_("Check for updates")) );
+    panel_sizer->Add( update_button, 0, wxALL, 5 );
+    panel_sizer->Layout();
+    panel->SetSizerAndFit( panel_sizer );
+    main_sizer->Add( panel_sizer );
+    main_sizer->Layout();
+    SetSizer( main_sizer );
+    Fit( );
 
     p_u = update_New( p_intf );
 }
@@ -104,16 +113,16 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
     update_iterator_t *p_uit = update_iterator_New( p_u );
     if( p_uit )
     {
-        wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
+        panel_sizer->Remove( update_button );
+        panel->DestroyChildren();
 
         p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
         p_uit->i_t = UPDATE_FILE_TYPE_ALL;
         update_iterator_Action( p_uit, UPDATE_MIRROR );
 
-        DestroyChildren();
 
         wxListCtrl *list =
-            new wxListCtrl( this, ChooseItem_Event,
+            new wxListCtrl( panel, ChooseItem_Event,
                             wxDefaultPosition, wxSize( 400, 300 ),
                             wxLC_AUTOARRANGE|wxLC_SINGLE_SEL );
         wxImageList *images = new wxImageList( 32, 32, TRUE );
@@ -150,10 +159,13 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
                               i_image );
         }
 
-        main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable updates and related downloads:\n(Double click on a file to download it)\n" ) ) ) );
-        main_sizer->Add( list );
+        panel_sizer->Add( new wxStaticText( panel, -1, wxU( _("\nAvailable updates and related downloads:\n(Double click on a file to download it)\n" ) ) ) );
+        panel_sizer->Add( list, 0, wxALL, 5 );
+        panel_sizer->Layout();
+        panel->SetSizerAndFit( panel_sizer );
+        main_sizer->Layout();
         SetSizerAndFit( main_sizer );
-        Layout();
+
         update_iterator_Delete( p_uit );
     }
 }
