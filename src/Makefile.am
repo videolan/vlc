@@ -11,7 +11,7 @@ EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in
 
 BUILT_SOURCES = $(DISTCLEANFILES) $(CLEANFILES)
 DISTCLEANFILES = stamp-api
-CLEANFILES = misc/modules_builtin.h stamp-version misc/version.c
+CLEANFILES = misc/modules_builtin.h
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc) stamp-builtins
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
@@ -110,15 +110,6 @@ misc/modules_builtin.h: Makefile misc/modules_builtin.h.in ../vlc-config
 	touch $@
 
 misc/modules.c: misc/modules_builtin.h
-
-misc/version.c:
-	$(TOOLBOX) --update-version
-
-stamp-version: misc/version.c
-	$(TOOLBOX) --update-version
-	touch $@
-
-.PHONY: stamp-version
 
 ###############################################################################
 # Building builtin modules
@@ -337,7 +328,6 @@ SOURCES_libvlc_common = \
 	misc/vlm.c \
 	misc/xml.c \
 	misc/hashtables.c \
-	misc/version.c \
 	extras/libc.c \
 	control/core.c \
 	control/playlist.c \
@@ -362,7 +352,16 @@ SOURCES_libvlc = \
 	$(OPT_SOURCES_libvlc_getopt) \
 	$(NULL)
 
+
 if !USE_LIBTOOL
+if !BUILD_SHARED
+SOURCES_libvlc += misc/version.c
+CLEANFILES += misc/version.c
+
+misc/version.c:
+	$(TOOLBOX) --update-version
+endif
+
 # Install shared libvlc
 install-exec-local:
 	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"

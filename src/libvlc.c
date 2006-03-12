@@ -158,11 +158,13 @@ DECLARE_VLC_VERSION( CompileHost, COMPILE_HOST );
 DECLARE_VLC_VERSION( CompileDomain, COMPILE_DOMAIN );
 DECLARE_VLC_VERSION( Compiler, COMPILER );
 
+#ifndef HAVE_SHARED_LIBVLC
 extern const char psz_vlc_changeset[];
 char const * VLC_Changeset( void )
 {
     return psz_vlc_changeset;
 }
+#endif
 
 /*****************************************************************************
  * VLC_Error: strerror() equivalent
@@ -2444,9 +2446,11 @@ static void Version( void )
     utf8_fprintf( stdout, _("Compiled by %s@%s.%s\n"),
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
     utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
+#ifndef HAVE_SHARED_LIBVLC
     if( strcmp( VLC_Changeset(), "exported" ) )
         utf8_fprintf( stdout, _("Based upon svn changeset [%s]\n"),
                  VLC_Changeset() );
+#endif
     utf8_fprintf( stdout, LICENSE_MSG );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
