@@ -498,7 +498,9 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                 _("Compiled by ") + VLC_CompileBy() + "@" +
                 VLC_CompileHost() + "." + VLC_CompileDomain() + ".\n" +
                 _("Compiler: ") + VLC_Compiler() + ".\n" +
+#ifndef HAVE_SHARED_LIBVLC
                 _("Based on SVN revision: ") + VLC_Changeset() + ".\n\n" +
+#endif
                 _("The VideoLAN team <videolan@videolan.org>\n"
                   "http://www.videolan.org/");
 

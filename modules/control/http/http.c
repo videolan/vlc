@@ -538,7 +538,9 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_compile_domain",
                            VLC_CompileDomain() );
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_compiler", VLC_Compiler() );
+#ifndef HAVE_SHARED_LIBVLC
     E_(mvar_AppendNewVar)( p_args->vars, "vlc_changeset", VLC_Changeset() );
+#endif
     E_(mvar_AppendNewVar)( p_args->vars, "stream_position", position );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_time", time );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_length", length );

@@ -1145,14 +1145,16 @@ VLC_EXPORT( const char *, VLC_CompileBy, ( void ) );
 VLC_EXPORT( const char *, VLC_CompileHost, ( void ) );
 VLC_EXPORT( const char *, VLC_CompileDomain, ( void ) );
 VLC_EXPORT( const char *, VLC_Compiler, ( void ) );
-VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 VLC_EXPORT( const char *, VLC_Error, ( int ) );
 
 /*****************************************************************************
  * Additional vlc stuff
  *****************************************************************************/
 #ifndef HAVE_SHARED_LIBVLC
+VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #   include "vlc_symbols.h"
+#else
+#   define VLC_Changeset( ) ("exported")
 #endif
 #include "os_specific.h"
 #include "vlc_messages.h"
