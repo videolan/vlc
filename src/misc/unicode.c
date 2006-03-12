@@ -470,43 +470,43 @@ int utf8_lstat( const char *filename, void *buf)
  *****************************************************************************/
 static int utf8_vasprintf( char **str, const char *fmt, va_list ap )
 {
-	char *utf8;
-	int res = vasprintf( &utf8, fmt, ap );
-	if( res == -1 )
-		return -1;
+    char *utf8;
+    int res = vasprintf( &utf8, fmt, ap );
+    if( res == -1 )
+        return -1;
 
-	*str = ToLocaleDup( utf8 );
-	free( utf8 );
-	return res;
+    *str = ToLocaleDup( utf8 );
+    free( utf8 );
+    return res;
 }
 
 static int utf8_vfprintf( FILE *stream, const char *fmt, va_list ap )
 {
-	char *str;
-	int res = utf8_vasprintf( &str, fmt, ap );
-	if( res == -1 )
-		return -1;
+    char *str;
+    int res = utf8_vasprintf( &str, fmt, ap );
+    if( res == -1 )
+        return -1;
 
-	fputs( str, stream );
-	free( str );
-	return res;
+    fputs( str, stream );
+    free( str );
+    return res;
 }
 
 int utf8_fprintf( FILE *stream, const char *fmt, ... )
 {
-	va_list ap;
-	int res;
+    va_list ap;
+    int res;
 
-	va_start( ap, fmt );
-	res = utf8_vfprintf( stream, fmt, ap );
-	va_end( ap );
-	return res;
+    va_start( ap, fmt );
+    res = utf8_vfprintf( stream, fmt, ap );
+    va_end( ap );
+    return res;
 }
 
 /*****************************************************************************
  * EnsureUTF8: replaces invalid/overlong UTF-8 sequences with question marks
  *****************************************************************************
- * Not Todo : convert Latin1 to UTF-8 on the flu
+ * Not Todo : convert Latin1 to UTF-8 on the fly
  * It is not possible given UTF-8 needs more space
  * Returns str if it was valid UTF-8, NULL if not.
  *****************************************************************************/
@@ -519,11 +519,8 @@ char *EnsureUTF8( char *str )
     while( (c = *ptr) != '\0' )
     {
         /* US-ASCII, 1 byte */
-        if( ( ( c >= 0x20 ) && ( c <= 0x7F ) )
-         || ( c == 0x09 ) || ( c == 0x0A ) || ( c == 0x0D ) )
-        {
+        if( c <= 0x7F )
             ptr++; /* OK */
-        }
         else
         /* 2 bytes */
         if( ( c >= 0xC2 ) && ( c <= 0xDF ) )
@@ -532,10 +529,7 @@ char *EnsureUTF8( char *str )
             if( isutf8cont( c ) )
                 ptr += 2; /* OK */
             else
-            {
-                *ptr++ = '?'; /* invalid */
-                str = NULL;
-            }
+                goto error;
         }
         else
         /* 3 bytes */
@@ -548,16 +542,10 @@ char *EnsureUTF8( char *str )
                 if( isutf8cont( c ) )
                     ptr += 3; /* OK */
                 else
-                {
-                    *ptr++ = '?';
-                    str = NULL;
-                }
+                    goto error;
             }
             else
-            {
-                *ptr++ = '?';
-                str = NULL;
-            }
+                goto error;
         }
         else
         if( ( ( c >= 0xE1 ) && ( c <= 0xEC ) ) || ( c == 0xEC )
@@ -570,16 +558,10 @@ char *EnsureUTF8( char *str )
                 if( isutf8cont( c ) )
                     ptr += 3; /* OK */
                 else
-                {
-                    *ptr++ = '?';
-                    str = NULL;
-                }
+                    goto error;
             }
             else
-            {
-                *ptr++ = '?';
-                str = NULL;
-            }
+                goto error;
         }
         else
         if( c == 0xED )
@@ -591,16 +573,10 @@ char *EnsureUTF8( char *str )
                 if( isutf8cont( c ) )
                     ptr += 3; /* OK */
                 else
-                {
-                    *ptr++ = '?';
-                    str = NULL;
-                }
+                    goto error;
             }
             else
-            {
-                *ptr++ = '?';
-                str = NULL;
-            }
+                goto error;
         }
         else
         /* 4 bytes */
@@ -616,22 +592,13 @@ char *EnsureUTF8( char *str )
                     if( isutf8cont( c ) )
                         ptr += 4; /* OK */
                     else
-                    {
-                        *ptr++ = '?';
-                        str = NULL;
-                    }
+                        goto error;
                 }
                 else
-                {
-                    *ptr++ = '?';
-                    str = NULL;
-                }
+                    goto error;
             }
             else
-            {
-                *ptr++ = '?';
-                str = NULL;
-            }
+                goto error;
         }
         else
         if( ( c >= 0xF1 ) && ( c <= 0xF3 ) )
@@ -645,23 +612,13 @@ char *EnsureUTF8( char *str )
                     c = ptr[3];
                     if( isutf8cont( c ) )
                         ptr += 4; /* OK */
-                    else
-                    {
-                        *ptr++ = '?';
-                        str = NULL;
-                    }
+                    goto error;
                 }
                 else
-                {
-                    *ptr++ = '?';
-                    str = NULL;
-                }
+                    goto error;
             }
             else
-            {
-                *ptr++ = '?';
-                str = NULL;
-            }
+                goto error;
         }
         else
         if( c == 0xF4 )
@@ -676,37 +633,40 @@ char *EnsureUTF8( char *str )
                     if( isutf8cont( c ) )
                         ptr += 4; /* OK */
                     else
-                    {
-                        *ptr++ = '?';
-                        str = NULL;
-                    }
+                        goto error;
                 }
                 else
-                {
-                    *ptr++ = '?';
-                    str = NULL;
-                }
+                    goto error;
             }
             else
-            {
-                *ptr++ = '?';
-                str = NULL;
-            }
+                goto error;
         }
         else
-        {
-            *ptr++ = '?';
-            str = NULL;
-        }
+            goto error;
+
+        continue;
+
+error:
+        *ptr++ = '?';
+        str = NULL;
     }
 
     return str;
 }
 
-/**********************************************************************
- * UTF32toUTF8: converts an array from UTF-32 to UTF-8
- *********************************************************************/
-char *UTF32toUTF8( const wchar_t *src, size_t len, size_t *newlen )
+/**
+ * UTF32toUTF8(): converts an array from UTF-32 to UTF-8.
+ *
+ * @param src the UTF32 table to be converted
+ * @param len the number of code points to be converted from src
+ * (ie. the number of uint32_t in the table pointed to by src)
+ * @param newlen an optional pointer. If not NULL, *newlen will
+ * contain the total number of bytes written.
+ *
+ * @return the result of the conversion (must be free'd())
+ * or NULL on error (in that case, *newlen is undefined).
+ */
+char *UTF32toUTF8( const uint32_t *src, size_t len, size_t *newlen )
 {
     char *res, *out;
 
@@ -741,12 +701,18 @@ char *UTF32toUTF8( const wchar_t *src, size_t len, size_t *newlen )
             continue;
         }
         else
+        if( uv < 0x110000 )
         {
             *out++ = (( uv >> 18)         | 0xf0);
             *out++ = (((uv >> 12) & 0x3f) | 0x80);
             *out++ = (((uv >>  6) & 0x3f) | 0x80);
             *out++ = (( uv        & 0x3f) | 0x80);
             continue;
+        }
+        else
+        {
+            free( res );
+            return NULL;
         }
     }
     len = out - res;
@@ -756,15 +722,16 @@ char *UTF32toUTF8( const wchar_t *src, size_t len, size_t *newlen )
     return res;
 }
 
-/**********************************************************************
- * FromUTF32: converts an UTF-32 string to UTF-8
- **********************************************************************
- * The result must be free()'d. NULL on error.
- *********************************************************************/
-char *FromUTF32( const wchar_t *src )
+/**
+ * FromUTF32(): converts an UTF-32 string to UTF-8.
+ *
+ * @return the result of the conversion (must be free()'d),
+ * or NULL in case of error.
+ */
+char *FromUTF32( const uint32_t *src )
 {
     size_t len;
-    const wchar_t *in;
+    const uint32_t *in;
 
     /* determine the size of the string */
     for( len = 1, in = src; GetWBE( in ); len++ )

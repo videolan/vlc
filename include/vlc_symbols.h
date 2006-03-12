@@ -426,7 +426,7 @@ struct module_symbols_t
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     char * (*config_GetUserDir_inner) (void);
-    char * (*FromUTF32_inner) (const wchar_t *);
+    char * (*FromUTF32_inner) (const uint32_t *);
     int (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
     int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
     int (*__intf_Interact_inner) (vlc_object_t *,interaction_dialog_t *);
