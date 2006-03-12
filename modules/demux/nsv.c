@@ -154,7 +154,6 @@ static int Demux( demux_t *p_demux )
             msg_Warn( p_demux, "cannot peek" );
             return 0;
         }
-        fprintf( stderr, "4 first bytes Signature %x: %c%c%c%c\n", *(uint32_t*)p_peek ,p_peek[0], p_peek[1], p_peek[2],p_peek[3] );
 
         if( !strncmp( (char *)p_peek, "NSVf", 4 ) )
         {
@@ -173,7 +172,6 @@ static int Demux( demux_t *p_demux )
         }
         else if( GetWLE( p_peek ) == 0xbeef )
         {
-            fprintf( stderr, "Next frame\n");
             /* Next frame of the current NSVs chunk */
             if( stream_Read( p_demux->s, NULL, 2 ) < 2 )
             {
@@ -189,7 +187,6 @@ static int Demux( demux_t *p_demux )
             {
                 return -1;
             }
-            fprintf( stderr, "Resynchronized\n" );
         }
     }
 
@@ -396,16 +393,14 @@ static int ReSynch( demux_t *p_demux )
             return VLC_EGENERIC;
         }
         i_skip = 0;
-        fprintf( stderr, "Poke %i resync bytes\n", i_peek );
+
         while( i_skip < i_peek - 4 )
         {
             if( !strncmp( (char *)p_peek, "NSVf", 4 )
                     || !strncmp( (char *)p_peek, "NSVs", 4 ) )
             {
-                fprintf( stderr, "Found NSVx chunk after %i\n", i_skip );
                 if( i_skip > 0 )
                 {
-                    fprintf( stderr, "Skipping %i bytes\n", i_skip );
                     stream_Read( p_demux->s, NULL, i_skip );
                 }
                 return VLC_SUCCESS;
