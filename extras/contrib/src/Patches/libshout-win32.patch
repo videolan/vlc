@@ -11,3 +11,15 @@ diff -u libshout/include/shout/shout.h.in libshout-new/include/shout/shout.h.in
  
  #define SHOUTERR_SUCCESS	(0)
  #define SHOUTERR_INSANE		(-1)
+diff -u libshout-orig/Makefile.am libshout/Makefile.am
+--- libshout-orig/Makefile.am	2005-02-19 19:36:49.000000000 +0000
++++ libshout/Makefile.am	2006-03-12 21:54:51.000000000 +0000
+@@ -3,7 +3,7 @@
+ AUTOMAKE_OPTIONS = 1.6 foreign
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = include src examples debian doc win32
++SUBDIRS = include src 
+ 
+ EXTRA_DIST = INSTALL m4/shout.m4 m4/ac_config_libconfig_in.m4 m4/acx_pthread.m4 \
+ 	m4/ogg.m4 m4/vorbis.m4 m4/xiph_compiler.m4 m4/xiph_net.m4 \

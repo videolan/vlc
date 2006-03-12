@@ -684,6 +684,7 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libshout-win32.patch
+	(cd $@; aclocal && automake)
 endif
   
 .shout: libshout .theora .ogg
