@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-11 22:27+0000\n"
+"POT-Creation-Date: 2006-03-12 17:26+0000\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Sam Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
@@ -347,8 +347,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:322 modules/gui/macosx/intf.m:480
 #: modules/gui/macosx/intf.m:574 modules/gui/pda/pda_interface.c:1264
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:202
-#: modules/gui/wxwidgets/interface.cpp:672
-#: modules/gui/wxwidgets/interface.cpp:683
+#: modules/gui/wxwidgets/interface.cpp:671
 msgid "Playlist"
 msgstr ""
 
@@ -962,62 +961,62 @@ msgstr "Switch interface"
 msgid "Add Interface"
 msgstr "Add Interface"
 
-#: src/libvlc.c:327 src/libvlc.c:482 src/misc/modules.c:1682
-#: src/misc/modules.c:1986
+#: src/libvlc.c:329 src/libvlc.c:484 src/misc/modules.c:1683
+#: src/misc/modules.c:1987
 msgid "C"
 msgstr "en_GB"
 
-#: src/libvlc.c:344
+#: src/libvlc.c:346
 msgid "Help options"
 msgstr "Help options"
 
-#: src/libvlc.c:2219 src/misc/configuration.c:1248
+#: src/libvlc.c:2221 src/misc/configuration.c:1242
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:2236 src/misc/configuration.c:1212
+#: src/libvlc.c:2238 src/misc/configuration.c:1206
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:2254 src/misc/configuration.c:1237
+#: src/libvlc.c:2256 src/misc/configuration.c:1231
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:2260
+#: src/libvlc.c:2262
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:2261
+#: src/libvlc.c:2263
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:2443
+#: src/libvlc.c:2445
 #, fuzzy, c-format
 msgid "VLC version %s\n"
 msgstr "Stereo"
 
-#: src/libvlc.c:2444
+#: src/libvlc.c:2446
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr ""
 
-#: src/libvlc.c:2446
+#: src/libvlc.c:2448
 #, c-format
 msgid "Compiler: %s\n"
 msgstr ""
 
-#: src/libvlc.c:2448
+#: src/libvlc.c:2451
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
-#: src/libvlc.c:2479
+#: src/libvlc.c:2483
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
-#: src/libvlc.c:2500
+#: src/libvlc.c:2504
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -2901,7 +2900,7 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr ""
 
 #: src/libvlc.h:856 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1479
+#: modules/gui/wxwidgets/interface.cpp:1467
 msgid "Play/Pause"
 msgstr ""
 
@@ -2927,7 +2926,6 @@ msgstr ""
 
 #: src/libvlc.h:862 modules/control/hotkeys.c:648
 #: modules/gui/macosx/controls.m:625 modules/gui/macosx/intf.m:518
-#: modules/gui/wxwidgets/interface.cpp:688
 msgid "Faster"
 msgstr ""
 
@@ -2937,7 +2935,6 @@ msgstr ""
 
 #: src/libvlc.h:864 modules/control/hotkeys.c:655
 #: modules/gui/macosx/controls.m:626 modules/gui/macosx/intf.m:519
-#: modules/gui/wxwidgets/interface.cpp:687
 msgid "Slower"
 msgstr ""
 
@@ -2949,8 +2946,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:476
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:592
 #: modules/gui/macosx/wizard.m:313 modules/gui/macosx/wizard.m:364
-#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:686
-#: modules/gui/wxwidgets/interface.cpp:1484
+#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1472
 #: modules/gui/wxwidgets/menus.cpp:289
 msgid "Next"
 msgstr ""
@@ -2962,8 +2958,7 @@ msgstr ""
 #: src/libvlc.h:868 modules/control/hotkeys.c:628
 #: modules/gui/macosx/controls.m:645 modules/gui/macosx/intf.m:471
 #: modules/gui/macosx/intf.m:520 modules/gui/macosx/intf.m:593
-#: modules/gui/wxwidgets/interface.cpp:685
-#: modules/gui/wxwidgets/interface.cpp:1483
+#: modules/gui/wxwidgets/interface.cpp:1471
 #: modules/gui/wxwidgets/menus.cpp:288
 msgid "Previous"
 msgstr ""
@@ -2977,9 +2972,8 @@ msgstr ""
 #: modules/gui/macosx/intf.m:591 modules/gui/pda/pda_interface.c:274
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
-#: modules/gui/wxwidgets/interface.cpp:669
-#: modules/gui/wxwidgets/interface.cpp:680
-#: modules/gui/wxwidgets/interface.cpp:1485
+#: modules/gui/wxwidgets/interface.cpp:668
+#: modules/gui/wxwidgets/interface.cpp:1473
 #: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr ""
@@ -3665,11 +3659,11 @@ msgstr ""
 msgid "print version information"
 msgstr ""
 
-#: src/misc/configuration.c:1212
+#: src/misc/configuration.c:1206
 msgid "boolean"
 msgstr ""
 
-#: src/misc/configuration.c:1223
+#: src/misc/configuration.c:1217
 msgid "key"
 msgstr ""
 
@@ -5832,7 +5826,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:96 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1349
+#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1337
 msgid "Volume"
 msgstr ""
 
@@ -7598,11 +7592,6 @@ msgstr "Flac audio packetiser"
 #, fuzzy
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "MPEG-I/II video demuxer"
-
-#: modules/codec/libvc1.c:54
-#, fuzzy
-msgid "VC-1 decoder module"
-msgstr "Decoder modules settings"
 
 #: modules/codec/lpcm.c:82
 msgid "Linear PCM audio decoder"
@@ -9396,6 +9385,11 @@ msgstr "&Shuffle Playlist"
 msgid "Podcast parser"
 msgstr "Copy packetiser"
 
+#: modules/demux/playlist/playlist.c:88
+#, fuzzy
+msgid "XSPF playlist import"
+msgstr "&Shuffle Playlist"
+
 #: modules/demux/playlist/podcast.c:289 modules/demux/playlist/podcast.c:298
 #: modules/demux/playlist/podcast.c:307 modules/demux/playlist/podcast.c:316
 #: modules/demux/playlist/podcast.c:325 modules/demux/playlist/podcast.c:335
@@ -9943,8 +9937,8 @@ msgstr "Channels"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159 modules/gui/macosx/open.m:440
 #: modules/gui/macosx/open.m:634 modules/gui/macosx/open.m:738
-#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:668
-#: modules/gui/wxwidgets/interface.cpp:679 modules/gui/wxwidgets/menus.cpp:317
+#: modules/gui/macosx/open.m:784 modules/gui/wxwidgets/interface.cpp:667
+#: modules/gui/wxwidgets/menus.cpp:317
 msgid "Open"
 msgstr ""
 
@@ -10158,7 +10152,7 @@ msgid "Take Screen Shot"
 msgstr ""
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:487
-#: modules/gui/wxwidgets/interface.cpp:601
+#: modules/gui/wxwidgets/interface.cpp:598
 msgid "About VLC media player"
 msgstr ""
 
@@ -10350,9 +10344,8 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:274
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:283
-#: modules/gui/wxwidgets/interface.cpp:670
-#: modules/gui/wxwidgets/interface.cpp:681
-#: modules/gui/wxwidgets/interface.cpp:1205
+#: modules/gui/wxwidgets/interface.cpp:669
+#: modules/gui/wxwidgets/interface.cpp:1193
 #: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
 msgid "Play"
 msgstr ""
@@ -10360,9 +10353,8 @@ msgstr ""
 #: modules/gui/macosx/embeddedwindow.m:66 modules/gui/macosx/intf.m:1304
 #: modules/gui/macosx/intf.m:1305 modules/gui/macosx/intf.m:1306
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
-#: modules/gui/wxwidgets/interface.cpp:671
-#: modules/gui/wxwidgets/interface.cpp:682
-#: modules/gui/wxwidgets/interface.cpp:1199
+#: modules/gui/wxwidgets/interface.cpp:670
+#: modules/gui/wxwidgets/interface.cpp:1187
 #: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr ""
@@ -10563,7 +10555,7 @@ msgstr "Video title"
 msgid "Show All"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1477
+#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1465
 msgid "Quit VLC"
 msgstr ""
 
@@ -12480,23 +12472,25 @@ msgid "Skin files (*.vlt;*.wsz)|*.vlt;*.wsz|Skin files (*.xml)|*.xml"
 msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:231
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:945
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:947
 #, fuzzy
 msgid "Open playlist"
 msgstr "&Shuffle Playlist"
 
 #: modules/gui/skins2/src/dialogs.cpp:232
-msgid "All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"
+msgid ""
+"All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF playlist|*."
+"xspf"
 msgstr ""
 
-#: modules/gui/skins2/src/dialogs.cpp:239
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:929
+#: modules/gui/skins2/src/dialogs.cpp:241
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:931
 #, fuzzy
 msgid "Save playlist"
 msgstr "&Shuffle Playlist"
 
-#: modules/gui/skins2/src/dialogs.cpp:239
-msgid "M3U file|*.m3u"
+#: modules/gui/skins2/src/dialogs.cpp:241
+msgid "M3U file|*.m3u|XSPF playlist|*.xspf"
 msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:343
@@ -12553,7 +12547,7 @@ msgid ""
 "\n"
 msgstr "Windows Service interface"
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:932
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:918
 #, fuzzy
 msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
@@ -12562,19 +12556,19 @@ msgstr ""
 "© 1996-2004 - the VideoLAN Team\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:933
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:919
 msgid "Compiled by "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:935
+#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:921
 msgid "Compiler: "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:501 modules/gui/wxwidgets/interface.cpp:936
+#: modules/gui/wince/interface.cpp:502 modules/gui/wxwidgets/interface.cpp:923
 msgid "Based on SVN revision: "
 msgstr ""
 
-#: modules/gui/wince/interface.cpp:502
+#: modules/gui/wince/interface.cpp:504
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/"
@@ -12921,7 +12915,7 @@ msgid "Sort this branch"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1621
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1623
 #, fuzzy
 msgid "Add node"
 msgstr "Audio encoder"
@@ -12948,34 +12942,39 @@ msgstr ""
 msgid "M3U file"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:917
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:912
+#, fuzzy
+msgid "XSPF playlist"
+msgstr "&Shuffle Playlist"
+
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:919
 msgid "Playlist is empty"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:917
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:919
 msgid "Can't save"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1411 modules/misc/freetype.c:100
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1413 modules/misc/freetype.c:100
 #: modules/misc/win32text.c:71
 msgid "Normal"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1413
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1415
 #, fuzzy
 msgid "Sorted by artist"
 msgstr "Reverse stereo"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1415
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1417
 #, fuzzy
 msgid "Sorted by Album"
 msgstr "Reverse stereo"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1620
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1622
 msgid "Please enter node name"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1621
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1623
 msgid "New node"
 msgstr ""
 
@@ -13326,150 +13325,149 @@ msgstr ""
 msgid "Next track"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:564
+#: modules/gui/wxwidgets/interface.cpp:561
 msgid "Quick &Open File...\tCtrl-O"
 msgstr "Quick &Open File…\tCtrl-O"
 
-#: modules/gui/wxwidgets/interface.cpp:567
+#: modules/gui/wxwidgets/interface.cpp:564
 msgid "Open &File...\tCtrl-F"
 msgstr "Open &File…\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:568
+#: modules/gui/wxwidgets/interface.cpp:565
 #, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
 msgstr "Open &File…\tCtrl-F"
 
-#: modules/gui/wxwidgets/interface.cpp:569
+#: modules/gui/wxwidgets/interface.cpp:566
 msgid "Open &Disc...\tCtrl-D"
 msgstr "Open &Disc…\tCtrl-D"
 
-#: modules/gui/wxwidgets/interface.cpp:571
+#: modules/gui/wxwidgets/interface.cpp:568
 msgid "Open &Network Stream...\tCtrl-N"
 msgstr "Open &Network Stream…\tCtrl-N"
 
-#: modules/gui/wxwidgets/interface.cpp:573
+#: modules/gui/wxwidgets/interface.cpp:570
 #, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
 msgstr "Open &Capture Device…\tCtrl-C"
 
-#: modules/gui/wxwidgets/interface.cpp:576
+#: modules/gui/wxwidgets/interface.cpp:573
 msgid "&Wizard...\tCtrl-W"
 msgstr "&Wizard…\tCtrl-W"
 
-#: modules/gui/wxwidgets/interface.cpp:579
+#: modules/gui/wxwidgets/interface.cpp:576
 msgid "E&xit\tCtrl-X"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:585
+#: modules/gui/wxwidgets/interface.cpp:582
 msgid "&Playlist...\tCtrl-P"
 msgstr "&Playlist…\tCtrl-P"
 
-#: modules/gui/wxwidgets/interface.cpp:587
+#: modules/gui/wxwidgets/interface.cpp:584
 msgid "&Messages...\tCtrl-M"
 msgstr "&Messages…\tCtrl-M"
 
-#: modules/gui/wxwidgets/interface.cpp:589
+#: modules/gui/wxwidgets/interface.cpp:586
 msgid "Stream and Media &info...\tCtrl-I"
 msgstr "Stream and Media &info…\tCtrl-I"
 
-#: modules/gui/wxwidgets/interface.cpp:591
+#: modules/gui/wxwidgets/interface.cpp:588
 msgid "VLM Control...\tCtrl-V"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:603
+#: modules/gui/wxwidgets/interface.cpp:601
 msgid "Check for updates ..."
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:607
+#: modules/gui/wxwidgets/interface.cpp:606
 #, fuzzy
 msgid "&File"
 msgstr "Title"
 
-#: modules/gui/wxwidgets/interface.cpp:608
+#: modules/gui/wxwidgets/interface.cpp:607
 #, fuzzy
 msgid "&View"
 msgstr "Video"
 
-#: modules/gui/wxwidgets/interface.cpp:609
+#: modules/gui/wxwidgets/interface.cpp:608
 #, fuzzy
 msgid "&Settings"
 msgstr "Setting"
 
-#: modules/gui/wxwidgets/interface.cpp:610
+#: modules/gui/wxwidgets/interface.cpp:609
 #, fuzzy
 msgid "&Audio"
 msgstr "Audio"
 
-#: modules/gui/wxwidgets/interface.cpp:611
+#: modules/gui/wxwidgets/interface.cpp:610
 #, fuzzy
 msgid "&Video"
 msgstr "Video"
 
-#: modules/gui/wxwidgets/interface.cpp:612
+#: modules/gui/wxwidgets/interface.cpp:611
 #, fuzzy
 msgid "&Navigation"
 msgstr "Polarisation"
 
-#: modules/gui/wxwidgets/interface.cpp:613
+#: modules/gui/wxwidgets/interface.cpp:612
 msgid "&Help"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:673
-#: modules/gui/wxwidgets/interface.cpp:684
+#: modules/gui/wxwidgets/interface.cpp:672
 #, fuzzy
 msgid "Small playlist"
 msgstr "&Shuffle Playlist"
 
-#: modules/gui/wxwidgets/interface.cpp:674
+#: modules/gui/wxwidgets/interface.cpp:673
 msgid "Previous playlist item"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:675
+#: modules/gui/wxwidgets/interface.cpp:674
 msgid "Next playlist item"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:676
+#: modules/gui/wxwidgets/interface.cpp:675
 msgid "Play slower"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:677
+#: modules/gui/wxwidgets/interface.cpp:676
 msgid "Play faster"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:873
+#: modules/gui/wxwidgets/interface.cpp:859
 msgid "Extended &GUI\tCtrl-G"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:876
+#: modules/gui/wxwidgets/interface.cpp:862
 #, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
 msgstr "&Bookmarks…"
 
-#: modules/gui/wxwidgets/interface.cpp:878
+#: modules/gui/wxwidgets/interface.cpp:864
 #, fuzzy
 msgid "Preference&s...\tCtrl-S"
 msgstr "Preferences…"
 
-#: modules/gui/wxwidgets/interface.cpp:931
+#: modules/gui/wxwidgets/interface.cpp:917
 #, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
 msgstr "Windows Service interface"
 
-#: modules/gui/wxwidgets/interface.cpp:942
+#: modules/gui/wxwidgets/interface.cpp:930
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:945
+#: modules/gui/wxwidgets/interface.cpp:933
 #, c-format
 msgid "About %s"
 msgstr ""
 
-#: modules/gui/wxwidgets/interface.cpp:1488
+#: modules/gui/wxwidgets/interface.cpp:1476
 #, fuzzy
 msgid "Show/Hide interface"
 msgstr "Add Interface"
@@ -13607,20 +13605,12 @@ msgstr ""
 msgid "Show systray icon"
 msgstr ""
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:102
-msgid "Show labels in toolbar"
-msgstr ""
-
-#: modules/gui/wxwidgets/wxwidgets.cpp:103
-msgid "Show labels below the icons in the toolbar."
-msgstr ""
-
-#: modules/gui/wxwidgets/wxwidgets.cpp:112
+#: modules/gui/wxwidgets/wxwidgets.cpp:110
 #, fuzzy
 msgid "wxWidgets interface module"
 msgstr "Windows Service interface"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:155
+#: modules/gui/wxwidgets/wxwidgets.cpp:152
 #, fuzzy
 msgid "wxWidgets dialogs provider"
 msgstr "wxWindows dialogues provider"
@@ -14016,6 +14006,11 @@ msgstr ""
 #: modules/misc/playlist/export.c:50
 msgid "Old playlist exporter"
 msgstr ""
+
+#: modules/misc/playlist/export.c:56
+#, fuzzy
+msgid "XSPF playlist export"
+msgstr "&Shuffle Playlist"
 
 #: modules/misc/qte_main.cpp:66
 msgid "Run as standalone Qt/Embedded GUI Server"
@@ -14606,7 +14601,7 @@ msgstr ""
 msgid "Universal Plug'n'Play discovery"
 msgstr ""
 
-#: modules/services_discovery/upnp_intel.cpp:258
+#: modules/services_discovery/upnp_intel.cpp:260
 msgid "Universal Plug'n'Play discovery ( Intel SDK )"
 msgstr ""
 
@@ -16706,6 +16701,10 @@ msgstr ""
 #: modules/visualization/xosd.c:82
 msgid "XOSD interface"
 msgstr "XOSD interface"
+
+#, fuzzy
+#~ msgid "VC-1 decoder module"
+#~ msgstr "Decoder modules settings"
 
 #, fuzzy
 #~ msgid ""
