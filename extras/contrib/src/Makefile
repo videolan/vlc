@@ -688,7 +688,7 @@ ifdef HAVE_WIN32
 endif
   
 .shout: libshout .theora .ogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd include make && make install && cd ../src && make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  make && make install )
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1605,15 +1605,13 @@ libIDL-0.6.3-win32-bin.zip:
 glib-19990228.zip:
 	$(WGET) $(GLIB_WIN32_BIN_URL)
 
-gecko-sdk-win32: gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
+.gecko-win32: gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
 	unzip gecko-sdk-i586-pc-msvc-1.8b1.zip
 	rm -rf ../gecko-sdk
 	mv gecko-sdk ..
 	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d ../gecko-sdk/bin
 	unzip glib-19990228.zip glib-1.2.dll -d ../gecko-sdk/bin
 	chmod a+x ../gecko-sdk/bin/*
-
-.gecko-win32: gecko-sdk-win32
 	touch $@
 
 CLEAN_FILE += .gecko-win32
