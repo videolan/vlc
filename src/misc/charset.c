@@ -456,7 +456,7 @@ const char *FindFallbackEncoding( const char *locale )
         case 'be':
         case 'bg':
         case 'mk':
-        /*case 'ru': FIXME: should we use ISO-8859-5 ir KIO8? */
+        case 'ru':
         case 'sr':
             /* KOI8, ISO-8859-5 and CP1251 are supposedly incompatible */
             return "CP1251";
@@ -510,8 +510,7 @@ const char *FindFallbackEncoding( const char *locale )
         /* Latin-10 (ISO-8859-16) does not seem to be used */
 
         /* KOI series */
-        case 'ru':
-            return "KOI8-R";
+        /* For Russian, we use CP1251 */
         case 'uk':
             return "KOI8-U";
         case 'tg':
