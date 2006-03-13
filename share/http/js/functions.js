@@ -931,7 +931,7 @@ function browse( dest )
 function browse_dir( dir )
 {
     document.getElementById( 'browse_lastdir' ).value = dir;
-    loadXMLDoc( 'requests/browse.xml?dir='+dir, parse_browse_dir );
+    loadXMLDoc( 'requests/browse.xml?dir='+escape(dir), parse_browse_dir );
 }
 function browse_path( p )
 {

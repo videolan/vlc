@@ -29,7 +29,7 @@
   <vlc id="rpn" param1="'dir' url_extract" />
   <vlc id="foreach" param1="file" param2="directory" />
     <vlc id="if" param1="file.basename value '.' 1 strncmp 0 != file.basename value '..' 2 strncmp 0 = |" />
-      <element type="<vlc id="value" param1="file.type" />" size="<vlc id="value" param1="file.size" />" date="<vlc id="value" param1="file.size" />" path="<vlc id="value" param1="file.name" />" name="<vlc id="value" param1="file.basename" />" />  
+      <element type="<vlc id="value" param1="file.type" />" size="<vlc id="value" param1="file.size" />" date="<vlc id="value" param1="file.size" />" path="<vlc id="value" param1="file.name value htmlspecialchars" />" name="<vlc id="value" param1="file.basename value htmlspecialchars" />" />  
     <vlc id="end" />
   <vlc id="end" />
 <vlc id="end" />
