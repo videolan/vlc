@@ -333,7 +333,7 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
             psz_bol++;
             if( !strncasecmp( psz_bol, "http://", sizeof("http://") -1 ) )
             {
-                psz_bol[0] = 'm'; psz_bol[1] = 'm'; psz_bol[2] = 's'; psz_bol[3] = 'h';
+                psz_bol[0] = 'm'; psz_bol[1] = 'm'; psz_bol[2] = 's'; psz_bol[3] = '/';
             }
         }
         else
