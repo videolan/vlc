@@ -376,6 +376,199 @@ char *__vlc_fix_readdir_charset( vlc_object_t *p_this, const char *psz_string )
 }
 
 /**
+ * @return a fallback characters encoding to be used, given a locale.
+ */
+const char *FindFallbackEncoding( const char *locale )
+{
+    if( ( locale == NULL ) || ( strlen( locale ) < 2 ) )
+        return "ASCII";
+
+    switch( U16_AT( locale ) )
+    {
+        /*** The ISO-8859 series (anything but Asia) ***/
+        /* Latin-1 Western-European languages (ISO-8859-1) */
+        case 'aa':
+        case 'af':
+        case 'an':
+        case 'br':
+        case 'ca':
+        case 'da':
+        case 'de':
+        case 'en':
+        case 'es':
+        case 'et':
+        case 'eu':
+        case 'fi':
+        case 'fo':
+        case 'fr':
+        case 'ga':
+        case 'gd':
+        case 'gl':
+        case 'gv':
+        case 'id':
+        case 'is':
+        case 'it':
+        case 'kl':
+        case 'kw':
+        case 'mg':
+        case 'ms':
+        case 'nb':
+        case 'nl':
+        case 'nn':
+        case 'no':
+        case 'oc':
+        case 'om':
+        case 'pt':
+        case 'so':
+        case 'sq':
+        case 'st':
+        case 'sv':
+        case 'tl':
+        case 'uz':
+        case 'wa':
+        case 'xh':
+        case 'zu':
+            /* Compatible Microsoft superset */
+            return "CP1252";
+
+        /* Latin-2 Slavic languages (ISO-8859-2) */
+        case 'bs':
+        case 'cs':
+        case 'hr':
+        case 'hu':
+        case 'pl':
+        case 'ro':
+        case 'sk':
+        case 'sl':
+            /* CP1250 is more common, but incompatible */
+            return "CP1250";
+
+        /* Latin-3 Southern European languages (ISO-8859-3) */
+        case 'eo':
+        case 'mt':
+        /*case 'tr': Turkish uses ISO-8859-9 instead */
+            return "ISO-8859-3";
+
+        /* Latin-4 North-European languages (ISO-8859-4) */
+        /* All use Latin-1 or Latin-6 instead */
+
+        /* Cyrillic alphabet languages (ISO-8859-5) */
+        case 'be':
+        case 'bg':
+        case 'mk':
+        /*case 'ru': FIXME: should we use ISO-8859-5 ir KIO8? */
+        case 'sr':
+            /* KOI8, ISO-8859-5 and CP1251 are supposedly incompatible */
+            return "CP1251";
+
+        /* Arabic (ISO-8859-6) */
+        case 'ar':
+            /* FIXME: someone check if we should return CP1256
+             * or ISO-8859-6 */
+            /* CP1256 is(?) more common, but incompatible(?) */
+            return "CP1256";
+
+        /* Greek (ISO-8859-7) */
+        case 'el':
+            /* FIXME: someone check if we should return CP1253
+            * or ISO-8859-7 */
+            /* CP1253 is(?) more common and partially compatible */
+            return "CP1253";
+
+        /* Hebrew (ISO-8859-8) */
+        case 'he':
+        case 'iw':
+        case 'yi':
+            /* Compatible Microsoft superset */
+            return "CP1255";
+
+        /* Latin-5 Turkish (ISO-8859-9) */
+        case 'tr':
+        case 'ku':
+            /* Compatible Microsoft superset */
+            return "CP1254";
+
+        /* Latin-6 “North-European” languages (ISO-8859-10) */
+        /* It is so much north European that glibc only uses that for Luganda
+         * which is spoken in Uganda... unless someone complains, I'm not
+         * using this one; let's fallback to CP1252 here. */
+        /* ISO-8859-11 does arguably not exist. Thai is handled below. */
+        /* ISO-8859-12 really doesn't exist. */
+
+        /* Latin-7 Baltic languages (ISO-8859-13) */
+        case 'lt':
+        case 'lv':
+        case 'mi': /* FIXME: ??? that's in New Zealand, doesn't sound baltic */
+            /* Compatible Microsoft superset */
+            return "CP1257";
+
+        /* Latin-8 Celtic languages (ISO-8859-14) */
+        case 'cy':
+            return "ISO-8859-14";
+
+        /* Latin-9 (ISO-8859-15) -> see Latin-1 */
+        /* Latin-10 (ISO-8859-16) does not seem to be used */
+
+        /* KOI series */
+        case 'ru':
+            return "KOI8-R";
+        case 'uk':
+            return "KOI8-U";
+        case 'tg':
+            return "KOI8-T";
+
+        /*** Asia ***/
+        case 'jp': /* Japanese */
+            /* Shift-JIS is way more common than EUC-JP */
+            return "SHIFT-JIS";
+        case 'ko': /* Korean */
+            return "EUC-KR";
+        case 'th': /* Thai */
+            return "TIS-620";
+        case 'vt': /* Vietnamese FIXME: infos needed */
+            /* VISCII is probably a bad idea as it is not extended ASCII */
+            /* glibc has TCVN5712-1, but I could find no infos on this one */
+            return "CP1258";
+
+        case 'kk': /* Kazakh FIXME: infos needed */
+            return "PT154";
+
+        case 'zh': /* Chinese, charset is country dependant */
+            if( ( strlen( locale ) >= 5 ) && ( locale[2] != '_' ) )
+                switch( U16_AT( locale + 3 ) )
+                {
+                    case 'HK': /* Hong Kong */
+                        /* FIXME: use something else? */
+                        return "BIG5-HKSCS";
+
+                    case 'TW': /* Taiwan */
+                        return "BIG5";
+                }
+            /* People's Republic of China */
+            /* Singapore */
+            /*
+             * GB18030 can represent any Unicode code point
+             * (like UTF-8), while remaining compatible with GBK
+             * FIXME: is it compatible with GB2312? if not, should we
+             * use GB2312 instead?
+             */
+            return "GB18030";
+    }
+
+    return "ASCII";
+}
+
+/**
+ * GetFallbackEncoding() suggests an encoding to be used for non UTF-8
+ * text files accord to the system's local settings. It is only a best
+ * guess.
+ */
+const char *GetFallbackEncoding( void )
+{
+    return FindFallbackEncoding( setlocale( LC_CTYPE, NULL ) );
+}
+
+/**
  * There are two decimal separators in the computer world-wide locales:
  * dot (which is the american default), and comma (which is used in France,
  * the country with the most VLC developers, among others).
