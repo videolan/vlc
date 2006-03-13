@@ -100,6 +100,17 @@ private:
 #define SYSTRAY_TEXT N_("Show systray icon")
 #define SYSTRAY_LONGTEXT N_("Show systray icon")
 
+#define PLAYLIST_TEXT N_("Playlist view" )
+#define PLAYLIST_LONGTEXT N_("There are two possible playlist views in the " \
+                "interface : the normal playlist (separate window), or an " \
+                "embedded playlist (within the main interface, but with " \
+                "less features. You can select which one will be available " \
+                "on the toolbar (or both)." )
+
+static int pi_playlist_views[] = { 0,1,2 };
+static char *psz_playlist_views[] = { N_("Normal" ), N_("Embedded" ) ,
+                                      N_("Both") };
+
 vlc_module_begin();
 #ifdef WIN32
     int i_score = 150;
@@ -134,6 +145,9 @@ vlc_module_begin();
     add_deprecated( "wxwin-minimal", VLC_FALSE); /*Deprecated since 0.8.4*/
     add_bool( "wx-autosize", 1, NULL,
               SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
+    add_integer( "wx-playlist-view", 0, NULL, PLAYLIST_TEXT, PLAYLIST_LONGTEXT,
+             VLC_FALSE );
+        change_integer_list( pi_playlist_views, psz_playlist_views, 0 );
     add_deprecated( "wxwin-autosize", VLC_FALSE); /*Deprecated since 0.8.4*/
 /* wxCocoa pretends to support this, but at least 2.6.x doesn't */
 #ifndef __APPLE__

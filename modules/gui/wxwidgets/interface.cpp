@@ -669,7 +669,7 @@ void Interface::CreateOurToolBar()
 #define HELP_PLAY N_("Play")
 #define HELP_PAUSE N_("Pause")
 #define HELP_PLO N_("Playlist")
-#define HELP_SPLO N_("Small playlist")
+#define HELP_SPLO N_("Embedded playlist")
 #define HELP_PLP N_("Previous playlist item")
 #define HELP_PLN N_("Next playlist item")
 #define HELP_SLOW N_("Play slower")
@@ -711,10 +711,12 @@ void Interface::CreateOurToolBar()
     toolbar->AddTool( NextStream_Event, wxT(""), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
     toolbar->AddSeparator();
-    toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( playlist_xpm ),
-                      wxU(_(HELP_PLO)) );
-    toolbar->AddTool( PlaylistSmall_Event, wxT(""),
-                      wxBitmap( playlist_small_xpm ), wxU(_(HELP_SPLO)) );
+    if( config_GetInt( p_intf, "wx-playlist-view" ) != 1 )
+        toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( playlist_xpm ),
+                          wxU(_(HELP_PLO)) );
+    if( config_GetInt( p_intf, "wx-playlist-view" ) >= 1 )
+        toolbar->AddTool( PlaylistSmall_Event, wxT(""),
+                          wxBitmap( playlist_small_xpm ), wxU(_(HELP_SPLO)) );
     }
 
     wxControl *p_dummy_ctrl =
