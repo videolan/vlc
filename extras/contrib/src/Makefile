@@ -1159,9 +1159,6 @@ x264:
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
 ifdef HAVE_WIN32
 	(cd x264; patch -p 0 < ../Patches/x264-svn-win32.patch )
-else
-	patch -p 0 < Patches/x264_svn.patch
-	rm x264/x264.c
 endif
 else
 x264-$(X264_VERSION).tar.gz:
