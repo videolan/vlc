@@ -5395,6 +5395,7 @@ AC_CONFIG_FILES([
   modules/misc/xml/Makefile
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
+  modules/mux/rtp/Makefile
   modules/packetizer/Makefile
   modules/services_discovery/Makefile
   modules/stream_out/Makefile

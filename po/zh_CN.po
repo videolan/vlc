@@ -10,13 +10,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.8.4-test1-svn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-12 17:26+0000\n"
+"POT-Creation-Date: 2006-03-14 21:08+0100\n"
 "PO-Revision-Date: 2005-12-11 11:12+0800\n"
 "Last-Translator: Wei Mingzhi <whistler_wmz@users.sourceforge.net>\n"
 "Language-Team: Simplified Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: include/vlc/vlc.h:578
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
+"本程序在适用法律允许范围内绝对没有任何保证。您可以在 GNU 通用公开\n"
+"许可协议下重新发布本软件，具体情况请参看 COPYING 文件。\n"
+"\n"
+"本软件由 VideoLAN 开发组开发，请参看 AUTHORS 文件。\n"
 
 #: include/vlc_config_cat.h:32
 msgid "VLC preferences"
@@ -446,9 +458,9 @@ msgid ""
 "the directory where you installed VLC and run \"vlc -I wxwin\"\n"
 msgstr ""
 
-#: include/vlc_meta.h:28 modules/gui/macosx/playlistinfo.m:183
-#: modules/gui/macosx/playlistinfo.m:298 modules/gui/macosx/playlist.m:316
-#: modules/gui/macosx/playlist.m:1225 modules/misc/growl.c:168
+#: include/vlc_meta.h:28 modules/gui/macosx/playlist.m:316
+#: modules/gui/macosx/playlist.m:1225 modules/gui/macosx/playlistinfo.m:183
+#: modules/gui/macosx/playlistinfo.m:298 modules/misc/growl.c:168
 #: modules/misc/growl.c:171
 msgid "Meta-information"
 msgstr ""
@@ -462,15 +474,15 @@ msgstr ""
 msgid "Title"
 msgstr "标题"
 
-#: include/vlc_meta.h:30 modules/gui/macosx/playlistinfo.m:57
-#: modules/gui/macosx/playlist.m:133 modules/gui/macosx/wizard.m:392
+#: include/vlc_meta.h:30 modules/gui/macosx/playlist.m:133
+#: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/wizard.m:392
 #: modules/gui/wince/playlist.cpp:674 modules/mux/asf.c:51
 msgid "Author"
 msgstr "作者"
 
-#: include/vlc_meta.h:31 modules/gui/macosx/playlistinfo.m:183
-#: modules/gui/macosx/playlistinfo.m:298 modules/gui/macosx/playlist.m:316
-#: modules/gui/macosx/playlist.m:1225
+#: include/vlc_meta.h:31 modules/gui/macosx/playlist.m:316
+#: modules/gui/macosx/playlist.m:1225 modules/gui/macosx/playlistinfo.m:183
+#: modules/gui/macosx/playlistinfo.m:298
 msgid "Artist"
 msgstr "艺术家"
 
@@ -612,18 +624,6 @@ msgstr "编码器名称"
 #: include/vlc_meta.h:69
 msgid "Codec Description"
 msgstr "编码器描述"
-
-#: include/vlc/vlc.h:578
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
-"本程序在适用法律允许范围内绝对没有任何保证。您可以在 GNU 通用公开\n"
-"许可协议下重新发布本软件，具体情况请参看 COPYING 文件。\n"
-"\n"
-"本软件由 VideoLAN 开发组开发，请参看 AUTHORS 文件。\n"
 
 #: src/audio_output/input.c:80 src/audio_output/input.c:126
 #: src/input/es_out.c:361 src/libvlc.h:365 src/video_output/video_output.c:379
@@ -2649,7 +2649,7 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "选择热键以切换全屏幕状态"
 
 #: src/libvlc.h:856 modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:81
-#: modules/gui/wxwidgets/interface.cpp:1467
+#: modules/gui/wxwidgets/interface.cpp:1469
 msgid "Play/Pause"
 msgstr "播放/暂停"
 
@@ -2695,7 +2695,7 @@ msgstr "选择热键以慢速回放"
 #: modules/gui/macosx/controls.m:646 modules/gui/macosx/intf.m:476
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:592
 #: modules/gui/macosx/wizard.m:313 modules/gui/macosx/wizard.m:364
-#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1472
+#: modules/gui/macosx/wizard.m:1541 modules/gui/wxwidgets/interface.cpp:1474
 #: modules/gui/wxwidgets/menus.cpp:289
 msgid "Next"
 msgstr "下一项"
@@ -2707,7 +2707,7 @@ msgstr "选择热键以播放列表中的下一个项目"
 #: src/libvlc.h:868 modules/control/hotkeys.c:628
 #: modules/gui/macosx/controls.m:645 modules/gui/macosx/intf.m:471
 #: modules/gui/macosx/intf.m:520 modules/gui/macosx/intf.m:593
-#: modules/gui/wxwidgets/interface.cpp:1471
+#: modules/gui/wxwidgets/interface.cpp:1473
 #: modules/gui/wxwidgets/menus.cpp:288
 msgid "Previous"
 msgstr "上一项"
@@ -2722,7 +2722,7 @@ msgstr "选择热键以播放列表中的上一个项目"
 #: modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:86
 #: modules/gui/wxwidgets/interface.cpp:668
-#: modules/gui/wxwidgets/interface.cpp:1473
+#: modules/gui/wxwidgets/interface.cpp:1475
 #: modules/gui/wxwidgets/menus.cpp:287 modules/visualization/xosd.c:235
 msgid "Stop"
 msgstr "停止"
@@ -4040,7 +4040,7 @@ msgid "Aspect-ratio"
 msgstr "纵横比"
 
 #: modules/access/cdda.c:52 modules/access/dshow/dshow.cpp:79
-#: modules/access/dvb/access.c:71 modules/access/dv.c:68
+#: modules/access/dv.c:68 modules/access/dvb/access.c:71
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:61
 #: modules/access/fake.c:40 modules/access/file.c:80 modules/access/ftp.c:42
 #: modules/access/gnomevfs.c:44 modules/access/http.c:53
@@ -4521,6 +4521,20 @@ msgstr "刷新清单"
 msgid "Configure"
 msgstr "配置"
 
+#: modules/access/dv.c:70 modules/access/file.c:82
+msgid ""
+"Allows you to modify the default caching value for file streams. This value "
+"should be set in millisecond units."
+msgstr ""
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+msgid "dv"
+msgstr ""
+
 #: modules/access/dvb/access.c:73
 msgid ""
 "Allows you to modify the default caching value for dvb streams. This value "
@@ -4757,20 +4771,6 @@ msgstr ""
 msgid "HTTP server"
 msgstr "CDDB服务器"
 
-#: modules/access/dv.c:70 modules/access/file.c:82
-msgid ""
-"Allows you to modify the default caching value for file streams. This value "
-"should be set in millisecond units."
-msgstr ""
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-msgid "dv"
-msgstr ""
-
 #: modules/access/dvdnav.c:59 modules/access/dvdread.c:57
 msgid "DVD angle"
 msgstr ""
@@ -4915,34 +4915,6 @@ msgstr "标准文件系统文件输入"
 msgid "File"
 msgstr "文件"
 
-#: modules/access_filter/record.c:43
-msgid "Record directory"
-msgstr ""
-
-#: modules/access_filter/record.c:45
-msgid "Allows you to specify the directory where the record will be stored"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:44
-msgid "Timeshift granularity"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:45
-msgid "Size of the temporary files use to store the timeshifted stream."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:47
-msgid "Timeshift directory"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:48
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
-msgid "Timeshift"
-msgstr ""
-
 #: modules/access/ftp.c:44
 msgid ""
 "Allows you to modify the default caching value for FTP streams. This value "
@@ -5066,175 +5038,6 @@ msgstr "如果您设置了此选项，在此限制下的最大比特率的串流
 msgid "Microsoft Media Server (MMS) input"
 msgstr "Microsoft Media Server (MMS)输入"
 
-#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
-msgid "Dummy stream output"
-msgstr ""
-
-#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr ""
-
-#: modules/access_output/file.c:60
-msgid "Append to file"
-msgstr ""
-
-#: modules/access_output/file.c:61
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:65
-msgid "File stream output"
-msgstr ""
-
-#: modules/access_output/http.c:60
-msgid "Username"
-msgstr "用户名"
-
-#: modules/access_output/http.c:61
-msgid ""
-"Allows you to give a user name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:64
-msgid ""
-"Allows you to give a password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:66
-msgid "Mime"
-msgstr ""
-
-#: modules/access_output/http.c:67
-msgid "Allows you to give the mime returned by the server."
-msgstr ""
-
-#: modules/access_output/http.c:70
-msgid ""
-"Path to the x509 PEM certificate file that will be used by the HTTP/SSL "
-"stream output"
-msgstr ""
-
-#: modules/access_output/http.c:73
-msgid ""
-"Path to the x509 PEM private key file that will  be used by the HTTP/SSL "
-"stream output. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:77
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used by the HTTP/SSL stream output. Leave empty if you "
-"don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:82
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be HTTP/SSL "
-"stream output. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:85
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:86
-msgid "Advertise the stream with the Bonjour protocol"
-msgstr ""
-
-#: modules/access_output/http.c:90
-msgid "HTTP stream output"
-msgstr ""
-
-#: modules/access_output/http.c:92 modules/control/http/http.c:58
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
-msgid "HTTP"
-msgstr ""
-
-#: modules/access_output/shout.c:58
-msgid "Stream-name"
-msgstr ""
-
-#: modules/access_output/shout.c:59
-msgid "The name this stream/channel will get on the icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:61
-msgid "Stream-description"
-msgstr ""
-
-#: modules/access_output/shout.c:62
-msgid "A description of the stream content. (Information about your channel)."
-msgstr ""
-
-#: modules/access_output/shout.c:65
-msgid "Stream MP3"
-msgstr ""
-
-#: modules/access_output/shout.c:66
-msgid ""
-"Normally you have to feed the shoutcast module with Ogg streams. This option "
-"allows you to feed MP3 streams instead, so you can forward MP3 streams to "
-"the icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:71
-msgid "libshout (icecast) output"
-msgstr ""
-
-#: modules/access_output/udp.c:75 modules/access/rtsp/access.c:40
-#: modules/demux/livedotcom.cpp:61
-msgid "Caching value (ms)"
-msgstr "缓存值 (毫秒)"
-
-#: modules/access_output/udp.c:77 modules/access/udp.c:44
-msgid ""
-"Allows you to modify the default caching value for UDP streams. This value "
-"should be set in millisecond units."
-msgstr "允许您修改 UDP 串流的默认的缓存值。这个值是以毫秒为单位的。"
-
-#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:441
-#: modules/gui/macosx/wizard.m:1782
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1332 modules/stream_out/rtp.c:82
-msgid "Time-To-Live (TTL)"
-msgstr "有效时间(TTL)"
-
-#: modules/access_output/udp.c:81
-#, fuzzy
-msgid "Allows you to define the Time-To-Live of the outgoing stream."
-msgstr "允许你指定该输出串流的有效时间"
-
-#: modules/access_output/udp.c:84
-msgid "Group packets"
-msgstr ""
-
-#: modules/access_output/udp.c:85
-msgid ""
-"Packets can be sent one by one at the right time or by groups. This allows "
-"you to give the number of packets that will be sent at a time. It helps "
-"reducing the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:90
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:91
-msgid ""
-"If you enable this option, packets will be sent directly, without trying to "
-"fill the MTU (ie, without trying to make the biggest possible packets in "
-"order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:97
-msgid "UDP stream output"
-msgstr ""
-
-#: modules/access_output/udp.c:98
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
-msgid "UDP"
-msgstr ""
-
 #: modules/access/pvr/pvr.c:48
 msgid ""
 "Allows you to modify the default caching value for pvr streams. This value "
@@ -5344,7 +5147,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/pvr/pvr.c:96 modules/access/vcdx/info.c:97
-#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1337
+#: modules/gui/macosx/intf.m:478 modules/gui/wxwidgets/interface.cpp:1339
 msgid "Volume"
 msgstr "音量"
 
@@ -5392,6 +5195,11 @@ msgstr ""
 #: modules/access/pvr/pvr.c:116
 msgid "MPEG Encoding cards input (with ivtv drivers)"
 msgstr "MPEG 压缩卡输入 (带有 ivtv 驱动程序)"
+
+#: modules/access/rtsp/access.c:40 modules/access_output/udp.c:75
+#: modules/demux/livedotcom.cpp:61
+msgid "Caching value (ms)"
+msgstr "缓存值 (毫秒)"
 
 #: modules/access/rtsp/access.c:42 modules/demux/livedotcom.cpp:63
 msgid ""
@@ -5472,6 +5280,12 @@ msgstr ""
 #: modules/access/tcp.c:47
 msgid "TCP input"
 msgstr "TCP输入"
+
+#: modules/access/udp.c:44 modules/access_output/udp.c:77
+msgid ""
+"Allows you to modify the default caching value for UDP streams. This value "
+"should be set in millisecond units."
+msgstr "允许您修改 UDP 串流的默认的缓存值。这个值是以毫秒为单位的。"
 
 #: modules/access/udp.c:47
 msgid "Autodetection of MTU"
@@ -5793,6 +5607,192 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
+msgstr ""
+
+#: modules/access_filter/record.c:43
+msgid "Record directory"
+msgstr ""
+
+#: modules/access_filter/record.c:45
+msgid "Allows you to specify the directory where the record will be stored"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:44
+msgid "Timeshift granularity"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:45
+msgid "Size of the temporary files use to store the timeshifted stream."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:47
+msgid "Timeshift directory"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:48
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:52 modules/access_filter/timeshift.c:53
+msgid "Timeshift"
+msgstr ""
+
+#: modules/access_output/dummy.c:40 modules/stream_out/dummy.c:47
+msgid "Dummy stream output"
+msgstr ""
+
+#: modules/access_output/dummy.c:41 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr ""
+
+#: modules/access_output/file.c:60
+msgid "Append to file"
+msgstr ""
+
+#: modules/access_output/file.c:61
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:65
+msgid "File stream output"
+msgstr ""
+
+#: modules/access_output/http.c:60
+msgid "Username"
+msgstr "用户名"
+
+#: modules/access_output/http.c:61
+msgid ""
+"Allows you to give a user name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:64
+msgid ""
+"Allows you to give a password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:66
+msgid "Mime"
+msgstr ""
+
+#: modules/access_output/http.c:67
+msgid "Allows you to give the mime returned by the server."
+msgstr ""
+
+#: modules/access_output/http.c:70
+msgid ""
+"Path to the x509 PEM certificate file that will be used by the HTTP/SSL "
+"stream output"
+msgstr ""
+
+#: modules/access_output/http.c:73
+msgid ""
+"Path to the x509 PEM private key file that will  be used by the HTTP/SSL "
+"stream output. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:77
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used by the HTTP/SSL stream output. Leave empty if you "
+"don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:82
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be HTTP/SSL "
+"stream output. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:85
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:86
+msgid "Advertise the stream with the Bonjour protocol"
+msgstr ""
+
+#: modules/access_output/http.c:90
+msgid "HTTP stream output"
+msgstr ""
+
+#: modules/access_output/http.c:92 modules/control/http/http.c:58
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:472
+msgid "HTTP"
+msgstr ""
+
+#: modules/access_output/shout.c:58
+msgid "Stream-name"
+msgstr ""
+
+#: modules/access_output/shout.c:59
+msgid "The name this stream/channel will get on the icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:61
+msgid "Stream-description"
+msgstr ""
+
+#: modules/access_output/shout.c:62
+msgid "A description of the stream content. (Information about your channel)."
+msgstr ""
+
+#: modules/access_output/shout.c:65
+msgid "Stream MP3"
+msgstr ""
+
+#: modules/access_output/shout.c:66
+msgid ""
+"Normally you have to feed the shoutcast module with Ogg streams. This option "
+"allows you to feed MP3 streams instead, so you can forward MP3 streams to "
+"the icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:71
+msgid "libshout (icecast) output"
+msgstr ""
+
+#: modules/access_output/udp.c:80 modules/gui/macosx/wizard.m:441
+#: modules/gui/macosx/wizard.m:1782
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:610
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1332 modules/stream_out/rtp.c:82
+msgid "Time-To-Live (TTL)"
+msgstr "有效时间(TTL)"
+
+#: modules/access_output/udp.c:81
+#, fuzzy
+msgid "Allows you to define the Time-To-Live of the outgoing stream."
+msgstr "允许你指定该输出串流的有效时间"
+
+#: modules/access_output/udp.c:84
+msgid "Group packets"
+msgstr ""
+
+#: modules/access_output/udp.c:85
+msgid ""
+"Packets can be sent one by one at the right time or by groups. This allows "
+"you to give the number of packets that will be sent at a time. It helps "
+"reducing the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:90
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:91
+msgid ""
+"If you enable this option, packets will be sent directly, without trying to "
+"fill the MTU (ie, without trying to make the biggest possible packets in "
+"order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:97
+msgid "UDP stream output"
+msgstr ""
+
+#: modules/access_output/udp.c:98
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:475
+msgid "UDP"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
@@ -9611,7 +9611,7 @@ msgstr "快速向前"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:274
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:283
 #: modules/gui/wxwidgets/interface.cpp:669
-#: modules/gui/wxwidgets/interface.cpp:1193
+#: modules/gui/wxwidgets/interface.cpp:1195
 #: modules/gui/wxwidgets/menus.cpp:294 modules/gui/wxwidgets/menus.cpp:308
 msgid "Play"
 msgstr "播放"
@@ -9620,7 +9620,7 @@ msgstr "播放"
 #: modules/gui/macosx/intf.m:1305 modules/gui/macosx/intf.m:1306
 #: modules/gui/pda/pda_interface.c:250 modules/gui/pda/pda_interface.c:251
 #: modules/gui/wxwidgets/interface.cpp:670
-#: modules/gui/wxwidgets/interface.cpp:1187
+#: modules/gui/wxwidgets/interface.cpp:1189
 #: modules/gui/wxwidgets/menus.cpp:296 modules/visualization/xosd.c:240
 msgid "Pause"
 msgstr "暂停"
@@ -9813,7 +9813,7 @@ msgstr "隐藏其它"
 msgid "Show All"
 msgstr "显示全部"
 
-#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1465
+#: modules/gui/macosx/intf.m:497 modules/gui/wxwidgets/interface.cpp:1467
 msgid "Quit VLC"
 msgstr "退出VLC"
 
@@ -9895,7 +9895,7 @@ msgid "Extended Controls"
 msgstr "扩展控制"
 
 #: modules/gui/macosx/intf.m:575 modules/gui/macosx/intf.m:606
-#: modules/gui/macosx/playlistinfo.m:54 modules/gui/macosx/playlist.m:483
+#: modules/gui/macosx/playlist.m:483 modules/gui/macosx/playlistinfo.m:54
 #, fuzzy
 msgid "Information"
 msgstr "变换"
@@ -10250,6 +10250,74 @@ msgstr ""
 msgid "Save File"
 msgstr "储存文件"
 
+#: modules/gui/macosx/playlist.m:478
+msgid "Save Playlist..."
+msgstr "储存播放列表..."
+
+#: modules/gui/macosx/playlist.m:480 modules/gui/pda/pda_interface.c:1254
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:278
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:285
+#: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:104
+msgid "Delete"
+msgstr "删除"
+
+#: modules/gui/macosx/playlist.m:481
+msgid "Expand Node"
+msgstr "展开结点"
+
+#: modules/gui/macosx/playlist.m:484
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:276
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:284
+msgid "Preparse"
+msgstr "预解释"
+
+#: modules/gui/macosx/playlist.m:485
+msgid "Sort Node by Name"
+msgstr "依名称排序节点"
+
+#: modules/gui/macosx/playlist.m:486
+msgid "Sort Node by Author"
+msgstr "依制作人排序节点"
+
+#: modules/gui/macosx/playlist.m:489 modules/gui/macosx/playlist.m:1520
+msgid "No items in the playlist"
+msgstr "播放列表中没有项目"
+
+#: modules/gui/macosx/playlist.m:493
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:323
+msgid "Search"
+msgstr "搜索"
+
+#: modules/gui/macosx/playlist.m:495
+msgid "Search in Playlist"
+msgstr "搜索播放列表"
+
+#: modules/gui/macosx/playlist.m:496
+msgid "Standard Play"
+msgstr "标准播放"
+
+#: modules/gui/macosx/playlist.m:499
+#, fuzzy
+msgid "Add Folder to Playlist"
+msgstr "增加至播放列表"
+
+#: modules/gui/macosx/playlist.m:745
+msgid "Save Playlist"
+msgstr "储存播放列表"
+
+#: modules/gui/macosx/playlist.m:1489
+msgid "Empty Folder"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:1514
+#, c-format
+msgid "%i items in the playlist"
+msgstr "播放列表中有 %i 个项目"
+
+#: modules/gui/macosx/playlist.m:1524
+msgid "1 item in the playlist"
+msgstr "播放列表中有 1 个项目"
+
 #: modules/gui/macosx/playlistinfo.m:55
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:585
@@ -10334,74 +10402,6 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:286
 msgid "Info"
 msgstr "信息"
-
-#: modules/gui/macosx/playlist.m:478
-msgid "Save Playlist..."
-msgstr "储存播放列表..."
-
-#: modules/gui/macosx/playlist.m:480 modules/gui/pda/pda_interface.c:1254
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:278
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:285
-#: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:104
-msgid "Delete"
-msgstr "删除"
-
-#: modules/gui/macosx/playlist.m:481
-msgid "Expand Node"
-msgstr "展开结点"
-
-#: modules/gui/macosx/playlist.m:484
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:276
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:284
-msgid "Preparse"
-msgstr "预解释"
-
-#: modules/gui/macosx/playlist.m:485
-msgid "Sort Node by Name"
-msgstr "依名称排序节点"
-
-#: modules/gui/macosx/playlist.m:486
-msgid "Sort Node by Author"
-msgstr "依制作人排序节点"
-
-#: modules/gui/macosx/playlist.m:489 modules/gui/macosx/playlist.m:1520
-msgid "No items in the playlist"
-msgstr "播放列表中没有项目"
-
-#: modules/gui/macosx/playlist.m:493
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:323
-msgid "Search"
-msgstr "搜索"
-
-#: modules/gui/macosx/playlist.m:495
-msgid "Search in Playlist"
-msgstr "搜索播放列表"
-
-#: modules/gui/macosx/playlist.m:496
-msgid "Standard Play"
-msgstr "标准播放"
-
-#: modules/gui/macosx/playlist.m:499
-#, fuzzy
-msgid "Add Folder to Playlist"
-msgstr "增加至播放列表"
-
-#: modules/gui/macosx/playlist.m:745
-msgid "Save Playlist"
-msgstr "储存播放列表"
-
-#: modules/gui/macosx/playlist.m:1489
-msgid "Empty Folder"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:1514
-#, c-format
-msgid "%i items in the playlist"
-msgstr "播放列表中有 %i 个项目"
-
-#: modules/gui/macosx/playlist.m:1524
-msgid "1 item in the playlist"
-msgstr "播放列表中有 1 个项目"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:212
@@ -11741,7 +11741,7 @@ msgstr ""
 "(WinCE界面)\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:918
+#: modules/gui/wince/interface.cpp:497 modules/gui/wxwidgets/interface.cpp:920
 #, fuzzy
 msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
@@ -11750,15 +11750,15 @@ msgstr ""
 "(c) 1996-2005 - VideoLAN 开发小组\n"
 "\n"
 
-#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:919
+#: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:921
 msgid "Compiled by "
 msgstr "编译者 "
 
-#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:921
+#: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:923
 msgid "Compiler: "
 msgstr "编译器: "
 
-#: modules/gui/wince/interface.cpp:502 modules/gui/wxwidgets/interface.cpp:923
+#: modules/gui/wince/interface.cpp:502 modules/gui/wxwidgets/interface.cpp:925
 msgid "Based on SVN revision: "
 msgstr ""
 
@@ -12143,7 +12143,8 @@ msgstr "播放列表是空的"
 msgid "Can't save"
 msgstr "无法储存"
 
-#: modules/gui/wxwidgets/dialogs/playlist.cpp:1413 modules/misc/freetype.c:100
+#: modules/gui/wxwidgets/dialogs/playlist.cpp:1413
+#: modules/gui/wxwidgets/wxwidgets.cpp:111 modules/misc/freetype.c:100
 #: modules/misc/win32text.c:71
 msgid "Normal"
 msgstr "正常"
@@ -12573,8 +12574,8 @@ msgstr "帮助(&H)"
 
 #: modules/gui/wxwidgets/interface.cpp:672
 #, fuzzy
-msgid "Small playlist"
-msgstr "储存播放列表"
+msgid "Embedded playlist"
+msgstr "打开播放列表"
 
 #: modules/gui/wxwidgets/interface.cpp:673
 msgid "Previous playlist item"
@@ -12592,19 +12593,19 @@ msgstr "慢速播放"
 msgid "Play faster"
 msgstr "快速播放"
 
-#: modules/gui/wxwidgets/interface.cpp:859
+#: modules/gui/wxwidgets/interface.cpp:861
 msgid "Extended &GUI\tCtrl-G"
 msgstr "扩展用户界面(&G)"
 
-#: modules/gui/wxwidgets/interface.cpp:862
+#: modules/gui/wxwidgets/interface.cpp:864
 msgid "&Bookmarks...\tCtrl-B"
 msgstr "书签(&B)"
 
-#: modules/gui/wxwidgets/interface.cpp:864
+#: modules/gui/wxwidgets/interface.cpp:866
 msgid "Preference&s...\tCtrl-S"
 msgstr "选项(&S)...\tCtrl-S"
 
-#: modules/gui/wxwidgets/interface.cpp:917
+#: modules/gui/wxwidgets/interface.cpp:919
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
@@ -12612,7 +12613,7 @@ msgstr ""
 " (wxWindows界面)\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:930
+#: modules/gui/wxwidgets/interface.cpp:932
 msgid ""
 "The VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/\n"
@@ -12622,12 +12623,12 @@ msgstr ""
 "http://www.videolan.org/\n"
 "\n"
 
-#: modules/gui/wxwidgets/interface.cpp:933
+#: modules/gui/wxwidgets/interface.cpp:935
 #, c-format
 msgid "About %s"
 msgstr "关于 %s"
 
-#: modules/gui/wxwidgets/interface.cpp:1476
+#: modules/gui/wxwidgets/interface.cpp:1478
 msgid "Show/Hide interface"
 msgstr "显示/隐藏界面"
 
@@ -12761,11 +12762,32 @@ msgstr "自动缩放 VLC 以与视频分辨率匹配"
 msgid "Show systray icon"
 msgstr "显示托盘图标"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:110
+#: modules/gui/wxwidgets/wxwidgets.cpp:103
+#, fuzzy
+msgid "Playlist view"
+msgstr "播放列表"
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:104
+msgid ""
+"There are two possible playlist views in the interface : the normal playlist "
+"(separate window), or an embedded playlist (within the main interface, but "
+"with less features. You can select which one will be available on the "
+"toolbar (or both)."
+msgstr ""
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:111
+msgid "Embedded"
+msgstr ""
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:112
+msgid "Both"
+msgstr ""
+
+#: modules/gui/wxwidgets/wxwidgets.cpp:121
 msgid "wxWidgets interface module"
 msgstr "wxWindows界面模块"
 
-#: modules/gui/wxwidgets/wxwidgets.cpp:152
+#: modules/gui/wxwidgets/wxwidgets.cpp:166
 msgid "wxWidgets dialogs provider"
 msgstr "wxWidgets dialogs 提供者"
 
@@ -13102,10 +13124,6 @@ msgstr "输出文件"
 msgid "Output data for RRDTool in this file"
 msgstr ""
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr ""
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr ""
@@ -13120,6 +13138,10 @@ msgstr ""
 
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
+msgstr ""
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
 msgstr ""
 
 #: modules/misc/msn.c:63
@@ -15648,6 +15670,10 @@ msgstr "在 xosd 输出中显示文字时所使用的字体"
 #: modules/visualization/xosd.c:82
 msgid "XOSD interface"
 msgstr "XOSD界面"
+
+#, fuzzy
+#~ msgid "Small playlist"
+#~ msgstr "储存播放列表"
 
 #, fuzzy
 #~ msgid "VC-1 decoder module"
