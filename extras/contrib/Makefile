@@ -92,7 +92,7 @@ package-win32: FORCE
 	tar cf - --dereference bin sbin include lib share/aclocal*\
 		share/autoconf* \
 		share/automake* share/gettext* gecko-sdk\
-		| (cd tmp/usr/win32; tar xf -)
+		| (cd tmp/usr/win32; tar xpf -)
 #kludge for live.com
 	mkdir -p tmp/usr/win32/live.com
 	for i in groupsock liveMedia UsageEnvironment BasicUsageEnvironment; do \
@@ -102,7 +102,7 @@ package-win32: FORCE
 	done;
 	./change_prefix.sh tmp $(PREFIX) /usr/win32
 #	Klugy kludge	
-	(cd tmp/usr/win32/bin; rm -f *.exe; chmod u+x *)
+	(cd tmp/usr/win32/bin; rm -f *.exe; chmod a+x *)
 	(cd tmp; tar cf - usr/win32/) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-only.tar.bz2
 	rm -rf tmp
 FORCE:
