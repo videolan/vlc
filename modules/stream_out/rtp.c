@@ -83,6 +83,10 @@
 #define TTL_LONGTEXT N_( \
     "Allows you to specify the Time-To-Live for the output stream." )
 
+#define RFC3016_TEXT N_("RFC3016(LATM)")
+#define RFC3016_LONGTEXT N_( \
+    "Allows you to specify using RFC3016 for MPEG4 audio streaming." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -122,6 +126,9 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
                  TTL_LONGTEXT, VLC_TRUE );
 
+    add_bool( SOUT_CFG_PREFIX "rfc3016", 0, NULL, RFC3016_TEXT,
+                 RFC3016_LONGTEXT, VLC_TRUE );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -130,7 +137,7 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
-    "description", "url","email", NULL
+    "description", "url","email", "rfc3016", NULL
 };
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
@@ -188,6 +195,7 @@ struct sout_stream_sys_t
     int  i_port_audio;
     int  i_port_video;
     int  i_ttl;
+    vlc_bool_t b_rfc3016;
 
     /* when need to use a private one or when using muxer */
     int i_payload_type;
@@ -317,7 +325,7 @@ static int Open( vlc_object_t *p_this )
         else
            p_sys->psz_session_name = strdup( "NONE" );
     }
-    
+
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
         if( !strcmp( p_cfg->psz_name, "sdp" ) )
@@ -374,6 +382,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     p_sys->i_ttl = val.i_int;
+
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "rfc3016", &val );
+    p_sys->b_rfc3016 = val.b_bool;
 
     p_sys->i_payload_type = 96;
     p_sys->i_es = 0;
@@ -884,6 +896,7 @@ static int rtp_packetize_mpv  ( sout_stream_t *, sout_stream_id_t *, block_t * )
 static int rtp_packetize_ac3  ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_split( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_mp4a ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_mp4a_latm ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_h263 ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_amr  ( sout_stream_t *, sout_stream_id_t *, block_t * );
 
@@ -1070,19 +1083,50 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
         case VLC_FOURCC( 'm', 'p', '4', 'a' ):
         {
-            char hexa[2*p_fmt->i_extra +1];
-
             id->i_payload_type = p_sys->i_payload_type++;
             id->i_clock_rate = p_fmt->audio.i_rate;
-            id->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
-            sprintf( id->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
-            id->pf_packetize = rtp_packetize_mp4a;
-            id->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
-            sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
-            sprintf( id->psz_fmtp,
-                     "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
-                     "config=%s; SizeLength=13;IndexLength=3; "
-                     "IndexDeltaLength=3; Profile=1;", hexa );
+
+            if(!p_sys->b_rfc3016)
+            {
+                char hexa[2*p_fmt->i_extra +1];
+
+                id->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
+                sprintf( id->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
+                id->pf_packetize = rtp_packetize_mp4a;
+                id->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
+                sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
+                sprintf( id->psz_fmtp,
+                        "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
+                        "config=%s; SizeLength=13;IndexLength=3; "
+                        "IndexDeltaLength=3; Profile=1;", hexa );
+            }
+            else
+            {
+                char hexa[13];
+                int i;
+                unsigned char config[6];
+                unsigned int aacsrates[15] = {
+                    96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
+                    16000, 12000, 11025, 8000, 7350, 0, 0 };
+
+                for( i = 0; i < 15; i++ )
+                    if( p_fmt->audio.i_rate == aacsrates[i] )
+                        break;
+
+                config[0]=0x40;
+                config[1]=0;
+                config[2]=0x20|i;
+                config[3]=p_fmt->audio.i_channels<<4;
+                config[4]=0x3f;
+                config[5]=0xc0;
+
+                asprintf( &id->psz_rtpmap, "MP4A-LATM/%d/%d",
+                          p_fmt->audio.i_rate, p_fmt->audio.i_channels );
+                id->pf_packetize = rtp_packetize_mp4a_latm;
+                sprintf_hexa( hexa, config, 6 );
+                asprintf( &id->psz_fmtp, "profile-level-id=15; "
+                          "object=2; cpresent=0; config=%s", hexa );
+            }
             break;
         }
         case VLC_FOURCC( 's', 'a', 'm', 'r' ):
@@ -1972,6 +2016,7 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     return VLC_SUCCESS;
 }
+
 static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
                               block_t *in )
 {
@@ -2030,6 +2075,59 @@ static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
         out->i_buffer   = 12 + i_payload;
+        out->i_dts    = in->i_dts + i * in->i_length / i_count;
+        out->i_length = in->i_length / i_count;
+
+        rtp_packetize_send( id, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *id,
+                                block_t *in )
+{
+    int     i_max   = id->i_mtu - 14; /* payload max in one packet */
+    int     latmhdrsize = in->i_buffer/0xff + 1;
+    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+
+    uint8_t *p_data = in->p_buffer, *pheader;
+    int     i_data  = in->i_buffer;
+    int     i;
+
+    for( i = 0; i < i_count; i++ )
+    {
+        int           i_payload = __MIN( i_max, i_data );
+        block_t *out;
+
+        if( i != 0 )
+            latmhdrsize = 0;
+        out = block_New( p_stream, 12 + latmhdrsize + i_payload );
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
+                              (in->i_pts > 0 ? in->i_pts : in->i_dts) );
+
+        if( i == 0 )
+        {
+            int tmp = in->i_buffer;
+
+            pheader=out->p_buffer+12;
+            while( tmp > 0xfe )
+            {
+                *pheader = 0xff;
+                pheader++;
+                tmp -= 0xff;
+            }
+            *pheader = tmp;
+        }
+
+        memcpy( &out->p_buffer[12+latmhdrsize], p_data, i_payload );
+
+        out->i_buffer   = 12 + latmhdrsize + i_payload;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
