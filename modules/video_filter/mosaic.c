@@ -365,7 +365,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     int i_index, i_real_index, i_row, i_col;
     int i_greatest_real_index_used = p_sys->i_order_length - 1;
 
-    int col_inner_width, row_inner_height;
+    unsigned int col_inner_width, row_inner_height;
 
     subpicture_region_t *p_region;
     subpicture_region_t *p_region_prev = NULL;
