@@ -27,13 +27,13 @@ diff -urNad /home/sam/debian/official/vlc/debian/vlc-0.7.2.svn20040826/modules/g
 --- vlc-0.8.4-svn20050823.orig/modules/gui/wxwidgets/interface.cpp
 +++ vlc-0.8.4-svn20050823/modules/gui/wxwidgets/interface.cpp
 @@ -437,8 +437,8 @@
-     /* Create the "Help" menu */
      wxMenu *help_menu = new wxMenu;
      help_menu->Append( About_Event, wxU(_("About VLC media player")) );
+ #ifndef WIN32
 -    help_menu->AppendSeparator();
 -    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates ...")) );
 +//    help_menu->AppendSeparator();
 +//    help_menu->Append( UpdateVLC_Event, wxU(_("Check for updates ...")) );
+ #endif
 
      /* Append the freshly created menus to the menu bar... */
-     wxMenuBar *menubar = new wxMenuBar();
