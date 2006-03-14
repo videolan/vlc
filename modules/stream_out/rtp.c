@@ -127,7 +127,7 @@ vlc_module_begin();
                  TTL_LONGTEXT, VLC_TRUE );
 
     add_bool( SOUT_CFG_PREFIX "rfc3016", 0, NULL, RFC3016_TEXT,
-                 RFC3016_LONGTEXT, VLC_TRUE );
+                 RFC3016_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Open, Close );
 vlc_module_end();
