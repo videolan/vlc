@@ -219,7 +219,7 @@ function check_and_replace_int( id, val )
 }
 
 function addslashes( str ){ return str.replace(/\'/g, '\\\''); }
-function escapebackslashes( str ){ return str.replace(/\\/g, '\\\\'); }
+function escapebackslashes( str ){ return str.replace(/\\[^']/g, '\\\\'); }
 
 function disable( id ){ document.getElementById( id ).disabled = true; }
 
