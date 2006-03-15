@@ -69,10 +69,10 @@
     <vlc id="rpn" param1="" /> <!-- FIXME -->
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_random' strcmp 0 =" />
-    <vlc id="rpn" param1="'random' 'VLC_OBJECT_PLAYLIST' vlc_var_get ! 'random' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
+    <vlc id="rpn" param1="'random' 'VLC_OBJECT_PLAYLIST' vlc_var_get 1 + 2 % 'random' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_loop' strcmp 0 =" />
-    <vlc id="rpn" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get ! 'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
+    <vlc id="rpn" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get 1 + 2 %  'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_repeat' strcmp 0 =" />
     <vlc id="rpn" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get 1 + 2 % 'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
@@ -99,7 +99,8 @@
   <state><vlc id="value" param1="stream_state" /></state>
   <position><vlc id="value" param1="stream_position" /></position>
   <fullscreen><vlc id="if" param1="'VLC_OBJECT_VOUT' vlc_obj_exists" /><vlc id="value" param1="'fullscreen' 'VLC_OBJECT_VOUT' vlc_var_get" /><vlc id="end" /></fullscreen>
-  <loop><vlc id="value" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get"/></loop>
+  <random><vlc id="value" param1="'random' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></random>
+  <loop><vlc id="value" param1="'loop' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></loop>
   <repeat><vlc id="value" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></repeat>
   <information>
     <vlc id="foreach" param1="inf" param2="information" />
