@@ -29,7 +29,7 @@ This dialog needs the following dialogs to be fully functional: <none>
 <div id="footer" class="dialog" >
   <a href="/">main VLC interface</a> -
   <a href="/vlm.html">VLM interface</a> -
-  <a href="http://www.videolan.org">videolan.org</a>
+  <a href="http://www.videolan.org">VideoLAN website</a>
   <br />
   <vlc id="value" param1="copyright" />
 </div>
