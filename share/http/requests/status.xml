@@ -42,7 +42,11 @@
     <vlc id="rpn" param1="id value vlc_play" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_pause' strcmp 0 =" />
-    <vlc id="rpn" param1="vlc_pause" />
+    <vlc id="if" param1="stream_state value 'stop' strcmp 0 = id value 0 = ! &" />
+      <vlc id="rpn" param1="id value vlc_play"/>
+    <vlc id="else" />
+      <vlc id="rpn" param1="vlc_pause" />
+    <vlc id="end" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_stop' strcmp 0 =" />
     <vlc id="rpn" param1="vlc_stop" />

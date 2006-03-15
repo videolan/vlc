@@ -21,9 +21,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* global variables */
+/**********************************************************************
+ * Global variables
+ *********************************************************************/
 
 var old_time = 0;
+var pl_cur_id;
 
 /**********************************************************************
  * Slider functions
@@ -273,11 +276,12 @@ function in_enqueue()
 function pl_play( id )
 {
     loadXMLDoc( 'requests/status.xml?command=pl_play&id='+id, parse_status );
+    pl_cur_id = id;
     setTimeout( 'update_playlist()', 1000 );
 }
 function pl_pause()
 {
-    loadXMLDoc( 'requests/status.xml?command=pl_pause', parse_status );
+    loadXMLDoc( 'requests/status.xml?command=pl_pause&id='+pl_cur_id, parse_status );
 }
 function pl_stop()
 {
@@ -478,6 +482,9 @@ function parse_playlist()
             var pos = document.createElement( "div" );
             var pos_top = pos;
             var elt = answer.firstChild;
+            
+            pl_cur_id = 0;  /* changed to the current id is there actually
+                             * is a current id */
             while( elt )
             {
                 if( elt.nodeName == "node" )
@@ -513,6 +520,7 @@ function parse_playlist()
                         clear_children( nowplaying );
                         nowplaying.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                         pl.appendChild( document.createTextNode( '* '));
+                        pl_cur_id = elt.getAttribute( 'id' );
                     }
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
