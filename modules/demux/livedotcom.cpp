@@ -486,6 +486,18 @@ static int  Open ( vlc_object_t *p_this )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'a', 'l', 'a', 'w' );
             }
+            else if( !strncmp( sub->codecName(), "G726", 4 ) )
+            {
+                tk->fmt.i_codec = VLC_FOURCC( 'g', '7', '2', '6' ); 
+                if( !strcmp( sub->codecName()+5, "40" )
+                    tk->fmt.audio.i_bitspersample = 5;
+                else if( !strcmp( sub->codecName()+5, "32" )
+                    tk->fmt.audio.i_bitspersample = 4;
+                else if( !strcmp( sub->codecName()+5, "24" )
+                    tk->fmt.audio.i_bitspersample = 3;
+                else if( !strcmp( sub->codecName()+5, "16" )
+                    tk->fmt.audio.i_bitspersample = 2;
+            }
             else if( !strcmp( sub->codecName(), "AMR" ) )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 's', 'a', 'm', 'r' );
