@@ -564,7 +564,11 @@ const char *FindFallbackEncoding( const char *locale )
  */
 const char *GetFallbackEncoding( void )
 {
+#if HAVE_SETLOCALE
     return FindFallbackEncoding( setlocale( LC_CTYPE, NULL ) );
+#else
+    return FindFallbackEncoding( NULL );
+#endif
 }
 
 /**
