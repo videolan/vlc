@@ -50,7 +50,8 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
                   uint32_t bgColor2,
                   uint32_t selColor,
                   const UString &rHelp,
-                  VarBool *pVisible );
+                  VarBool *pVisible,
+                  VarBool *pFlat );
         virtual ~CtrlTree();
 
         /// Handle an event on the control
@@ -113,6 +114,9 @@ class CtrlTree: public CtrlGeneric, public Observer<VarTree, tree_update*>,
 
         /// Don't move if the position variable is updated
         bool m_dontMove;
+
+        /// Do we want to "flaten" the tree ?
+        bool m_flat;
 
         /// Method called when the tree variable is modified
         virtual void onUpdate( Subject<VarTree, tree_update*> &rTree ,

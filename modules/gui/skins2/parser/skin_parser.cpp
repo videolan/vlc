@@ -341,6 +341,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_curTreeId = uniqueId( attr["id"] );
         const BuilderData::Tree treeData( m_curTreeId, atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["visible"],
+                attr["flat"],
                 atoi( attr["width"]), atoi( attr["height"] ),
                 attr["lefttop"], attr["rightbottom"],
                 attr["font"], "playtree",

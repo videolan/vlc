@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <math.h>
+#include "../utils/var_bool.hpp"
 #include "ctrl_tree.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/os_graphics.hpp"
@@ -55,7 +56,8 @@ CtrlTree::CtrlTree( intf_thread_t *pIntf,
                     uint32_t bgColor2,
                     uint32_t selColor,
                     const UString &rHelp,
-                    VarBool *pVisible ):
+                    VarBool *pVisible,
+                    VarBool *pFlat ):
     CtrlGeneric( pIntf,rHelp, pVisible), m_rTree( rTree), m_rFont( rFont ),
     m_pBgBitmap( pBgBitmap ), m_pItemBitmap( pItemBitmap ),
     m_pOpenBitmap( pOpenBitmap ), m_pClosedBitmap( pClosedBitmap ),
@@ -67,7 +69,9 @@ CtrlTree::CtrlTree( intf_thread_t *pIntf,
     m_rTree.addObserver( this );
     m_rTree.getPositionVar().addObserver( this );
 
-    m_firstPos = m_rTree.begin();
+    m_flat = pFlat->get();
+
+    m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
 
     makeImage();
 }
@@ -85,13 +89,16 @@ CtrlTree::~CtrlTree()
 int CtrlTree::itemHeight()
 {
     int itemHeight = m_rFont.getSize();
-    if( m_pClosedBitmap )
+    if( !m_flat )
     {
-        itemHeight = __MAX( m_pClosedBitmap->getHeight(), itemHeight );
-    }
-    if( m_pOpenBitmap )
-    {
-        itemHeight = __MAX( m_pOpenBitmap->getHeight(), itemHeight );
+        if( m_pClosedBitmap )
+        {
+            itemHeight = __MAX( m_pClosedBitmap->getHeight(), itemHeight );
+        }
+        if( m_pOpenBitmap )
+        {
+            itemHeight = __MAX( m_pOpenBitmap->getHeight(), itemHeight );
+        }
     }
     if( m_pItemBitmap )
     {
@@ -104,13 +111,16 @@ int CtrlTree::itemHeight()
 int CtrlTree::itemImageWidth()
 {
     int bitmapWidth = 5;
-    if( m_pClosedBitmap )
+    if( !m_flat )
     {
-        bitmapWidth = __MAX( m_pClosedBitmap->getWidth(), bitmapWidth );
-    }
-    if( m_pOpenBitmap )
-    {
-        bitmapWidth = __MAX( m_pOpenBitmap->getWidth(), bitmapWidth );
+        if( m_pClosedBitmap )
+        {
+            bitmapWidth = __MAX( m_pClosedBitmap->getWidth(), bitmapWidth );
+        }
+        if( m_pOpenBitmap )
+        {
+            bitmapWidth = __MAX( m_pOpenBitmap->getWidth(), bitmapWidth );
+        }
     }
     if( m_pItemBitmap )
     {
@@ -145,11 +155,13 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
     /// \todo handle delete in a more clever way
     else if ( arg->i_type == 1 ) // Global change or deletion
     {
-        m_firstPos = m_rTree.begin();
+        m_firstPos = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
         makeImage();
     }
     else if ( arg->i_type == 2 ) // Item-append
     {
+        if( m_flat && m_firstPos->size() )
+            m_firstPos = m_rTree.getNextLeaf( m_firstPos );
         /// \todo Check if the item is really visible in the view
         // (we only check if it in the document)
         if( arg->b_visible == true )
@@ -162,9 +174,12 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
         /* Make sure firstPos and lastSelected are still valid */
         while( m_firstPos->m_deleted && m_firstPos != m_rTree.root()->begin() )
         {
-            m_firstPos = m_rTree.getPrevVisibleItem( m_firstPos );
+            m_firstPos = m_flat ? m_rTree.getPrevLeaf( m_firstPos )
+                                : m_rTree.getPrevVisibleItem( m_firstPos );
         }
-        if( m_firstPos->m_deleted ) m_firstPos = m_rTree.root()->begin();
+        if( m_firstPos->m_deleted )
+            m_firstPos = m_flat ? m_rTree.firstLeaf()
+                                : m_rTree.root()->begin();
 
         if( arg->b_visible == true )
         {
@@ -177,11 +192,15 @@ void CtrlTree::onUpdate( Subject<VarTree, tree_update*> &rTree,
 void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
 {
     // Determine what is the first item to display
-    VarTree::Iterator it = m_rTree.begin();
+    VarTree::Iterator it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
 
     if( m_dontMove ) return;
 
-    int excessItems = m_rTree.visibleItems() - maxItems();
+    int excessItems;
+    if( m_flat )
+        excessItems = m_rTree.countLeafs() - maxItems();
+    else
+        excessItems = m_rTree.visibleItems() - maxItems();
 
     if( excessItems > 0)
     {
@@ -190,7 +209,10 @@ void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
 #ifdef _MSC_VER
 #   define lrint (int)
 #endif
-        it = m_rTree.getVisibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1);
+        if( m_flat )
+            it = m_rTree.getLeaf(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1 );
+        else
+            it = m_rTree.getVisibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1 );
     }
     if( m_firstPos != it )
     {
@@ -204,9 +226,13 @@ void CtrlTree::onUpdate( Subject<VarPercent, void*> &rPercent, void* arg)
 void CtrlTree::onResize()
 {
     // Determine what is the first item to display
-    VarTree::Iterator it = m_rTree.begin();
+    VarTree::Iterator it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
 
-    int excessItems = m_rTree.visibleItems() - maxItems();
+    int excessItems;
+    if( m_flat )
+        excessItems = m_rTree.countLeafs() - maxItems();
+    else
+        excessItems = m_rTree.visibleItems() - maxItems();
 
     if( excessItems > 0)
     {
@@ -215,7 +241,10 @@ void CtrlTree::onResize()
 #ifdef _MSC_VER
 #   define lrint (int)
 #endif
-        it = m_rTree.getVisibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1);
+        if( m_flat )
+            it = m_rTree.getLeaf(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1 );
+        else
+            it = m_rTree.getVisibleItem(lrint( (1.0 - rVarPos.get()) * (double)excessItems ) + 1 );
     }
     // Redraw the control if the position has changed
     m_firstPos = it;
@@ -243,9 +272,12 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         if( key == KEY_DELETE )
         {
             /* Find first non selected item before m_pLastSelected */
-            VarTree::Iterator it_sel = m_rTree.begin();
-            for( it = m_rTree.begin(); it != m_rTree.end();
-                   it = m_rTree.getNextVisibleItem( it ) )
+            VarTree::Iterator it_sel = m_flat ? m_rTree.firstLeaf()
+                                              : m_rTree.begin();
+            for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+                 it != m_rTree.end();
+                 it = m_flat ? m_rTree.getNextLeaf( it )
+                             : m_rTree.getNextVisibleItem( it ) )
             {
                 if( &*it == m_pLastSelected ) break;
                 if( !it->m_selected ) it_sel = it;
@@ -265,7 +297,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             while( i >= 0 )
             {
                 VarTree::Iterator it_old = it;
-                it = m_rTree.getNextVisibleItem( it );
+                it = m_flat ? m_rTree.getNextLeaf( it )
+                            : m_rTree.getNextVisibleItem( it );
                 /* End is already visible, dont' scroll */
                 if( it == m_rTree.end() )
                 {
@@ -289,9 +322,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             int i = maxItems();
             while( i >= maxItems()/2 )
             {
-                it = m_rTree.getPrevVisibleItem( it );
+                it = m_flat ? m_rTree.getPrevLeaf( it )
+                            : m_rTree.getPrevVisibleItem( it );
                 /* End is already visible, dont' scroll */
-                if( it == m_rTree.begin() )
+                if( it == ( m_flat ? m_rTree.firstLeaf() : m_rTree.begin() ) )
                 {
                     break;
                 }
@@ -304,10 +338,13 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         }
 
 
-        for( it = m_rTree.begin(); it != m_rTree.end();
-             it = m_rTree.getNextVisibleItem( it ) )
+        for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+             it != m_rTree.end();
+             it = m_flat ? m_rTree.getNextLeaf( it )
+                         : m_rTree.getNextVisibleItem( it ) )
         {
-            VarTree::Iterator next = m_rTree.getNextVisibleItem( it );
+            VarTree::Iterator next = m_flat ? m_rTree.getNextLeaf( it )
+                                            : m_rTree.getNextVisibleItem( it );
             if( key == KEY_UP )
             {
                 // Scroll up one item
@@ -345,7 +382,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 }
 
                 // Fix last tree item selection
-                if( m_rTree.getNextVisibleItem( it ) == m_rTree.end()
+                if( ( m_flat ? m_rTree.getNextLeaf( it )
+                    : m_rTree.getNextVisibleItem( it ) ) == m_rTree.end()
                  && &*it == m_pLastSelected )
                 {
                     (*it).m_selected = true;
@@ -428,8 +466,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             VarTree::Iterator itClicked = findItemAtPos( yPos );
             // Flag to know if the current item must be selected
             bool select = false;
-            for( it = m_rTree.begin(); it != m_rTree.end();
-                 it = m_rTree.getNextVisibleItem( it ) )
+            for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+                 it != m_rTree.end();
+                 it = m_flat ? m_rTree.getNextLeaf( it )
+                             : m_rTree.getNextVisibleItem( it ) )
             {
                 bool nextSelect = select;
                 if( it == itClicked || &*it == m_pLastSelected )
@@ -465,8 +505,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             VarTree::Iterator itClicked = findItemAtPos( yPos );
             // Flag to know if the current item must be selected
             bool select = false;
-            for( it = m_rTree.begin(); it != m_rTree.end();
-                 it = m_rTree.getNextVisibleItem( it ) )
+            for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+                 it != m_rTree.end();
+                 it = m_flat ? m_rTree.getNextLeaf( it )
+                             : m_rTree.getNextVisibleItem( it ) )
             {
                 bool nextSelect = select;
                 if( it == itClicked || &*it == m_pLastSelected )
@@ -491,8 +533,9 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             it = findItemAtPos(yPos);
             if( it != m_rTree.end() )
             {
-                if( it->size() && xPos > (it->depth() - 1) * itemImageWidth()
-                    && xPos < it->depth() * itemImageWidth() )
+                if( ( it->size() && xPos > (it->depth() - 1) * itemImageWidth()
+                      && xPos < it->depth() * itemImageWidth() )
+                 && !m_flat )
                 {
                     // Fold/unfold the item
                     it->m_expanded = !it->m_expanded;
@@ -502,8 +545,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                 {
                     // Unselect any previously selected item
                     VarTree::Iterator it2;
-                    for( it2 = m_rTree.begin(); it2 != m_rTree.end();
-                         it2 = m_rTree.getNextVisibleItem( it2 ) )
+                    for( it2 = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+                         it2 != m_rTree.end();
+                         it2 = m_flat ? m_rTree.getNextLeaf( it2 )
+                                      : m_rTree.getNextVisibleItem( it2 ) )
                     {
                         it2->m_selected = false;
                     }
@@ -537,7 +582,8 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         int direction = ((EvtScroll&)rEvent).getDirection();
 
         double percentage = m_rTree.getPositionVar().get();
-        double step = 2.0 / (double)m_rTree.visibleItems();
+        double step = 2.0 / (double)( m_flat ? m_rTree.countLeafs()
+                                             : m_rTree.visibleItems() );
         if( direction == EvtScroll::kUp )
         {
             percentage += step;
@@ -555,8 +601,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         VarTree::Iterator it;
         int i = 0;
         int iFirst = 0;
-        for( it = m_rTree.begin(); it != m_rTree.end();
-             it = m_rTree.getNextVisibleItem( it ) )
+        for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+             it != m_rTree.end();
+             it = m_flat ? m_rTree.getNextLeaf( it )
+                         : m_rTree.getNextVisibleItem( it ) )
         {
             i++;
             if( it == m_firstPos )
@@ -566,8 +614,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
             }
         }
         iFirst += maxItems();
-        if( iFirst >= m_rTree.visibleItems() ) iFirst = m_rTree.visibleItems();
-        float f_new = (float)iFirst / (float)m_rTree.visibleItems();
+        if( iFirst >= m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems() )
+            iFirst = m_flat ? m_rTree.countLeafs() : m_rTree.visibleItems();
+        float f_new = (float)iFirst / (float)( m_flat ? m_rTree.countLeafs()
+                                                      :m_rTree.visibleItems() );
         m_dontMove = true;
         m_rTree.getPositionVar().set( 1.0 - f_new );
         m_dontMove = false;
@@ -598,8 +648,10 @@ bool CtrlTree::ensureVisible( VarTree::Iterator item )
 
     m_rTree.ensureExpanded( item );
 
-    for( it = m_rTree.begin(); it != m_rTree.end();
-         it = m_rTree.getNextVisibleItem( it ) )
+    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+         it != m_rTree.end();
+         it = m_flat ? m_rTree.getNextLeaf( it )
+                     : m_rTree.getNextVisibleItem( it ) )
     {
         if( it->m_id == item->m_id ) break;
         focusItemIndex++;
@@ -612,8 +664,10 @@ bool CtrlTree::ensureVisible( int focusItemIndex )
     // Find  m_firstPos
     VarTree::Iterator it;
     int firstPosIndex = 0;
-    for( it = m_rTree.begin(); it != m_rTree.end();
-         it = m_rTree.getNextVisibleItem( it ) )
+    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+         it != m_rTree.end();
+         it = m_flat ? m_rTree.getNextLeaf( it )
+                     : m_rTree.getNextVisibleItem( it ) )
     {
         if( it == m_firstPos ) break;
         firstPosIndex++;
@@ -629,7 +683,8 @@ bool CtrlTree::ensureVisible( int focusItemIndex )
         // Scroll to have the wanted stream visible
         VarPercent &rVarPos = m_rTree.getPositionVar();
         rVarPos.set( 1.0 - (double)focusItemIndex /
-                           (double)m_rTree.visibleItems() );
+                           (double)( m_flat ? m_rTree.countLeafs()
+                                            : m_rTree.visibleItems() ) );
         return true;
     }
     return false;
@@ -641,8 +696,10 @@ void CtrlTree::autoScroll()
     int playIndex = 0;
     VarTree::Iterator it;
 
-    for( it = m_rTree.begin(); it != m_rTree.end();
-         it = m_rTree.getNextItem( it ) )
+    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+         it != m_rTree.end();
+         it = m_flat ? m_rTree.getNextLeaf( it )
+                     : m_rTree.getNextItem( it ) )
     {
         if( it->m_playing )
         {
@@ -650,8 +707,10 @@ void CtrlTree::autoScroll()
            break;
         }
     }
-    for( it = m_rTree.begin(); it != m_rTree.end();
-         it = m_rTree.getNextVisibleItem( it ) )
+    for( it = m_flat ? m_rTree.firstLeaf() : m_rTree.begin();
+         it != m_rTree.end();
+         it = m_flat ? m_rTree.getNextLeaf( it )
+                     : m_rTree.getNextVisibleItem( it ) )
     {
         if( it->m_playing )
            break;
@@ -710,7 +769,8 @@ void CtrlTree::makeImage()
                 }
                 do
                 {
-                    it = m_rTree.getNextVisibleItem( it );
+                    it = m_flat ? m_rTree.getNextLeaf( it )
+                                : m_rTree.getNextVisibleItem( it );
                 } while( it->m_deleted );
             }
         }
@@ -730,7 +790,8 @@ void CtrlTree::makeImage()
                 m_pImage->fillRect( 0, yPos, width, rectHeight, color );
                 do
                 {
-                    it = m_rTree.getNextVisibleItem( it );
+                    it = m_flat ? m_rTree.getNextLeaf( it )
+                                : m_rTree.getNextVisibleItem( it );
                 } while( it->m_deleted );
             }
             else
@@ -754,7 +815,7 @@ void CtrlTree::makeImage()
         // Draw the text
         if( pStr != NULL )
         {
-            int depth = it->depth();
+            int depth = m_flat ? 1 : it->depth();
             GenericBitmap *pText = m_rFont.drawString( *pStr, color, width - bitmapWidth * depth );
             if( !pText )
             {
@@ -796,7 +857,8 @@ void CtrlTree::makeImage()
             delete pText;
         }
         do {
-        it = m_rTree.getNextVisibleItem( it );
+        it = m_flat ? m_rTree.getNextLeaf( it )
+                    : m_rTree.getNextVisibleItem( it );
         } while( it->m_deleted );
     }
     stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
@@ -808,7 +870,8 @@ VarTree::Iterator CtrlTree::findItemAtPos( int pos )
     // We decrement pos as we try the other items, until pos == 0.
     VarTree::Iterator it;
     for( it = m_firstPos; it != m_rTree.end() && pos != 0;
-         it = m_rTree.getNextVisibleItem( it ) )
+         it = m_flat ? m_rTree.getNextLeaf( it )
+                     : m_rTree.getNextVisibleItem( it ) )
     {
         pos--;
     }

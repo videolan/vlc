@@ -225,12 +225,37 @@ VarTree::Iterator VarTree::getVisibleItem( int n )
     while( it != end() )
     {
         n--;
-        if( n <= 0 ) return it;
+        if( n <= 0 )
+            return it;
         if( it->m_expanded )
         {
-            int i = n - it->visibleItems();
+            int i;
+            i = n - it->visibleItems();
             if( i <= 0 ) return it->getVisibleItem( n );
             n = i;
+        }
+        it++;
+    }
+    return end();
+}
+
+VarTree::Iterator VarTree::getLeaf( int n )
+{
+    Iterator it = begin();
+    while( it != end() )
+    {
+        if( it->size() )
+        {
+            int i;
+            i = n - it->countLeafs();
+            if( i <= 0 ) return it->getLeaf( n );
+            n = i;
+        }
+        else
+        {
+            n--;
+            if( n <= 0 )
+                return it;
         }
         it++;
     }
@@ -260,15 +285,13 @@ VarTree::Iterator VarTree::getPrevVisibleItem( Iterator it )
 {
     VarTree::Iterator it_old = it;
     if( it == root()->begin() || it == ++(root()->begin()) ) return it;
-    if( it->parent() )
-    {
-    }
+
     /* Was it the first child of its parent ? */
     if( it->parent() && it == it->parent()->begin() )
     {
         /* Yes, get previous uncle */
         it = it_old->prev_uncle();
-   }
+    }
     else
         it--;
 
@@ -300,6 +323,49 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
     return it;
 }
 
+VarTree::Iterator VarTree::getPrevItem( Iterator it )
+{
+    VarTree::Iterator it_old = it;
+    if( it == root()->begin() || it == ++(root()->begin()) ) return it;
+
+    /* Was it the first child of its parent ? */
+    if( it->parent() && it == it->parent()->begin() )
+    {
+        /* Yes, get previous uncle */
+        it = it_old->prev_uncle();
+    }
+    else
+        it--;
+
+    /* We have found an expanded uncle, take its last child */
+    while( it != root()->begin() && it->size() )
+    {
+            it = it->end();
+            it--;
+    }
+    return it;
+}
+
+VarTree::Iterator VarTree::getNextLeaf( Iterator it )
+{
+    do
+    {
+        it = getNextItem( it );
+    }
+    while( it != root()->end() && it->size() );
+    return it;
+}
+
+VarTree::Iterator VarTree::getPrevLeaf( Iterator it )
+{
+    do
+    {
+        it = getPrevItem( it );
+    }
+    while( it != root()->begin() && it->size() ); /* FIXME ? */
+    if( it == root()->begin() ) it = firstLeaf();
+    return it;
+}
 
 VarTree::Iterator VarTree::findById( int id )
 {
@@ -327,3 +393,25 @@ void VarTree::ensureExpanded( VarTree::Iterator it )
         current = current->parent();
     }
 }
+
+int VarTree::countLeafs()
+{
+    if( size() == 0 ) return 1;
+
+    int i_count = 0;
+    Iterator it = begin();
+    while( it != end() )
+    {
+        i_count += it->countLeafs();
+        it++;
+    }
+    return i_count;
+}
+
+VarTree::Iterator VarTree::firstLeaf()
+{
+    Iterator b = root()->begin();
+    if( b->size() ) return getNextLeaf( b );
+    return b;
+}
+

@@ -871,13 +871,14 @@ void Builder::addTree( const BuilderData::Tree &rData )
     // Get the visibility variable
     // XXX check when it is null
     VarBool *pVisible = pInterpreter->getVarBool( rData.m_visible, m_pTheme );
+    VarBool *pFlat = pInterpreter->getVarBool( rData.m_flat, m_pTheme );
 
     // Create the list control
     CtrlTree *pTree = new CtrlTree( getIntf(), *pVar, *pFont, pBgBmp,
        pItemBmp, pOpenBmp, pClosedBmp,
        rData.m_fgColor, rData.m_playColor, rData.m_bgColor1,
        rData.m_bgColor2, rData.m_selColor,
-       UString( getIntf(), rData.m_help.c_str() ), pVisible );
+       UString( getIntf(), rData.m_help.c_str() ), pVisible, pFlat );
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,

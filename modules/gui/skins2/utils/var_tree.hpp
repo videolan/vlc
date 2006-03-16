@@ -119,15 +119,8 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
             return parent;
         }
 
-        /// Get depth (root depth is 0)
-        int depth()
-        {
-            VarTree *parent = this;
-            int depth = 0;
-            while( ( parent = parent->parent() ) != NULL )
-                depth++;
-            return depth;
-        }
+        /// Get first leaf
+        Iterator firstLeaf();
 
         void removeChild( VarTree::Iterator item )
         {
@@ -147,8 +140,14 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         /// Count the number of items that should be displayed if the playlist window wasn't limited
         int visibleItems();
 
+        /// Count the number of leafs in the tree
+        int countLeafs();
+
         /// Return iterator to the n'th visible item
         Iterator getVisibleItem( int n );
+
+        /// Return iterator to the n'th leaf
+        Iterator getLeaf( int n );
 
         /// Given an iterator to a visible item, return the next visible item
         Iterator getNextVisibleItem( Iterator it );
@@ -159,11 +158,31 @@ class VarTree: public Variable, public Subject<VarTree, tree_update*>
         /// Given an iterator to an item, return the next item
         Iterator getNextItem( Iterator it );
 
+        /// Given an iterator to an item, return the previous item
+        Iterator getPrevItem( Iterator it );
+
+        /// Given an iterator to an item, return the next leaf
+        Iterator getNextLeaf( Iterator it );
+
+        /// Given an iterator to an item, return the previous leaf
+        Iterator getPrevLeaf( Iterator it );
+
         /// Find a children node with the given id
         Iterator findById( int id );
 
         /// Ensure an item is expanded
         void ensureExpanded( VarTree::Iterator );
+
+        /// Get depth (root depth is 0)
+        int depth()
+        {
+            VarTree *parent = this;
+            int depth = 0;
+            while( ( parent = parent->parent() ) != NULL )
+                depth++;
+            return depth;
+        }
+
 
     private:
         /// List of children
