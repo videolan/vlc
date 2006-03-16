@@ -321,6 +321,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireDefault( "id" );
         RequireDefault( "font" );
         CheckDefault( "visible", "true" );
+        CheckDefault( "flat", "false" );
         CheckDefault( "x", "0" );
         CheckDefault( "y", "0" );
         CheckDefault( "width", "0" );
