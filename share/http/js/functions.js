@@ -433,20 +433,18 @@ function parse_status()
                 document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Play' );
             }
 
-            if( status.getElementsByTagName( 'random' )[0].firstChild.data == "1" )
-                document.getElementById( 'btn_shuffle').style.background = 'rgb( 170, 170, 170 )';
-            else
-                document.getElementById( 'btn_shuffle').style.background = '';
-
-            if( status.getElementsByTagName( 'loop' )[0].firstChild.data == "1" )
-                document.getElementById( 'btn_loop').style.background = 'rgb( 170, 170, 170 )';
-            else
-                document.getElementById( 'btn_loop').style.background = '';
-
-            if( status.getElementsByTagName( 'repeat' )[0].firstChild.data == "1" )
-                document.getElementById( 'btn_repeat').style.background = 'rgb( 170, 170, 170 )';
-            else
-                document.getElementById( 'btn_repeat').style.background = '';
+	    if( status.getElementsByTagName( 'random' )[0].firstChild.data == "1" )
+	    	document.getElementById( 'btn_shuffle').setAttribute( 'class', 'on' );
+	    else
+	    	document.getElementById( 'btn_shuffle').setAttribute( 'class', 'off' );
+	    if( status.getElementsByTagName( 'loop' )[0].firstChild.data == "1" )
+	    	document.getElementById( 'btn_loop').setAttribute( 'class', 'on' );
+	    else
+	    	document.getElementById( 'btn_loop').setAttribute( 'class', 'off' );
+	    if( status.getElementsByTagName( 'repeat' )[0].firstChild.data == "1" )
+	    	document.getElementById( 'btn_repeat').setAttribute( 'class', 'on' );
+	    else
+	    	document.getElementById( 'btn_repeat').setAttribute( 'class', 'off' );
 
             var tree = document.createElement( "ul" );
             var categories = status.getElementsByTagName( 'category' );
