@@ -110,7 +110,6 @@
     IBOutlet id o_t7_text;
     IBOutlet id o_t7_title;
     IBOutlet id o_t7_txt_saveFileTo;
-    IBOutlet id o_t7_txt_note_saveFolderTo;
     IBOutlet id o_t7_btn_mrInfo_local;
     IBOutlet id o_t7_ckb_local;
     

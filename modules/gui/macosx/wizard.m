@@ -453,9 +453,6 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t7_btn_chooseFile setTitle: _NS("Choose...")];
     [o_t7_ckb_local setTitle: _NS("Local playback")];
     [o_t7_btn_mrInfo_local setTitle: _NS("More Info")];
-    [o_t7_txt_note_saveFolderTo setStringValue: _NS("Note that your input " \
-        "files will keep their original names when being saved in the folder " \
-        "you selected. Existing files may be overwritten.")];
 
     /* page eight ("Summary") */
     [o_t8_txt_text setStringValue: _NS("This page lists all your selections. " \
@@ -1117,13 +1114,11 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 [o_t7_txt_saveFileTo setStringValue: 
                     _NS("Select the folder to save to")];
-                [o_t7_txt_note_saveFolderTo setHidden: NO];
             }
             else
             {
                 [o_t7_txt_saveFileTo setStringValue: 
                     _NS("Select the file to save to")];
-                [o_t7_txt_note_saveFolderTo setHidden: YES];
             }
         }
     }
@@ -1183,31 +1178,65 @@ static VLCWizard *_o_sharedInstance = nil;
                     _NS("Enter either a valid path or choose a location " \
                     "through the button's dialog-box.")]);
         } else {
+            /* create a string containing the requested suffix for later usage */
+            NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
+                [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
+                objectAtIndex:0];
+            if( theEncapFormat == @"ps" )
+                theEncapFormat = @"mpg";
+
+            /* look whether we need to process multiple items or not.
+             * choose a faster variant if we just want a single item */
             if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
             {
                 NSMutableArray * tempArray = [[NSMutableArray alloc] init];
-                NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
-                    [[o_userSelections objectForKey:@"encapFormat"] intValue]] \
-                    objectAtIndex:0];
-                if( theEncapFormat == @"ps" )
-                    theEncapFormat = @"mpg";
                 int x = 0;
                 int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
+                NSMutableString * tempString = [[NSMutableString alloc] init];
                 while( x != y )
                 {
-                    [tempArray addObject:[NSString stringWithFormat: @"%@%@.%@",
+                    tempString = [NSString stringWithFormat: @"%@%@.%@",
                         [o_t7_fld_filePath stringValue],
                         [[NSFileManager defaultManager] displayNameAtPath:
                         [[o_userSelections objectForKey:@"pathToStrm"]
-                        objectAtIndex: x]],theEncapFormat]];
+                        objectAtIndex: x]],theEncapFormat];
+                    if( [[NSFileManager defaultManager] fileExistsAtPath: \
+                        tempString] )
+                    {
+                        /* we don't wanna overwrite existing files, so add an
+                         * int to the file-name */
+                        int additionalInt = 0;
+                        while( additionalInt < 100 )
+                        {
+                            tempString = [NSString stringWithFormat:@"%@%@.%i.%@",
+                                [o_t7_fld_filePath stringValue],
+                                [[NSFileManager defaultManager] displayNameAtPath:
+                                [[o_userSelections objectForKey:@"pathToStrm"]
+                                objectAtIndex: x]], additionalInt,
+                                theEncapFormat];
+                            if(! [[NSFileManager defaultManager] \
+                                fileExistsAtPath: tempString] )
+                                break;
+                            additionalInt += 1;
+                        }
+                        if( additionalInt >= 100 )
+                            msg_Err( VLCIntf, "your destination folder is " \
+                                "cluttered with files with the same name. " \
+                                "clean up a bit and try again." );
+                    }
+                    [tempArray addObject: [tempString retain]];
                     x += 1;
                 }
                 [o_userSelections setObject: [NSArray arrayWithArray:tempArray]
                     forKey: @"trnscdFilePath"];
                 [tempArray release];
+                [tempString release];
             }
             else
             {
+                /* we don't need to check for existing items because Cocoa
+                 * does that already when we are asking the user for a location
+                 * to save her file */
                 [o_userSelections setObject: [NSArray arrayWithObject: \
                     [o_t7_fld_filePath stringValue]] forKey: @"trnscdFilePath"];
             }
