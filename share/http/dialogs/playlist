@@ -38,12 +38,6 @@ This dialog needs the following dialogs to be fully functional: <none>
       <img src="images/empty.png" alt="Empty" />
       <span class="btn_text">Empty</span>
     </button>
-    &nbsp;
-    <button id="btn_sort" onclick="pl_sort( 1, 0 );" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Sort" >
-      <img src="images/sort.png" alt="Sort" />
-      <span class="btn_text">Sort</span>
-    </button>
-    &nbsp;
     <button id="btn_shuffle" onclick="pl_shuffle();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Shuffle" >
       <img src="images/shuffle.png" alt="Shuffle" />
       <span class="btn_text">Shuffle</span>
