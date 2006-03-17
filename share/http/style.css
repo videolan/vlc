@@ -26,6 +26,8 @@ body {
 	font-family: Arial, sans-serif;
 	font-size: 12pt;
 	text-align: center; /* Center on page - IE */
+	padding: 0px;
+	margin: 0px;
 }
 
 div {
@@ -142,7 +144,7 @@ div.popup {
 	border: solid #888 1px;
 	margin: 10px auto; /* Center on page - Firefox */
 	position: absolute;
-	z-index: 1;
+	z-index: 2;
 	font-size: 0.8em;
 }
 div#browse {
@@ -152,6 +154,7 @@ div#browse {
 div#browse div.title {
 	background-color: #008;
 }
+
 div#browser {
 	padding: 20px;
 }
@@ -198,4 +201,10 @@ div.menu {
 div.menu button {
 	background: transparent;
 	border: 1px solid transparent;
+}
+
+div.popup img.close {
+	position: absolute;
+	right: 2px;
+	top: 2px;
 }

@@ -107,9 +107,7 @@ sout and playlist .
 <div id="info" class="dialog" style="display: none;" >
   <div class="title">
     Stream and media info
-    <button id="btn_info_hide" onclick="hide( 'info' );">
-      Hide
-    </button>
+    <img class="close" src="images/white_cross_small.png" alt="Close" onclick="hide('info');"/>
   </div>
   <div id="infotree">
   </div>

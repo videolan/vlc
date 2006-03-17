@@ -29,6 +29,7 @@ This dialog needs the following dialogs to be fully functional: browse
 <div id="input" class="dialog" style="display: none">
   <div class="title">
     Input
+    <img class="close" src="images/white_cross_small.png" alt="Close" onclick="hide('input');"/>
   </div>
   <div class="controls">
     <label for="input_mrl">Input (MRL)</label>

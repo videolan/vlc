@@ -30,6 +30,7 @@ Note that the sout chain is used and sent to VLC by the input dialog
 <div id="sout" class="dialog" style="display: none">
   <div class="title">
     Stream Output
+    <img class="close" src="images/white_cross_small.png" alt="Close" onclick="hide('sout');"/>
   </div>
   <div class="controls">
     <label for="sout_mrl">Destination (MRL)</label>

@@ -28,6 +28,7 @@ This dialog needs the following dialogs to be fully functional: <none>
 <div id="playlist" class="dialog" >
   <div class="title">
     Playlist
+    <img class="close" src="images/white_cross_small.png" alt="Close" onclick="hide('playlist');"/>
   </div>
   <div class="controls">
     <!--<button id="btn_delete" onmouseover="button_over(this);" onmouseout="button_out(this);">
