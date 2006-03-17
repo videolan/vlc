@@ -66,7 +66,7 @@
     <vlc id="rpn" param1="playlist_empty" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_sort' strcmp 0 =" />
-    <vlc id="rpn" param1="" /> <!-- FIXME -->
+    <vlc id="rpn" param1="val value id value playlist_sort" />
   <vlc id="end" />
   <vlc id="if" param1="command value 'pl_random' strcmp 0 =" />
     <vlc id="rpn" param1="'random' 'VLC_OBJECT_PLAYLIST' vlc_var_get 1 + 2 % 'random' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />

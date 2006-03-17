@@ -887,6 +887,17 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             msg_Dbg( p_intf, "requested to move playlist item %d to %d",
                      i_pos, i_newpos);
         }
+	else if( !strcmp( s, "playlist_sort" ) )
+	{
+	    int i_order = E_(SSPopN)( st, vars );
+	    int i_sort = E_(SSPopN)( st, vars );
+	    i_order = i_order % 2;
+	    i_sort = i_sort % 9;
+	    playlist_RecursiveNodeSort (  p_sys->p_playlist,
+			    p_sys->p_playlist->p_general,
+			    i_sort, i_order );
+	    msg_Dbg( p_intf, "requested sort playlist by : %d in order : %d", i_sort, i_order );
+	}
         else if( !strcmp( s, "vlc_volume_set" ) )
         {
             char *psz_vol = E_(SSPop)( st );

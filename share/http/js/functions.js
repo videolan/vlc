@@ -308,10 +308,9 @@ function pl_empty()
     loadXMLDoc( 'requests/status.xml?command=pl_empty', parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
-function pl_sort()
+function pl_sort( sort, order )
 {
-    /* FIXME */
-    loadXMLDoc( 'requests/status.xml?command=pl_sort', parse_status );
+    loadXMLDoc( 'requests/status.xml?command=pl_sort&id='+order+'&val='+sort, parse_status );
     setTimeout( 'update_playlist()', 1000 );
 }
 function pl_shuffle()
@@ -433,18 +432,18 @@ function parse_status()
                 document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Play' );
             }
 
-	    if( status.getElementsByTagName( 'random' )[0].firstChild.data == "1" )
-	    	document.getElementById( 'btn_shuffle').setAttribute( 'class', 'on' );
-	    else
-	    	document.getElementById( 'btn_shuffle').setAttribute( 'class', 'off' );
-	    if( status.getElementsByTagName( 'loop' )[0].firstChild.data == "1" )
-	    	document.getElementById( 'btn_loop').setAttribute( 'class', 'on' );
-	    else
-	    	document.getElementById( 'btn_loop').setAttribute( 'class', 'off' );
-	    if( status.getElementsByTagName( 'repeat' )[0].firstChild.data == "1" )
-	    	document.getElementById( 'btn_repeat').setAttribute( 'class', 'on' );
-	    else
-	    	document.getElementById( 'btn_repeat').setAttribute( 'class', 'off' );
+            if( status.getElementsByTagName( 'random' )[0].firstChild.data == "1" )
+                document.getElementById( 'btn_shuffle').setAttribute( 'class', 'on' );
+            else
+                document.getElementById( 'btn_shuffle').setAttribute( 'class', 'off' );
+            if( status.getElementsByTagName( 'loop' )[0].firstChild.data == "1" )
+                document.getElementById( 'btn_loop').setAttribute( 'class', 'on' );
+            else
+                document.getElementById( 'btn_loop').setAttribute( 'class', 'off' );
+            if( status.getElementsByTagName( 'repeat' )[0].firstChild.data == "1" )
+                document.getElementById( 'btn_repeat').setAttribute( 'class', 'on' );
+            else
+                document.getElementById( 'btn_repeat').setAttribute( 'class', 'off' );
 
             var tree = document.createElement( "ul" );
             var categories = status.getElementsByTagName( 'category' );
