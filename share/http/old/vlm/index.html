@@ -7,7 +7,7 @@
     <link href="../style.css" title="Default" rel="stylesheet" type="text/css" />
 
     <vlc id="if" param1="url_param"/>
-        <meta http-equiv="refresh" content="0;URL=/vlm/" />
+        <meta http-equiv="refresh" content="0;URL=/old/vlm/" />
     <vlc id="end" />
 
     <vlc id="control" param1="vlm_setup,vlm_new,vlm_del,vlm_play,vlm_pause,vlm_stop,vlm_seek,vlm_save,vlm_load" />
@@ -31,12 +31,12 @@
     <div class="sectitle">VLM - New</div>
     <div class="section">
 
-    <form method="get" action="/vlm/new.html" />
+    <form method="get" action="/old/vlm/new.html" />
     <input type="test" name="name" size="40"/>
     <input type="submit" name="type" value="broadcast"/>
     </form>
 
-    <form method="get" action="/vlm/new.html" />
+    <form method="get" action="/old/vlm/new.html" />
     <input type="test" name="name" size="40"/>
     <input type="submit" name="type" value="schedule"/>
     </form>
@@ -62,7 +62,7 @@
            <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
           </form>
          </td>
-         <td><a href="/vlm/show.html?name=<vlc id="value" param1="el.name" />&type=broadcast"><vlc id="value" param1="el.name" /></a></td>
+         <td><a href="/old/vlm/show.html?name=<vlc id="value" param1="el.name" />&type=broadcast"><vlc id="value" param1="el.name" /></a></td>
         </tr>
        </table>
       </td>
@@ -134,7 +134,7 @@
            <input type="hidden" name="name" value="<vlc id="value" param1="el.name" />" />
           </form>
          </td>
-         <td><a href="/vlm/show.html?name=<vlc id="value" param1="el.name" />&type=schedule"><vlc id="value" param1="el.name" /></a></td>
+         <td><a href="/old/vlm/show.html?name=<vlc id="value" param1="el.name" />&type=schedule"><vlc id="value" param1="el.name" /></a></td>
         </tr>
        </table>
       </td>

@@ -16,7 +16,7 @@
     <div class="section">
 
     <vlc id="if" param1="'type' url_extract 'broadcast' strcmp 0 =" />
-        <form method="get" action="/vlm/" />
+        <form method="get" action="/old/vlm/" />
         <table>
         <tr><td>Name : <vlc id="value" param1="'name' url_extract"/> </td> </tr>
         <tr><td>Type: Schedule </td></tr>
@@ -31,7 +31,7 @@
         </form>
     <vlc id="else" />
     <vlc id="if" param1="'type' url_extract 'schedule' strcmp 0 =" />
-        <form method="get" action="/vlm/" />
+        <form method="get" action="/old/vlm/" />
         <table>
         <tr><td>Name : <vlc id="value" param1="'name' url_extract"/> </td> </tr>
         <tr><td>Type: Schedule </td></tr>

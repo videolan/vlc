@@ -19,7 +19,7 @@
 <vlc id="if" param1="'name' url_extract el.name value strcmp 0 =" />
 
     <vlc id="if" param1="'type' url_extract 'broadcast' strcmp 0 =" />
-        <form method="get" action="/vlm/" />
+        <form method="get" action="/old/vlm/" />
         <table>
         <tr><td>Name : </td><td><vlc id="value" param1="'name' url_extract"/> </td> </tr>
         <tr><td>Type: </td><td>Broadcast </td></tr>
@@ -40,7 +40,7 @@
         </form>
     <vlc id="else" />
     <vlc id="if" param1="'type' url_extract 'schedule' strcmp 0 =" />
-        <form method="get" action="/vlm/" />
+        <form method="get" action="/old/vlm/" />
         <table>
         <tr><td>Name : </td><td><vlc id="value" param1="'name' url_extract"/> </td> </tr>
         <tr><td>Type: </td><td>Schedule </td></tr>
