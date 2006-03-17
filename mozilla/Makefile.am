@@ -41,9 +41,12 @@ noinst_DATA = npvlc_rc.$(OBJEXT)
 
 SOURCES_support = support/npwin.cpp
 CPPFLAGS_mozilla_EXTRA = -DXP_WIN -DXP_WIN32
-LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc)
+LDFLAGS_npvlc = -shared -Wl,--kill-at $(LIBRARIES_libvlc)
 
 DATA_npvlc_rc = $(noinst_npvlc_rc_DATA)
+noinst_npvlc_rc_DATA = npvlc_rc.$(OBJEXT)
+noinst_npvlc_rcdir =
+
 npvlc_rc.$(OBJEXT): npvlc_rc.rc
 	$(WINDRES) -DVERSION=$(VERSION) \
 		-DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` \
