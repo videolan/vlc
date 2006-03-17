@@ -187,3 +187,15 @@ div.controls button.off {
 	background-color: #fff;
 }
 
+div.menu {
+	position: absolute;
+	border: 1px solid #ccc;
+	padding: 5px;
+	background: url('images/white.png') repeat;
+	display: none;
+}
+
+div.menu button {
+	background: transparent;
+	border: 1px solid transparent;
+}

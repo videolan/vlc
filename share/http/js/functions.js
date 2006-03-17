@@ -228,6 +228,10 @@ function enable( id ){ document.getElementById( id ).disabled = false; }
 function button_over( element ){ element.style.border = "1px solid #000"; }
 
 function button_out( element ){ element.style.border = "1px solid #fff"; }
+function button_out_menu( element ){ element.style.border = "1px solid transparent"; }
+
+function show_menu( id ){ document.getElementById(id).style.display = 'block'; }
+function hide_menu( id ){ document.getElementById(id).style.display = 'none'; }
 
 /* toggle show help under the buttons */
 function toggle_btn_text()
