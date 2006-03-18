@@ -489,7 +489,9 @@ WindowSettings::WindowSettings( intf_thread_t *_p_intf )
 
         id = strtol( psz, &psz, 0 );
         if( *psz != ',' ) /* broken cfg */
+        {
             goto invalid;
+        }
         psz++;
 
         for( i = 0; i < 4; i++ )
@@ -499,13 +501,17 @@ WindowSettings::WindowSettings( intf_thread_t *_p_intf )
             if( i < 3 )
             {
                 if( *psz != ',' )
+                {
                     goto invalid;
+                }
                 psz++;
             }
             else
             {
                 if( *psz != ')' )
+                {
                     goto invalid;
+                }
             }
         }
         if( id == ID_SCREEN )
@@ -530,16 +536,22 @@ WindowSettings::WindowSettings( intf_thread_t *_p_intf )
     }
 
     if( i_screen_w <= 0 || i_screen_h <= 0 )
+    {
         goto invalid;
+    }
 
     for( i = 0; i < ID_MAX; i++ )
     {
         if( !b_valid[i] )
             continue;
         if( position[i].x < 0 || position[i].y < 0 )
+        {
             goto invalid;
-        if( size[i].x <= 0 || size[i].y <= 0 )
+        }
+        if( i != ID_SMALL_PLAYLIST && (size[i].x <= 0 || size[i].y <= 0)  )
+        {
             goto invalid;
+        }
     }
 
     if( psz_org ) free( psz_org );
