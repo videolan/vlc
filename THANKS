@@ -99,6 +99,7 @@ Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes
 Olivier Aubert <oaubert at bat710.univ-lyon1.fr> - clone list patch
 Olivier Pomel <pomel at via.ecp.fr> - original VLC code
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
+Patrick Horn <patrickd0thorn at mindspring d0t com> - DirectShow patch
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
 Pierre Marc Dumuid <pierre.dumuid at adelaide dot edu dot au> - Playlist patches

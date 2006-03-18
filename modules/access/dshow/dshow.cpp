@@ -121,6 +121,21 @@ static char *ppsz_tuner_input_text[] =
 #define TUNER_INPUT_TEXT N_("Tuner input type")
 #define TUNER_INPUT_LONGTEXT N_( \
     "Allows you to select the tuner input type (Cable/Antenna)." )
+#define VIDEO_IN_TEXT N_("Video input pin")
+#define VIDEO_IN_LONGTEXT N_( \
+    "Allows you to select the video input source, such as composite, s-video, " \
+	"or tuner. Since these settings are hardware-specfic, you should find good " \
+	"settings in the \"Device config\" area, and use those numbers here. -1 " \
+	"means that settings will not be changed.")
+#define AUDIO_IN_TEXT N_("Audio input pin")
+#define AUDIO_IN_LONGTEXT N_( \
+    "Allows you to select the audio input source. See the \"video input\" option." )
+#define VIDEO_OUT_TEXT N_("Video output pin")
+#define VIDEO_OUT_LONGTEXT N_( \
+    "Allows you to select the video output type. See the \"video input\" option." )
+#define AUDIO_OUT_TEXT N_("Audio output pin")
+#define AUDIO_OUT_LONGTEXT N_( \
+    "Allows you to select the audio output type. See the \"video input\" option." )
 
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, vlc_bool_t );
 static void CommonClose( vlc_object_t *, access_sys_t * );
@@ -172,6 +187,18 @@ vlc_module_begin();
     add_integer( "dshow-tuner-input", 0, NULL, TUNER_INPUT_TEXT,
                  TUNER_INPUT_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_tuner_input, ppsz_tuner_input_text, 0 );
+
+    add_integer( "dshow-video-input",  -1, NULL, VIDEO_IN_TEXT,
+		VIDEO_IN_LONGTEXT, VLC_TRUE );
+
+    add_integer( "dshow-audio-input",  -1, NULL, AUDIO_IN_TEXT,
+		AUDIO_IN_LONGTEXT, VLC_TRUE );
+
+    add_integer( "dshow-video-output", -1, NULL, VIDEO_OUT_TEXT,
+		VIDEO_OUT_LONGTEXT, VLC_TRUE );
+
+    add_integer( "dshow-audio-output", -1, NULL, AUDIO_OUT_TEXT,
+		AUDIO_OUT_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "dshow" );
     set_capability( "access_demux", 0 );
@@ -344,6 +371,11 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     var_Create( p_this, "dshow-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    var_Create( p_this, "dshow-video-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-audio-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-video-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-audio-output", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
     /* Initialize OLE/COM */
     CoInitialize( 0 );
 
@@ -421,6 +453,19 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
     {
+            var_Get( p_this, "dshow-video-input", &val );
+            if( val.i_int > 0 )
+                    p_sys->crossbar_routes[i].VideoInputIndex=val.i_int;
+            var_Get( p_this, "dshow-video-output", &val );
+            if( val.i_int > 0 )
+                    p_sys->crossbar_routes[i].VideoOutputIndex=val.i_int;
+            var_Get( p_this, "dshow-audio-input", &val );
+            if( val.i_int > 0 )
+                    p_sys->crossbar_routes[i].AudioInputIndex=val.i_int;
+            var_Get( p_this, "dshow-audio-output", &val );
+            if( val.i_int > 0 )
+                    p_sys->crossbar_routes[i].AudioOutputIndex=val.i_int;
+
         IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
         LONG VideoInputIndex = p_sys->crossbar_routes[i].VideoInputIndex;
         LONG VideoOutputIndex = p_sys->crossbar_routes[i].VideoOutputIndex;
