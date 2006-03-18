@@ -185,7 +185,7 @@ function mosaic_code_update()
 "## HTTP interface mosaic wizard ##\n"+
 "##################################\n"+
 "\n"+
-"# Comment the following line if you don't want to reset you VLM configuration\n"+
+"# Comment the following line if you don't want to reset your VLM configuration\n"+
 "del all\n"+
 "\n"+
 "# Background options\n"+
