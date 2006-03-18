@@ -95,7 +95,7 @@ sout.
   </div>
   <div  id="mosaic_list" class="popup" style="display: none; background: url('images/white.png') repeat;">[<a href="javascript:hide('mosaic_list');">hide</a>] - Select a stream:<br/><div id="mosaic_list_content"></div></div>
   <div class="controls">
-    Click on each of the cells to asign inputs. (<a href="javascript:document.getElementById('mosaic_list').value='';show('mosaic_list');">Show input list</a>)
+    Click on each of the cells to assign inputs. (<a href="javascript:document.getElementById('mosaic_list').value='';show('mosaic_list');">Show input list</a>)
   </div>
   <div id="mosaic_layout" class="mosaic_bg"></div>
   <textarea id="mosaic_code" cols="80" rows="30"></textarea>
