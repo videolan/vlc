@@ -973,6 +973,12 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                             index = E_(mvar_FileSetNew)( p_intf, m.param1, arg );
                             free( arg );
                         }
+                        else if( !strcmp( m.param2, "object" ) )
+                        {
+                            char *arg = E_(SSPop)( &p_args->stack );
+                            index = E_(mvar_ObjectSetNew)( p_intf, m.param1, arg );
+                            free( arg );
+                        }
                         else if( !strcmp( m.param2, "playlist" ) )
                         {
                             index = E_(mvar_PlaylistSetNew)( p_intf, m.param1,

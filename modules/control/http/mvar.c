@@ -350,6 +350,34 @@ mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
     return s;
 }
 
+mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
+                               char *psz_capability )
+{
+    mvar_t *s = E_(mvar_New)( psz_name, "set" );
+    int i;
+
+    vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
+                                        FIND_ANYWHERE );
+
+    for( i = 0; i < p_list->i_count; i++ )
+    {
+        module_t *p_parser = (module_t *)p_list->p_values[i].p_object;
+        if( !strcmp( p_parser->psz_capability, psz_capability ) )
+        {
+            mvar_t *sd = E_(mvar_New)( "sd", p_parser->psz_object_name );
+            E_(mvar_AppendNewVar)( sd, "name",
+                p_parser->psz_longname ? p_parser->psz_longname
+                : ( p_parser->psz_shortname ? p_parser->psz_shortname
+                : p_parser->psz_object_name ) );
+            E_(mvar_AppendVar)( s, sd );
+        }
+    }
+
+    vlc_list_release( p_list );
+
+    return s;
+}
+
 mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
                                  input_thread_t *p_input,
                                  const char *psz_variable )
