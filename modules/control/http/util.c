@@ -449,6 +449,15 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
             sprintf( value, "%d", i_depth );
             E_(mvar_AppendNewVar)( itm, "depth", value );
 
+            if( p_node->i_flags & PLAYLIST_RO_FLAG )
+            {
+                E_(mvar_AppendNewVar)( itm, "ro", "ro" );
+            }
+            else
+            {
+                E_(mvar_AppendNewVar)( itm, "ro", "rw" );
+            }
+
             E_(mvar_AppendVar)( s, itm );
         }
         else
@@ -474,6 +483,15 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
 
             sprintf( value, "%d", i_depth );
             E_(mvar_AppendNewVar)( itm, "depth", value );
+
+            if( p_node->i_flags & PLAYLIST_RO_FLAG )
+            {
+                E_(mvar_AppendNewVar)( itm, "ro", "ro" );
+            }
+            else
+            {
+                E_(mvar_AppendNewVar)( itm, "ro", "rw" );
+            }
 
             E_(mvar_AppendVar)( s, itm );
 
