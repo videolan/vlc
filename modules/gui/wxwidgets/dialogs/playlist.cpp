@@ -538,7 +538,9 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
         while( treectrl->GetItemParent( item ).IsOk() )
         {
             item = treectrl->GetItemParent( item );
-            treectrl->Expand( item );
+            if( ! (item == treectrl->GetRootItem() &&
+                treectrl->HasFlag( wxTR_HIDE_ROOT ) ) )
+                treectrl->Expand( item );
         }
     }
     else
