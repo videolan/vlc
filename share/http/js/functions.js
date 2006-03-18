@@ -557,6 +557,9 @@ function parse_playlist()
                     }
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
+                    var duration = elt.getAttribute( 'duration' );
+                    if( duration > 0 )
+                        pl.appendChild( document.createTextNode( " (" + format_time( elt.getAttribute( 'duration' ) / 1000000 ) + ")" ) );
                     pos.appendChild( pl );
 
                     if( elt.getAttribute( 'ro' ) == 'rw' )

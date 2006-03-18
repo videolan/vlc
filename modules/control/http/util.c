@@ -458,6 +458,9 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
                 E_(mvar_AppendNewVar)( itm, "ro", "rw" );
             }
 
+            sprintf( value, "%d", p_node->input.i_duration );
+            E_(mvar_AppendNewVar)( itm, "duration", value );
+
             E_(mvar_AppendVar)( s, itm );
         }
         else

@@ -71,7 +71,7 @@ This dialog needs the following dialogs to be fully functional: <none>
       <div id="menu_sd" class="menu" >
         <vlc id="rpn" param1="services_discovery" />
         <vlc id="foreach" param1="sd" param2="object" />
-        <button onclick="pl_sd('<vlc id="value" param1="sd" />');hide_menu('menu_sd');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="<vlc id="value" param1="sd.name" />" ><vlc id="value" param1="sd.name" /></button><br/>
+        <button onclick="pl_sd('<vlc id="value" param1="sd" />');hide_menu('menu_sd');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="Toggle <vlc id="value" param1="sd.name" />" ><vlc id="value" param1="sd.name" /></button><br/>
         <vlc id="end" />
       </div>
     </button>
