@@ -118,6 +118,7 @@ Tim 'O Callaghan <tim.ocallaghan at limestudios dot com> - pvr input cleaning pa
 Thomas Graf <tgraf at europe.com> - gettext support, German translation
 Thomas L. Wood <twood at lucent.com> - fixed a bug in QuantMatrixExtension
 Tong Ka Man <kmtong at cwbase dot com> - playlist_Clear addition
+Udo Richter <udo underscore richter at gmx dot de> - Trancode padding / cropping
 Valek Filippov <frob at df.ru> - Russian translation
 Vicente Jimenez Aguilar <vice at v1ce.net> - Spanish translation
 Vincent van den Heuvel <heuvel@mac.com> - OSX about window artwork (v0.8.4)
