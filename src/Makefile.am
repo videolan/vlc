@@ -358,8 +358,10 @@ if !BUILD_SHARED
 SOURCES_libvlc += misc/version.c
 CLEANFILES += misc/version.c
 
-misc/version.c:
+misc/version.c: FORCE
 	$(TOOLBOX) --update-version
+FORCE:
+
 endif
 
 # Install shared libvlc
