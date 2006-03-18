@@ -520,6 +520,19 @@ function parse_playlist()
                     nda.appendChild( ndai );
                     pos.appendChild( nda );
                     pos.appendChild( document.createTextNode( ' ' + elt.getAttribute( 'name' ) ) );
+
+                    if( elt.getAttribute( 'ro' ) == 'rw' )
+                    {
+                        pos.appendChild( document.createTextNode( ' ' ) );
+                        var del = document.createElement( "a" );
+                        del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
+                            var delimg = document.createElement( "img" );
+                            delimg.setAttribute( 'src', 'images/delete_small.png' );
+                            delimg.setAttribute( 'alt', '(delete)' );
+                        del.appendChild( delimg );
+                        pos.appendChild( del );
+                    }
+
                     var nd = document.createElement( "div" );
                     nd.setAttribute( 'class', 'pl_node' );
                     nd.setAttribute( 'id', 'pl_'+elt.getAttribute( 'id' ) );
@@ -545,15 +558,18 @@ function parse_playlist()
                     pl.setAttribute( 'title', elt.getAttribute( 'uri' ));
                     pl.appendChild( document.createTextNode( elt.getAttribute( 'name' ) ) );
                     pos.appendChild( pl );
-                    pos.appendChild( document.createTextNode( ' ' ) );
 
-                    var del = document.createElement( "a" );
-                    del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
-                      var delimg = document.createElement( "img" );
-                      delimg.setAttribute( 'src', 'images/delete_small.png' );
-                      delimg.setAttribute( 'alt', '(delete)' );
-                    del.appendChild( delimg );
-                    pos.appendChild( del );
+                    if( elt.getAttribute( 'ro' ) == 'rw' )
+                    {
+                        pos.appendChild( document.createTextNode( ' ' ) );
+                        var del = document.createElement( "a" );
+                        del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
+                            var delimg = document.createElement( "img" );
+                            delimg.setAttribute( 'src', 'images/delete_small.png' );
+                            delimg.setAttribute( 'alt', '(delete)' );
+                        del.appendChild( delimg );
+                        pos.appendChild( del );
+                    }
                 }
                 if( elt.firstChild )
                 {

@@ -35,9 +35,9 @@
   <vlc id="end" />
   <vlc id="if" param1="pl.type value 'Node' strcmp" />
     <vlc id="rpn" param1="1 +" />
-    <leaf id="<vlc id="value" param1="pl.index" />" <vlc id="if" param1="pl.current" /> current="current" <vlc id="end" /> uri="<vlc id="value" param1="pl.uri value '&' '&amp;' str_replace" />" name="<vlc id="value" param1="pl.name value '&' '&amp;' str_replace" />" />
+    <leaf id="<vlc id="value" param1="pl.index" />" <vlc id="if" param1="pl.current" /> current="current" <vlc id="end" /> uri="<vlc id="value" param1="pl.uri value '&' '&amp;' str_replace" />" name="<vlc id="value" param1="pl.name value '&' '&amp;' str_replace" />" ro="<vlc id="value" param1="pl.ro" />" />
   <vlc id="else" />
-    <node id="<vlc id="value" param1="pl.index" />" name="<vlc id="value" param1="pl.name value '&' '&amp;' str_replace" />" >
+    <node id="<vlc id="value" param1="pl.index" />" name="<vlc id="value" param1="pl.name value '&' '&amp;' str_replace" />" ro="<vlc id="value" param1="pl.ro" />" >
     <vlc id="if" param1="first_item value 0 ="/>
       <vlc id="rpn" param1="first_item 1 store" />
     <vlc id="end"/>
