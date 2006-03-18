@@ -27,7 +27,7 @@ This dialog needs the following dialogs to be fully functional: input and
 sout.
 <vlc id="end" />
 
-<div id="mosaic" class="dialog" >
+<div id="mosaic" class="dialog" style="overflow:visible;">
   <div class="title">
     VLC media player - Mosaic wizard
     <button id="btn_toggle_text" onclick="toggle_btn_text();">
@@ -98,9 +98,11 @@ sout.
     Click on each of the cells to assign inputs. (<a href="javascript:document.getElementById('mosaic_list').value='';show('mosaic_list');">Show input list</a>)
   </div>
   <div id="mosaic_layout" class="mosaic_bg"></div>
-  <textarea id="mosaic_code" cols="80" rows="30"></textarea>
   <div class="controls">
     <input type="button" value="Let's go!" onclick="mosaic_batch(document.getElementById('mosaic_code').value);" />
     <input type="button" value="Stop" onclick="mosaic_stop()" />
+    <br/><br/>
+    Edit the following VLM command batch if you want to fine tune your mosaic settings:
   </div>
+  <textarea id="mosaic_code" cols="80" rows="30"></textarea>
 </div>
