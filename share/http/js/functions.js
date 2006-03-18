@@ -215,7 +215,8 @@ function check_and_replace_int( id, val )
     if( value( id ) != ''
         && ( !objRegExp.test( value( id ) )
              || parseInt( value( id ) ) < 1 ) )
-        document.getElementById( id ).value = val;
+        return document.getElementById( id ).value = val;
+    return document.getElementById( id ).value;
 }
 
 function addslashes( str ){ return str.replace(/\'/g, '\\\''); }
@@ -679,19 +680,14 @@ function update_input_file()
 /* update the input MRL using data from the input disc helper */
 function update_input_disc()
 {
-    var mrl = document.getElementById( 'input_mrl' );
-    var type = radio_value( "input_disc_type" );
-    var device = value( "input_disc_dev" );
+    var mrl     = document.getElementById( 'input_mrl' );
+    var type    = radio_value( "input_disc_type" );
+    var device  = value( "input_disc_dev" );
 
-    check_and_replace_int( 'input_disc_title', 0 );
-    check_and_replace_int( 'input_disc_chapter', 0 );
-    check_and_replace_int( 'input_disc_subtrack', '' );
-    check_and_replace_int( 'input_disc_audiotrack', 0 );
-
-    var title = value( 'input_disc_title' );
-    var chapter = value( 'input_disc_chapter' );
-    var subs = value( 'input_disc_subtrack' );
-    var audio = value( 'input_disc_audiotrack' );
+    var title   = check_and_replace_int( 'input_disc_title', 0 );
+    var chapter = check_and_replace_int( 'input_disc_chapter', 0 );
+    var subs    = check_and_replace_int( 'input_disc_subtrack', '' );
+    var audio   = check_and_replace_int( 'input_disc_audiotrack', 0 );
 
     mrl.value = "";
 
@@ -853,6 +849,8 @@ function update_sout()
             mrl.value += "scodec="+value( 'sout_scodec' );
             alot = true;
         }
+        mrl.value += value( 'sout_extra' );
+            
         mrl.value += "}";
     }
 

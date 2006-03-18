@@ -36,12 +36,65 @@ sout.
     </button>
   </div>
   <div class="controls">
-    <label for="mosaic_rows">Rows:</label> <input type="text" id="mosaic_rows" value="" onchange="mosaic_size_change();" />
-    <label for="mosaic_cols">Columns:</label> <input type="text" id="mosaic_cols" value="" onchange="mosaic_size_change();" />
-    <br/>
-    <label for="mosaic_input_name">Name:</label> <input type="text" id="mosaic_input_name" value="" />
-    <label for="mosaic_input">Input:</label> <input type="text" id="mosaic_input" value="" /> <input type="button" value="Add to input list" onclick="mosaic_add_input();" />
+    <b>Mosaic dimensions:</b><br/>
+    <table style="text-align: right;">
+      <tr>
+        <td>
+          <label for="bg_width">Background width*:</label> <input class="mosaic_bg" type="text" id="bg_width" value="400" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="bg_height">Background height*:</label> <input class="mosaic_bg" type="text" id="bg_height" value="300" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_width">Width:</label> <input class="mosaic_tbl" type="text" id="mosaic_width" value="200" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_height">Height:</label> <input class="mosaic_tbl" type="text" id="mosaic_height" value="200" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_xoffset">X offset (left):</label> <input class="mosaic_tbl" type="text" id="mosaic_xoffset" value="10" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_yoffset">Y offset (top):</label> <input class="mosaic_tbl" type="text" id="mosaic_yoffset" value="10" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_cols">Columns:</label> <input class="mosaic_itm" type="text" id="mosaic_cols" value="2" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_rows">Rows:</label> <input class="mosaic_itm" type="text" id="mosaic_rows" value="2" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="mosaic_hborder">Horizontal border:</label> <input class="mosaic_itm" type="text" id="mosaic_hborder" value="10" size="8" onchange="mosaic_size_change();" />
+        </td>
+        <td>
+          <label for="mosaic_vborder">Vertical border:</label> <input class="mosaic_itm" type="text" id="mosaic_vborder" value="5" size="8" onchange="mosaic_size_change();" />
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+        *: these values aren't used by the mosaic code.<br/> They're only here to adapt the preview's size.
+        </td>
+      </tr>
+    </table>
+    <b>Background:</b><br/>
+    <label for="mosaic_bg_input">Input:<label> <input type="text" id="mosaic_bg_input" class="mosaic_bg" value="" size="60" onblur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_input_edit( 'mosaic_bg_input' );" /><br/>
+    <b>Item:</b><br/>
+    <label for="mosaic_input_name">Name:</label> <input type="text" id="mosaic_input_name" value="" class="mosaic_itm" />
+    <label for="mosaic_input">Input:</label> <input type="text" id="mosaic_input" value="" class="mosaic_itm" /> <input type="button" value="Edit" onclick="vlm_input_edit( 'mosaic_input' );" /> <input type="button" value="Add to input list" onclick="mosaic_add_input();" /><br/>
+    <b>Stream:</b><br/>
+    <label for="mosaic_output">Output:</label> <input type="text" id="mosaic_output" value="" size="60" onvlur="mosaic_code_update();" /> <input type="button" value="Edit" onclick="vlm_output_edit( 'mosaic_output' );" />
   </div>
-  <div  id="mosaic_list" class="popup" style="display: none">Select a stream:<br/></div>
-  <div id="mosaic_layout"></div>
+  <div  id="mosaic_list" class="popup" style="display: none; background: url('images/white.png') repeat;">[<a href="javascript:hide('mosaic_list');">hide</a>] - Select a stream:<br/><div id="mosaic_list_content"></div></div>
+  <div id="mosaic_layout" class="mosaic_bg"></div>
+  <textarea id="mosaic_code" cols="80" rows="30"></textarea>
+  <input type="button" value="Let's go!" onclick="mosaic_batch(document.getElementById('mosaic_code').value);" />
+  <input type="button" value="Stop" onclick="mosaic_stop()" />
 </div>

@@ -31,25 +31,26 @@
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link href="style.css" rel="stylesheet" type="text/css" />
   <script type="text/javascript" src="js/functions.js"></script>
+  <script type="text/javascript" src="js/vlm.js"></script>
   <script type="text/javascript" src="js/mosaic.js"></script>
 
 </head>
 
-<body onload="mosaic_size_change();">
+<body onload="mosaic_init();">
 
-<h1>TODO : code</h1>
+<h1>Mosaic wizard</h1>
 
 <vlc id="rpn" param1="page vlm store" />
 
 <!-- do we need to browse in order to setup a mosaic ? for the background image maybe ... -->
 <vlc id="include" param1="dialogs/browse" />
 
-<!-- the actual mosaic stuff -->
-<vlc id="include" param1="dialogs/mosaic" />
 <!-- used to select background and sub streams -->
 <vlc id="include" param1="dialogs/input" />
 <!-- select final output -->
 <vlc id="include" param1="dialogs/sout" />
+<!-- the actual mosaic stuff -->
+<vlc id="include" param1="dialogs/mosaic" />
 
 <vlc id="include" param1="dialogs/footer" />
 

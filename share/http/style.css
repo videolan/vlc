@@ -60,7 +60,7 @@ form {
 	display: inline;
 }
 
-input {
+input, textarea {
 	border: solid #000 1px;
 	background-color: #fff;
 }
@@ -167,24 +167,50 @@ div#mosaic_list {
 	left: 25%;
 }
 
-div#mosaic_layout {
-	border: 1px solid #000;
-	background-color: #ddf;
-	display: block;
-	margin: 1em;
-	padding: 0.3em 0.6em;
+.mosaic_bg {
+	background-color: #aaf;
 }
-div.mosaic_row {
-	padding: 0.6em 0em;
+.mosaic_tbl {
+	background-color: #faa;
+}
+.mosaic_itm {
+	background-color: #afa;
+}
+div#mosaic_layout {
+	border: 0px solid #000;
+	padding: 0px;
+	margin: 10px auto;
 }
 
-.mosaic_element {
-	display: inline;
-	border: 1px solid #000;
-	margin: 0em 0.3em;
-	padding: 0.3em 0.3em;
-	background-color: #dfd;
+div#mosaic_dt {
+	border: 0px solid #000;
+	position: relative;
 }
+table#mosaic_table {
+	border-spacing: 0px 0px;
+	position: relative;
+}
+table#mosaic_table tr {
+	padding: 0px;
+	margin: 0px;
+}
+table#mosaic_table td {
+	border: 0px solid #000;
+	text-align: center;
+	padding: 0px;
+	margin: 0px;
+}
+table#mosaic_table input {
+	border: 0px;
+	background: transparent;
+	text-align: center;
+}
+textarea#mosaic_code {
+	padding: 0px;
+	display: block;
+	margin: 10px auto;
+}
+
 div.controls button.on {
 	background-color: #aaa;
 }
