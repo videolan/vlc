@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
+#include <vlc/vlc.h>
 
 /* Library functions to manipulate initial condition values */
 
@@ -115,6 +115,7 @@ void init_cond_to_string(init_cond_t * init_cond) {
 
 	/* Create a string "param_name=val" */
 	switch (init_cond->param->type) {
+                lldiv_t div;
 		
 		case P_TYPE_BOOL:
 			sprintf(string, "%s=%d\n", init_cond->param->name, init_cond->init_val.bool_val);
@@ -123,7 +124,9 @@ void init_cond_to_string(init_cond_t * init_cond) {
 			sprintf(string, "%s=%d\n", init_cond->param->name, init_cond->init_val.int_val);
 			break;
 		case P_TYPE_DOUBLE:
-			sprintf(string, "%s=%f\n", init_cond->param->name, init_cond->init_val.double_val);
+                        div = lldiv( init_cond->init_val.double_val * 1000000,
+                                     1000000 );
+			sprintf(string, "%s="I64Fd".%06u\n", init_cond->param->name, div.quot, (unsigned int) div.rem );
 			break;
 		default:
 			return;

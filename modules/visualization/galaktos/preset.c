@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc/vlc.h>
 
 
 #include <stdio.h>
@@ -886,15 +887,19 @@ void write_init(init_cond_t * init_cond) {
     sprintf(s, "%s=%d\n", init_cond->param->name, init_cond->init_val.int_val);
 
   else if (init_cond->param->type == P_TYPE_DOUBLE)
-    sprintf(s, "%s=%f\n", init_cond->param->name, init_cond->init_val.double_val);
+  {
+    lldiv_t div = lldiv( init_cond->init_val.double_val * 1000000,1000000 );
+    sprintf(s, "%s="I64Fd".%06u\n", init_cond->param->name, div.quot,
+                    (unsigned int) div.rem );
+  }
 
   else { printf("write_init: unknown parameter type!\n"); return; }
-  
+
   len = strlen(s);
 
   if ((fwrite(s, 1, len, write_stream)) != len)
     printf("write_init: failed writing to file stream! Out of disk space?\n");
-  
+
 }
 
 
