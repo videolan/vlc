@@ -304,6 +304,8 @@ DIST_http = \
 	http/images/stop.png \
 	http/images/help.png \
 	http/images/playlist_small.png \
+	http/images/white.png \
+	http/images/sd.png \
 	http/.hosts \
 	http/mosaic.html \
 	$(NULL)
