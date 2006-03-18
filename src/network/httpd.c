@@ -62,37 +62,6 @@
 
 static void httpd_ClientClean( httpd_client_t *cl );
 
-/* each host run in his own thread */
-struct httpd_host_t
-{
-    VLC_COMMON_MEMBERS
-
-    httpd_t     *httpd;
-
-    /* ref count */
-    int         i_ref;
-
-    /* address/port and socket for listening at connections */
-    char        *psz_hostname;
-    int         i_port;
-    int         *fd;
-
-    vlc_mutex_t lock;
-
-    /* all registered url (becarefull that 2 httpd_url_t could point at the same url)
-     * This will slow down the url research but make my live easier
-     * All url will have their cb trigger, but only the first one can answer
-     * */
-    int         i_url;
-    httpd_url_t **url;
-
-    int            i_client;
-    httpd_client_t **client;
-
-    /* TLS data */
-    tls_server_t *p_tls;
-};
-
 struct httpd_url_t
 {
     httpd_host_t *host;
@@ -1079,7 +1048,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         p_tls = NULL;
 
     /* create the new host */
-    host = vlc_object_create( p_this, sizeof( httpd_host_t ) );
+    host = vlc_object_create( p_this, VLC_OBJECT_HTTPD_HOST );
     host->httpd = httpd;
     vlc_mutex_init( httpd, &host->lock );
     host->i_ref = 1;
@@ -2441,7 +2410,6 @@ static void httpd_HostThread( httpd_host_t *host )
                 struct  sockaddr_storage sock;
 
                 fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
-                msg_Info( host, "Accepting" );
                 if( fd >= 0 )
                 {
                     int i_state = 0;
@@ -2480,11 +2448,14 @@ static void httpd_HostThread( httpd_host_t *host )
                     if( fd >= 0 )
                     {
                         httpd_client_t *cl;
+                        char ip[NI_MAXNUMERICHOST];
                         stats_UpdateInteger( host, STATS_CLIENT_CONNECTIONS,
                                              1, NULL );
                         stats_UpdateInteger( host, STATS_ACTIVE_CONNECTIONS, 1,
                                              NULL );
                         cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
+                        httpd_ClientIP( cl, ip );
+                        msg_Dbg( host, "Connection from %s", ip );
                         p_tls = NULL;
                         vlc_mutex_lock( &host->lock );
                         TAB_APPEND( host->i_client, host->client, cl );

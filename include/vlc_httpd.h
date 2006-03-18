@@ -61,6 +61,39 @@ enum
     HTTPD_MSG_MAX
 };
 
+/* each host run in his own thread */
+struct httpd_host_t
+{
+    VLC_COMMON_MEMBERS
+
+    httpd_t     *httpd;
+
+    /* ref count */
+    int         i_ref;
+
+    /* address/port and socket for listening at connections */
+    char        *psz_hostname;
+    int         i_port;
+    int         *fd;
+
+    vlc_mutex_t lock;
+
+    /* all registered url (becarefull that 2 httpd_url_t could point at the same url)
+     * This will slow down the url research but make my live easier
+     * All url will have their cb trigger, but only the first one can answer
+     * */
+    int         i_url;
+    httpd_url_t **url;
+
+    int            i_client;
+    httpd_client_t **client;
+
+    /* TLS data */
+    tls_server_t *p_tls;
+};
+
+
+
 enum
 {
     HTTPD_PROTO_NONE,

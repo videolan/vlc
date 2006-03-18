@@ -182,7 +182,11 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
         case VLC_OBJECT_HTTPD:
             i_size = sizeof( httpd_t );
-            psz_type = "http daemon";
+            psz_type = "http server";
+            break;
+        case VLC_OBJECT_HTTPD_HOST:
+            i_size = sizeof( httpd_host_t );
+            psz_type = "http server";
             break;
         case VLC_OBJECT_VLM:
             i_size = sizeof( vlm_t );

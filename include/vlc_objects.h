@@ -61,6 +61,7 @@
 #define VLC_OBJECT_XML        (-27)
 #define VLC_OBJECT_OSDMENU    (-28)
 #define VLC_OBJECT_STATS      (-29)
+#define VLC_OBJECT_HTTPD_HOST (-30)
 
 #define VLC_OBJECT_GENERIC  (-666)
 
