@@ -37,12 +37,13 @@ Note that the sout chain is used and sent to VLC by the input dialog
     <vlc id="if" param1="page value 'vlm' strcmp 0 =" />
       <input type="text" name="sout_mrl" id="sout_mrl" size="60" onkeypress="if( event.keyCode == 13 ) vlm_output_change();"/>
       <br/>
-      <input type="submit" value="Ok" onclick="vlm_output_change();" />
+      <input type="button" value="Ok" onclick="vlm_output_change();" />
+      <input type="button" value="Cancel" onclick="hide('sout');" />
       <input type="hidden" id="sout_dest" />
     <vlc id="else" />
       <input type="text" name="sout_mrl" id="sout_mrl" size="60" onkeypress="if( event.keyCode == 13 ) save_sout();" />
       <br/>
-      <input type="submit" value="Save" onclick="save_sout();" />
+      <input type="button" value="Save" onclick="save_sout();" />
     <vlc id="end" />
     <input type="button" value="Cancel" onclick="reset_sout();"/>
     <input type="hidden" id="sout_old_mrl" value="" /> <!-- FIXME -->

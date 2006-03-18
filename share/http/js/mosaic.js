@@ -134,6 +134,8 @@ function mosaic_add_input()
     streams[ addunderscores( value('mosaic_input_name') ) ] =
         value('mosaic_input');
 
+    mosaic_feedback( addunderscores( value('mosaic_input_name') ) + " ( " + value('mosaic_input') + " ) added to input list.", true );
+
     var mlist = document.getElementById( "mosaic_list_content" );
     while( mlist.hasChildNodes() )
         mlist.removeChild( mlist.firstChild );
@@ -146,12 +148,12 @@ function mosaic_add_input()
         minput.setAttribute( 'href', 'javascript:mosaic_elt_select(\''+name+'\');');
         minput.setAttribute( 'id', name );
         minput.setAttribute( 'value', mrl );
-        minput.setAttribute( 'title', mrl );
         
         var minputtxt = document.createTextNode( name );
 
         minput.appendChild( minputtxt );
         mlist.appendChild( minput );
+        mlist.appendChild( document.createTextNode( " ( "+mrl+" )" ) );
         mlist.appendChild( document.createElement( 'br' ) );
     }
 }
@@ -159,9 +161,13 @@ function mosaic_add_input()
 function mosaic_elt_select( id )
 {
     hide( 'mosaic_list' );
-    document.getElementById( document.getElementById( 'mosaic_list' ).value ).value = id;
-    cells[ document.getElementById( 'mosaic_list' ).value ] = id;
-    mosaic_code_update();
+    var ml = document.getElementById( 'mosaic_list' ).value;
+    if( ml )
+    {
+        document.getElementById( ml ).value = id;
+        cells[ ml ] = id;
+        mosaic_code_update();
+    }
 }
 
 function mosaic_elt_choose( id )
@@ -305,4 +311,21 @@ function mosaic_stop()
         }
     }
     mosaic_batch( cmd );
-}   
+}
+
+function mosaic_feedback( msg, ok )
+{
+    var f = document.getElementById( "mosaic_feedback" );
+    while( f.hasChildNodes() )
+        f.removeChild( f.firstChild );
+
+    f.style.fontWeight = "bold";
+    if( ok )
+        f.style.color = "#0f0";
+    else
+        f.style.color = "#f00";
+
+    var t = document.createTextNode( ( ok ? "Info: " : "Error: " ) + msg );
+    f.appendChild( t );
+
+}

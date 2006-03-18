@@ -36,6 +36,7 @@ This dialog needs the following dialogs to be fully functional: browse
     <vlc id="if" param1="page value 'vlm' strcmp 0 =" />
       <input type="text" name="input_mrl" id="input_mrl" size="60" onkeypress="if( event.keyCode == 13 ) vlm_input_change();"/>
       <input type="button" value="Ok" onclick="vlm_input_change();" />
+      <input type="button" value="Cancel" onclick="hide('input');" />
       <input type="hidden" id="input_dest" value="" />
     <vlc id="else" />
       <input type="text" name="input_mrl" id="input_mrl" size="60" onkeypress="if( event.keyCode == 13 ) in_play();"/>
