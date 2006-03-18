@@ -59,7 +59,7 @@ Interfaces:
     - support for processing multiple items with the wizard in a single run
     - option to save selections in the wizard for a session (default enabled)
  * HTTP
-    - New default interface pages for VLC and VLM
+    - New default interface pages for VLC and VLM (including a mosaic wizard)
     - A bunch of new RPN functions
 
 Windows Port:
