@@ -694,7 +694,9 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
                 case VLC_VAR_FLOAT:
                 {
                     char psz_value[20];
-                    snprintf( psz_value, sizeof(psz_value), "%f", val.f_float );
+                    lldiv_t value = lldiv( val.f_float * 1000000, 1000000 );
+                    snprintf( psz_value, sizeof(psz_value), I64Fd".%06u",
+                                    value.quot, (unsigned int)value.rem );
                     E_(SSPush)( st, psz_value );
                     break;
                 }
@@ -788,8 +790,10 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             case VLC_VAR_FLOAT:
             {
                 char psz_string[20];
-                snprintf( psz_string, sizeof(psz_string), "%f",
-                          config_GetFloat( p_intf, psz_variable ) );
+                lldiv_t value = lldiv( config_GetFloat( p_intf, psz_variable )
+                                       * 1000000, 1000000 );
+                snprintf( psz_string, sizeof(psz_string), I64Fd".%06u",
+                          value.quot, (unsigned int)value.rem );
                 E_(SSPush)( st, psz_string );
                 break;
             }

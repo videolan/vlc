@@ -687,6 +687,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
             int     i;
             float   f;
             char    *psz;
+            lldiv_t div;
 
             if( *m->param1  == '\0' )
             {
@@ -701,7 +702,9 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     break;
                 case MVLC_FLOAT:
                     f = config_GetFloat( p_intf, m->param1 );
-                    sprintf( value, "%f", f );
+                    div = lldiv( f * 1000000 , 1000000 );
+                    sprintf( value, I64Fd".%06u", div.quot,
+                            (unsigned int)div.rem );
                     break;
                 case MVLC_STRING:
                     psz = config_GetPsz( p_intf, m->param1 );
