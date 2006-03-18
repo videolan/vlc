@@ -305,6 +305,7 @@ DIST_http = \
 	http/images/help.png \
 	http/images/playlist_small.png \
 	http/images/white.png \
+	http/images/white_small_cross.png \
 	http/images/sd.png \
 	http/.hosts \
 	http/mosaic.html \
