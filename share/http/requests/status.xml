@@ -77,6 +77,13 @@
   <vlc id="if" param1="command value 'pl_repeat' strcmp 0 =" />
     <vlc id="rpn" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get 1 + 2 % 'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_set" />
   <vlc id="end" />
+  <vlc id="if" param1="command value 'pl_sd' strcmp 0 =" />
+    <vlc id="if" param1="val value services_discovery_is_loaded" />
+      <vlc id="rpn" param1="val value services_discovery_remove" />
+    <vlc id="else" />
+      <vlc id="rpn" param1="val value services_discovery_add" />
+    <vlc id="end" />
+  <vlc id="end" />
 
   <!-- misc commands -->
   <vlc id="if" param1="command value 'fullscreen' strcmp 0 =" />

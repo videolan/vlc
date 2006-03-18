@@ -65,6 +65,16 @@ This dialog needs the following dialogs to be fully functional: <none>
         <button onclick="pl_sort(0,1);hide_menu('menu_sort');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="Sort by Id descending" >Id reverse</button><br/>
       </div>
     </button>
+    <button id="btn_sd" onmouseover="show_menu('menu_sd');" onmouseout="hide_menu('menu_sd');" title="Services Discovery" >
+      <img src="images/sd.png" alt="Services Discovery" />
+      <span class="btn_text">Services Discovery</span>
+      <div id="menu_sd" class="menu" >
+        <vlc id="rpn" param1="services_discovery" />
+        <vlc id="foreach" param1="sd" param2="object" />
+        <button onclick="pl_sd('<vlc id="value" param1="sd" />');hide_menu('menu_sd');" onmouseover="button_over(this);" onmouseout="button_out_menu(this);" title="<vlc id="value" param1="sd.name" />" ><vlc id="value" param1="sd.name" /></button><br/>
+        <vlc id="end" />
+      </div>
+    </button>
   </div>
   <div id="playtree">
     (?)

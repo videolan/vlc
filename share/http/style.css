@@ -124,6 +124,9 @@ div#infotree dt {
 	text-decoration: underline;
 }
 
+div#playtree {
+	min-height: 150px;
+}
 div.pl_node {
 	padding-left: 20px;
 	font-style: italic;

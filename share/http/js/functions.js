@@ -330,6 +330,10 @@ function pl_repeat()
 {
     loadXMLDoc( 'requests/status.xml?command=pl_repeat', parse_status );
 }
+function pl_sd( value )
+{
+    loadXMLDoc( 'requests/status.xml?command=pl_sd&val='+value, parse_status );
+}
 
 /* misc actions */
 function volume_down()
