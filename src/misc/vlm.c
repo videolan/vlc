@@ -1234,11 +1234,15 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         vlc_value_t val;
         float f_percentage;
 
-        if( psz_args && sscanf( psz_args, "%f", &f_percentage ) == 1 )
+        if( psz_args )
         {
-            val.f_float = f_percentage / 100.0 ;
-            var_Set( p_instance->p_input, "position", val );
-            return VLC_SUCCESS;
+            f_percentage = i18n_atof( psz_args );
+            if( f_percentage >= 0.0 && f_percentage <= 100.0 )
+            {
+                val.f_float = f_percentage / 100.0 ;
+                var_Set( p_instance->p_input, "position", val );
+                return VLC_SUCCESS;
+            }
         }
     }
     else if( !strcmp( psz_command, "stop" ) )
@@ -2312,8 +2316,8 @@ int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
     {
         double f_pos = (double)va_arg( args, double );
         char psz_pos[50];
-
-        sprintf( psz_pos, "%f", f_pos );
+        lldiv_t div = lldiv( f_pos * 10000000, 10000000 );
+        sprintf( psz_pos, I64Fd".%07u", div.quot, (unsigned int) div.rem );
         i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "seek", psz_pos);
         break;
     }
