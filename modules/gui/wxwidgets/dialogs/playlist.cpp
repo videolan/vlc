@@ -877,7 +877,7 @@ void Playlist::DeleteTreeItem( wxTreeItemId item )
    if( p_item->i_children == -1 ) DeleteItem( p_item->input.i_id );
    else DeleteNode( p_item );
 
-   RemoveItem( item );
+   RemoveItem( p_item->input.i_id );
    UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
 
