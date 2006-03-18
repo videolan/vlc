@@ -197,6 +197,12 @@ vlc_module_begin();
     set_callbacks( E_(OpenFilter), E_(CloseFilter) );
     set_description( _("ffmpeg video filter") );
 
+    /* crop/padd submodule */
+    add_submodule();
+    set_capability( "crop padd", 10 );
+    set_callbacks( E_(OpenCropPadd), E_(CloseFilter) );
+    set_description( _("ffmpeg crop padd filter") );
+
     /* video filter submodule */
     add_submodule();
     set_capability( "video filter2", 0 );

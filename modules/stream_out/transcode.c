@@ -6,7 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
- *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl> 
+ *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,29 @@
 #define CROPRIGHT_TEXT N_("Video crop right")
 #define CROPRIGHT_LONGTEXT N_( \
     "Allows you to specify the right coordinate for the video cropping." )
+
+#define PADDTOP_TEXT N_("Video padd top")
+#define PADDTOP_LONGTEXT N_( \
+    "Allows you to specify padding of black lines at the top." )
+#define PADDLEFT_TEXT N_("Video padd left")
+#define PADDLEFT_LONGTEXT N_( \
+    "Allows you to specify padding of black lines on the left." )
+#define PADDBOTTOM_TEXT N_("Video padd bottom")
+#define PADDBOTTOM_LONGTEXT N_( \
+    "Allows you to specify padding of black lines at the top." )
+#define PADDRIGHT_TEXT N_("Video padd right")
+#define PADDRIGHT_LONGTEXT N_( \
+    "Allows you to specify padding of black lines on the right." )
+
+#define CANVAS_WIDTH_TEXT N_("Video canvas width")
+#define CANVAS_WIDTH_LONGTEXT N_( \
+    "Allows to padd or crop the frame to a specified width" )
+#define CANVAS_HEIGHT_TEXT N_("Video canvas height")
+#define CANVAS_HEIGHT_LONGTEXT N_( \
+    "Allows to padd or crop the frame to a specified height" )
+#define CANVAS_ASPECT_TEXT N_("Video canvas aspect ratio")
+#define CANVAS_ASPECT_LONGTEXT N_( \
+    "Set aspect (like 4:3) of video canvas and letterbox accordingly" )
 
 #define AENC_TEXT N_("Audio encoder")
 #define AENC_LONGTEXT N_( \
@@ -211,6 +234,22 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "cropright", 0, NULL, CROPRIGHT_TEXT,
                  CROPRIGHT_LONGTEXT, VLC_TRUE );
 
+    add_integer( SOUT_CFG_PREFIX "paddtop", 0, NULL, PADDTOP_TEXT,
+                 PADDTOP_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "paddleft", 0, NULL, PADDLEFT_TEXT,
+                 PADDLEFT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "paddbottom", 0, NULL, PADDBOTTOM_TEXT,
+                 PADDBOTTOM_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "paddright", 0, NULL, PADDRIGHT_TEXT,
+                 PADDRIGHT_LONGTEXT, VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "canvas-width", 0, NULL, CANVAS_WIDTH_TEXT,
+                 CANVAS_WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "canvas-height", 0, NULL, CANVAS_HEIGHT_TEXT,
+                 CANVAS_HEIGHT_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "canvas-aspect", NULL, NULL, CANVAS_ASPECT_TEXT,
+                CANVAS_ASPECT_LONGTEXT, VLC_FALSE );
+
     set_section( N_("Audio"), NULL );
     add_string( SOUT_CFG_PREFIX "aenc", NULL, NULL, AENC_TEXT,
                 AENC_LONGTEXT, VLC_FALSE );
@@ -250,6 +289,8 @@ vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
+    "paddtop", "paddbottom", "paddleft", "paddright", 
+    "canvas-width", "canvas-height", "canvas-aspect", 
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
     "samplerate", "channels", "senc", "scodec", "soverlay", "sfilter",
@@ -354,6 +395,26 @@ struct sout_stream_sys_t
     int             i_crop_bottom;
     int             i_crop_right;
     int             i_crop_left;
+
+    int             i_padd_top;
+    int             i_padd_bottom;
+    int             i_padd_right;
+    int             i_padd_left;
+
+    int             i_canvas_width;
+    int             i_canvas_height;
+    int             i_canvas_aspect;
+    
+    /* Video, calculated */
+    int             i_src_x_offset;
+    int             i_src_y_offset;
+    int             i_crop_width;
+    int             i_crop_height;
+
+    int             i_dst_x_offset;
+    int             i_dst_y_offset;
+    int             i_nopadd_width;
+    int             i_nopadd_height;
 
     /* SPU */
     vlc_fourcc_t    i_scodec;   /* codec spu (0 if not transcode) */
@@ -549,6 +610,44 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_crop_left = val.i_int;
     var_Get( p_stream, SOUT_CFG_PREFIX "cropright", &val );
     p_sys->i_crop_right = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "paddtop", &val );
+    p_sys->i_padd_top = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "paddbottom", &val );
+    p_sys->i_padd_bottom = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "paddleft", &val );
+    p_sys->i_padd_left = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "paddright", &val );
+    p_sys->i_padd_right = val.i_int;
+    
+    var_Get( p_stream, SOUT_CFG_PREFIX "canvas-width", &val );
+    p_sys->i_canvas_width = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "canvas-height", &val );
+    p_sys->i_canvas_height = val.i_int;
+    
+    var_Get( p_stream, SOUT_CFG_PREFIX "canvas-aspect", &val );
+    if ( val.psz_string )
+    {
+        char *psz_parser = strchr( val.psz_string, ':' );
+
+        if( psz_parser )
+        {
+            *psz_parser++ = '\0';
+            p_sys->i_canvas_aspect = atoi( val.psz_string ) * VOUT_ASPECT_FACTOR
+                / atoi( psz_parser );
+        }
+        else
+        {
+            msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
+            p_sys->i_canvas_aspect = 0;
+        }
+
+        free( val.psz_string );
+    }
+    else
+    {
+        p_sys->i_canvas_aspect = 0;
+    }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "threads", &val );
     p_sys->i_threads = val.i_int;
@@ -866,8 +965,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         /* Complete destination format */
         id->p_encoder->fmt_out.i_codec = p_sys->i_vcodec;
-        id->p_encoder->fmt_out.video.i_width  = p_sys->i_width;
-        id->p_encoder->fmt_out.video.i_height = p_sys->i_height;
+        id->p_encoder->fmt_out.video.i_width  = p_sys->i_width & ~1;
+        id->p_encoder->fmt_out.video.i_height = p_sys->i_height & ~1;
         id->p_encoder->fmt_out.i_bitrate = p_sys->i_vbitrate;
 
         /* Build decoder -> filter -> encoder chain */
@@ -1536,67 +1635,234 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    /* Hack because of the copy packetizer which can fail to detect the
-     * proper size (which forces us to wait until the 1st frame
-     * is decoded) */
-    int i_width = id->p_decoder->fmt_out.video.i_width -
-        p_sys->i_crop_left - p_sys->i_crop_right;
-    int i_height = id->p_decoder->fmt_out.video.i_height -
-        p_sys->i_crop_top - p_sys->i_crop_bottom;
+     /* Calculate scaling, padding, cropping etc. */
 
+     /* width/height of source */
+     int i_src_width = id->p_decoder->fmt_out.video.i_width;
+     int i_src_height = id->p_decoder->fmt_out.video.i_height;
+
+     /* with/height scaling */
+     float f_scale_width = 1;
+     float f_scale_height = 1;
+
+     /* width/height of output stream */
+     int i_dst_width;
+     int i_dst_height;
+
+     /* aspect ratio */
+     float f_aspect = (float)id->p_decoder->fmt_out.video.i_aspect /
+                             VOUT_ASPECT_FACTOR;
+
+     msg_Dbg( p_stream, "decoder aspect is %i:%i",
+                  id->p_decoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
+
+     /* Change f_aspect from source frame to source pixel */
+     f_aspect = f_aspect * i_src_height / i_src_width;
+     msg_Dbg( p_stream, "source pixel aspect is %f:1", f_aspect );
+
+     /* width/height after cropping */
+     p_sys->i_src_x_offset = p_sys->i_crop_left & ~1;
+     p_sys->i_src_y_offset = p_sys->i_crop_top & ~1;
+     p_sys->i_crop_width = i_src_width - ( p_sys->i_crop_left & ~1 ) -
+                            ( p_sys->i_crop_right & ~1 );
+     p_sys->i_crop_height = i_src_height - ( p_sys->i_crop_top & ~1 ) -
+                            ( p_sys->i_crop_bottom & ~1 );
+
+    /* Calculate scaling factor for specified parameters */
     if( id->p_encoder->fmt_out.video.i_width <= 0 &&
         id->p_encoder->fmt_out.video.i_height <= 0 && p_sys->f_scale )
     {
+        /* Global scaling. Make sure width will remain a factor of 16 */
         float f_real_scale;
-        id->p_encoder->fmt_out.video.i_width = i_width * p_sys->f_scale;
-        if( id->p_encoder->fmt_out.video.i_width % 16 <= 7 &&
-            id->p_encoder->fmt_out.video.i_width >= 16 )
-            id->p_encoder->fmt_out.video.i_width -=
-                    id->p_encoder->fmt_out.video.i_width % 16;
+        int  i_new_height;
+        int i_new_width = i_src_width * p_sys->f_scale;
+
+        if( i_new_width % 16 <= 7 && i_new_width >= 16 )
+            i_new_width -= i_new_width % 16;
         else
-            id->p_encoder->fmt_out.video.i_width +=
-                    16 - id->p_encoder->fmt_out.video.i_width % 16;
+            i_new_width += 16 - i_new_width % 16;
 
-        f_real_scale = (float)( id->p_encoder->fmt_out.video.i_width) /
-                                (float)i_width;
+        f_real_scale = (float)( i_new_width ) / (float) i_src_width;
 
-        id->p_encoder->fmt_out.video.i_height = __MAX( 16,
-                                                  i_height * f_real_scale );
-        msg_Dbg( p_stream, "scaling to %ix%i",
-                        id->p_encoder->fmt_out.video.i_width,
-                        id->p_encoder->fmt_out.video.i_height  );
+        i_new_height = __MAX( 16, i_src_height * (float)f_real_scale );
+
+        f_scale_width = f_real_scale;
+        f_scale_height = (float) i_new_height / (float) i_src_height;
     }
     else if( id->p_encoder->fmt_out.video.i_width > 0 &&
              id->p_encoder->fmt_out.video.i_height <= 0 )
     {
-        id->p_encoder->fmt_out.video.i_height =
-            id->p_encoder->fmt_out.video.i_width / (double)i_width * i_height;
+        /* Only width specified */
+        f_scale_width = (float)id->p_encoder->fmt_out.video.i_width /
+                             p_sys->i_crop_width;
+        f_scale_height = f_scale_width;
     }
     else if( id->p_encoder->fmt_out.video.i_width <= 0 &&
              id->p_encoder->fmt_out.video.i_height > 0 )
     {
-        id->p_encoder->fmt_out.video.i_width =
-            id->p_encoder->fmt_out.video.i_height / (double)i_height * i_width;
-    }
+         /* Only height specified */
+         f_scale_height = (float)id->p_encoder->fmt_out.video.i_height /
+                              p_sys->i_crop_height;
+         f_scale_width = f_scale_height;
+     }
+     else if( id->p_encoder->fmt_out.video.i_width > 0 &&
+              id->p_encoder->fmt_out.video.i_height > 0 )
+     {
+         /* Width and height specified */
+         f_scale_width = (float)id->p_encoder->fmt_out.video.i_width
+                               / p_sys->i_crop_width;
+         f_scale_height = (float)id->p_encoder->fmt_out.video.i_height
+                               / p_sys->i_crop_height;
+     }
 
-    if( p_sys->i_maxwidth
-         && id->p_encoder->fmt_out.video.i_width > p_sys->i_maxwidth )
-        id->p_encoder->fmt_out.video.i_width = p_sys->i_maxwidth;
-    if( p_sys->i_maxheight
-         && id->p_encoder->fmt_out.video.i_height > p_sys->i_maxheight )
-        id->p_encoder->fmt_out.video.i_height = p_sys->i_maxheight;
+     /* check maxwidth and maxheight */
+     /* note: maxwidth and maxheight currently does not handle
+      * canvas and padding, just scaling and cropping. */
 
-    /* Make sure the size is at least a multiple of 2 */
-    id->p_encoder->fmt_out.video.i_width =
-        (id->p_encoder->fmt_out.video.i_width + 1) >> 1 << 1;
-    id->p_encoder->fmt_out.video.i_height =
-        (id->p_encoder->fmt_out.video.i_height + 1) >> 1 << 1;
+     if( p_sys->i_maxwidth && f_scale_width > (float)p_sys->i_maxwidth /
+                                                     p_sys->i_crop_width )
+     {
+         f_scale_width = (float)p_sys->i_maxwidth / p_sys->i_crop_width;
+     }
+     if( p_sys->i_maxheight && f_scale_height > (float)p_sys->i_maxheight /
+                                                       p_sys->i_crop_height )
+     {
+         f_scale_height = (float)p_sys->i_maxheight / p_sys->i_crop_height;
+     }
 
-    id->p_encoder->fmt_in.video.i_width =
-        id->p_encoder->fmt_out.video.i_width;
-    id->p_encoder->fmt_in.video.i_height =
-        id->p_encoder->fmt_out.video.i_height;
+     /* Change aspect ratio from source pixel to scaled pixel */
+     f_aspect = f_aspect * f_scale_height / f_scale_width;
+     msg_Dbg( p_stream, "scaled pixel aspect is %f:1", f_aspect );
 
+     /* Correct scaling for target aspect ratio */
+     /* Shrink video if necessary */
+     if ( p_sys->i_canvas_aspect > 0 )
+     {
+         float f_target_aspect = (float)p_sys->i_canvas_aspect /
+                                        VOUT_ASPECT_FACTOR;
+
+         if( p_sys->i_canvas_width > 0 && p_sys->i_canvas_height > 0)
+         {
+             /* Calculate pixel aspect of canvas */
+             f_target_aspect = f_target_aspect / p_sys->i_canvas_width *
+                               p_sys->i_canvas_height;
+         }
+         if( f_target_aspect > f_aspect )
+         {
+             /* Reduce width scale to increase aspect */
+             f_scale_width = f_scale_width * f_aspect / f_target_aspect;
+         }
+         else
+         {
+             /* Reduce height scale to decrease aspect */
+             f_scale_height = f_scale_height * f_target_aspect / f_aspect;
+         }
+         f_aspect = f_target_aspect;
+         msg_Dbg( p_stream, "Canvas scaled pixel aspect is %f:1", f_aspect );
+     }
+
+     /* f_scale_width and f_scale_height are now final */
+
+     /* Calculate width, height from scaling */
+     /* Make sure its multiple of 2 */
+
+     i_dst_width = 2 * (int)( p_sys->i_crop_width * f_scale_width / 2 + 0.5 );
+     i_dst_height = 2 *
+                    (int)( p_sys->i_crop_height * f_scale_height / 2 + 0.5 );
+
+     p_sys->i_nopadd_width = i_dst_width;
+     p_sys->i_nopadd_height = i_dst_height;
+     p_sys->i_dst_x_offset = 0;
+     p_sys->i_dst_y_offset = 0;
+
+     /* Handle canvas and padding */
+
+     if( p_sys->i_canvas_width <= 0 )
+     {
+         /* No canvas width set, add explicit padding border */
+         i_dst_width = p_sys->i_nopadd_width + ( p_sys->i_padd_left & ~1 ) +
+                      ( p_sys->i_padd_right & ~1 );
+         p_sys->i_dst_x_offset = ( p_sys->i_padd_left & ~1 );
+     }
+     else
+     {
+         /* Canvas set, check if we have to padd or crop */
+
+         if( p_sys->i_canvas_width < p_sys->i_nopadd_width )
+         {
+             /* need to crop more, but keep same scaling */
+             int i_crop = 2 * (int)( ( p_sys->i_canvas_width & ~1 ) /
+                                       f_scale_width / 2 + 0.5 );
+
+             p_sys->i_src_x_offset += ( ( p_sys->i_crop_width - i_crop ) / 2 )
+                                           & ~1;
+             p_sys->i_crop_width = i_crop;
+             i_dst_width = p_sys->i_canvas_width & ~1;
+             p_sys->i_nopadd_width = i_dst_width;
+         }
+         else if( p_sys->i_canvas_width > p_sys->i_nopadd_width )
+         {
+             /* need to padd */
+             i_dst_width = p_sys->i_canvas_width & ~1;
+             p_sys->i_dst_x_offset = ( i_dst_width - p_sys->i_nopadd_width )/2;
+             p_sys->i_dst_x_offset = p_sys->i_dst_x_offset & ~1;
+         }
+     }
+
+     if( p_sys->i_canvas_height <= 0 )
+     {
+         /* No canvas set, add padding border */
+         i_dst_height = p_sys->i_nopadd_height + ( p_sys->i_padd_top & ~1 ) +
+                        ( p_sys->i_padd_bottom & ~1 );
+         p_sys->i_dst_y_offset = ( p_sys->i_padd_top & ~1 );
+     }
+     else
+     {
+         /* Canvas set, check if we have to padd or crop */
+
+         if( p_sys->i_canvas_height < p_sys->i_nopadd_height )
+         {
+             /* need to crop more, but keep same scaling */
+             int i_crop = 2 * (int)( ( p_sys->i_canvas_height & ~1 ) /
+                                        f_scale_height / 2 + 0.5 );
+
+             p_sys->i_src_y_offset += ( ( p_sys->i_crop_height - i_crop ) / 2 )
+                                                & ~1;
+             p_sys->i_crop_height = i_crop;
+             i_dst_height = p_sys->i_canvas_height & ~1;
+             p_sys->i_nopadd_height = i_dst_height;
+         }
+         else if( p_sys->i_canvas_height > p_sys->i_nopadd_height )
+         {
+             /* need to padd */
+             i_dst_height = p_sys->i_canvas_height & ~1;
+             p_sys->i_dst_y_offset = ( i_dst_height - p_sys->i_nopadd_height )
+                                        /2;
+             p_sys->i_dst_y_offset = p_sys->i_dst_y_offset & ~1;
+         }
+     }
+
+
+     /* Change aspect ratio from scaled pixel to output frame */
+
+     f_aspect = f_aspect * i_dst_width / i_dst_height;
+
+     /* Store calculated values */
+     id->p_encoder->fmt_out.video.i_width = i_dst_width;
+     id->p_encoder->fmt_out.video.i_height = i_dst_height;
+
+     id->p_encoder->fmt_in.video.i_width = i_dst_width;
+     id->p_encoder->fmt_in.video.i_height = i_dst_height;
+
+     msg_Dbg( p_stream, "Source %ix%i, crop %ix%i, "
+                        "destination %ix%i, padding %ix%i",
+         i_src_width, i_src_height,
+         p_sys->i_crop_width, p_sys->i_crop_height,
+         p_sys->i_nopadd_width, p_sys->i_nopadd_height,
+         i_dst_width, i_dst_height
+     );
+
+    /* Handle frame rate conversion */
     if( !id->p_encoder->fmt_out.video.i_frame_rate ||
         !id->p_encoder->fmt_out.video.i_frame_rate_base )
     {
@@ -1628,11 +1894,12 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
     /* Check whether a particular aspect ratio was requested */
     if( !id->p_encoder->fmt_out.video.i_aspect )
     {
-        id->p_encoder->fmt_out.video.i_aspect =
-            id->p_decoder->fmt_out.video.i_aspect;
+        id->p_encoder->fmt_out.video.i_aspect = (int)( f_aspect * VOUT_ASPECT_FACTOR + 0.5 );
     }
     id->p_encoder->fmt_in.video.i_aspect =
         id->p_encoder->fmt_out.video.i_aspect;
+
+    msg_Dbg( p_stream, "encoder aspect is %i:%i", id->p_encoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
 
     id->p_encoder->p_module =
         module_Need( id->p_encoder, "encoder", p_sys->psz_venc, VLC_TRUE );
@@ -1850,12 +2117,14 @@ static int transcode_video_process( sout_stream_t *p_stream,
             /* Check if we need a filter for chroma conversion or resizing */
             if( id->p_decoder->fmt_out.video.i_chroma !=
                 id->p_encoder->fmt_in.video.i_chroma ||
-                id->p_decoder->fmt_out.video.i_width !=
-                id->p_encoder->fmt_out.video.i_width ||
-                id->p_decoder->fmt_out.video.i_height !=
-                id->p_encoder->fmt_out.video.i_height ||
-                p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
-                p_sys->i_crop_left > 0 || p_sys->i_crop_right > 0 )
+                
+                (int)id->p_decoder->fmt_out.video.i_width != p_sys->i_crop_width ||
+                p_sys->i_crop_width != p_sys->i_nopadd_width ||
+                p_sys->i_nopadd_width != (int)id->p_encoder->fmt_out.video.i_width ||
+                
+                (int)id->p_decoder->fmt_out.video.i_height != p_sys->i_crop_height ||
+                p_sys->i_crop_height != p_sys->i_nopadd_height ||
+                p_sys->i_nopadd_height != (int)id->p_encoder->fmt_out.video.i_height)
             {
                 id->pp_filter[id->i_filter] =
                     vlc_object_create( p_stream, VLC_OBJECT_FILTER );
@@ -1869,9 +2138,21 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 id->pp_filter[id->i_filter]->fmt_in = id->p_decoder->fmt_out;
                 id->pp_filter[id->i_filter]->fmt_out = id->p_encoder->fmt_in;
                 id->pp_filter[id->i_filter]->p_cfg = NULL;
+
+
+                id->pp_filter[id->i_filter]->fmt_in.video.i_x_offset = p_sys->i_src_x_offset;
+                id->pp_filter[id->i_filter]->fmt_in.video.i_y_offset = p_sys->i_src_y_offset;
+                id->pp_filter[id->i_filter]->fmt_in.video.i_visible_width = p_sys->i_crop_width;
+                id->pp_filter[id->i_filter]->fmt_in.video.i_visible_height = p_sys->i_crop_height;
+
+                id->pp_filter[id->i_filter]->fmt_out.video.i_x_offset = p_sys->i_dst_x_offset;
+                id->pp_filter[id->i_filter]->fmt_out.video.i_y_offset = p_sys->i_dst_y_offset;
+                id->pp_filter[id->i_filter]->fmt_out.video.i_visible_width = p_sys->i_nopadd_width;
+                id->pp_filter[id->i_filter]->fmt_out.video.i_visible_height = p_sys->i_nopadd_height;
+
                 id->pp_filter[id->i_filter]->p_module =
                     module_Need( id->pp_filter[id->i_filter],
-                                 "video filter2", 0, 0 );
+                                 "crop padd", 0, 0 );
                 if( id->pp_filter[id->i_filter]->p_module )
                 {
                     id->pp_filter[id->i_filter]->p_owner =

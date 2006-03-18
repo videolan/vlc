@@ -51,6 +51,7 @@ struct filter_sys_t
     vlc_bool_t b_resize;
     vlc_bool_t b_convert;
     vlc_bool_t b_resize_first;
+    vlc_bool_t b_enable_croppadd;
 
     es_format_t fmt_in;
     int i_src_ffmpeg_chroma;
@@ -61,10 +62,11 @@ struct filter_sys_t
     ImgReSampleContext *p_rsc;
 };
 
+
 /*****************************************************************************
- * OpenFilter: probe the filter and return score
+ * OpenFilterEx: common code to OpenFilter and OpenCropPadd
  *****************************************************************************/
-int E_(OpenFilter)( vlc_object_t *p_this )
+static int OpenFilterEx( vlc_object_t *p_this, vlc_bool_t b_enable_croppadd )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
@@ -80,6 +82,20 @@ int E_(OpenFilter)( vlc_object_t *p_this )
     b_resize =
         p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height;
+
+    if ( b_enable_croppadd ) 
+    {
+        b_resize = b_resize ||
+            p_filter->fmt_in.video.i_visible_width != p_filter->fmt_in.video.i_width ||
+            p_filter->fmt_in.video.i_visible_height != p_filter->fmt_in.video.i_height ||
+            p_filter->fmt_in.video.i_x_offset != 0 ||
+            p_filter->fmt_in.video.i_y_offset != 0 ||
+            p_filter->fmt_out.video.i_visible_width != p_filter->fmt_out.video.i_width ||
+            p_filter->fmt_out.video.i_visible_height != p_filter->fmt_out.video.i_height ||
+            p_filter->fmt_out.video.i_x_offset != 0 ||
+            p_filter->fmt_out.video.i_y_offset != 0;
+    }
+
     b_convert =
         p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma;
 
@@ -99,6 +115,7 @@ int E_(OpenFilter)( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->p_rsc = NULL;
+    p_sys->b_enable_croppadd = b_enable_croppadd;
     p_sys->i_src_ffmpeg_chroma =
         E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma );
     p_sys->i_dst_ffmpeg_chroma =
@@ -131,6 +148,23 @@ int E_(OpenFilter)( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * OpenFilter: probe the filter and return score
+ *****************************************************************************/
+int E_(OpenFilter)( vlc_object_t *p_this )
+{
+    return OpenFilterEx( p_this, VLC_FALSE );
+}
+
+/*****************************************************************************
+ * OpenCropPadd: probe the filter and return score
+ *****************************************************************************/
+int E_(OpenCropPadd)( vlc_object_t *p_this )
+{
+    return OpenFilterEx( p_this, VLC_TRUE );
+}
+
+
+/*****************************************************************************
  * CloseFilter: clean up the filter
  *****************************************************************************/
 void E_(CloseFilter)( vlc_object_t *p_this )
@@ -151,11 +185,36 @@ void E_(CloseFilter)( vlc_object_t *p_this )
 static int CheckInit( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_bool_t b_change;
+    int i_croptop=0;
+    int i_cropbottom=0;
+    int i_cropleft=0;
+    int i_cropright=0;
+    int i_paddtop=0;
+    int i_paddbottom=0;
+    int i_paddleft=0;
+    int i_paddright=0;
 
-    if( p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ||
+
+    b_change= p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ||
         p_filter->fmt_in.video.i_height != p_sys->fmt_in.video.i_height ||
         p_filter->fmt_out.video.i_width != p_sys->fmt_out.video.i_width ||
-        p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height )
+        p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height;
+
+    if ( p_sys->b_enable_croppadd )
+    {
+        b_change = b_change ||
+            p_filter->fmt_in.video.i_y_offset != p_sys->fmt_in.video.i_y_offset ||
+            p_filter->fmt_in.video.i_x_offset != p_sys->fmt_in.video.i_x_offset ||
+            p_filter->fmt_in.video.i_visible_width != p_sys->fmt_in.video.i_visible_width ||
+            p_filter->fmt_in.video.i_visible_height != p_sys->fmt_in.video.i_visible_height ||
+            p_filter->fmt_out.video.i_y_offset != p_sys->fmt_out.video.i_y_offset ||
+            p_filter->fmt_out.video.i_x_offset != p_sys->fmt_out.video.i_x_offset ||
+            p_filter->fmt_out.video.i_visible_width != p_sys->fmt_out.video.i_visible_width ||
+            p_filter->fmt_out.video.i_visible_height != p_sys->fmt_out.video.i_visible_height;
+    }
+
+    if ( b_change )
     {
         if( p_sys->p_rsc ) img_resample_close( p_sys->p_rsc );
         p_sys->p_rsc = 0;
@@ -191,12 +250,67 @@ static int CheckInit( filter_t *p_filter )
             p_sys->b_resize_first = VLC_TRUE;
         }
 
+        if ( p_sys->b_enable_croppadd )
+        {
+            p_sys->b_resize = p_sys->b_resize ||
+                p_filter->fmt_in.video.i_visible_width != p_filter->fmt_in.video.i_width ||
+                p_filter->fmt_in.video.i_visible_height != p_filter->fmt_in.video.i_height ||
+                p_filter->fmt_in.video.i_x_offset != 0 ||
+                p_filter->fmt_in.video.i_y_offset != 0 ||
+                p_filter->fmt_out.video.i_visible_width != p_filter->fmt_out.video.i_width ||
+                p_filter->fmt_out.video.i_visible_height != p_filter->fmt_out.video.i_height ||
+                p_filter->fmt_out.video.i_x_offset != 0 ||
+                p_filter->fmt_out.video.i_y_offset != 0;
+        }
+
         if( p_sys->b_resize )
         {
-            p_sys->p_rsc = img_resample_init( p_filter->fmt_out.video.i_width,
+            if ( p_sys->b_enable_croppadd )
+            {
+                i_croptop=p_filter->fmt_in.video.i_y_offset;
+                i_cropbottom=p_filter->fmt_in.video.i_height
+                                       - p_filter->fmt_in.video.i_visible_height
+                                       - p_filter->fmt_in.video.i_y_offset;
+                i_cropleft=p_filter->fmt_in.video.i_x_offset;
+                i_cropright=p_filter->fmt_in.video.i_width
+                                      - p_filter->fmt_in.video.i_visible_width
+                                      - p_filter->fmt_in.video.i_x_offset;
+
+
+                i_paddtop=p_filter->fmt_out.video.i_y_offset;
+                i_paddbottom=p_filter->fmt_out.video.i_height
+                                       - p_filter->fmt_out.video.i_visible_height
+                                       - p_filter->fmt_out.video.i_y_offset;
+                i_paddleft=p_filter->fmt_out.video.i_x_offset;
+                i_paddright=p_filter->fmt_out.video.i_width
+                                      - p_filter->fmt_out.video.i_visible_width
+                                      - p_filter->fmt_out.video.i_x_offset;
+            }
+
+#if LIBAVCODEC_BUILD >= 4708
+            p_sys->p_rsc = img_resample_full_init( 
+                               p_filter->fmt_out.video.i_width,
                                p_filter->fmt_out.video.i_height,
                                p_filter->fmt_in.video.i_width,
-                               p_filter->fmt_in.video.i_height );
+                               p_filter->fmt_in.video.i_height,
+                               i_croptop,i_cropbottom,
+                               i_cropleft,i_cropright,
+                               i_paddtop,i_paddbottom,
+                               i_paddleft,i_paddright );
+#else
+            p_sys->p_rsc = img_resample_full_init( 
+                               p_filter->fmt_out.video.i_width - i_paddleft - i_paddright,
+                               p_filter->fmt_out.video.i_height - i_paddtop - i_paddbottom,
+                               p_filter->fmt_in.video.i_width,
+                               p_filter->fmt_in.video.i_height,
+                               i_croptop,i_cropbottom,
+                               i_cropleft,i_cropright );
+#endif
+            msg_Dbg( p_filter, "input: %ix%i -> %ix%i",
+                p_filter->fmt_out.video.i_width,
+                p_filter->fmt_out.video.i_height,
+                p_filter->fmt_in.video.i_width,
+                p_filter->fmt_in.video.i_height);
 
             if( !p_sys->p_rsc )
             {
@@ -228,6 +342,65 @@ static int CheckInit( filter_t *p_filter )
 
     return VLC_SUCCESS;
 }
+
+/* fill padd code from ffmpeg */
+static int padcolor[3] = { 16, 128, 128 };
+
+/* Expects img to be yuv420 */
+static void fill_pad_region( AVPicture* img, int height, int width,
+        int padtop, int padbottom, int padleft, int padright, int *color ) 
+{
+    int i, y, shift;
+    uint8_t *optr;
+
+    for ( i = 0; i < 3; i++ ) 
+    {
+        shift = ( i == 0 ) ? 0 : 1;
+
+        if ( padtop || padleft ) 
+        {
+            memset( img->data[i], color[i], ( ( ( img->linesize[i] * padtop ) +
+                            padleft ) >> shift) );
+        }
+
+        if ( padleft || padright ) 
+        {
+            optr = img->data[i] + ( img->linesize[i] * ( padtop >> shift ) ) +
+                ( img->linesize[i] - ( padright >> shift ) );
+
+            for ( y = 0; y < ( ( height - ( padtop + padbottom ) ) >> shift ); y++ ) 
+            {
+                memset( optr, color[i], ( padleft + padright ) >> shift );
+                optr += img->linesize[i];
+            }
+        }
+
+        if (padbottom) 
+        {
+            optr = img->data[i] + ( img->linesize[i] * ( ( height - padbottom ) >> shift ) );
+            memset( optr, color[i], ( ( img->linesize[i] * padbottom ) >> shift ) );
+        }
+    }
+}
+
+#if LIBAVCODEC_BUILD < 4708
+
+/* Workaround, because old libavcodec doesnt know how to padd */
+
+static void img_resample_padd( ImgReSampleContext *s, AVPicture *output, 
+        const AVPicture *input, int padtop, int padleft )
+{
+    AVPicture nopadd_pic = *output;
+
+    /* shift out top and left padding for old ffmpeg */
+    nopadd_pic.data[0] += ( nopadd_pic.linesize[0] * padtop + padleft );
+    nopadd_pic.data[1] += ( nopadd_pic.linesize[1] * padtop + padleft ) >> 1;
+    nopadd_pic.data[2] += ( nopadd_pic.linesize[2] * padtop + padleft ) >> 1;
+    img_resample( s, &nopadd_pic, input );
+}
+#endif
+
+
 
 /*****************************************************************************
  * Do the processing here
@@ -291,7 +464,43 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         if( p_sys->b_resize_first )
         {
             if( p_sys->b_convert ) p_dst = &p_sys->tmp_pic;
+
+#if LIBAVCODEC_BUILD >= 4708
             img_resample( p_sys->p_rsc, p_dst, p_src );
+#else        
+            if ( p_sys->b_enable_croppadd )
+            {
+                img_resample_padd( p_sys->p_rsc, p_dst, p_src, 
+                    p_filter->fmt_out.video.i_y_offset, 
+                    p_filter->fmt_out.video.i_x_offset );
+            } 
+            else 
+            {
+                img_resample( p_sys->p_rsc, p_dst, p_src );
+            }
+#endif
+
+            if (p_sys->b_enable_croppadd)
+            {
+                if (p_filter->fmt_out.video.i_visible_width != p_filter->fmt_out.video.i_width ||
+                    p_filter->fmt_out.video.i_visible_height != p_filter->fmt_out.video.i_height ||
+                    p_filter->fmt_out.video.i_x_offset != 0 ||
+                    p_filter->fmt_out.video.i_y_offset != 0)
+                {
+                    fill_pad_region(p_dst, p_filter->fmt_out.video.i_height,
+                                    p_filter->fmt_out.video.i_width,
+                                    p_filter->fmt_out.video.i_y_offset,
+                                    p_filter->fmt_out.video.i_height
+                                      - p_filter->fmt_out.video.i_visible_height
+                                      - p_filter->fmt_out.video.i_y_offset,
+                                    p_filter->fmt_out.video.i_x_offset,
+                                    p_filter->fmt_out.video.i_width
+                                      - p_filter->fmt_out.video.i_visible_width
+                                      - p_filter->fmt_out.video.i_x_offset,
+                                    padcolor);
+                }
+            }
+
             p_src = p_dst;
         }
     }
@@ -316,7 +525,42 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
     if( p_sys->b_resize && !p_sys->b_resize_first && p_sys->p_rsc )
     {
         p_dst = &dest_pic;
+
+#if LIBAVCODEC_BUILD >= 4708
         img_resample( p_sys->p_rsc, p_dst, p_src );
+#else
+        if ( p_sys->b_enable_croppadd )
+        {
+            img_resample_padd( p_sys->p_rsc, p_dst, p_src, 
+                p_filter->fmt_out.video.i_y_offset, 
+                p_filter->fmt_out.video.i_x_offset );
+        } 
+        else 
+        {
+            img_resample( p_sys->p_rsc, p_dst, p_src );
+        }
+#endif
+ 
+        if (p_sys->b_enable_croppadd)
+        {
+            if (p_filter->fmt_out.video.i_visible_width != p_filter->fmt_out.video.i_width ||
+                p_filter->fmt_out.video.i_visible_height != p_filter->fmt_out.video.i_height ||
+                p_filter->fmt_out.video.i_x_offset != 0 ||
+                p_filter->fmt_out.video.i_y_offset != 0)
+            {
+                fill_pad_region(p_dst, p_filter->fmt_out.video.i_height,
+                                p_filter->fmt_out.video.i_width,
+                                p_filter->fmt_out.video.i_y_offset,
+                                p_filter->fmt_out.video.i_height
+                                  - p_filter->fmt_out.video.i_visible_height
+                                  - p_filter->fmt_out.video.i_y_offset,
+                                p_filter->fmt_out.video.i_x_offset,
+                                p_filter->fmt_out.video.i_width
+                                  - p_filter->fmt_out.video.i_visible_width
+                                  - p_filter->fmt_out.video.i_x_offset,
+                                padcolor);
+            }
+        }
     }
 
     /* Special case for RV32 -> YUVA */
