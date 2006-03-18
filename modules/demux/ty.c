@@ -371,7 +371,7 @@ int TyDemux(demux_t *p_demux)
     demux_sys_t      *p_sys = p_demux->p_sys;
 
     /*msg_Dbg(p_demux, "ty demux processing" );*/
-   
+
     /* did we hit EOF earlier? */
     if (p_sys->eof) return 0;
 
@@ -386,7 +386,7 @@ int TyDemux(demux_t *p_demux)
     * - set PTS for data packets
     * - pass the data on to the proper codec via es_out_Send()
 
-    * if this is the first time or  
+    * if this is the first time or
     * if we're at the end of this chunk, start a new one
     */
     /* parse the next chunk's record headers */
@@ -784,7 +784,7 @@ static int ty_stream_seek(demux_t *p_demux, double seek_pct)
     /* seek within the chunk to get roughly to where we want */
     p_sys->i_cur_rec = (int)
       ((double) ((seek_pos % CHUNK_SIZE) / (double) (CHUNK_SIZE)) * p_sys->i_num_recs);
-    msg_Dbg(p_demux, "Seeked to file pos " I64Fd, seek_pos);
+    msg_Dbg(p_demux, "seeked to file pos " I64Fd, seek_pos);
     msg_Dbg(p_demux, " (chunk %d, record %d)",
              p_sys->i_chunk_count - 1, p_sys->i_cur_rec);
 

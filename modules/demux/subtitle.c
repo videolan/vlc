@@ -704,9 +704,9 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
     unsigned int i;
 
     int i_microsecperframe = 40000; /* default to 25 fps */
-    if( p_sys->i_microsecperframe > 0 ) 
+    if( p_sys->i_microsecperframe > 0 )
         i_microsecperframe = p_sys->i_microsecperframe;
-    
+
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
     p_subtitle->psz_text = NULL;

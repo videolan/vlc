@@ -381,7 +381,7 @@ static int ChunkFind( demux_t *p_demux, char *fcc, unsigned int *pi_size )
 
         i_size = GetDWLE( p_peek + 4 );
 
-        msg_Dbg( p_demux, "Chunk: fcc=`%4.4s` size=%d", p_peek, i_size );
+        msg_Dbg( p_demux, "chunk: fcc=`%4.4s` size=%d", p_peek, i_size );
 
         if( !memcmp( p_peek, fcc, 4 ) )
         {

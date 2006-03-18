@@ -76,7 +76,7 @@ int E_(Import_PLS)( vlc_object_t *p_this )
     p_demux->p_sys = malloc( sizeof(demux_sys_t) );
     if( p_demux->p_sys == NULL )
     {
-        msg_Err( p_demux, "Out of memory" );
+        msg_Err( p_demux, "out of memory" );
         return VLC_ENOMEM;
     }
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );

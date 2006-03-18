@@ -191,7 +191,7 @@ static int Activate( vlc_object_t * p_this )
     /* Allocate p_m3u */
     p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
     p_demux->p_sys->i_type = i_type;
-    msg_Dbg( p_this, "Playlist type: %d - %d", i_type, i_type2 );
+    msg_Dbg( p_this, "playlist type: %d - %d", i_type, i_type2 );
 
     return VLC_SUCCESS;
 }

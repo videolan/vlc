@@ -40,7 +40,7 @@
  *****************************************************************************/
 
 #define INTERLEAVE_TEXT N_("Force interleaved method" )
-#define INTERLEAVE_LONGTEXT N_( "Force interleaved method" )
+#define INTERLEAVE_LONGTEXT N_( "Force interleaved method." )
 
 #define INDEX_TEXT N_("Force index creation")
 #define INDEX_LONGTEXT N_( \

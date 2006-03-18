@@ -407,7 +407,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
     for( j = 0; j < p_meta->i_record_entries_count; j++ )
     {
         asf_metadata_record_t *p_rec = &p_meta->record[j];
-        
+
         if( p_rec->i_type == ASF_METADATA_TYPE_STRING )
             msg_Dbg( s, "  - %s=%s",
                      p_rec->psz_name, p_rec->p_data );
@@ -717,7 +717,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
-             "Read \"content description object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
+             "read \"content description object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
              p_cd->psz_title,
              p_cd->psz_author,
              p_cd->psz_copyright,
@@ -779,7 +779,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "Read \"language list object\" %d entries", 
+    msg_Dbg( s, "read \"language list object\" %d entries", 
              p_ll->i_language );
     for( i = 0; i < p_ll->i_language; i++ )
         msg_Dbg( s, "  - '%s'", 
@@ -820,12 +820,12 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
     {
         p_sb->bitrate[i].i_stream_number = GetWLE( &p_data[0] )& 0x7f;
         p_sb->bitrate[i].i_avg_bitrate = GetDWLE( &p_data[2] );
-       
+
         p_data += 2+4;
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s,"Read \"stream bitrate properties object\"" );
+    msg_Dbg( s,"read \"stream bitrate properties object\"" );
     for( i = 0; i < p_sb->i_bitrate; i++ )
     {
         msg_Dbg( s,"  - stream=%d bitrate=%d",
@@ -883,7 +883,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         p_esp->pi_stream_name_language[i] = GetWLE( &p_data[0] );
         i_size = GetWLE( &p_data[2] );
         p_data += 2;
-        
+ 
         psz = calloc( i_size/2 + 1, sizeof( char ) );
         for( i_len = 0; i_len < i_size/2; i_len++ )
         {
@@ -924,7 +924,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "Read \"extended stream properties object\":" );
+    msg_Dbg( s, "read \"extended stream properties object\":" );
     msg_Dbg( s, "  - start="I64Fd" end="I64Fd,
              p_esp->i_start_time, p_esp->i_end_time );
     msg_Dbg( s, "  - data bitrate=%d buffer=%d initial fullness=%d",
@@ -991,7 +991,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     }
         
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "Read \"advanced mutual exclusion object\"" );
+    msg_Dbg( s, "read \"advanced mutual exclusion object\"" );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
         msg_Dbg( s, "  - stream=%d", p_ae->pi_stream_number[i] );
 #endif
@@ -1033,7 +1033,7 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
         p_sp->pi_priority_flag[i] = GetWLE( p_data ); p_data += 2;
     }
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "Read \"stream prioritization object\"" );
+    msg_Dbg( s, "read \"stream prioritization object\"" );
     for( i = 0; i < p_sp->i_priority_count; i++ )
         msg_Dbg( s, "  - Stream:%d flags=0x%x",
                  p_sp->pi_priority_stream_number[i],
@@ -1137,7 +1137,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "Read \"extended content description object\"" );
+    msg_Dbg( s, "read \"extended content description object\"" );
     for( i = 0; i < p_ec->i_count; i++ )
         msg_Dbg( s, "  - '%s' = '%s'",
                  p_ec->ppsz_name[i],

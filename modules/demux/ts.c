@@ -82,26 +82,29 @@ static void Close ( vlc_object_t * );
 
 #define PMT_TEXT N_("Extra PMT")
 #define PMT_LONGTEXT N_( \
-  "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])" )
+  "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])." )
 
 #define PID_TEXT N_("Set id of ES to PID")
-#define PID_LONGTEXT N_("set id of es to pid")
+#define PID_LONGTEXT N_("Set the internal ID of each elementary stream" \
+                       " handled by VLC to the same value as the PID in" \
+                       " the TS stream, instead of 1, 2, 3, etc. Useful to" \
+                       " do \'#duplicate{..., select=\"es=<pid>\"}\'.")
 
 #define TSOUT_TEXT N_("Fast udp streaming")
 #define TSOUT_LONGTEXT N_( \
-  "Sends TS to specific ip:port by udp (you must know what you are doing)")
+  "Sends TS to specific ip:port by udp (you must know what you are doing).")
 
 #define MTUOUT_TEXT N_("MTU for out mode")
-#define MTUOUT_LONGTEXT N_("MTU for out mode")
+#define MTUOUT_LONGTEXT N_("MTU for out mode.")
 
 #define CSA_TEXT N_("CSA ck")
-#define CSA_LONGTEXT N_("CSA ck")
+#define CSA_LONGTEXT N_("Control word for the CSa encryption algorithm")
 
 #define SILENT_TEXT N_("Silent mode")
-#define SILENT_LONGTEXT N_("do not complain on encrypted PES")
+#define SILENT_LONGTEXT N_("Do not complain on encrypted PES.")
 
 #define CAPMT_SYSID_TEXT N_("CAPMT System ID")
-#define CAPMT_SYSID_LONGTEXT N_("only forward descriptors from this SysID to the CAM")
+#define CAPMT_SYSID_LONGTEXT N_("Only forward descriptors from this SysID to the CAM.")
 
 #define CPKT_TEXT N_("Packet size in bytes to decrypt")
 #define CPKT_LONGTEXT N_("Specify the size of the TS packet to decrypt. " \
@@ -109,7 +112,7 @@ static void Close ( vlc_object_t * );
     "decrypting. " )
 
 #define TSDUMP_TEXT N_("Filename of dump")
-#define TSDUMP_LONGTEXT N_("Specify a filename where to dump the TS in")
+#define TSDUMP_LONGTEXT N_("Specify a filename where to dump the TS in.")
 
 #define APPEND_TEXT N_("Append")
 #define APPEND_LONGTEXT N_( \
@@ -133,7 +136,7 @@ vlc_module_begin();
     add_integer( "ts-out-mtu", 1500, NULL, MTUOUT_TEXT,
                  MTUOUT_LONGTEXT, VLC_TRUE );
     add_string( "ts-csa-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, VLC_TRUE );
-    add_integer( "ts-csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, VLC_TRUE );    
+    add_integer( "ts-csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, VLC_TRUE );
     add_bool( "ts-silent", 0, NULL, SILENT_TEXT, SILENT_LONGTEXT, VLC_TRUE );
 
     add_file( "ts-dump-file", NULL, NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, VLC_FALSE );
@@ -326,7 +329,7 @@ struct demux_sys_t
     FILE        *p_file;    /* filehandle */
     uint64_t    i_write;    /* bytes written */
     vlc_bool_t  b_file_out; /* dump mode enabled */
-    
+
     /* */
     vlc_bool_t  b_meta;
 };
@@ -832,7 +835,7 @@ static int DemuxFile( demux_t *p_demux )
     i_data = stream_Read( p_demux->s, p_sys->buffer, i_bufsize );
     if( (i_data <= 0) && (i_data < p_sys->i_packet_size) )
     {
-        msg_Dbg( p_demux, "Error reading malformed packets" );
+        msg_Dbg( p_demux, "error reading malformed packets" );
         return i_data;
     }
 
@@ -1945,13 +1948,13 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     byte1 = IODGetByte( &i_data, &p_data );
     byte2 = IODGetByte( &i_data, &p_data );
     byte3 = IODGetByte( &i_data, &p_data );
-    if( byte2 == 0x02 )	//old vlc's buggy implementation of the IOD_descriptor
+    if( byte2 == 0x02 ) //old vlc's buggy implementation of the IOD_descriptor
     {
         p_iod->i_iod_label_scope = 0x11;
         p_iod->i_iod_label = byte1;
         i_iod_tag = byte2;
     }
-    else		//correct implementation of the IOD_descriptor
+    else  //correct implementation of the IOD_descriptor
     {
         p_iod->i_iod_label_scope = byte1;
         p_iod->i_iod_label = byte2;
@@ -2910,7 +2913,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 {
                     dvbpsi_stream_identifier_dr_t *si;
                     si = dvbpsi_DecodeStreamIdentifierDr( p_dr );
-                    
+
                     msg_Dbg( p_demux, "    * Stream Component Identifier: %d", si->i_component_tag );
                 }
 #endif

@@ -80,7 +80,7 @@ typedef struct
     es_format_t fmt;
     es_out_id_t *p_es;
     int         i_track_id;
-    
+
     int         i_current_subtitle;
     int         i_subtitles;
     subtitle_t  *p_subtitles;
@@ -95,11 +95,11 @@ struct demux_sys_t
 
     text_t      txt;
     stream_t    *p_vobsub_stream;
-    
+
     /* all tracks */
     int            i_tracks;
     vobsub_track_t *track;
-    
+
     int         i_original_frame_width;
     int         i_original_frame_height;
     vlc_bool_t  b_palette;
@@ -212,7 +212,7 @@ static void Close( vlc_object_t *p_this )
         if( p_sys->track[i].p_subtitles ) free( p_sys->track[i].p_subtitles );
     }
     if( p_sys->track ) free( p_sys->track );
-    
+
     if( p_sys->p_vobsub_stream )
         stream_Delete( p_sys->p_vobsub_stream );
 
@@ -472,7 +472,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
         {
             return( VLC_EGENERIC );
         }
-        
+
         if( *line == 0 || *line == '\r' || *line == '\n' || *line == '#' ) 
             continue;
         else if( !strncmp( "size:", line, 5 ) )
@@ -546,7 +546,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 current_tk->p_subtitles = (subtitle_t*)malloc( sizeof( subtitle_t ) );;
                 current_tk->i_track_id = i_track_id;
                 current_tk->i_delay = (int64_t)0;
-                
+
                 es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
                 fmt.subs.spu.i_original_frame_width = p_sys->i_original_frame_width;
                 fmt.subs.spu.i_original_frame_height = p_sys->i_original_frame_height;
@@ -574,7 +574,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             int h, m, s, ms, count, loc = 0;
             int i_sign = 1;
             int64_t i_start, i_location = 0;
-            
+
             vobsub_track_t *current_tk = &p_sys->track[p_sys->i_tracks - 1];
 
             if( sscanf( line, "timestamp: %d%n:%d:%d:%d, filepos: %x",
@@ -592,11 +592,11 @@ static int ParseVobSubIDX( demux_t *p_demux )
                             s * 1000 +
                             ms ) * 1000;
                 i_location = loc;
-                
+
                 current_tk->i_subtitles++;
                 current_tk->p_subtitles = (subtitle_t*)realloc( current_tk->p_subtitles, sizeof( subtitle_t ) * (current_tk->i_subtitles + 1 ) );
                 current_sub = &current_tk->p_subtitles[current_tk->i_subtitles - 1];
-                
+
                 current_sub->i_start = (int64_t) i_start * i_sign;
                 current_sub->i_start += current_tk->i_delay;
                 current_sub->i_vobsub_location = i_location;
@@ -685,7 +685,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
 #define tk p_sys->track[i]
             p_pkt->i_dts = p_pkt->i_pts = p_bk->i_pts;
             p_pkt->i_length = 0;
-            
+
             if( tk.p_es && tk.i_track_id == i_spu )
             {
                 es_out_Send( p_demux->out, tk.p_es, p_pkt );

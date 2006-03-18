@@ -230,7 +230,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     /* FIXME bitrate */
     if( i_query == DEMUX_SET_TIME ) return VLC_EGENERIC;
     else if( i_query == DEMUX_GET_META )
-    {        
+    {
         vlc_meta_t **pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
         if( p_demux->p_sys->p_meta )
             *pp_meta = vlc_meta_Duplicate( p_demux->p_sys->p_meta );

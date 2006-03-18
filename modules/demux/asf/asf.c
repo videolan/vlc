@@ -156,7 +156,7 @@ static int Demux( demux_t *p_demux )
             ASF_GetGUID( &guid, p_peek );
             if( ASF_CmpGUID( &guid, &asf_object_header_guid ) )
             {
-                msg_Warn( p_demux, "Found a new ASF header" );
+                msg_Warn( p_demux, "found a new ASF header" );
                 /* We end this stream */
                 DemuxEnd( p_demux );
 
@@ -366,7 +366,7 @@ static int DemuxPacket( demux_t *p_demux )
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-//        i_packet_size_left = i_packet_length;   // XXX donn�s reellement lu
+//        i_packet_size_left = i_packet_length;   // XXX data really read 
     /* FIXME I have to do that for some file, I don't known why */
     i_packet_size_left = i_data_packet_min;
 

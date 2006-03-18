@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
 #define FPS_TEXT N_("Frames per Second")
 #define FPS_LONGTEXT N_("This is the desired frame rate when " \
     "playing MJPEG from a file. Use 0 (this is the default value) for a " \
-    "live stream (from the camera).")
+    "live stream (from a camera).")
 
 vlc_module_begin();
     set_shortname( "MJPEG");
@@ -236,7 +236,7 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         }
         else
         {
-            msg_Dbg( p_demux, "Discard MIME header: %s", psz_line );
+            msg_Dbg( p_demux, "discard MIME header: %s", psz_line );
         }
         free( psz_line );
         psz_line = GetLine( p_demux, &i_pos );
@@ -408,11 +408,11 @@ static int MjpgDemux( demux_t *p_demux )
         i++;
         if( i >= p_sys->i_data_peeked )
         {
-            msg_Dbg( p_demux, "Did not find JPEG EOI in %d bytes",
+            msg_Dbg( p_demux, "did not find JPEG EOI in %d bytes",
                      p_sys->i_data_peeked );
             if( !Peek( p_demux, VLC_FALSE ) )
             {
-                msg_Warn( p_demux, "No more data is available at the moment" );
+                msg_Warn( p_demux, "no more data is available at the moment" );
                 return 0;
             }
         }
@@ -471,7 +471,7 @@ static int MimeDemux( demux_t *p_demux )
 
                 if( !Peek( p_demux, VLC_FALSE ) )
                 {
-                    msg_Warn( p_demux, "No more data is available at the "
+                    msg_Warn( p_demux, "no more data is available at the "
                               "moment" );
                     return 0;
                 }
@@ -491,7 +491,7 @@ static int MimeDemux( demux_t *p_demux )
 
     if( !b_match )
     {
-        msg_Err( p_demux, "Discard non-JPEG part" );
+        msg_Err( p_demux, "discard non-JPEG part" );
         stream_Read( p_demux->s, NULL, i );
         return 0;
     }

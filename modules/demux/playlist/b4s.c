@@ -84,7 +84,7 @@ int E_(Import_B4S)( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof(demux_sys_t) );
     if( p_sys == NULL )
     {
-        msg_Err( p_demux, "Out of memory" );
+        msg_Err( p_demux, "out of memory" );
         return VLC_ENOMEM;
     }
     p_sys->b_shout = p_demux->psz_demux &&

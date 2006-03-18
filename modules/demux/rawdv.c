@@ -396,7 +396,7 @@ static block_t *dv_extract_audio( demux_t *p_demux,
     i_audio_quant = p_buf[4] & 0x07; /* 0 - 16bit, 1 - 12bit */
     if( i_audio_quant > 1 )
     {
-        msg_Dbg( p_demux, "Unsupported quantization for DV audio");
+        msg_Dbg( p_demux, "unsupported quantization for DV audio");
         return NULL;
     }
 
@@ -451,7 +451,7 @@ static block_t *dv_extract_audio( demux_t *p_demux,
                 else
                 {
                     /* 12bit quantization */
-                    lc = ((uint16_t)p_frame[d] << 4) | 
+                    lc = ((uint16_t)p_frame[d] << 4) |
                          ((uint16_t)p_frame[d+2] >> 4);
                     lc = (lc == 0x800 ? 0 : dv_audio_12to16(lc));
 
