@@ -98,7 +98,7 @@ static void Close ( vlc_object_t * );
 #define MTUOUT_LONGTEXT N_("MTU for out mode.")
 
 #define CSA_TEXT N_("CSA ck")
-#define CSA_LONGTEXT N_("Control word for the CSa encryption algorithm")
+#define CSA_LONGTEXT N_("Control word for the CSA encryption algorithm")
 
 #define SILENT_TEXT N_("Silent mode")
 #define SILENT_LONGTEXT N_("Do not complain on encrypted PES.")
