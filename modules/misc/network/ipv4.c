@@ -103,41 +103,29 @@ vlc_module_end();
 /*****************************************************************************
  * BuildAddr: utility function to build a struct sockaddr_in
  *****************************************************************************/
-static int BuildAddr( struct sockaddr_in * p_socket,
+static int BuildAddr( vlc_object_t *p_obj, struct sockaddr_in * p_socket,
                       const char * psz_address, int i_port )
 {
-    /* Reset struct */
-    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                /* family */
-    p_socket->sin_port = htons( (uint16_t)i_port );
-    if( !*psz_address )
-    {
-        p_socket->sin_addr.s_addr = INADDR_ANY;
-    }
-    else
-    {
-        struct hostent    * p_hostent;
+    struct addrinfo hints, *res;
+    int i_val;
 
-        /* Try to convert address directly from in_addr - this will work if
-         * psz_address is dotted decimal. */
-#ifdef HAVE_ARPA_INET_H
-        if( !inet_aton( psz_address, &p_socket->sin_addr ) )
-#else
-        p_socket->sin_addr.s_addr = inet_addr( psz_address );
-        if( p_socket->sin_addr.s_addr == INADDR_NONE )
-#endif
-        {
-            /* We have a fqdn, try to find its address */
-            if ( (p_hostent = gethostbyname( psz_address )) == NULL )
-            {
-                return( -1 );
-            }
+    memset( &hints, 0, sizeof( hints ) );
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE;
 
-            /* Copy the first address of the host in the socket address */
-            memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0],
-                     p_hostent->h_length );
-        }
+    msg_Dbg( p_obj, "Resolving %s:%d...", psz_address, i_port );
+    i_val = vlc_getaddrinfo( p_obj, psz_address, i_port, &hints, &res );
+    if( i_val )
+    {
+        msg_Warn( p_obj, "%s: %s", psz_address, vlc_gai_strerror( i_val ) );
+        return -1;
     }
+
+    /* Copy the first address of the host in the socket address */
+    memcpy( p_socket, res->ai_addr, sizeof( *p_socket ) );
+    vlc_freeaddrinfo( res );
+
     return( 0 );
 }
 
@@ -243,10 +231,11 @@ static int OpenUDP( vlc_object_t * p_this )
 #if defined( WIN32 ) || defined( UNDER_CE )
     /* Under Win32 and for multicasting, we bind to INADDR_ANY,
      * so let's call BuildAddr with "" instead of psz_bind_addr */
-    if( BuildAddr( &sock, IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) ?
+    if( BuildAddr( p_this, &sock,
+        IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) ?
                    "" : psz_bind_addr, i_bind_port ) == -1 )
 #else
-    if( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
+    if( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
 #endif
     {
         msg_Dbg( p_this, "could not build local address" );
@@ -266,7 +255,7 @@ static int OpenUDP( vlc_object_t * p_this )
     /* Restore the sock struct so we can spare a few #ifdef WIN32 later on */
     if( IN_MULTICAST( ntohl( inet_addr(psz_bind_addr) ) ) )
     {
-        if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )
+        if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )
         {
             msg_Dbg( p_this, "could not build local address" );
             close( i_handle );
@@ -416,7 +405,7 @@ static int OpenUDP( vlc_object_t * p_this )
     if( *psz_server_addr )
     {
         /* Build socket for remote connection */
-        if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
+        if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
         {
             msg_Warn( p_this, "cannot build remote address" );
             close( i_handle );
